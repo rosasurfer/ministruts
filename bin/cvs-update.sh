@@ -18,9 +18,9 @@ cd ${PROJECT_ROOT}
 export CVSROOT=:pserver:${USER}:${PASS}@localhost:${PORT}/home/cvs
 cvs -d ${CVSROOT} login
 
-cvs -d ${CVSROOT} -qr checkout -PR -d php_lang -r HEAD php_lang
+#cvs -d ${CVSROOT} -qr checkout -PR -d php_lang -r HEAD php_lang
 #-------------------------------------------------------
-#cvs -d ${CVSROOT} -qr update -CPRd -r HEAD php_lang
+cvs -d ${CVSROOT} -qr update -CPRd -r HEAD php_lang
 
 cvs -d ${CVSROOT} logout
 export -n CVSROOT
