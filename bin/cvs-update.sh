@@ -39,3 +39,5 @@ find $PROJECT -follow -type d                                                   
 find $PROJECT -follow -type f   -path '*/bin*' -prune -regex '.*\.\(pl\|php\|sh\)'    -print0 | xargs -0r chmod 0754          && \
 find $PROJECT -follow -type f ! -path '*/bin*' -prune ! -perm 0644                    -print0 | xargs -0r chmod 0644          && \
 find $PROJECT -follow -name '.#*'                                                     -print0 | xargs -0r rm                  &
+
+echo
