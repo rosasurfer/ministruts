@@ -10,7 +10,7 @@ function onError($errorLevel, $msg, $file, $line, $vars) {
    static $windows = null;                   // ob PHP unter Windows läuft
 
    if (!$levels) {
-      $levels = Array(E_PARSE           => 'Parse Error',         // All levels for completeness only, in reality
+      $levels = array(E_PARSE           => 'Parse Error',         // All levels for completeness only, in reality
                       E_COMPILE_ERROR   => 'Compile Error',       // the only entries we should consider are
                       E_COMPILE_WARNING => 'Compile Warning',     // E_WARNING, E_NOTICE, E_USER_ERROR, E_USER_WARNING, E_USER_NOTICE and E_STRICT.
                       E_CORE_ERROR      => 'Core Error',
@@ -118,7 +118,7 @@ set_error_handler('onError');
  */
 function executeSql($sql, &$db) {                              // Return: array $result['set']    - das Resultset
    $sql = trim($sql);                                          //               $result['rows']   - Anzahl der zurückgegebenen oder bearbeiteten Datensätze
-   $result = Array('set'   => null,                            //               $result['error']  - eine eventuelle MySQL-Fehlermeldung
+   $result = array('set'   => null,                            //               $result['error']  - eine eventuelle MySQL-Fehlermeldung
                    'rows'  => 0,
                    'error' => null);
    if (!is_array($db)) {
@@ -339,7 +339,7 @@ function echoPre($var) {                                       // Return: void
  * @desc Gibt den aktuellen Errorlevel des Scripts in lesbarer Form zurück
  */
 function getReadableErrorLevel() {
-   $levels = Array();
+   $levels = array();
    $current = error_reporting();
    if (($current & E_ERROR          ) == E_ERROR          ) $levels[] = 'E_ERROR';
    if (($current & E_WARNING        ) == E_WARNING        ) $levels[] = 'E_WARNING';
@@ -429,7 +429,7 @@ function getRequest() {
 
    if ($_SERVER['REQUEST_METHOD']=='POST' && (int)$headers['Content-Length'] > 0) {
       if ($headers['Content-Type'] == 'application/x-www-form-urlencoded') {
-         $params = Array();
+         $params = array();
          foreach ($_POST as $name => $value) {
             $params[] = $name.'='.urlEncode($value);
          }
@@ -449,17 +449,17 @@ function getRequest() {
 /**
  * @desc Gibt alle Request-Header zurück.
  */
-function getRequestHeaders() {                                 // Return: Array
+function getRequestHeaders() {                                 // Return: array
    if (function_exists('apache_request_headers')) {
       $headers = apache_request_headers();
       if ($headers === false) {
          trigger_error('Error reading request headers, apache_request_headers(): false', E_USER_WARNING);
-         $headers = Array();
+         $headers = array();
       }
       return $headers;
    }
 
-   $headers = Array();
+   $headers = array();
    foreach ($_SERVER as $key => $value) {
       if (ereg('HTTP_(.+)', $key, $matches) > 0) {
          $key = strToLower($matches[1]);

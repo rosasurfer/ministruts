@@ -12,7 +12,7 @@
  */
 class Mailer {
 
-   var $config = Array('host'    => null,       // SMTP server host name
+   var $config = array('host'    => null,       // SMTP server host name
                        'port'    => null,       // SMTP server port
                        'auth'    => false,      // use authentification ?
                        'user'    => null,       // username
@@ -158,7 +158,7 @@ class Mailer {
       $this->log("\n----==::  Sending new mail  [from: $from] [to: $to] [subject: $subject]  :==----");
       $returnPath = "<$from>";
       if (is_array($headers)) {
-         $tmp = Array();
+         $tmp = array();
          foreach ($headers as $header) {
             $header = trim($header);
             if (strPos(strToLower($header), 'return-path:') === 0) { // is a custom 'Return-Path' header given ?

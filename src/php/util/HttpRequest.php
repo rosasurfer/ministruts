@@ -11,7 +11,7 @@ class HttpRequest {
    var $ip;
    var $port;
    var $uri;
-   var $headers = Array('User-Agent' => 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8b) Gecko/20050217',
+   var $headers = array('User-Agent' => 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8b) Gecko/20050217',
                         'Accept'     => 'text/html;q=0.9,text/plain;q=0.8,*/*;q=0.5',
                         'Connection' => 'close');
    var $cookieStore;
@@ -44,7 +44,7 @@ class HttpRequest {
          $this->headers =& array_merge($this->headers, $headers);
 
       if (!is_array(@$_SERVER['STORED_COOKIES']))
-         $_SERVER['STORED_COOKIES'] = Array();
+         $_SERVER['STORED_COOKIES'] = array();
 
       $this->cookieStore =& $_SERVER['STORED_COOKIES'];
 
@@ -102,7 +102,7 @@ class HttpRequest {
 
       // Debugging: Request-Header anzeigen
       if ($this->debug) {
-         $headers = Array();
+         $headers = array();
          $headers[] = "GET $this->uri HTTP/1.0";
          if ($this->host != $this->ip)
             $headers[] = "Host: $this->host";
@@ -113,7 +113,7 @@ class HttpRequest {
       }
 
       // Response auslesen
-      $headers = Array();
+      $headers = array();
       while (($line=trim(fGets($socket))) != '') {
          $headers[] = $line;
       }
@@ -153,7 +153,7 @@ class HttpRequest {
             $nameValue = $parts[0];
             array_shift($parts);
 
-            $sentCookie = Array();
+            $sentCookie = array();
             foreach ($parts as $part) {
                $pair =& explode('=', trim($part));
                $sentCookie[$pair[0]] = $pair[1];
@@ -190,7 +190,7 @@ class HttpRequest {
       if ($this->followRedirects && ($this->getResponseCode()==301 || $this->getResponseCode()==302)) {
          $host    = $this->host;
          $uri     =& current($this->getResponseHeader('location'));
-         $headers = Array('Referer' => 'http://'.$this->host.$this->uri);
+         $headers = array('Referer' => 'http://'.$this->host.$this->uri);
          $cookies = $this->getStoredCookies($host, $uri);
          if ($cookies) {
             $headers['Cookie'] = $cookies;
@@ -237,7 +237,7 @@ class HttpRequest {
       if (is_null($this->responseHeaderMap)) {
          if (is_null($headers=$this->getResponseHeaders()))
             return null;
-         $map = Array();
+         $map = array();
 
          foreach ($headers as $header) {
             $pos = strPos($header, ': ');
@@ -266,7 +266,7 @@ class HttpRequest {
          $map =& array_change_key_case($temp, CASE_LOWER);
       }
       $name = strToLower($name);
-      $foundHeaders = Array();
+      $foundHeaders = array();
       foreach($map as $key => $value) {
          if ($key == $name) {
             $foundHeaders[] = $value;
@@ -301,7 +301,7 @@ class HttpRequest {
     * Get all stored cookies matching the specified domain and path.
     */
    function getStoredCookies($domain, $path) {
-      $cookies = Array();
+      $cookies = array();
       $domain = strToLower($domain);
       $storedCookies =& $this->cookieStore;
       foreach ($storedCookies as $cookie) {
