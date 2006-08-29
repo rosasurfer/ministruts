@@ -4,7 +4,7 @@ PROJECT_NAME=php_lib
 
 
 # update project
-echo Updating project $PROJECT_NAME ...
+echo Updating $PROJECT_NAME ...
 
 USER=`cat ~/.cvs.shadow1`
 PASS=`cat ~/.cvs.shadow2`
