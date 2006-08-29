@@ -260,6 +260,7 @@ function checkSessionId() {                                    // Return: void
          $valid = is_file($sessionSavePath.'/sess_'.$_REQUEST[$sessionName]);
       }
       if (!$valid) {
+         //setCookie($sessionName, null, 0, '/');
          setCookie($sessionName, null);
          redirect($_SERVER['PHP_SELF'].($_SERVER['QUERY_STRING'] ? '?'.str_replace($sessionName.'='.$_REQUEST[$sessionName], '', $_SERVER['QUERY_STRING']) : ''));
       }
