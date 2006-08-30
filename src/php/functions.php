@@ -2,7 +2,7 @@
 define('WINDOWS', (strPos(strToLower(php_uname('s')), 'windows') !== false));
 
 /**
- * @desc Eigener Errorhandler.
+ * Eigener Errorhandler.
  */
 function onError($errorLevel, $msg, $file, $line, $vars) {
    static $levels  = null;
@@ -114,7 +114,7 @@ set_error_handler('onError');
 
 
 /**
- * @desc Führt in der angegebenen Datenbank eine SQL-Anweisung aus (benutzt eine evt. schon offene Verbindung).
+ * Führt in der angegebenen Datenbank eine SQL-Anweisung aus (benutzt eine evt. schon offene Verbindung).
  */
 function executeSql($sql, &$db) {                              // Return: array $result['set']    - das Resultset
    $sql = trim($sql);                                          //               $result['rows']   - Anzahl der zurückgegebenen oder bearbeiteten Datensätze
@@ -160,7 +160,7 @@ function executeSql($sql, &$db) {                              // Return: array 
 
 
 /**
- * @desc Startet eine neue Datenbank-Transaktion.
+ * Startet eine neue Datenbank-Transaktion.
  */
 function beginTransaction(&$db) {
    if (isSet($db['isTransaction']) && $db['isTransaction']) {
@@ -172,7 +172,7 @@ function beginTransaction(&$db) {
 
 
 /**
- * @desc Committed eine Datenbank-Transaktion.
+ * Committed eine Datenbank-Transaktion.
  */
 function commitTransaction(&$db) {
    if (!$db['connection']) {
@@ -190,7 +190,7 @@ function commitTransaction(&$db) {
 
 
 /**
- * @desc Rollt eine Datenbank-Transaktion zurück.
+ * Rollt eine Datenbank-Transaktion zurück.
  */
 function rollbackTransaction(&$db) {
    if (!$db['connection']) {
@@ -208,7 +208,7 @@ function rollbackTransaction(&$db) {
 
 
 /**
- * @desc Ermittelt einen evt. gesetzten 'Forwarded-IP'-Value des aktuellen Request.
+ * Ermittelt einen evt. gesetzten 'Forwarded-IP'-Value des aktuellen Request.
  */
 function getForwardedIP() {                                    // Return: string
    static $address = false;
@@ -226,7 +226,7 @@ function getForwardedIP() {                                    // Return: string
 
 
 /**
- * @desc Erzeugt eine zufällige ID der angegebenen Länge (ohne die Zeichen 0 O 1 l I, da Verwechselungsgefahr).
+ * Erzeugt eine zufällige ID der angegebenen Länge (ohne die Zeichen 0 O 1 l I, da Verwechselungsgefahr).
  */
 function getRandomId($length) {                                // Return: string
    (!isSet($length) || !is_int($length) || $length < 1) && trigger_error("Invalid argument length: $length", E_USER_ERROR);
@@ -246,7 +246,7 @@ function getRandomId($length) {                                // Return: string
 
 
 /**
- * @desc Prüft eine übergebene Session-ID. Die Session könnte verfallen oder die ID ungültig sein.
+ * Prüft eine übergebene Session-ID. Die Session könnte verfallen oder die ID ungültig sein.
  */
 function checkSessionId() {                                    // Return: void
    $sessionName = session_name();
@@ -269,7 +269,7 @@ function checkSessionId() {                                    // Return: void
 
 
 /**
- * @desc Prüft, ob eine aktuelle HttpSession existiert oder nicht.
+ * Prüft, ob eine aktuelle HttpSession existiert oder nicht.
  */
 function isSession() {                                         // Return: boolean
    return defined('SID');
@@ -277,7 +277,7 @@ function isSession() {                                         // Return: boolea
 
 
 /**
- * @desc Prüft, ob die aktuelle HttpSession neu ist oder nicht.
+ * Prüft, ob die aktuelle HttpSession neu ist oder nicht.
  */
 function isSessionNew() {                                      // Return: boolean
    static $result = null;
@@ -289,7 +289,7 @@ function isSessionNew() {                                      // Return: boolea
 
 
 /**
- * @desc Sendet einen Redirect-Header mit der angegebenen URL.
+ * Sendet einen Redirect-Header mit der angegebenen URL.
  */
 function redirect($url) {
    if (isSession()) {
@@ -309,7 +309,7 @@ function redirect($url) {
 
 
 /**
- * @desc Hilfsfunktion zur formatierten Anzeige einer Variablen (mittels <pre> Tag).
+ * Hilfsfunktion zur formatierten Anzeige einer Variablen (mittels <pre> Tag).
  */
 function printFormatted($var, $return = false) {               // Return: void   - wenn $return = false (default)
    $console = (!isSet($_SERVER['REQUEST_METHOD']));            //         string - wenn $return = true (siehe Dokumentation zu print_r())
@@ -328,7 +328,7 @@ function printFormatted($var, $return = false) {               // Return: void  
 }
 
 /**
- * @desc Alias für printFormatted().
+ * Alias für printFormatted().
  */
 function echoPre($var) {                                       // Return: void
    printFormatted($var);
@@ -336,7 +336,7 @@ function echoPre($var) {                                       // Return: void
 
 
 /**
- * @desc Gibt den aktuellen Errorlevel des Scripts in lesbarer Form zurück
+ * Gibt den aktuellen Errorlevel des Scripts in lesbarer Form zurück
  */
 function getReadableErrorLevel() {
    $levels = array();
@@ -361,7 +361,7 @@ function getReadableErrorLevel() {
 
 
 /**
- * @desc Dekodiert alle HTML-Entities zurück in ihre entsprechenden Zeichen (ISO-8859-15).
+ * Dekodiert alle HTML-Entities zurück in ihre entsprechenden Zeichen (ISO-8859-15).
  */
 function decodeHtmlEntities($html) {                           // Return: string - der dekodierte String
    $table =& get_html_translation_table(HTML_ENTITIES, ENT_QUOTES);
@@ -374,7 +374,7 @@ function decodeHtmlEntities($html) {                           // Return: string
 
 
 /**
- * @desc Prüft, ob der übergebene Parameter ein gültiges Datum darstellt (Format: yyyy-mm-dd).
+ * Prüft, ob der übergebene Parameter ein gültiges Datum darstellt (Format: yyyy-mm-dd).
  */
 function isDate($date) {                                       // Return: boolean
    if (!is_string($date)) return false;
@@ -387,7 +387,7 @@ function isDate($date) {                                       // Return: boolea
 
 
 /**
- * @desc Addiert zu einem Datum die angegebene Anzahl von Tagen (Format: yyyy-mm-dd).
+ * Addiert zu einem Datum die angegebene Anzahl von Tagen (Format: yyyy-mm-dd).
  */
 function addDate($date, $days) {                               // Return: string
    if (!isDate($date)) { trigger_error('Invalid argument \$date: '.$date, E_USER_WARNING); return null; }
@@ -403,7 +403,7 @@ function addDate($date, $days) {                               // Return: string
 
 
 /**
- * @desc Subtrahiert von einem Datum die angegebene Anzahl von Tagen (Format: yyyy-mm-dd).
+ * Subtrahiert von einem Datum die angegebene Anzahl von Tagen (Format: yyyy-mm-dd).
  */
 function subDate($date, $days) {                               // Return: string
    if (!is_int($days)) { trigger_error('Invalid argument \$days: '.$days, E_USER_WARNING); return null; }
@@ -412,7 +412,7 @@ function subDate($date, $days) {                               // Return: string
 
 
 /**
- * @desc Gibt eine lesbare Representation des HTTP-Requests zurück.
+ * Gibt eine lesbare Representation des HTTP-Requests zurück.
  */
 function getRequest() {
    $request = $_SERVER['REQUEST_METHOD'].' '.$_SERVER['REQUEST_URI'].' '.$_SERVER['SERVER_PROTOCOL']."\n";
@@ -447,7 +447,7 @@ function getRequest() {
 
 
 /**
- * @desc Gibt alle Request-Header zurück.
+ * Gibt alle Request-Header zurück.
  */
 function getRequestHeaders() {                                 // Return: array
    if (function_exists('apache_request_headers')) {
@@ -474,5 +474,40 @@ function getRequestHeaders() {                                 // Return: array
          $headers['Content-Length'] = $_SERVER['CONTENT_LENGTH'];
    }
    return $headers;
+}
+
+
+/**
+ * Ob Error-Messages existieren oder nicht.
+ */
+function isActionErrors() {                                    // Return: boolean
+   return isSet($_REQUEST['__ACTION_ERRORS__']) && sizeOf($_REQUEST['__action_errors__']);
+}
+
+
+/**
+ * Ob für den angegebenen Schlüssel eine Error-Message existiert oder nicht.
+ */
+function isActionError($key) {                                 // Return: boolean
+   return isSet($_REQUEST['__ACTION_ERRORS__'][$key]);
+}
+
+
+/**
+ * Gibt die Error-Message für den angegebenen Schlüssel zurück.
+ */
+function getActionError($key) {                                // Return: string
+   if (isActionError($key)) {
+      return $_REQUEST['__ACTION_ERRORS__'][$key];
+   }
+   return null;
+}
+
+
+/**
+ * Setzt für den angegebenen Schlüssel eine Error-Message.
+ */
+function setActionError($key, $message) {                      // Return: void
+   $_REQUEST['__ACTION_ERRORS__'][$key] = $message;
 }
 ?>
