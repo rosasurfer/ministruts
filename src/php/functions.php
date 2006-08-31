@@ -115,6 +115,8 @@ set_error_handler('onError');
 
 /**
  * Führt in der angegebenen Datenbank eine SQL-Anweisung aus (benutzt eine evt. schon offene Verbindung).
+ *
+ * @return array
  */
 function executeSql($sql, &$db) {                              // Return: array $result['set']    - das Resultset
    $sql = trim($sql);                                          //               $result['rows']   - Anzahl der zurückgegebenen oder bearbeiteten Datensätze
@@ -161,6 +163,8 @@ function executeSql($sql, &$db) {                              // Return: array 
 
 /**
  * Startet eine neue Datenbank-Transaktion.
+ *
+ * @return boolean
  */
 function beginTransaction(&$db) {
    if (isSet($db['isTransaction']) && $db['isTransaction']) {
@@ -173,6 +177,8 @@ function beginTransaction(&$db) {
 
 /**
  * Committed eine Datenbank-Transaktion.
+ *
+ * @return boolean
  */
 function commitTransaction(&$db) {
    if (!$db['connection']) {
@@ -191,6 +197,8 @@ function commitTransaction(&$db) {
 
 /**
  * Rollt eine Datenbank-Transaktion zurück.
+ *
+ * @return boolean
  */
 function rollbackTransaction(&$db) {
    if (!$db['connection']) {
@@ -209,8 +217,10 @@ function rollbackTransaction(&$db) {
 
 /**
  * Ermittelt einen evt. gesetzten 'Forwarded-IP'-Value des aktuellen Request.
+ *
+ * @return string
  */
-function getForwardedIP() {                                    // Return: string
+function getForwardedIP() {
    static $address = false;
    if ($address === false) {
       $address = $_SERVER['HTTP_X_FORWARDED_FOR'];
@@ -246,43 +256,56 @@ function getRandomId($length) {                                // Return: string
 
 
 /**
- * Prüft eine übergebene Session-ID. Die Session könnte verfallen oder die ID ungültig sein.
+ * Startet eine neue HTTP-Session oder setzt eine vorhergehende Session fort. Ist die übergebene Session-ID ungültig, wird eine neue generiert.
+ *
+ * @return boolean - ob die resultierende Session neu ist oder nicht
  */
-function checkSessionId() {                                    // Return: void
-   $sessionName = session_name();
-   if (!isSession() && isSet($_REQUEST[$sessionName])) {
-      $valid = (preg_match('/^[a-zA-Z0-9]+$/', $_REQUEST[$sessionName]));
-
-      if ($valid) {                    // !!! prüfen, ob Session mit dieser ID existiert (funktioniert nur mit File-Handler !!!
-         $sessionSavePath = session_save_path();
-         if (strPos($sessionSavePath, ';') !== false)
-            $sessionSavePath = subStr($sessionSavePath, strPos($sessionSavePath, ';') + 1);
-         $valid = is_file($sessionSavePath.'/sess_'.$_REQUEST[$sessionName]);
-      }
-      if (!$valid) {
-         //setCookie($sessionName, null, 0, '/');
-         setCookie($sessionName, null);
-         redirect($_SERVER['PHP_SELF'].($_SERVER['QUERY_STRING'] ? '?'.str_replace($sessionName.'='.$_REQUEST[$sessionName], '', $_SERVER['QUERY_STRING']) : ''));
+function startSession() {
+   if (!isSession()) {
+      $php_errormsg = null;
+      @session_start();
+      if (strPos($php_errormsg, 'The session id contains invalid characters') === 0) {
+         session_regenerate_id();
+         return true;
       }
    }
+   return isSessionNew();
 }
 
 
 /**
  * Prüft, ob eine aktuelle HttpSession existiert oder nicht.
+ *
+ * @return boolean
  */
-function isSession() {                                         // Return: boolean
+function isSession() {
    return defined('SID');
 }
 
 
 /**
  * Prüft, ob die aktuelle HttpSession neu ist oder nicht.
+ *
+ * @return boolean
  */
-function isSessionNew() {                                      // Return: boolean
-   static $result = null;
-   if ($result === null) {
-      $result = (isSession() && (!isSet($_REQUEST[session_name()]) || $_REQUEST[session_name()]!=session_id()));
+function isSessionNew() {
+   static $result = null;  // statisches Zwischenspeichern des Ergebnisses
+
+   if (is_null($result)) {
+      if (isSession()) {                                    // eine Session existiert ...
+         if (@$_REQUEST[session_name()] == session_id()) {  // ... sie kommt vom Kunden
+            $result = (sizeOf($_SESSION) == 0);             // eine leere Session muß neu sein
+         }
+         else {            // Session kommt nicht vom Kunden
+            $result = true;
+         }
+         if (sizeOf($_SESSION) == 0) {                      // leere Session initialisieren
+            $_SESSION['__SESSION_INITIALIZED__'] = 1;
+         }
+      }
+      else {               // Session existiert nicht, könnte aber noch erzeugt werden, also Ergebnis nicht speichern
+         return false;
+      }
    }
    return $result;
 }
@@ -310,6 +333,8 @@ function redirect($url) {
 
 /**
  * Hilfsfunktion zur formatierten Anzeige einer Variablen (mittels <pre> Tag).
+ *
+ * @return string
  */
 function printFormatted($var, $return = false) {               // Return: void   - wenn $return = false (default)
    $console = (!isSet($_SERVER['REQUEST_METHOD']));            //         string - wenn $return = true (siehe Dokumentation zu print_r())
@@ -325,18 +350,21 @@ function printFormatted($var, $return = false) {               // Return: void  
       return $str;
 
    echo $str;
+   return null;
 }
 
 /**
  * Alias für printFormatted().
  */
-function echoPre($var) {                                       // Return: void
+function echoPre($var) {
    printFormatted($var);
 }
 
 
 /**
- * Gibt den aktuellen Errorlevel des Scripts in lesbarer Form zurück
+ * Gibt den aktuellen Errorlevel des Scripts in lesbarer Form zurück.
+ *
+ * @return string
  */
 function getReadableErrorLevel() {
    $levels = array();
@@ -362,8 +390,10 @@ function getReadableErrorLevel() {
 
 /**
  * Dekodiert alle HTML-Entities zurück in ihre entsprechenden Zeichen (ISO-8859-15).
+ *
+ * @return string der dekodierte String
  */
-function decodeHtmlEntities($html) {                           // Return: string - der dekodierte String
+function decodeHtmlEntities($html) {
    $table =& get_html_translation_table(HTML_ENTITIES, ENT_QUOTES);
    $table =& array_flip($table);
    $table['&nbsp;'] = ' ';
@@ -375,8 +405,10 @@ function decodeHtmlEntities($html) {                           // Return: string
 
 /**
  * Prüft, ob der übergebene Parameter ein gültiges Datum darstellt (Format: yyyy-mm-dd).
+ *
+ * @return boolean
  */
-function isDate($date) {                                       // Return: boolean
+function isDate($date) {
    if (!is_string($date)) return false;
    if (!preg_match_all("/^([0-9]{4})-([0-9]{2})-([0-9]{2})$/", $date, $matches, PREG_SET_ORDER)) return false;
    $year  = $matches[0][1];
@@ -388,8 +420,10 @@ function isDate($date) {                                       // Return: boolea
 
 /**
  * Addiert zu einem Datum die angegebene Anzahl von Tagen (Format: yyyy-mm-dd).
+ *
+ * @return string
  */
-function addDate($date, $days) {                               // Return: string
+function addDate($date, $days) {
    if (!isDate($date)) { trigger_error('Invalid argument \$date: '.$date, E_USER_WARNING); return null; }
    if (!is_int($days)) { trigger_error('Invalid argument \$days: '.$days, E_USER_WARNING); return null; }
 
@@ -404,8 +438,10 @@ function addDate($date, $days) {                               // Return: string
 
 /**
  * Subtrahiert von einem Datum die angegebene Anzahl von Tagen (Format: yyyy-mm-dd).
+ *
+ * @return string
  */
-function subDate($date, $days) {                               // Return: string
+function subDate($date, $days) {
    if (!is_int($days)) { trigger_error('Invalid argument \$days: '.$days, E_USER_WARNING); return null; }
    return addDate($date, -$days);
 }
@@ -413,6 +449,8 @@ function subDate($date, $days) {                               // Return: string
 
 /**
  * Gibt eine lesbare Representation des HTTP-Requests zurück.
+ *
+ * @return string
  */
 function getRequest() {
    $request = $_SERVER['REQUEST_METHOD'].' '.$_SERVER['REQUEST_URI'].' '.$_SERVER['SERVER_PROTOCOL']."\n";
@@ -448,8 +486,10 @@ function getRequest() {
 
 /**
  * Gibt alle Request-Header zurück.
+ *
+ * @return array
  */
-function getRequestHeaders() {                                 // Return: array
+function getRequestHeaders() {
    if (function_exists('apache_request_headers')) {
       $headers = apache_request_headers();
       if ($headers === false) {
@@ -479,26 +519,30 @@ function getRequestHeaders() {                                 // Return: array
 
 /**
  * Ob Error-Messages existieren oder nicht.
- * 
+ *
  * @return boolean
  */
-function isActionErrors() {                                    
+function isActionErrors() {
    return isSet($_REQUEST['__ACTION_ERRORS__']) && sizeOf($_REQUEST['__action_errors__']);
 }
 
 
 /**
  * Ob für den angegebenen Schlüssel eine Error-Message existiert oder nicht.
+ *
+ * @return boolean
  */
-function isActionError($key) {                                 // Return: boolean
+function isActionError($key) {
    return isSet($_REQUEST['__ACTION_ERRORS__'][$key]);
 }
 
 
 /**
  * Gibt die Error-Message für den angegebenen Schlüssel zurück.
+ *
+ * @return string
  */
-function getActionError($key) {                                // Return: string
+function getActionError($key) {
    if (isActionError($key)) {
       return $_REQUEST['__ACTION_ERRORS__'][$key];
    }
@@ -509,7 +553,7 @@ function getActionError($key) {                                // Return: string
 /**
  * Setzt für den angegebenen Schlüssel eine Error-Message.
  */
-function setActionError($key, $message) {                      // Return: void
+function setActionError($key, $message) {
    $_REQUEST['__ACTION_ERRORS__'][$key] = $message;
 }
 ?>
