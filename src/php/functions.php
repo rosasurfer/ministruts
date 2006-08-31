@@ -479,8 +479,10 @@ function getRequestHeaders() {                                 // Return: array
 
 /**
  * Ob Error-Messages existieren oder nicht.
+ * 
+ * @return boolean
  */
-function isActionErrors() {                                    // Return: boolean
+function isActionErrors() {                                    
    return isSet($_REQUEST['__ACTION_ERRORS__']) && sizeOf($_REQUEST['__action_errors__']);
 }
 
