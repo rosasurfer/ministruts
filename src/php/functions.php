@@ -312,6 +312,24 @@ function isSessionNew() {
 
 
 /**
+ * Entfernt alle gespeicherten Informationen aus der aktuellen Session.
+ *
+ * @return boolean true  - alle gespeicherten Informationen wurden gelöscht
+ *                 false - ein Fehler ist aufgetreten (es existiert keine Session)
+ */
+function clearSession() {
+   if (isSession()) {
+      foreach ($_SESSION as $key => $value) {
+         if ($key != '__SESSION_INITIALIZED__') 
+            unSet($_SESSION[$key]);
+      }
+      return true;
+   }
+   return false;
+}
+
+
+/**
  * Sendet einen Redirect-Header mit der angegebenen URL.
  */
 function redirect($url) {
