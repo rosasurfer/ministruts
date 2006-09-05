@@ -466,6 +466,22 @@ function subDate($date, $days) {
 
 
 /**
+ * Formatiert einen SQL-Date- oder SQL-DateTime-Wert mit dem angegebenen Format.
+ *
+ * @return string
+ */
+function formatSqlDate($format, $sqlDate) {
+   if (!is_null($sqlDate) && $sqlDate!='0000-00-00 00:00:00') {
+      $timestamp = strToTime($sqlDate);
+
+      if (is_int($timestamp) && $timestamp >= 0) 
+         return date($format, $timestamp);
+   }
+   return null;
+}
+
+
+/**
  * Gibt eine lesbare Representation des HTTP-Requests zurück.
  *
  * @return string
