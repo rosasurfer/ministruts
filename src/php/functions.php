@@ -347,6 +347,12 @@ function redirect($url) {
    }
    header('Location: '.$url);
    exit();                       // Ausgabe weiteren Contents verhindern
+
+   /* !!!
+    * HTTP/1.1 requires an absolute URI as argument to 'Location:' including the scheme, hostname and absolute path, 
+    * but some clients accept relative URIs. You can usually use $_SERVER['HTTP_HOST'], $_SERVER['PHP_SELF'] and 
+    * dirname() to make an absolute URI from a relative one yourself.
+    */    
 }
 
 
