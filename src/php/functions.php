@@ -1,6 +1,7 @@
 <?
 define('WINDOWS', (strPos(strToLower(php_uname('s')), 'windows') !== false));
 
+
 /**
  * Eigener Errorhandler.
  */
@@ -371,11 +372,20 @@ function printFormatted($var, $return = false) {               // Return: void  
    return null;
 }
 
+
 /**
  * Alias für printFormatted().
  */
 function echoPre($var) {
    printFormatted($var);
+}
+
+
+/**
+ * Bibt den übergebenen String als JavaScript aus.
+ */
+function echoJScript($script) {
+   echo '<script language="JavaScript">'.$script.'</script>';
 }
 
 
@@ -482,6 +492,41 @@ function formatSqlDate($format, $sqlDate) {
 
 
 /**
+ * date_mysql2german
+ * wandelt ein MySQL-DATE (ISO-Date)
+ * in ein traditionelles deutsches Datum um.
+function date_mysql2german($datum) {
+    list($jahr, $monat, $tag) = explode("-", $datum);
+
+    return sprintf("%02d.%02d.%04d", $tag, $monat, $jahr);
+}         
+ */
+
+/**
+ * date_german2mysql
+ * wandelt ein traditionelles deutsches Datum
+ * nach MySQL (ISO-Date).
+function date_german2mysql($datum) {
+    list($tag, $monat, $jahr) = explode(".", $datum);
+
+    return sprintf("%04d-%02d-%02d", $jahr, $monat, $tag);
+}
+ */
+
+/**
+ * timestamp_mysql2german
+ * wandelt ein MySQL-Timestamp
+ * in ein traditionelles deutsches Datum um.
+function timestamp_mysql2german($t) {
+    return sprintf("%02d.%02d.%04d",
+                    substr($t, 6, 2),
+                    substr($t, 4, 2),
+                    substr($t, 0, 4));
+}
+*/
+
+
+/**
  * Gibt eine lesbare Representation des HTTP-Requests zurück.
  *
  * @return string
@@ -551,13 +596,15 @@ function getRequestHeaders() {
 }
 
 
+define('ACTION_ERRORS_KEY', '__ACTION_ERRORS__');
+
 /**
  * Ob Error-Messages existieren oder nicht.
  *
  * @return boolean
  */
 function isActionErrors() {
-   return isSet($_REQUEST['__ACTION_ERRORS__']) && sizeOf($_REQUEST['__action_errors__']);
+   return isSet($_REQUEST[ACTION_ERRORS_KEY]) && sizeOf($_REQUEST[ACTION_ERRORS_KEY]);
 }
 
 
@@ -567,18 +614,24 @@ function isActionErrors() {
  * @return boolean
  */
 function isActionError($key) {
-   return isSet($_REQUEST['__ACTION_ERRORS__'][$key]);
+   return isSet($_REQUEST[ACTION_ERRORS_KEY][$key]);
 }
 
 
 /**
- * Gibt die Error-Message für den angegebenen Schlüssel zurück.
+ * Gibt die Error-Message für den angegebenen Schlüssel zurück. 
+ * Ohne Schlüssel wird die erste vorhandene Error-Message zurückgegeben.
  *
  * @return string
  */
-function getActionError($key) {
-   if (isActionError($key)) {
-      return $_REQUEST['__ACTION_ERRORS__'][$key];
+function getActionError($key = null) {
+   if (is_null($key)) {
+      if (isActionErrors()) {
+         return current($_REQUEST[ACTION_ERRORS_KEY]);
+      } 
+   }
+   elseif (isActionError($key)) {
+      return $_REQUEST[ACTION_ERRORS_KEY][$key];
    }
    return null;
 }
@@ -588,6 +641,39 @@ function getActionError($key) {
  * Setzt für den angegebenen Schlüssel eine Error-Message.
  */
 function setActionError($key, $message) {
-   $_REQUEST['__ACTION_ERRORS__'][$key] = $message;
+   $_REQUEST[ACTION_ERRORS_KEY][$key] = $message;
 }
+
+
+
+
+/*
+Wie stelle ich Tabellenzeilen abwechselnd farbig dar?
+-----------------------------------------------------
+In der folgenden Funktion bgcolor() kann man beliebig viele Farben im Array $col definieren, 
+die bei jedem Aufruf der Reihe nach berücksichtigt werden. Optional kann die Funktion mit 
+einem Integer-Wert aufgerufen werden (bgcolor(n)), um immer n aufeinander folgende Zeilen 
+derselben Farbe zu erhalten.
+
+function bgcolor($row = 1) {
+    static $i;
+    static $col = array('#FFDDDD',
+                        '#DDFFDD',
+                        '#DDDDFF'
+                       ); // etc.
+    $bg = $col[(int)($i + .00000001)];
+    $i += 1 / $row;
+    if ($i >= count($col)) $i = 0;
+    return $bg;
+}
+printf("<tr bgcolor='%s'><td>...</td></tr>\n", bgcolor(2));
+
+oder mit CSS
+------------
+row0 {background-color:#FFDDDD}
+row1 {background-color:#DDFFDD}
+
+printf("<tr class='row%s'><td>...</td></tr>\n", $line % 2);
+*/
+
 ?>
