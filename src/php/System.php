@@ -2,6 +2,6 @@
 /**
  * System
  */
-class System {
+class System extends Object {
 }
 ?>

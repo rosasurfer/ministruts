@@ -1,4 +1,6 @@
 <?
+require_once('php/Object.php');
+
 /**
  * BasePdfDocument
  *
@@ -9,7 +11,7 @@
  * Note that they companion class SimplePdfDocument can be used to extend this class and dramatically
  * simplify the creation of documents.
  */
-class BasePdfDocument {
+class BasePdfDocument extends Object {
 
    /**
     * the current number of pdf objects in the document

@@ -1,16 +1,15 @@
 <?
+require_once('php/Object.php');
+
 /**
  * Mailer
- *
- *
- *
  *
  * Example:
  * --------
  * $mailer =& new Mailer();
  * $mailer->sendMail($from, $to, $subject, $message, $headers);
  */
-class Mailer {
+class Mailer extends Object {
 
    var $config = array('host'    => null,       // SMTP server host name
                        'port'    => null,       // SMTP server port

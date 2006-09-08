@@ -1,0 +1,7 @@
+<?
+/**
+ * Object
+ */
+class Object {
+}
+?>

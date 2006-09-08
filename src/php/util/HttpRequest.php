@@ -1,8 +1,10 @@
 <?
+require_once('php/Object.php');
+
 /**
  * HttpRequest
  */
-class HttpRequest {
+class HttpRequest extends Object {
 
    var $debug = false;
    var $error = false;        // whether or not an error occurred (to avoid recursions)
