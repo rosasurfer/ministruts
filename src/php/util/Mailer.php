@@ -31,6 +31,8 @@ class Mailer extends Object {
     * Default constructor
     */
    function Mailer() {
+      $this->Object();
+
       $this->debug = @$GLOBALS['debug'];
       global $smtp, $smtp_port, $smtp_use_auth, $smtp_user, $smtp_pass;
 

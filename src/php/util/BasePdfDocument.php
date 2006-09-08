@@ -187,8 +187,9 @@ class BasePdfDocument extends Object {
     * @var array array of 4 numbers, defining the bottom left and upper right corner of the page. first two are normally zero.
     */
    function BasePdfDocument($pageSize = array(0, 0, 612, 792)) {
-      $this->newDocument($pageSize);
+      $this->Object();
 
+      $this->newDocument($pageSize);
       // also initialize the font families that are known about already
       $this->setFontFamily('init');
       //$this->fileIdentifier = md5('xxxxxxxx'.time());
