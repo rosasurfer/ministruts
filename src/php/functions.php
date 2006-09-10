@@ -388,9 +388,9 @@ function echoPre($var) {
 
 
 /**
- * Bibt den übergebenen String als JavaScript aus.
+ * Gibt den übergebenen String als JavaScript aus.
  */
-function echoJScript($script) {
+function javaScript($script) {
    echo '<script language="JavaScript">'.$script.'</script>';
 }
 
