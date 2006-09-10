@@ -1,5 +1,7 @@
 <?
 define('WINDOWS', (strPos(strToLower(php_uname('s')), 'windows') !== false));
+define('ACTION_ERRORS_KEY', '__ACTION_ERRORS__');
+define('SESSION_INIT_KEY' , '__SESSION_INITIALIZED__');
 
 
 /**
@@ -301,7 +303,7 @@ function isSessionNew() {
             $result = true;
          }
          if (sizeOf($_SESSION) == 0) {                      // leere Session initialisieren
-            $_SESSION['__SESSION_INITIALIZED__'] = 1;
+            $_SESSION[SESSION_INIT_KEY] = 1;
          }
       }
       else {               // Session existiert nicht, könnte aber noch erzeugt werden, also Ergebnis nicht speichern
@@ -321,7 +323,7 @@ function isSessionNew() {
 function clearSession() {
    if (isSession()) {
       foreach ($_SESSION as $key => $value) {
-         if ($key != '__SESSION_INITIALIZED__') 
+         if ($key != SESSION_INIT_KEY) 
             unSet($_SESSION[$key]);
       }
       return true;
@@ -612,8 +614,6 @@ function getRequestHeaders() {
    return $headers;
 }
 
-
-define('ACTION_ERRORS_KEY', '__ACTION_ERRORS__');
 
 /**
  * Ob Error-Messages existieren oder nicht.
