@@ -662,6 +662,15 @@ function setActionError($key, $message) {
 }
 
 
+/**
+ * Ist <tt>$value</tt> nicht NULL, gibt die Funktion <tt>$value</tt> zurück, andererseits die Alternative <tt>$alt</tt>.
+ * 
+ * @return mixed 
+ */
+function &ifNull(&$value, $alt) {
+   return (isSet($value) ? $value : $alt);
+}
+
 
 
 /*
