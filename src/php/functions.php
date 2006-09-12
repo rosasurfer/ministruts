@@ -323,7 +323,7 @@ function isSessionNew() {
 function clearSession() {
    if (isSession()) {
       foreach ($_SESSION as $key => $value) {
-         if ($key != SESSION_INIT_KEY) 
+         if ($key != SESSION_INIT_KEY)
             unSet($_SESSION[$key]);
       }
       return true;
@@ -351,10 +351,10 @@ function redirect($url) {
    exit();                       // Ausgabe weiteren Contents verhindern
 
    /* !!!
-    * HTTP/1.1 requires an absolute URI as argument to 'Location:' including the scheme, hostname and absolute path, 
-    * but some clients accept relative URIs. You can usually use $_SERVER['HTTP_HOST'], $_SERVER['PHP_SELF'] and 
+    * HTTP/1.1 requires an absolute URI as argument to 'Location:' including the scheme, hostname and absolute path,
+    * but some clients accept relative URIs. You can usually use $_SERVER['HTTP_HOST'], $_SERVER['PHP_SELF'] and
     * dirname() to make an absolute URI from a relative one yourself.
-    */    
+    */
 }
 
 
@@ -492,18 +492,18 @@ function formatSqlDate($format, $sqlDate) {
    if (!is_null($sqlDate) && $sqlDate!='0000-00-00 00:00:00') {
       if ($sqlDate < '1970-01-01 00:00:00') {
          if ($format == 'd.m.Y') {
-            $data = explode('-', $sqlDate);   
+            $data = explode('-', $sqlDate);
             return "$data[2].$data[1].$data[0]";
          }
          else {
             trigger_error('Cannot format sql date: '.$sqlDate, E_USER_WARNING);
-         } 
+         }
       }
       else {
          $timestamp = strToTime($sqlDate);
          if (is_int($timestamp)) {
             return date($format, $timestamp);
-         } 
+         }
       }
    }
    return null;
@@ -518,7 +518,7 @@ function date_mysql2german($datum) {
     list($jahr, $monat, $tag) = explode("-", $datum);
 
     return sprintf("%02d.%02d.%04d", $tag, $monat, $jahr);
-}         
+}
  */
 
 /**
@@ -636,7 +636,7 @@ function isActionError($key) {
 
 
 /**
- * Gibt die Error-Message für den angegebenen Schlüssel zurück. 
+ * Gibt die Error-Message für den angegebenen Schlüssel zurück.
  * Ohne Schlüssel wird die erste vorhandene Error-Message zurückgegeben.
  *
  * @return string
@@ -645,7 +645,7 @@ function getActionError($key = null) {
    if (is_null($key)) {
       if (isActionErrors()) {
          return current($_REQUEST[ACTION_ERRORS_KEY]);
-      } 
+      }
    }
    elseif (isActionError($key)) {
       return $_REQUEST[ACTION_ERRORS_KEY][$key];
@@ -664,10 +664,10 @@ function setActionError($key, $message) {
 
 /**
  * Ist <tt>$value</tt> nicht NULL, gibt die Funktion <tt>$value</tt> zurück, andererseits die Alternative <tt>$alt</tt>.
- * 
- * @return mixed 
+ *
+ * @return mixed
  */
-function &ifNull(&$value, $alt) {
+function ifNull(&$value, $alt) {
    return (isSet($value) ? $value : $alt);
 }
 
@@ -676,9 +676,9 @@ function &ifNull(&$value, $alt) {
 /*
 Wie stelle ich Tabellenzeilen abwechselnd farbig dar?
 -----------------------------------------------------
-In der folgenden Funktion bgcolor() kann man beliebig viele Farben im Array $col definieren, 
-die bei jedem Aufruf der Reihe nach berücksichtigt werden. Optional kann die Funktion mit 
-einem Integer-Wert aufgerufen werden (bgcolor(n)), um immer n aufeinander folgende Zeilen 
+In der folgenden Funktion bgcolor() kann man beliebig viele Farben im Array $col definieren,
+die bei jedem Aufruf der Reihe nach berücksichtigt werden. Optional kann die Funktion mit
+einem Integer-Wert aufgerufen werden (bgcolor(n)), um immer n aufeinander folgende Zeilen
 derselben Farbe zu erhalten.
 
 function bgcolor($row = 1) {
