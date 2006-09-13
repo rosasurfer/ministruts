@@ -700,6 +700,15 @@ row0 {background-color:#FFDDDD}
 row1 {background-color:#DDFFDD}
 
 printf("<tr class='row%s'><td>...</td></tr>\n", $line % 2);
-*/
 
+
+
+----------------------------------------------------------------------------
+Indicate that script is being called by CLI (vielleicht besser für $console)
+----------------------------------------------------------------------------
+if ( php_sapi_name() == 'cli' ) {
+   $CLI = true ;
+}
+
+*/
 ?>
