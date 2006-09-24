@@ -1,6 +1,4 @@
 <?
-require_once('php/Object.php');
-
 /**
  * Mailer
  *
@@ -9,7 +7,7 @@ require_once('php/Object.php');
  * $mailer =& new Mailer();
  * $mailer->sendMail($from, $to, $subject, $message, $headers);
  */
-class Mailer extends Object {
+class Mailer {
 
    var $config = array('host'    => null,       // SMTP server host name
                        'port'    => null,       // SMTP server port
@@ -31,8 +29,6 @@ class Mailer extends Object {
     * Default constructor
     */
    function Mailer() {
-      $this->Object();
-
       $this->debug = @$GLOBALS['debug'];
       global $smtp, $smtp_port, $smtp_use_auth, $smtp_user, $smtp_pass;
 

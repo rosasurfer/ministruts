@@ -1,10 +1,8 @@
 <?
-require_once('php/Object.php');
-
 /**
  * HttpRequest
  */
-class HttpRequest extends Object {
+class HttpRequest {
 
    var $debug = false;
    var $error = false;        // whether or not an error occurred (to avoid recursions)
@@ -32,8 +30,6 @@ class HttpRequest extends Object {
     * Constructor
     */
    function HttpRequest($host, $port, $uri, $headers = null) {
-      $this->Object();
-
       if (!is_string($host)  || !$host)              trigger_error('Invalid host: '.$host, E_USER_ERROR);
       if (!is_int($port)     || $port < 1)           trigger_error('Invalid port: '.$port, E_USER_ERROR);
       if (!is_string($uri)   || !$uri)               trigger_error('Invalid uri: '.$uri, E_USER_ERROR);

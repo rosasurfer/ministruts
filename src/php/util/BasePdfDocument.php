@@ -1,6 +1,4 @@
 <?
-require_once('php/Object.php');
-
 /**
  * BasePdfDocument
  *
@@ -11,7 +9,7 @@ require_once('php/Object.php');
  * Note that they companion class SimplePdfDocument can be used to extend this class and dramatically
  * simplify the creation of documents.
  */
-class BasePdfDocument extends Object {
+class BasePdfDocument {
 
    /**
     * the current number of pdf objects in the document
@@ -187,8 +185,6 @@ class BasePdfDocument extends Object {
     * @var array array of 4 numbers, defining the bottom left and upper right corner of the page. first two are normally zero.
     */
    function BasePdfDocument($pageSize = array(0, 0, 612, 792)) {
-      $this->Object();
-
       $this->newDocument($pageSize);
       // also initialize the font families that are known about already
       $this->setFontFamily('init');
