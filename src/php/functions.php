@@ -322,7 +322,8 @@ function isSessionNew() {
  */
 function clearSession() {
    if (isSession()) {
-      foreach ($_SESSION as $key => $value) {
+      $session = $_SESSION;
+      foreach ($session as $key => $value) {
          if ($key != SESSION_INIT_KEY)
             unSet($_SESSION[$key]);
       }
