@@ -446,11 +446,16 @@ function decodeHtmlEntities($html) {
  * @return boolean
  */
 function isDate($date) {
-   if (!is_string($date)) return false;
-   if (!preg_match_all("/^([0-9]{4})-([0-9]{2})-([0-9]{2})$/", $date, $matches, PREG_SET_ORDER)) return false;
+   static $datePattern = '/^([0-9]{4})-([0-9]{2})-([0-9]{2})$/';
+
+   $matches = array();
+   if (!is_string($date) || !preg_match_all($datePattern, $date, $matches, PREG_SET_ORDER))
+      return false;
+
    $year  = $matches[0][1];
    $month = $matches[0][2];
    $day   = $matches[0][3];
+
    return checkDate((int) $month, (int) $day, (int) $year);
 }
 
@@ -461,8 +466,8 @@ function isDate($date) {
  * @return string
  */
 function addDate($date, $days) {
-   if (!isDate($date)) { trigger_error('Invalid argument \$date: '.$date, E_USER_WARNING); return null; }
-   if (!is_int($days)) { trigger_error('Invalid argument \$days: '.$days, E_USER_WARNING); return null; }
+   if (!isDate($date)) { trigger_error('Invalid argument $date: '.$date, E_USER_WARNING); return null; }
+   if (!is_int($days)) { trigger_error('Invalid argument $days: '.$days, E_USER_WARNING); return null; }
 
    $parts = explode('-', $date);
    $year  = (int) $parts[0];
