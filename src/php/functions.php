@@ -322,8 +322,8 @@ function isSessionNew() {
  */
 function clearSession() {
    if (isSession()) {
-      $session = $_SESSION;
-      foreach ($session as $key => $value) {
+      $keys = array_keys($_SESSION);
+      foreach ($keys as $key) {
          if ($key != SESSION_INIT_KEY)
             unSet($_SESSION[$key]);
       }
@@ -455,7 +455,6 @@ function isDate($date) {
    $year  = $matches[0][1];
    $month = $matches[0][2];
    $day   = $matches[0][3];
-
    return checkDate((int) $month, (int) $day, (int) $year);
 }
 
