@@ -1,11 +1,22 @@
 <?
+set_error_handler('onError');
+
+
 define('WINDOWS', (strPos(strToLower(php_uname('s')), 'windows') !== false));
-define('ACTION_ERRORS_KEY', '__ACTION_ERRORS__');
-define('SESSION_INIT_KEY' , '__SESSION_INITIALIZED__');
+define('ACTION_ERRORS_KEY', 'php.lib._ACTION_ERRORS_');
+define('SESSION_INIT_KEY' , 'php.lib._SESSION_INITIALIZED_');
 
 
 /**
  * Eigener Errorhandler.
+ *
+ * @param errorLevel -
+ * @param msg        -
+ * @param file       -
+ * @param line       -
+ * @param vars       -
+ *
+ * @throws <tt>Exception</tt>
  */
 function onError($errorLevel, $msg, $file, $line, $vars) {
    static $levels  = null;
@@ -113,7 +124,6 @@ function onError($errorLevel, $msg, $file, $line, $vars) {
          exit(1);                                                                   // bei kritischen Fehlern Script beenden
    }
 }
-set_error_handler('onError');
 
 
 /**
@@ -241,7 +251,7 @@ function getForwardedIP() {
 /**
  * Erzeugt eine zufällige ID der angegebenen Länge (ohne die Zeichen 0 O 1 l I, da Verwechselungsgefahr).
  */
-function getRandomId($length) {                                // Return: string
+function getRandomID($length) {                                // Return: string
    (!isSet($length) || !is_int($length) || $length < 1) && trigger_error("Invalid argument length: $length", E_USER_ERROR);
 
    $id = crypt(uniqId(rand(), true));                          // zufällige ID erzeugen
@@ -249,7 +259,7 @@ function getRandomId($length) {                                // Return: string
    $id = strRev(str_replace('/', '', str_replace('.', '', str_replace('$', '', str_replace('0', '', str_replace('O', '', str_replace('1', '', str_replace('l', '', str_replace('I', '', $id)))))))));
    $len = strLen($id);
    if ($len < $length) {
-      $id .= getRandomId($length-$len);                        // bis zur gewünschten Länge vergrößern ...
+      $id .= getRandomID($length-$len);                        // bis zur gewünschten Länge vergrößern ...
    }
    else {
       $id = subStr($id, 0, $length);                           // oder auf die gewünschte Länge kürzen
@@ -272,7 +282,7 @@ function startSession() {
          return true;
       }
    }
-   return isSessionNew();
+   return isNewSession();
 }
 
 
@@ -291,7 +301,7 @@ function isSession() {
  *
  * @return boolean
  */
-function isSessionNew() {
+function isNewSession() {
    static $result = null;  // statisches Zwischenspeichern des Ergebnisses
 
    if (is_null($result)) {
@@ -338,7 +348,7 @@ function clearSession() {
  */
 function redirect($url) {
    if (isSession()) {
-      if (isSessionNew() || SID!=='') {                        // bleiben wir innerhalb der Domain und Cookies sind aus, wird eine evt. Session-ID weitergegeben
+      if (isNewSession() || SID!=='') {                        // bleiben wir innerhalb der Domain und Cookies sind aus, wird eine evt. Session-ID weitergegeben
          $host = strToLower(!empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']);
          $found = preg_match_all('/^https?:\/{2,}([a-z0-9-]+(\.[a-z0-9-]+)*)*.*$/', strToLower(trim($url)), $matches, PREG_SET_ORDER);
 
@@ -430,7 +440,7 @@ function getReadableErrorLevel() {
  *
  * @return string der dekodierte String
  */
-function decodeHtmlEntities($html) {
+function decodeHTML($html) {
    $table =& get_html_translation_table(HTML_ENTITIES, ENT_QUOTES);
    $table =& array_flip($table);
    $table['&nbsp;'] = ' ';
