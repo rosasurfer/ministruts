@@ -1,10 +1,24 @@
 <?
-set_error_handler('onError');
-
-
-define('WINDOWS', (strPos(strToLower(php_uname('s')), 'windows') !== false));
 define('ACTION_ERRORS_KEY', 'php.lib._ACTION_ERRORS_');
 define('SESSION_INIT_KEY' , 'php.lib._SESSION_INITIALIZED_');
+define('WINDOWS', (strPos(strToLower(php_uname('s')), 'windows') !== false));       // ob PHP unter Windows läuft
+
+
+set_error_handler('onError');
+if (PHP_VERSION >= '5')
+   set_exception_handler('onException');
+
+
+/**
+ * Eigener Exceptionhandler.
+ *
+ * @param exception -
+ */
+function onException($exception) {
+   echoPre($exception->getTrace());
+   echoPre($exception->getTraceAsString());
+   echoPre(debug_backtrace());
+}
 
 
 /**
@@ -21,7 +35,6 @@ define('SESSION_INIT_KEY' , 'php.lib._SESSION_INITIALIZED_');
 function onError($errorLevel, $msg, $file, $line, $vars) {
    static $levels  = null;
    static $console = null;                   // ob PHP als Konsolenapplikation läuft
-   static $windows = null;                   // ob PHP unter Windows läuft
 
    if (!$levels) {
       $levels = array(E_PARSE           => 'Parse Error',         // All levels for completeness only, in reality
@@ -42,7 +55,6 @@ function onError($errorLevel, $msg, $file, $line, $vars) {
       if ($console) {
          ini_set('html_errors', '0');
       }
-      $windows = defined('WINDOWS') ? WINDOWS : (strPos(strToLower(php_uname('s')), 'windows') !== false);
    }
 
    $logLevel      =  error_reporting();
@@ -104,7 +116,7 @@ function onError($errorLevel, $msg, $file, $line, $vars) {
 
       // Fehler ins Error-Log schreiben
       if ($logErrors) {
-         $error = $windows ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $error)) : str_replace("\r\n", "\n", $error);
+         $error = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $error)) : str_replace("\r\n", "\n", $error);
          error_log(trim($error), 0);
       }
 
@@ -113,7 +125,7 @@ function onError($errorLevel, $msg, $file, $line, $vars) {
          if ($trace)
             $error .= "\n".$trace;
          $error .= "\nRequest:\n--------\n".getRequest()."\nIP: ".$_SERVER['REMOTE_ADDR']."\n---\n";
-         $error = $windows ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $error)) : str_replace("\r\n", "\n", $error);
+         $error = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $error)) : str_replace("\r\n", "\n", $error);
 
          foreach ($GLOBALS['webmasters'] as $webmaster) {
             error_log($error, 1, $webmaster, 'Subject: PHP error_log: '.$levels[$errorLevel].' at '.@$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']);
@@ -374,16 +386,13 @@ function redirect($url) {
  *
  * @return string
  */
-function printFormatted($var, $return = false) {               // Return: void   - wenn $return = false (default)
-   $console = (!isSet($_SERVER['REQUEST_METHOD']));            //         string - wenn $return = true (siehe Dokumentation zu print_r())
+function printFormatted($var, $return = false) {                  // Return: void   - wenn $return = false (default)
+   $str = (is_array($var) ? print_r($var, true) : $var)."\n";     //         string - wenn $return = true (siehe Dokumentation zu print_r())
 
-   $str = null;
-   if (!$console)
-      $str .= "<div align='left'><pre>";
+   if (isSet($_SERVER['REQUEST_METHOD'])) {
+      $str = '<div align="left"><pre>'.$str.'</pre></div>';
+   }
 
-   $str .= (is_array($var) ? print_r($var, true) : $var)."\n";
-   if (!$console)
-      $str .= '</pre></div>';
    if ($return)
       return $str;
 
