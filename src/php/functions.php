@@ -494,24 +494,24 @@ function subDate($date, $days) {
  * @return string
  */
 function formatSqlDate($format, $sqlDate) {
-   if (!is_null($sqlDate) && $sqlDate!='0000-00-00 00:00:00') {
-      if ($sqlDate < '1970-01-01 00:00:00') {
-         if ($format == 'd.m.Y') {
-            $data = explode('-', $sqlDate);
-            return "$data[2].$data[1].$data[0]";
-         }
-         else {
-            trigger_error('Cannot format sql date: '.$sqlDate, E_USER_WARNING);
-         }
+   if (is_null($sqlDate) || $sqlDate=='0000-00-00 00:00:00')
+      return null;
+
+   if ($sqlDate < '1970-01-01 00:00:00') {
+      if ($format == 'd.m.Y') {
+         $data = explode('-', $sqlDate);
+         return "$data[2].$data[1].$data[0]";
       }
       else {
-         $timestamp = strToTime($sqlDate);
-         if (is_int($timestamp)) {
-            return date($format, $timestamp);
-         }
+         trigger_error('Cannot format SQL date: '.$sqlDate, E_USER_WARNING);
       }
    }
-   return null;
+   else {
+      $timestamp = strToTime($sqlDate);
+      if (is_int($timestamp)) {
+         return date($format, $timestamp);
+      }
+   }
 }
 
 
