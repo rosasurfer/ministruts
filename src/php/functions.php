@@ -4,9 +4,9 @@ define('SESSION_INIT_KEY' , 'php.lib._SESSION_INITIALIZED_');
 define('WINDOWS', (strPos(strToLower(php_uname('s')), 'windows') !== false));       // ob PHP unter Windows läuft
 
 
-set_error_handler('onError');
 if (PHP_VERSION >= '5')
    set_exception_handler('onException');
+set_error_handler('onError');
 
 
 /**
