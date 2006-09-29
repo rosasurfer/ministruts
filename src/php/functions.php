@@ -422,7 +422,7 @@ function javaScript($script) {
  *
  * @return string
  */
-function getReadableErrorLevel() {
+function getErrorLevelAsString() {
    $levels = array();
    $current = error_reporting();
    if (($current & E_ERROR          ) == E_ERROR          ) $levels[] = 'E_ERROR';
@@ -440,7 +440,7 @@ function getReadableErrorLevel() {
    if (defined('E_STRICT')) {
       if (($current & E_STRICT      ) == E_STRICT         ) $levels[] = 'E_STRICT';
    }
-   return $current.": ".implode(' | ', $levels);
+   return $current.": ".join(' | ', $levels);
 }
 
 
@@ -692,7 +692,7 @@ function setActionError($key, $message) {
  * @return mixed
  */
 function ifNull(&$value, $alt) {
-   return (isSet($value) ? $value : $alt);
+   return isSet($value) ? $value : $alt;
 }
 
 
