@@ -143,7 +143,7 @@ function onError($errorLevel, $msg, $file, $line, $vars) {
  *
  * @return array
  */
-function executeSql($sql, &$db) {                              // Return: array $result['set']    - das Resultset
+function &executeSql($sql, &$db) {                             // Return: array $result['set']    - das Resultset
    $sql = trim($sql);                                          //               $result['rows']   - Anzahl der zurückgegebenen oder bearbeiteten Datensätze
    $result = array('set'   => null,                            //               $result['error']  - eine eventuelle MySQL-Fehlermeldung
                    'rows'  => 0,
@@ -160,9 +160,9 @@ function executeSql($sql, &$db) {                              // Return: array 
    elseif ($db['database'] && !mysql_select_db($db['database'], $db['connection'])) {     // Datenbank selektieren
       $result['error'] = ($errno = mysql_errno()) ? "Datenbank nicht gefunden\n$errno: ".mysql_error() : 'Netzwerkfehler beim Datenbankzugriff';
    }
-   elseif ($resultSet = mysql_query($sql, $db['connection'])) {                           // Abfrage abschicken
+   elseif ($resultSet =& mysql_query($sql, $db['connection'])) {                          // Abfrage abschicken
       if (is_resource($resultSet)) {
-         $result['set'] = $resultSet;
+         $result['set'] =& $resultSet;
          $result['rows'] = mysql_num_rows($resultSet);                                    // Anzahl der zurückgegebenen Zeilen auslesen
       }
       else {
