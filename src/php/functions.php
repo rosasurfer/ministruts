@@ -1,6 +1,6 @@
 <?
-define('ACTION_ERRORS_KEY', 'php.lib._ACTION_ERRORS_');
-define('SESSION_INIT_KEY' , 'php.lib._SESSION_INITIALIZED_');
+define('ACTION_ERRORS_KEY', '__ACTION_ERRORS__');
+define('SESSION_INIT_KEY' , '__SESSION_INITIALIZED__');
 define('WINDOWS', (strPos(strToLower(php_uname('s')), 'windows') !== false));       // ob PHP unter Windows läuft
 
 
