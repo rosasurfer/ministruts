@@ -160,7 +160,7 @@ function &executeSql($sql, &$db) {                             // Return: array 
    elseif ($db['database'] && !mysql_select_db($db['database'], $db['connection'])) {     // Datenbank selektieren
       $result['error'] = ($errno = mysql_errno()) ? "Datenbank nicht gefunden\n$errno: ".mysql_error() : 'Netzwerkfehler beim Datenbankzugriff';
    }
-   elseif ($resultSet =& mysql_query($sql, $db['connection'])) {                          // Abfrage abschicken
+   elseif ($resultSet = mysql_query($sql, $db['connection'])) {                           // Abfrage abschicken
       if (is_resource($resultSet)) {
          $result['set'] =& $resultSet;
          $result['rows'] = mysql_num_rows($resultSet);                                    // Anzahl der zurückgegebenen Zeilen auslesen
