@@ -1,18 +1,46 @@
 <?
-define('ACTION_ERRORS_KEY', '__ACTION_ERRORS__');
-define('SESSION_INIT_KEY' , '__SESSION_INITIALIZED__');
 define('WINDOWS', (strPos(strToLower(php_uname('s')), 'windows') !== false));       // ob PHP unter Windows läuft
 
 
-if (PHP_VERSION >= '5')
+if (function_exists('set_exception_handler'))   // ab PHP 5
    set_exception_handler('onException');
 set_error_handler('onError');
+
+
+
+/**
+ * Lädt die Definition der angegebenen Klasse (ab PHP 5).
+ *
+ * @param className - Klassenname
+ */
+function __autoload($className) {
+   static $classes = null;
+   if (is_null($classes)) {
+
+
+      // Hier werden alle Klassendefinitionen der Library mit dem Pfad der entprechenden PHP-Datei aufgeführt.
+      $classes = array('AbstractActionForm' => 'php/actions/AbstractActionForm.php',
+
+                       'BasePdfDocument'    => 'php/util/BasePdfDocument.php',
+                       'HttpRequest'        => 'php/util/HttpRequest.php',
+                       'Mailer'             => 'php/util/Mailer.php',
+                       'SimplePdfDocument'  => 'php/util/SimplePdfDocument.php',
+      );
+
+      // Hinzuladen zusätzlicher, projektspezifischer Definitionen. Das Array mit den Definitionen MUSS '$__autoloadClasses' heißen.
+      if (isSet($GLOBALS['__autoloadClasses']) && getType($GLOBALS['__autoloadClasses'])=='array')
+         $classes =& array_merge($classes, $GLOBALS['__autoloadClasses']);
+   }
+
+   if (isSet($classes[$className]))
+      require_once($classes[$className]);
+}
 
 
 /**
  * Eigener Exceptionhandler.
  *
- * @param exception -
+ * @param exception - ausgelöste Exception, die behandelt werden soll
  */
 function onException($exception) {
    echoPre($exception->getTrace());
@@ -325,7 +353,7 @@ function isNewSession() {
             $result = true;
          }
          if (sizeOf($_SESSION) == 0) {                      // leere Session initialisieren
-            $_SESSION[SESSION_INIT_KEY] = 1;
+            $_SESSION['__INITIALIZED__'] = 1;
          }
       }
       else {               // Session existiert nicht, könnte aber noch erzeugt werden, also Ergebnis nicht speichern
@@ -346,7 +374,7 @@ function clearSession() {
    if (isSession()) {
       $keys = array_keys($_SESSION);
       foreach ($keys as $key) {
-         if ($key != SESSION_INIT_KEY)
+         if ($key != '__INITIALIZED__')
             unSet($_SESSION[$key]);
       }
       return true;
@@ -450,8 +478,7 @@ function getErrorLevelAsString() {
  * @return string der dekodierte String
  */
 function decodeHTML($html) {
-   $table =& get_html_translation_table(HTML_ENTITIES, ENT_QUOTES);
-   $table =& array_flip($table);
+   $table =& array_flip(get_html_translation_table(HTML_ENTITIES, ENT_QUOTES));
    $table['&nbsp;'] = ' ';
    $table['&euro;'] = '€';
    $string = strTr($html, $table);
@@ -645,7 +672,7 @@ function getRequestHeaders() {
  * @return boolean
  */
 function isActionErrors() {
-   return isSet($_REQUEST[ACTION_ERRORS_KEY]) && sizeOf($_REQUEST[ACTION_ERRORS_KEY]);
+   return isSet($_REQUEST['__ACTION_ERRORS__']) && sizeOf($_REQUEST['__ACTION_ERRORS__']);
 }
 
 
@@ -655,7 +682,7 @@ function isActionErrors() {
  * @return boolean
  */
 function isActionError($key) {
-   return isSet($_REQUEST[ACTION_ERRORS_KEY][$key]);
+   return isSet($_REQUEST['__ACTION_ERRORS__'][$key]);
 }
 
 
@@ -668,11 +695,11 @@ function isActionError($key) {
 function getActionError($key = null) {
    if (is_null($key)) {
       if (isActionErrors()) {
-         return current($_REQUEST[ACTION_ERRORS_KEY]);
+         return current($_REQUEST['__ACTION_ERRORS__']);
       }
    }
    elseif (isActionError($key)) {
-      return $_REQUEST[ACTION_ERRORS_KEY][$key];
+      return $_REQUEST['__ACTION_ERRORS__'][$key];
    }
    return null;
 }
@@ -682,7 +709,7 @@ function getActionError($key = null) {
  * Setzt für den angegebenen Schlüssel eine Error-Message.
  */
 function setActionError($key, $message) {
-   $_REQUEST[ACTION_ERRORS_KEY][$key] = $message;
+   $_REQUEST['__ACTION_ERRORS__'][$key] = $message;
 }
 
 
@@ -726,13 +753,11 @@ row1 {background-color:#DDFFDD}
 printf("<tr class='row%s'><td>...</td></tr>\n", $line % 2);
 
 
-
 ----------------------------------------------------------------------------
 Indicate that script is being called by CLI (vielleicht besser für $console)
 ----------------------------------------------------------------------------
 if ( php_sapi_name() == 'cli' ) {
    $CLI = true ;
 }
-
 */
 ?>
