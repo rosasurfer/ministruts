@@ -115,8 +115,8 @@ function onError($errorLevel, $msg, $file, $line, $vars) {
          }
 
          array_shift($stackTrace);                             // Der erste Frame kann weg, er ist der Errorhandler selbst.
-         if ($stackTrace[0]['function'] == 'trigger_error')
-            array_shift($stackTrace);                          // Ist der nächste ein 'trigger_error'-Frame, kann auch der weg.
+         if (!isSet($stackTrace[0]['file']))
+            array_shift($stackTrace);                          // Ist der nächste Frame ein interner PHP-Error, kann auch der weg.
 
          $size = sizeOf($stackTrace);
          if ($size > 1) {
