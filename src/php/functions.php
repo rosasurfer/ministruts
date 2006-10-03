@@ -99,7 +99,7 @@ function onError($errorLevel, $msg, $file, $line, $vars) {
       if ($errorLevel != E_NOTICE || (subStr($msg, 0, 25)!='Use of undefined constant' && subStr($msg, 0, 20)!='Undefined variable: ')) {
          $stackTrace = debug_backtrace();
 
-         // Damit die Zuordnung stimmt, werden FILE und LINE eine Position nach hinten verschoben.
+         // Damit die Zuordnung stimmt (wie in Java), werden FILE und LINE jeweils einen Frame nach unten verschoben.
          $stackTrace[] = array('function'=>'main');
          $size = sizeOf($stackTrace);
          for ($i=$size; $i-- > 0;) {
@@ -116,7 +116,7 @@ function onError($errorLevel, $msg, $file, $line, $vars) {
 
          array_shift($stackTrace);                             // Der erste Frame kann weg, er ist der Errorhandler selbst.
          if ($stackTrace[0]['function'] == 'trigger_error')
-            array_shift($stackTrace);                          // Ist der nächste ein 'trigger_error'-Frame, kann er auch weg.
+            array_shift($stackTrace);                          // Ist der nächste ein 'trigger_error'-Frame, kann auch der weg.
 
          $size = sizeOf($stackTrace);
          if ($size > 1) {
@@ -127,12 +127,12 @@ function onError($errorLevel, $msg, $file, $line, $vars) {
             $callLen = $lineLen = 0;
             for ($i=0; $i < $size; $i++) {
                $frame =& $stackTrace[$i];
-               $call = '';
+               $call = null;
                if (isSet($frame['class']))
-                  $call = (PHP_VERSION<'5' ? ucFirst($frame['class']):$frame['class']).(isSet($frame['type']) ? $frame['type'] : '.');
-               $call .= $frame['function'];
-               $frame['call'] = $call.'():';
-               $callLen = max($callLen, strLen($frame['call']));
+                  $call = (PHP_VERSION<'5' ? ucFirst($frame['class']):$frame['class']).$frame['type'];
+               $call .= $frame['function'].'():';
+               $callLen = max($callLen, strLen($call));
+               $frame['call'] = $call;
 
                $frame['line'] = isSet($frame['line']) ? " # line $frame[line]," : '';
                $lineLen = max($lineLen, strLen($frame['line']));
