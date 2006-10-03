@@ -99,15 +99,15 @@ function onError($errorLevel, $msg, $file, $line, $vars) {
       if ($errorLevel != E_NOTICE || (subStr($msg, 0, 25)!='Use of undefined constant' && subStr($msg, 0, 20)!='Undefined variable: ')) {
          $stackTrace = debug_backtrace();
          array_shift($stackTrace);                       // drop the first element, it's this function itself
-         $sizeOfStackTrace = sizeOf($stackTrace);
+         $size = sizeOf($stackTrace);
 
-         if ($sizeOfStackTrace > 1) {
+         if ($size > 1) {
             $trace  = "Stacktrace:\n";
             $trace .= "-----------\n";
 
             // formatieren (PHP style)
             $callLen = $lineLen = 0;
-            for ($i=0; $i < $sizeOfStackTrace; $i++) {
+            for ($i=0; $i < $size; $i++) {
                $frame =& $stackTrace[$i];
                $call = '';
                if (isSet($frame['class']))
@@ -119,9 +119,9 @@ function onError($errorLevel, $msg, $file, $line, $vars) {
                $frame['line'] = isSet($frame['line']) ? " # line $frame[line]," : '';
                $lineLen = max($lineLen, strLen($frame['line']));
 
-               $frame['file'] = isSet($frame['file']) ? " file: $frame[file]" : ' [PHP kernel]';
+               $frame['file'] = isSet($frame['file']) ? " file: $frame[file]" : ' [php]';
             }
-            for ($i=0; $i < $sizeOfStackTrace; $i++) {
+            for ($i=0; $i < $size; $i++) {
                $trace .= str_pad($stackTrace[$i]['call'], $callLen).str_pad($stackTrace[$i]['line'], $lineLen).$stackTrace[$i]['file']."\n";
             }
          }
@@ -136,7 +136,7 @@ function onError($errorLevel, $msg, $file, $line, $vars) {
             echo "</div>";
          }
          else {
-            echo $error;                                 // PHP-Linux gibt den Fehler zusätzlich auf stderr aus,
+            echo $error;                                 // PHP gibt den Fehler unter Linux zusätzlich auf stderr aus,
             if ($trace)                                  // also auf der Konsole ggf. unterdrücken ( 2>/dev/null )
                printFormatted("\n".$trace);
          }
