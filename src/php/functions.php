@@ -87,8 +87,8 @@ function onError($errorLevel, $msg, $file, $line, $vars) {
 
    $logLevel      =  error_reporting();
    $logErrors     = (ini_get('log_errors') == '1');
-   $mailErrors    = !$console && $_SERVER['REMOTE_ADDR']!='127.0.0.1';           // nur, wenn nicht auf der Konsole und nicht auf localhost
-   $displayErrors =  $console || $_SERVER['REMOTE_ADDR']=='127.0.0.1';           // Anzeige im Browser nur, wenn auf localhost
+   $mailErrors    = !$console && $_SERVER['REMOTE_ADDR']!='127.0.0.1';     // nur, wenn nicht auf der Konsole und nicht auf localhost
+   $displayErrors =  $console || $_SERVER['REMOTE_ADDR']=='127.0.0.1';     // Anzeige im Browser nur, wenn auf localhost
    $htmlErrors    = !$console;
 
    if (($logLevel & $errorLevel) == $errorLevel) {
@@ -98,22 +98,40 @@ function onError($errorLevel, $msg, $file, $line, $vars) {
       $trace = null;
       if ($errorLevel != E_NOTICE || (subStr($msg, 0, 25)!='Use of undefined constant' && subStr($msg, 0, 20)!='Undefined variable: ')) {
          $stackTrace = debug_backtrace();
-         array_shift($stackTrace);                       // drop the first element, it's this function itself
-         $size = sizeOf($stackTrace);
 
+         // Damit die Zuordnung stimmt, werden FILE und LINE eine Position nach hinten verschoben.
+         $stackTrace[] = array('function'=>'main');
+         $size = sizeOf($stackTrace);
+         for ($i=$size; $i-- > 0;) {
+            if (isSet($stackTrace[$i-1]['file']))
+               $stackTrace[$i]['file'] = $stackTrace[$i-1]['file'];
+            else
+               unset($stackTrace[$i]['file']);
+
+            if (isSet($stackTrace[$i-1]['line']))
+               $stackTrace[$i]['line'] = $stackTrace[$i-1]['line'];
+            else
+               unset($stackTrace[$i]['line']);
+         }
+
+         array_shift($stackTrace);                             // Der erste Frame kann weg, er ist der Errorhandler selbst.
+         if ($stackTrace[0]['function'] == 'trigger_error')
+            array_shift($stackTrace);                          // Ist der nächste ein 'trigger_error'-Frame, kann er auch weg.
+
+         $size = sizeOf($stackTrace);
          if ($size > 1) {
             $trace  = "Stacktrace:\n";
             $trace .= "-----------\n";
 
-            // formatieren (PHP style)
+            // Stacktrace formatieren
             $callLen = $lineLen = 0;
             for ($i=0; $i < $size; $i++) {
                $frame =& $stackTrace[$i];
                $call = '';
                if (isSet($frame['class']))
-                  $call = ucFirst($frame['class']).(isSet($frame['type']) ? $frame['type'] : '.');
+                  $call = (PHP_VERSION<'5' ? ucFirst($frame['class']):$frame['class']).(isSet($frame['type']) ? $frame['type'] : '.');
                $call .= $frame['function'];
-               $frame['call'] = $call.(($frame['function']=='include' || $frame['function']=='include_once' || $frame['function']=='require' || $frame['function']=='require_once') ? ':':'():');
+               $frame['call'] = $call.'():';
                $callLen = max($callLen, strLen($frame['call']));
 
                $frame['line'] = isSet($frame['line']) ? " # line $frame[line]," : '';
@@ -160,8 +178,9 @@ function onError($errorLevel, $msg, $file, $line, $vars) {
          }
       }
 
+      // bei kritischen Fehlern Script beenden
       if ($errorLevel & (E_PARSE | E_COMPILE_ERROR | E_CORE_ERROR | E_ERROR | E_USER_ERROR))
-         exit(1);                                                                   // bei kritischen Fehlern Script beenden
+         exit(1);
    }
 }
 
