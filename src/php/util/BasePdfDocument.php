@@ -1282,305 +1282,341 @@ class BasePdfDocument {
    }
 
    /**
-    * open the font file and return a php structure containing it.
-    * first check if this one has been done before and saved in a form more suited to php
-    * note that if a php serialized version does not exist it will try and make one, but will
-    * require write access to the directory to do it... it is MUCH faster to have these serialized
+    * Open the font file and return a php structure containing it.
+    * First check if this one has been done before and saved in a form more suited to php.
+    * Note that if a php serialized version does not exist it will try and make one, but will
+    * require write access to the directory to do it. It is MUCH faster to have these serialized
     * files.
     *
     * @access private
     */
-   function openFont($font){
-     // assume that $font contains both the path and perhaps the extension to the file, split them
-     $pos=strrpos($font,'/');
-     if ($pos===false){
-       $dir = './';
-       $name = $font;
-     } else {
-       $dir=substr($font,0,$pos+1);
-       $name=substr($font,$pos+1);
-     }
+   function openFont($font) {
+      // assume that $font contains both the path and perhaps the extension to the file, split them
+      $pos = strRPos($font,'/');
+      if ($pos === false) {
+         $dir = './';
+         $name = $font;
+      }
+      else {
+         $dir = subStr($font, 0, $pos+1);
+         $name = subStr($font, $pos+1);
+      }
 
-     if (substr($name,-4)=='.afm'){
-       $name=substr($name,0,strlen($name)-4);
-     }
-     $this->addMessage('openFont: '.$font.' - '.$name);
-     if (file_exists($dir.'php_'.$name.'.afm')){
-       $this->addMessage('openFont: php file exists '.$dir.'php_'.$name.'.afm');
-       $tmp = file($dir.'php_'.$name.'.afm');
-       $this->fonts[$font]=unserialize($tmp[0]);
-       if (!isset($this->fonts[$font]['_version_']) || $this->fonts[$font]['_version_']<1){
-         // if the font file is old, then clear it out and prepare for re-creation
-         $this->addMessage('openFont: clear out, make way for new version.');
-         unset($this->fonts[$font]);
-       }
-     }
-     if (!isset($this->fonts[$font]) && file_exists($dir.$name.'.afm')){
-       // then rebuild the php_<font>.afm file from the <font>.afm file
-       $this->addMessage('openFont: build php file from '.$dir.$name.'.afm');
-       $data = array();
-       $file = file($dir.$name.'.afm');
-       foreach ($file as $rowA){
-         $row=trim($rowA);
-         $pos=strpos($row,' ');
-         if ($pos){
-           // then there must be some keyword
-           $key = substr($row,0,$pos);
-           switch ($key){
-             case 'FontName':
-             case 'FullName':
-             case 'FamilyName':
-             case 'Weight':
-             case 'ItalicAngle':
-             case 'IsFixedPitch':
-             case 'CharacterSet':
-             case 'UnderlinePosition':
-             case 'UnderlineThickness':
-             case 'Version':
-             case 'EncodingScheme':
-             case 'CapHeight':
-             case 'XHeight':
-             case 'Ascender':
-             case 'Descender':
-             case 'StdHW':
-             case 'StdVW':
-             case 'StartCharMetrics':
-               $data[$key]=trim(substr($row,$pos));
-               break;
-             case 'FontBBox':
-               $data[$key]=explode(' ',trim(substr($row,$pos)));
-               break;
-             case 'C':
-               //C 39 ; WX 222 ; N quoteright ; B 53 463 157 718 ;
-               $bits=explode(';',trim($row));
-               $dtmp=array();
-               foreach($bits as $bit){
-                 $bits2 = explode(' ',trim($bit));
-                 if (strlen($bits2[0])){
-                   if (count($bits2)>2){
-                     $dtmp[$bits2[0]]=array();
-                     for ($i=1;$i<count($bits2);$i++){
-                       $dtmp[$bits2[0]][]=$bits2[$i];
-                     }
-                   } else if (count($bits2)==2){
-                     $dtmp[$bits2[0]]=$bits2[1];
-                   }
-                 }
-               }
-               if ($dtmp['C']>=0){
-                 $data['C'][$dtmp['C']]=$dtmp;
-                 $data['C'][$dtmp['N']]=$dtmp;
-               } else {
-                 $data['C'][$dtmp['N']]=$dtmp;
-               }
-               break;
-             case 'KPX':
-               //KPX Adieresis yacute -40
-               $bits=explode(' ',trim($row));
-               $data['KPX'][$bits[1]][$bits[2]]=$bits[3];
-               break;
-           }
+      if (subStr($name, -4) == '.afm') {
+         $name = subStr($name, 0, strLen($name)-4);
+      }
+      $this->addMessage('openFont: '.$font.' - '.$name);
+
+      if (file_exists($dir.'php_'.$name.'.afm')) {
+         $this->addMessage('openFont: php file exists '.$dir.'php_'.$name.'.afm');
+         $tmp = file($dir.'php_'.$name.'.afm');
+         $this->fonts[$font] = unSerialize($tmp[0]);
+         if (!isSet($this->fonts[$font]['_version_']) || $this->fonts[$font]['_version_'] < 1) {
+            // if the font file is old, then clear it out and prepare for re-creation
+            $this->addMessage('openFont: clear out, make way for new version.');
+            unset($this->fonts[$font]);
          }
-       }
-       $data['_version_']=1;
-       $this->fonts[$font]=$data;
-       $fp = fopen($dir.'php_'.$name.'.afm','w');
-       fwrite($fp,serialize($data));
-       fclose($fp);
-     } else if (!isset($this->fonts[$font])){
-       $this->addMessage('openFont: no font file found');
-   //    echo 'Font not Found '.$font;
-     }
+      }
+
+      if (!isSet($this->fonts[$font]) && file_exists($dir.$name.'.afm')) {
+         // then rebuild the php_<font>.afm file from the <font>.afm file
+         $this->addMessage('openFont: build php file from '.$dir.$name.'.afm');
+         $data = array();
+         $file = file($dir.$name.'.afm');
+         foreach ($file as $rowA) {
+            $row = trim($rowA);
+            $pos = strPos($row, ' ');
+            if ($pos) {
+               // then there must be some keyword
+               $key = subStr($row, 0, $pos);
+               switch ($key) {
+                  case 'FontName':
+                  case 'FullName':
+                  case 'FamilyName':
+                  case 'Weight':
+                  case 'ItalicAngle':
+                  case 'IsFixedPitch':
+                  case 'CharacterSet':
+                  case 'UnderlinePosition':
+                  case 'UnderlineThickness':
+                  case 'Version':
+                  case 'EncodingScheme':
+                  case 'CapHeight':
+                  case 'XHeight':
+                  case 'Ascender':
+                  case 'Descender':
+                  case 'StdHW':
+                  case 'StdVW':
+                  case 'StartCharMetrics':
+                     $data[$key] = trim(subStr($row, $pos));
+                     break;
+                  case 'FontBBox':
+                     $data[$key] = explode(' ', trim(subStr($row, $pos)));
+                     break;
+                  case 'C':
+                     //C 39 ; WX 222 ; N quoteright ; B 53 463 157 718 ;
+                     $bits = explode(';', trim($row));
+                     $dtmp = array();
+                     foreach ($bits as $bit) {
+                        $bits2 = explode(' ',trim($bit));
+                        if (strLen($bits2[0])) {
+                           if (count($bits2) > 2) {
+                              $dtmp[$bits2[0]] = array();
+                              for ($i=1; $i < count($bits2); $i++) {
+                                 $dtmp[$bits2[0]][] = $bits2[$i];
+                              }
+                           }
+                           else if (count($bits2) == 2) {
+                              $dtmp[$bits2[0]] = $bits2[1];
+                           }
+                        }
+                     }
+                     if ($dtmp['C'] >= 0) {
+                        $data['C'][$dtmp['C']] = $dtmp;
+                        $data['C'][$dtmp['N']] = $dtmp;
+                     }
+                     else {
+                        $data['C'][$dtmp['N']] = $dtmp;
+                     }
+                     break;
+                  case 'KPX':
+                     //KPX Adieresis yacute -40
+                     $bits = explode(' ', trim($row));
+                     $data['KPX'][$bits[1]][$bits[2]] = $bits[3];
+                     break;
+               }
+            }
+         }
+         $data['_version_'] = 1;
+         $this->fonts[$font] = $data;
+         $fp = fOpen($dir.'php_'.$name.'.afm','w');
+         fWrite($fp, serialize($data));
+         fClose($fp);
+      }
+      else if (!isSet($this->fonts[$font])){
+         $this->addMessage('openFont: no font file found');
+         // echo 'Font not Found '.$font;
+      }
    }
 
+
    /**
-    * if the font is not loaded then load it and make the required object
-    * else just make it the current font
-    * the encoding array can contain 'encoding'=> 'none','WinAnsiEncoding','MacRomanEncoding' or 'MacExpertEncoding'
-    * note that encoding='none' will need to be used for symbolic fonts
+    * If the font is not loaded then load it and make the required object
+    * else just make it the current font.  Searches the include_path if $fontName is not found.
+    * The encoding array can contain 'encoding'=> 'none','WinAnsiEncoding','MacRomanEncoding' or 'MacExpertEncoding'.
+    * Note that encoding='none' will need to be used for symbolic fonts
     * and 'differences' => an array of mappings between numbers 0->255 and character names.
-    *
     */
-   function selectFont($fontName,$encoding='',$set=1){
-     if (!isset($this->fonts[$fontName])){
-       // load the file
-       $this->openFont($fontName);
-       if (isset($this->fonts[$fontName])){
-         $this->numObj++;
-         $this->numFonts++;
-         $pos=strrpos($fontName,'/');
-   //      $dir=substr($fontName,0,$pos+1);
-         $name=substr($fontName,$pos+1);
-         if (substr($name,-4)=='.afm'){
-           $name=substr($name,0,strlen($name)-4);
+   function selectFont($fontName, $encoding='', $set=1) {
+      if (!is_file($fontName)) {
+         $paths = explode(PATH_SEPARATOR, ini_get('include_path'));
+         $found = null;
+         foreach ($paths as $path) {
+            if (is_file($path.DIRECTORY_SEPARATOR.$fontName)) {
+               $found = $path.DIRECTORY_SEPARATOR.$fontName;
+               break;
+            }
          }
-         $options=array('name'=>$name);
-         if (is_array($encoding)){
-           // then encoding and differences might be set
-           if (isset($encoding['encoding'])){
-             $options['encoding']=$encoding['encoding'];
-           }
-           if (isset($encoding['differences'])){
-             $options['differences']=$encoding['differences'];
-           }
-         } else if (strlen($encoding)){
-           // then perhaps only the encoding has been set
-           $options['encoding']=$encoding;
+         if (is_null($found)) {
+            trigger_error('File not found: '.$fontName, E_USER_WARNING);
          }
-         $fontObj = $this->numObj;
-         $this->o_font($this->numObj,'new',$options);
-         $this->fonts[$fontName]['fontNum']=$this->numFonts;
-         // if this is a '.afm' font, and there is a '.pfa' file to go with it ( as there
-         // should be for all non-basic fonts), then load it into an object and put the
-         // references into the font object
-         $basefile = substr($fontName,0,strlen($fontName)-4);
-         if (file_exists($basefile.'.pfb')){
-           $fbtype = 'pfb';
-         } else if (file_exists($basefile.'.ttf')){
-           $fbtype = 'ttf';
-         } else {
-           $fbtype='';
+         else {
+            $fontName = $found;
          }
-         $fbfile = $basefile.'.'.$fbtype;
+         unset($paths, $path, $found);
+      }
 
-   //      $pfbfile = substr($fontName,0,strlen($fontName)-4).'.pfb';
-   //      $ttffile = substr($fontName,0,strlen($fontName)-4).'.ttf';
-         $this->addMessage('selectFont: checking for - '.$fbfile);
-         if (substr($fontName,-4)=='.afm' && strlen($fbtype) ){
-           $adobeFontName = $this->fonts[$fontName]['FontName'];
-   //        $fontObj = $this->numObj;
-           $this->addMessage('selectFont: adding font file - '.$fbfile.' - '.$adobeFontName);
-           // find the array of fond widths, and put that into an object.
-           $firstChar = -1;
-           $lastChar = 0;
-           $widths = array();
-           foreach ($this->fonts[$fontName]['C'] as $num=>$d){
-             if (intval($num)>0 || $num=='0'){
-               if ($lastChar>0 && $num>$lastChar+1){
-                 for($i=$lastChar+1;$i<$num;$i++){
-                   $widths[] = 0;
-                 }
+      if (!isSet($this->fonts[$fontName])) {
+         // load the file
+         $this->openFont($fontName);
+
+         if (isSet($this->fonts[$fontName])) {
+            $this->numObj++;
+            $this->numFonts++;
+            $pos = strRPos($fontName, '/');
+         // $dir = subStr($fontName, 0, $pos+1);
+            $name = subStr($fontName, $pos+1);
+            if (substr($name, -4) == '.afm') {
+               $name = subStr($name, 0, strLen($name)-4);
+            }
+            $options = array('name' => $name);
+            if (is_array($encoding)) {
+               // then encoding and differences might be set
+               if (isSet($encoding['encoding'])) {
+                  $options['encoding'] = $encoding['encoding'];
                }
-               $widths[] = $d['WX'];
-               if ($firstChar==-1){
-                 $firstChar = $num;
+               if (isSet($encoding['differences'])) {
+                  $options['differences'] = $encoding['differences'];
                }
-               $lastChar = $num;
-             }
-           }
-           // also need to adjust the widths for the differences array
-           if (isset($options['differences'])){
-             foreach($options['differences'] as $charNum=>$charName){
-               if ($charNum>$lastChar){
-                 for($i=$lastChar+1;$i<=$charNum;$i++){
-                   $widths[]=0;
-                 }
-                 $lastChar=$charNum;
+            }
+            else if (strLen($encoding)) {
+               // then perhaps only the encoding has been set
+               $options['encoding'] = $encoding;
+            }
+            $fontObj = $this->numObj;
+            $this->o_font($this->numObj, 'new', $options);
+            $this->fonts[$fontName]['fontNum'] = $this->numFonts;
+            // if this is a '.afm' font, and there is a '.pfa' file to go with it (as there
+            // should be for all non-basic fonts), then load it into an object and put the
+            // references into the font object
+            $basefile = subStr($fontName, 0, strLen($fontName)-4);
+            if (file_exists($basefile.'.pfb')) {
+               $fbtype = 'pfb';
+            }
+            else if (file_exists($basefile.'.ttf')) {
+               $fbtype = 'ttf';
+            }
+            else {
+               $fbtype = '';
+            }
+            $fbfile = $basefile.'.'.$fbtype;
+
+            // $pfbfile = subStr($fontName, 0, strLen($fontName)-4).'.pfb';
+            // $ttffile = subStr($fontName, 0, strLen($fontName)-4).'.ttf';
+            $this->addMessage('selectFont: checking for - '.$fbfile);
+            if (subStr($fontName, -4) == '.afm' && strLen($fbtype)) {
+               $adobeFontName = $this->fonts[$fontName]['FontName'];
+               // $fontObj = $this->numObj;
+               $this->addMessage('selectFont: adding font file - '.$fbfile.' - '.$adobeFontName);
+               // find the array of fond widths, and put that into an object.
+               $firstChar = -1;
+               $lastChar = 0;
+               $widths = array();
+               foreach ($this->fonts[$fontName]['C'] as $num => $d) {
+                  if (intVal($num) > 0 || $num=='0') {
+                     if ($lastChar > 0 && $num > $lastChar+1) {
+                        for ($i=$lastChar+1; $i < $num; $i++) {
+                           $widths[] = 0;
+                        }
+                     }
+                     $widths[] = $d['WX'];
+                     if ($firstChar == -1) {
+                        $firstChar = $num;
+                     }
+                     $lastChar = $num;
+                  }
                }
-               if (isset($this->fonts[$fontName]['C'][$charName])){
-                 $widths[$charNum-$firstChar]=$this->fonts[$fontName]['C'][$charName]['WX'];
+               // also need to adjust the widths for the differences array
+               if (isSet($options['differences'])) {
+                  foreach($options['differences'] as $charNum => $charName) {
+                     if ($charNum > $lastChar) {
+                        for ($i=$lastChar+1; $i <= $charNum; $i++) {
+                           $widths[]=0;
+                        }
+                        $lastChar=$charNum;
+                     }
+                     if (isSet($this->fonts[$fontName]['C'][$charName])) {
+                        $widths[$charNum-$firstChar] = $this->fonts[$fontName]['C'][$charName]['WX'];
+                     }
+                  }
                }
-             }
-           }
-           $this->addMessage('selectFont: FirstChar='.$firstChar);
-           $this->addMessage('selectFont: LastChar='.$lastChar);
-           $this->numObj++;
-           $this->o_contents($this->numObj,'new','raw');
-           $this->objects[$this->numObj]['c'].='[';
-           foreach($widths as $width){
-             $this->objects[$this->numObj]['c'].=' '.$width;
-           }
-           $this->objects[$this->numObj]['c'].=' ]';
-           $widthid = $this->numObj;
+               $this->addMessage('selectFont: FirstChar='.$firstChar);
+               $this->addMessage('selectFont: LastChar='.$lastChar);
+               $this->numObj++;
+               $this->o_contents($this->numObj, 'new', 'raw');
+               $this->objects[$this->numObj]['c'] .= '[';
+               foreach ($widths as $width) {
+                  $this->objects[$this->numObj]['c'] .= ' '.$width;
+               }
+               $this->objects[$this->numObj]['c'] .= ' ]';
+               $widthid = $this->numObj;
 
-           // load the pfb file, and put that into an object too.
-           // note that pdf supports only binary format type 1 font files, though there is a
-           // simple utility to convert them from pfa to pfb.
-           $fp = fopen($fbfile,'rb');
-           $tmp = get_magic_quotes_runtime();
-           set_magic_quotes_runtime(0);
-           $data = fread($fp,filesize($fbfile));
-           set_magic_quotes_runtime($tmp);
-           fclose($fp);
+               // load the pfb file, and put that into an object too.
+               // note that pdf supports only binary format type 1 font files, though there is a
+               // simple utility to convert them from pfa to pfb.
+               $fp = fOpen($fbfile, 'rb');
+               $tmp = get_magic_quotes_runtime();
+               set_magic_quotes_runtime(0);
+               $data = fRead($fp, fileSize($fbfile));
+               set_magic_quotes_runtime($tmp);
+               fClose($fp);
 
-           // create the font descriptor
-           $this->numObj++;
-           $fontDescriptorId = $this->numObj;
-           $this->numObj++;
-           $pfbid = $this->numObj;
-           // determine flags (more than a little flakey, hopefully will not matter much)
-           $flags=0;
-           if ($this->fonts[$fontName]['ItalicAngle']!=0){ $flags+=pow(2,6); }
-           if ($this->fonts[$fontName]['IsFixedPitch']=='true'){ $flags+=1; }
-           $flags+=pow(2,5); // assume non-sybolic
+               // create the font descriptor
+               $this->numObj++;
+               $fontDescriptorId = $this->numObj;
+               $this->numObj++;
+               $pfbid = $this->numObj;
+               // determine flags (more than a little flakey, hopefully will not matter much)
+               $flags = 0;
+               if ($this->fonts[$fontName]['ItalicAngle'] != 0) {
+                  $flags += pow(2, 6);
+               }
+               if ($this->fonts[$fontName]['IsFixedPitch'] == 'true') {
+                  $flags += 1;
+               }
+               $flags += pow(2, 5); // assume non-sybolic
 
-           $list = array('Ascent'=>'Ascender','CapHeight'=>'CapHeight','Descent'=>'Descender','FontBBox'=>'FontBBox','ItalicAngle'=>'ItalicAngle');
-           $fdopt = array(
-            'Flags'=>$flags
-            ,'FontName'=>$adobeFontName
-            ,'StemV'=>100  // don't know what the value for this should be!
-           );
-           foreach($list as $k=>$v){
-             if (isset($this->fonts[$fontName][$v])){
-               $fdopt[$k]=$this->fonts[$fontName][$v];
-             }
-           }
+               $list = array('Ascent'     => 'Ascender',
+                             'CapHeight'  => 'CapHeight',
+                             'Descent'    => 'Descender',
+                             'FontBBox'   => 'FontBBox',
+                             'ItalicAngle'=> 'ItalicAngle');
+               $fdopt = array('Flags'    => $flags,
+                              'FontName' => $adobeFontName,
+                              'StemV'    => 100);     // don't know what the value for this should be!
+               foreach ($list as $k => $v) {
+                  if (isSet($this->fonts[$fontName][$v])) {
+                     $fdopt[$k] = $this->fonts[$fontName][$v];
+                  }
+               }
 
-           if ($fbtype=='pfb'){
-             $fdopt['FontFile']=$pfbid;
-           } else if ($fbtype=='ttf'){
-             $fdopt['FontFile2']=$pfbid;
-           }
-           $this->o_fontDescriptor($fontDescriptorId,'new',$fdopt);
+               if ($fbtype == 'pfb') {
+                  $fdopt['FontFile'] = $pfbid;
+               }
+               else if ($fbtype == 'ttf') {
+                  $fdopt['FontFile2'] = $pfbid;
+               }
+               $this->o_fontDescriptor($fontDescriptorId, 'new', $fdopt);
 
-           // embed the font program
-           $this->o_contents($this->numObj,'new');
-           $this->objects[$pfbid]['c'].=$data;
-           // determine the cruicial lengths within this file
-           if ($fbtype=='pfb'){
-             $l1 = strpos($data,'eexec')+6;
-             $l2 = strpos($data,'00000000')-$l1;
-             $l3 = strlen($data)-$l2-$l1;
-             $this->o_contents($this->numObj,'add',array('Length1'=>$l1,'Length2'=>$l2,'Length3'=>$l3));
-           } else if ($fbtype=='ttf'){
-             $l1 = strlen($data);
-             $this->o_contents($this->numObj,'add',array('Length1'=>$l1));
-           }
+               // embed the font program
+               $this->o_contents($this->numObj, 'new');
+               $this->objects[$pfbid]['c'] .= $data;
+               // determine the cruicial lengths within this file
+               if ($fbtype == 'pfb') {
+                  $l1 = strPos($data, 'eexec') + 6;
+                  $l2 = strPos($data, '00000000') - $l1;
+                  $l3 = strLen($data) -$l2 -$l1;
+                  $this->o_contents($this->numObj, 'add', array('Length1'=>$l1, 'Length2'=>$l2, 'Length3'=>$l3));
+               }
+               else if ($fbtype == 'ttf') {
+                  $l1 = strLen($data);
+                  $this->o_contents($this->numObj, 'add', array('Length1'=>$l1));
+               }
 
+               // tell the font object about all this new stuff
+               $tmp = array('BaseFont'       => $adobeFontName,
+                            'Widths'         => $widthid,
+                            'FirstChar'      => $firstChar,
+                            'LastChar'       => $lastChar,
+                            'FontDescriptor' => $fontDescriptorId);
+               if ($fbtype == 'ttf') {
+                  $tmp['SubType'] = 'TrueType';
+               }
+               $this->addMessage('adding extra info to font.('.$fontObj.')');
+               foreach ($tmp as $fk => $fv) {
+                  $this->addMessage($fk." : ".$fv);
+               }
+               $this->o_font($fontObj, 'add', $tmp);
+            }
+            else {
+               $this->addMessage('selectFont: pfb or ttf file not found, ok if this is one of the 14 standard fonts');
+            }
 
-           // tell the font object about all this new stuff
-           $tmp = array('BaseFont'=>$adobeFontName,'Widths'=>$widthid
-                                         ,'FirstChar'=>$firstChar,'LastChar'=>$lastChar
-                                         ,'FontDescriptor'=>$fontDescriptorId);
-           if ($fbtype=='ttf'){
-             $tmp['SubType']='TrueType';
-           }
-           $this->addMessage('adding extra info to font.('.$fontObj.')');
-           foreach($tmp as $fk=>$fv){
-             $this->addMessage($fk." : ".$fv);
-           }
-           $this->o_font($fontObj,'add',$tmp);
-
-         } else {
-           $this->addMessage('selectFont: pfb or ttf file not found, ok if this is one of the 14 standard fonts');
+            // also set the differences here, note that this means that these will take effect only the
+            //first time that a font is selected, else they are ignored
+            if (isSet($options['differences'])) {
+               $this->fonts[$fontName]['differences'] = $options['differences'];
+            }
          }
-
-
-         // also set the differences here, note that this means that these will take effect only the
-         //first time that a font is selected, else they are ignored
-         if (isset($options['differences'])){
-           $this->fonts[$fontName]['differences']=$options['differences'];
-         }
-       }
-     }
-     if ($set && isset($this->fonts[$fontName])){
-       // so if for some reason the font was not set in the last one then it will not be selected
-       $this->currentBaseFont=$fontName;
-       // the next line means that if a new font is selected, then the current text state will be
-       // applied to it as well.
-       $this->setCurrentFont();
-     }
-     return $this->currentFontNum;
+      }
+      if ($set && isSet($this->fonts[$fontName])) {
+         // so if for some reason the font was not set in the last one then it will not be selected
+         $this->currentBaseFont = $fontName;
+         // the next line means that if a new font is selected, then the current text state will be
+         // applied to it as well.
+         $this->setCurrentFont();
+      }
+      return $this->currentFontNum;
    }
 
    /**
@@ -2807,46 +2843,58 @@ class BasePdfDocument {
    }
 
    /**
-    * add a JPEG image into the document, from a file
+    * Add a JPEG image from a file into the document. Searches the include_path if $file is not found.
     */
-   function addJpegFromFile($img,$x,$y,$w=0,$h=0){
-     // attempt to add a jpeg image straight from a file, using no GD commands
-     // note that this function is unable to operate on a remote file.
+   function addJpegFromFile($file, $x, $y, $w=0, $h=0) {
+      // Attempt to add a jpeg image straight from a file, using no GD commands.
+      // Note that this function is unable to operate on a remote files.
+      if (!is_file($file)) {
+         $paths = explode(PATH_SEPARATOR, ini_get('include_path'));
+         $found = null;
+         foreach ($paths as $path) {
+            if (is_file($path.DIRECTORY_SEPARATOR.$file)) {
+               $found = $path.DIRECTORY_SEPARATOR.$file;
+               break;
+            }
+         }
+         if (is_null($found)) {
+            trigger_error('File not found: '.$file, E_USER_WARNING);
+            return;
+         }
+         $file = $found;
+         unset($paths, $path, $found);
+      }
 
-     if (! file_exists($img)){
-       return;
-     }
+      $tmp = getImageSize($file);
+      $imageWidth  = $tmp[0];
+      $imageHeight = $tmp[1];
 
-     $tmp = getImageSize($img);
-     $imageWidth = $tmp[0];
-     $imageHeight = $tmp[1];
+      if (isSet($tmp['channels'])) {
+         $channels = $tmp['channels'];
+      }
+      else {
+         $channels = 3;
+      }
 
-     if (isset($tmp['channels'])){
-       $channels = $tmp['channels'];
-     } else {
-       $channels = 3;
-     }
+      if ($w <= 0 && $h <= 0) {
+         $w = $imageWidth;
+      }
+      if ($w == 0) {
+         $w = $h/$imageHeight * $imageWidth;
+      }
+      if ($h == 0) {
+         $h = $w * $imageHeight/$imageWidth;
+      }
 
-     if ($w<=0 && $h<=0){
-       $w=$imageWidth;
-     }
-     if ($w==0){
-       $w=$h/$imageHeight*$imageWidth;
-     }
-     if ($h==0){
-       $h=$w*$imageHeight/$imageWidth;
-     }
+      $fp = fOpen($file, 'rb');
 
-     $fp=fopen($img,'rb');
+      $tmp = get_magic_quotes_runtime();
+      set_magic_quotes_runtime(0);
+      $data = fRead($fp, fileSize($file));
+      set_magic_quotes_runtime($tmp);
 
-     $tmp = get_magic_quotes_runtime();
-     set_magic_quotes_runtime(0);
-     $data = fread($fp,filesize($img));
-     set_magic_quotes_runtime($tmp);
-
-     fclose($fp);
-
-     $this->addJpegImage_common($data,$x,$y,$w,$h,$imageWidth,$imageHeight,$channels);
+      fClose($fp);
+      $this->addJpegImage_common($data, $x, $y, $w, $h, $imageWidth, $imageHeight, $channels);
    }
 
    /**
