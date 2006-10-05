@@ -1620,7 +1620,7 @@ class BasePdfDocument {
    }
 
    /**
-    * sets up the current font, based on the font families, and the current text state
+    * Sets up the current font, based on the font families, and the current text state
     * note that this system is quite flexible, a <b><i> font can be completely different to a
     * <i><b> font, and even <b><b> will have to be defined within the family to have meaning
     * This function is to be called whenever the currentTextState is changed, it will update
@@ -1634,7 +1634,7 @@ class BasePdfDocument {
    function setCurrentFont(){
      if (strlen($this->currentBaseFont)==0){
        // then assume an initial font
-       $this->selectFont('./fonts/Helvetica.afm');
+       $this->selectFont(dirName(__FILE__).'/fonts/Helvetica.afm');
      }
      $cf = substr($this->currentBaseFont,strrpos($this->currentBaseFont,'/')+1);
      if (strlen($this->currentTextState)
@@ -1951,7 +1951,7 @@ class BasePdfDocument {
     */
    function getFontHeight($size){
      if (!$this->numFonts){
-       $this->selectFont('./fonts/Helvetica');
+       $this->selectFont(dirName(__FILE__).'/fonts/Helvetica');
      }
      // for the current font, and the given size, what is the height of the font in user units
      $h = $this->fonts[$this->currentFont]['FontBBox'][3]-$this->fonts[$this->currentFont]['FontBBox'][1];
@@ -1966,7 +1966,7 @@ class BasePdfDocument {
    function getFontDecender($size){
      // note that this will most likely return a negative value
      if (!$this->numFonts){
-       $this->selectFont('./fonts/Helvetica');
+       $this->selectFont(dirName(__FILE__).'/fonts/Helvetica');
      }
      $h = $this->fonts[$this->currentFont]['FontBBox'][1];
      return $size*$h/1000;
@@ -2177,7 +2177,9 @@ class BasePdfDocument {
     * add text to the document, at a specified location, size and angle on the page
     */
    function addText($x,$y,$size,$text,$angle=0,$wordSpaceAdjust=0){
-     if (!$this->numFonts){$this->selectFont('./fonts/Helvetica');}
+     if (!$this->numFonts) {
+        $this->selectFont(dirName(__FILE__).'/fonts/Helvetica');
+     }
 
      // if there are any open callbacks, then they should be called, to show the start of the line
      if ($this->nCallback>0){
@@ -2275,7 +2277,7 @@ class BasePdfDocument {
      $store_currentTextState = $this->currentTextState;
 
      if (!$this->numFonts){
-       $this->selectFont('./fonts/Helvetica');
+       $this->selectFont(dirName(__FILE__).'/fonts/Helvetica');
      }
 
      // converts a number or a float to a string so it can get the width
@@ -2361,7 +2363,9 @@ class BasePdfDocument {
      // but will need to be re-set before printing, so that the chars work out right
      $store_currentTextState = $this->currentTextState;
 
-     if (!$this->numFonts){$this->selectFont('./fonts/Helvetica');}
+     if (!$this->numFonts) {
+        $this->selectFont(dirName(__FILE__).'/fonts/Helvetica'); 
+     }
      if ($width<=0){
        // error, pretend it printed ok, otherwise risking a loop
        return '';
