@@ -21,10 +21,11 @@ function __autoload($className) {
       // Hier werden alle Klassendefinitionen der Library mit dem Pfad der entprechenden PHP-Datei aufgeführt.
       $classes = array('AbstractActionForm' => 'php/actions/AbstractActionForm.php',
 
-                       'BasePdfDocument'    => 'php/util/BasePdfDocument.php',
+                       'BasePdfDocument'    => 'php/pdf/BasePdfDocument.php',
+                       'SimplePdfDocument'  => 'php/pdf/SimplePdfDocument.php',
+
                        'HttpRequest'        => 'php/util/HttpRequest.php',
                        'Mailer'             => 'php/util/Mailer.php',
-                       'SimplePdfDocument'  => 'php/util/SimplePdfDocument.php',
       );
 
       // Hinzuladen zusätzlicher, projektspezifischer Definitionen. Das Array mit den Definitionen MUSS '$__autoloadClasses' heißen.
