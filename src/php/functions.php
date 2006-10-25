@@ -1,5 +1,5 @@
 <?
-define('WINDOWS', (strPos(strToLower(php_uname('s')), 'windows') !== false));       // ob PHP unter Windows läuft
+define('WINDOWS', (strToUpper(subStr(PHP_OS, 0, 3))==='WIN'));          // ob PHP unter Windows läuft
 
 
 if (function_exists('set_exception_handler'))   // ab PHP 5
