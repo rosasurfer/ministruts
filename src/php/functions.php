@@ -149,7 +149,7 @@ function onError($errorLevel, $msg, $file, $line, $vars) {
       // Fehler anzeigen
       if ($displayErrors) {
          if ($htmlErrors) {
-            echo nl2br("<div align='left'><b>$levels[$errorLevel]</b>: $msg\n in <b>$file</b> on line <b>$line</b>");
+            echo nl2br("<div align='left' style='font:normal normal 12px/normal arial,helvetica,sans-serif'><b>$levels[$errorLevel]</b>: $msg\n in <b>$file</b> on line <b>$line</b>");
             if ($trace)
                echo '<br>'.printFormatted($trace, true).'<br>';
             echo "</div>";
@@ -438,7 +438,7 @@ function printFormatted($var, $return = false) {                  // Return: voi
    $str = (is_array($var) ? print_r($var, true) : $var)."\n";     //         string - wenn $return = true (siehe Dokumentation zu print_r())
 
    if (isSet($_SERVER['REQUEST_METHOD'])) {
-      $str = '<div align="left"><pre>'.$str.'</pre></div>';
+      $str = '<div align="left" style="font:normal normal 11px/normal serif"><pre>'.$str.'</pre></div>';
    }
 
    if ($return)
@@ -500,7 +500,7 @@ function getErrorLevelAsString() {
 function decodeHTML($html) {
    $table =& array_flip(get_html_translation_table(HTML_ENTITIES, ENT_QUOTES));
    $table['&nbsp;'] = ' ';
-   $table['&euro;'] = '€';
+   $table['&euro;'] = '?';
    $string = strTr($html, $table);
    return preg_replace('/&#(\d+);/me', "chr('\\1')", $string);
 }
