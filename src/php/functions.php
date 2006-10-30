@@ -500,7 +500,7 @@ function getErrorLevelAsString() {
 function decodeHTML($html) {
    $table =& array_flip(get_html_translation_table(HTML_ENTITIES, ENT_QUOTES));
    $table['&nbsp;'] = ' ';
-   $table['&euro;'] = '?';
+   $table['&euro;'] = '€';
    $string = strTr($html, $table);
    return preg_replace('/&#(\d+);/me', "chr('\\1')", $string);
 }
