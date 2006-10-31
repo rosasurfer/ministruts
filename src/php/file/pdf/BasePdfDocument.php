@@ -1413,7 +1413,7 @@ class BasePdfDocument {
     */
    function selectFont($fontName, $encoding='', $set=1) {
       if (!is_file($fontName)) {
-         $paths = explode(PATH_SEPARATOR, ini_get('include_path'));
+         $paths = explode(PATH_SEPARATOR, trim(ini_get('include_path'), PATH_SEPARATOR));
          $found = null;
          foreach ($paths as $path) {
             if (is_file($path.DIRECTORY_SEPARATOR.$fontName)) {
@@ -2368,7 +2368,7 @@ class BasePdfDocument {
      $store_currentTextState = $this->currentTextState;
 
      if (!$this->numFonts) {
-        $this->selectFont(dirName(__FILE__).'/fonts/Helvetica'); 
+        $this->selectFont(dirName(__FILE__).'/fonts/Helvetica');
      }
      if ($width<=0){
        // error, pretend it printed ok, otherwise risking a loop
@@ -2857,7 +2857,7 @@ class BasePdfDocument {
       // Attempt to add a jpeg image straight from a file, using no GD commands.
       // Note that this function is unable to operate on a remote files.
       if (!is_file($file)) {
-         $paths = explode(PATH_SEPARATOR, ini_get('include_path'));
+         $paths = explode(PATH_SEPARATOR, trim(ini_get('include_path'), PATH_SEPARATOR));
          $found = null;
          foreach ($paths as $path) {
             if (is_file($path.DIRECTORY_SEPARATOR.$file)) {
