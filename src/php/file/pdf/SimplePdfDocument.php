@@ -12,10 +12,10 @@ require_once('php/pdf/BasePdfDocument.php');
  */
 class SimplePdfDocument extends BasePdfDocument {
 
-   var $ez = array('fontSize' => 10);  // used for storing most of the page configuration parameters
-   var $y;                             // this is the current vertical positon on the page of the writing point, very important
-   var $ezPages = array();             // keep an array of the ids of the pages, making it easy to go back and add page numbers etc.
-   var $ezPageCount = 0;
+   private  $ez = array('fontSize' => 10);   // used for storing most of the page configuration parameters
+   private  $y;                              // this is the current vertical positon on the page of the writing point, very important
+   private  $ezPages = array();              // keep an array of the ids of the pages, making it easy to go back and add page numbers etc.
+   private $ezPageCount = 0;
 
    // ------------------------------------------------------------------------------
    function SimplePdfDocument($paper='a4', $orientation='portrait') {

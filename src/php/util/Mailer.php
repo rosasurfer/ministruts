@@ -9,20 +9,20 @@
  */
 class Mailer {
 
-   var $config = array('host'    => null,       // SMTP server host name
-                       'port'    => null,       // SMTP server port
-                       'auth'    => false,      // use authentification ?
-                       'user'    => null,       // username
-                       'pass'    => null,       // password
-                       'timeout' => 60);        // default socket timeout
-   var $hostname;
-   var $connection     = null;
-   var $responseStatus = 0;
-   var $response       = null;
+   private $config = array('host'    => null,      // SMTP server host name
+                           'port'    => null,      // SMTP server port
+                           'auth'    => false,     // use authentification ?
+                           'user'    => null,      // username
+                           'pass'    => null,      // password
+                           'timeout' => 60);       // default socket timeout
+   private $hostname;
+   private $connection     = null;
+   private $responseStatus = 0;
+   private $response       = null;
 
-   var $debug     = false;
-   var $logFile   = 'Mailer.log';
-   var $logBuffer = null;
+   private $debug     = false;
+   private $logFile   = 'Mailer.log';
+   private $logBuffer = null;
 
 
    /**

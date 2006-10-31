@@ -4,26 +4,26 @@
  */
 class HttpRequest {
 
-   var $debug = false;
-   var $error = false;        // whether or not an error occurred (to avoid recursions)
+   private $debug = false;
+   private $error = false;       // whether or not an error occurred (to avoid recursions)
 
-   var $host;
-   var $ip;
-   var $port;
-   var $uri;
-   var $headers = array('User-Agent' => 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8b) Gecko/20050217',
-                        'Accept'     => 'text/html;q=0.9,text/plain;q=0.8,*/*;q=0.5',
-                        'Connection' => 'close');
-   var $cookieStore;
-   var $followRedirects = true;
+   private $host;
+   private $ip;
+   private $port;
+   private $uri;
+   private $headers = array('User-Agent' => 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8b) Gecko/20050217',
+                            'Accept'     => 'text/html;q=0.9,text/plain;q=0.8,*/*;q=0.5',
+                            'Connection' => 'close');
+   private $cookieStore;
+   private $followRedirects = true;
 
-   var $socket;
-   var $timeout = 60;
-   var $responseCode;
-   var $responseHeaders;
-   var $responseHeaderMap;
-   var $lcResponseHeaderMap;
-   var $responseBody;
+   private $socket;
+   private $timeout = 60;
+   private $responseCode;
+   private $responseHeaders;
+   private $responseHeaderMap;
+   private $lcResponseHeaderMap;
+   private $responseBody;
 
 
    /**
