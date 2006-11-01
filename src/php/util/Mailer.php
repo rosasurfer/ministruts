@@ -4,7 +4,7 @@
  *
  * Example:
  * --------
- * $mailer =& new Mailer();
+ * $mailer = new Mailer();
  * $mailer->sendMail($from, $to, $subject, $message, $headers);
  */
 class Mailer {

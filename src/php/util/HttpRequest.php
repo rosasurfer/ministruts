@@ -198,7 +198,7 @@ class HttpRequest {
          if ($this->debug)
             echoPre("redirection to: $uri");
 
-         $request =& new HttpRequest($host, 80, $uri, $headers);
+         $request = new HttpRequest($host, 80, $uri, $headers);
 
          if (is_null($this->responseHeaders = $request->getResponseHeaders()) || is_null($this->responseBody = $request->getResponseBody())) {
             $this->error = true;

@@ -1,6 +1,4 @@
 <?
-require_once('php/pdf/BasePdfDocument.php');
-
 /**
  * SimplePdfDocument
  *

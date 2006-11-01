@@ -28,7 +28,7 @@ function __autoload($className) {
                        'Mailer'             => 'php/util/Mailer.php',
       );
 
-      // Hinzuladen zusätzlicher, projektspezifischer Definitionen. Das Array mit den Definitionen MUSS '$__autoloadClasses' heißen.
+      // Hinzuladen zusätzlicher, projektspezifischer Definitionen. Das Array mit den Definitionen muß '$__autoloadClasses' heißen.
       if (isSet($GLOBALS['__autoloadClasses']) && getType($GLOBALS['__autoloadClasses'])=='array')
          $classes =& array_merge($classes, $GLOBALS['__autoloadClasses']);
    }
