@@ -638,7 +638,7 @@ function getRequest() {
       if ($headers['Content-Type'] == 'application/x-www-form-urlencoded') {
          $params = array();
          foreach ($_POST as $name => $value) {
-            $params[] = $name.'='.urlEncode($value);
+            $params[] = $name.'='.urlEncode((string) $value);
          }
          $request .= "\n".implode('&', $params)."\n";
       }
