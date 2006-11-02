@@ -337,7 +337,7 @@ function startSession() {
    if (!isSession()) {
       $php_errormsg = null;
       @session_start();
-      if (strPos($php_errormsg, 'The session id contains invalid characters') === 0) {
+      if (preg_match('/The session id contains (invalid|illegal) characters/', $php_errormsg)) {
          session_regenerate_id();
          return true;
       }
