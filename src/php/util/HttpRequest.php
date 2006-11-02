@@ -30,9 +30,9 @@ class HttpRequest {
     * Constructor
     */
    function HttpRequest($host, $port, $uri, $headers = null) {
-      if (!is_string($host)  || !$host)              trigger_error('Invalid host: '.$host, E_USER_ERROR);
-      if (!is_int($port)     || $port < 1)           trigger_error('Invalid port: '.$port, E_USER_ERROR);
-      if (!is_string($uri)   || !$uri)               trigger_error('Invalid uri: '.$uri, E_USER_ERROR);
+      if (!is_string($host)  || !$host)              trigger_error('Invalid host: '.$host,                E_USER_ERROR);
+      if (!is_int($port)     || $port < 1)           trigger_error('Invalid port: '.$port,                E_USER_ERROR);
+      if (!is_string($uri)   || !$uri)               trigger_error('Invalid uri: '.$uri,                  E_USER_ERROR);
       if (!is_null($headers) && !is_array($headers)) trigger_error('Invalid argument headers: '.$headers, E_USER_ERROR);
 
       $this->debug = @$GLOBALS['debug'];
