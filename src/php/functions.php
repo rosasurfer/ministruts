@@ -687,21 +687,18 @@ function getRequestHeaders() {
 
 
 /**
- * Ob Error-Messages existieren oder nicht.
+ * Ob für den übergebenen Schlüssel eine Error-Message existiert.
+ * Ohne Angabe eines Schlüssel prüft die Funktion, ob irgendeine Error-Message existiert.
  *
- * @return boolean
- */
-function isActionErrors() {
-   return isSet($_REQUEST['__ACTION_ERRORS__']) && sizeOf($_REQUEST['__ACTION_ERRORS__']);
-}
-
-
-/**
- * Ob für den angegebenen Schlüssel eine Error-Message existiert oder nicht.
+ * @param  key     - zu überprüfender Schlüssel
  *
- * @return boolean
+ * @return boolean - true, wenn eine Error-Message für diesen Schlüssel existiert,
+ *                   false andererseits
  */
-function isActionError($key) {
+function isActionError($key = null) {
+   if (func_num_args() == 0) {
+      return isSet($_REQUEST['__ACTION_ERRORS__']) && sizeOf($_REQUEST['__ACTION_ERRORS__'] > 0);
+   }
    return isSet($_REQUEST['__ACTION_ERRORS__'][$key]);
 }
 
@@ -710,11 +707,14 @@ function isActionError($key) {
  * Gibt die Error-Message für den angegebenen Schlüssel zurück.
  * Ohne Schlüssel wird die erste vorhandene Error-Message zurückgegeben.
  *
- * @return string
+ * @param  key    - Schlüssel der Error-Message
+ *
+ * @return string - Error-Message
  */
 function getActionError($key = null) {
-   if (is_null($key)) {
-      if (isActionErrors()) {
+   if (func_num_args() == 0) {
+      if (isActionError()) {
+         reset($_REQUEST['__ACTION_ERRORS__']);
          return current($_REQUEST['__ACTION_ERRORS__']);
       }
    }
