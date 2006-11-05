@@ -151,7 +151,7 @@ function onError($errorLevel, $msg, $file, $line, $vars) {
 
       // Fehler ins Error-Log schreiben
       if ($logErrors) {
-         $logMsg = str_replace(array("\r\n", "\n"), ' ', $message);     // alle Zeilenumbrüche entfernen
+         $logMsg = 'PHP '.str_replace(array("\r\n", "\n"), ' ', $message);     // alle Zeilenumbrüche entfernen
          error_log($logMsg, 0);
       }
 
@@ -257,7 +257,7 @@ function onException($exception) {
 
    // Fehler ins Error-Log schreiben
    if ($logErrors) {
-      $logMsg = str_replace(array("\r\n", "\n"), ' ', $message);        // alle Zeilenumbrüche entfernen
+      $logMsg = 'PHP '.str_replace(array("\r\n", "\n"), ' ', $message);        // alle Zeilenumbrüche entfernen
       error_log($logMsg, 0);
    }
 
