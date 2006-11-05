@@ -28,7 +28,7 @@ function __autoload($className) {
 
       // Hinzuladen zusätzlicher, projektspezifischer Definitionen. Das Array mit den Definitionen muß '$__autoloadClasses' heißen.
       if (isSet($GLOBALS['__autoloadClasses']) && getType($GLOBALS['__autoloadClasses'])=='array')
-         $classes =& array_merge($classes, $GLOBALS['__autoloadClasses']);
+         $classes = array_merge($classes, $GLOBALS['__autoloadClasses']);
    }
 
    if (isSet($classes[$className])) {
@@ -55,9 +55,9 @@ function __autoload($className) {
 function onError($errorLevel, $msg, $file, $line, $vars) {
    static $levels  = null;
    if (!$levels) {
-      $levels = array(E_PARSE           => 'Parse Error',         // All levels for completeness only, in reality
-                      E_COMPILE_ERROR   => 'Compile Error',       // the only entries we should consider are
-                      E_COMPILE_WARNING => 'Compile Warning',     // E_WARNING, E_NOTICE, E_USER_ERROR, E_USER_WARNING, E_USER_NOTICE and E_STRICT.
+      $levels = array(E_PARSE           => 'Parse Error',
+                      E_COMPILE_ERROR   => 'Compile Error',
+                      E_COMPILE_WARNING => 'Compile Warning',
                       E_CORE_ERROR      => 'Core Error',
                       E_CORE_WARNING    => 'Core Warning',
                       E_ERROR           => 'Error',
