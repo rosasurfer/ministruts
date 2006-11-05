@@ -1,23 +1,21 @@
 <?
-define('WINDOWS', (strToUpper(subStr(PHP_OS, 0, 3))==='WIN'));          // ob PHP unter Windows läuft
+define('WINDOWS', (strToUpper(subStr(PHP_OS, 0, 3))==='WIN'));       // ob das Script unter Windows läuft
 
 
-if (function_exists('set_exception_handler'))   // ab PHP 5
-   set_exception_handler('onException');
 set_error_handler('onError');
+set_exception_handler('onException');                                // setzt PHP 5 voraus
 
 
 
 /**
- * Lädt die Definition der angegebenen Klasse (ab PHP 5).
+ * Lädt die Klassendefinition der angegebenen Klasse (ab PHP 5).
  *
  * @param className - Klassenname
  */
 function __autoload($className) {
    static $classes = null;
+
    if (is_null($classes)) {
-
-
       // Hier werden alle Klassendefinitionen der Library mit dem Pfad der entprechenden PHP-Datei aufgeführt.
       $classes = array('AbstractActionForm' => 'php/actions/AbstractActionForm.php',
 
@@ -33,38 +31,29 @@ function __autoload($className) {
          $classes =& array_merge($classes, $GLOBALS['__autoloadClasses']);
    }
 
-   if (isSet($classes[$className]))
+   if (isSet($classes[$className])) {
       require_once($classes[$className]);
+   }
+   else {
+      trigger_error("Class '$className' is not defined", E_USER_ERROR);
+   }
 }
 
 
 /**
- * Eigener Exceptionhandler.
- *
- * @param exception - ausgelöste Exception, die behandelt werden soll
- */
-function onException($exception) {
-   echoPre($exception->getTrace());
-   echoPre($exception->getTraceAsString());
-   echoPre(debug_backtrace());
-}
-
-
-/**
- * Eigener Errorhandler.
+ * Globaler Handler für nicht abgefangene Fehler.  Zeigt den Fehler im Browser an,
+ * wenn der Request von 'localhost' kam.  Loggt den Fehler im Errorlog und schickt eine
+ * Fehler-Email an alle registrierten Webmaster.
+ * Ist der Fehler schwerwiegender als 'Warning', wird das Script automatisch beendet.
  *
  * @param errorLevel -
  * @param msg        -
  * @param file       -
  * @param line       -
  * @param vars       -
- *
- * @throws <tt>Exception</tt>
  */
 function onError($errorLevel, $msg, $file, $line, $vars) {
    static $levels  = null;
-   static $console = null;                   // ob PHP als Konsolenapplikation läuft
-
    if (!$levels) {
       $levels = array(E_PARSE           => 'Parse Error',         // All levels for completeness only, in reality
                       E_COMPILE_ERROR   => 'Compile Error',       // the only entries we should consider are
@@ -77,33 +66,29 @@ function onError($errorLevel, $msg, $file, $line, $vars) {
                       E_USER_ERROR      => 'Error',
                       E_USER_WARNING    => 'Warning',
                       E_USER_NOTICE     => 'Notice');
-      if (defined('E_STRICT')) {
+      if (defined('E_STRICT'))
          $levels[E_STRICT] = 'Runtime Notice';
-      }
-      $console = (!isSet($_SERVER['REQUEST_METHOD']));
-      if ($console) {
-         ini_set('html_errors', '0');
-      }
    }
+   $console     = !isSet($_SERVER['REQUEST_METHOD']);                   // ob das Script in der Konsole läuft
+   $display     = $console || $_SERVER['REMOTE_ADDR']=='127.0.0.1';     // ob der Fehler angezeigt werden soll (im Browser nur, wenn Request von localhost kommt)
+   $displayHtml = $display && !$console;                                // ob die Ausgabe HTML-formatiert werden muß
+   $logErrors   = (ini_get('log_errors'));                              // ob Fehler geloggt werden sollen
+   $mailErrors  = !$console && $_SERVER['REMOTE_ADDR']!='127.0.0.1';    // ob Fehler-Mails verschickt werden sollen
 
-   $logLevel      =  error_reporting();
-   $logErrors     = (ini_get('log_errors') == '1');
-   $mailErrors    = !$console && $_SERVER['REMOTE_ADDR']!='127.0.0.1';     // nur, wenn nicht auf der Konsole und nicht auf localhost
-   $displayErrors =  $console || $_SERVER['REMOTE_ADDR']=='127.0.0.1';     // Anzeige im Browser nur, wenn auf localhost
-   $htmlErrors    = !$console;
+   $msg = trim($msg);
 
+   // Alles weitere nur, wenn der ausgelöste Fehler vom aktuellen Loglevel abgedeckt wird.
+   $logLevel = error_reporting();
    if (($logLevel & $errorLevel) == $errorLevel) {
-      $error = $levels[$errorLevel].': '.trim($msg)."\nin $file on line $line\n";
+      $message = $levels[$errorLevel].': '.$msg."\nin $file on line $line\n";
 
       // Stacktrace generieren
       $trace = null;
       if ($errorLevel != E_NOTICE || (subStr($msg, 0, 25)!='Use of undefined constant' && subStr($msg, 0, 20)!='Undefined variable: ')) {
-         $stackTrace = debug_backtrace();
-
-         // Damit die Zuordnung stimmt (wie in Java), werden FILE und LINE jeweils einen Frame nach unten verschoben.
-         $stackTrace[] = array('function'=>'main');
-         $size = sizeOf($stackTrace);
-         for ($i=$size; $i-- > 0;) {
+         $stackTrace   = debug_backtrace();
+         $stackTrace[] = array('function'=>'main');                     // Damit der Stacktrace mit Java übereinstimmt, wird ein
+         $size = sizeOf($stackTrace);                                   // zusätzlicher Frame fürs Hauptscript angefügt und alle
+         for ($i=$size; $i-- > 0;) {                                    // FILE- und LINE-Felder um einen Frame nach unten verschoben.
             if (isSet($stackTrace[$i-1]['file']))
                $stackTrace[$i]['file'] = $stackTrace[$i-1]['file'];
             else
@@ -115,22 +100,23 @@ function onError($errorLevel, $msg, $file, $line, $vars) {
                unset($stackTrace[$i]['line']);
          }
 
-         array_shift($stackTrace);                             // Der erste Frame kann weg, er ist der Errorhandler selbst.
+         array_shift($stackTrace);                                      // Der erste Frame kann weg, er ist der Errorhandler selbst.
          if (!isSet($stackTrace[0]['file']))
-            array_shift($stackTrace);                          // Ist der nächste Frame ein interner PHP-Error, kann auch der weg.
+            array_shift($stackTrace);                                   // Ist der zweite Frame ein interner PHP-Fehler, kann auch dieser weg.
 
+
+         // Stacktrace lesbar formatieren
          $size = sizeOf($stackTrace);
          if ($size > 1) {
             $trace  = "Stacktrace:\n";
             $trace .= "-----------\n";
-
-            // Stacktrace formatieren
             $callLen = $lineLen = 0;
-            for ($i=0; $i < $size; $i++) {
+
+            for ($i=0; $i < $size; $i++) {                              // Spalten LINE und FILE untereinander ausrichten
                $frame =& $stackTrace[$i];
                $call = null;
                if (isSet($frame['class']))
-                  $call = (PHP_VERSION<'5' ? ucFirst($frame['class']):$frame['class']).$frame['type'];
+                  $call = $frame['class'].$frame['type'];
                $call .= $frame['function'].'():';
                $callLen = max($callLen, strLen($call));
                $frame['call'] = $call;
@@ -146,42 +132,142 @@ function onError($errorLevel, $msg, $file, $line, $vars) {
          }
       }
 
-      // Fehler anzeigen
-      if ($displayErrors) {
-         if ($htmlErrors) {
-            echo nl2br("<div align='left' style='font:normal normal 12px/normal arial,helvetica,sans-serif'><b>$levels[$errorLevel]</b>: $msg\n in <b>$file</b> on line <b>$line</b>");
+
+      // Fehleranzeige
+      if ($display) {
+         if ($displayHtml) {
+            echo nl2br('<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.$levels[$errorLevel].'</b>: '.$msg."\n in <b>".$file.'</b> on line <b>'.$line.'</b>');
             if ($trace)
                echo '<br>'.printFormatted($trace, true).'<br>';
-            echo "</div>";
+            echo '</div>';
          }
          else {
-            echo $error;                                 // PHP gibt den Fehler unter Linux zusätzlich auf stderr aus,
-            if ($trace)                                  // also auf der Konsole ggf. unterdrücken ( 2>/dev/null )
+            echo $message;                                              // PHP gibt den Fehler unter Linux zusätzlich auf stderr aus,
+            if ($trace)                                                 // also auf der Konsole ggf. unterdrücken ( 2>/dev/null )
                printFormatted("\n".$trace);
          }
       }
 
       // Fehler ins Error-Log schreiben
       if ($logErrors) {
-         $error = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $error)) : str_replace("\r\n", "\n", $error);
-         error_log(trim($error), 0);
+         $logMsg = str_replace(array("\r\n", "\n"), ' ', $message);     // alle Zeilenumbrüche entfernen
+         error_log($logMsg, 0);
       }
 
-      // Fehler an Webmaster mailen
+      // Fehler-Email an alle registrierten Webmaster schicken
       if ($mailErrors) {
          if ($trace)
-            $error .= "\n".$trace;
-         $error .= "\nRequest:\n--------\n".getRequest()."\nIP: ".$_SERVER['REMOTE_ADDR']."\n---\n";
-         $error = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $error)) : str_replace("\r\n", "\n", $error);
+            $message .= "\n".$trace;
+         $message .= "\nRequest:\n--------\n".getRequest()."\nIP: ".$_SERVER['REMOTE_ADDR']."\n---\n";
+         $message = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $message)) : str_replace("\r\n", "\n", $message);
 
          foreach ($GLOBALS['webmasters'] as $webmaster) {
-            error_log($error, 1, $webmaster, 'Subject: PHP error_log: '.$levels[$errorLevel].' at '.@$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']);
+            error_log($message, 1, $webmaster, 'Subject: PHP error_log: '.$levels[$errorLevel].' at '.@$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']);
          }
       }
 
       // bei kritischen Fehlern Script beenden
       if ($errorLevel & (E_PARSE | E_COMPILE_ERROR | E_CORE_ERROR | E_ERROR | E_USER_ERROR))
          exit(1);
+   }
+}
+
+
+/**
+ * Globaler Handler für nicht abgefangene Exceptions.  Zeigt die Exception im Browser an,
+ * wenn der Request von 'localhost' kam.  Loggt die Exception im Errorlog und schickt eine
+ * Fehler-Email an alle registrierten Webmaster.
+ * Nach Abarbeitung wird das Script von PHP immer automatisch beendet.
+ *
+ * @param exception - die ausgelöste Exception
+ */
+function onException($exception) {
+   $console     = !isSet($_SERVER['REQUEST_METHOD']);                   // ob das Script in der Konsole läuft
+   $display     = $console || $_SERVER['REMOTE_ADDR']=='127.0.0.1';     // ob die Exception angezeigt werden soll (im Browser nur, wenn Request von localhost kommt)
+   $displayHtml = $display && !$console;                                // ob die Ausgabe HTML-formatiert werden muß
+   $logErrors   = (ini_get('log_errors'));                              // ob Fehler geloggt werden sollen
+   $mailErrors  = !$console && $_SERVER['REMOTE_ADDR']!='127.0.0.1';    // ob Fehler-Mails verschickt werden sollen
+
+   $msg  = $exception->getMessage();
+   $code = $exception->getCode();
+   $file = $exception->getFile();
+   $line = $exception->getLine();
+
+
+   // Stacktrace generieren
+   $stackTrace = $exception->getTrace();
+   $stackTrace[] = array('function'=>'main');                           // Damit der Stacktrace mit Java übereinstimmt, wird ein
+   $size = sizeOf($stackTrace);                                         // zusätzlicher Frame fürs Hauptscript angefügt und alle
+   for ($i=$size; $i-- > 0;) {                                          // FILE- und LINE-Felder um einen Frame nach unten verschoben.
+      if (isSet($stackTrace[$i-1]['file']))
+         $stackTrace[$i]['file'] = $stackTrace[$i-1]['file'];
+      else
+         unset($stackTrace[$i]['file']);
+
+      if (isSet($stackTrace[$i-1]['line']))
+         $stackTrace[$i]['line'] = $stackTrace[$i-1]['line'];
+      else
+         unset($stackTrace[$i]['line']);
+   }
+   $stackTrace[0]['file'] = $file;                                      // der erste Frame wird mit den Werten der Exception bestückt
+   $stackTrace[0]['line'] = $line;
+
+
+   // Stacktrace lesbar formatieren
+   $size = sizeOf($stackTrace);
+   $trace  = "Stacktrace:\n";
+   $trace .= "-----------\n";
+   $callLen = $lineLen = 0;
+
+   for ($i=0; $i < $size; $i++) {                                       // Spalten LINE und FILE untereinander ausrichten
+      $frame =& $stackTrace[$i];
+      $call = null;
+      if (isSet($frame['class']))
+         $call = $frame['class'].$frame['type'];
+      $call .= $frame['function'].'():';
+      $callLen = max($callLen, strLen($call));
+      $frame['call'] = $call;
+
+      $frame['line'] = isSet($frame['line']) ? " # line $frame[line]," : '';
+      $lineLen = max($lineLen, strLen($frame['line']));
+
+      $frame['file'] = isSet($frame['file']) ? " file: $frame[file]" : ' [php]';
+   }
+   for ($i=0; $i < $size; $i++) {
+      $trace .= str_pad($stackTrace[$i]['call'], $callLen).str_pad($stackTrace[$i]['line'], $lineLen).$stackTrace[$i]['file']."\n";
+   }
+
+
+   // Fehleranzeige
+   $message = 'Uncaught '.get_class($exception).': '.$msg.' (Error-Code: '.$code.")\nin ".$file.' on line '.$line."\n";
+   if ($display) {
+      if ($displayHtml) {
+         echo nl2br('<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>Uncaught '.get_class($exception).'</b>: '.$msg.' (Error-Code: '.$code.")\n in <b>".$file.'</b> on line <b>'.$line.'</b>');
+         echo '<br>'.printFormatted($trace, true).'<br></div>';
+      }
+      else {
+         echo $message;
+         printFormatted("\n".$trace);
+      }
+   }
+
+
+   // Fehler ins Error-Log schreiben
+   if ($logErrors) {
+      $logMsg = str_replace(array("\r\n", "\n"), ' ', $message);        // alle Zeilenumbrüche entfernen
+      error_log($logMsg, 0);
+   }
+
+
+   // Fehler-Email an alle registrierten Webmaster schicken
+   if ($mailErrors) {
+      $message .= "\n".$trace;
+      $message .= "\nRequest:\n--------\n".getRequest()."\nIP: ".$_SERVER['REMOTE_ADDR']."\n---\n";
+      $message = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $message)) : str_replace("\r\n", "\n", $message);
+
+      foreach ($GLOBALS['webmasters'] as $webmaster) {
+         error_log($message, 1, $webmaster, 'Subject: PHP error_log: Uncaught '.get_class($exception).' at '.@$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']);
+      }
    }
 }
 
@@ -438,7 +524,7 @@ function printFormatted($var, $return = false) {                  // Return: voi
    $str = (is_array($var) ? print_r($var, true) : $var)."\n";     //         string - wenn $return = true (siehe Dokumentation zu print_r())
 
    if (isSet($_SERVER['REQUEST_METHOD'])) {
-      $str = '<div align="left" style="font:normal normal 11px/normal serif"><pre>'.$str.'</pre></div>';
+      $str = '<div align="left" style="font:normal normal 12px/normal serif"><pre>'.$str.'</pre></div>';
    }
 
    if ($return)
