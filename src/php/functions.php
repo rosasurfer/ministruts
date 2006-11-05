@@ -63,11 +63,10 @@ function onError($errorLevel, $msg, $file, $line, $vars) {
                       E_ERROR           => 'Error',
                       E_WARNING         => 'Warning',
                       E_NOTICE          => 'Notice',
+                      E_STRICT          => 'Runtime Notice',
                       E_USER_ERROR      => 'Error',
                       E_USER_WARNING    => 'Warning',
                       E_USER_NOTICE     => 'Notice');
-      if (defined('E_STRICT'))
-         $levels[E_STRICT] = 'Runtime Notice';
    }
    $console     = !isSet($_SERVER['REQUEST_METHOD']);                   // ob das Script in der Konsole läuft
    $display     = $console || $_SERVER['REMOTE_ADDR']=='127.0.0.1';     // ob der Fehler angezeigt werden soll (im Browser nur, wenn Request von localhost kommt)
@@ -78,8 +77,7 @@ function onError($errorLevel, $msg, $file, $line, $vars) {
    $msg = trim($msg);
 
    // Alles weitere nur, wenn der ausgelöste Fehler vom aktuellen Loglevel abgedeckt wird.
-   $logLevel = error_reporting();
-   if (($logLevel & $errorLevel) == $errorLevel) {
+   if ((error_reporting() & $errorLevel) == $errorLevel) {
       $message = $levels[$errorLevel].': '.$msg."\nin $file on line $line\n";
 
       // Stacktrace generieren
@@ -559,6 +557,7 @@ function javaScript($script) {
 function getErrorLevelAsString() {
    $levels = array();
    $current = error_reporting();
+
    if (($current & E_ERROR          ) == E_ERROR          ) $levels[] = 'E_ERROR';
    if (($current & E_WARNING        ) == E_WARNING        ) $levels[] = 'E_WARNING';
    if (($current & E_PARSE          ) == E_PARSE          ) $levels[] = 'E_PARSE';
@@ -571,9 +570,8 @@ function getErrorLevelAsString() {
    if (($current & E_USER_WARNING   ) == E_USER_WARNING   ) $levels[] = 'E_USER_WARNING';
    if (($current & E_USER_NOTICE    ) == E_USER_NOTICE    ) $levels[] = 'E_USER_NOTICE';
    if (($current & E_ALL            ) == E_ALL            ) $levels[] = 'E_ALL';
-   if (defined('E_STRICT')) {
-      if (($current & E_STRICT      ) == E_STRICT         ) $levels[] = 'E_STRICT';
-   }
+   if (($current & E_STRICT         ) == E_STRICT         ) $levels[] = 'E_STRICT';
+
    return $current.": ".join(' | ', $levels);
 }
 
