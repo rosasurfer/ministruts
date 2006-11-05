@@ -9,6 +9,8 @@ set_exception_handler('onException');                                // setzt PH
 
 /**
  * Lädt die Klassendefinition der angegebenen Klasse (ab PHP 5).
+ * Aus dieser Funktion darf keine Exception geworfen werden, da eine solche Exception nicht an einen installierten
+ * Exception-Handler weitergeleitet, sondern das Script von PHP mit einem 'Fatal Error' beendet wird.
  *
  * @param className - Klassenname
  */
@@ -41,16 +43,17 @@ function __autoload($className) {
 
 
 /**
- * Globaler Handler für nicht abgefangene Fehler.  Zeigt den Fehler im Browser an,
- * wenn der Request von 'localhost' kam.  Loggt den Fehler im Errorlog und schickt eine
- * Fehler-Email an alle registrierten Webmaster.
- * Ist der Fehler schwerwiegender als 'Warning', wird das Script automatisch beendet.
+ * Globaler Handler für nicht abgefangene Fehler.  Zeigt den Fehler im Browser an, wenn der Request von
+ * 'localhost' kommt.  Loggt den Fehler im Errorlog und schickt eine Fehler-Email an alle registrierten
+ * Webmaster.  Ist der Fehler schwerwiegender als 'Warning', wird das Script automatisch beendet.
  *
  * @param errorLevel -
  * @param msg        -
  * @param file       -
  * @param line       -
  * @param vars       -
+ *
+ * @return boolean   - false, um den Fehler so an PHP weiterzuleiten, als wenn kein Error-Handler installiert wäre.
  */
 function onError($errorLevel, $msg, $file, $line, $vars) {
    static $levels  = null;
@@ -168,6 +171,8 @@ function onError($errorLevel, $msg, $file, $line, $vars) {
       if ($errorLevel & (E_PARSE | E_COMPILE_ERROR | E_CORE_ERROR | E_ERROR | E_USER_ERROR))
          exit(1);
    }
+
+   return true;
 }
 
 
