@@ -53,7 +53,7 @@ function __autoload($className) {
  * @param line       -
  * @param vars       -
  *
- * @return boolean   - false, um den Fehler so an PHP weiterzuleiten, als wenn kein Error-Handler installiert wäre.
+ * @return boolean   - false, um den Fehler so an PHP weiterzuleiten, als wenn kein Error-Handler installiert wäre
  */
 function onError($errorLevel, $msg, $file, $line, $vars) {
    static $levels  = null;
@@ -71,11 +71,11 @@ function onError($errorLevel, $msg, $file, $line, $vars) {
                       E_USER_WARNING    => 'Warning',
                       E_USER_NOTICE     => 'Notice');
    }
-   $console     = !isSet($_SERVER['REQUEST_METHOD']);                   // ob das Script in der Konsole läuft
-   $display     = $console || $_SERVER['REMOTE_ADDR']=='127.0.0.1';     // ob der Fehler angezeigt werden soll (im Browser nur, wenn Request von localhost kommt)
-   $displayHtml = $display && !$console;                                // ob die Ausgabe HTML-formatiert werden muß
-   $logErrors   = (ini_get('log_errors'));                              // ob Fehler geloggt werden sollen
-   $mailErrors  = !$console && $_SERVER['REMOTE_ADDR']!='127.0.0.1';    // ob Fehler-Mails verschickt werden sollen
+   $console     = !isSet($_SERVER['REQUEST_METHOD']);                         // ob das Script in der Konsole läuft
+   $display     = $console || $_SERVER['REMOTE_ADDR']=='127.0.0.1';           // ob der Fehler angezeigt werden soll (im Browser nur, wenn Request von localhost kommt)
+   $displayHtml = $display && !$console;                                      // ob die Ausgabe HTML-formatiert werden muß
+   $logErrors   = (ini_get('log_errors'));                                    // ob Fehler geloggt werden soll
+   $mailErrors  = !$console && $_SERVER['REMOTE_ADDR']!='127.0.0.1';          // ob Fehler-Mails verschickt werden sollen
 
    $msg = trim($msg);
 
@@ -87,9 +87,9 @@ function onError($errorLevel, $msg, $file, $line, $vars) {
       $trace = null;
       if ($errorLevel != E_NOTICE || (subStr($msg, 0, 25)!='Use of undefined constant' && subStr($msg, 0, 20)!='Undefined variable: ')) {
          $stackTrace   = debug_backtrace();
-         $stackTrace[] = array('function'=>'main');                     // Damit der Stacktrace mit Java übereinstimmt, wird ein
-         $size = sizeOf($stackTrace);                                   // zusätzlicher Frame fürs Hauptscript angefügt und alle
-         for ($i=$size; $i-- > 0;) {                                    // FILE- und LINE-Felder um einen Frame nach unten verschoben.
+         $stackTrace[] = array('function'=>'main');                           // Damit der Stacktrace mit Java übereinstimmt, wird ein
+         $size = sizeOf($stackTrace);                                         // zusätzlicher Frame fürs Hauptscript angefügt und alle
+         for ($i=$size; $i-- > 0;) {                                          // FILE- und LINE-Felder um einen Frame nach unten verschoben.
             if (isSet($stackTrace[$i-1]['file']))
                $stackTrace[$i]['file'] = $stackTrace[$i-1]['file'];
             else
@@ -101,9 +101,9 @@ function onError($errorLevel, $msg, $file, $line, $vars) {
                unset($stackTrace[$i]['line']);
          }
 
-         array_shift($stackTrace);                                      // Der erste Frame kann weg, er ist der Errorhandler selbst.
+         array_shift($stackTrace);                                            // Der erste Frame kann weg, er ist der Errorhandler selbst.
          if (!isSet($stackTrace[0]['file']))
-            array_shift($stackTrace);                                   // Ist der zweite Frame ein interner PHP-Fehler, kann auch dieser weg.
+            array_shift($stackTrace);                                         // Ist der zweite Frame ein interner PHP-Fehler, kann auch dieser weg.
 
 
          // Stacktrace lesbar formatieren
@@ -113,7 +113,7 @@ function onError($errorLevel, $msg, $file, $line, $vars) {
             $trace .= "-----------\n";
             $callLen = $lineLen = 0;
 
-            for ($i=0; $i < $size; $i++) {                              // Spalten LINE und FILE untereinander ausrichten
+            for ($i=0; $i < $size; $i++) {                                    // Spalten LINE und FILE untereinander ausrichten
                $frame =& $stackTrace[$i];
                $call = null;
                if (isSet($frame['class']))
@@ -143,15 +143,15 @@ function onError($errorLevel, $msg, $file, $line, $vars) {
             echo '</div>';
          }
          else {
-            echo $message;                                              // PHP gibt den Fehler unter Linux zusätzlich auf stderr aus,
-            if ($trace)                                                 // also auf der Konsole ggf. unterdrücken ( 2>/dev/null )
+            echo $message;                                                    // PHP gibt den Fehler unter Linux zusätzlich auf stderr aus,
+            if ($trace)                                                       // also auf der Konsole ggf. unterdrücken ( 2>/dev/null )
                printFormatted("\n".$trace);
          }
       }
 
       // Fehler ins Error-Log schreiben
       if ($logErrors) {
-         $logMsg = 'PHP '.str_replace(array("\r\n", "\n"), ' ', $message);     // alle Zeilenumbrüche entfernen
+         $logMsg = 'PHP '.str_replace(array("\r\n", "\n"), ' ', $message);    // alle Zeilenumbrüche entfernen
          error_log($logMsg, 0);
       }
 
@@ -178,18 +178,18 @@ function onError($errorLevel, $msg, $file, $line, $vars) {
 
 /**
  * Globaler Handler für nicht abgefangene Exceptions.  Zeigt die Exception im Browser an,
- * wenn der Request von 'localhost' kam.  Loggt die Exception im Errorlog und schickt eine
+ * wenn der Request von 'localhost' kommt.  Loggt die Exception im Errorlog und schickt eine
  * Fehler-Email an alle registrierten Webmaster.
  * Nach Abarbeitung wird das Script von PHP immer automatisch beendet.
  *
  * @param exception - die ausgelöste Exception
  */
 function onException($exception) {
-   $console     = !isSet($_SERVER['REQUEST_METHOD']);                   // ob das Script in der Konsole läuft
-   $display     = $console || $_SERVER['REMOTE_ADDR']=='127.0.0.1';     // ob die Exception angezeigt werden soll (im Browser nur, wenn Request von localhost kommt)
-   $displayHtml = $display && !$console;                                // ob die Ausgabe HTML-formatiert werden muß
-   $logErrors   = (ini_get('log_errors'));                              // ob Fehler geloggt werden sollen
-   $mailErrors  = !$console && $_SERVER['REMOTE_ADDR']!='127.0.0.1';    // ob Fehler-Mails verschickt werden sollen
+   $console     = !isSet($_SERVER['REQUEST_METHOD']);                         // ob das Script in der Konsole läuft
+   $display     = $console || $_SERVER['REMOTE_ADDR']=='127.0.0.1';           // ob die Exception angezeigt werden soll (im Browser nur, wenn Request von localhost kommt)
+   $displayHtml = $display && !$console;                                      // ob die Ausgabe HTML-formatiert werden muß
+   $logErrors   = (ini_get('log_errors'));                                    // ob Fehler geloggt werden soll
+   $mailErrors  = !$console && $_SERVER['REMOTE_ADDR']!='127.0.0.1';          // ob Fehler-Mails verschickt werden sollen
 
    $msg  = $exception->getMessage();
    $code = $exception->getCode();
@@ -199,9 +199,9 @@ function onException($exception) {
 
    // Stacktrace generieren
    $stackTrace = $exception->getTrace();
-   $stackTrace[] = array('function'=>'main');                           // Damit der Stacktrace mit Java übereinstimmt, wird ein
-   $size = sizeOf($stackTrace);                                         // zusätzlicher Frame fürs Hauptscript angefügt und alle
-   for ($i=$size; $i-- > 0;) {                                          // FILE- und LINE-Felder um einen Frame nach unten verschoben.
+   $stackTrace[] = array('function'=>'main');                                 // Damit der Stacktrace mit Java übereinstimmt, wird ein
+   $size = sizeOf($stackTrace);                                               // zusätzlicher Frame fürs Hauptscript angefügt und alle
+   for ($i=$size; $i-- > 0;) {                                                // FILE- und LINE-Felder um einen Frame nach unten verschoben.
       if (isSet($stackTrace[$i-1]['file']))
          $stackTrace[$i]['file'] = $stackTrace[$i-1]['file'];
       else
@@ -212,7 +212,7 @@ function onException($exception) {
       else
          unset($stackTrace[$i]['line']);
    }
-   $stackTrace[0]['file'] = $file;                                      // der erste Frame wird mit den Werten der Exception bestückt
+   $stackTrace[0]['file'] = $file;                                            // der erste Frame wird mit den Werten der Exception bestückt
    $stackTrace[0]['line'] = $line;
 
 
@@ -222,7 +222,7 @@ function onException($exception) {
    $trace .= "-----------\n";
    $callLen = $lineLen = 0;
 
-   for ($i=0; $i < $size; $i++) {                                       // Spalten LINE und FILE untereinander ausrichten
+   for ($i=0; $i < $size; $i++) {                                             // Spalten LINE und FILE untereinander ausrichten
       $frame =& $stackTrace[$i];
       $call = null;
       if (isSet($frame['class']))
