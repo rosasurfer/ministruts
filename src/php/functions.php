@@ -46,21 +46,19 @@ function __autoload($className) {
 
 /**
  * Globaler Handler für nicht abgefangene Fehler.  Zeigt den Fehler im Browser an, wenn der Request von
- * 'localhost' kommt.  Loggt den Fehler im Errorlog und schickt eine Fehler-Email an alle registrierten
- * Webmaster.  Nach Abarbeitung wird das Script immer beendet.
+ * 'localhost' kommt.  Loggt den Fehler im Errorlog und schickt Fehler-Emails an alle registrierten
+ * Webmaster.  Ist der Fehler schwerwiegender als 'Warning', wird das Script automatisch beendet.
  *
  * @param level -
  * @param msg   -
  * @param file  -
  * @param line  -
  * @param vars  -
- *
- * @return boolean   - false, um den Fehler so an PHP weiterzuleiten, als wenn kein Error-Handler installiert wäre
  */
 function onError($level, $msg, $file, $line, $vars) {
 
-   //$error = new PHPError($level, $msg, $file, $line, $vars);
-   //throw $error;
+   $error = new PHPError($level, $msg, $file, $line, $vars);
+   throw $error;
 
    $levels = array(E_PARSE           => 'Parse Error',
                    E_COMPILE_ERROR   => 'Compile Error',
@@ -167,16 +165,17 @@ function onError($level, $msg, $file, $line, $vars) {
       }
    }
 
-   // bei sämtlichen Fehlern Script beenden
-   exit(1);
+
+   // bei kritischen Fehlern Script beenden
+   if ($level & (E_PARSE | E_COMPILE_ERROR | E_CORE_ERROR | E_ERROR | E_USER_ERROR))
+      exit(1);
 }
 
 
 /**
  * Globaler Handler für nicht abgefangene Exceptions.  Zeigt die Exception im Browser an,
- * wenn der Request von 'localhost' kommt.  Loggt die Exception im Errorlog und schickt eine
- * Fehler-Email an alle registrierten Webmaster.
- * Nach Abarbeitung wird das Script immer beendet.
+ * wenn der Request von 'localhost' kommt.  Loggt die Exception im Errorlog und schickt
+ * Fehler-Emails an alle registrierten Webmaster.  Nach Abarbeitung wird das Script immer beendet.
  *
  * @param exception - die ausgelöste Exception
  */
@@ -271,6 +270,9 @@ function onException($exception) {
          error_log($message, 1, $webmaster, 'Subject: PHP error_log: Uncaught '.$className.' at '.@$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']);
       }
    }
+
+   // nach sämtlichen Fehlern Script beenden
+   exit(1);
 }
 
 
