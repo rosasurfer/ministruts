@@ -1,6 +1,6 @@
 #!/bin/sh
 PROJECTS_ROOT=/var/www
-PROJECT=php_lib
+PROJECT=ministruts
 
 
 # update project
