@@ -14,7 +14,7 @@ set_exception_handler('onException');                                // setzt PH
  *
  * @param className - Klassenname
  */
-function __autoload($className) {
+function __autoLoad($className) {
    static $classes = null;
 
    if (is_null($classes)) {
@@ -36,7 +36,7 @@ function __autoload($className) {
    }
 
    if (isSet($classes[$className])) {
-      require_once($classes[$className]);
+      require($classes[$className]);
    }
    else {
       trigger_error("Class '$className' is not defined", E_USER_ERROR);
@@ -45,9 +45,11 @@ function __autoload($className) {
 
 
 /**
- * Globaler Handler für nicht abgefangene Fehler.  Zeigt den Fehler im Browser an, wenn der Request von
- * 'localhost' kommt.  Loggt den Fehler im Errorlog und schickt Fehler-Emails an alle registrierten
- * Webmaster.  Ist der Fehler schwerwiegender als 'Warning', wird das Script automatisch beendet.
+ * Globaler Handler für nicht abgefangene Fehler.  Alle Fehler werden in eine Exception vom Typ
+ * PHPError umgewandelt und zurückgeworfen.
+ * Fehler, die in einer __autoLoad-Funktion ausgelöst wurden, werden wie herkömmliche PHP-Fehler behandelt,
+ * d.h. Anzeige im Browser, wenn der Request von 'localhost' kommt, loggen im Errorlog und verschicken von
+ * Fehler-Emails an alle registrierten Webmaster.  Nach Abarbeitung wird das Script beendet.
  *
  * @param level -
  * @param msg   -
@@ -57,22 +59,17 @@ function __autoload($className) {
  */
 function onError($level, $msg, $file, $line, $vars) {
 
-   //$error = new PHPError($level, $msg, $file, $line, $vars);
-   //throw $error;
+   // Prüfen, ob der Fehler in __autoLoad-Funktion ausgelöst wurde, dann darf keine Exception geworfen werden.
+   $error = new PHPError($level, $msg, $file, $line, $vars);
+   $autoLoad = false;
+   foreach($error->getTrace() as $frame) {
+      $autoLoad |= (strToLower($frame['function']) == '__autoload');
+   }
+   if (!$autoLoad)                                                            // Im Produktivbetrieb sollten nie Fehler in der __autoLoad-Funktion
+      throw $error;                                                           // ausgelöst werden, sodaß hier alle Fehler die Funktion verlassen.
 
-   $levels = array(E_PARSE           => 'Parse Error',
-                   E_COMPILE_ERROR   => 'Compile Error',
-                   E_COMPILE_WARNING => 'Compile Warning',
-                   E_CORE_ERROR      => 'Core Error',
-                   E_CORE_WARNING    => 'Core Warning',
-                   E_ERROR           => 'Error',
-                   E_WARNING         => 'Warning',
-                   E_NOTICE          => 'Notice',
-                   E_STRICT          => 'Runtime Notice',
-                   E_USER_ERROR      => 'Error',
-                   E_USER_WARNING    => 'Warning',
-                   E_USER_NOTICE     => 'Notice');
 
+   // Herkömmliche Fehlerbehandlung (wird nur in Test-/Entwicklungsphase benutzt)
    $console     = !isSet($_SERVER['REQUEST_METHOD']);                         // ob das Script in der Konsole läuft
    $display     = $console || $_SERVER['REMOTE_ADDR']=='127.0.0.1';           // ob der Fehler angezeigt werden soll (im Browser nur, wenn Request von localhost kommt)
    $displayHtml = $display && !$console;                                      // ob die Ausgabe HTML-formatiert werden muß
@@ -131,11 +128,11 @@ function onError($level, $msg, $file, $line, $vars) {
 
    // Fehleranzeige
    $msg = trim($msg);
-   $message = $levels[$level].': '.$msg."\nin ".$file.' on line '.$line."\n";
+   $message = $error->getLevelAsString().': '.$msg."\nin ".$file.' on line '.$line."\n";
 
    if ($display) {
       if ($displayHtml) {
-         echo nl2br('<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.$levels[$level].'</b>: '.$msg."\n in <b>".$file.'</b> on line <b>'.$line.'</b>');
+         echo nl2br('<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.$error->getLevelAsString().'</b>: '.$msg."\n in <b>".$file.'</b> on line <b>'.$line.'</b>');
          if ($trace)
             echo '<br>'.printFormatted($trace, true).'<br>';
          echo '</div>';
@@ -161,21 +158,19 @@ function onError($level, $msg, $file, $line, $vars) {
       $message = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $message)) : str_replace("\r\n", "\n", $message);
 
       foreach ($GLOBALS['webmasters'] as $webmaster) {
-         error_log($message, 1, $webmaster, 'Subject: PHP error_log: '.$levels[$level].' at '.@$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']);
+         error_log($message, 1, $webmaster, 'Subject: PHP error_log: '.$error->getLevelAsString().' at '.@$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']);
       }
    }
 
-
-   // bei kritischen Fehlern Script beenden
-   if ($level & (E_PARSE | E_COMPILE_ERROR | E_CORE_ERROR | E_ERROR | E_USER_ERROR))
-      exit(1);
+   // Script immer beenden
+   exit(1);
 }
 
 
 /**
  * Globaler Handler für nicht abgefangene Exceptions.  Zeigt die Exception im Browser an,
  * wenn der Request von 'localhost' kommt.  Loggt die Exception im Errorlog und schickt
- * Fehler-Emails an alle registrierten Webmaster.  Nach Abarbeitung wird das Script immer beendet.
+ * Fehler-Emails an alle registrierten Webmaster.  Nach Abarbeitung wird das Script beendet.
  *
  * @param exception - die ausgelöste Exception
  */
@@ -271,7 +266,7 @@ function onException($exception) {
       }
    }
 
-   // nach sämtlichen Fehlern Script beenden
+   // Script immer beenden
    exit(1);
 }
 
