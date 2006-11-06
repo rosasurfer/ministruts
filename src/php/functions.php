@@ -57,8 +57,8 @@ function __autoload($className) {
  */
 function onError($level, $msg, $file, $line, $vars) {
 
-   $error = new PHPError($level, $msg, $file, $line, $vars);
-   throw $error;
+   //$error = new PHPError($level, $msg, $file, $line, $vars);
+   //throw $error;
 
    $levels = array(E_PARSE           => 'Parse Error',
                    E_COMPILE_ERROR   => 'Compile Error',
