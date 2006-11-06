@@ -58,18 +58,18 @@ function __autoLoad($className) {
  * @param vars  -
  */
 function onError($level, $msg, $file, $line, $vars) {
+   if ((error_reporting() & $level) != $level)                                // Fehler, die der aktuelle Loglevel nicht abgedeckt, werden ignoriert
+      return;
 
-   // Prüfen, ob der Fehler in __autoLoad-Funktion ausgelöst wurde, dann darf keine Exception geworfen werden.
+   // Fehler in Exception kapseln und 'zurückwerfen' (solange er nicht in __autoLoad ausgelöst wurde)
    $error = new PHPError($level, $msg, $file, $line, $vars);
-   $autoLoad = false;
-   foreach($error->getTrace() as $frame) {
-      $autoLoad |= (strToLower($frame['function']) == '__autoload');
-   }
-   if (!$autoLoad)                                                            // Im Produktivbetrieb sollten nie Fehler in der __autoLoad-Funktion
-      throw $error;                                                           // ausgelöst werden, sodaß hier alle Fehler die Funktion verlassen.
+   $trace = $error->getTrace();
+   $frame =& $trace[1];
+   if (isSet($frame['class']) || strToLower($frame['function'])!='__autoload')
+      throw $error;
 
 
-   // Herkömmliche Fehlerbehandlung (wird nur in Test-/Entwicklungsphase benutzt)
+   // Herkömmliche Fehlerbehandlung für __autoLoad-Fehler
    $console     = !isSet($_SERVER['REQUEST_METHOD']);                         // ob das Script in der Konsole läuft
    $display     = $console || $_SERVER['REMOTE_ADDR']=='127.0.0.1';           // ob der Fehler angezeigt werden soll (im Browser nur, wenn Request von localhost kommt)
    $displayHtml = $display && !$console;                                      // ob die Ausgabe HTML-formatiert werden muß
@@ -234,7 +234,7 @@ function onException($exception) {
 
 
    // Fehleranzeige
-   $className = ($exception instanceof PHPError) ? 'PHP '.$exception->getLevelAsString() : get_class($exception);
+   $className = ($exception instanceof PHPError) ? $exception->getLevelAsString() : get_class($exception);
    $message = 'Uncaught '.$className.': '.$msg.' (Error-Code: '.$code.")\nin ".$file.' on line '.$line."\n";
    if ($display) {
       if ($displayHtml) {
@@ -262,7 +262,7 @@ function onException($exception) {
       $message = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $message)) : str_replace("\r\n", "\n", $message);
 
       foreach ($GLOBALS['webmasters'] as $webmaster) {
-         error_log($message, 1, $webmaster, 'Subject: PHP error_log: Uncaught '.$className.' at '.@$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']);
+         error_log($message, 1, $webmaster, 'Subject: PHP error_log: '.$className.' at '.@$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']);
       }
    }
 
