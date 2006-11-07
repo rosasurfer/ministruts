@@ -235,7 +235,7 @@ function onException($exception) {
 
    // Fehleranzeige
    $className = ($exception instanceof PHPError) ? $exception->getLevelAsString() : get_class($exception);
-   $message = 'Fatal Error: Uncaught '.$className.': '.$msg.' (Error-Code: '.$code.")\nin ".$file.' on line '.$line."\n";
+   $message = 'Fatal error: Uncaught '.$className.': '.$msg.' (Error-Code: '.$code.")\nin ".$file.' on line '.$line."\n";
    if ($display) {
       if ($displayHtml) {
          echo nl2br('<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>Fatal Error: Uncaught '.$className.'</b>: '.$msg.' (Error-Code: '.$code.")\n in <b>".$file.'</b> on line <b>'.$line.'</b>');
