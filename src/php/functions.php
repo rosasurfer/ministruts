@@ -128,11 +128,11 @@ function onError($level, $msg, $file, $line, $vars) {
 
    // Fehleranzeige
    $msg = trim($msg);
-   $message = $error->getLevelAsString().': '.$msg."\nin ".$file.' on line '.$line."\n";
+   $message = 'Fatal '.$error->getLevelAsString().': '.$msg."\nin ".$file.' on line '.$line."\n";
 
    if ($display) {
       if ($displayHtml) {
-         echo nl2br('<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.$error->getLevelAsString().'</b>: '.$msg."\n in <b>".$file.'</b> on line <b>'.$line.'</b>');
+         echo nl2br('<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>Fatal '.$error->getLevelAsString().'</b>: '.$msg."\n in <b>".$file.'</b> on line <b>'.$line.'</b>');
          if ($trace)
             echo '<br>'.printFormatted($trace, true).'<br>';
          echo '</div>';
@@ -158,7 +158,7 @@ function onError($level, $msg, $file, $line, $vars) {
       $message = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $message)) : str_replace("\r\n", "\n", $message);
 
       foreach ($GLOBALS['webmasters'] as $webmaster) {
-         error_log($message, 1, $webmaster, 'Subject: PHP error_log: '.$error->getLevelAsString().' at '.@$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']);
+         error_log($message, 1, $webmaster, 'Subject: PHP error_log: Fatal '.$error->getLevelAsString().' at '.@$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']);
       }
    }
 
@@ -235,10 +235,10 @@ function onException($exception) {
 
    // Fehleranzeige
    $className = ($exception instanceof PHPError) ? $exception->getLevelAsString() : get_class($exception);
-   $message = 'Uncaught '.$className.': '.$msg.' (Error-Code: '.$code.")\nin ".$file.' on line '.$line."\n";
+   $message = 'Fatal Error: Uncaught '.$className.': '.$msg.' (Error-Code: '.$code.")\nin ".$file.' on line '.$line."\n";
    if ($display) {
       if ($displayHtml) {
-         echo nl2br('<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>Uncaught '.$className.'</b>: '.$msg.' (Error-Code: '.$code.")\n in <b>".$file.'</b> on line <b>'.$line.'</b>');
+         echo nl2br('<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>Fatal Error: Uncaught '.$className.'</b>: '.$msg.' (Error-Code: '.$code.")\n in <b>".$file.'</b> on line <b>'.$line.'</b>');
          echo '<br>'.printFormatted($trace, true).'<br></div>';
       }
       else {
@@ -262,7 +262,7 @@ function onException($exception) {
       $message = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $message)) : str_replace("\r\n", "\n", $message);
 
       foreach ($GLOBALS['webmasters'] as $webmaster) {
-         error_log($message, 1, $webmaster, 'Subject: PHP error_log: '.$className.' at '.@$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']);
+         error_log($message, 1, $webmaster, 'Subject: PHP error_log: Fatal '.$className.' at '.@$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']);
       }
    }
 

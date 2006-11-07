@@ -117,7 +117,7 @@ class HttpRequest {
       while (($line=trim(fGets($socket))) != '') {
          $headers[] = $line;
       }
-      $data =& stream_get_meta_data($socket);
+      $data = stream_get_meta_data($socket);
       if ($data['timed_out']) {
          $this->error = true;
          trigger_error("Timeout on socket connection to http://$this->host:$this->port$this->uri", E_USER_WARNING);
