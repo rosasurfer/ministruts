@@ -35,6 +35,7 @@ function __autoLoad($className) {
          $classes = array_merge($classes, $GLOBALS['__autoloadClasses']);
    }
 
+
    if (isSet($classes[$className])) {
       require($classes[$className]);
    }
@@ -65,9 +66,10 @@ function onError($level, $msg, $file, $line, $vars) {
    $error = new PHPError($level, $msg, $file, $line, $vars);
    $trace = $error->getTrace();
    $frame =& $trace[1];
-   if (isSet($frame['class']) || strToLower($frame['function'])!='__autoload')
+   if (isSet($frame['class']) || ($frame['function']!='__autoLoad' && $frame['function']!='trigger_error'))
       throw $error;
-
+   if ($frame['function']=='trigger_error' && (!isSet($trace[2]) || isSet($trace[2]['class']) || $trace[2]['function']!='__autoLoad'))
+      throw $error;
 
    // Herkömmliche Fehlerbehandlung für __autoLoad-Fehler
    $console     = !isSet($_SERVER['REQUEST_METHOD']);                         // ob das Script in der Konsole läuft
