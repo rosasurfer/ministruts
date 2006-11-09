@@ -138,7 +138,9 @@ function onError($level, $msg, $file, $line, $vars) {
    $message = 'Fatal '.$error->getLevelAsString().': '.$msg."\nin ".$file.' on line '.$line."\n";
 
    if ($display) {
-      flush(); ob_flush();
+      flush();
+      ob_flush();
+
       if ($displayHtml) {
          echo nl2br('<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>Fatal '.$error->getLevelAsString().'</b>: '.$msg."\n in <b>".$file.'</b> on line <b>'.$line.'</b>');
          if ($trace)
@@ -245,7 +247,9 @@ function onException($exception) {
    $className = ($exception instanceof PHPError) ? $exception->getLevelAsString() : get_class($exception);
    $message = 'Fatal error: Uncaught '.$className.': '.$msg.' (Error-Code: '.$code.")\nin ".$file.' on line '.$line."\n";
    if ($display) {
-      flush(); ob_flush();
+      flush();
+      ob_flush();
+
       if ($displayHtml) {
          echo nl2br('<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>Fatal Error: Uncaught '.$className.'</b>: '.$msg.' (Error-Code: '.$code.")\n in <b>".$file.'</b> on line <b>'.$line.'</b>');
          echo '<br>'.printFormatted($trace, true).'<br></div>';
@@ -538,7 +542,9 @@ function printFormatted($var, $return = false) {                                
    if ($return)
       return $str;
 
-   flush(); ob_flush();
+   flush();
+   ob_flush();
+
    echo $str;
    return null;
 }
