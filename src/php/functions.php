@@ -59,7 +59,11 @@ function __autoLoad($className) {
  * @param vars  -
  */
 function onError($level, $msg, $file, $line, $vars) {
-   if ((error_reporting() & $level) != $level)                                // Fehler, die der aktuelle Loglevel nicht abgedeckt, werden ignoriert
+   static $error_reporting = null;
+   if (is_null($error_reporting))
+      $error_reporting = error_reporting();
+
+   if (($error_reporting & $level) != $level)                                 // Fehler, die der aktuelle Loglevel nicht abgedeckt, werden ignoriert
       return;
 
    // Fehler in Exception kapseln und 'zurückwerfen' (solange er nicht in __autoLoad ausgelöst wurde)
@@ -70,6 +74,7 @@ function onError($level, $msg, $file, $line, $vars) {
       throw $error;
    if ($frame['function']=='trigger_error' && (!isSet($trace[2]) || isSet($trace[2]['class']) || $trace[2]['function']!='__autoLoad'))
       throw $error;
+
 
    // Herkömmliche Fehlerbehandlung für __autoLoad-Fehler
    $console     = !isSet($_SERVER['REQUEST_METHOD']);                         // ob das Script in der Konsole läuft

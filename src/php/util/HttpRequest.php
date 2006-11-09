@@ -5,7 +5,7 @@
 class HttpRequest {
 
    private $debug = false;
-   private $error = false;       // whether or not an error occurred (to avoid recursions)
+   private $error = false;          // whether or not an error occurred (to avoid recursions)
 
    private $host;
    private $ip;
@@ -30,10 +30,10 @@ class HttpRequest {
     * Constructor
     */
    function HttpRequest($host, $port, $uri, $headers = null) {
-      if (!is_string($host)  || !$host)              trigger_error('Invalid host: '.$host,                E_USER_ERROR);
-      if (!is_int($port)     || $port < 1)           trigger_error('Invalid port: '.$port,                E_USER_ERROR);
-      if (!is_string($uri)   || !$uri)               trigger_error('Invalid uri: '.$uri,                  E_USER_ERROR);
-      if (!is_null($headers) && !is_array($headers)) trigger_error('Invalid argument headers: '.$headers, E_USER_ERROR);
+      if (!is_string($host)  || $host=='')           throw new InvalidArgumentException('Invalid host: '.$host);
+      if (!is_int($port)     || $port < 1)           throw new InvalidArgumentException('Invalid port: '.$port);
+      if (!is_string($uri)   || $uri=='')            throw new InvalidArgumentException('Invalid uri: '.$uri);
+      if (!is_null($headers) && !is_array($headers)) throw new InvalidArgumentException('Invalid headers array: '.$headers);
 
       $this->debug = @$GLOBALS['debug'];
       $this->host = trim(strToLower($host));
@@ -41,7 +41,7 @@ class HttpRequest {
       $this->uri = trim($uri);
 
       if (!is_null($headers))
-         $this->headers =& array_merge($this->headers, $headers);
+         $this->headers = array_merge($this->headers, $headers);
 
       if (!is_array(@$_SERVER['STORED_COOKIES']))
          $_SERVER['STORED_COOKIES'] = array();
@@ -149,16 +149,16 @@ class HttpRequest {
       $cookies = $this->getResponseHeader('set-cookie');
       if (sizeOf($cookies) > 0) {
          foreach ($cookies as $cookie) {
-            $parts =& explode(';', $cookie);
+            $parts = explode(';', $cookie);
             $nameValue = $parts[0];
             array_shift($parts);
 
             $sentCookie = array();
             foreach ($parts as $part) {
-               $pair =& explode('=', trim($part));
+               $pair = explode('=', trim($part));
                $sentCookie[$pair[0]] = $pair[1];
             }
-            $pair =& explode('=', trim($nameValue));
+            $pair = explode('=', trim($nameValue));
             $sentCookie['name'] = $pair[0];
             $sentCookie['value'] = $pair[1];
 
@@ -189,7 +189,7 @@ class HttpRequest {
       // Redirects mit neuem HttpRequest verfolgen
       if ($this->followRedirects && ($this->getResponseCode()==301 || $this->getResponseCode()==302)) {
          $host    = $this->host;
-         $uri     =& current($this->getResponseHeader('location'));
+         $uri     = current($this->getResponseHeader('location'));
          $headers = array('Referer' => 'http://'.$this->host.$this->uri);
          $cookies = $this->getStoredCookies($host, $uri);
          if ($cookies) {
@@ -263,7 +263,7 @@ class HttpRequest {
       if (is_null($map)) {
          if (is_null($temp=$this->getResponseHeaderMap()))
             return null;
-         $map =& array_change_key_case($temp, CASE_LOWER);
+         $map = array_change_key_case($temp, CASE_LOWER);
       }
       $name = strToLower($name);
       $foundHeaders = array();
@@ -283,11 +283,10 @@ class HttpRequest {
          if (is_null($headers=$this->getResponseHeaders()))
             return null;
          $statusLine = $headers[0];
-
          if (strPos($statusLine, 'HTTP/1.') !== 0) {
             trigger_error('Invalid HTTP status line: '.$statusLine, E_USER_ERROR);
          }
-         $tokens =& explode(' ', $statusLine);
+         $tokens = explode(' ', $statusLine);
          $status = (int) $tokens[1];
          if ($tokens[1] != "$status") {
             trigger_error('Invalid HTTP status code: '.$statusLine, E_USER_ERROR);
