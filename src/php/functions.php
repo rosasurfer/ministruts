@@ -46,11 +46,10 @@ function __autoLoad($className) {
 
 
 /**
- * Globaler Handler für nicht abgefangene Fehler.  Alle Fehler werden in eine Exception vom Typ
- * PHPError umgewandelt und zurückgeworfen.
- * Fehler, die in einer __autoLoad-Funktion ausgelöst wurden, werden wie herkömmliche PHP-Fehler behandelt,
- * d.h. Anzeige im Browser, wenn der Request von 'localhost' kommt, loggen im Errorlog und verschicken von
- * Fehler-Emails an alle registrierten Webmaster.  Nach Abarbeitung wird das Script beendet.
+ * Globaler Handler für herkömmliche PHP-Fehler.  Die Fehler werden in eine Exception vom Typ PHPError umgewandelt
+ * und zurückgeworfen.  E_USER_WARNINGs und Fehler, die in der __autoLoad-Funktion ausgelöst wurden, werden wie
+ * herkömmliche PHP-Fehler behandelt, d.h. Anzeige im Browser, wenn der Request von 'localhost' kommt, loggen im
+ * Errorlog und verschicken von Fehler-Emails an die registrierten Webmaster.
  *
  * @param level -
  * @param msg   -
@@ -60,23 +59,43 @@ function __autoLoad($className) {
  */
 function onError($level, $msg, $file, $line, $vars) {
    static $error_reporting = null;
-   if (is_null($error_reporting))
-      $error_reporting = error_reporting();
+   static $levels = null;
 
-   if (($error_reporting & $level) != $level)                                 // Fehler, die der aktuelle Loglevel nicht abgedeckt, werden ignoriert
+   if (is_null($error_reporting)) {
+      $error_reporting = error_reporting();
+      $levels = array(E_PARSE           => 'Parse Error',
+                      E_COMPILE_ERROR   => 'Compile Error',
+                      E_COMPILE_WARNING => 'Compile Warning',
+                      E_CORE_ERROR      => 'Core Error',
+                      E_CORE_WARNING    => 'Core Warning',
+                      E_ERROR           => 'Error',
+                      E_WARNING         => 'Warning',
+                      E_NOTICE          => 'Notice',
+                      E_STRICT          => 'Runtime Notice',
+                      E_USER_ERROR      => 'Error',
+                      E_USER_WARNING    => 'Warning',
+                      E_USER_NOTICE     => 'Notice');
+   }
+
+
+   // Fehler, die der aktuelle Loglevel nicht abgedeckt, werden ignoriert
+   if (($error_reporting & $level) != $level)
       return;
 
-   // Fehler in Exception kapseln und 'zurückwerfen' (solange er nicht in __autoLoad ausgelöst wurde)
-   $error = new PHPError($level, $msg, $file, $line, $vars);
-   $trace = $error->getTrace();
-   $frame =& $trace[1];
-   if (isSet($frame['class']) || ($frame['function']!='__autoLoad' && $frame['function']!='trigger_error'))
-      throw $error;
-   if ($frame['function']=='trigger_error' && (!isSet($trace[2]) || isSet($trace[2]['class']) || $trace[2]['function']!='__autoLoad'))
-      throw $error;
+
+   // Fehler in Exception kapseln und zurückwerfen (wenn nicht E_USER_WARNING und nicht in __autoLoad ausgelöst)
+   if (($error_reporting & $level) != E_USER_WARNING) {
+      $error = new PHPError($level, $msg, $file, $line, $vars);
+      $trace = $error->getTrace();
+      $frame =& $trace[1];
+      if (isSet($frame['class']) || ($frame['function']!='__autoLoad' && $frame['function']!='trigger_error'))
+         throw $error;
+      if ($frame['function']=='trigger_error' && (!isSet($trace[2]) || isSet($trace[2]['class']) || $trace[2]['function']!='__autoLoad'))
+         throw $error;
+   }
 
 
-   // Herkömmliche Fehlerbehandlung für __autoLoad-Fehler
+   // E_USER_WARNING und Fehler in __autoLoad werden geloggt
    $console     = !isSet($_SERVER['REQUEST_METHOD']);                         // ob das Script in der Konsole läuft
    $display     = $console || $_SERVER['REMOTE_ADDR']=='127.0.0.1';           // ob der Fehler angezeigt werden soll (im Browser nur, wenn Request von localhost kommt)
    $displayHtml = $display && !$console;                                      // ob die Ausgabe HTML-formatiert werden muß
@@ -135,14 +154,15 @@ function onError($level, $msg, $file, $line, $vars) {
 
    // Fehleranzeige
    $msg = trim($msg);
-   $message = 'Fatal '.$error->getLevelAsString().': '.$msg."\nin ".$file.' on line '.$line."\n";
+   $message = 'Fatal '.$levels[$level].': '.$msg."\nin ".$file.' on line '.$line."\n";
 
    if ($display) {
+      while (ob_get_level())
+         ob_end_flush();
       flush();
-      ob_flush();
 
       if ($displayHtml) {
-         echo nl2br('<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>Fatal '.$error->getLevelAsString().'</b>: '.$msg."\n in <b>".$file.'</b> on line <b>'.$line.'</b>');
+         echo nl2br('<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>Fatal '.$levels[$level].'</b>: '.$msg."\n in <b>".$file.'</b> on line <b>'.$line.'</b>');
          if ($trace)
             echo '<br>'.printFormatted($trace, true).'<br>';
          echo '</div>';
@@ -168,11 +188,11 @@ function onError($level, $msg, $file, $line, $vars) {
       $message = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $message)) : str_replace("\r\n", "\n", $message);
 
       foreach ($GLOBALS['webmasters'] as $webmaster) {
-         error_log($message, 1, $webmaster, 'Subject: PHP error_log: Fatal '.$error->getLevelAsString().' at '.@$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']);
+         error_log($message, 1, $webmaster, 'Subject: PHP error_log: Fatal '.$levels[$level].' at '.@$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']);
       }
    }
 
-   // Script immer beenden
+   // Bei Fehler in __autoLoad Script beenden
    exit(1);
 }
 
@@ -247,8 +267,9 @@ function onException($exception) {
    $className = ($exception instanceof PHPError) ? $exception->getLevelAsString() : get_class($exception);
    $message = 'Fatal error: Uncaught '.$className.': '.$msg.' (Error-Code: '.$code.")\nin ".$file.' on line '.$line."\n";
    if ($display) {
+      while (ob_get_level())
+         ob_end_flush();
       flush();
-      ob_flush();
 
       if ($displayHtml) {
          echo nl2br('<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>Fatal Error: Uncaught '.$className.'</b>: '.$msg.' (Error-Code: '.$code.")\n in <b>".$file.'</b> on line <b>'.$line.'</b>');
@@ -542,8 +563,9 @@ function printFormatted($var, $return = false) {                                
    if ($return)
       return $str;
 
+   while (ob_get_level())
+      ob_end_flush();
    flush();
-   ob_flush();
 
    echo $str;
    return null;
