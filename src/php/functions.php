@@ -6,7 +6,6 @@ set_error_handler('onError');
 set_exception_handler('onException');                                // setzt PHP 5 voraus
 
 
-
 /**
  * Lädt die Klassendefinition der angegebenen Klasse (ab PHP 5).
  * Aus dieser Funktion darf keine Exception geworfen werden, da eine solche Exception nicht an einen installierten
@@ -61,13 +60,12 @@ function __autoLoad($className) {
  *                   false, wenn der Fehler an PHP weitergereicht werden soll (als wenn der Error-Handler nicht registriert wäre)
  */
 function onError($level, $msg, $file, $line, $vars) {
-   static $error_reporting = null;
-   if (is_null($error_reporting))
-      $error_reporting = error_reporting();
+   $error_reporting = error_reporting();
 
    // Fehler, die der aktuelle Loglevel nicht abdeckt, werden ignoriert
-   if (($error_reporting & $level) != $level)
+   if ($error_reporting==0 || ($error_reporting & $level) != $level)          // 0 bedeutet:    @statement   hat Fehler ausgelöst
       return true;
+
 
    // Typspezifische Behandlung
    if ($level != E_USER_WARNING && $level != E_STRICT) {                      // werden nur geloggt
@@ -195,7 +193,7 @@ function onError($level, $msg, $file, $line, $vars) {
    }
 
    // E_USER_WARNING und E_STRICT werden nur geloggt
-   if ($level==E_USER_WARNING || $level==E_STRICT)                            
+   if ($level==E_USER_WARNING || $level==E_STRICT)
       return true;
 
    exit(1);
@@ -269,15 +267,14 @@ function onException($exception) {
 
 
    // Fehleranzeige
-   $className = ($exception instanceof PHPError) ? $exception->getLevelAsString() : get_class($exception);
-   $message = 'Fatal error: Uncaught '.$className.': '.$msg.' (Error-Code: '.$code.")\nin ".$file.' on line '.$line."\n";
+   $message = 'Fatal '.get_class($exception).': '.$msg.' (Error-Code: '.$code.")\nin ".$file.' on line '.$line."\n";
    if ($display) {
       while (ob_get_level())
          ob_end_flush();
       flush();
 
       if ($displayHtml) {
-         echo nl2br('<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>Fatal Error: Uncaught '.$className.'</b>: '.$msg.' (Error-Code: '.$code.")\n in <b>".$file.'</b> on line <b>'.$line.'</b>');
+         echo nl2br('<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>Fatal '.get_class($exception).'</b>: '.$msg.' (Error-Code: '.$code.")\n in <b>".$file.'</b> on line <b>'.$line.'</b>');
          echo '<br>'.printFormatted($trace, true).'<br></div>';
       }
       else {
@@ -301,7 +298,7 @@ function onException($exception) {
       $message = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $message)) : str_replace("\r\n", "\n", $message);
 
       foreach ($GLOBALS['webmasters'] as $webmaster) {
-         error_log($message, 1, $webmaster, 'Subject: PHP error_log: Fatal '.$className.' at '.@$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']);
+         error_log($message, 1, $webmaster, 'Subject: PHP error_log: Fatal '.get_class($exception).' at '.@$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']);
       }
    }
 
@@ -460,11 +457,15 @@ function getRandomID($length) {                                // Return: string
  */
 function startSession() {
    if (!isSession()) {
-      $php_errormsg = null;
-      @session_start();
-      if (preg_match('/The session id contains (invalid|illegal) characters/', $php_errormsg)) {
-         session_regenerate_id();
-         return true;
+      try {
+         session_start();
+      }
+      catch (PHPError $error) {
+         if (preg_match('/The session id contains illegal characters/', $error->getMessage())) {
+            session_regenerate_id();
+            return true;
+         }
+         throw $error;
       }
    }
    return isNewSession();
@@ -490,16 +491,15 @@ function isNewSession() {
    static $result = null;           // Ergebnis statisch zwischenspeichern
 
    if (is_null($result)) {
-      if (isSession()) {                                                                     // eine Session existiert ...
-         $sessionName = session_name();
-         if (isSet($_REQUEST[$sessionName]) && $_REQUEST[$sessionName]==session_id()) {      // ... sie kommt vom Kunden
-            $result = (sizeOf($_SESSION) == 0);                                              // eine leere Session muß neu sein
+      if (isSession()) {                                          // eine Session existiert ...
+         if (@$_REQUEST[session_name()]==session_id()) {          // ... sie kommt vom Kunden
+            $result = (sizeOf($_SESSION) == 0);                   // eine leere Session muß neu sein
          }
-         else {                                                                              // Session kommt nicht vom Kunden
+         else {                                                   // Session kommt nicht vom Kunden
             $result = true;
          }
 
-         if (sizeOf($_SESSION) == 0) {                                                       // leere Session initialisieren
+         if (sizeOf($_SESSION) == 0) {                            // leere Session initialisieren
             $_SESSION['__INITIALIZED__'] = 1;
          }
       }
