@@ -621,7 +621,7 @@ function getErrorLevelAsString() {
  * @return string der dekodierte String
  */
 function decodeHTML($html) {
-   $table =& array_flip(get_html_translation_table(HTML_ENTITIES, ENT_QUOTES));
+   $table = array_flip(get_html_translation_table(HTML_ENTITIES, ENT_QUOTES));
    $table['&nbsp;'] = ' ';
    $table['&euro;'] = '€';
    $string = strTr($html, $table);
