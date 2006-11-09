@@ -525,7 +525,7 @@ function printFormatted($var, $return = false) {                                
    $str = (is_array($var) || is_object($var) ? print_r($var, true) : $var)."\n";       //         string - wenn $return = true (siehe Dokumentation zu print_r())
 
    if (isSet($_SERVER['REQUEST_METHOD'])) {
-      $str = '<div align="left" style="font:normal normal 12px/normal serif"><pre>'.$str.'</pre></div>';
+      $str = '<div align="left"><pre style="font:normal normal 12px/normal courier,serif">'.$str.'</pre></div>';
    }
 
    if ($return)
