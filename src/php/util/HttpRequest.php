@@ -51,12 +51,14 @@ class HttpRequest {
       // falls ein Domainname übergeben wurde, dessen IP ermitteln
       if (preg_match('/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/', $this->host, $matches) == 0) {
          $this->ip = getHostByName($this->host);
-         ($this->ip == $this->host) && trigger_error('Cannot resolve ip address of: '.$host, E_USER_ERROR);
+         if ($this->ip == $this->host)
+            throw new RuntimeException('Cannot resolve ip address of: '.$host);
       }
       else {
          array_shift($matches);
          foreach ($matches as $value) {
-            ((int) $value > 255) && trigger_error('Invalid ip address: '.$host, E_USER_ERROR);
+            if ((int) $value > 255)
+               throw new RuntimeException('Invalid ip address: '.$host);
          }
          $this->ip = $this->host;
       }
@@ -68,7 +70,9 @@ class HttpRequest {
    function connect() {
       if ($this->error)
          return false;
-      $this->socket && trigger_error('Cannot reconnect already opened socket', E_USER_ERROR);
+
+      if ($this->socket)
+         throw new RuntimeException('Cannot reconnect already opened socket');
 
       // Socket öffnen
       $socket = fSockOpen('tcp://'.$this->ip, $this->port, $errorNo, $errorMsg, $this->timeout) or trigger_error("Could not open socket - error $errorNo: $errorMsg", E_USER_WARNING);
@@ -283,14 +287,14 @@ class HttpRequest {
          if (is_null($headers=$this->getResponseHeaders()))
             return null;
          $statusLine = $headers[0];
-         if (strPos($statusLine, 'HTTP/1.') !== 0) {
-            trigger_error('Invalid HTTP status line: '.$statusLine, E_USER_ERROR);
-         }
+         if (strPos($statusLine, 'HTTP/1.') !== 0)
+            throw new RuntimeException('Invalid HTTP status line: '.$statusLine);
+
          $tokens = explode(' ', $statusLine);
          $status = (int) $tokens[1];
-         if ($tokens[1] != "$status") {
-            trigger_error('Invalid HTTP status code: '.$statusLine, E_USER_ERROR);
-         }
+         if ($tokens[1] != "$status")
+            throw new RuntimeException('Invalid HTTP status code: '.$statusLine);
+
          $this->responseCode = $status;
       }
       return $this->responseCode;
@@ -319,7 +323,7 @@ class HttpRequest {
       $count = fWrite($this->socket, $data."\r\n", strLen($data)+2);
 
       if ($count != strLen($data)+2)
-         trigger_error('Error writing to socket, length of data: '.(strLen($data)+2).', bytes written: '.$count."\ndata: ".$data, E_USER_ERROR);
+         throw new RuntimeException('Error writing to socket, length of data: '.(strLen($data)+2).', bytes written: '.$count."\ndata: ".$data);
    }
 }
 ?>

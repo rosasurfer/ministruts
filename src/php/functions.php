@@ -349,7 +349,7 @@ function &executeSql($sql, &$db) {                             // Return: array 
    }
    if ($result['error']) {
       $result['error'] .= "\nSQL: ".str_replace("\n", " ", str_replace("\r\n", "\n", $sql));
-      trigger_error($result['error'], E_USER_ERROR);
+      throw new RuntimeException($result['error']);
    }
 
    return $result;
@@ -434,7 +434,8 @@ function getForwardedIP() {
  * Erzeugt eine zufällige ID der angegebenen Länge (ohne die Zeichen 0 O 1 l I, da Verwechselungsgefahr).
  */
 function getRandomID($length) {                                // Return: string
-   (!isSet($length) || !is_int($length) || $length < 1) && trigger_error("Invalid argument length: $length", E_USER_ERROR);
+   if (!isSet($length) || !is_int($length) || $length < 1)
+      throw new RuntimeException('Invalid argument length: '.$length);
 
    $id = crypt(uniqId(rand(), true));                          // zufällige ID erzeugen
    $id = strip_tags(stripSlashes($id));                        // Sonder- und leicht zu verwechselnde Zeichen entfernen
