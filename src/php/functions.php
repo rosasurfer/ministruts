@@ -13,7 +13,7 @@ set_exception_handler('onException');                                // setzt PH
  *
  * @param className - Klassenname
  */
-function __autoLoad($className) {
+function __autoload($className) {
    static $classes = null;
 
    if (is_null($classes)) {
@@ -46,7 +46,7 @@ function __autoLoad($className) {
 
 /**
  * Globaler Handler für herkömmliche PHP-Fehler.  Die Fehler werden in eine Exception vom Typ PHPError umgewandelt
- * und zurückgeworfen.  E_USER_WARNINGs und Fehler, die in der __autoLoad-Funktion ausgelöst wurden, werden wie
+ * und zurückgeworfen.  E_USER_WARNINGs und Fehler, die in der __autoload-Funktion ausgelöst wurden, werden wie
  * herkömmliche PHP-Fehler behandelt, d.h. Anzeige im Browser, wenn der Request von 'localhost' kommt, loggen im
  * Errorlog und verschicken von Fehler-Emails an die registrierten Webmaster.
  *
@@ -70,11 +70,11 @@ function onError($level, $msg, $file, $line, $vars) {
    // Typspezifische Behandlung
    if ($level != E_USER_WARNING && $level != E_STRICT) {                      // werden nur geloggt
       $error = new PHPError($level, $msg, $file, $line, $vars);               // Fehler in Exception kapseln und zurückwerfen
-      $trace = $error->getTrace();                                            // (wenn nicht in __autoLoad ausgelöst)
+      $trace = $error->getTrace();                                            // (wenn nicht in __autoload ausgelöst)
       $frame =& $trace[1];
-      if (isSet($frame['class']) || ($frame['function']!='__autoLoad' && $frame['function']!='trigger_error'))
+      if (isSet($frame['class']) || (strToLower($frame['function'])!='__autoload' && $frame['function']!='trigger_error'))
          throw $error;
-      if ($frame['function']=='trigger_error' && (!isSet($trace[2]) || isSet($trace[2]['class']) || $trace[2]['function']!='__autoLoad'))
+      if ($frame['function']=='trigger_error' && (!isSet($trace[2]) || isSet($trace[2]['class']) || strToLower($trace[2]['function'])!='__autoload'))
          throw $error;
    }
 
