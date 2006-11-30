@@ -17,16 +17,17 @@ function __autoload($className) {
    static $classes = null;
 
    if (is_null($classes)) {
-      // Hier werden alle Klassendefinitionen der Library mit dem Pfad der entprechenden PHP-Datei aufgeführt.
-      $classes = array('PHPError'           => 'php/lang/PHPError.php',
+      // Hier werden alle Klassendefinitionen der Library mit ihrem Pfad aufgeführt.
+      $classes = array('AbstractActionForm'      => 'php/actions/AbstractActionForm.php',
 
-                       'AbstractActionForm' => 'php/actions/AbstractActionForm.php',
+                       'PHPError'                => 'php/lang/PHPError.php',
+                       'InfrastructureException' => 'php/lang/InfrastructureException.php',
 
-                       'BasePdfDocument'    => 'php/pdf/BasePdfDocument.php',
-                       'SimplePdfDocument'  => 'php/pdf/SimplePdfDocument.php',
+                       'BasePdfDocument'         => 'php/pdf/BasePdfDocument.php',
+                       'SimplePdfDocument'       => 'php/pdf/SimplePdfDocument.php',
 
-                       'HttpRequest'        => 'php/util/HttpRequest.php',
-                       'Mailer'             => 'php/util/Mailer.php',
+                       'HttpRequest'             => 'php/util/HttpRequest.php',
+                       'Mailer'                  => 'php/util/Mailer.php',
       );
 
       // Hinzuladen zusätzlicher, projektspezifischer Definitionen. Das Array mit den Definitionen muß '$__autoloadClasses' heißen.
