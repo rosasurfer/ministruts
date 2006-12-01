@@ -90,7 +90,7 @@ function onError($level, $msg, $file, $line, $vars) {
 
    // Stacktrace generieren
    $stackTrace   = debug_backtrace();
-   $stackTrace[] = array('function' => 'main');                               // Damit der Stacktrace mit Java übereinstimmt, wird ein
+   $stackTrace[] = array('function' => 'main');                               // Damit der Stacktrace wie in Java aussieht, wird ein
    $size = sizeOf($stackTrace);                                               // zusätzlicher Frame fürs Hauptscript angefügt und alle
    for ($i=$size; $i-- > 0;) {                                                // FILE- und LINE-Felder um einen Frame nach unten verschoben.
       if (isSet($stackTrace[$i-1]['file']))
