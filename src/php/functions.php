@@ -559,12 +559,24 @@ function redirect($url) {
 
 
 /**
- * Hilfsfunktion zur formatierten Anzeige einer Variablen (mittels <pre> Tag).
+ * Hilfsfunktion zur HTML-formatierten Ausgabe einer Variablen.
  *
- * @return string
+ * @param var    - die auszugebende Variable
+ * @param return - Ob der Ausgabewert auf STDOUT ausgegeben werden soll (FALSE) oder Rückgabewert der Funktion sein soll (TRUE).
+ *                 Default ist false
+ * @return string - Rückgabewert, wenn der Parameter return TRUE ist, NULL andererseits
  */
-function printFormatted($var, $return = false) {                                       // Return: void   - wenn $return = false (default)
-   $str = (is_array($var) || is_object($var) ? print_r($var, true) : $var)."\n";       //         string - wenn $return = true (siehe Dokumentation zu print_r())
+function printFormatted($var, $return = false) {
+   if (is_object($var) && method_exists($var, '__toString')) {
+      $str = $var->__toString();
+   }
+   elseif (is_object($var) || is_array($var)) {
+      $str = print_r($var, true);
+   }
+   else {
+      $str = $var;
+   }
+   $str .= "\n";
 
    if (isSet($_SERVER['REQUEST_METHOD'])) {
       $str = '<div align="left"><pre style="font:normal normal 12px/normal courier,serif">'.$str.'</pre></div>';
