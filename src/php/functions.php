@@ -216,14 +216,13 @@ function onException($exception) {
    $mailErrors  = !$console && $_SERVER['REMOTE_ADDR']!='127.0.0.1';          // ob Fehler-Mails verschickt werden sollen
 
    $msg  = $exception->getMessage();
-   $code = $exception->getCode();
    $file = $exception->getFile();
    $line = $exception->getLine();
 
 
    // Stacktrace generieren
    $stackTrace = $exception->getTrace();
-   if ($exception instanceof PHPError)                                        // Ist die Exception ein PHPError, kann der erste Frame weg (er ist der Errorhandler).
+   if ($exception instanceof PHPError)                                        // Ist die Exception ein PHPError, kann der erste Frame weg (er ist der Errorhandler selbst).
       array_shift($stackTrace);
    $stackTrace[] = array('function'=>'main');                                 // Damit der Stacktrace mit Java übereinstimmt, wird ein
    $size = sizeOf($stackTrace);                                               // zusätzlicher Frame fürs Hauptscript angefügt und alle
@@ -268,14 +267,16 @@ function onException($exception) {
 
 
    // Fehleranzeige
-   $message = 'Fatal '.get_class($exception).': '.$msg.' (Error-Code: '.$code.")\nin ".$file.' on line '.$line."\n";
+   $fatal = ($exception instanceof PHPError) ? 'Fatal ' : '';
+   $className = get_class($exception);  
+   $message = $fatal.$className.': '.$msg.")\nin ".$file.' on line '.$line."\n";
    if ($display) {
       while (ob_get_level())
          ob_end_flush();
       flush();
 
       if ($displayHtml) {
-         echo nl2br('<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>Fatal '.get_class($exception).'</b>: '.$msg.' (Error-Code: '.$code.")\n in <b>".$file.'</b> on line <b>'.$line.'</b>');
+         echo nl2br('<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.$fatal.$className.'</b>: '.$msg.")\n in <b>".$file.'</b> on line <b>'.$line.'</b>');
          echo '<br>'.printFormatted($trace, true).'<br></div>';
       }
       else {
@@ -299,7 +300,7 @@ function onException($exception) {
       $message = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $message)) : str_replace("\r\n", "\n", $message);
 
       foreach ($GLOBALS['webmasters'] as $webmaster) {
-         error_log($message, 1, $webmaster, 'Subject: PHP error_log: Fatal '.get_class($exception).' at '.@$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']);
+         error_log($message, 1, $webmaster, 'Subject: PHP error_log: '.$fatal.$className.' at '.@$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']);
       }
    }
 
