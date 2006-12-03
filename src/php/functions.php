@@ -20,8 +20,9 @@ function __autoload($className) {
       // Hier werden alle Klassendefinitionen der Library mit ihrem Pfad aufgeführt.
       $classes = array('AbstractActionForm'      => 'php/actions/AbstractActionForm.php',
 
-                       'PHPError'                => 'php/lang/PHPError.php',
                        'InfrastructureException' => 'php/lang/InfrastructureException.php',
+                       'NestableException'       => 'php/lang/NestableException.php',
+                       'PHPError'                => 'php/lang/PHPError.php',
 
                        'BasePdfDocument'         => 'php/pdf/BasePdfDocument.php',
                        'SimplePdfDocument'       => 'php/pdf/SimplePdfDocument.php',
@@ -268,15 +269,15 @@ function onException($exception) {
 
    // Fehleranzeige
    $fatal = ($exception instanceof PHPError) ? 'Fatal ' : '';
-   $className = get_class($exception);  
-   $message = $fatal.$className.': '.$msg.")\nin ".$file.' on line '.$line."\n";
+   $className = get_class($exception);
+   $message = $fatal.$className.': '.$msg."\nin ".$file.' on line '.$line."\n";
    if ($display) {
       while (ob_get_level())
          ob_end_flush();
       flush();
 
       if ($displayHtml) {
-         echo nl2br('<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.$fatal.$className.'</b>: '.$msg.")\n in <b>".$file.'</b> on line <b>'.$line.'</b>');
+         echo nl2br('<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.$fatal.$className.'</b>: '.$msg."\n in <b>".$file.'</b> on line <b>'.$line.'</b>');
          echo '<br>'.printFormatted($trace, true).'<br></div>';
       }
       else {
