@@ -20,6 +20,7 @@ function __autoload($className) {
       // Hier werden alle Klassendefinitionen der MiniStruts-Library mit ihrem Pfad aufgeführt.
       $classes = array('AbstractActionForm'       => 'php/actions/AbstractActionForm.php',
 
+                       'IllegalTypeException'     => 'php/lang/IllegalTypeException.php',
                        'InfrastructureException'  => 'php/lang/InfrastructureException.php',
                        'InvalidArgumentException' => 'php/lang/InvalidArgumentException.php',
                        'NestableException'        => 'php/lang/NestableException.php',
