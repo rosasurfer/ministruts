@@ -17,18 +17,20 @@ function __autoload($className) {
    static $classes = null;
 
    if (is_null($classes)) {
-      // Hier werden alle Klassendefinitionen der Library mit ihrem Pfad aufgeführt.
-      $classes = array('AbstractActionForm'      => 'php/actions/AbstractActionForm.php',
+      // Hier werden alle Klassendefinitionen der MiniStruts-Library mit ihrem Pfad aufgeführt.
+      $classes = array('AbstractActionForm'       => 'php/actions/AbstractActionForm.php',
 
-                       'InfrastructureException' => 'php/lang/InfrastructureException.php',
-                       'NestableException'       => 'php/lang/NestableException.php',
-                       'PHPError'                => 'php/lang/PHPError.php',
+                       'InfrastructureException'  => 'php/lang/InfrastructureException.php',
+                       'InvalidArgumentException' => 'php/lang/InvalidArgumentException.php',
+                       'NestableException'        => 'php/lang/NestableException.php',
+                       'PHPError'                 => 'php/lang/PHPError.php',
+                       'RuntimeException'         => 'php/lang/RuntimeException.php',
 
-                       'BasePdfDocument'         => 'php/pdf/BasePdfDocument.php',
-                       'SimplePdfDocument'       => 'php/pdf/SimplePdfDocument.php',
+                       'BasePdfDocument'          => 'php/pdf/BasePdfDocument.php',
+                       'SimplePdfDocument'        => 'php/pdf/SimplePdfDocument.php',
 
-                       'HttpRequest'             => 'php/util/HttpRequest.php',
-                       'Mailer'                  => 'php/util/Mailer.php',
+                       'HttpRequest'              => 'php/util/HttpRequest.php',
+                       'Mailer'                   => 'php/util/Mailer.php',
       );
 
       // Hinzuladen zusätzlicher, projektspezifischer Definitionen. Das Array mit den Definitionen muß '$__autoloadClasses' heißen.
