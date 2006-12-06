@@ -1421,7 +1421,7 @@ class BasePdfDocument {
                break;
             }
          }
-         if (is_null($found)) {
+         if ($found === null) {
             trigger_error('File not found: '.$fontName, E_USER_WARNING);
          }
          else {
@@ -2865,7 +2865,7 @@ class BasePdfDocument {
                break;
             }
          }
-         if (is_null($found)) {
+         if ($found === null) {
             trigger_error('File not found: '.$file, E_USER_WARNING);
             return;
          }

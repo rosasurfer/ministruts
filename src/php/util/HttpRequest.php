@@ -33,14 +33,14 @@ class HttpRequest {
       if (!is_string($host)  || $host=='')           throw new InvalidArgumentException('Invalid host: '.$host);
       if (!is_int($port)     || $port < 1)           throw new InvalidArgumentException('Invalid port: '.$port);
       if (!is_string($uri)   || $uri=='')            throw new InvalidArgumentException('Invalid uri: '.$uri);
-      if (!is_null($headers) && !is_array($headers)) throw new InvalidArgumentException('Invalid headers array: '.$headers);
+      if ($headers !== null && !is_array($headers)) throw new InvalidArgumentException('Invalid headers array: '.$headers);
 
       $this->debug = @$GLOBALS['debug'];
       $this->host = trim(strToLower($host));
       $this->port = $port;
       $this->uri = trim($uri);
 
-      if (!is_null($headers))
+      if ($headers !== null)
          $this->headers = array_merge($this->headers, $headers);
 
       if (!is_array(@$_SERVER['STORED_COOKIES']))
@@ -204,7 +204,7 @@ class HttpRequest {
 
          $request = new HttpRequest($host, 80, $uri, $headers);
 
-         if (is_null($this->responseHeaders = $request->getResponseHeaders()) || is_null($this->responseBody = $request->getResponseBody())) {
+         if (($this->responseHeaders = $request->getResponseHeaders()) === null || ($this->responseBody = $request->getResponseBody()) === null) {
             $this->error = true;
             return false;
          }
@@ -216,7 +216,7 @@ class HttpRequest {
     * Get the HTTP response body.
     */
    function getResponseBody() {
-      if (is_null($this->responseHeaders)) {
+      if ($this->responseHeaders === null) {
          if (!$this->connect())
             return null;
       }
@@ -227,7 +227,7 @@ class HttpRequest {
     * Get all HTTP response headers.
     */
    function getResponseHeaders() {
-      if (is_null($this->responseHeaders)) {
+      if ($this->responseHeaders === null) {
          if (!$this->connect())
             return null;
       }
@@ -238,8 +238,8 @@ class HttpRequest {
     * Get all HTTP response headers as an associative array (a map).
     */
    function getResponseHeaderMap() {
-      if (is_null($this->responseHeaderMap)) {
-         if (is_null($headers=$this->getResponseHeaders()))
+      if ($this->responseHeaderMap === null) {
+         if (($headers=$this->getResponseHeaders()) === null)
             return null;
          $map = array();
 
@@ -264,8 +264,8 @@ class HttpRequest {
     */
    function getResponseHeader($name) {
       $map =& $this->lcResponseHeaderMap;
-      if (is_null($map)) {
-         if (is_null($temp=$this->getResponseHeaderMap()))
+      if ($map === null) {
+         if (($temp=$this->getResponseHeaderMap()) === null)
             return null;
          $map = array_change_key_case($temp, CASE_LOWER);
       }
@@ -283,8 +283,8 @@ class HttpRequest {
     * Get the HTTP response status code.
     */
    function getResponseCode() {
-      if (is_null($this->responseCode)) {
-         if (is_null($headers=$this->getResponseHeaders()))
+      if ($this->responseCode === null) {
+         if (($headers=$this->getResponseHeaders()) === null)
             return null;
          $statusLine = $headers[0];
          if (strPos($statusLine, 'HTTP/1.') !== 0)

@@ -151,7 +151,7 @@ function onError($level, $msg, $file, $line, $vars) {
 
 
    static $levels = null;
-   if (is_null($levels)) {
+   if ($levels === null) {
       $levels = array(E_PARSE           => 'Parse Error',
                       E_COMPILE_ERROR   => 'Compile Error',
                       E_COMPILE_WARNING => 'Compile Warning',
@@ -506,7 +506,7 @@ function isSession() {
 function isNewSession() {
    static $result = null;           // Ergebnis statisch zwischenspeichern
 
-   if (is_null($result)) {
+   if ($result === null) {
       if (isSession()) {                                          // eine Session existiert ...
          if (@$_REQUEST[session_name()]==session_id()) {          // ... sie kommt vom Kunden
             $result = (sizeOf($_SESSION) == 0);                   // eine leere Session muß neu sein
@@ -719,7 +719,7 @@ function subDate($date, $days) {
  * @return string
  */
 function formatSqlDate($format, $sqlDate) {
-   if (is_null($sqlDate) || $sqlDate=='0000-00-00 00:00:00')
+   if ($sqlDate === null || $sqlDate=='0000-00-00 00:00:00')
       return null;
 
    if ($sqlDate < '1970-01-01 00:00:00') {
