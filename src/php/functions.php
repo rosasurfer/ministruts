@@ -188,8 +188,8 @@ function onError($level, $msg, $file, $line, $vars) {
    // Fehler-Email an alle registrierten Webmaster schicken
    if ($mailErrors) {
       if ($trace)
-         $message .= "\n".$trace;
-      $message .= "\nRequest:\n--------\n".getRequest()."\nIP: ".$_SERVER['REMOTE_ADDR']."\n---\n";
+         $message .= "\n\n".$trace;
+      $message .= "\n\nRequest:\n--------\n".getRequest()."\n\nIP: ".$_SERVER['REMOTE_ADDR']."\n---\n";
       $message = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $message)) : str_replace("\r\n", "\n", $message);
 
       foreach ($GLOBALS['webmasters'] as $webmaster) {
@@ -299,8 +299,8 @@ function onException($exception) {
 
    // Fehler-Email an alle registrierten Webmaster schicken
    if ($mailErrors) {
-      $message .= "\n".$trace;
-      $message .= "\nRequest:\n--------\n".getRequest()."\nIP: ".$_SERVER['REMOTE_ADDR']."\n---\n";
+      $message .= "\n\n".$trace;
+      $message .= "\n\nRequest:\n--------\n".getRequest()."\n\nIP: ".$_SERVER['REMOTE_ADDR']."\n---\n";
       $message = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $message)) : str_replace("\r\n", "\n", $message);
 
       foreach ($GLOBALS['webmasters'] as $webmaster) {
