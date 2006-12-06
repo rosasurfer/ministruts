@@ -1,0 +1,7 @@
+<?
+/**
+ * Logger
+ */
+class Logger {
+}
+?>

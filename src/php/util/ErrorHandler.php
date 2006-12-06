@@ -1,0 +1,7 @@
+<?
+/**
+ * ErrorHandler
+ */
+class ErrorHandler {
+}
+?>
