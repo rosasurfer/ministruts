@@ -652,16 +652,30 @@ function getErrorLevelAsString() {
 
 
 /**
- * Dekodiert alle HTML-Entities zurück in ihre entsprechenden Zeichen (ISO-8859-15).
+ * Dekodiert HTML-Entities innerhalb eines Strings nach ISO-8859-15.
  *
- * @return string der dekodierte String
+ * @param html - der zu dekodierende String
+ *
+ * @return string
  */
-function decodeHTML($html) {
+function decodeHtml($html) {
    $table = array_flip(get_html_translation_table(HTML_ENTITIES, ENT_QUOTES));
    $table['&nbsp;'] = ' ';
    $table['&euro;'] = '€';
    $string = strTr($html, $table);
    return preg_replace('/&#(\d+);/me', "chr('\\1')", $string);
+}
+
+
+/**
+ * Dekodiert einen UTF-8-kodierten String nach ISO-8859-1.
+ *
+ * @param string - der zu dekodierende String
+ *
+ * @return string
+ */
+function decodeUtf8($string) {
+   return html_entity_decode(htmlEntities($string, ENT_NOQUOTES, 'UTF-8'));
 }
 
 
