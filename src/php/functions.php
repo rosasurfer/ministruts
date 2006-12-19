@@ -1,11 +1,11 @@
 <?
 /**
- * Systemvoraussetzung des Frameworks: PHP 5.0+
+ * Systemvoraussetzung: PHP 5.0+
  */
 
 
-// Alle Klassendefinitionen des Frameworks (kann mit Domain-Klassendefinitionen erweitert/überschrieben werden)
-// ------------------------------------------------------------------------------------------------------------
+// Klassendefinitionen des Frameworks können mit Domainklassen erweitert oder überschrieben werden
+// -----------------------------------------------------------------------------------------------
 $__autoloadClasses = array('AbstractActionForm'       => 'php/actions/AbstractActionForm.php',
 
                            'IllegalTypeException'     => 'php/lang/IllegalTypeException.php',
