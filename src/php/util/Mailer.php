@@ -7,7 +7,7 @@
  * $mailer = new Mailer();
  * $mailer->sendMail($from, $to, $subject, $message, $headers);
  */
-class Mailer {
+class Mailer extends Object {
 
    private $config = array('host'    => null,      // SMTP server host name
                            'port'    => null,      // SMTP server port

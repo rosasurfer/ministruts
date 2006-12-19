@@ -4,8 +4,8 @@
  */
 
 
-// Klassendefinitionen des Frameworks können mit Domainklassen erweitert oder überschrieben werden
-// -----------------------------------------------------------------------------------------------
+// Klassendefinitionen des Frameworks, können mit Domainklassen erweitert oder überschrieben werden
+// ------------------------------------------------------------------------------------------------
 $__autoloadClasses = array('AbstractActionForm'       => 'php/actions/AbstractActionForm.php',
 
                            'IllegalTypeException'     => 'php/lang/IllegalTypeException.php',

@@ -2,7 +2,7 @@
 /**
  * ErrorHandler
  */
-class ErrorHandler {
+class ErrorHandler extends Object {
 
 
    /**

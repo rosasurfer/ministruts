@@ -2,7 +2,7 @@
 /**
  * HttpRequest
  */
-class HttpRequest {
+class HttpRequest extends Object {
 
    private $debug = false;
    private $error = false;          // whether or not an error occurred (to avoid recursions)

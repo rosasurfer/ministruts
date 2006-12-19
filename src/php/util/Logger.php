@@ -2,6 +2,6 @@
 /**
  * Logger
  */
-class Logger {
+class Logger extends Object {
 }
 ?>
