@@ -41,8 +41,8 @@ define('WINDOWS', (strToUpper(subStr(PHP_OS, 0, 3))==='WIN'));       // ob der S
 
 /**
  * Lädt die Klassendefinition der angegebenen Klasse.
- * Diese Funktion darf keine Exceptions auslösen.  Sie würden nicht an einen installierten
- * Exception-Handler weitergeleitet, sondern das Script würde von PHP mit 'Fatal Error' beendet.
+ * Diese Funktion darf keine Exception werfen.  Sie würde nicht an einen installierten
+ * Exception-Handler weitergeleitet, sondern PHP würde das Script mit einem 'Fatal Error' beenden.
  *
  * @param string className - Klassenname
  */
@@ -392,7 +392,7 @@ function beginTransaction(&$db) {
  */
 function commitTransaction(&$db) {
    if (!$db['connection']) {
-      trigger_error("Warn: No database connection for committing transaction", E_USER_WARNING);
+      trigger_error("Warn: No database connection", E_USER_WARNING);
       return false;
    }
    if (!isSet($db['isTransaction']) || !$db['isTransaction']) {
@@ -412,7 +412,7 @@ function commitTransaction(&$db) {
  */
 function rollbackTransaction(&$db) {
    if (!$db['connection']) {
-      trigger_error("Warn: No database connection for rolling back transaction", E_USER_WARNING);
+      trigger_error("Warn: No database connection", E_USER_WARNING);
       return false;
    }
    if (!isSet($db['isTransaction']) || !$db['isTransaction']) {
