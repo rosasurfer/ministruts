@@ -12,6 +12,7 @@ $__autoloadClasses = array('AbstractActionForm'       => 'php/actions/AbstractAc
                            'InfrastructureException'  => 'php/lang/InfrastructureException.php',
                            'InvalidArgumentException' => 'php/lang/InvalidArgumentException.php',
                            'NestableException'        => 'php/lang/NestableException.php',
+                           'Object'                   => 'php/lang/Object.php',
                            'PHPError'                 => 'php/lang/PHPError.php',
                            'RuntimeException'         => 'php/lang/RuntimeException.php',
 
