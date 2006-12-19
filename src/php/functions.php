@@ -1,6 +1,6 @@
 <?
 /**
- * Systemvoraussetzung: PHP 5.0+
+ * Systemvoraussetzung: PHP 5.1+
  */
 
 
