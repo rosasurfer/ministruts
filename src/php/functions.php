@@ -577,10 +577,10 @@ function redirect($url) {
 /**
  * Hilfsfunktion zur HTML-formatierten Ausgabe einer Variablen.
  *
- * @param var    - die auszugebende Variable
- * @param return - Ob der Ausgabewert auf STDOUT ausgegeben werden soll (FALSE) oder Rückgabewert der Funktion sein soll (TRUE).
- *                 Default ist false
- * @return string - Rückgabewert, wenn der Parameter return TRUE ist, NULL andererseits
+ * @param var     - die auszugebende Variable
+ * @param return  - Ob der Ausgabewert auf STDOUT ausgegeben werden soll (FALSE) oder Rückgabewert der Funktion sein soll (TRUE),
+ *                  default ist false
+ * @return string - Rückgabewert, wenn der Parameter return TRUE ist, NULL andererseits.
  */
 function printFormatted($var, $return = false) {
    if (is_object($var) && method_exists($var, '__toString')) {
@@ -600,10 +600,6 @@ function printFormatted($var, $return = false) {
 
    if ($return)
       return $str;
-
-   while (ob_get_level())
-      ob_end_flush();
-   flush();
 
    echo $str;
    return null;
