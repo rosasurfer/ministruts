@@ -172,10 +172,6 @@ function onError($level, $msg, $file, $line, $vars) {
    $message = $levels[$level].': '.$msg."\nin ".$file.' on line '.$line."\n";
 
    if ($display) {
-      while (ob_get_level())
-         ob_end_flush();
-      flush();
-
       if ($displayHtml) {
          echo nl2br('<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.$levels[$level].'</b>: '.$msg."\n in <b>".$file.'</b> on line <b>'.$line.'</b>');
          if ($trace)
@@ -285,10 +281,6 @@ function onException($exception) {
    $className = get_class($exception);
    $message = $fatal.$className.': '.$msg."\nin ".$file.' on line '.$line."\n";
    if ($display) {
-      while (ob_get_level())
-         ob_end_flush();
-      flush();
-
       if ($displayHtml) {
          echo nl2br('<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.$fatal.$className.'</b>: '.$msg."\n in <b>".$file.'</b> on line <b>'.$line.'</b>');
          echo '<br>'.printFormatted($trace, true).'<br></div>';
