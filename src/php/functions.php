@@ -504,7 +504,7 @@ function isSession() {
  *
  * @return boolean
  */
-function isNewSession() {
+function isSessionNew() {
    static $result = null;           // Ergebnis statisch zwischenspeichern
 
    if ($result === null) {
@@ -526,10 +526,6 @@ function isNewSession() {
       }
    }
    return $result;
-}
-
-function isSessionNew() {
-   return isNewSession();
 }
 
 
