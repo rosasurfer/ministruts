@@ -485,7 +485,7 @@ function startSession() {
          throw $error;
       }
    }
-   return isNewSession();
+   return isSessionNew();
 }
 
 
@@ -557,7 +557,7 @@ function clearSession() {
  */
 function redirect($url) {
    if (isSession()) {
-      if (isNewSession() || SID!=='') {                        // bleiben wir innerhalb der Domain und Cookies sind aus, wird eine evt. Session-ID weitergegeben
+      if (isSessionNew() || SID !== '') {                      // bleiben wir innerhalb der Domain und Cookies sind aus, wird eine evt. Session-ID weitergegeben
          $host = strToLower(!empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']);
          $found = preg_match_all('/^https?:\/{2,}([a-z0-9-]+(\.[a-z0-9-]+)*)*.*$/', strToLower(trim($url)), $matches, PREG_SET_ORDER);
 
