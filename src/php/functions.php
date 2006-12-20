@@ -593,6 +593,7 @@ function printFormatted($var, $return = false) {
    if ($return)
       return $str;
 
+   ob_get_level() ? ob_flush() : flush();
    echo $str;
    return null;
 }
