@@ -508,15 +508,16 @@ function isNewSession() {
    static $result = null;           // Ergebnis statisch zwischenspeichern
 
    if ($result === null) {
-      if (isSession()) {                                          // eine Session existiert ...
-         if (@$_REQUEST[session_name()]==session_id()) {          // ... sie kommt vom Kunden
-            $result = (sizeOf($_SESSION) == 0);                   // eine leere Session muß neu sein
+      if (isSession()) {                                                                  // eine Session existiert ...
+         $sessionName = session_name();
+         if (isSet($_REQUEST[$sessionName]) && $_REQUEST[$sessionName]==session_id()) {   // ... sie kommt vom Kunden
+            $result = (sizeOf($_SESSION) == 0);                                           // eine leere Session muß neu sein
          }
-         else {                                                   // Session kommt nicht vom Kunden
+         else {                                                                           // Session kommt nicht vom Kunden
             $result = true;
          }
 
-         if (sizeOf($_SESSION) == 0) {                            // leere Session initialisieren
+         if (sizeOf($_SESSION) == 0) {                                                    // leere Session initialisieren
             $_SESSION['__INITIALIZED__'] = 1;
          }
       }
@@ -525,6 +526,10 @@ function isNewSession() {
       }
    }
    return $result;
+}
+
+function isSessionNew() {
+   return isNewSession();
 }
 
 
