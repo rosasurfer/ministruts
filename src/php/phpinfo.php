@@ -1,20 +1,25 @@
 <?
+if (PHP_VERSION < '5.1' || '5.2' <= PHP_VERSION)                              error('Warning: PHP version is not 5.1.x');
+
 if (ini_get('safe_mode'))                                                     error('Warning: safe_mode is not Off');
 if (ini_get('expose_php'))                                                    error('Warning: expose_php is not Off');
 
 if (ini_get('register_globals'))                                              error('Warning: register_globals is not Off');
+if (ini_get('register_long_arrays'))                                          error('Warning: register_long_arrays is not Off');
 if (ini_get('register_argc_argv'))                                            error('Warning: register_argc_argv is not Off');
-if (ini_get('allow_url_fopen'))                                               error('Warning: allow_url_fopen is not Off');
+if (!ini_get('auto_globals_jit'))                                             error('Warning: register_argc_argv is not On');
 if (ini_get('variables_order') != 'GPCS')                                     error('Warning: variables_order is not \'GPCS\': '.ini_get('variables_order'));
 if (ini_get('always_populate_raw_post_data'))                                 error('Warning: always_populate_raw_post_data is not Off');
 if (ini_get('define_syslog_variables'))                                       error('Warning: define_syslog_variables is not Off');
 if (ini_get('arg_separator.output') != '&amp;')                               error('Warning: arg_separator.output is not \'&amp;amp;\': '.ini_get('arg_separator.output'));
+if (ini_get('allow_url_fopen'))                                               error('Warning: allow_url_fopen is not Off');
 
 if ((int) ini_get('max_execution_time') != 30)                                error('Warning: max_execution_time is not 30: '.ini_get('max_execution_time'));
 if ((int) ini_get('default_socket_timeout') != 60)                            error('Warning: default_socket_timeout is not 60: '.ini_get('default_socket_timeout'));
 if (ini_get('implicit_flush'))                                                error('Warning: implicit_flush is not Off');
 if (ini_get('allow_call_time_pass_reference'))                                error('Warning: allow_call_time_pass_reference is not Off');
 if (!ini_get('ignore_user_abort'))                                            error('Warning: ignore_user_abort is not On');
+if (ini_get('session.save_handler') != 'files')                               error('Warning: session.save_handler is not \'files\': '.ini_get('session.save_handler'));
 if (ini_get('session.save_handler') == 'files') {
    $domainRoot = realPath($_SERVER['DOCUMENT_ROOT']);
    $dirs = explode(DIRECTORY_SEPARATOR, $domainRoot);
@@ -39,14 +44,20 @@ if (ini_get('magic_quotes_gpc'))                                              er
 if (ini_get('magic_quotes_runtime'))                                          error('Warning: magic_quotes_runtime is not Off');
 if (ini_get('magic_quotes_sybase'))                                           error('Warning: magic_quotes_sybase is not Off');
 
+$paths = explode(PATH_SEPARATOR, ini_get('include_path'));
+for ($i=0; $i < sizeOf($paths); ) if (trim($paths[$i++]) == '')               error('Warning: include_path contains empty path on position '.$i);
 if (ini_get('auto_prepend_file') != '')                                       error('Warning: auto_prepend_file is not empty: '.ini_get('auto_prepend_file'));
 if (ini_get('auto_append_file') != '')                                        error('Warning: auto_append_file is not empty: '.ini_get('auto_append_file'));
 if (ini_get('auto_detect_line_endings'))                                      error('Warning: auto_detect_line_endings is not Off');
-if (!ini_get('file_uploads'))                                                 error('Warning: file_uploads is not On' );
 if (ini_get('default_mimetype') != 'text/html')                               error('Warning: default_mimetype is not \'text/html\': '.ini_get('default_mimetype'));
+if (ini_get('default_charset') != 'iso-8859-1')                               error('Warning: default_charset is not \'iso-8859-1\': '.ini_get('default_charset'));
+if (!ini_get('file_uploads'))                                                 error('Warning: file_uploads is not On' );
+if ((int) ini_get('output_buffering') == 0)                                   error('Warning: output_buffering is disabled: '.ini_get('output_buffering'));
 
 if (ini_get('asp_tags'))                                                      error('Warning: asp_tags is not Off');
 if (!ini_get('y2k_compliance'))                                               error('Warning: y2k_compliance is not On');
+if (strLen(ini_get('date.timezone')) == 0)                                    error('Warning: date.timezone is not set');
+
 $current = (int) ini_get('error_reporting');
 if (($current & (E_ALL | E_STRICT)) != (E_ALL | E_STRICT))                    error('Warning: error_reporting is not E_ALL | E_STRICT: '.ini_get('error_reporting'));
 if (ini_get('ignore_repeated_errors'))                                        error('Warning: ignore_repeated_errors is not Off');
@@ -56,6 +67,7 @@ if ((int)ini_get('log_errors_max_len') != 0)                                  er
 if (!ini_get('track_errors'))                                                 error('Warning: track_errors is not On' );
 if (ini_get('html_errors'))                                                   error('Warning: html_errors is not Off');
 
+if (ini_get('enable_dl'))                                                     error('Warning: enable_dl is not Off');
 $declaredClasses = get_declared_classes();
 if (in_array('InvalidArgumentException', $declaredClasses))                   error('Warning: internal class SPL.InvalidArgumentException is not disabled (see: disable_classes)');
 if (in_array('RuntimeException'        , $declaredClasses))                   error('Warning: internal class SPL.RuntimeException is not disabled (see: disable_classes)');
@@ -70,12 +82,10 @@ $local = (@$_SERVER['REMOTE_ADDR']=='127.0.0.1');
 if ($local) {
    if (!ini_get('display_errors'))                                            error('Warning: display_errors is not On');
    if (!ini_get('display_startup_errors'))                                    error('Warning: display_startup_errors is not On');
-   if ((int) ini_get('output_buffering') != 0)                                error('Warning: output_buffering is enabled: '.ini_get('output_buffering'));
 }
 else {
    if (ini_get('display_errors'))                                             error('Warning: display_errors is not Off');
    if (ini_get('display_startup_errors'))                                     error('Warning: display_startup_errors is not Off');
-   if ((int) ini_get('output_buffering') == 0)                                error('Warning: output_buffering is disabled: '.ini_get('output_buffering'));
 }
 
 
@@ -101,23 +111,12 @@ function error($var) {
 }
 
 
+
 /*
-date.timezone     !!!
-include_path      !!!
-
-register_long_arrays
-auto_globals_jit
-default_charset
-enable_dl
-upload_tmp_dir
-sendmail_path
-
-cgi
 zlib.output_compression = Off
 mysql.trace_mode = Off
 assert.active = On
 */
-
 
 phpinfo();
 ?>
