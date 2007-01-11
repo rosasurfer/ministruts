@@ -101,7 +101,8 @@ class SimplePdfDocument extends BasePdfDocument {
             $size[3] = $paper[1] / 2.54 * 72;
          }
       }
-      $this->BasePdfDocument($size);
+      parent:: __construct($size);
+
       $this->ez['pageWidth']  = $size[2];
       $this->ez['pageHeight'] = $size[3];
 
@@ -427,18 +428,18 @@ class SimplePdfDocument extends BasePdfDocument {
    }
 
    // ------------------------------------------------------------------------------
-   function ezPRVTcleanUp(){
+   function ezPRVTcleanUp() {
      $this->ezPRVTaddPageNumbers();
    }
 
    // ------------------------------------------------------------------------------
-   function stream($options=''){
+   function stream($options = '') {
      $this->ezPRVTcleanUp();
-     BasePdfDocument::stream($options);
+     parent:: stream($options);
    }
 
    // ------------------------------------------------------------------------------
-   function ezOutput($options=0){
+   function ezOutput($options = 0) {
      $this->ezPRVTcleanUp();
      return $this->output($options);
    }
