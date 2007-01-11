@@ -8,6 +8,8 @@
 // ------------------------------------------------------------------------------------------------
 $__autoloadClasses = array('AbstractActionForm'       => 'php/actions/AbstractActionForm.php',
 
+                           'PersistableObject'        => 'php/db/PersistableObject.php',
+
                            'IllegalTypeException'     => 'php/lang/IllegalTypeException.php',
                            'InfrastructureException'  => 'php/lang/InfrastructureException.php',
                            'InvalidArgumentException' => 'php/lang/InvalidArgumentException.php',
