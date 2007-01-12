@@ -19,5 +19,14 @@ abstract class PersistableObject extends Object {
     * Speichert die aktuelle Instanz.
     */
    abstract public function save();
+
+
+   /**
+    * Mappt Datenbankspalten auf Instanzvariablen.
+    *
+    * @param property - Name der zu mappenden Tabellenspalte
+    * @param value    - Wert, auf den die entsprechende Variable der Klasseninstanz gesetzt werden soll
+    */
+   abstract protected function __set($property, $value);
 }
 ?>

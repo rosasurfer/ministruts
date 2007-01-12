@@ -329,7 +329,7 @@ function onException($exception) {
  * Führt eine SQL-Anweisung aus. Dabei wird eine evt. schon offene Verbindung weiterverwendet.
  *
  * @param sql - die auszuführende SQL-Anweisung (string)
- * @param &db - die zu verwendende Datenbankkonfiguration (array)
+ * @param db  - die zu verwendende Datenbankkonfiguration (array)
  *
  * @return array['set']  - das zurückgegebene Resultset (wenn zutreffend)
  *              ['rows'] - Anzahl der zurückgegebenen bzw. bearbeiteten Datensätze (wenn zutreffend)
@@ -344,7 +344,7 @@ function &executeSql($sql, array &$db) {
 
    // ohne bestehende Verbindung eine neue aufbauen
    if ($db['connection'] === null) {
-      $db['connection'] = mysql_connect($db['server'], $db['user'], $db['password']);
+      $db['connection'] = mysql_connect($db['server'], $db['user'], $db['password'], true);
       if ($db['connection'] === null)
          throw new RuntimeException('Database connection error'.($errno = mysql_errno()) ? "\nError ".mysql_errno().': '.mysql_error() : '');
 
