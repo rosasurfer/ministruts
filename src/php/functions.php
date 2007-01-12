@@ -51,21 +51,24 @@ define('WINDOWS', (strToUpper(subStr(PHP_OS, 0, 3))==='WIN'));       // ob der S
  */
 function __autoload($className) {
    global $__autoloadClasses;
-
    if (isSet($__autoloadClasses[$className])) {
       include($__autoloadClasses[$className]);
       return true;
    }
-
    trigger_error("Undefined class '$className'", E_USER_ERROR);
 }
 
 
 /**
  * Globaler Handler für herkömmliche PHP-Fehler.  Die Fehler werden in eine Exception vom Typ PHPError umgewandelt
- * und zurückgeworfen.  E_USER_WARNINGs und Fehler, die in der __autoload-Funktion ausgelöst wurden, werden wie
- * herkömmliche PHP-Fehler behandelt, d.h. Anzeige im Browser, wenn der Request von 'localhost' kommt, loggen im
- * Errorlog und verschicken von Fehler-Emails an die registrierten Webmaster.
+ * und zurückgeworfen.
+ *
+ * Ausnahmen: E_USER_WARNINGs und Fehler, die in __autoload() ausgelöst wurden, werden weiterhin wie herkömmliche
+ * Fehler behandelt, d.h.:
+ *
+ *  - Fehleranzeige (im Browser nur, wenn der Request von 'localhost' kommt)
+ *  - Loggen im Errorlog
+ *  - Verschicken von Fehler-Emails an die registrierten Webmaster
  *
  * @param level -
  * @param msg   -
@@ -215,9 +218,12 @@ function onError($level, $msg, $file, $line, $vars) {
 
 
 /**
- * Globaler Handler für nicht abgefangene Exceptions.  Zeigt die Exception im Browser an,
- * wenn der Request von 'localhost' kommt.  Loggt die Exception im Errorlog und schickt
- * Fehler-Emails an alle registrierten Webmaster.  Nach Abarbeitung wird das Script beendet.
+ * Globaler Handler für nicht behandelte Exceptions.
+ *
+ * Ablauf: - Anzeige der Exception (im Browser nur, wenn der Request von 'localhost' kommt)
+ *         - Loggen im Errorlog
+ *         - Verschicken von Fehler-Emails an die registrierten Webmaster
+ *         - Beenden des Scriptes
  *
  * @param exception - die ausgelöste Exception
  */
@@ -320,48 +326,53 @@ function onException($exception) {
 
 
 /**
- * Führt in der angegebenen Datenbank eine SQL-Anweisung aus (benutzt eine evt. schon offene Verbindung).
+ * Führt eine SQL-Anweisung aus. Dabei wird eine evt. schon offene Verbindung weiterverwendet.
  *
- * @return array
+ * @param sql - die auszuführende SQL-Anweisung (string)
+ * @param &db - die zu verwendende Datenbankkonfiguration (array)
+ *
+ * @return array['set']  - das zurückgegebene Resultset (wenn zutreffend)
+ *              ['rows'] - Anzahl der zurückgegebenen bzw. bearbeiteten Datensätze (wenn zutreffend)
  */
-function &executeSql($sql, &$db) {                             // Return: array $result['set']    - das Resultset
-   $sql = trim($sql);                                          //               $result['rows']   - Anzahl der zurückgegebenen oder bearbeiteten Datensätze
-   $result = array('set'   => null,                            //               $result['error']  - eine eventuelle MySQL-Fehlermeldung
-                   'rows'  => 0,
-                   'error' => null);
-   if (!is_array($db)) {
-      $result['error'] = 'Ungültige DB-Konfiguration - type of $db: '.getType($db);
-   }                                                                                      // ohne Connection neue aufbauen
-   elseif (!$db['connection'] && (!isSet($db['server']) || !isSet($db['user']) || !isSet($db['password']) || !$db['database'])) {
-      $result['error'] = 'DB-Konfiguration fehlerhaft';
-   }                                                                                      // ohne Connection neue aufbauen
-   elseif (!$db['connection'] && !($db['connection'] = mysql_connect($db['server'], $db['user'], $db['password']))) {
-      $result['error'] = "Keine Datenbankverbindung\n".mysql_errno().': '.mysql_error();
+function &executeSql($sql, array &$db) {
+   if (!is_string($sql) || !($sql = trim($sql)))
+      throw new InvalidArgumentException('Invalid SQL string: '.$sql);
+
+   if (!isSet($db['server']) || !isSet($db['user']) || !isSet($db['password']) || !$db['database'] || !array_key_exists('connection', $db))
+      throw new InvalidArgumentException('Invalid database configuration: '.$db);
+
+
+   // ohne bestehende Verbindung eine neue aufbauen
+   if ($db['connection'] === null) {
+      $db['connection'] = mysql_connect($db['server'], $db['user'], $db['password']);
+      if ($db['connection'] === null)
+         throw new RuntimeException('Database connection error'.($errno = mysql_errno()) ? "\nError ".mysql_errno().': '.mysql_error() : '');
+
+      // nach Verbindungsaufbau Datenbank selektieren
+      if (!mysql_select_db($db['database'], $db['connection']))
+         throw new RuntimeException(($errno = mysql_errno()) ? "Error selecting the database\nError $errno: ".mysql_error() : 'Database connection error');
    }
-   elseif ($db['database'] && !mysql_select_db($db['database'], $db['connection'])) {     // Datenbank selektieren
-      $result['error'] = ($errno = mysql_errno()) ? "Datenbank nicht gefunden\n$errno: ".mysql_error() : 'Netzwerkfehler beim Datenbankzugriff';
+
+
+   // Abfrage abschicken
+   if (!($resultSet = mysql_query($sql, $db['connection']))) {
+      $error = ($errno = mysql_errno()) ? "SQL-Error $errno: ".mysql_error() : 'Database connection error';
+      throw new RuntimeException($error."\nSQL: ".str_replace("\n", ' ', str_replace("\r\n", "\n", $sql)));
    }
-   elseif ($resultSet = mysql_query($sql, $db['connection'])) {                           // Abfrage abschicken
-      if (is_resource($resultSet)) {
-         $result['set'] =& $resultSet;
-         $result['rows'] = mysql_num_rows($resultSet);                                    // Anzahl der zurückgegebenen Zeilen auslesen
-      }
-      else {
-         $sql = strToLower($sql);
-         if (subStr($sql,0,6)=='insert' || subStr($sql,0,7)=='replace' || subStr($sql,0,6)=='update' || subStr($sql,0,6)=='delete') {
-            $result['rows'] = mysql_affected_rows($db['connection']);                     // Anzahl der geänderten Zeilen auslesen
-         }
-      }
+
+   // Ergebnis der Abfrage auslesen
+   $result = array('set'  => null,
+                   'rows' => 0);
+
+   if (is_resource($resultSet)) {
+      $result['set']  =& $resultSet;
+      $result['rows'] = mysql_num_rows($resultSet);                     // Anzahl der selektierten Zeilen
    }
    else {
-      if ($errNo = mysql_errno()) {
-         $result['error'] = "SQL-Error $errNo: ".mysql_error();
+      $sql = strToLower($sql);
+      if (subStr($sql, 0, 6)=='insert' || subStr($sql, 0, 7)=='replace' || subStr($sql, 0, 6)=='update' || subStr($sql, 0, 6)=='delete') {
+         $result['rows'] = mysql_affected_rows($db['connection']);      // Anzahl der aktualisierten Zeilen
       }
-      else $result['error'] = 'Netzwerkfehler beim Datenbankzugriff';
-   }
-   if ($result['error']) {
-      $result['error'] .= "\nSQL: ".str_replace("\n", " ", str_replace("\r\n", "\n", $sql));
-      throw new RuntimeException($result['error']);
    }
 
    return $result;
