@@ -15,7 +15,7 @@ $__autoloadClasses = array('AbstractActionForm'       => 'php/actions/AbstractAc
                            'InvalidArgumentException' => 'php/lang/InvalidArgumentException.php',
                            'NestableException'        => 'php/lang/NestableException.php',
                            'Object'                   => 'php/lang/Object.php',
-                           'PHPError'                 => 'php/lang/PHPError.php',
+                           'PHPErrorException'        => 'php/lang/PHPErrorException.php',
                            'RuntimeException'         => 'php/lang/RuntimeException.php',
 
                            'BasePdfDocument'          => 'php/pdf/BasePdfDocument.php',
@@ -60,7 +60,7 @@ function __autoload($className) {
 
 
 /**
- * Globaler Handler für herkömmliche PHP-Fehler.  Die Fehler werden in eine Exception vom Typ PHPError umgewandelt
+ * Globaler Handler für herkömmliche PHP-Fehler.  Die Fehler werden in eine Exception vom Typ PHPErrorException umgewandelt
  * und zurückgeworfen.
  *
  * Ausnahmen: E_USER_WARNINGs und Fehler, die in __autoload() ausgelöst wurden, werden weiterhin wie herkömmliche
@@ -89,7 +89,7 @@ function onError($level, $msg, $file, $line, $vars) {
 
    // Typspezifische Behandlung
    if ($level != E_USER_WARNING && $level != E_STRICT) {                      // werden nur geloggt
-      $error = new PHPError($level, $msg, $file, $line, $vars);               // Fehler in Exception kapseln und zurückwerfen
+      $error = new PHPErrorException($level, $msg, $file, $line, $vars);      // Fehler in Exception kapseln und zurückwerfen
       $trace = $error->getTrace();                                            // (wenn nicht in __autoload ausgelöst)
       $frame =& $trace[1];
       if (isSet($frame['class']) || (strToLower($frame['function'])!='__autoload' && $frame['function']!='trigger_error'))
@@ -241,8 +241,8 @@ function onException($exception) {
 
    // Stacktrace generieren
    $stackTrace = $exception->getTrace();
-   if ($exception instanceof PHPError)                                        // Ist die Exception ein PHPError, kann der erste Frame weg (er ist der Errorhandler selbst).
-      array_shift($stackTrace);
+   if ($exception instanceof PHPErrorException)                               // Ist die Exception eine PHPErrorException, kann der erste Frame weg.
+      array_shift($stackTrace);                                               // (er ist der Errorhandler selbst)
    $stackTrace[] = array('function'=>'main');                                 // Damit der Stacktrace mit Java übereinstimmt, wird ein
    $size = sizeOf($stackTrace);                                               // zusätzlicher Frame fürs Hauptscript angefügt und alle
    for ($i=$size; $i-- > 0;) {                                                // FILE- und LINE-Felder um einen Frame nach unten verschoben.
@@ -286,13 +286,12 @@ function onException($exception) {
 
 
    // Fehleranzeige
-   $fatal = ($exception instanceof PHPError) ? 'Fatal ' : '';
    $className = get_class($exception);
-   $message = $fatal.$className.': '.$msg."\nin ".$file.' on line '.$line."\n";
+   $message = $className.': '.$msg."\nin ".$file.' on line '.$line."\n";
    if ($display) {
       if ($displayHtml) {
          ob_get_level() ? ob_flush() : flush();
-         echo nl2br('<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.$fatal.$className.'</b>: '.$msg."\n in <b>".$file.'</b> on line <b>'.$line.'</b>');
+         echo nl2br('<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.$className.'</b>: '.$msg."\n in <b>".$file.'</b> on line <b>'.$line.'</b>');
          echo '<br>'.printFormatted($trace, true).'<br></div>';
       }
       else {
@@ -316,7 +315,7 @@ function onException($exception) {
       $message = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $message)) : str_replace("\r\n", "\n", $message);
 
       foreach ($GLOBALS['webmasters'] as $webmaster) {
-         error_log($message, 1, $webmaster, 'Subject: PHP error_log: '.$fatal.$className.' at '.@$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']);
+         error_log($message, 1, $webmaster, 'Subject: PHP error_log: '.$className.' at '.@$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']);
       }
    }
 
@@ -484,7 +483,7 @@ function startSession() {
       try {
          session_start();
       }
-      catch (PHPError $error) {
+      catch (PHPErrorException $error) {
          if (preg_match('/The session id contains illegal characters/', $error->getMessage())) {
             session_regenerate_id();
             return true;
