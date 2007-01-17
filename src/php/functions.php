@@ -4,8 +4,21 @@
  */
 
 
-// Klassendefinitionen des Frameworks, können mit Domainklassen erweitert oder überschrieben werden
-// ------------------------------------------------------------------------------------------------
+// Globale Konstanten
+// ------------------
+define('WINDOWS', (strToUpper(subStr(PHP_OS, 0, 3))==='WIN'));    // ob der Server unter Windows läuft
+
+define('L_DEBUG' , 10001);                                        // die verschiedenen Loglevel
+define('L_NOTICE', 10002);
+define('L_INFO'  , 10003);
+define('L_WARN'  , 10004);
+define('L_ERROR' , 10005);
+define('L_FATAL' , 10006);
+
+
+
+// Klassenimporte, können mit Domainklassen überschrieben werden
+// -------------------------------------------------------------
 $__autoloadClasses['AbstractActionForm'      ] = 'php/actions/AbstractActionForm.php';
 
 $__autoloadClasses['PersistableObject'       ] = 'php/db/PersistableObject.php';
@@ -28,17 +41,10 @@ $__autoloadClasses['Mailer'                  ] = 'php/util/Mailer.php';
 
 
 
-
-// Eigene Error- und Exceptionhandler registrieren
-// -----------------------------------------------
+// Eigene Errorhandler registrieren
+// --------------------------------
 set_error_handler('onError');
 set_exception_handler('onException');
-
-
-
-// Definition globaler Konstanten
-// ------------------------------
-define('WINDOWS', (strToUpper(subStr(PHP_OS, 0, 3))==='WIN'));       // ob der Server unter Windows läuft
 
 
 
@@ -608,7 +614,7 @@ function printFormatted($var, $return = false) {
       $str = print_r($var, true);
    }
    else {
-      $str = $var;
+      $str = (string) $var;
    }
    $str .= "\n";
 

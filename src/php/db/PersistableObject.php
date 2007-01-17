@@ -52,13 +52,25 @@ abstract class PersistableObject extends Object {
    protected function __set($property, $value) {
       static $mappings = null;
       if ($mappings === null) {
-         eval('$mappings =& '.get_class($this).'::$mappings;');   // runtime evaluation of static property  (erst ab PHP6 fest eingebaut)
+         eval('$mappings =& '.get_class($this).'::$mappings;');         // runtime evaluation of static property  (erst ab PHP6 fest eingebaut)
       }
 
-      if (!isSet($mappings[$property]))
-         throw new RuntimeException("Database mapping for field '$property' not found (class ".get_Class($this).")");
+      // Mapping suchen
+      if (isSet($mappings[$property])) {
+         $this->$mappings[$property] = $value;                          // gefunden, Property setzen
+      }
+      else {                                                            // Mapping nicht gefunden: prüfen, ob mysql_fetch_object() der Aufrufer ist
+         $trace = debug_backTrace();
+         $i = 0;
+         do {
+            $frame =& $trace[++$i];
+         } while (strToLower($frame['function'])=='__set');
 
-      $this->$mappings[$property] = $value;
+         if (strToLower($frame['function']) == 'mysql_fetch_object')    // ja
+            throw new RuntimeException("Database mapping for field '$property' not found (class ".get_Class($this).")");
+
+         parent:: __set($property, $value);                             // nein, Aufruf weiterreichen (Programmierfehler)
+      }
    }
 }
 ?>

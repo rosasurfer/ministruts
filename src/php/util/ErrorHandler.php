@@ -6,6 +6,14 @@ class ErrorHandler extends Object {
 
 
    /**
+    * Constructor
+    */
+   private function __construct() {
+      throw new Exception('Do not instantiate this class.');
+   }
+
+
+   /**
     * @param level -
     * @param msg   -
     * @param file  -
