@@ -6,26 +6,26 @@
 
 // Klassendefinitionen des Frameworks, können mit Domainklassen erweitert oder überschrieben werden
 // ------------------------------------------------------------------------------------------------
-$__autoloadClasses = array('AbstractActionForm'       => 'php/actions/AbstractActionForm.php',
+$__autoloadClasses['AbstractActionForm'      ] = 'php/actions/AbstractActionForm.php';
 
-                           'PersistableObject'        => 'php/db/PersistableObject.php',
+$__autoloadClasses['PersistableObject'       ] = 'php/db/PersistableObject.php';
 
-                           'IllegalTypeException'     => 'php/lang/IllegalTypeException.php',
-                           'InfrastructureException'  => 'php/lang/InfrastructureException.php',
-                           'InvalidArgumentException' => 'php/lang/InvalidArgumentException.php',
-                           'NestableException'        => 'php/lang/NestableException.php',
-                           'Object'                   => 'php/lang/Object.php',
-                           'PHPErrorException'        => 'php/lang/PHPErrorException.php',
-                           'RuntimeException'         => 'php/lang/RuntimeException.php',
+$__autoloadClasses['IllegalTypeException'    ] = 'php/lang/IllegalTypeException.php';
+$__autoloadClasses['InfrastructureException' ] = 'php/lang/InfrastructureException.php';
+$__autoloadClasses['InvalidArgumentException'] = 'php/lang/InvalidArgumentException.php';
+$__autoloadClasses['NestableException'       ] = 'php/lang/NestableException.php';
+$__autoloadClasses['Object'                  ] = 'php/lang/Object.php';
+$__autoloadClasses['PHPErrorException'       ] = 'php/lang/PHPErrorException.php';
+$__autoloadClasses['RuntimeException'        ] = 'php/lang/RuntimeException.php';
 
-                           'BasePdfDocument'          => 'php/pdf/BasePdfDocument.php',
-                           'SimplePdfDocument'        => 'php/pdf/SimplePdfDocument.php',
+$__autoloadClasses['BasePdfDocument'         ] = 'php/pdf/BasePdfDocument.php';
+$__autoloadClasses['SimplePdfDocument'       ] = 'php/pdf/SimplePdfDocument.php';
 
-                           'ErrorHandler'             => 'php/util/ErrorHandler.php',
-                           'HttpRequest'              => 'php/util/HttpRequest.php',
-                           'Logger'                   => 'php/util/Logger.php',
-                           'Mailer'                   => 'php/util/Mailer.php',
-);
+$__autoloadClasses['ErrorHandler'            ] = 'php/util/ErrorHandler.php';
+$__autoloadClasses['HttpRequest'             ] = 'php/util/HttpRequest.php';
+$__autoloadClasses['Logger'                  ] = 'php/util/Logger.php';
+$__autoloadClasses['Mailer'                  ] = 'php/util/Mailer.php';
+
 
 
 
@@ -433,22 +433,34 @@ function rollbackTransaction(&$db) {
 
 
 /**
- * Ermittelt einen evt. gesetzten 'Forwarded-IP'-Value des aktuellen Request.
+ * Gibt den Wert des 'Forwarded-IP'-Headers des aktuellen Request zurück.
  *
- * @return string
+ * @return string - IP-Adresse oder NULL, wenn der Header nicht gesetzt ist
  */
 function getForwardedIP() {
-   static $address = false;
-   if ($address === false) {
-      $address = $_SERVER['HTTP_X_FORWARDED_FOR'];
-      if ($address == null)
-         $address = $_SERVER['HTTP_HTTP_X_FORWARDED_FOR'];
-      if ($address == null)
-         $address = $_SERVER['HTTP_X_UP_FORWARDED_FOR'];
-      if ($address == null)
-         $address = $_SERVER['HTTP_HTTP_X_UP_FORWARDED_FOR'];
+   static $ip = false;
+
+   if ($ip === false) {
+      if (isSet($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+         $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+      }
+      elseif (isSet($_SERVER['HTTP_HTTP_X_FORWARDED_FOR'])) {
+         $ip = $_SERVER['HTTP_HTTP_X_FORWARDED_FOR'];
+      }
+      elseif (isSet($_SERVER['HTTP_X_UP_FORWARDED_FOR'])) {       // mobile device
+         $ip = $_SERVER['HTTP_X_UP_FORWARDED_FOR'];
+      }
+      elseif (isSet($_SERVER['HTTP_HTTP_X_UP_FORWARDED_FOR'])) {  // mobile device
+         $ip = $_SERVER['HTTP_HTTP_X_UP_FORWARDED_FOR'];
+      }
+      elseif (isSet($_SERVER[''])) {
+         $ip = $_SERVER[''];
+      }
+      else {
+         $ip = null;
+      }
    }
-   return $address;
+   return $ip;
 }
 
 
