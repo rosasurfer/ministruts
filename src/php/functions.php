@@ -88,24 +88,24 @@ function __autoload($className) {
 function onError($level, $msg, $file, $line, $vars) {
    $error_reporting = error_reporting();
 
-   // Fehler, die der aktuelle Loglevel nicht abdeckt, werden ignoriert
-   if ($error_reporting==0 || ($error_reporting & $level) != $level)          // 0 bedeutet:    @statement   hat Fehler ausgelöst
+   // Fehler, die der aktuelle Errorlevel nicht abdeckt, werden ignoriert
+   if ($error_reporting==0 || ($error_reporting & $level) != $level)          // 0 bedeutet: @-Operator hat Fehler ausgelöst (@statement)
       return true;
 
 
-   // Typspezifische Behandlung
+   // Level-spezifische Behandlung
    if ($level != E_USER_WARNING && $level != E_STRICT) {                      // werden nur geloggt
-      $error = new PHPErrorException($level, $msg, $file, $line, $vars);      // Fehler in Exception kapseln und zurückwerfen
-      $trace = $error->getTrace();                                            // (wenn nicht in __autoload ausgelöst)
+      $exception = new PHPErrorException($msg, $file, $line, $vars);          // Fehler in Exception kapseln und zurückwerfen
+      $trace = $exception->getTrace();                                        // (wenn nicht in __autoload ausgelöst)
       $frame =& $trace[1];
       if (isSet($frame['class']) || (strToLower($frame['function'])!='__autoload' && $frame['function']!='trigger_error'))
-         throw $error;
+         throw $exception;
       if ($frame['function']=='trigger_error' && (!isSet($trace[2]) || isSet($trace[2]['class']) || strToLower($trace[2]['function'])!='__autoload'))
-         throw $error;
+         throw $exception;
    }
 
 
-   // Fehler, die keine Exception auslösen sollen
+   // Behandlung von Fehlern, die nicht in eine Exception umgewandelt werden
    $console     = !isSet($_SERVER['REQUEST_METHOD']);                         // ob das Script in der Konsole läuft
    $display     = $console || $_SERVER['REMOTE_ADDR']=='127.0.0.1';           // ob der Fehler angezeigt werden soll (im Browser nur, wenn Request von localhost kommt)
    $displayHtml = $display && !$console;                                      // ob die Ausgabe HTML-formatiert werden muß
