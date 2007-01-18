@@ -33,9 +33,13 @@ class Logger extends Object {
     * - Mailen der Message an alle registrierten Webmaster
     */
    public static function log($mixed, $exception = null, $logLevel = L_ERROR) {
-      // Statische Variablen initialisieren
-      static $logLevels = null;
+      static $logLevels   = null;
+      static $console     = null;
+      static $display     = null;
+      static $displayHtml = null;
+      static $mail        = null;
 
+      // Statische Variablen ein einziges Mal initialisieren
       if ($logLevels === null) {
          $logLevels = array(L_DEBUG  => '[Debug]',
                             L_NOTICE => '[Notice]',
@@ -110,6 +114,8 @@ class Logger extends Object {
       else {
          $msg = (string) $msg;
       }
+      if ($ex)
+         $msg .= ' ('.get_class($ex).')';
 
 
       // Quellcode-Position der Loganweisung einfügen
