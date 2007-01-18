@@ -18,11 +18,11 @@ class Logger extends Object {
     *
     * Aufrufvarianten:
     * ----------------
-    * Logger::log($message)                              // Loglevel: L_WARN
+    * Logger::log($message)                              // Loglevel: L_ERROR
     * Logger::log($message, $logLevel)
-    * Logger::log($exception)                            // Loglevel: L_WARN
+    * Logger::log($exception)                            // Loglevel: L_ERROR
     * Logger::log($exception, $logLevel)
-    * Logger::log($message, $exception)                  // Loglevel: L_WARN
+    * Logger::log($message, $exception)                  // Loglevel: L_ERROR
     * Logger::log($message, $exception, $logLevel)
     *
     * Ablauf:
@@ -32,22 +32,17 @@ class Logger extends Object {
     * - Eintrag ins Errorlog
     * - Mailen der Message an alle registrierten Webmaster
     */
-   public static function log($mixed, $exception = null, $logLevel = L_WARN) {
+   public static function log($mixed, $exception = null, $logLevel = L_ERROR) {
       // Statische Variablen initialisieren
       static $logLevels = null;
+
       if ($logLevels === null) {
-         $logLevels = array(L_DEBUG        => '[Debug]',
-                            L_NOTICE       => '[Notice]',
-                            L_INFO         => '[Info]',
-                            L_WARN         => '[Warn]',
-                            L_ERROR        => '[Error]',
-                            L_FATAL        => '[Fatal]',
-                            E_NOTICE       => '[Notice]',                     // es können auch die üblichen PHP-Errorkonstanten verwendet werden
-                            E_WARNING      => '[Warn]',
-                            E_ERROR        => '[Error]',
-                            E_USER_NOTICE  => '[Notice]',
-                            E_USER_WARNING => '[Warn]',
-                            E_USER_ERROR   => '[Error]',
+         $logLevels = array(L_DEBUG  => '[Debug]',
+                            L_NOTICE => '[Notice]',
+                            L_INFO   => '[Info]',
+                            L_WARN   => '[Warn]',
+                            L_ERROR  => '[Error]',    // Default-Loglevel
+                            L_FATAL  => '[Fatal]',
          );
          $console     = !isSet($_SERVER['REQUEST_METHOD']);                   // ob das Script in der Konsole läuft
          $display     = $console || $_SERVER['REMOTE_ADDR']=='127.0.0.1';     // ob die Message angezeigt werden soll (im Browser nur, wenn Request von localhost kommt)
@@ -56,7 +51,7 @@ class Logger extends Object {
       }
 
       $msg = $ex = null;
-      $level = L_WARN;        // Default-Loglevel
+      $level = $logLevel;
 
 
       // Parameter validieren
@@ -92,7 +87,6 @@ class Logger extends Object {
          if (!$exception instanceof Exception)
             throw new InvalidArgumentException('Invalid argument $exception: '.$exception);
          $ex = $exception;
-         $level = $logLevel;
          if (!is_int($level) || !isSet($logLevels[$level]))
             throw new InvalidArgumentException('Invalid log level: '.$level);
       }
