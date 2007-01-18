@@ -6,14 +6,14 @@
 
 // Globale Konstanten
 // ------------------
-define('WINDOWS', (strToUpper(subStr(PHP_OS, 0, 3))==='WIN'));    // ob der Server unter Windows läuft
-
 define('L_DEBUG' , 10001);                                        // die verschiedenen Loglevel
 define('L_NOTICE', 10002);
 define('L_INFO'  , 10003);
 define('L_WARN'  , 10004);
 define('L_ERROR' , 10005);
 define('L_FATAL' , 10006);
+
+define('WINDOWS', (strToUpper(subStr(PHP_OS, 0, 3))==='WIN'));    // ob das Script unter Windows läuft
 
 
 
@@ -23,6 +23,7 @@ $__autoloadClasses['AbstractActionForm'      ] = 'php/actions/AbstractActionForm
 
 $__autoloadClasses['PersistableObject'       ] = 'php/db/PersistableObject.php';
 
+$__autoloadClasses['BusinessRuleException'   ] = 'php/lang/BusinessRuleException.php';
 $__autoloadClasses['IllegalTypeException'    ] = 'php/lang/IllegalTypeException.php';
 $__autoloadClasses['InfrastructureException' ] = 'php/lang/InfrastructureException.php';
 $__autoloadClasses['InvalidArgumentException'] = 'php/lang/InvalidArgumentException.php';
@@ -50,12 +51,11 @@ set_exception_handler('onException');
 
 /**
  * Lädt die Klassendefinition der angegebenen Klasse.
- * Diese Funktion darf keine Exception werfen.  Sie würde nicht an einen installierten
- * Exception-Handler weitergeleitet, sondern PHP würde das Script mit einem 'Fatal Error' beenden.
  *
  * @param string className - Klassenname
  */
 function __autoload($className) {
+   // Diese Funktion darf keine Exception werfen, denn das würde einen 'PHP Fatal Error' auslösen.
    global $__autoloadClasses;
    if (isSet($__autoloadClasses[$className])) {
       include($__autoloadClasses[$className]);
