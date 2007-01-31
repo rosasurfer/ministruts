@@ -7,7 +7,7 @@
 abstract class PersistableObject extends Object {
 
 
-   // 'leeres' Datenbankmapping
+   // leeres Datenbankmapping
    protected static $mappings;
 
 
@@ -36,9 +36,8 @@ abstract class PersistableObject extends Object {
     *    protected $id;
     *    protected $created;
     *    protected $key;
-    *    protected $name;
-    *                                     // Field names     => Property names
-    *                                     // ---------------------------------
+    *    protected $name;                 # Field names     => Property names
+    *                                     # ---------------------------------
     *    protected static $mappings = array('a_id'          => 'id',
     *                                       'creation_date' => 'created',
     *                                       'object_key'    => 'key',
@@ -47,7 +46,7 @@ abstract class PersistableObject extends Object {
     * }
     *
     * @param property - Name der zu mappenden Tabellenspalte
-    * @param value    - Wert, auf den die entsprechende Variable der Klasseninstanz gesetzt werden soll
+    * @param value    - Wert der zu mappenden Tabellenspalte
     */
    protected function __set($property, $value) {
       static $mappings = null;
@@ -59,15 +58,20 @@ abstract class PersistableObject extends Object {
       if (isSet($mappings[$property])) {
          $this->$mappings[$property] = $value;                          // gefunden, Property setzen
       }
-      else {                                                            // Mapping nicht gefunden: prüfen, ob mysql_fetch_object() der Aufrufer ist
+      else {                                                            // Mapping nicht gefunden
          $trace = debug_backTrace();
          $i = 0;
          do {
             $frame =& $trace[++$i];
          } while (strToLower($frame['function'])=='__set');
 
-         if (strToLower($frame['function']) == 'mysql_fetch_object')    // ja
-            throw new RuntimeException("Database mapping for field '$property' not found (class ".get_Class($this).")");
+         if (strToLower($frame['function']) == 'mysql_fetch_object') {  // : prüfen, ob mysql_fetch_object() der Aufrufer ist
+            // PHP bug: http://bugs.php.net/bug.php?id=38624
+            //throw new RuntimeException("Database mapping for field '$property' not found (class ".get_class($this).")");
+
+            Logger::log("Database mapping for field '$property' not found (class ".get_class($this).")", L_FATAL);
+            exit;
+         }
 
          parent:: __set($property, $value);                             // nein, Aufruf weiterreichen (Programmierfehler)
       }
