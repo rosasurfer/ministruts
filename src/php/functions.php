@@ -35,6 +35,7 @@ $__autoloadClasses['RuntimeException'        ] = 'php/lang/RuntimeException.php'
 $__autoloadClasses['BasePdfDocument'         ] = 'php/pdf/BasePdfDocument.php';
 $__autoloadClasses['SimplePdfDocument'       ] = 'php/pdf/SimplePdfDocument.php';
 
+$__autoloadClasses['BaseValidator'           ] = 'php/util/BaseValidator.php';
 $__autoloadClasses['ErrorHandler'            ] = 'php/util/ErrorHandler.php';
 $__autoloadClasses['HttpRequest'             ] = 'php/util/HttpRequest.php';
 $__autoloadClasses['Logger'                  ] = 'php/util/Logger.php';
