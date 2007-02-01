@@ -70,7 +70,6 @@ abstract class PersistableObject extends Object {
             // PHP bug: http://bugs.php.net/bug.php?id=38624
             Logger::log(new RuntimeException("Database mapping for field '$property' not found (class ".get_class($this).")"), L_FATAL);
             exit;
-
             //throw new RuntimeException("Database mapping for field '$property' not found (class ".get_class($this).")");
          }
 
