@@ -170,7 +170,7 @@ function onError($level, $msg, $file, $line, $vars) {
                       E_COMPILE_WARNING   => 'Compile Warning',
                       E_CORE_ERROR        => 'Core Error',
                       E_CORE_WARNING      => 'Core Warning',
-                      E_RECOVERABLE_ERROR => 'Error',
+                    //E_RECOVERABLE_ERROR => 'Error',
                       E_ERROR             => 'Error',
                       E_WARNING           => 'Warning',
                       E_NOTICE            => 'Notice',
