@@ -133,8 +133,7 @@ class Logger extends Object {
             echo nl2br('<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.$logLevels[$level].'</b>: '.$msg."\n in <b>".$file.'</b> on line <b>'.$line.'</b><br>');
             if ($ex) {
                if ($ex instanceof NestableException) {
-                  echo '<br>'.$ex->__toString();
-                  echo printFormatted("Stacktrace:\n-----------\n".$ex->getReadableStackTrace(), true).'<br>';
+                  echo '<br>'.$ex.printFormatted("Stacktrace:\n-----------\n".$ex->getReadableStackTrace(), true).'<br>';
                }
                else {
                   echo '<br>'.get_class($ex).': '.$ex->getMessage();
@@ -148,7 +147,7 @@ class Logger extends Object {
             echo $message;                                                       // PHP gibt den Fehler unter Linux zusätzlich auf stderr aus,
             if ($ex) {                                                           // also auf der Konsole ggf. unterdrücken ( 2>/dev/null )
                if ($ex instanceof NestableException) {
-                  printFormatted("\n".$ex->__toString()."\n".$ex->getReadableStackTrace());
+                  printFormatted("\n$ex\n".$ex->getReadableStackTrace());
                }
                else {
                   printFormatted("\n".get_class($ex).': '.$ex->getMessage()."\nStacktrace not available\n");
@@ -167,7 +166,7 @@ class Logger extends Object {
       if ($mail) {
          if ($ex) {
             if ($ex instanceof NestableException) {
-               $message .= "\n\n".$ex->__toString()."\n".$ex->getReadableStackTrace();
+               $message .= "\n\n$ex\n".$ex->getReadableStackTrace();
             }
             else {
                $message .= "\n\n".get_class($ex).': '.$ex->getMessage()."\nStacktrace not available\n";

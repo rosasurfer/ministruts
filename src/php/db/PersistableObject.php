@@ -65,13 +65,8 @@ abstract class PersistableObject extends Object {
             $frame =& $trace[++$i];
          } while (strToLower($frame['function'])=='__set');
 
-         if (strToLower($frame['function']) == 'mysql_fetch_object') {  // prüfen, ob Aufruf von mysql_fetch_object() kommt
-
-            // PHP bug: http://bugs.php.net/bug.php?id=38624
-            Logger::log(new RuntimeException("Database mapping for field '$property' not found (class ".get_class($this).")"), L_FATAL);
-            exit;
-            //throw new RuntimeException("Database mapping for field '$property' not found (class ".get_class($this).")");
-         }
+         if (strToLower($frame['function']) == 'mysql_fetch_object')    // prüfen, ob Aufruf von mysql_fetch_object() kommt
+            throw new RuntimeException("Database mapping for field '$property' not found (class ".get_class($this).")");
 
          parent:: __set($property, $value);                             // nein, Aufruf weiterreichen (Programmierfehler)
       }

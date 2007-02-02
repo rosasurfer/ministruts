@@ -1,6 +1,6 @@
 <?
 /**
- * Systemvoraussetzung: PHP 5.1+
+ * Systemvoraussetzung: PHP 5.2+
  */
 
 
@@ -657,19 +657,20 @@ function getErrorLevelAsString() {
    $levels = array();
    $current = error_reporting();
 
-   if (($current & E_ERROR          ) == E_ERROR          ) $levels[] = 'E_ERROR';
-   if (($current & E_WARNING        ) == E_WARNING        ) $levels[] = 'E_WARNING';
-   if (($current & E_PARSE          ) == E_PARSE          ) $levels[] = 'E_PARSE';
-   if (($current & E_NOTICE         ) == E_NOTICE         ) $levels[] = 'E_NOTICE';
-   if (($current & E_CORE_ERROR     ) == E_CORE_ERROR     ) $levels[] = 'E_CORE_ERROR';
-   if (($current & E_CORE_WARNING   ) == E_CORE_WARNING   ) $levels[] = 'E_CORE_WARNING';
-   if (($current & E_COMPILE_ERROR  ) == E_COMPILE_ERROR  ) $levels[] = 'E_COMPILE_ERROR';
-   if (($current & E_COMPILE_WARNING) == E_COMPILE_WARNING) $levels[] = 'E_COMPILE_WARNING';
-   if (($current & E_USER_ERROR     ) == E_USER_ERROR     ) $levels[] = 'E_USER_ERROR';
-   if (($current & E_USER_WARNING   ) == E_USER_WARNING   ) $levels[] = 'E_USER_WARNING';
-   if (($current & E_USER_NOTICE    ) == E_USER_NOTICE    ) $levels[] = 'E_USER_NOTICE';
-   if (($current & E_ALL            ) == E_ALL            ) $levels[] = 'E_ALL';
-   if (($current & E_STRICT         ) == E_STRICT         ) $levels[] = 'E_STRICT';
+   if (($current & E_ERROR            ) == E_ERROR            ) $levels[] = 'E_ERROR';
+   if (($current & E_WARNING          ) == E_WARNING          ) $levels[] = 'E_WARNING';
+   if (($current & E_PARSE            ) == E_PARSE            ) $levels[] = 'E_PARSE';
+   if (($current & E_NOTICE           ) == E_NOTICE           ) $levels[] = 'E_NOTICE';
+   if (($current & E_CORE_ERROR       ) == E_CORE_ERROR       ) $levels[] = 'E_CORE_ERROR';
+   if (($current & E_CORE_WARNING     ) == E_CORE_WARNING     ) $levels[] = 'E_CORE_WARNING';
+   if (($current & E_COMPILE_ERROR    ) == E_COMPILE_ERROR    ) $levels[] = 'E_COMPILE_ERROR';
+   if (($current & E_COMPILE_WARNING  ) == E_COMPILE_WARNING  ) $levels[] = 'E_COMPILE_WARNING';
+   if (($current & E_USER_ERROR       ) == E_USER_ERROR       ) $levels[] = 'E_USER_ERROR';
+   if (($current & E_USER_WARNING     ) == E_USER_WARNING     ) $levels[] = 'E_USER_WARNING';
+   if (($current & E_USER_NOTICE      ) == E_USER_NOTICE      ) $levels[] = 'E_USER_NOTICE';
+   if (($current & E_RECOVERABLE_ERROR) == E_RECOVERABLE_ERROR) $levels[] = 'E_RECOVERABLE_ERROR';
+   if (($current & E_ALL              ) == E_ALL              ) $levels[] = 'E_ALL';
+   if (($current & E_STRICT           ) == E_STRICT           ) $levels[] = 'E_STRICT';
 
    return $current.": ".join(' | ', $levels);
 }

@@ -1,5 +1,5 @@
 <?
-if (PHP_VERSION < '5.1' || '5.2' <= PHP_VERSION)                              error('Warning: PHP version is not 5.1.x');
+if (PHP_VERSION < '5.2' || '5.3' <= PHP_VERSION)                              error('Warning: PHP version is not 5.2.x');
 
 if (ini_get('safe_mode'))                                                     error('Warning: safe_mode is not Off');
 if (ini_get('expose_php'))                                                    error('Warning: expose_php is not Off');
