@@ -165,18 +165,19 @@ function onError($level, $msg, $file, $line, $vars) {
 
    static $levels = null;
    if ($levels === null) {
-      $levels = array(E_PARSE           => 'Parse Error',
-                      E_COMPILE_ERROR   => 'Compile Error',
-                      E_COMPILE_WARNING => 'Compile Warning',
-                      E_CORE_ERROR      => 'Core Error',
-                      E_CORE_WARNING    => 'Core Warning',
-                      E_ERROR           => 'Error',
-                      E_WARNING         => 'Warning',
-                      E_NOTICE          => 'Notice',
-                      E_STRICT          => 'Runtime Notice',
-                      E_USER_ERROR      => 'Error',
-                      E_USER_WARNING    => 'Warning',
-                      E_USER_NOTICE     => 'Notice');
+      $levels = array(E_PARSE             => 'Parse Error',
+                      E_COMPILE_ERROR     => 'Compile Error',
+                      E_COMPILE_WARNING   => 'Compile Warning',
+                      E_CORE_ERROR        => 'Core Error',
+                      E_CORE_WARNING      => 'Core Warning',
+                      E_RECOVERABLE_ERROR => 'Error',
+                      E_ERROR             => 'Error',
+                      E_WARNING           => 'Warning',
+                      E_NOTICE            => 'Notice',
+                      E_STRICT            => 'Runtime Notice',
+                      E_USER_ERROR        => 'Error',
+                      E_USER_WARNING      => 'Warning',
+                      E_USER_NOTICE       => 'Notice');
    }
 
    // Fehleranzeige
