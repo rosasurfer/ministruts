@@ -7,12 +7,13 @@ if (ini_get('expose_php'))                                                    er
 if (ini_get('register_globals'))                                              error('Warning: register_globals is not Off');
 if (ini_get('register_long_arrays'))                                          error('Warning: register_long_arrays is not Off');
 if (ini_get('register_argc_argv'))                                            error('Warning: register_argc_argv is not Off');
-if (!ini_get('auto_globals_jit'))                                             error('Warning: register_argc_argv is not On');
+if (!ini_get('auto_globals_jit'))                                             error('Warning: auto_globals_jit is not On');
 if (ini_get('variables_order') != 'GPCS')                                     error('Warning: variables_order is not \'GPCS\': '.ini_get('variables_order'));
 if (ini_get('always_populate_raw_post_data'))                                 error('Warning: always_populate_raw_post_data is not Off');
 if (ini_get('define_syslog_variables'))                                       error('Warning: define_syslog_variables is not Off');
 if (ini_get('arg_separator.output') != '&amp;')                               error('Warning: arg_separator.output is not \'&amp;amp;\': '.ini_get('arg_separator.output'));
 if (ini_get('allow_url_fopen'))                                               error('Warning: allow_url_fopen is not Off');
+if (ini_get('allow_url_include'))                                             error('Warning: allow_url_include is not Off');
 
 if ((int) ini_get('max_execution_time') != 30)                                error('Warning: max_execution_time is not 30: '.ini_get('max_execution_time'));
 if ((int) ini_get('default_socket_timeout') != 60)                            error('Warning: default_socket_timeout is not 60: '.ini_get('default_socket_timeout'));
@@ -32,6 +33,7 @@ if (ini_get('session.save_handler') == 'files') {
 if (ini_get('session.serialize_handler') != 'php')                            error('Warning: session.serialize_handler is not \'php\': '.ini_get('session.serialize_handler'));
 if (ini_get('session.auto_start'))                                            error('Warning: session.auto_start is not Off');
 if (!ini_get('session.use_cookies'))                                          error('Warning: session.use_cookies is not On' );
+if (ini_get('session.cookie_httponly'))                                       error('Warning: session.cookie_httponly is not Off' );
 if (!ini_get('session.use_trans_sid'))                                        error('Warning: session.use_trans_sid is not On');
 if (ini_get('url_rewriter.tags') != 'a=href,area=href,frame=src,iframe=src,form=,fieldset=')
                                                                               error('Warning: url_rewriter.tags is not \'a=href,area=href,frame=src,iframe=src,form=,fieldset=\': '.ini_get('url_rewriter.tags'));
@@ -51,7 +53,7 @@ if (ini_get('auto_append_file') != '')                                        er
 if (ini_get('auto_detect_line_endings'))                                      error('Warning: auto_detect_line_endings is not Off');
 if (ini_get('default_mimetype') != 'text/html')                               error('Warning: default_mimetype is not \'text/html\': '.ini_get('default_mimetype'));
 if (ini_get('default_charset') != 'iso-8859-1')                               error('Warning: default_charset is not \'iso-8859-1\': '.ini_get('default_charset'));
-if (!ini_get('file_uploads'))                                                 error('Warning: file_uploads is not On' );
+if (ini_get('file_uploads'))                                                  error('Warning: file_uploads is not Off' );
 
 if (ini_get('asp_tags'))                                                      error('Warning: asp_tags is not Off');
 if (!ini_get('y2k_compliance'))                                               error('Warning: y2k_compliance is not On');
@@ -83,7 +85,7 @@ if ($local) {
 else {
    if (ini_get('display_errors'))                                             error('Warning: display_errors is not Off');
    if (ini_get('display_startup_errors'))                                     error('Warning: display_startup_errors is not Off');
-   if ((int) ini_get('output_buffering') == 0)                                error('Warning: output_buffering is disabled: '.ini_get('output_buffering'));
+   if ((int) ini_get('output_buffering') == 0)                                error('Warning: output_buffering is not enabled: '.ini_get('output_buffering'));
 }
 
 
