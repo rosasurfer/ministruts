@@ -52,7 +52,6 @@ if (ini_get('auto_detect_line_endings'))                                      er
 if (ini_get('default_mimetype') != 'text/html')                               error('Warning: default_mimetype is not \'text/html\': '.ini_get('default_mimetype'));
 if (ini_get('default_charset') != 'iso-8859-1')                               error('Warning: default_charset is not \'iso-8859-1\': '.ini_get('default_charset'));
 if (!ini_get('file_uploads'))                                                 error('Warning: file_uploads is not On' );
-if ((int) ini_get('output_buffering') == 0)                                   error('Warning: output_buffering is disabled: '.ini_get('output_buffering'));
 
 if (ini_get('asp_tags'))                                                      error('Warning: asp_tags is not Off');
 if (!ini_get('y2k_compliance'))                                               error('Warning: y2k_compliance is not On');
@@ -68,9 +67,6 @@ if (!ini_get('track_errors'))                                                 er
 if (ini_get('html_errors'))                                                   error('Warning: html_errors is not Off');
 
 if (ini_get('enable_dl'))                                                     error('Warning: enable_dl is not Off');
-$declaredClasses = get_declared_classes();
-if (in_array('InvalidArgumentException', $declaredClasses))                   error('Warning: internal class SPL.InvalidArgumentException is not disabled (see: disable_classes)');
-if (in_array('RuntimeException'        , $declaredClasses))                   error('Warning: internal class SPL.RuntimeException is not disabled (see: disable_classes)');
 
 // Verfügbarkeit der MySQL-Extensions prüfen
 if (!extension_loaded('mysql'))                                               error('Warning: mysql extension is not loaded');
@@ -82,10 +78,12 @@ $local = (@$_SERVER['REMOTE_ADDR']=='127.0.0.1');
 if ($local) {
    if (!ini_get('display_errors'))                                            error('Warning: display_errors is not On');
    if (!ini_get('display_startup_errors'))                                    error('Warning: display_startup_errors is not On');
+   if ((int) ini_get('output_buffering') != 0)                                error('Warning: output_buffering is enabled: '.ini_get('output_buffering'));
 }
 else {
    if (ini_get('display_errors'))                                             error('Warning: display_errors is not Off');
    if (ini_get('display_startup_errors'))                                     error('Warning: display_startup_errors is not Off');
+   if ((int) ini_get('output_buffering') == 0)                                error('Warning: output_buffering is disabled: '.ini_get('output_buffering'));
 }
 
 
