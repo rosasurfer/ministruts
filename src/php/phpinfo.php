@@ -63,7 +63,7 @@ if (ini_get('ignore_repeated_errors'))                                        er
 if (ini_get('ignore_repeated_source'))                                        error('Warning: ignore_repeated_source is not Off');
 if (!ini_get('log_errors'))                                                   error('Warning: log_errors is not On' );
 if ((int)ini_get('log_errors_max_len') != 0)                                  error('Warning: log_errors_max_len is not 0: '.ini_get('log_errors_max_len'));
-if (!ini_get('track_errors'))                                                 error('Warning: track_errors is not On' );
+if (ini_get('track_errors'))                                                  error('Warning: track_errors is not Off' );
 if (ini_get('html_errors'))                                                   error('Warning: html_errors is not Off');
 
 if (ini_get('enable_dl'))                                                     error('Warning: enable_dl is not Off');
