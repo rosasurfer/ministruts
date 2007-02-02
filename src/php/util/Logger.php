@@ -39,7 +39,7 @@ class Logger extends Object {
       static $displayHtml = null;
       static $mail        = null;
 
-      // Statische Variablen ein einziges Mal initialisieren
+      // Statische Variablen einmal initialisieren
       if ($logLevels === null) {
          $logLevels = array(L_DEBUG  => '[Debug]',
                             L_NOTICE => '[Notice]',
@@ -114,8 +114,9 @@ class Logger extends Object {
       else {
          $msg = (string) $msg;
       }
-      if ($ex)
-         $msg .= ' ('.get_class($ex).')';
+      if ($ex) {
+         $msg = $msg ? $msg.' ('.get_class($ex).')' : get_class($ex);
+      }
 
 
       // Quellcode-Position der Loganweisung einfügen
@@ -131,15 +132,27 @@ class Logger extends Object {
          if ($displayHtml) {
             echo nl2br('<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.$logLevels[$level].'</b>: '.$msg."\n in <b>".$file.'</b> on line <b>'.$line.'</b><br>');
             if ($ex) {
-               echo '<br>'.$ex->__toString();
-               echo printFormatted($ex->getReadableStackTrace(), true).'<br>';
+               if ($ex instanceof NestableException) {
+                  echo '<br>'.$ex->__toString();
+                  echo printFormatted("Stacktrace:\n-----------\n".$ex->getReadableStackTrace(), true).'<br>';
+               }
+               else {
+                  echo '<br>'.get_class($ex).': '.$ex->getMessage();
+                  echo printFormatted('Stacktrace not available', true).'<br>';
+                  //echoPre(print_r($ex, true));
+               }
             }
             echo "</div>\n";
          }
          else {
             echo $message;                                                       // PHP gibt den Fehler unter Linux zusätzlich auf stderr aus,
             if ($ex) {                                                           // also auf der Konsole ggf. unterdrücken ( 2>/dev/null )
-               printFormatted("\n".$ex->__toString()."\n".$ex->getReadableStackTrace());
+               if ($ex instanceof NestableException) {
+                  printFormatted("\n".$ex->__toString()."\n".$ex->getReadableStackTrace());
+               }
+               else {
+                  printFormatted("\n".get_class($ex).': '.$ex->getMessage()."\nStacktrace not available\n");
+               }
             }
          }
       }
@@ -153,7 +166,12 @@ class Logger extends Object {
       // Logmessage an alle registrierten Webmaster mailen
       if ($mail) {
          if ($ex) {
-            $message .= "\n\n".$ex->__toString()."\n".$ex->getReadableStackTrace();
+            if ($ex instanceof NestableException) {
+               $message .= "\n\n".$ex->__toString()."\n".$ex->getReadableStackTrace();
+            }
+            else {
+               $message .= "\n\n".get_class($ex).': '.$ex->getMessage()."\nStacktrace not available\n";
+            }
          }
          $message .= "\n\nRequest:\n--------\n".getRequest()."\n\nIP: ".$_SERVER['REMOTE_ADDR']."\n---\n";
          $message = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $message)) : str_replace("\r\n", "\n", $message);
