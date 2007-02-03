@@ -27,21 +27,32 @@ $__autoloadClasses['Logger'                  ] = 'php/util/Logger.php';
 $__autoloadClasses['Mailer'                  ] = 'php/util/Mailer.php';
 
 
+
 // Globale Konstanten
 // ------------------
-define('L_DEBUG' , 10001);                                        // die verschiedenen Loglevel
-define('L_NOTICE', 10002);
-define('L_INFO'  , 10003);
-define('L_WARN'  , 10004);
-define('L_ERROR' , 10005);
-define('L_FATAL' , 10006);
+define('L_DEBUG' ,  1);                            // die verschiedenen Loglevel
+define('L_NOTICE',  2);
+define('L_INFO'  ,  4);
+define('L_WARN'  ,  8);
+define('L_ERROR' , 16);
+define('L_FATAL' , 32);
+define('LOGLEVEL', L_ERROR);                       // aktiver Default-Loglevel
+
+define('IS_L_DEBUG' , L_DEBUG  >= LOGLEVEL);       // boolsche Konstanten, die anzeigen, ob ein Loglevel aktiv ist oder nicht
+define('IS_L_NOTICE', L_NOTICE >= LOGLEVEL);
+define('IS_L_INFO'  , L_INFO   >= LOGLEVEL);
+define('IS_L_WARN'  , L_WARN   >= LOGLEVEL);
+define('IS_L_ERROR' , L_ERROR  >= LOGLEVEL);
+define('IS_L_FATAL' , L_FATAL  >= LOGLEVEL);
+
+
 define('WINDOWS', (strToUpper(subStr(PHP_OS, 0, 3))==='WIN'));    // ob das Script unter Windows läuft
 
 
 
 // Errorhandler registrieren
 // -------------------------
-set_error_handler(array('ErrorHandler', 'handleError'));
+set_error_handler    (array('ErrorHandler', 'handleError'    ));
 set_exception_handler(array('ErrorHandler', 'handleException'));
 
 
