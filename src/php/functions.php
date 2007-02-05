@@ -4,27 +4,28 @@
 
 // Klassenimporte
 // --------------
-$__autoloadClasses['AbstractActionForm'      ] = 'php/actions/AbstractActionForm.php';
+$__autoloadClasses['AbstractActionForm'             ] = 'php/actions/AbstractActionForm.php';
 
-$__autoloadClasses['PersistableObject'       ] = 'php/db/PersistableObject.php';
+$__autoloadClasses['ConcurrentModificationException'] = 'php/db/ConcurrentModificationException.php';
+$__autoloadClasses['PersistableObject'              ] = 'php/db/PersistableObject.php';
 
-$__autoloadClasses['BusinessRuleException'   ] = 'php/lang/BusinessRuleException.php';
-$__autoloadClasses['IllegalTypeException'    ] = 'php/lang/IllegalTypeException.php';
-$__autoloadClasses['InfrastructureException' ] = 'php/lang/InfrastructureException.php';
-$__autoloadClasses['InvalidArgumentException'] = 'php/lang/InvalidArgumentException.php';
-$__autoloadClasses['NestableException'       ] = 'php/lang/NestableException.php';
-$__autoloadClasses['Object'                  ] = 'php/lang/Object.php';
-$__autoloadClasses['PHPErrorException'       ] = 'php/lang/PHPErrorException.php';
-$__autoloadClasses['RuntimeException'        ] = 'php/lang/RuntimeException.php';
+$__autoloadClasses['BusinessRuleException'          ] = 'php/lang/BusinessRuleException.php';
+$__autoloadClasses['IllegalTypeException'           ] = 'php/lang/IllegalTypeException.php';
+$__autoloadClasses['InfrastructureException'        ] = 'php/lang/InfrastructureException.php';
+$__autoloadClasses['InvalidArgumentException'       ] = 'php/lang/InvalidArgumentException.php';
+$__autoloadClasses['NestableException'              ] = 'php/lang/NestableException.php';
+$__autoloadClasses['Object'                         ] = 'php/lang/Object.php';
+$__autoloadClasses['PHPErrorException'              ] = 'php/lang/PHPErrorException.php';
+$__autoloadClasses['RuntimeException'               ] = 'php/lang/RuntimeException.php';
 
-$__autoloadClasses['BasePdfDocument'         ] = 'php/pdf/BasePdfDocument.php';
-$__autoloadClasses['SimplePdfDocument'       ] = 'php/pdf/SimplePdfDocument.php';
+$__autoloadClasses['BasePdfDocument'                ] = 'php/pdf/BasePdfDocument.php';
+$__autoloadClasses['SimplePdfDocument'              ] = 'php/pdf/SimplePdfDocument.php';
 
-$__autoloadClasses['BaseValidator'           ] = 'php/util/BaseValidator.php';
-$__autoloadClasses['ErrorHandler'            ] = 'php/util/ErrorHandler.php';
-$__autoloadClasses['HttpRequest'             ] = 'php/util/HttpRequest.php';
-$__autoloadClasses['Logger'                  ] = 'php/util/Logger.php';
-$__autoloadClasses['Mailer'                  ] = 'php/util/Mailer.php';
+$__autoloadClasses['BaseValidator'                  ] = 'php/util/BaseValidator.php';
+$__autoloadClasses['ErrorHandler'                   ] = 'php/util/ErrorHandler.php';
+$__autoloadClasses['HttpRequest'                    ] = 'php/util/HttpRequest.php';
+$__autoloadClasses['Logger'                         ] = 'php/util/Logger.php';
+$__autoloadClasses['Mailer'                         ] = 'php/util/Mailer.php';
 
 
 

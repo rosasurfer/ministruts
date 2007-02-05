@@ -7,8 +7,11 @@
 abstract class PersistableObject extends Object {
 
 
-   // leeres Datenbankmapping
+   /* leeres Datenbankmapping (array) */
    protected static $mappings;
+
+   /* Object zum Festhalten von geänderten Eigenschaften (array) */
+   protected $changes;
 
 
    /**
@@ -26,8 +29,8 @@ abstract class PersistableObject extends Object {
 
 
    /**
-    * Mappt Datenbankspalten auf Instanzvariablen. Damit dies funktioniert, muß die statische
-    * Variable $mappings jeder persistenten Klasse deren Datenbankmapping enthalten.
+    * Mappt Datenbankspalten auf Instanzvariablen. Damit dies funktioniert,
+    * muß das statische Array $mappings das Datenbankmapping der Klasse enthalten.
     *
     * Beispiel:
     * ---------
@@ -36,12 +39,12 @@ abstract class PersistableObject extends Object {
     *    protected $id;
     *    protected $created;
     *    protected $key;
-    *    protected $name;                 # Field names     => Property names
-    *                                     # ---------------------------------
+    *    protected $name;                    Spaltenname    =>  Object-Eigenschaft
+    *                                        -------------------------------------
     *    protected static $mappings = array('a_id'          => 'id',
     *                                       'creation_date' => 'created',
     *                                       'object_key'    => 'key',
-    *                                       'fullname'      => 'name',
+    *                                       'fullname'      => 'fullName',
     *    );
     * }
     *
