@@ -45,7 +45,6 @@ define('IS_L_WARN'  , L_WARN   >= LOGLEVEL);
 define('IS_L_ERROR' , L_ERROR  >= LOGLEVEL);
 define('IS_L_FATAL' , L_FATAL  >= LOGLEVEL);
 
-
 define('WINDOWS', (strToUpper(subStr(PHP_OS, 0, 3))==='WIN'));    // ob das Script unter Windows läuft
 
 

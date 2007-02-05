@@ -174,6 +174,25 @@ class ErrorHandler extends Object {
 
 
    /**
+    * Globaler Handler für nicht abgefangene Exceptions. Die Exception wird geloggt und das Script beendet.
+    *
+    * @param Exception $exception - die zu behandelnde Exception
+    */
+   public static function handleException(Exception $exception) {
+      Logger ::logException($exception);
+      exit(1);
+   }
+
+
+
+
+
+
+   /**
+    * -------------------------------
+    * --- Alter Exception-Handler ---
+    * -------------------------------
+    *
     * Globaler Handler für nicht abgefangene Exceptions.
     *
     * Ablauf: - Anzeige der Exception (im Browser nur, wenn der Request von 'localhost' kommt)
@@ -183,7 +202,7 @@ class ErrorHandler extends Object {
     *
     * @param Exception $exception - die zu behandelnde Exception
     */
-   public static function handleException(Exception $exception) {
+   public static function handleException_old(Exception $exception) {
       $console     = !isSet($_SERVER['REQUEST_METHOD']);                         // ob das Script in der Konsole läuft
       $display     = $console || $_SERVER['REMOTE_ADDR']=='127.0.0.1';           // ob die Exception angezeigt werden soll (im Browser nur, wenn Request von localhost kommt)
       $displayHtml = $display && !$console;                                      // ob die Ausgabe HTML-formatiert werden muß
