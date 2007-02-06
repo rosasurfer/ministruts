@@ -133,7 +133,7 @@ function &executeSql($sql, array &$db) {
  *
  * @return boolean
  */
-function beginTransaction(&$db) {
+function beginTransaction(array &$db) {
    if (isSet($db['isTransaction']) && $db['isTransaction']) {
       return false;
    }
@@ -147,7 +147,7 @@ function beginTransaction(&$db) {
  *
  * @return boolean
  */
-function commitTransaction(&$db) {
+function commitTransaction(array &$db) {
    if (!$db['connection']) {
       trigger_error("Warn: No database connection", E_USER_WARNING);
       return false;
@@ -167,7 +167,7 @@ function commitTransaction(&$db) {
  *
  * @return boolean
  */
-function rollbackTransaction(&$db) {
+function rollbackTransaction(array &$db) {
    if (!$db['connection']) {
       trigger_error("Warn: No database connection", E_USER_WARNING);
       return false;
