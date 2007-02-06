@@ -95,11 +95,11 @@ function &executeSql($sql, array &$db) {
    if ($db['connection'] === null) {
       $db['connection'] = mysql_connect($db['server'], $db['user'], $db['password'], true);
       if ($db['connection'] === null)
-         throw new RuntimeException('Database connection error'.($errno = mysql_errno()) ? "\nError ".mysql_errno().': '.mysql_error() : '');
+         throw new InfrastructureException('Database connection error'.($errno = mysql_errno()) ? "\nError ".mysql_errno().': '.mysql_error() : '');
 
       // nach Verbindungsaufbau Datenbank selektieren
       if (!mysql_select_db($db['database'], $db['connection']))
-         throw new RuntimeException(($errno = mysql_errno()) ? "Error selecting the database\nError $errno: ".mysql_error() : 'Database connection error');
+         throw new InfrastructureException(($errno = mysql_errno()) ? "Error $errno: ".mysql_error() : 'Database connection error');
    }
 
 

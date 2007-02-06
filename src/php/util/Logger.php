@@ -208,7 +208,7 @@ class Logger extends Object {
       $stackTrace = debug_backtrace();
          $file = $stackTrace[0]['file'];
          $line = $stackTrace[0]['line'];
-      $message = $logLevels[$level].': '.$msg."\nin ".$file.' on line '.$line."\n";
+      $message = self::$logLevels[$level].': '.$msg."\nin ".$file.' on line '.$line."\n";
 
 
       // Anzeige
