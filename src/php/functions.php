@@ -505,20 +505,17 @@ function formatSqlDate($format, $sqlDate) {
       return null;
 
    if ($sqlDate < '1970-01-01 00:00:00') {
-      if ($format == 'd.m.Y') {
-         $data = explode('-', $sqlDate);
-         return "$data[2].$data[1].$data[0]";
-      }
-      else {
-         trigger_error('Cannot format SQL date: '.$sqlDate, E_USER_WARNING);
-      }
+      if ($format != 'd.m.Y') 
+         throw RuntimeException('Cannot format SQL date: '.$sqlDate);
+      $data = explode('-', $sqlDate);
+      return "$data[2].$data[1].$data[0]";
    }
-   else {
-      $timestamp = strToTime($sqlDate);
-      if (is_int($timestamp)) {
-         return date($format, $timestamp);
-      }
-   }
+
+   $timestamp = strToTime($sqlDate);
+   if (!is_int($timestamp)) 
+      throw InvalidArgumentException('Invalid SQL date: '.$sqlDate);
+
+   return date($format, $timestamp);
 }
 
 
