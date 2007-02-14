@@ -1423,12 +1423,10 @@ class BasePdfDocument extends Object {
                break;
             }
          }
-         if ($found === null) {
-            trigger_error('File not found: '.$fontName, E_USER_WARNING);
-         }
-         else {
-            $fontName = $found;
-         }
+         if ($found === null)
+            throw new RuntimeException('File not found: '.$fontName);
+
+         $fontName = $found;
          unset($paths, $path, $found);
       }
 
@@ -2867,10 +2865,9 @@ class BasePdfDocument extends Object {
                break;
             }
          }
-         if ($found === null) {
-            trigger_error('File not found: '.$file, E_USER_WARNING);
-            return;
-         }
+         if ($found === null)
+            throw new RuntimeException('File not found: '.$file);
+
          $file = $found;
          unset($paths, $path, $found);
       }
