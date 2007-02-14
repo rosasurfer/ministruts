@@ -67,7 +67,8 @@ abstract class PersistableObject extends Object {
 
 
    /**
-    * Fügt diese Instanz in die Datenbank ein.
+    * Fügt diese Instanz in die Datenbank ein.  Diese Methode sollte nie direkt aufgerufen werden,
+    * statt dessen sollte immer PersistableObject::save() benutzt werden. 
     */
    protected function insert() {
       throw new RuntimeException('Method not implemented');
@@ -75,7 +76,8 @@ abstract class PersistableObject extends Object {
 
 
    /**
-    * Aktualisiert diese Instanz in der Datenbank.
+    * Aktualisiert diese Instanz in der Datenbank.  Diese Methode sollte nie direkt aufgerufen werden,
+    * statt dessen sollte immer PersistableObject::save() benutzt werden. 
     */
    protected function update() {
       throw new RuntimeException('Method not implemented');
