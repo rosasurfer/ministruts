@@ -20,11 +20,23 @@ abstract class PersistableObject extends Object {
    const C_NOT_NULL = 4;
 
 
-   /* leeres Datenbankmapping (array) */
+   /* Leeres Datenbankmapping (array) */
    protected static $mapping;
 
    /* Flag für den aktuellen Änderungsstatus einer Instanz (boolean) */
    protected $isModified;
+
+
+   /* Standard-Properties jeder Instanz */
+   protected $id;             // Primary Key:     int
+   protected $version;        // Versionsnummer:  string (timestamp) 
+   protected $created;        // Erzeugungsdatum: string (datetime)
+
+
+   /* Standard-Getter für die Standard-Properties */
+   public    function getId()      { return $this->id;      }
+   protected function getVersion() { return $this->version; }
+   public    function getCreated() { return $this->created; }
 
 
    /**
@@ -47,6 +59,9 @@ abstract class PersistableObject extends Object {
       }
       elseif ($this->isModified) {
          $this->update();
+      }
+      else {
+         //Logger::log('Nothing to save, '.get_class($this).' instance is in sync with the database.', L_NOTICE);
       }
    }
 
