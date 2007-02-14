@@ -39,8 +39,31 @@ abstract class PersistableObject extends Object {
 
 
    /**
-    * Speichert die aktuelle Instanz.
+    * Speichert diese Instanz in der Datenbank.
     */
-   abstract public function save();
+   public function save() {
+      if (!$this->isPersistent()) {
+         $this->insert();
+      }
+      elseif ($this->isModified) {
+         $this->update();
+      }
+   }
+
+
+   /**
+    * Fügt diese Instanz in die Datenbank ein.
+    */
+   protected function insert() {
+      throw new RuntimeException('Method not implemented');
+   }
+
+
+   /**
+    * Aktualisiert diese Instanz in der Datenbank.
+    */
+   protected function update() {
+      throw new RuntimeException('Method not implemented');
+   }
 }
 ?>
