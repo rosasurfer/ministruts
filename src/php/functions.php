@@ -29,22 +29,24 @@ $__autoloadClasses['Mailer'                         ] = 'php/util/Mailer.php';
 
 
 
-// Globale Konstanten
-// ------------------
-define('L_DEBUG' ,  1);                            // die verschiedenen Loglevel
+// Konstanten
+// ----------
+define('L_DEBUG' ,  1);                                           // die verschiedenen Loglevel
 define('L_NOTICE',  2);
 define('L_INFO'  ,  4);
 define('L_WARN'  ,  8);
 define('L_ERROR' , 16);
 define('L_FATAL' , 32);
-define('LOGLEVEL', L_ERROR);                       // aktiver Default-Loglevel
 
-define('IS_L_DEBUG' , L_DEBUG  >= LOGLEVEL);       // boolsche Konstanten, die anzeigen, ob ein Loglevel aktiv ist oder nicht
-define('IS_L_NOTICE', L_NOTICE >= LOGLEVEL);
-define('IS_L_INFO'  , L_INFO   >= LOGLEVEL);
-define('IS_L_WARN'  , L_WARN   >= LOGLEVEL);
-define('IS_L_ERROR' , L_ERROR  >= LOGLEVEL);
-define('IS_L_FATAL' , L_FATAL  >= LOGLEVEL);
+define('LOGLEVEL', L_WARN);                           // der aktive Loglevel
+
+define('LOGLEVEL_DEBUG' , L_DEBUG  >= LOGLEVEL);      // Flags, die anzeigen, ob ein Loglevel aktiv ist oder nicht
+define('LOGLEVEL_NOTICE', L_NOTICE >= LOGLEVEL);
+define('LOGLEVEL_INFO'  , L_INFO   >= LOGLEVEL);
+define('LOGLEVEL_WARN'  , L_WARN   >= LOGLEVEL);
+define('LOGLEVEL_ERROR' , L_ERROR  >= LOGLEVEL);
+define('LOGLEVEL_FATAL' , L_FATAL  >= LOGLEVEL);
+
 
 define('WINDOWS', (strToUpper(subStr(PHP_OS, 0, 3))==='WIN'));    // ob das Script unter Windows läuft
 
@@ -129,55 +131,77 @@ function &executeSql($sql, array &$db) {
 
 
 /**
- * Startet eine neue Datenbank-Transaktion.
+ * Startet eine neue Datenbank-Transaktion und signalisiert, ob eine neue Transaktion gestartet wurde.
  *
- * @return boolean
+ * @return boolean - TRUE, wenn eine neue Transaktion gestartet wurde
+ *                   FALSE, wenn sich an eine bereits aktive Transaktion angeschlossen wurde
  */
 function beginTransaction(array &$db) {
-   if (isSet($db['isTransaction']) && $db['isTransaction']) {
+   if (isSet($db['transaction']) && $db['transaction']) {
+      $db['transaction'] = $db['transaction'] + 1;
       return false;
    }
+
    executeSql('begin', $db);
-   return ($db['isTransaction'] = true);
-}
-
-
-/**
- * Committed eine Datenbank-Transaktion.
- *
- * @return boolean
- */
-function commitTransaction(array &$db) {
-   if (!$db['connection']) {
-      trigger_error("Warn: No database connection", E_USER_WARNING);
-      return false;
-   }
-   if (!isSet($db['isTransaction']) || !$db['isTransaction']) {
-      trigger_error("Warn: No database transaction to commit", E_USER_WARNING);
-      return false;
-   }
-   executeSql('commit', $db);
-   $db['isTransaction'] = false;
+   $db['transaction'] = 1;
    return true;
 }
 
 
 /**
- * Rollt eine Datenbank-Transaktion zurück.
+ * Schließt eine nicht verschachtelte Datenbank-Transaktion ab.  Ist die Transaktion eine verschachtelte Transaktion,
+ * wird der Aufruf still ignoriert, da eine Transaktion immer von der höchsten Ebene aus geschlossen werden muß.
  *
- * @return boolean
+ * @return boolean - TRUE, wenn die Transaktion abgeschlossen wurde
+ *                   FALSE, wenn die verschachtelte Transaktion nicht abgeschlossen wurde
+ */
+function commitTransaction(array &$db) {
+   if (!$db['connection']) {
+      Logger::log('No database connection', L_ERROR);
+      return false;
+   }
+
+   if (!isSet($db['transaction']) || !$db['transaction']) {
+      LOGLEVEL_WARN && Logger::log('No database transaction to commit', L_WARN);
+      return false;
+   }
+
+   if ($db['transaction'] > 1) {                      // Transaktionszähler herunterzählen und nichts weiter tun
+      $db['transaction'] = $db['transaction'] - 1;
+      return false;
+   }
+
+   executeSql('commit', $db);                         // committen
+   $db['transaction'] = 0;
+   return true;
+}
+
+
+/**
+ * Rollt eine nicht verschachtelte Datenbank-Transaktion zurück.  Ist die Transaktion eine verschachtelte Transaktion,
+ * wird der Aufruf still ignoriert, da eine Transaktion immer von der höchsten Ebene aus zurückgerollt werden muß.
+ *
+ * @return boolean - TRUE, wenn die Transaktion zurückgerollt wurde
+ *                   FALSE, wenn die verschachtelte Transaktion nicht zurückgerollt wurde
  */
 function rollbackTransaction(array &$db) {
    if (!$db['connection']) {
-      trigger_error("Warn: No database connection", E_USER_WARNING);
+      Logger::log('No database connection', L_ERROR);
       return false;
    }
-   if (!isSet($db['isTransaction']) || !$db['isTransaction']) {
-      trigger_error("Warn: No database transaction to roll back", E_USER_WARNING);
+
+   if (!isSet($db['transaction']) || !$db['transaction']) {
+      LOGLEVEL_WARN && Logger::log('No database transaction to roll back', L_WARN);
       return false;
    }
-   executeSql('rollback', $db);
-   $db['isTransaction'] = false;
+
+   if ($db['transaction'] > 1) {                      // Transaktionszähler herunterzählen und nichts weiter tun
+      $db['transaction'] = $db['transaction'] - 1;
+      return false;
+   }
+
+   executeSql('rollback', $db);                       // rollback
+   $db['transaction'] = 0;
    return true;
 }
 
@@ -505,14 +529,14 @@ function formatSqlDate($format, $sqlDate) {
       return null;
 
    if ($sqlDate < '1970-01-01 00:00:00') {
-      if ($format != 'd.m.Y') 
+      if ($format != 'd.m.Y')
          throw RuntimeException('Cannot format SQL date: '.$sqlDate);
       $data = explode('-', $sqlDate);
       return "$data[2].$data[1].$data[0]";
    }
 
    $timestamp = strToTime($sqlDate);
-   if (!is_int($timestamp)) 
+   if (!is_int($timestamp))
       throw InvalidArgumentException('Invalid SQL date: '.$sqlDate);
 
    return date($format, $timestamp);
