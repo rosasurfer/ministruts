@@ -496,8 +496,8 @@ function isDate($date) {
  * @return string
  */
 function addDate($date, $days) {
-   if (!isDate($date)) { trigger_error('Invalid argument $date: '.$date, E_USER_WARNING); return null; }
-   if (!is_int($days)) { trigger_error('Invalid argument $days: '.$days, E_USER_WARNING); return null; }
+   if (!isDate($date)) throw new InvalidArgumentException('Invalid argument $date: '.$date);
+   if (!is_int($days)) throw new InvalidArgumentException('Invalid argument $days: '.$days);
 
    $parts = explode('-', $date);
    $year  = (int) $parts[0];
@@ -514,30 +514,30 @@ function addDate($date, $days) {
  * @return string
  */
 function subDate($date, $days) {
-   if (!is_int($days)) { trigger_error('Invalid argument \$days: '.$days, E_USER_WARNING); return null; }
+   if (!is_int($days)) throw new InvalidArgumentException('Invalid argument $days: '.$days);
    return addDate($date, -$days);
 }
 
 
 /**
- * Formatiert einen SQL-Date- oder SQL-DateTime-Wert mit dem angegebenen Format.
+ * Formatiert einen Date- oder DateTime-Value mit dem angegebenen Format.
  *
  * @return string
  */
-function formatSqlDate($format, $sqlDate) {
-   if ($sqlDate === null || $sqlDate=='0000-00-00 00:00:00')
+function formatDate($format, $date) {
+   if ($date === null || $date=='0000-00-00 00:00:00')
       return null;
 
-   if ($sqlDate < '1970-01-01 00:00:00') {
+   if ($date < '1970-01-01 00:00:00') {
       if ($format != 'd.m.Y')
-         throw RuntimeException('Cannot format SQL date: '.$sqlDate);
-      $data = explode('-', $sqlDate);
-      return "$data[2].$data[1].$data[0]";
+         throw new InvalidArgumentException('Invalid argument $format: '.$format);
+      $parts = explode('-', $date);
+      return $parts[2].'.'.$parts[1].'.'.$parts[0];
    }
 
-   $timestamp = strToTime($sqlDate);
+   $timestamp = strToTime($date);
    if (!is_int($timestamp))
-      throw InvalidArgumentException('Invalid SQL date: '.$sqlDate);
+      throw new InvalidArgumentException('Invalid argument $date: '.$date);
 
    return date($format, $timestamp);
 }
