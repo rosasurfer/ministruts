@@ -7,33 +7,26 @@
 abstract class PersistableObject extends Object {
 
 
-   /* Mapping-Constante: numerische Spalte */
-   const C_NUMERIC  = 1;
-
-   /* Mapping-Constante: String-Spalte */
-   const C_STRING   = 2;
-
-   /* Mapping-Constante: Spalte, die NULL sein kann */
-   const C_NULL     = 3;
-
-   /* Mapping-Constante: Spalte, die nicht NULL sein kann */
-   const C_NOT_NULL = 4;
+   // Mapping-Constanten
+   const T_BOOL     = 1;         // boolean
+   const T_INT      = 2;         // int
+   const T_FLOAT    = 3;         // float
+   const T_STRING   = 4;         // string
+   const T_NULL     = true;      // null
+   const T_NOT_NULL = false;     // not null
 
 
-   /* Leeres Datenbankmapping (array) */
-   protected static $mapping;
-
-   /* Flag für den aktuellen Änderungsstatus einer Instanz (boolean) */
+   // Flag für den aktuellen Änderungsstatus einer Instanz (boolean)
    protected $isModified;
 
 
-   /* Standard-Properties jeder Instanz */
-   protected $id;             // Primary Key:     int
-   protected $version;        // Versionsnummer:  string (timestamp) 
-   protected $created;        // Erzeugungsdatum: string (datetime)
+   // Standard-Properties einer Instanz
+   protected $id;                         // Primary Key:     int
+   protected $version;                    // Versionsnummer:  timestamp (string)
+   protected $created;                    // Erzeugungsdatum: datetime  (string)
 
 
-   /* Standard-Getter für die Standard-Properties */
+   // Getter
    public    function getId()      { return $this->id;      }
    protected function getVersion() { return $this->version; }
    public    function getCreated() { return $this->created; }
@@ -68,7 +61,7 @@ abstract class PersistableObject extends Object {
 
    /**
     * Fügt diese Instanz in die Datenbank ein.  Diese Methode sollte nie direkt aufgerufen werden,
-    * statt dessen sollte immer PersistableObject::save() benutzt werden. 
+    * statt dessen sollte immer PersistableObject::save() benutzt werden.
     */
    protected function insert() {
       throw new RuntimeException('Method not implemented');
@@ -77,10 +70,68 @@ abstract class PersistableObject extends Object {
 
    /**
     * Aktualisiert diese Instanz in der Datenbank.  Diese Methode sollte nie direkt aufgerufen werden,
-    * statt dessen sollte immer PersistableObject::save() benutzt werden. 
+    * statt dessen sollte immer PersistableObject::save() benutzt werden.
     */
    protected function update() {
       throw new RuntimeException('Method not implemented');
+   }
+
+
+   /**
+    * Erzeugt aus den übergebenen Daten eine neue Instanz.
+    *
+    * @param array $data - Array mit Instanzdaten (aus der Datenbank)
+    *
+    * @return instance
+    */
+   public static function createInstance(array &$data) {
+      throw new RuntimeException('Implement YourClass::createInstance() to create instances of your class, see example at '.__CLASS__.'::createInstance()');
+      /*
+      // Example:
+      // --------
+      public static function createInstance(array &$data) {
+         $instance = new YourClass();
+         PersistableObject::populate($instance, YourClass::$mapping, $data);
+         return $instance;
+      }
+      */
+   }
+
+
+   /**
+    * Bevölkert eine PersistableObject-Instanz mit den übergebenen Daten.
+    *
+    * Achtung: Das gleichzeitige Erzeugen sehr vieler Instanzen (z.B. Batchprocessing; mehrere tausend Stück) ist
+    *          ca. 3 x mal schneller, wenn diese Methode überschrieben und ohne Schleifen implementiert wird.
+    *
+    * @param PersistableObject $object - Instanz
+    * @param array $mapping            - Datenbankmapping
+    * @param array $data               - Daten
+    */
+   protected static function populate(PersistableObject $object, array &$mapping, array &$data) {
+      foreach ($mapping['fields'] as &$field) {
+         $column =& $field[0];
+
+         if ($data[$column] !== null) {
+            $type =& $field[2];
+
+            if ($type === PersistableObject ::T_STRING) {
+               $object->$field[1] =& $data[$column];
+            }
+            elseif ($type === PersistableObject ::T_INT) {
+               $object->$field[1] = (int) $data[$column];
+            }
+            elseif ($type === PersistableObject ::T_FLOAT) {
+               $object->$field[1] = (float) $data[$column];
+            }
+            elseif ($type === PersistableObject ::T_BOOL) {
+               $object->$field[1] = (bool) $data[$column];
+            }
+            else {
+               throw new RuntimeException('Unknown data type \''.$type.'\' in database mapping of '.get_class($object).'::'.$field[1]);
+            }
+         }
+      }
    }
 }
 ?>
