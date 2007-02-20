@@ -65,13 +65,12 @@ set_exception_handler(array('ErrorHandler', 'handleException'));
  * @param string $className - Klassenname
  */
 function __autoload($className) {
-   global $__autoloadClasses;
-   if (isSet($__autoloadClasses[$className])) {
-      include($__autoloadClasses[$className]);
+   if (isSet($GLOBALS['__autoloadClasses'][$className])) {
+      include($GLOBALS['__autoloadClasses'][$className]);
       return true;
    }
 
-   // __autoload() darf keine Exception werfen (würde einen 'Fatal Error' auslösen)
+   // __autoload() darf keine Exception werfen (löst 'Fatal Error' aus)
    trigger_error("Undefined class '$className'", E_USER_ERROR);
 }
 
