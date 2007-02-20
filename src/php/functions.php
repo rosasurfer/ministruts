@@ -65,7 +65,7 @@ set_exception_handler(array('ErrorHandler', 'handleException'));
  * @param string $className - Klassenname
  */
 function __autoload($className) {
-   if (isSet($GLOBALS['__autoloadClasses'][$className])) {
+   if (isSet($GLOBALS['__autoloadClasses']) && isSet($GLOBALS['__autoloadClasses'][$className])) {
       include($GLOBALS['__autoloadClasses'][$className]);
       return true;
    }
