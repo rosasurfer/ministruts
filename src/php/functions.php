@@ -524,7 +524,7 @@ function subDate($date, $days) {
  * @return string
  */
 function formatDate($format, $date) {
-   if ($date === null || $date=='0000-00-00 00:00:00')
+   if ($date === null || $date==='0000-00-00 00:00:00')
       return null;
 
    if ($date < '1970-01-01 00:00:00') {
