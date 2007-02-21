@@ -543,6 +543,21 @@ function formatDate($format, $date) {
 
 
 /**
+ * Formatiert einen Zahlenwert im Währungsformat.
+ *
+ * @param  mixed $value          - Geldbetrag (integer oder float)
+ * @param  int   $decimals$value - Anzahl der Nachkommastellen
+ *
+ * @return string
+ */
+function formatMoney($value, $decimals = 2) {
+   if (!is_int($value) && !is_float($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
+   if (!is_int($decimals))                   throw new IllegalTypeException('Illegal type of parameter $decimals: '.getType($decimals));
+
+   return number_format((float) $value, $decimals, ',', '.');
+}
+
+/**
  * date_mysql2german
  * wandelt ein MySQL-DATE (ISO-Date)
  * in ein traditionelles deutsches Datum um.
