@@ -136,6 +136,8 @@ abstract class PersistableObject extends Object {
     * @param PersistableObject $object - Instanz
     * @param array $mapping            - Datenbankmapping
     * @param array $data               - Daten
+    *
+    * @return PersistableObject instance - die modifizierte Instanz
     */
    protected static function populate(PersistableObject $object, array &$mapping, array &$data) {
       foreach ($mapping['fields'] as &$field) {
@@ -161,6 +163,7 @@ abstract class PersistableObject extends Object {
             }
          }
       }
+      return $object;
    }
 }
 ?>

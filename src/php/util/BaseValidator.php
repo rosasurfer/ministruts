@@ -58,29 +58,53 @@ class BaseValidator extends Object {
       if ($format == 'Y-m-d') {
          static $YmdPattern = '/^([0-9]{4})-([0-9]{2})-([0-9]{2})$/';
 
-         $matches = array();
-         if (!is_string($date) || !preg_match_all($YmdPattern, $date, $matches, PREG_SET_ORDER))
+         if (!is_string($date) || !preg_match($YmdPattern, $date, $matches))
             return false;
 
-         $year  = $matches[0][1];
-         $month = $matches[0][2];
-         $day   = $matches[0][3];
+         $year  = $matches[1];
+         $month = $matches[2];
+         $day   = $matches[3];
          return checkDate((int) $month, (int) $day, (int) $year);
       }
       elseif ($format == 'd.m.Y') {
          static $dmYPattern = '/^([0-9]{2})\.([0-9]{2})\.([0-9]{4})$/';
 
-         $matches = array();
-         if (!is_string($date) || !preg_match_all($dmYPattern, $date, $matches, PREG_SET_ORDER))
+         if (!is_string($date) || !preg_match($dmYPattern, $date, $matches))
             return false;
 
-         $year  = $matches[0][3];
-         $month = $matches[0][2];
-         $day   = $matches[0][1];
+         $year  = $matches[3];
+         $month = $matches[2];
+         $day   = $matches[1];
          return checkDate((int) $month, (int) $day, (int) $year);
       }
 
       return false;
+   }
+
+
+   /**
+    * Ob der übergebene String eine gültige Festnetztelefunnummer ist.
+    *
+    * @param  string $string - der zu prüfende String
+    *
+    * @return boolean
+    */
+   public static function isFixedPhoneNo($string) {                        // !!! To-do: implementieren und Länderflag übergeben
+      static $pattern = '/^\+?[0-9]{7,}$/';
+      return is_string($string) && strLen($string) && preg_match($pattern, $string);
+   }
+
+
+   /**
+    * Ob der übergebene String eine gültige Mobilfunknummer ist.
+    *
+    * @param  string $string - der zu prüfende String
+    *
+    * @return boolean
+    */
+   public static function isCellPhoneNo($string) {                         // !!! To-do: implementieren und Länderflag übergeben
+      static $pattern = '/^\+?[0-9]{7,}$/';
+      return is_string($string) && strLen($string) && preg_match($pattern, $string);
    }
 }
 ?>

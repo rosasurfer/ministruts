@@ -529,7 +529,7 @@ function formatDate($format, $date) {
 
    if ($date < '1970-01-01 00:00:00') {
       if ($format != 'd.m.Y')
-         throw new InvalidArgumentException('Invalid argument $format: '.$format);
+         throw new RuntimeException('Cannot format early date '.$date.' with format: '.$format);
       $parts = explode('-', $date);
       return $parts[2].'.'.$parts[1].'.'.$parts[0];
    }
