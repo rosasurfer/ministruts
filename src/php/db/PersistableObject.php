@@ -20,16 +20,45 @@ abstract class PersistableObject extends Object {
    protected $isModified;
 
 
-   // Standard-Properties einer Instanz
-   protected $id;                         // Primary Key:     int
-   protected $version;                    // Versionsnummer:  timestamp (string)
-   protected $created;                    // Erzeugungsdatum: datetime  (string)
+   // Standard-Properties jeder Instanz
+   protected $id;                // Primary Key:         int
+   protected $version;           // Versionsnummer:      timestamp (string)
+   protected $created;           // Erzeugungszeitpunkt: datetime  (string)
 
 
-   // Getter
-   public    function getId()      { return $this->id;      }
-   protected function getVersion() { return $this->version; }
-   public    function getCreated() { return $this->created; }
+   /**
+    * Gibt die ID dieser Instanz zurück.
+    *
+    * @return int - ID (primary key)
+    */
+   public function getId() {
+      return $this->id;
+   }
+
+
+   /**
+    * Gibt die Versionsnummer dieser Instanz zurück.
+    *
+    * @return string - Versionsnummer (Zeitpunkt der letzten Änderung)
+    */
+   protected function getVersion() {
+      return $this->version;
+   }
+
+
+   /**
+    * Gibt den Erstellungszeitpunkt dieser Instanz zurück.
+    *
+    * @param string $format - Zeitformat
+    *
+    * @return string - Zeitpunkt
+    */
+   public function getCreated($format = 'Y-m-d H:i:s')  {
+      if ($format == 'Y-m-d H:i:s')
+         return $this->created;
+
+      return formatDate($format, $this->created);
+   }
 
 
    /**
