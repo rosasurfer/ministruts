@@ -1418,7 +1418,8 @@ class BasePdfDocument extends Object {
          $paths = explode(PATH_SEPARATOR, ini_get('include_path'));
          $found = null;
          foreach ($paths as $path) {
-            if (is_file($path.DIRECTORY_SEPARATOR.$fontName)) {
+            $path = realPath($path);
+            if ($path && is_file($path.DIRECTORY_SEPARATOR.$fontName)) {
                $found = $path.DIRECTORY_SEPARATOR.$fontName;
                break;
             }
