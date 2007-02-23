@@ -524,13 +524,16 @@ function subDate($date, $days) {
  * @return string
  */
 function formatDate($format, $date) {
-   if ($date === null || $date==='0000-00-00 00:00:00')
+   if ($date === null)
       return null;
 
    if ($date < '1970-01-01 00:00:00') {
-      if ($format != 'd.m.Y')
-         throw new RuntimeException('Cannot format early date '.$date.' with format: '.$format);
-      $parts = explode('-', $date);
+      if ($format != 'd.m.Y') {
+         LOGLEVEL_NOTICE && Logger::log('Cannot format early date '.$date.' with format: '.$format, L_NOTICE);
+         return preg_replace('/[1-9]/', '0', date($format, time()));
+      }
+
+      $parts = explode('-', substr($date, 0, 10));
       return $parts[2].'.'.$parts[1].'.'.$parts[0];
    }
 
