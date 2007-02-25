@@ -134,32 +134,32 @@ abstract class PersistableObject extends Object {
     *          ca. 3 x mal schneller, wenn diese Methode überschrieben und ohne Schleifen implementiert wird.
     *
     * @param PersistableObject $object - Instanz
-    * @param array $mapping            - Datenbankmapping
-    * @param array $data               - Daten
+    * @param array $mappings           - Datenbankmapping
+    * @param array $dataRow            - Datenreihe
     *
     * @return PersistableObject instance - die modifizierte Instanz
     */
-   protected static function populate(PersistableObject $object, array &$mapping, array &$data) {
-      foreach ($mapping['fields'] as &$field) {
-         $column =& $field[0];
+   protected static function populate(PersistableObject $object, array &$mappings, array &$dataRow) {
+      foreach ($mappings['fields'] as $property => &$mapping) {
+         $column =& $mapping[0];
 
-         if ($data[$column] !== null) {
-            $type =& $field[2];
+         if ($dataRow[$column] !== null) {
+            $type =& $mapping[1];
 
-            if ($type === PersistableObject ::T_STRING) {
-               $object->$field[1] =& $data[$column];
+            if ($type === PersistableObject::T_STRING) {
+               $object->$property =& $dataRow[$column];
             }
-            elseif ($type === PersistableObject ::T_INT) {
-               $object->$field[1] = (int) $data[$column];
+            elseif ($type === PersistableObject::T_INT) {
+               $object->$property = (int) $dataRow[$column];
             }
-            elseif ($type === PersistableObject ::T_FLOAT) {
-               $object->$field[1] = (float) $data[$column];
+            elseif ($type === PersistableObject::T_FLOAT) {
+               $object->$property = (float) $dataRow[$column];
             }
-            elseif ($type === PersistableObject ::T_BOOL) {
-               $object->$field[1] = (bool) $data[$column];
+            elseif ($type === PersistableObject::T_BOOL) {
+               $object->$property = (bool) $dataRow[$column];
             }
             else {
-               throw new RuntimeException('Unknown data type \''.$type.'\' in database mapping of '.get_class($object).'::'.$field[1]);
+               throw new RuntimeException('Unknown data type \''.$type.'\' in database mapping of '.get_class($object).'::'.$property);
             }
          }
       }

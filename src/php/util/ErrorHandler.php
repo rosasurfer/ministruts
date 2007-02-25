@@ -6,14 +6,6 @@ class ErrorHandler extends Object {
 
 
    /**
-    * Constructor
-    */
-   private function __construct() {
-      throw new Exception('Do not instantiate this class.');
-   }
-
-
-   /**
     * Globaler Handler für herkömmliche PHP-Fehler.  Die Fehler werden in eine Exception vom Typ PHPErrorException umgewandelt
     * und zurückgeworfen.
     *

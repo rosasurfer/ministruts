@@ -26,14 +26,6 @@ class Logger extends Object {
 
 
    /**
-    * Constructor
-    */
-   private function __construct() {
-      throw new Exception('Do not instantiate this class.');
-   }
-
-
-   /**
     * Initialisiert die statischen Klassenvariablen.
     */
    private static function init() {

@@ -6,14 +6,6 @@ class BaseValidator extends Object {
 
 
    /**
-    * Constructor
-    */
-   private function __construct() {
-      throw new Exception('Do not instantiate this class.');
-   }
-
-
-   /**
     * Ob der übergebene String eine syntaktisch gültige E-Mail-Adresse ist. Handelt es sich um eine AOL-Adresse,
     * wird auch die AOL-Syntax überprüft (Format: http://postmaster.info.aol.com/faq/mailerfaq.html#syntax)
     *
