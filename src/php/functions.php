@@ -1,5 +1,6 @@
 <?
-/* Systemvoraussetzung: PHP 5.2+ */
+// Systemvoraussetzung: PHP 5.1+
+// -----------------------------
 
 
 // Klassenimporte
@@ -14,6 +15,7 @@ $__autoloadClasses['IllegalTypeException'           ] = 'php/lang/IllegalTypeExc
 $__autoloadClasses['InfrastructureException'        ] = 'php/lang/InfrastructureException.php';
 $__autoloadClasses['InvalidArgumentException'       ] = 'php/lang/InvalidArgumentException.php';
 $__autoloadClasses['NestableException'              ] = 'php/lang/NestableException.php';
+$__autoloadClasses['NoPermissionException'          ] = 'php/lang/NoPermissionException.php';
 $__autoloadClasses['Object'                         ] = 'php/lang/Object.php';
 $__autoloadClasses['PHPErrorException'              ] = 'php/lang/PHPErrorException.php';
 $__autoloadClasses['RuntimeException'               ] = 'php/lang/RuntimeException.php';
@@ -31,7 +33,7 @@ $__autoloadClasses['Mailer'                         ] = 'php/util/Mailer.php';
 
 // Konstanten
 // ----------
-define('L_DEBUG' ,  1);                                           // die verschiedenen Loglevel
+define('L_DEBUG' ,  1);                               // die verschiedenen Loglevel
 define('L_NOTICE',  2);
 define('L_INFO'  ,  4);
 define('L_WARN'  ,  8);
