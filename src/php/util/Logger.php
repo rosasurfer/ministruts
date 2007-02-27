@@ -89,24 +89,6 @@ class Logger extends Object {
    }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
    /**
     * Loggt eine Message und/oder eine Exception.
     *
@@ -192,7 +174,7 @@ class Logger extends Object {
          $msg = (string) $msg;
       }
       if ($ex) {
-         $msg = $msg ? $msg.' ('.get_class($ex).')' : get_class($ex);
+         $msg = $msg ? $msg.' ('.(string) $ex.')' : (string) $ex;
       }
 
 
