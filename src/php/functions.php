@@ -550,16 +550,23 @@ function formatDate($format, $date) {
 /**
  * Formatiert einen Zahlenwert im Währungsformat.
  *
- * @param  mixed $value          - Geldbetrag (integer oder float)
- * @param  int   $decimals$value - Anzahl der Nachkommastellen
+ * @param  mixed  $value            - Zahlenwert (integer oder float)
+ * @param  int    $decimals         - Anzahl der Nachkommastellen
+ * @param  string $decimalSeparator - Dezimaltrennzeichen (entweder '.' oder ',')
  *
  * @return string
  */
-function formatMoney($value, $decimals = 2) {
+function formatMoney($value, $decimals = 2, $decimalSeparator = '.') {
    if (!is_int($value) && !is_float($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
    if (!is_int($decimals))                   throw new IllegalTypeException('Illegal type of parameter $decimals: '.getType($decimals));
 
-   return number_format((float) $value, $decimals, ',', '.');
+   if ($decimalSeparator == '.')
+      return number_format($value, $decimals, '.', ',');
+
+   if ($decimalSeparator == ',')
+      return number_format($value, $decimals, ',', '.');
+
+   throw new InvalidArgumentException('Invalid argument $decimalSeparator: '.$decimalSeparator);
 }
 
 /**
