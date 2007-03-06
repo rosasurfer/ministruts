@@ -2038,13 +2038,16 @@ class BasePdfDocument extends Object {
      $j=$i;
      if ($text[$j]=='<'){
        $j++;
+       if (strlen($text) <= $j) 
+         return $directive;
+
        switch($text[$j]){
          case '/':
            $j++;
-           if (strlen($text) <= $j){
+           if (strlen($text) <= $j) {
              return $directive;
            }
-           switch($text[$j]){
+           switch($text[$j]) {
              case 'b':
              case 'i':
                $j++;
@@ -2121,7 +2124,7 @@ class BasePdfDocument extends Object {
          case 'C':
            $noClose=1;
          case 'c':
-           // this this might be a callback function
+           // this might be a callback function
            $j++;
            $k = strpos($text,'>',$j);
            if ($k!==false && $text[$j]==':'){
