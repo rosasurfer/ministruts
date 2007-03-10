@@ -98,5 +98,82 @@ class BaseValidator extends Object {
       static $pattern = '/^\+?[0-9]{7,}$/';
       return is_string($string) && strLen($string) && preg_match($pattern, $string);
    }
+
+
+   /**
+    * Ob der übergebene String ein vollständiger Straßenname ist (Landstr. [23]).
+    *
+    * @param  string $string - der zu prüfende String
+    *
+    * @return boolean
+    */
+   public static function isAddress($string) {
+      static $pattern = '/^([a-zäöü][a-zäöüß-]*[a-zäöü.] *)+[a-z0-9\/.-]*$/';
+      return is_string($string) && strLen($string) && preg_match($pattern, strToLower($string));
+   }
+
+
+   /**
+    * Ob der übergebene String ein gültiger Vorname ist.
+    *
+    * @param  string $string - der zu prüfende String
+    *
+    * @return boolean
+    */
+   public static function isFirstName($string) {
+      static $pattern = '/^[a-zäöüß-]{3,}$/';
+      return is_string($string) && strLen($string) && preg_match($pattern, strToLower($string));
+   }
+
+
+   /**
+    * Ob der übergebene String ein gültiger Nachname ist.
+    *
+    * @param  string $string - der zu prüfende String
+    *
+    * @return boolean
+    */
+   public static function isLastName($string) {
+      return BaseValidator::isFirstName($string);
+   }
+
+
+   /**
+    * Ob der übergebene String ein gültiger Ortsname ist.
+    *
+    * @param  string $string - der zu prüfende String
+    *
+    * @return boolean
+    */
+   public static function isPlaceName($string) {
+      static $pattern = '/^[a-zäöüß.-]{3,}$/';
+      return is_string($string) && strLen($string) && preg_match($pattern, strToLower($string));
+   }
+
+
+   /**
+    * Ob der übergebene String ein gültiger Straßenname ist.
+    *
+    * @param  string $string - der zu prüfende String
+    *
+    * @return boolean
+    */
+   public static function isStreetName($string) {
+      static $pattern = '/^[a-zäöüß. -]{3,}$/';
+      return is_string($string) && strLen($string) && preg_match($pattern, strToLower($string));
+   }
+
+
+   /**
+    * Ob der übergebene String eine gültige Hausnummer ist.
+    *
+    * @param  string $string - der zu prüfende String
+    *
+    * @return boolean
+    */
+   public static function isStreetNumber($string) {
+      static $pattern = '/^[0-9A-Za-z-\/]+$/';
+      return is_string($string) && strLen($string) && preg_match($pattern, strToLower($string));
+   }
 }
 ?>
