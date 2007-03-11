@@ -523,25 +523,28 @@ function subDate($date, $days) {
 /**
  * Formatiert einen Date- oder DateTime-Value mit dem angegebenen Format.
  *
+ * @param  string $format   - Formatstring (siehe PHP Manual date())
+ * @param  string $datetime - Datum oder Zeit
+ *
  * @return string
  */
-function formatDate($format, $date) {
-   if ($date === null)
+function formatDate($format, $datetime) {
+   if ($datetime === null)
       return null;
 
-   if ($date < '1970-01-01 00:00:00') {
+   if ($datetime < '1970-01-01 00:00:00') {
       if ($format != 'd.m.Y') {
-         LOGLEVEL_NOTICE && Logger::log('Cannot format early date '.$date.' with format: '.$format, L_NOTICE);
+         LOGLEVEL_NOTICE && Logger::log('Cannot format early datetime '.$datetime.' with format: '.$format, L_NOTICE);
          return preg_replace('/[1-9]/', '0', date($format, time()));
       }
 
-      $parts = explode('-', substr($date, 0, 10));
+      $parts = explode('-', substr($datetime, 0, 10));
       return $parts[2].'.'.$parts[1].'.'.$parts[0];
    }
 
-   $timestamp = strToTime($date);
+   $timestamp = strToTime($datetime);
    if (!is_int($timestamp))
-      throw new InvalidArgumentException('Invalid argument $date: '.$date);
+      throw new InvalidArgumentException('Invalid argument $datetime: '.$datetime);
 
    return date($format, $timestamp);
 }
