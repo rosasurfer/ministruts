@@ -5,17 +5,18 @@
 class Logger extends Object {
 
 
-   /* ob das Script in der Konsole läuft */
+   /* Ob das Script in der Konsole läuft. */
    private static $console;
 
-   /* ob das Event angezeigt werden soll (im Browser nur, wenn Request von localhost kommt) */
-   private static $displayEvent;
+   /* Ob das Event angezeigt werden soll (im Browser nur, wenn Request von localhost kommt). */
+   private static $display;
 
-   /* ob die Anzeige HTML-formatiert werden soll */
+   /* Ob die Anzeige HTML-formatiert werden soll. */
    private static $displayHtml;
 
-   /* ob Benachrichtigungsmails an die Webmaster verschickt werden sollen */
+   /* Ob Benachrichtigungsmails an die Webmaster verschickt werden sollen. */
    private static $mailEvent;
+
    private static $logLevels = array(L_DEBUG  => '[Debug]',
                                      L_NOTICE => '[Notice]',
                                      L_INFO   => '[Info]',
@@ -32,10 +33,10 @@ class Logger extends Object {
       if (self::$console !== null)
          return;
 
-      self::$console      = !isSet($_SERVER['REQUEST_METHOD']);
-      self::$displayEvent = self::$console || $_SERVER['REMOTE_ADDR']=='127.0.0.1';
-      self::$displayHtml  = self::$displayEvent && !self::$console;
-      self::$mailEvent    = !self::$console && $_SERVER['REMOTE_ADDR']!='127.0.0.1';
+      self::$console     = !isSet($_SERVER['REQUEST_METHOD']);
+      self::$display     = self::$console || $_SERVER['REMOTE_ADDR']=='127.0.0.1';
+      self::$displayHtml = self::$display && !self::$console;
+      self::$mailEvent   = !self::$display;
    }
 
 
@@ -55,16 +56,24 @@ class Logger extends Object {
          self:: init();
 
       // 1. Exception anzeigen
-      if (self::$displayEvent) {
+      if (self::$display) {
          if (self::$displayHtml) {
-            echo nl2br('<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.get_class($exception).'</b>: '.$exception->getMessage()."\nin <b>".$exception->getFile().'</b> on line <b>'.$exception->getLine().'</b><br>');
-            echo '<br>'.printFormatted("Stacktrace:\n-----------\n".$exception->printStackTrace(true)).'</div>';
+            echo '<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.self::$logLevels[L_FATAL].' '.get_class($exception).'</b>: '.nl2br($exception->getMessage())."<br>in <b>".$exception->getFile().'</b> on line <b>'.$exception->getLine().'</b><br>';
+            if ($exception instanceof NestableException) 
+               echo '<br>'.printFormatted("Stacktrace:\n-----------\n".$exception->printStackTrace(true), true).'</div>';
+            else 
+               echo printFormatted('\nStacktrace not available', true).'</div>';
          }
          else {
             ob_get_level() ? ob_flush() : flush();
-            echo get_class($exception).': '.$exception->getMessage()."\nin ".$exception->getFile().' on line '.$exception->getLine()."\n\n";
-            echo "Stacktrace:\n-----------\n";
-            $exception->printStackTrace();
+            echo get_class($exception).': '.$exception->getMessage()."\nin ".$exception->getFile().' on line '.$exception->getLine()."\n";
+            if ($exception instanceof NestableException) {
+               echo "\nStacktrace:\n-----------\n";
+               $exception->printStackTrace();
+            } 
+            else {
+               echo printFormatted('\nStacktrace not available', true);
+            } 
          }
       }
 
@@ -186,7 +195,7 @@ class Logger extends Object {
 
 
       // Anzeige
-      if (self::$displayEvent) {
+      if (self::$display) {
          ob_get_level() ? ob_flush() : flush();
          if (self::$displayHtml) {
             echo nl2br('<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.self::$logLevels[$level].'</b>: '.$msg."\n in <b>".$file.'</b> on line <b>'.$line.'</b><br>');
@@ -238,97 +247,6 @@ class Logger extends Object {
             error_log($message, 1, $webmaster, 'Subject: PHP error_log: '.self::$logLevels[$level].' at '.@$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']);
          }
       }
-   }
-
-
-   /**
-    * Loggt ein Event.
-    *
-    * Signaturen (= Aufrufvarianten):
-    * -------------------------------
-    * Logger::log($message)                              // Loglevel: L_ERROR
-    * Logger::log($message, $logLevel)
-    * Logger::log($exception)                            // Loglevel: L_ERROR
-    * Logger::log($exception, $logLevel)
-    * Logger::log($message, $exception)                  // Loglevel: L_ERROR
-    * Logger::log($message, $exception, $logLevel)
-    *
-    * Ablauf:
-    * -------
-    * - prüfen, ob das Event vom aktuellen Loglevel abgedeckt wird
-    * - Anzeige des Events (im Browser nur, wenn der HttpRequest von 'localhost' kommt)
-    * - Eintrag des Events ins Errorlog
-    * - Benachrichtigungsmail an alle registrierten Webmaster
-    */
-   public static function logEvent($mixed, $exception = null, $logLevel = L_ERROR) {
-      $message = null;
-      $level = $logLevel;
-
-      // 1. verwendete Methodensignatur ermitteln und Parameter zuordnen
-      $args = func_num_args();
-      if ($args == 1) {
-         if ($mixed instanceof Exception) {                       // Logger::log($exception)
-            $exception = $mixed;
-         }
-         else {                                                   // Logger::log($message)
-            $message = $mixed;
-         }
-      }
-      elseif ($args == 2) {
-         if ($mixed instanceof Exception) {                       // Logger::log($exception, $logLevel)
-            $level = $exception;
-            if (!isSet(self::$logLevels[$level]))
-               throw new InvalidArgumentException('Invalid log level: '.$level.' ('.getType($level).')');
-            $exception = $mixed;
-         }
-         elseif ($exception instanceof Exception) {               // Logger::log($message, $exception)
-            $message = $mixed;
-         }
-         else {                                                   // Logger::log($message, $logLevel)
-            $message = $mixed;
-            $level = $exception;
-            if (!isSet(self::$logLevels[$level]))
-               throw new InvalidArgumentException('Invalid log level: '.$level.' ('.getType($level).')');
-            $exception = null;
-         }
-      }
-      elseif ($args == 3) {                                       // Logger::log($message, $exception, $logLevel)
-         $message = $mixed;
-         if (!$exception instanceof Exception)
-            throw new InvalidArgumentException('Invalid argument $exception: '.$exception.' ('.getType($exception).')');
-         if (!isSet(self::$logLevels[$level]))
-            throw new InvalidArgumentException('Invalid log level: '.$level.' ('.getType($level).')');
-      }
-      else {
-         throw new RuntimeException('Illegal number of arguments: '.$args);
-      }
-
-
-      // 2. Prüfen, ob der angegebene Loglevel vom aktuell aktiven Loglevel abgedeckt wird
-      if ($level < LOGLEVEL)
-         return;
-
-      if (self::$console === null)
-         self:: init();
-
-      // 3. Event anzeigen
-      if (self::$displayEvent) {
-         ob_get_level() ? ob_flush() : flush();
-         if (self::$displayHtml) {
-            //echo nl2br('<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.$className.'</b>: '.$msg."\n in <b>".$file.'</b> on line <b>'.$line.'</b>');
-            //echo '<br>'.printFormatted($trace, true).'<br></div>';
-         }
-         else {
-            //echo $message;
-            //printFormatted("\n".$trace);
-         }
-      }
-      //    3.1 print($ex)
-      //    3.2 $ex->printStackTrace()
-
-      // 4. Eintrag ins Error-Log
-
-      // 5. Benachrichtigungsmail an die Webmaster verschicken
    }
 }
 ?>
