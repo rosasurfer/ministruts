@@ -202,7 +202,7 @@ class Logger extends Object {
          $plainMessage = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $plainMessage)) : str_replace("\r\n", "\n", $plainMessage);
 
          foreach ($GLOBALS['webmasters'] as $webmaster) {
-            error_log($message, 1, $webmaster, 'Subject: PHP error_log: '.self::$logLevels[$level].' at '.(isSet($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '').$_SERVER['PHP_SELF']);
+            error_log($plainMessage, 1, $webmaster, 'Subject: PHP error_log: '.self::$logLevels[$level].' at '.(isSet($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '').$_SERVER['PHP_SELF']);
          }
       }
    }
