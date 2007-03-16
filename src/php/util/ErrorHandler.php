@@ -6,15 +6,10 @@ class ErrorHandler extends Object {
 
 
    /**
-    * Globaler Handler für herkömmliche PHP-Fehler.  Die Fehler werden in eine Exception vom Typ PHPErrorException umgewandelt
-    * und zurückgeworfen.
+    * Globaler Handler für herkömmliche PHP-Fehler.  Die Fehler werden in einer PHPErrorException gekapselt und zurückgeworfen.
     *
-    * Ausnahmen: E_USER_WARNINGs und Fehler, die in __autoload() ausgelöst wurden, werden weiterhin wie herkömmliche
-    *            Fehler behandelt, d.h.:
-    *
-    *  - Fehleranzeige (im Browser nur, wenn der Request von 'localhost' kommt)
-    *  - Loggen im Errorlog
-    *  - Verschicken von Fehler-Emails an alle registrierten Webmaster
+    * Ausnahmen: E_USER_WARNING, E_STRICT und __autoload-Fehler werden geloggt und nicht zurückgeworfen
+    * ----------
     *
     * @param int    $level   -
     * @param string $message -
@@ -28,21 +23,56 @@ class ErrorHandler extends Object {
    public static function handleError($level, $message, $file, $line, array $vars) {
       $error_reporting = error_reporting();
 
+
       // Fehler, die der aktuelle Errorlevel nicht abdeckt, werden ignoriert
-      if ($error_reporting==0 || ($error_reporting & $level) != $level)          // 0 bedeutet, der @-Operator hat den Fehler ausgelöst (@statement)
+      if ($error_reporting==0 || ($error_reporting & $level) != $level)          // $error_reporting==0 bedeutet, der Fehler wurde durch den @-Operator unterdrückt
          return true;
 
 
-      // Level-spezifische Behandlung
-      if ($level != E_USER_WARNING && $level != E_STRICT) {                      // werden nur geloggt
-         $exception = new PHPErrorException($message, $file, $line, $vars);          // Fehler in Exception kapseln und zurückwerfen
-         $trace = $exception->getTrace();                                        // (wenn nicht in __autoload ausgelöst)
+      // Fehler in Exception kapseln
+      $exception = new PHPErrorException($message, $file, $line, $vars);
+
+
+      // Fehler behandeln
+      if ($level == E_USER_WARNING || $level == E_STRICT) {                      // E_USER_WARNING und E_STRICT werden nur geloggt
+         Logger ::logException($exception, L_WARN);
+         return true;
+      }
+      else {
+         $trace = $exception->getTrace();                                        // alles andere wird zurückgeworfen, außer ...
          $frame =& $trace[1];
          if (isSet($frame['class']) || (strToLower($frame['function'])!='__autoload' && $frame['function']!='trigger_error'))
             throw $exception;
          if ($frame['function']=='trigger_error' && (!isSet($trace[2]) || isSet($trace[2]['class']) || strToLower($trace[2]['function'])!='__autoload'))
             throw $exception;
+
+         Logger ::logException($exception, L_FATAL);                             // ... __autoload-Fehler dürfen nicht zurückgeworfen werden (PHP Fatal Error)
+         exit(1);
       }
+   }
+
+
+   /**
+    * Globaler Handler für nicht abgefangene Exceptions. Die Exception wird geloggt und das Script beendet.
+    *
+    * @param Exception $exception - die zu behandelnde Exception
+    */
+   public static function handleException(Exception $exception) {
+      Logger ::logException($exception);
+      exit(1);
+   }
+
+
+
+
+
+
+   /**
+    * ---------------------------
+    * --- Alter Error-Handler ---
+    * ---------------------------
+    */
+   public static function handleError_old($level, $message, $file, $line, array $vars) {
 
 
       // Behandlung von Fehlern, die nicht in eine Exception umgewandelt werden
@@ -166,33 +196,9 @@ class ErrorHandler extends Object {
 
 
    /**
-    * Globaler Handler für nicht abgefangene Exceptions. Die Exception wird geloggt und das Script beendet.
-    *
-    * @param Exception $exception - die zu behandelnde Exception
-    */
-   public static function handleException(Exception $exception) {
-      Logger ::logException($exception);
-      exit(1);
-   }
-
-
-
-
-
-
-   /**
     * -------------------------------
     * --- Alter Exception-Handler ---
     * -------------------------------
-    *
-    * Globaler Handler für nicht abgefangene Exceptions.
-    *
-    * Ablauf: - Anzeige der Exception (im Browser nur, wenn der Request von 'localhost' kommt)
-    *         - Loggen im Errorlog
-    *         - Verschicken von Fehler-Emails an alle registrierten Webmaster
-    *         - Beenden des Scriptes
-    *
-    * @param Exception $exception - die zu behandelnde Exception
     */
    public static function handleException_old(Exception $exception) {
       $console     = !isSet($_SERVER['REQUEST_METHOD']);                         // ob das Script in der Konsole läuft

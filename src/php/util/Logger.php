@@ -59,9 +59,9 @@ class Logger extends Object {
       if (self::$display) {
          if (self::$displayHtml) {
             echo '<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.self::$logLevels[L_FATAL].' '.get_class($exception).'</b>: '.nl2br($exception->getMessage())."<br>in <b>".$exception->getFile().'</b> on line <b>'.$exception->getLine().'</b><br>';
-            if ($exception instanceof NestableException) 
+            if ($exception instanceof NestableException)
                echo '<br>'.printFormatted("Stacktrace:\n-----------\n".$exception->printStackTrace(true), true).'</div>';
-            else 
+            else
                echo printFormatted('\nStacktrace not available', true).'</div>';
          }
          else {
@@ -70,10 +70,10 @@ class Logger extends Object {
             if ($exception instanceof NestableException) {
                echo "\nStacktrace:\n-----------\n";
                $exception->printStackTrace();
-            } 
+            }
             else {
                echo printFormatted('\nStacktrace not available', true);
-            } 
+            }
          }
       }
 
@@ -244,7 +244,7 @@ class Logger extends Object {
          $message = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $message)) : str_replace("\r\n", "\n", $message);
 
          foreach ($GLOBALS['webmasters'] as $webmaster) {
-            error_log($message, 1, $webmaster, 'Subject: PHP error_log: '.self::$logLevels[$level].' at '.@$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']);
+            error_log($message, 1, $webmaster, 'Subject: PHP error_log: '.self::$logLevels[$level].' at '.(isSet($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '').$_SERVER['PHP_SELF']);
          }
       }
    }
