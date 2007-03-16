@@ -41,74 +41,18 @@ class Logger extends Object {
 
 
    /**
-    * Loggt eine Exception.
-    *
-    * Ablauf:
-    * -------
-    * - Anzeige der Exception (im Browser nur, wenn der HttpRequest von 'localhost' kommt)
-    * - Eintrag der Exception ins Errorlog
-    * - Verschicken einer Benachrichtigungsmail an alle registrierten Webmaster
-    *
-    * @param Exception $exception - die zu loggende Exception
-    */
-   public static function logException(Exception $exception) {
-      if (self::$console === null)
-         self:: init();
-
-      // 1. Exception anzeigen
-      if (self::$display) {
-         if (self::$displayHtml) {
-            echo '<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.self::$logLevels[L_FATAL].' '.get_class($exception).'</b>: '.nl2br($exception->getMessage())."<br>in <b>".$exception->getFile().'</b> on line <b>'.$exception->getLine().'</b><br>';
-            if ($exception instanceof NestableException)
-               echo '<br>'.printFormatted("Stacktrace:\n-----------\n".$exception->printStackTrace(true), true).'</div>';
-            else
-               echo printFormatted('\nStacktrace not available', true).'</div>';
-         }
-         else {
-            ob_get_level() ? ob_flush() : flush();
-            echo get_class($exception).': '.$exception->getMessage()."\nin ".$exception->getFile().' on line '.$exception->getLine()."\n";
-            if ($exception instanceof NestableException) {
-               echo "\nStacktrace:\n-----------\n";
-               $exception->printStackTrace();
-            }
-            else {
-               echo printFormatted('\nStacktrace not available', true);
-            }
-         }
-      }
-
-
-      // 2. Exception ins Error-Log eintragen
-      $logMessage = get_class($exception).': '.$exception->getMessage().' in '.$exception->getFile().' on line '.$exception->getLine();
-      $logMessage = 'PHP '.str_replace(array("\r\n", "\n"), ' ', $logMessage);      // Zeilenumbrüche entfernen
-      error_log($logMessage, 0);
-
-
-      // 3. Benachrichtigungsmail an die Webmaster verschicken
-      if (self::$mailEvent && isSet($GLOBALS['webmasters'])) {
-         $mailMessage  = get_class($exception).': '.$exception->getMessage()."\nin ".$exception->getFile().' on line '.$exception->getLine()."\n";
-         $mailMessage .= "\nStacktrace:\n-----------\n".$exception->printStackTrace(true);
-         $mailMessage .= "\nRequest:\n--------\n".getRequest()."\n\nIP: ".$_SERVER['REMOTE_ADDR']."\n---\n";
-         $mailMessage = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $mailMessage)) : str_replace("\r\n", "\n", $mailMessage);
-
-         foreach ($GLOBALS['webmasters'] as $webmaster) {
-            error_log($mailMessage, 1, $webmaster, 'Subject: PHP error_log: '.get_class($exception).' at '.@$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']);
-         }
-      }
-   }
-
-
-   /**
     * Loggt eine Message und/oder eine Exception.
     *
-    * Aufrufvarianten:
-    * ----------------
-    * Logger::log($message)                              // Loglevel: L_ERROR
-    * Logger::log($message, $logLevel)
-    * Logger::log($exception)                            // Loglevel: L_ERROR
-    * Logger::log($exception, $logLevel)
-    * Logger::log($message, $exception)                  // Loglevel: L_ERROR
-    * Logger::log($message, $exception, $logLevel)
+    * Methodensignaturen:
+    * -------------------
+    * Logger::log($message)                        // Level L_ERROR
+    * Logger::log($message, $level)
+    *
+    * Logger::log($exception)                      // Level L_ERROR
+    * Logger::log($exception, $level)
+    *
+    * Logger::log($message, $exception)            // Level L_ERROR
+    * Logger::log($message, $exception, $level)
     *
     * Ablauf:
     * -------
@@ -117,131 +61,145 @@ class Logger extends Object {
     * - Eintrag ins Errorlog
     * - Benachrichtigungsmail an alle registrierten Webmaster
     */
-   public static function log($mixed, $exception = null, $logLevel = L_ERROR) {
-      $msg = $ex = null;
-      $level = $logLevel;
-
-
-      // Parameter validieren
+   public static function log() {
       $args = func_num_args();
+
       if ($args == 1) {
-         if ($mixed instanceof Exception) {                    // Logger::log($exception)
-            $ex = $mixed;
-         }
-         else {                                                // Logger::log($message)
-            $msg = $mixed;
-         }
+         $arg1 = func_get_arg(0);
+
+         if (is_string($arg1))              return self:: _log($arg1);                 // Logger::log($message)
+         if ($arg1 instanceof Exception)    return self:: _log(null, $arg1);           // Logger::log($exception)
       }
       elseif ($args == 2) {
-         if ($mixed instanceof Exception) {                    // Logger::log($exception, $logLevel)
-            $ex = $mixed;
-            $level = $exception;
-            if (!isSet(self::$logLevels[$level]))
-               throw new InvalidArgumentException('Invalid log level: '.$level);
+         $arg1 = func_get_arg(0);
+         $arg2 = func_get_arg(1);
+
+         if (is_string($arg1)) {
+            if (is_int($arg2))              return self:: _log($arg1, null, $arg2);    // Logger::log($message, $level)
+            if ($arg2 instanceof Exception) return self:: _log($arg1, $arg2);          // Logger::log($message, $exception)
          }
-         elseif ($exception instanceof Exception) {            // Logger::log($message, $exception)
-            $msg = $mixed;
-            $ex = $exception;
-         }
-         else {                                                // Logger::log($message, $logLevel)
-            $msg = $mixed;
-            $level = $exception;
-            if (!isSet(self::$logLevels[$level]))
-               throw new InvalidArgumentException('Invalid log level: '.$level);
+         elseif ($arg1 instanceof Exception) {
+            if (is_int($arg2))              return self:: _log(null, $arg1, $arg2);    // Logger::log($exception, $level)
          }
       }
-      elseif ($args == 3) {                                    // Logger::log($message, $exception, $logLevel)
-         $msg = $mixed;
-         if (!$exception instanceof Exception)
-            throw new InvalidArgumentException('Invalid argument $exception: '.$exception);
-         $ex = $exception;
-         if (!isSet(self::$logLevels[$level]))
-            throw new InvalidArgumentException('Invalid log level: '.$level);
+      elseif ($args == 3) {
+         $arg1 = func_get_arg(0);
+         $arg2 = func_get_arg(1);
+         $arg3 = func_get_arg(2);
+
+         if (is_string($arg1) && $arg2 instanceof Exception && is_int($arg3))
+                                            return self:: _log($arg1, $arg2, $arg3);   // Logger::log($message, $exception, $level)
       }
-      else {
-         throw new RuntimeException('Illegal number of arguments: '.$args);
-      }
+
+      throw new InvalidArgumentException('Invalid arguments');
+   }
+
+
+   /**
+    * Loggt eine Message und/oder eine Exception.
+    *
+    * Ablauf:
+    * -------
+    * - prüfen, ob Message vom aktuellen Loglevel abgedeckt wird
+    * - Anzeige der Message (im Browser nur, wenn der Request von 'localhost' kommt)
+    * - Eintrag ins Errorlog
+    * - Benachrichtigungsmail an alle registrierten Webmaster
+    */
+   private static function _log($message, $exception = null, $level = L_ERROR) {
+      if (!isSet(self::$logLevels[$level])) throw new InvalidArgumentException('Invalid log level: '.$level);
+
+
+      // Messages, die der aktuelle Loglevel nicht abdeckt, werden ignoriert
+      //if (false)
+      //   return;
 
 
       // Statische Klassenvariablen initialisieren
       if (self::$console === null)
          self:: init();
 
-      // Messages, die der aktuelle Loglevel nicht abdeckt, werden nicht geloggt
-      //if (false)
-      //   return;
+
+      // Quellcode-Position der Ursache ermitteln
+      $stackTrace = debug_backtrace();
+      $frame =& $stackTrace[sizeOf($stackTrace)-1];               // der letzte Frame
+      $file = $line = $uncaughtException = null;
+
+      /*
+      foreach ($stackTrace as $frame) {
+         if (isSet($frame['args'])) {
+            unset($frame['args']);
+         }
+         echoPre($frame);
+      }
+      */
+
+      if ($message==null && isSet($frame['class']) && isSet($frame['type']) && isSet($frame['function']) && $frame['class'].$frame['type'].$frame['function'] == 'ErrorHandler::handleException') {
+         $uncaughtException = true;
+         $file = $frame['args'][0]->getFile();                    // Aufruf durch globalen Errorhandler
+         $line = $frame['args'][0]->getLine();
+      }
+      else {
+         $uncaughtException = false;                              // manueller Aufruf im Code
+         $file = $stackTrace[1]['file'];
+         $line = $stackTrace[1]['line'];                          // !!! Aufruf der Logmethode genauer tracen
+      }
 
 
       // Logmessage zusammensetzen
-      if (is_object($msg) && method_exists($msg, '__toString')) {
-         $msg = $msg->__toString();
+      if ($exception) {
+         if ($message === null) {
+            $message = (string) $exception;
+         }
+         else {
+            $message .= ' ('.get_class($exception).')';
+         }
       }
-      elseif (is_object($msg) || is_array($msg)) {
-         $msg = print_r($msg, true);
-      }
-      else {
-         $msg = (string) $msg;
-      }
-      if ($ex) {
-         $msg = $msg ? $msg.' ('.(string) $ex.')' : (string) $ex;
-      }
-
-
-      // Quellcode-Position der Loganweisung einfügen
-      $stackTrace = debug_backtrace();
-         $file = $stackTrace[0]['file'];
-         $line = $stackTrace[0]['line'];
-      $message = self::$logLevels[$level].': '.$msg."\nin ".$file.' on line '.$line."\n";
+      $plainMessage = self::$logLevels[$level].': '.$message."\nin ".$file.' on line '.$line."\n";
 
 
       // Anzeige
       if (self::$display) {
          ob_get_level() ? ob_flush() : flush();
          if (self::$displayHtml) {
-            echo nl2br('<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.self::$logLevels[$level].'</b>: '.$msg."\n in <b>".$file.'</b> on line <b>'.$line.'</b><br>');
-            if ($ex) {
-               if ($ex instanceof NestableException) {
-                  echo '<br>'.$ex.printFormatted("Stacktrace:\n-----------\n".$ex->printStackTrace(true), true).'<br>';
+            echo '<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.self::$logLevels[$level].'</b>: '.nl2br($message)."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
+            if ($exception) {
+               if ($exception instanceof NestableException) {
+                  echo '<br>'.$exception.'<br><br>'.printFormatted("Stacktrace:\n-----------\n".$exception->printStackTrace(true), true);
                }
                else {
-                  echo '<br>'.get_class($ex).': '.$ex->getMessage();
-                  echo printFormatted('Stacktrace not available', true).'<br>';
-                  //echoPre(print_r($ex, true));
+                  echo '<br>'.get_class($exception).': '.$exception->getMessage().'<br><br>';
+                  echo printFormatted('Stacktrace not available', true);
                }
             }
-            echo "</div>\n";
+            echo "<br></div>\n";
          }
          else {
-            echo $message;                                                       // PHP gibt den Fehler unter Linux zusätzlich auf stderr aus,
-            if ($ex) {                                                           // also auf der Konsole ggf. unterdrücken ( 2>/dev/null )
-               if ($ex instanceof NestableException) {
-                  printFormatted("\n$ex\n".$ex->printStackTrace(true));
-               }
-               else {
-                  printFormatted("\n".get_class($ex).': '.$ex->getMessage()."\nStacktrace not available\n");
-               }
+            echo $plainMessage;                                                  // PHP gibt den Fehler unter Linux zusätzlich auf stderr aus,
+            if ($exception) {                                                    // also auf der Konsole ggf. unterdrücken ( 2>/dev/null )
+               if ($exception instanceof NestableException)
+                  printFormatted("\n$exception\n".$exception->printStackTrace(true));
+               else
+                  printFormatted("\n".get_class($exception).': '.$exception->getMessage()."\nStacktrace not available\n");
             }
          }
       }
 
 
       // Logmessage ins Error-Log schreiben
-      $logMsg = 'PHP '.str_replace(array("\r\n", "\n"), ' ', $message);       // Zeilenumbrüche entfernen
-      error_log($logMsg, 0);
+      error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', $plainMessage), 0);      // Zeilenumbrüche entfernen
 
 
       // Logmessage an alle registrierten Webmaster mailen
       if (self::$mailEvent) {
-         if ($ex) {
-            if ($ex instanceof NestableException) {
-               $message .= "\n\n$ex\n".$ex->printStackTrace(true);
-            }
-            else {
-               $message .= "\n\n".get_class($ex).': '.$ex->getMessage()."\nStacktrace not available\n";
-            }
+         if ($exception) {
+            if ($exception instanceof NestableException)
+               $plainMessage .= "\n\n".$exception."\n\n\nStacktrace:\n-----------\n".$exception->printStackTrace(true);
+            else
+               $plainMessage .= "\n\n".get_class($exception).': '.$exception->getMessage()."\nStacktrace not available\n";
          }
-         $message .= "\n\nRequest:\n--------\n".getRequest()."\n\nIP: ".$_SERVER['REMOTE_ADDR']."\n---\n";
-         $message = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $message)) : str_replace("\r\n", "\n", $message);
+
+         $plainMessage .= "\n\n\nRequest:\n--------\n".getRequest()."\n\n\nIP: ".$_SERVER['REMOTE_ADDR']."\n---\n";
+         $plainMessage = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $plainMessage)) : str_replace("\r\n", "\n", $plainMessage);
 
          foreach ($GLOBALS['webmasters'] as $webmaster) {
             error_log($message, 1, $webmaster, 'Subject: PHP error_log: '.self::$logLevels[$level].' at '.(isSet($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '').$_SERVER['PHP_SELF']);
