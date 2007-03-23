@@ -30,13 +30,13 @@ class Logger extends Object {
     * Initialisiert die statischen Klassenvariablen.
     */
    private static function init() {
-      if (self::$console !== null)
+      if (Logger ::$console !== null)
          return;
 
-      self::$console     = !isSet($_SERVER['REQUEST_METHOD']);
-      self::$display     = self::$console || $_SERVER['REMOTE_ADDR']=='127.0.0.1';
-      self::$displayHtml = self::$display && !self::$console;
-      self::$mailEvent   = !self::$display;
+      Logger ::$console     = !isSet($_SERVER['REQUEST_METHOD']);
+      Logger ::$display     =  Logger ::$console || $_SERVER['REMOTE_ADDR']=='127.0.0.1';
+      Logger ::$displayHtml =  Logger ::$display && !Logger ::$console;
+      Logger ::$mailEvent   = !Logger ::$display;
    }
 
 
@@ -67,19 +67,19 @@ class Logger extends Object {
       if ($args == 1) {
          $arg1 = func_get_arg(0);
 
-         if (is_string($arg1))              return self:: _log($arg1);                 // Logger::log($message)
-         if ($arg1 instanceof Exception)    return self:: _log(null, $arg1);           // Logger::log($exception)
+         if (is_string($arg1))              return Logger ::_log($arg1);                // Logger::log($message)
+         if ($arg1 instanceof Exception)    return Logger ::_log(null, $arg1);          // Logger::log($exception)
       }
       elseif ($args == 2) {
          $arg1 = func_get_arg(0);
          $arg2 = func_get_arg(1);
 
          if (is_string($arg1)) {
-            if (is_int($arg2))              return self:: _log($arg1, null, $arg2);    // Logger::log($message, $level)
-            if ($arg2 instanceof Exception) return self:: _log($arg1, $arg2);          // Logger::log($message, $exception)
+            if (is_int($arg2))              return Logger ::_log($arg1, null, $arg2);   // Logger::log($message, $level)
+            if ($arg2 instanceof Exception) return Logger ::_log($arg1, $arg2);         // Logger::log($message, $exception)
          }
          elseif ($arg1 instanceof Exception) {
-            if (is_int($arg2))              return self:: _log(null, $arg1, $arg2);    // Logger::log($exception, $level)
+            if (is_int($arg2))              return Logger ::_log(null, $arg1, $arg2);   // Logger::log($exception, $level)
          }
       }
       elseif ($args == 3) {
@@ -88,7 +88,7 @@ class Logger extends Object {
          $arg3 = func_get_arg(2);
 
          if (is_string($arg1) && $arg2 instanceof Exception && is_int($arg3))
-                                            return self:: _log($arg1, $arg2, $arg3);   // Logger::log($message, $exception, $level)
+                                            return Logger ::_log($arg1, $arg2, $arg3);  // Logger::log($message, $exception, $level)
       }
 
       throw new InvalidArgumentException('Invalid arguments');
@@ -106,7 +106,7 @@ class Logger extends Object {
     * - Benachrichtigungsmail an alle registrierten Webmaster
     */
    private static function _log($message, $exception = null, $level = L_ERROR) {
-      if (!isSet(self::$logLevels[$level])) throw new InvalidArgumentException('Invalid log level: '.$level);
+      if (!isSet(Logger ::$logLevels[$level])) throw new InvalidArgumentException('Invalid log level: '.$level);
 
 
       // Messages, die der aktuelle Loglevel nicht abdeckt, werden ignoriert
@@ -115,8 +115,8 @@ class Logger extends Object {
 
 
       // Statische Klassenvariablen initialisieren
-      if (self::$console === null)
-         self:: init();
+      if (Logger ::$console === null)
+         Logger ::init();
 
 
       // Quellcode-Position der Ursache ermitteln
@@ -154,14 +154,14 @@ class Logger extends Object {
             $message .= ' ('.get_class($exception).')';
          }
       }
-      $plainMessage = self::$logLevels[$level].': '.$message."\nin ".$file.' on line '.$line."\n";
+      $plainMessage = Logger ::$logLevels[$level].': '.$message."\nin ".$file.' on line '.$line."\n";
 
 
       // Anzeige
-      if (self::$display) {
+      if (Logger ::$display) {
          ob_get_level() ? ob_flush() : flush();
-         if (self::$displayHtml) {
-            echo '<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.self::$logLevels[$level].'</b>: '.nl2br($message)."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
+         if (Logger ::$displayHtml) {
+            echo '<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.Logger ::$logLevels[$level].'</b>: '.nl2br($message)."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
             if ($exception) {
                if ($exception instanceof NestableException) {
                   echo '<br>'.$exception.'<br><br>'.printFormatted("Stacktrace:\n-----------\n".$exception->printStackTrace(true), true);
@@ -190,7 +190,7 @@ class Logger extends Object {
 
 
       // Logmessage an alle registrierten Webmaster mailen
-      if (self::$mailEvent) {
+      if (Logger ::$mailEvent) {
          if ($exception) {
             if ($exception instanceof NestableException)
                $plainMessage .= "\n\n".$exception."\n\n\nStacktrace:\n-----------\n".$exception->printStackTrace(true);
@@ -202,7 +202,7 @@ class Logger extends Object {
          $plainMessage = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $plainMessage)) : str_replace("\r\n", "\n", $plainMessage);
 
          foreach ($GLOBALS['webmasters'] as $webmaster) {
-            error_log($plainMessage, 1, $webmaster, 'Subject: PHP error_log: '.self::$logLevels[$level].' at '.(isSet($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '').$_SERVER['PHP_SELF']);
+            error_log($plainMessage, 1, $webmaster, 'Subject: PHP error_log: '.Logger ::$logLevels[$level].' at '.(isSet($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '').$_SERVER['PHP_SELF']);
          }
       }
    }
