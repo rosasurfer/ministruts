@@ -124,15 +124,6 @@ class Logger extends Object {
       $frame =& $stackTrace[sizeOf($stackTrace)-1];               // der letzte Frame
       $file = $line = $uncaughtException = null;
 
-      /*
-      foreach ($stackTrace as $frame) {
-         if (isSet($frame['args'])) {
-            unset($frame['args']);
-         }
-         echoPre($frame);
-      }
-      */
-
       if ($message==null && isSet($frame['class']) && isSet($frame['type']) && isSet($frame['function']) && $frame['class'].$frame['type'].$frame['function'] == 'ErrorHandler::handleException') {
          $uncaughtException = true;
          $file = $frame['args'][0]->getFile();                    // Aufruf durch globalen Errorhandler
@@ -185,11 +176,7 @@ class Logger extends Object {
       }
 
 
-      // Logmessage ins Error-Log schreiben
-      error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', $plainMessage), 0);      // Zeilenumbrüche entfernen
-
-
-      // Logmessage an alle registrierten Webmaster mailen
+      // Logmessage entweder an die registrierten Webmaster mailen ...
       if (Logger ::$mailEvent) {
          if ($exception) {
             if ($exception instanceof NestableException)
@@ -204,6 +191,10 @@ class Logger extends Object {
          foreach ($GLOBALS['webmasters'] as $webmaster) {
             error_log($plainMessage, 1, $webmaster, 'Subject: PHP error_log: '.Logger ::$logLevels[$level].' at '.(isSet($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '').$_SERVER['PHP_SELF']);
          }
+      }
+      // ... oder ins Error-Log schreiben
+      else {
+         error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', $plainMessage), 0);      // Zeilenumbrüche entfernen
       }
    }
 }
