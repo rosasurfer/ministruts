@@ -6,6 +6,32 @@ class BaseValidator extends Object {
 
 
    /**
+    * Ob der übergebene String eine syntaktisch richtige IP-Adresse ist.
+    *
+    * @param string $string - der zu überprüfende String
+    *
+    * @return boolean
+    */
+   public static function isIPAddress($string) {
+      static $pattern = '/^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/';
+
+      $result = is_string($string) && strLen($string) && preg_match($pattern, $string, $matches);
+
+      if ($result) {
+         array_shift($matches);
+         foreach ($matches as $part) {
+            if ((strPos($part, '0') === 0 && $part!=='0') || (int) $part > 255) {
+               $result = false;
+               break;
+            }
+         }
+      }
+
+      return $result;
+   }
+
+
+   /**
     * Ob der übergebene String eine syntaktisch gültige E-Mail-Adresse ist. Handelt es sich um eine AOL-Adresse,
     * wird auch die AOL-Syntax überprüft (Format: http://postmaster.info.aol.com/faq/mailerfaq.html#syntax)
     *
