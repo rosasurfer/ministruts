@@ -72,8 +72,10 @@ function __autoload($className) {
       return true;
    }
 
-   // __autoload() darf keine Exception werfen (löst 'Fatal Error' aus)
-   trigger_error("Undefined class '$className'", E_USER_ERROR);
+   // Exception erzeugen und manuell weiterleiten, da __autoload keine Exceptions werfen darf (löst 'PHP Fatal Error' aus)
+   $stackTrace = debug_backtrace();
+   $exception = new PHPErrorException("Undefined class '$className'", $stackTrace[0]['file'], $stackTrace[0]['line'], array());
+   ErrorHandler ::handleException($exception);
 }
 
 

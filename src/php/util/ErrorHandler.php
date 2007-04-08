@@ -8,7 +8,7 @@ class ErrorHandler extends Object {
    /**
     * Globaler Handler für herkömmliche PHP-Fehler.  Die Fehler werden in einer PHPErrorException gekapselt und zurückgeworfen.
     *
-    * Ausnahmen: E_USER_WARNING, E_STRICT und __autoload-Fehler werden geloggt und nicht zurückgeworfen
+    * Ausnahmen: E_USER_WARNING und E_STRICT: Fehler werden nur geloggt
     * ----------
     *
     * @param int    $level   -
@@ -29,30 +29,22 @@ class ErrorHandler extends Object {
          return true;
 
 
-      // Fehler in Exception kapseln
+      // Fehler in Exception kapseln ...
       $exception = new PHPErrorException($message, $file, $line, $vars);
 
 
-      // Fehler behandeln
-      if ($level == E_USER_WARNING) {                                            // E_USER_WARNINGs werden nur geloggt
+      // ... und zur Behandlung weiterleiten
+      if ($level == E_USER_WARNING) {                    // E_USER_WARNINGs werden nur geloggt
          Logger ::log($exception, L_WARN);
-         return true;
       }
-      elseif ($level == E_STRICT) {                                              // E_STRICT darf nicht zurückgeworfen werden
-         Logger ::log($exception, L_FATAL);
-         exit(1);
+      elseif ($level == E_STRICT) {                      // E_STRICT darf nicht zurückgeworfen werden und wird deshalb manuell weitergeleitet
+         self:: handleException($exception);
       }
       else {
-         $trace = $exception->getTrace();                                        // alles andere wird zurückgeworfen, außer ...
-         $frame =& $trace[1];
-         if (isSet($frame['class']) || (strToLower($frame['function'])!='__autoload' && $frame['function']!='trigger_error'))
-            throw $exception;
-         if ($frame['function']=='trigger_error' && (!isSet($trace[2]) || isSet($trace[2]['class']) || strToLower($trace[2]['function'])!='__autoload'))
-            throw $exception;
-
-         Logger ::log($exception, L_FATAL);                                      // ... __autoload-Fehler dürfen auch nicht zurückgeworfen werden
-         exit(1);
+         throw $exception;                               // alles andere wird zurückgeworfen
       }
+
+      return true;
    }
 
 
