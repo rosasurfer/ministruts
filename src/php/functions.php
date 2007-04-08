@@ -24,7 +24,6 @@ $__autoloadClasses['BasePdfDocument'                ] = 'php/pdf/BasePdfDocument
 $__autoloadClasses['SimplePdfDocument'              ] = 'php/pdf/SimplePdfDocument.php';
 
 $__autoloadClasses['BaseValidator'                  ] = 'php/util/BaseValidator.php';
-$__autoloadClasses['ErrorHandler'                   ] = 'php/util/ErrorHandler.php';
 $__autoloadClasses['HttpRequest'                    ] = 'php/util/HttpRequest.php';
 $__autoloadClasses['Logger'                         ] = 'php/util/Logger.php';
 $__autoloadClasses['Mailer'                         ] = 'php/util/Mailer.php';
@@ -56,8 +55,8 @@ define('WINDOWS', (strToUpper(subStr(PHP_OS, 0, 3))==='WIN'));    // ob das Scri
 
 // Errorhandler registrieren
 // -------------------------
-set_error_handler    (array('ErrorHandler', 'handleError'    ));
-set_exception_handler(array('ErrorHandler', 'handleException'));
+set_error_handler    (array('Logger', 'handleError'    ));
+set_exception_handler(array('Logger', 'handleException'));
 
 
 
@@ -75,7 +74,7 @@ function __autoload($className) {
    // Exception erzeugen und manuell weiterleiten, da __autoload keine Exceptions werfen darf (löst 'PHP Fatal Error' aus)
    $stackTrace = debug_backtrace();
    $exception = new PHPErrorException("Undefined class '$className'", $stackTrace[0]['file'], $stackTrace[0]['line'], array());
-   ErrorHandler ::handleException($exception);
+   Logger ::handleException($exception);
 }
 
 

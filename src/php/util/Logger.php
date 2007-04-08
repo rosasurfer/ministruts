@@ -41,7 +41,61 @@ class Logger extends Object {
 
 
    /**
-    * Loggt eine Message und/oder eine Exception.
+    * Globaler Handler für herkömmliche PHP-Fehler.  Die Fehler werden in einer PHPErrorException gekapselt und zurückgeworfen.
+    *
+    * Ausnahmen: E_USER_WARNING und E_STRICT: Fehler werden nur geloggt
+    * ----------
+    *
+    * @param int    $level   -
+    * @param string $message -
+    * @param string $file    -
+    * @param int    $line    -
+    * @param array  $vars    -
+    *
+    * @return boolean - true, wenn der Fehler erfolgreich behandelt wurde
+    *                   false, wenn der Fehler weitergereicht werden soll, als wenn der ErrorHandler nicht registriert wäre
+    */
+   public static function handleError($level, $message, $file, $line, array $vars) {
+      $error_reporting = error_reporting();
+
+
+      // Fehler, die der aktuelle Errorlevel nicht abdeckt, werden ignoriert
+      if ($error_reporting==0 || ($error_reporting & $level) != $level)          // $error_reporting==0 bedeutet, der Fehler wurde durch den @-Operator unterdrückt
+         return true;
+
+
+      // Fehler in Exception kapseln ...
+      $exception = new PHPErrorException($message, $file, $line, $vars);
+
+
+      // ... und zur Behandlung weiterleiten
+      if ($level == E_USER_WARNING) {                    // E_USER_WARNINGs werden nur geloggt
+         Logger ::_log(null, $exception, L_WARN);
+      }
+      elseif ($level == E_STRICT) {                      // E_STRICT darf nicht zurückgeworfen werden und wird deshalb manuell weitergeleitet
+         Logger ::handleException($exception);
+      }
+      else {
+         throw $exception;                               // alles andere wird zurückgeworfen
+      }
+
+      return true;
+   }
+
+
+   /**
+    * Globaler Handler für nicht abgefangene Exceptions. Die Exception wird geloggt und das Script beendet.
+    *
+    * @param Exception $exception - die zu behandelnde Exception
+    */
+   public static function handleException(Exception $exception) {
+      Logger ::_log(null, $exception, L_FATAL);
+      exit(1);
+   }
+
+
+   /**
+    * Loggt eine Message und/oder eine Exception. Überladene Methode.
     *
     * Methodensignaturen:
     * -------------------
@@ -104,6 +158,10 @@ class Logger extends Object {
     * - Anzeige der Message (im Browser nur, wenn der Request von 'localhost' kommt)
     * - Eintrag ins Errorlog
     * - Benachrichtigungsmail an alle registrierten Webmaster
+    *
+    * @param string    $message   - die zu loggende Message
+    * @param Exception $exception - die zu loggende Exception
+    * @param int       $level     - der Loglevel, der mindestens aktiv sein muß
     */
    private static function _log($message, $exception = null, $level = L_ERROR) {
       if (!isSet(Logger ::$logLevels[$level])) throw new InvalidArgumentException('Invalid log level: '.$level);
@@ -124,7 +182,7 @@ class Logger extends Object {
       $frame =& $stackTrace[sizeOf($stackTrace)-1];               // der letzte Frame
       $file = $line = $uncaughtException = null;
 
-      if ($message==null && isSet($frame['class']) && isSet($frame['type']) && isSet($frame['function']) && $frame['class'].$frame['type'].$frame['function'] == 'ErrorHandler::handleException') {
+      if ($message==null && isSet($frame['class']) && isSet($frame['type']) && isSet($frame['function']) && $frame['class'].$frame['type'].$frame['function'] == 'Logger::handleException') {
          $uncaughtException = true;
          $file = $frame['args'][0]->getFile();                    // Aufruf durch globalen Errorhandler
          $line = $frame['args'][0]->getLine();
