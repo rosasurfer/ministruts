@@ -66,15 +66,19 @@ set_exception_handler(array('Logger', 'handleException'));
  * @param string $className - Klassenname
  */
 function __autoload($className) {
-   if (isSet($GLOBALS['__autoloadClasses']) && isSet($GLOBALS['__autoloadClasses'][$className])) {
-      include($GLOBALS['__autoloadClasses'][$className]);
-      return true;
+   try {
+      if (isSet($GLOBALS['__autoloadClasses'][$className])) {
+         include($GLOBALS['__autoloadClasses'][$className]);
+         return true;
+      }
+
+      $stackTrace = debug_backtrace();
+      throw new PHPErrorException("Undefined class '$className'", $stackTrace[0]['file'], $stackTrace[0]['line'], array());
+   }
+   catch (Exception $ex) {             // alle auftretenden Exceptions manuell behandeln, da __autoload    
+      Logger ::handleException($ex);   // keine Exceptions werfen darf (löst 'PHP Fatal Error' aus)
    }
 
-   // Exception erzeugen und manuell weiterleiten, da __autoload keine Exceptions werfen darf (löst 'PHP Fatal Error' aus)
-   $stackTrace = debug_backtrace();
-   $exception = new PHPErrorException("Undefined class '$className'", $stackTrace[0]['file'], $stackTrace[0]['line'], array());
-   Logger ::handleException($exception);
    exit(1);
 }
 
