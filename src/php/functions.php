@@ -75,6 +75,7 @@ function __autoload($className) {
    $stackTrace = debug_backtrace();
    $exception = new PHPErrorException("Undefined class '$className'", $stackTrace[0]['file'], $stackTrace[0]['line'], array());
    Logger ::handleException($exception);
+   exit(1);
 }
 
 
