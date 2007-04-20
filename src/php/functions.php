@@ -75,7 +75,7 @@ function __autoload($className) {
       $stackTrace = debug_backtrace();
       throw new PHPErrorException("Undefined class '$className'", $stackTrace[0]['file'], $stackTrace[0]['line'], array());
    }
-   catch (Exception $ex) {             // alle auftretenden Exceptions manuell behandeln, da __autoload    
+   catch (Exception $ex) {             // alle auftretenden Exceptions manuell behandeln, da __autoload
       Logger ::handleException($ex);   // keine Exceptions werfen darf (löst 'PHP Fatal Error' aus)
    }
 
@@ -479,31 +479,12 @@ function decodeUtf8($string) {
 
 
 /**
- * Prüft, ob der übergebene Parameter ein gültiges Datum darstellt (Format: yyyy-mm-dd).
- *
- * @return boolean
- */
-function isDate($date) {
-   static $datePattern = '/^([0-9]{4})-([0-9]{2})-([0-9]{2})$/';
-
-   $matches = array();
-   if (!is_string($date) || !preg_match_all($datePattern, $date, $matches, PREG_SET_ORDER))
-      return false;
-
-   $year  = $matches[0][1];
-   $month = $matches[0][2];
-   $day   = $matches[0][3];
-   return checkDate((int) $month, (int) $day, (int) $year);
-}
-
-
-/**
  * Addiert zu einem Datum die angegebene Anzahl von Tagen (Format: yyyy-mm-dd).
  *
  * @return string
  */
 function addDate($date, $days) {
-   if (!isDate($date)) throw new InvalidArgumentException('Invalid argument $date: '.$date);
+   if (!BaseValidator::isDate($date)) throw new InvalidArgumentException('Invalid argument $date: '.$date);
    if (!is_int($days)) throw new InvalidArgumentException('Invalid argument $days: '.$days);
 
    $parts = explode('-', $date);
