@@ -73,6 +73,7 @@ class BaseValidator extends Object {
     * @return boolean
     */
    public static function isDate($date, $format = 'Y-m-d') {
+      // wenn nicht unter Windows ...
       if (!WINDOWS) {
          if     ($format == 'Y-m-d'      ) $data = strPTime($date, '%Y-%m-%d');
          elseif ($format == 'Y-m-d H:i'  ) $data = strPTime($date, '%Y-%m-%d %H:%M');
@@ -83,6 +84,8 @@ class BaseValidator extends Object {
          else                              $data = strPTime($date, $format);
          return ($data !== false && checkDate($data['tm_mon']+1, $data['tm_mday'], $data['tm_year']+1900) && $data['tm_sec'] <= 59 && $data['unparsed']=='');
       }
+
+      // wenn unter Windows (dort ist strPTime() nicht implementiert) ...
       else {
          if ($format == 'Y-m-d') {
             static $YmdPattern = '/^([0-9]{4})-([0-9]{2})-([0-9]{2})$/';
