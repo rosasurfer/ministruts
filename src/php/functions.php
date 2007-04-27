@@ -546,7 +546,7 @@ function formatDate($format, $datetime) {
  *
  * @return string
  */
-function formatMoney($value, $decimals = 2, $decimalSeparator = '.') {
+function formatMoney($value, $decimals = 2, $decimalSeparator = ',') {
    if (!is_int($value) && !is_float($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
    if (!is_int($decimals))                   throw new IllegalTypeException('Illegal type of parameter $decimals: '.getType($decimals));
 
