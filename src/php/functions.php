@@ -102,13 +102,18 @@ function &executeSql($sql, array &$db) {
 
    // ohne bestehende Verbindung eine neue aufbauen
    if ($db['connection'] === null) {
-      $db['connection'] = mysql_connect($db['server'], $db['user'], $db['password'], true);
-      if ($db['connection'] === null)
-         throw new InfrastructureException('Database connection error'.($errno = mysql_errno()) ? "\nError ".mysql_errno().': '.mysql_error() : '');
+      try {
+         $db['connection'] = mysql_connect($db['server'], $db['user'], $db['password'], true);
+         if ($db['connection'] === null)
+            throw new InfrastructureException('Database connection error'.($errno = mysql_errno() ? "\nError ".mysql_errno().': '.mysql_error() : '')."\nSQL: ".str_replace("\n", ' ', str_replace("\r\n", "\n", $sql)));
+      }
+      catch (PHPErrorException $ex) {
+         throw new InfrastructureException('Database connection error'.($errno = mysql_errno() ? "\nError ".mysql_errno().': '.mysql_error() : '')."\nSQL: ".str_replace("\n", ' ', str_replace("\r\n", "\n", $sql)), $ex);
+      }
 
       // nach Verbindungsaufbau Datenbank selektieren
       if (!mysql_select_db($db['database'], $db['connection']))
-         throw new InfrastructureException(($errno = mysql_errno()) ? "Error $errno: ".mysql_error() : 'Database connection error');
+         throw new InfrastructureException(($errno = mysql_errno() ? "Error $errno: ".mysql_error() : 'Database connection error')."\nSQL: ".str_replace("\n", ' ', str_replace("\r\n", "\n", $sql)));
    }
 
 
