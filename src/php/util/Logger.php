@@ -34,7 +34,7 @@ class Logger extends Object {
          return;
 
       Logger ::$console     = !isSet($_SERVER['REQUEST_METHOD']);
-      Logger ::$display     =  Logger ::$console || $_SERVER['REMOTE_ADDR']=='127.0.0.1';
+      Logger ::$display     =  Logger ::$console || $_SERVER['REMOTE_ADDR']=='127.0.0.1' || (ini_get('display_errors'));
       Logger ::$displayHtml =  Logger ::$display && !Logger ::$console;
       Logger ::$mailEvent   = !Logger ::$display;
    }
