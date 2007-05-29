@@ -118,7 +118,22 @@ class Logger extends Object {
       }
 
 
-      // 4. Script beenden
+      // 4. Exception an die registrierten Adressen mailen ...
+      if (Logger ::$mailEvent) {
+         $mailMsg = $plainMessage."\n\n".$message."\n\n\n".$traceStr."\n\n\nRequest:\n--------\n".getRequest()."\n\n\nIP: ".$_SERVER['REMOTE_ADDR']."\n---\n";
+         $mailMsg = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $mailMsg)) : str_replace("\r\n", "\n", $mailMsg);
+
+         foreach ($GLOBALS['webmasters'] as $webmaster) {
+            error_log($mailMsg, 1, $webmaster, 'Subject: PHP error_log: [Fatal] at '.(isSet($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '').$_SERVER['PHP_SELF']);
+         }
+      }
+      // ... oder ins Error-Log schreiben
+      else {
+         error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', $plainMessage), 0);      // Zeilenumbrüche entfernen
+      }
+
+
+      // 5. Script beenden
       exit(1);
    }
 
@@ -226,25 +241,22 @@ class Logger extends Object {
          else {
             echo $plainMessage;
             if ($exception)
-               echo "\n".$exMessage."\n".$exTraceStr;
+               echo "\n".$exMessage."\n\n".$exTraceStr."\n";
          }
       }
 
 
-      // Logmessage entweder an die registrierten Webmaster mailen ...
+      // Logmessage entweder an die registrierten Adressen mailen ...
       if (Logger ::$mailEvent) {
-         if ($exception) {
-            if ($exception instanceof NestableException)
-               $plainMessage .= "\n\n".$exception."\n\n\nStacktrace:\n-----------\n".$exception->printStackTrace(true);
-            else
-               $plainMessage .= "\n\n".get_class($exception).': '.$exception->getMessage()."\nStacktrace not available\n";
-         }
+         $mailMsg = $plainMessage;
+         if ($exception)
+            $mailMsg .= "\n\n".$exMessage."\n\n\n".$exTraceStr;
 
-         $plainMessage .= "\n\n\nRequest:\n--------\n".getRequest()."\n\n\nIP: ".$_SERVER['REMOTE_ADDR']."\n---\n";
-         $plainMessage = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $plainMessage)) : str_replace("\r\n", "\n", $plainMessage);
+         $mailMsg .= "\n\n\nRequest:\n--------\n".getRequest()."\n\n\nIP: ".$_SERVER['REMOTE_ADDR']."\n---\n";
+         $mailMsg  = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $mailMsg)) : str_replace("\r\n", "\n", $mailMsg);
 
          foreach ($GLOBALS['webmasters'] as $webmaster) {
-            error_log($plainMessage, 1, $webmaster, 'Subject: PHP error_log: '.Logger ::$logLevels[$level].' at '.(isSet($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '').$_SERVER['PHP_SELF']);
+            error_log($mailMsg, 1, $webmaster, 'Subject: PHP error_log: '.Logger ::$logLevels[$level].' at '.(isSet($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '').$_SERVER['PHP_SELF']);
          }
       }
       // ... oder ins Error-Log schreiben
