@@ -108,7 +108,7 @@ class Logger extends Object {
          ob_get_level() ? ob_flush() : flush();
 
          if (Logger ::$displayHtml) {
-            echo '<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>Fatal: Uncaught</b> '.nl2br($message)."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
+            echo '</script><div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>Fatal: Uncaught</b> '.nl2br($message)."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
             echo '<br>'.$message.'<br><br>'.printFormatted($traceStr, true);
             echo "<br></div>\n";
          }
@@ -232,10 +232,9 @@ class Logger extends Object {
          ob_get_level() ? ob_flush() : flush();
 
          if (Logger ::$displayHtml) {
-            echo '<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.Logger ::$logLevels[$level].'</b>: '.nl2br($message)."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
-            if ($exception) {
+            echo '</script><div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.Logger ::$logLevels[$level].'</b>: '.nl2br($message)."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
+            if ($exception) 
                echo '<br>'.$exMessage.'<br><br>'.printFormatted($exTraceStr, true);
-            }
             echo "<br></div>\n";
          }
          else {
