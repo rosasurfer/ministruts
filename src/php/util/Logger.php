@@ -8,10 +8,10 @@ class Logger extends Object {
    /* Ob das Script in der Konsole läuft. */
    private static $console;
 
-   /* Ob das Event angezeigt werden soll (im Browser nur, wenn Request von localhost kommt). */
+   /* Ob das Event angezeigt werden soll. */
    private static $display;
 
-   /* Ob die Anzeige HTML-formatiert werden soll. */
+   /* Ob eine Anzeige HTML-formatiert werden soll. */
    private static $displayHtml;
 
    /* Ob Benachrichtigungsmails an die Webmaster verschickt werden sollen. */
@@ -27,7 +27,7 @@ class Logger extends Object {
 
 
    /**
-    * Initialisiert die statischen Klassenvariablen.
+    * Initialisiert die statischen Klassenvariablen (siehe oben).
     */
    private static function init() {
       if (Logger ::$console !== null)
@@ -43,8 +43,8 @@ class Logger extends Object {
    /**
     * Globaler Handler für herkömmliche PHP-Fehler.  Die Fehler werden in einer PHPErrorException gekapselt und zurückgeworfen.
     *
-    * Ausnahmen: E_USER_WARNING und E_STRICT: Fehler werden nur geloggt
-    * ----------
+    * Ausnahme: E_USER_WARNING und E_STRICT werden nur geloggt
+    * ---------
     *
     * @param int    $level   -
     * @param string $message -
@@ -60,7 +60,7 @@ class Logger extends Object {
 
 
       // Fehler, die der aktuelle Errorlevel nicht abdeckt, werden ignoriert
-      if ($error_reporting==0 || ($error_reporting & $level) != $level)          // $error_reporting==0 bedeutet, der Fehler wurde durch den @-Operator unterdrückt
+      if ($error_reporting==0 || ($error_reporting & $level) != $level)       // $error_reporting==0 bedeutet, der Fehler wurde durch @-Operator unterdrückt
          return true;
 
 
@@ -73,10 +73,10 @@ class Logger extends Object {
          Logger ::_log(null, $exception, L_WARN);
       }
       elseif ($level == E_STRICT) {                      // E_STRICT darf nicht zurückgeworfen werden und wird deshalb manuell weitergeleitet
-         Logger ::handleException($exception);
+         Logger ::handleException($exception);           // (kann also nicht mit try-catch abgefangen werden)
       }
       else {
-         throw $exception;                               // alles andere wird zurückgeworfen
+         throw $exception;                               // alles andere wird zurückgeworfen (und kann abgefangen werden)
       }
 
       return true;
@@ -85,11 +85,40 @@ class Logger extends Object {
 
    /**
     * Globaler Handler für nicht abgefangene Exceptions. Die Exception wird geloggt und das Script beendet.
+    * Der Aufruf kann automatisch (globaler ErrorHandler) oder manuell (Codeteile, die keine Exceptions werfen dürfen)
+    * erfolgt sein.
     *
     * @param Exception $exception - die zu behandelnde Exception
     */
    public static function handleException(Exception $exception) {
-      Logger ::_log(null, $exception, L_FATAL);
+      // 1. Klasse initialisieren
+      Logger ::init();
+
+
+      // 2. Fehlerdaten ermitteln
+      $message  = ($exception instanceof NestableException) ? (string) $exception : get_class($exception).': '.$exception->getMessage();
+      $traceStr = ($exception instanceof NestableException) ? "Stacktrace:\n-----------\n".$exception->printStackTrace(true) : 'Stacktrace not available';
+      $file     =  $exception->getFile();
+      $line     =  $exception->getLine();
+      $plainMessage = 'Fatal: Uncaught '.$message."\nin ".$file.' on line '.$line."\n";
+
+
+      // 3. Exception anzeigen
+      if (Logger ::$display) {
+         ob_get_level() ? ob_flush() : flush();
+
+         if (Logger ::$displayHtml) {
+            echo '<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>Fatal: Uncaught</b> '.nl2br($message)."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
+            echo '<br>'.$message.'<br><br>'.printFormatted($traceStr, true);
+            echo "<br></div>\n";
+         }
+         else {
+            echo $plainMessage."\n".$message."\n".$traceStr."\n";    // PHP gibt den Fehler unter Linux zusätzlich auf stderr aus,
+         }                                                           // also auf der Konsole ggf. unterdrücken
+      }
+
+
+      // 4. Script beenden
       exit(1);
    }
 
@@ -107,23 +136,18 @@ class Logger extends Object {
     *
     * Logger::log($message, $exception)            // Level L_ERROR
     * Logger::log($message, $exception, $level)
-    *
-    * Ablauf:
-    * -------
-    * - prüfen, ob Message vom aktuellen Loglevel abgedeckt wird
-    * - Anzeige der Message (im Browser nur, wenn der Request von 'localhost' kommt)
-    * - Eintrag ins Errorlog
-    * - Benachrichtigungsmail an alle registrierten Webmaster
     */
    public static function log() {
       $args = func_num_args();
 
+      // Aufruf mit einem Argument
       if ($args == 1) {
          $arg1 = func_get_arg(0);
 
          if (is_string($arg1))              return Logger ::_log($arg1);                // Logger::log($message)
          if ($arg1 instanceof Exception)    return Logger ::_log(null, $arg1);          // Logger::log($exception)
       }
+      // Aufruf mit zwei Argumenten
       elseif ($args == 2) {
          $arg1 = func_get_arg(0);
          $arg2 = func_get_arg(1);
@@ -136,6 +160,7 @@ class Logger extends Object {
             if (is_int($arg2))              return Logger ::_log(null, $arg1, $arg2);   // Logger::log($exception, $level)
          }
       }
+      // Aufruf mit drei Argumenten
       elseif ($args == 3) {
          $arg1 = func_get_arg(0);
          $arg2 = func_get_arg(1);
@@ -155,9 +180,8 @@ class Logger extends Object {
     * Ablauf:
     * -------
     * - prüfen, ob Message vom aktuellen Loglevel abgedeckt wird
-    * - Anzeige der Message (im Browser nur, wenn der Request von 'localhost' kommt)
-    * - Eintrag ins Errorlog
-    * - Benachrichtigungsmail an alle registrierten Webmaster
+    * - Anzeige der Message
+    * - entweder Benachrichtigungsmail verschicken oder Message ins Errorlog schreiben
     *
     * @param string    $message   - die zu loggende Message
     * @param Exception $exception - die zu loggende Exception
@@ -167,69 +191,42 @@ class Logger extends Object {
       if (!isSet(Logger ::$logLevels[$level])) throw new InvalidArgumentException('Invalid log level: '.$level);
 
 
-      // Messages, die der aktuelle Loglevel nicht abdeckt, werden ignoriert
-      //if (false)
-      //   return;
+      // Messages, die der aktuelle Loglevel nicht abdeckt, ignorieren
+      //if (false) return;
 
 
-      // Statische Klassenvariablen initialisieren
-      if (Logger ::$console === null)
-         Logger ::init();
+      // 1. Klasse initialisieren
+      Logger ::init();
 
 
-      // Quellcode-Position der Ursache ermitteln
-      $stackTrace = debug_backtrace();
-      $frame =& $stackTrace[sizeOf($stackTrace)-1];               // der letzte Frame
-      $file = $line = $uncaughtException = null;
-
-      if ($message==null && isSet($frame['class']) && isSet($frame['type']) && isSet($frame['function']) && $frame['class'].$frame['type'].$frame['function'] == 'Logger::handleException') {
-         $uncaughtException = true;
-         $file = $frame['args'][0]->getFile();                    // Aufruf durch globalen Errorhandler
-         $line = $frame['args'][0]->getLine();
-      }
-      else {
-         $uncaughtException = false;                              // manueller Aufruf im Code
-         $file = $stackTrace[1]['file'];
-         $line = $stackTrace[1]['line'];                          // !!! Aufruf der Logmethode genauer tracen
-      }
-
-
-      // Logmessage zusammensetzen
+      // 2. Logdaten ermitteln
+      $exMessage = $exTraceStr = null;
       if ($exception) {
-         if ($message === null) {
-            $message = (string) $exception;
-         }
-         else {
-            $message .= ' ('.get_class($exception).')';
-         }
+         $message   .= ($message === null) ? (string) $exception : ' ('.get_class($exception).')';
+         $exMessage  = ($exception instanceof NestableException) ? (string) $exception : get_class($exception).': '.$exception->getMessage();;
+         $exTraceStr = ($exception instanceof NestableException) ? "Stacktrace:\n-----------\n".$exception->printStackTrace(true) : 'Stacktrace not available';
       }
+      $trace = debug_backtrace();
+      $file  = $trace[1]['file'];
+      $line  = $trace[1]['line'];
       $plainMessage = Logger ::$logLevels[$level].': '.$message."\nin ".$file.' on line '.$line."\n";
 
 
-      // Anzeige
+      // 3. Anzeige
       if (Logger ::$display) {
          ob_get_level() ? ob_flush() : flush();
+
          if (Logger ::$displayHtml) {
             echo '<div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.Logger ::$logLevels[$level].'</b>: '.nl2br($message)."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
             if ($exception) {
-               if ($exception instanceof NestableException) {
-                  echo '<br>'.$exception.'<br><br>'.printFormatted("Stacktrace:\n-----------\n".$exception->printStackTrace(true), true);
-               }
-               else {
-                  echo '<br>'.get_class($exception).': '.$exception->getMessage().'<br><br>';
-                  echo printFormatted('Stacktrace not available', true);
-               }
+               echo '<br>'.$exMessage.'<br><br>'.printFormatted($exTraceStr, true);
             }
             echo "<br></div>\n";
          }
          else {
-            echo $plainMessage;                                                  // PHP gibt den Fehler unter Linux zusätzlich auf stderr aus,
-            if ($exception) {                                                    // also auf der Konsole ggf. unterdrücken ( 2>/dev/null )
-               if ($exception instanceof NestableException)
-                  printFormatted("\n$exception\n".$exception->printStackTrace(true));
-               else
-                  printFormatted("\n".get_class($exception).': '.$exception->getMessage()."\nStacktrace not available\n");
-            }
+            echo $plainMessage;
+            if ($exception)
+               echo "\n".$exMessage."\n".$exTraceStr;
          }
       }
 

@@ -75,11 +75,9 @@ function __autoload($className) {
       $stackTrace = debug_backtrace();
       throw new PHPErrorException("Undefined class '$className'", $stackTrace[0]['file'], $stackTrace[0]['line'], array());
    }
-   catch (Exception $ex) {             // alle auftretenden Exceptions manuell behandeln, da __autoload
-      Logger ::handleException($ex);   // keine Exceptions werfen darf (löst 'PHP Fatal Error' aus)
+   catch (Exception $ex) {                   // Auftretende Exceptions manuell an globalen ErrorHandler weiterreichen,
+      Logger ::handleException($ex);         // da __autoload() keine Exceptions werfen darf.
    }
-
-   exit(1);
 }
 
 
