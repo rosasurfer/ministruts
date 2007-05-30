@@ -185,7 +185,7 @@ class Logger extends Object {
                                             return Logger ::_log($arg1, $arg2, $arg3);  // Logger::log($message, $exception, $level)
       }
 
-      throw new InvalidArgumentException('Invalid arguments');
+      throw new InvalidArgument_Exception('Invalid arguments');
    }
 
 
@@ -203,7 +203,7 @@ class Logger extends Object {
     * @param int       $level     - der Loglevel, der mindestens aktiv sein muß
     */
    private static function _log($message, $exception = null, $level = L_ERROR) {
-      if (!isSet(Logger ::$logLevels[$level])) throw new InvalidArgumentException('Invalid log level: '.$level);
+      if (!isSet(Logger ::$logLevels[$level])) throw new InvalidArgument_Exception('Invalid log level: '.$level);
 
 
       // Messages, die der aktuelle Loglevel nicht abdeckt, ignorieren
@@ -233,7 +233,7 @@ class Logger extends Object {
 
          if (Logger ::$displayHtml) {
             echo '</script><div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.Logger ::$logLevels[$level].'</b>: '.nl2br($message)."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
-            if ($exception) 
+            if ($exception)
                echo '<br>'.$exMessage.'<br><br>'.printFormatted($exTraceStr, true);
             echo "<br></div>\n";
          }

@@ -1425,7 +1425,7 @@ class BasePdfDocument extends Object {
             }
          }
          if ($found === null)
-            throw new RuntimeException('File not found: '.$fontName);
+            throw new Runtime_Exception('File not found: '.$fontName);
 
          $fontName = $found;
          unset($paths, $path, $found);
@@ -2038,7 +2038,7 @@ class BasePdfDocument extends Object {
      $j=$i;
      if ($text[$j]=='<'){
        $j++;
-       if (strlen($text) <= $j) 
+       if (strlen($text) <= $j)
          return $directive;
 
        switch($text[$j]){
@@ -2870,7 +2870,7 @@ class BasePdfDocument extends Object {
             }
          }
          if ($found === null)
-            throw new RuntimeException('File not found: '.$file);
+            throw new Runtime_Exception('File not found: '.$file);
 
          $file = $found;
          unset($paths, $path, $found);
