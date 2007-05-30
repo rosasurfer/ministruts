@@ -30,10 +30,10 @@ class HttpRequest extends Object {
     * Constructor
     */
    function HttpRequest($host, $port, $uri, $headers = null) {
-      if (!is_string($host) || $host=='')           throw new InvalidArgument_Exception('Invalid host: '.$host);
-      if (!is_int($port)    || $port < 1)           throw new InvalidArgument_Exception('Invalid port: '.$port);
-      if (!is_string($uri)  || $uri=='')            throw new InvalidArgument_Exception('Invalid uri: '.$uri);
-      if ($headers !== null && !is_array($headers)) throw new InvalidArgument_Exception('Invalid headers array: '.$headers);
+      if (!is_string($host) || $host=='')           throw new InvalidArgumentException('Invalid host: '.$host);
+      if (!is_int($port)    || $port < 1)           throw new InvalidArgumentException('Invalid port: '.$port);
+      if (!is_string($uri)  || $uri=='')            throw new InvalidArgumentException('Invalid uri: '.$uri);
+      if ($headers !== null && !is_array($headers)) throw new InvalidArgumentException('Invalid headers array: '.$headers);
 
       $this->debug = @$GLOBALS['debug'];
       $this->host = trim(strToLower($host));
@@ -52,13 +52,13 @@ class HttpRequest extends Object {
       if (preg_match('/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/', $this->host, $matches) == 0) {
          $this->ip = getHostByName($this->host);
          if ($this->ip == $this->host)
-            throw new Runtime_Exception('Cannot resolve ip address of: '.$host);
+            throw new RuntimeException('Cannot resolve ip address of: '.$host);
       }
       else {
          array_shift($matches);
          foreach ($matches as $value) {
             if ((int) $value > 255)
-               throw new Runtime_Exception('Invalid ip address: '.$host);
+               throw new RuntimeException('Invalid ip address: '.$host);
          }
          $this->ip = $this->host;
       }
@@ -72,7 +72,7 @@ class HttpRequest extends Object {
          return false;
 
       if ($this->socket)
-         throw new Runtime_Exception('Cannot reconnect already opened socket');
+         throw new RuntimeException('Cannot reconnect already opened socket');
 
       // Socket öffnen
       $socket = fSockOpen('tcp://'.$this->ip, $this->port, $errorNo, $errorMsg, $this->timeout) or trigger_error("Could not open socket - error $errorNo: $errorMsg", E_USER_WARNING);
@@ -288,12 +288,12 @@ class HttpRequest extends Object {
             return null;
          $statusLine = $headers[0];
          if (strPos($statusLine, 'HTTP/1.') !== 0)
-            throw new Runtime_Exception('Invalid HTTP status line: '.$statusLine);
+            throw new RuntimeException('Invalid HTTP status line: '.$statusLine);
 
          $tokens = explode(' ', $statusLine);
          $status = (int) $tokens[1];
          if ($tokens[1] != "$status")
-            throw new Runtime_Exception('Invalid HTTP status code: '.$statusLine);
+            throw new RuntimeException('Invalid HTTP status code: '.$statusLine);
 
          $this->responseCode = $status;
       }
@@ -323,7 +323,7 @@ class HttpRequest extends Object {
       $count = fWrite($this->socket, $data."\r\n", strLen($data)+2);
 
       if ($count != strLen($data)+2)
-         throw new Runtime_Exception('Error writing to socket, length of data: '.(strLen($data)+2).', bytes written: '.$count."\ndata: ".$data);
+         throw new RuntimeException('Error writing to socket, length of data: '.(strLen($data)+2).', bytes written: '.$count."\ndata: ".$data);
    }
 }
 ?>

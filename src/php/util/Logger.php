@@ -185,7 +185,7 @@ class Logger extends Object {
                                             return Logger ::_log($arg1, $arg2, $arg3);  // Logger::log($message, $exception, $level)
       }
 
-      throw new InvalidArgument_Exception('Invalid arguments');
+      throw new InvalidArgumentException('Invalid arguments');
    }
 
 
@@ -203,7 +203,7 @@ class Logger extends Object {
     * @param int       $level     - der Loglevel, der mindestens aktiv sein muß
     */
    private static function _log($message, $exception = null, $level = L_ERROR) {
-      if (!isSet(Logger ::$logLevels[$level])) throw new InvalidArgument_Exception('Invalid log level: '.$level);
+      if (!isSet(Logger ::$logLevels[$level])) throw new InvalidArgumentException('Invalid log level: '.$level);
 
 
       // Messages, die der aktuelle Loglevel nicht abdeckt, ignorieren

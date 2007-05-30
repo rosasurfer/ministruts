@@ -13,12 +13,12 @@ $__autoloadClasses['PersistableObject'              ] = 'php/db/PersistableObjec
 $__autoloadClasses['BusinessRuleException'          ] = 'php/lang/BusinessRuleException.php';
 $__autoloadClasses['IllegalTypeException'           ] = 'php/lang/IllegalTypeException.php';
 $__autoloadClasses['InfrastructureException'        ] = 'php/lang/InfrastructureException.php';
-$__autoloadClasses['InvalidArgument_Exception'      ] = 'php/lang/InvalidArgument_Exception.php';
+$__autoloadClasses['InvalidArgumentException'       ] = 'php/lang/InvalidArgumentException.php';
 $__autoloadClasses['NestableException'              ] = 'php/lang/NestableException.php';
 $__autoloadClasses['NoPermissionException'          ] = 'php/lang/NoPermissionException.php';
 $__autoloadClasses['Object'                         ] = 'php/lang/Object.php';
 $__autoloadClasses['PHPErrorException'              ] = 'php/lang/PHPErrorException.php';
-$__autoloadClasses['Runtime_Exception'              ] = 'php/lang/Runtime_Exception.php';
+$__autoloadClasses['RuntimeException'               ] = 'php/lang/RuntimeException.php';
 
 $__autoloadClasses['BasePdfDocument'                ] = 'php/pdf/BasePdfDocument.php';
 $__autoloadClasses['SimplePdfDocument'              ] = 'php/pdf/SimplePdfDocument.php';
@@ -92,10 +92,10 @@ function __autoload($className) {
  */
 function &executeSql($sql, array &$db) {
    if (!is_string($sql) || !($sql = trim($sql)))
-      throw new InvalidArgument_Exception('Invalid SQL string: '.$sql);
+      throw new InvalidArgumentException('Invalid SQL string: '.$sql);
 
    if (!isSet($db['server']) || !isSet($db['user']) || !isSet($db['password']) || !$db['database'] || !array_key_exists('connection', $db))
-      throw new InvalidArgument_Exception('Invalid database configuration: '.$db);
+      throw new InvalidArgumentException('Invalid database configuration: '.$db);
 
 
    // ohne bestehende Verbindung eine neue aufbauen
@@ -118,7 +118,7 @@ function &executeSql($sql, array &$db) {
    // Abfrage abschicken
    if (!($resultSet = mysql_query($sql, $db['connection']))) {
       $error = ($errno = mysql_errno()) ? "SQL-Error $errno: ".mysql_error() : 'Database connection error';
-      throw new Runtime_Exception($error."\nSQL: ".str_replace("\n", ' ', str_replace("\r\n", "\n", $sql)));
+      throw new RuntimeException($error."\nSQL: ".str_replace("\n", ' ', str_replace("\r\n", "\n", $sql)));
    }
 
    // Ergebnis der Abfrage auslesen
@@ -253,7 +253,7 @@ function getForwardedIP() {
  */
 function getRandomID($length) {                                // Return: string
    if (!isSet($length) || !is_int($length) || $length < 1)
-      throw new Runtime_Exception('Invalid argument length: '.$length);
+      throw new RuntimeException('Invalid argument length: '.$length);
 
    $id = crypt(uniqId(rand(), true));                          // zufällige ID erzeugen
    $id = strip_tags(stripSlashes($id));                        // Sonder- und leicht zu verwechselnde Zeichen entfernen
@@ -487,8 +487,8 @@ function decodeUtf8($string) {
  * @return string
  */
 function addDate($date, $days) {
-   if (!BaseValidator::isDate($date)) throw new InvalidArgument_Exception('Invalid argument $date: '.$date);
-   if (!is_int($days)) throw new InvalidArgument_Exception('Invalid argument $days: '.$days);
+   if (!BaseValidator::isDate($date)) throw new InvalidArgumentException('Invalid argument $date: '.$date);
+   if (!is_int($days)) throw new InvalidArgumentException('Invalid argument $days: '.$days);
 
    $parts = explode('-', $date);
    $year  = (int) $parts[0];
@@ -505,7 +505,7 @@ function addDate($date, $days) {
  * @return string
  */
 function subDate($date, $days) {
-   if (!is_int($days)) throw new InvalidArgument_Exception('Invalid argument $days: '.$days);
+   if (!is_int($days)) throw new InvalidArgumentException('Invalid argument $days: '.$days);
    return addDate($date, -$days);
 }
 
@@ -534,7 +534,7 @@ function formatDate($format, $datetime) {
 
    $timestamp = strToTime($datetime);
    if (!is_int($timestamp))
-      throw new InvalidArgument_Exception('Invalid argument $datetime: '.$datetime);
+      throw new InvalidArgumentException('Invalid argument $datetime: '.$datetime);
 
    return date($format, $timestamp);
 }
@@ -559,7 +559,7 @@ function formatMoney($value, $decimals = 2, $decimalSeparator = ',') {
    if ($decimalSeparator == ',')
       return number_format($value, $decimals, ',', '.');
 
-   throw new InvalidArgument_Exception('Invalid argument $decimalSeparator: '.$decimalSeparator);
+   throw new InvalidArgumentException('Invalid argument $decimalSeparator: '.$decimalSeparator);
 }
 
 /**

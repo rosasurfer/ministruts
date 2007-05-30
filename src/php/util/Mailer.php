@@ -305,7 +305,7 @@ class Mailer extends Object {
       $count = fWrite($this->connection, $data."\r\n", strLen($data)+2);
 
       if ($count != strLen($data)+2)
-         throw new Runtime_Exception('Error writing to socket, length of data: '.(strLen($data)+2).', bytes written: '.$count."\ndata: ".$data."\n\nTransfer log:\n-------------\n".$this->logBuffer);
+         throw new RuntimeException('Error writing to socket, length of data: '.(strLen($data)+2).', bytes written: '.$count."\ndata: ".$data."\n\nTransfer log:\n-------------\n".$this->logBuffer);
 
       $this->logSentData($data);
    }

@@ -93,7 +93,7 @@ abstract class PersistableObject extends Object {
     * statt dessen sollte immer PersistableObject::save() benutzt werden.
     */
    protected function insert() {
-      throw new Runtime_Exception('Method not implemented');
+      throw new RuntimeException('Method not implemented');
    }
 
 
@@ -102,7 +102,7 @@ abstract class PersistableObject extends Object {
     * statt dessen sollte immer PersistableObject::save() benutzt werden.
     */
    protected function update() {
-      throw new Runtime_Exception('Method not implemented');
+      throw new RuntimeException('Method not implemented');
    }
 
 
@@ -114,7 +114,7 @@ abstract class PersistableObject extends Object {
     * @return instance
     */
    public static function createInstance(array &$data) {
-      throw new Runtime_Exception('Implement YourClass::createInstance() to create instances of your class, see example at '.__CLASS__.'::createInstance()');
+      throw new RuntimeException('Implement YourClass::createInstance() to create instances of your class, see example at '.__CLASS__.'::createInstance()');
       /*
       // Example:
       // --------
@@ -159,7 +159,7 @@ abstract class PersistableObject extends Object {
                $object->$property = (bool) $dataRow[$column];
             }
             else {
-               throw new Runtime_Exception('Unknown data type \''.$type.'\' in database mapping of '.get_class($object).'::'.$property);
+               throw new RuntimeException('Unknown data type \''.$type.'\' in database mapping of '.get_class($object).'::'.$property);
             }
          }
       }
