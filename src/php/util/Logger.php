@@ -100,7 +100,7 @@ class Logger extends Object {
       $traceStr = ($exception instanceof NestableException) ? "Stacktrace:\n-----------\n".$exception->printStackTrace(true) : 'Stacktrace not available';
       $file     =  $exception->getFile();
       $line     =  $exception->getLine();
-      $plainMessage = 'Fatal: Uncaught '.$message."\nin ".$file.' on line '.$line."\n";
+      $plainMessage = 'Uncaught '.$message."\nin ".$file.' on line '.$line."\n";
 
 
       // 3. Exception anzeigen
@@ -108,7 +108,7 @@ class Logger extends Object {
          ob_get_level() ? ob_flush() : flush();
 
          if (Logger ::$displayHtml) {
-            echo '</script><div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>Fatal: Uncaught</b> '.nl2br($message)."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
+            echo '</script><div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>Uncaught</b> '.nl2br($message)."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
             echo '<br>'.$message.'<br><br>'.printFormatted($traceStr, true);
             echo "<br></div>\n";
          }
@@ -124,7 +124,7 @@ class Logger extends Object {
          $mailMsg = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $mailMsg)) : str_replace("\r\n", "\n", $mailMsg);
 
          foreach ($GLOBALS['webmasters'] as $webmaster) {
-            error_log($mailMsg, 1, $webmaster, 'Subject: PHP error_log: [Fatal] at '.(isSet($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '').$_SERVER['PHP_SELF']);
+            error_log($mailMsg, 1, $webmaster, 'Subject: PHP error_log: Uncaught Exception at '.(isSet($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '').$_SERVER['PHP_SELF']);
          }
       }
       // ... oder ins Error-Log schreiben
