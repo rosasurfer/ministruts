@@ -108,7 +108,7 @@ class Logger extends Object {
          ob_get_level() ? ob_flush() : flush();
 
          if (Logger ::$displayHtml) {
-            echo '</script><div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>Uncaught</b> '.nl2br($message)."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
+            echo '</script></i></b><div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>Uncaught</b> '.nl2br($message)."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
             echo '<br>'.$message.'<br><br>'.printFormatted($traceStr, true);
             echo "<br></div>\n";
          }
