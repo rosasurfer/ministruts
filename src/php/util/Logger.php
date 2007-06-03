@@ -113,7 +113,7 @@ class Logger extends Object {
             echo "<br></div>\n";
          }
          else {
-            echo $plainMessage."\n".$message."\n".$traceStr."\n";    // PHP gibt den Fehler unter Linux zusätzlich auf stderr aus,
+            echo $plainMessage."\n\n".$message."\n\n\n".$traceStr."\n";    // PHP gibt den Fehler unter Linux zusätzlich auf stderr aus,
          }                                                           // also auf der Konsole ggf. unterdrücken
       }
 
