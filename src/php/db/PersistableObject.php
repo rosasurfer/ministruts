@@ -147,17 +147,20 @@ abstract class PersistableObject extends Object {
          if ($dataRow[$column] !== null) {
             $type =& $mapping[1];
 
-            if ($type === PersistableObject::T_STRING) {
+            if ($type === PersistableObject ::T_STRING) {
                $object->$property =& $dataRow[$column];
             }
-            elseif ($type === PersistableObject::T_INT) {
+            elseif ($type === PersistableObject ::T_INT) {
                $object->$property = (int) $dataRow[$column];
             }
-            elseif ($type === PersistableObject::T_FLOAT) {
+            elseif ($type === PersistableObject ::T_FLOAT) {
                $object->$property = (float) $dataRow[$column];
             }
-            elseif ($type === PersistableObject::T_BOOL) {
+            elseif ($type === PersistableObject ::T_BOOL) {
                $object->$property = (bool) $dataRow[$column];
+            }
+            elseif ($type === PersistableObject ::T_SET) {
+               $object->$property = (strLen($dataRow[$column]) == 0) ? array() : explode(',', $dataRow[$column]);
             }
             else {
                throw new RuntimeException('Unknown data type \''.$type.'\' in database mapping of '.get_class($object).'::'.$property);
