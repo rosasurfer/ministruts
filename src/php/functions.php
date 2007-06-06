@@ -143,6 +143,8 @@ function &executeSql($sql, array &$db) {
 /**
  * Startet eine neue Datenbank-Transaktion und signalisiert, ob eine neue Transaktion gestartet wurde.
  *
+ * @param array $db - die zu verwendende Datenbankkonfiguration
+ *
  * @return boolean - TRUE, wenn eine neue Transaktion gestartet wurde
  *                   FALSE, wenn sich an eine bereits aktive Transaktion angeschlossen wurde
  */
@@ -161,6 +163,8 @@ function beginTransaction(array &$db) {
 /**
  * Schließt eine nicht verschachtelte Datenbank-Transaktion ab.  Ist die Transaktion eine verschachtelte Transaktion,
  * wird der Aufruf still ignoriert, da eine Transaktion immer von der höchsten Ebene aus geschlossen werden muß.
+ *
+ * @param array $db - die zu verwendende Datenbankkonfiguration
  *
  * @return boolean - TRUE, wenn die Transaktion abgeschlossen wurde
  *                   FALSE, wenn die verschachtelte Transaktion nicht abgeschlossen wurde
@@ -190,6 +194,8 @@ function commitTransaction(array &$db) {
 /**
  * Rollt eine nicht verschachtelte Datenbank-Transaktion zurück.  Ist die Transaktion eine verschachtelte Transaktion,
  * wird der Aufruf still ignoriert, da eine Transaktion immer von der höchsten Ebene aus zurückgerollt werden muß.
+ *
+ * @param array $db - die zu verwendende Datenbankkonfiguration
  *
  * @return boolean - TRUE, wenn die Transaktion zurückgerollt wurde
  *                   FALSE, wenn die verschachtelte Transaktion nicht zurückgerollt wurde
@@ -249,9 +255,13 @@ function getForwardedIP() {
 
 
 /**
- * Erzeugt eine zufällige ID der angegebenen Länge (ohne die Zeichen 0 O 1 l I, da Verwechselungsgefahr).
+ * Erzeugt eine zufällige ID (wegen Verwechselungsgefahr ohne die Zeichen 0 O 1 l I).
+ *
+ * @param int $length - Länge der ID
+ *
+ * @return string - ID
  */
-function getRandomID($length) {                                // Return: string
+function getRandomID($length) {
    if (!isSet($length) || !is_int($length) || $length < 1)
       throw new RuntimeException('Invalid argument length: '.$length);
 
@@ -270,7 +280,8 @@ function getRandomID($length) {                                // Return: string
 
 
 /**
- * Startet eine neue HTTP-Session oder setzt eine vorhergehende Session fort. Ist die übergebene Session-ID ungültig, wird eine neue generiert.
+ * Startet eine neue HTTP-Session oder setzt eine vorhergehende Session fort.
+ * Ist die übergebene Session-ID ungültig, wird eine neue ID generiert.
  *
  * @return boolean - ob die resultierende Session neu ist oder nicht
  */
@@ -334,8 +345,8 @@ function isSessionNew() {
 /**
  * Entfernt alle gespeicherten Informationen aus der aktuellen Session.
  *
- * @return boolean true  - alle gespeicherten Informationen wurden gelöscht
- *                 false - ein Fehler ist aufgetreten (es existiert keine Session)
+ * @return boolean - TRUE, wenn alle gespeicherten Informationen gelöscht wurden
+ *                   FALSE, wenn keine Session existiert
  */
 function clearSession() {
    if (isSession()) {
@@ -351,7 +362,9 @@ function clearSession() {
 
 
 /**
- * Sendet einen Redirect-Header mit der angegebenen URL.
+ * Sendet einen Redirect-Header mit der angegebenen URL. Danach wird das aktuelle Script beendet.
+ *
+ * @param string $url - URL
  */
 function redirect($url) {
    if (isSession()) {
@@ -379,10 +392,11 @@ function redirect($url) {
 /**
  * Hilfsfunktion zur HTML-formatierten Ausgabe einer Variablen.
  *
- * @param var     - die auszugebende Variable
- * @param return  - Ob der Ausgabewert auf STDOUT ausgegeben werden soll (FALSE) oder Rückgabewert der Funktion sein soll (TRUE),
- *                  default ist false
- * @return string - Rückgabewert, wenn der Parameter return TRUE ist, NULL andererseits.
+ * @param mixed $var    - die auszugebende Variable
+ * @param bool  $return - Ob die Ausgabe auf STDOUT erfolgen soll (FALSE) oder als Rückgabewert der Funktion (TRUE),
+ *                        default ist false
+ *
+ * @return string - Rückgabewert, wenn $return TRUE ist, NULL andererseits.
  */
 function printFormatted($var, $return = false) {
    if (is_object($var) && method_exists($var, '__toString')) {
@@ -410,18 +424,22 @@ function printFormatted($var, $return = false) {
 
 
 /**
- * Alias für printFormatted().
+ * Alias für printFormatted($var, false).
+ *
+ * @param mixed $var - die auszugebende Variable
  */
 function echoPre($var) {
-   printFormatted($var);
+   printFormatted($var, false);
 }
 
 
 /**
- * Gibt den übergebenen String als JavaScript aus.
+ * Gibt einen String als JavaScript aus.
+ *
+ * @param string $snippet - Code
  */
-function javaScript($script) {
-   echo '<script language="JavaScript">'.$script.'</script>';
+function javaScript($snippet) {
+   echo '<script language="JavaScript">'.$snippet.'</script>';
 }
 
 
@@ -454,9 +472,9 @@ function getErrorLevelAsString() {
 
 
 /**
- * Dekodiert HTML-Entities innerhalb eines Strings nach ISO-8859-15.
+ * Dekodiert einen HTML-String nach ISO-8859-15.
  *
- * @param html - der zu dekodierende String
+ * @param string $html - der zu dekodierende String
  *
  * @return string
  */
@@ -472,7 +490,7 @@ function decodeHtml($html) {
 /**
  * Dekodiert einen UTF-8-kodierten String nach ISO-8859-1.
  *
- * @param string - der zu dekodierende String
+ * @param string $string - der zu dekodierende String
  *
  * @return string
  */
@@ -482,13 +500,16 @@ function decodeUtf8($string) {
 
 
 /**
- * Addiert zu einem Datum die angegebene Anzahl von Tagen (Format: yyyy-mm-dd).
+ * Addiert zu einem Datum eine Anzahl von Tagen.
  *
- * @return string
+ * @param string $date - Ausgangsdatum (Format: yyyy-mm-dd)
+ * @param int    $days - Tagesanzahl
+ *
+ * @return string - resultierendes Datum
  */
 function addDate($date, $days) {
-   if (!BaseValidator::isDate($date)) throw new InvalidArgumentException('Invalid argument $date: '.$date);
-   if (!is_int($days)) throw new InvalidArgumentException('Invalid argument $days: '.$days);
+   if (!BaseValidator ::isDate($date)) throw new InvalidArgumentException('Invalid argument $date: '.$date);
+   if (!is_int($days))                 throw new InvalidArgumentException('Invalid argument $days: '.$days);
 
    $parts = explode('-', $date);
    $year  = (int) $parts[0];
@@ -500,7 +521,10 @@ function addDate($date, $days) {
 
 
 /**
- * Subtrahiert von einem Datum die angegebene Anzahl von Tagen (Format: yyyy-mm-dd).
+ * Subtrahiert von einem Datum eine Anzahl von Tagen.
+ *
+ * @param string $date - Ausgangsdatum (Format: yyyy-mm-dd)
+ * @param int    $days - Tagesanzahl
  *
  * @return string
  */
@@ -511,10 +535,10 @@ function subDate($date, $days) {
 
 
 /**
- * Formatiert einen Date- oder DateTime-Value mit dem angegebenen Format.
+ * Formatiert einen Date- oder DateTime-Wert mit dem angegebenen Format.
  *
- * @param  string $format   - Formatstring (siehe PHP Manual date())
- * @param  string $datetime - Datum oder Zeit
+ * @param string $format   - Formatstring (siehe PHP Manual zu date())
+ * @param string $datetime - Datum oder Zeit
  *
  * @return string
  */
@@ -543,9 +567,9 @@ function formatDate($format, $datetime) {
 /**
  * Formatiert einen Zahlenwert im Währungsformat.
  *
- * @param  mixed  $value            - Zahlenwert (integer oder float)
- * @param  int    $decimals         - Anzahl der Nachkommastellen
- * @param  string $decimalSeparator - Dezimaltrennzeichen (entweder '.' oder ',')
+ * @param mixed  $value            - Zahlenwert (integer oder float)
+ * @param int    $decimals         - Anzahl der Nachkommastellen
+ * @param string $decimalSeparator - Dezimaltrennzeichen (entweder '.' oder ',')
  *
  * @return string
  */
@@ -639,11 +663,11 @@ function getRequest() {
  *
  * @return array
  */
-function getRequestHeaders() {
+function &getRequestHeaders() {
    if (function_exists('apache_request_headers')) {
       $headers = apache_request_headers();
       if ($headers === false) {
-         trigger_error('Error reading request headers, apache_request_headers(): false', E_USER_WARNING);
+         Logger ::log('Error reading request headers, apache_request_headers(): false', L_WARN);
          $headers = array();
       }
       return $headers;
@@ -671,16 +695,24 @@ function getRequestHeaders() {
  * Ob für den übergebenen Schlüssel eine Error-Message existiert.
  * Ohne Angabe eines Schlüssel prüft die Funktion, ob irgendeine Error-Message existiert.
  *
- * @param  key     - zu überprüfender Schlüssel
+ * @param string $key     - zu überprüfender Schlüssel
+ * @param bool   $session - ob die Error-Message in der HttpSession gesucht werden soll (per default wird im Request gesucht)
  *
  * @return boolean - true, wenn eine Error-Message für diesen Schlüssel existiert,
  *                   false andererseits
  */
-function isActionError($key = null) {
-   if (func_num_args() == 0) {
-      return isSet($_REQUEST['__ACTION_ERRORS__']) && sizeOf($_REQUEST['__ACTION_ERRORS__'] > 0);
+function isActionError($key = null, $session = false) {
+   if ($session && !isSession())
+      return false;
+
+   $place = $session ? $_SESSION : $_REQUEST;
+
+   if ($key === null) {          // auf irgendeine prüfen
+      return isSet($place['__ACTION_ERRORS__']) && sizeOf($place['__ACTION_ERRORS__'] > 0);
    }
-   return isSet($_REQUEST['__ACTION_ERRORS__'][$key]);
+   else {                        // auf eine bestimmte prüfen
+      return isSet($place['__ACTION_ERRORS__']) && isSet($place['__ACTION_ERRORS__'][$key]);
+   }
 }
 
 
@@ -688,76 +720,55 @@ function isActionError($key = null) {
  * Gibt die Error-Message für den angegebenen Schlüssel zurück.
  * Ohne Schlüssel wird die erste vorhandene Error-Message zurückgegeben.
  *
- * @param  key    - Schlüssel der Error-Message
+ * @param string $key     - Schlüssel der Error-Message
+ * @param bool   $session - ob die Error-Message in der HttpSession gesucht werden soll (per default wird im Request gesucht)
  *
  * @return string - Error-Message
  */
-function getActionError($key = null) {
-   if (func_num_args() == 0) {
-      if (isActionError()) {
-         reset($_REQUEST['__ACTION_ERRORS__']);
-         return current($_REQUEST['__ACTION_ERRORS__']);
+function getActionError($key = null, $session = false) {
+   if ($session && !isSession())
+      return null;
+
+   $place = $session ? $_SESSION : $_REQUEST;
+
+   if ($key === null) {                                  // die erste zurückgeben
+      if (isSet($place['__ACTION_ERRORS__'])) {
+         foreach ($place['__ACTION_ERRORS__'] as $error)
+            return $error;
       }
    }
-   elseif (isActionError($key)) {
-      return $_REQUEST['__ACTION_ERRORS__'][$key];
+   elseif (isSet($place['__ACTION_ERRORS__'][$key])) {   // eine bestimmte zurückgeben
+      return $place['__ACTION_ERRORS__'][$key];
    }
+
    return null;
 }
 
 
 /**
  * Setzt für den angegebenen Schlüssel eine Error-Message.
- */
-function setActionError($key, $message) {
-   $_REQUEST['__ACTION_ERRORS__'][$key] = $message;
-}
-
-
-/**
- * Ist <tt>$value</tt> nicht NULL, gibt die Funktion <tt>$value</tt> zurück, andererseits die Alternative <tt>$alt</tt>.
  *
- * @return mixed
+ *
+ * @param string $key     - Schlüssel der Error-Message
+ * @param string $message - Error-Message
+ * @param bool   $session - ob die Error-Message in der HttpSession gesetzt werden soll (per default wird sie im Request gesetzt)
  */
-function ifNull(&$value, $alt) {
-   return isSet($value) ? $value : $alt;
+function setActionError($key, $message, $session = false) {
+   if ($session) {
+      startSession();
+      $_SESSION['__ACTION_ERRORS__'][$key] = $message;
+   }
+   else {
+      $_REQUEST['__ACTION_ERRORS__'][$key] = $message;
+   }
 }
 
 
 
 /*
-Wie stelle ich Tabellenzeilen abwechselnd farbig dar?
------------------------------------------------------
-In der folgenden Funktion bgcolor() kann man beliebig viele Farben im Array $col definieren,
-die bei jedem Aufruf der Reihe nach berücksichtigt werden. Optional kann die Funktion mit
-einem Integer-Wert aufgerufen werden (bgcolor(n)), um immer n aufeinander folgende Zeilen
-derselben Farbe zu erhalten.
-
-function bgcolor($row = 1) {
-    static $i;
-    static $col = array('#FFDDDD',
-                        '#DDFFDD',
-                        '#DDDDFF'
-                       ); // etc.
-    $bg = $col[(int)($i + .00000001)];
-    $i += 1 / $row;
-    if ($i >= count($col)) $i = 0;
-    return $bg;
-}
-printf("<tr bgcolor='%s'><td>...</td></tr>\n", bgcolor(2));
-
-oder mit CSS
-------------
-row0 {background-color:#FFDDDD}
-row1 {background-color:#DDFFDD}
-
-printf("<tr class='row%s'><td>...</td></tr>\n", $line % 2);
-
-
-----------------------------------------------------------------------------
 Indicate that script is being called by CLI (vielleicht besser für $console)
 ----------------------------------------------------------------------------
-if ( php_sapi_name() == 'cli' ) {
+if (php_sapi_name() == 'cli') {
    $CLI = true ;
 }
 */
