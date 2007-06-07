@@ -764,6 +764,15 @@ function setActionError($key, $message, $session = false) {
 }
 
 
+/**
+ * Ist <tt>$value</tt> nicht NULL, gibt die Funktion <tt>$value</tt> zurück, andererseits die Alternative <tt>$alt</tt>.
+ *
+ * @return mixed
+ */
+function ifNull($value, $alt) {
+   return ($value === null) ? $alt : $value;
+}
+
 
 /*
 Indicate that script is being called by CLI (vielleicht besser für $console)
