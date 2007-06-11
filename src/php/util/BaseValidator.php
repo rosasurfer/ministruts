@@ -169,6 +169,18 @@ class BaseValidator extends Object {
 
 
    /**
+    * Ob der übergebene String ein gültiger Geschlechtsbezeichner ist.
+    *
+    * @param string $string - der zu prüfende String
+    *
+    * @return boolean
+    */
+   public static function isGender($string) {
+      return ($string==='female' || $string==='male');
+   }
+
+
+   /**
     * Ob der übergebene String eine gültige Festnetztelefunnummer ist.
     *
     * @param  string $string - der zu prüfende String
