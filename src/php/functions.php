@@ -479,9 +479,12 @@ function getErrorLevelAsString() {
  * @return string
  */
 function decodeHtml($html) {
-   $table = array_flip(get_html_translation_table(HTML_ENTITIES, ENT_QUOTES));
-   $table['&nbsp;'] = ' ';
-   $table['&euro;'] = '€';
+   static $table = null;
+   if ($table === null) {
+      $table = array_flip(get_html_translation_table(HTML_ENTITIES, ENT_QUOTES));
+      $table['&nbsp;'] = ' ';
+      $table['&euro;'] = '€';
+   }
    $string = strTr($html, $table);
    return preg_replace('/&#(\d+);/me', "chr('\\1')", $string);
 }
@@ -692,7 +695,7 @@ function &getRequestHeaders() {
 
 
 /**
- * Ob unter dem angegebenen Schlüssel eine Error-Message existiert.  Ohne Angabe eines Schlüssel wird geprüft, 
+ * Ob unter dem angegebenen Schlüssel eine Error-Message existiert.  Ohne Angabe eines Schlüssel wird geprüft,
  * ob irgendeine Error-Message existiert. Existiert eine HttpSession, wird auch dort gesucht.
  *
  * @param string $key - Schlüssel
@@ -702,17 +705,17 @@ function &getRequestHeaders() {
  */
 function isActionError($key = null) {
    if ($key === null) {       // auf irgendeine prüfen
-      if (isSet($_REQUEST['__ACTION_ERRORS__']) && sizeOf($_REQUEST['__ACTION_ERRORS__']) > 0) 
+      if (isSet($_REQUEST['__ACTION_ERRORS__']) && sizeOf($_REQUEST['__ACTION_ERRORS__']) > 0)
          return true;
 
-      if (isSession() && isSet($_SESSION['__ACTION_ERRORS__']) && sizeOf($_SESSION['__ACTION_ERRORS__']) > 0) 
+      if (isSession() && isSet($_SESSION['__ACTION_ERRORS__']) && sizeOf($_SESSION['__ACTION_ERRORS__']) > 0)
          return true;
    }
    else {                     // auf eine bestimmte prüfen
-      if (isSet($_REQUEST['__ACTION_ERRORS__']) && isSet($_REQUEST['__ACTION_ERRORS__'][$key])) 
+      if (isSet($_REQUEST['__ACTION_ERRORS__']) && isSet($_REQUEST['__ACTION_ERRORS__'][$key]))
          return true;
 
-      if (isSession() && isSet($_SESSION['__ACTION_ERRORS__']) && isSet($_SESSION['__ACTION_ERRORS__'][$key])) 
+      if (isSession() && isSet($_SESSION['__ACTION_ERRORS__']) && isSet($_SESSION['__ACTION_ERRORS__'][$key]))
          return true;
    }
    return false;
@@ -720,9 +723,9 @@ function isActionError($key = null) {
 
 
 /**
- * Gibt die Error-Message für den angegebenen Schlüssel zurück.  Ohne Schlüssel wird die erste vorhandene 
- * Error-Message zurückgegeben.  
- * Existiert eine HttpSession, wird auch dort gesucht.  Alle Error-Messages in der HttpSession werden nach  
+ * Gibt die Error-Message für den angegebenen Schlüssel zurück.  Ohne Schlüssel wird die erste vorhandene
+ * Error-Message zurückgegeben.
+ * Existiert eine HttpSession, wird auch dort gesucht.  Alle Error-Messages in der HttpSession werden nach
  * dem ersten Auslesen irgendeiner Error-Message gelöscht.
  *
  * @param string $key - Schlüssel der Error-Message
@@ -740,19 +743,19 @@ function getActionError($key = null) {
          $errors = $_SESSION['__ACTION_ERRORS__'];
          unset($_SESSION['__ACTION_ERRORS__']);
 
-         foreach ($errors as &$error) 
+         foreach ($errors as &$error)
             return $error;
       }
    }
    else {                     // eine bestimmte zurückgeben
-      if (isSet($_REQUEST['__ACTION_ERRORS__'][$key])) 
+      if (isSet($_REQUEST['__ACTION_ERRORS__'][$key]))
          return $_REQUEST['__ACTION_ERRORS__'][$key];
-      
+
       if (isSession() && isSet($_SESSION['__ACTION_ERRORS__'])) {
          $errors = $_SESSION['__ACTION_ERRORS__'];
          unset($_SESSION['__ACTION_ERRORS__']);
 
-         if (isSet($errors[$key])) 
+         if (isSet($errors[$key]))
             return $errors[$key];
       }
    }
