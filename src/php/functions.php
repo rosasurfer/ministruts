@@ -479,6 +479,9 @@ function getErrorLevelAsString() {
  * @return string
  */
 function decodeHtml($html) {
+   if ($html === null || $html === '')
+      return $html;
+       
    static $table = null;
    if ($table === null) {
       $table = array_flip(get_html_translation_table(HTML_ENTITIES, ENT_QUOTES));
@@ -498,6 +501,9 @@ function decodeHtml($html) {
  * @return string
  */
 function decodeUtf8($string) {
+   if ($string === null || $string === '')
+      return $string;
+      
    return html_entity_decode(htmlEntities($string, ENT_NOQUOTES, 'UTF-8'));
 }
 
