@@ -43,7 +43,7 @@ class BaseValidator extends Object {
       static $emailAddressPattern = '/^([a-z0-9]+|[a-z0-9]+[a-z0-9_.-]+)@((([a-z0-9]+|[a-z0-9]+[a-z0-9-]+[a-z0-9]+)\.)*)([a-z0-9][a-z0-9-]*[a-z0-9])\.([a-z]{2,4})$/';
       static $aolUsernamePattern  = '/^[a-z][a-z0-9]{2,15}$/';
 
-      $result = is_string($string) && !empty($string) && (boolean) preg_match($emailAddressPattern, strToLower($string), $matches);
+      $result = is_string($string) && strLen($string) < 100 && (boolean) preg_match($emailAddressPattern, strToLower($string), $matches);
 
       if ($result) {
          $domain = $matches[5];
