@@ -214,7 +214,7 @@ class BaseValidator extends Object {
     * @return boolean
     */
    public static function isAddress($string) {
-      static $pattern = '/^([a-zäöü](-?[a-zäöüß])+\.? *)+[a-z0-9\/.-]*$/';
+      static $pattern = '/^([a-zäöüÄÖÜ](-?[a-zäöüßÄÖÜ])+\.? *)+[a-z0-9\/.-]*$/';
 
       return is_string($string) && strLen($string) && preg_match($pattern, strToLower($string));
    }
@@ -228,7 +228,7 @@ class BaseValidator extends Object {
     * @return boolean
     */
    public static function isFirstName($string) {
-      static $pattern = '/^([a-zäöü]([\'-]?[a-zäöüß])+ *)+$/';
+      static $pattern = '/^([a-zäöüÄÖÜ]([\'-]?[a-zäöüßéÄÖÜ])+ *)+$/';
       return is_string($string) && strLen($string) && preg_match($pattern, strToLower($string));
    }
 
@@ -253,9 +253,7 @@ class BaseValidator extends Object {
     * @return boolean
     */
    public static function isPlaceName($string) {
-      static $pattern = '/^([a-zäöü](-?[a-zäöüß])+\.? *)+$/';
-
-
+      static $pattern = '/^([a-zäöüÄÖÜ](-?[a-zäöüßÄÖÜ])+\.? *)+$/';
       return is_string($string) && strLen($string) && preg_match($pattern, strToLower($string));
    }
 
@@ -268,7 +266,7 @@ class BaseValidator extends Object {
     * @return boolean
     */
    public static function isStreetName($string) {
-      static $pattern = '/^[a-zäöüß. -]{3,}$/';
+      static $pattern = '/^[a-zäöüßÄÖÜ. -]{3,}$/';
       return is_string($string) && strLen($string) && preg_match($pattern, strToLower($string));
    }
 
