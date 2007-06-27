@@ -214,7 +214,7 @@ class BaseValidator extends Object {
     * @return boolean
     */
    public static function isAddress($string) {
-      static $pattern = '/^([a-zäöüÄÖÜ](-?[a-zäöüßÄÖÜ])+\.? *)+[a-z0-9\/.-]*$/';
+      static $pattern = '/^([a-zäöüÄÖÜ](-?[a-zäöüßÄÖÜé])+\.? *)+[a-z0-9\/.-]*$/';
 
       return is_string($string) && strLen($string) && preg_match($pattern, strToLower($string));
    }
