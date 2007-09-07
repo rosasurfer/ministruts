@@ -120,7 +120,13 @@ class Logger extends Object {
 
       // 4. Exception an die registrierten Adressen mailen ...
       if (Logger ::$mailEvent) {
-         $mailMsg = $plainMessage."\n\n".$message."\n\n\n".$traceStr."\n\n\nRequest:\n--------\n".getRequest()."\n\n\nIP: ".$_SERVER['REMOTE_ADDR']."\n---\n";
+
+         $ip   = $_SERVER['REMOTE_ADDR'];
+         $host = getHostByAddr($ip);
+         if ($host != $ip) 
+            $ip = $host.' ('.$ip.')';  
+         
+         $mailMsg = $plainMessage."\n\n".$message."\n\n\n".$traceStr."\n\n\nRequest:\n--------\n".getRequest()."\n\n\nIP: ".$ip."\n---\n";
          $mailMsg = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $mailMsg)) : str_replace("\r\n", "\n", $mailMsg);
 
          foreach ($GLOBALS['webmasters'] as $webmaster) {
@@ -251,7 +257,12 @@ class Logger extends Object {
          if ($exception)
             $mailMsg .= "\n\n".$exMessage."\n\n\n".$exTraceStr;
 
-         $mailMsg .= "\n\n\nRequest:\n--------\n".getRequest()."\n\n\nIP: ".$_SERVER['REMOTE_ADDR']."\n---\n";
+         $ip   = $_SERVER['REMOTE_ADDR'];
+         $host = getHostByAddr($ip);
+         if ($host != $ip) 
+            $ip = $host.' ('.$ip.')';  
+
+         $mailMsg .= "\n\n\nRequest:\n--------\n".getRequest()."\n\n\nIP: ".$ip."\n---\n";
          $mailMsg  = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $mailMsg)) : str_replace("\r\n", "\n", $mailMsg);
 
          foreach ($GLOBALS['webmasters'] as $webmaster) {
