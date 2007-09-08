@@ -120,18 +120,30 @@ class Logger extends Object {
 
       // 4. Exception an die registrierten Adressen mailen ...
       if (Logger ::$mailEvent) {
+         $mailMsg  = $plainMessage."\n\n".$message."\n\n\n".$traceStr;
+
+         $session = isSession() ? print_r($_SESSION, true) : null;
 
          $ip   = $_SERVER['REMOTE_ADDR'];
          $host = getHostByAddr($ip);
-         if ($host != $ip) 
+         if ($host != $ip)
             $ip = $host.' ('.$ip.')';
-                                                                                                              
-         $mailMsg = $plainMessage."\n\n".$message."\n\n\n".$traceStr."\n\n\nRequest:\n--------\n".getRequest()."\n----------------\n\n\nIP:        ".$ip."\nTimestamp: ".date('Y-m-d H:i:s')."\n";
+
+         $mailMsg .= "\n\n\nRequest:\n--------\n".getRequest()."\n\n\n"
+                  .  "Session: ".(isSession() ? '('.(isSessionNew() ? '':'not ')."new)\n--------\n".$session."\n\n\n" : "  (no session)\n")
+                  .  "Host (IP): ".$ip."\n"
+                  .  "Timestamp: ".date('Y-m-d H:i:s')."\n";
+
          $mailMsg = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $mailMsg)) : str_replace("\r\n", "\n", $mailMsg);
+
+         $old_sendmail_from = ini_get('sendmail_from');
+         if (isSet($_SERVER['SERVER_ADMIN']))
+            ini_set('sendmail_from', $_SERVER['SERVER_ADMIN']);                           // wirkt sich nur unter Windows aus
 
          foreach ($GLOBALS['webmasters'] as $webmaster) {
             error_log($mailMsg, 1, $webmaster, 'Subject: PHP error_log: Uncaught Exception at '.(isSet($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '').$_SERVER['PHP_SELF']);
          }
+         ini_set('sendmail_from', $old_sendmail_from);
       }
       // ... oder ins Error-Log schreiben
       else {
@@ -257,17 +269,28 @@ class Logger extends Object {
          if ($exception)
             $mailMsg .= "\n\n".$exMessage."\n\n\n".$exTraceStr;
 
+         $session = isSession() ? print_r($_SESSION, true) : null;
+
          $ip   = $_SERVER['REMOTE_ADDR'];
          $host = getHostByAddr($ip);
-         if ($host != $ip) 
-            $ip = $host.' ('.$ip.')';  
+         if ($host != $ip)
+            $ip = $host.' ('.$ip.')';
 
-         $mailMsg .= "\n\n\nRequest:\n--------\n".getRequest()."\n----------------\n\n\nIP:        ".$ip."\nTimestamp: ".date('Y-m-d H:i:s')."\n";
-         $mailMsg  = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $mailMsg)) : str_replace("\r\n", "\n", $mailMsg);
+         $mailMsg .= "\n\n\nRequest:\n--------\n".getRequest()."\n\n\n"
+                  .  "Session: ".(isSession() ? '('.(isSessionNew() ? '':'not ')."new)\n--------\n".$session."\n\n\n" : "  (no session)\n")
+                  .  "Host (IP): ".$ip."\n"
+                  .  "Timestamp: ".date('Y-m-d H:i:s')."\n";
+
+         $mailMsg = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $mailMsg)) : str_replace("\r\n", "\n", $mailMsg);
+
+         $old_sendmail_from = ini_get('sendmail_from');
+         if (isSet($_SERVER['SERVER_ADMIN']))
+            ini_set('sendmail_from', $_SERVER['SERVER_ADMIN']);                           // wirkt sich nur unter Windows aus
 
          foreach ($GLOBALS['webmasters'] as $webmaster) {
             error_log($mailMsg, 1, $webmaster, 'Subject: PHP error_log: '.Logger ::$logLevels[$level].' at '.(isSet($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '').$_SERVER['PHP_SELF']);
          }
+         ini_set('sendmail_from', $old_sendmail_from);
       }
       // ... oder ins Error-Log schreiben
       else {
