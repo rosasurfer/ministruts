@@ -70,9 +70,19 @@ if (ini_get('html_errors'))                                                   er
 
 if (ini_get('enable_dl'))                                                     error('Warning: enable_dl is not Off');
 
-// Verfügbarkeit der MySQL-Extensions prüfen
+// Verfügbarkeit der MySQL-Extensions
 if (!extension_loaded('mysql'))                                               error('Warning: mysql extension is not loaded');
 if (!extension_loaded('mysqli') && PHP_VERSION >= '5')                        error('Warning: mysqli extension is not loaded');
+
+// Mailkonfiguration
+if (strToUpper(subStr(PHP_OS, 0, 3)) == 'WIN') {
+   if (!ini_get('sendmail_path') && !ini_get('sendmail_from') && !isSet($_SERVER['SERVER_ADMIN']))                         // Windows
+                                                                              error('Warning: neither sendmail_path nor sendmail_from are set');
+}
+elseif (!ini_get('sendmail_path'))                                            error('Warning: sendmail_path is not set');  // nicht Windows
+
+// Serverkonfiguration
+if (isSet($_SERVER['REQUEST_METHOD']) && !isSet($_SERVER['SERVER_ADMIN']))    error('Warning: $_SERVER[\'SERVER_ADMIN\'] is not set');
 
 
 // Die folgenden Einstellungen unterscheiden sich zwischen Entwicklungs- und Produktivsystemen.
