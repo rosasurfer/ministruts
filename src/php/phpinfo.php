@@ -28,7 +28,7 @@ if (ini_get('session.save_handler') == 'files') {
       array_pop($dirs);
       $domainRoot = join(DIRECTORY_SEPARATOR, $dirs);
    }
-   if (strPos(realPath(ini_get('session.save_path')), $domainRoot) === false) error('Warning: session.save_path is outside of the project: '.realPath(ini_get('session.save_path')));
+   if (strPos(realPath(ini_get('session.save_path')), $domainRoot) === false) error('Warning: session.save_path doesn\'t point inside the projects directory tree: '.realPath(ini_get('session.save_path')));
 }
 if (ini_get('session.serialize_handler') != 'php')                            error('Warning: session.serialize_handler is not \'php\': '.ini_get('session.serialize_handler'));
 if (ini_get('session.auto_start'))                                            error('Warning: session.auto_start is not Off');
