@@ -799,6 +799,54 @@ function ifNull($value, $alt) {
 }
 
 
+/**
+ * Ob ein String einen anderen String enthält.
+ *
+ * @param string $haystack - der zu prüfende String
+ * @param string $needle   - der zu suchende String
+ * @param boolean $case    - ob bei der Suche Groß-/Kleinschreibung beachtet werden soll (Default: nein)
+ *
+ * @return boolean
+ */
+function stringContains($haystack, $needle, $case = false) {
+   if ($case)
+      return (strPos($haystack, $needle) !== false);
+
+   return (striPos($haystack, $needle) !== false);
+}
+
+
+/**
+ * Ob ein String mit einem anderen String beginnt.
+ *
+ * @param string $haystack - der zu prüfende String
+ * @param string $needle   - der zu suchende String
+ * @param boolean $case    - ob bei der Suche Groß-/Kleinschreibung beachtet werden soll (Default: nein)
+ *
+ * @return boolean
+ */
+function stringStartsWith($haystack, $needle, $case = false) {
+   if ($case)
+      return (strPos($haystack, $needle) === 0);
+
+   return (striPos($haystack, $needle) === 0);
+}
+
+
+/**
+ * Ob ein String mit einem anderen String endet.
+ *
+ * @param string $haystack - der zu prüfende String
+ * @param string $needle   - der zu suchende String
+ * @param boolean $case    - ob bei der Suche Groß-/Kleinschreibung beachtet werden soll (Default: nein)
+ *
+ * @return boolean
+ */
+function stringEndsWith($haystack, $needle, $case = false) {
+   return strStartsWith(strRev($haystack), strRev($needle), $case);
+}
+
+
 /*
 Indicate that script is being called by CLI (vielleicht besser für $console)
 ----------------------------------------------------------------------------
