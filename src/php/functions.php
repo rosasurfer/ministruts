@@ -804,11 +804,11 @@ function ifNull($value, $alt) {
  *
  * @param string $haystack - der zu prüfende String
  * @param string $needle   - der zu suchende String
- * @param boolean $case    - ob bei der Suche Groß-/Kleinschreibung beachtet werden soll (Default: nein)
+ * @param boolean $case    - ob bei der Suche Groß-/Kleinschreibung beachtet werden soll (Default: ja)
  *
  * @return boolean
  */
-function stringContains($haystack, $needle, $case = false) {
+function stringContains($haystack, $needle, $case = true) {
    if ($case)
       return (strPos($haystack, $needle) !== false);
 
@@ -821,11 +821,11 @@ function stringContains($haystack, $needle, $case = false) {
  *
  * @param string $haystack - der zu prüfende String
  * @param string $needle   - der zu suchende String
- * @param boolean $case    - ob bei der Suche Groß-/Kleinschreibung beachtet werden soll (Default: nein)
+ * @param boolean $case    - ob bei der Suche Groß-/Kleinschreibung beachtet werden soll (Default: ja)
  *
  * @return boolean
  */
-function stringStartsWith($haystack, $needle, $case = false) {
+function stringStartsWith($haystack, $needle, $case = true) {
    if ($case)
       return (strPos($haystack, $needle) === 0);
 
@@ -838,12 +838,12 @@ function stringStartsWith($haystack, $needle, $case = false) {
  *
  * @param string $haystack - der zu prüfende String
  * @param string $needle   - der zu suchende String
- * @param boolean $case    - ob bei der Suche Groß-/Kleinschreibung beachtet werden soll (Default: nein)
+ * @param boolean $case    - ob bei der Suche Groß-/Kleinschreibung beachtet werden soll (Default: ja)
  *
  * @return boolean
  */
-function stringEndsWith($haystack, $needle, $case = false) {
-   return strStartsWith(strRev($haystack), strRev($needle), $case);
+function stringEndsWith($haystack, $needle, $case = true) {
+   return stringStartsWith(strRev($haystack), strRev($needle), $case);
 }
 
 
