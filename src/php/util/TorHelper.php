@@ -14,7 +14,33 @@ class TorHelper extends Object {
     *                     FALSE andererseits
     */
    public static function isExitNode($ip) {
-      return false;
+      $nodes =& self:: getExitNodes();
+      return isSet($nodes[$ip]);
+   }
+
+
+   /**
+    * Gibt alle aktuellen Exit-Nodes zurück.
+    *
+    * @return array - assoziatives Array mit den IP-Adressen aller Exit-Nodes
+    */
+   private static function &getExitNodes() {
+      static $nodes = null;
+
+      if ($nodes === null) {
+         $handle = curl_init('http://torstatus.kgprog.com/ip_list_exit.php/Tor_ip_list_EXIT.csv');
+         curl_setOpt($handle, CURLOPT_BINARYTRANSFER, true);
+         curl_setOpt($handle, CURLOPT_RETURNTRANSFER, true);
+
+         $response = curl_exec($handle);
+         if ($response === false)
+            throw new InfrastructureException('CURL error: '.curl_errno($handle).': '.curl_error($handle));
+         curl_close($handle);
+
+         $nodes = array_flip(explode("\n", str_replace("\r\n", "\n", trim($response))));
+      }
+
+      return $nodes;
    }
 }
 ?>
