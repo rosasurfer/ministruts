@@ -27,6 +27,7 @@ $__autoloadClasses['BaseValidator'                  ] = 'php/util/BaseValidator.
 $__autoloadClasses['HttpRequest'                    ] = 'php/util/HttpRequest.php';
 $__autoloadClasses['Logger'                         ] = 'php/util/Logger.php';
 $__autoloadClasses['Mailer'                         ] = 'php/util/Mailer.php';
+$__autoloadClasses['TorHelper'                      ] = 'php/util/TorHelper.php';
 
 
 
@@ -481,7 +482,7 @@ function getErrorLevelAsString() {
 function decodeHtml($html) {
    if ($html === null || $html === '')
       return $html;
-       
+
    static $table = null;
    if ($table === null) {
       $table = array_flip(get_html_translation_table(HTML_ENTITIES, ENT_QUOTES));
@@ -503,7 +504,7 @@ function decodeHtml($html) {
 function decodeUtf8($string) {
    if ($string === null || $string === '')
       return $string;
-      
+
    return html_entity_decode(htmlEntities($string, ENT_NOQUOTES, 'UTF-8'));
 }
 
