@@ -22,10 +22,10 @@
 
  */
 
-$VERSION='$Id: apc.php,v 3.65 2006/10/27 18:32:52 shire Exp $';
+$VERSION='$Id: apc.php,v 3.68 2007/07/22 00:25:48 gopalv Exp $';
 
 ////////// READ OPTIONAL CONFIGURATION FILE ////////////
-// if (file_exists("apc.conf.php")) include("apc.conf.php");
+//if (file_exists("apc.conf.php")) include("apc.conf.php");
 ////////////////////////////////////////////////////////
 
 ////////// BEGIN OF DEFAULT CONFIG AREA ///////////////////////////////////////////////////////////
@@ -59,7 +59,7 @@ function defaults($d,$v) {
 
 // rewrite $PHP_SELF to block XSS attacks
 //
-$PHP_SELF= isset($_SERVER['PHP_SELF']) ? htmlentities(strip_tags($_SERVER['PHP_SELF'],'')) : '';
+$PHP_SELF= isset($_SERVER['PHP_SELF']) ? htmlentities(strip_tags($_SERVER['PHP_SELF'],''), ENT_QUOTES) : '';
 $time = time();
 $host = getenv('HOSTNAME');
 if($host) { $host = '('.$host.')'; }
@@ -75,6 +75,7 @@ define('OB_VERSION_CHECK',9);
 $vardom=array(
    'OB'  => '/^\d+$/',        // operational mode switch
    'CC'  => '/^[01]$/',       // clear cache requested
+   'DU'  => '/^.*$/',         // Delete User Key
    'SH'  => '/^[a-z0-9]+$/',     // shared object description
 
    'IMG' => '/^[123]$/',         // image to generate
@@ -85,7 +86,7 @@ $vardom=array(
    'SORT1'  => '/^[AHSMCDTZ]$/', // first sort key
    'SORT2'  => '/^[DA]$/',       // second sort key
    'AGGR'   => '/^\d+$/',        // aggregation by dir level
-   'SEARCH' => '/^.*$/'       // aggregation by dir level
+   'SEARCH' => '~^[a-zA-Z0-1/_.-]*$~'        // aggregation by dir level
 );
 
 // default cache mode
@@ -114,7 +115,7 @@ if (empty($_REQUEST)) {
 foreach($vardom as $var => $dom) {
    if (!isset($_REQUEST[$var])) {
       $MYREQUEST[$var]=NULL;
-   } else if (!is_array($_REQUEST[$var]) && preg_match($dom,$_REQUEST[$var])) {
+   } else if (!is_array($_REQUEST[$var]) && preg_match($dom.'D',$_REQUEST[$var])) {
       $MYREQUEST[$var]=$_REQUEST[$var];
    } else {
       $MYREQUEST[$var]=$_REQUEST[$var]=NULL;
@@ -177,6 +178,10 @@ if ($AUTHENTICATED && $MYREQUEST['OB'] == OB_USER_CACHE) {
 // clear cache
 if ($AUTHENTICATED && isset($MYREQUEST['CC']) && $MYREQUEST['CC']) {
    apc_clear_cache($cache_mode);
+}
+
+if ($AUTHENTICATED && !empty($MYREQUEST['DU'])) {
+   apc_delete($MYREQUEST['DU']);
 }
 
 if(!function_exists('apc_cache_info') || !($cache=@apc_cache_info($cache_mode))) {
@@ -929,7 +934,6 @@ case OB_USER_CACHE:
    $fieldheading='User Entry Label';
    $fieldkey='info';
 
-
 // -----------------------------------------------
 // System Cache Entries
 // -----------------------------------------------
@@ -1093,9 +1097,18 @@ EOB;
           else
             echo '<td class="td-n center">None</td>';
         }
-        echo
-          '<td class="td-last center" nowrap>',$entry['deletion_time'] ? date(DATE_FORMAT,$entry['deletion_time']) : '-','</td>',
-          '</tr>';
+        if ($entry['deletion_time']) {
+
+          echo '<td class="td-last center" nowrap>', date(DATE_FORMAT,$entry['deletion_time']), '</td>';
+        } else if ($MYREQUEST['OB'] == OB_USER_CACHE) {
+
+          echo '<td class="td-last center" nowrap>';
+          echo '[<a href="', $MY_SELF, '&OB=', $MYREQUEST['OB'], '&DU=', urlencode($entry[$fieldkey]), '">Delete Now</a>]';
+          echo '</td>';
+        } else {
+          echo '<td class="td-last center"> &nbsp; </td>';
+        }
+        echo '</tr>';
         $i++;
         if ($i == $MYREQUEST['COUNT'])
           break;
@@ -1257,7 +1270,13 @@ case OB_VERSION_CHECK:
       </tr>
 EOB;
 
-   $rss = @file_get_contents("http://pecl.php.net/feeds/pkg_apc.rss");
+   //$rss = @file_get_contents("");
+   $handle = curl_init('http://pecl.php.net/feeds/pkg_apc.rss');
+   curl_setOpt($handle, CURLOPT_BINARYTRANSFER, true);
+   curl_setOpt($handle, CURLOPT_RETURNTRANSFER, true);
+   $rss = curl_exec($handle);
+   curl_close($handle);
+
    if (!$rss) {
       echo '<tr class="td-last center"><td>Unable to fetch version information.</td></tr>';
    } else {
