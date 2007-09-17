@@ -1,6 +1,8 @@
-<?
+<?php
+
 if (PHP_VERSION < '5.2' || '5.3' <= PHP_VERSION)                              error('Warning: PHP version is not 5.2.x');
 
+if (!ini_get('short_open_tag'))                                               error('Warning: short_open_tag is not On');
 if (ini_get('safe_mode'))                                                     error('Warning: safe_mode is not Off');
 if (ini_get('expose_php'))                                                    error('Warning: expose_php is not Off');
 
