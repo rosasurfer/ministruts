@@ -634,7 +634,7 @@ div.info table th {
 div.info table th a.sortable { color:black; }
 div.info table tr.tr-0 { background:rgb(238,238,238); }
 div.info table tr.tr-1 { background:rgb(221,221,221); }
-div.info table td { padding:0.3em 1em 0.3em 1em; }
+div.info table td { padding:0.3em 1em 0.3em 1em; font-size:12px; }
 div.info table td.td-0 { border-right:solid rgb(102,102,153) 1px; white-space:nowrap; }
 div.info table td.td-n { border-right:solid rgb(102,102,153) 1px; }
 div.info table td h3 {
@@ -1034,18 +1034,18 @@ EOB;
 
       '<div class="info"><table cellspacing=0><tbody>',
       '<tr>',
-      '<th>',sortheader('S',$fieldheading,  "&OB=".$MYREQUEST['OB']),'</th>',
-      '<th>',sortheader('H','Hits',         "&OB=".$MYREQUEST['OB']),'</th>',
-      '<th>',sortheader('Z','Size',         "&OB=".$MYREQUEST['OB']),'</th>',
-      '<th>',sortheader('A','Last accessed',"&OB=".$MYREQUEST['OB']),'</th>',
-      '<th>',sortheader('M','Last modified',"&OB=".$MYREQUEST['OB']),'</th>',
-      '<th>',sortheader('C','Created at',   "&OB=".$MYREQUEST['OB']),'</th>';
+      '<th nowrap>',sortheader('S',$fieldheading,  "&OB=".$MYREQUEST['OB']),'</th>',
+      '<th nowrap>',sortheader('H','Hits',         "&OB=".$MYREQUEST['OB']),'</th>',
+      '<th nowrap>',sortheader('Z','Size',         "&OB=".$MYREQUEST['OB']),'</th>',
+      '<th nowrap>',sortheader('A','Last accessed',"&OB=".$MYREQUEST['OB']),'</th>',
+      '<th nowrap>',sortheader('M','Last modified',"&OB=".$MYREQUEST['OB']),'</th>',
+      '<th nowrap>',sortheader('C','Created at',   "&OB=".$MYREQUEST['OB']),'</th>';
 
    if($fieldname=='info') {
       $cols+=2;
-       echo '<th>',sortheader('T','Timeout',"&OB=".$MYREQUEST['OB']),'</th>';
+       echo '<th nowrap>',sortheader('T','Timeout',"&OB=".$MYREQUEST['OB']),'</th>';
    }
-   echo '<th>',sortheader('D','Deleted at',"&OB=".$MYREQUEST['OB']),'</th></tr>';
+   echo '<th nowrap>',sortheader('D','Deleted at',"&OB=".$MYREQUEST['OB']),'</th></tr>';
 
    // builds list with alpha numeric sortable keys
    //
@@ -1181,12 +1181,12 @@ EOB;
 
       '<div class="info"><table cellspacing=0><tbody>',
       '<tr>',
-      '<th>',sortheader('S','Directory Name',   "&OB=".$MYREQUEST['OB']),'</th>',
-      '<th>',sortheader('T','Number of Files',"&OB=".$MYREQUEST['OB']),'</th>',
-      '<th>',sortheader('H','Total Hits', "&OB=".$MYREQUEST['OB']),'</th>',
-      '<th>',sortheader('Z','Total Size', "&OB=".$MYREQUEST['OB']),'</th>',
-      '<th>',sortheader('C','Avg. Hits',  "&OB=".$MYREQUEST['OB']),'</th>',
-      '<th>',sortheader('A','Avg. Size',  "&OB=".$MYREQUEST['OB']),'</th>',
+      '<th nowrap>',sortheader('S','Directory Name',   "&OB=".$MYREQUEST['OB']),'</th>',
+      '<th nowrap>',sortheader('T','Number of Files',"&OB=".$MYREQUEST['OB']),'</th>',
+      '<th nowrap>',sortheader('H','Total Hits', "&OB=".$MYREQUEST['OB']),'</th>',
+      '<th nowrap>',sortheader('Z','Total Size', "&OB=".$MYREQUEST['OB']),'</th>',
+      '<th nowrap>',sortheader('C','Avg. Hits',  "&OB=".$MYREQUEST['OB']),'</th>',
+      '<th nowrap>',sortheader('A','Avg. Size',  "&OB=".$MYREQUEST['OB']),'</th>',
       '</tr>';
 
    // builds list with alpha numeric sortable keys
