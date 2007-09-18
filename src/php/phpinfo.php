@@ -37,8 +37,8 @@ if (ini_get('session.auto_start'))                                            er
 if (!ini_get('session.use_cookies'))                                          error('Warning: session.use_cookies is not On' );
 if (ini_get('session.cookie_httponly'))                                       error('Warning: session.cookie_httponly is not Off' );
 if (!ini_get('session.use_trans_sid'))                                        error('Warning: session.use_trans_sid is not On');
-if (ini_get('url_rewriter.tags') != 'a=href,area=href,frame=src,iframe=src,input=src,form=,fieldset=')
-                                                                              error('Warning: url_rewriter.tags is not \'a=href,area=href,frame=src,iframe=src,input=src,form=,fieldset=\': '.ini_get('url_rewriter.tags'));
+if (ini_get('url_rewriter.tags') != 'a=href,area=href,frame=src,iframe=src,form=,fieldset=')
+                                                                              error('Warning: url_rewriter.tags is not \'a=href,area=href,frame=src,iframe=src,form=,fieldset=\': '.ini_get('url_rewriter.tags'));
 if (ini_get('session.bug_compat_42'))                                         error('Warning: session.bug_compat_42 is not Off');
 if (ini_get('session.bug_compat_42') && !ini_get('session.bug_compat_warn'))  error('Warning: session.bug_compat_warn is not On');
 if (ini_get('session.referer_check') != '')                                   error('Warning: session.referer_check is not \'\': '.ini_get('session.referer_check'));
