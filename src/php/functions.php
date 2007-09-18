@@ -58,7 +58,12 @@ define('WINDOWS', (strToUpper(subStr(PHP_OS, 0, 3))==='WIN'));    // ob das Scri
 // -------------------------
 set_error_handler    (array('Logger', 'handleError'    ));
 set_exception_handler(array('Logger', 'handleException'));
-
+/*
+function wrapErrorHandler    ($level, $message, $file, $line, array $vars) { Logger ::handleError    ($level, $message, $file, $line, $vars); }
+function wrapExceptionHandler(Exception $exception)                        { Logger ::handleException($exception)                           ; }
+set_error_handler    ('wrapErrorHandler'    );
+set_exception_handler('wrapExceptionHandler');
+*/
 
 
 /**
@@ -76,7 +81,7 @@ function __autoload($className) {
       $stackTrace = debug_backtrace();
       throw new PHPErrorException("Undefined class '$className'", $stackTrace[0]['file'], $stackTrace[0]['line'], array());
    }
-   catch (Exception $ex) {                   // Auftretende Exceptions manuell an globalen ErrorHandler weiterreichen,
+   catch (Exception $ex) {                   // Auftretende Exceptions manuell an ErrorHandler weiterreichen,
       Logger ::handleException($ex);         // da __autoload() keine Exceptions werfen darf.
    }
 }
