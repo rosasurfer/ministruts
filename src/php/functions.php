@@ -655,19 +655,24 @@ function getRequest() {
       $request .= str_pad($key.':', $maxLen).' '.$value."\n";
    }
 
-   if ($_SERVER['REQUEST_METHOD']=='POST' && (int)$headers['Content-Length'] > 0) {
-      if ($headers['Content-Type'] == 'application/x-www-form-urlencoded') {
-         $params = array();
-         foreach ($_POST as $name => $value) {
-            $params[] = $name.'='.urlEncode((string) $value);
+   if ($_SERVER['REQUEST_METHOD']=='POST' && isSet($headers['Content-Length']) && (int)$headers['Content-Length'] > 0) {
+      if (isSet($headers['Content-Type'])) {
+         if ($headers['Content-Type'] == 'application/x-www-form-urlencoded') {
+            $params = array();
+            foreach ($_POST as $name => $value) {
+               $params[] = $name.'='.urlEncode((string) $value);
+            }
+            $request .= "\n".implode('&', $params)."\n";
          }
-         $request .= "\n".implode('&', $params)."\n";
-      }
-      else if ($headers['Content-Type'] == 'multipart/form-data') {
-         ;                    // !!! to do
+         else if ($headers['Content-Type'] == 'multipart/form-data') {
+            ;                    // !!! to do
+         }
+         else {
+            ;                    // !!! to do
+         }
       }
       else {
-         ;                    // !!! to do
+            ;                    // !!! to do
       }
    }
    return $request;
