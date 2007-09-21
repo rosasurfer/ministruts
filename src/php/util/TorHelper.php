@@ -117,8 +117,6 @@ class TorHelper extends Object {
          $nodes = array_flip(explode("\n", str_replace("\r\n", "\n", trim($response))));
       }
 
-      Logger ::log(print_r(self::$curlErrors, true), L_INFO);
-
       return $nodes;
    }
 }
