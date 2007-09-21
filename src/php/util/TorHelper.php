@@ -72,8 +72,7 @@ class TorHelper extends Object {
                                       77 => 'CURLE_SSL_CACERT_BADFILE'     ,
                                       78 => 'CURLE_REMOTE_FILE_NOT_FOUND'  ,
                                       79 => 'CURLE_SSH'                    ,
-                                      80 => 'CURLE_SSL_SHUTDOWN_FAILED'    ,
-                                       );
+                                      80 => 'CURLE_SSL_SHUTDOWN_FAILED'    );
 
 
    /**
