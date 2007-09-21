@@ -94,7 +94,7 @@ class TorHelper extends Object {
     *
     * @return array - assoziatives Array mit den IP-Adressen aller Exit-Nodes
     */
-   public static function &getExitNodes() {
+   private static function &getExitNodes() {
       static $nodes = null;
 
       if ($nodes === null) {
