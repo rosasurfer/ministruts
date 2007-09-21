@@ -230,7 +230,6 @@ class Logger extends Object {
 
 
       // 2. Logdaten ermitteln
-      $message = (string) $message;
       $exMessage = $exTraceStr = null;
       if ($exception) {
          $message   .= ($message === null) ? (string) $exception : ' ('.get_class($exception).')';
