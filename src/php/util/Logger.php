@@ -15,7 +15,7 @@ class Logger extends Object {
    private static $displayHtml;
 
    /* Ob Benachrichtigungsmails an die Webmaster verschickt werden sollen. */
-   private static $mailEvent;
+   private static $mail;
 
    private static $logLevels = array(L_DEBUG  => '[Debug]',
                                      L_NOTICE => '[Notice]',
@@ -36,7 +36,7 @@ class Logger extends Object {
       self::$console     = !isSet($_SERVER['REQUEST_METHOD']);
       self::$display     =  self::$console || $_SERVER['REMOTE_ADDR']=='127.0.0.1' || (ini_get('display_errors'));
       self::$displayHtml =  self::$display && !self::$console;
-      self::$mailEvent   = !self::$display;
+      self::$mail        = !self::$display;
    }
 
 
@@ -117,7 +117,7 @@ class Logger extends Object {
 
 
       // 4. Exception an die registrierten Adressen mailen ...
-      if (self::$mailEvent) {
+      if (self::$mail) {
          $mailMsg  = $plainMessage."\n\n".$message."\n\n\n".$traceStr;
 
          $session = isSession() ? print_r($_SESSION, true) : null;
@@ -259,7 +259,7 @@ class Logger extends Object {
 
 
       // Logmessage entweder an die registrierten Adressen mailen ...
-      if (self::$mailEvent) {
+      if (self::$mail) {
          $mailMsg = $plainMessage;
          if ($exception)
             $mailMsg .= "\n\n".$exMessage."\n\n\n".$exTraceStr;
