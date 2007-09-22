@@ -235,9 +235,14 @@ class Logger extends Object {
          $exMessage  = ($exception instanceof NestableException) ? (string) $exception : get_class($exception).': '.$exception->getMessage();;
          $exTraceStr = ($exception instanceof NestableException) ? "Stacktrace:\n-----------\n".$exception->printStackTrace(true) : 'Stacktrace not available';
       }
+
       $trace = debug_backtrace();
-      $file  = $trace[1]['file'];
-      $line  = $trace[1]['line'];
+
+      while (!isSet($trace[1]['file']))      // wenn 'file' nicht existiert, kommt der Aufruf aus dem Kernel (z.B. Errorhandler)
+         array_shift($trace);                // also Einstiegspunkt im User-Code suchen
+      $file = $trace[1]['file'];
+      $line = $trace[1]['line'];
+
       $plainMessage = self::$logLevels[$level].': '.$message."\nin ".$file.' on line '.$line."\n";
 
 
