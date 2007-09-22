@@ -33,16 +33,8 @@ class TorHelper extends Object {
          curl_setOpt($handle, CURLOPT_BINARYTRANSFER, true);
 
          $response = curl_exec($handle);
-
-         if ($response === false) {
-            $error = curl_error($handle);
-            if (empty($error)) {
-               $error = curl_errno($handle);
-               if (isSet(CURL ::$errors[$error]))
-                  $error = CURL ::$errors[$error];
-            }
-            throw new InfrastructureException('CURL error: '.$error);
-         }
+         if ($response === false)
+            throw new InfrastructureException('CURL error: '.CURL ::getError($handle));
          curl_close($handle);
 
          $nodes = array_flip(explode("\n", str_replace("\r\n", "\n", trim($response))));
