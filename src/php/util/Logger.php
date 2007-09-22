@@ -101,7 +101,7 @@ class Logger extends Object {
       $plainMessage = 'Uncaught '.$message."\nin ".$file.' on line '.$line."\n";
 
 
-      // 3. Exception anzeigen
+      // 3. Exception anzeigen (wenn $display TRUE ist)
       if (self::$display) {
          ob_get_level() ? ob_flush() : flush();
 
@@ -116,7 +116,7 @@ class Logger extends Object {
       }
 
 
-      // 4. Exception an die registrierten Adressen mailen ...
+      // 4. Exception an die registrierten Adressen mailen (wenn $mail TRUE ist) ...
       if (self::$mail) {
          $mailMsg  = $plainMessage."\n\n".$message."\n\n\n".$traceStr;
 
@@ -138,12 +138,13 @@ class Logger extends Object {
          if (isSet($_SERVER['SERVER_ADMIN']))
             ini_set('sendmail_from', $_SERVER['SERVER_ADMIN']);                           // wirkt sich nur unter Windows aus
 
-         foreach ($GLOBALS['webmasters'] as $webmaster) {
-            error_log($mailMsg, 1, $webmaster, 'Subject: PHP error_log: Uncaught Exception at '.(isSet($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '').$_SERVER['PHP_SELF']);
+         foreach ($GLOBALS['webmasters'] as $address) {
+            error_log($mailMsg, 1, $address, 'Subject: PHP error_log: Uncaught Exception at '.(isSet($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '').$_SERVER['PHP_SELF']);
          }
          ini_set('sendmail_from', $old_sendmail_from);
       }
-      // ... oder ins Error-Log schreiben
+
+      // ... oder Exception ins Error-Log schreiben
       else {
          error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', $plainMessage), 0);      // Zeilenumbrüche entfernen
       }
@@ -240,7 +241,7 @@ class Logger extends Object {
       $plainMessage = self::$logLevels[$level].': '.$message."\nin ".$file.' on line '.$line."\n";
 
 
-      // 3. Anzeige
+      // 3. Logmessage anzeigen (wenn $display TRUE ist)
       if (self::$display) {
          ob_get_level() ? ob_flush() : flush();
 
@@ -258,7 +259,7 @@ class Logger extends Object {
       }
 
 
-      // Logmessage entweder an die registrierten Adressen mailen ...
+      // 4. Logmessage an die registrierten Adressen mailen (wenn $mail TRUE ist) ...
       if (self::$mail) {
          $mailMsg = $plainMessage;
          if ($exception)
@@ -282,12 +283,13 @@ class Logger extends Object {
          if (isSet($_SERVER['SERVER_ADMIN']))
             ini_set('sendmail_from', $_SERVER['SERVER_ADMIN']);                           // wirkt sich nur unter Windows aus
 
-         foreach ($GLOBALS['webmasters'] as $webmaster) {
-            error_log($mailMsg, 1, $webmaster, 'Subject: PHP error_log: '.self::$logLevels[$level].' at '.(isSet($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '').$_SERVER['PHP_SELF']);
+         foreach ($GLOBALS['webmasters'] as $address) {
+            error_log($mailMsg, 1, $address, 'Subject: PHP error_log: '.self::$logLevels[$level].' at '.(isSet($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '').$_SERVER['PHP_SELF']);
          }
          ini_set('sendmail_from', $old_sendmail_from);
       }
-      // ... oder ins Error-Log schreiben
+
+      // ... oder Logmessage ins Error-Log schreiben
       else {
          error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', $plainMessage), 0);      // Zeilenumbrüche entfernen
       }
