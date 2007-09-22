@@ -7,6 +7,8 @@
 // --------------
 $__autoloadClasses['AbstractActionForm'             ] = 'php/actions/AbstractActionForm.php';
 
+$__autoloadClasses['Cache'                          ] = 'php/cache/Cache.php';
+
 $__autoloadClasses['ConcurrentModificationException'] = 'php/db/ConcurrentModificationException.php';
 $__autoloadClasses['PersistableObject'              ] = 'php/db/PersistableObject.php';
 
