@@ -23,10 +23,6 @@ class Cache extends Object {
 
       $result = apc_store($key, serialize($value), $ttl);
 
-      if (CONFIG_PROJECTKEY == 'PFL') {
-         sleep(5);
-      }
-
       fClose($fH);
       return $result;
    }
