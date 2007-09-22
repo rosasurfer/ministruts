@@ -144,8 +144,8 @@ class Logger extends Object {
          ini_set('sendmail_from', $old_sendmail_from);
       }
 
-      // ... oder Exception ins Error-Log schreiben
-      else {
+      // ... oder Exception ins Error-Log schreiben, falls sie nicht schon angezeigt wurde
+      elseif (!self::$display) {
          error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', $plainMessage), 0);      // Zeilenumbrüche entfernen
       }
 
@@ -294,8 +294,8 @@ class Logger extends Object {
          ini_set('sendmail_from', $old_sendmail_from);
       }
 
-      // ... oder Logmessage ins Error-Log schreiben
-      else {
+      // ... oder Logmessage ins Error-Log schreiben, falls sie nicht schon angezeigt wurde
+      elseif (!self::$display) {
          error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', $plainMessage), 0);      // Zeilenumbrüche entfernen
       }
    }
