@@ -29,7 +29,7 @@ class Logger extends Object {
    /**
     * Initialisiert die statischen Klassenvariablen (siehe oben).
     */
-   private static function init() {
+   private static function initStatics() {
       if (self::$console !== null)
          return;
 
@@ -41,10 +41,8 @@ class Logger extends Object {
 
 
    /**
-    * Globaler Handler für herkömmliche PHP-Fehler.  Die Fehler werden in einer PHPErrorException gekapselt und zurückgeworfen.
-    *
-    * Ausnahme: E_USER_WARNING und E_STRICT werden nur geloggt
-    * ---------
+    * Globaler Handler für herkömmliche PHP-Fehler. Die Fehler werden in einer PHPErrorException gekapselt und je nach Error-Level behandelt.
+    * E_USER_NOTICE und E_USER_WARNING werden nur geloggt (kein Scriptabbruch).
     *
     * @param int    $level   -
     * @param string $message -
@@ -52,8 +50,8 @@ class Logger extends Object {
     * @param int    $line    -
     * @param array  $vars    -
     *
-    * @return boolean - true, wenn der Fehler erfolgreich behandelt wurde
-    *                   false, wenn der Fehler weitergereicht werden soll, als wenn der ErrorHandler nicht registriert wäre
+    * @return boolean - TRUE,  wenn der Fehler erfolgreich behandelt wurde
+    *                   FALSE, wenn der Fehler weitergereicht werden soll, als wenn der ErrorHandler nicht registriert wäre
     */
    public static function handleError($level, $message, $file, $line, array $vars) {
       $error_reporting = error_reporting();
@@ -68,15 +66,15 @@ class Logger extends Object {
       $exception = new PHPErrorException($message, $file, $line, $vars);
 
 
-      // ... und zur Behandlung weiterleiten
-      if ($level == E_USER_WARNING) {                    // E_USER_WARNINGs werden nur geloggt
-         self:: _log(null, $exception, L_WARN);
-      }
-      elseif ($level == E_STRICT) {                      // E_STRICT darf nicht zurückgeworfen werden und wird deshalb manuell weitergeleitet
-         self:: handleException($exception);             // (kann also nicht mit try-catch abgefangen werden)
-      }
+      // ... und behandeln
+      if     ($level == E_USER_NOTICE ) self:: _log(null, $exception, L_NOTICE);
+      elseif ($level == E_USER_WARNING) self:: _log(null, $exception, L_WARN  );
       else {
-         throw $exception;                               // alles andere wird zurückgeworfen (und kann abgefangen werden)
+         if ($level == E_STRICT) {                 // E_STRICT ist ein PHP-Spezialfall (wieviele noch ?) und kann nicht zurückgeworfen werden.
+            self:: handleException($exception);    // (Kann dadurch nicht mit try-catch abgefangen werden.)
+            exit(1);
+         }
+         throw $exception;                         // Alles andere zurückwerfen (kann also mit try-catch abgefangen werden).
       }
 
       return true;
@@ -91,8 +89,8 @@ class Logger extends Object {
     * @param Exception $exception - die zu behandelnde Exception
     */
    public static function handleException(Exception $exception) {
-      // 1. Klasse initialisieren
-      self:: init();
+      // 1. statische Klassenvariablen initialisieren
+      self:: initStatics();
 
 
       // 2. Fehlerdaten ermitteln
@@ -225,8 +223,8 @@ class Logger extends Object {
       //if (false) return;
 
 
-      // 1. Klasse initialisieren
-      self:: init();
+      // 1. statische Klassenvariablen initialisieren
+      self:: initStatics();
 
 
       // 2. Logdaten ermitteln
