@@ -28,7 +28,8 @@ class TorHelper extends Object {
       static $nodes = null;
 
       if ($nodes === null) {
-         $handle = curl_init('http://torstatus.kgprog.com/ip_list_exit.php/Tor_ip_list_EXIT.csv');
+         //$handle = curl_init('http://torstatus.kgprog.com/ip_list_exit.php/Tor_ip_list_EXIT.csv');
+         $handle = curl_init('http://torstatus.torproxy.net/ip_list_exit.php/Tor_ip_list_EXIT.csv');
          curl_setOpt($handle, CURLOPT_RETURNTRANSFER, true);
          curl_setOpt($handle, CURLOPT_BINARYTRANSFER, true);
 
