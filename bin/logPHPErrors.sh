@@ -1,47 +1,37 @@
 #!/bin/sh
+#
+# Aufruf: find /var/www/project -name 'php_error_log' -print0 | xargs -0r logPHPErrors.sh
+#
+
+
+# Leerzeichengetrennte Liste der User oder E-Mail-Adressen, an die Benachrichtigungen geschickt werden sollen
+# (z.B. 'root webmaster@domain.com')
+webmasters=root
 
 
 
-cd /var/www/project
-find . -name 'php_error_log'
+# default to current user, if not specified.
+addresses=${webmasters:-`whoami`}
+
+
+
+# alle übergebenen Dateinamen verarbeiten
+for file ; do
+
+    # Prüfen, ob die Datei gerade bearbeitet wird. Wenn ja, abbrechen, ansonsten umbenennen ...
+    [ -f "$file.tmp" ] && echo "Remove file $file.tmp, it is in the way." 1>&2 && exit 1
+    mv "$file" "$file.tmp"
+
+    # ... und jede Zeile an jede E-Mail-Adresse schicken
+    while read line ; do
+        for address in $addresses ; do
+            echo 'PHP error in: '$file $'\n\n'$line | mail -s "PHP error_log: [Fatal] Uncatched error" $address
+        done
+    done < "$file.tmp"
+
+    # aufräumen
+    rm "$file.tmp"
+done
 
 
 exit 0
-
-
-
-# Parameter prüfen
-#[ ! $# -eq 1 -o ! "${1#**.}" = "1" ] && echo "Usage: ${0#**/} <logfile.1>" 1>&2 && exit 1
-
-
-# Variablen definieren
-logfilename=impression_log
-logfile=$logfilename.1
-date=`date '+%Y-%m-%d'`
-
-
-# prüfen, ob die Logdatei existiert und beschreibbar ist
-cd /var/www/project/domain.tld/log
-[ ! -f $logfile ] && echo "File not found: $logfile"    1>&2 && exit 1
-[ ! -w $logfile ] && echo "File not writable: $logfile" 1>&2 && exit 1
-
-
-# sortieren (wenn im Apache BufferedLogs eingeschaltet sind, sind die Logs nicht sortiert)
-sort -o $logfile $logfile
-
-
-# Existenz des Webverzeichnisses überprüfen und ggf. anlegen
-pid=25001
-targetdir=/var/www/project/domain.tld/htdocs/path/logs/$pid
-if [ ! -d $targetdir ] ; then
-    mkdir -p $targetdir
-    [ ! -d $targetdir ] && echo "Cannot create webmaster directory: $targetdir" 1>&2 && exit 1
-fi
-
-
-# Partner-ID rausfiltern und Ergebnisse gezippt ins entsprechende Webverzeichnis schreiben
-targetfile=$targetdir/$logfilename-$date.zip
-[ -f $targetfile ] && echo "File already exists: $targetfile" 1>&2 && exit 1
-grep "pid=$pid" $logfile > $logfilename-$date
-zip -9 $targetfile $logfilename-$date > /dev/null
-rm $logfilename-$date
