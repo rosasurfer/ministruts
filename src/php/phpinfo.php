@@ -1,4 +1,6 @@
 <?php
+a 
+
 define('WINDOWS', (strToUpper(subStr(PHP_OS, 0, 3)) === 'WIN'));              // ob das Script unter Windows läuft
 define('LOCAL'  , (@$_SERVER['REMOTE_ADDR'] == '127.0.0.1'));                 // ob das Script lokal läuft
 
