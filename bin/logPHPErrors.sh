@@ -6,7 +6,8 @@
 
 # Leerzeichengetrennte Liste der User oder E-Mail-Adressen, an die Benachrichtigungen geschickt werden sollen
 # (z.B. 'root webmaster@domain.com')
-webmasters=root
+#webmasters=root
+webmasters='user1@domain.tld user2@domain.tld'
 
 
 
