@@ -1,6 +1,8 @@
 <?php
+define('WINDOWS', (strToUpper(subStr(PHP_OS, 0, 3)) === 'WIN'));              // ob das Script unter Windows läuft
+define('LOCAL'  , (@$_SERVER['REMOTE_ADDR'] == '127.0.0.1'));                 // ob das Script lokal läuft
 
-if (PHP_VERSION < '5.2' || '5.3' <= PHP_VERSION)                              error('Warning: PHP version is not 5.2.x');
+if (PHP_VERSION < '5.2')                                                      error('Warning: PHP version is not at least 5.2.x');
 
 if (!ini_get('short_open_tag'))                                               error('Warning: short_open_tag is not On');
 if (ini_get('safe_mode'))                                                     error('Warning: safe_mode is not Off');
@@ -72,33 +74,48 @@ if (ini_get('html_errors'))                                                   er
 
 if (ini_get('enable_dl'))                                                     error('Warning: enable_dl is not Off');
 
-// Verfügbarkeit der MySQL-Extensions
+
+// MySQL-Extensions
+// ----------------
 if (!extension_loaded('mysql'))                                               error('Warning: mysql extension is not loaded');
 if (!extension_loaded('mysqli') && PHP_VERSION >= '5')                        error('Warning: mysqli extension is not loaded');
 
+
 // Mailkonfiguration
-if (strToUpper(subStr(PHP_OS, 0, 3)) == 'WIN') {
-   if (!ini_get('sendmail_path') && !ini_get('sendmail_from') && !isSet($_SERVER['SERVER_ADMIN']))                         // Windows
-                                                                              error('Warning: neither sendmail_path nor sendmail_from are set');
+// -----------------
+if (WINDOWS && !ini_get('sendmail_path') && !ini_get('sendmail_from') && !isSet($_SERVER['SERVER_ADMIN']))
+                                                                              error('Windows warning: neither sendmail_path nor sendmail_from are set');
+if (!WINDOWS && !ini_get('sendmail_path'))                                    error('Warning: sendmail_path is not set');
+if (isSet($_SERVER['REQUEST_METHOD']) && !isSet($_SERVER['SERVER_ADMIN']))    error('Warning: email address $_SERVER[\'SERVER_ADMIN\'] is not set');
+
+
+// Opcode-Cache
+// ------------
+if (!extension_loaded('apc'))                                                 error('Warning: could not find an opcode cache');
+if (extension_loaded('apc')) {
+   if (!ini_get('apc.enabled'))                                               error('Warning: apc.enabled is not On');
+   if (WINDOWS && ini_get('apc.cache_by_default'))                            error('Windows warning: apc.cache_by_default is not Off');
+   if (!WINDOWS && !ini_get('apc.cache_by_default'))                          error('Warning: apc.cache_by_default is not On');
 }
-elseif (!ini_get('sendmail_path'))                                            error('Warning: sendmail_path is not set');  // nicht Windows
-
-// Serverkonfiguration
-if (isSet($_SERVER['REQUEST_METHOD']) && !isSet($_SERVER['SERVER_ADMIN']))    error('Warning: $_SERVER[\'SERVER_ADMIN\'] is not set');
 
 
-// Die folgenden Einstellungen unterscheiden sich zwischen Entwicklungs- und Produktivsystemen.
-$local = (@$_SERVER['REMOTE_ADDR']=='127.0.0.1');
-if ($local) {
+// Entwicklungs- bzw. Produktivsystem: Fehlerausgabe etc.
+// ------------------------------------------------------
+if (LOCAL) {
    if (!ini_get('display_errors'))                                            error('Warning: display_errors is not On');
    if (!ini_get('display_startup_errors'))                                    error('Warning: display_startup_errors is not On');
    if ((int) ini_get('output_buffering') != 0)                                error('Warning: output_buffering is enabled: '.ini_get('output_buffering'));
+   if (extension_loaded('apc')) {
+   }
 }
 else {
    if (ini_get('display_errors'))                                             error('Warning: display_errors is not Off');
    if (ini_get('display_startup_errors'))                                     error('Warning: display_startup_errors is not Off');
    if ((int) ini_get('output_buffering') == 0)                                error('Warning: output_buffering is not enabled: '.ini_get('output_buffering'));
+   if (extension_loaded('apc') && ini_get('apc.stat'))                        error('Warning: apc.stat is not Off');
 }
+
+
 
 
 // Bestätigung, wenn alles ok ist.
@@ -121,8 +138,6 @@ function error($var) {
    }
    echo $str;
 }
-
-
 
 /*
 zlib.output_compression = Off
