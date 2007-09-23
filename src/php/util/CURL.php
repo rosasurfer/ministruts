@@ -97,6 +97,16 @@ class CURL extends Object {
 
 
    /**
+    * Gibt den letzten CURL-Fehlercode zurück.
+    *
+    * @param resource $handle - CURL-Handle
+    */
+   public static function getErrorNo(&$handle) {
+      return curl_errno($handle);
+   }
+
+
+   /**
     * Gibt den HTTP-Statuscode einer CURL-Verbindung zurück.
     *
     * @param resource $handle - CURL-Handle
