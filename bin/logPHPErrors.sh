@@ -2,6 +2,10 @@
 #
 # Aufruf: find /var/www/project -name 'php_error_log' -print0 | xargs -0r logPHPErrors.sh
 #
+# Sollte als Cron-Job ausgeführt werden.
+#
+#############################################################################################################
+
 
 
 # Leerzeichengetrennte Liste der User oder E-Mail-Adressen, an die Benachrichtigungen geschickt werden sollen
