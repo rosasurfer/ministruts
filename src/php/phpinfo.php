@@ -95,6 +95,7 @@ if (isSet($_SERVER['REQUEST_METHOD']) && !isSet($_SERVER['SERVER_ADMIN']))    er
 if (!extension_loaded('apc'))                                                 error('Warning: could not find an opcode cache');
 if (extension_loaded('apc')) {
    if (!ini_get('apc.enabled'))                                               error('Warning: apc.enabled is not On');
+   if (!ini_get('apc.stat'))                                                  error('Warning: apc.stat is not On');     // Off verursacht Fehler (Dateien werden teilweise nicht gecacht)
    if (WINDOWS && ini_get('apc.cache_by_default'))                            error('Windows warning: apc.cache_by_default is not Off');
    if (!WINDOWS && !ini_get('apc.cache_by_default'))                          error('Warning: apc.cache_by_default is not On');
 }
@@ -106,14 +107,11 @@ if (LOCAL) {
    if (!ini_get('display_errors'))                                            error('Warning: display_errors is not On');
    if (!ini_get('display_startup_errors'))                                    error('Warning: display_startup_errors is not On');
    if ((int) ini_get('output_buffering') != 0)                                error('Warning: output_buffering is enabled: '.ini_get('output_buffering'));
-   if (extension_loaded('apc')) {
-   }
 }
 else {
    if (ini_get('display_errors'))                                             error('Warning: display_errors is not Off');
    if (ini_get('display_startup_errors'))                                     error('Warning: display_startup_errors is not Off');
    if ((int) ini_get('output_buffering') == 0)                                error('Warning: output_buffering is not enabled: '.ini_get('output_buffering'));
-   if (extension_loaded('apc') && ini_get('apc.stat'))                        error('Warning: apc.stat is not Off');
 }
 
 
