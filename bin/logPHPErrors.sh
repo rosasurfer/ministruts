@@ -1,10 +1,10 @@
 #!/bin/sh
 #
-# Aufruf: find /var/www/project -name 'php_error_log' -print0 | xargs -0r logPHPErrors.sh
+# Aufruf: /bin/ls -1 /var/www/project/*/log/php_error_log 2> /dev/null | while read line ; do logPHPErrors.sh "$line" ; done
 #
 # Sollte als Cron-Job ausgeführt werden.
 #
-#############################################################################################################
+##############################################################################################################################
 
 
 
