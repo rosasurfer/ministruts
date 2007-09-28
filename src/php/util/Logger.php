@@ -11,25 +11,25 @@ class Logger extends Object {
    /* Ob das Event angezeigt werden soll. */
    private static $display;
 
-   /* Ob eine Anzeige HTML-formatiert werden soll. */
+   /* Ob die Anzeige HTML-formatiert werden soll. */
    private static $displayHtml;
 
-   /* Ob Benachrichtigungsmails an die Webmaster verschickt werden sollen. */
+   /* Ob der/die Webmaster benachrichtigt werden sollen. */
    private static $mail;
 
-   private static $logLevels = array(L_DEBUG  => '[Debug]',
+   private static $logLevels = array(L_DEBUG  => '[Debug]' ,
+                                     L_INFO   => '[Info]'  ,
                                      L_NOTICE => '[Notice]',
-                                     L_INFO   => '[Info]',
-                                     L_WARN   => '[Warn]',
-                                     L_ERROR  => '[Error]',    // Default-Loglevel
-                                     L_FATAL  => '[Fatal]',
+                                     L_WARN   => '[Warn]'  ,
+                                     L_ERROR  => '[Error]' ,
+                                     L_FATAL  => '[Fatal]' ,
    );
 
 
    /**
-    * Initialisiert die statischen Klassenvariablen (siehe oben).
+    * Initialisiert die statischen Klassenvariablen.
     */
-   private static function initStatics() {
+   private static function init() {
       if (self::$console !== null)
          return;
 
@@ -37,6 +37,45 @@ class Logger extends Object {
       self::$display     =  self::$console || $_SERVER['REMOTE_ADDR']=='127.0.0.1' || (ini_get('display_errors'));
       self::$displayHtml =  self::$display && !self::$console;
       self::$mail        = !self::$display;
+   }
+
+
+   /**
+    * Gibt den Loglevel der angegebenen Klasse zurück.
+    *
+    * @param string $className - Klassenname
+    *
+    * @return int - Loglevel
+    */
+   private static function getLogLevel($className) {
+      static $settings = null;
+      if ($settings === null) {
+         $settings = $GLOBALS['__logLevelSettings'];
+         krSort($settings);
+      }
+
+      static $levels = null;
+      if (isSet($levels[$className]))
+         return $levels[$className];
+
+      $level = null;
+      $fullClassName = $GLOBALS['__imports'][$className];
+
+      if (isSet($settings[$fullClassName])) {
+         $level = $settings[$fullClassName];
+      }
+      else {
+         foreach ($settings as $package => $packageLevel) {
+            if ($package === '' || stringStartsWith($fullClassName, $package)) {
+               $level = $packageLevel;
+               break;
+            }
+         }
+         if ($level === null)
+            throw new RuntimeException('Undefined default log level');
+      }
+
+      return $levels[$className] = $level;
    }
 
 
@@ -55,7 +94,6 @@ class Logger extends Object {
     */
    public static function handleError($level, $message, $file, $line, array $vars) {
       $error_reporting = error_reporting();
-
 
       // Fehler, die der aktuelle Errorlevel nicht abdeckt, werden ignoriert
       if ($error_reporting==0 || ($error_reporting & $level) != $level)       // $error_reporting==0 bedeutet, der Fehler wurde durch @-Operator unterdrückt
@@ -89,11 +127,9 @@ class Logger extends Object {
     * @param Exception $exception - die zu behandelnde Exception
     */
    public static function handleException(Exception $exception) {
-      // 1. statische Klassenvariablen initialisieren
-      self:: initStatics();
+      self ::init();
 
-
-      // 2. Fehlerdaten ermitteln
+      // 1. Fehlerdaten ermitteln
       $message  = ($exception instanceof NestableException) ? (string) $exception : get_class($exception).': '.$exception->getMessage();
       $traceStr = ($exception instanceof NestableException) ? "Stacktrace:\n-----------\n".$exception->printStackTrace(true) : 'Stacktrace not available';
       $file     =  $exception->getFile();
@@ -101,7 +137,7 @@ class Logger extends Object {
       $plainMessage = 'Uncaught '.$message."\nin ".$file.' on line '.$line."\n";
 
 
-      // 3. Exception anzeigen (wenn $display TRUE ist)
+      // 2. Exception anzeigen (wenn $display TRUE ist)
       if (self::$display) {
          ob_get_level() ? ob_flush() : flush();
 
@@ -116,7 +152,7 @@ class Logger extends Object {
       }
 
 
-      // 4. Exception an die registrierten Adressen mailen (wenn $mail TRUE ist) ...
+      // 3. Exception an die registrierten Adressen mailen (wenn $mail TRUE ist) ...
       if (self::$mail) {
          $mailMsg  = $plainMessage."\n\n".$message."\n\n\n".$traceStr;
 
@@ -150,7 +186,7 @@ class Logger extends Object {
       }
 
 
-      // 5. Script beenden
+      // 4. Script beenden
       exit(1);
    }
 
@@ -160,43 +196,32 @@ class Logger extends Object {
     *
     * Methodensignaturen:
     * -------------------
-    * Logger::log($message)                        // Level L_ERROR
-    * Logger::log($message, $level)
-    *
-    * Logger::log($exception)                      // Level L_ERROR
-    * Logger::log($exception, $level)
-    *
-    * Logger::log($message, $exception)            // Level L_ERROR
-    * Logger::log($message, $exception, $level)
+    * Logger::log($message,             $level, $class)
+    * Logger::log(          $exception, $level, $class)
+    * Logger::log($message, $exception, $level, $class)
     */
-   public static function log() {
+   public static function log($arg1 = null, $arg2 = null, $arg3 = null, $arg4 = null) {
       $args = func_num_args();
 
-      // Aufruf mit einem Argument
-      if ($args == 1) {
-         $arg1 = func_get_arg(0);
-
-         if ($arg1 instanceof Exception)                  return self:: _log(null, $arg1);            // Logger::log($exception)
-         else                                             return self:: _log($arg1, null);            // Logger::log($message)
-      }
-      // Aufruf mit zwei Argumenten
-      elseif ($args == 2) {
-         $arg1 = func_get_arg(0);
-         $arg2 = func_get_arg(1);
-
-         if ($arg1 instanceof Exception) {
-            if (is_int($arg2))                            return self:: _log(null, $arg1, $arg2);     // Logger::log($exception, $level)
-         }
-         elseif (is_int($arg2))                           return self:: _log($arg1, null, $arg2);     // Logger::log($message, $level)
-         elseif ($arg2 instanceof Exception)              return self:: _log($arg1, $arg2);           // Logger::log($message, $exception)
-      }
       // Aufruf mit drei Argumenten
-      elseif ($args == 3) {
-         $arg1 = func_get_arg(0);
-         $arg2 = func_get_arg(1);
-         $arg3 = func_get_arg(2);
+      if ($args == 3) {
+         if ($arg2 < self ::getLogLevel($arg3))                // was vom jeweiligen Loglevel nicht abdeckt wird, wird ignoriert
+            return;
 
-         if ($arg2 instanceof Exception && is_int($arg3)) return self:: _log($arg1, $arg2, $arg3);    // Logger::log($message, $exception, $level)
+         if (is_int($arg2)) {
+            if ($arg1 instanceof Exception)
+               return self:: _log(null, $arg1, $arg2);         // Logger::log($exception, $level, $class)
+            return self:: _log($arg1, null, $arg2);            // Logger::log($message  , $level, $class)
+         }
+      }
+      // Aufruf mit vier Argumenten
+      elseif ($args == 4) {
+         if ($arg3 < self ::getLogLevel($arg4))                // was vom jeweiligen Loglevel nicht abdeckt wird, wird ignoriert
+            return;
+
+         if (is_int($arg3))
+            if ($arg2 === null || $arg2 instanceof Exception)
+               return self:: _log($arg1, $arg2, $arg3);        // Logger::log($message, $exception, $level, $class)
       }
 
       throw new InvalidArgumentException('Invalid arguments');
@@ -218,17 +243,9 @@ class Logger extends Object {
     */
    private static function _log($message, $exception = null, $level = L_ERROR) {
       if (!isSet(self::$logLevels[$level])) throw new InvalidArgumentException('Invalid log level: '.$level);
+      self ::init();
 
-
-      // Messages, die der aktuelle Loglevel nicht abdeckt, ignorieren
-      //if (false) return;
-
-
-      // 1. statische Klassenvariablen initialisieren
-      self:: initStatics();
-
-
-      // 2. Logdaten ermitteln
+      // 1. Logdaten ermitteln
       $exMessage = $exTraceStr = null;
       if ($exception) {
          $message   .= ($message === null) ? (string) $exception : ' ('.get_class($exception).')';
@@ -246,7 +263,7 @@ class Logger extends Object {
       $plainMessage = self::$logLevels[$level].': '.$message."\nin ".$file.' on line '.$line."\n";
 
 
-      // 3. Logmessage anzeigen (wenn $display TRUE ist)
+      // 2. Logmessage anzeigen (wenn $display TRUE ist)
       if (self::$display) {
          ob_get_level() ? ob_flush() : flush();
 
@@ -264,7 +281,7 @@ class Logger extends Object {
       }
 
 
-      // 4. Logmessage an die registrierten Adressen mailen (wenn $mail TRUE ist) ...
+      // 3. Logmessage an die registrierten Adressen mailen (wenn $mail TRUE ist) ...
       if (self::$mail) {
          $mailMsg = $plainMessage;
          if ($exception)

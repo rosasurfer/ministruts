@@ -1,60 +1,52 @@
 <?
-// Systemvoraussetzung: PHP 5.1+
+// Systemvoraussetzung: PHP 5.2+
 // -----------------------------
 
 
 // Klassenimporte
 // --------------
-$__autoloadClasses['AbstractActionForm'             ] = 'php/actions/AbstractActionForm.php';
+$__imports['AbstractActionForm'             ] = 'php/actions/AbstractActionForm';
 
-$__autoloadClasses['Cache'                          ] = 'php/cache/Cache.php';
+$__imports['Cache'                          ] = 'php/cache/Cache';
 
-$__autoloadClasses['ConcurrentModificationException'] = 'php/db/ConcurrentModificationException.php';
-$__autoloadClasses['PersistableObject'              ] = 'php/db/PersistableObject.php';
+$__imports['ConcurrentModificationException'] = 'php/db/ConcurrentModificationException';
+$__imports['PersistableObject'              ] = 'php/db/PersistableObject';
 
-$__autoloadClasses['BusinessRuleException'          ] = 'php/lang/BusinessRuleException.php';
-$__autoloadClasses['IllegalTypeException'           ] = 'php/lang/IllegalTypeException.php';
-$__autoloadClasses['InfrastructureException'        ] = 'php/lang/InfrastructureException.php';
-$__autoloadClasses['InvalidArgumentException'       ] = 'php/lang/InvalidArgumentException.php';
-$__autoloadClasses['NestableException'              ] = 'php/lang/NestableException.php';
-$__autoloadClasses['NoPermissionException'          ] = 'php/lang/NoPermissionException.php';
-$__autoloadClasses['Object'                         ] = 'php/lang/Object.php';
-$__autoloadClasses['PHPErrorException'              ] = 'php/lang/PHPErrorException.php';
-$__autoloadClasses['RuntimeException'               ] = 'php/lang/RuntimeException.php';
+$__imports['BusinessRuleException'          ] = 'php/lang/BusinessRuleException';
+$__imports['IllegalTypeException'           ] = 'php/lang/IllegalTypeException';
+$__imports['InfrastructureException'        ] = 'php/lang/InfrastructureException';
+$__imports['InvalidArgumentException'       ] = 'php/lang/InvalidArgumentException';
+$__imports['NestableException'              ] = 'php/lang/NestableException';
+$__imports['NoPermissionException'          ] = 'php/lang/NoPermissionException';
+$__imports['Object'                         ] = 'php/lang/Object';
+$__imports['PHPErrorException'              ] = 'php/lang/PHPErrorException';
+$__imports['RuntimeException'               ] = 'php/lang/RuntimeException';
 
-$__autoloadClasses['BasePdfDocument'                ] = 'php/pdf/BasePdfDocument.php';
-$__autoloadClasses['SimplePdfDocument'              ] = 'php/pdf/SimplePdfDocument.php';
+$__imports['BasePdfDocument'                ] = 'php/pdf/BasePdfDocument';
+$__imports['SimplePdfDocument'              ] = 'php/pdf/SimplePdfDocument';
 
-$__autoloadClasses['BaseValidator'                  ] = 'php/util/BaseValidator.php';
-$__autoloadClasses['Config'                         ] = 'php/util/Config.php';
-$__autoloadClasses['CURL'                           ] = 'php/util/CURL.php';
-$__autoloadClasses['HttpRequest'                    ] = 'php/util/HttpRequest.php';
-$__autoloadClasses['Logger'                         ] = 'php/util/Logger.php';
-$__autoloadClasses['Mailer'                         ] = 'php/util/Mailer.php';
-$__autoloadClasses['TorHelper'                      ] = 'php/util/TorHelper.php';
-
+$__imports['BaseValidator'                  ] = 'php/util/BaseValidator';
+$__imports['Config'                         ] = 'php/util/Config';
+$__imports['CURL'                           ] = 'php/util/CURL';
+$__imports['HttpRequest'                    ] = 'php/util/HttpRequest';
+$__imports['Logger'                         ] = 'php/util/Logger';
+$__imports['Mailer'                         ] = 'php/util/Mailer';
+$__imports['TorHelper'                      ] = 'php/util/TorHelper';
 
 
 // Konstanten
 // ----------
-define('L_DEBUG' ,  1);                               // die verschiedenen Loglevel
-define('L_NOTICE',  2);
-define('L_INFO'  ,  4);
+define('L_DEBUG' ,  1);                // die einzelnen Loglevel
+define('L_INFO'  ,  2);
+define('L_NOTICE',  4);
 define('L_WARN'  ,  8);
 define('L_ERROR' , 16);
 define('L_FATAL' , 32);
 
-define('LOGLEVEL', L_WARN);                           // der aktive Loglevel
-
-define('LOGLEVEL_DEBUG' , L_DEBUG  >= LOGLEVEL);      // Flags, die anzeigen, ob ein Loglevel aktiv ist oder nicht
-define('LOGLEVEL_NOTICE', L_NOTICE >= LOGLEVEL);
-define('LOGLEVEL_INFO'  , L_INFO   >= LOGLEVEL);
-define('LOGLEVEL_WARN'  , L_WARN   >= LOGLEVEL);
-define('LOGLEVEL_ERROR' , L_ERROR  >= LOGLEVEL);
-define('LOGLEVEL_FATAL' , L_FATAL  >= LOGLEVEL);
+$__logLevelSettings[''] = L_WARN;      // der Default-Loglevel
 
 
-define('WINDOWS', (strToUpper(subStr(PHP_OS, 0, 3))==='WIN'));    // ob das Script unter Windows läuft
+define('WINDOWS' , (strToUpper(subStr(PHP_OS, 0, 3))==='WIN'));   // ob das Script unter Windows läuft
 
 
 
@@ -71,22 +63,21 @@ set_exception_handler('wrapExceptionHandler');
 
 
 /**
- * Lädt die Klassendefinition der angegebenen Klasse.
+ * Lädt die angegebene Klasse.
  *
  * @param string $className - Klassenname
  */
 function __autoload($className) {
    try {
-      if (isSet($GLOBALS['__autoloadClasses'][$className])) {
-         include($GLOBALS['__autoloadClasses'][$className]);
+      if (isSet($GLOBALS['__imports'][$className])) {
+         include($GLOBALS['__imports'][$className].'.php');
          return true;
       }
-
       $stackTrace = debug_backtrace();
       throw new PHPErrorException("Undefined class '$className'", $stackTrace[0]['file'], $stackTrace[0]['line'], array());
    }
-   catch (Exception $ex) {                   // Auftretende Exceptions manuell an ErrorHandler weiterreichen,
-      Logger ::handleException($ex);         // da __autoload() keine Exceptions werfen darf.
+   catch (Exception $ex) {                   // Auftretende Exceptions manuell weiterreichen,
+      Logger ::handleException($ex);         // denn __autoload() darf keine Exceptions werfen.
    }
 }
 
@@ -97,8 +88,8 @@ function __autoload($className) {
  * @param string $sql - die auszuführende SQL-Anweisung
  * @param array  $db  - die zu verwendende Datenbankkonfiguration
  *
- * @return array['set']  - das zurückgegebene Resultset (wenn zutreffend)
- *              ['rows'] - Anzahl der zurückgegebenen bzw. bearbeiteten Datensätze (wenn zutreffend)
+ * @return array['set']  - das zurückgegebene Resultset (wenn SELECT)
+ *              ['rows'] - Anzahl der zurückgegebenen/eingefügten/aktualisierten Datensätze (wenn SELECT/INSERT/UPDATE)
  */
 function &executeSql($sql, array &$db) {
    if (!is_string($sql) || !($sql = trim($sql)))
@@ -181,12 +172,12 @@ function beginTransaction(array &$db) {
  */
 function commitTransaction(array &$db) {
    if (!$db['connection']) {
-      Logger::log('No database connection', L_ERROR);
+      Logger ::log('No database connection', L_ERROR);
       return false;
    }
 
    if (!isSet($db['transaction']) || !$db['transaction']) {
-      LOGLEVEL_WARN && Logger::log('No database transaction to commit', L_WARN);
+      Logger ::log('No database transaction to commit', L_WARN);
       return false;
    }
 
@@ -212,12 +203,12 @@ function commitTransaction(array &$db) {
  */
 function rollbackTransaction(array &$db) {
    if (!$db['connection']) {
-      Logger::log('No database connection', L_ERROR);
+      Logger ::log('No database connection', L_ERROR);
       return false;
    }
 
    if (!isSet($db['transaction']) || !$db['transaction']) {
-      LOGLEVEL_WARN && Logger::log('No database transaction to roll back', L_WARN);
+      Logger ::log('No database transaction to roll back', L_WARN);
       return false;
    }
 
@@ -567,7 +558,7 @@ function formatDate($format, $datetime) {
 
    if ($datetime < '1970-01-01 00:00:00') {
       if ($format != 'd.m.Y') {
-         LOGLEVEL_NOTICE && Logger::log('Cannot format early datetime '.$datetime.' with format: '.$format, L_NOTICE);
+         Logger ::log('Cannot format early datetime '.$datetime.' with format: '.$format, L_NOTICE);
          return preg_replace('/[1-9]/', '0', date($format, time()));
       }
 
