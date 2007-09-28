@@ -18,7 +18,7 @@ class Cache extends Object {
    /**
     */
    public static function set($key, $value, $ttl = 0) {
-      $fH = fOpen(CONFIG_PROJECT_TMP_DIRECTORY.'/apc_user_lock_'.$key.'.txt', 'w');
+      $fH = fOpen(CONFIG_PROJECT_TMP_DIRECTORY.'/apc_lock_'.$key.'.txt', 'w');
       fLock($fH, LOCK_EX);
 
       $result = apc_store($key, serialize($value), $ttl);
