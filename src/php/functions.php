@@ -26,6 +26,7 @@ $__autoloadClasses['BasePdfDocument'                ] = 'php/pdf/BasePdfDocument
 $__autoloadClasses['SimplePdfDocument'              ] = 'php/pdf/SimplePdfDocument.php';
 
 $__autoloadClasses['BaseValidator'                  ] = 'php/util/BaseValidator.php';
+$__autoloadClasses['Config'                         ] = 'php/util/Config.php';
 $__autoloadClasses['CURL'                           ] = 'php/util/CURL.php';
 $__autoloadClasses['HttpRequest'                    ] = 'php/util/HttpRequest.php';
 $__autoloadClasses['Logger'                         ] = 'php/util/Logger.php';
