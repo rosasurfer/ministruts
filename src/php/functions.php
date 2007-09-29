@@ -9,6 +9,9 @@ $__imports['AbstractActionForm'             ] = 'php/actions/AbstractActionForm'
 
 $__imports['Cache'                          ] = 'php/cache/Cache';
 
+$__imports['Object'                         ] = 'php/core/Object';
+$__imports['StaticFactory'                  ] = 'php/core/StaticFactory';
+
 $__imports['ConcurrentModificationException'] = 'php/db/ConcurrentModificationException';
 $__imports['PersistableObject'              ] = 'php/db/PersistableObject';
 
@@ -18,7 +21,6 @@ $__imports['InfrastructureException'        ] = 'php/lang/InfrastructureExceptio
 $__imports['InvalidArgumentException'       ] = 'php/lang/InvalidArgumentException';
 $__imports['NestableException'              ] = 'php/lang/NestableException';
 $__imports['NoPermissionException'          ] = 'php/lang/NoPermissionException';
-$__imports['Object'                         ] = 'php/lang/Object';
 $__imports['PHPErrorException'              ] = 'php/lang/PHPErrorException';
 $__imports['RuntimeException'               ] = 'php/lang/RuntimeException';
 
@@ -31,6 +33,7 @@ $__imports['CURL'                           ] = 'php/util/CURL';
 $__imports['HttpRequest'                    ] = 'php/util/HttpRequest';
 $__imports['Logger'                         ] = 'php/util/Logger';
 $__imports['Mailer'                         ] = 'php/util/Mailer';
+$__imports['StringUtils'                    ] = 'php/util/StringUtils';
 $__imports['TorHelper'                      ] = 'php/util/TorHelper';
 
 
@@ -374,7 +377,7 @@ function redirect($url) {
          $found = preg_match_all('/^https?:\/{2,}([a-z0-9-]+(\.[a-z0-9-]+)*)*.*$/', strToLower(trim($url)), $matches, PREG_SET_ORDER);
 
          if (!$found || $matches[0][1]==$host) {               // SID anhängen
-            $url .= (stringContains($url, '?') ? ini_get('arg_separator.output') : '?').SID;
+            $url .= (StringUtils ::contains($url, '?') ? ini_get('arg_separator.output') : '?').SID;
          }
       }
       session_write_close();
@@ -801,54 +804,6 @@ function setActionError($key, $message, $session = false) {
  */
 function ifNull($value, $alt) {
    return ($value === null) ? $alt : $value;
-}
-
-
-/**
- * Ob ein String einen anderen String enthält.
- *
- * @param string $haystack - der zu prüfende String
- * @param string $needle   - der zu suchende String
- * @param boolean $case    - ob bei der Suche Groß-/Kleinschreibung beachtet werden soll (Default: ja)
- *
- * @return boolean
- */
-function stringContains($haystack, $needle, $case = true) {
-   if ($case)
-      return (strPos($haystack, $needle) !== false);
-
-   return (striPos($haystack, $needle) !== false);
-}
-
-
-/**
- * Ob ein String mit einem anderen String beginnt.
- *
- * @param string $haystack - der zu prüfende String
- * @param string $needle   - der zu suchende String
- * @param boolean $case    - ob bei der Suche Groß-/Kleinschreibung beachtet werden soll (Default: ja)
- *
- * @return boolean
- */
-function stringStartsWith($haystack, $needle, $case = true) {
-   if ($case)
-      return (strPos($haystack, $needle) === 0);
-
-   return (striPos($haystack, $needle) === 0);
-}
-
-
-/**
- * Ob ein String mit einem anderen String endet.
- *
- * @param string $haystack - der zu prüfende String
- * @param string $needle   - der zu suchende String
- * @param boolean $case    - ob bei der Suche Groß-/Kleinschreibung beachtet werden soll (Default: ja)
- *
- * @return boolean
- */
-function stringEndsWith($haystack, $needle, $case = true) {
-   return stringStartsWith(strRev($haystack), strRev($needle), $case);
 }
 
 

@@ -47,7 +47,7 @@ class Mailer extends Object {
       elseif (!$hostname = php_uName('n')) {
          $hostname = 'localhost';
       }
-      if (!stringContains($hostname, '.')) {
+      if (!StringUtils ::contains($hostname, '.')) {
          $hostname .= '.localdomain';              // hostname must contain of more than one period (see RFC 2821)
       }
       $this->hostname = strToLower($hostname);
@@ -158,7 +158,7 @@ class Mailer extends Object {
          $tmp = array();
          foreach ($headers as $header) {
             $header = trim($header);
-            if (stringStartsWith($header, 'return-path:', false)) {  // is a custom 'Return-Path' header given ?
+            if (StringUtils ::startsWith($header, 'return-path:', false)) {  // is a custom 'Return-Path' header given ?
                $returnPath = trim(subStr($header, 12));
             }
             else {

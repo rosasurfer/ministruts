@@ -2,7 +2,7 @@
 /**
  * CURL
  */
-class CURL extends Object {
+class CURL extends StaticFactory {
 
 
    private static $errors = array(CURLE_OK                      => 'CURLE_OK'                     ,

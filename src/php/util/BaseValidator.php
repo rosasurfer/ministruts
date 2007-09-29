@@ -2,7 +2,7 @@
 /**
  * BaseValidator
  */
-class BaseValidator extends Object {
+class BaseValidator extends StaticFactory {
 
 
    /**
@@ -20,7 +20,7 @@ class BaseValidator extends Object {
       if ($result) {
          array_shift($matches);
          foreach ($matches as $part) {
-            if ((stringStartsWith($part, '0') && $part!=='0') || (int) $part > 255) {
+            if ((StringUtils ::startsWith($part, '0') && $part!=='0') || (int) $part > 255) {
                $result = false;
                break;
             }

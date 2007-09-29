@@ -2,7 +2,7 @@
 /**
  * Cache
  */
-class Cache extends Object {
+class Cache extends StaticFactory {
 
 
    /**

@@ -2,7 +2,7 @@
 /**
  * Logger
  */
-class Logger extends Object {
+class Logger extends StaticFactory {
 
 
    /* Ob das Script in der Konsole läuft. */
@@ -69,7 +69,7 @@ class Logger extends Object {
       }
       else {
          foreach ($settings as $package => $packageLevel) {
-            if ($package === '' || stringStartsWith($fullClassName, $package)) {
+            if ($package === '' || StringUtils ::startsWith($fullClassName, $package)) {
                $level = $packageLevel;
                break;
             }

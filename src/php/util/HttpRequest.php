@@ -287,7 +287,7 @@ class HttpRequest extends Object {
          if (($headers=$this->getResponseHeaders()) === null)
             return null;
          $statusLine = $headers[0];
-         if (!stringStartsWith($statusLine, 'HTTP/1.'))
+         if (!StringUtils ::startsWith($statusLine, 'HTTP/1.'))
             throw new RuntimeException('Invalid HTTP status line: '.$statusLine);
 
          $tokens = explode(' ', $statusLine);
@@ -309,7 +309,7 @@ class HttpRequest extends Object {
       $storedCookies =& $this->cookieStore;
       foreach ($storedCookies as $cookie) {
          $cDomain = $cookie['domain'];
-         if ((striStr($domain, '.'.$cDomain)==$cDomain || $domain==$cDomain) && stringStartsWith($path, $cookie['path'])) {
+         if ((striStr($domain, '.'.$cDomain)==$cDomain || $domain==$cDomain) && StringUtils ::startsWith($path, $cookie['path'])) {
             $cookies[] = $cookie['name'].'='.$cookie['value'];
          }
       }
