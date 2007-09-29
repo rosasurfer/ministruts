@@ -49,7 +49,7 @@ class TorHelper extends Object {
             $response = curl_exec($handle);
             if (!$response) {
                $error = CURL ::getError($handle);
-               //Logger  ::log('CURL error: '.$error.', url: '.$url, L_NOTICE);
+               //Logger  ::log('CURL error: '.$error.', url: '.$url, L_NOTICE, __CLASS__);
             }
          }
          curl_close($handle);

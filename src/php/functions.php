@@ -172,12 +172,12 @@ function beginTransaction(array &$db) {
  */
 function commitTransaction(array &$db) {
    if (!$db['connection']) {
-      Logger ::log('No database connection', L_ERROR);
+      Logger ::log('No database connection', L_ERROR, __CLASS__);
       return false;
    }
 
    if (!isSet($db['transaction']) || !$db['transaction']) {
-      Logger ::log('No database transaction to commit', L_WARN);
+      Logger ::log('No database transaction to commit', L_WARN, __CLASS__);
       return false;
    }
 
@@ -203,12 +203,12 @@ function commitTransaction(array &$db) {
  */
 function rollbackTransaction(array &$db) {
    if (!$db['connection']) {
-      Logger ::log('No database connection', L_ERROR);
+      Logger ::log('No database connection', L_ERROR, __CLASS__);
       return false;
    }
 
    if (!isSet($db['transaction']) || !$db['transaction']) {
-      Logger ::log('No database transaction to roll back', L_WARN);
+      Logger ::log('No database transaction to roll back', L_WARN, __CLASS__);
       return false;
    }
 
@@ -558,7 +558,7 @@ function formatDate($format, $datetime) {
 
    if ($datetime < '1970-01-01 00:00:00') {
       if ($format != 'd.m.Y') {
-         Logger ::log('Cannot format early datetime '.$datetime.' with format: '.$format, L_NOTICE);
+         Logger ::log('Cannot format early datetime '.$datetime.' with format: '.$format, L_NOTICE, __CLASS__);
          return preg_replace('/[1-9]/', '0', date($format, time()));
       }
 
@@ -682,7 +682,7 @@ function &getRequestHeaders() {
    if (function_exists('apache_request_headers')) {
       $headers = apache_request_headers();
       if ($headers === false) {
-         Logger ::log('Error reading request headers, apache_request_headers(): false', L_WARN);
+         Logger ::log('Error reading request headers, apache_request_headers(): false', L_WARN, __CLASS__);
          $headers = array();
       }
       return $headers;
