@@ -48,7 +48,7 @@ class Logger extends Object {
     * @return int - Loglevel
     */
    private static function getLogLevel($class) {
-      if (empty($class))
+      if ($class === '')
          return $GLOBALS['__logLevelSettings'][''];      // Default-Loglevel
 
       static $settings = null;
@@ -204,30 +204,45 @@ class Logger extends Object {
     * Logger::log($message, $exception, $level, $class)
     */
    public static function log($arg1 = null, $arg2 = null, $arg3 = null, $arg4 = null) {
+      $message = $exception = $level = $class = null;
+
       $args = func_num_args();
+      if ($args == 3) {
+         $message = $exception = $arg1;
+         $level   = $arg2;
+         $class   = $arg3;
+      }
+      elseif ($args == 4) {
+         $message   = $arg1;
+         $exception = $arg2;
+         $level     = $arg3;
+         $class     = $arg4;
+      }
+      else {
+         throw new InvalidArgumentException('Invalid number of arguments');
+      }
+
+      if (!is_int($level))    throw new IllegalTypeException('Illegal type of parameter $level: '.getType($level));
+      if (!is_string($class)) throw new IllegalTypeException('Illegal type of parameter $class: '.getType($class));
+
+      // was der jeweilige Loglevel nicht abdeckt, wird ignoriert
+      if ($level < self ::getLogLevel($class))
+         return;
 
       // Aufruf mit drei Argumenten
       if ($args == 3) {
-         if ($arg2 < self ::getLogLevel($arg3))                // was vom jeweiligen Loglevel nicht abdeckt wird, wird ignoriert
-            return;
-
-         if (is_int($arg2)) {
-            if ($arg1 instanceof Exception)
-               return self:: _log(null, $arg1, $arg2);         // Logger::log($exception, $level, $class)
-            return self:: _log($arg1, null, $arg2);            // Logger::log($message  , $level, $class)
-         }
+         if ($message===null || is_string($message))
+            return self:: _log($message, null, $level);           // Logger::log($message  , $level, $class)
+         if ($exception instanceof Exception)
+            return self:: _log(null, $exception, $level);         // Logger::log($exception, $level, $class)
+         throw new IllegalTypeException('Illegal type of first parameter: '.getType($arg1));
       }
+
       // Aufruf mit vier Argumenten
-      elseif ($args == 4) {
-         if ($arg3 < self ::getLogLevel($arg4))                // was vom jeweiligen Loglevel nicht abdeckt wird, wird ignoriert
-            return;
+      if ($message!==null && !is_string($message))               throw new IllegalTypeException('Illegal type of parameter $message: '.getType($message));
+      if ($exception!==null && !$exception instanceof Exception) throw new IllegalTypeException('Illegal type of parameter $exception: '.(is_object($exception) ? get_class($exception) : getType($exception)));
 
-         if (is_int($arg3))
-            if ($arg2 === null || $arg2 instanceof Exception)
-               return self:: _log($arg1, $arg2, $arg3);        // Logger::log($message, $exception, $level, $class)
-      }
-
-      throw new InvalidArgumentException('Invalid arguments');
+      return self:: _log($message, $exception, $level);           // Logger::log($message, $exception, $level, $class)
    }
 
 
@@ -240,11 +255,11 @@ class Logger extends Object {
     * - Anzeige der Message
     * - entweder Benachrichtigungsmail verschicken oder Message ins Errorlog schreiben
     *
-    * @param mixed     $message   - die zu loggende Message
-    * @param Exception $exception - die zu loggende Exception
-    * @param int       $level     - der Mindest-Loglevel, der aktiv sein muß
+    * @param mixed     $message   - zu loggende Message
+    * @param Exception $exception - zu loggende Exception
+    * @param int       $level     - zu loggender Loglevel
     */
-   private static function _log($message, $exception = null, $level = L_ERROR) {
+   private static function _log($message, Exception $exception = null, $level) {
       if (!isSet(self::$logLevels[$level])) throw new InvalidArgumentException('Invalid log level: '.$level);
       self ::init();
 
