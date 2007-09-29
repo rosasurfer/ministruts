@@ -43,11 +43,14 @@ class Logger extends Object {
    /**
     * Gibt den Loglevel der angegebenen Klasse zurück.
     *
-    * @param string $className - Klassenname
+    * @param string $class - Klassenname
     *
     * @return int - Loglevel
     */
-   private static function getLogLevel($className) {
+   private static function getLogLevel($class) {
+      if (empty($class))
+         return $GLOBALS['__logLevelSettings'][''];      // Default-Loglevel
+
       static $settings = null;
       if ($settings === null) {
          $settings = $GLOBALS['__logLevelSettings'];
@@ -55,12 +58,12 @@ class Logger extends Object {
       }
 
       static $levels = null;
-      if (isSet($levels[$className]))
-         return $levels[$className];
+      if (isSet($levels[$class]))
+         return $levels[$class];
+
+      $fullClassName =  $GLOBALS['__imports'][$class];
 
       $level = null;
-      $fullClassName = $GLOBALS['__imports'][$className];
-
       if (isSet($settings[$fullClassName])) {
          $level = $settings[$fullClassName];
       }
@@ -75,7 +78,7 @@ class Logger extends Object {
             throw new RuntimeException('Undefined default log level');
       }
 
-      return $levels[$className] = $level;
+      return $levels[$class] = $level;
    }
 
 
