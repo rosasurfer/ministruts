@@ -2,7 +2,34 @@
 /**
  * Cache
  *
- * Statische Fassade für konkrete Cacher-Implementierungen
+ * Statische Fassade für konkrete Cache-Implementierungen.
+ *
+ * @see AbstractCachePeer
+ *
+ *
+ *    get from cache:
+ *
+ *          Cache::get($key)
+ *
+ *
+ *    drop object from cache:
+ *
+ *          Cache::delete($key)
+ *
+ *
+ *    store data:
+ *
+ *          Cache::set($key, $value, $expires = Cache::EXPIRES_MEDIUM)
+ *
+ *
+ *    store data but only if peer *doesn't* already hold data for this key:
+ *
+ *          Cache::add($key, $value, $expires = Cache::EXPIRES_MEDIUM)
+ *
+ *
+ *    store data but only if peer *does* already hold data for this key:
+ *
+ *          Cache::replace($key, $value, $expires = Cache::EXPIRES_MEDIUM)
  */
 class Cache extends StaticFactory {
 

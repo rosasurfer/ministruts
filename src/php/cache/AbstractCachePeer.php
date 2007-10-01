@@ -4,29 +4,7 @@
  *
  * Abstrakte Basisklasse für Cache-Implementierungen.
  *
- *    get from cache:
- *
- *          abstract public function get($key)
- *
- *
- *    drop object from cache:
- *
- *          abstract public function delete($key)
- *
- *
- *    store data:
- *
- *          public function set($key, $value, $expires = Cache::EXPIRES_MEDIUM)
- *
- *
- *    store data but only if peer *doesn't* already hold data for this key:
- *
- *          public function add($key, $value, $expires = Cache::EXPIRES_MEDIUM)
- *
- *
- *    store data but only if peer *does* already hold data for this key:
- *
- *          public function replace($key, $value, $expires = Cache::EXPIRES_MEDIUM)
+ * @see Cache
  */
 abstract class AbstractCachePeer extends Object {
 
