@@ -6,7 +6,7 @@
  *
  * A PHP class to provide the basic functionality to create a PDF document without any requirement
  * for additional modules.
- * Note that they companion class SimplePdfDocument can be used to extend this class and dramatically
+ * Note that the companion class SimplePdfDocument can be used to extend this class and dramatically
  * simplify the creation of documents.
  */
 class BasePdfDocument extends Object {

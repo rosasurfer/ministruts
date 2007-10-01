@@ -42,17 +42,27 @@ $__imports['TorHelper'                      ] = 'php/util/TorHelper';
 
 // Konstanten
 // ----------
-define('L_DEBUG' ,  1);                // die einzelnen Loglevel
+// die einzelnen Loglevel
+define('L_DEBUG' ,  1);
 define('L_INFO'  ,  2);
 define('L_NOTICE',  4);
 define('L_WARN'  ,  8);
 define('L_ERROR' , 16);
 define('L_FATAL' , 32);
+$__logLevelSettings[''] = L_WARN;   // der Default-Loglevel
 
-$__logLevelSettings[''] = L_WARN;      // der Default-Loglevel
+
+// Zeitkonstanten
+define('MINUTE' ,  60         );
+define('HOUR'   ,  60 * MINUTE);
+define('DAY'    ,  24 * HOUR  );
+define('WEEK'   ,   7 * DAY   );
+define('MONTH'  ,  30 * DAY   );
+define('YEAR'   , 365 * DAY   );
 
 
-define('WINDOWS' , (strToUpper(subStr(PHP_OS, 0, 3))==='WIN'));   // ob das Script unter Windows läuft
+// ob wir unter Windows laufen
+define('WINDOWS', (strToUpper(subStr(PHP_OS, 0, 3))==='WIN'));
 
 
 

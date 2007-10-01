@@ -37,12 +37,6 @@
 class Cache extends StaticFactory {
 
 
-   const EXPIRES_NEVER   = 0;
-   const EXPIRES_MAXIMUM = 21600;      // 6 hrs
-   const EXPIRES_MEDIUM  = 3600;       // 1 hr
-   const EXPIRES_MINIMUM = 300;        // 5 mins
-
-
    // aktuelle Cache-Implementierung
    private static $peer = null;
 
@@ -72,7 +66,7 @@ class Cache extends StaticFactory {
     *
     * @return boolean - TRUE bei Erfolg, FALSE andererseits
     */
-   public static function set($key, &$value, $expires = self:: EXPIRES_NEVER) {
+   public static function set($key, &$value, $expires = 0) {
       return self:: getPeer()->set($key, $value, $expires);
    }
 
@@ -86,7 +80,7 @@ class Cache extends StaticFactory {
     *
     * @return boolean - TRUE bei Erfolg, FALSE andererseits
     */
-   public static function add($key, &$value, $expires = self:: EXPIRES_NEVER) {
+   public static function add($key, &$value, $expires = 0) {
       return self:: getPeer()->add($key, $value, $expires);
    }
 
@@ -100,7 +94,7 @@ class Cache extends StaticFactory {
     *
     * @return boolean - TRUE bei Erfolg, FALSE andererseits
     */
-   public static function replace($key, &$value, $expires = self:: EXPIRES_NEVER) {
+   public static function replace($key, &$value, $expires = 0) {
       return self:: getPeer()->replace($key, $value, $expires);
    }
 

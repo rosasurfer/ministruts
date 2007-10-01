@@ -72,7 +72,7 @@ final class ApcCache extends AbstractCachePeer {
    /**
     * Implementierung von set/add/replace (protected)
     */
-   protected function store($action, $key, &$value, $expires = Cache ::EXPIRES_NEVER) {
+   protected function store($action, $key, &$value, $expires = 0) {
       if ($action == 'add' && $this->isCached($key))
          return false;
 

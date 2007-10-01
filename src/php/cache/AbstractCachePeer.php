@@ -13,7 +13,7 @@ abstract class AbstractCachePeer extends Object {
    abstract public    function delete($key);
    abstract public    function isCached($key);
 
-   abstract protected function store($action, $key, &$value, $expires = Cache ::EXPIRES_NEVER);
+   abstract protected function store($action, $key, &$value, $expires = 0);
 
 
    /**
@@ -25,7 +25,10 @@ abstract class AbstractCachePeer extends Object {
     *
     * @return boolean - TRUE bei Erfolg, FALSE andererseits
     */
-   final public function set($key, &$value, $expires = Cache ::EXPIRES_NEVER) {
+   final public function set($key, &$value, $expires = 0) {
+      if (!is_string($key))  throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
+      if (!is_int($expires)) throw new IllegalTypeException('Illegal type of parameter $expires: '.getType($expires));
+
       return $this->store('set', $key, $value, $expires);
    }
 
@@ -39,7 +42,10 @@ abstract class AbstractCachePeer extends Object {
     *
     * @return boolean - TRUE bei Erfolg, FALSE andererseits
     */
-   final public function add($key, &$value, $expires = Cache ::EXPIRES_NEVER) {
+   final public function add($key, &$value, $expires = 0) {
+      if (!is_string($key))  throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
+      if (!is_int($expires)) throw new IllegalTypeException('Illegal type of parameter $expires: '.getType($expires));
+
       return $this->store('add', $key, $value, $expires);
    }
 
@@ -53,7 +59,10 @@ abstract class AbstractCachePeer extends Object {
     *
     * @return boolean - TRUE bei Erfolg, FALSE andererseits
     */
-   final public function replace($key, &$value, $expires = Cache ::EXPIRES_NEVER) {
+   final public function replace($key, &$value, $expires = 0) {
+      if (!is_string($key))  throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
+      if (!is_int($expires)) throw new IllegalTypeException('Illegal type of parameter $expires: '.getType($expires));
+
       return $this->store('replace', $key, $value, $expires);
    }
 }
