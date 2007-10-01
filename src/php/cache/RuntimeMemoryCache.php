@@ -59,7 +59,7 @@ final class RuntimeMemoryCache extends AbstractCachePeer {
 
 
    /**
-    * Implementierung von set/add/replace (protected)
+    * Implementierung von set/add/replace (protected), $expires wird ignoriert (hat hier keine Wirkung)
     */
    protected function store($action, $key, &$value, $expires = 0) {
       if ($action == 'add' && $this->isCached($key))
