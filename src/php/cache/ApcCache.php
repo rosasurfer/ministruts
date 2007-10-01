@@ -82,7 +82,7 @@ final class ApcCache extends AbstractCachePeer {
       // im Cache wird ein Array[creation_timestamp, value] gespeichert
       $data = array(time(), $value);
 
-      if (! apc_store($key, array($data[0], serialize($data[1])), $expires))
+      if (!apc_store($key, array($data[0], serialize($data[1])), $expires))
          throw new RuntimeException('Unexpected APC error, apc_store() returned FALSE');
 
       $this->pool[$key] =& $data;
