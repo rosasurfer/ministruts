@@ -7,7 +7,10 @@
 // --------------
 $__imports['AbstractActionForm'             ] = 'php/actions/AbstractActionForm';
 
+$__imports['AbstractCachePeer'              ] = 'php/cache/AbstractCachePeer';
+$__imports['ApcCache'                       ] = 'php/cache/ApcCache';
 $__imports['Cache'                          ] = 'php/cache/Cache';
+$__imports['RuntimeMemoryCache'             ] = 'php/cache/RuntimeMemoryCache';
 
 $__imports['Object'                         ] = 'php/core/Object';
 $__imports['StaticFactory'                  ] = 'php/core/StaticFactory';

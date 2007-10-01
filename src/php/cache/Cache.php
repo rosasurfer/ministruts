@@ -20,7 +20,7 @@ class Cache extends StaticFactory {
    /**
     * Gibt die Instanz der aktuellen Cache-Implementierung zurück.
     *
-    * @return CachePeer
+    * @return AbstractCachePeer
     */
    private static function getPeer() {
       if (!self::$peer) {
