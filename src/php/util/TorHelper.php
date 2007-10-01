@@ -32,7 +32,7 @@ class TorHelper extends StaticFactory {
     * @return array - assoziatives Array mit den IP-Adressen aller Exit-Nodes
     */
    private static function &getExitNodes() {
-      $nodes = Cache ::get($key = 'tor_exit_nodes');
+      $nodes = Cache ::get($key = __CLASS__.'_tor_exit_nodes');
 
       if ($nodes == null) {
          $url = $handle = $response = $error = null;
