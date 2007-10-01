@@ -2,34 +2,37 @@
 /**
  * Cache
  *
- * Statische Fassade für konkrete Cache-Implementierungen.
+ * Fassade für verschiedene Cache-Implementierungen.
+ *
+ * Anwendung:
+ * ----------
+ *
+ *    Objekt im Cache speichern:
+ *
+ *       Cache::set($key, $value, $expires);
+ *
+ *
+ *    Objekt im Cache nur dann speichern, wenn es dort noch nicht existiert:
+ *
+ *       Cache::add($key, $value, $expires)
+ *
+ *
+ *    Objekt im Cache nur dann speichern, wenn es dort bereits existiert:
+ *
+ *       Cache::replace($key, $value, $expires)
+ *
+ *
+ *    Objekt aus dem Cache holen:
+ *
+ *       $value = Cache::get($key);
+ *
+ *
+ *    Objekt im Cache löschen:
+ *
+ *       Cache::delete($key);
+ *
  *
  * @see AbstractCachePeer
- *
- *
- *    get from cache:
- *
- *          Cache::get($key)
- *
- *
- *    drop object from cache:
- *
- *          Cache::delete($key)
- *
- *
- *    store data:
- *
- *          Cache::set($key, $value, $expires = Cache::EXPIRES_MEDIUM)
- *
- *
- *    store data but only if peer *doesn't* already hold data for this key:
- *
- *          Cache::add($key, $value, $expires = Cache::EXPIRES_MEDIUM)
- *
- *
- *    store data but only if peer *does* already hold data for this key:
- *
- *          Cache::replace($key, $value, $expires = Cache::EXPIRES_MEDIUM)
  */
 class Cache extends StaticFactory {
 
@@ -128,7 +131,7 @@ class Cache extends StaticFactory {
 
 
    /**
-    * Prüft, ob unter dem angegebenen Schlüssel ein Wert im Cache gespeichert ist.
+    * Ob unter dem angegebenen Schlüssel ein Wert im Cache gespeichert ist.
     *
     * @param string $key - Schlüssel
     *
