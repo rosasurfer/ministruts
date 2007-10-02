@@ -5,8 +5,6 @@
 
 // Klassenimporte
 // --------------
-$__imports['AbstractActionForm'             ] = 'php/actions/AbstractActionForm';
-
 $__imports['AbstractCachePeer'              ] = 'php/cache/AbstractCachePeer';
 $__imports['ApcCache'                       ] = 'php/cache/ApcCache';
 $__imports['Cache'                          ] = 'php/cache/Cache';
@@ -38,6 +36,8 @@ $__imports['Logger'                         ] = 'php/util/Logger';
 $__imports['Mailer'                         ] = 'php/util/Mailer';
 $__imports['StringUtils'                    ] = 'php/util/StringUtils';
 $__imports['TorHelper'                      ] = 'php/util/TorHelper';
+
+$__imports['AbstractActionForm'             ] = 'php/webflow/AbstractActionForm';
 
 
 // Konstanten
