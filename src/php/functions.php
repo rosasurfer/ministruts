@@ -31,7 +31,6 @@ $__imports['SimplePdfDocument'              ] = 'php/pdf/SimplePdfDocument';
 $__imports['BaseValidator'                  ] = 'php/util/BaseValidator';
 $__imports['Config'                         ] = 'php/util/Config';
 $__imports['CURL'                           ] = 'php/util/CURL';
-$__imports['HttpRequest'                    ] = 'php/util/HttpRequest';
 $__imports['HttpConnection'                 ] = 'php/util/HttpConnection';
 $__imports['Logger'                         ] = 'php/util/Logger';
 $__imports['Mailer'                         ] = 'php/util/Mailer';
