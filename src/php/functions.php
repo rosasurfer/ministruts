@@ -32,12 +32,15 @@ $__imports['BaseValidator'                  ] = 'php/util/BaseValidator';
 $__imports['Config'                         ] = 'php/util/Config';
 $__imports['CURL'                           ] = 'php/util/CURL';
 $__imports['HttpRequest'                    ] = 'php/util/HttpRequest';
+$__imports['HttpConnection'                 ] = 'php/util/HttpConnection';
 $__imports['Logger'                         ] = 'php/util/Logger';
 $__imports['Mailer'                         ] = 'php/util/Mailer';
 $__imports['StringUtils'                    ] = 'php/util/StringUtils';
 $__imports['TorHelper'                      ] = 'php/util/TorHelper';
 
 $__imports['AbstractActionForm'             ] = 'php/webflow/AbstractActionForm';
+$__imports['FrontController'                ] = 'php/webflow/FrontController';
+
 
 
 // Konstanten
