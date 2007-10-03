@@ -34,7 +34,7 @@ abstract class Singleton extends Object implements Instantiatable {
       $object = $args ? new $class($args) : new $class();
 
       if (!$object instanceof Singleton)
-         throw new InvalidArgumentException('Class is not a Singleton subclass: '.$class);
+         throw new InvalidArgumentException('Not a Singleton subclass: '.$class);
 
       return self::$instances[$class] = $object;
    }
