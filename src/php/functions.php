@@ -46,6 +46,7 @@ $__imports['ActionMapping'                  ] = 'php/flow/ActionMapping';
 $__imports['FrontController'                ] = 'php/flow/FrontController';
 $__imports['HttpRequest'                    ] = 'php/flow/HttpRequest';
 $__imports['HttpSession'                    ] = 'php/flow/HttpSession';
+$__imports['RequestProcessor'               ] = 'php/flow/RequestProcessor';
 
 
 
