@@ -1,8 +1,10 @@
 <?
 /**
- * Vererbbare Singleton-Pattern-Implementierung.
+ * Singleton
+ *
+ * Vererbbare Implementierung des Singleton-Patterns.
  */
-abstract class Singleton extends Object {
+abstract class Singleton extends Object implements Instantiatable {
 
 
    // Pool mit allen existierenden Singletons
@@ -20,7 +22,7 @@ abstract class Singleton extends Object {
     *
     * @return Singleton
     */
-   final public static function getInstance($class, $args = null /*, ... */) {
+   final protected static function getInstance($class, $args = null /*, ... */) {
       if (isSet(self::$instances[$class]))
          return self::$instances[$class];
 
@@ -38,6 +40,9 @@ abstract class Singleton extends Object {
    }
 
 
+   /**
+    * Verhindert das Clonen von Singleton-Instanzen.
+    */
    final private function __clone() {/* do not clone me */}
 }
 ?>

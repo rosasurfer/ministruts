@@ -1,10 +1,11 @@
 <?
 /**
+ * Instantiatable
  */
 interface Instantiatable {
 
    /**
-    * Gibt die Instanz einer Klasse zurück, wird hauptsächlich benutzt zum Zugriff auf Singleton's.
+    * Gibt die Instanz einer Klasse zurück, wird hauptsächlich beim Zugriff auf Singleton's benutzt.
     *
     * @return Instantiatable
     *
