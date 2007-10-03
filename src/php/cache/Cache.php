@@ -37,6 +37,9 @@
 class Cache extends StaticFactory {
 
 
+   const EXPIRES_NEVER = 0;
+
+
    // aktuelle Cache-Implementierung
    private static $peer = null;
 
