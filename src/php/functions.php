@@ -45,6 +45,7 @@ $__imports['ActionForward'                  ] = 'php/flow/ActionForward';
 $__imports['ActionMapping'                  ] = 'php/flow/ActionMapping';
 $__imports['FrontController'                ] = 'php/flow/FrontController';
 $__imports['HttpRequest'                    ] = 'php/flow/HttpRequest';
+$__imports['HttpSession'                    ] = 'php/flow/HttpSession';
 
 
 
