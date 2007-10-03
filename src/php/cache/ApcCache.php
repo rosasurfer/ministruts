@@ -52,6 +52,13 @@ final class ApcCache extends AbstractCachePeer {
       if ($this->isCached($key))
          return $this->pool[$key][1];
       return null;
+
+      /*
+      $data = apc_fetch($key);
+      if ($data === false)
+         return false;
+      return unserialize($data[1]);
+      */
    }
 
 

@@ -20,6 +20,7 @@ $__imports['PersistableObject'              ] = 'php/db/PersistableObject';
 
 $__imports['BusinessRuleException'          ] = 'php/lang/BusinessRuleException';
 $__imports['IllegalTypeException'           ] = 'php/lang/IllegalTypeException';
+$__imports['IllegalStateException'          ] = 'php/lang/IllegalStateException';
 $__imports['InfrastructureException'        ] = 'php/lang/InfrastructureException';
 $__imports['InvalidArgumentException'       ] = 'php/lang/InvalidArgumentException';
 $__imports['NestableException'              ] = 'php/lang/NestableException';
@@ -40,6 +41,7 @@ $__imports['StringUtils'                    ] = 'php/util/StringUtils';
 $__imports['TorHelper'                      ] = 'php/util/TorHelper';
 
 $__imports['AbstractActionForm'             ] = 'php/flow/AbstractActionForm';
+$__imports['ActionForward'                  ] = 'php/flow/ActionForward';
 $__imports['ActionMapping'                  ] = 'php/flow/ActionMapping';
 $__imports['FrontController'                ] = 'php/flow/FrontController';
 $__imports['HttpRequest'                    ] = 'php/flow/HttpRequest';
