@@ -166,8 +166,7 @@ class Logger extends StaticFactory {
          if ($host != $ip)
             $ip = $host.' ('.$ip.')';
 
-         $request = new Request();
-         $mailMsg .= "\n\n\nRequest:\n--------\n".$request."\n\n\n"
+         $mailMsg .= "\n\n\nRequest:\n--------\n".Request ::me()."\n\n\n"
                   .  "Session: ".(isSession() ? '('.(isSessionNew() ? '':'not ')."new)\n--------\n".$session."\n\n\n" : "  (no session)\n")
                   .  "Host (IP): ".$ip."\n"
                   .  "Timestamp: ".date('Y-m-d H:i:s')."\n";
@@ -313,8 +312,7 @@ class Logger extends StaticFactory {
          if ($host != $ip)
             $ip = $host.' ('.$ip.')';
 
-         $request = new Request();
-         $mailMsg .= "\n\n\nRequest:\n--------\n".$request."\n\n\n"
+         $mailMsg .= "\n\n\nRequest:\n--------\n".Request ::me()."\n\n\n"
                   .  "Session: ".(isSession() ? '('.(isSessionNew() ? '':'not ')."new)\n--------\n".$session."\n\n\n" : "  (no session)\n")
                   .  "Host (IP): ".$ip."\n"
                   .  "Timestamp: ".date('Y-m-d H:i:s')."\n";
