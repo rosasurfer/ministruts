@@ -7,7 +7,7 @@
 abstract class Singleton extends Object implements Instantiatable {
 
 
-   // Pool mit allen existierenden Singletons
+   // Pool mit allen momentan existierenden Singletons
    private static $instances = array();
 
 
@@ -34,7 +34,7 @@ abstract class Singleton extends Object implements Instantiatable {
       $object = $args ? new $class($args) : new $class();
 
       if (!$object instanceof Singleton)
-         throw new InvalidArgumentException('Not a Singleton subclass: '.$class);
+         throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
 
       return self::$instances[$class] = $object;
    }

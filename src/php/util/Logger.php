@@ -166,7 +166,7 @@ class Logger extends StaticFactory {
          if ($host != $ip)
             $ip = $host.' ('.$ip.')';
 
-         $request = new HttpRequest();
+         $request = new Request();
          $mailMsg .= "\n\n\nRequest:\n--------\n".$request."\n\n\n"
                   .  "Session: ".(isSession() ? '('.(isSessionNew() ? '':'not ')."new)\n--------\n".$session."\n\n\n" : "  (no session)\n")
                   .  "Host (IP): ".$ip."\n"
@@ -313,7 +313,7 @@ class Logger extends StaticFactory {
          if ($host != $ip)
             $ip = $host.' ('.$ip.')';
 
-         $request = new HttpRequest();
+         $request = new Request();
          $mailMsg .= "\n\n\nRequest:\n--------\n".$request."\n\n\n"
                   .  "Session: ".(isSession() ? '('.(isSessionNew() ? '':'not ')."new)\n--------\n".$session."\n\n\n" : "  (no session)\n")
                   .  "Host (IP): ".$ip."\n"
