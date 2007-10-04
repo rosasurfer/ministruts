@@ -11,8 +11,10 @@ abstract class Singleton extends Object implements Instantiatable {
    private static $instances = array();
 
 
-   // Konstruktor
-   protected function __construct() {/* kann nicht von außen aufgerufen werden */}
+   /**
+    * Nicht-öffentlicher Konstruktor
+    */
+   protected function __construct() { /* you can't call me from outside with new ... */ }
 
 
    /**
