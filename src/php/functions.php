@@ -49,9 +49,7 @@ $__imports['HttpRequest'                    ] = 'php/util/HttpRequest';
 $__imports['Logger'                         ] = 'php/util/Logger';
 $__imports['Mailer'                         ] = 'php/util/Mailer';
 $__imports['String'                         ] = 'php/util/String';
-$__imports['StringUtils'                    ] = 'php/util/StringUtils';
 $__imports['TorHelper'                      ] = 'php/util/TorHelper';
-
 
 
 
