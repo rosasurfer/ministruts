@@ -20,7 +20,7 @@ class BaseValidator extends StaticFactory {
       if ($result) {
          array_shift($matches);
          foreach ($matches as $part) {
-            if ((StringUtils ::startsWith($part, '0') && $part!=='0') || (int) $part > 255) {
+            if ((String ::startsWith($part, '0') && $part!=='0') || (int) $part > 255) {
                $result = false;
                break;
             }

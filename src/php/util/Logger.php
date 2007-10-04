@@ -69,7 +69,7 @@ class Logger extends StaticFactory {
       }
       else {
          foreach ($settings as $package => $packageLevel) {
-            if ($package === '' || StringUtils ::startsWith($fullClassName, $package)) {
+            if ($package === '' || String ::startsWith($fullClassName, $package)) {
                $level = $packageLevel;
                break;
             }
