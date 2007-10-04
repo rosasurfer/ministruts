@@ -1,11 +1,13 @@
 <?
 /**
  * HttpRequest
+ *
+ * Stellt einen HttpRequest zu einer URL dar.
  */
 class HttpRequest extends Object {
 
    private $debug = false;
-   private $error = false;          // whether or not an error occurred (to avoid recursions)
+   private $error = false;          // whether or not an error occurred
 
    private $host;
    private $ip;
