@@ -19,8 +19,10 @@ $__imports['ConcurrentModificationException'] = 'php/db/ConcurrentModificationEx
 $__imports['PersistableObject'              ] = 'php/db/PersistableObject';
 
 $__imports['BusinessRuleException'          ] = 'php/lang/BusinessRuleException';
-$__imports['IllegalTypeException'           ] = 'php/lang/IllegalTypeException';
+$__imports['FileNotFoundException'          ] = 'php/lang/FileNotFoundException';
+$__imports['IOException'                    ] = 'php/lang/IOException';
 $__imports['IllegalStateException'          ] = 'php/lang/IllegalStateException';
+$__imports['IllegalTypeException'           ] = 'php/lang/IllegalTypeException';
 $__imports['InfrastructureException'        ] = 'php/lang/InfrastructureException';
 $__imports['InvalidArgumentException'       ] = 'php/lang/InvalidArgumentException';
 $__imports['NestableException'              ] = 'php/lang/NestableException';
