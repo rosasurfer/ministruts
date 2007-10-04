@@ -18,7 +18,16 @@ $__imports['StaticFactory'                  ] = 'php/core/StaticFactory';
 $__imports['ConcurrentModificationException'] = 'php/db/ConcurrentModificationException';
 $__imports['PersistableObject'              ] = 'php/db/PersistableObject';
 
+$__imports['AbstractActionForm'             ] = 'php/flow/AbstractActionForm';
+$__imports['ActionForward'                  ] = 'php/flow/ActionForward';
+$__imports['ActionMapping'                  ] = 'php/flow/ActionMapping';
+$__imports['FrontController'                ] = 'php/flow/FrontController';
+$__imports['HttpSession'                    ] = 'php/flow/HttpSession';
+$__imports['Request'                        ] = 'php/flow/Request';
+$__imports['RequestProcessor'               ] = 'php/flow/RequestProcessor';
+
 $__imports['BusinessRuleException'          ] = 'php/lang/BusinessRuleException';
+$__imports['ClassNotFoundException'         ] = 'php/lang/ClassNotFoundException';
 $__imports['FileNotFoundException'          ] = 'php/lang/FileNotFoundException';
 $__imports['IOException'                    ] = 'php/lang/IOException';
 $__imports['IllegalStateException'          ] = 'php/lang/IllegalStateException';
@@ -39,16 +48,10 @@ $__imports['CURL'                           ] = 'php/util/CURL';
 $__imports['HttpRequest'                    ] = 'php/util/HttpRequest';
 $__imports['Logger'                         ] = 'php/util/Logger';
 $__imports['Mailer'                         ] = 'php/util/Mailer';
+$__imports['String'                         ] = 'php/util/String';
 $__imports['StringUtils'                    ] = 'php/util/StringUtils';
 $__imports['TorHelper'                      ] = 'php/util/TorHelper';
 
-$__imports['AbstractActionForm'             ] = 'php/flow/AbstractActionForm';
-$__imports['ActionForward'                  ] = 'php/flow/ActionForward';
-$__imports['ActionMapping'                  ] = 'php/flow/ActionMapping';
-$__imports['FrontController'                ] = 'php/flow/FrontController';
-$__imports['HttpSession'                    ] = 'php/flow/HttpSession';
-$__imports['Request'                        ] = 'php/flow/Request';
-$__imports['RequestProcessor'               ] = 'php/flow/RequestProcessor';
 
 
 
@@ -102,6 +105,10 @@ function __autoload($className) {
          return true;
       }
       $stackTrace = debug_backtrace();
+
+      while (!isSet($stackTrace[0]['file']))
+         array_shift($stackTrace);
+
       throw new PHPErrorException("Undefined class '$className'", $stackTrace[0]['file'], $stackTrace[0]['line'], array());
    }
    catch (Exception $ex) {                   // Auftretende Exceptions manuell weiterreichen,
