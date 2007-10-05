@@ -24,6 +24,7 @@ $__imports['BaseAction'                     ] = 'php/flow/BaseAction';
 $__imports['BaseActionForm'                 ] = 'php/flow/BaseActionForm';
 $__imports['FrontController'                ] = 'php/flow/FrontController';
 $__imports['HttpSession'                    ] = 'php/flow/HttpSession';
+$__imports['ModuleConfig'                   ] = 'php/flow/ModuleConfig';
 $__imports['Request'                        ] = 'php/flow/Request';
 $__imports['RequestProcessor'               ] = 'php/flow/RequestProcessor';
 
