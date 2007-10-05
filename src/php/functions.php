@@ -19,9 +19,9 @@ $__imports['ConcurrentModificationException'] = 'php/db/ConcurrentModificationEx
 $__imports['PersistableObject'              ] = 'php/db/PersistableObject';
 
 $__imports['AbstractActionForm'             ] = 'php/flow/AbstractActionForm';
-$__imports['Action'                         ] = 'php/flow/Action';
 $__imports['ActionForward'                  ] = 'php/flow/ActionForward';
 $__imports['ActionMapping'                  ] = 'php/flow/ActionMapping';
+$__imports['BaseAction'                     ] = 'php/flow/BaseAction';
 $__imports['FrontController'                ] = 'php/flow/FrontController';
 $__imports['HttpSession'                    ] = 'php/flow/HttpSession';
 $__imports['Request'                        ] = 'php/flow/Request';
