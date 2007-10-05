@@ -18,16 +18,6 @@ $__imports['StaticFactory'                  ] = 'php/core/StaticFactory';
 $__imports['ConcurrentModificationException'] = 'php/db/ConcurrentModificationException';
 $__imports['PersistableObject'              ] = 'php/db/PersistableObject';
 
-$__imports['ActionForward'                  ] = 'php/flow/ActionForward';
-$__imports['ActionMapping'                  ] = 'php/flow/ActionMapping';
-$__imports['BaseAction'                     ] = 'php/flow/BaseAction';
-$__imports['BaseActionForm'                 ] = 'php/flow/BaseActionForm';
-$__imports['FrontController'                ] = 'php/flow/FrontController';
-$__imports['HttpSession'                    ] = 'php/flow/HttpSession';
-$__imports['ModuleConfig'                   ] = 'php/flow/ModuleConfig';
-$__imports['Request'                        ] = 'php/flow/Request';
-$__imports['RequestProcessor'               ] = 'php/flow/RequestProcessor';
-
 $__imports['BusinessRuleException'          ] = 'php/lang/BusinessRuleException';
 $__imports['ClassNotFoundException'         ] = 'php/lang/ClassNotFoundException';
 $__imports['FileNotFoundException'          ] = 'php/lang/FileNotFoundException';
@@ -43,6 +33,16 @@ $__imports['RuntimeException'               ] = 'php/lang/RuntimeException';
 
 $__imports['BasePdfDocument'                ] = 'php/pdf/BasePdfDocument';
 $__imports['SimplePdfDocument'              ] = 'php/pdf/SimplePdfDocument';
+
+$__imports['ActionForward'                  ] = 'php/struts/ActionForward';
+$__imports['ActionMapping'                  ] = 'php/struts/ActionMapping';
+$__imports['BaseAction'                     ] = 'php/struts/BaseAction';
+$__imports['BaseActionForm'                 ] = 'php/struts/BaseActionForm';
+$__imports['FrontController'                ] = 'php/struts/FrontController';
+$__imports['HttpSession'                    ] = 'php/struts/HttpSession';
+$__imports['ModuleConfig'                   ] = 'php/struts/ModuleConfig';
+$__imports['Request'                        ] = 'php/struts/Request';
+$__imports['RequestProcessor'               ] = 'php/struts/RequestProcessor';
 
 $__imports['BaseValidator'                  ] = 'php/util/BaseValidator';
 $__imports['Config'                         ] = 'php/util/Config';

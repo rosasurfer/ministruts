@@ -1,0 +1,3 @@
+<?
+FrontController ::me()->processRequest();
+?>
