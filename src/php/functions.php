@@ -18,11 +18,10 @@ $__imports['StaticFactory'                  ] = 'php/core/StaticFactory';
 $__imports['ConcurrentModificationException'] = 'php/db/ConcurrentModificationException';
 $__imports['PersistableObject'              ] = 'php/db/PersistableObject';
 
-$__imports['AbstractActionForm'             ] = 'php/flow/AbstractActionForm';
-$__imports['BaseActionForm'                 ] = 'php/flow/BaseActionForm';
 $__imports['ActionForward'                  ] = 'php/flow/ActionForward';
 $__imports['ActionMapping'                  ] = 'php/flow/ActionMapping';
 $__imports['BaseAction'                     ] = 'php/flow/BaseAction';
+$__imports['BaseActionForm'                 ] = 'php/flow/BaseActionForm';
 $__imports['FrontController'                ] = 'php/flow/FrontController';
 $__imports['HttpSession'                    ] = 'php/flow/HttpSession';
 $__imports['Request'                        ] = 'php/flow/Request';
