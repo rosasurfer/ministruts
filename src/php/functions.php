@@ -103,12 +103,7 @@ function __autoload($className) {
          include($GLOBALS['__imports'][$className].'.php');
          return true;
       }
-      $stackTrace = debug_backtrace();
-
-      while (!isSet($stackTrace[0]['file']))
-         array_shift($stackTrace);
-
-      throw new PHPErrorException("Undefined class '$className'", $stackTrace[0]['file'], $stackTrace[0]['line'], array());
+      throw new ClassNotFoundException("Undefined class '$className'");
    }
    catch (Exception $ex) {                   // Auftretende Exceptions manuell weiterreichen,
       Logger ::handleException($ex);         // denn __autoload() darf keine Exceptions werfen.
