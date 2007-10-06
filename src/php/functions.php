@@ -5,6 +5,8 @@
 
 // Klassenimporte
 // --------------
+$__imports['AbstractActionForm'             ] = 'php/actions/AbstractActionForm';
+
 $__imports['AbstractCachePeer'              ] = 'php/cache/AbstractCachePeer';
 $__imports['ApcCache'                       ] = 'php/cache/ApcCache';
 $__imports['Cache'                          ] = 'php/cache/Cache';
@@ -34,15 +36,16 @@ $__imports['RuntimeException'               ] = 'php/lang/RuntimeException';
 $__imports['BasePdfDocument'                ] = 'php/pdf/BasePdfDocument';
 $__imports['SimplePdfDocument'              ] = 'php/pdf/SimplePdfDocument';
 
+$__imports['ActionForm'                     ] = 'php/struts/ActionForm';
 $__imports['ActionForward'                  ] = 'php/struts/ActionForward';
 $__imports['ActionMapping'                  ] = 'php/struts/ActionMapping';
 $__imports['BaseAction'                     ] = 'php/struts/BaseAction';
 $__imports['BaseActionForm'                 ] = 'php/struts/BaseActionForm';
 $__imports['FrontController'                ] = 'php/struts/FrontController';
-$__imports['HttpSession'                    ] = 'php/struts/HttpSession';
 $__imports['ModuleConfig'                   ] = 'php/struts/ModuleConfig';
 $__imports['Request'                        ] = 'php/struts/Request';
 $__imports['RequestProcessor'               ] = 'php/struts/RequestProcessor';
+$__imports['Response'                       ] = 'php/struts/Response';
 
 $__imports['BaseValidator'                  ] = 'php/util/BaseValidator';
 $__imports['Config'                         ] = 'php/util/Config';
