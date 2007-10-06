@@ -15,7 +15,7 @@
 class FrontController extends Singleton {
 
 
-   const STRUTS4P_CONFIG_FILE = 'struts4p-config.xml';
+   const STRUTS4P_CONFIG_FILE = 'php-struts-config.xml';
 
 
    // es gibt zur Zeit nur ein Modul (daß sich nicht ändern kann)
@@ -23,9 +23,30 @@ class FrontController extends Singleton {
 
 
    /**
-    * Konstruktor.
+    * Gibt die Singleton-Instanz dieser Klasse zurück. Ist ein Cache installiert, wird sie gecacht.
+    * Dadurch muß die Konfiguration nicht bei jedem Request neu eingelesen werden.
     *
-    * Lädt die Struts-Konfiguration, parst und kompiliert sie.
+    * @return FrontController
+    */
+   public static function me() {
+
+      // development only (don't uses cache)
+      return Singleton ::getInstance(__CLASS__);
+
+
+      $instance = Cache ::get($key = __CLASS__.'_instance');
+      if (!$instance) {
+         $instance = Singleton ::getInstance(__CLASS__);
+         Cache ::set($key, $instance);
+      }
+      return $instance;
+   }
+
+
+   /**
+    * Konstruktor
+    *
+    * Lädt die Struts-Konfiguration und parst und kompiliert sie.
     */
    protected function __construct() {
       try {
@@ -41,27 +62,6 @@ class FrontController extends Singleton {
       catch (Exception $ex) {
          throw new RuntimeException('Error loading '.self ::STRUTS4P_CONFIG_FILE, $ex);
       }
-   }
-
-
-   /**
-    * Gibt die Singleton-Instanz dieser Klasse zurück. Ist ein Cache installiert, wird sie gecacht.
-    * Dadurch muß die Konfiguration nicht bei jedem Request neu eingelesen werden.
-    *
-    * @return FrontController
-    */
-   public static function me() {
-
-      // development only (don't uses cache)
-      //return Singleton ::getInstance(__CLASS__);
-      //
-
-      $instance = Cache ::get($key = __CLASS__.'_instance');
-      if (!$instance) {
-         $instance = Singleton ::getInstance(__CLASS__);
-         Cache ::set($key, $instance);
-      }
-      return $instance;
    }
 
 
@@ -85,9 +85,9 @@ class FrontController extends Singleton {
          throw new RuntimeException('Could not resolve root path of library, giving up.');
       $libroot = join(DIRECTORY_SEPARATOR, $dirs);
 
-      // aktuelles Verzeichnis merken und ins Rootverzeichnis wechseln, damit die DTD gefunden wird
       $cwd = getCwd();
       try {
+         // ins Rootverzeichnis wechseln, damit die DTD gefunden wird
          chdir($libroot);
       }
       catch (Exception $ex) { throw new RuntimeException('Could not change working directory to "'.$libroot.'"', $ex); }
@@ -95,8 +95,8 @@ class FrontController extends Singleton {
       // Datei laden und validieren ...
       $object = new SimpleXMLElement($xml, LIBXML_DTDVALID);
 
-      // ... und zurück ins Ausgangsverzeichnis
       try {
+         // zurück ins Ausgangsverzeichnis wechseln
          chdir($cwd);
       }
       catch (Exception $ex) { throw new RuntimeException('Could not change working directory back to "'.$cwd.'"', $ex); }
@@ -122,11 +122,15 @@ class FrontController extends Singleton {
     */
    private function initMappings(ModuleConfig $config, SimpleXMLElement $xml) {
       if ($xml->{'action-mappings'}) {
-
          foreach ($xml->{'action-mappings'}->action as $action) {
-            $mapping = ActionMapping ::create()->setPath((string) $action['path'])
-                                               ->setAction((string) $action['name'])
-                                               ->setDefault((string) $action['default'] == 'true');
+            $mapping = new ActionMapping($config);
+
+            if (isSet($action['path'   ])) $mapping->setPath   ((string) $action['path'   ]);
+            if (isSet($action['forward'])) $mapping->setForward((string) $action['forward']);
+            if (isSet($action['type'   ])) $mapping->setAction ((string) $action['type'   ]);
+            if (isSet($action['form'   ])) $mapping->setForm   ((string) $action['form'   ]);
+            if (isSet($action['default'])) $mapping->setDefault((string) $action['default'] == 'true');
+
             foreach ($action->forward as $forward) {
                $mapping->addForward(new ActionForward((string) $forward['name'],
                                                       (string) $forward['path'],
@@ -147,8 +151,7 @@ class FrontController extends Singleton {
     */
    private function getRequestProcessor(ModuleConfig $config) {
       $class = $config->getProcessorClass();
-      $processor = new $class($config);
-      return $processor;
+      return new $class($config);
    }
 
 
@@ -156,9 +159,10 @@ class FrontController extends Singleton {
     * Verarbeitet den aktuellen Request.
     */
    public function processRequest() {
-      $request = Request ::me();
+      $request  = Request ::me();
+      $response = Response ::me();
       $processor = $this->getRequestProcessor($this->moduleConfig);
-      $processor->process($request);
+      $processor->process($request, $response);
    }
 }
 ?>

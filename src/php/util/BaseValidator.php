@@ -241,7 +241,7 @@ class BaseValidator extends StaticFactory {
     * @return boolean
     */
    public static function isLastName($string) {
-      return BaseValidator::isFirstName($string);
+      return BaseValidator ::isFirstName($string);
    }
 
 

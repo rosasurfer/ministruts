@@ -12,7 +12,7 @@ class ModuleConfig extends Object {
    private $mappings = array();
 
    // Default-ActionMapping (wenn angegeben)
-   private /* ActionMapping */ $defaultMapping;
+   private $defaultMapping;
 
    // Klassenname der RequestProcessor-Implementierung, die für dieses Module benutzt wird
    private $processorClass = 'RequestProcessor';
@@ -52,15 +52,28 @@ class ModuleConfig extends Object {
 
 
    /**
+    * Gibt das ActionMapping für den angegebenen Pfad zurück. Zuerst wird nach einer genauen Übereinstimmung
+    * gesucht und danach, wenn keines gefunden wurde, nach einem Default-ActionMapping.
+    *
+    * @param ActionMapping $mapping
+    */
+   public function findActionMapping($path) {
+      if (isSet($this->mappings[$path]))
+         return $this->mappings[$path];
+      return $this->defaultMappings;
+   }
+
+
+   /**
     * Setzt den Klassennamen der RequestProcessor-Implementierung, die für dieses Module benutzt wird.
     * Diese Klasse muß eine Subklasse von RequestProcessor sein.
     *
     * @param string $className
     */
    public function setProcessorClass($className) {
-      if ($this->configured)                               throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($className))                          throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
-      if (!is_subclass_of($className, 'RequestProcessor')) throw new InvalidArgumentException('Not a RequestProcessor subclass: '.$className);
+      if ($this->configured)                                       throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($className))                                  throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
+      if (!is_subclass_of($className, $parent='RequestProcessor')) throw new InvalidArgumentException("Not a subclass of $parent: ".$className);
 
       $this->processorClass = $className;
    }
@@ -87,6 +100,21 @@ class ModuleConfig extends Object {
          $mapping->freeze();
 
       $this->configured = true;
+   }
+
+
+   /**
+    * Sucht und gibt den globalen ActionForward mit dem angegebenen Namen zurück.
+    * Wird kein Forward gefunden, wird NULL zurückgegeben.
+    *
+    * @param $name - logischer Name des ActionForwards
+    *
+    * @return ActionForward
+    */
+   public function findForward($name) {
+      if (isSet($this->globalForwards[$name]))
+         return $this->globalForwards[$name];
+      return null;
    }
 }
 ?>

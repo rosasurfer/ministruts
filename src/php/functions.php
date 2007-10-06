@@ -36,10 +36,10 @@ $__imports['RuntimeException'               ] = 'php/lang/RuntimeException';
 $__imports['BasePdfDocument'                ] = 'php/pdf/BasePdfDocument';
 $__imports['SimplePdfDocument'              ] = 'php/pdf/SimplePdfDocument';
 
+$__imports['Action'                         ] = 'php/struts/Action';
 $__imports['ActionForm'                     ] = 'php/struts/ActionForm';
 $__imports['ActionForward'                  ] = 'php/struts/ActionForward';
 $__imports['ActionMapping'                  ] = 'php/struts/ActionMapping';
-$__imports['BaseAction'                     ] = 'php/struts/BaseAction';
 $__imports['FrontController'                ] = 'php/struts/FrontController';
 $__imports['ModuleConfig'                   ] = 'php/struts/ModuleConfig';
 $__imports['Request'                        ] = 'php/struts/Request';

@@ -2,12 +2,17 @@
 /**
  * Request
  *
- * Diese Klasse stellt den HTTP-Request dar, der den Server erreicht hat.
+ * Diese Klasse stellt den HTTP-Request mit seinen Daten dar, sowie er von PHP an das aufgerufene Script übergeben wurde.
  * Da es immer nur einen einzigen Request geben kann, ist er als Singleton implementiert. Das bedeutet unter anderem,
- * daß es keinen Konstruktor gibt, man kann also nicht selbst einen neuen Request erzeugen (es gibt nur den einen,
- * der vom Server an PHP weitergereicht wurde).
+ * daß es keinen öffentlichen Konstruktor gibt, man kann also nicht selbst einen neuen Request erzeugen (es gibt nur
+ * den einen, der vom Server an PHP weitergereicht wurde).
  */
 final class Request extends Singleton {
+
+
+   const MESSAGE_KEY = '__ACTION_MESSAGES__';
+
+   private $method;
 
 
    /**
@@ -20,6 +25,62 @@ final class Request extends Singleton {
       if (isSet($_SERVER['REQUEST_METHOD']))
          return Singleton ::getInstance(__CLASS__);
       return null;
+   }
+
+
+   /**
+    * Konstruktor
+    */
+   protected function __construct() {
+      $this->method = $_SERVER['REQUEST_METHOD'];
+   }
+
+
+   /**
+    * Gibt die HTTP-Meode des Requests zurück.
+    *
+    * @return string
+    */
+   public function getMethod() {
+      return $this->method;
+   }
+
+
+   /**
+    * Ob dieser Request ein GET-Request ist.
+    *
+    * @return boolean
+    */
+   public function isGet() {
+      return ($this->method === 'GET');
+   }
+
+
+   /**
+    * Ob dieser Request ein POST-Request ist.
+    *
+    * @return boolean
+    */
+   public function isPost() {
+      return ($this->method === 'POST');
+   }
+
+
+   /**
+    * Gibt die Pfadkomponente der URL des Requests zurück.
+    */
+   public function getPathInfo() {
+      return $_SERVER['PHP_SELF'];
+   }
+
+
+   /**
+    * Prüft, ob eine aktuelle HttpSession existiert oder nicht.
+    *
+    * @return boolean
+    */
+   public function isSession() {
+      return defined('SID');
    }
 
 

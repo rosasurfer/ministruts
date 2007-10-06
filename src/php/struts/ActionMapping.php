@@ -5,22 +5,30 @@
 class ActionMapping extends Object {
 
 
-   private $path;                   // string
-   private $action;                 // string
-   private $form;                   // string
-   private $default;                // boolean
+   protected $path;                   // string
+   protected $forward;                // string (der direkt konfigurierte ActionForward, wenn angegeben)
+   protected $action;                 // string
+   protected $form;                   // string
+   protected $default;                // boolean
 
 
    // Array mit den lokalen ActionForwards
-   private $forwards = array();
+   protected $forwards = array();
 
    // ob diese Komponente vollständig konfiguriert ist
-   private $configured = false;     // boolean
+   protected $configured = false;     // boolean
+
+   // ModuleConfig, zu der wir gehören
+   protected $moduleConfig;
 
 
-   // new ActionMapping()->
-   public static function create() {
-      return new self();
+   /**
+    * Constructor
+    *
+    * @param ModuleConfig $config - ModuleConfig, zu der dieses Mapping gehört
+    */
+   public function __construct(ModuleConfig $config) {
+      $this->moduleConfig = $config;
    }
 
 
@@ -41,8 +49,40 @@ class ActionMapping extends Object {
    }
 
 
+   /**
+    * Gibt den Pfad dieses Mappings zurück.
+    *
+    * @return string
+    */
    public function getPath() {
       return $this->path;
+   }
+
+
+   /**
+    * Setzt den Namen des direkt konfigurierten Forwards.
+    *
+    * @param string $name
+    *
+    * @return ActionMapping
+    */
+   public function setForward($name) {
+      if ($this->configured) throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($name)) throw new IllegalTypeException('Illegal type of argument $name: '.getType($name));
+      if ($this->action)     throw new RuntimeException('Configuration error: Exactly one of action "forward" or action "type" must be specified.');
+
+      $this->forward = $name;
+      return $this;
+   }
+
+
+   /**
+    * Gibt den Namen des internen Forwards oder NULL, wenn keiner konfiguriert wurde, zurück.
+    *
+    * @return string
+    */
+   public function getForward() {
+      return $this->forward;
    }
 
 
@@ -54,15 +94,21 @@ class ActionMapping extends Object {
     * @return ActionMapping
     */
    public function setAction($className) {
-      if ($this->configured)                         throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($className))                    throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
-      if (!is_subclass_of($className, 'BaseAction')) throw new InvalidArgumentException('Not a subclass of BaseAction: '.$className);
+      if ($this->configured)                             throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($className))                        throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
+      if (!is_subclass_of($className, $parent='Action')) throw new InvalidArgumentException("Not a subclass of $parent: ".$className);
+      if ($this->forward)                                throw new RuntimeException('Configuration error: Exactly one of action "forward" or action "type" must be specified.');
 
       $this->action = $className;
       return $this;
    }
 
 
+   /**
+    * Gibt den Klassennamen der auszuführenden Action oder NULL, wenn keine Action konfiguriert wurde, zurück.
+    *
+    * @return string - Klassenname
+    */
    public function getAction() {
       return $this->action;
    }
@@ -78,13 +124,18 @@ class ActionMapping extends Object {
    public function setForm($className) {
       if ($this->configured)                                 throw new IllegalStateException('Configuration is frozen');
       if (!is_string($className))                            throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
-      if (!is_subclass_of($className, 'BaseActionForm')) throw new InvalidArgumentException('Not an BaseActionForm subclass: '.$className);
+      if (!is_subclass_of($className, $parent='ActionForm')) throw new InvalidArgumentException("Not a subclass of $parent: ".$className);
 
       $this->form = $className;
       return $this;
    }
 
 
+   /**
+    * Gibt den Klassennamen der ActionForm oder NULL, wenn keine ActionForm konfiguriert wurde, zurück.
+    *
+    * @return string - Klassenname
+    */
    public function getForm() {
       return $this->form;
    }
@@ -143,6 +194,27 @@ class ActionMapping extends Object {
 
       foreach ($this->forwards as $forward)
          $forward->freeze();
+   }
+
+
+   /**
+    * Sucht und gibt den ActionForward mit dem angegebenen Namen zurück. Zuerst werden die lokalen
+    * Forwards des Mappings durchsucht und danach, wenn kein Forward gefunden wurde, die globalen
+    * Forwards der Modulkonfiguration. Wird kein Forward gefunden, wird NULL zurückgegeben.
+    *
+    * @param $name - logischer Name des ActionForwards
+    *
+    * @return ActionForward
+    */
+   public function findForward($name) {
+      if (isSet($this->forwards[$name]))
+         return $this->forwards[$name];
+
+      $forward = $this->moduleConfig->findForward($name);
+      if (!$forward)
+         Logger ::log('No ActionForward found for name: '.$name, L_WARN, __CLASS__);
+
+      return $forward;
    }
 }
 ?>
