@@ -60,7 +60,8 @@ class ModuleConfig extends Object {
    public function findActionMapping($path) {
       if (isSet($this->mappings[$path]))
          return $this->mappings[$path];
-      return $this->defaultMappings;
+
+      return $this->defaultMapping;
    }
 
 
