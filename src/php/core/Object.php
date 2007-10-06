@@ -15,13 +15,12 @@ class Object {
     */
    private static function __call($methodName, array &$params) {
       $trace = debug_backTrace();
-      $i = 0;
-      do {
-         $frame =& $trace[++$i];
-      } while (strToLower($frame['function'])=='__call');
 
-      $class = $frame['class'];
-      throw new RuntimeException("Call to undefined method $class::$methodName()");
+      for ($i=0; $i < sizeOf($trace); $i++) {
+         if (strToLower($trace[$i]['function']) !== '__call')
+            break;
+      }
+      throw new RuntimeException('Call to undefined method '.$trace[$i]['class']."::$methodName()");
    }
 
 
