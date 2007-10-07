@@ -49,6 +49,7 @@ class ModuleConfig extends Object {
       if ($mapping->isDefault()) {
          if ($this->defaultMapping)
             throw new RuntimeException('Only one ActionMapping can be marked as "default" within a module.');
+
          $this->defaultMapping = $mapping;
       }
 
@@ -60,7 +61,9 @@ class ModuleConfig extends Object {
     * Gibt das ActionMapping für den angegebenen Pfad zurück. Zuerst wird nach einer genauen Übereinstimmung
     * gesucht und danach, wenn keines gefunden wurde, nach einem Default-ActionMapping.
     *
-    * @param ActionMapping $mapping
+    * @param string $path
+    *
+    * @return ActionMapping
     */
    public function findActionMapping($path) {
       if (isSet($this->mappings[$path]))

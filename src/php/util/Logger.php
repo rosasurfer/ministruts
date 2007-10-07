@@ -61,7 +61,7 @@ class Logger extends StaticFactory {
       if (isSet($levels[$class]))
          return $levels[$class];
 
-      $fullClassName =  $GLOBALS['__imports'][$class];
+      $fullClassName = $GLOBALS['__imports'][$class];
 
       $level = null;
       if (isSet($settings[$fullClassName])) {

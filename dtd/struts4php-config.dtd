@@ -1,0 +1,203 @@
+<!--
+     DTD for the Struts for PHP Application Configuration File
+
+     To support validation of your configuration file, include the following
+     DOCTYPE element at the beginning (after the "xml" declaration):
+
+     <!DOCTYPE php-struts-config SYSTEM "dtd/struts4php-config.dtd">
+-->
+
+
+<!-- ========== Defined Types ============================================= -->
+
+
+<!-- A "Boolean" is the string representation of a boolean (true or false) 
+     variable.    
+-->
+
+<!ENTITY % Boolean "(true|false)">
+
+
+<!-- A "ClassName" is the simple name of a PHP class that is instantiated to 
+     provide the functionality of the enclosing element.
+-->
+<!ENTITY % ClassName "CDATA">
+
+
+<!-- An "Integer" is a character string consisting solely of numeric digits,
+     optionally preceeded by a minus sign, that can be converted to a
+     32-bit integer.
+-->
+<!ENTITY % Integer "CDATA">
+
+
+<!-- A "Location" is a relative path, delimited by "/" characters, that
+     defines the location of a resource relative to the location of the
+     Struts4PHP configuration file itself.
+-->
+<!ENTITY % Location "#PCDATA">
+
+
+<!-- A "PropertyName" is the name of a class property, and must begin with
+     a lower case letter and contain only characters that are legal in a
+     PHP identifier.
+-->
+<!ENTITY % PropertyName "CDATA">
+
+
+<!-- A "RequestPath" is a module-relative URI path, beginning with a
+     slash "/", that identifies a mapped resource within this web application.
+-->
+<!ENTITY % RequestPath "CDATA">
+
+
+<!-- A "RequestType" identifies a request type.
+-->
+<!ENTITY % RequestType "(get|post)">
+
+
+
+<!-- ========== Top Level Elements ======================================== -->
+
+
+<!-- The "php-struts-config" element is the root of the configuration file hierarchy, 
+     and contains nested elements for all of the other configuration settings.
+-->
+<!ELEMENT struts-config (global-forwards?, action-mappings?)>
+<!ATTLIST struts-config  id             ID              #IMPLIED>
+
+
+<!-- The "global-forwards" element describes a set of ActionForward objects that are 
+     available to all Action objects as a return value. The individual ActionForwards 
+     are configured through nested <forward> elements. An <action> element may override 
+     a global forward by defining a local <forward> of the same name.
+-->
+<!ELEMENT global-forwards (forward*)>
+<!ATTLIST global-forwards id            ID              #IMPLIED>
+
+
+<!-- The "forward" element describes an ActionForward that is to be made available to 
+     an Action as a return value. An ActionForward is referenced by a logical name and 
+     encapsulates a URI. A "forward" element may be used to describe both global and 
+     local ActionForwards. Global forwards are available to all the Action objects in 
+     the module. Local forwards can be nested within a <mapping> element and are only 
+     available to an Action object when it is invoked through that ActionMapping.
+
+     name           The unique identifier for this forward. Referenced by the Action 
+                    object at runtime to select - by its logical name - the resource 
+                    that should complete the request/response.
+
+     include        The identifier of the resource that is encapsulated by the logical 
+                    name of this ActionForward.  If the value begins with a slash "/" 
+                    character it is interpreted as the path to a physical resource.
+                    If it doesn't begin with a slash "/" character it is interpreted as 
+                    the class name of a layout subclass [TilesLayout].  Exactly one of 
+                    "include", "redirect" or "alias" must be specified.
+                    
+     redirect       The module-relative path of the location to which a redirect 
+                    instruction should be issued.  If the value of a local ActionForward 
+                    (nested within a <mapping> element) is "__self" the redirect 
+                    instruction is issued to the location identified by the path attribute 
+                    of the enclosing <mapping> element.  Exactly one of "include", 
+                    "redirect"  or "alias" must be specified.
+
+     alias          The unique identifier of another ActionForward to use instead.  
+                    Used to simplify the configuration.  Exactly one of "include", 
+                    "redirect" or "alias" must be specified.
+-->
+<!ELEMENT forward (set-property*)>
+<!ATTLIST forward        id             ID              #IMPLIED>
+<!ATTLIST forward        name           CDATA           #REQUIRED>
+<!ATTLIST forward        include        CDATA           #IMPLIED>
+<!ATTLIST forward        redirect       %RequestPath;   #IMPLIED>
+<!ATTLIST forward        alias          CDATA           #IMPLIED>
+
+
+<!-- The "action-mappings" element describes a set of ActionMapping objects
+     that are available to process requests matching the given url-pattern. 
+     The individual ActionMappings are configured through nested
+     <action> elements. 
+-->
+<!ELEMENT action-mappings (mapping*)>
+<!ATTLIST action-mappings id             ID              #IMPLIED>
+
+
+<!-- The "mapping" element describes an ActionMapping object that is to be used
+     to process a request for a specific module-relative URI. The following
+     attributes are defined:
+
+     path            The module-relative path of the submitted request, starting
+                     with a "/" character, and without the filename extension if
+                     extension mapping is used.
+
+                     NOTE:  Do *not* include a period in your path name,
+                     because it will look like a filename extension and
+                     cause your Action to not be located.
+
+     forward         Module-relative path of the resource that will process this 
+                     request, instead of the Action class specified by "type".  
+                     The path WILL NOT be processed through the "forwardPattern" 
+                     attribute that is configured on the "controller" element for 
+                     this module. Exactly one of "forward" or "type" must be
+                     specified.
+
+     action          Class name of the action subclass [Action] that will process 
+                     requests for this action mapping. Not valid if the "forward" 
+                     attribute is specified.  Exactly one of "forward" or "type" 
+                     must be specified.
+
+     form            Class name of the action form subclass [ActionForm],
+                     if any, that is associated with this action mapping.
+
+     parameter       General-purpose configuration parameter that can be used to
+                     pass extra information to the Action object selected by
+                     this action mapping.
+
+     roles           Comma-delimited list of role names that are allowed access 
+                     to this ActionMapping object.
+
+     method          The request type that this ActionMapping may be restricted to. 
+                     Legal values are "get" and "post".
+                     [no restriction]
+
+     default         Set to "true" if this object should be configured as the
+                     default action mapping for this module. If a request does not
+                     match another object, it will be passed to the ActionMapping
+                     object with default set to "true". Only one ActionMapping
+                     object can be marked as "default" within a module.
+                     [false]
+-->
+<!ELEMENT mapping (set-property*, forward*)>
+<!ATTLIST mapping        id             ID              #IMPLIED>
+<!ATTLIST mapping        action         %ClassName;     #IMPLIED>
+<!ATTLIST mapping        default        %Boolean;       #IMPLIED>
+<!ATTLIST mapping        form           %ClassName;     #IMPLIED>
+<!ATTLIST mapping        forward        %RequestPath;   #IMPLIED>
+<!ATTLIST mapping        method         %RequestType;   #IMPLIED>
+<!ATTLIST mapping        parameter      CDATA           #IMPLIED>
+<!ATTLIST mapping        path           %RequestPath;   #REQUIRED>
+<!ATTLIST mapping        roles          CDATA           #IMPLIED>
+
+
+<!-- ========== Subordinate Elements ====================================== -->
+
+
+<!-- The "set-property" element specifies the method name and initial value of
+     an additional class configuration property. When the object representing
+     the surrounding element is instantiated, the accessor for the indicated
+     property is called and passed the indicated value. The "set-property"
+     element is especially useful when a custom subclass is used with
+     <forward> or <mapping> elements. The subclass can be passed whatever other 
+     properties may be required to configure the object without changing how 
+     the struts4p-config is parsed.
+
+     property        Name of the class property whose setter method will be 
+                     called.
+
+     value           String representation of the value to which this
+                     property will be set, after suitable type conversion
+-->
+<!ELEMENT set-property   EMPTY>
+<!ATTLIST set-property   id             ID              #IMPLIED>
+<!ATTLIST set-property   property       %PropertyName;  #REQUIRED>
+<!ATTLIST set-property   value          CDATA           #REQUIRED>

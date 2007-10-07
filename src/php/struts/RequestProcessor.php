@@ -30,15 +30,17 @@ class RequestProcessor extends Object {
 
 
    /**
-    * Verarbeitet den übergebenen Request und gibt entweder den entsprechenden Content aus oder leitet auf eine andere Resource um.
+    * Verarbeitet den übergebenen Request und gibt entweder den entsprechenden Content aus oder
+    * leitet auf eine andere Resource um.
     *
     * @param Request  $request
     * @param Response $response
     */
    final public function process(Request $request, Response $response) {
 
-      // Pfad zur Actionauswahl ermitteln
+      // Pfad für die Mappingauswahl ermitteln
       $path = $this->processPath($request, $response);
+      $this->logDebug && Logger ::log('Resolved path for mapping selection: '.$path, L_DEBUG, __CLASS__);
 
 
       // falls notwendig, ein Locale setzen
@@ -61,7 +63,7 @@ class RequestProcessor extends Object {
       $this->processCachedMessages($request, $response);
 
 
-      // das entsprechende ActionMapping ermitteln
+      // das zum angegebenen Pfad passende ActionMapping ermitteln
       $mapping = $this->processMapping($request, $response, $path);
       if (!$mapping) {
          $this->logDebug && Logger ::log('Could not find a mapping for this request', L_DEBUG, __CLASS__);
@@ -69,7 +71,7 @@ class RequestProcessor extends Object {
       }
 
 
-      // ggf. benötigte Rollen überprüfen
+      // Rollenbeschränkungen des Mappings überprüfen
       if (!$this->processRoles($request, $response, $mapping)) {
          $this->logDebug && Logger ::log('User does not have any required role, denying access', L_DEBUG, __CLASS__);
          return;
@@ -81,15 +83,15 @@ class RequestProcessor extends Object {
          return;
 
 
-      // die ActionForm des Mappings erzeugen
+      // ActionForm des Mappings erzeugen
       $form = $this->processActionForm($request, $response, $mapping);
 
 
-      // die Action des Mappings erzeugen
+      // Action des Mappings erzeugen
       $action = $this->processActionCreate($request, $response, $mapping);
 
 
-      // die Action aufrufen
+      // Action aufrufen
       $forward = $this->processActionExceute($request, $response, $action, $form);
 
 
@@ -239,7 +241,7 @@ class RequestProcessor extends Object {
       if (!$forward)
          return true;
 
-      $this->doForward($forward);
+      $this->processActionForward($request, $response, $forward);
       return false;
    }
 
