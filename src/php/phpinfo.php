@@ -26,6 +26,7 @@ if (ini_get('implicit_flush'))                                                ec
 if (ini_get('allow_call_time_pass_reference'))                                echoError('Warning: allow_call_time_pass_reference is not Off');
 if (!ini_get('ignore_user_abort'))                                            echoError('Warning: ignore_user_abort is not On');
 if (ini_get('session.save_handler') != 'files')                               echoError('Warning: session.save_handler is not \'files\': '.ini_get('session.save_handler'));
+/*
 if (ini_get('session.save_handler') == 'files') {
    $domainRoot = realPath($_SERVER['DOCUMENT_ROOT']);
    $dirs = explode(DIRECTORY_SEPARATOR, $domainRoot);
@@ -35,6 +36,7 @@ if (ini_get('session.save_handler') == 'files') {
    }
    if (strPos(realPath(ini_get('session.save_path')), $domainRoot) === false) echoError('Warning: session.save_path doesn\'t point inside the projects directory tree: '.realPath(ini_get('session.save_path')));
 }
+*/
 if (ini_get('session.serialize_handler') != 'php')                            echoError('Warning: session.serialize_handler is not \'php\': '.ini_get('session.serialize_handler'));
 if (ini_get('session.auto_start'))                                            echoError('Warning: session.auto_start is not Off');
 if (!ini_get('session.use_cookies'))                                          echoError('Warning: session.use_cookies is not On' );
