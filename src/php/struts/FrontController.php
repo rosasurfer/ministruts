@@ -66,17 +66,17 @@ class FrontController extends Singleton {
 
 
    /**
+    * Sucht die Konfigurationsdatei, liest sie ein und parst sie in ein XML-Objekt. Die XML-Datei wird validiert.
+    *
     * @return SimpleXMLElement
     */
    private function loadConfiguration() {
-      $fileName = self ::STRUTS_CONFIG_FILE;
-      //if (!is_file($fileName))     throw new FileNotFoundException('No such file: '.$fileName);
-      //if (!is_readable($fileName)) throw new IOException('File is not readable: '.$fileName);
+      $fileName = APPLICATION_ROOT.DIRECTORY_SEPARATOR.'WEB-INF'.DIRECTORY_SEPARATOR.self ::STRUTS_CONFIG_FILE;
+      if (!is_file($fileName))     throw new FileNotFoundException('Configuration file not found: '.$fileName);
+      if (!is_readable($fileName)) throw new IOException('File is not readable: '.$fileName);
+      $content = file_get_contents($fileName, false);
 
-      $xml = file_get_contents($fileName, true);      // !!! der Include-Path darf nicht durchsucht werden !!!
-
-
-      // Rootverzeichnis der Library ermitteln
+      // DTD suchen, Rootverzeichnis der Library ermitteln
       $dirs = explode(DIRECTORY_SEPARATOR, dirName(__FILE__));
       while (($dir=array_pop($dirs)) !== null)
          if ($dir == 'src')
@@ -87,13 +87,13 @@ class FrontController extends Singleton {
 
       $cwd = getCwd();
       try {
-         // ins Rootverzeichnis wechseln, damit die DTD gefunden wird
+         // ins Rootverzeichnis wechseln
          chdir($libroot);
       }
       catch (Exception $ex) { throw new RuntimeException('Could not change working directory to "'.$libroot.'"', $ex); }
 
-      // Datei laden und validieren ...
-      $object = new SimpleXMLElement($xml, LIBXML_DTDVALID);
+      // Konfiguration parsen und validieren ...
+      $object = new SimpleXMLElement($content, LIBXML_DTDVALID);
 
       try {
          // zurück ins Ausgangsverzeichnis wechseln
