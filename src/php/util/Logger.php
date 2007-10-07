@@ -47,7 +47,7 @@ class Logger extends StaticFactory {
     *
     * @return int - Loglevel
     */
-   private static function getLogLevel($class) {
+   public static function getLogLevel($class) {
       if ($class === '')
          return $GLOBALS['__logLevelSettings'][''];      // Default-Loglevel
 
