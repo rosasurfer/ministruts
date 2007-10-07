@@ -172,16 +172,23 @@ class ActionMapping extends Object {
 
 
    /**
-    * Fügt dem ActionMapping einen ActionForward hinzu.
+    * Fügt dem ActionMapping unter dem angegebenen Namen einen ActionForward hinzu. Der angegebene
+    * Name kann vom internen Namen des Forwards abweichen, sodaß die Definition von Aliassen möglich
+    * ist (ein Forward ist unter mehreren Namen auffindbar).
     *
+    * @param string        $name
     * @param ActionForward $forward
     *
     * @return ActionMapping
     */
-   public function addForward(ActionForward $forward) {
+   public function addForward($name, ActionForward $forward) {
       if ($this->configured) throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($name)) throw new IllegalTypeException('Illegal type of argument $name: '.getType($name));
 
-      $this->forwards[$forward->getName()] = $forward;
+      if (isSet($this->forwards[$name]))
+         throw new RuntimeException('Non-unique identifier detected for local ActionForwards: '.$name);
+
+      $this->forwards[$name] = $forward;
       return $this;
    }
 
@@ -190,10 +197,19 @@ class ActionMapping extends Object {
     * Friert die Konfiguration dieser Komponente ein.
     */
    public function freeze() {
-      $this->configured = true;
+      if (!$this->configured) {
 
-      foreach ($this->forwards as $forward)
-         $forward->freeze();
+         if ($this->path === null)
+            throw new IllegalStateException('No path configured for this '.$this);
+
+         if ($this->action === null && $this->forward === null)
+            throw new IllegalStateException('Neither an action nor a forward configured for this '.$this);
+
+         foreach ($this->forwards as $forward)
+            $forward->freeze();
+
+         $this->configured = true;
+      }
    }
 
 
@@ -211,10 +227,20 @@ class ActionMapping extends Object {
          return $this->forwards[$name];
 
       $forward = $this->moduleConfig->findForward($name);
-      if (!$forward)
-         Logger ::log('No ActionForward found for name: '.$name, L_WARN, __CLASS__);
+      if (!$forward && $this->configured)
+         Logger ::log('No ActionForward found for name: '.$name, L_ERROR, __CLASS__);
 
       return $forward;
+   }
+
+
+   /**
+    * Return a human readable string representation of this instance.
+    *
+    * @return string
+    */
+   public function __toString() {
+       return print_r($this, true);
    }
 }
 ?>

@@ -8,6 +8,10 @@ class RequestProcessor extends Object {
    // ModuleConfig, zu der wir gehören
    protected /* ModuleConfig */ $moduleConfig;
 
+   private $logDebug;
+   private $logInfo;
+   private $logNotice;
+
 
    /**
     * Erzeugt einen neuen RequestProcessor.
@@ -15,6 +19,12 @@ class RequestProcessor extends Object {
     * @param ModuleConfig $config - Modulkonfiguration, der dieser RequestProcessor zugeordnet ist
     */
    public function __construct(ModuleConfig $config) {
+      $loglevel = Logger ::getLogLevel(__CLASS__);
+
+      $this->logDebug  = ($loglevel <= L_DEBUG);
+      $this->logInfo   = ($loglevel <= L_INFO);
+      $this->logNotice = ($loglevel <= L_NOTICE);
+
       $this->moduleConfig = $config;
    }
 
@@ -25,7 +35,7 @@ class RequestProcessor extends Object {
     * @param Request  $request
     * @param Response $response
     */
-   public function process(Request $request, Response $response) {
+   final public function process(Request $request, Response $response) {
 
       // Pfad zur Actionauswahl ermitteln
       $path = $this->processPath($request, $response);
@@ -41,8 +51,10 @@ class RequestProcessor extends Object {
 
 
       // allgemeinen Preprocessing-Hook aufrufen
-      if (!$this->processPreprocess($request, $response))
+      if (!$this->processPreprocess($request, $response)) {
+         $this->logDebug && Logger ::log('Preprocessor hook returned false', L_DEBUG, __CLASS__);
          return;
+      }
 
 
       // ActionMessages, auf die schon zugegriffen wurde, aus der Session löschen
@@ -51,13 +63,17 @@ class RequestProcessor extends Object {
 
       // das entsprechende ActionMapping ermitteln
       $mapping = $this->processMapping($request, $response, $path);
-      if ($mapping === null)
+      if (!$mapping) {
+         $this->logDebug && Logger ::log('Could not find a mapping for this request', L_DEBUG, __CLASS__);
          return;
+      }
 
 
       // ggf. benötigte Rollen überprüfen
-      if (!$this->processRoles($request, $response, $mapping))
+      if (!$this->processRoles($request, $response, $mapping)) {
+         $this->logDebug && Logger ::log('User does not have any required role, denying access', L_DEBUG, __CLASS__);
          return;
+      }
 
 
       // falls im Mapping statt einer Action ein Forward konfiguriert wurde, diesen verarbeiten
@@ -182,8 +198,7 @@ class RequestProcessor extends Object {
    protected function processMapping(Request $request, Response $response, $path) {
       $mapping = $this->moduleConfig->findActionMapping($path);
 
-      if ($mapping === null) {      // no mapping can be found to process this request
-         //$response->sendError(404, "Invalid path: $path");
+      if (!$mapping) {      // no mapping can be found to process this request
          echoPre("Not found: 404\n\nThe requested URL $path was not found on this server");
       }
 
@@ -283,8 +298,16 @@ class RequestProcessor extends Object {
     * @param ActionForward $forward
     */
    protected function processActionForward(Request $request, Response $response, ActionForward $forward=null) {
-      if ($forward)
-         $this->doForward($forward);
+      if ($forward) {
+         if ($forward->isRedirect()) {
+            echoPre('redirect');
+         }
+         else {
+            // include
+            echoPre('include');
+         }
+         echoPre($forward);
+      }
    }
 }
 ?>

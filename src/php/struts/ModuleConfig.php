@@ -22,14 +22,21 @@ class ModuleConfig extends Object {
 
 
    /**
-    * Fügt dieser Modulkonfiguration einen globalen ActionForward hinzu.
+    * Fügt dieser Modulkonfiguration unter dem angegebenen Namen einen globalen ActionForward hinzu.
+    * Der angegebene Name kann vom internen Namen des Forwards abweichen, sodaß die Definition von Aliassen
+    * möglich ist (ein Forward ist unter mehreren Namen auffindbar).
     *
+    * @param string        $name
     * @param ActionForward $forward
     */
-   public function addGlobalForward(ActionForward $forward) {
+   public function addGlobalForward($name, ActionForward $forward) {
       if ($this->configured) throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($name)) throw new IllegalTypeException('Illegal type of argument $name: '.getType($name));
 
-      $this->globalForwards[$forward->getName()] = $forward;
+      if (isSet($this->globalForwards[$name]))
+         throw new RuntimeException('Non-unique identifier detected for global ActionForwards: '.$name);
+
+      $this->globalForwards[$name] = $forward;
    }
 
 
@@ -94,13 +101,15 @@ class ModuleConfig extends Object {
     * Friert die Konfiguration ein, sodaß sie später nicht mehr geändert werden kann.
     */
    public function freeze() {
-      foreach ($this->globalForwards as $forward)
-         $forward->freeze();
+      if (!$this->configured) {
+         foreach ($this->globalForwards as $forward)
+            $forward->freeze();
 
-      foreach ($this->mappings as $mapping)
-         $mapping->freeze();
+         foreach ($this->mappings as $mapping)
+            $mapping->freeze();
 
-      $this->configured = true;
+         $this->configured = true;
+      }
    }
 
 

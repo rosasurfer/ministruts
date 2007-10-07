@@ -15,7 +15,7 @@
 class FrontController extends Singleton {
 
 
-   const STRUTS4P_CONFIG_FILE = 'php-struts-config.xml';
+   const STRUTS_CONFIG_FILE = 'struts-config.xml';
 
 
    // es gibt zur Zeit nur ein Modul (daß sich nicht ändern kann)
@@ -60,7 +60,7 @@ class FrontController extends Singleton {
          $this->moduleConfig = $config;
       }
       catch (Exception $ex) {
-         throw new RuntimeException('Error loading '.self ::STRUTS4P_CONFIG_FILE, $ex);
+         throw new RuntimeException('Error loading '.self ::STRUTS_CONFIG_FILE, $ex);
       }
    }
 
@@ -69,7 +69,7 @@ class FrontController extends Singleton {
     * @return SimpleXMLElement
     */
    private function loadConfiguration() {
-      $fileName = self ::STRUTS4P_CONFIG_FILE;
+      $fileName = self ::STRUTS_CONFIG_FILE;
       //if (!is_file($fileName))     throw new FileNotFoundException('No such file: '.$fileName);
       //if (!is_readable($fileName)) throw new IOException('File is not readable: '.$fileName);
 
@@ -109,10 +109,25 @@ class FrontController extends Singleton {
     */
    private function initGlobalForwards(ModuleConfig $config, SimpleXMLElement $xml) {
       if ($xml->{'global-forwards'}) {
-         foreach ($xml->{'global-forwards'}->forward as $forward) {
-            $config->addGlobalForward(new ActionForward((string) $forward['name'],
-                                                        (string) $forward['path'],
-                                                        (string) $forward['redirect'] == 'true'));
+         foreach ($xml->{'global-forwards'}->forward as $elem) {
+            if (sizeOf($elem->attributes()) > 2)
+               throw new RuntimeException('Only one of "include", "redirect" or "alias" must be specified for global forward "'.$elem['name'].'"');
+
+            $name = (string) $elem['name'];
+            $forward = null;
+
+            if ($path = (string) $elem['include']) {
+               $forward = new ActionForward($name, $path, false);
+            }
+            elseif ($path = (string) $elem['redirect']) {
+               $forward = new ActionForward($name, $path, true);
+            }
+            elseif ($alias = (string) $elem['alias']) {
+               $forward = $config->findForward($alias);
+               if (!$forward)
+                  throw new RuntimeException('No ActionForward found for alias: '.$alias);
+            }
+            $config->addGlobalForward($name, $forward);
          }
       }
    }
@@ -122,19 +137,34 @@ class FrontController extends Singleton {
     */
    private function initMappings(ModuleConfig $config, SimpleXMLElement $xml) {
       if ($xml->{'action-mappings'}) {
-         foreach ($xml->{'action-mappings'}->action as $action) {
+         foreach ($xml->{'action-mappings'}->mapping as $elem) {
             $mapping = new ActionMapping($config);
+            $mapping->setPath((string) $elem['path']);
 
-            if (isSet($action['path'   ])) $mapping->setPath   ((string) $action['path'   ]);
-            if (isSet($action['forward'])) $mapping->setForward((string) $action['forward']);
-            if (isSet($action['type'   ])) $mapping->setAction ((string) $action['type'   ]);
-            if (isSet($action['form'   ])) $mapping->setForm   ((string) $action['form'   ]);
-            if (isSet($action['default'])) $mapping->setDefault((string) $action['default'] == 'true');
+            if (isSet($elem['action' ])) $mapping->setAction ((string) $elem['action'   ]);
+            if (isSet($elem['forward'])) $mapping->setForward((string) $elem['forward']);
+            if (isSet($elem['form'   ])) $mapping->setForm   ((string) $elem['form'   ]);
+            if (isSet($elem['default'])) $mapping->setDefault((string) $elem['default'] == 'true');
 
-            foreach ($action->forward as $forward) {
-               $mapping->addForward(new ActionForward((string) $forward['name'],
-                                                      (string) $forward['path'],
-                                                      (string) $forward['redirect'] == 'true'));
+            foreach ($elem->forward as $elem) {
+               if (sizeOf($elem->attributes()) > 2)
+                  throw new RuntimeException('Only one of "include", "redirect" or "alias" must be specified for local forward "'.$elem['name'].'"');
+
+               $name = (string) $elem['name'];
+               $forward = null;
+
+               if ($path = (string) $elem['include']) {
+                  $forward = new ActionForward($name, $path, false);
+               }
+               elseif ($path = (string) $elem['redirect']) {
+                  $forward = new ActionForward($name, $path, true);
+               }
+               elseif ($alias = (string) $elem['alias']) {
+                  $forward = $mapping->findForward($alias);
+                  if (!$forward)
+                     throw new RuntimeException('No ActionForward found for alias: '.$alias);
+               }
+               $mapping->addForward($name, $forward);
             }
             $config->addActionMapping($mapping);
          }

@@ -2,39 +2,27 @@
 /**
  * ActionForward
  *
- * Ein ActionForward bezeichnet ein Ziel, zu dem nach Aufruf einer Action verzweigt wird.
- * Instanzen dieser Klasse können innerhalb eines ActionMapping konfiguriert oder bei Bedarf
- * auch manuell erzeugt werden.
- *
- * Ein ActionForward hat mindestens die folgenden Eigenschaften:
+ * Ein ActionForward bezeichnet ein Ziel, zu dem nach Aufruf einer Action verzweigt wird, mit den folgenden Eigenschaften:
  *
  *   name     - logischer Name, unter dem der ActionForward gefunden werden kann
- *
- *   path     - HTML-Layout (beginnend mit '/'), Klassenname eines Layouts oder URL (wenn Redirect)
- *
- *   redirect - ob der ActionForward einen Redirect auslösen soll (default: false)
+ *   path     - physische Resource (z.B. HTML-Datei), Klassenname eines Layouts oder URL
+ *   redirect - ob ein Redirect ausgelöst werden soll (nur bei URL, default: false)
  */
 class ActionForward extends Object {
 
 
-   private $name;                   // string
-   private $path;                   // string
-   private $redirect;               // boolean
+   protected $name;                  // string
+   protected $path;                  // string
+   protected $redirect;              // boolean
 
    // ob diese Komponente vollständig konfiguriert ist
-   private $configured = false;     // boolean
+   protected $configured = false;    // boolean
 
 
    // Getter
    public function getName()    { return $this->name;     }
    public function getPath()    { return $this->path;     }
    public function isRedirect() { return $this->redirect; }
-
-
-   // new ActionForward()->
-   public static function create() {
-      return new self();
-   }
 
 
    /**
@@ -100,21 +88,28 @@ class ActionForward extends Object {
 
 
    /**
-    * Friert die Konfiguration dieser Komponente ein.
+    * Friert die Konfiguration dieser Komponente ein. Nachdem Aufruf dieser Methode kann die Konfiguration der Komponente
+    * nicht mehr verändert werden.
     */
    public function freeze() {
-      $this->configured = true;
+      if (!$this->configured) {
+         $this->configured = true;
+      }
    }
 
 
    /**
-    * Erzeugt einen neuen ActionForward, der auf dieser Instanz basiert.
-    * Nützlich zum manuellen Erzeugen und Modifizieren von vorhandenen ActionForwards.
+    * Erzeugt einen neuen ActionForward, der auf dieser Instanz basiert. Die Konfiguration des neuen Forwards ist
+    * noch nicht eingefroren, sodaß diese Methode zum "Modifizieren" vorhandener Forwards benutzt werden kann.
     *
     * @return ActionForward
+    *
+    * @see ActionForward::freeze()
     */
    public function copy() {
-      return new self($this->getName(), $this->getPath(), $this->isRedirect());
+      $forward = clone $this;
+      $forward->configured = false;
+      return $forward;
    }
 }
 ?>
