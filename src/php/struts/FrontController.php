@@ -19,7 +19,7 @@ class FrontController extends Singleton {
 
 
    // es gibt zur Zeit nur ein Modul (daß sich nicht ändern kann)
-   private /* ModuleConfig */ $moduleConfig;
+   private /*ModuleConfig*/ $moduleConfig;
 
 
    /**

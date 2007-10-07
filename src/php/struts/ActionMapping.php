@@ -19,7 +19,7 @@ class ActionMapping extends Object {
    protected $configured = false;     // boolean
 
    // ModuleConfig, zu der wir gehören
-   protected $moduleConfig;
+   protected /*ModuleConfig*/ $moduleConfig;
 
 
    /**
@@ -205,8 +205,11 @@ class ActionMapping extends Object {
          if ($this->action === null && $this->forward === null)
             throw new IllegalStateException('Neither an action nor a forward configured for this '.$this);
 
-         foreach ($this->forwards as $forward)
+         foreach ($this->forwards as $forward) {
+            if ($forward->isRedirect() && $forward->getPath()==='__self')
+               $forward->setPath($this->path);
             $forward->freeze();
+         }
 
          $this->configured = true;
       }

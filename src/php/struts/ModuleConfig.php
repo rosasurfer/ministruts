@@ -5,14 +5,9 @@
 class ModuleConfig extends Object {
 
 
-   // globale ActionForwards
    private $globalForwards = array();
-
-   // ActionMappings
-   private $mappings = array();
-
-   // Default-ActionMapping (wenn angegeben)
-   private $defaultMapping;
+   private $mappings       = array();
+   private /* ActionMapping */ $defaultMapping;
 
    // Klassenname der RequestProcessor-Implementierung, die für dieses Module benutzt wird
    private $processorClass = 'RequestProcessor';
@@ -35,6 +30,9 @@ class ModuleConfig extends Object {
 
       if (isSet($this->globalForwards[$name]))
          throw new RuntimeException('Non-unique identifier detected for global ActionForwards: '.$name);
+
+      if ($forward->isRedirect() && $forward->getPath()==='__self')
+         throw new RuntimeException('You cannot use the magic __self keyword on global forwards: '.$name);
 
       $this->globalForwards[$name] = $forward;
    }

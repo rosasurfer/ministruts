@@ -5,7 +5,7 @@
 abstract class Action extends Object {
 
 
-   protected $mapping;
+   protected /*ActionMapping*/ $mapping;
 
 
    /**

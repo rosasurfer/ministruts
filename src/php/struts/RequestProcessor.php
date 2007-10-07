@@ -104,6 +104,8 @@ class RequestProcessor extends Object {
     *
     * @param Request  $request
     * @param Response $response
+    *
+    * @return string
     */
    protected function processPath(Request $request, Response $response) {
       $path = $request->getPathInfo();
