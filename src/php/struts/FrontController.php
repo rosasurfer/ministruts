@@ -49,8 +49,16 @@ class FrontController extends Singleton {
     * Lädt die Struts-Konfiguration und parst und kompiliert sie.
     */
    protected function __construct() {
+      if (!defined('APPLICATION_ROOT_DIRECTORY'))
+         define('APPLICATION_ROOT_DIRECTORY', dirName($_SERVER['SCRIPT_FILENAME']));
+
+      if (!defined('APPLICATION_ROOT_URL')) {
+         $url = subStr($_SERVER['SCRIPT_FILENAME'], strLen($_SERVER['DOCUMENT_ROOT']));
+         define('APPLICATION_ROOT_URL', subStr($url, 0, strRPos($url, '/')));
+      }
+
       try {
-         // !!! Wir müssen zuerst prüfen, ob der Zugriff auf WEB-INF und CVS-Verzeichnisse gesperrt ist !!!
+         // !!! Wir müssen prüfen, ob der Zugriff auf WEB-INF und CVS-Verzeichnisse gesperrt ist !!!
 
          $xmlObject = $this->loadConfiguration();
 
