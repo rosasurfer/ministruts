@@ -205,6 +205,11 @@ class ActionMapping extends Object {
          if ($this->action === null && $this->forward === null)
             throw new IllegalStateException('Neither an action nor a forward configured for this '.$this);
 
+         // try to find a matching ActionForm
+         if ($this->action!==null && $this->form===null && isImportedClass($this->action.'Form')) {
+            $this->setForm($this->action.'Form');
+         }
+
          foreach ($this->forwards as $forward) {
             if ($forward->isRedirect() && $forward->getPath()==='__self')
                $forward->setPath($this->path);

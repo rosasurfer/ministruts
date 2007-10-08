@@ -5,15 +5,65 @@
 class ModuleConfig extends Object {
 
 
-   private $globalForwards = array();
-   private $mappings       = array();
-   private /* ActionMapping */ $defaultMapping;
+   /**
+    * Ob diese Komponente vollständig konfiguriert ist. Wenn dieses Flag gesetzt ist, wirft jeder Versuch,
+    * die Konfiguration zu ändern, eine IllegalStateException.
+    */
+   protected $configured = false;
+
+
+   /**
+    * Der Prefix dieses Modules relative zur APPLICATION_ROOT_URL. Anhand dieses Prefixes werden die
+    * verschiedenen Module einer Anwendung unterschieden.  Die ModuleConfig mit dem Leerstring als Prefix
+    * ist die Default-Konfiguration der Anwendung.
+    */
+   protected $prefix;
+
+
+   protected $globalForwards = array();
+   protected $mappings       = array();
+   protected /* ActionMapping */ $defaultMapping;
+
 
    // Klassenname der RequestProcessor-Implementierung, die für dieses Module benutzt wird
-   private $processorClass = 'RequestProcessor';
+   protected $processorClass = 'RequestProcessor';
 
-   // Ob diese Komponente vollständig konfiguriert ist.
-   private $configured = false;
+
+   /**
+    * Erzeugt eine neue ModuleConfig.
+    *
+    * @param string $prefix     - der Prefix dieses Modules relativ zur Basis-URL der Anwendung
+    * @param string $configfile - Pfad zur Konfigurationsdatei dieses Modules
+    */
+   public function __construct($prefix, $configfile) {
+      $this->setPrefix($prefix);
+
+      // parse XML-config
+   }
+
+
+   /**
+    * Gibt den Prefix dieser ModuleConfig zurück. Anhand dieses Prefix werde die verschiedenen Module der
+    * Anwendung unterschieden.
+    *
+    * @return string
+    */
+   public function getPrefix() {
+      return $this->prefix;
+   }
+
+
+   /**
+    * Setzt den Prefix der ModuleConfig.
+    *
+    * @param string prefix
+    */
+   public function setPrefix($prefix) {
+      if ($this->configured)   throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($prefix)) throw new IllegalTypeException('Illegal type of argument $prefix: '.getType($prefix));
+
+      $this->prefix = $prefix;
+   }
 
 
    /**

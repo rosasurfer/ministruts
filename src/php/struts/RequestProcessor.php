@@ -87,8 +87,8 @@ class RequestProcessor extends Object {
       $form = $this->processActionForm($request, $response, $mapping);
 
 
-      // Action des Mappings erzeugen
-      $action = $this->processActionCreate($request, $response, $mapping);
+      // Action des Mappings erzeugen (Form wird schon hier übergeben, damit im User-Code NPEs vermieden werden)
+      $action = $this->processActionCreate($request, $response, $mapping, $form);
 
 
       // Action aufrufen
@@ -111,9 +111,8 @@ class RequestProcessor extends Object {
     */
    protected function processPath(Request $request, Response $response) {
       $path = $request->getPathInfo();
-
-      // führende Verzeichnisse abschneiden
-      return strRChr($path, '/'); // !!! to-do: Module prefix abschneiden
+      // Context-URL abschneiden
+      return subStr($path, strLen(APPLICATION_ROOT_URL));   // !!! to-do: Module prefix abschneiden
    }
 
 
@@ -270,12 +269,13 @@ class RequestProcessor extends Object {
     * @param Request       $request
     * @param Response      $response
     * @param ActionMapping $mapping
+    * @param ActionForm    $form     - ActionForm, die konfiguriert wurde oder NULL
     *
     * @return Action
     */
-   protected function processActionCreate(Request $request, Response $response, ActionMapping $mapping) {
+   protected function processActionCreate(Request $request, Response $response, ActionMapping $mapping, ActionForm $form=null) {
       $class = $mapping->getAction();
-      return new $class($mapping);
+      return new $class($mapping, $form);
    }
 
 
@@ -285,12 +285,11 @@ class RequestProcessor extends Object {
     * @param Request    $request
     * @param Response   $response
     * @param Action     $action
-    * @param ActionForm $form
     *
     * @return ActionForward
     */
-   protected function processActionExceute(Request $request, Response $response, Action $action, ActionForm $form=null) {
-      return $action->execute($form, $request, $response);
+   protected function processActionExceute(Request $request, Response $response, Action $action) {
+      return $action->execute($request, $response);
    }
 
 

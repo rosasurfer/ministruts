@@ -19,7 +19,7 @@ class FrontController extends Singleton {
 
 
    // es gibt zur Zeit nur ein Modul (daß sich nicht ändern kann)
-   private /*ModuleConfig*/ $moduleConfig;
+   private /* ModuleConfig */ $moduleConfig;
 
 
    /**
@@ -50,9 +50,13 @@ class FrontController extends Singleton {
     */
    protected function __construct() {
       try {
+         // !!! Wir müssen zuerst prüfen, ob der Zugriff auf WEB-INF und CVS-Verzeichnisse gesperrt ist !!!
+
          $xmlObject = $this->loadConfiguration();
 
-         $config = new ModuleConfig();
+         $configfile = APPLICATION_ROOT_DIRECTORY.DIRECTORY_SEPARATOR.'WEB-INF'.DIRECTORY_SEPARATOR.self ::STRUTS_CONFIG_FILE;
+         $config = new ModuleConfig('', $configfile);
+
          $this->initGlobalForwards($config, $xmlObject);
          $this->initMappings($config, $xmlObject);
          $config->freeze();
@@ -71,7 +75,7 @@ class FrontController extends Singleton {
     * @return SimpleXMLElement
     */
    private function loadConfiguration() {
-      $fileName = APPLICATION_ROOT.DIRECTORY_SEPARATOR.'WEB-INF'.DIRECTORY_SEPARATOR.self ::STRUTS_CONFIG_FILE;
+      $fileName = APPLICATION_ROOT_DIRECTORY.DIRECTORY_SEPARATOR.'WEB-INF'.DIRECTORY_SEPARATOR.self ::STRUTS_CONFIG_FILE;
       if (!is_file($fileName))     throw new FileNotFoundException('Configuration file not found: '.$fileName);
       if (!is_readable($fileName)) throw new IOException('File is not readable: '.$fileName);
       $content = file_get_contents($fileName, false);

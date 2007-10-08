@@ -130,9 +130,9 @@
                      with a "/" character, and without the filename extension if
                      extension mapping is used.
 
-                     NOTE:  Do *not* include a period in your path name,
-                     because it will look like a filename extension and
-                     cause your Action to not be located.
+                     NOTE:  Do *not* include a period in your path name, because 
+                     it will look like a filename extension and cause your Action 
+                     to not be located.
 
      forward         Module-relative path of the resource that will process this 
                      request, instead of the Action class specified by "type".  
@@ -146,8 +146,12 @@
                      attribute is specified.  Exactly one of "forward" or "type" 
                      must be specified.
 
-     form            Class name of the action form subclass [ActionForm],
-                     if any, that is associated with this action mapping.
+     form            Class name of the action form subclass [ActionForm], if any, 
+                     that is associated with this action mapping.  If an action 
+                     form with a name matching the corresponding action name is 
+                     found that action form is used.  So if you carefully name your 
+                     classes (ie. "DoThatAction" and "DoThatActionForm") you don't 
+                     have to specify this value.
 
      parameter       General-purpose configuration parameter that can be used to
                      pass extra information to the Action object selected by
