@@ -115,6 +115,20 @@ function __autoload($className) {
 
 
 /**
+ * Ob die angegebene Klasse als Import deklariert wurde.  Diese Funktion ist notwendig, da eine einfache Abfrage der Art
+ * "if (class_exist($className, true))" nicht funktioniert, weil __autoload() Exceptions nicht zurückwerfen kann.
+ * Der Klassenname wird hier daher ohne Aufruf von __autoload() geprüft.
+ *
+ * @param string $className - Klassenname
+ *
+ * @see __autoLoad()
+ */
+function isImportedClass($className) {
+   return isSet($GLOBALS['__imports'][$className]);
+}
+
+
+/**
  * Führt eine SQL-Anweisung aus. Dabei wird eine evt. schon offene Verbindung weiterverwendet.
  *
  * @param string $sql - die auszuführende SQL-Anweisung
