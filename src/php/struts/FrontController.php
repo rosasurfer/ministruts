@@ -7,10 +7,10 @@
  *
  * Hintergrund ist, daß es nur eine Instanz gibt, die aus Performance-Gründen im Cache zwischengehalten und für jeden Request
  * wiederverwendet wird. Wenn nun z.B. eine Variable vor dem Speichern im Cache mit einem Zwischenwert belegt würde, dann würde
- * dieser Wert an weitere Requests weitergereicht, wodurch deren Abarbeitung unerwartet gestört werden könnte.
+ * dieser Wert an weitere Requests weitergereicht, wodurch deren Verarbeitung gestört werden könnte.
  *
  * Als einfache Richtlinie läßt sich sagen, daß außerhalb von Funktionen keine Variablen angelegt werden dürfen.
- * Wird das eingehalten, ist er thread-sicher.
+ * Wird das eingehalten, ist er "thread-sicher".
  */
 class FrontController extends Singleton {
 
@@ -41,9 +41,9 @@ class FrontController extends Singleton {
       // Anwendungskonfiguration laden
 
 
-
       // development only (don't uses cache)
-      //return Singleton ::getInstance(__CLASS__);
+      return Singleton ::getInstance(__CLASS__);
+
 
       $instance = Cache ::get($key=__CLASS__.'_instance');
       if (!$instance) {
@@ -62,6 +62,7 @@ class FrontController extends Singleton {
    protected function __construct() {
       // Webumgebung prüfen      !!! prüfen, ob Zugriff auf WEB-INF und CVS gesperrt ist !!!
 
+
       // Alle Struts-Konfigurationen in WEB-INF suchen
       $baseName = baseName(self:: STRUTS_CONFIG_FILE, '.xml');
       $files = glob(APPLICATION_ROOT_DIRECTORY.'/WEB-INF/'.$baseName.'*.xml', GLOB_ERR);
@@ -69,7 +70,7 @@ class FrontController extends Singleton {
          throw new FileNotFoundException('Configuration file not found: '.self:: STRUTS_CONFIG_FILE);
 
 
-      // Für jede Struts-Konfiguration eine ModuleConfig-Instanze erzeugen und den Prefix registrieren
+      // Für jede Struts-Konfiguration eine ModuleConfig-Instanz erzeugen und registrieren
       try {
          foreach ($files as $file) {
             $config = new ModuleConfig($file);
@@ -84,7 +85,7 @@ class FrontController extends Singleton {
 
 
    /**
-    * Registriert den Modul-Prefix der übergebenen ModuleConfig-Instanze.
+    * Registriert den Modul-Prefix der übergebenen ModuleConfig-Instanz.
     *
     * @param ModuleConfig $config
     */
@@ -99,11 +100,11 @@ class FrontController extends Singleton {
 
 
    /**
-    * Gibt den Prefix des Moduls zurück, zu dem der angegebene Request gehört.
+    * Gibt den Prefix des Moduls zurück, das den angegebenen Request verarbeitet.
     *
     * @param Request request
     *
-    * @return string - Modulprefix oder "" für das default-Modul
+    * @return string - Modulprefix bzw. "" für das Default-Modul
     */
    private function getModulePrefix(Request $request) {
       $pathInfo = $request->getPathInfo();
