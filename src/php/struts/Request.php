@@ -13,6 +13,7 @@ final class Request extends Singleton {
    const MESSAGE_KEY = '__ACTION_MESSAGES__';
 
    private $method;
+   private $pathInfo;
 
 
    /**
@@ -32,7 +33,7 @@ final class Request extends Singleton {
     * Konstruktor
     */
    protected function __construct() {
-      $this->method = $_SERVER['REQUEST_METHOD'];
+      $this->method   = $_SERVER['REQUEST_METHOD'];
    }
 
 
@@ -70,7 +71,10 @@ final class Request extends Singleton {
     * Gibt die Pfadkomponente der URL des Requests zurück.
     */
    public function getPathInfo() {
-      return $_SERVER['PHP_SELF'];
+      if ($this->pathInfo === null) {
+         $this->pathInfo = $_SERVER['PHP_SELF'] = preg_replace('/\/{2,}/', '/', $_SERVER['PHP_SELF']);
+      }
+      return $this->pathInfo;
    }
 
 

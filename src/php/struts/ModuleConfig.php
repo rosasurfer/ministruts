@@ -6,39 +6,198 @@ class ModuleConfig extends Object {
 
 
    /**
+    * Der Klassenname der Default-RequestProcessor-Implementierung.
+    */
+   const DEFAULT_PROCESSOR_CLASS = 'RequestProcessor';
+
+
+   /**
+    * Der Klassenname der Default-ActionMapping-Implementierung.
+    */
+   const DEFAULT_MAPPING_CLASS = 'ActionMapping';
+
+
+   /**
+    * Der Klassenname der Default-ActionForward-Implementierung.
+    */
+   const DEFAULT_FORWARD_CLASS = 'ActionForward';
+
+
+   /**
     * Ob diese Komponente vollständig konfiguriert ist. Wenn dieses Flag gesetzt ist, wirft jeder Versuch,
-    * die Konfiguration zu ändern, eine IllegalStateException.
+    * die Komponente zu ändern, eine IllegalStateException.
     */
    protected $configured = false;
 
 
    /**
-    * Der Prefix dieses Modules relative zur APPLICATION_ROOT_URL. Anhand dieses Prefixes werden die
-    * verschiedenen Module einer Anwendung unterschieden.  Die ModuleConfig mit dem Leerstring als Prefix
-    * ist die Default-Konfiguration der Anwendung.
+    * Der Prefix dieses Modules relative zur ROOT_URL der Anwendung.  Die Prefixe innerhalb einer Anwendung
+    * sind eindeutig.  Die ModuleConfig mit einem Leerstring als Prefix ist das Default-Module der Anwendung.
     */
-   protected $prefix;
+   protected $prefix;      // string
 
 
-   protected $globalForwards = array();
-   protected $mappings       = array();
-   protected /* ActionMapping */ $defaultMapping;
+   /**
+    * Die globalen Forwards dieses Moduls.
+    */
+   protected /*ActionForward[]*/ $forwards = array();
 
 
-   // Klassenname der RequestProcessor-Implementierung, die für dieses Module benutzt wird
-   protected $processorClass = 'RequestProcessor';
+   /**
+    * Die ActionMappings dieses Moduls.
+    */
+   protected /*ActionMapping[]*/ $mappings = array();
+
+
+   /**
+    * Das Default-ActionMapping dieses Moduls oder NULL, wenn keines definiert wurde.
+    */
+   protected /*ActionMapping*/ $defaultMapping;
+
+
+   /**
+    * Der Klassenname der RequestProcessor-Implementierung, die für dieses Modul definiert ist.
+    */
+   protected $processorClass = self:: DEFAULT_PROCESSOR_CLASS;
+
+
+   /**
+    * Der Klassenname der ActionMapping-Implementierung, die für dieses Modul definiert ist.
+    */
+   protected $mappingClass   = self:: DEFAULT_MAPPING_CLASS;
+
+
+   /**
+    * Der Klassenname der ActionForward-Implementierung, die für dieses Modul definiert ist.
+    */
+   protected $forwardClass   = self:: DEFAULT_FORWARD_CLASS;
 
 
    /**
     * Erzeugt eine neue ModuleConfig.
     *
-    * @param string $prefix     - der Prefix dieses Modules relativ zur Basis-URL der Anwendung
     * @param string $configfile - Pfad zur Konfigurationsdatei dieses Modules
     */
-   public function __construct($prefix, $configfile) {
-      $this->setPrefix($prefix);
+   public function __construct($configfile) {
+      if (!is_string($configfile)) throw new IllegalTypeException('Illegal type of argument $configfile: '.getType($configfile));
 
-      // parse XML-config
+      $xml = $this->loadConfiguration($configfile);
+
+      $this->setPrefix((string) $xml['prefix']);
+      $this->createForwards($xml);
+      $this->createMappings($xml);
+   }
+
+
+   /**
+    * Liest die angegebene Konfigurationsdatei in ein XML-Objekt ein (mit Validierung).
+    *
+    * @param string $fileName - Pfad zur Konfigurationsdatei
+    *
+    * @return SimpleXMLElement
+    */
+   protected function loadConfiguration($fileName) {
+      if (!is_file($fileName))     throw new FileNotFoundException('Configuration file not found: '.$fileName);
+      if (!is_readable($fileName)) throw new IOException('File is not readable: '.$fileName);
+      $content = file_get_contents($fileName, false);
+
+      // die DTD liegt relativ zum Rootverzeichnis der Library
+      $dirs = explode(DIRECTORY_SEPARATOR, dirName(__FILE__));
+      while (($dir=array_pop($dirs)) !== null)
+         if ($dir == 'src')
+            break;
+      if (sizeOf($dirs) == 0)
+         throw new RuntimeException('Could not resolve root path of library, giving up.');
+      $libroot = join(DIRECTORY_SEPARATOR, $dirs);
+
+      $cwd = getCwd();
+      try {
+         // ins Rootverzeichnis wechseln
+         chdir($libroot);
+      }
+      catch (Exception $ex) { throw new RuntimeException('Could not change working directory to "'.$libroot.'"', $ex); }
+
+      // Konfiguration parsen und validieren ...
+      $object = new SimpleXMLElement($content, LIBXML_DTDVALID);
+
+      try {
+         // zurück ins Ausgangsverzeichnis wechseln
+         chdir($cwd);
+      }
+      catch (Exception $ex) { throw new RuntimeException('Could not change working directory back to "'.$cwd.'"', $ex); }
+
+      return $object;
+   }
+
+
+   /**
+    * Liest und erzeugt die im XML-Objekt definierten globalen ActionForwards.
+    *
+    * @param SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
+    */
+   protected function createForwards(SimpleXMLElement $xml) {
+      if ($xml->{'global-forwards'}) {
+         foreach ($xml->{'global-forwards'}->forward as $elem) {
+            if (sizeOf($elem->attributes()) > 2)
+               throw new RuntimeException('Only one of "include", "redirect" or "alias" must be specified for global forward "'.$elem['name'].'"');
+
+            $name = (string) $elem['name'];
+            $forward = null;
+
+            if ($path = (string) $elem['include']) {
+               $forward = new $this->forwardClass($name, $path, false);
+            }
+            elseif ($path = (string) $elem['redirect']) {
+               $forward = new $this->forwardClass($name, $path, true);
+            }
+            elseif ($alias = (string) $elem['alias']) {
+               $forward = $this->findForward($alias);
+               if (!$forward) throw new RuntimeException('No ActionForward found for alias: '.$alias);
+            }
+            $this->addForward($name, $forward);
+         }
+      }
+   }
+
+
+   /**
+    * Liest und erzeugt die im XML-Objekt definierten ActionMappings.
+    *
+    * @param SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
+    */
+   protected function createMappings(SimpleXMLElement $xml) {
+      if ($xml->{'action-mappings'}) {
+         foreach ($xml->{'action-mappings'}->mapping as $elem) {
+            $mapping = new $this->mappingClass($this);
+            $mapping->setPath((string) $elem['path']);
+
+            if (isSet($elem['action' ])) $mapping->setAction ((string) $elem['action'   ]);
+            if (isSet($elem['forward'])) $mapping->setForward((string) $elem['forward']);
+            if (isSet($elem['form'   ])) $mapping->setForm   ((string) $elem['form'   ]);
+            if (isSet($elem['default'])) $mapping->setDefault((string) $elem['default'] == 'true');
+
+            foreach ($elem->forward as $elem) {
+               if (sizeOf($elem->attributes()) > 2)
+                  throw new RuntimeException('Only one of "include", "redirect" or "alias" must be specified for local forward "'.$elem['name'].'"');
+
+               $name = (string) $elem['name'];
+               $forward = null;
+
+               if ($path = (string) $elem['include']) {
+                  $forward = new $this->forwardClass($name, $path, false);
+               }
+               elseif ($path = (string) $elem['redirect']) {
+                  $forward = new $this->forwardClass($name, $path, true);
+               }
+               elseif ($alias = (string) $elem['alias']) {
+                  $forward = $mapping->findForward($alias);
+                  if (!$forward) throw new RuntimeException('No ActionForward found for alias: '.$alias);
+               }
+               $mapping->addForward($name, $forward);
+            }
+            $this->addMapping($mapping);
+         }
+      }
    }
 
 
@@ -58,30 +217,32 @@ class ModuleConfig extends Object {
     *
     * @param string prefix
     */
-   public function setPrefix($prefix) {
+   protected function setPrefix($prefix) {
       if ($this->configured)   throw new IllegalStateException('Configuration is frozen');
       if (!is_string($prefix)) throw new IllegalTypeException('Illegal type of argument $prefix: '.getType($prefix));
+      if ($prefix!=='' && !String ::startsWith($prefix, '/'))
+         throw new IllegalTypeException('Module prefixes must start with a slash "/" character, found: '.$prefix);
 
       $this->prefix = $prefix;
    }
 
 
    /**
-    * Fügt dieser Modulkonfiguration unter dem angegebenen Namen einen globalen ActionForward hinzu.
+    * Fügt dieser Modulkonfiguration einen globalen ActionForward unter dem angegebenen Namen hinzu.
     * Der angegebene Name kann vom internen Namen des Forwards abweichen, sodaß die Definition von Aliassen
     * möglich ist (ein Forward ist unter mehreren Namen auffindbar).
     *
     * @param string        $name
     * @param ActionForward $forward
     */
-   public function addGlobalForward($name, ActionForward $forward) {
+   protected function addForward($name, ActionForward $forward) {
       if ($this->configured) throw new IllegalStateException('Configuration is frozen');
       if (!is_string($name)) throw new IllegalTypeException('Illegal type of argument $name: '.getType($name));
 
-      if (isSet($this->globalForwards[$name]))
-         throw new RuntimeException('Non-unique identifier detected for global ActionForwards: '.$name);
+      if (isSet($this->forwards[$name]))
+         throw new RuntimeException('Non-unique identifier detected for global ActionForward: '.$name);
 
-      $this->globalForwards[$name] = $forward;
+      $this->forwards[$name] = $forward;
    }
 
 
@@ -90,7 +251,7 @@ class ModuleConfig extends Object {
     *
     * @param ActionMapping $mapping
     */
-   public function addActionMapping(ActionMapping $mapping) {
+   protected function addMapping(ActionMapping $mapping) {
       if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
       if ($mapping->isDefault()) {
@@ -112,7 +273,7 @@ class ModuleConfig extends Object {
     *
     * @return ActionMapping
     */
-   public function findActionMapping($path) {
+   public function findMapping($path) {
       if (isSet($this->mappings[$path]))
          return $this->mappings[$path];
 
@@ -126,10 +287,10 @@ class ModuleConfig extends Object {
     *
     * @param string $className
     */
-   public function setProcessorClass($className) {
-      if ($this->configured)                                       throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($className))                                  throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
-      if (!is_subclass_of($className, $parent='RequestProcessor')) throw new InvalidArgumentException("Not a subclass of $parent: ".$className);
+   protected function setProcessorClass($className) {
+      if ($this->configured)                                                   throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($className))                                              throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
+      if (!is_subclass_of($className, $parent=self:: DEFAULT_PROCESSOR_CLASS)) throw new InvalidArgumentException("Not a subclass of $parent: ".$className);
 
       $this->processorClass = $className;
    }
@@ -146,11 +307,63 @@ class ModuleConfig extends Object {
 
 
    /**
-    * Friert die Konfiguration ein, sodaß sie später nicht mehr geändert werden kann.
+    * Setzt den Klassennamen der ActionMapping-Implementierung, die für dieses Modul benutzt wird.
+    * Diese Klasse muß eine Subklasse von ActionMapping sein.
+    *
+    * @param string $className
+    */
+   protected function setMappingClass($className) {
+      if ($this->configured)                                                 throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($className))                                            throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
+      if (!is_subclass_of($className, $parent=self:: DEFAULT_MAPPING_CLASS)) throw new InvalidArgumentException("Not a subclass of $parent: ".$className);
+
+      $this->mappingClass = $className;
+   }
+
+
+   /**
+    * Gibt den Klassennamen der ActionMapping-Implementierung zurück.
+    *
+    * @return string
+    */
+   public function getMappingClass() {
+      return $this->mappingClass;
+   }
+
+
+   /**
+    * Setzt den Klassennamen der ActionForward-Implementierung, die für dieses Modul benutzt wird.
+    * Diese Klasse muß eine Subklasse von ActionForward sein.
+    *
+    * @param string $className
+    */
+   protected function setForwardClass($className) {
+      if ($this->configured)                                                 throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($className))                                            throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
+      if (!is_subclass_of($className, $parent=self:: DEFAULT_FORWARD_CLASS)) throw new InvalidArgumentException("Not a subclass of $parent: ".$className);
+
+      $this->forwardClass = $className;
+   }
+
+
+   /**
+    * Gibt den Klassennamen der ActionForward-Implementierung zurück.
+    *
+    * @return string
+    */
+   public function getForwardClass() {
+      return $this->forwardClass;
+   }
+
+
+   /**
+    * Friert die Konfiguration ein, sodaß sie nicht mehr geändert werden kann.
+    *
+    * @return ModuleConfig
     */
    public function freeze() {
       if (!$this->configured) {
-         foreach ($this->globalForwards as $forward)
+         foreach ($this->forwards as $forward)
             $forward->freeze();
 
          foreach ($this->mappings as $mapping)
@@ -158,6 +371,7 @@ class ModuleConfig extends Object {
 
          $this->configured = true;
       }
+      return $this;
    }
 
 
@@ -170,8 +384,9 @@ class ModuleConfig extends Object {
     * @return ActionForward
     */
    public function findForward($name) {
-      if (isSet($this->globalForwards[$name]))
-         return $this->globalForwards[$name];
+      if (isSet($this->forwards[$name]))
+         return $this->forwards[$name];
+
       return null;
    }
 }

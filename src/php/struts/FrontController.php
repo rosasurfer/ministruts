@@ -18,8 +18,8 @@ class FrontController extends Singleton {
    const STRUTS_CONFIG_FILE = 'struts-config.xml';
 
 
-   // es gibt zur Zeit nur ein Modul (daß sich nicht ändern kann)
-   private /* ModuleConfig */ $moduleConfig;
+   // alle registrierten Module, aufgeschlüssselt nach ihrem Prefix
+   private /*ModuleConfig[]*/ $registeredModules = array();
 
 
    /**
@@ -29,12 +29,23 @@ class FrontController extends Singleton {
     * @return FrontController
     */
    public static function me() {
+      // Root-Verzeichnis und URL definieren
+      if (!defined('APPLICATION_ROOT_DIRECTORY'))
+         define('APPLICATION_ROOT_DIRECTORY', dirName($_SERVER['SCRIPT_FILENAME']));
+
+      if (!defined('APPLICATION_ROOT_URL')) {
+         $url = subStr($_SERVER['SCRIPT_FILENAME'], strLen($_SERVER['DOCUMENT_ROOT']));
+         define('APPLICATION_ROOT_URL', subStr($url, 0, strRPos($url, '/')));
+      }
+
+      // Anwendungskonfiguration laden
+
+
 
       // development only (don't uses cache)
-      return Singleton ::getInstance(__CLASS__);
+      //return Singleton ::getInstance(__CLASS__);
 
-
-      $instance = Cache ::get($key = __CLASS__.'_instance');
+      $instance = Cache ::get($key=__CLASS__.'_instance');
       if (!$instance) {
          $instance = Singleton ::getInstance(__CLASS__);
          Cache ::set($key, $instance);
@@ -49,138 +60,69 @@ class FrontController extends Singleton {
     * Lädt die Struts-Konfiguration und parst und kompiliert sie.
     */
    protected function __construct() {
-      if (!defined('APPLICATION_ROOT_DIRECTORY'))
-         define('APPLICATION_ROOT_DIRECTORY', dirName($_SERVER['SCRIPT_FILENAME']));
+      // Webumgebung prüfen      !!! prüfen, ob Zugriff auf WEB-INF und CVS gesperrt ist !!!
 
-      if (!defined('APPLICATION_ROOT_URL')) {
-         $url = subStr($_SERVER['SCRIPT_FILENAME'], strLen($_SERVER['DOCUMENT_ROOT']));
-         define('APPLICATION_ROOT_URL', subStr($url, 0, strRPos($url, '/')));
-      }
+      // Alle Struts-Konfigurationen in WEB-INF suchen
+      $baseName = baseName(self:: STRUTS_CONFIG_FILE, '.xml');
+      $files = glob(APPLICATION_ROOT_DIRECTORY.'/WEB-INF/'.$baseName.'*.xml', GLOB_ERR);
+      if (sizeOf($files) == 0)
+         throw new FileNotFoundException('Configuration file not found: '.self:: STRUTS_CONFIG_FILE);
 
+
+      // Für jede Struts-Konfiguration eine ModuleConfig-Instanze erzeugen und den Prefix registrieren
       try {
-         // !!! Wir müssen prüfen, ob der Zugriff auf WEB-INF und CVS-Verzeichnisse gesperrt ist !!!
-
-         $xmlObject = $this->loadConfiguration();
-
-         $configfile = APPLICATION_ROOT_DIRECTORY.DIRECTORY_SEPARATOR.'WEB-INF'.DIRECTORY_SEPARATOR.self ::STRUTS_CONFIG_FILE;
-         $config = new ModuleConfig('', $configfile);
-
-         $this->initGlobalForwards($config, $xmlObject);
-         $this->initMappings($config, $xmlObject);
-         $config->freeze();
-
-         $this->moduleConfig = $config;
+         foreach ($files as $file) {
+            $config = new ModuleConfig($file);
+            $config->freeze();
+            $this->registerModule($config);
+         }
       }
       catch (Exception $ex) {
-         throw new RuntimeException('Error loading '.self ::STRUTS_CONFIG_FILE, $ex);
+         throw new RuntimeException('Error loading '.$file, $ex);
       }
    }
 
 
    /**
-    * Sucht die Konfigurationsdatei, liest sie ein und parst sie in ein XML-Objekt. Die XML-Datei wird validiert.
+    * Registriert den Modul-Prefix der übergebenen ModuleConfig-Instanze.
     *
-    * @return SimpleXMLElement
+    * @param ModuleConfig $config
     */
-   private function loadConfiguration() {
-      $fileName = APPLICATION_ROOT_DIRECTORY.DIRECTORY_SEPARATOR.'WEB-INF'.DIRECTORY_SEPARATOR.self ::STRUTS_CONFIG_FILE;
-      if (!is_file($fileName))     throw new FileNotFoundException('Configuration file not found: '.$fileName);
-      if (!is_readable($fileName)) throw new IOException('File is not readable: '.$fileName);
-      $content = file_get_contents($fileName, false);
+   private function registerModule(ModuleConfig $config) {
+      $prefix = $config->getPrefix();
 
-      // DTD suchen, Rootverzeichnis der Library ermitteln
-      $dirs = explode(DIRECTORY_SEPARATOR, dirName(__FILE__));
-      while (($dir=array_pop($dirs)) !== null)
-         if ($dir == 'src')
-            break;
-      if (sizeOf($dirs) == 0)
-         throw new RuntimeException('Could not resolve root path of library, giving up.');
-      $libroot = join(DIRECTORY_SEPARATOR, $dirs);
+      if (isSet($this->registeredModules[$prefix]))
+         throw new RuntimeException('All modules must have unique module prefixes, non-unique: "'.$prefix.'"');
 
-      $cwd = getCwd();
-      try {
-         // ins Rootverzeichnis wechseln
-         chdir($libroot);
-      }
-      catch (Exception $ex) { throw new RuntimeException('Could not change working directory to "'.$libroot.'"', $ex); }
-
-      // Konfiguration parsen und validieren ...
-      $object = new SimpleXMLElement($content, LIBXML_DTDVALID);
-
-      try {
-         // zurück ins Ausgangsverzeichnis wechseln
-         chdir($cwd);
-      }
-      catch (Exception $ex) { throw new RuntimeException('Could not change working directory back to "'.$cwd.'"', $ex); }
-
-      return $object;
+      $this->registeredModules[$prefix] = $config;
    }
 
 
    /**
+    * Gibt den Prefix des Moduls zurück, zu dem der angegebene Request gehört.
+    *
+    * @param Request request
+    *
+    * @return string - Modulprefix oder "" für das default-Modul
     */
-   private function initGlobalForwards(ModuleConfig $config, SimpleXMLElement $xml) {
-      if ($xml->{'global-forwards'}) {
-         foreach ($xml->{'global-forwards'}->forward as $elem) {
-            if (sizeOf($elem->attributes()) > 2)
-               throw new RuntimeException('Only one of "include", "redirect" or "alias" must be specified for global forward "'.$elem['name'].'"');
+   private function getModulePrefix(Request $request) {
+      $pathInfo = $request->getPathInfo();
 
-            $name = (string) $elem['name'];
-            $forward = null;
+      if (!String ::startsWith($pathInfo, APPLICATION_ROOT_URL))
+         throw new RuntimeException('Cannot select module prefix of uri: '.$pathInfo);
 
-            if ($path = (string) $elem['include']) {
-               $forward = new ActionForward($name, $path, false);
-            }
-            elseif ($path = (string) $elem['redirect']) {
-               $forward = new ActionForward($name, $path, true);
-            }
-            elseif ($alias = (string) $elem['alias']) {
-               $forward = $config->findForward($alias);
-               if (!$forward)
-                  throw new RuntimeException('No ActionForward found for alias: '.$alias);
-            }
-            $config->addGlobalForward($name, $forward);
-         }
+      $matchPath = dirName(subStr($pathInfo, strLen(APPLICATION_ROOT_URL)));
+      if ($matchPath === '\\')
+         $matchPath = '';
+
+      while (!isSet($this->registeredModules[$matchPath])) {
+         $lastSlash = strRPos($matchPath, '/');
+         if ($lastSlash === false)
+            throw new RuntimeException('No module configured for uri: '.$pathInfo);
+         $matchPath = subStr($matchPath, 0, $lastSlash);
       }
-   }
 
-
-   /**
-    */
-   private function initMappings(ModuleConfig $config, SimpleXMLElement $xml) {
-      if ($xml->{'action-mappings'}) {
-         foreach ($xml->{'action-mappings'}->mapping as $elem) {
-            $mapping = new ActionMapping($config);
-            $mapping->setPath((string) $elem['path']);
-
-            if (isSet($elem['action' ])) $mapping->setAction ((string) $elem['action'   ]);
-            if (isSet($elem['forward'])) $mapping->setForward((string) $elem['forward']);
-            if (isSet($elem['form'   ])) $mapping->setForm   ((string) $elem['form'   ]);
-            if (isSet($elem['default'])) $mapping->setDefault((string) $elem['default'] == 'true');
-
-            foreach ($elem->forward as $elem) {
-               if (sizeOf($elem->attributes()) > 2)
-                  throw new RuntimeException('Only one of "include", "redirect" or "alias" must be specified for local forward "'.$elem['name'].'"');
-
-               $name = (string) $elem['name'];
-               $forward = null;
-
-               if ($path = (string) $elem['include']) {
-                  $forward = new ActionForward($name, $path, false);
-               }
-               elseif ($path = (string) $elem['redirect']) {
-                  $forward = new ActionForward($name, $path, true);
-               }
-               elseif ($alias = (string) $elem['alias']) {
-                  $forward = $mapping->findForward($alias);
-                  if (!$forward)
-                     throw new RuntimeException('No ActionForward found for alias: '.$alias);
-               }
-               $mapping->addForward($name, $forward);
-            }
-            $config->addActionMapping($mapping);
-         }
-      }
+      return $matchPath;
    }
 
 
@@ -203,7 +145,15 @@ class FrontController extends Singleton {
    public function processRequest() {
       $request  = Request ::me();
       $response = Response ::me();
-      $processor = $this->getRequestProcessor($this->moduleConfig);
+
+      // Module selektieren
+      $prefix = $this->getModulePrefix($request);
+      $moduleConfig = $this->registeredModules[$prefix];
+
+      // RequestProcessor holen
+      $processor = $this->getRequestProcessor($moduleConfig);
+
+      // Request verarbeiten
       $processor->process($request, $response);
    }
 }

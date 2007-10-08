@@ -5,6 +5,13 @@
 class ActionMapping extends Object {
 
 
+   /**
+    * Ob diese Komponente vollständig konfiguriert ist. Wenn dieses Flag gesetzt ist, wirft jeder Versuch,
+    * die Komponente zu ändern, eine IllegalStateException.
+    */
+   protected $configured = false;
+
+
    protected $path;                   // string
    protected $forward;                // string (der direkt konfigurierte ActionForward, wenn angegeben)
    protected $action;                 // string
@@ -12,13 +19,15 @@ class ActionMapping extends Object {
    protected $default;                // boolean
 
 
-   // Array mit den lokalen ActionForwards
-   protected $forwards = array();
+   /**
+    * Die lokalen Forwards dieses Mappings.
+    */
+   protected /*ActionForward[]*/ $forwards = array();
 
-   // ob diese Komponente vollständig konfiguriert ist
-   protected $configured = false;     // boolean
 
-   // ModuleConfig, zu der wir gehören
+   /**
+    * Modulkonfiguration, zu dem das Mapping gehört
+    */
    protected /*ModuleConfig*/ $moduleConfig;
 
 
@@ -235,7 +244,8 @@ class ActionMapping extends Object {
          return $this->forwards[$name];
 
       if ($name === '__self') {
-         $forward = new ActionForward($name, $this->path, true);
+         $class = $this->moduleConfig->getForwardClass();
+         $forward = new $class($name, $this->path, true);
          return $forward->freeze();
       }
 

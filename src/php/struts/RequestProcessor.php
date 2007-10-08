@@ -40,7 +40,6 @@ class RequestProcessor extends Object {
 
       // Pfad für die Mappingauswahl ermitteln
       $path = $this->processPath($request, $response);
-      $this->logDebug && Logger ::log('Resolved path for mapping selection: '.$path, L_DEBUG, __CLASS__);
 
 
       // falls notwendig, ein Locale setzen
@@ -101,8 +100,7 @@ class RequestProcessor extends Object {
 
 
    /**
-    * Gibt die Pfadkomponente des Requests, die für die ActionMapping-Auswahl benutzt wird,
-    * zurück.
+    * Gibt die module-relative Pfadkomponente des Requests, die für die ActionMapping-Auswahl benutzt wird, zurück.
     *
     * @param Request  $request
     * @param Response $response
@@ -111,8 +109,10 @@ class RequestProcessor extends Object {
     */
    protected function processPath(Request $request, Response $response) {
       $path = $request->getPathInfo();
-      // Context-URL abschneiden
-      return subStr($path, strLen(APPLICATION_ROOT_URL));   // !!! to-do: Module prefix abschneiden
+      $path = subStr($path, strlen(APPLICATION_ROOT_URL.$this->moduleConfig->getPrefix()));
+
+      $this->logDebug && Logger ::log('Path used for mapping selection: '.$path, L_DEBUG, __CLASS__);
+      return $path;
    }
 
 
@@ -199,7 +199,7 @@ class RequestProcessor extends Object {
     * @return ActionMapping
     */
    protected function processMapping(Request $request, Response $response, $path) {
-      $mapping = $this->moduleConfig->findActionMapping($path);
+      $mapping = $this->moduleConfig->findMapping($path);
 
       if (!$mapping) {      // no mapping can be found to process this request
          echoPre("Not found: 404\n\nThe requested URL $path was not found on this server");
@@ -259,6 +259,7 @@ class RequestProcessor extends Object {
       $class = $mapping->getForm();
       if (!$class)
          return null;
+
       return new $class($request);
    }
 
@@ -275,6 +276,7 @@ class RequestProcessor extends Object {
     */
    protected function processActionCreate(Request $request, Response $response, ActionMapping $mapping, ActionForm $form=null) {
       $class = $mapping->getAction();
+
       return new $class($mapping, $form);
    }
 
@@ -306,7 +308,6 @@ class RequestProcessor extends Object {
             echoPre('redirect');
          }
          else {
-            // include
             echoPre('include');
          }
          echoPre($forward);
