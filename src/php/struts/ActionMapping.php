@@ -195,6 +195,8 @@ class ActionMapping extends Object {
 
    /**
     * Friert die Konfiguration dieser Komponente ein.
+    *
+    * @return ActionMapping
     */
    public function freeze() {
       if (!$this->configured) {
@@ -210,21 +212,19 @@ class ActionMapping extends Object {
             $this->setForm($this->action.'Form');
          }
 
-         foreach ($this->forwards as $forward) {
-            if ($forward->isRedirect() && $forward->getPath()==='__self')
-               $forward->setPath($this->path);
+         foreach ($this->forwards as $forward)
             $forward->freeze();
-         }
 
          $this->configured = true;
       }
+      return $this;
    }
 
 
    /**
-    * Sucht und gibt den ActionForward mit dem angegebenen Namen zurück. Zuerst werden die lokalen
-    * Forwards des Mappings durchsucht und danach, wenn kein Forward gefunden wurde, die globalen
-    * Forwards der Modulkonfiguration. Wird kein Forward gefunden, wird NULL zurückgegeben.
+    * Sucht und gibt den ActionForward mit dem angegebenen Namen zurück. Zuerst werden die lokalen Forwards des Mappings
+    * durchsucht und danach die globalen Forwards der Modulkonfiguration.  Wird kein Forward gefunden, wird NULL zurückgegeben.
+    * Es existiert immer ein Forward mit dem speziellen Name "__self". Er ist ein Redirect-Forward auf das ActionMapping selbst.
     *
     * @param $name - logischer Name des ActionForwards
     *
@@ -234,7 +234,13 @@ class ActionMapping extends Object {
       if (isSet($this->forwards[$name]))
          return $this->forwards[$name];
 
+      if ($name === '__self') {
+         $forward = new ActionForward($name, $this->path, true);
+         return $forward->freeze();
+      }
+
       $forward = $this->moduleConfig->findForward($name);
+
       if (!$forward && $this->configured)
          Logger ::log('No ActionForward found for name: '.$name, L_ERROR, __CLASS__);
 

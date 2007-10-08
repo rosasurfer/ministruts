@@ -95,11 +95,8 @@
                     "include", "redirect" or "alias" must be specified.
                     
      redirect       The module-relative path of the location to which a redirect 
-                    instruction should be issued.  If the value of a local ActionForward 
-                    (nested within a <mapping> element) is "__self" the redirect 
-                    instruction is issued to the location identified by the path attribute 
-                    of the enclosing <mapping> element.  Exactly one of "include", 
-                    "redirect"  or "alias" must be specified.
+                    instruction should be issued.  Exactly one of "include", "redirect"  
+                    or "alias" must be specified.
 
      alias          The unique identifier of another ActionForward to use instead.  
                     Used to simplify the configuration.  Exactly one of "include", 

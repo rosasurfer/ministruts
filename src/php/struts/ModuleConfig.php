@@ -81,9 +81,6 @@ class ModuleConfig extends Object {
       if (isSet($this->globalForwards[$name]))
          throw new RuntimeException('Non-unique identifier detected for global ActionForwards: '.$name);
 
-      if ($forward->isRedirect() && $forward->getPath()==='__self')
-         throw new RuntimeException('You cannot use the magic __self keyword on global forwards: '.$name);
-
       $this->globalForwards[$name] = $forward;
    }
 
