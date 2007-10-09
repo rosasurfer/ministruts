@@ -12,11 +12,12 @@ class ActionMapping extends Object {
    protected $configured = false;
 
 
-   protected $path;                   // string
-   protected $forward;                // string (der direkt konfigurierte ActionForward, wenn angegeben)
-   protected $action;                 // string
-   protected $form;                   // string
-   protected $default;                // boolean
+   protected $path;        // string
+   protected $action;      // string
+   protected $form;        // string
+   protected $default;     // boolean
+
+   protected /*ActionForward*/ $forward;  // im Mapping angegebener ActionForward (statt einer Action)
 
 
    /**
