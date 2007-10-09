@@ -83,7 +83,7 @@ class ModuleConfig extends Object {
 
       $xml = $this->loadConfiguration($configfile);
 
-      $this->setPrefix((string) $xml['prefix']);
+      $this->setPrefix((string) $xml['module']);
       $this->createForwards($xml);
       $this->createMappings($xml);
    }

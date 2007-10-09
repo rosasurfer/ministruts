@@ -275,12 +275,15 @@ class RequestProcessor extends Object {
     */
    protected function processActionForward(Request $request, Response $response, ActionForward $forward=null) {
       if ($forward) {
+
          if ($forward->isRedirect()) {
             echoPre('redirect');
          }
          else {
             echoPre('include');
          }
+
+
          echoPre($forward);
       }
    }
