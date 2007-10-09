@@ -46,11 +46,6 @@ class RequestProcessor extends Object {
       $this->processLocale($request, $response);
 
 
-      // falls notwendig, Content-Type und no-caching-Header setzen
-      $this->processContentType($request, $response);
-      $this->processNoCache($request, $response);
-
-
       // allgemeinen Preprocessing-Hook aufrufen
       if (!$this->processPreprocess($request, $response)) {
          $this->logDebug && Logger ::log('Preprocessor hook returned false', L_DEBUG, __CLASS__);
@@ -58,7 +53,7 @@ class RequestProcessor extends Object {
       }
 
 
-      // ActionMessages, auf die schon zugegriffen wurde, aus der Session löschen
+      // ActionMessages aus der Session löschen
       $this->processCachedMessages($request, $response);
 
 
@@ -129,30 +124,6 @@ class RequestProcessor extends Object {
 
 
    /**
-    * Setzt bei Bedarf den Default-Content-Type (und den Zeichensatz) für den Response.
-    *
-    * Note: Der Header wird überschrieben, falls die Anfrage in einem Redirect endet.
-    *
-    * @param Request  $request
-    * @param Response $response
-    */
-   protected function processContentType(Request $request, Response $response) {
-   }
-
-
-   /**
-    * Setzt bei Bedarf den 'no-cache' Header für den Response.
-    *
-    * Note: Der Header wird überschrieben, falls die Anfrage in einem Redirect endet.
-    *
-    * @param Request  $request
-    * @param Response $response
-    */
-   protected function processNoCache(Request $request, Response $response) {
-   }
-
-
-   /**
     * Allgemeiner Preprocessing-Hook, der bei Bedarf überschrieben werden kann. Muß TRUE
     * zurückgeben, wenn die Verarbeitung nach dem Aufruf normal fortgesetzt werden soll,
     * oder FALSE, wenn bereits eine Anwort generiert wurde.
@@ -177,15 +148,15 @@ class RequestProcessor extends Object {
     * @param Response $response
     */
    protected function processCachedMessages(Request $request, Response $response) {
-      if ($request->isSession() && isSet($_SESSION[Request ::MESSAGE_KEY])) {
-         $errors =& $_SESSION[Request ::MESSAGE_KEY];
+      if ($request->isSession() && isSet($_SESSION[Struts ::ACTION_MESSAGE_KEY])) {
+         $errors =& $_SESSION[Struts ::ACTION_MESSAGE_KEY];
 
          foreach ($errors as $key => $error)
             if ($error['accessed'])
-               unset($_SESSION[Request ::MESSAGE_KEY][$key]);
+               unset($_SESSION[Struts ::ACTION_MESSAGE_KEY][$key]);
 
          if(sizeOf($errors) == 0)
-            unset($_SESSION[Request ::MESSAGE_KEY]);
+            unset($_SESSION[Struts ::ACTION_MESSAGE_KEY]);
       }
    }
 
