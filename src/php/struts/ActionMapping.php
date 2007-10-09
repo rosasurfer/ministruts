@@ -246,7 +246,8 @@ class ActionMapping extends Object {
       if ($name === '__self') {
          $class = $this->moduleConfig->getForwardClass();
          $forward = new $class($name, $this->path, true);
-         return $forward->freeze();
+         $forward->freeze();
+         return $this->forwards[$name] = $forward;
       }
 
       $forward = $this->moduleConfig->findForward($name);
