@@ -10,8 +10,6 @@
 final class Request extends Singleton {
 
 
-   const MESSAGE_KEY = '__ACTION_MESSAGES__';
-
    private $method;
    private $pathInfo;
 

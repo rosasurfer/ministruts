@@ -45,6 +45,7 @@ $__imports['ModuleConfig'                   ] = 'php/struts/ModuleConfig';
 $__imports['Request'                        ] = 'php/struts/Request';
 $__imports['RequestProcessor'               ] = 'php/struts/RequestProcessor';
 $__imports['Response'                       ] = 'php/struts/Response';
+$__imports['Struts'                         ] = 'php/struts/Struts';
 
 $__imports['BaseValidator'                  ] = 'php/util/BaseValidator';
 $__imports['Config'                         ] = 'php/util/Config';
