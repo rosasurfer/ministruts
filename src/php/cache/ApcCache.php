@@ -2,7 +2,7 @@
 /**
  * ApcCache
  *
- * Cacht Objekte im APC-Opcode-Cache.
+ * Cacht Objekte im APC-Cache.
  */
 final class ApcCache extends AbstractCachePeer {
 
