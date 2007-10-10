@@ -68,7 +68,7 @@
                     prefix is the default module of the application.  The prefix of all 
                     other modules must start with a slash "/" character.
 -->
-<!ELEMENT struts-config (global-forwards?, action-mappings?)>
+<!ELEMENT struts-config (global-forwards?, action-mappings?, roles?)>
 <!ATTLIST struts-config  id             ID              #IMPLIED>
 <!ATTLIST struts-config  module         CDATA           #IMPLIED>
 
@@ -176,6 +176,26 @@
 <!ATTLIST mapping        parameter      CDATA           #IMPLIED>
 <!ATTLIST mapping        path           %RequestPath;   #REQUIRED>
 <!ATTLIST mapping        roles          CDATA           #IMPLIED>
+
+
+<!-- The "roles" element describes a set of roles.  The individual roles are configured 
+     through nested <role> elements. 
+-->
+<!ELEMENT roles (role*)>
+<!ATTLIST roles          id             ID              #IMPLIED>
+
+
+<!-- The "role" element describes a logical role. 
+
+     name           Logical name of the role.
+
+     class          Class name of the verifyer subclass [RoleVerifyer] that will process 
+                    role checking.
+-->
+<!ELEMENT role (set-property*)>
+<!ATTLIST role           id             ID              #IMPLIED>
+<!ATTLIST role           name           CDATA           #REQUIRED>
+<!ATTLIST role           class          %ClassName;     #REQUIRED>
 
 
 <!-- ========== Subordinate Elements ====================================== -->

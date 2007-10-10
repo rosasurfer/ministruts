@@ -38,38 +38,23 @@ class RequestProcessor extends Object {
     */
    final public function process(Request $request, Response $response) {
 
-      // Pfad für die Mappingauswahl ermitteln
-      $path = $this->processPath($request, $response);
-
-
       // falls notwendig, ein Locale setzen
       $this->processLocale($request, $response);
-
-
-      // allgemeinen Preprocessing-Hook aufrufen
-      if (!$this->processPreprocess($request, $response)) {
-         $this->logDebug && Logger ::log('Preprocessor hook returned false', L_DEBUG, __CLASS__);
-         return;
-      }
 
 
       // ActionMessages aus der Session löschen
       $this->processCachedMessages($request, $response);
 
 
-      // das zum angegebenen Pfad passende ActionMapping ermitteln
-      $mapping = $this->processMapping($request, $response, $path);
-      if (!$mapping) {
-         $this->logDebug && Logger ::log('Could not find a mapping for this request', L_DEBUG, __CLASS__);
+      // passendes Mapping ermitteln
+      $mapping = $this->processMapping($request, $response);
+      if (!$mapping)
          return;
-      }
 
 
-      // Rollenbeschränkungen des Mappings überprüfen
-      if (!$this->processRoles($request, $response, $mapping)) {
-         $this->logDebug && Logger ::log('User does not have any required role, denying access', L_DEBUG, __CLASS__);
+      // Methodenbeschränkungen des Mappings überprüfen
+      if (!$this->processMethod($request, $response, $mapping))
          return;
-      }
 
 
       // falls im Mapping statt einer Action ein Forward konfiguriert wurde, diesen verarbeiten
@@ -81,33 +66,18 @@ class RequestProcessor extends Object {
       $form = $this->processActionForm($request, $response, $mapping);
 
 
-      // Action des Mappings erzeugen (Form wird schon hier übergeben, damit im User-Code NPEs vermieden werden)
+      // Action des Mappings erzeugen (Form wird der Action schon hier übergeben, damit der User-Code einfacher sein kann)
       $action = $this->processActionCreate($request, $response, $mapping, $form);
 
 
       // Action aufrufen
-      $forward = $this->processActionExceute($request, $response, $action, $form);
+      $forward = $this->processActionExecute($request, $response, $action, $form);
+      if (!$forward)
+         return;
 
 
       // den zurückgegebenen ActionForward verarbeiten
       $this->processActionForward($request, $response, $forward);
-   }
-
-
-   /**
-    * Gibt die module-relative Pfadkomponente des Requests, die für die ActionMapping-Auswahl benutzt wird, zurück.
-    *
-    * @param Request  $request
-    * @param Response $response
-    *
-    * @return string
-    */
-   protected function processPath(Request $request, Response $response) {
-      $path = $request->getPathInfo();
-      $path = subStr($path, strlen(APPLICATION_ROOT_URL.$this->moduleConfig->getPrefix()));
-
-      $this->logDebug && Logger ::log('Path used for mapping selection: '.$path, L_DEBUG, __CLASS__);
-      return $path;
    }
 
 
@@ -120,22 +90,6 @@ class RequestProcessor extends Object {
     * @param Response $response
     */
    protected function processLocale(Request $request, Response $response) {
-   }
-
-
-   /**
-    * Allgemeiner Preprocessing-Hook, der bei Bedarf überschrieben werden kann. Muß TRUE
-    * zurückgeben, wenn die Verarbeitung nach dem Aufruf normal fortgesetzt werden soll,
-    * oder FALSE, wenn bereits eine Anwort generiert wurde.
-    * Die Default-Implementierung macht nichts.
-    *
-    * @param Request  $request
-    * @param Response $response
-    *
-    * @return boolean
-    */
-   protected function processPreprocess(Request $request, Response $response) {
-      return true;
    }
 
 
@@ -160,30 +114,36 @@ class RequestProcessor extends Object {
       }
    }
 
+
    /**
     * Ermittelt das zu benutzende ActionMapping.
     *
     * @param Request  $request
     * @param Response $response
-    * @param string   $path     - Pfadkomponente zur ActionMapping-Auswahl
     *
     * @return ActionMapping
     */
-   protected function processMapping(Request $request, Response $response, $path) {
-      $mapping = $this->moduleConfig->findMapping($path);
+   protected function processMapping(Request $request, Response $response) {
+      // Pfad für die Mappingauswahl ermitteln ...
+      $path = $request->getPathInfo();
+      $path = subStr($path, strlen(APPLICATION_ROOT_URL.$this->moduleConfig->getPrefix()));
 
-      if (!$mapping) {      // no mapping can be found to process this request
+      $this->logDebug && Logger ::log('Path used for mapping selection: '.$path, L_DEBUG, __CLASS__);
+
+      // ... und Mapping suchen
+      $mapping = $this->moduleConfig->findMapping($path);
+      if (!$mapping) {
+         $this->logInfo && Logger ::log('Could not find a mapping for this request', L_INFO, __CLASS__);
          echoPre("Not found: 404\n\nThe requested URL $path was not found on this server");
       }
-
       return $mapping;
    }
 
 
    /**
-    * Wenn die Action Zugriffsbeschränkungen hat, sicherstellen, daß der User mindestens eine der angegebenen
-    * Rollen inne hat. Gibt TRUE zurück, wenn die Verarbeitung fortgesetzt und der Zugriff gewährt werden soll,
-    * oder FALSE, wenn der Zugriff nicht gewährt wird.
+    * Wenn die Action Methodenbeschränkungen des Requests hat, sicherstellen, daß der Request der angegebenen
+    * Methode entspricht. Gibt TRUE zurück, wenn die Verarbeitung fortgesetzt werden soll oder FALSE, wenn der
+    * Zugriff nicht gewährt wird.
     *
     * @param Request       $request
     * @param Response      $response
@@ -191,8 +151,16 @@ class RequestProcessor extends Object {
     *
     * @return boolean
     */
-   protected function processRoles(Request $request, Response $response, ActionMapping $mapping) {
-      return true;
+   protected function processMethod(Request $request, Response $response, ActionMapping $mapping) {
+      $method = $mapping->getMethod();
+
+      if ($method===null || $method == $request->getMethod())
+         return true;
+
+      $this->logDebug && Logger ::log('Request does not have the required method type, denying access', L_DEBUG, __CLASS__);
+      echoPre('Access denied: 403');
+
+      return false;
    }
 
 
@@ -231,7 +199,11 @@ class RequestProcessor extends Object {
       if (!$class)
          return null;
 
-      return new $class($request);
+      // ActionForm erzeugen und im Request speichern
+      $form = new $class($request);
+      $request->setAttribute(Struts ::ACTION_FORM_KEY, $form);
+
+      return $form;
    }
 
 
@@ -261,8 +233,31 @@ class RequestProcessor extends Object {
     *
     * @return ActionForward
     */
-   protected function processActionExceute(Request $request, Response $response, Action $action) {
-      return $action->execute($request, $response);
+   protected function processActionExecute(Request $request, Response $response, Action $action) {
+      $forward = null;
+
+      // Alles kapseln, damit Postprocessing-Hook auch nach Exceptions aufgerufen wird (für Transaction-Rollback o.ä.)
+      $throwable = null;
+      try {
+         // allgemeiner Preprocessing-Hook
+         $forward = $action->executeBefore($request, $response);
+
+         // Action nur ausführen, wenn executeBefore() nicht Abbruch signalisiert hat
+         if ($forward === null)
+            $forward = $action->execute($request, $response);
+      }
+      catch (Exception $ex) {
+         $throwable = $ex;
+      }
+
+      // allgemeiner Postprocessing-Hook
+      $forward = $action->executeAfter($request, $response, $forward);
+
+      // jetzt aufgetretene Exceptions weiterreichen
+      if ($throwable)
+         throw $throwable;
+
+      return $forward;
    }
 
 
@@ -275,16 +270,18 @@ class RequestProcessor extends Object {
     */
    protected function processActionForward(Request $request, Response $response, ActionForward $forward=null) {
       if ($forward) {
-
          if ($forward->isRedirect()) {
-            echoPre('redirect');
+            $url = APPLICATION_ROOT_URL.$this->moduleConfig->getPrefix().$forward->getPath();
+            //echoPre('redirect: '.$url);
+            redirect($url);
          }
          else {
-            echoPre('include');
+            // Form in den lokalen Namespace legen
+            $form = $request->getAttribute(Struts ::ACTION_FORM_KEY);
+
+            //echoPre('include: '.$forward->getPath());
+            include($forward->getPath());
          }
-
-
-         echoPre($forward);
       }
    }
 }

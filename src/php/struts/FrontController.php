@@ -29,7 +29,10 @@ class FrontController extends Singleton {
     * @return FrontController
     */
    public static function me() {
-      // Root-Verzeichnis und URL definieren
+      if (!Request ::me())          // ohne Request gibts keine FrontController-Instanz
+         return null;
+
+      // Anwendungskonfiguration laden
       if (!defined('APPLICATION_ROOT_DIRECTORY'))
          define('APPLICATION_ROOT_DIRECTORY', dirName($_SERVER['SCRIPT_FILENAME']));
 
@@ -38,11 +41,19 @@ class FrontController extends Singleton {
          define('APPLICATION_ROOT_URL', subStr($url, 0, strRPos($url, '/')));
       }
 
-      // Anwendungskonfiguration laden
+      if (!defined('CONFIG_APP_ROOT'))
+         define('CONFIG_APP_ROOT', APPLICATION_ROOT_URL);
+
+      if (!isSet($_SERVER['DOMAIN'])) {
+         $parts = explode('.', strRev($_SERVER['SERVER_NAME']), 3);
+         $_SERVER['DOMAIN'] = strRev($parts[0].(sizeOf($parts) > 1 ? '.'.$parts[1] : null));
+      }
 
 
       // development only (don't uses cache)
+      // ---------------------------------------
       return Singleton ::getInstance(__CLASS__);
+      // ---------------------------------------
 
 
       $instance = Cache ::get($key=__CLASS__.'_instance');

@@ -15,7 +15,10 @@ class ActionMapping extends Object {
    protected $path;        // string
    protected $action;      // string
    protected $form;        // string
+   protected $method;      // string
    protected $default;     // boolean
+
+   protected /*String[]*/ $roles = array();
 
    protected /*ActionForward*/ $forward;  // im Mapping angegebener ActionForward (statt einer Action)
 
@@ -70,6 +73,73 @@ class ActionMapping extends Object {
 
 
    /**
+    * Gibt die Methodenbeschränkung dieses Mappings zurück.
+    *
+    * @return string - Name einer HTTP-Methode oder NULL, wenn keine Einschränkung existiert
+    */
+   public function getMethod() {
+      return $this->method;
+   }
+
+
+   /**
+    * Setzt die Methodenbeschränkung dieses Mappings.  Requests, die nicht der angegebenen Methode entsprechen, werden abgewiesen.
+    *
+    * @param string $method - HTTP-Methode, "GET" oder "POST"
+    *
+    * @return ActionMapping
+    */
+   public function setMethod($method) {
+      if ($this->configured)                   throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($method))                 throw new IllegalTypeException('Illegal type of argument $method: '.getType($method));
+      $method = strToUpper($method);
+      if ($method!=='GET' && $method!=='POST') throw new InvalidArgumentException('Invalid argument $method: '.$method);
+
+      $this->method = $method;
+      return $this;
+   }
+
+
+   /**
+    * Gibt die Rollenbeschränkung dieses Mappings zurück.
+    *
+    * @return string - Rollenbezeichner
+    */
+   public function getRoles() {
+      return $this->roles;
+   }
+
+
+   /**
+    * Setzt die Rollenbeschränkung dieses Mappings.  Requests, die nicht mindestens einer angegebenen Rolle genügen, werden abgewiesen.
+    * Beginnt ein Rollenbezeichner mit einem Ausrufezeichen "!", darf der User der angegebenen Rolle NICHT angehören.
+    *
+    * @param string - ein oder mehrere Rollenbezeichner (komma-getrennet)
+    *
+    * @return ActionMapping
+    */
+   public function setRoles($roles) {
+      if ($this->configured)  throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($roles)) throw new IllegalTypeException('Illegal type of argument $roles: '.getType($roles));
+
+      static $pattern = '/^!?[A-Za-z_][A-Za-z0-9_]*(,!?[A-Za-z_][A-Za-z0-9_]*)*$/';
+      if (!strLen($roles) || !preg_match($pattern, $roles)) throw new InvalidArgumentException('Invalid argument $roles: "'.$roles.'"');
+
+      // check for impossible constraints, ie. "Member,!Member"
+      $tokens = explode(',', $roles);
+      $keys = array_flip($tokens);
+
+      foreach ($tokens as $role) {
+         if (isSet($keys['!'.$role])) throw new InvalidArgumentException('Invalid argument $roles: "'.$roles.'"');
+      }
+
+      // remove duplicates
+      $this->roles = join(',', array_flip($keys));
+      return $this;
+   }
+
+
+   /**
     * Setzt den Namen des direkt konfigurierten Forwards.
     *
     * @param string $name
@@ -104,10 +174,10 @@ class ActionMapping extends Object {
     * @return ActionMapping
     */
    public function setAction($className) {
-      if ($this->configured)                             throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($className))                        throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
-      if (!is_subclass_of($className, $parent='Action')) throw new InvalidArgumentException("Not a subclass of $parent: ".$className);
-      if ($this->forward)                                throw new RuntimeException('Configuration error: Exactly one of action "forward" or action "type" must be specified.');
+      if ($this->configured)                                       throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($className))                                  throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
+      if (!is_subclass_of($className, Struts ::ACTION_BASE_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts ::ACTION_BASE_CLASS.': '.$className);
+      if ($this->forward)                                          throw new RuntimeException('Configuration error: Exactly one of action "forward" or action "type" must be specified.');
 
       $this->action = $className;
       return $this;
@@ -132,9 +202,9 @@ class ActionMapping extends Object {
     * @return ActionMapping
     */
    public function setForm($className) {
-      if ($this->configured)                                 throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($className))                            throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
-      if (!is_subclass_of($className, $parent='ActionForm')) throw new InvalidArgumentException("Not a subclass of $parent: ".$className);
+      if ($this->configured)                                            throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($className))                                       throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
+      if (!is_subclass_of($className, Struts ::ACTION_FORM_BASE_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts ::ACTION_FORM_BASE_CLASS.': '.$className);
 
       $this->form = $className;
       return $this;

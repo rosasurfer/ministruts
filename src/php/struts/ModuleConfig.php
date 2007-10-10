@@ -6,24 +6,6 @@ class ModuleConfig extends Object {
 
 
    /**
-    * Der Klassenname der Default-RequestProcessor-Implementierung.
-    */
-   const DEFAULT_PROCESSOR_CLASS = 'RequestProcessor';
-
-
-   /**
-    * Der Klassenname der Default-ActionMapping-Implementierung.
-    */
-   const DEFAULT_MAPPING_CLASS = 'ActionMapping';
-
-
-   /**
-    * Der Klassenname der Default-ActionForward-Implementierung.
-    */
-   const DEFAULT_FORWARD_CLASS = 'ActionForward';
-
-
-   /**
     * Ob diese Komponente vollständig konfiguriert ist. Wenn dieses Flag gesetzt ist, wirft jeder Versuch,
     * die Komponente zu ändern, eine IllegalStateException.
     */
@@ -58,19 +40,19 @@ class ModuleConfig extends Object {
    /**
     * Der Klassenname der RequestProcessor-Implementierung, die für dieses Modul definiert ist.
     */
-   protected $processorClass = self:: DEFAULT_PROCESSOR_CLASS;
+   protected $processorClass = Struts ::DEFAULT_PROCESSOR_CLASS;
 
 
    /**
     * Der Klassenname der ActionMapping-Implementierung, die für dieses Modul definiert ist.
     */
-   protected $mappingClass   = self:: DEFAULT_MAPPING_CLASS;
+   protected $mappingClass   = Struts ::DEFAULT_MAPPING_CLASS;
 
 
    /**
     * Der Klassenname der ActionForward-Implementierung, die für dieses Modul definiert ist.
     */
-   protected $forwardClass   = self:: DEFAULT_FORWARD_CLASS;
+   protected $forwardClass   = Struts ::DEFAULT_FORWARD_CLASS;
 
 
    /**
@@ -171,9 +153,11 @@ class ModuleConfig extends Object {
             $mapping = new $this->mappingClass($this);
             $mapping->setPath((string) $elem['path']);
 
-            if (isSet($elem['action' ])) $mapping->setAction ((string) $elem['action'   ]);
-            if (isSet($elem['forward'])) $mapping->setForward((string) $elem['forward']);
+            if (isSet($elem['action' ])) $mapping->setAction ((string) $elem['action' ]);
             if (isSet($elem['form'   ])) $mapping->setForm   ((string) $elem['form'   ]);
+            if (isSet($elem['forward'])) $mapping->setForward((string) $elem['forward']);
+            if (isSet($elem['method' ])) $mapping->setMethod ((string) $elem['method' ]);
+            if (isSet($elem['roles'  ])) $mapping->setRoles  ((string) $elem['roles'  ]);
             if (isSet($elem['default'])) $mapping->setDefault((string) $elem['default'] == 'true');
 
             foreach ($elem->forward as $elem) {
@@ -288,9 +272,9 @@ class ModuleConfig extends Object {
     * @param string $className
     */
    protected function setProcessorClass($className) {
-      if ($this->configured)                                                   throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($className))                                              throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
-      if (!is_subclass_of($className, $parent=self:: DEFAULT_PROCESSOR_CLASS)) throw new InvalidArgumentException("Not a subclass of $parent: ".$className);
+      if ($this->configured)                                             throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($className))                                        throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
+      if (!is_subclass_of($className, Struts ::DEFAULT_PROCESSOR_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts ::DEFAULT_PROCESSOR_CLASS.': '.$className);
 
       $this->processorClass = $className;
    }
@@ -313,9 +297,9 @@ class ModuleConfig extends Object {
     * @param string $className
     */
    protected function setMappingClass($className) {
-      if ($this->configured)                                                 throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($className))                                            throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
-      if (!is_subclass_of($className, $parent=self:: DEFAULT_MAPPING_CLASS)) throw new InvalidArgumentException("Not a subclass of $parent: ".$className);
+      if ($this->configured)                                           throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($className))                                      throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
+      if (!is_subclass_of($className, Struts ::DEFAULT_MAPPING_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts ::DEFAULT_MAPPING_CLASS.': '.$className);
 
       $this->mappingClass = $className;
    }
@@ -338,9 +322,9 @@ class ModuleConfig extends Object {
     * @param string $className
     */
    protected function setForwardClass($className) {
-      if ($this->configured)                                                 throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($className))                                            throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
-      if (!is_subclass_of($className, $parent=self:: DEFAULT_FORWARD_CLASS)) throw new InvalidArgumentException("Not a subclass of $parent: ".$className);
+      if ($this->configured)                                           throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($className))                                      throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
+      if (!is_subclass_of($className, Struts ::DEFAULT_FORWARD_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts ::DEFAULT_FORWARD_CLASS.': '.$className);
 
       $this->forwardClass = $className;
    }
