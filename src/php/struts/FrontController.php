@@ -18,6 +18,18 @@ class FrontController extends Singleton {
    const STRUTS_CONFIG_FILE = 'struts-config.xml';
 
 
+   /**
+    * Das Wurzelverzeichnis der aktuellen Webapplikation.
+    */
+   private $applicationDir;
+
+
+   /**
+    * Die Pfadkomponente der URL der laufenden Webapplikation (= Context-URL).
+    */
+   private $applicationPath;
+
+
    // alle registrierten Module, aufgeschlüssselt nach ihrem Prefix
    private /*ModuleConfig[]*/ $registeredModules = array();
 
@@ -29,27 +41,14 @@ class FrontController extends Singleton {
     * @return FrontController
     */
    public static function me() {
-      if (!Request ::me())          // ohne Request gibts keine FrontController-Instanz
+      // der FrontController steht nur im Webkontext zur Verfügung
+      if (!Request ::me()) {
+         Logger ::log('You can not use this componente at the command line', L_ERROR, __CLASS__);
          return null;
-
-      // Anwendungskonfiguration laden
-      if (!defined('APPLICATION_ROOT_DIRECTORY'))
-         define('APPLICATION_ROOT_DIRECTORY', dirName($_SERVER['SCRIPT_FILENAME']));
-
-      if (!defined('APPLICATION_ROOT_URL')) {
-         $url = subStr($_SERVER['SCRIPT_FILENAME'], strLen($_SERVER['DOCUMENT_ROOT']));
-         define('APPLICATION_ROOT_URL', subStr($url, 0, strRPos($url, '/')));
-      }
-
-      if (!defined('CONFIG_APP_ROOT'))
-         define('CONFIG_APP_ROOT', APPLICATION_ROOT_URL);
-
-      if (!isSet($_SERVER['DOMAIN'])) {
-         $parts = explode('.', strRev($_SERVER['SERVER_NAME']), 3);
-         $_SERVER['DOMAIN'] = strRev($parts[0].(sizeOf($parts) > 1 ? '.'.$parts[1] : null));
       }
 
 
+      // ---------------------------------------
       // development only (don't use cache)
       // ---------------------------------------
       return Singleton ::getInstance(__CLASS__);
@@ -71,12 +70,17 @@ class FrontController extends Singleton {
     * Lädt die Struts-Konfiguration und parst und kompiliert sie.
     */
    protected function __construct() {
-      // Webumgebung prüfen      !!! prüfen, ob Zugriff auf WEB-INF und CVS gesperrt ist !!!
+      // Konfiguration vervollständigen
+      $this->applicationDir  = dirName($script=$_SERVER['SCRIPT_FILENAME']);
+      $this->applicationPath = subStr($script, $length=strLen($_SERVER['DOCUMENT_ROOT']), strRPos($script, '/')-$length);
+
+
+      // Umgebung prüfen (ist Zugriff auf WEB-INF und CVS gesperrt ?)
 
 
       // Alle Struts-Konfigurationen in WEB-INF suchen
       $baseName = baseName(self:: STRUTS_CONFIG_FILE, '.xml');
-      $files = glob(APPLICATION_ROOT_DIRECTORY.'/WEB-INF/'.$baseName.'*.xml', GLOB_ERR);
+      $files = glob($this->applicationDir.'/WEB-INF/'.$baseName.'*.xml', GLOB_ERR);
       if (sizeOf($files) == 0)
          throw new FileNotFoundException('Configuration file not found: '.self:: STRUTS_CONFIG_FILE);
 
@@ -118,22 +122,27 @@ class FrontController extends Singleton {
     * @return string - Modulprefix bzw. "" für das Default-Modul
     */
    private function getModulePrefix(Request $request) {
-      $pathInfo = $request->getPathInfo();
+      $config = $request->getAttribute(Struts ::MODULE_KEY);
 
-      if (!String ::startsWith($pathInfo, APPLICATION_ROOT_URL))
-         throw new RuntimeException('Cannot select module prefix of uri: '.$pathInfo);
+      if ($config !== null) {
+         return $config->getPrefix();
+      }
 
-      $matchPath = dirName(subStr($pathInfo, strLen(APPLICATION_ROOT_URL)));
+      $scriptName = $request->getPathInfo();
+
+      if (!String ::startsWith($scriptName, $this->applicationPath))
+         throw new RuntimeException('Can not select module prefix of uri: '.$scriptName);
+
+      $matchPath = dirName(subStr($scriptName, strLen($this->applicationPath)));
       if ($matchPath === '\\')
          $matchPath = '';
 
       while (!isSet($this->registeredModules[$matchPath])) {
          $lastSlash = strRPos($matchPath, '/');
          if ($lastSlash === false)
-            throw new RuntimeException('No module configured for uri: '.$pathInfo);
+            throw new RuntimeException('No module configured for uri: '.$scriptName);
          $matchPath = subStr($matchPath, 0, $lastSlash);
       }
-
       return $matchPath;
    }
 
@@ -158,9 +167,12 @@ class FrontController extends Singleton {
       $request  = Request ::me();
       $response = Response ::me();
 
+      $request->setAttribute(Struts ::APPLICATION_PATH_KEY, $this->applicationPath);
+
       // Module selektieren
       $prefix = $this->getModulePrefix($request);
       $moduleConfig = $this->registeredModules[$prefix];
+      $request->setAttribute(Struts ::MODULE_KEY, $moduleConfig);
 
       // RequestProcessor holen
       $processor = $this->getRequestProcessor($moduleConfig);

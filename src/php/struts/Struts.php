@@ -62,6 +62,12 @@ final class Struts extends StaticFactory {
 
 
    /**
+    * Request-Key, unter dem die Pfadkomponente der URL der laufenden Anwendung gespeichert ist (= Context-Path).
+    */
+   const APPLICATION_PATH_KEY = 'javax.servlet.include.servlet_path';
+
+
+   /**
     * Session-Key, unter dem ein vom User gewähltes Locale gespeichert wird.
     */
    const LOCALE_KEY = 'org.apache.struts.action.LOCALE';
@@ -71,5 +77,11 @@ final class Struts extends StaticFactory {
     * Request-Key, unter dem die verfügbaren MessageResources gespeichert sind (Internationalisierung).
     */
    const MESSAGES_KEY = 'org.apache.struts.action.MESSAGE_RESOURCES';
+
+
+   /**
+    * Request-Key, unter dem das Module, das diesem Request zugeordnet wurde, gespeichert ist (ModuleConfig-Instanz).
+    */
+   const MODULE_KEY = 'org.apache.struts.action.MODULE';
 }
 ?>

@@ -125,8 +125,9 @@ class RequestProcessor extends Object {
     */
    protected function processMapping(Request $request, Response $response) {
       // Pfad für die Mappingauswahl ermitteln ...
-      $path = $request->getPathInfo();
-      $path = subStr($path, strlen(APPLICATION_ROOT_URL.$this->moduleConfig->getPrefix()));
+      $appPath    = $request->getAttribute(Struts ::APPLICATION_PATH_KEY);
+      $scriptName = $request->getPathInfo();
+      $path = subStr($scriptName, strlen($appPath.$this->moduleConfig->getPrefix()));
 
       $this->logDebug && Logger ::log('Path used for mapping selection: '.$path, L_DEBUG, __CLASS__);
 
@@ -271,13 +272,15 @@ class RequestProcessor extends Object {
    protected function processActionForward(Request $request, Response $response, ActionForward $forward=null) {
       if ($forward) {
          if ($forward->isRedirect()) {
-            $url = APPLICATION_ROOT_URL.$this->moduleConfig->getPrefix().$forward->getPath();
+            $appPath = $request->getAttribute(Struts ::APPLICATION_PATH_KEY);
+            $url = $appPath.$this->moduleConfig->getPrefix().$forward->getPath();
             //echoPre('redirect: '.$url);
             redirect($url);
          }
          else {
-            // Form in den lokalen Namespace legen
-            $form = $request->getAttribute(Struts ::ACTION_FORM_KEY);
+            // Daten in den lokalen Namespace legen
+            $appPath = $request->getAttribute(Struts ::APPLICATION_PATH_KEY);
+            $form    = $request->getAttribute(Struts ::ACTION_FORM_KEY);
 
             //echoPre('include: '.$forward->getPath());
             include($forward->getPath());
