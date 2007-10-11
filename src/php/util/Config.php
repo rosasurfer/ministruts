@@ -98,6 +98,26 @@ final class Config extends Singleton {
 
 
    /**
+    */
+   private function getProperty($key) {
+      if (isSet($this->properties[$key]))
+         return $this->properties[$key];
+      return null;
+   }
+
+
+   /**
+    */
+   private function setProperty($key, $value) {
+      $this->properties[$key] = $value;
+
+      // Cache ggf. aktualisieren
+      if (Cache ::isCached($key=__CLASS__))
+         Cache ::set($key, $this);
+   }
+
+
+   /**
     * Gibt die unter dem angegebenen Schlüssel gespeicherte Konfigurationseinstellung zurück oder NULL, wenn unter diesem
     * Schlüssel keine Einstellung existiert.
     *
@@ -111,11 +131,13 @@ final class Config extends Singleton {
 
 
    /**
+    * Setzt oder überschreibt die Einstellung mit dem angegebenen Schlüssel. Ist der Wert kein String, wird er in einen String konvertiert.
+    *
+    * @param string $key   - Schlüssel
+    * @param mixed  $value - Einstellung
     */
-   private function getProperty($key) {
-      if (isSet($this->properties[$key]))
-         return $this->properties[$key];
-      return null;
+   public static function set($key, $value) {
+      return self ::me()->setProperty($key, (string) $value);
    }
 }
 ?>
