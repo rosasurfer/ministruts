@@ -50,7 +50,7 @@ class FrontController extends Singleton {
       }
 
 
-      // development only (don't uses cache)
+      // development only (don't use cache)
       // ---------------------------------------
       return Singleton ::getInstance(__CLASS__);
       // ---------------------------------------
