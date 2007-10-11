@@ -79,8 +79,8 @@ class ModuleConfig extends Object {
     * @return SimpleXMLElement
     */
    protected function loadConfiguration($fileName) {
-      if (!is_file($fileName))     throw new FileNotFoundException('Configuration file not found: '.$fileName);
-      if (!is_readable($fileName)) throw new IOException('File is not readable: '.$fileName);
+      if (!is_file($fileName))     throw new FileNotFoundException('File not found: '.$fileName);
+      if (!is_readable($fileName)) throw new IOException('File not readable: '.$fileName);
       $content = file_get_contents($fileName, false);
 
       // die DTD liegt relativ zum Rootverzeichnis der Library
