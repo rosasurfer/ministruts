@@ -41,20 +41,17 @@ class FrontController extends Singleton {
     * @return FrontController
     */
    public static function me() {
-      // der FrontController steht nur im Webkontext zur Verfügung
-      if (!Request ::me()) {
+      if (!isSet($_SERVER['REQUEST_METHOD'])) {
          Logger ::log('You can not use this componente at the command line', L_ERROR, __CLASS__);
          return null;
       }
 
-
-      // ---------------------------------------
-      // development only (don't use cache)
-      // ---------------------------------------
-      return Singleton ::getInstance(__CLASS__);
-      // ---------------------------------------
+      // auf dem Entwicklungssystem wird die Struts-Konfiguration immer neu einlesen
+      if ($_SERVER['REMOTE_ADDR']=='127.0.0.1')
+         return Singleton ::getInstance(__CLASS__);
 
 
+      // auf dem Production-Server wird sie nach der Initialisierung im Cache abgelegt
       $instance = Cache ::get($key=__CLASS__.'_instance');
       if (!$instance) {
          $instance = Singleton ::getInstance(__CLASS__);
