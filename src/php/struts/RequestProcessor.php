@@ -8,9 +8,8 @@ class RequestProcessor extends Object {
    // ModuleConfig, zu der wir gehören
    protected /* ModuleConfig */ $moduleConfig;
 
-   private $logDebug;
-   private $logInfo;
-   private $logNotice;
+
+   private $logDebug, $logInfo, $logNotice;
 
 
    /**
@@ -19,8 +18,7 @@ class RequestProcessor extends Object {
     * @param ModuleConfig $config - Modulkonfiguration, der dieser RequestProcessor zugeordnet ist
     */
    public function __construct(ModuleConfig $config) {
-      $loglevel = Logger ::getLogLevel(__CLASS__);
-
+      $loglevel        = Logger ::getLogLevel(__CLASS__);
       $this->logDebug  = ($loglevel <= L_DEBUG);
       $this->logInfo   = ($loglevel <= L_INFO);
       $this->logNotice = ($loglevel <= L_NOTICE);

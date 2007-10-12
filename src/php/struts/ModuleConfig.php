@@ -13,6 +13,12 @@ class ModuleConfig extends Object {
 
 
    /**
+    * Der Pfad der Konfigurationsdatei dieses Moduls.
+    */
+   protected $configFile;  // string
+
+
+   /**
     * Der Prefix dieses Modules relative zur ROOT_URL der Anwendung.  Die Prefixe innerhalb einer Anwendung
     * sind eindeutig.  Die ModuleConfig mit einem Leerstring als Prefix ist das Default-Module der Anwendung.
     */
@@ -38,6 +44,12 @@ class ModuleConfig extends Object {
 
 
    /**
+    * Die Tiles-Definitionen dieses Moduls.
+    */
+   protected /*TilesDefinition[]*/ $tilesDefinitions = array();
+
+
+   /**
     * Der Klassenname der RequestProcessor-Implementierung, die für dieses Modul definiert ist.
     */
    protected $processorClass = Struts ::DEFAULT_PROCESSOR_CLASS;
@@ -55,24 +67,42 @@ class ModuleConfig extends Object {
    protected $forwardClass   = Struts ::DEFAULT_FORWARD_CLASS;
 
 
+   // tmp. Array mit gefundenen Pfaden, wird nicht serialisiert (siehe __sleep())
+   protected $resourcePaths = array();
+
+
+   private $logDebug, $logInfo, $logNotice;
+
+
    /**
     * Erzeugt eine neue ModuleConfig.
     *
-    * @param string $configfile - Pfad zur Konfigurationsdatei dieses Modules
+    * @param string $fileName - Pfad zur Konfigurationsdatei dieses Modules
     */
-   public function __construct($configfile) {
-      if (!is_string($configfile)) throw new IllegalTypeException('Illegal type of argument $configfile: '.getType($configfile));
+   public function __construct($fileName) {
+      if (!is_string($fileName)) throw new IllegalTypeException('Illegal type of argument $fileName: '.getType($fileName));
 
-      $xml = $this->loadConfiguration($configfile);
+      $loglevel        = Logger ::getLogLevel(__CLASS__);
+      $this->logDebug  = ($loglevel <= L_DEBUG);
+      $this->logInfo   = ($loglevel <= L_INFO);
+      $this->logNotice = ($loglevel <= L_NOTICE);
 
+      $this->configFile = $fileName;
+      $xml = $this->loadConfiguration($fileName);
       $this->setPrefix((string) $xml['module']);
-      $this->createForwards($xml);
-      $this->createMappings($xml);
+
+      $this->processForwards($xml);
+      $this->processMappings($xml);
+      $this->processTiles($xml);
+      $this->processErrors($xml);
+      $this->processRoles($xml);
+
+      $this->processResourcePaths();
    }
 
 
    /**
-    * Liest die angegebene Konfigurationsdatei in ein XML-Objekt ein (mit Validierung).
+    * Validiert die angegebene Konfigurationsdatei und wandelt sie in ein XML-Objekt um.
     *
     * @param string $fileName - Pfad zur Konfigurationsdatei
     *
@@ -93,19 +123,18 @@ class ModuleConfig extends Object {
       $libroot = join(DIRECTORY_SEPARATOR, $dirs);
 
       $cwd = getCwd();
-      try {
-         // ins Rootverzeichnis wechseln
-         chdir($libroot);
-      }
+
+      // ins Rootverzeichnis wechseln
+      try { chDir($libroot); }
       catch (Exception $ex) { throw new RuntimeException('Could not change working directory to "'.$libroot.'"', $ex); }
+
 
       // Konfiguration parsen und validieren ...
       $object = new SimpleXMLElement($content, LIBXML_DTDVALID);
 
-      try {
-         // zurück ins Ausgangsverzeichnis wechseln
-         chdir($cwd);
-      }
+
+      // zurück ins Ausgangsverzeichnis wechseln
+      try { chDir($cwd); }
       catch (Exception $ex) { throw new RuntimeException('Could not change working directory back to "'.$cwd.'"', $ex); }
 
       return $object;
@@ -113,11 +142,11 @@ class ModuleConfig extends Object {
 
 
    /**
-    * Liest und erzeugt die im XML-Objekt definierten globalen ActionForwards.
+    * Verarbeitet die in der Konfiguration definierten globalen ActionForwards.
     *
     * @param SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
     */
-   protected function createForwards(SimpleXMLElement $xml) {
+   protected function processForwards(SimpleXMLElement $xml) {
       if ($xml->{'global-forwards'}) {
          foreach ($xml->{'global-forwards'}->forward as $elem) {
             if (sizeOf($elem->attributes()) > 2)
@@ -127,6 +156,8 @@ class ModuleConfig extends Object {
             $forward = null;
 
             if ($path = (string) $elem['include']) {
+               // mark it, we will check this later to allow forward references in the file
+               $this->resourcePaths[] = $path;
                $forward = new $this->forwardClass($name, $path, false);
             }
             elseif ($path = (string) $elem['redirect']) {
@@ -143,11 +174,11 @@ class ModuleConfig extends Object {
 
 
    /**
-    * Liest und erzeugt die im XML-Objekt definierten ActionMappings.
+    * Verarbeitet die in der Konfiguration definierten ActionMappings.
     *
     * @param SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
     */
-   protected function createMappings(SimpleXMLElement $xml) {
+   protected function processMappings(SimpleXMLElement $xml) {
       if ($xml->{'action-mappings'}) {
          foreach ($xml->{'action-mappings'}->mapping as $elem) {
             $mapping = new $this->mappingClass($this);
@@ -168,6 +199,8 @@ class ModuleConfig extends Object {
                $forward = null;
 
                if ($path = (string) $elem['include']) {
+                  // mark it, we will check this later to allow forward references in the file
+                  $this->resourcePaths[] = $path;
                   $forward = new $this->forwardClass($name, $path, false);
                }
                elseif ($path = (string) $elem['redirect']) {
@@ -181,6 +214,61 @@ class ModuleConfig extends Object {
             }
             $this->addMapping($mapping);
          }
+      }
+   }
+
+
+   /**
+    * Verarbeitet die in der Konfiguration definierten Tiles.
+    *
+    * @param SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
+    */
+   protected function processTiles(SimpleXMLElement $xml) {
+      if ($xml->{'tiles-definitions'}) {
+         foreach ($xml->{'tiles-definitions'}->definition as $element) {
+            $definition = array();
+
+            if (isSet($element['name'   ])) $definition['name'   ] = (string) $element['name'];
+            if (isSet($element['path'   ])) $definition['path'   ] = (string) $element['path'];
+            if (isSet($element['extends'])) $definition['extends'] = (string) $element['extends'];
+
+            $this->tilesDefinitions[$definition['name']] = $definition;
+         }
+      }
+   }
+
+
+   /**
+    * Verarbeitet die in der Konfiguration definierten Error-Einstellungen.
+    *
+    * @param SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
+    */
+   protected function processErrors(SimpleXMLElement $xml) {
+   }
+
+
+   /**
+    * Verarbeitet die in der Konfiguration definierten Rolleneinschränkungen.
+    *
+    * @param SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
+    */
+   protected function processRoles(SimpleXMLElement $xml) {
+   }
+
+
+   /**
+    * Überprüft alle in der Konfiguartion angegebenen lokalen Resourcen.  Diese Prüfung erfolgt erst nach dem Einlesen der Konfiguration,
+    * sodaß Vorwärtsreferenzen innerhalb der Datei möglich sind.
+    * z.B.: Ein ActionForward zeigt auf eine Tiles-Definiton, die erst später in der Datei definiert ist.
+    *
+    * @param SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
+    */
+   protected function processResourcePaths() {
+      foreach ($this->resourcePaths as $path) {
+         if ($this->findTilesDefinition($path))
+            continue;
+         if (!$this->findLocalResource($path))
+            throw new RuntimeException('No resource found for include path: '.$path);
       }
    }
 
@@ -372,6 +460,48 @@ class ModuleConfig extends Object {
          return $this->forwards[$name];
 
       return null;
+   }
+
+
+   /**
+    * Sucht und gibt die Tiles-Definition mit dem angegebenen Namen zurück.
+    * Wird keine Definition gefunden, wird NULL zurückgegeben.
+    *
+    * @param $name - logischer Name der Definition
+    *
+    * @return TilesDefinition
+    */
+   public function findTilesDefinition($name) {
+      if (isSet($this->tilesDefinitions[$name]))
+         return $this->tilesDefinitions[$name];
+
+      return null;
+   }
+
+
+   /**
+    * Sucht nach einer lokalen Resource mit dem angegebenen Namen und gibt den vollständigen Dateinamen zurück
+    * oder NULL, wenn keine Resource gefunden wurde.
+    *
+    * @param $path - Pfadangabe
+    *
+    * @return string - Dateiname
+    */
+   public function findLocalResource($path) {
+      $fileName = dirName($this->configFile).'/'.$path;
+
+      if (is_file($fileName) && is_readable($fileName))
+         return true;
+
+      return false;
+   }
+
+
+   /**
+    */
+   public function __sleep() {
+      $this->resourcePaths = null;
+      return array_keys((array) $this);
    }
 }
 ?>

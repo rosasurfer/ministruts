@@ -70,6 +70,8 @@ class FrontController extends Singleton {
       // Konfiguration vervollständigen
       $this->applicationDir  = dirName($script=$_SERVER['SCRIPT_FILENAME']);
       $this->applicationPath = subStr($script, $length=strLen($_SERVER['DOCUMENT_ROOT']), strRPos($script, '/')-$length);
+      Config ::set('application.directory', $this->applicationDir );
+      Config ::set('application.path'     , $this->applicationPath);
 
 
       // Umgebung prüfen (ist Zugriff auf WEB-INF und CVS gesperrt ?)
