@@ -17,11 +17,16 @@ final class Config extends Singleton {
     * @return Config
     */
    public static function me() {
-      // unter Windows (= Development) wird die Config jedes mal neu eingelesen
-      if (WINDOWS)
+
+      // auf der Konsole oder dem Entwicklungssystem (Web) oder die Config immer neu einlesen
+      $console     = !isSet($_SERVER['REQUEST_METHOD']);
+      $development = !$console && $_SERVER['REMOTE_ADDR']=='127.0.0.1';
+
+      if ($console || $development)
          return Singleton ::getInstance(__CLASS__);
 
-      // unter Linux wird sie nach der Initialisierung im Cache abgelegt
+
+      // wir laufen auf dem Production-Webserver: nach der Initialisierung wird sie im Cache abgelegt
       $instance = Cache ::get($key=__CLASS__);
       if (!$instance) {
          $instance = Singleton ::getInstance(__CLASS__);
