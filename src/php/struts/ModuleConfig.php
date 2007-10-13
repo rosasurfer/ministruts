@@ -15,14 +15,20 @@ class ModuleConfig extends Object {
    /**
     * Der Pfad der Konfigurationsdatei dieses Moduls.
     */
-   protected $configFile;  // string
+   protected $configFile;     // string
 
 
    /**
     * Der Prefix dieses Modules relative zur ROOT_URL der Anwendung.  Die Prefixe innerhalb einer Anwendung
     * sind eindeutig.  Die ModuleConfig mit einem Leerstring als Prefix ist das Default-Module der Anwendung.
     */
-   protected $prefix;      // string
+   protected $prefix;         // string
+
+
+   /**
+    * Das Basisverzeichnis für von diesem Modul einzubindende lokale Resourcen.
+    */
+   protected $resourceBase;   // string
 
 
    /**
@@ -67,8 +73,8 @@ class ModuleConfig extends Object {
    protected $forwardClass   = Struts ::DEFAULT_FORWARD_CLASS;
 
 
-   // tmp. Array mit gefundenen Pfaden, wird nicht serialisiert (siehe __sleep())
-   protected $resourcePaths = array();
+   // Array mit gefundenen Pfaden, Inhalt wird nicht serialisiert
+   private $resourcePaths = array();
 
 
    private $logDebug, $logInfo, $logNotice;
@@ -89,7 +95,9 @@ class ModuleConfig extends Object {
 
       $this->configFile = $fileName;
       $xml = $this->loadConfiguration($fileName);
-      $this->setPrefix((string) $xml['module']);
+
+      $this->setPrefix      ((string) $xml['module']       );
+      $this->setResourceBase((string) $xml['resource-base']);
 
       $this->processForwards($xml);
       $this->processMappings($xml);
@@ -269,6 +277,8 @@ class ModuleConfig extends Object {
          if (!$this->findLocalResource($path))
             throw new RuntimeException('Resource or definition not found: '.$path);
       }
+      // we don't need this anymore
+      $this->resourcePaths = null;
    }
 
 
@@ -295,6 +305,35 @@ class ModuleConfig extends Object {
          throw new IllegalTypeException('Module prefixes must start with a slash "/" character, found: '.$prefix);
 
       $this->prefix = $prefix;
+   }
+
+
+   /**
+    * Gibt das Basisverzeichnis für lokale Resourcen zurück.
+    *
+    * @return string
+    */
+   public function getResourceBase() {
+      return $this->resourceBase;
+   }
+
+
+   /**
+    * Setzt das Basisverzeichnis für lokale Resourcen.
+    *
+    * @param string $directory - zur Struts-Konfiguration relatives Verzeichnis
+    */
+   protected function setResourceBase($directory) {
+      if ($this->configured)      throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($directory)) throw new IllegalTypeException('Illegal type of argument $directory: '.getType($directory));
+
+      $directory = dirName($this->configFile).'/'.trim($directory, '/\\');
+
+      if (!is_dir($directory))
+         throw new FileNotFoundException('Directory not found: '.$directory);
+
+      // trailing slash at the end to allow people omitting leading slashs at their resource values
+      $this->resourceBase = $directory.'/';
    }
 
 
@@ -487,16 +526,16 @@ class ModuleConfig extends Object {
     * @return string - Dateiname
     */
    public function findLocalResource($path) {
-      $fileName = dirName($this->configFile).'/'.$path;
-      return is_file($fileName);
-   }
+      $resourceBase = $this->resourceBase;
 
+      // strip query string
+      $parts = explode('?', $path, 2);
 
-   /**
-    */
-   public function __sleep() {
-      $this->resourcePaths = null;
-      return array_keys((array) $this);
+      if (is_file($resourceBase.$parts[0])) {
+         return $resourceBase.join('?', $parts);
+      }
+
+      return null;
    }
 }
 ?>

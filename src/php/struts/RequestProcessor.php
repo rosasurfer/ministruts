@@ -272,7 +272,6 @@ class RequestProcessor extends Object {
          if ($forward->isRedirect()) {
             $appPath = $request->getAttribute(Struts ::APPLICATION_PATH_KEY);
             $url = $appPath.$this->moduleConfig->getPrefix().$forward->getPath();
-            //echoPre('redirect: '.$url);
             redirect($url);
          }
          else {
@@ -280,8 +279,8 @@ class RequestProcessor extends Object {
             $appPath = $request->getAttribute(Struts ::APPLICATION_PATH_KEY);
             $form    = $request->getAttribute(Struts ::ACTION_FORM_KEY);
 
-            //echoPre('include: '.$forward->getPath());
-            include($forward->getPath());
+            $resourceBase = $this->moduleConfig->getResourceBase();
+            include($resourceBase.$forward->getPath());
          }
       }
    }

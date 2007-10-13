@@ -31,9 +31,9 @@
 <!ENTITY % Integer "CDATA">
 
 
-<!-- A "Location" is a relative path, delimited by "/" characters, that
-     defines the location of a resource relative to the location of the
-     Struts4PHP configuration file itself.
+<!-- A "Location" is a relative path, delimited by slash "/" characters, that
+     defines the location of a resource relative to the location of the Struts 
+     configuration file itself.
 -->
 <!ENTITY % Location "#PCDATA">
 
@@ -74,14 +74,20 @@
 <!-- The "struts-config" element is the root of the configuration file hierarchy,
      and contains nested elements for all of the other configuration settings.
 
-     module         The module prefix of this struts module. It is the context-relative
+     module         The module prefix of this Struts module. It is the context-relative
                     unique path of the module.  The module with the empty string [""]
                     prefix is the default module of the application.  The prefix of all
                     other modules must start with a slash "/" character.
+                    [""]
+
+     resource-base  The base directory to lookup local resources.  This value is interpreted 
+                    as relative to the location of the Struts configuration file itself.
+                    ["."]
 -->
 <!ELEMENT struts-config (global-forwards?, action-mappings?, tiles-definitions?, roles?)>
 <!ATTLIST struts-config  id             ID              #IMPLIED>
 <!ATTLIST struts-config  module         CDATA           #IMPLIED>
+<!ATTLIST struts-config  resource-base  CDATA           #IMPLIED>
 
 
 <!-- The "global-forwards" element describes a set of ActionForward objects that are
@@ -105,8 +111,8 @@
                   complete the request/response.
 
      include      The identifier of a resource to include.  This may be a tiles definition
-                  or a path to a physical resource relative to the "WEB-INF" directory of
-                  the application.  Exactly one of "include", "redirect" or "alias" must be
+                  or a path to a physical resource relative to the resource base directory 
+                  of the module.  Exactly one of "include", "redirect" or "alias" must be
                   specified.
 
      redirect     The module-relative path of the location to which a redirect
@@ -138,7 +144,7 @@
      attributes are defined:
 
      path            The module-relative path of the submitted request, starting
-                     with a "/" character.
+                     with a slash "/" character.
 
      forward         Module-relative path of the resource that will process this
                      request, instead of the Action class specified by "type".
