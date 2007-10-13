@@ -86,7 +86,6 @@ final class Config extends Singleton {
     * @param string $filename - Dateiname
     */
    private function loadFile($filename) {
-      if (!is_readable($filename)) throw new IOException('File not readable: '.$filename);
       $lines = file($filename, FILE_IGNORE_NEW_LINES + FILE_SKIP_EMPTY_LINES);
 
       foreach ($lines as $line) {

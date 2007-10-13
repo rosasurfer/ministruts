@@ -109,8 +109,7 @@ class ModuleConfig extends Object {
     * @return SimpleXMLElement
     */
    protected function loadConfiguration($fileName) {
-      if (!is_file($fileName))     throw new FileNotFoundException('File not found: '.$fileName);
-      if (!is_readable($fileName)) throw new IOException('File not readable: '.$fileName);
+      if (!is_file($fileName)) throw new FileNotFoundException('File not found: '.$fileName);
       $content = file_get_contents($fileName, false);
 
       // die DTD liegt relativ zum Rootverzeichnis der Library
@@ -268,7 +267,7 @@ class ModuleConfig extends Object {
          if ($this->findTilesDefinition($path))
             continue;
          if (!$this->findLocalResource($path))
-            throw new RuntimeException('No resource found for include path: '.$path);
+            throw new RuntimeException('Resource or definition not found: '.$path);
       }
    }
 
@@ -489,11 +488,7 @@ class ModuleConfig extends Object {
     */
    public function findLocalResource($path) {
       $fileName = dirName($this->configFile).'/'.$path;
-
-      if (is_file($fileName) && is_readable($fileName))
-         return true;
-
-      return false;
+      return is_file($fileName);
    }
 
 
