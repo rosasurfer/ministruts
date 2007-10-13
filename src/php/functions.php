@@ -100,8 +100,9 @@ set_exception_handler('wrapExceptionHandler');
  * Lädt die angegebene Klasse.
  *
  * @param string $className - Klassenname
+ * @param mixed  $throw     - ob Exceptions zurückgeworfen werfen dürfen (nur für manuellen Aufruf)
  */
-function __autoload($className) {
+function __autoload($className /*, $throw */) {
    try {
       if (isSet($GLOBALS['__imports'][$className])) {
          include($GLOBALS['__imports'][$className].'.php');
@@ -109,23 +110,32 @@ function __autoload($className) {
       }
       throw new ClassNotFoundException("Undefined class '$className'");
    }
-   catch (Exception $ex) {                   // Auftretende Exceptions manuell weiterreichen,
-      Logger ::handleException($ex);         // denn __autoload() darf keine Exceptions werfen.
+   catch (Exception $ex) {
+      if (func_num_args() > 1)         // Exceptions nur weiterrreichen, wenn wir nicht vom PHP-Kernel aufgerufen wurden
+         throw $ex;
+      Logger ::handleException($ex);   // PHP-Kernel: manuell verarbeiten (__autoload darf keine Exceptions werfen)
    }
 }
 
 
 /**
- * Ob die angegebene Klasse deklariert wurde.  Diese Funktion ist notwendig, weil eine einfache Abfrage der Art
- * "if (class_exist($className, true))" nicht funktioniert, weil __autoload() eine ClassNotFoundException nicht
- * zurückwerfen kann.  Der Klassenname wird daher ohne Aufruf von __autoload() geprüft.
+ * Ob die angegebene Klasse existiert.  Diese Funktion ist notwendig, weil eine einfache Abfrage der Art
+ * "if (class_exist($className, true))" im Fehlerfall das Script beenden muß (__autoload darf keine Exceptions werfen).
+ * Wird __autoload von hier und nicht aus dem PHP-Kernel aufgerufen, werden Exceptions weitergereicht und der folgende
+ * Code kann entsprechend reagieren.
  *
  * @param string $className - Klassenname
  *
  * @see __autoLoad()
  */
 function is_class($className) {
-   return isSet($GLOBALS['__imports'][$className]);
+   try {
+      __autoLoad($className, true);
+      return true;
+   }
+   catch (ClassNotFoundException $ex) { /**/ }
+
+   return false;
 }
 
 
