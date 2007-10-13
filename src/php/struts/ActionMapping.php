@@ -284,11 +284,16 @@ class ActionMapping extends Object {
          if ($this->path === null)
             throw new IllegalStateException('No path configured for this '.$this);
 
-         if ($this->action === null && $this->forward === null)
-            throw new IllegalStateException('Neither an action nor a forward configured for this '.$this);
+         // wenn weder Action noch Forward angegeben sind, passende Action suchen
+         if (!$this->action && !$this->forward) {
+            $className = ucFirst(baseName($this->path, '.php')).'Action';
+            if (!is_class($className))
+               throw new IllegalStateException('Either an action or a forward must be configured for this '.$this);
+            $this->setAction($className);
+         }
 
-         // try to find a matching ActionForm
-         if ($this->action!==null && $this->form===null && isImportedClass($this->action.'Form')) {
+         // wenn keine ActionForm angegeben ist, passende Form suchen
+         if ($this->action && !$this->form && is_class($this->action.'Form')) {
             $this->setForm($this->action.'Form');
          }
 

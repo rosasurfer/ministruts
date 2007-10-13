@@ -155,22 +155,22 @@ class Module extends Object {
     */
    protected function processForwards(SimpleXMLElement $xml) {
       if ($xml->{'global-forwards'}) {
-         foreach ($xml->{'global-forwards'}->forward as $elem) {
-            if (sizeOf($elem->attributes()) > 2)
-               throw new RuntimeException('Only one of "include", "redirect" or "alias" must be specified for global forward "'.$elem['name'].'"');
+         foreach ($xml->{'global-forwards'}->forward as $element) {
+            if (sizeOf($element->attributes()) > 2)
+               throw new RuntimeException('Only one of "include", "redirect" or "alias" must be specified for global forward "'.$element['name'].'"');
 
-            $name = (string) $elem['name'];
+            $name = (string) $element['name'];
             $forward = null;
 
-            if ($path = (string) $elem['include']) {
+            if ($path = (string) $element['include']) {
                // mark it, we will check this later to allow forward references in the file
                $this->resourcePaths[] = $path;
                $forward = new $this->forwardClass($name, $path, false);
             }
-            elseif ($path = (string) $elem['redirect']) {
+            elseif ($path = (string) $element['redirect']) {
                $forward = new $this->forwardClass($name, $path, true);
             }
-            elseif ($alias = (string) $elem['alias']) {
+            elseif ($alias = (string) $element['alias']) {
                $forward = $this->findForward($alias);
                if (!$forward) throw new RuntimeException('No ActionForward found for alias: '.$alias);
             }
@@ -187,33 +187,33 @@ class Module extends Object {
     */
    protected function processMappings(SimpleXMLElement $xml) {
       if ($xml->{'action-mappings'}) {
-         foreach ($xml->{'action-mappings'}->mapping as $elem) {
+         foreach ($xml->{'action-mappings'}->mapping as $m) {
             $mapping = new $this->mappingClass($this);
-            $mapping->setPath((string) $elem['path']);
+            $mapping->setPath((string) $m['path']);
 
-            if (isSet($elem['action' ])) $mapping->setAction ((string) $elem['action' ]);
-            if (isSet($elem['form'   ])) $mapping->setForm   ((string) $elem['form'   ]);
-            if (isSet($elem['forward'])) $mapping->setForward((string) $elem['forward']);
-            if (isSet($elem['method' ])) $mapping->setMethod ((string) $elem['method' ]);
-            if (isSet($elem['roles'  ])) $mapping->setRoles  ((string) $elem['roles'  ]);
-            if (isSet($elem['default'])) $mapping->setDefault((string) $elem['default'] == 'true');
+            if (isSet($m['action' ])) $mapping->setAction ((string) $m['action' ]);
+            if (isSet($m['form'   ])) $mapping->setForm   ((string) $m['form'   ]);
+            if (isSet($m['forward'])) $mapping->setForward((string) $m['forward']);
+            if (isSet($m['method' ])) $mapping->setMethod ((string) $m['method' ]);
+            if (isSet($m['roles'  ])) $mapping->setRoles  ((string) $m['roles'  ]);
+            if (isSet($m['default'])) $mapping->setDefault((string) $m['default'] == 'true');
 
-            foreach ($elem->forward as $elem) {
-               if (sizeOf($elem->attributes()) > 2)
-                  throw new RuntimeException('Only one of "include", "redirect" or "alias" must be specified for local forward "'.$elem['name'].'"');
+            foreach ($m->forward as $f) {
+               if (sizeOf($f->attributes()) > 2)
+                  throw new RuntimeException('Only one of "include", "redirect" or "alias" must be specified for local forward "'.$f['name'].'"');
 
-               $name = (string) $elem['name'];
+               $name = (string) $f['name'];
                $forward = null;
 
-               if ($path = (string) $elem['include']) {
+               if ($path = (string) $f['include']) {
                   // mark it, we will check this later to allow forward references in the file
                   $this->resourcePaths[] = $path;
                   $forward = new $this->forwardClass($name, $path, false);
                }
-               elseif ($path = (string) $elem['redirect']) {
+               elseif ($path = (string) $f['redirect']) {
                   $forward = new $this->forwardClass($name, $path, true);
                }
-               elseif ($alias = (string) $elem['alias']) {
+               elseif ($alias = (string) $f['alias']) {
                   $forward = $mapping->findForward($alias);
                   if (!$forward) throw new RuntimeException('No ActionForward found for alias: '.$alias);
                }
