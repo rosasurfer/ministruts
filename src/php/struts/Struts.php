@@ -14,15 +14,21 @@ final class Struts extends StaticFactory {
 
 
    /**
+    * Der Klassenname der Default-ActionForward-Implementierung.
+    */
+   const DEFAULT_FORWARD_CLASS = 'ActionForward';
+
+
+   /**
     * Der Klassenname der Default-ActionMapping-Implementierung.
     */
    const DEFAULT_MAPPING_CLASS = 'ActionMapping';
 
 
    /**
-    * Der Klassenname der Default-ActionForward-Implementierung.
+    * Der Klassenname der Default-Tiles-Implementierung.
     */
-   const DEFAULT_FORWARD_CLASS = 'ActionForward';
+   const DEFAULT_TILES_CLASS = 'Tile';
 
 
    /**

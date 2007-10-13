@@ -275,13 +275,10 @@ class ActionMapping extends Object {
 
    /**
     * Friert die Konfiguration dieser Komponente ein.
-    *
-    * @return ActionMapping
     */
    public function freeze() {
       if (!$this->configured) {
-
-         if ($this->path === null)
+         if (!$this->path)
             throw new IllegalStateException('No path configured for this '.$this);
 
          // wenn weder Action noch Forward angegeben sind, passende Action suchen
@@ -302,7 +299,6 @@ class ActionMapping extends Object {
 
          $this->configured = true;
       }
-      return $this;
    }
 
 
@@ -332,16 +328,6 @@ class ActionMapping extends Object {
          Logger ::log('No ActionForward found for name: '.$name, L_ERROR, __CLASS__);
 
       return $forward;
-   }
-
-
-   /**
-    * Return a human readable string representation of this instance.
-    *
-    * @return string
-    */
-   public function __toString() {
-       return print_r($this, true);
    }
 }
 ?>

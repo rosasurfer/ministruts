@@ -275,12 +275,19 @@ class RequestProcessor extends Object {
             redirect($url);
          }
          else {
-            // Daten in den lokalen Namespace legen
-            $appPath = $request->getAttribute(Struts ::APPLICATION_PATH_KEY);
-            $form    = $request->getAttribute(Struts ::ACTION_FORM_KEY);
+            $path = $forward->getPath();
+            $tile = $this->module->findTile($path);
 
-            $resourceBase = $this->module->getResourceBase();
-            include($resourceBase.$forward->getPath());
+            if (!$tile) {
+               // create a simple tile on the fly
+               $tile = new $this->module->getTilesClass($this);
+               $tile->setName('.name')
+                    ->setPath($path)
+                    ->freeze();
+            }
+
+            // render the tile
+            $tile->render($request, $response);
          }
       }
    }

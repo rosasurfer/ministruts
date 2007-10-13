@@ -240,7 +240,7 @@
 <!ATTLIST set              id               ID              #IMPLIED>
 <!ATTLIST set              name             CDATA           #REQUIRED>
 <!ATTLIST set              type             %ContentType;   #IMPLIED>
-<!ATTLIST set              value            CDATA           #IMPLIED>
+<!ATTLIST set              value            CDATA           #REQUIRED>
 
 
 <!-- The "roles" element describes a set of roles.  The individual roles are configured 

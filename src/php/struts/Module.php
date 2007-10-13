@@ -50,9 +50,9 @@ class Module extends Object {
 
 
    /**
-    * Die Tiles-Definitionen dieses Moduls.
+    * Die Tiles dieses Moduls.
     */
-   protected /*TilesDefinition[]*/ $tilesDefinitions = array();
+   protected /*Tile[]*/ $tiles = array();
 
 
    /**
@@ -62,15 +62,21 @@ class Module extends Object {
 
 
    /**
+    * Der Klassenname der ActionForward-Implementierung, die für dieses Modul definiert ist.
+    */
+   protected $forwardClass   = Struts ::DEFAULT_FORWARD_CLASS;
+
+
+   /**
     * Der Klassenname der ActionMapping-Implementierung, die für dieses Modul definiert ist.
     */
    protected $mappingClass   = Struts ::DEFAULT_MAPPING_CLASS;
 
 
    /**
-    * Der Klassenname der ActionForward-Implementierung, die für dieses Modul definiert ist.
+    * Der Klassenname der Tiles-Implementierung, die für dieses Modul definiert ist.
     */
-   protected $forwardClass   = Struts ::DEFAULT_FORWARD_CLASS;
+   protected $tilesClass     = Struts ::DEFAULT_TILES_CLASS;
 
 
    // Array mit gefundenen Pfaden, Inhalt wird nicht serialisiert
@@ -163,7 +169,7 @@ class Module extends Object {
             $forward = null;
 
             if ($path = (string) $element['include']) {
-               // mark it, we will check this later to allow forward references in the file
+               // mark it, we will check this later
                $this->resourcePaths[] = $path;
                $forward = new $this->forwardClass($name, $path, false);
             }
@@ -206,7 +212,7 @@ class Module extends Object {
                $forward = null;
 
                if ($path = (string) $f['include']) {
-                  // mark it, we will check this later to allow forward references in the file
+                  // mark it, we will check this later
                   $this->resourcePaths[] = $path;
                   $forward = new $this->forwardClass($name, $path, false);
                }
@@ -232,16 +238,66 @@ class Module extends Object {
     */
    protected function processTiles(SimpleXMLElement $xml) {
       if ($xml->{'tiles-definitions'}) {
-         foreach ($xml->{'tiles-definitions'}->definition as $element) {
-            $definition = array();
-
-            if (isSet($element['name'   ])) $definition['name'   ] = (string) $element['name'];
-            if (isSet($element['path'   ])) $definition['path'   ] = (string) $element['path'];
-            if (isSet($element['extends'])) $definition['extends'] = (string) $element['extends'];
-
-            $this->tilesDefinitions[$definition['name']] = $definition;
+         foreach ($xml->{'tiles-definitions'}->definition as $d) {
+            $this->findOrCreateTile((string) $d['name'], $xml);
          }
       }
+   }
+
+
+   /**
+    * Erzeugt die Tile mit dem angegebenen Namen und gibt sie zurück.
+    *
+    * @param string           $name - Tile-Name
+    * @param SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration
+    *
+    * @return Tile
+    */
+   private function findOrCreateTile($name, SimpleXMLElement $xml) {
+      // it may already exist
+      $tile = $this->findTile($name);
+      if ($tile)
+         return $tile;
+
+      // no, lookup it's definition
+      $definition = $tile = null;
+      foreach ($xml->{'tiles-definitions'}->definition as $d) {
+         if ((string)$d['name'] != $name)
+            continue;
+         $definition = $d;
+         break;
+      }
+      if (!$definition)                           throw new RuntimeException('Tiles definition not found: "'.$name.'"');
+      if (sizeOf($definition->attributes()) != 2) throw new RuntimeException('Exactly one of "path" or "extends" must be specified for Tiles definition "'.$name.'"');
+
+      // create it
+      if (isSet($definition['path'])) {
+         // this is a simple tile
+         $path = (string) $definition['path'];
+         if (!$this->findLocalResource($path)) throw new RuntimeException('Resource of tile definition "'.$name.'" not found: "'.$path.'"');
+
+         $tile = new $this->tilesClass($this);
+         $tile->setName((string) $definition['name']);
+         $tile->setPath($path);
+
+         foreach ($definition->set as $property) {
+            $tile->setProperty((string) $property['name'], (string) $property['value']);
+         }
+      }
+      else {
+         // this is an extended tile, so clone and modify it's parent
+         $parent = $this->findOrCreateTile((string) $definition['extends'], $xml);
+         $tile = clone $parent;
+         $tile->setName((string) $definition['name']);
+
+         foreach ($definition->set as $property) {
+            $tile->setProperty((string) $property['name'], (string) $property['value']);
+         }
+      }
+
+      // store it
+      $this->addTile($tile);
+      return $tile;
    }
 
 
@@ -266,13 +322,13 @@ class Module extends Object {
    /**
     * Überprüft alle in der Konfiguartion angegebenen lokalen Resourcen.  Diese Prüfung erfolgt erst nach dem Einlesen der Konfiguration,
     * sodaß Vorwärtsreferenzen innerhalb der Datei möglich sind.
-    * z.B.: Ein ActionForward zeigt auf eine Tiles-Definiton, die erst später in der Datei definiert ist.
+    * z.B.: Ein ActionForward zeigt auf eine Tiles-Definition, die erst später in der Datei definiert ist.
     *
     * @param SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
     */
    protected function processResourcePaths() {
       foreach ($this->resourcePaths as $path) {
-         if ($this->findTilesDefinition($path))
+         if ($this->findTile($path))
             continue;
          if (!$this->findLocalResource($path))
             throw new RuntimeException('Resource or definition not found: '.$path);
@@ -376,6 +432,17 @@ class Module extends Object {
 
 
    /**
+    * Fügt diesem Module eine Tile hinzu.
+    *
+    * @param Tile $tile
+    */
+   protected function addTile(Tile $tile) {
+      if ($this->configured) throw new IllegalStateException('Configuration is frozen');
+      $this->tiles[$tile->getName()] = $tile;
+   }
+
+
+   /**
     * Gibt das ActionMapping für den angegebenen Pfad zurück. Zuerst wird nach einer genauen Übereinstimmung
     * gesucht und danach, wenn keines gefunden wurde, nach einem Default-ActionMapping.
     *
@@ -413,6 +480,31 @@ class Module extends Object {
     */
    public function getProcessorClass() {
       return $this->processorClass;
+   }
+
+
+   /**
+    * Setzt den Klassennamen der Tiles-Implementierung, die für dieses Modul benutzt wird.
+    * Diese Klasse muß eine Subklasse von Tile sein.
+    *
+    * @param string $className
+    */
+   protected function setTilesClass($className) {
+      if ($this->configured)                                         throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($className))                                    throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
+      if (!is_subclass_of($className, Struts ::DEFAULT_TILES_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts ::DEFAULT_TILES_CLASS.': '.$className);
+
+      $this->tilesClass = $className;
+   }
+
+
+   /**
+    * Gibt den Klassennamen der Tiles-Implementierung zurück.
+    *
+    * @return string
+    */
+   public function getTilesClass() {
+      return $this->tilesClass;
    }
 
 
@@ -468,8 +560,6 @@ class Module extends Object {
 
    /**
     * Friert die Konfiguration ein, sodaß sie nicht mehr geändert werden kann.
-    *
-    * @return Module
     */
    public function freeze() {
       if (!$this->configured) {
@@ -479,9 +569,11 @@ class Module extends Object {
          foreach ($this->mappings as $mapping)
             $mapping->freeze();
 
+         foreach ($this->tiles as $tile)
+            $tile->freeze();
+
          $this->configured = true;
       }
-      return $this;
    }
 
 
@@ -502,16 +594,16 @@ class Module extends Object {
 
 
    /**
-    * Sucht und gibt die Tiles-Definition mit dem angegebenen Namen zurück.
-    * Wird keine Definition gefunden, wird NULL zurückgegeben.
+    * Sucht und gibt die Tile mit dem angegebenen Namen zurück.
+    * Wird keine Tile gefunden, wird NULL zurückgegeben.
     *
-    * @param $name - logischer Name der Definition
+    * @param $name - logischer Name der Tile
     *
-    * @return TilesDefinition
+    * @return Tile
     */
-   public function findTilesDefinition($name) {
-      if (isSet($this->tilesDefinitions[$name]))
-         return $this->tilesDefinitions[$name];
+   public function findTile($name) {
+      if (isSet($this->tiles[$name]))
+         return $this->tiles[$name];
 
       return null;
    }
@@ -526,14 +618,11 @@ class Module extends Object {
     * @return string - Dateiname
     */
    public function findLocalResource($path) {
-      $resourceBase = $this->resourceBase;
-
       // strip query string
       $parts = explode('?', $path, 2);
 
-      if (is_file($resourceBase.$parts[0])) {
-         return $resourceBase.join('?', $parts);
-      }
+      if (is_file($this->resourceBase.$parts[0]))
+         return $this->resourceBase.join('?', $parts);
 
       return null;
    }
