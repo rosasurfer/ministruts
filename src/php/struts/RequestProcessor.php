@@ -5,8 +5,8 @@
 class RequestProcessor extends Object {
 
 
-   // ModuleConfig, zu der wir gehören
-   protected /* ModuleConfig */ $moduleConfig;
+   // Module, zu dem wir gehören
+   protected /*Module*/ $module;
 
 
    private $logDebug, $logInfo, $logNotice;
@@ -15,15 +15,15 @@ class RequestProcessor extends Object {
    /**
     * Erzeugt einen neuen RequestProcessor.
     *
-    * @param ModuleConfig $config - Modulkonfiguration, der dieser RequestProcessor zugeordnet ist
+    * @param Module $module - Module, dem dieser RequestProcessor zugeordnet ist
     */
-   public function __construct(ModuleConfig $config) {
+   public function __construct(Module $module) {
       $loglevel        = Logger ::getLogLevel(__CLASS__);
       $this->logDebug  = ($loglevel <= L_DEBUG);
       $this->logInfo   = ($loglevel <= L_INFO);
       $this->logNotice = ($loglevel <= L_NOTICE);
 
-      $this->moduleConfig = $config;
+      $this->module = $module;
    }
 
 
@@ -125,12 +125,12 @@ class RequestProcessor extends Object {
       // Pfad für die Mappingauswahl ermitteln ...
       $appPath    = $request->getAttribute(Struts ::APPLICATION_PATH_KEY);
       $scriptName = $request->getPathInfo();
-      $path = subStr($scriptName, strlen($appPath.$this->moduleConfig->getPrefix()));
+      $path = subStr($scriptName, strlen($appPath.$this->module->getPrefix()));
 
       $this->logDebug && Logger ::log('Path used for mapping selection: '.$path, L_DEBUG, __CLASS__);
 
       // ... und Mapping suchen
-      $mapping = $this->moduleConfig->findMapping($path);
+      $mapping = $this->module->findMapping($path);
       if (!$mapping) {
          $this->logInfo && Logger ::log('Could not find a mapping for this request', L_INFO, __CLASS__);
          echoPre("Not found: 404\n\nThe requested URL $path was not found on this server");
@@ -271,7 +271,7 @@ class RequestProcessor extends Object {
       if ($forward) {
          if ($forward->isRedirect()) {
             $appPath = $request->getAttribute(Struts ::APPLICATION_PATH_KEY);
-            $url = $appPath.$this->moduleConfig->getPrefix().$forward->getPath();
+            $url = $appPath.$this->module->getPrefix().$forward->getPath();
             redirect($url);
          }
          else {
@@ -279,7 +279,7 @@ class RequestProcessor extends Object {
             $appPath = $request->getAttribute(Struts ::APPLICATION_PATH_KEY);
             $form    = $request->getAttribute(Struts ::ACTION_FORM_KEY);
 
-            $resourceBase = $this->moduleConfig->getResourceBase();
+            $resourceBase = $this->module->getResourceBase();
             include($resourceBase.$forward->getPath());
          }
       }

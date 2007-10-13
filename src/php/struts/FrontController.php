@@ -31,7 +31,7 @@ class FrontController extends Singleton {
 
 
    // alle registrierten Module, aufgeschlüssselt nach ihrem Prefix
-   private /*ModuleConfig[]*/ $registeredModules = array();
+   private /*Module[]*/ $registeredModules = array();
 
 
    /**
@@ -84,10 +84,10 @@ class FrontController extends Singleton {
          throw new FileNotFoundException('Configuration file not found: '.self:: STRUTS_CONFIG_FILE);
 
 
-      // Für jede Struts-Konfiguration eine ModuleConfig-Instanz erzeugen und registrieren
+      // Für jede Struts-Konfiguration eine Module-Instanz erzeugen und registrieren
       try {
          foreach ($files as $file) {
-            $config = new ModuleConfig($file);
+            $config = new Module($file);
             $config->freeze();
             $this->registerModule($config);
          }
@@ -99,17 +99,17 @@ class FrontController extends Singleton {
 
 
    /**
-    * Registriert den Modul-Prefix der übergebenen ModuleConfig-Instanz.
+    * Registriert den Module-Prefix der übergebenen Instanz.
     *
-    * @param ModuleConfig $config
+    * @param Module $module
     */
-   private function registerModule(ModuleConfig $config) {
-      $prefix = $config->getPrefix();
+   private function registerModule(Module $module) {
+      $prefix = $module->getPrefix();
 
       if (isSet($this->registeredModules[$prefix]))
          throw new RuntimeException('All modules must have unique module prefixes, non-unique: "'.$prefix.'"');
 
-      $this->registeredModules[$prefix] = $config;
+      $this->registeredModules[$prefix] = $module;
    }
 
 
@@ -149,13 +149,13 @@ class FrontController extends Singleton {
    /**
     * Gibt den RequestProcessor zurück, der für das angegebene Module zuständig ist.
     *
-    * @param ModuleConfig $config
+    * @param Module $module
     *
     * @return RequestProcessor
     */
-   private function getRequestProcessor(ModuleConfig $config) {
-      $class = $config->getProcessorClass();
-      return new $class($config);
+   private function getRequestProcessor(Module $module) {
+      $class = $module->getProcessorClass();
+      return new $class($module);
    }
 
 
@@ -170,11 +170,11 @@ class FrontController extends Singleton {
 
       // Module selektieren
       $prefix = $this->getModulePrefix($request);
-      $moduleConfig = $this->registeredModules[$prefix];
-      $request->setAttribute(Struts ::MODULE_KEY, $moduleConfig);
+      $module = $this->registeredModules[$prefix];
+      $request->setAttribute(Struts ::MODULE_KEY, $module);
 
       // RequestProcessor holen
-      $processor = $this->getRequestProcessor($moduleConfig);
+      $processor = $this->getRequestProcessor($module);
 
       // Request verarbeiten
       $processor->process($request, $response);

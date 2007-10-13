@@ -80,7 +80,7 @@ final class Struts extends StaticFactory {
 
 
    /**
-    * Request-Key, unter dem das Module, das diesem Request zugeordnet wurde, gespeichert ist (ModuleConfig-Instanz).
+    * Request-Key, unter dem das Modul, das diesem Request zugeordnet wurde, gespeichert ist.
     */
    const MODULE_KEY = 'org.apache.struts.action.MODULE';
 }

@@ -30,18 +30,18 @@ class ActionMapping extends Object {
 
 
    /**
-    * Modulkonfiguration, zu dem das Mapping gehört
+    * Module, zu dem das Mapping gehört
     */
-   protected /*ModuleConfig*/ $moduleConfig;
+   protected /*Module*/ $module;
 
 
    /**
     * Constructor
     *
-    * @param ModuleConfig $config - ModuleConfig, zu der dieses Mapping gehört
+    * @param Module $module - Module, zu dem dieses Mapping gehört
     */
-   public function __construct(ModuleConfig $config) {
-      $this->moduleConfig = $config;
+   public function __construct(Module $module) {
+      $this->module = $module;
    }
 
 
@@ -303,8 +303,8 @@ class ActionMapping extends Object {
 
    /**
     * Sucht und gibt den ActionForward mit dem angegebenen Namen zurück. Zuerst werden die lokalen Forwards des Mappings
-    * durchsucht und danach die globalen Forwards der Modulkonfiguration.  Wird kein Forward gefunden, wird NULL zurückgegeben.
-    * Es existiert immer ein Forward mit dem speziellen Name "__self". Er ist ein Redirect-Forward auf das ActionMapping selbst.
+    * durchsucht und danach die globalen Forwards des Modules.  Wird kein Forward gefunden, wird NULL zurückgegeben.  Es
+    * existiert immer ein Forward mit dem speziellen Name "__self". Er ist ein Redirect-Forward auf das ActionMapping selbst.
     *
     * @param $name - logischer Name des ActionForwards
     *
@@ -315,13 +315,13 @@ class ActionMapping extends Object {
          return $this->forwards[$name];
 
       if ($name === '__self') {
-         $class = $this->moduleConfig->getForwardClass();
+         $class = $this->module->getForwardClass();
          $forward = new $class($name, $this->path, true);
          $forward->freeze();
          return $this->forwards[$name] = $forward;
       }
 
-      $forward = $this->moduleConfig->findForward($name);
+      $forward = $this->module->findForward($name);
 
       if (!$forward && $this->configured)
          Logger ::log('No ActionForward found for name: '.$name, L_ERROR, __CLASS__);

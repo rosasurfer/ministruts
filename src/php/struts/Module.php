@@ -1,8 +1,8 @@
 <?
 /**
- * ModuleConfig
+ * Module
  */
-class ModuleConfig extends Object {
+class Module extends Object {
 
 
    /**
@@ -20,7 +20,7 @@ class ModuleConfig extends Object {
 
    /**
     * Der Prefix dieses Modules relative zur ROOT_URL der Anwendung.  Die Prefixe innerhalb einer Anwendung
-    * sind eindeutig.  Die ModuleConfig mit einem Leerstring als Prefix ist das Default-Module der Anwendung.
+    * sind eindeutig.  Das Module mit einem Leerstring als Prefix ist das Default-Module der Anwendung.
     */
    protected $prefix;         // string
 
@@ -81,7 +81,7 @@ class ModuleConfig extends Object {
 
 
    /**
-    * Erzeugt eine neue ModuleConfig.
+    * Erzeugt ein neues Module.
     *
     * @param string $fileName - Pfad zur Konfigurationsdatei dieses Modules
     */
@@ -283,7 +283,7 @@ class ModuleConfig extends Object {
 
 
    /**
-    * Gibt den Prefix dieser ModuleConfig zurück. Anhand dieses Prefix werde die verschiedenen Module der
+    * Gibt den Prefix dieses Modules zurück. Anhand dieses Prefix werde die verschiedenen Module der
     * Anwendung unterschieden.
     *
     * @return string
@@ -294,7 +294,7 @@ class ModuleConfig extends Object {
 
 
    /**
-    * Setzt den Prefix der ModuleConfig.
+    * Setzt den Prefix des Modules.
     *
     * @param string prefix
     */
@@ -338,9 +338,9 @@ class ModuleConfig extends Object {
 
 
    /**
-    * Fügt dieser Modulkonfiguration einen globalen ActionForward unter dem angegebenen Namen hinzu.
-    * Der angegebene Name kann vom internen Namen des Forwards abweichen, sodaß die Definition von Aliassen
-    * möglich ist (ein Forward ist unter mehreren Namen auffindbar).
+    * Fügt diesem Module einen globalen ActionForward unter dem angegebenen Namen hinzu.  Der angegebene Name kann vom
+    * internen Namen des Forwards abweichen, sodaß die Definition von Aliassen möglich ist (ein Forward ist unter mehreren
+    * Namen auffindbar).
     *
     * @param string        $name
     * @param ActionForward $forward
@@ -357,7 +357,7 @@ class ModuleConfig extends Object {
 
 
    /**
-    * Fügt dieser Modulkonfiguration ein ActionMapping hinzu.
+    * Fügt diesem Module ein ActionMapping hinzu.
     *
     * @param ActionMapping $mapping
     */
@@ -469,7 +469,7 @@ class ModuleConfig extends Object {
    /**
     * Friert die Konfiguration ein, sodaß sie nicht mehr geändert werden kann.
     *
-    * @return ModuleConfig
+    * @return Module
     */
    public function freeze() {
       if (!$this->configured) {
