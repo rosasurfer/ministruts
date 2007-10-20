@@ -100,8 +100,8 @@ set_exception_handler('wrapExceptionHandler');
 /**
  * Lädt die angegebene Klasse.
  *
- * @param string $className - Klassenname
- * @param mixed  $throw     - ob Exceptions zurückgeworfen werfen dürfen (nur für manuellen Aufruf)
+ * @param string  $className - Klassenname
+ * @param boolean $throw     - ob Exceptions zurückgeworfen werfen dürfen (bei manuellem Aufruf)
  */
 function __autoload($className /*, $throw */) {
    try {
@@ -116,23 +116,28 @@ function __autoload($className /*, $throw */) {
          throw $ex;
       Logger ::handleException($ex);   // PHP-Kernel: manuell verarbeiten (__autoload darf keine Exceptions werfen)
    }
+   return false;
 }
 
 
 /**
  * Ob die angegebene Klasse existiert.  Diese Funktion ist notwendig, weil eine einfache Abfrage der Art
- * "if (class_exist($className, true))" im Fehlerfall das Script beenden muß (__autoload darf keine Exceptions werfen).
- * Wird __autoload von hier und nicht aus dem PHP-Kernel aufgerufen, werden Exceptions weitergereicht und der folgende
- * Code kann entsprechend reagieren.
+ * "if (class_exist($className, true))" das Script im Fehlerfall beendet (__autoload darf keine Exceptions werfen).
+ * Wird __autoload aus dieser Funktion und nicht aus dem PHP-Kernel aufgerufen, werden Exceptions weitergereicht
+ * und der folgende Code kann entsprechend reagieren.
  *
  * @param string $className - Klassenname
  *
- * @see __autoLoad()
+ * @return boolean
+ *
+ * @see __autoload()
  */
 function is_class($className) {
-   try {
-      __autoLoad($className, true);
+   if (class_exists($className, false))
       return true;
+
+   try {
+      return (bool) __autoload($className, true);
    }
    catch (ClassNotFoundException $ex) { /**/ }
 
