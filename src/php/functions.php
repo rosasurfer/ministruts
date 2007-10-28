@@ -45,6 +45,7 @@ $__imports['Module'                         ] = 'php/struts/Module';
 $__imports['Request'                        ] = 'php/struts/Request';
 $__imports['RequestProcessor'               ] = 'php/struts/RequestProcessor';
 $__imports['Response'                       ] = 'php/struts/Response';
+$__imports['RoleProcessor'                  ] = 'php/struts/RoleProcessor';
 $__imports['Struts'                         ] = 'php/struts/Struts';
 $__imports['Tile'                           ] = 'php/struts/Tile';
 

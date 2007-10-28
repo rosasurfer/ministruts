@@ -17,8 +17,7 @@ class ActionMapping extends Object {
    protected $form;        // string
    protected $method;      // string
    protected $default;     // boolean
-
-   protected /*String[]*/ $roles = array();
+   protected $roles;       // string
 
    protected /*ActionForward*/ $forward;  // im Mapping angegebener ActionForward (statt einer Action)
 
@@ -42,6 +41,16 @@ class ActionMapping extends Object {
     */
    public function __construct(Module $module) {
       $this->module = $module;
+   }
+
+
+   /**
+    * Gibt das Module, zu dem dieses Mapping gehört, zurück.
+    *
+    * @return Module instance
+    */
+   public function getModule() {
+      return $this->module;
    }
 
 
@@ -111,10 +120,9 @@ class ActionMapping extends Object {
 
 
    /**
-    * Setzt die Rollenbeschränkung dieses Mappings.  Requests, die nicht mindestens einer angegebenen Rolle genügen, werden abgewiesen.
-    * Beginnt ein Rollenbezeichner mit einem Ausrufezeichen "!", darf der User der angegebenen Rolle NICHT angehören.
+    * Setzt die Rollenbeschränkung dieses Mappings.  Requests, die nicht den angebenen Rollen genügen, werden abgewiesen.
     *
-    * @param string - ein oder mehrere Rollenbezeichner (komma-getrennet)
+    * @param string - Rollenausdruck
     *
     * @return ActionMapping
     */
@@ -122,7 +130,9 @@ class ActionMapping extends Object {
       if ($this->configured)  throw new IllegalStateException('Configuration is frozen');
       if (!is_string($roles)) throw new IllegalTypeException('Illegal type of argument $roles: '.getType($roles));
 
-      static $pattern = '/^!?[A-Za-z_][A-Za-z0-9_]*(,!?[A-Za-z_][A-Za-z0-9_]*)*$/';
+      //static $pattern = '/^!?[A-Za-z_][A-Za-z0-9_]*(,!?[A-Za-z_][A-Za-z0-9_]*)*$/';
+      static $pattern = '/^!?[A-Za-z_][A-Za-z0-9_]*$/';
+
       if (!strLen($roles) || !preg_match($pattern, $roles)) throw new InvalidArgumentException('Invalid argument $roles: "'.$roles.'"');
 
       // check for impossible constraints, ie. "Member,!Member"

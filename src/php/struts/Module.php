@@ -58,19 +58,19 @@ class Module extends Object {
    /**
     * Der Klassenname der RequestProcessor-Implementierung, die für dieses Modul definiert ist.
     */
-   protected $processorClass = Struts ::DEFAULT_PROCESSOR_CLASS;
+   protected $requestProcessorClass = Struts ::DEFAULT_REQUEST_PROCESSOR_CLASS;
 
 
    /**
     * Der Klassenname der ActionForward-Implementierung, die für dieses Modul definiert ist.
     */
-   protected $forwardClass   = Struts ::DEFAULT_FORWARD_CLASS;
+   protected $forwardClass   = Struts ::DEFAULT_ACTION_FORWARD_CLASS;
 
 
    /**
     * Der Klassenname der ActionMapping-Implementierung, die für dieses Modul definiert ist.
     */
-   protected $mappingClass   = Struts ::DEFAULT_MAPPING_CLASS;
+   protected $mappingClass   = Struts ::DEFAULT_ACTION_MAPPING_CLASS;
 
 
    /**
@@ -79,8 +79,14 @@ class Module extends Object {
    protected $tilesClass     = Struts ::DEFAULT_TILES_CLASS;
 
 
-   // Array mit gefundenen Pfaden, Inhalt wird nicht serialisiert
-   private $resourcePaths = array();
+   /**
+    * Der Klassenname der RoleProcessor-Implementierung, die für dieses Modul definiert ist.
+    */
+   protected $roleProcessorClass;
+
+
+   // die definierten Resource-Pfade (werden nicht serialisiert)
+   private $definedResourcePaths = array();
 
 
    private $logDebug, $logInfo, $logNotice;
@@ -102,16 +108,17 @@ class Module extends Object {
       $this->configFile = $fileName;
       $xml = $this->loadConfiguration($fileName);
 
-      $this->setPrefix      ((string) $xml['module']       );
+      $this->setPrefix      ((string) $xml['module'       ]);
       $this->setResourceBase((string) $xml['resource-base']);
+      if ($xml['role-processor'])
+         $this->setRoleProcessorClass((string) $xml['role-processor']);
 
       $this->processForwards($xml);
       $this->processMappings($xml);
       $this->processTiles($xml);
       $this->processErrors($xml);
-      $this->processRoles($xml);
 
-      $this->processResourcePaths();
+      $this->checkResourcePaths();
    }
 
 
@@ -169,8 +176,7 @@ class Module extends Object {
             $forward = null;
 
             if ($path = (string) $element['include']) {
-               // mark it, we will check this later
-               $this->resourcePaths[] = $path;
+               $this->definedResourcePaths[] = $path;           // tmp. save all resource paths for checking after reading the tiles configuration
                $forward = new $this->forwardClass($name, $path, false);
             }
             elseif ($path = (string) $element['redirect']) {
@@ -193,35 +199,39 @@ class Module extends Object {
     */
    protected function processMappings(SimpleXMLElement $xml) {
       if ($xml->{'action-mappings'}) {
-         foreach ($xml->{'action-mappings'}->mapping as $m) {
+         foreach ($xml->{'action-mappings'}->mapping as $mappingTag) {
             $mapping = new $this->mappingClass($this);
-            $mapping->setPath((string) $m['path']);
+            $mapping->setPath((string) $mappingTag['path']);
 
-            if (isSet($m['action' ])) $mapping->setAction ((string) $m['action' ]);
-            if (isSet($m['form'   ])) $mapping->setForm   ((string) $m['form'   ]);
-            if (isSet($m['forward'])) $mapping->setForward((string) $m['forward']);
-            if (isSet($m['method' ])) $mapping->setMethod ((string) $m['method' ]);
-            if (isSet($m['roles'  ])) $mapping->setRoles  ((string) $m['roles'  ]);
-            if (isSet($m['default'])) $mapping->setDefault((string) $m['default'] == 'true');
+            if (isSet($mappingTag['action' ])) $mapping->setAction ((string) $mappingTag['action' ]);
+            if (isSet($mappingTag['form'   ])) $mapping->setForm   ((string) $mappingTag['form'   ]);
+            if (isSet($mappingTag['forward'])) $mapping->setForward((string) $mappingTag['forward']);
+            if (isSet($mappingTag['method' ])) $mapping->setMethod ((string) $mappingTag['method' ]);
 
-            foreach ($m->forward as $f) {
-               if (sizeOf($f->attributes()) > 2)
-                  throw new RuntimeException('Only one of "include", "redirect" or "alias" must be specified for local forward "'.$f['name'].'"');
+            if (isSet($mappingTag['roles'])) {
+               if (!$this->roleProcessorClass)
+                  throw new RuntimeException('No RoleProcessor configuration found for role: "'.$mappingTag['roles'].'"');
+               $mapping->setRoles($roles = (string) $mappingTag['roles']);
+            }
+            if (isSet($mappingTag['default'])) $mapping->setDefault((string) $mappingTag['default'] == 'true');
 
-               $name = (string) $f['name'];
+            foreach ($mappingTag->forward as $forwardTag) {
+               if (sizeOf($forwardTag->attributes()) > 2)
+                  throw new RuntimeException('Only one of "include", "redirect" or "alias" must be specified for local forward "'.$forwardTag['name'].'"');
+
+               $name = (string) $forwardTag['name'];
                $forward = null;
 
-               if ($path = (string) $f['include']) {
-                  // mark it, we will check this later
-                  $this->resourcePaths[] = $path;
+               if ($path = (string) $forwardTag['include']) {
+                  $this->definedResourcePaths[] = $path;           // tmp. save all resource paths for checking after reading the tiles configuration
                   $forward = new $this->forwardClass($name, $path, false);
                }
-               elseif ($path = (string) $f['redirect']) {
+               elseif ($path = (string) $forwardTag['redirect']) {
                   $forward = new $this->forwardClass($name, $path, true);
                }
-               elseif ($alias = (string) $f['alias']) {
+               elseif ($alias = (string) $forwardTag['alias']) {
                   $forward = $mapping->findForward($alias);
-                  if (!$forward) throw new RuntimeException('No ActionForward found for alias: '.$alias);
+                  if (!$forward) throw new RuntimeException('No ActionForward found for alias: "'.$alias.'"');
                }
                $mapping->addForward($name, $forward);
             }
@@ -239,7 +249,7 @@ class Module extends Object {
    protected function processTiles(SimpleXMLElement $xml) {
       if ($xml->{'tiles-definitions'}) {
          foreach ($xml->{'tiles-definitions'}->definition as $d) {
-            $this->findOrCreateTile((string) $d['name'], $xml);
+            $this->createTile((string) $d['name'], $xml);
          }
       }
    }
@@ -253,7 +263,7 @@ class Module extends Object {
     *
     * @return Tile
     */
-   private function findOrCreateTile($name, SimpleXMLElement $xml) {
+   private function createTile($name, SimpleXMLElement $xml) {
       // it may already exist
       $tile = $this->findTile($name);
       if ($tile)
@@ -286,7 +296,7 @@ class Module extends Object {
       }
       else {
          // this is an extended tile, so clone and modify it's parent
-         $parent = $this->findOrCreateTile((string) $definition['extends'], $xml);
+         $parent = $this->createTile((string) $definition['extends'], $xml);
          $tile = clone $parent;
          $tile->setName((string) $definition['name']);
 
@@ -295,7 +305,7 @@ class Module extends Object {
          }
       }
 
-      // store it
+      // save it
       $this->addTile($tile);
       return $tile;
    }
@@ -307,34 +317,6 @@ class Module extends Object {
     * @param SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
     */
    protected function processErrors(SimpleXMLElement $xml) {
-   }
-
-
-   /**
-    * Verarbeitet die in der Konfiguration definierten Rolleneinschränkungen.
-    *
-    * @param SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
-    */
-   protected function processRoles(SimpleXMLElement $xml) {
-   }
-
-
-   /**
-    * Überprüft alle in der Konfiguartion angegebenen lokalen Resourcen.  Diese Prüfung erfolgt erst nach dem Einlesen der Konfiguration,
-    * sodaß Vorwärtsreferenzen innerhalb der Datei möglich sind.
-    * z.B.: Ein ActionForward zeigt auf eine Tiles-Definition, die erst später in der Datei definiert ist.
-    *
-    * @param SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
-    */
-   protected function processResourcePaths() {
-      foreach ($this->resourcePaths as $path) {
-         if ($this->findTile($path))
-            continue;
-         if (!$this->findLocalResource($path))
-            throw new RuntimeException('Resource or definition not found: '.$path);
-      }
-      // we don't need this anymore
-      $this->resourcePaths = null;
    }
 
 
@@ -390,6 +372,21 @@ class Module extends Object {
 
       // trailing slash at the end to allow people omitting leading slashs at their resource values
       $this->resourceBase = $directory.'/';
+   }
+
+
+   /**
+    * Setzt den Klassennamen der RoleProcessor-Implementierung, die für dieses Module benutzt wird.
+    * Diese Klasse muß eine Subklasse von RoleProcessor sein.
+    *
+    * @param string $className
+    */
+   protected function setRoleProcessorClass($className) {
+      if ($this->configured)                                               throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($className))                                          throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
+      if (!is_subclass_of($className, Struts ::ROLE_PROCESSOR_BASE_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts ::ROLE_PROCESSOR_BASE_CLASS.': '.$className);
+
+      $this->roleProcessorClass = $className;
    }
 
 
@@ -464,12 +461,12 @@ class Module extends Object {
     *
     * @param string $className
     */
-   protected function setProcessorClass($className) {
-      if ($this->configured)                                             throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($className))                                        throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
-      if (!is_subclass_of($className, Struts ::DEFAULT_PROCESSOR_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts ::DEFAULT_PROCESSOR_CLASS.': '.$className);
+   protected function setRequestProcessorClass($className) {
+      if ($this->configured)                                                     throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($className))                                                throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
+      if (!is_subclass_of($className, Struts ::DEFAULT_REQUEST_PROCESSOR_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts ::DEFAULT_REQUEST_PROCESSOR_CLASS.': '.$className);
 
-      $this->processorClass = $className;
+      $this->requestProcessorClass = $className;
    }
 
 
@@ -478,8 +475,23 @@ class Module extends Object {
     *
     * @return string
     */
-   public function getProcessorClass() {
-      return $this->processorClass;
+   public function getRequestProcessorClass() {
+      return $this->requestProcessorClass;
+   }
+
+
+   /**
+    * Gibt die RoleProcessor-Implementierung dieses Moduls zurück.
+    *
+    * @return RoleProcessor
+    */
+   public function getRoleProcessor() {
+      static $instance = null;
+
+      if (!$instance && ($class = $this->roleProcessorClass))
+         $instance = new $class;
+
+      return $instance;
    }
 
 
@@ -515,9 +527,9 @@ class Module extends Object {
     * @param string $className
     */
    protected function setMappingClass($className) {
-      if ($this->configured)                                           throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($className))                                      throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
-      if (!is_subclass_of($className, Struts ::DEFAULT_MAPPING_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts ::DEFAULT_MAPPING_CLASS.': '.$className);
+      if ($this->configured)                                                  throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($className))                                             throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
+      if (!is_subclass_of($className, Struts ::DEFAULT_ACTION_MAPPING_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts ::DEFAULT_ACTION_MAPPING_CLASS.': '.$className);
 
       $this->mappingClass = $className;
    }
@@ -540,9 +552,9 @@ class Module extends Object {
     * @param string $className
     */
    protected function setForwardClass($className) {
-      if ($this->configured)                                           throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($className))                                      throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
-      if (!is_subclass_of($className, Struts ::DEFAULT_FORWARD_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts ::DEFAULT_FORWARD_CLASS.': '.$className);
+      if ($this->configured)                                                  throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($className))                                             throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
+      if (!is_subclass_of($className, Struts ::DEFAULT_ACTION_FORWARD_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts ::DEFAULT_ACTION_FORWARD_CLASS.': '.$className);
 
       $this->forwardClass = $className;
    }
@@ -594,6 +606,26 @@ class Module extends Object {
 
 
    /**
+    * Überprüft alle in der Konfiguartion angegebenen lokalen Resourcen.  Diese Prüfung erfolgt erst nach dem Einlesen der Konfiguration,
+    * sodaß Vorwärtsreferenzen innerhalb der Datei möglich sind.
+    * z.B.: Ein ActionForward zeigt auf eine Tiles-Definition, die erst später in der Datei definiert ist.
+    *
+    * @param SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
+    */
+   private function checkResourcePaths() {
+      foreach ($this->definedResourcePaths as $path) {
+         if ($this->findTile($path))
+            continue;
+         if (!$this->findLocalResource($path))
+            throw new RuntimeException('Resource or definition not found: '.$path);
+      }
+
+      // we don't need this anymore
+      $this->definedResourcePaths = null;
+   }
+
+
+   /**
     * Sucht und gibt die Tile mit dem angegebenen Namen zurück.
     * Wird keine Tile gefunden, wird NULL zurückgegeben.
     *
@@ -617,7 +649,7 @@ class Module extends Object {
     *
     * @return string - Dateiname
     */
-   public function findLocalResource($path) {
+   private function findLocalResource($path) {
       // strip query string
       $parts = explode('?', $path, 2);
 

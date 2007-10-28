@@ -10,19 +10,19 @@ final class Struts extends StaticFactory {
    /**
     * Der Klassenname der Default-RequestProcessor-Implementierung.
     */
-   const DEFAULT_PROCESSOR_CLASS = 'RequestProcessor';
+   const DEFAULT_REQUEST_PROCESSOR_CLASS = 'RequestProcessor';
 
 
    /**
     * Der Klassenname der Default-ActionForward-Implementierung.
     */
-   const DEFAULT_FORWARD_CLASS = 'ActionForward';
+   const DEFAULT_ACTION_FORWARD_CLASS = 'ActionForward';
 
 
    /**
     * Der Klassenname der Default-ActionMapping-Implementierung.
     */
-   const DEFAULT_MAPPING_CLASS = 'ActionMapping';
+   const DEFAULT_ACTION_MAPPING_CLASS = 'ActionMapping';
 
 
    /**
@@ -41,6 +41,12 @@ final class Struts extends StaticFactory {
     * Der Basisklassenname der ActionForm-Implementierung.
     */
    const ACTION_FORM_BASE_CLASS = 'ActionForm';
+
+
+   /**
+    * Der Basisklassenname der RoleProcessor-Implementierung.
+    */
+   const ROLE_PROCESSOR_BASE_CLASS = 'RoleProcessor';
 
 
    /**

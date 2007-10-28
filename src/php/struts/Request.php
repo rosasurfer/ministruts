@@ -182,7 +182,7 @@ final class Request extends Singleton {
 
 
    /**
-    * Gibt den unter dem angegebenen Schlüssel gespeicherten Wert zurück oder NULL, wenn unter diesem Namen kein Wert existiert.
+    * Gibt den unter dem angegebenen Schlüssel gespeicherten Wert zurück oder NULL, wenn unter dem Schlüssel kein Wert existiert.
     *
     * @param string $key - Schlüssel, unter dem der Wert gespeichert ist
     *
@@ -191,8 +191,31 @@ final class Request extends Singleton {
    public function &getAttribute($key) {
       if (isSet($this->attributes[$key]))
          return $this->attributes[$key];
+
       $value = null;
       return $value;
+   }
+
+
+   /**
+    * Ob der User, der den Request ausgelöst hat, Inhaber der angegebenen Rollen ist.
+    *
+    * @param string $roles - Rollenbeschränkung
+    *
+    * @return boolean
+    */
+   public function isUserInRole($roles) {
+      if (!is_string($roles)) throw new IllegalTypeException('Illegal type of argument $roles: '.getType($roles));
+
+      // ActionMapping holen
+      $mapping = $this->getAttribute(Struts ::ACTION_MAPPING_KEY);
+      if (!$mapping)
+         throw new RuntimeException('Illegal method call.');
+
+      // RoleProcessor holen und Rückgabewert prüfen
+      $forward = $mapping->getModule()->getRoleProcessor()->processRoles($this, Response ::me(), $mapping);
+
+      return (!$forward);
    }
 }
 ?>

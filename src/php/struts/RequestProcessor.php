@@ -19,8 +19,8 @@ class RequestProcessor extends Object {
     */
    public function __construct(Module $module) {
       $loglevel        = Logger ::getLogLevel(__CLASS__);
-      $this->logDebug  = ($loglevel <= L_DEBUG);
-      $this->logInfo   = ($loglevel <= L_INFO);
+      $this->logDebug  = ($loglevel <= L_DEBUG );
+      $this->logInfo   = ($loglevel <= L_INFO  );
       $this->logNotice = ($loglevel <= L_NOTICE);
 
       $this->module = $module;
@@ -44,7 +44,7 @@ class RequestProcessor extends Object {
       $this->processCachedMessages($request, $response);
 
 
-      // passendes Mapping ermitteln
+      // das passende Mapping ermitteln
       $mapping = $this->processMapping($request, $response);
       if (!$mapping)
          return;
@@ -52,6 +52,11 @@ class RequestProcessor extends Object {
 
       // Methodenbeschränkungen des Mappings überprüfen
       if (!$this->processMethod($request, $response, $mapping))
+         return;
+
+
+      // ggf. benötigte Rollen überprüfen
+      if (!$this->processRoles($request, $response, $mapping))
          return;
 
 
@@ -122,27 +127,31 @@ class RequestProcessor extends Object {
     * @return ActionMapping
     */
    protected function processMapping(Request $request, Response $response) {
-      // Pfad für die Mappingauswahl ermitteln ...
+      // Pfad für die Mappingauswahl ermitteln, ...
       $appPath    = $request->getAttribute(Struts ::APPLICATION_PATH_KEY);
       $scriptName = $request->getPathInfo();
       $path = subStr($scriptName, strlen($appPath.$this->module->getPrefix()));
 
       $this->logDebug && Logger ::log('Path used for mapping selection: '.$path, L_DEBUG, __CLASS__);
 
-      // ... und Mapping suchen
+      // ... Mapping suchen ...
       $mapping = $this->module->findMapping($path);
       if (!$mapping) {
          $this->logInfo && Logger ::log('Could not find a mapping for this request', L_INFO, __CLASS__);
          echoPre("Not found: 404\n\nThe requested URL $path was not found on this server");
       }
+
+      // ... und im Request hinterlegen
+      $request->setAttribute(Struts ::ACTION_MAPPING_KEY, $mapping);
+
       return $mapping;
    }
 
 
    /**
-    * Wenn die Action Methodenbeschränkungen des Requests hat, sicherstellen, daß der Request der angegebenen
-    * Methode entspricht. Gibt TRUE zurück, wenn die Verarbeitung fortgesetzt werden soll oder FALSE, wenn der
-    * Zugriff nicht gewährt wird.
+    * Wenn die Action Request-Methodenbeschränkungen hat, sicherstellen, daß der Request der angegebenen Methode
+    * entspricht. Gibt TRUE zurück, wenn die Verarbeitung fortgesetzt werden soll oder FALSE, wenn der Zugriff
+    * nicht gewährt wird.
     *
     * @param Request       $request
     * @param Response      $response
@@ -153,12 +162,36 @@ class RequestProcessor extends Object {
    protected function processMethod(Request $request, Response $response, ActionMapping $mapping) {
       $method = $mapping->getMethod();
 
-      if ($method===null || $method == $request->getMethod())
+      if (!$method || $method == $request->getMethod())
          return true;
 
       $this->logDebug && Logger ::log('Request does not have the required method type, denying access', L_DEBUG, __CLASS__);
       echoPre('Access denied: 403');
 
+      return false;
+   }
+
+
+   /**
+    * Wenn die Action Zugriffsbeschränkungen hat, sicherstellen, daß der User Inhaber der angegebenen Rollen ist.  Gibt TRUE zurück,
+    * wenn die Verarbeitung fortgesetzt und der Zugriff gewährt werden soll, oder FALSE, wenn der Zugriff nicht gewährt und der Request
+    * bereits beendet wurde.
+    *
+    * @param Request       $request
+    * @param Response      $response
+    * @param ActionMapping $mapping
+    *
+    * @return boolean
+    */
+   protected function processRoles(Request $request, Response $response, ActionMapping $mapping) {
+      if ($mapping->getRoles() === null)
+         return true;
+
+      $forward = $this->module->getRoleProcessor()->processRoles($request, $response, $mapping);
+      if (!$forward)
+         return true;
+
+      $this->processActionForward($request, $response, $forward);
       return false;
    }
 

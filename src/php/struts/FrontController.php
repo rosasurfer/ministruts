@@ -154,7 +154,7 @@ class FrontController extends Singleton {
     * @return RequestProcessor
     */
    private function getRequestProcessor(Module $module) {
-      $class = $module->getProcessorClass();
+      $class = $module->getRequestProcessorClass();
       return new $class($module);
    }
 
