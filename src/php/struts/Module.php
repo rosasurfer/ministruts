@@ -96,9 +96,11 @@ class Module extends Object {
     * Erzeugt ein neues Module.
     *
     * @param string $fileName - Pfad zur Konfigurationsdatei dieses Modules
+    * @param string $prefix   - Prefix des Modules
     */
-   public function __construct($fileName) {
+   public function __construct($fileName, $prefix) {
       if (!is_string($fileName)) throw new IllegalTypeException('Illegal type of argument $fileName: '.getType($fileName));
+      if (!is_string($prefix))   throw new IllegalTypeException('Illegal type of argument $prefix: '.getType($prefix));
 
       $loglevel        = Logger ::getLogLevel(__CLASS__);
       $this->logDebug  = ($loglevel <= L_DEBUG);
@@ -106,10 +108,11 @@ class Module extends Object {
       $this->logNotice = ($loglevel <= L_NOTICE);
 
       $this->configFile = $fileName;
-      $xml = $this->loadConfiguration($fileName);
+      $this->setPrefix($prefix);
 
-      $this->setPrefix      ((string) $xml['module'       ]);
+      $xml = $this->loadConfiguration($fileName);
       $this->setResourceBase((string) $xml['resource-base']);
+
       if ($xml['role-processor'])
          $this->setRoleProcessorClass((string) $xml['role-processor']);
 

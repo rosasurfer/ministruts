@@ -74,12 +74,6 @@
 <!-- The "struts-config" element is the root of the configuration file hierarchy,
      and contains nested elements for all of the other configuration settings.
 
-     module         The module prefix of this Struts module. It is the context-relative
-                    unique path of the module.  The module with the empty string [""]
-                    prefix is the default module of the application.  The prefix of all
-                    other modules must start with a slash "/" character.
-                    [""]
-
      resource-base  The base directory to lookup local resources.  This value is interpreted 
                     as relative to the location of the Struts configuration file itself.
                     ["."]
@@ -89,7 +83,6 @@
 -->
 <!ELEMENT struts-config (global-forwards?, action-mappings?, tiles-definitions?)>
 <!ATTLIST struts-config  id             ID              #IMPLIED>
-<!ATTLIST struts-config  module         CDATA           #IMPLIED>
 <!ATTLIST struts-config  resource-base  CDATA           #IMPLIED>
 <!ATTLIST struts-config  role-processor %ClassName;     #IMPLIED>
 

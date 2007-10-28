@@ -4,3 +4,9 @@
 
    - Vereinfachung für die Webentwickler: Action::executeBefore() und Action::execute() können statt einer ActionForward-Instanz
      auch einfach nur den entsprechenden Namen zurückgeben (so wie er in der struts-config.xml definiert ist)
+
+   - der Modulprefix der Module wird nicht mehr in der struts-config.xml konfiguriert, sondern über den Dateinamen definiert:
+     struts-config.xml          - Prefix: ""
+     struts-config-member.xml   - Prefix: "/member"
+     struts-config-xyz-123.xml  - Prefix: "/xyz-123"
+

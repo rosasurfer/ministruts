@@ -15,9 +15,6 @@
 class FrontController extends Singleton {
 
 
-   const STRUTS_CONFIG_FILE = 'struts-config.xml';
-
-
    /**
     * Das Wurzelverzeichnis der aktuellen Webapplikation.
     */
@@ -78,16 +75,18 @@ class FrontController extends Singleton {
 
 
       // Alle Struts-Konfigurationen in WEB-INF suchen
-      $baseName = baseName(self:: STRUTS_CONFIG_FILE, '.xml');
-      $files = glob($this->applicationDir.'/WEB-INF/'.$baseName.'*.xml', GLOB_ERR);
-      if (sizeOf($files) == 0)
-         throw new FileNotFoundException('Configuration file not found: '.self:: STRUTS_CONFIG_FILE);
+      if (!is_file($this->applicationDir.'/WEB-INF/struts-config.xml')) throw new FileNotFoundException('Configuration file not found: struts-config.xml');
+      $files[] = $this->applicationDir.'/WEB-INF/struts-config.xml';
+      $files   = array_merge($files, glob($this->applicationDir.'/WEB-INF/struts-config-*.xml', GLOB_ERR));
 
 
-      // Für jede Struts-Konfiguration eine Module-Instanz erzeugen und registrieren
+      // Für jede Struts-Konfiguration eine Module-Instanz erzeugen und Prefix registrieren
       try {
          foreach ($files as $file) {
-            $config = new Module($file);
+            $baseName = baseName($file, '.xml');
+            $prefix = (String ::startsWith($baseName, 'struts-config-')) ? '/'.subStr($baseName, 14) : '';
+
+            $config = new Module($file, $prefix);
             $config->freeze();
             $this->registerModule($config);
          }
@@ -107,7 +106,7 @@ class FrontController extends Singleton {
       $prefix = $module->getPrefix();
 
       if (isSet($this->registeredModules[$prefix]))
-         throw new RuntimeException('All modules must have unique module prefixes, non-unique: "'.$prefix.'"');
+         throw new RuntimeException('All modules must have unique module prefixes, non-unique prefix: "'.$prefix.'"');
 
       $this->registeredModules[$prefix] = $module;
    }
