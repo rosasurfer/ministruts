@@ -1,3 +1,6 @@
 2007-10-28
 
-   -  automatische Rollenüberprüfung per struts-config.xml integriert
+   - automatische Rollenüberprüfung per struts-config.xml integriert
+
+   - Vereinfachung für die Webentwickler: Action::executeBefore() und Action::execute() können statt einer ActionForward-Instanz
+     auch einfach nur den entsprechenden Namen zurückgeben (so wie er in der struts-config.xml definiert ist)

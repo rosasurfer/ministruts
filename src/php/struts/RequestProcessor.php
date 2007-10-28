@@ -257,7 +257,7 @@ class RequestProcessor extends Object {
 
 
    /**
-    * Übergibt den Request der angegebenen Action zur Bearbeitung und gibt den von der Action zurückgegebenen ActionForward zurück.
+    * Übergibt den Request zur Bearbeitung an die konfigurierte Action und gibt den von ihr zurückgegebenen ActionForward zurück.
     *
     * @param Request    $request
     * @param Response   $response
@@ -267,23 +267,29 @@ class RequestProcessor extends Object {
     */
    protected function processActionExecute(Request $request, Response $response, Action $action) {
       $forward = null;
-
-      // Alles kapseln, damit Postprocessing-Hook auch nach Exceptions aufgerufen wird (für Transaction-Rollback o.ä.)
       $throwable = null;
+
+      // Alles kapseln, damit der Postprocessing-Hook immer aufgerufen wird (auch nach Exceptions, z.B. für Transaction-Rollback o.ä.)
       try {
-         // allgemeiner Preprocessing-Hook
+         // allgemeine Preprocessing-Hook aufrufen
          $forward = $action->executeBefore($request, $response);
 
-         // Action nur ausführen, wenn executeBefore() nicht Abbruch signalisiert hat
+         // Action nur ausführen, wenn executeBefore() nicht schon Abbruch signalisiert hat
          if ($forward === null)
             $forward = $action->execute($request, $response);
       }
       catch (Exception $ex) {
-         $throwable = $ex;
+         $throwable = $ex;    // evt. aufgetretene Exception zwischenspeichern
       }
 
-      // allgemeiner Postprocessing-Hook
+      // falls nur ein Forward-Identifier zurückgegeben wurde, diesen auflösen
+      if (is_string($forward))
+         $forward = $action->getMapping()->findForward($forward);
+
+
+      // allgemeinen Postprocessing-Hook immer aufrufen
       $forward = $action->executeAfter($request, $response, $forward);
+
 
       // jetzt aufgetretene Exceptions weiterreichen
       if ($throwable)

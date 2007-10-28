@@ -24,15 +24,28 @@ abstract class Action extends Object {
 
 
    /**
-    * Allgemeiner Pre-Processing-Hook, der von Subklassen bei Bedarf überschrieben werden kann.  Gibt
-    * NULL zurück, wenn die Verarbeitung fortgesetzt werden soll oder eine ActionForward-Instanz, wenn
-    * die Verarbeitung abgebrochen und zu dem vom Forward beschriebenen Ziel verzweigt werden soll.
+    * Gibt das ActionMapping, zu dem diese Action gehört, zurück.
+    *
+    * @return ActionMapping instance
+    */
+   public function getMapping() {
+      return $this->mapping;
+   }
+
+
+   /**
+    * Allgemeiner Pre-Processing-Hook, der von Subklassen bei Bedarf überschrieben werden kann.  Gibt NULL zurück,
+    * wenn die Verarbeitung fortgesetzt werden soll oder eine ActionForward-Instanz, wenn die Verarbeitung
+    * abgebrochen und zu dem vom Forward beschriebenen Ziel verzweigt werden soll.
     * Die Default-Implementierung macht nichts.
+    *
+    * Note: Zur Vereinfachung kann statt einer Instanz auch der Name eines ActionForward aus der struts-config.xml
+    *       zurückgeben werden.
     *
     * @param Request       $request
     * @param Response      $response
     *
-    * @return ActionForward oder NULL
+    * @return mixed ActionForward, string oder NULL
     */
    public function executeBefore(Request $request, Response $response) {
       return null;
@@ -40,13 +53,16 @@ abstract class Action extends Object {
 
 
    /**
-    * Führt die Action aus und gibt einen ActionForward zurück, der beschreibt, zu welcher Resource verzweigt
-    * werden soll.  Muß implementiert werden.
+    * Führt die Action aus und gibt einen ActionForward zurück, der beschreibt, zu welcher Resource verzweigt werden
+    * soll.  Muß implementiert werden.
+    *
+    * Note: Zur Vereinfachung kann statt einer Instanz auch der Name eines ActionForward aus der struts-config.xml
+    *       zurückgeben werden.
     *
     * @param Request  $request
     * @param Response $response
     *
-    * @return ActionForward
+    * @return mixed ActionForward, string oder NULL
     */
    abstract public function execute(Request $request, Response $response);
 
@@ -54,15 +70,16 @@ abstract class Action extends Object {
    /**
     * Allgemeiner Post-Processing-Hook, der von Subklassen bei Bedarf überschrieben werden kann.
     *
-    * Besondere Vorsicht ist anzuwenden, da zu der Zeit, da diese Methode aufgerufen wird, der Content schon ausgeliefert
-    * und der Response schon fertiggestellt sein kann. Die Methode ist für Aufräumarbeiten nützlich, z.B. das Committen von
-    * Transaktionen oder das Schließen von Datenbankverbindungen. Die Default-Implementierung macht nichts.
+    * Besondere Vorsicht ist anzuwenden, da zu dem Zeitpunkt, da diese Methode aufgerufen wird, der Content schon
+    * ausgeliefert und der Response schon fertiggestellt sein kann. Die Methode ist für Aufräumarbeiten nützlich,
+    * z.B. das Committen von Transaktionen oder das Schließen von Datenbankverbindungen.
+    * Die Default-Implementierung macht nichts.
     *
     * @param Request       $request
     * @param Response      $response
     * @param ActionForward $forward  - der originale ActionForward, wie ihn die Action zurückgegeben hat
     *
-    * @return ActionForward - der originale oder ein modifizierter ActionForward (z.B. zusätzliche Query-Parameter)
+    * @return ActionForward - der originale oder ein modifizierter ActionForward (z.B. mit weiteren Query-Parameter)
     */
    public function executeAfter(Request $request, Response $response, ActionForward $forward=null) {
       return $forward;
