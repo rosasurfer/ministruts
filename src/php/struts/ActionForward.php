@@ -90,10 +90,14 @@ class ActionForward extends Object {
    /**
     * Friert die Konfiguration dieser Komponente ein. Nachdem Aufruf dieser Methode kann die Konfiguration der Komponente
     * nicht mehr verändert werden.
+    *
+    * @return ActionForward
     */
    public function freeze() {
       if (!$this->configured)
          $this->configured = true;
+
+      return $this;
    }
 
 

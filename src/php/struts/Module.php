@@ -84,11 +84,7 @@ class Module extends Object {
     */
    protected $roleProcessorClass;
 
-
-   // die definierten Resource-Pfade (werden nicht serialisiert)
-   private $definedResourcePaths = array();
-
-
+   // Logstatus
    private $logDebug, $logInfo, $logNotice;
 
 
@@ -113,15 +109,12 @@ class Module extends Object {
       $xml = $this->loadConfiguration($fileName);
       $this->setResourceBase((string) $xml['resource-base']);
 
-      if ($xml['role-processor'])
-         $this->setRoleProcessorClass((string) $xml['role-processor']);
+      if ($xml['role-processor']) $this->setRoleProcessorClass((string) $xml['role-processor']);
 
       $this->processForwards($xml);
       $this->processMappings($xml);
       $this->processTiles($xml);
       $this->processErrors($xml);
-
-      $this->checkResourcePaths();
    }
 
 
@@ -141,8 +134,7 @@ class Module extends Object {
       while (($dir=array_pop($dirs)) !== null)
          if ($dir == 'src')
             break;
-      if (sizeOf($dirs) == 0)
-         throw new RuntimeException('Could not resolve root path of library, giving up.');
+      if (sizeOf($dirs) == 0) throw new RuntimeException('Could not resolve root path of library, giving up.');
       $libroot = join(DIRECTORY_SEPARATOR, $dirs);
 
       $cwd = getCwd();
@@ -165,152 +157,172 @@ class Module extends Object {
 
 
    /**
-    * Verarbeitet die in der Konfiguration definierten globalen ActionForwards.
+    * Erzeugt die in der Konfiguration definierten globalen ActionForwards.
     *
-    * @param SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
+    * @param SimpleXMLElement $xml - XML-Konfiguration
     */
    protected function processForwards(SimpleXMLElement $xml) {
-      if ($xml->{'global-forwards'}) {
-         foreach ($xml->{'global-forwards'}->forward as $element) {
-            if (sizeOf($element->attributes()) > 2)
-               throw new RuntimeException('Only one of "include", "redirect" or "alias" must be specified for global forward "'.$element['name'].'"');
+      // process global 'include' and 'redirect' forwards
+      foreach ($xml->xPath('/struts-config/global-forwards/forward[@include] | /struts-config/global-forwards/forward[@redirect]') as $tag) {
+         $name = (string) $tag['name'];
+         if (sizeOf($tag->attributes()) > 2) throw new RuntimeException('Only one of "include", "redirect" or "alias" must be specified for global ActionForward "'.$name.'"');
 
-            $name = (string) $element['name'];
-            $forward = null;
+         $forward = null;
 
-            if ($path = (string) $element['include']) {
-               $this->definedResourcePaths[] = $path;           // tmp. save all resource paths for checking after reading the tiles configuration
-               $forward = new $this->forwardClass($name, $path, false);
-            }
-            elseif ($path = (string) $element['redirect']) {
-               $forward = new $this->forwardClass($name, $path, true);
-            }
-            elseif ($alias = (string) $element['alias']) {
-               $forward = $this->findForward($alias);
-               if (!$forward) throw new RuntimeException('No ActionForward found for alias: '.$alias);
-            }
-            $this->addForward($name, $forward);
+         if ($path = (string) $tag['include']) {
+            $this->checkResourceName($path, $xml);
+            $forward = new $this->forwardClass($name, $path, false);
          }
+         else {
+            $redirect = (string) $tag['redirect'];
+            $forward = new $this->forwardClass($name, $redirect, true);
+         }
+         $this->addForward($name, $forward);
+      }
+
+      // process global 'alias' forwards
+      foreach ($xml->xPath('/struts-config/global-forwards/forward[@alias]') as $tag) {
+         $name = (string) $tag['name'];
+         if (sizeOf($tag->attributes()) > 2) throw new RuntimeException('Only one of "include", "redirect" or "alias" must be specified for global ActionForward "'.$name.'"');
+
+         $alias = (string) $tag['alias'];
+         $forward = $this->findForward($alias);
+         if (!$forward) throw new RuntimeException('No ActionForward found for alias: "'.$alias.'"');
+
+         $this->addForward($name, $forward);
       }
    }
 
 
    /**
-    * Verarbeitet die in der Konfiguration definierten ActionMappings.
+    * Erzeugt die in der Konfiguration definierten ActionMappings.
     *
-    * @param SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
+    * @param SimpleXMLElement $xml - XML-Konfiguration
     */
    protected function processMappings(SimpleXMLElement $xml) {
-      if ($xml->{'action-mappings'}) {
-         foreach ($xml->{'action-mappings'}->mapping as $mappingTag) {
-            $mapping = new $this->mappingClass($this);
-            $mapping->setPath((string) $mappingTag['path']);
+      foreach ($xml->xPath('/struts-config/action-mappings/mapping') as $tag) {
+         $mapping = new $this->mappingClass($this);
+         $mapping->setPath((string) $tag['path']);
 
-            if (isSet($mappingTag['action' ])) $mapping->setAction ((string) $mappingTag['action' ]);
-            if (isSet($mappingTag['form'   ])) $mapping->setForm   ((string) $mappingTag['form'   ]);
-            if (isSet($mappingTag['forward'])) $mapping->setForward((string) $mappingTag['forward']);
-            if (isSet($mappingTag['method' ])) $mapping->setMethod ((string) $mappingTag['method' ]);
+         if ($tag['action' ]) $mapping->setAction ((string) $tag['action' ]);
+         if ($tag['form'   ]) $mapping->setForm   ((string) $tag['form'   ]);
+         if ($tag['forward']) $mapping->setForward((string) $tag['forward']);
+         if ($tag['method' ]) $mapping->setMethod ((string) $tag['method' ]);
+         if ($tag['default']) $mapping->setDefault((string) $tag['default'] == 'true');
 
-            if (isSet($mappingTag['roles'])) {
-               if (!$this->roleProcessorClass)
-                  throw new RuntimeException('No RoleProcessor configuration found for role: "'.$mappingTag['roles'].'"');
-               $mapping->setRoles($roles = (string) $mappingTag['roles']);
-            }
-            if (isSet($mappingTag['default'])) $mapping->setDefault((string) $mappingTag['default'] == 'true');
-
-            foreach ($mappingTag->forward as $forwardTag) {
-               if (sizeOf($forwardTag->attributes()) > 2)
-                  throw new RuntimeException('Only one of "include", "redirect" or "alias" must be specified for local forward "'.$forwardTag['name'].'"');
-
-               $name = (string) $forwardTag['name'];
-               $forward = null;
-
-               if ($path = (string) $forwardTag['include']) {
-                  $this->definedResourcePaths[] = $path;           // tmp. save all resource paths for checking after reading the tiles configuration
-                  $forward = new $this->forwardClass($name, $path, false);
-               }
-               elseif ($path = (string) $forwardTag['redirect']) {
-                  $forward = new $this->forwardClass($name, $path, true);
-               }
-               elseif ($alias = (string) $forwardTag['alias']) {
-                  $forward = $mapping->findForward($alias);
-                  if (!$forward) throw new RuntimeException('No ActionForward found for alias: "'.$alias.'"');
-               }
-               $mapping->addForward($name, $forward);
-            }
-            $this->addMapping($mapping);
+         if ($tag['roles']) {
+            if (!$this->roleProcessorClass) throw new RuntimeException('RoleProcessor configuration not found for role: "'.$tag['roles'].'"');
+            $mapping->setRoles((string) $tag['roles']);
          }
+
+         // process local 'include' and 'redirect' forwards
+         foreach ($tag->xPath('./forward[@include] | ./forward[@redirect]') as $forwardTag) {
+            $name = (string) $forwardTag['name'];
+            if (sizeOf($forwardTag->attributes()) > 2) throw new RuntimeException('Only one of "include", "redirect" or "alias" must be specified for local forward "'.$name.'"');
+
+            $forward = null;
+
+            if ($path = (string) $forwardTag['include']) {
+               $this->checkResourceName($path, $xml);
+               $forward = new $this->forwardClass($name, $path, false);
+            }
+            else {
+               $redirect = (string) $forwardTag['redirect'];
+               $forward = new $this->forwardClass($name, $redirect, true);
+            }
+            $mapping->addForward($name, $forward);
+         }
+
+         // process local 'alias' forwards
+         foreach ($tag->xPath('./forward[@alias]') as $forwardTag) {
+            $name = (string) $forwardTag['name'];
+            if (sizeOf($forwardTag->attributes()) > 2) throw new RuntimeException('Only one of "include", "redirect" or "alias" must be specified for local forward "'.$name.'"');
+
+            $alias = (string) $forwardTag['alias'];
+            $forward = $mapping->findForward($alias);
+            if (!$forward) throw new RuntimeException('No ActionForward found for alias: "'.$alias.'"');
+
+            $mapping->addForward($name, $forward);
+         }
+
+         $this->addMapping($mapping);
       }
    }
 
 
    /**
-    * Verarbeitet die in der Konfiguration definierten Tiles.
+    * Durchläuft alle konfigurierten Tiles.
     *
     * @param SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
     */
    protected function processTiles(SimpleXMLElement $xml) {
-      if ($xml->{'tiles-definitions'}) {
-         foreach ($xml->{'tiles-definitions'}->definition as $d) {
-            $this->createTile((string) $d['name'], $xml);
-         }
+      foreach ($xml->xPath('/struts-config/tiles-definitions/definition') as $tag) {
+         $tile = $this->getDefinedTile((string) $tag['name'], $xml);
       }
    }
 
 
    /**
-    * Erzeugt die Tile mit dem angegebenen Namen und gibt sie zurück.
+    * Sucht die Tilesdefinition mit dem angegebenen Namen und gibt die entsprechende Tile-Instanz zurück.
     *
     * @param string           $name - Tile-Name
-    * @param SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration
+    * @param SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration der Tile
     *
-    * @return Tile
+    * @return Tile instance
     */
-   private function createTile($name, SimpleXMLElement $xml) {
-      // it may already exist
-      $tile = $this->findTile($name);
-      if ($tile)
-         return $tile;
+   private function getDefinedTile($name, SimpleXMLElement $xml) {
+      // if the tile already exists return it
+      if (isSet($this->tiles[$name]))
+         return $this->tiles[$name];
 
-      // no, lookup it's definition
-      $definition = $tile = null;
-      foreach ($xml->{'tiles-definitions'}->definition as $d) {
-         if ((string)$d['name'] != $name)
-            continue;
-         $definition = $d;
-         break;
-      }
-      if (!$definition)                           throw new RuntimeException('Tiles definition not found: "'.$name.'"');
-      if (sizeOf($definition->attributes()) != 2) throw new RuntimeException('Exactly one of "path" or "extends" must be specified for Tiles definition "'.$name.'"');
+      // find it's definition ...
+      $nodes = $xml->xPath("/struts-config/tiles-definitions/definition[@name='$name']");
+      if (sizeOf($nodes) == 0)             throw new RuntimeException('Tiles definition not found: "'.$name.'"');
+      if (sizeOf($nodes) != 1)             throw new RuntimeException('Non-unique identifier detected for tiles definition "'.$name.'"');
+      $tag = $nodes[0];
+      if (sizeOf($tag->attributes()) != 2) throw new RuntimeException('Exactly one of "path" or "extends" must be specified for tiles definition "'.$name.'"');
 
-      // create it
-      if (isSet($definition['path'])) {
-         // this is a simple tile
-         $path = (string) $definition['path'];
-         if (!$this->findLocalResource($path)) throw new RuntimeException('Resource of tile definition "'.$name.'" not found: "'.$path.'"');
+      // ... create a new instance ...
+      $tile = null;
+      if ($tag['path']) {                    // 'path' given, it's a simple tile
+         $path = (string) $tag['path'];
+         if (!$this->isLocalResource($path)) throw new RuntimeException('Resource "'.$path.'" not found in tile definition "'.$name.'"');
 
          $tile = new $this->tilesClass($this);
-         $tile->setName((string) $definition['name']);
          $tile->setPath($path);
-
-         foreach ($definition->set as $property) {
-            $tile->setProperty((string) $property['name'], (string) $property['value']);
-         }
       }
-      else {
-         // this is an extended tile, so clone and modify it's parent
-         $parent = $this->createTile((string) $definition['extends'], $xml);
+      else {                                 // 'path' not given, it's an extended tile (get and clone it's parent)
+         $parent = $this->getDefinedTile((string) $tag['extends'], $xml);
          $tile = clone $parent;
-         $tile->setName((string) $definition['name']);
-
-         foreach ($definition->set as $property) {
-            $tile->setProperty((string) $property['name'], (string) $property['value']);
-         }
       }
+      $this->initTile($tile, $tag);
 
-      // save it
+      // ... and save it
       $this->addTile($tile);
       return $tile;
+   }
+
+
+   /**
+    * Initialisiert die übergebene Tile-Instanz mit den Daten ihrer XML-Konfiguration.
+    *
+    * @param Tile             $tile - Tile-Instanz
+    * @param SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration
+    */
+   private function initTile(Tile $tile, SimpleXMLElement $xml) {
+      $tile->setName((string) $xml['name']);
+
+      foreach ($xml->set as $tag) {
+         $name  = (string) $tag['name'];
+         $type  = (!$tag['type'] || (string) $tag['type']=='resource') ? 'resource' : 'string';
+         $value = $tag['value'] ? (string) $tag['value'] : trim((string) $tag);
+
+         if ($type == 'resource') {
+            $this->checkResourceName($value, $xml);
+         }
+
+         $tile->setProperty($name, $value);
+      }
    }
 
 
@@ -406,7 +418,7 @@ class Module extends Object {
       if (!is_string($name)) throw new IllegalTypeException('Illegal type of argument $name: '.getType($name));
 
       if (isSet($this->forwards[$name]))
-         throw new RuntimeException('Non-unique identifier detected for global ActionForward: '.$name);
+         throw new RuntimeException('Non-unique identifier detected for global ActionForward "'.$name.'"');
 
       $this->forwards[$name] = $forward;
    }
@@ -421,9 +433,7 @@ class Module extends Object {
       if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
       if ($mapping->isDefault()) {
-         if ($this->defaultMapping)
-            throw new RuntimeException('Only one ActionMapping can be marked as "default" within a module.');
-
+         if ($this->defaultMapping) throw new RuntimeException('Only one ActionMapping can be marked as "default" within a module.');
          $this->defaultMapping = $mapping;
       }
 
@@ -575,6 +585,8 @@ class Module extends Object {
 
    /**
     * Friert die Konfiguration ein, sodaß sie nicht mehr geändert werden kann.
+    *
+    * @return Module
     */
    public function freeze() {
       if (!$this->configured) {
@@ -589,6 +601,7 @@ class Module extends Object {
 
          $this->configured = true;
       }
+      return $this;
    }
 
 
@@ -609,28 +622,22 @@ class Module extends Object {
 
 
    /**
-    * Überprüft alle in der Konfiguartion angegebenen lokalen Resourcen.  Diese Prüfung erfolgt erst nach dem Einlesen der Konfiguration,
-    * sodaß Vorwärtsreferenzen innerhalb der Datei möglich sind.
-    * z.B.: Ein ActionForward zeigt auf eine Tiles-Definition, die erst später in der Datei definiert ist.
+    * Ob unter dem angegebenen Namen eine Resourcendefiniton oder eine lokale Datei existiert.
     *
-    * @param SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
+    * @param string           $name - Bezeichner der Resource
+    * @param SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration
     */
-   private function checkResourcePaths() {
-      foreach ($this->definedResourcePaths as $path) {
-         if ($this->findTile($path))
-            continue;
-         if (!$this->findLocalResource($path))
-            throw new RuntimeException('Resource or definition not found: '.$path);
-      }
+   private function checkResourceName($name, SimpleXMLElement $xml) {
+      $nodes = $xml->xPath("/struts-config/tiles-definitions/definition[@name='$name']");
 
-      // we don't need this anymore
-      $this->definedResourcePaths = null;
+      if (sizeOf($nodes) == 0 && !$this->isLocalResource($name)) throw new RuntimeException('Resource or definition not found: "'.$name.'"');
+      if (sizeOf($nodes) >  1)                                   throw new RuntimeException('Non-unique identifier detected for tiles definition: "'.$name.'"');
    }
 
 
    /**
-    * Sucht und gibt die Tile mit dem angegebenen Namen zurück.
-    * Wird keine Tile gefunden, wird NULL zurückgegeben.
+    * Sucht und gibt die Tile mit dem angegebenen Namen zurück, oder NULL, wenn keine Tile mit diesem Namen
+    * gefunden wurde.
     *
     * @param $name - logischer Name der Tile
     *
@@ -645,8 +652,21 @@ class Module extends Object {
 
 
    /**
-    * Sucht nach einer lokalen Resource mit dem angegebenen Namen und gibt den vollständigen Dateinamen zurück
-    * oder NULL, wenn keine Resource gefunden wurde.
+    * Ob unter dem angegebenen Namen eine lokale Resource existiert.
+    *
+    * @param $path - Pfadangabe
+    *
+    * @return boolean
+    */
+   private function isLocalResource($path) {
+      $filename = $this->findLocalResource($path);
+      return ($filename !== null);
+   }
+
+
+   /**
+    * Sucht nach einer lokalen Resource mit dem angegebenen Namen und gibt den vollständigen Dateinamen zurück,
+    * oder NULL, wenn keine Resource mit diesem Namen gefunden wurde.
     *
     * @param $path - Pfadangabe
     *

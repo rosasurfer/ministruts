@@ -285,6 +285,8 @@ class ActionMapping extends Object {
 
    /**
     * Friert die Konfiguration dieser Komponente ein.
+    *
+    * @return Actionmapping
     */
    public function freeze() {
       if (!$this->configured) {
@@ -309,6 +311,7 @@ class ActionMapping extends Object {
 
          $this->configured = true;
       }
+      return $this;
    }
 
 
@@ -335,7 +338,7 @@ class ActionMapping extends Object {
       $forward = $this->module->findForward($name);
 
       if (!$forward && $this->configured)
-         Logger ::log('No ActionForward found for name: '.$name, L_ERROR, __CLASS__);
+         Logger ::log('No ActionForward found for name: "'.$name.'"', L_ERROR, __CLASS__);
 
       return $forward;
    }

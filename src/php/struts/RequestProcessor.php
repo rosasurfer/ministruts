@@ -309,24 +309,24 @@ class RequestProcessor extends Object {
    protected function processActionForward(Request $request, Response $response, ActionForward $forward=null) {
       if ($forward) {
          if ($forward->isRedirect()) {
-            $appPath = $request->getAttribute(Struts ::APPLICATION_PATH_KEY);
-            $url = $appPath.$this->module->getPrefix().$forward->getPath();
+            $applicationPath = $request->getAttribute(Struts ::APPLICATION_PATH_KEY);
+            $url = $applicationPath.$this->module->getPrefix().$forward->getPath();
             redirect($url);
          }
          else {
             $path = $forward->getPath();
             $tile = $this->module->findTile($path);
 
-            if (!$tile) {
-               // create a simple tile on the fly
-               $tile = new $this->module->getTilesClass($this);
-               $tile->setName('.name')
+            if (!$tile) {  // create a simple one on the fly
+               $class = $this->module->getTilesClass();
+               $tile = new $class($this->module);
+               $tile->setName('generic')
                     ->setPath($path)
                     ->freeze();
             }
 
             // render the tile
-            $tile->render($request, $response);
+            $tile->render();
          }
       }
    }

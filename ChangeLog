@@ -1,3 +1,10 @@
+2007-10-29
+
+   - Module: Konfiguration wird mit XPath eingelesen, dadurch sind überall Vorwärtsdeklarationen möglich
+
+   - Tiles: Definitionen und Dateipfade werden auf Existenz überprüft
+
+
 2007-10-28
 
    - automatische Rollenüberprüfung per struts-config.xml integriert
@@ -9,4 +16,3 @@
      struts-config.xml          - Prefix: ""
      struts-config-member.xml   - Prefix: "/member"
      struts-config-xyz-123.xml  - Prefix: "/xyz-123"
-

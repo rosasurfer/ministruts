@@ -88,9 +88,9 @@ class Tile extends Object {
 
 
    /**
-    * Speichert unter dem angegebenen Namen eine Property in der Tile.
+    * Speichert in der Tile unter dem angegebenen Namen eine zusätzliche Eigenschaft.
     *
-    * @param string $name  - Name der Property
+    * @param string $name  - Name der Eigenschaft
     * @param mixed  $value - der zu speichernde Wert
     */
    public function setProperty($name, $value) {
@@ -103,35 +103,34 @@ class Tile extends Object {
 
    /**
     * Friert die Konfiguration dieser Komponente ein.
+    *
+    * @return Tile
     */
    public function freeze() {
       if (!$this->configured) {
-         if (!$this->name)
-            throw new IllegalStateException('No name configured for this '.$this);
-         if (!$this->path)
-            throw new IllegalStateException('No path configured for '.__CLASS__.' "'.$this->name.'"');
+         if (!$this->name) throw new IllegalStateException('No name configured for this '.$this);
+         if (!$this->path) throw new IllegalStateException('No path configured for '.__CLASS__.' "'.$this->name.'"');
 
          $this->configured = true;
       }
+      return $this;
    }
 
 
    /**
-    * Gibt den Content dieser Tiles-Definition aus.
-    *
-    * @param Request  $request
-    * @param Response $response
+    * Zeigt den Inhalt dieser Komponente an.
     */
-   public function render(Request $request, Response $response) {
+   public function render() {
+      $request  = Request  ::me();
+      $response = Response ::me();
+
+      $tile    = $this;
       $appPath = $request->getAttribute(Struts ::APPLICATION_PATH_KEY);
       $form    = $request->getAttribute(Struts ::ACTION_FORM_KEY);
 
-      $resourceBase = $this->module->getResourceBase();
+      extract($this->properties);
 
-      foreach ($this->properties as $key => $value) {
-         ${$key} = $resourceBase.$value;
-      }
-      include($resourceBase.$this->path);
+      include($this->module->getResourceBase().$this->path);
    }
 }
 ?>

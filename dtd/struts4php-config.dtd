@@ -1,8 +1,8 @@
 <!--
      DTD for the Struts for PHP Application Configuration File
 
-     To support validation of your configuration file, include the following
-     DOCTYPE element at the beginning (after the "xml" declaration):
+     To support validation of your configuration file, include the following DOCTYPE element at the 
+     beginning (after the "xml" declaration):
 
      <!DOCTYPE struts-config SYSTEM "dtd/struts4php-config.dtd">
 -->
@@ -11,251 +11,209 @@
 <!-- ========== Defined Types ============================================= -->
 
 
-<!-- A "Boolean" is the string representation of a boolean (true or false)
-     variable.
+<!-- A "Boolean" is the string representation of a boolean (true or false) variable.
 -->
 
 <!ENTITY % Boolean "(true|false)">
 
 
-<!-- A "ClassName" is the simple name of a PHP class that is instantiated to
-     provide the functionality of the enclosing element.
+<!-- A "ClassName" is the simple name of a PHP class that is instantiated to provide the 
+     functionality of the enclosing element.
 -->
 <!ENTITY % ClassName "CDATA">
 
 
-<!-- An "Integer" is a character string consisting solely of numeric digits,
-     optionally preceeded by a minus sign, that can be converted to a
-     32-bit integer.
+<!-- A "LogicalName" is the logical name used to reference an element. It must begin with a letter 
+     and contain only characters that are legal in a PHP identifier.
 -->
-<!ENTITY % Integer "CDATA">
+<!ENTITY % LogicalName "CDATA">
 
 
-<!-- A "Location" is a relative path, delimited by slash "/" characters, that
-     defines the location of a resource relative to the location of the Struts 
-     configuration file itself.
--->
-<!ENTITY % Location "#PCDATA">
-
-
-<!-- A "PropertyName" is the name of a class property, and must begin with
-     a lower case letter and contain only characters that are legal in a
-     PHP identifier.
--->
-<!ENTITY % PropertyName "CDATA">
-
-
-<!-- A "RequestPath" is a module-relative URI path, beginning with a
-     slash "/", that identifies a mapped resource within this web application.
+<!-- A "RequestPath" is a module-relative URI path, beginning with a slash "/", that identifies a 
+     mapped resource within this web application.
 -->
 <!ENTITY % RequestPath "CDATA">
 
 
-<!-- A "RequestType" identifies a request type.
+<!-- A "ResourcePath" is a relative path, delimited by slash "/" characters, that defines the 
+     location of a resource relative to the location of the Struts configuration file itself.
 -->
-<!ENTITY % RequestType "(get|post)">
+<!ENTITY % ResourcePath "CDATA">
 
-
-<!-- A "ContentType" is the content type of an attribute passed to a tile
-     component.
--->
-<!ENTITY % ContentType "(string|path|definition)">
-
-
-<!-- A "DefinitionName" is the unique identifier of a definition. This identifier
-     is a logical name used to reference the definition.
--->
-<!ENTITY % DefinitionName "CDATA">
 
 
 <!-- ========== Top Level Elements ======================================== -->
 
 
-<!-- The "struts-config" element is the root of the configuration file hierarchy,
-     and contains nested elements for all of the other configuration settings.
+<!-- The "struts-config" element is the root of the configuration file hierarchy, and contains 
+     nested elements for all of the other configuration settings.
 
-     resource-base  The base directory to lookup local resources.  This value is interpreted 
-                    as relative to the location of the Struts configuration file itself.
+     resource-base  The base directory to lookup local resources.  This value is interpreted as 
+                    relative to the location of the Struts configuration file itself.
                     ["."]
 
      role-processor Class name of the [RoleProcessor] subclass that will perform role checking 
                     for this module.
 -->
-<!ELEMENT struts-config (global-forwards?, action-mappings?, tiles-definitions?)>
-<!ATTLIST struts-config  id             ID              #IMPLIED>
-<!ATTLIST struts-config  resource-base  CDATA           #IMPLIED>
-<!ATTLIST struts-config  role-processor %ClassName;     #IMPLIED>
+<!ELEMENT struts-config (global-forwards?, action-mappings, tiles-definitions?)>
+<!ATTLIST struts-config  
+          resource-base     %ResourcePath;  #IMPLIED
+          role-processor    %ClassName;     #IMPLIED
+>
 
 
-<!-- The "global-forwards" element describes a set of ActionForward objects that are
-     available to all Action objects as a return value. The individual ActionForwards
-     are configured through nested <forward> elements. An <action> element may override
-     a global forward by defining a local <forward> of the same name.
+<!-- The "global-forwards" element describes a set of ActionForward objects that are available to 
+     all Action objects as a return value. The individual ActionForwards are configured through 
+     nested <forward> elements. An <action> element may override a global forward by defining a 
+     local <forward> of the same name.
 -->
 <!ELEMENT global-forwards (forward*)>
-<!ATTLIST global-forwards id            ID              #IMPLIED>
 
 
-<!-- The "forward" element describes an ActionForward that is to be made available to
-     an Action as a return value. An ActionForward is referenced by a logical name and
-     encapsulates a URI. A "forward" element may be used to describe both global and
-     local ActionForwards. Global forwards are available to all the Action objects in
-     the module. Local forwards can be nested within a <mapping> element and are only
-     available to an Action object when it is invoked through that ActionMapping.
+<!-- The "forward" element describes an ActionForward that is to be made available to an Action as 
+     a return value. An ActionForward is referenced by a logical name and encapsulates a URI. 
+     A "forward" element may be used to describe both global and local ActionForwards. Global 
+     forwards are available to all the Action objects in the module. Local forwards can be nested 
+     within a <mapping> element and are only available to an Action object when it is invoked 
+     through that ActionMapping.
 
-     name         The unique identifier for this forward. Referenced by the Action object
-                  at runtime to select - by its logical name - the resource that should
-                  complete the request/response.
+     name       The unique identifier for this forward. Referenced by the Action object at runtime 
+                to select - by its logical name - the resource that should complete the request/
+                response.
 
-     include      The identifier of a resource to include.  This may be a tiles definition
-                  or a path to a physical resource relative to the resource base directory 
-                  of the module.  Exactly one of "include", "redirect" or "alias" must be
-                  specified.
+     include    The identifier of a resource to include.  This may be a tiles definition or a path 
+                to a physical resource relative to the resource base directory of the module.
+                Exactly one of "include", "redirect" or "alias" must be specified.
 
-     redirect     The module-relative path of the location to which a redirect
-                  instruction should be issued.  Exactly one of "include", "redirect"
-                  or "alias" must be specified.
+     redirect   The module-relative path of the location to which a redirect instruction should be 
+                issued.  Exactly one of "include", "redirect" or "alias" must be specified.
 
-     alias        The unique identifier of another ActionForward to use instead.  Exactly 
-                  one of "include", "redirect" or "alias" must be specified.
+     alias      The unique identifier of another ActionForward to use instead.  Exactly one of 
+                "include", "redirect" or "alias" must be specified.
 -->
 <!ELEMENT forward (set-property*)>
-<!ATTLIST forward        id             ID              #IMPLIED>
-<!ATTLIST forward        name           CDATA           #REQUIRED>
-<!ATTLIST forward        include        CDATA           #IMPLIED>
-<!ATTLIST forward        redirect       %RequestPath;   #IMPLIED>
-<!ATTLIST forward        alias          CDATA           #IMPLIED>
+<!ATTLIST forward        
+          name          %LogicalName;   #REQUIRED
+          include       %ResourcePath;  #IMPLIED
+          redirect      %RequestPath;   #IMPLIED
+          alias         %LogicalName;   #IMPLIED
+>
 
 
-<!-- The "action-mappings" element describes a set of ActionMapping objects
-     that are available to process requests matching the given url-pattern.
-     The individual ActionMappings are configured through nested
-     <action> elements.
+<!-- The "action-mappings" element describes a set of ActionMapping objects that are available to 
+     process requests matching the given url-pattern.  The individual ActionMappings are configured 
+     through nested <mapping> elements.
 -->
-<!ELEMENT action-mappings (mapping*)>
-<!ATTLIST action-mappings id             ID              #IMPLIED>
+<!ELEMENT action-mappings (mapping+)>
 
 
-<!-- The "mapping" element describes an ActionMapping object that is to be used
-     to process a request for a specific module-relative URI. The following
-     attributes are defined:
+<!-- The "mapping" element describes an ActionMapping object that is to be used to process a request 
+     for a specific module-relative URI. The following attributes are defined:
 
-     path            The module-relative path of the submitted request, starting
-                     with a slash "/" character.
+     path       The module-relative path of the submitted request, starting with a slash "/" character.
 
-     forward         Module-relative path of the resource that will process this
-                     request, instead of the Action class specified by "type".
-                     Exactly one of "forward" or "type" must be specified.
+     forward    Module-relative path of the resource that will process this request, instead of the 
+                Action class specified by "type". Exactly one of "forward" or "action" must be 
+                specified.
 
-     action          Class name of the action subclass [Action] that will process
-                     requests for this action mapping. Not valid if the "forward"
-                     attribute is specified.  Exactly one of "forward" or "type"
-                     must be specified.
+     action     Class name of the action subclass [Action] that will process requests for this action 
+                mapping. Not valid if the "forward" attribute is specified.  Exactly one of "forward" 
+                or "action" must be specified.
 
-     form            Class name of the action form subclass [ActionForm], if any,
-                     that is associated with this action mapping.  If an action
-                     form with a name matching the corresponding action name is
-                     found that action form is used.  So if you carefully name your
-                     classes (ie. "DoThatAction" and "DoThatActionForm") you don't
-                     have to specify this value.
+     form       Class name of the action form subclass [ActionForm], if any, that is associated with 
+                this action mapping.  If an action form with a name matching the corresponding action 
+                name is found that action form is used.  So if you carefully name your classes (ie. 
+                "DoThatAction" and "DoThatActionForm") you don't need to explicitly specify this value.
 
-     parameter       General-purpose configuration parameter that can be used to
-                     pass extra information to the Action object selected by
-                     this action mapping.
+     parameter  General-purpose configuration parameter that can be used to pass extra information to 
+                the Action object selected by this action mapping.
 
-     roles           Comma-delimited list of role names that are allowed access
-                     to this ActionMapping object.
+     roles      Comma-delimited list of role names that are allowed access to this ActionMapping object.
 
-     method          The request type that this ActionMapping may be restricted to.
-                     Legal values are "get" and "post".
-                     [no restriction]
+     method     The HTTP method type that this ActionMapping is restricted to. Legal values are "get" 
+                and "post" [no restrictions].
 
-     default         Set to "true" if this object should be configured as the
-                     default action mapping for this module. If a request does not
-                     match another object, it will be passed to the ActionMapping
-                     object with default set to "true". Only one ActionMapping
-                     object can be marked as "default" within a module.
-                     [false]
+     default    Set to "true" if this object should be configured as the default action mapping for this 
+                module. If a request does not match another object, it will be passed to the action 
+                mapping object with default set to "true". Only one action mapping object can be marked 
+                as "default" within a module [false].
 -->
 <!ELEMENT mapping (set-property*, forward*)>
-<!ATTLIST mapping        id             ID              #IMPLIED>
-<!ATTLIST mapping        action         %ClassName;     #IMPLIED>
-<!ATTLIST mapping        default        %Boolean;       #IMPLIED>
-<!ATTLIST mapping        form           %ClassName;     #IMPLIED>
-<!ATTLIST mapping        forward        %RequestPath;   #IMPLIED>
-<!ATTLIST mapping        method         %RequestType;   #IMPLIED>
-<!ATTLIST mapping        parameter      CDATA           #IMPLIED>
-<!ATTLIST mapping        path           %RequestPath;   #REQUIRED>
-<!ATTLIST mapping        roles          CDATA           #IMPLIED>
+<!ATTLIST mapping        
+          path          %RequestPath;   #REQUIRED
+          forward       %ResourcePath;  #IMPLIED
+          action        %ClassName;     #IMPLIED
+          form          %ClassName;     #IMPLIED
+          parameter     CDATA           #IMPLIED
+          roles         CDATA           #IMPLIED
+          method        (get|post)      #IMPLIED
+          default       %Boolean;       "false"
+>
 
 
-<!-- The "tiles-definitions" element describes a set of TilesDefinition objects
-     that are available.  The individual definitions are configured through nested
-     <definition> elements.
+<!-- The "tiles-definitions" element describes a set of TilesDefinition objects that are available.  
+     The individual definitions are configured through nested <definition> elements.
 -->
 <!ELEMENT tiles-definitions (definition*)>
-<!ATTLIST tiles-definitions id          ID              #IMPLIED>
 
 
-<!-- The "definition" element describes a definition that can be inserted in a jsp
-     page. This definition is identified by its logical name. A definition allows
-     to define all the attributes that can be set in <insert> tag from a jsp page.
+<!-- The "definition" element describes a single definition that can be inserted in a page. It is 
+     identified by its logical name. 
 
-     name         The unique identifier for this definition.
+     name       The unique identifier for this definition.
 
-     extends      Name of a definition that is used as ancestor of this definition.
-                  All attributes from the ancestor are available to the new definition. 
-                  Any attribute inherited from the ancestor can be overloaded by providing 
-                  a new value.  Exactly one of "path" or "extends" must be specified.
+     path       The path to the resource used as tile relative to the "WEB-INF" directory of the 
+                application.  Exactly one of "path" or "extends" must be specified.
 
-     path         The path to the resource used as tile relative to the "WEB-INF" directory 
-                  of the application.  Exactly one of "path" or "extends" must be specified.
-                     
+     extends    Name of a definition that is used as ancestor of this definition.  All attributes 
+                from the ancestor are available to the new definition.  Any attribute inherited 
+                from the ancestor can be overloaded by providing a new value.  Exactly one of "path"
+                or "extends" must be specified.
 -->
 <!ELEMENT definition (set*)>
-<!ATTLIST definition       id               ID               #IMPLIED>
-<!ATTLIST definition       name             %DefinitionName; #REQUIRED>
-<!ATTLIST definition       path             %RequestPath;    #IMPLIED>
-<!ATTLIST definition       extends          %DefinitionName; #IMPLIED>
+<!ATTLIST definition       
+          name      %LogicalName;   #REQUIRED
+          path      %ResourcePath;  #IMPLIED
+          extends   %LogicalName;   #IMPLIED
+>
 
 
-<!-- The "set" element describes an attribute of a definition. It allows to specify the tiles 
-     attribute name and its value. The value can be specified as an xml attribute, or in the 
-     body of the tag.
+<!-- The "set" element describes an additional component passed to a tiles definition.  The value 
+     of this component can be specified as an xml attribute or in the body of the <set> tag.
 
-     name         The unique identifier for this attribute.
+     name       The unique identifier for this component.
 
-     type         The type of the value. Can be "string", "path" or "definition".  By default,
-                  no type is associated to a value. If a type is associated, it will be used 
-                  as a hint to process the value when the attribute will be used in the inserted 
-                  tile.
+     type       The type of the passed value. Can be "string" or "resource".
+                [resource]
 
-     value        The value associated to this attribute. The value should be specified with 
-                  this attribute or in the body of the tag.
+     value      The value associated to this component. This value should be specified with this 
+                attribute or in the body of the tag.
 -->
 <!ELEMENT set (#PCDATA)>
-<!ATTLIST set              id               ID              #IMPLIED>
-<!ATTLIST set              name             CDATA           #REQUIRED>
-<!ATTLIST set              type             %ContentType;   #IMPLIED>
-<!ATTLIST set              value            CDATA           #REQUIRED>
+<!ATTLIST set              
+          name      %LogicalName;       #REQUIRED
+          type      (string|resource)   "resource"
+          value     CDATA               #IMPLIED
+>
 
 
 <!-- ========== Subordinate Elements ====================================== -->
 
 
-<!-- The "set-property" element specifies the method name and initial value of an additional 
-     class configuration property.  When the object representing the surrounding element is 
-     instantiated, the accessor for the indicated property is called and passed the indicated
-     value. The "set-property" element is especially useful when a custom subclass is used with
-     <forward> or <mapping> elements.  The subclass can be passed whatever other properties may 
-     be required to configure the object without changing how the struts4php-config is parsed.
+<!-- The "set-property" element specifies the method name and initial value of an additional class 
+     configuration property.  When the object representing the surrounding element is instantiated, 
+     the accessor for the indicated property is called and passed the indicated value. 
+     The "set-property" element is especially useful when a custom subclass is used with <forward> 
+     or <mapping> elements.  The subclass can be passed whatever other properties may be required 
+     to configure the object without changing how the struts-config is parsed.
 
-     property      Name of the class property whose setter method will be called.
+     property   Name of the class property whose setter method will be called.
 
-     value         String representation of the value to which this property will be set, after 
-                   suitable type conversion
+     value      String representation of the value to which this property will be set, after suitable 
+                type conversion.
 -->
-<!ELEMENT set-property   EMPTY>
-<!ATTLIST set-property   id             ID              #IMPLIED>
-<!ATTLIST set-property   property       %PropertyName;  #REQUIRED>
-<!ATTLIST set-property   value          CDATA           #REQUIRED>
+<!ELEMENT set-property EMPTY>
+<!ATTLIST set-property   
+          property      %LogicalName;   #REQUIRED
+          value         CDATA           #REQUIRED
+>
