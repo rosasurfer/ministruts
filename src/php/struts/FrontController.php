@@ -69,7 +69,7 @@ class FrontController extends Singleton {
       Config ::set('application.path'     , $this->applicationPath);
 
 
-      // Umgebung prüfen (ist Zugriff auf WEB-INF und CVS gesperrt ?)
+      // Umgebung überprüfen:  Ist der Zugriff auf WEB-INF und CVS gesperrt ?
       $applicationRoot = subStr($_SERVER['SCRIPT_URI'], 0, strPos($_SERVER['SCRIPT_URI'], '/', 8)).$this->applicationPath;
       $locations = array($applicationRoot.'/WEB-INF',
                          $applicationRoot.'/WEB-INF/',
