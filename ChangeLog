@@ -1,7 +1,12 @@
 2007-10-30
 
    - neues Package "php/net/http" für alles, was mit HTTP zu tun hat
+
    - neues Package "php/net/mail" für alles, was mit E-Mail zu tun hat
+
+   - php/net/http/CurlHttpRequest: GET und POST implementiert
+
+   - php/struts/FrontController: überprüft während der Initialisierung, ob der Webzugriff auf WEB-INF- und CVS-Verzeichnisse gesperrt ist
 
 
 2007-10-29
