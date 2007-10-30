@@ -40,7 +40,6 @@ $__imports['HeaderParser'                   ] = 'php/net/http/HeaderParser';
 $__imports['HttpRequest'                    ] = 'php/net/http/HttpRequest';
 $__imports['HttpResponse'                   ] = 'php/net/http/HttpResponse';
 $__imports['IHttpClient'                    ] = 'php/net/http/IHttpClient';
-$__imports['RemoteHttpRequest'              ] = 'php/net/http/RemoteHttpRequest';
 
 $__imports['Mailer'                         ] = 'php/net/mail/Mailer';
 

@@ -8,6 +8,8 @@
 
    - php/struts/FrontController: überprüft während der Initialisierung, ob der Webzugriff auf WEB-INF- und CVS-Verzeichnisse gesperrt ist
 
+   - php/net/http/RemoteHttpRequest: gelöscht, statt dessen nur noch CurlHttpRequest verwenden
+
 
 2007-10-29
 
