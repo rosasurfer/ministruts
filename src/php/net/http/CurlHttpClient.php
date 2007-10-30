@@ -10,9 +10,11 @@ final class CurlHttpClient implements IHttpClient {
    // CURL-Handle
    private $handle;
 
-   private $timeout         = 30;       // int         default: 30 Sekunden
-   private $followRedirects = false;    // boolean     default: false
-   private $maxRedirects    = 10;       // int         default: 10
+   private $timeout          = 30;              // int
+   private $followRedirects  = false;           // boolean
+   private $maxRedirects     = 10;              // int
+   private $currentRedirect  = 0;               // int:  für manuelle Redirects (wenn open_basedir definiert ist und followRedirects TRUE ist)
+   private $userAgent        = 'Mozilla/5.0';   // string
 
 
    /**
@@ -109,17 +111,21 @@ final class CurlHttpClient implements IHttpClient {
     * @return HttpResponse
     */
    public function send(HttpRequest $request) {
+      $response = CurlHttpResponse ::create();
 
       $handle = curl_init();
 
-      $options = array(CURLOPT_RETURNTRANSFER => true,
-                       CURLOPT_BINARYTRANSFER => true,
+      $options = array(CURLOPT_WRITEFUNCTION  => array($response, 'writeContent'),
+                       CURLOPT_HEADERFUNCTION => array($response, 'writeHeader'),
                        CURLOPT_URL            => $request->getUrl(),
                        CURLOPT_TIMEOUT        => $this->timeout,
-                       CURLOPT_FOLLOWLOCATION => $this->followRedirects,
-                       CURLOPT_MAXREDIRS      => $this->maxRedirects,
-                       CURLOPT_USERAGENT      => 'MiniStruts::'.__CLASS__,
+                       CURLOPT_USERAGENT      => $this->userAgent,
                        );
+
+      if ($this->followRedirects && !ini_get('open_basedir')) {
+         $options[CURLOPT_FOLLOWLOCATION] = true;
+         $options[CURLOPT_MAXREDIRS]      = $this->maxRedirects;
+      }
 
       if ($request->getMethod() == 'GET') {
          $options[CURLOPT_HTTPGET] = true;
@@ -131,17 +137,24 @@ final class CurlHttpClient implements IHttpClient {
       }
       curl_setopt_array($handle, $options);
 
-      $response = $exception = null;
-
       if (curl_exec($handle) === false)
-         $exception = new InfrastructureException('Could not retrieve url, CURL error: '.CURL ::getError($handle).', url: '.$request->getUrl());
-      else
-         $response = CurlHttpResponse ::create()->setStatus(curl_getinfo($handle, CURLINFO_HTTP_CODE));
+         Logger ::log('Could not retrieve url, CURL error: '.CURL ::getError($handle).', url: '.$request->getUrl(), L_INFO, __CLASS__);
+      $response->setStatus($status = curl_getinfo($handle, CURLINFO_HTTP_CODE));
 
       curl_close($handle);
 
-      if ($exception)
-         throw $exception;
+
+      // ggf. einen manuellen Redirect ausführen (falls "open_basedir" gesetzt ist)
+      if (($status==301 || $status==302) && $this->followRedirects && ini_get('open_basedir')) {
+         if ($this->currentRedirect < $this->maxRedirects) {
+            $this->currentRedirect++;
+            $request  = HttpRequest ::create()->setUrl($response->getHeader('Location')); // !!! to-do: relative Redirects abfangen
+            $response = $this->send($request);
+         }
+         else {
+            Logger ::log('maxRedirects limit exceeded: '.$this->maxRedirects, L_WARN, __CLASS__);
+         }
+      }
 
       return $response;
    }
