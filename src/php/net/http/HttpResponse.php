@@ -8,6 +8,6 @@ interface HttpResponse {
    /**
     * @return int - Status-Code
     */
-   public function getStatus();
+   function getStatus();
 }
 ?>

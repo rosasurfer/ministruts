@@ -8,22 +8,22 @@ interface IHttpClient {
    /**
     * @param int $timeout - Time-out in Sekunden
     */
-   public function setTimeout($timeout);
-   public function getTimeout();
+   function setTimeout($timeout);
+   function getTimeout();
 
 
    /**
     * @param boolean $follow - ob einem Redirect-Header gefolgt werden soll oder nicht
     */
-   public function setFollowRedirects($follow);
-   public function isFollowRedirects();
+   function setFollowRedirects($follow);
+   function isFollowRedirects();
 
 
    /**
     * @param int $redirects - maximale Anzahl der zu folgenden Redirect-Header
     */
-   public function setMaxRedirects($redirects);
-   public function getMaxRedirects();
+   function setMaxRedirects($redirects);
+   function getMaxRedirects();
 
 
    /**
@@ -33,6 +33,6 @@ interface IHttpClient {
     *
     * @return HttpResponse
     */
-   public function send(HttpRequest $request);
+   function send(HttpRequest $request);
 }
 ?>

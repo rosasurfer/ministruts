@@ -11,6 +11,6 @@ interface Instantiatable {
     *
     * @see Singleton
     */
-   public static function me();
+   static function me();
 }
 ?>
