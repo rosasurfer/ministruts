@@ -33,9 +33,11 @@ $__imports['NoPermissionException'          ] = 'php/lang/NoPermissionException'
 $__imports['PHPErrorException'              ] = 'php/lang/PHPErrorException';
 $__imports['RuntimeException'               ] = 'php/lang/RuntimeException';
 
-$__imports['CURL'                           ] = 'php/het/http/CURL';
+$__imports['CURL'                           ] = 'php/net/http/CURL';
 $__imports['CurlHttpClient'                 ] = 'php/net/http/CurlHttpClient';
+$__imports['CurlHttpResponse'               ] = 'php/net/http/CurlHttpResponse';
 $__imports['HttpRequest'                    ] = 'php/net/http/HttpRequest';
+$__imports['HttpResponse'                   ] = 'php/net/http/HttpResponse';
 $__imports['IHttpClient'                    ] = 'php/net/http/IHttpClient';
 $__imports['RemoteHttpRequest'              ] = 'php/net/http/RemoteHttpRequest';
 

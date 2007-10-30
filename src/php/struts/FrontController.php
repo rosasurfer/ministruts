@@ -70,7 +70,18 @@ class FrontController extends Singleton {
 
 
       // Umgebung prüfen (ist Zugriff auf WEB-INF und CVS gesperrt ?)
-
+      $applicationRoot = subStr($_SERVER['SCRIPT_URI'], 0, strPos($_SERVER['SCRIPT_URI'], '/', 8)).$this->applicationPath;
+      $locations = array($applicationRoot.'/WEB-INF',
+                         $applicationRoot.'/WEB-INF/',
+                         $applicationRoot.'/CVS',
+                         $applicationRoot.'/CVS/',
+                         );
+      foreach ($locations as $location) {
+         $request = HttpRequest ::create()->setUrl($location);
+         $status  = CurlHttpClient ::create()->send($request)->getStatus();
+         if ($status != 403 && $status != 404)
+            throw new InfrastructureException('Fatal web server configuration error: URL "'.$location.'" is visible to the internet');
+      }
 
       // Alle Struts-Konfigurationen in WEB-INF suchen
       if (!is_file($this->applicationDir.'/WEB-INF/struts-config.xml')) throw new FileNotFoundException('Configuration file not found: struts-config.xml');

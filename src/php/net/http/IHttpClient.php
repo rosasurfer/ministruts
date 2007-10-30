@@ -15,8 +15,8 @@ interface IHttpClient {
    /**
     * @param boolean $follow - ob einem Redirect-Header gefolgt werden soll oder nicht
     */
-   public function setFollowLocation($follow);
-   public function isFollowLocation();
+   public function setFollowRedirects($follow);
+   public function isFollowRedirects();
 
 
    /**
@@ -27,7 +27,9 @@ interface IHttpClient {
 
 
    /**
-    * Führt den Request aus und gibt die empfangene Antwort zurück.
+    * Führt den übergebenen Request aus und gibt die empfangene Antwort zurück.
+    *
+    * @param HttpRequest $request
     *
     * @return HttpResponse
     */
