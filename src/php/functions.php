@@ -34,8 +34,10 @@ $__imports['PHPErrorException'              ] = 'php/lang/PHPErrorException';
 $__imports['RuntimeException'               ] = 'php/lang/RuntimeException';
 
 $__imports['CURL'                           ] = 'php/het/http/CURL';
-$__imports['CurlHttpRequest'                ] = 'php/net/http/CurlHttpRequest';
+$__imports['CurlHttpClient'                 ] = 'php/net/http/CurlHttpClient';
 $__imports['HttpRequest'                    ] = 'php/net/http/HttpRequest';
+$__imports['IHttpClient'                    ] = 'php/net/http/IHttpClient';
+$__imports['RemoteHttpRequest'              ] = 'php/net/http/RemoteHttpRequest';
 
 $__imports['Mailer'                         ] = 'php/net/mail/Mailer';
 
