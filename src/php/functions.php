@@ -33,13 +33,15 @@ $__imports['NoPermissionException'          ] = 'php/lang/NoPermissionException'
 $__imports['PHPErrorException'              ] = 'php/lang/PHPErrorException';
 $__imports['RuntimeException'               ] = 'php/lang/RuntimeException';
 
+$__imports['TorHelper'                      ] = 'php/net/TorHelper';
+
 $__imports['CURL'                           ] = 'php/net/http/CURL';
 $__imports['CurlHttpClient'                 ] = 'php/net/http/CurlHttpClient';
 $__imports['CurlHttpResponse'               ] = 'php/net/http/CurlHttpResponse';
 $__imports['HeaderParser'                   ] = 'php/net/http/HeaderParser';
+$__imports['HttpClient'                     ] = 'php/net/http/HttpClient';
 $__imports['HttpRequest'                    ] = 'php/net/http/HttpRequest';
 $__imports['HttpResponse'                   ] = 'php/net/http/HttpResponse';
-$__imports['IHttpClient'                    ] = 'php/net/http/IHttpClient';
 
 $__imports['Mailer'                         ] = 'php/net/mail/Mailer';
 
@@ -63,7 +65,6 @@ $__imports['BaseValidator'                  ] = 'php/util/BaseValidator';
 $__imports['Config'                         ] = 'php/util/Config';
 $__imports['Logger'                         ] = 'php/util/Logger';
 $__imports['String'                         ] = 'php/util/String';
-$__imports['TorHelper'                      ] = 'php/util/TorHelper';
 
 
 

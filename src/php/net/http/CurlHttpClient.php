@@ -4,17 +4,13 @@
  *
  * Eine Klasse, die mit CURL HttpRequests ausführen kann.
  */
-final class CurlHttpClient implements IHttpClient {
+final class CurlHttpClient extends HttpClient {
 
 
    // CURL-Handle
    private $handle;
 
-   private $timeout          = 30;              // int
-   private $followRedirects  = false;           // boolean
-   private $maxRedirects     = 10;              // int
    private $currentRedirect  = 0;               // int:  für manuelle Redirects (wenn open_basedir definiert ist und followRedirects TRUE ist)
-   private $userAgent        = 'Mozilla/5.0';   // string
 
 
    /**
@@ -24,82 +20,6 @@ final class CurlHttpClient implements IHttpClient {
     */
    public static function create() {
       return new self;
-   }
-
-
-   /**
-    * Setzt den Verbindungs-Timeout.
-    *
-    * @param int $timeout - Timeout in Sekunden
-    *
-    * @return CurlHttpClient
-    */
-   public function setTimeout($timeout) {
-      if (!is_int($timeout)) throw new IllegalTypeException('Illegal type of argument $timeout: '.getType($timeout));
-      if ($timeout < 1)      throw new InvalidArgumentException('Invalid argument $timeout: '.$timeout);
-
-      $this->timeout = $timeout;
-      return $this;
-   }
-
-
-   /**
-    * Gibt den eingestellten Verbindungs-Timeout zurück.
-    *
-    * @param int $timeout - Timeout in Sekunden
-    *
-    * @return CurlHttpClient
-    */
-   public function getTimeout() {
-      return $this->timeout;
-   }
-
-
-   /**
-    * Ob Redirect-Headern gefolgt werden soll oder nicht.
-    *
-    * @param boolean $follow
-    *
-    * @return CurlHttpClient
-    */
-   public function setFollowRedirects($follow) {
-      if ($follow!==true && $follow!==false) throw new IllegalTypeException('Illegal type of argument $follow: '.getType($follow));
-
-      $this->followRedirects = $follow;
-      return $this;
-   }
-
-
-   /**
-    * Gibt die aktuelle Redirect-Einstellung zurück.
-    *
-    * @return boolean
-    */
-   public function isFollowRedirects() {
-      return $this->followRedirects;
-   }
-
-
-   /**
-    * Setzt die maximale Anzahl der Redirects, denen gefolgt werden soll.
-    *
-    * @param int $maxRedirects
-    *
-    * @return CurlHttpClient
-    */
-   public function setMaxRedirects($maxRedirects) {
-      $this->maxRedirects = $maxRedirects;
-      return $this;
-   }
-
-
-   /**
-    * Gibt die Anzahl der Redirects zurück, denen gefolgt wird.
-    *
-    * @return int
-    */
-   public function getMaxRedirects() {
-      return $this->maxRedirects;
    }
 
 
