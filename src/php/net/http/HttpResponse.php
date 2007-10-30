@@ -36,9 +36,9 @@ interface HttpResponse {
     *
     * @param $name - Name des Headers
     *
-    * @return string
+    * @return mixed - String oder Array mit dem/den gefundenen Header(n)
     */
-   function getHeader($name);                   // !!! to-do: getHeader() muß ein Array zurückgeben
+   function getHeader($name);
 
 
    /**
