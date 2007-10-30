@@ -33,6 +33,12 @@ $__imports['NoPermissionException'          ] = 'php/lang/NoPermissionException'
 $__imports['PHPErrorException'              ] = 'php/lang/PHPErrorException';
 $__imports['RuntimeException'               ] = 'php/lang/RuntimeException';
 
+$__imports['CURL'                           ] = 'php/het/http/CURL';
+$__imports['CurlHttpRequest'                ] = 'php/net/http/CurlHttpRequest';
+$__imports['HttpRequest'                    ] = 'php/net/http/HttpRequest';
+
+$__imports['Mailer'                         ] = 'php/net/mail/Mailer';
+
 $__imports['BasePdfDocument'                ] = 'php/pdf/BasePdfDocument';
 $__imports['SimplePdfDocument'              ] = 'php/pdf/SimplePdfDocument';
 
@@ -51,10 +57,7 @@ $__imports['Tile'                           ] = 'php/struts/Tile';
 
 $__imports['BaseValidator'                  ] = 'php/util/BaseValidator';
 $__imports['Config'                         ] = 'php/util/Config';
-$__imports['CURL'                           ] = 'php/util/CURL';
-$__imports['HttpRequest'                    ] = 'php/util/HttpRequest';
 $__imports['Logger'                         ] = 'php/util/Logger';
-$__imports['Mailer'                         ] = 'php/util/Mailer';
 $__imports['String'                         ] = 'php/util/String';
 $__imports['TorHelper'                      ] = 'php/util/TorHelper';
 

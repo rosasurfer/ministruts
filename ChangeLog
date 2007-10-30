@@ -1,3 +1,9 @@
+2007-10-30
+
+   - neues Package "php/net/http" für alles, was mit HTTP zu tun hat
+   - neues Package "php/net/mail" für alles, was mit E-Mail zu tun hat
+
+
 2007-10-29
 
    - Module: Konfiguration wird mit XPath eingelesen, dadurch sind überall Vorwärtsdeklarationen möglich

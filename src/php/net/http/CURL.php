@@ -78,13 +78,13 @@ class CURL extends StaticFactory {
    /**
     * Gibt eine Beschreibung des letzten CURL-Fehlers zurück.
     *
-    * @param resource $handle - CURL-Handle
+    * @param resource $curlHandle - CURL-Handle
     */
-   public static function getError(&$handle) {
-      $error = curl_error($handle);
+   public static function getError(&$curlHandle) {
+      $error = curl_error($curlHandle);
 
       if (empty($error)) {
-         $error = curl_errno($handle);
+         $error = curl_errno($curlHandle);
          if (isSet(self::$errors[$error])) {
             $error = self::$errors[$error];
          }
@@ -99,19 +99,19 @@ class CURL extends StaticFactory {
    /**
     * Gibt den letzten CURL-Fehlercode zurück.
     *
-    * @param resource $handle - CURL-Handle
+    * @param resource $curlHandle - CURL-Handle
     */
-   public static function getErrorNo(&$handle) {
-      return curl_errno($handle);
+   public static function getErrorNo(&$curlHandle) {
+      return curl_errno($curlHandle);
    }
 
 
    /**
     * Gibt den HTTP-Statuscode einer CURL-Verbindung zurück.
     *
-    * @param resource $handle - CURL-Handle
+    * @param resource $curlHandle - CURL-Handle
     */
-   public static function getHttpStatusCode(&$handle) {
-      return (int) curl_getinfo($handle, CURLINFO_HTTP_CODE);
+   public static function getHttpStatusCode(&$curlHandle) {
+      return (int) curl_getinfo($curlHandle, CURLINFO_HTTP_CODE);
    }
 }
