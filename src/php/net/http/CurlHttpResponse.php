@@ -49,7 +49,7 @@ final class CurlHttpResponse implements HttpResponse {
     */
    public function setStatus($status) {
       if (!is_int($status)) throw new IllegalTypeException('Illegal type of argument $status: '.getType($status));
-      if ($status < 1)      throw new InvalidArgumentException('Invalid argument $status: '.$status);
+      if ($status < 0)      throw new InvalidArgumentException('Invalid argument $status: '.$status);
 
       $this->status = $status;
       return $this;
