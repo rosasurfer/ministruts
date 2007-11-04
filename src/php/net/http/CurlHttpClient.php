@@ -33,8 +33,10 @@ final class CurlHttpClient extends HttpClient {
    public function send(HttpRequest $request) {
       $response = CurlHttpResponse ::create();
 
+      // CURL-Session initialisieren
       $handle = curl_init();
 
+      // Optionen setzen
       $options = array(CURLOPT_WRITEFUNCTION  => array($response, 'writeContent'),
                        CURLOPT_HEADERFUNCTION => array($response, 'writeHeader'),
                        CURLOPT_URL            => $request->getUrl(),
@@ -57,26 +59,33 @@ final class CurlHttpClient extends HttpClient {
       }
       curl_setopt_array($handle, $options);
 
-      if (curl_exec($handle) === false)
-         Logger ::log('Could not retrieve url, CURL error: '.CURL ::getError($handle).', url: '.$request->getUrl(), L_INFO, __CLASS__);
-      $response->setStatus($status = curl_getinfo($handle, CURLINFO_HTTP_CODE));
-
+      // Request ausführen
+      if (curl_exec($handle) === false) {
+         $response = null;
+         Logger ::log('CURL error: '.CURL ::getError($handle).', url: '.$request->getUrl(), L_WARN, __CLASS__);
+      }
+      else {
+         $response->setStatus(curl_getinfo($handle, CURLINFO_HTTP_CODE));
+      }
       curl_close($handle);
 
-
-      // ggf. einen manuellen Redirect ausführen (falls "open_basedir" gesetzt ist)
-      if (($status==301 || $status==302) && $this->followRedirects && ini_get('open_basedir')) {
-         if ($this->currentRedirect < $this->maxRedirects) {
-            $this->currentRedirect++;
-            $request  = HttpRequest ::create()->setUrl($response->getHeader('Location')); // !!! to-do: relative Redirects abfangen
-            $response = $this->send($request);
+      // Response auswerten
+      if ($response) {
+         $status = $response->getStatus();
+         // ggf. manuellen Redirect ausführen (falls "open_basedir" oder "safe_mode" aktiviert ist)
+         if (($status==301 || $status==302) && $this->followRedirects && (ini_get('open_basedir') || ini_get('safe_mode'))) {
+            if ($this->currentRedirect < $this->maxRedirects) {
+               $this->currentRedirect++;
+               $request  = HttpRequest ::create()->setUrl($response->getHeader('Location')); // !!! to-do: relative Redirects abfangen
+               $response = $this->send($request);
+            }
+            else {
+               Logger ::log('CURL error: maxRedirects limit exceeded - '.$this->maxRedirects, L_WARN, __CLASS__);
+            }
          }
-         else {
-            Logger ::log('maxRedirects limit exceeded: '.$this->maxRedirects, L_WARN, __CLASS__);
-         }
+         return $response;
       }
-
-      return $response;
+      return null;
    }
 }
 ?>

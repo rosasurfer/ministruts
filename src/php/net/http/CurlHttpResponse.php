@@ -49,7 +49,7 @@ final class CurlHttpResponse implements HttpResponse {
     */
    public function setStatus($status) {
       if (!is_int($status)) throw new IllegalTypeException('Illegal type of argument $status: '.getType($status));
-      if ($status < 0)      throw new InvalidArgumentException('Invalid argument $status: '.$status);
+      if ($status < 1)      throw new InvalidArgumentException('Invalid argument $status: '.$status);
 
       $this->status = $status;
       return $this;
@@ -101,9 +101,8 @@ final class CurlHttpResponse implements HttpResponse {
 
 
    /**
-    * nur für internen Gebrauch:
-    *
-    * Callbackfunktion für CurlHttpClient, der der Content des HTTP-Requests chunk-weise übergeben wird.
+    * Nur für internen Gebrauch:  Callback für CurlHttpClient, der der Content des HTTP-Requests chunk-weise
+    * --------------------------  übergeben wird.
     *
     * @param resource $handle - das aktuelle CURL-Handle
     * @param string   $data   - die empfangenen Daten
@@ -120,9 +119,8 @@ final class CurlHttpResponse implements HttpResponse {
 
 
    /**
-    * nur für internen Gebrauch:
-    *
-    * Callbackfunktion für CurlHttpClient, der die Response-Header zeilenweise übergeben werden.
+    * Nur für internen Gebrauch:  Callback für CurlHttpClient, der die Response-Header zeilenweise übergeben werden.
+    * --------------------------
     *
     * @param resource $handle - das aktuelle CURL-Handle
     * @param string   $line   - vollständige Headerzeile, bestehend aus dem Namen, einem Doppelpunkt und den Daten
