@@ -92,6 +92,8 @@ abstract class HttpClient extends Object {
     * @param HttpRequest $request
     *
     * @return HttpResponse
+    *
+    * @throws IOException - wenn ein Fehler auftritt
     */
    abstract public function send(HttpRequest $request);
 }

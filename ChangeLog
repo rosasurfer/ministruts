@@ -1,3 +1,8 @@
+2007-11-06
+
+   - php/net/http/CurlHttpClient::send() wirft jetzt bei allen auftretenden Fehlern eine IOException
+
+
 2007-10-30
 
    - neues Package "php/net/http" für alles, was mit HTTP zu tun hat

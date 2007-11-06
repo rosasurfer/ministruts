@@ -77,13 +77,11 @@ class FrontController extends Singleton {
                          $applicationRoot.'/CVS/',
                          );
       foreach ($locations as $location) {
-         $request = HttpRequest ::create()->setUrl($location);
+         $request  = HttpRequest ::create()->setUrl($location);
          $response = CurlHttpClient ::create()->send($request);
-         if ($response) {
-            $status = $response->getStatus();
-            if ($status != 403 && $status != 404)
-               throw new InfrastructureException('Fatal web server configuration error: URL "'.$location.'" is visible to the internet');
-         }
+         $status = $response->getStatus();
+         if ($status != 403 && $status != 404)
+            throw new InfrastructureException('Fatal web server configuration error: URL "'.$location.'" is visible to the internet');
       }
 
       // Alle Struts-Konfigurationen in WEB-INF suchen
