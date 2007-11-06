@@ -5,7 +5,7 @@
 abstract class HttpClient extends Object {
 
 
-   protected $timeout         = 30;              // int
+   protected $timeout         = 60;              // int
    protected $followRedirects = false;           // boolean
    protected $maxRedirects    = 10;              // int
    protected $userAgent       = 'Mozilla/5.0';   // string
