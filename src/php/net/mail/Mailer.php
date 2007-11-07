@@ -154,6 +154,7 @@ class Mailer extends Object {
       // init mail
       $this->log("\n----==::  Sending new mail  [from: $from] [to: $to] [subject: $subject]  :==----");
       $returnPath = "<$from>";
+
       if (is_array($headers)) {
          $tmp = array();
          foreach ($headers as $header) {
