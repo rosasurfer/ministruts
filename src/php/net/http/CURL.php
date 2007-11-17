@@ -81,37 +81,17 @@ class CURL extends StaticFactory {
     * @param resource $curlHandle - CURL-Handle
     */
    public static function getError(&$curlHandle) {
-      $error = curl_error($curlHandle);
+      $errorNo  = curl_errno($curlHandle);
+      $errorStr = curl_error($curlHandle);
 
-      if (empty($error)) {
-         $error = curl_errno($curlHandle);
-         if (isSet(self::$errors[$error])) {
-            $error = self::$errors[$error];
-         }
-         else {
-            $error = (string) $error;
-         }
+      if (isSet(self::$errors[$errorNo])) {
+         $cError = self::$errors[$errorNo];
       }
-      return $error;
-   }
+      else {
+         $cError = '???';
+         Logger ::log('Unknown CURL error code: '.$errorNo, L_NOTICE, __CLASS__);
+      }
 
-
-   /**
-    * Gibt den letzten CURL-Fehlercode zurück.
-    *
-    * @param resource $curlHandle - CURL-Handle
-    */
-   public static function getErrorNo(&$curlHandle) {
-      return curl_errno($curlHandle);
-   }
-
-
-   /**
-    * Gibt den HTTP-Statuscode einer CURL-Verbindung zurück.
-    *
-    * @param resource $curlHandle - CURL-Handle
-    */
-   public static function getHttpStatusCode(&$curlHandle) {
-      return (int) curl_getinfo($curlHandle, CURLINFO_HTTP_CODE);
+      return "$errorNo $cError ($errorStr)";
    }
 }
