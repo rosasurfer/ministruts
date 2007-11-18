@@ -85,13 +85,12 @@ class CURL extends StaticFactory {
       $errorStr = curl_error($curlHandle);
 
       if (isSet(self::$errors[$errorNo])) {
-         $cError = self::$errors[$errorNo];
+         $errorNo = self::$errors[$errorNo];
       }
       else {
-         $cError = '???';
-         Logger ::log('Unknown CURL error code: '.$errorNo, L_NOTICE, __CLASS__);
+         Logger ::log('Unknown CURL error code: '.$errorNo, L_WARN, __CLASS__);
       }
 
-      return "$errorNo $cError ($errorStr)";
+      return "$errorNo ($errorStr)";
    }
 }
