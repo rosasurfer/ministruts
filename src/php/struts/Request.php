@@ -36,6 +36,9 @@ final class Request extends Singleton {
     */
    protected function __construct() {
       $this->method = $_SERVER['REQUEST_METHOD'];
+
+      // Input-Variablen neu definieren ($_COOKIE und $_FILES sind kein User-Input)
+      $_REQUEST = array_merge($_GET, $_POST);
    }
 
 
