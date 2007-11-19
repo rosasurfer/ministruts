@@ -43,7 +43,7 @@ final class Request extends Singleton {
 
 
    /**
-    * Gibt die HTTP-Meode des Requests zurück.
+    * Gibt die HTTP-Methode dieses Requests zurück.
     *
     * @return string
     */
@@ -73,13 +73,25 @@ final class Request extends Singleton {
 
 
    /**
-    * Gibt die Pfadkomponente der URL des Requests zurück.
+    * Gibt die Pfadkomponente der URL dieses Requests zurück.
+    *
+    * @return string
     */
    public function getPathInfo() {
       if ($this->pathInfo === null) {
          $this->pathInfo = $_SERVER['PHP_SELF'] = preg_replace('/\/{2,}/', '/', $_SERVER['PHP_SELF']);
       }
       return $this->pathInfo;
+   }
+
+
+   /**
+    * Gibt die Querykomponente der URL dieses Requests zurück.
+    *
+    * @return string
+    */
+   public function getQuery() {
+      return isSet($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : null;
    }
 
 
@@ -185,7 +197,7 @@ final class Request extends Singleton {
 
 
    /**
-    * Gibt den unter dem angegebenen Schlüssel gespeicherten Wert zurück oder NULL, wenn unter dem
+    * Gibt den unter dem angegebenen Schlüssel gespeicherten Wert zurück oder NULL, wenn unter diesem
     * Schlüssel kein Wert existiert.
     *
     * @param string $key - Schlüssel, unter dem der Wert gespeichert ist

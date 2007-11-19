@@ -1,8 +1,10 @@
 2007-11-19
 
    - Refactoring: TorHelper::getExitNodes() benutzt CurlHttpClient
-   - Refactoring: Klassen php/net/http/CURL und php/net/http/CurlHttpClient zusammengefaßt
-   - Refactoring: php/functions.php -> php/init.php
+                  Klassen php/net/http/CURL und php/net/http/CurlHttpClient zusammengefaßt
+                  php/functions.php -> php/init.php
+
+   - php/struts/Request::getQuery() hinzugefügt
 
 
 2007-11-12
