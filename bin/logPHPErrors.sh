@@ -3,7 +3,7 @@
 # Aufruf: find /var/www/project -name 'php_error_log' -print0 2> /dev/null | xargs -0r logPHPErrors.sh
 #   oder: /bin/ls -1 /var/www/project/*/log/php_error_log 2> /dev/null | while read line ; do logPHPErrors.sh "$line" ; done
 #
-# Sollte als Cron-Job ausgeführt werden.
+# Als Cron-Job ausführen.
 #
 ##############################################################################################################################
 
@@ -24,18 +24,20 @@ addresses=${webmasters:-`whoami`}
 # alle übergebenen Dateinamen verarbeiten
 for file ; do
 
-    # Prüfen, ob die Datei gerade bearbeitet wird. Wenn ja, abbrechen, ansonsten umbenennen ...
+    # abbrechen, wenn die Datei gerade bearbeitet wird
     [ -f "$file.tmp" ] && echo "Remove file $file.tmp, it is in the way." 1>&2 && exit 1
+
+    # Datei umbenennen, ...
     mv "$file" "$file.tmp"
 
-    # ... und jede Zeile an jede E-Mail-Adresse schicken
+    # ... jede Zeile an jede E-Mail-Adresse schicken, ...
     while read line ; do
         for address in $addresses ; do
             echo 'PHP error in: '$file $'\n\n'$line | mail -s "PHP error_log: [Fatal] Uncatched error" $address
         done
     done < "$file.tmp"
 
-    # aufräumen
+    # ... und aufräumen
     rm "$file.tmp"
 done
 
