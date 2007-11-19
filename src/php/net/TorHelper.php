@@ -5,12 +5,12 @@
 class TorHelper extends StaticFactory {
 
 
-   private static $mirrors = array('torstatus.kgprog.com',
-                                   'torstatus.blutmagie.de',
-                                   'torstatus.torproxy.net',
-                                   'torstat.kleine-eismaus.de',
-                                   'tns.hermetix.org',
-                                   );
+   private static $torMirrors = array('torstatus.kgprog.com',
+                                      'torstatus.blutmagie.de',
+                                      'torstatus.torproxy.net',
+                                      'tns.hermetix.org',
+                                      'torstat.kleine-eismaus.de',  // down ???
+                                     );
 
 
    /**
@@ -35,30 +35,36 @@ class TorHelper extends StaticFactory {
       $nodes = Cache ::get($key = __CLASS__.'_tor_exit_nodes');
 
       if ($nodes == null) {
-         $url = $handle = $response = $error = null;
-         $size = sizeOf(self::$mirrors);
+         $content = null;
+         $size = sizeOf(self::$torMirrors);
 
-         for ($i=0; $i < $size && !$response; ++$i) {
-            $url = 'http://'.self::$mirrors[$i].'/ip_list_exit.php/Tor_ip_list_EXIT.csv';
-            if ($handle !== null)
-               curl_close($handle);
-            $handle = curl_init($url);
-            curl_setOpt($handle, CURLOPT_RETURNTRANSFER, true);
-            curl_setOpt($handle, CURLOPT_BINARYTRANSFER, true);
-            $response = curl_exec($handle);
-            if (!$response) {
-               $error = CURL ::getError($handle);
-               //Logger ::log('CURL error: '.$error.', url: '.$url, L_NOTICE, __CLASS__);
+         for ($i=0; $i < $size; ++$i) {
+            $request = HttpRequest ::create()->setUrl('http://'.self::$torMirrors[$i].'/ip_list_exit.php/Tor_ip_list_EXIT.csv');
+            try {
+               $response = CurlHttpClient ::create()->setFollowRedirects(true)->send($request);
+               if ($response->getStatus() != 200) {
+                  Logger ::log('Could not get Tor exit nodes, got HTTP status '.$response->getStatus().' for url: '.$request->getUrl(), L_NOTICE, __CLASS__);
+                  continue;
+               }
             }
-         }
-         curl_close($handle);
-         if (!$response)
-            throw new InfrastructureException('Could not retrieve Tor exit nodes, CURL error: '.$error.', url: '.$url);
+            catch (IOException $ex) {
+               Logger ::log('Could not get Tor exit nodes, got '.$ex.' for url: '.$request->getUrl(), L_NOTICE, __CLASS__);
+               continue;
+            }
 
-         $nodes = array_flip(explode("\n", str_replace("\r\n", "\n", trim($response))));
+            $content = trim($response->getContent());
+            break;
+         }
+
+         $nodes = strLen($content) ? array_flip(explode("\n", str_replace("\r\n", "\n", $content))) : array();
+
+         if (sizeOf($nodes) == 0) {
+            Logger ::log('Could not get Tor exit nodes from any mirror', L_ERROR, __CLASS__);
+         }
 
          Cache ::set($key, $nodes, 10 * MINUTE);
       }
+
       return $nodes;
    }
 }
