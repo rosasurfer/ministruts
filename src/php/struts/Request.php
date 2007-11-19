@@ -35,7 +35,7 @@ final class Request extends Singleton {
     * Konstruktor
     */
    protected function __construct() {
-      $this->method   = $_SERVER['REQUEST_METHOD'];
+      $this->method = $_SERVER['REQUEST_METHOD'];
    }
 
 
@@ -214,8 +214,9 @@ final class Request extends Singleton {
          throw new RuntimeException('Illegal method call.');
 
       // RoleProcessor holen und Rückgabewert prüfen
-      $forward = $mapping->getModule()->getRoleProcessor()->processRoles($this, Response ::me(), $mapping);
-
+      $forward = $mapping->getModule()
+                         ->getRoleProcessor()
+                         ->processRoles($this, Response ::me(), $mapping);
       return (!$forward);
    }
 }
