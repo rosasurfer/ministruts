@@ -59,7 +59,7 @@ class FrontController extends Singleton {
    /**
     * Konstruktor
     *
-    * Lädt die Struts-Konfiguration und parst und kompiliert sie.
+    * Lädt die Struts-Konfiguration und erzeugt einen entsprechenden Objektbaum.
     */
    protected function __construct() {
       // Konfiguration vervollständigen
@@ -81,7 +81,7 @@ class FrontController extends Singleton {
          $response = CurlHttpClient ::create()->send($request);
          $status = $response->getStatus();
          if ($status != 403 && $status != 404)
-            throw new InfrastructureException('Fatal web server configuration error: URL "'.$location.'" is visible to the internet');
+            throw new InfrastructureException('Fatal web server configuration error: URL "'.$location.'" is accessible');
       }
 
       // Alle Struts-Konfigurationen in WEB-INF suchen

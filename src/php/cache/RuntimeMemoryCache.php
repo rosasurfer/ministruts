@@ -2,8 +2,8 @@
 /**
  * RuntimeMemoryCache
  *
- * Default Prozess-RAM Cache. Cacht Objekte nur im Speicher des aktuellen Prozesses, nicht Request-übergreifend.
- * Nützlich als Cache-Fallback, wenn ein Cache benötigt, jedoch keiner installiert ist.
+ * Prozess-Cache. Cacht Objekte nur im Speicher (RAM) des aktuellen Prozesses, nicht Request-übergreifend.
+ * Nützlich als Fallback, wenn ein Cache benötigt wird, jedoch keiner installiert ist.
  */
 final class RuntimeMemoryCache extends AbstractCachePeer {
 
