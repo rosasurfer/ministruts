@@ -35,7 +35,6 @@ $__imports['RuntimeException'               ] = 'php/lang/RuntimeException';
 
 $__imports['TorHelper'                      ] = 'php/net/TorHelper';
 
-$__imports['CURL'                           ] = 'php/net/http/CURL';
 $__imports['CurlHttpClient'                 ] = 'php/net/http/CurlHttpClient';
 $__imports['CurlHttpResponse'               ] = 'php/net/http/CurlHttpResponse';
 $__imports['HeaderParser'                   ] = 'php/net/http/HeaderParser';
