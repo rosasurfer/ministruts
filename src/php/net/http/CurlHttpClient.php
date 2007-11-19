@@ -156,6 +156,8 @@ final class CurlHttpClient extends HttpClient {
     * Gibt eine Beschreibung des letzten CURL-Fehlers zurück.
     *
     * @param resource $handle - CURL-Handle
+    *
+    * @return string
     */
    private static function getError(&$handle) {
       $errorNo  = curl_errno($handle);
