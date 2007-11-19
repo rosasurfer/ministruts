@@ -97,9 +97,10 @@ class RequestProcessor extends Object {
 
 
    /**
-    * Löscht ActionMessages, die in der HttpSession gespeichert sind und auf die schon zugegriffen wurde.
-    * Dies erlaubt das Speichern von Nachrichten in der Session, die nur einmal angezeigt werden können und
-    * danach automatisch verschwinden. Dadurch können z.B. trotz eines Redirects Fehlermeldungen angezeigt werden.
+    * Löscht ActionMessages, die in der HttpSession gespeichert sind und auf die schon zugegriffen
+    * wurde. Dies erlaubt das Speichern von Nachrichten in der Session, die nur einmal angezeigt
+    * werden können und danach automatisch verschwinden. Dadurch können z.B. trotz eines Redirects
+    * Fehlermeldungen angezeigt werden.
     *
     * @param Request  $request
     * @param Response $response
@@ -149,9 +150,9 @@ class RequestProcessor extends Object {
 
 
    /**
-    * Wenn die Action Request-Methodenbeschränkungen hat, sicherstellen, daß der Request der angegebenen Methode
-    * entspricht. Gibt TRUE zurück, wenn die Verarbeitung fortgesetzt werden soll oder FALSE, wenn der Zugriff
-    * nicht gewährt wird.
+    * Wenn die Action Request-Methodenbeschränkungen hat, sicherstellen, daß der Request der
+    * angegebenen Methode entspricht. Gibt TRUE zurück, wenn die Verarbeitung fortgesetzt werden soll
+    * oder FALSE, wenn der Zugriff nicht gewährt wird.
     *
     * @param Request       $request
     * @param Response      $response
@@ -173,9 +174,9 @@ class RequestProcessor extends Object {
 
 
    /**
-    * Wenn die Action Zugriffsbeschränkungen hat, sicherstellen, daß der User Inhaber der angegebenen Rollen ist.  Gibt TRUE zurück,
-    * wenn die Verarbeitung fortgesetzt und der Zugriff gewährt werden soll, oder FALSE, wenn der Zugriff nicht gewährt und der Request
-    * bereits beendet wurde.
+    * Wenn die Action Zugriffsbeschränkungen hat, sicherstellen, daß der User Inhaber der angegebenen
+    * Rollen ist.  Gibt TRUE zurück, wenn die Verarbeitung fortgesetzt und der Zugriff gewährt werden
+    * soll, oder FALSE, wenn der Zugriff nicht gewährt und der Request bereits beendet wurde.
     *
     * @param Request       $request
     * @param Response      $response
@@ -197,8 +198,9 @@ class RequestProcessor extends Object {
 
 
    /**
-    * Verarbeitet einen direkt im ActionMapping angegebenen ActionForward (wenn angegeben). Gibt TRUE zurück, wenn
-    * die Verarbeitung fortgesetzt werden soll, oder FALSE, wenn der Request bereits beendet wurde.
+    * Verarbeitet einen direkt im ActionMapping angegebenen ActionForward (wenn angegeben). Gibt TRUE
+    * zurück, wenn die Verarbeitung fortgesetzt werden soll, oder FALSE, wenn der Request bereits
+    * beendet wurde.
     *
     * @param Request       $request
     * @param Response      $response
@@ -217,8 +219,8 @@ class RequestProcessor extends Object {
 
 
    /**
-    * Erzeugt und gibt die ActionForm des angegebenen Mappings zurück (wenn konfiguriert). Ist keine ActionForm konfiguriert,
-    * wird NULL zurückgegeben.
+    * Erzeugt und gibt die ActionForm des angegebenen Mappings zurück (wenn konfiguriert). Ist keine
+    * ActionForm konfiguriert, wird NULL zurückgegeben.
     *
     * @param Request       $request
     * @param Response      $response
@@ -257,7 +259,8 @@ class RequestProcessor extends Object {
 
 
    /**
-    * Übergibt den Request zur Bearbeitung an die konfigurierte Action und gibt den von ihr zurückgegebenen ActionForward zurück.
+    * Übergibt den Request zur Bearbeitung an die konfigurierte Action und gibt den von ihr
+    * zurückgegebenen ActionForward zurück.
     *
     * @param Request    $request
     * @param Response   $response
@@ -300,7 +303,8 @@ class RequestProcessor extends Object {
 
 
    /**
-    * Verarbeitet den von der Action zurückgegebenen ActionForward.  Leitet auf die Resource weiter, die der ActionForward bezeichnet.
+    * Verarbeitet den von der Action zurückgegebenen ActionForward.  Leitet auf die Resource weiter,
+    * die der ActionForward bezeichnet.
     *
     * @param Request       $request
     * @param Response      $response

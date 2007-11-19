@@ -92,7 +92,8 @@ class ActionMapping extends Object {
 
 
    /**
-    * Setzt die Methodenbeschränkung dieses Mappings.  Requests, die nicht der angegebenen Methode entsprechen, werden abgewiesen.
+    * Setzt die Methodenbeschränkung dieses Mappings.  Requests, die nicht der angegebenen Methode
+    * entsprechen, werden abgewiesen.
     *
     * @param string $method - HTTP-Methode, "GET" oder "POST"
     *
@@ -120,7 +121,8 @@ class ActionMapping extends Object {
 
 
    /**
-    * Setzt die Rollenbeschränkung dieses Mappings.  Requests, die nicht den angebenen Rollen genügen, werden abgewiesen.
+    * Setzt die Rollenbeschränkung dieses Mappings.  Requests, die nicht den angebenen Rollen genügen,
+    * werden abgewiesen.
     *
     * @param string - Rollenausdruck
     *
@@ -195,7 +197,8 @@ class ActionMapping extends Object {
 
 
    /**
-    * Gibt den Klassennamen der auszuführenden Action oder NULL, wenn keine Action konfiguriert wurde, zurück.
+    * Gibt den Klassennamen der auszuführenden Action oder NULL, wenn keine Action konfiguriert wurde,
+    * zurück.
     *
     * @return string - Klassenname
     */
@@ -232,9 +235,9 @@ class ActionMapping extends Object {
 
 
    /**
-    * Setzt das Default-Flag für dieses ActionMapping. Requests, die keinem anderen Mapping zugeordnet werden können,
-    * werden von dem Mapping mit gesetztem Default-Flag verarbeitet. Nur ein Mapping innerhalb eines Modules kann
-    * dieses Flag gesetzt werden.
+    * Setzt das Default-Flag für dieses ActionMapping. Requests, die keinem anderen Mapping zugeordnet
+    * werden können, werden von dem Mapping mit gesetztem Default-Flag verarbeitet. Nur ein Mapping
+    * innerhalb eines Modules kann dieses Flag gesetzt werden.
     *
     * @param boolean $default
     *
@@ -316,9 +319,10 @@ class ActionMapping extends Object {
 
 
    /**
-    * Sucht und gibt den ActionForward mit dem angegebenen Namen zurück. Zuerst werden die lokalen Forwards des Mappings
-    * durchsucht und danach die globalen Forwards des Modules.  Wird kein Forward gefunden, wird NULL zurückgegeben.  Es
-    * existiert immer ein Forward mit dem speziellen Name "__self". Er ist ein Redirect-Forward auf das ActionMapping selbst.
+    * Sucht und gibt den ActionForward mit dem angegebenen Namen zurück. Zuerst werden die lokalen
+    * Forwards des Mappings durchsucht und danach die globalen Forwards des Modules.  Wird kein Forward
+    * gefunden, wird NULL zurückgegeben.  Es existiert immer ein Forward mit dem speziellen Name "__self".
+    * Er ist ein Redirect-Forward auf das ActionMapping selbst.
     *
     * @param $name - logischer Name des ActionForwards
     *

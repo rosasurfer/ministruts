@@ -2,15 +2,16 @@
 /**
  * FrontController
  *
- * Der FrontController muß "thread-sicher" programmiert sein. Das bedeutet, er muß zustandlos sein und darf nichts speichern,
- * WAS SICH ÄNDERN KÖNNTE.
+ * Der FrontController muß "thread-sicher" programmiert sein. Das bedeutet, er muß zustandlos sein und
+ * darf nichts speichern, WAS SICH ÄNDERN KÖNNTE.
  *
- * Hintergrund ist, daß es nur eine Instanz gibt, die aus Performance-Gründen im Cache zwischengehalten und für jeden Request
- * wiederverwendet wird. Wenn nun z.B. eine Variable vor dem Speichern im Cache mit einem Zwischenwert belegt würde, dann würde
- * dieser Wert an weitere Requests weitergereicht, wodurch deren Verarbeitung gestört werden könnte.
+ * Hintergrund ist, daß es nur eine Instanz gibt, die aus Performance-Gründen im Cache zwischengehalten
+ * und für jeden Request wiederverwendet wird. Wenn nun z.B. eine Variable vor dem Speichern im Cache mit
+ * einem Zwischenwert belegt würde, dann würde dieser Wert an weitere Requests weitergereicht, wodurch
+ * deren Verarbeitung gestört werden könnte.
  *
- * Als einfache Richtlinie läßt sich sagen, daß außerhalb von Funktionen keine Variablen angelegt werden dürfen.
- * Wird das eingehalten, ist er "thread-sicher".
+ * Als einfache Richtlinie läßt sich sagen, daß außerhalb von Funktionen keine Variablen angelegt werden
+ * dürfen. Wird das eingehalten, ist er "thread-sicher".
  */
 class FrontController extends Singleton {
 

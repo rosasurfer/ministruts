@@ -2,10 +2,10 @@
 /**
  * Request
  *
- * Diese Klasse stellt den HTTP-Request mit seinen Daten dar, sowie er von PHP an das aufgerufene Script übergeben wurde.
- * Da es immer nur einen einzigen Request geben kann, ist er als Singleton implementiert. Das bedeutet unter anderem,
- * daß es keinen öffentlichen Konstruktor gibt, man kann also nicht selbst einen neuen Request erzeugen (es gibt nur
- * den einen, der vom Server an PHP weitergereicht wurde).
+ * Diese Klasse stellt den HTTP-Request mit seinen Daten dar, sowie er von PHP an das aufgerufene Script
+ * übergeben wurde. Da es immer nur einen einzigen Request geben kann, ist er als Singleton implementiert.
+ * Das bedeutet unter anderem, daß es keinen öffentlichen Konstruktor gibt, man kann also nicht selbst
+ * einen neuen Request erzeugen (es gibt nur den einen, der vom Server an PHP weitergereicht wurde).
  */
 final class Request extends Singleton {
 
@@ -19,8 +19,8 @@ final class Request extends Singleton {
 
 
    /**
-    * Gibt die aktuelle Klasseninstanz zurück, wenn das Script im Kontext eines HTTP-Requestes aufgerufen wurde.
-    * In allen anderen Fällen, z.B. bei Aufruf in der Konsole, wird NULL zurückgegeben.
+    * Gibt die aktuelle Klasseninstanz zurück, wenn das Script im Kontext eines HTTP-Requestes aufgerufen
+    * wurde. In allen anderen Fällen, z.B. bei Aufruf in der Konsole, wird NULL zurückgegeben.
     *
     * @return Request - Instanz oder NULL
     */
@@ -182,7 +182,8 @@ final class Request extends Singleton {
 
 
    /**
-    * Gibt den unter dem angegebenen Schlüssel gespeicherten Wert zurück oder NULL, wenn unter dem Schlüssel kein Wert existiert.
+    * Gibt den unter dem angegebenen Schlüssel gespeicherten Wert zurück oder NULL, wenn unter dem
+    * Schlüssel kein Wert existiert.
     *
     * @param string $key - Schlüssel, unter dem der Wert gespeichert ist
     *

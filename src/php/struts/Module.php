@@ -20,7 +20,7 @@ class Module extends Object {
 
    /**
     * Der Prefix dieses Modules relative zur ROOT_URL der Anwendung.  Die Prefixe innerhalb einer Anwendung
-    * sind eindeutig.  Das Module mit einem Leerstring als Prefix ist das Default-Module der Anwendung.
+    * sind eindeutig. Das Module mit einem Leerstring als Prefix ist das Default-Module der Anwendung.
     */
    protected $prefix;         // string
 
@@ -406,9 +406,9 @@ class Module extends Object {
 
 
    /**
-    * Fügt diesem Module einen globalen ActionForward unter dem angegebenen Namen hinzu.  Der angegebene Name kann vom
-    * internen Namen des Forwards abweichen, sodaß die Definition von Aliassen möglich ist (ein Forward ist unter mehreren
-    * Namen auffindbar).
+    * Fügt diesem Module einen globalen ActionForward unter dem angegebenen Namen hinzu.  Der angegebene
+    * Name kann vom internen Namen des Forwards abweichen, sodaß die Definition von Aliassen möglich ist
+    * (ein Forward ist unter mehreren Namen auffindbar).
     *
     * @param string        $name
     * @param ActionForward $forward
@@ -453,8 +453,8 @@ class Module extends Object {
 
 
    /**
-    * Gibt das ActionMapping für den angegebenen Pfad zurück. Zuerst wird nach einer genauen Übereinstimmung
-    * gesucht und danach, wenn keines gefunden wurde, nach einem Default-ActionMapping.
+    * Gibt das ActionMapping für den angegebenen Pfad zurück. Zuerst wird nach einer genauen
+    * Übereinstimmung gesucht und danach, wenn keines gefunden wurde, nach einem Default-ActionMapping.
     *
     * @param string $path
     *
@@ -636,8 +636,8 @@ class Module extends Object {
 
 
    /**
-    * Sucht und gibt die Tile mit dem angegebenen Namen zurück, oder NULL, wenn keine Tile mit diesem Namen
-    * gefunden wurde.
+    * Sucht und gibt die Tile mit dem angegebenen Namen zurück, oder NULL, wenn keine Tile mit diesem
+    * Namen gefunden wurde.
     *
     * @param $name - logischer Name der Tile
     *
@@ -665,8 +665,8 @@ class Module extends Object {
 
 
    /**
-    * Sucht nach einer lokalen Resource mit dem angegebenen Namen und gibt den vollständigen Dateinamen zurück,
-    * oder NULL, wenn keine Resource mit diesem Namen gefunden wurde.
+    * Sucht nach einer lokalen Resource mit dem angegebenen Namen und gibt den vollständigen Dateinamen
+    * zurück, oder NULL, wenn keine Resource mit diesem Namen gefunden wurde.
     *
     * @param $path - Pfadangabe
     *

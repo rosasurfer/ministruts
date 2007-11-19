@@ -2,7 +2,8 @@
 /**
  * ActionForward
  *
- * Ein ActionForward bezeichnet ein Ziel, zu dem nach Aufruf einer Action verzweigt wird, mit den folgenden Eigenschaften:
+ * Ein ActionForward bezeichnet ein Ziel, zu dem nach Aufruf einer Action verzweigt wird, mit den
+ * folgenden Eigenschaften:
  *
  *   name     - logischer Name, unter dem der ActionForward gefunden werden kann
  *   path     - physische Resource (z.B. HTML-Datei), Klassenname eines Layouts oder URL
@@ -88,8 +89,8 @@ class ActionForward extends Object {
 
 
    /**
-    * Friert die Konfiguration dieser Komponente ein. Nachdem Aufruf dieser Methode kann die Konfiguration der Komponente
-    * nicht mehr verändert werden.
+    * Friert die Konfiguration dieser Komponente ein. Nachdem Aufruf dieser Methode kann die Konfiguration
+    * der Komponente nicht mehr verändert werden.
     *
     * @return ActionForward
     */
@@ -102,8 +103,9 @@ class ActionForward extends Object {
 
 
    /**
-    * Erzeugt einen neuen ActionForward, der auf dieser Instanz basiert. Die Konfiguration des neuen Forwards ist
-    * noch nicht eingefroren, sodaß diese Methode zum "Modifizieren" vorhandener Forwards benutzt werden kann.
+    * Erzeugt einen neuen ActionForward, der auf dieser Instanz basiert. Die Konfiguration des neuen
+    * Forwards ist noch nicht eingefroren, sodaß diese Methode zum "Modifizieren" vorhandener Forwards
+    * benutzt werden kann.
     *
     * @return ActionForward
     *

@@ -12,8 +12,8 @@ final class Response extends Singleton {
 
 
    /**
-    * Gibt die aktuelle Klasseninstanz zurück, wenn das Script im Kontext eines HTTP-Requestes aufgerufen wurde.
-    * In allen anderen Fällen, z.B. bei Aufruf in der Konsole, wird NULL zurückgegeben.
+    * Gibt die aktuelle Klasseninstanz zurück, wenn das Script im Kontext eines HTTP-Requestes aufgerufen
+    * wurde. In allen anderen Fällen, z.B. bei Aufruf in der Konsole, wird NULL zurückgegeben.
     *
     * @return Response - Instanz oder NULL
     */
@@ -36,7 +36,8 @@ final class Response extends Singleton {
 
 
    /**
-    * Gibt den unter dem angegebenen Schlüssel gespeicherten Wert zurück oder NULL, wenn unter diesem Namen kein Wert existiert.
+    * Gibt den unter dem angegebenen Schlüssel gespeicherten Wert zurück oder NULL, wenn unter diesem
+    * Namen kein Wert existiert.
     *
     * @param string $key - Schlüssel, unter dem der Wert gespeichert ist
     *

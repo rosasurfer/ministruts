@@ -6,8 +6,8 @@ class Tile extends Object {
 
 
    /**
-    * Ob diese Komponente vollständig konfiguriert ist. Wenn dieses Flag gesetzt ist, wirft jeder Versuch,
-    * die Komponente zu ändern, eine IllegalStateException.
+    * Ob diese Komponente vollständig konfiguriert ist. Wenn dieses Flag gesetzt ist, wirft jeder
+    * Versuch, die Komponente zu ändern, eine IllegalStateException.
     */
    protected $configured = false;
 
