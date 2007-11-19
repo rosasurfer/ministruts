@@ -17,7 +17,7 @@ abstract class Action extends Object {
     * @param ActionMapping $mapping - das Mapping, zu dem die Action gehört
     * @param ActionForm    $form    - die ActionForm oder NULL, wenn keine angegeben wurde
     */
-   public function __construct(ActionMapping $mapping, ActionForm $form=null) {
+   public function __construct(ActionMapping $mapping, ActionForm $form = null) {
       $this->mapping = $mapping;
       $this->form = $form;
    }
@@ -83,7 +83,7 @@ abstract class Action extends Object {
     * @return ActionForward - der originale oder ein modifizierter ActionForward (z.B. mit weiteren
     *                         Query-Parameter)
     */
-   public function executeAfter(Request $request, Response $response, ActionForward $forward=null) {
+   public function executeAfter(Request $request, Response $response, ActionForward $forward = null) {
       return $forward;
    }
 }
