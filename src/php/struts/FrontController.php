@@ -97,9 +97,9 @@ class FrontController extends Singleton {
             $baseName = baseName($file, '.xml');
             $prefix = (String ::startsWith($baseName, 'struts-config-')) ? '/'.subStr($baseName, 14) : '';
 
-            $config = new Module($file, $prefix);
-            $config->freeze();
-            $this->registerModule($config);
+            $module = new Module($file, $prefix);
+            $module->freeze();
+            $this->registerModule($module);
          }
       }
       catch (Exception $ex) {
@@ -131,10 +131,10 @@ class FrontController extends Singleton {
     * @return string - Modulprefix bzw. "" für das Default-Modul
     */
    private function getModulePrefix(Request $request) {
-      $config = $request->getAttribute(Struts ::MODULE_KEY);
+      $module = $request->getAttribute(Struts ::MODULE_KEY);
 
-      if ($config !== null) {
-         return $config->getPrefix();
+      if ($module !== null) {
+         return $module->getPrefix();
       }
 
       $scriptName = $request->getPathInfo();
