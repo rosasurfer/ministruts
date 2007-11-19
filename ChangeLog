@@ -6,6 +6,8 @@
 
    - php/struts/Request::getQuery() hinzugefügt
 
+   - Bugfix: php/struts/ActionMapping::findForward('__self') hatte Query-Parameter der URL ignoriert
+
 
 2007-11-12
 
