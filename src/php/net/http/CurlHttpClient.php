@@ -133,7 +133,7 @@ final class CurlHttpClient extends HttpClient {
 
       // Request ausführen
       if (curl_exec($handle) === false)
-         throw new IOException('CURL error: '.self ::getError($handle).', url: '.$request->getUrl());
+         throw new IOException('CURL error '.self ::getError($handle).', url: '.$request->getUrl());
 
       $response->setStatus($status = curl_getinfo($handle, CURLINFO_HTTP_CODE));
       curl_close($handle);
