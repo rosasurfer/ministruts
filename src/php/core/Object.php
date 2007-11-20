@@ -13,7 +13,7 @@ class Object {
     *
     * @throws RuntimeException
     */
-   private static function __call($methodName, array &$params) {
+   private static function __call($methodName, array $params) {
       $trace = debug_backTrace();
 
       for ($i=0; $i < sizeOf($trace); $i++) {
