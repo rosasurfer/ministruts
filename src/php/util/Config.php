@@ -17,18 +17,14 @@ final class Config extends Singleton {
     * @return Config
     */
    public static function me() {
-      // an der Konsole oder auf dem Entwicklungswebserver die Config immer neu einlesen
-      $console     = !isSet($_SERVER['REQUEST_METHOD']);
-      $development = !$console && $_SERVER['REMOTE_ADDR']=='127.0.0.1';
-
-      if ($console || $development)
-         return Singleton ::getInstance(__CLASS__);
-
-      // auf dem Production-Server Config nach der Initialisierung im Cache ablegen
-      $instance = Cache ::get($key=__CLASS__);
+      // ist die Instanz im Cache, wird sie von dort geladen
+      $instance = Cache ::get($key=__CLASS__.'_instance');
       if (!$instance) {
-         $instance = Singleton ::getInstance(__CLASS__);
-         Cache ::set($key, $instance);
+         $instance = parent:: getInstance(__CLASS__);
+
+         // auf dem Production-Server wird sie nach der Erzeugung gecacht
+         if (isSet($_SERVER['REQUEST_METHOD']) && $_SERVER['REMOTE_ADDR']!='127.0.0.1')
+            Cache ::set($key, $instance);
       }
       return $instance;
    }
@@ -45,19 +41,17 @@ final class Config extends Singleton {
       $filename = 'config.properties';
       $baseName = baseName($filename, '.properties');
 
-      if (Request ::me()) {
-         // bei Webapplikation in WEB-INF
+      if (Request ::me()) {   // bei Webapplikation in WEB-INF suchen
          $files = array_reverse(glob(getCwd().'/WEB-INF/'.$baseName.'*.properties', GLOB_ERR));
       }
-      else {
-         // bei Konsolenapplikation im aktuellen Verzeichnis
+      else {                  // bei Konsolenapplikation im aktuellen Verzeichnis suchen
          $files = array_reverse(glob(getCwd().'/'.$baseName.'*.properties', GLOB_ERR));
       }
       foreach ($files as $file) {
          $configfiles[] = $file;
       }
 
-      // weitere Konfigurationsdateien im include-Pfad suchen
+      // include-Pfad nach weiteren Konfigurationsdateien durchsuchen
       $paths = explode(PATH_SEPARATOR, ini_get('include_path'));
       foreach ($paths as $path) {
          $files = array_reverse(glob($path.'/'.$baseName.'*.properties', GLOB_ERR));
@@ -78,7 +72,8 @@ final class Config extends Singleton {
 
 
    /**
-    * Lädt eine einzelne Konfigurationsdatei.  Schon vorhandene Einstellungen werden dabei nicht überschrieben.
+    * Lädt eine einzelne Konfigurationsdatei.  Schon vorhandene Einstellungen werden dabei nicht
+    * überschrieben.
     *
     * @param string $filename - Dateiname
     */
@@ -124,7 +119,7 @@ final class Config extends Singleton {
     *
     * @param string $key - Schlüssel
     *
-    * @return string - Konfigurationseinstellung
+    * @return mixed - String oder Array mit Konfigurationseinstellung
     */
    public static function get($key) {
       return self ::me()->getProperty($key);
