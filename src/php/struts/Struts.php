@@ -52,7 +52,7 @@ final class Struts extends StaticFactory {
    /**
     * Request- oder Session-Key, unter dem eventuelle ActionErrors gespeichert sind.
     */
-   const ACTION_ERROR_KEY = 'org.apache.struts.action.ERROR';
+   const ACTION_ERRORS_KEY = 'org.apache.struts.action.ERRORS';
 
 
    /**
@@ -70,7 +70,7 @@ final class Struts extends StaticFactory {
    /**
     * Request- oder Session-Key, unter dem eventuelle ActionMessages gespeichert sind.
     */
-   const ACTION_MESSAGE_KEY = 'org.apache.struts.action.MESSAGE';
+   const ACTION_MESSAGES_KEY = 'org.apache.struts.action.MESSAGES';
 
 
    /**

@@ -5,7 +5,8 @@
 abstract class ActionForm extends Object {
 
 
-   protected $actionKey;      // DispatchAction-Key
+   protected /*Request*/ $request;     // der Request, mit dem wir verbunden sind
+   protected             $actionKey;   // string: DispatchAction-Key
 
 
    /**
@@ -16,11 +17,13 @@ abstract class ActionForm extends Object {
     * @param Request $request - der aktuelle Request
     */
    public function __construct(Request $request) {
+      $this->request = $request;
+
       // ggf. definierten Dispatch-Parameter auslesen
       if (isSet($_REQUEST['action']))
          $this->actionKey = $_REQUEST['action'];
 
-      // Request-Parameter einlesen
+      // Request-Parameter auslesen
       $this->populate($request);
    }
 
@@ -37,8 +40,7 @@ abstract class ActionForm extends Object {
    /**
     * Validiert die eingelesenen Parameter. Kann anwendungsabhängig überschrieben werden.
     *
-    * @return boolean - TRUE, wenn die übergebenen Parameter gültig sind,
-    *                   FALSE andererseits
+    * @return boolean - TRUE, wenn die übergebenen Parameter gültig sind, FALSE andererseits
     */
    public function validate() {
       return true;
@@ -48,7 +50,7 @@ abstract class ActionForm extends Object {
    /**
     * Gibt den DispatchAction-Key zurück, sofern er angegeben wurde (siehe java.struts.DispatchAction).
     *
-    * @return string - Action-Key oder NULL, wen kein Wert übertragen wurde
+    * @return string - Action-Key oder NULL, wenn kein Wert angegeben wurde
     */
    public function getActionKey() {
       return $this->actionKey;

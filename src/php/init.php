@@ -732,9 +732,8 @@ function isActionError($key = null) {
 
 /**
  * Gibt die Error-Message für den angegebenen Schlüssel zurück.  Ohne Schlüssel wird die erste vorhandene
- * Error-Message zurückgegeben.
- * Existiert eine HttpSession, wird auch dort gesucht.  Alle Error-Messages in der HttpSession werden nach
- * dem ersten Auslesen irgendeiner Error-Message gelöscht.
+ * Error-Message zurückgegeben. Existiert eine HttpSession, wird auch dort gesucht.  Alle Error-Messages
+ * in der HttpSession werden nach dem ersten Auslesen irgendeiner Error-Message gelöscht.
  *
  * @param string $key - Schlüssel der Error-Message
  *

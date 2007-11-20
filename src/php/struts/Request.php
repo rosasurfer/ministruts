@@ -102,6 +102,7 @@ final class Request extends Singleton {
     */
    public function isSession() {
       return defined('SID');
+      // TODO: Sessionverwaltung ausbauen
    }
 
 
@@ -186,17 +187,6 @@ final class Request extends Singleton {
 
 
    /**
-    * Speichert einen Wert unter dem angegebenen Schlüssel im Request.
-    *
-    * @param string $key   - Schlüssel, unter dem der Wert gespeichert wird
-    * @param mixed  $value - der zu speichernde Wert
-    */
-   public function setAttribute($key, &$value) {
-      $this->attributes[$key] = $value;
-   }
-
-
-   /**
     * Gibt den unter dem angegebenen Schlüssel gespeicherten Wert zurück oder NULL, wenn unter diesem
     * Schlüssel kein Wert existiert.
     *
@@ -209,7 +199,30 @@ final class Request extends Singleton {
          return $this->attributes[$key];
 
       $value = null;
-      return $value;
+      return $value;    // Referenz auf NULL
+   }
+
+
+   /**
+    * Speichert einen Wert unter dem angegebenen Schlüssel im Request.
+    *
+    * @param string $key   - Schlüssel, unter dem der Wert gespeichert wird
+    * @param mixed  $value - der zu speichernde Wert
+    */
+   public function setAttribute($key, &$value) {
+      $this->attributes[$key] = $value;
+   }
+
+
+   /**
+    * Löscht den Wert unter dem angegebenen Schlüssel aus dem Request.
+    *
+    * @param string $key - Schlüssel des zu löschenden Wertes
+    */
+   public function removeAttribute($key) {
+      if (isSet($this->attributes[$key])) {
+         unset($this->attributes[$key]);
+      }
    }
 
 
@@ -233,6 +246,78 @@ final class Request extends Singleton {
                          ->getRoleProcessor()
                          ->processRoles($this, Response ::me(), $mapping);
       return (!$forward);
+   }
+
+
+   /**
+    * Gibt die Error-Message für den angegebenen Schlüssel zurück.  Ohne Schlüssel wird die erste
+    * vorhandene Error-Message zurückgegeben.
+    *
+    * @param string $key - Schlüssel der Error-Message
+    *
+    * @return string - Error-Message
+    */
+   public function getActionError($key = null) {
+      $errors =& $this->getAttribute(Struts ::ACTION_ERRORS_KEY);
+
+      if ($key === null) {       // die erste zurückgeben
+         if ($errors !== null) {
+            foreach ($errors as &$error)
+               return $error;
+         }
+      }                          // eine bestimmte zurückgeben
+      elseif (isSet($errors[$key])) {
+         return $errors[$key];
+      }
+      return null;
+   }
+
+
+   /**
+    * Gibt alle vorhandenen Error-Messages zurück.
+    *
+    * @return array - Error-Messages
+    */
+   public function getActionErrors() {
+      $errors =& $this->getAttribute(Struts ::ACTION_ERRORS_KEY);
+
+      if ($errors === null)
+         $errors = array();
+
+      return $errors;
+   }
+
+
+   /**
+    * Ob unter dem angegebenen Schlüssel eine Error-Message existiert.  Ohne Angabe eines Schlüssel wird
+    * geprüft, ob eine beliebige Error-Message existiert.
+    *
+    * @param string $key - Schlüssel
+    *
+    * @return boolean
+    */
+   public function isActionError($key = null) {
+      return ($this->getActionError($key) !== null);
+   }
+
+
+   /**
+    * Setzt für den angegebenen Schlüssel eine Error-Message.
+    *
+    * @param string $key     - Schlüssel der Error-Message
+    * @param string $message - Error-Message
+    */
+   public function setActionError($key, $message) {
+      if (is_string($message)) {
+         $this->attributes[Struts ::ACTION_ERRORS_KEY][$key] = $message;
+      }
+      elseif ($message === null) {
+         if (isSet($this->attributes[Struts ::ACTION_ERRORS_KEY]) && isSet($this->attributes[Struts ::ACTION_ERRORS_KEY][$key]))
+            unset($this->attributes[Struts ::ACTION_ERRORS_KEY][$key]);
+      }
+      else {
+         throw new IllegalTypeException('Illegal type of parameter $message: '.getType($message));
+      }
    }
 }
 ?>

@@ -41,7 +41,7 @@ class RequestProcessor extends Object {
 
 
       // ActionMessages aus der Session löschen
-      $this->processCachedMessages($request, $response);
+      $this->processCachedActionMessages($request, $response);
 
 
       // das passende Mapping ermitteln
@@ -97,24 +97,55 @@ class RequestProcessor extends Object {
 
 
    /**
-    * Löscht ActionMessages, die in der HttpSession gespeichert sind und auf die schon zugegriffen
-    * wurde. Dies erlaubt das Speichern von Nachrichten in der Session, die nur einmal angezeigt
-    * werden können und danach automatisch verschwinden. Dadurch können z.B. trotz eines Redirects
-    * Fehlermeldungen angezeigt werden.
+    * Speichert alle vorhandenen ActionMessages in der HttpSession zwischen. Beim nächsten Request werden
+    * diese Messages automatisch zurück in den Request verschoben und stehen wieder zur Verfügung.
+    *
+    * @param Request  $request
+    *
+    * @see Request::setActionMessage()
+    * @see RequestProcessor::processCachedActionMessages()
+    */
+   protected function cacheActionMessages(Request $request) {
+      $errors = $request->getActionErrors();
+      if (sizeOf($errors) == 0)
+         return;
+
+      // TODO: Referenz auf init.php entfernen
+      if (!$request->isSession())
+         startSession();
+
+      foreach ($errors as $key => $value) {
+         $_SESSION[Struts ::ACTION_ERRORS_KEY][$key] = $value;
+      }
+
+      // TODO: ActionMessages verarbeiten
+   }
+
+
+   /**
+    * Verschiebt ActionMessages, die in der HttpSession zwischengespeichert sind, zurück in den aktuellen
+    * Request. Wird verwendet, um ActionMessages über einen Redirect hinweg übertragen zu können.
     *
     * @param Request  $request
     * @param Response $response
+    *
+    * @see Request::setActionMessage()
+    * @see RequestProcessor::cacheActionMessages()
     */
-   protected function processCachedMessages(Request $request, Response $response) {
-      if ($request->isSession() && isSet($_SESSION[Struts ::ACTION_MESSAGE_KEY])) {
-         $errors =& $_SESSION[Struts ::ACTION_MESSAGE_KEY];
+   protected function processCachedActionMessages(Request $request, Response $response) {
+      if ($request->isSession()) {
+         if (isSet($_SESSION[Struts ::ACTION_MESSAGES_KEY])) {
+            $messages = $_SESSION[Struts ::ACTION_MESSAGES_KEY];
+            $request->setAttribute(Struts ::ACTION_MESSAGES_KEY, $messages);
+            unset($_SESSION[Struts ::ACTION_MESSAGES_KEY]);
+         }
 
-         foreach ($errors as $key => $error)
-            if ($error['accessed'])
-               unset($_SESSION[Struts ::ACTION_MESSAGE_KEY][$key]);
-
-         if(sizeOf($errors) == 0)
-            unset($_SESSION[Struts ::ACTION_MESSAGE_KEY]);
+         if (isSet($_SESSION[Struts ::ACTION_ERRORS_KEY])) {
+            $errors = $_SESSION[Struts ::ACTION_ERRORS_KEY];
+            $request->setAttribute(Struts ::ACTION_ERRORS_KEY, $errors);
+            unset($_SESSION[Struts ::ACTION_ERRORS_KEY]);
+         }
+         // TODO: ActionError -> ActionMessage
       }
    }
 
@@ -313,9 +344,11 @@ class RequestProcessor extends Object {
    protected function processActionForward(Request $request, Response $response, ActionForward $forward=null) {
       if ($forward) {
          if ($forward->isRedirect()) {
+            $this->cacheActionMessages($request);
+
             $applicationPath = $request->getAttribute(Struts ::APPLICATION_PATH_KEY);
             $url = $applicationPath.$this->module->getPrefix().$forward->getPath();
-            redirect($url);
+            redirect($url); // TODO: Referenz auf init.php entfernen
          }
          else {
             $path = $forward->getPath();

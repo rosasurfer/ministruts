@@ -1,3 +1,8 @@
+2007-11-20
+
+   - php/struts/RequestProcessor: ActionMessages/-Errors werden bei einem Redirect automatisch zum nächsten Request übertragen
+
+
 2007-11-19
 
    - Refactoring: TorHelper::getExitNodes() benutzt CurlHttpClient
