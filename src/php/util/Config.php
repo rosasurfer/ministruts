@@ -18,13 +18,13 @@ final class Config extends Singleton {
     */
    public static function me() {
       // ist die Instanz im Cache, wird sie von dort geladen
-      $instance = Cache ::get($key=__CLASS__.'_instance');
+      $instance = Cache ::get(__CLASS__);
       if (!$instance) {
          $instance = parent:: getInstance(__CLASS__);
 
          // auf dem Production-Server wird sie nach der Erzeugung gecacht
          if (isSet($_SERVER['REQUEST_METHOD']) && $_SERVER['REMOTE_ADDR']!='127.0.0.1')
-            Cache ::set($key, $instance);
+            Cache ::set(__CLASS__, $instance);
       }
       return $instance;
    }
@@ -107,9 +107,9 @@ final class Config extends Singleton {
    private function setProperty($key, $value) {
       $this->properties[$key] = $value;
 
-      // Cache ggf. aktualisieren
-      if (Cache ::isCached($key=__CLASS__))
-         Cache ::set($key, $this);
+      // Cache aktualisieren, wenn Instanz dort gespeichert ist
+      if (Cache ::isCached(__CLASS__))
+         Cache ::set(__CLASS__, $this);
    }
 
 

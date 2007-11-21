@@ -45,13 +45,13 @@ class FrontController extends Singleton {
       }
 
       // ist die Struts-Konfiguration im Cache, wird sie von dort geladen
-      $instance = Cache ::get($key=__CLASS__.'_instance');
+      $instance = Cache ::get(__CLASS__);
       if (!$instance) {
          $instance = parent:: getInstance(__CLASS__);
 
          // auf dem Entwicklungssystem wird sie nicht gecacht
-         if ($_SERVER['REMOTE_ADDR'] != '127.0.0.1')
-            Cache ::set($key, $instance);
+         //if ($_SERVER['REMOTE_ADDR'] != '127.0.0.1')
+            Cache ::set(__CLASS__, $instance);
       }
       return $instance;
    }
