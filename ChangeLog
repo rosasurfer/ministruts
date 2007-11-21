@@ -2,6 +2,9 @@
 
    - php/struts/RequestProcessor: ActionMessages/-Errors werden bei einem Redirect automatisch zum nächsten Request übertragen
 
+   - php/cache: transparenter Namespace-Support, Werte können in verschiedenen Projekten unter denselben Keys gespeichert werden,
+     ohne sich zu stören
+
 
 2007-11-19
 

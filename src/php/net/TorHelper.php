@@ -32,7 +32,7 @@ class TorHelper extends StaticFactory {
     * @return array - assoziatives Array mit den IP-Adressen aller Exit-Nodes
     */
    private static function &getExitNodes() {
-      $nodes = Cache ::get($key = __CLASS__.'_tor_exit_nodes');
+      $nodes = Cache ::get($key='exit_nodes', __FILE__);
 
       if ($nodes == null) {
          $content = null;
@@ -62,7 +62,7 @@ class TorHelper extends StaticFactory {
             Logger ::log('Could not get Tor exit nodes from any mirror', L_ERROR, __CLASS__);
          }
 
-         Cache ::set($key, $nodes, 10 * MINUTE);
+         Cache ::set($key, $nodes, 10 * MINUTE, __FILE__);
       }
 
       return $nodes;

@@ -63,78 +63,84 @@ class Cache extends StaticFactory {
    /**
     * Speichert einen Wert im Cache.
     *
-    * @param string $key     - Schlüssel, unter dem der Wert gespeichert wird
-    * @param mixed  $value   - der zu speichernde Wert
-    * @param int    $expires - Zeitspanne in Sekunden, die der Wert gespeichert bleiben soll (default: für immer)
+    * @param string $key       - Schlüssel, unter dem der Wert gespeichert wird
+    * @param mixed  $value     - der zu speichernde Wert
+    * @param int    $expires   - Zeitspanne in Sekunden, die der Wert gespeichert bleiben soll (default: immer)
+    * @param string $namespace - Namensraum innerhalb des Caches (default: APPLICATION_NAME)
     *
     * @return boolean - TRUE bei Erfolg, FALSE andererseits
     */
-   public static function set($key, &$value, $expires = 0) {
-      return self:: getPeer()->set($key, $value, $expires);
+   public static function set($key, &$value, $expires = self:: EXPIRES_NEVER, $namespace = APPLICATION_NAME) {
+      return self:: getPeer()->set($key, $value, $expires, $namespace);
    }
 
 
    /**
-    * Speichert einen Wert im Cache nur dann, wenn noch kein Wert unter dem Schlüssel existiert.
+    * Speichert einen Wert im Cache, wenn noch kein Wert unter dem angegebenen Schlüssel existiert.
     *
-    * @param string $key     - Schlüssel, unter dem der Wert gespeichert wird
-    * @param mixed  $value   - der zu speichernde Wert
-    * @param int    $expires - Zeitspanne in Sekunden, die der Wert gespeichert bleiben soll (default: für immer)
+    * @param string $key       - Schlüssel, unter dem der Wert gespeichert wird
+    * @param mixed  $value     - der zu speichernde Wert
+    * @param int    $expires   - Zeitspanne in Sekunden, die der Wert gespeichert bleiben soll (default: immer)
+    * @param string $namespace - Namensraum innerhalb des Caches (default: APPLICATION_NAME)
     *
     * @return boolean - TRUE bei Erfolg, FALSE andererseits
     */
-   public static function add($key, &$value, $expires = 0) {
-      return self:: getPeer()->add($key, $value, $expires);
+   public static function add($key, &$value, $expires = self:: EXPIRES_NEVER, $namespace = APPLICATION_NAME) {
+      return self:: getPeer()->add($key, $value, $expires, $namespace);
    }
 
 
    /**
-    * Speichert einen Wert im Cache nur dann, wenn bereits ein Wert unter dem Schlüssel existiert.
+    * Speichert einen Wert im Cache, wenn bereits ein Wert unter dem angegebenen Schlüssel existiert.
     *
-    * @param string $key     - Schlüssel, unter dem der Wert gespeichert wird
-    * @param mixed  $value   - der zu speichernde Wert
-    * @param int    $expires - Zeitspanne in Sekunden, die der Wert gespeichert bleiben soll (default: für immer)
+    * @param string $key       - Schlüssel, unter dem der Wert gespeichert wird
+    * @param mixed  $value     - der zu speichernde Wert
+    * @param int    $expires   - Zeitspanne in Sekunden, die der Wert gespeichert bleiben soll (default: immer)
+    * @param string $namespace - Namensraum innerhalb des Caches (default: APPLICATION_NAME)
     *
     * @return boolean - TRUE bei Erfolg, FALSE andererseits
     */
-   public static function replace($key, &$value, $expires = 0) {
-      return self:: getPeer()->replace($key, $value, $expires);
+   public static function replace($key, &$value, $expires = self:: EXPIRES_NEVER, $namespace = APPLICATION_NAME) {
+      return self:: getPeer()->replace($key, $value, $expires, $namespace);
    }
 
 
    /**
     * Gibt einen Wert aus dem Cache zurück.
     *
-    * @param string $key - Schlüssel, unter dem der Wert gespeichert ist
+    * @param string $key       - Schlüssel, unter dem der Wert gespeichert ist
+    * @param string $namespace - Namensraum innerhalb des Caches (default: APPLICATION_NAME)
     *
     * @return mixed - der gespeicherte Wert oder NULL, falls kein solcher Schlüssel existiert
     */
-   public static function get($key) {
-      return self:: getPeer()->get($key);
+   public static function get($key, $namespace = APPLICATION_NAME) {
+      return self:: getPeer()->get($key, $namespace);
    }
 
 
    /**
     * Löscht einen Wert aus dem Cache.
     *
-    * @param string $key - Schlüssel, unter dem der Wert gespeichert ist
+    * @param string $key       - Schlüssel, unter dem der Wert gespeichert ist
+    * @param string $namespace - Namensraum innerhalb des Caches (default: APPLICATION_NAME)
     *
     * @return boolean - TRUE bei Erfolg,
     *                   FALSE, falls kein solcher Schlüssel existiert
     */
-   public static function delete($key) {
-      return self:: getPeer()->delete($key);
+   public static function delete($key, $namespace = APPLICATION_NAME) {
+      return self:: getPeer()->delete($key, $namespace);
    }
 
 
    /**
     * Ob unter dem angegebenen Schlüssel ein Wert im Cache gespeichert ist.
     *
-    * @param string $key - Schlüssel
+    * @param string $key       - Schlüssel
+    * @param string $namespace - Namensraum innerhalb des Caches (default: APPLICATION_NAME)
     *
     * @return boolean
     */
-   public static function isCached($key) {
-      return self:: getPeer()->isCached($key);
+   public static function isCached($key, $namespace = APPLICATION_NAME) {
+      return self:: getPeer()->isCached($key, $namespace);
    }
 }
