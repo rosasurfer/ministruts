@@ -17,12 +17,13 @@ final class Config extends Singleton {
     * @return Config
     */
    public static function me() {
-      // ist die Instanz im Cache, wird sie von dort geladen
+      // Versuch, die Instanz aus dem Cache zu laden
       $instance = Cache ::get(__CLASS__);
-      if (!$instance) {
+
+      if (!$instance) { // Cache-Miss, neue Instanz erzeugen ...
          $instance = parent:: getInstance(__CLASS__);
 
-         // auf dem Production-Server wird sie nach der Erzeugung gecacht
+         // ... und (nur auf dem Production-Server) cachen
          if (isSet($_SERVER['REQUEST_METHOD']) && $_SERVER['REMOTE_ADDR']!='127.0.0.1')
             Cache ::set(__CLASS__, $instance);
       }
@@ -33,47 +34,28 @@ final class Config extends Singleton {
    /**
     * Konstruktor
     *
-    * Sucht und lädt alle verfügbaren Konfigurationsdateien.
+    * Lädt die Konfiguration aus der Datei "config.properties", wenn sie existiert.  Existiert eine weitere
+    * Datei "config-custom.properties", wird auch diese geladen. Diese zusätzliche Datei darf nicht im
+    * Repository gespeichert werden, sodaß parallel eine globale und eine lokale Konfiguration mit
+    * unterschiedlichen Einstellungen verwendet werden kann. Lokale Einstellungen überschreiben globale
+    * Einstellungen.
     */
    protected function __construct() {
-      // Konfigurationsdateien suchen
-      $configfiles = null;
-      $filename = 'config.properties';
-      $baseName = baseName($filename, '.properties');
+      // Konfigurationsdateien suchen, bei Webapplikationen in WEB-INF, bei Konsolenapplikationen im aktuellen Verzeichnis suchen
+      $path = getCwd().(Request ::me() ? '/WEB-INF/' : '/');
 
-      if (Request ::me()) {   // bei Webapplikation in WEB-INF suchen
-         $files = array_reverse(glob(getCwd().'/WEB-INF/'.$baseName.'*.properties', GLOB_ERR));
-      }
-      else {                  // bei Konsolenapplikation im aktuellen Verzeichnis suchen
-         $files = array_reverse(glob(getCwd().'/'.$baseName.'*.properties', GLOB_ERR));
-      }
-      foreach ($files as $file) {
-         $configfiles[] = $file;
-      }
+      $files = array();
+      if (is_file($file = $path.'config.properties'       )) $files[] = $file;
+      if (is_file($file = $path.'config-custom.properties')) $files[] = $file;
 
-      // include-Pfad nach weiteren Konfigurationsdateien durchsuchen
-      $paths = explode(PATH_SEPARATOR, ini_get('include_path'));
-      foreach ($paths as $path) {
-         $files = array_reverse(glob($path.'/'.$baseName.'*.properties', GLOB_ERR));
-         foreach ($files as $file)
-            $configfiles[] = $file;
-      }
-
-
-      if (sizeOf($configfiles) == 0) {
-         Logger ::log('Configuration file not found: '.$filename, L_WARN, __CLASS__);
-         return;
-      }
-
-      // alle gefundenen Konfigurationen laden
-      foreach ($configfiles as $file)
+      // gefundene Dateien laden
+      foreach ($files as $file)
          $this->loadFile($file);
    }
 
 
    /**
-    * Lädt eine einzelne Konfigurationsdatei.  Schon vorhandene Einstellungen werden dabei nicht
-    * überschrieben.
+    * Lädt eine einzelne Konfigurationsdatei.  Schon vorhandene Einstellungen werden durch folgende Einstellungen überschrieben.
     *
     * @param string $filename - Dateiname
     */
@@ -81,14 +63,37 @@ final class Config extends Singleton {
       $lines = file($filename, FILE_IGNORE_NEW_LINES + FILE_SKIP_EMPTY_LINES);
 
       foreach ($lines as $line) {
-         $parts = explode('=', $line, 2);
-         if (sizeOf($parts) < 2) throw new RuntimeException('Syntax error in "'.$filename.'" at: '.$parts[0]);
+         $properties =& $this->properties;
 
+         // Key und Value trennen
+         $parts = explode('=', $line, 2);
+         if (sizeOf($parts) < 2)
+            throw new RuntimeException('Syntax error in "'.$filename.'" at line: "'.$line.'"');
          $key   = trim($parts[0]);
          $value = trim($parts[1]);
 
-         if (!isSet($this->properties[$key]))
-            $this->properties[$key] = $value;
+         // Namespaces im Key in Arrays transformieren
+         $names = explode('.', $key);
+         $size = sizeOf($names);
+
+         for ($i=0; $i<$size;) {
+            $name = trim($names[$i]);
+            if ($name == '')
+               throw new RuntimeException('Syntax error in "'.$filename.'" at line: "'.$line.'"');
+
+            if (++$i < $size) {     // nicht der letzte Schlüsselteil
+               if (isSet($properties[$name]) && is_string($properties[$name]))
+                  throw new RuntimeException('Syntax error in "'.$filename.'" at line: "'.$line.'"'."\nCan not overwrite string value with array value.");
+               if (!isSet($properties[$name]))
+                  $properties[$name] = array();    // weitere Ebene
+               $properties =& $properties[$name];
+            }
+            else {                  // der letzte Schlüsselteil
+               if (isSet($properties[$name]) && is_array($properties[$name]))
+                  throw new RuntimeException('Syntax error in "'.$filename.'" at line: "'.$line.'"'."\nCan not overwrite array value with string value.");
+               $properties[$name] = $value;        // Wert
+            }
+         }
       }
    }
 
