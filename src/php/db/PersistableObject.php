@@ -90,7 +90,8 @@ abstract class PersistableObject extends Object {
 
 
    /**
-    * Fügt diese Instanz in die Datenbank ein.  Diese Methode muß von der konkreten Klasse implementiert werden.
+    * Fügt diese Instanz in die Datenbank ein.  Diese Methode muß von der konkreten Klasse implementiert
+    * werden.
     */
    protected function insert() {
       throw new RuntimeException('Method not implemented: '.get_class($this).'::insert()');
@@ -98,7 +99,8 @@ abstract class PersistableObject extends Object {
 
 
    /**
-    * Aktualisiert diese Instanz in der Datenbank.  Diese Methode muß von der konkreten Klasse implementiert werden.
+    * Aktualisiert diese Instanz in der Datenbank.  Diese Methode muß von der konkreten Klasse implementiert
+    * werden.
     */
    protected function update() {
       throw new RuntimeException('Method not implemented: '.get_class($this).'::update()');
@@ -106,7 +108,8 @@ abstract class PersistableObject extends Object {
 
 
    /**
-    * Löscht diese Instanz aus der Datenbank.  Diese Methode muß von der konkreten Klasse implementiert werden.
+    * Löscht diese Instanz aus der Datenbank.  Diese Methode muß von der konkreten Klasse implementiert
+    * werden.
     */
    public function delete() {
       throw new RuntimeException('Method not implemented: '.get_class($this).'::delete()');
@@ -137,14 +140,14 @@ abstract class PersistableObject extends Object {
    /**
     * Bevölkert eine PersistableObject-Instanz mit den übergebenen Daten.
     *
-    * Achtung: Das gleichzeitige Erzeugen sehr vieler Instanzen (z.B. Batchprocessing; mehrere tausend Stück) ist
-    *          ca. 3 x mal schneller, wenn diese Methode überschrieben und ohne Schleifen implementiert wird.
+    * Note: Das gleichzeitige Erzeugen sehr vieler Instanzen (z.B. mehrere tausend Stück) ist ca. 3 x mal
+    *       schneller, wenn diese Methode überschrieben und ohne Schleifen implementiert wird.
     *
     * @param PersistableObject $object - Instanz
     * @param array $mappings           - Datenbankmapping
     * @param array $dataRow            - Datenreihe
     *
-    * @return PersistableObject instance - die modifizierte Instanz
+    * @return PersistableObject - die bevölkerte Instanz
     */
    protected static function populate(PersistableObject $object, array &$mappings, array &$dataRow) {
       foreach ($mappings['fields'] as $property => &$mapping) {
@@ -153,20 +156,20 @@ abstract class PersistableObject extends Object {
          if ($dataRow[$column] !== null) {
             $type =& $mapping[1];
 
-            if ($type === PersistableObject ::T_STRING) {
+            if ($type === self:: T_STRING) {
                $object->$property =& $dataRow[$column];
             }
-            elseif ($type === PersistableObject ::T_INT) {
+            elseif ($type === self:: T_INT) {
                $object->$property = (int) $dataRow[$column];
             }
-            elseif ($type === PersistableObject ::T_FLOAT) {
+            elseif ($type === self:: T_FLOAT) {
                $object->$property = (float) $dataRow[$column];
             }
-            elseif ($type === PersistableObject ::T_BOOL) {
+            elseif ($type === self:: T_BOOL) {
                $object->$property = (bool) $dataRow[$column];
             }
-            elseif ($type === PersistableObject ::T_SET) {
-               $object->$property = (strLen($dataRow[$column]) == 0) ? array() : explode(',', $dataRow[$column]);
+            elseif ($type === self:: T_SET) {
+               $object->$property = strLen($dataRow[$column]) ? explode(',', $dataRow[$column]) : array();
             }
             else {
                throw new RuntimeException('Unknown data type \''.$type.'\' in database mapping of '.get_class($object).'::'.$property);
