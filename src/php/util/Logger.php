@@ -49,11 +49,11 @@ class Logger extends StaticFactory {
     */
    public static function getLogLevel($class) {
       if ($class === '')
-         return $GLOBALS['__logLevelSettings'][''];      // Default-Loglevel
+         return $GLOBALS['__logLevels'][''];      // Default-Loglevel
 
       static $settings = null;
       if ($settings === null) {
-         $settings = $GLOBALS['__logLevelSettings'];
+         $settings = $GLOBALS['__logLevels'];
          krSort($settings);
       }
 

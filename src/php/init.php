@@ -76,7 +76,7 @@ define('L_NOTICE',  4);
 define('L_WARN'  ,  8);
 define('L_ERROR' , 16);
 define('L_FATAL' , 32);
-$__logLevelSettings[''] = L_WARN;   // der Default-Loglevel
+$__logLevels[''] = L_WARN;   // der Default-Loglevel
 
 
 // Zeitkonstanten
