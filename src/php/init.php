@@ -130,9 +130,9 @@ function __autoload($className /*, $throw */) {
 
 /**
  * Ob die angegebene Klasse existiert.  Diese Funktion ist notwendig, weil eine einfache Abfrage der Art
- * "if (class_exist($className, true))" das Script im Fehlerfall beendet (__autoload darf keine Exceptions werfen).
- * Wird __autoload aus dieser Funktion und nicht aus dem PHP-Kernel aufgerufen, werden Exceptions weitergereicht
- * und der folgende Code kann entsprechend reagieren.
+ * "if (class_exist($className, true))" das Script im Fehlerfall beendet (__autoload darf keine Exceptions
+ * werfen). Wird __autoload aus dieser Funktion und nicht aus dem PHP-Kernel aufgerufen, werden Exceptions
+ * weitergereicht und der folgende Code kann entsprechend reagieren.
  *
  * @param string $className - Klassenname
  *
@@ -159,8 +159,8 @@ function is_class($className) {
  * @param string $sql - die auszuführende SQL-Anweisung
  * @param array  $db  - die zu verwendende Datenbankkonfiguration
  *
- * @return array['set']  - das zurückgegebene Resultset (wenn SELECT)
- *              ['rows'] - Anzahl der zurückgegebenen/eingefügten/aktualisierten Datensätze (wenn SELECT/INSERT/UPDATE)
+ * @return array['set']  - das zurückgegebene Resultset (bei SELECT)
+ *              ['rows'] - Anzahl der betroffenen Datensätze (bei SELECT/INSERT/UPDATE)
  */
 function &executeSql($sql, array &$db) {
    if (!is_string($sql) || !($sql = trim($sql)))
@@ -233,8 +233,9 @@ function beginTransaction(array &$db) {
 
 
 /**
- * Schließt eine nicht verschachtelte Datenbank-Transaktion ab.  Ist die Transaktion eine verschachtelte Transaktion,
- * wird der Aufruf still ignoriert, da eine Transaktion immer von der höchsten Ebene aus geschlossen werden muß.
+ * Schließt eine nicht verschachtelte Datenbank-Transaktion ab.  Ist die Transaktion eine verschachtelte
+ * Transaktion, wird der Aufruf still ignoriert, da eine Transaktion immer von der höchsten Ebene aus
+ * geschlossen werden muß.
  *
  * @param array $db - die zu verwendende Datenbankkonfiguration
  *
@@ -252,20 +253,21 @@ function commitTransaction(array &$db) {
       return false;
    }
 
-   if ($db['transaction'] > 1) {                      // Transaktionszähler herunterzählen und nichts weiter tun
+   if ($db['transaction'] > 1) {             // Transaktionszähler herunterzählen und nichts weiter tun
       $db['transaction'] = $db['transaction'] - 1;
       return false;
    }
 
-   executeSql('commit', $db);                         // committen
+   executeSql('commit', $db);                // committen
    $db['transaction'] = 0;
    return true;
 }
 
 
 /**
- * Rollt eine nicht verschachtelte Datenbank-Transaktion zurück.  Ist die Transaktion eine verschachtelte Transaktion,
- * wird der Aufruf still ignoriert, da eine Transaktion immer von der höchsten Ebene aus zurückgerollt werden muß.
+ * Rollt eine nicht verschachtelte Datenbank-Transaktion zurück.  Ist die Transaktion eine verschachtelte
+ * Transaktion, wird der Aufruf still ignoriert, da eine Transaktion immer von der höchsten Ebene aus
+ * zurückgerollt werden muß.
  *
  * @param array $db - die zu verwendende Datenbankkonfiguration
  *
@@ -283,12 +285,12 @@ function rollbackTransaction(array &$db) {
       return false;
    }
 
-   if ($db['transaction'] > 1) {                      // Transaktionszähler herunterzählen und nichts weiter tun
+   if ($db['transaction'] > 1) {             // Transaktionszähler herunterzählen und nichts weiter tun
       $db['transaction'] = $db['transaction'] - 1;
       return false;
    }
 
-   executeSql('rollback', $db);                       // rollback
+   executeSql('rollback', $db);              // rollback
    $db['transaction'] = 0;
    return true;
 }
@@ -337,15 +339,15 @@ function getRandomID($length) {
    if (!isSet($length) || !is_int($length) || $length < 1)
       throw new RuntimeException('Invalid argument length: '.$length);
 
-   $id = crypt(uniqId(rand(), true));                          // zufällige ID erzeugen
-   $id = strip_tags(stripSlashes($id));                        // Sonder- und leicht zu verwechselnde Zeichen entfernen
+   $id = crypt(uniqId(rand(), true));              // zufällige ID erzeugen
+   $id = strip_tags(stripSlashes($id));            // Sonder- und leicht zu verwechselnde Zeichen entfernen
    $id = strRev(str_replace('/', '', str_replace('.', '', str_replace('$', '', str_replace('0', '', str_replace('O', '', str_replace('1', '', str_replace('l', '', str_replace('I', '', $id)))))))));
    $len = strLen($id);
    if ($len < $length) {
-      $id .= getRandomID($length-$len);                        // bis zur gewünschten Länge vergrößern ...
+      $id .= getRandomID($length-$len);            // bis zur gewünschten Länge vergrößern ...
    }
    else {
-      $id = subStr($id, 0, $length);                           // oder auf die gewünschte Länge kürzen
+      $id = subStr($id, 0, $length);               // oder auf die gewünschte Länge kürzen
    }
    return $id;
 }
@@ -453,10 +455,10 @@ function redirect($url) {
    header('Location: '.$url);
    exit();                       // Ausgabe weiteren Contents verhindern
 
-   /* !!!
-    * HTTP/1.1 requires an absolute URI as argument to 'Location:' including the scheme, hostname and absolute path,
-    * but some clients accept relative URIs. You can usually use $_SERVER['HTTP_HOST'], $_SERVER['PHP_SELF'] and
-    * dirname() to make an absolute URI from a relative one yourself.
+   /** TODO:
+    * HTTP/1.1 requires an absolute URI as argument to 'Location:' including the scheme, hostname and
+    * absolute path, but some clients accept relative URIs. You can usually use $_SERVER['HTTP_HOST'],
+    * $_SERVER['PHP_SELF'] and dirname() to make an absolute URI from a relative one yourself.
     */
 }
 
@@ -466,7 +468,7 @@ function redirect($url) {
  *
  * @param mixed $var    - die auszugebende Variable
  * @param bool  $return - Ob die Ausgabe auf STDOUT erfolgen soll (FALSE) oder als Rückgabewert der Funktion (TRUE),
- *                        default ist false
+ *                        Default ist FALSE
  *
  * @return string - Rückgabewert, wenn $return TRUE ist, NULL andererseits.
  */
@@ -703,8 +705,8 @@ function timestamp_mysql2german($t) {
 
 
 /**
- * Ob unter dem angegebenen Schlüssel eine Error-Message existiert.  Ohne Angabe eines Schlüssel wird geprüft,
- * ob irgendeine Error-Message existiert. Existiert eine HttpSession, wird auch dort gesucht.
+ * Ob unter dem angegebenen Schlüssel eine Error-Message existiert.  Ohne Angabe eines Schlüssel wird
+ * geprüft, ob irgendeine Error-Message existiert. Existiert eine HttpSession, wird auch dort gesucht.
  *
  * @param string $key - Schlüssel
  *
@@ -773,10 +775,10 @@ function getActionError($key = null) {
 /**
  * Setzt für den angegebenen Schlüssel eine Error-Message.
  *
- *
  * @param string $key     - Schlüssel der Error-Message
  * @param string $message - Error-Message
- * @param bool   $session - ob die Error-Message in der HttpSession gespeichert werden soll (per default wird sie im Request gesetzt)
+ * @param bool   $session - ob die Error-Message in der HttpSession gespeichert werden soll (per default
+ *                          wird sie im Request gesetzt)
  */
 function setActionError($key, $message, $session = false) {
    if (!$session) {
@@ -790,12 +792,12 @@ function setActionError($key, $message, $session = false) {
 
 
 /**
- * Ist <tt>$value</tt> nicht NULL, gibt die Funktion <tt>$value</tt> zurück, andererseits die Alternative <tt>$alt</tt>.
+ * Ist $value nicht NULL, gibt die Funktion $value zurück, ansonsten die Alternative $altValue.
  *
  * @return mixed
  */
-function ifNull($value, $alt) {
-   return ($value === null) ? $alt : $value;
+function ifNull($value, $altValue) {
+   return ($value === null) ? $altValue : $value;
 }
 
 
@@ -803,7 +805,7 @@ function ifNull($value, $alt) {
 Indicate that script is being called by CLI (vielleicht besser für $console)
 ----------------------------------------------------------------------------
 if (php_sapi_name() == 'cli') {
-   $CLI = true ;
+   $console = true ;
 }
 */
 ?>
