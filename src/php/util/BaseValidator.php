@@ -32,35 +32,28 @@ class BaseValidator extends StaticFactory {
 
 
    /**
-    * Ob der übergebene String eine syntaktisch gültige E-Mail-Adresse ist. Handelt es sich um eine AOL-Adresse,
-    * wird auch die AOL-Syntax überprüft (Format: http://postmaster.info.aol.com/faq/mailerfaq.html#syntax)
+    * Ob der übergebene String eine syntaktisch gültige E-Mail-Adresse ist.
     *
     * @param string $string - der zu überprüfende String
     *
     * @return boolean
     */
    public static function isEmailAddress($string) {
-      static $emailAddressPattern = '/^([a-z0-9+-]+|[a-z0-9+-]+[a-z0-9_.+-]+)@((([a-z0-9]+|[a-z0-9]+[a-z0-9-]+[a-z0-9]+)\.)*)([a-z0-9][a-z0-9-]*[a-z0-9])\.([a-z]{2,4})$/';
-      static $aolUsernamePattern  = '/^[a-z][a-z0-9]{2,15}$/';
+      static $pattern = '/^[a-z0-9+-]+[a-z0-9_.+-]*@(([a-z0-9]+|[a-z0-9]+[a-z0-9-]+[a-z0-9]+)\.)*([a-z0-9][a-z0-9-]*[a-z0-9])\.([a-z]{2,4})$/';
+      return is_string($string) && strLen($string) && preg_match($pattern, strToLower($string));
+   }
 
-      $result = is_string($string) && strLen($string) < 100 && (boolean) preg_match($emailAddressPattern, strToLower($string), $matches);
 
-      if ($result) {
-         $domain = $matches[5];
-         $tld    = $matches[6];
-
-         if ($domain == 'aol') {
-            if ($tld != 'com') {
-               $result = false;                    // es gibt nur aol.com-Adressen
-            }
-            else {
-               $username = $matches[1];
-               $result = (boolean) preg_match($aolUsernamePattern, $username);
-            }
-         }
-      }
-
-      return $result;
+   /**
+    * Ob der übergebene String ein gültiges E-Mail-Adressmuster ist. Wildcards sind ? und *.
+    *
+    * @param string $string - der zu überprüfende String
+    *
+    * @return boolean
+    */
+   public static function isEmailAddressPattern($string) {
+      static $pattern = '/^[a-z0-9?*+-]+[a-z0-9?*_.+-]*@(([a-z0-9?*]+|[a-z0-9?*]+[a-z0-9?*-]+[a-z0-9?*]+)\.)*(\*|[a-z0-9?*][a-z0-9?*-]*[a-z0-9?*])\.(\*|[a-z?*]{2,4})$/';
+      return is_string($string) && strLen($string) && preg_match($pattern, strToLower($string));
    }
 
 
