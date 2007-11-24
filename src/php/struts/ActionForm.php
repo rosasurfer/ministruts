@@ -20,8 +20,9 @@ abstract class ActionForm extends Object {
       $this->request = $request;
 
       // ggf. definierten Dispatch-Parameter auslesen
-      if (isSet($_REQUEST['action']))
-         $this->actionKey = $_REQUEST['action'];
+      if     (isSet($_REQUEST['action'  ])) $this->actionKey = $_REQUEST['action'  ];
+      elseif (isSet($_REQUEST['action_x'])) $this->actionKey = $_REQUEST['action_x'];     // input-Type 'image'
+
 
       // Request-Parameter auslesen
       $this->populate($request);
