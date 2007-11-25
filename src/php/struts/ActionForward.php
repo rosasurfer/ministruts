@@ -89,6 +89,24 @@ class ActionForward extends Object {
 
 
    /**
+    * Fügt dem Querystring dieses Forwards ein Key-Value-Paar hinzu.
+    *
+    * @param string $key   - Schlüssel
+    * @param string $value - Wert
+    *
+    * @return ActionForward
+    */
+   public function addQueryData($key, $value) {
+      if ($this->configured)  throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($key))   throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
+      if (!is_string($value)) throw new IllegalTypeException('Illegal type of argument $value: '.getType($value));
+
+      $this->path .= (strPos($this->path, '?')===false ? '?':'&').$key.'='.$value;
+      return $this;
+   }
+
+
+   /**
     * Friert die Konfiguration dieser Komponente ein. Nachdem Aufruf dieser Methode kann die Konfiguration
     * der Komponente nicht mehr verändert werden.
     *
