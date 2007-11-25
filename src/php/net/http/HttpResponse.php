@@ -6,6 +6,13 @@ interface HttpResponse {
 
 
    /**
+    * Server status codes; see RFC 2068.
+    *
+    * TODO: Status-Codes implementieren (numerisch und Klartext)
+    */
+
+
+   /**
     * Gibt den HTTP-Status zurück.
     *
     * @return int - Statuscode
