@@ -333,8 +333,8 @@ class ActionMapping extends Object {
          return $this->forwards[$name];
 
       if ($name === '__self') {
-         $query = Request ::me()->getQuery();
-         $url = $this->path.($query === null ? '' : '?'.$query);
+         $query = Request ::me()->getQueryString();
+         $url = $this->path.($query===null ? '' : '?'.$query);
 
          $class = $this->module->getForwardClass();
          $forward = new $class($name, $url, true);
