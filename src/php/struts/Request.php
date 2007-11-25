@@ -11,7 +11,8 @@ final class Request extends Singleton {
 
 
    private $method;
-   private $pathInfo;
+   private $uri;
+   private $path;
 
 
    // Attribute-Pool
@@ -73,15 +74,64 @@ final class Request extends Singleton {
 
 
    /**
+    * Gibt den Teil der URL dieses Requests zurück, wie er in der ersten Zeile des HTTP-Protokolls
+    * erscheint, relativ zum Server-Wurzelverzeichnis (Pfadname + Pfadinfo + Querystring).
+    *
+    * z.B.: /myapp/stuff/view.php/info?key=value
+    *
+    * @return string
+    */
+   public function getURI() {
+      if ($this->uri === null) {
+         $this->uri = $_SERVER['REQUEST_URI'];
+      }
+      return $this->uri;
+   }
+
+
+   /**
+    * Gibt den Teil der URL dieses Requests zurück, wie er in der ersten Zeile des HTTP-Protokolls
+    * erscheint, relativ zum Wurzelverzeichnis der Anwendung (Pfadname + Pfadinfo + Querystring).
+    *
+    * z.B.: /view.php?key=value
+    *
+    * @return string
+    */
+   public function getRelativeURI() {
+      return subStr($this->getURI(), strLen($this->getApplicationPath()));
+   }
+
+
+   /**
     * Gibt die Pfadkomponente der URL dieses Requests zurück.
     *
     * @return string
     */
-   public function getPathInfo() {
-      if ($this->pathInfo === null) {
-         $this->pathInfo = $_SERVER['PHP_SELF'] = preg_replace('/\/{2,}/', '/', $_SERVER['PHP_SELF']);
+   public function getPath() {
+      if ($this->path === null) {
+         $this->path = $_SERVER['PHP_SELF'] = preg_replace('/\/{2,}/', '/', $_SERVER['PHP_SELF']);
       }
-      return $this->pathInfo;
+      return $this->path;
+   }
+
+
+   /**
+    * Gibt die zum Wurzelverzeichnis der Anwendung relative Pfadkomponente der URL dieses Requests zurück.
+    *
+    * @return string
+    */
+   public function getRelativePath() {
+      return subStr($this->getPath(), strLen($this->getApplicationPath()));
+   }
+
+
+   /**
+    * Gibt das Wurzelverzeichnis der Anwendung, zu der dieser Request gehört, zurück.
+    *
+    * @return string
+    */
+   public function getApplicationPath() {
+      return $this->getAttribute(Struts ::APPLICATION_PATH_KEY);
    }
 
 
@@ -90,7 +140,7 @@ final class Request extends Singleton {
     *
     * @return string
     */
-   public function getQuery() {
+   public function getQueryString() {
       return isSet($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : null;
    }
 
