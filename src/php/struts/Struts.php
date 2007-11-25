@@ -4,7 +4,7 @@
  *
  * Globale Konstanten für das Struts-Framework.
  */
-final class Struts extends StaticFactory {
+final class Struts extends StaticClass {
 
 
    /**

@@ -2,7 +2,7 @@
 /**
  * BaseValidator
  */
-class BaseValidator extends StaticFactory {
+class BaseValidator extends StaticClass {
 
 
    /**

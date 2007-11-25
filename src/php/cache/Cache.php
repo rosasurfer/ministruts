@@ -34,7 +34,7 @@
  *
  * @see AbstractCachePeer
  */
-class Cache extends StaticFactory {
+class Cache extends StaticClass {
 
 
    const EXPIRES_NEVER = 0;

@@ -2,7 +2,7 @@
 /**
  * String
  */
-final class String extends StaticFactory {
+final class String extends StaticClass {
 
 
    /**

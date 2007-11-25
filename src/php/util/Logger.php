@@ -2,7 +2,7 @@
 /**
  * Logger
  */
-class Logger extends StaticFactory {
+class Logger extends StaticClass {
 
 
    /* Ob das Script in der Konsole läuft. */

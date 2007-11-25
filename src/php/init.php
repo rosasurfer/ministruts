@@ -15,7 +15,7 @@ $__imports['RuntimeMemoryCache'             ] = 'php/cache/RuntimeMemoryCache';
 $__imports['Instantiatable'                 ] = 'php/core/Instantiatable';
 $__imports['Object'                         ] = 'php/core/Object';
 $__imports['Singleton'                      ] = 'php/core/Singleton';
-$__imports['StaticFactory'                  ] = 'php/core/StaticFactory';
+$__imports['StaticClass'                    ] = 'php/core/StaticClass';
 
 $__imports['ConcurrentModificationException'] = 'php/db/ConcurrentModificationException';
 $__imports['PersistableObject'              ] = 'php/db/PersistableObject';

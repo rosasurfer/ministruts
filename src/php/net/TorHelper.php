@@ -2,7 +2,7 @@
 /**
  * TorHelper
  */
-class TorHelper extends StaticFactory {
+class TorHelper extends StaticClass {
 
 
    private static $torMirrors = array('torstatus.kgprog.com',
