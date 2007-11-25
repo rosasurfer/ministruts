@@ -2,7 +2,7 @@
 /**
  * Einfache Basisklasse für rein statische Klassen.
  *
- * Klassen, die von StaticClass abgeleitet werden, können nicht instantiiert werden.
+ * Klassen, die von StaticClass abgeleitet sind, können nicht instantiiert werden.
  */
 abstract class StaticClass extends Object {
 
