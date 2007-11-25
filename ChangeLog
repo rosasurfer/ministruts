@@ -1,6 +1,14 @@
 2007-11-25
 
-   - Refactoring: php/core/StaticFactory -> php/core/StaticClass
+   - Refactoring:   php/core/StaticFactory            -> php/core/StaticClass
+                    php/struts/Request::getPathInfo() -> Request::getPath()
+                    php/struts/Request::getQuery()    -> Request::getQueryString()
+
+   - neue Methoden: php/struts/ActionForward::addQueryData()
+                    php/struts/Request::getApplicationPath()
+                    php/struts/Request::getRelativePath()
+                    php/struts/Request::getRelativeURI()
+                    php/struts/Request::getURI()
 
 
 2007-11-24

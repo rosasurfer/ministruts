@@ -9,7 +9,7 @@ class RequestProcessor extends Object {
    protected /*Module*/ $module;
 
 
-   private $logDebug, $logInfo, $logNotice;
+   private $logDebug, $logInfo, $logNotice;  // boolean
 
 
    /**
@@ -65,11 +65,11 @@ class RequestProcessor extends Object {
          return;
 
 
-      // ActionForm des Mappings erzeugen
+      // ActionForm vorbereiten
       $form = $this->processActionForm($request, $response, $mapping);
 
 
-      // Action des Mappings erzeugen (Form wird der Action schon hier übergeben, damit der User-Code einfacher sein kann)
+      // Action erzeugen (Form und Mapping werden schon hier übergeben, damit User-Code einfacher wird)
       $action = $this->processActionCreate($request, $response, $mapping, $form);
 
 
@@ -159,22 +159,23 @@ class RequestProcessor extends Object {
     * @return ActionMapping
     */
    protected function processMapping(Request $request, Response $response) {
-      // Pfad für die Mappingauswahl ermitteln, ...
-      $appPath    = $request->getAttribute(Struts ::APPLICATION_PATH_KEY);
-      $scriptName = $request->getPathInfo();
-      $path = subStr($scriptName, strlen($appPath.$this->module->getPrefix()));
+      // Pfad für die Mappingauswahl ermitteln ...
+      $contextPath = $request->getAttribute(Struts ::APPLICATION_PATH_KEY);
+      $requestPath = $request->getPath();
+      $path = subStr($requestPath, strLen($contextPath.$this->module->getPrefix()));
 
       $this->logDebug && Logger ::log('Path used for mapping selection: '.$path, L_DEBUG, __CLASS__);
 
-      // ... Mapping suchen ...
+      // Mapping suchen und im Request speichern
       $mapping = $this->module->findMapping($path);
-      if (!$mapping) {
-         $this->logInfo && Logger ::log('Could not find a mapping for this request', L_INFO, __CLASS__);
-         echoPre("Not found: 404\n\nThe requested URL $path was not found on this server");
+      if ($mapping) {
+         $request->setAttribute(Struts ::ACTION_MAPPING_KEY, $mapping);
       }
-
-      // ... und im Request hinterlegen
-      $request->setAttribute(Struts ::ACTION_MAPPING_KEY, $mapping);
+      else {
+         $this->logInfo && Logger ::log('Could not find a mapping for this request', L_INFO, __CLASS__);
+         echoPre("Not found: 404\n\nThe requested URL ".$requestPath." was not found on this server");
+         // TODO: HttpResponse modifizieren und status code setzen
+      }
 
       return $mapping;
    }
@@ -194,12 +195,12 @@ class RequestProcessor extends Object {
    protected function processMethod(Request $request, Response $response, ActionMapping $mapping) {
       $method = $mapping->getMethod();
 
-      if (!$method || $method == $request->getMethod())
+      if (!$method || $method==$request->getMethod())
          return true;
 
       $this->logDebug && Logger ::log('Request does not have the required method type, denying access', L_DEBUG, __CLASS__);
       echoPre('Access denied: 403');
-
+      // TODO: HttpResponse modifizieren und status code setzen
       return false;
    }
 
@@ -303,9 +304,9 @@ class RequestProcessor extends Object {
       $forward = null;
       $throwable = null;
 
-      // Alles kapseln, damit der Postprocessing-Hook immer aufgerufen wird (auch nach Exceptions, z.B. für Transaction-Rollback o.ä.)
+      // Alles kapseln, damit Postprocessing-Hook auch nach Exceptions aufgerufen werden kann (z.B. Transaction-Rollback o.ä.)
       try {
-         // allgemeine Preprocessing-Hook aufrufen
+         // allgemeinen Preprocessing-Hook aufrufen
          $forward = $action->executeBefore($request, $response);
 
          // Action nur ausführen, wenn executeBefore() nicht schon Abbruch signalisiert hat
@@ -316,12 +317,12 @@ class RequestProcessor extends Object {
          $throwable = $ex;    // evt. aufgetretene Exception zwischenspeichern
       }
 
-      // falls nur ein Forward-Identifier zurückgegeben wurde, diesen auflösen
+      // falls statt eines ActionForwards ein Forward-Identifier zurückgegeben wurde, diesen auflösen
       if (is_string($forward))
          $forward = $action->getMapping()->findForward($forward);
 
 
-      // allgemeinen Postprocessing-Hook immer aufrufen
+      // allgemeinen Postprocessing-Hook aufrufen
       $forward = $action->executeAfter($request, $response, $forward);
 
 

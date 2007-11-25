@@ -23,7 +23,7 @@ class FrontController extends Singleton {
 
 
    /**
-    * Die Pfadkomponente der URL der laufenden Webapplikation (= Context-URL).
+    * Die Pfadkomponente der URL der laufenden Webapplikation (Context-Pfad).
     */
    private $applicationPath;
 
@@ -137,7 +137,7 @@ class FrontController extends Singleton {
          return $module->getPrefix();
       }
 
-      $scriptName = $request->getPathInfo();
+      $scriptName = $request->getPath();
 
       if (!String ::startsWith($scriptName, $this->applicationPath))
          throw new RuntimeException('Can not select module prefix of uri: '.$scriptName);
