@@ -64,7 +64,7 @@ final class Config extends Singleton {
     * Lädt die Konfiguration aus der Datei "config.properties", wenn sie existiert.  Existiert eine weitere
     * Datei "config-custom.properties", wird auch diese geladen. Diese zusätzliche Datei darf nicht im
     * Repository gespeichert werden, sodaß parallel eine globale und eine lokale Konfiguration mit
-    * unterschiedlichen Einstellungen verwendet werden kann. Lokale Einstellungen überschreiben globale
+    * unterschiedlichen Einstellungen verwendet werden können. Lokale Einstellungen überschreiben globale
     * Einstellungen.
     */
    protected function __construct() {
