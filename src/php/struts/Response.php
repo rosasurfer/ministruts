@@ -46,7 +46,9 @@ final class Response extends Singleton {
    public function &getAttribute($key) {
       if (isSet($this->attributes[$key]))
          return $this->attributes[$key];
-      return null;
+
+      $value = null;
+      return $value;    // Referenz auf NULL
    }
 }
 ?>

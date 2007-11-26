@@ -52,6 +52,7 @@ $__imports['ActionForm'                     ] = 'php/struts/ActionForm';
 $__imports['ActionForward'                  ] = 'php/struts/ActionForward';
 $__imports['ActionMapping'                  ] = 'php/struts/ActionMapping';
 $__imports['FrontController'                ] = 'php/struts/FrontController';
+$__imports['HttpSession'                    ] = 'php/struts/HttpSession';
 $__imports['Module'                         ] = 'php/struts/Module';
 $__imports['Request'                        ] = 'php/struts/Request';
 $__imports['RequestProcessor'               ] = 'php/struts/RequestProcessor';

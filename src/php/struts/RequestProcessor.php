@@ -110,9 +110,7 @@ class RequestProcessor extends Object {
       if (sizeOf($errors) == 0)
          return;
 
-      // TODO: Referenz auf init.php entfernen
-      if (!$request->isSession())
-         startSession();
+      $session = $request->getSession();
 
       foreach ($errors as $key => $value) {
          $_SESSION[Struts ::ACTION_ERRORS_KEY][$key] = $value;

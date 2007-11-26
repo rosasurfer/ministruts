@@ -14,6 +14,11 @@ final class Request extends Singleton {
    private $uri;
    private $path;
 
+   /**
+    * HttpSession des Requests, falls eine existiert
+    */
+   protected /*HttpSession*/ $session = null;
+
 
    // Attribute-Pool
    private $attributes = array();
@@ -146,13 +151,25 @@ final class Request extends Singleton {
 
 
    /**
-    * Prüft, ob eine aktuelle HttpSession existiert oder nicht.
+    * Ob eine aktuelle HttpSession existiert oder nicht.
     *
     * @return boolean
     */
    public function isSession() {
       return defined('SID');
-      // TODO: Sessionverwaltung ausbauen
+   }
+
+
+   /**
+    * Gibt die aktuelle HttpSession zurück. Existiert noch keine Session, wird eine erzeugt.
+    *
+    * @return HttpSession
+    */
+   public function getSession() {
+      if (!$this->session)
+         $this->session = HttpSession ::me();
+
+      return $this->session;
    }
 
 
