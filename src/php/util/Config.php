@@ -2,7 +2,34 @@
 /**
  * Config
  *
- * Klasse zur Anwendungskonfiguration.
+ * Helferklasse zur Anwendungskonfiguration. Einstellungen werden in der Datei "config.properties" abgelegt.
+ * Bei Webanwendungen wird nach dieser Datei im WEB-INF-Verzeichnis, bei Konsolenanwendungen im aktuellen
+ * Verzeichnis gesucht. Existiert eine Datei "config-custom.properties", wird auch diese eingelesen, sie
+ * überschreibt gleichlautende Einstellungen in "config.properties". Dadurch können parallel eine globale
+ * und eine lokale Konfiguration vorgehalten werden.
+ *
+ * Dateiformat:
+ * ------------
+ * Einstellungen werden als "name = wert" abgelegt. Kommentare werden mit einem Hash "#" eingeleitet.
+ * Leerzeilen und führende oder abschließende Leerzeichen werden ignoriert. Einstellungen können gruppiert
+ * werden, eine solche Gruppe kann einzeln (Rückgabewert ist ein String ) oder komplett (Rückgabewert ist
+ * ein assoziatives Array) abgefragt werden.
+ *
+ * Beispiel:
+ * ---------
+ * <pre>
+ * app-name                 = myapp
+ *
+ * db.host                  = localhost:3306
+ * db.username              = myapp_user
+ * db.password              = plainpassword
+ * db.database              = db_test
+ *
+ * # ein Komentar in einer eigenen Zeile
+ *
+ * logger.php.struts        = info
+ * logger.php.struts.Action = warn              # ein weiterer Kommentar innerhalb der Zeile
+ * </pre>
  */
 final class Config extends Singleton {
 
@@ -17,13 +44,13 @@ final class Config extends Singleton {
     * @return Config
     */
    public static function me() {
-      // Versuch, die Instanz aus dem Cache zu laden
+      // versuchen, die Instanz aus dem Cache zu laden
       $instance = Cache ::get(__CLASS__);
 
       if (!$instance) { // Cache-Miss, neue Instanz erzeugen ...
          $instance = parent:: getInstance(__CLASS__);
 
-         // ... und (nur auf dem Production-Server) cachen
+         // ... und cachen (wenn auf Production-Server)
          if (isSet($_SERVER['REQUEST_METHOD']) && $_SERVER['REMOTE_ADDR']!='127.0.0.1')
             Cache ::set(__CLASS__, $instance);
       }
@@ -41,7 +68,7 @@ final class Config extends Singleton {
     * Einstellungen.
     */
    protected function __construct() {
-      // Konfigurationsdateien suchen, bei Webapplikationen in WEB-INF, bei Konsolenapplikationen im aktuellen Verzeichnis suchen
+      // Konfigurationen suchen, bei Webapplikation in WEB-INF, an der Konsole im aktuellen Verzeichnis
       $path = getCwd().(Request ::me() ? '/WEB-INF/' : '/');
 
       $files = array();
@@ -49,13 +76,15 @@ final class Config extends Singleton {
       if (is_file($file = $path.'config-custom.properties')) $files[] = $file;
 
       // gefundene Dateien laden
-      foreach ($files as $file)
+      foreach ($files as $file) {
          $this->loadFile($file);
+      }
    }
 
 
    /**
-    * Lädt eine einzelne Konfigurationsdatei.  Schon vorhandene Einstellungen werden durch folgende Einstellungen überschrieben.
+    * Lädt eine Konfigurationsdatei. Schon vorhandene Einstellungen werden durch folgende Einstellungen
+    * überschrieben.
     *
     * @param string $filename - Dateiname
     */
@@ -63,58 +92,20 @@ final class Config extends Singleton {
       $lines = file($filename, FILE_IGNORE_NEW_LINES + FILE_SKIP_EMPTY_LINES);
 
       foreach ($lines as $line) {
-         $properties =& $this->properties;
+         // Kommentare entfernen
+         $parts = explode('#', $line, 2);
+         $line = trim($parts[0]);
+         if ($line == '')
+            continue;
 
          // Key und Value trennen
          $parts = explode('=', $line, 2);
          if (sizeOf($parts) < 2)
             throw new RuntimeException('Syntax error in "'.$filename.'" at line: "'.$line.'"');
-         $key   = trim($parts[0]);
-         $value = trim($parts[1]);
 
-         // Namespaces im Key in Arrays transformieren
-         $names = explode('.', $key);
-         $size = sizeOf($names);
-
-         for ($i=0; $i<$size;) {
-            $name = trim($names[$i]);
-            if ($name == '')
-               throw new RuntimeException('Syntax error in "'.$filename.'" at line: "'.$line.'"');
-
-            if (++$i < $size) {     // nicht der letzte Schlüsselteil
-               if (isSet($properties[$name]) && is_string($properties[$name]))
-                  throw new RuntimeException('Syntax error in "'.$filename.'" at line: "'.$line.'"'."\nCan not overwrite string value with array value.");
-               if (!isSet($properties[$name]))
-                  $properties[$name] = array();    // weitere Ebene
-               $properties =& $properties[$name];
-            }
-            else {                  // der letzte Schlüsselteil
-               if (isSet($properties[$name]) && is_array($properties[$name]))
-                  throw new RuntimeException('Syntax error in "'.$filename.'" at line: "'.$line.'"'."\nCan not overwrite array value with string value.");
-               $properties[$name] = $value;        // Wert
-            }
-         }
+         // Eigenschaft setzen
+         $this->setProperty(trim($parts[0]), trim($parts[1]), false); // Cache nicht aktualisieren
       }
-   }
-
-
-   /**
-    */
-   private function getProperty($key) {
-      if (isSet($this->properties[$key]))
-         return $this->properties[$key];
-      return null;
-   }
-
-
-   /**
-    */
-   private function setProperty($key, $value) {
-      $this->properties[$key] = $value;
-
-      // Cache aktualisieren, wenn Instanz dort gespeichert ist
-      if (Cache ::isCached(__CLASS__))
-         Cache ::set(__CLASS__, $this);
    }
 
 
@@ -132,14 +123,75 @@ final class Config extends Singleton {
 
 
    /**
-    * Setzt oder überschreibt die Einstellung mit dem angegebenen Schlüssel. Ist der Wert kein String,
-    * wird er in einen String konvertiert.
+    * Setzt oder überschreibt die Einstellung mit dem angegebenen Schlüssel. Wert muß ein String sein.
     *
     * @param string $key   - Schlüssel
-    * @param mixed  $value - Einstellung
+    * @param string $value - Einstellung
     */
    public static function set($key, $value) {
-      return self ::me()->setProperty($key, (string) $value);
+      if (!is_string($key))   throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
+      if (!is_string($value)) throw new IllegalTypeException('Illegal type of argument $value: '.getType($value));
+      return self ::me()->setProperty($key, $value);
+   }
+
+
+   /**
+    * @param string $key
+    *
+    * @return mixed
+    *
+    * @see Config::get()
+    */
+   private function getProperty($key) {
+      $properties =& $this->properties;
+
+      if (strPos($key, '.') === false) {
+         if (isSet($properties[$key]))
+            return $properties[$key];
+      }
+      else {
+         $parts = explode('.', $key, 2);
+         if (isSet($properties[$parts[0]]) && isSet($properties[$parts[0]][$parts[1]]))
+            return $properties[$parts[0]][$parts[1]];
+      }
+
+      return null;
+   }
+
+
+   /**
+    * @param string  $key
+    * @param string  $value
+    * @param boolean $updateCache
+    *
+    * @see Config::set()
+    */
+   private function setProperty($key, $value, $updateCache = true) {
+      $properties =& $this->properties;
+
+      // einfacher Schlüssel: 'setting = ???'
+      if (strPos($key, '.') === false) {
+         if ($key == '')
+            throw new InvalidArgumentException('Invalid argument $key: '.$key);
+         if (isSet($properties[$key]) && is_array($properties[$key]))
+            throw new InvalidArgumentException('Can not overwrite config group "'.$key.'" with string value.');
+         $properties[$key] = $value;
+      }
+      // Schlüssel, der auf eine Gruppe zeigt: 'group.setting = ???'
+      else {
+         $parts = explode('.', $key, 2);
+         if ($parts[0]=='' || $parts[1]=='')
+            throw new InvalidArgumentException('Invalid argument $key: '.$key);
+         if (isSet($properties[$parts[0]]) && is_string($properties[$parts[0]]))
+            throw new InvalidArgumentException('Can not overwrite config value "'.$parts[0].'" with config group value.');
+         if (!isSet($properties[$parts[0]]))
+            $properties[$parts[0]] = array();         // weitere Ebene
+         $properties[$parts[0]][$parts[1]] = $value;  // Wert
+      }
+
+      // Cache aktualisieren, wenn Instanz dort gespeichert ist
+      if ($updateCache && Cache ::isCached(__CLASS__))
+         Cache ::set(__CLASS__, $this);
    }
 }
 ?>

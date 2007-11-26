@@ -2,6 +2,8 @@
 
    - Sessionverwaltung ausgebaut: php/struts/HttpSession
 
+   - php/util/Config vervollständigt (Anwendungskonfiguration)
+
 
 2007-11-25
 
