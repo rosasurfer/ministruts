@@ -124,6 +124,11 @@ final class Config extends Singleton {
 
    /**
     * Setzt oder überschreibt die Einstellung mit dem angegebenen Schlüssel. Wert muß ein String sein.
+    * Diese Methode kann aus der Anwendung heraus aufgerufen werden, um zusätzliche Laufzeiteinstellungen
+    * zu speichern. Obwohl diese Einstellungen nicht in der "config.properties" auftauchen, gehen sie
+    * nach dem Ende des Requests nicht verloren. Solange kein Serverneustart erfolgt, kann sich die
+    * Anwendung auf dese Weise während der Laufzeit selbständig an sich ändernde Bedingungen anpassen und
+    * sich selbst steuern.
     *
     * @param string $key   - Schlüssel
     * @param string $value - Einstellung
