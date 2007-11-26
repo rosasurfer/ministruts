@@ -631,7 +631,7 @@ function formatDate($format, $datetime) {
 
    if ($datetime < '1970-01-01 00:00:00') {
       if ($format != 'd.m.Y') {
-         Logger ::log(new RuntimeException('Cannot format early datetime '.$datetime.' with format: '.$format), L_NOTICE, __CLASS__);
+         Logger ::log(new RuntimeException('Cannot format early datetime '.$datetime.' with format: '.$format), L_INFO, __CLASS__);
          return preg_replace('/[1-9]/', '0', date($format, time()));
       }
 
