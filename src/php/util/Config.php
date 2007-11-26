@@ -178,19 +178,25 @@ final class Config extends Singleton {
       if (strPos($key, '.') === false) {
          if ($key == '')
             throw new InvalidArgumentException('Invalid argument $key: '.$key);
+
          if (isSet($properties[$key]) && is_array($properties[$key]))
-            throw new InvalidArgumentException('Can not overwrite config group "'.$key.'" with string value.');
-         $properties[$key] = $value;
+            $properties[$key][''] = $value;
+         else
+            $properties[$key] = $value;
       }
       // Schlüssel, der auf eine Gruppe zeigt: 'group.setting = ???'
       else {
          $parts = explode('.', $key, 2);
          if ($parts[0]=='' || $parts[1]=='')
             throw new InvalidArgumentException('Invalid argument $key: '.$key);
-         if (isSet($properties[$parts[0]]) && is_string($properties[$parts[0]]))
-            throw new InvalidArgumentException('Can not overwrite config value "'.$parts[0].'" with config group value.');
-         if (!isSet($properties[$parts[0]]))
+
+         if (isSet($properties[$parts[0]])) {
+            if (is_string($properties[$parts[0]]))
+               $properties[$parts[0]] = array('' => $properties[$parts[0]]);  // weitere Ebene mit altem Wert
+         }
+         else {
             $properties[$parts[0]] = array();         // weitere Ebene
+         }
          $properties[$parts[0]][$parts[1]] = $value;  // Wert
       }
 
