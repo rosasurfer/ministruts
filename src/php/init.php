@@ -406,7 +406,7 @@ function isSessionNew() {
          }
 
          if (sizeOf($_SESSION) == 0) {                                                    // leere Session initialisieren
-            $_SESSION['__INITIALIZED__'] = 1;
+            $_SESSION['__SESSION_CREATED__'] = time();
          }
       }
       else {                        // Session existiert nicht, könnte aber noch erzeugt werden, also Ergebnis (noch) nicht speichern
@@ -427,7 +427,7 @@ function clearSession() {
    if (isSession()) {
       $keys = array_keys($_SESSION);
       foreach ($keys as $key) {
-         if ($key != '__INITIALIZED__')
+         if (!String ::startsWith($key, '__SESSION_'))
             unSet($_SESSION[$key]);
       }
       return true;

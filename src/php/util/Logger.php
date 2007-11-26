@@ -159,15 +159,16 @@ class Logger extends StaticClass {
       if (self::$mail) {
          $mailMsg  = $plainMessage."\n\n".$message."\n\n\n".$traceStr;
 
-         $session = isSession() ? print_r($_SESSION, true) : null;
+         $request = Request ::me();
+         $session = $request && $request->isSession() ? print_r($_SESSION, true) : null;
 
          $ip   = $_SERVER['REMOTE_ADDR'];
          $host = getHostByAddr($ip);
          if ($host != $ip)
             $ip = $host.' ('.$ip.')';
 
-         $mailMsg .= "\n\n\nRequest:\n--------\n".Request ::me()."\n\n\n"
-                  .  "Session: ".(isSession() ? "\n--------\n".$session."\n\n\n" : "  (no session)\n")
+         $mailMsg .= "\n\n\nRequest:\n--------\n".$request."\n\n\n"
+                  .  "Session: ".($session ? "\n--------\n".$session."\n\n\n" : "  (no session)\n")
                   .  "Host (IP): ".$ip."\n"
                   .  "Timestamp: ".date('Y-m-d H:i:s')."\n";
 
@@ -305,15 +306,16 @@ class Logger extends StaticClass {
          if ($exception)
             $mailMsg .= "\n\n".$exMessage."\n\n\n".$exTraceStr;
 
-         $session = isSession() ? print_r($_SESSION, true) : null;
+         $request = Request ::me();
+         $session = $request && $request->isSession() ? print_r($_SESSION, true) : null;
 
          $ip   = $_SERVER['REMOTE_ADDR'];
          $host = getHostByAddr($ip);
          if ($host != $ip)
             $ip = $host.' ('.$ip.')';
 
-         $mailMsg .= "\n\n\nRequest:\n--------\n".Request ::me()."\n\n\n"
-                  .  "Session: ".(isSession() ? "\n--------\n".$session."\n\n\n" : "  (no session)\n")
+         $mailMsg .= "\n\n\nRequest:\n--------\n".$request."\n\n\n"
+                  .  "Session: ".($session ? "\n--------\n".$session."\n\n\n" : "  (no session)\n")
                   .  "Host (IP): ".$ip."\n"
                   .  "Timestamp: ".date('Y-m-d H:i:s')."\n";
 
