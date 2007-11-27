@@ -5,8 +5,6 @@
 
 // Klassenimporte
 // --------------
-$__imports['AbstractActionForm'             ] = 'php/actions/AbstractActionForm';
-
 $__imports['AbstractCachePeer'              ] = 'php/cache/AbstractCachePeer';
 $__imports['ApcCache'                       ] = 'php/cache/ApcCache';
 $__imports['Cache'                          ] = 'php/cache/Cache';

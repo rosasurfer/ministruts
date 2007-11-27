@@ -1,3 +1,8 @@
+2007-11-27
+
+   - php/actions/AbstractActionForm gelöscht, wird durch php/struts/ActionForm ersetzt
+
+
 2007-11-26
 
    - Sessionverwaltung ausgebaut: php/struts/HttpSession
