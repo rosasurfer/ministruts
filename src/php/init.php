@@ -18,18 +18,18 @@ $__imports['StaticClass'                    ] = 'php/core/StaticClass';
 $__imports['ConcurrentModificationException'] = 'php/db/ConcurrentModificationException';
 $__imports['PersistableObject'              ] = 'php/db/PersistableObject';
 
-$__imports['BusinessRuleException'          ] = 'php/lang/BusinessRuleException';
-$__imports['ClassNotFoundException'         ] = 'php/lang/ClassNotFoundException';
-$__imports['FileNotFoundException'          ] = 'php/lang/FileNotFoundException';
-$__imports['IOException'                    ] = 'php/lang/IOException';
-$__imports['IllegalStateException'          ] = 'php/lang/IllegalStateException';
-$__imports['IllegalTypeException'           ] = 'php/lang/IllegalTypeException';
-$__imports['InfrastructureException'        ] = 'php/lang/InfrastructureException';
-$__imports['InvalidArgumentException'       ] = 'php/lang/InvalidArgumentException';
-$__imports['NestableException'              ] = 'php/lang/NestableException';
-$__imports['NoPermissionException'          ] = 'php/lang/NoPermissionException';
-$__imports['PHPErrorException'              ] = 'php/lang/PHPErrorException';
-$__imports['RuntimeException'               ] = 'php/lang/RuntimeException';
+$__imports['BusinessRuleException'          ] = 'php/exceptions/BusinessRuleException';
+$__imports['ClassNotFoundException'         ] = 'php/exceptions/ClassNotFoundException';
+$__imports['FileNotFoundException'          ] = 'php/exceptions/FileNotFoundException';
+$__imports['IOException'                    ] = 'php/exceptions/IOException';
+$__imports['IllegalStateException'          ] = 'php/exceptions/IllegalStateException';
+$__imports['IllegalTypeException'           ] = 'php/exceptions/IllegalTypeException';
+$__imports['InfrastructureException'        ] = 'php/exceptions/InfrastructureException';
+$__imports['InvalidArgumentException'       ] = 'php/exceptions/InvalidArgumentException';
+$__imports['NestableException'              ] = 'php/exceptions/NestableException';
+$__imports['NoPermissionException'          ] = 'php/exceptions/NoPermissionException';
+$__imports['PHPErrorException'              ] = 'php/exceptions/PHPErrorException';
+$__imports['RuntimeException'               ] = 'php/exceptions/RuntimeException';
 
 $__imports['TorHelper'                      ] = 'php/net/TorHelper';
 

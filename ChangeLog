@@ -2,6 +2,8 @@
 
    - php/actions/AbstractActionForm gelöscht, wird durch php/struts/ActionForm ersetzt
 
+   - Refactoring: Package php/lang -> php/exceptions
+
 
 2007-11-26
 
