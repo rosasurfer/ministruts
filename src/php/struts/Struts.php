@@ -74,8 +74,7 @@ final class Struts extends StaticClass {
 
 
    /**
-    * Request-Key, unter dem die Pfadkomponente der URL der laufenden Anwendung gespeichert ist
-    * (entspricht in Java dem Context-Path).
+    * Request-Key, unter dem der Context-Pfad der laufenden Anwendung (die Basis-URL) gespeichert ist.
     */
    const APPLICATION_PATH_KEY = 'javax.servlet.include.servlet_path';
 

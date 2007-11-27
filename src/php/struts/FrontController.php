@@ -13,43 +13,42 @@
  * Als einfache Richtlinie läßt sich sagen, daß außerhalb von Funktionen keine Variablen angelegt werden
  * dürfen. Wird das eingehalten, ist er "thread-sicher".
  */
-class FrontController extends Singleton {
+final class FrontController extends Singleton {
 
 
    /**
-    * Das Wurzelverzeichnis der aktuellen Webapplikation.
+    * Der logische Pfad der aktuellen Webapplikation (Context-Pfad) relativ zur Wurzel-URL des Webservers.
+    * Dieser Pfad kann physisch existieren (Verzeichnis unterhalb von DOCUMENT_ROOT) oder virtuell sein,
+    * wenn die Anwendung z.B. mit mod_alias oder mod_rewrite eingebunden wurde.
+    *
+    * z.B. ""       - Default, Anwendung liegt im Wurzelverzeichnis des Webservers "http://domain.tld/"
+    *      "/myapp" - Anwendung ist unter "http://domain.tld/myapp/" erreichbar
     */
-   private $applicationDir;
+   const APPLICATION_CONTEXT = APPLICATION_CONTEXT;
 
 
    /**
-    * Die Pfadkomponente der URL der laufenden Webapplikation (Context-Pfad).
+    * die registrierten Module, Schlüssel ist ihr Prefix
     */
-   private $applicationPath;
-
-
-   // alle registrierten Module, aufgeschlüssselt nach ihrem Prefix
-   private /*Module[]*/ $registeredModules = array();
+   private /*Module[]*/ $modules = array();
 
 
    /**
     * Gibt die Singleton-Instanz dieser Klasse zurück. Ist ein Cache installiert, wird sie gecacht.
-    * Dadurch muß die Konfiguration nicht bei jedem Request neu eingelesen werden.
+    * Dadurch muß die XML-Konfiguration nicht bei jedem Request neu eingelesen werden.
     *
     * @return FrontController
     */
    public static function me() {
-      if (!isSet($_SERVER['REQUEST_METHOD'])) {
-         Logger ::log('You can not use this componente at the command line', L_ERROR, __CLASS__);
-         return null;
-      }
+      if (!isSet($_SERVER['REQUEST_METHOD']))
+         throw new IllegalStateException('You can not use '.__CLASS__.' in this context.');
 
-      // ist die Struts-Konfiguration im Cache, wird sie von dort geladen
+      // Ist schon eine Instanz im Cache ?
       $instance = Cache ::get(__CLASS__);
-      if (!$instance) {
+      if (!$instance) {                   // nein
          $instance = parent:: getInstance(__CLASS__);
 
-         // auf dem Entwicklungssystem wird sie nicht gecacht
+         // Instanz cachen, wenn nicht auf lokaler Maschine (localhost = development)
          if ($_SERVER['REMOTE_ADDR'] != '127.0.0.1')
             Cache ::set(__CLASS__, $instance);
       }
@@ -64,18 +63,16 @@ class FrontController extends Singleton {
     */
    protected function __construct() {
       // Konfiguration vervollständigen
-      $this->applicationDir  = dirName($script=$_SERVER['SCRIPT_FILENAME']);
-      $this->applicationPath = subStr($script, $length=strLen($_SERVER['DOCUMENT_ROOT']), strRPos($script, '/')-$length);
-      Config ::set('application.directory', $this->applicationDir );
-      Config ::set('application.path'     , $this->applicationPath);
+      $appDirectory = dirName($script=$_SERVER['SCRIPT_FILENAME']);
+      Config ::set('application.directory', $appDirectory);
 
 
       // Umgebung überprüfen:  Ist der Zugriff auf WEB-INF und CVS gesperrt ?
-      $applicationRoot = subStr($_SERVER['SCRIPT_URI'], 0, strPos($_SERVER['SCRIPT_URI'], '/', 8)).$this->applicationPath;
-      $locations = array($applicationRoot.'/WEB-INF',
-                         $applicationRoot.'/WEB-INF/',
-                         $applicationRoot.'/CVS',
-                         $applicationRoot.'/CVS/',
+      $contextURL = $this->getContextURL();
+      $locations = array($contextURL.'WEB-INF',
+                         $contextURL.'WEB-INF/',
+                         $contextURL.'CVS',
+                         $contextURL.'CVS/',
                          );
       foreach ($locations as $location) {
          $request  = HttpRequest ::create()->setUrl($location);
@@ -85,13 +82,16 @@ class FrontController extends Singleton {
             throw new InfrastructureException('Fatal web server configuration error: URL "'.$location.'" is accessible');
       }
 
+
       // Alle Struts-Konfigurationen in WEB-INF suchen
-      if (!is_file($this->applicationDir.'/WEB-INF/struts-config.xml')) throw new FileNotFoundException('Configuration file not found: struts-config.xml');
-      $files[] = $this->applicationDir.'/WEB-INF/struts-config.xml';
-      $files   = array_merge($files, glob($this->applicationDir.'/WEB-INF/struts-config-*.xml', GLOB_ERR));
+      if (!is_file($appDirectory.'/WEB-INF/struts-config.xml'))
+         throw new FileNotFoundException('Configuration file not found: struts-config.xml');
+
+      $files   = glob($appDirectory.'/WEB-INF/struts-config-*.xml', GLOB_ERR);
+      $files[] = $appDirectory.'/WEB-INF/struts-config.xml';
 
 
-      // Für jede Struts-Konfiguration eine Module-Instanz erzeugen und Prefix registrieren
+      // Für jede Datei ein Modul erzeugen und registrieren
       try {
          foreach ($files as $file) {
             $baseName = baseName($file, '.xml');
@@ -116,37 +116,54 @@ class FrontController extends Singleton {
    private function registerModule(Module $module) {
       $prefix = $module->getPrefix();
 
-      if (isSet($this->registeredModules[$prefix]))
+      if (isSet($this->modules[$prefix]))
          throw new RuntimeException('All modules must have unique module prefixes, non-unique prefix: "'.$prefix.'"');
 
-      $this->registeredModules[$prefix] = $module;
+      $this->modules[$prefix] = $module;
    }
 
 
    /**
-    * Gibt den Prefix des Moduls zurück, das den angegebenen Request verarbeitet.
+    * Verarbeitet den aktuellen Request.
+    */
+   public function processRequest() {
+      $request  = Request ::me();
+      $response = Response ::me();
+
+      $context = self:: APPLICATION_CONTEXT;
+      $request->setAttribute(Struts ::APPLICATION_PATH_KEY, $context); // by reference
+
+      // Module selektieren
+      $prefix = $this->getModulePrefix($request);
+      $module = $this->modules[$prefix];
+      $request->setAttribute(Struts ::MODULE_KEY, $module);
+
+      // RequestProcessor holen
+      $processor = $this->getRequestProcessor($module);
+
+      // Request verarbeiten
+      $processor->process($request, $response);
+   }
+
+
+   /**
+    * Ermittelt den Prefix des Moduls, das den Request verarbeiten soll.
     *
     * @param Request request
     *
-    * @return string - Modulprefix bzw. "" für das Default-Modul
+    * @return string - Modulprefix
     */
    private function getModulePrefix(Request $request) {
-      $module = $request->getAttribute(Struts ::MODULE_KEY);
-
-      if ($module !== null) {
-         return $module->getPrefix();
-      }
-
       $scriptName = $request->getPath();
 
-      if (!String ::startsWith($scriptName, $this->applicationPath))
-         throw new RuntimeException('Can not select module prefix of uri: '.$scriptName);
+      if (!String ::startsWith($scriptName, self:: APPLICATION_CONTEXT))
+         throw new RuntimeException('Can not resolve module prefix from uri: '.$scriptName);
 
-      $matchPath = dirName(subStr($scriptName, strLen($this->applicationPath)));
+      $matchPath = dirName(subStr($scriptName, strLen(self:: APPLICATION_CONTEXT)));
       if ($matchPath === '\\')
          $matchPath = '';
 
-      while (!isSet($this->registeredModules[$matchPath])) {
+      while (!isSet($this->modules[$matchPath])) {
          $lastSlash = strRPos($matchPath, '/');
          if ($lastSlash === false)
             throw new RuntimeException('No module configured for uri: '.$scriptName);
@@ -170,24 +187,18 @@ class FrontController extends Singleton {
 
 
    /**
-    * Verarbeitet den aktuellen Request.
+    * Gibt die vollständige Basis-URL der aktuellen Anwendung zurück.
+    * (Protokoll + Hostname + Port + Context-Pfad).
+    *
+    * z.B.: https://www.domain.tld:433/myapp/
+    *
+    * @return string
     */
-   public function processRequest() {
-      $request  = Request ::me();
-      $response = Response ::me();
-
-      $request->setAttribute(Struts ::APPLICATION_PATH_KEY, $this->applicationPath);
-
-      // Module selektieren
-      $prefix = $this->getModulePrefix($request);
-      $module = $this->registeredModules[$prefix];
-      $request->setAttribute(Struts ::MODULE_KEY, $module);
-
-      // RequestProcessor holen
-      $processor = $this->getRequestProcessor($module);
-
-      // Request verarbeiten
-      $processor->process($request, $response);
+   private function getContextURL() {
+      $protocol = isSet($_SERVER['HTTPS']) ? 'https' : 'http';
+      $host     = $_SERVER['SERVER_NAME'];
+      $port     = $_SERVER['SERVER_PORT']=='80' ? '' : ':'.$_SERVER['SERVER_PORT'];
+      return $protocol.'://'.$host.$port.self ::APPLICATION_CONTEXT.'/';
    }
 }
 ?>

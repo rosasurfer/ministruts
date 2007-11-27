@@ -11,6 +11,7 @@ final class Request extends Singleton {
 
 
    private $method;
+   private $hostURL;
    private $uri;
    private $path;
 
@@ -79,6 +80,35 @@ final class Request extends Singleton {
 
 
    /**
+    * Gibt die Basis-URL des Servers zurück, über den dieser Request läuft.
+    * (Protokoll + Hostname + Port).
+    *
+    * z.B.: https://www.domain.tld:433/
+    *
+    * @return string
+    */
+   public function getHostURL() {
+      if ($this->hostURL === null) {
+         $http = isSet($_SERVER['HTTPS']) ? 'https' : 'http';
+         $host = $_SERVER['SERVER_NAME'];
+         $port = $_SERVER['SERVER_PORT']=='80' ? '' : ':'.$_SERVER['SERVER_PORT'];
+         $this->hostURL = "$http://$host$port/";
+      }
+      return $this->hostURL;
+
+      /*
+      function baseurl() {
+         if(!empty($_SERVER["HTTPS"])){$http = "https";}else{$http = 'http';}
+         $port = ($_SERVER["SERVER_PORT"] == "80") ? "" : (":".$_SERVER["SERVER_PORT"]);
+         $basename = preg_replace('/^.+[\\\\\\/]/', '', $_SERVER['PHP_SELF'] );
+         $dir = substr($_SERVER['REQUEST_URI'], 0, -strlen($basename)-1);
+         return "$http://".$_SERVER['SERVER_NAME'].$port.$dir;
+      }
+      */
+   }
+
+
+   /**
     * Gibt den Teil der URL dieses Requests zurück, wie er in der ersten Zeile des HTTP-Protokolls
     * erscheint, relativ zum Server-Wurzelverzeichnis (Pfadname + Pfadinfo + Querystring).
     *
@@ -96,14 +126,14 @@ final class Request extends Singleton {
 
    /**
     * Gibt den Teil der URL dieses Requests zurück, wie er in der ersten Zeile des HTTP-Protokolls
-    * erscheint, relativ zum Wurzelverzeichnis der Anwendung (Pfadname + Pfadinfo + Querystring).
+    * erscheint, relativ zur Basis-URL der Anwendung (Pfadname + Pfadinfo + Querystring).
     *
     * z.B.: /view.php?key=value
     *
     * @return string
     */
    public function getRelativeURI() {
-      return subStr($this->getURI(), strLen($this->getApplicationPath()));
+      return subStr($this->getURI(), strLen($this->getContextPath()));
    }
 
 
@@ -121,21 +151,21 @@ final class Request extends Singleton {
 
 
    /**
-    * Gibt die zum Wurzelverzeichnis der Anwendung relative Pfadkomponente der URL dieses Requests zurück.
+    * Gibt die zur Basis-URL der Anwendung relative Pfadkomponente der URL dieses Requests zurück.
     *
     * @return string
     */
    public function getRelativePath() {
-      return subStr($this->getPath(), strLen($this->getApplicationPath()));
+      return subStr($this->getPath(), strLen($this->getContextPath()));
    }
 
 
    /**
-    * Gibt das Wurzelverzeichnis der Anwendung, zu der dieser Request gehört, zurück.
+    * Gibt die Basis-URL der laufenden Anwendung zurück.
     *
     * @return string
     */
-   public function getApplicationPath() {
+   public function getContextPath() {
       return $this->getAttribute(Struts ::APPLICATION_PATH_KEY);
    }
 

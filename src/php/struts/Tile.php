@@ -124,9 +124,8 @@ class Tile extends Object {
       $request  = Request  ::me();
       $response = Response ::me();
 
-      $tile    = $this;
-      $appPath = $request->getAttribute(Struts ::APPLICATION_PATH_KEY);
-      $form    = $request->getAttribute(Struts ::ACTION_FORM_KEY);
+      $tile = $this;
+      $form = $request->getAttribute(Struts ::ACTION_FORM_KEY);
 
       extract($this->properties);
 

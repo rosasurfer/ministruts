@@ -1,8 +1,11 @@
 2007-11-27
 
+   - php/struts/Request::getApplicationPath() -> getContextPath()
+     php/struts/Request::getHostURL() hinzugefügt
+
    - php/actions/AbstractActionForm gelöscht, wird durch php/struts/ActionForm ersetzt
 
-   - Refactoring: Package php/lang -> php/exceptions
+   - Package php/lang  ->  php/exceptions
 
 
 2007-11-26

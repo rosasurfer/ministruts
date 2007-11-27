@@ -345,9 +345,11 @@ class RequestProcessor extends Object {
          if ($forward->isRedirect()) {
             $this->cacheActionMessages($request);
 
-            $applicationPath = $request->getAttribute(Struts ::APPLICATION_PATH_KEY);
-            $url = $applicationPath.$this->module->getPrefix().$forward->getPath();
-            redirect($url); // TODO: Referenz auf init.php entfernen
+            $context = $request->getAttribute(Struts ::APPLICATION_PATH_KEY);
+            $url = $context.$this->module->getPrefix().$forward->getPath();
+
+            // TODO: Referenz auf init.php entfernen
+            redirect($url);
          }
          else {
             $path = $forward->getPath();

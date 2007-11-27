@@ -385,7 +385,7 @@ class Module extends Object {
       if (!is_dir($directory))
          throw new FileNotFoundException('Directory not found: '.$directory);
 
-      // trailing slash at the end to allow people omitting leading slashs at their resource values
+      // trailing slash at the end to allow people omitting the leading slash at their resources
       $this->resourceBase = $directory.'/';
    }
 
