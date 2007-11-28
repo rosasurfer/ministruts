@@ -78,8 +78,8 @@ final class FrontController extends Singleton {
          $request  = HttpRequest ::create()->setUrl($location);
          $response = CurlHttpClient ::create()->send($request);
          $status = $response->getStatus();
-         if ($status != 403 && $status != 404)
-            throw new InfrastructureException('Fatal web server configuration error: URL "'.$location.'" is accessible');
+         if ($status != 404)
+            throw new InfrastructureException('Fatal web server configuration error, resource at "'.$location.'" is not hidden: '.$status);
       }
 
 

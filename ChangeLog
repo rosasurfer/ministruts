@@ -1,3 +1,9 @@
+2007-11-28
+
+   - php/struts/FrontController: strengere Prüfung beim Zugriff auf CVS- oder WEB-INF-Verzeichnis, als Antwort wird
+     nur noch ein 404 (SC_NOT_FOUND) akzeptiert
+
+
 2007-11-27
 
    - php/struts/Request::getApplicationPath() -> getContextPath()
