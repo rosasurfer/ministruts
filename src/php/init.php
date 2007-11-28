@@ -3,8 +3,8 @@
 // -----------------------------
 
 
-// Klassenimporte
-// --------------
+// Klassendefinitionen
+// -------------------
 $__imports['AbstractCachePeer'              ] = 'php/cache/AbstractCachePeer';
 $__imports['ApcCache'                       ] = 'php/cache/ApcCache';
 $__imports['Cache'                          ] = 'php/cache/Cache';
@@ -64,6 +64,8 @@ $__imports['Config'                         ] = 'php/util/Config';
 $__imports['Logger'                         ] = 'php/util/Logger';
 $__imports['String'                         ] = 'php/util/String';
 
+@include('classes.php');  // vorausschauendes Laden weiterer Definitionen vor Einrichten des ErrorHandlers
+
 
 
 // Konstanten
@@ -89,7 +91,6 @@ define('YEAR'   , 365 * DAY   );
 
 // ob wir unter Windows laufen
 define('WINDOWS', (strToUpper(subStr(PHP_OS, 0, 3))==='WIN'));
-
 
 
 // Errorhandler registrieren
@@ -146,7 +147,7 @@ function is_class($className) {
    try {
       return (bool) __autoload($className, true);
    }
-   catch (ClassNotFoundException $ex) { /**/ }
+   catch (ClassNotFoundException $ex) { /* yes, we eat it */ }
 
    return false;
 }
