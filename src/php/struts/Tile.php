@@ -174,6 +174,7 @@ class Tile extends Object {
 
       extract($this->properties);
 
+      // TODO: Framework vor Zugriff aus der HTML-Seite mit $this schützen
       include($this->module->getResourceBase().$this->path);
    }
 }
