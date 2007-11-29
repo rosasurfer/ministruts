@@ -1,3 +1,8 @@
+2007-11-29
+
+   - php/struts: logische Prüfung und Fehlermeldungen beim Parsen von struts-config.xml ausgebaut
+
+
 2007-11-28
 
    - php/struts/FrontController: strengere Prüfung beim Zugriff auf CVS- oder WEB-INF-Verzeichnis, als Antwort wird

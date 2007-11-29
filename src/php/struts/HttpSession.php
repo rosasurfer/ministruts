@@ -87,7 +87,7 @@ class HttpSession extends Singleton {
 
          // Marker setzen, ab jetzt: sizeOf($_SESSION) > 0
          $_SESSION['__SESSION_CREATED__'  ] = time();
-         $_SESSION['__SESSION_IP__'       ] = $_SERVER['REMOTE_ADDR'];     // TODO: forwarded address einbauen
+         $_SESSION['__SESSION_IP__'       ] = $_SERVER['REMOTE_ADDR'];     // TODO: forwarded remote IP einbauen
          $_SESSION['__SESSION_USERAGENT__'] = $_SERVER['HTTP_USER_AGENT'];
 
          $this->new = true;

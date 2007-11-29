@@ -48,7 +48,7 @@
 <!-- The "struts-config" element is the root of the configuration file hierarchy, and contains 
      nested elements for all of the other configuration settings.
 
-     resource-base  The base directory to lookup local resources.  This value is interpreted as 
+     doc-base       The base directory to lookup local resources.  This value is interpreted as 
                     relative to the location of the Struts configuration file itself.
                     ["."]
 
@@ -57,7 +57,7 @@
 -->
 <!ELEMENT struts-config (global-forwards?, action-mappings, tiles-definitions?)>
 <!ATTLIST struts-config  
-          resource-base     %ResourcePath;  #IMPLIED
+          doc-base          %ResourcePath;  #IMPLIED
           role-processor    %ClassName;     #IMPLIED
 >
 
@@ -71,13 +71,13 @@
 
 
 <!-- The "forward" element describes an ActionForward that is to be made available to an Action as 
-     a return value. An ActionForward is referenced by a logical name and encapsulates a URI. 
-     A "forward" element may be used to describe both global and local ActionForwards. Global 
-     forwards are available to all the Action objects in the module. Local forwards can be nested 
-     within a <mapping> element and are only available to an Action object when it is invoked 
-     through that ActionMapping.
+     a return value.  An ActionForward is referenced by a logical name and encapsulates an URI or 
+     a tiles definition.  A "forward" element may be used to describe both global and local forwards. 
+     Global forwards are available to all actions of the module. Local forwards can be nested 
+     within a <mapping> element and are only available to an action when it is invoked through that 
+     ActionMapping.
 
-     name       The unique identifier for this forward. Referenced by the Action object at runtime 
+     name       The unique identifier for the forward. Referenced by the Action object at runtime 
                 to select - by its logical name - the resource that should complete the request/
                 response.
 
@@ -112,31 +112,33 @@
 
      path       The module-relative path of the submitted request, starting with a slash "/" character.
 
-     forward    Module-relative path of the resource that will process this request, instead of the 
-                Action class specified by "type". Exactly one of "forward" or "action" must be 
-                specified.
+     forward    The identifier of a resource to include, instead of passing the request to an action 
+                specified by "action".  See the "forward" element's "include" attribute for more 
+                information.  Not valid if the "action" attribute is specified.
 
-     action     Class name of the action subclass [Action] that will process requests for this action 
-                mapping. Not valid if the "forward" attribute is specified.  Exactly one of "forward" 
-                or "action" must be specified.
+     action     Class name of the [Action] subclass that will process requests for the action mapping. 
+                Not valid if the "forward" attribute is specified.  If no "forward" attribute is specified
+                and an action with a name matching the mapping's "path" attribute is found that action 
+                is used.  So if you carefully name paths and classes (ie. "/doThat.php" matches 
+                "DoThatAction") you can omit this value.
 
-     form       Class name of the action form subclass [ActionForm], if any, that is associated with 
-                this action mapping.  If an action form with a name matching the corresponding action 
-                name is found that action form is used.  So if you carefully name your classes (ie. 
-                "DoThatAction" and "DoThatActionForm") you don't need to explicitly specify this value.
+     form       Class name of the [ActionForm] subclass, if any, that is associated with the mapping.  
+                If an action form with a name matching the mapping's action is found that action form 
+                is used.  So if you carefully name your classes (ie. "DoThatAction" matches 
+                "DoThatActionForm") you can omit this value.
 
      parameter  General-purpose configuration parameter that can be used to pass extra information to 
-                the Action object selected by this action mapping.
+                the action object of the mapping.
 
-     roles      Comma-delimited list of role names that are allowed access to this ActionMapping object.
+     roles      Comma-delimited list of role names that are allowed access to the action mapping.
 
-     method     The HTTP method type that this ActionMapping is restricted to. Legal values are "get" 
+     method     The HTTP method type that the action mapping is restricted to. Legal values are "get" 
                 and "post" [no restrictions].
 
-     default    Set to "true" if this object should be configured as the default action mapping for this 
-                module. If a request does not match another object, it will be passed to the action 
-                mapping object with default set to "true". Only one action mapping object can be marked 
-                as "default" within a module [false].
+     default    Set to "true" if the mapping should be configured as the default action mapping for 
+                the module.  If a request does not match any other mapping, it will be passed to the 
+                action mapping with default set to "true". Only one action mapping can be marked as 
+                "default" within a module [false].
 -->
 <!ELEMENT mapping (set-property*, forward*)>
 <!ATTLIST mapping        
@@ -162,7 +164,7 @@
 
      name       The unique identifier for this definition.
 
-     path       The path to the resource used as tile relative to the "WEB-INF" directory of the 
+     path       The path of the resource used as tile relative to the "WEB-INF" directory of the 
                 application.  Exactly one of "path" or "extends" must be specified.
 
      extends    Name of a definition that is used as ancestor of this definition.  All attributes 

@@ -55,12 +55,12 @@ class RequestProcessor extends Object {
          return;
 
 
-      // ggf. benötigte Rollen überprüfen
+      // benötigte Rollen überprüfen
       if (!$this->processRoles($request, $response, $mapping))
          return;
 
 
-      // falls im Mapping statt einer Action ein Forward konfiguriert wurde, diesen verarbeiten
+      // falls statt einer Action ein direkter Forward konfiguriert wurde, diesen verarbeiten
       if (!$this->processMappingForward($request, $response, $mapping))
          return;
 
