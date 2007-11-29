@@ -1,6 +1,10 @@
 2007-11-29
 
-   - php/struts: logische Prüfung und Fehlermeldungen beim Parsen von struts-config.xml ausgebaut
+   - php/struts:
+     * logische Prüfung und Fehlermeldungen beim Parsen von struts-config.xml ausgebaut
+     * forward-Attribute im ActionMapping kann auf globalen Forward oder Tiles-Definition zeigen
+     * Tiles können ineinander geschachtelt werden
+     * im <set>-Tag in Tilesdefinitionen muß kein Typ mehr angegeben werden, er wird selbst erkannt
 
 
 2007-11-28

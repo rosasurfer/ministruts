@@ -13,12 +13,6 @@ class Module extends Object {
 
 
    /**
-    * Der Pfad der Konfigurationsdatei dieses Moduls.
-    */
-   protected $configFile;     // string
-
-
-   /**
     * Der Prefix dieses Modules relative zur ROOT_URL der Anwendung.  Die Prefixe innerhalb einer Anwendung
     * sind eindeutig. Das Module mit einem Leerstring als Prefix ist das Default-Module der Anwendung.
     */
@@ -104,14 +98,11 @@ class Module extends Object {
       $this->logInfo   = ($loglevel <= L_INFO);
       $this->logNotice = ($loglevel <= L_NOTICE);
 
-      $this->configFile = $fileName;
-      $this->setPrefix($prefix);
-
       $xml = $this->loadConfiguration($fileName);
-      $this->setResourceBase((string) $xml['doc-base']);
 
-      if ($xml['role-processor']) $this->setRoleProcessorClass((string) $xml['role-processor']);
-
+      $this->setPrefix($prefix);
+      $this->setResourceBase($xml);
+      $this->setRoleProcessorClass($xml);
       $this->processForwards($xml);
       $this->processMappings($xml);
       $this->processTiles($xml);
@@ -145,15 +136,103 @@ class Module extends Object {
       catch (Exception $ex) { throw new RuntimeException('Could not change working directory to "'.$libroot.'"', $ex); }
 
 
-      // Konfiguration parsen und validieren ...
-      $object = new SimpleXMLElement($content, LIBXML_DTDVALID);
+      // Konfiguration parsen, validieren und Dateinamen hinterlegen
+      $xml = new SimpleXMLElement($content, LIBXML_DTDVALID);
+      $xml['config-file'] = $fileName;
 
 
       // zurück ins Ausgangsverzeichnis wechseln
       try { chDir($cwd); }
       catch (Exception $ex) { throw new RuntimeException('Could not change working directory back to "'.$cwd.'"', $ex); }
 
-      return $object;
+      return $xml;
+   }
+
+
+   /**
+    * Gibt den Prefix dieses Modules zurück. Anhand dieses Prefix werde die verschiedenen Module der
+    * Anwendung unterschieden.
+    *
+    * @return string
+    */
+   public function getPrefix() {
+      return $this->prefix;
+   }
+
+
+   /**
+    * Setzt den Prefix des Modules.
+    *
+    * @param string prefix
+    */
+   protected function setPrefix($prefix) {
+      if ($this->configured)   throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($prefix)) throw new IllegalTypeException('Illegal type of argument $prefix: '.getType($prefix));
+      if ($prefix!=='' && !String ::startsWith($prefix, '/'))
+         throw new IllegalTypeException('Module prefixes must start with a slash "/" character, found: '.$prefix);
+
+      $this->prefix = $prefix;
+   }
+
+
+   /**
+    * Gibt das Basisverzeichnis für lokale Resourcen zurück.
+    *
+    * @return string
+    */
+   public function getResourceBase() {
+      return $this->resourceBase;
+   }
+
+
+   /**
+    * Setzt das Basisverzeichnis für lokale Resourcen.
+    *
+    * @param SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
+    */
+   protected function setResourceBase(SimpleXMLElement $xml) {
+      if ($this->configured) throw new IllegalStateException('Configuration is frozen');
+
+      $baseDirectory = dirName((string) $xml['config-file']);
+      if ($xml['doc-base'])
+         $baseDirectory .= '/'.trim($xml['doc-base'], '/\\');
+
+      if (!is_dir($baseDirectory)) throw new FileNotFoundException('Directory not found: '.$baseDirectory);
+
+      // trailing slash at the end to allow people omitting the leading slash at their resources
+      $this->resourceBase = $baseDirectory.'/';
+   }
+
+
+   /**
+    * Gibt die RoleProcessor-Implementierung dieses Moduls zurück.
+    *
+    * @return RoleProcessor
+    */
+   public function getRoleProcessor() {
+      static $instance = null;
+
+      if (!$instance && ($class = $this->roleProcessorClass))
+         $instance = new $class;
+
+      return $instance;
+   }
+
+
+   /**
+    * Setzt den Klassennamen der RoleProcessor-Implementierung, die für dieses Module benutzt wird.
+    * Diese Klasse muß eine Subklasse von RoleProcessor sein.
+    *
+    * @param SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
+    */
+   protected function setRoleProcessorClass(SimpleXMLElement $xml) {
+      if ($this->configured) throw new IllegalStateException('Configuration is frozen');
+      if (!$xml['role-processor'])
+         return;
+
+      $className = (string) $xml['role-processor'];
+      if (!is_subclass_of($className, Struts ::ROLE_PROCESSOR_BASE_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts ::ROLE_PROCESSOR_BASE_CLASS.': '.$className);
+      $this->roleProcessorClass = $className;
    }
 
 
@@ -273,13 +352,14 @@ class Module extends Object {
       foreach ($xml->xPath('/struts-config/tiles-definitions/definition') as $tag) {
          $tile = $this->getDefinedTile((string) $tag['name'], $xml);
       }
+      // TODO: rekursive Tiles-Definitionen bei Verschachtelung und Vererbung abfangen
    }
 
 
    /**
-    * Sucht die Tilesdefinition mit dem angegebenen Namen und gibt die entsprechende Tile-Instanz zurück.
+    * Sucht die Tilesdefinition mit dem angegebenen Namen und gibt die entsprechende Instanz zurück.
     *
-    * @param string           $name - Tile-Name
+    * @param string           $name - Name der Tile
     * @param SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration der Tile
     *
     * @return Tile instance
@@ -298,7 +378,6 @@ class Module extends Object {
       if (sizeOf($tag->attributes()) != 2) throw new RuntimeException('Exactly one of "path" or "extends" must be specified for tiles definition "'.$name.'"');
 
       // ... create a new instance ...
-      $tile = null;
       if ($tag['path']) {                    // 'path' given, it's a simple tile
          $path = (string) $tag['path'];
          if (!$this->isLocalResource($path)) throw new RuntimeException('Resource "'.$path.'" not found in tile definition "'.$name.'"');
@@ -331,20 +410,27 @@ class Module extends Object {
          $name  = (string) $tag['name'];
          // TODO: Name-Value von <set> wird nicht auf Eindeutigkeit überprüft
 
-         if ($tag['value']) { // value im Attribut
+         if ($tag['value']) {    // value im Attribut
             if (strLen($tag)) throw new RuntimeException('Exactly one of "value" attribute or body value must be specified in set "'.$name.'" of tiles definition "'.$tile->getName().'"');
-            $type  = $tag['type'] ? (string) $tag['type'] : 'resource';
             $value = (string) $tag['value'];
-            if ($type == 'resource')
-               if (!$this->isResource($value, $xml)) throw new RuntimeException('No resource found for "value" attribute "'.$value.'" in set "'.$name.'" of tiles definition "'.$tile->getName().'"');
+
+            if ($tag['type']) {
+               $type = (string) $tag['type'];
+               if ($type == Tile ::PROP_TYPE_RESOURCE)
+                  if (!$this->isResource($value, $xml)) throw new RuntimeException('No resource found for "value" attribute "'.$value.'" in set "'.$name.'" of tiles definition "'.$tile->getName().'"');
+            }
+            else {
+               $type = $this->isResource($value, $xml) ? Tile ::PROP_TYPE_RESOURCE : Tile ::PROP_TYPE_STRING;
+            }
          }
-         else {               // value im Body
-            $type  = $tag['type'] ? (string) $tag['type'] : 'resource';
-            if ($type == 'resource') throw new RuntimeException('"value" attribute must be specified for type "resource" in set "'.$name.'" of tiles definition "'.$tile->getName().'"');
+         else {                  // value im Body
             $value = trim((string) $tag);
+
+            $type = ($tag['type']) ? (string) $tag['type'] : Tile ::PROP_TYPE_STRING;
+            if ($type == Tile ::PROP_TYPE_RESOURCE) throw new RuntimeException('A "value" attribute must be specified for type "resource" in set "'.$name.'" of tiles definition "'.$tile->getName().'"');
          }
 
-         $tile->setProperty($name, $value);
+         $tile->setProperty($name, $type, $value);
       }
    }
 
@@ -355,76 +441,6 @@ class Module extends Object {
     * @param SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
     */
    protected function processErrors(SimpleXMLElement $xml) {
-   }
-
-
-   /**
-    * Gibt den Prefix dieses Modules zurück. Anhand dieses Prefix werde die verschiedenen Module der
-    * Anwendung unterschieden.
-    *
-    * @return string
-    */
-   public function getPrefix() {
-      return $this->prefix;
-   }
-
-
-   /**
-    * Setzt den Prefix des Modules.
-    *
-    * @param string prefix
-    */
-   protected function setPrefix($prefix) {
-      if ($this->configured)   throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($prefix)) throw new IllegalTypeException('Illegal type of argument $prefix: '.getType($prefix));
-      if ($prefix!=='' && !String ::startsWith($prefix, '/'))
-         throw new IllegalTypeException('Module prefixes must start with a slash "/" character, found: '.$prefix);
-
-      $this->prefix = $prefix;
-   }
-
-
-   /**
-    * Gibt das Basisverzeichnis für lokale Resourcen zurück.
-    *
-    * @return string
-    */
-   public function getResourceBase() {
-      return $this->resourceBase;
-   }
-
-
-   /**
-    * Setzt das Basisverzeichnis für lokale Resourcen.
-    *
-    * @param string $directory - zur Struts-Konfiguration relatives Verzeichnis
-    */
-   protected function setResourceBase($directory) {
-      if ($this->configured)      throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($directory)) throw new IllegalTypeException('Illegal type of argument $directory: '.getType($directory));
-
-      $directory = dirName($this->configFile).'/'.trim($directory, '/\\');
-
-      if (!is_dir($directory))
-         throw new FileNotFoundException('Directory not found: '.$directory);
-
-      // trailing slash at the end to allow people omitting the leading slash at their resources
-      $this->resourceBase = $directory.'/';
-   }
-
-
-   /**
-    * Setzt den Klassennamen der RoleProcessor-Implementierung, die für dieses Module benutzt wird.
-    * Diese Klasse muß eine Subklasse von RoleProcessor sein.
-    *
-    * @param string $className
-    */
-   protected function setRoleProcessorClass($className) {
-      if ($this->configured)                                               throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($className))                                          throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
-      if (!is_subclass_of($className, Struts ::ROLE_PROCESSOR_BASE_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts ::ROLE_PROCESSOR_BASE_CLASS.': '.$className);
-
-      $this->roleProcessorClass = $className;
    }
 
 
@@ -514,21 +530,6 @@ class Module extends Object {
     */
    public function getRequestProcessorClass() {
       return $this->requestProcessorClass;
-   }
-
-
-   /**
-    * Gibt die RoleProcessor-Implementierung dieses Moduls zurück.
-    *
-    * @return RoleProcessor
-    */
-   public function getRoleProcessor() {
-      static $instance = null;
-
-      if (!$instance && ($class = $this->roleProcessorClass))
-         $instance = new $class;
-
-      return $instance;
    }
 
 

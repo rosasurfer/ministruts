@@ -355,7 +355,7 @@ class RequestProcessor extends Object {
             $path = $forward->getPath();
             $tile = $this->module->findTile($path);
 
-            if (!$tile) {  // create a simple one on the fly
+            if (!$tile) {     // it's a page, create a simple one on the fly
                $class = $this->module->getTilesClass();
                $tile = new $class($this->module);
                $tile->setName('generic')
