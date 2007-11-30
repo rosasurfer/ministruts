@@ -112,9 +112,9 @@
 
      path       The module-relative path of the submitted request, starting with a slash "/" character.
 
-     forward    The identifier of a resource to include, instead of passing the request to an action 
-                specified by "action".  See the "forward" element's "include" attribute for more 
-                information.  Not valid if the "action" attribute is specified.
+     forward    Identifier of a resource to include or path of an action to which control should be 
+                forwarded, instead of passing the request to the action specified by "action".  See the 
+                "forward" element for more information.  Not valid if the "action" attribute is specified.
 
      action     Class name of the [Action] subclass that will process requests for the action mapping. 
                 Not valid if the "forward" attribute is specified.  If no "forward" attribute is specified
@@ -122,18 +122,23 @@
                 is used.  So if your path name matches your action class name (ie. "/doThat.php" matches 
                 "DoThatAction") you can omit this value.
 
+     parameter  General-purpose configuration parameter that can be used to pass extra information to 
+                the action object of the mapping.
+
      form       Class name of the [ActionForm] subclass, if any, that is associated with the mapping.  
                 If an action form with a name matching the mapping's action is found that action form 
                 is used.  So if your action class name matches your action form class name 
                 (ie. "DoThatAction" matches "DoThatActionForm") you can omit this value.
 
-     parameter  General-purpose configuration parameter that can be used to pass extra information to 
-                the action object of the mapping.
-
-     roles      Comma-delimited list of role names that are allowed access to the action mapping.
+     form-error Set if the validate method of the ActionForm should be called prior to execute the Action 
+                object of this action mapping. Can be an identifier of a resource to include or path of an 
+                action to which control should be returned if a validation error is encountered.  Valid 
+                only when "form" is specified.
 
      method     The HTTP method type that the action mapping is restricted to. Legal values are "get" 
                 and "post" [no restrictions].
+
+     roles      Comma-delimited list of role names that are allowed access to the action mapping.
 
      default    Set to "true" if the mapping should be configured as the default action mapping for 
                 the module.  If a request does not match any other mapping, it will be passed to the 
@@ -145,10 +150,11 @@
           path          %RequestPath;   #REQUIRED
           forward       %ResourcePath;  #IMPLIED
           action        %ClassName;     #IMPLIED
-          form          %ClassName;     #IMPLIED
           parameter     CDATA           #IMPLIED
-          roles         CDATA           #IMPLIED
+          form          %ClassName;     #IMPLIED
+          form-error    %ResourcePath;  #IMPLIED
           method        (get|post)      #IMPLIED
+          roles         CDATA           #IMPLIED
           default       %Boolean;       "false"
 >
 

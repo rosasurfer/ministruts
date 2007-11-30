@@ -283,30 +283,72 @@ class Module extends Object {
          $mapping = new $this->mappingClass($this);
          $mapping->setPath((string) $tag['path']);
 
-         if ($tag['action' ]) $mapping->setAction ((string) $tag['action' ]);
-         if ($tag['form'   ]) $mapping->setForm   ((string) $tag['form'   ]);
-         if ($tag['method' ]) $mapping->setMethod ((string) $tag['method' ]);
-         if ($tag['default']) $mapping->setDefault((string) $tag['default'] == 'true');
-
-         // process internal forward
+         // attributes
+         // ----------
+         // process internal forward attribute
          if ($tag['forward']) {
+            if ($tag['action']) throw new RuntimeException('Only one of "action" or "forward" can be specified for mapping "'.$mapping->getPath().'"');
             $path = (string) $tag['forward'];
 
-            if (!$this->isResource($path, $xml)) {
-               $forward = $this->findForward($path);
-               if (!$forward) throw new RuntimeException('No resource or forward found for "forward" attribute "'.$path.'" of mapping "'.$mapping->getPath().'"');
+            if ($this->isResource($path, $xml)) {
+               $forward = new $this->forwardClass('generic', $path, false);
             }
             else {
-               $forward = new $this->forwardClass('generic', $path, false);
+               $forward = $this->findForward($path);
+               if (!$forward) throw new RuntimeException('No resource or forward found for "forward" attribute "'.$path.'" of mapping "'.$mapping->getPath().'"');
             }
             $mapping->setForward($forward);
          }
 
+         // process action attribute
+         if ($tag['action']) {
+            $mapping->setAction((string) $tag['action']);
+         }
+         elseif (!$tag['forward']) {
+            $className = ucFirst(baseName($mapping->getPath(), '.php')).'Action';
+            if (!is_class($className)) throw new RuntimeException('Either an "action" or "forward" attribute must be specified for mapping "'.$mapping->getPath().'"');
+            $mapping->setAction($className);
+        }
+
+         // process form attribute
+         if ($tag['form']) {
+            $mapping->setForm((string) $tag['form']);
+         }
+         elseif (($action = $mapping->getAction()) && is_class($action.'Form')) {
+            $mapping->setForm($action.'Form');
+         }
+
+         // process form-error attribute
+         if ($tag['form-error']) {
+            if (!$mapping->getForm()) throw new RuntimeException('A "form" must be specified for the "form-error" attribute in mapping "'.$mapping->getPath().'"');
+            $path = (string) $tag['form-error'];
+
+            if ($this->isResource($path, $xml)) {
+               $forward = new $this->forwardClass('generic', $path, false);
+            }
+            else {
+               $forward = $this->findForward($path);
+               // TODO: es muß eine Mapping-URL als Forward möglich sein
+               if (!$forward) throw new RuntimeException('No resource or forward found for "form-error" attribute "'.$path.'" of mapping "'.$mapping->getPath().'"');
+            }
+            $mapping->setFormErrorForward($forward);
+         }
+
+         // process method attribute
+         if ($tag['method' ]) $mapping->setMethod ((string) $tag['method' ]);
+
+         // process roles attribute
          if ($tag['roles']) {
             if (!$this->roleProcessorClass) throw new RuntimeException('RoleProcessor configuration not found for "roles" attribute "'.$tag['roles'].'" of mapping "'.$mapping->getPath().'"');
             $mapping->setRoles((string) $tag['roles']);
          }
 
+         // process default attribute
+         if ($tag['default']) $mapping->setDefault((string) $tag['default'] == 'true');
+
+
+         // child nodes
+         // -----------
          // process local 'include' and 'redirect' forwards
          foreach ($tag->xPath('./forward[@include] | ./forward[@redirect]') as $forwardTag) {
             $name = (string) $forwardTag['name'];
@@ -338,6 +380,8 @@ class Module extends Object {
             $mapping->addForward($name, $forward);
          }
 
+         // done
+         // ----
          $this->addMapping($mapping);
       }
    }
@@ -353,7 +397,7 @@ class Module extends Object {
          $name = (string) $tag['name'];
          $tile = $this->getDefinedTile($name, $xml);
       }
-      // TODO: rekursive Tiles-Definitionen bei Verschachtelung und Vererbung abfangen
+      // TODO: rekursive Tiles-Definitionen abfangen
    }
 
 

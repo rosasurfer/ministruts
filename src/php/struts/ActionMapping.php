@@ -12,17 +12,24 @@ class ActionMapping extends Object {
    protected $configured = false;
 
 
-   protected $path;        // string
-   protected $action;      // string
-   protected $form;        // string
-   protected $method;      // string
-   protected $default;     // boolean
-   protected $roles;       // string
+   protected $path;              // string
+   protected $action;            // string
+   protected $form;              // string
+   protected $method;            // string
+   protected $roles;             // string
+   protected $default;           // boolean
+
 
    /**
-    * Direkt im Mapping statt einer Action konfigurierter ActionForward.
+    * Im Mapping statt einer Action konfigurierter ActionForward.
     */
-   protected /*ActionForward*/ $forward;  //
+   protected /*ActionForward*/ $forward;
+
+
+   /**
+    * Nach einem Validation-Error aufzurufender ActionForward.
+    */
+   protected /*ActionForward*/ $formErrorForward;
 
 
    /**
@@ -163,7 +170,7 @@ class ActionMapping extends Object {
     */
    public function setForward(ActionForward $forward) {
       if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-      if ($this->action)     throw new RuntimeException('Configuration error: Only one of mapping "forward" or mapping "action" can be specified.');
+      if ($this->action)     throw new RuntimeException('Configuration error: Only one of mapping "action" or mapping "forward" can be specified.');
 
       $this->forward = $forward;
       return $this;
@@ -191,7 +198,7 @@ class ActionMapping extends Object {
       if ($this->configured)                                       throw new IllegalStateException('Configuration is frozen');
       if (!is_string($className))                                  throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
       if (!is_subclass_of($className, Struts ::ACTION_BASE_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts ::ACTION_BASE_CLASS.': '.$className);
-      if ($this->forward)                                          throw new RuntimeException('Configuration error: Only one of mapping "forward" or mapping "action" can be specified.');
+      if ($this->forward)                                          throw new RuntimeException('Configuration error: Only one of mapping "action" or mapping "forward" can be specified.');
 
       $this->action = $className;
       return $this;
@@ -233,6 +240,33 @@ class ActionMapping extends Object {
     */
    public function getForm() {
       return $this->form;
+   }
+
+
+   /**
+    * Setzt den ActionForward, zu dem verzweigt wird, wenn die ActionForm dieses Mappings vor Aufruf
+    * der Action validiert wird und dabei Fehler zurückgibt.
+    *
+    * @param ActionForward $forward
+    *
+    * @return ActionMapping
+    */
+   public function setFormErrorForward(ActionForward $forward) {
+      if ($this->configured) throw new IllegalStateException('Configuration is frozen');
+
+      $this->formErrorForward = $forward;
+      return $this;
+   }
+
+
+   /**
+    * Gibt den ActionForward zurück, zu dem verzweigt wird, wenn die ActionForm dieses Mappings vor
+    * Aufruf der Action validiert wird und dabei Fehler zurückgibt.
+    *
+    * @return ActionForward
+    */
+   public function getFormErrorForward() {
+      return $this->formErrorForward;
    }
 
 
@@ -295,24 +329,15 @@ class ActionMapping extends Object {
     */
    public function freeze() {
       if (!$this->configured) {
-         if (!$this->path)
-            throw new IllegalStateException('No path configured for this '.$this);
-
-         // wenn weder Action noch interner ActionForward angegeben sind, nach einer zum Pfad passenden Action suchen
-         if (!$this->action && !$this->forward) {
-            $className = ucFirst(baseName($this->path, '.php')).'Action';
-            if (!is_class($className))
-               throw new IllegalStateException('Either an action or a forward must be configured for this '.$this);
-            $this->setAction($className);
-         }
-
-         // wenn keine ActionForm angegeben ist, nach einer zur Action passenden ActionForm suchen
-         if ($this->action && !$this->form && is_class($this->action.'Form')) {
-            $this->setForm($this->action.'Form');
-         }
+         if (!$this->path)                              throw new IllegalStateException('A path must be configured for mapping "'.$this->path.'"');
+         if (!$this->action && !$this->forward)         throw new IllegalStateException('Either an action or forward must be configured for mapping "'.$this->path.'"');
+         if (!$this->form   && $this->formErrorForward) throw new IllegalStateException('An action form must be configured for form error forward in mapping "'.$this->path.'"');
 
          if ($this->forward)
             $this->forward->freeze();
+
+         if ($this->formErrorForward)
+            $this->formErrorForward->freeze();
 
          foreach ($this->forwards as $forward)
             $forward->freeze();

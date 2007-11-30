@@ -60,13 +60,18 @@ class RequestProcessor extends Object {
          return;
 
 
-      // falls statt einer Action ein direkter Forward konfiguriert wurde, diesen verarbeiten
-      if (!$this->processMappingForward($request, $response, $mapping))
+      // ActionForm vorbereiten
+      $form = $this->processActionForm($request, $response, $mapping);
+
+
+      // falls konfiguriert, ActionForm validieren
+      if ($form && !$this->processFormValidate($request, $response, $mapping, $form))
          return;
 
 
-      // ActionForm vorbereiten
-      $form = $this->processActionForm($request, $response, $mapping);
+      // falls statt einer Action ein direkter Forward konfiguriert wurde, diesen verarbeiten
+      if (!$this->processMappingForward($request, $response, $mapping))
+         return;
 
 
       // Action erzeugen (Form und Mapping werden schon hier übergeben, damit User-Code einfacher wird)
@@ -198,6 +203,7 @@ class RequestProcessor extends Object {
 
       $this->logDebug && Logger ::log('Request does not have the required method type, denying access', L_DEBUG, __CLASS__);
       echoPre('Access denied: 403');
+
       // TODO: auf Default-Mapping umleiten
       return false;
    }
@@ -219,27 +225,6 @@ class RequestProcessor extends Object {
          return true;
 
       $forward = $this->module->getRoleProcessor()->processRoles($request, $response, $mapping);
-      if (!$forward)
-         return true;
-
-      $this->processActionForward($request, $response, $forward);
-      return false;
-   }
-
-
-   /**
-    * Verarbeitet einen direkt im ActionMapping angegebenen ActionForward (wenn angegeben). Gibt TRUE
-    * zurück, wenn die Verarbeitung fortgesetzt werden soll, oder FALSE, wenn der Request bereits
-    * beendet wurde.
-    *
-    * @param Request       $request
-    * @param Response      $response
-    * @param ActionMapping $mapping
-    *
-    * @return boolean
-    */
-   protected function processMappingForward(Request $request, Response $response, ActionMapping $mapping) {
-      $forward = $mapping->getForward();
       if (!$forward)
          return true;
 
@@ -272,6 +257,53 @@ class RequestProcessor extends Object {
 
 
    /**
+    * Wenn Form-Validierung für das Mapping aktiviert ist, wird die ActionForm des Mappings validiert.
+    * Treten dabei Validation-Fehler auf, wird auf die konfigurierte Fehler-Resource weitergeleitet.
+    * Gibt TRUE zurück, wenn die Verarbeitung fortgesetzt werden soll, oder FALSE, wenn Fehler
+    * aufgetreten sind und der Request bereits beendet wurde.
+    *
+    * @param Request       $request
+    * @param Response      $response
+    * @param ActionMapping $mapping
+    * @param ActionForm    $form
+    *
+    * @return boolean
+    */
+   protected function processFormValidate(Request $request, Response $response, ActionMapping $mapping, ActionForm $form) {
+      $forward = $mapping->getFormErrorForward();
+      if (!$forward)
+         return true;
+
+      if ($form->validate())
+         return true;
+
+      $this->processActionForward($request, $response, $forward);
+      return false;
+   }
+
+
+   /**
+    * Verarbeitet einen direkt im ActionMapping angegebenen ActionForward (wenn angegeben). Gibt TRUE
+    * zurück, wenn die Verarbeitung fortgesetzt werden soll, oder FALSE, wenn der Request bereits
+    * beendet wurde.
+    *
+    * @param Request       $request
+    * @param Response      $response
+    * @param ActionMapping $mapping
+    *
+    * @return boolean
+    */
+   protected function processMappingForward(Request $request, Response $response, ActionMapping $mapping) {
+      $forward = $mapping->getForward();
+      if (!$forward)
+         return true;
+
+      $this->processActionForward($request, $response, $forward);
+      return false;
+   }
+
+
+   /**
     * Erzeugt und gibt die Action zurück, die für das angegebene Mapping konfiguriert wurde.
     *
     * @param Request       $request
@@ -282,9 +314,9 @@ class RequestProcessor extends Object {
     * @return Action
     */
    protected function processActionCreate(Request $request, Response $response, ActionMapping $mapping, ActionForm $form=null) {
-      $class = $mapping->getAction();
+      $actionClass = $mapping->getAction();
 
-      return new $class($mapping, $form);
+      return new $actionClass($mapping, $form);
    }
 
 
@@ -340,32 +372,30 @@ class RequestProcessor extends Object {
     * @param Response      $response
     * @param ActionForward $forward
     */
-   protected function processActionForward(Request $request, Response $response, ActionForward $forward=null) {
-      if ($forward) {
-         if ($forward->isRedirect()) {
-            $this->cacheActionMessages($request);
+   protected function processActionForward(Request $request, Response $response, ActionForward $forward) {
+      if ($forward->isRedirect()) {
+         $this->cacheActionMessages($request);
 
-            $context = $request->getAttribute(Struts ::APPLICATION_PATH_KEY);
-            $url = $context.$this->module->getPrefix().$forward->getPath();
+         $context = $request->getAttribute(Struts ::APPLICATION_PATH_KEY);
+         $url = $context.$this->module->getPrefix().$forward->getPath();
 
-            // TODO: Referenz auf init.php entfernen
-            redirect($url);
+         // TODO: Referenz auf init.php entfernen
+         redirect($url);
+      }
+      else {
+         $path = $forward->getPath();
+         $tile = $this->module->findTile($path);
+
+         if (!$tile) {     // it's a page, create a simple one on the fly
+            $class = $this->module->getTilesClass();
+            $tile = new $class($this->module);
+            $tile->setName('generic')
+                 ->setPath($path)
+                 ->freeze();
          }
-         else {
-            $path = $forward->getPath();
-            $tile = $this->module->findTile($path);
 
-            if (!$tile) {     // it's a page, create a simple one on the fly
-               $class = $this->module->getTilesClass();
-               $tile = new $class($this->module);
-               $tile->setName('generic')
-                    ->setPath($path)
-                    ->freeze();
-            }
-
-            // render the tile
-            $tile->render();
-         }
+         // render the tile
+         $tile->render();
       }
    }
 }

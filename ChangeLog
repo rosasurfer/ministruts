@@ -1,3 +1,9 @@
+2007-11-30
+
+   - struts-config.xml: "form-error"-Attribut für ActionMappings, damit können Formulareingaben ohne
+     ActionKlassen validiert werden, wenn außer der Validierung keine weitere Logik benötigt wird
+
+
 2007-11-29
 
    - php/struts/:
@@ -5,16 +11,16 @@
      * forward-Attribut im ActionMapping kann auf globalen Forward oder Tiles-Definition zeigen
      * Tiles können ineinander geschachtelt werden
      * im <set>-Tag in Tilesdefinitionen muß kein Typ mehr angegeben werden, er wird selbst erkannt
-     * in der HTML-Seite kann mit $this->parent->property auf in der umgebenden Tiles-Definition 
+     * in der HTML-Seite kann mit $this->parent->property auf in der umgebenden Tiles-Definition
        gesetzte Eigenschaften zugegriffen werden
 
 
 2007-11-28
 
-   - php/struts/FrontController: strengere Prüfung beim Zugriff auf CVS- oder WEB-INF-Verzeichnis, 
+   - php/struts/FrontController: strengere Prüfung beim Zugriff auf CVS- oder WEB-INF-Verzeichnis,
      als Antwort wird nur noch ein 404 (SC_NOT_FOUND) akzeptiert
 
-   - vorausschauendes Laden weiterer Klassendefinitionen; include('imports.php') in Projekten nicht 
+   - vorausschauendes Laden weiterer Klassendefinitionen; include('imports.php') in Projekten nicht
      mehr nötig
 
 
@@ -60,10 +66,10 @@
 
 2007-11-20
 
-   - php/struts/RequestProcessor: ActionMessages/-Errors werden bei einem Redirect automatisch zum 
+   - php/struts/RequestProcessor: ActionMessages/-Errors werden bei einem Redirect automatisch zum
      nächsten Request übertragen
 
-   - php/cache/: transparenter Namespace-Support, Werte können in verschiedenen Projekten unter 
+   - php/cache/: transparenter Namespace-Support, Werte können in verschiedenen Projekten unter
      denselben Keys gespeichert werden, ohne sich zu stören
 
 
@@ -96,7 +102,7 @@
 
    - php/net/http/CurlHttpRequest: GET und POST implementiert
 
-   - php/struts/FrontController: überprüft während der Initialisierung, ob der Webzugriff auf WEB-INF- 
+   - php/struts/FrontController: überprüft während der Initialisierung, ob der Webzugriff auf WEB-INF-
      und CVS-Verzeichnisse gesperrt ist
 
    - php/net/http/RemoteHttpRequest: gelöscht, statt dessen nur noch CurlHttpRequest verwenden
@@ -113,11 +119,11 @@
 
    - automatische Rollenüberprüfung per struts-config.xml integriert
 
-   - Vereinfachung für die Webentwickler: Action::executeBefore() und Action::execute() können statt 
-     einer ActionForward-Instanz auch einfach nur den entsprechenden Namen zurückgeben (so wie er in 
+   - Vereinfachung für die Webentwickler: Action::executeBefore() und Action::execute() können statt
+     einer ActionForward-Instanz auch einfach nur den entsprechenden Namen zurückgeben (so wie er in
      der struts-config.xml definiert ist)
 
-   - der Modulprefix der Module wird nicht mehr in der struts-config.xml konfiguriert, sondern über 
+   - der Modulprefix der Module wird nicht mehr in der struts-config.xml konfiguriert, sondern über
      den Dateinamen definiert:
 
      struts-config.xml          - Prefix: ""
