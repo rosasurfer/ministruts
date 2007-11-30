@@ -198,7 +198,7 @@ class RequestProcessor extends Object {
 
       $this->logDebug && Logger ::log('Request does not have the required method type, denying access', L_DEBUG, __CLASS__);
       echoPre('Access denied: 403');
-      // TODO: HttpResponse modifizieren und status code setzen
+      // TODO: auf Default-Mapping umleiten
       return false;
    }
 

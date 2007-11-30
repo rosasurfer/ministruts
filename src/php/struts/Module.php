@@ -350,7 +350,8 @@ class Module extends Object {
     */
    protected function processTiles(SimpleXMLElement $xml) {
       foreach ($xml->xPath('/struts-config/tiles-definitions/definition') as $tag) {
-         $tile = $this->getDefinedTile((string) $tag['name'], $xml);
+         $name = (string) $tag['name'];
+         $tile = $this->getDefinedTile($name, $xml);
       }
       // TODO: rekursive Tiles-Definitionen bei Verschachtelung und Vererbung abfangen
    }
@@ -374,13 +375,14 @@ class Module extends Object {
       if (!$nodes)            throw new RuntimeException('Tiles definition not found: "'.$name.'"'); // false oder leeres Array
       if (sizeOf($nodes) > 1) throw new RuntimeException('Non-unique "name" attribute detected for tiles definition "'.$name.'"');
 
+
       $tag = $nodes[0];
       if (sizeOf($tag->attributes()) != 2) throw new RuntimeException('Exactly one of "path" or "extends" must be specified for tiles definition "'.$name.'"');
 
-      // ... create a new instance ...
+      // create a new instance ...
       if ($tag['path']) {                    // 'path' given, it's a simple tile
          $path = (string) $tag['path'];
-         if (!$this->isLocalResource($path)) throw new RuntimeException('Resource "'.$path.'" not found in tile definition "'.$name.'"');
+         if (!$this->isLocalResource($path)) throw new RuntimeException('File "'.$path.'" not found in tile definition "'.$name.'"');
 
          $tile = new $this->tilesClass($this);
          $tile->setPath($path);
@@ -389,23 +391,24 @@ class Module extends Object {
          $parent = $this->getDefinedTile((string) $tag['extends'], $xml);
          $tile = clone $parent;
       }
-      $this->initTile($tile, $tag);
+      $tile->setName($name);
 
-      // ... and save it
+      // process it's properties ...
+      $this->processTileProperties($tile, $tag);
+
+      // ... and finally save it
       $this->addTile($tile);
       return $tile;
    }
 
 
    /**
-    * Initialisiert die übergebene Tile-Instanz mit den Daten ihrer XML-Konfiguration.
+    * Verarbeitet die in einer Tiles-Definition angegebenen zusätzlichen Properties.
     *
     * @param Tile             $tile - Tile-Instanz
     * @param SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration
     */
-   private function initTile(Tile $tile, SimpleXMLElement $xml) {
-      $tile->setName((string) $xml['name']);
-
+   private function processTileProperties(Tile $tile, SimpleXMLElement $xml) {
       foreach ($xml->set as $tag) {
          $name  = (string) $tag['name'];
          // TODO: Name-Value von <set> wird nicht auf Eindeutigkeit überprüft
@@ -420,7 +423,13 @@ class Module extends Object {
                   if (!$this->isResource($value, $xml)) throw new RuntimeException('No resource found for "value" attribute "'.$value.'" in set "'.$name.'" of tiles definition "'.$tile->getName().'"');
             }
             else {
-               $type = $this->isResource($value, $xml) ? Tile ::PROP_TYPE_RESOURCE : Tile ::PROP_TYPE_STRING;
+               if (String ::startsWith($value, 'layouts/') || String ::startsWith($value, 'tiles/')) {
+                  $type = Tile ::PROP_TYPE_RESOURCE;
+                  if (!$this->isResource($value, $xml)) throw new RuntimeException('No resource found for "value" attribute "'.$value.'" in set "'.$name.'" of tiles definition "'.$tile->getName().'"');
+               }
+               else {
+                  $type = $this->isResource($value, $xml) ? Tile ::PROP_TYPE_RESOURCE : Tile ::PROP_TYPE_STRING;
+               }
             }
          }
          else {                  // value im Body
