@@ -33,6 +33,13 @@ class Tile extends Object {
 
 
    /**
+    * Die zur Laufzeit diese Tile-Instanz umgebende Instanz oder NULL, wenn diese Instanz das äußerste
+    * Fragment der Ausgabe darstellt.
+    */
+   protected /*Tile*/ $parent;
+
+
+   /**
     * Constructor
     *
     * @param Module $module - Module, zu dem diese Tile gehört
@@ -115,14 +122,43 @@ class Tile extends Object {
 
 
    /**
+    * Gibt die Property mit dem angegebenen Namen zurück. Magische, überladene Methode. Ermöglicht den
+    * einfachen Zugriff auf zusätzlich definierte String-Properties in Eltern- oder Kind-Definitionen
+    * dieser Tiles-Definitionen.  Es können nur String-Properties abgefragt werden, der Zugriff auf
+    * Page- oder Definition-Properties ist nicht möglich.
+    *
+    * Beispiel:
+    * ---------
+    *    $title = $this->parent->title;
+    *
+    * Gibt die "title"-Eigenschaft der umgebenden Elterndefinition dieser Tile-Instanz zurück.
+    *
+    * @param string $name - Name der zurückzugebenden String-Eigenschaft
+    *
+    * @return string - String-Eigenschaft
+    *
+    * @throws InvalidArgumentException - wenn eine Eigenschaft mit diesem Namen nicht existiert
+    */
+   private function __get($name) {
+      if (isSet($this->properties[$name]))
+         return $this->properties[$name];
+
+      throw new InvalidArgumentException('Invalid argument $name: '.$name);
+   }
+
+
+   /**
     * Initialisiert die für diese Tile definierten zusätzlichen Eigenschaften (siehe <set>-Tag in
     * struts-config.xml).  Dabei werden Bezeichner für in der Tile enthaltene Seiten oder weitere
     * Tilesdefinitionen durch ihre jeweiligen Instanzen ersetzt.
     */
-   private function initProperties() {
+   private function initPageContext() {
       foreach($this->properties as &$property) {
-         if (sizeOf($property) == 1)
-            return;                          // Tile-Properties wurden schon initialisiert
+         if (sizeOf($property) == 1) {          // Property wurde schon initialisiert
+            if ($property instanceof self)
+               $property->parent = $this;
+            continue;
+         }
 
          $type  = $property[0];
          $value = $property[1];
@@ -140,6 +176,8 @@ class Tile extends Object {
                     ->setPath($value)
                     ->freeze();
             }
+            $tile->parent = $this;
+
             $property = $tile;
          }
       }
@@ -166,7 +204,7 @@ class Tile extends Object {
     * Zeigt den Inhalt dieser Komponente an.
     */
    public function render() {
-      $this->initProperties();
+      $this->initPageContext();
 
       $request  = Request  ::me();
       $response = Response ::me();
