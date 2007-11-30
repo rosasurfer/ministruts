@@ -439,6 +439,7 @@ class Module extends Object {
             if ($type == Tile ::PROP_TYPE_RESOURCE) throw new RuntimeException('A "value" attribute must be specified for type "resource" in set "'.$name.'" of tiles definition "'.$tile->getName().'"');
          }
 
+         // TODO: bei extended Tiles Typübereinstimmung überladener Properties prüfen
          $tile->setProperty($name, $type, $value);
       }
    }
