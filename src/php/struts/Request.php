@@ -2,10 +2,13 @@
 /**
  * Request
  *
- * Diese Klasse stellt den HTTP-Request mit seinen Daten dar, sowie er von PHP an das aufgerufene Script
- * übergeben wurde. Da es immer nur einen einzigen Request geben kann, ist er als Singleton implementiert.
- * Das bedeutet unter anderem, daß es keinen öffentlichen Konstruktor gibt, man kann also nicht selbst
- * einen neuen Request erzeugen (es gibt nur den einen, der vom Server an PHP weitergereicht wurde).
+ * Diese Klasse stellt den HTTP-Request mit seinen Daten dar, sowie er von PHP an das aufgerufene
+ * Script übergeben wurde. Da es immer nur einen einzigen Request geben kann, ist er als Singleton
+ * implementiert.  Das bedeutet unter anderem, daß es keinen öffentlichen Konstruktor gibt, man kann
+ * also nicht selbst einen neuen Request erzeugen (es gibt nur den einen, der vom Server an PHP
+ * weitergereicht wurde).
+ *
+ * TODO: LinkTool implementieren, um path-info verwenden zu können
  */
 final class Request extends Singleton {
 
@@ -386,8 +389,8 @@ final class Request extends Singleton {
 
 
    /**
-    * Ob unter dem angegebenen Schlüssel eine Error-Message existiert.  Ohne Angabe eines Schlüssel wird
-    * geprüft, ob eine beliebige Error-Message existiert.
+    * Ob unter dem angegebenen Schlüssel eine Error-Message existiert.  Ohne Angabe eines Schlüssel
+    * wird geprüft, ob eine beliebige Error-Message existiert.
     *
     * @param string $key - Schlüssel
     *
