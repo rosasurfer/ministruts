@@ -2,7 +2,7 @@
 /**
  * RuntimeMemoryCache
  *
- * Prozess-Cache. Cacht Objekte nur im Speicher (RAM) des aktuellen Prozesses, nicht Request-übergreifend.
+ * Prozess-Cache. Cacht Objekte im Speicher (RAM) des aktuellen Prozesses, nicht Request-übergreifend.
  * Nützlich als Fallback, wenn ein Cache benötigt wird, jedoch keiner installiert ist.
  */
 final class RuntimeMemoryCache extends AbstractCachePeer {

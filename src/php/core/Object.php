@@ -32,7 +32,7 @@ class Object {
     *
     * @throws RuntimeException
     */
-   private static function __set($property, $value) {
+   private function __set($property, $value) {
       $trace = debug_backTrace();
       $class = get_class($trace[0]['object']);
       throw new RuntimeException("Undefined class variable $class::$property");

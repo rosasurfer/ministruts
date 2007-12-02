@@ -25,6 +25,7 @@ abstract class PersistableObject extends Object {
    protected $id;                // Primary Key:         int
    protected $version;           // Versionsnummer:      timestamp (string)
    protected $created;           // Erzeugungszeitpunkt: datetime  (string)
+   protected $deleted;           // Löschzeitpunkt:      datetime  (string)
 
 
    /**
@@ -59,6 +60,31 @@ abstract class PersistableObject extends Object {
          return $this->created;
 
       return formatDate($format, $this->created);
+   }
+
+
+   /**
+    * Gibt den Erstellungszeitpunkt dieser Instanz zurück.
+    *
+    * @param string $format - Zeitformat
+    *
+    * @return string - Zeitpunkt
+    */
+   public function getDeleted($format = 'Y-m-d H:i:s')  {
+      if ($format == 'Y-m-d H:i:s')
+         return $this->deleted;
+
+      return formatDate($format, $this->deleted);
+   }
+
+
+   /**
+    * Ob diese Instanz in der Datenbank als "gelöscht" markiert ist (Soft-Delete).
+    *
+    * @return boolean
+    */
+   public function isDeleted() {
+      return ($this->deleted !== null);
    }
 
 
@@ -129,9 +155,8 @@ abstract class PersistableObject extends Object {
       // Example:
       // --------
       public static function createInstance(array &$data) {
-         $instance = new YourClass();
-         PersistableObject::populate($instance, YourClass::$mapping, $data);
-         return $instance;
+         $instance = new self();
+         return parent ::populate($instance, self::$mapping, $data);
       }
       */
    }
