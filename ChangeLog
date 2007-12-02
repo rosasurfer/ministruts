@@ -1,3 +1,8 @@
+2007-12-02
+
+   - neu: php/struts/PageContext zum Datenaustausch zwischen Templates
+
+
 2007-11-30
 
    - struts-config.xml: "form-error"-Attribut für ActionMappings, damit können Formulareingaben ohne

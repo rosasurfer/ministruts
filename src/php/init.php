@@ -52,6 +52,7 @@ $__imports['ActionMapping'                  ] = 'php/struts/ActionMapping';
 $__imports['FrontController'                ] = 'php/struts/FrontController';
 $__imports['HttpSession'                    ] = 'php/struts/HttpSession';
 $__imports['Module'                         ] = 'php/struts/Module';
+$__imports['PageContext'                    ] = 'php/struts/PageContext';
 $__imports['Request'                        ] = 'php/struts/Request';
 $__imports['RequestProcessor'               ] = 'php/struts/RequestProcessor';
 $__imports['Response'                       ] = 'php/struts/Response';
@@ -166,6 +167,7 @@ function &executeSql($sql, array &$db) {
    if (!is_string($sql) || !($sql = trim($sql)))
       throw new InvalidArgumentException('Invalid SQL string: '.$sql);
 
+
    if (!isSet($db['server']) || !isSet($db['user']) || !isSet($db['password']) || !$db['database'] || !array_key_exists('connection', $db))
       throw new InvalidArgumentException('Invalid database configuration: '.$db);
 
@@ -222,7 +224,7 @@ function &executeSql($sql, array &$db) {
  */
 function beginTransaction(array &$db) {
    if (isSet($db['transaction']) && $db['transaction']) {
-      $db['transaction'] = $db['transaction'] + 1;
+      ++$db['transaction'];
       return false;
    }
 

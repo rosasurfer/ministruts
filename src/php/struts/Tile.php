@@ -137,13 +137,13 @@ class Tile extends Object {
     *
     * @return string - String-Eigenschaft
     *
-    * @throws InvalidArgumentException - wenn eine Eigenschaft mit diesem Namen nicht existiert
+    * @throws RuntimeException - wenn eine Eigenschaft mit diesem Namen nicht existiert
     */
    private function __get($name) {
       if (isSet($this->properties[$name]))
          return $this->properties[$name];
 
-      throw new InvalidArgumentException('Invalid argument $name: '.$name);
+      throw new RuntimeException('Invalid argument $name: '.$name);
    }
 
 
@@ -152,7 +152,7 @@ class Tile extends Object {
     * struts-config.xml).  Dabei werden Bezeichner für in der Tile enthaltene Seiten oder weitere
     * Tilesdefinitionen durch ihre jeweiligen Instanzen ersetzt.
     */
-   private function initPageContext() {
+   private function initContext() {
       foreach($this->properties as &$property) {
          if (sizeOf($property) == 1) {          // Property wurde schon initialisiert
             if ($property instanceof self)
@@ -204,13 +204,15 @@ class Tile extends Object {
     * Zeigt den Inhalt dieser Komponente an.
     */
    public function render() {
-      $this->initPageContext();
+      $this->initContext();
+
+      extract($this->properties);
 
       $request  = Request  ::me();
       $response = Response ::me();
       $form     = $request->getAttribute(Struts ::ACTION_FORM_KEY);
 
-      extract($this->properties);
+      $PAGE = PageContext ::me();
 
       // TODO: Framework vor Zugriff aus der HTML-Seite mit $this schützen
       include($this->module->getResourceBase().$this->path);
