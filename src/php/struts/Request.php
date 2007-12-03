@@ -179,6 +179,17 @@ final class Request extends Singleton {
 
 
    /**
+    * Ob mit dem Request eine Session-ID übertragen wurde.
+    *
+    * @return boolean
+    */
+   public function isSessionId() {
+      $name = session_name();
+      return (isSet($_COOKIE [$name]) || isSet($_REQUEST[$name]));
+   }
+
+
+   /**
     * Ob eine aktuelle HttpSession existiert oder nicht.
     *
     * @return boolean

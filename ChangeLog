@@ -3,9 +3,14 @@
    - einige globale Funktionen aus init.php entfernt (statt dessen nur noch Methoden der jeweiligen
      Objekte benutzen)
 
-   - neu: php/net/http/HeaderUtils, php/struts/PageContext::get(), php/struts/PageContext::set()
+   - neu: php/net/http/HeaderUtils
+          php/struts/PageContext::get()
+          php/struts/PageContext::set()
+          php/struts/Request::isSessionId()
 
-   - die HttpSession ist nur noch über Request::getSession() zu erreichen, nicht mehr allein
+   - die HttpSession ist nur noch per Request::getSession() zu erreichen, nicht mehr durch HttpSession::me()
+
+   - die HttpSession wird automatisch gestartet und nur, wenn sie wirklich benötigt wird
 
 
 2007-12-02

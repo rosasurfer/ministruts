@@ -36,6 +36,10 @@ class RequestProcessor extends Object {
     */
    final public function process(Request $request, Response $response) {
 
+      // falls angefordert, Session starten
+      $this->processSession($request, $response);
+
+
       // falls notwendig, ein Locale setzen
       $this->processLocale($request, $response);
 
@@ -86,6 +90,20 @@ class RequestProcessor extends Object {
 
       // den zurückgegebenen ActionForward verarbeiten
       $this->processActionForward($request, $response, $forward);
+   }
+
+
+   /**
+    * Startet eine HttpSession bzw. setzt eine vorhergehende fort, wenn eine Session-ID übertragen
+    * wurde, die Session aber noch nicht läuft.
+    *
+    * @param Request  $request
+    * @param Response $response
+    */
+   protected function processSession(Request $request, Response $response) {
+      if (!$request->isSession() && $request->isSessionId()) {
+         $session = $request->getSession();
+      }
    }
 
 
