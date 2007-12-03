@@ -18,11 +18,6 @@ final class Request extends Singleton {
    private $uri;
    private $path;
 
-   /**
-    * HttpSession des Requests, falls eine existiert
-    */
-   protected /*HttpSession*/ $session = null;
-
 
    // Attribute-Pool
    private $attributes = array();
@@ -199,10 +194,7 @@ final class Request extends Singleton {
     * @return HttpSession
     */
    public function getSession() {
-      if (!$this->session)
-         $this->session = HttpSession ::me();
-
-      return $this->session;
+      return HttpSession ::me($this);
    }
 
 
