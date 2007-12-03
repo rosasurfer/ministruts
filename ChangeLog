@@ -1,3 +1,9 @@
+2007-12-03
+
+   - einige globale Funktionen aus init.php entfernt (statt dessen nur noch Methoden der jeweiligen
+     Objekte benutzen)
+
+
 2007-12-02
 
    - neu: php/struts/PageContext zum Datenaustausch zwischen Templates

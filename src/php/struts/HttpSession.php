@@ -126,5 +126,24 @@ class HttpSession extends Singleton {
    public function getName() {
       return session_name();
    }
+
+
+   /**
+    * Entfernt alle gespeicherten Informationen aus der aktuellen Session.
+    *
+    * @return boolean - TRUE, wenn alle gespeicherten Informationen gelöscht wurden
+    *                   FALSE, wenn keine Session existiert
+   function clearSession() {
+      if (isSession()) {
+         $keys = array_keys($_SESSION);
+         foreach ($keys as $key) {
+            if (!String ::startsWith($key, '__SESSION_'))
+               unSet($_SESSION[$key]);
+         }
+         return true;
+      }
+      return false;
+   }
+    */
 }
 ?>
