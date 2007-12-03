@@ -248,7 +248,7 @@ class Module extends Object {
          if (sizeOf($tag->attributes()) > 2) throw new RuntimeException('Only one of "include", "redirect" or "alias" must be specified for global forward "'.$name.'"');
 
          if ($path = (string) $tag['include']) {
-            if (!$this->isResource($path, $xml)) throw new RuntimeException('No resource found for "include" attribute "'.$path.'" of global forward "'.$name.'"');
+            if (!$this->isResource($path, $xml)) throw new RuntimeException('Resource "'.$path.'" not found for attribute "include" of global forward "'.$name.'"');
             $forward = new $this->forwardClass($name, $path, false);
          }
          else {
@@ -266,7 +266,7 @@ class Module extends Object {
 
          $alias = (string) $tag['alias'];
          $forward = $this->findForward($alias);
-         if (!$forward) throw new RuntimeException('No forward found for "alias" attribute "'.$alias.'" of global forward "'.$name.'"');
+         if (!$forward) throw new RuntimeException('Forward "'.$alias.'" not found for attribute "alias" attribute of global forward "'.$name.'"');
 
          $this->addForward($name, $forward);
       }
@@ -295,7 +295,7 @@ class Module extends Object {
             }
             else {
                $forward = $this->findForward($path);
-               if (!$forward) throw new RuntimeException('No resource or forward found for "forward" attribute "'.$path.'" of mapping "'.$mapping->getPath().'"');
+               if (!$forward) throw new RuntimeException('Resource or forward "'.$path.'" not found for attribute "forward" of mapping "'.$mapping->getPath().'"');
             }
             $mapping->setForward($forward);
          }
@@ -329,7 +329,7 @@ class Module extends Object {
             else {
                $forward = $this->findForward($path);
                // TODO: es muß eine Mapping-URL als Forward möglich sein
-               if (!$forward) throw new RuntimeException('No resource or forward found for "form-error" attribute "'.$path.'" of mapping "'.$mapping->getPath().'"');
+               if (!$forward) throw new RuntimeException('Resource or forward "'.$path.'" not found for attribute "form-error" of mapping "'.$mapping->getPath().'"');
             }
             $mapping->setFormErrorForward($forward);
          }
@@ -355,7 +355,7 @@ class Module extends Object {
             if (sizeOf($forwardTag->attributes()) > 2) throw new RuntimeException('Only one of "include", "redirect" or "alias" must be specified for forward "'.$name.'" of mapping "'.$mapping->getPath().'"');
 
             if ($path = (string) $forwardTag['include']) {
-               if (!$this->isResource($path, $xml)) throw new RuntimeException('No resource found for "include" attribute "'.$path.'" of forward "'.$name.'" of mapping "'.$mapping->getPath().'"');
+               if (!$this->isResource($path, $xml)) throw new RuntimeException('Resource "'.$path.'" not found for attribute "include" of forward "'.$name.'" of mapping "'.$mapping->getPath().'"');
                $forward = new $this->forwardClass($name, $path, false);
             }
             else {
@@ -375,7 +375,7 @@ class Module extends Object {
             if ($alias == ActionForward ::__SELF) throw new RuntimeException('Can not use protected keyword "'.$alias.'" as "alias" attribute value for forward "'.$name.'" of mapping "'.$mapping->getPath().'"');
 
             $forward = $mapping->findForward($alias);
-            if (!$forward) throw new RuntimeException('No forward found for "alias" attribute "'.$alias.'" of forward "'.$name.'" of mapping "'.$mapping->getPath().'"');
+            if (!$forward) throw new RuntimeException('Forward "'.$alias.'" not found for attribute "alias" of forward "'.$name.'" of mapping "'.$mapping->getPath().'"');
 
             $mapping->addForward($name, $forward);
          }
@@ -464,12 +464,12 @@ class Module extends Object {
             if ($tag['type']) {
                $type = (string) $tag['type'];
                if ($type == Tile ::PROP_TYPE_RESOURCE)
-                  if (!$this->isResource($value, $xml)) throw new RuntimeException('No resource found for "value" attribute "'.$value.'" in set "'.$name.'" of tiles definition "'.$tile->getName().'"');
+                  if (!$this->isResource($value, $xml)) throw new RuntimeException('Resource "'.$value.'" not found for attribute "value" in set "'.$name.'" of tiles definition "'.$tile->getName().'"');
             }
             else {
                if (String ::startsWith($value, 'layouts/') || String ::startsWith($value, 'tiles/')) {
                   $type = Tile ::PROP_TYPE_RESOURCE;
-                  if (!$this->isResource($value, $xml)) throw new RuntimeException('No resource found for "value" attribute "'.$value.'" in set "'.$name.'" of tiles definition "'.$tile->getName().'"');
+                  if (!$this->isResource($value, $xml)) throw new RuntimeException('Resource "'.$value.'" not found for attribute "value" in set "'.$name.'" of tiles definition "'.$tile->getName().'"');
                }
                else {
                   $type = $this->isResource($value, $xml) ? Tile ::PROP_TYPE_RESOURCE : Tile ::PROP_TYPE_STRING;
