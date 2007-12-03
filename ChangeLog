@@ -10,7 +10,7 @@
 
    - die HttpSession ist nur noch per Request::getSession() zu erreichen, nicht mehr durch HttpSession::me()
 
-   - die HttpSession wird automatisch gestartet und nur, wenn sie wirklich benötigt wird
+   - die HttpSession wird automatisch und nur, wenn sie wirklich benötigt wird, gestartet
 
 
 2007-12-02
