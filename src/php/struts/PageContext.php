@@ -37,6 +37,29 @@ class PageContext extends Singleton {
 
 
    /**
+    * Gibt einen Wert aus dem PageContext zurück.
+    *
+    * @param string $key - Schlüssel, unter dem der Wert gespeichert ist
+    *
+    * @return mixed - der gespeicherte Wert oder NULL, falls kein solcher Schlüssel existiert
+    */
+   public static function get($key) {
+      return self::me()->__get($key);
+   }
+
+
+   /**
+    * Speichert einen Wert im PageContext.
+    *
+    * @param string $key   - Schlüssel, unter dem der Wert gespeichert wird
+    * @param mixed  $value - der zu speichernde Wert
+    */
+   public static function set($key, $value) {
+      return self::me()->__set($key, $value);
+   }
+
+
+   /**
     * Magische Methode, die die Eigenschaft mit dem angegebenen Namen zurückgibt. Wird automatisch
     * aufgerufen und ermöglicht den Zugriff auf Eigenschaften mit dynamischen Namen.
     *
