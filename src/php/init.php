@@ -66,7 +66,7 @@ $__imports['Config'                         ] = 'php/util/Config';
 $__imports['Logger'                         ] = 'php/util/Logger';
 $__imports['String'                         ] = 'php/util/String';
 
-@include('classes.php');  // vorausschauendes Laden weiterer Definitionen vor Einrichten des ErrorHandlers
+@include('c'.'lasses.php');  // ggf. Laden weiterer Definitionen (der String-Hack ist nur für Eclipse da)
 
 
 
