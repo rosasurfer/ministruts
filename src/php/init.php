@@ -36,6 +36,7 @@ $__imports['TorHelper'                      ] = 'php/net/TorHelper';
 $__imports['CurlHttpClient'                 ] = 'php/net/http/CurlHttpClient';
 $__imports['CurlHttpResponse'               ] = 'php/net/http/CurlHttpResponse';
 $__imports['HeaderParser'                   ] = 'php/net/http/HeaderParser';
+$__imports['HeaderUtils'                    ] = 'php/net/http/HeaderUtils';
 $__imports['HttpClient'                     ] = 'php/net/http/HttpClient';
 $__imports['HttpRequest'                    ] = 'php/net/http/HttpRequest';
 $__imports['HttpResponse'                   ] = 'php/net/http/HttpResponse';
@@ -352,33 +353,6 @@ function getRandomID($length) {
       $id = subStr($id, 0, $length);               // oder auf die gewünschte Länge kürzen
    }
    return $id;
-}
-
-
-/**
- * Sendet einen Redirect-Header mit der angegebenen URL. Danach wird das aktuelle Script beendet.
- *
- * @param string $url - URL
- */
-function redirect($url) {
-   if (isSession()) {
-      if (isSessionNew() || SID !== '') {                      // bleiben wir innerhalb der Domain und Cookies sind aus, wird eine evt. Session-ID weitergegeben
-         $host = strToLower(!empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']);
-         $found = preg_match_all('/^https?:\/{2,}([a-z0-9-]+(\.[a-z0-9-]+)*)*.*$/', strToLower(trim($url)), $matches, PREG_SET_ORDER);
-
-         if (!$found || $matches[0][1]==$host) {               // SID anhängen
-            $url .= (String ::contains($url, '?') ? ini_get('arg_separator.output') : '?').SID;
-         }
-      }
-      session_write_close();
-   }
-   /** TODO: HTTP/1.1 requires an absolute URI as argument to 'Location:' including the scheme, hostname and
-    *        absolute path, but some clients accept relative URIs. You can usually use $_SERVER['HTTP_HOST'],
-    *        $_SERVER['PHP_SELF'] and dirname() to make an absolute URI from a relative one yourself.
-    */
-
-   header('Location: '.$url);
-   exit();                       // Ausgabe weiteren Contents verhindern
 }
 
 

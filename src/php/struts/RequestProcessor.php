@@ -378,9 +378,7 @@ class RequestProcessor extends Object {
 
          $context = $request->getAttribute(Struts ::APPLICATION_PATH_KEY);
          $url = $context.$this->module->getPrefix().$forward->getPath();
-
-         // TODO: Referenz auf init.php entfernen
-         redirect($url);
+         HeaderUtils ::redirect($url);
       }
       else {
          $path = $forward->getPath();
