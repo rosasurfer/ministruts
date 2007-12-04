@@ -119,6 +119,7 @@ set_exception_handler('wrapExceptionHandler');
 function __autoload($className /*, $throw */) {
    try {
       if (isSet($GLOBALS['__imports'][$className])) {
+         // TODO: warnen, wenn der Pfad nicht absolut ist
          include($GLOBALS['__imports'][$className].'.php');
          return true;
       }

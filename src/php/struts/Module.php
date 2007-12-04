@@ -194,9 +194,9 @@ class Module extends Object {
       if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
       $baseDirectory = dirName((string) $xml['config-file']);
-      if ($xml['doc-base'])
-         $baseDirectory .= '/'.trim($xml['doc-base'], '/\\');
-
+      if ($xml['doc-base']) {
+         $baseDirectory = realPath($baseDirectory.DIRECTORY_SEPARATOR.trim($xml['doc-base'], '/\\'));
+      }
       if (!is_dir($baseDirectory)) throw new FileNotFoundException('Directory not found: '.$baseDirectory);
 
       // trailing slash at the end to allow people omitting the leading slash at their resources
