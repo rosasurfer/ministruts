@@ -4,6 +4,8 @@
 
    - Klassen werden mit absolutem Pfad geladen, dadurch muß "include_path" nicht mehr durchsucht werden
 
+   - $__imports -> $__classes
+
 
 2007-12-03
 

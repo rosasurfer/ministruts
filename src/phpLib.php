@@ -7,66 +7,66 @@
 // -------------------
 $dir = dirName(__FILE__).DIRECTORY_SEPARATOR;
 
-$__imports['AbstractCachePeer'              ] = $dir.'php/cache/AbstractCachePeer';
-$__imports['ApcCache'                       ] = $dir.'php/cache/ApcCache';
-$__imports['Cache'                          ] = $dir.'php/cache/Cache';
-$__imports['RuntimeMemoryCache'             ] = $dir.'php/cache/RuntimeMemoryCache';
+$__classes['AbstractCachePeer'              ] = $dir.'php/cache/AbstractCachePeer';
+$__classes['ApcCache'                       ] = $dir.'php/cache/ApcCache';
+$__classes['Cache'                          ] = $dir.'php/cache/Cache';
+$__classes['RuntimeMemoryCache'             ] = $dir.'php/cache/RuntimeMemoryCache';
 
-$__imports['Instantiatable'                 ] = $dir.'php/core/Instantiatable';
-$__imports['Object'                         ] = $dir.'php/core/Object';
-$__imports['Singleton'                      ] = $dir.'php/core/Singleton';
-$__imports['StaticClass'                    ] = $dir.'php/core/StaticClass';
+$__classes['Instantiatable'                 ] = $dir.'php/core/Instantiatable';
+$__classes['Object'                         ] = $dir.'php/core/Object';
+$__classes['Singleton'                      ] = $dir.'php/core/Singleton';
+$__classes['StaticClass'                    ] = $dir.'php/core/StaticClass';
 
-$__imports['ConcurrentModificationException'] = $dir.'php/db/ConcurrentModificationException';
-$__imports['PersistableObject'              ] = $dir.'php/db/PersistableObject';
+$__classes['ConcurrentModificationException'] = $dir.'php/db/ConcurrentModificationException';
+$__classes['PersistableObject'              ] = $dir.'php/db/PersistableObject';
 
-$__imports['BusinessRuleException'          ] = $dir.'php/exceptions/BusinessRuleException';
-$__imports['ClassNotFoundException'         ] = $dir.'php/exceptions/ClassNotFoundException';
-$__imports['FileNotFoundException'          ] = $dir.'php/exceptions/FileNotFoundException';
-$__imports['IOException'                    ] = $dir.'php/exceptions/IOException';
-$__imports['IllegalStateException'          ] = $dir.'php/exceptions/IllegalStateException';
-$__imports['IllegalTypeException'           ] = $dir.'php/exceptions/IllegalTypeException';
-$__imports['InfrastructureException'        ] = $dir.'php/exceptions/InfrastructureException';
-$__imports['InvalidArgumentException'       ] = $dir.'php/exceptions/InvalidArgumentException';
-$__imports['NestableException'              ] = $dir.'php/exceptions/NestableException';
-$__imports['NoPermissionException'          ] = $dir.'php/exceptions/NoPermissionException';
-$__imports['PHPErrorException'              ] = $dir.'php/exceptions/PHPErrorException';
-$__imports['RuntimeException'               ] = $dir.'php/exceptions/RuntimeException';
+$__classes['BusinessRuleException'          ] = $dir.'php/exceptions/BusinessRuleException';
+$__classes['ClassNotFoundException'         ] = $dir.'php/exceptions/ClassNotFoundException';
+$__classes['FileNotFoundException'          ] = $dir.'php/exceptions/FileNotFoundException';
+$__classes['IOException'                    ] = $dir.'php/exceptions/IOException';
+$__classes['IllegalStateException'          ] = $dir.'php/exceptions/IllegalStateException';
+$__classes['IllegalTypeException'           ] = $dir.'php/exceptions/IllegalTypeException';
+$__classes['InfrastructureException'        ] = $dir.'php/exceptions/InfrastructureException';
+$__classes['InvalidArgumentException'       ] = $dir.'php/exceptions/InvalidArgumentException';
+$__classes['NestableException'              ] = $dir.'php/exceptions/NestableException';
+$__classes['NoPermissionException'          ] = $dir.'php/exceptions/NoPermissionException';
+$__classes['PHPErrorException'              ] = $dir.'php/exceptions/PHPErrorException';
+$__classes['RuntimeException'               ] = $dir.'php/exceptions/RuntimeException';
 
-$__imports['TorHelper'                      ] = $dir.'php/net/TorHelper';
+$__classes['TorHelper'                      ] = $dir.'php/net/TorHelper';
 
-$__imports['CurlHttpClient'                 ] = $dir.'php/net/http/CurlHttpClient';
-$__imports['CurlHttpResponse'               ] = $dir.'php/net/http/CurlHttpResponse';
-$__imports['HeaderParser'                   ] = $dir.'php/net/http/HeaderParser';
-$__imports['HeaderUtils'                    ] = $dir.'php/net/http/HeaderUtils';
-$__imports['HttpClient'                     ] = $dir.'php/net/http/HttpClient';
-$__imports['HttpRequest'                    ] = $dir.'php/net/http/HttpRequest';
-$__imports['HttpResponse'                   ] = $dir.'php/net/http/HttpResponse';
+$__classes['CurlHttpClient'                 ] = $dir.'php/net/http/CurlHttpClient';
+$__classes['CurlHttpResponse'               ] = $dir.'php/net/http/CurlHttpResponse';
+$__classes['HeaderParser'                   ] = $dir.'php/net/http/HeaderParser';
+$__classes['HeaderUtils'                    ] = $dir.'php/net/http/HeaderUtils';
+$__classes['HttpClient'                     ] = $dir.'php/net/http/HttpClient';
+$__classes['HttpRequest'                    ] = $dir.'php/net/http/HttpRequest';
+$__classes['HttpResponse'                   ] = $dir.'php/net/http/HttpResponse';
 
-$__imports['Mailer'                         ] = $dir.'php/net/mail/Mailer';
+$__classes['Mailer'                         ] = $dir.'php/net/mail/Mailer';
 
-$__imports['BasePdfDocument'                ] = $dir.'php/pdf/BasePdfDocument';
-$__imports['SimplePdfDocument'              ] = $dir.'php/pdf/SimplePdfDocument';
+$__classes['BasePdfDocument'                ] = $dir.'php/pdf/BasePdfDocument';
+$__classes['SimplePdfDocument'              ] = $dir.'php/pdf/SimplePdfDocument';
 
-$__imports['Action'                         ] = $dir.'php/struts/Action';
-$__imports['ActionForm'                     ] = $dir.'php/struts/ActionForm';
-$__imports['ActionForward'                  ] = $dir.'php/struts/ActionForward';
-$__imports['ActionMapping'                  ] = $dir.'php/struts/ActionMapping';
-$__imports['FrontController'                ] = $dir.'php/struts/FrontController';
-$__imports['HttpSession'                    ] = $dir.'php/struts/HttpSession';
-$__imports['Module'                         ] = $dir.'php/struts/Module';
-$__imports['PageContext'                    ] = $dir.'php/struts/PageContext';
-$__imports['Request'                        ] = $dir.'php/struts/Request';
-$__imports['RequestProcessor'               ] = $dir.'php/struts/RequestProcessor';
-$__imports['Response'                       ] = $dir.'php/struts/Response';
-$__imports['RoleProcessor'                  ] = $dir.'php/struts/RoleProcessor';
-$__imports['Struts'                         ] = $dir.'php/struts/Struts';
-$__imports['Tile'                           ] = $dir.'php/struts/Tile';
+$__classes['Action'                         ] = $dir.'php/struts/Action';
+$__classes['ActionForm'                     ] = $dir.'php/struts/ActionForm';
+$__classes['ActionForward'                  ] = $dir.'php/struts/ActionForward';
+$__classes['ActionMapping'                  ] = $dir.'php/struts/ActionMapping';
+$__classes['FrontController'                ] = $dir.'php/struts/FrontController';
+$__classes['HttpSession'                    ] = $dir.'php/struts/HttpSession';
+$__classes['Module'                         ] = $dir.'php/struts/Module';
+$__classes['PageContext'                    ] = $dir.'php/struts/PageContext';
+$__classes['Request'                        ] = $dir.'php/struts/Request';
+$__classes['RequestProcessor'               ] = $dir.'php/struts/RequestProcessor';
+$__classes['Response'                       ] = $dir.'php/struts/Response';
+$__classes['RoleProcessor'                  ] = $dir.'php/struts/RoleProcessor';
+$__classes['Struts'                         ] = $dir.'php/struts/Struts';
+$__classes['Tile'                           ] = $dir.'php/struts/Tile';
 
-$__imports['BaseValidator'                  ] = $dir.'php/util/BaseValidator';
-$__imports['Config'                         ] = $dir.'php/util/Config';
-$__imports['Logger'                         ] = $dir.'php/util/Logger';
-$__imports['String'                         ] = $dir.'php/util/String';
+$__classes['BaseValidator'                  ] = $dir.'php/util/BaseValidator';
+$__classes['Config'                         ] = $dir.'php/util/Config';
+$__classes['Logger'                         ] = $dir.'php/util/Logger';
+$__classes['String'                         ] = $dir.'php/util/String';
 
 @include($dir='classes.php');    // vorausschauendes Definieren weiterer Klassen
 unset($dir);
@@ -118,9 +118,17 @@ set_exception_handler('wrapExceptionHandler');
  */
 function __autoload($className /*, $throw */) {
    try {
-      if (isSet($GLOBALS['__imports'][$className])) {
-         // TODO: warnen, wenn der Pfad nicht absolut ist
-         include($GLOBALS['__imports'][$className].'.php');
+      if (isSet($GLOBALS['__classes'][$className])) {
+         $className = $GLOBALS['__classes'][$className];
+
+         // TODO: Warnen bei relativen Klassendefinitionen
+         /*
+         $relative = WINDOWS ? !preg_match('/^[a-zA-Z]:/', $className) : (strPos($className, '/') !== 0);
+         if ($relative)
+            Logger ::log('Not an absolute class name definition: '.$className, L_WARN, __CLASS__);
+         */
+
+         include($className.'.php');
          return true;
       }
       throw new ClassNotFoundException("Undefined class '$className'");
