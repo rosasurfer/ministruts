@@ -1,3 +1,10 @@
+2007-12-04
+
+   - php/init.php -> phpLib.php
+
+   - Klassen werden mit absolutem Pfad geladen, dadurch muß "include_path" nicht mehr durchsucht werden
+
+
 2007-12-03
 
    - einige globale Funktionen aus init.php entfernt (statt dessen nur noch Methoden der jeweiligen
