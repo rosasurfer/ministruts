@@ -1,3 +1,8 @@
+2007-12-05
+
+   - php/net/http/HttpResponse: Status-Codes implementiert
+
+
 2007-12-04
 
    - php/init.php -> phpLib.php

@@ -12,7 +12,7 @@ final class CurlHttpClient extends HttpClient {
 
    private $currentRedirect = 0;    // int:  für manuelle Redirects (wenn open_basedir|safe_mode aktiv ist und followRedirects TRUE ist)
 
-   // CURL-Fehlerkonstanten
+   // CURL-Fehlerbeschreibungen
    private static $errors = array(CURLE_OK                      => 'CURLE_OK'                     ,
                                   CURLE_UNSUPPORTED_PROTOCOL    => 'CURLE_UNSUPPORTED_PROTOCOL'   ,
                                   CURLE_FAILED_INIT             => 'CURLE_FAILED_INIT'            ,

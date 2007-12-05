@@ -42,8 +42,9 @@ class TorHelper extends StaticClass {
             $request = HttpRequest ::create()->setUrl('http://'.self::$torMirrors[$i].'/ip_list_exit.php/Tor_ip_list_EXIT.csv');
             try {
                $response = CurlHttpClient ::create()->setFollowRedirects(true)->send($request);
-               if ($response->getStatus() != 200) {
-                  Logger ::log('Could not get Tor exit nodes, got HTTP status '.$response->getStatus().' for url: '.$request->getUrl(), L_NOTICE, __CLASS__);
+               $status = $response->getStatus();
+               if ($status != 200) {
+                  Logger ::log('Could not get Tor exit nodes, got HTTP status '.$status.' ('.HttpResponse ::$sc[$status].') for url: '.$request->getUrl(), L_NOTICE, __CLASS__);
                   continue;
                }
             }

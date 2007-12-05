@@ -4,7 +4,7 @@
  *
  * Stellt die Anwort auf einen von Curl gestellten HttpRequest dar.
  */
-final class CurlHttpResponse implements HttpResponse {
+final class CurlHttpResponse extends HttpResponse {
 
 
    // HeaderParser
@@ -101,8 +101,7 @@ final class CurlHttpResponse implements HttpResponse {
 
 
    /**
-    * Nur für internen Gebrauch:  Callback für CurlHttpClient, der der Content des HTTP-Requests chunk-weise
-    * --------------------------  übergeben wird.
+    * Callback für CurlHttpClient, dem der Content des HTTP-Requests chunk-weise übergeben wird.
     *
     * @param resource $handle - das aktuelle CURL-Handle
     * @param string   $data   - die empfangenen Daten
@@ -119,8 +118,7 @@ final class CurlHttpResponse implements HttpResponse {
 
 
    /**
-    * Nur für internen Gebrauch:  Callback für CurlHttpClient, der die Response-Header zeilenweise übergeben werden.
-    * --------------------------
+    * Callback für CurlHttpClient, dem die Response-Header zeilenweise übergeben werden.
     *
     * @param resource $handle - das aktuelle CURL-Handle
     * @param string   $line   - vollständige Headerzeile, bestehend aus dem Namen, einem Doppelpunkt und den Daten
