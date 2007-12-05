@@ -75,12 +75,17 @@ final class FrontController extends Singleton {
                          $contextURL.'CVS/',
                          );
       foreach ($locations as $location) {
-         // TODO: Authentifizierungs-Infos müssen ggf. vom aktuellen Request übernommen werden
          $request  = HttpRequest ::create()->setUrl($location);
          $response = CurlHttpClient ::create()->send($request);
          $status = $response->getStatus();
-         if ($status != 404)
-            throw new InfrastructureException('Fatal web server configuration error, resource at "'.$location.'" is not hidden: '.$status);
+
+         // TODO: Authentication support einbauen
+         if ($status == 401) {
+            Logger ::log('Web server configuration check: authentication support not yet implemented, location: "'.$location.'"', L_NOTICE, __CLASS__);
+         }
+         elseif ($status != 404) {
+            throw new InfrastructureException('Web server configuration error, resource at "'.$location.'" is not hidden: '.$status);
+         }
       }
 
 
