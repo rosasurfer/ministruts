@@ -156,7 +156,8 @@ class Logger extends StaticClass {
 
 
       // 3. Exception an die registrierten Adressen mailen (wenn $mail TRUE ist) ...
-      if (self::$mail) {
+      // TODO: $GLOBALS['webmasters'] auf Config::get('buglovers') umstellen
+      if (self::$mail && isSet($GLOBALS['webmasters'])) {
          $mailMsg  = $plainMessage."\n\n".$message."\n\n\n".$traceStr;
 
          $request = Request ::me();
@@ -301,7 +302,8 @@ class Logger extends StaticClass {
 
 
       // 3. Logmessage an die registrierten Adressen mailen (wenn $mail TRUE ist) ...
-      if (self::$mail) {
+      // TODO: $GLOBALS['webmasters'] auf Config::get('buglovers') umstellen
+      if (self::$mail && isSet($GLOBALS['webmasters'])) {
          $mailMsg = $plainMessage;
          if ($exception)
             $mailMsg .= "\n\n".$exMessage."\n\n\n".$exTraceStr;
