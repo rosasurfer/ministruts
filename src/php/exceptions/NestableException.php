@@ -54,7 +54,8 @@ abstract class NestableException extends Exception {
    /**
     * Gibt die Exception zurück, die diese Exception ausgelöst hat.
     *
-    * @return exception - Ursache oder NULL, wenn diese Exception nicht durch eine andere Exception ausgelöst wurde.
+    * @return exception - Ursache oder NULL, wenn diese Exception nicht durch eine andere Exception
+    *                     ausgelöst wurde.
     */
    public function getCause() {
       return $this->cause;

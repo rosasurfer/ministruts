@@ -18,10 +18,14 @@ $__classes['Singleton'                      ] = $dir.'php/core/Singleton';
 $__classes['StaticClass'                    ] = $dir.'php/core/StaticClass';
 
 $__classes['ConcurrentModificationException'] = $dir.'php/db/ConcurrentModificationException';
+$__classes['DB'                             ] = $dir.'php/db/DB';
+$__classes['DBPool'                         ] = $dir.'php/db/DBPool';
+$__classes['MySQLConnector'                 ] = $dir.'php/db/MySQLConnector';
 $__classes['PersistableObject'              ] = $dir.'php/db/PersistableObject';
 
 $__classes['BusinessRuleException'          ] = $dir.'php/exceptions/BusinessRuleException';
 $__classes['ClassNotFoundException'         ] = $dir.'php/exceptions/ClassNotFoundException';
+$__classes['DatabaseException'              ] = $dir.'php/exceptions/DatabaseException';
 $__classes['FileNotFoundException'          ] = $dir.'php/exceptions/FileNotFoundException';
 $__classes['IOException'                    ] = $dir.'php/exceptions/IOException';
 $__classes['IllegalStateException'          ] = $dir.'php/exceptions/IllegalStateException';

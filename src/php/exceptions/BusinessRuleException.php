@@ -2,7 +2,7 @@
 /**
  * BusinessRuleException
  *
- * Allgemeine Exception zur Markierung von Fehlern der Geschäftslogik.
+ * Allgemeine Exception zur Markierung von Fehlern in der Geschäftslogik.
  */
 class BusinessRuleException extends RuntimeException {
 }

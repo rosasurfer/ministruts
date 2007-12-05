@@ -2,7 +2,8 @@
 /**
  * PHPErrorException
  *
- * Eine PHPErrorException sollte nur im globalen ErrorHandler oder in einer magischen PHP-Methode (__****) instanziiert werden.
+ * Eine PHPErrorException sollte nur im globalen ErrorHandler oder in einer magischen PHP-Methode
+ * (__****) instanziiert werden.
  */
 class PHPErrorException extends NestableException {
 
@@ -40,9 +41,9 @@ class PHPErrorException extends NestableException {
          $trace =& parent ::getStackTrace();
 
          array_shift($trace);                                     // Der erste Frame kann weg, er ist der ErrorHandler.
-         if (strToLower($trace[0]['function']) == '__autoload') 
+         if (strToLower($trace[0]['function']) == '__autoload')
             array_shift($trace);                                  // Der nächste Frame kann weg, wenn er auf __autoload zeigt.
-         
+
          $this->trace =& $trace;
       }
 

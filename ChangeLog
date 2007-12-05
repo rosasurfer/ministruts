@@ -2,6 +2,10 @@
 
    - php/net/http/HttpResponse: Status-Codes implementiert
 
+   - php/db/: neu DBPool, DB, MySQLConnector (der DB-Zugriff wird klassenorientiert)
+
+   - php/exceptions/: neu DatabaseException
+
 
 2007-12-04
 

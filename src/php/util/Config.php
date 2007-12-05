@@ -44,10 +44,10 @@ final class Config extends Singleton {
     * @return Config
     */
    public static function me() {
-      // versuchen, die Instanz aus dem Cache zu laden
+      // gibt es eine Instanz im Cache ?
       $instance = Cache ::get(__CLASS__);
 
-      if (!$instance) { // Cache-Miss, neue Instanz erzeugen ...
+      if (!$instance) { // nein, neue Instanz erzeugen ...
          $instance = parent:: getInstance(__CLASS__);
 
          // ... und cachen (wenn auf Production-Server)
@@ -115,7 +115,7 @@ final class Config extends Singleton {
     *
     * @param string $key - Schlüssel
     *
-    * @return mixed - String oder Array mit Konfigurationseinstellung
+    * @return mixed - String oder Array mit Konfigurationseinstellungen
     */
    public static function get($key) {
       return self ::me()->getProperty($key);
@@ -125,10 +125,9 @@ final class Config extends Singleton {
    /**
     * Setzt oder überschreibt die Einstellung mit dem angegebenen Schlüssel. Wert muß ein String sein.
     * Diese Methode kann aus der Anwendung heraus aufgerufen werden, um zusätzliche Laufzeiteinstellungen
-    * zu speichern. Obwohl diese Einstellungen nicht in der "config.properties" auftauchen, gehen sie
-    * nach dem Ende des Requests nicht verloren. Solange kein Serverneustart erfolgt, kann sich die
-    * Anwendung auf dese Weise während der Laufzeit selbständig an sich ändernde Bedingungen anpassen und
-    * sich selbst steuern.
+    * zu speichern. Zusätzliche Einstellungen werden nicht in "config.properties" gespeichert, gehen
+    * aber nach Ende des Requests nicht verloren, solange der Server nicht neu gestartet wird.  Auf
+    * diese Weise kann sich die Anwendung während der Laufzeit selbständig anpassen und steuern.
     *
     * @param string $key   - Schlüssel
     * @param string $value - Einstellung
@@ -150,16 +149,20 @@ final class Config extends Singleton {
    private function getProperty($key) {
       $properties =& $this->properties;
 
-      if (strPos($key, '.') === false) {
-         if (isSet($properties[$key]))
-            return $properties[$key];
-      }
-      else {
-         $parts = explode('.', $key, 2);
-         if (isSet($properties[$parts[0]]) && isSet($properties[$parts[0]][$parts[1]]))
-            return $properties[$parts[0]][$parts[1]];
-      }
+      $parts = explode('.', $key);
+      $size = sizeOf($parts);
 
+      for ($i=0; $i<$size; ++$i) {
+         $subkey = $parts[$i];
+
+         if (!isSet($properties[$subkey]))
+            break;
+
+         if ($i+1 == $size)   // das letzte Element
+            return $properties[$subkey];
+
+         $properties =& $properties[$subkey];
+      }
       return null;
    }
 
@@ -174,30 +177,32 @@ final class Config extends Singleton {
    private function setProperty($key, $value, $updateCache = true) {
       $properties =& $this->properties;
 
-      // einfacher Schlüssel: 'setting = ???'
-      if (strPos($key, '.') === false) {
-         if ($key == '')
-            throw new InvalidArgumentException('Invalid argument $key: '.$key);
+      $parts = explode('.', $key);
+      $size = sizeOf($parts);
 
-         if (isSet($properties[$key]) && is_array($properties[$key]))
-            $properties[$key][''] = $value;
-         else
-            $properties[$key] = $value;
-      }
-      // Schlüssel, der auf eine Gruppe zeigt: 'group.setting = ???'
-      else {
-         $parts = explode('.', $key, 2);
-         if ($parts[0]=='' || $parts[1]=='')
-            throw new InvalidArgumentException('Invalid argument $key: '.$key);
+      for ($i=0; $i<$size; ++$i) {
+         $current = trim($parts[$i]);
+         if ($current == '') throw new InvalidArgumentException('Invalid argument $key: '.$key);
 
-         if (isSet($properties[$parts[0]])) {
-            if (is_string($properties[$parts[0]]))
-               $properties[$parts[0]] = array('' => $properties[$parts[0]]);  // weitere Ebene mit altem Wert
+         if ($i+1 < $size) {
+            // noch nicht das letzte Element
+            if (!isSet($properties[$current])) {
+               $properties[$current] = array();                            // weitere Ebene
+            }
+            elseif (is_string($properties[$current])) {
+               $properties[$current] = array('' => $properties[$current]); // weitere Ebene und alter Wert
+            }
+            $properties =& $properties[$current];
          }
          else {
-            $properties[$parts[0]] = array();         // weitere Ebene
+            // das letzte Element
+            if (!isSet($properties[$current]) || is_string($properties[$current])) {
+               $properties[$current] = $value;           // überschreiben
+            }
+            else {
+               $properties[$current][''] = $value;       // Wurzeleintrag eines Arrays
+            }
          }
-         $properties[$parts[0]][$parts[1]] = $value;  // Wert
       }
 
       // Cache aktualisieren, wenn Instanz dort gespeichert ist
