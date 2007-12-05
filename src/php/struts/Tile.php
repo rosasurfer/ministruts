@@ -201,10 +201,12 @@ class Tile extends Object {
 
 
    /**
-    * Zeigt den Inhalt dieser Komponente an.
+    * Zeigt den Inhalt dieses Seitenfragments an.
     */
    public function render() {
       $this->initContext();
+
+      // TODO: Framework vor $this-Zugriff aus der HTML-Seite schützen
 
       extract($this->properties);
 
@@ -214,8 +216,12 @@ class Tile extends Object {
 
       $PAGE = PageContext ::me();
 
-      // TODO: Framework vor Zugriff aus der HTML-Seite mit $this schützen
+      $__tplName = subStr($this->path, 0, strRPos($this->path, '.'));
+      echo("\n<!-- start ".$__tplName." -->\n");
+
       include($this->module->getResourceBase().$this->path);
+
+      echo("\n<!-- end ".$__tplName." -->\n");
    }
 }
 ?>
