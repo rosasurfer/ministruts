@@ -1,6 +1,7 @@
 <?
 // Systemvoraussetzung: PHP 5.2+
 // -----------------------------
+$__start_time__ = microTime(true);
 
 
 // Klassendefinitionen
