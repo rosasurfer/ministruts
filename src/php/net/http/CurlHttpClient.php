@@ -89,7 +89,7 @@ final class CurlHttpClient extends HttpClient {
     * @return CurlHttpClient
     */
    public static function create() {
-      return new self;
+      return new self();
    }
 
 
