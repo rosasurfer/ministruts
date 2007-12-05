@@ -17,7 +17,6 @@ $__classes['Object'                         ] = $dir.'php/core/Object';
 $__classes['Singleton'                      ] = $dir.'php/core/Singleton';
 $__classes['StaticClass'                    ] = $dir.'php/core/StaticClass';
 
-$__classes['ConcurrentModificationException'] = $dir.'php/db/ConcurrentModificationException';
 $__classes['DB'                             ] = $dir.'php/db/DB';
 $__classes['DBPool'                         ] = $dir.'php/db/DBPool';
 $__classes['MySQLConnector'                 ] = $dir.'php/db/MySQLConnector';
@@ -25,6 +24,7 @@ $__classes['PersistableObject'              ] = $dir.'php/db/PersistableObject';
 
 $__classes['BusinessRuleException'          ] = $dir.'php/exceptions/BusinessRuleException';
 $__classes['ClassNotFoundException'         ] = $dir.'php/exceptions/ClassNotFoundException';
+$__classes['ConcurrentModificationException'] = $dir.'php/exceptions/ConcurrentModificationException';
 $__classes['DatabaseException'              ] = $dir.'php/exceptions/DatabaseException';
 $__classes['FileNotFoundException'          ] = $dir.'php/exceptions/FileNotFoundException';
 $__classes['IOException'                    ] = $dir.'php/exceptions/IOException';
