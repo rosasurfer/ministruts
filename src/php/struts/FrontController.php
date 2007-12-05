@@ -75,6 +75,7 @@ final class FrontController extends Singleton {
                          $contextURL.'CVS/',
                          );
       foreach ($locations as $location) {
+         // TODO: Authentifizierungs-Infos müssen ggf. vom aktuellen Request übernommen werden
          $request  = HttpRequest ::create()->setUrl($location);
          $response = CurlHttpClient ::create()->send($request);
          $status = $response->getStatus();
