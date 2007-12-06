@@ -396,6 +396,7 @@ class RequestProcessor extends Object {
 
          $context = $request->getAttribute(Struts ::APPLICATION_PATH_KEY);
          $url = $context.$this->module->getPrefix().$forward->getPath();
+         // TODO: QueryString kodieren
          HeaderUtils ::redirect($url);
       }
       else {

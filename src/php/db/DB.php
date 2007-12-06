@@ -85,7 +85,7 @@ abstract class DB extends Object {
     */
    public static function spawn($className, $host, $username, $password, $database = null) {
       if (!is_subclass_of($className, __CLASS__))
-         throw new InvalidArgumentException('Not a subclass of '.__CLASS__.': '.$className);
+         throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$className);
 
       $connector = new $className();
       $connector->setHost($host)
