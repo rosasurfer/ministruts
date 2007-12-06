@@ -217,11 +217,11 @@ class Tile extends Object {
       $PAGE = PageContext ::me();
 
       $__tplName = subStr($this->path, 0, strRPos($this->path, '.'));
-      echo("\n<!-- start ".$__tplName." -->\n");
+      echo("\n<!-- #begin: ".$__tplName." -->\n");
 
       include($this->module->getResourceBase().$this->path);
 
-      echo("\n<!-- end ".$__tplName." -->\n");
+      echo("\n<!-- #end: ".$__tplName." -->\n");
    }
 }
 ?>
