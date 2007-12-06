@@ -13,7 +13,7 @@ $__classes['ApcCache'                       ] = $dir.'php/cache/ApcCache';
 $__classes['Cache'                          ] = $dir.'php/cache/Cache';
 $__classes['RuntimeMemoryCache'             ] = $dir.'php/cache/RuntimeMemoryCache';
 
-$__classes['Instantiatable'                 ] = $dir.'php/core/Instantiatable';
+$__classes['ISingle'                        ] = $dir.'php/core/ISingle';
 $__classes['Object'                         ] = $dir.'php/core/Object';
 $__classes['Singleton'                      ] = $dir.'php/core/Singleton';
 $__classes['StaticClass'                    ] = $dir.'php/core/StaticClass';

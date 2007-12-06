@@ -2,9 +2,9 @@
 /**
  * Singleton
  *
- * Vererbbare Implementierung des Singleton-Patterns.
+ * Abstraktes Grundgerüst für Implementierungen des Singleton-Patterns.
  */
-abstract class Singleton extends Object implements Instantiatable {
+abstract class Singleton extends Object implements ISingle {
 
 
    // Pool mit allen momentan existierenden Singletons
