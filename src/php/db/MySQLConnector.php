@@ -1,7 +1,5 @@
 <?
 /**
- * MySQLConnector
- *
  * MySQL Connector
  */
 final class MySQLConnector extends DB {
@@ -9,6 +7,8 @@ final class MySQLConnector extends DB {
 
    /**
     * Stellt die Verbindung zur Datenbank her.
+    *
+    * @return MySQLConnector
     */
    protected function connect() {
       $host = $this->host;
@@ -27,7 +27,7 @@ final class MySQLConnector extends DB {
    /**
     * Trennt die Verbindung des Connectors zur Datenbank.
     *
-    * @return MySQL
+    * @return MySQLConnector
     */
    protected function disconnect() {
       if ($this->isConnected()) {
@@ -39,14 +39,15 @@ final class MySQLConnector extends DB {
 
 
    /**
-    * Führt eine SQL-Anweisung aus. Gibt das Ergebnis als Resource zurück.
+    * Führt eine SQL-Anweisung aus (SQL-Klartext). Gibt das Ergebnis als Resource zurück.
     *
     * @param string $sql - SQL-Anweisung
     *
     * @return mixed - je nach Statement ein ResultSet oder ein Boolean
     */
    public function queryRaw($sql) {
-      // Verbindung sicherstellen
+      if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
+
       if (!$this->isConnected())
          $this->connect();
 
@@ -68,8 +69,6 @@ final class MySQLConnector extends DB {
     *              ['rows'] - Anzahl der betroffenen Datensätze (bei SELECT/INSERT/UPDATE)
     */
    public function executeSql($sql) {
-      if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
-
       $result = array('set'  => null,
                       'rows' => 0);
 
