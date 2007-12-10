@@ -15,7 +15,12 @@ final class MySQLConnector extends DB {
       if ($this->port)
          $host .= ':'.$this->port;
 
-      $this->link = mysql_connect($host, $this->username, $this->password, true);
+      $this->link = mysql_connect($host,
+                                  $this->username,
+                                  $this->password,
+                                  true,
+                                  2             // 2 = CLIENT_FOUND_ROWS
+                                  );
 
       if (!$this->link || ($this->database && !mysql_select_db($this->database, $this->link)))
          throw new InfrastructureException('Can not connect to MySQL server: '.mysql_error($this->link));

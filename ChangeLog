@@ -1,3 +1,9 @@
+2007-12-10
+
+   - php/db/MySQLConnector: mysql_affected_rows() gibt jetzt die Anzahl der gefundenen anstatt der
+     modifizierten Zeilen zurück
+
+
 2007-12-06
 
    - Refactoring: php/core/Instantiatable -> php/core/ISingle
