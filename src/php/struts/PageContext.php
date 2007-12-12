@@ -2,20 +2,22 @@
 /**
  * PageContext
  *
- * Container, in dem für den Renderprozeß benötigte Objekte oder Variablen abgelegt werden. Beim Rendern
- * kann auf diese Daten aus dem HTML wieder zugegriffen werden.  Innerhalb eines Seitenfragments können
- * auch neue Daten im Container gespeichert werden, jedoch nur, wenn diese Daten neu sind, überschreiben
- * vorhandener Daten aus dem Seitenfragment ist nicht möglich.
+ * Container, in dem für den Renderprozeß benötigte Objekte oder Variablen abgelegt werden. Beim
+ * Rendern kann auf diese Daten aus dem HTML zugegriffen werden.  Innerhalb eines Seitenfragments
+ * können auch neue Daten im Container gespeichert werden, jedoch nur, wenn diese Daten neu sind,
+ * überschreiben vorhandener Daten aus dem Seitenfragment ist nicht möglich.
  *
  * Beispiel:
  * ---------
  *    $PAGE->title = 'HTML-Title';
  *
- * Speichert die Varibale "title" mit dem Wert 'HTML-Title' im PageContext
+ * Speichert die Variable "title" mit dem Wert 'HTML-Title' im PageContext
  *
  *    $var = $PAGE->title;
  *
- * Gibt die hinterlegte Eigenschaft mit dem Namen "title" zurück.
+ * Gibt die gespeicherte Eigenschaft mit dem Namen "title" zurück.
+ *
+ * TODO: Properties aus dem Tiles-Context müssen auch im PageContext erreichbar sein
  */
 class PageContext extends Singleton {
 

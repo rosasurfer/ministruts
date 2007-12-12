@@ -1,3 +1,8 @@
+2007-12-12
+
+   - struts-config.xml: in Tiles-Properties (<set>-Tag) vom Typ "string" können Variablen verwendet werden
+
+
 2007-12-10
 
    - php/db/MySQLConnector: mysql_affected_rows() gibt jetzt die Anzahl der gefundenen anstatt der

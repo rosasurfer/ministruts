@@ -148,9 +148,8 @@ class Tile extends Object {
 
 
    /**
-    * Initialisiert die für diese Tile definierten zusätzlichen Eigenschaften (siehe <set>-Tag in
-    * struts-config.xml).  Dabei werden Bezeichner für in der Tile enthaltene Seiten oder weitere
-    * Tilesdefinitionen durch ihre jeweiligen Instanzen ersetzt.
+    * Initialisiert die für diese Tile in struts-config.xml mit <set>-Tags definierten Eigenschaften.
+    * Dabei werden die in der Tile definierten Bezeichner durch entsprechende Objektinstanzen ersetzt.
     */
    private function initContext() {
       foreach($this->properties as &$property) {
@@ -164,7 +163,8 @@ class Tile extends Object {
          $value = $property[1];
 
          if ($type == self ::PROP_TYPE_STRING) {         // String-Value
-            $property = $value;
+            // TODO: (Compile- oder Laufzeit)-Variablenersetzung implementieren
+            $property = eval("return $value;");
          }
          elseif ($type == self ::PROP_TYPE_RESOURCE) {   // Page oder Tilesdefinition
             $tile = $this->module->findTile($value);
