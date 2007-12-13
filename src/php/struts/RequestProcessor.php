@@ -288,6 +288,7 @@ class RequestProcessor extends Object {
     * @return boolean
     */
    protected function processFormValidate(Request $request, Response $response, ActionMapping $mapping, ActionForm $form) {
+      // TODO: Form muß immer validiert werden, solange invalidate nicht "false" ist
       $forward = $mapping->getFormErrorForward();
       if (!$forward)
          return true;

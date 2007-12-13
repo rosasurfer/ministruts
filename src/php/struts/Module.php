@@ -131,6 +131,8 @@ class Module extends Object {
 
       $cwd = getCwd();
 
+      // TODO: XML ohne Verzeichniswechsel validieren
+
       // ins Rootverzeichnis wechseln
       try { chDir($libroot); }
       catch (Exception $ex) { throw new RuntimeException('Could not change working directory to "'.$libroot.'"', $ex); }
