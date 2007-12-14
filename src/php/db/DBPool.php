@@ -20,6 +20,13 @@ final class DBPool extends Singleton {
 
 
    /**
+    * verschiedene Schreibweisen
+    */
+   private static $knownConnectors = array('mysql'          => 'MySQLConnector',
+                                           'mysqlconnector' => 'MySQLConnector',
+                                           );
+
+   /**
     * Gibt die Klasseninstanz zurück.
     *
     * @return DBPool
@@ -48,7 +55,16 @@ final class DBPool extends Singleton {
          $connector = $me->pool[$name];
       }
       elseif ($config=Config ::get('db.'.$name)) { // nein, Config holen und Connector laden
-         $class = $config['connector'].'Connector';
+         $name = strToLower($config['connector']);
+
+         // bekannte Connectoren trotz verschiedener Schreibweisen erkennen
+         if (isSet(self::$knownConnectors[$name])) {
+            $class = self::$knownConnectors[$name];
+         }
+         else {   // unbekannt, Fall-back: name.Connector
+            $class = $config['connector'].'Connector';
+         }
+
          $host  = $config['host'     ];
          $user  = $config['username' ];
          $pass  = $config['password' ];

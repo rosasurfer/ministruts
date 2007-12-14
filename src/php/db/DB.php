@@ -75,19 +75,19 @@ abstract class DB extends Object {
    /**
     * Erzeugt einen neuen Connector und initialisiert ihn.
     *
-    * @param  string $className - Klassenname des konkreten Connectors
-    * @param  string $host      - Hostname(:Port) des Datenbankservers
-    * @param  string $username  - Benutzername
-    * @param  string $password  - Passwort
-    * @param  string $database  - vorzuselektierende Datenbank
+    * @param  string $class    - Klassenname des konkreten Connectors
+    * @param  string $host     - Hostname(:Port) des Datenbankservers
+    * @param  string $username - Benutzername
+    * @param  string $password - Passwort
+    * @param  string $database - vorzuselektierende Datenbank
     *
     * @return DB - Connector
     */
-   public static function spawn($className, $host, $username, $password, $database = null) {
-      if (!is_subclass_of($className, __CLASS__))
-         throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$className);
+   public static function spawn($class, $host, $username, $password, $database = null) {
+      if (!is_subclass_of($class, __CLASS__))
+         throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
 
-      $connector = new $className();
+      $connector = new $class();
       $connector->setHost($host)
                 ->setUsername($username)
                 ->setPassword($password)
