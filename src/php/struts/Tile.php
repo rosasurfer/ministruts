@@ -163,8 +163,7 @@ class Tile extends Object {
          $value = $property[1];
 
          if ($type == self ::PROP_TYPE_STRING) {         // String-Value
-            // TODO: (Compile- oder Laufzeit)-Variablenersetzung implementieren
-            $property = eval("return \"$value\";");
+            $property = $value;
          }
          elseif ($type == self ::PROP_TYPE_RESOURCE) {   // Page oder Tilesdefinition
             $tile = $this->module->findTile($value);
