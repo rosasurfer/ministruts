@@ -48,7 +48,7 @@ class RequestProcessor extends Object {
       $this->processCachedActionMessages($request, $response);
 
 
-      // das passende Mapping ermitteln
+      // Mapping für den Request ermitteln
       $mapping = $this->processMapping($request, $response);
       if (!$mapping)
          return;
@@ -172,12 +172,13 @@ class RequestProcessor extends Object {
 
 
    /**
-    * Ermittelt das zu benutzende ActionMapping.
+    * Wählt das zu benutzende ActionMapping. Kann kein Mapping gefunden werden, wird eine Fehlermeldung
+    * erzeugt und NULL zurückgegeben
     *
     * @param Request  $request
     * @param Response $response
     *
-    * @return ActionMapping
+    * @return ActionMapping - ActionMapping oder NULL
     */
    protected function processMapping(Request $request, Response $response) {
       // Pfad für die Mappingauswahl ermitteln ...
@@ -188,24 +189,46 @@ class RequestProcessor extends Object {
       $this->logDebug && Logger ::log('Path used for mapping selection: '.$path, L_DEBUG, __CLASS__);
 
       // Mapping suchen und im Request speichern
-      $mapping = $this->module->findMapping($path);
-      if ($mapping) {
+      if (($mapping = $this->module->findMapping($path)) || ($mapping = $this->module->getDefaultMapping())) {
          $request->setAttribute(Struts ::ACTION_MAPPING_KEY, $mapping);
-      }
-      else {
-         $this->logInfo && Logger ::log('Could not find a mapping for this request', L_INFO, __CLASS__);
-         echoPre("Not found: 404\n\nThe requested URL ".$requestPath." was not found on this server");
-         // TODO: HttpResponse modifizieren und status code setzen
+         return $mapping;
       }
 
-      return $mapping;
+      // kein Mapping gefunden
+      $this->logInfo && Logger ::log('Could not find a mapping for path: '.$path, L_INFO, __CLASS__);
+
+
+      // TODO: Status-Code 404 im HttpResponse setzen
+
+      // falls vorhanden, ein 404-Layout einbinden
+      if ($forward = $this->module->findForward((string) HttpResponse ::SC_NOT_FOUND)) {
+         $this->processActionForward($request, $response, $forward);
+         return null;
+      }
+
+      // einfache Fehlermeldung ausgeben
+      echo <<<EOT_404
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html>
+<head>
+<title>404 Not Found</title>
+</head>
+<body>
+<h1>Not Found</h1>
+<p>The requested URL $requestPath was not found on this server.</p>
+<hr>
+</body>
+</html>
+EOT_404;
+      return null;
    }
 
 
    /**
-    * Wenn die Action Request-Methodenbeschränkungen hat, sicherstellen, daß der Request der
-    * angegebenen Methode entspricht. Gibt TRUE zurück, wenn die Verarbeitung fortgesetzt werden soll
-    * oder FALSE, wenn der Zugriff nicht gewährt wird.
+    * Wenn für das ActionMapping Methodenbeschränkungen definiert sind, sicherstellen, daß der Request
+    * diese Beschränkungen erfüllt. Gibt TRUE zurück, wenn die Verarbeitung fortgesetzt und der Zugriff
+    * gewährt werden soll werden soll, oder FALSE, wenn der Zugriff nicht gewährt wird und der Request
+    * beendet wurde.
     *
     * @param Request       $request
     * @param Response      $response
@@ -219,10 +242,33 @@ class RequestProcessor extends Object {
       if (!$method || $method==$request->getMethod())
          return true;
 
+      // Beschränkung nicht erfüllt
       $this->logDebug && Logger ::log('Request does not have the required method type, denying access', L_DEBUG, __CLASS__);
-      echoPre('Access denied: 403');
 
-      // TODO: auf Default-Mapping umleiten
+
+      // TODO: Status-Code 405 im HttpResponse setzen
+
+      // falls vorhanden, ein 405-Layout einbinden
+      if ($forward = $this->module->findForward((string) HttpResponse ::SC_METHOD_NOT_ALLOWED)) {
+         $this->processActionForward($request, $response, $forward);
+         return false;
+      }
+
+      // einfache Fehlermeldung ausgeben
+      $requestPath = $request->getPath();
+      echo <<<EOT_405
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html>
+<head>
+<title>405 Method Not Allowed</title>
+</head>
+<body>
+<h1>Method Not Allowed</h1>
+<p>The specified HTTP method is not allowed for the URL $requestPath</p>
+<hr>
+</body>
+</html>
+EOT_405;
       return false;
    }
 
@@ -230,7 +276,7 @@ class RequestProcessor extends Object {
    /**
     * Wenn die Action Zugriffsbeschränkungen hat, sicherstellen, daß der User Inhaber der angegebenen
     * Rollen ist.  Gibt TRUE zurück, wenn die Verarbeitung fortgesetzt und der Zugriff gewährt werden
-    * soll, oder FALSE, wenn der Zugriff nicht gewährt und der Request bereits beendet wurde.
+    * soll, oder FALSE, wenn der Zugriff nicht gewährt wird und der Request beendet wurde.
     *
     * @param Request       $request
     * @param Response      $response

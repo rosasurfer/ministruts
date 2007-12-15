@@ -38,7 +38,7 @@ class Module extends Object {
 
 
    /**
-    * Das Default-ActionMapping dieses Moduls oder NULL, wenn keines definiert wurde.
+    * Das Default-ActionMapping dieses Moduls, wenn eeines definiert wurde.
     */
    protected /*ActionMapping*/ $defaultMapping;
 
@@ -548,18 +548,26 @@ class Module extends Object {
 
 
    /**
-    * Gibt das ActionMapping für den angegebenen Pfad zurück. Zuerst wird nach einer genauen
-    * Übereinstimmung gesucht und danach, wenn keines gefunden wurde, nach einem Default-ActionMapping.
+    * Gibt das ActionMapping für den angegebenen Pfad zurück.
     *
     * @param string $path
     *
-    * @return ActionMapping
+    * @return ActionMapping - Mapping oder NULL, wenn kein Mapping gefunden wurde
     */
    public function findMapping($path) {
       if (isSet($this->mappings[$path]))
          return $this->mappings[$path];
 
-      // TODO: NULL statt defaultMapping zurückgeben
+      return null;
+   }
+
+
+   /**
+    * Gibt das Default-ActionMapping dieses Moduls zurück.
+    *
+    * @return ActionMapping - Mapping oder NULL, wenn kein Default-Mapping definiert ist
+    */
+   public function getDefaultMapping() {
       return $this->defaultMapping;
    }
 
@@ -703,8 +711,8 @@ class Module extends Object {
 
 
    /**
-    * Sucht und gibt die Tile mit dem angegebenen Namen zurück, oder NULL, wenn keine Tile mit diesem
-    * Namen gefunden wurde.
+    * Gibt die Tile mit dem angegebenen Namen zurück oder NULL, wenn keine Tile mit diesem Namen
+    * gefunden wurde.
     *
     * @param $name - logischer Name der Tile
     *

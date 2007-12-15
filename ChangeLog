@@ -1,3 +1,8 @@
+2007-12-15
+
+   - struts-config.xml: anwendungseigene HTTP-404- und HTTP-405-Fehlerlayouts werden automatisch eingebunden
+
+
 2007-12-12
 
    - struts-config.xml: in Tiles-Properties (<set>-Tag) vom Typ "string" können Variablen verwendet werden
