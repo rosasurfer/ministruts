@@ -122,38 +122,12 @@ class Tile extends Object {
 
 
    /**
-    * Gibt die Property mit dem angegebenen Namen zurück. Magische, überladene Methode. Ermöglicht den
-    * einfachen Zugriff auf zusätzlich definierte String-Properties in Eltern- oder Kind-Definitionen
-    * dieser Tiles-Definitionen.  Es können nur String-Properties abgefragt werden, der Zugriff auf
-    * Page- oder Definition-Properties ist nicht möglich.
-    *
-    * Beispiel:
-    * ---------
-    *    $title = $this->parent->title;
-    *
-    * Gibt die "title"-Eigenschaft der umgebenden Elterndefinition dieser Tile-Instanz zurück.
-    *
-    * @param string $name - Name der zurückzugebenden String-Eigenschaft
-    *
-    * @return string - String-Eigenschaft
-    *
-    * @throws RuntimeException - wenn eine Eigenschaft mit diesem Namen nicht existiert
-    */
-   private function __get($name) {
-      if (isSet($this->properties[$name]))
-         return $this->properties[$name];
-
-      throw new RuntimeException('Invalid argument $name: '.$name);
-   }
-
-
-   /**
     * Initialisiert die für diese Tile in struts-config.xml mit <set>-Tags definierten Eigenschaften.
     * Dabei werden die in der Tile definierten Bezeichner durch entsprechende Objektinstanzen ersetzt.
     */
    private function initContext() {
       foreach($this->properties as &$property) {
-         if (sizeOf($property) == 1) {          // Property wurde schon initialisiert
+         if (sizeOf($property) == 1) {                   // Property wurde schon initialisiert
             if ($property instanceof self)
                $property->parent = $this;
             continue;
@@ -168,7 +142,7 @@ class Tile extends Object {
          elseif ($type == self ::PROP_TYPE_RESOURCE) {   // Page oder Tilesdefinition
             $tile = $this->module->findTile($value);
 
-            if (!$tile) {     // it's a page, create a simple one on the fly
+            if (!$tile) {     // it's a file path, create a simple Tile on the fly
                $class = $this->module->getTilesClass();
                $tile = new $class($this->module);
                $tile->setName('generic')
