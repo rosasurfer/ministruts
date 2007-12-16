@@ -145,8 +145,8 @@ class Logger extends StaticClass {
          ob_get_level() ? ob_flush() : flush();
 
          if (self::$displayHtml) {
-            echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>Uncaught</b> '.nl2br($message)."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
-            echo '<br>'.$message.'<br><br>'.printFormatted($traceStr, true);
+            echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>Uncaught</b> '.nl2br(htmlEntities($message))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
+            echo '<br>'.htmlEntities($message).'<br><br>'.printFormatted(htmlEntities($traceStr), true);
             echo "<br></div>\n";
          }
          else {
@@ -288,9 +288,9 @@ class Logger extends StaticClass {
          ob_get_level() ? ob_flush() : flush();
 
          if (self::$displayHtml) {
-            echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.self::$logLevels[$level].'</b>: '.nl2br($message)."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
+            echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.self::$logLevels[$level].'</b>: '.nl2br(htmlEntities($message))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
             if ($exception)
-               echo '<br>'.$exMessage.'<br><br>'.printFormatted($exTraceStr, true);
+               echo '<br>'.htmlEntities($exMessage).'<br><br>'.printFormatted(htmlEntities($exTraceStr), true);
             echo "<br></div>\n";
          }
          else {
