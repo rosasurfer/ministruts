@@ -393,14 +393,17 @@ final class Request extends Singleton {
 
    /**
     * Ob unter dem angegebenen Schlüssel eine Error-Message existiert.  Ohne Angabe eines Schlüssel
-    * wird geprüft, ob eine beliebige Error-Message existiert.
+    * wird geprüft, ob überhaupt irgendeine Error-Message existiert.
     *
     * @param string $key - Schlüssel
     *
     * @return boolean
     */
    public function isActionError($key = null) {
-      return ($this->getActionError($key) !== null);
+      if ($key !== null) {
+         return ($this->getActionError($key) !== null);
+      }
+      return (sizeOf($this->getAttribute(Struts ::ACTION_ERRORS_KEY)) > 0);
    }
 
 

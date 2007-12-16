@@ -79,7 +79,7 @@ final class FrontController extends Singleton {
          $response = CurlHttpClient ::create()->send($request);
          $status = $response->getStatus();
 
-         // TODO: Authentication Support einbauen
+         // TODO: HTTP-Authentication-Support in Serverprüfung einbauen
          if ($status == 401) {
             Logger ::log('Web server configuration check: authentication support not yet implemented for location: "'.$location.'"', L_NOTICE, __CLASS__);
          }
