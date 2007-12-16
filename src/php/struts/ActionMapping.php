@@ -15,6 +15,7 @@ class ActionMapping extends Object {
    protected $path;              // string
    protected $action;            // string
    protected $form;              // string
+   protected $validate;          // boolean
    protected $method;            // string
    protected $roles;             // string
    protected $default;           // boolean
@@ -24,12 +25,6 @@ class ActionMapping extends Object {
     * Im Mapping statt einer Action konfigurierter ActionForward.
     */
    protected /*ActionForward*/ $forward;
-
-
-   /**
-    * Nach einem Validation-Error aufzurufender ActionForward.
-    */
-   protected /*ActionForward*/ $formErrorForward;
 
 
    /**
@@ -74,7 +69,7 @@ class ActionMapping extends Object {
    public function setPath($path) {
       if ($this->configured)                throw new IllegalStateException('Configuration is frozen');
       if (!is_string($path))                throw new IllegalTypeException('Illegal type of argument $path: '.getType($path));
-      if (!String ::startsWith($path, '/')) throw new InvalidArgumentException('The path property of an '.__CLASS__.' must begin with a slash "/", found: "'.$path.'"');
+      if (!String ::startsWith($path, '/')) throw new InvalidArgumentException('The "path" attribute of a mapping must begin with a slash "/", found "'.$path.'"');
 
       $this->path = $path;
       return $this;
@@ -170,7 +165,7 @@ class ActionMapping extends Object {
     */
    public function setForward(ActionForward $forward) {
       if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-      if ($this->action)     throw new RuntimeException('Configuration error: Only one of mapping "action" or mapping "forward" can be specified.');
+      if ($this->action)     throw new RuntimeException('Configuration error: Only one attribute of "action", "include", "redirect" or "forward" can be specified for mapping "'.$this->path.'"');
 
       $this->forward = $forward;
       return $this;
@@ -198,7 +193,7 @@ class ActionMapping extends Object {
       if ($this->configured)                                       throw new IllegalStateException('Configuration is frozen');
       if (!is_string($className))                                  throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
       if (!is_subclass_of($className, Struts ::ACTION_BASE_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts ::ACTION_BASE_CLASS.': '.$className);
-      if ($this->forward)                                          throw new RuntimeException('Configuration error: Only one of mapping "action" or mapping "forward" can be specified.');
+      if ($this->forward)                                          throw new RuntimeException('Configuration error: Only one attribute of "action", "include", "redirect" or "forward" can be specified for mapping "'.$this->path.'"');
 
       $this->action = $className;
       return $this;
@@ -244,29 +239,30 @@ class ActionMapping extends Object {
 
 
    /**
-    * Setzt den ActionForward, zu dem verzweigt wird, wenn die ActionForm dieses Mappings vor Aufruf
-    * der Action validiert wird und dabei Fehler zurückgibt.
+    * Setzt das Validate-Flag für die ActionForm des ActionMappings.  Das Flag zeigt an, ob die
+    * ActionForm vor Aufruf der Action validiert werden soll oder nicht.  Ohne entsprechende Angabe
+    * in der struts-config.xml wird die ActionForm immer validiert.
     *
-    * @param ActionForward $forward
+    * @param boolean $default
     *
     * @return ActionMapping
     */
-   public function setFormErrorForward(ActionForward $forward) {
-      if ($this->configured) throw new IllegalStateException('Configuration is frozen');
+   public function setValidate($validate) {
+      if ($this->configured)   throw new IllegalStateException('Configuration is frozen');
+      if (!is_bool($validate)) throw new IllegalTypeException('Illegal type of argument $validate: '.getType($validate));
 
-      $this->formErrorForward = $forward;
+      $this->validate = $validate;
       return $this;
    }
 
 
    /**
-    * Gibt den ActionForward zurück, zu dem verzweigt wird, wenn die ActionForm dieses Mappings vor
-    * Aufruf der Action validiert wird und dabei Fehler zurückgibt.
+    * Ob die ActionForm des Mappings vor Aufruf der Action automatisch validiert wird oder nicht.
     *
-    * @return ActionForward
+    * @return boolean
     */
-   public function getFormErrorForward() {
-      return $this->formErrorForward;
+   public function isValidate() {
+      return ($this->validate);
    }
 
 
@@ -315,7 +311,7 @@ class ActionMapping extends Object {
       if (!is_string($name)) throw new IllegalTypeException('Illegal type of argument $name: '.getType($name));
 
       if (isSet($this->forwards[$name]))
-         throw new RuntimeException('Non-unique identifier detected for local ActionForwards: '.$name);
+         throw new RuntimeException('Non-unique name detected for local action forward "'.$name.'"');
 
       $this->forwards[$name] = $forward;
       return $this;
@@ -329,15 +325,24 @@ class ActionMapping extends Object {
     */
    public function freeze() {
       if (!$this->configured) {
-         if (!$this->path)                              throw new IllegalStateException('A path must be configured for mapping "'.$this->path.'"');
-         if (!$this->action && !$this->forward)         throw new IllegalStateException('Either an action or forward must be configured for mapping "'.$this->path.'"');
-         if (!$this->form   && $this->formErrorForward) throw new IllegalStateException('An action form must be configured for form error forward in mapping "'.$this->path.'"');
+         if (!$this->path)                                              throw new IllegalStateException('A "path" attribute must be configured for mapping "'.$this->path.'"');
+         if (!$this->form && $this->validate)                           throw new IllegalStateException('A "form" must be configured for "validate" attribute value "true" in mapping "'.$this->path.'"');
+
+         if (!$this->action && !$this->forward) {
+            if (!$this->form || !$this->validate)
+               throw new IllegalStateException('Either an "action" or "forward" attribute must be configured for mapping "'.$this->path.'"');
+         }
+         if (!$this->action && $this->validate) {
+            if (!isSet($this->forwards[ActionForward ::VALIDATION_SUCCESS_KEY]) || !isSet($this->forwards[ActionForward ::VALIDATION_ERROR_KEY]))
+               throw new IllegalStateException('A "success" and an "error" forward must be configured for validation of mapping "'.$this->path.'"');
+         }
+
+
+
+
 
          if ($this->forward)
             $this->forward->freeze();
-
-         if ($this->formErrorForward)
-            $this->formErrorForward->freeze();
 
          foreach ($this->forwards as $forward)
             $forward->freeze();
@@ -376,7 +381,7 @@ class ActionMapping extends Object {
       $forward = $this->module->findForward($name);
 
       if (!$forward && $this->configured)
-         Logger ::log('No ActionForward found for name: "'.$name.'"', L_WARN, __CLASS__);
+         Logger ::log('No ActionForward found for name "'.$name.'"', L_WARN, __CLASS__);
 
       return $forward;
    }

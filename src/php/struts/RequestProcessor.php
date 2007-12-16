@@ -68,8 +68,8 @@ class RequestProcessor extends Object {
       $form = $this->processActionForm($request, $response, $mapping);
 
 
-      // falls konfiguriert, ActionForm validieren
-      if ($form && !$this->processFormValidate($request, $response, $mapping, $form))
+      // ActionForm validieren
+      if ($form && !$this->processActionFormValidate($request, $response, $mapping, $form))
          return;
 
 
@@ -298,8 +298,8 @@ EOT_405;
 
 
    /**
-    * Erzeugt und gibt die ActionForm des angegebenen Mappings zurück (wenn konfiguriert). Ist keine
-    * ActionForm konfiguriert, wird NULL zurückgegeben.
+    * Erzeugt die ActionForm des angegebenen Mappings und gibt sie zurück. Ist keine ActionForm
+    * konfiguriert, wird NULL zurückgegeben.
     *
     * @param Request       $request
     * @param Response      $response
@@ -308,12 +308,12 @@ EOT_405;
     * @return ActionForm
     */
    protected function processActionForm(Request $request, Response $response, ActionMapping $mapping) {
-      $class = $mapping->getForm();
-      if (!$class)
+      $className = $mapping->getForm();
+      if (!$className)
          return null;
 
       // ActionForm erzeugen und im Request speichern
-      $form = new $class($request);
+      $form = new $className($request);
       $request->setAttribute(Struts ::ACTION_FORM_KEY, $form);
 
       return $form;
@@ -321,10 +321,10 @@ EOT_405;
 
 
    /**
-    * Wenn Form-Validierung für das Mapping aktiviert ist, wird die ActionForm des Mappings validiert.
-    * Treten dabei Validation-Fehler auf, wird auf die konfigurierte Fehler-Resource weitergeleitet.
-    * Gibt TRUE zurück, wenn die Verarbeitung fortgesetzt werden soll, oder FALSE, wenn Fehler
-    * aufgetreten sind und der Request bereits beendet wurde.
+    * Validiert die ActionForm, wenn entprechend konfiguriert.  Ist für das ActionMapping keine Action
+    * konfiguriert, wird je nach Ergebnis der Validierung auf die konfigurierte "success"- oder "error"-
+    * Resource weitergeleitet.  Gibt TRUE zurück, wenn die Verarbeitung fortgesetzt werden soll, oder
+    * FALSE, wenn auf eine andere Resource weitergeleitet und der Request bereits beendet wurde.
     *
     * @param Request       $request
     * @param Response      $response
@@ -333,14 +333,17 @@ EOT_405;
     *
     * @return boolean
     */
-   protected function processFormValidate(Request $request, Response $response, ActionMapping $mapping, ActionForm $form) {
-      // TODO: Form muß immer validiert werden, solange invalidate nicht "false" ist
-      $forward = $mapping->getFormErrorForward();
-      if (!$forward)
+   protected function processActionFormValidate(Request $request, Response $response, ActionMapping $mapping, ActionForm $form) {
+      if (!$mapping->isValidate())
          return true;
 
-      if ($form->validate())
+      $success = $form->validate();
+
+      if ($mapping->getAction())
          return true;
+
+      $key = $success ? ActionForward ::VALIDATION_SUCCESS_KEY : ActionForward ::VALIDATION_ERROR_KEY;
+      $forward = $mapping->findForward($key);
 
       $this->processActionForward($request, $response, $forward);
       return false;
@@ -450,7 +453,7 @@ EOT_405;
          $path = $forward->getPath();
          $tile = $this->module->findTile($path);
 
-         if (!$tile) {     // it's a page, create a simple one on the fly
+         if (!$tile) {     // $path is a file, create a simple Tile on the fly
             $class = $this->module->getTilesClass();
             $tile = new $class($this->module);
             $tile->setName('generic')

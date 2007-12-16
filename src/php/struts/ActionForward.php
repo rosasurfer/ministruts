@@ -13,6 +13,18 @@ class ActionForward extends Object {
 
 
    /**
+    * Der Default-Bezeichner, mit dem nach erfolgreicher Validierung nach einem ActionForward gesucht wird.
+    */
+   const VALIDATION_SUCCESS_KEY = 'success';
+
+
+   /**
+    * Der Default-Bezeichner, mit dem nach fehlgeschlagener Validierung nach einem ActionForward gesucht wird.
+    */
+   const VALIDATION_ERROR_KEY   = 'error';
+
+
+   /**
     * Geschützter Forward-Bezeichner, über den zur Laufzeit ein Redirect-Forward auf die URL des aktuell
     * verwendeten ActionMappings erreicht werden kann.
     */

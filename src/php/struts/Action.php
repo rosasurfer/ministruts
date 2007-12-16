@@ -5,8 +5,8 @@
 abstract class Action extends Object {
 
 
-   protected /* ActionMapping */ $mapping;
-   protected /* ActionForm    */ $form;
+   protected /*ActionMapping*/ $mapping;
+   protected /*ActionForm   */ $form;
 
 
    /**
@@ -19,16 +19,16 @@ abstract class Action extends Object {
     */
    public function __construct(ActionMapping $mapping, ActionForm $form = null) {
       $this->mapping = $mapping;
-      $this->form = $form;
+      $this->form    = $form;
    }
 
 
    /**
-    * Gibt das ActionMapping, zu dem diese Action gehört, zurück.
+    * Gibt das aktuelle ActionMapping, das die Verwendung dieser Action definiert, zurück.
     *
-    * @return ActionMapping instance
+    * @return ActionMapping
     */
-   public function getMapping() {
+   final public function getMapping() {
       return $this->mapping;
    }
 
