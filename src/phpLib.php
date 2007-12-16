@@ -1,7 +1,7 @@
 <?
 // Systemvoraussetzung: PHP 5.2+
 // -----------------------------
-$__start_time__ = microTime(true);
+define('START_TIME', microTime(true));
 
 
 // Klassendefinitionen
@@ -73,7 +73,7 @@ $__classes['Config'                         ] = $dir.'php/util/Config';
 $__classes['Logger'                         ] = $dir.'php/util/Logger';
 $__classes['String'                         ] = $dir.'php/util/String';
 
-@include($dir='classes.php');    // vorausschauendes Definieren weiterer Klassen
+@include($dir='classes.php');    // vorausschauendes Laden weiterer Klassendefinitionen
 unset($dir);
 
 
@@ -169,150 +169,6 @@ function is_class($className) {
    catch (ClassNotFoundException $ex) { /* yes, we eat it */ }
 
    return false;
-}
-
-
-/**
- * Führt eine SQL-Anweisung aus. Dabei wird eine evt. schon offene Verbindung weiterverwendet.
- *
- * @param string $sql - die auszuführende SQL-Anweisung
- * @param array  $db  - die zu verwendende Datenbankkonfiguration
- *
- * @return array['set']  - das zurückgegebene Resultset (bei SELECT)
- *              ['rows'] - Anzahl der betroffenen Datensätze (bei SELECT/INSERT/UPDATE)
- */
-function &executeSql($sql, array &$db) {
-   if (!is_string($sql) || !($sql = trim($sql)))
-      throw new InvalidArgumentException('Invalid SQL string: '.$sql);
-
-
-   if (!isSet($db['server']) || !isSet($db['user']) || !isSet($db['password']) || !$db['database'] || !array_key_exists('connection', $db))
-      throw new InvalidArgumentException('Invalid database configuration: '.$db);
-
-
-   // ohne bestehende Verbindung eine neue aufbauen
-   if ($db['connection'] === null) {
-      try {
-         $db['connection'] = mysql_connect($db['server'], $db['user'], $db['password'], true);
-         if ($db['connection'] === null)
-            throw new InfrastructureException('Database connection error'.(($errno = mysql_errno()) ? "\nError $errno: ".mysql_error() : '')."\nSQL: ".str_replace("\n", ' ', str_replace("\r\n", "\n", $sql)));
-      }
-      catch (PHPErrorException $ex) {
-         throw new InfrastructureException('Database connection error'.(($errno = mysql_errno()) ? "\nError $errno: ".mysql_error() : '')."\nSQL: ".str_replace("\n", ' ', str_replace("\r\n", "\n", $sql)), $ex);
-      }
-
-      // nach Verbindungsaufbau Datenbank selektieren
-      if (!mysql_select_db($db['database'], $db['connection']))
-         throw new InfrastructureException((($errno = mysql_errno()) ? "Error $errno: ".mysql_error() : 'Database connection error')."\nSQL: ".str_replace("\n", ' ', str_replace("\r\n", "\n", $sql)));
-   }
-
-
-   // Abfrage abschicken
-   if (!($resultSet = mysql_query($sql, $db['connection']))) {
-      $error = ($errno = mysql_errno()) ? "SQL-Error $errno: ".mysql_error() : 'Database connection error';
-      throw new RuntimeException($error."\nSQL: ".str_replace("\n", ' ', str_replace("\r\n", "\n", $sql)));
-   }
-
-   // Ergebnis der Abfrage auslesen
-   $result = array('set'  => null,
-                   'rows' => 0);
-
-   if (is_resource($resultSet)) {
-      $result['set']  =& $resultSet;
-      $result['rows'] = mysql_num_rows($resultSet);                     // Anzahl der selektierten Zeilen
-   }
-   else {
-      $sql = strToLower($sql);
-      if (subStr($sql, 0, 6)=='insert' || subStr($sql, 0, 7)=='replace' || subStr($sql, 0, 6)=='update' || subStr($sql, 0, 6)=='delete') {
-         $result['rows'] = mysql_affected_rows($db['connection']);      // Anzahl der aktualisierten Zeilen
-      }
-   }
-
-   return $result;
-}
-
-
-/**
- * Startet eine neue Datenbank-Transaktion und signalisiert, ob eine neue Transaktion gestartet wurde.
- *
- * @param array $db - die zu verwendende Datenbankkonfiguration
- *
- * @return boolean - TRUE, wenn eine neue Transaktion gestartet wurde
- *                   FALSE, wenn sich an eine bereits aktive Transaktion angeschlossen wurde
- */
-function beginTransaction(array &$db) {
-   if (isSet($db['transaction']) && $db['transaction']) {
-      ++$db['transaction'];
-      return false;
-   }
-
-   executeSql('begin', $db);
-   $db['transaction'] = 1;
-   return true;
-}
-
-
-/**
- * Schließt eine nicht verschachtelte Datenbank-Transaktion ab.  Ist die Transaktion eine verschachtelte
- * Transaktion, wird der Aufruf still ignoriert, da eine Transaktion immer von der höchsten Ebene aus
- * geschlossen werden muß.
- *
- * @param array $db - die zu verwendende Datenbankkonfiguration
- *
- * @return boolean - TRUE, wenn die Transaktion abgeschlossen wurde
- *                   FALSE, wenn die verschachtelte Transaktion nicht abgeschlossen wurde
- */
-function commitTransaction(array &$db) {
-   if (!$db['connection']) {
-      Logger ::log('No database connection', L_ERROR, __CLASS__);
-      return false;
-   }
-
-   if (!isSet($db['transaction']) || !$db['transaction']) {
-      Logger ::log('No database transaction to commit', L_WARN, __CLASS__);
-      return false;
-   }
-
-   if ($db['transaction'] > 1) {             // Transaktionszähler herunterzählen und nichts weiter tun
-      $db['transaction'] = $db['transaction'] - 1;
-      return false;
-   }
-
-   executeSql('commit', $db);                // committen
-   $db['transaction'] = 0;
-   return true;
-}
-
-
-/**
- * Rollt eine nicht verschachtelte Datenbank-Transaktion zurück.  Ist die Transaktion eine verschachtelte
- * Transaktion, wird der Aufruf still ignoriert, da eine Transaktion immer von der höchsten Ebene aus
- * zurückgerollt werden muß.
- *
- * @param array $db - die zu verwendende Datenbankkonfiguration
- *
- * @return boolean - TRUE, wenn die Transaktion zurückgerollt wurde
- *                   FALSE, wenn die verschachtelte Transaktion nicht zurückgerollt wurde
- */
-function rollbackTransaction(array &$db) {
-   if (!$db['connection']) {
-      Logger ::log('No database connection', L_ERROR, __CLASS__);
-      return false;
-   }
-
-   if (!isSet($db['transaction']) || !$db['transaction']) {
-      Logger ::log('No database transaction to roll back', L_WARN, __CLASS__);
-      return false;
-   }
-
-   if ($db['transaction'] > 1) {             // Transaktionszähler herunterzählen und nichts weiter tun
-      $db['transaction'] = $db['transaction'] - 1;
-      return false;
-   }
-
-   executeSql('rollback', $db);              // rollback
-   $db['transaction'] = 0;
-   return true;
 }
 
 
