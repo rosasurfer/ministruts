@@ -325,21 +325,20 @@ class ActionMapping extends Object {
     */
    public function freeze() {
       if (!$this->configured) {
-         if (!$this->path)                                              throw new IllegalStateException('A "path" attribute must be configured for mapping "'.$this->path.'"');
-         if (!$this->form && $this->validate)                           throw new IllegalStateException('A "form" must be configured for "validate" attribute value "true" in mapping "'.$this->path.'"');
+         if (!$this->path)                    throw new IllegalStateException('A "path" attribute must be configured for mapping "'.$this->path.'"');
+         if (!$this->form && $this->validate) throw new IllegalStateException('A "form" must be configured for "validate" attribute value "true" in mapping "'.$this->path.'"');
 
          if (!$this->action && !$this->forward) {
-            if (!$this->form || !$this->validate)
-               throw new IllegalStateException('Either an "action" or "forward" attribute must be configured for mapping "'.$this->path.'"');
+            if (!$this->form || !$this->validate) throw new IllegalStateException('Either an "action", "include", "redirect" or "forward" attribute must be specified for mapping "'.$this->path.'"');
+
+            if (!$this->form || !$this->validate) {
+               throw new IllegalStateException('Either an "action", "include", "redirect" or "forward" attribute must be specified for mapping "'.$this->path.'"');
+            }
+            elseif ($this->form && $this->validate) {
+               if (!isSet($this->forwards[ActionForward ::VALIDATION_SUCCESS_KEY]) || !isSet($this->forwards[ActionForward ::VALIDATION_ERROR_KEY]))
+                  throw new IllegalStateException('A "success" and an "error" forward must be configured for validation of mapping "'.$this->path.'"');
+            }
          }
-         if (!$this->action && $this->validate) {
-            if (!isSet($this->forwards[ActionForward ::VALIDATION_SUCCESS_KEY]) || !isSet($this->forwards[ActionForward ::VALIDATION_ERROR_KEY]))
-               throw new IllegalStateException('A "success" and an "error" forward must be configured for validation of mapping "'.$this->path.'"');
-         }
-
-
-
-
 
          if ($this->forward)
             $this->forward->freeze();

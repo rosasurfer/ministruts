@@ -321,10 +321,11 @@ EOT_405;
 
 
    /**
-    * Validiert die ActionForm, wenn entprechend konfiguriert.  Ist für das ActionMapping keine Action
-    * konfiguriert, wird je nach Ergebnis der Validierung auf die konfigurierte "success"- oder "error"-
-    * Resource weitergeleitet.  Gibt TRUE zurück, wenn die Verarbeitung fortgesetzt werden soll, oder
-    * FALSE, wenn auf eine andere Resource weitergeleitet und der Request bereits beendet wurde.
+    * Validiert die ActionForm, wenn entprechend konfiguriert.  Ist für das ActionMapping ein direkter
+    * Forward konfiguriert, wird nach der Validierung auf diesen Forward weitergeleitet. Ist kein
+    * allgemeiner Forward definiert, wird auf die konfigurierte "success" oder "error"-Resource
+    * weitergeleitet.  Gibt TRUE zurück, wenn die Verarbeitung fortgesetzt werden soll, oder FALSE,
+    * wenn auf eine andere Resource weitergeleitet und der Request bereits beendet wurde.
     *
     * @param Request       $request
     * @param Response      $response
@@ -342,8 +343,11 @@ EOT_405;
       if ($mapping->getAction())
          return true;
 
-      $key = $success ? ActionForward ::VALIDATION_SUCCESS_KEY : ActionForward ::VALIDATION_ERROR_KEY;
-      $forward = $mapping->findForward($key);
+      $forward = $mapping->getForward();
+      if (!$forward) {
+         $key = $success ? ActionForward ::VALIDATION_SUCCESS_KEY : ActionForward ::VALIDATION_ERROR_KEY;
+         $forward = $mapping->findForward($key);
+      }
 
       $this->processActionForward($request, $response, $forward);
       return false;

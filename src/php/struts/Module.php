@@ -229,6 +229,7 @@ class Module extends Object {
     */
    protected function setRoleProcessorClass(SimpleXMLElement $xml) {
       if ($this->configured) throw new IllegalStateException('Configuration is frozen');
+      // TODO: struts-config.xml: "role-processor" in eigenes Tag auslagern
       if (!$xml['role-processor'])
          return;
 
@@ -336,15 +337,11 @@ class Module extends Object {
          // process validate attribute
          if ($mapping->getForm()) {
             $action = $mapping->getAction();
-            if ($action) {
+            if ($action || $mapping->getForward()) {
                $validate = $tag['validate'] ? ($tag['validate'] == 'true') : !$action;
             }
-            elseif ($mapping->getForward()) {
-               if ($tag['validate'] == 'true') throw new RuntimeException('Cannot validate "form" when an "include", "redirect" or "forward" attribute is specified in mapping "'.$mapping->getPath().'"');
-               $validate = false;
-            }
             else {
-               if ($tag['validate'] == 'false') throw new RuntimeException('An "action" attribute or a forward definition is required to set "validate" attribute to "false" in mapping "'.$mapping->getPath().'"');
+               if ($tag['validate'] == 'false') throw new RuntimeException('An "action", "include", "redirect" or "forward" attribute is required when "validate" attribute is set to "false" in mapping "'.$mapping->getPath().'"');
                $validate = true;
                // Prüfung auf 'success' und 'error' Forward erfolgt in ActionMapping:freeze()
             }
