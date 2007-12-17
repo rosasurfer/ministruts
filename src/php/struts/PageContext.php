@@ -4,8 +4,8 @@
  *
  * Container, in dem für den Renderprozeß benötigte Objekte oder Variablen abgelegt werden. Beim
  * Rendern kann auf diese Daten aus dem HTML zugegriffen werden.  Innerhalb eines Seitenfragments
- * können auch neue Daten im Container gespeichert werden, jedoch nur, wenn diese Daten neu sind,
- * überschreiben vorhandener Daten aus dem Seitenfragment ist nicht möglich.
+ * können auch Daten im Container gespeichert werden, jedoch nur, wenn dabei keine vorhandenen
+ * Daten überschrieben werden.
  *
  * Beispiel:
  * ---------
@@ -62,18 +62,14 @@ class PageContext extends Singleton {
 
 
    /**
-    * Magische Methode, die die Eigenschaft mit dem angegebenen Namen zurückgibt. Wird automatisch
+    * Magische PHP-Methode, die die Eigenschaft mit dem angegebenen Namen zurückgibt. Wird automatisch
     * aufgerufen und ermöglicht den Zugriff auf Eigenschaften mit dynamischen Namen.
     *
     * @param  string $name - Name der Eigenschaft
-    * @return mixed
-    * @throws RuntimeException - wenn keine Eigenschaft mit diesem Namen existiert
+    * @return mixed        - Wert oder NULL, wenn die Eigenschaft nicht existiert
     */
    private function __get($name) {
-      if (isSet($this->properties[$name]))
-         return $this->properties[$name];
-
-      throw new RuntimeException('Unknown property: '.__CLASS__.'::$'.$name);
+      return isSet($this->properties[$name]) ? $this->properties[$name] : null;
    }
 
 
@@ -87,12 +83,11 @@ class PageContext extends Singleton {
    private function __set($name, $value) {
       if (!is_string($name)) throw new IllegalTypeException('Illegal type of argument $name: '.getType($name));
 
-      if (isSet($this->properties[$name])) {
-         // TODO: überschreiben vorhandener Eigenschaften validieren
+      if ($value !== null) {
          $this->properties[$name] = $value;
       }
       else {
-         $this->properties[$name] = $value;
+         unset($this->properties[$name]);
       }
    }
 }
