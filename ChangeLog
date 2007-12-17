@@ -43,7 +43,7 @@
 
    - Klassen werden mit absolutem Pfad geladen, dadurch muß "include_path" nicht mehr durchsucht werden
 
-   - $__imports -> $__classes
+   - Refactoring: globale Variable $__imports -> $__classes
 
 
 2007-12-03
@@ -87,9 +87,6 @@
 
    - php/struts/FrontController: strengere Prüfung beim Zugriff auf CVS- oder WEB-INF-Verzeichnis,
      als Antwort wird nur noch ein 404 (SC_NOT_FOUND) akzeptiert
-
-   - vorausschauendes Laden weiterer Klassendefinitionen; include('imports.php') in Projekten nicht
-     mehr nötig
 
 
 2007-11-27

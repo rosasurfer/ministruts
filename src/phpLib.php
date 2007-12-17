@@ -73,7 +73,6 @@ $__classes['Config'                         ] = $dir.'php/util/Config';
 $__classes['Logger'                         ] = $dir.'php/util/Logger';
 $__classes['String'                         ] = $dir.'php/util/String';
 
-@include($dir='classes.php');    // vorausschauendes Laden weiterer Klassendefinitionen
 unset($dir);
 
 
