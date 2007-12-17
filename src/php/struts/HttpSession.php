@@ -74,20 +74,19 @@ class HttpSession extends Singleton {
 
       // Session prüfen
       if (sizeOf($_SESSION) == 0) {          // neue Session gestartet, woher kommt die ID ?
-         $sname = session_name();
-         $sid = session_id();
+         $sName = session_name();
+         $sId   = session_id();
 
          // TODO: Verwendung von $_COOKIE und $_REQUEST ist unsicher
-         if     (isSet($_COOKIE [$sname]) && $_COOKIE [$sname] == $sid) $fromUser = true;    // vom Cookie
-         elseif (isSet($_REQUEST[$sname]) && $_REQUEST[$sname] == $sid) $fromUser = true;    // aus GET/POST
+         if     (isSet($_COOKIE [$sName]) && $_COOKIE [$sName] == $sId) $fromUser = true;    // vom Cookie
+         elseif (isSet($_REQUEST[$sName]) && $_REQUEST[$sName] == $sId) $fromUser = true;    // aus GET/POST
          else                                                           $fromUser = false;
 
-         if ($fromUser) {
+         if ($fromUser)
             session_regenerate_id(true);     // neue ID generieren und alte Datei löschen
-         }
 
-         // Marker setzen, ab jetzt: sizeOf($_SESSION) > 0
-         $_SESSION['__SESSION_CREATED__'  ] = time();
+         // Marker setzen, ab jetzt ist sizeOf($_SESSION) immer > 0
+         $_SESSION['__SESSION_CREATED__'  ] = microTime(true);
          $_SESSION['__SESSION_IP__'       ] = $_SERVER['REMOTE_ADDR'];     // TODO: forwarded remote IP einbauen
          $_SESSION['__SESSION_USERAGENT__'] = $_SERVER['HTTP_USER_AGENT'];
 
@@ -130,11 +129,69 @@ class HttpSession extends Singleton {
 
 
    /**
+    * Gibt den unter dem angegebenen Schlüssel in der Session gespeicherten Wert zurück oder NULL,
+    * wenn unter diesem Schlüssel kein Wert existiert.
+    *
+    * @param string $key - Schlüssel, unter dem der Wert gespeichert ist
+    *
+    * @return mixed - der gespeicherte Wert oder NULL
+    */
+   public function getAttribute($key) {
+      return isSet($_SESSION[$key]) ? $_SESSION[$key] : null;
+   }
+
+
+   /**
+    * Speichert in der Session unter dem angegebenen Schlüssel einen Wert.  Ein unter dem selben
+    * Schlüssel schon vorhandener Wert wird ersetzt.
+    *
+    * Ist der übergebene Wert NULL, hat dies den selben Effekt wie der Aufruf von
+    * HttpSession::removeAttribute()
+    *
+    * @param string $key   - Schlüssel, unter dem der Wert gespeichert wird
+    * @param mixed  $value - der zu speichernde Wert
+    */
+   public function setAttribute($key, $value) {
+      if (!is_string($key)) throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
+
+      if ($value !== null) {
+         $_SESSION[$key] = $value;
+      }
+      else {
+         $this->removeAttribute($key);
+      }
+   }
+
+
+   /**
+    * Löscht den unter dem angegebenen Schlüssel in der Session gespeicherten Wert.  Existiert unter
+    * dem angegebenen Schlüssel kein Wert, macht die Methode gar nichts.
+    *
+    * @param string $key - Schlüssel, unter dem der Wert gespeichert ist
+    */
+   public function removeAttribute($key) {
+      unset($_SESSION[$key]);
+   }
+
+
+   /**
+    * Ob unter dem angegebenen Schlüssel ein Wert in der Session existiert.
+    *
+    * @param string $key - Schlüssel
+    *
+    * @return boolean
+    */
+   public function isAttribute($key) {
+      return isSet($_SESSION[$key]);
+   }
+
+
+   /**
     * Entfernt alle gespeicherten Informationen aus der aktuellen Session.
     *
     * @return boolean - TRUE, wenn alle gespeicherten Informationen gelöscht wurden
     *                   FALSE, wenn keine Session existiert
-   function clearSession() {
+   function clear() {
       if (isSession()) {
          $keys = array_keys($_SESSION);
          foreach ($keys as $key) {
