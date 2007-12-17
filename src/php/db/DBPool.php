@@ -55,11 +55,11 @@ final class DBPool extends Singleton {
          $connector = $me->pool[$name];
       }
       elseif ($config=Config ::get('db.'.$name)) { // nein, Config holen und Connector laden
-         $name = strToLower($config['connector']);
+         $lowerName = strToLower($config['connector']);
 
          // bekannte Connectoren trotz verschiedener Schreibweisen erkennen
-         if (isSet(self::$knownConnectors[$name])) {
-            $class = self::$knownConnectors[$name];
+         if (isSet(self::$knownConnectors[$lowerName])) {
+            $class = self::$knownConnectors[$lowerName];
          }
          else {   // unbekannt, Fall-back: name.Connector
             $class = $config['connector'].'Connector';
