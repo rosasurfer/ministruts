@@ -192,6 +192,7 @@ class ActionMapping extends Object {
    public function setAction($className) {
       if ($this->configured)                                       throw new IllegalStateException('Configuration is frozen');
       if (!is_string($className))                                  throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
+      if (!is_class($className))                                   throw new ClassNotFoundException("Undefined class '$className'");
       if (!is_subclass_of($className, Struts ::ACTION_BASE_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts ::ACTION_BASE_CLASS.': '.$className);
       if ($this->forward)                                          throw new RuntimeException('Configuration error: Only one attribute of "action", "include", "redirect" or "forward" can be specified for mapping "'.$this->path.'"');
 
@@ -221,6 +222,7 @@ class ActionMapping extends Object {
    public function setForm($className) {
       if ($this->configured)                                            throw new IllegalStateException('Configuration is frozen');
       if (!is_string($className))                                       throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
+      if (!is_class($className))                                        throw new ClassNotFoundException("Undefined class '$className'");
       if (!is_subclass_of($className, Struts ::ACTION_FORM_BASE_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts ::ACTION_FORM_BASE_CLASS.': '.$className);
 
       $this->form = $className;

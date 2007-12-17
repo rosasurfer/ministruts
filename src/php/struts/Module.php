@@ -234,6 +234,8 @@ class Module extends Object {
          return;
 
       $className = (string) $xml['role-processor'];
+
+      if (!is_class($className))                                           throw new ClassNotFoundException("Undefined class '$className'");
       if (!is_subclass_of($className, Struts ::ROLE_PROCESSOR_BASE_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts ::ROLE_PROCESSOR_BASE_CLASS.': '.$className);
       $this->roleProcessorClass = $className;
    }
@@ -599,6 +601,7 @@ class Module extends Object {
    protected function setRequestProcessorClass($className) {
       if ($this->configured)                                                     throw new IllegalStateException('Configuration is frozen');
       if (!is_string($className))                                                throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
+      if (!is_class($className))                                                 throw new ClassNotFoundException("Undefined class '$className'");
       if (!is_subclass_of($className, Struts ::DEFAULT_REQUEST_PROCESSOR_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts ::DEFAULT_REQUEST_PROCESSOR_CLASS.': '.$className);
 
       $this->requestProcessorClass = $className;
@@ -624,6 +627,7 @@ class Module extends Object {
    protected function setTilesClass($className) {
       if ($this->configured)                                         throw new IllegalStateException('Configuration is frozen');
       if (!is_string($className))                                    throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
+      if (!is_class($className))                                     throw new ClassNotFoundException("Undefined class '$className'");
       if (!is_subclass_of($className, Struts ::DEFAULT_TILES_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts ::DEFAULT_TILES_CLASS.': '.$className);
 
       $this->tilesClass = $className;
@@ -649,6 +653,7 @@ class Module extends Object {
    protected function setMappingClass($className) {
       if ($this->configured)                                                  throw new IllegalStateException('Configuration is frozen');
       if (!is_string($className))                                             throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
+      if (!is_class($className))                                              throw new ClassNotFoundException("Undefined class '$className'");
       if (!is_subclass_of($className, Struts ::DEFAULT_ACTION_MAPPING_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts ::DEFAULT_ACTION_MAPPING_CLASS.': '.$className);
 
       $this->mappingClass = $className;
@@ -674,6 +679,7 @@ class Module extends Object {
    protected function setForwardClass($className) {
       if ($this->configured)                                                  throw new IllegalStateException('Configuration is frozen');
       if (!is_string($className))                                             throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
+      if (!is_class($className))                                              throw new ClassNotFoundException("Undefined class '$className'");
       if (!is_subclass_of($className, Struts ::DEFAULT_ACTION_FORWARD_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts ::DEFAULT_ACTION_FORWARD_CLASS.': '.$className);
 
       $this->forwardClass = $className;

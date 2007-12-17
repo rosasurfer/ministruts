@@ -148,9 +148,10 @@ function __autoload($className /*, $throw */) {
 
 
 /**
- * Ob die angegebene Klasse existiert.  Diese Funktion ist notwendig, weil eine einfache Abfrage der Art
- * "if (class_exist($className, true))" das Script im Fehlerfall beendet (__autoload darf keine Exceptions
- * werfen). Wird __autoload aus dieser Funktion und nicht aus dem PHP-Kernel aufgerufen, werden Exceptions
+ * Ob der angegebene Klassenname definiert ist.  Diese Funktion ist notwendig, weil eine einfache
+ * Abfrage der Art "if (class_exist($className, true))" __autoload() aufruft und dabei im Fehlerfall
+ * das Script mit einem fatalen Fehler beendet (__autoload darf keine Exceptions werfen).
+ * Wird __autoload aus dieser Funktion und nicht aus dem PHP-Kernel aufgerufen, werden Exceptions
  * weitergereicht und der folgende Code kann entsprechend reagieren.
  *
  * @param string $className - Klassenname

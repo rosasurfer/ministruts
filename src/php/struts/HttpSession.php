@@ -2,7 +2,7 @@
 /**
  * HttpSession
  *
- * Wrapper für die aktuelle HttpSession des Requests.
+ * Wrapper für die aktuelle HttpSession des Users.
  */
 class HttpSession extends Singleton {
 
@@ -14,7 +14,8 @@ class HttpSession extends Singleton {
 
 
    /**
-    * Ob die Session neu ist oder nicht. Die Session ist neu, wenn der User die Session-ID noch nicht kennt.
+    * Ob die Session neu ist oder nicht. Die Session ist neu, wenn der User die Session-ID noch nicht
+    * kennt.
     */
    protected /*bool*/ $new = null;
 
@@ -50,13 +51,13 @@ class HttpSession extends Singleton {
     */
    protected function init() {
       /**
-       * PHP läßt sich ohne weiteres manipulierte Session-IDs unterschieben, solange diese keine ungültigen
-       * Zeichen enthalten (IDs wie PHPSESSID=111 werden anstandslos akzeptiert). Wenn session_start()
-       * zurückkehrt, gibt es mit den eingebauten PHP-Mitteln keine elegante Möglichkeit mehr, festzustellen,
-       * ob die Session-ID von PHP oder vom User generiert wurde. Daher wird in jeder Session mit neuer ID
-       * eine zusätzliche Markierungsvariable gespeichert. Fehlt diese Markierung nach der Initialisierung,
-       * wurde die ID nicht hier generiert. In diesem Fall wird die Session aus Sicherheitsgründen verworfen
-       * und eine neue erzeugt.
+       * PHP läßt sich ohne weiteres manipulierte Session-IDs unterschieben, solange diese keine
+       * ungültigen Zeichen enthalten (IDs wie PHPSESSID=111 werden anstandslos akzeptiert). Wenn
+       * session_start() zurückkehrt, gibt es mit den eingebauten PHP-Mitteln keine elegante Möglichkeit
+       * mehr, festzustellen, ob die Session-ID von PHP oder vom User generiert wurde. Daher wird in
+       * jeder Session mit neuer ID eine zusätzliche Markierungsvariable gespeichert. Fehlt diese
+       * Markierung nach der Initialisierung, wurde die ID nicht hier generiert. In diesem Fall wird
+       * die Session aus Sicherheitsgründen verworfen und eine neue erzeugt.
        */
 
       // Session starten oder fortsetzen
