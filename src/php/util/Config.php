@@ -2,28 +2,29 @@
 /**
  * Config
  *
- * Helferklasse zur Anwendungskonfiguration. Einstellungen werden in der Datei "config.properties" abgelegt.
- * Bei Webanwendungen wird nach dieser Datei im WEB-INF-Verzeichnis, bei Konsolenanwendungen im aktuellen
- * Verzeichnis gesucht. Existiert eine Datei "config-custom.properties", wird auch diese eingelesen, sie
- * überschreibt gleichlautende Einstellungen in "config.properties". Dadurch können parallel eine globale
- * und eine lokale Konfiguration vorgehalten werden.
+ * Helferklasse zur Anwendungskonfiguration. Einstellungen werden in der Datei "config.properties"
+ * abgelegt.  Bei Webanwendungen wird nach der Datei im WEB-INF-Verzeichnis, bei Konsolenanwendungen
+ * im aktuellen Verzeichnis gesucht.  Existiert eine Datei "config-custom.properties", wird auch diese
+ * eingelesen, sie überschreibt gleichlautende Einstellungen in "config.properties". Dadurch können
+ * parallel eine globale und eine lokale Konfiguration vorgehalten werden.
  *
  * Dateiformat:
  * ------------
  * Einstellungen werden als "name = wert" abgelegt. Kommentare werden mit einem Hash "#" eingeleitet.
- * Leerzeilen und führende oder abschließende Leerzeichen werden ignoriert. Einstellungen können gruppiert
- * werden, eine solche Gruppe kann einzeln (Rückgabewert ist ein String ) oder komplett (Rückgabewert ist
- * ein assoziatives Array) abgefragt werden.
+ * Leerzeilen und führende oder abschließende Leerzeichen werden ignoriert. Einstellungen können
+ * gruppiert werden, eine solche Gruppe kann einzeln (Rückgabewert ist ein String ) oder komplett
+ * (Rückgabewert ist ein assoziatives Array) abgefragt werden.
  *
  * Beispiel:
  * ---------
  * <pre>
- * app-name                 = myapp
+ * app-name     = myapp
  *
- * db.host                  = localhost:3306
- * db.username              = myapp_user
- * db.password              = plainpassword
- * db.database              = db_test
+ * db.connector = mysql
+ * db.host      = localhost:3306
+ * db.username  = myapp_user
+ * db.password  = plainpassword
+ * db.database  = db_test
  *
  * # ein Komentar in einer eigenen Zeile
  *
@@ -61,14 +62,16 @@ final class Config extends Singleton {
    /**
     * Konstruktor
     *
-    * Lädt die Konfiguration aus der Datei "config.properties", wenn sie existiert.  Existiert eine weitere
-    * Datei "config-custom.properties", wird auch diese geladen. Diese zusätzliche Datei darf nicht im
-    * Repository gespeichert werden, sodaß parallel eine globale und eine lokale Konfiguration mit
-    * unterschiedlichen Einstellungen verwendet werden können. Lokale Einstellungen überschreiben globale
-    * Einstellungen.
+    * Lädt die Konfiguration aus der Datei "config.properties", wenn sie existiert.  Existiert eine
+    * weitere Datei "config-custom.properties", wird auch diese geladen. Diese zusätzliche Datei darf
+    * nicht im Repository gespeichert werden, sodaß parallel eine globale und eine lokale Konfiguration
+    * mit unterschiedlichen Einstellungen verwendet werden können. Lokale Einstellungen überschreiben
+    * globale Einstellungen.
     */
    protected function __construct() {
-      // Konfigurationen suchen, bei Webapplikation in WEB-INF, an der Konsole im aktuellen Verzeichnis
+      // Konfigurationen suchen, bei Webapplikation in WEB-INF, bei Shellscripten im aktuellen Verzeichnis
+
+      // TODO: Config-Verzeichnis darf nicht mit getCwd() ermittelt werden
       $path = getCwd().(Request ::me() ? '/WEB-INF/' : '/');
 
       $files = array();
