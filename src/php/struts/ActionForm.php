@@ -5,8 +5,16 @@
 abstract class ActionForm extends Object {
 
 
-   protected /*Request*/ $request;     // der Request, mit dem wir verbunden sind
-   protected             $actionKey;   // string: DispatchAction-Key
+   /**
+    * der Request, zu dem wir gehören
+    */
+   protected /*Request*/ $request;
+
+
+   /**
+    * DispatchAction-Key
+    */
+   protected /*string*/ $actionKey;
 
 
    /**
@@ -19,9 +27,9 @@ abstract class ActionForm extends Object {
    public function __construct(Request $request) {
       $this->request = $request;
 
-      // ggf. definierten Dispatch-Parameter auslesen
+      // ggf. definierten DispatchAction-Key auslesen
       if     (isSet($_REQUEST['action'  ])) $this->actionKey = $_REQUEST['action'  ];
-      elseif (isSet($_REQUEST['action_x'])) $this->actionKey = $_REQUEST['action_x'];     // input-Type 'image'
+      elseif (isSet($_REQUEST['action_x'])) $this->actionKey = $_REQUEST['action_x'];  // submit-Type "image"
 
 
       // Parameter einlesen
@@ -32,13 +40,13 @@ abstract class ActionForm extends Object {
    /**
     * Liest die im Request übergebenen Parameter ein.  Muß anwendungsabhängig implementiert werden.
     *
-    * @param Request $request
+    * @param Request $request - der aktuelle Request
     */
    abstract protected function populate(Request $request);
 
 
    /**
-    * Ob die eingelesenen Parameter gültig sind. Sollte anwendungsabhängig überschrieben werden.
+    * Ob die eingelesenen Parameter gültig sind. Muß anwendungsabhängig überschrieben werden.
     *
     * @return boolean - TRUE, wenn die übergebenen Parameter gültig sind, FALSE andererseits
     *                   (diese Default-Implementierung gibt immer TRUE zurück)
