@@ -1,6 +1,6 @@
 <?
 /**
- * Einfache Basisklasse für rein statische Klassen.
+ * Einfache Superklasse für nur statisch zu verwendende Klassen.
  *
  * Klassen, die von StaticClass abgeleitet sind, können nicht instantiiert werden.
  */
