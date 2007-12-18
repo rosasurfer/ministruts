@@ -18,6 +18,8 @@ $__classes['Object'                         ] = $dir.'php/core/Object';
 $__classes['Singleton'                      ] = $dir.'php/core/Singleton';
 $__classes['StaticClass'                    ] = $dir.'php/core/StaticClass';
 
+$__classes['IDAOConnected'                  ] = $dir.'php/dao/IDAOConnected';
+
 $__classes['DB'                             ] = $dir.'php/db/DB';
 $__classes['DBPool'                         ] = $dir.'php/db/DBPool';
 $__classes['MySQLConnector'                 ] = $dir.'php/db/MySQLConnector';
@@ -68,7 +70,7 @@ $__classes['RoleProcessor'                  ] = $dir.'php/struts/RoleProcessor';
 $__classes['Struts'                         ] = $dir.'php/struts/Struts';
 $__classes['Tile'                           ] = $dir.'php/struts/Tile';
 
-$__classes['BaseValidator'                  ] = $dir.'php/util/BaseValidator';
+$__classes['CommonValidator'                ] = $dir.'php/util/CommonValidator';
 $__classes['Config'                         ] = $dir.'php/util/Config';
 $__classes['Logger'                         ] = $dir.'php/util/Logger';
 $__classes['String'                         ] = $dir.'php/util/String';
@@ -329,8 +331,8 @@ function decodeUtf8($string) {
  * @return string - resultierendes Datum
  */
 function addDate($date, $days) {
-   if (!BaseValidator ::isDate($date)) throw new InvalidArgumentException('Invalid argument $date: '.$date);
-   if (!is_int($days))                 throw new InvalidArgumentException('Invalid argument $days: '.$days);
+   if (!CommonValidator ::isDate($date)) throw new InvalidArgumentException('Invalid argument $date: '.$date);
+   if (!is_int($days))                   throw new InvalidArgumentException('Invalid argument $days: '.$days);
 
    $parts = explode('-', $date);
    $year  = (int) $parts[0];

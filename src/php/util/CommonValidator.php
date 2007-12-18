@@ -1,8 +1,8 @@
 <?
 /**
- * BaseValidator
+ * CommonValidator
  */
-class BaseValidator extends StaticClass {
+class CommonValidator extends StaticClass {
 
 
    /**
@@ -234,7 +234,7 @@ class BaseValidator extends StaticClass {
     * @return boolean
     */
    public static function isLastName($string) {
-      return BaseValidator ::isFirstName($string);
+      return self:: isFirstName($string);
    }
 
 
