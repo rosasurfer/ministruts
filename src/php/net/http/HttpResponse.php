@@ -242,6 +242,8 @@ abstract class HttpResponse extends Object {
 
    /**
     * HTTP status code descriptions
+    *
+    * TODO: HttpResponse::$sc - unmöglicher Name
     */
    public static $sc = array(self:: SC_CONTINUE                        => 'SC_CONTINUE'                       ,
                              self:: SC_SWITCHING_PROTOCOLS             => 'SC_SWITCHING_PROTOCOLS'            ,
