@@ -37,7 +37,7 @@ final class DBPool extends Singleton {
 
 
    /**
-    * Gibt den Connector mit dem jeweiligen Namen zurück.
+    * Gibt den Connector mit dem angegebenen Namen zurück.
     *
     * @param string $name - Name
     *
@@ -55,11 +55,11 @@ final class DBPool extends Singleton {
          $connector = $me->pool[$name];
       }
       elseif ($config=Config ::get('db.'.$name)) { // nein, Config holen und Connector laden
-         $lowerName = strToLower($config['connector']);
+         $connectorName = strToLower($config['connector']);
 
          // bekannte Connectoren trotz verschiedener Schreibweisen erkennen
-         if (isSet(self::$knownConnectors[$lowerName])) {
-            $class = self::$knownConnectors[$lowerName];
+         if (isSet(self::$knownConnectors[$connectorName])) {
+            $class = self::$knownConnectors[$connectorName];
          }
          else {   // unbekannt, Fall-back: name.Connector
             $class = $config['connector'].'Connector';
