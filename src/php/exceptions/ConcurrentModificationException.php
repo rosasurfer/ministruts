@@ -2,9 +2,7 @@
 /**
  * ConcurrentModificationException
  *
- * Markiert Fehler beim gleichzeitigen Schreibzugriff auf PersistableObject-Instanzen.
- *
- * TODO: überflüssig, refaktorieren
+ * Markiert Fehler bei gleichzeitigen Änderungen von Daten durch mehrere Prozesse.
  */
 class ConcurrentModificationException extends InfrastructureException {
 }
