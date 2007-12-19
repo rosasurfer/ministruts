@@ -1,3 +1,8 @@
+2007-12-19
+
+   - struts-config.xml: Syntaxvereinfachungen <tiles-definitions> -> <tiles>, <definition> -> <tile>
+
+
 2007-12-18
 
    - Refactoring: php/util/BaseValidator   -> php/util/CommonValidator

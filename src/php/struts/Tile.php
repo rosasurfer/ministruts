@@ -117,7 +117,7 @@ class Tile extends Object {
          throw new InvalidArgumentException('Invalid argument $type: '.$type);
 
       $this->properties[$name] = array($type, $value);
-      // TODO: valid types -> string, page or definition
+      // TODO: valid types -> string, page or tile
    }
 
 

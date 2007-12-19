@@ -415,7 +415,7 @@ class Module extends Object {
     * @param SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
     */
    protected function processTiles(SimpleXMLElement $xml) {
-      foreach ($xml->xPath('/struts-config/tiles-definitions/definition') as $tag) {
+      foreach ($xml->xPath('/struts-config/tiles/tile') as $tag) {
          $name = (string) $tag['name'];
          $tile = $this->getDefinedTile($name, $xml);
       }
@@ -437,7 +437,7 @@ class Module extends Object {
          return $this->tiles[$name];
 
       // find it's definition ...
-      $nodes = $xml->xPath("/struts-config/tiles-definitions/definition[@name='$name']");
+      $nodes = $xml->xPath("/struts-config/tiles/tile[@name='$name']");
       if (!$nodes)            throw new RuntimeException('Tiles definition not found: "'.$name.'"'); // false oder leeres Array
       if (sizeOf($nodes) > 1) throw new RuntimeException('Non-unique "name" attribute detected for tiles definition "'.$name.'"');
 
@@ -760,7 +760,7 @@ class Module extends Object {
     * @return boolean
     */
    private function isIncludeResource($name, SimpleXMLElement $xml) {
-      $nodes = $xml->xPath("/struts-config/tiles-definitions/definition[@name='$name']");
+      $nodes = $xml->xPath("/struts-config/tiles/tile[@name='$name']");
 
       if ($nodes) {
          if (sizeOf($nodes) > 1)

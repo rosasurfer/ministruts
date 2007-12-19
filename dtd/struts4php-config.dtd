@@ -55,7 +55,7 @@
      role-processor Class name of the [RoleProcessor] subclass that will perform role checking
                     for this module.
 -->
-<!ELEMENT struts-config (global-forwards?, action-mappings, tiles-definitions?)>
+<!ELEMENT struts-config (global-forwards?, action-mappings, tiles?)>
 <!ATTLIST struts-config
           doc-base          %ResourcePath;  #IMPLIED
           role-processor    %ClassName;     #IMPLIED
@@ -163,27 +163,26 @@
 >
 
 
-<!-- The "tiles-definitions" element describes the set of available Tiles objects.  Individual
-     tiles are configured through nested <definition> elements.
+<!-- The "tiles" element describes the set of available Tiles objects.  Individual tiles are configured
+     through nested <tile> elements.
 -->
-<!ELEMENT tiles-definitions (definition*)>
+<!ELEMENT tiles (tile*)>
 
 
-<!-- The "definition" element describes a single definition that can be inserted in a page. It is
-     identified by its logical name.
+<!-- The "tile" element describes a single Tile that can be inserted in a page. It is identified by its
+     logical name.
 
-     name       The unique identifier for this definition.
+     name       The unique identifier for this tile.
 
-     path       The path of the resource used as tile relative to the "WEB-INF" directory of the
-                application.  Exactly one of "path" or "extends" must be specified.
+     path       The path of the file used as tile relative to the "WEB-INF" directory of the application.
+                Exactly one of "path" or "extends" must be specified.
 
-     extends    Name of a definition that is used as ancestor of this definition.  All attributes
-                from the ancestor are available to the new definition.  Any attribute inherited
-                from the ancestor can be overloaded by providing a new value.  Exactly one of "path"
-                or "extends" must be specified.
+     extends    Name of a tile that is used as ancestor of this tile.  All attributes from the ancestor
+                are available to the new tile.  Any attribute inherited from the ancestor can be over-
+                written by providing a new value.  Exactly one of "path" or "extends" must be specified.
 -->
-<!ELEMENT definition (set*)>
-<!ATTLIST definition
+<!ELEMENT tile (set*)>
+<!ATTLIST tile
           name      %LogicalName;   #REQUIRED
           path      %ResourcePath;  #IMPLIED
           extends   %LogicalName;   #IMPLIED
