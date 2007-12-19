@@ -20,6 +20,7 @@ final class Response extends Singleton {
    public static function me() {
       if (isSet($_SERVER['REQUEST_METHOD']))
          return Singleton ::getInstance(__CLASS__);
+
       return null;
    }
 

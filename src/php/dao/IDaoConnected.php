@@ -2,13 +2,13 @@
 /**
  * Hilfs-Interface zum Finden des DAO eines PersistableObject.
  */
-interface IDAOConnected {
+interface IDaoConnected {
 
 
    /**
-    * Gibt das DAO eines PersistableObject zurück.
+    * Gibt den DAO für ein PersistableObject zurück.
     *
-    * @return CommonDAO
+    * @return BaseDAO
     */
    static function dao();
 }

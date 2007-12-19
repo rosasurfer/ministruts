@@ -1,6 +1,11 @@
 2007-12-18
 
-   - Refactoring: php/util/BaseValidator -> php/util/CommonValidator
+   - Refactoring: php/util/BaseValidator   -> php/util/CommonValidator
+
+   - php/db/PersistableObject -> php/dao/PersistableObject
+
+   - DB-Layer: DAO-Hierarchie eingeführt, BaseDAO, IDaoConnected, alles von "static" auf Instanzen umgestellt
+     (Instanzen sind über PersistableObject::dao() erreichbar)
 
 
 2007-12-16

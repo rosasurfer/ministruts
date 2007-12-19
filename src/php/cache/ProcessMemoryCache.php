@@ -1,11 +1,11 @@
 <?
 /**
- * RuntimeMemoryCache
+ * ProcessMemoryCache
  *
  * Prozess-Cache. Cacht Objekte im Speicher (RAM) des aktuellen Prozesses, nicht Request-übergreifend.
  * Nützlich als Fallback, wenn ein Cache benötigt wird, jedoch keiner installiert ist.
  */
-final class RuntimeMemoryCache extends AbstractCachePeer {
+final class ProcessMemoryCache extends AbstractCachePeer {
 
 
    // Referenz-Pool
@@ -34,7 +34,7 @@ final class RuntimeMemoryCache extends AbstractCachePeer {
     * @return mixed - Der gespeicherte Wert oder NULL, falls kein solcher Schlüssel existiert.
     *                 Wird im Cache ein NULL-Wert gespeichert, wird ebenfalls NULL zurückgegeben.
     *
-    * @see RuntimeMemoryCache::isCached()
+    * @see ProcessMemoryCache::isCached()
     */
    public function get($key, $ns) {
       if ($this->isCached($key, $ns))

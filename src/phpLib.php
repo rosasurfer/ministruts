@@ -11,19 +11,19 @@ $dir = dirName(__FILE__).DIRECTORY_SEPARATOR;
 $__classes['AbstractCachePeer'              ] = $dir.'php/cache/AbstractCachePeer';
 $__classes['ApcCache'                       ] = $dir.'php/cache/ApcCache';
 $__classes['Cache'                          ] = $dir.'php/cache/Cache';
-$__classes['RuntimeMemoryCache'             ] = $dir.'php/cache/RuntimeMemoryCache';
+$__classes['ProcessMemoryCache'             ] = $dir.'php/cache/ProcessMemoryCache';
 
-$__classes['ISingle'                        ] = $dir.'php/core/ISingle';
 $__classes['Object'                         ] = $dir.'php/core/Object';
 $__classes['Singleton'                      ] = $dir.'php/core/Singleton';
 $__classes['StaticClass'                    ] = $dir.'php/core/StaticClass';
 
-$__classes['IDAOConnected'                  ] = $dir.'php/dao/IDAOConnected';
+$__classes['BaseDAO'                        ] = $dir.'php/dao/BaseDAO';
+$__classes['IDaoConnected'                  ] = $dir.'php/dao/IDaoConnected';
+$__classes['PersistableObject'              ] = $dir.'php/dao/PersistableObject';
 
 $__classes['DB'                             ] = $dir.'php/db/DB';
 $__classes['DBPool'                         ] = $dir.'php/db/DBPool';
 $__classes['MySQLConnector'                 ] = $dir.'php/db/MySQLConnector';
-$__classes['PersistableObject'              ] = $dir.'php/db/PersistableObject';
 
 $__classes['BusinessRuleException'          ] = $dir.'php/exceptions/BusinessRuleException';
 $__classes['ClassNotFoundException'         ] = $dir.'php/exceptions/ClassNotFoundException';
@@ -39,6 +39,7 @@ $__classes['NestableException'              ] = $dir.'php/exceptions/NestableExc
 $__classes['NoPermissionException'          ] = $dir.'php/exceptions/NoPermissionException';
 $__classes['PHPErrorException'              ] = $dir.'php/exceptions/PHPErrorException';
 $__classes['RuntimeException'               ] = $dir.'php/exceptions/RuntimeException';
+$__classes['UnsupportedMethodException'     ] = $dir.'php/exceptions/UnsupportedMethodException';
 
 $__classes['TorHelper'                      ] = $dir.'php/net/TorHelper';
 

@@ -34,13 +34,15 @@
  *
  * @see AbstractCachePeer
  */
-class Cache extends StaticClass {
+final class Cache extends StaticClass {
 
 
    const EXPIRES_NEVER = 0;
 
 
-   // aktuelle Cache-Implementierung
+   /**
+    * die aktuelle Cache-Implementierung
+    */
    private static $peer = null;
 
 
@@ -54,7 +56,7 @@ class Cache extends StaticClass {
          if (extension_loaded('apc') && ini_get('apc.enabled'))
             self::$peer = new ApcCache();
          else
-            self::$peer = new RuntimeMemoryCache();
+            self::$peer = new ProcessMemoryCache();
       }
       return self::$peer;
    }
@@ -65,7 +67,7 @@ class Cache extends StaticClass {
     *
     * @param string $key       - Schlüssel, unter dem der Wert gespeichert wird
     * @param mixed  $value     - der zu speichernde Wert
-    * @param int    $expires   - Zeitspanne in Sekunden, die der Wert gespeichert bleiben soll (default: immer)
+    * @param int    $expires   - Zeitspanne in Sekunden, die der Wert gültig bleiben soll (default: immer)
     * @param string $namespace - Namensraum innerhalb des Caches (default: APPLICATION_NAME)
     *
     * @return boolean - TRUE bei Erfolg, FALSE andererseits
@@ -80,7 +82,7 @@ class Cache extends StaticClass {
     *
     * @param string $key       - Schlüssel, unter dem der Wert gespeichert wird
     * @param mixed  $value     - der zu speichernde Wert
-    * @param int    $expires   - Zeitspanne in Sekunden, die der Wert gespeichert bleiben soll (default: immer)
+    * @param int    $expires   - Zeitspanne in Sekunden, die der Wert gültig bleiben soll (default: immer)
     * @param string $namespace - Namensraum innerhalb des Caches (default: APPLICATION_NAME)
     *
     * @return boolean - TRUE bei Erfolg, FALSE andererseits
@@ -95,7 +97,7 @@ class Cache extends StaticClass {
     *
     * @param string $key       - Schlüssel, unter dem der Wert gespeichert wird
     * @param mixed  $value     - der zu speichernde Wert
-    * @param int    $expires   - Zeitspanne in Sekunden, die der Wert gespeichert bleiben soll (default: immer)
+    * @param int    $expires   - Zeitspanne in Sekunden, die der Wert gültig bleiben soll (default: immer)
     * @param string $namespace - Namensraum innerhalb des Caches (default: APPLICATION_NAME)
     *
     * @return boolean - TRUE bei Erfolg, FALSE andererseits

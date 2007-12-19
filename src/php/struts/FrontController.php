@@ -46,7 +46,7 @@ final class FrontController extends Singleton {
       // Ist schon eine Instanz im Cache ?
       $instance = Cache ::get(__CLASS__);
       if (!$instance) {                   // nein
-         $instance = parent:: getInstance(__CLASS__);
+         $instance = Singleton ::getInstance(__CLASS__);
 
          // Instanz cachen, wenn nicht auf lokaler Maschine (localhost = development)
          if ($_SERVER['REMOTE_ADDR'] != '127.0.0.1')

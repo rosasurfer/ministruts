@@ -49,7 +49,7 @@ final class Config extends Singleton {
       $instance = Cache ::get(__CLASS__);
 
       if (!$instance) { // nein, neue Instanz erzeugen ...
-         $instance = parent:: getInstance(__CLASS__);
+         $instance = Singleton ::getInstance(__CLASS__);
 
          // ... und cachen (wenn auf Production-Server)
          if (isSet($_SERVER['REQUEST_METHOD']) && $_SERVER['REMOTE_ADDR']!='127.0.0.1')

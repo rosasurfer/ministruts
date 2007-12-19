@@ -2,9 +2,9 @@
 /**
  * PersistableObject
  *
- * Abstrakte Superklasse für Objekte, die dauerhaft gespeichert werden können.
+ * Abstrakte Basisklasse für speicherbare Objekte.
  */
-abstract class PersistableObject extends Object {
+abstract class PersistableObject extends Object implements IDaoConnected {
 
 
    // Mapping-Constanten

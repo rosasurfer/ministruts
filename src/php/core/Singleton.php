@@ -4,10 +4,12 @@
  *
  * Abstraktes Grundgerüst für Implementierungen des Singleton-Patterns.
  */
-abstract class Singleton extends Object implements ISingle {
+abstract class Singleton extends Object {
 
 
-   // Pool mit allen momentan existierenden Singletons
+   /**
+    * Pool der momentan existierenden Singletons
+    */
    private static $instances = array();
 
 
@@ -24,7 +26,7 @@ abstract class Singleton extends Object implements ISingle {
     *
     * @return Singleton
     */
-   final protected static function getInstance($class, $args = null /*, ... */) {
+   final public static function getInstance($class, $args = null /*, ... */) {
       if (isSet(self::$instances[$class]))
          return self::$instances[$class];
 

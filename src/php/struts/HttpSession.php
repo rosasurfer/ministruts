@@ -21,21 +21,6 @@ class HttpSession extends Singleton {
 
 
    /**
-    * Gibt die Session-Instanz zurück.  Kann nur in einem Web-Kontext verwendet werden.
-    *
-    * @param Request $request - Request, zu dem die Session gehört
-    *
-    * @return HttpSession - Instanz
-    */
-   public static function me(Request $request = null) {
-      if ($request === null)
-         throw new InvalidArgumentException('Invalid argument $request: null');
-
-      return Singleton ::getInstance(__CLASS__, $request);
-   }
-
-
-   /**
     * Konstruktor
     *
     * @param Request $request - der Request, zu dem die Session gehört
