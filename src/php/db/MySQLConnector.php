@@ -44,7 +44,7 @@ final class MySQLConnector extends DB {
 
 
    /**
-    * Führt eine SQL-Anweisung aus (SQL-Klartext). Gibt das Ergebnis als Resource zurück.
+    * Führt eine SQL-Anweisung aus und gibt das Ergebnis als Resource zurück.
     *
     * @param string $sql - SQL-Anweisung
     *

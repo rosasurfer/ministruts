@@ -20,7 +20,7 @@ abstract class Singleton extends Object {
 
 
    /**
-    * Erzeugt die Singleton-Instanz der gewünschten Klasse.
+    * Gibt die Singleton-Instanz der gewünschten Klasse zurück.
     *
     * @param string $class - Klassennname
     *

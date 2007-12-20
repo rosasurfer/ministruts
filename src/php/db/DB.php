@@ -63,13 +63,13 @@ abstract class DB extends Object {
 
 
    /**
-    * Führt ein SQL-Statement aus.
+    * Führt eine SQL-Anweisung aus.
     *
-    * @param string $queryString - SQL-Statement
+    * @param string $sql - SQL-Anweisung
     *
     * @return mixed - je nach Connector
     */
-   abstract public function queryRaw($queryString);
+   abstract public function queryRaw($sql);
 
 
    /**
