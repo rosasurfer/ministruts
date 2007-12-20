@@ -1,6 +1,6 @@
 <?
 /**
- * Hilfs-Interface zum Finden des DAO eines PersistableObject.
+ * Interface zum Finden des DAO eines PersistableObject.
  */
 interface IDaoConnected {
 
