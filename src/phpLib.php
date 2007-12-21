@@ -39,6 +39,7 @@ $__classes['NestableException'              ] = $dir.'php/exceptions/NestableExc
 $__classes['NoPermissionException'          ] = $dir.'php/exceptions/NoPermissionException';
 $__classes['PHPErrorException'              ] = $dir.'php/exceptions/PHPErrorException';
 $__classes['RuntimeException'               ] = $dir.'php/exceptions/RuntimeException';
+$__classes['UnimplementedFeatureException'  ] = $dir.'php/exceptions/UnimplementedFeatureException';
 $__classes['UnsupportedMethodException'     ] = $dir.'php/exceptions/UnsupportedMethodException';
 
 $__classes['TorHelper'                      ] = $dir.'php/net/TorHelper';
