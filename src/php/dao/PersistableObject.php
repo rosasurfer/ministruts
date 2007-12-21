@@ -29,18 +29,6 @@ abstract class PersistableObject extends Object implements IDaoConnected {
 
 
    /**
-    * Gibt den DAO für die angegebene Klasse zurück.
-    *
-    * @deprecated ab PHP v5.3, statt dessen get_called_class() benutzen
-    *
-    * @return BaseDAO
-    */
-   protected static function getDAO($className) {
-      return Singleton ::getInstance($className.'DAO');
-   }
-
-
-   /**
     * Gibt die ID dieser Instanz zurück.
     *
     * @return int - ID (primary key)
