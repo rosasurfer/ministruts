@@ -7,25 +7,24 @@
 abstract class PersistableObject extends Object implements IDaoConnected {
 
 
-   // Mapping-Constanten
-   const T_BOOL     = 1;         // boolean
-   const T_INT      = 2;         // int
-   const T_FLOAT    = 3;         // float
-   const T_STRING   = 4;         // string
-   const T_SET      = 5;         // set
-   const T_NULL     = true;      // null
-   const T_NOT_NULL = false;     // not null
+   protected static $createInstance = false;
 
 
-   // Flag für den aktuellen Änderungsstatus einer Instanz (boolean)
-   protected $isModified;
+   // Flag für den aktuellen Änderungsstatus der Instanz
+   protected $isModified = false;
 
 
    // Standard-Properties jeder Instanz
-   protected $id;                // Primary Key:         int
-   protected $version;           // Versionsnummer:      timestamp (string)
-   protected $created;           // Erzeugungszeitpunkt: datetime  (string)
-   protected $deleted;           // Löschzeitpunkt:      datetime  (string)
+   protected $id;           // Primary Key:         int
+   protected $version;      // Versionsnummer:      timestamp (string)
+   protected $created;      // Erzeugungszeitpunkt: datetime  (string)
+   protected $deleted;      // Löschzeitpunkt:      datetime  (string)
+
+
+   /**
+    * Default-Konstruktor
+    */
+   protected function __construct() { /* */ }
 
 
    /**
@@ -43,7 +42,7 @@ abstract class PersistableObject extends Object implements IDaoConnected {
     *
     * @return string - Versionsnummer (Zeitpunkt der letzten Änderung)
     */
-   protected function getVersion() {
+   public function getVersion() {
       return $this->version;
    }
 
@@ -120,7 +119,7 @@ abstract class PersistableObject extends Object implements IDaoConnected {
     * werden.
     */
    protected function insert() {
-      throw new RuntimeException('Method not implemented: '.get_class($this).'::insert()');
+      throw new UnimplementedFeatureException('method not yet implemented');
    }
 
 
@@ -129,7 +128,7 @@ abstract class PersistableObject extends Object implements IDaoConnected {
     * werden.
     */
    protected function update() {
-      throw new RuntimeException('Method not implemented: '.get_class($this).'::update()');
+      throw new UnimplementedFeatureException('method not yet implemented');
    }
 
 
@@ -138,66 +137,45 @@ abstract class PersistableObject extends Object implements IDaoConnected {
     * werden.
     */
    public function delete() {
-      throw new RuntimeException('Method not implemented: '.get_class($this).'::delete()');
+      throw new UnimplementedFeatureException('method not yet implemented');
    }
 
 
    /**
-    * Erzeugt aus den übergebenen Daten eine neue Instanz.
+    * Erzeugt eine neue Instanz.
     *
-    * @param array $data - Array mit Instanzdaten (aus der Datenbank)
+    * @param string $class - Klassenname der zu erzeugenden Instanz
+    * @param array  $row   - Array mit Instanzdaten (Datenbankzeile)
     *
-    * @return instance
+    * @return PersistableObject
     */
-   public static function createInstance(array &$data) {
-      throw new RuntimeException('Implement YourClass::createInstance() to instantiate your class, see example at '.__CLASS__.'::createInstance()');
-      /*
-      // Example:
-      // --------
-      public static function createInstance(array &$data) {
-         $instance = new self();
-         return parent ::populate($instance, self::$mapping, $data);
-      }
-      */
-   }
+   public static function createInstance(/*self*/ &$class, array &$row) {
+      self::$createInstance = true;
+      $object = new $class();
+      self::$createInstance = false;
+      if (!$object instanceof self) throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
 
+      $mappings = $object->dao()->mapping;
 
-   /**
-    * Bevölkert eine PersistableObject-Instanz mit den übergebenen Daten.
-    *
-    * Note: Das gleichzeitige Erzeugen sehr vieler Instanzen (z.B. mehrere tausend Stück) ist ca. 3 x mal
-    *       schneller, wenn diese Methode überschrieben und ohne Schleifen implementiert wird.
-    *
-    * @param PersistableObject $object - Instanz
-    * @param array $mappings           - Datenbankmapping
-    * @param array $dataRow            - Datenreihe
-    *
-    * @return PersistableObject - die bevölkerte Instanz
-    */
-   protected static function populate(PersistableObject $object, array &$mappings, array &$dataRow) {
       foreach ($mappings['fields'] as $property => &$mapping) {
          $column =& $mapping[0];
 
-         if ($dataRow[$column] !== null) {
+         if ($row[$column] !== null) {
             $type =& $mapping[1];
 
-            if ($type === self:: T_STRING) {
-               $object->$property =& $dataRow[$column];
-            }
-            elseif ($type === self:: T_INT) {
-               $object->$property = (int) $dataRow[$column];
-            }
-            elseif ($type === self:: T_FLOAT) {
-               $object->$property = (float) $dataRow[$column];
-            }
-            elseif ($type === self:: T_BOOL) {
-               $object->$property = (bool) $dataRow[$column];
-            }
-            elseif ($type === self:: T_SET) {
-               $object->$property = strLen($dataRow[$column]) ? explode(',', $dataRow[$column]) : array();
-            }
-            else {
-               throw new RuntimeException('Unknown data type \''.$type.'\' in database mapping of '.get_class($object).'::'.$property);
+            switch ($type) {
+               case BaseDAO ::T_STRING:
+                  $object->$property =& $row[$column];        break;
+               case BaseDAO ::T_INT:
+                  $object->$property = (int) $row[$column];   break;
+               case BaseDAO ::T_FLOAT:
+                  $object->$property = (float) $row[$column]; break;
+               case BaseDAO ::T_BOOL:
+                  $object->$property = (bool) $row[$column];  break;
+               case BaseDAO ::T_SET:
+                  $object->$property = strLen($row[$column]) ? explode(',', $row[$column]) : array(); break;
+               default:
+                  throw new InvalidArgumentException('Unknown data type "'.$type.'" in database mapping of '.$class.'::'.$property);
             }
          }
       }

@@ -1,3 +1,10 @@
+2007-12-22
+
+   - umfangreiches Refactoring am DB-Layer, u.a. ist das Mapping jetzt in den DAOs, PersistableObject::populate()
+     und die createInstance()-Methoden in den konkreten Objekten existieren nicht mehr, statt dessen wurde alles
+     in PersistableObject::createInstance() zusammengefaßt
+
+
 2007-12-19
 
    - struts-config.xml: Syntaxvereinfachungen <tiles-definitions> -> <tiles>, <definition> -> <tile>
