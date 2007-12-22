@@ -37,9 +37,9 @@ final class DBPool extends Singleton {
 
 
    /**
-    * Gibt den Connector mit dem angegebenen Namen zurück.
+    * Gibt den Connector für den angegebenen Datenbank-Aliasnamen zurück.
     *
-    * @param string $name - Name
+    * @param string $name - Datenbank-Alias
     *
     * @return DB
     */
@@ -55,9 +55,9 @@ final class DBPool extends Singleton {
          $connector = $me->pool[$name];
       }
       elseif ($config=Config ::get('db.'.$name)) { // nein, Config holen und Connector laden
+         // bekannte Connectoren trotz verschiedener Schreibweisen erkennen
          $connectorName = strToLower($config['connector']);
 
-         // bekannte Connectoren trotz verschiedener Schreibweisen erkennen
          if (isSet(self::$knownConnectors[$connectorName])) {
             $class = self::$knownConnectors[$connectorName];
          }
