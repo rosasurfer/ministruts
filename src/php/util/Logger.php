@@ -98,8 +98,9 @@ class Logger extends StaticClass {
    public static function handleError($level, $message, $file, $line, array $vars) {
       $error_reporting = error_reporting();
 
-      // Fehler, die der aktuelle Errorlevel nicht abdeckt, werden ignoriert
-      if ($error_reporting==0 || ($error_reporting & $level) != $level)       // $error_reporting==0 bedeutet, der Fehler wurde durch @-Operator unterdrückt
+      // Fehler ignorieren, die absichtlich unterdrückt oder durch den aktuelle Errorlevel nicht abgedeckt werden
+      // $error_reporting==0: @-Operator
+      if ($error_reporting==0 || ($error_reporting & $level) != $level)
          return true;
 
 
