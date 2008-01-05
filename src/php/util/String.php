@@ -51,4 +51,34 @@ final class String extends StaticClass {
 
       return (striPos($haystack, $needle) !== false);
    }
+
+
+   /**
+    * Ob ein String UTF-8-kodiert ist.
+    *
+    * @param string $string - der zu prüfende String
+    *
+    * @return boolean
+    *
+    * TODO: String::isUtf8Encoded() überarbeiten
+    */
+   public static function isUtf8Encoded($string) {
+      return self:: contains($string, 'Ã');
+   }
+
+
+   /**
+    * Dekodiert einen UTF-8-kodierten String nach ISO-8859-1.
+    *
+    * @param string $string - der zu dekodierende String
+    *
+    * @return string
+    */
+   public static function decodeUtf8($string) {
+      if ($string === null || strLen($string) < 2)
+         return $string;
+
+      // TODO: htmlEntities('UTF-8') verfälscht den String, wenn er nicht utf-8-kodiert ist
+      return html_entity_decode(htmlEntities($string, ENT_NOQUOTES, 'UTF-8'));
+   }
 }

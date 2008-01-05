@@ -83,10 +83,12 @@ class Module extends Object {
 
 
    /**
-    * Erzeugt ein neues Module.
+    * Erzeugt ein neues Modul, liest und parst dessen Konfigurationsdatei.
     *
-    * @param string $fileName - Pfad zur Konfigurationsdatei dieses Modules
+    * @param string $fileName - Pfad zur Konfigurationsdatei des Modules
     * @param string $prefix   - Prefix des Modules
+    *
+    * TODO: Module-Encoding entsprechend dem Config-Datei-Encoding implementieren
     */
    public function __construct($fileName, $prefix) {
       if (!is_string($fileName)) throw new IllegalTypeException('Illegal type of argument $fileName: '.getType($fileName));
@@ -286,10 +288,15 @@ class Module extends Object {
    protected function processMappings(SimpleXMLElement $xml) {
       foreach ($xml->xPath('/struts-config/action-mappings/mapping') as $tag) {
          $mapping = new $this->mappingClass($this);
-         $mapping->setPath((string) $tag['path']);
+
 
          // attributes
          // ----------
+         // process path attribute
+         $path = String ::decodeUtf8((string) $tag['path']);
+         $mapping->setPath($path);
+
+
          // process include attribute
          if ($tag['include']) {
             if ($mapping->getForward()) throw new RuntimeException('Only one attribute of "action", "include", "redirect" or "forward" can be specified for mapping "'.$mapping->getPath().'"');

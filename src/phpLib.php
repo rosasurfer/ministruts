@@ -310,21 +310,6 @@ function decodeHtml($html) {
 
 
 /**
- * Dekodiert einen UTF-8-kodierten String nach ISO-8859-1.
- *
- * @param string $string - der zu dekodierende String
- *
- * @return string
- */
-function decodeUtf8($string) {
-   if ($string === null || $string === '')
-      return $string;
-
-   return html_entity_decode(htmlEntities($string, ENT_NOQUOTES, 'UTF-8'));
-}
-
-
-/**
  * Addiert zu einem Datum eine Anzahl von Tagen.
  *
  * @param string $date - Ausgangsdatum (Format: yyyy-mm-dd)

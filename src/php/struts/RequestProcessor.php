@@ -179,12 +179,17 @@ class RequestProcessor extends Object {
     * @param Response $response
     *
     * @return ActionMapping - ActionMapping oder NULL
+    *
+    * TODO: verschiedene Encodings berücksichtigen (iso-8859-1, utf-8) und URL in Module-Encoding konvertieren
     */
    protected function processMapping(Request $request, Response $response) {
       // Pfad für die Mappingauswahl ermitteln ...
       $contextPath = $request->getAttribute(Struts ::APPLICATION_PATH_KEY);
       $requestPath = $request->getPath();
       $path = subStr($requestPath, strLen($contextPath.$this->module->getPrefix()));
+      if (String ::isUtf8Encoded($path)) {
+         $path = String ::decodeUtf8($path);
+      }
 
       $this->logDebug && Logger ::log('Path used for mapping selection: '.$path, L_DEBUG, __CLASS__);
 

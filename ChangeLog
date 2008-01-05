@@ -1,3 +1,10 @@
+2008-01-05
+
+   - neue Methoden: util/String::isUtf8Encoded(), util/String::decodeUtf8() (guess what they do)
+
+   - php/struts/RequestProcessor: UTF8-kodierte URL's des Internet Explorers werden verarbeitet
+
+
 2007-12-22
 
    - umfangreiches Refactoring am DB-Layer, u.a. ist das Mapping jetzt in den DAOs, PersistableObject::populate()
