@@ -129,7 +129,7 @@ function __autoload($className /*, $throw */) {
       if (isSet($GLOBALS['__classes'][$className])) {
          $className = $GLOBALS['__classes'][$className];
 
-         // TODO: ::autoload(): Warnen bei relativen Klassenpfaden
+         // TODO: autoload(): Warnen bei relativen Klassenpfaden
          /*
          $relative = WINDOWS ? !preg_match('/^[a-zA-Z]:/', $className) : (strPos($className, '/') !== 0);
          if ($relative)
