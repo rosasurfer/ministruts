@@ -75,7 +75,7 @@ final class String extends StaticClass {
     * @return string
     */
    public static function decodeUtf8($string) {
-      if ($string === null || strLen($string) < 2)
+      if (!self:: isUtf8Encoded($string))
          return $string;
 
       // TODO: htmlEntities('UTF-8') verfälscht den String, wenn er nicht utf-8-kodiert ist
