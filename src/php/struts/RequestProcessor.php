@@ -187,9 +187,7 @@ class RequestProcessor extends Object {
       $contextPath = $request->getAttribute(Struts ::APPLICATION_PATH_KEY);
       $requestPath = $request->getPath();
       $path = subStr($requestPath, strLen($contextPath.$this->module->getPrefix()));
-      if (String ::isUtf8Encoded($path)) {
-         $path = String ::decodeUtf8($path);
-      }
+      $path = String ::decodeUtf8($path);
 
       $this->logDebug && Logger ::log('Path used for mapping selection: '.$path, L_DEBUG, __CLASS__);
 
