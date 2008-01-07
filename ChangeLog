@@ -1,3 +1,9 @@
+2008-01-07
+
+   - php/net/http/HttpClient::setFollowRedirects() -> HttpClient::followRedirects(),
+     php/net/http/HttpClient::isFollowRedirects()  -> HttpClient::followsRedirects()
+
+
 2008-01-05
 
    - neue Methoden: util/String::isUtf8Encoded(), util/String::decodeUtf8() (guess what they do)
