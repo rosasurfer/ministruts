@@ -3,6 +3,8 @@
    - php/net/http/HttpClient::setFollowRedirects() -> HttpClient::followRedirects(),
      php/net/http/HttpClient::isFollowRedirects()  -> HttpClient::followsRedirects()
 
+   - php/util/String::decodeUtf8() verarbeitet sowohl Strings als auch String-Arrays
+
 
 2008-01-05
 
