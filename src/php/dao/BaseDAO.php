@@ -41,6 +41,9 @@ abstract class BaseDAO extends Singleton {
    protected /*string*/ $objectClass;
 
 
+   protected $foundItemsCounter = 0;
+
+
    /**
     * Konstruktor
     *
@@ -51,6 +54,18 @@ abstract class BaseDAO extends Singleton {
    protected function __construct() {
       $this->objectClass = subStr(get_class($this), 0, -3);
       $this->worker = DBPool ::getDB($this->mapping['link']);
+   }
+
+
+   /**
+    * Gibt den Wert des internen Ergebniszählers zurück. Kann bei seitenweiser Ergebnisanzeige
+    * statt einer zweiten Datenbankabfrage benutzt werden.
+    * (siehe found_rows():  http://dev.mysql.com/doc/refman/5.1/en/information-functions.html)
+    *
+    * @return int - Gesamtanzahl von Ergebnissen (ohne LIMIT-Klausel)
+    */
+   public function getFoundItemsCounter() {
+      return $this->foundItemsCounter;
    }
 
 

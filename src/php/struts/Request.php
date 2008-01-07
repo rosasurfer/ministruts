@@ -130,7 +130,7 @@ final class Request extends Singleton {
 
    /**
     * Gibt den Teil der URL dieses Requests zurück, wie er in der ersten Zeile des HTTP-Protokolls
-    * erscheint, relativ zur Basis-URL der Anwendung (Pfadname + Pfadinfo + Querystring).
+    * erscheint, relativ zur Context-URL der Anwendung (Pfadname + Pfadinfo + Querystring).
     *
     * z.B.: /view.php?key=value
     *
@@ -142,7 +142,7 @@ final class Request extends Singleton {
 
 
    /**
-    * Gibt die Pfadkomponente der URL dieses Requests zurück.
+    * Gibt den Pfadbestandteil der URL dieses Requests zurück.
     *
     * @return string
     */
@@ -155,7 +155,7 @@ final class Request extends Singleton {
 
 
    /**
-    * Gibt die zur Basis-URL der Anwendung relative Pfadkomponente der URL dieses Requests zurück.
+    * Gibt den zur Context-URL relativen Pfadbestandteil der URL dieses Requests zurück.
     *
     * @return string
     */
@@ -165,7 +165,7 @@ final class Request extends Singleton {
 
 
    /**
-    * Gibt die Basis-URL der laufenden Anwendung zurück.
+    * Gibt die Context-URL der Anwendung zurück.
     *
     * @return string
     */
@@ -175,7 +175,7 @@ final class Request extends Singleton {
 
 
    /**
-    * Gibt die Querykomponente der URL dieses Requests zurück.
+    * Gibt die Querystring der URL dieses Requests zurück.
     *
     * @return string
     */
