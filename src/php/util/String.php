@@ -15,6 +15,10 @@ final class String extends StaticClass {
     * @return boolean
     */
    public static function startsWith($haystack, $needle, $case = true) {
+      if ($haystack!==null && !is_string($haystack)) throw new IllegalTypeException('Illegal type of parameter $haystack: '.getType($haystack));
+      if ($needle!==null && !is_string($needle))     throw new IllegalTypeException('Illegal type of parameter $needle: '.getType($needle));
+      if ($case!==true && $case!==false)             throw new IllegalTypeException('Illegal type of parameter $case: '.getType($case));
+
       if ($case)
          return (strPos($haystack, $needle) === 0);
 
@@ -32,6 +36,10 @@ final class String extends StaticClass {
     * @return boolean
     */
    public static function endsWith($haystack, $needle, $case = true) {
+      if ($haystack!==null && !is_string($haystack)) throw new IllegalTypeException('Illegal type of parameter $haystack: '.getType($haystack));
+      if ($needle!==null && !is_string($needle))     throw new IllegalTypeException('Illegal type of parameter $needle: '.getType($needle));
+      if ($case!==true && $case!==false)             throw new IllegalTypeException('Illegal type of parameter $case: '.getType($case));
+
       return self:: startsWith(strRev($haystack), strRev($needle), $case);
    }
 
@@ -46,6 +54,10 @@ final class String extends StaticClass {
     * @return boolean
     */
    public static function contains($haystack, $needle, $case = true) {
+      if ($haystack!==null && !is_string($haystack)) throw new IllegalTypeException('Illegal type of parameter $haystack: '.getType($haystack));
+      if ($needle!==null && !is_string($needle))     throw new IllegalTypeException('Illegal type of parameter $needle: '.getType($needle));
+      if ($case!==true && $case!==false)             throw new IllegalTypeException('Illegal type of parameter $case: '.getType($case));
+
       if ($case)
          return (strPos($haystack, $needle) !== false);
 
@@ -63,18 +75,28 @@ final class String extends StaticClass {
     * TODO: String::isUtf8Encoded() überarbeiten
     */
    public static function isUtf8Encoded($string) {
+      if ($string!==null && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+
       return self:: contains($string, 'Ã');
    }
 
 
    /**
-    * Dekodiert einen UTF-8-kodierten String nach ISO-8859-1.
+    * Dekodiert UTF-8-kodierte Strings nach ISO-8859-1. Verarbeitet sowohl einzelne Strings als auch
+    * Sring-Arrays.
     *
-    * @param string $string - der zu dekodierende String
+    * @param string|[] $string - die zu dekodierenden Strings
     *
-    * @return string
+    * @return string|[]
     */
    public static function decodeUtf8($string) {
+      if (is_array($string)) {
+         foreach ($string as $key => &$value)
+            $string[$key] = self:: decodeUtf8($value);
+         return $string;
+      }
+      if ($string!==null && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+
       if (!self:: isUtf8Encoded($string))
          return $string;
 
