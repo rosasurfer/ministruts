@@ -1,5 +1,10 @@
 2008-01-07
 
+   - neues Package php/dependency: Dependency-Framework
+
+
+2008-01-07
+
    - php/net/http/HttpClient::setFollowRedirects() -> HttpClient::followRedirects(),
      php/net/http/HttpClient::isFollowRedirects()  -> HttpClient::followsRedirects()
 
