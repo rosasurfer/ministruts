@@ -63,47 +63,56 @@ final class Cache extends StaticClass {
 
 
    /**
-    * Speichert einen Wert im Cache.
+    * Speichert einen Wert im Cache.  Ein schon vorhandener Wert unter demselben Schlüssel wird
+    * überschrieben.  Läuft die angegebene Zeitspanne ab oder ändert sich der Status der angegebenen
+    * Abhängigkeit, wird der Wert automatisch ungültig.
     *
-    * @param string $key       - Schlüssel, unter dem der Wert gespeichert wird
-    * @param mixed  $value     - der zu speichernde Wert
-    * @param int    $expires   - Zeitspanne in Sekunden, die der Wert gültig bleiben soll (default: immer)
-    * @param string $namespace - Namensraum innerhalb des Caches (default: APPLICATION_NAME)
+    * @param string      $key        - Schlüssel, unter dem der Wert gespeichert wird
+    * @param mixed       $value      - der zu speichernde Wert
+    * @param int         $expires    - Zeitspanne in Sekunden, nach der der Wert verfällt (default: nie)
+    * @param IDependency $dependency - Abhängigkeit der Gültigkeit des gespeicherten Wertes
+    * @param string      $namespace  - Namensraum innerhalb des Caches (default: APPLICATION_NAME)
     *
     * @return boolean - TRUE bei Erfolg, FALSE andererseits
     */
-   public static function set($key, &$value, $expires = self:: EXPIRES_NEVER, $namespace = APPLICATION_NAME) {
-      return self:: getPeer()->set($key, $value, $expires, $namespace);
+   public static function set($key, &$value, $expires = self:: EXPIRES_NEVER, IDependency $dependency = null, $namespace = APPLICATION_NAME) {
+      return self:: getPeer()->set($key, $value, $expires, $dependency, $namespace);
    }
 
 
    /**
-    * Speichert einen Wert im Cache, wenn noch kein Wert unter dem angegebenen Schlüssel existiert.
+    * Speichert einen Wert im Cache nur dann, wenn noch kein Wert unter dem angegebenen Schlüssel
+    * existiert.  Läuft die angegebene Zeitspanne ab oder ändert sich der Status der angegebenen
+    * Abhängigkeit, wird der Wert automatisch ungültig.
     *
-    * @param string $key       - Schlüssel, unter dem der Wert gespeichert wird
-    * @param mixed  $value     - der zu speichernde Wert
-    * @param int    $expires   - Zeitspanne in Sekunden, die der Wert gültig bleiben soll (default: immer)
-    * @param string $namespace - Namensraum innerhalb des Caches (default: APPLICATION_NAME)
+    * @param string      $key        - Schlüssel, unter dem der Wert gespeichert wird
+    * @param mixed       $value      - der zu speichernde Wert
+    * @param int         $expires    - Zeitspanne in Sekunden, nach der der Wert verfällt (default: nie)
+    * @param IDependency $dependency - Abhängigkeit der Gültigkeit des gespeicherten Wertes
+    * @param string      $namespace  - Namensraum innerhalb des Caches (default: APPLICATION_NAME)
     *
     * @return boolean - TRUE bei Erfolg, FALSE andererseits
     */
-   public static function add($key, &$value, $expires = self:: EXPIRES_NEVER, $namespace = APPLICATION_NAME) {
-      return self:: getPeer()->add($key, $value, $expires, $namespace);
+   public static function add($key, &$value, $expires = self:: EXPIRES_NEVER, IDependency $dependency = null, $namespace = APPLICATION_NAME) {
+      return self:: getPeer()->add($key, $value, $expires, $dependency, $namespace);
    }
 
 
    /**
-    * Speichert einen Wert im Cache, wenn bereits ein Wert unter dem angegebenen Schlüssel existiert.
+    * Speichert einen Wert im Cache nur dann, wenn unter dem angegebenen Schlüssel bereits ein Wert
+    * existiert.  Läuft die angegebene Zeitspanne ab oder ändert sich der Status der angegebenen
+    * Abhängigkeit, wird der Wert automatisch ungültig.
     *
-    * @param string $key       - Schlüssel, unter dem der Wert gespeichert wird
-    * @param mixed  $value     - der zu speichernde Wert
-    * @param int    $expires   - Zeitspanne in Sekunden, die der Wert gültig bleiben soll (default: immer)
-    * @param string $namespace - Namensraum innerhalb des Caches (default: APPLICATION_NAME)
+    * @param string      $key        - Schlüssel, unter dem der Wert gespeichert wird
+    * @param mixed       $value      - der zu speichernde Wert
+    * @param int         $expires    - Zeitspanne in Sekunden, nach der der Wert verfällt (default: nie)
+    * @param IDependency $dependency - Abhängigkeit der Gültigkeit des gespeicherten Wertes
+    * @param string      $namespace  - Namensraum innerhalb des Caches (default: APPLICATION_NAME)
     *
     * @return boolean - TRUE bei Erfolg, FALSE andererseits
     */
-   public static function replace($key, &$value, $expires = self:: EXPIRES_NEVER, $namespace = APPLICATION_NAME) {
-      return self:: getPeer()->replace($key, $value, $expires, $namespace);
+   public static function replace($key, &$value, $expires = self:: EXPIRES_NEVER, IDependency $dependency = null, $namespace = APPLICATION_NAME) {
+      return self:: getPeer()->replace($key, $value, $expires, $dependency, $namespace);
    }
 
 

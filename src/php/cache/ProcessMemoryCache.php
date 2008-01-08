@@ -15,30 +15,40 @@ final class ProcessMemoryCache extends AbstractCachePeer {
    /**
     * Ob unter dem angegebenen Schlüssel ein Wert im Cache gespeichert ist.
     *
-    * @param string $key - Schlüssel
-    * @param string $ns  - Namensraum innerhalb des Caches
+    * @param string $key       - Schlüssel
+    * @param string $namespace - Namensraum innerhalb des Caches
     *
     * @return boolean
     */
-   public function isCached($key, $ns) {
-      return isSet($this->pool["$ns:$key"]);
+   public function isCached($key, $namespace) {
+      if (isSet($this->pool["$namespace::$key"])) {
+         $dependency = $this->pool["$namespace::$key"][2];
+
+         if ($dependency && $dependency->isStatusChanged()) {
+            $this->delete($key, $namespace);
+            return false;
+         }
+         return true;
+      }
+      return false;
    }
 
 
    /**
     * Gibt einen Wert aus dem Cache zurück.
     *
-    * @param string $key - Schlüssel, unter dem der Wert gespeichert ist
-    * @param string $ns  - Namensraum innerhalb des Caches
+    * @param string $key       - Schlüssel, unter dem der Wert gespeichert ist
+    * @param string $namespace - Namensraum innerhalb des Caches
     *
     * @return mixed - Der gespeicherte Wert oder NULL, falls kein solcher Schlüssel existiert.
-    *                 Wird im Cache ein NULL-Wert gespeichert, wird ebenfalls NULL zurückgegeben.
+    *                 War im Cache ein NULL-Wert gespeichert, wird ebenfalls NULL zurückgegeben.
     *
     * @see ProcessMemoryCache::isCached()
     */
-   public function get($key, $ns) {
-      if ($this->isCached($key, $ns))
-         return $this->pool["$ns:$key"][1];
+   public function get($key, $namespace) {
+      if ($this->isCached($key, $namespace))
+         return $this->pool["$namespace::$key"][1];
+
       return null;
    }
 
@@ -46,15 +56,14 @@ final class ProcessMemoryCache extends AbstractCachePeer {
    /**
     * Löscht einen Wert aus dem Cache.
     *
-    * @param string $key - Schlüssel, unter dem der Wert gespeichert ist
-    * @param string $ns  - Namensraum innerhalb des Caches
+    * @param string $key       - Schlüssel, unter dem der Wert gespeichert ist
+    * @param string $namespace - Namensraum innerhalb des Caches
     *
-    * @return boolean - TRUE bei Erfolg,
-    *                   FALSE, falls kein solcher Schlüssel existiert
+    * @return boolean - TRUE bei Erfolg, FALSE, falls kein solcher Schlüssel existiert
     */
-   public function delete($key, $ns) {
-      if ($this->isCached($key, $ns)) {
-         unSet($this->pool["$ns:$key"]);
+   public function delete($key, $namespace) {
+      if (isSet($this->pool["$namespace::$key"])) {
+         unSet($this->pool["$namespace::$key"]);
          return true;
       }
       return false;
@@ -64,15 +73,15 @@ final class ProcessMemoryCache extends AbstractCachePeer {
    /**
     * Implementierung von set/add/replace (protected), $expires wird ignoriert (hat hier keine Wirkung)
     */
-   protected function store($action, $key, &$value, $expires, $ns) {
-      if ($action == 'add' && $this->isCached($key, $ns))
+   protected function store($action, $key, &$value, $expires, IDependency $dependency = null, $namespace) {
+      if ($action == 'add' && $this->isCached($key, $namespace))
          return false;
 
-      if ($action == 'replace' && !$this->isCached($key, $ns))
+      if ($action == 'replace' && !$this->isCached($key, $namespace))
          return false;
 
-      // es wird ein Array[creation_timestamp, value] gespeichert
-      $this->pool["$ns:$key"] = array(time(), $value);
+      // im Cache wird ein Array[creation_timestamp, value, dependency] gespeichert
+      $this->pool["$namespace::$key"] = array(time(), $value, $dependency);
       return true;
    }
 }

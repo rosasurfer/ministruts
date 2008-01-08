@@ -14,28 +14,42 @@ final class ApcCache extends AbstractCachePeer {
    /**
     * Ob unter dem angegebenen Schlüssel ein Wert im Cache gespeichert ist.
     *
-    * @param string $key - Schlüssel
-    * @param string $ns  - Namensraum innerhalb des Caches
+    * @param string $key       - Schlüssel
+    * @param string $namespace - Namensraum innerhalb des Caches
     *
     * @return boolean
     */
-   public function isCached($key, $ns) {
+   public function isCached($key, $namespace) {
       // Hier wird die eigentliche Arbeit gemacht. isCached() schaut nicht nur nach, ob ein Wert im Cache
       // existiert, sondern speichert ihn auch im lokalen Referenz-Pool. Folgende Abfragen müssen so nicht
       // ein weiteres Mal auf den Cache zugreifen, sondern können aus dem lokalen Pool bedient werden.
       // Existiert der Wert im Cache nicht, wird auch das vermerkt, sodaß intern nur ein einziger
       // Cache-Zugriff je Schlüssel benötigt wird.
 
-      if (isSet($this->pool["$ns:$key"]))
-         return ($this->pool["$ns:$key"] !== false);
+      if (isSet($this->pool["$namespace::$key"])) {
+         if ($this->pool["$namespace::$key"] === false)
+            return false;
 
-      $data = apc_fetch("$ns:$key");
-      if ($data === false)                      // Cache-Miss, im Referenz-Pool FALSE setzen
-         return $this->pool["$ns:$key"] = false;
+         $dependency = $this->pool["$namespace::$key"][2];
+         if ($dependency && $dependency->isStatusChanged()) {
+            $this->delete($key, $namespace);    // verfallenen Wert löschen
+            return false;
+         }
+      }
 
-      $data[1] = unserialize($data[1]);         // Cache-Hit, im Referenz-Pool speichern
-      $this->pool["$ns:$key"] =& $data;
+      $data = apc_fetch("$namespace::$key");
+      if (!$data)                               // Cache-Miss, im Referenz-Pool FALSE setzen
+         return $this->pool["$namespace::$key"] = false;
 
+      $data[1] = unserialize($data[1]);         // Cache-Hit, Dependency prüfen
+      $dependency = $data[1][1];
+
+      if ($dependency && $dependency->isStatusChanged()) {
+         $this->delete($key, $namespace);       // verfallenen Wert löschen
+         return false;
+      }
+                                                // im Referenz-Pool speichern
+      $this->pool["$namespace::$key"] = array($data[0], $data[1][0], $dependency);
       return true;
    }
 
@@ -43,21 +57,21 @@ final class ApcCache extends AbstractCachePeer {
    /**
     * Gibt einen Wert aus dem Cache zurück.
     *
-    * @param string $key - Schlüssel, unter dem der Wert gespeichert ist
-    * @param string $ns  - Namensraum innerhalb des Caches
+    * @param string $key       - Schlüssel, unter dem der Wert gespeichert ist
+    * @param string $namespace - Namensraum innerhalb des Caches
     *
     * @return mixed - Der gespeicherte Wert oder NULL, falls kein solcher Schlüssel existiert.
     *                 Wird im Cache ein NULL-Wert gespeichert, wird ebenfalls NULL zurückgegeben.
     *
     * @see ApcCache::isCached()
     */
-   public function get($key, $ns) {
-      if ($this->isCached($key, $ns))
-         return $this->pool["$ns:$key"][1];
-      return null;
+   public function get($key, $namespace) {
+      if ($this->isCached($key, $namespace))
+         return $this->pool["$namespace::$key"][1];
 
+      return null;
       /*
-      $data = apc_fetch("$ns:$key");
+      $data = apc_fetch("$namespace::$key");
       if ($data === false)
          return null;
       return unserialize($data[1]);
@@ -68,35 +82,34 @@ final class ApcCache extends AbstractCachePeer {
    /**
     * Löscht einen Wert aus dem Cache.
     *
-    * @param string $key - Schlüssel, unter dem der Wert gespeichert ist
-    * @param string $ns  - Namensraum innerhalb des Caches
+    * @param string $key       - Schlüssel, unter dem der Wert gespeichert ist
+    * @param string $namespace - Namensraum innerhalb des Caches
     *
-    * @return boolean - TRUE bei Erfolg,
-    *                   FALSE, falls kein solcher Schlüssel existiert
+    * @return boolean - TRUE bei Erfolg, FALSE, falls kein solcher Schlüssel existiert
     */
-   public function delete($key, $ns) {
-      $this->pool["$ns:$key"] = false;    // Marker für nächste Abfrage setzen
-      return apc_delete("$ns:$key");
+   public function delete($key, $namespace) {
+      $this->pool["$namespace::$key"] = false;    // Marker für nächste Abfrage setzen
+      return apc_delete("$namespace::$key");
    }
 
 
    /**
     * Implementierung von set/add/replace (protected)
     */
-   protected function store($action, $key, &$value, $expires, $ns) {
-      if ($action == 'add' && $this->isCached($key, $ns))
+   protected function store($action, $key, &$value, $expires, IDependency $dependency = null, $namespace) {
+      if ($action == 'add' && $this->isCached($key, $namespace))
          return false;
 
-      if ($action == 'replace' && !$this->isCached($key, $ns))
+      if ($action == 'replace' && !$this->isCached($key, $namespace))
          return false;
 
-      // im Cache wird ein Array[creation_timestamp, value] gespeichert
-      $data = array(time(), $value);
+      // im Cache wird ein Array[creation_timestamp, value, dependency] gespeichert
+      $data = array($value, $dependency);
 
-      if (!apc_store("$ns:$key", array($data[0], serialize($data[1])), $expires))
+      if (!apc_store("$namespace::$key", array(time(), serialize($data)), $expires))
          throw new RuntimeException('Unexpected APC error, apc_store() returned FALSE');
 
-      $this->pool["$ns:$key"] =& $data;
+      $this->pool["$namespace::$key"] =& $data;
       return true;
    }
 }
