@@ -65,7 +65,7 @@ class TorHelper extends StaticClass {
             Logger ::log('Could not get Tor exit nodes from any mirror', L_ERROR, __CLASS__);
          }
 
-         Cache ::set($key, $nodes, 10 * MINUTE, __FILE__);
+         Cache ::set($key, $nodes, 10 * MINUTE, null, __FILE__);
       }
 
       return $nodes;
