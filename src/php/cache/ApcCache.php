@@ -29,8 +29,8 @@ final class ApcCache extends AbstractCachePeer {
       if (isSet($this->pool["$ns:$key"]))
          return ($this->pool["$ns:$key"] !== false);
 
-      $data = apc_fetch("$ns:$key");            // Cache-Miss, im Referenz-Pool FALSE setzen
-      if ($data === false)
+      $data = apc_fetch("$ns:$key");
+      if ($data === false)                      // Cache-Miss, im Referenz-Pool FALSE setzen
          return $this->pool["$ns:$key"] = false;
 
       $data[1] = unserialize($data[1]);         // Cache-Hit, im Referenz-Pool speichern

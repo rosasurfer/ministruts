@@ -47,7 +47,7 @@ class FileDependency implements IDependency {
    public function __construct($fileName) {
       if (!is_string($fileName)) throw new IllegalTypeException('Illegal type of argument $fileName: '.getType($fileName));
 
-      // TODO: Directories mit DirectoryDependence verarbeiten
+      // TODO: Directories mit DirectoryDependency verarbeiten
 
       if (file_exists($fileName)) {
          $this->fileName = realPath($fileName);
