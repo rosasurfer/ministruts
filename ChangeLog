@@ -2,6 +2,11 @@
 
    - neues Package php/dependency: Dependency-Framework
 
+   - beim Cachen kann zusätzlich zur Expire-Zeit des Wertes eine Dependency angegeben werden
+
+   - Struts: die Strutskonfiguration wird ständig gecacht (auch auf development-Systemen), per FileDependency
+     monitored und bei Änderungen automatisch neu geladen
+
 
 2008-01-07
 

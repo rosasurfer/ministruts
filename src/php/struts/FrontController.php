@@ -45,13 +45,15 @@ final class FrontController extends Singleton {
 
       // Ist schon eine Instanz im Cache ?
       $instance = Cache ::get(__CLASS__);
-      if (!$instance) {                   // nein
+      if (!$instance) {                      // nein, Cache miss
          $instance = Singleton ::getInstance(__CLASS__);
 
-         // Instanz cachen, wenn nicht auf lokaler Maschine (localhost = development)
-         if ($_SERVER['REMOTE_ADDR'] != '127.0.0.1')
-            Cache ::set(__CLASS__, $instance);
+         // FileDependency erzeugen und Instanz cachen
+         $appDirectory = dirName($_SERVER['SCRIPT_FILENAME']);
+         $dependency = new FileDependency($appDirectory.'/WEB-INF/struts-config.xml');
+         Cache ::set(__CLASS__, $instance, Cache ::EXPIRES_NEVER, $dependency);
       }
+
       return $instance;
    }
 
@@ -63,7 +65,7 @@ final class FrontController extends Singleton {
     */
    protected function __construct() {
       // Konfiguration vervollständigen
-      $appDirectory = dirName($script=$_SERVER['SCRIPT_FILENAME']);
+      $appDirectory = dirName($_SERVER['SCRIPT_FILENAME']);
       Config ::set('application.directory', $appDirectory);
 
 
