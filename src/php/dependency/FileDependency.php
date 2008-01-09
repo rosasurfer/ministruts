@@ -22,19 +22,19 @@
  * $dependency->isStatusChanged() gibt FALSE zurück.  Nach Änderung oder Löschen der Datei gibt der
  * Aufruf von $dependency->isStatusChanged() TRUE zurück.
  */
-class FileDependency implements IDependency {
+class FileDependency extends Object implements IDependency {
 
 
    /**
     * Dateiname
     */
-   private $fileName;      // string
+   private $fileName;   // string
 
 
    /**
     * letzter Änderungszeitpunkt der Datei (Unix-Timestamp)
     */
-   private $timestamp;     // int
+   private $timestamp;  // int
 
 
    /**
@@ -46,6 +46,7 @@ class FileDependency implements IDependency {
     */
    public function __construct($fileName) {
       if (!is_string($fileName)) throw new IllegalTypeException('Illegal type of argument $fileName: '.getType($fileName));
+      if (!strLen($fileName))    throw new InvalidArgumentException('Invalid argument $fileName: '.$fileName);
 
       // TODO: Directories mit DirectoryDependency verarbeiten
 
@@ -56,16 +57,8 @@ class FileDependency implements IDependency {
       else {
          $name = str_replace('\\', '/', $fileName);
 
-         if (WINDOWS) {
-            if (String ::startsWith($name, '/') || !preg_match('/^([A-Za-z]:\/+)?[^:\*\?"<>|]+$/', $name))
-               throw new InvalidArgumentException('Invalid argument $fileName: '.$fileName);
-
-            if (!preg_match('/^[a-z]:/i', $name))     // relativ, Windows
-               $name = getCwd().'/'.$name;
-         }
-         else if (!String ::startsWith($name, '/')) { // relativ, nicht Windows
-            $name = getCwd().'/'.$name;
-         }
+         if ((WINDOWS && !preg_match('/^[a-z]:/i', $name)) || (!WINDOWS && !String ::startsWith($name, '/')))
+            $name = getCwd().'/'.$name;      // absoluten Pfad erzeugen, da Arbeitsverzeichnis wechseln kann
 
          $this->fileName = str_replace('/', DIRECTORY_SEPARATOR, $name);
       }
