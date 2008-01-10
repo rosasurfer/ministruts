@@ -30,13 +30,15 @@ abstract class BaseDAO extends Singleton {
 
 
    /**
-    * prozessweiter Reference-Cache
+    * Prozessweiter Reference-Cache
+    *
+    * TODO: ReferencePool implementieren
     */
    private /*PersistableObject[]*/ $identityMap;
 
 
    /**
-    * Name der Entityklasse
+    * Name der Entityklasse, für die der DAO zuständig ist
     */
    protected /*string*/ $objectClass;
 
@@ -49,7 +51,7 @@ abstract class BaseDAO extends Singleton {
     *
     * Erzeugt einen neuen DAO.
     *
-    * @param  string $alias - Aliasname der Datenbank, mit dem die Object-Klasse verbunden ist
+    * @param  string $alias - Aliasname der Datenbank, mit dem die Entity-Klasse verbunden ist.
     */
    protected function __construct() {
       $this->objectClass = subStr(get_class($this), 0, -3);
@@ -69,22 +71,40 @@ abstract class BaseDAO extends Singleton {
    }
 
 
-   // single object getters
+   /**
+    * single object getters
+    */
    public function getByQuery($query) {
-      return $this->worker
+      return $this->getWorker()
                   ->executeSql($query);
    }
 
-   // object's list getters
+
+   /**
+    * object's list getters
+    */
    public function getListByQuery($query) {
-      return $this->worker
+      return $this->getWorker()
                   ->executeSql($query);
    }
 
-   // DML statement
+
+   /**
+    * DML statement
+    */
    public function executeSql($sql) {
-      return $this->worker
+      return $this->getWorker()
                   ->executeSql($sql);
+   }
+
+
+   /**
+    * Gibt den Worker (die konkrete Connector-Implementierung) für diesen DAO zurück.
+    *
+    * @return DB
+    */
+   private function getWorker() {
+      return $this->worker;
    }
 }
 ?>

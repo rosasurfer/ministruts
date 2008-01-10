@@ -7,9 +7,6 @@
 abstract class PersistableObject extends Object implements IDaoConnected {
 
 
-   protected static $createInstance = false;
-
-
    // Flag für den aktuellen Änderungsstatus der Instanz
    protected $isModified = false;
 
@@ -19,6 +16,10 @@ abstract class PersistableObject extends Object implements IDaoConnected {
    protected $version;      // Versionsnummer:      timestamp (string)
    protected $created;      // Erzeugungszeitpunkt: datetime  (string)
    protected $deleted;      // Löschzeitpunkt:      datetime  (string)
+
+
+   // temp. Property
+   protected static $createInstance = false;
 
 
    /**
@@ -180,6 +181,18 @@ abstract class PersistableObject extends Object implements IDaoConnected {
          }
       }
       return $object;
+   }
+
+
+   /**
+    * Gibt den DAO für diese Instanz zurück.
+    *
+    * @param string $class - Klassenname der Instanz
+    *
+    * @return BaseDAO
+    */
+   protected static function getDAO($class) {
+      return Singleton ::getInstance($class.'DAO');
    }
 }
 ?>
