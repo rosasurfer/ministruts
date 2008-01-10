@@ -17,30 +17,20 @@ abstract class BaseDAO extends Singleton {
    const T_NOT_NULL = false;     // not null
 
 
-   /**
-    * Datenbank-Alias der Entityklasse
-    */
+   // Datenbank-Alias der Entityklasse
    private /*string*/ $dbAlias;
 
 
-   /**
-    * Worker dieses DAO's
-    */
+   // Worker dieses DAO's
    private /*DB*/ $worker;
 
 
-   /**
-    * Prozessweiter Reference-Cache
-    *
-    * TODO: ReferencePool implementieren
-    */
-   private /*PersistableObject[]*/ $identityMap;
+   // TODO: ReferencePool implementieren
+   private $identityMap;
 
 
-   /**
-    * Name der Entityklasse, für die der DAO zuständig ist
-    */
-   protected /*string*/ $objectClass;
+   // Name der Entityklasse, für die der DAO zuständig ist
+   protected /*string*/ $entityClass;
 
 
    protected $foundItemsCounter = 0;
@@ -54,7 +44,7 @@ abstract class BaseDAO extends Singleton {
     * @param  string $alias - Aliasname der Datenbank, mit dem die Entity-Klasse verbunden ist.
     */
    protected function __construct() {
-      $this->objectClass = subStr(get_class($this), 0, -3);
+      $this->entityClass = subStr(get_class($this), 0, -3);
       $this->worker = DBPool ::getDB($this->mapping['link']);
    }
 
@@ -114,7 +104,7 @@ abstract class BaseDAO extends Singleton {
 
       if ($result['rows'] == 1) {
          $row = mysql_fetch_assoc($result['set']);
-         $instance = PersistableObject ::createInstance($this->objectClass, $row);
+         $instance = PersistableObject ::createInstance($this->entityClass, $row);
       }
       $this->foundItemsCounter = $instance ? 1 : 0;
 
@@ -133,7 +123,7 @@ abstract class BaseDAO extends Singleton {
       $instances = array();
 
       while ($row = mysql_fetch_assoc($result['set'])) {
-         $instances[] = PersistableObject ::createInstance($this->objectClass, $row);
+         $instances[] = PersistableObject ::createInstance($this->entityClass, $row);
       }
       $this->foundItemsCounter = $result['rows'];
 

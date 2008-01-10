@@ -20,7 +20,7 @@ class CommonValidator extends StaticClass {
       if ($result) {
          array_shift($matches);
          foreach ($matches as $part) {
-            if ((String ::startsWith($part, '0') && $part!=='0') || (int) $part > 255) {
+            if (($part{0}=='0' && $part!=='0') || (int) $part > 255) {
                $result = false;
                break;
             }

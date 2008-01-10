@@ -172,7 +172,7 @@ class Module extends Object {
    protected function setPrefix($prefix) {
       if ($this->configured)   throw new IllegalStateException('Configuration is frozen');
       if (!is_string($prefix)) throw new IllegalTypeException('Illegal type of argument $prefix: '.getType($prefix));
-      if ($prefix!=='' && !String ::startsWith($prefix, '/'))
+      if ($prefix!=='' && $prefix{0}!='/')
          throw new IllegalTypeException('Module prefixes must start with a slash "/" character, found "'.$prefix.'"');
 
       $this->prefix = $prefix;

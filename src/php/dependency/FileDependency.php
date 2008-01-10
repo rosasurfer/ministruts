@@ -57,7 +57,7 @@ class FileDependency extends Object implements IDependency {
       else {
          $name = str_replace('\\', '/', $fileName);
 
-         if ((WINDOWS && !preg_match('/^[a-z]:/i', $name)) || (!WINDOWS && !String ::startsWith($name, '/')))
+         if ((WINDOWS && !preg_match('/^[a-z]:/i', $name)) || (!WINDOWS && $name{0}!='/'))
             $name = getCwd().'/'.$name;      // absoluten Pfad erzeugen, da Arbeitsverzeichnis wechseln kann
 
          $this->fileName = str_replace('/', DIRECTORY_SEPARATOR, $name);
