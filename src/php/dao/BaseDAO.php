@@ -99,6 +99,49 @@ abstract class BaseDAO extends Singleton {
 
 
    /**
+    * Konvertiert ein eindeutiges DB-Resultset in eine PersistableObject-Instanz.
+    *
+    * @param array $result - Rückgabewert einer Datenbankabfrage
+    *
+    * @return array - Instanz
+    *
+    * @throws DatabaseException - wenn ein mehrzeiliges Resultset übergeben wird
+    */
+   protected function makeObject(array $result) {
+      if ($result['rows'] > 1) throw new DatabaseException('Unexpected, non-unique query result: '.$result);
+
+      $instance = null;
+
+      if ($result['rows'] == 1) {
+         $row = mysql_fetch_assoc($result['set']);
+         $instance = PersistableObject ::createInstance($this->objectClass, $row);
+      }
+      $this->foundItemsCounter = $instance ? 1 : 0;
+
+      return $instance;
+   }
+
+
+   /**
+    * Konvertiert ein DB-Resultset in PersistableObject-Instanzen.
+    *
+    * @param array $result - Rückgabewert einer Datenbankabfrage
+    *
+    * @return array - Instanzen
+    */
+   protected function makeObjects(array $result) {
+      $instances = array();
+
+      while ($row = mysql_fetch_assoc($result['set'])) {
+         $instances[] = PersistableObject ::createInstance($this->objectClass, $row);
+      }
+      $this->foundItemsCounter = $result['rows'];
+
+      return $instances;
+   }
+
+
+   /**
     * Gibt den Worker (die konkrete Connector-Implementierung) für diesen DAO zurück.
     *
     * @return DB
