@@ -73,6 +73,17 @@ abstract class DB extends Object {
 
 
    /**
+    * Führt eine SQL-Anweisung aus. Gibt das Ergebnis als Array zurück.
+    *
+    * @param string $sql - SQL-Anweisung
+    *
+    * @return array['set' ] - das zurückgegebene Resultset (bei SELECT)
+    *              ['rows'] - Anzahl der betroffenen Datensätze (bei SELECT/INSERT/UPDATE)
+    */
+   abstract public function executeSql($sql);
+
+
+   /**
     * Erzeugt einen neuen Connector und initialisiert ihn.
     *
     * @param  string $class    - Klassenname des konkreten Connectors
