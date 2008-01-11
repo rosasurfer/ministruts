@@ -1,3 +1,8 @@
+2008-01-11
+
+   - Dokumentation erweitert
+
+
 2008-01-10
 
    - neue Methoden: php/dao/BaseDAO:makeObject(), php/dao/BaseDAO:makeObjects()
