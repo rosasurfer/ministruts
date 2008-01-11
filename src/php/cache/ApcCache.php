@@ -35,6 +35,7 @@ final class ApcCache extends AbstractCachePeer {
             $this->delete($key, $namespace);    // verfallenen Wert löschen
             return false;
          }
+         return true;
       }
 
       $data = apc_fetch("$namespace::$key");
@@ -104,12 +105,13 @@ final class ApcCache extends AbstractCachePeer {
          return false;
 
       // im Cache wird ein Array[creation_timestamp, value, dependency] gespeichert
+      $time = time();
       $data = array($value, $dependency);
 
-      if (!apc_store("$namespace::$key", array(time(), serialize($data)), $expires))
+      if (!apc_store("$namespace::$key", array($time, serialize($data)), $expires))
          throw new RuntimeException('Unexpected APC error, apc_store() returned FALSE');
 
-      $this->pool["$namespace::$key"] =& $data;
+      $this->pool["$namespace::$key"] = array($time, $value, $dependency);
       return true;
    }
 }
