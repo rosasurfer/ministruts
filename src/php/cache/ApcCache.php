@@ -7,7 +7,7 @@
 final class ApcCache extends AbstractCachePeer {
 
 
-   // Referenz-Pool
+   // TODO: durch ReferencePool-Implementierung ersetzen
    private $pool = array();
 
 
