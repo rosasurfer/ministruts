@@ -86,5 +86,21 @@ abstract class Action extends Object {
    public function executeAfter(Request $request, Response $response, ActionForward $forward = null) {
       return $forward;
    }
+
+
+   /**
+    * Sucht den ActionForward mit dem angegebenen Namen und gibt ihn zurück. Zuerst werden die lokalen
+    * Forwards des ActionMapping der Action durchsucht, danach die globalen Forwards des Modules. Wird
+    * kein entsprechender Forward gefunden, wird NULL zurückgegeben.
+    *
+    * @param string $name - Bezeichner des ActionForwards
+    *
+    * @return ActionForward
+    *
+    * @see ActionMapping::findForward()
+    */
+   protected function findForward($name) {
+      return $this->mapping->findForward($name);
+   }
 }
 ?>
