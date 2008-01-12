@@ -11,7 +11,7 @@ $dir = dirName(__FILE__).DIRECTORY_SEPARATOR;
 $__classes['AbstractCachePeer'              ] = $dir.'php/cache/AbstractCachePeer';
 $__classes['ApcCache'                       ] = $dir.'php/cache/ApcCache';
 $__classes['Cache'                          ] = $dir.'php/cache/Cache';
-$__classes['ProcessMemoryCache'             ] = $dir.'php/cache/ProcessMemoryCache';
+$__classes['ReferencePool'                  ] = $dir.'php/cache/ReferencePool';
 
 $__classes['Object'                         ] = $dir.'php/core/Object';
 $__classes['Singleton'                      ] = $dir.'php/core/Singleton';

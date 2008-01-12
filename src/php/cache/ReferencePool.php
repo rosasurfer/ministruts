@@ -1,14 +1,15 @@
 <?
 /**
- * ProcessMemoryCache
+ * ReferencePool
  *
- * Prozess-Cache. Cacht Objekte im Speicher (RAM) des aktuellen Prozesses, nicht Request-übergreifend.
- * Nützlich als Fallback, wenn ein Cache benötigt wird, jedoch keiner installiert ist.
+ * Die einfachste CachePeer-Implementierung.  Dieser Cache  speichert die Objekte nur im Prozeß-Speicher
+ * des Requests, die Werte bleiben also nicht Request-übergreifend erhalten.  Er stellt jedoch sicher,
+ * daß mehrere Zugriffe auf ein gespeichertes Object immer ein und dieselbe Instanz zurückliefern.
  */
-final class ProcessMemoryCache extends AbstractCachePeer {
+final class ReferencePool extends AbstractCachePeer {
 
 
-   // Referenz-Pool
+   // Pool
    private $pool = array();
 
 
@@ -21,16 +22,17 @@ final class ProcessMemoryCache extends AbstractCachePeer {
     * @return boolean
     */
    public function isCached($key, $namespace) {
-      if (isSet($this->pool["$namespace::$key"])) {
-         $dependency = $this->pool["$namespace::$key"][2];
+      if (!isSet($this->pool["$namespace::$key"]))
+         return false;
 
-         if ($dependency && $dependency->isStatusChanged()) {
-            $this->delete($key, $namespace);
-            return false;
-         }
-         return true;
+      /*IDependency*/ $dependency = $this->pool["$namespace::$key"][2];
+
+      if ($dependency && $dependency->isStatusChanged()) {
+         unSet($this->pool["$namespace::$key"]);
+         return false;
       }
-      return false;
+
+      return true;
    }
 
 
@@ -42,8 +44,6 @@ final class ProcessMemoryCache extends AbstractCachePeer {
     *
     * @return mixed - Der gespeicherte Wert oder NULL, falls kein solcher Schlüssel existiert.
     *                 War im Cache ein NULL-Wert gespeichert, wird ebenfalls NULL zurückgegeben.
-    *
-    * @see ProcessMemoryCache::isCached()
     */
    public function get($key, $namespace) {
       if ($this->isCached($key, $namespace))
@@ -80,7 +80,7 @@ final class ProcessMemoryCache extends AbstractCachePeer {
       if ($action == 'replace' && !$this->isCached($key, $namespace))
          return false;
 
-      // im Cache wird ein Array[creation_timestamp, value, dependency] gespeichert
+      // 'set': im Cache wird ein Array[creation_timestamp, value, dependency] gespeichert
       $this->pool["$namespace::$key"] = array(time(), $value, $dependency);
       return true;
    }

@@ -56,7 +56,7 @@ final class Cache extends StaticClass {
          if (extension_loaded('apc') && ini_get('apc.enabled'))
             self::$peer = new ApcCache();
          else
-            self::$peer = new ProcessMemoryCache();
+            self::$peer = new ReferencePool();
       }
       return self::$peer;
    }

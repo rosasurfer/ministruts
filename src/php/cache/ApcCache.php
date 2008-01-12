@@ -3,12 +3,27 @@
  * ApcCache
  *
  * Cacht Objekte im APC-Cache.
+ *
+ * TODO: Cache-Values in Wrapperobjekt speichern und CREATED, EXPIRES etc. verarbeiten
  */
 final class ApcCache extends AbstractCachePeer {
 
 
-   // TODO: durch ReferencePool-Implementierung ersetzen
-   private $pool = array();
+   // lokaler ReferencePool
+   private $pool;
+
+
+   /**
+    * Gibt den lokalen ReferencePool zurück.
+    *
+    * @return ReferencePool
+    */
+   private function getPool() {
+      if (!$this->pool)
+         $this->pool = new ReferencePool();
+
+      return $this->pool;
+   }
 
 
    /**
@@ -20,38 +35,37 @@ final class ApcCache extends AbstractCachePeer {
     * @return boolean
     */
    public function isCached($key, $namespace) {
-      // Hier wird die eigentliche Arbeit gemacht. isCached() schaut nicht nur nach, ob ein Wert im Cache
-      // existiert, sondern speichert ihn auch im lokalen Referenz-Pool. Folgende Abfragen müssen so nicht
-      // ein weiteres Mal auf den Cache zugreifen, sondern können aus dem lokalen Pool bedient werden.
-      // Existiert der Wert im Cache nicht, wird auch das vermerkt, sodaß intern nur ein einziger
-      // Cache-Zugriff je Schlüssel benötigt wird.
+      // Hier wird die eigentliche Arbeit gemacht. Die Methode prüft nicht nur, ob der Wert im Cache
+      // existiert, sondern speichert ihn auch im lokalen ReferencePool. Folgende Abfragen müssen so
+      // nicht ein weiteres Mal auf den Cache zugreifen, sondern können aus dem lokalen Pool bedient
+      // werden.
 
-      if (isSet($this->pool["$namespace::$key"])) {
-         if ($this->pool["$namespace::$key"] === false)
-            return false;
-
-         $dependency = $this->pool["$namespace::$key"][2];
-         if ($dependency && $dependency->isStatusChanged()) {
-            $this->delete($key, $namespace);    // verfallenen Wert löschen
-            return false;
-         }
+      // ReferencePool abfragen
+      if ($this->getPool()->isCached($key, $namespace)) {
          return true;
       }
+      else {
+         // APC abfragen
+         $data = apc_fetch("$namespace::$key");
+         if (!$data)          // Cache-Miss
+            return false;
 
-      $data = apc_fetch("$namespace::$key");
-      if (!$data)                               // Cache-Miss, im Referenz-Pool FALSE setzen
-         return $this->pool["$namespace::$key"] = false;
+         // Cache-Hit, $data Format: array(timestamp, array($value, $dependency))
+         $timestamp = $data[0];
+         $data[1] = unserialize($data[1]);
+         $value      = $data[1][0];
+         $dependency = $data[1][1];
 
-      $data[1] = unserialize($data[1]);         // Cache-Hit, Dependency prüfen
-      $dependency = $data[1][1];
+         // Dependency prüfen und Wert ggf. löschen
+         if ($dependency && $dependency->isStatusChanged()) {
+            $this->delete($key, $namespace);
+            return false;
+         }
 
-      if ($dependency && $dependency->isStatusChanged()) {
-         $this->delete($key, $namespace);       // verfallenen Wert löschen
-         return false;
+         // ok, Wert im ReferencePool speichern
+         $this->getPool()->set($key, $value, Cache ::EXPIRES_NEVER, $dependency, $namespace);
+         return true;
       }
-                                                // im Referenz-Pool speichern
-      $this->pool["$namespace::$key"] = array($data[0], $data[1][0], $dependency);
-      return true;
    }
 
 
@@ -68,15 +82,9 @@ final class ApcCache extends AbstractCachePeer {
     */
    public function get($key, $namespace) {
       if ($this->isCached($key, $namespace))
-         return $this->pool["$namespace::$key"][1];
+         return $this->getPool()->get($key, $namespace);
 
       return null;
-      /*
-      $data = apc_fetch("$namespace::$key");
-      if ($data === false)
-         return null;
-      return unserialize($data[1]);
-      */
    }
 
 
@@ -89,7 +97,8 @@ final class ApcCache extends AbstractCachePeer {
     * @return boolean - TRUE bei Erfolg, FALSE, falls kein solcher Schlüssel existiert
     */
    public function delete($key, $namespace) {
-      $this->pool["$namespace::$key"] = false;    // Marker für nächste Abfrage setzen
+      $this->getPool()->delete($key, $namespace);
+
       return apc_delete("$namespace::$key");
    }
 
@@ -104,15 +113,19 @@ final class ApcCache extends AbstractCachePeer {
       if ($action == 'replace' && !$this->isCached($key, $namespace))
          return false;
 
-      // im Cache wird ein Array[creation_timestamp, value, dependency] gespeichert
-      $time = time();
-      $data = array($value, $dependency);
+      if ($action == 'set') {
+         // im Cache wird ein array(timestamp, array(value, dependency)) gespeichert
+         $time = time();
+         $data = array($value, $dependency);
 
-      if (!apc_store("$namespace::$key", array($time, serialize($data)), $expires))
-         throw new RuntimeException('Unexpected APC error, apc_store() returned FALSE');
+         if (!apc_store("$namespace::$key", array($time, serialize($data)), $expires))
+            throw new RuntimeException('Unexpected APC error, apc_store() returned FALSE');
 
-      $this->pool["$namespace::$key"] = array($time, $value, $dependency);
-      return true;
+         $this->getPool()->store($action, $key, $value, $expires, $dependency, $namespace);
+         return true;
+      }
+
+      throw new InvalidArgumentException('Invalid argument $action: '.$action);
    }
 }
 ?>
