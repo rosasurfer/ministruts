@@ -7,15 +7,20 @@ define('START_TIME', microTime(true));
 // -----------------------------------------------------------------------------------------------------------------------------------
 // ggf. automatisch den Profiler starten
 if (extension_loaded('APD') && !isSet($GLOBALS['__APD_PROFILE__']) && (isSet($_GET['__PROFILE__']) || isSet($_POST['__PROFILE__']))) {
-   $dumpFile = $GLOBALS['__APD_PROFILE__'] = apd_set_pprof_trace(ini_get('apd.dumpdir'));
+   $dumpFile = apd_set_pprof_trace(ini_get('apd.dumpdir'));
 
-   // tatsächlichen Aufrufer des Scripts in weiterer Datei hinterlegen
-   $fH = fOpen($dumpFile.'.caller', 'wb');
-   fWrite($fH, apd_get_url()."\n");
-   fClose($fH);
+   if ($dumpFile) {  // Bug in v0.9, gibt den Dateinamen nicht zurück
+      $GLOBALS['__APD_PROFILE__'] = $dumpFile;
 
-   unset($dumpFile, $fH);
-   register_shutdown_function('apd_shutdown_function');
+      // tatsächlichen Aufrufer des Scripts in weiterer Datei hinterlegen
+      $fH = fOpen($dumpFile.'.caller', 'wb');
+      fWrite($fH, apd_get_url()."\n");
+      fClose($fH);
+
+      register_shutdown_function('apd_shutdown_function');
+      unset($fH);
+   }
+   unset($dumpFile);
 }
 // -----------------------------------------------------------------------------------------------------------------------------------
 
