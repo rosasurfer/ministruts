@@ -4,6 +4,23 @@
 define('START_TIME', microTime(true));
 
 
+// -----------------------------------------------------------------------------------------------------------------------------------
+// ggf. automatisch den Profiler starten
+if (extension_loaded('APD') && !isSet($GLOBALS['__APD_PROFILE__']) && (isSet($_GET['__PROFILE__']) || isSet($_POST['__PROFILE__']))) {
+   $dumpFile = $GLOBALS['__APD_PROFILE__'] = apd_set_pprof_trace(ini_get('apd.dumpdir'));
+
+   // tatsächlichen Aufrufer des Scripts in weiterer Datei hinterlegen
+   $fH = fOpen($dumpFile.'.caller', 'wb');
+   fWrite($fH, apd_get_url()."\n");
+   fClose($fH);
+
+   unset($dumpFile, $fH);
+   register_shutdown_function('apd_shutdown_function');
+}
+// -----------------------------------------------------------------------------------------------------------------------------------
+
+
+
 // Klassendefinitionen
 // -------------------
 $dir = dirName(__FILE__).DIRECTORY_SEPARATOR;
@@ -441,6 +458,46 @@ function timestamp_mysql2german($t) {
  */
 function ifNull($value, $altValue) {
    return ($value === null) ? $altValue : $value;
+}
+
+
+/**
+ * Nur für APD: Gibt die vollständige URL des Requests zurück.
+ *
+ * @return string
+ */
+function apd_get_url() {
+   $proto = isSet($_SERVER['HTTPS']) ? 'https' : 'http';
+   $host  = $_SERVER['SERVER_NAME'];
+   $port  = $_SERVER['SERVER_PORT']=='80' ? '' : ':'.$_SERVER['SERVER_PORT'];
+   return "$proto://$host$port".$_SERVER['REQUEST_URI'];
+}
+
+
+/**
+ * Nur für APD: Shutdown-Function, fügt nach dem Profiling einen Link zum Report in die Seite ein.
+ */
+function apd_shutdown_function() {
+   if (isSet($GLOBALS['__APD_PROFILE__'])) {
+      $isHTML = false;
+
+      // überprüfen, ob der aktuelle Content HTML ist (z.B. nicht bei Downloads)
+      foreach (headers_list() as $header) {
+         $parts = explode(':', $header, 2);
+         if (strToLower($parts[0]) == 'content-type') {
+            $isHTML = (striPos(trim($parts[1]), 'text/html') === 0);
+            break;
+         }
+      }
+
+      // bei HTML-Content Link auf Profiler-Report ausgeben
+      if ($isHTML) {
+         $file = baseName($GLOBALS['__APD_PROFILE__']);
+         echo('<p><a href="/apd/pprofprint.php?file='.$file.'">Profiling Report</a>: '.$file);
+      }
+
+      unset($GLOBALS['__APD_PROFILE__']);
+   }
 }
 
 
