@@ -6,7 +6,9 @@ define('START_TIME', microTime(true));
 
 // -----------------------------------------------------------------------------------------------------------------------------------
 // ggf. automatisch den Profiler starten
-if (extension_loaded('APD') && !isSet($GLOBALS['__APD_PROFILE__']) && (isSet($_GET['__PROFILE__']) || isSet($_POST['__PROFILE__']))) {
+if (extension_loaded('APD') && APD_VERSION>='1.0.1' && !isSet($GLOBALS['__APD_PROFILE__'])
+   && (isSet($_GET['__PROFILE__']) || isSet($_POST['__PROFILE__']))) {
+
    $dumpFile = $GLOBALS['__APD_PROFILE__'] = apd_set_pprof_trace(ini_get('apd.dumpdir'));
 
    // tatsächlichen Aufrufer des Scripts in weiterer Datei hinterlegen
