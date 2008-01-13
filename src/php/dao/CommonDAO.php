@@ -1,10 +1,10 @@
 <?
 /**
- * BaseDAO
+ * CommonDAO
  *
- * Basis aller DAO's.
+ * Ein einfacher DAO, der die Grundfunktionaliät bereitstellt.  Kann anwendungsspezifisch erweitert werden.
  */
-abstract class BaseDAO extends Singleton {
+class CommonDAO extends Singleton {
 
 
    // Mapping-Constanten

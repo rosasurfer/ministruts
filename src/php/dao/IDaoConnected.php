@@ -1,14 +1,16 @@
 <?
 /**
- * Interface zum Finden des DAO eines PersistableObject.
+ * Interface zum Finden des DAO einer Instanz.
+ *
+ * @see PersistableObject
  */
 interface IDaoConnected {
 
 
    /**
-    * Gibt den DAO für die PersistableObject zurück.
+    * Gibt den DAO für die Instanz zurück.
     *
-    * @return BaseDAO
+    * @return CommonDAO
     */
    static function dao();
 }

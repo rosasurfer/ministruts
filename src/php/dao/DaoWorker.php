@@ -6,7 +6,7 @@ class DaoWorker extends Object {
 
 
    // DAO der Entity-Klasse dieses Workers
-   private /*BaseDAO*/ $dao;
+   private /*CommonDAO*/ $dao;
 
 
    // Name der Entity-Klasse dieses Workers
@@ -25,9 +25,9 @@ class DaoWorker extends Object {
     *
     * Erzeugt einen neuen Worker für den angegebenen DAO.
     *
-    * @param BaseDAO $dao - BaseDAO
+    * @param CommonDAO $dao - CommonDAO
     */
-   public function __construct(BaseDAO $dao) {
+   public function __construct(CommonDAO $dao) {
       $this->dao = $dao;
       $this->entityClass = $dao->getEntityClass();
    }

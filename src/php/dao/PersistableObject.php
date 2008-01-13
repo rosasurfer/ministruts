@@ -182,15 +182,15 @@ abstract class PersistableObject extends Object implements IDaoConnected {
             $type =& $mapping[1];
 
             switch ($type) {
-               case BaseDAO ::T_STRING:
+               case CommonDAO ::T_STRING:
                   $object->$property =&        $row[$column]; break;
-               case BaseDAO ::T_INT:
+               case CommonDAO ::T_INT:
                   $object->$property = (int)   $row[$column]; break;
-               case BaseDAO ::T_FLOAT:
+               case CommonDAO ::T_FLOAT:
                   $object->$property = (float) $row[$column]; break;
-               case BaseDAO ::T_BOOL:
+               case CommonDAO ::T_BOOL:
                   $object->$property = (bool)  $row[$column]; break;
-               case BaseDAO ::T_SET:
+               case CommonDAO ::T_SET:
                   $object->$property = strLen($row[$column]) ? explode(',', $row[$column]) : array();
                   break;
                default:
@@ -207,7 +207,7 @@ abstract class PersistableObject extends Object implements IDaoConnected {
     *
     * @param string $class - Klassenname der Instanz
     *
-    * @return BaseDAO
+    * @return CommonDAO
     */
    protected static function getDAO($class) {
       return Singleton ::getInstance($class.'DAO');
