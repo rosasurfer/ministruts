@@ -6,10 +6,10 @@ define('START_TIME', microTime(true));
 
 // -----------------------------------------------------------------------------------------------------------------------------------
 // ggf. automatisch den Profiler starten
-if (extension_loaded('APD') && APD_VERSION>='1.0.1' && !isSet($GLOBALS['__APD_PROFILE__'])
-   && (isSet($_GET['__PROFILE__']) || isSet($_POST['__PROFILE__']))) {
+if (extension_loaded('APD') && APD_VERSION>='1.0.1' && !isSet($GLOBALS['_APD_PROFILE_'])
+   && (isSet($_GET['_PROFILE_']) || isSet($_POST['_PROFILE_']))) {
 
-   $dumpFile = $GLOBALS['__APD_PROFILE__'] = apd_set_pprof_trace(ini_get('apd.dumpdir'));
+   $dumpFile = $GLOBALS['_APD_PROFILE_'] = apd_set_pprof_trace(ini_get('apd.dumpdir'));
 
    // tatsächlichen Aufrufer des Scripts in weiterer Datei hinterlegen
    $fH = fOpen($dumpFile.'.caller', 'wb');
@@ -480,7 +480,7 @@ function apd_get_url() {
  * Nur für APD: Shutdown-Function, fügt nach dem Profiling einen Link zum Report in die Seite ein.
  */
 function apd_shutdown_function() {
-   if (isSet($GLOBALS['__APD_PROFILE__'])) {
+   if (isSet($GLOBALS['_APD_PROFILE_'])) {
       $isHTML = false;
 
       // überprüfen, ob der aktuelle Content HTML ist (z.B. nicht bei Downloads)
@@ -494,11 +494,11 @@ function apd_shutdown_function() {
 
       // bei HTML-Content Link auf Profiler-Report ausgeben
       if ($isHTML) {
-         $file = baseName($GLOBALS['__APD_PROFILE__']);
+         $file = baseName($GLOBALS['_APD_PROFILE_']);
          echo('<p><a href="/apd/pprofprint.php?file='.$file.'">Profiling Report</a>: '.$file);
       }
 
-      unset($GLOBALS['__APD_PROFILE__']);
+      unset($GLOBALS['_APD_PROFILE_']);
    }
 }
 
