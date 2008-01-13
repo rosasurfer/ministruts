@@ -6,7 +6,7 @@
  *
  * TODO: Cache-Values in Wrapperobjekt speichern und CREATED, EXPIRES etc. verarbeiten
  */
-final class ApcCache extends AbstractCachePeer {
+final class ApcCache extends CachePeer {
 
 
    // lokaler ReferencePool

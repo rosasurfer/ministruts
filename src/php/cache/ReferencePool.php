@@ -6,7 +6,7 @@
  * des Requests, die Werte bleiben also nicht Request-übergreifend erhalten.  Er stellt jedoch sicher,
  * daß mehrere Zugriffe auf ein gespeichertes Object immer ein und dieselbe Instanz zurückliefern.
  */
-final class ReferencePool extends AbstractCachePeer {
+final class ReferencePool extends CachePeer {
 
 
    // Pool

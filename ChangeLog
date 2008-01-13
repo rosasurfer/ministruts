@@ -1,5 +1,10 @@
 2008-01-12
 
+   - Refactoring: php/cache/AbstractCachePeer -> php/cache/CachePeer
+
+
+2008-01-12
+
    - Refactoring: php/cache/ProcessMemoryCache -> php/cache/ReferencePool
 
    - php/cache/ApcCache verwendet für's Reference-Pooling eine ReferencePool-Instanz

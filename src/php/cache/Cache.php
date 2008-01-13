@@ -32,7 +32,7 @@
  *       Cache::delete($key);
  *
  *
- * @see AbstractCachePeer
+ * @see CachePeer
  */
 final class Cache extends StaticClass {
 
@@ -49,7 +49,7 @@ final class Cache extends StaticClass {
    /**
     * Gibt die Instanz der aktuellen Cache-Implementierung zurück.
     *
-    * @return AbstractCachePeer
+    * @return CachePeer
     */
    private static function getPeer() {
       if (!self::$peer) {

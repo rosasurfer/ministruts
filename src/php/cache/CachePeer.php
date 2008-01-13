@@ -1,12 +1,12 @@
 <?
 /**
- * AbstractCachePeer
+ * CachePeer
  *
  * Abstrakte Basisklasse für Cache-Implementierungen.
  *
  * @see Cache
  */
-abstract class AbstractCachePeer extends Object {
+abstract class CachePeer extends Object {
 
 
    abstract public    function get($key, $namespace);

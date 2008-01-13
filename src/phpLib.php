@@ -25,9 +25,9 @@ if (extension_loaded('APD') && !isSet($GLOBALS['_APD_PROFILE_']) && (isSet($_GET
 // -------------------
 $dir = dirName(__FILE__).DIRECTORY_SEPARATOR;
 
-$__classes['AbstractCachePeer'              ] = $dir.'php/cache/AbstractCachePeer';
 $__classes['ApcCache'                       ] = $dir.'php/cache/ApcCache';
 $__classes['Cache'                          ] = $dir.'php/cache/Cache';
+$__classes['CachePeer'                      ] = $dir.'php/cache/CachePeer';
 $__classes['ReferencePool'                  ] = $dir.'php/cache/ReferencePool';
 
 $__classes['Object'                         ] = $dir.'php/core/Object';
