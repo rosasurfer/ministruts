@@ -21,15 +21,8 @@ abstract class BaseDAO extends Singleton {
    private /*DB*/ $worker;
 
 
-   // TODO: ReferencePool implementieren
-   private $identityMap;
-
-
    // Name der Entityklasse, für die der DAO zuständig ist
-   protected /*string*/ $entityClass;
-
-
-   protected $foundItemsCounter = 0;
+   private $entityClass;
 
 
    /**
@@ -37,7 +30,7 @@ abstract class BaseDAO extends Singleton {
     *
     * Erzeugt einen neuen DAO.
     *
-    * @param  string $alias - Aliasname der Datenbank, mit dem die Entity-Klasse verbunden ist.
+    * @param string $alias - Aliasname der Datenbank, mit dem die Entity-Klasse verbunden ist.
     */
    protected function __construct() {
       $this->entityClass = subStr(get_class($this), 0, -3);
@@ -49,80 +42,53 @@ abstract class BaseDAO extends Singleton {
     * statt einer zweiten Datenbankabfrage benutzt werden.
     * (siehe found_rows():  http://dev.mysql.com/doc/refman/5.1/en/information-functions.html)
     *
-    * @return int - Gesamtanzahl von Ergebnissen (ohne LIMIT-Klausel)
+    * @return int - Gesamtanzahl von Ergebnissen (ohne Berücksichtigung einer LIMIT-Klausel)
     */
-   public function getFoundItemsCounter() {
-      return $this->foundItemsCounter;
+   final public function countFoundItems() {
+      return $this->getWorker()->countFoundItems();
    }
 
 
    /**
     * single object getters
     */
-   public function getByQuery($query) {
-      return $this->getWorker()
-                  ->executeSql($query);
+   final public function getByQuery($query) {
+      return $this->getWorker()->getByQuery($query);
    }
 
 
    /**
     * object's list getters
     */
-   public function getListByQuery($query) {
-      return $this->getWorker()
-                  ->executeSql($query);
+   final public function getListByQuery($query, $count = false) {
+      return $this->getWorker()->getListByQuery($query, $count);
    }
 
 
    /**
-    * DML statement
     */
-   public function executeSql($sql) {
-      return $this->getWorker()
-                  ->executeSql($sql);
+   final public function executeSql($sql, $count = false) {
+      return $this->getWorker()->executeSql($sql, $count);
    }
 
 
    /**
-    * Konvertiert ein eindeutiges DB-Resultset in eine PersistableObject-Instanz.
+    * Gibt das Mapping der Entity-Klasse des DAO zurück.
     *
-    * @param array $result - Rückgabewert einer Datenbankabfrage
-    *
-    * @return array - Instanz
-    *
-    * @throws DatabaseException - wenn ein mehrzeiliges Resultset übergeben wird
+    * @return array
     */
-   protected function makeObject(array $result) {
-      if ($result['rows'] > 1) throw new DatabaseException('Unexpected, non-unique query result: '.$result);
-
-      $instance = null;
-
-      if ($result['rows'] == 1) {
-         $row = mysql_fetch_assoc($result['set']);
-         $instance = PersistableObject ::createInstance($this->entityClass, $row);
-      }
-      $this->foundItemsCounter = $instance ? 1 : 0;
-
-      return $instance;
+   final public function getMapping() {
+      return $this->mapping;
    }
 
 
    /**
-    * Konvertiert ein DB-Resultset in PersistableObject-Instanzen.
+    * Gibt den Namen der Entity-Klaase dieses DAO's zurück.
     *
-    * @param array $result - Rückgabewert einer Datenbankabfrage
-    *
-    * @return array - Instanzen
+    * @return string - Klassenname
     */
-   protected function makeObjects(array $result) {
-      $instances = array();
-
-      while ($row = mysql_fetch_assoc($result['set'])) {
-         $instances[] = PersistableObject ::createInstance($this->entityClass, $row);
-      }
-      $this->foundItemsCounter = $result['rows'];
-
-      return $instances;
+   final public function getEntityClass() {
+      return $this->entityClass;
    }
 
 
@@ -133,7 +99,7 @@ abstract class BaseDAO extends Singleton {
     */
    private function getWorker() {
       if (!$this->worker) {
-         $this->worker = DBPool ::getDB($this->mapping['link']);
+         $this->worker = new DaoWorker($this);
       }
       return $this->worker;
    }
