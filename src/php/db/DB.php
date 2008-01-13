@@ -103,7 +103,6 @@ abstract class DB extends Object {
                 ->setUsername($username)
                 ->setPassword($password)
                 ->setDataBase($database);
-
       return $connector;
    }
 

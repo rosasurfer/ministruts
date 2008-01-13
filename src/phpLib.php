@@ -35,6 +35,7 @@ $__classes['Singleton'                      ] = $dir.'php/core/Singleton';
 $__classes['StaticClass'                    ] = $dir.'php/core/StaticClass';
 
 $__classes['BaseDAO'                        ] = $dir.'php/dao/BaseDAO';
+$__classes['DaoWorker'                      ] = $dir.'php/dao/DaoWorker';
 $__classes['IDaoConnected'                  ] = $dir.'php/dao/IDaoConnected';
 $__classes['PersistableObject'              ] = $dir.'php/dao/PersistableObject';
 

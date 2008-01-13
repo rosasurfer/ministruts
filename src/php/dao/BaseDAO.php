@@ -83,7 +83,7 @@ abstract class BaseDAO extends Singleton {
 
 
    /**
-    * Gibt den Namen der Entity-Klaase dieses DAO's zurück.
+    * Gibt den Namen der Entity-Klasse dieses DAO's zurück.
     *
     * @return string - Klassenname
     */
