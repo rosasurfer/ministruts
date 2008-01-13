@@ -2,7 +2,7 @@
 /**
  * PersistableObject
  *
- * Abstrakte Basisklasse für speicherbare Objekte.
+ * Abstrakte Basisklasse für gespeicherte Objekte.
  */
 abstract class PersistableObject extends Object implements IDaoConnected {
 
@@ -18,14 +18,33 @@ abstract class PersistableObject extends Object implements IDaoConnected {
    protected $deleted;      // Löschzeitpunkt:      datetime  (string)
 
 
-   // temp. Property
-   protected static $createInstance = false;
-
-
    /**
-    * Default-Konstruktor
+    * Default-Construktor.
+    *
+    * Der Constructor ist final, neue PersistableObject-Instanzen werden mittels einer Helfermethode
+    * erzeugt (vorzugsweise create()). Diese Methode muß implementiert werden, wenn neue Instanzen
+    * erzeugt (und gespeichert) werden können sollen.
+    *
+    * Beispiel:
+    * ---------
+    *
+    * class MyClass extends PersistableObject {
+    *
+    *    private $property = null;
+    *
+    *
+    *    public static function create($arg) {
+    *       ...    // some parameter validation
+    *
+    *       $instance = new self();
+    *       $instance->property = $arg;
+    *       return $instance;
+    *    }
+    * }
     */
-   protected function __construct() { /* */ }
+   final protected function __construct() {
+      $this->created = $this->version = date('Y-m-d H:i:s');
+   }
 
 
    /**
@@ -120,7 +139,7 @@ abstract class PersistableObject extends Object implements IDaoConnected {
     * werden.
     */
    protected function insert() {
-      throw new UnimplementedFeatureException('method not yet implemented');
+      throw new UnimplementedFeatureException('Method '.__METHOD__.' not yet implemented');
    }
 
 
@@ -129,7 +148,7 @@ abstract class PersistableObject extends Object implements IDaoConnected {
     * werden.
     */
    protected function update() {
-      throw new UnimplementedFeatureException('method not yet implemented');
+      throw new UnimplementedFeatureException('Method '.__METHOD__.' not yet implemented');
    }
 
 
@@ -138,7 +157,7 @@ abstract class PersistableObject extends Object implements IDaoConnected {
     * werden.
     */
    public function delete() {
-      throw new UnimplementedFeatureException('method not yet implemented');
+      throw new UnimplementedFeatureException('Method '.__METHOD__.' not yet implemented');
    }
 
 
@@ -151,9 +170,7 @@ abstract class PersistableObject extends Object implements IDaoConnected {
     * @return PersistableObject
     */
    public static function createInstance(&$class, array &$row) {
-      self::$createInstance = true;
       $object = new $class();
-      self::$createInstance = false;
       if (!$object instanceof self) throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
 
       $mappings = $object->dao()->mapping;
