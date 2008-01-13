@@ -17,10 +17,6 @@ abstract class BaseDAO extends Singleton {
    const T_NOT_NULL = false;     // not null
 
 
-   // Datenbank-Alias der Entityklasse
-   private /*string*/ $dbAlias;
-
-
    // Worker dieses DAO's
    private /*DB*/ $worker;
 
@@ -45,7 +41,6 @@ abstract class BaseDAO extends Singleton {
     */
    protected function __construct() {
       $this->entityClass = subStr(get_class($this), 0, -3);
-      $this->worker = DBPool ::getDB($this->mapping['link']);
    }
 
 
@@ -137,6 +132,9 @@ abstract class BaseDAO extends Singleton {
     * @return DB
     */
    private function getWorker() {
+      if (!$this->worker) {
+         $this->worker = DBPool ::getDB($this->mapping['link']);
+      }
       return $this->worker;
    }
 }

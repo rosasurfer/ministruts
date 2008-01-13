@@ -150,7 +150,7 @@ abstract class PersistableObject extends Object implements IDaoConnected {
     *
     * @return PersistableObject
     */
-   public static function createInstance(/*self*/ &$class, array &$row) {
+   public static function createInstance(&$class, array &$row) {
       self::$createInstance = true;
       $object = new $class();
       self::$createInstance = false;
@@ -166,15 +166,16 @@ abstract class PersistableObject extends Object implements IDaoConnected {
 
             switch ($type) {
                case BaseDAO ::T_STRING:
-                  $object->$property =& $row[$column];        break;
+                  $object->$property =&        $row[$column]; break;
                case BaseDAO ::T_INT:
-                  $object->$property = (int) $row[$column];   break;
+                  $object->$property = (int)   $row[$column]; break;
                case BaseDAO ::T_FLOAT:
                   $object->$property = (float) $row[$column]; break;
                case BaseDAO ::T_BOOL:
-                  $object->$property = (bool) $row[$column];  break;
+                  $object->$property = (bool)  $row[$column]; break;
                case BaseDAO ::T_SET:
-                  $object->$property = strLen($row[$column]) ? explode(',', $row[$column]) : array(); break;
+                  $object->$property = strLen($row[$column]) ? explode(',', $row[$column]) : array();
+                  break;
                default:
                   throw new InvalidArgumentException('Unknown data type "'.$type.'" in database mapping of '.$class.'::'.$property);
             }
