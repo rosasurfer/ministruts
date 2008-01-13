@@ -98,11 +98,12 @@ class Logger extends StaticClass {
    public static function handleError($level, $message, $file, $line, array $vars) {
       $error_reporting = error_reporting();
 
-      // Fehler ignorieren, die absichtlich unterdrückt oder durch den aktuelle Errorlevel nicht abgedeckt werden
-      // $error_reporting==0: @-Operator
+      // Fehler ignorieren, die absichtlich unterdrückt oder durch den aktuellen Errorlevel nicht abgedeckt werden
+      //  $error_reporting==0 // @-Operator
       if ($error_reporting==0 || ($error_reporting & $level) != $level)
          return true;
 
+      // TODO: E_STRICT-Fehler, die in __autoload() ausgelöst werden (Compile-Time), deaktivieren __autoload() (PHPErrorException wird nicht gefunden)
 
       // Fehler in Exception kapseln ...
       $exception = new PHPErrorException($message, $file, $line, $vars);

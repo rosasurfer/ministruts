@@ -6,7 +6,7 @@ interface IDaoConnected {
 
 
    /**
-    * Gibt den DAO für ein PersistableObject zurück.
+    * Gibt den DAO für die PersistableObject zurück.
     *
     * @return BaseDAO
     */
