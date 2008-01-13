@@ -8,19 +8,19 @@ class Object {
    /**
     * Magische Methode. Fängt durch unbekannte Methodenaufrufe ausgelöste, fatale PHP-Fehler ab.
     *
-    * @param string $methodName - Name der aufgerufenen Methode
-    * @param array  $params     - Array mit den der Methode übergebenen Parametern
+    * @param string $methode - Name der aufgerufenen Methode
+    * @param array  $params  - Array mit den der Methode übergebenen Parametern
     *
     * @throws RuntimeException
     */
-   private static function __call($methodName, array $params) {
+   private static function __call($method, array $params) {
       $trace = debug_backTrace();
 
       for ($i=0; $i < sizeOf($trace); $i++) {
          if (strToLower($trace[$i]['function']) !== '__call')
             break;
       }
-      throw new RuntimeException('Call to undefined method '.$trace[$i]['class']."::$methodName()");
+      throw new RuntimeException('Call to undefined method '.$trace[$i]['class']."::$methode()");
    }
 
 

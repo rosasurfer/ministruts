@@ -16,7 +16,7 @@ abstract class Singleton extends Object {
    /**
     * Nicht-öffentlicher Konstruktor
     */
-   protected function __construct() { /* you can't call me from outside with new ... */ }
+   protected function __construct() { /* you can't call me from outside ... */ }
 
 
    /**
@@ -30,7 +30,7 @@ abstract class Singleton extends Object {
       if (isSet(self::$instances[$class]))
          return self::$instances[$class];
 
-      // for Singleton::getInstance('class_name', $arg1, ...) calling
+      // for Singleton::getInstance($class, $arg1, ...) calling
       if (func_num_args() > 2) {
          $args = func_get_args();
          array_shift($args);

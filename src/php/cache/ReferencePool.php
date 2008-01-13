@@ -3,8 +3,9 @@
  * ReferencePool
  *
  * Die einfachste CachePeer-Implementierung.  Dieser Cache  speichert die Objekte nur im Prozeß-Speicher
- * des Requests, die Werte bleiben also nicht Request-übergreifend erhalten.  Er stellt jedoch sicher,
- * daß mehrere Zugriffe auf ein gespeichertes Object immer ein und dieselbe Instanz zurückliefern.
+ * des Requests, die Werte bleiben also nach Ende des Requests nicht erhalten.  Er stellt jedoch sicher,
+ * daß mehrere Zugriffe auf ein gespeichertes Object immer ein und dieselbe Instanz zurückliefern und
+ * wird deshalb intern von jedem Cache als Reference-Pool verwendet.
  */
 final class ReferencePool extends CachePeer {
 
