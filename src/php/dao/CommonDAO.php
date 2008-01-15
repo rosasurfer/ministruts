@@ -8,13 +8,15 @@ class CommonDAO extends Singleton {
 
 
    // Mapping-Constanten
-   const T_BOOL     = 1;         // boolean
-   const T_INT      = 2;         // int
-   const T_FLOAT    = 3;         // float
-   const T_STRING   = 4;         // string
-   const T_SET      = 5;         // set
-   const T_NULL     = true;      // null
-   const T_NOT_NULL = false;     // not null
+   const T_BOOL     = 1;               // boolean
+   const T_BOOLEAN  = self ::T_BOOL;
+   const T_INT      = 2;               // int
+   const T_INTEGER  = self ::T_INT;
+   const T_FLOAT    = 3;               // float
+   const T_STRING   = 4;               // string
+   const T_SET      = 5;               // set
+   const T_NULL     = true;            // null
+   const T_NOT_NULL = false;           // not null
 
 
    // Worker dieses DAO's
