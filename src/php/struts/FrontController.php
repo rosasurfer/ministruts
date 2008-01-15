@@ -66,6 +66,8 @@ final class FrontController extends Singleton {
    protected function __construct() {
       // Konfiguration vervollständigen
       $appDirectory = dirName($_SERVER['SCRIPT_FILENAME']);
+      // TODO: Config(application.directory) muß zentral abgefragt werden können
+      // geht verloren, wenn die Config neu geladen wird
       Config ::set('application.directory', $appDirectory);
 
 
