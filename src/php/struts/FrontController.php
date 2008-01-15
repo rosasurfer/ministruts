@@ -45,10 +45,10 @@ final class FrontController extends Singleton {
 
       // Ist schon eine Instanz im Cache ?
       $instance = Cache ::get(__CLASS__);
-      if (!$instance) {                      // nein, Cache miss
+      if (!$instance) {                   // nein, neue Instanz erzeugen ...
          $instance = Singleton ::getInstance(__CLASS__);
 
-         // FileDependency erzeugen und Instanz cachen
+         // ... und mit FileDependency cachen
          $appDirectory = dirName($_SERVER['SCRIPT_FILENAME']);
          $dependency = new FileDependency($appDirectory.'/WEB-INF/struts-config.xml');
          Cache ::set(__CLASS__, $instance, Cache ::EXPIRES_NEVER, $dependency);
