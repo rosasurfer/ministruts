@@ -3,6 +3,11 @@
    - Struts: DTD umbenannt dtd/struts4php-config.dtd -> dtd/php-struts-config.dtd
 
 
+2008-01-13
+
+   - umfangreiches Refactoring am DB-Layer
+
+
 2008-01-12
 
    - Refactoring: php/cache/AbstractCachePeer -> php/cache/CachePeer
