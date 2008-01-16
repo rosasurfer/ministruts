@@ -190,6 +190,8 @@ class Tile extends Object {
       $PAGE = PageContext ::me();
 
       $__tplName = subStr($this->path, 0, strRPos($this->path, '.'));
+
+      // TODO: kein Zeilenumbruch vorm Beginn des Basislayouts
       echo("\n<!-- #begin: ".$__tplName." -->\n");
 
       include($this->module->getResourceBase().$this->path);
