@@ -9,6 +9,7 @@
  * weitergereicht wurde).
  *
  * TODO: LinkTool implementieren, um path-info verwenden zu können
+ * TODO: Versions-String in css- und js-Links einfügen
  */
 final class Request extends Singleton {
 
