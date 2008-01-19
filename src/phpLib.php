@@ -482,7 +482,9 @@ function apd_get_url() {
  * Nur für APD: Shutdown-Function, fügt nach dem Profiling einen Link zum Report in die Seite ein.
  */
 function apd_shutdown_function($dumpFile = null) {
-   flush();
+   if (!headers_sent()) {
+      flush();
+   }
 
    // überprüfen, ob der aktuelle Content HTML ist (z.B. nicht bei Downloads)
    $isHTML = false;
