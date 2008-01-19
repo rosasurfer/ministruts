@@ -6,8 +6,8 @@ define('START_TIME', microTime(true));
 
 // -----------------------------------------------------------------------------------------------------------------------------------
 // ggf. Profiler starten
-if (extension_loaded('APD') && !isSet($GLOBALS['_APD_PROFILE_']) && (isSet($_GET['_PROFILE_']) || isSet($_POST['_PROFILE_']))) {
-   $dumpFile = $GLOBALS['_APD_PROFILE_'] = apd_set_pprof_trace(ini_get('apd.dumpdir'));
+if (extension_loaded('APD') && (isSet($_GET['_PROFILE_']) || isSet($_POST['_PROFILE_']))) {
+   $dumpFile = apd_set_pprof_trace(ini_get('apd.dumpdir'));
 
    if ($dumpFile) {
       // tatsächlichen Aufrufer des Scripts in weiterer Datei hinterlegen
@@ -16,9 +16,9 @@ if (extension_loaded('APD') && !isSet($GLOBALS['_APD_PROFILE_']) && (isSet($_GET
       fClose($fH);
       unset($fH);
    }
-   unset($dumpFile);
 
-   register_shutdown_function('apd_shutdown_function');
+   register_shutdown_function('apd_shutdown_function', $dumpFile);
+   unset($dumpFile);
 }
 // -----------------------------------------------------------------------------------------------------------------------------------
 
@@ -481,31 +481,28 @@ function apd_get_url() {
 /**
  * Nur für APD: Shutdown-Function, fügt nach dem Profiling einen Link zum Report in die Seite ein.
  */
-function apd_shutdown_function() {
-   if (array_key_exists('_APD_PROFILE_', $GLOBALS)) {
-      $isHTML = false;
+function apd_shutdown_function($dumpFile = null) {
+   flush();
 
-      // überprüfen, ob der aktuelle Content HTML ist (z.B. nicht bei Downloads)
-      foreach (headers_list() as $header) {
-         $parts = explode(':', $header, 2);
-         if (strToLower($parts[0]) == 'content-type') {
-            $isHTML = (striPos(trim($parts[1]), 'text/html') === 0);
-            break;
-         }
+   // überprüfen, ob der aktuelle Content HTML ist (z.B. nicht bei Downloads)
+   $isHTML = false;
+   foreach (headers_list() as $header) {
+      $parts = explode(':', $header, 2);
+      if (strToLower($parts[0]) == 'content-type') {
+         $isHTML = (striPos(trim($parts[1]), 'text/html') === 0);
+         break;
       }
+   }
 
-      // bei HTML-Content Link auf Profiler-Report ausgeben
-      if ($isHTML) {
-         if ($GLOBALS['_APD_PROFILE_']) {
-            $file = baseName($GLOBALS['_APD_PROFILE_']);
-            echo('<p><a href="/apd/pprofprint.php?file='.$file.'">Profiling Report</a>: '.$file);
-         }
-         else {
-            echo('<p>Profiling Report: filename not available (old APD version ?)');
-         }
+   // bei HTML-Content Link auf Profiler-Report ausgeben
+   if ($isHTML) {
+      if ($dumpFile) {
+         $file = baseName($dumpFile);
+         echo('<p><a href="/apd/pprofprint.php?file='.$file.'">Profiling Report</a>: '.$file);
       }
-
-      unset($GLOBALS['_APD_PROFILE_']);
+      else {
+         echo('<p>Profiling Report: filename not available (old APD version ?)');
+      }
    }
 }
 
