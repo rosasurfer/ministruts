@@ -5,11 +5,13 @@
 class TorHelper extends StaticClass {
 
 
-   private static $torMirrors = array('torstatus.kgprog.com',
-                                      'torstatus.blutmagie.de',
-                                      'torstatus.torproxy.net',
-                                      'tns.hermetix.org',
-                                      'torstat.kleine-eismaus.de',  // down ???
+   private static $torMirrors = array('torstatus.kgprog.com'    ,
+                                      'torstatus.all.de'        ,
+                                      'torstatus.blutmagie.de'  ,
+                                      'torstatus.torproxy.net'  ,
+                                      'tns.hermetix.org'        ,
+                                      'arachne.doesntexist.org' ,
+                                      'kradense.whsites.net/tns',
                                      );
 
 
