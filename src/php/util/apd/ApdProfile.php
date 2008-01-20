@@ -554,7 +554,17 @@ final class ApdProfile extends Object {
    /**
     */
    private function compareByName($a, $b) {
-      return self:: compareStrings($this->functions[$a], $this->functions[$b]);
+      $a = $this->functions[$a];
+      $b = $this->functions[$b];
+
+      $al = ($a{0} == strToLower($a{0}));
+      $bl = ($b{0} == strToLower($b{0}));
+
+      // Kleine Anfangsbuchstaben werden vor große sortiert
+      if (($al && $bl) || (!$al && !$bl))
+         return self:: compareStrings($a, $b);
+
+      return $al ? -1 : 1;
    }
 
 
