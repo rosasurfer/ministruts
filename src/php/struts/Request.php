@@ -46,7 +46,7 @@ final class Request extends Singleton {
 
       // UTF8-kodierte Parameter nach ISO-8859 konvertieren (Internet Explorer läßt grüßen)
       $_GET  = String ::decodeUtf8($_GET);
-      $_POST = String ::decodeUtf8($_POST); // TODO: außergewöhnliche POST-Parameter-Encodings verarbeiten
+      $_POST = String ::decodeUtf8($_POST);           // TODO: POST-Encodings berücksichtigen
 
       // $_REQUEST-Array neu definieren ($_COOKIE und $_FILES sind kein User-Input)
       // TODO: array_merge() auf Request-Parametern macht Übergabe von Arrays unmöglich

@@ -12,7 +12,7 @@ if (extension_loaded('APD') && (isSet($_GET['_PROFILE_']) || isSet($_POST['_PROF
    if ($dumpFile) {
       // tatsächlichen Aufrufer des Scripts in weiterer Datei hinterlegen
       $fH = fOpen($dumpFile.'.caller', 'wb');
-      fWrite($fH, apd_get_url()."\n");
+      fWrite($fH, 'caller='.apd_get_url()."\n\nEND_HEADER\n");
       fClose($fH);
       unset($fH);
    }
@@ -100,6 +100,8 @@ $__classes['CommonValidator'                ] = $dir.'php/util/CommonValidator';
 $__classes['Config'                         ] = $dir.'php/util/Config';
 $__classes['Logger'                         ] = $dir.'php/util/Logger';
 $__classes['String'                         ] = $dir.'php/util/String';
+
+$__classes['ApdProfile'                     ] = $dir.'php/util/apd/ApdProfile';
 
 unset($dir);
 
@@ -474,7 +476,8 @@ function apd_get_url() {
    $proto = isSet($_SERVER['HTTPS']) ? 'https' : 'http';
    $host  = $_SERVER['SERVER_NAME'];
    $port  = $_SERVER['SERVER_PORT']=='80' ? '' : ':'.$_SERVER['SERVER_PORT'];
-   return "$proto://$host$port".$_SERVER['REQUEST_URI'];
+   $url   = "$proto://$host$port".$_SERVER['REQUEST_URI'];
+   return $url;
 }
 
 
@@ -499,21 +502,11 @@ function apd_shutdown_function($dumpFile = null) {
    // bei HTML-Content Link auf Profiler-Report ausgeben
    if ($isHTML) {
       if ($dumpFile) {
-         $file = baseName($dumpFile);
-         echo('<p><a href="/apd/pprofprint.php?file='.$file.'">Profiling Report</a>: '.$file);
+         echo('<p><a href="/apd/?file='.$dumpFile.'">Profiling Report</a>: '.baseName($dumpFile));
       }
       else {
          echo('<p>Profiling Report: filename not available (old APD version ?)');
       }
    }
 }
-
-
-/*
-Indicate that script is being called by CLI (vielleicht besser für $console)
-----------------------------------------------------------------------------
-if (php_sapi_name() == 'cli') {
-   $console = true ;
-}
-*/
 ?>
