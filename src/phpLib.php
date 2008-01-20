@@ -502,7 +502,7 @@ function apd_shutdown_function($dumpFile = null) {
    // bei HTML-Content Link auf Profiler-Report ausgeben
    if ($isHTML) {
       if ($dumpFile) {
-         echo('<p><a href="/apd/?file='.$dumpFile.'">Profiling Report</a>: '.baseName($dumpFile));
+         echo('<p><a href="/apd/?file='.$dumpFile.'" target="apd">Profiling Report</a>: '.baseName($dumpFile));
       }
       else {
          echo('<p>Profiling Report: filename not available (old APD version ?)');
