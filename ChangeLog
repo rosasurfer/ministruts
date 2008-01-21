@@ -1,6 +1,11 @@
+2008-01-21
+
+   - APD-Profilingreport: der URL-Parameter "limit=0" bedeutet kein Limit
+
+
 2008-01-20
 
-   - APD: der Profilingreport kann übers Web abgerufen werden, ein Link wird automatisch eingeblendet
+   - APD-Profilingreport: kann übers Web abgerufen werden, ein Link wird automatisch eingeblendet
 
 
 2008-01-15

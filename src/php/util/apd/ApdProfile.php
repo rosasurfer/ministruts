@@ -266,13 +266,13 @@ final class ApdProfile extends Object {
 
 
       $limit = $this->getLimit();
-      $line = 0;
+      $line  = 0;
 
       foreach ($this->functions as $i => $function) {
          if ($this->isOption('i') && $this->functionTypes[$i] == '1')
             continue;
 
-         if (++$line > $limit)
+         if ($limit && ++$line > $limit)
             break;
 
          $realTime      = $functionRealTime     [$i]/1000000;
@@ -372,7 +372,7 @@ final class ApdProfile extends Object {
          if (isSet($_REQUEST['limit'])) {
             $limit = trim($_REQUEST['limit']);
 
-            if (ctype_digit($limit) && $limit > 0)
+            if (ctype_digit($limit))
                $this->options['O'] = $this->options['limit']  = (int) $limit;
          }
       }
@@ -425,7 +425,8 @@ final class ApdProfile extends Object {
     * @return int - Anzahl
     */
    private function getLimit() {
-      if ($limit = $this->getOption('O'))
+      $limit = $this->getOption('O');
+      if ($limit !== null)
          return $limit;
 
       return 40;     // Default
