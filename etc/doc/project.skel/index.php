@@ -12,8 +12,8 @@ include(dirName(__FILE__).'/WEB-INF/classes/classes.php');
 
 
 define('APPLICATION_NAME'   ,  'myAppName');
-define('APPLICATION_CONTEXT', '/'         ); // means the application resides in the document root
-                                             // directory of the web server
+define('APPLICATION_CONTEXT', '/'         ); // '/' means the application resides in the document root
+                                             // directory of the web server nut you can use any directory
 
 FrontController ::me()->processRequest();
 ?>

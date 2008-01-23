@@ -48,12 +48,12 @@
 <!-- The "struts-config" element is the root of the configuration file hierarchy, and contains
      nested elements for all of the other configuration settings.
 
-     doc-base       The base directory to lookup local resources.  This value is interpreted as
+     doc-base       The base directory to lookup local files.  This value is interpreted as
                     relative to the location of the Struts configuration file itself.
                     ["."]
 
      role-processor Class name of the [RoleProcessor] subclass that will perform role checking
-                    for this module.
+                    for the module.
 -->
 <!ELEMENT struts-config (global-forwards?, action-mappings, tiles?)>
 <!ATTLIST struts-config
