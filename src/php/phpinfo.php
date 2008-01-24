@@ -96,8 +96,7 @@ if (!extension_loaded('apc'))                                                 ec
 if (extension_loaded('apc')) {
    if (!ini_get('apc.enabled'))                                               echoError('Warning: apc.enabled is not On');
    if (!ini_get('apc.stat'))                                                  echoError('Warning: apc.stat is not On');     // Off verursacht Fehler (Dateien werden teilweise nicht gecacht)
-   if (WINDOWS && ini_get('apc.cache_by_default'))                            echoError('Windows warning: apc.cache_by_default is not Off');
-   if (!WINDOWS && !ini_get('apc.cache_by_default'))                          echoError('Warning: apc.cache_by_default is not On');
+   if (!ini_get('apc.cache_by_default'))                                      echoError('Warning: apc.cache_by_default is not On');
 }
 
 
