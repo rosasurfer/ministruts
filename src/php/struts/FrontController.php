@@ -1,17 +1,6 @@
 <?
 /**
  * FrontController
- *
- * Der FrontController muß "thread-sicher" programmiert sein. Das bedeutet, er muß zustandlos sein und
- * darf nichts speichern, WAS SICH ÄNDERN KÖNNTE.
- *
- * Hintergrund ist, daß es nur eine Instanz gibt, die aus Performance-Gründen im Cache zwischengehalten
- * und für jeden Request wiederverwendet wird. Wenn nun z.B. eine Variable vor dem Speichern im Cache mit
- * einem Zwischenwert belegt würde, dann würde dieser Wert an weitere Requests weitergereicht, wodurch
- * deren Verarbeitung gestört werden könnte.
- *
- * Als einfache Richtlinie läßt sich sagen, daß außerhalb von Funktionen keine Variablen angelegt werden
- * dürfen. Wird das eingehalten, ist er "thread-sicher".
  */
 final class FrontController extends Singleton {
 
@@ -21,7 +10,7 @@ final class FrontController extends Singleton {
     * Dieser Pfad kann physisch existieren (Verzeichnis unterhalb von DOCUMENT_ROOT) oder virtuell sein,
     * wenn die Anwendung z.B. mit mod_alias oder mod_rewrite eingebunden wurde.
     *
-    * z.B. ""       - Default, Anwendung liegt im Wurzelverzeichnis des Webservers "http://domain.tld/"
+    * z.B. ""       - Anwendung liegt im Wurzelverzeichnis des Webservers "http://domain.tld/" (default)
     *      "/myapp" - Anwendung ist unter "http://domain.tld/myapp/" erreichbar
     */
    const APPLICATION_CONTEXT = APPLICATION_CONTEXT;
@@ -36,6 +25,19 @@ final class FrontController extends Singleton {
    /**
     * Gibt die Singleton-Instanz dieser Klasse zurück. Ist ein Cache installiert, wird sie gecacht.
     * Dadurch muß die XML-Konfiguration nicht bei jedem Request neu eingelesen werden.
+    *
+    * NOTE:
+    * -----
+    * Diese Methode muß "thread-sicher" programmiert sein. Das bedeutet, sie darf keine Werte in
+    * Klassenvariablen speichern.
+    *
+    * Hintergrund ist, daß es nur eine einzige FrontController-Instanz gibt, die aus Performance-
+    * Gründen gecacht und bei jedem Request wiederverwendet wird.  Wenn nun z.B. ein Wert in einer
+    * Klassenvariable gespeichert würde, dann würde dieser Wert nicht nur in diesem, sondern auch in
+    * allen weiteren Requests existieren, wodurch deren Verarbeitung gestört werden könnte.
+    *
+    * Als einfache Richtlinie gilt, daß diese Methode keine Werte in $this oder self speichern darf.
+    * Wird das eingehalten, ist die Klasse "thread-sicher".
     *
     * @return FrontController
     */
