@@ -39,22 +39,22 @@ final class DBPool extends Singleton {
    /**
     * Gibt den Connector für den angegebenen Datenbank-Aliasnamen zurück.
     *
-    * @param string $name - Datenbank-Alias
+    * @param string $alias - Datenbank-Alias
     *
     * @return DB
     */
-   public static function getDB($name = null) {
+   public static function getDB($alias = null) {
       $me = self ::me();
 
-      if ($name === null) {                        // single db project
+      if ($alias === null) {                        // single db project
          if (!$me->default)
-            throw new IllegalStateException('Invalid default database connector: null');
+            throw new IllegalStateException('Invalid default database configuration: null');
          $connector = $me->default;
       }
-      elseif (isSet($me->pool[$name])) {           // im Pool ?
-         $connector = $me->pool[$name];
+      elseif (isSet($me->pool[$alias])) {           // im Pool ?
+         $connector = $me->pool[$alias];
       }
-      elseif ($config=Config ::get('db.'.$name)) { // nein, Config holen und Connector laden
+      elseif ($config=Config ::get('db.'.$alias)) { // nein, Config holen und Connector laden
          // bekannte Connectoren trotz verschiedener Schreibweisen erkennen
          $connectorName = strToLower($config['connector']);
 
@@ -71,10 +71,10 @@ final class DBPool extends Singleton {
          $db    = $config['database' ];
 
          $connector = DB ::spawn($class, $host, $user, $pass, $db);
-         $me->pool[$name] = $connector;
+         $me->pool[$alias] = $connector;
       }
       else {
-         throw new IllegalStateException('Can not find database connector named "'.$name.'"');
+         throw new IllegalStateException('Can not find database configuration for alias "'.$alias.'"');
       }
 
       return $connector;
