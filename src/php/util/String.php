@@ -100,7 +100,6 @@ final class String extends StaticClass {
       if (!self:: isUtf8Encoded($string))
          return $string;
 
-      // TODO: htmlEntities('UTF-8') verfälscht den String, wenn er nicht utf-8-kodiert ist
       return html_entity_decode(htmlEntities($string, ENT_NOQUOTES, 'UTF-8'));
    }
 }
