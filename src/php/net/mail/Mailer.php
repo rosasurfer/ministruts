@@ -9,6 +9,7 @@
  */
 class Mailer extends Object {
 
+
    private $config = array('host'    => null,      // SMTP server host name
                            'port'    => null,      // SMTP server port
                            'auth'    => false,     // use authentification ?
@@ -28,7 +29,7 @@ class Mailer extends Object {
    /**
     * Default constructor
     */
-   function Mailer() {
+   public function __construct() {
       $this->debug = @$GLOBALS['debug'];
       global $smtp, $smtp_port, $smtp_use_auth, $smtp_user, $smtp_pass;
 
@@ -55,10 +56,11 @@ class Mailer extends Object {
       $this->log("\n----==:[ New Mailer instance - smtp://".$this->config['host'].':'.$this->config['port'].($this->config['auth'] ? ' with authentification':'')."]:==----");
    }
 
+
    /**
     * Verbindung herstellen
     */
-   function connect() {
+   private function connect() {
       $this->log("\n----==::  Connecting  :==----");
       $connection = fSockOpen('tcp://'.$this->config['host'],
                               $this->config['port'],
@@ -98,10 +100,11 @@ class Mailer extends Object {
       return true;
    }
 
+
    /**
     * Authentifizierung
     */
-   function authenticate() {
+   private function authenticate() {
       if (!$this->connection) {
          trigger_error('Cannot authenticate: Not connected', E_USER_WARNING);
          return false;
@@ -142,10 +145,11 @@ class Mailer extends Object {
       return true;
    }
 
+
    /**
     * Mail verschicken.
     */
-   function sendMail($from, $to, $subject, $message, $headers) {
+   public function sendMail($from, $to, $subject, $message, $headers) {
       $this->connection && $this->logBuffer = null;                  // reset log buffer if already connected
 
       if (!$this->connection     && !$this->connect())      return false;
@@ -232,10 +236,11 @@ class Mailer extends Object {
       return true;
    }
 
+
    /**
     * Verbindung resetten
     */
-   function reset() {
+   public function reset() {
       if (!$this->connection) {
          trigger_error('Cannot reset connection: Not connected', E_USER_WARNING);
          return false;
@@ -252,10 +257,11 @@ class Mailer extends Object {
       return true;
    }
 
+
    /**
     * Verbindung trennen
     */
-   function disconnect() {
+   public function disconnect() {
       if (!$this->connection) return false;
 
       $this->writeData('QUIT');
@@ -275,14 +281,10 @@ class Mailer extends Object {
    }
 
 
-   // ********************************************
-   // private functions, for internal use only ...
-   // ********************************************
-
    /**
     * Antwort des Servers lesen
     */
-   function readResponse() {
+   private function readResponse() {
       $lines = null;
       while (trim($line = fGets($this->connection)) != '') {
          $lines .= $line;
@@ -299,10 +301,11 @@ class Mailer extends Object {
       return $lines;
    }
 
+
    /**
     * Daten in die Socketverbindung schreiben
     */
-   function writeData($data) {
+   private function writeData($data) {
       $count = fWrite($this->connection, $data."\r\n", strLen($data)+2);
 
       if ($count != strLen($data)+2)
@@ -311,19 +314,21 @@ class Mailer extends Object {
       $this->logSentData($data);
    }
 
+
    /**
     * Response parsen
     */
-   function checkResponse($response) {
+   private function checkResponse($response) {
       $response = trim($response);
       $this->responseStatus = intVal(subStr($response, 0, 3));
       $this->response = subStr($response, 4);
    }
 
+
    /**
     * Message loggen
     */
-   function log($data) {
+   private function log($data) {
       $data .= "\n";
 
       if ($this->debug) {
@@ -345,16 +350,45 @@ class Mailer extends Object {
       }
    }
 
+
    /**
     * Empfangene Daten loggen
     */
-   function logResponse($data) {
+   private function logResponse($data) {
       $this->logBuffer .= $data;
 
       if ($this->debug) {
          is_resource($this->logFile) || ($this->logFile = fOpen(dirName(__FILE__).'/'.$this->logFile, 'ab'));
          fWrite($this->logFile, $data, strLen($data));
       }
+   }
+
+
+   /**
+    * Ob die übergebene E-Mail-Adresse gültig ist. Dabei wird geprüft, ob die Domain existiert und ob Mail
+    * für das Postfach angenommen wird (wenn möglich).
+    *
+    * @param  string $address - zu prüfende E-Mail-Adresse
+    *
+    * @return boolean
+    */
+   public static function isValidAddress($address) {
+      $address = strToLower($address);
+
+      $parts = explode('@', $address);
+      if (sizeOf($parts) != 2)
+         return false;
+
+      $mailbox = $parts[0];
+      $domain  = $parts[1];
+
+      // TODO: DNS und Postannahme prüfen
+
+      // es gibt nur aol.com-Adressen, Format siehe: http://postmaster.info.aol.com/faq/mailerfaq.html#syntax
+      if (String ::startsWith($domain, 'aol.') && strRPos($domain, '.')==3)
+         return ($domain=='aol.com' && preg_match('/^[a-z][a-z0-9]{2,15}$/', $mailbox));
+
+      return true;
    }
 }
 
