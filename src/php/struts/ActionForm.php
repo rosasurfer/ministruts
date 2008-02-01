@@ -8,13 +8,13 @@ abstract class ActionForm extends Object {
    /**
     * der Request, zu dem wir gehören
     */
-   protected /*Request*/ $request;
+   protected /*transient Request*/ $request;
 
 
    /**
     * DispatchAction-Key
     */
-   protected /*string*/ $actionKey;
+   protected /*transient string*/ $actionKey;
 
 
    /**
@@ -63,6 +63,21 @@ abstract class ActionForm extends Object {
     */
    public function getActionKey() {
       return $this->actionKey;
+   }
+
+
+   /**
+    * Verhindert das Serialisieren transienter Werte.
+    *
+    * @return array - Array mit den zu serialisierenden Eigenschaften
+    */
+   final public function __sleep() {
+      $array = (array) $this;
+
+      $null = chr(0);
+      unset($array["${null}*${null}request"], $array["${null}*${null}actionKey"]);
+
+      return array_keys($array);
    }
 }
 ?>

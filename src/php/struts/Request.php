@@ -186,6 +186,26 @@ final class Request extends Singleton {
 
 
    /**
+    * Gibt die IP-Adresse zurück, von der aus der Request gemacht wurde.
+    *
+    * @return string
+    */
+   public function getRemoteAddress() {
+      return $_SERVER['REMOTE_ADDR'];
+   }
+
+
+   /**
+    * Gibt den Hostnamen zurück, von dem aus der Request gemacht wurde.
+    *
+    * @return string
+    */
+   public function getRemoteHostname() {
+      return getHostByAddr($this->getRemoteAddress());
+   }
+
+
+   /**
     * Ob mit dem Request eine Session-ID übertragen wurde.
     *
     * @return boolean
@@ -431,6 +451,37 @@ final class Request extends Singleton {
       else {
          throw new IllegalTypeException('Illegal type of parameter $message: '.getType($message));
       }
+   }
+
+
+   /**
+    * Verhindert das Serialisieren von Instanzen dieser Klasse.
+    */
+   final public function __sleep() {
+      $ex = new IllegalStateException('You cannot serialize me: '.__CLASS__);
+      /**
+       * TODO: Definition des Exceptionhandlers aus Root-Script entfernen, damit Fehler abgefangen werden
+       *
+       *   IllegalStateException: You cannot serialize me: Request
+       *
+       *   Stacktrace:
+       *   -----------
+       *   Request->__sleep(): # line 461, file: E:\Projekte\ministruts\src\php\struts\Request.php
+       *   main():                         [php]
+       *
+       *
+       *   Fatal error: Exception thrown without a stack frame in Unknown on line 0
+       */
+      Logger ::log($ex, L_ERROR, __CLASS__);
+      throw $ex;
+   }
+
+
+   /**
+    * Verhindert das Deserialisieren von Instanzen dieser Klasse.
+    */
+   final public function __wakeUp() {
+      throw new IllegalStateException('You cannot unserialize me: '.__CLASS__);
    }
 }
 ?>
