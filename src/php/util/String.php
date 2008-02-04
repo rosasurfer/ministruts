@@ -83,11 +83,11 @@ final class String extends StaticClass {
 
    /**
     * Dekodiert UTF-8-kodierte Strings nach ISO-8859-1. Verarbeitet sowohl einzelne Strings als auch
-    * Sring-Arrays.
+    * String-Arrays.
     *
-    * @param string|[] $string - die zu dekodierenden Strings
+    * @param mixed $string - der/die zu dekodierende/n Strings
     *
-    * @return string|[]
+    * @return mixed - der/die dekodierte/n Strings
     */
    public static function decodeUtf8($string) {
       if (is_array($string)) {
@@ -101,5 +101,59 @@ final class String extends StaticClass {
          return $string;
 
       return html_entity_decode(htmlEntities($string, ENT_NOQUOTES, 'UTF-8'));
+   }
+
+
+   /**
+    * Konvertiert Zeichen mit spezieller HTML-Bedeutung in ihre entsprechenden HTML-Entities.
+    * Diese Methode macht dasselbe wie die interne PHP-Funktion gleichen Namens mit dem Unterschied,
+    * daß der Default-Value von quote_style nicht ENT_COMPAT sondern ENT_QUOTES ist.  Weiterhin können
+    * als erster Parameter auch String-Arrays übergeben werden.
+    *
+    * Bedeutung der optionalen Parameter: siehe PHP-Manual
+    *
+    * @param mixed  $string        - der/die zu konvertierende/n Strings
+    * @param int    $quote_style   -
+    * @param string $charset       -
+    * @param bool   $double_encode -
+    *
+    * @return mixed - der/die konvertierte/n Strings
+    */
+   public static function htmlSpecialChars($string, $quote_style=ENT_QUOTES, $charset='ISO-8859-1', $double_encode=true) {
+      if (is_array($string)) {
+         foreach ($string as $key => &$value)
+            $string[$key] = self:: htmlSpecialChars($value, $quote_style, $charset, $double_encode);
+         return $string;
+      }
+      if ($string!==null && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+
+      return htmlSpecialChars($string, $quote_style, $charset, $double_encode);
+   }
+
+
+   /**
+    * Konvertiert alle Zeichen eines Strings in ihre entsprechenden HTML-Entities.
+    * Diese Methode macht dasselbe wie die interne PHP-Funktion gleichen Namens mit dem Unterschied,
+    * daß der Default-Value von quote_style nicht ENT_COMPAT sondern ENT_QUOTES ist.  Weiterhin können
+    * als erster Parameter auch String-Arrays übergeben werden.
+    *
+    * Bedeutung der optionalen Parameter: siehe PHP-Manual
+    *
+    * @param mixed  $string        - der/die zu konvertierende/n Strings
+    * @param int    $quote_style   -
+    * @param string $charset       -
+    * @param bool   $double_encode -
+    *
+    * @return mixed - der/die konvertierte/n Strings
+    */
+   public static function htmlEntities($string, $quote_style=ENT_QUOTES, $charset='ISO-8859-1', $double_encode=true) {
+      if (is_array($string)) {
+         foreach ($string as $key => &$value)
+            $string[$key] = self:: htmlEntities($value, $quote_style, $charset, $double_encode);
+         return $string;
+      }
+      if ($string!==null && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+
+      return htmlEntities($string, $quote_style, $charset, $double_encode);
    }
 }

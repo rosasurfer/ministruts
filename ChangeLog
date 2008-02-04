@@ -1,3 +1,9 @@
+2008-02-04
+
+   - neue Methode php/util/String::htmlSpecialChars() mit sinnvolleren Default-Values
+   - neue Methode php/util/String::htmlEntities() mit sinnvolleren Default-Values
+
+
 2008-01-21
 
    - APD-Profilingreport: der URL-Parameter "limit=0" bedeutet kein Limit
