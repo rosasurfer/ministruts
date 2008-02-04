@@ -55,7 +55,7 @@ final class Request extends Singleton {
 
 
    /**
-    * Gibt die HTTP-Methode dieses Requests zurück.
+    * Gibt die HTTP-Methode des Requests zurück.
     *
     * @return string
     */
@@ -65,7 +65,7 @@ final class Request extends Singleton {
 
 
    /**
-    * Ob dieser Request ein GET-Request ist.
+    * Ob der Request ein GET-Request ist.
     *
     * @return boolean
     */
@@ -75,7 +75,7 @@ final class Request extends Singleton {
 
 
    /**
-    * Ob dieser Request ein POST-Request ist.
+    * Ob der Request ein POST-Request ist.
     *
     * @return boolean
     */
@@ -85,10 +85,10 @@ final class Request extends Singleton {
 
 
    /**
-    * Gibt die Basis-URL des Servers zurück, über den dieser Request läuft.
-    * (Protokoll + Hostname + Port).
+    * Gibt die Wurzel-URL des Webservers zurück, über den der Request läuft. Dieser Wert endet NICHT
+    * mit einem Slash "/".
     *
-    * z.B.: https://www.domain.tld:433/
+    * z.B.: https://www.domain.tld:433   (Protokoll + Hostname + Port)
     *
     * @return string
     */
@@ -97,7 +97,7 @@ final class Request extends Singleton {
          $http = isSet($_SERVER['HTTPS']) ? 'https' : 'http';
          $host = $_SERVER['SERVER_NAME'];
          $port = $_SERVER['SERVER_PORT']=='80' ? '' : ':'.$_SERVER['SERVER_PORT'];
-         $this->hostURL = "$http://$host$port/";
+         $this->hostURL = "$http://$host$port";
       }
       return $this->hostURL;
 
@@ -114,10 +114,10 @@ final class Request extends Singleton {
 
 
    /**
-    * Gibt den Teil der URL dieses Requests zurück, wie er in der ersten Zeile des HTTP-Protokolls
-    * erscheint, relativ zum Server-Wurzelverzeichnis (Pfadname + Pfadinfo + Querystring).
+    * Gibt den Teil der URL des Requests zurück, wie er in der ersten Zeile des HTTP-Protokolls
+    * erscheint, relativ zum Wurzelverzeichnis des Webservers. Dieser Wert beginnt mit einem Slash "/".
     *
-    * z.B.: /myapp/stuff/view.php/info?key=value
+    * z.B.: /myapplication/foo/bar.php/info?key=value   (Pfadname + Pfadinfo + Querystring)
     *
     * @return string
     */
@@ -130,20 +130,22 @@ final class Request extends Singleton {
 
 
    /**
-    * Gibt den Teil der URL dieses Requests zurück, wie er in der ersten Zeile des HTTP-Protokolls
-    * erscheint, relativ zur Context-URL der Anwendung (Pfadname + Pfadinfo + Querystring).
+    * Gibt den Teil der URL des Requests zurück, wie er in der ersten Zeile des HTTP-Protokolls
+    * erscheint, relativ zur Wurzel-URL der Anwendung. Dieser Wert beginnt mit einem Slash "/".
     *
-    * z.B.: /view.php?key=value
+    * z.B.: /foo/bar.php/info?key=value   (Pfadname + Pfadinfo + Querystring)
     *
     * @return string
     */
    public function getRelativeURI() {
-      return subStr($this->getURI(), strLen($this->getContextPath()));
+      return subStr($this->getURI(), strLen($this->getApplicationPath()));
    }
 
 
    /**
-    * Gibt den Pfadbestandteil der URL dieses Requests zurück.
+    * Gibt den Pfadbestandteil der URL des Requests zurück. Dieser Wert beginnt mit einem Slash "/".
+    *
+    * z.B.: /myapplication/foo/bar.php   (Pfad ohne Pfadinfo und ohne Querystring)
     *
     * @return string
     */
@@ -156,27 +158,47 @@ final class Request extends Singleton {
 
 
    /**
-    * Gibt den zur Context-URL relativen Pfadbestandteil der URL dieses Requests zurück.
+    * Gibt den Pfadbestandteil der URL des Requests relativ zur Wurzel-URL der Anwendung zurück.
+    * Dieser Wert beginnt mit einem Slash "/".
+    *
+    * z.B.: /foo/bar.php   (Pfad ohne Pfadinfo und ohne Querystring)
     *
     * @return string
     */
    public function getRelativePath() {
-      return subStr($this->getPath(), strLen($this->getContextPath()));
+      return subStr($this->getPath(), strLen($this->getApplicationPath()));
    }
 
 
    /**
-    * Gibt die Context-URL der Anwendung zurück.
+    * Gibt die Wurzel-URL der Anwendung zurück. Liegt die Anwendung im Wurzelverzeichnis des Webservers,
+    * ist dieser Wert ein Leerstring "". Anderenfalls beginnt der Wert mit einem Slash "/".
+    *
+    * z.B.: /myapplication   (Pfad ohne Pfadinfo und ohne Querystring)
     *
     * @return string
     */
-   public function getContextPath() {
+   public function getApplicationPath() {
       return $this->getAttribute(Struts ::APPLICATION_PATH_KEY);
    }
 
 
    /**
-    * Gibt die Querystring der URL dieses Requests zurück.
+    * Alias für Request::getApplicationPath()
+    *
+    * @return string
+    *
+    * @see Request::getApplicationPath()
+    */
+   public function getContextPath() {
+      return $this->getApplicationPath();
+   }
+
+
+   /**
+    * Gibt den Querystring der URL des Requests zurück.
+    *
+    * z.B.: key1=value1&key2=value2
     *
     * @return string
     */
@@ -455,7 +477,7 @@ final class Request extends Singleton {
 
 
    /**
-    * Verhindert das Serialisieren von Instanzen dieser Klasse.
+    * Verhindert das Serialisieren von Request-Instanzen.
     */
    final public function __sleep() {
       $ex = new IllegalStateException('You cannot serialize me: '.__CLASS__);
@@ -478,7 +500,7 @@ final class Request extends Singleton {
 
 
    /**
-    * Verhindert das Deserialisieren von Instanzen dieser Klasse.
+    * Verhindert das Deserialisieren von Request-Instanzen.
     */
    final public function __wakeUp() {
       throw new IllegalStateException('You cannot unserialize me: '.__CLASS__);
