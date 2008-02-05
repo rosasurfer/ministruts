@@ -29,9 +29,9 @@ class PageContext extends Singleton {
 
 
    /**
-    * Gibt die einzige Klasseninstanz zurück.
+    * Gibt die Singleton-Instanz dieser Klasse zurück.
     *
-    * @return PageContext
+    * @return Singleton
     */
    public static function me() {
       return Singleton ::getInstance(__CLASS__);

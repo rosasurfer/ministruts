@@ -28,7 +28,7 @@ final class FrontController extends Singleton {
     * Als einfache Richtlinie gilt, daß diese Methode keine Werte in $this oder self speichern darf.
     * Wird das eingehalten, ist die Klasse "thread-sicher".
     *
-    * @return FrontController
+    * @return Singleton
     */
    public static function me() {
       if (!isSet($_SERVER['REQUEST_METHOD']))

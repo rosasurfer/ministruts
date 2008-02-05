@@ -42,7 +42,7 @@ final class Config extends Singleton {
    /**
     * Gibt die Singleton-Instanz dieser Klasse zurück.
     *
-    * @return Config
+    * @return Singleton
     */
    public static function me() {
       // gibt es eine Instanz im Cache ?

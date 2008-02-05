@@ -27,9 +27,9 @@ final class DBPool extends Singleton {
                                            );
 
    /**
-    * Gibt die Klasseninstanz zurück.
+    * Gibt die Singleton-Instanz dieser Klasse zurück.
     *
-    * @return DBPool
+    * @return Singleton
     */
    public static function me() {
       return Singleton ::getInstance(__CLASS__);
