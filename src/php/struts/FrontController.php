@@ -6,17 +6,6 @@ final class FrontController extends Singleton {
 
 
    /**
-    * Der logische Pfad der aktuellen Webapplikation (Context-Pfad) relativ zur Wurzel-URL des Webservers.
-    * Dieser Pfad kann physisch existieren (Verzeichnis unterhalb von DOCUMENT_ROOT) oder virtuell sein,
-    * wenn die Anwendung z.B. mit mod_alias oder mod_rewrite eingebunden wurde.
-    *
-    * z.B. ""       - Anwendung liegt im Wurzelverzeichnis des Webservers "http://domain.tld/" (default)
-    *      "/myapp" - Anwendung ist unter "http://domain.tld/myapp/" erreichbar
-    */
-   const APPLICATION_CONTEXT = APPLICATION_CONTEXT;
-
-
-   /**
     * die registrierten Module, Schlüssel ist ihr Prefix
     */
    private /*Module[]*/ $modules = array();
@@ -66,19 +55,21 @@ final class FrontController extends Singleton {
     * Lädt die Struts-Konfiguration und erzeugt einen entsprechenden Objektbaum.
     */
    protected function __construct() {
-      // Konfiguration vervollständigen
-      $appDirectory = dirName($_SERVER['SCRIPT_FILENAME']);
-      // TODO: Config(application.directory) muß zentral abgefragt werden können
-      // geht verloren, wenn die Config neu geladen wird
-      Config ::set('application.directory', $appDirectory);
+      // Umgebung prüfen 1:  Ist die Servervariable APPLICATION_PATH richtig gesetzt ?
+      if (!isSet($_SERVER['APPLICATION_PATH'])) {
+         throw new InfrastructureException('Web server configuration error, environment variable "APPLICATION_PATH" is not defined');
+      }
+      elseif (!preg_match('/^(\/[^\/]+)*$/', $_SERVER['APPLICATION_PATH'])) {
+         throw new InfrastructureException('Web server configuration error, invalid value of environment variable "APPLICATION_PATH": '.$_SERVER['APPLICATION_PATH']);
+      }
 
-
-      // Umgebung überprüfen:  Ist der Zugriff auf WEB-INF und CVS gesperrt ?
-      $contextURL = $this->getContextURL();
-      $locations = array($contextURL.'WEB-INF',
-                         $contextURL.'WEB-INF/',
-                         $contextURL.'CVS',
-                         $contextURL.'CVS/',
+      // Umgebung prüfen 2:  Ist der Zugriff auf WEB-INF und CVS-Daten gesperrt ?
+      $baseURL = Request ::me()->getApplicationURL();
+      $locations = array($baseURL.'/WEB-INF',
+                         $baseURL.'/WEB-INF/',
+                         $baseURL.'/WEB-INF/struts-config.xml',
+                         $baseURL.'/CVS',
+                         $baseURL.'/CVS/',
                          );
       foreach ($locations as $location) {
          $request  = HttpRequest ::create()->setUrl($location);
@@ -96,7 +87,8 @@ final class FrontController extends Singleton {
       }
 
 
-      // Alle Struts-Konfigurationen in WEB-INF suchen
+      // Struts-Konfigurationsdateien suchen
+      $appDirectory = dirName($_SERVER['SCRIPT_FILENAME']);
       if (!is_file($appDirectory.'/WEB-INF/struts-config.xml'))
          throw new FileNotFoundException('Configuration file not found: struts-config.xml');
 
@@ -143,9 +135,6 @@ final class FrontController extends Singleton {
       $request  = Request ::me();
       $response = Response ::me();
 
-      $context = self:: APPLICATION_CONTEXT;
-      $request->setAttribute(Struts ::APPLICATION_PATH_KEY, $context); // by reference
-
       // Module selektieren
       $prefix = $this->getModulePrefix($request);
       $module = $this->modules[$prefix];
@@ -167,12 +156,13 @@ final class FrontController extends Singleton {
     * @return string - Modulprefix
     */
    private function getModulePrefix(Request $request) {
-      $scriptName = $request->getPath();
+      $scriptName      = $request->getPath();
+      $applicationPath = $request->getApplicationPath();
 
-      if (!String ::startsWith($scriptName, self:: APPLICATION_CONTEXT))
+      if (!String ::startsWith($scriptName, $applicationPath))
          throw new RuntimeException('Can not resolve module prefix from uri: '.$scriptName);
 
-      $matchPath = dirName(subStr($scriptName, strLen(self:: APPLICATION_CONTEXT)));
+      $matchPath = dirName(subStr($scriptName, strLen($applicationPath)));
       if ($matchPath === '\\')
          $matchPath = '';
 
@@ -196,22 +186,6 @@ final class FrontController extends Singleton {
    private function getRequestProcessor(Module $module) {
       $class = $module->getRequestProcessorClass();
       return new $class($module);
-   }
-
-
-   /**
-    * Gibt die vollständige Basis-URL der aktuellen Anwendung zurück.
-    * (Protokoll + Hostname + Port + Context-Pfad).
-    *
-    * z.B.: https://www.domain.tld:433/myapp/
-    *
-    * @return string
-    */
-   private function getContextURL() {
-      $protocol = isSet($_SERVER['HTTPS']) ? 'https' : 'http';
-      $host     = $_SERVER['SERVER_NAME'];
-      $port     = $_SERVER['SERVER_PORT']=='80' ? '' : ':'.$_SERVER['SERVER_PORT'];
-      return $protocol.'://'.$host.$port.self ::APPLICATION_CONTEXT.'/';
    }
 }
 ?>

@@ -114,6 +114,19 @@ final class Request extends Singleton {
 
 
    /**
+    * Gibt die Wurzel-URL der Anwendung zurück. Dieser Wert endet NICHT mit einem Slash "/".
+    *
+    * z.B.: https://www.domain.tld:433/myapplication   (Protokoll + Hostname + Port + Anwendungspfad)
+    *
+    * @return string
+    */
+   public function getApplicationURL() {
+      // TODO: ApplicationURL ist Eigenschaft der Anwendung, nicht des Requests -> auslagern
+      return $this->getHostURL().$this->getApplicationPath();
+   }
+
+
+   /**
     * Gibt den Teil der URL des Requests zurück, wie er in der ersten Zeile des HTTP-Protokolls
     * erscheint, relativ zum Wurzelverzeichnis des Webservers. Dieser Wert beginnt mit einem Slash "/".
     *
@@ -171,15 +184,20 @@ final class Request extends Singleton {
 
 
    /**
-    * Gibt die Wurzel-URL der Anwendung zurück. Liegt die Anwendung im Wurzelverzeichnis des Webservers,
-    * ist dieser Wert ein Leerstring "". Anderenfalls beginnt der Wert mit einem Slash "/".
+    * Gibt den Pfadbestandteil der Wurzel-URL der Anwendung zurück. Liegt die Anwendung im Wurzel-
+    * verzeichnis des Webservers, ist dieser Wert ein Leerstring "". Anderenfalls beginnt dieser Wert
+    * mit einem Slash "/".
     *
     * z.B.: /myapplication   (Pfad ohne Pfadinfo und ohne Querystring)
     *
     * @return string
     */
    public function getApplicationPath() {
-      return $this->getAttribute(Struts ::APPLICATION_PATH_KEY);
+      // TODO: ApplicationPath ist Eigenschaft der Anwendung, nicht des Requests -> auslagern
+      if (isSet($_SERVER['APPLICATION_PATH']))
+         return $_SERVER['APPLICATION_PATH'];
+
+      return null;
    }
 
 

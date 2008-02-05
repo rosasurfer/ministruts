@@ -173,7 +173,7 @@ class RequestProcessor extends Object {
 
    /**
     * Wählt das zu benutzende ActionMapping. Kann kein Mapping gefunden werden, wird eine Fehlermeldung
-    * erzeugt und NULL zurückgegeben
+    * erzeugt und NULL zurückgegeben.
     *
     * @param Request  $request
     * @param Response $response
@@ -184,9 +184,9 @@ class RequestProcessor extends Object {
     */
    protected function processMapping(Request $request, Response $response) {
       // Pfad für die Mappingauswahl ermitteln ...
-      $contextPath = $request->getAttribute(Struts ::APPLICATION_PATH_KEY);
-      $requestPath = $request->getPath();
-      $path = subStr($requestPath, strLen($contextPath.$this->module->getPrefix()));
+      $requestPath     = $request->getPath();
+      $applicationPath = $request->getApplicationPath();
+      $path = subStr($requestPath, strLen($applicationPath.$this->module->getPrefix()));
       $path = String ::decodeUtf8($path);
 
       // TODO: URL case-insensitive verarbeiten
@@ -453,8 +453,10 @@ EOT_405;
       if ($forward->isRedirect()) {
          $this->cacheActionMessages($request);
 
-         $context = $request->getAttribute(Struts ::APPLICATION_PATH_KEY);
-         $url = $context.$this->module->getPrefix().$forward->getPath();
+         $applicationPath = $request->getApplicationPath();
+         // TODO: prüfen, ob der Pfad absolut oder relativ ist
+         $url = $applicationPath.$this->module->getPrefix().$forward->getPath();
+
          // TODO: QueryString kodieren
          HeaderUtils ::redirect($url);
       }

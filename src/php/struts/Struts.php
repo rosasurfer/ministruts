@@ -74,12 +74,6 @@ final class Struts extends StaticClass {
 
 
    /**
-    * Request-Key, unter dem der Context-Pfad der laufenden Anwendung (die Basis-URL) gespeichert ist.
-    */
-   const APPLICATION_PATH_KEY = 'javax.servlet.include.servlet_path';
-
-
-   /**
     * Session-Key, unter dem ein vom User gewähltes Locale gespeichert ist.
     */
    const LOCALE_KEY = 'org.apache.struts.action.LOCALE';
