@@ -5,6 +5,8 @@
    - Konfiguration: In index.php muß die Konstante APPLICATION_CONTEXT nicht mehr definiert werden,
      stattdessen wird dieser Wert in der Apache-Konfiguration gesetzt (SetEnv APPLICATION_PATH '/myapp').
 
+   - Aufruf des FrontControllers in index.php nur noch mit:  FrontController ::processRequest();
+
 
 2008-02-04
 

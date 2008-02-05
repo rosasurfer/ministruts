@@ -12,6 +12,27 @@ final class FrontController extends Singleton {
 
 
    /**
+    * Verarbeitet den aktuellen Request.
+    */
+   public static function processRequest() {
+      $controller = self ::me();
+      $request    = Request ::me();
+      $response   = Response ::me();
+
+      // Module selektieren
+      $prefix = $controller->getModulePrefix($request);
+      $module = $controller->modules[$prefix];
+      $request->setAttribute(Struts ::MODULE_KEY, $module);
+
+      // RequestProcessor holen
+      $processor = $controller->getRequestProcessor($module);
+
+      // Request verarbeiten
+      $processor->process($request, $response);
+   }
+
+
+   /**
     * Gibt die Singleton-Instanz dieser Klasse zurück. Ist ein Cache installiert, wird sie gecacht.
     * Dadurch muß die XML-Konfiguration nicht bei jedem Request neu eingelesen werden.
     *
@@ -125,26 +146,6 @@ final class FrontController extends Singleton {
          throw new RuntimeException('All modules must have unique module prefixes, non-unique prefix: "'.$prefix.'"');
 
       $this->modules[$prefix] = $module;
-   }
-
-
-   /**
-    * Verarbeitet den aktuellen Request.
-    */
-   public function processRequest() {
-      $request  = Request ::me();
-      $response = Response ::me();
-
-      // Module selektieren
-      $prefix = $this->getModulePrefix($request);
-      $module = $this->modules[$prefix];
-      $request->setAttribute(Struts ::MODULE_KEY, $module);
-
-      // RequestProcessor holen
-      $processor = $this->getRequestProcessor($module);
-
-      // Request verarbeiten
-      $processor->process($request, $response);
    }
 
 

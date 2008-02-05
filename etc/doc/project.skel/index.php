@@ -11,5 +11,5 @@ include(dirName(__FILE__).'/WEB-INF/classes/classes.php');
 
 define('APPLICATION_NAME', 'myAppName');
 
-FrontController ::me()->processRequest();
+FrontController ::processRequest();
 ?>
