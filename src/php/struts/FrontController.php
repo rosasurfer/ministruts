@@ -101,7 +101,6 @@ final class FrontController extends Singleton {
          if ($status == 401) {
             Logger ::log('Web server configuration check: authentication support not yet implemented for location: "'.$location.'"', L_NOTICE, __CLASS__);
          }
-         // TODO: Apache 2.2 liefert statt eines 404 einen 403
          elseif ($status != 404) {
             throw new InfrastructureException('Web server configuration error, resource at "'.$location.'" is not hidden: '.$status.' ('.HttpResponse ::$sc[$status].')');
          }
