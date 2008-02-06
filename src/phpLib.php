@@ -131,16 +131,14 @@ define('YEAR'   , 365 * DAY   );
 define('WINDOWS', (strToUpper(subStr(PHP_OS, 0, 3))==='WIN'));
 
 
+
 // Errorhandler registrieren
 // -------------------------
-set_error_handler    (array('Logger', 'handleError'    ));
-set_exception_handler(array('Logger', 'handleException'));
-/*
-function wrapErrorHandler    ($level, $message, $file, $line, array $vars) { Logger ::handleError    ($level, $message, $file, $line, $vars); }
-function wrapExceptionHandler(Exception $exception)                        { Logger ::handleException($exception)                           ; }
-set_error_handler    ('wrapErrorHandler'    );
-set_exception_handler('wrapExceptionHandler');
-*/
+// "Ausgelagert", da auf manche Fehler nicht reagiert werden kann, wenn sie in der Datei
+// auftreten, in der die Handler registriert werden (z.B. manche E_STRICT-Fehler).
+//
+eval("set_error_handler    (array('Logger', 'handleError'    ));");
+eval("set_exception_handler(array('Logger', 'handleException'));");
 
 
 /**

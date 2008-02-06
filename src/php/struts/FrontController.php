@@ -84,15 +84,7 @@ final class FrontController extends Singleton {
       $this->logInfo   = ($loglevel <= L_INFO  );
       $this->logNotice = ($loglevel <= L_NOTICE);
 
-      // Umgebung prüfen 1:  Ist die Servervariable APPLICATION_PATH richtig gesetzt ?
-      if (!isSet($_SERVER['APPLICATION_PATH'])) {
-         throw new InfrastructureException('Web server configuration error, environment variable APPLICATION_PATH is not defined');
-      }
-      elseif (!preg_match('/^(\/[^\/]+)*$/', $_SERVER['APPLICATION_PATH'])) {
-         throw new InfrastructureException('Web server configuration error, invalid value of environment variable APPLICATION_PATH: "'.$_SERVER['APPLICATION_PATH'].'"');
-      }
-
-      // Umgebung prüfen 2:  Ist der Zugriff auf WEB-INF und CVS-Daten gesperrt ?
+      // Umgebung prüfen:  Ist der Zugriff auf WEB-INF und CVS-Daten gesperrt ?
       $baseURL = Request ::me()->getApplicationURL();
       $locations = array($baseURL.'/WEB-INF',
                          $baseURL.'/WEB-INF/',

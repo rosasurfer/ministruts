@@ -83,6 +83,39 @@ class Logger extends StaticClass {
 
 
    /**
+    * Gibt den angegebenen Errorlevel in lesbarer Form zurück. Ohne
+    *
+    * @param int $level - Errorlevel, ohne Angabe wird der Errorlevel des aktuellen Scriptes
+    *                     ausgewertet.
+    * @return string
+    */
+   public static function getErrorLevelAsString($level=null) {
+      if (func_num_args() && !is_int($level)) throw new IllegalTypeException('Illegal type of parameter $level: '.getType($level));
+
+      $levels = array();
+      if (!$level)
+         $level = error_reporting();
+
+      if (($level & E_ERROR            ) == E_ERROR            ) $levels[] = 'E_ERROR';
+      if (($level & E_WARNING          ) == E_WARNING          ) $levels[] = 'E_WARNING';
+      if (($level & E_PARSE            ) == E_PARSE            ) $levels[] = 'E_PARSE';
+      if (($level & E_NOTICE           ) == E_NOTICE           ) $levels[] = 'E_NOTICE';
+      if (($level & E_CORE_ERROR       ) == E_CORE_ERROR       ) $levels[] = 'E_CORE_ERROR';
+      if (($level & E_CORE_WARNING     ) == E_CORE_WARNING     ) $levels[] = 'E_CORE_WARNING';
+      if (($level & E_COMPILE_ERROR    ) == E_COMPILE_ERROR    ) $levels[] = 'E_COMPILE_ERROR';
+      if (($level & E_COMPILE_WARNING  ) == E_COMPILE_WARNING  ) $levels[] = 'E_COMPILE_WARNING';
+      if (($level & E_USER_ERROR       ) == E_USER_ERROR       ) $levels[] = 'E_USER_ERROR';
+      if (($level & E_USER_WARNING     ) == E_USER_WARNING     ) $levels[] = 'E_USER_WARNING';
+      if (($level & E_USER_NOTICE      ) == E_USER_NOTICE      ) $levels[] = 'E_USER_NOTICE';
+      if (($level & E_RECOVERABLE_ERROR) == E_RECOVERABLE_ERROR) $levels[] = 'E_RECOVERABLE_ERROR';
+      if (($level & E_ALL              ) == E_ALL              ) $levels[] = 'E_ALL';
+      if (($level & E_STRICT           ) == E_STRICT           ) $levels[] = 'E_STRICT';
+
+      return join(' | ', $levels).' ('.$level.')';
+   }
+
+
+   /**
     * Globaler Handler für herkömmliche PHP-Fehler. Die Fehler werden in einer PHPErrorException gekapselt und je nach Error-Level behandelt.
     * E_USER_NOTICE und E_USER_WARNING werden nur geloggt (kein Scriptabbruch).
     *
@@ -103,7 +136,7 @@ class Logger extends StaticClass {
       if ($error_reporting==0 || ($error_reporting & $level) != $level)
          return true;
 
-      // TODO: E_STRICT-Fehler, die in __autoload() ausgelöst werden (Compile-Time), deaktivieren __autoload() (PHPErrorException wird nicht gefunden)
+      // TODO: E_STRICT-Fehler in __autoload() während des Kompilierens löschen __autoload() => Klassen für Fehleranzeige werden nicht gefunden
 
       // Fehler in Exception kapseln ...
       $exception = new PHPErrorException($message, $file, $line, $vars);
@@ -113,11 +146,11 @@ class Logger extends StaticClass {
       if     ($level == E_USER_NOTICE ) self:: _log(null, $exception, L_NOTICE);
       elseif ($level == E_USER_WARNING) self:: _log(null, $exception, L_WARN  );
       else {
-         if ($level == E_STRICT) {                 // E_STRICT ist ein PHP-Spezialfall (wieviele noch ?) und kann nicht zurückgeworfen werden.
-            self:: handleException($exception);    // (Kann dadurch nicht mit try-catch abgefangen werden.)
+         if ($level==E_STRICT || ($file=='Unknown' && $line==0)) {    // Spezialfälle, die nicht abgefangen oder zurückgeworfen werden können
+            self:: handleException($exception);
             exit(1);
          }
-         throw $exception;                         // Alles andere zurückwerfen (kann also mit try-catch abgefangen werden).
+         throw $exception;                                           // alles andere zurückwerfen
       }
 
       return true;
