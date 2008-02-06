@@ -19,6 +19,7 @@ class RequestProcessor extends Object {
     */
    public function __construct(Module $module) {
       $loglevel        = Logger ::getLogLevel(__CLASS__);
+
       $this->logDebug  = ($loglevel <= L_DEBUG );
       $this->logInfo   = ($loglevel <= L_INFO  );
       $this->logNotice = ($loglevel <= L_NOTICE);
@@ -188,6 +189,9 @@ class RequestProcessor extends Object {
       $applicationPath = $request->getApplicationPath();
       $path = subStr($requestPath, strLen($applicationPath.$this->module->getPrefix()));
       $path = String ::decodeUtf8($path);
+
+      if ($path == '/')
+         $path = '/index.php';
 
       // TODO: URL case-insensitive verarbeiten
 

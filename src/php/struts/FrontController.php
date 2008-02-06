@@ -5,6 +5,9 @@
 final class FrontController extends Singleton {
 
 
+   private $logDebug, $logInfo, $logNotice;  // boolean
+
+
    /**
     * die registrierten Module, Schlüssel ist ihr Prefix
     */
@@ -76,12 +79,17 @@ final class FrontController extends Singleton {
     * Lädt die Struts-Konfiguration und erzeugt einen entsprechenden Objektbaum.
     */
    protected function __construct() {
+      $loglevel        = Logger ::getLogLevel(__CLASS__);
+      $this->logDebug  = ($loglevel <= L_DEBUG );
+      $this->logInfo   = ($loglevel <= L_INFO  );
+      $this->logNotice = ($loglevel <= L_NOTICE);
+
       // Umgebung prüfen 1:  Ist die Servervariable APPLICATION_PATH richtig gesetzt ?
       if (!isSet($_SERVER['APPLICATION_PATH'])) {
-         throw new InfrastructureException('Web server configuration error, environment variable "APPLICATION_PATH" is not defined');
+         throw new InfrastructureException('Web server configuration error, environment variable APPLICATION_PATH is not defined');
       }
       elseif (!preg_match('/^(\/[^\/]+)*$/', $_SERVER['APPLICATION_PATH'])) {
-         throw new InfrastructureException('Web server configuration error, invalid value of environment variable "APPLICATION_PATH": '.$_SERVER['APPLICATION_PATH']);
+         throw new InfrastructureException('Web server configuration error, invalid value of environment variable APPLICATION_PATH: "'.$_SERVER['APPLICATION_PATH'].'"');
       }
 
       // Umgebung prüfen 2:  Ist der Zugriff auf WEB-INF und CVS-Daten gesperrt ?
@@ -156,23 +164,21 @@ final class FrontController extends Singleton {
     * @return string - Modulprefix
     */
    private function getModulePrefix(Request $request) {
-      $scriptName      = $request->getPath();
+      $requestPath     = $request->getPath();
       $applicationPath = $request->getApplicationPath();
 
-      if (!String ::startsWith($scriptName, $applicationPath))
-         throw new RuntimeException('Can not resolve module prefix from uri: '.$scriptName);
+      if ($applicationPath && !String ::startsWith($requestPath, $applicationPath))
+         throw new RuntimeException('Can not resolve module prefix from request path: '.$requestPath);
 
-      $matchPath = dirName(subStr($scriptName, strLen($applicationPath)));
-      if ($matchPath === '\\')
-         $matchPath = '';
+      $prefix = subStr($requestPath, $len=strLen($applicationPath), strRPos($requestPath, '/')-$len);
 
-      while (!isSet($this->modules[$matchPath])) {
-         $lastSlash = strRPos($matchPath, '/');
+      while (!isSet($this->modules[$prefix])) {
+         $lastSlash = strRPos($prefix, '/');
          if ($lastSlash === false)
-            throw new RuntimeException('No module configured for uri: '.$scriptName);
-         $matchPath = subStr($matchPath, 0, $lastSlash);
+            throw new RuntimeException('No module configured for request path: '.$requestPath);
+         $prefix = subStr($prefix, 0, $lastSlash);
       }
-      return $matchPath;
+      return $prefix;
    }
 
 

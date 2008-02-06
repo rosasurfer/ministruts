@@ -17,6 +17,7 @@ final class String extends StaticClass {
    public static function startsWith($haystack, $needle, $case = true) {
       if ($haystack!==null && !is_string($haystack)) throw new IllegalTypeException('Illegal type of parameter $haystack: '.getType($haystack));
       if ($needle!==null && !is_string($needle))     throw new IllegalTypeException('Illegal type of parameter $needle: '.getType($needle));
+      if ($needle == '')                             throw new InvalidArgumentException('Invalid argument $needle: "'.$needle.'"');
       if ($case!==true && $case!==false)             throw new IllegalTypeException('Illegal type of parameter $case: '.getType($case));
 
       if ($case)
