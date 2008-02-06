@@ -3,7 +3,7 @@
  * PHPErrorException
  *
  * Eine PHPErrorException sollte nur im globalen ErrorHandler oder in einer magischen PHP-Methode
- * (__****) instanziiert werden.
+ * erzeugt werden.
  */
 class PHPErrorException extends NestableException {
 
