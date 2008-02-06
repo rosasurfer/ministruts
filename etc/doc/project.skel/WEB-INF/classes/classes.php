@@ -4,6 +4,7 @@
  */
 $dir = dirName(__FILE__).DIRECTORY_SEPARATOR;
 
-// example:
-//$__classes['HelloWorldAction'] = $dir.'actions/HelloWorldAction';
+$__classes['HelloWorldAction'] = $dir.'actions/HelloWorldAction';
+
+unset($dir);
 ?>
