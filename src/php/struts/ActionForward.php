@@ -108,7 +108,7 @@ class ActionForward extends Object {
 
 
    /**
-    * Fügt dem Querystring dieses Forwards ein Key-Value-Paar hinzu.
+    * Fügt dem Querystring dieses ActionForwards ein weiteres Key-Value-Paar hinzu.
     *
     * @param string $key   - Schlüssel
     * @param string $value - Wert
@@ -120,7 +120,10 @@ class ActionForward extends Object {
       if (!is_string($key))   throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
       if (!is_string($value)) throw new IllegalTypeException('Illegal type of argument $value: '.getType($value));
 
-      $this->path .= (strPos($this->path, '?')===false ? '?':'&').$key.'='.$value;
+      $separator = String ::contains($this->path, '?') ? '&' : '?';
+
+      $this->path .= $separator.$key.'='.str_replace('&', '%26', $value);     // urlEncode('&') = '%26'
+
       return $this;
    }
 
