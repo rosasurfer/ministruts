@@ -119,12 +119,12 @@ $__logLevels[''] = L_WARN;   // der Default-Loglevel
 
 
 // Zeitkonstanten
-define('MINUTE' ,  60         );
-define('HOUR'   ,  60 * MINUTE);
-define('DAY'    ,  24 * HOUR  );
-define('WEEK'   ,   7 * DAY   );
-define('MONTH'  ,  30 * DAY   );
-define('YEAR'   , 365 * DAY   );
+define('MINUTE' ,  60         ); define('MINUTES', MINUTE);
+define('HOUR'   ,  60 * MINUTE); define('HOURS'  , HOUR  );
+define('DAY'    ,  24 * HOUR  ); define('DAYS'   , DAY   );
+define('WEEK'   ,   7 * DAY   ); define('WEEKS'  , WEEK  );
+define('MONTH'  ,  30 * DAY   ); define('MONTHS' , MONTH );
+define('YEAR'   , 365 * DAY   ); define('YEARS'  , YEAR  );
 
 
 // ob wir unter Windows laufen
