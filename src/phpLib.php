@@ -200,38 +200,6 @@ function is_class($className) {
 
 
 /**
- * Gibt den Wert des 'Forwarded-IP'-Headers des aktuellen Request zurück.
- *
- * @return string - IP-Adresse oder NULL, wenn der entsprechende Header nicht gesetzt ist
- */
-function getForwardedIP() {
-   static $ip = false;
-
-   if ($ip === false) {
-      if (isSet($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-         $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-      }
-      elseif (isSet($_SERVER['HTTP_HTTP_X_FORWARDED_FOR'])) {
-         $ip = $_SERVER['HTTP_HTTP_X_FORWARDED_FOR'];
-      }
-      elseif (isSet($_SERVER['HTTP_X_UP_FORWARDED_FOR'])) {       // mobile device
-         $ip = $_SERVER['HTTP_X_UP_FORWARDED_FOR'];
-      }
-      elseif (isSet($_SERVER['HTTP_HTTP_X_UP_FORWARDED_FOR'])) {  // mobile device
-         $ip = $_SERVER['HTTP_HTTP_X_UP_FORWARDED_FOR'];
-      }
-      elseif (isSet($_SERVER[''])) {
-         $ip = $_SERVER[''];
-      }
-      else {
-         $ip = null;
-      }
-   }
-   return $ip;
-}
-
-
-/**
  * Erzeugt eine zufällige ID (wegen Verwechselungsgefahr ohne die Zeichen 0 O 1 l I).
  *
  * @param int $length - Länge der ID

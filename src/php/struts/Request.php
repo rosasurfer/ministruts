@@ -233,7 +233,7 @@ final class Request extends Singleton {
    /**
     * Gibt die IP-Adresse zurück, von der aus der Request gemacht wurde.
     *
-    * @return string
+    * @return string - IP-Adresse
     */
    public function getRemoteAddress() {
       return $_SERVER['REMOTE_ADDR'];
@@ -247,6 +247,40 @@ final class Request extends Singleton {
     */
    public function getRemoteHostname() {
       return getHostByAddr($this->getRemoteAddress());
+   }
+
+
+   /**
+    * Gibt den Wert des 'Forwarded-IP'-Headers des aktuellen Request zurück.
+    *
+    * @return string - IP-Adresse oder NULL, wenn der entsprechende Header nicht gesetzt ist
+    */
+   public function getForwardedRemoteAddress() {
+      static $address = false;
+
+	  // TODO: Request::getForwardedRemoteAddress() überarbeiten
+
+      if ($address === false) {
+         if (isSet($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $address = $_SERVER['HTTP_X_FORWARDED_FOR'];
+         }
+         elseif (isSet($_SERVER['HTTP_HTTP_X_FORWARDED_FOR'])) {
+            $address = $_SERVER['HTTP_HTTP_X_FORWARDED_FOR'];
+         }
+         elseif (isSet($_SERVER['HTTP_X_UP_FORWARDED_FOR'])) {       // mobile device
+            $address = $_SERVER['HTTP_X_UP_FORWARDED_FOR'];
+         }
+         elseif (isSet($_SERVER['HTTP_HTTP_X_UP_FORWARDED_FOR'])) {  // mobile device
+            $address = $_SERVER['HTTP_HTTP_X_UP_FORWARDED_FOR'];
+         }
+         elseif (isSet($_SERVER[''])) {
+            $address = $_SERVER[''];
+         }
+         else {
+            $address = null;
+         }
+      }
+      return $address;
    }
 
 
