@@ -297,7 +297,7 @@ EOT_405;
       if ($mapping->getRoles() === null)
          return true;
 
-      $forward = $this->module->getRoleProcessor()->processRoles($request, $response, $mapping);
+      $forward = $this->module->getRoleProcessor()->processRoles($request, $mapping);
       if (!$forward)
          return true;
 

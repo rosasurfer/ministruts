@@ -402,25 +402,22 @@ final class Request extends Singleton {
 
 
    /**
-    * Ob der User, der den Request ausgelöst hat, Inhaber der angegebenen Rollen ist.
+    * Ob der User, der den Request ausgelöst hat, Inhaber der angegebenen Rolle(n) ist.
     *
-    * @param string $roles - Rollenbeschränkung
+    * @param string $roles - Rollenbezeichner
     *
     * @return boolean
     */
    public function isUserInRole($roles) {
       if (!is_string($roles)) throw new IllegalTypeException('Illegal type of argument $roles: '.getType($roles));
 
-      // ActionMapping holen
-      $mapping = $this->getAttribute(Struts ::ACTION_MAPPING_KEY);
-      if (!$mapping)
-         throw new RuntimeException('Illegal method call.');
+      // RoleProcessor holen und Aufruf weiterreichen
+      $processor = $this->getAttribute(Struts ::MODULE_KEY)
+                        ->getRoleProcessor();
+      if ($processor)
+         return $processor->isUserInRole($this, $roles);
 
-      // RoleProcessor holen und Rückgabewert prüfen
-      $forward = $mapping->getModule()
-                         ->getRoleProcessor()
-                         ->processRoles($this, Response ::me(), $mapping);
-      return (!$forward);
+      return false;
    }
 
 
