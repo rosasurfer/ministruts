@@ -2,7 +2,8 @@
 /**
  * CommonDAO
  *
- * Ein einfacher DAO, der die Grundfunktionaliät bereitstellt.  Kann anwendungsspezifisch erweitert werden.
+ * Ein einfacher DAO, der die Grundfunktionaliät bereitstellt.  Kann anwendungsspezifisch erweitert
+ * werden.
  */
 class CommonDAO extends Singleton {
 
@@ -95,9 +96,20 @@ class CommonDAO extends Singleton {
 
 
    /**
-    * Gibt den Worker (die konkrete Connector-Implementierung) für diesen DAO zurück.
+    * Gibt den der persistenten Klasse zugrunde liegenden DB-Adapter zurück.
     *
     * @return DB
+    */
+   final public function getDB() {
+      return $this->getWorker()->getDB();
+   }
+
+
+   /**
+    * Gibt den Worker dieses DAO zurück. Ein Worker implementiert eine konkrete Caching-Strategie und
+    * kann Entity-spezifisch konfiguriert werden.
+    *
+    * @return DaoWorker
     */
    private function getWorker() {
       if (!$this->worker) {

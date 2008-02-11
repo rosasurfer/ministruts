@@ -1,6 +1,9 @@
 <?
 /**
  * DaoWorker
+ *
+ * Ein DaoWorker implementiert eine konkrete Caching-Strategie. Zu jeder persistenten Klasse gehört
+ * genau ein DaoWorker.
  */
 class DaoWorker extends Object {
 
@@ -122,11 +125,11 @@ class DaoWorker extends Object {
 
 
    /**
-    * Gibt den DB-Adapter zurück.
+    * Gibt den der persistenten Klasse zugrunde liegenden DB-Adapter zurück.
     *
     * @return DB
     */
-   private function getDB() {
+   public function getDB() {
       if (!$this->adapter) {
          $mapping = $this->dao->getMapping();
          $this->adapter = DBPool ::getDB($mapping['link']);
