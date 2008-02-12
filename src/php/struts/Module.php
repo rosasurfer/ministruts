@@ -572,7 +572,7 @@ class Module extends Object {
    protected function processController(SimpleXMLElement $xml) {
       if ($this->configured)                                                     throw new IllegalStateException('Configuration is frozen');
 
-      foreach ($xml->xPath('/struts-config/controller[@request-processor]') as $controller) {
+      foreach ($xml->xPath('/struts-config/controller') as $controller) {
          if ($controller['request-processor']) {
             $this->setRequestProcessorClass((string) $controller['request-processor']);
          }
