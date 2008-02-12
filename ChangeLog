@@ -1,5 +1,10 @@
 2008-02-10
 
+   - neue Methoden: php/struts/Request::getHostname(), php/struts/Request::getDomainname()
+
+
+2008-02-10
+
    - neue Methode: php/struts/RoleProcessor::isUserInRole()
 
 

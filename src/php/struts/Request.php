@@ -85,6 +85,41 @@ final class Request extends Singleton {
 
 
    /**
+    * Gibt den vollen Hostnamen des Servers zurück, über den der Request läuft.  Dieser Wert enthält
+    * eventuelle Subdomains.
+    *
+    * z.B.: www.domain.tld
+    *
+    * @return string
+    */
+   public function getHostname() {
+      return $_SERVER['SERVER_NAME'];
+   }
+
+
+   /**
+    * Gibt den einfachen Domainnamen des Servers zurück, über den der Request läuft.  Dieser Wert
+    * enthält keine Subdomains.
+    *
+    * z.B.: domain.tld
+    *
+    * @return string
+    */
+   public function getDomainName() {
+      static $domain = null;
+
+      if (!$domain) {
+         $parts = explode('.', strRev($this->getHostname()), 3);
+
+         $domain = $parts[0];
+         if (sizeOf($parts) > 1)
+            $domain .= '.'.$parts[1];
+      }
+      return $domain;
+   }
+
+
+   /**
     * Gibt die Wurzel-URL des Webservers zurück, über den der Request läuft. Dieser Wert endet NICHT
     * mit einem Slash "/".
     *
