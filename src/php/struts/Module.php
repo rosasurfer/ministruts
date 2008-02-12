@@ -104,7 +104,7 @@ class Module extends Object {
 
       $this->setPrefix($prefix);
       $this->setResourceBase($xml);
-      $this->setRoleProcessorClass($xml);
+      $this->processController($xml);
       $this->processForwards($xml);
       $this->processMappings($xml);
       $this->processTiles($xml);
@@ -205,41 +205,6 @@ class Module extends Object {
 
       // trailing slash at the end to allow people omitting the leading slash at their resources
       $this->resourceBase = $baseDirectory.'/';
-   }
-
-
-   /**
-    * Gibt die RoleProcessor-Implementierung dieses Moduls zurück.
-    *
-    * @return RoleProcessor
-    */
-   public function getRoleProcessor() {
-      static $instance = null;
-
-      if (!$instance && ($class = $this->roleProcessorClass))
-         $instance = new $class;
-
-      return $instance;
-   }
-
-
-   /**
-    * Setzt den Klassennamen der RoleProcessor-Implementierung, die für dieses Module benutzt wird.
-    * Diese Klasse muß eine Subklasse von RoleProcessor sein.
-    *
-    * @param SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
-    */
-   protected function setRoleProcessorClass(SimpleXMLElement $xml) {
-      if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-      // TODO: struts-config.xml: "role-processor" in eigenes Tag auslagern
-      if (!$xml['role-processor'])
-         return;
-
-      $className = (string) $xml['role-processor'];
-
-      if (!is_class($className))                                           throw new ClassNotFoundException("Undefined class '$className'");
-      if (!is_subclass_of($className, Struts ::ROLE_PROCESSOR_BASE_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts ::ROLE_PROCESSOR_BASE_CLASS.': '.$className);
-      $this->roleProcessorClass = $className;
    }
 
 
@@ -600,6 +565,26 @@ class Module extends Object {
 
 
    /**
+    * Verarbeite Controller-Einstellungen.
+    *
+    * @param SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
+    */
+   protected function processController(SimpleXMLElement $xml) {
+      if ($this->configured)                                                     throw new IllegalStateException('Configuration is frozen');
+
+      foreach ($xml->xPath('/struts-config/controller[@request-processor]') as $controller) {
+         if ($controller['request-processor']) {
+            $this->setRequestProcessorClass((string) $controller['request-processor']);
+         }
+
+         if ($controller['role-processor']) {
+            $this->setRoleProcessorClass((string) $controller['role-processor']);
+         }
+      }
+   }
+
+
+   /**
     * Setzt den Klassennamen der RequestProcessor-Implementierung, die für dieses Module benutzt wird.
     * Diese Klasse muß eine Subklasse von RequestProcessor sein.
     *
@@ -622,6 +607,37 @@ class Module extends Object {
     */
    public function getRequestProcessorClass() {
       return $this->requestProcessorClass;
+   }
+
+
+   /**
+    * Setzt den Klassennamen der RoleProcessor-Implementierung, die für dieses Module benutzt wird.
+    * Diese Klasse muß eine Subklasse von RoleProcessor sein.
+    *
+    * @param string $className
+    */
+   protected function setRoleProcessorClass($className) {
+      if ($this->configured)                                               throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($className))                                          throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
+      if (!is_class($className))                                           throw new ClassNotFoundException("Undefined class '$className'");
+      if (!is_subclass_of($className, Struts ::ROLE_PROCESSOR_BASE_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts ::ROLE_PROCESSOR_BASE_CLASS.': '.$className);
+
+      $this->roleProcessorClass = $className;
+   }
+
+
+   /**
+    * Gibt die RoleProcessor-Implementierung dieses Moduls zurück.
+    *
+    * @return RoleProcessor
+    */
+   public function getRoleProcessor() {
+      static $instance = null;
+
+      if (!$instance && ($class = $this->roleProcessorClass))
+         $instance = new $class;
+
+      return $instance;
    }
 
 

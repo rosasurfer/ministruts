@@ -18,7 +18,7 @@ class RequestProcessor extends Object {
     * @param Module $module - Module, dem dieser RequestProcessor zugeordnet ist
     */
    public function __construct(Module $module) {
-      $loglevel        = Logger ::getLogLevel(__CLASS__);
+      $loglevel = Logger ::getLogLevel(__CLASS__);
 
       $this->logDebug  = ($loglevel <= L_DEBUG );
       $this->logInfo   = ($loglevel <= L_INFO  );
@@ -95,8 +95,8 @@ class RequestProcessor extends Object {
 
 
    /**
-    * Startet eine HttpSession bzw. setzt eine vorhergehende fort, wenn eine Session-ID übertragen
-    * wurde, die Session aber noch nicht läuft.
+    * Wurde mit dem Request eine Session-ID übertragen, wird die entsprechende HttpSession fortgesetzt.
+    * Existiert noch keine Session, wird eine neue erzeugt.
     *
     * @param Request  $request
     * @param Response $response

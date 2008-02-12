@@ -50,15 +50,11 @@
 
      doc-base       The base directory to lookup local files.  This value is interpreted as
                     relative to the location of the Struts configuration file itself.
-                    ["."]
-
-     role-processor Class name of the [RoleProcessor] subclass that will perform role checking
-                    for the module.
+                    [default: "."]
 -->
-<!ELEMENT struts-config (global-forwards?, action-mappings, tiles?)>
+<!ELEMENT struts-config (global-forwards?, action-mappings, tiles?, controller?)>
 <!ATTLIST struts-config
-          doc-base          %ResourcePath;  #IMPLIED
-          role-processor    %ClassName;     #IMPLIED
+          doc-base      %ResourcePath;    #IMPLIED
 >
 
 
@@ -138,15 +134,16 @@
 
      method     The HTTP method type the action mapping is restricted to. Legal values are "get" and
                 "post".
-                [no restrictions]
+                [default: no restrictions]
 
      roles      Comma-delimited list of role names that are allowed access to the action mapping.
+                [default: none]
 
      default    Set to "true" if the mapping should be configured as the default action mapping for
                 the module.  If a request does not match any other mapping, it will be passed to the
                 action mapping with default set to "true". Only one action mapping can be marked as
                 "default" within a module.
-                [false]
+                [default: false]
 -->
 <!ELEMENT mapping (set-property*, forward*)>
 <!ATTLIST mapping
@@ -207,6 +204,23 @@
           name      %LogicalName;       #REQUIRED
           type      (string|resource)   "resource"
           value     CDATA               #IMPLIED
+>
+
+
+<!-- The "controller" element describes FrontController related settings.
+
+     request-processor  Class name of the RequestProcessor subclass that will perform request
+                        processing for the module.
+                        [default: RequestProcessor]
+
+     role-processor     Class name of the [RoleProcessor] subclass that will perform role checking
+                        for the module.
+                        [default: none]
+-->
+<!ELEMENT controller EMPTY>
+<!ATTLIST controller
+          request-processor   %ClassName;    #IMPLIED
+          role-processor      %ClassName;    #IMPLIED
 >
 
 

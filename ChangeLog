@@ -1,4 +1,10 @@
-2008-02-10
+2008-02-12
+
+   - Struts-Syntax: neues Tag "controller", RoleProcessor-Konfiguration dorthin verschoben
+     (/struts-config/controller/[@role-processor])
+
+   - Struts: je Modul kann ein anwendungsspezifischer RequestProcessor konfiguriert werden
+     (/struts-config/controller/[@request-processor])
 
    - neue Methoden: php/struts/Request::getHostname(), php/struts/Request::getDomainname()
 

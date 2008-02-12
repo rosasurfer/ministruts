@@ -109,11 +109,12 @@ final class Request extends Singleton {
       static $domain = null;
 
       if (!$domain) {
-         $parts = explode('.', strRev($this->getHostname()), 3);
+         $parts = array_reverse(explode('.', $this->getHostname()));
 
          $domain = $parts[0];
-         if (sizeOf($parts) > 1)
-            $domain .= '.'.$parts[1];
+
+         if (sizeOf($parts) > 1 && $parts[1]!='www' && $parts[1]!='local')
+            $domain = $parts[1].'.'.$domain;
       }
       return $domain;
    }
