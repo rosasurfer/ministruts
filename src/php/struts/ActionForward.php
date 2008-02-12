@@ -26,7 +26,7 @@ class ActionForward extends Object {
 
    /**
     * Geschützter Forward-Bezeichner, über den zur Laufzeit ein Redirect-Forward auf die URL des aktuell
-    * verwendeten ActionMappings erreicht werden kann.
+    * verwendeten ActionMappings erzeugt werden kann.
     */
    const __SELF = '__self';
 
