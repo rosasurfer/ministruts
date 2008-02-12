@@ -126,7 +126,8 @@ final class String extends StaticClass {
             $string[$key] = self:: htmlSpecialChars($value, $quote_style, $charset, $double_encode);
          return $string;
       }
-      if ($string!==null && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+      if ($string === null)
+         return null;
 
       return htmlSpecialChars($string, $quote_style, $charset, $double_encode);
    }
@@ -153,7 +154,8 @@ final class String extends StaticClass {
             $string[$key] = self:: htmlEntities($value, $quote_style, $charset, $double_encode);
          return $string;
       }
-      if ($string!==null && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+      if ($string === null)
+         return null;
 
       return htmlEntities($string, $quote_style, $charset, $double_encode);
    }
