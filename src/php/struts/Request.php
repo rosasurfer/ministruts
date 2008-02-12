@@ -198,6 +198,8 @@ final class Request extends Singleton {
       static $path = null;
       if ($path === null && isSet($_SERVER['APPLICATION_PATH'])) {
          $path = $_SERVER['APPLICATION_PATH'];
+
+         // syntaktisch zwar nicht korrekt, doch wir wissen, was mit "/" gemeint ist
          if ($path == '/')
             $path = '';
       }
@@ -258,7 +260,7 @@ final class Request extends Singleton {
    public function getForwardedRemoteAddress() {
       static $address = false;
 
-	  // TODO: Request::getForwardedRemoteAddress() überarbeiten
+     // TODO: Request::getForwardedRemoteAddress() überarbeiten
 
       if ($address === false) {
          if (isSet($_SERVER['HTTP_X_FORWARDED_FOR'])) {
