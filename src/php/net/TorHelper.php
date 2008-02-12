@@ -5,13 +5,13 @@
 class TorHelper extends StaticClass {
 
 
-   private static $torMirrors = array('torstatus.kgprog.com'    ,
-                                      'torstatus.all.de'        ,
+   private static $torMirrors = array('torstatus.all.de'        ,
                                       'torstatus.blutmagie.de'  ,
                                       'torstatus.torproxy.net'  ,
                                       'tns.hermetix.org'        ,
                                       'arachne.doesntexist.org' ,
                                       'kradense.whsites.net/tns',
+                                      'torstatus.kgprog.com'    ,
                                      );
 
 
@@ -43,10 +43,10 @@ class TorHelper extends StaticClass {
          for ($i=0; $i < $size; ++$i) {
             $request = HttpRequest ::create()->setUrl('http://'.self::$torMirrors[$i].'/ip_list_exit.php/Tor_ip_list_EXIT.csv');
             try {
-               $response = CurlHttpClient ::create()
-                                          ->followRedirects(true)
-                                          ->send($request);
+               // TODO: Warnung ausgeben und Reihenfolge ändern, wenn ein Server nicht antwortet
+               $response = CurlHttpClient ::create()->followRedirects(true)->send($request);
                $status = $response->getStatus();
+
                if ($status != 200) {
                   Logger ::log('Could not get Tor exit nodes, got HTTP status '.$status.' ('.HttpResponse ::$sc[$status].') for url: '.$request->getUrl(), L_NOTICE, __CLASS__);
                   continue;
