@@ -25,8 +25,23 @@ class Tile extends Object {
    protected /*Module*/ $module;
 
 
-   protected $name;           // string
-   protected $path;           // string
+   /**
+    * eindeutige Name dieser Tile
+    */
+   protected /*string*/ $name;
+
+
+   /**
+    * vollständiger Dateiname dieser Tile
+    */
+   protected /*string*/ $path;
+
+
+   /**
+    * Label dieser Tile (für Kommentare etc.)
+    */
+   protected /*string*/ $label;
+
 
    // Property-Pool
    protected $properties = array();
@@ -43,9 +58,11 @@ class Tile extends Object {
     * Constructor
     *
     * @param Module $module - Module, zu dem diese Tile gehört
+    * @param Tile   $parent - (Parent-)Instanz der neuen (verschachtelten) Instanz
     */
-   public function __construct(Module $module) {
+   public function __construct(Module $module, Tile $parent=null) {
       $this->module = $module;
+      $this->parent = $parent;
    }
 
 
@@ -86,17 +103,34 @@ class Tile extends Object {
 
 
    /**
-    * Setzt den Pfad dieser Tile.
+    * Setzt den Dateinamen dieser Tile.
     *
-    * @param string $path
+    * @param string $file  - vollständiger Dateiname
+    * @param string $label - Label für diese Tile (für Kommentare im HTML etc.)
     *
     * @return Tile
     */
-   public function setPath($path) {
-      if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($path)) throw new IllegalTypeException('Illegal type of argument $path: '.getType($path));
+   public function setPath($file) {
+      if ($this->configured)  throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($file))  throw new IllegalTypeException('Illegal type of argument $file: '.getType($file));
 
-      $this->path = $path;
+      $this->path  = $file;
+      return $this;
+   }
+
+
+   /**
+    * Setzt das Label dieser Tile. Das Label wird in HTML-Kommentaren etc. verwendet.
+    *
+    * @param string $label - Label
+    *
+    * @return Tile
+    */
+   public function setLabel($label) {
+      if ($this->configured)  throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($label)) throw new IllegalTypeException('Illegal type of argument $label: '.getType($label));
+
+      $this->label = $label;
       return $this;
    }
 
@@ -105,55 +139,15 @@ class Tile extends Object {
     * Speichert in der Tile unter dem angegebenen Namen eine zusätzliche Eigenschaft.
     *
     * @param string $name  - Name der Eigenschaft
-    * @param string $type  - Typ der Eigenschaft (string|resource)
-    * @param string $value - der zu speichernde Wert
+    * @param mixed  $value - der zu speichernde Wert (String oder Object)
     */
-   public function setProperty($name, $type, $value) {
-      if ($this->configured)  throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($name))  throw new IllegalTypeException('Illegal type of argument $name: '.getType($name));
-      if (!is_string($value)) throw new IllegalTypeException('Illegal type of argument $value: '.getType($value));
+   public function setProperty($name, $value) {
+      if ($this->configured)                             throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($name))                             throw new IllegalTypeException('Illegal type of argument $name: '.getType($name));
+      if (!is_string($value) && !$value instanceof self) throw new IllegalTypeException('Illegal type of argument $value: '.getType($value));
 
-      if ($type!==self ::PROP_TYPE_STRING && $type!==self ::PROP_TYPE_RESOURCE)
-         throw new InvalidArgumentException('Invalid argument $type: '.$type);
-
-      $this->properties[$name] = array($type, $value);
+      $this->properties[$name] = $value;
       // TODO: valid types -> string, page or tile
-   }
-
-
-   /**
-    * Initialisiert die für diese Tile in struts-config.xml mit <set>-Tags definierten Eigenschaften.
-    * Dabei werden die in der Tile definierten Bezeichner durch entsprechende Objektinstanzen ersetzt.
-    */
-   private function initContext() {
-      foreach($this->properties as &$property) {
-         if (sizeOf($property) == 1) {                   // Property wurde schon initialisiert
-            if ($property instanceof self)
-               $property->parent = $this;
-            continue;
-         }
-
-         $type  = $property[0];
-         $value = $property[1];
-
-         if ($type == self ::PROP_TYPE_STRING) {         // String-Value
-            $property = $value;
-         }
-         elseif ($type == self ::PROP_TYPE_RESOURCE) {   // Page oder Tilesdefinition
-            $tile = $this->module->findTile($value);
-
-            if (!$tile) {     // it's a file path, create a simple Tile on the fly
-               $class = $this->module->getTilesClass();
-               $tile = new $class($this->module);
-               $tile->setName('generic')
-                    ->setPath($value)
-                    ->freeze();
-            }
-            $tile->parent = $this;
-
-            $property = $tile;
-         }
-      }
    }
 
 
@@ -167,6 +161,11 @@ class Tile extends Object {
          if (!$this->name) throw new IllegalStateException('No name configured for this '.$this);
          if (!$this->path) throw new IllegalStateException('No path configured for '.__CLASS__.' "'.$this->name.'"');
 
+         foreach ($this->properties as $property) {
+            if ($property instanceof self)
+               $property->freeze();
+         }
+
          $this->configured = true;
       }
       return $this;
@@ -174,29 +173,24 @@ class Tile extends Object {
 
 
    /**
-    * Zeigt den Inhalt dieses Seitenfragments an.
+    * Gibt den Inhalt dieser Tile aus.
     */
    public function render() {
-      $this->initContext();
-
       // TODO: Framework vor $this-Zugriff aus der HTML-Seite schützen
-
       extract($this->properties);
 
       $request  = Request  ::me();
       $response = Response ::me();
       $form     = $request->getAttribute(Struts ::ACTION_FORM_KEY);
+      $PAGE     = PageContext ::me();
 
-      $PAGE = PageContext ::me();
+      echo ($this->parent ? "\n":null)."<!-- #begin: ".$this->label." -->\n";
 
-      $__tplName = subStr($this->path, 0, strRPos($this->path, '.'));
+      include($this->path);
 
-      // TODO: kein Zeilenumbruch vorm Beginn des Basislayouts
-      echo("\n<!-- #begin: ".$__tplName." -->\n");
+      echo "\n<!-- #end: ".$this->label." -->\n";
 
-      include($this->module->getResourceBase().$this->path);
-
-      echo("\n<!-- #end: ".$__tplName." -->\n");
+      //$__tplName = subStr($this->path, 0, strRPos($this->path, '.'));
    }
 }
 ?>

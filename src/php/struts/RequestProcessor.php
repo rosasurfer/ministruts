@@ -468,15 +468,16 @@ EOT_405;
          $path = $forward->getPath();
          $tile = $this->module->findTile($path);
 
-         if (!$tile) {     // $path is a file, create a simple Tile on the fly
+         if (!$tile) {
+            // $path ist ein Dateiname, einfache Tile erzeugen, damit render() existiert
             $class = $this->module->getTilesClass();
             $tile = new $class($this->module);
             $tile->setName('generic')
                  ->setPath($path)
+                 ->setLabel($forward->getLabel())
                  ->freeze();
          }
 
-         // render the tile
          $tile->render();
       }
    }

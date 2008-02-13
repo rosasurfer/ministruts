@@ -33,6 +33,7 @@ class ActionForward extends Object {
 
    protected $name;                  // string
    protected $path;                  // string
+   protected $label;                 // string
    protected $redirect;              // boolean
 
    // ob diese Komponente vollständig konfiguriert ist
@@ -42,6 +43,7 @@ class ActionForward extends Object {
    // Getter
    public function getName()    { return $this->name;     }
    public function getPath()    { return $this->path;     }
+   public function getLabel()   { return $this->label;    }
    public function isRedirect() { return $this->redirect; }
 
 
@@ -87,6 +89,22 @@ class ActionForward extends Object {
       if (!is_string($path)) throw new IllegalTypeException('Illegal type of argument $path: '.getType($path));
 
       $this->path = $path;
+      return $this;
+   }
+
+
+   /**
+    * Setzt das Label dieses Forwards. Das Label wird in HTML-Kommentaren etc. verwendet.
+    *
+    * @param string $label - Label
+    *
+    * @return ActionForward
+    */
+   public function setLabel($label) {
+      if ($this->configured)  throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($label)) throw new IllegalTypeException('Illegal type of argument $label: '.getType($label));
+
+      $this->label = $label;
       return $this;
    }
 

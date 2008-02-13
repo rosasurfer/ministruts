@@ -16,13 +16,13 @@ class Module extends Object {
     * Der Prefix dieses Modules relative zur ROOT_URL der Anwendung.  Die Prefixe innerhalb einer Anwendung
     * sind eindeutig. Das Module mit einem Leerstring als Prefix ist das Default-Module der Anwendung.
     */
-   protected $prefix;         // string
+   protected /*string*/ $prefix;
 
 
    /**
-    * Das Basisverzeichnis für von diesem Modul einzubindende lokale Resourcen.
+    * alle Basisverzeichnisse für von diesem Modul einzubindende Resourcen
     */
-   protected $resourceBase;   // string
+   protected $resourceDirectories = array();
 
 
    /**
@@ -180,16 +180,6 @@ class Module extends Object {
 
 
    /**
-    * Gibt das Basisverzeichnis für lokale Resourcen zurück.
-    *
-    * @return string
-    */
-   public function getResourceBase() {
-      return $this->resourceBase;
-   }
-
-
-   /**
     * Setzt das Basisverzeichnis für lokale Resourcen.
     *
     * @param SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
@@ -197,24 +187,25 @@ class Module extends Object {
    protected function setResourceBase(SimpleXMLElement $xml) {
       if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
-      $docBase = dirName((string) $xml['config-file']);
-      if ($xml['doc-base']) {
-         $directory = str_replace('\\', '/', (string) $xml['doc-base']);
+      $xmlDirectory = dirName((string) $xml['config-file']);
 
-         if ($directory{0} == '/') {
-            $docBase = realPath($directory);
-         }
-         else {
-            $docBase = realPath($docBase.'/'.$directory);
-         }
-         if (!is_dir($docBase)) throw new FileNotFoundException('Directory not found: "'.$directory.'"');
-      }
-      else {
-         if (!is_dir($docBase)) throw new FileNotFoundException('Directory not found: "'.$docBase.'"');
+      if (!$xml['doc-base']) {
+         if (!is_dir($xmlDirectory)) throw new FileNotFoundException('Directory not found: "'.$xmlDirectory.'"');
+         $this->resourceDirectories[] = $xmlDirectory;
+         return;
       }
 
-      // trailing slash at the end to allow people omitting the leading slash at their resources
-      $this->resourceBase = $docBase.'/';
+      $directories = explode(',', (string) $xml['doc-base']);
+
+      foreach ($directories as $directory) {
+         $dir = str_replace('\\', '/', trim($directory));
+
+         if ($dir{0} == '/') $dir = realPath($dir);
+         else                $dir = realPath($xmlDirectory.'/'.$dir);
+
+         if (!is_dir($dir)) throw new FileNotFoundException('Directory not found: "'.$directory.'"');
+         $this->resourceDirectories[] = $dir;
+      }
    }
 
 
@@ -230,8 +221,15 @@ class Module extends Object {
          if (sizeOf($tag->attributes()) > 2) throw new RuntimeException('Only one of "include", "redirect" or "forward" must be specified for global forward "'.$name.'"');
 
          if ($path = (string) $tag['include']) {
-            if (!$this->isIncludeResource($path, $xml)) throw new RuntimeException('Tiles definition or file "'.$path.'" not found for attribute "include" of global forward "'.$name.'"');
-            $forward = new $this->forwardClass($name, $path, false);
+            if (!$this->isIncludable($path, $xml)) throw new RuntimeException('Tiles definition or file "'.$path.'" not found for attribute "include" of global forward "'.$name.'"');
+
+            if ($this->isTile($path, $xml)) {
+               $forward = new $this->forwardClass($name, $path, false);
+            }
+            else {
+               $forward = new $this->forwardClass($name, $this->findFile($path), false);
+               $forward->setLabel(subStr($path, 0, strRPos($path, '.')));
+            }
          }
          else {
             $redirect = (string) $tag['redirect'];
@@ -241,7 +239,7 @@ class Module extends Object {
          $this->addForward($name, $forward);
       }
 
-      // process global 'forward' forwards (recht unsinnig, aber technisch möglich)
+      // process global 'forward' forwards (fragwürdig, aber möglich)
       foreach ($xml->xPath('/struts-config/global-forwards/forward[@forward]') as $tag) {
          $name = (string) $tag['name'];
          if (sizeOf($tag->attributes()) > 2) throw new RuntimeException('Only one of "include", "redirect" or "forward" must be specified for global forward "'.$name.'"');
@@ -276,8 +274,15 @@ class Module extends Object {
          if ($tag['include']) {
             if ($mapping->getForward()) throw new RuntimeException('Only one attribute of "action", "include", "redirect" or "forward" can be specified for mapping "'.$mapping->getPath().'"');
             $path = (string) $tag['include'];
-            if (!$this->isIncludeResource($path, $xml)) throw new RuntimeException('Tiles definition or file "'.$path.'" not found for attribute "include" of mapping "'.$mapping->getPath().'"');
-            $forward = new $this->forwardClass('generic', $path, false);
+            if (!$this->isIncludable($path, $xml)) throw new RuntimeException('Tiles definition or file "'.$path.'" not found for attribute "include" of mapping "'.$mapping->getPath().'"');
+
+            if ($this->isTile($path, $xml)) {
+               $forward = new $this->forwardClass('generic', $path, false);
+            }
+            else {
+               $forward = new $this->forwardClass('generic', $this->findFile($path), false);
+               $forward->setLabel(subStr($path, 0, strRPos($path, '.')));
+            }
             $mapping->setForward($forward);
          }
 
@@ -359,8 +364,15 @@ class Module extends Object {
             if (sizeOf($forwardTag->attributes()) > 2) throw new RuntimeException('Only one of "include", "redirect" or "forward" must be specified for forward "'.$name.'" of mapping "'.$mapping->getPath().'"');
 
             if ($path = (string) $forwardTag['include']) {
-               if (!$this->isIncludeResource($path, $xml)) throw new RuntimeException('Tiles definition or file "'.$path.'" not found for attribute "include" of forward "'.$name.'" of mapping "'.$mapping->getPath().'"');
-               $forward = new $this->forwardClass($name, $path, false);
+               if (!$this->isIncludable($path, $xml)) throw new RuntimeException('Tiles definition or file "'.$path.'" not found for attribute "include" of forward "'.$name.'" of mapping "'.$mapping->getPath().'"');
+
+               if ($this->isTile($path, $xml)) {
+                  $forward = new $this->forwardClass($name, $path, false);
+               }
+               else {
+                  $forward = new $this->forwardClass($name, $this->findFile($path), false);
+                  $forward->setLabel(subStr($path, 0, strRPos($path, '.')));
+               }
             }
             else {
                $redirect = (string) $forwardTag['redirect'];
@@ -428,14 +440,16 @@ class Module extends Object {
       if (sizeOf($tag->attributes()) != 2) throw new RuntimeException('Exactly one of "path" or "extends" must be specified for tiles definition "'.$name.'"');
 
       // create a new instance ...
-      if ($tag['path']) {                    // 'path' given, it's a simple tile
+      if ($tag['path']) {              // 'path' given, it's a simple tile
          $path = (string) $tag['path'];
-         if (!$this->isLocalFile($path)) throw new RuntimeException('File "'.$path.'" not found in tiles definition "'.$name.'"');
+         $file = $this->findFile($path);
+         if (!$file) throw new RuntimeException('File "'.$path.'" not found in tiles definition "'.$name.'"');
 
          $tile = new $this->tilesClass($this);
-         $tile->setPath($path);
+         $tile->setPath($file)
+              ->setLabel(subStr($path, 0, strRPos($path, '.')));
       }
-      else {                                 // 'path' not given, it's an extended tile (get and clone it's parent)
+      else {                           // 'path' not given, it's an extended tile (get and clone it's parent)
          $parent = $this->getDefinedTile((string) $tag['extends'], $xml);
          $tile = clone $parent;
       }
@@ -461,34 +475,45 @@ class Module extends Object {
          $name  = (string) $tag['name'];
          // TODO: Name-Value von <set> wird nicht auf Eindeutigkeit überprüft
 
-         if ($tag['value']) {    // value im Attribut
-            if (strLen($tag)) throw new RuntimeException('Exactly one of "value" attribute or body value must be specified in set "'.$name.'" of tiles definition "'.$tile->getName().'"');
+         if ($tag['value']) { // value ist im Attribut angegeben
+            if (strLen($tag) > 0) throw new RuntimeException('Exactly one of "value" attribute or body value must be specified in set "'.$name.'" of tiles definition "'.$tile->getName().'"');
             $value = (string) $tag['value'];
 
-            if ($tag['type']) {
+            if ($tag['type'])
                $type = (string) $tag['type'];
-               if ($type == Tile ::PROP_TYPE_RESOURCE)
-                  if (!$this->isIncludeResource($value, $xml)) throw new RuntimeException('Tiles definition or file "'.$value.'" not found for attribute "value" in set "'.$name.'" of tiles definition "'.$tile->getName().'"');
-            }
-            else {
-               if (String ::startsWith($value, 'layouts/') || String ::startsWith($value, 'tiles/')) {
-                  $type = Tile ::PROP_TYPE_RESOURCE;
-                  if (!$this->isIncludeResource($value, $xml)) throw new RuntimeException('Tiles definition or file "'.$value.'" not found for attribute "value" in set "'.$name.'" of tiles definition "'.$tile->getName().'"');
-               }
-               else {
-                  $type = $this->isIncludeResource($value, $xml) ? Tile ::PROP_TYPE_RESOURCE : Tile ::PROP_TYPE_STRING;
-               }
-            }
-         }
-         else {                  // value im Body
-            $value = trim((string) $tag);
 
+            elseif (String ::startsWith($value, 'layouts/') || String ::startsWith($value, 'tiles/'))
+               $type = Tile ::PROP_TYPE_RESOURCE;
+
+            else
+               $type = $this->isIncludable($value, $xml) ? Tile ::PROP_TYPE_RESOURCE : Tile ::PROP_TYPE_STRING;
+         }
+         else {               // value ist im Body angegeben
+            $value = trim((string) $tag);
             $type = ($tag['type']) ? (string) $tag['type'] : Tile ::PROP_TYPE_STRING;
             if ($type == Tile ::PROP_TYPE_RESOURCE) throw new RuntimeException('A "value" attribute must be specified for type "resource" in set "'.$name.'" of tiles definition "'.$tile->getName().'"');
          }
 
+
+         // Ist value eine Tile, diese initialisieren.
+         if ($type == Tile ::PROP_TYPE_RESOURCE) {
+            if ($this->isTile($value, $xml)) {
+               $nestedTile = $this->getDefinedTile($value, $xml);
+            }
+            elseif ($this->isFile($value)) {       // einfache Tile erzeugen, damit render() existiert
+               $nestedTile = new $this->tilesClass($this, $tile);
+               $nestedTile->setName('generic')
+                          ->setPath($this->findFile($value))
+                          ->setLabel(subStr($value, 0, strRPos($value, '.')));
+            }
+            else {
+               throw new RuntimeException('Tiles definition or file "'.$value.'" not found for attribute "value" in set "'.$name.'" of tiles definition "'.$tile->getName().'"');
+            }
+            $value = $nestedTile;
+         }
+
          // TODO: bei extended Tiles Typübereinstimmung überladener Properties prüfen
-         $tile->setProperty($name, $type, $value);
+         $tile->setProperty($name, $value);
       }
    }
 
@@ -785,14 +810,27 @@ class Module extends Object {
 
    /**
     * Ob unter dem angegebenen Namen eine inkludierbare Resource existiert. Dies kann entweder eine
-    * Tiles-Definition oder eine lokale Datei sein.
+    * Tiles-Definition oder eine Datei sein.
     *
     * @param string           $name - Name der Resource
     * @param SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration
     *
     * @return boolean
     */
-   private function isIncludeResource($name, SimpleXMLElement $xml) {
+   private function isIncludable($name, SimpleXMLElement $xml) {
+      return $this->isTile($name, $xml) || $this->isFile($name);
+   }
+
+
+   /**
+    * Ob unter dem angegebenen Namen eine Tile definiert ist.
+    *
+    * @param string           $name - Name der Tile
+    * @param SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration
+    *
+    * @return boolean
+    */
+   private function isTile($name, SimpleXMLElement $xml) {
       $nodes = $xml->xPath("/struts-config/tiles/tile[@name='$name']");
 
       if ($nodes) {
@@ -800,39 +838,44 @@ class Module extends Object {
             throw new RuntimeException('Non-unique name detected for tiles definition "'.$name.'"');
          return true;
       }
-
-      // $nodes ist FALSE oder leeres Array
-      return $this->isLocalFile($name);
+      return false;
    }
 
 
    /**
-    * Ob unter dem angegebenen Namen eine lokale Datei existiert.
+    * Ob in den Resource-Verzeichnissen dieses Modules unter dem angegebenen Namen eine Datei existiert.
     *
     * @param $path - Pfadangabe
     *
     * @return boolean
     */
-   private function isLocalFile($path) {
-      $filename = $this->findLocalFile($path);
+   private function isFile($path) {
+      $filename = $this->findFile($path);
       return ($filename !== null);
    }
 
 
    /**
-    * Sucht nach einer lokalen Datei mit dem angegebenen Namen und gibt den vollständigen Dateinamen
-    * zurück, oder NULL, wenn keine Datei mit diesem Namen gefunden wurde.
+    * Sucht in den Resource-Verzeichnissen dieses Modules nach einer Datei mit dem angegebenen Namen
+    * und gibt den vollständigen Dateinamen zurück, oder NULL, wenn keine Datei mit diesem Namen
+    * gefunden wurde.
     *
-    * @param $path - Pfadangabe
+    * @param $name - relativer Dateiname
     *
     * @return string - Dateiname
     */
-   private function findLocalFile($path) {
+   private function findFile($name) {
       // strip query string
-      $parts = explode('?', $path, 2);
+      $parts = explode('?', $name, 2);
 
-      if (is_file($this->resourceBase.$parts[0]))
-         return $this->resourceBase.join('?', $parts);
+      foreach ($this->resourceDirectories as $directory) {
+         if (is_file($directory.'/'.$parts[0])) {
+            $name = realPath($directory.'/'.array_shift($parts));
+            if ($parts)
+               $name .= '?'.$parts[0];
+            return $name;
+         }
+      }
 
       return null;
    }

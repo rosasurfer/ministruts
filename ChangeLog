@@ -1,3 +1,9 @@
+2008-02-13
+
+   - Struts-Syntax: /struts-config/[@doc-base] kann eine Liste von Verzeichnissen enthalten,
+     in denen nach HTML-Dateien gesucht wird
+
+
 2008-02-12
 
    - Struts-Syntax: neues Tag "controller", RoleProcessor-Konfiguration dorthin verschoben

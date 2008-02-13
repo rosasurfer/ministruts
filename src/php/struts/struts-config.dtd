@@ -48,9 +48,10 @@
 <!-- The "struts-config" element is the root of the configuration file hierarchy, and contains
      nested elements for all of the other configuration settings.
 
-     doc-base       The base directory to lookup local files.  This value is interpreted as
-                    relative to the location of the Struts configuration file itself.
-                    [default: "."]
+     doc-base     One or more base directories to lookup html files.  Values may be absolute or
+                  relative to the location of the Struts configuration file itself.  Multiple
+                  values are separated by comma ",".
+                  [default: dirName(struts-config.xml)]
 -->
 <!ELEMENT struts-config (global-forwards?, action-mappings, tiles?, controller?)>
 <!ATTLIST struts-config
