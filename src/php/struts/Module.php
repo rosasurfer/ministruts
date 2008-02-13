@@ -197,14 +197,24 @@ class Module extends Object {
    protected function setResourceBase(SimpleXMLElement $xml) {
       if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
-      $baseDirectory = dirName((string) $xml['config-file']);
+      $docBase = dirName((string) $xml['config-file']);
       if ($xml['doc-base']) {
-         $baseDirectory = realPath($baseDirectory.DIRECTORY_SEPARATOR.trim($xml['doc-base'], '/\\'));
+         $directory = str_replace('\\', '/', (string) $xml['doc-base']);
+
+         if ($directory{0} == '/') {
+            $docBase = realPath($directory);
+         }
+         else {
+            $docBase = realPath($docBase.'/'.$directory);
+         }
+         if (!is_dir($docBase)) throw new FileNotFoundException('Directory not found: "'.$directory.'"');
       }
-      if (!is_dir($baseDirectory)) throw new FileNotFoundException('Directory not found: "'.$baseDirectory.'"');
+      else {
+         if (!is_dir($docBase)) throw new FileNotFoundException('Directory not found: "'.$docBase.'"');
+      }
 
       // trailing slash at the end to allow people omitting the leading slash at their resources
-      $this->resourceBase = $baseDirectory.'/';
+      $this->resourceBase = $docBase.'/';
    }
 
 
