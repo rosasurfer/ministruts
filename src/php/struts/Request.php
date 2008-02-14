@@ -462,14 +462,14 @@ final class Request extends Singleton {
 
 
    /**
-    * Löscht den Wert unter dem angegebenen Schlüssel aus dem Request.
+    * Löscht die Werte mit den angegebenen Schlüsseln aus dem Request. Es können mehrere Schlüssel
+    * angegeben werden.
     *
     * @param string $key - Schlüssel des zu löschenden Wertes
     */
-   public function removeAttribute($key) {
-      if (isSet($this->attributes[$key])) {
+   public function removeAttributes($key /*, $key2, $key3 ...*/) {
+      foreach (func_get_args() as $key)
          unset($this->attributes[$key]);
-      }
    }
 
 
