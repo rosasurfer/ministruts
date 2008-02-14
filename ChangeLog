@@ -2,11 +2,13 @@
 
    - php/util/Logger: E-Mail-Adresskonfiguration auf Config::get('mail.buglovers') umgestellt
 
-   - php/struts/Request:removeAttribute() -> Request:removeAttributes(), mehrere Argumente werden
+   - php/struts/Request::removeAttribute() -> Request::removeAttributes(), mehrere Argumente werden
      verarbeitet
 
-   - php/struts/HttpSession:removeAttribute() -> HttpSession:removeAttributes(), mehrere Argumente
+   - php/struts/HttpSession::removeAttribute() -> HttpSession::removeAttributes(), mehrere Argumente
      werden verarbeitet
+
+   - neue Methode: php/struts/Request::removeActionErrors()
 
    - Bugfix: htmlSpecialChars() unterstützt vor PHP 5.2.3 nur 3 Parameter
 

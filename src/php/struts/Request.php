@@ -549,7 +549,8 @@ final class Request extends Singleton {
 
 
    /**
-    * Setzt für den angegebenen Schlüssel eine Error-Message.
+    * Setzt für den angegebenen Schlüssel eine Error-Message. Ist Message NULL, wird die Message mit
+    * dem angegebenen Schlüssel aus dem Request gelöscht.
     *
     * @param string $key     - Schlüssel der Error-Message
     * @param string $message - Error-Message
@@ -565,6 +566,14 @@ final class Request extends Singleton {
       else {
          throw new IllegalTypeException('Illegal type of parameter $message: '.getType($message));
       }
+   }
+
+
+   /**
+    * Löscht alle Error-Messages aus dem Request.
+    */
+   public function removeActionErrors() {
+      unset($this->attributes[Struts ::ACTION_ERRORS_KEY]);
    }
 
 
