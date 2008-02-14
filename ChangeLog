@@ -1,6 +1,6 @@
 2008-02-14
 
-   - E-Mail-Adresskonfiguration für Logmeldungen auf Config::get('mail.buglovers') umgestellt
+   - php/util/Logger: E-Mail-Adresskonfiguration auf Config::get('mail.buglovers') umgestellt
 
 
 2008-02-13

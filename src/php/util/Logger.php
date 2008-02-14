@@ -83,9 +83,9 @@ class Logger extends StaticClass {
 
 
    /**
-    * Gibt den angegebenen Errorlevel in lesbarer Form zurück. Ohne
+    * Gibt den angegebenen Errorlevel in lesbarer Form zurück.
     *
-    * @param int $level - Errorlevel, ohne Angabe wird der Errorlevel des aktuellen Scriptes
+    * @param int $level - Errorlevel, ohne Angabe wird der aktuellen Errorlevel des laufenden Scriptes
     *                     ausgewertet.
     * @return string
     */
@@ -132,11 +132,10 @@ class Logger extends StaticClass {
       $error_reporting = error_reporting();
 
       // Fehler ignorieren, die absichtlich unterdrückt oder durch den aktuellen Errorlevel nicht abgedeckt werden
-      //  $error_reporting==0 // @-Operator
+      // $error_reporting==0: @-Operator
       if ($error_reporting==0 || ($error_reporting & $level) != $level)
          return true;
 
-      // TODO: E_STRICT-Fehler in __autoload() während des Kompilierens löschen __autoload() => Klassen für Fehleranzeige werden nicht gefunden
 
       // Fehler in Exception kapseln ...
       $exception = new PHPErrorException($message, $file, $line, $vars);
@@ -186,13 +185,12 @@ class Logger extends StaticClass {
          }
          else {
             echo $plainMessage."\n\n".$message."\n\n\n".$traceStr."\n";    // PHP gibt den Fehler unter Linux zusätzlich auf stderr aus,
-         }                                                           // also auf der Konsole ggf. unterdrücken
+         }                                                                 // also auf der Konsole ggf. unterdrücken
       }
 
 
       // 3. Exception an die registrierten Adressen mailen (wenn $mail TRUE ist) ...
-      // TODO: $GLOBALS['webmasters'] auf Config::get('buglovers') umstellen
-      if (self::$mail && isSet($GLOBALS['webmasters'])) {
+      if (self::$mail && ($addresses = Config::get('mail.buglovers'))) {
          $mailMsg  = $plainMessage."\n\n".$message."\n\n\n".$traceStr;
 
          $request = Request ::me();
@@ -212,9 +210,9 @@ class Logger extends StaticClass {
 
          $old_sendmail_from = ini_get('sendmail_from');
          if (isSet($_SERVER['SERVER_ADMIN']))
-            ini_set('sendmail_from', $_SERVER['SERVER_ADMIN']);                           // wirkt sich nur unter Windows aus
+            ini_set('sendmail_from', $_SERVER['SERVER_ADMIN']);                           // nur für Windows relevant
 
-         foreach ($GLOBALS['webmasters'] as $address) {
+         foreach ($addresses as $address) {
             error_log($mailMsg, 1, $address, 'Subject: PHP error_log: Uncaught Exception at '.(isSet($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '').$_SERVER['PHP_SELF']);
          }
          ini_set('sendmail_from', $old_sendmail_from);
@@ -337,8 +335,7 @@ class Logger extends StaticClass {
 
 
       // 3. Logmessage an die registrierten Adressen mailen (wenn $mail TRUE ist) ...
-      // TODO: $GLOBALS['webmasters'] auf Config::get('buglovers') umstellen
-      if (self::$mail && isSet($GLOBALS['webmasters'])) {
+      if (self::$mail && ($addresses = Config::get('mail.buglovers'))) {
          $mailMsg = $plainMessage;
          if ($exception)
             $mailMsg .= "\n\n".$exMessage."\n\n\n".$exTraceStr;
@@ -360,9 +357,9 @@ class Logger extends StaticClass {
 
          $old_sendmail_from = ini_get('sendmail_from');
          if (isSet($_SERVER['SERVER_ADMIN']))
-            ini_set('sendmail_from', $_SERVER['SERVER_ADMIN']);                           // wirkt sich nur unter Windows aus
+            ini_set('sendmail_from', $_SERVER['SERVER_ADMIN']);                           // nur für Windows relevant
 
-         foreach ($GLOBALS['webmasters'] as $address) {
+         foreach ($addresses as $address) {
             error_log($mailMsg, 1, $address, 'Subject: PHP error_log: '.self::$logLevels[$level].' at '.(isSet($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '').$_SERVER['PHP_SELF']);
          }
          ini_set('sendmail_from', $old_sendmail_from);
