@@ -49,9 +49,8 @@
      nested elements for all of the other configuration settings.
 
      doc-base     One or more base directories to lookup html files.  Values may be absolute or
-                  relative to the location of the Struts configuration file itself.  Multiple
-                  values are separated by comma ",".
-                  [default: dirName(struts-config.xml)]
+                  relative to the WEB-INF directory.  Multiple values are separated by comma ",".
+                  [default: WEB-INF]
 -->
 <!ELEMENT struts-config (global-forwards?, action-mappings, tiles?, controller?)>
 <!ATTLIST struts-config
