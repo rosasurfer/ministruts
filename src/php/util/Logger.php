@@ -129,6 +129,10 @@ class Logger extends StaticClass {
     *                   FALSE, wenn der Fehler weitergereicht werden soll, als wenn der ErrorHandler nicht registriert wäre
     */
    public static function handleError($level, $message, $file, $line, array $vars) {
+
+      // temporär, um Ursache für "Exception thrown without a stack frame in Unknown on line 0" zu finden
+      error_log('PHP Error: '.str_replace(array("\r\n", "\n"), ' ', "$message in file $file (line $line)"), 0);
+
       $error_reporting = error_reporting();
 
       // Fehler ignorieren, die absichtlich unterdrückt oder durch den aktuellen Errorlevel nicht abgedeckt werden
