@@ -1,3 +1,8 @@
+2008-02-14
+
+   - E-Mail-Adresskonfiguration für Logmeldungen auf Config::get('mail.buglovers') umgestellt
+
+
 2008-02-13
 
    - Struts-Syntax: /struts-config/[@doc-base] kann eine Liste von Verzeichnissen enthalten,
