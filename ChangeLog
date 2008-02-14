@@ -8,6 +8,8 @@
    - php/struts/HttpSession:removeAttribute() -> HttpSession:removeAttributes(), mehrere Argumente
      werden verarbeitet
 
+   - Bugfix: htmlSpecialChars() unterstützt vor PHP 5.2.3 nur 3 Parameter
+
 
 2008-02-13
 
