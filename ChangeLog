@@ -2,6 +2,12 @@
 
    - php/util/Logger: E-Mail-Adresskonfiguration auf Config::get('mail.buglovers') umgestellt
 
+   - php/struts/Request:removeAttribute() -> Request:removeAttributes(), mehrere Argumente werden
+     verarbeitet
+
+   - php/struts/HttpSession:removeAttribute() -> HttpSession:removeAttributes(), mehrere Argumente
+     werden verarbeitet
+
 
 2008-02-13
 
