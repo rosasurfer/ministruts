@@ -137,6 +137,8 @@ define('WINDOWS', (strToUpper(subStr(PHP_OS, 0, 3))==='WIN'));
 // "Ausgelagert", da auf manche Fehler nicht reagiert werden kann, wenn sie in der Datei
 // auftreten, in der die Handler registriert werden (z.B. manche E_STRICT-Fehler).
 //
+// TODO: Klasse wird schon bei der Definition geladen, dadurch Überschreiben nicht möglich
+//
 eval("set_error_handler    (array('Logger', 'handleError'    ));");
 eval("set_exception_handler(array('Logger', 'handleException'));");
 
