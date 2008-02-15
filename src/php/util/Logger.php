@@ -119,26 +119,25 @@ class Logger extends StaticClass {
     * Globaler Handler für herkömmliche PHP-Fehler. Die Fehler werden in einer PHPErrorException gekapselt und je nach Error-Level behandelt.
     * E_USER_NOTICE und E_USER_WARNING werden nur geloggt (kein Scriptabbruch).
     *
-    * @param int    $level   -
-    * @param string $message -
-    * @param string $file    -
-    * @param int    $line    -
-    * @param array  $vars    -
+    * @param int    $level   - Error-Level
+    * @param string $message - Error-Message
+    * @param string $file    - Datei, in der der Fehler auftrat
+    * @param int    $line    - Zeile der Datei, in der der Fehler auftrat
+    * @param array  $context - aktive Symboltabelle des Punktes, an dem der Fehler auftrat
     *
     * @return boolean - TRUE,  wenn der Fehler erfolgreich behandelt wurde
     *                   FALSE, wenn der Fehler weitergereicht werden soll, als wenn der ErrorHandler nicht registriert wäre
     */
-   public static function handleError($level, $message, $file, $line, array $vars) {
-      $error_reporting = error_reporting();
+   public static function handleError($level, $message, $file, $line, array $context) {
+      // absichtlich unterdrückte und vom aktuellen Errorlevel nicht abgedeckte Fehler ignorieren
+      $error_reporting = error_reporting();     // 0: @-Operator
 
-      // Fehler ignorieren, die absichtlich unterdrückt oder durch den aktuellen Errorlevel nicht abgedeckt werden
-      // $error_reporting==0: @-Operator
       if ($error_reporting==0 || ($error_reporting & $level) != $level)
          return true;
 
 
       // Fehler in Exception kapseln ...
-      $exception = new PHPErrorException($message, $file, $line, $vars);
+      $exception = new PHPErrorException($message, $file, $line, $context);
 
 
       // ... und behandeln
