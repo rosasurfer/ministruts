@@ -14,18 +14,18 @@ class PHPErrorException extends NestableException {
    // Cache-Variable für den als String formatierten Stacktrace
    private $traceString;
 
-   private $vars;
+   private $context;
 
 
    /**
     * Constructor
     */
-   public function __construct($message, $file, $line, array $vars) {
+   public function __construct($message, $file, $line, array $context) {
        parent:: __construct($message);
 
        $this->file =  $file;
        $this->line =  $line;
-       $this->vars =& $vars;
+       $this->vars =& $context;
    }
 
 

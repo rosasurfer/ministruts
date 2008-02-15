@@ -11,13 +11,15 @@ abstract class NestableException extends Exception {
     * Die Exception, die diese Exception ausgelöst hat, oder NULL, wenn diese Exception
     * nicht durch eine andere Exception ausgelöst wurde.
     */
-   private $cause;
+   private /*Exception*/ $cause;
+
 
    /* Cachevariable für den erzeugten Stacktrace */
-   private $trace;
+   private /*array*/     $trace;
+
 
    /* Cachevariable für den als String formatierten Stacktrace */
-   private $traceString;
+   private /*string*/    $traceString;
 
 
    /**
