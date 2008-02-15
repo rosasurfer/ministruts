@@ -110,7 +110,7 @@ final class FrontController extends Singleton {
       // Struts-Konfigurationsdateien suchen
       $appDirectory = dirName($_SERVER['SCRIPT_FILENAME']);
       if (!is_file($appDirectory.'/WEB-INF/struts-config.xml'))
-         throw new FileNotFoundException('Configuration file not found: struts-config.xml');
+         throw new FileNotFoundException('Configuration file not found: "struts-config.xml"');
 
       $files   = glob($appDirectory.'/WEB-INF/struts-config-*.xml', GLOB_ERR);
       $files[] = $appDirectory.'/WEB-INF/struts-config.xml';
