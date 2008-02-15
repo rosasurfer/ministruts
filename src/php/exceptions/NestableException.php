@@ -25,29 +25,37 @@ abstract class NestableException extends Exception {
    /**
     * Erzeugt eine neue NestableException mit der angegebenen Nachricht und Ursache.
     *
-    * @param mixed - Nachricht (String) oder Ursache (Exception) dieser Exception
-    * @param cause - Ursache oder Auslöser dieser Exception
+    * Überladene Signatur:
+    * --------------------
+    *    1) new NestableException()
+    *    2) new NestableException(Exception $cause)
+    *    3) new NestableException(string $message)
+    *    4) new NestableException(string $message, Exception $cause)
+    *
+    * @param mixed     $message - Nachricht (string) oder ursächliche Exception
+    * @param Exception $cause   - ursächliche Exception
     */
-   public function __construct($mixed = null, Exception $cause = null) {
+   public function __construct($message = null, Exception $cause = null) {
 
       // Dieser Code implementiert 4 verschiedene Klassenkonstruktoren (wie für Java-Exceptions;
       // siehe: http://java.sun.com/j2se/1.5.0/docs/api/java/lang/Exception.html#constructor_summary)
       $args = func_num_args();
 
-      if ($args == 0) {                                        // new NestableException()
+      if ($args == 0) {                         // new NestableException()
          parent:: __construct();
       }
       elseif ($args == 1) {
-         if ($mixed instanceof Exception) {                    // new NestableException(Exception $cause)
+         if ($message instanceof Exception) {   // new NestableException(Exception $cause)
+            $cause = $message;
             parent:: __construct();
-            $this->cause = $mixed;
+            $this->cause = $cause;
          }
-         else {                                                // new NestableException(String $message)
-            parent:: __construct($mixed);
+         else {                                 // new NestableException(string $message)
+            parent:: __construct($message);
          }
       }
-      else {                                                   // new NestableException(String $message, Exception $cause)
-         parent:: __construct($mixed);
+      else {                                    // new NestableException(string $message, Exception $cause)
+         parent:: __construct($message);
          $this->cause = $cause;
       }
    }
@@ -76,8 +84,8 @@ abstract class NestableException extends Exception {
       if ($trace === null) {
          $trace = parent:: getTrace();
 
-         $trace[] = array('function' => 'main');                     // Damit der Stacktrace mit Java übereinstimmt, wird ein zusätzlicher Frame fürs
-         $size = sizeOf($trace);                                     // Hauptscript angefügt und alle FILE- und LINE-Felder einen Frame nach unten verschoben.
+         $trace[] = array('function' => 'main');            // Damit der Stacktrace mit Java übereinstimmt, wird ein zusätzlicher Frame fürs
+         $size = sizeOf($trace);                            // Hauptscript angefügt und alle FILE- und LINE-Felder einen Frame nach unten verschoben.
 
          for ($i=$size; $i-- > 0;) {
             if (isSet($trace[$i-1]['file']))
@@ -91,7 +99,7 @@ abstract class NestableException extends Exception {
                unset($trace[$i]['line']);
          }
 
-         $trace[0]['file'] = $this->file;                            // Der erste Frame wird mit den Werten der Exception bestückt.
+         $trace[0]['file'] = $this->file;                   // Der erste Frame wird mit den Werten der Exception bestückt.
          $trace[0]['line'] = $this->line;
 
          // Wurde die Exception in Object::__set() geworfen, Stacktrace modifizieren, so daß der falsche Aufruf im ersten Frame steht.
