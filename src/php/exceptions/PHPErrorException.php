@@ -58,13 +58,6 @@ class PHPErrorException extends NestableException {
          echoPre($trace);
          */
 
-         // Der erste Frame (ErrorHandler) und alle weiteren Frames der ErrorHandlerkette können weg.
-         //do {
-         //   array_shift($trace);
-         //   $frame = $trace[0];
-         //} while (!isSet($frame['file']) || !isSet($frame['line']) || $frame['file']!=$this->file || $frame['line']!=$this->line);
-
-
          // Die ersten beiden Frames könne weg: 1. ErrorHandler (Logger::handleError), 2: Handlerdefinition (__lambda_func)
          array_shift($trace);
          array_shift($trace);

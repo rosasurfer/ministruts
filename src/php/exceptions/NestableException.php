@@ -36,9 +36,6 @@ abstract class NestableException extends Exception {
     * @param Exception $cause   - ursächliche Exception
     */
    public function __construct($message = null, Exception $cause = null) {
-
-      // Dieser Code implementiert 4 verschiedene Klassenkonstruktoren (wie für Java-Exceptions;
-      // siehe: http://java.sun.com/j2se/1.5.0/docs/api/java/lang/Exception.html#constructor_summary)
       $args = func_num_args();
 
       if ($args == 0) {                         // new NestableException()
@@ -73,6 +70,38 @@ abstract class NestableException extends Exception {
 
 
    /**
+    * Gibt den Stacktrace dieser Exception zurück, der wie ein Java-Stacktrace interpretiert werden kann.
+    *
+    * @return array - java-ähnlicher Stacktrace
+    */
+   protected function &getJavaStackTrace() {
+      $trace = parent:: getTrace();
+
+      /*
+      foreach ($trace as &$frame)
+         unset($frame['args']);
+      echoPre($trace);
+      */
+
+      $trace[] = array('function' => 'main');      // Für die Java-Ähnlichkeit wird ein zusätzlicher Frame fürs Hauptscript angefügt und
+                                                   // alle FILE- und LINE-Felder um eine Position nach hinten verschoben.
+      for ($i=sizeOf($trace); $i--;) {
+         if (isSet($trace[$i-1]['file']))
+            $trace[$i]['file'] = $trace[$i-1]['file'];
+         else
+            unset($trace[$i]['file']);
+
+         if (isSet($trace[$i-1]['line']))
+            $trace[$i]['line'] = $trace[$i-1]['line'];
+         else
+            unset($trace[$i]['line']);
+      }
+
+      return $trace;
+   }
+
+
+   /**
     * Gibt den Stacktrace dieser Exception zurück.
     *
     * @return array - java-ähnlicher Stacktrace
@@ -90,14 +119,15 @@ abstract class NestableException extends Exception {
          echoPre($trace);
          */
 
-         $trace[0]['file'] = $this->file;                   // Der erste Frame wird mit den Werten der Exception bestückt.
+         // Der erste Frame wird mit den Werten der Exception bestückt.
+         $trace[0]['file'] = $this->file;
          $trace[0]['line'] = $this->line;
 
-         // Wurde die Exception in Object::__set() geworfen, Stacktrace modifizieren, so daß der falsche Aufruf im ersten Frame steht.
+         // Wurde die Exception in Object::__set() ausgelöst, Stacktrace modifizieren, so daß der falsche Aufruf im ersten Frame steht.
          while (strToLower($trace[0]['function']) == '__set')
             array_shift($trace);
 
-         // Wurde die Exception in Object::__call() geworfen, Stacktrace modifizieren, so daß der falsche Aufruf im ersten Frame steht.
+         // Wurde die Exception in Object::__call() ausgelöst, Stacktrace modifizieren, so daß der falsche Aufruf im ersten Frame steht.
          if (strToLower($trace[0]['function']) == '__call') {
             while (strToLower($trace[0]['function']) == '__call')
                array_shift($trace);
@@ -106,32 +136,6 @@ abstract class NestableException extends Exception {
 
          $this->trace =& $trace;
       }
-      return $trace;
-   }
-
-
-   /**
-    * Gibt den Stacktrace dieser Exception zurück, der wie ein Java-Stacktrace interpretiert werden kann.
-    *
-    * @return array - java-ähnlicher Stacktrace
-    */
-   protected function &getJavaStackTrace() {
-      $trace = parent:: getTrace();
-
-      $trace[] = array('function' => 'main');      // Für die Java-Ähnlichkeit wird ein zusätzlicher Frame fürs Hauptscript angefügt und
-                                                   // alle FILE- und LINE-Felder um eine Position nach hinten verschoben.
-      for ($i=sizeOf($trace); $i--;) {
-         if (isSet($trace[$i-1]['file']))
-            $trace[$i]['file'] = $trace[$i-1]['file'];
-         else
-            unset($trace[$i]['file']);
-
-         if (isSet($trace[$i-1]['line']))
-            $trace[$i]['line'] = $trace[$i-1]['line'];
-         else
-            unset($trace[$i]['line']);
-      }
-
       return $trace;
    }
 

@@ -142,8 +142,9 @@ set_exception_handler(create_function('Exception $exception'                    
 /**
  * Lädt die angegebene Klasse.
  *
- * @param string  $className - Klassenname
- * @param boolean $throw     - ob Exceptions zurückgeworfen werfen dürfen (bei manuellem Aufruf)
+ * @param string $className - Klassenname
+ * @param mixed  $throw     - Ob Exceptions geworfen werfen dürfen. Typ und Wert des Parameters sind unwichtig,
+ *                            seine Existenz allein reicht für die Erkennung eines manuellen Aufrufs.
  */
 function __autoload($className /*, $throw */) {
    try {
@@ -163,10 +164,10 @@ function __autoload($className /*, $throw */) {
       throw new ClassNotFoundException("Undefined class '$className'");
    }
    catch (Exception $ex) {
-      if (func_num_args() > 1)         // Exceptions nur weiterrreichen, wenn wir nicht vom PHP-Kernel aufgerufen wurden
+      if (func_num_args() > 1)         // Exceptions nur bei manuellem Aufruf werfen
          throw $ex;
-      Logger ::handleException($ex);   // PHP-Kernel: manuell verarbeiten (__autoload darf keine Exceptions werfen)
-   }
+      Logger ::handleException($ex);   // Aufruf durch den PHP-Kernel: Exception manuell verarbeiten
+   }                                   // (__autoload darf keine Exceptions werfen)
    return false;
 }
 
