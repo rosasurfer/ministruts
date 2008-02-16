@@ -1,3 +1,9 @@
+2008-02-16
+
+   - php/exceptionsPHPErrorException: im Stacktrace wird ein weiterer Level (der Eintrittspinkt in den
+     PHP-Kernel) angezeigt
+
+
 2008-02-14
 
    - php/util/Logger: E-Mail-Adresskonfiguration auf Config::get('mail.buglovers') umgestellt

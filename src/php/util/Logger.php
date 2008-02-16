@@ -136,8 +136,6 @@ class Logger extends StaticClass {
       // absichtlich unterdrückte und vom aktuellen Errorlevel nicht abgedeckte Fehler ignorieren
       $error_reporting = error_reporting();     // 0: @-Operator
 
-      echoPre("$message,  file: $file, line: $line");
-
       if ($error_reporting==0 || ($error_reporting & $level) != $level)
          return true;
 

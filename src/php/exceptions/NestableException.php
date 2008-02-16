@@ -80,24 +80,15 @@ abstract class NestableException extends Exception {
    public function &getStackTrace() {
       $trace = $this->trace;
 
-      // Originalstacktrace anpassen und zwischenspeichern
+      // Stacktrace anpassen und zwischenspeichern
       if ($trace === null) {
-         $trace = parent:: getTrace();
+         $trace =& $this->getJavaStackTrace();
 
-         $trace[] = array('function' => 'main');            // Damit der Stacktrace mit Java übereinstimmt, wird ein zusätzlicher Frame fürs
-         $size = sizeOf($trace);                            // Hauptscript angefügt und alle FILE- und LINE-Felder einen Frame nach unten verschoben.
-
-         for ($i=$size; $i-- > 0;) {
-            if (isSet($trace[$i-1]['file']))
-               $trace[$i]['file'] = $trace[$i-1]['file'];
-            else
-               unset($trace[$i]['file']);
-
-            if (isSet($trace[$i-1]['line']))
-               $trace[$i]['line'] = $trace[$i-1]['line'];
-            else
-               unset($trace[$i]['line']);
-         }
+         /*
+         foreach ($trace as &$frame)
+            unset($frame['args']);
+         echoPre($trace);
+         */
 
          $trace[0]['file'] = $this->file;                   // Der erste Frame wird mit den Werten der Exception bestückt.
          $trace[0]['line'] = $this->line;
@@ -115,6 +106,32 @@ abstract class NestableException extends Exception {
 
          $this->trace =& $trace;
       }
+      return $trace;
+   }
+
+
+   /**
+    * Gibt den Stacktrace dieser Exception zurück, der wie ein Java-Stacktrace interpretiert werden kann.
+    *
+    * @return array - java-ähnlicher Stacktrace
+    */
+   protected function &getJavaStackTrace() {
+      $trace = parent:: getTrace();
+
+      $trace[] = array('function' => 'main');      // Für die Java-Ähnlichkeit wird ein zusätzlicher Frame fürs Hauptscript angefügt und
+                                                   // alle FILE- und LINE-Felder um eine Position nach hinten verschoben.
+      for ($i=sizeOf($trace); $i--;) {
+         if (isSet($trace[$i-1]['file']))
+            $trace[$i]['file'] = $trace[$i-1]['file'];
+         else
+            unset($trace[$i]['file']);
+
+         if (isSet($trace[$i-1]['line']))
+            $trace[$i]['line'] = $trace[$i-1]['line'];
+         else
+            unset($trace[$i]['line']);
+      }
+
       return $trace;
    }
 
