@@ -52,13 +52,21 @@ class PHPErrorException extends NestableException {
       if ($trace === null) {
          $trace =& parent ::getStackTrace();
 
+         /*
+         foreach ($trace as &$frame)
+            unset($frame['args']);
+         echoPre($trace);
+         */
+
          // Der erste Frame (ErrorHandler) und alle weiteren Frames der ErrorHandlerkette können weg.
-         array_shift($trace);
-         while ($this->file!=$trace[0]['file'] || $this->line!=$trace[0]['line'])
+         do {
             array_shift($trace);
+            $frame = $trace[0];
+         } while (!isSet($frame['file']) || !isSet($frame['line']) || $frame['file']!=$this->file || $frame['line']!=$this->line);
 
          // Der nächste Frame kann weg, wenn er auf __autoload zeigt.
-         if (strToLower($trace[0]['function']) == '__autoload')
+         $frame = $trace[0];
+         if (!isSet($frame['class']) && strToLower($frame['function'])=='__autoload')
             array_shift($trace);
 
          $this->trace =& $trace;

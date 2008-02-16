@@ -1,6 +1,9 @@
 <?
 /**
  * Logger
+ *
+ * Diese Klasse sollte möglichst wenige externe Abhängigkeiten haben, um während der Fehlerverarbeitung
+ * auftretende weitere Fehler zu verhindern.
  */
 class Logger extends StaticClass {
 
@@ -133,6 +136,8 @@ class Logger extends StaticClass {
       // absichtlich unterdrückte und vom aktuellen Errorlevel nicht abgedeckte Fehler ignorieren
       $error_reporting = error_reporting();     // 0: @-Operator
 
+      echoPre("$message,  file: $file, line: $line");
+
       if ($error_reporting==0 || ($error_reporting & $level) != $level)
          return true;
 
@@ -180,8 +185,8 @@ class Logger extends StaticClass {
          ob_get_level() ? ob_flush() : flush();
 
          if (self::$displayHtml) {
-            echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif"><b>Uncaught</b> '.nl2br(String ::htmlSpecialChars($message))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
-            echo '<br>'.String ::htmlSpecialChars($message).'<br><br>'.printFormatted(String ::htmlSpecialChars($traceStr), true);
+            echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif"><b>Uncaught</b> '.nl2br(htmlSpecialChars($message, ENT_QUOTES))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
+            echo '<br>'.htmlSpecialChars($message, ENT_QUOTES).'<br><br>'.printFormatted($traceStr, true);
             echo "<br></div>\n";
          }
          else {
@@ -322,9 +327,9 @@ class Logger extends StaticClass {
          ob_get_level() ? ob_flush() : flush();
 
          if (self::$displayHtml) {
-            echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.self::$logLevels[$level].'</b>: '.nl2br(String ::htmlSpecialChars($message))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
+            echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.self::$logLevels[$level].'</b>: '.nl2br(htmlSpecialChars($message, ENT_QUOTES))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
             if ($exception)
-               echo '<br>'.String ::htmlSpecialChars($exMessage).'<br><br>'.printFormatted(String ::htmlSpecialChars($exTraceStr), true);
+               echo '<br>'.htmlSpecialChars($exMessage, ENT_QUOTES).'<br><br>'.printFormatted($exTraceStr, true);
             echo "<br></div>\n";
          }
          else {

@@ -243,7 +243,7 @@ function printFormatted($var, $return = false) {
    }
 
    if (isSet($_SERVER['REQUEST_METHOD'])) {
-      $str = '<div align="left"><pre style="margin:0; font:normal normal 12px/normal \'Courier New\',courier,serif">'.$str.'</pre></div>';
+      $str = '<div align="left"><pre style="margin:0; font:normal normal 12px/normal \'Courier New\',courier,serif">'.htmlSpecialChars($str, ENT_QUOTES).'</pre></div>';
    }
    $str .= "\n";
 
