@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="iso-8859-15"?>
 <!DOCTYPE struts-config SYSTEM "dtd/php-struts-config.dtd">
 
-<struts-config doc-base="./include">
+<struts-config doc-base="include">
 
    <global-forwards>
       <forward name="404"	include=".404"/>
