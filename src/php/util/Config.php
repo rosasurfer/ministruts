@@ -2,11 +2,12 @@
 /**
  * Config
  *
- * Helferklasse zur Anwendungskonfiguration. Einstellungen werden in der Datei "config.properties"
- * abgelegt.  Bei Webanwendungen wird nach der Datei im WEB-INF-Verzeichnis, bei Konsolenanwendungen
- * im aktuellen Verzeichnis gesucht.  Existiert eine Datei "config-custom.properties", wird auch diese
- * eingelesen, sie überschreibt gleichlautende Einstellungen in "config.properties". Dadurch können
- * parallel eine globale und eine lokale Konfiguration vorgehalten werden.
+ * Klasse zur Anwendungskonfiguration.  Einstellungen werden in der Datei "config.properties" abgelegt.
+ * Bei Webanwendungen wird nach dieser Datei im WEB-INF-Verzeichnis, bei Konsolenanwendungen im aktuellen
+ * Verzeichnis gesucht.  Existiert eine Datei "config-custom.properties", wird auch diese eingelesen, sie
+ * überschreibt dann gleichlautende Einstellungen in "config.properties".  Werden in "config.properties"
+ * Production-Einstellungen und in "config-custom.properties" Entwicklungseinstellungen gespeichert, kann
+ * durch einfaches Umbenennen von "config-custom.properties" zwischen beiden Umgebungen umgeschaltet werden.
  *
  * Dateiformat:
  * ------------
@@ -17,8 +18,6 @@
  *
  * Beispiel:
  * ---------
- * <pre>
- * app-name     = myapp
  *
  * db.connector = mysql
  * db.host      = localhost:3306
@@ -30,7 +29,6 @@
  *
  * logger.php.struts        = info
  * logger.php.struts.Action = warn              # ein weiterer Kommentar innerhalb der Zeile
- * </pre>
  */
 final class Config extends Singleton {
 
