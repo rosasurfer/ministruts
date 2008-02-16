@@ -44,13 +44,13 @@ class PHPErrorException extends NestableException {
    /**
     * Gibt den Stacktrace dieser Exception zurück.
     *
-    * @return array - Java-ähnlicher Stacktrace
+    * @return array - Stacktrace
     */
    public function &getStackTrace() {
       $trace = $this->trace;
 
       if ($trace === null) {
-         $trace =& parent ::getStackTrace();
+         $trace =& $this->getJavaStackTrace();
 
          /*
          foreach ($trace as &$frame)
@@ -59,10 +59,15 @@ class PHPErrorException extends NestableException {
          */
 
          // Der erste Frame (ErrorHandler) und alle weiteren Frames der ErrorHandlerkette können weg.
-         do {
-            array_shift($trace);
-            $frame = $trace[0];
-         } while (!isSet($frame['file']) || !isSet($frame['line']) || $frame['file']!=$this->file || $frame['line']!=$this->line);
+         //do {
+         //   array_shift($trace);
+         //   $frame = $trace[0];
+         //} while (!isSet($frame['file']) || !isSet($frame['line']) || $frame['file']!=$this->file || $frame['line']!=$this->line);
+
+
+         // Die ersten beiden Frames könne weg: 1. ErrorHandler (Logger::handleError), 2: Handlerdefinition (__lambda_func)
+         array_shift($trace);
+         array_shift($trace);
 
          // Der nächste Frame kann weg, wenn er auf __autoload zeigt.
          $frame = $trace[0];
