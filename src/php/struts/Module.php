@@ -443,7 +443,7 @@ class Module extends Object {
       if ($tag['path']) {              // 'path' given, it's a simple tile
          $path = (string) $tag['path'];
          $file = $this->findFile($path);
-         if (!$file) throw new RuntimeException('File "'.$path.'" not found in tiles definition "'.$name.'"');
+         if (!$file) throw new FileNotFoundException('File "'.$path.'" not found in tiles definition "'.$name.'"');
 
          $tile = new $this->tilesClass($this);
          $tile->setPath($file)
