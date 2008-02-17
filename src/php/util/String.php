@@ -160,6 +160,9 @@ final class String extends StaticClass {
       if ($string === null)
          return null;
 
+      if (PHP_VERSION < '5.2.3')
+         return htmlEntities($string, $quote_style, $charset);
+
       return htmlEntities($string, $quote_style, $charset, $double_encode);
    }
 }
