@@ -116,7 +116,7 @@ final class String extends StaticClass {
     * @param mixed  $string        - der/die zu konvertierende/n Strings
     * @param int    $quote_style   -
     * @param string $charset       -
-    * @param bool   $double_encode -
+    * @param bool   $double_encode - (PHP 5.2.3+)
     *
     * @return mixed - der/die konvertierte/n Strings
     */
@@ -147,7 +147,7 @@ final class String extends StaticClass {
     * @param mixed  $string        - der/die zu konvertierende/n Strings
     * @param int    $quote_style   -
     * @param string $charset       -
-    * @param bool   $double_encode -
+    * @param bool   $double_encode - (PHP 5.2.3+)
     *
     * @return mixed - der/die konvertierte/n Strings
     */
