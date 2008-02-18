@@ -24,7 +24,7 @@
 
 
 <!-- A "LogicalName" is the logical name used to reference an element. It must begin with a letter
-     and contain only characters that are legal in a PHP identifier.
+     and contain only characters that are legal for PHP identifiers.
 -->
 <!ENTITY % LogicalName "CDATA">
 
@@ -75,7 +75,8 @@
      name       The unique identifier for the forward. Used at runtime to select - by its logical
                 name - the resource that should complete the request/response.
 
-     include    The name of a tiles definition or a file to include (tile definitions are preferred).
+     include    The name of a tiles definition or a file to include. Tiles definition names must
+                start with a dot ".", file names must not start with a dot ".".
                 Exactly one of "include", "redirect" or "forward" must be specified.
 
      redirect   The module-relative path of the location to which a redirect instruction should be
@@ -106,8 +107,9 @@
      path       The module-relative path of the submitted request, starting with a slash "/" character.
 
      include    The name of a tiles definition or file to include, instead of passing the request to an
-                action (tiles definition name is preferred).  Not valid if the "action" attribute is
-                specified.  Only one of "include", "redirect" or "forward" can be specified.
+                action. Tiles definition names must start with a dot ".", file names must not start with
+                a dot ".". Not valid if the "action" attribute is specified.  Only one of "include",
+                "redirect" or "forward" can be specified.
 
      redirect   The module-relative path of the location to which a redirect instruction should be
                 issued, instead of passing the request to an action.  Not valid if the "action"
@@ -174,9 +176,10 @@
      path       The path of the file used as tile relative to the "WEB-INF" directory of the application.
                 Exactly one of "path" or "extends" must be specified.
 
-     extends    Name of a tile that is used as ancestor of this tile.  All attributes from the ancestor
-                are available to the new tile.  Any attribute inherited from the ancestor can be over-
-                written by providing a new value.  Exactly one of "path" or "extends" must be specified.
+     extends    Name of a tile that is used as ancestor of this tile.  Tiles definition names must start
+                with a dot ".".  All attributes from the ancestor are available to the new tile.  Any
+                attribute inherited from the ancestor can be overwritten by providing a new value.  Exactly
+                one of "path" or "extends" must be specified.
 -->
 <!ELEMENT tile (set*)>
 <!ATTLIST tile
