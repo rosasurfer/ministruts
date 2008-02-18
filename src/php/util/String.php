@@ -8,40 +8,40 @@ final class String extends StaticClass {
    /**
     * Ob ein String mit einem anderen String beginnt.
     *
-    * @param string $haystack - der zu prüfende String
-    * @param string $needle   - der zu suchende String
-    * @param boolean $case    - ob bei der Suche Groß-/Kleinschreibung beachtet werden soll (Default: ja)
+    * @param string  $string     - der zu prüfende String
+    * @param string  $start      - der zu suchende String
+    * @param boolean $ignoreCase - ob bei der Suche Groß-/Kleinschreibung ignoriert werden soll (Default: nein)
     *
     * @return boolean
     */
-   public static function startsWith($haystack, $needle, $case = true) {
-      if ($haystack!==null && !is_string($haystack)) throw new IllegalTypeException('Illegal type of parameter $haystack: '.getType($haystack));
-      if ($needle!==null && !is_string($needle))     throw new IllegalTypeException('Illegal type of parameter $needle: '.getType($needle));
-      if ($needle == '')                             throw new InvalidArgumentException('Invalid argument $needle: "'.$needle.'"');
-      if ($case!==true && $case!==false)             throw new IllegalTypeException('Illegal type of parameter $case: '.getType($case));
+   public static function startsWith($string, $start, $ignoreCase = false) {
+      if ($string!==null && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+      if ($start!==null && !is_string($start))   throw new IllegalTypeException('Illegal type of parameter $start: '.getType($start));
+      if ($start == '')                          throw new InvalidArgumentException('Invalid argument $start: "'.$start.'"');
+      if (!is_bool($ignoreCase))                 throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
 
-      if ($case)
-         return (strPos($haystack, $needle) === 0);
+      if ($ignoreCase)
+         return (striPos($string, $start) === 0);
 
-      return (striPos($haystack, $needle) === 0);
+      return (strPos($string, $start) === 0);
    }
 
 
    /**
     * Ob ein String mit einem anderen String endet.
     *
-    * @param string $haystack - der zu prüfende String
-    * @param string $needle   - der zu suchende String
-    * @param boolean $case    - ob bei der Suche Groß-/Kleinschreibung beachtet werden soll (Default: ja)
+    * @param string  $string     - der zu prüfende String
+    * @param string  $end        - der zu suchende String
+    * @param boolean $ignoreCase - ob bei der Suche Groß-/Kleinschreibung ignoriert werden soll (Default: nein)
     *
     * @return boolean
     */
-   public static function endsWith($haystack, $needle, $case = true) {
-      if ($haystack!==null && !is_string($haystack)) throw new IllegalTypeException('Illegal type of parameter $haystack: '.getType($haystack));
-      if ($needle!==null && !is_string($needle))     throw new IllegalTypeException('Illegal type of parameter $needle: '.getType($needle));
-      if ($case!==true && $case!==false)             throw new IllegalTypeException('Illegal type of parameter $case: '.getType($case));
+   public static function endsWith($string, $end, $ignoreCase = false) {
+      if ($string!==null && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+      if ($end!==null && !is_string($end))       throw new IllegalTypeException('Illegal type of parameter $end: '.getType($end));
+      if (!is_bool($ignoreCase))                       throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
 
-      return self:: startsWith(strRev($haystack), strRev($needle), $case);
+      return self:: startsWith(strRev($string), strRev($end), $ignoreCase);
    }
 
 
