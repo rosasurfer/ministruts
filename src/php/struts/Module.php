@@ -218,10 +218,10 @@ class Module extends Object {
       // process global 'include' and 'redirect' forwards
       foreach ($xml->xPath('/struts-config/global-forwards/forward[@include] | /struts-config/global-forwards/forward[@redirect]') as $tag) {
          $name = (string) $tag['name'];
-         if (sizeOf($tag->attributes()) > 2) throw new RuntimeException('Only one of "include", "redirect" or "forward" must be specified for global forward "'.$name.'"');
+         if (sizeOf($tag->attributes()) > 2) throw new RuntimeException('Global forward "'.$name.'": Only one attribute of "include", "redirect" or "forward" must be specified');
 
          if ($path = (string) $tag['include']) {
-            if (!$this->isIncludable($path, $xml)) throw new RuntimeException('Tiles definition or file "'.$path.'" not found for attribute "include" of global forward "'.$name.'"');
+            if (!$this->isIncludable($path, $xml)) throw new RuntimeException('Global forward "'.$name.'", attribute "include": '.($path{0}=='.' ? 'Tiles definition':'File').' "'.$path.'" not found');
 
             if ($this->isTile($path, $xml)) {
                $forward = new $this->forwardClass($name, $path, false);
@@ -242,11 +242,11 @@ class Module extends Object {
       // process global 'forward' forwards (fragwürdig, aber möglich)
       foreach ($xml->xPath('/struts-config/global-forwards/forward[@forward]') as $tag) {
          $name = (string) $tag['name'];
-         if (sizeOf($tag->attributes()) > 2) throw new RuntimeException('Only one of "include", "redirect" or "forward" must be specified for global forward "'.$name.'"');
+         if (sizeOf($tag->attributes()) > 2) throw new RuntimeException('Global forward "'.$name.'": Only one attribute of "include", "redirect" or "forward" must be specified');
 
          $alias = (string) $tag['forward'];
          $forward = $this->findForward($alias);
-         if (!$forward) throw new RuntimeException('Forward "'.$alias.'" not found for attribute "forward" attribute of global forward "'.$name.'"');
+         if (!$forward) throw new RuntimeException('Global forward "'.$name.'", attribute "forward": Forward "'.$alias.'" not found');
 
          $this->addForward($name, $forward);
       }
@@ -272,9 +272,9 @@ class Module extends Object {
 
          // process include attribute
          if ($tag['include']) {
-            if ($mapping->getForward()) throw new RuntimeException('Only one attribute of "action", "include", "redirect" or "forward" can be specified for mapping "'.$mapping->getPath().'"');
+            if ($mapping->getForward()) throw new RuntimeException('Mapping "'.$mapping->getPath().'": Only one attribute of "action", "include", "redirect" or "forward" must be specified');
             $path = (string) $tag['include'];
-            if (!$this->isIncludable($path, $xml)) throw new RuntimeException('Tiles definition or file "'.$path.'" not found for attribute "include" of mapping "'.$mapping->getPath().'"');
+            if (!$this->isIncludable($path, $xml)) throw new RuntimeException('Mapping "'.$mapping->getPath().'", attribute "include": '.($path{0}=='.' ? 'Tiles definition':'File').' "'.$path.'" not found');
 
             if ($this->isTile($path, $xml)) {
                $forward = new $this->forwardClass('generic', $path, false);
@@ -289,7 +289,7 @@ class Module extends Object {
 
          // process redirect attribute
          if ($tag['redirect']) {
-            if ($mapping->getForward()) throw new RuntimeException('Only one attribute of "action", "include", "redirect" or "forward" can be specified for mapping "'.$mapping->getPath().'"');
+            if ($mapping->getForward()) throw new RuntimeException('Mapping "'.$mapping->getPath().'": Only one attribute of "action", "include", "redirect" or "forward" must be specified');
             $path = (string) $tag['redirect'];
             // TODO: URL validieren
             $forward = new $this->forwardClass('generic', $path, true);
@@ -299,18 +299,18 @@ class Module extends Object {
 
          // process forward attribute
          if ($tag['forward']) {
-            if ($mapping->getForward()) throw new RuntimeException('Only one attribute of "action", "include", "redirect" or "forward" can be specified for mapping "'.$mapping->getPath().'"');
+            if ($mapping->getForward()) throw new RuntimeException('Mapping "'.$mapping->getPath().'": Only one attribute of "action", "include", "redirect" or "forward" must be specified');
             $path = (string) $tag['forward'];
             $forward = $this->findForward($path);
-            if (!$forward) throw new RuntimeException('Forward "'.$path.'" not found for attribute "forward" of mapping "'.$mapping->getPath().'"');
+            if (!$forward) throw new RuntimeException('Mapping "'.$mapping->getPath().'", attribute "forward": Forward "'.$path.'" not found');
             $mapping->setForward($forward);
          }
-         if ($mapping->getForward() && sizeOf($tag->xPath('./forward'))) throw new RuntimeException('Can not mix "include", "redirect" or "forward" attribute with nested <forward> elements in mapping "'.$mapping->getPath().'"');
+         if ($mapping->getForward() && sizeOf($tag->xPath('./forward'))) throw new RuntimeException('Mapping "'.$mapping->getPath().'": Only an "include", "redirect" or "forward" attribute *or* nested <forward> elements must be specified');
 
 
          // process action attribute
          if ($tag['action']) {
-            if ($mapping->getForward()) throw new RuntimeException('Only one attribute of "action", "include", "redirect" or "forward" can be specified for mapping "'.$mapping->getPath().'"');
+            if ($mapping->getForward()) throw new RuntimeException('Mapping "'.$mapping->getPath().'": Only one attribute of "action", "include", "redirect" or "forward" must be specified');
             $path = (string) $tag['action'];
             // TODO: URL validieren
             $mapping->setAction($path);
@@ -330,13 +330,13 @@ class Module extends Object {
                $validate = $tag['validate'] ? ($tag['validate'] == 'true') : !$action;
             }
             else {
-               if ($tag['validate'] == 'false') throw new RuntimeException('An "action", "include", "redirect" or "forward" attribute is required when "validate" attribute is set to "false" in mapping "'.$mapping->getPath().'"');
+               if ($tag['validate'] == 'false') throw new RuntimeException('Mapping "'.$mapping->getPath().'": An "action", "include", "redirect" or "forward" attribute is required when "validate" attribute is set to "false"');
                $validate = true;
                // Prüfung auf 'success' und 'error' Forward erfolgt in ActionMapping:freeze()
             }
          }
          elseif ($validate = $tag['validate'] == 'true') {
-            throw new RuntimeException('A "form" must be specified for "validate" attribute "true" in mapping "'.$mapping->getPath().'"');
+            throw new RuntimeException('Mapping "'.$mapping->getPath().'": A "form" attribute must be specified when the "validate" attribute is set to "true"');
          }
          $mapping->setValidate($validate);
 
@@ -347,7 +347,7 @@ class Module extends Object {
 
          // process roles attribute
          if ($tag['roles']) {
-            if (!$this->roleProcessorClass) throw new RuntimeException('RoleProcessor configuration not found for "roles" attribute "'.$tag['roles'].'" of mapping "'.$mapping->getPath().'"');
+            if (!$this->roleProcessorClass) throw new RuntimeException('Mapping "'.$mapping->getPath().'", attribute "roles": RoleProcessor configuration not found');
             $mapping->setRoles((string) $tag['roles']);
          }
 
@@ -361,10 +361,10 @@ class Module extends Object {
          // process local 'include' and 'redirect' forwards
          foreach ($tag->xPath('./forward[@include] | ./forward[@redirect]') as $forwardTag) {
             $name = (string) $forwardTag['name'];
-            if (sizeOf($forwardTag->attributes()) > 2) throw new RuntimeException('Only one of "include", "redirect" or "forward" must be specified for forward "'.$name.'" of mapping "'.$mapping->getPath().'"');
+            if (sizeOf($forwardTag->attributes()) > 2) throw new RuntimeException('Mapping "'.$mapping->getPath().'", forward "'.$name.'": Only one attribute of "include", "redirect" or "forward" must be specified');
 
             if ($path = (string) $forwardTag['include']) {
-               if (!$this->isIncludable($path, $xml)) throw new RuntimeException('Tiles definition or file "'.$path.'" not found for attribute "include" of forward "'.$name.'" of mapping "'.$mapping->getPath().'"');
+               if (!$this->isIncludable($path, $xml)) throw new RuntimeException('Mapping "'.$mapping->getPath().'", forward "'.$name.'", attribute "include": '.($path{0}=='.' ? 'Tiles definition':'File').' "'.$path.'" not found');
 
                if ($this->isTile($path, $xml)) {
                   $forward = new $this->forwardClass($name, $path, false);
@@ -385,13 +385,13 @@ class Module extends Object {
          // process local 'forward' forwards
          foreach ($tag->xPath('./forward[@forward]') as $forwardTag) {
             $name = (string) $forwardTag['name'];
-            if (sizeOf($forwardTag->attributes()) > 2) throw new RuntimeException('Only one of "include", "redirect" or "forward" must be specified for forward "'.$name.'" of mapping "'.$mapping->getPath().'"');
+            if (sizeOf($forwardTag->attributes()) > 2) throw new RuntimeException('Mapping "'.$mapping->getPath().'", forward "'.$name.'": Only one attribute of "include", "redirect" or "forward" must be specified');
 
             $alias = (string) $forwardTag['forward'];
-            if ($alias == ActionForward ::__SELF) throw new RuntimeException('Can not use protected keyword "'.$alias.'" as "forward" attribute value for forward "'.$name.'" of mapping "'.$mapping->getPath().'"');
+            if ($alias == ActionForward ::__SELF) throw new RuntimeException('Mapping "'.$mapping->getPath().'", forward "'.$name.'", attribute "forward": Can not use magic keyword "'.$alias.'" as attribute value');
 
             $forward = $mapping->findForward($alias);
-            if (!$forward) throw new RuntimeException('Forward "'.$alias.'" not found for attribute "alias" of forward "'.$name.'" of mapping "'.$mapping->getPath().'"');
+            if (!$forward) throw new RuntimeException('Mapping "'.$mapping->getPath().'", forward "'.$name.'", attribute "forward": Forward "'.$alias.'" not found');
 
             $mapping->addForward($name, $forward);
          }
@@ -432,18 +432,18 @@ class Module extends Object {
 
       // find it's definition ...
       $nodes = $xml->xPath("/struts-config/tiles/tile[@name='$name']");
-      if (!$nodes)            throw new RuntimeException('Tiles definition not found: "'.$name.'"'); // false oder leeres Array
+      if (!$nodes)            throw new RuntimeException('Tiles definition "'.$name.'" not found'); // false oder leeres Array
       if (sizeOf($nodes) > 1) throw new RuntimeException('Non-unique "name" attribute detected for tiles definition "'.$name.'"');
 
 
       $tag = $nodes[0];
-      if (sizeOf($tag->attributes()) != 2) throw new RuntimeException('Exactly one of "path" or "extends" must be specified for tiles definition "'.$name.'"');
+      if (sizeOf($tag->attributes()) != 2) throw new RuntimeException('Tile "'.$name.'": Exactly one attribute of "path" or "extends" must be specified');
 
       // create a new instance ...
       if ($tag['path']) {              // 'path' given, it's a simple tile
          $path = (string) $tag['path'];
          $file = $this->findFile($path);
-         if (!$file) throw new FileNotFoundException('File "'.$path.'" not found in tiles definition "'.$name.'"');
+         if (!$file) throw new FileNotFoundException('Tile "'.$name.'", attribute "path": File "'.$path.'" not found');
 
          $tile = new $this->tilesClass($this);
          $tile->setPath($file)
@@ -476,7 +476,7 @@ class Module extends Object {
          // TODO: Name-Value von <set> wird nicht auf Eindeutigkeit überprüft
 
          if ($tag['value']) { // value ist im Attribut angegeben
-            if (strLen($tag) > 0) throw new RuntimeException('Exactly one of "value" attribute or body value must be specified in set "'.$name.'" of tiles definition "'.$tile->getName().'"');
+            if (strLen($tag) > 0) throw new RuntimeException('Tile "'.$tile->getName().'", set "'.$name.'": Only a "value" attribute *or* a body value must be specified');
             $value = (string) $tag['value'];
 
             if ($tag['type'])
@@ -491,7 +491,7 @@ class Module extends Object {
          else {               // value ist im Body angegeben
             $value = trim((string) $tag);
             $type = ($tag['type']) ? (string) $tag['type'] : Tile ::PROP_TYPE_STRING;
-            if ($type == Tile ::PROP_TYPE_RESOURCE) throw new RuntimeException('A "value" attribute must be specified for type "resource" in set "'.$name.'" of tiles definition "'.$tile->getName().'"');
+            if ($type == Tile ::PROP_TYPE_RESOURCE) throw new RuntimeException('Tile "'.$tile->getName().'", set "'.$name.'": A "value" attribute must be specified when attribute type is set to "resource"');
          }
 
 
@@ -507,7 +507,7 @@ class Module extends Object {
                           ->setLabel(subStr($value, 0, strRPos($value, '.')));
             }
             else {
-               throw new RuntimeException('Tiles definition or file "'.$value.'" not found for attribute "value" in set "'.$name.'" of tiles definition "'.$tile->getName().'"');
+               throw new RuntimeException('Tile "'.$tile->getName().'", set "'.$name.'", attribute "value": '.($value{0}=='.' ? 'Tiles definition':'File').' "'.$value.'" not found');
             }
             $value = $nestedTile;
          }
@@ -605,7 +605,7 @@ class Module extends Object {
     * @param SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
     */
    protected function processController(SimpleXMLElement $xml) {
-      if ($this->configured)                                                     throw new IllegalStateException('Configuration is frozen');
+      if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
       foreach ($xml->xPath('/struts-config/controller') as $controller) {
          if ($controller['request-processor']) {
