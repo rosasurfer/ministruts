@@ -163,7 +163,7 @@ class Mailer extends Object {
          $tmp = array();
          foreach ($headers as $header) {
             $header = trim($header);
-            if (String ::startsWith($header, 'return-path:', false)) {  // is a custom 'Return-Path' header given ?
+            if (String ::startsWith($header, 'return-path:', true)) {  // is a custom 'Return-Path' header given ?
                $returnPath = trim(subStr($header, 12));
             }
             else {
