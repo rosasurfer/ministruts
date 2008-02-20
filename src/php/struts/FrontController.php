@@ -94,7 +94,9 @@ final class FrontController extends Singleton {
                          );
       foreach ($locations as $location) {
          $request  = HttpRequest ::create()->setUrl($location);
-         $response = CurlHttpClient ::create()->send($request);
+         $response = CurlHttpClient ::create()
+                                    ->setTimeout(5)
+                                    ->send($request);
          $status = $response->getStatus();
 
          // TODO: HTTP-Authentication-Support in Serverprüfung einbauen
