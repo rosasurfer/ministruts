@@ -93,6 +93,7 @@ final class FrontController extends Singleton {
                          $baseURL.'/CVS/',
                          );
       foreach ($locations as $location) {
+         // TODO: IOException während HttpClient::send() abfangen
          $request  = HttpRequest ::create()->setUrl($location);
          $response = CurlHttpClient ::create()
                                     ->setTimeout(5)
