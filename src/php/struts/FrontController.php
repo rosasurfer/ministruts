@@ -93,14 +93,13 @@ final class FrontController extends Singleton {
                          $baseURL.'/CVS/',
                          );
       foreach ($locations as $location) {
-         // TODO: IOException während HttpClient::send() abfangen
          $request  = HttpRequest ::create()->setUrl($location);
          $response = CurlHttpClient ::create()
                                     ->setTimeout(5)
                                     ->send($request);
          $status = $response->getStatus();
 
-         // TODO: HTTP-Authentication-Support in Serverprüfung einbauen
+         // TODO: HTTP-Authentication-Support einbauen
          if ($status == 401) {
             Logger ::log('Web server configuration check: authentication support not yet implemented for location: "'.$location.'"', L_NOTICE, __CLASS__);
          }
