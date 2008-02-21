@@ -67,14 +67,23 @@ final class Config extends Singleton {
     * globale Einstellungen.
     */
    protected function __construct() {
-      // Konfigurationen suchen, bei Webapplikation in WEB-INF, bei Shellscripten im aktuellen Verzeichnis
-
-      // TODO: Config-Verzeichnis darf nicht mit getCwd() ermittelt werden
-      $path = getCwd().(Request ::me() ? '/WEB-INF/' : '/');
-
       $files = array();
-      if (is_file($file = $path.'config.properties'       )) $files[] = $file;
-      if (is_file($file = $path.'config-custom.properties')) $files[] = $file;
+
+      // Verzeichnis der Konfigurationsdateien ermitteln (bei Webapplikation "WEB-INF", bei Shellscripten das Ausgangsverzeichnis)
+      $path = realPath(dirName($_SERVER['SCRIPT_FILENAME'])).DIRECTORY_SEPARATOR;
+      if (isSet($_SERVER['REQUEST_METHOD']))
+         $path .= 'WEB-INF'.DIRECTORY_SEPARATOR;
+
+
+      // alle Config-Dateien suchen
+      if (is_file($file = $path.'config.properties'))
+         $files[] = $file;
+      else
+         Logger ::log('Main configuration file "config.properties" not found in path "'.$path.'"', L_WARN, __CLASS__);
+
+      if (is_file($file = $path.'config-custom.properties'))
+         $files[] = $file;
+
 
       // gefundene Dateien laden
       foreach ($files as $file) {
