@@ -29,7 +29,7 @@ abstract class ActionForm extends Object {
 
       // ggf. definierten DispatchAction-Key auslesen
       if     (isSet($_REQUEST['action'  ])) $this->actionKey = $_REQUEST['action'  ];
-      elseif (isSet($_REQUEST['action_x'])) $this->actionKey = $_REQUEST['action_x'];  // submit-Type "image"
+      elseif (isSet($_REQUEST['action.x'])) $this->actionKey = $_REQUEST['action.x'];  // submit-Type "image"
 
 
       // Parameter einlesen

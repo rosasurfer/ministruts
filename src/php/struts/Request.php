@@ -8,6 +8,17 @@
  * also nicht selbst einen neuen Request erzeugen (es gibt nur den einen, der vom Server an PHP
  * weitergereicht wurde).
  *
+ * NOTE:
+ * -----
+ * Diese Klasse verarbeitet die Request-Parameter intern wie in Java, mehrfache Werte je Parameter mit
+ * numerischen oder assoziativen Schlüsseln werden automatisch verarbeitet ("a=1&a=2&a=3&a[]=4&a[key]=5").
+ *
+ * Die globalen PHP-Variablen $_GET, $_POST und $_REQUEST entsprechen der Originalimplementierung,
+ * mehrfache Werte werden also überschrieben.
+ *
+ * @see Request::getParameter()
+ * @see Request::getParameters()
+ *
  * TODO: LinkTool implementieren, um path-info verwenden zu können
  * TODO: Versions-String in css- und js-Links einfügen
  */
@@ -19,6 +30,12 @@ final class Request extends Singleton {
    private $uri;
    private $path;
 
+
+   // Parameterhalter
+   private $parameters = array('REQUEST' => array(),
+                               'GET'     => array(),
+                               'POST'    => array(),
+                               );
 
    // Attribute-Pool
    private $attributes = array();
@@ -44,13 +61,83 @@ final class Request extends Singleton {
    protected function __construct() {
       $this->method = $_SERVER['REQUEST_METHOD'];
 
-      // UTF8-kodierte Parameter nach ISO-8859 konvertieren (Internet Explorer läßt grüßen)
-      $_GET  = String ::decodeUtf8($_GET);
-      $_POST = String ::decodeUtf8($_POST);           // TODO: POST-Encodings berücksichtigen
+      // $_GET, $_POST und $_REQUEST manuell einlesen (die PHP-Implementierung ist indiskutabel, außerdem sind $_COOKIE und $_FILES kein User-Input)
+      $_REQUEST = $_GET = $_POST = array();
 
-      // $_REQUEST-Array neu definieren ($_COOKIE und $_FILES sind kein User-Input)
-      // TODO: array_merge() auf Request-Parametern macht Übergabe von Arrays unmöglich
-      $_REQUEST = array_merge($_GET, $_POST);
+      // POST-Parameter haben höhere Priorität als GET und werden zuerst verarbeitet
+      if ($this->isPost())
+         $this->parseParameters(file_get_contents('php://input'), 'POST');
+
+      // GET-Parameter
+      if (strLen($_SERVER['QUERY_STRING']))
+         $this->parseParameters($_SERVER['QUERY_STRING'], 'GET');
+   }
+
+
+   /**
+    * Parst die Parameter im übergebenen String und speichert die Ergebnisse in den entsprechenden
+    * Arrays.
+    *
+    * NOTE:
+    * -----
+    * Die Request-Parameter werden wie in Java verarbeitet, es sind also mehrfache Werte je Parameter
+    * möglich ("a=1&a=2&a=3&a[]=4&a[key]=5").
+    *
+    * Die globalen PHP-Variablen $_GET, $_POST und $_REQUEST entsprechen der Originalimplementierung,
+    * mehrfache Werte werden also überschrieben.
+    *
+    * @param string $rawData - Parameter-Rohdaten
+    * @param string $target  - Bezeichner für das Zielarray: 'GET' oder 'POST'
+    *
+    * @see Request::getParameter()
+    * @see Request::getParameters()
+    */
+   private function parseParameters($rawData, $target) {
+      $pairs = explode('&', $rawData);
+
+      foreach ($pairs as $pair) {
+         $parts = explode('=', $pair, 2);
+         if (($name = trim(urlDecode($parts[0]))) == '')
+            continue;
+         // UTF8-Values nach ISO-8859 konvertieren (Internet Explorer etc.)
+         $name  =                          String ::decodeUtf8($name);
+         $value = sizeOf($parts)==1 ? '' : String ::decodeUtf8(urlDecode($parts[1]));
+         $key   = null;
+
+         // TODO: Arrays rekursiv verarbeiten
+         if (($open=strPos($name, '[')) && ($close=strPos($name, ']')) && strLen($name)==$close+1) {
+            // Arrayindex angegeben
+            $key  = trim(subStr($name, $open+1, $close-$open-1));
+            $name = trim(subStr($name, 0, $open));
+
+            if (!strLen($key)) $this->parameters['REQUEST'][$name][]     = $this->parameters[$target][$name][]     = $value;
+            else               $this->parameters['REQUEST'][$name][$key] = $this->parameters[$target][$name][$key] = $value;
+
+            if ($target == 'GET') {
+               if     (!strLen($key))               $_REQUEST[$name][]     = $value;
+               elseif (!isSet($_POST[$name][$key])) $_REQUEST[$name][$key] = $value;   // GET darf POST nicht überschreiben
+
+               if (!strLen($key)) $_GET[$name][]     = $value;
+               else               $_GET[$name][$key] = $value;
+            }
+            else {
+               if (!strLen($key)) $_REQUEST[$name][]     = $_POST[$name][]     = $value;
+               else               $_REQUEST[$name][$key] = $_POST[$name][$key] = $value;
+            }
+         }
+         else {
+            // normaler Name, kein Array
+            $this->parameters['REQUEST'][$name][] = $this->parameters[$target][$name][] = $value;
+
+            if ($target == 'GET') {
+               if (!isSet($_POST[$name])) $_REQUEST[$name] = $value;                   // GET darf POST nicht überschreiben
+               $_GET[$name] = $value;
+            }
+            else {
+               $_REQUEST[$name] = $_POST[$name] = $value;
+            }
+         }
+      }
    }
 
 
@@ -81,6 +168,22 @@ final class Request extends Singleton {
     */
    public function isPost() {
       return ($this->method === 'POST');
+   }
+
+
+   /**
+    * Gibt die Requestparameter mit dem angegebenen Namen zurück.  Diese Methode gibt ein Array mit
+    * den übertragenen Parametern zurück.
+    *
+    * @param string $name - Parametername
+    *
+    * @return array - String-Array
+    */
+   public function getParameters($name) {
+      if (isSet($this->parameters['REQUEST'][$name]))
+         return $this->parameters['REQUEST'][$name];
+
+      return array();
    }
 
 
@@ -434,10 +537,10 @@ final class Request extends Singleton {
 
 
    /**
-    * Gibt den unter dem angegebenen Schlüssel gespeicherten Wert zurück oder NULL, wenn unter diesem
-    * Schlüssel kein Wert existiert.
+    * Gibt den im Request-Context unter dem angegebenen Schlüssel gespeicherten Wert zurück oder NULL,
+    * wenn unter diesem Schlüssel kein Wert existiert.
     *
-    * @param string $key - Schlüssel, unter dem der Wert gespeichert ist
+    * @param string $key - Schlüssel, unter dem der Wert im Context gespeichert ist
     *
     * @return mixed - der gespeicherte Wert oder NULL
     */

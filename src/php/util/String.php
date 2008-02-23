@@ -56,8 +56,8 @@ final class String extends StaticClass {
     */
    public static function contains($haystack, $needle, $case = true) {
       if ($haystack!==null && !is_string($haystack)) throw new IllegalTypeException('Illegal type of parameter $haystack: '.getType($haystack));
-      if ($needle!==null && !is_string($needle))     throw new IllegalTypeException('Illegal type of parameter $needle: '.getType($needle));
-      if ($case!==true && $case!==false)             throw new IllegalTypeException('Illegal type of parameter $case: '.getType($case));
+      if ($needle  !==null && !is_string($needle))   throw new IllegalTypeException('Illegal type of parameter $needle: '.getType($needle));
+      if ($case    !==true && $case!==false)         throw new IllegalTypeException('Illegal type of parameter $case: '.getType($case));
 
       if ($case)
          return (strPos($haystack, $needle) !== false);
@@ -78,7 +78,7 @@ final class String extends StaticClass {
    public static function isUtf8Encoded($string) {
       if ($string!==null && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
 
-      return self:: contains($string, 'Ã');
+      return ($string!='' && self:: contains($string, 'Ã'));
    }
 
 
@@ -86,9 +86,9 @@ final class String extends StaticClass {
     * Dekodiert UTF-8-kodierte Strings nach ISO-8859-1. Verarbeitet sowohl einzelne Strings als auch
     * String-Arrays.
     *
-    * @param mixed $string - der/die zu dekodierende/n Strings
+    * @param mixed $string - der oder die zu dekodierenden Strings
     *
-    * @return mixed - der/die dekodierte/n Strings
+    * @return mixed - der oder die dekodierten Strings
     */
    public static function decodeUtf8($string) {
       if (is_array($string)) {
@@ -98,7 +98,7 @@ final class String extends StaticClass {
       }
       if ($string!==null && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
 
-      if (!self:: isUtf8Encoded($string))
+      if ($string=='' || !self:: isUtf8Encoded($string))
          return $string;
 
       return html_entity_decode(htmlEntities($string, ENT_NOQUOTES, 'UTF-8'));
@@ -126,8 +126,8 @@ final class String extends StaticClass {
             $string[$key] = self:: htmlSpecialChars($value, $quote_style, $charset, $double_encode);
          return $string;
       }
-      if ($string === null)
-         return null;
+      if (!strLen($string))
+         return $string;
 
       if (PHP_VERSION < '5.2.3')
          return htmlSpecialChars($string, $quote_style, $charset);
@@ -157,8 +157,8 @@ final class String extends StaticClass {
             $string[$key] = self:: htmlEntities($value, $quote_style, $charset, $double_encode);
          return $string;
       }
-      if ($string === null)
-         return null;
+      if (!strLen($string))
+         return $string;
 
       if (PHP_VERSION < '5.2.3')
          return htmlEntities($string, $quote_style, $charset);
