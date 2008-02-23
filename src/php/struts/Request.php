@@ -571,6 +571,8 @@ final class Request extends Singleton {
 
    /**
     * Löscht alle Error-Messages aus dem Request.
+    *
+    * TODO: Error-Messages auch aus der Session löschen
     */
    public function removeActionErrors() {
       unset($this->attributes[Struts ::ACTION_ERRORS_KEY]);

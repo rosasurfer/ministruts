@@ -1,9 +1,8 @@
 2008-02-23
 
    - struts-config.xml: neues Attribute "scope" im ActionMapping
-     Werte: "request" - ActionForm wird im Request gespeichert (wie bisher)
-            "session" - ActionForm wird in der Session gespeichert (ermöglicht mehrseitige Formulare,
-                        PageWizards etc.)
+     Werte: "request" - ActionForm wird wie bisher im Request gespeichert
+            "session" - ActionForm wird in der Session gespeichert (ermöglicht mehrseitige Formulare etc.)
 
 
 2008-02-16
