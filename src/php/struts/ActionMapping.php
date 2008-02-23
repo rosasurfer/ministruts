@@ -15,10 +15,11 @@ class ActionMapping extends Object {
    protected $path;              // string
    protected $action;            // string
    protected $form;              // string
+   protected $scope = 'request'; // string
    protected $validate;          // boolean
    protected $method;            // string
    protected $roles;             // string
-   protected $default;           // boolean
+   protected $default = false;   // boolean
 
 
    /**
@@ -241,6 +242,60 @@ class ActionMapping extends Object {
 
 
    /**
+    * Setzt das Scope-Attribute der ActionForm dieses Mappings.  Das Scope-Attribute bestimmt, in
+    * welchem Kontext auf die ActionForm-Instanz zugegriffen wird.  Default ist "request".  Wird dieser
+    * Wert auf "session" gesetzt, können Formulareingaben über mehrere Requests zur Verfügung stehen
+    * (z.B. für Page-Wizards o.ä. mehrseitige Formulare).
+    *
+    * @param string $scope - "request" oder "session"
+    *
+    * @return ActionMapping
+    */
+   public function setScope($scope) {
+      if ($this->configured)                        throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($scope))                       throw new IllegalTypeException('Illegal type of argument $scope: '.getType($scope));
+      if ($scope!=='request' && $scope!=='session') throw new InvalidArgumentException('Invalid argument $scope: '.$scope);
+
+      $this->scope = $scope;
+      return $this;
+   }
+
+
+   /**
+    * Gibt den Bezeichner des Kontexts zurück, in dem auf die ActionForm dieses Mappings zugegriffen wird.
+    *
+    * @return string - Scope-Bezeichner
+    */
+   public function getScope() {
+      return $this->scope;
+   }
+
+
+   /**
+    * Ob die ActionForm dieses Mappings im Request gespeichert wird.
+    *
+    * @return boolean
+    *
+    * @see ActionMapping::setScope()
+    */
+   public function isRequestScope() {
+      return ($this->scope == 'request');
+   }
+
+
+   /**
+    * Ob die ActionForm dieses Mappings in der HttpSession gespeichert wird.
+    *
+    * @return boolean
+    *
+    * @see ActionMapping::setScope()
+    */
+   public function isSessionScope() {
+      return ($this->scope == 'session');
+   }
+
+
+   /**
     * Setzt das Validate-Flag für die ActionForm des ActionMappings.  Das Flag zeigt an, ob die
     * ActionForm vor Aufruf der Action validiert werden soll oder nicht.  Ohne entsprechende Angabe
     * in der struts-config.xml wird die ActionForm immer validiert.
@@ -294,7 +349,7 @@ class ActionMapping extends Object {
     * @see setDefault()
     */
    public function isDefault() {
-      return ($this->default);
+      return (bool) $this->default;
    }
 
 
@@ -357,11 +412,11 @@ class ActionMapping extends Object {
    /**
     * Sucht und gibt den ActionForward mit dem angegebenen Namen zurück. Zuerst werden die lokalen
     * Forwards des Mappings durchsucht, danach die globalen Forwards des Modules.  Wird kein Forward
-    * gefunden, wird NULL zurückgegeben.  Zusätzlich zu den konfigureierten Forwards kann zur Laufzeit
-    * unter dem speziellen Namen "__self" ein Redirect-Forward auf das ActionMapping selbst abgerufen
+    * gefunden, wird NULL zurückgegeben.  Zusätzlich zu den konfigurierten Forwards kann zur Laufzeit
+    * unter dem geschützten Namen "__self" ein Redirect-Forward auf das ActionMapping selbst abgerufen
     * werden.
     *
-    * @param $name - logischer Name des ActionForwards
+    * @param string $name - logischer Name
     *
     * @return ActionForward
     */
@@ -370,12 +425,15 @@ class ActionMapping extends Object {
          return $this->forwards[$name];
 
       if ($name === ActionForward ::__SELF) {
+         $url = $this->path;
+
          $query = Request ::me()->getQueryString();
-         $url = $this->path.($query===null ? '' : '?'.$query);
+         if (strLen($query))
+            $url .= '?'.$query;
 
          $class = $this->module->getForwardClass();
          $forward = new $class($name, $url, true);
-         //$forward->freeze();  // don't freeze it, user code may want to change it
+         //don't call $forward->freeze(), userland code may want to modify the forward
          return $forward;
       }
 

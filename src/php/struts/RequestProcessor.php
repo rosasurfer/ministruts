@@ -307,7 +307,7 @@ EOT_405;
 
 
    /**
-    * Erzeugt die ActionForm des angegebenen Mappings und gibt sie zurück. Ist keine ActionForm
+    * Erzeugt die ActionForm des angegebenen Mappings bzw. gibt sie zurück. Ist keine ActionForm
     * konfiguriert, wird NULL zurückgegeben.
     *
     * @param Request       $request
@@ -321,9 +321,23 @@ EOT_405;
       if (!$className)
          return null;
 
-      // ActionForm erzeugen und im Request speichern
-      $form = new $className($request);
+      $form = null;
+
+      // ActionForm zuerst in der Session suchen ...
+      if ($mapping->isSessionScope())
+         $form = $request->getSession()->getAttribute($className);
+
+      // ... und bei Mißerfolg neue Instanz erzeugen
+      if (!$form)
+         $form = new $className($request);
+
+
+      // Instanz immer im Request ...
       $request->setAttribute(Struts ::ACTION_FORM_KEY, $form);
+
+      // ... und ggf. auch in der Session speichern
+      if ($mapping->isSessionScope())
+         $request->getSession()->setAttribute($className, $form);
 
       return $form;
    }

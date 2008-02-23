@@ -1,3 +1,11 @@
+2008-02-23
+
+   - struts-config.xml: neues Attribute "scope" im ActionMapping
+     Werte: "request" - ActionForm wird im Request gespeichert (wie bisher)
+            "session" - ActionForm wird in der Session gespeichert (ermöglicht mehrseitige Formulare,
+                        PageWizards etc.)
+
+
 2008-02-16
 
    - php/exceptionsPHPErrorException: im Stacktrace wird ein weiterer Level (der Eintrittspinkt in den

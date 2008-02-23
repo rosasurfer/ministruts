@@ -48,9 +48,9 @@
 <!-- The "struts-config" element is the root of the configuration file hierarchy, and contains
      nested elements for all of the other configuration settings.
 
-     doc-base     One or more base directories to lookup html files.  Values may be absolute or
-                  relative to the WEB-INF directory.  Multiple values are separated by comma ",".
-                  [default: WEB-INF]
+     doc-base   Comma-delimited list of directories to lookup HTML files.  Values may be absolute
+                or relative to the WEB-INF directory.
+                [default: application/WEB-INF]
 -->
 <!ELEMENT struts-config (global-forwards?, action-mappings, tiles?, controller?)>
 <!ATTLIST struts-config
@@ -124,7 +124,11 @@
 
      form       Class name of the [ActionForm] subclass, if any, that is associated with the mapping.
 
-     validate   Only valid if the "form" attribute is specified.  Set to "true" if the ActionForm should
+     scope      The context ("request" or "session") that is used to store and access the ActionForm,
+                if any.  Optional if "form" is specified, else not valid.
+                [default: request]
+
+     validate   Valid only if the "form" attribute is specified.  Set to "true" if the ActionForm should
                 be validated prior to calling the Action object, or set to "false" if you don't want
                 validation at that time.  The default behaviour is "false" when an action object or
                 a forward (include, redirect, forward) is specified, and "true" when no action object
@@ -134,8 +138,7 @@
                 validates user input.  You must configure two nested action forwards named "success"
                 and "error" for this to work.
 
-     method     The HTTP method type the action mapping is restricted to. Legal values are "get" and
-                "post".
+     method     The HTTP method ("get" or "post") the ActionMapping is restricted to.
                 [default: no restrictions]
 
      roles      Comma-delimited list of role names that are allowed access to the action mapping.
@@ -149,16 +152,17 @@
 -->
 <!ELEMENT mapping (set-property*, forward*)>
 <!ATTLIST mapping
-          path          %RequestPath;   #REQUIRED
-          include       %ResourcePath;  #IMPLIED
-          redirect      %RequestPath;   #IMPLIED
-          forward       %LogicalName;   #IMPLIED
-          action        %ClassName;     #IMPLIED
-          form          %ClassName;     #IMPLIED
-          validate      %Boolean;       "true"
-          method        (get|post)      #IMPLIED
-          roles         CDATA           #IMPLIED
-          default       %Boolean;       "false"
+          path          %RequestPath;        #REQUIRED
+          include       %ResourcePath;       #IMPLIED
+          redirect      %RequestPath;        #IMPLIED
+          forward       %LogicalName;        #IMPLIED
+          action        %ClassName;          #IMPLIED
+          form          %ClassName;          #IMPLIED
+          scope         (request|session)    "request"
+          validate      %Boolean;            "true"
+          method        (get|post)           #IMPLIED
+          roles         CDATA                #IMPLIED
+          default       %Boolean;            "false"
 >
 
 

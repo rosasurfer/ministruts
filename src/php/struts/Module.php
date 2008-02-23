@@ -318,9 +318,13 @@ class Module extends Object {
 
 
          // process form attribute
-         if ($tag['form']) {
+         if ($tag['form'])
             $mapping->setForm((string) $tag['form']);
-         }
+
+
+         // process scope attribute
+         if ($tag['scope'])
+            $mapping->setScope((string) $tag['scope']);
 
 
          // process validate attribute
@@ -342,7 +346,8 @@ class Module extends Object {
 
 
          // process method attribute
-         if ($tag['method' ]) $mapping->setMethod ((string) $tag['method' ]);
+         if ($tag['method' ])
+            $mapping->setMethod ((string) $tag['method' ]);
 
 
          // process roles attribute
@@ -353,7 +358,8 @@ class Module extends Object {
 
 
          // process default attribute
-         if ($tag['default']) $mapping->setDefault((string) $tag['default'] == 'true');
+         if ($tag['default'])
+            $mapping->setDefault((string) $tag['default'] == 'true');
 
 
          // child nodes

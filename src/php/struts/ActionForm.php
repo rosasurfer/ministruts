@@ -67,7 +67,7 @@ abstract class ActionForm extends Object {
 
 
    /**
-    * Verhindert das Serialisieren transienter Werte.
+    * Verhindert das Serialisieren transienter Werte.  Wird intern vorm Serialisieren aufgerufen.
     *
     * @return array - Array mit den zu serialisierenden Eigenschaften
     */
@@ -78,6 +78,15 @@ abstract class ActionForm extends Object {
       unset($array["${null}*${null}request"], $array["${null}*${null}actionKey"]);
 
       return array_keys($array);
+   }
+
+
+   /**
+    * Reinitialisiert die transienten Werte dieser Instanz.  Wird intern nach dem Deserialisieren
+    * aufgerufen.
+    */
+   final public function __wakeUp() {
+      $this->__construct(Request ::me());
    }
 }
 ?>
