@@ -217,7 +217,7 @@ class Logger extends StaticClass {
             ini_set('sendmail_from', $_SERVER['SERVER_ADMIN']);                           // nur für Windows relevant
 
          foreach ($addresses as $address) {
-            error_log($mailMsg, 1, $address, 'Subject: PHP error_log: Uncaught Exception at '.(isSet($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '').$_SERVER['PHP_SELF']);
+            error_log($mailMsg, 1, $address, 'Subject: PHP error_log: Uncaught Exception at '.(isSet($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : '').$_SERVER['PHP_SELF']);
          }
          ini_set('sendmail_from', $old_sendmail_from);
       }
@@ -364,7 +364,7 @@ class Logger extends StaticClass {
             ini_set('sendmail_from', $_SERVER['SERVER_ADMIN']);                           // nur für Windows relevant
 
          foreach ($addresses as $address) {
-            error_log($mailMsg, 1, $address, 'Subject: PHP error_log: '.self::$logLevels[$level].' at '.(isSet($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '').$_SERVER['PHP_SELF']);
+            error_log($mailMsg, 1, $address, 'Subject: PHP error_log: '.self::$logLevels[$level].' at '.(isSet($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : '').$_SERVER['PHP_SELF']);
          }
          ini_set('sendmail_from', $old_sendmail_from);
       }
