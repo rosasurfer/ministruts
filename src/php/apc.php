@@ -436,12 +436,15 @@ if (isset($MYREQUEST['IMG']))
 
 // pretty printer for byte values
 //
-function bsize($s) {
+function bsize($s, $long = true) {
    foreach (array('','K','M','G') as $i => $k) {
       if ($s < 1024) break;
       $s/=1024;
    }
-   return sprintf("%5.1f %sBytes",$s,$k);
+   $str = sprintf("%5.1f %sB",$s,$k);
+   if ($long)
+      $str .= 'ytes';
+   return $str;
 }
 
 // sortable table header in "scripts for this host" view
@@ -1086,7 +1089,7 @@ EOB;
           '<tr class=tr-',$i%2,'>',
           "<td class=td-0><a href=\"$MY_SELF&OB=",$MYREQUEST['OB'],"&SH=",md5($entry[$fieldkey]),"\">",$entry[$fieldname],'</a></td>',
           '<td class="td-n center">',$entry['num_hits'],'</td>',
-          '<td class="td-n right">',$entry['mem_size'],'</td>',
+          '<td class="td-n right">',bsize($entry['mem_size'], false),'</td>',
           '<td class="td-n center" nowrap>',date(DATE_FORMAT,$entry['access_time']),'</td>',
           '<td class="td-n center" nowrap>',date(DATE_FORMAT,$entry['mtime']),'</td>',
           '<td class="td-n center" nowrap>',date(DATE_FORMAT,$entry['creation_time']),'</td>';
