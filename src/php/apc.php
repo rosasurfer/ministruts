@@ -1089,7 +1089,7 @@ EOB;
           '<tr class=tr-',$i%2,'>',
           "<td class=td-0><a href=\"$MY_SELF&OB=",$MYREQUEST['OB'],"&SH=",md5($entry[$fieldkey]),"\">",$entry[$fieldname],'</a></td>',
           '<td class="td-n center">',$entry['num_hits'],'</td>',
-          '<td class="td-n right">',bsize($entry['mem_size'], false),'</td>',
+          '<td class="td-n right" nowrap>',bsize($entry['mem_size'], false),'</td>',
           '<td class="td-n center" nowrap>',date(DATE_FORMAT,$entry['access_time']),'</td>',
           '<td class="td-n center" nowrap>',date(DATE_FORMAT,$entry['mtime']),'</td>',
           '<td class="td-n center" nowrap>',date(DATE_FORMAT,$entry['creation_time']),'</td>';
