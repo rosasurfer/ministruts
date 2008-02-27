@@ -8,10 +8,11 @@ class TorHelper extends StaticClass {
    private static $torMirrors = array('torstatus.all.de'        ,
                                       'torstatus.blutmagie.de'  ,
                                       'torstatus.torproxy.net'  ,
-                                      'tns.hermetix.org'        ,
-                                      'arachne.doesntexist.org' ,
                                       'kradense.whsites.net/tns',
                                       'torstatus.kgprog.com'    ,
+                                      'torstatus.cyberphunk.org',
+                                      'arachne.doesntexist.org' ,
+                                      'tns.hermetix.org'        ,
                                      );
 
 
@@ -23,6 +24,12 @@ class TorHelper extends StaticClass {
     * @return boolean
     */
    public static function isExitNode($ip) {
+      if (!is_string($ip)) throw new IllegalTypeException('Illegal type of parameter $ip: '.getType($ip));
+
+      // TODO: mit Filter-Extension lokale Netze abfangen
+      if ($ip == '127.0.0.1')
+         return false;
+
       $nodes =& self:: getExitNodes();
       return isSet($nodes[$ip]);
    }
