@@ -194,7 +194,6 @@ class Logger extends StaticClass {
 
 
       // 3. Exception an die registrierten Adressen mailen (wenn $mail TRUE ist) ...
-      $success = false;
       if (self::$mail && ($addresses[] = Config::get('mail.buglovers'))) {
          $mailMsg  = $plainMessage."\n\n".$message."\n\n\n".$traceStr;
 
@@ -219,14 +218,16 @@ class Logger extends StaticClass {
 
          foreach ($addresses as $address) {
             $success = error_log($mailMsg, 1, $address, 'Subject: PHP error_log: Uncaught Exception at '.(isSet($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : '').$_SERVER['PHP_SELF']);
-            if (!$success)
+            if (!$success) {
+               error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', $plainMessage), 0);
                break;
+            }
          }
          ini_set('sendmail_from', $old_sendmail_from);
       }
 
       // ... oder Exception ins Error-Log schreiben, falls sie nicht schon angezeigt wurde
-      if (!self::$display || !$success) {
+      elseif (!self::$display) {
          error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', $plainMessage), 0);      // Zeilenumbrüche entfernen
       }
 
@@ -342,7 +343,6 @@ class Logger extends StaticClass {
 
 
       // 3. Logmessage an die registrierten Adressen mailen (wenn $mail TRUE ist) ...
-      $success = false;
       if (self::$mail && ($addresses[] = Config::get('mail.buglovers'))) {
          $mailMsg = $plainMessage;
          if ($exception)
@@ -369,14 +369,16 @@ class Logger extends StaticClass {
 
          foreach ($addresses as $address) {
             $success = error_log($mailMsg, 1, $address, 'Subject: PHP error_log: '.self::$logLevels[$level].' at '.(isSet($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : '').$_SERVER['PHP_SELF']);
-            if (!$success)
+            if (!$success) {
+               error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', $plainMessage), 0);
                break;
+            }
          }
          ini_set('sendmail_from', $old_sendmail_from);
       }
 
       // ... oder Logmessage ins Error-Log schreiben, falls sie nicht schon angezeigt wurde
-      if (!self::$display || !$success) {
+      elseif (!self::$display) {
          error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', $plainMessage), 0);      // Zeilenumbrüche entfernen
       }
    }
