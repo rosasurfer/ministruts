@@ -52,19 +52,19 @@ class HttpSession extends Singleton {
          }
          catch (PHPErrorException $error) {
             if (strPos($error->getMessage(), 'The session id contains illegal characters') === false)
-               throw $error;              // andere Fehler weiterreichen
-            session_regenerate_id();      // neue ID generieren
+               throw $error;                 // andere Fehler weiterreichen
+            session_regenerate_id();         // neue ID generieren
          }
       }
 
-      // Session prüfen
+      // Alter der Session prüfen
       if (sizeOf($_SESSION) == 0) {          // neue Session gestartet, woher kommt die ID ?
          $sName = session_name();
          $sId   = session_id();
 
          // TODO: Verwendung von $_COOKIE und $_REQUEST ist unsicher
-         if     (isSet($_COOKIE [$sName]) && $_COOKIE [$sName] == $sId) $fromUser = true;    // vom Cookie
-         elseif (isSet($_REQUEST[$sName]) && $_REQUEST[$sName] == $sId) $fromUser = true;    // aus GET/POST
+         if     (isSet($_COOKIE [$sName]) && $_COOKIE [$sName] == $sId) $fromUser = true;    // ID kommt vom Cookie
+         elseif (isSet($_REQUEST[$sName]) && $_REQUEST[$sName] == $sId) $fromUser = true;    // ID kommt aus GET/POST
          else                                                           $fromUser = false;
 
          if ($fromUser)

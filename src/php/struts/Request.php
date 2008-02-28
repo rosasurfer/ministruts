@@ -457,6 +457,24 @@ final class Request extends Singleton {
 
 
    /**
+    * Zerstört die aktuelle HttpSession des Requests.
+    *
+    * @return boolean
+    */
+   public function destroySession() {
+      if ($this->isSession()) {
+         // TODO: 1. Cookie mit 2. überschreiben statt einen weiteren hinzuzufügen
+         // besser einen schon gesetzten Cookie mit header($replace = true) überschreiben
+         // außerdem soll $value = '' nicht immer funktionieren, besser: $value = sess_id()
+
+         // TODO: SID und die gesamte Session zurücksetzen
+         setcookie(session_name(), '', time() - 1*DAY, '/');
+         session_destroy();
+      }
+   }
+
+
+   /**
     * Gibt alle Request-Header zurück.
     *
     * @return array
@@ -573,6 +591,30 @@ final class Request extends Singleton {
    public function removeAttributes($key /*, $key2, $key3 ...*/) {
       foreach (func_get_args() as $key)
          unset($this->attributes[$key]);
+   }
+
+
+   /**
+    * Setzt einen Cookie mit den angegebenen Daten.
+    *
+    * @param string $name    - Name des Cookies
+    * @param mixed  $value   - der zu speichernde Wert (wird zu String gecastet)
+    * @param int    $expires - Lebenszeit des Cookies (0: bis zum Schließen des Browsers)
+    * @param string $path    - Pfad, für den der Cookie gültig sein soll
+    */
+   public function setCookie($name, $value, $expires = 0, $path = null) {
+      if (!is_string($name)) throw new IllegalTypeException('Illegal type of argument $name: '.getType($name));
+      if (!is_int($expires)) throw new IllegalTypeException('Illegal type of argument $expires: '.getType($expires));
+      if ($expires < 0)      throw new InvalidArgumentException('Invalid argument $expires: '.$expires);
+
+      $value = (string) $value;
+
+      if ($path === null)
+         $path = $this->getApplicationPath().'/';
+
+      if (!is_string($path)) throw new IllegalTypeException('Illegal type of argument $path: '.getType($path));
+
+      setCookie($name, $value, $expires, $path);
    }
 
 
