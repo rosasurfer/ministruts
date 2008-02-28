@@ -131,6 +131,7 @@ abstract class PersistableObject extends Object implements IDaoConnected {
       else {
          //Logger ::log('Nothing to save, '.get_class($this).' instance is in sync with the database.', L_NOTICE, __CLASS__);
       }
+      $this->isModified = false;
    }
 
 
