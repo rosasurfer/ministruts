@@ -26,6 +26,10 @@ class HttpSession extends Singleton {
     * @param Request $request - der Request, zu dem die Session gehört
     */
    protected function __construct(Request $request) {
+      // Prüfen, ob schon außerhalb dieser Klasse eine Session gestartet wurde
+      if ($request->isSession())
+         throw new IllegalStateException('Cannot initialize '.__CLASS__.', found already started session. Use this class *only* for session handling!');
+
       $this->request = $request;
       $this->init();
    }
@@ -45,17 +49,24 @@ class HttpSession extends Singleton {
        * Aus Sicherheitsgründen wird eine solche Session verworfen und eine neue ID erzeugt.
        */
 
-      // Session starten oder fortsetzen
-      if (!$this->request->isSession()) {
-         try {
-            session_start();
-         }
-         catch (PHPErrorException $error) {
-            if (strPos($error->getMessage(), 'The session id contains illegal characters') === false)
-               throw $error;                 // andere Fehler weiterreichen
-            session_regenerate_id();         // neue ID generieren
-         }
+      // Session-Cookie auf Application beschränken, um mehrere Projekte je Domain zu ermöglichen
+      $params = session_get_cookie_params();
+      session_set_cookie_params($params['lifetime'],
+                                $this->request->getApplicationPath().'/',
+                                $params['domain'],
+                                $params['secure'],
+                                $params['httponly']);
+
+      // Session starten bzw. fortsetzen
+      try {
+         session_start();
       }
+      catch (PHPErrorException $error) {
+         if (strPos($error->getMessage(), 'The session id contains illegal characters') === false)
+            throw $error;                 // andere Fehler weiterreichen
+         session_regenerate_id();         // neue ID generieren
+      }
+
 
       // Inhalt der Session prüfen
       if (sizeOf($_SESSION) == 0) {          // 0 bedeutet, die Session ist (für diese Methode) neu
