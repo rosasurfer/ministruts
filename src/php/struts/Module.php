@@ -266,6 +266,7 @@ class Module extends Object {
          // attributes
          // ----------
          // process path attribute
+         // TODO: die konfigurierten Pfade werden nicht auf Eindeutigkeit geprüft
          $path = String ::decodeUtf8((string) $tag['path']);
          $mapping->setPath($path);
 
