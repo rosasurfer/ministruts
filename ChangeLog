@@ -1,3 +1,9 @@
+2008-03-01
+
+   - Tiles: In jedem Html-Fragement steht eine Variable $session mit der aktuellen HttpSession zur Verfügung.
+     Existiert keine Session, ist diese Variable NULL.
+
+
 2008-02-23
 
    - struts-config.xml: neues Attribute "scope" im ActionMapping

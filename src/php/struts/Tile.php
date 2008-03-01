@@ -181,16 +181,15 @@ class Tile extends Object {
 
       $request  = Request  ::me();
       $response = Response ::me();
+      $session  = $request->isSession() ? $request->getSession() : null;
       $form     = $request->getAttribute(Struts ::ACTION_FORM_KEY);
       $PAGE     = PageContext ::me();
 
-      echo ($this->parent ? "\n":null)."<!-- #begin: ".$this->label." -->\n";
+      echo ($this->parent ? "\n" : null)."<!-- #begin: ".$this->label." -->\n";
 
       include($this->path);
 
       echo "\n<!-- #end: ".$this->label." -->\n";
-
-      //$__tplName = subStr($this->path, 0, strRPos($this->path, '.'));
    }
 }
 ?>

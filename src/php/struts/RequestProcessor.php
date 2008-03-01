@@ -429,7 +429,8 @@ EOT_405;
       $forward = null;
       $throwable = null;
 
-      // Alles kapseln, damit Postprocessing-Hook auch nach Exceptions aufgerufen werden kann (z.B. Transaction-Rollback o.ä.)
+      // Alles kapseln, damit Postprocessing-Hook auch nach Auftreten einer Exception aufgerufen
+      // werden kann (z.B. Transaction-Rollback o.ä.)
       try {
          // allgemeinen Preprocessing-Hook aufrufen
          $forward = $action->executeBefore($request, $response);
@@ -437,6 +438,9 @@ EOT_405;
          // Action nur ausführen, wenn executeBefore() nicht schon Abbruch signalisiert hat
          if ($forward === null)
             $forward = $action->execute($request, $response);
+
+         if ($forward === null)
+            $this->logInfo && Logger ::log('ActionForward of NULL returned from Action::execute()', L_INFO, __CLASS__);
       }
       catch (Exception $ex) {
          $throwable = $ex;    // evt. aufgetretene Exception zwischenspeichern

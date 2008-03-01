@@ -628,13 +628,13 @@ final class Request extends Singleton {
    public function isUserInRole($roles) {
       if (!is_string($roles)) throw new IllegalTypeException('Illegal type of argument $roles: '.getType($roles));
 
-      // RoleProcessor holen und Aufruf weiterreichen
+      // RoleProcessor holen ...
       $processor = $this->getAttribute(Struts ::MODULE_KEY)
                         ->getRoleProcessor();
-      if ($processor)
-         return $processor->isUserInRole($this, $roles);
+      if (!$processor) throw new RuntimeException('You can not call '.__METHOD__.'() without a configured RoleProcessor');
 
-      return false;
+      // ... und Aufruf weiterreichen
+      return $processor->isUserInRole($this, $roles);
    }
 
 
