@@ -38,11 +38,11 @@ class HttpSession extends Singleton {
       /**
        * PHP läßt sich ohne weiteres manipulierte Session-IDs unterschieben, solange diese keine
        * ungültigen Zeichen enthalten (IDs wie PHPSESSID=111 werden anstandslos akzeptiert). Wenn
-       * session_start() zurückkehrt, gibt es mit den eingebauten PHP-Mitteln keine elegante Möglichkeit
-       * mehr, festzustellen, ob die Session-ID von PHP oder vom User generiert wurde. Daher wird in
-       * jeder Session mit neuer ID eine zusätzliche Markierungsvariable gespeichert. Fehlt diese
-       * Markierung nach der Initialisierung, wurde die ID nicht hier generiert. In diesem Fall wird
-       * die Session aus Sicherheitsgründen verworfen und eine neue erzeugt.
+       * session_start() zurückkehrt, gibt es mit den vorhandenen PHP-Mitteln keine vernünftige
+       * Möglichkeit mehr, festzustellen, ob die Session-ID von PHP oder vom User generiert wurde.
+       * Daher wird in dieser Methode jede neue Session mit einer zusätzliche Markierung versehen.
+       * Fehlt diese Markierung nach Rückkehr von session_start(), wurde die ID nicht hier generiert.
+       * Aus Sicherheitsgründen wird eine solche Session verworfen und eine neue ID erzeugt.
        */
 
       // Session starten oder fortsetzen
@@ -57,15 +57,15 @@ class HttpSession extends Singleton {
          }
       }
 
-      // Alter der Session prüfen
-      if (sizeOf($_SESSION) == 0) {          // neue Session gestartet, woher kommt die ID ?
-         $sName = session_name();
-         $sId   = session_id();
+      // Inhalt der Session prüfen
+      if (sizeOf($_SESSION) == 0) {          // 0 bedeutet, die Session ist (für diese Methode) neu
+         $sessionName = session_name();
+         $sessionId   = session_id();        // prüfen, woher die ID kommt ...
 
          // TODO: Verwendung von $_COOKIE und $_REQUEST ist unsicher
-         if     (isSet($_COOKIE [$sName]) && $_COOKIE [$sName] == $sId) $fromUser = true;    // ID kommt vom Cookie
-         elseif (isSet($_REQUEST[$sName]) && $_REQUEST[$sName] == $sId) $fromUser = true;    // ID kommt aus GET/POST
-         else                                                           $fromUser = false;
+         if     (isSet($_COOKIE [$sessionName]) && $_COOKIE [$sessionName] == $sessionId) $fromUser = true; // ID kommt vom Cookie
+         elseif (isSet($_REQUEST[$sessionName]) && $_REQUEST[$sessionName] == $sessionId) $fromUser = true; // ID kommt aus GET/POST
+         else                                                                             $fromUser = false;
 
          if ($fromUser)
             session_regenerate_id(true);     // neue ID generieren und alte Datei löschen
