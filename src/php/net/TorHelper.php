@@ -55,12 +55,12 @@ class TorHelper extends StaticClass {
                $status = $response->getStatus();
 
                if ($status != 200) {
-                  Logger ::log('Could not get Tor exit nodes, got HTTP status '.$status.' ('.HttpResponse ::$sc[$status].') for url: '.$request->getUrl(), L_NOTICE, __CLASS__);
+                  Logger ::log('Could not get Tor exit nodes from '.self::$torMirrors[$i].', HTTP status '.$status.' ('.HttpResponse ::$sc[$status]."),\n url: ".$request->getUrl(), L_NOTICE, __CLASS__);
                   continue;
                }
             }
             catch (IOException $ex) {
-               Logger ::log('Could not get Tor exit nodes, got '.$ex.' for url: '.$request->getUrl(), L_NOTICE, __CLASS__);
+               Logger ::log('Could not get Tor exit nodes from '.self::$torMirrors[$i], $ex, L_NOTICE, __CLASS__);
                continue;
             }
 
@@ -71,7 +71,7 @@ class TorHelper extends StaticClass {
          $nodes = strLen($content) ? array_flip(explode("\n", str_replace("\r\n", "\n", $content))) : array();
 
          if (sizeOf($nodes) == 0) {
-            Logger ::log('Could not get Tor exit nodes from any mirror', L_ERROR, __CLASS__);
+            Logger ::log('Could not get Tor exit nodes from any server', L_ERROR, __CLASS__);
          }
 
          Cache ::set($key, $nodes, 10 * MINUTE, null, __FILE__);

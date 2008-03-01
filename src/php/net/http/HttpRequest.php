@@ -64,7 +64,7 @@ final class HttpRequest extends Object {
 
 
    /**
-    * Gibt due URL dieses Requests zurück.
+    * Gibt die URL dieses Requests zurück.
     *
     * @return string $url
     */

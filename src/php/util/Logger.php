@@ -290,15 +290,11 @@ class Logger extends StaticClass {
 
 
    /**
-    * Loggt eine Message und/oder eine Exception.
+    * Loggt eine Message und/oder eine Exception.  Je nach aktueller Laufzeitumgebung wird die Logmeldung
+    * entweder am Bildschirm angezeigt, an die konfigurierten E-Mailadressen gemailt oder ins PHP-Errorlog
+    * geschrieben.
     *
-    * Ablauf:
-    * -------
-    * - prüfen, ob Message vom aktuellen Loglevel abgedeckt wird
-    * - Anzeige der Message
-    * - entweder Benachrichtigungsmail verschicken oder Message ins Errorlog schreiben
-    *
-    * @param mixed     $message   - zu loggende Message
+    * @param string    $message   - zu loggende Message
     * @param Exception $exception - zu loggende Exception
     * @param int       $level     - zu loggender Loglevel
     */
