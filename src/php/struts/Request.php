@@ -728,7 +728,6 @@ final class Request extends Singleton {
     * Verhindert das Serialisieren von Request-Instanzen.
     */
    final public function __sleep() {
-      $ex = new IllegalStateException('You cannot serialize me: '.__CLASS__);
       /**
        * TODO: Definition des Exceptionhandlers aus Root-Script entfernen, damit Fehler abgefangen werden
        *
@@ -742,6 +741,8 @@ final class Request extends Singleton {
        *
        *   Fatal error: Exception thrown without a stack frame in Unknown on line 0
        */
+
+      $ex = new IllegalStateException('You cannot serialize me: '.__CLASS__);
       Logger ::log($ex, L_ERROR, __CLASS__);
       throw $ex;
    }
