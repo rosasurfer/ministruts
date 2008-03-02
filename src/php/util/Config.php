@@ -111,7 +111,7 @@ final class Config extends Singleton {
          // Key und Value trennen
          $parts = explode('=', $line, 2);
          if (sizeOf($parts) < 2)
-            throw new RuntimeException('Syntax error in "'.$filename.'" at line: "'.$line.'"');
+            throw new RuntimeException('Syntax error in configuration file "'.$filename.'" at line: "'.$line.'"');
 
          // Eigenschaft setzen
          $this->setProperty(trim($parts[0]), trim($parts[1]), false); // Cache nicht aktualisieren
@@ -120,15 +120,30 @@ final class Config extends Singleton {
 
 
    /**
-    * Gibt die unter dem angegebenen Schlüssel gespeicherte Konfigurationseinstellung zurück oder NULL,
-    * wenn unter diesem Schlüssel keine Einstellung existiert.
+    * Gibt die unter dem angegebenen Schlüssel gespeicherte Einstellung zurück.  Existiert die Einstellung
+    * nicht, wird statt dessen ein angegebener Defaultwert zurückgegeben.
     *
-    * @param string $key - Schlüssel
+    * @param string $key     - Schlüssel
+    * @param mixed  $default - Defaultwert
     *
-    * @return mixed - String oder Array mit Konfigurationseinstellungen
+    * @return mixed - Konfigurationseinstellung
+    *
+    * @throws RuntimeException - wenn unter dem angegebenen Schlüssel keine Einstellung existiert und
+    *                            kein Defaultwert angegeben wurde
     */
-   public static function get($key) {
-      return self ::me()->getProperty($key);
+   public static function get($key, $default = null) {
+      if (!is_string($key)) throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
+
+      $value = self ::me()->getProperty($key);
+
+      if ($value === null) {
+         if (func_num_args() == 1)
+            throw new RuntimeException('Missing configuration setting for key "'.$key.'"');
+
+         return $default;
+      }
+
+      return $value;
    }
 
 
@@ -145,6 +160,7 @@ final class Config extends Singleton {
    public static function set($key, $value) {
       if (!is_string($key))   throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
       if (!is_string($value)) throw new IllegalTypeException('Illegal type of argument $value: '.getType($value));
+
       return self ::me()->setProperty($key, $value);
    }
 
@@ -180,11 +196,11 @@ final class Config extends Singleton {
    /**
     * @param string  $key
     * @param string  $value
-    * @param boolean $updateCache
+    * @param boolean $persist
     *
     * @see Config::set()
     */
-   private function setProperty($key, $value, $updateCache = true) {
+   private function setProperty($key, $value, $persist = true) {
       $properties =& $this->properties;
 
       $parts = explode('.', $key);
@@ -215,8 +231,8 @@ final class Config extends Singleton {
          }
       }
 
-      // Cache aktualisieren, wenn Instanz dort gespeichert ist
-      if ($updateCache && Cache ::isCached(__CLASS__))
+      // Cache aktualisieren, falls die Config-Instanz dort gespeichert ist
+      if ($persist && Cache ::isCached(__CLASS__))
          Cache ::set(__CLASS__, $this);
    }
 }
