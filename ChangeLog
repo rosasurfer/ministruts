@@ -1,3 +1,13 @@
+2008-03-02
+
+   - php/util/Config::get($key, $default): zusätzlicher Parameter $default;
+     Dieser Defaultwert wird zurückgegeben, wenn der Schlüssel $key nicht existiert. Ohne Defaultwert wird bei
+     nicht existierendem Schlüssel eine RuntimeException geworfen. Möchte man eine Exception verhindern und keinen
+     Defaultwert angeben (altes Verhalten), ruft man die Methode mit $default = NULL auf:
+
+        $value = Config::get('myKey', null);
+
+
 2008-03-01
 
    - Tiles: In jedem Html-Fragement steht eine Variable $session mit der aktuellen HttpSession zur Verfügung.
