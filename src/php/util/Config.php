@@ -12,23 +12,22 @@
  * Dateiformat:
  * ------------
  * Einstellungen werden als "name = wert" abgelegt. Kommentare werden mit einem Hash "#" eingeleitet.
- * Leerzeilen und führende oder abschließende Leerzeichen werden ignoriert. Einstellungen können
- * gruppiert werden, eine solche Gruppe kann einzeln (Rückgabewert ist ein String ) oder komplett
- * (Rückgabewert ist ein assoziatives Array) abgefragt werden.
+ * Leerzeilen, führende und abschließende Leerzeichen werden ignoriert. Einstellungen können gruppiert
+ * werden, eine solche Gruppe kann einzeln (Rückgabewert: String ) oder komplett (Rückgabewert: assoziatives
+ * Array) abgefragt werden.
  *
  * Beispiel:
  * ---------
- *
  * db.connector = mysql
  * db.host      = localhost:3306
  * db.username  = myapp_user
  * db.password  = plainpassword
  * db.database  = db_test
  *
- * # ein Komentar in einer eigenen Zeile
+ * # Kommentar in eigener Zeile
  *
  * logger.php.struts        = info
- * logger.php.struts.Action = warn              # ein weiterer Kommentar innerhalb der Zeile
+ * logger.php.struts.Action = warn          # Kommentar innerhalb einer Zeile
  */
 final class Config extends Singleton {
 
@@ -121,7 +120,7 @@ final class Config extends Singleton {
 
    /**
     * Gibt die unter dem angegebenen Schlüssel gespeicherte Einstellung zurück.  Existiert die Einstellung
-    * nicht, wird statt dessen ein angegebener Defaultwert zurückgegeben.
+    * nicht, wird statt dessen der angegebene Defaultwert zurückgegeben.
     *
     * @param string $key     - Schlüssel
     * @param mixed  $default - Defaultwert
