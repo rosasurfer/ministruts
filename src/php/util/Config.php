@@ -120,10 +120,10 @@ final class Config extends Singleton {
 
    /**
     * Gibt die unter dem angegebenen Schlüssel gespeicherte Einstellung zurück.  Existiert die Einstellung
-    * nicht, wird statt dessen der angegebene Defaultwert zurückgegeben.
+    * nicht, wird der angegebene Defaultwert zurückgegeben.
     *
     * @param string $key     - Schlüssel
-    * @param mixed  $default - Defaultwert
+    * @param mixed  $default - Defaultwert (kann auch NULL sein, um z.B. eine Exception zu verhindern)
     *
     * @return mixed - Konfigurationseinstellung
     *
