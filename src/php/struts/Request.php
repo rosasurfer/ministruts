@@ -202,7 +202,7 @@ final class Request extends Singleton {
 
    /**
     * Gibt den einfachen Domainnamen des Servers zurück, über den der Request läuft.  Dieser Wert
-    * enthält keine Subdomains.
+    * enthält keine Subdomain.
     *
     * z.B.: domain.tld
     *
@@ -213,9 +213,9 @@ final class Request extends Singleton {
 
       if (!$domain) {
          $parts = array_reverse(explode('.', $this->getHostname()));
-
          $domain = $parts[0];
 
+         // TODO: Implementierung von Request::getDomainName() ist buggy
          if (sizeOf($parts) > 1 && $parts[1]!='www' && $parts[1]!='local')
             $domain = $parts[1].'.'.$domain;
       }
