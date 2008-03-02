@@ -1,8 +1,17 @@
 2008-03-02
 
-   - php/util/Config::get($key, $default): zusätzlicher Parameter $default;
+   - struts-config.xml: Attribut umbenannt: /struts-config/action-mappings/mapping/[@method] -> [@methods]
+
+   - struts-config.xml: /struts-config/action-mappings/mapping/[@methods]:  Default-Wert auf "GET" gesetzt, d.h.,
+     daß dieses Attribut in den meisten Fällen nicht mehr angegeben werden muß. Nur POST-URL's müssen noch extra
+     konfiguriert werden. Sollen GET und POST unterstützt werden, werden beide Methoden kommagetrennt angegeben:
+
+        methods="get,post"
+
+
+   - php/util/Config::get($key, $default): zusätzlicher Parameter $default
      Dieser Defaultwert wird zurückgegeben, wenn der Schlüssel $key nicht existiert. Ohne Defaultwert wird bei
-     nicht existierendem Schlüssel eine RuntimeException geworfen. Möchte man eine Exception verhindern und keinen
+     nicht existierendem Schlüssel eine RuntimeException geworfen. Möchte man diese Exception verhindern, aber keinen
      Defaultwert angeben (altes Verhalten), ruft man die Methode mit $default = NULL auf:
 
         $value = Config::get('myKey', null);

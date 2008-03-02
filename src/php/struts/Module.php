@@ -346,9 +346,16 @@ class Module extends Object {
          $mapping->setValidate($validate);
 
 
-         // process method attribute
-         if ($tag['method' ])
-            $mapping->setMethod ((string) $tag['method' ]);
+         // process method attributes
+         if ($tag['methods' ]) {
+            $methods = explode(',', (string) $tag['methods']);
+            foreach ($methods as $method) {
+               $mapping->setMethod(trim($method));
+            }
+         }
+         else {
+            $mapping->setMethod('GET');   // default: GET
+         }
 
 
          // process roles attribute

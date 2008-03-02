@@ -12,14 +12,14 @@ class ActionMapping extends Object {
    protected $configured = false;
 
 
-   protected $path;              // string
-   protected $action;            // string
-   protected $form;              // string
-   protected $scope = 'request'; // string
-   protected $validate;          // boolean
-   protected $method;            // string
-   protected $roles;             // string
-   protected $default = false;   // boolean
+   protected $path;                 // string
+   protected $action;               // string
+   protected $form;                 // string
+   protected $scope   = 'request';  // string
+   protected $validate;             // boolean
+   protected $methods;              // array
+   protected $roles;                // string
+   protected $default = false;      // boolean
 
 
    /**
@@ -88,20 +88,24 @@ class ActionMapping extends Object {
 
 
    /**
-    * Gibt die Methodenbeschränkung dieses Mappings zurück.
+    * Ob das Mapping für die angegebene HTTP-Methode konfiguriert wurde.
     *
-    * @return string - Name einer HTTP-Methode oder NULL, wenn keine Einschränkung existiert
+    * @param string $method - HTTP-Methode
+    *
+    * @return boolean
     */
-   public function getMethod() {
-      return $this->method;
+   public function isSupportedMethod($method) {
+      if (!is_string($method)) throw new IllegalTypeException('Illegal type of argument $method: '.getType($method));
+
+      return isSet($this->methods[strToUpper($method)]);
    }
 
 
    /**
-    * Setzt die Methodenbeschränkung dieses Mappings.  Requests, die nicht der angegebenen Methode
-    * entsprechen, werden abgewiesen.
+    * Setzt die HTTP-Methoden, die dieses Mapping unterstützt.  Requests einer nicht konfigurierten
+    * Methode werden abgewiesen.
     *
-    * @param string $method - HTTP-Methode, "GET" oder "POST"
+    * @param string $method - HTTP-Methode ("GET", "POST")
     *
     * @return ActionMapping
     */
@@ -111,7 +115,7 @@ class ActionMapping extends Object {
       $method = strToUpper($method);
       if ($method!=='GET' && $method!=='POST') throw new InvalidArgumentException('Invalid argument $method: '.$method);
 
-      $this->method = $method;
+      $this->methods[$method] = true;
       return $this;
    }
 

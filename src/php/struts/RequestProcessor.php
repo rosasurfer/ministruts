@@ -246,13 +246,11 @@ EOT_404;
     * @return boolean
     */
    protected function processMethod(Request $request, Response $response, ActionMapping $mapping) {
-      $method = $mapping->getMethod();
-
-      if (!$method || $method==$request->getMethod())
+      if ($mapping->isSupportedMethod($request->getMethod()))
          return true;
 
       // Beschränkung nicht erfüllt
-      $this->logDebug && Logger ::log('Request does not have the required method type, denying access', L_DEBUG, __CLASS__);
+      $this->logDebug && Logger ::log('HTTP method "'.$request->getMethod().'" is not supported by ActionMapping, denying access', L_DEBUG, __CLASS__);
 
 
       // TODO: Status-Code 405 im HttpResponse setzen

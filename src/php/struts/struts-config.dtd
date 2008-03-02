@@ -138,8 +138,8 @@
                 validates user input.  You must configure two nested action forwards named "success"
                 and "error" for this to work.
 
-     method     The HTTP method ("get" or "post") the ActionMapping is restricted to.
-                [default: no restrictions]
+     methods    Comma-delimited list of HTTP method names ("get", "post") the ActionMapping is supporting.
+                [default: get]
 
      roles      Comma-delimited list of role names that are allowed access to the action mapping.
                 [default: none]
@@ -152,17 +152,17 @@
 -->
 <!ELEMENT mapping (set-property*, forward*)>
 <!ATTLIST mapping
-          path          %RequestPath;        #REQUIRED
-          include       %ResourcePath;       #IMPLIED
-          redirect      %RequestPath;        #IMPLIED
-          forward       %LogicalName;        #IMPLIED
-          action        %ClassName;          #IMPLIED
-          form          %ClassName;          #IMPLIED
-          scope         (request|session)    "request"
-          validate      %Boolean;            "true"
-          method        (get|post)           #IMPLIED
-          roles         CDATA                #IMPLIED
-          default       %Boolean;            "false"
+          path          %RequestPath;                 #REQUIRED
+          include       %ResourcePath;                #IMPLIED
+          redirect      %RequestPath;                 #IMPLIED
+          forward       %LogicalName;                 #IMPLIED
+          action        %ClassName;                   #IMPLIED
+          form          %ClassName;                   #IMPLIED
+          scope         (request|session)             "request"
+          validate      %Boolean;                     "true"
+          methods       CDATA                         "get"
+          roles         CDATA                         #IMPLIED
+          default       %Boolean;                     "false"
 >
 
 
