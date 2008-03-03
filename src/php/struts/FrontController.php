@@ -84,6 +84,8 @@ final class FrontController extends Singleton {
       $this->logInfo   = ($loglevel <= L_INFO  );
       $this->logNotice = ($loglevel <= L_NOTICE);
 
+      // TODO: keine Fehlermeldung bei falschem $_SERVER['APPLICATION_PATH'] ( z.B. 'myapp/' statt '/myapp')
+
       // Umgebung prüfen:  Ist der Zugriff auf WEB-INF und CVS-Daten gesperrt ?
       $baseURL = Request ::me()->getApplicationURL();
       $locations = array($baseURL.'/WEB-INF',
