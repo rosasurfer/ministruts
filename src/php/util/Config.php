@@ -120,14 +120,15 @@ final class Config extends Singleton {
       foreach ($paths as $key => $path) {
          $path = realPath($path);
          if ($path) {
-            if (is_file($file = $path.DIRECTORY_SEPARATOR.'config-custom.properties')) $files[] = $file;
-            if (is_file($file = $path.DIRECTORY_SEPARATOR.'config.properties'))        $files[] = $file;
+            if (is_file($file = $path.DIRECTORY_SEPARATOR.'config-custom.properties')) $files[$file] = $file; // assoz. Array verhindert doppelte Einträge
+            if (is_file($file = $path.DIRECTORY_SEPARATOR.'config.properties'))        $files[$file] = $file;
          }
       }
 
 
       // wir laden die Dateien von der Wurzel aus und überschreiben alle vorhandenen Werte
       $files = array_reverse($files);
+
 
       // gefundene Dateien laden
       foreach ($files as $file) {

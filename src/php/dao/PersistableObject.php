@@ -120,8 +120,10 @@ abstract class PersistableObject extends Object implements IDaoConnected {
 
    /**
     * Speichert diese Instanz in der Datenbank.
+    *
+    * @return PersistableObject
     */
-   public function save() {
+   final public function save() {
       if (!$this->isPersistent()) {
          $this->insert();
       }
@@ -132,12 +134,16 @@ abstract class PersistableObject extends Object implements IDaoConnected {
          //Logger ::log('Nothing to save, '.get_class($this).' instance is in sync with the database.', L_NOTICE, __CLASS__);
       }
       $this->isModified = false;
+
+      return $this;
    }
 
 
    /**
     * Fügt diese Instanz in die Datenbank ein.  Diese Methode muß von der konkreten Klasse implementiert
     * werden.
+    *
+    * @return PersistableObject
     */
    protected function insert() {
       throw new UnimplementedFeatureException('Method '.__METHOD__.' not yet implemented');
@@ -147,6 +153,8 @@ abstract class PersistableObject extends Object implements IDaoConnected {
    /**
     * Aktualisiert diese Instanz in der Datenbank.  Diese Methode muß von der konkreten Klasse implementiert
     * werden.
+    *
+    * @return PersistableObject
     */
    protected function update() {
       throw new UnimplementedFeatureException('Method '.__METHOD__.' not yet implemented');
@@ -156,6 +164,8 @@ abstract class PersistableObject extends Object implements IDaoConnected {
    /**
     * Löscht diese Instanz aus der Datenbank.  Diese Methode muß von der konkreten Klasse implementiert
     * werden.
+    *
+    * @return NULL
     */
    public function delete() {
       throw new UnimplementedFeatureException('Method '.__METHOD__.' not yet implemented');
