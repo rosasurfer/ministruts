@@ -19,6 +19,7 @@
    - php/util/Config: Bei der Suche nach Konfigurationsdateien wird das WEB-INF-Verzeichnis der Anwendung und zusätzlich
      der Include-Pfad durchsucht, wodurch die Konfiguration flexibler gestaltet werden kann.  Es wird also in jedem
      einzelnen Pfad des Include-Pfads nach einer "config.properties" und einer "config-custom.properties" gesucht.
+     (siehe Dokumentation in der Klasse)
 
 
 2008-03-01

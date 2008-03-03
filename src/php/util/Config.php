@@ -2,19 +2,57 @@
 /**
  * Config
  *
- * Klasse zur Anwendungskonfiguration.  Einstellungen werden in der Datei "config.properties" abgelegt.
- * Bei Webanwendungen wird nach dieser Datei im WEB-INF-Verzeichnis, bei Konsolenanwendungen im aktuellen
- * Verzeichnis gesucht.  Existiert eine Datei "config-custom.properties", wird auch diese eingelesen, sie
- * überschreibt dann gleichlautende Einstellungen in "config.properties".  Werden in "config.properties"
- * Production-Einstellungen und in "config-custom.properties" Entwicklungseinstellungen gespeichert, kann
- * durch einfaches Umbenennen von "config-custom.properties" zwischen beiden Umgebungen umgeschaltet werden.
+ * Klasse zur Anwendungskonfiguration.  Einstellungen werden in Dateien "config.properties" und
+ * "config-custom.properties" abgelegt, die in folgender Reihenfolge gesucht und verarbeitet werden:
+ *
+ *
+ * Webanwendungen:
+ * ---------------
+ *    - "config-custom.properties" im WEB-INF-Verzeichnis der Anwendung
+ *    - "config.properties"        im WEB-INF-Verzeichnis der Anwendung
+ *
+ * Für jeden einzelnen Pfad des PHP-Include-Pfades (ini_get("include_path")):
+ *    - "config-custom.properties" in diesem Pfad
+ *    - "config.properties"        in diesem Pfad
+ *
+ *
+ * Konsolenanwendungen:
+ * --------------------
+ *    - "config-custom.properties" im Scriptverzeichnis
+ *    - "config.properties"        im Scriptverzeichnis
+ *
+ * Für jeden einzelnen Pfad des PHP-Include-Pfades (ini_get("include_path")):
+ *    - "config-custom.properties" in diesem Pfad
+ *    - "config.properties"        in diesem Pfad
+ *
+ *
+ * Durch diese Reihenfolge können mehrere Dateien gleichen Namens geladen werden, z.B. eine für die
+ * Konfiguration einer Bibliothek (liegt im Include-Path der Bibliothek) und eine weitere für die
+ * Konfiguration eines einzelnen Projektes (liegt im WEB-INF-Verzeichnis des Projektes).  Dabei haben
+ * die zuerst eingelesenen Einstellungen eine höhere Priorität als die später eingelesenen.  Allgemeine
+ * Einstellungen in einer Bibliothek können so durch eigene Einstellungen im Projektverzeichnis
+ * überschrieben werden.  Da in einem Verzeichnis zuerst nach "config-custom.properties" und danach
+ * nach "config.properties" gesucht wird, hat eine "config-custom.properties" eine höhere Priorität
+ * als eine "config-custom.properties" im selben Verzeichnis.
+ *
+ * Die Datei "config.properties" enthält jeweils allgemeingültige Einstellungen für den Produktivbetrieb.
+ * Diese Datei wird im CVS versioniert.  Die Datei "config-custom.properties" dagegen enthält arbeitsplatz-
+ * spezifische Einstellungen.  Sie ist für den Entwicklungsbetrieb gedacht und wird nicht im CVS gespeichert.
+ * Dadurch eignet sie sich für persönliche Einstellungen des Entwicklers (lokale Datenbankzugangsdaten,
+ * E-Mailadressen, Loglevel etc.).
+ *
+ * Werden in "config.properties" Produktiveinstellungen und in "config-custom.properties" Entwicklungs-
+ * einstellungen gespeichert, kann durch einfaches Umbenennen von "config-custom.properties" zwischen
+ * beiden Umgebungen umgeschaltet werden.
+ *
  *
  * Dateiformat:
  * ------------
  * Einstellungen werden als "name = wert" abgelegt. Kommentare werden mit einem Hash "#" eingeleitet.
- * Leerzeilen, führende und abschließende Leerzeichen werden ignoriert. Einstellungen können gruppiert
- * werden, eine solche Gruppe kann einzeln (Rückgabewert: String ) oder komplett (Rückgabewert: assoziatives
- * Array) abgefragt werden.
+ * Leerzeilen, führende und abschließende Leerzeichen werden ignoriert.  Durch Gruppierung können
+ * Strukturen definiert werden, eine solche Struktur kann im ganzen (Rückgabewert: Array) oder als
+ * einzelner Wert (Rückgabewert: String) abgefragt werden.
+ *
  *
  * Beispiel:
  * ---------
@@ -68,21 +106,30 @@ final class Config extends Singleton {
    protected function __construct() {
       $files = array();
 
-      // Verzeichnis der Konfigurationsdateien ermitteln (bei Webapplikation "WEB-INF", bei Shellscripten das Ausgangsverzeichnis)
-      $path = realPath(dirName($_SERVER['SCRIPT_FILENAME'])).DIRECTORY_SEPARATOR;
+      // Ausgangsverzeichnis ermitteln (bei Webapplikation "WEB-INF", bei Shellscripten das Scriptverzeichnis)
+      $path = realPath(dirName($_SERVER['SCRIPT_FILENAME']));
       if (isSet($_SERVER['REQUEST_METHOD']))
-         $path .= 'WEB-INF'.DIRECTORY_SEPARATOR;
+         $path .= DIRECTORY_SEPARATOR.'WEB-INF';
 
 
-      // alle Config-Dateien suchen
-      if (is_file($file = $path.'config.properties'))
-         $files[] = $file;
-      else
-         Logger ::log('Main configuration file "config.properties" not found in path "'.$path.'"', L_WARN, __CLASS__);
+      // Include-Pfad in einzelne Pfade zerlegen
+      $paths = explode(PATH_SEPARATOR, $path.PATH_SEPARATOR.ini_get('include_path'));
 
-      if (is_file($file = $path.'config-custom.properties'))
-         $files[] = $file;
 
+      // Config-Dateien suchen
+      foreach ($paths as $key => $path) {
+         $path = realPath($path);
+         if ($path) {
+            if (is_file($file = $path.DIRECTORY_SEPARATOR.'config-custom.properties')) $files[] = $file;
+            if (is_file($file = $path.DIRECTORY_SEPARATOR.'config.properties'))        $files[] = $file;
+         }
+         if ($key==0 && !is_file($file))
+            Logger ::log('Main configuration file "'.baseName($file).'" not found in path "'.$path.'"', L_WARN, __CLASS__);
+      }
+
+
+      // wir laden die Dateien von der Wurzel aus und überschreiben alle vorhandenen Werte
+      $files = array_reverse($files);
 
       // gefundene Dateien laden
       foreach ($files as $file) {
