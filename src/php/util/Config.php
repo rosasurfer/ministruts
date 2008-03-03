@@ -123,8 +123,6 @@ final class Config extends Singleton {
             if (is_file($file = $path.DIRECTORY_SEPARATOR.'config-custom.properties')) $files[] = $file;
             if (is_file($file = $path.DIRECTORY_SEPARATOR.'config.properties'))        $files[] = $file;
          }
-         if ($key==0 && !is_file($file))
-            Logger ::log('Main configuration file "'.baseName($file).'" not found in path "'.$path.'"', L_WARN, __CLASS__);
       }
 
 
