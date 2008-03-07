@@ -48,11 +48,12 @@ class HttpSession extends Singleton {
        * Fehlt diese Markierung nach Rückkehr von session_start(), wurde die ID nicht hier generiert.
        * Aus Sicherheitsgründen wird eine solche Session verworfen und eine neue ID erzeugt.
        */
+      $request = $this->request;
 
       // Session-Cookie auf Application beschränken, um mehrere Projekte je Domain zu ermöglichen
       $params = session_get_cookie_params();
       session_set_cookie_params($params['lifetime'],
-                                $this->request->getApplicationPath().'/',
+                                $request->getApplicationPath().'/',
                                 $params['domain'],
                                 $params['secure'],
                                 $params['httponly']);
@@ -82,9 +83,11 @@ class HttpSession extends Singleton {
             session_regenerate_id(true);     // neue ID generieren und alte Datei löschen
 
          // Marker setzen, ab jetzt ist sizeOf($_SESSION) immer > 0
+         // TODO: $request->getHeader() eibauen
          $_SESSION['__SESSION_CREATED__'  ] = microTime(true);
-         $_SESSION['__SESSION_IP__'       ] = $_SERVER['REMOTE_ADDR'];     // TODO: forwarded remote IP einbauen
-         $_SESSION['__SESSION_USERAGENT__'] = $_SERVER['HTTP_USER_AGENT'];
+         $_SESSION['__SESSION_IP__'       ] = $request->getRemoteAddress();      // TODO: forwarded remote IP einbauen
+         if (isSet($_SERVER['HTTP_USER_AGENT']))
+            $_SESSION['__SESSION_USERAGENT__'] = $_SERVER['HTTP_USER_AGENT'];
 
          $this->new = true;
       }

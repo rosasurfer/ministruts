@@ -8,7 +8,6 @@
 
         methods="get,post"
 
-
    - php/util/Config::get($key, $default): zusätzlicher Parameter $default
      Dieser Defaultwert wird zurückgegeben, wenn der Schlüssel $key nicht existiert. Ohne Defaultwert wird bei
      nicht existierendem Schlüssel eine RuntimeException geworfen. Möchte man diese Exception verhindern, aber keinen
