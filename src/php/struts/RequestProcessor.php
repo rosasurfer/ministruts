@@ -37,11 +37,11 @@ class RequestProcessor extends Object {
     */
    final public function process(Request $request, Response $response) {
 
-      // falls angefordert, Session starten
+      // ggf. Session starten
       $this->processSession($request, $response);
 
 
-      // falls notwendig, ein Locale setzen
+      // ggf. Locale setzen
       $this->processLocale($request, $response);
 
 
@@ -121,31 +121,7 @@ class RequestProcessor extends Object {
 
 
    /**
-    * Speichert alle vorhandenen ActionMessages in der HttpSession zwischen. Beim nächsten Request werden
-    * diese Messages automatisch zurück in den Request verschoben und stehen wieder zur Verfügung.
-    *
-    * @param Request  $request
-    *
-    * @see Request::setActionMessage()
-    * @see RequestProcessor::processCachedActionMessages()
-    */
-   protected function cacheActionMessages(Request $request) {
-      $errors = $request->getActionErrors();
-      if (sizeOf($errors) == 0)
-         return;
-
-      $session = $request->getSession();
-
-      foreach ($errors as $key => $value) {
-         $_SESSION[Struts ::ACTION_ERRORS_KEY][$key] = $value;
-      }
-
-      // TODO: ActionMessages verarbeiten
-   }
-
-
-   /**
-    * Verschiebt ActionMessages, die in der HttpSession zwischengespeichert sind, zurück in den aktuellen
+    * Verschiebt ActionMessages, die in der HttpSession gespeichert sind, zurück in den aktuellen
     * Request. Wird verwendet, um ActionMessages über einen Redirect hinweg übertragen zu können.
     *
     * @param Request  $request
@@ -169,6 +145,30 @@ class RequestProcessor extends Object {
          }
          // TODO: ActionError -> ActionMessage
       }
+   }
+
+
+   /**
+    * Kopiert alle vorhandenen ActionMessages in die HttpSession. Beim nächsten Request werden diese
+    * Messages automatisch zurück in den Request verschoben und stehen wieder zur Verfügung.
+    *
+    * @param Request  $request
+    *
+    * @see Request::setActionMessage()
+    * @see RequestProcessor::processCachedActionMessages()
+    */
+   protected function cacheActionMessages(Request $request) {
+      $errors = $request->getActionErrors();
+      if (sizeOf($errors) == 0)
+         return;
+
+      $session = $request->getSession();
+
+      foreach ($errors as $key => $value) {
+         $_SESSION[Struts ::ACTION_ERRORS_KEY][$key] = $value;
+      }
+
+      // TODO: ActionMessages verarbeiten
    }
 
 
