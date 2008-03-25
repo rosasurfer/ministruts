@@ -203,7 +203,9 @@ class Mailer extends Object {
 
       $this->writeData('Date: '.date('r'));                          // needed headers
          $from = preg_replace('~([\xA0-\xFF])~e', '"=?ISO-8859-1?Q?=".strToUpper(decHex(ord("$1")))."?="', $from);
-      $this->writeData("From: Customer Support <$from>");
+
+      // TODO: Mailer: hardcodierte Adressen und Header entfernen
+      $this->writeData("From: Kundensupport <$from>");
          $to = preg_replace('~([\xA0-\xFF])~e', '"=?ISO-8859-1?Q?=".strToUpper(decHex(ord("$1")))."?="', $to);
       $this->writeData("To: $to");
          $subject = preg_replace('~([\xA0-\xFF])~e', '"=?ISO-8859-1?Q?=".strToUpper(decHex(ord("$1")))."?="', $subject);
