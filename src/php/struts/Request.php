@@ -290,6 +290,7 @@ final class Request extends Singleton {
     * @return string
     */
    public function getRelativeURI() {
+      // TODO: gibt absoluten Link auf falsches Verzeichnis zurück
       return subStr($this->getURI(), strLen($this->getApplicationPath()));
    }
 
