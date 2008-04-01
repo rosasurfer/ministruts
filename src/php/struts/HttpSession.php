@@ -70,6 +70,7 @@ class HttpSession extends Singleton {
 
 
       // Inhalt der Session prüfen
+      // TODO: Session verwerfen, wenn der User zwischen Cookie- und URL-Übertragung wechselt
       if (sizeOf($_SESSION) == 0) {          // 0 bedeutet, die Session ist (für diese Methode) neu
          $sessionName = session_name();
          $sessionId   = session_id();        // prüfen, woher die ID kommt ...
