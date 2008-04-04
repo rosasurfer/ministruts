@@ -15,7 +15,7 @@ class Mailer extends Object {
                            'auth'    => false,     // use authentification ?
                            'user'    => null,      // username
                            'pass'    => null,      // password
-                           'timeout' => 60);       // default socket timeout
+                           'timeout' => 90);       // default socket timeout
    private $hostname;
    private $connection     = null;
    private $responseStatus = 0;
