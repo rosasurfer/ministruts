@@ -5,14 +5,15 @@
 class TorHelper extends StaticClass {
 
 
-   private static $torMirrors = array('torstatus.all.de'        ,
-                                      'torstatus.blutmagie.de'  ,
+   // TODO: Serverliste beiFehlern dynamisch anpassen
+   private static $torMirrors = array('torstatus.blutmagie.de'  ,
                                       'torstatus.torproxy.net'  ,
                                       'kradense.whsites.net/tns',
                                       'torstatus.kgprog.com'    ,
                                       'torstatus.cyberphunk.org',
                                       'arachne.doesntexist.org' ,
                                       'tns.hermetix.org'        ,
+                                      'torstatus.all.de'        ,
                                      );
 
 
