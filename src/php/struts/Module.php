@@ -272,6 +272,13 @@ class Module extends Object {
 
 
          // process include attribute
+
+         // TODO: include einer anderen URL ermöglichen
+         //
+         // z.B.:
+         // <mapping path="/index.php"  form="ActionForm" include=".home"/>
+         // <mapping path="/menu.php"   include="/index.php"/>
+
          if ($tag['include']) {
             if ($mapping->getForward()) throw new RuntimeException('Mapping "'.$mapping->getPath().'": Only one attribute of "action", "include", "redirect" or "forward" must be specified');
             $path = (string) $tag['include'];
