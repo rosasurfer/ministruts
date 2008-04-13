@@ -207,7 +207,7 @@ class Logger extends StaticClass {
 
          $mailMsg .= "\n\n\nRequest:\n--------\n".$request."\n\n\n"
                   .  "Session: ".($session ? "\n--------\n".$session."\n\n\n" : "  (no session)\n")
-                  .  "Host     : ".$ip."\n"
+                  .  "Host:      ".$ip."\n"
                   .  "Timestamp: ".date('Y-m-d H:i:s')."\n";
 
          $mailMsg = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $mailMsg)) : str_replace("\r\n", "\n", $mailMsg);
@@ -354,7 +354,7 @@ class Logger extends StaticClass {
 
          $mailMsg .= "\n\n\nRequest:\n--------\n".$request."\n\n\n"
                   .  "Session: ".($session ? "\n--------\n".$session."\n\n\n" : "  (no session)\n")
-                  .  "Host     : ".$ip."\n"
+                  .  "Host:      ".$ip."\n"
                   .  "Timestamp: ".date('Y-m-d H:i:s')."\n";
 
          $mailMsg = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $mailMsg)) : str_replace("\r\n", "\n", $mailMsg);
