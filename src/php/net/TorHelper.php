@@ -7,7 +7,7 @@ class TorHelper extends StaticClass {
 
    // TODO: Serverliste beiFehlern dynamisch anpassen
    private static $torMirrors = array('torstatus.blutmagie.de'  ,
-                                      'torstatus.torproxy.net'  ,
+                          //pewa: 404 'torstatus.torproxy.net'  ,
                                       'kradense.whsites.net/tns',
                                       'torstatus.kgprog.com'    ,
                                       'torstatus.cyberphunk.org',
