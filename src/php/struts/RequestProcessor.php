@@ -444,7 +444,7 @@ EOT_405;
          $throwable = $ex;    // evt. aufgetretene Exception zwischenspeichern
       }
 
-      // falls statt eines ActionForwards ein Forward-Identifier zurückgegeben wurde, diesen auflösen
+      // falls statt eines ActionForwards ein String-Identifier zurückgegeben wurde, diesen auflösen
       if (is_string($forward))
          $forward = $action->getMapping()->findForward($forward);
 
