@@ -61,7 +61,7 @@ class CommonValidator extends StaticClass {
     * Ob der übergebene String einen gültigen Date/DateTime-Wert darstellt.
     *
     * @param string $string - der zu überprüfende String
-    * @param string $format - das Format, dem der String genügen soll
+    * @param string $format - das Format, dem der String entsprechen soll
     *
     * @return boolean
     */
