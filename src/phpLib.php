@@ -386,6 +386,25 @@ function formatMoney($value, $decimals = 2, $decimalSeparator = ',') {
    throw new InvalidArgumentException('Invalid argument $decimalSeparator: '.$decimalSeparator);
 }
 
+
+/**
+ * Formatiert einen Byte-Wert je nach Größe in Byte, Kilobyte, Megabyte oder Gigabyte.
+ *
+ * @param int $bytes - Byte-Wert
+ *
+ * @return string
+ */
+function formatBytes($bytes) {
+   foreach (array('', 'K', 'M', 'G') as $size) {
+      if ($bytes < 1024)
+         break;
+      $bytes /= 1024;
+   }
+
+   return sprintF('%5.1f %sB', $bytes, $size);
+}
+
+
 /**
  * date_mysql2german
  * wandelt ein MySQL-DATE (ISO-Date)

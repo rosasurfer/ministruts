@@ -1,3 +1,8 @@
+2008-08-18
+
+   - neue Methode: formatBytes() zur formatierten Ausgabe von Bytewerten
+
+
 2008-03-02
 
    - struts-config.xml: Attribut umbenannt: /struts-config/action-mappings/mapping/[@method] -> [@methods]
