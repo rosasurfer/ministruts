@@ -185,11 +185,13 @@ class Tile extends Object {
       $form     = $request->getAttribute(Struts ::ACTION_FORM_KEY);
       $PAGE     = PageContext ::me();
 
-      echo ($this->parent ? "\n" : null)."<!-- #begin: ".$this->label." -->\n";
+      echo ($this->label != "layouts/default" ? ($this->parent ? "\n" : null)."<!-- #begin: ".$this->label." -->\n" : null);
+      //echo ($this->parent ? "\n" : null)."<!-- #begin: ".$this->label." -->\n";
 
       include($this->path);
 
-      echo "\n<!-- #end: ".$this->label." -->\n";
+		echo ($this->label != "layouts/default" ? ($this->parent ? "\n" : null)."<!-- #end: ".$this->label." -->\n" : null);
+      //echo "\n<!-- #end: ".$this->label." -->\n";
    }
 }
 ?>
