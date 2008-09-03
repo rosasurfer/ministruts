@@ -108,8 +108,8 @@ final class String extends StaticClass {
    /**
     * Konvertiert Zeichen mit spezieller HTML-Bedeutung in ihre entsprechenden HTML-Entities.
     * Diese Methode macht dasselbe wie die interne PHP-Funktion gleichen Namens mit dem Unterschied,
-    * daß der Default-Value von quote_style nicht ENT_COMPAT sondern ENT_QUOTES ist.  Weiterhin können
-    * als erster Parameter auch String-Arrays übergeben werden.
+    * daß der Default-Value des Parameters $quote_style nicht ENT_COMPAT sondern ENT_QUOTES ist.
+    * Weiterhin können als erster Parameter auch String-Arrays übergeben werden.
     *
     * Bedeutung der optionalen Parameter: siehe PHP-Manual
     *
