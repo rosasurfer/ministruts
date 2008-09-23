@@ -7,14 +7,15 @@ class TorHelper extends StaticClass {
 
    // TODO: Serverliste beiFehlern dynamisch anpassen
    private static $torMirrors = array(
-                          //pewa: 404 'torstatus.torproxy.net'  ,
-                                      'kradense.whsites.net/tns',
-                                      'torstatus.kgprog.com'    ,
-                                      'torstatus.cyberphunk.org',
-                                      'arachne.doesntexist.org' ,
-                                      'tns.hermetix.org'        ,
-                                      'torstatus.all.de'        ,
-                                      'torstatus.blutmagie.de'  ,
+                                      'torstatus.kgprog.com'     ,
+                                      'torstat.kleine-eismaus.de',
+                                      'torstatus.amorphis.eu'    ,
+                                      'torstatus.blutmagie.de'   ,
+                                      'torstatus.cyberphunk.org' ,
+                                      'tns.hermetix.org'         ,
+                                      'arachne.doesntexist.org'  ,
+                                      'torstatus.all.de'         ,
+                           // https://'kradense.whsites.net/tns' ,
                                      );
 
 
