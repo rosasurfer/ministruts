@@ -22,8 +22,11 @@ final class MySQLConnector extends DB {
                                   2             // 2 = CLIENT_FOUND_ROWS
                                   );
 
-      if (!$this->link || ($this->database && !mysql_select_db($this->database, $this->link)))
+      if (!$this->link)
          throw new InfrastructureException('Can not connect to MySQL server: '.mysql_error($this->link));
+
+      if ($this->database && !mysql_select_db($this->database, $this->link))
+         throw new InfrastructureException('Can not select database '.$this->database.': '.mysql_error($this->link));
 
       return $this;
    }
