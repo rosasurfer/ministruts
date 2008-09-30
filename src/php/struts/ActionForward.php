@@ -136,6 +136,8 @@ class ActionForward extends Object {
    public function addQueryData($key, $value) {
       if ($this->configured)  throw new IllegalStateException('Configuration is frozen');
       if (!is_string($key))   throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
+      if ($value === null)
+         $value = '';
       if (!is_string($value)) throw new IllegalTypeException('Illegal type of argument $value: '.getType($value));
 
       $separator = String ::contains($this->path, '?') ? '&' : '?';
