@@ -51,37 +51,23 @@ class Logger extends StaticClass {
     * @return int - Loglevel
     */
    public static function getLogLevel($class) {
-      if ($class === '')
-         return $GLOBALS['__logLevels'][''];      // Default-Loglevel
+      static $logLevels = null;
 
-      static $settings = null;
-      if ($settings === null) {
-         $settings = $GLOBALS['__logLevels'];
-         krSort($settings);
-      }
+      // Loglevel-Konfiguration ermitteln
+      if ($logLevels === null) {
+         $logLevels = Config ::get('logger', array());
 
-      static $levels = null;
-      if (isSet($levels[$class]))
-         return $levels[$class];
-
-      $fullClassName = $GLOBALS['__classes'][$class];
-
-      $level = null;
-      if (isSet($settings[$fullClassName])) {
-         $level = $settings[$fullClassName];
-      }
-      else {
-         foreach ($settings as $package => $packageLevel) {
-            if ($package === '' || String ::startsWith($fullClassName, $package)) {
-               $level = $packageLevel;
-               break;
-            }
+         foreach ($logLevels as $class => $level) {
+            if (!is_string($level)) throw new IllegalTypeException('Illegal log level value type ('.getType($level).') for class : '.$class);
+            $logLevels[$class] = constant('L_'.strToUpper($level));
          }
-         if ($level === null)
-            throw new RuntimeException('Undefined default log level');
       }
 
-      return $levels[$class] = $level;
+      // Loglevel abfragen
+      if (isSet($logLevels[$class]))
+         return $logLevels[$class];
+
+      return L_WARN;                   // Default-Loglevel
    }
 
 
