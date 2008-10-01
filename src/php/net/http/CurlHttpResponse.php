@@ -6,15 +6,11 @@
  */
 final class CurlHttpResponse extends HttpResponse {
 
+   private $logDebug, $logInfo, $logNotice;  // boolean
 
-   // HeaderParser
    private /*HeaderParser*/ $headerParser;
-
-   // Status-Code
-   private $status;        // int
-
-   // Content
-   private $content;       // string
+   private /*int*/          $status;         // Status-Code
+   private /*string*/       $content;        // Content
 
    // aktuelle Länge des gelesenen Contents in Byte
    private $currentContentLength = 0;
@@ -22,10 +18,14 @@ final class CurlHttpResponse extends HttpResponse {
 
    /**
     * Erzeugt eine neue Instanz.
-    *
-    * @return CurlHttpResponse
     */
    public function __construct() {
+      $loglevel = Logger ::getLogLevel(__CLASS__);
+
+      $this->logDebug  = ($loglevel <= L_DEBUG );
+      $this->logInfo   = ($loglevel <= L_INFO  );
+      $this->logNotice = ($loglevel <= L_NOTICE);
+
       $this->headerParser = HeaderParser ::create();
    }
 
@@ -67,7 +67,7 @@ final class CurlHttpResponse extends HttpResponse {
 
 
    /**
-    * Gibt die übertragenen Header zurück.
+    * Gibt die empfangenen Header zurück.
     *
     * @return array - Array mit Headern
     */
@@ -101,33 +101,36 @@ final class CurlHttpResponse extends HttpResponse {
 
 
    /**
-    * Callback für CurlHttpClient, dem der Content des HTTP-Requests chunk-weise übergeben wird.
+    * Callback für CurlHttpClient, dem die empfangenen Response-Header zeilenweise übergeben werden.
     *
-    * @param resource $handle - das aktuelle CURL-Handle
-    * @param string   $data   - die empfangenen Daten
+    * @param resource $cHandle - das CURL-Handle des aktuellen Requests
+    * @param string   $line    - vollständige Headerzeile, bestehend aus dem Namen, einem Doppelpunkt und den Daten
     *
     * @return int - Anzahl der bei diesem Methodenaufruf erhaltenen Bytes
     */
-   public function writeContent($resource, $data) {
-      $this->content .= $data;
-      $obtained = strLen($data);
+   public function writeHeader($cHandle, $line) {
+      $this->logDebug && Logger ::log('Header line received:  '.$line, L_DEBUG, __CLASS__);
 
-      $this->currentContentLength += $obtained;
-      return $obtained;
+      $this->headerParser->parseLine($line);
+      return strLen($line);
    }
 
 
    /**
-    * Callback für CurlHttpClient, dem die Response-Header zeilenweise übergeben werden.
+    * Callback für CurlHttpClient, dem der empfangene Content des HTTP-Requests chunk-weise übergeben wird.
     *
-    * @param resource $handle - das aktuelle CURL-Handle
-    * @param string   $line   - vollständige Headerzeile, bestehend aus dem Namen, einem Doppelpunkt und den Daten
+    * @param resource $cHandle - das CURL-Handle des aktuellen Requests
+    * @param string   $data    - die empfangenen Daten
     *
     * @return int - Anzahl der bei diesem Methodenaufruf erhaltenen Bytes
     */
-   public function writeHeader($resource, $line) {
-      $this->headerParser->parseLine($line);
-      return strLen($line);
+   public function writeContent($cHandle, $data) {
+      $this->content .= $data;
+
+      $obtainedLength = strLen($data);
+      $this->currentContentLength += $obtainedLength;
+
+      return $obtainedLength;
    }
 
 

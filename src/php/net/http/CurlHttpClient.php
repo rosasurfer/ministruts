@@ -106,46 +106,46 @@ final class CurlHttpClient extends HttpClient {
       $response = CurlHttpResponse ::create();
 
       // CURL-Session initialisieren
-      $handle = curl_init();
+      $cHandle = curl_init();
 
       // Optionen setzen
-      $options = array(CURLOPT_WRITEFUNCTION  => array($response, 'writeContent'),
-                       CURLOPT_HEADERFUNCTION => array($response, 'writeHeader'),
-                       CURLOPT_URL            => $request->getUrl(),
+      $options = array(CURLOPT_URL            => $request->getUrl(),
                        CURLOPT_TIMEOUT        => $this->timeout,
                        CURLOPT_USERAGENT      => $this->userAgent,
+                       CURLOPT_HEADERFUNCTION => array($response, 'writeHeader'),
+                       CURLOPT_WRITEFUNCTION  => array($response, 'writeContent'),
                        );
 
+      // CURLOPT_FOLLOWLOCATION funktioniert nur bei deaktiviertem "open_basedir"-Setting
       if ($this->followRedirects && !ini_get('open_basedir')) {
          $options[CURLOPT_FOLLOWLOCATION] = true;
          $options[CURLOPT_MAXREDIRS]      = $this->maxRedirects;
       }
 
-      if ($request->getMethod() == 'GET') {
-         $options[CURLOPT_HTTPGET] = true;
-      }
-      else {
+      if ($request->getMethod() == 'POST') {
          $options[CURLOPT_POST]       = true;
          $options[CURLOPT_URL]        = subStr($request->getUrl(), 0, strPos($request->getUrl(), '?'));
          $options[CURLOPT_POSTFIELDS] = strStr($request->getUrl(), '?');
       }
-      curl_setopt_array($handle, $options);
+      curl_setopt_array($cHandle, $options);
 
       // Request ausführen
-      if (curl_exec($handle) === false)
-         throw new IOException('CURL error '.self ::getError($handle).', url: '.$request->getUrl());
+      if (curl_exec($cHandle) === false)
+         throw new IOException('CURL error '.self ::getError($cHandle).', url: '.$request->getUrl());
 
-      $response->setStatus($status = curl_getinfo($handle, CURLINFO_HTTP_CODE));
-      curl_close($handle);
+      $response->setStatus($status = curl_getinfo($cHandle, CURLINFO_HTTP_CODE));
+      curl_close($cHandle);
 
       // ggf. manuellen Redirect ausführen (falls "open_basedir" oder "safe_mode" aktiviert ist)
       if (($status==301 || $status==302) && $this->followRedirects && (ini_get('open_basedir') || ini_get('safe_mode'))) {
          if ($this->currentRedirect >= $this->maxRedirects)
             throw new IOException('CURL error: maxRedirects limit exceeded - '.$this->maxRedirects.', url: '.$request->getUrl());
 
+         // TODO: relative Redirects abfangen
+         // TODO: verschachtelte IOExceptions abfangen
          $this->currentRedirect++;
-         $request  = HttpRequest ::create()->setUrl($response->getHeader('Location')); // !!! to-do: relative Redirects abfangen
-         $response = $this->send($request);                                            // !!! to-do: verschachtelte IOExceptions abfangen
+         $request  = HttpRequest ::create()->setUrl($response->getHeader('Location'));
+         $response = $this->send($request);
       }
 
       return $response;
