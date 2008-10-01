@@ -36,10 +36,10 @@
  * als eine "config-custom.properties" im selben Verzeichnis.
  *
  * Die Datei "config.properties" enthält jeweils allgemeingültige Einstellungen für den Produktivbetrieb.
- * Diese Datei wird im CVS versioniert.  Die Datei "config-custom.properties" dagegen enthält arbeitsplatz-
- * spezifische Einstellungen.  Sie ist für den Entwicklungsbetrieb gedacht und wird nicht im CVS gespeichert.
- * Dadurch eignet sie sich für persönliche Einstellungen des Entwicklers (lokale Datenbankzugangsdaten,
- * E-Mailadressen, Loglevel etc.).
+ * Diese Datei wird in der Regel im CVS versioniert.  Die Datei "config-custom.properties" dagegen
+ * enthält arbeitsplatzspezifische Einstellungen.  Sie ist für den Entwicklungsbetrieb gedacht und sollte
+ * nicht im CVS gespeichert werden.  Dadurch eignet sie sich für persönliche Einstellungen des Entwicklers
+ * (lokale Datenbankzugangsdaten, E-Mailadressen, Loglevel etc.).
  *
  * Werden in "config.properties" Produktiveinstellungen und in "config-custom.properties" Entwicklungs-
  * einstellungen gespeichert, kann durch einfaches Umbenennen von "config-custom.properties" zwischen
@@ -80,7 +80,7 @@ final class Config extends Singleton {
     * @return Singleton
     */
    public static function me() {
-      // gibt es eine Instanz im Cache ?
+      // gibt es bereits eine Instanz im Cache ?
       $instance = Cache ::get(__CLASS__);
 
       if (!$instance) {       // nein, neue Instanz erzeugen ...
