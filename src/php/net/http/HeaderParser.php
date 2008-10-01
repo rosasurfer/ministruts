@@ -24,14 +24,13 @@ final class HeaderParser extends Object {
     *
     * @param string $data - rohe Headerdaten
     *
-    * @return array - assoziatives Array mit Headern (name => value)
+    * @return HeaderParser
     */
-   public function parse($data) {
+   public function parseLines($data) {
       $lines = explode("\n", $data);
 
-      foreach ($lines as $line) {
+      foreach ($lines as $line)
          $this->parseLine($line);
-      }
 
       return $this;
    }
@@ -41,11 +40,13 @@ final class HeaderParser extends Object {
     * Parst eine einzelne Headerzeile.
     *
     * @param string $line - Headerzeile
+    *
+    * @return HeaderParser
     */
    public function parseLine($line) {
       $line = trim($line, "\r\n");
 
-      if (preg_match("/^([\w-]+):\s+(.+)/", $line, $matches)) {
+      if (preg_match('/^([\w-]+):\s+(.+)/', $line, $matches)) {
          $name = strToLower($matches[1]);
          $value = $matches[2];
          $this->currentHeader = $name;
@@ -60,9 +61,9 @@ final class HeaderParser extends Object {
             $this->headers[$name] = $value;
          }
       }
-      elseif (preg_match("/^\s+(.+)$/", $line, $matches) && $this->currentHeader !== null) {
+      elseif (preg_match('/^\s+(.+)$/', $line, $matches) && $this->currentHeader !== null) {
          if (is_array($this->headers[$this->currentHeader])) {
-            $lastKey = count($this->headers[$this->currentHeader]) - 1;
+            $lastKey = sizeOf($this->headers[$this->currentHeader]) - 1;
             $this->headers[$this->currentHeader][$lastKey] .= $matches[1];
          }
          else {
@@ -75,7 +76,7 @@ final class HeaderParser extends Object {
 
 
    /**
-    * Gibt die erhaltenen Header zurück.
+    * Gibt alle empfangenen Header zurück.
     *
     * @return array - assoziatives Array mit Headern (name => value)
     */
