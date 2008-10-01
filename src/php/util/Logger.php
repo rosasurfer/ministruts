@@ -56,6 +56,8 @@ class Logger extends StaticClass {
       // Loglevel-Konfiguration ermitteln
       if ($logLevels === null) {
          $logLevels = Config ::get('logger', array());
+         if (is_string($logLevels))
+            $logLevels = array('' => $logLevels);
 
          foreach ($logLevels as $class => $level) {
             if (!is_string($level)) throw new IllegalTypeException('Illegal log level value type ('.getType($level).') for class : '.$class);
