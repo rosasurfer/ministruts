@@ -5,7 +5,7 @@
 final class FrontController extends Singleton {
 
 
-   private $logDebug, $logInfo, $logNotice;  // boolean
+   private static $logDebug, $logInfo, $logNotice;  // boolean
 
 
    /**

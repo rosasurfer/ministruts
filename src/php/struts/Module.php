@@ -5,6 +5,9 @@
 class Module extends Object {
 
 
+   private static $logDebug, $logInfo, $logNotice;  // boolean
+
+
    /**
     * Ob diese Komponente vollständig konfiguriert ist. Wenn dieses Flag gesetzt ist, wirft jeder Versuch,
     * die Komponente zu ändern, eine IllegalStateException.
@@ -77,9 +80,6 @@ class Module extends Object {
     * Der Klassenname der RoleProcessor-Implementierung, die für dieses Modul definiert ist.
     */
    protected $roleProcessorClass;
-
-   // Logstatus
-   private $logDebug, $logInfo, $logNotice;
 
 
    /**
