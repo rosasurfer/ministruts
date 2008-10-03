@@ -9,8 +9,7 @@ class TorHelper extends StaticClass {
 
 
    // TODO: Serverliste bei Fehlern dynamisch anpassen
-   private static $torMirrors = array(
-                                      'torstatus.kgprog.com'     ,
+   private static $torMirrors = array('torstatus.kgprog.com'     ,
                                       'torstat.kleine-eismaus.de',
                                       'torstatus.amorphis.eu'    ,
                                       'torstatus.blutmagie.de'   ,
