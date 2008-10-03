@@ -5,11 +5,11 @@
 class RequestProcessor extends Object {
 
 
+   private static $logDebug, $logInfo, $logNotice;  // boolean
+
+
    // Module, zu dem wir gehören
    protected /*Module*/ $module;
-
-
-   private $logDebug, $logInfo, $logNotice;  // boolean
 
 
    /**
@@ -195,7 +195,7 @@ class RequestProcessor extends Object {
 
       // TODO: URL case-insensitive verarbeiten
 
-      $this->logDebug && Logger ::log('Path used for mapping selection: '.$path, L_DEBUG, __CLASS__);
+      self::$logDebug && Logger ::log('Path used for mapping selection: '.$path, L_DEBUG, __CLASS__);
 
       // Mapping suchen und im Request speichern
       if (($mapping = $this->module->findMapping($path)) || ($mapping = $this->module->getDefaultMapping())) {
@@ -204,7 +204,7 @@ class RequestProcessor extends Object {
       }
 
       // kein Mapping gefunden
-      $this->logInfo && Logger ::log('Could not find a mapping for path: '.$path, L_INFO, __CLASS__);
+      self::$logInfo && Logger ::log('Could not find a mapping for path: '.$path, L_INFO, __CLASS__);
 
 
       // TODO: Status-Code 404 im HttpResponse setzen
@@ -250,7 +250,7 @@ EOT_404;
          return true;
 
       // Beschränkung nicht erfüllt
-      $this->logDebug && Logger ::log('HTTP method "'.$request->getMethod().'" is not supported by ActionMapping, denying access', L_DEBUG, __CLASS__);
+      self::$logDebug && Logger ::log('HTTP method "'.$request->getMethod().'" is not supported by ActionMapping, denying access', L_DEBUG, __CLASS__);
 
 
       // TODO: Status-Code 405 im HttpResponse setzen
@@ -438,7 +438,7 @@ EOT_405;
             $forward = $action->execute($request, $response);
 
          if ($forward === null)
-            $this->logInfo && Logger ::log('ActionForward of NULL returned from Action::execute()', L_INFO, __CLASS__);
+            self::$logInfo && Logger ::log('ActionForward of NULL returned from Action::execute()', L_INFO, __CLASS__);
       }
       catch (Exception $ex) {
          $throwable = $ex;    // evt. aufgetretene Exception zwischenspeichern
