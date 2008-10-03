@@ -7,6 +7,9 @@
 final class CurlHttpClient extends HttpClient {
 
 
+   private static $logDebug, $logInfo, $logNotice;  // boolean
+
+
    // CURL-Handle
    private $handle;
 
@@ -84,6 +87,18 @@ final class CurlHttpClient extends HttpClient {
 
 
    /**
+    * Erzeugt eine neue Instanz.
+    */
+   public function __construct() {
+      $loglevel = Logger ::getLogLevel(__CLASS__);
+
+      self::$logDebug  = ($loglevel <= L_DEBUG );
+      self::$logInfo   = ($loglevel <= L_INFO  );
+      self::$logNotice = ($loglevel <= L_NOTICE);
+   }
+
+
+   /**
     * Erzeugt eine neue Instanz von CurlHttpClient.
     *
     * @return CurlHttpClient
@@ -144,6 +159,9 @@ final class CurlHttpClient extends HttpClient {
          // TODO: relative Redirects abfangen
          // TODO: verschachtelte IOExceptions abfangen
          $this->currentRedirect++;
+
+         self::$logInfo && Logger ::log('Performing manual redirect to: '.$response->getHeader('Location'), L_INFO, __CLASS__);
+
          $request  = HttpRequest ::create()->setUrl($response->getHeader('Location'));
          $response = $this->send($request);
       }

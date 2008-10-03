@@ -38,7 +38,7 @@ final class CurlHttpResponse extends HttpResponse {
     * @return CurlHttpResponse
     */
    public static function create() {
-      return new self;
+      return new self();
    }
 
 
