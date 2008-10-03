@@ -15,7 +15,7 @@ final class HeaderParser extends Object {
     * @return HeaderParser
     */
    public static function create() {
-      return new self;
+      return new self();
    }
 
 
