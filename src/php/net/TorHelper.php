@@ -20,6 +20,18 @@ class TorHelper extends StaticClass {
                            // https://'kradense.whsites.net/tns' ,
                                      );
 
+   /**
+    * Initialisiert die Klasse.
+    */
+   private static function init() {
+      if (self::$logDebug === null) {
+         $loglevel = Logger ::getLogLevel(__CLASS__);
+         self::$logDebug  = ($loglevel <= L_DEBUG);
+         self::$logInfo   = ($loglevel <= L_INFO);
+         self::$logNotice = ($loglevel <= L_NOTICE);
+      }
+   }
+
 
    /**
     * Prüft, ob die übergebene IP-Adresse ein aktueller Tor-Exit-Node ist.
@@ -29,6 +41,8 @@ class TorHelper extends StaticClass {
     * @return boolean
     */
    public static function isExitNode($ip) {
+      self:: init();
+
       if (!is_string($ip)) throw new IllegalTypeException('Illegal type of parameter $ip: '.getType($ip));
 
       // TODO: mit Filter-Extension lokale Netze abfangen
