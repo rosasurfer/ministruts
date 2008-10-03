@@ -34,7 +34,8 @@ abstract class PersistableObject extends Object implements IDaoConnected {
     *
     *
     *    public static function create($arg) {
-    *       ...    // some parameter validation
+    *
+    *       // ... parameter validation etc.
     *
     *       $instance = new self();
     *       $instance->property = $arg;
