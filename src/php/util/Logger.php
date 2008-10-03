@@ -60,7 +60,7 @@ class Logger extends StaticClass {
             $logLevels = array('' => $logLevels);
 
          foreach ($logLevels as $class => $level) {
-            if (!is_string($level)) throw new IllegalTypeException('Illegal log level value type ('.getType($level).') for class : '.$class);
+            if (!is_string($level)) throw new IllegalTypeException('Illegal log level type ('.getType($level).') for class : '.$class);
             $logLevels[$class] = constant('L_'.strToUpper($level));
          }
       }
