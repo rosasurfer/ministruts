@@ -4,6 +4,7 @@
  */
 class TorHelper extends StaticClass {
 
+
    private static $logDebug, $logInfo, $logNotice;  // boolean
 
 
