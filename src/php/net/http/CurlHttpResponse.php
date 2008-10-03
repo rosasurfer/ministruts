@@ -8,6 +8,7 @@ final class CurlHttpResponse extends HttpResponse {
 
    private $logDebug, $logInfo, $logNotice;  // boolean
 
+
    private /*HeaderParser*/ $headerParser;
    private /*int*/          $status;         // Status-Code
    private /*string*/       $content;        // Content
