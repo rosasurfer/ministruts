@@ -6,7 +6,8 @@
  */
 final class CurlHttpResponse extends HttpResponse {
 
-   private $logDebug, $logInfo, $logNotice;  // boolean
+
+   private static $logDebug, $logInfo, $logNotice;  // boolean
 
 
    private /*HeaderParser*/ $headerParser;
@@ -110,7 +111,7 @@ final class CurlHttpResponse extends HttpResponse {
     * @return int - Anzahl der bei diesem Methodenaufruf erhaltenen Bytes
     */
    public function writeHeader($cHandle, $line) {
-      $this->logDebug && Logger ::log('Header line received:  '.$line, L_DEBUG, __CLASS__);
+      self::$logDebug && Logger ::log('Header line received:  '.$line, L_DEBUG, __CLASS__);
 
       $this->headerParser->parseLine($line);
       return strLen($line);
