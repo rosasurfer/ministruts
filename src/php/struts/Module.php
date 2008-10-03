@@ -96,9 +96,9 @@ class Module extends Object {
 
       $loglevel = Logger ::getLogLevel(__CLASS__);
 
-      $this->logDebug  = ($loglevel <= L_DEBUG);
-      $this->logInfo   = ($loglevel <= L_INFO);
-      $this->logNotice = ($loglevel <= L_NOTICE);
+      self::$logDebug  = ($loglevel <= L_DEBUG);
+      self::$logInfo   = ($loglevel <= L_INFO);
+      self::$logNotice = ($loglevel <= L_NOTICE);
 
       $xml = $this->loadConfiguration($fileName);
 

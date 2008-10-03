@@ -80,9 +80,10 @@ final class FrontController extends Singleton {
     */
    protected function __construct() {
       $loglevel        = Logger ::getLogLevel(__CLASS__);
-      $this->logDebug  = ($loglevel <= L_DEBUG );
-      $this->logInfo   = ($loglevel <= L_INFO  );
-      $this->logNotice = ($loglevel <= L_NOTICE);
+
+      self::$logDebug  = ($loglevel <= L_DEBUG );
+      self::$logInfo   = ($loglevel <= L_INFO  );
+      self::$logNotice = ($loglevel <= L_NOTICE);
 
       // TODO: keine Fehlermeldung bei falschem $_SERVER['APPLICATION_PATH'] ( z.B. 'myapp/' statt '/myapp')
 

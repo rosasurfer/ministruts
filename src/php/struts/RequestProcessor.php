@@ -20,9 +20,9 @@ class RequestProcessor extends Object {
    public function __construct(Module $module) {
       $loglevel = Logger ::getLogLevel(__CLASS__);
 
-      $this->logDebug  = ($loglevel <= L_DEBUG );
-      $this->logInfo   = ($loglevel <= L_INFO  );
-      $this->logNotice = ($loglevel <= L_NOTICE);
+      self::$logDebug  = ($loglevel <= L_DEBUG );
+      self::$logInfo   = ($loglevel <= L_INFO  );
+      self::$logNotice = ($loglevel <= L_NOTICE);
 
       $this->module = $module;
    }
