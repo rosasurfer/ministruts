@@ -20,7 +20,7 @@ final class HttpRequest extends Object {
     * @return HttpRequest
     */
    public static function create() {
-      return new self;
+      return new self();
    }
 
 
