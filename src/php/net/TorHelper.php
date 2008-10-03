@@ -4,8 +4,10 @@
  */
 class TorHelper extends StaticClass {
 
+   private $logDebug, $logInfo, $logNotice;  // boolean
 
-   // TODO: Serverliste beiFehlern dynamisch anpassen
+
+   // TODO: Serverliste bei Fehlern dynamisch anpassen
    private static $torMirrors = array(
                                       'torstatus.kgprog.com'     ,
                                       'torstat.kleine-eismaus.de',
@@ -58,12 +60,12 @@ class TorHelper extends StaticClass {
                $status = $response->getStatus();
 
                if ($status != 200) {
-                  Logger ::log('Could not get Tor exit nodes from '.self::$torMirrors[$i].', HTTP status '.$status.' ('.HttpResponse ::$sc[$status]."),\n url: ".$request->getUrl(), L_NOTICE, __CLASS__);
+                  $this->logNotice && Logger ::log('Could not get Tor exit nodes from '.self::$torMirrors[$i].', HTTP status '.$status.' ('.HttpResponse ::$sc[$status]."),\n url: ".$request->getUrl(), L_NOTICE, __CLASS__);
                   continue;
                }
             }
             catch (IOException $ex) {
-               Logger ::log('Could not get Tor exit nodes from '.self::$torMirrors[$i], $ex, L_NOTICE, __CLASS__);
+               $this->logNotice && Logger ::log('Could not get Tor exit nodes from '.self::$torMirrors[$i], $ex, L_NOTICE, __CLASS__);
                continue;
             }
 
@@ -77,7 +79,7 @@ class TorHelper extends StaticClass {
             Logger ::log('Could not get Tor exit nodes from any server', L_ERROR, __CLASS__);
          }
 
-         Cache ::set($key, $nodes, 10 * MINUTE, null, __FILE__);
+         Cache ::set($key, $nodes, 30 * MINUTE, null, __FILE__);
       }
 
       return $nodes;
