@@ -26,6 +26,7 @@ class TorHelper extends StaticClass {
    private static function init() {
       if (self::$logDebug === null) {
          $loglevel = Logger ::getLogLevel(__CLASS__);
+
          self::$logDebug  = ($loglevel <= L_DEBUG);
          self::$logInfo   = ($loglevel <= L_INFO);
          self::$logNotice = ($loglevel <= L_NOTICE);
