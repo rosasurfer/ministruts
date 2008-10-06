@@ -8,7 +8,7 @@ abstract class PersistableObject extends Object implements IDaoConnected {
 
 
    // Flag für den aktuellen Änderungsstatus der Instanz
-   protected $isModified = false;
+   protected $modified = false;
 
 
    // Standard-Properties jeder Instanz
@@ -128,14 +128,14 @@ abstract class PersistableObject extends Object implements IDaoConnected {
       if (!$this->isPersistent()) {
          $this->insert();
       }
-      elseif ($this->isModified) {
+      elseif ($this->modified) {
          $this->update();
       }
       else {
          //Logger ::log('Nothing to save, '.get_class($this).' instance is in sync with the database.', L_NOTICE, __CLASS__);
       }
 
-      $this->isModified = false;
+      $this->modified = false;
 
       return $this;
    }
