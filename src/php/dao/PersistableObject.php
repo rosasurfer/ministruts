@@ -8,14 +8,15 @@ abstract class PersistableObject extends Object implements IDaoConnected {
 
 
    // Flag für den aktuellen Änderungsstatus der Instanz
-   protected $modified = false;
+   protected /*bool*/  $modified = false;
+   protected /*array*/ $modifications;
 
 
    // Standard-Properties jeder Instanz
-   protected $id;           // Primary Key:         int
-   protected $version;      // Versionsnummer:      timestamp (string)
-   protected $created;      // Erzeugungszeitpunkt: datetime  (string)
-   protected $deleted;      // Löschzeitpunkt:      datetime  (string)
+   protected /*int*/    $id;           // Primary Key
+   protected /*string*/ $created;      // Erzeugungszeitpunkt: datetime
+   protected /*string*/ $version;      // Versionsnummer:      timestamp
+   protected /*string*/ $deleted;      // Löschzeitpunkt:      datetime
 
 
    /**
@@ -59,16 +60,6 @@ abstract class PersistableObject extends Object implements IDaoConnected {
 
 
    /**
-    * Gibt die Versionsnummer dieser Instanz zurück.
-    *
-    * @return string - Versionsnummer (Zeitpunkt der letzten Änderung)
-    */
-   public function getVersion() {
-      return $this->version;
-   }
-
-
-   /**
     * Gibt den Erstellungszeitpunkt dieser Instanz zurück.
     *
     * @param string $format - Zeitformat
@@ -80,6 +71,16 @@ abstract class PersistableObject extends Object implements IDaoConnected {
          return $this->created;
 
       return formatDate($format, $this->created);
+   }
+
+
+   /**
+    * Gibt die Versionsnummer dieser Instanz zurück.
+    *
+    * @return string - Versionsnummer (Zeitpunkt der letzten Änderung)
+    */
+   public function getVersion() {
+      return $this->version;
    }
 
 
@@ -132,9 +133,9 @@ abstract class PersistableObject extends Object implements IDaoConnected {
          $this->update();
       }
       else {
-         //Logger ::log('Nothing to save, '.get_class($this).' instance is in sync with the database.', L_NOTICE, __CLASS__);
+         // Logger ::log('Nothing to save, '.get_class($this).' instance is in sync with the database.', L_NOTICE, __CLASS__);
       }
-
+      $this->updateLinks();
       $this->modified = false;
 
       return $this;
@@ -148,7 +149,7 @@ abstract class PersistableObject extends Object implements IDaoConnected {
     * @return PersistableObject
     */
    protected function insert() {
-      throw new UnimplementedFeatureException('Method '.__METHOD__.' not yet implemented');
+      throw new UnimplementedFeatureException('Method '.__METHOD__.' not implemented');
    }
 
 
@@ -159,7 +160,18 @@ abstract class PersistableObject extends Object implements IDaoConnected {
     * @return PersistableObject
     */
    protected function update() {
-      throw new UnimplementedFeatureException('Method '.__METHOD__.' not yet implemented');
+      throw new UnimplementedFeatureException('Method '.__METHOD__.' not implemented');
+   }
+
+
+   /**
+    * Aktualisiert die Kreuzverknüpfungen dieser Instanz in der Datenbank.  Diese Methode muß von der
+    * konkreten Klasse implementiert werden.
+    *
+    * @return PersistableObject
+    */
+   protected function updateLinks() {
+      return $this;
    }
 
 
@@ -170,7 +182,7 @@ abstract class PersistableObject extends Object implements IDaoConnected {
     * @return NULL
     */
    public function delete() {
-      throw new UnimplementedFeatureException('Method '.__METHOD__.' not yet implemented');
+      throw new UnimplementedFeatureException('Method '.__METHOD__.' not implemented');
    }
 
 
