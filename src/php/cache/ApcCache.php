@@ -9,8 +9,7 @@
 final class ApcCache extends CachePeer {
 
 
-   // lokaler ReferencePool
-   private $pool;
+   private /*ReferencePool*/ $pool;
 
 
    /**
@@ -51,8 +50,8 @@ final class ApcCache extends CachePeer {
             return false;
 
          // Cache-Hit, $data Format: array(timestamp, array($value, $dependency))
-         $timestamp = $data[0];
-         $data[1] = unserialize($data[1]);
+         $timestamp  = $data[0];
+         $data[1]    = unserialize($data[1]);
          $value      = $data[1][0];
          $dependency = $data[1][1];
 
