@@ -451,6 +451,23 @@ function ifNull($value, $altValue) {
 
 
 /**
+ * Pretty printer for byte values.
+ *
+ * @param int $value - Byte value
+ *
+ * @return string
+ */
+function byteSize($value) {
+   foreach (array('','K','M','G') as $unit) {
+      if ($value < 1024)
+         break;
+      $value /= 1024;
+   }
+   return sPrintF('%5.1f %sB', $value, $unit);
+}
+
+
+/**
  * Nur für APD: Gibt die vollständige URL des Requests zurück.
  *
  * @return string
