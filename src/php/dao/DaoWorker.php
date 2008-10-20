@@ -13,14 +13,14 @@ class DaoWorker extends Object {
 
 
    // Name der Entity-Klasse dieses Workers
-   protected $entityClass;
+   protected /*string*/ $entityClass;
 
 
    // DB-Adapter der Entity-Klasse dieses Workers
    private /*DB*/ $adapter;
 
 
-   private $foundItemsCounter = 0;
+   private /*int*/ $foundItemsCounter = 0;
 
 
    /**

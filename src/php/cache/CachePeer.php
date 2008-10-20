@@ -52,8 +52,8 @@ abstract class CachePeer extends Object {
     * @return boolean - TRUE bei Erfolg, FALSE andererseits
     */
    final public function add($key, &$value, $expires, IDependency $dependency = null, $namespace) {
-      if (!is_string($key))  throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
-      if (!is_int($expires)) throw new IllegalTypeException('Illegal type of parameter $expires: '.getType($expires));
+      if (!is_string($key))       throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
+      if (!is_int($expires))      throw new IllegalTypeException('Illegal type of parameter $expires: '.getType($expires));
       if (!is_string($namespace)) throw new IllegalTypeException('Illegal type of parameter $namespace: '.getType($namespace));
 
       return $this->store('add', $key, $value, $expires, $dependency, $namespace);
@@ -74,8 +74,8 @@ abstract class CachePeer extends Object {
     * @return boolean - TRUE bei Erfolg, FALSE andererseits
     */
    final public function replace($key, &$value, $expires, IDependency $dependency = null, $namespace) {
-      if (!is_string($key))  throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
-      if (!is_int($expires)) throw new IllegalTypeException('Illegal type of parameter $expires: '.getType($expires));
+      if (!is_string($key))       throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
+      if (!is_int($expires))      throw new IllegalTypeException('Illegal type of parameter $expires: '.getType($expires));
       if (!is_string($namespace)) throw new IllegalTypeException('Illegal type of parameter $namespace: '.getType($namespace));
 
       return $this->store('replace', $key, $value, $expires, $dependency, $namespace);

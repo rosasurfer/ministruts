@@ -8,10 +8,10 @@ final class HttpRequest extends Object {
 
 
    // Http-Methode des Requests (default: GET)
-   private $method = 'GET';
+   private /*string*/ $method = 'GET';
 
    // URL
-   private $url;
+   private /*string*/ $url;
 
 
    /**

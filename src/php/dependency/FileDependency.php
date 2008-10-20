@@ -28,19 +28,19 @@ class FileDependency extends Object implements IDependency {
    /**
     * Dateiname
     */
-   private $fileName;   // string
+   private /*string*/ $fileName;
 
 
    /**
     * letzter Änderungszeitpunkt der Datei (Unix-Timestamp)
     */
-   private $timestamp;  // int
+   private /*int*/ $timestamp;
 
 
    /**
     * Constructor
     *
-    * Erzeugt eine neue FileDependency-Instanz, die die Datei mit dem übergebenen Namen überwacht.
+    * Erzeugt eine neue FileDependency, die die Datei mit dem übergebenen Namen überwacht.
     *
     * @param string $fileName - Dateiname
     */
@@ -72,9 +72,9 @@ class FileDependency extends Object implements IDependency {
     */
    public function isStatusChanged() {
       // TODO: stat-Cache bei wiederholten Aufrufen löschen, siehe clearStatCache()
-      if (file_exists($this->fileName)) {
+      if (file_exists($this->fileName))
          return ($this->timestamp !== fileMTime($this->fileName));
-      }
+
       return ($this->timestamp !== null);
    }
 }

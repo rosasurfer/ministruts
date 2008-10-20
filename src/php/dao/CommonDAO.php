@@ -25,7 +25,7 @@ class CommonDAO extends Singleton {
 
 
    // Name der Entityklasse, für die der DAO zuständig ist
-   private $entityClass;
+   private /*string*/ $entityClass;
 
 
    /**
