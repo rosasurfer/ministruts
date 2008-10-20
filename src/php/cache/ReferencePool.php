@@ -72,18 +72,23 @@ final class ReferencePool extends CachePeer {
 
 
    /**
-    * Implementierung von set/add/replace (protected), $expires wird ignoriert (hat hier keine Wirkung)
+    * Implementierung von set(), add() und replace(). Der Parameter $expires wird bei diesem Cache
+    * vernachlässigt, da alle Instanzen nur für die Dauer des aktuellen Requests existieren.
     */
    protected function store($action, $key, &$value, $expires, IDependency $dependency = null, $namespace) {
-      if ($action == 'add' && $this->isCached($key, $namespace))
+      if ($action=='add' && $this->isCached($key, $namespace))
          return false;
 
-      if ($action == 'replace' && !$this->isCached($key, $namespace))
+      if ($action=='replace' && !$this->isCached($key, $namespace))
          return false;
 
-      // 'set': im Cache wird ein Array[creation_timestamp, value, dependency] gespeichert
-      $this->pool["$namespace::$key"] = array(time(), $value, $dependency);
-      return true;
+      if ($action=='set') {
+         // im Cache wird ein Array[creation_timestamp, value, dependency] gespeichert
+         $this->pool["$namespace::$key"] = array(time(), $value, $dependency);
+         return true;
+      }
+
+      throw new InvalidArgumentException('Invalid argument $action: '.$action);
    }
 }
 ?>
