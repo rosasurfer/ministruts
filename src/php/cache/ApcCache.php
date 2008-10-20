@@ -17,7 +17,7 @@ final class ApcCache extends CachePeer {
     *
     * @return ReferencePool
     */
-   private function getPool() {
+   private function getReferencePool() {
       if (!$this->pool)
          $this->pool = new ReferencePool();
 
@@ -40,7 +40,7 @@ final class ApcCache extends CachePeer {
       // werden.
 
       // ReferencePool abfragen
-      if ($this->getPool()->isCached($key, $namespace)) {
+      if ($this->getReferencePool()->isCached($key, $namespace)) {
          return true;
       }
       else {
@@ -62,7 +62,7 @@ final class ApcCache extends CachePeer {
          }
 
          // ok, Wert im ReferencePool speichern
-         $this->getPool()->set($key, $value, Cache ::EXPIRES_NEVER, $dependency, $namespace);
+         $this->getReferencePool()->set($key, $value, Cache ::EXPIRES_NEVER, $dependency, $namespace);
          return true;
       }
    }
@@ -81,7 +81,7 @@ final class ApcCache extends CachePeer {
     */
    public function get($key, $namespace) {
       if ($this->isCached($key, $namespace))
-         return $this->getPool()->get($key, $namespace);
+         return $this->getReferencePool()->get($key, $namespace);
 
       return null;
    }
@@ -96,23 +96,23 @@ final class ApcCache extends CachePeer {
     * @return boolean - TRUE bei Erfolg, FALSE, falls kein solcher Schlüssel existiert
     */
    public function delete($key, $namespace) {
-      $this->getPool()->delete($key, $namespace);
+      $this->getReferencePool()->delete($key, $namespace);
 
       return apc_delete("$namespace::$key");
    }
 
 
    /**
-    * Implementierung von set/add/replace (protected)
+    * Implementierung von set(), add() und replace().
     */
    protected function store($action, $key, &$value, $expires, IDependency $dependency = null, $namespace) {
-      if ($action == 'add' && $this->isCached($key, $namespace))
+      if ($action=='add' && $this->isCached($key, $namespace))
          return false;
 
-      if ($action == 'replace' && !$this->isCached($key, $namespace))
+      if ($action=='replace' && !$this->isCached($key, $namespace))
          return false;
 
-      if ($action == 'set') {
+      if ($action=='set') {
          // im Cache wird ein array(timestamp, array(value, dependency)) gespeichert
          $time = time();
          $data = array($value, $dependency);
@@ -120,7 +120,7 @@ final class ApcCache extends CachePeer {
          if (!apc_store("$namespace::$key", array($time, serialize($data)), $expires))
             throw new RuntimeException('Unexpected APC error, apc_store() returned FALSE');
 
-         $this->getPool()->store($action, $key, $value, $expires, $dependency, $namespace);
+         $this->getReferencePool()->store($action, $key, $value, $expires, $dependency, $namespace);
          return true;
       }
 
