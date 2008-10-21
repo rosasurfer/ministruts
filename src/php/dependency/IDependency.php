@@ -8,10 +8,7 @@
  * (Session, Datenbank, Clustercache, Dateisystem ...).  Implementierende Klassen müssen serialisierbar
  * sein.
  *
- * Anwendungsbeispiel:
- * -------------------
- *
- * siehe FileDependency
+ * @see FileDependency
  */
 interface IDependency {
 
