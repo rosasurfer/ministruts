@@ -7,7 +7,7 @@
 final class CurlHttpResponse extends HttpResponse {
 
 
-   private static $logDebug, $logInfo, $logNotice;  // boolean
+   private static /*bool*/ $logDebug, $logInfo, $logNotice;  // boolean
 
 
    private /*HeaderParser*/ $headerParser;
@@ -15,15 +15,14 @@ final class CurlHttpResponse extends HttpResponse {
    private /*string*/       $content;        // Content
 
    // aktuelle Länge des gelesenen Contents in Byte
-   private $currentContentLength = 0;
+   private /*int*/ $currentContentLength = 0;
 
 
    /**
     * Erzeugt eine neue Instanz.
     */
    public function __construct() {
-      $loglevel = Logger ::getLogLevel(__CLASS__);
-
+      $loglevel        = Logger ::getLogLevel(__CLASS__);
       self::$logDebug  = ($loglevel <= L_DEBUG );
       self::$logInfo   = ($loglevel <= L_INFO  );
       self::$logNotice = ($loglevel <= L_NOTICE);

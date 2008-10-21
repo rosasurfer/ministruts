@@ -5,14 +5,14 @@
 class Module extends Object {
 
 
-   private static $logDebug, $logInfo, $logNotice;  // boolean
+   private static /*bool*/ $logDebug, $logInfo, $logNotice;
 
 
    /**
     * Ob diese Komponente vollständig konfiguriert ist. Wenn dieses Flag gesetzt ist, wirft jeder Versuch,
     * die Komponente zu ändern, eine IllegalStateException.
     */
-   protected $configured = false;
+   protected /*bool*/ $configured = false;
 
 
    /**
@@ -25,7 +25,7 @@ class Module extends Object {
    /**
     * alle Basisverzeichnisse für von diesem Modul einzubindende Resourcen
     */
-   protected $resourceDirectories = array();
+   protected /*array*/ $resourceDirectories = array();
 
 
    /**
@@ -55,31 +55,31 @@ class Module extends Object {
    /**
     * Der Klassenname der RequestProcessor-Implementierung, die für dieses Modul definiert ist.
     */
-   protected $requestProcessorClass = Struts ::DEFAULT_REQUEST_PROCESSOR_CLASS;
+   protected /*string*/ $requestProcessorClass = Struts ::DEFAULT_REQUEST_PROCESSOR_CLASS;
 
 
    /**
     * Der Klassenname der ActionForward-Implementierung, die für dieses Modul definiert ist.
     */
-   protected $forwardClass = Struts ::DEFAULT_ACTION_FORWARD_CLASS;
+   protected /*string*/ $forwardClass = Struts ::DEFAULT_ACTION_FORWARD_CLASS;
 
 
    /**
     * Der Klassenname der ActionMapping-Implementierung, die für dieses Modul definiert ist.
     */
-   protected $mappingClass = Struts ::DEFAULT_ACTION_MAPPING_CLASS;
+   protected /*string*/ $mappingClass = Struts ::DEFAULT_ACTION_MAPPING_CLASS;
 
 
    /**
     * Der Klassenname der Tiles-Implementierung, die für dieses Modul definiert ist.
     */
-   protected $tilesClass = Struts ::DEFAULT_TILES_CLASS;
+   protected /*string*/ $tilesClass = Struts ::DEFAULT_TILES_CLASS;
 
 
    /**
     * Der Klassenname der RoleProcessor-Implementierung, die für dieses Modul definiert ist.
     */
-   protected $roleProcessorClass;
+   protected /*string*/ $roleProcessorClass;
 
 
    /**
@@ -94,8 +94,7 @@ class Module extends Object {
       if (!is_string($fileName)) throw new IllegalTypeException('Illegal type of argument $fileName: '.getType($fileName));
       if (!is_string($prefix))   throw new IllegalTypeException('Illegal type of argument $prefix: '.getType($prefix));
 
-      $loglevel = Logger ::getLogLevel(__CLASS__);
-
+      $loglevel        = Logger ::getLogLevel(__CLASS__);
       self::$logDebug  = ($loglevel <= L_DEBUG);
       self::$logInfo   = ($loglevel <= L_INFO);
       self::$logNotice = ($loglevel <= L_NOTICE);

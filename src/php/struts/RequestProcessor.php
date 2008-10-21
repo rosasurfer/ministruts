@@ -5,7 +5,7 @@
 class RequestProcessor extends Object {
 
 
-   private static $logDebug, $logInfo, $logNotice;  // boolean
+   private static /*bool*/ $logDebug, $logInfo, $logNotice;
 
 
    // Module, zu dem wir gehören
@@ -18,8 +18,7 @@ class RequestProcessor extends Object {
     * @param Module $module - Module, dem dieser RequestProcessor zugeordnet ist
     */
    public function __construct(Module $module) {
-      $loglevel = Logger ::getLogLevel(__CLASS__);
-
+      $loglevel        = Logger ::getLogLevel(__CLASS__);
       self::$logDebug  = ($loglevel <= L_DEBUG );
       self::$logInfo   = ($loglevel <= L_INFO  );
       self::$logNotice = ($loglevel <= L_NOTICE);

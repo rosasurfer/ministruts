@@ -7,13 +7,13 @@
 final class CurlHttpClient extends HttpClient {
 
 
-   private static $logDebug, $logInfo, $logNotice;  // boolean
+   private static /*bool*/ $logDebug, $logInfo, $logNotice;
 
+
+   private /*int*/ $currentRedirect = 0;    // für manuelle Redirects (wenn open_basedir|safe_mode aktiv ist und followRedirects TRUE ist)
 
    // CURL-Handle
    private $handle;
-
-   private $currentRedirect = 0;    // int:  für manuelle Redirects (wenn open_basedir|safe_mode aktiv ist und followRedirects TRUE ist)
 
    // CURL-Fehlerbeschreibungen
    private static $errors = array(CURLE_OK                      => 'CURLE_OK'                     ,
@@ -90,8 +90,7 @@ final class CurlHttpClient extends HttpClient {
     * Erzeugt eine neue Instanz.
     */
    public function __construct() {
-      $loglevel = Logger ::getLogLevel(__CLASS__);
-
+      $loglevel        = Logger ::getLogLevel(__CLASS__);
       self::$logDebug  = ($loglevel <= L_DEBUG );
       self::$logInfo   = ($loglevel <= L_INFO  );
       self::$logNotice = ($loglevel <= L_NOTICE);
