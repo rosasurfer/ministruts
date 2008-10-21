@@ -31,13 +31,13 @@ class ActionForward extends Object {
    const __SELF = '__self';
 
 
-   protected $name;                  // string
-   protected $path;                  // string
-   protected $label;                 // string
-   protected $redirect;              // boolean
+   protected /*string*/ $name;
+   protected /*string*/ $path;
+   protected /*string*/ $label;
+   protected /*bool*/   $redirect;
 
    // ob diese Komponente vollständig konfiguriert ist
-   protected $configured = false;    // boolean
+   protected /*bool*/ $configured = false;
 
 
    // Getter
