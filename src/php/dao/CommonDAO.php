@@ -96,7 +96,7 @@ class CommonDAO extends Singleton {
 
 
    /**
-    * Gibt den der persistenten Klasse zugrunde liegenden DB-Adapter zurück.
+    * Gibt den für die persistente Klasse dieses DAO zuständigen DB-Adapter zurück.
     *
     * @return DB
     */
