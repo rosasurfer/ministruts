@@ -22,7 +22,7 @@
  * $dependency->isStatusChanged() gibt FALSE zurück.  Nach Änderung oder Löschen der Datei gibt der
  * Aufruf von $dependency->isStatusChanged() TRUE zurück.
  */
-class FileDependency extends Object implements IDependency {
+class FileDependency extends ChainableDependency {
 
 
    /**
@@ -66,16 +66,34 @@ class FileDependency extends Object implements IDependency {
 
 
    /**
+    * Erzeugt eine neue FileDependency, die die Datei mit dem übergebenen Namen überwacht.
+    *
+    * @param string $fileName - Dateiname
+    *
+    * @return FileDependency
+    */
+   public static function create($fileName) {
+      return new self($fileName);
+   }
+
+
+   /**
     * Ob sich die der Abhängigkeit zugrunde liegende Datei geändert hat oder nicht.
     *
     * @return boolean
     */
    public function isStatusChanged() {
       // TODO: stat-Cache bei wiederholten Aufrufen löschen, siehe clearStatCache()
-      if (file_exists($this->fileName))
-         return ($this->timestamp !== fileMTime($this->fileName));
 
-      return ($this->timestamp !== null);
+      if (file_exists($this->fileName)) {
+         if ($this->timestamp !== fileMTime($this->fileName))
+            return true;
+      }
+      elseif ($this->timestamp !== null) {
+         return true;
+      }
+
+      return parent::isStatusChanged();
    }
 }
 ?>

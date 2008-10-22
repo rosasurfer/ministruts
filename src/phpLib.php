@@ -30,6 +30,7 @@ $dir = dirName(__FILE__).DIRECTORY_SEPARATOR;
 $__classes['ApcCache'                       ] = $dir.'php/cache/ApcCache';
 $__classes['Cache'                          ] = $dir.'php/cache/Cache';
 $__classes['CachePeer'                      ] = $dir.'php/cache/CachePeer';
+$__classes['FileSystemCache'                ] = $dir.'php/cache/FileSystemCache';
 $__classes['ReferencePool'                  ] = $dir.'php/cache/ReferencePool';
 
 $__classes['Object'                         ] = $dir.'php/core/Object';
@@ -45,6 +46,7 @@ $__classes['DB'                             ] = $dir.'php/db/DB';
 $__classes['DBPool'                         ] = $dir.'php/db/DBPool';
 $__classes['MySQLConnector'                 ] = $dir.'php/db/MySQLConnector';
 
+$__classes['ChainableDependency'            ] = $dir.'php/dependency/ChainableDependency';
 $__classes['FileDependency'                 ] = $dir.'php/dependency/FileDependency';
 $__classes['IDependency'                    ] = $dir.'php/dependency/IDependency';
 
@@ -388,24 +390,6 @@ function formatMoney($value, $decimals = 2, $decimalSeparator = ',') {
 
 
 /**
- * Formatiert einen Byte-Wert je nach Größe in Byte, Kilobyte, Megabyte oder Gigabyte.
- *
- * @param int $bytes - Byte-Wert
- *
- * @return string
- */
-function formatBytes($bytes) {
-   foreach (array('', 'K', 'M', 'G') as $size) {
-      if ($bytes < 1024)
-         break;
-      $bytes /= 1024;
-   }
-
-   return sprintF('%5.1f %sB', $bytes, $size);
-}
-
-
-/**
  * date_mysql2german
  * wandelt ein MySQL-DATE (ISO-Date)
  * in ein traditionelles deutsches Datum um.
@@ -453,7 +437,7 @@ function ifNull($value, $altValue) {
 /**
  * Pretty printer for byte values.
  *
- * @param int $value - Byte value
+ * @param int $value - byte value
  *
  * @return string
  */
