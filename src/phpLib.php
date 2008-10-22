@@ -441,7 +441,7 @@ function ifNull($value, $altValue) {
  *
  * @return string
  */
-function byteSize($value) {
+function formatBytes($value) {
    foreach (array('','K','M','G') as $unit) {
       if ($value < 1024)
          break;
