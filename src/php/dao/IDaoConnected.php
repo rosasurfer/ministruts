@@ -12,6 +12,6 @@ interface IDaoConnected {
     *
     * @return CommonDAO
     */
-   static function dao();
+   public static function dao();
 }
 ?>
