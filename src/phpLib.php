@@ -390,6 +390,23 @@ function formatMoney($value, $decimals = 2, $decimalSeparator = ',') {
 
 
 /**
+ * Pretty printer for byte values.
+ *
+ * @param int $value - byte value
+ *
+ * @return string
+ */
+function byteSize($value) {
+   foreach (array('', 'K', 'M', 'G') as $unit) {
+      if ($value < 1024)
+         break;
+      $value /= 1024;
+   }
+   return sPrintF('%5.1f %sB', $value, $unit);
+}
+
+
+/**
  * date_mysql2german
  * wandelt ein MySQL-DATE (ISO-Date)
  * in ein traditionelles deutsches Datum um.
@@ -431,23 +448,6 @@ function timestamp_mysql2german($t) {
  */
 function ifNull($value, $altValue) {
    return ($value === null) ? $altValue : $value;
-}
-
-
-/**
- * Pretty printer for byte values.
- *
- * @param int $value - byte value
- *
- * @return string
- */
-function formatBytes($value) {
-   foreach (array('','K','M','G') as $unit) {
-      if ($value < 1024)
-         break;
-      $value /= 1024;
-   }
-   return sPrintF('%5.1f %sB', $value, $unit);
 }
 
 
