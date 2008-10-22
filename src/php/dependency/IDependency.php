@@ -18,6 +18,6 @@ interface IDependency {
     *
     * @return boolean
     */
-   function isStatusChanged();
+   public function isStatusChanged();
 }
 ?>
