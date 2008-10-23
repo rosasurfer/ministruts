@@ -5,7 +5,7 @@
 class TorHelper extends StaticClass {
 
 
-   private static $logDebug, $logInfo, $logNotice;  // boolean
+   private static /*bool*/ $logDebug, $logInfo, $logNotice;
 
 
    // TODO: Serverliste bei Fehlern dynamisch anpassen
@@ -25,10 +25,9 @@ class TorHelper extends StaticClass {
     */
    private static function init() {
       if (self::$logDebug === null) {
-         $loglevel = Logger ::getLogLevel(__CLASS__);
-
-         self::$logDebug  = ($loglevel <= L_DEBUG);
-         self::$logInfo   = ($loglevel <= L_INFO);
+         $loglevel        = Logger ::getLogLevel(__CLASS__);
+         self::$logDebug  = ($loglevel <= L_DEBUG );
+         self::$logInfo   = ($loglevel <= L_INFO  );
          self::$logNotice = ($loglevel <= L_NOTICE);
       }
    }
@@ -61,7 +60,8 @@ class TorHelper extends StaticClass {
     * @return array - assoziatives Array mit den IP-Adressen aller Exit-Nodes
     */
    private static function &getExitNodes() {
-      $nodes = Cache ::get($key='exit_nodes', __FILE__);
+      $cache = Cache ::me('php-torhelper');
+      $nodes = $cache->get($key='exit_nodes');
 
       if ($nodes == null) {
          $content = null;
@@ -94,9 +94,8 @@ class TorHelper extends StaticClass {
             Logger ::log('Could not get Tor exit nodes from any server', L_ERROR, __CLASS__);
          }
 
-         Cache ::set($key, $nodes, 30 * MINUTE, null, __FILE__);
+         $cache->set($key, $nodes, 30 * MINUTES);
       }
-
       return $nodes;
    }
 }

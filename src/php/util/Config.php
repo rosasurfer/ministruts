@@ -67,7 +67,11 @@
  * logger.php.struts        = info
  * logger.php.struts.Action = warn          # Kommentar innerhalb einer Zeile
  */
-final class Config extends Singleton {
+final class Config extends Object {
+
+
+   // die gefundenen Config-Files
+   private /*string[]*/ $files = array();
 
 
    // Property-Pool
@@ -80,17 +84,47 @@ final class Config extends Singleton {
     * @return Singleton
     */
    public static function me() {
-      // gibt es bereits eine Instanz im Cache ?
-      $instance = Cache ::get(__CLASS__);
+      /*
+      Die Konfiguration wird im Cache gespeichert und der Cache wird mit Hilfe der Konfiguration
+      initialisiert.  Dadurch kommt es zu zirkulären Aufrufen zwischen Config::me() und Cache::me().
+      Bei solchen zirkulären Aufrufen (und nur dann) gibt Cache::me() NULL zurück.
+      @see Cache::me()
+      */
 
-      if (!$instance) {       // nein, neue Instanz erzeugen ...
-         $instance = Singleton ::getInstance(__CLASS__);
+      static /*Config*/ $config       = null;   // emuliert Singleton-Verhalten (Config kann nicht Singleton sein)
+      static /*bool*/   $configCached = false;
 
-         // ... und auf Production-Server cachen
-         if (isSet($_SERVER['REQUEST_METHOD']) && $_SERVER['REMOTE_ADDR']!='127.0.0.1')
-            Cache ::set(__CLASS__, $instance);
+      $cache = null;
+
+      if (!$config) {
+         $cache = Cache ::me();                             // gibt es bereits eine Instanz im Cache ?
+
+         if (!$cache || !($config=$cache->get(__CLASS__)))
+            $config = new self();                           // nein, Config neu einlesen
       }
-      return $instance;
+      elseif (!$configCached) {
+         // Config ist noch nicht gecacht, nachschauen, ob ein Cache da ist
+         $cache = Cache ::me();
+      }
+
+      // hier haben wir immer eine Config, sie ist aber evt. noch nicht gecacht
+      if (!$configCached && $cache) {
+
+         // Cache ist da, nochmal nachschauen, ob es bereits eine Instanz im Cache gibt
+         if ($cached=$cache->get(__CLASS__)) {
+            $configCached = true;      // jetzt gibt es 2 Instanzen => Config kann nicht Singleton sein
+            $config       = $cached;   // aktuelle durch die Version im Cache ersetzen
+         }
+         else {
+            $dependency = null;        // nein, Config cachen
+            foreach ($config->files as $file) {
+               if (!$dependency) $dependency =    FileDependency ::create($file);
+               else              $dependency->add(FileDependency ::create($file));
+            }
+            $configCached = Cache ::me()->set(__CLASS__, $config, Cache ::EXPIRES_NEVER, $dependency);
+         }
+      }
+      return $config;
    }
 
 
@@ -103,7 +137,7 @@ final class Config extends Singleton {
     * mit unterschiedlichen Einstellungen verwendet werden können. Lokale Einstellungen überschreiben
     * globale Einstellungen.
     */
-   protected function __construct() {
+   private function __construct() {
       $files = array();
 
       // Ausgangsverzeichnis ermitteln (bei Webapplikation "WEB-INF", bei Shellscripten das Scriptverzeichnis)
@@ -124,6 +158,7 @@ final class Config extends Singleton {
             if (is_file($file = $path.DIRECTORY_SEPARATOR.'config.properties'))        $files[$file] = $file;
          }
       }
+      $this->files = $files;
 
 
       // wir laden die Dateien von der Wurzel aus und überschreiben alle vorhandenen Werte
@@ -277,8 +312,14 @@ final class Config extends Singleton {
       }
 
       // Cache aktualisieren, falls die Config-Instanz dort gespeichert ist
-      if ($persist && Cache ::isCached(__CLASS__))
-         Cache ::set(__CLASS__, $this);
+      if ($persist && Cache ::me()->isCached(__CLASS__))
+         Cache ::me()->set(__CLASS__, $this);
    }
+
+
+   /**
+    * Verhindert das Clonen der Config-Instanz.
+    */
+   private function __clone() {/* do not clone me */}
 }
 ?>

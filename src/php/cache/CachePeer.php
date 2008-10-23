@@ -4,16 +4,92 @@
  *
  * Abstrakte Basisklasse für Cache-Implementierungen.
  *
- * @see Cache
+ * Anwendung:
+ * ----------
+ *
+ *    Objekt speichern:
+ *
+ *       CachePeer::set($key, $value, $expires);
+ *
+ *
+ *    Objekt hinzufügen (nur speichern, wenn es noch nicht im Cache existiert):
+ *
+ *       CachePeer::add($key, $value, $expires)
+ *
+ *
+ *    Objekt ersetzen (nur speichern, wenn es bereits im Cache existiert):
+ *
+ *       CachePeer::replace($key, $value, $expires)
+ *
+ *
+ *    Objekt aus dem Cache holen:
+ *
+ *       $value = CachePeer::get($key);
+ *
+ *
+ *    Objekt löschen:
+ *
+ *       CachePeer::delete($key);
+ *
+ * @see ApcCache
+ * @see FileSystemCache
+ * @see ReferencePool
  */
 abstract class CachePeer extends Object {
 
 
-   abstract public    function get($key, $namespace);
-   abstract public    function delete($key, $namespace);
-   abstract public    function isCached($key, $namespace);
+   protected /*string*/        $label;
+   protected /*string*/        $namespace;
+   protected /*array*/         $options;
+   private   /*ReferencePool*/ $referencePool;
 
-   abstract protected function store($action, $key, &$value, $expires, IDependency $dependency = null, $namespace);
+
+   /**
+    * Gibt den lokalen ReferencePool zurück.
+    *
+    * @return ReferencePool
+    */
+   protected function getReferencePool() {
+      if (!$this->referencePool)
+         $this->referencePool = new ReferencePool($this->label);
+      return $this->referencePool;
+   }
+
+
+   /**
+    * Gibt einen Wert aus dem Cache zurück.
+    *
+    * @param string $key - Schlüssel, unter dem der Wert gespeichert ist
+    *
+    * @return mixed - Der gespeicherte Wert oder NULL, falls kein solcher Schlüssel existiert.
+    */
+   abstract public function get($key);
+
+
+   /**
+    * Löscht einen Wert aus dem Cache.
+    *
+    * @param string $key - Schlüssel, unter dem der Wert gespeichert ist
+    *
+    * @return boolean - TRUE bei Erfolg, FALSE, falls kein solcher Schlüssel existiert
+    */
+   abstract public function delete($key);
+
+
+   /**
+    * Ob unter dem angegebenen Schlüssel ein Wert im Cache gespeichert ist.
+    *
+    * @param string $key - Schlüssel
+    *
+    * @return boolean
+    */
+   abstract public function isCached($key);
+
+
+   /**
+    * Implementierung von set(), add() und replace().
+    */
+   abstract protected function store($action, $key, &$value, $expires, IDependency $dependency = null);
 
 
    /**
@@ -25,16 +101,14 @@ abstract class CachePeer extends Object {
     * @param mixed       $value      - der zu speichernde Wert
     * @param int         $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfällt
     * @param IDependency $dependency - Abhängigkeit der Gültigkeit des gespeicherten Wertes
-    * @param string      $namespace  - Namensraum innerhalb des Caches
     *
     * @return boolean - TRUE bei Erfolg, FALSE andererseits
     */
-   final public function set($key, &$value, $expires, IDependency $dependency = null, $namespace) {
+   final public function set($key, &$value, $expires = Cache ::EXPIRES_NEVER, IDependency $dependency = null) {
       if (!is_string($key))       throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
       if (!is_int($expires))      throw new IllegalTypeException('Illegal type of parameter $expires: '.getType($expires));
-      if (!is_string($namespace)) throw new IllegalTypeException('Illegal type of parameter $namespace: '.getType($namespace));
 
-      return $this->store('set', $key, $value, $expires, $dependency, $namespace);
+      return $this->store('set', $key, $value, $expires, $dependency);
    }
 
 
@@ -47,16 +121,14 @@ abstract class CachePeer extends Object {
     * @param mixed       $value      - der zu speichernde Wert
     * @param int         $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfällt
     * @param IDependency $dependency - Abhängigkeit der Gültigkeit des gespeicherten Wertes
-    * @param string      $namespace  - Namensraum innerhalb des Caches
     *
     * @return boolean - TRUE bei Erfolg, FALSE andererseits
     */
-   final public function add($key, &$value, $expires, IDependency $dependency = null, $namespace) {
+   final public function add($key, &$value, $expires = Cache ::EXPIRES_NEVER, IDependency $dependency = null) {
       if (!is_string($key))       throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
       if (!is_int($expires))      throw new IllegalTypeException('Illegal type of parameter $expires: '.getType($expires));
-      if (!is_string($namespace)) throw new IllegalTypeException('Illegal type of parameter $namespace: '.getType($namespace));
 
-      return $this->store('add', $key, $value, $expires, $dependency, $namespace);
+      return $this->store('add', $key, $value, $expires, $dependency);
    }
 
 
@@ -69,16 +141,14 @@ abstract class CachePeer extends Object {
     * @param mixed       $value      - der zu speichernde Wert
     * @param int         $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfällt
     * @param IDependency $dependency - Abhängigkeit der Gültigkeit des gespeicherten Wertes
-    * @param string      $namespace  - Namensraum innerhalb des Caches
     *
     * @return boolean - TRUE bei Erfolg, FALSE andererseits
     */
-   final public function replace($key, &$value, $expires, IDependency $dependency = null, $namespace) {
+   final public function replace($key, &$value, $expires = Cache ::EXPIRES_NEVER, IDependency $dependency = null) {
       if (!is_string($key))       throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
       if (!is_int($expires))      throw new IllegalTypeException('Illegal type of parameter $expires: '.getType($expires));
-      if (!is_string($namespace)) throw new IllegalTypeException('Illegal type of parameter $namespace: '.getType($namespace));
 
-      return $this->store('replace', $key, $value, $expires, $dependency, $namespace);
+      return $this->store('replace', $key, $value, $expires, $dependency);
    }
 }
 ?>

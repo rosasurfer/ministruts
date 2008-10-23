@@ -2,35 +2,7 @@
 /**
  * Cache
  *
- * Fassade für verschiedene Cache-Implementierungen.
- *
- * Anwendung:
- * ----------
- *
- *    Objekt im Cache speichern:
- *
- *       Cache::set($key, $value, $expires);
- *
- *
- *    Objekt im Cache nur dann speichern, wenn es dort noch nicht existiert:
- *
- *       Cache::add($key, $value, $expires)
- *
- *
- *    Objekt im Cache nur dann speichern, wenn es dort bereits existiert:
- *
- *       Cache::replace($key, $value, $expires)
- *
- *
- *    Objekt aus dem Cache holen:
- *
- *       $value = Cache::get($key);
- *
- *
- *    Objekt im Cache löschen:
- *
- *       Cache::delete($key);
- *
+ * Factory für verschiedene Cache-Implementierungen.
  *
  * @see CachePeer
  */
@@ -41,117 +13,108 @@ final class Cache extends StaticClass {
 
 
    /**
-    * die aktuelle Cache-Implementierung
+    * Default-Cache-Implementierung
     */
-   private static $peer = null;
+   private static /*CachePeer*/   $default;
 
 
    /**
-    * Gibt die Instanz der aktuellen Cache-Implementierung zurück.
+    * weitere Cache-Implementierungen
+    */
+   private static /*CachePeer[]*/ $caches;
+
+
+   /**
+    * Gibt die Cache-Implementierung für den angegebenen Bezeichner zurück. Unterschiedliche Bezeichner
+    * stehen für verschiedene Cache-Implementierungen, z.B. APC, Dateisystem-Cache, MemCache.
+    *
+    * @param string $label - Bezeichner
     *
     * @return CachePeer
     */
-   private static function getPeer() {
-      if (!self::$peer) {
-         if (extension_loaded('apc') && ini_get('apc.enabled'))
-            self::$peer = new ApcCache();
-         else
-            self::$peer = new ReferencePool();
+   public static function me($label = null) {
+      /*
+      Undocumented:
+      -------------
+      Die Konfiguration wird im Cache gespeichert und der Cache wird mit Hilfe der Konfiguration
+      initialisiert.  Dadurch kommt es zu zirkulären Aufrufen zwischen Config::me() und Cache::me().
+      Bei solchen zirkulären Aufrufen (und nur dann) wird NULL zurückgegeben.
+      @see Config::me()
+      */
+
+      static /*array*/ $creationsInProgress;
+      static /*array*/ $circularCalls;
+
+
+      // Default-Cache
+      if ($label === null) {
+         if (!self::$default) {
+            $key = '';
+
+            // rekursive Aufrufe während der Instantiierung abfangen
+            if (isSet($creationsInProgress[$key])) {
+               $circularCalls[$key] = true;
+               return null;
+            }
+
+            // Flag zur Erkenung rekursiver Aufrufe setzen
+            $creationsInProgress[$key] = true;
+
+            // neuen Cache instantiieren
+            if (extension_loaded('apc') && ini_get('apc.enabled'))
+               self::$default = new ApcCache($label);
+            else
+               self::$default = new ReferencePool($label);
+
+            // Flag zurücksetzen
+            unset($creationsInProgress[$key]);
+
+            // trat ein rekursiver Aufruf auf, muß die Config evt. noch gecacht werden
+            if (isSet($circularCalls[$key])) {
+               // Die Config wird bei jedem Request einmal neu eingelesen und erst dann durch die gecachte
+               // Variante ersetzt. Abhilfe: Logger-Anweisungen aus der Cache- und den abhängigen Klassen entfernen
+               Logger ::log(new RuntimeException('Circular method call, performance is degraded'), L_WARN, __CLASS__);
+
+               unset($circularCalls[$key]);
+               Config ::me();
+            }
+         }
+         return self::$default;
       }
-      return self::$peer;
-   }
 
 
-   /**
-    * Speichert einen Wert im Cache.  Ein schon vorhandener Wert unter demselben Schlüssel wird
-    * überschrieben.  Läuft die angegebene Zeitspanne ab oder ändert sich der Status der angegebenen
-    * Abhängigkeit, wird der Wert automatisch ungültig.
-    *
-    * @param string      $key        - Schlüssel, unter dem der Wert gespeichert wird
-    * @param mixed       $value      - der zu speichernde Wert
-    * @param int         $expires    - Zeitspanne in Sekunden, nach der der Wert verfällt (default: nie)
-    * @param IDependency $dependency - Abhängigkeit der Gültigkeit des gespeicherten Wertes
-    * @param string      $namespace  - Namensraum innerhalb des Caches (default: APPLICATION_NAME)
-    *
-    * @return boolean - TRUE bei Erfolg, FALSE andererseits
-    */
-   public static function set($key, &$value, $expires = self:: EXPIRES_NEVER, IDependency $dependency = null, $namespace = APPLICATION_NAME) {
-      return self:: getPeer()->set($key, $value, $expires, $dependency, $namespace);
-   }
+      // spezifischer Cache
+      if (!is_string($label)) throw new IllegalTypeException('Illegal type of argument $label: '.getType($label));
 
 
-   /**
-    * Speichert einen Wert im Cache nur dann, wenn noch kein Wert unter dem angegebenen Schlüssel
-    * existiert.  Läuft die angegebene Zeitspanne ab oder ändert sich der Status der angegebenen
-    * Abhängigkeit, wird der Wert automatisch ungültig.
-    *
-    * @param string      $key        - Schlüssel, unter dem der Wert gespeichert wird
-    * @param mixed       $value      - der zu speichernde Wert
-    * @param int         $expires    - Zeitspanne in Sekunden, nach der der Wert verfällt (default: nie)
-    * @param IDependency $dependency - Abhängigkeit der Gültigkeit des gespeicherten Wertes
-    * @param string      $namespace  - Namensraum innerhalb des Caches (default: APPLICATION_NAME)
-    *
-    * @return boolean - TRUE bei Erfolg, FALSE andererseits
-    */
-   public static function add($key, &$value, $expires = self:: EXPIRES_NEVER, IDependency $dependency = null, $namespace = APPLICATION_NAME) {
-      return self:: getPeer()->add($key, $value, $expires, $dependency, $namespace);
-   }
+      if (!isSet(self::$caches[$label])) {
+         // rekursive Aufrufe während der Instantiierung abfangen
+         if (isSet($creationsInProgress[$label])) {
+            $circularCalls[$label] = true;
+            return null;
+         }
+
+         // Cache-Konfiguration auslesen
+         $class   = Config::me()->get('cache.'.$label.'.class');
+         $options = Config::me()->get('cache.'.$label.'.options', null);
 
 
-   /**
-    * Speichert einen Wert im Cache nur dann, wenn unter dem angegebenen Schlüssel bereits ein Wert
-    * existiert.  Läuft die angegebene Zeitspanne ab oder ändert sich der Status der angegebenen
-    * Abhängigkeit, wird der Wert automatisch ungültig.
-    *
-    * @param string      $key        - Schlüssel, unter dem der Wert gespeichert wird
-    * @param mixed       $value      - der zu speichernde Wert
-    * @param int         $expires    - Zeitspanne in Sekunden, nach der der Wert verfällt (default: nie)
-    * @param IDependency $dependency - Abhängigkeit der Gültigkeit des gespeicherten Wertes
-    * @param string      $namespace  - Namensraum innerhalb des Caches (default: APPLICATION_NAME)
-    *
-    * @return boolean - TRUE bei Erfolg, FALSE andererseits
-    */
-   public static function replace($key, &$value, $expires = self:: EXPIRES_NEVER, IDependency $dependency = null, $namespace = APPLICATION_NAME) {
-      return self:: getPeer()->replace($key, $value, $expires, $dependency, $namespace);
-   }
+         // Cache instantiieren
+         $creationsInProgress[$label] = true;
+         self::$caches[$label] = new $class($label, $options);
+         unset($creationsInProgress[$label]);
 
 
-   /**
-    * Gibt einen Wert aus dem Cache zurück.
-    *
-    * @param string $key       - Schlüssel, unter dem der Wert gespeichert ist
-    * @param string $namespace - Namensraum innerhalb des Caches (default: APPLICATION_NAME)
-    *
-    * @return mixed - der gespeicherte Wert oder NULL, falls kein solcher Schlüssel existiert
-    */
-   public static function get($key, $namespace = APPLICATION_NAME) {
-      return self:: getPeer()->get($key, $namespace);
-   }
+         // trat ein rekursiver Aufruf auf, muß die Config evt. noch gecacht werden
+         if (isSet($circularCalls[$label])) {
+            // Die Config wird bei jedem Request einmal neu eingelesen und erst dann durch die gecachte
+            // Variante ersetzt. Abhilfe: Logger-Anweisungen aus der Cache- und den abhängigen Klassen entfernen
+            Logger ::log(new RuntimeException('Circular method call, performance is degraded'), L_WARN, __CLASS__);
 
-
-   /**
-    * Löscht einen Wert aus dem Cache.
-    *
-    * @param string $key       - Schlüssel, unter dem der Wert gespeichert ist
-    * @param string $namespace - Namensraum innerhalb des Caches (default: APPLICATION_NAME)
-    *
-    * @return boolean - TRUE bei Erfolg,
-    *                   FALSE, falls kein solcher Schlüssel existiert
-    */
-   public static function delete($key, $namespace = APPLICATION_NAME) {
-      return self:: getPeer()->delete($key, $namespace);
-   }
-
-
-   /**
-    * Ob unter dem angegebenen Schlüssel ein Wert im Cache gespeichert ist.
-    *
-    * @param string $key       - Schlüssel
-    * @param string $namespace - Namensraum innerhalb des Caches (default: APPLICATION_NAME)
-    *
-    * @return boolean
-    */
-   public static function isCached($key, $namespace = APPLICATION_NAME) {
-      return self:: getPeer()->isCached($key, $namespace);
+            unset($circularCalls[$label]);
+            Config ::me();
+         }
+      }
+      return self::$caches[$label];
    }
 }

@@ -5,7 +5,7 @@
 final class FrontController extends Singleton {
 
 
-   private static $logDebug, $logInfo, $logNotice;  // boolean
+   private static /*bool*/ $logDebug, $logInfo, $logNotice;
 
 
    /**
@@ -59,14 +59,15 @@ final class FrontController extends Singleton {
          throw new IllegalStateException('You can not use '.__CLASS__.' in this context.');
 
       // Ist schon eine Instanz im Cache ?
-      $instance = Cache ::get(__CLASS__);
-      if (!$instance) {                   // nein, neue Instanz erzeugen ...
+      $instance = Cache ::me()->get(__CLASS__);
+      if (!$instance) {
+         // nein, neue Instanz erzeugen ...
          $instance = Singleton ::getInstance(__CLASS__);
 
          // ... und mit FileDependency cachen
          $appDirectory = dirName($_SERVER['SCRIPT_FILENAME']);
          $dependency = new FileDependency($appDirectory.'/WEB-INF/struts-config.xml');
-         Cache ::set(__CLASS__, $instance, Cache ::EXPIRES_NEVER, $dependency);
+         Cache ::me()->set(__CLASS__, $instance, Cache ::EXPIRES_NEVER, $dependency);
       }
 
       return $instance;
@@ -80,7 +81,6 @@ final class FrontController extends Singleton {
     */
    protected function __construct() {
       $loglevel        = Logger ::getLogLevel(__CLASS__);
-
       self::$logDebug  = ($loglevel <= L_DEBUG );
       self::$logInfo   = ($loglevel <= L_INFO  );
       self::$logNotice = ($loglevel <= L_NOTICE);
