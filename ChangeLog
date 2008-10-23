@@ -1,3 +1,10 @@
+2008-10-23
+
+   - neu: php/cache/FileSystemCache
+
+	- mehrere Caches möglich, können in config.properties konfiguriert werden
+
+
 2008-10-22
 
    - neu: php/dependency/ChainableDependency
