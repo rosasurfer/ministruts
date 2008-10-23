@@ -244,17 +244,15 @@ function printFormatted($var, $return = false) {
    else {
       $str = (string) $var;
    }
-
-   if (isSet($_SERVER['REQUEST_METHOD'])) {
+   if (isSet($_SERVER['REQUEST_METHOD']))
       $str = '<div align="left"><pre style="margin:0; font:normal normal 12px/normal \'Courier New\',courier,serif">'.htmlSpecialChars($str, ENT_QUOTES).'</pre></div>';
-   }
+
    $str .= "\n";
 
    if ($return)
       return $str;
 
    //ob_get_level() ? ob_flush() : flush();
-
    while (ob_get_level()) ob_end_flush();
    flush();
 
