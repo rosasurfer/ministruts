@@ -168,7 +168,9 @@ class Logger extends StaticClass {
 
       // 2. Exception anzeigen (wenn $display TRUE ist)
       if (self::$display) {
-         ob_get_level() ? ob_flush() : flush();
+         //ob_get_level() ? ob_flush() : flush();
+         while (ob_get_level()) ob_end_flush();
+         flush();
 
          if (self::$displayHtml) {
             echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif"><b>Uncaught</b> '.nl2br(htmlSpecialChars($message, ENT_QUOTES))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
@@ -310,7 +312,9 @@ class Logger extends StaticClass {
 
       // 2. Logmessage anzeigen (wenn $display TRUE ist)
       if (self::$display) {
-         ob_get_level() ? ob_flush() : flush();
+         //ob_get_level() ? ob_flush() : flush();
+         while (ob_get_level()) ob_end_flush();
+         flush();
 
          if (self::$displayHtml) {
             echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.self::$logLevels[$level].'</b>: '.nl2br(htmlSpecialChars($message, ENT_QUOTES))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
