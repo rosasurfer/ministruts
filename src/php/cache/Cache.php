@@ -61,10 +61,12 @@ final class Cache extends StaticClass {
             $creationsInProgress[$key] = true;
 
             // neuen Cache instantiieren
-            if (extension_loaded('apc') && ini_get('apc.enabled'))
+            if (extension_loaded('apc') && ini_get(isSet($_SERVER['REQUEST_METHOD']) ? 'apc.enabled' : 'apc.enable_cli')) {
                self::$default = new ApcCache($label);
-            else
+            }
+            else {
                self::$default = new ReferencePool($label);
+            }
 
             // Flag zurücksetzen
             unset($creationsInProgress[$key]);
