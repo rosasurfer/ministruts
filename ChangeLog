@@ -42,7 +42,7 @@
 
 2008-03-01
 
-   - Tiles: In jedem Html-Fragement steht eine Variable $session mit der aktuellen HttpSession zur Verfügung.
+   - Tiles: In jedem Html-Fragment steht eine Variable $session mit der aktuellen HttpSession zur Verfügung.
      Existiert keine Session, ist diese Variable NULL.
 
 
