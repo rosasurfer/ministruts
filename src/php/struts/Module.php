@@ -855,7 +855,7 @@ class Module extends Object {
 
       if ($nodes) {
          if (sizeOf($nodes) > 1)
-            throw new RuntimeException('Non-unique name detected for tiles definition "'.$name.'"');
+            throw new RuntimeException('Non-unique tiles definition name "'.$name.'"');
          return true;
       }
       return false;
