@@ -6,7 +6,7 @@ abstract class ActionForm extends Object {
 
 
    /**
-    * der Request, zu dem wir gehören
+    * Request, zu dem wir gehören
     */
    protected /*transient Request*/ $request;
 
@@ -30,7 +30,6 @@ abstract class ActionForm extends Object {
       // ggf. definierten DispatchAction-Key auslesen
       if     (isSet($_REQUEST['action'  ])) $this->actionKey = $_REQUEST['action'  ];
       elseif (isSet($_REQUEST['action.x'])) $this->actionKey = $_REQUEST['action.x'];  // submit-Type "image"
-
 
       // Parameter einlesen
       $this->populate($request);
