@@ -37,7 +37,7 @@ final class FileSystemCache extends CachePeer {
 
 
       // Cache-Verzeichnis ggf. erzeugen
-      if (!is_writable($directory) && !mkDir($directory, 0700, true))
+      if (is_file($directory) || (!is_writable($directory) && !mkDir($directory, 0700, true)))
          throw new InvalidArgumentException('Can not write to $directory: '.$directory);
 
       $this->directory = realPath($directory).DIRECTORY_SEPARATOR;
@@ -202,7 +202,7 @@ final class FileSystemCache extends CachePeer {
 
       // Unterverzeichnis ggf. erzeugen
       $directory = dirName($fileName);
-      if (!is_writable($directory) && !mkDir($directory, 0700, true))
+      if (is_file($directory) || (!is_writable($directory) && !mkDir($directory, 0700, true)))
          throw new InvalidArgumentException('Can not write to directory: '.$directory);
 
       // Datei schreiben
