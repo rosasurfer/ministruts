@@ -318,15 +318,15 @@ class Module extends Object {
          // process action attribute
          if ($tag['action']) {
             if ($mapping->getForward()) throw new RuntimeException('Mapping "'.$mapping->getPath().'": Only one attribute of "action", "include", "redirect" or "forward" must be specified');
-            $path = (string) $tag['action'];
+            $action = (string) $tag['action'];
             // TODO: URL validieren
-            $mapping->setAction($path);
+            $mapping->setActionClassName($action);
          }
 
 
          // process form attribute
          if ($tag['form'])
-            $mapping->setForm((string) $tag['form']);
+            $mapping->setFormClassName((string) $tag['form']);
 
 
          // process scope attribute
@@ -335,8 +335,8 @@ class Module extends Object {
 
 
          // process validate attribute
-         if ($mapping->getForm()) {
-            $action = $mapping->getAction();
+         if ($mapping->getFormClassName()) {
+            $action = $mapping->getActionClassName();
             if ($action || $mapping->getForward()) {
                $validate = $tag['validate'] ? ($tag['validate'] == 'true') : !$action;
             }

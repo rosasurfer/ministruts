@@ -65,7 +65,7 @@ class RequestProcessor extends Object {
 
 
       // ActionForm vorbereiten
-      $form = $this->processActionForm($request, $response, $mapping);
+      $form = $this->processActionFormCreate($request, $response, $mapping);
 
 
       // ActionForm validieren
@@ -313,23 +313,23 @@ EOT_405;
     *
     * @return ActionForm
     */
-   protected function processActionForm(Request $request, Response $response, ActionMapping $mapping) {
-      $className = $mapping->getForm();
+   protected function processActionFormCreate(Request $request, Response $response, ActionMapping $mapping) {
+      $className = $mapping->getFormClassName();
       if (!$className)
          return null;
 
       $form = null;
 
-      // ActionForm zuerst in der Session suchen ...
+      // bei gesetztem Session-Scope ActionForm zuerst in der Session suchen ...
       if ($mapping->isSessionScope())
          $form = $request->getSession()->getAttribute($className);
 
-      // ... und bei Mißerfolg neue Instanz erzeugen
+      // ... ansonsten neue Instanz erzeugen
       if (!$form)
          $form = new $className($request);
 
 
-      // Instanz immer im Request ...
+      // Instanz im Request ...
       $request->setAttribute(Struts ::ACTION_FORM_KEY, $form);
 
       // ... und ggf. auch in der Session speichern
@@ -360,7 +360,7 @@ EOT_405;
 
       $success = $form->validate();
 
-      if ($mapping->getAction())
+      if ($mapping->getActionClassName())
          return true;
 
       $forward = $mapping->getForward();
@@ -406,9 +406,9 @@ EOT_405;
     * @return Action
     */
    protected function processActionCreate(Request $request, Response $response, ActionMapping $mapping, ActionForm $form=null) {
-      $actionClass = $mapping->getAction();
+      $className = $mapping->getActionClassName();
 
-      return new $actionClass($mapping, $form);
+      return new $className($mapping, $form);
    }
 
 
