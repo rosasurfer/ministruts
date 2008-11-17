@@ -184,7 +184,7 @@ class Logger extends StaticClass {
 
 
       // 3. Exception an die registrierten Adressen mailen (wenn $mail TRUE ist) ...
-      if (self::$mail && ($addresses = Config ::get('mail.buglovers')) && ($addresses = explode(',', $addresses))) {
+      if (self::$mail && ($addresses = explode(',', Config ::get('mail.buglovers')))) {
          $mailMsg  = $plainMessage."\n\n".$message."\n\n\n".$traceStr;
 
          $request = Request ::me();
@@ -207,10 +207,13 @@ class Logger extends StaticClass {
             ini_set('sendmail_from', $_SERVER['SERVER_ADMIN']);                           // nur für Windows relevant
 
          foreach ($addresses as $address) {
-            $success = error_log($mailMsg, 1, $address, 'Subject: PHP error_log: Uncaught Exception at '.(isSet($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : '').$_SERVER['PHP_SELF']);
-            if (!$success) {
-               error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', $plainMessage), 0);
-               break;
+            // TODO: Adressformat validieren
+            if ($address) {
+               $success = error_log($mailMsg, 1, $address, 'Subject: PHP error_log: Uncaught Exception at '.(isSet($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : '').$_SERVER['PHP_SELF']);
+               if (!$success) {
+                  error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', $plainMessage), 0);
+                  break;
+               }
             }
          }
          ini_set('sendmail_from', $old_sendmail_from);
@@ -331,7 +334,7 @@ class Logger extends StaticClass {
 
 
       // 3. Logmessage an die registrierten Adressen mailen (wenn $mail TRUE ist) ...
-      if (self::$mail && ($addresses = Config ::get('mail.buglovers')) && ($addresses = explode(',', $addresses))) {
+      if (self::$mail && ($addresses = explode(',', Config ::get('mail.buglovers')))) {
          $mailMsg = $plainMessage;
          if ($exception)
             $mailMsg .= "\n\n".$exMessage."\n\n\n".$exTraceStr;
@@ -356,10 +359,13 @@ class Logger extends StaticClass {
             ini_set('sendmail_from', $_SERVER['SERVER_ADMIN']);                           // nur für Windows relevant
 
          foreach ($addresses as $address) {
-            $success = error_log($mailMsg, 1, $address, 'Subject: PHP error_log: '.self::$logLevels[$level].' at '.(isSet($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : '').$_SERVER['PHP_SELF']);
-            if (!$success) {
-               error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', $plainMessage), 0);
-               break;
+            // TODO: Adressformat validieren
+            if ($address) {
+               $success = error_log($mailMsg, 1, $address, 'Subject: PHP error_log: '.self::$logLevels[$level].' at '.(isSet($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : '').$_SERVER['PHP_SELF']);
+               if (!$success) {
+                  error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', $plainMessage), 0);
+                  break;
+               }
             }
          }
          ini_set('sendmail_from', $old_sendmail_from);
