@@ -209,6 +209,7 @@ class Logger extends StaticClass {
          foreach ($addresses as $address) {
             // TODO: Adressformat validieren
             if ($address) {
+               // TODO: Header mit Fehlermeldung hinzufügen, damit beim Empfänger Messagefilter unterstützt werden
                $success = error_log($mailMsg, 1, $address, 'Subject: PHP error_log: Uncaught Exception at '.(isSet($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : '').$_SERVER['PHP_SELF']);
                if (!$success) {
                   error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', $plainMessage), 0);
