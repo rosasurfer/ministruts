@@ -201,7 +201,7 @@ abstract class DB extends Object {
     */
    public function commit() {
       if ($this->transaction < 1) {
-         Logger ::log('No database transaction to commit', L_WARN, __CLASS__);
+         Logger ::log('No database transaction to commit', L_NOTICE, __CLASS__);
       }
       else {
          if ($this->transaction == 1)
@@ -221,7 +221,7 @@ abstract class DB extends Object {
     */
    public function rollback() {
       if ($this->transaction < 1) {
-         Logger ::log('No database transaction to roll back', L_WARN, __CLASS__);
+         Logger ::log('No database transaction to roll back', L_NOTICE, __CLASS__);
       }
       else {
          if ($this->transaction == 1)
