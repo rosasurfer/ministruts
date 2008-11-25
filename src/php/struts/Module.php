@@ -800,7 +800,7 @@ class Module extends Object {
     * Sucht und gibt den globalen ActionForward mit dem angegebenen Namen zurück.
     * Wird kein Forward gefunden, wird NULL zurückgegeben.
     *
-    * @param $name - logischer Name des ActionForwards
+    * @param string $name - logischer Name des ActionForwards
     *
     * @return ActionForward
     */
@@ -816,7 +816,7 @@ class Module extends Object {
     * Gibt die Tile mit dem angegebenen Namen zurück oder NULL, wenn keine Tile mit diesem Namen
     * gefunden wurde.
     *
-    * @param $name - logischer Name der Tile
+    * @param string $name - logischer Name der Tile
     *
     * @return Tile
     */
@@ -865,7 +865,7 @@ class Module extends Object {
    /**
     * Ob in den Resource-Verzeichnissen dieses Modules unter dem angegebenen Namen eine Datei existiert.
     *
-    * @param $path - Pfadangabe
+    * @param string $path - Pfadangabe
     *
     * @return boolean
     */
@@ -880,7 +880,7 @@ class Module extends Object {
     * und gibt den vollständigen Dateinamen zurück, oder NULL, wenn keine Datei mit diesem Namen
     * gefunden wurde.
     *
-    * @param $name - relativer Dateiname
+    * @param string $name - relativer Dateiname
     *
     * @return string - Dateiname
     */
