@@ -4,6 +4,8 @@
  *
  * Diese Klasse sollte möglichst wenige externe Abhängigkeiten haben, um während der Fehlerverarbeitung
  * auftretende weitere Fehler zu verhindern.
+ *
+ * TODO: Logger muß erweitert werden können
  */
 class Logger extends StaticClass {
 
@@ -185,6 +187,16 @@ class Logger extends StaticClass {
 
       // 3. Exception an die registrierten Adressen mailen (wenn $mail TRUE ist) ...
       if (self::$mail && ($addresses = explode(',', Config ::get('mail.buglovers')))) {
+
+         // TODO: temporäre Logsperre auf server wegen Lastproblemen:
+         if ($_SERVER['SERVER_ADDR']=='0.0.0.0') {
+            if ($file=='/var/www/ministruts/src/php/db/MySQLConnector.php')
+               if (  $message=="PHPErrorException: mysql_connect(): Can't connect to local MySQL server through socket '/tmp/mysql.sock' (11)"
+                  || $message=="PHPErrorException: mysql_connect(): Too many connections") {
+                  exit(1);
+               }
+         }
+
          $mailMsg  = $plainMessage."\n\n".$message."\n\n\n".$traceStr;
 
          $request = Request ::me();
