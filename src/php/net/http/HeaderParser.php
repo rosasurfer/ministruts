@@ -88,7 +88,7 @@ final class HeaderParser extends Object {
    /**
     * Ob ein Header mit dem angegebenen Namen existiert.
     *
-    * @param $name - Name des Headers
+    * @param string $name - Name des Headers
     *
     * @return boolean
     */
@@ -100,7 +100,7 @@ final class HeaderParser extends Object {
    /**
     * Gibt den Header mit dem angegebenen Namen zurück.
     *
-    * @param $name - Name des Headers
+    * @param string $name - Name des Headers
     *
     * @return string
     */
