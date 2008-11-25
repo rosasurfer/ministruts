@@ -134,10 +134,10 @@ define('WINDOWS', (strToUpper(subStr(PHP_OS, 0, 3))==='WIN'));
 
 
 
-// Errorhandler registrieren
-// -------------------------
-set_error_handler    (create_function('$level, $message, $file, $line, array $context', 'return Logger ::handleError($level, $message, $file, $line, $context);'));
-set_exception_handler(create_function('Exception $exception'                          , 'return Logger ::handleException($exception);'                          ));
+// Errorhandler registrieren (per anonymer Funktion, damit Logger nicht schon hier geladen und included wird)
+// ----------------------------------------------------------------------------------------------------------
+set_error_handler    (create_function('$level, $message, $file, $line, array $context', 'return Logger::handleError($level, $message, $file, $line, $context);'));
+set_exception_handler(create_function('Exception $exception'                          , 'return Logger::handleException($exception);'                          ));
 
 
 
