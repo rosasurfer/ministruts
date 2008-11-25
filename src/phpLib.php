@@ -5,7 +5,7 @@
 
 // -----------------------------------------------------------------------------------------------------------------------------------
 // ggf. Profiler starten
-if (extension_loaded('APD') && (isSet($_GET['_PROFILE_']) || isSet($_POST['_PROFILE_']))) {
+if (extension_loaded('APD') && isSet($_REQUEST['_PROFILE_'])) {
    $dumpFile = apd_set_pprof_trace(ini_get('apd.dumpdir'));
 
    if ($dumpFile) {
@@ -471,9 +471,8 @@ function apd_get_url() {
  * Nur für APD: Shutdown-Function, fügt nach dem Profiling einen Link zum Report in die Seite ein.
  */
 function apd_shutdown_function($dumpFile = null) {
-   if (!headers_sent()) {
+   if (!headers_sent())
       flush();
-   }
 
    // überprüfen, ob der aktuelle Content HTML ist (z.B. nicht bei Downloads)
    $isHTML = false;
