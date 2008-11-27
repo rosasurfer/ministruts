@@ -85,9 +85,9 @@ final class Config extends Object {
     */
    public static function me() {
       /*
-      Die Konfiguration wird im Cache gespeichert und der Cache wird mit Hilfe der Konfiguration
-      initialisiert.  Dadurch kommt es zu zirkulären Aufrufen zwischen Config::me() und Cache::me().
-      Bei solchen zirkulären Aufrufen (und nur dann) gibt Cache::me() NULL zurück.
+      Die Konfiguration wird gecacht und der Cache wird mit Hilfe der Konfiguration initialisiert.
+      Dadurch kommt es zu zirkulären Aufrufen zwischen Config::me() und Cache::me().  Bei solchen
+      zirkulären Aufrufen (und nur dann) gibt Cache::me() NULL zurück.
       @see Cache::me()
       */
 
@@ -111,15 +111,16 @@ final class Config extends Object {
       if (!$configCached && $cache) {
 
          // Cache ist da, nochmal nachschauen, ob es bereits eine Instanz im Cache gibt
-         if ($cached=$cache->get(__CLASS__)) {
-            $configCached = true;      // jetzt gibt es 2 Instanzen => Config kann nicht Singleton sein
-            $config       = $cached;   // aktuelle durch die Version im Cache ersetzen
+         if ($cached = $cache->get(__CLASS__)) {
+            $configCached = true;      // ja, jetzt gibt es 2 Instanzen (daher kann Config nicht als Singleton definiert werden)
+            $config       = $cached;   // aktuelle Version durch Version im Cache ersetzen
          }
          else {
             $dependency = null;        // nein, Config cachen
             foreach ($config->files as $file) {
-               if (!$dependency) $dependency =    FileDependency ::create($file);
-               else              $dependency->add(FileDependency ::create($file));
+               // TODO: Änderungen werden nicht erkannt, wenn eine weitere config-Datei hinzugefügt wird
+               $singleDep  = FileDependency ::create($file);
+               $dependency = $dependency ? $dependency->add($singleDep) : $singleDep;
             }
             $configCached = Cache ::me()->set(__CLASS__, $config, Cache ::EXPIRES_NEVER, $dependency);
          }
