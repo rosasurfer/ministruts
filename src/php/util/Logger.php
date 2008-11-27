@@ -189,7 +189,7 @@ class Logger extends StaticClass {
       if (self::$mail && ($addresses = explode(',', Config ::get('mail.buglovers')))) {
 
          // TODO: temporäre Logsperre auf server wegen Lastproblemen:
-         if (false && $_SERVER['SERVER_ADDR']=='0.0.0.0') {
+         if ($_SERVER['SERVER_ADDR']=='0.0.0.0') {
             if ($file=='/var/www/ministruts/src/php/db/MySQLConnector.php')
                if (  $message=="PHPErrorException: mysql_connect(): Can't connect to local MySQL server through socket '/tmp/mysql.sock' (11)"
                   || $message=="PHPErrorException: mysql_connect(): Too many connections") {
