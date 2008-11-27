@@ -42,17 +42,11 @@ class Mailer extends Object {
       }
 
       // get the hostname
-      if (isSet($_SERVER['SERVER_NAME'])) {
-         $hostname = $_SERVER['SERVER_NAME'];
-      }
-      elseif (!$hostname = php_uName('n')) {
-         $hostname = 'localhost';
-      }
-      if (!String ::contains($hostname, '.')) {
-         $hostname .= '.localdomain';              // hostname must contain of more than one period (see RFC 2821)
-      }
-      $this->hostname = strToLower($hostname);
+      if     (isSet($_SERVER['SERVER_NAME'])) $hostname  = $_SERVER['SERVER_NAME'];
+      elseif (!$hostname = php_uName('n'))    $hostname  = 'localhost';
+      if (!String ::contains($hostname, '.')) $hostname .= '.localdomain';    // hostname must contain more than only one part (see RFC 2821)
 
+      $this->hostname = strToLower($hostname);
       $this->log("\n----==:[ New Mailer instance - smtp://".$this->config['host'].':'.$this->config['port'].($this->config['auth'] ? ' with authentification':'')."]:==----");
    }
 
@@ -183,6 +177,7 @@ class Mailer extends Object {
       }
 
       $this->writeData("RCPT TO:<$to>");
+      // TODO: macht der MTA ein DNS lookup, kann es in readResponse() zu einem Time-out kommen
       $response = $this->readResponse();
 
       $this->checkResponse($response);
