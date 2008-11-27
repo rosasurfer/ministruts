@@ -530,6 +530,7 @@ function composeMessage($from, $fromName, $to, $toName, $subject, $textMsg, $htm
    $message .= "\n";
    $message.="--$outerBoundary--\n";
 
+   // TODO: mail() gibt keinen Fehler zurück, wenn eine Socket-Verbindung fehlschlägt
    mail($to, $subject, $message, $headers);
 }
 */
