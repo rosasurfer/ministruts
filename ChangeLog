@@ -1,5 +1,10 @@
 2008-10-23
 
+   - Bugfix: SimpleXMLElement::xPath() gibt entgegen der Dokumentation NICHT immer ein Array zurück
+
+
+2008-10-23
+
    - neu: php/cache/FileSystemCache
 
 	- mehrere Caches möglich, können in config.properties konfiguriert werden
