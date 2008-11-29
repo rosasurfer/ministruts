@@ -1,4 +1,4 @@
-2008-10-23
+2008-10-29
 
    - Bugfix: SimpleXMLElement::xPath() gibt entgegen der Dokumentation NICHT immer ein Array zurück
 
