@@ -215,7 +215,11 @@ class Module extends Object {
     */
    protected function processForwards(SimpleXMLElement $xml) {
       // process global 'include' and 'redirect' forwards
-      foreach ($xml->xPath('/struts-config/global-forwards/forward[@include] | /struts-config/global-forwards/forward[@redirect]') as $tag) {
+      $elements = $xml->xPath('/struts-config/global-forwards/forward[@include] | /struts-config/global-forwards/forward[@redirect]');
+      if ($elements === false)
+         $elements = array(); // xPath() gibt entgegen der Dokumentation NICHT immer ein Array zurück
+
+      foreach ($elements as $tag) {
          $name = (string) $tag['name'];
          if (sizeOf($tag->attributes()) > 2) throw new RuntimeException('Global forward "'.$name.'": Only one attribute of "include", "redirect" or "forward" must be specified');
 
@@ -239,7 +243,11 @@ class Module extends Object {
       }
 
       // process global 'forward' forwards (fragwürdig, aber möglich)
-      foreach ($xml->xPath('/struts-config/global-forwards/forward[@forward]') as $tag) {
+      $elements = $xml->xPath('/struts-config/global-forwards/forward[@forward]');
+      if ($elements === false)
+         $elements = array(); // xPath() gibt entgegen der Dokumentation NICHT immer ein Array zurück
+
+      foreach ($elements as $tag) {
          $name = (string) $tag['name'];
          if (sizeOf($tag->attributes()) > 2) throw new RuntimeException('Global forward "'.$name.'": Only one attribute of "include", "redirect" or "forward" must be specified');
 
@@ -258,7 +266,11 @@ class Module extends Object {
     * @param SimpleXMLElement $xml - XML-Konfiguration
     */
    protected function processMappings(SimpleXMLElement $xml) {
-      foreach ($xml->xPath('/struts-config/action-mappings/mapping') as $tag) {
+      $elements = $xml->xPath('/struts-config/action-mappings/mapping');
+      if ($elements === false)
+         $elements = array(); // xPath() gibt entgegen der Dokumentation NICHT immer ein Array zurück
+
+      foreach ($elements as $tag) {
          $mapping = new $this->mappingClass($this);
 
 
@@ -853,7 +865,7 @@ class Module extends Object {
    private function isTile($name, SimpleXMLElement $xml) {
       $nodes = $xml->xPath("/struts-config/tiles/tile[@name='$name']");
 
-      if ($nodes) {
+      if ($nodes) {                 // xPath() gibt entgegen der Dokumentation NICHT immer ein Array zurück
          if (sizeOf($nodes) > 1)
             throw new RuntimeException('Non-unique tiles definition name "'.$name.'"');
          return true;
