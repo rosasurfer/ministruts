@@ -391,7 +391,11 @@ class Module extends Object {
          // child nodes
          // -----------
          // process local 'include' and 'redirect' forwards
-         foreach ($tag->xPath('./forward[@include] | ./forward[@redirect]') as $forwardTag) {
+         $subElements = $tag->xPath('./forward[@include] | ./forward[@redirect]');
+         if ($subElements === false)
+            $subElements = array(); // xPath() gibt entgegen der Dokumentation NICHT immer ein Array zurück
+
+         foreach ($subElements as $forwardTag) {
             $name = (string) $forwardTag['name'];
             if (sizeOf($forwardTag->attributes()) > 2) throw new RuntimeException('Mapping "'.$mapping->getPath().'", forward "'.$name.'": Only one attribute of "include", "redirect" or "forward" must be specified');
 
@@ -415,7 +419,11 @@ class Module extends Object {
          }
 
          // process local 'forward' forwards
-         foreach ($tag->xPath('./forward[@forward]') as $forwardTag) {
+         $subElements = $tag->xPath('./forward[@forward]');
+         if ($subElements === false)
+            $subElements = array(); // xPath() gibt entgegen der Dokumentation NICHT immer ein Array zurück
+
+         foreach ($subElements as $forwardTag) {
             $name = (string) $forwardTag['name'];
             if (sizeOf($forwardTag->attributes()) > 2) throw new RuntimeException('Mapping "'.$mapping->getPath().'", forward "'.$name.'": Only one attribute of "include", "redirect" or "forward" must be specified');
 
@@ -441,7 +449,11 @@ class Module extends Object {
     * @param SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
     */
    protected function processTiles(SimpleXMLElement $xml) {
-      foreach ($xml->xPath('/struts-config/tiles/tile') as $tag) {
+      $elements = $xml->xPath('/struts-config/tiles/tile');
+      if ($elements === false)
+         $elements = array(); // xPath() gibt entgegen der Dokumentation NICHT immer ein Array zurück
+
+      foreach ($elements as $tag) {
          $name = (string) $tag['name'];
          $tile = $this->getDefinedTile($name, $xml);
       }
@@ -637,9 +649,14 @@ class Module extends Object {
     * @param SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
     */
    protected function processController(SimpleXMLElement $xml) {
-      if ($this->configured) throw new IllegalStateException('Configuration is frozen');
+      if ($this->configured)
+         throw new IllegalStateException('Configuration is frozen');
 
-      foreach ($xml->xPath('/struts-config/controller') as $controller) {
+      $elements = $xml->xPath('/struts-config/controller');
+      if ($elements === false)
+         $elements = array(); // xPath() gibt entgegen der Dokumentation NICHT immer ein Array zurück
+
+      foreach ($elements as $controller) {
          if ($controller['request-processor']) {
             $this->setRequestProcessorClass((string) $controller['request-processor']);
          }
