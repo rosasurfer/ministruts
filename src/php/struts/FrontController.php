@@ -1,6 +1,21 @@
 <?
 /**
  * FrontController
+ *
+ * NOTE:
+ * -----
+ * Diese Klasse muß "thread-sicher" programmiert sein. Das bedeutet, in den Methoden dürfen keine
+ * Instanzvariablen geändert werden.
+ *
+ * Hintergrund ist, daß es nur eine einzige FrontController-Instanz gibt, die aus Performance-
+ * Gründen gecacht und bei jedem Request wiederverwendet wird.  Wenn nun z.B. während eines Methoden-
+ * aufrufs ein Wert in einer Instanzvariable geändert würde, dann würde sich diese Änderung nicht nur
+ * auf diesen, sondern auch auf alle weiteren Prozesse, die diese Instanz verwenden, auswirken,
+ * wodurch deren Ablauf gestört werden könnte.
+ *
+ * Als einfache Richtlinie gilt, daß in den Methoden keine Werte in $this oder self geändert werden
+ * dürfen.  Wird das eingehalten, ist die Klasse "thread-sicher".
+ *
  */
 final class FrontController extends Singleton {
 
@@ -9,48 +24,14 @@ final class FrontController extends Singleton {
 
 
    /**
-    * die registrierten Module, Schlüssel ist ihr Prefix
+    * alle registrierten Module, Schlüssel ist ihr Prefix
     */
    private /*Module[]*/ $modules = array();
 
 
    /**
-    * Verarbeitet den aktuellen Request.
-    */
-   public static function processRequest() {
-      $controller = self ::me();
-      $request    = Request ::me();
-      $response   = Response ::me();
-
-      // Module selektieren
-      $prefix = $controller->getModulePrefix($request);
-      $module = $controller->modules[$prefix];
-      $request->setAttribute(Struts ::MODULE_KEY, $module);
-
-      // RequestProcessor holen
-      $processor = $controller->getRequestProcessor($module);
-
-      // Request verarbeiten
-      $processor->process($request, $response);
-   }
-
-
-   /**
     * Gibt die Singleton-Instanz dieser Klasse zurück. Ist ein Cache installiert, wird sie gecacht.
     * Dadurch muß die XML-Konfiguration nicht bei jedem Request neu eingelesen werden.
-    *
-    * NOTE:
-    * -----
-    * Diese Methode muß "thread-sicher" programmiert sein. Das bedeutet, sie darf keine Werte in
-    * Klassenvariablen speichern.
-    *
-    * Hintergrund ist, daß es nur eine einzige FrontController-Instanz gibt, die aus Performance-
-    * Gründen gecacht und bei jedem Request wiederverwendet wird.  Wenn nun z.B. ein Wert in einer
-    * Klassenvariable gespeichert würde, dann würde dieser Wert nicht nur in diesem, sondern auch in
-    * allen weiteren Requests existieren, wodurch deren Verarbeitung gestört werden könnte.
-    *
-    * Als einfache Richtlinie gilt, daß diese Methode keine Werte in $this oder self speichern darf.
-    * Wird das eingehalten, ist die Klasse "thread-sicher".
     *
     * @return Singleton
     */
@@ -61,15 +42,22 @@ final class FrontController extends Singleton {
       // Ist schon eine Instanz im Cache ?
       $instance = Cache ::me()->get(__CLASS__);
       if (!$instance) {
-         // nein, neue Instanz erzeugen ...
-         $instance = Singleton ::getInstance(__CLASS__);
+         // TODO: Instanziierung und cachen synchronisieren
+         // $lock = new Object();
+         // synchronized ($lock) {
+               // nach Erhalten des Locks Cache erneut prüfen
+               // $instance = Cache ::me()->get(__CLASS__);
+               // if (!$instance) {
+                     // neue Instanz erzeugen ...
+                     $instance = Singleton ::getInstance(__CLASS__);
 
-         // ... und mit FileDependency cachen
-         $appDirectory = dirName($_SERVER['SCRIPT_FILENAME']);
-         $dependency = new FileDependency($appDirectory.'/WEB-INF/struts-config.xml');
-         Cache ::me()->set(__CLASS__, $instance, Cache ::EXPIRES_NEVER, $dependency);
+                     // ... und mit FileDependency cachen
+                     $appDirectory = dirName($_SERVER['SCRIPT_FILENAME']);
+                     $dependency = new FileDependency($appDirectory.'/WEB-INF/struts-config.xml');
+                     Cache ::me()->set(__CLASS__, $instance, Cache ::EXPIRES_NEVER, $dependency);
+               // }
+         // }
       }
-
       return $instance;
    }
 
@@ -129,7 +117,11 @@ final class FrontController extends Singleton {
 
             $module = new Module($file, $prefix);
             $module->freeze();
-            $this->registerModule($module);
+
+            if (isSet($this->modules[$prefix]))
+               throw new RuntimeException('All modules must have unique module prefixes, non-unique prefix: "'.$prefix.'"');
+
+            $this->modules[$prefix] = $module;
          }
       }
       catch (Exception $ex) {
@@ -139,17 +131,23 @@ final class FrontController extends Singleton {
 
 
    /**
-    * Registriert den Module-Prefix der übergebenen Instanz.
-    *
-    * @param Module $module
+    * Verarbeitet den aktuellen Request.
     */
-   private function registerModule(Module $module) {
-      $prefix = $module->getPrefix();
+   public static function processRequest() {
+      $request    = Request  ::me();
+      $response   = Response ::me();
+      $controller = self     ::me();
 
-      if (isSet($this->modules[$prefix]))
-         throw new RuntimeException('All modules must have unique module prefixes, non-unique prefix: "'.$prefix.'"');
+      // Module selektieren
+      $prefix = $controller->getModulePrefix($request);
+      $module = $controller->modules[$prefix];
+      $request->setAttribute(Struts ::MODULE_KEY, $module);
 
-      $this->modules[$prefix] = $module;
+      // RequestProcessor holen
+      $processor = $controller->getRequestProcessor($module);
+
+      // Request verarbeiten
+      $processor->process($request, $response);
    }
 
 
