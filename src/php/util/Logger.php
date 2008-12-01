@@ -212,7 +212,6 @@ class Logger extends StaticClass {
             // TODO: Adressformat validieren
             if ($address) {
                // TODO: Header mit Fehlermeldung hinzufügen, damit beim Empfänger Messagefilter unterstützt werden
-               // TODO: error_log() benutzt vermutlich mail(), gibt also keinen Fehler zurück, wenn eine Socket-Verbindung fehlschlägt
                $success = error_log($mailMsg, 1, $address, 'Subject: PHP error_log: Uncaught Exception at '.(isSet($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : '').$_SERVER['PHP_SELF']);
                if (!$success) {
                   error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', $plainMessage), 0);
@@ -366,7 +365,6 @@ class Logger extends StaticClass {
             // TODO: Adressformat validieren
             if ($address) {
                // TODO: Header mit Fehlermeldung hinzufügen, damit beim Empfänger Messagefilter unterstützt werden
-               // TODO: error_log() benutzt vermutlich mail(), gibt also keinen Fehler zurück, wenn eine Socket-Verbindung fehlschlägt
                $success = error_log($mailMsg, 1, $address, 'Subject: PHP error_log: '.self::$logLevels[$level].' at '.(isSet($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : '').$_SERVER['PHP_SELF']);
                if (!$success) {
                   error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', $plainMessage), 0);

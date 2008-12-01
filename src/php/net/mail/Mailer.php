@@ -57,10 +57,8 @@ class Mailer extends Object {
     * Sorgt bei Zerstörung des Objekts dafür, daß eine noch offene Connection geschlossen werden.
     */
    public function __destruct() {
-      if (is_resource($this->connection)) {
-         fClose($this->connection);
-         $this->connection = null;
-      }
+      if ($this->connection)
+         $this->disconnect();
    }
 
 
@@ -560,7 +558,6 @@ function composeMessage($from, $fromName, $to, $toName, $subject, $textMsg, $htm
    $message .= "\n";
    $message.="--$outerBoundary--\n";
 
-   // TODO: mail() gibt keinen Fehler zurück, wenn eine Socket-Verbindung fehlschlägt
    mail($to, $subject, $message, $headers);
 }
 */
