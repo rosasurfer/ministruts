@@ -95,8 +95,8 @@ final class Cache extends StaticClass {
          }
 
          // Cache-Konfiguration auslesen
-         $class   = Config::me()->get('cache.'.$label.'.class');
-         $options = Config::me()->get('cache.'.$label.'.options', null);
+         $class   = Config ::me()->get('cache.'.$label.'.class');
+         $options = Config ::me()->get('cache.'.$label.'.options', null);
 
 
          // Cache instantiieren
