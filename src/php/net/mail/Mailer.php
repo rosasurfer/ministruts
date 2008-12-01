@@ -10,42 +10,43 @@
 class Mailer extends Object {
 
 
-   private $config = array('host'    => null,      // SMTP server host name
-                           'port'    => null,      // SMTP server port
-                           'auth'    => false,     // use authentification ?
-                           'user'    => null,      // username
-                           'pass'    => null,      // password
-                           'timeout' => 90);       // default socket timeout
-   private $hostname;
-   private $connection     = null;
-   private $responseStatus = 0;
-   private $response       = null;
+   private /*array*/ $config = array('host'    => null,      // SMTP server host name
+                                     'port'    => null,      // SMTP server port
+                                     'auth'    => false,     // use authentification ?
+                                     'user'    => null,      // username
+                                     'pass'    => null,      // password
+                                     'timeout' => 90);       // default socket timeout
 
-   private $debug     = false;
-   private $logBuffer = null;
+   private /*string*/   $hostname;
+   private /*resource*/ $connection     = null;
+   private /*int*/      $responseStatus = 0;
+   private /*string*/   $response       = null;
+   private /*string*/   $logBuffer      = null;
 
 
    /**
     * Default constructor
     */
    public function __construct() {
-      $this->debug = @$GLOBALS['debug'];
-      global $smtp, $smtp_port, $smtp_use_auth, $smtp_user, $smtp_pass;
+      $this->config['host'] = ini_get('SMTP');
+      $this->config['port'] = ini_get('smtp_port');
 
-      $this->config['host'] = isSet($smtp)      ? $smtp     : ini_get('SMTP');
-      $this->config['port'] = isSet($smtp_port) ? $smtp_port: ini_get('smtp_port');
-      $this->config['auth'] = $smtp_use_auth;
-      if ($smtp_use_auth) {
-         $this->config['user'] = $smtp_user;
-         $this->config['pass'] = $smtp_pass;
+      if (isSet($GLOBALS['smtp_use_auth'])) {
+         $this->config['auth'] = (bool) $GLOBALS['smtp_use_auth'];
+         if ($this->config['auth']) {
+            $this->config['user'] = $GLOBALS['smtp_user'];
+            $this->config['pass'] = $GLOBALS['smtp_pass'];
+         }
       }
 
-      // get the hostname
-      if     (isSet($_SERVER['SERVER_NAME'])) $hostname  = $_SERVER['SERVER_NAME'];
-      elseif (!$hostname = php_uName('n'))    $hostname  = 'localhost';
-      if (!String ::contains($hostname, '.')) $hostname .= '.localdomain';    // hostname must contain more than only one part (see RFC 2821)
-
+      // get our hostname
+      $hostname = php_uName('n');
+      if (!$hostname)
+         $hostname  = 'localhost';
+      if (!String ::contains($hostname, '.'))
+         $hostname .= '.localdomain';    // hostname must contain more than one part (see RFC 2821)
       $this->hostname = strToLower($hostname);
+
       $this->log("\n----==:[ New Mailer instance - smtp://".$this->config['host'].':'.$this->config['port'].($this->config['auth'] ? ' with authentification':'')."]:==----");
    }
 
@@ -82,38 +83,31 @@ class Mailer extends Object {
                               $this->config['port'],
                               $errorCode,
                               $errorMsg,
-                              $this->config['timeout']) or trigger_error("Could not open socket: $errorMsg (error $errorCode)", E_USER_WARNING);
+                              $this->config['timeout']);
       if (!$connection)
-         return false;
+         throw new RuntimeException("Could not open socket: $errorMsg (error $errorCode)");
 
       $data = stream_get_meta_data($connection);
-      if ($data['timed_out']) {
-         trigger_error('Timeout on socket connection', E_USER_WARNING);
-         return false;
-      }
+      if ($data['timed_out'])
+         throw new InfrastructureException('Timeout on socket connection');
+
       socket_set_timeout($connection, $this->config['timeout']);
       $this->connection = $connection;
 
-      if ($this->readResponse() === false)                                       // read greeting
-         return false;
-
-
       // init connection
-      $this->writeData('EHLO '.$this->hostname);                                 // extended Hello first...
+      $this->readResponse();                          // read greeting
+      $this->writeData('EHLO '.$this->hostname);      // extended Hello first...
       $response = $this->readResponse();
 
       $this->checkResponse($response);
       if ($this->responseStatus != 250) {
-         $this->writeData('HELO '.$this->hostname);                              // normal Hello if extended fails...
+         $this->writeData('HELO '.$this->hostname);   // normal Hello if extended fails...
          $response = $this->readResponse();
 
          $this->checkResponse($response);
-         if ($this->responseStatus != 250) {
-            trigger_error('HELO command not accepted: '.$this->responseStatus.' '.$this->response, E_USER_WARNING);
-            return false;
-         }
+         if ($this->responseStatus != 250)
+            throw new RuntimeException('HELO command not accepted: '.$this->responseStatus.' '.$this->response);
       }
-      return true;
    }
 
 
@@ -121,122 +115,127 @@ class Mailer extends Object {
     * Authentifizierung
     */
    private function authenticate() {
-      if (!$this->connection) {
-         trigger_error('Cannot authenticate: Not connected', E_USER_WARNING);
-         return false;
-      }
+      if (!$this->connection)
+         throw new RuntimeException('Cannot authenticate: Not connected');
 
       // init authentication
       $this->writeData('AUTH LOGIN');
       $response = $this->readResponse();
 
       $this->checkResponse($response);
-      if ($this->responseStatus == 503) {
-         return true;                                                            // already authenticated
-      }
-      if ($this->responseStatus != 334) {
-         trigger_error('AUTH LOGIN command not supported: '.$this->responseStatus.' '.$this->response, E_USER_WARNING);
-         return false;
-      }
+      if ($this->responseStatus == 503)
+         return;                          // already authenticated
+
+      if ($this->responseStatus != 334)
+         throw new RuntimeException('AUTH LOGIN command not supported: '.$this->responseStatus.' '.$this->response);
 
       // send user
       $this->writeData(base64_encode($this->config['user']));
       $response = $this->readResponse();
 
       $this->checkResponse($response);
-      if ($this->responseStatus != 334) {
-         trigger_error('Username '.$this->config['user'].' not accepted'.$this->responseStatus.' '.$this->response, E_USER_WARNING);
-         return false;
-      }
+      if ($this->responseStatus != 334)
+         throw new RuntimeException('Username '.$this->config['user'].' not accepted'.$this->responseStatus.' '.$this->response);
 
       // send pass
       $this->writeData(base64_encode($this->config['pass']));
       $response = $this->readResponse();
 
       $this->checkResponse($response);
-      if ($this->responseStatus != 235) {
-         trigger_error('Login failed for username '.$this->config['user'].': '.$this->responseStatus.' '.$this->response, E_USER_WARNING);
-         return false;
-      }
-      return true;
+      if ($this->responseStatus != 235)
+         throw new RuntimeException('Login failed for username '.$this->config['user'].': '.$this->responseStatus.' '.$this->response);
    }
 
 
    /**
     * Mail verschicken.
     */
-   public function sendMail($from, $to, $subject, $message, $headers) {
-      $this->connection && $this->logBuffer = null;                  // reset log buffer if already connected
+   public function sendMail($fromAddress, $toAddress, $subject, $message, array $headers = null) {
+      if (!is_string($fromAddress)) throw new IllegalTypeException('Illegal type of parameter $fromAddress: '.getType($fromAddress));
+      $from = $this->parseAddress($fromAddress);
+      if (!$from) throw new InvalidArgumentException('Invalid argument $fromAddress: '.$fromAddress);
 
-      if (!$this->connection     && !$this->connect())      return false;
-      if ( $this->config['auth'] && !$this->authenticate()) return false;
+      if (!is_string($toAddress)) throw new IllegalTypeException('Illegal type of parameter $toAddress: '.getType($toAddress));
+      $to = $this->parseAddress($toAddress);
+      if (!$to) throw new InvalidArgumentException('Invalid argument $toAddress: '.$toAddress);
+
+      if (!is_string($subject)) throw new IllegalTypeException('Illegal type of parameter $subject: '.getType($subject));
+      if (!is_string($message)) throw new IllegalTypeException('Illegal type of parameter $message: '.getType($message));
+
+      if ($headers === null)
+         $headers = array();
+      foreach ($headers as $key => $header)
+         if (!is_string($header)) throw new IllegalTypeException('Illegal parameter type in argument $headers[$key]: '.getType($header));
+
+
+      if ($this->connection)
+         $this->logBuffer = null;         // reset log buffer if already connected
+
+      if (!$this->connection)
+         $this->connect();
+
+      if ($this->config['auth'])
+         $this->authenticate();
+
 
       // init mail
-      $this->log("\n----==::  Sending new mail  [from: $from] [to: $to] [subject: $subject]  :==----");
-      $returnPath = "<$from>";
+      $this->log("\n----==::  Sending new mail  [from: $from[address]] [to: $to[address]] [subject: $subject]  :==----");
 
-      if (is_array($headers)) {
-         $tmp = array();
-         foreach ($headers as $header) {
-            $header = trim($header);
-            if (String ::startsWith($header, 'return-path:', true)) {  // is a custom 'Return-Path' header given ?
-               $returnPath = trim(subStr($header, 12));
-            }
-            else {
-               $tmp[] = $header;
-            }
+
+      // check for a custom 'Return-Path' header
+      $returnPath = $from['address'];
+      foreach ($headers as $key => $header) {
+         $header = trim($header);
+         if (String ::startsWith($header, 'return-path:', true)) {
+            $result = $this->parseAddress(subStr($header, 12));
+            if (!$result) throw new InvalidArgumentException('Invalid Return-Path header: '.$header);
+            $returnPath = $result['address'];
+            unset($headers[$key]);
          }
-         $headers = $tmp;
       }
 
-      $this->writeData("MAIL FROM:$returnPath");
+      $this->writeData("MAIL FROM: <$returnPath>");
       $response = $this->readResponse();
 
       $this->checkResponse($response);
-      if ($this->responseStatus != 250) {
-         trigger_error("MAIL FROM:$returnPath command not accepted: ".$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer, E_USER_WARNING);
-         return false;
-      }
+      if ($this->responseStatus != 250)
+         throw new RuntimeException("MAIL FROM: <$returnPath> command not accepted: ".$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
 
-      $this->writeData("RCPT TO:<$to>");
+      $this->writeData("RCPT TO: <$to[address]>");
       // TODO: macht der MTA ein DNS lookup, kann es in readResponse() zu einem Time-out kommen
       $response = $this->readResponse();
 
       $this->checkResponse($response);
-      if ($this->responseStatus != 250 && $this->responseStatus != 251) {
-         trigger_error("RCPT TO:<$to> command not accepted: ".$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer, E_USER_WARNING);
-         return false;
-      }
+      if ($this->responseStatus != 250 && $this->responseStatus != 251)
+         throw new RuntimeException("RCPT TO: <$to[address]> command not accepted: ".$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
 
-      // sent the mail data
-      $this->writeData('DATA');                                      // init
+
+      // send mail data
+      $this->writeData('DATA');
       $response = $this->readResponse();
 
       $this->checkResponse($response);
-      if ($this->responseStatus != 354) {
-         trigger_error('DATA command not accepted: '.$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer, E_USER_WARNING);
-         return false;
-      }
+      if ($this->responseStatus != 354)
+         throw new RuntimeException('DATA command not accepted: '.$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
 
-      $this->writeData('Date: '.date('r'));                          // needed headers
+
+      // send needed headers
+      $this->writeData('Date: '.date('r'));
          $from = preg_replace('~([\xA0-\xFF])~e', '"=?ISO-8859-1?Q?=".strToUpper(decHex(ord("$1")))."?="', $from);
-
-      // TODO: Mailer: hardcodierte Adressen und Header entfernen
-      $this->writeData("From: Kundensupport <$from>");
+      $this->writeData("From: $from[name] <$from[address]>");
          $to = preg_replace('~([\xA0-\xFF])~e', '"=?ISO-8859-1?Q?=".strToUpper(decHex(ord("$1")))."?="', $to);
-      $this->writeData("To: $to");
+      $this->writeData("To: $to[name] <$to[address]>");
          $subject = preg_replace('~([\xA0-\xFF])~e', '"=?ISO-8859-1?Q?=".strToUpper(decHex(ord("$1")))."?="', $subject);
       $this->writeData("Subject: $subject");
-      $this->writeData("X-Mailer: Microsoft Office Outlook 11");     // save us from Hotmail junk folder ;-)
+      $this->writeData("X-Mailer: Microsoft Office Outlook 11");     // save us from Hotmail junk folder
       $this->writeData("X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2900.2180");
 
-      if (is_array($headers)) {                                      // custom headers
-         foreach ($headers as $header) {
-            if (isSet($header) && $header != '') {
-               $header = preg_replace('~([\xA0-\xFF])~e', '"=?ISO-8859-1?Q?=".strToUpper(decHex(ord("$1")))."?="', $header);
-               $this->writeData($header);
-            }
-         }
+
+      // send custom headers
+      foreach ($headers as $header) {
+         // TODO: Header syntaktisch überprüfen
+         $header = preg_replace('~([\xA0-\xFF])~e', '"=?ISO-8859-1?Q?=".strToUpper(decHex(ord("$1")))."?="', $header);
+         $this->writeData($header);
       }
       $this->writeData('');
 
@@ -248,11 +247,8 @@ class Mailer extends Object {
       $response = $this->readResponse();
 
       $this->checkResponse($response);
-      if ($this->responseStatus != 250) {
-         trigger_error('Sent data not accepted: '.$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer, E_USER_WARNING);
-         return false;
-      }
-      return true;
+      if ($this->responseStatus != 250)
+         throw new RuntimeException('Sent data not accepted: '.$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
    }
 
 
@@ -260,20 +256,15 @@ class Mailer extends Object {
     * Verbindung resetten
     */
    public function reset() {
-      if (!$this->connection) {
-         trigger_error('Cannot reset connection: Not connected', E_USER_WARNING);
-         return false;
-      }
+      if (!$this->connection)
+         throw new RuntimeException('Cannot reset connection: Not connected');
 
       $this->writeData('RSET');
       $response = $this->readResponse();
 
       $this->checkResponse($response);
-      if ($this->responseStatus != 250) {
-         trigger_error('RSET command not accepted: '.$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer, E_USER_WARNING);
-         return false;
-      }
-      return true;
+      if ($this->responseStatus != 250)
+         throw new RuntimeException('RSET command not accepted: '.$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
    }
 
 
@@ -288,15 +279,11 @@ class Mailer extends Object {
       $response = $this->readResponse();
 
       $this->checkResponse($response);
-      if ($this->responseStatus != 221) {
-         trigger_error('QUIT command not accepted: '.$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer, E_USER_WARNING);
-         return false;
-      }
+      if ($this->responseStatus != 221)
+         throw new RuntimeException('QUIT command not accepted: '.$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
 
       fClose($this->connection);
       $this->connection = null;
-
-      return true;
    }
 
 
@@ -311,10 +298,8 @@ class Mailer extends Object {
             break;
       }
       $data = stream_get_meta_data($this->connection);
-      if ($data['timed_out']) {
-         trigger_error('Timeout on socket connection', E_USER_WARNING);
-         return false;
-      }
+      if ($data['timed_out'])
+         throw new RuntimeException('Timeout on socket connection');
 
       $this->logResponse($lines);
       return $lines;
@@ -393,6 +378,44 @@ class Mailer extends Object {
          return ($domain=='aol.com' && preg_match('/^[a-z][a-z0-9]{2,15}$/', $mailbox));
 
       return true;
+   }
+
+
+   /**
+    * Zerlegt eine vollständige E-Mailadresse "Name <user@domain>" in ihre beiden Bestandteile.
+    *
+    * @param string $address - Adresse
+    *
+    * @return mixed - ein Array mit den beiden Adressbestandteilen oder FALSE, wenn die übergebene
+    *                 Adresse syntaktisch falsch ist
+    */
+   private function parseAddress($address) {
+      if (!is_string($address)) throw new IllegalTypeException('Illegal type of parameter $address: '.getType($address));
+
+      $address = trim($address);
+
+      // auf schließende Klammer ">" prüfen
+      if (!String ::endsWith($address, '>')) {
+         // keine, es muß eine einfache E-Mailadresse sein
+         if (CommonValidator ::isEmailAddress($address))
+            return array('name'    => '',
+                         'address' => $address);
+         return false;
+      }
+
+      // schließende Klammer existiert, auf öffnende Klammer "<" prüfen
+      $open = strRPos($address, '<');
+      if ($open === false)
+         return false;
+
+      $name    = trim(subStr($address, 0, $open));
+      $address = subStr($address, $open+1, strLen($address)-$open-2);
+
+      if (CommonValidator ::isEmailAddress($address))
+         return array('name'    => $name==$address ? '': $name,
+                      'address' => $address);
+
+      return false;
    }
 }
 
