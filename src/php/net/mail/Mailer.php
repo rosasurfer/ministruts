@@ -22,7 +22,6 @@ class Mailer extends Object {
    private $response       = null;
 
    private $debug     = false;
-   private $logFile   = 'Mailer.log';
    private $logBuffer = null;
 
 
@@ -48,6 +47,19 @@ class Mailer extends Object {
 
       $this->hostname = strToLower($hostname);
       $this->log("\n----==:[ New Mailer instance - smtp://".$this->config['host'].':'.$this->config['port'].($this->config['auth'] ? ' with authentification':'')."]:==----");
+   }
+
+
+   /**
+    * Destructor
+    *
+    * Sorgt bei Zerstörung des Objekts dafür, daß eine noch offene Connection geschlossen werden.
+    */
+   public function __destruct() {
+      if (is_resource($this->connection)) {
+         fClose($this->connection);
+         $this->connection = null;
+      }
    }
 
 
@@ -269,7 +281,8 @@ class Mailer extends Object {
     * Verbindung trennen
     */
    public function disconnect() {
-      if (!$this->connection) return false;
+      if (!$this->connection)
+         return false;
 
       $this->writeData('QUIT');
       $response = $this->readResponse();
@@ -283,7 +296,6 @@ class Mailer extends Object {
       fClose($this->connection);
       $this->connection = null;
 
-      $this->debug && fClose($this->logFile);
       return true;
    }
 
@@ -337,11 +349,6 @@ class Mailer extends Object {
     */
    private function log($data) {
       $data .= "\n";
-
-      if ($this->debug) {
-         is_resource($this->logFile) || ($this->logFile = fOpen(dirName(__FILE__).'/'.$this->logFile, 'ab'));
-         fWrite($this->logFile, $data, strLen($data));
-      }
    }
 
    /**
@@ -350,11 +357,6 @@ class Mailer extends Object {
    function logSentData($data) {
       $data = preg_replace('/^(.*)/m', " -> $1", $data)."\n";
       $this->logBuffer .= $data;
-
-      if ($this->debug) {
-         is_resource($this->logFile) || ($this->logFile = fOpen(dirName(__FILE__).'/'.$this->logFile, 'ab'));
-         fWrite($this->logFile, $data, strLen($data));
-      }
    }
 
 
@@ -363,11 +365,6 @@ class Mailer extends Object {
     */
    private function logResponse($data) {
       $this->logBuffer .= $data;
-
-      if ($this->debug) {
-         is_resource($this->logFile) || ($this->logFile = fOpen(dirName(__FILE__).'/'.$this->logFile, 'ab'));
-         fWrite($this->logFile, $data, strLen($data));
-      }
    }
 
 
