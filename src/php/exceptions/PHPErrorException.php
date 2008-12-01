@@ -3,10 +3,9 @@
  * PHPErrorException
  *
  * Eine PHPErrorException darf nur im globalen ErrorHandler erzeugt werden. Eigentlich müßte
- * PHPErrorException daher eine innere Klasse des ErrorHandlers mit privatem Konstruktor sein.
- * Das ist in PHP nicht möglich. Deshalb setzt der ErrorHandler vor dem Erzeugen einer Instanz
- * einen Marker ($GLOBALS['$__php_error_create']), der im Konstruktor der Exception sofort
- * wieder gelöscht wird.
+ * PHPErrorException daher eine private, innere Klasse des ErrorHandlers sein.  Da dies in PHP nicht
+ * möglich ist, setzt der ErrorHandler vor dem Erzeugen einer neuen Instanz eine Markierung (globale
+ * Variable $__php_error_create), die im Konstruktor der Exception sofort wieder gelöscht wird.
  *
  * @see Logger::handleError()
  */
@@ -58,7 +57,7 @@ class PHPErrorException extends NestableException {
          echoPre($trace);
          */
 
-         // Die ersten beiden Frames könne weg: 1. ErrorHandler (Logger::handleError), 2: Handlerdefinition (__lambda_func)
+         // Die ersten beiden Frames können weg: 1. ErrorHandler (Logger::handleError), 2: Handlerdefinition (__lambda_func)
          array_shift($trace);
          array_shift($trace);
 
