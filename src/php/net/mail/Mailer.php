@@ -52,6 +52,16 @@ class Mailer extends Object {
 
 
    /**
+    * Erzeugt eine neue Instanz und gibt sie zurück.
+    *
+    * @return Mailer
+    */
+   public static function create() {
+      return new self();
+   }
+
+
+   /**
     * Verbindung herstellen
     */
    private function connect() {
@@ -362,14 +372,14 @@ class Mailer extends Object {
 
 
    /**
-    * Ob die übergebene E-Mail-Adresse gültig ist. Dabei wird geprüft, ob die Domain existiert und ob Mail
+    * Testet die übergebene E-Mailadresse. Dabei wird geprüft, ob die Domain existiert und ob Mail
     * für das Postfach angenommen wird (wenn möglich).
     *
     * @param  string $address - zu prüfende E-Mail-Adresse
     *
     * @return boolean
     */
-   public static function isValidAddress($address) {
+   public static function testAddress($address) {
       $address = strToLower($address);
 
       $parts = explode('@', $address);
