@@ -1,3 +1,9 @@
+2008-12-01
+
+   - php/net/mail/Mailer: von PHP-Errormessages auf Exceptions umgestellt
+   - php/net/mail/Mailer: verarbeitet Pseudonamen in E-Mailadressen ("Firstname Lastname <user@domain.tld>")
+
+
 2008-10-29
 
    - Bugfix: SimpleXMLElement::xPath() gibt entgegen der Dokumentation NICHT immer ein Array zurück
