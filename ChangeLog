@@ -1,3 +1,8 @@
+2008-12-02
+
+   - php/net/mail/Mailer: Logmeldungen überarbeitet, kein Werfen von verschachtelten Exceptions mehr
+
+
 2008-12-01
 
    - php/net/mail/Mailer: von PHP-Errormessages auf Exceptions umgestellt
