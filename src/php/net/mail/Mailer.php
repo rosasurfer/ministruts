@@ -46,8 +46,6 @@ class Mailer extends Object {
       if (!String ::contains($hostname, '.'))
          $hostname .= '.localdomain';    // hostname must contain more than one part (see RFC 2821)
       $this->hostname = strToLower($hostname);
-
-      $this->log("\n----==:[ New Mailer instance - smtp://".$this->config['host'].':'.$this->config['port'].($this->config['auth'] ? ' with authentification':'')."]:==----");
    }
 
 
@@ -82,7 +80,6 @@ class Mailer extends Object {
     * Verbindung herstellen
     */
    private function connect() {
-      $this->log("\n----==::  Connecting  :==----");
       $connection = fSockOpen('tcp://'.$this->config['host'],
                               $this->config['port'],
                               $errorCode,
@@ -185,10 +182,6 @@ class Mailer extends Object {
             $this->authenticate();
 
 
-         // init mail
-         $this->log("\n----==::  Sending new mail  [from: $from[address]] [to: $to[address]] [subject: $subject]  :==----");
-
-
          // check for a custom 'Return-Path' header
          $returnPath = $from['address'];
          foreach ($headers as $key => $header) {
@@ -201,6 +194,8 @@ class Mailer extends Object {
             }
          }
 
+
+         // init mail
          $this->writeData("MAIL FROM: <$returnPath>");
          $response = $this->readResponse();
 
@@ -209,15 +204,12 @@ class Mailer extends Object {
             throw new MailerException("MAIL FROM: <$returnPath> command not accepted: ".$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
 
          $this->writeData("RCPT TO: <$to[address]>");
-         // TODO: macht der MTA ein DNS lookup, kann es in readResponse() zu einem Time-out kommen
-         $response = $this->readResponse();
+         $response = $this->readResponse();     // TODO: macht der MTA ein DNS-Lookup, kann es in readResponse() zum Time-out kommen
 
          $this->parseResponse($response);
          if ($this->responseStatus != 250 && $this->responseStatus != 251)
             throw new MailerException("RCPT TO: <$to[address]> command not accepted: ".$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
 
-
-         // send mail data
          $this->writeData('DATA');
          $response = $this->readResponse();
 
@@ -226,7 +218,7 @@ class Mailer extends Object {
             throw new MailerException('DATA command not accepted: '.$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
 
 
-         // send needed headers
+         // needed headers
          $this->writeData('Date: '.date('r'));
             $from = preg_replace('~([\xA0-\xFF])~e', '"=?ISO-8859-1?Q?=".strToUpper(decHex(ord("$1")))."?="', $from);
          $this->writeData("From: $from[name] <$from[address]>");
@@ -238,7 +230,7 @@ class Mailer extends Object {
          $this->writeData("X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2900.2180");
 
 
-         // send custom headers
+         // custom headers
          foreach ($headers as $header) {
             // TODO: Header syntaktisch überprüfen
             $header = preg_replace('~([\xA0-\xFF])~e', '"=?ISO-8859-1?Q?=".strToUpper(decHex(ord("$1")))."?="', $header);
@@ -246,11 +238,15 @@ class Mailer extends Object {
          }
          $this->writeData('');
 
+
+         // mail body
          $message = str_replace("\r\n", "\n", $message);
          $message = str_replace("\n", "\r\n", $message);
-         $this->writeData($message);                                    // body
+         $this->writeData($message);
 
-         $this->writeData('.');                                         // end
+
+         // end marker
+         $this->writeData('.');
          $response = $this->readResponse();
 
          $this->parseResponse($response);
@@ -355,13 +351,6 @@ class Mailer extends Object {
       $this->response = subStr($response, 4);
    }
 
-
-   /**
-    * Message loggen
-    */
-   private function log($data) {
-      $data .= "\n";
-   }
 
    /**
     * Gesendete Daten loggen
