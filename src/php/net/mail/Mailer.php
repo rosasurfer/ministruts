@@ -15,7 +15,7 @@ class Mailer extends Object {
                                      'auth'    => false,     // use authentification ?
                                      'user'    => null,      // username
                                      'pass'    => null,      // password
-                                     'timeout' => 30);       // default socket timeout
+                                     'timeout' => 300);      // default socket timeout: sendmail braucht ewig
 
    private /*string*/   $hostname;
    private /*resource*/ $connection     = null;
