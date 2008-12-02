@@ -25,7 +25,7 @@ class Mailer extends Object {
 
 
    /**
-    * Default constructor
+    * Constructor
     */
    public function __construct() {
       $this->config['host'] = ini_get('SMTP');
@@ -57,8 +57,14 @@ class Mailer extends Object {
     * Sorgt bei Zerstörung des Objekts dafür, daß eine noch offene Connection geschlossen werden.
     */
    public function __destruct() {
-      if ($this->connection)
-         $this->disconnect();
+      // Wird der Destructor nach einer Exception während des Versandes aufgerufen und löst disconnect()
+      // in der Folge eine weitere Exception aus, wird keine der beiden Exceptions von PHP an den globalen
+      // Errorhandler übergeben.  Deshalb ist jede öffentliche Methode dieser Klasse in einen try-catch-Block
+      // gekapselt, der bei Auslösen einer Exception die Verbindung still schließt [$this->disconnect(true)].
+      // Dadurch wird gewährleistet, daß Exceptions, die hier im Destruktor auftreten, normal weitergereicht
+      // werden können [$this->disconnect(false)] und nicht absichtlich unterdrückt werden müssen.
+
+      $this->disconnect(false);
    }
 
 
@@ -97,14 +103,14 @@ class Mailer extends Object {
       $this->writeData('EHLO '.$this->hostname);      // extended Hello first...
       $response = $this->readResponse();
 
-      $this->checkResponse($response);
+      $this->parseResponse($response);
       if ($this->responseStatus != 250) {
          $this->writeData('HELO '.$this->hostname);   // normal Hello if extended fails...
          $response = $this->readResponse();
 
-         $this->checkResponse($response);
+         $this->parseResponse($response);
          if ($this->responseStatus != 250)
-            throw new RuntimeException('HELO command not accepted: '.$this->responseStatus.' '.$this->response);
+            throw new MailerException('HELO command not accepted: '.$this->responseStatus.' '.$this->response);
       }
    }
 
@@ -113,35 +119,35 @@ class Mailer extends Object {
     * Authentifizierung
     */
    private function authenticate() {
-      if (!$this->connection)
+      if (!is_resource($this->connection))
          throw new RuntimeException('Cannot authenticate: Not connected');
 
       // init authentication
       $this->writeData('AUTH LOGIN');
       $response = $this->readResponse();
 
-      $this->checkResponse($response);
+      $this->parseResponse($response);
       if ($this->responseStatus == 503)
          return;                          // already authenticated
 
       if ($this->responseStatus != 334)
-         throw new RuntimeException('AUTH LOGIN command not supported: '.$this->responseStatus.' '.$this->response);
+         throw new MailerException('AUTH LOGIN command not supported: '.$this->responseStatus.' '.$this->response);
 
       // send user
       $this->writeData(base64_encode($this->config['user']));
       $response = $this->readResponse();
 
-      $this->checkResponse($response);
+      $this->parseResponse($response);
       if ($this->responseStatus != 334)
-         throw new RuntimeException('Username '.$this->config['user'].' not accepted'.$this->responseStatus.' '.$this->response);
+         throw new MailerException('Username '.$this->config['user'].' not accepted'.$this->responseStatus.' '.$this->response);
 
       // send pass
       $this->writeData(base64_encode($this->config['pass']));
       $response = $this->readResponse();
 
-      $this->checkResponse($response);
+      $this->parseResponse($response);
       if ($this->responseStatus != 235)
-         throw new RuntimeException('Login failed for username '.$this->config['user'].': '.$this->responseStatus.' '.$this->response);
+         throw new MailerException('Login failed for username '.$this->config['user'].': '.$this->responseStatus.' '.$this->response);
    }
 
 
@@ -149,104 +155,113 @@ class Mailer extends Object {
     * Mail verschicken.
     */
    public function sendMail($fromAddress, $toAddress, $subject, $message, array $headers = null) {
-      if (!is_string($fromAddress)) throw new IllegalTypeException('Illegal type of parameter $fromAddress: '.getType($fromAddress));
-      $from = $this->parseAddress($fromAddress);
-      if (!$from) throw new InvalidArgumentException('Invalid argument $fromAddress: '.$fromAddress);
+      // alles kapseln, um bei Fehlern Verbindung still zu schließen
+      try {
 
-      if (!is_string($toAddress)) throw new IllegalTypeException('Illegal type of parameter $toAddress: '.getType($toAddress));
-      $to = $this->parseAddress($toAddress);
-      if (!$to) throw new InvalidArgumentException('Invalid argument $toAddress: '.$toAddress);
+         if (!is_string($fromAddress)) throw new IllegalTypeException('Illegal type of parameter $fromAddress: '.getType($fromAddress));
+         $from = $this->parseAddress($fromAddress);
+         if (!$from) throw new InvalidArgumentException('Invalid argument $fromAddress: '.$fromAddress);
 
-      if (!is_string($subject)) throw new IllegalTypeException('Illegal type of parameter $subject: '.getType($subject));
-      if (!is_string($message)) throw new IllegalTypeException('Illegal type of parameter $message: '.getType($message));
+         if (!is_string($toAddress)) throw new IllegalTypeException('Illegal type of parameter $toAddress: '.getType($toAddress));
+         $to = $this->parseAddress($toAddress);
+         if (!$to) throw new InvalidArgumentException('Invalid argument $toAddress: '.$toAddress);
 
-      if ($headers === null)
-         $headers = array();
-      foreach ($headers as $key => $header)
-         if (!is_string($header)) throw new IllegalTypeException('Illegal parameter type in argument $headers[$key]: '.getType($header));
+         if (!is_string($subject)) throw new IllegalTypeException('Illegal type of parameter $subject: '.getType($subject));
+         if (!is_string($message)) throw new IllegalTypeException('Illegal type of parameter $message: '.getType($message));
 
-
-      if ($this->connection)
-         $this->logBuffer = null;         // reset log buffer if already connected
-
-      if (!$this->connection)
-         $this->connect();
-
-      if ($this->config['auth'])
-         $this->authenticate();
+         if ($headers === null)
+            $headers = array();
+         foreach ($headers as $key => $header)
+            if (!is_string($header)) throw new IllegalTypeException('Illegal parameter type in argument $headers[$key]: '.getType($header));
 
 
-      // init mail
-      $this->log("\n----==::  Sending new mail  [from: $from[address]] [to: $to[address]] [subject: $subject]  :==----");
+         if (is_resource($this->connection))
+            $this->logBuffer = null;         // reset log buffer if already connected
+
+         if (!is_resource($this->connection))
+            $this->connect();
+
+         if ($this->config['auth'])
+            $this->authenticate();
 
 
-      // check for a custom 'Return-Path' header
-      $returnPath = $from['address'];
-      foreach ($headers as $key => $header) {
-         $header = trim($header);
-         if (String ::startsWith($header, 'return-path:', true)) {
-            $result = $this->parseAddress(subStr($header, 12));
-            if (!$result) throw new InvalidArgumentException('Invalid Return-Path header: '.$header);
-            $returnPath = $result['address'];
-            unset($headers[$key]);
+         // init mail
+         $this->log("\n----==::  Sending new mail  [from: $from[address]] [to: $to[address]] [subject: $subject]  :==----");
+
+
+         // check for a custom 'Return-Path' header
+         $returnPath = $from['address'];
+         foreach ($headers as $key => $header) {
+            $header = trim($header);
+            if (String ::startsWith($header, 'return-path:', true)) {
+               $result = $this->parseAddress(subStr($header, 12));
+               if (!$result) throw new InvalidArgumentException('Invalid Return-Path header: '.$header);
+               $returnPath = $result['address'];
+               unset($headers[$key]);
+            }
          }
+
+         $this->writeData("MAIL FROM: <$returnPath>");
+         $response = $this->readResponse();
+
+         $this->parseResponse($response);
+         if ($this->responseStatus != 250)
+            throw new MailerException("MAIL FROM: <$returnPath> command not accepted: ".$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
+
+         $this->writeData("RCPT TO: <$to[address]>");
+         // TODO: macht der MTA ein DNS lookup, kann es in readResponse() zu einem Time-out kommen
+         $response = $this->readResponse();
+
+         $this->parseResponse($response);
+         if ($this->responseStatus != 250 && $this->responseStatus != 251)
+            throw new MailerException("RCPT TO: <$to[address]> command not accepted: ".$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
+
+
+         // send mail data
+         $this->writeData('DATA');
+         $response = $this->readResponse();
+
+         $this->parseResponse($response);
+         if ($this->responseStatus != 354)
+            throw new MailerException('DATA command not accepted: '.$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
+
+
+         // send needed headers
+         $this->writeData('Date: '.date('r'));
+            $from = preg_replace('~([\xA0-\xFF])~e', '"=?ISO-8859-1?Q?=".strToUpper(decHex(ord("$1")))."?="', $from);
+         $this->writeData("From: $from[name] <$from[address]>");
+            $to = preg_replace('~([\xA0-\xFF])~e', '"=?ISO-8859-1?Q?=".strToUpper(decHex(ord("$1")))."?="', $to);
+         $this->writeData("To: $to[name] <$to[address]>");
+            $subject = preg_replace('~([\xA0-\xFF])~e', '"=?ISO-8859-1?Q?=".strToUpper(decHex(ord("$1")))."?="', $subject);
+         $this->writeData("Subject: $subject");
+         $this->writeData("X-Mailer: Microsoft Office Outlook 11");     // save us from Hotmail junk folder
+         $this->writeData("X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2900.2180");
+
+
+         // send custom headers
+         foreach ($headers as $header) {
+            // TODO: Header syntaktisch überprüfen
+            $header = preg_replace('~([\xA0-\xFF])~e', '"=?ISO-8859-1?Q?=".strToUpper(decHex(ord("$1")))."?="', $header);
+            $this->writeData($header);
+         }
+         $this->writeData('');
+
+         $message = str_replace("\r\n", "\n", $message);
+         $message = str_replace("\n", "\r\n", $message);
+         $this->writeData($message);                                    // body
+
+         $this->writeData('.');                                         // end
+         $response = $this->readResponse();
+
+         $this->parseResponse($response);
+         if ($this->responseStatus != 250)
+            throw new MailerException('Sent data not accepted: '.$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
+
       }
-
-      $this->writeData("MAIL FROM: <$returnPath>");
-      $response = $this->readResponse();
-
-      $this->checkResponse($response);
-      if ($this->responseStatus != 250)
-         throw new RuntimeException("MAIL FROM: <$returnPath> command not accepted: ".$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
-
-      $this->writeData("RCPT TO: <$to[address]>");
-      // TODO: macht der MTA ein DNS lookup, kann es in readResponse() zu einem Time-out kommen
-      $response = $this->readResponse();
-
-      $this->checkResponse($response);
-      if ($this->responseStatus != 250 && $this->responseStatus != 251)
-         throw new RuntimeException("RCPT TO: <$to[address]> command not accepted: ".$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
-
-
-      // send mail data
-      $this->writeData('DATA');
-      $response = $this->readResponse();
-
-      $this->checkResponse($response);
-      if ($this->responseStatus != 354)
-         throw new RuntimeException('DATA command not accepted: '.$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
-
-
-      // send needed headers
-      $this->writeData('Date: '.date('r'));
-         $from = preg_replace('~([\xA0-\xFF])~e', '"=?ISO-8859-1?Q?=".strToUpper(decHex(ord("$1")))."?="', $from);
-      $this->writeData("From: $from[name] <$from[address]>");
-         $to = preg_replace('~([\xA0-\xFF])~e', '"=?ISO-8859-1?Q?=".strToUpper(decHex(ord("$1")))."?="', $to);
-      $this->writeData("To: $to[name] <$to[address]>");
-         $subject = preg_replace('~([\xA0-\xFF])~e', '"=?ISO-8859-1?Q?=".strToUpper(decHex(ord("$1")))."?="', $subject);
-      $this->writeData("Subject: $subject");
-      $this->writeData("X-Mailer: Microsoft Office Outlook 11");     // save us from Hotmail junk folder
-      $this->writeData("X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2900.2180");
-
-
-      // send custom headers
-      foreach ($headers as $header) {
-         // TODO: Header syntaktisch überprüfen
-         $header = preg_replace('~([\xA0-\xFF])~e', '"=?ISO-8859-1?Q?=".strToUpper(decHex(ord("$1")))."?="', $header);
-         $this->writeData($header);
+      catch (Exception $ex) {
+         $this->disconnect(true);
+         throw $ex;
       }
-      $this->writeData('');
-
-      $message = str_replace("\r\n", "\n", $message);
-      $message = str_replace("\n", "\r\n", $message);
-      $this->writeData($message);                                    // body
-
-      $this->writeData('.');                                         // end
-      $response = $this->readResponse();
-
-      $this->checkResponse($response);
-      if ($this->responseStatus != 250)
-         throw new RuntimeException('Sent data not accepted: '.$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
    }
 
 
@@ -254,31 +269,45 @@ class Mailer extends Object {
     * Verbindung resetten
     */
    public function reset() {
-      if (!$this->connection)
-         throw new RuntimeException('Cannot reset connection: Not connected');
+      // alles kapseln, um bei Fehlern Verbindung still zu schließen
+      try {
 
-      $this->writeData('RSET');
-      $response = $this->readResponse();
+         if (!is_resource($this->connection))
+            throw new RuntimeException('Cannot reset connection: Not connected');
 
-      $this->checkResponse($response);
-      if ($this->responseStatus != 250)
-         throw new RuntimeException('RSET command not accepted: '.$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
+         $this->writeData('RSET');
+         $response = $this->readResponse();
+
+         $this->parseResponse($response);
+         if ($this->responseStatus != 250)
+            throw new MailerException('RSET command not accepted: '.$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
+
+      }
+      catch (Exception $ex) {
+         $this->disconnect(true);
+         throw $ex;
+      }
    }
 
 
    /**
     * Verbindung trennen
+    *
+    * @param bool $silent - ob die Verbindung still und ohne Exception geschlossen werden soll
+    *                       (default = FALSE)
     */
-   public function disconnect() {
-      if (!$this->connection)
-         return false;
+   public function disconnect($silent = false) {
+      if (!is_resource($this->connection))
+         return;
 
-      $this->writeData('QUIT');
-      $response = $this->readResponse();
+      if (!$silent) {
+         $this->writeData('QUIT');
+         $response = $this->readResponse();
 
-      $this->checkResponse($response);
-      if ($this->responseStatus != 221)
-         throw new RuntimeException('QUIT command not accepted: '.$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
+         $this->parseResponse($response);
+         if ($this->responseStatus != 221)
+            throw new MailerException('QUIT command not accepted: '.$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
+      }
 
       fClose($this->connection);
       $this->connection = null;
@@ -286,7 +315,7 @@ class Mailer extends Object {
 
 
    /**
-    * Antwort des Servers lesen
+    * Antwort der Gegenseite lesen
     */
    private function readResponse() {
       $lines = null;
@@ -320,7 +349,7 @@ class Mailer extends Object {
    /**
     * Response parsen
     */
-   private function checkResponse($response) {
+   private function parseResponse($response) {
       $response = trim($response);
       $this->responseStatus = intVal(subStr($response, 0, 3));
       $this->response = subStr($response, 4);
@@ -337,7 +366,7 @@ class Mailer extends Object {
    /**
     * Gesendete Daten loggen
     */
-   function logSentData($data) {
+   private function logSentData($data) {
       $data = preg_replace('/^(.*)/m', " -> $1", $data)."\n";
       $this->logBuffer .= $data;
    }
