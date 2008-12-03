@@ -15,20 +15,20 @@ class ActionForward extends Object {
    /**
     * Der Default-Bezeichner, mit dem nach erfolgreicher Validierung nach einem ActionForward gesucht wird.
     */
-   const VALIDATION_SUCCESS_KEY = 'success';
+   const /*string*/ VALIDATION_SUCCESS_KEY = 'success';
 
 
    /**
     * Der Default-Bezeichner, mit dem nach fehlgeschlagener Validierung nach einem ActionForward gesucht wird.
     */
-   const VALIDATION_ERROR_KEY   = 'error';
+   const /*string*/ VALIDATION_ERROR_KEY   = 'error';
 
 
    /**
     * Geschützter Forward-Bezeichner, über den zur Laufzeit ein Redirect-Forward auf die URL des aktuell
     * verwendeten ActionMappings erzeugt werden kann.
     */
-   const __SELF = '__self';
+   const /*string*/ __SELF = '__self';
 
 
    protected /*string*/ $name;
@@ -41,10 +41,10 @@ class ActionForward extends Object {
 
 
    // Getter
-   public function getName()    { return $this->name;     }
-   public function getPath()    { return $this->path;     }
-   public function getLabel()   { return $this->label;    }
-   public function isRedirect() { return $this->redirect; }
+   public /*string*/ function getName()    { return $this->name;     }
+   public /*string*/ function getPath()    { return $this->path;     }
+   public /*string*/ function getLabel()   { return $this->label;    }
+   public /*bool*/   function isRedirect() { return $this->redirect; }
 
 
    /**
