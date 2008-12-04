@@ -11,8 +11,6 @@ PASS=`cat ~/.cvs.shadow2`
 
 if [ $USERNAME = 'user1' ] ; then
     PORT=2402
-elif [ $USERNAME = 'user2' ] ; then
-    PORT=2403
 else
     PORT=2401
 fi
