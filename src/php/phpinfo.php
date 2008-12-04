@@ -3,7 +3,7 @@ if (!defined('WINDOWS')) define('WINDOWS', (strToUpper(subStr(PHP_OS, 0, 3)) ===
 if (!defined('LOCAL'))   define('LOCAL'  , (@$_SERVER['REMOTE_ADDR'] == '127.0.0.1'));       // ob das Script lokal läuft
 
 
-if (PHP_VERSION < '5.2')                                                      echoError('Warning: PHP version is not at least 5.2.x');
+if (PHP_VERSION < '5.2')                                                      echoError('Warning: PHP version is older than 5.2');
 
 if (!ini_get('short_open_tag'))                                               echoError('Warning: short_open_tag is not On');
 if (ini_get('safe_mode'))                                                     echoError('Warning: safe_mode is not Off');
@@ -21,6 +21,7 @@ if (ini_get('allow_url_fopen'))                                               ec
 if (ini_get('allow_url_include'))                                             echoError('Warning: allow_url_include is not Off');
 
 if ((int) ini_get('max_execution_time') != 30)                                echoError('Warning: max_execution_time is not 30: '.ini_get('max_execution_time'));
+if ((int) ini_get('memory_limit') > 64)                                       echoError('Warning: memory_limit is higher than 64 MB: '.ini_get('memory_limit').' MB');
 if ((int) ini_get('default_socket_timeout') != 60)                            echoError('Warning: default_socket_timeout is not 60: '.ini_get('default_socket_timeout'));
 if (ini_get('implicit_flush'))                                                echoError('Warning: implicit_flush is not Off');
 if (ini_get('allow_call_time_pass_reference'))                                echoError('Warning: allow_call_time_pass_reference is not Off');
