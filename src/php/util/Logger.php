@@ -180,14 +180,14 @@ class Logger extends StaticClass {
             echo "<br></div>\n";
          }
          else {
-            echo $plainMessage."\n\n".$message."\n\n\n".$traceStr."\n";    // PHP gibt den Fehler unter Linux zusätzlich auf stderr aus,
+            echo $plainMessage."\n\n".$message."\n\n".$traceStr."\n";    // PHP gibt den Fehler unter Linux zusätzlich auf stderr aus,
          }                                                                 // also auf der Konsole ggf. unterdrücken
       }
 
 
       // 3. Exception an die registrierten Adressen mailen (wenn $mail TRUE ist) ...
       if (self::$mail && ($addresses = explode(',', Config ::get('mail.buglovers')))) {
-         $mailMsg  = $plainMessage."\n\n".$message."\n\n\n".$traceStr;
+         $mailMsg  = $plainMessage."\n\n".$message."\n\n".$traceStr;
 
          $request = Request ::me();
          $session = $request && $request->isSession() ? print_r($_SESSION, true) : null;
@@ -340,7 +340,7 @@ class Logger extends StaticClass {
       if (self::$mail && ($addresses = explode(',', Config ::get('mail.buglovers')))) {
          $mailMsg = $plainMessage;
          if ($exception)
-            $mailMsg .= "\n\n".$exMessage."\n\n\n".$exTraceStr;
+            $mailMsg .= "\n\n".$exMessage."\n\n".$exTraceStr;
 
          $request = Request ::me();
          $session = $request && $request->isSession() ? print_r($_SESSION, true) : null;
