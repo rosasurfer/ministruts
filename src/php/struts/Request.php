@@ -25,10 +25,10 @@
 final class Request extends Singleton {
 
 
-   private $method;
-   private $hostURL;
-   private $uri;
-   private $path;
+   private /*string*/ $method;
+   private /*string*/ $hostURL;
+   private /*string*/ $uri;
+   private /*string*/ $path;
 
 
    // Parameterhalter
@@ -68,7 +68,7 @@ final class Request extends Singleton {
       if ($this->isPost())
          $this->parseParameters(file_get_contents('php://input'), 'POST');
 
-      // GET-Parameter
+      // GET-Parameter (nicht per $this->isGet(), denn sie können auch in anderen Requests vorhanden sein)
       if (strLen($_SERVER['QUERY_STRING']))
          $this->parseParameters($_SERVER['QUERY_STRING'], 'GET');
    }
@@ -349,7 +349,7 @@ final class Request extends Singleton {
 
 
    /**
-    * Alias für Request::getApplicationPath()
+    * Alias für Request::getApplicationPath(), für die Java-Abteilung :-)
     *
     * @return string
     *
@@ -373,7 +373,7 @@ final class Request extends Singleton {
 
 
    /**
-    * Gibt die IP-Adresse zurück, von der aus der Request gemacht wurde.
+    * Gibt die IP-Adresse zurück, von der aus der Request ausgelöst wurde.
     *
     * @return string - IP-Adresse
     */
@@ -383,7 +383,7 @@ final class Request extends Singleton {
 
 
    /**
-    * Gibt den Hostnamen zurück, von dem aus der Request gemacht wurde.
+    * Gibt den Hostnamen zurück, von dem aus der Request ausgelöst wurde.
     *
     * @return string
     */
@@ -396,7 +396,7 @@ final class Request extends Singleton {
 
 
    /**
-    * Gibt den Wert des 'Forwarded-IP'-Headers des aktuellen Request zurück.
+    * Gibt den Wert eines evt. 'Forwarded-IP'-Headers des aktuellen Request zurück.
     *
     * @return string - IP-Adresse oder NULL, wenn der entsprechende Header nicht gesetzt ist
     */
@@ -576,7 +576,7 @@ final class Request extends Singleton {
 
 
    /**
-    * Speichert einen Wert unter dem angegebenen Schlüssel im Request.
+    * Speichert einen Wert unter dem angegebenen Schlüssel im Request-Context.
     *
     * @param string $key   - Schlüssel, unter dem der Wert gespeichert wird
     * @param mixed  $value - der zu speichernde Wert
@@ -587,14 +587,15 @@ final class Request extends Singleton {
 
 
    /**
-    * Löscht die Werte mit den angegebenen Schlüsseln aus dem Request. Es können mehrere Schlüssel
+    * Löscht die Werte mit den angegebenen Schlüsseln aus dem Request-Context. Es können mehrere Schlüssel
     * angegeben werden.
     *
     * @param string $key - Schlüssel des zu löschenden Wertes
     */
    public function removeAttributes($key /*, $key2, $key3 ...*/) {
-      foreach (func_get_args() as $key)
+      foreach (func_get_args() as $key) {
          unset($this->attributes[$key]);
+      }
    }
 
 
@@ -635,7 +636,7 @@ final class Request extends Singleton {
       // RoleProcessor holen ...
       $processor = $this->getAttribute(Struts ::MODULE_KEY)
                         ->getRoleProcessor();
-      if (!$processor) throw new RuntimeException('You can not call '.__METHOD__.'() without a configured RoleProcessor');
+      if (!$processor) throw new RuntimeException('You can not call '.__METHOD__.'() without configuring a RoleProcessor');
 
       // ... und Aufruf weiterreichen
       return $processor->isUserInRole($this, $roles);
@@ -732,20 +733,6 @@ final class Request extends Singleton {
     * Verhindert das Serialisieren von Request-Instanzen.
     */
    final public function __sleep() {
-      /**
-       * TODO: Definition des Exceptionhandlers aus Root-Script entfernen, damit Fehler abgefangen werden
-       *
-       *   IllegalStateException: You cannot serialize me: Request
-       *
-       *   Stacktrace:
-       *   -----------
-       *   Request->__sleep(): # line 461, file: E:\Projekte\ministruts\src\php\struts\Request.php
-       *   main():                         [php]
-       *
-       *
-       *   Fatal error: Exception thrown without a stack frame in Unknown on line 0
-       */
-
       $ex = new IllegalStateException('You cannot serialize me: '.__CLASS__);
       Logger ::log($ex, L_ERROR, __CLASS__);
       throw $ex;
