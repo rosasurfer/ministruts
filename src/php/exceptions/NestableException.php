@@ -176,9 +176,9 @@ abstract class NestableException extends Exception {
          }
          if ($this->cause !== null) {
             if ($this->cause instanceof NestableException)
-               $string .= "\n\ncaused by\n".$this->cause."\n\nStacktrace:\n-----------\n".$this->cause->printStackTrace(true);
+               $string .= "\ncaused by\n".$this->cause."\n\nStacktrace:\n-----------\n".$this->cause->printStackTrace(true);
             else
-               $string .= "\n\ncaused by\n".$this->cause."\n\nStacktrace not available\n";
+               $string .= "\ncaused by\n".$this->cause."\n\nStacktrace not available\n";
          }
 
          $this->traceString = $string;
