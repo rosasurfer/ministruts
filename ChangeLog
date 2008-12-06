@@ -1,3 +1,8 @@
+2008-12-06
+
+   - php/util/Config: erkennt jetzt auch Änderungen durch neu hinzukommende config-Dateien
+
+
 2008-12-02
 
    - php/net/mail/Mailer: Logmeldungen überarbeitet, kein Werfen von verschachtelten Exceptions mehr
