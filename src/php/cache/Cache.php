@@ -42,7 +42,7 @@ final class Cache extends StaticClass {
       @see Config::me()
       */
 
-      // TODO: wir müssen die zufällige Verwendung des APPLICATION_NAME als label abfangen
+      // TODO: zufällige Verwendung des APPLICATION_NAME als label abfangen
 
       static /*array*/ $currentCreations;
       static /*array*/ $circularCalls;
