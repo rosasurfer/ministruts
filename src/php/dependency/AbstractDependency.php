@@ -1,9 +1,10 @@
 <?
 /**
- * ChainableDependency
+ * AbstractDependency
  *
- * Abstrakte Basisklasse für verkettete Abhängigkeiten.  Implementoren dieser Klasse können Abhängigkeiten
- * von mehreren verschiedenen Zustandswechseln abbilden.
+ * Abstrakte Basisklasse für Abhängigkeiten von bestimmten Ereignissen.  Jede einzelne Implementation
+ * dieser Klasse bildet eine Abhängigkeit vom Eintreten eines einzelnen spezifischen Ereignisses ab.
+ * Abhängigkeiten können kombiniert werden.
  *
  * Anwendungsbeispiel:
  * -------------------
@@ -23,7 +24,7 @@
  * Nach Änderung oder Löschen einer der Dateien gibt der Aufruf von $dependency->isStatusChanged()
  * TRUE zurück.
  */
-abstract class ChainableDependency extends Object implements IDependency {
+abstract class AbstractDependency extends Object implements IDependency {
 
 
    /**
@@ -33,12 +34,12 @@ abstract class ChainableDependency extends Object implements IDependency {
 
 
    /**
-    * Fügt den Abhängigkeiten dieser Instanz eine weitere hinzu. Die neue Abhängigkeit wird
-    * nach allen anderen vorhandenen Abhängigkeiten eingefügt.
+    * Kombiniert diese Abhängigkeit mit einer weiteren. Die hinzugefügte Abhängigkeit wird nach allen
+    * anderen vorhandenen Abhängigkeiten eingefügt.
     *
     * @param IDependency $dependency - Abhängigkeit
     *
-    * @return ChainableDependency
+    * @return AbstractDependency
     */
    public function add(IDependency $dependency) {
       $this->dependencies[] = $dependency;
