@@ -81,7 +81,7 @@ final class Config extends Object {
    /**
     * Gibt die Singleton-Instanz dieser Klasse zurück.
     *
-    * @return Singleton
+    * @return Config
     */
    public static function me() {
       /*
@@ -91,15 +91,14 @@ final class Config extends Object {
       @see Cache::me()
       */
 
-      static /*Config*/ $config       = null;   // emuliert Singleton-Verhalten (Config kann nicht Singleton sein)
+      static /*Config*/ $config       = null;   // emuliert Singleton (Config kann nicht Singleton sein)
       static /*bool*/   $configCached = false;
 
       $cache = null;
 
       if (!$config) {
-         $cache = Cache ::me();                             // gibt es bereits eine Instanz im Cache ?
-
-         if (!$cache || !($config=$cache->get(__CLASS__)))
+         $cache = Cache ::me();                             // $cache kann NULL sein (siehe Kommentar)
+         if (!$cache || !($config=$cache->get(__CLASS__)))  // gibt es bereits eine Config im Cache ?
             $config = new self();                           // nein, Config neu einlesen
       }
       elseif (!$configCached) {
@@ -107,24 +106,26 @@ final class Config extends Object {
          $cache = Cache ::me();
       }
 
+
       // hier haben wir immer eine Config, sie ist aber evt. noch nicht gecacht
       if (!$configCached && $cache) {
-
-         // Cache ist da, nochmal nachschauen, ob es bereits eine Instanz im Cache gibt
+         // Cache ist da, nochmal nachschauen, ob dort bereits eine Config liegt
          if ($cached = $cache->get(__CLASS__)) {
-            $configCached = true;      // ja, jetzt gibt es 2 Instanzen (daher kann Config nicht als Singleton definiert werden)
-            $config       = $cached;   // aktuelle Version durch Version im Cache ersetzen
+            $configCached = true;      // JA, jetzt gibt es also 2 Instanzen (darum kann Config selbst nicht Singleton sein)
+            $config       = $cached;   // Version in $config verwerfen und durch gecachte Version ersetzen
          }
          else {
-            $dependency = null;        // nein, Config cachen
-            foreach ($config->files as $file) {
-               // TODO: Änderungen werden nicht erkannt, wenn eine weitere config-Datei hinzugefügt wird
+            $dependency = null;        // NEIN, Config cachen
+            foreach ($config->files as $file => $fileExists) {
                $singleDep  = FileDependency ::create($file);
                $dependency = $dependency ? $dependency->add($singleDep) : $singleDep;
             }
+
+            // TODO: zusätzliche MinLifetime von 60 sek., um nicht bei jedem Zugriff alle Dateien zu prüfen
             $configCached = Cache ::me()->set(__CLASS__, $config, Cache ::EXPIRES_NEVER, $dependency);
          }
       }
+
       return $config;
    }
 
@@ -155,20 +156,22 @@ final class Config extends Object {
       foreach ($paths as $key => $path) {
          $path = realPath($path);
          if ($path) {
-            if (is_file($file = $path.DIRECTORY_SEPARATOR.'config-custom.properties')) $files[$file] = $file; // assoz. Array verhindert doppelte Einträge
-            if (is_file($file = $path.DIRECTORY_SEPARATOR.'config.properties'))        $files[$file] = $file;
+            $file = null;
+            $files[$file] = is_file($file = $path.DIRECTORY_SEPARATOR.'config-custom.properties');
+            $files[$file] = is_file($file = $path.DIRECTORY_SEPARATOR.'config.properties');
          }
       }
       $this->files = $files;
 
 
-      // wir laden die Dateien von der Wurzel aus und überschreiben alle vorhandenen Werte
+      // Weiter vorn im include_path stehende Dateien haben Vorrang vor weiter hinten stehenden.  Daher laden
+      // wir die Dateien von hinten aus und überschreiben mit den folgenden Dateien die vorhandenen Werte.
       $files = array_reverse($files);
 
-
       // gefundene Dateien laden
-      foreach ($files as $file) {
-         $this->loadFile($file);
+      foreach ($files as $name => $fileExists) {
+         if ($fileExists)
+            $this->loadFile($name);
       }
    }
 
