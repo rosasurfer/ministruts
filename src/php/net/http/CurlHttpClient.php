@@ -190,4 +190,71 @@ final class CurlHttpClient extends HttpClient {
       return "$errorNo ($errorStr)";
    }
 }
+
+/*
+   I wrote a simple function that can "spawn" another thread within the webserver by making async http request.
+   The page that is being spawned can call ignore_user_abort() and do whatever it wants in the background...
+   Example:
+   --------
+   function http_spawn($page) {
+      $basepath = ereg_replace('[^/]*$', '', $_SERVER['PHP_SELF']);
+      $cbSock = fsockopen('localhost', $_SERVER['SERVER_PORT'], $errno, $errstr, 5);
+      fwrite($cbSock, "GET {$basepath}{$page} HTTP/1.0\r\nHost: {$_SERVER['HTTP_HOST']}\r\n\r\n");
+   }
+
+   http_spawn("ftindex.php");
+*/
+
+/*
+   If you want to simulate a crontask you must call this script once and it will keep running forever
+   (during server uptime) in the background while "doing something" every specified seconds (= $interval).
+   Example:
+   --------
+   ignore_user_abort(true);   // run script in background
+   set_time_limit(0);         // run script forever
+   $interval = 60 * 15;       // do every 15 minutes...
+
+   do {
+     // add the script that has to be ran every 15 minutes here
+     // ...
+     sleep($interval);        // wait 15 minutes
+   } while(true);
+*/
+
+/*
+   pulstar at mail dot com (07-Aug-2003 07:32)
+   -------------------------------------------
+   These functions are very useful for example if you need to control when a visitor in your website place an order
+   and you need to check if he/she didn't clicked the submit button twice or cancelled the submit just after have
+   clicked the submit button.  If your visitor click the stop button just after have submitted it, your script may
+   stop in the middle of the process of registering the products and do not finish the list, generating inconsistency
+   in your database.  With the ignore_user_abort() function you can make your script finish everything fine and after
+   you can check with register_shutdown_function() and connection_aborted() if the visitor cancelled the submission or
+   lost his/her connection. If he/she did, you can set the order as not confirmed and when the visitor came back, you
+   can present the old order again.  To prevent a double click of the submit button, you can disable it with javascript
+   or in your script you can set a flag for that order, which will be recorded into the database. Before accept a new
+   submission, the script will check if the same order was not placed before and reject it.  This will work fine, as the
+   script have finished the job before.  Note that if you use ob_start("callback_function") in the begin of your script,
+   you can specify a callback function that will act like the shutdown function when our script ends and also will let
+   you to work on the generated page before send it to the visitor.
+
+   ej at campbell *dot* name (12-Feb-2004 01:01)
+   ---------------------------------------------
+   I don't think the given example will occur in the real world.  As long as your order handling script does not output
+   anything, there's no way that it will be aborted before it completes processing (unless it timeouts).  PHP only senses
+   user aborts when a script sends output.  If there's no output sent to the client before processing completes, which is
+   presumably the case for an order handling script, the script will run to completion.  So, the only time a script can
+   be terminated due to the user hitting stop is when it sends output.  If you don't send any output until processing
+   completes, you don't have to worry about user aborts.
+
+   bg at ms dot com (22-Sep-2005 02:42)
+   ------------------------------------
+   Confirmed.  User presses STOP button.  This sends a RST packet and closes the connection.  PHP is most certainly
+   immediately affected (i.e., the script is stopped, whether or not any output is pending for the user, or even if script
+   is just grinding away on a database without having output anything).
+   ignore_user_abort() exists to prevent this.
+   If user STOPS, script ignores the RST and runs to completion (the output is apparently ignored by apache and not sent
+   to the user, who sent the RST and closed the TCP connection).  If user's connection just vanishes (isp problem, disconnect,
+   whatever), and there is no RST sent by user, then eventually the script will timeout.
+*/
 ?>
