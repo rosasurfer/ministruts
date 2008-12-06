@@ -9,7 +9,7 @@
 final class Cache extends StaticClass {
 
 
-   const EXPIRES_NEVER = 0;
+   const /*int*/ EXPIRES_NEVER = 0;
 
 
    /**
@@ -42,7 +42,9 @@ final class Cache extends StaticClass {
       @see Config::me()
       */
 
-      static /*array*/ $creationsInProgress;
+      // TODO: wir müssen die zufällige Verwendung des APPLICATION_NAME als label abfangen
+
+      static /*array*/ $currentCreations;
       static /*array*/ $circularCalls;
 
 
@@ -52,13 +54,13 @@ final class Cache extends StaticClass {
             $key = '';
 
             // rekursive Aufrufe während der Instantiierung abfangen
-            if (isSet($creationsInProgress[$key])) {
+            if (isSet($currentCreations[$key])) {
                $circularCalls[$key] = true;
                return null;
             }
 
             // Flag zur Erkenung rekursiver Aufrufe setzen
-            $creationsInProgress[$key] = true;
+            $currentCreations[$key] = true;
 
             // neuen Cache instantiieren
             if (extension_loaded('apc') && ini_get(isSet($_SERVER['REQUEST_METHOD']) ? 'apc.enabled' : 'apc.enable_cli'))
@@ -67,7 +69,7 @@ final class Cache extends StaticClass {
                self::$default = new ReferencePool($label);
 
             // Flag zurücksetzen
-            unset($creationsInProgress[$key]);
+            unset($currentCreations[$key]);
 
             // trat ein rekursiver Aufruf auf, muß die Config evt. noch gecacht werden
             if (isSet($circularCalls[$key])) {
@@ -89,7 +91,7 @@ final class Cache extends StaticClass {
 
       if (!isSet(self::$caches[$label])) {
          // rekursive Aufrufe während der Instantiierung abfangen
-         if (isSet($creationsInProgress[$label])) {
+         if (isSet($currentCreations[$label])) {
             $circularCalls[$label] = true;
             return null;
          }
@@ -100,9 +102,9 @@ final class Cache extends StaticClass {
 
 
          // Cache instantiieren
-         $creationsInProgress[$label] = true;
+         $currentCreations[$label] = true;
          self::$caches[$label] = new $class($label, $options);
-         unset($creationsInProgress[$label]);
+         unset($currentCreations[$label]);
 
 
          // trat ein rekursiver Aufruf auf, muß die Config evt. noch gecacht werden
