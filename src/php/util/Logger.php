@@ -2,12 +2,14 @@
 /**
  * Logger
  *
- * Diese Klasse sollte möglichst wenige externe Abhängigkeiten haben, um während der Fehlerverarbeitung
- * auftretende weitere Fehler zu verhindern.
- *
  * TODO: Logger muß erweitert werden können
  */
 class Logger extends StaticClass {
+
+   /**
+    * Diese Klasse sollte möglichst wenige externe Abhängigkeiten haben, um während der Fehlerverarbeitung
+    * auftretende weitere Fehler zu verhindern.
+    */
 
 
    /* Ob das Script in der Konsole läuft. */
@@ -38,7 +40,7 @@ class Logger extends StaticClass {
       if (self::$console !== null)
          return;
 
-      self::$console     = !isSet($_SERVER['REQUEST_METHOD']);
+      self::$console     = !isSet($_SERVER['REQUEST_METHOD']);    // TODO: prüfen, ob ein Terminal vorhanden ist
       self::$display     =  self::$console || $_SERVER['REMOTE_ADDR']=='127.0.0.1' || (ini_get('display_errors'));
       self::$displayHtml =  self::$display && !self::$console;
       self::$mail        = !self::$display;
@@ -55,14 +57,15 @@ class Logger extends StaticClass {
    public static function getLogLevel($class) {
       static $logLevels = null;
 
-      // Loglevel-Konfiguration ermitteln
       if ($logLevels === null) {
+         // Loglevel-Konfiguration verarbeiten
          $logLevels = Config ::get('logger', array());
          if (is_string($logLevels))
             $logLevels = array('' => $logLevels);
 
          foreach ($logLevels as $class => $level) {
-            if (!is_string($level)) throw new IllegalTypeException('Illegal log level type ('.getType($level).') for class : '.$class);
+            if (!is_string($level))
+               throw new IllegalTypeException('Illegal log level type ('.getType($level).') for class : '.$class);
             $logLevels[$class] = constant('L_'.strToUpper($level));
          }
       }
@@ -71,7 +74,7 @@ class Logger extends StaticClass {
       if (isSet($logLevels[$class]))
          return $logLevels[$class];
 
-      return L_WARN;                   // Default-Loglevel
+      return L_NOTICE;              // Default-Loglevel
    }
 
 
