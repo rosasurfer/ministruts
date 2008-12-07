@@ -41,22 +41,26 @@ final class FrontController extends Singleton {
 
       // Ist schon eine Instanz im Cache ?
       $instance = Cache ::me()->get(__CLASS__);
-      if (!$instance) {
-         // TODO: Instanziierung und cachen synchronisieren
-         // $lock = new Object();
-         // synchronized ($lock) {
-               // nach Erhalten des Locks Cache erneut prüfen
-               // $instance = Cache ::me()->get(__CLASS__);
-               // if (!$instance) {
-                     // neue Instanz erzeugen ...
-                     $instance = Singleton ::getInstance(__CLASS__);
 
-                     // ... und mit FileDependency cachen
-                     $appDirectory = dirName($_SERVER['SCRIPT_FILENAME']);
-                     $dependency = new FileDependency($appDirectory.'/WEB-INF/struts-config.xml');
-                     Cache ::me()->set(__CLASS__, $instance, Cache ::EXPIRES_NEVER, $dependency);
-               // }
-         // }
+      if (!$instance) {
+         $appDirectory = dirName($_SERVER['SCRIPT_FILENAME']);    // TODO: Application::getBaseDirectory()
+         $configFile   = $appDirectory.'/WEB-INF/struts-config.xml';
+
+         // Einlesen und Cachen der struts-config.xml synchronisieren
+         $lock = new FileLock($configFile);
+
+         //synchronized ($lock) {
+               // Cache erneut prüfen (während des Wartens kann ein anderer Prozeß die Instanz erzeugt haben)
+               $instance = Cache ::me()->get(__CLASS__);
+               if (!$instance) {
+                  // neue Instanz erzeugen ...
+                  $instance = Singleton ::getInstance(__CLASS__);
+
+                  // ... und mit FileDependency cachen
+                  $dependency = new FileDependency($configFile);
+                  Cache ::me()->set(__CLASS__, $instance, Cache ::EXPIRES_NEVER, $dependency);
+               }
+         //}
       }
       return $instance;
    }
@@ -134,9 +138,9 @@ final class FrontController extends Singleton {
     * Verarbeitet den aktuellen Request.
     */
    public static function processRequest() {
+      $controller = self     ::me();
       $request    = Request  ::me();
       $response   = Response ::me();
-      $controller = self     ::me();
 
       // Module selektieren
       $prefix = $controller->getModulePrefix($request);
