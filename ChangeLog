@@ -1,6 +1,17 @@
 2008-12-06
 
+	- neu: php/locking/FileLocker
+
+	- neu: php/struts/Request::getHeader() - zur Abfrage eines einzelnen Headers
+
    - php/util/Config: erkennt jetzt auch Änderungen durch neu hinzukommende config-Dateien
+
+	- php/struts/FrontController: Parsen und Cachen der struts-config.xml synchronisiert
+
+
+2008-12-05
+
+   - Refactoring: php/dependency/ChainableDependency  ->  php/dependency/AbstractDependency
 
 
 2008-12-02
@@ -11,6 +22,7 @@
 2008-12-01
 
    - php/net/mail/Mailer: von PHP-Errormessages auf Exceptions umgestellt
+
    - php/net/mail/Mailer: verarbeitet Pseudonamen in E-Mailadressen ("Firstname Lastname <user@domain.tld>")
 
 
