@@ -67,6 +67,8 @@ $__classes['RuntimeException'               ] = $dir.'php/exceptions/RuntimeExce
 $__classes['UnimplementedFeatureException'  ] = $dir.'php/exceptions/UnimplementedFeatureException';
 $__classes['UnsupportedMethodException'     ] = $dir.'php/exceptions/UnsupportedMethodException';
 
+$__classes['FileLock'                       ] = $dir.'php/locking/FileLock';
+
 $__classes['TorHelper'                      ] = $dir.'php/net/TorHelper';
 
 $__classes['CurlHttpClient'                 ] = $dir.'php/net/http/CurlHttpClient';
