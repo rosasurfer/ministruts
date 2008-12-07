@@ -107,6 +107,8 @@ $__classes['String'                         ] = $dir.'php/util/String';
 
 $__classes['ApdProfile'                     ] = $dir.'php/util/apd/ApdProfile';
 
+$__classes['Lock'                           ] = $dir.'incubator/Lock';
+
 unset($dir);
 
 
