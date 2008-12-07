@@ -122,8 +122,6 @@ define('L_NOTICE',  4);
 define('L_WARN'  ,  8);
 define('L_ERROR' , 16);
 define('L_FATAL' , 32);
-$__logLevels[''] = L_WARN;   // der Default-Loglevel
-
 
 // Zeitkonstanten
 define('MINUTE' ,  60         ); define('MINUTES', MINUTE);
@@ -132,7 +130,6 @@ define('DAY'    ,  24 * HOUR  ); define('DAYS'   , DAY   );
 define('WEEK'   ,   7 * DAY   ); define('WEEKS'  , WEEK  );
 define('MONTH'  ,  30 * DAY   ); define('MONTHS' , MONTH );
 define('YEAR'   , 365 * DAY   ); define('YEARS'  , YEAR  );
-
 
 // ob wir unter Windows laufen
 define('WINDOWS', (strToUpper(subStr(PHP_OS, 0, 3))==='WIN'));
