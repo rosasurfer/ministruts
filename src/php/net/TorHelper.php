@@ -60,8 +60,8 @@ class TorHelper extends StaticClass {
     * @return array - assoziatives Array mit den IP-Adressen aller Exit-Nodes
     */
    private static function &getExitNodes() {
-      $cache = Cache ::me('php-torhelper');
-      $nodes = $cache->get($key='exit_nodes');
+      $cache = Cache ::me(__CLASS__);
+      $nodes = $cache->get($key='tor_exit_nodes');
 
       if ($nodes == null) {
          $content = null;
@@ -75,12 +75,12 @@ class TorHelper extends StaticClass {
                $status = $response->getStatus();
 
                if ($status != 200) {
-                  self::$logNotice && Logger ::log('Could not get Tor exit nodes from '.self::$torMirrors[$i].', HTTP status '.$status.' ('.HttpResponse ::$sc[$status]."),\n url: ".$request->getUrl(), L_NOTICE, __CLASS__);
+                  self::$logNotice && Logger ::log('Could not get TOR exit nodes from '.self::$torMirrors[$i].', HTTP status '.$status.' ('.HttpResponse ::$sc[$status]."),\n url: ".$request->getUrl(), L_NOTICE, __CLASS__);
                   continue;
                }
             }
             catch (IOException $ex) {
-               self::$logNotice && Logger ::log('Could not get Tor exit nodes from '.self::$torMirrors[$i], $ex, L_NOTICE, __CLASS__);
+               self::$logNotice && Logger ::log('Could not get TOR exit nodes from '.self::$torMirrors[$i], $ex, L_NOTICE, __CLASS__);
                continue;
             }
 
@@ -90,9 +90,8 @@ class TorHelper extends StaticClass {
 
          $nodes = strLen($content) ? array_flip(explode("\n", str_replace("\r\n", "\n", $content))) : array();
 
-         if (sizeOf($nodes) == 0) {
-            Logger ::log('Could not get Tor exit nodes from any server', L_ERROR, __CLASS__);
-         }
+         if (!$nodes)
+            Logger ::log('Could not get TOR exit nodes from any server', L_ERROR, __CLASS__);
 
          $cache->set($key, $nodes, 30 * MINUTES);
       }
