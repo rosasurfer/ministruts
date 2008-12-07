@@ -479,36 +479,59 @@ final class Request extends Singleton {
 
 
    /**
+    * Gibt den angegebenen Request-Header zurück.
+    *
+    * @param string $name - Name des Headers
+    *
+    * @return string - Header oder NULL, wenn kein Header mit dem angegebenen Namen übertragen wurde.
+    */
+   public function getHeader($name) {
+      static $headers = null;
+      if ($headers === null)
+         $headers = array_change_key_case($this->getHeaders(), CASE_LOWER);
+
+      $name = strToLower($name);
+
+      if (isSet($headers[$name]))
+         return $headers[$name];
+
+      return null;
+   }
+
+
+   /**
     * Gibt alle Request-Header zurück.
     *
     * @return array
     */
    public function getHeaders() {
+      static $headers = null;
 
       // muß noch umfassend überarbeitet werden !!!!
 
-      if (function_exists('apache_request_headers')) {
-         $headers = apache_request_headers();
-         if ($headers === false) {
-            Logger ::log('Error reading request headers, apache_request_headers(): false', L_ERROR, __CLASS__);
+      if ($headers === null) {
+         if (function_exists('apache_request_headers')) {
+            $hdrs = apache_request_headers();
+            if ($hdrs === false)
+               throw new RuntimeException('Error reading request headers, apache_request_headers() returned FALSE');
+            $headers = $hdrs;
+         }
+         else {
             $headers = array();
+            foreach ($_SERVER as $key => $value) {
+               if (ereg('HTTP_(.+)', $key, $matches) > 0) {
+                  $key = strToLower($matches[1]);
+                  $key = str_replace(' ', '-', ucWords(str_replace('_', ' ', $key)));
+                  $headers[$key] = $value;
+               }
+            }
+            if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+               if (isSet($_SERVER['CONTENT_TYPE']))
+                  $headers['Content-Type'] = $_SERVER['CONTENT_TYPE'];
+               if (isSet($_SERVER['CONTENT_LENGTH']))
+                  $headers['Content-Length'] = $_SERVER['CONTENT_LENGTH'];
+            }
          }
-         return $headers;
-      }
-
-      $headers = array();
-      foreach ($_SERVER as $key => $value) {
-         if (ereg('HTTP_(.+)', $key, $matches) > 0) {
-            $key = strToLower($matches[1]);
-            $key = str_replace(' ', '-', ucWords(str_replace('_', ' ', $key)));
-            $headers[$key] = $value;
-         }
-      }
-      if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-         if (isSet($_SERVER['CONTENT_TYPE']))
-            $headers['Content-Type'] = $_SERVER['CONTENT_TYPE'];
-         if (isSet($_SERVER['CONTENT_LENGTH']))
-            $headers['Content-Length'] = $_SERVER['CONTENT_LENGTH'];
       }
       return $headers;
    }
