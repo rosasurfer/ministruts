@@ -79,7 +79,8 @@ final class Config extends Object {
 
 
    /**
-    * Gibt die Singleton-Instanz dieser Klasse zurück.
+    * Gibt die Instanz dieser Klasse zurück.  Obwohl Config nicht Singleton implementiert, gibt es im
+    * User-Code nur eine einzige Instanz.
     *
     * @return Config
     */
@@ -111,8 +112,8 @@ final class Config extends Object {
       if (!$configCached && $cache) {
          // Cache ist da, nochmal nachschauen, ob dort bereits eine Config liegt
          if ($cached = $cache->get(__CLASS__)) {
-            $configCached = true;      // JA, jetzt gibt es also 2 Instanzen (darum kann Config selbst nicht Singleton sein)
-            $config       = $cached;   // Version in $config verwerfen und durch gecachte Version ersetzen
+            $configCached = true;      // JA, jetzt gibt es also 2 Instanzen (darum ist Config nicht Singleton)
+            $config       = $cached;   // $config durch $cached Version ersetzen
          }
          else {
             $dependency = null;        // NEIN, Config cachen
