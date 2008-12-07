@@ -43,10 +43,8 @@ final class Cache extends StaticClass {
       */
 
       // TODO: zufällige Verwendung des APPLICATION_NAME als label abfangen
-
       static /*array*/ $currentCreations;
       static /*array*/ $circularCalls;
-
 
       // Default-Cache
       if ($label === null) {
@@ -86,7 +84,8 @@ final class Cache extends StaticClass {
 
 
       // spezifischer Cache
-      if (!is_string($label)) throw new IllegalTypeException('Illegal type of argument $label: '.getType($label));
+      if (!is_string($label))
+         throw new IllegalTypeException('Illegal type of argument $label: '.getType($label));
 
 
       if (!isSet(self::$caches[$label])) {
