@@ -80,7 +80,6 @@ $__classes['HttpRequest'                    ] = $dir.'php/net/http/HttpRequest';
 $__classes['HttpResponse'                   ] = $dir.'php/net/http/HttpResponse';
 
 $__classes['Mailer'                         ] = $dir.'php/net/mail/Mailer';
-$__classes['MailerException'                ] = $dir.'php/net/mail/MailerException';
 
 $__classes['BasePdfDocument'                ] = $dir.'php/pdf/BasePdfDocument';
 $__classes['SimplePdfDocument'              ] = $dir.'php/pdf/SimplePdfDocument';

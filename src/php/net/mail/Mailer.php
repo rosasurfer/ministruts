@@ -9,7 +9,7 @@
  */
 class Mailer extends Object {
 
-   // TODO: SPF-Eintrag der Absenderdomain beim Testen umgehen
+   // TODO: SPF-Eintrag der Absenderdomain zum Testen umgehen
    /**
     * Return-Path: <postmaster@domain.tld>
     * Received: from compute1.internal (compute1.internal [0.0.0.0])
@@ -143,7 +143,7 @@ class Mailer extends Object {
 
          $this->parseResponse($response);
          if ($this->responseStatus != 250)
-            throw new MailerException('HELO command not accepted: '.$this->responseStatus.' '.$this->response);
+            throw new RuntimeException('HELO command not accepted: '.$this->responseStatus.' '.$this->response);
       }
    }
 
@@ -164,7 +164,7 @@ class Mailer extends Object {
          return;                          // already authenticated
 
       if ($this->responseStatus != 334)
-         throw new MailerException('AUTH LOGIN command not supported: '.$this->responseStatus.' '.$this->response);
+         throw new RuntimeException('AUTH LOGIN command not supported: '.$this->responseStatus.' '.$this->response);
 
       // send user
       $this->writeData(base64_encode($this->config['user']));
@@ -172,7 +172,7 @@ class Mailer extends Object {
 
       $this->parseResponse($response);
       if ($this->responseStatus != 334)
-         throw new MailerException('Username '.$this->config['user'].' not accepted'.$this->responseStatus.' '.$this->response);
+         throw new RuntimeException('Username '.$this->config['user'].' not accepted'.$this->responseStatus.' '.$this->response);
 
       // send pass
       $this->writeData(base64_encode($this->config['pass']));
@@ -180,7 +180,7 @@ class Mailer extends Object {
 
       $this->parseResponse($response);
       if ($this->responseStatus != 235)
-         throw new MailerException('Login failed for username '.$this->config['user'].': '.$this->responseStatus.' '.$this->response);
+         throw new RuntimeException('Login failed for username '.$this->config['user'].': '.$this->responseStatus.' '.$this->response);
    }
 
 
@@ -237,21 +237,21 @@ class Mailer extends Object {
 
          $this->parseResponse($response);
          if ($this->responseStatus != 250)
-            throw new MailerException("MAIL FROM: <$returnPath> command not accepted: ".$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
+            throw new RuntimeException("MAIL FROM: <$returnPath> command not accepted: ".$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
 
          $this->writeData("RCPT TO: <$to[address]>");
          $response = $this->readResponse();     // TODO: macht der MTA ein DNS-Lookup, kann es in readResponse() zum Time-out kommen
 
          $this->parseResponse($response);
          if ($this->responseStatus != 250 && $this->responseStatus != 251)
-            throw new MailerException("RCPT TO: <$to[address]> command not accepted: ".$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
+            throw new RuntimeException("RCPT TO: <$to[address]> command not accepted: ".$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
 
          $this->writeData('DATA');
          $response = $this->readResponse();
 
          $this->parseResponse($response);
          if ($this->responseStatus != 354)
-            throw new MailerException('DATA command not accepted: '.$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
+            throw new RuntimeException('DATA command not accepted: '.$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
 
 
          // needed headers
@@ -287,7 +287,7 @@ class Mailer extends Object {
 
          $this->parseResponse($response);
          if ($this->responseStatus != 250)
-            throw new MailerException('Sent data not accepted: '.$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
+            throw new RuntimeException('Sent data not accepted: '.$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
 
       }
       catch (Exception $ex) {
@@ -312,7 +312,7 @@ class Mailer extends Object {
 
          $this->parseResponse($response);
          if ($this->responseStatus != 250)
-            throw new MailerException('RSET command not accepted: '.$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
+            throw new RuntimeException('RSET command not accepted: '.$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
 
       }
       catch (Exception $ex) {
@@ -338,7 +338,7 @@ class Mailer extends Object {
 
          $this->parseResponse($response);
          if ($this->responseStatus != 221)
-            throw new MailerException('QUIT command not accepted: '.$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
+            throw new RuntimeException('QUIT command not accepted: '.$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
       }
 
       fClose($this->connection);
