@@ -9,6 +9,42 @@
  */
 class Mailer extends Object {
 
+   // TODO: SPF-Eintrag der Absenderdomain beim Testen umgehen
+   /**
+    * Return-Path: <postmaster@domain.tld>
+    * Received: from compute1.internal (compute1.internal [0.0.0.0])
+    *     by store52m.internal (Cyrus v2.3.13-fmsvn17160) with LMTPA;
+    *     Sun, 21 Dec 2008 07:18:19 -0500
+    * Received: from mx3.domain.tld ([0.0.0.0])
+    *   by compute1.internal (LMTPProxy); Sun, 21 Dec 2008 07:18:20 -0500
+    * Received: from quad.domain.tld (domain.tld [0.0.0.0])
+    *    by mx3.domain.tld (Postfix) with ESMTP id 02D70FE
+    *    for <user@domain.tld>; Sun, 21 Dec 2008 07:18:19 -0500 (EST)
+    * Received: (qmail 6101 invoked by uid 110); 21 Dec 2008 13:18:18 +0100
+    * X-Remote-Delivered-To: 25-user@domain.tld
+    * X-Spam-Checker-Version: SpamAssassin 3.2.4 (2008-01-01) on
+    *    quad.domain.tld
+    * X-Spam-Level:
+    * X-Spam-Status: No, score=0.6 required=7.0 tests=MISSING_MID,RCVD_IN_PBL,
+    *    RDNS_DYNAMIC autolearn=no version=3.2.4
+    * Received: (qmail 6033 invoked from network); 21 Dec 2008 13:18:13 +0100
+    * Received: from d0-0-0-0.cust.domain.tld (HELO device.localdomain) (0.0.0.0)
+    *   by domain.tld with SMTP; 21 Dec 2008 13:18:13 +0100
+    *
+    * Received-SPF: softfail (domain.tld: transitioning SPF record at domain.tld does not designate 0.0.0.0 as permitted sender)
+    *                                                                                                                      ^
+    *                                                                                                                      |
+    *                                                                                                    lokale Adresse (beim Testen zu Hause)
+    * Date: Sun, 21 Dec 2008 13:18:13 +0100
+    * From: local.domain.tld <user@domain.tld>
+    * To: User Name <user@domain.tld>
+    * Subject: ******************* an User Name
+    * Content-Type: text/plain; charset=iso-8859-1
+    *
+    * Hallo User Name,
+    * ...
+    */
+
 
    private /*array*/ $config = array('host'    => null,      // SMTP server host name
                                      'port'    => null,      // SMTP server port
