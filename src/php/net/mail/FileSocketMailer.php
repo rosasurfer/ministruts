@@ -1,0 +1,31 @@
+<?
+/**
+ * Mailer, der Mails über eine (lokale) FileSocket-Verbindung verschickt.
+ */
+class FileSocketMailer extends Mailer {
+
+
+   /**
+    * Constructor
+    *
+    * @param array $options - Mailer-Optionen
+    */
+   protected function __construct(array $options) {
+      throw new UnimplementedFeatureException('Method is not implemented: '.__METHOD__);
+   }
+
+
+   /**
+    * Verschickt eine Mail.
+    *
+    * @param string $sender   - Absender  (Format: 'Vorname Nachname <user@domain.tld>')
+    * @param string $receiver - Empfänger (Format: 'Vorname Nachname <user@domain.tld>')
+    * @param string $subject  - Betreffzeile der E-Mail
+    * @param string $message  - Inhalt der E-Mail
+    * @param array  $headers  - zusätzliche zu setzende Mail-Header
+    */
+   public function sendMail($sender, $receiver, $subject, $message, array $headers = null) {
+      throw new UnimplementedFeatureException('Method is not implemented: '.__METHOD__);
+   }
+}
+?>

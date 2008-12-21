@@ -56,6 +56,7 @@ $__classes['ConcurrentModificationException'] = $dir.'php/exceptions/ConcurrentM
 $__classes['DatabaseException'              ] = $dir.'php/exceptions/DatabaseException';
 $__classes['FileNotFoundException'          ] = $dir.'php/exceptions/FileNotFoundException';
 $__classes['IOException'                    ] = $dir.'php/exceptions/IOException';
+$__classes['IllegalAccessException'         ] = $dir.'php/exceptions/IllegalAccessException';
 $__classes['IllegalStateException'          ] = $dir.'php/exceptions/IllegalStateException';
 $__classes['IllegalTypeException'           ] = $dir.'php/exceptions/IllegalTypeException';
 $__classes['InfrastructureException'        ] = $dir.'php/exceptions/InfrastructureException';
@@ -79,7 +80,10 @@ $__classes['HttpClient'                     ] = $dir.'php/net/http/HttpClient';
 $__classes['HttpRequest'                    ] = $dir.'php/net/http/HttpRequest';
 $__classes['HttpResponse'                   ] = $dir.'php/net/http/HttpResponse';
 
+$__classes['CLIMailer'                      ] = $dir.'php/net/mail/CLIMailer';
+$__classes['FileSocketMailer'               ] = $dir.'php/net/mail/FileSocketMailer';
 $__classes['Mailer'                         ] = $dir.'php/net/mail/Mailer';
+$__classes['SMTPMailer'                     ] = $dir.'php/net/mail/SMTPMailer';
 
 $__classes['BasePdfDocument'                ] = $dir.'php/pdf/BasePdfDocument';
 $__classes['SimplePdfDocument'              ] = $dir.'php/pdf/SimplePdfDocument';
