@@ -1,3 +1,8 @@
+2008-12-21
+
+	- neu: php/net/mail/CLIMailer, php/net/mail/FileSocketMailer, php/net/mail/SMTPMailer
+
+
 2008-12-06
 
 	- neu: php/locking/FileLocker
