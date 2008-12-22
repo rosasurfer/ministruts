@@ -562,7 +562,7 @@ final class Request extends Singleton {
             if ($headers['Content-Type'] == 'application/x-www-form-urlencoded') {
                $params = array();
                foreach ($_POST as $name => &$value) {
-                  $params[] = $name.'='.urlEncode((string) $value);
+                  $params[] = $name.'='.rawUrlEncode((string) $value);
                }
                $result .= "\n".implode('&', $params)."\n";
             }

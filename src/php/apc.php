@@ -1106,7 +1106,7 @@ EOB;
         } else if ($MYREQUEST['OB'] == OB_USER_CACHE) {
 
           echo '<td class="td-last center" nowrap>';
-          echo '[<a href="', $MY_SELF, '&OB=', $MYREQUEST['OB'], '&DU=', urlencode($entry[$fieldkey]), '">Delete Now</a>]';
+          echo '[<a href="', $MY_SELF, '&OB=', $MYREQUEST['OB'], '&DU=', rawUrlencode($entry[$fieldkey]), '">Delete Now</a>]';
           echo '</td>';
         } else {
           echo '<td class="td-last center"> &nbsp; </td>';
