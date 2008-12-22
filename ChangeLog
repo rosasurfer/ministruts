@@ -2,6 +2,8 @@
 
 	- Bugfix: php/net/http/HttpRequest konnte mit ungültiger URL erzeugt werden
 
+	- Bugfix: php/net/mail/SMTPMailer - Punkte am Beginn einer Zeile der Mail wurden nicht escaped
+
 
 2008-12-21
 
