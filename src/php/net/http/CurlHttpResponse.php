@@ -7,7 +7,7 @@
 final class CurlHttpResponse extends HttpResponse {
 
 
-   private static /*bool*/ $logDebug, $logInfo, $logNotice;  // boolean
+   private static /*bool*/ $logDebug, $logInfo, $logNotice;
 
 
    private /*HeaderParser*/ $headerParser;
