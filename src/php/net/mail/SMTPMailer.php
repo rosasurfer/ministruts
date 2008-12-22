@@ -268,10 +268,14 @@ class SMTPMailer extends Mailer {
 
 
          // mail body
-         $message = str_replace("\r\n", "\n", $message);
-         $message = str_replace("\n", "\r\n", $message);
-         $this->writeData($message);
-
+         $message = str_replace(array("\r\n", "\r"), array("\n", "\n"), $message);
+         $lines = explode("\n", $message);
+         foreach ($lines as $line) {
+            if(subStr($line, 0, 1) == '.') {
+               $line = '.'.$line;   // escape leading dots by a second dot to avoid confusion with the end marker
+            }
+            $this->writeData($line);
+         }
 
          // end marker
          $this->writeData('.');
