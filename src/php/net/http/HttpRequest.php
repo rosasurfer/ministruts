@@ -7,10 +7,9 @@
 final class HttpRequest extends Object {
 
 
-   // Http-Methode des Requests (default: GET)
+   // HTTP-Methode (default: GET)
    private /*string*/ $method = 'GET';
 
-   // URL
    private /*string*/ $url;
 
 
@@ -58,6 +57,13 @@ final class HttpRequest extends Object {
     * @return HttpRequest
     */
    public function setUrl($url) {
+      if (!is_string($url)) throw new IllegalTypeException('Illegal type of argument $url: '.getType($url));
+
+      // TODO: URL genauer validieren
+
+      if (strPos($url, ' ') !== false)
+         throw new InvalidArgumentException('Invalid argument $url: '.$url);
+
       $this->url = $url;
       return $this;
    }
