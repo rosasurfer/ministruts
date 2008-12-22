@@ -142,7 +142,7 @@ class ActionForward extends Object {
 
       $separator = String ::contains($this->path, '?') ? '&' : '?';
 
-      $this->path .= $separator.$key.'='.str_replace('&', '%26', $value);     // urlEncode('&') = '%26'
+      $this->path .= $separator.$key.'='.str_replace(array(' ', '#', '&'), array('%20', '%23', '%26'), $value);
 
       return $this;
    }
