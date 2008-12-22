@@ -242,6 +242,7 @@ class SMTPMailer extends Mailer {
          if ($this->responseStatus != 354)
             throw new RuntimeException('DATA command not accepted: '.$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
 
+         // TODO: zu lange Header umbrechen
 
          // needed headers
          $this->writeData('Date: '.date('r'));
@@ -267,14 +268,30 @@ class SMTPMailer extends Mailer {
          $this->writeData('');
 
 
+         $maxLineLength = 990;   // eigentlich 998, doch FastMail nimmt 990
+
          // mail body
          $message = str_replace(array("\r\n", "\r"), array("\n", "\n"), $message);
          $lines = explode("\n", $message);
          foreach ($lines as $line) {
-            if(subStr($line, 0, 1) == '.') {
-               $line = '.'.$line;   // escape leading dots by a second dot to avoid confusion with the end marker
+
+            // break up long lines into several shorter ones
+            $pieces = null;
+            while (strLen($line) > $maxLineLength) {
+               $pos = strRPos(subStr($line, 0, $maxLineLength), ' ');
+               if (!$pos)
+                  $pos = $maxLineLength - 1;    // patch to fix DOS attack
+
+               $pieces[] = subStr($line, 0, $pos);
+               $line = subStr($line, $pos + 1);
             }
-            $this->writeData($line);
+            $pieces[] = $line;
+
+            foreach ($pieces as $line) {
+               if (subStr($line, 0, 1) == '.')
+                  $line = '.'.$line;            // escape leading dots to avoid end marker confusion
+               $this->writeData($line);
+            }
          }
 
          // end marker

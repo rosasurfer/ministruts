@@ -3,7 +3,7 @@
 	- Bugfix: php/net/http/HttpRequest konnte mit ungültiger URL erzeugt werden
 
 	- Bugfix: php/net/mail/SMTPMailer - Punkte am Beginn einer Zeile der Mail wurden nicht escaped
-
+												 - zu lange Zeilen in der Nachricht wurden nicht umgebrochen
 
 2008-12-21
 
