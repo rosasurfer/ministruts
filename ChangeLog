@@ -1,3 +1,8 @@
+2008-12-22
+
+	- Bugfix: php/net/http/HttpRequest konnte mit ungültiger URL erzeugt werden
+
+
 2008-12-21
 
 	- neu: php/net/mail/CLIMailer, php/net/mail/FileSocketMailer, php/net/mail/SMTPMailer

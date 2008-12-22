@@ -36,3 +36,22 @@ final class HeaderUtils extends StaticClass {
        */
    }
 }
+/*
+# Author: Eric O
+# Date: July 13, 2006
+# Creating Automatic Self-Redirect To Secure Version
+# of Website as Seen on Paypal and other secure sites
+# Changes HTTP to HTTPS
+
+#gets the URI of the script
+$url =  $_SERVER['SCRIPT_URI'];
+#chops URI into bits BORK BORK BORK
+$chopped = parse_url($url);
+#HOST and PATH portions of your final destination
+$destination = $chopped[host].$chopped[path];
+#if you are not HTTPS, then do something about it
+if($chopped[scheme] != "https"){
+   #forwards to HTTP version of URI with secure certificate
+   header("Location: https://$destination");
+}
+*/
