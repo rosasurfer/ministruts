@@ -102,7 +102,7 @@ if (extension_loaded('apc')) {
 
 // System-V Semaphores
 // -------------------
-if (!WINDOWS && !function_exists('sem_get'))                                  echoError('Warning: System-V Semaphore extension is not loaded');
+if (!WINDOWS && !extension_loaded('sysvsem'))                                 echoError('Warning: System-V Semaphore extension is not loaded');
 
 
 // Entwicklungs- bzw. Produktivsystem: Fehlerausgabe etc.
@@ -137,11 +137,9 @@ function echoError($str) {
 zlib.output_compression = Off
 mysql.trace_mode = Off
 assert.active = On
+$str = print_r(get_loaded_extensions(), true);
+echo '<div align="left"><pre style="margin:0; font:normal normal 12px/normal \'Courier New\',courier,serif">'.htmlSpecialChars($str, ENT_QUOTES).'</pre></div>';
 */
 
 phpinfo();
-
-
-$str = print_r(get_loaded_extensions(), true);
-echo '<div align="left"><pre style="margin:0; font:normal normal 12px/normal \'Courier New\',courier,serif">'.htmlSpecialChars($str, ENT_QUOTES).'</pre></div>';
 ?>
