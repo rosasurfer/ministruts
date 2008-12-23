@@ -100,6 +100,11 @@ if (extension_loaded('apc')) {
 }
 
 
+// System-V Semaphores
+// -------------------
+if (!WINDOWS && !function_exists('sem_get'))                                  echoError('Warning: System-V Semaphore extension is not loaded');
+
+
 // Entwicklungs- bzw. Produktivsystem: Fehlerausgabe etc.
 // ------------------------------------------------------
 if (LOCAL) {
