@@ -1,32 +1,37 @@
 2009-01-01
 
-	- Dependency-Framework überarbeitet: verbesserte Auswertung
-	  neu: 			php/dependency/ChainedDependency
-	  Refactoring: php/dependency/IDependency::isStatusChanged()  ->  php/dependency/IDependency::isValid()
-						php/dependency/AbstractDependency  				  ->  php/dependency/ChainableDependency
+   - Dependency-Framework:
+
+     neu: php/dependency/ChainedDependency
+          php/dependency/MaxAgeDependency
+
+     neu: ChainedDependency-Instanzen können logisch verknüpft werden (AND und ODER)
+
+     Refactoring: php/dependency/IDependency::isStatusChanged()  ->  php/dependency/IDependency::isValid()
+                  php/dependency/AbstractDependency              ->  php/dependency/ChainableDependency
 
 
 2008-12-22
 
-	- Bugfix: php/net/http/HttpRequest konnte mit ungültiger URL erzeugt werden
+   - Bugfix: php/net/http/HttpRequest konnte mit ungültiger URL erzeugt werden
 
-	- Bugfix: php/net/mail/SMTPMailer - Punkte am Beginn einer Zeile der Mail wurden nicht escaped
-												 - zu lange Zeilen in der Nachricht wurden nicht umgebrochen
+   - Bugfix: php/net/mail/SMTPMailer - Punkte am Beginn einer Zeile der Mail wurden nicht escaped
+                                     - zu lange Zeilen in der Nachricht wurden nicht umgebrochen
 
 2008-12-21
 
-	- neu: php/net/mail/CLIMailer, php/net/mail/FileSocketMailer, php/net/mail/SMTPMailer
+   - neu: php/net/mail/CLIMailer, php/net/mail/FileSocketMailer, php/net/mail/SMTPMailer
 
 
 2008-12-06
 
-	- neu: php/locking/FileLocker
+   - neu: php/locking/FileLocker
 
-	- neu: php/struts/Request::getHeader() - zur Abfrage eines einzelnen Headers
+   - neu: php/struts/Request::getHeader() - zur Abfrage eines einzelnen Headers
 
    - php/util/Config: erkennt jetzt auch Änderungen durch neu hinzukommende config-Dateien
 
-	- php/struts/FrontController: Parsen und Cachen der struts-config.xml synchronisiert
+   - php/struts/FrontController: Parsen und Cachen der struts-config.xml synchronisiert
 
 
 2008-12-05
@@ -55,14 +60,14 @@
 
    - neu: php/cache/FileSystemCache
 
-	- mehrere Caches möglich, können in config.properties konfiguriert werden
+   - mehrere Caches möglich, können in config.properties konfiguriert werden
 
 
 2008-10-22
 
    - neu: php/dependency/ChainableDependency
 
-	- Refactoring: php/dependency/FileDependency ist von ChainableDependency abgeleitet
+   - Refactoring: php/dependency/FileDependency ist von ChainableDependency abgeleitet
 
 
 2008-08-18
