@@ -1,3 +1,8 @@
+2009-01-01
+
+	- Refactoring: php/dependency/IDependency::isStatusChanged()  ->  php/dependency/IDependency::isValid()
+
+
 2008-12-22
 
 	- Bugfix: php/net/http/HttpRequest konnte mit ungültiger URL erzeugt werden
@@ -54,7 +59,7 @@
 
    - neu: php/dependency/ChainableDependency
 
-	- Refactoring: php/dependency/FileDependency  ist von  ChainableDependency  abgeleitet
+	- Refactoring: php/dependency/FileDependency ist von ChainableDependency abgeleitet
 
 
 2008-08-18
