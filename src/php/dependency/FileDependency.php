@@ -22,7 +22,7 @@
  * $dependency->isValid() gibt TRUE zurück.  Nach Änderung oder Löschen der Datei gibt der Aufruf von
  * $dependency->isValid() FALSE zurück.
  */
-class FileDependency extends AbstractDependency {
+class FileDependency extends ChainableDependency {
 
 
    /**
@@ -58,7 +58,8 @@ class FileDependency extends AbstractDependency {
          if ((WINDOWS && !preg_match('/^[a-z]:/i', $name)) || (!WINDOWS && $name{0}!='/'))
             $name = getCwd().'/'.$name;         // relativer Pfad: absoluten Pfad erzeugen, da Arbeitsverzeichnis wechseln kann
 
-         $this->fileName = str_replace('/', DIRECTORY_SEPARATOR, $name);
+         $this->fileName     = str_replace('/', DIRECTORY_SEPARATOR, $name);
+         $this->lastModified = null;
       }
    }
 
@@ -92,7 +93,7 @@ class FileDependency extends AbstractDependency {
          return false;
       }
 
-      return parent::isValid();
+      return true;
    }
 }
 ?>
