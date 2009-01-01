@@ -1,6 +1,9 @@
 2009-01-01
 
-	- Refactoring: php/dependency/IDependency::isStatusChanged()  ->  php/dependency/IDependency::isValid()
+	- Dependency-Framework überarbeitet: verbesserte Auswertung
+	  neu: 			php/dependency/ChainedDependency
+	  Refactoring: php/dependency/IDependency::isStatusChanged()  ->  php/dependency/IDependency::isValid()
+						php/dependency/AbstractDependency  				  ->  php/dependency/ChainableDependency
 
 
 2008-12-22
