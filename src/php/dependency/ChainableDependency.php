@@ -4,7 +4,7 @@
  *
  * Abstrakte Basisklasse für Abhängigkeiten von bestimmten Zuständen oder Bedingungen.  Jede Implementierung
  * dieser Klasse bildet eine Abhängigkeit von einem bestimmten Zustand oder einer bestimmten Bedingung ab.
- * Abhängigkeiten können kombiniert werden.
+ * Abhängigkeiten können durch logisches UND oder logisches ODER kombiniert werden.
  *
  * Anwendungsbeispiel:
  * -------------------
@@ -30,17 +30,42 @@ abstract class ChainableDependency extends Object implements IDependency {
 
 
    /**
-    * Kombiniert diese Abhängigkeit mit einer weiteren. Die neue Abhängigkeit wird nach allen anderen
-    * vorhandenen Abhängigkeiten eingefügt (logisches AND).
+    * Kombiniert diese Abhängigkeit mit einer weiteren durch ein logisches UND (AND).
     *
     * @param IDependency $dependency - Abhängigkeit
     *
     * @return ChainedDependency
     */
-   public function add(IDependency $dependency) {
-      return ChainedDependency ::create()
-                               ->add($this)
-                               ->add($dependency);
+   public function andDependency(IDependency $dependency) {
+      return ChainedDependency ::create($this)
+                               ->andDependency($dependency);
+   }
+
+
+   /**
+    * Kombiniert diese Abhängigkeit mit einer weiteren durch ein logisches ODER (OR).
+    *
+    * @param IDependency $dependency - Abhängigkeit
+    *
+    * @return ChainedDependency
+    */
+   public function orDependency(IDependency $dependency) {
+      return ChainedDependency ::create($this)
+                               ->orDependency($dependency);
+   }
+
+
+   /**
+    * Alias für self::andDependency()
+    *
+    * Kombiniert diese Abhängigkeit mit einer weiteren durch ein logisches UND (AND).
+    *
+    * @param IDependency $dependency - Abhängigkeit
+    *
+    * @return ChainedDependency
+    */
+   final public function add(IDependency $dependency) {
+      return $this->andDependency($dependency);
    }
 }
 ?>

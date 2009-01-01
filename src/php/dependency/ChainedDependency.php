@@ -6,38 +6,69 @@ class ChainedDependency extends ChainableDependency {
 
 
    /**
-    * Constructor
+    * Abhängigkeiten des Gesamtausdrucks
     */
-   private function __construct() {
-   }
+   private /*IDependency[]*/ $dependencies;
 
 
    /**
-    * die definierten Abhängigkeiten dieser Instanz
+    * logischer Typ der Gesamtabhängigkeit (AND oder OR)
     */
-   private /*IDependency[]*/ $dependencies = array();
+   private /*string*/ $type;
+
+
+   /**
+    * Constructor
+    *
+    * @param IDependency $dependency - Abhängigkeit
+    */
+   private function __construct(IDependency $dependency) {
+      $this->dependencies[] = $dependency;
+   }
 
 
    /**
     * Erzeugt eine neue Instanz.
     *
+    * @param IDependency $dependency - Abhängigkeit
+    *
     * @return ChainedDependency
     */
-   public static function create() {
-      return new self();
+   protected static function create(IDependency $dependency) {
+      return new self($dependency);
    }
 
 
    /**
-    * Kombiniert diese Abhängigkeit mit einer weiteren. Die neue Abhängigkeit wird nach allen anderen
-    * vorhandenen Abhängigkeiten eingefügt.
+    * Kombiniert diese Abhängigkeit mit einer weiteren durch ein logisches UND (AND).
     *
     * @param IDependency $dependency - Abhängigkeit
     *
     * @return ChainedDependency
     */
-   public function add(IDependency $dependency) {
+   public function andDependency(IDependency $dependency) {
+      if ($this->type == 'OR')
+         return self ::create($this)->andDependency($dependency);
+
       $this->dependencies[] = $dependency;
+      $this->type           = 'AND';
+      return $this;
+   }
+
+
+   /**
+    * Kombiniert diese Abhängigkeit mit einer weiteren durch ein logisches ODER (OR).
+    *
+    * @param IDependency $dependency - Abhängigkeit
+    *
+    * @return ChainedDependency
+    */
+   public function orDependency(IDependency $dependency) {
+      if ($this->type == 'AND')
+         return self ::create($this)->orDependency($dependency);
+
+      $this->dependencies[] = $dependency;
+      $this->type           = 'OR';
       return $this;
    }
 
@@ -49,11 +80,23 @@ class ChainedDependency extends ChainableDependency {
     *                   FALSE, wenn der Zustandswechsel eingetreten ist und die Abhängigkeit nicht mehr erfüllt ist.
     */
    public function isValid() {
-      foreach ($this->dependencies as $dependency) {
-         if (!$dependency->isValid())
-            return false;
+      if ($this->type == 'AND') {
+         foreach ($this->dependencies as $dependency) {
+            if (!$dependency->isValid())
+               return false;
+         }
+         return true;
       }
-      return true;
+
+      if ($this->type == 'OR' ) {
+         foreach ($this->dependencies as $dependency) {
+            if ($dependency->isValid())
+               return true;
+         }
+         return false;
+      }
+
+      throw new RuntimeException('Unreachable code reached');
    }
 }
 ?>
