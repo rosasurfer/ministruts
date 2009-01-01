@@ -6,12 +6,12 @@
  * dieser Klasse bildet eine Abhängigkeit von einem bestimmten Zustand oder einer bestimmten Bedingung ab.
  * Abhängigkeiten können durch logisches UND oder logisches ODER kombiniert werden.
  *
- * Anwendungsbeispiel:
- * -------------------
+ * Beispiel:
+ * ---------
  *
  *    $dependency = FileDependency::create('/etc/crontab')
- *            ->add(FileDependency::create('/etc/hosts'))
- *            ->add(FileDependency::create('/etc/resolve.conf'));
+ *        ->andThat(FileDependency::create('/etc/hosts'))
+ *        ->andThat(FileDependency::create('/etc/resolve.conf'));
  *    ...
  *
  *    if (!$dependency->isValid()) {
@@ -19,9 +19,10 @@
  *    }
  *
  * Dieses Beispiel definiert eine gemeinsame Abhängigkeit vom Zustand dreier Dateien '/etc/crontab',
- * '/etc/hosts' und '/etc/resolv.conf'.  Solange keine dieser Dateien verändert oder gelöscht wird,
- * bleibt die Abhängigkeit erfüllt und der Aufruf von $dependency->isValid() gibt TRUE zurück.  Nach
- * Änderung oder Löschen einer dieser Dateien gibt der Aufruf von $dependency->isValid() FALSE zurück.
+ * '/etc/hosts' und '/etc/resolv.conf' (AND-Verknüpfung).  Solange keine dieser Dateien verändert oder
+ * gelöscht wird, bleibt die Abhängigkeit erfüllt und der Aufruf von $dependency->isValid() gibt TRUE
+ * zurück.  Nach Änderung oder Löschen einer dieser Dateien gibt der Aufruf von $dependency->isValid()
+ * FALSE zurück.
  *
  * @see ChainedDependency
  * @see FileDependency
@@ -36,9 +37,9 @@ abstract class ChainableDependency extends Object implements IDependency {
     *
     * @return ChainedDependency
     */
-   public function andDependency(IDependency $dependency) {
+   public function andThat(IDependency $dependency) {
       return ChainedDependency ::create($this)
-                               ->andDependency($dependency);
+                               ->andThat($dependency);
    }
 
 
@@ -49,23 +50,9 @@ abstract class ChainableDependency extends Object implements IDependency {
     *
     * @return ChainedDependency
     */
-   public function orDependency(IDependency $dependency) {
+   public function orThat(IDependency $dependency) {
       return ChainedDependency ::create($this)
-                               ->orDependency($dependency);
-   }
-
-
-   /**
-    * Alias für self::andDependency()
-    *
-    * Kombiniert diese Abhängigkeit mit einer weiteren durch ein logisches UND (AND).
-    *
-    * @param IDependency $dependency - Abhängigkeit
-    *
-    * @return ChainedDependency
-    */
-   final public function add(IDependency $dependency) {
-      return $this->andDependency($dependency);
+                               ->orThat($dependency);
    }
 }
 ?>

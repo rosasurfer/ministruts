@@ -119,7 +119,7 @@ final class Config extends Object {
             $dependency = null;        // NEIN, Config cachen
             foreach ($config->files as $file => $fileExists) {
                $singleDep  = FileDependency ::create($file);
-               $dependency = $dependency ? $dependency->add($singleDep) : $singleDep;
+               $dependency = $dependency ? $dependency->andThat($singleDep) : $singleDep;
             }
 
             // TODO: zusätzliche MinLifetime von 60 sek., um nicht bei jedem Zugriff alle Dateien zu prüfen
