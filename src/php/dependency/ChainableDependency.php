@@ -31,7 +31,7 @@ abstract class ChainableDependency extends Object implements IDependency {
 
    /**
     * Kombiniert diese Abhängigkeit mit einer weiteren. Die neue Abhängigkeit wird nach allen anderen
-    * vorhandenen Abhängigkeiten eingefügt.
+    * vorhandenen Abhängigkeiten eingefügt (logisches AND).
     *
     * @param IDependency $dependency - Abhängigkeit
     *

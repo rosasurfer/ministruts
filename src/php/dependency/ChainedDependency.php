@@ -36,7 +36,7 @@ class ChainedDependency extends ChainableDependency {
     *
     * @return ChainedDependency
     */
-   final public function add(IDependency $dependency) {
+   public function add(IDependency $dependency) {
       $this->dependencies[] = $dependency;
       return $this;
    }

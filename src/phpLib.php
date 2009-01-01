@@ -46,7 +46,8 @@ $__classes['DB'                             ] = $dir.'php/db/DB';
 $__classes['DBPool'                         ] = $dir.'php/db/DBPool';
 $__classes['MySQLConnector'                 ] = $dir.'php/db/MySQLConnector';
 
-$__classes['AbstractDependency'             ] = $dir.'php/dependency/AbstractDependency';
+$__classes['ChainableDependency'            ] = $dir.'php/dependency/ChainableDependency';
+$__classes['ChainedDependency'              ] = $dir.'php/dependency/ChainedDependency';
 $__classes['FileDependency'                 ] = $dir.'php/dependency/FileDependency';
 $__classes['IDependency'                    ] = $dir.'php/dependency/IDependency';
 

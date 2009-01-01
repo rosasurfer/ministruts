@@ -77,7 +77,7 @@ class FileDependency extends ChainableDependency {
 
 
    /**
-    * Ob sich die der Abhängigkeit zugrunde liegende Datei geändert hat oder nicht.
+    * Ob die der Abhängigkeit zugrunde liegende Datei weiterhin unverändert ist.
     *
     * @return boolean - TRUE, wenn die Datei sich nicht geändert hat.
     *                   FALSE, wenn die Datei sich geändert hat.
