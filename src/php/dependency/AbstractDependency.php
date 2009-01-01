@@ -2,9 +2,9 @@
 /**
  * AbstractDependency
  *
- * Abstrakte Basisklasse für Abhängigkeiten von bestimmten Ereignissen.  Jede einzelne Implementation
- * dieser Klasse bildet eine Abhängigkeit vom Eintreten eines einzelnen spezifischen Ereignisses ab.
- * Abhängigkeiten können kombiniert werden.
+ * Abstrakte Basisklasse für Abhängigkeiten von bestimmten Zuständen oder Bedingungen.  Jede einzelne
+ * Implementierung dieser Klasse bildet eine Abhängigkeit von einem bestimmten Zustand oder einer bestimmten
+ * Bedingung. Abhängigkeiten können kombiniert werden.
  *
  * Anwendungsbeispiel:
  * -------------------
@@ -14,15 +14,14 @@
  *            ->add(FileDependency::create('/etc/resolve.conf'));
  *    ....
  *
- *    if ($dependency->isStatusChanged()) {
+ *    if (!$dependency->isValid()) {
  *       // irgendeine Aktion
  *    }
  *
  * Dieses Beispiel definiert eine gemeinsame Abhängigkeit vom Zustand dreier Dateien '/etc/crontab',
  * '/etc/hosts' und '/etc/resolv.conf'.  Solange keine der Dateien verändert oder gelöscht wird, bleibt
- * die Abhängigkeit erfüllt und der Aufruf von $dependency->isStatusChanged() gibt FALSE zurück.
- * Nach Änderung oder Löschen einer der Dateien gibt der Aufruf von $dependency->isStatusChanged()
- * TRUE zurück.
+ * die Abhängigkeit erfüllt und der Aufruf von $dependency->isValid() gibt TRUE zurück.  Nach Änderung
+ * oder Löschen einer der Dateien gibt der Aufruf von $dependency->isValid() FALSE zurück.
  */
 abstract class AbstractDependency extends Object implements IDependency {
 
@@ -48,16 +47,17 @@ abstract class AbstractDependency extends Object implements IDependency {
 
 
    /**
-    * Ob sich die den Abhängigkeiten zugrunde liegende Zustände geändert haben oder nicht.
+    * Ob das zu überwachende Ereignis oder der Zustandswechsel eingetreten sind oder nicht.
     *
-    * @return boolean
+    * @return boolean - TRUE, wenn die Abhängigkeit weiterhin erfüllt ist.
+    *                   FALSE, wenn der Zustandswechsel eingetreten ist und die Abhängigkeit nicht mehr erfüllt ist.
     */
-   public function isStatusChanged() {
+   public function isValid() {
       foreach ($this->dependencies as $dependency) {
-         if ($dependency->isStatusChanged())
-            return true;
+         if (!$dependency->isValid())
+            return false;
       }
-      return false;
+      return true;
    }
 }
 ?>

@@ -13,14 +13,14 @@
  *    $dependency = new FileDependency('/etc/crontab');
  *    ....
  *
- *    if ($dependency->isStatusChanged()) {
+ *    if (!$dependency->isValid()) {
  *       // irgendeine Aktion
  *    }
  *
  * Dieses Beispiel definiert eine Abhängigkeit vom Änderungszeitpunkt der Datei '/etc/crontab'.
  * Solange die Datei nicht verändert wird, bleibt die Abhängigkeit erfüllt und der Aufruf von
- * $dependency->isStatusChanged() gibt FALSE zurück.  Nach Änderung oder Löschen der Datei gibt der
- * Aufruf von $dependency->isStatusChanged() TRUE zurück.
+ * $dependency->isValid() gibt TRUE zurück.  Nach Änderung oder Löschen der Datei gibt der Aufruf von
+ * $dependency->isValid() FALSE zurück.
  */
 class FileDependency extends AbstractDependency {
 
@@ -78,20 +78,21 @@ class FileDependency extends AbstractDependency {
    /**
     * Ob sich die der Abhängigkeit zugrunde liegende Datei geändert hat oder nicht.
     *
-    * @return boolean
+    * @return boolean - TRUE, wenn die Datei sich nicht geändert hat.
+    *                   FALSE, wenn die Datei sich geändert hat.
     */
-   public function isStatusChanged() {
+   public function isValid() {
       // TODO: stat-Cache bei wiederholten Aufrufen löschen, siehe clearStatCache()
 
       if (file_exists($this->fileName)) {
          if ($this->lastModified !== fileMTime($this->fileName))
-            return true;
+            return false;
       }
       elseif ($this->lastModified !== null) {
-         return true;
+         return false;
       }
 
-      return parent::isStatusChanged();
+      return parent::isValid();
    }
 }
 ?>

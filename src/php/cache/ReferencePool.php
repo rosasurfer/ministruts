@@ -61,7 +61,7 @@ final class ReferencePool extends CachePeer {
 
       /*IDependency*/ $dependency = $this->pool[$key][2];
 
-      if ($dependency && $dependency->isStatusChanged()) {
+      if ($dependency && !$dependency->isValid()) {
          unSet($this->pool[$key]);
          return false;
       }

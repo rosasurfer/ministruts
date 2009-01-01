@@ -52,7 +52,7 @@ final class ApcCache extends CachePeer {
          $dependency = $data[1][1];
 
          // Dependency prüfen und Wert ggf. löschen
-         if ($dependency && $dependency->isStatusChanged()) {
+         if ($dependency && !$dependency->isValid()) {
             $this->delete($key);
             return false;
          }
