@@ -71,6 +71,8 @@ $__classes['UnimplementedFeatureException'  ] = $dir.'php/exceptions/Unimplement
 $__classes['UnsupportedMethodException'     ] = $dir.'php/exceptions/UnsupportedMethodException';
 
 $__classes['FileLock'                       ] = $dir.'php/locking/FileLock';
+$__classes['Lock'                           ] = $dir.'php/locking/Lock';
+$__classes['SystemFiveLock'                 ] = $dir.'php/locking/SystemFiveLock';
 
 $__classes['TorHelper'                      ] = $dir.'php/net/TorHelper';
 
@@ -111,8 +113,6 @@ $__classes['Logger'                         ] = $dir.'php/util/Logger';
 $__classes['String'                         ] = $dir.'php/util/String';
 
 $__classes['ApdProfile'                     ] = $dir.'php/util/apd/ApdProfile';
-
-$__classes['Lock'                           ] = $dir.'incubator/Lock';
 
 unset($dir);
 

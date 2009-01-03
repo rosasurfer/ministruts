@@ -10,16 +10,13 @@
  * release() method or by the termination of the current PHP process, whichever comes first. The validity
  * of a lock may be tested by invoking its isValid() method.  A file lock is either exclusive or shared.
  * A shared lock prevents other concurrently-running programs from acquiring an overlapping exclusive
- * lock, but does allow them to acquire overlapping shared locks. An exclusive lock prevents other programs
+ * lock, but does allow them to acquire overlapping shared locks.  An exclusive lock prevents other programs
  * from acquiring an overlapping lock of either type.  Once it is released, a lock has no further effect
  * on the locks that may be acquired by other programs.  Whether a lock is exclusive or shared may be
  * determined by invoking its isShared() method.  Some platforms do not support shared locks, in which
  * case a request for a shared lock is automatically converted into a request for an exclusive lock.
- *
- * Only the validity of a lock is subject to change over time; all other aspects of a lock's state are
- * immutable.
  */
-class FileLock extends Object {
+final class FileLock extends Lock {
 
 
    private /*Resource*/ $fileHandle;
