@@ -39,7 +39,7 @@ final class SystemFiveLock extends Lock {
 
       // Obacht geben, daß Lock auch nach abgebrochenem Script entfernt wird
 
-      echoPre(self::$locks);
+      self::$locks = self::$locks[$key];
    }
 
 
