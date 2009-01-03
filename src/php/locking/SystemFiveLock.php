@@ -4,6 +4,8 @@
  *
  * A token representing a lock on a System-V shared memory segment.  Some platforms do not support
  * System-V shared memory (ie. Windows).
+ *
+ *
  */
 final class SystemFiveLock extends Lock {
 
@@ -17,9 +19,15 @@ final class SystemFiveLock extends Lock {
     * Constructor
     *
     * Erzeugt für den angegebenen Schlüssel eine neue Lock-Instanz.  Um über Prozess-/Threadgrenzen
-    * hinweg dieselbe Instanz ansprechen zu können, ist eine fest definierter, jedoch trotzdem eindeutiger
-    * Schlüssel notwendig.  Es empfiehlt sich die Verwendung von Dateiname+Zeilen-Nr. der Code-Zeile,
+    * hinweg dieselbe Instanz ansprechen zu können, ist ein fest definierter, jedoch trotzdem eindeutiger
+    * Schlüssel notwendig.  Es empfiehlt sich die Verwendung von Dateiname + Zeilen-Nr. der Code-Zeile,
     * an der das Lock erzeugt wird.
+    *
+    * Example:
+    * --------
+    *
+    *  $lock = new SystemFiveLock(__FILE__.'#'.__LINE__);
+    *
     *
     * @param  string $key - eindeutiger Schlüssel der Instanz
     *
