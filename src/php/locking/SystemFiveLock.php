@@ -38,6 +38,8 @@ final class SystemFiveLock extends Lock {
       sem_acquire(self::$locks[$key]);
 
       // Obacht geben, daß Lock auch nach abgebrochenem Script entfernt wird
+
+      echoPre($this);
    }
 
 
