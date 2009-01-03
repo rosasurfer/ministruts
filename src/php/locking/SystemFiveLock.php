@@ -8,7 +8,7 @@
 final class SystemFiveLock extends Lock {
 
 
-   public static /*array*/  $locks;
+   private  /*static array*/  $locks;
 
    private        /*string*/ $key;
    private        /*int*/    $keyId;
@@ -38,8 +38,6 @@ final class SystemFiveLock extends Lock {
       sem_acquire(self::$locks[$key]);
 
       // Obacht geben, daß Lock auch nach abgebrochenem Script entfernt wird
-
-      self::$locks = self::$locks[$key];
    }
 
 
