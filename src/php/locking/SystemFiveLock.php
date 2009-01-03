@@ -8,7 +8,7 @@
 final class SystemFiveLock extends Lock {
 
 
-   private static /*array*/  $locks;
+   protected static /*array*/  $locks;
 
    private        /*string*/ $key;
    private        /*int*/    $keyId;
