@@ -46,8 +46,6 @@ final class SystemFiveLock extends Lock {
     * Sorgt bei Zerstörung der Instanz dafür, daß ein evt. noch gehaltenes Lock freigegeben wird.
     */
    public function __destruct() {
-      echoPre(__METHOD__);
-
       $this->release();
    }
 
@@ -73,8 +71,6 @@ final class SystemFiveLock extends Lock {
       if ($this->isValid()) {
          sem_remove(self::$pool[$this->key]);
          unset(self::$pool[$this->key]);
-
-         echoPre(__METHOD__);
       }
    }
 }

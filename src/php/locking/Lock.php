@@ -58,4 +58,22 @@ abstract class Lock extends Object {
       return hexDec(subStr(md5($key), 0, 7)) + strLen($key);
                                       // 7: strLen(decHex(PHP_INT_MAX)) - 1   (x86)
    }
+
+
+   /**
+    * Verhindert das Serialisieren von Lock-Instanzen.
+    */
+   final public function __sleep() {
+      $ex = new IllegalStateException('You cannot serialize me: '.__CLASS__);
+      Logger ::log($ex, L_ERROR, __CLASS__);
+      throw $ex;
+   }
+
+
+   /**
+    * Verhindert das Deserialisieren von Lock-Instanzen.
+    */
+   final public function __wakeUp() {
+      throw new IllegalStateException('You cannot unserialize me: '.__CLASS__);
+   }
 }
