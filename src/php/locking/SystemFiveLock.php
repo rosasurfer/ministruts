@@ -77,7 +77,9 @@ final class SystemFiveLock extends Lock {
     */
    public function release() {
       if ($this->isValid()) {
-         sem_remove(self::$pool[$this->key]);
+         if (!sem_remove(self::$pool[$this->key]))
+            throw new RuntimeException('Cannot remove semaphore for key "'.$this->key.'"');
+
          unset(self::$pool[$this->key]);
       }
    }
