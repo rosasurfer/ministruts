@@ -5,7 +5,7 @@
 
 // -----------------------------------------------------------------------------------------------------------------------------------
 // ggf. Profiler starten
-if (extension_loaded('APD') && isSet($_REQUEST['_PROFILE_'])) {
+if (extension_loaded('APD') && isSet($_REQUEST['_PROFILER_'])) {
    $dumpFile = apd_set_pprof_trace(ini_get('apd.dumpdir'));
 
    if ($dumpFile) {
