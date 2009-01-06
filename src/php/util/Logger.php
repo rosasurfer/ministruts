@@ -142,11 +142,22 @@ class Logger extends StaticClass {
       if     ($level == E_USER_NOTICE ) self:: _log(null, $exception, L_NOTICE);
       elseif ($level == E_USER_WARNING) self:: _log(null, $exception, L_WARN  );
       else {
-         if ($level==E_STRICT || ($file=='Unknown' && $line==0)) {    // Spezialfälle, die nicht abgefangen oder zurückgeworfen werden können
-            self:: handleException($exception);
+         $destructor = false;
+         foreach ($exception->getStackTrace() as $frame) {
+            if (isSet($frame['class']) && isSet($frame['function']) && strToLower($frame['function'])=='__destruct') {
+               $destructor = true;
+               break;
+            }
+         }
+
+         // Spezialfälle, die nicht zurückgeworfen werden dürfen/können
+         if ($level==E_STRICT || ($file=='Unknown' && $line==0) || $destructor) {
+            self ::handleException($exception);
             exit(1);
          }
-         throw $exception;                                           // alles andere zurückwerfen
+
+         // alles andere zurückwerfen
+         throw $exception;
       }
 
       return true;
