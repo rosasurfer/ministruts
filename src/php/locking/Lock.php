@@ -36,23 +36,28 @@ final class Lock extends BaseLock {
          if (!is_string($mutex)) throw new IllegalTypeException('Illegal type of argument $mutex: '.getType($mutex));
       }
       else {
-         // kein Mutex angegeben, file & line des aufrufenden Codes verwenden
+         // kein Mutex angegeben, __FILE__ & __LINE__ des aufrufenden Codes verwenden
          $trace = debug_backtrace();
          $mutex = $trace[0]['file'].'#'.$trace[0]['line'];
       }
 
-      // konkretes Lock instanziieren
+
+      // 1.) vorzugsweise SystemFiveLock verwenden
       if (false && extension_loaded('sysvsem')) {
          $this->impl = new SystemFiveLock($mutex);
       }
+
+      // 2.) alternativ FileLock verwenden
       else {
-         // FileLock benötigt eine existierende, zu sperrende Datei
-         $this->lockFile = tempNam(ini_get('session.save_path'), 'lock_');
+         // Namen der Lock-Datei ermitteln
+         $name = md5($mutex);
+         $file = ini_get('session.save_path').DIRECTORY_SEPARATOR.'lock_'.$name;
 
-         if (!touch($this->lockFile))
-            throw new RuntimeException('Cannot create lock file "'.$this->lockFile.'"');
+         // Lock-Datei ggf. erzeugen
+         if (!is_file($file) && !touch($file))
+            throw new RuntimeException('Cannot create lock file "'.$file.'"');
 
-         $this->impl = new FileLock($this->lockFile);
+         $this->impl = new FileLock($this->lockFile = $file);
       }
    }
 
@@ -65,8 +70,8 @@ final class Lock extends BaseLock {
    public function __destruct() {
       $this->impl = null;
 
-      if ($this->lockFile)
-         unlink($this->lockFile);
+      if ($this->lockFile && !unlink($this->lockFile))
+         throw new RuntimeException('Cannot delete lock file "'.$this->lockFile.'"');
    }
 
 
