@@ -19,8 +19,10 @@
 final class FileLock extends Lock {
 
 
-   private /*Resource*/ $fileHandle;
-   private /*bool*/     $shared;
+   private static /*Resource[]*/ $handles;
+
+   private /*string*/ $file;
+   private /*bool*/   $shared;
 
 
    /**
@@ -33,15 +35,18 @@ final class FileLock extends Lock {
     *                          (default: FALSE = exklusives Lock)
     */
    public function __construct($file, $shared = false) {
-      if (!is_string($file)) throw new IllegalTypeException('Illegal type of argument $file: '.getType($file));
-      if (!is_bool($shared)) throw new IllegalTypeException('Illegal type of argument $shared: '.getType($shared));
+      if (!is_string($file))            throw new IllegalTypeException('Illegal type of argument $file: '.getType($file));
+      if (!is_bool($shared))            throw new IllegalTypeException('Illegal type of argument $shared: '.getType($shared));
+      if (isSet(self::$handles[$file])) throw new RuntimeException('Dead-lock detected: already holding a lock for file "'.$file.'"');
 
-      $this->fileHandle = fOpen($file, 'r');
-      $this->shared     = $shared;
+      $this->file   = $file;
+      $this->shared = $shared;
+
+      self::$handles[$file] = fOpen($file, 'r');
 
       $mode = $shared ? LOCK_SH : LOCK_EX;
 
-      if (!fLock($this->fileHandle, $mode))
+      if (!fLock(self::$handles[$file], $mode))
          throw new RuntimeException('Can not aquire '.($shared ? 'shared':'exclusive').' file lock for "'.$file.'"');
    }
 
@@ -72,7 +77,7 @@ final class FileLock extends Lock {
     * @return boolean
     */
    public function isValid() {
-      return is_resource($this->fileHandle);
+      return is_resource(self::$handles[$this->file]);
    }
 
 
@@ -85,7 +90,8 @@ final class FileLock extends Lock {
     */
    public function release() {
       if ($this->isValid()) {
-         fClose($this->fileHandle);    // see docs: The lock is released also by fClose()...
+         fClose(self::$handles[$this->file]);   // see docs: The lock is released also by fClose()...
+         unset(self::$handles[$this->file]);
       }
    }
 }
