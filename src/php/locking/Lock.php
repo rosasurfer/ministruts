@@ -70,8 +70,11 @@ final class Lock extends BaseLock {
    public function __destruct() {
       $this->impl = null;
 
-      if ($this->lockFile && !unlink($this->lockFile))
-         throw new RuntimeException('Cannot delete lock file "'.$this->lockFile.'"');
+      if ($this->lockFile) {
+         if (!unlink($this->lockFile))
+            throw new RuntimeException('Cannot delete lock file "'.$this->lockFile.'"');
+         $this->lockFile = null;
+      }
    }
 
 
