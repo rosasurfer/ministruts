@@ -233,11 +233,11 @@ function getRandomID($length) {
 
 
 /**
- * Hilfsfunktion zur HTML-formatierten Ausgabe einer Variablen.
+ * Hilfsfunktion zur formatierten Ausgabe einer Variable.
  *
  * @param mixed $var    - die auszugebende Variable
- * @param bool  $return - Ob die Ausgabe auf STDOUT erfolgen soll (FALSE) oder als Rückgabewert der Funktion (TRUE),
- *                        Default ist FALSE
+ * @param bool  $return - Ob die Ausgabe auf STDOUT erfolgen soll (FALSE) oder als Rückgabewert der Funktion (TRUE).
+ *                        (default: FALSE)
  *
  * @return string - Rückgabewert, wenn $return TRUE ist, NULL andererseits.
  */
@@ -251,20 +251,29 @@ function printFormatted($var, $return = false) {
    else {
       $str = (string) $var;
    }
+
    if (isSet($_SERVER['REQUEST_METHOD']))
       $str = '<div align="left"><pre style="margin:0; font:normal normal 12px/normal \'Courier New\',courier,serif">'.htmlSpecialChars($str, ENT_QUOTES).'</pre></div>';
-
    $str .= "\n";
 
    if ($return)
       return $str;
 
-   //ob_get_level() ? ob_flush() : flush();
-   while (ob_get_level()) ob_end_flush();
-   flush();
-
    echo $str;
    return null;
+
+   /*
+   function var_dump_ret($var) {
+      ob_start();
+      var_dump($var);
+      return ob_get_clean();
+   }
+
+   $lock = new SystemFiveLock(__FILE__.'#'.__LINE__);
+
+   echoPre($lock);
+   echoPre(var_dump_ret($lock));
+   */
 }
 
 

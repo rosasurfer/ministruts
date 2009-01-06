@@ -173,8 +173,7 @@ class Logger extends StaticClass {
 
       // 2. Exception anzeigen (wenn $display TRUE ist)
       if (self::$display) {
-         //ob_get_level() ? ob_flush() : flush();
-         while (ob_get_level()) ob_end_flush();
+         while (@ob_end_flush()) ;
          flush();
 
          if (self::$displayHtml) {
@@ -321,8 +320,7 @@ class Logger extends StaticClass {
 
       // 2. Logmessage anzeigen (wenn $display TRUE ist)
       if (self::$display) {
-         //ob_get_level() ? ob_flush() : flush();
-         while (ob_get_level()) ob_end_flush();
+         while (@ob_end_flush()) ;
          flush();
 
          if (self::$displayHtml) {
