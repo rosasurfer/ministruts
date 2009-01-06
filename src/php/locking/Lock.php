@@ -22,7 +22,8 @@
 final class Lock extends BaseLock {
 
 
-   private /*Lock*/ $impl;
+   private /*Lock*/   $impl;
+   private /*string*/ $lockFile;
 
 
    /**
@@ -46,13 +47,26 @@ final class Lock extends BaseLock {
       }
       else {
          // FileLock benötigt eine existierende, zu sperrende Datei
-         $filename = tempNam(ini_get('session.save_path'), 'lock_');
+         $this->lockFile = tempNam(ini_get('session.save_path'), 'lock_');
 
-         if (!touch($filename))
-            throw new RuntimeException('Cannot create file "'.$filename.'"');
+         if (!touch($this->lockFile))
+            throw new RuntimeException('Cannot create lock file "'.$this->lockFile.'"');
 
-         $this->impl = new FileLock($filename);
+         $this->impl = new FileLock($this->lockFile);
       }
+   }
+
+
+   /**
+    * Destructor
+    *
+    * Sorgt bei Zerstörung der Instanz dafür, daß eine evt. erzeugte Lockdatei wieder gelöscht wird.
+    */
+   public function __destruct() {
+      $this->impl = null;
+
+      if ($this->lockFile)
+         unlink($this->lockFile);
    }
 
 
