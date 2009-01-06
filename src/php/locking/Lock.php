@@ -43,7 +43,7 @@ final class Lock extends BaseLock {
 
 
       // 1.) vorzugsweise SystemFiveLock verwenden
-      if (false && extension_loaded('sysvsem')) {
+      if (extension_loaded('sysvsem')) {
          $this->impl = new SystemFiveLock($mutex);
       }
 
