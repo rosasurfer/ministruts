@@ -46,15 +46,10 @@ final class Lock extends BaseLock {
       }
       else {
          // FileLock benötigt eine existierende, zu sperrende Datei
-         $tmpName  = tempNam(ini_get('session.save_path'), 'lock_');
-         $dirName  = dirName($tmpName);
-         $baseName = baseName($tmpName);
-         $filename = $dirName.DIRECTORY_SEPARATOR.'lock_'.$baseName;
+         $filename = tempNam(ini_get('session.save_path'), 'lock_');
 
          if (!touch($filename))
             throw new RuntimeException('Cannot create file "'.$filename.'"');
-
-         //unlink($tmpName);
 
          $this->impl = new FileLock($filename);
       }
