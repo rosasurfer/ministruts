@@ -68,13 +68,7 @@ final class Lock extends BaseLock {
     * Sorgt bei Zerstörung der Instanz dafür, daß eine evt. erzeugte Lockdatei wieder gelöscht wird.
     */
    public function __destruct() {
-      $this->impl = null;
-
-      if ($this->lockFile) {
-         if (!unlink($this->lockFile))
-            throw new RuntimeException('Cannot delete lock file "'.$this->lockFile.'"');
-         $this->lockFile = null;
-      }
+      $this->release();
    }
 
 
@@ -96,6 +90,17 @@ final class Lock extends BaseLock {
     * @see Lock::isValid()
     */
    public function release() {
-      return $this->impl->release();
+      // der Prozeß, der ein Lock hält, muß auch eine evt. Lockdatei löschen
+      $lockHolder = $this->isValid();
+
+      // TODO: $fileLock->release(true);
+      $retValue = $this->impl->release();
+
+      if ($lockHolder && $this->lockFile) {
+         @unlink($this->lockFile); // @, denn theoretisch kann hier schon ein anderer Prozeß das Lock halten
+         $this->lockFile = null;
+      }
+
+      return $retValue;
    }
 }
