@@ -77,7 +77,10 @@ final class FileLock extends BaseLock {
     * @return boolean
     */
    public function isValid() {
-      return is_resource(self::$handles[$this->file]);
+      if (isSet(self::$handles[$this->file]))
+         return is_resource(self::$handles[$this->file]);
+
+      return false;
    }
 
 
