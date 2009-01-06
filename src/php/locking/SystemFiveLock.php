@@ -5,7 +5,7 @@
  * A token representing a lock on a System-V shared memory segment.  Some platforms do not support
  * System-V shared memory (ie. Windows).
  */
-final class SystemFiveLock extends Lock {
+final class SystemFiveLock extends BaseLock {
 
 
    private static /*Resource[]*/ $handles;
@@ -41,8 +41,6 @@ final class SystemFiveLock extends Lock {
       self::$handles[$key] = sem_get($this->getKeyId($key));
 
       sem_acquire(self::$handles[$key]);
-
-      // TODO: Obacht geben, daß Lock nach abgebrochenem Script ggf. entfernt wird
    }
 
 

@@ -70,6 +70,7 @@ $__classes['RuntimeException'               ] = $dir.'php/exceptions/RuntimeExce
 $__classes['UnimplementedFeatureException'  ] = $dir.'php/exceptions/UnimplementedFeatureException';
 $__classes['UnsupportedMethodException'     ] = $dir.'php/exceptions/UnsupportedMethodException';
 
+$__classes['BaseLock'                       ] = $dir.'php/locking/BaseLock';
 $__classes['FileLock'                       ] = $dir.'php/locking/FileLock';
 $__classes['Lock'                           ] = $dir.'php/locking/Lock';
 $__classes['SystemFiveLock'                 ] = $dir.'php/locking/SystemFiveLock';

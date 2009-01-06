@@ -16,7 +16,7 @@
  * determined by invoking its isShared() method.  Some platforms do not support shared locks, in which
  * case a request for a shared lock is automatically converted into a request for an exclusive lock.
  */
-final class FileLock extends Lock {
+final class FileLock extends BaseLock {
 
 
    private static /*Resource[]*/ $handles;

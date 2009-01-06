@@ -2,31 +2,63 @@
 /**
  * Lock
  *
- * A token representing a lock.
+ * Delegate auf eine konkrete Lock-Implementierung.  Aus Sicht des User-Codes ist nur die Funktionalität
+ * interessant, nicht jedoch, wie das Lock konkret implementiert wird.
  *
- * A lock object is initially valid.  It remains valid until the lock is released by invoking the
- * release() method or by the termination of the current PHP process, whichever comes first. The validity
- * of a lock may be tested by invoking its isValid() method.  Once it is released, a lock has no further
- * effect.
+ * Ein Lock stellt die Sperre eines oder mehrerer Code-Abschnitte gegen gleichzeitigen Zugriff durch
+ * konkurrierende PHP-Threads oder -Prozesse dar.
  *
- * Only the validity of a lock is subject to change over time; all other aspects of a lock's state are
- * immutable.
+ * Eine Lock-Instanz ist nach Erzeugung gesperrt und die Sperre immer gültig.  Besitzt zum Zeitpunkt
+ * des Aufrufs ein anderer Prozeß die gewünschte Sperre des jeweiligen Code-Abschnitts, blockiert
+ * aufrufende Prozeß, bis er die Sperre erlangt.  Die Sperre bleibt gültig, bis sie durch Aufruf der
+ * release()-Methode, durch Zerstörung der Lock-Instanz oder durch Beendigung des Scriptes (je nachdem
+ * welches der Ereignisse zuerst eintritt) freigegeben wird.  Die Gültigkeit einer Sperre kann durch
+ * Aufruf der isValid()-Methode überprüft werden.  Nach Freigabe der Sperre hat die Lock-Instanz keinerlei
+ * weitere Funktionen mehr.
+ *
+ * Im Lebenszyklus einer Lock-Instanz kann sich nur die Gültigkeit der Sperre ändern, alle anderen Aspekte
+ * der Instanz sind unveränderlich.
  */
-abstract class Lock extends Object {
+final class Lock extends BaseLock {
+
+
+   private /*Lock*/ $impl;
 
 
    /**
     * Constructor
     *
-   public function __construct($path, $label = APPLICATION_NAME) {
-      if (extension_loaded('sysvsem')) {
-         $this->implementation = null;   // SystemFiveLock
+    * @param string $mutex - Schlüssel, auf dem ein Lock gehalten werden soll
+    */
+   public function __construct($mutex = null) {
+      if (func_num_args()) {
+         if (!is_string($mutex)) throw new IllegalTypeException('Illegal type of argument $mutex: '.getType($mutex));
       }
       else {
-         $this->implementation = null;   // FileLock
+         // kein Mutex angegeben, file & line des aufrufenden Codes verwenden
+         $trace = debug_backtrace();
+         $mutex = $trace[0]['file'].'#'.$trace[0]['line'];
+      }
+
+      // konkretes Lock instanziieren
+      if (extension_loaded('sysvsem')) {
+         $this->impl = new SystemFiveLock($mutex);
+      }
+      else {
+         // FileLock benötigt eine existierende, zu sperrende Datei
+         $tmpName  = tempNam(ini_get('session.save_path'), 'lock_');
+         $dirName  = dirName($tmpName);
+         $baseName = baseName($tmpName);
+         $filename = $dirName.DIRECTORY_SEPARATOR.'lock_'.$baseName;
+
+         if (!touch($filename))
+            throw new RuntimeException('Cannot create file "'.$filename.'"');
+
+         //unlink($tmpName);
+
+         $this->impl = new FileLock($filename);
       }
    }
-   */
 
 
    /**
@@ -34,7 +66,9 @@ abstract class Lock extends Object {
     *
     * @return boolean
     */
-   abstract public function isValid();
+   public function isValid() {
+      return $this->impl->isValid();
+   }
 
 
    /**
@@ -44,34 +78,7 @@ abstract class Lock extends Object {
     *
     * @see Lock::isValid()
     */
-   abstract public function release();
-
-
-   /**
-    * Transformiert einen Schlüssel in eine numerische ID.
-    *
-    * @param  string $key - Schlüssel
-    *
-    * @return int - ID
-    */
-   protected function getKeyId($key) {
-      return hexDec(subStr(md5($key), 0, 7)) + strLen($key);
-                                      // 7: strLen(decHex(PHP_INT_MAX)) - 1   (x86)
-   }
-
-
-   /**
-    * Verhindert das Serialisieren von Lock-Instanzen.
-    */
-   final public function __sleep() {
-      throw new IllegalStateException('You cannot serialize me: '.__CLASS__);
-   }
-
-
-   /**
-    * Verhindert das Deserialisieren von Lock-Instanzen.
-    */
-   final public function __wakeUp() {
-      throw new IllegalStateException('You cannot unserialize me: '.__CLASS__);
+   public function release() {
+      return $this->impl->release();
    }
 }
