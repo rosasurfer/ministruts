@@ -97,7 +97,7 @@ final class Lock extends BaseLock {
       $retValue = $this->impl->release();
 
       if ($lockHolder && $this->lockFile) {
-         @unlink($this->lockFile); // @, denn theoretisch kann hier schon ein anderer Prozeß das Lock halten
+         unlink($this->lockFile); // @, denn theoretisch kann hier schon ein anderer Prozeß das Lock halten
          $this->lockFile = null;
       }
 
