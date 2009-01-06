@@ -4,8 +4,6 @@
  *
  * A token representing a lock on a System-V shared memory segment.  Some platforms do not support
  * System-V shared memory (ie. Windows).
- *
- *
  */
 final class SystemFiveLock extends Lock {
 
