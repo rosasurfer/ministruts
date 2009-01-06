@@ -10,9 +10,9 @@
 final class SystemFiveLock extends Lock {
 
 
-   private static /*array*/  $pool;
+   private static /*Resource[]*/ $handles;
 
-   private        /*string*/ $key;
+   private /*string*/ $key;
 
 
    /**
@@ -35,14 +35,14 @@ final class SystemFiveLock extends Lock {
     *                            demselben Schlüssel existiert
     */
    public function __construct($key) /*throws RuntimeException*/ {
-      if (!is_string($key))         throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
-      if (isSet(self::$pool[$key])) throw new RuntimeException('Dead-lock detected: already holding a lock for key "'.$key.'"');
+      if (!is_string($key))            throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
+      if (isSet(self::$handles[$key])) throw new RuntimeException('Dead-lock detected: already holding a lock for key "'.$key.'"');
 
       $this->key = $key;
 
-      self::$pool[$key] = sem_get($this->getKeyId($key));
+      self::$handles[$key] = sem_get($this->getKeyId($key));
 
-      sem_acquire(self::$pool[$key]);
+      sem_acquire(self::$handles[$key]);
 
       // TODO: Obacht geben, daß Lock nach abgebrochenem Script ggf. entfernt wird
    }
@@ -64,7 +64,7 @@ final class SystemFiveLock extends Lock {
     * @return boolean
     */
    public function isValid() {
-      return isSet(self::$pool[$this->key]);
+      return isSet(self::$handles[$this->key]);
    }
 
 
@@ -77,10 +77,10 @@ final class SystemFiveLock extends Lock {
     */
    public function release() {
       if ($this->isValid()) {
-         if (!sem_remove(self::$pool[$this->key]))
+         if (!sem_remove(self::$handles[$this->key]))
             throw new RuntimeException('Cannot remove semaphore for key "'.$this->key.'"');
 
-         unset(self::$pool[$this->key]);
+         unset(self::$handles[$this->key]);
       }
    }
 }
