@@ -22,7 +22,7 @@
 final class Lock extends BaseLock {
 
 
-   private /*Lock*/ $impl;    // konkrete Implementierung des Locks
+   private /*Lock*/ $impl;    // konkrete Implementierung
 
 
    /**
