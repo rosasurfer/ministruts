@@ -46,10 +46,8 @@ final class SystemFiveLock extends BaseLock {
             break;
          }
          catch (PHPErrorException $ex) {
-            if ($ex->getMessage() == 'sem_acquire(): failed to acquire key 0x'.$hexId.': Identifier removed') {
-               Logger ::log('failed:    $decId: '.$decId.', $hexId: 0x'.$hexId, L_WARN, __CLASS__);
+            if ($ex->getMessage() == 'sem_acquire(): failed to acquire key 0x'.$hexId.': Identifier removed')
                continue;
-            }
             throw $ex;
          }
       }
