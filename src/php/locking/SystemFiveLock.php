@@ -86,7 +86,7 @@ final class SystemFiveLock extends BaseLock {
     */
    public function release() {
       if ($this->isValid()) {
-         if (!sem_release(self::$semIds[$this->key]))
+         if (!sem_remove(self::$semIds[$this->key]))
             throw new RuntimeException('Cannot remove semaphore for key "'.$this->key.'"');
 
          unset(self::$semIds[$this->key]);
