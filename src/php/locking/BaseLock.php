@@ -31,7 +31,7 @@ abstract class BaseLock extends Object {
     * @return int - ID
     */
    protected function getKeyId($key) {
-      return hexDec(subStr(md5($key), 0, 7)) + strLen($key);
+      return (int) hexDec(subStr(md5($key), 0, 7)) + strLen($key);
                                       // 7: strLen(decHex(PHP_INT_MAX)) - 1   (x86)
    }
 

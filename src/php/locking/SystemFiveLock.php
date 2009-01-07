@@ -41,7 +41,7 @@ final class SystemFiveLock extends BaseLock {
       do {
          $semId = sem_get($id, 1, 0600);
          try {
-            sem_acquire($semId); // hier kann bereits ein anderer Prozeß das Lock halten (und in der Folge entfernen)
+            sem_acquire($semId); // hier kann bereits ein anderer Prozeß das Lock halten und evt. entfernen
             break;
          }
          catch (PHPErrorException $ex) {
