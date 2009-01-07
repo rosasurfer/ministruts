@@ -22,8 +22,7 @@
 final class Lock extends BaseLock {
 
 
-   private /*Lock*/   $impl;        // konkrete Implementierung des Locks
-   private /*string*/ $lockFile;    // Dateiname, falls FileLock
+   private /*Lock*/ $impl;    // konkrete Implementierung des Locks
 
 
    /**
@@ -57,7 +56,7 @@ final class Lock extends BaseLock {
          if (!is_file($file) && !touch($file))
             throw new RuntimeException('Cannot create lock file "'.$file.'"');
 
-         $this->impl = new FileLock($this->lockFile = $file);
+         $this->impl = new FileLock($file);
       }
    }
 
