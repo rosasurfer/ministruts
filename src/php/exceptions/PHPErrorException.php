@@ -12,14 +12,9 @@
 class PHPErrorException extends NestableException {
 
 
-   // Cache-Variable für den erzeugten Stacktrace
-   private $trace;
-
-   // Cache-Variable für den als String formatierten Stacktrace
-   private $traceString;
-
-
-   private $context;
+   private /*arry*/   $context;
+   private /*array*/  $trace;          // Stacktrace
+   private /*string*/ $traceString;    // Stacktrace als String formatiert
 
 
    /**
