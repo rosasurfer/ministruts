@@ -142,6 +142,8 @@ class Logger extends StaticClass {
       if     ($level == E_USER_NOTICE ) self:: _log(null, $exception, L_NOTICE);
       elseif ($level == E_USER_WARNING) self:: _log(null, $exception, L_WARN  );
       else {
+         // TODO: Destructors müssen komplett in einem try-catch-Block gekapselt werden
+         // prüfen, ob wir aus einem Destructor kommen
          $destructor = false;
          foreach ($exception->getStackTrace() as $frame) {
             if (isSet($frame['class']) && isSet($frame['function']) && strToLower($frame['function'])=='__destruct') {
