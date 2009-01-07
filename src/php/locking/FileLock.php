@@ -89,11 +89,17 @@ final class FileLock extends BaseLock {
     * markiert es als ungültig (invalid).  Wenn das Lock bereits ungültig (invalid) ist, hat der Aufruf
     * keinen Effekt.
     *
+    * @param bool $deleteFile - ob das verwendete Lockfile beim Freigeben des Locks gelöscht werden soll (default: FALSE)
+    *
     * @see FileLock::isValid()
     */
-   public function release() {
+   public function release($deleteFile = false) {
+      if (!is_bool($deleteFile)) throw new IllegalTypeException('Illegal type of argument $deleteFile: '.getType($deleteFile));
+
       if ($this->isValid()) {
          fClose(self::$handles[$this->file]);   // see docs: The lock is released also by fClose()...
+         if ($deleteFile)
+            @unlink($this->file);               // @: theoretisch kann hier schon ein anderer Prozeß das Lock halten
          unset(self::$handles[$this->file]);
       }
    }

@@ -22,8 +22,8 @@
 final class Lock extends BaseLock {
 
 
-   private /*Lock*/   $impl;
-   private /*string*/ $lockFile;
+   private /*Lock*/   $impl;        // konkrete Implementierung des Locks
+   private /*string*/ $lockFile;    // Dateiname, falls FileLock
 
 
    /**
@@ -42,14 +42,14 @@ final class Lock extends BaseLock {
       }
 
 
-      // 1.) vorzugsweise SystemFiveLock verwenden
+      // konkrete Implementierung erzeugen, vorzugsweise SystemFiveLock
       if (extension_loaded('sysvsem')) {
          $this->impl = new SystemFiveLock($mutex);
       }
 
-      // 2.) alternativ FileLock verwenden
+      // alternativ FileLock verwenden
       else {
-         // Namen der Lock-Datei ermitteln
+         // Lock-Dateinamen berechnen
          $name = md5($mutex);
          $file = ini_get('session.save_path').DIRECTORY_SEPARATOR.'lock_'.$name;
 
@@ -90,17 +90,6 @@ final class Lock extends BaseLock {
     * @see Lock::isValid()
     */
    public function release() {
-      // der Prozeß, der ein Lock hält, muß auch eine evt. Lockdatei löschen
-      $lockHolder = $this->isValid();
-
-      // TODO: $fileLock->release(true);
-      $retValue = $this->impl->release();
-
-      if ($lockHolder && $this->lockFile) {
-         @unlink($this->lockFile); // @, denn theoretisch kann hier schon ein anderer Prozeß das Lock halten
-         $this->lockFile = null;
-      }
-
-      return $retValue;
+      return $this->impl->release(true); // true: Lockfile einer FileLock-Implementierung löschen lassen
    }
 }
