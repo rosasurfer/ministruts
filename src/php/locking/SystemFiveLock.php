@@ -39,7 +39,7 @@ final class SystemFiveLock extends BaseLock {
       $id = $this->getKeyId($key);
 
       do {
-         $semId = sem_get($id, 1, 0600);
+         $semId = sem_get($id, 1, 0666);
          try {
             sem_acquire($semId); // hier kann bereits ein anderer Prozeß das Lock halten und evt. entfernen
             break;
