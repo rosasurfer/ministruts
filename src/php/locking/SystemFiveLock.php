@@ -8,7 +8,7 @@
 final class SystemFiveLock extends BaseLock {
 
 
-   private static /*Resource[]*/ $handles;
+   private static /*Resource[]*/ $semIds;
 
    private /*string*/ $key;
 
@@ -33,14 +33,27 @@ final class SystemFiveLock extends BaseLock {
     *                            demselben Schlüssel existiert
     */
    public function __construct($key) /*throws RuntimeException*/ {
-      if (!is_string($key))            throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
-      if (isSet(self::$handles[$key])) throw new RuntimeException('Dead-lock detected: already holding a lock for key "'.$key.'"');
+      if (!is_string($key))           throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
+      if (isSet(self::$semIds[$key])) throw new RuntimeException('Dead-lock detected: already holding a lock for key "'.$key.'"');
+
+      $id = $this->getKeyId($key);
+
+      do {
+         $semId = sem_get($id);
+         try {
+            sem_acquire($semId); // hier kann bereits ein anderer Prozeß das Lock halten (und in der Folge entfernen)
+            break;
+         }
+         catch (PHPErrorException $ex) {
+            if ($ex->getMessage() == 'sem_acquire(): failed to acquire key 0x'.decHex($id).': Identifier removed')
+               continue;
+            throw $ex;
+         }
+      }
+      while (true);
 
       $this->key = $key;
-
-      self::$handles[$key] = sem_get($this->getKeyId($key));
-
-      sem_acquire(self::$handles[$key]);
+      self::$semIds[$key] = $semId;
    }
 
 
@@ -60,7 +73,7 @@ final class SystemFiveLock extends BaseLock {
     * @return boolean
     */
    public function isValid() {
-      return isSet(self::$handles[$this->key]);
+      return isSet(self::$semIds[$this->key]);
    }
 
 
@@ -73,10 +86,10 @@ final class SystemFiveLock extends BaseLock {
     */
    public function release() {
       if ($this->isValid()) {
-         if (!sem_remove(self::$handles[$this->key]))
+         if (!sem_remove(self::$semIds[$this->key]))
             throw new RuntimeException('Cannot remove semaphore for key "'.$this->key.'"');
 
-         unset(self::$handles[$this->key]);
+         unset(self::$semIds[$this->key]);
       }
    }
 }
