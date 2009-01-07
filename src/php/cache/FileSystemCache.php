@@ -198,8 +198,6 @@ final class FileSystemCache extends CachePeer {
     * @return boolean - TRUE bei Erfolg, FALSE andererseits
     */
    private function writeFile($fileName, $value, $expires) {
-      // TODO: während des Schreibens Lock setzen
-
       // Unterverzeichnis ggf. erzeugen
       $directory = dirName($fileName);
       if (is_file($directory) || (!is_writable($directory) && !mkDir($directory, 0700, true)))

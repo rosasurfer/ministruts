@@ -46,21 +46,21 @@ final class FrontController extends Singleton {
          $appDirectory = dirName($_SERVER['SCRIPT_FILENAME']);    // TODO: Application::getBaseDirectory()
          $configFile   = $appDirectory.'/WEB-INF/struts-config.xml';
 
-         // Einlesen und Cachen der struts-config.xml synchronisieren
+         // Einlesen und Parsen der struts-config.xml synchronisieren
          $lock = new FileLock($configFile);
 
-         //synchronized ($lock) {
-               // Cache erneut prüfen (während des Wartens kann ein anderer Prozeß die Instanz erzeugt haben)
-               $instance = Cache ::me()->get(__CLASS__);
-               if (!$instance) {
-                  // neue Instanz erzeugen ...
-                  $instance = Singleton ::getInstance(__CLASS__);
+            // Cache erneut prüfen (während des Wartens kann ein anderer Prozeß die Instanz erzeugt haben)
+            $instance = Cache ::me()->get(__CLASS__);
+            if (!$instance) {
+               // neue Instanz erzeugen ...
+               $instance = Singleton ::getInstance(__CLASS__);
 
-                  // ... und mit FileDependency cachen
-                  $dependency = new FileDependency($configFile);
-                  Cache ::me()->set(__CLASS__, $instance, Cache ::EXPIRES_NEVER, $dependency);
-               }
-         //}
+               // ... und mit FileDependency cachen
+               $dependency = new FileDependency($configFile);
+               Cache ::me()->set(__CLASS__, $instance, Cache ::EXPIRES_NEVER, $dependency);
+            }
+
+         $lock->release();
       }
       return $instance;
    }
