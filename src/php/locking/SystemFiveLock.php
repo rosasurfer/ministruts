@@ -36,17 +36,18 @@ final class SystemFiveLock extends BaseLock {
       if (!is_string($key))           throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
       if (isSet(self::$semIds[$key])) throw new RuntimeException('Dead-lock detected: already holding a lock for key "'.$key.'"');
 
-      $id = $this->getKeyId($key);
+      $decId = $this->getKeyId($key);
+      $hexId = decHex($decId);
 
       do {
-         $semId = sem_get($id, 1, 0666);
+         $semId = sem_get($decId, 1, 0666);
          try {
             sem_acquire($semId); // hier kann bereits ein anderer Prozeß das Lock halten und evt. entfernen
             break;
          }
          catch (PHPErrorException $ex) {
-            if ($ex->getMessage() == 'sem_acquire(): failed to acquire key 0x'.decHex($id).': Identifier removed')
-               continue;
+            //if ($ex->getMessage() == 'sem_acquire(): failed to acquire key 0x'.$hexId.': Identifier removed')
+            //   continue;
             throw $ex;
          }
       }
