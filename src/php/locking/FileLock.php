@@ -46,6 +46,7 @@ final class FileLock extends BaseLock {
 
       $mode = $shared ? LOCK_SH : LOCK_EX;
 
+      // TODO: hier kann ein anderer (das Lock haltender) Prozeß die Datei schon wieder gelöscht haben
       if (!fLock(self::$handles[$file], $mode))
          throw new RuntimeException('Can not aquire '.($shared ? 'shared':'exclusive').' file lock for "'.$file.'"');
    }

@@ -42,7 +42,8 @@ final class SystemFiveLock extends BaseLock {
       do {
          $semId = sem_get($decId, 1, 0666);
          try {
-            sem_acquire($semId); // hier kann bereits ein anderer Prozeß das Lock halten und evt. entfernen
+            // hier kann ein anderer (das Lock haltender) Prozeß den Semaphore schon wieder gelöscht haben
+            sem_acquire($semId);
             break;
          }
          catch (PHPErrorException $ex) {
