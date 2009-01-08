@@ -51,6 +51,7 @@ $__classes['ChainedDependency'              ] = $dir.'php/dependency/ChainedDepe
 $__classes['FileDependency'                 ] = $dir.'php/dependency/FileDependency';
 $__classes['IDependency'                    ] = $dir.'php/dependency/IDependency';
 $__classes['MaxAgeDependency'               ] = $dir.'php/dependency/MaxAgeDependency';
+$__classes['MinAgeDependency'               ] = $dir.'php/dependency/MinAgeDependency';
 
 $__classes['BusinessRuleException'          ] = $dir.'php/exceptions/BusinessRuleException';
 $__classes['ClassNotFoundException'         ] = $dir.'php/exceptions/ClassNotFoundException';
