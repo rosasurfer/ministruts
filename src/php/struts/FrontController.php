@@ -90,7 +90,7 @@ final class FrontController extends Singleton {
       foreach ($locations as $location) {
          $request  = HttpRequest ::create()->setUrl($location);
          $response = CurlHttpClient ::create()
-                                    ->setTimeout(5)
+                                    ->setTimeout(10)
                                     ->send($request);
          $status = $response->getStatus();
 
