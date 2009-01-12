@@ -155,19 +155,17 @@ set_exception_handler(create_function('Exception $exception'                    
  *
  * @param string $className - Klassenname
  * @param mixed  $throw     - Ob Exceptions geworfen werfen dürfen. Typ und Wert des Parameters sind unwichtig,
- *                            seine Existenz allein reicht für die Erkennung eines manuellen Aufrufs.
+ *                            seine Existenz reicht für die Erkennung eines manuellen Aufrufs.
  */
 function __autoload($className /*, $throw */) {
    try {
       if (isSet($GLOBALS['__classes'][$className])) {
          $className = $GLOBALS['__classes'][$className];
 
-         // TODO: autoload(): Warnen bei relativen Klassenpfaden
-         /*
-         $relative = WINDOWS ? !preg_match('/^[a-zA-Z]:/', $className) : (strPos($className, '/') !== 0);
+         // Warnen bei relativen Dateipfaden (Performanceeinbußen in APC, siehe Setting 'apc.stat')
+         $relative = WINDOWS ? !preg_match('/^[a-z]:/i', $className) : ($className{0} != '/');
          if ($relative)
-            Logger ::log('Not an absolute class name definition: '.$className, L_WARN, __CLASS__);
-         */
+            Logger ::log('Relative file name for class definition: '.$className, L_WARN, __CLASS__);
 
          include($className.'.php');
          return true;
@@ -187,7 +185,7 @@ function __autoload($className /*, $throw */) {
  * Ob der angegebene Klassenname definiert ist.  Diese Funktion ist notwendig, weil eine einfache
  * Abfrage der Art "if (class_exist($className, true))" __autoload() aufruft und dabei im Fehlerfall
  * das Script mit einem fatalen Fehler beendet (__autoload darf keine Exceptions werfen).
- * Wird __autoload aus dieser Funktion und nicht aus dem PHP-Kernel aufgerufen, werden Exceptions
+ * Wird __autoload() aus dieser Funktion und nicht aus dem PHP-Kernel aufgerufen, werden Exceptions
  * weitergereicht und der folgende Code kann entsprechend reagieren.
  *
  * @param string $className - Klassenname
