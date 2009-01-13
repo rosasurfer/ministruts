@@ -1194,7 +1194,7 @@ class SimplePdfDocument extends BasePdfDocument {
      // 'leading' => number, defines the total height taken by the line, independent of the font height.
      // 'spacing' => a real number, though usually set to one of 1, 1.5, 2 (line spacing as used in word processing)
 
-     // if $test is set then this should just check if the text is going to flow onto a new page or not, returning true or false
+     // if $test is set then this should just check if the text is going to flow onto a new page or not, returning TRUE or FALSE
 
      // apply the filtering which will make the underlining function.
      $text = $this->ezProcessText($text);

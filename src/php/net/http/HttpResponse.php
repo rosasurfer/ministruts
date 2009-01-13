@@ -171,7 +171,7 @@ abstract class HttpResponse extends Object {
 
    /**
     * Status code (412) indicating that the precondition given in one or more of the request headers
-    * evaluated to false when it was tested on the server.
+    * evaluated to FALSE when it was tested on the server.
     */
    const SC_PRECONDITION_FAILED = 412;
 

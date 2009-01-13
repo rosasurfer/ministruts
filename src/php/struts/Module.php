@@ -476,7 +476,7 @@ class Module extends Object {
 
       // find it's definition ...
       $nodes = $xml->xPath("/struts-config/tiles/tile[@name='$name']");
-      if (!$nodes)            throw new RuntimeException('Tiles definition "'.$name.'" not found'); // false oder leeres Array
+      if (!$nodes)            throw new RuntimeException('Tiles definition "'.$name.'" not found'); // FALSE oder leeres Array
       if (sizeOf($nodes) > 1) throw new RuntimeException('Non-unique "name" attribute detected for tiles definition "'.$name.'"');
 
 
