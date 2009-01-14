@@ -372,7 +372,7 @@ final class ApdProfile extends Object {
          if (isSet($_REQUEST['limit'])) {
             $limit = trim($_REQUEST['limit']);
 
-            if (ctype_digit($limit))
+            if (cType_digit($limit))
                $this->options['O'] = $this->options['limit']  = (int) $limit;
          }
       }

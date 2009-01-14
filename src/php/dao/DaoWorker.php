@@ -97,7 +97,7 @@ class DaoWorker extends Object {
 
       $instance = null;
 
-      if ($result['rows'] == 1) {
+      if ($result['rows']) {
          $row = mysql_fetch_assoc($result['set']);
          $instance = PersistableObject ::createInstance($this->entityClass, $row);
       }
