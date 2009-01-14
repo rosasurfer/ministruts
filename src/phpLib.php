@@ -111,6 +111,7 @@ $__classes['Tile'                           ] = $dir.'php/struts/Tile';
 
 $__classes['CommonValidator'                ] = $dir.'php/util/CommonValidator';
 $__classes['Config'                         ] = $dir.'php/util/Config';
+$__classes['Date'                           ] = $dir.'php/util/Date';
 $__classes['Logger'                         ] = $dir.'php/util/Logger';
 $__classes['String'                         ] = $dir.'php/util/String';
 
