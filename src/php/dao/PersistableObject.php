@@ -8,8 +8,8 @@ abstract class PersistableObject extends Object implements IDaoConnected {
 
 
    // Flag für den aktuellen Änderungsstatus der Instanz
-   protected /*bool*/  $modified = false;
-   protected /*array*/ $modifications;
+   protected /*bool*/   $modified = false;
+   protected /*array*/  $modifications;
 
 
    // Standard-Properties jeder Instanz
