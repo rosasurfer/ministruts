@@ -66,8 +66,9 @@ class CommonValidator extends StaticClass {
     * @return boolean
     */
    public static function isDate($date, $format = 'Y-m-d') {
-      // wenn nicht unter Windows ...
-      if (!WINDOWS) {
+      /*
+      // wenn nicht unter Windows ... !WINDOWS
+      if (false) { // !!! strPTime() hält sich nicht 100% an das angegebene Format (versucht intelligent zu sein)
          if     ($format == 'Y-m-d'      ) $data = strPTime($date, '%Y-%m-%d');
          elseif ($format == 'Y-m-d H:i'  ) $data = strPTime($date, '%Y-%m-%d %H:%M');
          elseif ($format == 'Y-m-d H:i:s') $data = strPTime($date, '%Y-%m-%d %H:%M:%S');
@@ -77,87 +78,38 @@ class CommonValidator extends StaticClass {
          else                              $data = strPTime($date, $format);
          return ($data !== false && checkDate($data['tm_mon']+1, $data['tm_mday'], $data['tm_year']+1900) && $data['tm_sec'] <= 59 && $data['unparsed']=='');
       }
+      */
 
-      // wenn unter Windows (dort ist strPTime() nicht implementiert) ...
-      else {
-         if ($format == 'Y-m-d') {
-            static $YmdPattern = '/^([0-9]{4})-([0-9]{2})-([0-9]{2})$/';
-
-            if (!preg_match($YmdPattern, $date, $matches))
-               return false;
-
-            $year  = $matches[1];
-            $month = $matches[2];
-            $day   = $matches[3];
-            return checkDate((int) $month, (int) $day, (int) $year);
-         }
-         elseif ($format == 'Y-m-d H:i') {
-            static $YmdHiPattern = '/^([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2})$/';
-
-            if (!preg_match($YmdHiPattern, $date, $matches))
-               return false;
-
-            $year   = $matches[1];
-            $month  = $matches[2];
-            $day    = $matches[3];
-            $hour   = $matches[4];
-            $minute = $matches[5];
-            return (checkDate((int) $month, (int) $day, (int) $year) && (int) $hour < 24 && (int) $minute < 60);
-         }
-         elseif ($format == 'Y-m-d H:i:s') {
-            static $YmdHisPattern = '/^([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})$/';
-
-            if (!preg_match($YmdHisPattern, $date, $matches))
-               return false;
-
-            $year   = $matches[1];
-            $month  = $matches[2];
-            $day    = $matches[3];
-            $hour   = $matches[4];
-            $minute = $matches[5];
-            $second = $matches[6];
-            return (checkDate((int) $month, (int) $day, (int) $year) && (int) $hour < 24 && (int) $minute < 60 && (int) $second < 60);
-         }
-         elseif ($format == 'd.m.Y') {
-            static $dmYPattern = '/^([0-9]{2})\.([0-9]{2})\.([0-9]{4})$/';
-
-            if (!preg_match($dmYPattern, $date, $matches))
-               return false;
-
-            $year  = $matches[3];
-            $month = $matches[2];
-            $day   = $matches[1];
-            return checkDate((int) $month, (int) $day, (int) $year);
-         }
-         elseif ($format == 'd.m.Y H:i') {
-            static $dmYHiPattern = '/^([0-9]{2})-([0-9]{2})-([0-9]{4}) ([0-9]{2}):([0-9]{2})$/';
-
-            if (!preg_match($dmYHiPattern, $date, $matches))
-               return false;
-
-            $day    = $matches[1];
-            $month  = $matches[2];
-            $year   = $matches[3];
-            $hour   = $matches[4];
-            $minute = $matches[5];
-            return (checkDate((int) $month, (int) $day, (int) $year) && (int) $hour < 24 && (int) $minute < 60);
-         }
-         elseif ($format == 'd.m.Y H:i:s') {
-            static $dmYHisPattern = '/^([0-9]{2})-([0-9]{2})-([0-9]{4}) ([0-9]{2}):([0-9]{2}):([0-9]{2})$/';
-
-            if (!preg_match($dmYHisPattern, $date, $matches))
-               return false;
-
-            $day    = $matches[1];
-            $month  = $matches[2];
-            $year   = $matches[3];
-            $hour   = $matches[4];
-            $minute = $matches[5];
-            $second = $matches[6];
-            return (checkDate((int) $month, (int) $day, (int) $year) && (int) $hour < 24 && (int) $minute < 60 && (int) $second < 60);
-         }
+      if ($format=='Y-m-d' || $format=='d.m.Y') {
+         $format .= ' H:i:s';
+         $date   .= ' 00:00:00';
       }
-      return false;
+      elseif ($format=='Y-m-d H:i' || $format=='d.m.Y H:i') {
+         $format .= ':s';
+         $date   .= ':00';
+      }
+
+      if ($format == 'Y-m-d H:i:s') {
+         if (!preg_match('/^([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})$/', $date, $m))
+            return false;
+         $year   = (int) $m[1];
+         $month  = (int) $m[2];
+         $day    = (int) $m[3];
+         $hour   = (int) $m[4];
+         $minute = (int) $m[5];
+         $second = (int) $m[6];
+      }
+      elseif ($format == 'd.m.Y H:i:s') {
+         if (!preg_match('/^([0-9]{2})-([0-9]{2})-([0-9]{4}) ([0-9]{2}):([0-9]{2}):([0-9]{2})$/', $date, $m))
+            return false;
+         $year   = (int) $m[3];
+         $month  = (int) $m[2];
+         $day    = (int) $m[1];
+         $hour   = (int) $m[4];
+         $minute = (int) $m[5];
+         $second = (int) $m[6];
+      }
+      return checkDate($month, $day, $year) && $hour<24 && $minute<60 && $second<60;
    }
 
 
