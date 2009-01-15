@@ -273,7 +273,7 @@ class Logger extends StaticClass {
          $class     = $arg4;
       }
       else {
-         throw new InvalidArgumentException('Invalid number of arguments');
+         throw new InvalidArgumentException('Invalid number of arguments: '.$args);
       }
 
       if (!is_int($level))    throw new IllegalTypeException('Illegal type of parameter $level: '.getType($level));
