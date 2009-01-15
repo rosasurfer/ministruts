@@ -64,6 +64,8 @@ class CommonValidator extends StaticClass {
     * @param string $format - das Format, dem der String entsprechen soll
     *
     * @return boolean
+    *
+    * TODO: isDate() überprüft bis jetzt nur 'Y-m-d' und 'd.m.Y', nicht 'd/m/Y'
     */
    public static function isDate($date, $format = 'Y-m-d') {
       /*
