@@ -82,36 +82,74 @@ class CommonValidator extends StaticClass {
       }
       */
 
-      if ($format=='Y-m-d' || $format=='d.m.Y') {
-         $format .= ' H:i:s';
-         $date   .= ' 00:00:00';
-      }
-      elseif ($format=='Y-m-d H:i' || $format=='d.m.Y H:i') {
-         $format .= ':s';
-         $date   .= ':00';
+      if ($format == 'Y-m-d') {
+         if (!preg_match('/^([0-9]{4})-([0-9]{2})-([0-9]{2})$/', $date, $m))
+            return false;
+
+         $year  = $m[1];
+         $month = $m[2];
+         $day   = $m[3];
+         return checkDate($month, $day, $year);
       }
 
-      if ($format == 'Y-m-d H:i:s') {
+      elseif ($format == 'Y-m-d H:i') {
+         if (!preg_match('/^([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2})$/', $date, $m))
+            return false;
+
+         $year   = $m[1];
+         $month  = $m[2];
+         $day    = $m[3];
+         $hour   = $m[4];
+         $minute = $m[5];
+         return (checkDate($month, $day, $year) && $hour < 24 && $minute < 60);
+      }
+
+      elseif ($format == 'Y-m-d H:i:s') {
          if (!preg_match('/^([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})$/', $date, $m))
             return false;
-         $year   = (int) $m[1];
-         $month  = (int) $m[2];
-         $day    = (int) $m[3];
-         $hour   = (int) $m[4];
-         $minute = (int) $m[5];
-         $second = (int) $m[6];
-         return checkDate($month, $day, $year) && $hour<24 && $minute<60 && $second<60;
+
+         $year   = $m[1];
+         $month  = $m[2];
+         $day    = $m[3];
+         $hour   = $m[4];
+         $minute = $m[5];
+         $second = $m[6];
+         return (checkDate($month, $day, $year) && $hour < 24 && $minute < 60 && $second < 60);
       }
+
+      elseif ($format == 'd.m.Y') {
+         if (!preg_match('/^([0-9]{2})\.([0-9]{2})\.([0-9]{4})$/', $date, $m))
+            return false;
+
+         $year  = $m[3];
+         $month = $m[2];
+         $day   = $m[1];
+         return checkDate($month, $day, $year);
+      }
+
+      elseif ($format == 'd.m.Y H:i') {
+         if (!preg_match('/^([0-9]{2})-([0-9]{2})-([0-9]{4}) ([0-9]{2}):([0-9]{2})$/', $date, $m))
+            return false;
+
+         $day    = $m[1];
+         $month  = $m[2];
+         $year   = $m[3];
+         $hour   = $m[4];
+         $minute = $m[5];
+         return (checkDate($month, $day, $year) && $hour < 24 && $minute < 60);
+      }
+
       elseif ($format == 'd.m.Y H:i:s') {
          if (!preg_match('/^([0-9]{2})-([0-9]{2})-([0-9]{4}) ([0-9]{2}):([0-9]{2}):([0-9]{2})$/', $date, $m))
             return false;
-         $year   = (int) $m[3];
-         $month  = (int) $m[2];
-         $day    = (int) $m[1];
-         $hour   = (int) $m[4];
-         $minute = (int) $m[5];
-         $second = (int) $m[6];
-         return checkDate($month, $day, $year) && $hour<24 && $minute<60 && $second<60;
+
+         $day    = $m[1];
+         $month  = $m[2];
+         $year   = $m[3];
+         $hour   = $m[4];
+         $minute = $m[5];
+         $second = $m[6];
+         return (checkDate($month, $day, $year) && $hour < 24 && $minute < 60 && $second < 60);
       }
 
       return false;
