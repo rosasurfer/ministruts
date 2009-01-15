@@ -98,6 +98,7 @@ class CommonValidator extends StaticClass {
          $hour   = (int) $m[4];
          $minute = (int) $m[5];
          $second = (int) $m[6];
+         return checkDate($month, $day, $year) && $hour<24 && $minute<60 && $second<60;
       }
       elseif ($format == 'd.m.Y H:i:s') {
          if (!preg_match('/^([0-9]{2})-([0-9]{2})-([0-9]{4}) ([0-9]{2}):([0-9]{2}):([0-9]{2})$/', $date, $m))
@@ -108,8 +109,10 @@ class CommonValidator extends StaticClass {
          $hour   = (int) $m[4];
          $minute = (int) $m[5];
          $second = (int) $m[6];
+         return checkDate($month, $day, $year) && $hour<24 && $minute<60 && $second<60;
       }
-      return checkDate($month, $day, $year) && $hour<24 && $minute<60 && $second<60;
+
+      return false;
    }
 
 
