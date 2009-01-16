@@ -22,7 +22,12 @@ final class Date extends StaticClass {
       $ts1 = strToTime($start);
       $ts2 = strToTime($end);
 
-      return ($ts2 - $ts1) / DAYS;
+      $diff = $ts2 - $ts1;
+
+      if ($diff % DAYS)
+         Logger ::log("($ts2-$ts1) % DAYS != 0: ".($diff%DAYS), L_WARN, __CLASS__);
+
+      return (int) ($diff / DAYS);
    }
 
 
