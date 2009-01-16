@@ -19,8 +19,8 @@ final class Date extends StaticClass {
       if (!is_string($end))                  throw new IllegalTypeException('Illegal type of parameter $end: '.getType($end));
       if (!CommonValidator ::isDate($end))   throw new InvalidArgumentException('Invalid argument $end: "'.$end.'"');
 
-      $ts1 = strToTime($start);
-      $ts2 = strToTime($end);
+      $ts1 = strToTime($start.' GMT'); // ohne Angabe einer Zeitzone wird die lokale DST einkalkuliert
+      $ts2 = strToTime($end.' GMT');
 
       $diff = $ts2 - $ts1;
 
