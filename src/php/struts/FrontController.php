@@ -80,6 +80,7 @@ final class FrontController extends Singleton {
       // TODO: keine Fehlermeldung bei falschem $_SERVER['APPLICATION_PATH'] ( z.B. 'myapp/' statt '/myapp')
 
       // Umgebung prüfen:  Ist der Zugriff auf WEB-INF und CVS-Daten gesperrt ?
+      // TODO: apache_lookup_uri() oder virtual() benutzen
       $baseURL = Request ::me()->getApplicationURL();
       $locations = array($baseURL.'/WEB-INF',
                          $baseURL.'/WEB-INF/',
