@@ -403,13 +403,48 @@ final class Request extends Singleton {
    public function getForwardedRemoteAddress() {
       static $address = false;
 
-     // TODO: Request::getForwardedRemoteAddress() überarbeiten
-     /*
-     Note that the X-Forwarded for header might contain multiple addresses, comma separated, if the request was
-     forwarded through multiple proxies.  Finally, note that any user can add an X-Forwarded-For header themselves.
-     The header is only good for traceback information, never for authentication. If you use it for traceback, just
-     log the entire X-Forwarded-For header, along with the REMOTE_ADDR.
-     */
+      // TODO: Request::getForwardedRemoteAddress() überarbeiten
+      /*
+      Note that the X-Forwarded for header might contain multiple addresses, comma separated, if the request was
+      forwarded through multiple proxies.  Finally, note that any user can add an X-Forwarded-For header themselves.
+      The header is only good for traceback information, never for authentication. If you use it for traceback, just
+      log the entire X-Forwarded-For header, along with the REMOTE_ADDR.
+      */
+
+      /*
+      I am just starting to try to tackle this issue of getting the real ip address.
+      One flaw I see in the preceding notes is that none will bring up a true live ip address when the first proxy
+      is behind a nat router/firewall.  I am about to try and nut this out but from the data I see so far the true
+      ip address (live ip of the nat router) is included in $_SERVER['HTTP_CACHE_CONTROL'] as bypass-client=xx.xx.xx.xx
+      $_SERVER['HTTP_X_FORWARDED_FOR'] contains the proxy behind the nat router.  $_SERVER['REMOTE_ADDR'] is the isp
+      proxy (from what I read this can be a list of proxies if you go through more than one).  I am not sure if
+      bypass-client holds true when you get routed through several proxies along the way.
+      */
+
+      /*
+      @see: Notes zu getEnv():
+      mkaman at aldeafutura dot com (23-Apr-2004 02:33)
+      I think there is a better way to determine a correct ip. This is based in the fact that the private ip's for lan
+      use are described in RFC 1918...
+      */
+
+      /*
+      I've read all the comments here.  Most of you trust that HTTP_X_FORWARDED_FOR is the real ip address of the user.
+      But it can easily be faked by sending a wrong HTTP request.  REMOTE_ADDR does contain the 'real' ip address (maybe
+      of the proxy server but it cannot be faked as easy as X_FORWARDED_FOR).  So if you rely on checking the visitor by
+      it's ip address validate _both_ $_SERVER['REMOTE_ADDR'] and $_SERVER['HTTP_X_FORWARDED_FOR'].
+      */
+
+      function getIP() {
+         if    (getEnv('HTTP_CLIENT_IP'))       $ip = getEnv('HTTP_CLIENT_IP');
+         elseif(getEnv('HTTP_X_FORWARDED_FOR')) $ip = getEnv('HTTP_X_FORWARDED_FOR');
+         elseif(getEnv('REMOTE_ADDR'))          $ip = getEnv('REMOTE_ADDR');
+         else                                   $ip = 'UNKNOWN';
+         return $ip;
+      }
+
+
+
 
       if ($address === false) {
          if (isSet($_SERVER['HTTP_X_FORWARDED_FOR'])) {
