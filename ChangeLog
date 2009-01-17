@@ -1,6 +1,8 @@
 2009-01-17
 
    - php/util/Logger überarbeitet
+	
+	- php/util/Config: Caching überarbeitet, die Config-Dateien werden jetzt nur alle 60 Sekunden auf Veränderung überprüft
 
 
 2009-01-14
