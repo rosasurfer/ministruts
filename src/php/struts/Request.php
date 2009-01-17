@@ -404,6 +404,12 @@ final class Request extends Singleton {
       static $address = false;
 
      // TODO: Request::getForwardedRemoteAddress() überarbeiten
+     /*
+     Note that the X-Forwarded for header might contain multiple addresses, comma separated, if the request was
+     forwarded through multiple proxies.  Finally, note that any user can add an X-Forwarded-For header themselves.
+     The header is only good for traceback information, never for authentication. If you use it for traceback, just
+     log the entire X-Forwarded-For header, along with the REMOTE_ADDR.
+     */
 
       if ($address === false) {
          if (isSet($_SERVER['HTTP_X_FORWARDED_FOR'])) {
