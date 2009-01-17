@@ -46,7 +46,7 @@ final class FrontController extends Singleton {
          $appDirectory = dirName($_SERVER['SCRIPT_FILENAME']);    // TODO: Application::getBaseDirectory()
          $configFile   = $appDirectory.'/WEB-INF/struts-config.xml';
 
-         // Einlesen und Parsen der struts-config.xml synchronisieren
+         // Parsen der struts-config.xml synchronisieren
          $lock = new FileLock($configFile);
 
             // Cache erneut prüfen (während des Wartens kann ein anderer Prozeß die Instanz erzeugt haben)
