@@ -93,7 +93,7 @@ final class ReferencePool extends CachePeer {
     *
     * @return boolean - TRUE bei Erfolg, FALSE, falls kein solcher Schlüssel existiert
     */
-   public function delete($key) {
+   public function drop($key) {
       if (isSet($this->pool[$key])) {
          unSet($this->pool[$key]);
          return true;

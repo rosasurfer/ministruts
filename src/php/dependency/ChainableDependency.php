@@ -9,9 +9,9 @@
  * Beispiel:
  * ---------
  *
- *    $dependency = FileDependency::create('/etc/crontab')
- *        ->andThat(FileDependency::create('/etc/hosts'))
- *        ->andThat(FileDependency::create('/etc/resolve.conf'));
+ *    $dependency =               FileDependency::create('/etc/crontab')
+ *                ->andDependency(FileDependency::create('/etc/hosts'))
+ *                ->andDependency(FileDependency::create('/etc/resolve.conf'));
  *    ...
  *
  *    if (!$dependency->isValid()) {
@@ -37,9 +37,9 @@ abstract class ChainableDependency extends Object implements IDependency {
     *
     * @return ChainedDependency
     */
-   public function andThat(IDependency $dependency) {
+   public function andDependency(IDependency $dependency) {
       return ChainedDependency ::create($this)
-                               ->andThat($dependency);
+                               ->andDependency($dependency);
    }
 
 
@@ -50,9 +50,9 @@ abstract class ChainableDependency extends Object implements IDependency {
     *
     * @return ChainedDependency
     */
-   public function orThat(IDependency $dependency) {
+   public function orDependency(IDependency $dependency) {
       return ChainedDependency ::create($this)
-                               ->orThat($dependency);
+                               ->orDependency($dependency);
    }
 }
 ?>

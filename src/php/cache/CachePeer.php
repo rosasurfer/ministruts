@@ -29,7 +29,7 @@
  *
  *    Objekt löschen:
  *
- *       CachePeer::delete($key);
+ *       CachePeer::drop($key);
  *
  * @see ApcCache
  * @see FileSystemCache
@@ -73,7 +73,7 @@ abstract class CachePeer extends Object {
     *
     * @return boolean - TRUE bei Erfolg, FALSE, falls kein solcher Schlüssel existiert
     */
-   abstract public function delete($key);
+   abstract public function drop($key);
 
 
    /**

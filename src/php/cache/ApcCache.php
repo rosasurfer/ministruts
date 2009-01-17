@@ -53,7 +53,7 @@ final class ApcCache extends CachePeer {
 
          // Dependency prüfen und Wert ggf. löschen
          if ($dependency && !$dependency->isValid()) {
-            $this->delete($key);
+            $this->drop($key);
             return false;
          }
 
@@ -87,8 +87,8 @@ final class ApcCache extends CachePeer {
     *
     * @return boolean - TRUE bei Erfolg, FALSE, falls kein solcher Schlüssel existiert
     */
-   public function delete($key) {
-      $this->getReferencePool()->delete($key);
+   public function drop($key) {
+      $this->getReferencePool()->drop($key);
 
       return apc_delete($this->namespace.'::'.$key);
    }

@@ -34,11 +34,12 @@ final class Cache extends StaticClass {
     */
    public static function me($label = null) {
       /*
-      Undocumented:
-      -------------
+      NOTE:
+      -----
       Die Konfiguration wird im Cache gespeichert und der Cache wird mit Hilfe der Konfiguration
       initialisiert.  Dadurch kommt es zu zirkulären Aufrufen zwischen Config::me() und Cache::me().
       Bei solchen zirkulären Aufrufen (und nur dann) wird NULL zurückgegeben.
+
       @see Config::me()
       */
 

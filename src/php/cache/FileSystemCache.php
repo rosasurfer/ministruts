@@ -76,7 +76,7 @@ final class FileSystemCache extends CachePeer {
 
          // Dependency prüfen und Wert ggf. löschen
          if ($dependency && !$dependency->isValid()) {
-            $this->delete($key);
+            $this->drop($key);
             return false;
          }
 
@@ -110,14 +110,14 @@ final class FileSystemCache extends CachePeer {
     *
     * @return boolean - TRUE bei Erfolg, FALSE, falls kein solcher Schlüssel existiert
     */
-   public function delete($key) {
+   public function drop($key) {
       $fileName = $this->getFilePath($key);
 
       if (is_file($fileName)) {
          if (unLink($fileName)) {
             clearStatCache();
 
-            $this->getReferencePool()->delete($key);
+            $this->getReferencePool()->drop($key);
             return true;
          }
          throw new RuntimeException('Cannot delete file: '.$fileName);

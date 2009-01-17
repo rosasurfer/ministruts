@@ -46,9 +46,9 @@ class ChainedDependency extends ChainableDependency {
     *
     * @return ChainedDependency
     */
-   public function andThat(IDependency $dependency) {
+   public function andDependency(IDependency $dependency) {
       if ($this->type == 'OR')
-         return self ::create($this)->andThat($dependency);
+         return self ::create($this)->andDependency($dependency);
 
       $this->dependencies[] = $dependency;
       $this->type           = 'AND';
@@ -63,9 +63,9 @@ class ChainedDependency extends ChainableDependency {
     *
     * @return ChainedDependency
     */
-   public function orThat(IDependency $dependency) {
+   public function orDependency(IDependency $dependency) {
       if ($this->type == 'AND')
-         return self ::create($this)->orThat($dependency);
+         return self ::create($this)->orDependency($dependency);
 
       $this->dependencies[] = $dependency;
       $this->type           = 'OR';
