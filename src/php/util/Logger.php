@@ -37,12 +37,8 @@ class Logger extends StaticClass {
       self::$display = ($console && $terminal)
                     || (isSet($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR']=='127.0.0.1')
                     || (bool) ini_get('display_errors');
-      self::$mail    = !self::$display || ($console && !$terminal);
 
-      if ($console || $_SERVER['REMOTE_ADDR']=='127.0.0.1') {
-         echoPre('$display: '.(int) self::$display);
-         echoPre('$mail: '   .(int) self::$mail);
-      }
+      self::$mail = !self::$display || ($console && !$terminal);
    }
 
 
