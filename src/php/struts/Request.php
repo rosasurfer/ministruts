@@ -435,17 +435,6 @@ final class Request extends Singleton {
       it's ip address validate _both_ $_SERVER['REMOTE_ADDR'] and $_SERVER['HTTP_X_FORWARDED_FOR'].
       */
 
-      function getIP() {
-         if    (getEnv('HTTP_CLIENT_IP'))       $ip = getEnv('HTTP_CLIENT_IP');
-         elseif(getEnv('HTTP_X_FORWARDED_FOR')) $ip = getEnv('HTTP_X_FORWARDED_FOR');
-         elseif(getEnv('REMOTE_ADDR'))          $ip = getEnv('REMOTE_ADDR');
-         else                                   $ip = 'UNKNOWN';
-         return $ip;
-      }
-
-
-
-
       if ($address === false) {
          if (isSet($_SERVER['HTTP_X_FORWARDED_FOR'])) {
             $address = $_SERVER['HTTP_X_FORWARDED_FOR'];
