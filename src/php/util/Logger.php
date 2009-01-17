@@ -11,18 +11,9 @@ class Logger extends StaticClass {
     * auftretende weitere Fehler zu verhindern.
     */
 
+   private static /*bool*/ $display;   // Ob das Ereignis angezeigt werden soll.
+   private static /*bool*/ $mail;      // Ob eine E-Mail verschickt werden soll.
 
-   /* Ob das Script in der Konsole läuft. */
-   private static $console;
-
-   /* Ob das Event angezeigt werden soll. */
-   private static $display;
-
-   /* Ob die Anzeige HTML-formatiert werden soll. */
-   private static $displayHtml;
-
-   /* Ob der/die Webmaster benachrichtigt werden sollen. */
-   private static $mail;
 
    private static $logLevels = array(L_DEBUG  => '[Debug]' ,
                                      L_INFO   => '[Info]'  ,
@@ -37,13 +28,21 @@ class Logger extends StaticClass {
     * Initialisiert die statischen Klassenvariablen.
     */
    private static function init() {
-      if (self::$console !== null)
+      if (self::$display !== null)
          return;
 
-      self::$console     = !isSet($_SERVER['REQUEST_METHOD']);    // TODO: prüfen, ob ein Terminal vorhanden ist
-      self::$display     =  self::$console || $_SERVER['REMOTE_ADDR']=='127.0.0.1' || (ini_get('display_errors'));
-      self::$displayHtml =  self::$display && !self::$console;
-      self::$mail        = !self::$display;
+      $console  = !isSet($_SERVER['REQUEST_METHOD']); // ob wir in einer Shell laufen
+      $terminal = WINDOWS || (bool) getEnv('TERM');   // ob wir ein Terminal haben
+
+      self::$display = ($console && $terminal)
+                    || (isSet($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR']=='127.0.0.1')
+                    || (bool) ini_get('display_errors');
+      self::$mail    = !self::$display || ($console && !$terminal);
+
+      if ($console || $_SERVER['REMOTE_ADDR']=='127.0.0.1') {
+         echoPre('$display: '.(int) self::$display);
+         echoPre('$mail: '   .(int) self::$mail);
+      }
    }
 
 
@@ -189,7 +188,7 @@ class Logger extends StaticClass {
          while (@ob_end_flush()) ;
          flush();
 
-         if (self::$displayHtml) {
+         if (isSet($_SERVER['REQUEST_METHOD'])) {
             echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif"><b>Uncaught</b> '.nl2br(htmlSpecialChars($message, ENT_QUOTES))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
             echo '<br>'.htmlSpecialChars($message, ENT_QUOTES).'<br><br>'.printFormatted($traceStr, true);
             echo "<br></div>\n";
@@ -336,7 +335,7 @@ class Logger extends StaticClass {
          while (@ob_end_flush()) ;
          flush();
 
-         if (self::$displayHtml) {
+         if (isSet($_SERVER['REQUEST_METHOD'])) {
             echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.self::$logLevels[$level].'</b>: '.nl2br(htmlSpecialChars($message, ENT_QUOTES))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
             if ($exception)
                echo '<br>'.htmlSpecialChars($exMessage, ENT_QUOTES).'<br><br>'.printFormatted($exTraceStr, true);
