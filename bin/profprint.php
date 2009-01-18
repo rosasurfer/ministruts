@@ -1,11 +1,9 @@
 #!/usr/bin/php
 <?
-ini_set('include_path', realPath(dirName(__FILE__).'/../src'));
-
-
 // Library einbinden
-require('phpLib.php');
+define('PHPLIB_DIR', dirName(__FILE__).'/../src/');
+require(PHPLIB_DIR.'phpLib.php');
 
 
-include('php/apd.php');
+include(PHPLIB_DIR.'php/apd.php');
 ?>

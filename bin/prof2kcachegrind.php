@@ -3,8 +3,8 @@
 error_reporting(E_ALL | E_STRICT);
 
 // MiniStruts einbinden
-ini_set('include_path', realPath(dirName(__FILE__).'/../src'));
-require('phpLib.php');
+define('PHPLIB_DIR', dirName(__FILE__).'/../src/');
+require(PHPLIB_DIR.'phpLib.php');
 
 
 // Kommandozeilenargumente einlesen
