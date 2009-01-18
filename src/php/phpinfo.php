@@ -62,14 +62,14 @@ if (ini_get('file_uploads'))                                                  ec
 
 if (ini_get('asp_tags'))                                                      echoError('Warning: asp_tags is not Off');
 if (!ini_get('y2k_compliance'))                                               echoError('Warning: y2k_compliance is not On');
-if (strLen(ini_get('date.timezone')) == 0)                                    echoError('Warning: date.timezone is not set');
+if (!strLen(ini_get('date.timezone')))                                        echoError('Warning: date.timezone is not set');
 
 $current = (int) ini_get('error_reporting');
 if (($current & (E_ALL | E_STRICT)) != (E_ALL | E_STRICT))                    echoError('Warning: error_reporting is not E_ALL | E_STRICT: '.ini_get('error_reporting'));
 if (ini_get('ignore_repeated_errors'))                                        echoError('Warning: ignore_repeated_errors is not Off');
 if (ini_get('ignore_repeated_source'))                                        echoError('Warning: ignore_repeated_source is not Off');
 if (!ini_get('log_errors'))                                                   echoError('Warning: log_errors is not On' );
-if ((int)ini_get('log_errors_max_len') != 0)                                  echoError('Warning: log_errors_max_len is not 0: '.ini_get('log_errors_max_len'));
+if ((int) ini_get('log_errors_max_len') != 0)                                 echoError('Warning: log_errors_max_len is not 0: '.ini_get('log_errors_max_len'));
 if (ini_get('track_errors'))                                                  echoError('Warning: track_errors is not Off' );
 if (ini_get('html_errors'))                                                   echoError('Warning: html_errors is not Off');
 
@@ -97,6 +97,9 @@ if (extension_loaded('apc')) {
    if (!ini_get('apc.enabled'))                                               echoError('Warning: apc.enabled is not On');
    if (!ini_get('apc.stat'))                                                  echoError('Warning: apc.stat is not On');     // Off verursacht Fehler (Dateien werden teilweise nicht gecacht)
    if (!ini_get('apc.cache_by_default'))                                      echoError('Warning: apc.cache_by_default is not On');
+   if (!ini_get('apc.write_lock'))                                            echoError('Warning: apc.write_lock is not On');
+   if (!ini_get('apc.report_autofilter'))                                     echoError('Warning: apc.report_autofilter is not On');
+   if (!ini_get('apc.include_once_override'))                                 echoError('Warning: apc.include_once_override is not On');
 }
 
 
