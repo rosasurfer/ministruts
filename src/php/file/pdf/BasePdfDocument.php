@@ -1401,35 +1401,30 @@ class BasePdfDocument extends Object {
       }
       else if (!isSet($this->fonts[$font])){
          $this->addMessage('openFont: no font file found');
-         // echo 'Font not Found '.$font;
+         // echo 'Font not found '.$font;
       }
    }
 
 
    /**
-    * If the font is not loaded then load it and make the required object
-    * else just make it the current font.  Searches the include_path if $fontName is not found.
+    * If the font is not loaded then load it and make the required object else just make it the current font.
     * The encoding array can contain 'encoding'=> 'none','WinAnsiEncoding','MacRomanEncoding' or 'MacExpertEncoding'.
     * Note that encoding='none' will need to be used for symbolic fonts
     * and 'differences' => an array of mappings between numbers 0->255 and character names.
     */
    function selectFont($fontName, $encoding='', $set=1) {
       if (!is_file($fontName)) {
-         $paths = explode(PATH_SEPARATOR, ini_get('include_path'));
-         $found = null;
-         foreach ($paths as $path) {
-            $path = realPath($path);
-            if ($path && is_file($path.DIRECTORY_SEPARATOR.$fontName)) {
-               $found = $path.DIRECTORY_SEPARATOR.$fontName;
-               break;
-            }
-         }
-         if ($found === null)
-            throw new RuntimeException('File not found: '.$fontName);
+         $fontPath = dirName(__FILE__).DIRECTORY_SEPARATOR.'fonts'.DIRECTORY_SEPARATOR;
 
-         $fontName = $found;
-         unset($paths, $path, $found);
+         if (!String ::endsWith($fontName, '.afm'))
+            $fontName .= '.afm';
+
+         if (!is_file($fontPath.$fontName))
+            throw new RuntimeException('File not found: '.$fontPath.$fontName);
+
+         $fontName = $fontPath.$fontName;
       }
+      $fontName = str_replace('\\', '/', $fontName);
 
       if (!isSet($this->fonts[$fontName])) {
          // load the file
@@ -1614,6 +1609,7 @@ class BasePdfDocument extends Object {
             }
          }
       }
+
       if ($set && isSet($this->fonts[$fontName])) {
          // so if for some reason the font was not set in the last one then it will not be selected
          $this->currentBaseFont = $fontName;
@@ -1639,7 +1635,7 @@ class BasePdfDocument extends Object {
    function setCurrentFont(){
      if (strlen($this->currentBaseFont)==0){
        // then assume an initial font
-       $this->selectFont(dirName(__FILE__).'/fonts/Helvetica.afm');
+       $this->selectFont('Helvetica');
      }
      $cf = substr($this->currentBaseFont,strrpos($this->currentBaseFont,'/')+1);
      if (strlen($this->currentTextState)
