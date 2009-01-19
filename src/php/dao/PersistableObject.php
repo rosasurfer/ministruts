@@ -85,7 +85,7 @@ abstract class PersistableObject extends Object implements IDaoConnected {
 
 
    /**
-    * Gibt den Erstellungszeitpunkt dieser Instanz zurück.
+    * Gibt den Zeitpunkt des "Soft-Delete" dieser Instanz zurück.
     *
     * @param string $format - Zeitformat
     *
