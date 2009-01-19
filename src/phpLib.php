@@ -3,6 +3,21 @@
 // -----------------------------
 
 
+// Errorhandler registrieren (anonym, damit Logger nicht schon hier included wird) und Shutdown markieren
+// ------------------------------------------------------------------------------------------------------
+set_error_handler    (create_function('$level, $message, $file, $line, array $context', 'return Logger::handleError($level, $message, $file, $line, $context);'));
+set_exception_handler(create_function('Exception $exception'                          , 'return Logger::handleException($exception);'                          ));
+
+
+// Shutdown markieren (damit Exceptions während des Shutdowns keinen fatalen Fehler auslösen)
+// ------------------------------------------------------------------------------------------
+register_shutdown_function('mark_shutdown');
+function mark_shutdown() {
+   $GLOBALS['$__shutdown'] = true;
+}
+
+
+
 // -----------------------------------------------------------------------------------------------------------------------------------
 // ggf. Profiler starten
 if (extension_loaded('APD') && (isSet($_REQUEST['_PROFILE_']) || isSet($_REQUEST['_PROFILER_']))) {
@@ -139,13 +154,6 @@ define('YEAR'   , 365 * DAY   ); define('YEARS'  , YEAR  );
 
 // ob wir unter Windows laufen
 define('WINDOWS', (strToUpper(subStr(PHP_OS, 0, 3))==='WIN'));
-
-
-
-// Errorhandler registrieren (per anonymer Funktion, damit Logger nicht schon hier geladen und included wird)
-// ----------------------------------------------------------------------------------------------------------
-set_error_handler    (create_function('$level, $message, $file, $line, array $context', 'return Logger::handleError($level, $message, $file, $line, $context);'));
-set_exception_handler(create_function('Exception $exception'                          , 'return Logger::handleException($exception);'                          ));
 
 
 

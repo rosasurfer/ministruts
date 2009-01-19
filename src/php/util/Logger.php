@@ -123,7 +123,6 @@ class Logger extends StaticClass {
    public static function handleError($level, $message, $file, $line, array $context) {
       // absichtlich unterdrückte und vom aktuellen Errorlevel nicht abgedeckte Fehler ignorieren
       $error_reporting = error_reporting();     // 0: @-Operator
-
       if ($error_reporting==0 || ($error_reporting & $level) != $level)
          return true;
 
@@ -137,18 +136,8 @@ class Logger extends StaticClass {
       if     ($level == E_USER_NOTICE ) self:: _log(null, $exception, L_NOTICE);
       elseif ($level == E_USER_WARNING) self:: _log(null, $exception, L_WARN  );
       else {
-         // TODO: Destructors müssen komplett in einem try-catch-Block gekapselt werden
-         // prüfen, ob wir aus einem Destructor kommen
-         $destructor = false;
-         foreach ($exception->getStackTrace() as $frame) {
-            if (isSet($frame['class']) && isSet($frame['function']) && strToLower($frame['function'])=='__destruct') {
-               $destructor = true;
-               break;
-            }
-         }
-
          // Spezialfälle, die nicht zurückgeworfen werden dürfen/können
-         if ($level==E_STRICT || ($file=='Unknown' && $line==0) || $destructor) {
+         if ($level==E_STRICT || ($file=='Unknown' && $line==0)) {
             self ::handleException($exception);
             exit(1);
          }
@@ -168,8 +157,12 @@ class Logger extends StaticClass {
     *
     * @param Exception $exception - die zu behandelnde Exception
     */
-   public static function handleException(Exception $exception) {
+   public static function handleException(Exception $exception, $destructor = false) {
       self ::init();
+
+      // Bei Aufruf aus einem Destruktor VOR dem Shutdown kann die Exception zurückgereicht werden.
+      if ($destructor && !isSet($GLOBALS['$__shutdown']))
+         return;
 
       // 1. Fehlerdaten ermitteln
       $message  = ($exception instanceof NestableException) ? (string) $exception : get_class($exception).': '.$exception->getMessage();

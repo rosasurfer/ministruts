@@ -84,14 +84,13 @@ class SMTPMailer extends Mailer {
     * Sorgt bei Zerstörung des Objekts dafür, daß eine noch offene Connection geschlossen werden.
     */
    public function __destruct() {
-      // Wird der Destructor nach einer Exception während des Versandes aufgerufen und löst disconnect()
-      // in der Folge eine weitere Exception aus, wird keine der beiden Exceptions von PHP an den globalen
-      // Errorhandler übergeben.  Deshalb ist jede öffentliche Methode dieser Klasse in einen try-catch-Block
-      // gekapselt, der bei Auslösen einer Exception die Verbindung still schließt [$this->disconnect(true)].
-      // Dadurch wird gewährleistet, daß Exceptions, die hier im Destruktor auftreten, normal weitergereicht
-      // werden können [$this->disconnect(false)] und nicht absichtlich unterdrückt werden müssen.
-
-      $this->disconnect(false);
+      try {
+         $this->disconnect();
+      }
+      catch (Exception $ex) {
+         Logger ::handleException($ex, true);
+         throw $ex;
+      }
    }
 
 
@@ -177,136 +176,127 @@ class SMTPMailer extends Mailer {
     * @param array  $headers  - zusätzliche zu setzende Mail-Header
     */
    public function sendMail($sender, $receiver, $subject, $message, array $headers = null) {
-      // alles kapseln, um bei Fehlern Verbindung still zu schließen
-      try {
+      if (!is_string($sender)) throw new IllegalTypeException('Illegal type of parameter $sender: '.getType($sender));
+      $from = $this->parseAddress($sender);
+      if (!$from) throw new InvalidArgumentException('Invalid argument $sender: '.$sender);
 
-         if (!is_string($sender)) throw new IllegalTypeException('Illegal type of parameter $sender: '.getType($sender));
-         $from = $this->parseAddress($sender);
-         if (!$from) throw new InvalidArgumentException('Invalid argument $sender: '.$sender);
+      if (!is_string($receiver)) throw new IllegalTypeException('Illegal type of parameter $receiver: '.getType($receiver));
+      $to = $this->parseAddress($receiver);
+      if (!$to) throw new InvalidArgumentException('Invalid argument $receiver: '.$receiver);
 
-         if (!is_string($receiver)) throw new IllegalTypeException('Illegal type of parameter $receiver: '.getType($receiver));
-         $to = $this->parseAddress($receiver);
-         if (!$to) throw new InvalidArgumentException('Invalid argument $receiver: '.$receiver);
+      if (!is_string($subject)) throw new IllegalTypeException('Illegal type of parameter $subject: '.getType($subject));
+      if (!is_string($message)) throw new IllegalTypeException('Illegal type of parameter $message: '.getType($message));
 
-         if (!is_string($subject)) throw new IllegalTypeException('Illegal type of parameter $subject: '.getType($subject));
-         if (!is_string($message)) throw new IllegalTypeException('Illegal type of parameter $message: '.getType($message));
-
-         if ($headers === null)
-            $headers = array();
-         foreach ($headers as $key => $header)
-            if (!is_string($header)) throw new IllegalTypeException('Illegal parameter type in argument $headers[$key]: '.getType($header));
+      if ($headers === null)
+         $headers = array();
+      foreach ($headers as $key => $header)
+         if (!is_string($header)) throw new IllegalTypeException('Illegal parameter type in argument $headers[$key]: '.getType($header));
 
 
-         if (is_resource($this->connection))
-            $this->logBuffer = null;         // reset log buffer if already connected
+      if (is_resource($this->connection))
+         $this->logBuffer = null;         // reset log buffer if already connected
 
-         if (!is_resource($this->connection))
-            $this->connect();
+      if (!is_resource($this->connection))
+         $this->connect();
 
-         if ($this->config['auth_username'])
-            $this->authenticate();
+      if ($this->config['auth_username'])
+         $this->authenticate();
 
 
-         // check for a custom 'Return-Path' header
-         $returnPath = $from['address'];
-         foreach ($headers as $key => $header) {
-            $header = trim($header);
-            if (String ::startsWith($header, 'return-path:', true)) {
-               $result = $this->parseAddress(subStr($header, 12));
-               if (!$result) throw new InvalidArgumentException('Invalid Return-Path header: '.$header);
-               $returnPath = $result['address'];
-               unset($headers[$key]);
-            }
+      // check for a custom 'Return-Path' header
+      $returnPath = $from['address'];
+      foreach ($headers as $key => $header) {
+         $header = trim($header);
+         if (String ::startsWith($header, 'return-path:', true)) {
+            $result = $this->parseAddress(subStr($header, 12));
+            if (!$result) throw new InvalidArgumentException('Invalid Return-Path header: '.$header);
+            $returnPath = $result['address'];
+            unset($headers[$key]);
          }
-
-
-         // init mail
-         $this->writeData("MAIL FROM: <$returnPath>");
-         $response = $this->readResponse();
-
-         $this->parseResponse($response);
-         if ($this->responseStatus != 250)
-            throw new RuntimeException("MAIL FROM: <$returnPath> command not accepted: ".$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
-
-         $this->writeData("RCPT TO: <$to[address]>");
-         $response = $this->readResponse();     // TODO: macht der MTA ein DNS-Lookup, kann es in readResponse() zum Time-out kommen
-
-         $this->parseResponse($response);
-         if ($this->responseStatus != 250 && $this->responseStatus != 251)
-            throw new RuntimeException("RCPT TO: <$to[address]> command not accepted: ".$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
-
-         $this->writeData('DATA');
-         $response = $this->readResponse();
-
-         $this->parseResponse($response);
-         if ($this->responseStatus != 354)
-            throw new RuntimeException('DATA command not accepted: '.$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
-
-         // TODO: zu lange Header umbrechen
-
-         // needed headers
-         $this->writeData('Date: '.date('r'));
-
-         $from = preg_replace('~([\xA0-\xFF])~e', '"=?ISO-8859-1?Q?=".strToUpper(decHex(ord("$1")))."?="', $from);
-         $this->writeData("From: $from[name] <$from[address]>");
-
-         $to = preg_replace('~([\xA0-\xFF])~e', '"=?ISO-8859-1?Q?=".strToUpper(decHex(ord("$1")))."?="', $to);
-         $this->writeData("To: $to[name] <$to[address]>");
-
-         $subject = preg_replace('~([\xA0-\xFF])~e', '"=?ISO-8859-1?Q?=".strToUpper(decHex(ord("$1")))."?="', $subject);
-         $this->writeData("Subject: $subject");
-         $this->writeData("X-Mailer: Microsoft Office Outlook 11");     // save us from Hotmail junk folder
-         $this->writeData("X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2900.2180");
-
-
-         // custom headers
-         foreach ($headers as $header) {
-            // TODO: Header syntaktisch überprüfen
-            $header = preg_replace('~([\xA0-\xFF])~e', '"=?ISO-8859-1?Q?=".strToUpper(decHex(ord("$1")))."?="', $header);
-            $this->writeData($header);
-         }
-         $this->writeData('');
-
-
-         $maxLineLength = 990;   // eigentlich 998, doch FastMail nimmt 990
-
-         // mail body
-         $message = str_replace(array("\r\n", "\r"), array("\n", "\n"), $message);
-         $lines = explode("\n", $message);
-         foreach ($lines as $line) {
-
-            // break up long lines into several shorter ones
-            $pieces = null;
-            while (strLen($line) > $maxLineLength) {
-               $pos = strRPos(subStr($line, 0, $maxLineLength), ' ');
-               if (!$pos)
-                  $pos = $maxLineLength - 1;    // patch to fix DOS attack
-
-               $pieces[] = subStr($line, 0, $pos);
-               $line = subStr($line, $pos + 1);
-            }
-            $pieces[] = $line;
-
-            foreach ($pieces as $line) {
-               if (subStr($line, 0, 1) == '.')
-                  $line = '.'.$line;            // escape leading dots to avoid end marker confusion
-               $this->writeData($line);
-            }
-         }
-
-         // end marker
-         $this->writeData('.');
-         $response = $this->readResponse();
-
-         $this->parseResponse($response);
-         if ($this->responseStatus != 250)
-            throw new RuntimeException('Sent data not accepted: '.$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
-
       }
-      catch (Exception $ex) {
-         $this->disconnect(true);
-         throw $ex;
+
+
+      // init mail
+      $this->writeData("MAIL FROM: <$returnPath>");
+      $response = $this->readResponse();
+
+      $this->parseResponse($response);
+      if ($this->responseStatus != 250)
+         throw new RuntimeException("MAIL FROM: <$returnPath> command not accepted: ".$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
+
+      $this->writeData("RCPT TO: <$to[address]>");
+      $response = $this->readResponse();     // TODO: macht der MTA ein DNS-Lookup, kann es in readResponse() zum Time-out kommen
+
+      $this->parseResponse($response);
+      if ($this->responseStatus != 250 && $this->responseStatus != 251)
+         throw new RuntimeException("RCPT TO: <$to[address]> command not accepted: ".$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
+
+      $this->writeData('DATA');
+      $response = $this->readResponse();
+
+      $this->parseResponse($response);
+      if ($this->responseStatus != 354)
+         throw new RuntimeException('DATA command not accepted: '.$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
+
+      // TODO: zu lange Header umbrechen
+
+      // needed headers
+      $this->writeData('Date: '.date('r'));
+
+      $from = preg_replace('~([\xA0-\xFF])~e', '"=?ISO-8859-1?Q?=".strToUpper(decHex(ord("$1")))."?="', $from);
+      $this->writeData("From: $from[name] <$from[address]>");
+
+      $to = preg_replace('~([\xA0-\xFF])~e', '"=?ISO-8859-1?Q?=".strToUpper(decHex(ord("$1")))."?="', $to);
+      $this->writeData("To: $to[name] <$to[address]>");
+
+      $subject = preg_replace('~([\xA0-\xFF])~e', '"=?ISO-8859-1?Q?=".strToUpper(decHex(ord("$1")))."?="', $subject);
+      $this->writeData("Subject: $subject");
+      $this->writeData("X-Mailer: Microsoft Office Outlook 11");     // save us from Hotmail junk folder
+      $this->writeData("X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2900.2180");
+
+
+      // custom headers
+      foreach ($headers as $header) {
+         // TODO: Header syntaktisch überprüfen
+         $header = preg_replace('~([\xA0-\xFF])~e', '"=?ISO-8859-1?Q?=".strToUpper(decHex(ord("$1")))."?="', $header);
+         $this->writeData($header);
       }
+      $this->writeData('');
+
+
+      $maxLineLength = 990;   // eigentlich 998, doch FastMail nimmt 990
+
+      // mail body
+      $message = str_replace(array("\r\n", "\r"), array("\n", "\n"), $message);
+      $lines = explode("\n", $message);
+      foreach ($lines as $line) {
+
+         // break up long lines into several shorter ones
+         $pieces = null;
+         while (strLen($line) > $maxLineLength) {
+            $pos = strRPos(subStr($line, 0, $maxLineLength), ' ');
+            if (!$pos)
+               $pos = $maxLineLength - 1;    // patch to fix DOS attack
+
+            $pieces[] = subStr($line, 0, $pos);
+            $line = subStr($line, $pos + 1);
+         }
+         $pieces[] = $line;
+
+         foreach ($pieces as $line) {
+            if (subStr($line, 0, 1) == '.')
+               $line = '.'.$line;            // escape leading dots to avoid end marker confusion
+            $this->writeData($line);
+         }
+      }
+
+      // end marker
+      $this->writeData('.');
+      $response = $this->readResponse();
+
+      $this->parseResponse($response);
+      if ($this->responseStatus != 250)
+         throw new RuntimeException('Sent data not accepted: '.$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
    }
 
 
@@ -314,32 +304,22 @@ class SMTPMailer extends Mailer {
     * Verbindung resetten
     */
    public function reset() {
-      // alles kapseln, um bei Fehlern Verbindung still zu schließen
-      try {
+      if (!is_resource($this->connection))
+         throw new RuntimeException('Cannot reset connection: Not connected');
 
-         if (!is_resource($this->connection))
-            throw new RuntimeException('Cannot reset connection: Not connected');
+      $this->writeData('RSET');
+      $response = $this->readResponse();
 
-         $this->writeData('RSET');
-         $response = $this->readResponse();
-
-         $this->parseResponse($response);
-         if ($this->responseStatus != 250)
-            throw new RuntimeException('RSET command not accepted: '.$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
-
-      }
-      catch (Exception $ex) {
-         $this->disconnect(true);
-         throw $ex;
-      }
+      $this->parseResponse($response);
+      if ($this->responseStatus != 250)
+         throw new RuntimeException('RSET command not accepted: '.$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
    }
 
 
    /**
     * Verbindung trennen
     *
-    * @param bool $silent - ob die Verbindung still und ohne Exception geschlossen werden soll
-    *                       (default = FALSE)
+    * @param bool $silent - ob die Verbindung still und ohne Exception geschlossen werden soll (default: FALSE)
     */
    public function disconnect($silent = false) {
       if (!is_resource($this->connection))

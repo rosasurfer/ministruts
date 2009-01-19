@@ -65,7 +65,13 @@ final class SystemFiveLock extends BaseLock {
     * Sorgt bei Zerstörung der Instanz dafür, daß ein evt. noch gehaltenes Lock freigegeben wird.
     */
    public function __destruct() {
-      $this->release();
+      try {
+         $this->release();
+      }
+      catch (Exception $ex) {
+         Logger ::handleException($ex, true);
+         throw $ex;
+      }
    }
 
 

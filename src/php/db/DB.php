@@ -40,12 +40,18 @@ abstract class DB extends Object {
     * und die Verbindung zur Datenbank geschlossen wird.
     */
    public function __destruct() {
-      if ($this->isConnected()) {
+      try {
+         if ($this->isConnected()) {
 
-         if ($this->transaction)
-            $this->rollback();
+            if ($this->transaction)
+               $this->rollback();
 
-         $this->disconnect();
+            $this->disconnect();
+         }
+      }
+      catch (Exception $ex) {
+         Logger ::handleException($ex, true);
+         throw $ex;
       }
    }
 

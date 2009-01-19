@@ -67,7 +67,13 @@ final class Lock extends BaseLock {
     * Sorgt bei Zerstörung der Instanz dafür, daß eine evt. erzeugte Lockdatei wieder gelöscht wird.
     */
    public function __destruct() {
-      $this->release();
+      try {
+         $this->release();
+      }
+      catch (Exception $ex) {
+         Logger ::handleException($ex, true);
+         throw $ex;
+      }
    }
 
 
