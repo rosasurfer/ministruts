@@ -181,9 +181,6 @@ class Logger extends StaticClass {
 
       // 2. Exception anzeigen (wenn $display TRUE ist)
       if (self::$display) {
-         while (@ob_end_flush()) ;
-         flush();
-
          if (isSet($_SERVER['REQUEST_METHOD'])) {
             echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif"><b>Uncaught</b> '.nl2br(htmlSpecialChars($message, ENT_QUOTES))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
             echo '<br>'.htmlSpecialChars($message, ENT_QUOTES).'<br><br>'.printFormatted($traceStr, true);
@@ -200,17 +197,19 @@ class Logger extends StaticClass {
          $mailMsg  = $plainMessage."\n\n".$message."\n\n\n".$traceStr;
 
          $request = Request ::me();
-         $session = $request && $request->isSession() ? print_r($_SESSION, true) : null;
+         if ($request) {
+            $session = $request && $request->isSession() ? print_r($_SESSION, true) : null;
 
-         $ip   = $_SERVER['REMOTE_ADDR'];
-         $host = getHostByAddr($ip);
-         if ($host != $ip)
-            $ip = $host.' ('.$ip.')';
+            $ip   = $_SERVER['REMOTE_ADDR'];
+            $host = getHostByAddr($ip);
+            if ($host != $ip)
+               $ip = $host.' ('.$ip.')';
 
-         $mailMsg .= "\n\n\nRequest:\n--------\n".$request."\n\n\n"
-                  .  "Session: ".($session ? "\n--------\n".$session."\n\n\n" : "  (no session)\n")
-                  .  "Host:      ".$ip."\n"
-                  .  "Timestamp: ".date('Y-m-d H:i:s')."\n";
+            $mailMsg .= "\n\n\nRequest:\n--------\n".$request."\n\n\n"
+                     .  "Session: ".($session ? "\n--------\n".$session."\n\n\n" : "  (no session)\n")
+                     .  "Host:      ".$ip."\n"
+                     .  "Timestamp: ".date('Y-m-d H:i:s')."\n";
+         }
 
          $mailMsg = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $mailMsg)) : str_replace("\r\n", "\n", $mailMsg);
 
@@ -328,9 +327,6 @@ class Logger extends StaticClass {
 
       // 2. Logmessage anzeigen (wenn $display TRUE ist)
       if (self::$display) {
-         while (@ob_end_flush()) ;
-         flush();
-
          if (isSet($_SERVER['REQUEST_METHOD'])) {
             echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.self::$logLevels[$level].'</b>: '.nl2br(htmlSpecialChars($message, ENT_QUOTES))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
             if ($exception)
@@ -352,17 +348,19 @@ class Logger extends StaticClass {
             $mailMsg .= "\n\n".$exMessage."\n\n\n".$exTraceStr;
 
          $request = Request ::me();
-         $session = $request && $request->isSession() ? print_r($_SESSION, true) : null;
+         if ($request) {
+            $session = $request && $request->isSession() ? print_r($_SESSION, true) : null;
 
-         $ip   = $_SERVER['REMOTE_ADDR'];
-         $host = getHostByAddr($ip);
-         if ($host != $ip)
-            $ip = $host.' ('.$ip.')';
+            $ip   = $_SERVER['REMOTE_ADDR'];
+            $host = getHostByAddr($ip);
+            if ($host != $ip)
+               $ip = $host.' ('.$ip.')';
 
-         $mailMsg .= "\n\n\nRequest:\n--------\n".$request."\n\n\n"
-                  .  "Session: ".($session ? "\n--------\n".$session."\n\n\n" : "  (no session)\n")
-                  .  "Host:      ".$ip."\n"
-                  .  "Timestamp: ".date('Y-m-d H:i:s')."\n";
+            $mailMsg .= "\n\n\nRequest:\n--------\n".$request."\n\n\n"
+                     .  "Session: ".($session ? "\n--------\n".$session."\n\n\n" : "  (no session)\n")
+                     .  "Host:      ".$ip."\n"
+                     .  "Timestamp: ".date('Y-m-d H:i:s')."\n";
+         }
 
          $mailMsg = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $mailMsg)) : str_replace("\r\n", "\n", $mailMsg);
 
