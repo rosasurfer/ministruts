@@ -162,7 +162,7 @@ abstract class NestableException extends Exception {
             $call = null;
             if (isSet($frame['class']))
                $call = $frame['class'].$frame['type'];
-            $call .= $frame['function'].'()';
+            $call .= $frame['function'].'() ';
             $callLen = max($callLen, strLen($call));
             $frame['call'] = $call;
 
