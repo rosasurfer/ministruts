@@ -157,12 +157,12 @@ abstract class NestableException extends Exception {
          $size = sizeOf($trace);
          $callLen = $lineLen = 0;
 
-         for ($i=0; $i < $size; $i++) {                        // Spalten LINE und FILE untereinander ausrichten
+         for ($i=0; $i < $size; $i++) {                        // FILE und LINE untereinander ausrichten
             $frame =& $trace[$i];
             $call = null;
             if (isSet($frame['class']))
                $call = $frame['class'].$frame['type'];
-            $call .= $frame['function'].'():';
+            $call .= $frame['function'].'()';
             $callLen = max($callLen, strLen($call));
             $frame['call'] = $call;
 
