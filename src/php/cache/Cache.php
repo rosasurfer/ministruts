@@ -58,7 +58,7 @@ final class Cache extends StaticClass {
                return null;
             }
 
-            // Flag zur Erkenung rekursiver Aufrufe setzen
+            // Flag zur Erkennung rekursiver Aufrufe setzen
             $currentCreations[$key] = true;
 
             // neuen Cache instantiieren
