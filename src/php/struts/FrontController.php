@@ -39,30 +39,58 @@ final class FrontController extends Singleton {
       if (!isSet($_SERVER['REQUEST_METHOD']))
          throw new IllegalStateException('You can not use '.__CLASS__.' in this context.');
 
-      // Ist schon eine Instanz im Cache ?
-      $instance = Cache ::me()->get(__CLASS__);
+      $cache = Cache ::me();
 
-      if (!$instance) {
-         $appDirectory = dirName($_SERVER['SCRIPT_FILENAME']);    // TODO: Application::getBaseDirectory()
-         $configFile   = $appDirectory.'/WEB-INF/struts-config.xml';
+      // Ist schon eine Instanz im Cache ?
+      $controller = self ::getCachedVersion($cache);
+
+      if (!$controller) {
+         // TODO: Application::getBaseDirectory() implementieren
+         $configFile = dirName($_SERVER['SCRIPT_FILENAME']).'/WEB-INF/struts-config.xml';
 
          // Parsen der struts-config.xml synchronisieren
          $lock = new FileLock($configFile);
 
-            // Cache erneut prüfen (während des Wartens kann ein anderer Prozeß die Instanz erzeugt haben)
-            $instance = Cache ::me()->get(__CLASS__);
-            if (!$instance) {
-               // neue Instanz erzeugen ...
-               $instance = Singleton ::getInstance(__CLASS__);
-
-               // ... und mit FileDependency cachen
+            $controller = self ::getCachedVersion($cache);
+            if (!$controller) {
+               // neue Instanz und FileDependency erzeugen ...
+               $controller = Singleton ::getInstance(__CLASS__);
                $dependency = new FileDependency($configFile);
-               Cache ::me()->set(__CLASS__, $instance, Cache ::EXPIRES_NEVER, $dependency);
+
+               // Backup des Controllers anlegen und alles cachen
+               $backup = array('controller' => $controller,
+                               'dependency' => $dependency);
+
+               // Effekt: die FileDependency wird nicht bei jedem Abruf, sondern nur alle paar Sekunden überprüft
+               $cache->set(__CLASS__          , $controller, 20 * SECONDS);
+               $cache->set(__CLASS__.'_backup', $backup    , Cache ::EXPIRES_NEVER);
             }
 
          $lock->release();
       }
-      return $instance;
+      return $controller;
+   }
+
+
+   /**
+    */
+   private static function getCachedVersion(CachePeer $cache) {
+      $controller = $cache->get(__CLASS__);
+
+      if (!$controller) {
+         $backup = $cache->get(__CLASS__.'_backup');
+         if ($backup) {
+            if ($backup['dependency']->isValid()) {
+               $controller = $backup['controller'];
+               $cache->set(__CLASS__, $controller, 20 * SECONDS);
+            }
+            else {
+               $cache->drop(__CLASS__.'_backup');
+            }
+         }
+      }
+
+      return $controller;
    }
 
 

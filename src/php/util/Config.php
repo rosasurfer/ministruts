@@ -133,19 +133,19 @@ final class Config extends Object {
                else         $chain = $chain->andDependency($dependency);
             }
 
-            // Backup der Config und Dependency anlegen und alles cachen
+            // Backup der Config anlegen und alles cachen
             $backup = array('config'     => $config,
                             'dependency' => $dependency);
 
-            // Effekt: die FileDependency wird nicht nach jedem Abruf, sondern nur alle 60 Sek. überprüft
-            $cache->set(__CLASS__          , $config, 1 * MINUTE           );
+            // Effekt: die FileDependency wird nicht bei jedem Abruf, sondern nur alle paar Sekunden überprüft
+            $cache->set(__CLASS__          , $config, 20 * SECONDS);
             $cache->set(__CLASS__.'_backup', $backup, Cache ::EXPIRES_NEVER);
 
             $configCached = true;
          }
       }
 
-      //$lock->release(); // Lock wird durch GarbageCollector freigegeben
+      //Lock wird durch GarbageCollector freigegeben
       return $config;
    }
 
@@ -160,7 +160,7 @@ final class Config extends Object {
          if ($backup) {
             if ($backup['dependency']->isValid()) {
                $config = $backup['config'];
-               $cache->set(__CLASS__, $config, 1 * MINUTE);
+               $cache->set(__CLASS__, $config, 20 * SECONDS);
             }
             else {
                $cache->drop(__CLASS__.'_backup');

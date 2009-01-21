@@ -145,12 +145,11 @@ define('L_ERROR' , 16);
 define('L_FATAL' , 32);
 
 // Zeitkonstanten
-define('MINUTE' ,  60         ); define('MINUTES', MINUTE);
-define('HOUR'   ,  60 * MINUTE); define('HOURS'  , HOUR  );
-define('DAY'    ,  24 * HOUR  ); define('DAYS'   , DAY   );
-define('WEEK'   ,   7 * DAY   ); define('WEEKS'  , WEEK  );
-define('MONTH'  ,  30 * DAY   ); define('MONTHS' , MONTH );
-define('YEAR'   , 365 * DAY   ); define('YEARS'  , YEAR  );
+define('SECOND' ,  1          ); define('SECONDS', SECOND);
+define('MINUTE' , 60 * SECONDS); define('MINUTES', MINUTE);
+define('HOUR'   , 60 * MINUTES); define('HOURS'  , HOUR  );
+define('DAY'    , 24 * HOURS  ); define('DAYS'   , DAY   );
+define('WEEK'   ,  7 * DAYS   ); define('WEEKS'  , WEEK  );
 
 // ob wir unter Windows laufen
 define('WINDOWS', (strToUpper(subStr(PHP_OS, 0, 3))==='WIN'));
