@@ -267,19 +267,6 @@ function printFormatted($var, $return = false) {
 
    echo $str;
    return null;
-
-   /*
-   function var_dump_ret($var) {
-      ob_start();
-      var_dump($var);
-      return ob_get_clean();
-   }
-
-   $lock = new SystemFiveLock(__FILE__.'#'.__LINE__);
-
-   echoPre($lock);
-   echoPre(var_dump_ret($lock));
-   */
 }
 
 
@@ -290,6 +277,22 @@ function printFormatted($var, $return = false) {
  */
 function echoPre($var) {
    printFormatted($var, false);
+}
+
+
+/**
+ * Gibt den Inhalt einer Variable aus.
+ *
+ * @param mixed $var    - Variable
+ * @param bool  $return - Ob die Ausgabe auf STDOUT erfolgen soll (FALSE) oder als Rückgabewert der Funktion (TRUE).
+ *                        (default: FALSE)
+ */
+function dump($var, $return = false) {
+   if ($return) ob_start();
+
+   var_dump($var);
+
+   if ($return) return ob_get_clean();
 }
 
 
