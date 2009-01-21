@@ -1,10 +1,10 @@
 2009-01-21
 
-   - php/struts/FrontController: Caching überarbeitet, die XML-Dateien werden jetzt nur noch alle paar Sekunden auf Veränderung überprüft
+   - php/struts/FrontController: Caching überarbeitet, die XML-Dateien werden jetzt nur noch alle 20 Sekunden auf Veränderung überprüft
 
    - php/cache/CachePeer: Caches vereinfacht (CachePeer::store() wurde entfernt)
 
-   - php/dependency/: Dependencies können eine minimale Lebensdauer haben
+   - php/dependency/: Dependencies können eine minimale Gültigkeit haben und werden dann nur in definierten Intervallen überprüft
 
 
 2009-01-19
@@ -16,7 +16,7 @@
 
    - php/util/Logger überarbeitet
 	
-   - php/util/Config: Caching überarbeitet, die Config-Dateien werden jetzt nur noch alle paar Sekunden auf Veränderung überprüft
+   - php/util/Config: Caching überarbeitet, die Config-Dateien werden jetzt nur noch alle 20 Sekunden auf Veränderung überprüft
 
 
 2009-01-14
