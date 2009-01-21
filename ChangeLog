@@ -1,8 +1,18 @@
+2009-01-21
+
+   - php/struts/FrontController: Caching überarbeitet, die XML-Dateien werden jetzt nur noch alle paar Sekunden auf Veränderung überprüft
+
+
+2009-01-19
+
+   - Exception-Handling überarbeitet: auch während des Shutdowns können jetzt Exceptions geworfen werden
+	
+
 2009-01-17
 
    - php/util/Logger überarbeitet
 	
-	- php/util/Config: Caching überarbeitet, die Config-Dateien werden jetzt nur alle 60 Sekunden auf Veränderung überprüft
+   - php/util/Config: Caching überarbeitet, die Config-Dateien werden jetzt nur noch alle paar Sekunden auf Veränderung überprüft
 
 
 2009-01-14
