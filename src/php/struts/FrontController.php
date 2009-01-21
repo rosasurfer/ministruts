@@ -42,7 +42,7 @@ final class FrontController extends Singleton {
       $cache = Cache ::me();
 
       // Ist schon eine Instanz im Cache ?
-      $controller = self ::getCachedVersion($cache);
+      $controller = $cache->get(__CLASS__);
 
       if (!$controller) {
          // TODO: Application::getBaseDirectory() implementieren
@@ -51,45 +51,19 @@ final class FrontController extends Singleton {
          // Parsen der struts-config.xml synchronisieren
          $lock = new FileLock($configFile);
 
-            $controller = self ::getCachedVersion($cache);
+            $controller = $cache->get(__CLASS__);
             if (!$controller) {
-               // neue Instanz und FileDependency erzeugen ...
+               // neue Instanz erzeugen ...
                $controller = Singleton ::getInstance(__CLASS__);
-               $dependency = new FileDependency($configFile);
 
-               // Backup des Controllers anlegen und alles cachen
-               $backup = array('controller' => $controller,
-                               'dependency' => $dependency);
-
-               // Effekt: die FileDependency wird nicht bei jedem Abruf, sondern nur alle paar Sekunden überprüft
-               $cache->set(__CLASS__          , $controller, 20 * SECONDS);
-               $cache->set(__CLASS__.'_backup', $backup    , Cache ::EXPIRES_NEVER);
+               // ... und mit FileDependency cachen
+               $dependency = FileDependency ::create($configFile)
+                                            ->setMinValidity(20 * SECONDS);
+               $cache->set(__CLASS__, $controller, Cache ::EXPIRES_NEVER, $dependency);
             }
 
          $lock->release();
       }
-      return $controller;
-   }
-
-
-   /**
-    */
-   private static function getCachedVersion(CachePeer $cache) {
-      $controller = $cache->get(__CLASS__);
-
-      if (!$controller) {
-         $backup = $cache->get(__CLASS__.'_backup');
-         if ($backup) {
-            if ($backup['dependency']->isValid()) {
-               $controller = $backup['controller'];
-               $cache->set(__CLASS__, $controller, 20 * SECONDS);
-            }
-            else {
-               $cache->drop(__CLASS__.'_backup');
-            }
-         }
-      }
-
       return $controller;
    }
 

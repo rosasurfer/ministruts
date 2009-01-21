@@ -21,16 +21,13 @@ final class ReferencePool extends CachePeer {
    /**
     * Constructor.
     *
-    * Erzeugt eine neue Instanz.  Ein evt. angegebenes Label (Namespace) wird in der Folge ignoriert,
-    * da für einen ReferencePool im Speicher eines Prozesses nur ein Namespace sinnvoll ist.
+    * Erzeugt eine neue Instanz.  Ein evt. angegebenes Label (Namespace) wird ignoriert, da ein ReferencePool
+    * Referenzen verwaltet und im Speicher des Prozesses nur ein Namespace existiert.
     *
     * @param string $label   - Cache-Bezeichner
     * @param array  $options - zusätzliche Optionen
     */
    public function __construct($label = null, array $options = null) {
-      $this->label     = $label;
-      $this->namespace = null;
-      $this->options   = $options;
    }
 
 
@@ -59,9 +56,12 @@ final class ReferencePool extends CachePeer {
       if (!isSet($this->pool[$key]))
          return false;
 
-      /*IDependency*/ $dependency = $this->pool[$key][2];
+      // Solange wir im ReferencePool nicht den created-Wert aus dem Cache haben, können wir expires
+      // und minValidity nicht prüfen
 
-      if ($dependency && !$dependency->isValid()) {
+      $dependency = $this->pool[$key][3];
+
+      if ($dependency && !$dependency->getMinValidity() && !$dependency->isValid()) {
          unSet($this->pool[$key]);
          return false;
       }
@@ -107,9 +107,6 @@ final class ReferencePool extends CachePeer {
     * überschrieben.  Läuft die angegebene Zeitspanne ab oder ändert sich der Status der angegebenen
     * Abhängigkeit, wird der Wert automatisch ungültig.
     *
-    * Der Parameter $expires wird bei diesem Cache
-    * vernachlässigt, da alle Instanzen nur für die Dauer des aktuellen Requests existieren.
-    *
     * @param string      $key        - Schlüssel, unter dem der Wert gespeichert wird
     * @param mixed       $value      - der zu speichernde Wert
     * @param int         $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfällt
@@ -121,8 +118,8 @@ final class ReferencePool extends CachePeer {
       if (!is_string($key))  throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
       if (!is_int($expires)) throw new IllegalTypeException('Illegal type of parameter $expires: '.getType($expires));
 
-      // im Cache wird ein Array[creation_timestamp, value, dependency] gespeichert
-      $this->pool[$key] = array(time(), $value, $dependency);
+      // im Cache wird ein Array[creation_timestamp, value, expires, dependency] gespeichert
+      $this->pool[$key] = array(/*time()*/null, $value, /*$expires*/null, $dependency);
 
       return true;
    }

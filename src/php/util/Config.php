@@ -98,13 +98,13 @@ final class Config extends Object {
       $cache = null;
 
       if (!$config) {
-         $cache = Cache ::me();                                                        // $cache kann NULL sein (siehe Kommentar)
-         if (!$cache || !($configCached = ($config=self::getCachedVersion($cache)))) { // gibt es bereits eine Config im Cache ?
+         $cache = Cache ::me();                                                  // $cache kann NULL sein (siehe Kommentar)
+         if (!$cache || !($configCached = ($config=$cache->get(__CLASS__)))) {   // gibt es bereits eine Config im Cache ?
 
             $lock = new Lock(APPLICATION_NAME.'|'.__FILE__.'#'.__LINE__);
 
-            if (!$cache || !($configCached = ($config=self::getCachedVersion($cache)))) {
-               $config = new self();                                                   // nein, Config neu einlesen
+            if (!$cache || !($configCached = ($config=$cache->get(__CLASS__)))) {
+               $config = new self();                                             // nein, Config neu einlesen
             }
          }
       }
@@ -117,7 +117,7 @@ final class Config extends Object {
       // Hier haben wir immer eine Config, sie ist aber evt. noch nicht gecacht
       if ($cache && !$configCached) {
          // Cache ist da, nochmal nachschauen, ob dort bereits eine Config liegt
-         if ($cached = self::getCachedVersion($cache)) {
+         if ($cached = $cache->get(__CLASS__)) {
             // JA
             $configCached = true;      // jetzt gibt es 2 Instanzen ($config + $cached, darum kann Config nicht Singleton sein)
             $config       = $cached;   // $config durch $cached Version ersetzen
@@ -125,49 +125,23 @@ final class Config extends Object {
          else {
             // NEIN, Config cachen
 
-            // Dependency erzeugen
+            // Dependency erzeugen ...
             $chain = null;
             foreach ($config->files as $filename => $exists) {
-               $dependency  = FileDependency ::create($filename);
-               if (!$chain) $chain = $dependency;
-               else         $chain = $chain->andDependency($dependency);
+               $singleDependency = FileDependency ::create($filename);
+               if (!$chain) $chain = $singleDependency;
+               else         $chain = $chain->andDependency($singleDependency);
             }
+            $chain->setMinValidity(20 * SECONDS);
 
-            // Backup der Config anlegen und alles cachen
-            $backup = array('config'     => $config,
-                            'dependency' => $dependency);
-
-            // Effekt: die FileDependency wird nicht bei jedem Abruf, sondern nur alle paar Sekunden überprüft
-            $cache->set(__CLASS__          , $config, 20 * SECONDS);
-            $cache->set(__CLASS__.'_backup', $backup, Cache ::EXPIRES_NEVER);
+            // ... und cachen
+            $cache->set(__CLASS__, $config, Cache ::EXPIRES_NEVER, $chain);
 
             $configCached = true;
          }
       }
 
       //Lock wird durch GarbageCollector freigegeben
-      return $config;
-   }
-
-
-   /**
-    */
-   private static function getCachedVersion(CachePeer $cache) {
-      $config = $cache->get(__CLASS__);
-
-      if (!$config) {
-         $backup = $cache->get(__CLASS__.'_backup');
-         if ($backup) {
-            if ($backup['dependency']->isValid()) {
-               $config = $backup['config'];
-               $cache->set(__CLASS__, $config, 20 * SECONDS);
-            }
-            else {
-               $cache->drop(__CLASS__.'_backup');
-            }
-         }
-      }
-
       return $config;
    }
 

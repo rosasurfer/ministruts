@@ -31,9 +31,8 @@ final class ApcCache extends CachePeer {
     */
    public function isCached($key) {
       // Hier wird die eigentliche Arbeit gemacht. Die Methode prüft nicht nur, ob der Wert im Cache
-      // existiert, sondern speichert ihn auch im lokalen ReferencePool. Folgende Abfragen müssen so
-      // nicht ein weiteres Mal auf den Cache zugreifen, sondern können aus dem lokalen Pool bedient
-      // werden.
+      // existiert, sondern holt ihn auch gleich und speichert eine Referenz im ReferencePool. Folgende
+      // Abfragen können so sofort aus dem ReferencePool bedient werden.
 
       // ReferencePool abfragen
       if ($this->getReferencePool()->isCached($key)) {
@@ -45,16 +44,38 @@ final class ApcCache extends CachePeer {
          if (!$data)          // Cache-Miss
             return false;
 
-         // Cache-Hit, $data Format: array(timestamp, array($value, $dependency))
-         $timestamp  = $data[0];
-         $data[1]    = unserialize($data[1]);
-         $value      = $data[1][0];
-         $dependency = $data[1][1];
+         // Cache-Hit, Datenformat: array(created, expires, serialize(array($value, $dependency)))
+         $created = $data[0];
+         $expires = $data[1];
 
-         // Dependency prüfen und Wert ggf. löschen
-         if ($dependency && !$dependency->isValid()) {
+         // expires prüfen
+         if ($expires && $created+$expires < time()) {
             $this->drop($key);
             return false;
+         }
+
+         $data[2]    = unserialize($data[2]);
+         $value      = $data[2][0];
+         $dependency = $data[2][1];
+
+         // Dependency prüfen
+         if ($dependency) {
+            $minValid = $dependency->getMinValidity();
+
+            if ($minValid) {
+               if (time() > $created+$minValid) {
+                  if (!$dependency->isValid()) {
+                     $this->drop($key);
+                     return false;
+                  }
+                  // created aktualisieren (Wert praktisch neu in den Cache schreiben)
+                  return $this->set($key, $value, $expires, $dependency);
+               }
+            }
+            elseif (!$dependency->isValid()) {
+               $this->drop($key);
+               return false;
+            }
          }
 
          // ok, Wert im ReferencePool speichern
@@ -110,11 +131,12 @@ final class ApcCache extends CachePeer {
       if (!is_string($key))  throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
       if (!is_int($expires)) throw new IllegalTypeException('Illegal type of parameter $expires: '.getType($expires));
 
-      // im Cache wird ein array(timestamp, array(value, dependency)) gespeichert
-      $time = time();
-      $data = array($value, $dependency);
+      // im Cache wird ein array(created, expires, serialize(array(value, dependency))) gespeichert
+      $created = time();
+      $data    = array($value, $dependency);
 
-      if (!apc_store($this->namespace.'::'.$key, array($time, serialize($data)), $expires))
+      // apc_store() appears to only store one level deep, solution: serialize($data)
+      if (!apc_store($this->namespace.'::'.$key, array($created, $expires, serialize($data)), $expires))
          throw new RuntimeException('Unexpected APC error, apc_store() returned FALSE');
 
       $this->getReferencePool()->set($key, $value, $expires, $dependency);
