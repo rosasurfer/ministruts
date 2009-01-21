@@ -7,27 +7,27 @@
  * Anwendung:
  * ----------
  *
- *    Objekt speichern:
+ *    Wert speichern:
  *
  *       CachePeer::set($key, $value, $expires);
  *
  *
- *    Objekt hinzufügen (nur speichern, wenn es noch nicht im Cache existiert):
+ *    Wert hinzufügen (nur speichern, wenn er noch nicht im Cache existiert):
  *
  *       CachePeer::add($key, $value, $expires)
  *
  *
- *    Objekt ersetzen (nur speichern, wenn es bereits im Cache existiert):
+ *    Wert ersetzen (nur speichern, wenn er bereits im Cache existiert):
  *
  *       CachePeer::replace($key, $value, $expires)
  *
  *
- *    Objekt aus dem Cache holen:
+ *    Wert aus dem Cache holen:
  *
  *       $value = CachePeer::get($key);
  *
  *
- *    Objekt löschen:
+ *    Wert löschen:
  *
  *       CachePeer::drop($key);
  *
@@ -87,12 +87,6 @@ abstract class CachePeer extends Object {
 
 
    /**
-    * Implementierung von set(), add() und replace().
-    */
-   abstract protected function store($action, $key, &$value, $expires, IDependency $dependency = null);
-
-
-   /**
     * Speichert einen Wert im Cache.  Ein schon vorhandener Wert unter demselben Schlüssel wird
     * überschrieben.  Läuft die angegebene Zeitspanne ab oder ändert sich der Status der angegebenen
     * Abhängigkeit, wird der Wert automatisch ungültig.
@@ -104,11 +98,20 @@ abstract class CachePeer extends Object {
     *
     * @return boolean - TRUE bei Erfolg, FALSE andererseits
     */
-   final public function set($key, &$value, $expires = Cache ::EXPIRES_NEVER, IDependency $dependency = null) {
-      if (!is_string($key))       throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
-      if (!is_int($expires))      throw new IllegalTypeException('Illegal type of parameter $expires: '.getType($expires));
+   abstract public function set($key, &$value, $expires = Cache ::EXPIRES_NEVER, IDependency $dependency = null);
 
-      return $this->store('set', $key, $value, $expires, $dependency);
+
+   /**
+    * Alias für $self::drop()
+    *
+    * Löscht einen Wert aus dem Cache.
+    *
+    * @param string $key - Schlüssel, unter dem der Wert gespeichert ist
+    *
+    * @return boolean - TRUE bei Erfolg, FALSE, falls kein solcher Schlüssel existiert
+    */
+   final public function delete($key) {
+      return $this->drop($key);
    }
 
 
@@ -125,10 +128,10 @@ abstract class CachePeer extends Object {
     * @return boolean - TRUE bei Erfolg, FALSE andererseits
     */
    final public function add($key, &$value, $expires = Cache ::EXPIRES_NEVER, IDependency $dependency = null) {
-      if (!is_string($key))       throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
-      if (!is_int($expires))      throw new IllegalTypeException('Illegal type of parameter $expires: '.getType($expires));
+      if ($this->isCached($key))
+         return false;
 
-      return $this->store('add', $key, $value, $expires, $dependency);
+      return $this->set($key, $value, $expires, $dependency);
    }
 
 
@@ -145,10 +148,10 @@ abstract class CachePeer extends Object {
     * @return boolean - TRUE bei Erfolg, FALSE andererseits
     */
    final public function replace($key, &$value, $expires = Cache ::EXPIRES_NEVER, IDependency $dependency = null) {
-      if (!is_string($key))       throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
-      if (!is_int($expires))      throw new IllegalTypeException('Illegal type of parameter $expires: '.getType($expires));
+      if (!$this->isCached($key))
+         return false;
 
-      return $this->store('replace', $key, $value, $expires, $dependency);
+      return $this->set($key, $value, $expires, $dependency);
    }
 }
 ?>

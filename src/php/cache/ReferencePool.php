@@ -103,23 +103,28 @@ final class ReferencePool extends CachePeer {
 
 
    /**
-    * Implementierung von set(), add() und replace(). Der Parameter $expires wird bei diesem Cache
+    * Speichert einen Wert im Cache.  Ein schon vorhandener Wert unter demselben Schlüssel wird
+    * überschrieben.  Läuft die angegebene Zeitspanne ab oder ändert sich der Status der angegebenen
+    * Abhängigkeit, wird der Wert automatisch ungültig.
+    *
+    * Der Parameter $expires wird bei diesem Cache
     * vernachlässigt, da alle Instanzen nur für die Dauer des aktuellen Requests existieren.
+    *
+    * @param string      $key        - Schlüssel, unter dem der Wert gespeichert wird
+    * @param mixed       $value      - der zu speichernde Wert
+    * @param int         $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfällt
+    * @param IDependency $dependency - Abhängigkeit der Gültigkeit des gespeicherten Wertes
+    *
+    * @return boolean - TRUE bei Erfolg, FALSE andererseits
     */
-   protected function store($action, $key, &$value, $expires, IDependency $dependency = null) {
-      if ($action=='add' && $this->isCached($key))
-         return false;
+   public function set($key, &$value, $expires = Cache ::EXPIRES_NEVER, IDependency $dependency = null) {
+      if (!is_string($key))  throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
+      if (!is_int($expires)) throw new IllegalTypeException('Illegal type of parameter $expires: '.getType($expires));
 
-      if ($action=='replace' && !$this->isCached($key))
-         return false;
+      // im Cache wird ein Array[creation_timestamp, value, dependency] gespeichert
+      $this->pool[$key] = array(time(), $value, $dependency);
 
-      if ($action=='set') {
-         // im Cache wird ein Array[creation_timestamp, value, dependency] gespeichert
-         $this->pool[$key] = array(time(), $value, $dependency);
-         return true;
-      }
-
-      throw new InvalidArgumentException('Invalid argument $action: '.$action);
+      return true;
    }
 }
 ?>
