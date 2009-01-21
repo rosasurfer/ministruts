@@ -232,7 +232,7 @@ final class Config extends Object {
     *                            kein Defaultwert angegeben wurde
     */
    public static function get($key, $default = null) {
-      if (!is_string($key)) throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
+      if ($key!==(string)$key) throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
 
       $value = self ::me()->getProperty($key);
 
@@ -258,8 +258,8 @@ final class Config extends Object {
     * @param string $value - Einstellung
     */
    public static function set($key, $value) {
-      if (!is_string($key))   throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
-      if (!is_string($value)) throw new IllegalTypeException('Illegal type of argument $value: '.getType($value));
+      if ($key!==(string)$key)     throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
+      if ($value!==(string)$value) throw new IllegalTypeException('Illegal type of argument $value: '.getType($value));
 
       return self ::me()->setProperty($key, $value);
    }

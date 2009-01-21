@@ -54,7 +54,7 @@ final class MySQLConnector extends DB {
     * @return mixed - je nach Statement ein ResultSet oder ein Boolean
     */
    public function queryRaw($sql) {
-      if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
+      if ($sql!==(string)$sql) throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
 
       if (!$this->isConnected())
          $this->connect();

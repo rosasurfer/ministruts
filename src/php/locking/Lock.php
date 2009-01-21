@@ -32,7 +32,7 @@ final class Lock extends BaseLock {
     */
    public function __construct($mutex = null) {
       if (func_num_args()) {
-         if (!is_string($mutex)) throw new IllegalTypeException('Illegal type of argument $mutex: '.getType($mutex));
+         if ($mutex !== (string) $mutex) throw new IllegalTypeException('Illegal type of argument $mutex: '.getType($mutex));
       }
       else {
          // kein Mutex angegeben, __FILE__ & __LINE__ des aufrufenden Codes verwenden

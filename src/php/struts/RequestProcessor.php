@@ -444,7 +444,7 @@ EOT_405;
       }
 
       // falls statt eines ActionForwards ein String-Identifier zurückgegeben wurde, diesen auflösen
-      if (is_string($forward))
+      if ($forward === (string) $forward)
          $forward = $action->getMapping()->findForward($forward);
 
 

@@ -176,21 +176,21 @@ class SMTPMailer extends Mailer {
     * @param array  $headers  - zusätzliche zu setzende Mail-Header
     */
    public function sendMail($sender, $receiver, $subject, $message, array $headers = null) {
-      if (!is_string($sender)) throw new IllegalTypeException('Illegal type of parameter $sender: '.getType($sender));
+      if ($sender!==(string)$sender) throw new IllegalTypeException('Illegal type of parameter $sender: '.getType($sender));
       $from = $this->parseAddress($sender);
       if (!$from) throw new InvalidArgumentException('Invalid argument $sender: '.$sender);
 
-      if (!is_string($receiver)) throw new IllegalTypeException('Illegal type of parameter $receiver: '.getType($receiver));
+      if ($receiver!==(string)$receiver) throw new IllegalTypeException('Illegal type of parameter $receiver: '.getType($receiver));
       $to = $this->parseAddress($receiver);
       if (!$to) throw new InvalidArgumentException('Invalid argument $receiver: '.$receiver);
 
-      if (!is_string($subject)) throw new IllegalTypeException('Illegal type of parameter $subject: '.getType($subject));
-      if (!is_string($message)) throw new IllegalTypeException('Illegal type of parameter $message: '.getType($message));
+      if ($subject!==(string)$subject) throw new IllegalTypeException('Illegal type of parameter $subject: '.getType($subject));
+      if ($message!==(string)$message) throw new IllegalTypeException('Illegal type of parameter $message: '.getType($message));
 
       if ($headers === null)
          $headers = array();
       foreach ($headers as $key => $header)
-         if (!is_string($header)) throw new IllegalTypeException('Illegal parameter type in argument $headers[$key]: '.getType($header));
+         if ($header!==(string)$header) throw new IllegalTypeException('Illegal parameter type in argument $headers[$key]: '.getType($header));
 
 
       if (is_resource($this->connection))

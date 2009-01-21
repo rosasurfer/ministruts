@@ -14,9 +14,9 @@ final class Date extends StaticClass {
     * @return int - Tage
     */
    public static function diffDays($start, $end) {
-      if (!is_string($start))                throw new IllegalTypeException('Illegal type of parameter $start: '.getType($start));
+      if ($start!==(string)$start)           throw new IllegalTypeException('Illegal type of parameter $start: '.getType($start));
       if (!CommonValidator ::isDate($start)) throw new InvalidArgumentException('Invalid argument $start: "'.$start.'"');
-      if (!is_string($end))                  throw new IllegalTypeException('Illegal type of parameter $end: '.getType($end));
+      if ($end!==(string)$end)               throw new IllegalTypeException('Illegal type of parameter $end: '.getType($end));
       if (!CommonValidator ::isDate($end))   throw new InvalidArgumentException('Invalid argument $end: "'.$end.'"');
 
       $ts1 = strToTime($start.' GMT'); // ohne Angabe einer Zeitzone wird die lokale DST einkalkuliert
@@ -40,9 +40,9 @@ final class Date extends StaticClass {
     * @return array
     */
    public static function getDateRange($startDate, $days) {
-      if (!is_string($startDate))                throw new IllegalTypeException('Illegal type of parameter $startDate: '.getType($startDate));
+      if ($startDate!==(string)$startDate)       throw new IllegalTypeException('Illegal type of parameter $startDate: '.getType($startDate));
       if (!CommonValidator ::isDate($startDate)) throw new InvalidArgumentException('Invalid argument $startDate: "'.$startDate.'"');
-      if (!is_int($days))                        throw new IllegalTypeException('Illegal type of parameter $days: '.getType($days));
+      if ($days!==(int)$days)                    throw new IllegalTypeException('Illegal type of parameter $days: '.getType($days));
       if ($days < 0)                             throw new InvalidArgumentException('Invalid argument $days: '.$days);
 
       $range = array();

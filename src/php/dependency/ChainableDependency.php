@@ -86,8 +86,8 @@ abstract class ChainableDependency extends Object implements IDependency {
     * @return ChainedDependency
     */
    public function setMinValidity($time) {
-      if (!is_int($time)) throw new IllegalTypeException('Illegal type of argument $time: '.getType($time));
-      if ($time < 0)      throw new InvalidArgumentException('Invalid argument $time: '.$time);
+      if ($time!==(int)$time) throw new IllegalTypeException('Illegal type of argument $time: '.getType($time));
+      if ($time < 0)          throw new InvalidArgumentException('Invalid argument $time: '.$time);
 
       $this->minValidity = $time;
 

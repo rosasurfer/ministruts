@@ -85,7 +85,7 @@ final class Cache extends StaticClass {
 
 
       // spezifischer Cache
-      if (!is_string($label))
+      if ($label!==(string)$label)
          throw new IllegalTypeException('Illegal type of argument $label: '.getType($label));
 
 

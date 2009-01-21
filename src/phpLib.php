@@ -221,7 +221,7 @@ function is_class($className) {
  * @return string - ID
  */
 function getRandomID($length) {
-   if (!isSet($length) || !is_int($length) || $length < 1)
+   if (!isSet($length) || ($length!==(int)$length) || $length < 1)
       throw new RuntimeException('Invalid argument length: '.$length);
 
    $id = crypt(uniqId(rand(), true));              // zufällige ID erzeugen
@@ -338,7 +338,7 @@ function decodeHtml($html) {
  */
 function addDate($date, $days) {
    if (!CommonValidator ::isDate($date)) throw new InvalidArgumentException('Invalid argument $date: '.$date);
-   if (!is_int($days))                   throw new InvalidArgumentException('Invalid argument $days: '.$days);
+   if ($days!==(int)$days)               throw new InvalidArgumentException('Invalid argument $days: '.$days);
 
    $parts = explode('-', $date);
    $year  = (int) $parts[0];
@@ -358,7 +358,7 @@ function addDate($date, $days) {
  * @return string
  */
 function subDate($date, $days) {
-   if (!is_int($days)) throw new InvalidArgumentException('Invalid argument $days: '.$days);
+   if ($days!==(int)$days) throw new InvalidArgumentException('Invalid argument $days: '.$days);
    return addDate($date, -$days);
 }
 
@@ -386,7 +386,7 @@ function formatDate($format, $datetime) {
    }
 
    $timestamp = strToTime($datetime);
-   if (!is_int($timestamp))
+   if ($timestamp!==(int)$timestamp)
       throw new InvalidArgumentException('Invalid argument $datetime: '.$datetime);
 
    return date($format, $timestamp);
@@ -403,8 +403,8 @@ function formatDate($format, $datetime) {
  * @return string
  */
 function formatMoney($value, $decimals = 2, $decimalSeparator = ',') {
-   if (!is_int($value) && !is_float($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
-   if (!is_int($decimals))                   throw new IllegalTypeException('Illegal type of parameter $decimals: '.getType($decimals));
+   if ($value!==(int)$value && $value!==(float)$value) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
+   if ($decimals!==(int)$decimals)                     throw new IllegalTypeException('Illegal type of parameter $decimals: '.getType($decimals));
 
    if ($decimalSeparator == '.')
       return number_format($value, $decimals, '.', ',');

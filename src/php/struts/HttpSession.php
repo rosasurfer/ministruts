@@ -152,7 +152,7 @@ class HttpSession extends Singleton {
     * @param mixed  $value - der zu speichernde Wert
     */
    public function setAttribute($key, $value) {
-      if (!is_string($key)) throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
+      if ($key!==(string)$key) throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
 
       if ($value !== null) {
          $_SESSION[$key] = $value;

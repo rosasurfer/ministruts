@@ -69,8 +69,8 @@ class ActionForward extends Object {
     * @return ActionForward
     */
    public function setName($name) {
-      if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($name)) throw new IllegalTypeException('Illegal type of argument $name: '.getType($name));
+      if ($this->configured)     throw new IllegalStateException('Configuration is frozen');
+      if ($name!==(string)$name) throw new IllegalTypeException('Illegal type of argument $name: '.getType($name));
 
       $this->name = $name;
       return $this;
@@ -85,8 +85,8 @@ class ActionForward extends Object {
     * @return ActionForward
     */
    public function setPath($path) {
-      if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($path)) throw new IllegalTypeException('Illegal type of argument $path: '.getType($path));
+      if ($this->configured)     throw new IllegalStateException('Configuration is frozen');
+      if ($path!==(string)$path) throw new IllegalTypeException('Illegal type of argument $path: '.getType($path));
 
       $this->path = $path;
       return $this;
@@ -101,8 +101,8 @@ class ActionForward extends Object {
     * @return ActionForward
     */
    public function setLabel($label) {
-      if ($this->configured)  throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($label)) throw new IllegalTypeException('Illegal type of argument $label: '.getType($label));
+      if ($this->configured)       throw new IllegalStateException('Configuration is frozen');
+      if ($label!==(string)$label) throw new IllegalTypeException('Illegal type of argument $label: '.getType($label));
 
       $this->label = $label;
       return $this;
@@ -117,8 +117,8 @@ class ActionForward extends Object {
     * @return ActionForward
     */
    public function setRedirect($redirect) {
-      if ($this->configured)   throw new IllegalStateException('Configuration is frozen');
-      if (!is_bool($redirect)) throw new IllegalTypeException('Illegal type of argument $redirect: '.getType($redirect));
+      if ($this->configured)           throw new IllegalStateException('Configuration is frozen');
+      if ($redirect!==(bool)$redirect) throw new IllegalTypeException('Illegal type of argument $redirect: '.getType($redirect));
 
       $this->redirect = $redirect;
       return $this;
@@ -134,11 +134,11 @@ class ActionForward extends Object {
     * @return ActionForward
     */
    public function addQueryData($key, $value) {
-      if ($this->configured)  throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($key))   throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
+      if ($this->configured)   throw new IllegalStateException('Configuration is frozen');
+      if ($key!==(string)$key) throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
       if ($value === null)
          $value = '';
-      if (!is_string($value)) throw new IllegalTypeException('Illegal type of argument $value: '.getType($value));
+      if ($value!==(string)$value) throw new IllegalTypeException('Illegal type of argument $value: '.getType($value));
 
       $separator = String ::contains($this->path, '?') ? '&' : '?';
 

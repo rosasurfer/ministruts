@@ -661,16 +661,16 @@ final class Request extends Singleton {
     * @param string $path    - Pfad, für den der Cookie gültig sein soll
     */
    public function setCookie($name, $value, $expires = 0, $path = null) {
-      if (!is_string($name)) throw new IllegalTypeException('Illegal type of argument $name: '.getType($name));
-      if (!is_int($expires)) throw new IllegalTypeException('Illegal type of argument $expires: '.getType($expires));
-      if ($expires < 0)      throw new InvalidArgumentException('Invalid argument $expires: '.$expires);
+      if ($name!==(string)$name)    throw new IllegalTypeException('Illegal type of argument $name: '.getType($name));
+      if ($expires!==(int)$expires) throw new IllegalTypeException('Illegal type of argument $expires: '.getType($expires));
+      if ($expires < 0)             throw new InvalidArgumentException('Invalid argument $expires: '.$expires);
 
       $value = (string) $value;
 
       if ($path === null)
          $path = $this->getApplicationPath().'/';
 
-      if (!is_string($path)) throw new IllegalTypeException('Illegal type of argument $path: '.getType($path));
+      if ($path!==(string)$path) throw new IllegalTypeException('Illegal type of argument $path: '.getType($path));
 
       setCookie($name, $value, $expires, $path);
    }
@@ -684,7 +684,7 @@ final class Request extends Singleton {
     * @return boolean
     */
    public function isUserInRole($roles) {
-      if (!is_string($roles)) throw new IllegalTypeException('Illegal type of argument $roles: '.getType($roles));
+      if ($roles!==(string)$roles) throw new IllegalTypeException('Illegal type of argument $roles: '.getType($roles));
 
       // RoleProcessor holen ...
       $processor = $this->getAttribute(Struts ::MODULE_KEY)
@@ -759,7 +759,7 @@ final class Request extends Singleton {
     * @param string $message - Error-Message
     */
    public function setActionError($key, $message) {
-      if (is_string($message)) {
+      if ($message === (string) $message) {
          $this->attributes[Struts ::ACTION_ERRORS_KEY][$key] = $message;
       }
       elseif ($message === null) {

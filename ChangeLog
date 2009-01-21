@@ -6,6 +6,8 @@
 
    - php/dependency/: Dependencies können eine minimale Gültigkeit haben und werden dann nur in definierten Intervallen überprüft
 
+   - Funktionen is_int(), is_float(), is_double(), is_string() durch direkte Casts ersetzt (Casts-Tests sind mehr als doppelt so schnell)
+
 
 2009-01-19
 

@@ -33,7 +33,7 @@ final class SystemFiveLock extends BaseLock {
     *                            demselben Schlüssel existiert
     */
    public function __construct($key) /*throws RuntimeException*/ {
-      if (!is_string($key))           throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
+      if ($key !== (string)$key)     throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
       if (isSet(self::$semIds[$key])) throw new RuntimeException('Dead-lock detected: already holding a lock for key "'.$key.'"');
 
       $decId = $this->getKeyId($key);
