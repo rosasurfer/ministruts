@@ -24,6 +24,7 @@ class ChainedDependency extends ChainableDependency {
     */
    private function __construct(IDependency $dependency) {
       $this->dependencies[] = $dependency;
+      $this->setMinValidity($dependency->getMinValidity());
    }
 
 
@@ -47,11 +48,16 @@ class ChainedDependency extends ChainableDependency {
     * @return ChainedDependency
     */
    public function andDependency(IDependency $dependency) {
+      if ($dependency === $this)
+         return $this;
+
       if ($this->type == 'OR')
          return self ::create($this)->andDependency($dependency);
 
-      $this->dependencies[] = $dependency;
       $this->type           = 'AND';
+      $this->dependencies[] = $dependency;
+      $this->setMinValidity(max($this->getMinValidity(), $dependency->getMinValidity()));
+
       return $this;
    }
 
@@ -64,11 +70,16 @@ class ChainedDependency extends ChainableDependency {
     * @return ChainedDependency
     */
    public function orDependency(IDependency $dependency) {
+      if ($dependency === $this)
+         return $this;
+
       if ($this->type == 'AND')
          return self ::create($this)->orDependency($dependency);
 
-      $this->dependencies[] = $dependency;
       $this->type           = 'OR';
+      $this->dependencies[] = $dependency;
+      $this->setMinValidity(max($this->getMinValidity(), $dependency->getMinValidity()));
+
       return $this;
    }
 

@@ -12,7 +12,15 @@ interface IDependency {
 
 
    /**
-    * Ob das zu überwachende Ereignis oder der Zustandswechsel eingetreten sind oder nicht.
+    * Gibt die Mindestgültigkeit der Abhängigkeit zurück.
+    *
+    * @return int - Mindestgültigkeit in Sekunden
+    */
+   public function getMinValidity();
+
+
+   /**
+    * Ob das zu überwachende Ereignis oder ein Zustandswechsel eingetreten sind oder nicht.
     *
     * @return boolean - TRUE, wenn die Abhängigkeit weiterhin erfüllt ist.
     *                   FALSE, wenn der Zustandswechsel eingetreten ist und die Abhängigkeit nicht mehr erfüllt ist.

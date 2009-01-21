@@ -31,6 +31,12 @@ abstract class ChainableDependency extends Object implements IDependency {
 
 
    /**
+    * Mindestgültigkeit
+    */
+   private /*int*/ $minValidity = 0;
+
+
+   /**
     * Kombiniert diese Abhängigkeit mit einer weiteren durch ein logisches UND (AND).
     *
     * @param IDependency $dependency - Abhängigkeit
@@ -38,6 +44,9 @@ abstract class ChainableDependency extends Object implements IDependency {
     * @return ChainedDependency
     */
    public function andDependency(IDependency $dependency) {
+      if ($dependency === $this)
+         return $this;
+
       return ChainedDependency ::create($this)
                                ->andDependency($dependency);
    }
@@ -51,8 +60,38 @@ abstract class ChainableDependency extends Object implements IDependency {
     * @return ChainedDependency
     */
    public function orDependency(IDependency $dependency) {
+      if ($dependency === $this)
+         return $this;
+
       return ChainedDependency ::create($this)
                                ->orDependency($dependency);
+   }
+
+
+   /**
+    * Gibt die Mindestgültigkeit dieser Abhängigkeit zurück.
+    *
+    * @return int - Mindestgültigkeit in Sekunden
+    */
+   public function getMinValidity() {
+      return $this->minValidity;
+   }
+
+
+   /**
+    * Setzt die Mindestgültigkeit dieser Abhängigkeit.
+    *
+    * @param int $time - Mindestgültigkeit in Sekunden
+    *
+    * @return ChainedDependency
+    */
+   public function setMinValidity($time) {
+      if (!is_int($time)) throw new IllegalTypeException('Illegal type of argument $time: '.getType($time));
+      if ($time < 0)      throw new InvalidArgumentException('Invalid argument $time: '.$time);
+
+      $this->minValidity = $time;
+
+      return $this;
    }
 }
 ?>
