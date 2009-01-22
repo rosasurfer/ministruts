@@ -72,12 +72,13 @@ final class String extends StaticClass {
     * @param string $string - der zu prüfende String
     *
     * @return boolean
-    *
-    * TODO: String::isUtf8Encoded() überarbeiten
     */
    public static function isUtf8Encoded($string) {
       if ($string!==null && $string!==(string)$string) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
 
+      // TODO: String::isUtf8Encoded() enthält Fehler
+
+      // z.B. /anmelden.php~ÝÜÃÂÛÚËÊ..... => TRUE
       return ($string!='' && self:: contains($string, 'Ã'));
    }
 
@@ -86,9 +87,9 @@ final class String extends StaticClass {
     * Dekodiert UTF-8-kodierte Strings nach ISO-8859-1. Verarbeitet sowohl einzelne Strings als auch
     * String-Arrays.
     *
-    * @param mixed $string - der oder die zu dekodierenden Strings
+    * @param mixed $string - zu dekodierende(r) String(s)
     *
-    * @return mixed - der oder die dekodierten Strings
+    * @return mixed - dekodierte(r) String(s)
     */
    public static function decodeUtf8($string) {
       if (is_array($string)) {
