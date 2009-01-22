@@ -63,7 +63,7 @@ final class ApcCache extends CachePeer {
             $minValid = $dependency->getMinValidity();
 
             if ($minValid) {
-               if (time() > $created+$minValid) {
+               if (time() > $created+$minValid && !WINDOWS) { // unter Windows wird $minValid ignoriert
                   if (!$dependency->isValid()) {
                      $this->drop($key);
                      return false;
