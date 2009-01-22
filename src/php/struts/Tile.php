@@ -139,12 +139,12 @@ class Tile extends Object {
     * Speichert in der Tile unter dem angegebenen Namen eine zusätzliche Eigenschaft.
     *
     * @param string $name  - Name der Eigenschaft
-    * @param mixed  $value - der zu speichernde Wert (String oder Object)
+    * @param mixed  $value - der zu speichernde Wert (String oder Tile)
     */
    public function setProperty($name, $value) {
-      if ($this->configured)                                  throw new IllegalStateException('Configuration is frozen');
-      if ($name!==(string)$name)                              throw new IllegalTypeException('Illegal type of argument $name: '.getType($name));
-      if ($value!==(string)$value && !$value instanceof self) throw new IllegalTypeException('Illegal type of argument $value: '.getType($value));
+      if ($this->configured)                             throw new IllegalStateException('Configuration is frozen');
+      if ($name!==(string)$name)                         throw new IllegalTypeException('Illegal type of argument $name: '.getType($name));
+      if (!$value instanceof self && !is_string($value)) throw new IllegalTypeException('Illegal type of argument $value: '.getType($value));
 
       $this->properties[$name] = $value;
       // TODO: valid types -> string, page or tile
