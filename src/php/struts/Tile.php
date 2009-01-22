@@ -84,8 +84,8 @@ class Tile extends Object {
     * @return Tile
     */
    public function setName($name) {
-      if ($this->configured)        throw new IllegalStateException('Configuration is frozen');
-      if ($name !== (string) $name) throw new IllegalTypeException('Illegal type of argument $name: '.getType($name));
+      if ($this->configured)     throw new IllegalStateException('Configuration is frozen');
+      if ($name!==(string)$name) throw new IllegalTypeException('Illegal type of argument $name: '.getType($name));
 
       $this->name = $name;
       return $this;

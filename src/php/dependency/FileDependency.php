@@ -45,8 +45,8 @@ class FileDependency extends ChainableDependency {
     * @param string $fileName - Dateiname
     */
    public function __construct($fileName) {
-      if ($fileName !== (string) $fileName) throw new IllegalTypeException('Illegal type of argument $fileName: '.getType($fileName));
-      if (!strLen($fileName))               throw new InvalidArgumentException('Invalid argument $fileName: '.$fileName);
+      if ($fileName!==(string)$fileName) throw new IllegalTypeException('Illegal type of argument $fileName: '.getType($fileName));
+      if (!strLen($fileName))            throw new InvalidArgumentException('Invalid argument $fileName: '.$fileName);
 
       if (file_exists($fileName)) {             // existierende Datei
          $this->fileName     = realPath($fileName);
