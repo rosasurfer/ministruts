@@ -61,10 +61,9 @@ $__classes['DB'                             ] = $dir.'php/db/DB';
 $__classes['DBPool'                         ] = $dir.'php/db/DBPool';
 $__classes['MySQLConnector'                 ] = $dir.'php/db/MySQLConnector';
 
-$__classes['ChainableDependency'            ] = $dir.'php/dependency/ChainableDependency';
+$__classes['Dependency'                     ] = $dir.'php/dependency/Dependency';
 $__classes['ChainedDependency'              ] = $dir.'php/dependency/ChainedDependency';
 $__classes['FileDependency'                 ] = $dir.'php/dependency/FileDependency';
-$__classes['IDependency'                    ] = $dir.'php/dependency/IDependency';
 
 $__classes['BusinessRuleException'          ] = $dir.'php/exceptions/BusinessRuleException';
 $__classes['ClassNotFoundException'         ] = $dir.'php/exceptions/ClassNotFoundException';

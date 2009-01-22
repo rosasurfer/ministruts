@@ -2,13 +2,13 @@
 /**
  * ChainedDependency
  */
-class ChainedDependency extends ChainableDependency {
+class ChainedDependency extends Dependency {
 
 
    /**
     * Abhängigkeiten des Gesamtausdrucks
     */
-   private /*IDependency[]*/ $dependencies;
+   private /*Dependency[]*/ $dependencies;
 
 
    /**
@@ -20,9 +20,9 @@ class ChainedDependency extends ChainableDependency {
    /**
     * Constructor
     *
-    * @param IDependency $dependency - Abhängigkeit
+    * @param Dependency $dependency - Abhängigkeit
     */
-   private function __construct(IDependency $dependency) {
+   private function __construct(Dependency $dependency) {
       $this->dependencies[] = $dependency;
       $this->setMinValidity($dependency->getMinValidity());
    }
@@ -31,11 +31,11 @@ class ChainedDependency extends ChainableDependency {
    /**
     * Erzeugt eine neue Instanz.
     *
-    * @param IDependency $dependency - Abhängigkeit
+    * @param Dependency $dependency - Abhängigkeit
     *
     * @return ChainedDependency
     */
-   protected static function create(IDependency $dependency) {
+   protected static function create(Dependency $dependency) {
       return new self($dependency);
    }
 
@@ -43,11 +43,11 @@ class ChainedDependency extends ChainableDependency {
    /**
     * Kombiniert diese Abhängigkeit mit einer weiteren durch ein logisches UND (AND).
     *
-    * @param IDependency $dependency - Abhängigkeit
+    * @param Dependency $dependency - Abhängigkeit
     *
     * @return ChainedDependency
     */
-   public function andDependency(IDependency $dependency) {
+   public function andDependency(Dependency $dependency) {
       if ($dependency === $this)
          return $this;
 
@@ -65,11 +65,11 @@ class ChainedDependency extends ChainableDependency {
    /**
     * Kombiniert diese Abhängigkeit mit einer weiteren durch ein logisches ODER (OR).
     *
-    * @param IDependency $dependency - Abhängigkeit
+    * @param Dependency $dependency - Abhängigkeit
     *
     * @return ChainedDependency
     */
-   public function orDependency(IDependency $dependency) {
+   public function orDependency(Dependency $dependency) {
       if ($dependency === $this)
          return $this;
 

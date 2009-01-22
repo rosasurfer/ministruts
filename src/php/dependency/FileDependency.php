@@ -22,7 +22,7 @@
  * $dependency->isValid() gibt TRUE zurück.  Nach Änderung oder Löschen der Datei gibt der Aufruf von
  * $dependency->isValid() FALSE zurück.
  */
-class FileDependency extends ChainableDependency {
+class FileDependency extends Dependency {
 
 
    /**

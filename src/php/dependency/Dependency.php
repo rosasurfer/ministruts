@@ -1,10 +1,15 @@
 <?
 /**
- * ChainableDependency
+ * Dependency
  *
- * Abstrakte Basisklasse für Abhängigkeiten von bestimmten Zuständen oder Bedingungen.  Jede Implementierung
- * dieser Klasse bildet eine Abhängigkeit von einem bestimmten Zustand oder einer bestimmten Bedingung ab.
- * Abhängigkeiten können durch logisches UND oder logisches ODER kombiniert werden.
+ * Abstrakte Basisklasse für Abhängigkeiten von bestimmten Zuständen oder Bedingungen.  Wird benutzt,
+ * um abhängig von einer Änderung Aktionen auszulösen.  Jede Implementierung dieser Klasse bildet eine
+ * Abhängigkeit von einem bestimmten Zustand oder einer bestimmten Bedingung ab.  Soll ein Zustand
+ * prozeßübergreifend verfolgt werden, muß die Instanz in einem entprechenden Persistenz-Container
+ * gespeichert werden (Session, Datenbank, Dateisystem etc.).  Die Implementierungen müssen serialisierbar
+ * sein.
+ *
+ * Mehrere Abhängigkeiten können durch logisches UND oder ODER kombiniert werden.
  *
  * Beispiel:
  * ---------
@@ -15,7 +20,7 @@
  *    ...
  *
  *    if (!$dependency->isValid()) {
- *       // irgendeine Aktion
+ *       // Zustand hat sich geändert, beliebige Aktion ausführen
  *    }
  *
  * Dieses Beispiel definiert eine gemeinsame Abhängigkeit vom Zustand dreier Dateien '/etc/crontab',
@@ -27,7 +32,7 @@
  * @see ChainedDependency
  * @see FileDependency
  */
-abstract class ChainableDependency extends Object implements IDependency {
+abstract class Dependency extends Object {
 
 
    /**
@@ -37,13 +42,22 @@ abstract class ChainableDependency extends Object implements IDependency {
 
 
    /**
+    * Ob das zu überwachende Ereignis oder ein Zustandswechsel eingetreten sind oder nicht.
+    *
+    * @return boolean - TRUE, wenn die Abhängigkeit weiterhin erfüllt ist.
+    *                   FALSE, wenn der Zustandswechsel eingetreten ist und die Abhängigkeit nicht mehr erfüllt ist.
+    */
+   abstract public function isValid();
+
+
+   /**
     * Kombiniert diese Abhängigkeit mit einer weiteren durch ein logisches UND (AND).
     *
-    * @param IDependency $dependency - Abhängigkeit
+    * @param Dependency $dependency - Abhängigkeit
     *
     * @return ChainedDependency
     */
-   public function andDependency(IDependency $dependency) {
+   public function andDependency(Dependency $dependency) {
       if ($dependency === $this)
          return $this;
 
@@ -55,11 +69,11 @@ abstract class ChainableDependency extends Object implements IDependency {
    /**
     * Kombiniert diese Abhängigkeit mit einer weiteren durch ein logisches ODER (OR).
     *
-    * @param IDependency $dependency - Abhängigkeit
+    * @param Dependency $dependency - Abhängigkeit
     *
     * @return ChainedDependency
     */
-   public function orDependency(IDependency $dependency) {
+   public function orDependency(Dependency $dependency) {
       if ($dependency === $this)
          return $this;
 

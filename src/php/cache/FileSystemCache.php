@@ -152,14 +152,14 @@ final class FileSystemCache extends CachePeer {
     * überschrieben.  Läuft die angegebene Zeitspanne ab oder ändert sich der Status der angegebenen
     * Abhängigkeit, wird der Wert automatisch ungültig.
     *
-    * @param string      $key        - Schlüssel, unter dem der Wert gespeichert wird
-    * @param mixed       $value      - der zu speichernde Wert
-    * @param int         $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfällt
-    * @param IDependency $dependency - Abhängigkeit der Gültigkeit des gespeicherten Wertes
+    * @param string     $key        - Schlüssel, unter dem der Wert gespeichert wird
+    * @param mixed      $value      - der zu speichernde Wert
+    * @param int        $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfällt
+    * @param Dependency $dependency - Abhängigkeit der Gültigkeit des gespeicherten Wertes
     *
     * @return boolean - TRUE bei Erfolg, FALSE andererseits
     */
-   public function set($key, &$value, $expires = Cache ::EXPIRES_NEVER, IDependency $dependency = null) {
+   public function set($key, &$value, $expires = Cache ::EXPIRES_NEVER, Dependency $dependency = null) {
       if ($key!==(string)$key)      throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
       if ($expires!==(int)$expires) throw new IllegalTypeException('Illegal type of parameter $expires: '.getType($expires));
 

@@ -91,14 +91,14 @@ abstract class CachePeer extends Object {
     * überschrieben.  Läuft die angegebene Zeitspanne ab oder ändert sich der Status der angegebenen
     * Abhängigkeit, wird der Wert automatisch ungültig.
     *
-    * @param string      $key        - Schlüssel, unter dem der Wert gespeichert wird
-    * @param mixed       $value      - der zu speichernde Wert
-    * @param int         $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfällt
-    * @param IDependency $dependency - Abhängigkeit der Gültigkeit des gespeicherten Wertes
+    * @param string     $key        - Schlüssel, unter dem der Wert gespeichert wird
+    * @param mixed      $value      - der zu speichernde Wert
+    * @param int        $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfällt
+    * @param Dependency $dependency - Abhängigkeit der Gültigkeit des gespeicherten Wertes
     *
     * @return boolean - TRUE bei Erfolg, FALSE andererseits
     */
-   abstract public function set($key, &$value, $expires = Cache ::EXPIRES_NEVER, IDependency $dependency = null);
+   abstract public function set($key, &$value, $expires = Cache ::EXPIRES_NEVER, Dependency $dependency = null);
 
 
    /**
@@ -120,14 +120,14 @@ abstract class CachePeer extends Object {
     * existiert.  Läuft die angegebene Zeitspanne ab oder ändert sich der Status der angegebenen
     * Abhängigkeit, wird der Wert automatisch ungültig.
     *
-    * @param string      $key        - Schlüssel, unter dem der Wert gespeichert wird
-    * @param mixed       $value      - der zu speichernde Wert
-    * @param int         $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfällt
-    * @param IDependency $dependency - Abhängigkeit der Gültigkeit des gespeicherten Wertes
+    * @param string     $key        - Schlüssel, unter dem der Wert gespeichert wird
+    * @param mixed      $value      - der zu speichernde Wert
+    * @param int        $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfällt
+    * @param Dependency $dependency - Abhängigkeit der Gültigkeit des gespeicherten Wertes
     *
     * @return boolean - TRUE bei Erfolg, FALSE andererseits
     */
-   final public function add($key, &$value, $expires = Cache ::EXPIRES_NEVER, IDependency $dependency = null) {
+   final public function add($key, &$value, $expires = Cache ::EXPIRES_NEVER, Dependency $dependency = null) {
       if ($this->isCached($key))
          return false;
 
@@ -140,14 +140,14 @@ abstract class CachePeer extends Object {
     * existiert.  Läuft die angegebene Zeitspanne ab oder ändert sich der Status der angegebenen
     * Abhängigkeit, wird der Wert automatisch ungültig.
     *
-    * @param string      $key        - Schlüssel, unter dem der Wert gespeichert wird
-    * @param mixed       $value      - der zu speichernde Wert
-    * @param int         $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfällt
-    * @param IDependency $dependency - Abhängigkeit der Gültigkeit des gespeicherten Wertes
+    * @param string     $key        - Schlüssel, unter dem der Wert gespeichert wird
+    * @param mixed      $value      - der zu speichernde Wert
+    * @param int        $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfällt
+    * @param Dependency $dependency - Abhängigkeit der Gültigkeit des gespeicherten Wertes
     *
     * @return boolean - TRUE bei Erfolg, FALSE andererseits
     */
-   final public function replace($key, &$value, $expires = Cache ::EXPIRES_NEVER, IDependency $dependency = null) {
+   final public function replace($key, &$value, $expires = Cache ::EXPIRES_NEVER, Dependency $dependency = null) {
       if (!$this->isCached($key))
          return false;
 
