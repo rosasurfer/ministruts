@@ -1,3 +1,8 @@
+2009-01-22
+
+   - php/dependency/: Klassenstruktur vereinfacht
+
+
 2009-01-21
 
    - php/struts/FrontController: Caching überarbeitet, die XML-Dateien werden jetzt nur noch alle 20 Sekunden auf Veränderung überprüft
