@@ -56,7 +56,7 @@ abstract class ActionForm extends Object {
 
 
    /**
-    * Gibt den DispatchAction-Key zurück (siehe java.struts.DispatchAction).
+    * Gibt den DispatchAction-Key zurück (Beschreibung: siehe java.struts.DispatchAction).
     *
     * @return string - Action-Key oder NULL, wenn kein Wert angegeben wurde
     */
