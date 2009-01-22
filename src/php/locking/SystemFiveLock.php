@@ -39,16 +39,22 @@ final class SystemFiveLock extends BaseLock {
       $decId = $this->getKeyId($key);
       $hexId = decHex($decId);
 
+      $count = 3; // max. Anzahl von akzeptablen Fehlern, danach wird eine auftretende Exception weitergereicht
       do {
-         $semId = sem_get($decId, 1, 0666);
          try {
-            // hier kann ein anderer (das Lock haltender) Prozeß den Semaphore schon wieder gelöscht haben
+            // unter noch unbekannten Umständen: failed for key...
+            $semId = sem_get($decId, 1, 0666);
+
+            // ein das Lock haltender Prozeß kann den Semaphore während des Wartens gelöscht haben: failed to acquire...
             sem_acquire($semId);
             break;
          }
          catch (PHPErrorException $ex) {
-            if ($ex->getMessage() == 'sem_acquire(): failed to acquire key 0x'.$hexId.': Identifier removed')
+            if ($count-- && ($ex->getMessage()=='sem_get(): failed for key 0x'.$hexId.': Invalid argument'
+                          || $ex->getMessage()=='sem_acquire(): failed to acquire key 0x'.$hexId.': Identifier removed')) {
+               uSleep(100000); // Endlosschleife verhindern und 100 msec. warten
                continue;
+            }
             throw $ex;
          }
       }
