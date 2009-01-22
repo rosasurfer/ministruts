@@ -68,16 +68,36 @@ final class FileSystemCache extends CachePeer {
          if (!$data)       // Cache-Miss
             return false;
 
-         // Cache-Hit, $data Format: array(timestamp, array($value, $dependency))
-         $timestamp  = $data[0];
-         $data[1]    = unserialize($data[1]);
-         $value      = $data[1][0];
-         $dependency = $data[1][1];
+         // Cache-Hit, $data Format: array(created, $expires, $value, $dependency)
+         $created    = $data[0];
+         $expires    = $data[1];
+         $value      = $data[2];
+         $dependency = $data[3];
 
-         // Dependency prüfen und Wert ggf. löschen
-         if ($dependency && !$dependency->isValid()) {
+         // expires prüfen
+         if ($expires && $created+$expires < time()) {
             $this->drop($key);
             return false;
+         }
+
+         // Dependency prüfen
+         if ($dependency) {
+            $minValid = $dependency->getMinValidity();
+
+            if ($minValid) {
+               if (time() > $created+$minValid && !WINDOWS) { // unter Windows wird $minValid ignoriert
+                  if (!$dependency->isValid()) {
+                     $this->drop($key);
+                     return false;
+                  }
+                  // created aktualisieren (Wert praktisch neu in den Cache schreiben)
+                  return $this->set($key, $value, $expires, $dependency);
+               }
+            }
+            elseif (!$dependency->isValid()) {
+               $this->drop($key);
+               return false;
+            }
          }
 
          // ok, Wert im ReferencePool speichern
@@ -143,12 +163,12 @@ final class FileSystemCache extends CachePeer {
       if ($key!==(string)$key)      throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
       if ($expires!==(int)$expires) throw new IllegalTypeException('Illegal type of parameter $expires: '.getType($expires));
 
-      // im Cache wird ein array(timestamp, array(value, dependency)) gespeichert
-      $time = time();
-      $data = array($value, $dependency);
+      // im Cache wird ein array(created, expires, value, dependency) gespeichert
+      $created = time();
 
       $file = $this->getFilePath($key);
-      $this->writeFile($file, array($time, serialize($data)), $expires);
+      $this->writeFile($file, array($created, $expires, $value, $dependency), $expires);
+
       $this->getReferencePool()->set($key, $value, $expires, $dependency);
 
       return true;
