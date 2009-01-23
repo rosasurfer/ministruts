@@ -167,11 +167,13 @@ function __autoload($className /*, $throw */) {
       if (isSet($GLOBALS['__classes'][$className])) {
          $className = $GLOBALS['__classes'][$className];
 
-         // Warnen bei relativen Dateipfaden (Performanceeinbußen in APC, siehe Setting 'apc.stat')
+         // Warnen bei relativem Pfad (verschlechtert Performance, ganz besonders mit APC-Setting 'apc.stat=0')
          $relative = WINDOWS ? !preg_match('/^[a-z]:/i', $className) : ($className{0} != '/');
          if ($relative)
             Logger ::log('Relative file name for class definition: '.$className, L_WARN, __CLASS__);
 
+         // clean up the local scope, then include the file
+         unset($relative);
          include($className.'.php');
          return true;
       }
@@ -200,7 +202,7 @@ function __autoload($className /*, $throw */) {
  * @see __autoload()
  */
 function is_class($className) {
-   if (class_exists($className, false))
+   if (class_exists($className, false) || interface_exists($className, false))
       return true;
 
    try {
