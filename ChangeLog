@@ -2,6 +2,8 @@
 
    - php/dependency/: Unterscheidung, ob $minValidity geprüft wird oder nicht, erfogt bei Dependency-Erzeugung und nicht im Cache
 
+   - php/dependency/FileDependency: Erzeugung von Dependencies für mehrere Dateien vereinfacht
+
 
 2009-01-22
 
