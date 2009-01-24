@@ -56,9 +56,11 @@ final class FrontController extends Singleton {
                // neue Instanz erzeugen ...
                $controller = Singleton ::getInstance(__CLASS__);
 
+               $dependency = FileDependency ::create($configFile);
+               if (!WINDOWS || $_SERVER['REMOTE_ADDR']!='127.0.0.1')    // Unterscheidung Production/Development
+                  $dependency->setMinValidity(60 * SECONDS);
+
                // ... und mit FileDependency cachen
-               $dependency = FileDependency ::create($configFile)
-                                            ->setMinValidity(20 * SECONDS);
                $cache->set(__CLASS__, $controller, Cache ::EXPIRES_NEVER, $dependency);
             }
 

@@ -132,9 +132,11 @@ final class Config extends Object {
                if (!$chain) $chain = $singleDependency;
                else         $chain = $chain->andDependency($singleDependency);
             }
-            $chain->setMinValidity(20 * SECONDS);
 
-            // ... und cachen
+            if (!WINDOWS || $_SERVER['REMOTE_ADDR']!='127.0.0.1')    // Unterscheidung Production/Development
+               $chain->setMinValidity(60 * SECONDS);
+
+            // ... und Config mit Dependency cachen
             $cache->set(__CLASS__, $config, Cache ::EXPIRES_NEVER, $chain);
 
             $configCached = true;

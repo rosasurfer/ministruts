@@ -84,7 +84,7 @@ final class FileSystemCache extends CachePeer {
          if ($dependency) {
             $minValid = $dependency->getMinValidity();
 
-            if ($minValid && !WINDOWS) {        // unter Windows wird $minValid ignoriert
+            if ($minValid) {
                if (time() > $created+$minValid) {
                   if (!$dependency->isValid()) {
                      $this->drop($key);
