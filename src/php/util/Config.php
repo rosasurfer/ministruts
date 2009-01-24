@@ -123,23 +123,13 @@ final class Config extends Object {
             $config       = $cached;   // $config durch $cached Version ersetzen
          }
          else {
-            // NEIN, Config cachen
-
-            // Dependency erzeugen ...
-            $chain = null;
-            foreach ($config->files as $filename => $exists) {
-               $singleDependency = FileDependency ::create($filename);
-               if (!$chain) $chain = $singleDependency;
-               else         $chain = $chain->andDependency($singleDependency);
-            }
-
+            // NEIN, Dependency erzeugen ...
+            $dependency = FileDependency ::create(array_keys($config->files));
             if (!WINDOWS || $_SERVER['REMOTE_ADDR']!='127.0.0.1')    // Unterscheidung Production/Development
-               $chain->setMinValidity(60 * SECONDS);
+               $dependency->setMinValidity(60 * SECONDS);
 
-            // ... und Config mit Dependency cachen
-            $cache->set(__CLASS__, $config, Cache ::EXPIRES_NEVER, $chain);
-
-            $configCached = true;
+            // ... und Config cachen
+            $configCached = $cache->set(__CLASS__, $config, Cache ::EXPIRES_NEVER, $dependency);
          }
       }
 

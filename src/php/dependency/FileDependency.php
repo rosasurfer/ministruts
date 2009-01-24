@@ -40,7 +40,7 @@ class FileDependency extends Dependency {
    /**
     * Constructor
     *
-    * Erzeugt eine neue FileDependency, die die Datei mit dem übergebenen Namen überwacht.
+    * Erzeugt eine neue FileDependency, die die angegebene Datei überwacht.
     *
     * @param string $fileName - Dateiname
     */
@@ -65,14 +65,28 @@ class FileDependency extends Dependency {
 
 
    /**
-    * Erzeugt eine neue FileDependency, die die Datei mit dem übergebenen Namen überwacht.
+    * Erzeugt eine neue FileDependency, die eine oder mehrere Dateien überwacht.
     *
-    * @param string $fileName - Dateiname
+    * @param mixed $fileNames - einzelner Dateiname (String) oder Array von Dateinamen
     *
-    * @return FileDependency
+    * @return Dependency
     */
-   public static function create($fileName) {
-      return new self($fileName);
+   public static function create($fileNames) {
+      if (!is_array($fileNames)) {
+         if ($fileNames!==(string)$fileNames) throw new IllegalTypeException('Illegal type of argument $fileNames: '.getType($fileNames));
+         if (!strLen($fileNames))             throw new InvalidArgumentException('Invalid argument $fileNames: '.$fileNames);
+         $fileNames = array($fileNames);
+      }
+      if (!$fileNames) throw new InvalidArgumentException('Invalid argument $fileNames: '.$fileNames);
+
+      $dependency = null;
+
+      foreach ($fileNames as $name) {
+         if (!$dependency) $dependency = new self($name);
+         else              $dependency->andDependency(new self($name));
+      }
+
+      return $dependency;
    }
 
 
