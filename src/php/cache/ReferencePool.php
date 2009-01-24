@@ -56,15 +56,17 @@ final class ReferencePool extends CachePeer {
       if (!isSet($this->pool[$key]))
          return false;
 
+
+      /*
       // Solange wir im ReferencePool nicht den created-Wert aus dem Cache haben, können wir expires
       // und minValidity nicht prüfen
-
       $dependency = $this->pool[$key][3];
 
       if ($dependency && !$dependency->getMinValidity() && !$dependency->isValid()) {
          unSet($this->pool[$key]);
          return false;
       }
+      */
 
       return true;
    }
