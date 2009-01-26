@@ -1,3 +1,8 @@
+2009-01-26
+
+   - neue: php/util/String::encodeUtf8() - Kodierung von Strings und String-Arrays
+
+
 2009-01-24
 
    - php/dependency/: Unterscheidung, ob $minValidity geprüft wird oder nicht, erfogt bei Dependency-Erzeugung und nicht im Cache
