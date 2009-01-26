@@ -84,8 +84,7 @@ final class String extends StaticClass {
 
 
    /**
-    * Dekodiert UTF-8-kodierte Strings nach ISO-8859-1. Verarbeitet sowohl einzelne Strings als auch
-    * String-Arrays.
+    * Dekodiert Strings von UTF-8 nach ISO-8859-1. Verarbeitet sowohl einzelne Strings als auch String-Arrays.
     *
     * @param mixed $string - zu dekodierende(r) String(s)
     *
@@ -93,16 +92,51 @@ final class String extends StaticClass {
     */
    public static function decodeUtf8($string) {
       if (is_array($string)) {
-         foreach ($string as $key => &$value)
-            $string[$key] = self:: decodeUtf8($value);
-         return $string;
+         $array = array();
+         foreach ($string as $key => $value) {
+            if ($key===(string)$key)
+               $key = self:: decodeUtf8($key);
+            $array[$key] = self:: decodeUtf8($value);
+         }
+         return $array;
       }
-      if ($string!==null && $string!==(string)$string) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
 
-      if ($string=='' || !self:: isUtf8Encoded($string))
+      if ($string===null || $string==='')
+         return $string;
+
+      if ($string!==(string)$string) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+
+      if (!self:: isUtf8Encoded($string))
          return $string;
 
       return html_entity_decode(htmlEntities($string, ENT_NOQUOTES, 'UTF-8'));
+   }
+
+
+   /**
+    * Kodiert Strings von ISO-8859-1 nach UTF-8. Verarbeitet sowohl einzelne Strings als auch String-Arrays.
+    *
+    * @param mixed $string - zu kodierende(r) String(s)
+    *
+    * @return mixed - kodierte(r) String(s)
+    */
+   public static function encodeUtf8($string) {
+      if (is_array($string)) {
+         $array = array();
+         foreach ($string as $key => $value) {
+            if ($key===(string)$key)
+               $key = self:: encodeUtf8($key);
+            $array[$key] = self:: encodeUtf8($value);
+         }
+         return $array;
+      }
+
+      if ($string===null || $string==='')
+         return $string;
+
+      if ($string!==(string)$string) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+
+      return utf8_encode($string);
    }
 
 
