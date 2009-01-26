@@ -76,18 +76,12 @@ if (ini_get('html_errors'))                                                   ec
 if (ini_get('enable_dl'))                                                     echoError('Warning: enable_dl is not Off');
 
 
-// MySQL-Extensions
-// ----------------
-if (!extension_loaded('mysql'))                                               echoError('Warning: mysql extension is not loaded');
-if (!extension_loaded('mysqli') && PHP_VERSION >= '5')                        echoError('Warning: mysqli extension is not loaded');
-
-
-// Mailkonfiguration
-// -----------------
-if (WINDOWS && !ini_get('sendmail_path') && !ini_get('sendmail_from') && !isSet($_SERVER['SERVER_ADMIN']))
-                                                                              echoError('Windows warning: neither sendmail_path nor sendmail_from are set');
-if (!WINDOWS && !ini_get('sendmail_path'))                                    echoError('Warning: sendmail_path is not set');
-if (isSet($_SERVER['REQUEST_METHOD']) && !isSet($_SERVER['SERVER_ADMIN']))    echoError('Warning: email address $_SERVER[\'SERVER_ADMIN\'] is not set');
+// Extensions
+// ----------
+if (!extension_loaded('mysql'))                                               echoError('Warning: MySQL extension is not loaded');
+if (!extension_loaded('mysqli'))                                              echoError('Warning: MySQLi extension is not loaded');
+if (!extension_loaded('json'))                                                echoError('Warning: JSON extension is not loaded');
+if (!WINDOWS && !extension_loaded('sysvsem'))                                 echoError('Warning: System-V Semaphore extension is not loaded');
 
 
 // Opcode-Cache
@@ -104,9 +98,12 @@ if (extension_loaded('apc')) {
 }
 
 
-// System-V Semaphores
-// -------------------
-if (!WINDOWS && !extension_loaded('sysvsem'))                                 echoError('Warning: System-V Semaphore extension is not loaded');
+// Mailkonfiguration
+// -----------------
+if (WINDOWS && !ini_get('sendmail_path') && !ini_get('sendmail_from') && !isSet($_SERVER['SERVER_ADMIN']))
+                                                                              echoError('Windows warning: neither sendmail_path nor sendmail_from are set');
+if (!WINDOWS && !ini_get('sendmail_path'))                                    echoError('Warning: sendmail_path is not set');
+if (isSet($_SERVER['REQUEST_METHOD']) && !isSet($_SERVER['SERVER_ADMIN']))    echoError('Warning: email address $_SERVER[\'SERVER_ADMIN\'] is not set');
 
 
 // Entwicklungs- bzw. Produktivsystem: Fehlerausgabe etc.
