@@ -759,12 +759,12 @@ final class Request extends Singleton {
     * @param string $message - Error-Message
     */
    public function setActionError($key, $message) {
-      if ($message === (string) $message) {
-         $this->attributes[Struts ::ACTION_ERRORS_KEY][$key] = $message;
-      }
-      elseif ($message === null) {
-         if (isSet($this->attributes[Struts ::ACTION_ERRORS_KEY]) && isSet($this->attributes[Struts ::ACTION_ERRORS_KEY][$key]))
+      if ($message === null) {
+         if (isSet($this->attributes[Struts ::ACTION_ERRORS_KEY][$key]))
             unset($this->attributes[Struts ::ACTION_ERRORS_KEY][$key]);
+      }
+      elseif ($message === (string) $message) {
+         $this->attributes[Struts ::ACTION_ERRORS_KEY][$key] = $message;
       }
       else {
          throw new IllegalTypeException('Illegal type of parameter $message: '.getType($message));
@@ -773,12 +773,46 @@ final class Request extends Singleton {
 
 
    /**
-    * Löscht alle Error-Messages aus dem Request.
+    * Löscht einzelne oder alle Error-Messages aus dem Request.
+    *
+    * @param string $key - die Schlüssel der zu löschenden Werte (ohne Angabe werden alle Error-Messages gelöscht)
+    *
+    * @return array - die gelöschten Error-Messages
     *
     * TODO: Error-Messages auch aus der Session löschen
     */
-   public function removeActionErrors() {
+   public function dropActionErrors(/*$key1, $key2, $key3 ...*/) {
+      $dropped = array();
+
+      $args = func_get_args();
+
+      if ($args) {
+         foreach ($args as $key => $value) {
+            if ($error = $this->getActionError($value)) {
+               $dropped[$value] = $error;
+               $this->setActionError($value, null);
+            }
+         }
+         return $dropped;
+      }
+
+      $dropped = $this->getActionErrors();
       unset($this->attributes[Struts ::ACTION_ERRORS_KEY]);
+      return $dropped;
+   }
+
+
+   /**
+    * Alias für self::dropActionErrors()
+    *
+    * Löscht einzelne oder alle Error-Messages aus dem Request.
+    *
+    * @param string $key - die Schlüssel der zu löschenden Werte (ohne Angabe werden alle Error-Messages gelöscht)
+    *
+    * @return array - die gelöschten Error-Messages
+    */
+   public function removeActionErrors() {
+      return $this->dropActionErrors();
    }
 
 
