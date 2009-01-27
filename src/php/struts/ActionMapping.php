@@ -417,8 +417,8 @@ class ActionMapping extends Object {
     * Sucht und gibt den ActionForward mit dem angegebenen Namen zurück. Zuerst werden die lokalen
     * Forwards des Mappings durchsucht, danach die globalen Forwards des Modules.  Wird kein Forward
     * gefunden, wird NULL zurückgegeben.  Zusätzlich zu den konfigurierten Forwards kann zur Laufzeit
-    * unter dem geschützten Namen "__self" ein Redirect-Forward auf das ActionMapping selbst abgerufen
-    * werden.
+    * unter dem geschützten Bezeichner "__self" ein Redirect-Forward auf das ActionMapping selbst
+    * abgerufen werden.
     *
     * @param string $name - logischer Name
     *
