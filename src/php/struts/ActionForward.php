@@ -140,6 +140,8 @@ class ActionForward extends Object {
          $value = '';
       if ($value!==(string)$value) throw new IllegalTypeException('Illegal type of argument $value: '.getType($value));
 
+      // TODO: Übergabe von mehreren Werten ermöglichen
+
       $separator = (strPos($this->path, '?')!==false) ? '&' : '?';
 
       $this->path .= $separator.$key.'='.str_replace(array(' ', '#', '&'), array('%20', '%23', '%26'), $value);
