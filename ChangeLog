@@ -1,6 +1,12 @@
+2009-01-27
+
+   - php/struts/Request::dropActionErrors()  =>  Alias für Request::removeActionErrors(),
+	  Request::dropActionErrors() gibt die gelöschten ErrorMessages zurück
+
+
 2009-01-26
 
-   - neue: php/util/String::encodeUtf8() - Kodierung von Strings und String-Arrays
+   - neu: php/util/String::encodeUtf8() - Kodierung von Strings und String-Arrays
 
 
 2009-01-24
