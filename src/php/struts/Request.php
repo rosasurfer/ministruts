@@ -708,8 +708,8 @@ final class Request extends Singleton {
       $errors =& $this->getAttribute(Struts ::ACTION_ERRORS_KEY);
 
       if ($key === null) {       // die erste zurückgeben
-         if ($errors !== null) {
-            foreach ($errors as &$error)
+         if ($errors) {
+            foreach ($errors as $error)
                return $error;
          }
       }                          // eine bestimmte zurückgeben
