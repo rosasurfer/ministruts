@@ -73,18 +73,20 @@ final class ReferencePool extends CachePeer {
 
 
    /**
-    * Gibt einen Wert aus dem Cache zurück.
+    * Gibt einen Wert aus dem Cache zurück.  Existiert der Wert nicht, wird der angegebene Defaultwert
+    * zurückgegeben.
     *
-    * @param string $key - Schlüssel, unter dem der Wert gespeichert ist
+    * @param string $key     - Schlüssel, unter dem der Wert gespeichert ist
+    * @param mixed  $default - Defaultwert (kann selbst auch NULL sein)
     *
     * @return mixed - Der gespeicherte Wert oder NULL, falls kein solcher Schlüssel existiert.
     *                 Achtung: Ist im Cache ein NULL-Wert gespeichert, wird ebenfalls NULL zurückgegeben.
     */
-   public function get($key) {
+   public function get($key, $default = null) {
       if ($this->isCached($key))
          return $this->pool[$key][1];
 
-      return null;
+      return $default;
    }
 
 
