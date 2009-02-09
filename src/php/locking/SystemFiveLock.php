@@ -33,7 +33,7 @@ final class SystemFiveLock extends BaseLock {
     *                            demselben Schlüssel existiert
     */
    public function __construct($key) /*throws RuntimeException*/ {
-      if ($key !== (string)$key)     throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
+      if ($key !== (string)$key)      throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
       if (isSet(self::$semIds[$key])) throw new RuntimeException('Dead-lock detected: already holding a lock for key "'.$key.'"');
 
       $decId = $this->getKeyId($key);
@@ -50,6 +50,7 @@ final class SystemFiveLock extends BaseLock {
             break;
          }
          catch (PHPErrorException $ex) {
+            // TODO: Quellcode umschreiben (ext/sysvsem/sysvsem.c) und Fehler lokalisieren
             if ($count-- && ($ex->getMessage()=='sem_get(): failed for key 0x'.$hexId.': Invalid argument'
                           || $ex->getMessage()=='sem_get(): failed acquiring SYSVSEM_SETVAL for key 0x'.$hexId.': Invalid argument'
                           || $ex->getMessage()=='sem_acquire(): failed to acquire key 0x'.$hexId.': Identifier removed')) {
