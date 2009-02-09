@@ -98,7 +98,8 @@ final class MySQLConnector extends DB {
          $error   = ($errno = mysql_errno()) ? "SQL-Error $errno: ".mysql_error() : 'Can not connect to MySQL server';
          if (self::$logDebug)
             $error .= ' (taken time: '.round($end - $start, 4).' seconds)';
-         $message = $error."\nSQL: ".str_replace(array("\r\n","\r","\n"), array("\n","\n"," "), $sql);
+         //$sql = str_replace(array("\r\n","\r","\n"), array("\n","\n"," "), $sql);
+         $message = $error."\nSQL: ".$sql;
          throw new DatabaseException($message);
       }
 
@@ -107,7 +108,7 @@ final class MySQLConnector extends DB {
       if (self::$logDebug) {
          $neededTime = round($end - $start, 4);
          if ($neededTime > self::$maxQueryTime)
-            Logger ::log("SQL statement took more than $maxTime seconds: $neededTime\n$sql", L_DEBUG, __CLASS__);
+            Logger ::log('SQL statement took more than '.self::$maxQueryTime." seconds: $neededTime\n$sql", L_DEBUG, __CLASS__);
       }
 
       return $result;
