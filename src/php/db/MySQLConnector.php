@@ -108,7 +108,7 @@ final class MySQLConnector extends DB {
          $neededTime = round($end - $start, 4);
          if ($neededTime > $maxTime) {
             $sql = str_replace(array("\r\n","\r","\n"), array("\n","\n"," "), $sql);
-            Logger ::log("SQL statement took more than $maxTime seconds: $neededTime\n\n$sql", L_DEBUG, __CLASS__);
+            Logger ::log("SQL statement took more than $maxTime seconds: $neededTime\n$sql", L_DEBUG, __CLASS__);
          }
       }
 
