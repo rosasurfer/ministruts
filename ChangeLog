@@ -1,3 +1,8 @@
+2009-02-09
+
+   - php/db/MySQLConnector: im Loglevel DEBUG und bei Exceptions wird die Ausführungsdauer der Query geloggt
+
+
 2009-01-30
 
    - neu: php/cache/CachePeer::get($key, $default)
