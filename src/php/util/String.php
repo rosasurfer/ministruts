@@ -200,4 +200,24 @@ final class String extends StaticClass {
 
       return htmlEntities($string, $quote_style, $charset, $double_encode);
    }
+
+
+   /**
+    * Entfernt Zeilenumbrüche aus einem String und ersetzt sie mit Leerzeichen.  Mehrere aufeinanderfolgende
+    * Zeilenumbrüche werden auf ein Leerzeichen reduziert.
+    *
+    * @param string $string - der zu bearbeitende String
+    *
+    * @return String
+    */
+   public static function stripLineBreaks($string) {
+      if ($string===null || $string==='')
+         return $string;
+
+      if ($string!==(string)$string) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+
+      return str_replace(array("\r\n", "\r", "\n"),
+                         array("\n"  , "\n", " " ),
+                         $string);
+   }
 }
