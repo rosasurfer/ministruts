@@ -11,8 +11,8 @@ class Logger extends StaticClass {
     * auftretende weitere Fehler zu verhindern.
     */
 
-   private static /*bool*/ $display;   // Ob das Ereignis angezeigt werden soll.
-   private static /*bool*/ $mail;      // Ob eine E-Mail verschickt werden soll.
+   private static /*bool*/ $display,   // Ob das Ereignis angezeigt werden soll.
+                  /*bool*/ $mail;      // Ob eine E-Mail verschickt werden soll.
 
 
    private static $logLevels = array(L_DEBUG  => '[Debug]' ,
