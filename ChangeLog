@@ -1,6 +1,8 @@
 2009-02-09
 
    - php/db/MySQLConnector: im Loglevel DEBUG und bei Exceptions wird die Ausführungsdauer der Query geloggt
+	
+	- neu: php/util/String::stripLineBreaks()
 
 
 2009-01-30
