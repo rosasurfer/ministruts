@@ -8,27 +8,27 @@ abstract class DB extends Object {
 
 
    /**
-    * die interne, originale Connection
+    * Das interne, originale Connection-Objekt.
     */
    protected /*resource*/ $link;
 
 
-   // credentials
-   protected $host;           // string
-   protected $port;           // string
-   protected $username;       // string
-   protected $password;       // string
-   protected $database;       // string
+   // Verbindungs- und Zugangsdaten
+   protected /*string*/ $host;
+   protected /*string*/ $port;
+   protected /*string*/ $username;
+   protected /*string*/ $password;
+   protected /*string*/ $database;
 
 
    /**
     * Transaktionszähler (0 = keine aktive Transaktion)
     */
-   private $transaction = 0;  // int
+   private /*int*/ $transaction = 0;
 
 
    /**
-    * Schützt den Konstruktor von außen, Instanzen können nur über DB::spawn() erzeugt werden.
+    * Geschützter Default-Konstruktor, Instanzen können nur über DB::spawn() erzeugt werden.
     */
    protected function __construct() { /**/ }
 
