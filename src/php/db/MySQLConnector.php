@@ -1,8 +1,26 @@
 <?
 /**
- * MySQL Connector
+ * MySQLConnector
  */
 final class MySQLConnector extends DB {
+
+
+   private static /*bool*/ $logDebug,
+                  /*bool*/ $logInfo,
+                  /*bool*/ $logNotice;
+
+
+   /**
+    * Erzeugt eine neue MySQLConnector-Instanz.
+    */
+   public function __construct() {
+      $loglevel        = Logger ::getLogLevel(__CLASS__);
+      self::$logDebug  = ($loglevel <= L_DEBUG );
+      self::$logInfo   = ($loglevel <= L_INFO  );
+      self::$logNotice = ($loglevel <= L_NOTICE);
+
+      parent ::__construct();
+   }
 
 
    /**
@@ -59,11 +77,41 @@ final class MySQLConnector extends DB {
       if (!$this->isConnected())
          $this->connect();
 
+      // ggf. Startzeitpunkt speichern
+      $start = $end = 0;
+      if (self::$logDebug)
+         $start = microTime(true);
+
+
       // Statement abschicken
-      if (!$result = mysql_query($sql, $this->link)) {
-         $error = ($errno=mysql_errno()) ? "SQL-Error $errno: ".mysql_error() : 'Can not connect to MySQL server';
-         throw new DatabaseException($error."\nSQL: ".str_replace(array("\r\n","\r","\n"), array("\n","\n"," "), $sql));
+      $result = mysql_query($sql, $this->link);
+
+
+      // ggf. Endzeitpunkt speichern
+      if (self::$logDebug)
+         $end = microTime(true);
+
+
+      // Ergebnis auswerten
+      if (!$result) {
+         $error   = ($errno = mysql_errno()) ? "SQL-Error $errno: ".mysql_error() : 'Can not connect to MySQL server';
+         if (self::$logDebug)
+            $error .= ' (taken time: '.round($end - $start, 4).' seconds)';
+         $message = $error."\nSQL: ".str_replace(array("\r\n","\r","\n"), array("\n","\n"," "), $sql);
+         throw new DatabaseException($message);
       }
+
+
+      // Zu lange Statements (> 3 Sekunden) ggf. loggen
+      if (self::$logDebug) {
+         $maxTime    = 3;
+         $neededTime = round($end - $start, 4);
+         if ($neededTime > $maxTime) {
+            $sql = str_replace(array("\r\n","\r","\n"), array("\n","\n"," "), $sql);
+            Logger ::log("SQL statement took more than $maxTime seconds: $neededTime\n\n$sql", L_DEBUG, __CLASS__);
+         }
+      }
+
       return $result;
    }
 
@@ -80,11 +128,11 @@ final class MySQLConnector extends DB {
       $result = array('set'  => null,
                       'rows' => 0);
 
-      $set = $this->queryRaw($sql);
+      $rawResult = $this->queryRaw($sql);
 
-      if (is_resource($set)) {
-         $result['set']  = $set;
-         $result['rows'] = mysql_num_rows($set);                  // Anzahl der erhaltenen Zeilen
+      if (is_resource($rawResult)) {
+         $result['set']  = $rawResult;
+         $result['rows'] = mysql_num_rows($rawResult);            // Anzahl der erhaltenen Zeilen
       }
       else {
          $sql = strToLower($sql);
