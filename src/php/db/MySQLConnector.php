@@ -98,7 +98,7 @@ final class MySQLConnector extends DB {
          $error   = ($errno = mysql_errno()) ? "SQL-Error $errno: ".mysql_error() : 'Can not connect to MySQL server';
          if (self::$logDebug)
             $error .= ' (taken time: '.round($end - $start, 4).' seconds)';
-         //$sql = str_replace(array("\r\n","\r","\n"), array("\n","\n"," "), $sql);
+         //$sql = String ::stripLineBreaks($sql);
          $message = $error."\nSQL: ".$sql;
          throw new DatabaseException($message);
       }
