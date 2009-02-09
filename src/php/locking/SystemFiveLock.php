@@ -51,6 +51,7 @@ final class SystemFiveLock extends BaseLock {
          }
          catch (PHPErrorException $ex) {
             if ($count-- && ($ex->getMessage()=='sem_get(): failed for key 0x'.$hexId.': Invalid argument'
+                          || $ex->getMessage()=='sem_get(): failed acquiring SYSVSEM_SETVAL for key 0x'.$hexId.': Invalid argument'
                           || $ex->getMessage()=='sem_acquire(): failed to acquire key 0x'.$hexId.': Identifier removed')) {
                uSleep(100000); // Endlosschleife verhindern und 100 msec. warten
                continue;
