@@ -64,8 +64,7 @@
  *
  * # Kommentar in eigener Zeile
  *
- * logger.php.struts        = info
- * logger.php.struts.Action = warn          # Kommentar innerhalb einer Zeile
+ * logger.Action = warn    # Kommentar innerhalb einer Zeile
  */
 final class Config extends Object {
 
