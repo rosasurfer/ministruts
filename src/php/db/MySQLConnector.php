@@ -7,7 +7,8 @@ final class MySQLConnector extends DB {
 
    private static /*bool*/ $logDebug,
                   /*bool*/ $logInfo,
-                  /*bool*/ $logNotice;
+                  /*bool*/ $logNotice,
+                  /*int*/  $maxQueryTime = 3; // benötigt eine Query länger als hier angegeben, wird sie im Logelevel DEBUG geloggt
 
 
    /**
@@ -77,13 +78,13 @@ final class MySQLConnector extends DB {
       if (!$this->isConnected())
          $this->connect();
 
+
       // ggf. Startzeitpunkt speichern
-      $start = $end = 0;
       if (self::$logDebug)
          $start = microTime(true);
 
 
-      // Statement abschicken
+      // Statement ausführen
       $result = mysql_query($sql, $this->link);
 
 
@@ -102,14 +103,11 @@ final class MySQLConnector extends DB {
       }
 
 
-      // Zu lange Statements (> 3 Sekunden) ggf. loggen
+      // Zu lang dauernde Statements loggen
       if (self::$logDebug) {
-         $maxTime    = 3;
          $neededTime = round($end - $start, 4);
-         if ($neededTime > $maxTime) {
-            $sql = str_replace(array("\r\n","\r","\n"), array("\n","\n"," "), $sql);
+         if ($neededTime > self::$maxQueryTime)
             Logger ::log("SQL statement took more than $maxTime seconds: $neededTime\n$sql", L_DEBUG, __CLASS__);
-         }
       }
 
       return $result;
