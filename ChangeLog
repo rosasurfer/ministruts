@@ -1,3 +1,8 @@
+2009-02-10
+
+   - php/db/MySQLConnector: bei Deadlocks und Lock-Wait-Timeouts werden die in der DB laufenden Prozesse geloggt.
+	
+
 2009-02-09
 
    - php/db/MySQLConnector: im Loglevel DEBUG und bei Exceptions wird die Ausführungsdauer der Query geloggt
