@@ -95,11 +95,17 @@ final class MySQLConnector extends DB {
 
       // Ergebnis auswerten
       if (!$result) {
-         $error   = ($errno = mysql_errno()) ? "SQL-Error $errno: ".mysql_error() : 'Can not connect to MySQL server';
+         $error = ($errno = mysql_errno()) ? "SQL-Error $errno: ".mysql_error() : 'Can not connect to MySQL server';
          if (self::$logDebug)
             $error .= ' (taken time: '.round($end - $start, 4).' seconds)';
-         //$sql = String ::stripLineBreaks($sql);
+
          $message = $error."\nSQL: ".$sql;
+
+         if ($errno==1205 || $errno==1213) {             // 1205: Lock wait timeout exceeded
+            $list = $this->printProcessList(true);       // 1213: Deadlock found when trying to get lock
+            $message .= "\n\nProcess list:\n".$list;
+         }
+
          throw new DatabaseException($message);
       }
 
@@ -140,6 +146,120 @@ final class MySQLConnector extends DB {
          }
       }
       return $result;
+   }
+
+
+   /**
+    * Liest die aktuell laufenden und für diese Connection sichtbaren Prozesse aus.
+    *
+    * @return array - Report mit Processlist-Daten
+    */
+   private function getProcessList() {
+      $oldLogDebug = self::$logDebug;
+      if ($oldLogDebug)
+         self::$logDebug = false;
+
+      $result = $this->queryRaw('show full processlist');
+
+      self::$logDebug = $oldLogDebug;
+
+      while ($data[] = mysql_fetch_assoc($result));
+      array_pop($data);
+
+      return $data;
+   }
+
+
+   /**
+    * Hilfsfunktion zur formatierten Ausgabe der aktuell laufenden Prozesse.
+    *
+    * @param bool $return - Ob die Ausgabe auf STDOUT oder als Rückgabewert der Funktion (TRUE) erfolgen soll.
+    *                       (default: FALSE)
+    *
+    * @return string - Rückgabewert, wenn $return TRUE ist, NULL andererseits
+    */
+   private function printProcessList($return = false) {
+      $list = $this->getProcessList();
+
+      $lengthId      = strLen('Id'     );
+      $lengthUser    = strLen('User'   );
+      $lengthHost    = strLen('Host'   );
+      $lengthDb      = strLen('db'     );
+      $lengthCommand = strLen('Command');
+      $lengthTime    = strLen('Time'   );
+      $lengthState   = strLen('State'  );
+      $lengthInfo    = strLen('Info'   );
+
+      foreach ($list as &$row) {
+         $row['Info'] = trim(preg_replace('/\s+/', ' ', $row['Info']));
+
+         $lengthId      = max($lengthId     , strLen($row['Id'     ]));
+         $lengthUser    = max($lengthUser   , strLen($row['User'   ]));
+         $lengthHost    = max($lengthHost   , strLen($row['Host'   ]));
+         $lengthDb      = max($lengthDb     , strLen($row['db'     ]));
+         $lengthCommand = max($lengthCommand, strLen($row['Command']));
+         $lengthTime    = max($lengthTime   , strLen($row['Time'   ]));
+         $lengthState   = max($lengthState  , strLen($row['State'  ]));
+         $lengthInfo    = max($lengthInfo   , strLen($row['Info'   ]));
+      }
+
+      // top separator line
+      $string = '+-'.str_repeat('-', $lengthId     )
+              .'-+-'.str_repeat('-', $lengthUser   )
+              .'-+-'.str_repeat('-', $lengthHost   )
+              .'-+-'.str_repeat('-', $lengthDb     )
+              .'-+-'.str_repeat('-', $lengthCommand)
+              .'-+-'.str_repeat('-', $lengthTime   )
+              .'-+-'.str_repeat('-', $lengthState  )
+              .'-+-'.str_repeat('-', $lengthInfo   )."-+\n";
+
+      // header line
+      $string .= '| '.str_pad('Id'     , $lengthId     , ' ', STR_PAD_RIGHT)
+               .' | '.str_pad('User'   , $lengthUser   , ' ', STR_PAD_RIGHT)
+               .' | '.str_pad('Host'   , $lengthHost   , ' ', STR_PAD_RIGHT)
+               .' | '.str_pad('db'     , $lengthDb     , ' ', STR_PAD_RIGHT)
+               .' | '.str_pad('Command', $lengthCommand, ' ', STR_PAD_RIGHT)
+               .' | '.str_pad('Time'   , $lengthTime   , ' ', STR_PAD_RIGHT)
+               .' | '.str_pad('State'  , $lengthState  , ' ', STR_PAD_RIGHT)
+               .' | '.str_pad('Info'   , $lengthInfo   , ' ', STR_PAD_RIGHT)." |\n";
+
+      // separator line
+      $string .= '+-'.str_repeat('-', $lengthId     )
+               .'-+-'.str_repeat('-', $lengthUser   )
+               .'-+-'.str_repeat('-', $lengthHost   )
+               .'-+-'.str_repeat('-', $lengthDb     )
+               .'-+-'.str_repeat('-', $lengthCommand)
+               .'-+-'.str_repeat('-', $lengthTime   )
+               .'-+-'.str_repeat('-', $lengthState  )
+               .'-+-'.str_repeat('-', $lengthInfo   )."-+\n";
+
+      // data lines
+      foreach ($list as $key => &$row) {
+         $string .= '| '.str_pad($row['Id'     ], $lengthId     , ' ', STR_PAD_LEFT )
+                  .' | '.str_pad($row['User'   ], $lengthUser   , ' ', STR_PAD_RIGHT)
+                  .' | '.str_pad($row['Host'   ], $lengthHost   , ' ', STR_PAD_RIGHT)
+                  .' | '.str_pad($row['db'     ], $lengthDb     , ' ', STR_PAD_RIGHT)
+                  .' | '.str_pad($row['Command'], $lengthCommand, ' ', STR_PAD_RIGHT)
+                  .' | '.str_pad($row['Time'   ], $lengthTime   , ' ', STR_PAD_LEFT )
+                  .' | '.str_pad($row['State'  ], $lengthState  , ' ', STR_PAD_RIGHT)
+                  .' | '.str_pad($row['Info'   ], $lengthInfo   , ' ', STR_PAD_RIGHT)." |\n";
+      }
+
+      // bottom separator line
+      $string .= '+-'.str_repeat('-', $lengthId     )
+               .'-+-'.str_repeat('-', $lengthUser   )
+               .'-+-'.str_repeat('-', $lengthHost   )
+               .'-+-'.str_repeat('-', $lengthDb     )
+               .'-+-'.str_repeat('-', $lengthCommand)
+               .'-+-'.str_repeat('-', $lengthTime   )
+               .'-+-'.str_repeat('-', $lengthState  )
+               .'-+-'.str_repeat('-', $lengthInfo   )."-+\n";
+
+      if ($return)
+         return $string;
+
+      echoPre($list);
+      return null;
    }
 }
 ?>
