@@ -1,3 +1,8 @@
+2009-02-12
+
+   - php/locking/SystemFiveLock: Logging von unterdrückten Fehlern
+
+
 2009-02-10
 
    - php/db/MySQLConnector: bei Deadlocks und Lock-Wait-Timeouts werden die in der DB laufenden Prozesse geloggt.
