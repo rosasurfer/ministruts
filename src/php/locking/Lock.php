@@ -22,34 +22,43 @@
 final class Lock extends BaseLock {
 
 
-   private /*Lock*/ $impl;    // konkrete Implementierung
+   // Schlüssel der im Moment gehaltenen Locks
+   private static /*string[]*/ $lockedKeys;
+
+   private /*Lock*/   $impl;  // aktuelle Implementierung der Instanz
+   private /*string*/ $key;   // aktueller Schlüssel der Instanz
 
 
    /**
     * Constructor
     *
-    * @param string $mutex - Schlüssel, auf dem ein Lock gehalten werden soll
+    * @param string $key - Schlüssel, auf dem ein Lock gehalten werden soll
     */
-   public function __construct($mutex = null) {
+   public function __construct($key = null) {
       if (func_num_args()) {
-         if ($mutex!==(string)$mutex) throw new IllegalTypeException('Illegal type of argument $mutex: '.getType($mutex));
+         if ($key!==(string)$key) throw new IllegalTypeException('Illegal type of argument $mutex: '.getType($key));
       }
       else {
-         // kein Mutex angegeben, __FILE__ & __LINE__ des aufrufenden Codes verwenden
+         // kein Schlüssel angegeben, __FILE__ & __LINE__ des aufrufenden Codes verwenden
          $trace = debug_backtrace();
-         $mutex = $trace[0]['file'].'#'.$trace[0]['line'];
+         $key   = $trace[0]['file'].'#'.$trace[0]['line'];
       }
+      if (isSet(self::$lockedKeys[$key])) throw new RuntimeException('Dead-lock detected: already holding a lock for key "'.$key.'"');
+      self::$lockedKeys[$key] = true;
 
+      $loglevel        = Logger ::getLogLevel(__CLASS__);
+
+      $this->key = $key;
 
       // konkrete Implementierung erzeugen, vorzugsweise SystemFiveLock
       if (extension_loaded('sysvsem')) {
-         $this->impl = new SystemFiveLock($mutex);
+         $this->impl = new SystemFiveLock($key);
       }
 
       // alternativ FileLock verwenden
       else {
          // Lock-Dateinamen berechnen
-         $name = md5($mutex);
+         $name = md5($key);
          $file = ini_get('session.save_path').DIRECTORY_SEPARATOR.'lock_'.$name;
 
          // Lock-Datei ggf. erzeugen
@@ -83,7 +92,10 @@ final class Lock extends BaseLock {
     * @return boolean
     */
    public function isValid() {
-      return $this->impl->isValid();
+      if ($this->impl)
+         return $this->impl->isValid();
+
+      return false;
    }
 
 
@@ -95,6 +107,9 @@ final class Lock extends BaseLock {
     * @see Lock::isValid()
     */
    public function release() {
-      return $this->impl->release(true); // true: Lockfile einer FileLock-Implementierung löschen lassen
+      if ($this->impl) {
+         $this->impl->release(true);            // true: Lockfile eines evt. FileLocks löschen lassen
+         unset(self::$lockedKeys[$this->key]);
+      }
    }
 }
