@@ -2,6 +2,10 @@
 
    - php/locking/SystemFiveLock: Logging von unterdrückten Fehlern
 
+	- php/locking: Bugfix: rekursive Lockversuche konnten unter bestimmten Umständen zu Endlosschleifen führen 
+
+	- Initialisierung von Config und Cache vereinfacht
+
 
 2009-02-10
 
