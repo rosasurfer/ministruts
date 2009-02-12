@@ -40,10 +40,12 @@ final class SystemFiveLock extends BaseLock {
       if ($key !== (string)$key)      throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
       if (isSet(self::$semIds[$key])) throw new RuntimeException('Dead-lock detected: already holding a lock for key "'.$key.'"');
 
+      /*
       $loglevel        = Logger ::getLogLevel(__CLASS__);
       self::$logDebug  = ($loglevel <= L_DEBUG );
       self::$logInfo   = ($loglevel <= L_INFO  );
       self::$logNotice = ($loglevel <= L_NOTICE);
+      */
 
       $decId = $this->getKeyId($key);
       $hexId = decHex($decId);
