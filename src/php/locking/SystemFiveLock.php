@@ -39,7 +39,7 @@ final class SystemFiveLock extends BaseLock {
       $decId = $this->getKeyId($key);
       $hexId = decHex($decId);
 
-      $count = 3; // max. Anzahl von akzeptablen Fehlern, danach wird eine auftretende Exception weitergereicht
+      $count = 3; // max. Anzahl akzeptabler Fehler, eine weitere Exception wird weitergereicht
       do {
          try {
             // unter noch unbekannten Umständen: failed for key...
@@ -53,6 +53,8 @@ final class SystemFiveLock extends BaseLock {
             // TODO: Quellcode umschreiben (ext/sysvsem/sysvsem.c) und Fehler lokalisieren
             if ($count-- && ($ex->getMessage()=='sem_get(): failed for key 0x'.$hexId.': Invalid argument'
                           || $ex->getMessage()=='sem_get(): failed acquiring SYSVSEM_SETVAL for key 0x'.$hexId.': Invalid argument'
+                          || $ex->getMessage()=='sem_get(): failed acquiring SYSVSEM_SETVAL for key 0x'.$hexId.': Identifier removed'
+                          || $ex->getMessage()=='sem_acquire(): failed to acquire key 0x'.$hexId.': Invalid argument'
                           || $ex->getMessage()=='sem_acquire(): failed to acquire key 0x'.$hexId.': Identifier removed')) {
                uSleep(100000); // Endlosschleife verhindern und 100 msec. warten
                continue;
