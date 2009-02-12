@@ -79,60 +79,45 @@ final class Config extends Object {
 
    /**
     * Gibt die Instanz dieser Klasse zurück.  Obwohl Config nicht Singleton implementiert, gibt es im
-    * User-Code nur eine einzige Instanz.
+    * User-Code nur eine einzige Instanz.  Die Konfiguration wird im Defaul-Cache gecacht.
     *
     * @return Config
     */
    public static function me() {
-      /*
-      Die Konfiguration wird gecacht und der Cache wird mit Hilfe der Konfiguration initialisiert.
-      Dadurch kommt es zu zirkulären Aufrufen zwischen Config::me() und Cache::me().  Bei solchen
-      zirkulären Aufrufen (und nur dann) gibt Cache::me() NULL zurück.
-      @see Cache::me()
-      */
-
-      static /*Config*/ $config       = null;   // emuliert Singleton (Config kann nicht Singleton sein)
-      static /*bool*/   $configCached = false;
+      static /*Config*/ $config = null;      // emuliert Singleton (Config kann nicht Singleton sein)
+      static /*bool*/   $locked = false;     // Hilfsvariable, falls me() rekursiv aufgerufen wird
 
       $cache = null;
 
       if (!$config) {
-         $cache = Cache ::me();                                                  // $cache kann NULL sein (siehe Kommentar)
-         if (!$cache || !($configCached = ($config=$cache->get(__CLASS__)))) {   // gibt es bereits eine Config im Cache ?
+         $cache  = Cache ::me();
+         $config = $cache->get(__CLASS__);   // gibt es bereits eine Config im Cache ?
 
-            $lock = new Lock(APPLICATION_NAME.'|'.__FILE__.'#'.__LINE__);
+         if (!$config) {
+            $lock = null;
 
-            if (!$cache || !($configCached = ($config=$cache->get(__CLASS__)))) {
-               $config = new self();                                             // nein, Config neu einlesen
+            if (!$locked) {
+               // Lock holen und nochmal nachschauen
+               $locked = true;
+               $lock   = new Lock(APPLICATION_NAME.'|'.__FILE__.'#'.__LINE__);
+               $config = $cache->get(__CLASS__);
+            }
+
+            if (!$config) {
+               // Config existiert tatsächlich noch nicht, also neu einlesen ...
+               $config = new self();
+
+               // ... FileDependency erzeugen ...
+               $dependency = FileDependency ::create(array_keys($config->files));
+               if (!WINDOWS || $_SERVER['REMOTE_ADDR']!='127.0.0.1')    // Unterscheidung Production/Development
+                  $dependency->setMinValidity(60 * SECONDS);
+
+               // ... und cachen
+               $cache->set(__CLASS__, $config, Cache ::EXPIRES_NEVER, $dependency);
             }
          }
       }
-      elseif (!$configCached) {
-         // Config ist noch nicht gecacht, nachschauen, ob ein Cache da ist
-         $cache = Cache ::me();
-      }
-
-
-      // Hier haben wir immer eine Config, sie ist aber evt. noch nicht gecacht
-      if ($cache && !$configCached) {
-         // Cache ist da, nochmal nachschauen, ob dort bereits eine Config liegt
-         if ($cached = $cache->get(__CLASS__)) {
-            // JA
-            $configCached = true;      // jetzt gibt es 2 Instanzen ($config + $cached, darum kann Config nicht Singleton sein)
-            $config       = $cached;   // $config durch $cached Version ersetzen
-         }
-         else {
-            // NEIN, Dependency erzeugen ...
-            $dependency = FileDependency ::create(array_keys($config->files));
-            if (!WINDOWS || $_SERVER['REMOTE_ADDR']!='127.0.0.1')    // Unterscheidung Production/Development
-               $dependency->setMinValidity(60 * SECONDS);
-
-            // ... und Config cachen
-            $configCached = $cache->set(__CLASS__, $config, Cache ::EXPIRES_NEVER, $dependency);
-         }
-      }
-
-      //Lock wird durch GarbageCollector freigegeben
+      // evt. Lock wird durch GarbageCollector freigegeben
       return $config;
    }
 
