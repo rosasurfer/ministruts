@@ -421,6 +421,10 @@ final class MySQLConnector extends DB {
       // top separator line
       $length1 = $lengthId+2+$lengthTimestring+2+$lengthUser+2+$lengthHost+2+$lengthVictim+2+$lengthTime+2+$lengthUndo+2+$lengthLStructs+2+strLen('Query');
       $length2 = $lengthId+2+$lengthTimestring+2+$lengthUser+2+$lengthHost+2+$lengthVictim+2+$lengthTime+2+$lengthUndo+2+$lengthLStructs+2+$lengthQuery;
+      if ($length2 > 900) {
+         $lengthQuery -= $length2 + 900;
+         $length2 = 900;
+      }
       $lPre    = $lPost = ($length1-strLen(' Deadlock Transactions '))/2;
       $lPost  += $length2 - $length1;
       $string = str_repeat('_', floor($lPre)).' Deadlock Transactions '.str_repeat('_', ceil($lPost))."\n";
@@ -448,6 +452,9 @@ final class MySQLConnector extends DB {
                  .'  '.str_pad($t['structs'   ], $lengthLStructs  , ' ', STR_PAD_LEFT )
                  .'  '.str_pad($t['query'     ], $lengthQuery     , ' ', STR_PAD_RIGHT)."\n";
       }
+
+      // bottom separator line
+      $string .= str_repeat('_', $length2)."\n";
 
 
       // Lockanzeige generieren
@@ -493,6 +500,9 @@ final class MySQLConnector extends DB {
                     .'  '.str_pad($l['special'   ], $lengthSpecial, ' ', STR_PAD_RIGHT)."\n";
          }
       }
+
+      // bottom separator line
+      $string .= str_repeat('_', $length)."\n";
 
 
       if ($return)
