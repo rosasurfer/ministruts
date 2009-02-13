@@ -1,5 +1,7 @@
 <?
 /**
+ *
+ *
  * MySQLConnector
  */
 final class MySQLConnector extends DB {
