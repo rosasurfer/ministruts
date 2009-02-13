@@ -113,8 +113,9 @@ final class MySQLConnector extends DB {
       // Zu lang dauernde Statements loggen
       if (self::$logDebug) {
          $neededTime = round($end - $start, 4);
-         if ($neededTime > self::$maxQueryTime)
+         if ($neededTime > self::$maxQueryTime) {
             Logger ::log('SQL statement took more than '.self::$maxQueryTime." seconds: $neededTime\n$sql", L_DEBUG, __CLASS__);
+         }
       }
 
       return $result;
@@ -293,6 +294,7 @@ final class MySQLConnector extends DB {
    private function printDeadlockStatus($return = false) {
       $status = $this->getInnoDbStatus();
 
+      // Datenformat: siehe Ende der Methode
       if (!preg_match('/\nLATEST DETECTED DEADLOCK\n-+\n(.+)\n-+\n/sU', $status, $match))
          return null;
       $status = $match[1];
@@ -303,30 +305,12 @@ final class MySQLConnector extends DB {
          self::$logNotice && Logger ::log("Error parsing deadlock status\n\n".$status, L_NOTICE, __CLASS__);
          return null;
       }
+      array_shift($blocks); // führende Timestring-Zeile entfernen
 
-
-      // Timestring auslesen
-      $time = trim(array_shift($blocks));
-      if (!preg_match('/^([0-9]{2})([0-9]{2})([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})$/', $time, $m)) {
-         self::$logNotice && Logger ::log("Error parsing deadlock status time string\n\n".$status, L_NOTICE, __CLASS__);
-         return null;
-      }
-      $yy = $m[1]; $yy = ($yy > '69' ? '19':'20').$yy;
-      $mm = $m[2];
-      $dd = $m[3];
-      $ho = $m[4];
-      $mo = $m[5];
-      $se = $m[6];
-      if (!(checkDate($mm, $dd, $yy) && $ho < 24 && $mo < 60 && $se < 60)) {
-         self::$logNotice && Logger ::log("Error parsing deadlock status time string\n\n".$status, L_NOTICE, __CLASS__);
-         return null;
-      }
-      $timestring = "$yy-$mm-$dd $ho:$mo:$se";
+      $transactions = array();
 
 
       // Blöcke parsen
-      $transactions = array();
-
       foreach ($blocks as $block) {
          $block = trim($block);
 
@@ -394,68 +378,26 @@ final class MySQLConnector extends DB {
       kSort($transactions);
 
 
-      // Transaktionsanzeige generieren
-      $lengthId         = strLen('Id'        );
-      $lengthTimestring = 19;
-      $lengthUser       = strLen('User'      );
-      $lengthHost       = strLen('Host'      );
-      $lengthVictim     = strLen('Victim'    );
-      $lengthVictim     = strLen('Victim'    );
-      $lengthTime       = strLen('Time'      );
-      $lengthUndo       = strLen('Undo'      );
-      $lengthLStructs   = strLen('LStructs'  );
-      $lengthQuery      = strLen('Query'     );
+      // Längen der Transaktionsanzeige ermitteln
+      $lengthId     = strLen('Id'    );
+      $lengthUser   = strLen('User'  );
+      $lengthHost   = strLen('Host'  );
+      $lengthVictim = strLen('Victim');
+      $lengthTime   = strLen('Time'  );
+      $lengthUndo   = strLen('Undo'  );
+      $lengthQuery  = strLen('Query' );
 
       foreach ($transactions as &$t) {
-         $lengthId       = max($lengthId      , strLen($t['connection']));
-         $lengthUser     = max($lengthUser    , strLen($t['user'      ]));
-         $lengthHost     = max($lengthHost    , strLen($t['host'      ]));
-         $lengthTime     = max($lengthTime    , strLen($t['time'      ]));
-         $lengthUndo     = max($lengthUndo    , strLen($t['undo'      ]));
-         $lengthLStructs = max($lengthLStructs, strLen($t['structs'   ]));
-         $lengthQuery    = max($lengthQuery   , strLen($t['query'     ]));
+         $lengthId    = max($lengthId   , strLen($t['connection']));
+         $lengthUser  = max($lengthUser , strLen($t['user'      ]));
+         $lengthHost  = max($lengthHost , strLen($t['host'      ]));
+         $lengthTime  = max($lengthTime , strLen($t['time'      ]));
+         $lengthUndo  = max($lengthUndo , strLen($t['undo'      ]));
+         $lengthQuery = max($lengthQuery, strLen($t['query'     ]));
       }
 
-      // top separator line
-      $length1 = $lengthId+2+$lengthTimestring+2+$lengthUser+2+$lengthHost+2+$lengthVictim+2+$lengthTime+2+$lengthUndo+2+$lengthLStructs+2+strLen('Query');
-      $length2 = $lengthId+2+$lengthTimestring+2+$lengthUser+2+$lengthHost+2+$lengthVictim+2+$lengthTime+2+$lengthUndo+2+$lengthLStructs+2+$lengthQuery;
-      if ($length2 > 900) {
-         $lengthQuery -= $length2 + 900;
-         $length2 = 900;
-      }
-      $lPre    = $lPost = ($length1-strLen(' Deadlock Transactions '))/2;
-      $lPost  += $length2 - $length1;
-      $string = str_repeat('_', floor($lPre)).' Deadlock Transactions '.str_repeat('_', ceil($lPost))."\n";
 
-      // header line
-      $string .=    str_pad('ID'        , $lengthId        , ' ', STR_PAD_RIGHT)
-              .'  '.str_pad('Timestring', $lengthTimestring, ' ', STR_PAD_RIGHT)
-              .'  '.str_pad('User'      , $lengthUser      , ' ', STR_PAD_RIGHT)
-              .'  '.str_pad('Host'      , $lengthHost      , ' ', STR_PAD_RIGHT)
-              .'  '.str_pad('Victim'    , $lengthVictim    , ' ', STR_PAD_RIGHT)
-              .'  '.str_pad('Time'      , $lengthTime      , ' ', STR_PAD_LEFT )
-              .'  '.str_pad('Undo'      , $lengthUndo      , ' ', STR_PAD_LEFT )
-              .'  '.str_pad('LStructs'  , $lengthLStructs  , ' ', STR_PAD_LEFT )
-              .'  '.str_pad('Query'     , $lengthQuery     , ' ', STR_PAD_RIGHT)."\n";
-
-      // data lines
-      foreach ($transactions as &$t) {
-         $string .=    str_pad($t['connection'], $lengthId        , ' ', STR_PAD_LEFT )
-                 .'  '.str_pad($timestring     , $lengthTimestring, ' ', STR_PAD_RIGHT)
-                 .'  '.str_pad($t['user'      ], $lengthUser      , ' ', STR_PAD_RIGHT)
-                 .'  '.str_pad($t['host'      ], $lengthHost      , ' ', STR_PAD_RIGHT)
-                 .'  '.str_pad($t['victim'    ], $lengthVictim    , ' ', STR_PAD_RIGHT)
-                 .'  '.str_pad($t['time'      ], $lengthTime      , ' ', STR_PAD_LEFT )
-                 .'  '.str_pad($t['undo'      ], $lengthUndo      , ' ', STR_PAD_LEFT )
-                 .'  '.str_pad($t['structs'   ], $lengthLStructs  , ' ', STR_PAD_LEFT )
-                 .'  '.str_pad($t['query'     ], $lengthQuery     , ' ', STR_PAD_RIGHT)."\n";
-      }
-
-      // bottom separator line
-      $string .= str_repeat('_', $length2)."\n";
-
-
-      // Lockanzeige generieren
+      // Längen der Lockanzeige ermitteln
       $lengthWaiting = strLen('Waiting');
       $lengthMode    = strLen('Mode'   );
       $lengthDb      = strLen('DB'     );
@@ -472,9 +414,46 @@ final class MySQLConnector extends DB {
          }
       }
 
+
+      // Transaktionsanzeige generieren
       // top separator line
-      $length  = $lengthId+2+$lengthWaiting+2+$lengthMode+2+$lengthDb+2+$lengthTable+2+$lengthIndex+2+$lengthSpecial;
-      $lPre    = $lPost = ($length-strLen(' Deadlock Locks '))/2;
+      $lengthL = $lengthId+2+$lengthWaiting+2+$lengthMode+2+$lengthDb+2+$lengthTable+2+$lengthIndex+2+$lengthSpecial;
+      $lengthT = $lengthId+2+$lengthUser+2+$lengthHost+2+$lengthVictim+2+$lengthTime+2+$lengthUndo+2+$lengthQuery;
+      if ($lengthT > 180) {
+         $lengthQuery -= ($lengthT - 180);
+         $lengthT = 180;
+      }
+      $lPre   = $lPost = ($lengthL-strLen(' Deadlock Transactions '))/2;
+      $lPost += $lengthT - $lengthL;
+      $string = str_repeat('_', floor($lPre)).' Deadlock Transactions '.str_repeat('_', ceil($lPost))."\n";
+
+      // header line
+      $string .=    str_pad('ID'    , $lengthId    , ' ', STR_PAD_RIGHT)
+              .'  '.str_pad('User'  , $lengthUser  , ' ', STR_PAD_RIGHT)
+              .'  '.str_pad('Host'  , $lengthHost  , ' ', STR_PAD_RIGHT)
+              .'  '.str_pad('Victim', $lengthVictim, ' ', STR_PAD_RIGHT)
+              .'  '.str_pad('Time'  , $lengthTime  , ' ', STR_PAD_LEFT )
+              .'  '.str_pad('Undo'  , $lengthUndo  , ' ', STR_PAD_LEFT )
+              .'  '.        'Query'."\n";
+
+      // data lines
+      foreach ($transactions as &$t) {
+         $string .=    str_pad($t['connection'], $lengthId    , ' ', STR_PAD_LEFT )
+                 .'  '.str_pad($t['user'      ], $lengthUser  , ' ', STR_PAD_RIGHT)
+                 .'  '.str_pad($t['host'      ], $lengthHost  , ' ', STR_PAD_RIGHT)
+                 .'  '.str_pad($t['victim'    ], $lengthVictim, ' ', STR_PAD_RIGHT)
+                 .'  '.str_pad($t['time'      ], $lengthTime  , ' ', STR_PAD_LEFT )
+                 .'  '.str_pad($t['undo'      ], $lengthUndo  , ' ', STR_PAD_LEFT )
+                 .'  '.subStr ($t['query'     ], 0, $lengthQuery)."\n";
+      }
+
+      // bottom separator line
+      $string .= str_repeat('_', $lengthT)."\n";
+
+
+      // Lockanzeige generieren
+      // top separator line
+      $lPre    = $lPost = ($lengthL-strLen(' Deadlock Locks '))/2;
       $string .= "\n\n\n".str_repeat('_', floor($lPre)).' Deadlock Locks '.str_repeat('_', ceil($lPost))."\n";
 
       // header line
@@ -500,13 +479,61 @@ final class MySQLConnector extends DB {
       }
 
       // bottom separator line
-      $string .= str_repeat('_', $length)."\n";
+      $string .= str_repeat('_', $lengthL)."\n";
 
       if ($return)
          return $string;
 
       echoPre($string);
       return null;
+
+      /*
+      ------------------------
+      LATEST DETECTED DEADLOCK
+      ------------------------
+      090213 20:12:02
+      *** (1) TRANSACTION:
+      TRANSACTION 0 56471972, ACTIVE 1 sec, process no 25931, OS thread id 81980336 starting index read
+      mysql tables in use 2, locked 2
+      LOCK WAIT 4 lock struct(s), heap size 320, undo log entries 1
+      MySQL thread id 279372, query id 1830074 server.localdomain 0.0.0.0 database Updating
+      update v_view
+            set registrations = registrations + if(@delete  , -1, if(@undelete  , +1, 0)),
+                activations   = activations   + if(@activate, +1, if(@deactivate, -1, 0))
+            where date = date(old.created)
+      *** (1) WAITING FOR THIS LOCK TO BE GRANTED:
+      RECORD LOCKS space id 0 page no 450 n bits 408 index `PRIMARY` of table `database/v_view` trx id 0 56471972 lock_mode X locks rec but not gap waiting
+      Record lock, heap no 341 PHYSICAL RECORD: n_fields 5; compact format; info bits 0
+       0: len 3; hex 8fb24d; asc   M;; 1: len 6; hex 0000035db1a0; asc    ]  ;; 2: len 7; hex 00000001c910a9; asc        ;; 3: len 4; hex 000010af; asc     ;; 4: len 4; hex 00000808; asc     ;;
+
+      *** (2) TRANSACTION:
+      TRANSACTION 0 56471970, ACTIVE 2 sec, process no 25931, OS thread id 120036272 starting index read, thread declared inside InnoDB 0
+      mysql tables in use 2, locked 2
+      11 lock struct(s), heap size 1024, undo log entries 1
+      MySQL thread id 279368, query id 1830052 server.localdomain 0.0.0.0 database executing
+      insert into v_view (date, registrations, activations)
+            select date(new.created)              as 'date',
+                   1                              as 'registrations',
+                   new.orderactivated is not null as 'activations'
+               from dual
+               where new.deleted is null
+            on duplicate key update registrations = registrations + 1,
+                                    activations   = activations + (new.orderactivated is not null)
+      *** (2) HOLDS THE LOCK(S):
+      RECORD LOCKS space id 0 page no 450 n bits 408 index `PRIMARY` of table `database/v_view` trx id 0 56471970 lock mode S locks rec but not gap
+      Record lock, heap no 341 PHYSICAL RECORD: n_fields 5; compact format; info bits 0
+       0: len 3; hex 8fb24d; asc   M;; 1: len 6; hex 0000035db1a0; asc    ]  ;; 2: len 7; hex 00000001c910a9; asc        ;; 3: len 4; hex 000010af; asc     ;; 4: len 4; hex 00000808; asc     ;;
+
+      *** (2) WAITING FOR THIS LOCK TO BE GRANTED:
+      RECORD LOCKS space id 0 page no 450 n bits 408 index `PRIMARY` of table `database/v_view` trx id 0 56471970 lock_mode X locks rec but not gap waiting
+      Record lock, heap no 341 PHYSICAL RECORD: n_fields 5; compact format; info bits 0
+       0: len 3; hex 8fb24d; asc   M;; 1: len 6; hex 0000035db1a0; asc    ]  ;; 2: len 7; hex 00000001c910a9; asc        ;; 3: len 4; hex 000010af; asc     ;; 4: len 4; hex 00000808; asc     ;;
+
+      *** WE ROLL BACK TRANSACTION (2)
+      ------------
+      TRANSACTIONS
+      ------------
+      */
    }
 }
 ?>
