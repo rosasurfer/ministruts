@@ -293,7 +293,6 @@ final class MySQLConnector extends DB {
    private function printDeadlockStatus($return = false) {
       $status = $this->getInnoDbStatus();
 
-      // siehe Formatbeispiel am Ende der Methode
       if (!preg_match('/\nLATEST DETECTED DEADLOCK\n-+\n(.+)\n-+\n/sU', $status, $match))
          return null;
       $status = $match[1];
@@ -381,8 +380,7 @@ final class MySQLConnector extends DB {
                              'special'     => str_replace(' waiting', '', $match[8]),
                              'waiting'     => (int) String ::endsWith($match[8], ' waiting', true),
                              );
-               if ($lock['waiting']) $transactions[$match[5]]['locks'][] = $lock;                // wartende Locks ans Ende (kann nur ein einziges sein)
-               else                  array_unshift($transactions[$match[5]]['locks'], $lock);    // gehaltene Locks an den Anfang
+               $transactions[$match[5]]['locks'][] = $lock;
             }
             else {
                self::$logNotice && Logger ::log("Error parsing deadlock status block\n\n".$block, L_NOTICE, __CLASS__);
@@ -421,6 +419,10 @@ final class MySQLConnector extends DB {
       // top separator line
       $length1 = $lengthId+2+$lengthTimestring+2+$lengthUser+2+$lengthHost+2+$lengthVictim+2+$lengthTime+2+$lengthUndo+2+$lengthLStructs+2+strLen('Query');
       $length2 = $lengthId+2+$lengthTimestring+2+$lengthUser+2+$lengthHost+2+$lengthVictim+2+$lengthTime+2+$lengthUndo+2+$lengthLStructs+2+$lengthQuery;
+      if ($length2 > 900) {
+         $lengthQuery -= $length2 + 900;
+         $length2 = 900;
+      }
       $lPre    = $lPost = ($length1-strLen(' Deadlock Transactions '))/2;
       $lPost  += $length2 - $length1;
       $string = str_repeat('_', floor($lPre)).' Deadlock Transactions '.str_repeat('_', ceil($lPost))."\n";
@@ -448,6 +450,9 @@ final class MySQLConnector extends DB {
                  .'  '.str_pad($t['structs'   ], $lengthLStructs  , ' ', STR_PAD_LEFT )
                  .'  '.str_pad($t['query'     ], $lengthQuery     , ' ', STR_PAD_RIGHT)."\n";
       }
+
+      // bottom separator line
+      $string .= str_repeat('_', $length2)."\n";
 
 
       // Lockanzeige generieren
@@ -494,57 +499,14 @@ final class MySQLConnector extends DB {
          }
       }
 
+      // bottom separator line
+      $string .= str_repeat('_', $length)."\n";
 
       if ($return)
          return $string;
 
       echoPre($string);
       return null;
-
-      /*
-      ------------------------
-      LATEST DETECTED DEADLOCK
-      ------------------------
-      090212 19:03:58
-      *** (1) TRANSACTION:
-      TRANSACTION 0 56092596, ACTIVE 4 sec, process no 25931, OS thread id 96791472 starting index read
-      mysql tables in use 2, locked 2
-      LOCK WAIT 4 lock struct(s), heap size 320, undo log entries 1
-      MySQL thread id 49814, query id 304437 server.localdomain 0.0.0.0 database Updating
-      update v_view
-            set registrations = registrations + if(@delete  , -1, if(@undelete  , +1, 0)),
-                activations   = activations   + if(@activate, +1, if(@deactivate, -1, 0))
-            where date = date(old.created)
-      *** (1) WAITING FOR THIS LOCK TO BE GRANTED:
-      RECORD LOCKS space id 0 page no 450 n bits 408 index `PRIMARY` of table `database/v_view` trx id 0 56092596 lock_mode X locks rec but not gap waiting
-      Record lock, heap no 340 PHYSICAL RECORD: n_fields 5; compact format; info bits 0
-       0: len 3; hex 8fb24c; asc   L;; 1: len 6; hex 00000357e787; asc    W  ;; 2: len 7; hex 00000001ca1157; asc       W;; 3: len 4; hex 00000bd4; asc     ;; 4: len 4; hex 00000627; asc    ';;
-
-      *** (2) TRANSACTION:
-      TRANSACTION 0 56092564, ACTIVE 6 sec, process no 25931, OS thread id 83479472 starting index read, thread declared inside InnoDB 0
-      mysql tables in use 2, locked 2
-      11 lock struct(s), heap size 1024, undo log entries 1
-      MySQL thread id 49800, query id 304349 server.localdomain 0.0.0.0 database executing
-      insert into v_view (date, registrations, activations)
-            select date(new.created)              as 'date',
-                   1                              as 'registrations',
-                   new.orderactivated is not null as 'activations'
-               from dual
-               where new.deleted is null
-            on duplicate key update registrations = registrations + 1,
-                                    activations   = activations + (new.orderactivated is not null)
-      *** (2) HOLDS THE LOCK(S):
-      RECORD LOCKS space id 0 page no 450 n bits 408 index `PRIMARY` of table `database/v_view` trx id 0 56092564 lock mode S locks rec but not gap
-      Record lock, heap no 340 PHYSICAL RECORD: n_fields 5; compact format; info bits 0
-       0: len 3; hex 8fb24c; asc   L;; 1: len 6; hex 00000357e787; asc    W  ;; 2: len 7; hex 00000001ca1157; asc       W;; 3: len 4; hex 00000bd4; asc     ;; 4: len 4; hex 00000627; asc    ';;
-
-      *** (2) WAITING FOR THIS LOCK TO BE GRANTED:
-      RECORD LOCKS space id 0 page no 450 n bits 408 index `PRIMARY` of table `database/v_view` trx id 0 56092564 lock_mode X locks rec but not gap waiting
-      Record lock, heap no 340 PHYSICAL RECORD: n_fields 5; compact format; info bits 0
-       0: len 3; hex 8fb24c; asc   L;; 1: len 6; hex 00000357e787; asc    W  ;; 2: len 7; hex 00000001ca1157; asc       W;; 3: len 4; hex 00000bd4; asc     ;; 4: len 4; hex 00000627; asc    ';;
-
-      *** WE ROLL BACK TRANSACTION (2)
-      */
    }
 }
 ?>
