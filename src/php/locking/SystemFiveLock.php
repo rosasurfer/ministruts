@@ -66,9 +66,9 @@ final class SystemFiveLock extends BaseLock {
                           || $ex->getMessage()=='sem_get(): failed acquiring SYSVSEM_SETVAL for key 0x'.$hexId.': Identifier removed'
                           || $ex->getMessage()=='sem_acquire(): failed to acquire key 0x'.$hexId.': Invalid argument'
                           || $ex->getMessage()=='sem_acquire(): failed to acquire key 0x'.$hexId.': Identifier removed')) {
-               self::$logInfo && Logger ::log($ex, L_INFO, __CLASS__);
+               self::$logDebug && Logger ::log($ex->getMessage().', trying again ...', L_DEBUG, __CLASS__);
 
-               uSleep(100000); // Endlosschleife verhindern und 100 msec. warten
+               uSleep(50000); // Endlosschleife verhindern und 50 msec. warten
                continue;
             }
             throw $ex;
