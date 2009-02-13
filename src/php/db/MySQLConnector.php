@@ -381,8 +381,7 @@ final class MySQLConnector extends DB {
                              'special'     => str_replace(' waiting', '', $match[8]),
                              'waiting'     => (int) String ::endsWith($match[8], ' waiting', true),
                              );
-               if ($lock['waiting']) $transactions[$match[5]]['locks'][] = $lock;                // wartende Locks ans Ende (kann nur ein einziges sein)
-               else                  array_unshift($transactions[$match[5]]['locks'], $lock);    // gehaltene Locks an den Anfang
+               $transactions[$match[5]]['locks'][] = $lock;
             }
             else {
                self::$logNotice && Logger ::log("Error parsing deadlock status block\n\n".$block, L_NOTICE, __CLASS__);
