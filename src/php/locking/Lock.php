@@ -46,22 +46,18 @@ final class Lock extends BaseLock {
       if (isSet(self::$lockedKeys[$key])) throw new RuntimeException('Dead-lock detected: already holding a lock for key "'.$key.'"');
       self::$lockedKeys[$key] = true;
 
-      $loglevel        = Logger ::getLogLevel(__CLASS__);
-
       $this->key = $key;
 
-      // konkrete Implementierung erzeugen, vorzugsweise SystemFiveLock
+      // konkretes Lock erzeugen, vorzugsweise SystemFiveLock
       if (extension_loaded('sysvsem')) {
          $this->impl = new SystemFiveLock($key);
       }
-
-      // alternativ FileLock verwenden
       else {
-         // Lock-Dateinamen berechnen
+         // alternativ FileLock verwenden, Lock-Dateinamen berechnen ...
          $name = md5($key);
          $file = ini_get('session.save_path').DIRECTORY_SEPARATOR.'lock_'.$name;
 
-         // Lock-Datei ggf. erzeugen
+         // ... und Lock-Datei erzeugen
          if (!is_file($file) && !touch($file))
             throw new RuntimeException('Cannot create lock file "'.$file.'"');
 
