@@ -6,10 +6,12 @@
 
 	- Initialisierung von Config und Cache vereinfacht
 
+	- php/db/MySQLConnector: bei Deadlocks werden die betroffenen Transaktionen und die beteiligten Locks geloggt
+
 
 2009-02-10
 
-   - php/db/MySQLConnector: bei Deadlocks und Lock-Wait-Timeouts werden die in der DB laufenden Prozesse geloggt.
+   - php/db/MySQLConnector: bei Lock-Wait-Timeouts werden die in der DB laufenden Prozesse geloggt.
 	
 
 2009-02-09
