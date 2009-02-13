@@ -101,9 +101,9 @@ final class MySQLConnector extends DB {
 
          $message = $error."\nSQL: ".$sql;
 
-         if ($errno==1205 || $errno==1213) {             // 1205: Lock wait timeout exceeded
-            $list = $this->printProcessList(true);       // 1213: Deadlock found when trying to get lock
-            $message .= "\n\nProcess list:\n".$list;
+         if ($errno == 1213) {      // 1213: Deadlock found when trying to get lock
+            $deadlockStatus = $this->printDeadlockStatus(true);
+            $message .= "\n\n".$deadlockStatus;
          }
 
          throw new DatabaseException($message);
@@ -173,7 +173,7 @@ final class MySQLConnector extends DB {
    /**
     * Hilfsfunktion zur formatierten Ausgabe der aktuell laufenden Prozesse.
     *
-    * @param bool $return - Ob die Ausgabe auf STDOUT oder als Rückgabewert der Funktion (TRUE) erfolgen soll.
+    * @param bool $return - Ob die Ausgabe auf STDOUT (FALSE) oder als Rückgabewert der Funktion (TRUE) erfolgen soll.
     *                       (default: FALSE)
     *
     * @return string - Rückgabewert, wenn $return TRUE ist, NULL andererseits
@@ -191,7 +191,7 @@ final class MySQLConnector extends DB {
       $lengthInfo    = strLen('Info'   );
 
       foreach ($list as &$row) {
-         $row['Info'] = trim(preg_replace('/\s+/', ' ', $row['Info']));
+         $row['Info'] = trim(String ::stripDoubleSpaces($row['Info']));
 
          $lengthId      = max($lengthId     , strLen($row['Id'     ]));
          $lengthUser    = max($lengthUser   , strLen($row['User'   ]));
@@ -260,6 +260,291 @@ final class MySQLConnector extends DB {
 
       echoPre($list);
       return null;
+   }
+
+
+   /**
+    * Liest den aktuellen InnoDB-Status der Datenbank aus.
+    *
+    * @return string - Report mit Status-Daten
+    */
+   private function getInnoDbStatus() {
+      $oldLogDebug = self::$logDebug;
+      if ($oldLogDebug)
+         self::$logDebug = false;
+
+      // TODO: Vorsicht vor 1227: Access denied; you need the SUPER privilege for this operation
+      $result = $this->queryRaw('show engine innodb status');
+
+      self::$logDebug = $oldLogDebug;
+
+      return trim(mysql_result($result, 0))."\n";
+   }
+
+
+   /**
+    * Gibt eine aufbereitete und formatierte Version des aktuellen InnoDB-Deadlock-Status der Datenbank aus.
+    *
+    * @param bool $return - Ob die Ausgabe auf STDOUT (FALSE) oder als Rückgabewert der Funktion (TRUE) erfolgen soll.
+    *                       (default: FALSE)
+    *
+    * @return string - Rückgabewert, wenn $return TRUE ist, NULL andererseits
+    */
+   private function printDeadlockStatus($return = false) {
+      $status = $this->getInnoDbStatus();
+
+      // siehe Formatbeispiel am Ende der Methode
+      if (!preg_match('/\nLATEST DETECTED DEADLOCK\n-+\n(.+)\n-+\n/sU', $status, $match))
+         return null;
+      $status = $match[1];
+
+      // Blöcke trennen
+      $blocks = explode("\n*** ", $status);
+      if (!$blocks) {
+         self::$logNotice && Logger ::log("Error parsing deadlock status\n\n".$status, L_NOTICE, __CLASS__);
+         return null;
+      }
+
+
+      // Timestring auslesen
+      $time = trim(array_shift($blocks));
+      if (!preg_match('/^([0-9]{2})([0-9]{2})([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})$/', $time, $m)) {
+         self::$logNotice && Logger ::log("Error parsing deadlock status time string\n\n".$status, L_NOTICE, __CLASS__);
+         return null;
+      }
+      $yy = $m[1]; $yy = ($yy > '69' ? '19':'20').$yy;
+      $mm = $m[2];
+      $dd = $m[3];
+      $ho = $m[4];
+      $mo = $m[5];
+      $se = $m[6];
+      if (!(checkDate($mm, $dd, $yy) && $ho < 24 && $mo < 60 && $se < 60)) {
+         self::$logNotice && Logger ::log("Error parsing deadlock status time string\n\n".$status, L_NOTICE, __CLASS__);
+         return null;
+      }
+      $timestring = "$yy-$mm-$dd $ho:$mo:$se";
+
+
+      // Blöcke parsen
+      $transactions = array();
+
+      foreach ($blocks as $block) {
+         $block = trim($block);
+
+         // Roll back block
+         if (String ::startsWith($block, 'WE ROLL BACK TRANSACTION ', true)) {
+            if (!preg_match('/^WE ROLL BACK TRANSACTION \((\d+)\)$/i', $block, $match)) {
+               self::$logNotice && Logger ::log("Error parsing deadlock status roll back block\n\n".$block, L_NOTICE, __CLASS__);
+               return null;
+            }
+            foreach ($transactions as &$transaction) {
+               $transaction['victim'] = ($transaction['no']==(int) $match[1]) ? 'Yes':'No';
+            }
+         }
+         else {
+            $lines = explode("\n", $block);
+            if (sizeOf($lines) < 2) {
+               self::$logNotice && Logger ::log("Error parsing deadlock status block\n\n".$block, L_NOTICE, __CLASS__);
+               return null;
+            }
+            // Transaction block
+            if (String ::startsWith($lines[1], 'TRANSACTION ', true)) {
+               if (!preg_match('/\s*\((\d+)\).*\nTRANSACTION \d+ (\d+), ACTIVE (\d+) sec.+\n(LOCK WAIT )?(\d+) lock struct.+, undo log entries (\d+).*\nMySQL thread id (\d+), query id \d+ (\S+) \S+ (\S+).+?\n(.+)$/is', $block, $match)) {
+                  self::$logNotice && Logger ::log("Error parsing deadlock status transaction block\n\n".$block, L_NOTICE, __CLASS__);
+                  return null;
+               }
+               $transaction = array('no'          => (int) $match[1],
+                                    'transaction' => (int) $match[2],
+                                    'time'        => (int) $match[3],
+                                    'structs'     => (int) $match[5],
+                                    'undo'        => (int) $match[6],
+                                    'connection'  => (int) $match[7],
+                                    'host'        =>       $match[8],
+                                    'user'        =>       $match[9],
+                                    'query'       => trim(String ::stripDoubleSpaces(String ::stripLineBreaks($match[10]))),
+                                    'locks'       => array(),
+                                    );
+               $transactions[$match[2]] = $transaction;
+            }
+            // Lock block
+            elseif (String ::startsWith($lines[1], 'RECORD LOCKS ', true)) {
+               if (!preg_match('/\s*\((\d+)\).*\nRECORD LOCKS space id \d+ page no \d+ n bits \d+ index `(\S+)` of table `([^\/]+)\/([^`]+)` trx id \d+ (\d+) lock(_| )mode (S|X) locks\s(.+(waiting)?)/i', $block, $match)) {
+                  self::$logNotice && Logger ::log("Error parsing deadlock status lock block\n\n".$block, L_NOTICE, __CLASS__);
+                  return null;
+               }
+               $lock = array('no'          => (int) $match[1],
+                             'index'       =>       $match[2],
+                             'db'          =>       $match[3],
+                             'table'       =>       $match[4],
+                             'transaction' => (int) $match[5],
+                             'mode'        => strToUpper($match[7]),
+                             'special'     => str_replace(' waiting', '', $match[8]),
+                             'waiting'     => (int) String ::endsWith($match[8], ' waiting', true),
+                             );
+               if ($lock['waiting']) $transactions[$match[5]]['locks'][] = $lock;                // wartende Locks ans Ende (kann nur ein einziges sein)
+               else                  array_unshift($transactions[$match[5]]['locks'], $lock);    // gehaltene Locks an den Anfang
+            }
+            else {
+               self::$logNotice && Logger ::log("Error parsing deadlock status block\n\n".$block, L_NOTICE, __CLASS__);
+               return null;
+            }
+         }
+      }
+
+
+      // Transaktionen nach Transaktions-Nr. sortieren
+      kSort($transactions);
+
+
+      // Transaktionsanzeige generieren
+      $lengthId         = strLen('Id'        );
+      $lengthTimestring = 19;
+      $lengthUser       = strLen('User'      );
+      $lengthHost       = strLen('Host'      );
+      $lengthVictim     = strLen('Victim'    );
+      $lengthVictim     = strLen('Victim'    );
+      $lengthTime       = strLen('Time'      );
+      $lengthUndo       = strLen('Undo'      );
+      $lengthLStructs   = strLen('LStructs'  );
+      $lengthQuery      = strLen('Query'     );
+
+      foreach ($transactions as &$t) {
+         $lengthId       = max($lengthId      , strLen($t['connection']));
+         $lengthUser     = max($lengthUser    , strLen($t['user'      ]));
+         $lengthHost     = max($lengthHost    , strLen($t['host'      ]));
+         $lengthTime     = max($lengthTime    , strLen($t['time'      ]));
+         $lengthUndo     = max($lengthUndo    , strLen($t['undo'      ]));
+         $lengthLStructs = max($lengthLStructs, strLen($t['structs'   ]));
+         $lengthQuery    = max($lengthQuery   , strLen($t['query'     ]));
+      }
+
+      // top separator line
+      $length1 = $lengthId+2+$lengthTimestring+2+$lengthUser+2+$lengthHost+2+$lengthVictim+2+$lengthTime+2+$lengthUndo+2+$lengthLStructs+2+strLen('Query');
+      $length2 = $lengthId+2+$lengthTimestring+2+$lengthUser+2+$lengthHost+2+$lengthVictim+2+$lengthTime+2+$lengthUndo+2+$lengthLStructs+2+$lengthQuery;
+      $lPre    = $lPost = ($length1-strLen(' Deadlock Transactions '))/2;
+      $lPost  += $length2 - $length1;
+      $string = str_repeat('_', floor($lPre)).' Deadlock Transactions '.str_repeat('_', ceil($lPost))."\n";
+
+      // header line
+      $string .=    str_pad('ID'        , $lengthId        , ' ', STR_PAD_RIGHT)
+              .'  '.str_pad('Timestring', $lengthTimestring, ' ', STR_PAD_RIGHT)
+              .'  '.str_pad('User'      , $lengthUser      , ' ', STR_PAD_RIGHT)
+              .'  '.str_pad('Host'      , $lengthHost      , ' ', STR_PAD_RIGHT)
+              .'  '.str_pad('Victim'    , $lengthVictim    , ' ', STR_PAD_RIGHT)
+              .'  '.str_pad('Time'      , $lengthTime      , ' ', STR_PAD_LEFT )
+              .'  '.str_pad('Undo'      , $lengthUndo      , ' ', STR_PAD_LEFT )
+              .'  '.str_pad('LStructs'  , $lengthLStructs  , ' ', STR_PAD_LEFT )
+              .'  '.str_pad('Query'     , $lengthQuery     , ' ', STR_PAD_RIGHT)."\n";
+
+      // data lines
+      foreach ($transactions as &$t) {
+         $string .=    str_pad($t['connection'], $lengthId        , ' ', STR_PAD_LEFT )
+                 .'  '.str_pad($timestring     , $lengthTimestring, ' ', STR_PAD_RIGHT)
+                 .'  '.str_pad($t['user'      ], $lengthUser      , ' ', STR_PAD_RIGHT)
+                 .'  '.str_pad($t['host'      ], $lengthHost      , ' ', STR_PAD_RIGHT)
+                 .'  '.str_pad($t['victim'    ], $lengthVictim    , ' ', STR_PAD_RIGHT)
+                 .'  '.str_pad($t['time'      ], $lengthTime      , ' ', STR_PAD_LEFT )
+                 .'  '.str_pad($t['undo'      ], $lengthUndo      , ' ', STR_PAD_LEFT )
+                 .'  '.str_pad($t['structs'   ], $lengthLStructs  , ' ', STR_PAD_LEFT )
+                 .'  '.str_pad($t['query'     ], $lengthQuery     , ' ', STR_PAD_RIGHT)."\n";
+      }
+
+
+      // Lockanzeige generieren
+      $lengthWaiting = strLen('Waiting');
+      $lengthMode    = strLen('Mode'   );
+      $lengthDb      = strLen('DB'     );
+      $lengthTable   = strLen('Table'  );
+      $lengthIndex   = strLen('Index'  );
+      $lengthSpecial = strLen('Special');
+
+      foreach ($transactions as &$t) {
+         foreach ($t['locks'] as &$l) {
+            $lengthDb      = max($lengthDb     , strLen($l['db'     ]));
+            $lengthTable   = max($lengthTable  , strLen($l['table'  ]));
+            $lengthIndex   = max($lengthIndex  , strLen($l['index'  ]));
+            $lengthSpecial = max($lengthSpecial, strLen($l['special']));
+         }
+      }
+
+      // top separator line
+      $length  = $lengthId+2+$lengthWaiting+2+$lengthMode+2+$lengthDb+2+$lengthTable+2+$lengthIndex+2+$lengthSpecial;
+      $lPre    = $lPost = ($length-strLen(' Deadlock Locks '))/2;
+      $string .= "\n\n\n".str_repeat('_', floor($lPre)).' Deadlock Locks '.str_repeat('_', ceil($lPost))."\n";
+
+      // header line
+      $string .=    str_pad('ID'     , $lengthId     , ' ', STR_PAD_RIGHT)
+              .'  '.str_pad('Waiting', $lengthWaiting, ' ', STR_PAD_LEFT )
+              .'  '.str_pad('Mode'   , $lengthMode   , ' ', STR_PAD_RIGHT)
+              .'  '.str_pad('DB'     , $lengthDb     , ' ', STR_PAD_RIGHT)
+              .'  '.str_pad('Table'  , $lengthTable  , ' ', STR_PAD_RIGHT)
+              .'  '.str_pad('Index'  , $lengthIndex  , ' ', STR_PAD_RIGHT)
+              .'  '.str_pad('Special', $lengthSpecial, ' ', STR_PAD_RIGHT)."\n";
+
+      // data lines
+      foreach ($transactions as &$t) {
+         foreach ($t['locks'] as &$l) {
+            $string .=    str_pad($t['connection'], $lengthId     , ' ', STR_PAD_LEFT )
+                    .'  '.str_pad($l['waiting'   ], $lengthWaiting, ' ', STR_PAD_LEFT )
+                    .'  '.str_pad($l['mode'      ], $lengthMode   , ' ', STR_PAD_RIGHT)
+                    .'  '.str_pad($l['db'        ], $lengthDb     , ' ', STR_PAD_RIGHT)
+                    .'  '.str_pad($l['table'     ], $lengthTable  , ' ', STR_PAD_RIGHT)
+                    .'  '.str_pad($l['index'     ], $lengthIndex  , ' ', STR_PAD_RIGHT)
+                    .'  '.str_pad($l['special'   ], $lengthSpecial, ' ', STR_PAD_RIGHT)."\n";
+         }
+      }
+
+
+      if ($return)
+         return $string;
+
+      echoPre($string);
+      return null;
+
+      /*
+      ------------------------
+      LATEST DETECTED DEADLOCK
+      ------------------------
+      090212 19:03:58
+      *** (1) TRANSACTION:
+      TRANSACTION 0 56092596, ACTIVE 4 sec, process no 25931, OS thread id 96791472 starting index read
+      mysql tables in use 2, locked 2
+      LOCK WAIT 4 lock struct(s), heap size 320, undo log entries 1
+      MySQL thread id 49814, query id 304437 server.localdomain 0.0.0.0 database Updating
+      update v_view
+            set registrations = registrations + if(@delete  , -1, if(@undelete  , +1, 0)),
+                activations   = activations   + if(@activate, +1, if(@deactivate, -1, 0))
+            where date = date(old.created)
+      *** (1) WAITING FOR THIS LOCK TO BE GRANTED:
+      RECORD LOCKS space id 0 page no 450 n bits 408 index `PRIMARY` of table `database/v_view` trx id 0 56092596 lock_mode X locks rec but not gap waiting
+      Record lock, heap no 340 PHYSICAL RECORD: n_fields 5; compact format; info bits 0
+       0: len 3; hex 8fb24c; asc   L;; 1: len 6; hex 00000357e787; asc    W  ;; 2: len 7; hex 00000001ca1157; asc       W;; 3: len 4; hex 00000bd4; asc     ;; 4: len 4; hex 00000627; asc    ';;
+
+      *** (2) TRANSACTION:
+      TRANSACTION 0 56092564, ACTIVE 6 sec, process no 25931, OS thread id 83479472 starting index read, thread declared inside InnoDB 0
+      mysql tables in use 2, locked 2
+      11 lock struct(s), heap size 1024, undo log entries 1
+      MySQL thread id 49800, query id 304349 server.localdomain 0.0.0.0 database executing
+      insert into v_view (date, registrations, activations)
+            select date(new.created)              as 'date',
+                   1                              as 'registrations',
+                   new.orderactivated is not null as 'activations'
+               from dual
+               where new.deleted is null
+            on duplicate key update registrations = registrations + 1,
+                                    activations   = activations + (new.orderactivated is not null)
+      *** (2) HOLDS THE LOCK(S):
+      RECORD LOCKS space id 0 page no 450 n bits 408 index `PRIMARY` of table `database/v_view` trx id 0 56092564 lock mode S locks rec but not gap
+      Record lock, heap no 340 PHYSICAL RECORD: n_fields 5; compact format; info bits 0
+       0: len 3; hex 8fb24c; asc   L;; 1: len 6; hex 00000357e787; asc    W  ;; 2: len 7; hex 00000001ca1157; asc       W;; 3: len 4; hex 00000bd4; asc     ;; 4: len 4; hex 00000627; asc    ';;
+
+      *** (2) WAITING FOR THIS LOCK TO BE GRANTED:
+      RECORD LOCKS space id 0 page no 450 n bits 408 index `PRIMARY` of table `database/v_view` trx id 0 56092564 lock_mode X locks rec but not gap waiting
+      Record lock, heap no 340 PHYSICAL RECORD: n_fields 5; compact format; info bits 0
+       0: len 3; hex 8fb24c; asc   L;; 1: len 6; hex 00000357e787; asc    W  ;; 2: len 7; hex 00000001ca1157; asc       W;; 3: len 4; hex 00000bd4; asc     ;; 4: len 4; hex 00000627; asc    ';;
+
+      *** WE ROLL BACK TRANSACTION (2)
+      */
    }
 }
 ?>
