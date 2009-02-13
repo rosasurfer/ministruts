@@ -220,4 +220,21 @@ final class String extends StaticClass {
                          array("\n"  , "\n", " " ),
                          $string);
    }
+
+
+   /**
+    * Ersetzt in einem String mehrfache durch einfache Leerzeichen.
+    *
+    * @param string $string - der zu bearbeitende String
+    *
+    * @return String
+    */
+   public static function stripDoubleSpaces($string) {
+      if ($string===null || $string==='')
+         return $string;
+
+      if ($string!==(string)$string) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+
+      return preg_replace('/\s+/', ' ', $string);
+   }
 }
