@@ -102,6 +102,9 @@ final class MySQLConnector extends DB {
 
          $message .= "\nSQL: ".$sql;
 
+         if ($errno == 1205)           // 1205: Lock wait timeout exceeded
+            $message .= "\n\n".$this->printProcessList(true);
+
          if ($errno == 1213)           // 1213: Deadlock found when trying to get lock
             $message .= "\n\n".$this->printDeadlockStatus(true);
 
