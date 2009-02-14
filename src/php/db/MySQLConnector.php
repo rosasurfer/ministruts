@@ -14,7 +14,7 @@ final class MySQLConnector extends DB {
    /**
     * Erzeugt eine neue MySQLConnector-Instanz.
     */
-   public function __construct() {
+   protected function __construct() {
       $loglevel        = Logger ::getLogLevel(__CLASS__);
       self::$logDebug  = ($loglevel <= L_DEBUG );
       self::$logInfo   = ($loglevel <= L_INFO  );
@@ -95,16 +95,15 @@ final class MySQLConnector extends DB {
 
       // Ergebnis auswerten
       if (!$result) {
-         $error = ($errno = mysql_errno()) ? "SQL-Error $errno: ".mysql_error() : 'Can not connect to MySQL server';
+         $message = ($errno = mysql_errno()) ? "SQL-Error $errno: ".mysql_error() : 'Can not connect to MySQL server';
+
          if (self::$logDebug)
-            $error .= ' (taken time: '.round($end - $start, 4).' seconds)';
+            $message .= ' (taken time: '.round($end - $start, 4).' seconds)';
 
-         $message = $error."\nSQL: ".$sql;
+         $message .= "\nSQL: ".$sql;
 
-         if ($errno == 1213) {      // 1213: Deadlock found when trying to get lock
-            $deadlockStatus = $this->printDeadlockStatus(true);
-            $message .= "\n\n".$deadlockStatus;
-         }
+         if ($errno == 1213)           // 1213: Deadlock found when trying to get lock
+            $message .= "\n\n".$this->printDeadlockStatus(true);
 
          throw new DatabaseException($message);
       }
@@ -113,9 +112,8 @@ final class MySQLConnector extends DB {
       // Zu lang dauernde Statements loggen
       if (self::$logDebug) {
          $neededTime = round($end - $start, 4);
-         if ($neededTime > self::$maxQueryTime) {
+         if ($neededTime > self::$maxQueryTime)
             Logger ::log('SQL statement took more than '.self::$maxQueryTime." seconds: $neededTime\n$sql", L_DEBUG, __CLASS__);
-         }
       }
 
       return $result;
