@@ -67,7 +67,6 @@ class SMTPMailer extends Mailer {
       $this->config = array_merge($this->config, $options);
 
 
-
       // get our hostname
       $hostname = php_uName('n');
       if (!$hostname)
