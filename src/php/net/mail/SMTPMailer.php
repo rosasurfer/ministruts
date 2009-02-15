@@ -40,6 +40,12 @@ class SMTPMailer extends Mailer {
     * ...
     */
 
+   private static /*bool*/ $logDebug,
+                  /*bool*/ $logInfo,
+                  /*bool*/ $logNotice,
+                  /*int*/  $maxSendingTime = 2;    // benötigt der Versand länger als hier angegeben, wird er im Logelevel DEBUG geloggt
+
+
    private /*array*/ $config = array('host'          => null,     // SMTP server host name
                                      'port'          => null,     // SMTP server port
                                      'auth_username' => null,     // authentification username
@@ -59,6 +65,12 @@ class SMTPMailer extends Mailer {
     * @param array $options - Mailer-Optionen
     */
    protected function __construct(array $options) {
+      $loglevel        = Logger ::getLogLevel(__CLASS__);
+      self::$logDebug  = ($loglevel <= L_DEBUG );
+      self::$logInfo   = ($loglevel <= L_INFO  );
+      self::$logNotice = ($loglevel <= L_NOTICE);
+
+
       // Defaultwerte aus PHP-Konfiguration übernehmen...
       $this->config['host'] = ini_get('SMTP');
       $this->config['port'] = ini_get('smtp_port');
@@ -192,6 +204,11 @@ class SMTPMailer extends Mailer {
          if ($header!==(string)$header) throw new IllegalTypeException('Illegal parameter type in argument $headers[$key]: '.getType($header));
 
 
+      // ggf. Startzeitpunkt speichern
+      if (self::$logDebug)
+         $start = microTime(true);
+
+
       if (is_resource($this->connection))
          $this->logBuffer = null;         // reset log buffer if already connected
 
@@ -263,7 +280,7 @@ class SMTPMailer extends Mailer {
       $this->writeData('');
 
 
-      $maxLineLength = 990;   // eigentlich 998, doch FastMail nimmt 990
+      $maxLineLength = 990;   // eigentlich 998, doch FastMail nimmt auch nur 990
 
       // mail body
       $message = str_replace(array("\r\n", "\r"), array("\n", "\n"), $message);
@@ -296,6 +313,19 @@ class SMTPMailer extends Mailer {
       $this->parseResponse($response);
       if ($this->responseStatus != 250)
          throw new RuntimeException('Sent data not accepted: '.$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
+
+
+      // ggf. Endzeitpunkt speichern
+      if (self::$logDebug)
+         $end = microTime(true);
+
+
+      // Zu lang dauernden Versand loggen
+      if (self::$logDebug) {
+         $neededTime = round($end - $start, 4);
+         if ($neededTime > self::$maxSendingTime)
+            Logger ::log(__METHOD__.'() to '.$to['address'].' took more than '.self::$maxSendingTime.' seconds: '.$neededTime, L_DEBUG, __CLASS__);
+      }
    }
 
 
