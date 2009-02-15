@@ -160,7 +160,7 @@ class Logger extends StaticClass {
    public static function handleException(Exception $exception, $destructor = false) {
       self ::init();
 
-      // Bei Aufruf aus einem Destruktor VOR dem Shutdown kann die Exception zurückgereicht werden.
+      // Bei Aufruf aus einem Destruktor *vor* dem Shutdown kann die Exception zurückgereicht werden.
       if ($destructor && !isSet($GLOBALS['$__shutdown']))
          return;
 
@@ -169,25 +169,25 @@ class Logger extends StaticClass {
       $traceStr = ($exception instanceof NestableException) ? "Stacktrace:\n-----------\n".$exception->printStackTrace(true) : 'Stacktrace not available';
       $file     =  $exception->getFile();
       $line     =  $exception->getLine();
-      $plainMessage = 'Uncaught '.$message."\nin ".$file.' on line '.$line."\n";
+      $plainMessage = '[FATAL] Uncaught '.$message."\nin ".$file.' on line '.$line."\n";
 
 
       // 2. Exception anzeigen (wenn $display TRUE ist)
       if (self::$display) {
          if (isSet($_SERVER['REQUEST_METHOD'])) {
-            echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif"><b>Uncaught</b> '.nl2br(htmlSpecialChars($message, ENT_QUOTES))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
-            echo '<br>'.htmlSpecialChars($message, ENT_QUOTES).'<br><br>'.printFormatted($traceStr, true);
+            echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif"><b>[FATAL] Uncaught</b> '.nl2br(htmlSpecialChars($message, ENT_QUOTES))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
+            echo '<br>'.printFormatted($traceStr, true);
             echo "<br></div>\n";
          }
          else {
-            echo $plainMessage."\n\n".$message."\n\n\n".$traceStr."\n";    // PHP gibt den Fehler unter Linux zusätzlich auf stderr aus,
-         }                                                                 // also auf der Konsole ggf. unterdrücken
+            echo $plainMessage."\n".$traceStr."\n";   // PHP gibt den Fehler unter Linux zusätzlich auf stderr aus,
+         }                                            // also auf der Konsole ggf. unterdrücken
       }
 
 
       // 3. Exception an die registrierten Adressen mailen (wenn $mail TRUE ist) ...
       if (self::$mail && ($addresses = explode(',', Config ::get('mail.buglovers')))) {
-         $mailMsg  = $plainMessage."\n\n".$message."\n\n\n".$traceStr;
+         $mailMsg  = $plainMessage."\n".$traceStr;
 
          $request = Request ::me();
          if ($request) {
@@ -199,7 +199,7 @@ class Logger extends StaticClass {
                $ip = $host.' ('.$ip.')';
 
             $mailMsg .= "\n\n\nRequest:\n--------\n".$request."\n\n\n"
-                     .  "Session: ".($session ? "\n--------\n".$session."\n\n\n" : "  (no session)\n")
+                     .  "Session: ".($session ? "\n--------\n".$session."\n\n\n" : "  - no session -\n")
                      .  "Host:      ".$ip."\n"
                      .  "Timestamp: ".date('Y-m-d H:i:s')."\n";
          }
@@ -217,7 +217,7 @@ class Logger extends StaticClass {
             // TODO: Adressformat validieren
             if ($address) {
                // TODO: Header mit Fehlermeldung hinzufügen, damit beim Empfänger Messagefilter unterstützt werden
-               $success = error_log($mailMsg, 1, $address, 'Subject: PHP error_log: Uncaught Exception at '.(isSet($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : '').$_SERVER['PHP_SELF']);
+               $success = error_log($mailMsg, 1, $address, 'Subject: PHP: [FATAL] Uncaught Exception at '.(isSet($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : '').$_SERVER['PHP_SELF']);
                if (!$success) {
                   error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', $plainMessage), 0);
                   break;
