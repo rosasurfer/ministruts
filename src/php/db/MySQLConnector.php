@@ -115,7 +115,7 @@ final class MySQLConnector extends DB {
       // Zu lang dauernde Statements loggen
       if (self::$logDebug) {
          $neededTime = round($end - $start, 4);
-         if ($neededTime > self::$maxQueryTime) 
+         if ($neededTime > self::$maxQueryTime)
             Logger ::log('SQL statement took more than '.self::$maxQueryTime." seconds: $neededTime\n$sql", L_DEBUG, __CLASS__);
       }
 
@@ -296,9 +296,12 @@ final class MySQLConnector extends DB {
       $status = $this->getInnoDbStatus();
 
       // Datenformat: siehe Ende der Methode
-      if (!preg_match('/\nLATEST DETECTED DEADLOCK\n-+\n(.+)\n-+\n/sU', $status, $match))
+      if (!preg_match('/\nLATEST DETECTED DEADLOCK\n-+\n(.+)\n-+\n/sU', $status, $match)) {
+         self::$logNotice && Logger ::log("Error parsing InnoDB status\n\n".$status, L_NOTICE, __CLASS__);
          return null;
+      }
       $status = $match[1];
+
 
       // Blöcke trennen
       $blocks = explode("\n*** ", $status);
