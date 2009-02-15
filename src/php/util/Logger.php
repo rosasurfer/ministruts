@@ -353,7 +353,7 @@ class Logger extends StaticClass {
                $ip = $host.' ('.$ip.')';
 
             $mailMsg .= "\n\n\nRequest:\n--------\n".$request."\n\n\n"
-                     .  "Session: ".($session ? "\n--------\n".$session."\n\n\n" : "  (no session)\n")
+                     .  "Session: ".($session ? "\n--------\n".$session."\n\n\n" : "  - no session -\n")
                      .  "Host:      ".$ip."\n"
                      .  "Timestamp: ".date('Y-m-d H:i:s')."\n";
          }
