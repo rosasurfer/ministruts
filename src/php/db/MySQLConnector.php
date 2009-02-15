@@ -115,7 +115,7 @@ final class MySQLConnector extends DB {
       // Zu lang dauernde Statements loggen
       if (self::$logDebug) {
          $neededTime = round($end - $start, 4);
-         if ($neededTime > self::$maxQueryTime)
+         if ($neededTime > self::$maxQueryTime) 
             Logger ::log('SQL statement took more than '.self::$maxQueryTime." seconds: $neededTime\n$sql", L_DEBUG, __CLASS__);
       }
 
@@ -352,7 +352,7 @@ final class MySQLConnector extends DB {
             }
             // Lock block
             elseif (String ::startsWith($lines[1], 'RECORD LOCKS ', true)) {
-               if (!preg_match('/\s*\((\d+)\).*\nRECORD LOCKS space id \d+ page no \d+ n bits \d+ index `(\S+)` of table `([^\/]+)\/([^`]+)` trx id \d+ (\d+) lock(_| )mode (S|X) locks\s(.+(waiting)?)/i', $block, $match)) {
+               if (!preg_match('/\s*\((\d+)\).*\nRECORD LOCKS space id \d+ page no \d+ n bits \d+ index `(\S+)` of table `([^\/]+)\/([^`]+)` trx id \d+ (\d+) lock(_| )mode (S|X)( locks (.+))?( waiting)?/i', $block, $match)) {
                   self::$logNotice && Logger ::log("Error parsing deadlock status lock block\n\n".$block, L_NOTICE, __CLASS__);
                   return null;
                }
@@ -362,9 +362,11 @@ final class MySQLConnector extends DB {
                              'table'       =>       $match[4],
                              'transaction' => (int) $match[5],
                              'mode'        => strToUpper($match[7]),
-                             'special'     => str_replace(' waiting', '', $match[8]),
-                             'waiting'     => (int) String ::endsWith($match[8], ' waiting', true),
+                             'special'     => ($special = isSet($match[9]) ? $match[9] : ''),
+                             'waiting'     => (string)(int) (String ::endsWith($special, ' waiting', true) || (isSet($match[10]) && $match[10]==' waiting')),
                              );
+               if (String ::endsWith($special, ' waiting', true))
+                  $lock['special'] = subStr($special, 0, strLen($special)-8);
                $transactions[$match[5]]['locks'][] = $lock;
             }
             else {
@@ -521,7 +523,7 @@ final class MySQLConnector extends DB {
             on duplicate key update registrations = registrations + 1,
                                     activations   = activations + (new.orderactivated is not null)
       *** (2) HOLDS THE LOCK(S):
-      RECORD LOCKS space id 0 page no 450 n bits 408 index `PRIMARY` of table `database/v_view` trx id 0 56471970 lock mode S locks rec but not gap
+      RECORD LOCKS space id 0 page no 450 n bits 408 index `PRIMARY` of table `database/v_view` trx id 0 56471970 lock mode S
       Record lock, heap no 341 PHYSICAL RECORD: n_fields 5; compact format; info bits 0
        0: len 3; hex 8fb24d; asc   M;; 1: len 6; hex 0000035db1a0; asc    ]  ;; 2: len 7; hex 00000001c910a9; asc        ;; 3: len 4; hex 000010af; asc     ;; 4: len 4; hex 00000808; asc     ;;
 
