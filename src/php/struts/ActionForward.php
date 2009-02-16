@@ -129,16 +129,18 @@ class ActionForward extends Object {
     * Fügt dem Querystring dieses ActionForwards ein weiteres Key-Value-Paar hinzu.
     *
     * @param string $key   - Schlüssel
-    * @param string $value - Wert
+    * @param scalar $value - Wert (int|float|string|bool)
     *
     * @return ActionForward
     */
    public function addQueryData($key, $value) {
-      if ($this->configured)       throw new IllegalStateException('Configuration is frozen');
-      if ($key!==(string)$key)     throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
-      if ($value === null)
-         $value = '';
-      if ($value!==(string)$value) throw new IllegalTypeException('Illegal type of argument $value: '.getType($value));
+      if ($this->configured)      throw new IllegalStateException('Configuration is frozen');
+      if ($key!==(string)$key)    throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
+      if ($value === null)        $value = '';
+      elseif (is_bool($value))    $value = (int) $value;
+      elseif (!is_scalar($value)) throw new IllegalTypeException('Illegal type of argument $value: '.getType($value));
+
+      $value = (string) $value;
 
       // TODO: Übergabe von mehreren Werten ermöglichen
 
