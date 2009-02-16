@@ -1,3 +1,8 @@
+2009-02-16
+
+   - php/struts/ActionForward::addQueryData() akzeptiert alle skalaren Werte als Value (vorher nur Strings)
+
+
 2009-02-12
 
    - php/locking/SystemFiveLock: Logging von unterdrückten Fehlern
