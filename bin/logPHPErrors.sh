@@ -34,7 +34,7 @@ for file ; do
     # ... jede Zeile an jede E-Mail-Adresse schicken, ...
     while read line ; do
         for address in $addresses ; do
-            echo 'PHP error in: '$file $'\n\n'$line | mail -s "PHP error_log: [Fatal] Uncatched error" $address
+            echo 'PHP error in: '$file $'\n\n'$line | mail -s "PHP: [FATAL] Uncatched error" $address
         done
     done < "$file.tmp"
 
