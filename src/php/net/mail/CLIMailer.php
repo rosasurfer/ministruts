@@ -11,7 +11,7 @@ class CLIMailer extends Mailer {
     * @param array $options - Mailer-Optionen
     */
    protected function __construct(array $options) {
-      throw new UnimplementedFeatureException('Method is not implemented: '.__METHOD__);
+      throw new UnimplementedFeatureException('Method '.get_class($this).'::'.__FUNCTION__.'() is not implemented');
    }
 
 
@@ -25,7 +25,7 @@ class CLIMailer extends Mailer {
     * @param array  $headers  - zusätzliche zu setzende Mail-Header
     */
    public function sendMail($sender, $receiver, $subject, $message, array $headers = null) {
-      throw new UnimplementedFeatureException('Method is not implemented: '.__METHOD__);
+      throw new UnimplementedFeatureException('Method '.get_class($this).'::'.__FUNCTION__.'() is not implemented');
    }
 }
 ?>

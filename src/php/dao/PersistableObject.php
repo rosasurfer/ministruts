@@ -149,7 +149,7 @@ abstract class PersistableObject extends Object implements IDaoConnected {
     * @return PersistableObject
     */
    protected function insert() {
-      throw new UnimplementedFeatureException('Method '.__METHOD__.' not implemented');
+      throw new UnimplementedFeatureException('Method '.get_class($this).'::'.__FUNCTION__.'() is not implemented');
    }
 
 
@@ -160,7 +160,7 @@ abstract class PersistableObject extends Object implements IDaoConnected {
     * @return PersistableObject
     */
    protected function update() {
-      throw new UnimplementedFeatureException('Method '.__METHOD__.' not implemented');
+      throw new UnimplementedFeatureException('Method '.get_class($this).'::'.__FUNCTION__.'() is not implemented');
    }
 
 
@@ -182,7 +182,7 @@ abstract class PersistableObject extends Object implements IDaoConnected {
     * @return NULL
     */
    public function delete() {
-      throw new UnimplementedFeatureException('Method '.__METHOD__.' not implemented');
+      throw new UnimplementedFeatureException('Method '.get_class($this).'::'.__FUNCTION__.'() is not implemented');
    }
 
 
