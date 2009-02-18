@@ -105,20 +105,6 @@ abstract class CachePeer extends Object {
 
 
    /**
-    * Alias für $self::drop()
-    *
-    * Löscht einen Wert aus dem Cache.
-    *
-    * @param string $key - Schlüssel, unter dem der Wert gespeichert ist
-    *
-    * @return boolean - TRUE bei Erfolg, FALSE, falls kein solcher Schlüssel existiert
-    */
-   final public function delete($key) {
-      return $this->drop($key);
-   }
-
-
-   /**
     * Speichert einen Wert im Cache nur dann, wenn noch kein Wert unter dem angegebenen Schlüssel
     * existiert.  Läuft die angegebene Zeitspanne ab oder ändert sich der Status der angegebenen
     * Abhängigkeit, wird der Wert automatisch ungültig.
