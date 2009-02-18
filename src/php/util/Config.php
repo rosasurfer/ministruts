@@ -109,7 +109,7 @@ final class Config extends Object {
 
                // ... FileDependency erzeugen ...
                $dependency = FileDependency ::create(array_keys($config->files));
-               if (!WINDOWS || $_SERVER['REMOTE_ADDR']!='127.0.0.1')    // Unterscheidung Production/Development
+               if (!WINDOWS || (isSet($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR']!='127.0.0.1'))    // Unterscheidung Production/Development
                   $dependency->setMinValidity(60 * SECONDS);
 
                // ... und cachen
