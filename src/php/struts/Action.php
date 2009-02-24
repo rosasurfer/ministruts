@@ -71,7 +71,7 @@ abstract class Action extends Object {
     * Allgemeiner Post-Processing-Hook, der von Subklassen bei Bedarf überschrieben werden kann.
     *
     * Besondere Vorsicht ist anzuwenden, da zu dem Zeitpunkt, da diese Methode aufgerufen wird, der
-    * Content schon ausgeliefert und der Response schon fertiggestellt sein kann. Die Methode ist für
+    * Content schon ausgeliefert und der Response schon fertiggestellt sein KANN. Die Methode ist für
     * Aufräumarbeiten nützlich, z.B. das Committen von Transaktionen oder das Schließen von
     * Datenbankverbindungen.
     * Die Default-Implementierung macht nichts.
