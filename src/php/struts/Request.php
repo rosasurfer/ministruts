@@ -820,9 +820,7 @@ final class Request extends Singleton {
     * Verhindert das Serialisieren von Request-Instanzen.
     */
    final public function __sleep() {
-      $ex = new IllegalStateException('You cannot serialize me: '.__CLASS__);
-      Logger ::log($ex, L_ERROR, __CLASS__);
-      throw $ex;
+      throw new IllegalStateException('You cannot serialize me: '.__CLASS__);
    }
 
 

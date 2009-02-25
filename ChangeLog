@@ -1,5 +1,10 @@
 2009-02-16
 
+   - php/util/Logger: loggt auch bei normalen Logmessages einen Stacktrace (auch ohne Exception)
+
+
+2009-02-16
+
    - php/struts/ActionForward::addQueryData() akzeptiert alle skalaren Werte als Value (vorher nur Strings)
 
 
