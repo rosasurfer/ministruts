@@ -70,19 +70,13 @@ abstract class NestableException extends Exception {
 
 
    /**
-    * Gibt den Stacktrace dieser Exception zurück, der wie ein Java-Stacktrace interpretiert werden kann.
+    * Wandelt den übergebenen Stacktrace in einen Java-ähnlichen Stacktrace um.
+    *
+    * @parameter array - zu bearbeitender Stacktrace
     *
     * @return array - java-ähnlicher Stacktrace
     */
-   protected function &getJavaStackTrace() {
-      $trace = parent:: getTrace();
-
-      /*
-      foreach ($trace as &$frame)
-         unset($frame['args']);
-      echoPre($trace);
-      */
-
+   final public static function transformToJavaStackTrace(array $trace) {
       $trace[] = array('function' => 'main');      // Für die Java-Ähnlichkeit wird ein zusätzlicher Frame fürs Hauptscript angefügt und
                                                    // alle FILE- und LINE-Felder um eine Position nach hinten verschoben.
       for ($i=sizeOf($trace); $i--;) {
@@ -106,18 +100,12 @@ abstract class NestableException extends Exception {
     *
     * @return array - java-ähnlicher Stacktrace
     */
-   public function &getStackTrace() {
-      $trace = $this->trace;
+   public function getStackTrace() {
+      $trace =& $this->trace;
 
       // Stacktrace anpassen und zwischenspeichern
       if ($trace === null) {
-         $trace =& $this->getJavaStackTrace();
-
-         /*
-         foreach ($trace as &$frame)
-            unset($frame['args']);
-         echoPre($trace);
-         */
+         $trace = self ::transformToJavaStackTrace(parent:: getTrace());
 
          // Der erste Frame wird mit den Werten der Exception bestückt.
          $trace[0]['file'] = $this->file;
@@ -147,48 +135,65 @@ abstract class NestableException extends Exception {
     *
     * @return string - NULL oder formatierter, java-ähnlicher Stacktrace
     */
-   public function printStackTrace($return = false) {
-      $string = $this->traceString;
+   final public function printStackTrace($return = false) {
+      $result =& $this->traceString;
 
       // Stacktrace formatieren und Ergebnis zwischenspeichern
-      if ($string === null) {
-         $trace =& $this->getStackTrace();
+      if ($result === null) {
+         $result = self ::formatStackTrace($this->getStackTrace());
 
-         $size = sizeOf($trace);
-         $callLen = $lineLen = 0;
-
-         for ($i=0; $i < $size; $i++) {                        // FILE und LINE untereinander ausrichten
-            $frame =& $trace[$i];
-            $call = null;
-            if (isSet($frame['class']))
-               $call = $frame['class'].$frame['type'];
-            $call .= $frame['function'].'() ';
-            $callLen = max($callLen, strLen($call));
-            $frame['call'] = $call;
-
-            $frame['line'] = isSet($frame['line']) ? " # line $frame[line]," : '';
-            $lineLen = max($lineLen, strLen($frame['line']));
-
-            $frame['file'] = isSet($frame['file']) ? " file: $frame[file]" : ' [php]';
-         }
-         for ($i=0; $i < $size; $i++) {
-            $string .= str_pad($trace[$i]['call'], $callLen).str_pad($trace[$i]['line'], $lineLen).$trace[$i]['file']."\n";
-         }
          if ($this->cause !== null) {
+            $result .= "\n\n\ncaused by\n".$this->cause."\n\nStacktrace:\n-----------\n";
             if ($this->cause instanceof NestableException)
-               $string .= "\n\n\ncaused by\n".$this->cause."\n\nStacktrace:\n-----------\n".$this->cause->printStackTrace(true);
-            else
-               $string .= "\n\n\ncaused by\n".$this->cause."\n\nStacktrace not available\n";
+               $result .= $this->cause->printStackTrace(true);
+            else {
+               $result .= self ::formatStackTrace(self ::transformToJavaStackTrace($this->cause->getTrace()));
+            }
          }
-
-         $this->traceString = $string;
+         $this->traceString =& $result;
       }
 
       if ($return)
-         return $string;
+         return $result;
 
-      echo $string;
+      echo $result;
       return null;
+   }
+
+
+   /**
+    * Gibt eine formatierte, lesbare Version eines Stacktrace zurück.
+    *
+    * @param array $trace - Stacktrace
+    *
+    * @return string - lesbarer Stacktrace
+    */
+   final public static function formatStackTrace(array $trace) {
+      $result = null;
+
+      $size = sizeOf($trace);
+      $callLen = $lineLen = 0;
+
+      for ($i=0; $i < $size; $i++) {                        // FILE und LINE untereinander ausrichten
+         $frame =& $trace[$i];
+         $call = null;
+         if (isSet($frame['class']))
+            $call = $frame['class'].$frame['type'];
+         $call .= $frame['function'].'() ';
+         $callLen = max($callLen, strLen($call));
+         $frame['call'] = $call;
+
+         $frame['line'] = isSet($frame['line']) ? " # line $frame[line]," : '';
+         $lineLen = max($lineLen, strLen($frame['line']));
+
+         $frame['file'] = isSet($frame['file']) ? " file: $frame[file]" : ' [php]';
+      }
+
+      for ($i=0; $i < $size; $i++) {
+         $result .= str_pad($trace[$i]['call'], $callLen).str_pad($trace[$i]['line'], $lineLen).$trace[$i]['file']."\n";
+      }
+
+      return $result;
    }
 
 

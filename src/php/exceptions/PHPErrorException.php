@@ -40,17 +40,11 @@ class PHPErrorException extends NestableException {
     *
     * @return array - Stacktrace
     */
-   public function &getStackTrace() {
-      $trace = $this->trace;
+   public function getStackTrace() {
+      $trace =& $this->trace;
 
       if ($trace === null) {
-         $trace =& $this->getJavaStackTrace();
-
-         /*
-         foreach ($trace as &$frame)
-            unset($frame['args']);
-         echoPre($trace);
-         */
+         $trace = parent ::transformToJavaStackTrace(parent:: getTrace());
 
          // Die ersten beiden Frames können weg: 1. ErrorHandler (Logger::handleError), 2: Handlerdefinition (__lambda_func)
          array_shift($trace);

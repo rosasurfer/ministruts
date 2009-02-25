@@ -121,6 +121,8 @@ class Logger extends StaticClass {
     *                   weitergereicht werden soll, als wenn der ErrorHandler nicht registriert wäre
     */
    public static function handleError($level, $message, $file, $line, array $context) {
+      //echoPre($message.', $file: '.$file.', $line: '.$line);
+
       // absichtlich unterdrückte und vom aktuellen Errorlevel nicht abgedeckte Fehler ignorieren
       $error_reporting = error_reporting();     // 0: @-Operator
       if ($error_reporting==0 || ($error_reporting & $level) != $level)
@@ -189,9 +191,8 @@ class Logger extends StaticClass {
       if (self::$mail && ($addresses = explode(',', Config ::get('mail.buglovers')))) {
          $mailMsg  = $plainMessage."\n".$traceStr;
 
-         $request = Request ::me();
-         if ($request) {
-            $session = $request && $request->isSession() ? print_r($_SESSION, true) : null;
+         if ($request=Request ::me()) {
+            $session = $request->isSession() ? print_r($_SESSION, true) : null;
 
             $ip   = $_SERVER['REMOTE_ADDR'];
             $host = getHostByAddr($ip);
@@ -276,9 +277,9 @@ class Logger extends StaticClass {
       // Aufruf mit drei Argumenten
       if ($args == 3) {
          if ($message===null || $message===(string)$message)
-            return self:: _log($message, null, $level);           // Logger::log($message  , $level, $class)
+            return self:: _log($message, null, $level);        // Logger::log($message  , $level, $class)
          if ($exception instanceof Exception)
-            return self:: _log(null, $exception, $level);         // Logger::log($exception, $level, $class)
+            return self:: _log(null, $exception, $level);      // Logger::log($exception, $level, $class)
          throw new IllegalTypeException('Illegal type of first parameter: '.getType($arg1));
       }
 
@@ -286,7 +287,7 @@ class Logger extends StaticClass {
       if ($message!==null && $message!==(string)$message)        throw new IllegalTypeException('Illegal type of parameter $message: '.getType($message));
       if ($exception!==null && !$exception instanceof Exception) throw new IllegalTypeException('Illegal type of parameter $exception: '.(is_object($exception) ? get_class($exception) : getType($exception)));
 
-      return self:: _log($message, $exception, $level);           // Logger::log($message, $exception, $level, $class)
+      return self:: _log($message, $exception, $level);        // Logger::log($message, $exception, $level, $class)
    }
 
 
@@ -304,19 +305,33 @@ class Logger extends StaticClass {
       self ::init();
 
       // 1. Logdaten ermitteln
-      $exMessage = $exTraceStr = null;
+      $exMessage = null;
       if ($exception) {
-         $message   .= ($message === null) ? (string) $exception : ' ('.get_class($exception).')';
-         $exMessage  = ($exception instanceof NestableException) ? (string) $exception : get_class($exception).': '.$exception->getMessage();;
-         $exTraceStr = ($exception instanceof NestableException) ? "Stacktrace:\n-----------\n".$exception->printStackTrace(true) : 'Stacktrace not available';
+         $message  .= ($message === null) ? (string) $exception : ' ('.get_class($exception).')';
+         $exMessage = ($exception instanceof NestableException) ? (string) $exception : get_class($exception).': '.$exception->getMessage();;
       }
 
-      $trace = debug_backtrace();
+      if ($exception instanceof NestableException) {
+         $trace = $exception->getStackTrace();
+         $file  = $exception->getFile();
+         $line  = $exception->getLine();
+         $trace = "Stacktrace:\n-----------\n".$exception->printStackTrace(true);
+      }
+      else {
+         $trace = $exception ? $exception->getTrace() : debug_backtrace();
+         $trace = NestableException ::transformToJavaStackTrace($trace);
+         array_shift($trace);
+         array_shift($trace);          // die ersten beiden Frames können weg: 1. Logger::_log(), 2: Logger::log()
 
-      while (!isSet($trace[1]['file']))      // wenn 'file' nicht existiert, kommt der Aufruf aus dem Kernel (z.B. Errorhandler)
-         array_shift($trace);                // also Einstiegspunkt im User-Code suchen
-      $file = $trace[1]['file'];
-      $line = $trace[1]['line'];
+         foreach ($trace as $f) {      // ersten Frame mit __FILE__ suchen
+            if (isSet($f['file'])) {
+               $file = $f['file'];
+               $line = $f['line'];
+               break;
+            }
+         }
+         $trace = "Stacktrace:\n-----------\n".NestableException ::formatStackTrace($trace);
+      }
 
       $plainMessage = self::$logLevels[$level].': '.$message."\nin ".$file.' on line '.$line."\n";
 
@@ -326,26 +341,21 @@ class Logger extends StaticClass {
          if (isSet($_SERVER['REQUEST_METHOD'])) {
             echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.self::$logLevels[$level].'</b>: '.nl2br(htmlSpecialChars($message, ENT_QUOTES))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
             if ($exception)
-               echo '<br>'.htmlSpecialChars($exMessage, ENT_QUOTES).'<br><br>'.printFormatted($exTraceStr, true);
-            echo "<br></div>\n";
+               echo '<br>'.htmlSpecialChars($exMessage, ENT_QUOTES).'<br>';
+            echo '<br>'.printFormatted($trace, true)."<br></div>\n";
          }
          else {
-            echo $plainMessage;
-            if ($exception)
-               echo "\n".$exMessage."\n\n".$exTraceStr."\n";
+            echo $plainMessage.($exception ? "\n".$exMessage."\n":'')."\n".$trace."\n";
          }
       }
 
 
       // 3. Logmessage an die registrierten Adressen mailen (wenn $mail TRUE ist) ...
       if (self::$mail && ($addresses = explode(',', Config ::get('mail.buglovers')))) {
-         $mailMsg = $plainMessage;
-         if ($exception)
-            $mailMsg .= "\n\n".$exMessage."\n\n\n".$exTraceStr;
+         $mailMsg = $plainMessage.($exception ? "\n\n".$exMessage."\n":'')."\n\n".$trace;
 
-         $request = Request ::me();
-         if ($request) {
-            $session = $request && $request->isSession() ? print_r($_SESSION, true) : null;
+         if ($request=Request ::me()) {
+            $session = $request->isSession() ? print_r($_SESSION, true) : null;
 
             $ip   = $_SERVER['REMOTE_ADDR'];
             $host = getHostByAddr($ip);
