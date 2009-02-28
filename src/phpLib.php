@@ -9,30 +9,31 @@ set_error_handler    (create_function('$level, $message, $file, $line, array $co
 set_exception_handler(create_function('Exception $exception'                          , 'return Logger::handleException($exception);'                          ));
 
 
+
 // Shutdown markieren (damit Exceptions während des Shutdowns keinen fatalen Fehler auslösen)
 // ------------------------------------------------------------------------------------------
-register_shutdown_function('mark_shutdown');
-function mark_shutdown() {
-   $GLOBALS['$__shutdown'] = true;
-}
+function mark_shutdown() { $GLOBALS['$__shutdown'] = true; }
+register_shutdown_function('mark_shutdown');                                  // wird als erste Shutdown-Funktion ausgeführt
 
 
 
 // -----------------------------------------------------------------------------------------------------------------------------------
 // ggf. Profiler starten
-if (extension_loaded('APD') && (isSet($_REQUEST['_PROFILE_']) || isSet($_REQUEST['_PROFILER_']))) {
+if (extension_loaded('APD') && isSet($_REQUEST['_PROFILE_'])) {
    $dumpFile = apd_set_pprof_trace(ini_get('apd.dumpdir'));
-
    if ($dumpFile) {
       // tatsächlichen Aufrufer des Scripts in weiterer Datei hinterlegen
-      $fH = fOpen($dumpFile.'.caller', 'wb');
-      fWrite($fH, 'caller='.apd_get_url()."\n\nEND_HEADER\n");
-      fClose($fH);
-      unset($fH);
-   }
+      $prot = isSet($_SERVER['HTTPS']) ? 'https':'http';
+      $host = $_SERVER['SERVER_NAME'];
+      $port = $_SERVER['SERVER_PORT']=='80' ? '':':'.$_SERVER['SERVER_PORT'];
+      $url  = "$prot://$host$port".$_SERVER['REQUEST_URI'];
 
-   register_shutdown_function('apd_shutdown_function', $dumpFile);
-   unset($dumpFile);
+      $fH = fOpen($dumpFile.'.caller', 'wb');
+      fWrite($fH, "caller=$url\n\nEND_HEADER\n");
+      fClose($fH);
+   }
+   register_stacked_shutdown_function('apd_on_shutdown', array($dumpFile));   // wird als letzte Shutdown-Funktion ausgeführt
+   unset($dumpFile, $fH, $prot, $host, $port, $url);
 }
 // -----------------------------------------------------------------------------------------------------------------------------------
 
@@ -191,26 +192,95 @@ function __autoload($className /*, $throw */) {
 /**
  * Ob der angegebene Klassenname definiert ist.  Diese Funktion ist notwendig, weil eine einfache
  * Abfrage der Art "if (class_exist($className, true))" __autoload() aufruft und dabei im Fehlerfall
- * das Script mit einem fatalen Fehler beendet (__autoload darf keine Exceptions werfen).
+ * das Script mit einem fatalen Fehler beendet (__autoload darf aber keine Exceptions werfen).
  * Wird __autoload() aus dieser Funktion und nicht aus dem PHP-Kernel aufgerufen, werden Exceptions
  * weitergereicht und der folgende Code kann entsprechend reagieren.
  *
- * @param string $className - Klassenname
+ * @param string $name - Klassenname
  *
  * @return boolean
  *
  * @see __autoload()
  */
-function is_class($className) {
-   if (class_exists($className, false) || interface_exists($className, false))
+function is_class($name) {
+   if (class_exists($name, false))
       return true;
 
    try {
-      return (bool) __autoload($className, true);
+      return (bool) __autoload($name, true);
    }
    catch (ClassNotFoundException $ex) { /* yes, we eat it */ }
 
    return false;
+}
+
+
+/**
+ * Ob der angegebene Interface-Name definiert ist.  Diese Funktion ist notwendig, weil eine einfache
+ * Abfrage der Art "if (interface_exist($interfaceName, true))" __autoload() aufruft und dabei im Fehlerfall
+ * das Script mit einem fatalen Fehler beendet (__autoload darf aber keine Exceptions werfen).
+ * Wird __autoload() aus dieser Funktion und nicht aus dem PHP-Kernel aufgerufen, werden Exceptions
+ * weitergereicht und der folgende Code kann entsprechend reagieren.
+ *
+ * @param string $name - Interface-Name
+ *
+ * @return boolean
+ *
+ * @see __autoload()
+ */
+function is_interface($name) {
+   if (interface_exists($name, false))
+      return true;
+
+   try {
+      return (bool) __autoload($name, true);
+   }
+   catch (ClassNotFoundException $ex) { /* yes, we eat it */ }
+
+   return false;
+}
+
+
+/**
+ * Diese Funktion registriert wie register_shutdown_function() Funktionen oder Methoden zur Ausführung
+ * während des Script-Shutdowns.  Zusätzlich kann angegeben werden, ob die Callback-Handler in der Reihenfolge
+ * der Registrierung (FIFO; wie register_shutdown_function()) oder umgekehrt (LIFO) erfolgen soll.
+ *
+ * @param callable $callback - Callback-Handler (Funktion oder Methode)
+ * @param array    $args     - dem Callback-Handler zu übergebende Argumente
+ * @param boolean  $lifo     - bestimmt die Position des Handlers innerhalb der registrierten Handler
+ *                             und damit die Reihenfolge des Aufrufs (TRUE: LIFO, FALSE: FIFO)
+ *
+ * @see register_shutdown_function()
+ */
+function register_stacked_shutdown_function(/*callable*/ $callback = null, array $args = null, $lifo = true) {
+   static $functions = array();
+
+   if ($callback === null) {
+      $trace = debug_backTrace();
+      $frame = array_pop($trace); // der letzte Frame
+
+      if (!isSet($frame['file']) && !isSet($frame['line'])) {     // wenn Aufruf aus PHP-Core, also während des Script-Shutdowns ...
+         for ($i=sizeOf($functions); $i; ) {                      // ... alle registrierten Funktionen rückwärts abarbeiten
+            $f = $functions[--$i];
+            call_user_func_array($f['name'], $f['args']);
+         }
+         return;
+      }
+   }
+
+   $name = null;
+   if (!is_string($callback) && !is_array($callback)) throw new IllegalTypeException('Illegal type of parameter $callback: '.getType($callback));
+   if (!is_callable($callback, false, $name))        throw new InvalidArgumentException('Invalid callback "'.$name.'" passed');
+   if ($args!==null && !is_array($args))              throw new IllegalTypeException('Illegal type of parameter $args: '.getType($args));
+   if (!is_bool($lifo))                               throw new IllegalTypeException('Illegal type of parameter $lifo: '.getType($lifo));
+
+   if (!$functions)
+      register_shutdown_function(__FUNCTION__);
+
+   $function = array('name' => $callback, 'args' => $args);
+   if ($lifo) $functions[] = $function;
+   else       array_unshift($functions, $function);
 }
 
 
@@ -480,44 +550,26 @@ function ifNull($value, $altValue) {
 
 
 /**
- * Nur für APD: Gibt die vollständige URL des Requests zurück.
- *
- * @return string
- */
-function apd_get_url() {
-   $proto = isSet($_SERVER['HTTPS']) ? 'https' : 'http';
-   $host  = $_SERVER['SERVER_NAME'];
-   $port  = $_SERVER['SERVER_PORT']=='80' ? '' : ':'.$_SERVER['SERVER_PORT'];
-   $url   = "$proto://$host$port".$_SERVER['REQUEST_URI'];
-   return $url;
-}
-
-
-/**
  * Nur für APD: Shutdown-Function, fügt nach dem Profiling einen Link zum Report in die Seite ein.
  */
-function apd_shutdown_function($dumpFile = null) {
+function apd_on_shutdown($dumpFile = null) {
    if (!headers_sent())
       flush();
 
    // überprüfen, ob der aktuelle Content HTML ist (z.B. nicht bei Downloads)
-   $isHTML = false;
+   $html = false;
    foreach (headers_list() as $header) {
       $parts = explode(':', $header, 2);
       if (strToLower($parts[0]) == 'content-type') {
-         $isHTML = (striPos(trim($parts[1]), 'text/html') === 0);
+         $html = (striPos(trim($parts[1]), 'text/html') === 0);
          break;
       }
    }
 
    // bei HTML-Content Link auf Profiler-Report ausgeben
-   if ($isHTML) {
-      if ($dumpFile) {
-         echo('<p style="clear:both; text-align:left; margin:6px"><a href="/apd/?file='.$dumpFile.'" target="apd">Profiling Report: '.baseName($dumpFile).'</a>');
-      }
-      else {
-         echo('<p style="clear:both; text-align:left; margin:6px">Profiling Report: filename not available (old APD version ?)');
-      }
+   if ($html) {
+      if ($dumpFile) echo('<p style="clear:both; text-align:left; margin:6px"><a href="/apd/?file='.$dumpFile.'" target="apd">Profiling Report: '.baseName($dumpFile).'</a>');
+      else           echo('<p style="clear:both; text-align:left; margin:6px">Profiling Report: filename not available (old APD version ?)');
    }
 }
 ?>

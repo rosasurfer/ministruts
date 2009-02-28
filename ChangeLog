@@ -1,3 +1,9 @@
+2009-02-28
+
+   - neue Funktion is_interface(): prüft die Existenz einer Interface-Definition ohne Aufruf von __autoload()
+	- neue Funktion register_stacked_shutdown_function(): ermöglicht Spezifizierung der Ausführungsreihenfolge mehrerer Shutdown-Handler
+
+
 2009-02-16
 
    - php/util/Logger: loggt auch bei normalen Logmessages einen Stacktrace (auch ohne Exception)
