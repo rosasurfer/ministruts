@@ -9,9 +9,9 @@ set_error_handler    (create_function('$level, $message, $file, $line, array $co
 set_exception_handler(create_function('Exception $exception'                          , 'return Logger::handleException($exception);'                          ));
 
 
-// Shutdown markieren (damit Exceptions während des Shutdowns keinen fatalen Fehler auslösen)
-// ------------------------------------------------------------------------------------------
-register_shutdown_function(create_function(null, '$GLOBALS[\'$__shutdown\'] = true;'));   // wird als erste Shutdown-Funktion ausgeführt
+// Für den Logger Beginn des Shutdowns markieren (um fatale Fehler zu verhindern; siehe Logger)
+// --------------------------------------------------------------------------------------------
+register_shutdown_function(create_function(null, '$GLOBALS[\'$__shutting_down\'] = true;'));    // wird als erste Shutdown-Funktion ausgeführt
 
 
 // -----------------------------------------------------------------------------------------------------------------------------------

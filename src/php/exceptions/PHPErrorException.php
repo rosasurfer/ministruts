@@ -3,9 +3,10 @@
  * PHPErrorException
  *
  * Eine PHPErrorException darf nur im globalen ErrorHandler erzeugt werden. Eigentlich müßte
- * PHPErrorException daher eine private, innere Klasse des ErrorHandlers sein.  Da dies in PHP nicht
- * möglich ist, setzt der ErrorHandler vor dem Erzeugen einer neuen Instanz eine Markierung (globale
- * Variable $__php_error_create), die im Konstruktor der Exception sofort wieder gelöscht wird.
+ * PHPErrorException daher eine private, innere Klasse des Errorhandlers sein.  Da dies in PHP nicht
+ * möglich ist, setzt der Errorhandler vor dem Erzeugen einer neuen PHPErrorException eine Markierung
+ * (globale Variable $__PHPErrorException_create), die im Konstruktor der Exception sofort wieder
+ * gelöscht wird.
  *
  * @see Logger::handleError()
  */
@@ -22,10 +23,10 @@ class PHPErrorException extends NestableException {
     */
    public function __construct($message, $file, $line, array $context) {
       // prüfen, ob wir außerhalb des ErrorHandler aufgerufen wurden
-      if (!isSet($GLOBALS['$__php_error_create']))
+      if (!isSet($GLOBALS['$__PHPErrorException_create']))
          throw new RuntimeException('Illegal access to non-public constructor of '.__CLASS__.' (see documentation)');
 
-      unset($GLOBALS['$__php_error_create']);      // Marker entfernen
+      unset($GLOBALS['$__PHPErrorException_create']);    // Marker entfernen
 
       parent:: __construct($message);
 
