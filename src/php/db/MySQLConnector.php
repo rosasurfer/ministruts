@@ -118,7 +118,6 @@ final class MySQLConnector extends DB {
          if ($neededTime > self::$maxQueryTime)
             Logger ::log('SQL statement took more than '.self::$maxQueryTime." seconds: $neededTime\n$sql", L_DEBUG, __CLASS__);
       }
-
       return $result;
    }
 
@@ -192,70 +191,52 @@ final class MySQLConnector extends DB {
       $lengthState   = strLen('State'  );
       $lengthInfo    = strLen('Info'   );
 
-      foreach ($list as &$row) {
-         $row['Info'] = trim(String ::stripDoubleSpaces($row['Info']));
+      foreach ($list as &$p) {
+         $p['Info'] = trim(String ::stripDoubleSpaces($p['Info']));
 
-         $lengthId      = max($lengthId     , strLen($row['Id'     ]));
-         $lengthUser    = max($lengthUser   , strLen($row['User'   ]));
-         $lengthHost    = max($lengthHost   , strLen($row['Host'   ]));
-         $lengthDb      = max($lengthDb     , strLen($row['db'     ]));
-         $lengthCommand = max($lengthCommand, strLen($row['Command']));
-         $lengthTime    = max($lengthTime   , strLen($row['Time'   ]));
-         $lengthState   = max($lengthState  , strLen($row['State'  ]));
-         $lengthInfo    = max($lengthInfo   , strLen($row['Info'   ]));
+         $lengthId      = max($lengthId     , strLen($p['Id'     ]));
+         $lengthUser    = max($lengthUser   , strLen($p['User'   ]));
+         $lengthHost    = max($lengthHost   , strLen($p['Host'   ]));
+         $lengthDb      = max($lengthDb     , strLen($p['db'     ]));
+         $lengthCommand = max($lengthCommand, strLen($p['Command']));
+         $lengthTime    = max($lengthTime   , strLen($p['Time'   ]));
+         $lengthState   = max($lengthState  , strLen($p['State'  ]));
+         $lengthInfo    = max($lengthInfo   , strLen($p['Info'   ]));
       }
 
-      // top separator line
-      $string = '+-'.str_repeat('-', $lengthId     )
-              .'-+-'.str_repeat('-', $lengthUser   )
-              .'-+-'.str_repeat('-', $lengthHost   )
-              .'-+-'.str_repeat('-', $lengthDb     )
-              .'-+-'.str_repeat('-', $lengthCommand)
-              .'-+-'.str_repeat('-', $lengthTime   )
-              .'-+-'.str_repeat('-', $lengthState  )
-              .'-+-'.str_repeat('-', $lengthInfo   )."-+\n";
+      // title line
+      $length = $lengthId+2+$lengthUser+2+$lengthHost+2+$lengthDb+2+$lengthCommand+2+$lengthTime+2+$lengthState+2+$lengthInfo;
+      if ($length > 180) {
+         $lengthInfo -= ($length - 180);
+         $length = 180;
+      }
+      $lPre   = $lPost = ($length-strLen(' Process List '))/2;
+      $string = str_repeat('_', floor($lPre)).' Process List '.str_repeat('_', ceil($lPost))."\n";
 
       // header line
-      $string .= '| '.str_pad('Id'     , $lengthId     , ' ', STR_PAD_RIGHT)
-               .' | '.str_pad('User'   , $lengthUser   , ' ', STR_PAD_RIGHT)
-               .' | '.str_pad('Host'   , $lengthHost   , ' ', STR_PAD_RIGHT)
-               .' | '.str_pad('db'     , $lengthDb     , ' ', STR_PAD_RIGHT)
-               .' | '.str_pad('Command', $lengthCommand, ' ', STR_PAD_RIGHT)
-               .' | '.str_pad('Time'   , $lengthTime   , ' ', STR_PAD_RIGHT)
-               .' | '.str_pad('State'  , $lengthState  , ' ', STR_PAD_RIGHT)
-               .' | '.str_pad('Info'   , $lengthInfo   , ' ', STR_PAD_RIGHT)." |\n";
-
-      // separator line
-      $string .= '+-'.str_repeat('-', $lengthId     )
-               .'-+-'.str_repeat('-', $lengthUser   )
-               .'-+-'.str_repeat('-', $lengthHost   )
-               .'-+-'.str_repeat('-', $lengthDb     )
-               .'-+-'.str_repeat('-', $lengthCommand)
-               .'-+-'.str_repeat('-', $lengthTime   )
-               .'-+-'.str_repeat('-', $lengthState  )
-               .'-+-'.str_repeat('-', $lengthInfo   )."-+\n";
+      $string .=    str_pad('Id'     , $lengthId     , ' ', STR_PAD_RIGHT)
+              .'  '.str_pad('User'   , $lengthUser   , ' ', STR_PAD_RIGHT)
+              .'  '.str_pad('Host'   , $lengthHost   , ' ', STR_PAD_RIGHT)
+              .'  '.str_pad('Db'     , $lengthDb     , ' ', STR_PAD_RIGHT)
+              .'  '.str_pad('Command', $lengthCommand, ' ', STR_PAD_RIGHT)
+              .'  '.str_pad('Time'   , $lengthTime   , ' ', STR_PAD_RIGHT)
+              .'  '.str_pad('State'  , $lengthState  , ' ', STR_PAD_RIGHT)
+              .'  '.        'Info'."\n";
 
       // data lines
-      foreach ($list as $key => &$row) {
-         $string .= '| '.str_pad($row['Id'     ], $lengthId     , ' ', STR_PAD_LEFT )
-                  .' | '.str_pad($row['User'   ], $lengthUser   , ' ', STR_PAD_RIGHT)
-                  .' | '.str_pad($row['Host'   ], $lengthHost   , ' ', STR_PAD_RIGHT)
-                  .' | '.str_pad($row['db'     ], $lengthDb     , ' ', STR_PAD_RIGHT)
-                  .' | '.str_pad($row['Command'], $lengthCommand, ' ', STR_PAD_RIGHT)
-                  .' | '.str_pad($row['Time'   ], $lengthTime   , ' ', STR_PAD_LEFT )
-                  .' | '.str_pad($row['State'  ], $lengthState  , ' ', STR_PAD_RIGHT)
-                  .' | '.str_pad($row['Info'   ], $lengthInfo   , ' ', STR_PAD_RIGHT)." |\n";
+      foreach ($list as &$p) {
+         $string .=    str_pad($p['Id'     ], $lengthId     , ' ', STR_PAD_LEFT )
+                 .'  '.str_pad($p['User'   ], $lengthUser   , ' ', STR_PAD_RIGHT)
+                 .'  '.str_pad($p['Host'   ], $lengthHost   , ' ', STR_PAD_RIGHT)
+                 .'  '.str_pad($p['db'     ], $lengthDb     , ' ', STR_PAD_RIGHT)
+                 .'  '.str_pad($p['Command'], $lengthCommand, ' ', STR_PAD_RIGHT)
+                 .'  '.str_pad($p['Time'   ], $lengthTime   , ' ', STR_PAD_LEFT )
+                 .'  '.str_pad($p['State'  ], $lengthState  , ' ', STR_PAD_RIGHT)
+                 .'  '.subStr ($p['Info'], 0, $lengthInfo)."\n";
       }
 
       // bottom separator line
-      $string .= '+-'.str_repeat('-', $lengthId     )
-               .'-+-'.str_repeat('-', $lengthUser   )
-               .'-+-'.str_repeat('-', $lengthHost   )
-               .'-+-'.str_repeat('-', $lengthDb     )
-               .'-+-'.str_repeat('-', $lengthCommand)
-               .'-+-'.str_repeat('-', $lengthTime   )
-               .'-+-'.str_repeat('-', $lengthState  )
-               .'-+-'.str_repeat('-', $lengthInfo   )."-+\n";
+      $string .= str_repeat('_', $length)."\n";
 
       if ($return)
          return $string;
@@ -423,8 +404,8 @@ final class MySQLConnector extends DB {
 
       // Transaktionsanzeige generieren
       // top separator line
-      $lengthL = $lengthId+2+$lengthWaiting+2+$lengthMode+2+$lengthDb+2+$lengthTable+2+$lengthIndex+2+$lengthSpecial;
       $lengthT = $lengthId+2+$lengthUser+2+$lengthHost+2+$lengthVictim+2+$lengthTime+2+$lengthUndo+2+$lengthQuery;
+      $lengthL = $lengthId+2+$lengthWaiting+2+$lengthMode+2+$lengthDb+2+$lengthTable+2+$lengthIndex+2+$lengthSpecial;
       if ($lengthT > 180) {
          $lengthQuery -= ($lengthT - 180);
          $lengthT = 180;
@@ -450,7 +431,7 @@ final class MySQLConnector extends DB {
                  .'  '.str_pad($t['victim'    ], $lengthVictim, ' ', STR_PAD_RIGHT)
                  .'  '.str_pad($t['time'      ], $lengthTime  , ' ', STR_PAD_LEFT )
                  .'  '.str_pad($t['undo'      ], $lengthUndo  , ' ', STR_PAD_LEFT )
-                 .'  '.subStr ($t['query'     ], 0, $lengthQuery)."\n";
+                 .'  '.subStr ($t['query'], 0, $lengthQuery)."\n";
       }
 
       // bottom separator line
