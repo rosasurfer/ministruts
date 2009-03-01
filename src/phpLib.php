@@ -9,12 +9,9 @@ set_error_handler    (create_function('$level, $message, $file, $line, array $co
 set_exception_handler(create_function('Exception $exception'                          , 'return Logger::handleException($exception);'                          ));
 
 
-
 // Shutdown markieren (damit Exceptions während des Shutdowns keinen fatalen Fehler auslösen)
 // ------------------------------------------------------------------------------------------
-function mark_shutdown() { $GLOBALS['$__shutdown'] = true; }
-register_shutdown_function('mark_shutdown');                                  // wird als erste Shutdown-Funktion ausgeführt
-
+register_shutdown_function(create_function(null, '$GLOBALS[\'$__shutdown\'] = true;'));   // wird als erste Shutdown-Funktion ausgeführt
 
 
 // -----------------------------------------------------------------------------------------------------------------------------------
@@ -32,7 +29,7 @@ if (extension_loaded('APD') && isSet($_REQUEST['_PROFILE_'])) {
       fWrite($fH, "caller=$url\n\nEND_HEADER\n");
       fClose($fH);
    }
-   register_stacked_shutdown_function('apd_on_shutdown', array($dumpFile));   // wird als letzte Shutdown-Funktion ausgeführt
+   register_lifo_shutdown_function('apd_shutdown', $dumpFile);    // wird als letzte LIFO-Shutdown-Funktion ausgeführt
    unset($dumpFile, $fH, $prot, $host, $port, $url);
 }
 // -----------------------------------------------------------------------------------------------------------------------------------
@@ -243,22 +240,20 @@ function is_interface($name) {
 
 /**
  * Diese Funktion registriert wie register_shutdown_function() Funktionen oder Methoden zur Ausführung
- * während des Script-Shutdowns.  Zusätzlich kann angegeben werden, ob die Callback-Handler in der Reihenfolge
- * der Registrierung (FIFO; wie register_shutdown_function()) oder umgekehrt (LIFO) erfolgen soll.
+ * während des Shutdowns.  Die registrierten Funktionen werden jedoch nicht in der Reihenfolge der
+ * Registrierung, sondern umgekehrt aufgerufen (Last-In, First-Out). Alle zusätzlich zum Callback-Handler
+ * übergebenen Argumente werden beim Shutdown an den Handler weitergereicht.
  *
  * @param callable $callback - Callback-Handler (Funktion oder Methode)
- * @param array    $args     - dem Callback-Handler zu übergebende Argumente
- * @param boolean  $lifo     - bestimmt die Position des Handlers innerhalb der registrierten Handler
- *                             und damit die Reihenfolge des Aufrufs (TRUE: LIFO, FALSE: FIFO)
  *
  * @see register_shutdown_function()
  */
-function register_stacked_shutdown_function(/*callable*/ $callback = null, array $args = null, $lifo = true) {
+function register_lifo_shutdown_function(/*callable*/ $callback = null /*, $args1, $args2, ...*/) {
    static $functions = array();
 
    if ($callback === null) {
       $trace = debug_backTrace();
-      $frame = array_pop($trace); // der letzte Frame
+      $frame = array_pop($trace);
 
       if (!isSet($frame['file']) && !isSet($frame['line'])) {     // wenn Aufruf aus PHP-Core, also während des Script-Shutdowns ...
          for ($i=sizeOf($functions); $i; ) {                      // ... alle registrierten Funktionen rückwärts abarbeiten
@@ -271,16 +266,15 @@ function register_stacked_shutdown_function(/*callable*/ $callback = null, array
 
    $name = null;
    if (!is_string($callback) && !is_array($callback)) throw new IllegalTypeException('Illegal type of parameter $callback: '.getType($callback));
-   if (!is_callable($callback, false, $name))        throw new InvalidArgumentException('Invalid callback "'.$name.'" passed');
-   if ($args!==null && !is_array($args))              throw new IllegalTypeException('Illegal type of parameter $args: '.getType($args));
-   if (!is_bool($lifo))                               throw new IllegalTypeException('Illegal type of parameter $lifo: '.getType($lifo));
+   if (!is_callable($callback, false, $name))         throw new InvalidArgumentException('Invalid callback "'.$name.'" passed');
 
    if (!$functions)
-      register_shutdown_function(__FUNCTION__);
+      register_shutdown_function(__FUNCTION__);    // beim 1. Aufruf wird die Methode selbst als Shutdown-Handler registriert
 
-   $function = array('name' => $callback, 'args' => $args);
-   if ($lifo) $functions[] = $function;
-   else       array_unshift($functions, $function);
+   $args = func_get_args();
+   array_shift($args);
+
+   $functions[] = array('name' => $callback, 'args' => $args);
 }
 
 
@@ -552,7 +546,7 @@ function ifNull($value, $altValue) {
 /**
  * Nur für APD: Shutdown-Function, fügt nach dem Profiling einen Link zum Report in die Seite ein.
  */
-function apd_on_shutdown($dumpFile = null) {
+function apd_shutdown($dumpFile = null) {
    if (!headers_sent())
       flush();
 
