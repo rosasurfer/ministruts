@@ -1,9 +1,7 @@
 #!/usr/bin/php
 <?
 // Library einbinden
-define('PHPLIB_DIR', dirName(__FILE__).'/../src/');
-require(PHPLIB_DIR.'phpLib.php');
+require(dirName(__FILE__).'/../src/phpLib.php');
 
-
-include(PHPLIB_DIR.'php/apd.php');
+include(dirName(__FILE__).'/../src/php/apd.php');
 ?>
