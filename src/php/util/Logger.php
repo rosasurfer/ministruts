@@ -50,6 +50,9 @@ class Logger extends StaticClass {
     * @return int - Loglevel
     */
    public static function getLogLevel($class) {
+
+      $defaultLevel = L_NOTICE;  // Default-Loglevel
+
       static $logLevels = null;
 
       if ($logLevels === null) {
@@ -61,7 +64,11 @@ class Logger extends StaticClass {
          foreach ($logLevels as $className => $level) {
             if ($level!==(string)$level)
                throw new IllegalTypeException('Illegal log level type ('.getType($level).') for class: '.$className);
-            $logLevels[$className] = constant('L_'.strToUpper($level));
+
+            if     ($level == '')                     $logLevels[$className] = $defaultLevel;
+            elseif (defined('L_'.strToUpper($level))) $logLevels[$className] = constant('L_'.strToUpper($level));
+            else
+               throw new InvalidArgumentException('Invalid log level for class '.$className.': '.$level);
          }
       }
 
@@ -69,7 +76,7 @@ class Logger extends StaticClass {
       if (isSet($logLevels[$class]))
          return $logLevels[$class];
 
-      return L_NOTICE;        // Default-Loglevel
+      return $defaultLevel;
    }
 
 

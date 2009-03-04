@@ -11,9 +11,9 @@
  *    - "config-custom.properties" im WEB-INF-Verzeichnis der Anwendung
  *    - "config.properties"        im WEB-INF-Verzeichnis der Anwendung
  *
- * Für jeden einzelnen Pfad des PHP-Include-Pfades (ini_get("include_path")):
- *    - "config-custom.properties" in diesem Pfad
- *    - "config.properties"        in diesem Pfad
+ *    Für jeden einzelnen Pfad des PHP-Include-Pfades:
+ *    - "config-custom.properties"
+ *    - "config.properties"
  *
  *
  * Konsolenanwendungen:
@@ -21,9 +21,9 @@
  *    - "config-custom.properties" im Scriptverzeichnis
  *    - "config.properties"        im Scriptverzeichnis
  *
- * Für jeden einzelnen Pfad des PHP-Include-Pfades (ini_get("include_path")):
- *    - "config-custom.properties" in diesem Pfad
- *    - "config.properties"        in diesem Pfad
+ *    Für jeden einzelnen Pfad des PHP-Include-Pfades:
+ *    - "config-custom.properties"
+ *    - "config.properties"
  *
  *
  * Durch diese Reihenfolge können mehrere Dateien gleichen Namens geladen werden, z.B. eine für die
@@ -31,20 +31,13 @@
  * Konfiguration eines einzelnen Projektes (liegt im WEB-INF-Verzeichnis des Projektes).  Dabei haben
  * die zuerst eingelesenen Einstellungen eine höhere Priorität als die später eingelesenen.  Allgemeine
  * Einstellungen in einer Bibliothek können so durch eigene Einstellungen im Projektverzeichnis
- * überschrieben werden.  Da in einem Verzeichnis zuerst nach "config-custom.properties" und danach
- * nach "config.properties" gesucht wird, hat eine "config-custom.properties" eine höhere Priorität
- * als eine "config-custom.properties" im selben Verzeichnis.
+ * überschrieben werden.  Einstellungen in "config-custom.properties" haben eine höhere Priorität als
+ * die entsprechenden Einstellungen einer "config.properties" im selben Verzeichnis.
  *
- * Die Datei "config.properties" enthält jeweils allgemeingültige Einstellungen für den Produktivbetrieb.
- * Diese Datei wird in der Regel im CVS versioniert.  Die Datei "config-custom.properties" dagegen
- * enthält arbeitsplatzspezifische Einstellungen.  Sie ist für den Entwicklungsbetrieb gedacht und sollte
- * nicht im CVS gespeichert werden.  Dadurch eignet sie sich für persönliche Einstellungen des Entwicklers
- * (lokale Datenbankzugangsdaten, E-Mailadressen, Loglevel etc.).
- *
- * Werden in "config.properties" Produktiveinstellungen und in "config-custom.properties" Entwicklungs-
- * einstellungen gespeichert, kann durch einfaches Umbenennen von "config-custom.properties" zwischen
- * beiden Umgebungen umgeschaltet werden.
- *
+ * Die Datei "config.properties" enthält allgemeingültige oder Default-Einstellungen eines Projektes.
+ * Diese Datei wird im Repository gespeichert.  Die Datei "config-custom.properties" hingegen enthält
+ * arbeitsplatzspezifische Einstellungen für den Entwicklungsbetrieb oder spezielle, nicht öffentliche
+ * Einstellungen für den Produktivbetrieb.  Sie wird nicht im Repository gespeichert.
  *
  * Dateiformat:
  * ------------
@@ -125,11 +118,10 @@ final class Config extends Object {
    /**
     * Konstruktor
     *
-    * Lädt die Konfiguration aus der Datei "config.properties", wenn sie existiert.  Existiert eine
-    * weitere Datei "config-custom.properties", wird auch diese geladen. Diese zusätzliche Datei darf
-    * nicht im Repository gespeichert werden, sodaß parallel eine globale und eine lokale Konfiguration
-    * mit unterschiedlichen Einstellungen verwendet werden können. Lokale Einstellungen überschreiben
-    * globale Einstellungen.
+    * Lädt die Konfiguration aus allen existierenden config.properties- und config-custom.properties-
+    * Dateien.  Diese config-custom.propertie-Datei sollte nicht im Repository gespeichert werden, so
+    * daß eine globale und eine lokale Konfiguration mit unterschiedlichen Einstellungen möglich sind.
+    * Lokale Einstellungen überschreiben globale Einstellungen.
     */
    private function __construct() {
       $files = array();
@@ -139,10 +131,8 @@ final class Config extends Object {
       if (isSet($_SERVER['REQUEST_METHOD']))
          $path .= DIRECTORY_SEPARATOR.'WEB-INF';
 
-
-      // Include-Pfad in einzelne Pfade zerlegen
+      // Include-Pfad zerlegen
       $paths = explode(PATH_SEPARATOR, $path.PATH_SEPARATOR.ini_get('include_path'));
-
 
       // Config-Dateien suchen
       foreach ($paths as $key => $path) {
@@ -155,9 +145,8 @@ final class Config extends Object {
       }
       $this->files = $files;
 
-
-      // Weiter vorn im include_path stehende Dateien haben Vorrang vor weiter hinten stehenden.  Daher laden
-      // wir die Dateien von hinten aus und überschreiben mit den folgenden Dateien die vorhandenen Werte.
+      // Weiter vorn im include-path stehende Dateien haben Vorrang vor weiter hinten stehenden.  Wir
+      // laden die Dateien von hinten aus und überschreiben mit folgenden Einstellungen bereits vorhandene.
       $files = array_reverse($files);
 
       // gefundene Dateien laden

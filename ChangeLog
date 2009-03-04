@@ -1,3 +1,8 @@
+2009-03-04
+
+   - php/util/Config: ein Loglevel kann durch Angabe eines leeren Wertes auf den Default-Loglevel zurückgesetzt werden
+
+
 2009-02-28
 
    - neue Funktion is_interface(): prüft die Existenz einer Interface-Definition ohne Aufruf von __autoload()
