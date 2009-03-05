@@ -147,10 +147,7 @@ final class Config extends Object {
 
       // Weiter vorn im include-path stehende Dateien haben Vorrang vor weiter hinten stehenden.  Wir
       // laden die Dateien von hinten aus und überschreiben mit folgenden Einstellungen bereits vorhandene.
-      $files = array_reverse($files);
-
-      // gefundene Dateien laden
-      foreach ($files as $name => $fileExists) {
+      foreach (array_reverse($files) as $name => $fileExists) {
          if ($fileExists)
             $this->loadFile($name);
       }
