@@ -192,6 +192,8 @@ final class MySQLConnector extends DB {
       $lengthInfo    = strLen('Info'   );
 
       foreach ($list as &$p) {
+         if (($i=striPos($p['Host'], '.localdomain:')) || ($i=striPos($p['Host'], ':')))
+            $p['Host'] = subStr($p['Host'], 0, $i);
          $p['Info'] = trim(String ::stripDoubleSpaces($p['Info']));
 
          $lengthId      = max($lengthId     , strLen($p['Id'     ]));
