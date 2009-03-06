@@ -1,3 +1,8 @@
+2009-03-05
+
+   - php/util/Config: Laufzeitänderungen sind nur noch für den aktuellen Request gültig und werden nicht zurück in den Cache geschrieben
+
+
 2009-03-04
 
    - php/util/Config: ein Loglevel kann durch Angabe eines leeren Wertes auf den Default-Loglevel zurückgesetzt werden
