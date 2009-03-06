@@ -211,10 +211,9 @@ final class Config extends Object {
 
    /**
     * Setzt oder überschreibt die Einstellung mit dem angegebenen Schlüssel. Wert muß ein String sein.
-    * Diese Methode kann aus der Anwendung heraus aufgerufen werden, um zusätzliche Laufzeiteinstellungen
-    * zu speichern. Zusätzliche Einstellungen werden nicht in "config.properties" gespeichert, gehen
-    * aber nach Ende des Requests nicht verloren, solange der Server nicht neu gestartet wird.  Auf
-    * diese Weise kann sich die Anwendung während der Laufzeit selbständig anpassen und steuern.
+    * Diese Methode kann aus der Anwendung heraus aufgerufen werden, um zur Laufzeit Einstellungen zu
+    * zu ändern. Diese Änderungen werden nicht in "config.properties" gespeichert und gehen nach Ende
+    * des Requests verloren.
     *
     * @param string $key   - Schlüssel
     * @param string $value - Einstellung
@@ -258,11 +257,11 @@ final class Config extends Object {
    /**
     * @param string  $key
     * @param string  $value
-    * @param boolean $persist
+    * @param boolean $persist - (nicht implementiert)
     *
     * @see Config::set()
     */
-   private function setProperty($key, $value, $persist = true) {
+   private function setProperty($key, $value, $persist = false) {
       $properties =& $this->properties;
 
       $parts = explode('.', $key);
@@ -294,8 +293,8 @@ final class Config extends Object {
       }
 
       // Cache aktualisieren, falls die Config-Instanz dort gespeichert ist
-      if ($persist && Cache ::me()->isCached(__CLASS__))
-         Cache ::me()->set(__CLASS__, $this);
+      //if ($persist && Cache ::me()->isCached($class=get_class($this)))
+      //   Cache ::me()->set($class, $this);
    }
 
 
