@@ -686,10 +686,13 @@ final class Request extends Singleton {
    public function isUserInRole($roles) {
       if ($roles!==(string)$roles) throw new IllegalTypeException('Illegal type of argument $roles: '.getType($roles));
 
+      // Module holen
+      $module = $this->getAttribute(Struts ::MODULE_KEY);
+      if (!$module) throw new RuntimeException('You can not call '.get_class($this).__FUNCTION__.'() in this context');
+
       // RoleProcessor holen ...
-      $processor = $this->getAttribute(Struts ::MODULE_KEY)
-                        ->getRoleProcessor();
-      if (!$processor) throw new RuntimeException('You can not call '.__METHOD__.'() without configuring a RoleProcessor');
+      $processor = $module->getRoleProcessor();
+      if (!$processor) throw new RuntimeException('You can not call '.get_class($this).__FUNCTION__.'() without configuring a RoleProcessor');
 
       // ... und Aufruf weiterreichen
       return $processor->isUserInRole($this, $roles);
@@ -820,7 +823,7 @@ final class Request extends Singleton {
     * Verhindert das Serialisieren von Request-Instanzen.
     */
    final public function __sleep() {
-      throw new IllegalStateException('You cannot serialize me: '.__CLASS__);
+      throw new IllegalStateException('You cannot serialize me: '.get_class($this));
    }
 
 
@@ -828,7 +831,7 @@ final class Request extends Singleton {
     * Verhindert das Deserialisieren von Request-Instanzen.
     */
    final public function __wakeUp() {
-      throw new IllegalStateException('You cannot unserialize me: '.__CLASS__);
+      throw new IllegalStateException('You cannot unserialize me: '.get_class($this));
    }
 }
 ?>
