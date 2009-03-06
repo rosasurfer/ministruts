@@ -49,7 +49,7 @@ final class SystemFiveLock extends BaseLock {
       $decId = $this->getKeyId($key);
       $hexId = decHex($decId);
 
-      $trials = 3;   // max. Anzahl akzeptabler Fehler, eine weitere Exception wird weitergereicht
+      $trials = 10;   // max. Anzahl akzeptabler Fehler, eine weitere Exception wird weitergereicht
       $i = 0;
       do {
          try {
@@ -68,7 +68,7 @@ final class SystemFiveLock extends BaseLock {
                                 || $ex->getMessage()=='sem_acquire(): failed to acquire key 0x'.$hexId.': Invalid argument'
                                 || $ex->getMessage()=='sem_acquire(): failed to acquire key 0x'.$hexId.': Identifier removed')) {
                self::$logDebug && Logger ::log($ex->getMessage().', trying again ... ('.($i+1).')', L_DEBUG, __CLASS__);
-               //uSleep(50000); // Endlosschleife verhindern und 50 msec. warten
+               uSleep(50000); // Endlosschleife verhindern und 50 msec. warten
                continue;
             }
             throw new RuntimeException("Giving up to get lock after $i trials", $ex);
