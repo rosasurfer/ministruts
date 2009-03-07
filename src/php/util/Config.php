@@ -196,6 +196,7 @@ final class Config extends Object {
    public static function get($key, $default = null) {
       if ($key!==(string)$key) throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
 
+      // TODO: Typen erkennen und automatisch casten
       $value = self ::me()->getProperty($key);
 
       if ($value === null) {
