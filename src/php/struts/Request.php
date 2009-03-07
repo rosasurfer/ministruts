@@ -209,15 +209,15 @@ final class Request extends Singleton {
     * @return string
     */
    public function getDomainName() {
+      // TODO: Request::getDomainName() ist unsinnig
       static $domain = null;
 
       if (!$domain) {
          $parts = array_reverse(explode('.', $this->getHostname()));
-         $domain = $parts[0];
+         $tld = $parts[0];
 
-         // TODO: Implementierung von Request::getDomainName() ist buggy
-         if (sizeOf($parts) > 1 && $parts[1]!='www' && $parts[1]!='local')
-            $domain = $parts[1].'.'.$domain;
+         if (sizeOf($parts) > 1 && $parts[1]!='www' && $parts[1]!='local') $domain = $parts[1].'.'.$tld;
+         else                                                              $domain = $tld;
       }
       return $domain;
    }
@@ -234,7 +234,7 @@ final class Request extends Singleton {
    public function getHostURL() {
       if ($this->hostURL === null) {
          $http = isSet($_SERVER['HTTPS']) ? 'https' : 'http';
-         $host = $_SERVER['SERVER_NAME'];
+         $host = $this->getHostname();
          $port = $_SERVER['SERVER_PORT']=='80' ? '' : ':'.$_SERVER['SERVER_PORT'];
          $this->hostURL = "$http://$host$port";
       }
@@ -304,6 +304,7 @@ final class Request extends Singleton {
     */
    public function getPath() {
       if ($this->path === null) {
+         // TODO: schneidet path-info einfach ab
          $this->path = $_SERVER['PHP_SELF'] = preg_replace('/\/{2,}/', '/', $_SERVER['PHP_SELF']);
       }
       return $this->path;

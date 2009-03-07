@@ -17,12 +17,11 @@ final class HeaderUtils extends StaticClass {
       if ($request->isSession()) {
          $session = $request->getSession();
          if ($session->isNew() || SID !== '') {   // bleiben wir innerhalb der Domain und Cookies sind aus, wird eine evt. Session-ID weitergegeben
-            $host = strToLower(!empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']);
+            // TODO: kompletter Unfug
             $found = preg_match_all('/^https?:\/{2,}([a-z0-9-]+(\.[a-z0-9-]+)*)*.*$/', strToLower(trim($url)), $matches, PREG_SET_ORDER);
 
-            if (!$found || $matches[0][1]==$host) {               // SID anhängen
-               $url .= (String ::contains($url, '?') ? ini_get('arg_separator.output') : '?').SID;
-            }
+            if (!$found || $matches[0][1]==$request->getHostname())     // SID anhängen
+               $url .= (String ::contains($url, '?') ? '&':'?').SID;
          }
          session_write_close();
       }
@@ -44,7 +43,7 @@ final class HeaderUtils extends StaticClass {
 # Changes HTTP to HTTPS
 
 #gets the URI of the script
-$url =  $_SERVER['SCRIPT_URI'];
+$url =  $_SERVER['SCRIPT_URI']; // nur mit mod_rewrite on
 #chops URI into bits BORK BORK BORK
 $chopped = parse_url($url);
 #HOST and PATH portions of your final destination
