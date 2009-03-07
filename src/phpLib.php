@@ -3,14 +3,14 @@
 // -----------------------------
 
 
-// Errorhandler registrieren (anonym, damit Logger nicht schon hier included wird) und Shutdown markieren
-// ------------------------------------------------------------------------------------------------------
+// Errorhandler registrieren (anonym, damit die Klasse nicht schon hier included wird)
+// -----------------------------------------------------------------------------------
 set_error_handler    (create_function('$level, $message, $file, $line, array $context', 'return Logger::handleError($level, $message, $file, $line, $context);'));
 set_exception_handler(create_function('Exception $exception'                          , 'return Logger::handleException($exception);'                          ));
 
 
-// Für den Logger Beginn des Shutdowns markieren (um fatale Fehler zu verhindern; siehe Logger)
-// --------------------------------------------------------------------------------------------
+// Beginn des Shutdowns markieren (um fatale Fehler beim Shutdown zu verhindern; siehe Logger)
+// -------------------------------------------------------------------------------------------
 register_shutdown_function(create_function(null, '$GLOBALS[\'$__shutting_down\'] = true;'));    // wird als erste Shutdown-Funktion ausgeführt
 
 
@@ -29,8 +29,34 @@ if (extension_loaded('APD') && isSet($_REQUEST['_PROFILE_'])) {
       fWrite($fH, "caller=$url\n\nEND_HEADER\n");
       fClose($fH);
    }
-   register_lifo_shutdown_function('apd_shutdown', $dumpFile);    // wird als letzte LIFO-Shutdown-Funktion ausgeführt
+   register_lifo_shutdown_function('apd_addProfileLink', $dumpFile); // wird als letzte LIFO-Shutdown-Funktion ausgeführt
    unset($dumpFile, $fH, $prot, $host, $port, $url);
+
+}
+
+
+/**
+ * Nur für den Profiler: Shutdown-Function, fügt nach dem Profiling einen Link zum Report in die Seite ein.
+ */
+function apd_addProfileLink($dumpFile = null) {
+   if (!headers_sent())
+      flush();
+
+   // überprüfen, ob der aktuelle Content HTML ist (z.B. nicht bei Downloads)
+   $html = false;
+   foreach (headers_list() as $header) {
+      $parts = explode(':', $header, 2);
+      if (strToLower($parts[0]) == 'content-type') {
+         $html = (striPos(trim($parts[1]), 'text/html') === 0);
+         break;
+      }
+   }
+
+   // bei HTML-Content Link auf Profiler-Report ausgeben
+   if ($html) {
+      if ($dumpFile) echo('<p style="clear:both; text-align:left; margin:6px"><a href="/apd/?file='.$dumpFile.'" target="apd">Profiling Report: '.baseName($dumpFile).'</a>');
+      else           echo('<p style="clear:both; text-align:left; margin:6px">Profiling Report: filename not available (old APD version ?)');
+   }
 }
 // -----------------------------------------------------------------------------------------------------------------------------------
 
@@ -130,10 +156,7 @@ $__classes['ApdProfile'                     ] = $dir.'php/util/apd/ApdProfile';
 unset($dir);
 
 
-
-// Konstanten
-// ----------
-// die einzelnen Loglevel
+// Loglevel
 define('L_DEBUG' ,  1);
 define('L_INFO'  ,  2);
 define('L_NOTICE',  4);
@@ -154,7 +177,7 @@ define('WINDOWS', (strToUpper(subStr(PHP_OS, 0, 3))==='WIN'));
 
 
 /**
- * Lädt die angegebene Klasse.
+ * Class-Loader, lädt die angegebene Klasse.
  *
  * @param string $className - Klassenname
  * @param mixed  $throw     - Ob Exceptions geworfen werfen dürfen. Typ und Wert des Parameters sind unwichtig,
@@ -188,10 +211,11 @@ function __autoload($className /*, $throw */) {
 
 /**
  * Ob der angegebene Klassenname definiert ist.  Diese Funktion ist notwendig, weil eine einfache
- * Abfrage der Art "if (class_exist($className, true))" __autoload() aufruft und dabei im Fehlerfall
- * das Script mit einem fatalen Fehler beendet (__autoload darf aber keine Exceptions werfen).
- * Wird __autoload() aus dieser Funktion und nicht aus dem PHP-Kernel aufgerufen, werden Exceptions
- * weitergereicht und der folgende Code kann entsprechend reagieren.
+ * Abfrage der Art "if (class_exist($className, true))" __autoload() aufruft und bei Nichtexistenz der
+ * Klasse das Script mit einem fatalen Fehler beendet (Exceptions statt eines Fehlers sind in __autoload()
+ * nicht möglich).
+ * Wird __autoload() direkt aus dieser Funktion und nicht von PHP aufgerufen, werden Exceptions weitergereicht
+ * und der folgende Code kann entsprechend reagieren.
  *
  * @param string $name - Klassenname
  *
@@ -214,10 +238,11 @@ function is_class($name) {
 
 /**
  * Ob der angegebene Interface-Name definiert ist.  Diese Funktion ist notwendig, weil eine einfache
- * Abfrage der Art "if (interface_exist($interfaceName, true))" __autoload() aufruft und dabei im Fehlerfall
- * das Script mit einem fatalen Fehler beendet (__autoload darf aber keine Exceptions werfen).
- * Wird __autoload() aus dieser Funktion und nicht aus dem PHP-Kernel aufgerufen, werden Exceptions
- * weitergereicht und der folgende Code kann entsprechend reagieren.
+ * Abfrage der Art "if (interface_exist($interfaceName, true))" __autoload() aufruft und bei Nichtexistenz
+ * des Interfaces das Script mit einem fatalen Fehler beendet (Exceptions statt eines Fehlers sind in
+ * __autoload() nicht möglich).
+ * Wird __autoload() direkt aus dieser Funktion und nicht von PHP aufgerufen, werden Exceptions weitergereicht
+ * und der folgende Code kann entsprechend reagieren.
  *
  * @param string $name - Interface-Name
  *
@@ -545,30 +570,5 @@ function timestamp_mysql2german($t) {
  */
 function ifNull($value, $altValue) {
    return ($value === null) ? $altValue : $value;
-}
-
-
-/**
- * Nur für APD: Shutdown-Function, fügt nach dem Profiling einen Link zum Report in die Seite ein.
- */
-function apd_shutdown($dumpFile = null) {
-   if (!headers_sent())
-      flush();
-
-   // überprüfen, ob der aktuelle Content HTML ist (z.B. nicht bei Downloads)
-   $html = false;
-   foreach (headers_list() as $header) {
-      $parts = explode(':', $header, 2);
-      if (strToLower($parts[0]) == 'content-type') {
-         $html = (striPos(trim($parts[1]), 'text/html') === 0);
-         break;
-      }
-   }
-
-   // bei HTML-Content Link auf Profiler-Report ausgeben
-   if ($html) {
-      if ($dumpFile) echo('<p style="clear:both; text-align:left; margin:6px"><a href="/apd/?file='.$dumpFile.'" target="apd">Profiling Report: '.baseName($dumpFile).'</a>');
-      else           echo('<p style="clear:both; text-align:left; margin:6px">Profiling Report: filename not available (old APD version ?)');
-   }
 }
 ?>

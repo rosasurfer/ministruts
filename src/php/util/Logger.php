@@ -229,7 +229,7 @@ class Logger extends StaticClass {
                // TODO: Adressformat validieren
                if ($address) {
                   // TODO: Header mit Fehlermeldung hinzufügen, damit beim Empfänger Messagefilter unterstützt werden
-                  $success = error_log($mailMsg, 1, $address, 'Subject: PHP: [FATAL] Uncaught Exception at '.(isSet($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : '').$_SERVER['PHP_SELF']);
+                  $success = error_log($mailMsg, 1, $address, 'Subject: PHP: [FATAL] Uncaught Exception at '.($request ? $request->getHostname():'').$_SERVER['PHP_SELF']);
                   if (!$success) {
                      error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', $plainMessage), 0);
                      break;
@@ -398,7 +398,7 @@ class Logger extends StaticClass {
             // TODO: Adressformat validieren
             if ($address) {
                // TODO: Header mit Fehlermeldung hinzufügen, damit beim Empfänger Messagefilter unterstützt werden
-               $success = error_log($mailMsg, 1, $address, 'Subject: PHP: '.self::$logLevels[$level].' at '.(isSet($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : '').$_SERVER['PHP_SELF']);
+               $success = error_log($mailMsg, 1, $address, 'Subject: PHP: '.self::$logLevels[$level].' at '.($request ? $request->getHostname():'').$_SERVER['PHP_SELF']);
                if (!$success) {
                   error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', $plainMessage), 0);
                   break;
