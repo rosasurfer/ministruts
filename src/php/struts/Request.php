@@ -335,8 +335,8 @@ final class Request extends Singleton {
     */
    public function getApplicationPath() {
       // TODO: ApplicationPath ist Eigenschaft der Anwendung, nicht des Requests -> auslagern
-
       static $path = null;
+
       if ($path === null && isSet($_SERVER['APPLICATION_PATH'])) {
          $path = $_SERVER['APPLICATION_PATH'];
 
