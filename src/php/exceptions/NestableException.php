@@ -203,16 +203,12 @@ abstract class NestableException extends Exception {
     * @return string - String im Format Class:message
     */
    public function __toString() {
-      $className = get_class($this);
+      $message = parent ::getMessage();
 
-      $message = parent:: getMessage();
       if ($message !== null)
          $message = ': '.$message;
 
-      //if ($this->cause !== null)
-      //   $message .= ' ('.get_class($this->cause).')';
-
-      return $className.$message;
+      return get_class($this).$message;
    }
 }
 ?>
