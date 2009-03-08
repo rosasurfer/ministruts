@@ -34,20 +34,52 @@ final class MySQLConnector extends DB {
       if ($this->port)
          $host .= ':'.$this->port;
 
-      $this->link = mysql_connect($host,
-                                  $this->username,
-                                  $this->password,
-                                  true,
-                                  2             // 2 = CLIENT_FOUND_ROWS
-                                  );
+      try {
+         $this->link = mysql_connect($host,
+                                     $this->username,
+                                     $this->password,
+                                     true,
+                                     2                // 2 = CLIENT_FOUND_ROWS
+                                     );
+      }
+      catch (Exception $ex) {
+         throw new InfrastructureException("Can not connect to MySQL server on '$host'", $ex);  // Message enthält den Port
+      }
 
-      if (!$this->link)
-         throw new InfrastructureException('Can not connect to MySQL server: '.mysql_error($this->link));
-
-      if ($this->database && !mysql_select_db($this->database, $this->link))
-         throw new InfrastructureException('Can not select database '.$this->database.': '.mysql_error($this->link));
+      try {
+         if ($this->database && !mysql_select_db($this->database, $this->link))
+            throw new InfrastructureException(mysql_error($this->link));
+      }
+      catch (InfrastructureException $ex) {
+         throw $ex;
+      }
+      catch (Exception $ex) {
+         throw new InfrastructureException("Can not select database '$this->database'", $ex);
+      }
 
       return $this;
+      /*                         #define CLIENT_LONG_PASSWORD          1             // new more secure passwords
+                                 #define CLIENT_FOUND_ROWS             2             // found instead of affected rows
+                                 #define CLIENT_LONG_FLAG              4             // get all column flags
+                                 #define CLIENT_CONNECT_WITH_DB        8             // one can specify db on connect
+                                 #define CLIENT_NO_SCHEMA             16             // don't allow database.table.column
+      MYSQL_CLIENT_COMPRESS      #define CLIENT_COMPRESS              32             // can use compression protocol
+                                 #define CLIENT_ODBC                  64             // ODBC client
+                                 #define CLIENT_LOCAL_FILES          128             // can use LOAD DATA LOCAL
+      MYSQL_CLIENT_IGNORE_SPACE  #define CLIENT_IGNORE_SPACE         256             // ignore spaces before '('
+                                 #define CLIENT_CHANGE_USER          512             // support the mysql_change_user()    alt: #define CLIENT_PROTOCOL_41  512  // new 4.1 protocol
+      MYSQL_CLIENT_INTERACTIVE   #define CLIENT_INTERACTIVE         1024             // this is an interactive client
+      MYSQL_CLIENT_SSL           #define CLIENT_SSL                 2048             // switch to SSL after handshake
+                                 #define CLIENT_IGNORE_SIGPIPE      4096             // ignore sigpipes
+                                 #define CLIENT_TRANSACTIONS        8192             // client knows about transactions
+                                 #define CLIENT_RESERVED           16384             // old flag for 4.1 protocol
+                                 #define CLIENT_SECURE_CONNECTION  32768             // new 4.1 authentication
+                                 #define CLIENT_MULTI_STATEMENTS   65536             // enable multi-stmt support
+                                 #define CLIENT_MULTI_RESULTS     131072             // enable multi-results
+                                 #define CLIENT_REMEMBER_OPTIONS  ((ulong) 1) << 31  // ?
+
+      Not all of these may work or be meaningful, but CLIENT_FOUND_ROWS does, at least.
+      */
    }
 
 
