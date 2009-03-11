@@ -394,7 +394,7 @@ function getArgvArray() {
    if (!isSet($GLOBALS['argv']) || !is_array($GLOBALS['argv'])) {
       if (!isSet($_SERVER['argv']) || !is_array($_SERVER['argv'])) {
          if (!isSet($GLOBALS['HTTP_SERVER_VARS']) || isSet($GLOBALS['HTTP_SERVER_VARS']['argv']) || !is_array($GLOBALS['HTTP_SERVER_VARS']['argv'])) {
-            throw new RuntimeException('Could not get command line arguments (register_argc_argv = Off ?)');
+            throw new RuntimeException('Could not get command line arguments, "register_argc_argv" = Off ???');
          }
          $array = $GLOBALS['HTTP_SERVER_VARS']['argv'];
       }
@@ -515,8 +515,4 @@ pprofp <flags> <trace file>
 EOD;
     exit(1);
 }
-
-/*
-echoPre(number_format(memory_get_usage()).'    (peak: '.number_format(memory_get_peak_usage()).')');
-*/
 ?>
