@@ -49,7 +49,7 @@ final class Lock extends BaseLock {
       $this->key = $key;
 
       // konkretes Lock erzeugen, vorzugsweise SystemFiveLock
-      if (false && extension_loaded('sysvsem')) {
+      if (extension_loaded('sysvsem')) {
          $this->impl = new SystemFiveLock($key);
       }
       else {
