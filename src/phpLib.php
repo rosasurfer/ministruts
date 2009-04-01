@@ -282,7 +282,7 @@ function register_lifo_shutdown_function(/*callable*/ $callback = null /*, $args
 
       if (!isSet($frame['file']) && !isSet($frame['line'])) {     // wenn Aufruf aus PHP-Core, also während des Script-Shutdowns ...
          try {
-            for ($i=sizeOf($functions); $i; ) {                      // ... alle registrierten Funktionen rückwärts abarbeiten
+            for ($i=sizeOf($functions); $i; ) {                   // ... alle registrierten Funktionen rückwärts abarbeiten
                $f = $functions[--$i];
                call_user_func_array($f['name'], $f['args']);
             }
