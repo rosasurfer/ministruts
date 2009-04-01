@@ -80,7 +80,7 @@ class SMTPMailer extends Mailer {
 
 
       // get our hostname
-      $hostname = php_uName('n');
+      $hostname = php_uname('n');
       if (!$hostname)
          $hostname  = 'localhost';
       if (!String ::contains($hostname, '.'))
