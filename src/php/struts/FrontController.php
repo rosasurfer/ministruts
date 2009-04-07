@@ -92,11 +92,11 @@ final class FrontController extends Singleton {
                          $baseURL.'/CVS',
                          $baseURL.'/CVS/',
                          );
-
+      /*
       foreach ($locations as $location) {
          $request  = HttpRequest ::create()->setUrl($location);
          $response = CurlHttpClient ::create()
-                                    ->setTimeout(10)
+                                    ->setTimeout(5)
                                     ->send($request);
          $status = $response->getStatus();
 
@@ -108,6 +108,7 @@ final class FrontController extends Singleton {
             throw new InfrastructureException('Web server configuration error, resource at "'.$location.'" is not blocked: '.$status.' ('.HttpResponse ::$sc[$status].')');
          }
       }
+      */
 
 
       // Struts-Konfigurationsdateien suchen
