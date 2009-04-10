@@ -1,47 +1,67 @@
 #!/bin/sh
+################################################################################################################################
+#                                                                                                                              #
+# Sucht und meldet nicht abgefangene PHP-Fehler.                                                                               #
+#                                                                                                                              #
+#                                                                                                                              #
+# Aufruf:  logPHPErrors.sh  <ERRORLOG_DIRECTORY>                                                                               #
+#                                                                                                                              #
+#   ERRORLOG_DIRECTORY - Das Verzeichnis, in dem nicht abgefangene PHP-Fehler gespeichert werden. Bei Verwendung von Wildcards #
+#                        muß das Argument in Anführungszeichen gesetzt werden.                                                 #
+#                                                                                                                              #
+# Beispiel:  logPHPErrors.sh  "/var/www/*/log"                                                                                 #
+#                                                                                                                              #
+################################################################################################################################
+
+
+# Name der PHP-Error-Logdatei (default: php_error_log)
 #
-# Aufruf: find /var/www -name 'php_error_log' -print0 2> /dev/null | xargs -0r logPHPErrors.sh
-#   oder:
-#         /bin/ls -1 /var/www/project/*/log/php_error_log 2> /dev/null | while read line ; do logPHPErrors.sh "$line" ; done
+LOGFILE_NAME="php_error_log"
+
+
+# User und/oder E-Mailadressen für Benachrichtigungen (kommagetrennt, keine Leerzeichen; default: der aktuelle User)
 #
-# Als Cron-Job ausführen.
-#
-##############################################################################################################################
+EMAILS_TO=root
 
 
 
-# Leerzeichengetrennte Liste der User oder E-Mail-Adressen, an die Benachrichtigungen geschickt werden sollen
-# (z.B. 'root webmaster@domain.com')
-#webmasters=root
-#webmasters='user1@domain.tld user2@domain.tld'
-webmasters='user1@domain.tld'
+# ------------------------------------------------------------------------------------------------------------------------------
+# Start
+# ------------------------------------------------------------------------------------------------------------------------------
+# Source function library
+. /etc/rc.d/init.d/functions
+
+shopt -s extglob; IFS=
+
+# ggf. Config-Defaultvalues setzen
+LOGFILE_NAME=${LOGFILE_NAME:-'php_error_log'}
+EMAILS_TO=${EMAILS_TO:-`whoami`}
 
 
-
-# default to current user, if not specified.
-addresses=${webmasters:-`whoami`}
+ERRORLOG_DIRECTORY="$1"
 
 
+while [ 1 ]; do
+   IFS=$'\n'
+   for file in `find $ERRORLOG_DIRECTORY -name "$LOGFILE_NAME"`; do
+      # Datei umbenennen
+      mv -f "$file" "$file.tmp"
 
-# alle übergebenen Dateinamen verarbeiten
-for file ; do
+      # Zeilen einzeln an alle E-Mail-Adressen schicken
+      IFS=$'\n'
+      for line in `cat "$file.tmp"`; do
+         echo "PHP error in: $file"$'\n\n'"$line" | mail -s "PHP: [FATAL] Uncatched error" $EMAILS_TO
+      done; IFS=
 
-    # abbrechen, wenn die Datei gerade bearbeitet wird
-    [ -f "$file.tmp" ] && echo "Remove file $file.tmp, it is in the way." 1>&2 && exit 1
+      # aufräumen
+      rm "$file.tmp"
+   done; IFS=
 
-    # Datei umbenennen, ...
-    mv "$file" "$file.tmp"
-
-    # ... jede Zeile an jede E-Mail-Adresse schicken, ...
-    while read line ; do
-        for address in $addresses ; do
-            echo 'PHP error in: '$file $'\n\n'$line | mail -s "PHP: [FATAL] Uncatched error" $address
-        done
-    done < "$file.tmp"
-
-    # ... und aufräumen
-    rm "$file.tmp"
+   # Schlafen gehen
+   sleep 60
 done
 
+exit
 
-exit 0
+
+# ------------------------------------------------------------------------------------------------------------------------------
