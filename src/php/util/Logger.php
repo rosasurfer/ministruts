@@ -34,6 +34,8 @@ class Logger extends StaticClass {
       $console  = !isSet($_SERVER['REQUEST_METHOD']); // ob wir in einer Shell laufen
       $terminal = WINDOWS || (bool) getEnv('TERM');   // ob wir ein Terminal haben
 
+      // TODO: $display ausschalten, wenn bereits ein Redirect-Header gesendet wurde
+
       self::$display = ($console && $terminal)
                     || (isSet($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR']=='127.0.0.1')
                     || (bool) ini_get('display_errors');
@@ -168,7 +170,6 @@ class Logger extends StaticClass {
     */
    public static function handleException(Exception $exception, $destructor = false) {
       try {
-         //echoPre(__METHOD__.'(): '.$exception);
          self ::init();
 
          // Bei manuellem Aufruf aus einem Destruktor kann die Exception zurückgereicht werden, sofern wir nicht im Shutdown sind
@@ -180,6 +181,7 @@ class Logger extends StaticClass {
          // 1. Fehlerdaten ermitteln
          $message  = ($exception instanceof NestableException) ? (string) $exception : get_class($exception).': '.$exception->getMessage();
          $traceStr = ($exception instanceof NestableException) ? "Stacktrace:\n-----------\n".$exception->printStackTrace(true) : 'Stacktrace not available';
+         // TODO: vernestelte, einfache Exceptions geben fehlerhaften Stacktrace zurück
          $file     =  $exception->getFile();
          $line     =  $exception->getLine();
          $plainMessage = '[FATAL] Uncaught '.$message."\nin ".$file.' on line '.$line."\n";
@@ -348,6 +350,7 @@ class Logger extends StaticClass {
             }
          }
          $trace = "Stacktrace:\n-----------\n".NestableException ::formatStackTrace($trace);
+         // TODO: vernestelte, einfache Exceptions geben fehlerhaften Stacktrace zurück
       }
 
       $plainMessage = self::$logLevels[$level].': '.$message."\nin ".$file.' on line '.$line."\n";
