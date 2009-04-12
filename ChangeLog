@@ -1,3 +1,8 @@
+2009-03-12
+
+   - Refactoring: register_lifo_shutdown_function() -> push_shutdown_function()
+
+
 2009-03-05
 
    - php/util/Config: Laufzeitänderungen sind nur noch für den aktuellen Request gültig und werden nicht zurück in den Cache geschrieben
