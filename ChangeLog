@@ -1,7 +1,8 @@
 2009-03-12
 
    - Refactoring: register_lifo_shutdown_function() -> push_shutdown_function()
-
+	- Der Versand einer E-Mail kann durch entsprechende Konfiguration in die Shutdown-Phase des Scriptes verschoben werden, 
+	  um evt. Transaktionen nicht unnötig lange zu blockieren.
 
 2009-03-05
 
