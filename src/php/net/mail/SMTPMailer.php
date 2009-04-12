@@ -1,44 +1,9 @@
 <?
 /**
- * Mailer, der Mails per TCP/IP-Protokoll über einen SMTP-Server verschickt.
+ * Mailer, der Mails per SMTP-Protokoll über einen SMTP-Server verschickt.
  */
 class SMTPMailer extends Mailer {
 
-   // TODO: SPF-Eintrag der Absenderdomain zum Testen umgehen
-   /**
-    * Return-Path: <user@domain.tld>
-    * Received: from compute1.internal (compute1.internal [0.0.0.0])
-    *     by store52m.internal (Cyrus v2.3.13-fmsvn17160) with LMTPA;
-    *     Sun, 21 Dec 2008 07:18:19 -0500
-    * Received: from mx3.domain.tld ([0.0.0.0])
-    *   by compute1.internal (LMTPProxy); Sun, 21 Dec 2008 07:18:20 -0500
-    * Received: from quad.domain.tld (domain.tld [0.0.0.0])
-    *    by mx3.domain.tld (Postfix) with ESMTP id 02D70FE
-    *    for <user@domain.tld>; Sun, 21 Dec 2008 07:18:19 -0500 (EST)
-    * Received: (qmail 6101 invoked by uid 110); 21 Dec 2008 13:18:18 +0100
-    * X-Remote-Delivered-To: 25-user@domain.tld
-    * X-Spam-Checker-Version: SpamAssassin 3.2.4 (2008-01-01) on
-    *    quad.domain.tld
-    * X-Spam-Level:
-    * X-Spam-Status: No, score=0.6 required=7.0 tests=MISSING_MID,RCVD_IN_PBL,
-    *    RDNS_DYNAMIC autolearn=no version=3.2.4
-    * Received: (qmail 6033 invoked from network); 21 Dec 2008 13:18:13 +0100
-    * Received: from d0-0-0-0.cust.domain.tld (HELO device.localdomain) (0.0.0.0)
-    *   by domain.tld with SMTP; 21 Dec 2008 13:18:13 +0100
-    *
-    * Received-SPF: softfail (domain.tld: transitioning SPF record at domain.tld does not designate 0.0.0.0 as permitted sender)
-    *                                                                                                                      ^
-    *                                                                                                                      |
-    *                                                                                                    lokale Adresse (beim Testen zu Hause)
-    * Date: Sun, 21 Dec 2008 13:18:13 +0100
-    * From: local.domain.tld <user@domain.tld>
-    * To: User Name <user@domain.tld>
-    * Subject: ********************************************************** an User Name
-    * Content-Type: text/plain; charset=iso-8859-1
-    *
-    * Hallo User Name,
-    * ...
-    */
 
    private static /*bool*/ $logDebug,
                   /*bool*/ $logInfo,
@@ -48,15 +13,16 @@ class SMTPMailer extends Mailer {
 
    private /*array*/ $config = array('host'          => null,     // SMTP server host name
                                      'port'          => null,     // SMTP server port
+                                     'timeout'       => 300,      // socket timeout: sendmail braucht ewig
                                      'auth_username' => null,     // authentification username
                                      'auth_password' => null,     // authentification password
-                                     'timeout'       => 300);     // socket timeout: sendmail braucht ewig
+                                     );
 
-   private /*string*/   $hostname;
-   private /*resource*/ $connection     = null;
+   private /*string*/   $hostName;
+   private /*resource*/ $connection;
    private /*int*/      $responseStatus = 0;
-   private /*string*/   $response       = null;
-   private /*string*/   $logBuffer      = null;
+   private /*string*/   $response;
+   private /*string*/   $logBuffer;
 
 
    /**
@@ -71,21 +37,41 @@ class SMTPMailer extends Mailer {
       self::$logNotice = ($loglevel <= L_NOTICE);
 
 
-      // Defaultwerte aus PHP-Konfiguration übernehmen...
-      $this->config['host'] = ini_get('SMTP');
-      $this->config['port'] = ini_get('smtp_port');
+      // fehlende Optionen mit PHP-Defaults bestücken
+      if (!isSet($options['host'])) {
+         $options['host'] = ini_get('SMTP');
+         $options['port'] = ini_get('smtp_port');
+      }
+      else {
+         $host = $options['host'];
+         if (!is_string($host)) throw new IllegalTypeException('Illegal type of option "host": '.getType($options['host']));
+         $parts = explode(':', $host);
 
-      // ... und mit angegebenen Optionen ergänzen
+         if (sizeOf($parts) == 1) {
+            if (trim($parts[0]) == '') throw new InvalidArgumentException('Invalid option "host": '.$options['host']);
+            $options['port'] = ini_get('smtp_port');     // TODO: Adresse und Port prüfen
+         }
+         elseif (sizeOf($parts) == 2) {
+            if (trim($parts[0])=='' || trim($parts[1])=='') throw new InvalidArgumentException('Invalid option "host": '.$options['host']);
+            $options['host'] = $parts[0];                // TODO: Adresse und Port prüfen
+            $options['port'] = $parts[1];
+         }
+         else {
+            throw new InvalidArgumentException('Invalid option "host": '.$options['host']);
+         }
+      }
+
+      // vorgegebene mit übergebenen Optionen mergen
       $this->config = array_merge($this->config, $options);
 
 
       // get our hostname
-      $hostname = php_uname('n');
-      if (!$hostname)
-         $hostname  = 'localhost';
-      if (!String ::contains($hostname, '.'))
-         $hostname .= '.localdomain';    // hostname must contain more than one part (see RFC 2821)
-      $this->hostname = strToLower($hostname);
+      $hostName = php_uname('n');
+      if (!$hostName)
+         $hostName  = 'localhost';
+      if (!String ::contains($hostName, '.'))
+         $hostName .= '.localdomain';    // hostname must contain more than one part (see RFC 2821)
+      $this->hostName = strToLower($hostName);
    }
 
 
@@ -126,12 +112,12 @@ class SMTPMailer extends Mailer {
 
       // init connection
       $this->readResponse();                          // read greeting
-      $this->writeData('EHLO '.$this->hostname);      // extended Hello first...
+      $this->writeData('EHLO '.$this->hostName);      // extended Hello first...
       $response = $this->readResponse();
 
       $this->parseResponse($response);
       if ($this->responseStatus != 250) {
-         $this->writeData('HELO '.$this->hostname);   // normal Hello if extended fails...
+         $this->writeData('HELO '.$this->hostName);   // normal Hello if extended fails...
          $response = $this->readResponse();
 
          $this->parseResponse($response);
@@ -192,6 +178,7 @@ class SMTPMailer extends Mailer {
       if (!$from) throw new InvalidArgumentException('Invalid argument $sender: '.$sender);
 
       if ($receiver!==(string)$receiver) throw new IllegalTypeException('Illegal type of parameter $receiver: '.getType($receiver));
+      $receiver = Config ::get('mail.address.forced-receiver', $receiver);
       $to = $this->parseAddress($receiver);
       if (!$to) throw new InvalidArgumentException('Invalid argument $receiver: '.$receiver);
 
@@ -425,5 +412,42 @@ class SMTPMailer extends Mailer {
    private function logResponse($data) {
       $this->logBuffer .= $data;
    }
+
+
+   // TODO: SPF-Eintrag der Absenderdomain zum Testen umgehen
+   /**
+    * Return-Path: <user@domain.tld>
+    * Received: from compute1.internal (compute1.internal [0.0.0.0])
+    *     by store52m.internal (Cyrus v2.3.13-fmsvn17160) with LMTPA;
+    *     Sun, 21 Dec 2008 07:18:19 -0500
+    * Received: from mx3.domain.tld ([0.0.0.0])
+    *   by compute1.internal (LMTPProxy); Sun, 21 Dec 2008 07:18:20 -0500
+    * Received: from quad.domain.tld (domain.tld [0.0.0.0])
+    *    by mx3.domain.tld (Postfix) with ESMTP id 02D70FE
+    *    for <user@domain.tld>; Sun, 21 Dec 2008 07:18:19 -0500 (EST)
+    * Received: (qmail 6101 invoked by uid 110); 21 Dec 2008 13:18:18 +0100
+    * X-Remote-Delivered-To: 25-user@domain.tld
+    * X-Spam-Checker-Version: SpamAssassin 3.2.4 (2008-01-01) on
+    *    quad.domain.tld
+    * X-Spam-Level:
+    * X-Spam-Status: No, score=0.6 required=7.0 tests=MISSING_MID,RCVD_IN_PBL,
+    *    RDNS_DYNAMIC autolearn=no version=3.2.4
+    * Received: (qmail 6033 invoked from network); 21 Dec 2008 13:18:13 +0100
+    * Received: from d0-0-0-0.cust.domain.tld (HELO device.localdomain) (0.0.0.0)
+    *   by domain.tld with SMTP; 21 Dec 2008 13:18:13 +0100
+    *
+    * Received-SPF: softfail (domain.tld: transitioning SPF record at domain.tlddoes not designate 0.0.0.0 as permitted sender)
+    *                                                                                                                      ^
+    *                                                                                                                      |
+    *                                                                                                    lokale Adresse (beim Testen zu Hause)
+    * Date: Sun, 21 Dec 2008 13:18:13 +0100
+    * From: local.domain.tld <user@domain.tld>
+    * To: User Name <user@domain.tld>
+    * Subject: *********************************** an User Name
+    * Content-Type: text/plain; charset=iso-8859-1
+    *
+    * Hallo User Name,
+    * ...
+    */
 }
 ?>

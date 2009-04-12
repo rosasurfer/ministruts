@@ -2,10 +2,7 @@
 /**
  * Mailer
  *
- * Example:
- * --------
- * $options = array();
- * Mailer ::create($options)->sendMail($from, $to, $subject, $message, $headers);
+ * Mailer-Factory und abstrakte Basisklasse für alle Mailer-Implementierungen.
  */
 abstract class Mailer extends Object {
 
@@ -41,7 +38,10 @@ abstract class Mailer extends Object {
       if ($options === null)
          $options = array();
 
-      $class = isSet($options['class']) ? $options['class'] : 'SMTPMailer';
+      if (!isSet($options['class']))
+         $options['class'] = 'PHPMailer';
+
+      $class = $options['class'];
 
       return new $class($options);
    }

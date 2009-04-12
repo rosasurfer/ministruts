@@ -199,7 +199,7 @@ class Logger extends StaticClass {
 
 
          // 3. Exception an die registrierten Adressen mailen (wenn $mail TRUE ist) ...
-         if (self::$mail && ($addresses = explode(',', Config ::get('mail.buglovers')))) {
+         if (self::$mail && ($addresses = explode(',', Config ::get('mail.address.buglovers')))) {
             $mailMsg  = $plainMessage."\n".$traceStr;
 
             if ($request=Request ::me()) {
@@ -368,7 +368,7 @@ class Logger extends StaticClass {
 
 
       // 3. Logmessage an die registrierten Adressen mailen (wenn $mail TRUE ist) ...
-      if (self::$mail && ($addresses = explode(',', Config ::get('mail.buglovers')))) {
+      if (self::$mail && ($addresses = explode(',', Config ::get('mail.address.buglovers')))) {
          $mailMsg = $plainMessage.($exception ? "\n\n".$exMessage."\n":'')."\n\n".$trace;
 
          if ($request=Request ::me()) {

@@ -1,6 +1,6 @@
 <?
 /**
- * (C)ommand (l)ine (i)nterface Mailer, verschickt Mails durch Aufruf eines Shellprogramms.
+ * Mailer, der Mails über ein Command-Line-Interface verschickt (Aufruf eines Shellprogramms).
  */
 class CLIMailer extends Mailer {
 
@@ -26,6 +26,8 @@ class CLIMailer extends Mailer {
     */
    public function sendMail($sender, $receiver, $subject, $message, array $headers = null) {
       throw new UnimplementedFeatureException('Method '.get_class($this).'::'.__FUNCTION__.'() is not implemented');
+
+      $receiver = Config ::get('mail.address.forced-receiver', $receiver);
    }
 }
 ?>

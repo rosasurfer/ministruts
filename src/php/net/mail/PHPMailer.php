@@ -1,8 +1,8 @@
 <?
 /**
- * Mailer, der Mails über eine FileSocket-Verbindung verschickt.
+ * Mailer, der Mails mit Hilfe der in PHP integrierten mail()-Funktion verschickt.
  */
-class FileSocketMailer extends Mailer {
+class PHPMailer extends Mailer {
 
 
    /**

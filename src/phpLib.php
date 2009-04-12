@@ -125,6 +125,7 @@ $__classes['HttpResponse'                   ] = $dir.'php/net/http/HttpResponse'
 $__classes['CLIMailer'                      ] = $dir.'php/net/mail/CLIMailer';
 $__classes['FileSocketMailer'               ] = $dir.'php/net/mail/FileSocketMailer';
 $__classes['Mailer'                         ] = $dir.'php/net/mail/Mailer';
+$__classes['PHPMailer'                      ] = $dir.'php/net/mail/PHPMailer';
 $__classes['SMTPMailer'                     ] = $dir.'php/net/mail/SMTPMailer';
 
 $__classes['BasePdfDocument'                ] = $dir.'php/pdf/BasePdfDocument';
