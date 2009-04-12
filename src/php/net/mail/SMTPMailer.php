@@ -11,12 +11,12 @@ class SMTPMailer extends Mailer {
                   /*int*/  $maxSendingTime = 2;    // benötigt der Versand länger als hier angegeben, wird er im Logelevel DEBUG geloggt
 
 
-   private /*array*/ $config = array('host'          => null,     // SMTP server host name
-                                     'port'          => null,     // SMTP server port
-                                     'timeout'       => 300,      // socket timeout: sendmail braucht ewig
-                                     'auth_username' => null,     // authentification username
-                                     'auth_password' => null,     // authentification password
-                                     );
+   protected /*array*/ $config = array('host'          => null,     // SMTP server host name
+                                       'port'          => null,     // SMTP server port
+                                       'timeout'       => 300,      // socket timeout: sendmail braucht ewig
+                                       'auth_username' => null,     // authentification username
+                                       'auth_password' => null,     // authentification password
+                                       );
 
    private /*string*/   $hostName;
    private /*resource*/ $connection;
@@ -35,7 +35,6 @@ class SMTPMailer extends Mailer {
       self::$logDebug  = ($loglevel <= L_DEBUG );
       self::$logInfo   = ($loglevel <= L_INFO  );
       self::$logNotice = ($loglevel <= L_NOTICE);
-
 
       // fehlende Optionen mit PHP-Defaults bestücken
       if (!isSet($options['host'])) {
@@ -63,7 +62,6 @@ class SMTPMailer extends Mailer {
 
       // vorgegebene mit übergebenen Optionen mergen
       $this->config = array_merge($this->config, $options);
-
 
       // get our hostname
       $hostName = php_uname('n');
@@ -189,6 +187,11 @@ class SMTPMailer extends Mailer {
          $headers = array();
       foreach ($headers as $key => $header)
          if ($header!==(string)$header) throw new IllegalTypeException('Illegal parameter type in argument $headers[$key]: '.getType($header));
+
+
+      // Versand je nach Konfiguration zum Shutdown verschieben (so blockieren wir keine laufenden Transaktionen etc.)
+      if ($this->isTimeShifted())
+         return;
 
 
       // ggf. Startzeitpunkt speichern

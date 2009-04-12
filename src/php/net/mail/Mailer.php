@@ -7,6 +7,9 @@
 abstract class Mailer extends Object {
 
 
+   protected /*array*/ $config;
+
+
    /**
     * Constructor
     *
@@ -44,6 +47,28 @@ abstract class Mailer extends Object {
       $class = $options['class'];
 
       return new $class($options);
+   }
+
+
+   /**
+    * Verschiebt den Versandvorgang dieses Mailers, wenn dies entsprechend konfiguriert ist.
+    *
+    * @return boolean - Ob der Versand verschoben wurde.
+    */
+   final protected function isTimeShifted() {
+      if (isSet($this->config['time-shift']) && $this->config['time-shift']) {
+         $trace = debug_backTrace();
+
+         $callback = array($this, $trace[1]['function']);
+         $args     = $trace[1]['args'];
+         array_unshift($args, $callback);
+
+         call_user_func_array('push_shutdown_function', $args);
+
+         $this->config['time-shift'] = false;
+         return true;
+      }
+      return false;
    }
 
 
