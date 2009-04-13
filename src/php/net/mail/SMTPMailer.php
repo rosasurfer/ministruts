@@ -190,7 +190,7 @@ class SMTPMailer extends Mailer {
 
 
       // Versand je nach Konfiguration zum Shutdown verschieben (so blockieren wir keine laufenden Transaktionen etc.)
-      if ($this->isTimeShifted())
+      if ($this->sendLater())
          return;
 
 

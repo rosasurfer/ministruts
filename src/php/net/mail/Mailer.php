@@ -55,8 +55,8 @@ abstract class Mailer extends Object {
     *
     * @return boolean - Ob der Versand verschoben wurde.
     */
-   final protected function isTimeShifted() {
-      if (isSet($this->config['time-shift']) && $this->config['time-shift']) {
+   final protected function sendLater() {
+      if (isSet($this->config['send-later']) && $this->config['send-later']) {
          $trace = debug_backTrace();
 
          $callback = array($this, $trace[1]['function']);
@@ -65,7 +65,7 @@ abstract class Mailer extends Object {
 
          call_user_func_array('push_shutdown_function', $args);
 
-         $this->config['time-shift'] = false;
+         $this->config['send-later'] = false;
          return true;
       }
       return false;

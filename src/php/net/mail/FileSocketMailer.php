@@ -28,7 +28,7 @@ class FileSocketMailer extends Mailer {
       throw new UnimplementedFeatureException('Method '.get_class($this).'::'.__FUNCTION__.'() is not implemented');
 
       // Versand je nach Konfiguration zum Shutdown verschieben (so blockieren wir keine laufenden Transaktionen etc.)
-      if ($this->isTimeShifted())
+      if ($this->sendLater())
          return;
 
       $receiver = Config ::get('mail.address.forced-receiver', $receiver);
