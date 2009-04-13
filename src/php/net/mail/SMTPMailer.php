@@ -189,7 +189,7 @@ class SMTPMailer extends Mailer {
          if ($header!==(string)$header) throw new IllegalTypeException('Illegal parameter type in argument $headers[$key]: '.getType($header));
 
 
-      // Versand je nach Konfiguration zum Shutdown verschieben (so blockieren wir keine laufenden Transaktionen etc.)
+      // Versand je nach Konfiguration verschieben (um z.B. keine Transaktionen zu blockieren)
       if ($this->sendLater())
          return;
 

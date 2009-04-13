@@ -1,4 +1,9 @@
-2009-03-12
+2009-04-13
+
+   - php/util/Logger: bei Ausgabe von Meldungen werden evt. gesendete Location-Header berücksichtigt (www-redirect)
+
+
+2009-04-12
 
    - Refactoring: register_lifo_shutdown_function() -> push_shutdown_function()
 	- Der Versand einer E-Mail kann durch entsprechende Konfiguration in die Shutdown-Phase des Scriptes verschoben werden, 
