@@ -34,8 +34,6 @@ class Logger extends StaticClass {
       $console  = !isSet($_SERVER['REQUEST_METHOD']); // ob wir in einer Shell laufen
       $terminal = WINDOWS || (bool) getEnv('TERM');   // ob wir ein Terminal haben
 
-      // TODO: $display ausschalten, wenn bereits ein Redirect-Header gesendet wurde
-
       self::$display = ($console && $terminal)
                     || (isSet($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR']=='127.0.0.1')
                     || (bool) ini_get('display_errors');
@@ -193,6 +191,16 @@ class Logger extends StaticClass {
                echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif"><b>[FATAL] Uncaught</b> '.nl2br(htmlSpecialChars($message, ENT_QUOTES))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
                echo '<br>'.printFormatted($traceStr, true);
                echo "<br></div>\n";
+
+               // Wurde ein Redirect-Header gesendet, ist die Ausgabe verloren und muß zusätzlich gemailt werden
+               // (kann vorher nicht zuverlässig ermittelt werden, da die Header noch nicht gesendet sein können)
+               foreach (headers_list() as $header) {
+                  if (striPos($header, 'Location: ') === 0) {
+                     self::$display = false;
+                     self::$mail    = true;
+                     break;
+                  }
+               }
             }
             else {
                echo $plainMessage."\n".$traceStr."\n";   // PHP gibt den Fehler unter Linux zusätzlich auf stderr aus,
@@ -201,7 +209,7 @@ class Logger extends StaticClass {
 
 
          // 3. Exception an die registrierten Adressen mailen (wenn $mail TRUE ist) ...
-         if (self::$mail && ($addresses = explode(',', Config ::get('mail.address.buglovers')))) {
+         if (self::$mail && ($addresses = Config ::get('mail.address.buglovers'))) {
             $mailMsg  = $plainMessage."\n".$traceStr;
 
             if ($request=Request ::me()) {
@@ -227,7 +235,9 @@ class Logger extends StaticClass {
             if (isSet($_SERVER['SERVER_ADMIN']))
                ini_set('sendmail_from', $_SERVER['SERVER_ADMIN']);                           // nur für Windows relevant
 
-            foreach ($addresses as $address) {
+            $addresses = Config ::get('mail.address.forced-receiver', $addresses);
+
+            foreach (explode(',', $addresses) as $address) {
                // TODO: Adressformat validieren
                if ($address) {
                   // TODO: Header mit Fehlermeldung hinzufügen, damit beim Empfänger Messagefilter unterstützt werden
@@ -363,6 +373,16 @@ class Logger extends StaticClass {
             if ($exception)
                echo '<br>'.htmlSpecialChars($exMessage, ENT_QUOTES).'<br>';
             echo '<br>'.printFormatted($trace, true)."<br></div>\n";
+
+            // Wurde ein Redirect-Header gesendet, ist die Ausgabe verloren und muß zusätzlich gemailt werden
+            // (kann vorher nicht zuverlässig ermittelt werden, da die Header noch nicht gesendet sein können)
+            foreach (headers_list() as $header) {
+               if (striPos($header, 'Location: ') === 0) {
+                  self::$display = false;
+                  self::$mail    = true;
+                  break;
+               }
+            }
          }
          else {
             echo $plainMessage.($exception ? "\n".$exMessage."\n":'')."\n".$trace."\n";
@@ -371,7 +391,7 @@ class Logger extends StaticClass {
 
 
       // 3. Logmessage an die registrierten Adressen mailen (wenn $mail TRUE ist) ...
-      if (self::$mail && ($addresses = explode(',', Config ::get('mail.address.buglovers')))) {
+      if (self::$mail && ($addresses = Config ::get('mail.address.buglovers'))) {
          $mailMsg = $plainMessage.($exception ? "\n\n".$exMessage."\n":'')."\n\n".$trace;
 
          if ($request=Request ::me()) {
@@ -397,7 +417,9 @@ class Logger extends StaticClass {
          if (isSet($_SERVER['SERVER_ADMIN']))
             ini_set('sendmail_from', $_SERVER['SERVER_ADMIN']);                           // nur für Windows relevant
 
-         foreach ($addresses as $address) {
+         $addresses = Config ::get('mail.address.forced-receiver', $addresses);
+
+         foreach (explode(',', $addresses) as $address) {
             // TODO: Adressformat validieren
             if ($address) {
                // TODO: Header mit Fehlermeldung hinzufügen, damit beim Empfänger Messagefilter unterstützt werden
