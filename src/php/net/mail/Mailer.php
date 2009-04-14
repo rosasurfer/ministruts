@@ -67,6 +67,17 @@ abstract class Mailer extends Object {
 
          $this->config['send-later'] = false;
          return true;
+
+         /**
+          * TODO: Message-Queue implementieren
+          *
+          * Noch keine Möglichkeit gefunden, bei Redirect-Header und aktiviertem "output_buffering" die Header
+          * vorzuschicken und den Versand im Hintergrund weiterlaufen zu lassen.  Da der Output-Buffer bei einem
+          * Redirect nie voll ist, wartet PHP immer, ob die Shutdown-Funktion noch Content ausgibt.
+          *
+          * Lösung:  Versand nicht während des Shutdowns, sondern per Message-Queue in einem anderen Prozeß ausführen.
+          *          (siehe https://www.dropr.org/)
+          */
       }
       return false;
    }
