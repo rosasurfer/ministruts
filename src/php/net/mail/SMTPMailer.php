@@ -189,8 +189,10 @@ class SMTPMailer extends Mailer {
          if ($header!==(string)$header) throw new IllegalTypeException('Illegal parameter type in argument $headers[$key]: '.getType($header));
 
 
-      // Versand je nach Konfiguration verschieben (um z.B. keine Transaktionen zu blockieren)
-      if ($this->sendLater())
+      // Versand je nach Konfiguration verschieben (um z.B. Transaktionen nicht zu blockieren)
+      $args = func_get_args();
+      $args[1] = $receiver;            // per 'mail.address.forced-receiver' überschriebenen Empfänger merken
+      if ($this->sendLater($args))
          return;
 
 
@@ -200,7 +202,7 @@ class SMTPMailer extends Mailer {
 
 
       if (is_resource($this->connection))
-         $this->logBuffer = null;         // reset log buffer if already connected
+         $this->logBuffer = null;      // reset log buffer if already connected
 
       if (!is_resource($this->connection))
          $this->connect();

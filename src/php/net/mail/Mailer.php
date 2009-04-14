@@ -53,15 +53,15 @@ abstract class Mailer extends Object {
    /**
     * Verschiebt den Versandvorgang dieses Mailers, wenn dies entsprechend konfiguriert ist.
     *
-    * @return boolean - Ob der Versand verschoben wurde.
+    * @param array $args - Daten der zu versendenden E-Mail
+    *
+    * @return boolean    - Ob der Versand verschoben wurde.
     */
-   final protected function sendLater() {
+   final protected function sendLater(array $args) {
       if (isSet($this->config['send-later']) && $this->config['send-later']) {
-         $trace = debug_backTrace();
 
-         $callback = array($this, $trace[1]['function']);
-         $args     = $trace[1]['args'];
-         array_unshift($args, $callback);
+         $callable = array($this, 'sendMail');
+         array_unshift($args, $callable);
 
          call_user_func_array('push_shutdown_function', $args);
 

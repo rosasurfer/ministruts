@@ -27,8 +27,10 @@ class CLIMailer extends Mailer {
    public function sendMail($sender, $receiver, $subject, $message, array $headers = null) {
       throw new UnimplementedFeatureException('Method '.get_class($this).'::'.__FUNCTION__.'() is not implemented');
 
-      // Versand je nach Konfiguration zum Shutdown verschieben (so blockieren wir keine laufenden Transaktionen etc.)
-      if ($this->sendLater())
+      // Versand je nach Konfiguration verschieben (um z.B. Transaktionen nicht zu blockieren)
+      $args = func_get_args();
+      $args[1] = $receiver;         // per 'mail.address.forced-receiver' überschriebenen Empfänger merken
+      if ($this->sendLater($args))
          return;
 
       $receiver = Config ::get('mail.address.forced-receiver', $receiver);
