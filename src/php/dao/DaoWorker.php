@@ -76,7 +76,7 @@ class DaoWorker extends Object {
     * statt einer zweiten Datenbankabfrage benutzt werden.
     * (siehe found_rows():  http://dev.mysql.com/doc/refman/5.1/en/information-functions.html)
     *
-    * @return int - Gesamtanzahl von Ergebnissen (ohne LIMIT-Klausel)
+    * @return int - Gesamtanzahl von Ergebnissen der letzten Abfrage (ohne Berücksichtigung einer LIMIT-Klausel)
     */
    public function countFoundItems() {
       return $this->foundItemsCounter;
