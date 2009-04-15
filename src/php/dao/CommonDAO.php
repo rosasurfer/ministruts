@@ -45,9 +45,9 @@ class CommonDAO extends Singleton {
     * statt einer zweiten Datenbankabfrage benutzt werden.
     * (siehe found_rows():  http://dev.mysql.com/doc/refman/5.1/en/information-functions.html)
     *
-    * @return int - Gesamtanzahl von Ergebnissen (ohne Berücksichtigung einer LIMIT-Klausel)
+    * @return int - Gesamtanzahl von Ergebnissen der letzten Abfrage (ohne Berücksichtigung einer LIMIT-Klausel)
     */
-   final public function countFoundItems() {
+   public function countFoundItems() {
       return $this->getWorker()->countFoundItems();
    }
 
