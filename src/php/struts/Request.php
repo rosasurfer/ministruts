@@ -417,22 +417,27 @@ final class Request extends Singleton {
 
       if ($address === false) {
          if (isSet($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            $address = $_SERVER['HTTP_X_FORWARDED_FOR'];
+            $header = $_SERVER['HTTP_X_FORWARDED_FOR'];
          }
          elseif (isSet($_SERVER['HTTP_HTTP_X_FORWARDED_FOR'])) {
-            $address = $_SERVER['HTTP_HTTP_X_FORWARDED_FOR'];
+            $header = $_SERVER['HTTP_HTTP_X_FORWARDED_FOR'];
          }
          elseif (isSet($_SERVER['HTTP_X_UP_FORWARDED_FOR'])) {       // mobile device
-            $address = $_SERVER['HTTP_X_UP_FORWARDED_FOR'];
+            $header = $_SERVER['HTTP_X_UP_FORWARDED_FOR'];
          }
          elseif (isSet($_SERVER['HTTP_HTTP_X_UP_FORWARDED_FOR'])) {  // mobile device
-            $address = $_SERVER['HTTP_HTTP_X_UP_FORWARDED_FOR'];
+            $header = $_SERVER['HTTP_HTTP_X_UP_FORWARDED_FOR'];
          }
          elseif (isSet($_SERVER[''])) {
-            $address = $_SERVER[''];
+            $header = $_SERVER[''];
          }
          else {
-            $address = null;
+            $header = $addresses = null;
+         }
+
+         if ($header !== null) {
+            $addresses = explode(',', trim($header, ', '));
+            $address = array_pop($addresses);
          }
       }
       return $address;
