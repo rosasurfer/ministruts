@@ -432,7 +432,7 @@ final class Request extends Singleton {
             $header = $_SERVER[''];
          }
          else {
-            $header = $addresses = null;
+            $header = $address = null;
          }
 
          if ($header !== null) {
@@ -440,6 +440,7 @@ final class Request extends Singleton {
             $address = array_pop($addresses);
          }
       }
+
       return $address;
    }
 
