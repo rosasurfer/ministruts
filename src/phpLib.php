@@ -112,6 +112,7 @@ $__classes['FileLock'                       ] = $dir.'php/locking/FileLock';
 $__classes['Lock'                           ] = $dir.'php/locking/Lock';
 $__classes['SystemFiveLock'                 ] = $dir.'php/locking/SystemFiveLock';
 
+$__classes['NetTools'                       ] = $dir.'php/net/NetTools';
 $__classes['TorHelper'                      ] = $dir.'php/net/TorHelper';
 
 $__classes['CurlHttpClient'                 ] = $dir.'php/net/http/CurlHttpClient';
