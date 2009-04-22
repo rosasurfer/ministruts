@@ -437,7 +437,7 @@ final class Request extends Singleton {
 
          if ($header !== null) {
             $addresses = explode(',', trim($header, ', '));
-            $address = array_pop($addresses);
+            $address = trim(array_pop($addresses));
          }
       }
 
