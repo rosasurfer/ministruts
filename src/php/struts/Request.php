@@ -67,10 +67,11 @@ final class Request extends Singleton {
       // POST-Parameter haben höhere Priorität als GET und werden zuerst verarbeitet
       if ($this->isPost()) {
          try {
-            $this->parseParameters(file_get_contents('php://input'), 'POST');
+            $parameters = file_get_contents('php://input');
+            $this->parseParameters($parameters, 'POST');
          }
          catch (Exception $ex) {
-            error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', (string) $ex.', location: parseParameters '.$ex->getFile().' on line '.$ex->getLine()), 0);
+            error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', (string) $ex.', strLen($parameters): '.strLen($parameters).', rawUrlEncode($parameters): '.rawUrlEncode($parameters).', $parameters: '.$parameters), 0);
             exit(1);
          }
       }
