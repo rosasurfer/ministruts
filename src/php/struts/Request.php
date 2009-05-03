@@ -429,6 +429,9 @@ final class Request extends Singleton {
             $header = $_SERVER['HTTP_HTTP_X_UP_FORWARDED_FOR'];
          }
          elseif (isSet($_SERVER['HTTP_X_DDOSPROXY'])) {              // First-Colo Proxy
+            $header = $_SERVER['HTTP_X_DDOSPROXY'];
+         }
+         elseif (isSet($_SERVER['HTTP_HTTP_X_DDOSPROXY'])) {         // First-Colo Proxy
             $header = $_SERVER['HTTP_HTTP_X_DDOSPROXY'];
          }
          elseif (isSet($_SERVER[''])) {
