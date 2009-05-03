@@ -112,9 +112,12 @@ final class String extends StaticClass {
       try {
          return html_entity_decode(htmlEntities($string, ENT_NOQUOTES, 'UTF-8'));
       }
-      catch (Exception $ex) {
-         error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', (string) $ex.', string: '.$string.', request-uri: '.$_SERVER['REQUEST_URI'].', location: '.$ex->getFile().' on line '.$ex->getLine()), 0);
-         exit(1);
+      catch (PHPErrorException $ex) {
+         if ($ex->getMessage() == 'htmlentities(): Invalid multibyte sequence in argument') {
+            error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', (string) $ex.', '.__METHOD__.'(), strLen($string): '.strLen($string).', rawUrlEncode($string): '.rawUrlEncode($string).', $string: '.$string), 0);
+            //exit(1);
+         }
+         throw $ex;
       }
    }
 

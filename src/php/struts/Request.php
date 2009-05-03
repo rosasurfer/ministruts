@@ -64,21 +64,26 @@ final class Request extends Singleton {
       // $_GET, $_POST und $_REQUEST manuell einlesen (die PHP-Implementierung ist indiskutabel, außerdem sind $_COOKIE und $_FILES kein User-Input)
       $_REQUEST = $_GET = $_POST = array();
 
-      // POST-Parameter haben höhere Priorität als GET und werden zuerst verarbeitet
-      if ($this->isPost()) {
-         try {
+      try {
+         // POST-Parameter haben höhere Priorität als GET und werden zuerst verarbeitet
+         if ($this->isPost()) {
             $parameters = file_get_contents('php://input');
             $this->parseParameters($parameters, 'POST');
          }
-         catch (Exception $ex) {
-            error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', (string) $ex.', strLen($parameters): '.strLen($parameters).', rawUrlEncode($parameters): '.rawUrlEncode($parameters).', $parameters: '.$parameters), 0);
-            exit(1);
+
+         // GET-Parameter (nicht per $this->isGet(), denn sie können auch in anderen Requests vorhanden sein)
+         if (strLen($_SERVER['QUERY_STRING'])) {
+            $parameters = $_SERVER['QUERY_STRING'];
+            $this->parseParameters($_SERVER['QUERY_STRING'], 'GET');
          }
       }
-
-      // GET-Parameter (nicht per $this->isGet(), denn sie können auch in anderen Requests vorhanden sein)
-      if (strLen($_SERVER['QUERY_STRING']))
-         $this->parseParameters($_SERVER['QUERY_STRING'], 'GET');
+      catch (PHPErrorException $ex) {
+         if ($ex->getMessage() == 'htmlentities(): Invalid multibyte sequence in argument') {
+            error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', (string) $ex.', '.__METHOD__.'('.$this->method.'), strLen($parameters): '.strLen($parameters).', rawUrlEncode($parameters): '.rawUrlEncode($parameters).', $parameters: '.$parameters), 0);
+            exit(1);
+         }
+         throw $ex;
+      }
    }
 
 
