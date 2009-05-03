@@ -114,7 +114,7 @@ final class String extends StaticClass {
          if ($php_errormsg != 'iconv(): Detected an illegal character in input string' &&
              $php_errormsg != 'iconv(): Detected an incomplete multibyte character in input string') {
 
-            $args = array('Logger::log', $php_errormsg.', raw: '.rawUrlEncode($string).', plain: '.$string, L_NOTICE, __CLASS__);
+            $args = array('Logger::log', $php_errormsg.': '.$string, L_NOTICE, __CLASS__);
             call_user_func_array('push_shutdown_function', $args);
          }
          return $string;

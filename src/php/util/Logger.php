@@ -235,6 +235,7 @@ class Logger extends StaticClass {
             }
 
             $mailMsg = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $mailMsg)) : str_replace("\r\n", "\n", $mailMsg);
+            $mailMsg = str_replace(chr(0), "*\x00*", $mailMsg);
 
             $old_sendmail_from = ini_get('sendmail_from');
             if (isSet($_SERVER['SERVER_ADMIN']))
@@ -248,7 +249,7 @@ class Logger extends StaticClass {
                   // TODO: Header mit Fehlermeldung hinzufügen, damit beim Empfänger Messagefilter unterstützt werden
                   $success = error_log($mailMsg, 1, $address, 'Subject: PHP: [FATAL] Uncaught Exception at '.($request ? $request->getHostname():'').$_SERVER['PHP_SELF']);
                   if (!$success) {
-                     error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', $plainMessage), 0);
+                     error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", $plainMessage)), 0);
                      break;
                   }
                }
@@ -258,18 +259,18 @@ class Logger extends StaticClass {
 
          // ... oder Exception ins Error-Log schreiben, falls sie nicht schon angezeigt wurde
          elseif (!self::$display) {
-            error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', $plainMessage), 0);       // Zeilenumbrüche entfernen
+            error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", $plainMessage)), 0);       // Zeilenumbrüche entfernen
          }
          throw new RuntimeException('test');
       }
       catch (Exception $second) {
          $file = $exception->getFile();
          $line = $exception->getLine();
-         error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', (string) $exception.' in '.$file.' on line '.$line), 0);
+         error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", (string) $exception).' in '.$file.' on line '.$line), 0);
 
          $file = $second->getFile();
          $line = $second->getLine();
-         error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', (string) $second.' in '.$file.' on line '.$line), 0);
+         error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", (string) $second).' in '.$file.' on line '.$line), 0);
       }
    }
 
@@ -418,6 +419,7 @@ class Logger extends StaticClass {
          }
 
          $mailMsg = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $mailMsg)) : str_replace("\r\n", "\n", $mailMsg);
+         $mailMsg = str_replace(chr(0), "*\x00*", $mailMsg);
 
          $old_sendmail_from = ini_get('sendmail_from');
          if (isSet($_SERVER['SERVER_ADMIN']))
