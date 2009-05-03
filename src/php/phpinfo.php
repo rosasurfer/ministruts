@@ -78,7 +78,7 @@ if (ini_get('enable_dl'))                                                     ec
 
 // Extensions
 // ----------
-if (!extension_loaded('iconv'))                                               echoError('Warning: iConv extension is not loaded');
+if (!extension_loaded('iconv'))                                               echoError('Warning: iconv extension is not loaded');
 if (!extension_loaded('json'))                                                echoError('Warning: JSON extension is not loaded');
 if (!extension_loaded('mysql'))                                               echoError('Warning: MySQL extension is not loaded');
 if (!extension_loaded('mysqli'))                                              echoError('Warning: MySQLi extension is not loaded');

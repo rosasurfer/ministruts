@@ -84,9 +84,10 @@ final class String extends StaticClass {
 
 
    /**
-    * Dekodiert Strings von UTF-8 nach ISO-8859-1. Verarbeitet sowohl einzelne Strings als auch String-Arrays.
+    * Dekodiert einen String von UTF-8 nach ISO-8859-1. Enthält der String keine gültige UTF-8-Zeichensequenz,
+    * wird der Original-Wert zurückgegeben.
     *
-    * @param mixed $string - zu dekodierende(r) String(s)
+    * @param mixed $string - der zu dekodierende String oder ein Array mit mehreren zu dekodierenden Strings
     *
     * @return mixed - dekodierte(r) String(s)
     */
@@ -106,19 +107,19 @@ final class String extends StaticClass {
 
       if ($string!==(string)$string) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
 
-      if (!self:: isUtf8Encoded($string))
-         return $string;
+      $php_errormsg = null;
+      $decoded = @iconv('UTF-8', 'ISO-8859-1', $string);
 
-      try {
-         return html_entity_decode(htmlEntities($string, ENT_NOQUOTES, 'UTF-8'));
+      if (isSet($php_errormsg)) {
+         // PHP-Error -> ungültiges UTF-8
+         Logger ::log($php_errormsg.': '.$string, L_NOTICE, __CLASS__);
+         return $string;
       }
-      catch (PHPErrorException $ex) {
-         if ($ex->getMessage() == 'htmlentities(): Invalid multibyte sequence in argument') {
-            error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', (string) $ex.', '.__METHOD__.'(), strLen($string): '.strLen($string).', rawUrlEncode($string): '.rawUrlEncode($string).', $string: '.$string), 0);
-            //exit(1);
-         }
-         throw $ex;
-      }
+
+      return $decoded;
+
+      // 30?¬Ùž¬ÌŠ,ÃŠìÚZ,Èš-ÚªíÛžìÝf,É
+      // name=YouTube+DownloaderHeinz&lastName=Groth&street=Dudenh%F6fer+Strasse&no=20b&zipCode=63500&place=Seligenstadt&country=de&day=18&month=07&year=1964&email=h.groth-seligenstadt@t-online.de&agreed=1&x=124&y=30?¬Ùž¬ÌŠ,ÃŠìÚZ,Èš-ÚªíÛžìÝf,É
    }
 
 
