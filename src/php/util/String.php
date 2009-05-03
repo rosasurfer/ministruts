@@ -109,7 +109,13 @@ final class String extends StaticClass {
       if (!self:: isUtf8Encoded($string))
          return $string;
 
-      return html_entity_decode(htmlEntities($string, ENT_NOQUOTES, 'UTF-8'));
+      try {
+         return html_entity_decode(htmlEntities($string, ENT_NOQUOTES, 'UTF-8'));
+      }
+      catch (Exception $ex) {
+         error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', (string) $ex.' "'.$string.'" in '.$ex->getFile().' on line '.$ex->getLine()), 0);
+         exit(1);
+      }
    }
 
 
