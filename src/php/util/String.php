@@ -112,19 +112,17 @@ final class String extends StaticClass {
 
       if (isSet($php_errormsg)) {
          // PHP-Error -> ungültiges UTF-8
+         if ($php_errormsg != 'iconv(): Detected an illegal character in input string' &&
+             $php_errormsg != 'test') {
 
-         //Logger ::log($php_errormsg.': '.$string, L_NOTICE, __CLASS__);
-
-         $args = array('Logger::log', $php_errormsg.': '.rawUrlDecode($string), L_NOTICE, __CLASS__);
-         call_user_func_array('push_shutdown_function', $args);
+            $args = array('Logger::log', $php_errormsg.', raw: '.rawUrlDecode($string).', plain: '.$string, L_NOTICE, __CLASS__);
+            call_user_func_array('push_shutdown_function', $args);
+         }
 
          return $string;
       }
 
       return $decoded;
-
-      // 30?¬Ùž¬ÌŠ,ÃŠìÚZ,Èš-ÚªíÛžìÝf,É
-      // name=YouTube+DownloaderHeinz&lastName=Groth&street=Dudenh%F6fer+Strasse&no=20b&zipCode=63500&place=Seligenstadt&country=de&day=18&month=07&year=1964&email=h.groth-seligenstadt@t-online.de&agreed=1&x=124&y=30?¬Ùž¬ÌŠ,ÃŠìÚZ,Èš-ÚªíÛžìÝf,É
    }
 
 
