@@ -65,8 +65,15 @@ final class Request extends Singleton {
       $_REQUEST = $_GET = $_POST = array();
 
       // POST-Parameter haben höhere Priorität als GET und werden zuerst verarbeitet
-      if ($this->isPost())
-         $this->parseParameters(file_get_contents('php://input'), 'POST');
+      if ($this->isPost()) {
+         try {
+            $this->parseParameters(file_get_contents('php://input'), 'POST');
+         }
+         catch (Exception $ex) {
+            error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', (string) $ex.', location: parseParameters '.$ex->getFile().' on line '.$ex->getLine()), 0);
+            exit(1);
+         }
+      }
 
       // GET-Parameter (nicht per $this->isGet(), denn sie können auch in anderen Requests vorhanden sein)
       if (strLen($_SERVER['QUERY_STRING']))
