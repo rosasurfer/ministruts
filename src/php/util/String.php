@@ -112,7 +112,12 @@ final class String extends StaticClass {
 
       if (isSet($php_errormsg)) {
          // PHP-Error -> ungültiges UTF-8
+
          //Logger ::log($php_errormsg.': '.$string, L_NOTICE, __CLASS__);
+
+         $args = array('Logger::log', $php_errormsg.': '.$string, L_NOTICE, __CLASS__);
+         call_user_func_array('push_shutdown_function', $args);
+
          return $string;
       }
 
