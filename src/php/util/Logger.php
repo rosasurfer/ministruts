@@ -164,6 +164,8 @@ class Logger extends StaticClass {
     * Der Aufruf kann automatisch (durch globalen Errorhandler) oder manuell (durch Code, der selbst keine Exceptions werfen darf)
     * erfolgen.
     *
+    * NOTE: PHP bricht das Script nach Aufruf dieses Handlers automatisch ab.
+    *
     * @param Exception $exception - die zu behandelnde Exception
     */
    public static function handleException(Exception $exception, $destructor = false) {
@@ -255,15 +257,16 @@ class Logger extends StaticClass {
          elseif (!self::$display) {
             error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', $plainMessage), 0);       // Zeilenumbrüche entfernen
          }
-
-
-         // 4. Script beenden
-         exit(1);
+         throw new RuntimeException('test');
       }
-      catch (Exception $exeption) {
+      catch (Exception $second) {
          $file = $exception->getFile();
          $line = $exception->getLine();
-         error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', (string) $exeption.' in '.$file.' on line '.$line), 0);
+         error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', (string) $exception.' in '.$file.' on line '.$line), 0);
+
+         $file = $second->getFile();
+         $line = $second->getLine();
+         error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', (string) $second.' in '.$file.' on line '.$line), 0);
       }
    }
 
