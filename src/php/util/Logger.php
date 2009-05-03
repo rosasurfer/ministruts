@@ -261,7 +261,6 @@ class Logger extends StaticClass {
          elseif (!self::$display) {
             error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", $plainMessage)), 0);       // Zeilenumbrüche entfernen
          }
-         throw new RuntimeException('test');
       }
       catch (Exception $second) {
          $file = $exception->getFile();
@@ -433,7 +432,7 @@ class Logger extends StaticClass {
                // TODO: Header mit Fehlermeldung hinzufügen, damit beim Empfänger Messagefilter unterstützt werden
                $success = error_log($mailMsg, 1, $address, 'Subject: PHP: '.self::$logLevels[$level].' at '.($request ? $request->getHostname():'').$_SERVER['PHP_SELF']);
                if (!$success) {
-                  error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', $plainMessage), 0);
+                  error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", $plainMessage)), 0);
                   break;
                }
             }
@@ -443,7 +442,7 @@ class Logger extends StaticClass {
 
       // ... oder Logmessage ins Error-Log schreiben, falls sie nicht schon angezeigt wurde
       elseif (!self::$display) {
-         error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', $plainMessage), 0);      // Zeilenumbrüche entfernen
+         error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", $plainMessage)), 0);      // Zeilenumbrüche entfernen
       }
    }
 }
