@@ -126,14 +126,17 @@ class Logger extends StaticClass {
     *
     * @return boolean - TRUE,  wenn der Fehler erfolgreich behandelt wurde, FALSE, wenn der Fehler
     *                   weitergereicht werden soll, als wenn der Errorhandler nicht registriert wäre
+    *
+    * NOTE: The error handler must return FALSE to populate $php_errormsg.
     */
    public static function handleError($level, $message, $file, $line, array $context) {
       //echoPre(__METHOD__.'(): '.$message.', $file: '.$file.', $line: '.$line);
 
       // absichtlich unterdrückte und vom aktuellen Errorlevel nicht abgedeckte Fehler ignorieren
-      $error_reporting = error_reporting();     // 0: @-Operator
-      if ($error_reporting==0 || ($error_reporting & $level) != $level)
-         return true;
+      $error_reporting = error_reporting();
+
+      if ($error_reporting == 0)                 return false;    // 0: @-Operator (see NOTE)
+      if (($error_reporting & $level) != $level) return true;
 
 
       // Fehler in Exception kapseln ...

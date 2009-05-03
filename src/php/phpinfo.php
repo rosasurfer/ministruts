@@ -68,9 +68,9 @@ $current = (int) ini_get('error_reporting');
 if (($current & (E_ALL | E_STRICT)) != (E_ALL | E_STRICT))                    echoError('Warning: error_reporting is not E_ALL | E_STRICT: '.ini_get('error_reporting'));
 if (ini_get('ignore_repeated_errors'))                                        echoError('Warning: ignore_repeated_errors is not Off');
 if (ini_get('ignore_repeated_source'))                                        echoError('Warning: ignore_repeated_source is not Off');
-if (!ini_get('log_errors'))                                                   echoError('Warning: log_errors is not On' );
+if (!ini_get('log_errors'))                                                   echoError('Warning: log_errors is not On');
 if ((int) ini_get('log_errors_max_len') != 0)                                 echoError('Warning: log_errors_max_len is not 0: '.ini_get('log_errors_max_len'));
-if (ini_get('track_errors'))                                                  echoError('Warning: track_errors is not Off' );
+if (!ini_get('track_errors'))                                                 echoError('Warning: track_errors is not On');
 if (ini_get('html_errors'))                                                   echoError('Warning: html_errors is not Off');
 
 if (ini_get('enable_dl'))                                                     echoError('Warning: enable_dl is not Off');
