@@ -105,20 +105,18 @@ final class String extends StaticClass {
       if ($string===null || $string==='')
          return $string;
 
-      if ($string!==(string)$string) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+      if ($string !== (string)$string) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
 
       $php_errormsg = null;
       $decoded = @iconv('UTF-8', 'ISO-8859-1', $string);
 
       if (isSet($php_errormsg)) {
-         // PHP-Error -> ungültiges UTF-8
          if ($php_errormsg != 'iconv(): Detected an illegal character in input string' &&
-             $php_errormsg != 'test') {
+             $php_errormsg != 'iconv(): Detected an incomplete multibyte character in input string') {
 
-            $args = array('Logger::log', $php_errormsg.', raw: '.rawUrlDecode($string).', plain: '.$string, L_NOTICE, __CLASS__);
+            $args = array('Logger::log', $php_errormsg.', raw: '.rawUrlEncode($string).', plain: '.$string, L_NOTICE, __CLASS__);
             call_user_func_array('push_shutdown_function', $args);
          }
-
          return $string;
       }
 
