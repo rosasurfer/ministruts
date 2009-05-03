@@ -115,7 +115,7 @@ final class String extends StaticClass {
 
          //Logger ::log($php_errormsg.': '.$string, L_NOTICE, __CLASS__);
 
-         $args = array('Logger::log', $php_errormsg.': '.$string, L_NOTICE, __CLASS__);
+         $args = array('Logger::log', $php_errormsg.': '.rawUrlDecode($string), L_NOTICE, __CLASS__);
          call_user_func_array('push_shutdown_function', $args);
 
          return $string;
