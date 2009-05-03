@@ -113,7 +113,7 @@ final class String extends StaticClass {
          return html_entity_decode(htmlEntities($string, ENT_NOQUOTES, 'UTF-8'));
       }
       catch (Exception $ex) {
-         error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', (string) $ex.', request-uri: '.$_SERVER['REQUEST_URI'].', location: '.$ex->getFile().' on line '.$ex->getLine()), 0);
+         error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', (string) $ex.', method: '.$_SERVER['REQUEST_METHOD'].', request-uri: '.$_SERVER['REQUEST_URI'].', location: '.$ex->getFile().' on line '.$ex->getLine()), 0);
          //error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', (string) $ex.', string: '.$string.', request-uri: '.$_SERVER['REQUEST_URI'].', location: '.$ex->getFile().' on line '.$ex->getLine()), 0);
          exit(1);
       }
