@@ -1,3 +1,10 @@
+2009-05-04
+
+   - neu: php/net/NetTools
+   - neu: php/struts/Request::guessRealRemoteAddress() - ermittelt die tatsächliche IP eines Kunden
+   - Refactoring: php/struts/Request  ->  php/struts/BaseRequest - Basisklasse für Erweiterungen von Request
+
+
 2009-04-13
 
    - php/util/Logger: bei Ausgabe von Meldungen werden evt. gesendete Location-Header berücksichtigt (www-redirect)
@@ -6,8 +13,8 @@
 2009-04-12
 
    - Refactoring: register_lifo_shutdown_function() -> push_shutdown_function()
-	- Der Versand einer E-Mail kann durch entsprechende Konfiguration in die Shutdown-Phase des Scriptes verschoben werden, 
-	  um evt. Transaktionen nicht unnötig lange zu blockieren.
+   - Der Versand einer E-Mail kann durch entsprechende Konfiguration in die Shutdown-Phase des Scriptes verschoben werden,
+     um evt. Transaktionen nicht unnötig lange zu blockieren.
 
 2009-03-05
 
@@ -22,7 +29,7 @@
 2009-02-28
 
    - neue Funktion is_interface(): prüft die Existenz einer Interface-Definition ohne Aufruf von __autoload()
-	- neue Funktion register_stacked_shutdown_function(): ermöglicht Spezifizierung der Ausführungsreihenfolge mehrerer Shutdown-Handler
+   - neue Funktion register_stacked_shutdown_function(): ermöglicht Spezifizierung der Ausführungsreihenfolge mehrerer Shutdown-Handler
 
 
 2009-02-16
@@ -39,36 +46,36 @@
 
    - php/locking/SystemFiveLock: Logging von unterdrückten Fehlern
 
-	- php/locking: Bugfix: rekursive Lockversuche konnten unter bestimmten Umständen zu Endlosschleifen führen 
+   - php/locking: Bugfix: rekursive Lockversuche konnten unter bestimmten Umständen zu Endlosschleifen führen
 
-	- Initialisierung von Config und Cache vereinfacht
+   - Initialisierung von Config und Cache vereinfacht
 
-	- php/db/MySQLConnector: bei Deadlocks werden die betroffenen Transaktionen und die beteiligten Locks geloggt
+   - php/db/MySQLConnector: bei Deadlocks werden die betroffenen Transaktionen und die beteiligten Locks geloggt
 
 
 2009-02-10
 
    - php/db/MySQLConnector: bei Lock-Wait-Timeouts werden die in der DB laufenden Prozesse geloggt.
-	
+
 
 2009-02-09
 
    - php/db/MySQLConnector: im Loglevel DEBUG und bei Exceptions wird die Ausführungsdauer der Query geloggt
-	
-	- neu: php/util/String::stripLineBreaks()
+
+   - neu: php/util/String::stripLineBreaks()
 
 
 2009-01-30
 
    - neu: php/cache/CachePeer::get($key, $default)
-     Die get()-Methoden aller CachePeers können mit einem Defaultvalue aufgerufen werden, der zurückgegeben wird, wenn der gewünschte Wert 
-     im Cache nicht existiert.  
+     Die get()-Methoden aller CachePeers können mit einem Defaultvalue aufgerufen werden, der zurückgegeben wird, wenn der gewünschte Wert
+     im Cache nicht existiert.
 
 
 2009-01-27
 
    - php/struts/Request::dropActionErrors()  =>  Alias für Request::removeActionErrors(),
-	  Request::dropActionErrors() gibt die gelöschten ErrorMessages zurück
+     Request::dropActionErrors() gibt die gelöschten ErrorMessages zurück
 
 
 2009-01-26
@@ -102,12 +109,12 @@
 2009-01-19
 
    - Exception-Handling überarbeitet: auch während des Shutdowns können jetzt Exceptions geworfen werden
-	
+
 
 2009-01-17
 
    - php/util/Logger überarbeitet
-	
+
    - php/util/Config: Caching überarbeitet, die Config-Dateien werden jetzt nur noch alle 20 Sekunden auf Veränderung überprüft
 
 
