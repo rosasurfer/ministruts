@@ -483,6 +483,9 @@ class BaseRequest extends Singleton {
     * @return string - Header oder NULL, wenn kein Header mit dem angegebenen Namen übertragen wurde.
     */
    public function getHeader($name) {
+
+      // TODO: es sind mehrere Header mit dem gleichen Namen möglich (Rückgabe entweder als ein Wert oder als Array)
+
       static $headers = null;
       if ($headers === null)
          $headers = array_change_key_case($this->getHeaders(), CASE_LOWER);
