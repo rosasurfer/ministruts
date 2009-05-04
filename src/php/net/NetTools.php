@@ -47,8 +47,6 @@ final class NetTools extends StaticClass {
          }
       }
 
-      echoPre($proxys);
-
       if (isSet($proxys[$address]))
          return true;
 
