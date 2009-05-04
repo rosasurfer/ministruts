@@ -136,6 +136,7 @@ $__classes['Action'                         ] = $dir.'php/struts/Action';
 $__classes['ActionForm'                     ] = $dir.'php/struts/ActionForm';
 $__classes['ActionForward'                  ] = $dir.'php/struts/ActionForward';
 $__classes['ActionMapping'                  ] = $dir.'php/struts/ActionMapping';
+$__classes['BaseRequest'                    ] = $dir.'php/struts/BaseRequest';
 $__classes['FrontController'                ] = $dir.'php/struts/FrontController';
 $__classes['HttpSession'                    ] = $dir.'php/struts/HttpSession';
 $__classes['Module'                         ] = $dir.'php/struts/Module';
