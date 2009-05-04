@@ -376,13 +376,14 @@ class BaseRequest extends Singleton {
 
 
    /**
-    * Gibt den Wert eines evt. 'Forwarded-IP'-Headers des aktuellen Request zurück.
+    * Versucht, unter Berücksichtigung evt. zwischengeschalteter Proxys die tatsächliche IP-Adresse, von der
+    * aus der Request gemacht wurde, zu ermitteln.  Kann diese Adresse nicht ermittelt werden, wird die letzte
+    * ermittelbare Adresse zurückgegeben, unter Umständen also die herkömmliche Remote-Adresse.
     *
-    * @return string - IP-Adresse oder NULL, wenn der entsprechende Header nicht gesetzt ist
+    * @return string - IP-Adresse
     */
-   public function getForwardedRemoteAddress() {
-
-      // TODO: BaseRequest::getForwardedRemoteAddress() überarbeiten
+   public function guessRealRemoteAddress() {
+      // TODO: BaseRequest::guessRealRemoteAddress() überarbeiten
       /*
       Note that the X-Forwarded for header might contain multiple addresses, comma separated, if the request was
       forwarded through multiple proxies.  Finally, note that any user can add an X-Forwarded-For header themselves.
@@ -405,6 +406,34 @@ class BaseRequest extends Singleton {
       use are described in RFC 1918...
       */
 
+      static $realAddress = null;
+
+      if ($realAddress === null) {
+         if     (isSet($_SERVER['HTTP_X_FORWARDED_FOR'        ])) $value = $_SERVER['HTTP_X_FORWARDED_FOR'        ];
+         elseif (isSet($_SERVER['HTTP_HTTP_X_FORWARDED_FOR'   ])) $value = $_SERVER['HTTP_HTTP_X_FORWARDED_FOR'   ];
+         elseif (isSet($_SERVER['HTTP_X_UP_FORWARDED_FOR'     ])) $value = $_SERVER['HTTP_X_UP_FORWARDED_FOR'     ]; // mobile device
+         elseif (isSet($_SERVER['HTTP_HTTP_X_UP_FORWARDED_FOR'])) $value = $_SERVER['HTTP_HTTP_X_UP_FORWARDED_FOR']; // mobile device
+         else                                                     $value = null;
+
+         if ($value !== null) {
+            $values = explode(',', trim($value, ', '));
+            $realAddress = trim(array_pop($values));
+         }
+         else {
+            $realAddress = $this->getRemoteAddress();
+         }
+      }
+
+      return $realAddress;
+   }
+
+
+   /**
+    * Gibt den Wert eines evt. 'Forwarded-IP'-Headers des aktuellen Request zurück.
+    *
+    * @return string - IP-Adresse oder NULL, wenn der entsprechende Header nicht gesetzt ist
+    */
+   public function getForwardedRemoteAddress() {
       static $result = false;
 
       if ($result === false) {
@@ -412,9 +441,7 @@ class BaseRequest extends Singleton {
          elseif (isSet($_SERVER['HTTP_HTTP_X_FORWARDED_FOR'   ])) $value = $_SERVER['HTTP_HTTP_X_FORWARDED_FOR'   ];
          elseif (isSet($_SERVER['HTTP_X_UP_FORWARDED_FOR'     ])) $value = $_SERVER['HTTP_X_UP_FORWARDED_FOR'     ]; // mobile device
          elseif (isSet($_SERVER['HTTP_HTTP_X_UP_FORWARDED_FOR'])) $value = $_SERVER['HTTP_HTTP_X_UP_FORWARDED_FOR']; // mobile device
-
-         elseif (isSet($_SERVER[''])) $value = $_SERVER[''];
-         else                         $value = $result = null;
+         else                                                     $value = $result = null;
 
          if ($value !== null) {
             $values = explode(',', trim($value, ', '));
