@@ -159,26 +159,35 @@ final class String extends StaticClass {
     *
     * Bedeutung der optionalen Parameter: siehe PHP-Manual
     *
-    * @param mixed  $string        - der/die zu konvertierende/n Strings
-    * @param int    $quote_style   -
-    * @param string $charset       -
-    * @param bool   $double_encode - (PHP 5.2.3+)
+    * @param mixed  $string       - der/die zu konvertierende/n Strings
+    * @param int    $quoteStyle   - siehe Bemerkungen
+    * @param string $charset      -
+    * @param bool   $doubleEncode - (PHP 5.2.3+)
     *
     * @return mixed - der/die konvertierte/n Strings
+    *
+    * NOTE:
+    * -----
+    * The translations performed are:
+    *    '&' (ampersand) becomes '&amp;'
+    *    '"' (double quote) becomes '&quot;' when ENT_NOQUOTES is not set
+    *    ''' (single quote) becomes '&#039;' only when ENT_QUOTES is set
+    *    '<' (less than) becomes '&lt;'
+    *    '>' (greater than) becomes '&gt;'
     */
-   public static function htmlSpecialChars($string, $quote_style=ENT_QUOTES, $charset='ISO-8859-1', $double_encode=true) {
+   public static function htmlSpecialChars($string, $quoteStyle=ENT_QUOTES, $charset='ISO-8859-1', $doubleEncode=true) {
       if (is_array($string)) {
          foreach ($string as $key => &$value)
-            $string[$key] = self:: htmlSpecialChars($value, $quote_style, $charset, $double_encode);
+            $string[$key] = self:: htmlSpecialChars($value, $quoteStyle, $charset, $doubleEncode);
          return $string;
       }
       if (!strLen($string))
          return $string;
 
       if (PHP_VERSION < '5.2.3')
-         return htmlSpecialChars($string, $quote_style, $charset);
+         return htmlSpecialChars($string, $quoteStyle, $charset);
 
-      return htmlSpecialChars($string, $quote_style, $charset, $double_encode);
+      return htmlSpecialChars($string, $quoteStyle, $charset, $doubleEncode);
    }
 
 
@@ -190,26 +199,26 @@ final class String extends StaticClass {
     *
     * Bedeutung der optionalen Parameter: siehe PHP-Manual
     *
-    * @param mixed  $string        - der/die zu konvertierende/n Strings
-    * @param int    $quote_style   -
-    * @param string $charset       -
-    * @param bool   $double_encode - (PHP 5.2.3+)
+    * @param mixed  $string       - der/die zu konvertierende/n Strings
+    * @param int    $quoteStyle   - (see PHP manual)
+    * @param string $charset      -
+    * @param bool   $doubleEncode - (PHP 5.2.3+)
     *
     * @return mixed - der/die konvertierte/n Strings
     */
-   public static function htmlEntities($string, $quote_style=ENT_QUOTES, $charset='ISO-8859-1', $double_encode=true) {
+   public static function htmlEntities($string, $quoteStyle=ENT_QUOTES, $charset='ISO-8859-1', $doubleEncode=true) {
       if (is_array($string)) {
          foreach ($string as $key => &$value)
-            $string[$key] = self:: htmlEntities($value, $quote_style, $charset, $double_encode);
+            $string[$key] = self:: htmlEntities($value, $quoteStyle, $charset, $doubleEncode);
          return $string;
       }
       if (!strLen($string))
          return $string;
 
       if (PHP_VERSION < '5.2.3')
-         return htmlEntities($string, $quote_style, $charset);
+         return htmlEntities($string, $quoteStyle, $charset);
 
-      return htmlEntities($string, $quote_style, $charset, $double_encode);
+      return htmlEntities($string, $quoteStyle, $charset, $doubleEncode);
    }
 
 
