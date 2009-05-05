@@ -405,6 +405,23 @@ function javaScript($snippet) {
 
 
 /**
+ * Shortcut-Ersatz für String::htmlSpecialChars()
+ *
+ * @param string $string - zu kodierender String
+ *
+ * @return string - kodierter String
+ *
+ * @see String::htmlSpecialChars()
+ */
+function htmlEncode($string) {
+   if (PHP_VERSION < '5.2.3')
+      return htmlSpecialChars($string, ENT_QUOTES, 'ISO-8859-1');
+
+   return htmlSpecialChars($string, ENT_QUOTES, 'ISO-8859-1', true);
+}
+
+
+/**
  * Dekodiert einen HTML-String nach ISO-8859-15.
  *
  * @param string $html - der zu dekodierende String
