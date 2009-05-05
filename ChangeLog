@@ -1,3 +1,8 @@
+2009-05-05
+
+   - neu: htmlEncode() - Shortcut-Ersatz für String::htmlSpecialChars() (bessere Lesbarkeit)
+
+
 2009-05-04
 
    - neu: php/net/NetTools
