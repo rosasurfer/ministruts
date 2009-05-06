@@ -84,7 +84,7 @@ class HttpSession extends Singleton {
             session_regenerate_id(true);     // neue ID generieren und alte Datei löschen
 
          // Marker setzen, ab jetzt ist sizeOf($_SESSION) immer > 0
-         // TODO: $request->getHeader() eibauen
+         // TODO: $request->getHeader() einbauen
          $_SESSION['__SESSION_CREATED__'  ] = microTime(true);
          $_SESSION['__SESSION_IP__'       ] = $request->getRemoteAddress();      // TODO: forwarded remote IP einbauen
          if (isSet($_SERVER['HTTP_USER_AGENT']))
