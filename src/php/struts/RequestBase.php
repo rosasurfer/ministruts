@@ -454,6 +454,47 @@ class BaseRequest extends Singleton {
 
 
    /**
+    * Gibt den Content dieses Requests zurück.  Der Content ist ein ggf. übertragener Request-Body (nur bei POST-Requests).
+    *
+    * @param bool $sanitize - ob die Contentlänge an einen ggf. übertragenen 'Content-Length' Header angepaßt werden soll
+    *                         (nur zu Debugging-Zwecken; default: TRUE)
+    *
+    * @return string - Request-Body oder NULL, wenn im Body keine Daten übertragen wurden.
+    */
+   public function getContent($sanitize = true) {
+      if ($sanitize !== (bool)$sanitize) throw new IllegalTypeException('Illegal type of argument $sanitize: '.getType($sanitize));
+
+      static $raw       = null;
+      static $sanitized = null;
+
+      static $read = false;
+      if (!$read) {
+         // TODO: php://input is not available with enctype="multipart/form-data"
+         if ($this->isPost()) {
+            $raw = file_get_contents('php://input');
+
+            $hLength = $this->getHeaderValue('Content-Length');
+
+            if ($hLength!==null && $hLength!=strLen($raw)) {
+               Logger ::log("Request header 'Content-Length' doesn't match length of received content data", L_NOTICE, __CLASS__);
+               $sanitized = subStr($raw, 0, $hLength);
+            }
+            else {
+               $sanitized =& $raw;
+            }
+
+            // temporär
+            if ($this->getHeaderValue('Content-Type') == 'multipart/form-data')
+               Logger ::log("Request of type 'multipart/form-data' received", L_NOTICE, __CLASS__);
+         }
+         $read = true;
+      }
+
+      return $sanitize ? $sanitized : $raw;
+   }
+
+
+   /**
     * Ob mit dem Request eine Session-ID übertragen wurde.
     *
     * @return boolean
@@ -503,64 +544,99 @@ class BaseRequest extends Singleton {
 
 
    /**
-    * Gibt den angegebenen Request-Header zurück.
+    * Gibt einen einzelnen Header als Name-Wert-Paar zurück.  Wurden mehrere Header dieses Namens übertragen,
+    * wird der erste übertragene Header zurückgegeben.
     *
     * @param string $name - Name des Headers
     *
-    * @return string - Header oder NULL, wenn kein Header mit dem angegebenen Namen übertragen wurde.
+    * @return array - Name-Wert-Paar oder NULL, wenn kein Header dieses Namens übertragen wurde
     */
    public function getHeader($name) {
+      if ($name!==(string)$name) throw new IllegalTypeException('Illegal type of argument $name: '.getType($name));
 
-      // TODO: es sind mehrere Header mit dem gleichen Namen möglich (Rückgabe entweder als ein Wert oder als Array)
-
-      static $headers = null;
-      if ($headers === null)
-         $headers = array_change_key_case($this->getHeaders(), CASE_LOWER);
-
-      $name = strToLower($name);
-
-      if (isSet($headers[$name]))
-         return $headers[$name];
-
-      return null;
+      return array_shift($this->getHeaders($name));
    }
 
 
    /**
-    * Gibt alle Request-Header zurück.
+    * Gibt alle oder einzelne Header als Array von Name-Wert-Paaren zurück (in der übertragenen Reihenfolge).
     *
-    * @return array
+    * @param string|array $names - ein oder mehrere Namen; ohne Angabe werden alle Header zurückgegeben
+    *
+    * @return array - Name-Wert-Paare
     */
-   public function getHeaders() {
+   public function getHeaders($names = null) {
+      if     ($names === null)   $names = array();
+      elseif (is_string($names)) $names = array($names);
+      elseif (is_array($names)) {
+         foreach ($names as $name)
+            if ($name !== (string)$name)
+               throw new IllegalTypeException('Illegal argument type in argument $names: '.getType($name));
+      }
+      else {
+         throw new IllegalTypeException('Illegal type of argument $names: '.getType($names));
+      }
+
+      // einmal alle Header einlesen
       static $headers = null;
-
-      // muß noch umfassend überarbeitet werden !!!!
-
       if ($headers === null) {
-         if (function_exists('apache_request_headers')) {
-            $hdrs = apache_request_headers();
-            if ($hdrs === false)
-               throw new RuntimeException('Error reading request headers, apache_request_headers() returned FALSE');
-            $headers = $hdrs;
+         if (function_exists('getAllHeaders')) {
+            $headers = getAllHeaders();
+            if ($headers === false) throw new RuntimeException('Error reading request headers, getAllHeaders() returned: FALSE');
          }
          else {
+            // TODO: in der PHP-Umgebung fehlen einige Header
+            // z.B. 'Authorization' (Digest), Basic authorization prüfen, $_FILES prüfen !!!
             $headers = array();
             foreach ($_SERVER as $key => $value) {
-               if (ereg('HTTP_(.+)', $key, $matches) > 0) {
-                  $key = strToLower($matches[1]);
+               if(subStr($key, 0, 5) == 'HTTP_') {
+                  $key = strToLower(subStr($key, 5));
                   $key = str_replace(' ', '-', ucWords(str_replace('_', ' ', $key)));
                   $headers[$key] = $value;
                }
             }
-            if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-               if (isSet($_SERVER['CONTENT_TYPE']))
-                  $headers['Content-Type'] = $_SERVER['CONTENT_TYPE'];
-               if (isSet($_SERVER['CONTENT_LENGTH']))
-                  $headers['Content-Length'] = $_SERVER['CONTENT_LENGTH'];
+            if ($this->isPost()) {
+               if (isSet($_SERVER['CONTENT_TYPE'  ])) $headers['Content-Type'  ] = $_SERVER['CONTENT_TYPE'  ];
+               if (isSet($_SERVER['CONTENT_LENGTH'])) $headers['Content-Length'] = $_SERVER['CONTENT_LENGTH'];
             }
          }
       }
-      return $headers;
+
+      // alle oder nur die gewünschten Header zurückgeben
+      if (!$names)
+         return $headers;
+
+      return array_intersect_ukey($headers, array_flip($names), 'strCaseCmp');
+   }
+
+
+   /**
+    * Gibt den Wert eines Headers als String zurück. Wurden mehrere Header dieses Namens übertragen, werden alle Werte
+    * dieser Header als komma-getrennte Liste zurückgegeben (in der übertragenen Reihenfolge).
+    *
+    * @param string $name - Name des Headers
+    *
+    * @return string - Wert
+    */
+   public function getHeaderValue($name) {
+      if ($name!==(string)$name) throw new IllegalTypeException('Illegal type of argument $name: '.getType($name));
+
+      return join(',', $this->getHeaders($name));
+   }
+
+
+   /**
+    * Gibt alle Werte eines Headers als Array zurück. Wurde ein einzelner Header dieses Namens mit mehreren Werten übertragen,
+    * werden alle diese Werte einzeln zurückgegeben (in der übertragenen Reihenfolge).
+    *
+    * @param string $name - Name des Headers
+    *
+    * @return array - Werte
+    */
+   public function getHeaderValues($name) {
+      if ($name!==(string)$name) throw new IllegalTypeException('Illegal type of argument $name: '.getType($name));
+
+      return array_map('trim', explode(',', $this->getHeaderValue($name)));
    }
 
 
@@ -570,41 +646,28 @@ class BaseRequest extends Singleton {
     * @return string
     */
    public function __toString() {
+      // Request
+      $string = $_SERVER['REQUEST_METHOD'].' '.$_SERVER['REQUEST_URI'].' '.$_SERVER['SERVER_PROTOCOL']."\n";
 
-      // muß noch umfassend überarbeitet werden !!!!
-
-      $result = $_SERVER['REQUEST_METHOD'].' '.$_SERVER['REQUEST_URI'].' '.$_SERVER['SERVER_PROTOCOL']."\n";
+      // Header
       $headers = $this->getHeaders();
-      $maxLen = 0;
-      foreach ($headers as $key => &$value) {
-         $maxLen = (strLen($key) > $maxLen) ? strLen($key) : $maxLen;
+      $maxLen  = 0;
+      foreach ($headers as $key => $value) {
+         $maxLen = max(strLen($key), $maxLen);
       }
-      $maxLen++;
-      foreach ($headers as $key => &$value) {
-         $result .= str_pad($key.':', $maxLen).' '.$value."\n";
+      $maxLen++; // +1 Zeichen für ':'
+      foreach ($headers as $key => $value) {
+         $string .= str_pad($key.':', $maxLen).' '.$value."\n";
       }
 
-      if ($_SERVER['REQUEST_METHOD']=='POST' && isSet($headers['Content-Length']) && (int)$headers['Content-Length'] > 0) {
-         if (isSet($headers['Content-Type'])) {
-            if ($headers['Content-Type'] == 'application/x-www-form-urlencoded') {
-               $params = array();
-               foreach ($_POST as $name => &$value) {
-                  $params[] = $name.'='.rawUrlEncode((string) $value);
-               }
-               $result .= "\n".implode('&', $params)."\n";
-            }
-            else if ($headers['Content-Type'] == 'multipart/form-data') {
-               ;                    // !!! to do
-            }
-            else {
-               ;                    // !!! to do
-            }
-         }
-         else {
-               ;                    // !!! to do
-         }
+      // Content (Body)
+      if ($this->isPost()) {
+         $content = $this->getContent(false);
+         if (strLen($content))
+            $string .= "\n".$content."\n";
       }
-      return $result;
+
+      return $string;
    }
 
 
