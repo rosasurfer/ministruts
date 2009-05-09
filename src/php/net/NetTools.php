@@ -10,15 +10,20 @@ final class NetTools extends StaticClass {
     *
     * @param string $address - IP-Adresse
     *
-    * @return boolean
+    * @return string - Hostname oder die übergebene IP-Adresse, wenn diese nicht aufgelöst werden kann
     */
    public static function getHostByAddress($address) {
       if ($address !== (string)$address) throw new IllegalTypeException('Illegal type of parameter $address: '.getType($address));
       if ($address == '')                throw new InvalidArgumentException('Invalid argument $address: "'.$address.'"');
 
-      // TODO: Format überprüfen
-
-      return getHostByAddr($address);
+      try {
+         return getHostByAddr($address);
+      }
+      catch (Exception $ex) {
+         if ($ex->getMessage() == 'gethostbyaddr(): Address is not a valid IPv4 or IPv6 address')
+            throw new InvalidArgumentException('Invalid argument $address: "'.$address.'"', $ex);
+         throw $ex;
+      }
    }
 
 
