@@ -1,6 +1,8 @@
 2009-05-09
 
    - Refactoring: php/net/NetTools::getHostByAddr()  ->  NetTools::getHostByAddress()
+	- Request::guessRealRemoteAddress() ermittelt die letzte im Internet erreichbare Adresse der übertragenen Forwarded-For-Header
+	- neu: php/util/CommonValidator::isIPLanAddress() - prüft, ob eine IP-Adresse eine lokale Netzwerkadresse ist
 
 
 2009-05-05
