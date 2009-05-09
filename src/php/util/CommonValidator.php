@@ -6,7 +6,7 @@ class CommonValidator extends StaticClass {
 
 
    /**
-    * Ob der übergebene String eine syntaktisch richtige IP-Adresse ist.
+    * Ob der übergebene String eine syntaktisch gültige IP-Adresse ist.
     *
     * @param string $string - der zu überprüfende String
     *
