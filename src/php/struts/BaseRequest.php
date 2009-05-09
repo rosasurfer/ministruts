@@ -383,14 +383,6 @@ class BaseRequest extends Singleton {
     * @return string - IP-Adresse
     */
    public function guessRealRemoteAddress() {
-      // TODO: BaseRequest::guessRealRemoteAddress() überarbeiten
-      /*
-      Note that the X-Forwarded for header might contain multiple addresses, comma separated, if the request was
-      forwarded through multiple proxies.  Finally, note that any user can add an X-Forwarded-For header themselves.
-      The header is only good for traceback information, never for authentication. If you use it for traceback, just
-      log the entire X-Forwarded-For header, along with the REMOTE_ADDR.
-      */
-
       /*
       I am just starting to try to tackle this issue of getting the real ip address.
       One flaw I see in the preceding notes is that none will bring up a true live ip address when the first proxy
@@ -406,42 +398,34 @@ class BaseRequest extends Singleton {
       use are described in RFC 1918...
       */
 
-      static $realAddress = null;
+      static $guessed = null;
 
-      if ($realAddress === null) {
-         if     (isSet($_SERVER['HTTP_X_FORWARDED_FOR'        ])) $value = $_SERVER['HTTP_X_FORWARDED_FOR'        ];
-         elseif (isSet($_SERVER['HTTP_HTTP_X_FORWARDED_FOR'   ])) $value = $_SERVER['HTTP_HTTP_X_FORWARDED_FOR'   ];
-         elseif (isSet($_SERVER['HTTP_X_UP_FORWARDED_FOR'     ])) $value = $_SERVER['HTTP_X_UP_FORWARDED_FOR'     ]; // mobile device
-         elseif (isSet($_SERVER['HTTP_HTTP_X_UP_FORWARDED_FOR'])) $value = $_SERVER['HTTP_HTTP_X_UP_FORWARDED_FOR']; // mobile device
-         else                                                     $value = null;
+      if ($guessed === null) {
+         $names[] = 'X-Forwarded-For';
+         $names[] = 'X-UP-Forwarded-For'; // mobile device
 
-         if ($value !== null) {
-            $values = explode(',', trim($value, ', '));
-            $realAddress = trim(array_pop($values));
-         }
-         else {
-            $realAddress = $this->getRemoteAddress();
-         }
+         $values = $this->getHeaderValues($names);
+
+         if ($values) $guessed = array_pop($values);        // TODO: kann statt IP Hostnamen oder 'unknown' beinhalten
+         else         $guessed = $this->getRemoteAddress(); // Fallback
       }
 
-      return $realAddress;
+      return $guessed;
    }
 
 
    /**
-    * Gibt den Wert eines evt. 'Forwarded-IP'-Headers des aktuellen Request zurück.
+    * Gibt den Wert eines 'Forwarded-IP'-Headers des aktuellen Requests zurück.
     *
-    * @return string - IP-Adresse oder NULL, wenn der entsprechende Header nicht gesetzt ist
+    * @return string - IP-Adresse oder NULL, wenn der Header nicht übertragen wurde
     */
    public function getForwardedRemoteAddress() {
       static $result = false;
 
       if ($result === false) {
-         if     (isSet($_SERVER['HTTP_X_FORWARDED_FOR'        ])) $value = $_SERVER['HTTP_X_FORWARDED_FOR'        ];
-         elseif (isSet($_SERVER['HTTP_HTTP_X_FORWARDED_FOR'   ])) $value = $_SERVER['HTTP_HTTP_X_FORWARDED_FOR'   ];
-         elseif (isSet($_SERVER['HTTP_X_UP_FORWARDED_FOR'     ])) $value = $_SERVER['HTTP_X_UP_FORWARDED_FOR'     ]; // mobile device
-         elseif (isSet($_SERVER['HTTP_HTTP_X_UP_FORWARDED_FOR'])) $value = $_SERVER['HTTP_HTTP_X_UP_FORWARDED_FOR']; // mobile device
-         else                                                     $value = $result = null;
+         if     (isSet($_SERVER['HTTP_X_FORWARDED_FOR'   ])) $value = $_SERVER['HTTP_X_FORWARDED_FOR'        ];
+         elseif (isSet($_SERVER['HTTP_X_UP_FORWARDED_FOR'])) $value = $_SERVER['HTTP_X_UP_FORWARDED_FOR'     ]; // mobile device
+         else                                                $value = $result = null;
 
          if ($value !== null) {
             $values = explode(',', trim($value, ', '));
@@ -544,7 +528,7 @@ class BaseRequest extends Singleton {
 
 
    /**
-    * Gibt einen einzelnen Header als Name-Wert-Paar zurück.  Wurden mehrere Header dieses Namens übertragen,
+    * Gibt den angegebenen Header als Name-Wert-Paar zurück.  Wurden mehrere Header dieses Namens übertragen,
     * wird der erste übertragene Header zurückgegeben.
     *
     * @param string $name - Name des Headers
@@ -559,7 +543,7 @@ class BaseRequest extends Singleton {
 
 
    /**
-    * Gibt alle oder einzelne Header als Array von Name-Wert-Paaren zurück (in der übertragenen Reihenfolge).
+    * Gibt die angegebenen Header als Array von Name-Wert-Paaren zurück (in der übertragenen Reihenfolge).
     *
     * @param string|array $names - ein oder mehrere Namen; ohne Angabe werden alle Header zurückgegeben
     *
@@ -600,6 +584,14 @@ class BaseRequest extends Singleton {
                if (isSet($_SERVER['CONTENT_LENGTH'])) $headers['Content-Length'] = $_SERVER['CONTENT_LENGTH'];
             }
          }
+
+         // Schauen wir mal, ob es immer noch solche falschen Header gibt...
+         $tmp = array('HTTP-X-Forwarded-For'    => 1,
+                      'HTTP_X-Forwarded-For'    => 1,
+                      'HTTP-X-UP-Forwarded-For' => 1,
+                      'HTTP_X-UP-Forwarded-For' => 1);
+         if (array_intersect_ukey($headers, $tmp, 'strCaseCmp'))
+            Logger ::log('Invalid X-Forwarded-For header found', L_NOTICE, __CLASS__);
       }
 
       // alle oder nur die gewünschten Header zurückgeben
@@ -611,8 +603,8 @@ class BaseRequest extends Singleton {
 
 
    /**
-    * Gibt den Wert eines Headers als String zurück. Wurden mehrere Header dieses Namens übertragen, werden alle Werte
-    * dieser Header als komma-getrennte Liste zurückgegeben (in der übertragenen Reihenfolge).
+    * Gibt den Wert des angegebenen Headers als String zurück. Wurden mehrere Header dieses Namens übertragen,
+    * werden alle Werte dieser Header als komma-getrennte Liste zurückgegeben (in der übertragenen Reihenfolge).
     *
     * @param string $name - Name des Headers
     *
@@ -626,17 +618,27 @@ class BaseRequest extends Singleton {
 
 
    /**
-    * Gibt alle Werte eines Headers als Array zurück. Wurde ein einzelner Header dieses Namens mit mehreren Werten übertragen,
-    * werden alle diese Werte einzeln zurückgegeben (in der übertragenen Reihenfolge).
+    * Gibt die einzelnen Werte aller angegebenen Header als Array zurück (in der übertragenen Reihenfolge).
     *
-    * @param string $name - Name des Headers
+    * @param string|array $names - ein oder mehrere Headernamen
     *
     * @return array - Werte
     */
-   public function getHeaderValues($name) {
-      if ($name!==(string)$name) throw new IllegalTypeException('Illegal type of argument $name: '.getType($name));
+   public function getHeaderValues($names) {
+      if (is_string($names))
+         $names = array($names);
+      elseif (is_array($names)) {
+         foreach ($names as $name)
+            if ($name !== (string)$name) throw new IllegalTypeException('Illegal argument type in argument $names: '.getType($name));
+      }
+      else {
+         throw new IllegalTypeException('Illegal type of argument $names: '.getType($names));
+      }
 
-      return array_map('trim', explode(',', $this->getHeaderValue($name)));
+      $headers = $this->getHeaders($names);
+      $values  = explode(',', join(',', $headers));
+
+      return array_map('trim', $values);
    }
 
 
