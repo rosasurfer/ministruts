@@ -392,11 +392,6 @@ class BaseRequest extends Singleton {
       proxy (from what I read this can be a list of proxies if you go through more than one).  I am not sure if
       bypass-client holds true when you get routed through several proxies along the way.
       */
-
-      /*
-      I think there is a better way to determine a correct ip. This is based in the fact that the private ip's for lan
-      use are described in RFC 1918...
-      */
       static $guessed = null;
 
       if ($guessed === null) {
@@ -405,8 +400,29 @@ class BaseRequest extends Singleton {
 
          $values = $this->getHeaderValues($names);
 
-         if ($values) $guessed = array_pop($values);        // TODO: kann statt IP Hostnamen oder 'unknown' beinhalten
-         else         $guessed = $this->getRemoteAddress(); // Fallback
+         if ($values) {
+            foreach ($values as $value) {
+               if (CommonValidator ::isIPAddress($value)) {
+                  $ip = $value;
+               }
+               else {
+                  $ip = NetTools ::getHostByName($value);
+                  if ($ip == $value)
+                     continue;
+               }
+               if ($ip != NetTools ::getHostByAddress($ip)) {
+                  $guessed = $ip;
+                  break;
+               }
+               if (!CommonValidator ::isIPLanAddress($ip)) {
+                  $guessed = $ip;
+                  Logger::log('Guessed a non-resolvable IP address as not a LAN address: '.$ip, L_NOTICE, __CLASS__);
+                  break;
+               }
+            }
+         }
+         if ($guessed === null)
+            $guessed = $this->getRemoteAddress(); // Fallback
       }
 
       return $guessed;
