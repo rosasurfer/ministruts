@@ -397,7 +397,6 @@ class BaseRequest extends Singleton {
       I think there is a better way to determine a correct ip. This is based in the fact that the private ip's for lan
       use are described in RFC 1918...
       */
-
       static $guessed = null;
 
       if ($guessed === null) {
@@ -636,9 +635,14 @@ class BaseRequest extends Singleton {
       }
 
       $headers = $this->getHeaders($names);
-      $values  = explode(',', join(',', $headers));
+      if ($headers) {
+         $values = array_map('trim', explode(',', join(',', $headers)));
+      }
+      else {
+         $values = $headers; // empty array
+      }
 
-      return array_map('trim', $values);
+      return $values;
    }
 
 
