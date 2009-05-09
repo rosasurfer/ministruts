@@ -12,7 +12,7 @@ final class NetTools extends StaticClass {
     *
     * @return boolean
     */
-   public static function getHostByAddr($address) {
+   public static function getHostByAddress($address) {
       if ($address !== (string)$address) throw new IllegalTypeException('Illegal type of parameter $address: '.getType($address));
       if ($address == '')                throw new InvalidArgumentException('Invalid argument $address: "'.$address.'"');
 
@@ -50,7 +50,7 @@ final class NetTools extends StaticClass {
       if (isSet($proxys[$address]))
          return true;
 
-      if (String ::endsWith(self ::getHostByAddr($address), '.proxy.aol.com', true))
+      if (String ::endsWith(self ::getHostByAddress($address), '.proxy.aol.com', true))
          return true;
 
       return false;
