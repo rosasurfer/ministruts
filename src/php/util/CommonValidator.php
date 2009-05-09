@@ -8,26 +8,58 @@ class CommonValidator extends StaticClass {
    /**
     * Ob der übergebene String eine syntaktisch gültige IP-Adresse ist.
     *
+    * @param string $string      - der zu überprüfende String
+    * @param bool   $returnBytes - Typ des Rückgabewertes:
+    *                                 FALSE: Boolean (default)
+    *                                 TRUE:  Array mit den Adressbytes oder FALSE, wenn der String keine gültige IP-Adresse darstellt
+    * @return boolean|array
+    */
+   public static function isIPAddress($string, $returnBytes = false) {
+      static $pattern = '/^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/';
+
+      $result = ($string===(string)$string) && strLen($string) && preg_match($pattern, $string, $bytes);
+
+      if ($result) {
+         array_shift($bytes);
+
+         foreach ($bytes as $i => $byte) {
+            $b = (int) $byte;
+            if ($byte!==(string)$b || $b > 255)
+               return false;
+            $bytes[$i] = $b;
+         }
+
+         if ($bytes[0] == 0)
+            return false;
+
+         return $returnBytes ? $bytes : true;
+      }
+      return false;
+   }
+
+
+   /**
+    * Ob der übergebene String eine syntaktisch gültige IP-Adresse eines lokalen Netzwerks ist.
+    *
     * @param string $string - der zu überprüfende String
     *
     * @return boolean
     */
-   public static function isIPAddress($string) {
-      static $pattern = '/^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/';
+   public static function isIPLanAddress($string) {
+      $bytes = self ::isIPAddress($string, true);
 
-      $result = ($string===(string)$string) && strLen($string) && preg_match($pattern, $string, $matches);
+      if ($bytes) {
+         if ($bytes[0] == 10)                   // 10.0.0.0 - 10.255.255.255
+            return true;
 
-      if ($result) {
-         array_shift($matches);
-         foreach ($matches as $part) {
-            if (($part{0}=='0' && $part!=='0') || (int) $part > 255) {
-               $result = false;
-               break;
-            }
-         }
+         if ($bytes[0] == 172)                  // 172.16.0.0 - 172.31.255.255
+            return (15 < $bytes[1] && $bytes[1] < 32);
+
+         if ($bytes[0]==192 && $bytes[1]==168)  // 192.168.0.0 - 192.168.255.255
+            return true;
       }
 
-      return $result;
+      return false;
    }
 
 
