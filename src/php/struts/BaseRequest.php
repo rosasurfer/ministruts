@@ -392,6 +392,13 @@ class BaseRequest extends Singleton {
       proxy (from what I read this can be a list of proxies if you go through more than one).  I am not sure if
       bypass-client holds true when you get routed through several proxies along the way.
       */
+
+      /*
+       * TODO: Diese IP kann einfach gefaked werden, wenn der Angreifer selbst einen x-beliebigen Forwarded-Header setzt.
+       *       Abhilfe: Es müßten immer Remote-Adresse UND ALLE Forwarded-Header gespeichert werden. Sind einige oder alle
+       *       Forwarded-Header gefaked, hat man immer noch die Remote-Adresse.
+       */
+
       static $guessed = null;
 
       if ($guessed === null) {
@@ -405,18 +412,18 @@ class BaseRequest extends Singleton {
                if (CommonValidator ::isIPAddress($value)) {
                   $ip = $value;
                }
-               else {
-                  $ip = NetTools ::getHostByName($value);
-                  if ($ip == $value)
-                     continue;
+               elseif ($value=='unknown' || $value==($ip=NetTools ::getHostByName($value))) {
+                  continue;
                }
+
                if ($ip != NetTools ::getHostByAddress($ip)) {
                   $guessed = $ip;
+                  Logger::log('Guessed a resolvable IP address as a WAN address: '.$ip, L_NOTICE, __CLASS__);
                   break;
                }
                if (!CommonValidator ::isIPLanAddress($ip)) {
                   $guessed = $ip;
-                  Logger::log('Guessed a non-resolvable IP address as not a LAN address: '.$ip, L_NOTICE, __CLASS__);
+                  Logger::log('Guessed a non-resolvable IP address as a WAN address: '.$ip, L_NOTICE, __CLASS__);
                   break;
                }
             }
