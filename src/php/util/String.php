@@ -107,6 +107,14 @@ final class String extends StaticClass {
 
       if ($string !== (string)$string) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
 
+
+      // prüfen, ob iconv() verfügbar ist, denn PHP schreibt bei fatalem Fehler keinen Fehler ins Errorlog: DANKE, PHP-Team !!!
+      static $function_exists = null;
+      if ($function_exists === null)
+         if (!$function_exists = function_exists('iconv'))
+            throw new RuntimeException('Fatal error: Call to undefined function iconv()');
+
+
       $php_errormsg = null;
       $decoded = @iconv('UTF-8', 'ISO-8859-1', $string);
 
