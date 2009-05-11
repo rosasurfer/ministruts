@@ -545,7 +545,8 @@ class BaseRequest extends Singleton {
    public function getHeader($name) {
       if ($name!==(string)$name) throw new IllegalTypeException('Illegal type of argument $name: '.getType($name));
 
-      return array_shift($this->getHeaders($name));
+      $headers = $this->getHeaders($name);
+      return array_shift($headers);
    }
 
 
