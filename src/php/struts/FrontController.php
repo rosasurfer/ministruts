@@ -159,11 +159,6 @@ final class FrontController extends Singleton {
 
       // Request verarbeiten
       $processor->process($request, $response);
-
-
-      // nur vorübergehend (Wert wurde in Request::getForwardedAddress() verwendet)
-      if (isSet($_SERVER['']))
-         self::$logNotice && Logger::log("Found unusual value for index \$_SERVER['']: \n".print_r($_SERVER, true), L_NOTICE, __CLASS__);
    }
 
 
