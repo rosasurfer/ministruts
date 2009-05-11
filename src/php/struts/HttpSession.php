@@ -87,8 +87,7 @@ class HttpSession extends Singleton {
          // TODO: $request->getHeader() einbauen
          $_SESSION['__SESSION_CREATED__'  ] = microTime(true);
          $_SESSION['__SESSION_IP__'       ] = $request->getRemoteAddress();      // TODO: forwarded remote IP einbauen
-         if (isSet($_SERVER['HTTP_USER_AGENT']))
-            $_SESSION['__SESSION_USERAGENT__'] = $_SERVER['HTTP_USER_AGENT'];
+         $_SESSION['__SESSION_USERAGENT__'] = $request->getHeaderValue('User-Agent');
 
          $this->new = true;
       }

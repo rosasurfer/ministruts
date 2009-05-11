@@ -435,25 +435,12 @@ class BaseRequest extends Singleton {
 
 
    /**
-    * Gibt den Wert eines 'Forwarded-IP'-Headers des aktuellen Requests zurück.
+    * Gibt den Wert des 'X-Forwarded-For'-Headers des aktuellen Requests zurück.
     *
-    * @return string - IP-Adresse oder NULL, wenn der Header nicht übertragen wurde
+    * @return string - Wert (ei oder mehrere IP-Adressen oder Hostnamen) oder NULL, wenn der Header nicht gesetzt ist
     */
    public function getForwardedRemoteAddress() {
-      static $result = false;
-
-      if ($result === false) {
-         if     (isSet($_SERVER['HTTP_X_FORWARDED_FOR'   ])) $value = $_SERVER['HTTP_X_FORWARDED_FOR'        ];
-         elseif (isSet($_SERVER['HTTP_X_UP_FORWARDED_FOR'])) $value = $_SERVER['HTTP_X_UP_FORWARDED_FOR'     ]; // mobile device
-         else                                                $value = $result = null;
-
-         if ($value !== null) {
-            $values = explode(',', trim($value, ', '));
-            $result = trim(array_pop($values));
-         }
-      }
-
-      return $result;
+      return $this->getHeaderValue(array('X-Forwarded-For', 'X-UP-Forwarded-For'));
    }
 
 
@@ -623,17 +610,30 @@ class BaseRequest extends Singleton {
 
 
    /**
-    * Gibt den Wert des angegebenen Headers als String zurück. Wurden mehrere Header dieses Namens übertragen,
-    * werden alle Werte dieser Header als komma-getrennte Liste zurückgegeben (in der übertragenen Reihenfolge).
+    * Gibt den Wert der angegebenen Header als String zurück. Wurden mehrere Namen angegeben oder wurden mehrere
+    * Header des angegebenen Namens übertragen, werden alle Werte dieser Header als eine komma-getrennte Liste
+    * zurückgegeben (in der übertragenen Reihenfolge).
     *
-    * @param string $name - Name des Headers
+    * @param string|array $names - ein oder mehrere Headernamen
     *
-    * @return string - Wert
+    * @return string - Wert oder NULL, wenn die angegebenen Header nicht gesetzt sind
     */
-   public function getHeaderValue($name) {
-      if ($name!==(string)$name) throw new IllegalTypeException('Illegal type of argument $name: '.getType($name));
+   public function getHeaderValue($names) {
+      if (is_string($names))
+         $names = array($names);
+      elseif (is_array($names)) {
+         foreach ($names as $name)
+            if ($name !== (string)$name) throw new IllegalTypeException('Illegal argument type in argument $names: '.getType($name));
+      }
+      else {
+         throw new IllegalTypeException('Illegal type of argument $names: '.getType($names));
+      }
 
-      return join(',', $this->getHeaders($name));
+      $headers = $this->getHeaders($names);
+      if ($headers)
+         return join(',', $headers);
+
+      return null;
    }
 
 
@@ -656,14 +656,10 @@ class BaseRequest extends Singleton {
       }
 
       $headers = $this->getHeaders($names);
-      if ($headers) {
-         $values = array_map('trim', explode(',', join(',', $headers)));
-      }
-      else {
-         $values = $headers; // empty array
-      }
+      if ($headers)
+         return array_map('trim', explode(',', join(',', $headers)));
 
-      return $values;
+      return $headers; // empty array;
    }
 
 
