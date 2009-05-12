@@ -64,6 +64,40 @@ class CommonValidator extends StaticClass {
 
 
    /**
+    * Ob der übergebene String eine syntaktisch gültige IP-Adresse eines externen Netzwerks ist.
+    *
+    * @param string $string - der zu überprüfende String
+    *
+    * @return boolean
+    */
+   public static function isIPWanAddress($string) {
+      $bytes = self ::isIPAddress($string, true);
+
+      // Die Logik entspricht dem Gegenteil von self::isIPLanAdress() + zusätzlicher Tests.
+      if ($bytes) {
+         if ($bytes[0] == 10)                   // 10.0.0.0 - 10.255.255.255
+            return false;
+
+         if ($bytes[0] == 127)                  // 127.0.0.0 - 127.255.255.255
+            return false;
+
+         if ($bytes[0]==169)                    // 169.0.0.0 - 169.255.255.255 !!! ist wahrscheinlich niemandem zugewiesen
+            return false;
+
+         if ($bytes[0] == 172)                  // 172.16.0.0 - 172.31.255.255
+            return !(15 < $bytes[1] && $bytes[1] < 32);
+
+         if ($bytes[0]==192)                    // 192.168.0.0 - 192.168.255.255
+            return ($bytes[1]!=168);
+
+      }
+
+      // dieses TRUE ist eher spekulativ
+      return true;
+   }
+
+
+   /**
     * Ob der übergebene String eine syntaktisch gültige E-Mail-Adresse ist.
     *
     * @param string $string - der zu überprüfende String
