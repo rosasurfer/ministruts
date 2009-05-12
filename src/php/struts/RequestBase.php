@@ -415,15 +415,13 @@ class BaseRequest extends Singleton {
                elseif ($value=='unknown' || $value=='localhost' || $value==($ip=NetTools ::getHostByName($value))) {
                   continue;
                }
-               if (String ::startsWith($ip, '127.') || CommonValidator ::isIPLanAddress($ip)) {
-                  continue;
+
+               if (CommonValidator ::isIPWanAddress($ip)) {
+                  $guessed = $ip;
+                  if ($ip == NetTools ::getHostByAddress($ip))
+                     Logger::log('Guessed a non-resolvable IP address as a WAN address: '.$ip, L_NOTICE, __CLASS__);
+                  break;
                }
-
-               $guessed = $ip;
-               if ($ip == NetTools ::getHostByAddress($ip))
-                  Logger::log('Guessed a non-resolvable IP address as a WAN address: '.$ip, L_NOTICE, __CLASS__);
-
-               break;
             }
          }
          if ($guessed === null)
