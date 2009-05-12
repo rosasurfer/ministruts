@@ -265,11 +265,11 @@ class Logger extends StaticClass {
       catch (Exception $second) {
          $file = $exception->getFile();
          $line = $exception->getLine();
-         error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", (string) $exception).' in '.$file.' on line '.$line), 0);
+         error_log('PHP (1) '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", (string) $exception).' in '.$file.' on line '.$line), 0);
 
          $file = $second->getFile();
          $line = $second->getLine();
-         error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", (string) $second).' in '.$file.' on line '.$line), 0);
+         error_log('PHP (2) '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", (string) $second).' in '.$file.' on line '.$line), 0);
       }
    }
 
@@ -336,113 +336,121 @@ class Logger extends StaticClass {
     * @param int       $level     - zu loggender Loglevel
     */
    private static function _log($message, Exception $exception = null, $level) {
-      if (!isSet(self::$logLevels[$level])) throw new InvalidArgumentException('Invalid log level: '.$level);
-      self ::init();
+      $plainMessage = null;
 
-      // 1. Logdaten ermitteln
-      $exMessage = null;
-      if ($exception) {
-         $message  .= ($message === null) ? (string) $exception : ' ('.get_class($exception).')';
-         $exMessage = ($exception instanceof NestableException) ? (string) $exception : get_class($exception).': '.$exception->getMessage();;
-      }
+      try {
+         if (!isSet(self::$logLevels[$level])) throw new InvalidArgumentException('Invalid log level: '.$level);
+         self ::init();
 
-      if ($exception instanceof NestableException) {
-         $trace = $exception->getStackTrace();
-         $file  = $exception->getFile();
-         $line  = $exception->getLine();
-         $trace = "Stacktrace:\n-----------\n".$exception->printStackTrace(true);
-      }
-      else {
-         $trace = $exception ? $exception->getTrace() : debug_backtrace();
-         $trace = NestableException ::transformToJavaStackTrace($trace);
-         array_shift($trace);
-         array_shift($trace);          // die ersten beiden Frames können weg: 1. Logger::_log(), 2: Logger::log()
-
-         foreach ($trace as $f) {      // ersten Frame mit __FILE__ suchen
-            if (isSet($f['file'])) {
-               $file = $f['file'];
-               $line = $f['line'];
-               break;
-            }
+         // 1. Logdaten ermitteln
+         $exMessage = null;
+         if ($exception) {
+            $message  .= ($message === null) ? (string) $exception : ' ('.get_class($exception).')';
+            $exMessage = ($exception instanceof NestableException) ? (string) $exception : get_class($exception).': '.$exception->getMessage();;
          }
-         $trace = "Stacktrace:\n-----------\n".NestableException ::formatStackTrace($trace);
-         // TODO: vernestelte, einfache Exceptions geben fehlerhaften Stacktrace zurück
-      }
 
-      $plainMessage = self::$logLevels[$level].': '.$message."\nin ".$file.' on line '.$line."\n";
+         if ($exception instanceof NestableException) {
+            $trace = $exception->getStackTrace();
+            $file  = $exception->getFile();
+            $line  = $exception->getLine();
+            $trace = "Stacktrace:\n-----------\n".$exception->printStackTrace(true);
+         }
+         else {
+            $trace = $exception ? $exception->getTrace() : debug_backtrace();
+            $trace = NestableException ::transformToJavaStackTrace($trace);
+            array_shift($trace);
+            array_shift($trace);          // die ersten beiden Frames können weg: 1. Logger::_log(), 2: Logger::log()
 
-
-      // 2. Logmessage anzeigen (wenn $display TRUE ist)
-      if (self::$display) {
-         if (isSet($_SERVER['REQUEST_METHOD'])) {
-            echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.self::$logLevels[$level].'</b>: '.nl2br(htmlSpecialChars($message, ENT_QUOTES))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
-            if ($exception)
-               echo '<br>'.htmlSpecialChars($exMessage, ENT_QUOTES).'<br>';
-            echo '<br>'.printFormatted($trace, true)."<br></div>\n";
-
-            // Wurde ein Redirect-Header gesendet, ist die Ausgabe verloren und muß zusätzlich gemailt werden
-            // (kann vorher nicht zuverlässig ermittelt werden, da die Header noch nicht gesendet sein können)
-            foreach (headers_list() as $header) {
-               if (striPos($header, 'Location: ') === 0) {
-                  self::$display = false;
-                  self::$mail    = true;
+            foreach ($trace as $f) {      // ersten Frame mit __FILE__ suchen
+               if (isSet($f['file'])) {
+                  $file = $f['file'];
+                  $line = $f['line'];
                   break;
                }
             }
-         }
-         else {
-            echo $plainMessage.($exception ? "\n".$exMessage."\n":'')."\n".$trace."\n";
-         }
-      }
-
-
-      // 3. Logmessage an die registrierten Adressen mailen (wenn $mail TRUE ist) ...
-      if (self::$mail && ($addresses = Config ::get('mail.address.buglovers'))) {
-         $mailMsg = $plainMessage.($exception ? "\n\n".$exMessage."\n":'')."\n\n".$trace;
-
-         if ($request=Request ::me()) {
-            $session = $request->isSession() ? print_r($_SESSION, true) : null;
-
-            $ip   = $_SERVER['REMOTE_ADDR'];
-            $host = getHostByAddr($ip);
-            if ($host != $ip)
-               $ip = $host.' ('.$ip.')';
-
-            $mailMsg .= "\n\n\nRequest:\n--------\n".$request."\n\n\n"
-                     .  "Session: ".($session ? "\n--------\n".$session."\n\n\n" : "  - no session -\n")
-                     .  "Host:      ".$ip."\n"
-                     .  "Timestamp: ".date('Y-m-d H:i:s')."\n";
-         }
-         else {
-            $mailMsg .= "\n\n\nShell:\n------\n".print_r($_SERVER, true)."\n\n\n";
+            $trace = "Stacktrace:\n-----------\n".NestableException ::formatStackTrace($trace);
+            // TODO: vernestelte, einfache Exceptions geben fehlerhaften Stacktrace zurück
          }
 
-         $mailMsg = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $mailMsg)) : str_replace("\r\n", "\n", $mailMsg);
-         $mailMsg = str_replace(chr(0), "*\x00*", $mailMsg);
+         $plainMessage = self::$logLevels[$level].': '.$message."\nin ".$file.' on line '.$line."\n";
 
-         $old_sendmail_from = ini_get('sendmail_from');
-         if (isSet($_SERVER['SERVER_ADMIN']))
-            ini_set('sendmail_from', $_SERVER['SERVER_ADMIN']);                           // nur für Windows relevant
 
-         $addresses = Config ::get('mail.address.forced-receiver', $addresses);
+         // 2. Logmessage anzeigen (wenn $display TRUE ist)
+         if (self::$display) {
+            if (isSet($_SERVER['REQUEST_METHOD'])) {
+               echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.self::$logLevels[$level].'</b>: '.nl2br(htmlSpecialChars($message, ENT_QUOTES))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
+               if ($exception)
+                  echo '<br>'.htmlSpecialChars($exMessage, ENT_QUOTES).'<br>';
+               echo '<br>'.printFormatted($trace, true)."<br></div>\n";
 
-         foreach (explode(',', $addresses) as $address) {
-            // TODO: Adressformat validieren
-            if ($address) {
-               // TODO: Header mit Fehlermeldung hinzufügen, damit beim Empfänger Messagefilter unterstützt werden
-               $success = error_log($mailMsg, 1, $address, 'Subject: PHP: '.self::$logLevels[$level].' at '.($request ? $request->getHostname():'').$_SERVER['PHP_SELF']);
-               if (!$success) {
-                  error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", $plainMessage)), 0);
-                  break;
+               // Wurde ein Redirect-Header gesendet, ist die Ausgabe verloren und muß zusätzlich gemailt werden
+               // (kann vorher nicht zuverlässig ermittelt werden, da die Header noch nicht gesendet sein können)
+               foreach (headers_list() as $header) {
+                  if (striPos($header, 'Location: ') === 0) {
+                     self::$display = false;
+                     self::$mail    = true;
+                     break;
+                  }
                }
             }
+            else {
+               echo $plainMessage.($exception ? "\n".$exMessage."\n":'')."\n".$trace."\n";
+            }
          }
-         ini_set('sendmail_from', $old_sendmail_from);
-      }
 
-      // ... oder Logmessage ins Error-Log schreiben, falls sie nicht schon angezeigt wurde
-      elseif (!self::$display) {
-         error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", $plainMessage)), 0);      // Zeilenumbrüche entfernen
+
+         // 3. Logmessage an die registrierten Adressen mailen (wenn $mail TRUE ist) ...
+         if (self::$mail && ($addresses = Config ::get('mail.address.buglovers'))) {
+            $mailMsg = $plainMessage.($exception ? "\n\n".$exMessage."\n":'')."\n\n".$trace;
+
+            if ($request=Request ::me()) {
+               $session = $request->isSession() ? print_r($_SESSION, true) : null;
+
+               $ip   = $_SERVER['REMOTE_ADDR'];
+               $host = getHostByAddr($ip);
+               if ($host != $ip)
+                  $ip = $host.' ('.$ip.')';
+
+               $mailMsg .= "\n\n\nRequest:\n--------\n".$request."\n\n\n"
+                        .  "Session: ".($session ? "\n--------\n".$session."\n\n\n" : "  - no session -\n")
+                        .  "Host:      ".$ip."\n"
+                        .  "Timestamp: ".date('Y-m-d H:i:s')."\n";
+            }
+            else {
+               $mailMsg .= "\n\n\nShell:\n------\n".print_r($_SERVER, true)."\n\n\n";
+            }
+
+            $mailMsg = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $mailMsg)) : str_replace("\r\n", "\n", $mailMsg);
+            $mailMsg = str_replace(chr(0), "*\x00*", $mailMsg);
+
+            $old_sendmail_from = ini_get('sendmail_from');
+            if (isSet($_SERVER['SERVER_ADMIN']))
+               ini_set('sendmail_from', $_SERVER['SERVER_ADMIN']);                           // nur für Windows relevant
+
+            $addresses = Config ::get('mail.address.forced-receiver', $addresses);
+
+            foreach (explode(',', $addresses) as $address) {
+               // TODO: Adressformat validieren
+               if ($address) {
+                  // TODO: Header mit Fehlermeldung hinzufügen, damit beim Empfänger Messagefilter unterstützt werden
+                  $success = error_log($mailMsg, 1, $address, 'Subject: PHP: '.self::$logLevels[$level].' at '.($request ? $request->getHostname():'').$_SERVER['PHP_SELF']);
+                  if (!$success) {
+                     error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", $plainMessage)), 0);
+                     break;
+                  }
+               }
+            }
+            ini_set('sendmail_from', $old_sendmail_from);
+         }
+
+         // ... oder Logmessage ins Error-Log schreiben, falls sie nicht schon angezeigt wurde
+         elseif (!self::$display) {
+            error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", $plainMessage)), 0);                           // Zeilenumbrüche entfernen
+         }
+      }
+      catch (Exception $ex) {
+         error_log('PHP (0) '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", $plainMessage ? $plainMessage:$message)), 0); // Zeilenumbrüche entfernen
+         throw $ex;
       }
    }
 }
