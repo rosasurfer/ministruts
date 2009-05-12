@@ -30,16 +30,28 @@ abstract class Singleton extends Object {
       if (isSet(self::$instances[$class]))
          return self::$instances[$class];
 
-      // for Singleton::getInstance($class, $arg1, ...) calling
+      // rekursives Erzeugen derselben Singleton-Instanz abfangen
+      static $currentCreations;
+      if (isSet($currentCreations[$class]))
+         throw new RuntimeException('Infinite loop: recursive call to '.__METHOD__."($class) detected");
+      $currentCreations[$class] = true;
+
+      // Parameter ermitteln
       if (func_num_args() > 2) {
          $args = func_get_args();
          array_shift($args);
       }
-      $object = $args ? new $class($args) : new $class();
-      if (!$object instanceof self)
-         throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
 
-      return self::$instances[$class] = $object;
+      // TODO: Was, wenn $args = false ist
+      $instance = $args ? new $class($args) : new $class();
+      if (!$instance instanceof self)
+         throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
+      self::$instances[$class] = $instance;
+
+      // Marker für rekursiven Aufruf zurücksetzen
+      unset($currentCreations[$class]);
+
+      return $instance;
    }
 
 
