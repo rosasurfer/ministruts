@@ -418,8 +418,8 @@ class BaseRequest extends Singleton {
 
                if (CommonValidator ::isIPWanAddress($ip)) {
                   $guessed = $ip;
-                  if ($ip == NetTools ::getHostByAddress($ip))
-                     Logger::log('Guessed a non-resolvable IP address as a WAN address: '.$ip, L_NOTICE, __CLASS__);
+                  //if ($ip == NetTools ::getHostByAddress($ip))
+                  //   Logger::log('Guessed a non-resolvable IP address as a WAN address: '.$ip, L_DEBUG, __CLASS__);
                   break;
                }
             }
