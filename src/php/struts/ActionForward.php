@@ -2,7 +2,7 @@
 /**
  * ActionForward
  *
- * Ein ActionForward bezeichnet ein Ziel, zu dem nach Aufruf einer Action verzweigt wird, mit den
+ * Ein ActionForward bezeichnet ein Ziel, zu dem nach Aufruf einer Action verzweigt wird.  Er hat die
  * folgenden Eigenschaften:
  *
  *   name     - logischer Name, unter dem der ActionForward gefunden werden kann
@@ -50,14 +50,14 @@ class ActionForward extends Object {
    /**
     * Erzeugt einen neuen ActionForward mit den angegebenen Daten.
     *
-    * @param string  $name     - Name der Instanz
+    * @param string  $name     - logischer Name des Forwards
     * @param string  $path     - Pfad der Instanz
     * @param boolean $redirect - Redirect-Flag für diese Instanz
     */
    public function __construct($name, $path, $redirect = false) {
-      $this->setName($name);
-      $this->setPath($path);
-      $this->setRedirect($redirect);
+      $this->setName($name)
+           ->setPath($path)
+           ->setRedirect($redirect);
    }
 
 
@@ -71,6 +71,7 @@ class ActionForward extends Object {
    public function setName($name) {
       if ($this->configured)     throw new IllegalStateException('Configuration is frozen');
       if ($name!==(string)$name) throw new IllegalTypeException('Illegal type of argument $name: '.getType($name));
+      if ($name==='')            throw new InvalidArgumentException('Invalid argument $name: '.$name);
 
       $this->name = $name;
       return $this;
@@ -87,6 +88,7 @@ class ActionForward extends Object {
    public function setPath($path) {
       if ($this->configured)     throw new IllegalStateException('Configuration is frozen');
       if ($path!==(string)$path) throw new IllegalTypeException('Illegal type of argument $path: '.getType($path));
+      if ($path==='')            throw new InvalidArgumentException('Invalid argument $path: '.$path);
 
       $this->path = $path;
       return $this;
@@ -103,6 +105,7 @@ class ActionForward extends Object {
    public function setLabel($label) {
       if ($this->configured)       throw new IllegalStateException('Configuration is frozen');
       if ($label!==(string)$label) throw new IllegalTypeException('Illegal type of argument $label: '.getType($label));
+      if ($label==='')             throw new InvalidArgumentException('Invalid argument $label: '.$label);
 
       $this->label = $label;
       return $this;
