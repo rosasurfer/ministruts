@@ -93,7 +93,8 @@ class DaoWorker extends Object {
     * @throws DatabaseException - wenn ein mehrzeiliges Resultset übergeben wird
     */
    public function makeObject(array $result) {
-      if ($result['rows'] > 1) throw new DatabaseException('Unexpected non-unique query result: '.$result);
+      if (getType($result['set']) != 'resource') throw new IllegalTypeException('Illegal type of parameter $result[set]: '.getType($result['set']));
+      if ($result['rows'] > 1)                   throw new DatabaseException('Unexpected non-unique query result: '.$result);
 
       $instance = null;
 
@@ -114,6 +115,8 @@ class DaoWorker extends Object {
     * @return array - Instanzen
     */
    public function makeObjects(array $result) {
+      if (getType($result['set']) != 'resource') throw new IllegalTypeException('Illegal type of parameter $result[set]: '.getType($result['set']));
+
       $instances = array();
 
       while ($row = mysql_fetch_assoc($result['set'])) {
