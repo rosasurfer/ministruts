@@ -1,3 +1,8 @@
+2009-06-13
+
+   - php/dao/DaoWorker.php - strengere Typüberprüfung
+
+
 2009-05-12
 
    - Bugfix: php/core/Singleton::getInstance() - Endlosschleifen beim rekursiven Abfragen einer Instanz werden abgefangen
