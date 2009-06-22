@@ -50,7 +50,7 @@ final class String extends StaticClass {
     *
     * @param string $haystack - der zu prüfende String
     * @param string $needle   - der zu suchende String
-    * @param boolean $case    - ob bei der Suche Groß-/Kleinschreibung beachtet werden soll (Default: ja)
+    * @param bool   $case     - ob bei der Suche Groß-/Kleinschreibung beachtet werden soll (Default: ja)
     *
     * @return boolean
     */
