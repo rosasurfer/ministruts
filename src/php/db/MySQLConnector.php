@@ -149,6 +149,8 @@ final class MySQLConnector extends DB {
          $neededTime = round($end - $start, 4);
          if ($neededTime > self::$maxQueryTime)
             Logger ::log('SQL statement took more than '.self::$maxQueryTime." seconds: $neededTime\n$sql", L_DEBUG, __CLASS__);
+
+         //Logger ::log($this->printDeadlockStatus(true), L_DEBUG, __CLASS__);
       }
       return $result;
    }
@@ -312,7 +314,9 @@ final class MySQLConnector extends DB {
 
       // Datenformat: siehe Ende der Methode
       if (!preg_match('/\nLATEST DETECTED DEADLOCK\n-+\n(.+)\n-+\n/sU', $status, $match)) {
-         Logger ::log("Error parsing InnoDB status\n\n".$status, L_ERROR, __CLASS__);
+         if (String ::contains($status, "\nLATEST DETECTED DEADLOCK\n")) $message = "Error parsing InnoDB status:";
+         else                                                            $message = "No deadlock infos found in InnoDB status:";
+         Logger ::log($message."\n\n".$status, L_ERROR, __CLASS__);
          return null;
       }
       $status = $match[1];
@@ -351,10 +355,11 @@ final class MySQLConnector extends DB {
             }
             // Transaction block
             if (String ::startsWith($lines[1], 'TRANSACTION ', true)) {
-               if (!preg_match('/\s*\((\d+)\).*\nTRANSACTION \d+ (\d+), ACTIVE (\d+) sec.+\n(LOCK WAIT )?(\d+) lock struct.+, undo log entries (\d+).*\nMySQL thread id (\d+), query id \d+ (\S+) \S+ (\S+).+?\n(.+)$/is', $block, $match)) {
+               if (!preg_match('/\s*\((\d+)\).*\nTRANSACTION \d+ (\d+), ACTIVE (\d+) sec.+\n(LOCK WAIT )?(\d+) lock struct\(s\), heap size \d+(?:, undo log entries (\d+))?\nMySQL thread id (\d+), query id \d+ (\S+) \S+ (\S+).+?\n(.+)$/is', $block, $match)) {
                   Logger ::log("Error parsing deadlock status transaction block\n\n".$block, L_ERROR, __CLASS__);
                   return null;
                }
+
                $transaction = array('no'          => (int) $match[1],
                                     'transaction' => (int) $match[2],
                                     'time'        => (int) $match[3],
@@ -507,54 +512,54 @@ final class MySQLConnector extends DB {
 
       echoPre($string);
       return null;
-
-      /*
-      ------------------------
-      LATEST DETECTED DEADLOCK
-      ------------------------
-      090213 20:12:02
-      *** (1) TRANSACTION:
-      TRANSACTION 0 56471972, ACTIVE 1 sec, process no 25931, OS thread id 81980336 starting index read
-      mysql tables in use 2, locked 2
-      LOCK WAIT 4 lock struct(s), heap size 320, undo log entries 1
-      MySQL thread id 279372, query id 1830074 server.localdomain 0.0.0.0 database Updating
-      update v_view
-            set registrations = registrations + if(@delete  , -1, if(@undelete  , +1, 0)),
-                activations   = activations   + if(@activate, +1, if(@deactivate, -1, 0))
-            where date = date(old.created)
-      *** (1) WAITING FOR THIS LOCK TO BE GRANTED:
-      RECORD LOCKS space id 0 page no 450 n bits 408 index `PRIMARY` of table `database/v_view` trx id 0 56471972 lock_mode X locks rec but not gap waiting
-      Record lock, heap no 341 PHYSICAL RECORD: n_fields 5; compact format; info bits 0
-       0: len 3; hex 8fb24d; asc   M;; 1: len 6; hex 0000035db1a0; asc    ]  ;; 2: len 7; hex 00000001c910a9; asc        ;; 3: len 4; hex 000010af; asc     ;; 4: len 4; hex 00000808; asc     ;;
-
-      *** (2) TRANSACTION:
-      TRANSACTION 0 56471970, ACTIVE 2 sec, process no 25931, OS thread id 120036272 starting index read, thread declared inside InnoDB 0
-      mysql tables in use 2, locked 2
-      11 lock struct(s), heap size 1024, undo log entries 1
-      MySQL thread id 279368, query id 1830052 server.localdomain 0.0.0.0 database executing
-      insert into v_view (date, registrations, activations)
-            select date(new.created)              as 'date',
-                   1                              as 'registrations',
-                   new.orderactivated is not null as 'activations'
-               from dual
-               where new.deleted is null
-            on duplicate key update registrations = registrations + 1,
-                                    activations   = activations + (new.orderactivated is not null)
-      *** (2) HOLDS THE LOCK(S):
-      RECORD LOCKS space id 0 page no 450 n bits 408 index `PRIMARY` of table `database/v_view` trx id 0 56471970 lock mode S
-      Record lock, heap no 341 PHYSICAL RECORD: n_fields 5; compact format; info bits 0
-       0: len 3; hex 8fb24d; asc   M;; 1: len 6; hex 0000035db1a0; asc    ]  ;; 2: len 7; hex 00000001c910a9; asc        ;; 3: len 4; hex 000010af; asc     ;; 4: len 4; hex 00000808; asc     ;;
-
-      *** (2) WAITING FOR THIS LOCK TO BE GRANTED:
-      RECORD LOCKS space id 0 page no 450 n bits 408 index `PRIMARY` of table `database/v_view` trx id 0 56471970 lock_mode X locks rec but not gap waiting
-      Record lock, heap no 341 PHYSICAL RECORD: n_fields 5; compact format; info bits 0
-       0: len 3; hex 8fb24d; asc   M;; 1: len 6; hex 0000035db1a0; asc    ]  ;; 2: len 7; hex 00000001c910a9; asc        ;; 3: len 4; hex 000010af; asc     ;; 4: len 4; hex 00000808; asc     ;;
-
-      *** WE ROLL BACK TRANSACTION (2)
-      ------------
-      TRANSACTIONS
-      ------------
-      */
    }
+/*
+$status = "
+------------------------
+LATEST DETECTED DEADLOCK
+------------------------
+090213 20:12:02
+*** (1) TRANSACTION:
+TRANSACTION 0 56471972, ACTIVE 1 sec, process no 25931, OS thread id 81980336 starting index read
+mysql tables in use 2, locked 2
+LOCK WAIT 4 lock struct(s), heap size 320, undo log entries 1
+MySQL thread id 279372, query id 1830074 server.localdomain 0.0.0.0 database Updating
+update v_view
+      set registrations = registrations + if(@delete  , -1, if(@undelete  , +1, 0)),
+          activations   = activations   + if(@activate, +1, if(@deactivate, -1, 0))
+      where date = date(old.created)
+*** (1) WAITING FOR THIS LOCK TO BE GRANTED:
+RECORD LOCKS space id 0 page no 450 n bits 408 index `PRIMARY` of table `database/v_view` trx id 0 56471972 lock_mode X locks rec but not gap waiting
+Record lock, heap no 341 PHYSICAL RECORD: n_fields 5; compact format; info bits 0
+ 0: len 3; hex 8fb24d; asc   M;; 1: len 6; hex 0000035db1a0; asc    ]  ;; 2: len 7; hex 00000001c910a9; asc        ;; 3: len 4; hex 000010af; asc     ;; 4: len 4; hex 00000808; asc     ;;
+
+*** (2) TRANSACTION:
+TRANSACTION 0 56471970, ACTIVE 2 sec, process no 25931, OS thread id 120036272 starting index read, thread declared inside InnoDB 0
+mysql tables in use 2, locked 2
+11 lock struct(s), heap size 1024, undo log entries 1
+MySQL thread id 279368, query id 1830052 server.localdomain 0.0.0.0 database executing
+insert into v_view (date, registrations, activations)
+      select date(new.created)              as 'date',
+             1                              as 'registrations',
+             new.orderactivated is not null as 'activations'
+         from dual
+         where new.deleted is null
+      on duplicate key update registrations = registrations + 1,
+                              activations   = activations + (new.orderactivated is not null)
+*** (2) HOLDS THE LOCK(S):
+RECORD LOCKS space id 0 page no 450 n bits 408 index `PRIMARY` of table `database/v_view` trx id 0 56471970 lock mode S
+Record lock, heap no 341 PHYSICAL RECORD: n_fields 5; compact format; info bits 0
+ 0: len 3; hex 8fb24d; asc   M;; 1: len 6; hex 0000035db1a0; asc    ]  ;; 2: len 7; hex 00000001c910a9; asc        ;; 3: len 4; hex 000010af; asc     ;; 4: len 4; hex 00000808; asc     ;;
+
+*** (2) WAITING FOR THIS LOCK TO BE GRANTED:
+RECORD LOCKS space id 0 page no 450 n bits 408 index `PRIMARY` of table `database/v_view` trx id 0 56471970 lock_mode X locks rec but not gap waiting
+Record lock, heap no 341 PHYSICAL RECORD: n_fields 5; compact format; info bits 0
+ 0: len 3; hex 8fb24d; asc   M;; 1: len 6; hex 0000035db1a0; asc    ]  ;; 2: len 7; hex 00000001c910a9; asc        ;; 3: len 4; hex 000010af; asc     ;; 4: len 4; hex 00000808; asc     ;;
+
+*** WE ROLL BACK TRANSACTION (2)
+------------
+TRANSACTIONS
+------------";
+*/
 }
 ?>
