@@ -265,7 +265,41 @@ final class Config extends Object {
    private function setProperty($key, $value, $persist = false) {
       $properties =& $this->properties;
 
-      $parts = explode('.', $key);
+      // alt: $parts = explode('.', $key);
+
+      // neu
+      $parts = array();
+      $k = $key;
+
+      while (true) {
+         $k = trim($k);
+
+         if ($k{0} != '"') {  // normaler Key ohne Anführungszeichen (")
+            $pos = strPos($k, '.');
+            if ($pos === false) {
+               $parts[] = $k;
+               break;
+            }
+            else {
+               $parts[] = trim(subStr($k, 0, $pos));
+               $k       = subStr($k, $pos+1);
+            }
+         }
+         else {               // Key beginnt mit Anführungszeichen (")
+            $pos = strPos($k, '"',1);
+            if ($pos === false) throw new InvalidArgumentException('Invalid argument $key: '.$key);
+
+            $parts[] = subStr($k, 1, $pos-1);
+            $k       = trim(subStr($k, $pos+1));
+
+            if (!strLen($k))
+               break;
+            if (strPos($k, '.') !== 0) throw new InvalidArgumentException('Invalid argument $key: '.$key);
+            $k = subStr($k, 1);
+         }
+      }
+      // end: neu
+
       $size = sizeOf($parts);
 
       for ($i=0; $i<$size; ++$i) {
