@@ -1,5 +1,10 @@
 2009-06-13
 
+   - neu: php/net/dns/checkDNS.php - Script zum automatischen Überprüfen von DNS-Einträgen
+
+
+2009-06-13
+
    - php/dao/DaoWorker.php - strengere Typüberprüfung
 
 
