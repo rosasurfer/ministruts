@@ -56,6 +56,12 @@ function queryDNS($domain, $type) {
    return $result;
 }
 
+$result = queryDNS('domain.tld', 'NS');
+echoPre($result);
+
+exit();
+
+
 
 // DNS-Einträge
 $domains = Config::get('dns.domain', array());
