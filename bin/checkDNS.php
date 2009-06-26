@@ -2,12 +2,11 @@
 <?
 set_time_limit(0);
 
-// MiniStruts einbinden
-require(dirName(__FILE__).'/../ministruts/src/phpLib.php');
+// Library einbinden
+require(dirName(__FILE__).'/../src/phpLib.php');
 
 
 define('APPLICATION_NAME', 'DNS-Checker');
-
 
 
 /**
