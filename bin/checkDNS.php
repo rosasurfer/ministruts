@@ -18,9 +18,6 @@ define('APPLICATION_NAME', 'DNS-Checker');
  * @return string - Wert
  */
 function queryDNS($domain, $type) {
-
-   echoPre(__METHOD__);
-
    $result = null;
 
    switch ($type) {
@@ -34,6 +31,11 @@ function queryDNS($domain, $type) {
          $result = ($result && isSet($result[0]['target'])) ? $result[0]['target'] : null;
          break;
 
+      case 'NS':
+         $result = dns_get_record($domain, DNS_NS);
+         //$result = ($result && isSet($result[0]['txt'])) ? $result[0]['txt'] : null;
+         break;
+
       case 'TXT'  :
          $result = dns_get_record($domain, DNS_TXT);
          $result = ($result && isSet($result[0]['txt'])) ? $result[0]['txt'] : null;
@@ -41,7 +43,6 @@ function queryDNS($domain, $type) {
 
       case 'CNAME':
       case 'HINFO':
-      case 'NS'   :
       case 'PTR'  :
       case 'SOA'  :
       case 'AAAA' :
