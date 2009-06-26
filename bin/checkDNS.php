@@ -33,7 +33,6 @@ function queryDNS($domain, $type) {
 
       case 'NS':
          $result = dns_get_record($domain, DNS_NS);
-         echoPre($result);
          $result = ($result && isSet($result[0]['target'])) ? $result[0]['target'] : null;
          break;
 
@@ -61,12 +60,6 @@ function queryDNS($domain, $type) {
    return $result;
 }
 
-$result = queryDNS('www.domain.tld', 'NS');
-echoPre($result);
-
-exit();
-
-
 
 // DNS-Einträge
 $domains = Config::get('dns.domain', array());
@@ -77,10 +70,11 @@ foreach ($domains as $domain => $domainValues) {
          $result = queryDNS($domain, $type);
          if ($result != $value) {
             if ($type == 'TXT') {
-               $value  = '"'.$value.'"';
-               $result = '"'.$result.'"';
+               if (String ::contains($value , ' ')) $value  = "\"$value\"";
+               if (String ::contains($result, ' ')) $result = "\"$result\"";
             }
-            echoPre("DNS error detected for      $domain: required $type value: $value,   found: $result");
+            $ns = queryDNS($domain, 'NS');
+            echoPre("DNS error detected for      $domain: required $type value: $value,   found: $result  (NS: $ns)");
          }
          continue;
       }
@@ -88,8 +82,10 @@ foreach ($domains as $domain => $domainValues) {
       foreach ($value as $subdomain => $subdomainValues) {
          foreach ($subdomainValues as $type => $value) {
             $result = queryDNS("$subdomain.$domain", $type);
-            if ($result != $value)
-               echoPre('DNS error detected for '.str_pad($subdomain, 4, ' ', STR_PAD_LEFT).".$domain: required $type value: $value,   found: $result");
+            if ($result != $value) {
+               $ns = queryDNS($domain, 'NS');
+               echoPre('DNS error detected for '.str_pad($subdomain, 4, ' ', STR_PAD_LEFT).".$domain: required $type value: $value,   found: $result  (NS: $ns)");
+            }
          }
       }
    }
