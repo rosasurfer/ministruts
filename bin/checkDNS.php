@@ -60,7 +60,7 @@ function queryDNS($domain, $type) {
    return $result;
 }
 
-$result = queryDNS('domain.tld', 'NS');
+$result = queryDNS('www.domain.tld', 'NS');
 echoPre($result);
 
 exit();
