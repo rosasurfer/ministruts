@@ -18,6 +18,8 @@
  *
  * Konsolenanwendungen:
  * --------------------
+ *    - "config-custom.properties" im aktuellen Verzeichnis
+ *    - "config.properties"        im aktuellen Verzeichnis
  *    - "config-custom.properties" im Scriptverzeichnis
  *    - "config.properties"        im Scriptverzeichnis
  *
@@ -124,17 +126,19 @@ final class Config extends Object {
     * Lokale Einstellungen überschreiben globale Einstellungen.
     */
    private function __construct() {
-      $files = array();
 
-      // Ausgangsverzeichnis ermitteln (bei Webapplikation "WEB-INF", bei Shellscripten das Scriptverzeichnis)
-      $path = realPath(dirName($_SERVER['SCRIPT_FILENAME']));
-      if (isSet($_SERVER['REQUEST_METHOD']))
-         $path .= DIRECTORY_SEPARATOR.'WEB-INF';
+      // Ausgangsverzeichnis ermitteln und Suchpfad definieren
+      $scriptDir = realPath(dirName($_SERVER['SCRIPT_FILENAME']));
 
-      // Include-Pfad zerlegen
+      // Web- oder Consolenanwendung
+      if (isSet($_SERVER['REQUEST_METHOD'])) $path = $scriptDir.DIRECTORY_SEPARATOR.'WEB-INF';
+      else                                   $path = getCwd().PATH_SEPARATOR.$scriptDir;
+
+      // Include-Pfad anhängen und Suchpfad zerlegen
       $paths = explode(PATH_SEPARATOR, $path.PATH_SEPARATOR.ini_get('include_path'));
 
       // Config-Dateien suchen
+      $files = array();
       foreach ($paths as $key => $path) {
          $path = realPath($path);
          if ($path) {

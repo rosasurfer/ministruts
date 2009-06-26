@@ -1,3 +1,8 @@
+2009-06-26
+
+   - php/util/Config: Konfigurationsdateien für Konsolenanwendungen werden zuerst im aktuellen Verzeichnis gesucht
+
+
 2009-06-13
 
    - neu: php/net/dns/checkDNS.php - Script zum automatisierten Überprüfen von DNS-Einträgen
