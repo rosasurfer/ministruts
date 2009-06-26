@@ -58,7 +58,7 @@ function queryDNS($domain, $type) {
 
 
 // DNS-Einträge
-$domains = Config::get('dns.domain');
+$domains = Config::get('dns.domain', array());
 
 foreach ($domains as $domain => $domainValues) {
    foreach ($domainValues as $type => $value) {
@@ -86,7 +86,7 @@ foreach ($domains as $domain => $domainValues) {
 
 
 // Reverse-DNS-Einträge
-$ips = Config::get('dns.ip');
+$ips = Config::get('dns.ip', array());
 
 foreach ($ips as $ip => $value) {
    $result = getHostByAddr($ip);
