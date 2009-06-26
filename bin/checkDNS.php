@@ -18,6 +18,9 @@ define('APPLICATION_NAME', 'DNS-Checker');
  * @return string - Wert
  */
 function queryDNS($domain, $type) {
+
+   echoPre(__METHOD__);
+
    $result = null;
 
    switch ($type) {
