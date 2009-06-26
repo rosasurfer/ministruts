@@ -33,7 +33,7 @@ function queryDNS($domain, $type) {
 
       case 'NS':
          $result = dns_get_record($domain, DNS_NS);
-         //$result = ($result && isSet($result[0]['txt'])) ? $result[0]['txt'] : null;
+         $result = ($result && isSet($result[0]['target'])) ? $result[0]['target'] : null;
          break;
 
       case 'TXT'  :
