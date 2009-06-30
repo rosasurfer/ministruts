@@ -20,6 +20,8 @@ define('APPLICATION_NAME', 'DNS-Checker');
 function queryDNS($domain, $type) {
    $result = null;
 
+   //echoPre('query for: '.$domain.'  '.$type.'  record');
+
    switch ($type) {
       case 'A':
          $result = dns_get_record($domain, DNS_A);
@@ -56,6 +58,8 @@ function queryDNS($domain, $type) {
       default:
          throw new InvalidArgumentException('Invalid argument $type: '.$type);
    }
+
+   //echoPre('result: '.$result);
 
    return $result;
 }
