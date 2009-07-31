@@ -27,7 +27,6 @@ class BaseRequest extends Singleton {
 
    private /*string*/ $method;
    private /*string*/ $hostURL;
-   private /*string*/ $uri;
    private /*string*/ $path;
 
 
@@ -210,22 +209,13 @@ class BaseRequest extends Singleton {
     */
    public function getHostURL() {
       if ($this->hostURL === null) {
-         $http = isSet($_SERVER['HTTPS']) ? 'https' : 'http';
-         $host = $this->getHostname();
-         $port = $_SERVER['SERVER_PORT']=='80' ? '' : ':'.$_SERVER['SERVER_PORT'];
-         $this->hostURL = "$http://$host$port";
+         $protocol = isSet($_SERVER['HTTPS']) ? 'https' : 'http';
+         $host     = $this->getHostname();
+         $port     = $_SERVER['SERVER_PORT']=='80' ? '' : ':'.$_SERVER['SERVER_PORT'];
+
+         $this->hostURL = "$protocol://$host$port";
       }
       return $this->hostURL;
-
-      /*
-      function baseurl() {
-         if(!empty($_SERVER["HTTPS"])){$http = "https";}else{$http = 'http';}
-         $port = ($_SERVER["SERVER_PORT"] == "80") ? "" : (":".$_SERVER["SERVER_PORT"]);
-         $basename = preg_replace('/^.+[\\\\\\/]/', '', $_SERVER['PHP_SELF'] );
-         $dir = substr($_SERVER['REQUEST_URI'], 0, -strlen($basename)-1);
-         return "$http://".$_SERVER['SERVER_NAME'].$port.$dir;
-      }
-      */
    }
 
 
@@ -243,6 +233,18 @@ class BaseRequest extends Singleton {
 
 
    /**
+    * Gibt die vollständige URL des Requests zurück.
+    *
+    * z.B.: https://www.domain.tld:433/myapplication/foo/bar.php/info?key=value
+    *
+    * @return string
+    */
+   public function getURL() {
+      return $this->getHostURL().$this->getURI();
+   }
+
+
+   /**
     * Gibt den Teil der URL des Requests zurück, wie er in der ersten Zeile des HTTP-Protokolls
     * erscheint, relativ zum Wurzelverzeichnis des Webservers. Dieser Wert beginnt mit einem Slash "/".
     *
@@ -251,10 +253,7 @@ class BaseRequest extends Singleton {
     * @return string
     */
    public function getURI() {
-      if ($this->uri === null) {
-         $this->uri = $_SERVER['REQUEST_URI'];
-      }
-      return $this->uri;
+      return $_SERVER['REQUEST_URI'];
    }
 
 
@@ -327,7 +326,7 @@ class BaseRequest extends Singleton {
 
 
    /**
-    * Alias für Request::getApplicationPath(), für die Java-Abteilung :-)
+    * Alias für Request::getApplicationPath() (für die Java-Abteilung :-)
     *
     * @return string
     *
