@@ -5,7 +5,9 @@
 class RequestProcessor extends Object {
 
 
-   private static /*bool*/ $logDebug, $logInfo, $logNotice;
+   private static /*bool*/ $logDebug,
+                  /*bool*/ $logInfo,
+                  /*bool*/ $logNotice;
 
 
    // Module, zu dem wir gehören
