@@ -25,8 +25,8 @@ final class Cache extends StaticClass {
 
 
    /**
-    * Gibt die Cache-Implementierung für den angegebenen Bezeichner zurück. Unterschiedliche Bezeichner
-    * stehen für verschiedene Cache-Implementierungen, z.B. APC, Dateisystem-Cache, MemCache.
+    * Gibt die Cache-Implementierung für den angegebenen Bezeichner zurück. Verschiedene Bezeichner
+    * stehen für verschiedene Cache-Implementierungen, z.B. APC-Cache, Dateisystem-Cache, MemCache.
     *
     * @param string $label - Bezeichner
     *
@@ -41,7 +41,7 @@ final class Cache extends StaticClass {
             $key = '';
 
             // neuen Cache instantiieren
-            if (extension_loaded('apc') && ini_get(isSet($_SERVER['REQUEST_METHOD']) ? 'apc.enabled' : 'apc.enable_cli'))
+            if (extension_loaded('apc') && ini_get(isSet($_SERVER['REQUEST_METHOD']) ? 'apc.enabled':'apc.enable_cli'))
                self::$default = new ApcCache($label);
             else
                self::$default = new ReferencePool($label);
@@ -51,7 +51,7 @@ final class Cache extends StaticClass {
 
 
       // spezifischer Cache
-      if ($label!==(string)$label)
+      if ($label !== (string)$label)
          throw new IllegalTypeException('Illegal type of argument $label: '.getType($label));
 
 
