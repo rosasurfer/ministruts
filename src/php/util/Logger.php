@@ -381,7 +381,9 @@ class Logger extends StaticClass {
                echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.self::$logLevels[$level].'</b>: '.nl2br(htmlSpecialChars($message, ENT_QUOTES))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
                if ($exception)
                   echo '<br>'.htmlSpecialChars($exMessage, ENT_QUOTES).'<br>';
-               echo '<br>'.printFormatted($trace, true)."<br></div>\n";
+               echo '<br>'.printFormatted($trace, true)."<br></div>";
+               if ($request=Request ::me())
+                  echo '<br>'.printFormatted("Request:\n--------\n".$request, true)."<br></div><br>";
 
                // Wurde ein Redirect-Header gesendet, ist die Ausgabe verloren und muß zusätzlich gemailt werden
                // (kann vorher nicht zuverlässig ermittelt werden, da die Header noch nicht gesendet sein können)
