@@ -128,15 +128,19 @@ class HttpSession extends Singleton {
 
 
    /**
-    * Gibt den unter dem angegebenen Schlüssel in der Session gespeicherten Wert zurück oder NULL,
-    * wenn unter diesem Schlüssel kein Wert existiert.
+    * Gibt den unter dem angegebenen Schlüssel in der Session gespeicherten Wert zurück oder den
+    * angegebenen Alternativwert, falls kein Wert unter diesem Schlüssel existiert.
     *
-    * @param string $key - Schlüssel, unter dem der Wert gespeichert ist
+    * @param string $key     - Schlüssel, unter dem der Wert gespeichert ist
+    * @param mixed  $default - Default- bzw. Alternativwert (kann selbst auch NULL sein)
     *
     * @return mixed - der gespeicherte Wert oder NULL
     */
-   public function getAttribute($key) {
-      return isSet($_SESSION[$key]) ? $_SESSION[$key] : null;
+   public function getAttribute($key, $default = null) {
+      if (isSet($_SESSION[$key]))
+         return $_SESSION[$key];
+
+      return $default;
    }
 
 
