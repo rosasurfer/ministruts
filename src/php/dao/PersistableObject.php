@@ -141,7 +141,6 @@ abstract class PersistableObject extends Object implements IDaoConnected {
          $this->insert();
       }
       elseif ($this->modified) {
-         Logger ::log(__METHOD__, L_NOTICE, __CLASS__);
          $this->update();
       }
       else {
