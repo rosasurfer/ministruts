@@ -45,7 +45,7 @@ abstract class PersistableObject extends Object implements IDaoConnected {
     * }
     */
    final protected function __construct() {
-      $this->created = $this->version = date('Y-m-d H:i:s');
+      $this->created = $this->touch();
    }
 
 
@@ -81,6 +81,17 @@ abstract class PersistableObject extends Object implements IDaoConnected {
     */
    public function getVersion() {
       return $this->version;
+   }
+
+
+   /**
+    * Aktualisiert die Versions-Nr. dieser Instanz und gibt den neuen Wert zurück.  Wird zur externen
+    * Generierung der Versions-Informationen verwendet.
+    *
+    * @return string - Versionsnummer (Zeitpunkt der letzten Änderung)
+    */
+   final protected function touch() {
+      return $this->version = date('Y-m-d H:i:s');
    }
 
 
@@ -130,6 +141,7 @@ abstract class PersistableObject extends Object implements IDaoConnected {
          $this->insert();
       }
       elseif ($this->modified) {
+         Logger ::log(__METHOD__, L_NOTICE, __CLASS__);
          $this->update();
       }
       else {
