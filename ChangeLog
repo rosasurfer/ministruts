@@ -1,3 +1,8 @@
+2009-08-18
+
+   - neu: php/dao/PersistableObject::touch() - zur externen Generierung von Versionsinformationen
+
+
 2009-06-26
 
    - php/util/Config: Konfigurationsdateien für Konsolenanwendungen werden zuerst im aktuellen Verzeichnis gesucht
