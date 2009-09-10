@@ -444,41 +444,33 @@ class BaseRequest extends Singleton {
    /**
     * Gibt den Content dieses Requests zurück.  Der Content ist ein ggf. übertragener Request-Body (nur bei POST-Requests).
     *
-    * @param bool $sanitize - ob die Contentlänge an einen ggf. übertragenen 'Content-Length' Header angepaßt werden soll
-    *                         (nur zu Debugging-Zwecken; default: TRUE)
-    *
-    * @return string - Request-Body oder NULL, wenn im Body keine Daten übertragen wurden.
+    * @return mixed - Request-Body oder NULL, wenn im Body keine Daten übertragen wurden.  Ist der Content-Typ des Requests "multipart/form-data"
+    *                 (File-Upload), wird statt des Request-Bodies ein Array mit den geposteten File-Informationen zurückgegeben.
     */
-   public function getContent($sanitize = true) {
-      if ($sanitize !== (bool)$sanitize) throw new IllegalTypeException('Illegal type of argument $sanitize: '.getType($sanitize));
+   public function getContent() {
+      static $content = null;
+      static $read    = false;
 
-      static $raw       = null;
-      static $sanitized = null;
-
-      static $read = false;
       if (!$read) {
-         // TODO: php://input is not available with enctype="multipart/form-data"
+         $read = true;
+
          if ($this->isPost()) {
-            $raw = file_get_contents('php://input');
-
-            $hLength = $this->getHeaderValue('Content-Length');
-
-            if ($hLength!==null && $hLength!=strLen($raw)) {
-               Logger ::log("Request header 'Content-Length' doesn't match length of received content data", L_NOTICE, __CLASS__);
-               $sanitized = subStr($raw, 0, $hLength);
+            $contentType = $this->getHeaderValue('Content-Type');
+            if ($contentType) {
+               $parts = explode(';', $contentType);
+               $contentType = $parts[0];
+            }
+            if ($contentType == 'multipart/form-data') {
+               // TODO: php://input is not available with enctype="multipart/form-data"
+               $content = $_FILES;
             }
             else {
-               $sanitized =& $raw;
+               $content = file_get_contents('php://input');
             }
-
-            // temporär
-            if ($this->getHeaderValue('Content-Type') == 'multipart/form-data')
-               Logger ::log("Request of type 'multipart/form-data' received", L_NOTICE, __CLASS__);
          }
-         $read = true;
       }
 
-      return $sanitize ? $sanitized : $raw;
+      return $content;
    }
 
 
@@ -683,7 +675,11 @@ class BaseRequest extends Singleton {
 
       // Content (Body)
       if ($this->isPost()) {
-         $content = $this->getContent(false);
+         $content = $this->getContent();
+
+         if (is_array($content))
+            $content = print_r($content, true);
+
          if (strLen($content))
             $string .= "\n".$content."\n";
       }
