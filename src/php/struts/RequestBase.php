@@ -706,6 +706,16 @@ class BaseRequest extends Singleton {
 
 
    /**
+    * Gibt alle im Request-Context gespeicherten Werte zurück.
+    *
+    * @return array - Werte-Array
+    */
+   public function getAttributes() {
+      return $this->attributes;
+   }
+
+
+   /**
     * Speichert einen Wert unter dem angegebenen Schlüssel im Request-Context.
     *
     * @param string $key   - Schlüssel, unter dem der Wert gespeichert wird
