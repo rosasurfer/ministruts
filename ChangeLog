@@ -1,3 +1,8 @@
+2009-09-16
+
+   - neu: php/struts/BaseRequest::getAttributes() - liefert alle im Request gespeicherten Attribute
+
+
 2009-08-18
 
    - neu: php/dao/PersistableObject::touch() - zur externen Generierung von Versionsinformationen
