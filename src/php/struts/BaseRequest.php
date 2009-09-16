@@ -654,41 +654,6 @@ class BaseRequest extends Singleton {
 
 
    /**
-    * Gibt eine lesbare Representation des Request zurück.
-    *
-    * @return string
-    */
-   public function __toString() {
-      // Request
-      $string = $_SERVER['REQUEST_METHOD'].' '.$_SERVER['REQUEST_URI'].' '.$_SERVER['SERVER_PROTOCOL']."\n";
-
-      // Header
-      $headers = $this->getHeaders();
-      $maxLen  = 0;
-      foreach ($headers as $key => $value) {
-         $maxLen = max(strLen($key), $maxLen);
-      }
-      $maxLen++; // +1 Zeichen für ':'
-      foreach ($headers as $key => $value) {
-         $string .= str_pad($key.':', $maxLen).' '.$value."\n";
-      }
-
-      // Content (Body)
-      if ($this->isPost()) {
-         $content = $this->getContent();
-
-         if (is_array($content))
-            $content = print_r($content, true);
-
-         if (strLen($content))
-            $string .= "\n".$content."\n";
-      }
-
-      return $string;
-   }
-
-
-   /**
     * Gibt den im Request-Context unter dem angegebenen Schlüssel gespeicherten Wert zurück oder NULL,
     * wenn unter diesem Schlüssel kein Wert existiert.
     *
@@ -907,6 +872,26 @@ class BaseRequest extends Singleton {
 
 
    /**
+    * Gibt das diesem Request zugeordnete ActionMapping zurück.
+    *
+    * @return ActionMapping - Mapping oder NULL, wenn die Request-Instance außerhalb des Struts-Frameworks benutzt wird.
+    */
+   public final function getMapping() {
+      return $this->getAttribute(Struts ::ACTION_MAPPING_KEY);
+   }
+
+
+   /**
+    * Gibt das diesem Request zugeordnete Struts-Module zurück.
+    *
+    * @return Module - Module oder NULL, wenn die Request-Instance außerhalb des Struts-Frameworks benutzt wird.
+    */
+   public final function getModule() {
+      return $this->getAttribute(Struts ::MODULE_KEY);
+   }
+
+
+   /**
     * Verhindert das Serialisieren von Request-Instanzen.
     */
    final public function __sleep() {
@@ -919,6 +904,41 @@ class BaseRequest extends Singleton {
     */
    final public function __wakeUp() {
       throw new IllegalStateException('You cannot unserialize me: '.get_class($this));
+   }
+
+
+   /**
+    * Gibt eine lesbare Representation des Request zurück.
+    *
+    * @return string
+    */
+   public function __toString() {
+      // Request
+      $string = $_SERVER['REQUEST_METHOD'].' '.$_SERVER['REQUEST_URI'].' '.$_SERVER['SERVER_PROTOCOL']."\n";
+
+      // Header
+      $headers = $this->getHeaders();
+      $maxLen  = 0;
+      foreach ($headers as $key => $value) {
+         $maxLen = max(strLen($key), $maxLen);
+      }
+      $maxLen++; // +1 Zeichen für ':'
+      foreach ($headers as $key => $value) {
+         $string .= str_pad($key.':', $maxLen).' '.$value."\n";
+      }
+
+      // Content (Body)
+      if ($this->isPost()) {
+         $content = $this->getContent();
+
+         if (is_array($content))
+            $content = print_r($content, true);
+
+         if (strLen($content))
+            $string .= "\n".$content."\n";
+      }
+
+      return $string;
    }
 }
 ?>
