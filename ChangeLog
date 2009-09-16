@@ -1,6 +1,8 @@
 2009-09-16
 
    - neu: php/struts/BaseRequest::getAttributes() - liefert alle im Request gespeicherten Attribute
+   - neu: php/struts/BaseRequest::getMapping()    - liefert das zugeordnete ActionMapping des Requests
+   - neu: php/struts/BaseRequest::getModule()     - liefert das zugeordnete Struts-Module des Requests
 
 
 2009-08-18
