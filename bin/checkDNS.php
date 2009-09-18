@@ -10,6 +10,14 @@ define('APPLICATION_NAME', 'DNS-Checker');
 
 
 /**
+ * TODO:
+ * -----
+ * Jeder Nameserver muß einzeln abgefragt werden, denn bei fehlerhafter Synchronisierung können sich die zurückgegebenen Werte unterscheiden.
+ */
+
+
+
+/**
  * Führt eine DNS-Abfrage durch und gibt den ermitelten Wert zurück
  *
  * @param $string $domain - Domain-Name, für den die Abfrage durchgeführt werden soll
