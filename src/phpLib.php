@@ -411,6 +411,15 @@ function javaScript($snippet) {
  *
  * @return string - kodierter String
  *
+ * Note:
+ * -----
+ * The translations performed are:
+ *    '&' (ampersand) becomes '&amp;'
+ *    '"' (double quote) becomes '&quot;' when ENT_NOQUOTES is not set
+ *    ''' (single quote) becomes '&#039;' only when ENT_QUOTES is set
+ *    '<' (less than) becomes '&lt;'
+ *    '>' (greater than) becomes '&gt;'
+ *
  * @see String::htmlSpecialChars()
  */
 function htmlEncode($string) {
