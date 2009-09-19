@@ -38,7 +38,7 @@ class RequestProcessor extends Object {
     */
    final public function process(Request $request, Response $response) {
 
-      // ggf. Session starten
+      // ggf. Session starten oder fortsetzen
       $this->processSession($request, $response);
 
 
@@ -97,7 +97,6 @@ class RequestProcessor extends Object {
 
    /**
     * Wurde mit dem Request eine Session-ID übertragen, wird die entsprechende HttpSession fortgesetzt.
-    * Existiert noch keine Session, wird eine neue erzeugt.
     *
     * @param Request  $request
     * @param Response $response

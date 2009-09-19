@@ -26,7 +26,7 @@ class HttpSession extends Singleton {
     * @param Request $request - der Request, zu dem die Session gehört
     */
    protected function __construct(Request $request) {
-      // Prüfen, ob schon außerhalb dieser Klasse eine Session gestartet wurde
+      // Prüfen, ob eine Session bereits außerhalb dieser Instanz gestartet wurde
       if ($request->isSession())
          throw new IllegalStateException('Cannot initialize '.__CLASS__.', found already started session. Use this class *only* for session handling!');
 
@@ -40,13 +40,12 @@ class HttpSession extends Singleton {
     */
    protected function init() {
       /**
-       * PHP läßt sich ohne weiteres manipulierte Session-IDs unterschieben, solange diese keine
-       * ungültigen Zeichen enthalten (IDs wie PHPSESSID=111 werden anstandslos akzeptiert). Wenn
-       * session_start() zurückkehrt, gibt es mit den vorhandenen PHP-Mitteln keine vernünftige
-       * Möglichkeit mehr, festzustellen, ob die Session-ID von PHP oder vom User generiert wurde.
-       * Daher wird in dieser Methode jede neue Session mit einer zusätzliche Markierung versehen.
-       * Fehlt diese Markierung nach Rückkehr von session_start(), wurde die ID nicht hier generiert.
-       * Aus Sicherheitsgründen wird eine solche Session verworfen und eine neue ID erzeugt.
+       * PHP läßt sich ohne weiteres manipulierte Session-IDs unterschieben, solange diese keine ungültigen Zeichen enthalten
+       * (IDs wie PHPSESSID=111 werden anstandslos akzeptiert).  Wenn session_start() zurückkehrt, gibt es mit den vorhandenen
+       * PHP-Mitteln keine vernünftige Möglichkeit mehr, festzustellen, ob die Session-ID von PHP oder (künstlich?) vom User
+       * generiert wurde.  Daher wird in dieser Methode jede neue Session mit einer zusätzliche Markierung versehen.  Fehlt diese
+       * Markierung nach Rückkehr von session_start(), wurde die ID nicht von PHP generiert.  Aus Sicherheitsgründen wird eine
+       * solche Session verworfen und eine neue ID erzeugt.
        */
       $request = $this->request;
 
