@@ -74,8 +74,7 @@ class BaseRequest extends Singleton {
 
 
    /**
-    * Parst die Parameter im übergebenen String und speichert die Ergebnisse in den entsprechenden
-    * Arrays.
+    * Parst die Parameter im übergebenen String und speichert die Ergebnisse in den entsprechenden Arrays.
     *
     * NOTE:
     * -----
@@ -171,7 +170,24 @@ class BaseRequest extends Singleton {
 
 
    /**
-    * Gibt die Requestparameter mit dem angegebenen Namen zurück.  Diese Methode gibt ein Array mit
+    * Gibt den Requestparameter mit dem angegebenen Namen zurück.  Diese Methode gibt einen einzelnen Wert zurück.
+    * Wurden mehrere Parameter dieses Namens übertragen, wird der letzte Parameter zurückgegeben.
+    *
+    * @param string $name - Parametername
+    *
+    * @return string - Parameterwert oder NULL, wenn kein Parameter dieses Namens übertragen wurde
+    */
+   public function getParameter($name) {
+      if (isSet($this->parameters['REQUEST'][$name])) {
+         $values = $this->parameters['REQUEST'][$name];
+         return array_pop($values);
+      }
+      return null;
+   }
+
+
+   /**
+    * Gibt alle Requestparameter mit dem angegebenen Namen zurück.  Diese Methode gibt ein Array mit
     * den übertragenen Parametern zurück.
     *
     * @param string $name - Parametername
