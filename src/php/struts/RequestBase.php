@@ -180,7 +180,7 @@ class BaseRequest extends Singleton {
    public function getParameter($name) {
       if (isSet($this->parameters['REQUEST'][$name])) {
          $values = $this->parameters['REQUEST'][$name];
-         return array_pop($values);
+         return $values[sizeOf($values)-1];
       }
       return null;
    }
