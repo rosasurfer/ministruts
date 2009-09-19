@@ -172,7 +172,7 @@ final class String extends StaticClass {
     *
     * @return mixed - der/die konvertierte/n Strings
     *
-    * NOTE:
+    * Note:
     * -----
     * The translations performed are:
     *    '&' (ampersand) becomes '&amp;'
