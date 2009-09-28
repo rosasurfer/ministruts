@@ -20,7 +20,7 @@ abstract class PersistableObject extends Object implements IDaoConnected {
 
 
    /**
-    * Default-Construktor.
+    * Default-Constructor.
     *
     * Der Constructor ist final, neue PersistableObject-Instanzen werden mittels einer Helfermethode
     * erzeugt (vorzugsweise create()). Diese Methode muß implementiert werden, wenn neue Instanzen
