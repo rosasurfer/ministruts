@@ -8,13 +8,13 @@ abstract class ActionForm extends Object {
    /**
     * Request, zu dem wir gehören
     */
-   protected /*transient Request*/ $request;
+   protected /*transient*/ /*Request*/ $request;
 
 
    /**
     * DispatchAction-Key
     */
-   protected /*transient string*/ $actionKey;
+   protected /*transient*/ /*string*/  $actionKey;
 
 
    /**
