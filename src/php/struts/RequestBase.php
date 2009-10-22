@@ -398,7 +398,7 @@ class BaseRequest extends Singleton {
     * @return string - IP-Adresse
     */
    public function guessRealRemoteAddress() {
-      /*
+      /**
       I am just starting to try to tackle this issue of getting the real ip address.
       One flaw I see in the preceding notes is that none will bring up a true live ip address when the first proxy
       is behind a nat router/firewall.  I am about to try and nut this out but from the data I see so far the true
@@ -406,9 +406,8 @@ class BaseRequest extends Singleton {
       $_SERVER['HTTP_X_FORWARDED_FOR'] contains the proxy behind the nat router.  $_SERVER['REMOTE_ADDR'] is the isp
       proxy (from what I read this can be a list of proxies if you go through more than one).  I am not sure if
       bypass-client holds true when you get routed through several proxies along the way.
-      */
-
-      /*
+       *
+       *
        * TODO: Diese IP kann einfach gefaked werden, wenn der Angreifer selbst einen x-beliebigen Forwarded-Header setzt.
        *       Abhilfe: Es müßten immer Remote-Adresse UND ALLE Forwarded-Header gespeichert werden. Sind einige oder alle
        *       Forwarded-Header gefaked, hat man immer noch die Remote-Adresse.
@@ -424,7 +423,10 @@ class BaseRequest extends Singleton {
 
          if ($values) {
             foreach ($values as $value) {
-               if (CommonValidator ::isIPAddress($value)) {
+               if ($value === '') {
+                  continue;
+               }
+               elseif (CommonValidator ::isIPAddress($value)) {
                   $ip = $value;
                }
                elseif ($value=='unknown' || $value=='localhost' || $value==($ip=NetTools ::getHostByName($value))) {
