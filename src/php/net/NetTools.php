@@ -43,7 +43,7 @@ final class NetTools extends StaticClass {
 
 
    /**
-    * Ob die IP-Adresse auf einen Proxy-Server weist.
+    * Ob die IP-Adresse auf einen bekannten Proxy-Server weist.
     *
     * @param string $address - IP-Adresse
     *
