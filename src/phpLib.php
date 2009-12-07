@@ -1,7 +1,9 @@
 <?
-// Systemvoraussetzung: PHP 5.2+
-// -----------------------------
-
+/**
+ * Inkludiert die gesamte MiniStruts-Library.
+ *
+ * Systemvoraussetzung: PHP 5.2+
+ */
 
 // Errorhandler registrieren (anonym, damit die Klasse nicht schon hier included wird)
 // -----------------------------------------------------------------------------------
@@ -233,8 +235,9 @@ function is_class($name) {
    try {
       return (bool) __autoload($name, true);
    }
-   catch (ClassNotFoundException $ex) { /* yes, we eat it */ }
-
+   catch (ClassNotFoundException $ex) {
+      /* Ja, die Exception wird absichtlich verschluckt. */
+   }
    return false;
 }
 
@@ -260,8 +263,9 @@ function is_interface($name) {
    try {
       return (bool) __autoload($name, true);
    }
-   catch (ClassNotFoundException $ex) { /* yes, we eat it */ }
-
+   catch (ClassNotFoundException $ex) {
+      /* Ja, die Exception wird absichtlich verschluckt. */
+   }
    return false;
 }
 
