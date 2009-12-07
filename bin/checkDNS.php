@@ -1,5 +1,9 @@
 #!/usr/bin/php -Cq
 <?
+/**
+ * TODO: Jeder Nameserver muß einzeln abgefragt werden, denn bei fehlerhafter Synchronisierung können
+ *       sich die zurückgegebenen Werte der einzelnen Server unterscheiden.
+ */
 set_time_limit(0);
 
 // Library einbinden
@@ -10,15 +14,7 @@ define('APPLICATION_NAME', 'DNS-Checker');
 
 
 /**
- * TODO:
- * -----
- * Jeder Nameserver muß einzeln abgefragt werden, denn bei fehlerhafter Synchronisierung können sich die zurückgegebenen Werte unterscheiden.
- */
-
-
-
-/**
- * Führt eine DNS-Abfrage durch und gibt den ermitelten Wert zurück
+ * Führt eine DNS-Abfrage durch und gibt den ermittelten Wert zurück
  *
  * @param $string $domain - Domain-Name, für den die Abfrage durchgeführt werden soll
  * @param $string $type   - Typ des abzufragenden Wertes (A, MX, NS, TXT, etc.)
@@ -73,7 +69,7 @@ function queryDNS($domain, $type) {
 }
 
 
-// DNS-Einträge
+// normale DNS-Einträge überprüfen (A, MX, NS, TXT, etc.)
 $domains = Config::get('dns.domain', array());
 
 foreach ($domains as $domain => $domainValues) {
@@ -104,7 +100,7 @@ foreach ($domains as $domain => $domainValues) {
 }
 
 
-// Reverse-DNS-Einträge
+// Reverse-DNS der angegebenen IP-Adressen überprüfen
 $ips = Config::get('dns.ip', array());
 
 foreach ($ips as $ip => $value) {
