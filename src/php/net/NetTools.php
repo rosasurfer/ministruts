@@ -46,12 +46,14 @@ final class NetTools extends StaticClass {
     * Ob die IP-Adresse auf einen bekannten Proxy-Server weist.
     *
     * @param string $address - IP-Adresse
+    * @param bool   $reverseResolve - ob die IP-Adresse rück-aufgelöst und überprüft werden soll (Default: FALSE)
     *
     * @return boolean
     */
-   public static function isProxyAddress($address) {
-      if (!is_string($address)) throw new IllegalTypeException('Illegal type of parameter $address: '.getType($address));
-      if (!strLen($address))    throw new InvalidArgumentException('Invalid argument $address: '.$address);
+   public static function isProxyAddress($address, $reverseResolve = false) {
+      if (!is_string($address))      throw new IllegalTypeException('Illegal type of parameter $address: '.getType($address));
+      if (!strLen($address))         throw new InvalidArgumentException('Invalid argument $address: '.$address);
+      if (!is_bool($reverseResolve)) throw new IllegalTypeException('Illegal type of parameter $reverseResolve: '.getType($reverseResolve));
 
       static $proxys = null;
 
@@ -639,9 +641,6 @@ final class NetTools extends StaticClass {
       if (isSet($proxys[$address]))
          return true;
 
-      if (String ::endsWith(self ::getHostByAddress($address), '.proxy.aol.com', true))
-         return true;
-
-      return false;
+      return ($reverseResolve && String ::endsWith(self ::getHostByAddress($address), '.proxy.aol.com', true));
    }
 }
