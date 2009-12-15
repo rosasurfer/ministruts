@@ -441,8 +441,10 @@ class BaseRequest extends Singleton {
                }
             }
          }
+
+         // Fallback
          if ($guessed === null)
-            $guessed = $this->getRemoteAddress(); // Fallback
+            $guessed = $this->getRemoteAddress();
       }
 
       return $guessed;
