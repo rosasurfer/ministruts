@@ -397,7 +397,7 @@ class BaseRequest extends Singleton {
     *
     * @return string - IP-Adresse
     */
-   public function guessRealRemoteAddress() {
+   public function getRealRemoteAddress() {
       /**
       I am just starting to try to tackle this issue of getting the real ip address.
       One flaw I see in the preceding notes is that none will bring up a true live ip address when the first proxy
