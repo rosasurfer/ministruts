@@ -452,7 +452,7 @@ class BaseRequest extends Singleton {
    /**
     * Gibt den Wert des 'X-Forwarded-For'-Headers des aktuellen Requests zurück.
     *
-    * @return string - Wert (ei oder mehrere IP-Adressen oder Hostnamen) oder NULL, wenn der Header nicht gesetzt ist
+    * @return string - Wert (ein oder mehrere IP-Adressen oder Hostnamen) oder NULL, wenn der Header nicht gesetzt ist
     */
    public function getForwardedRemoteAddress() {
       return $this->getHeaderValue(array('X-Forwarded-For', 'X-UP-Forwarded-For'));
