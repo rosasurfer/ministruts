@@ -39,6 +39,7 @@ class Logger extends StaticClass {
                     || (bool) ini_get('display_errors');
 
       self::$mail = !self::$display || ($console && !$terminal);
+      //echoPre(__METHOD__.'(): $display: '.(int)self::$display.', $mail: '.(int)self::$mail);
    }
 
 
@@ -130,7 +131,7 @@ class Logger extends StaticClass {
     * NOTE: The error handler must return FALSE to populate $php_errormsg.
     */
    public static function handleError($level, $message, $file, $line, array $context) {
-      //echoPre(__METHOD__.'(): '.$message.', $file: '.$file.', $line: '.$line);
+      //echoPre(__METHOD__.'(): '.self::$logLevels[$level].' '.$message.', $file: '.$file.', $line: '.$line);
 
       // absichtlich unterdrückte und vom aktuellen Errorlevel nicht abgedeckte Fehler ignorieren
       $error_reporting = error_reporting();
