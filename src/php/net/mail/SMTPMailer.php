@@ -98,6 +98,7 @@ class SMTPMailer extends Mailer {
                               $errorCode,
                               $errorMsg,
                               $this->config['timeout']);
+      // TODO: connect() bleibt ohne Fehlermeldung hängen, wenn keine Verbindung zustande kommt
       if (!$connection)
          throw new RuntimeException("Could not open socket: $errorMsg (error $errorCode)");
 
