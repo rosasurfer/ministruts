@@ -211,7 +211,7 @@ final class MySQLConnector extends DB {
     * @param bool $return - Ob die Ausgabe auf STDOUT (FALSE) oder als Rückgabewert der Funktion (TRUE) erfolgen soll.
     *                       (default: FALSE)
     *
-    * @return string - Rückgabewert, wenn $return TRUE ist, NULL andererseits
+    * @return string - wenn $return TRUE ist, die Ausgabe, andererseits NULL
     */
    private function printProcessList($return = false) {
       $list = $this->getProcessList();
@@ -242,9 +242,9 @@ final class MySQLConnector extends DB {
 
       // title line
       $length = $lengthId+2+$lengthUser+2+$lengthHost+2+$lengthDb+2+$lengthCommand+2+$lengthTime+2+$lengthState+2+$lengthInfo;
-      if ($length > 180) {
-         $lengthInfo -= ($length - 180);
-         $length = 180;
+      if ($length > 160) {
+         $lengthInfo -= ($length - 160);
+         $length = 160;
       }
       $lPre   = $lPost = ($length-strLen(' Process List '))/2;
       $string = str_repeat('_', floor($lPre)).' Process List '.str_repeat('_', ceil($lPost))."\n";
