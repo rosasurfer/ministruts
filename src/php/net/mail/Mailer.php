@@ -105,7 +105,7 @@ abstract class Mailer extends Object {
 
       // es gibt nur aol.com-Adressen, Format siehe: http://postmaster.info.aol.com/faq/mailerfaq.html#syntax
       if (String ::startsWith($domain, 'aol.') && strRPos($domain, '.')==3)
-         return ($domain=='aol.com' && preg_match('/^[a-z][a-z0-9]{2,15}$/', $mailbox));
+         return (($domain=='aol.com' || $domain=='aol.de') && preg_match('/^[a-z][a-z0-9]{2,15}$/', $mailbox));
 
       return true;
    }
