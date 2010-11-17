@@ -1,3 +1,8 @@
+2010-11-17
+
+   - neu: php/struts/Tile::getMergedProperties() - gibt die eigenen und die geerbten Properties zurück
+
+
 2009-10-22
 
    - Bugfix in php/struts/BaseRequest::guessRealRemoteAddress()
