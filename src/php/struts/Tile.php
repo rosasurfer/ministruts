@@ -173,11 +173,26 @@ class Tile extends Object {
 
 
    /**
+    * Gibt die eigenen und die geerbten Properties dieser Tile zurück. Eigene Properties überschreiben geerbte Properties mit demselben Namen.
+    *
+    * @return array - Properties
+    */
+   protected function getMergedProperties() {
+      if ($this->parent)
+         return(array_merge($this->parent->getMergedProperties(), $this->properties));
+
+      return($this->properties);
+   }
+
+
+   /**
     * Gibt den Inhalt dieser Tile aus.
     */
    public function render() {
       // TODO: Framework vor $this-Zugriff aus der HTML-Seite schützen
-      extract($this->properties);
+
+      // alle Properties holen und im Context dieser Methode ablegen
+      extract($this->getMergedProperties());
 
       $request  = Request  ::me();
       $response = Response ::me();
