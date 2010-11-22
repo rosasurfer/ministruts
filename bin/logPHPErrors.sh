@@ -58,7 +58,7 @@ while [ 1 ]; do
       rm "$file.tmp"
    done; IFS=
 
-   # vorm nächsten Durchlauf einen Moment schlafen gehen
+   # vorm nächsten Durchlauf eine Minute schlafen gehen
    sleep 60
 done
 
