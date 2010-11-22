@@ -9,7 +9,8 @@
 #   ERRORLOG_DIRECTORY - Das Verzeichnis, in dem nicht abgefangene PHP-Fehler gespeichert werden. Bei Verwendung von Wildcards #
 #                        muß das Argument in Anführungszeichen gesetzt werden.                                                 #
 #                                                                                                                              #
-# Beispiel:  logPHPErrors.sh  "/var/www/*/log"                                                                                 #
+#                                                                                                                              #
+# Beispiel:  nohup /logPHPErrors.sh "./applications/*/WEB-INF/etc/log" < /dev/null > /dev/null 2>&1 &                          #
 #                                                                                                                              #
 ################################################################################################################################
 
