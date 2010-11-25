@@ -109,6 +109,16 @@ $__classes['RuntimeException'               ] = $dir.'php/exceptions/RuntimeExce
 $__classes['UnimplementedFeatureException'  ] = $dir.'php/exceptions/UnimplementedFeatureException';
 $__classes['UnsupportedMethodException'     ] = $dir.'php/exceptions/UnsupportedMethodException';
 
+$__classes['BarCode'                        ] = $dir.'php/file/image/barcode/BarCode';
+$__classes['C128ABarCode'                   ] = $dir.'php/file/image/barcode/C128ABarCode';
+$__classes['C128BBarCode'                   ] = $dir.'php/file/image/barcode/C128BBarCode';
+$__classes['C128CBarCode'                   ] = $dir.'php/file/image/barcode/C128CBarCode';
+$__classes['C39BarCode'                     ] = $dir.'php/file/image/barcode/C39BarCode';
+$__classes['I2Of5BarCode'                   ] = $dir.'php/file/image/barcode/I2Of5BarCode';
+
+$__classes['BasePdfDocument'                ] = $dir.'php/file/pdf/BasePdfDocument';
+$__classes['SimplePdfDocument'              ] = $dir.'php/file/pdf/SimplePdfDocument';
+
 $__classes['BaseLock'                       ] = $dir.'php/locking/BaseLock';
 $__classes['FileLock'                       ] = $dir.'php/locking/FileLock';
 $__classes['Lock'                           ] = $dir.'php/locking/Lock';
@@ -130,9 +140,6 @@ $__classes['FileSocketMailer'               ] = $dir.'php/net/mail/FileSocketMai
 $__classes['Mailer'                         ] = $dir.'php/net/mail/Mailer';
 $__classes['PHPMailer'                      ] = $dir.'php/net/mail/PHPMailer';
 $__classes['SMTPMailer'                     ] = $dir.'php/net/mail/SMTPMailer';
-
-$__classes['BasePdfDocument'                ] = $dir.'php/pdf/BasePdfDocument';
-$__classes['SimplePdfDocument'              ] = $dir.'php/pdf/SimplePdfDocument';
 
 $__classes['Action'                         ] = $dir.'php/struts/Action';
 $__classes['ActionForm'                     ] = $dir.'php/struts/ActionForm';
