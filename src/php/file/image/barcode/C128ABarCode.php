@@ -6,20 +6,30 @@
  * @version  0.0.7a  2001-04-01
  * @author   barcode@mribti.com
  * @link     http://www.mribti.com/barcode/
+ *
+ * @author   refactored & extended by pewa
  */
 
 class C128ABarCode extends BarCode {
+
+   private static /*bool*/ $logDebug,
+                  /*bool*/ $logInfo,
+                  /*bool*/ $logNotice;
 
    var $mCharSet, $mChars;
 
    /**
     *
     */
-   function C128ABarCode($Width, $Height, $Style, $Value) {
-      $this->BarCode($Width, $Height, $Style);
+   public function __construct($Width, $Height, $Style, $Value) {
+      $loglevel        = Logger ::getLogLevel(__CLASS__);
+      self::$logDebug  = ($loglevel <= L_DEBUG );
+      self::$logInfo   = ($loglevel <= L_INFO  );
+      self::$logNotice = ($loglevel <= L_NOTICE);
+
+      parent:: __construct($Width, $Height, $Style);
       $this->mValue = $Value;
       $this->mChars = " !\"#$%&'()*+´-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_";
-
       $this->mCharSet = array("212222",   //  00
                               "222122",   //  01
                               "222221",   //  02

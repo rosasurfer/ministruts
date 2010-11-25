@@ -5,20 +5,29 @@
  * @version  0.0.7a  2001-04-01
  * @author   barcode@mribti.com
  * @link     http://www.mribti.com/barcode/
+ *
+ * @author   refactored & extended by pewa
  */
 
 class C128CBarCode extends BarCode {
+
+   private static /*bool*/ $logDebug,
+                  /*bool*/ $logInfo,
+                  /*bool*/ $logNotice;
 
    var $mCharSet, $mChars;
 
    /**
     *
     */
-   function C128CBarCode($Width, $Height, $Style, $Value) {
-      $this->BarCode($Width, $Height, $Style);
+   public function __construct($Width, $Height, $Style, $Value) {
+      $loglevel        = Logger ::getLogLevel(__CLASS__);
+      self::$logDebug  = ($loglevel <= L_DEBUG );
+      self::$logInfo   = ($loglevel <= L_INFO  );
+      self::$logNotice = ($loglevel <= L_NOTICE);
 
+      parent:: __construct($Width, $Height, $Style);
       $this->mValue = $Value;
-
       $this->mChars = array("00", "01", "02", "03", "04", "05", "06", "07", "08", "09",
                             "10", "11", "12", "13", "14", "15", "16", "17", "18", "19",
                             "20", "21", "22", "23", "24", "25", "26", "27", "28", "29",
@@ -29,7 +38,6 @@ class C128CBarCode extends BarCode {
                             "70", "71", "72", "73", "74", "75", "76", "77", "78", "79",
                             "80", "81", "82", "83", "84", "85", "86", "87", "88", "89",
                             "90", "91", "92", "93", "94", "95", "96", "97", "98", "99");
-
       $this->mCharSet = array("212222",   // 00
                               "222122",   // 01
                               "222221",   // 02

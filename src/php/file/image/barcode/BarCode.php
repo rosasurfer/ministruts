@@ -5,25 +5,11 @@
  * @version  0.0.7a  2001-04-01
  * @author   barcode@mribti.com
  * @link     http://www.mribti.com/barcode/
- */
-
-/**
  *
+ * @author   refactored & extended by pewa
  */
-function __TRACE__($str) {
-   if (__TRACE_ENABLED__) {
-   }
-}
 
-/**
- *
- */
-function __DEBUG__($str) {
-   if (__DEBUG_ENABLED__) {
-   }
-}
 
-/***************************** base class ********************************************/
 /* Styles */
 
 /* Global */
@@ -72,16 +58,25 @@ define("BCD_C128_BAR_3", 3);
 define("BCD_C128_BAR_4", 4);
 
 
-class BarCode extends Object {
+abstract class BarCode extends Object {
+
+   private static /*bool*/ $logDebug,
+                  /*bool*/ $logInfo,
+                  /*bool*/ $logNotice;
 
    var $mWidth, $mHeight, $mStyle, $mBgcolor, $mBrush;
    var $mImg, $mFont;
    var $mError;
 
    /**
-    *
+    * Geschützter Konstruktor, Instanzen können nur über abgeleitete Klassen erzeugt werden.
     */
-   function BarCode($Width = BCD_DEFAULT_Width, $Height = BCD_DEFAULT_HEIGHT, $Style = BCD_DEFAULT_STYLE) {
+   protected function __construct($Width = BCD_DEFAULT_Width, $Height = BCD_DEFAULT_HEIGHT, $Style = BCD_DEFAULT_STYLE) {
+      $loglevel        = Logger ::getLogLevel(__CLASS__);
+      self::$logDebug  = ($loglevel <= L_DEBUG );
+      self::$logInfo   = ($loglevel <= L_INFO  );
+      self::$logNotice = ($loglevel <= L_NOTICE);
+
       $this->mWidth   = $Width;
       $this->mHeight  = $Height;
       $this->mStyle   = $Style;
@@ -94,24 +89,18 @@ class BarCode extends Object {
       if (!($this->mStyle & BCS_TRANSPARENT)) {
          ImageFill($this->mImg, $this->mWidth, $this->mHeight, $this->mBgcolor);
       }
-      __TRACE__("OBJECT CONSTRUCTION: ".$this->mWidth." ".$this->mHeight." ".$this->mStyle);
    }
 
    /**
     *
     */
-   function DrawObject($xres) {
-      /* there is not implementation neded, is simply the asbsract function. */
-      __TRACE__("OBJECT DRAW: NEED VIRTUAL FUNCTION IMPLEMENTATION");
-      return false;
-   }
+   abstract protected function DrawObject($xres) {}
 
    /**
     *
     */
    function DrawBorder() {
       ImageRectangle($this->mImg, 0, 0, $this->mWidth-1, $this->mHeight-1, $this->mBrush);
-      __TRACE__("DRAWING BORDER");
    }
 
    /**
@@ -181,7 +170,6 @@ class BarCode extends Object {
     *
     */
    function SetStyle($Style) {
-      __TRACE__("CHANGING STYLE");
       $this->mStyle = $Style;
    }
 
@@ -195,7 +183,8 @@ class BarCode extends Object {
       if ($this->mStyle & BCS_IMAGE_PNG) {
          Header("Content-Type: image/png");
          ImagePng($this->mImg);
-      } else if ($this->mStyle & BCS_IMAGE_JPEG) {
+      }
+      else if ($this->mStyle & BCS_IMAGE_JPEG) {
          Header("Content-Type: image/jpeg");
          ImageJpeg($this->mImg);
       }
@@ -204,10 +193,10 @@ class BarCode extends Object {
    }
 
    /**
-    *
+    * Destructor
     */
-   function DestroyObject() {
-      ImageDestroy($obj->mImg);
+   public function __destruct() {
+      ImageDestroy($this->mImg);
    }
 }
 ?>

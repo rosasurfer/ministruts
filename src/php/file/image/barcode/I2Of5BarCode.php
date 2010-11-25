@@ -5,17 +5,28 @@
  * @version  0.0.7a  2001-04-01
  * @author   barcode@mribti.com
  * @link     http://www.mribti.com/barcode/
+ *
+ * @author   refactored & extended by pewa
  */
 
 class I2Of5BarCode extends BarCode {
+
+   private static /*bool*/ $logDebug,
+                  /*bool*/ $logInfo,
+                  /*bool*/ $logNotice;
 
    var $mCharSet;
 
    /**
     *
     */
-   function I2Of5BarCode($Width, $Height, $Style, $Value) {
-      $this->BarCode($Width, $Height, $Style);
+   public function __construct($Width, $Height, $Style, $Value) {
+      $loglevel        = Logger ::getLogLevel(__CLASS__);
+      self::$logDebug  = ($loglevel <= L_DEBUG );
+      self::$logInfo   = ($loglevel <= L_INFO  );
+      self::$logNotice = ($loglevel <= L_NOTICE);
+
+      parent:: __construct($Width, $Height, $Style);
       $this->mValue   = $Value;
       $this->mCharSet = array(/* 0 */ "00110",
                               /* 1 */ "10001",

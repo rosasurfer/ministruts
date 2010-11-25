@@ -3,10 +3,9 @@
  * @version  0.0.7a  2001-04-01
  * @author   barcode@mribti.com
  * @link     http://www.mribti.com/barcode/
+ *
+ * @author   refactored & extended by pewa
  */
-
-define (__TRACE_ENABLED__, false);
-define (__DEBUG_ENABLED__, false);
 
 if (!isSet($style )) $style  = BCD_DEFAULT_STYLE;
 if (!isSet($width )) $width  = BCD_DEFAULT_WIDTH;
@@ -16,30 +15,28 @@ if (!isSet($font  )) $font   = BCD_DEFAULT_FONT;
 
 switch ($type) {
    case "I25":
-      $obj = new I2Of5BarCode($width, $height, $style, $code);
+      $barcode = new I2Of5BarCode($width, $height, $style, $code);
       break;
    case "C39":
-      $obj = new C39BarCode($width, $height, $style, $code);
+      $barcode = new C39BarCode($width, $height, $style, $code);
       break;
    case "C128A":
-      $obj = new C128ABarCode($width, $height, $style, $code);
+      $barcode = new C128ABarCode($width, $height, $style, $code);
       break;
    case "C128B":
-      $obj = new C128BBarCode($width, $height, $style, $code);
+      $barcode = new C128BBarCode($width, $height, $style, $code);
       break;
    case "C128C":
-      $obj = new C128CBarCode($width, $height, $style, $code);
+      $barcode = new C128CBarCode($width, $height, $style, $code);
       break;
    default:
       echo "Need bar code type ex. C39";
-      $obj = false;
+      $barcode = null;
 }
 
-if ($obj) {
-   $obj->SetFont($font);
-   $obj->DrawObject($xres);
-   $obj->FlushObject();
-   $obj->DestroyObject();
-   unset($obj);  /* clean */
+if ($barcode) {
+   $barcode->SetFont($font);
+   $barcode->DrawObject($xres);
+   $barcode->FlushObject();
 }
 ?>
