@@ -71,7 +71,7 @@ class I2Of5BarCode extends BarCode {
          $cPos+=2;
       } while ($cPos<$len);
 
-      return $sPos + $StarSize + $StopSize;
+      return $sPos + $StartSize + $StopSize;
    }
 
    /**
