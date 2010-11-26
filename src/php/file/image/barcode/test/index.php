@@ -8,10 +8,10 @@ $border      = isSet($_REQUEST['border'     ]) ? $_REQUEST['border'     ] : '0';
 $drawtext    = isSet($_REQUEST['drawtext'   ]) ? $_REQUEST['drawtext'   ] : '0';
 $stretchtext = isSet($_REQUEST['stretchtext']) ? $_REQUEST['stretchtext'] : '0';
 $negative    = isSet($_REQUEST['negative'   ]) ? $_REQUEST['negative'   ] : '0';
-$width       = isSet($_REQUEST['width'      ]) ? $_REQUEST['width'      ] : BarCode ::DEFAULT_WIDTH;;
-$height      = isSet($_REQUEST['height'     ]) ? $_REQUEST['height'     ] : BarCode ::DEFAULT_HEIGHT;;
-$xres        = isSet($_REQUEST['xres'       ]) ? $_REQUEST['xres'       ] : BarCode ::DEFAULT_XRES;;
-$font        = isSet($_REQUEST['font'       ]) ? $_REQUEST['font'       ] : BarCode ::DEFAULT_FONT;;
+$width       = isSet($_REQUEST['width'      ]) ? $_REQUEST['width'      ] : BarCode ::DEFAULT_WIDTH;
+$height      = isSet($_REQUEST['height'     ]) ? $_REQUEST['height'     ] : BarCode ::DEFAULT_HEIGHT;
+$xres        = isSet($_REQUEST['xres'       ]) ? $_REQUEST['xres'       ] : BarCode ::DEFAULT_XRES;
+$font        = isSet($_REQUEST['font'       ]) ? $_REQUEST['font'       ] : BarCode ::DEFAULT_FONT;
 $value       = isSet($_REQUEST['value'      ]) ? $_REQUEST['value'      ] : null;
 
 ?>
@@ -25,7 +25,7 @@ $value       = isSet($_REQUEST['value'      ]) ? $_REQUEST['value'      ] : null
 <table align="center" width="600" border=0>
 <tr>
    <td>
-      Barcode is a small implementation of a barcode rendering class using <a href="http://www.php.net/">PHP</a> language
+      BarCode is a small implementation of a barcode rendering class using <a href="http://www.php.net/">PHP</a> language
       and the <a href="http://www.boutell.com/gd/">GD graphics library</a>.
    </td>
 </tr>
@@ -33,7 +33,7 @@ $value       = isSet($_REQUEST['value'      ]) ? $_REQUEST['value'      ] : null
    <td><br></td>
 </tr>
 <tr>
-   <td>Author: <a href="http://www.mribti.com/barcode/">www.mribti.com</a></td>
+   <td>Original implementation: <a href="http://www.mribti.com/barcode/">www.mribti.com</a></td>
 </tr>
 </table>
 <br>
@@ -85,15 +85,15 @@ $value       = isSet($_REQUEST['value'      ]) ? $_REQUEST['value'      ] : null
 
    <tr>
      <td rowspan="2" bgcolor="#EFEFEF"><b>Size</b></td>
-     <td>Width: <input type="text" size="6" maxlength="3" name="width" value="<?=$width?>"></td>
+     <td>Width: <input type="text" size="6" name="width" value="<?=$width?>"></td>
    </tr>
 
    <tr>
-     <td>Height: <input type="text" size="6" maxlength="3" name="height" value="<?=$height?>"></td>
+     <td>Height: <input type="text" size="6" name="height" value="<?=$height?>"></td>
    </tr>
 
    <tr>
-     <td bgcolor="#EFEFEF"><b>Xres</b></td>
+     <td bgcolor="#EFEFEF"><b>xRes</b></td>
      <td>
          <input type="radio" name="xres" value="1" <?=$xres=='1'?'checked':null?>> 1&nbsp;&nbsp;&nbsp;&nbsp;
          <input type="radio" name="xres" value="2" <?=$xres=='2'?'checked':null?>> 2&nbsp;&nbsp;&nbsp;&nbsp;
@@ -118,7 +118,7 @@ $value       = isSet($_REQUEST['value'      ]) ? $_REQUEST['value'      ] : null
    </tr>
 
    <tr>
-      <td colspan="2" align="center"><input type="submit" value="Create"></td>
+      <td colspan="2" align="center"><input type="submit" name="submit" value="Create"></td>
    </tr>
    </table>
 
@@ -141,20 +141,19 @@ if (strLen($value) > 0) {
       case 'C128B':
       case 'C128C':
          $class = "${type}BarCode";
-         $barcode = new $class(BarCode ::DEFAULT_WIDTH, BarCode ::DEFAULT_HEIGHT, $style, $value);
-         if ($barcode->DrawObject($xres)) {
-            ?> <table align="center"><tr><td><img src="image.php?type=<?=$type?>&width=<?=$width?>&height=<?=$height?>&style=<?=$style?>&value=<?=$value?>&font=<?=$font?>&xres=<?=$xres?>"></td></tr></table> <?
-         }
-         else {
-            ?> <table align="center"><tr><td><font color="red"><?=$barcode->GetError()?></font></td></tr></table> <?
-         }
+         $barcode = new $class($width, $height, $style, $xres, $font, $value);
+         $barcode->RenderImage();
+         $url = "image.php?type=$type&width=$width&height=$height&style=$style&xres=$xres&font=$font&value=$value";
+         ?>
+         <table align="center"><tr><td><a href="<?=$url?>" target="barcode_image"><img src="<?=$url?>" border=0></a></td></tr></table>
+         <?
          break;
 
       default:
-         // missing or invalid barcode type
+         throw new InvalidArgumentException("Unknown barcode standard \"$type\"");
    }
 }
-else {
+else if (isSet($_REQUEST['submit'])) {
    ?> <table align="center"><tr><td><font color="red">missing barcode value</font></td></tr></table> <?
 }
 ?>
