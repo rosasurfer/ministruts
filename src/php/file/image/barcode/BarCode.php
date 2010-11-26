@@ -2,128 +2,118 @@
 /**
  * Barcode renderer class
  *
- * @version  0.0.7a  2001-04-01
+ * @version  0.0.8a  2001-08-03
  * @author   barcode@mribti.com
  * @link     http://www.mribti.com/barcode/
- *
- * @author   refactored & extended by pewa
+ * @author   extended & refactored by pewa
  */
 
-
-/* Styles */
-
-/* Global */
-define("BCS_BORDER"        ,    1);
-define("BCS_TRANSPARENT"   ,    2);
-define("BCS_ALIGN_CENTER"  ,    4);
-define("BCS_ALIGN_LEFT"    ,    8);
-define("BCS_ALIGN_RIGHT"   ,   16);
-define("BCS_IMAGE_JPEG"    ,   32);
-define("BCS_IMAGE_PNG"     ,   64);
-define("BCS_DRAW_TEXT"     ,  128);
-define("BCS_STRETCH_TEXT"  ,  256);
-define("BCS_REVERSE_COLOR" ,  512);
-
-/* For I25 only  */
-define("BCS_I25_DRAW_CHECK", 2048);
-
-/* Default values */
-
-/* Global */
-define("BCD_DEFAULT_BACKGROUND_COLOR", 0xFFFFFF);
-define("BCD_DEFAULT_FOREGROUND_COLOR", 0x000000);
-define("BCD_DEFAULT_STYLE"           , BCS_BORDER | BCS_ALIGN_CENTER | BCS_IMAGE_PNG);
-define("BCD_DEFAULT_WIDTH"           , 460);
-define("BCD_DEFAULT_HEIGHT"          , 120);
-define("BCD_DEFAULT_FONT"            ,   5);
-define("BCD_DEFAULT_XRES"            ,   2);
-
-/* Margins */
-define("BCD_DEFAULT_MAR_Y1"     , 10);
-define("BCD_DEFAULT_MAR_Y2"     , 10);
-define("BCD_DEFAULT_TEXT_OFFSET",  2);
-
-/* For I25 only */
-define("BCD_I25_NARROW_BAR", 1);
-define("BCD_I25_WIDE_BAR"  , 2);
-
-/* For C39 only */
-define("BCD_C39_NARROW_BAR", 1);
-define("BCD_C39_WIDE_BAR"  , 2);
-
-/* For Code 128 */
-define("BCD_C128_BAR_1", 1);
-define("BCD_C128_BAR_2", 2);
-define("BCD_C128_BAR_3", 3);
-define("BCD_C128_BAR_4", 4);
+// really bad hack to circumvent PHP's inability to resolve combined constant declarations at compile time
+define('BARCODE_DEFAULT_STYLE', 1 | 4 | 64);   // STYLE_BORDER | STYLE_ALIGN_CENTER | STYLE_IMAGE_PNG
 
 
 abstract class BarCode extends Object {
+
+   // style flags
+   const /*int*/ STYLE_BORDER             =   1;
+   const /*int*/ STYLE_TRANSPARENT        =   2;
+   const /*int*/ STYLE_ALIGN_CENTER       =   4;
+   const /*int*/ STYLE_ALIGN_LEFT         =   8;
+   const /*int*/ STYLE_ALIGN_RIGHT        =  16;
+   const /*int*/ STYLE_IMAGE_JPEG         =  32;
+   const /*int*/ STYLE_IMAGE_PNG          =  64;
+   const /*int*/ STYLE_DRAW_TEXT          = 128;
+   const /*int*/ STYLE_STRETCH_TEXT       = 256;
+   const /*int*/ STYLE_REVERSE_COLOR      = 512;
+
+   // default values
+   const /*int*/ DEFAULT_BACKGROUND_COLOR = 0xFFFFFF;
+   const /*int*/ DEFAULT_FOREGROUND_COLOR = 0x000000;
+   const /*int*/ DEFAULT_STYLE            = BARCODE_DEFAULT_STYLE;   // see hack above class declaration
+   const /*int*/ DEFAULT_WIDTH            = 460;
+   const /*int*/ DEFAULT_HEIGHT           = 120;
+   const /*int*/ DEFAULT_FONT             =   5;
+   const /*int*/ DEFAULT_XRES             =   2;
+   const /*int*/ DEFAULT_MARGIN_Y1        =  10;
+   const /*int*/ DEFAULT_MARGIN_Y2        =  10;
+   const /*int*/ DEFAULT_TEXT_OFFSET      =   2;
+
 
    private static /*bool*/ $logDebug,
                   /*bool*/ $logInfo,
                   /*bool*/ $logNotice;
 
-   var $mWidth, $mHeight, $mStyle, $mBgcolor, $mBrush;
-   var $mImg, $mFont;
-   var $mError;
+   private /*string*/ $error;
+
+   protected /*int*/    $width,
+             /*int*/    $height,
+             /*int*/    $style,
+             /*int*/    $bgColor,
+             /*int*/    $brushColor,
+             /*int*/    $font,
+             /*string*/ $value,
+             /*hImg*/   $hImg;
+
 
    /**
     * Geschützter Konstruktor, Instanzen können nur über abgeleitete Klassen erzeugt werden.
     */
-   protected function __construct($Width = BCD_DEFAULT_Width, $Height = BCD_DEFAULT_HEIGHT, $Style = BCD_DEFAULT_STYLE) {
+   protected function __construct($width=self:: DEFAULT_WIDTH, $height=self:: DEFAULT_HEIGHT, $style=self:: DEFAULT_STYLE, $value) {
       $loglevel        = Logger ::getLogLevel(__CLASS__);
       self::$logDebug  = ($loglevel <= L_DEBUG );
       self::$logInfo   = ($loglevel <= L_INFO  );
       self::$logNotice = ($loglevel <= L_NOTICE);
 
-      $this->mWidth   = $Width;
-      $this->mHeight  = $Height;
-      $this->mStyle   = $Style;
-      $this->mFont    = BCD_DEFAULT_FONT;
-      $this->mImg     = ImageCreate($this->mWidth, $this->mHeight);
-      $dbColor        = $this->mStyle & BCS_REVERSE_COLOR ? BCD_DEFAULT_FOREGROUND_COLOR : BCD_DEFAULT_BACKGROUND_COLOR;
-      $dfColor        = $this->mStyle & BCS_REVERSE_COLOR ? BCD_DEFAULT_BACKGROUND_COLOR : BCD_DEFAULT_FOREGROUND_COLOR;
-      $this->mBgcolor = ImageColorAllocate($this->mImg, ($dbColor & 0xFF0000) >> 16, ($dbColor & 0x00FF00) >> 8 , $dbColor & 0x0000FF);
-      $this->mBrush   = ImageColorAllocate($this->mImg, ($dfColor & 0xFF0000) >> 16, ($dfColor & 0x00FF00) >> 8 , $dfColor & 0x0000FF);
-      if (!($this->mStyle & BCS_TRANSPARENT)) {
-         ImageFill($this->mImg, $this->mWidth, $this->mHeight, $this->mBgcolor);
-      }
+      $this->width  = $width;
+      $this->height = $height;
+      $this->style  = $style;
+      $this->value  = $value;
+      $this->font   = self:: DEFAULT_FONT;
+      $this->hImg   = ImageCreate($this->width, $this->height);
+
+      $bgColor = $this->style & self:: STYLE_REVERSE_COLOR ? self:: DEFAULT_FOREGROUND_COLOR : self:: DEFAULT_BACKGROUND_COLOR;
+      $fgColor = $this->style & self:: STYLE_REVERSE_COLOR ? self:: DEFAULT_BACKGROUND_COLOR : self:: DEFAULT_FOREGROUND_COLOR;
+
+      $this->bgColor    = ImageColorAllocate($this->hImg, ($bgColor & 0xFF0000) >> 16, ($bgColor & 0x00FF00) >> 8 , $bgColor & 0x0000FF);
+      $this->brushColor = ImageColorAllocate($this->hImg, ($fgColor & 0xFF0000) >> 16, ($fgColor & 0x00FF00) >> 8 , $fgColor & 0x0000FF);
+
+      if (!($this->style & self:: STYLE_TRANSPARENT))
+         ImageFill($this->hImg, $this->width, $this->height, $this->bgColor);
    }
 
    /**
     *
     */
-   abstract protected function DrawObject($xres) {}
+   abstract protected function DrawObject($xres);
 
    /**
     *
     */
-   function DrawBorder() {
-      ImageRectangle($this->mImg, 0, 0, $this->mWidth-1, $this->mHeight-1, $this->mBrush);
+   private function DrawBorder() {
+      ImageRectangle($this->hImg, 0, 0, $this->width-1, $this->height-1, $this->brushColor);
    }
 
    /**
     *
     */
-   function DrawChar($Font, $xPos, $yPos, $Char) {
-      ImageString($this->mImg, $Font, $xPos, $yPos, $Char, $this->mBrush);
+   protected function DrawChar($Font, $xPos, $yPos, $Char) {
+      ImageString($this->hImg, $Font, $xPos, $yPos, $Char, $this->brushColor);
    }
 
    /**
     *
     */
-   function DrawText($Font, $xPos, $yPos, $Char) {
-      ImageString($this->mImg, $Font, $xPos, $yPos, $Char, $this->mBrush);
+   protected function DrawText($Font, $xPos, $yPos, $Char) {
+      ImageString($this->hImg, $Font, $xPos, $yPos, $Char, $this->brushColor);
    }
 
    /**
     *
     */
-   function DrawSingleBar($xPos, $yPos, $xSize, $ySize) {
-      if ($xPos>=0 && $xPos<=$this->mWidth && ($xPos+$xSize)<=$this->mWidth && $yPos>=0 && $yPos<=$this->mHeight && ($yPos+$ySize)<=$this->mHeight) {
+   protected function DrawSingleBar($xPos, $yPos, $xSize, $ySize) {
+      if ($xPos>=0 && $xPos<=$this->width && ($xPos+$xSize)<=$this->width && $yPos>=0 && $yPos<=$this->height && ($yPos+$ySize)<=$this->height) {
          for ($i=0; $i<$xSize; $i++) {
-            ImageLine($this->mImg, $xPos+$i, $yPos, $xPos+$i, $yPos+$ySize, $this->mBrush);
+            ImageLine($this->hImg, $xPos+$i, $yPos, $xPos+$i, $yPos+$ySize, $this->brushColor);
          }
          return true;
       }
@@ -134,59 +124,38 @@ abstract class BarCode extends Object {
    /**
     *
     */
-   function GetError() {
-      return $this->mError;
-   }
-
-   /**
-    *
-    */
-   function GetFontHeight($font) {
+   protected function GetFontHeight($font) {
       return ImageFontHeight($font);
    }
 
    /**
     *
     */
-   function GetFontWidth($font) {
+   protected function GetFontWidth($font) {
       return ImageFontWidth($font);
    }
 
    /**
     *
     */
-   function SetFont($font) {
-      $this->mFont = $font;
+   public function SetFont($font) {
+      $this->font = $font;
    }
 
    /**
     *
     */
-   function GetStyle() {
-      return $this->mStyle;
-   }
-
-   /**
-    *
-    */
-   function SetStyle($Style) {
-      $this->mStyle = $Style;
-   }
-
-   /**
-    *
-    */
-   function FlushObject() {
-      if (($this->mStyle & BCS_BORDER)) {
+   public function FlushObject() {
+      if (($this->style & self:: STYLE_BORDER)) {
          $this->DrawBorder();
       }
-      if ($this->mStyle & BCS_IMAGE_PNG) {
+      if ($this->style & self:: STYLE_IMAGE_PNG) {
          Header("Content-Type: image/png");
-         ImagePng($this->mImg);
+         ImagePng($this->hImg);
       }
-      else if ($this->mStyle & BCS_IMAGE_JPEG) {
+      else if ($this->style & self:: STYLE_IMAGE_JPEG) {
          Header("Content-Type: image/jpeg");
-         ImageJpeg($this->mImg);
+         ImageJpeg($this->hImg);
       }
       else
          __DEBUG__("FlushObject: No output type");
@@ -196,7 +165,14 @@ abstract class BarCode extends Object {
     * Destructor
     */
    public function __destruct() {
-      ImageDestroy($this->mImg);
+      ImageDestroy($this->hImg);
+   }
+
+   /**
+    *
+    */
+   public function GetError() {
+      return $this->error;
    }
 }
 ?>

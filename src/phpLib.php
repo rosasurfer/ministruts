@@ -114,7 +114,7 @@ $__classes['C128ABarCode'                   ] = $dir.'php/file/image/barcode/C12
 $__classes['C128BBarCode'                   ] = $dir.'php/file/image/barcode/C128BBarCode';
 $__classes['C128CBarCode'                   ] = $dir.'php/file/image/barcode/C128CBarCode';
 $__classes['C39BarCode'                     ] = $dir.'php/file/image/barcode/C39BarCode';
-$__classes['I2Of5BarCode'                   ] = $dir.'php/file/image/barcode/I2Of5BarCode';
+$__classes['I25BarCode'                     ] = $dir.'php/file/image/barcode/I25BarCode';
 
 $__classes['BasePdfDocument'                ] = $dir.'php/file/pdf/BasePdfDocument';
 $__classes['SimplePdfDocument'              ] = $dir.'php/file/pdf/SimplePdfDocument';
