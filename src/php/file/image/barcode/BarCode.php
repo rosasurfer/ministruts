@@ -48,7 +48,8 @@ abstract class BarCode extends Object {
              /*int*/    $xres,
              /*int*/    $font,
              /*string*/ $value,
-             /*hImg*/   $hImg;
+             /*hImg*/   $hImg,
+             /*bool*/   $isRendered = false;
 
 
    /**
@@ -57,6 +58,9 @@ abstract class BarCode extends Object {
    protected function __construct($width=self:: DEFAULT_WIDTH, $height=self:: DEFAULT_HEIGHT, $style=self:: DEFAULT_STYLE, $xres=self:: DEFAULT_XRES, $font=self:: DEFAULT_FONT, $value) {
       if ($value!==(string)$value) throw new IllegalTypeException('Illegal type of argument $value: '.getType($value));
       if (strLen($value)==0)       throw new InvalidArgumentException('Invalid barcode $value: "'.$value.'"');
+
+      if (!($style & self:: STYLE_IMAGE_PNG) && !($style & self:: STYLE_IMAGE_JPEG))
+         throw new InvalidArgumentException("Invalid parameter style: $style (missing or unknown grapic format)");
 
       $this->width  = $width;
       $this->height = $height;
@@ -127,14 +131,27 @@ abstract class BarCode extends Object {
    }
 
    /**
+    *
+    */
+   final public function getContentType() {
+      if ($this->style & self:: STYLE_IMAGE_PNG)
+         return "image/png";
+
+      if ($this->style & self:: STYLE_IMAGE_JPEG)
+         return "image/jpeg";
+
+      return null;
+   }
+
+   /**
     * @return the BarCode instance
     */
-   abstract protected function RenderImage();
+   abstract protected function Render();
 
    /**
     *
     */
-   private function DrawBorder() {
+   protected function DrawBorder() {
       ImageRectangle($this->hImg, 0, 0, $this->width-1, $this->height-1, $this->fgColor);
    }
 
@@ -187,22 +204,31 @@ abstract class BarCode extends Object {
    /**
     * @return the BarCode instance
     */
-   public function FlushImage() {
-      if (($this->style & self:: STYLE_BORDER)) {
-         $this->DrawBorder();
-      }
-      if ($this->style & self:: STYLE_IMAGE_PNG) {
-         Header("Content-Type: image/png");
-         ImagePng($this->hImg);
-      }
-      else if ($this->style & self:: STYLE_IMAGE_JPEG) {
-         Header("Content-Type: image/jpeg");
-         ImageJpeg($this->hImg);
-      }
-      else {
-         throw new RuntimeException("invalid or unknown output format");
-      }
+   public function stream() {
+      if (!$this->isRendered)
+         $this->Render();
+
+      header("Content-Type: ".$this->getContentType());
+
+      if      ($this->style & self:: STYLE_IMAGE_PNG ) ImagePng($this->hImg);
+      else if ($this->style & self:: STYLE_IMAGE_JPEG) ImageJpeg($this->hImg);
+
       return $this;
+   }
+
+   /**
+    */
+   public function toString() {
+      if (!$this->isRendered)
+         $this->Render();
+
+      if (ob_start()) {
+         if      ($this->style & self:: STYLE_IMAGE_PNG ) ImagePng($this->hImg);
+         else if ($this->style & self:: STYLE_IMAGE_JPEG) ImageJpeg($this->hImg);
+         $content = ob_get_clean();
+         return $content;
+      }
+      return null;
    }
 
    /**

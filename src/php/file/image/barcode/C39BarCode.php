@@ -105,7 +105,10 @@ class C39BarCode extends BarCode {
    /**
     * @return the BarCode instance
     */
-   public function RenderImage() {
+   protected function Render() {
+      if ($this->isRendered)
+         return $this;
+
       $len  = strLen($this->value);
       $size = $this->GetSize();
       $xres = $this->xres;
@@ -161,8 +164,13 @@ class C39BarCode extends BarCode {
          $DrawPos += $narrow; /* Space between chars */
          $cPos++;
       } while ($cPos<$len);
+
       $DrawPos =  $this->DrawStop($DrawPos, self:: DEFAULT_MARGIN_Y1 , $ySize, $xres);
 
+      if (($this->style & self:: STYLE_BORDER))
+         $this->DrawBorder();
+
+      $this->isRendered = true;
       return $this;
     }
 

@@ -140,17 +140,21 @@ if (strLen($value) > 0) {
       case 'C128A':
       case 'C128B':
       case 'C128C':
-         $class = "${type}BarCode";
+         $class   = "${type}BarCode";
          $barcode = new $class($width, $height, $style, $xres, $font, $value);
-         $barcode->RenderImage();
-         $url = "image.php?type=$type&width=$width&height=$height&style=$style&xres=$xres&font=$font&value=$value";
+
+         $content     = $barcode->toString();
+         $contentType = $barcode->getContentType();
+         $data        = base64_encode($content);
+
+         $params = "type=$type&width=$width&height=$height&style=$style&xres=$xres&font=$font&value=$value";
          ?>
-         <table align="center"><tr><td><a href="<?=$url?>" target="barcode_image"><img src="<?=$url?>" border=0></a></td></tr></table>
+         <table align="center"><tr><td><a href="image.php?<?=$params?>" target="barcode_image"><img src="data:<?=$contentType?>;base64,<?=$data?>" border=0></a></td></tr></table>
          <?
          break;
 
       default:
-         throw new InvalidArgumentException("Unknown barcode standard \"$type\"");
+         throw new InvalidArgumentException("Unknown barcode type \"$type\"");
    }
 }
 else if (isSet($_REQUEST['submit'])) {

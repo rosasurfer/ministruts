@@ -15,12 +15,12 @@ switch ($type) {
    case "C128A":
    case "C128B":
    case "C128C":
-      $class = "${type}BarCode";
+      $class   = "${type}BarCode";
       $barcode = new $class($width, $height, $style, $xres, $font, $value);
-      $barcode->RenderImage()->FlushImage();
+      $barcode->stream();
       break;
 
    default:
-      throw new InvalidArgumentException("Unknown barcode standard \"$type\"");
+      throw new InvalidArgumentException("Unknown barcode type \"$type\"");
 }
 ?>

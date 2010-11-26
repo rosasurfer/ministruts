@@ -183,7 +183,10 @@ class C128CBarCode extends BaseC128BarCode {
    /**
     * @return the BarCode instance
     */
-   public function RenderImage() {
+   protected function Render() {
+      if ($this->isRendered)
+         return $this;
+
       $len  = strLen($this->value);
       $size = $this->GetSize();
       $xres = $this->xres;
@@ -234,6 +237,10 @@ class C128CBarCode extends BaseC128BarCode {
       $DrawPos = $this->DrawCheckChar($DrawPos, self:: DEFAULT_MARGIN_Y1 , $ysize, $xres);
       $DrawPos = $this->DrawStop($DrawPos, self:: DEFAULT_MARGIN_Y1 , $ysize, $xres);
 
+      if (($this->style & self:: STYLE_BORDER))
+         $this->DrawBorder();
+
+      $this->isRendered = true;
       return $this;
     }
 

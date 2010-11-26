@@ -110,6 +110,7 @@ $__classes['UnimplementedFeatureException'  ] = $dir.'php/exceptions/Unimplement
 $__classes['UnsupportedMethodException'     ] = $dir.'php/exceptions/UnsupportedMethodException';
 
 $__classes['BarCode'                        ] = $dir.'php/file/image/barcode/BarCode';
+$__classes['BaseC128BarCode'                ] = $dir.'php/file/image/barcode/BaseC128BarCode';
 $__classes['C128ABarCode'                   ] = $dir.'php/file/image/barcode/C128ABarCode';
 $__classes['C128BBarCode'                   ] = $dir.'php/file/image/barcode/C128BBarCode';
 $__classes['C128CBarCode'                   ] = $dir.'php/file/image/barcode/C128CBarCode';

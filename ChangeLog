@@ -1,3 +1,8 @@
+2010-11-26
+
+   - neu: Package php/file/image/barcode/* - BarCode-Library
+
+
 2010-11-17
 
    - neu: php/struts/Tile::getMergedProperties() - gibt die eigenen und die geerbten Properties zurück

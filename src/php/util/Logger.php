@@ -176,7 +176,10 @@ class Logger extends StaticClass {
       try {
          self ::init();
 
-         // Bei manuellem Aufruf aus einem Destruktor kann die Exception zurückgereicht werden, sofern wir nicht im Shutdown sind
+         // TODO: Fatal error: Ignoring exception from ***::__destruct() while an exception is already active (Uncaught PHPErrorException in E:\Projekte\ministruts\src\php\file\image\barcode\test\image.php on line 19)
+         //                    in E:\Projekte\ministruts\src\php\file\image\barcode\test\image.php on line 33
+
+         // Bei manuellem Aufruf aus einem Destruktor kann die Exception zurückgereicht werden (STIMMT DAS MIT OBIGEM BUG???), sofern wir nicht im Shutdown sind
          // (während des Shutdowns dürfen keine Exceptions mehr geworfen werden)
          if ($destructor && !isSet($GLOBALS['$__shutting_down']))
             return;

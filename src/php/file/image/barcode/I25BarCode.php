@@ -75,7 +75,10 @@ class I25BarCode extends BarCode {
    /**
     * @return the BarCode instance
     */
-   public function RenderImage() {
+   protected function Render() {
+      if ($this->isRendered)
+         return $this;
+
       $len  = strLen($this->value);
       $size = $this->GetSize();
       $xres = $this->xres;
@@ -123,6 +126,11 @@ class I25BarCode extends BarCode {
       } while ($cPos<$len);
 
       $sPos = $this->DrawStop($sPos, self:: DEFAULT_MARGIN_Y1, $ysize, $xres);
+
+      if (($this->style & self:: STYLE_BORDER))
+         $this->DrawBorder();
+
+      $this->isRendered = true;
       return $this;
    }
 
