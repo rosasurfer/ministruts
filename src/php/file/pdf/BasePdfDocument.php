@@ -2970,7 +2970,7 @@ class BasePdfDocument extends Object {
     *
     * @access private
     */
-   function addJpegImage_common(&$data,$x,$y,$w=0,$h=0,$imageWidth,$imageHeight,$channels=3){
+   private function addJpegImage_common(&$data,$x,$y,$w=0,$h=0,$imageWidth,$imageHeight,$channels=3){
      // note that this function is not to be called externally
      // it is just the common code between the GD and the file options
      $this->numImages++;
