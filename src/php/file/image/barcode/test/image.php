@@ -16,7 +16,7 @@ switch ($type) {
    case "C128B":
    case "C128C":
       $class   = "${type}BarCode";
-      $barcode = new $class($width, $height, $style, $xres, $font, $value);
+      $barcode = new $class($value, $width, $height, $style, $xres, $font);
       $barcode->stream();
       break;
 

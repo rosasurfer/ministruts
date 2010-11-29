@@ -39,7 +39,8 @@ abstract class BarCode extends Object {
    const /*int*/ DEFAULT_TEXT_OFFSET      =   2;
 
 
-   protected /*int*/    $width,
+   protected /*string*/ $value,
+             /*int*/    $width,
              /*int*/    $height,
              /*int*/    $style,
              /*bool*/   $reverseColor,
@@ -47,7 +48,6 @@ abstract class BarCode extends Object {
              /*int*/    $fgColor,
              /*int*/    $xres,
              /*int*/    $font,
-             /*string*/ $value,
              /*hImg*/   $hImg,
              /*bool*/   $isRendered = false;
 
@@ -55,7 +55,7 @@ abstract class BarCode extends Object {
    /**
     * Geschützter Konstruktor, Instanzen können nur von abgeleiteten Klassen erzeugt werden.
     */
-   protected function __construct($width=self:: DEFAULT_WIDTH, $height=self:: DEFAULT_HEIGHT, $style=self:: DEFAULT_STYLE, $xres=self:: DEFAULT_XRES, $font=self:: DEFAULT_FONT, $value) {
+   protected function __construct($value, $width=self:: DEFAULT_WIDTH, $height=self:: DEFAULT_HEIGHT, $style=self:: DEFAULT_STYLE, $xres=self:: DEFAULT_XRES, $font=self:: DEFAULT_FONT) {
       if ($value!==(string)$value) throw new IllegalTypeException('Illegal type of argument $value: '.getType($value));
       if (strLen($value)==0)       throw new InvalidArgumentException('Invalid barcode $value: "'.$value.'"');
 

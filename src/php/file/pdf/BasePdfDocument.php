@@ -2660,12 +2660,18 @@ class BasePdfDocument extends Object {
    }
 
    /**
-    * Add a JPEG image from a file into the document. Searches the include_path if the file is not found.
+    * Add a PNG image from a string containing binary data.
+    */
+   function addPngFromString($data, $x, $y, $w=0, $h=0) {
+      $this->addPngImage_common($data, 'binary_string', $x, $y, $w, $h);
+   }
+
+   /**
+    * Add a PNG image from a file into the document. Searches the include_path if the file is not found.
     * This should work with remote files.
     */
    function addPngFromFile($file, $x, $y, $w=0, $h=0) {
-      // read in a png file, interpret it, then add to the system
-
+      // search the include_path if the file cannot be found
       if (!is_file($file)) {
          $paths = explode(PATH_SEPARATOR, ini_get('include_path'));
          $found = null;
@@ -2678,24 +2684,32 @@ class BasePdfDocument extends Object {
          if ($found === null)
             throw new RuntimeException('File not found: '.$file);
          $file = $found;
-         unset($paths, $path, $found);
       }
 
+      // read in the file
       $tmp = get_magic_quotes_runtime();
       set_magic_quotes_runtime(0);
 
       $fp = fopen($file, 'rb');
-
-      $data='';
+      $data = '';
       while (!feof($fp)) {
-         $data .= fread($fp,1024);
+         $data .= fread($fp, 1024);
       }
       fclose($fp);
       set_magic_quotes_runtime($tmp);
+      $this->addPngImage_common($data, $file, $x, $y, $w, $h);
+   }
 
+   /**
+    * common code used by the two PNG adding functions
+    */
+   function addPngImage_common($data, $name, $x, $y, $w=0, $h=0) {
+      // note that this function is not to be called externally
+
+      // interpret the image data, then add the image to the system
       $header = chr(137).chr(80).chr(78).chr(71).chr(13).chr(10).chr(26).chr(10);
-      if (substr($data, 0, 8) != $header)
-         throw new RuntimeException('file="'.$file.'": '.'this file does not have a valid header');
+      if (subStr($data, 0, 8) != $header)
+         throw new RuntimeException('data="'.$name.'": '.'this image does not have a valid header');
 
       // set pointer
       $p = 8;
@@ -2708,24 +2722,22 @@ class BasePdfDocument extends Object {
       while ($p<$len) {
          $chunkLen = $this->PRVT_getBytes($data,$p,4);
          $chunkType = substr($data,$p+4,4);
-         //    echoPre("\$chunkType=$chunkType, \$chunkLen=$chunkLen");
+         // echoPre("\$chunkType=$chunkType, \$chunkLen=$chunkLen");
 
          switch ($chunkType) {
             case 'IHDR':
                // this is where all the file information comes from
-               $info['width']=$this->PRVT_getBytes($data,$p+8,4);
-               $info['height']=$this->PRVT_getBytes($data,$p+12,4);
-               $info['bitDepth']=ord($data[$p+16]);
-               $info['colorType']=ord($data[$p+17]);
-               $info['compressionMethod']=ord($data[$p+18]);
-               $info['filterMethod']=ord($data[$p+19]);
-               $info['interlaceMethod']=ord($data[$p+20]);
+               $info['width'            ] = $this->PRVT_getBytes($data,$p+8,4);
+               $info['height'           ] = $this->PRVT_getBytes($data,$p+12,4);
+               $info['bitDepth'         ] = ord($data[$p+16]);
+               $info['colorType'        ] = ord($data[$p+17]);
+               $info['compressionMethod'] = ord($data[$p+18]);
+               $info['filterMethod'     ] = ord($data[$p+19]);
+               $info['interlaceMethod'  ] = ord($data[$p+20]);
                // echoPre($info);
-               $haveHeader=1;
-               if ($info['compressionMethod']!=0)
-                  throw new RuntimeException('file="'.$file.'": '.'unsupported compression method');
-               if ($info['filterMethod']!=0)
-                  throw new RuntimeException('file="'.$file.'": '.'unsupported filter method');
+               $haveHeader = 1;
+               if ($info['compressionMethod']!=0) throw new RuntimeException('data="'.$name.'": '.'unsupported compression method');
+               if ($info['filterMethod'     ]!=0) throw new RuntimeException('data="'.$name.'": '.'unsupported filter method');
                break;
 
             case 'PLTE':
@@ -2788,16 +2800,13 @@ class BasePdfDocument extends Object {
       }
 
       if (!$haveHeader)
-         throw new RuntimeException('file="'.$file.'": '.'information header is missing');
-
+         throw new RuntimeException('data="'.$name.'": '.'information header is missing');
       if (isset($info['interlaceMethod']) && $info['interlaceMethod'])
-         throw new RuntimeException('file="'.$file.'": '.'There appears to be no support for interlaced images in pdf.');
-
+         throw new RuntimeException('data="'.$name.'": '.'There appears to be no support for interlaced images in pdf.');
       if ($info['bitDepth'] > 8)
-         throw new RuntimeException('file="'.$file.'": '.'only bit depth of 8 or less is supported');
-
+         throw new RuntimeException('data="'.$name.'": '.'only bit depth of 8 or less is supported');
       if ($info['colorType']!=2 && $info['colorType']!=0 && $info['colorType']!=3)
-         throw new RuntimeException('file="'.$file.'": '.'transparancey alpha channel not supported, transparency only supported for palette images.');
+         throw new RuntimeException('data="'.$name.'": '.'transparancey alpha channel not supported, transparency only supported for palette images.');
 
       switch ($info['colorType']) {
          case 3:
@@ -2814,12 +2823,10 @@ class BasePdfDocument extends Object {
             break;
       }
 
-      if ($w==0) {
-         $w=$h/$info['height']*$info['width'];
-      }
-      if ($h==0) {
-         $h=$w*$info['height']/$info['width'];
-      }
+      if ($w <= 0 && $h <= 0) $w = $info['width'];
+      if ($w <= 0)            $w = $h / $info['height'] * $info['width'];
+      if ($h <= 0)            $h = $w / $info['width'] * $info['height'];
+
       //echoPre($info);
       // so this image is ok... add it in.
       $this->numImages++;
@@ -2872,22 +2879,12 @@ class BasePdfDocument extends Object {
       $imageWidth  = $tmp[0];
       $imageHeight = $tmp[1];
 
-      if (isSet($tmp['channels'])) {
-         $channels = $tmp['channels'];
-      }
-      else {
-         $channels = 3;
-      }
+      if (isSet($tmp['channels'])) $channels = $tmp['channels'];
+      else                         $channels = 3;
 
-      if ($w <= 0 && $h <= 0) {
-         $w = $imageWidth;
-      }
-      if ($w == 0) {
-         $w = $h/$imageHeight * $imageWidth;
-      }
-      if ($h == 0) {
-         $h = $w * $imageHeight/$imageWidth;
-      }
+      if ($w <= 0 && $h <= 0) $w = $imageWidth;
+      if ($w <= 0)            $w = $h / $imageHeight * $imageWidth;
+      if ($h <= 0)            $h = $w / $imageWidth * $imageHeight;
 
       $fp = fOpen($file, 'rb');
 
@@ -3055,7 +3052,7 @@ class BasePdfDocument extends Object {
    /**
     * used to add messages for use in debugging
     */
-   function addMessage($message){
+   private function addMessage($message){
      $this->messages .= $message."\n";
      Logger ::log($message, L_DEBUG, __CLASS__);
    }

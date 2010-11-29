@@ -65,7 +65,7 @@ class C39BarCode extends BarCode {
    /**
     * Constructor
     */
-   public function __construct($width, $height, $style, $xres, $font, $value) {
+   public function __construct($value, $width=self:: DEFAULT_WIDTH, $height=self:: DEFAULT_HEIGHT, $style=self:: DEFAULT_STYLE, $xres=self:: DEFAULT_XRES, $font=self:: DEFAULT_FONT) {
       if ($value!==(string)$value) throw new IllegalTypeException('Illegal type of argument $value: '.getType($value));
 
       $len = strLen($value);
@@ -74,7 +74,7 @@ class C39BarCode extends BarCode {
             throw new InvalidArgumentException("Invalid barcode value \"$value\" (standard 'C-39' does not contain character '$value[$i]')");
       }
 
-      parent:: __construct($width, $height, $style, $xres, $font, $value);
+      parent:: __construct($value, $width, $height, $style, $xres, $font);
    }
 
    /**

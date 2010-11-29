@@ -125,7 +125,7 @@ class C128CBarCode extends BaseC128BarCode {
    /**
     * Constructor
     */
-   public function __construct($width, $height, $style, $xres, $font, $value) {
+   public function __construct($value, $width=self:: DEFAULT_WIDTH, $height=self:: DEFAULT_HEIGHT, $style=self:: DEFAULT_STYLE, $xres=self:: DEFAULT_XRES, $font=self:: DEFAULT_FONT) {
       if ($value!==(string)$value) throw new IllegalTypeException('Illegal type of argument $value: '.getType($value));
 
       $len = strLen($value);
@@ -136,7 +136,7 @@ class C128CBarCode extends BaseC128BarCode {
       if ($len % 2 != 0)
          throw new InvalidArgumentException("Invalid length of barcode value \"$value\" (standard 'Class 128-C' requires an even number of characters, pad the value with zeros)");
 
-      parent:: __construct($width, $height, $style, $xres, $font, $value);
+      parent:: __construct($value, $width, $height, $style, $xres, $font);
    }
 
    /**

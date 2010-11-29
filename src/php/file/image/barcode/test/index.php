@@ -141,13 +141,13 @@ if (strLen($value) > 0) {
       case 'C128B':
       case 'C128C':
          $class   = "${type}BarCode";
-         $barcode = new $class($width, $height, $style, $xres, $font, $value);
+         $barcode = new $class($value, $width, $height, $style, $xres, $font);
 
          $content     = $barcode->toString();
          $contentType = $barcode->getContentType();
          $data        = base64_encode($content);
 
-         $params = "type=$type&width=$width&height=$height&style=$style&xres=$xres&font=$font&value=$value";
+         $params = "type=$type&value=$value&width=$width&height=$height&style=$style&xres=$xres&font=$font";
          ?>
          <table align="center"><tr><td><a href="image.php?<?=$params?>" target="barcode_image"><img src="data:<?=$contentType?>;base64,<?=$data?>" border=0></a></td></tr></table>
          <?
