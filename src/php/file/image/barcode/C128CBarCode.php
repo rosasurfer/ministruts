@@ -125,8 +125,8 @@ class C128CBarCode extends BaseC128BarCode {
    /**
     * Constructor
     */
-   public function __construct($value, $width=self:: DEFAULT_WIDTH, $height=self:: DEFAULT_HEIGHT, $style=self:: DEFAULT_STYLE, $xres=self:: DEFAULT_XRES, $font=self:: DEFAULT_FONT) {
-      if ($value!==(string)$value) throw new IllegalTypeException('Illegal type of argument $value: '.getType($value));
+   public function __construct($value, $width, $height, $style=null, $xres=null, $font=null) {
+      parent:: __construct($value, $width, $height, $style, $xres, $font);
 
       $len = strLen($value);
       for ($i=0; $i<$len; $i++) {
@@ -135,14 +135,12 @@ class C128CBarCode extends BaseC128BarCode {
       }
       if ($len % 2 != 0)
          throw new InvalidArgumentException("Invalid length of barcode value \"$value\" (standard 'Class 128-C' requires an even number of characters, pad the value with zeros)");
-
-      parent:: __construct($value, $width, $height, $style, $xres, $font);
    }
 
    /**
     *
     */
-   protected function GetCharIndex($char) {
+   protected function getCharIndex($char) {
       $key = array_search($char, $this->chars);
       if ($key === false)
          return -1;
@@ -152,13 +150,13 @@ class C128CBarCode extends BaseC128BarCode {
    /**
     *
     */
-   protected function GetCheckCharValue() {
+   protected function getCheckCharValue() {
       $len = strLen($this->value);
       $sum = 105;    // 'C' type;
       $m   = 0;
       for ($i=0; $i<$len; $i+=2) {
          $m++;
-         $sum += $this->GetCharIndex($this->value[$i].$this->value[$i+1]) * $m;
+         $sum += $this->getCharIndex($this->value[$i].$this->value[$i+1]) * $m;
       }
       return $this->charSet[$sum % 103];
    }
@@ -166,29 +164,29 @@ class C128CBarCode extends BaseC128BarCode {
    /**
     *
     */
-   private function DrawCheckChar($DrawPos, $yPos, $ySize, $xres) {
-      $cset = $this->GetCheckCharValue();
-      $this->DrawSingleBar($DrawPos, self:: DEFAULT_MARGIN_Y1, $this->GetBarSize($cset[0], $xres) , $ySize);
-      $DrawPos += $this->GetBarSize($cset[0], $xres);
-      $DrawPos += $this->GetBarSize($cset[1], $xres);
-      $this->DrawSingleBar($DrawPos, self:: DEFAULT_MARGIN_Y1, $this->GetBarSize($cset[2], $xres) , $ySize);
-      $DrawPos += $this->GetBarSize($cset[2], $xres);
-      $DrawPos += $this->GetBarSize($cset[3], $xres);
-      $this->DrawSingleBar($DrawPos, self:: DEFAULT_MARGIN_Y1, $this->GetBarSize($cset[4], $xres) , $ySize);
-      $DrawPos += $this->GetBarSize($cset[4], $xres);
-      $DrawPos += $this->GetBarSize($cset[5], $xres);
+   private function drawCheckChar($DrawPos, $yPos, $ySize, $xres) {
+      $cset = $this->getCheckCharValue();
+      $this->drawSingleBar($DrawPos, self:: DEFAULT_MARGIN_Y1, $this->getBarSize($cset[0], $xres) , $ySize);
+      $DrawPos += $this->getBarSize($cset[0], $xres);
+      $DrawPos += $this->getBarSize($cset[1], $xres);
+      $this->drawSingleBar($DrawPos, self:: DEFAULT_MARGIN_Y1, $this->getBarSize($cset[2], $xres) , $ySize);
+      $DrawPos += $this->getBarSize($cset[2], $xres);
+      $DrawPos += $this->getBarSize($cset[3], $xres);
+      $this->drawSingleBar($DrawPos, self:: DEFAULT_MARGIN_Y1, $this->getBarSize($cset[4], $xres) , $ySize);
+      $DrawPos += $this->getBarSize($cset[4], $xres);
+      $DrawPos += $this->getBarSize($cset[5], $xres);
       return $DrawPos;
    }
 
    /**
     * @return the BarCode instance
     */
-   protected function Render() {
+   protected function render() {
       if ($this->isRendered)
          return $this;
 
       $len  = strLen($this->value);
-      $size = $this->GetSize();
+      $size = $this->getSize();
       $xres = $this->xres;
 
       if      ($this->style & self:: STYLE_ALIGN_CENTER) $sPos = (int) (($this->width - $size ) / 2);
@@ -196,49 +194,49 @@ class C128CBarCode extends BaseC128BarCode {
       else                                               $sPos = 0;
 
       /* Total height of bar code -Bars only- */
-      if ($this->style & self:: STYLE_DRAW_TEXT) $ysize = $this->height - self:: DEFAULT_MARGIN_Y1 - self:: DEFAULT_MARGIN_Y2 - $this->GetFontHeight();
+      if ($this->style & self:: STYLE_DRAW_TEXT) $ysize = $this->height - self:: DEFAULT_MARGIN_Y1 - self:: DEFAULT_MARGIN_Y2 - $this->getFontHeight();
       else                                       $ysize = $this->height - self:: DEFAULT_MARGIN_Y1 - self:: DEFAULT_MARGIN_Y2;
 
       /* Draw text */
       if ($this->style & self:: STYLE_DRAW_TEXT) {
          if ($this->style & self:: STYLE_STRETCH_TEXT) {
             for ($i=0; $i<$len; $i++) {
-               $this->DrawChar($sPos + ($size/$len)*$i + 2*self:: DEFAULT_BAR_2*$xres + 3*self:: DEFAULT_BAR_1*$xres + self:: DEFAULT_BAR_4*$xres,
+               $this->drawChar($sPos + ($size/$len)*$i + 2*self:: DEFAULT_BAR_2*$xres + 3*self:: DEFAULT_BAR_1*$xres + self:: DEFAULT_BAR_4*$xres,
                $ysize + self:: DEFAULT_MARGIN_Y1 + self:: DEFAULT_TEXT_OFFSET,
                $this->value[$i]);
             }
          }
          else {
             /* Center */
-            $text_width = $this->GetFontWidth() * strLen($this->value);
-            $this->DrawText($sPos + ($size-$text_width)/2,  // 2*self:: DEFAULT_BAR_2*$xres + 3*self:: DEFAULT_BAR_1*$xres + self:: DEFAULT_BAR_4*$xres,  (pewa)
+            $text_width = $this->getFontWidth() * strLen($this->value);
+            $this->drawText($sPos + ($size-$text_width)/2,  // 2*self:: DEFAULT_BAR_2*$xres + 3*self:: DEFAULT_BAR_1*$xres + self:: DEFAULT_BAR_4*$xres,  (pewa)
                             $ysize + self:: DEFAULT_MARGIN_Y1 + self:: DEFAULT_TEXT_OFFSET,
                             $this->value);
          }
       }
 
       $cPos = 0;
-      $DrawPos = $this->DrawStart($sPos, self:: DEFAULT_MARGIN_Y1 , $ysize, $xres);
+      $DrawPos = $this->drawStart($sPos, self:: DEFAULT_MARGIN_Y1 , $ysize, $xres);
       do {
-         $c     = $this->GetCharIndex($this->value[$cPos].$this->value[$cPos+1]);
+         $c     = $this->getCharIndex($this->value[$cPos].$this->value[$cPos+1]);
          $cset  = $this->charSet[$c];
-         $this->DrawSingleBar($DrawPos, self:: DEFAULT_MARGIN_Y1, $this->GetBarSize($cset[0], $xres) , $ysize);
-         $DrawPos += $this->GetBarSize($cset[0], $xres);
-         $DrawPos += $this->GetBarSize($cset[1], $xres);
-         $this->DrawSingleBar($DrawPos, self:: DEFAULT_MARGIN_Y1, $this->GetBarSize($cset[2], $xres) , $ysize);
-         $DrawPos += $this->GetBarSize($cset[2], $xres);
-         $DrawPos += $this->GetBarSize($cset[3], $xres);
-         $this->DrawSingleBar($DrawPos, self:: DEFAULT_MARGIN_Y1, $this->GetBarSize($cset[4], $xres) , $ysize);
-         $DrawPos += $this->GetBarSize($cset[4], $xres);
-         $DrawPos += $this->GetBarSize($cset[5], $xres);
+         $this->drawSingleBar($DrawPos, self:: DEFAULT_MARGIN_Y1, $this->getBarSize($cset[0], $xres) , $ysize);
+         $DrawPos += $this->getBarSize($cset[0], $xres);
+         $DrawPos += $this->getBarSize($cset[1], $xres);
+         $this->drawSingleBar($DrawPos, self:: DEFAULT_MARGIN_Y1, $this->getBarSize($cset[2], $xres) , $ysize);
+         $DrawPos += $this->getBarSize($cset[2], $xres);
+         $DrawPos += $this->getBarSize($cset[3], $xres);
+         $this->drawSingleBar($DrawPos, self:: DEFAULT_MARGIN_Y1, $this->getBarSize($cset[4], $xres) , $ysize);
+         $DrawPos += $this->getBarSize($cset[4], $xres);
+         $DrawPos += $this->getBarSize($cset[5], $xres);
          $cPos += 2;
       } while ($cPos<$len);
 
-      $DrawPos = $this->DrawCheckChar($DrawPos, self:: DEFAULT_MARGIN_Y1 , $ysize, $xres);
-      $DrawPos = $this->DrawStop($DrawPos, self:: DEFAULT_MARGIN_Y1 , $ysize, $xres);
+      $DrawPos = $this->drawCheckChar($DrawPos, self:: DEFAULT_MARGIN_Y1 , $ysize, $xres);
+      $DrawPos = $this->drawStop($DrawPos, self:: DEFAULT_MARGIN_Y1 , $ysize, $xres);
 
       if (($this->style & self:: STYLE_BORDER))
-         $this->DrawBorder();
+         $this->drawBorder();
 
       $this->isRendered = true;
       return $this;
@@ -247,36 +245,36 @@ class C128CBarCode extends BaseC128BarCode {
    /**
     *
     */
-   private function DrawStart($DrawPos, $yPos, $ySize, $xres) {
+   private function drawStart($DrawPos, $yPos, $ySize, $xres) {
       /* Start code is '211232' */
-      $this->DrawSingleBar($DrawPos, self:: DEFAULT_MARGIN_Y1, $this->GetBarSize('2', $xres) , $ySize);
-      $DrawPos += $this->GetBarSize('2', $xres);
-      $DrawPos += $this->GetBarSize('1', $xres);
-      $this->DrawSingleBar($DrawPos, self:: DEFAULT_MARGIN_Y1, $this->GetBarSize('1', $xres) , $ySize);
-      $DrawPos += $this->GetBarSize('1', $xres);
-      $DrawPos += $this->GetBarSize('2', $xres);
-      $this->DrawSingleBar($DrawPos, self:: DEFAULT_MARGIN_Y1, $this->GetBarSize('3', $xres) , $ySize);
-      $DrawPos += $this->GetBarSize('3', $xres);
-      $DrawPos += $this->GetBarSize('2', $xres);
+      $this->drawSingleBar($DrawPos, self:: DEFAULT_MARGIN_Y1, $this->getBarSize('2', $xres) , $ySize);
+      $DrawPos += $this->getBarSize('2', $xres);
+      $DrawPos += $this->getBarSize('1', $xres);
+      $this->drawSingleBar($DrawPos, self:: DEFAULT_MARGIN_Y1, $this->getBarSize('1', $xres) , $ySize);
+      $DrawPos += $this->getBarSize('1', $xres);
+      $DrawPos += $this->getBarSize('2', $xres);
+      $this->drawSingleBar($DrawPos, self:: DEFAULT_MARGIN_Y1, $this->getBarSize('3', $xres) , $ySize);
+      $DrawPos += $this->getBarSize('3', $xres);
+      $DrawPos += $this->getBarSize('2', $xres);
       return $DrawPos;
    }
 
    /**
     *
     */
-   private function DrawStop($DrawPos, $yPos, $ySize, $xres) {
+   private function drawStop($DrawPos, $yPos, $ySize, $xres) {
       /* Stop code is '2331112' */
-      $this->DrawSingleBar($DrawPos, self:: DEFAULT_MARGIN_Y1, $this->GetBarSize('2', $xres) , $ySize);
-      $DrawPos += $this->GetBarSize('2', $xres);
-      $DrawPos += $this->GetBarSize('3', $xres);
-      $this->DrawSingleBar($DrawPos, self:: DEFAULT_MARGIN_Y1, $this->GetBarSize('3', $xres) , $ySize);
-      $DrawPos += $this->GetBarSize('3', $xres);
-      $DrawPos += $this->GetBarSize('1', $xres);
-      $this->DrawSingleBar($DrawPos, self:: DEFAULT_MARGIN_Y1, $this->GetBarSize('1', $xres) , $ySize);
-      $DrawPos += $this->GetBarSize('1', $xres);
-      $DrawPos += $this->GetBarSize('1', $xres);
-      $this->DrawSingleBar($DrawPos, self:: DEFAULT_MARGIN_Y1, $this->GetBarSize('2', $xres) , $ySize);
-      $DrawPos += $this->GetBarSize('2', $xres);
+      $this->drawSingleBar($DrawPos, self:: DEFAULT_MARGIN_Y1, $this->getBarSize('2', $xres) , $ySize);
+      $DrawPos += $this->getBarSize('2', $xres);
+      $DrawPos += $this->getBarSize('3', $xres);
+      $this->drawSingleBar($DrawPos, self:: DEFAULT_MARGIN_Y1, $this->getBarSize('3', $xres) , $ySize);
+      $DrawPos += $this->getBarSize('3', $xres);
+      $DrawPos += $this->getBarSize('1', $xres);
+      $this->drawSingleBar($DrawPos, self:: DEFAULT_MARGIN_Y1, $this->getBarSize('1', $xres) , $ySize);
+      $DrawPos += $this->getBarSize('1', $xres);
+      $DrawPos += $this->getBarSize('1', $xres);
+      $this->drawSingleBar($DrawPos, self:: DEFAULT_MARGIN_Y1, $this->getBarSize('2', $xres) , $ySize);
+      $DrawPos += $this->getBarSize('2', $xres);
       return $DrawPos;
    }
 }

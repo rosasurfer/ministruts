@@ -65,22 +65,20 @@ class C39BarCode extends BarCode {
    /**
     * Constructor
     */
-   public function __construct($value, $width=self:: DEFAULT_WIDTH, $height=self:: DEFAULT_HEIGHT, $style=self:: DEFAULT_STYLE, $xres=self:: DEFAULT_XRES, $font=self:: DEFAULT_FONT) {
-      if ($value!==(string)$value) throw new IllegalTypeException('Illegal type of argument $value: '.getType($value));
+   public function __construct($value, $width, $height, $style=null, $xres=null, $font=null) {
+      parent:: __construct($value, $width, $height, $style, $xres, $font);
 
       $len = strLen($value);
       for ($i=0; $i<$len; $i++) {
-         if ($this->GetCharIndex($value[$i])==-1 || $value[$i]=='*')
+         if ($this->getCharIndex($value[$i])==-1 || $value[$i]=='*')
             throw new InvalidArgumentException("Invalid barcode value \"$value\" (standard 'C-39' does not contain character '$value[$i]')");
       }
-
-      parent:: __construct($value, $width, $height, $style, $xres, $font);
    }
 
    /**
     *
     */
-   private function GetCharIndex($char) {
+   private function getCharIndex($char) {
       $pos = strPos($this->chars, $char);
       if ($pos === false)
          return -1;
@@ -90,7 +88,7 @@ class C39BarCode extends BarCode {
    /**
     *
     */
-   protected function GetSize() {
+   protected function getSize() {
       $len  = strLen($this->value);
       $xres = $this->xres;
 
@@ -105,12 +103,12 @@ class C39BarCode extends BarCode {
    /**
     * @return the BarCode instance
     */
-   protected function Render() {
+   protected function render() {
       if ($this->isRendered)
          return $this;
 
       $len  = strLen($this->value);
-      $size = $this->GetSize();
+      $size = $this->getSize();
       $xres = $this->xres;
 
       $narrow = self:: DEFAULT_NARROW_BAR * $xres;
@@ -122,53 +120,53 @@ class C39BarCode extends BarCode {
       else                                               $sPos = 0;
 
       /* Total height of bar code -Bars only- */
-      if ($this->style & self:: STYLE_DRAW_TEXT) $ySize = $this->height - self:: DEFAULT_MARGIN_Y1 - self:: DEFAULT_MARGIN_Y2 - $this->GetFontHeight();
+      if ($this->style & self:: STYLE_DRAW_TEXT) $ySize = $this->height - self:: DEFAULT_MARGIN_Y1 - self:: DEFAULT_MARGIN_Y2 - $this->getFontHeight();
       else                                       $ySize = $this->height - self:: DEFAULT_MARGIN_Y1 - self:: DEFAULT_MARGIN_Y2;
 
       /* Draw text */
       if ($this->style & self:: STYLE_DRAW_TEXT) {
          if ($this->style & self:: STYLE_STRETCH_TEXT) {
             for ($i=0; $i<$len; $i++) {
-               $this->DrawChar($sPos + ($size/$len)*$i + $narrow*6+$wide*3,
+               $this->drawChar($sPos + ($size/$len)*$i + $narrow*6+$wide*3,
                                $ySize + self:: DEFAULT_MARGIN_Y1 + self:: DEFAULT_TEXT_OFFSET,
                                $this->value[$i]);
             }
          }
          else {
             /* Center */
-            $text_width = $this->GetFontWidth() * strLen($this->value);
-            $this->DrawText($sPos + ($size-$text_width)/2,           // + $narrow*6 + $wide*3 (pewa)
+            $text_width = $this->getFontWidth() * strLen($this->value);
+            $this->drawText($sPos + ($size-$text_width)/2,           // + $narrow*6 + $wide*3 (pewa)
                             $ySize + self:: DEFAULT_MARGIN_Y1 + self:: DEFAULT_TEXT_OFFSET,
                             $this->value);
          }
       }
 
-      $DrawPos = $this->DrawStart($sPos, self:: DEFAULT_MARGIN_Y1 , $ySize, $xres);
+      $DrawPos = $this->drawStart($sPos, self:: DEFAULT_MARGIN_Y1 , $ySize, $xres);
       do {
-         $c     = $this->GetCharIndex($this->value[$cPos]);
+         $c     = $this->getCharIndex($this->value[$cPos]);
          $cset  = $this->charSet[$c];
-         $this->DrawSingleBar($DrawPos, self:: DEFAULT_MARGIN_Y1, ($cset[0] == '0') ? $narrow : $wide , $ySize);
+         $this->drawSingleBar($DrawPos, self:: DEFAULT_MARGIN_Y1, ($cset[0] == '0') ? $narrow : $wide , $ySize);
          $DrawPos += ($cset[0] == '0') ? $narrow : $wide;
          $DrawPos += ($cset[1] == '0') ? $narrow : $wide;
-         $this->DrawSingleBar($DrawPos, self:: DEFAULT_MARGIN_Y1, ($cset[2] == '0') ? $narrow : $wide , $ySize);
+         $this->drawSingleBar($DrawPos, self:: DEFAULT_MARGIN_Y1, ($cset[2] == '0') ? $narrow : $wide , $ySize);
          $DrawPos += ($cset[2] == '0') ? $narrow : $wide;
          $DrawPos += ($cset[3] == '0') ? $narrow : $wide;
-         $this->DrawSingleBar($DrawPos, self:: DEFAULT_MARGIN_Y1, ($cset[4] == '0') ? $narrow : $wide , $ySize);
+         $this->drawSingleBar($DrawPos, self:: DEFAULT_MARGIN_Y1, ($cset[4] == '0') ? $narrow : $wide , $ySize);
          $DrawPos += ($cset[4] == '0') ? $narrow : $wide;
          $DrawPos += ($cset[5] == '0') ? $narrow : $wide;
-         $this->DrawSingleBar($DrawPos, self:: DEFAULT_MARGIN_Y1, ($cset[6] == '0') ? $narrow : $wide , $ySize);
+         $this->drawSingleBar($DrawPos, self:: DEFAULT_MARGIN_Y1, ($cset[6] == '0') ? $narrow : $wide , $ySize);
          $DrawPos += ($cset[6] == '0') ? $narrow : $wide;
          $DrawPos += ($cset[7] == '0') ? $narrow : $wide;
-         $this->DrawSingleBar($DrawPos, self:: DEFAULT_MARGIN_Y1, ($cset[8] == '0') ? $narrow : $wide , $ySize);
+         $this->drawSingleBar($DrawPos, self:: DEFAULT_MARGIN_Y1, ($cset[8] == '0') ? $narrow : $wide , $ySize);
          $DrawPos += ($cset[8] == '0') ? $narrow : $wide;
          $DrawPos += $narrow; /* Space between chars */
          $cPos++;
       } while ($cPos<$len);
 
-      $DrawPos =  $this->DrawStop($DrawPos, self:: DEFAULT_MARGIN_Y1 , $ySize, $xres);
+      $DrawPos =  $this->drawStop($DrawPos, self:: DEFAULT_MARGIN_Y1 , $ySize, $xres);
 
       if (($this->style & self:: STYLE_BORDER))
-         $this->DrawBorder();
+         $this->drawBorder();
 
       $this->isRendered = true;
       return $this;
@@ -177,23 +175,23 @@ class C39BarCode extends BarCode {
    /**
     *
     */
-   private function DrawStart($DrawPos, $yPos, $ySize, $xres) {
+   private function drawStart($DrawPos, $yPos, $ySize, $xres) {
       /* Start code is '*' */
       $narrow = self:: DEFAULT_NARROW_BAR * $xres;
       $wide   = self:: DEFAULT_WIDE_BAR * $xres;
-      $this->DrawSingleBar($DrawPos, $yPos, $narrow , $ySize);
+      $this->drawSingleBar($DrawPos, $yPos, $narrow , $ySize);
       $DrawPos += $narrow;
       $DrawPos += $wide;
-      $this->DrawSingleBar($DrawPos, $yPos, $narrow , $ySize);
+      $this->drawSingleBar($DrawPos, $yPos, $narrow , $ySize);
       $DrawPos += $narrow;
       $DrawPos += $narrow;
-      $this->DrawSingleBar($DrawPos, $yPos, $wide , $ySize);
+      $this->drawSingleBar($DrawPos, $yPos, $wide , $ySize);
       $DrawPos += $wide;
       $DrawPos += $narrow;
-      $this->DrawSingleBar($DrawPos, $yPos, $wide , $ySize);
+      $this->drawSingleBar($DrawPos, $yPos, $wide , $ySize);
       $DrawPos += $wide;
       $DrawPos += $narrow;
-      $this->DrawSingleBar($DrawPos, $yPos, $narrow, $ySize);
+      $this->drawSingleBar($DrawPos, $yPos, $narrow, $ySize);
       $DrawPos += $narrow;
       $DrawPos += $narrow; /* Space between chars */
       return $DrawPos;
@@ -202,23 +200,23 @@ class C39BarCode extends BarCode {
    /**
     *
     */
-   private function DrawStop($DrawPos, $yPos, $ySize, $xres) {
+   private function drawStop($DrawPos, $yPos, $ySize, $xres) {
       /* Stop code is '*' */
       $narrow = self:: DEFAULT_NARROW_BAR * $xres;
       $wide   = self:: DEFAULT_WIDE_BAR * $xres;
-      $this->DrawSingleBar($DrawPos, $yPos, $narrow , $ySize);
+      $this->drawSingleBar($DrawPos, $yPos, $narrow , $ySize);
       $DrawPos += $narrow;
       $DrawPos += $wide;
-      $this->DrawSingleBar($DrawPos, $yPos, $narrow , $ySize);
+      $this->drawSingleBar($DrawPos, $yPos, $narrow , $ySize);
       $DrawPos += $narrow;
       $DrawPos += $narrow;
-      $this->DrawSingleBar($DrawPos, $yPos, $wide , $ySize);
+      $this->drawSingleBar($DrawPos, $yPos, $wide , $ySize);
       $DrawPos += $wide;
       $DrawPos += $narrow;
-      $this->DrawSingleBar($DrawPos, $yPos, $wide , $ySize);
+      $this->drawSingleBar($DrawPos, $yPos, $wide , $ySize);
       $DrawPos += $wide;
       $DrawPos += $narrow;
-      $this->DrawSingleBar($DrawPos, $yPos, $narrow, $ySize);
+      $this->drawSingleBar($DrawPos, $yPos, $narrow, $ySize);
       $DrawPos += $narrow;
       return $DrawPos;
    }

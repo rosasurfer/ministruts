@@ -30,8 +30,8 @@ class I25BarCode extends BarCode {
    /**
     * Constructor
     */
-   public function __construct($value, $width=self:: DEFAULT_WIDTH, $height=self:: DEFAULT_HEIGHT, $style=self:: DEFAULT_STYLE, $xres=self:: DEFAULT_XRES, $font=self:: DEFAULT_FONT) {
-      if ($value!==(string)$value) throw new IllegalTypeException('Illegal type of argument $value: '.getType($value));
+   public function __construct($value, $width, $height, $style=null, $xres=null, $font=null) {
+      parent:: __construct($value, $width, $height, $style, $xres, $font);
 
       $len = strLen($value);
       for ($i=0; $i<$len; $i++) {
@@ -40,14 +40,12 @@ class I25BarCode extends BarCode {
       }
       if ($len % 2 != 0)
          throw new InvalidArgumentException("Invalid length of barcode value \"$value\" (standard 'Interleave 2 of 5' requires an even number of characters)");
-
-      parent:: __construct($value, $width, $height, $style, $xres, $font);
    }
 
    /**
     *
     */
-   protected function GetSize() {
+   protected function getSize() {
       $len  = strLen($this->value);
       $xres = $this->xres;
 
@@ -75,15 +73,15 @@ class I25BarCode extends BarCode {
    /**
     * @return the BarCode instance
     */
-   protected function Render() {
+   protected function render() {
       if ($this->isRendered)
          return $this;
 
       $len  = strLen($this->value);
-      $size = $this->GetSize();
+      $size = $this->getSize();
       $xres = $this->xres;
 
-      if ($this->style & self:: STYLE_DRAW_TEXT) $ysize = $this->height - self:: DEFAULT_MARGIN_Y1 - self:: DEFAULT_MARGIN_Y2 - $this->GetFontHeight();
+      if ($this->style & self:: STYLE_DRAW_TEXT) $ysize = $this->height - self:: DEFAULT_MARGIN_Y1 - self:: DEFAULT_MARGIN_Y2 - $this->getFontHeight();
       else                                       $ysize = $this->height - self:: DEFAULT_MARGIN_Y1 - self:: DEFAULT_MARGIN_Y2;
 
       if      ($this->style & self:: STYLE_ALIGN_CENTER) $sPos = (int) (($this->width - $size) / 2);
@@ -94,21 +92,21 @@ class I25BarCode extends BarCode {
          if ($this->style & self:: STYLE_STRETCH_TEXT) {
             /* Stretch */
             for ($i=0; $i<$len; $i++) {
-               $this->DrawChar($sPos + self:: DEFAULT_NARROW_BAR * 4 * $xres + ($size/$len) *$i,
+               $this->drawChar($sPos + self:: DEFAULT_NARROW_BAR * 4 * $xres + ($size/$len) *$i,
                                $ysize + self:: DEFAULT_MARGIN_Y1 + self:: DEFAULT_TEXT_OFFSET,
                                $this->value[$i]);
             }
          }
          else {
             /* Center */
-            $text_width = $this->GetFontWidth() * strLen($this->value);
-            $this->DrawText($sPos + ($size-$text_width)/2,                 // + self:: DEFAULT_NARROW_BAR*4*$xres,   (pewa)
+            $text_width = $this->getFontWidth() * strLen($this->value);
+            $this->drawText($sPos + ($size-$text_width)/2,                 // + self:: DEFAULT_NARROW_BAR*4*$xres,   (pewa)
                             $ysize + self:: DEFAULT_MARGIN_Y1 + self:: DEFAULT_TEXT_OFFSET,
                             $this->value);
          }
       }
 
-      $sPos = $this->DrawStart($sPos, self:: DEFAULT_MARGIN_Y1, $ysize, $xres);
+      $sPos = $this->drawStart($sPos, self:: DEFAULT_MARGIN_Y1, $ysize, $xres);
       $cPos = 0;
       do {
          $c1    = $this->value[$cPos];
@@ -119,16 +117,16 @@ class I25BarCode extends BarCode {
          for ($i=0; $i<5; $i++) {
             $type1 = ($cset1[$i]==0 ? self:: DEFAULT_NARROW_BAR : self:: DEFAULT_WIDE_BAR) * $xres;
             $type2 = ($cset2[$i]==0 ? self:: DEFAULT_NARROW_BAR : self:: DEFAULT_WIDE_BAR) * $xres;
-            $this->DrawSingleBar($sPos, self:: DEFAULT_MARGIN_Y1, $type1 , $ysize);
+            $this->drawSingleBar($sPos, self:: DEFAULT_MARGIN_Y1, $type1 , $ysize);
             $sPos += $type1 + $type2;
          }
          $cPos+=2;
       } while ($cPos<$len);
 
-      $sPos = $this->DrawStop($sPos, self:: DEFAULT_MARGIN_Y1, $ysize, $xres);
+      $sPos = $this->drawStop($sPos, self:: DEFAULT_MARGIN_Y1, $ysize, $xres);
 
       if (($this->style & self:: STYLE_BORDER))
-         $this->DrawBorder();
+         $this->drawBorder();
 
       $this->isRendered = true;
       return $this;
@@ -137,12 +135,12 @@ class I25BarCode extends BarCode {
    /**
     *
     */
-   private function DrawStart($DrawPos, $yPos, $ySize, $xres) {
+   private function drawStart($DrawPos, $yPos, $ySize, $xres) {
       /* Start code is "0000" */
-      $this->DrawSingleBar($DrawPos, $yPos, self:: DEFAULT_NARROW_BAR  * $xres , $ySize);
+      $this->drawSingleBar($DrawPos, $yPos, self:: DEFAULT_NARROW_BAR  * $xres , $ySize);
       $DrawPos += self:: DEFAULT_NARROW_BAR  * $xres;
       $DrawPos += self:: DEFAULT_NARROW_BAR  * $xres;
-      $this->DrawSingleBar($DrawPos, $yPos, self:: DEFAULT_NARROW_BAR  * $xres , $ySize);
+      $this->drawSingleBar($DrawPos, $yPos, self:: DEFAULT_NARROW_BAR  * $xres , $ySize);
       $DrawPos += self:: DEFAULT_NARROW_BAR  * $xres;
       $DrawPos += self:: DEFAULT_NARROW_BAR  * $xres;
       return $DrawPos;
@@ -151,12 +149,12 @@ class I25BarCode extends BarCode {
    /**
     *
     */
-   private function DrawStop($DrawPos, $yPos, $ySize, $xres) {
+   private function drawStop($DrawPos, $yPos, $ySize, $xres) {
       /* Stop code is "100" */
-      $this->DrawSingleBar($DrawPos, $yPos, self:: DEFAULT_WIDE_BAR * $xres , $ySize);
+      $this->drawSingleBar($DrawPos, $yPos, self:: DEFAULT_WIDE_BAR * $xres , $ySize);
       $DrawPos += self:: DEFAULT_WIDE_BAR  * $xres;
       $DrawPos += self:: DEFAULT_NARROW_BAR  * $xres;
-      $this->DrawSingleBar($DrawPos, $yPos, self:: DEFAULT_NARROW_BAR  * $xres , $ySize);
+      $this->drawSingleBar($DrawPos, $yPos, self:: DEFAULT_NARROW_BAR  * $xres , $ySize);
       $DrawPos += self:: DEFAULT_NARROW_BAR  * $xres;
       return $DrawPos;
    }

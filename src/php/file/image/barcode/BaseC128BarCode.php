@@ -22,7 +22,7 @@ abstract class BaseC128BarCode extends BarCode {
    /**
     *
     */
-   protected function GetCharIndex($char) {
+   protected function getCharIndex($char) {
       $pos = strPos($this->chars, $char);
       if ($pos === false)
          return -1;
@@ -32,28 +32,28 @@ abstract class BaseC128BarCode extends BarCode {
    /**
     *
     */
-   protected function GetSize() {
+   protected function getSize() {
       $len     = strLen($this->value);
       $charLen = strLen($this->chars[0]);
       $xres    = $this->xres;
 
       $ret = 0;
       for ($i=0; $i<$len; $i+=$charLen) {
-         $idx  = $this->GetCharIndex(subStr($this->value, $i, $charLen));
+         $idx  = $this->getCharIndex(subStr($this->value, $i, $charLen));
          $cset = $this->charSet[$idx];
-         $ret += $this->GetBarSize($xres, $cset[0]);
-         $ret += $this->GetBarSize($xres, $cset[1]);
-         $ret += $this->GetBarSize($xres, $cset[2]);
-         $ret += $this->GetBarSize($xres, $cset[3]);
-         $ret += $this->GetBarSize($xres, $cset[4]);
-         $ret += $this->GetBarSize($xres, $cset[5]);
+         $ret += $this->getBarSize($xres, $cset[0]);
+         $ret += $this->getBarSize($xres, $cset[1]);
+         $ret += $this->getBarSize($xres, $cset[2]);
+         $ret += $this->getBarSize($xres, $cset[3]);
+         $ret += $this->getBarSize($xres, $cset[4]);
+         $ret += $this->getBarSize($xres, $cset[5]);
       }
 
       // length of Check character
       $checkSize = 0;
-      $cset = $this->GetCheckCharValue();
+      $cset = $this->getCheckCharValue();
       for ($i=0; $i<6; $i++) {
-         $checkSize += $this->GetBarSize($cset[$i], $xres);
+         $checkSize += $this->getBarSize($cset[$i], $xres);
       }
 
       $startSize = 2*self:: DEFAULT_BAR_2*$xres + 3*self:: DEFAULT_BAR_1*$xres +   self:: DEFAULT_BAR_4*$xres;
@@ -64,7 +64,7 @@ abstract class BaseC128BarCode extends BarCode {
    /**
     *
     */
-   protected function GetBarSize($xres, $char) {
+   protected function getBarSize($xres, $char) {
       switch ($char) {
          case '1':
             $cVal = self:: DEFAULT_BAR_1;
@@ -87,6 +87,6 @@ abstract class BaseC128BarCode extends BarCode {
    /**
     *
     */
-   abstract protected function GetCheckCharValue();
+   abstract protected function getCheckCharValue();
 }
 ?>
