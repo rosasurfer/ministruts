@@ -5,9 +5,8 @@
  * http://www.ros.co.nz/pdf
  *
  * A PHP class to provide the basic functionality to create a PDF document without any requirement
- * for additional modules.
- * Note that the companion class SimplePdfDocument can be used to extend this class and dramatically
- * simplify the creation of documents.
+ * for additional modules.  Note that the companion class SimplePdfDocument can be used to extend
+ * this class and dramatically simplify the creation of documents.
  */
 class BasePdfDocument extends Object {
 
@@ -201,7 +200,7 @@ class BasePdfDocument extends Object {
     * Document object methods (internal use only)
     *
     * There is about one object method for each type of object in the pdf document
-    * Each function has the same call list ($id,$action,$options).
+    * Each function has the same call list ($id, $action, $options).
     * $id = the object ID of the object, or what it is to be if it is being created
     * $action = a string specifying the action to be performed, though ALL must support:
     *           'new' - create the object with the id $id
@@ -215,512 +214,531 @@ class BasePdfDocument extends Object {
    /**
     *destination object, used to specify the location for the user to jump to, presently on opening
     */
-   function o_destination($id,$action,$options=''){
-     if ($action!='new'){
-       $o =& $this->objects[$id];
-     }
-     switch($action){
-       case 'new':
-         $this->objects[$id]=array('t'=>'destination','info'=>array());
-         $tmp = '';
-         switch ($options['type']){
-           case 'XYZ':
-           case 'FitR':
-             $tmp =  ' '.$options['p3'].$tmp;
-           case 'FitH':
-           case 'FitV':
-           case 'FitBH':
-           case 'FitBV':
-             $tmp =  ' '.$options['p1'].' '.$options['p2'].$tmp;
-           case 'Fit':
-           case 'FitB':
-             $tmp =  $options['type'].$tmp;
-             $this->objects[$id]['info']['string']=$tmp;
-             $this->objects[$id]['info']['page']=$options['page'];
-         }
-         break;
-       case 'out':
-         $tmp = $o['info'];
-         $res="\n".$id." 0 obj\n".'['.$tmp['page'].' 0 R /'.$tmp['string']."]\nendobj\n";
-         return $res;
-         break;
-     }
+   function o_destination($id, $action, $options='') {
+      if ($action!='new')
+         $o =& $this->objects[$id];
+
+      switch ($action) {
+         case 'new':
+            $this->objects[$id]=array('t'=>'destination', 'info'=>array());
+            $tmp = '';
+            switch ($options['type']) {
+               case 'XYZ' :
+               case 'FitR':
+                  $tmp = ' '.$options['p3'].$tmp;
+               case 'FitH' :
+               case 'FitV' :
+               case 'FitBH':
+               case 'FitBV':
+                  $tmp = ' '.$options['p1'].' '.$options['p2'].$tmp;
+               case 'Fit' :
+               case 'FitB':
+                  $tmp = $options['type'].$tmp;
+                  $this->objects[$id]['info']['string'] = $tmp;
+                  $this->objects[$id]['info']['page'  ] = $options['page'];
+            }
+            break;
+
+         case 'out':
+            $tmp = $o['info'];
+            $res = "\n".$id." 0 obj\n".'['.$tmp['page'].' 0 R /'.$tmp['string']."]\nendobj\n";
+            return $res;
+      }
    }
 
    /**
     * set the viewer preferences
     */
-   function o_viewerPreferences($id,$action,$options=''){
-     if ($action!='new'){
-       $o =& $this->objects[$id];
-     }
-     switch ($action){
-       case 'new':
-         $this->objects[$id]=array('t'=>'viewerPreferences','info'=>array());
-         break;
-       case 'add':
-         foreach($options as $k=>$v){
-           switch ($k){
-             case 'HideToolbar':
-             case 'HideMenubar':
-             case 'HideWindowUI':
-             case 'FitWindow':
-             case 'CenterWindow':
-             case 'NonFullScreenPageMode':
-             case 'Direction':
-               $o['info'][$k]=$v;
-             break;
-           }
-         }
-         break;
-       case 'out':
+   function o_viewerPreferences($id,$action,$options='') {
+      if ($action!='new')
+         $o =& $this->objects[$id];
 
-         $res="\n".$id." 0 obj\n".'<< ';
-         foreach($o['info'] as $k=>$v){
-           $res.="\n/".$k.' '.$v;
-         }
-         $res.="\n>>\n";
-         return $res;
-         break;
-     }
+      switch ($action) {
+         case 'new':
+            $this->objects[$id]=array('t'=>'viewerPreferences','info'=>array());
+            break;
+
+         case 'add':
+            foreach ($options as $k => $v) {
+               switch ($k) {
+                  case 'HideToolbar':
+                  case 'HideMenubar':
+                  case 'HideWindowUI':
+                  case 'FitWindow':
+                  case 'CenterWindow':
+                  case 'NonFullScreenPageMode':
+                  case 'Direction':
+                     $o['info'][$k] = $v;
+                     break;
+               }
+            }
+            break;
+
+         case 'out':
+            $res="\n".$id." 0 obj\n".'<< ';
+            foreach ($o['info'] as $k => $v) {
+               $res.="\n/".$k.' '.$v;
+            }
+            $res.="\n>>\n";
+            return $res;
+      }
    }
 
    /**
     * define the document catalog, the overall controller for the document
     */
-   function o_catalog($id,$action,$options=''){
-     if ($action!='new'){
-       $o =& $this->objects[$id];
-     }
-     switch ($action){
-       case 'new':
-         $this->objects[$id]=array('t'=>'catalog','info'=>array());
-         $this->catalogId=$id;
-         break;
-       case 'outlines':
-       case 'pages':
-       case 'openHere':
-         $o['info'][$action]=$options;
-         break;
-       case 'viewerPreferences':
-         if (!isset($o['info']['viewerPreferences'])){
-           $this->numObj++;
-           $this->o_viewerPreferences($this->numObj,'new');
-           $o['info']['viewerPreferences']=$this->numObj;
-         }
-         $vp = $o['info']['viewerPreferences'];
-         $this->o_viewerPreferences($vp,'add',$options);
-         break;
-       case 'out':
-         $res="\n".$id." 0 obj\n".'<< /Type /Catalog';
-         foreach($o['info'] as $k=>$v){
-           switch($k){
-             case 'outlines':
-               $res.="\n".'/Outlines '.$v.' 0 R';
-               break;
-             case 'pages':
-               $res.="\n".'/Pages '.$v.' 0 R';
-               break;
-             case 'viewerPreferences':
-               $res.="\n".'/ViewerPreferences '.$o['info']['viewerPreferences'].' 0 R';
-               break;
-             case 'openHere':
-               $res.="\n".'/OpenAction '.$o['info']['openHere'].' 0 R';
-               break;
-           }
-         }
-         $res.=" >>\nendobj";
-         return $res;
-         break;
-     }
+   function o_catalog($id,$action,$options='') {
+      if ($action!='new')
+         $o =& $this->objects[$id];
+
+      switch ($action) {
+         case 'new':
+            $this->objects[$id]=array('t'=>'catalog','info'=>array());
+            $this->catalogId=$id;
+            break;
+
+         case 'outlines':
+         case 'pages':
+         case 'openHere':
+            $o['info'][$action] = $options;
+            break;
+
+         case 'viewerPreferences':
+            if (!isset($o['info']['viewerPreferences'])) {
+               $this->numObj++;
+               $this->o_viewerPreferences($this->numObj,'new');
+               $o['info']['viewerPreferences'] = $this->numObj;
+            }
+            $vp = $o['info']['viewerPreferences'];
+            $this->o_viewerPreferences($vp,'add',$options);
+            break;
+
+         case 'out':
+            $res="\n".$id." 0 obj\n".'<< /Type /Catalog';
+            foreach ($o['info'] as $k => $v) {
+               switch ($k) {
+                  case 'outlines':
+                     $res.="\n".'/Outlines '.$v.' 0 R';
+                     break;
+                  case 'pages':
+                     $res.="\n".'/Pages '.$v.' 0 R';
+                     break;
+                  case 'viewerPreferences':
+                     $res.="\n".'/ViewerPreferences '.$o['info']['viewerPreferences'].' 0 R';
+                     break;
+                  case 'openHere':
+                     $res.="\n".'/OpenAction '.$o['info']['openHere'].' 0 R';
+                     break;
+               }
+            }
+            $res.=" >>\nendobj";
+            return $res;
+      }
    }
 
    /**
     * object which is a parent to the pages in the document
     */
-   function o_pages($id,$action,$options=''){
-     if ($action!='new'){
-       $o =& $this->objects[$id];
-     }
-     switch ($action){
-       case 'new':
-         $this->objects[$id]=array('t'=>'pages','info'=>array());
-         $this->o_catalog($this->catalogId,'pages',$id);
-         break;
-       case 'page':
-         if (!is_array($options)){
-           // then it will just be the id of the new page
-           $o['info']['pages'][]=$options;
-         } else {
-           // then it should be an array having 'id','rid','pos', where rid=the page to which this one will be placed relative
-           // and pos is either 'before' or 'after', saying where this page will fit.
-           if (isset($options['id']) && isset($options['rid']) && isset($options['pos'])){
-             $i = array_search($options['rid'],$o['info']['pages']);
-             if (isset($o['info']['pages'][$i]) && $o['info']['pages'][$i]==$options['rid']){
-               // then there is a match
-               // make a space
-               switch ($options['pos']){
-                 case 'before':
-                   $k = $i;
-                   break;
-                 case 'after':
-                   $k=$i+1;
-                   break;
-                 default:
-                   $k=-1;
-                   break;
+   function o_pages($id,$action,$options='') {
+      if ($action!='new')
+         $o =& $this->objects[$id];
+
+      switch ($action) {
+         case 'new':
+            $this->objects[$id]=array('t'=>'pages','info'=>array());
+            $this->o_catalog($this->catalogId,'pages',$id);
+            break;
+
+         case 'page':
+            if (!is_array($options)) {
+               // then it will just be the id of the new page
+               $o['info']['pages'][]=$options;
+            }
+            else {
+               // then it should be an array having 'id','rid','pos', where rid=the page to which this one will be placed relative
+               // and pos is either 'before' or 'after', saying where this page will fit.
+               if (isset($options['id']) && isset($options['rid']) && isset($options['pos'])) {
+                  $i = array_search($options['rid'],$o['info']['pages']);
+                  if (isset($o['info']['pages'][$i]) && $o['info']['pages'][$i]==$options['rid']) {
+                     // then there is a match
+                     // make a space
+                     switch ($options['pos']) {
+                        case 'before':
+                           $k = $i;
+                           break;
+                        case 'after':
+                           $k = $i + 1;
+                           break;
+                        default:
+                           $k = -1;
+                           break;
+                     }
+                     if ($k>=0) {
+                        for ($j=count($o['info']['pages'])-1; $j>=$k; $j--) {
+                           $o['info']['pages'][$j+1] = $o['info']['pages'][$j];
+                        }
+                        $o['info']['pages'][$k] = $options['id'];
+                     }
+                  }
                }
-               if ($k>=0){
-                 for ($j=count($o['info']['pages'])-1;$j>=$k;$j--){
-                   $o['info']['pages'][$j+1]=$o['info']['pages'][$j];
-                 }
-                 $o['info']['pages'][$k]=$options['id'];
+            }
+            break;
+
+         case 'procset':
+            $o['info']['procset']=$options;
+            break;
+
+         case 'mediaBox':
+            $o['info']['mediaBox']=$options; // which should be an array of 4 numbers
+            break;
+
+         case 'font':
+            $o['info']['fonts'][]=array('objNum'=>$options['objNum'],'fontNum'=>$options['fontNum']);
+            break;
+
+         case 'xObject':
+            $o['info']['xObjects'][]=array('objNum'=>$options['objNum'],'label'=>$options['label']);
+            break;
+
+         case 'out':
+            if (count($o['info']['pages'])) {
+               $res = "\n".$id." 0 obj\n<< /Type /Pages\n/Kids [";
+               foreach ($o['info']['pages'] as $k => $v) {
+                  $res.=$v." 0 R\n";
                }
-             }
-           }
-         }
-         break;
-       case 'procset':
-         $o['info']['procset']=$options;
-         break;
-       case 'mediaBox':
-         $o['info']['mediaBox']=$options; // which should be an array of 4 numbers
-         break;
-       case 'font':
-         $o['info']['fonts'][]=array('objNum'=>$options['objNum'],'fontNum'=>$options['fontNum']);
-         break;
-       case 'xObject':
-         $o['info']['xObjects'][]=array('objNum'=>$options['objNum'],'label'=>$options['label']);
-         break;
-       case 'out':
-         if (count($o['info']['pages'])){
-           $res="\n".$id." 0 obj\n<< /Type /Pages\n/Kids [";
-           foreach($o['info']['pages'] as $k=>$v){
-             $res.=$v." 0 R\n";
-           }
-           $res.="]\n/Count ".count($this->objects[$id]['info']['pages']);
-           if ((isset($o['info']['fonts']) && count($o['info']['fonts'])) || isset($o['info']['procset'])){
-             $res.="\n/Resources <<";
-             if (isset($o['info']['procset'])){
-               $res.="\n/ProcSet ".$o['info']['procset']." 0 R";
-             }
-             if (isset($o['info']['fonts']) && count($o['info']['fonts'])){
-               $res.="\n/Font << ";
-               foreach($o['info']['fonts'] as $finfo){
-                 $res.="\n/F".$finfo['fontNum']." ".$finfo['objNum']." 0 R";
+               $res .= "]\n/Count ".count($this->objects[$id]['info']['pages']);
+               if ((isset($o['info']['fonts']) && count($o['info']['fonts'])) || isset($o['info']['procset'])) {
+                  $res.="\n/Resources <<";
+                  if (isset($o['info']['procset'])) {
+                     $res.="\n/ProcSet ".$o['info']['procset']." 0 R";
+                  }
+                  if (isset($o['info']['fonts']) && count($o['info']['fonts'])) {
+                     $res.="\n/Font << ";
+                     foreach ($o['info']['fonts'] as $finfo) {
+                        $res .= "\n/F".$finfo['fontNum']." ".$finfo['objNum']." 0 R";
+                     }
+                     $res.=" >>";
+                  }
+                  if (isset($o['info']['xObjects']) && count($o['info']['xObjects'])) {
+                     $res .= "\n/XObject << ";
+                     foreach ($o['info']['xObjects'] as $finfo) {
+                        $res .= "\n/".$finfo['label']." ".$finfo['objNum']." 0 R";
+                     }
+                     $res.=" >>";
+                  }
+                  $res.="\n>>";
+                  if (isset($o['info']['mediaBox'])) {
+                     $tmp = $o['info']['mediaBox'];
+                     $res .= "\n/MediaBox [".sprintf('%.3f',$tmp[0]).' '.sprintf('%.3f',$tmp[1]).' '.sprintf('%.3f',$tmp[2]).' '.sprintf('%.3f',$tmp[3]).']';
+                  }
                }
-               $res.=" >>";
-             }
-             if (isset($o['info']['xObjects']) && count($o['info']['xObjects'])){
-               $res.="\n/XObject << ";
-               foreach($o['info']['xObjects'] as $finfo){
-                 $res.="\n/".$finfo['label']." ".$finfo['objNum']." 0 R";
-               }
-               $res.=" >>";
-             }
-             $res.="\n>>";
-             if (isset($o['info']['mediaBox'])){
-               $tmp=$o['info']['mediaBox'];
-               $res.="\n/MediaBox [".sprintf('%.3f',$tmp[0]).' '.sprintf('%.3f',$tmp[1]).' '.sprintf('%.3f',$tmp[2]).' '.sprintf('%.3f',$tmp[3]).']';
-             }
-           }
-           $res.="\n >>\nendobj";
-         } else {
-           $res="\n".$id." 0 obj\n<< /Type /Pages\n/Count 0\n>>\nendobj";
-         }
-         return $res;
-       break;
-     }
+               $res.="\n >>\nendobj";
+            }
+            else {
+               $res = "\n".$id." 0 obj\n<< /Type /Pages\n/Count 0\n>>\nendobj";
+            }
+            return $res;
+      }
    }
 
    /**
     * define the outlines in the doc, empty for now
     */
-   function o_outlines($id,$action,$options=''){
-     if ($action!='new'){
-       $o =& $this->objects[$id];
-     }
-     switch ($action){
-       case 'new':
-         $this->objects[$id]=array('t'=>'outlines','info'=>array('outlines'=>array()));
-         $this->o_catalog($this->catalogId,'outlines',$id);
-         break;
-       case 'outline':
-         $o['info']['outlines'][]=$options;
-         break;
-       case 'out':
-         if (count($o['info']['outlines'])){
-           $res="\n".$id." 0 obj\n<< /Type /Outlines /Kids [";
-           foreach($o['info']['outlines'] as $k=>$v){
-             $res.=$v." 0 R ";
-           }
-           $res.="] /Count ".count($o['info']['outlines'])." >>\nendobj";
-         } else {
-           $res="\n".$id." 0 obj\n<< /Type /Outlines /Count 0 >>\nendobj";
-         }
-         return $res;
-         break;
-     }
+   function o_outlines($id,$action,$options='') {
+      if ($action!='new')
+         $o =& $this->objects[$id];
+
+      switch ($action) {
+         case 'new':
+            $this->objects[$id]=array('t'=>'outlines','info'=>array('outlines'=>array()));
+            $this->o_catalog($this->catalogId,'outlines',$id);
+            break;
+
+         case 'outline':
+            $o['info']['outlines'][]=$options;
+            break;
+
+         case 'out':
+            if (count($o['info']['outlines'])) {
+               $res = "\n".$id." 0 obj\n<< /Type /Outlines /Kids [";
+               foreach ($o['info']['outlines'] as $k=>$v) {
+                  $res.=$v." 0 R ";
+               }
+                  $res.="] /Count ".count($o['info']['outlines'])." >>\nendobj";
+            }
+            else {
+               $res = "\n".$id." 0 obj\n<< /Type /Outlines /Count 0 >>\nendobj";
+            }
+            return $res;
+      }
    }
 
    /**
     * an object to hold the font description
     */
-   function o_font($id,$action,$options=''){
-     if ($action!='new'){
-       $o =& $this->objects[$id];
-     }
-     switch ($action){
-       case 'new':
-         $this->objects[$id]=array('t'=>'font','info'=>array('name'=>$options['name'],'SubType'=>'Type1'));
-         $fontNum=$this->numFonts;
-         $this->objects[$id]['info']['fontNum']=$fontNum;
-         // deal with the encoding and the differences
-         if (isset($options['differences'])){
-           // then we'll need an encoding dictionary
-           $this->numObj++;
-           $this->o_fontEncoding($this->numObj,'new',$options);
-           $this->objects[$id]['info']['encodingDictionary']=$this->numObj;
-         } else if (isset($options['encoding'])){
-           // we can specify encoding here
-           switch($options['encoding']){
-             case 'WinAnsiEncoding':
-             case 'MacRomanEncoding':
-             case 'MacExpertEncoding':
-               $this->objects[$id]['info']['encoding']=$options['encoding'];
-               break;
-             case 'none':
-               break;
-             default:
+   function o_font($id,$action,$options='') {
+      if ($action!='new')
+         $o =& $this->objects[$id];
+
+      switch ($action) {
+         case 'new':
+            $this->objects[$id]=array('t'=>'font','info'=>array('name'=>$options['name'],'SubType'=>'Type1'));
+            $fontNum=$this->numFonts;
+            $this->objects[$id]['info']['fontNum']=$fontNum;
+            // deal with the encoding and the differences
+            if (isset($options['differences'])) {
+               // then we'll need an encoding dictionary
+               $this->numObj++;
+               $this->o_fontEncoding($this->numObj,'new',$options);
+               $this->objects[$id]['info']['encodingDictionary']=$this->numObj;
+            }
+            else if (isset($options['encoding'])) {
+               // we can specify encoding here
+               switch ($options['encoding']) {
+                  case 'WinAnsiEncoding':
+                  case 'MacRomanEncoding':
+                  case 'MacExpertEncoding':
+                     $this->objects[$id]['info']['encoding']=$options['encoding'];
+                     break;
+                  case 'none':
+                     break;
+                  default:
+                     $this->objects[$id]['info']['encoding']='WinAnsiEncoding';
+                     break;
+               }
+            }
+            else {
                $this->objects[$id]['info']['encoding']='WinAnsiEncoding';
-               break;
-           }
-         } else {
-           $this->objects[$id]['info']['encoding']='WinAnsiEncoding';
-         }
-         // also tell the pages node about the new font
-         $this->o_pages($this->currentNode,'font',array('fontNum'=>$fontNum,'objNum'=>$id));
-         break;
-       case 'add':
-         foreach ($options as $k=>$v){
-           switch ($k){
-             case 'BaseFont':
-               $o['info']['name'] = $v;
-               break;
-             case 'FirstChar':
-             case 'LastChar':
-             case 'Widths':
-             case 'FontDescriptor':
-             case 'SubType':
-             $this->addMessage('o_font '.$k." : ".$v);
-               $o['info'][$k] = $v;
-               break;
-           }
-        }
-         break;
-       case 'out':
-         $res="\n".$id." 0 obj\n<< /Type /Font\n/Subtype /".$o['info']['SubType']."\n";
-         $res.="/Name /F".$o['info']['fontNum']."\n";
-         $res.="/BaseFont /".$o['info']['name']."\n";
-         if (isset($o['info']['encodingDictionary'])){
-           // then place a reference to the dictionary
-           $res.="/Encoding ".$o['info']['encodingDictionary']." 0 R\n";
-         } else if (isset($o['info']['encoding'])){
-           // use the specified encoding
-           $res.="/Encoding /".$o['info']['encoding']."\n";
-         }
-         if (isset($o['info']['FirstChar'])){
-           $res.="/FirstChar ".$o['info']['FirstChar']."\n";
-         }
-         if (isset($o['info']['LastChar'])){
-           $res.="/LastChar ".$o['info']['LastChar']."\n";
-         }
-         if (isset($o['info']['Widths'])){
-           $res.="/Widths ".$o['info']['Widths']." 0 R\n";
-         }
-         if (isset($o['info']['FontDescriptor'])){
-           $res.="/FontDescriptor ".$o['info']['FontDescriptor']." 0 R\n";
-         }
-         $res.=">>\nendobj";
-         return $res;
-         break;
-     }
+            }
+            // also tell the pages node about the new font
+            $this->o_pages($this->currentNode,'font',array('fontNum'=>$fontNum,'objNum'=>$id));
+            break;
+
+         case 'add':
+            foreach ($options as $k=>$v) {
+               switch ($k) {
+                  case 'BaseFont':
+                     $o['info']['name'] = $v;
+                     break;
+                  case 'FirstChar':
+                  case 'LastChar':
+                  case 'Widths':
+                  case 'FontDescriptor':
+                  case 'SubType':
+                     $this->addMessage('o_font '.$k." : ".$v);
+                     $o['info'][$k] = $v;
+                     break;
+               }
+            }
+            break;
+
+         case 'out':
+            $res="\n".$id." 0 obj\n<< /Type /Font\n/Subtype /".$o['info']['SubType']."\n";
+            $res.="/Name /F".$o['info']['fontNum']."\n";
+            $res.="/BaseFont /".$o['info']['name']."\n";
+            if (isset($o['info']['encodingDictionary'])) {
+               // then place a reference to the dictionary
+               $res.="/Encoding ".$o['info']['encodingDictionary']." 0 R\n";
+            }
+            else if (isset($o['info']['encoding'])) {
+               // use the specified encoding
+               $res.="/Encoding /".$o['info']['encoding']."\n";
+            }
+            if (isset($o['info']['FirstChar'])) {
+               $res.="/FirstChar ".$o['info']['FirstChar']."\n";
+            }
+            if (isset($o['info']['LastChar'])) {
+               $res.="/LastChar ".$o['info']['LastChar']."\n";
+            }
+            if (isset($o['info']['Widths'])) {
+               $res.="/Widths ".$o['info']['Widths']." 0 R\n";
+            }
+            if (isset($o['info']['FontDescriptor'])) {
+               $res.="/FontDescriptor ".$o['info']['FontDescriptor']." 0 R\n";
+            }
+            $res.=">>\nendobj";
+            return $res;
+      }
    }
 
    /**
     * a font descriptor, needed for including additional fonts
     */
-   function o_fontDescriptor($id,$action,$options=''){
-     if ($action!='new'){
-       $o =& $this->objects[$id];
-     }
-     switch ($action){
-       case 'new':
-         $this->objects[$id]=array('t'=>'fontDescriptor','info'=>$options);
-         break;
-       case 'out':
-         $res="\n".$id." 0 obj\n<< /Type /FontDescriptor\n";
-         foreach ($o['info'] as $label => $value){
-           switch ($label){
-             case 'Ascent':
-             case 'CapHeight':
-             case 'Descent':
-             case 'Flags':
-             case 'ItalicAngle':
-             case 'StemV':
-             case 'AvgWidth':
-             case 'Leading':
-             case 'MaxWidth':
-             case 'MissingWidth':
-             case 'StemH':
-             case 'XHeight':
-             case 'CharSet':
-               if (strlen($value)){
-                 $res.='/'.$label.' '.$value."\n";
+   function o_fontDescriptor($id,$action,$options='') {
+      if ($action!='new')
+         $o =& $this->objects[$id];
+
+      switch ($action) {
+         case 'new':
+            $this->objects[$id]=array('t'=>'fontDescriptor','info'=>$options);
+            break;
+
+         case 'out':
+            $res="\n".$id." 0 obj\n<< /Type /FontDescriptor\n";
+            foreach ($o['info'] as $label => $value) {
+               switch ($label) {
+                  case 'Ascent':
+                  case 'CapHeight':
+                  case 'Descent':
+                  case 'Flags':
+                  case 'ItalicAngle':
+                  case 'StemV':
+                  case 'AvgWidth':
+                  case 'Leading':
+                  case 'MaxWidth':
+                  case 'MissingWidth':
+                  case 'StemH':
+                  case 'XHeight':
+                  case 'CharSet':
+                     if (strlen($value)) {
+                        $res.='/'.$label.' '.$value."\n";
+                     }
+                     break;
+                  case 'FontFile':
+                  case 'FontFile2':
+                  case 'FontFile3':
+                     $res.='/'.$label.' '.$value." 0 R\n";
+                     break;
+                  case 'FontBBox':
+                     $res.='/'.$label.' ['.$value[0].' '.$value[1].' '.$value[2].' '.$value[3]."]\n";
+                     break;
+                  case 'FontName':
+                     $res.='/'.$label.' /'.$value."\n";
+                     break;
                }
-               break;
-             case 'FontFile':
-             case 'FontFile2':
-             case 'FontFile3':
-               $res.='/'.$label.' '.$value." 0 R\n";
-               break;
-             case 'FontBBox':
-               $res.='/'.$label.' ['.$value[0].' '.$value[1].' '.$value[2].' '.$value[3]."]\n";
-               break;
-             case 'FontName':
-               $res.='/'.$label.' /'.$value."\n";
-               break;
-           }
-         }
-         $res.=">>\nendobj";
-         return $res;
-         break;
-     }
+            }
+            $res.=">>\nendobj";
+            return $res;
+      }
    }
 
    /**
     * the font encoding
     */
-   function o_fontEncoding($id,$action,$options=''){
-     if ($action!='new'){
-       $o =& $this->objects[$id];
-     }
-     switch ($action){
-       case 'new':
-         // the options array should contain 'differences' and maybe 'encoding'
-         $this->objects[$id]=array('t'=>'fontEncoding','info'=>$options);
-         break;
-       case 'out':
-         $res="\n".$id." 0 obj\n<< /Type /Encoding\n";
-         if (!isset($o['info']['encoding'])){
-           $o['info']['encoding']='WinAnsiEncoding';
-         }
-         if ($o['info']['encoding']!='none'){
-           $res.="/BaseEncoding /".$o['info']['encoding']."\n";
-         }
-         $res.="/Differences \n[";
-         $onum=-100;
-         foreach($o['info']['differences'] as $num=>$label){
-           if ($num!=$onum+1){
-             // we cannot make use of consecutive numbering
-             $res.= "\n".$num." /".$label;
-           } else {
-             $res.= " /".$label;
-           }
-           $onum=$num;
-         }
-         $res.="\n]\n>>\nendobj";
-         return $res;
-         break;
-     }
+   function o_fontEncoding($id,$action,$options='') {
+      if ($action!='new')
+         $o =& $this->objects[$id];
+
+      switch ($action) {
+         case 'new':
+            // the options array should contain 'differences' and maybe 'encoding'
+            $this->objects[$id]=array('t'=>'fontEncoding','info'=>$options);
+            break;
+
+         case 'out':
+            $res="\n".$id." 0 obj\n<< /Type /Encoding\n";
+            if (!isset($o['info']['encoding'])) {
+               $o['info']['encoding']='WinAnsiEncoding';
+            }
+            if ($o['info']['encoding']!='none') {
+               $res.="/BaseEncoding /".$o['info']['encoding']."\n";
+            }
+            $res.="/Differences \n[";
+            $onum=-100;
+            foreach ($o['info']['differences'] as $num=>$label) {
+               if ($num!=$onum+1) {
+                  // we cannot make use of consecutive numbering
+                  $res.= "\n".$num." /".$label;
+               }
+               else {
+                  $res.= " /".$label;
+               }
+               $onum=$num;
+            }
+            $res.="\n]\n>>\nendobj";
+            return $res;
+      }
    }
 
    /**
     * the document procset, solves some problems with printing to old PS printers
     */
-   function o_procset($id,$action,$options=''){
-     if ($action!='new'){
-       $o =& $this->objects[$id];
-     }
-     switch ($action){
-       case 'new':
-         $this->objects[$id]=array('t'=>'procset','info'=>array('PDF'=>1,'Text'=>1));
-         $this->o_pages($this->currentNode,'procset',$id);
-         $this->procsetObjectId=$id;
-         break;
-       case 'add':
-         // this is to add new items to the procset list, despite the fact that this is considered
-         // obselete, the items are required for printing to some postscript printers
-         switch ($options) {
-           case 'ImageB':
-           case 'ImageC':
-           case 'ImageI':
-             $o['info'][$options]=1;
-             break;
-         }
-         break;
-       case 'out':
-         $res="\n".$id." 0 obj\n[";
-         foreach ($o['info'] as $label=>$val){
-           $res.='/'.$label.' ';
-         }
-         $res.="]\nendobj";
-         return $res;
-         break;
-     }
+   function o_procset($id,$action,$options='') {
+      if ($action!='new')
+         $o =& $this->objects[$id];
+
+      switch ($action) {
+         case 'new':
+            $this->objects[$id]=array('t'=>'procset','info'=>array('PDF'=>1,'Text'=>1));
+            $this->o_pages($this->currentNode,'procset',$id);
+            $this->procsetObjectId=$id;
+            break;
+
+         case 'add':
+            // this is to add new items to the procset list, despite the fact that this is considered
+            // obselete, the items are required for printing to some postscript printers
+            switch ($options) {
+               case 'ImageB':
+               case 'ImageC':
+               case 'ImageI':
+                  $o['info'][$options]=1;
+                  break;
+            }
+            break;
+
+         case 'out':
+            $res="\n".$id." 0 obj\n[";
+            foreach ($o['info'] as $label=>$val) {
+               $res.='/'.$label.' ';
+            }
+            $res.="]\nendobj";
+            return $res;
+      }
    }
 
    /**
     * define the document information
     */
-   function o_info($id,$action,$options=''){
-     if ($action!='new'){
-       $o =& $this->objects[$id];
-     }
-     switch ($action){
-       case 'new':
-         $this->infoObject=$id;
-         $date='D:'.date('Ymd');
-         $this->objects[$id]=array('t'=>'info','info'=>array('Creator'=>'R and OS php pdf writer, http://www.ros.co.nz','CreationDate'=>$date));
-         break;
-       case 'Title':
-       case 'Author':
-       case 'Subject':
-       case 'Keywords':
-       case 'Creator':
-       case 'Producer':
-       case 'CreationDate':
-       case 'ModDate':
-       case 'Trapped':
-         $o['info'][$action]=$options;
-         break;
-       case 'out':
-         if ($this->encrypted){
-           $this->encryptInit($id);
-         }
-         $res="\n".$id." 0 obj\n<<\n";
-         foreach ($o['info']  as $k=>$v){
-           $res.='/'.$k.' (';
-           if ($this->encrypted){
-             $res.=$this->filterText($this->ARC4($v));
-           } else {
-             $res.=$this->filterText($v);
-           }
-           $res.=")\n";
-         }
-         $res.=">>\nendobj";
-         return $res;
-         break;
-     }
+   function o_info($id,$action,$options='') {
+      if ($action!='new')
+         $o =& $this->objects[$id];
+
+      switch ($action) {
+         case 'new':
+            $this->infoObject=$id;
+            $date='D:'.date('Ymd');
+            $this->objects[$id]=array('t'=>'info','info'=>array('Creator'=>'R and OS php pdf writer, http://www.ros.co.nz','CreationDate'=>$date));
+            break;
+
+         case 'Title':
+         case 'Author':
+         case 'Subject':
+         case 'Keywords':
+         case 'Creator':
+         case 'Producer':
+         case 'CreationDate':
+         case 'ModDate':
+         case 'Trapped':
+            $o['info'][$action]=$options;
+            break;
+
+         case 'out':
+            if ($this->encrypted) {
+               $this->encryptInit($id);
+            }
+            $res="\n".$id." 0 obj\n<<\n";
+            foreach ($o['info']  as $k=>$v) {
+               $res.='/'.$k.' (';
+               if ($this->encrypted) {
+                  $res.=$this->filterText($this->ARC4($v));
+               }
+               else {
+                  $res.=$this->filterText($v);
+               }
+               $res.=")\n";
+            }
+            $res.=">>\nendobj";
+            return $res;
+      }
    }
 
    /**
     * an action object, used to link to URLS initially
     */
    function o_action($id,$action,$options=''){
-     if ($action!='new'){
+     if ($action!='new')
        $o =& $this->objects[$id];
-     }
+
      switch ($action){
        case 'new':
          if (is_array($options)){
@@ -761,9 +779,9 @@ class BasePdfDocument extends Object {
     * initially will support just link annotations
     */
    function o_annotation($id,$action,$options=''){
-     if ($action!='new'){
+     if ($action!='new')
        $o =& $this->objects[$id];
-     }
+
      switch ($action){
        case 'new':
          // add the annotation to the current page
@@ -813,9 +831,9 @@ class BasePdfDocument extends Object {
     * a page object, it also creates a contents object to hold its contents
     */
    function o_page($id,$action,$options=''){
-     if ($action!='new'){
+     if ($action!='new')
        $o =& $this->objects[$id];
-     }
+
      switch ($action){
        case 'new':
          $this->numPages++;
@@ -882,9 +900,9 @@ class BasePdfDocument extends Object {
     * the contents objects hold all of the content which appears on pages
     */
    function o_contents($id,$action,$options=''){
-     if ($action!='new'){
+     if ($action!='new')
        $o =& $this->objects[$id];
-     }
+
      switch ($action){
        case 'new':
          $this->objects[$id]=array('t'=>'contents','c'=>'','info'=>array());
@@ -932,9 +950,9 @@ class BasePdfDocument extends Object {
     * an image object, will be an XObject in the document, includes description and data
     */
    function o_image($id,$action,$options=''){
-     if ($action!='new'){
+     if ($action!='new')
        $o =& $this->objects[$id];
-     }
+
      switch($action){
        case 'new':
          // make the new object
@@ -1007,9 +1025,9 @@ class BasePdfDocument extends Object {
     * encryption object.
     */
    function o_encryption($id,$action,$options=''){
-     if ($action!='new'){
+     if ($action!='new')
        $o =& $this->objects[$id];
-     }
+
      switch($action){
        case 'new':
          // make the new object
