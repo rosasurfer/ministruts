@@ -2662,7 +2662,7 @@ class BasePdfDocument extends Object {
    /**
     * Add a PNG image from a string containing binary data.
     */
-   function addPngFromString($data, $x, $y, $w=0, $h=0) {
+   public function addPngFromString($data, $x, $y, $w=0, $h=0) {
       $this->addPngImage_common($data, 'binary_string', $x, $y, $w, $h);
    }
 
@@ -2670,40 +2670,40 @@ class BasePdfDocument extends Object {
     * Add a PNG image from a file into the document. Searches the include_path if the file is not found.
     * This should work with remote files.
     */
-   function addPngFromFile($file, $x, $y, $w=0, $h=0) {
+   public function addPngFromFile($filename, $x, $y, $w=0, $h=0) {
       // search the include_path if the file cannot be found
-      if (!is_file($file)) {
+      if (!is_file($filename)) {
          $paths = explode(PATH_SEPARATOR, ini_get('include_path'));
          $found = null;
          foreach ($paths as $path) {
-            if (is_file($path.DIRECTORY_SEPARATOR.$file)) {
-               $found = $path.DIRECTORY_SEPARATOR.$file;
+            if (is_file($path.DIRECTORY_SEPARATOR.$filename)) {
+               $found = $path.DIRECTORY_SEPARATOR.$filename;
                break;
             }
          }
          if ($found === null)
-            throw new RuntimeException('File not found: '.$file);
-         $file = $found;
+            throw new RuntimeException('File not found: '.$filename);
+         $filename = $found;
       }
 
       // read in the file
       $tmp = get_magic_quotes_runtime();
       set_magic_quotes_runtime(0);
 
-      $fp = fopen($file, 'rb');
+      $fp = fOpen($filename, 'rb');
       $data = '';
-      while (!feof($fp)) {
-         $data .= fread($fp, 1024);
+      while (!fEof($fp)) {
+         $data .= fRead($fp, 1024);
       }
-      fclose($fp);
+      fClose($fp);
       set_magic_quotes_runtime($tmp);
-      $this->addPngImage_common($data, $file, $x, $y, $w, $h);
+      $this->addPngImage_common($data, $filename, $x, $y, $w, $h);
    }
 
    /**
     * common code used by the two PNG adding functions
     */
-   function addPngImage_common($data, $name, $x, $y, $w=0, $h=0) {
+   private function addPngImage_common($data, $name, $x, $y, $w=0, $h=0) {
       // note that this function is not to be called externally
 
       // interpret the image data, then add the image to the system
@@ -2857,7 +2857,7 @@ class BasePdfDocument extends Object {
    /**
     * Add a JPEG image from a file into the document. Searches the include_path if the file is not found.
     */
-   function addJpegFromFile($file, $x, $y, $w=0, $h=0) {
+   public function addJpegFromFile($file, $x, $y, $w=0, $h=0) {
       // Attempt to add a jpeg image straight from a file, using no GD commands.
       // Note that this function is unable to operate on a remote file.
       if (!is_file($file)) {
@@ -2898,11 +2898,11 @@ class BasePdfDocument extends Object {
    }
 
    /**
-    * add an image into the document, from a GD object
-    * this function is not all that reliable, and I would probably encourage people to use
-    * the file based functions
+    * Add an image into the document from a GD object.
+    * This function is not all that reliable, and I would probably encourage people to use
+    * the file based functions.
     */
-   function addImage(&$img,$x,$y,$w=0,$h=0,$quality=75){
+   function addImage(&$img, $x, $y, $w=0, $h=0, $quality=75) {
      // add a new image into the current location, as an external object
      // add the image at $x,$y, and with width and height as defined by $w & $h
 
@@ -2911,49 +2911,37 @@ class BasePdfDocument extends Object {
 
      // there seems to be some problem here in that images that have quality set above 75 do not appear
      // not too sure why this is, but in the meantime I have restricted this to 75.
-     if ($quality>75){
-       $quality=75;
-     }
+     if ($quality > 75)
+       $quality = 75;
 
      // if the width or height are set to zero, then set the other one based on keeping the image
-     // height/width ratio the same, if they are both zero, then give up :)
-     $imageWidth=imagesx($img);
-     $imageHeight=imagesy($img);
+     // height/width ratio the same.
+     $imageWidth  = imagesX($img);
+     $imageHeight = imagesY($img);
 
-     if ($w<=0 && $h<=0){
-       return;
-     }
-     if ($w==0){
-       $w=$h/$imageHeight*$imageWidth;
-     }
-     if ($h==0){
-       $h=$w*$imageHeight/$imageWidth;
-     }
+     if ($w <= 0 && $h <= 0) $w = $imageWidth;
+     if ($w <= 0)            $w = $h / $imageHeight * $imageWidth;
+     if ($h <= 0)            $h = $w / $imageWidth * $imageHeight;
 
      // gotta get the data out of the img..
-
      // so I write to a temp file, and then read it back.. soo ugly, my apologies.
-     $tmpDir='/tmp';
-     $tmpName=tempnam($tmpDir,'img');
-     imagejpeg($img,$tmpName,$quality);
-     $fp=fopen($tmpName,'rb');
+     $tmpDir = '/tmp';
+     $tmpName = tempNam($tmpDir, 'img_'.__CLASS__);
+     imageJpeg($img, $tmpName, $quality);
+     $fp = fOpen($tmpName, 'rb');
 
      $tmp = get_magic_quotes_runtime();
      set_magic_quotes_runtime(0);
-     $fp = fopen($tmpName,'rb');
-     if ($fp){
-       $data='';
-       while(!feof($fp)){
-         $data .= fread($fp,1024);
-       }
-       fclose($fp);
-     } else {
-       $error = 1;
-       $errormsg = 'trouble opening file';
+     $fp = fOpen($tmpName, 'rb');
+     $data='';
+     while(!fEOF($fp)){
+       $data .= fRead($fp,1024);
      }
-   //  $data = fread($fp,filesize($tmpName));
+     fClose($fp);
+
+     // $data = fRead($fp,filesize($tmpName));
      set_magic_quotes_runtime($tmp);
-   //  fclose($fp);
+     // fClose($fp);
      unlink($tmpName);
      $this->addJpegImage_common($data,$x,$y,$w,$h,$imageWidth,$imageHeight);
    }
