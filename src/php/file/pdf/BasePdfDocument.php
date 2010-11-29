@@ -1254,10 +1254,8 @@ class BasePdfDocument extends Object {
     * intialize a new document
     * if this is called on an existing document results may be unpredictable, but the existing document would be lost at minimum
     * this function is called automatically by the constructor function
-    *
-    * @access private
     */
-   function newDocument($pageSize=array(0,0,612,792)){
+   private function newDocument($pageSize=array(0,0,612,792)){
      $this->numObj=0;
      $this->objects = array();
 
@@ -1293,10 +1291,8 @@ class BasePdfDocument extends Object {
     * Note that if a php serialized version does not exist it will try and make one, but will
     * require write access to the directory to do it. It is MUCH faster to have these serialized
     * files.
-    *
-    * @access private
     */
-   function openFont($font) {
+   private function openFont($font) {
       // assume that $font contains both the path and perhaps the extension to the file, split them
       $pos = strRPos($font,'/');
       if ($pos === false) {
@@ -1629,10 +1625,8 @@ class BasePdfDocument extends Object {
     * If the user calls selectFont themselves then that will reset the currentBaseFont, and the currentFont
     * This function will change the currentFont to whatever it should be, but will not change the
     * currentBaseFont.
-    *
-    * @access private
     */
-   function setCurrentFont(){
+   private function setCurrentFont(){
      if (strlen($this->currentBaseFont)==0){
        // then assume an initial font
        $this->selectFont('Helvetica');
@@ -1666,10 +1660,8 @@ class BasePdfDocument extends Object {
 
    /**
     * add content to the currently active object
-    *
-    * @access private
     */
-   function addContent($content){
+   private function addContent($content){
      $this->objects[$this->currentContents]['c'].=$content;
    }
 
@@ -1976,10 +1968,8 @@ class BasePdfDocument extends Object {
    /**
     * filter the text, this is applied to all text just before being inserted into the pdf document
     * it escapes the various things that need to be escaped, and so on
-    *
-    * @access private
     */
-   function filterText($text){
+   private function filterText($text){
      $text = str_replace('\\','\\\\',$text);
      $text = str_replace('(','\(',$text);
      $text = str_replace(')','\)',$text);
@@ -1995,10 +1985,8 @@ class BasePdfDocument extends Object {
    /**
     * given a start position and information about how text is to be laid out, calculate where
     * on the page the text will end
-    *
-    * @access private
     */
-   function PRVTgetTextPosition($x,$y,$angle,$size,$wa,$text){
+   private function PRVTgetTextPosition($x,$y,$angle,$size,$wa,$text){
      // given this information return an array containing x and y for the end position as elements 0 and 1
      $w = $this->getTextWidth($size,$text);
      // need to adjust for the number of spaces in this text
@@ -2011,10 +1999,8 @@ class BasePdfDocument extends Object {
 
    /**
     * wrapper function for PRVTcheckTextDirective1
-    *
-    * @access private
     */
-   function PRVTcheckTextDirective(&$text,$i,&$f){
+   private function PRVTcheckTextDirective(&$text,$i,&$f){
      $x=0;
      $y=0;
      return $this->PRVTcheckTextDirective1($text,$i,$f,0,$x,$y);
@@ -2026,10 +2012,8 @@ class BasePdfDocument extends Object {
     * this has been re-worked to include everything neccesary to fins the current writing point, so that
     * the location can be sent to the callback function if required
     * if the directive does not require a font change, then $f should be set to 0
-    *
-    * @access private
     */
-   function PRVTcheckTextDirective1(&$text,$i,&$f,$final,&$x,&$y,$size=0,$angle=0,$wordSpaceAdjust=0){
+   private function PRVTcheckTextDirective1(&$text,$i,&$f,$final,&$x,&$y,$size=0,$angle=0,$wordSpaceAdjust=0){
      $directive = 0;
      $j=$i;
      if ($text[$j]=='<'){
@@ -2323,10 +2307,8 @@ class BasePdfDocument extends Object {
 
    /**
     * do a part of the calculation for sorting out the justification of the text
-    *
-    * @access private
     */
-   function PRVTadjustWrapText($text,$actual,$width,&$x,&$adjust,$justification){
+   private function PRVTadjustWrapText($text,$actual,$width,&$x,&$adjust,$justification){
      switch ($justification){
        case 'left':
          return;
@@ -2648,10 +2630,8 @@ class BasePdfDocument extends Object {
 
    /**
     * extract an integer from a position in a byte stream
-    *
-    * @access private
     */
-   function PRVT_getBytes(&$data,$pos,$num){
+   private function PRVT_getBytes(&$data,$pos,$num){
      // return the integer represented by $num bytes from $pos within $data
      $ret=0;
      for ($i=0;$i<$num;$i++){
@@ -2965,8 +2945,6 @@ class BasePdfDocument extends Object {
 
    /**
     * common code used by the two JPEG adding functions
-    *
-    * @access private
     */
    private function addJpegImage_common(&$data, $x, $y, $w=0, $h=0, $imageWidth, $imageHeight, $channels=3) {
      // note that this function is not to be called externally
