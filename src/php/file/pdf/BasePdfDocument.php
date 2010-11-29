@@ -2855,7 +2855,7 @@ class BasePdfDocument extends Object {
     */
    function addJpegFromFile($file, $x, $y, $w=0, $h=0) {
       // Attempt to add a jpeg image straight from a file, using no GD commands.
-      // Note that this function is unable to operate on a remote files.
+      // Note that this function is unable to operate on a remote file.
       if (!is_file($file)) {
          $paths = explode(PATH_SEPARATOR, ini_get('include_path'));
          $found = null;
@@ -2970,7 +2970,7 @@ class BasePdfDocument extends Object {
     *
     * @access private
     */
-   private function addJpegImage_common(&$data,$x,$y,$w=0,$h=0,$imageWidth,$imageHeight,$channels=3){
+   private function addJpegImage_common(&$data, $x, $y, $w=0, $h=0, $imageWidth, $imageHeight, $channels=3) {
      // note that this function is not to be called externally
      // it is just the common code between the GD and the file options
      $this->numImages++;
