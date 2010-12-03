@@ -284,18 +284,38 @@ abstract class BarCode extends Object {
    }
 
    /**
+    *
     */
    public function toString() {
       if (!$this->isRendered)
          $this->render();
 
-      if (ob_start()) {
+      static $data = null;
+
+      if ($data===null && ob_start()) {
          if      ($this->style & self:: STYLE_IMAGE_PNG ) imagePng($this->hImg);
          else if ($this->style & self:: STYLE_IMAGE_JPEG) imageJpeg($this->hImg);
-         $content = ob_get_clean();
-         return $content;
+         $data = ob_get_clean();
       }
-      return null;
+
+      return $data;
+   }
+
+   /**
+    * Save the barcode image in a file.
+    *
+    * @param  string $filename - filename
+    *
+    * @return BarCode instance
+    */
+   public function safeAs($filename) {
+      if (!is_string($filename)) throw new IllegalTypeException('Illegal type of parameter $filename: '.getType($filename));
+
+      $fH = fOpen($filename, 'xb');
+      fWrite($fH, $this->toString());
+      fClose($fH);
+
+      return $this;
    }
 
    /**
