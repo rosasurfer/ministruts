@@ -308,7 +308,7 @@ abstract class BarCode extends Object {
     *
     * @return BarCode instance
     */
-   public function safeAs($filename) {
+   public function saveAs($filename) {
       if (!is_string($filename)) throw new IllegalTypeException('Illegal type of parameter $filename: '.getType($filename));
 
       $fH = fOpen($filename, 'xb');
