@@ -222,12 +222,15 @@ abstract class DB extends Object {
    /**
     * Befindet sich der Connector in GENAU einer Transaktion, wird diese Transaktion zurückgerollt.
     * Befindet er sich in einer verschachtelten Transaktion, wird der Aufruf ignoriert.
+    * Ist keine Transaktion aktiv, wird je nach dem Wert von Parameter $silent eine Logmessage generiert.
     *
+    * @param  bool $silent - TRUE:  es wird keine Logmessage generiert
+    *                        FALSE: es wird eine Logmessage generiert (default)
     * @return DB
     */
-   public function rollback() {
+   public function rollback($silent = false) {
       if ($this->transaction < 1) {
-         Logger ::log('No database transaction to roll back', L_NOTICE, __CLASS__);
+         if (!$silent) Logger ::log('No database transaction to roll back', L_NOTICE, __CLASS__);
       }
       else {
          if ($this->transaction == 1)
