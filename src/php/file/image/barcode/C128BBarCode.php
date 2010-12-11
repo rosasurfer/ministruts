@@ -10,7 +10,7 @@
 
 class C128BBarCode extends BaseC128BarCode {
 
-   protected /*string*/   $chars = " !\"#$%&'()*+´-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{ }~";
+   protected /*string*/   $chars   = ' !"#$%&\'()*+´-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{ }~';
 
    protected /*string[]*/ $charSet = array('212222',   //  00
                                            '222122',   //  01
