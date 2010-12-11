@@ -1,12 +1,16 @@
 <?
 /**
- * Inkludiert die gesamte MiniStruts-Library.
+ * Inkludiert die MiniStruts-Library.
  *
- * Systemvoraussetzung: PHP 5.2+
+ * Systemvoraussetzung: PHP 5.2.1+
  */
+if (PHP_VERSION < '5.2.1') {
+   echo("Warning: You are working with a buggy PHP version (at least version 5.2.1 is needed).\nAll the hunnies are hollering.");
+}
 
-// Errorhandler registrieren (anonym, damit die Klasse nicht schon hier included wird)
-// -----------------------------------------------------------------------------------
+
+// Errorhandler anonym registrieren, damit die Klasse nicht schon hier geladen wird
+// --------------------------------------------------------------------------------
 set_error_handler    (create_function('$level, $message, $file, $line, array $context', 'return Logger::handleError($level, $message, $file, $line, $context);'));
 set_exception_handler(create_function('Exception $exception'                          , 'return Logger::handleException($exception);'                          ));
 

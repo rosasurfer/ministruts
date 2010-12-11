@@ -15,7 +15,7 @@ class C39BarCode extends BarCode {
    const /*int*/ DEFAULT_WIDE_BAR   = 2;
 
 
-   private /*string*/   $chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. *$/+%';
+   private /*string*/   $chars   = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. *$/+%';
 
    private /*string[]*/ $charSet = array('000110100',    //  0
                                          '100100001',    //  1
