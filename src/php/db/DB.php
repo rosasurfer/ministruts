@@ -229,6 +229,8 @@ abstract class DB extends Object {
     * @return DB
     */
    public function rollback($silent = false) {
+      if (!is_bool($silent)) throw new IllegalTypeException('Illegal type of parameter $silent: '.getType($silent));
+
       if ($this->transaction < 1) {
          if (!$silent) Logger ::log('No database transaction to roll back', L_NOTICE, __CLASS__);
       }
