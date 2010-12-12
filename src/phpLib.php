@@ -12,15 +12,15 @@ if (PHP_VERSION < '5.2.1') {
 // Errorhandler anonym registrieren, damit die Klasse nicht schon hier geladen wird
 // --------------------------------------------------------------------------------
 set_error_handler    (create_function('$level, $message, $file, $line, array $context', 'return Logger::handleError($level, $message, $file, $line, $context);'));
-set_exception_handler(create_function('Exception $exception'                          , 'return Logger::handleException($exception);'                          ));
+set_exception_handler(create_function('Exception $exception'                          , 'Logger::handleException($exception); exit(1);'                        ));   // exit code = 1 forcieren
 
 
-// Beginn des Shutdowns markieren (um fatale Fehler beim Shutdown zu verhindern; siehe Logger)
+// Beginn des Shutdowns markieren (um fatale Fehler beim Shutdown zu verhindern, siehe Logger)
 // -------------------------------------------------------------------------------------------
-register_shutdown_function(create_function(null, '$GLOBALS[\'$__shutting_down\'] = true;'));    // wird als erste Shutdown-Funktion ausgeführt
+register_shutdown_function(create_function(null, '$GLOBALS[\'$__shutting_down\'] = true;'));    // allererste Funktion auf dem Shutdown-Funktion-Stack
 
 
-// -----------------------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // ggf. Profiler starten
 if (extension_loaded('APD') && isSet($_REQUEST['_PROFILE_'])) {
    $dumpFile = apd_set_pprof_trace(ini_get('apd.dumpdir'));
@@ -221,6 +221,7 @@ function __autoload($className /*, $throw */) {
       if (func_num_args() > 1)         // Exceptions nur bei manuellem Aufruf werfen
          throw $ex;
       Logger ::handleException($ex);   // Aufruf durch den PHP-Kernel: Exception manuell verarbeiten
+      exit(1);
    }                                   // (__autoload darf keine Exceptions werfen)
    return false;
 }
