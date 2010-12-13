@@ -183,37 +183,41 @@ abstract class DB extends Object {
 
 
    /**
-    * Befindet sich der Connector nicht in einer Transaktion, wird eine neue Transaktion gestartet.
-    * Befindet er sich bereits in einer Transaktion, wird statt dessen nur der Transaktionszähler
-    * um eins erhöht.
+    * Befindet sich der Connector in *keiner* Transaktion, wird eine neue Transaktion gestartet und der Transaktionszähler erhöht.
+    * Befindet er sich bereits in einer Transaktion, wird nur der Transaktionszähler erhöht.
     *
     * @return DB
     */
    public function begin() {
-      if (!$this->transaction)
+      if ($this->transaction < 0)
+         throw new RuntimeException('Negative transaction counter detected: '.$this->transaction);
+
+      if ($this->transaction == 0)
          $this->queryRaw('start transaction');
 
-      ++$this->transaction;
+      $this->transaction++;
       return $this;
    }
 
 
    /**
-    * Befindet sich der Connector in GENAU einer Transaktion, wird diese Transaktion abgeschlossen.
-    * Befindet er sich in einer verschachtelten Transaktion, wird nur der Transaktionszähler um eins
-    * heruntergezählt.
+    * Befindet sich der Connector in genau *einer* Transaktion, wird diese Transaktion abgeschlossen.
+    * Befindet er sich in einer verschachtelten Transaktion, wird nur der Transaktionszähler heruntergezählt.
     *
     * @return DB
     */
    public function commit() {
-      if ($this->transaction < 1) {
-         Logger ::log('No database transaction to commit', L_NOTICE, __CLASS__);
+      if ($this->transaction < 0)
+         throw new RuntimeException('Negative transaction counter detected: '.$this->transaction);
+
+      if ($this->transaction == 0) {
+         Logger ::log('No database transaction to commit', L_WARN, __CLASS__);
       }
       else {
          if ($this->transaction == 1)
             $this->queryRaw('commit');
 
-         --$this->transaction;
+         $this->transaction--;
       }
       return $this;
    }
@@ -222,23 +226,21 @@ abstract class DB extends Object {
    /**
     * Befindet sich der Connector in GENAU einer Transaktion, wird diese Transaktion zurückgerollt.
     * Befindet er sich in einer verschachtelten Transaktion, wird der Aufruf ignoriert.
-    * Ist keine Transaktion aktiv, wird je nach dem Wert von Parameter $silent eine Logmessage generiert.
     *
-    * @param  bool $silent - TRUE:  es wird keine Logmessage generiert
-    *                        FALSE: es wird eine Logmessage generiert (default)
     * @return DB
     */
-   public function rollback($silent = false) {
-      if (!is_bool($silent)) throw new IllegalTypeException('Illegal type of parameter $silent: '.getType($silent));
+   public function rollback() {
+      if ($this->transaction < 0)
+         throw new RuntimeException('Negative transaction counter detected: '.$this->transaction);
 
-      if ($this->transaction < 1) {
-         if (!$silent) Logger ::log('No database transaction to roll back', L_NOTICE, __CLASS__);
+      if ($this->transaction == 0) {
+         Logger ::log('No database transaction to roll back', L_WARN, __CLASS__);
       }
       else {
          if ($this->transaction == 1)
             $this->queryRaw('rollback');
 
-         --$this->transaction;
+         $this->transaction--;
       }
       return $this;
    }

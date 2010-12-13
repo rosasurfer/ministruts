@@ -3,11 +3,6 @@
    - Exit Code != 0 bei Auftreten einer Exception forciert
 
 
-2010-12-11
-
-   - php/db/DB.php::rollback($silent = false) - Parameter $silent eingeführt
-
-
 2010-11-26
 
    - neu: Package php/file/image/barcode/* - BarCode-Library
