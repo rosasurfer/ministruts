@@ -39,14 +39,16 @@ abstract class BarCode extends Object {
    protected /*string*/ $value,
              /*int*/    $width,
              /*int*/    $height,
-             /*int*/    $style = self:: DEFAULT_STYLE,
+             /*int*/    $style   = self:: DEFAULT_STYLE,
              /*bool*/   $reverseColor,
              /*int*/    $bgColor,
              /*int*/    $fgColor,
-             /*int*/    $xres  = self:: DEFAULT_XRES,
-             /*int*/    $font  = self:: DEFAULT_FONT,
-             /*hImg*/   $hImg,
-             /*bool*/   $isRendered = false;
+             /*int*/    $xres    = self:: DEFAULT_XRES,
+             /*int*/    $font    = self:: DEFAULT_FONT,
+             /*bool*/   $isRendered;
+
+   private   /*string*/ $imgData,
+             /*hImg*/   $hImg;
 
 
    /**
@@ -290,15 +292,13 @@ abstract class BarCode extends Object {
       if (!$this->isRendered)
          $this->render();
 
-      static $data = null;
-
-      if ($data===null && ob_start()) {
+      if ($this->imgData===null && ob_start()) {
          if      ($this->style & self:: STYLE_IMAGE_PNG ) imagePng($this->hImg);
          else if ($this->style & self:: STYLE_IMAGE_JPEG) imageJpeg($this->hImg);
-         $data = ob_get_clean();
+         $this->imgData = ob_get_clean();
       }
 
-      return $data;
+      return $this->imgData;
    }
 
    /**
