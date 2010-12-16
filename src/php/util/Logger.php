@@ -119,14 +119,16 @@ class Logger extends StaticClass {
     * gekapselt und je nach Error-Level behandelt.  E_USER_NOTICE und E_USER_WARNING werden nur
     * geloggt (kein Scriptabbruch).
     *
-    * @param int    $level   - Error-Level
-    * @param string $message - Error-Message
-    * @param string $file    - Datei, in der der Fehler auftrat
-    * @param int    $line    - Zeile der Datei, in der der Fehler auftrat
-    * @param array  $context - aktive Symboltabelle des Punktes, an dem der Fehler auftrat
+    * @param int     $level   - Error-Level
+    * @param string  $message - Error-Message
+    * @param string  $file    - Datei, in der der Fehler auftrat
+    * @param int     $line    - Zeile der Datei, in der der Fehler auftrat
+    * @param mixed[] $context - aktive Symboltabelle des Punktes, an dem der Fehler auftrat
+    *                           (An array that points to the active symbol table at the point the error occurred. In other words, $context will contain an array
+    *                            of every variable that existed in the scope the error was triggered in. User error handler must not modify error context.)
     *
-    * @return boolean - TRUE,  wenn der Fehler erfolgreich behandelt wurde, FALSE, wenn der Fehler
-    *                   weitergereicht werden soll, als wenn der Errorhandler nicht registriert wäre
+    * @return bool - TRUE,  wenn der Fehler erfolgreich behandelt wurde, FALSE, wenn der Fehler
+    *                weitergereicht werden soll, als wenn der Errorhandler nicht registriert wäre
     *
     * NOTE: The error handler must return FALSE to populate $php_errormsg.
     */
