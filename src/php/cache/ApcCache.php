@@ -27,7 +27,7 @@ final class ApcCache extends CachePeer {
     *
     * @param string $key - Schlüssel
     *
-    * @return boolean
+    * @return bool
     */
    public function isCached($key) {
       // Hier wird die eigentliche Arbeit gemacht. Die Methode prüft nicht nur, ob der Wert im Cache
@@ -108,7 +108,7 @@ final class ApcCache extends CachePeer {
     *
     * @param string $key - Schlüssel, unter dem der Wert gespeichert ist
     *
-    * @return boolean - TRUE bei Erfolg, FALSE, falls kein solcher Schlüssel existiert
+    * @return bool - TRUE bei Erfolg, FALSE, falls kein solcher Schlüssel existiert
     */
    public function drop($key) {
       $this->getReferencePool()->drop($key);
@@ -127,7 +127,7 @@ final class ApcCache extends CachePeer {
     * @param int        $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfällt
     * @param Dependency $dependency - Abhängigkeit der Gültigkeit des gespeicherten Wertes
     *
-    * @return boolean - TRUE bei Erfolg, FALSE andererseits
+    * @return bool - TRUE bei Erfolg, FALSE andererseits
     */
    public function set($key, &$value, $expires = Cache ::EXPIRES_NEVER, Dependency $dependency = null) {
       if ($key!==(string)$key)      throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));

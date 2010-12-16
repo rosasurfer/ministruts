@@ -48,7 +48,7 @@ final class NetTools extends StaticClass {
     * @param string $address - IP-Adresse
     * @param bool   $reverseResolve - ob die IP-Adresse rück-aufgelöst und überprüft werden soll (Default: FALSE)
     *
-    * @return boolean
+    * @return bool
     */
    public static function isProxyAddress($address, $reverseResolve = false) {
       if (!is_string($address))      throw new IllegalTypeException('Illegal type of parameter $address: '.getType($address));

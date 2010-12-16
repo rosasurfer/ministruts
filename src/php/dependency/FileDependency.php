@@ -93,8 +93,8 @@ class FileDependency extends Dependency {
    /**
     * Ob die der Abhängigkeit zugrunde liegende Datei weiterhin unverändert ist.
     *
-    * @return boolean - TRUE, wenn die Datei sich nicht geändert hat.
-    *                   FALSE, wenn die Datei sich geändert hat.
+    * @return bool - TRUE, wenn die Datei sich nicht geändert hat.
+    *                FALSE, wenn die Datei sich geändert hat.
     */
    public function isValid() {
       // TODO: stat-Cache bei wiederholten Aufrufen löschen, siehe clearStatCache()

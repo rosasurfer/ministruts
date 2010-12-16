@@ -8,8 +8,8 @@ abstract class PersistableObject extends Object implements IDaoConnected {
 
 
    // Flag für den aktuellen Änderungsstatus der Instanz
-   protected /*bool*/   $modified = false;
-   protected /*array*/  $modifications;
+   protected /*bool*/     $modified = false;
+   protected /*string[]*/ $modifications;
 
 
    // Standard-Properties jeder Instanz
@@ -113,7 +113,7 @@ abstract class PersistableObject extends Object implements IDaoConnected {
    /**
     * Ob diese Instanz in der Datenbank als "gelöscht" markiert ist (Soft-Delete).
     *
-    * @return boolean
+    * @return bool
     */
    public function isDeleted() {
       return ($this->deleted !== null);
@@ -124,7 +124,7 @@ abstract class PersistableObject extends Object implements IDaoConnected {
     * Zeigt an, ob die aktuelle Instanz bereits gespeichert ist oder nicht.
     * Muß überschrieben werden, wenn die Primary Key-Spalte der Klasse nicht 'id' heißt.
     *
-    * @return boolean
+    * @return bool
     */
    public function isPersistent() {
       return ($this->id !== null);

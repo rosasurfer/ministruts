@@ -38,9 +38,9 @@
 abstract class CachePeer extends Object {
 
 
-   protected /*string*/        $label;
-   protected /*string*/        $namespace;
-   protected /*array*/         $options;
+   protected /*string       */ $label;
+   protected /*string       */ $namespace;
+   protected /*string[]     */ $options;
    private   /*ReferencePool*/ $referencePool;
 
 
@@ -74,7 +74,7 @@ abstract class CachePeer extends Object {
     *
     * @param string $key - Schlüssel, unter dem der Wert gespeichert ist
     *
-    * @return boolean - TRUE bei Erfolg, FALSE, falls kein solcher Schlüssel existiert
+    * @return bool - TRUE bei Erfolg, FALSE, falls kein solcher Schlüssel existiert
     */
    abstract public function drop($key);
 
@@ -84,7 +84,7 @@ abstract class CachePeer extends Object {
     *
     * @param string $key - Schlüssel
     *
-    * @return boolean
+    * @return bool
     */
    abstract public function isCached($key);
 
@@ -99,7 +99,7 @@ abstract class CachePeer extends Object {
     * @param int        $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfällt
     * @param Dependency $dependency - Abhängigkeit der Gültigkeit des gespeicherten Wertes
     *
-    * @return boolean - TRUE bei Erfolg, FALSE andererseits
+    * @return bool - TRUE bei Erfolg, FALSE andererseits
     */
    abstract public function set($key, &$value, $expires = Cache ::EXPIRES_NEVER, Dependency $dependency = null);
 
@@ -114,7 +114,7 @@ abstract class CachePeer extends Object {
     * @param int        $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfällt
     * @param Dependency $dependency - Abhängigkeit der Gültigkeit des gespeicherten Wertes
     *
-    * @return boolean - TRUE bei Erfolg, FALSE andererseits
+    * @return bool - TRUE bei Erfolg, FALSE andererseits
     */
    final public function add($key, &$value, $expires = Cache ::EXPIRES_NEVER, Dependency $dependency = null) {
       if ($this->isCached($key))
@@ -134,7 +134,7 @@ abstract class CachePeer extends Object {
     * @param int        $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfällt
     * @param Dependency $dependency - Abhängigkeit der Gültigkeit des gespeicherten Wertes
     *
-    * @return boolean - TRUE bei Erfolg, FALSE andererseits
+    * @return bool - TRUE bei Erfolg, FALSE andererseits
     */
    final public function replace($key, &$value, $expires = Cache ::EXPIRES_NEVER, Dependency $dependency = null) {
       if (!$this->isCached($key))

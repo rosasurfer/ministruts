@@ -99,7 +99,7 @@ class HttpSession extends Singleton {
    /**
     * Ob diese Session neu ist oder nicht. Die Session ist neu, wenn der User die aktuelle Session-ID noch nicht kennt.
     *
-    * @return boolean
+    * @return bool
     */
    public function isNew() {
       return $this->new;
@@ -183,7 +183,7 @@ class HttpSession extends Singleton {
     *
     * @param string $key - Schlüssel
     *
-    * @return boolean
+    * @return bool
     */
    public function isAttribute($key) {
       return isSet($_SESSION[$key]);
@@ -193,8 +193,8 @@ class HttpSession extends Singleton {
    /**
     * Entfernt alle gespeicherten Informationen aus der aktuellen Session.
     *
-    * @return boolean - TRUE, wenn alle gespeicherten Informationen gelöscht wurden
-    *                   FALSE, wenn keine Session existiert
+    * @return bool - TRUE, wenn alle gespeicherten Informationen gelöscht wurden
+    *                FALSE, wenn keine Session existiert
    function clear() {
       if (isSession()) {
          $keys = array_keys($_SESSION);

@@ -6,7 +6,7 @@ abstract class HttpClient extends Object {
 
 
    protected $timeout         = 30;              // int
-   protected $followRedirects = false;           // boolean
+   protected $followRedirects = false;           // bool
    protected $maxRedirects    = 10;              // int
    protected $userAgent       = 'Mozilla/5.0';   // string
 
@@ -40,7 +40,7 @@ abstract class HttpClient extends Object {
    /**
     * Ob Redirect-Headern gefolgt werden soll oder nicht.
     *
-    * @param boolean $follow
+    * @param bool $follow
     *
     * @return HttpClient
     */
@@ -55,7 +55,7 @@ abstract class HttpClient extends Object {
    /**
     * Gibt die aktuelle Redirect-Einstellung zurück.
     *
-    * @return boolean
+    * @return bool
     */
    public function followsRedirects() {
       return $this->followRedirects;

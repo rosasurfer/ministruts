@@ -243,7 +243,7 @@ EOT_404;
     * @param Response      $response
     * @param ActionMapping $mapping
     *
-    * @return boolean
+    * @return bool
     */
    protected function processMethod(Request $request, Response $response, ActionMapping $mapping) {
       if ($mapping->isSupportedMethod($request->getMethod()))
@@ -289,7 +289,7 @@ EOT_405;
     * @param Response      $response
     * @param ActionMapping $mapping
     *
-    * @return boolean
+    * @return bool
     */
    protected function processRoles(Request $request, Response $response, ActionMapping $mapping) {
       if ($mapping->getRoles() === null)
@@ -353,7 +353,7 @@ EOT_405;
     * @param ActionMapping $mapping
     * @param ActionForm    $form
     *
-    * @return boolean
+    * @return bool
     */
    protected function processActionFormValidate(Request $request, Response $response, ActionMapping $mapping, ActionForm $form) {
       if (!$mapping->isValidate())
@@ -384,7 +384,7 @@ EOT_405;
     * @param Response      $response
     * @param ActionMapping $mapping
     *
-    * @return boolean
+    * @return bool
     */
    protected function processMappingForward(Request $request, Response $response, ActionMapping $mapping) {
       $forward = $mapping->getForward();

@@ -8,7 +8,7 @@ abstract class BaseLock extends Object {
    /**
     * Ob dieses Lock gültig (valid) ist.
     *
-    * @return boolean
+    * @return bool
     */
    abstract public function isValid();
 

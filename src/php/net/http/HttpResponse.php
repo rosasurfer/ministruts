@@ -310,7 +310,7 @@ abstract class HttpResponse extends Object {
     *
     * @param string $name - Name des Headers
     *
-    * @return boolean
+    * @return bool
     */
    abstract public function isHeader($name);
 

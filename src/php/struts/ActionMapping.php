@@ -9,17 +9,17 @@ class ActionMapping extends Object {
     * Ob diese Komponente vollständig konfiguriert ist. Wenn dieses Flag gesetzt ist, wirft jeder Versuch,
     * die Komponente zu ändern, eine IllegalStateException.
     */
-   protected /*boolean*/ $configured = false;
+   protected /*bool*/ $configured = false;
 
 
-   protected /*string*/  $path;
-   protected /*string*/  $actionClassName;
-   protected /*string*/  $formClassName;
-   protected /*string*/  $scope = 'request';
-   protected /*boolean*/ $validate;
-   protected /*array*/   $methods;
-   protected /*string*/  $roles;
-   protected /*boolean*/ $default = false;
+   protected /*string */ $path;
+   protected /*string */ $actionClassName;
+   protected /*string */ $formClassName;
+   protected /*string */ $scope = 'request';
+   protected /*bool   */ $validate;
+   protected /*bool[] */ $methods;
+   protected /*string */ $roles;
+   protected /*bool   */ $default = false;
 
 
    /**
@@ -92,7 +92,7 @@ class ActionMapping extends Object {
     *
     * @param string $method - HTTP-Methode
     *
-    * @return boolean
+    * @return bool
     */
    public function isSupportedMethod($method) {
       if ($method!==(string)$method) throw new IllegalTypeException('Illegal type of argument $method: '.getType($method));
@@ -278,7 +278,7 @@ class ActionMapping extends Object {
    /**
     * Ob die ActionForm dieses Mappings im Request gespeichert wird.
     *
-    * @return boolean
+    * @return bool
     *
     * @see ActionMapping::setScope()
     */
@@ -290,7 +290,7 @@ class ActionMapping extends Object {
    /**
     * Ob die ActionForm dieses Mappings in der HttpSession gespeichert wird.
     *
-    * @return boolean
+    * @return bool
     *
     * @see ActionMapping::setScope()
     */
@@ -304,7 +304,7 @@ class ActionMapping extends Object {
     * ActionForm vor Aufruf der Action validiert werden soll oder nicht.  Ohne entsprechende Angabe
     * in der struts-config.xml wird die ActionForm immer validiert.
     *
-    * @param boolean $default
+    * @param bool $default
     *
     * @return ActionMapping
     */
@@ -320,7 +320,7 @@ class ActionMapping extends Object {
    /**
     * Ob die ActionForm des Mappings vor Aufruf der Action automatisch validiert wird oder nicht.
     *
-    * @return boolean
+    * @return bool
     */
    public function isValidate() {
       return ($this->validate);
@@ -332,7 +332,7 @@ class ActionMapping extends Object {
     * werden können, werden von dem Mapping mit gesetztem Default-Flag verarbeitet. Nur ein Mapping
     * innerhalb eines Modules kann dieses Flag gesetzt werden.
     *
-    * @param boolean $default
+    * @param bool $default
     *
     * @return ActionMapping
     */
@@ -348,7 +348,7 @@ class ActionMapping extends Object {
    /**
     * Ob für dieses ActionMapping das Default-Flag gesetzt ist.
     *
-    * @return boolean
+    * @return bool
     *
     * @see setDefault()
     */

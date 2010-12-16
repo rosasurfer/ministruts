@@ -25,7 +25,7 @@ class Module extends Object {
    /**
     * alle Basisverzeichnisse für von diesem Modul einzubindende Resourcen
     */
-   protected /*array*/ $resourceDirectories = array();
+   protected /*string[]*/ $resourceDirectories = array();
 
 
    /**
@@ -864,7 +864,7 @@ class Module extends Object {
     * @param string           $name - Name der Resource
     * @param SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration
     *
-    * @return boolean
+    * @return bool
     */
    private function isIncludable($name, SimpleXMLElement $xml) {
       return $this->isTile($name, $xml) || $this->isFile($name);
@@ -877,7 +877,7 @@ class Module extends Object {
     * @param string           $name - Name der Tile
     * @param SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration
     *
-    * @return boolean
+    * @return bool
     */
    private function isTile($name, SimpleXMLElement $xml) {
       $nodes = $xml->xPath("/struts-config/tiles/tile[@name='$name']");
@@ -896,7 +896,7 @@ class Module extends Object {
     *
     * @param string $path - Pfadangabe
     *
-    * @return boolean
+    * @return bool
     */
    private function isFile($path) {
       $filename = $this->findFile($path);

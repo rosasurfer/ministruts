@@ -85,7 +85,7 @@ final class Lock extends BaseLock {
    /**
     * Ob dieses Lock gültig (valid) ist.
     *
-    * @return boolean
+    * @return bool
     */
    public function isValid() {
       if ($this->impl)

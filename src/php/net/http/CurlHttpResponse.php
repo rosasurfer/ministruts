@@ -82,7 +82,7 @@ final class CurlHttpResponse extends HttpResponse {
     *
     * @param string $name - Name des Headers
     *
-    * @return boolean
+    * @return bool
     */
    public function isHeader($name) {
       return $this->headerParser->isHeader($name);

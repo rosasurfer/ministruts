@@ -90,7 +90,7 @@ final class HeaderParser extends Object {
     *
     * @param string $name - Name des Headers
     *
-    * @return boolean
+    * @return bool
     */
    public function isHeader($name) {
       return isSet($this->headers[strToLower($name)]);

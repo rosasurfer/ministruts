@@ -237,7 +237,7 @@ function __autoload($className /*, $throw */) {
  *
  * @param string $name - Klassenname
  *
- * @return boolean
+ * @return bool
  *
  * @see __autoload()
  */
@@ -265,7 +265,7 @@ function is_class($name) {
  *
  * @param string $name - Interface-Name
  *
- * @return boolean
+ * @return bool
  *
  * @see __autoload()
  */

@@ -8,21 +8,21 @@ class SMTPMailer extends Mailer {
    private static /*bool*/ $logDebug,
                   /*bool*/ $logInfo,
                   /*bool*/ $logNotice,
-                  /*int*/  $maxSendingTime = 2;    // benötigt der Versand länger als hier angegeben, wird er im Logelevel DEBUG geloggt
+                  /*int */ $maxSendingTime = 2;    // benötigt der Versand länger als hier angegeben, wird er im Logelevel DEBUG geloggt
 
 
-   protected /*array*/ $config = array('host'          => null,     // SMTP server host name
-                                       'port'          => null,     // SMTP server port
-                                       'timeout'       => 300,      // socket timeout: sendmail braucht ewig
-                                       'auth_username' => null,     // authentification username
-                                       'auth_password' => null,     // authentification password
-                                       );
+   protected /*string*/ $config = array('host'          => null,     // SMTP server host name
+                                        'port'          => null,     // SMTP server port
+                                        'timeout'       => 300,      // socket timeout: sendmail braucht ewig
+                                        'auth_username' => null,     // authentification username
+                                        'auth_password' => null,     // authentification password
+                                        );
 
-   private /*string*/   $hostName;
+   private /*string  */ $hostName;
    private /*resource*/ $connection;
-   private /*int*/      $responseStatus = 0;
-   private /*string*/   $response;
-   private /*string*/   $logBuffer;
+   private /*int     */ $responseStatus = 0;
+   private /*string  */ $response;
+   private /*string  */ $logBuffer;
 
 
    /**

@@ -260,9 +260,9 @@ final class Config extends Object {
 
 
    /**
-    * @param string  $key
-    * @param string  $value
-    * @param boolean $persist - (nicht implementiert)
+    * @param string $key
+    * @param string $value
+    * @param bool   $persist - (nicht implementiert)
     *
     * @see Config::set()
     */

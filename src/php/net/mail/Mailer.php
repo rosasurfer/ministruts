@@ -7,7 +7,7 @@
 abstract class Mailer extends Object {
 
 
-   protected /*array*/ $config;
+   protected /*string[]*/ $config;
 
 
    /**
@@ -55,7 +55,7 @@ abstract class Mailer extends Object {
     *
     * @param array $args - Daten der zu versendenden E-Mail
     *
-    * @return boolean    - Ob der Versand verschoben wurde.
+    * @return bool - ob der Versand verschoben wurde.
     */
    final protected function sendLater(array $args) {
       if (isSet($this->config['send-later']) && $this->config['send-later']) {
@@ -89,7 +89,7 @@ abstract class Mailer extends Object {
     *
     * @param  string $address - zu prüfende E-Mail-Adresse
     *
-    * @return boolean
+    * @return bool
     */
    public static function testAddress($address) {
       $address = strToLower($address);

@@ -352,7 +352,7 @@ final class ApdProfile extends Object {
    /**
     * Ob die angegebene Anzeigeoption gesetzt ist.
     *
-    * @return boolean
+    * @return bool
     */
    private function parseOptions() {
       $this->options = array();
@@ -382,7 +382,7 @@ final class ApdProfile extends Object {
    /**
     * Ob die angegebene Anzeigeoption gesetzt ist.
     *
-    * @return boolean
+    * @return bool
     */
    private function isOption($option) {
       if ($this->options === null)

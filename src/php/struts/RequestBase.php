@@ -152,7 +152,7 @@ class BaseRequest extends Singleton {
    /**
     * Ob der Request ein GET-Request ist.
     *
-    * @return boolean
+    * @return bool
     */
    final public function isGet() {
       return ($this->method === 'GET');
@@ -162,7 +162,7 @@ class BaseRequest extends Singleton {
    /**
     * Ob der Request ein POST-Request ist.
     *
-    * @return boolean
+    * @return bool
     */
    final public function isPost() {
       return ($this->method === 'POST');
@@ -497,7 +497,7 @@ class BaseRequest extends Singleton {
    /**
     * Ob mit dem Request eine Session-ID übertragen wurde.
     *
-    * @return boolean
+    * @return bool
     */
    public function isSessionId() {
       $name = session_name();
@@ -508,7 +508,7 @@ class BaseRequest extends Singleton {
    /**
     * Ob eine aktuelle HttpSession existiert oder nicht.
     *
-    * @return boolean
+    * @return bool
     */
    public function isSession() {
       return defined('SID');
@@ -528,7 +528,7 @@ class BaseRequest extends Singleton {
    /**
     * Zerstört die aktuelle HttpSession des Requests.
     *
-    * @return boolean
+    * @return bool
     */
    public function destroySession() {
       if ($this->isSession()) {
@@ -753,7 +753,7 @@ class BaseRequest extends Singleton {
     *
     * @param string $roles - Rollenbezeichner
     *
-    * @return boolean
+    * @return bool
     */
    public function isUserInRole($roles) {
       if ($roles!==(string)$roles) throw new IllegalTypeException('Illegal type of argument $roles: '.getType($roles));
@@ -816,7 +816,7 @@ class BaseRequest extends Singleton {
     *
     * @param string $key - Schlüssel
     *
-    * @return boolean
+    * @return bool
     */
    public function isActionError($key = null) {
       if ($key !== null) {

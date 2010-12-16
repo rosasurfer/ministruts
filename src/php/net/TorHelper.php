@@ -38,7 +38,7 @@ class TorHelper extends StaticClass {
     *
     * @param string $ip - IP-Adresse
     *
-    * @return boolean
+    * @return bool
     */
    public static function isExitNode($ip) {
       self:: init();

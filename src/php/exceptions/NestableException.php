@@ -15,11 +15,11 @@ abstract class NestableException extends Exception {
 
 
    /* Cachevariable für den erzeugten Stacktrace */
-   private /*array*/     $trace;
+   private /*string[][]*/ $trace;
 
 
    /* Cachevariable für den als String formatierten Stacktrace */
-   private /*string*/    $traceString;
+   private /*string*/ $traceString;
 
 
    /**
@@ -72,9 +72,9 @@ abstract class NestableException extends Exception {
    /**
     * Wandelt den übergebenen Stacktrace in einen Java-ähnlichen Stacktrace um.
     *
-    * @parameter array - zu bearbeitender Stacktrace
+    * @parameter string[][] $trace - zu bearbeitender Stacktrace
     *
-    * @return array - java-ähnlicher Stacktrace
+    * @return string[][] - java-ähnlicher Stacktrace
     */
    final public static function transformToJavaStackTrace(array $trace) {
       $trace[] = array('function' => 'main');      // Für die Java-Ähnlichkeit wird ein zusätzlicher Frame fürs Hauptscript angefügt und
@@ -131,7 +131,7 @@ abstract class NestableException extends Exception {
    /**
     * Gibt den formatierten Stacktrace dieser Exception aus.
     *
-    * @param boolean $return - ob die Ausgabe nicht auf STDOUT sondern als Rückgabe erfolgen soll
+    * @param bool $return - ob die Ausgabe nicht auf STDOUT sondern als Rückgabe erfolgen soll
     *
     * @return string - NULL oder formatierter, java-ähnlicher Stacktrace
     */

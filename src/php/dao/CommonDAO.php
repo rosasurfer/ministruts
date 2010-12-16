@@ -9,7 +9,7 @@ class CommonDAO extends Singleton {
 
 
    // Mapping-Constanten
-   const T_BOOL     = 1;               // boolean
+   const T_BOOL     = 1;               // bool
    const T_BOOLEAN  = self ::T_BOOL;
    const T_INT      = 2;               // int
    const T_INTEGER  = self ::T_INT;

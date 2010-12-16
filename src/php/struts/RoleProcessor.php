@@ -11,7 +11,7 @@ abstract class RoleProcessor {
     * @param Request $request
     * @param string  $roles   - Rollenbezeichner
     *
-    * @return boolean
+    * @return bool
     */
    abstract public function isUserInRole(Request $request, $roles);
 

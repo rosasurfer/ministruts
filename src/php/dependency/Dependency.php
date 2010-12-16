@@ -44,8 +44,8 @@ abstract class Dependency extends Object {
    /**
     * Ob das zu überwachende Ereignis oder ein Zustandswechsel eingetreten sind oder nicht.
     *
-    * @return boolean - TRUE, wenn die Abhängigkeit weiterhin erfüllt ist.
-    *                   FALSE, wenn der Zustandswechsel eingetreten ist und die Abhängigkeit nicht mehr erfüllt ist.
+    * @return bool - TRUE, wenn die Abhängigkeit weiterhin erfüllt ist.
+    *                FALSE, wenn der Zustandswechsel eingetreten ist und die Abhängigkeit nicht mehr erfüllt ist.
     */
    abstract public function isValid();
 

@@ -175,7 +175,7 @@ abstract class DB extends Object {
    /**
     * Ob eine Connection zur Datenbank besteht.
     *
-    * @return boolean
+    * @return bool
     */
    protected function isConnected() {
       return ($this->link && is_resource($this->link));
@@ -249,7 +249,7 @@ abstract class DB extends Object {
    /**
     * Ob der Connector sich im Moment in einer Transaktion befindet.
     *
-    * @return boolean
+    * @return bool
     */
    public function inTransaction() {
       return ($this->transaction > 0);

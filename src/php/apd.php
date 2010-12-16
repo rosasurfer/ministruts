@@ -320,7 +320,7 @@ function parseInfoBlock($tag, $hFile, &$config) {
 /**
  * Ob die angegebene Option gesetzt ist.
  *
- * @return boolean
+ * @return bool
  */
 function isOptionSet($option) {
     return array_key_exists($option, $GLOBALS['options']);

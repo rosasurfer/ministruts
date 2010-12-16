@@ -8,11 +8,11 @@ final class String extends StaticClass {
    /**
     * Ob ein String mit einem anderen String beginnt.
     *
-    * @param string  $string     - der zu prüfende String
-    * @param string  $start      - der zu suchende String
-    * @param boolean $ignoreCase - ob bei der Suche Groß-/Kleinschreibung ignoriert werden soll (Default: nein)
+    * @param string $string     - der zu prüfende String
+    * @param string $start      - der zu suchende String
+    * @param bool   $ignoreCase - ob bei der Suche Groß-/Kleinschreibung ignoriert werden soll (Default: nein)
     *
-    * @return boolean
+    * @return bool
     */
    public static function startsWith($string, $start, $ignoreCase = false) {
       if ($string!==null && $string!==(string)$string) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
@@ -30,11 +30,11 @@ final class String extends StaticClass {
    /**
     * Ob ein String mit einem anderen String endet.
     *
-    * @param string  $string     - der zu prüfende String
-    * @param string  $end        - der zu suchende String
-    * @param boolean $ignoreCase - ob bei der Suche Groß-/Kleinschreibung ignoriert werden soll (Default: nein)
+    * @param string $string     - der zu prüfende String
+    * @param string $end        - der zu suchende String
+    * @param bool   $ignoreCase - ob bei der Suche Groß-/Kleinschreibung ignoriert werden soll (Default: nein)
     *
-    * @return boolean
+    * @return bool
     */
    public static function endsWith($string, $end, $ignoreCase = false) {
       if ($string!==null && $string!==(string)$string) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
@@ -52,7 +52,7 @@ final class String extends StaticClass {
     * @param string $needle   - der zu suchende String
     * @param bool   $case     - ob bei der Suche Groß-/Kleinschreibung beachtet werden soll (Default: ja)
     *
-    * @return boolean
+    * @return bool
     */
    public static function contains($haystack, $needle, $case = true) {
       if ($haystack!==null && $haystack!==(string)$haystack) throw new IllegalTypeException('Illegal type of parameter $haystack: '.getType($haystack));
@@ -71,7 +71,7 @@ final class String extends StaticClass {
     *
     * @param string $string - der zu prüfende String
     *
-    * @return boolean
+    * @return bool
     */
    public static function isUtf8Encoded($string) {
       if ($string!==null && $string!==(string)$string) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));

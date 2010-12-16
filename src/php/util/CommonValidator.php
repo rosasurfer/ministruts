@@ -12,7 +12,7 @@ class CommonValidator extends StaticClass {
     * @param bool   $returnBytes - Typ des Rückgabewertes:
     *                                 FALSE: Boolean (default)
     *                                 TRUE:  Array mit den Adressbytes oder FALSE, wenn der String keine gültige IP-Adresse darstellt
-    * @return boolean|array
+    * @return bool|array
     */
    public static function isIPAddress($string, $returnBytes = false) {
       static $pattern = '/^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/';
@@ -43,7 +43,7 @@ class CommonValidator extends StaticClass {
     *
     * @param string $string - der zu überprüfende String
     *
-    * @return boolean
+    * @return bool
     */
    public static function isIPLanAddress($string) {
       $bytes = self ::isIPAddress($string, true);
@@ -68,7 +68,7 @@ class CommonValidator extends StaticClass {
     *
     * @param string $string - der zu überprüfende String
     *
-    * @return boolean
+    * @return bool
     */
    public static function isIPWanAddress($string) {
       $bytes = self ::isIPAddress($string, true);
@@ -101,7 +101,7 @@ class CommonValidator extends StaticClass {
     *
     * @param string $string - der zu überprüfende String
     *
-    * @return boolean
+    * @return bool
     */
    public static function isEmailAddress($string) {
       static $pattern = '/^[a-z0-9+-]+[a-z0-9_.+-]*@(([a-z0-9]+|[a-z0-9]+[a-z0-9-]+[a-z0-9]+)\.)*([a-z0-9][a-z0-9-]*[a-z0-9])\.([a-z]{2,4})$/';
@@ -114,7 +114,7 @@ class CommonValidator extends StaticClass {
     *
     * @param string $string - der zu überprüfende String
     *
-    * @return boolean
+    * @return bool
     */
    public static function isEmailAddressPattern($string) {
       static $pattern = '/^[a-z0-9?*+-]+[a-z0-9?*_.+-]*@(([a-z0-9?*]+|[a-z0-9?*]+[a-z0-9?*-]+[a-z0-9?*]+)\.)*(\*|[a-z0-9?*][a-z0-9?*-]*[a-z0-9?*])\.(\*|[a-z?*]{2,4})$/';
@@ -128,7 +128,7 @@ class CommonValidator extends StaticClass {
     * @param string $string - der zu überprüfende String
     * @param string $format - das Format, dem der String entsprechen soll
     *
-    * @return boolean
+    * @return bool
     *
     * TODO: isDate() überprüft bis jetzt nur 'Y-m-d' und 'd.m.Y', nicht 'd/m/Y'
     */
@@ -226,7 +226,7 @@ class CommonValidator extends StaticClass {
     *
     * @param string $string - der zu prüfende String
     *
-    * @return boolean
+    * @return bool
     */
    public static function isGender($string) {
       return ($string==='female' || $string==='male');
@@ -238,7 +238,7 @@ class CommonValidator extends StaticClass {
     *
     * @param  string $string - der zu prüfende String
     *
-    * @return boolean
+    * @return bool
     */
    public static function isFixedPhoneNo($string) {                        // !!! To-do: implementieren und Länderflag übergeben
       static $pattern = '/^\+?[0-9]{7,}$/';
@@ -251,7 +251,7 @@ class CommonValidator extends StaticClass {
     *
     * @param  string $string - der zu prüfende String
     *
-    * @return boolean
+    * @return bool
     */
    public static function isCellPhoneNo($string) {                         // !!! To-do: implementieren und Länderflag übergeben
       static $pattern = '/^\+?[0-9]{7,}$/';
@@ -264,7 +264,7 @@ class CommonValidator extends StaticClass {
     *
     * @param  string $string - der zu prüfende String
     *
-    * @return boolean
+    * @return bool
     */
    public static function isAddress($string) {
       static $pattern = '/^([a-zäöüÄÖÜ](-?[a-zäöüßÄÖÜé])+\.? *)+[a-z0-9\/.-]*$/';
@@ -278,7 +278,7 @@ class CommonValidator extends StaticClass {
     *
     * @param  string $string - der zu prüfende String
     *
-    * @return boolean
+    * @return bool
     */
    public static function isFirstName($string) {
       static $pattern = '/^([a-zäöüÄÖÜ]([\'-]?[a-zäöüßéÄÖÜ])+ *)+$/';
@@ -291,7 +291,7 @@ class CommonValidator extends StaticClass {
     *
     * @param  string $string - der zu prüfende String
     *
-    * @return boolean
+    * @return bool
     */
    public static function isLastName($string) {
       return self:: isFirstName($string);
@@ -303,7 +303,7 @@ class CommonValidator extends StaticClass {
     *
     * @param  string $string - der zu prüfende String
     *
-    * @return boolean
+    * @return bool
     */
    public static function isPlaceName($string) {
       static $pattern = '/^([a-zäöüÄÖÜ](-?[a-zäöüßÄÖÜ])+\.? *)+$/';
@@ -316,7 +316,7 @@ class CommonValidator extends StaticClass {
     *
     * @param  string $string - der zu prüfende String
     *
-    * @return boolean
+    * @return bool
     */
    public static function isStreetName($string) {
       static $pattern = '/^[a-zäöüßÄÖÜ. -]{3,}$/';
@@ -329,7 +329,7 @@ class CommonValidator extends StaticClass {
     *
     * @param  string $string - der zu prüfende String
     *
-    * @return boolean
+    * @return bool
     */
    public static function isStreetNumber($string) {
       static $pattern = '/^[0-9A-Za-z-\/]+$/';

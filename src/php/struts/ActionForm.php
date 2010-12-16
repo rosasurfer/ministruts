@@ -47,8 +47,8 @@ abstract class ActionForm extends Object {
    /**
     * Ob die eingelesenen Parameter gültig sind. Muß anwendungsabhängig überschrieben werden.
     *
-    * @return boolean - TRUE, wenn die übergebenen Parameter gültig sind, FALSE andererseits
-    *                   (diese Default-Implementierung gibt immer TRUE zurück)
+    * @return bool - TRUE, wenn die übergebenen Parameter gültig sind, FALSE andererseits
+    *                (diese Default-Implementierung gibt immer TRUE zurück)
     */
    public function validate() {
       return true;

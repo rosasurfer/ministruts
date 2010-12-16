@@ -35,9 +35,9 @@ final class FileLock extends BaseLock {
     *
     * Erzeugt ein neues FileLock für die angegebene Datei.
     *
-    * @param string  $file   - Datei, auf der das Lock gehalten werden soll (muß existieren)
-    * @param boolean $shared - TRUE, um ein shared Lock oder FALSE, um ein exclusive Lock zu setzen
-    *                          (default: FALSE = exklusives Lock)
+    * @param string $file   - Datei, auf der das Lock gehalten werden soll (muß existieren)
+    * @param bool   $shared - TRUE, um ein shared Lock oder FALSE, um ein exclusive Lock zu setzen
+    *                         (default: FALSE = exklusives Lock)
     */
    public function __construct($file, $shared = false) {
       if ($file!==(string)$file)        throw new IllegalTypeException('Illegal type of argument $file: '.getType($file));
@@ -81,7 +81,7 @@ final class FileLock extends BaseLock {
    /**
     * Ob dieses Lock ein shared oder ein exclusive Lock ist.
     *
-    * @return boolean
+    * @return bool
     */
    public function isShared() {
       return $this->shared;
@@ -91,7 +91,7 @@ final class FileLock extends BaseLock {
    /**
     * Ob dieses Lock gültig (valid) ist.
     *
-    * @return boolean
+    * @return bool
     */
    public function isValid() {
       if (isSet(self::$handles[$this->file]))
