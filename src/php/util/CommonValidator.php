@@ -9,9 +9,9 @@ class CommonValidator extends StaticClass {
     * Ob der übergebene String eine syntaktisch gültige IP-Adresse ist.
     *
     * @param string $string      - der zu überprüfende String
-    * @param bool   $returnBytes - Typ des Rückgabewertes:
-    *                                 FALSE: Boolean (default)
-    *                                 TRUE:  Array mit den Adressbytes oder FALSE, wenn der String keine gültige IP-Adresse darstellt
+    * @param bool   $returnBytes - Typ des Rückgabewertes
+    *                              FALSE: Boolean (default)
+    *                              TRUE:  Array mit den Adressbytes oder FALSE, wenn der String keine gültige IP-Adresse darstellt
     * @return bool|array
     */
    public static function isIPAddress($string, $returnBytes = false) {
