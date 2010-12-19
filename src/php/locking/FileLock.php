@@ -107,8 +107,6 @@ final class FileLock extends BaseLock {
     * keinen Effekt.
     *
     * @param bool $deleteFile - ob das verwendete Lockfile beim Freigeben des Locks gelöscht werden soll (default: FALSE)
-    *
-    * @see FileLock::isValid()
     */
    public function release($deleteFile = false) {
       if ($deleteFile!==(bool)$deleteFile) throw new IllegalTypeException('Illegal type of argument $deleteFile: '.getType($deleteFile));

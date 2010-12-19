@@ -119,8 +119,6 @@ final class SystemFiveLock extends BaseLock {
     * Wenn dieses Lock gültig (valid) ist, gibt der Aufruf dieser Methode das gehaltene Lock frei und
     * markiert es als ungültig (invalid).  Wenn das Lock bereits ungültig (invalid) ist, hat der Aufruf
     * keinen Effekt.
-    *
-    * @see FileLock::isValid()
     */
    public function release() {
       if ($this->isValid()) {
