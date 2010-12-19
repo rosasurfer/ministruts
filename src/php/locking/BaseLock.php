@@ -24,15 +24,15 @@ abstract class BaseLock extends Object {
 
 
    /**
-    * Transformiert einen Schlüssel in eine numerische ID.
+    * Transformiert einen Schlüssel (String) in einen eindeutigen numerischen Wert (Integer).
     *
     * @param  string $key - Schlüssel
     *
-    * @return int - ID
+    * @return int
     */
-   protected function getKeyId($key) {
+   protected function keyToId($key) {
       return (int) hexDec(subStr(md5($key), 0, 7)) + strLen($key);
-                                      // 7: strLen(decHex(PHP_INT_MAX)) - 1   (x86)
+                                            // 7: strLen(decHex(PHP_INT_MAX)) - 1   (x86)
    }
 
 

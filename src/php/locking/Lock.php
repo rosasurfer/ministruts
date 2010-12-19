@@ -22,7 +22,7 @@
 final class Lock extends BaseLock {
 
 
-   // Schlüssel der im Moment gehaltenen Locks
+   // alle Schlüssel der im Moment gehaltenen Locks
    private static /*string[]*/ $lockedKeys;
 
    private /*Lock*/   $impl;  // aktuelle Implementierung der Instanz
@@ -36,10 +36,10 @@ final class Lock extends BaseLock {
     */
    public function __construct($key = null) {
       if (func_num_args()) {
-         if ($key!==(string)$key) throw new IllegalTypeException('Illegal type of argument $mutex: '.getType($key));
+         if (!is_string($key)) throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
       }
       else {
-         // kein Schlüssel angegeben, __FILE__ & __LINE__ des aufrufenden Codes verwenden
+         // kein Schlüssel angegeben, __FILE__ + __LINE__ des aufrufenden Codes verwenden
          $trace = debug_backtrace();
          $key   = $trace[0]['file'].'#'.$trace[0]['line'];
       }

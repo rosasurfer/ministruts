@@ -12,7 +12,7 @@ final class SystemFiveLock extends BaseLock {
                   /*bool*/ $logInfo,
                   /*bool*/ $logNotice;
 
-   private static /*Resource[]*/ $semIds;
+   private static /*Resource[]*/ $hSemaphores;     // Semaphore-Handles
 
    private /*string*/ $key;
 
@@ -37,29 +37,29 @@ final class SystemFiveLock extends BaseLock {
     *                            demselben Schlüssel existiert
     */
    public function __construct($key) /*throws RuntimeException*/ {
-      if ($key !== (string)$key)      throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
-      if (isSet(self::$semIds[$key])) throw new RuntimeException('Dead-lock detected: already holding a lock for key "'.$key.'"');
-      self::$semIds[$key] = false;
+      if (!is_string($key))                throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
+      if (isSet(self::$hSemaphores[$key])) throw new RuntimeException('Dead-lock detected: already holding a lock for key "'.$key.'"');
+      self::$hSemaphores[$key] = false;
 
       $loglevel        = Logger ::getLogLevel(__CLASS__);
       self::$logDebug  = ($loglevel <= L_DEBUG );
       self::$logInfo   = ($loglevel <= L_INFO  );
       self::$logNotice = ($loglevel <= L_NOTICE);
 
-      $decId = $this->getKeyId($key);
-      $hexId = decHex($decId);
+      $integer = $this->keyToId($key);
 
       $trials = 5;   // max. Anzahl akzeptabler Fehler, eine weitere Exception wird weitergereicht
       $i = 0;
       do {
          try {
-            // TODO: bei hoher Last kann sem_get()/sem_acquire() scheitern
-            $semId = sem_get($decId, 1, 0666);
-            sem_acquire($semId);
+            // TODO: bei hoher Last können sem_get() oder sem_acquire() scheitern
+            $hSemaphore = sem_get($integer, 1, 0666);   // Semaphore-Handle holen
+            sem_acquire($hSemaphore);
             break;
          }
          catch (PHPErrorException $ex) {
             // TODO: Quellcode umschreiben (ext/sysvsem/sysvsem.c) und Fehler lokalisieren (vermutlich wird ein File-Limit überschritten)
+            $hexId = decHex($integer);
             if (++$i < $trials && ($ex->getMessage()=='sem_get(): failed for key 0x'.$hexId.': Invalid argument'
                                 || $ex->getMessage()=='sem_get(): failed for key 0x'.$hexId.': Identifier removed'
                                 || $ex->getMessage()=='sem_get(): failed acquiring SYSVSEM_SETVAL for key 0x'.$hexId.': Invalid argument'
@@ -73,13 +73,13 @@ final class SystemFiveLock extends BaseLock {
                continue;
             }
             // Endlosschleife verhindern
-            throw new RuntimeException("Giving up to get lock after $i trials", $ex);
+            throw new RuntimeException("Giving up to get lock for key \"$key\" after $i trials", $ex);
          }
       }
       while (true);
 
-      $this->key = $key;
-      self::$semIds[$key] = $semId;
+      $this->key               = $key;
+      self::$hSemaphores[$key] = $hSemaphore;
    }
 
 
