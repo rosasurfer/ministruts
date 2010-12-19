@@ -48,8 +48,9 @@ final class SystemFiveLock extends BaseLock {
 
       $integer = $this->keyToId($key);
 
-      $trials = 5;   // max. Anzahl akzeptabler Fehler, eine weitere Exception wird weitergereicht
-      $i = 0;
+      $i        = 0;
+      $trials   = 5;    // max. Anzahl akzeptabler Fehler, eine weitere Exception wird weitergereicht
+      $messages = null;
       do {
          try {
             // TODO: bei hoher Last können sem_get() oder sem_acquire() scheitern
@@ -59,21 +60,23 @@ final class SystemFiveLock extends BaseLock {
          }
          catch (PHPErrorException $ex) {
             // TODO: Quellcode umschreiben (ext/sysvsem/sysvsem.c) und Fehler lokalisieren (vermutlich wird ein File-Limit überschritten)
-            $hexId = decHex($integer);
-            if (++$i < $trials && ($ex->getMessage()=='sem_get(): failed for key 0x'.$hexId.': Invalid argument'
-                                || $ex->getMessage()=='sem_get(): failed for key 0x'.$hexId.': Identifier removed'
-                                || $ex->getMessage()=='sem_get(): failed acquiring SYSVSEM_SETVAL for key 0x'.$hexId.': Invalid argument'
-                                || $ex->getMessage()=='sem_get(): failed acquiring SYSVSEM_SETVAL for key 0x'.$hexId.': Identifier removed'
-                                || $ex->getMessage()=='sem_get(): failed releasing SYSVSEM_SETVAL for key 0x'.$hexId.': Invalid argument'
-                                || $ex->getMessage()=='sem_get(): failed releasing SYSVSEM_SETVAL for key 0x'.$hexId.': Identifier removed'
-                                || $ex->getMessage()=='sem_acquire(): failed to acquire key 0x'.$hexId.': Invalid argument'
-                                || $ex->getMessage()=='sem_acquire(): failed to acquire key 0x'.$hexId.': Identifier removed')) {
-               self::$logDebug && Logger ::log($ex->getMessage().', trying again ... ('.($i+1).')', L_DEBUG, __CLASS__);
-               uSleep(100000); // 100 msec. warten
+            $message = $ex->getMessage();
+            $hexId   = decHex($integer);
+            if (++$i < $trials && ($message == 'sem_get(): failed for key 0x'.$hexId.': Invalid argument'
+                                || $message == 'sem_get(): failed for key 0x'.$hexId.': Identifier removed'
+                                || $message == 'sem_get(): failed acquiring SYSVSEM_SETVAL for key 0x'.$hexId.': Invalid argument'
+                                || $message == 'sem_get(): failed acquiring SYSVSEM_SETVAL for key 0x'.$hexId.': Identifier removed'
+                                || $message == 'sem_get(): failed releasing SYSVSEM_SETVAL for key 0x'.$hexId.': Invalid argument'
+                                || $message == 'sem_get(): failed releasing SYSVSEM_SETVAL for key 0x'.$hexId.': Identifier removed'
+                                || $message == 'sem_acquire(): failed to acquire key 0x'.$hexId.': Invalid argument'
+                                || $message == 'sem_acquire(): failed to acquire key 0x'.$hexId.': Identifier removed')) {
+               self::$logDebug && Logger ::log($message.', trying again ... ('.($i+1).')', L_DEBUG, __CLASS__);
+               $messages[] = $message;
+               uSleep(200000); // 200 msec. warten
                continue;
             }
             // Endlosschleife verhindern
-            throw new RuntimeException("Giving up to get lock for key \"$key\" after $i trials", $ex);
+            throw new RuntimeException("Giving up to get lock for key \"$key\" after $i trials".($messages ? ", former errors:\n".join("\n", $messages):null), $ex);
          }
       }
       while (true);
