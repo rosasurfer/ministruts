@@ -108,8 +108,8 @@ final class SystemFiveLock extends BaseLock {
     * @return bool
     */
    public function isValid() {
-      if (isSet(self::$semIds[$this->key]))
-         return is_resource(self::$semIds[$this->key]);
+      if (isSet(self::$hSemaphores[$this->key]))
+         return is_resource(self::$hSemaphores[$this->key]);
 
       return false;
    }
@@ -124,10 +124,10 @@ final class SystemFiveLock extends BaseLock {
     */
    public function release() {
       if ($this->isValid()) {
-         if (!sem_remove(self::$semIds[$this->key]))
+         if (!sem_remove(self::$hSemaphores[$this->key]))
             throw new RuntimeException('Cannot remove semaphore for key "'.$this->key.'"');
 
-         unset(self::$semIds[$this->key]);
+         unset(self::$hSemaphores[$this->key]);
       }
    }
 }
