@@ -4,7 +4,7 @@
  *
  * Abstrakte Basisklasse für HttpResponse-Implementierungen.
  *
- * TODO: toString()-methode implementieren, die alle Header anzeigt
+ * TODO: toString()-Methode implementieren, die alle Header anzeigt
  */
 abstract class HttpResponse extends Object {
 
