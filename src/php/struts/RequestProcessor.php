@@ -417,14 +417,14 @@ EOT_405;
     * Übergibt den Request zur Bearbeitung an die konfigurierte Action und gibt den von ihr
     * zurückgegebenen ActionForward zurück.
     *
-    * @param Request    $request
-    * @param Response   $response
-    * @param Action     $action
+    * @param Request  $request
+    * @param Response $response
+    * @param Action   $action
     *
     * @return ActionForward
     */
    protected function processActionExecute(Request $request, Response $response, Action $action) {
-      $forward = null;
+      $forward   = null;
       $throwable = null;
 
       // Alles kapseln, damit Postprocessing-Hook auch nach Auftreten einer Exception aufgerufen
@@ -445,7 +445,7 @@ EOT_405;
       }
 
       // falls statt eines ActionForwards ein String-Identifier zurückgegeben wurde, diesen auflösen
-      if ($forward === (string) $forward)
+      if (is_string($forward))
          $forward = $action->getMapping()->findForward($forward);
 
 
@@ -453,7 +453,7 @@ EOT_405;
       $forward = $action->executeAfter($request, $response, $forward);
 
 
-      // jetzt aufgetretene Exceptions weiterreichen
+      // jetzt evt. aufgetretene Exception weiterreichen
       if ($throwable)
          throw $throwable;
 
