@@ -495,6 +495,26 @@ class BaseRequest extends Singleton {
 
 
    /**
+    * Gibt den Content-Type dieses Requests zurück.
+    *
+    * @return string - Content-Type oder NULL, wenn kein "Content-Type"-Header übertragen wurde.
+    */
+   public function getContentType() {
+      $contentType = $this->getHeaderValue('Content-Type');
+
+      if ($contentType) {
+         $types       = explode(',', $contentType, 2);
+         $contentType = array_shift($types);
+
+         $parts       = explode(';', $contentType, 2);
+         $contentType = trim(array_shift($parts));
+      }
+
+      return $contentType;
+   }
+
+
+   /**
     * Ob mit dem Request eine Session-ID übertragen wurde.
     *
     * @return bool
@@ -620,8 +640,8 @@ class BaseRequest extends Singleton {
 
 
    /**
-    * Gibt den Wert der angegebenen Header als String zurück. Wurden mehrere Namen angegeben oder wurden mehrere
-    * Header des angegebenen Namens übertragen, werden alle Werte dieser Header als eine komma-getrennte Liste
+    * Gibt den Wert des angegebenen Headers als String zurück. Wird ein Array mit mehreren Namen angegeben oder wurden
+    * mehrere Header des angegebenen Namens übertragen, werden alle Werte dieser Header als eine komma-getrennte Liste
     * zurückgegeben (in der übertragenen Reihenfolge).
     *
     * @param string|array $names - ein oder mehrere Headernamen
@@ -633,7 +653,7 @@ class BaseRequest extends Singleton {
          $names = array($names);
       elseif (is_array($names)) {
          foreach ($names as $name)
-            if ($name !== (string)$name) throw new IllegalTypeException('Illegal argument type in argument $names: '.getType($name));
+            if (is_string($name)) throw new IllegalTypeException('Illegal argument type in argument $names: '.getType($name));
       }
       else {
          throw new IllegalTypeException('Illegal type of argument $names: '.getType($names));
@@ -659,7 +679,7 @@ class BaseRequest extends Singleton {
          $names = array($names);
       elseif (is_array($names)) {
          foreach ($names as $name)
-            if ($name !== (string)$name) throw new IllegalTypeException('Illegal argument type in argument $names: '.getType($name));
+            if (is_string($name)) throw new IllegalTypeException('Illegal argument type in argument $names: '.getType($name));
       }
       else {
          throw new IllegalTypeException('Illegal type of argument $names: '.getType($names));
@@ -923,7 +943,7 @@ class BaseRequest extends Singleton {
     * Verhindert das Deserialisieren von Request-Instanzen.
     */
    final public function __wakeUp() {
-      throw new IllegalStateException('You cannot unserialize me: '.get_class($this));
+      throw new IllegalStateException('You cannot deserialize me: '.get_class($this));
    }
 
 
