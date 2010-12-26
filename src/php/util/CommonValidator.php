@@ -17,7 +17,7 @@ class CommonValidator extends StaticClass {
    public static function isIPAddress($string, $returnBytes = false) {
       static $pattern = '/^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/';
 
-      $result = ($string===(string)$string) && strLen($string) && preg_match($pattern, $string, $bytes);
+      $result = is_string($string) && strLen($string) && preg_match($pattern, $string, $bytes);
 
       if ($result) {
          array_shift($bytes);
@@ -105,7 +105,7 @@ class CommonValidator extends StaticClass {
     */
    public static function isEmailAddress($string) {
       static $pattern = '/^[a-z0-9+-]+[a-z0-9_.+-]*@(([a-z0-9]+|[a-z0-9]+[a-z0-9-]+[a-z0-9]+)\.)*([a-z0-9][a-z0-9-]*[a-z0-9])\.([a-z]{2,4})$/';
-      return ($string===(string)$string) && strLen($string) && preg_match($pattern, strToLower($string));
+      return is_string($string) && strLen($string) && preg_match($pattern, strToLower($string));
    }
 
 
@@ -118,7 +118,7 @@ class CommonValidator extends StaticClass {
     */
    public static function isEmailAddressPattern($string) {
       static $pattern = '/^[a-z0-9?*+-]+[a-z0-9?*_.+-]*@(([a-z0-9?*]+|[a-z0-9?*]+[a-z0-9?*-]+[a-z0-9?*]+)\.)*(\*|[a-z0-9?*][a-z0-9?*-]*[a-z0-9?*])\.(\*|[a-z?*]{2,4})$/';
-      return ($string===(string)$string) && strLen($string) && preg_match($pattern, strToLower($string));
+      return is_string($string) && strLen($string) && preg_match($pattern, strToLower($string));
    }
 
 
@@ -242,7 +242,7 @@ class CommonValidator extends StaticClass {
     */
    public static function isFixedPhoneNo($string) {                        // !!! To-do: implementieren und Länderflag übergeben
       static $pattern = '/^\+?[0-9]{7,}$/';
-      return ($string===(string)$string) && strLen($string) && preg_match($pattern, $string);
+      return is_string($string) && strLen($string) && preg_match($pattern, $string);
    }
 
 
@@ -255,7 +255,7 @@ class CommonValidator extends StaticClass {
     */
    public static function isCellPhoneNo($string) {                         // !!! To-do: implementieren und Länderflag übergeben
       static $pattern = '/^\+?[0-9]{7,}$/';
-      return ($string===(string)$string) && strLen($string) && preg_match($pattern, $string);
+      return is_string($string) && strLen($string) && preg_match($pattern, $string);
    }
 
 
@@ -269,7 +269,7 @@ class CommonValidator extends StaticClass {
    public static function isAddress($string) {
       static $pattern = '/^([a-zäöüÄÖÜ](-?[a-zäöüßÄÖÜé])+\.? *)+[a-z0-9\/.-]*$/';
 
-      return ($string===(string)$string) && strLen($string) && preg_match($pattern, strToLower($string));
+      return is_string($string) && strLen($string) && preg_match($pattern, strToLower($string));
    }
 
 
@@ -282,7 +282,7 @@ class CommonValidator extends StaticClass {
     */
    public static function isFirstName($string) {
       static $pattern = '/^([a-zäöüÄÖÜ]([\'-]?[a-zäöüßéÄÖÜ])+ *)+$/';
-      return ($string===(string)$string) && strLen($string) && preg_match($pattern, strToLower($string));
+      return is_string($string) && strLen($string) && preg_match($pattern, strToLower($string));
    }
 
 
@@ -307,7 +307,7 @@ class CommonValidator extends StaticClass {
     */
    public static function isPlaceName($string) {
       static $pattern = '/^([a-zäöüÄÖÜ](-?[a-zäöüßÄÖÜ])+\.? *)+$/';
-      return ($string===(string)$string) && strLen($string) && preg_match($pattern, strToLower($string));
+      return is_string($string) && strLen($string) && preg_match($pattern, strToLower($string));
    }
 
 
@@ -320,7 +320,7 @@ class CommonValidator extends StaticClass {
     */
    public static function isStreetName($string) {
       static $pattern = '/^[a-zäöüßÄÖÜ. -]{3,}$/';
-      return ($string===(string)$string) && strLen($string) && preg_match($pattern, strToLower($string));
+      return is_string($string) && strLen($string) && preg_match($pattern, strToLower($string));
    }
 
 
@@ -333,7 +333,7 @@ class CommonValidator extends StaticClass {
     */
    public static function isStreetNumber($string) {
       static $pattern = '/^[0-9A-Za-z-\/]+$/';
-      return ($string===(string)$string) && strLen($string) && preg_match($pattern, strToLower($string));
+      return is_string($string) && strLen($string) && preg_match($pattern, strToLower($string));
    }
 }
 ?>
