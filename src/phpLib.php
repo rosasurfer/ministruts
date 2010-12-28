@@ -15,7 +15,7 @@ set_error_handler    (create_function('$level, $message, $file, $line, array $co
 set_exception_handler(create_function('Exception $exception'                          , 'Logger::handleException($exception); exit(1);'                        ));   // exit code = 1 forcieren
 
 
-// Beginn des Shutdowns markieren (um fatale Fehler beim Shutdown zu verhindern, siehe Logger)
+// Beginn des Shutdowns markieren, um fatale Fehler beim Shutdown zu verhindern (siehe Logger)
 // -------------------------------------------------------------------------------------------
 register_shutdown_function(create_function(null, '$GLOBALS[\'$__shutting_down\'] = true;'));    // allererste Funktion auf dem Shutdown-Funktion-Stack
 
@@ -37,7 +37,6 @@ if (extension_loaded('APD') && isSet($_REQUEST['_PROFILE_'])) {
    }
    push_shutdown_function('apd_addProfileLink', $dumpFile);    // wird als letzte Shutdown-Funktion ausgeführt
    unset($dumpFile, $fH, $prot, $host, $port, $url);
-
 }
 
 
