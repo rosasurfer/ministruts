@@ -653,7 +653,7 @@ class BaseRequest extends Singleton {
          $names = array($names);
       elseif (is_array($names)) {
          foreach ($names as $name)
-            if (is_string($name)) throw new IllegalTypeException('Illegal argument type in argument $names: '.getType($name));
+            if (!is_string($name)) throw new IllegalTypeException('Illegal argument type in argument $names: '.getType($name));
       }
       else {
          throw new IllegalTypeException('Illegal type of argument $names: '.getType($names));
@@ -679,7 +679,7 @@ class BaseRequest extends Singleton {
          $names = array($names);
       elseif (is_array($names)) {
          foreach ($names as $name)
-            if (is_string($name)) throw new IllegalTypeException('Illegal argument type in argument $names: '.getType($name));
+            if (!is_string($name)) throw new IllegalTypeException('Illegal argument type in argument $names: '.getType($name));
       }
       else {
          throw new IllegalTypeException('Illegal type of argument $names: '.getType($names));
