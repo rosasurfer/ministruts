@@ -31,7 +31,7 @@ final class HttpRequest extends Object {
     * @return HttpRequest
     */
    public function setMethod($method) {
-      if ($method!==(string)$method)           throw new IllegalTypeException('Illegal type of argument $method: '.getType($method));
+      if (!is_string($method))                 throw new IllegalTypeException('Illegal type of argument $method: '.getType($method));
       if ($method!=='GET' && $method!=='POST') throw new InvalidArgumentException('Invalid argument $method: '.$method);
 
       $this->method = $method;
@@ -57,7 +57,7 @@ final class HttpRequest extends Object {
     * @return HttpRequest
     */
    public function setUrl($url) {
-      if ($url!==(string)$url) throw new IllegalTypeException('Illegal type of argument $url: '.getType($url));
+      if (!is_string($url)) throw new IllegalTypeException('Illegal type of argument $url: '.getType($url));
 
       // TODO: URL genauer validieren
 

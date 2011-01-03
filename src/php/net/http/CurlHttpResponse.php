@@ -11,7 +11,7 @@ final class CurlHttpResponse extends HttpResponse {
 
 
    private /*HeaderParser*/ $headerParser;
-   private /*int*/          $status;         // Status-Code
+   private /*int*/          $status;         // HTTP-Statuscode
    private /*string*/       $content;        // Content
 
    // aktuelle Länge des gelesenen Contents in Byte
@@ -49,8 +49,8 @@ final class CurlHttpResponse extends HttpResponse {
     * @return CurlHttpResponse
     */
    public function setStatus($status) {
-      if ($status!==(int)$status) throw new IllegalTypeException('Illegal type of argument $status: '.getType($status));
-      if ($status < 1)            throw new InvalidArgumentException('Invalid argument $status: '.$status);
+      if (!is_int($status)) throw new IllegalTypeException('Illegal type of argument $status: '.getType($status));
+      if ($status < 1)      throw new InvalidArgumentException('Invalid argument $status: '.$status);
 
       $this->status = $status;
       return $this;
