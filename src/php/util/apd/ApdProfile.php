@@ -194,11 +194,10 @@ final class ApdProfile extends Object {
                if ($this->isOption('i') && $this->functionTypes[$function] == '1')
                   break;
 
-               if ($lastMemory) {
+               if ($lastMemory)
                   $this->functionMemoryUsage[$function] += ($memory - $lastMemory);
-               }
-               $lastMemory = $memory;
 
+               $lastMemory = $memory;
                array_pop($callstack);     // bei Verlassen der Funktion wird sie vom Stack entfernt
                break;
          }
