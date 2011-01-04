@@ -26,17 +26,21 @@ if (extension_loaded('APD') && isSet($_REQUEST['_PROFILE_'])) {
    $dumpFile = apd_set_pprof_trace(ini_get('apd.dumpdir'));
    if ($dumpFile) {
       // tatsächlichen Aufrufer des Scripts in weiterer Datei hinterlegen
-      $prot = isSet($_SERVER['HTTPS']) ? 'https':'http';
-      $host = $_SERVER['SERVER_NAME'];
-      $port = $_SERVER['SERVER_PORT']=='80' ? '':':'.$_SERVER['SERVER_PORT'];
-      $url  = "$prot://$host$port".$_SERVER['REQUEST_URI'];
-
+      if (!isSet($_SERVER['REQUEST_METHOD'])) {                      // Konsolenaufruf ...
+         $caller = $_SERVER['PHP_SELF'];
+      }
+      else {                                                         // ... oder Webserver-Request
+         $protocol = isSet($_SERVER['HTTPS']) ? 'https':'http';
+         $host     = $_SERVER['SERVER_NAME'];
+         $port     = $_SERVER['SERVER_PORT']=='80' ? '':':'.$_SERVER['SERVER_PORT'];
+         $caller = "$protocol://$host$port".$_SERVER['REQUEST_URI'];
+      }
       $fH = fOpen($dumpFile.'.caller', 'wb');
-      fWrite($fH, "caller=$url\n\nEND_HEADER\n");
+      fWrite($fH, "caller=$caller\n\nEND_HEADER\n");
       fClose($fH);
    }
-   push_shutdown_function('apd_addProfileLink', $dumpFile);    // wird als letzte Shutdown-Funktion ausgeführt
-   unset($dumpFile, $fH, $prot, $host, $port, $url);
+   push_shutdown_function('apd_addProfileLink', $dumpFile);          // wird als letzte Shutdown-Funktion ausgeführt
+   unset($dumpFile, $fH, $prot, $host, $port, $caller);
 }
 
 
@@ -60,7 +64,10 @@ function apd_addProfileLink($dumpFile = null) {
    // bei HTML-Content Link auf Profiler-Report ausgeben
    if ($html) {
       if ($dumpFile) echo('<p style="clear:both; text-align:left; margin:6px"><a href="/apd/?file='.$dumpFile.'" target="apd">Profiling Report: '.baseName($dumpFile).'</a>');
-      else           echo('<p style="clear:both; text-align:left; margin:6px">Profiling Report: filename not available (old APD version ?)');
+      else           echo('<p style="clear:both; text-align:left; margin:6px">Profiling Report: filename not available (console or old APD version ?)');
+   }
+   else if (!isSet($_SERVER['REQUEST_METHOD'])) {  // Konsolenaufruf
+      echo("dumpfile = $dumpFile");
    }
 }
 // -----------------------------------------------------------------------------------------------------------------------------------
