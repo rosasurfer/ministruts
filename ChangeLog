@@ -1,3 +1,8 @@
+2011-01-04
+
+   - Refactoring: php/struts/BaseRequest -> abstract php/struts/RequestBase
+
+
 2010-12-25
 
    - neu: php/struts/BaseRequest::getContentType() - gibt den Content-Type-Header des Requests zurück
