@@ -73,7 +73,7 @@ final class Config extends Object {
 
    /**
     * Gibt die Instanz dieser Klasse zurück.  Obwohl Config nicht Singleton implementiert, gibt es im
-    * User-Code nur eine einzige Instanz.  Die Konfiguration wird im Defaul-Cache gecacht.
+    * User-Code nur eine einzige Instanz.  Die Konfiguration wird im Default-Cache gecacht.
     *
     * @return Config
     */
