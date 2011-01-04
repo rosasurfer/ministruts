@@ -63,7 +63,7 @@
 final class Config extends Object {
 
 
-   // die gefundenen Config-Files
+   // Namen der gefundenen Config-Files
    private /*string[]*/ $files = array();
 
 
@@ -79,7 +79,7 @@ final class Config extends Object {
     */
    public static function me() {
       static /*Config*/ $config = null;      // emuliert Singleton (Config kann nicht Singleton sein)
-      static /*bool*/   $locked = false;     // Hilfsvariable, falls me() rekursiv aufgerufen wird
+      static /*bool  */ $locked = false;     // Hilfsvariable, falls me() rekursiv aufgerufen wird
 
       $cache = null;
 
@@ -169,7 +169,7 @@ final class Config extends Object {
       foreach ($lines as $line) {
          // Kommentare entfernen
          $parts = explode('#', $line, 2);
-         $line = trim($parts[0]);
+         $line  = trim($parts[0]);
          if ($line == '')
             continue;
 
@@ -197,7 +197,7 @@ final class Config extends Object {
     *                            kein Defaultwert angegeben wurde
     */
    public static function get($key, $default = null) {
-      if ($key!==(string)$key) throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
+      if (!is_string($key)) throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
 
       // TODO: Typen erkennen und automatisch casten
       $value = self ::me()->getProperty($key);
@@ -223,8 +223,8 @@ final class Config extends Object {
     * @param string $value - Einstellung
     */
    public static function set($key, $value) {
-      if ($key!==(string)$key)     throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
-      if ($value!==(string)$value) throw new IllegalTypeException('Illegal type of argument $value: '.getType($value));
+      if (!is_string($key))   throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
+      if (!is_string($value)) throw new IllegalTypeException('Illegal type of argument $value: '.getType($value));
 
       return self ::me()->setProperty($key, $value);
    }
