@@ -22,7 +22,7 @@
  * TODO: LinkTool implementieren, um path-info verwenden zu können
  * TODO: Versions-String in css- und js-Links einfügen
  */
-class BaseRequest extends Singleton {
+abstract class BaseRequest extends Singleton {
 
 
    private /*string*/ $method;
@@ -41,16 +41,22 @@ class BaseRequest extends Singleton {
 
 
    /**
-    * Gibt die Singleton-Instanz dieser Klasse zurück, wenn das Script im Kontext eines HTTP-Requestes aufgerufen
-    * wurde. In allen anderen Fällen, z.B. bei Aufruf in der Konsole, wird NULL zurückgegeben.
+    * Gibt die Singleton-Instanz des konkreten Requests zurück, wenn das Script im Kontext eines HTTP-Requestes
+    * aufgerufen wurde. In allen anderen Fällen, z.B. bei Aufruf in der Konsole, wird NULL zurückgegeben.
     *
     * @return Singleton - Instanz oder NULL
+    *
+    * NOTE: Diese Methode muß in der konkreten Request-Klasse und *nicht hier* implementiert werden.
+    *       Der entsprechende Code ist nachfolgend angegeben und muß *unverändert* übernommen werden.
     */
    public static function me() {
+      throw new UnimplementedFeatureException('Method '.__METHOD__.'() must not be called directly, it needs to be implemented in the concrete Request class.');
+
+      // !!! Begin of default implementation, copy this piece of code into the concrete Request class !!!
       if (isSet($_SERVER['REQUEST_METHOD']))
          return Singleton ::getInstance(__CLASS__);
-
       return null;
+      // !!! End of default implementation ---------------------------------------------------------- !!!
    }
 
 
