@@ -1,10 +1,13 @@
 <?
 /**
- * Wrapper für BaseRequest
+ * Wrapper für RequestBase
  *
- * @see BaseRequest
+ * NOTE: Wird eine projektspezifische Request-Implementierung benötigt, kann im Projekt eine eigene Klasse Request deklariert werden
+ *       (die wie diese von RequestBase abgeleitet ist). Diese Klasse kann dann projektspezifisch angepaßt werden.
+ *
+ * @see RequestBase
  */
-final class Request extends BaseRequest {
+final class Request extends RequestBase {
 
 
    /**

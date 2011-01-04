@@ -1,12 +1,26 @@
 <?
 /**
- * BaseRequest
+ * RequestBase
  *
- * Diese Klasse stellt den HTTP-Request mit seinen Daten dar, sowie er von PHP an das aufgerufene
- * Script übergeben wurde. Da es immer nur einen einzigen Request geben kann, ist er als Singleton
- * implementiert.  Das bedeutet unter anderem, daß es keinen öffentlichen Konstruktor gibt, man kann
- * also nicht selbst einen neuen Request erzeugen (es gibt nur den einen, der vom Server an PHP
- * weitergereicht wurde).
+ * Diese Klasse stellt den HTTP-Request mit seinen Daten dar, sowie er von PHP an das aufgerufene Script übergeben wird.
+ * Da es immer nur einen einzigen Request geben kann, ist er als Singleton implementiert.  Das bedeutet unter anderem,
+ * daß es keinen öffentlichen Konstruktor gibt, man kann also nicht selbst einen neuen Request erzeugen (es gibt nur den
+ * einen, der vom Server an PHP weitergereicht wurde).
+ *
+ * Warum eine abstrakte Klasse RequestBase und eine zusätzliche, funktional leere Klasse Request als Implementierung?
+ *
+ * Wird eine projektspezifische Implementierung oder Erweiterung der Klasse Request benötigt, müßte eine Projektklasse von
+ * der Basisklasse der Library abgeleitet werden. Da PHP 5.2 keine Namespaces hat, würde für das Projekt der Klassenname
+ * Request für diese erweiterte Klasse nicht mehr zur Verfügung stehen (Überlappung mit Klasse desselben Namens in der Library).
+ * Durch die abstrakte Klasse RequestBase kann im Projekt eigene Funktionalität implementiert werden, und der Klassenname
+ * Request steht trotz fehlender Namespaces weiterhin frei zur Verfügung. Dieser Workaround wird erst mit Umstellung der Library
+ * auf PHP 5.3 überflüssig.
+ *
+ * Bis dahin beten wir zu den Göttern... und wenn es dann soweit ist: Da war ihres "Allah" Rufens kein Ende.¹
+ *
+ * ¹ Wörtlich: es war hoch ihr <i>takbìr</i>, d.h. sie begannen, als Zeichen größten Staunens, immer wieder <i>Allah akbar</i>
+ *   "Gott ist groß" zu rufen.
+ *
  *
  * NOTE:
  * -----
@@ -16,13 +30,13 @@
  * Die globalen PHP-Variablen $_GET, $_POST und $_REQUEST entsprechen der Originalimplementierung,
  * mehrfache Werte werden also überschrieben.
  *
- * @see BaseRequest::getParameter()
- * @see BaseRequest::getParameters()
+ * @see RequestBase::getParameter()
+ * @see RequestBase::getParameters()
  *
  * TODO: LinkTool implementieren, um path-info verwenden zu können
  * TODO: Versions-String in css- und js-Links einfügen
  */
-abstract class BaseRequest extends Singleton {
+abstract class RequestBase extends Singleton {
 
 
    private /*string*/ $method;
@@ -33,8 +47,7 @@ abstract class BaseRequest extends Singleton {
    // Parameterhalter
    private $parameters = array('REQUEST' => array(),
                                'GET'     => array(),
-                               'POST'    => array(),
-                               );
+                               'POST'    => array());
 
    // Attribute-Pool
    private $attributes = array();
@@ -46,17 +59,17 @@ abstract class BaseRequest extends Singleton {
     *
     * @return Singleton - Instanz oder NULL
     *
-    * NOTE: Diese Methode muß in der konkreten Request-Klasse und *nicht hier* implementiert werden.
-    *       Der entsprechende Code ist nachfolgend angegeben und muß *unverändert* übernommen werden.
+    * NOTE: Diese Methode muß nicht hier, sondern in der konkreten Request-Klasse implementiert werden.
+    *       Der entsprechende Code ist nachfolgend angegeben und muß unverändert übernommen werden.
     */
    public static function me() {
-      throw new UnimplementedFeatureException('Method '.__METHOD__.'() must not be called directly, it needs to be implemented in the concrete Request class.');
+      throw new RuntimeException('Method '.__METHOD__.'() must not be called directly, it needs to be implemented in the concrete Request class.');
 
-      // !!! Begin of default implementation, copy this piece of code into the concrete Request class !!!
+      // !!! begin code snippet !!!
       if (isSet($_SERVER['REQUEST_METHOD']))
          return Singleton ::getInstance(__CLASS__);
       return null;
-      // !!! End of default implementation ---------------------------------------------------------- !!!
+      // !!! end code snippet   !!!
    }
 
 
@@ -93,8 +106,8 @@ abstract class BaseRequest extends Singleton {
     * @param string $rawData - Parameter-Rohdaten
     * @param string $target  - Bezeichner für das Zielarray: 'GET' oder 'POST'
     *
-    * @see BaseRequest::getParameter()
-    * @see BaseRequest::getParameters()
+    * @see RequestBase::getParameter()
+    * @see RequestBase::getParameters()
     */
    protected function parseParameters($rawData, $target) {
       $pairs = explode('&', $rawData);
@@ -348,11 +361,11 @@ abstract class BaseRequest extends Singleton {
 
 
    /**
-    * Alias für Request::getApplicationPath() (für die Java-Abteilung :-)
+    * Alias für RequestBase::getApplicationPath() (für die Java-Abteilung :-)
     *
     * @return string
     *
-    * @see BaseRequest::getApplicationPath()
+    * @see RequestBase::getApplicationPath()
     */
    public function getContextPath() {
       return $this->getApplicationPath();
@@ -759,16 +772,16 @@ abstract class BaseRequest extends Singleton {
     * @param string $path    - Pfad, für den der Cookie gültig sein soll
     */
    public function setCookie($name, $value, $expires = 0, $path = null) {
-      if ($name!==(string)$name)    throw new IllegalTypeException('Illegal type of argument $name: '.getType($name));
-      if ($expires!==(int)$expires) throw new IllegalTypeException('Illegal type of argument $expires: '.getType($expires));
-      if ($expires < 0)             throw new InvalidArgumentException('Invalid argument $expires: '.$expires);
+      if (!is_string($name)) throw new IllegalTypeException('Illegal type of argument $name: '.getType($name));
+      if (!is_int($expires)) throw new IllegalTypeException('Illegal type of argument $expires: '.getType($expires));
+      if ($expires < 0)      throw new InvalidArgumentException('Invalid argument $expires: '.$expires);
 
       $value = (string) $value;
 
       if ($path === null)
          $path = $this->getApplicationPath().'/';
 
-      if ($path!==(string)$path) throw new IllegalTypeException('Illegal type of argument $path: '.getType($path));
+      if (!is_string($path)) throw new IllegalTypeException('Illegal type of argument $path: '.getType($path));
 
       setCookie($name, $value, $expires, $path);
    }
@@ -782,7 +795,7 @@ abstract class BaseRequest extends Singleton {
     * @return bool
     */
    public function isUserInRole($roles) {
-      if ($roles!==(string)$roles) throw new IllegalTypeException('Illegal type of argument $roles: '.getType($roles));
+      if (!is_string($roles)) throw new IllegalTypeException('Illegal type of argument $roles: '.getType($roles));
 
       // Module holen
       $module = $this->getAttribute(Struts ::MODULE_KEY);
@@ -864,7 +877,7 @@ abstract class BaseRequest extends Singleton {
          if (isSet($this->attributes[Struts ::ACTION_ERRORS_KEY][$key]))
             unset($this->attributes[Struts ::ACTION_ERRORS_KEY][$key]);
       }
-      elseif ($message === (string) $message) {
+      elseif (is_string($message)) {
          $this->attributes[Struts ::ACTION_ERRORS_KEY][$key] = $message;
       }
       else {
