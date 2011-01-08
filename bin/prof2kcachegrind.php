@@ -19,13 +19,13 @@ if (!isSet($options['f'])) {
 }
 
 if (!file_exists($options['f'])) {
-   print("Trace file ${opt['f']} does not exist\n");
+   print("Trace file {$opt['f']} does not exist\n");
    exit(1);
 }
 
 $IN = fOpen($options['f'], "r");
 if (!$IN) {
-   print("Trace file ${opt['f']} could not be opened\n");
+   print("Trace file {$opt['f']} could not be opened\n");
    exit(1);
 }
 

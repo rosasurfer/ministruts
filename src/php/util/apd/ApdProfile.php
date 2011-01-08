@@ -228,9 +228,9 @@ final class ApdProfile extends Object {
       $header = "
       Trace for %s
 
-      Total Elapsed Time = %$m.${d}f
-      Total User Time    = %$m.${d}f
-      Total System Time  = %$m.${d}f
+      Total Elapsed Time = %$m.{$d}f
+      Total User Time    = %$m.{$d}f
+      Total System Time  = %$m.{$d}f
       ";
       echoPre(sprintf($header, $this->config['caller'], $this->totalRealTime/1000000, $this->totalUserTime/1000000, $this->totalSystemTime/1000000));
    }

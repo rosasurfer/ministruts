@@ -140,7 +140,7 @@ if (strLen($value) > 0) {
       case 'C128A':
       case 'C128B':
       case 'C128C':
-         $class   = "${type}BarCode";
+         $class   = "{$type}BarCode";
          $barcode = new $class($value, $width, $height, $style, $xres, $font);
 
          $content     = $barcode->toString();

@@ -74,8 +74,8 @@ abstract class ActionForm extends Object {
       $array = (array) $this;
 
       $null = chr(0);
-      unset($array["${null}*${null}request"  ],    // unset transient properties
-            $array["${null}*${null}actionKey"]);
+      unset($array["{$null}*{$null}request"  ],    // unset transient properties
+            $array["{$null}*{$null}actionKey"]);
 
       return array_keys($array);                   // return the remaining keys (= property names)
    }
