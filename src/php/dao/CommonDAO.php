@@ -2,8 +2,7 @@
 /**
  * CommonDAO
  *
- * Ein einfacher DAO, der die Grundfunktionaliät bereitstellt.  Kann anwendungsspezifisch erweitert
- * werden.
+ * Ein einfacher DAO, der die Grundfunktionalität bereitstellt.  Kann anwendungsspezifisch erweitert werden.
  */
 class CommonDAO extends Singleton {
 
@@ -69,6 +68,13 @@ class CommonDAO extends Singleton {
 
 
    /**
+    * Führt eine SQL-Anweisung aus. Gibt das Ergebnis als mehrdimensionales Array zurück.
+    *
+    * @param  string $sql   - SQL-Anweisung
+    * @param  bool   $count - ob der interne Ergebniszähler aktualisiert werden soll
+    *
+    * @return array['set' ] - das zurückgegebene Resultset (nur bei SELECT-Statement)
+    *              ['rows'] - Anzahl der betroffenen Datensätze (nur bei SELECT/INSERT/UPDATE-Statement)
     */
    final public function executeSql($sql, $count = false) {
       return $this->getWorker()->executeSql($sql, $count);

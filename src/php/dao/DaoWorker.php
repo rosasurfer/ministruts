@@ -55,6 +55,13 @@ class DaoWorker extends Object {
 
 
    /**
+    * Führt eine SQL-Anweisung aus. Gibt das Ergebnis als mehrdimensionales Array zurück.
+    *
+    * @param  string $sql   - SQL-Anweisung
+    * @param  bool   $count - ob der interne Ergebniszähler aktualisiert werden soll
+    *
+    * @return array['set' ] - das zurückgegebene Resultset (nur bei SELECT-Statement)
+    *              ['rows'] - Anzahl der betroffenen Datensätze (nur bei SELECT/INSERT/UPDATE-Statement)
     */
    public function executeSql($sql, $count = false) {
       $result = $this->getDB()->executeSql($sql);

@@ -100,7 +100,7 @@ final class MySQLConnector extends DB {
    /**
     * Führt eine SQL-Anweisung aus und gibt das Ergebnis als Resource zurück.
     *
-    * @param string $sql - SQL-Anweisung
+    * @param  string $sql - SQL-Anweisung
     *
     * @return mixed - je nach Statement ein ResultSet oder ein Boolean
     */
@@ -157,12 +157,12 @@ final class MySQLConnector extends DB {
 
 
    /**
-    * Führt eine SQL-Anweisung aus. Gibt das Ergebnis als Array zurück.
+    * Führt eine SQL-Anweisung aus. Gibt das Ergebnis als mehrdimensionales Array zurück.
     *
-    * @param string $sql - SQL-Anweisung
+    * @param  string $sql - SQL-Anweisung
     *
-    * @return array['set' ] - das zurückgegebene Resultset (bei SELECT)
-    *              ['rows'] - Anzahl der betroffenen Datensätze (bei SELECT/INSERT/UPDATE)
+    * @return array['set' ] - das zurückgegebene Resultset (nur bei SELECT-Statement)
+    *              ['rows'] - Anzahl der betroffenen Datensätze (nur bei SELECT/INSERT/UPDATE-Statement)
     */
    public function executeSql($sql) {
       $result = array('set'  => null,
@@ -208,8 +208,8 @@ final class MySQLConnector extends DB {
    /**
     * Hilfsfunktion zur formatierten Ausgabe der aktuell laufenden Prozesse.
     *
-    * @param bool $return - Ob die Ausgabe auf STDOUT (FALSE) oder als Rückgabewert der Funktion (TRUE) erfolgen soll.
-    *                       (default: FALSE)
+    * @param  bool $return - Ob die Ausgabe auf STDOUT (FALSE) oder als Rückgabewert der Funktion (TRUE) erfolgen soll.
+    *                        (default: FALSE)
     *
     * @return string - wenn $return TRUE ist, die Ausgabe, andererseits NULL
     */
@@ -304,8 +304,8 @@ final class MySQLConnector extends DB {
    /**
     * Gibt eine aufbereitete und formatierte Version des aktuellen InnoDB-Deadlock-Status der Datenbank aus.
     *
-    * @param bool $return - Ob die Ausgabe auf STDOUT (FALSE) oder als Rückgabewert der Funktion (TRUE) erfolgen soll.
-    *                       (default: FALSE)
+    * @param  bool $return - Ob die Ausgabe auf STDOUT (FALSE) oder als Rückgabewert der Funktion (TRUE) erfolgen soll.
+    *                        (default: FALSE)
     *
     * @return string - Rückgabewert, wenn $return TRUE ist, NULL andererseits
     */

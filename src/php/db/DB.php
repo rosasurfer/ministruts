@@ -8,9 +8,9 @@ abstract class DB extends Object {
 
 
    /**
-    * Das interne, originale Connection-Objekt.
+    * Handle auf das interne, originale Connection-Objekt.
     */
-   protected /*resource*/ $link;
+   protected /*hResource*/ $link;
 
 
    // Verbindungs- und Zugangsdaten
@@ -71,7 +71,7 @@ abstract class DB extends Object {
    /**
     * Führt eine SQL-Anweisung aus.
     *
-    * @param string $sql - SQL-Anweisung
+    * @param  string $sql - SQL-Anweisung
     *
     * @return mixed - je nach Connector
     */
@@ -79,12 +79,12 @@ abstract class DB extends Object {
 
 
    /**
-    * Führt eine SQL-Anweisung aus. Gibt das Ergebnis als Array zurück.
+    * Führt eine SQL-Anweisung aus. Gibt das Ergebnis als mehrdimensionales Array zurück.
     *
-    * @param string $sql - SQL-Anweisung
+    * @param  string $sql - SQL-Anweisung
     *
-    * @return array['set' ] - das zurückgegebene Resultset (bei SELECT)
-    *              ['rows'] - Anzahl der betroffenen Datensätze (bei SELECT/INSERT/UPDATE)
+    * @return array['set' ] - das zurückgegebene Resultset (nur bei SELECT-Statement)
+    *              ['rows'] - Anzahl der betroffenen Datensätze (nur bei SELECT/INSERT/UPDATE-Statement)
     */
    abstract public function executeSql($sql);
 
@@ -116,7 +116,7 @@ abstract class DB extends Object {
    /**
     * Setzt Namen und Port des Datenbankservers.
     *
-    * @param string $host
+    * @param  string $host
     *
     * @return DB
     */
@@ -136,7 +136,7 @@ abstract class DB extends Object {
    /**
     * Setzt den Benutzernamen.
     *
-    * @param string $name
+    * @param  string $name
     *
     * @return DB
     */
@@ -149,7 +149,7 @@ abstract class DB extends Object {
    /**
     * Setzt das Passwort.
     *
-    * @param string $password
+    * @param  string $password
     *
     * @return DB
     */
@@ -162,7 +162,7 @@ abstract class DB extends Object {
    /**
     * Setzt den Namen des Datenbankschemas.
     *
-    * @param string $name - Datenbankname
+    * @param  string $name - Datenbankname
     *
     * @return DB
     */
