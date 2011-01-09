@@ -523,11 +523,11 @@ abstract class RequestBase extends Singleton {
       $contentType = $this->getHeaderValue('Content-Type');
 
       if ($contentType) {
-         $types       = explode(',', $contentType, 2);
-         $contentType = array_shift($types);
+         $headers     = explode(',', $contentType);
+         $contentType = array_shift($headers);
 
-         $parts       = explode(';', $contentType, 2);
-         $contentType = trim(array_shift($parts));
+         $values      = explode(';', $contentType, 2);
+         $contentType = trim(array_shift($values));
       }
 
       return $contentType;
