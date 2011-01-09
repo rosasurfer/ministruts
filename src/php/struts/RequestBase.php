@@ -496,8 +496,9 @@ abstract class RequestBase extends Singleton {
          if ($this->isPost()) {
             $contentType = $this->getHeaderValue('Content-Type');
             if ($contentType) {
-               $parts = explode(';', $contentType);
-               $contentType = $parts[0];
+               $headers     = explode(',', $contentType);
+               $parts       = explode(';', array_shift($headers), 2);
+               $contentType = array_shift($parts);
             }
             if ($contentType == 'multipart/form-data') {
                // TODO: php://input is not available with enctype="multipart/form-data"
