@@ -40,8 +40,8 @@ final class FileLock extends BaseLock {
     *                         (default: FALSE = exklusives Lock)
     */
    public function __construct($file, $shared = false) {
-      if ($file!==(string)$file)        throw new IllegalTypeException('Illegal type of argument $file: '.getType($file));
-      if ($shared!==(bool)$shared)      throw new IllegalTypeException('Illegal type of argument $shared: '.getType($shared));
+      if (!is_string($file))            throw new IllegalTypeException('Illegal type of argument $file: '.getType($file));
+      if (!is_bool($shared))            throw new IllegalTypeException('Illegal type of argument $shared: '.getType($shared));
       if (isSet(self::$handles[$file])) throw new RuntimeException('Dead-lock detected: already holding a lock for file "'.$file.'"');
       self::$handles[$file] = false;
 
@@ -109,7 +109,7 @@ final class FileLock extends BaseLock {
     * @param bool $deleteFile - ob das verwendete Lockfile beim Freigeben des Locks gelöscht werden soll (default: FALSE)
     */
    public function release($deleteFile = false) {
-      if ($deleteFile!==(bool)$deleteFile) throw new IllegalTypeException('Illegal type of argument $deleteFile: '.getType($deleteFile));
+      if (!is_bool($deleteFile)) throw new IllegalTypeException('Illegal type of argument $deleteFile: '.getType($deleteFile));
 
       if ($this->isValid()) {
          fClose(self::$handles[$this->file]);   // see docs: The lock is released also by fClose()...
