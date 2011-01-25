@@ -130,7 +130,7 @@ final class ApcCache extends CachePeer {
     * @return bool - TRUE bei Erfolg, FALSE andererseits
     */
    public function set($key, &$value, $expires = Cache ::EXPIRES_NEVER, Dependency $dependency = null) {
-      if ($key!==(string)$key)      throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
+      if (!is_string($key))         throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
       if ($expires!==(int)$expires) throw new IllegalTypeException('Illegal type of parameter $expires: '.getType($expires));
 
       // im Cache wird ein array(created, expires, serialize(array(value, dependency))) gespeichert

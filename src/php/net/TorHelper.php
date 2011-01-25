@@ -43,7 +43,7 @@ class TorHelper extends StaticClass {
    public static function isExitNode($ip) {
       self:: init();
 
-      if ($ip!==(string)$ip) throw new IllegalTypeException('Illegal type of parameter $ip: '.getType($ip));
+      if (!is_string($ip)) throw new IllegalTypeException('Illegal type of parameter $ip: '.getType($ip));
 
       // TODO: mit Filter-Extension lokale Netze abfangen
       if ($ip == '127.0.0.1')

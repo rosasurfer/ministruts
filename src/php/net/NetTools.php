@@ -13,8 +13,8 @@ final class NetTools extends StaticClass {
     * @return string - Hostname oder die originale IP-Adresse, wenn diese nicht aufgelöst werden kann
     */
    public static function getHostByAddress($address) {
-      if ($address !== (string)$address) throw new IllegalTypeException('Illegal type of parameter $address: '.getType($address));
-      if ($address == '')                throw new InvalidArgumentException('Invalid argument $address: "'.$address.'"');
+      if (!is_string($address)) throw new IllegalTypeException('Illegal type of parameter $address: '.getType($address));
+      if ($address == '')       throw new InvalidArgumentException('Invalid argument $address: "'.$address.'"');
 
       try {
          return getHostByAddr($address);
@@ -35,8 +35,8 @@ final class NetTools extends StaticClass {
     * @return string - IP-Adresse oder der originale Hostname, wenn dieser nicht aufgelöst werden kann
     */
    public static function getHostByName($name) {
-      if ($name !== (string)$name) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
-      if ($name == '')             throw new InvalidArgumentException('Invalid argument $name: "'.$name.'"');
+      if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
+      if ($name == '')       throw new InvalidArgumentException('Invalid argument $name: "'.$name.'"');
 
       return getHostByName($name);
    }

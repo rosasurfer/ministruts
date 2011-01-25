@@ -15,10 +15,10 @@ final class String extends StaticClass {
     * @return bool
     */
    public static function startsWith($string, $start, $ignoreCase = false) {
-      if ($string!==null && $string!==(string)$string) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
-      if ($start!==null && $start!==(string)$start)    throw new IllegalTypeException('Illegal type of parameter $start: '.getType($start));
-      if ($start == '')                                throw new InvalidArgumentException('Invalid argument $start: "'.$start.'"');
-      if ($ignoreCase!==(bool)$ignoreCase)             throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
+      if ($string!==null && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+      if ($start!==null && !is_string($start))   throw new IllegalTypeException('Illegal type of parameter $start: '.getType($start));
+      if ($start == '')                          throw new InvalidArgumentException('Invalid argument $start: "'.$start.'"');
+      if ($ignoreCase!==(bool)$ignoreCase)       throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
 
       if ($ignoreCase)
          return (striPos($string, $start) === 0);
@@ -37,9 +37,9 @@ final class String extends StaticClass {
     * @return bool
     */
    public static function endsWith($string, $end, $ignoreCase = false) {
-      if ($string!==null && $string!==(string)$string) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
-      if ($end!==null && $end!==(string)$end)          throw new IllegalTypeException('Illegal type of parameter $end: '.getType($end));
-      if ($ignoreCase!==(bool)$ignoreCase)             throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
+      if ($string!==null && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+      if ($end!==null && !is_string($end))       throw new IllegalTypeException('Illegal type of parameter $end: '.getType($end));
+      if ($ignoreCase!==(bool)$ignoreCase)       throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
 
       return self:: startsWith(strRev($string), strRev($end), $ignoreCase);
    }
@@ -55,9 +55,9 @@ final class String extends StaticClass {
     * @return bool
     */
    public static function contains($haystack, $needle, $case = true) {
-      if ($haystack!==null && $haystack!==(string)$haystack) throw new IllegalTypeException('Illegal type of parameter $haystack: '.getType($haystack));
-      if ($needle  !==null && $needle!==(string)$needle)     throw new IllegalTypeException('Illegal type of parameter $needle: '.getType($needle));
-      if ($case    !==true && $case!==false)                 throw new IllegalTypeException('Illegal type of parameter $case: '.getType($case));
+      if ($haystack!==null && !is_string($haystack)) throw new IllegalTypeException('Illegal type of parameter $haystack: '.getType($haystack));
+      if ($needle  !==null && !is_string($needle))   throw new IllegalTypeException('Illegal type of parameter $needle: '.getType($needle));
+      if ($case    !==true && $case!==false)         throw new IllegalTypeException('Illegal type of parameter $case: '.getType($case));
 
       if ($case)
          return (strPos($haystack, $needle) !== false);
@@ -74,7 +74,7 @@ final class String extends StaticClass {
     * @return bool
     */
    public static function isUtf8Encoded($string) {
-      if ($string!==null && $string!==(string)$string) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+      if ($string!==null && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
 
       // TODO: String::isUtf8Encoded() enthält Fehler
 
@@ -105,7 +105,7 @@ final class String extends StaticClass {
       if ($string===null || $string==='')
          return $string;
 
-      if ($string !== (string)$string) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+      if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
 
 
       // prüfen, ob iconv() verfügbar ist, denn PHP schreibt bei fatalem Fehler keinen Fehler ins Errorlog: DANKE, PHP-Team !!!
@@ -151,7 +151,7 @@ final class String extends StaticClass {
       if ($string===null || $string==='')
          return $string;
 
-      if ($string!==(string)$string) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+      if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
 
       return utf8_encode($string);
    }
@@ -240,7 +240,7 @@ final class String extends StaticClass {
       if ($string===null || $string==='')
          return $string;
 
-      if ($string!==(string)$string) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+      if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
 
       return str_replace(array("\r\n", "\r", "\n"),
                          array("\n"  , "\n", " " ),
@@ -259,7 +259,7 @@ final class String extends StaticClass {
       if ($string===null || $string==='')
          return $string;
 
-      if ($string!==(string)$string) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+      if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
 
       return preg_replace('/\s+/', ' ', $string);
    }

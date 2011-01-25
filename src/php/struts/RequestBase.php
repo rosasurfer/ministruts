@@ -592,7 +592,7 @@ abstract class RequestBase extends Singleton {
     * @return array - Name-Wert-Paar oder NULL, wenn kein Header dieses Namens übertragen wurde
     */
    public function getHeader($name) {
-      if ($name!==(string)$name) throw new IllegalTypeException('Illegal type of argument $name: '.getType($name));
+      if (!is_string($name)) throw new IllegalTypeException('Illegal type of argument $name: '.getType($name));
 
       $headers = $this->getHeaders($name);
       return array_shift($headers);

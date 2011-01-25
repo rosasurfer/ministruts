@@ -308,8 +308,8 @@ class Logger extends StaticClass {
          throw new InvalidArgumentException('Invalid number of arguments: '.$args);
       }
 
-      if ($level!==(int)$level)    throw new IllegalTypeException('Illegal type of parameter $level: '.getType($level));
-      if ($class!==(string)$class) throw new IllegalTypeException('Illegal type of parameter $class: '.getType($class));
+      if ($level!==(int)$level) throw new IllegalTypeException('Illegal type of parameter $level: '.getType($level));
+      if (!is_string($class))   throw new IllegalTypeException('Illegal type of parameter $class: '.getType($class));
 
       // was der jeweilige Loglevel nicht abdeckt, wird ignoriert
       if ($level < self ::getLogLevel($class))
@@ -325,7 +325,7 @@ class Logger extends StaticClass {
       }
 
       // Aufruf mit vier Argumenten
-      if ($message!==null && $message!==(string)$message)        throw new IllegalTypeException('Illegal type of parameter $message: '.getType($message));
+      if ($message!==null && !is_string($message))               throw new IllegalTypeException('Illegal type of parameter $message: '.getType($message));
       if ($exception!==null && !$exception instanceof Exception) throw new IllegalTypeException('Illegal type of parameter $exception: '.(is_object($exception) ? get_class($exception) : getType($exception)));
 
       return self:: _log($message, $exception, $level);        // Logger::log($message, $exception, $level, $class)

@@ -120,7 +120,7 @@ abstract class Mailer extends Object {
     *                 Adresse syntaktisch falsch ist
     */
    final protected function parseAddress($address) {
-      if ($address!==(string)$address) throw new IllegalTypeException('Illegal type of parameter $address: '.getType($address));
+      if (!is_string($address)) throw new IllegalTypeException('Illegal type of parameter $address: '.getType($address));
 
       $address = trim($address);
 
