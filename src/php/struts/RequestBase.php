@@ -491,8 +491,6 @@ abstract class RequestBase extends Singleton {
       static $read    = false;
 
       if (!$read) {
-         $read = true;
-
          if ($this->isPost()) {
             $contentType = $this->getHeaderValue('Content-Type');
             if ($contentType) {
@@ -508,6 +506,7 @@ abstract class RequestBase extends Singleton {
                $content = file_get_contents('php://input');
             }
          }
+         $read = true;
       }
 
       return $content;
