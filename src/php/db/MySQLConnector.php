@@ -47,6 +47,23 @@ final class MySQLConnector extends DB {
       }
 
       try {
+         foreach ($this->options as $option => $value) {
+            if (strLen($value)) {
+               if (!cType_digit($value))
+                  $value = "'$value'";
+               $sql = "set $option = $value";
+               if (!$this->queryRaw($sql)) throw new InfrastructureException(mysql_error($this->link));
+            }
+         }
+      }
+      catch (InfrastructureException $ex) {
+         throw $ex;
+      }
+      catch (Exception $ex) {
+         throw new InfrastructureException("Can not set system variable '$sql'", $ex);
+      }
+
+      try {
          if ($this->database && !mysql_select_db($this->database, $this->link))
             throw new InfrastructureException(mysql_error($this->link));
       }
@@ -149,7 +166,6 @@ final class MySQLConnector extends DB {
          $neededTime = round($end - $start, 4);
          if ($neededTime > self::$maxQueryTime)
             Logger ::log('SQL statement took more than '.self::$maxQueryTime." seconds: $neededTime\n$sql", L_DEBUG, __CLASS__);
-
          //Logger ::log($this->printDeadlockStatus(true), L_DEBUG, __CLASS__);
       }
       return $result;

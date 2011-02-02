@@ -61,16 +61,17 @@ final class DBPool extends Singleton {
          if (isSet(self::$knownConnectors[$name])) {
             $class = self::$knownConnectors[$name];
          }
-         else {   // unbekannt, Fall-back zu "name.Connector"
+         else {   // unbekannt, Fall-back zu "{$name}Connector"
             $class = $config['connector'].'Connector';
          }
 
-         $host  = $config['host'     ];
-         $user  = $config['username' ];
-         $pass  = $config['password' ];
-         $db    = $config['database' ];
+         $host    = $config['host'     ];
+         $user    = $config['username' ];
+         $pass    = $config['password' ];
+         $db      = $config['database' ];
+         $options = isSet($config['options']) ? $config['options'] : null;
 
-         $connector = DB ::spawn($class, $host, $user, $pass, $db);
+         $connector = DB ::spawn($class, $host, $user, $pass, $db, $options);
          $me->pool[$alias] = $connector;
       }
       else {

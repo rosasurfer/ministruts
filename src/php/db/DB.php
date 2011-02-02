@@ -14,11 +14,12 @@ abstract class DB extends Object {
 
 
    // Verbindungs- und Zugangsdaten
-   protected /*string*/ $host;
-   protected /*string*/ $port;
-   protected /*string*/ $username;
-   protected /*string*/ $password;
-   protected /*string*/ $database;
+   protected /*string*/   $host;
+   protected /*string*/   $port;
+   protected /*string*/   $username;
+   protected /*string*/   $password;
+   protected /*string*/   $database;
+   protected /*string[]*/ $options;
 
 
    /**
@@ -92,15 +93,16 @@ abstract class DB extends Object {
    /**
     * Erzeugt einen neuen Connector und initialisiert ihn.
     *
-    * @param  string $class    - Klassenname des konkreten Connectors
-    * @param  string $host     - Hostname(:Port) des Datenbankservers
-    * @param  string $username - Benutzername
-    * @param  string $password - Passwort
-    * @param  string $database - vorzuselektierende Datenbank
+    * @param  string   $class    - Klassenname des konkreten Connectors
+    * @param  string   $host     - Hostname(:Port) des Datenbankservers
+    * @param  string   $username - Benutzername
+    * @param  string   $password - Passwort
+    * @param  string   $database - vorzuselektierende Datenbank
+    * @param  string[] $options  - weitere Verbindungsoptionen
     *
     * @return DB - Connector
     */
-   public static function spawn($class, $host, $username, $password, $database = null) {
+   public static function spawn($class, $host, $username, $password, $database = null, array $options = null) {
       if (!is_subclass_of($class, __CLASS__))
          throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
 
@@ -108,7 +110,8 @@ abstract class DB extends Object {
       $connector->setHost($host)
                 ->setUsername($username)
                 ->setPassword($password)
-                ->setDataBase($database);
+                ->setDataBase($database)
+                ->setOptions($options);
       return $connector;
    }
 
@@ -168,6 +171,21 @@ abstract class DB extends Object {
     */
    protected function setDatabase($name) {
       $this->database = $name;
+      return $this;
+   }
+
+
+   /**
+    * Setzt weitere Verbindungsoptionen.
+    *
+    * @param  string[] $options - Optionen
+    *
+    * @return DB
+    */
+   protected function setOptions($options) {
+      if (is_null($options))
+         $options = array();
+      $this->options = $options;
       return $this;
    }
 
