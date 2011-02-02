@@ -123,5 +123,32 @@ class CommonDAO extends Singleton {
       }
       return $this->worker;
    }
+
+
+   /**
+    * Gibt die aktuelle Version des übergebenen Objects zurück.
+    *
+    * @param  PersistableObject $object - PersistableObject-Instanz
+    *
+    * @return PersistableObject instance
+    */
+   public final function refresh(PersistableObject $object) {
+      $class = $this->getEntityClass();
+      if (!$object instanceof $class) throw new InvalidArgumentException('Cannot refresh instances of '.get_class($object));
+      if (!$object->isPersistent())   throw new InvalidArgumentException('Cannot refresh non-persistent '.get_class($object));
+
+      $mapping   = $this->getMapping();
+      $tablename = $mapping['table'];
+      $id        = $object->getId();
+
+      $sql = "select *
+                 from `$tablename`
+                 where id = $id";
+      $instance = $this->getByQuery($sql);
+
+      if (!$instance) throw new ConcurrentModificationException('Error refreshing '.get_class($object).' ('.$id.'), data row not found');
+
+      return $instance;
+   }
 }
 ?>
