@@ -1,3 +1,8 @@
+2011-02-02
+
+   - neu: php/db/DB ermöglicht die Angabe weiterer Verbindungsoptionen in der DB-Konfiguration
+   
+
 2011-01-04
 
    - Refactoring: php/struts/BaseRequest -> abstract php/struts/RequestBase
