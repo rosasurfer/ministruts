@@ -241,18 +241,18 @@ final class Config extends Object {
       $properties =& $this->properties;
 
       $parts = explode('.', $key);
-      $size = sizeOf($parts);
+      $size  = sizeOf($parts);
 
       for ($i=0; $i<$size; ++$i) {
          $subkey = $parts[$i];
 
-         if (!isSet($properties[$subkey]))
-            break;
-
-         if ($i+1 == $size)   // das letzte Element
+         if (!is_array($properties) || !isSet($properties[$subkey])) // PHP sucks!!! $some_string[$some_other_string] löst keinen Fehler aus,
+            break;                                                   // sondern castet $some_other_string ohne Warnung zu 0
+                                                                     // Ergebnis: $some_string[$some_other_string] = $some_string{0}
+         if ($i+1 == $size)               // das letzte Element
             return $properties[$subkey];
 
-         $properties =& $properties[$subkey];
+         $properties =& $properties[$subkey];                        // wieder: $some_string[$some_other_string] = $some_string{0} => ohne Fehler
       }
       return null;
    }
