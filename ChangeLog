@@ -1,6 +1,7 @@
 2011-02-02
 
-   - neu: php/db/DB ermöglicht die Angabe weiterer Verbindungsoptionen in der DB-Konfiguration
+   - neu:    php/db/DB ermöglicht die Angabe weiterer Verbindungsoptionen in der DB-Konfiguration
+   - Bugfix: php/util/Config - PHP löst bei bestimmten, ungültigen Zugriffen auf Strings keine Fehler aus
    
 
 2011-01-04
