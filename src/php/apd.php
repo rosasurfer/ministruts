@@ -384,38 +384,15 @@ function sortByMemory  ($a, $b) { global $mem     ; return compareAsInt($mem    
 
 
 /**
- * Get the PHP $argv array across different configurations.
- * Will take care on register_globals and register_argc_argv ini settings.
- *
- * @return array - the $argv array
- */
-function getArgvArray() {
-   $array = null;
-   if (!isSet($GLOBALS['argv']) || !is_array($GLOBALS['argv'])) {
-      if (!isSet($_SERVER['argv']) || !is_array($_SERVER['argv'])) {
-         if (!isSet($GLOBALS['HTTP_SERVER_VARS']) || isSet($GLOBALS['HTTP_SERVER_VARS']['argv']) || !is_array($GLOBALS['HTTP_SERVER_VARS']['argv'])) {
-            throw new RuntimeException('Could not get command line arguments, "register_argc_argv" = Off ???');
-         }
-         $array = $GLOBALS['HTTP_SERVER_VARS']['argv'];
-      }
-      $array = $_SERVER['argv'];
-   }
-   $array = $GLOBALS['argv'];
-   array_shift($array);
-   return $array;
-}
-
-
-/**
  * Liest die Kommandozeilenargumente ein und parst sie.
  */
 function parseArguments($pattern) {
-   $args = getArgvArray();
-   if (empty($args))
-      return array(array(), array());
-
+   $args       = getArgvArray();
    $options    = array();
    $nonOptions = array();
+
+   if (empty($args))
+      return array($options, $nonOptions);
 
    reset($args);
    while (list($i, $arg) = each($args)) {
