@@ -59,7 +59,7 @@ final class ApdProfile extends Object {
       if (!is_file($file))   throw new FileNotFoundException('File not found: '.$file);
 
       // Datei einlesen
-      $hFile = $this->openFile($file);
+      $hFile = fOpen($file, 'r');
       $this->parseInfoBlock('HEADER', $hFile);
       $this->parseDataBlock($hFile);
       $this->parseInfoBlock('FOOTER', $hFile);
@@ -67,7 +67,7 @@ final class ApdProfile extends Object {
 
       // tatsächlichen Aufrufer einlesen
       if (is_file($file.'.caller')) {
-         $hFile = $this->openFile($file.'.caller');
+         $hFile = fOpen($file.'.caller', 'r');
          $this->parseInfoBlock('HEADER', $hFile);
          fClose($hFile);
       }
@@ -83,20 +83,6 @@ final class ApdProfile extends Object {
    public function display() {
       $this->renderHeader();
       $this->renderData();
-   }
-
-
-   /**
-    * Öffnet die angegebene Datei read-only und gibt das Dateihandle zurück.
-    *
-    * @return resource - Dateihandle
-    */
-   private function openFile($filename) {
-      if ($hFile = fOpen($filename, 'r'))
-         return $hFile;
-
-      echoPre('Failed to open "'.$filename.'" for reading');
-      exit(1);
    }
 
 
