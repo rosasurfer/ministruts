@@ -194,6 +194,15 @@ define('HOUR'   , 60 * MINUTES); define('HOURS'  , HOUR  );
 define('DAY'    , 24 * HOURS  ); define('DAYS'   , DAY   );
 define('WEEK'   ,  7 * DAYS   ); define('WEEKS'  , WEEK  );
 
+// Wochentage
+define('SUNDAY'   , 0);
+define('MONDAY'   , 1);
+define('TUESDAY'  , 2);
+define('WEDNESDAY', 3);
+define('THURSDAY' , 4);
+define('FRIDAY'   , 5);
+define('SATURDAY' , 6);
+
 // ob wir unter Windows laufen
 define('WINDOWS', (strToUpper(subStr(PHP_OS, 0, 3))==='WIN'));
 
