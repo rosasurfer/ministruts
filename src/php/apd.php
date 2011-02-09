@@ -387,33 +387,22 @@ function sortByMemory  ($a, $b) { global $mem     ; return compareAsInt($mem    
  * Liest die Kommandozeilenargumente ein und parst sie.
  */
 function parseArguments($pattern) {
-   $args       = getArgvArray();
-   $options    = array();
-   $nonOptions = array();
+   $options = $nonOptions = array();
 
-   if (empty($args))
+   $args = getArgvArray();
+   if (!$args)
       return array($options, $nonOptions);
 
-   reset($args);
-   while (list($i, $arg) = each($args)) {
-      if ($arg == '--') {
-         // '--' means explicit end of options
-         $nonOptions = array_merge($nonOptions, array_slice($args, $i + 1));
+   foreach ($args as $i => $arg) {
+      if ($arg == '--') {                                                     // '--' means explicit end of options
+         $nonOptions = array_merge($nonOptions, array_slice($args, $i+1));
          break;
       }
-      if ($arg{0} != '-' || (strLen($arg) > 1 && $arg{1} == '-') || $arg == '-') {
-         // '-' is stdin
+      if ($arg{0}!='-' || (strLen($arg) > 1 && $arg{1}=='-') || $arg=='-') {  // '-' is stdin
          $nonOptions = array_merge($nonOptions, array_slice($args, $i));
          break;
       }
-
-      try {
-         parseShortCmdOption(subStr($arg, 1), $pattern, $options, $args);
-      }
-      catch (InvalidArgumentException $ex) {
-         echo $ex->getMessage()."\n";
-         printUsage();
-      }
+      parseShortCmdOption(subStr($arg, 1), $pattern, $options, $args);
    }
    return array($options, $nonOptions);
 }
@@ -423,30 +412,32 @@ function parseArguments($pattern) {
  */
 function parseShortCmdOption($param, $pattern, &$results, &$args) {
    for ($i=0; $i < strLen($param); $i++) {
-      $option = $param{$i};
+      $option    = $param{$i};
       $optionArg = null;
 
-      // Try to find the option in the pattern string
-      if (($specifier = strStr($pattern, $option)) === false || $param{$i} == ':') {
-         throw new InvalidArgumentException("unrecognized option: $option");
+      // Look up the option in the pattern string
+      if (($specifier = strStr($pattern, $option))===false || $param{$i}==':') {
+         echo("unrecognized option: $option\n");
+         printUsage() && die(1);
       }
 
-      if (strLen($specifier) > 1 && $specifier{1} == ':') {
-         if (strLen($specifier) > 2 && $specifier{2} == ':') {
+      if (strLen($specifier) > 1 && $specifier{1}==':') {
+         if (strLen($specifier) > 2 && $specifier{2}==':') {
             if ($i + 1 < strLen($param)) {
                // Option takes an optional argument. Use the remainder of the arg string if there is anything left.
-               $results[] = array($option, subStr($param, $i + 1));
+               $results[] = array($option, subStr($param, $i+1));
                break;
             }
          }
          else {
             // Option requires an argument. Use the remainder of the arg string if there is anything left.
             if ($i + 1 < strLen($param)) {
-               $results[] = array($option, subStr($param, $i + 1));
+               $results[] = array($option, subStr($param, $i+1));
                break;
             }
             if (!(list(, $optionArg) = each($args)) || isShortCmdOption($optionArg)) {
-               throw new InvalidArgumentException("option requires an argument: $option");
+               echo("option requires an argument: $option\n");
+               printUsage() && die(1);
             }
          }
       }
@@ -458,7 +449,7 @@ function parseShortCmdOption($param, $pattern, &$results, &$args) {
 /**
  */
 function isShortCmdOption($param) {
-   return strLen($param) == 2 && $param{0} == '-' && preg_match('/[a-zA-Z]/', $param{1});
+   return strLen($param)==2 && $param{0}=='-' && ctype_alpha($param{1});
 }
 
 
