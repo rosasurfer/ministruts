@@ -29,9 +29,8 @@ cvs -d $CVSROOT logout
 export -n CVSROOT
 
 
-find $PROJECT -follow -type f -print0 | xargs -0r chmod 0644
-
 # may take some time, let's do it in the background
+find $PROJECT -follow -type f                                                         -print0 2>/dev/null | xargs -0r chmod 0644
 find $PROJECT -follow -type d \( ! -group apache -o ! -user apache \) ! -name 'CVS'   -print0 2>/dev/null | xargs -0r chown apache:apache && \
 find $PROJECT -follow -type d                                                         -print0 2>/dev/null | xargs -0r chmod 0755          && \
 find $PROJECT -follow -type f   -path '*/bin*' -prune -regex '.*\.\(pl\|php\|sh\)'    -print0 2>/dev/null | xargs -0r chmod 0754          && \
