@@ -524,7 +524,7 @@ abstract class RequestBase extends Singleton {
             else {
                // php://input is not available with enctype="multipart/form-data"
                if ($_POST)
-                  $content = '$_POST => '.print_r($_POST, true);
+                  $content = '$_POST => '.print_r($_POST, true)."\n";
                $content .= '$_FILES => '.print_r($_FILES, true);
             }
          }
