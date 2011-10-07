@@ -79,12 +79,38 @@ abstract class RequestBase extends Singleton {
    protected function __construct() {
       $this->method = $_SERVER['REQUEST_METHOD'];
 
-      // $_GET, $_POST und $_REQUEST manuell einlesen (die PHP-Implementierung ist indiskutabel, außerdem sind $_COOKIE und $_FILES kein User-Input)
-      $_REQUEST = $_GET = $_POST = array();
+      /**
+       * Die Arrays mit den Requestparametern $_GET, $_POST und $_REQUEST werden manuell erstellt.
+       * Die PHP-Implementierung ist aus den folgenden Gründen indiskutabel:
+       *
+       * (1) - Parameternamen werden modifiziert (image.x => image_x, image.y => image_y)
+       * (2) - später auftretende Werte überschreiben vorhergehende, statt in einem Array abgelegt zu werden ("?a=1&a=2" => a=2)
+       * (3) - UTF8-kodierte Parameternamen (wie sie beim Internet Explorer häufig auftreten) werden nicht dekodiert
+       * (4) - Cookies sind kein User-Input, werden aber in $_REQUEST eingefügt und überschreiben dort existierende Parameter.
+       */
+      $_REQUEST = $_GET = array();
 
       // POST-Parameter haben höhere Priorität als GET und werden zuerst verarbeitet
-      if ($this->isPost())
-         $this->parseParameters(file_get_contents('php://input'), 'POST');
+      if ($this->isPost()) {
+         if ($this->getContentType() != 'multipart/form-data') {
+            $_POST = array();
+            $this->parseParameters(file_get_contents('php://input'), 'POST');
+         }
+         else {
+            // php://input is not available with enctype="multipart/form-data"
+            // Wir behalten das originale $_POST-Array mit der PHP-Implementierung bei und überschreiben $_REQUEST
+
+            foreach ($_POST as $name => $value) {
+               $name  = String ::decodeUtf8($name);                  // (3) UTF8-Values dekodieren
+               $value = String ::decodeUtf8($value);
+
+               if (strPos($name, '_') != false)                      // (1) evt. modifizierte Parameter restaurieren
+                  $_REQUEST[str_replace('_', '.', $name)] = $value;
+               $_REQUEST[$name] = $value;
+            }
+            $_POST = $_REQUEST;                                      // $_POST mit neuer Version überschreiben
+         }
+      }
 
       // GET-Parameter (nicht per $this->isGet(), denn sie können auch in anderen Requests vorhanden sein)
       if (strLen($_SERVER['QUERY_STRING']))
@@ -492,18 +518,14 @@ abstract class RequestBase extends Singleton {
 
       if (!$read) {
          if ($this->isPost()) {
-            $contentType = $this->getHeaderValue('Content-Type');
-            if ($contentType) {
-               $headers     = explode(',', $contentType);
-               $parts       = explode(';', array_shift($headers), 2);
-               $contentType = array_shift($parts);
-            }
-            if ($contentType == 'multipart/form-data') {
-               // TODO: php://input is not available with enctype="multipart/form-data"
-               $content = $_FILES;
+            if ($this->getContentType() != 'multipart/form-data') {
+               $content = file_get_contents('php://input');
             }
             else {
-               $content = file_get_contents('php://input');
+               // php://input is not available with enctype="multipart/form-data"
+               if ($_POST)
+                  $content = '$_POST => '.print_r($_POST, true);
+               $content .= '$_FILES => '.print_r($_FILES, true);
             }
          }
          $read = true;
@@ -514,7 +536,8 @@ abstract class RequestBase extends Singleton {
 
 
    /**
-    * Gibt den Content-Type dieses Requests zurück.
+    * Gibt den Content-Type dieses Requests zurück. Werden unsinnigerweise mehrere "Content-Type"-Header übertragen, wird
+    * der erste gefundene Header zurückgegeben.
     *
     * @return string - Content-Type oder NULL, wenn kein "Content-Type"-Header übertragen wurde.
     */
@@ -522,7 +545,7 @@ abstract class RequestBase extends Singleton {
       $contentType = $this->getHeaderValue('Content-Type');
 
       if ($contentType) {
-         $headers     = explode(',', $contentType);
+         $headers     = explode(',', $contentType, 2);
          $contentType = array_shift($headers);
 
          $values      = explode(';', $contentType, 2);
@@ -989,10 +1012,6 @@ abstract class RequestBase extends Singleton {
       // Content (Body)
       if ($this->isPost()) {
          $content = $this->getContent();
-
-         if (is_array($content))
-            $content = print_r($content, true);
-
          if (strLen($content))
             $string .= "\n".$content."\n";
       }
