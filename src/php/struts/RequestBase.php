@@ -77,8 +77,10 @@ abstract class RequestBase extends Singleton {
     * Konstruktor
     */
    protected function __construct() {
-      $this->method = $_SERVER['REQUEST_METHOD'];
+      if (!ini_get('track_errors'))
+         throw new RuntimeException('PHP configuration setting "track_errors=On" is NOT set but desperately needed for correct request decoding.');
 
+      $this->method = $_SERVER['REQUEST_METHOD'];
       /**
        * Die Arrays mit den Requestparametern $_GET, $_POST und $_REQUEST werden manuell erstellt.
        * Die PHP-Implementierung ist aus den folgenden Gründen indiskutabel:
