@@ -6,8 +6,7 @@ PROJECT=ministruts
 # update project
 echo Updating $PROJECT ...
 
-USER=`cat ~/.cvs.shadow1`
-PASS=`cat ~/.cvs.shadow2`
+PASS=`cat ~/.cvs.shadow`
 
 if [ $USERNAME = 'user1' ] ; then
     PORT=2402
@@ -18,7 +17,7 @@ fi
 
 cd $PROJECTS_ROOT
 
-export CVSROOT=:pserver:$USER:$PASS@localhost:$PORT/home/cvs
+export CVSROOT=:pserver:$USERNAME:$PASS@localhost:$PORT/var/cvs
 cvs -d $CVSROOT login
 
 #cvs -d $CVSROOT -qr checkout -PR -d $PROJECT -r HEAD $PROJECT
