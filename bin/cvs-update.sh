@@ -29,11 +29,10 @@ export -n CVSROOT
 
 
 # may take some time, let's do it in the background
-find $PROJECT -follow                                                                 -print0 2>/dev/null | xargs -0r chmod a=r,u+w,a+X
-find $PROJECT -follow -type d \( ! -group apache -o ! -user apache \) ! -name 'CVS'   -print0 2>/dev/null | xargs -0r chown apache:apache && \
-find $PROJECT -follow -type f   -path '*/bin*' -prune -regex '.*\.\(pl\|php\|sh\)'    -print0 2>/dev/null | xargs -0r chmod a=r,ug+x,u+w  && \
-find $PROJECT -follow -type f ! -path '*/bin*' -prune ! -perm 0644                    -print0 2>/dev/null | xargs -0r chmod a=r,u+w       && \
-find $PROJECT -follow -type f -name '*.sh'                                            -print0 2>/dev/null | xargs -0r chmod u+x           && \
-find $PROJECT -follow -name '.#*'                                                     -print0 2>/dev/null | xargs -0r rm                  &
+find $PROJECT -follow                                                               -print0 2>/dev/null | xargs -0r chmod a=r,u+w,a+X
+find $PROJECT -follow -type d \( ! -group apache -o ! -user apache \) ! -name 'CVS' -print0 2>/dev/null | xargs -0r chown apache:apache && \
+find $PROJECT -follow -type f -path '*/bin*' -prune -regex '.*\.\(pl\|php\|sh\)'    -print0 2>/dev/null | xargs -0r chmod ug+x          && \
+find $PROJECT -follow -type f -name '*.sh'                                          -print0 2>/dev/null | xargs -0r chmod u+x           && \
+find $PROJECT -follow -name '.#*'                                                   -print0 2>/dev/null | xargs -0r rm                  &
 
 echo
