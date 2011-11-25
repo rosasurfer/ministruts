@@ -1,11 +1,8 @@
 <?php
 /**
  * A representation of a resource record of type <b>AAAA</b>
- *
- * @package DNSUtil
  */
-class AAAA_Record extends DNSResourceRecord
-{
+class AAAA_Record extends DNSResourceRecord {
     /* class variable definitions {{{ */
     protected $name;
     protected $type;

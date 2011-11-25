@@ -6,11 +6,8 @@ define('NET_DNS_DEFAULT_FUDGE', 300);
 /* TSIG_Record definition {{{ */
 /**
  * A representation of a resource record of type <b>TSIG</b>
- *
- * @package DNSUtil
  */
-class TSIG_Record extends DNSResourceRecord
-{
+class TSIG_Record extends DNSResourceRecord {
     /* class variable definitions {{{ */
     protected $name;
     protected $type;

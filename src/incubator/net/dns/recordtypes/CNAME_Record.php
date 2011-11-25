@@ -1,11 +1,8 @@
 <?php
 /**
  * A representation of a resource record of type <b>CNAME</b>
- *
- * @package DNSUtil
  */
-class CNAME_Record extends DNSResourceRecord
-{
+class CNAME_Record extends DNSResourceRecord {
     /* class variable definitions {{{ */
     protected $name;
     protected $type;

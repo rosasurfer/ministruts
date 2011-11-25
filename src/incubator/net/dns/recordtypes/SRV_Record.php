@@ -1,11 +1,8 @@
 <?php
 /**
  * A representation of a resource record of type <b>SRV</b>
- *
- * @package DNSUtil
  */
-class SRV_Record extends DNSResourceRecord
-{
+class SRV_Record extends DNSResourceRecord {
     /* class variable definitions {{{ */
     protected $name;
     protected $type;

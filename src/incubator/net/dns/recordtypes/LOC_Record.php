@@ -2,8 +2,7 @@
 /**
  * A representation of a resource record of type <b>LOC</b>
  */
-class LOC_Record extends DNSResourceRecord
-{
+class LOC_Record extends DNSResourceRecord {
     /* class variable definitions {{{ */
 
     // Static constants
