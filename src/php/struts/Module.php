@@ -268,28 +268,20 @@ class Module extends Object {
    protected function processMappings(SimpleXMLElement $xml) {
       $elements = $xml->xPath('/struts-config/action-mappings/mapping');
       if ($elements === false)
-         $elements = array(); // xPath() gibt entgegen der Dokumentation NICHT immer ein Array zurück
+         $elements = array(); // xPath() gibt entgegen der Dokumentation *NICHT* immer ein Array zurück
 
       foreach ($elements as $tag) {
          $mapping = new $this->mappingClass($this);
 
-
          // attributes
          // ----------
          // process path attribute
-         // TODO: die konfigurierten Pfade werden nicht auf Eindeutigkeit geprüft
+         // TODO: die konfigurierten Pfade werden nicht auf Eindeutigkeit geprüft, mehrfache Definitionen derselben URL abfangen
          $path = String ::decodeUtf8((string) $tag['path']);
          $mapping->setPath($path);
 
 
          // process include attribute
-
-         // TODO: include einer anderen URL ermöglichen
-         //
-         // z.B.:
-         // <mapping path="/index.php"  form="ActionForm" include=".home"/>
-         // <mapping path="/menu.php"   include="/index.php"/>
-
          if ($tag['include']) {
             if ($mapping->getForward()) throw new RuntimeException('Mapping "'.$mapping->getPath().'": Only one attribute of "action", "include", "redirect" or "forward" must be specified');
             $path = (string) $tag['include'];
