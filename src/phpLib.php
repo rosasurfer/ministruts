@@ -437,8 +437,8 @@ function echoPre($var) {
  * Gibt den Inhalt einer Variable aus.
  *
  * @param mixed $var    - Variable
- * @param bool  $return - Ob die Ausgabe auf STDOUT erfolgen soll (FALSE) oder als Rückgabewert der Funktion (TRUE).
- *                        (default: FALSE)
+ * @param bool  $return - TRUE, wenn das Ergebnis zurückgegeben werden soll;
+ *                        FALSE, wenn das Ergebnis auf STDOUT ausgegeben werden soll (default)
  */
 function dump($var, $return = false) {
    if ($return) ob_start();
