@@ -203,8 +203,8 @@ class Logger extends StaticClass {
                echo '<br>'.printFormatted($traceStr, true);
                echo "<br></div>\n";
 
-               // Wurde ein Redirect-Header gesendet, ist die Ausgabe verloren und muß zusätzlich gemailt werden
-               // (kann vorher nicht zuverlässig ermittelt werden, da die Header noch nicht gesendet sein können)
+               // Wurde ein Redirect-Header gesendet (oder gesetzt), ist die soeben gemachte Ausgabe verloren. Die Ausgabe kann nur durch zusätzliches Mailen "gerettet" werden.
+               // Dies kann vor echo() jedoch nicht zuverlässig ermittelt werden, da der Redirect-Header evt. zwar gesetzt, die Header aber noch nicht gesendet sein können.
                foreach (headers_list() as $header) {
                   if (striPos($header, 'Location: ') === 0) {
                      self::$display = false;
@@ -268,14 +268,14 @@ class Logger extends StaticClass {
             error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", $plainMessage)), 0);       // Zeilenumbrüche entfernen
          }
       }
-      catch (Exception $second) {
+      catch (Exception $secondEx) {
          $file = $exception->getFile();
          $line = $exception->getLine();
-         error_log('PHP (1) primary '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", (string) $exception).' in '.$file.' on line '.$line), 0);
+         error_log('PHP primary '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", (string) $exception).' in '.$file.' on line '.$line), 0);
 
-         $file = $second->getFile();
-         $line = $second->getLine();
-         error_log('PHP (2) secondary '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", (string) $second).' in '.$file.' on line '.$line), 0);
+         $file = $secondEx->getFile();
+         $line = $secondEx->getLine();
+         error_log('PHP secondary '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", (string) $secondEx).' in '.$file.' on line '.$line), 0);
       }
    }
 
