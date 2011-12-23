@@ -271,11 +271,11 @@ class Logger extends StaticClass {
       catch (Exception $second) {
          $file = $exception->getFile();
          $line = $exception->getLine();
-         error_log('PHP (1) '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", (string) $exception).' in '.$file.' on line '.$line), 0);
+         error_log('PHP (1) primary '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", (string) $exception).' in '.$file.' on line '.$line), 0);
 
          $file = $second->getFile();
          $line = $second->getLine();
-         error_log('PHP (2) '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", (string) $second).' in '.$file.' on line '.$line), 0);
+         error_log('PHP (2) secondary '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", (string) $second).' in '.$file.' on line '.$line), 0);
       }
    }
 
