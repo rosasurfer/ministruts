@@ -95,7 +95,7 @@ final class String extends StaticClass {
       if (is_array($string)) {
          $array = array();
          foreach ($string as $key => $value) {
-            if ($key === (string)$key)
+            if (is_string($key))
                $key = self:: decodeUtf8($key);
             $array[$key] = self:: decodeUtf8($value);
          }
