@@ -8,9 +8,13 @@ echo Updating $PROJECT ...
 
 PASS=`cat ~/.cvs.shadow`
 
-if [ $USERNAME = 'user1' ] ; then
+if   [ $USERNAME = 'user1' ] ; then
     PORT=2402
-else
+elif [ $USERNAME = 'user2' ] ; then
+    PORT=2403
+elif [ $USERNAME = 'user3' ] ; then
+    PORT=2404
+else 
     PORT=2401
 fi
 
