@@ -2,6 +2,6 @@
 /**
  * IllegalStateException
  */
-class IllegalStateException extends RuntimeException {
+class IllegalStateException extends plRuntimeException {
 }
 ?>

@@ -2,6 +2,6 @@
 /**
  * UnimplementedFeatureException
  */
-class UnimplementedFeatureException extends RuntimeException {
+class UnimplementedFeatureException extends plRuntimeException {
 }
 ?>

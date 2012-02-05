@@ -33,12 +33,12 @@ final class SystemFiveLock extends BaseLock {
     *
     * @param  string $key - eindeutiger Schlüssel der Instanz
     *
-    * @throws RuntimeException - wenn im aktuellen Prozess oder Thread bereits eine Lock-Instanz unter
+    * @throws plRuntimeException - wenn im aktuellen Prozess oder Thread bereits eine Lock-Instanz unter
     *                            demselben Schlüssel existiert
     */
-   public function __construct($key) /*throws RuntimeException*/ {
+   public function __construct($key) /*throws plRuntimeException*/ {
       if (!is_string($key))                throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
-      if (isSet(self::$hSemaphores[$key])) throw new RuntimeException('Dead-lock detected: already holding a lock for key "'.$key.'"');
+      if (isSet(self::$hSemaphores[$key])) throw new plRuntimeException('Dead-lock detected: already holding a lock for key "'.$key.'"');
       self::$hSemaphores[$key] = false;
 
       $loglevel        = Logger ::getLogLevel(__CLASS__);
@@ -76,7 +76,7 @@ final class SystemFiveLock extends BaseLock {
                continue;
             }
             // Endlosschleife verhindern
-            throw new RuntimeException("Giving up to get lock for key \"$key\" after $i trials".($messages ? ", former errors:\n".join("\n", $messages):null), $ex);
+            throw new plRuntimeException("Giving up to get lock for key \"$key\" after $i trials".($messages ? ", former errors:\n".join("\n", $messages):null), $ex);
          }
       }
       while (true);
@@ -123,7 +123,7 @@ final class SystemFiveLock extends BaseLock {
    public function release() {
       if ($this->isValid()) {
          if (!sem_remove(self::$hSemaphores[$this->key]))
-            throw new RuntimeException('Cannot remove semaphore for key "'.$this->key.'"');
+            throw new plRuntimeException('Cannot remove semaphore for key "'.$this->key.'"');
 
          unset(self::$hSemaphores[$this->key]);
       }

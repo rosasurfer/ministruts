@@ -32,7 +32,7 @@ final class HttpRequest extends Object {
     */
    public function setMethod($method) {
       if (!is_string($method))                 throw new IllegalTypeException('Illegal type of argument $method: '.getType($method));
-      if ($method!=='GET' && $method!=='POST') throw new InvalidArgumentException('Invalid argument $method: '.$method);
+      if ($method!=='GET' && $method!=='POST') throw new plInvalidArgumentException('Invalid argument $method: '.$method);
 
       $this->method = $method;
       return $this;
@@ -62,7 +62,7 @@ final class HttpRequest extends Object {
       // TODO: URL genauer validieren
 
       if (strPos($url, ' ') !== false)
-         throw new InvalidArgumentException('Invalid argument $url: '.$url);
+         throw new plInvalidArgumentException('Invalid argument $url: '.$url);
 
       $this->url = $url;
       return $this;

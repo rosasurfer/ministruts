@@ -11,7 +11,7 @@ class Object {
     * @param string $method - Name der aufgerufenen Methode
     * @param array  $args   - Array mit den der Methode übergebenen Argumenten
     *
-    * @throws RuntimeException
+    * @throws plRuntimeException
     */
    private static function __call($method, array $args) {
       $trace = debug_backTrace();
@@ -20,7 +20,7 @@ class Object {
          if (strToLower($trace[$i]['function']) !== '__call')
             break;
       }
-      throw new RuntimeException('Call to undefined method '.$trace[$i]['class']."::$method()");
+      throw new plRuntimeException('Call to undefined method '.$trace[$i]['class']."::$method()");
    }
 
 
@@ -30,12 +30,12 @@ class Object {
     * @param string $property - Name der undefinierten Variable
     * @param mixed  $value    - Wert, auf den die Variable gesetzt werden sollte
     *
-    * @throws RuntimeException
+    * @throws plRuntimeException
     */
    private function __set($property, $value) {
       $trace = debug_backTrace();
       $class = get_class($trace[0]['object']);
-      throw new RuntimeException("Undefined class variable $class::$property");
+      throw new plRuntimeException("Undefined class variable $class::$property");
    }
 
 

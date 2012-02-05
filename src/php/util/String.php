@@ -17,7 +17,7 @@ final class String extends StaticClass {
    public static function startsWith($string, $start, $ignoreCase = false) {
       if ($string!==null && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
       if ($start!==null && !is_string($start))   throw new IllegalTypeException('Illegal type of parameter $start: '.getType($start));
-      if ($start == '')                          throw new InvalidArgumentException('Invalid argument $start: "'.$start.'"');
+      if ($start == '')                          throw new plInvalidArgumentException('Invalid argument $start: "'.$start.'"');
       if ($ignoreCase!==(bool)$ignoreCase)       throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
 
       if ($ignoreCase)
@@ -112,7 +112,7 @@ final class String extends StaticClass {
       static $function_exists = null;
       if ($function_exists === null)
          if (!$function_exists = function_exists('iconv'))
-            throw new RuntimeException('Fatal error: Call to undefined function iconv()');
+            throw new plRuntimeException('Fatal error: Call to undefined function iconv()');
 
 
       $php_errormsg = null;

@@ -38,7 +38,7 @@ final class FileSystemCache extends CachePeer {
 
       // Cache-Verzeichnis ggf. erzeugen
       if (is_file($directory) || (!is_writable($directory) && !mkDir($directory, 0700, true)))
-         throw new InvalidArgumentException('Can not write to $directory: '.$directory);
+         throw new plInvalidArgumentException('Can not write to $directory: '.$directory);
 
       $this->directory = realPath($directory).DIRECTORY_SEPARATOR;
    }
@@ -142,7 +142,7 @@ final class FileSystemCache extends CachePeer {
             $this->getReferencePool()->drop($key);
             return true;
          }
-         throw new RuntimeException('Cannot delete file: '.$fileName);
+         throw new plRuntimeException('Cannot delete file: '.$fileName);
       }
 
       return false;
@@ -208,7 +208,7 @@ final class FileSystemCache extends CachePeer {
       }
 
       if ($data === false)
-         throw new RuntimeException('file_get_contents() returned FALSE, $fileName: "'.$fileName);
+         throw new plRuntimeException('file_get_contents() returned FALSE, $fileName: "'.$fileName);
 
       return unserialize($data);
    }
@@ -226,7 +226,7 @@ final class FileSystemCache extends CachePeer {
       // Unterverzeichnis ggf. erzeugen
       $directory = dirName($fileName);
       if (is_file($directory) || (!is_writable($directory) && !mkDir($directory, 0700, true)))
-         throw new InvalidArgumentException('Can not write to directory: '.$directory);
+         throw new plInvalidArgumentException('Can not write to directory: '.$directory);
 
       // Datei schreiben
       $fH = fOpen($fileName, 'wb');

@@ -2,6 +2,6 @@
 /**
  * IllegalAccessException
  */
-class IllegalAccessException extends RuntimeException {
+class IllegalAccessException extends plRuntimeException {
 }
 ?>

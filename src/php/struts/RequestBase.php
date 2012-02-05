@@ -63,7 +63,7 @@ abstract class RequestBase extends Singleton {
     *       Der entsprechende Code ist nachfolgend angegeben und muß unverändert übernommen werden.
     */
    public static function me() {
-      throw new RuntimeException('Method '.__METHOD__.'() must not be called directly, it needs to be implemented in the concrete Request class.');
+      throw new plRuntimeException('Method '.__METHOD__.'() must not be called directly, it needs to be implemented in the concrete Request class.');
 
       // !!! begin code snippet !!!
       if (isSet($_SERVER['REQUEST_METHOD']))
@@ -78,7 +78,7 @@ abstract class RequestBase extends Singleton {
     */
    protected function __construct() {
       if (!ini_get('track_errors'))
-         throw new RuntimeException('PHP configuration setting "track_errors=On" is NOT set but desperately needed for correct request decoding.');
+         throw new plRuntimeException('PHP configuration setting "track_errors=On" is NOT set but desperately needed for correct request decoding.');
 
       $this->method = $_SERVER['REQUEST_METHOD'];
       /**
@@ -647,7 +647,7 @@ abstract class RequestBase extends Singleton {
       if ($headers === null) {
          if (function_exists('getAllHeaders')) {
             $headers = getAllHeaders();
-            if ($headers === false) throw new RuntimeException('Error reading request headers, getAllHeaders() returned: FALSE');
+            if ($headers === false) throw new plRuntimeException('Error reading request headers, getAllHeaders() returned: FALSE');
          }
          else {
             // TODO: in der PHP-Umgebung fehlen einige Header
@@ -799,7 +799,7 @@ abstract class RequestBase extends Singleton {
    public function setCookie($name, $value, $expires = 0, $path = null) {
       if (!is_string($name)) throw new IllegalTypeException('Illegal type of argument $name: '.getType($name));
       if (!is_int($expires)) throw new IllegalTypeException('Illegal type of argument $expires: '.getType($expires));
-      if ($expires < 0)      throw new InvalidArgumentException('Invalid argument $expires: '.$expires);
+      if ($expires < 0)      throw new plInvalidArgumentException('Invalid argument $expires: '.$expires);
 
       $value = (string) $value;
 
@@ -824,11 +824,11 @@ abstract class RequestBase extends Singleton {
 
       // Module holen
       $module = $this->getAttribute(Struts ::MODULE_KEY);
-      if (!$module) throw new RuntimeException('You can not call '.get_class($this).__FUNCTION__.'() in this context');
+      if (!$module) throw new plRuntimeException('You can not call '.get_class($this).__FUNCTION__.'() in this context');
 
       // RoleProcessor holen ...
       $processor = $module->getRoleProcessor();
-      if (!$processor) throw new RuntimeException('You can not call '.get_class($this).__FUNCTION__.'() without configuring a RoleProcessor');
+      if (!$processor) throw new plRuntimeException('You can not call '.get_class($this).__FUNCTION__.'() without configuring a RoleProcessor');
 
       // ... und Aufruf weiterreichen
       return $processor->isUserInRole($this, $roles);

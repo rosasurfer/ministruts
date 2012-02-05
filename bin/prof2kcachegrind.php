@@ -191,7 +191,7 @@ function parseArguments($pattern) {
       try {
          parseShortCmdOption(subStr($arg, 1), $pattern, $options, $args);
       }
-      catch (InvalidArgumentException $ex) {
+      catch (plInvalidArgumentException $ex) {
          echo $ex->getMessage()."\n";
          printUsage();
       }
@@ -209,7 +209,7 @@ function parseShortCmdOption($param, $pattern, &$results, &$args) {
 
       // Try to find the option in the pattern string
       if (($specifier = strStr($pattern, $option)) === false || $param{$i} == ':') {
-         throw new InvalidArgumentException("unrecognized option: $option");
+         throw new plInvalidArgumentException("unrecognized option: $option");
       }
 
       if (strLen($specifier) > 1 && $specifier{1} == ':') {
@@ -227,7 +227,7 @@ function parseShortCmdOption($param, $pattern, &$results, &$args) {
                break;
             }
             if (!(list(, $optionArg) = each($args)) || isShortCmdOption($optionArg)) {
-               throw new InvalidArgumentException("option requires an argument: $option");
+               throw new plInvalidArgumentException("option requires an argument: $option");
             }
          }
       }

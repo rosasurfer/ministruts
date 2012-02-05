@@ -139,7 +139,7 @@ final class ApcCache extends CachePeer {
 
       // apc_store() appears to only store one level deep, solution: serialize($data)
       if (!apc_store($this->namespace.'::'.$key, array($created, $expires, serialize($data)), $expires))
-         throw new RuntimeException('Unexpected APC error, apc_store() returned FALSE');
+         throw new plRuntimeException('Unexpected APC error, apc_store() returned FALSE');
 
       $this->getReferencePool()->set($key, $value, $expires, $dependency);
 

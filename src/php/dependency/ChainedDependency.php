@@ -107,7 +107,7 @@ class ChainedDependency extends Dependency {
          return false;
       }
 
-      throw new RuntimeException('Unreachable code reached');
+      throw new plRuntimeException('Unreachable code reached');
    }
 }
 ?>

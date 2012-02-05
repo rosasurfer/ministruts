@@ -2,7 +2,7 @@
 /**
  * NestableException
  *
- * Basisklasse für Exceptions, die weitere ursächliche Exceptions enthalten können.
+ * Basisklasse für Exceptions, die weitere ursächliche Exceptions kapseln können.
  */
 abstract class NestableException extends Exception {
 

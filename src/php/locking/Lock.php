@@ -43,7 +43,7 @@ final class Lock extends BaseLock {
          $trace = debug_backtrace();
          $key   = $trace[0]['file'].'#'.$trace[0]['line'];
       }
-      if (isSet(self::$lockedKeys[$key])) throw new RuntimeException('Dead-lock detected: already holding a lock for key "'.$key.'"');
+      if (isSet(self::$lockedKeys[$key])) throw new plRuntimeException('Dead-lock detected: already holding a lock for key "'.$key.'"');
       self::$lockedKeys[$key] = true;
 
       $this->key = $key;
@@ -59,7 +59,7 @@ final class Lock extends BaseLock {
 
          // ... und Lock-Datei erzeugen
          if (!is_file($file) && !touch($file))
-            throw new RuntimeException('Cannot create lock file "'.$file.'"');
+            throw new plRuntimeException('Cannot create lock file "'.$file.'"');
 
          $this->impl = new FileLock($file);
       }

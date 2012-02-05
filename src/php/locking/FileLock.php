@@ -42,7 +42,7 @@ final class FileLock extends BaseLock {
    public function __construct($file, $shared = false) {
       if (!is_string($file))            throw new IllegalTypeException('Illegal type of argument $file: '.getType($file));
       if (!is_bool($shared))            throw new IllegalTypeException('Illegal type of argument $shared: '.getType($shared));
-      if (isSet(self::$handles[$file])) throw new RuntimeException('Dead-lock detected: already holding a lock for file "'.$file.'"');
+      if (isSet(self::$handles[$file])) throw new plRuntimeException('Dead-lock detected: already holding a lock for file "'.$file.'"');
       self::$handles[$file] = false;
 
       $loglevel        = Logger ::getLogLevel(__CLASS__);
@@ -58,7 +58,7 @@ final class FileLock extends BaseLock {
 
       // TODO: hier kann ein anderer (das Lock haltender) Prozeß die Datei schon wieder gelöscht haben
       if (!fLock(self::$handles[$file], $mode))
-         throw new RuntimeException('Can not aquire '.($shared ? 'shared':'exclusive').' file lock for "'.$file.'"');
+         throw new plRuntimeException('Can not aquire '.($shared ? 'shared':'exclusive').' file lock for "'.$file.'"');
    }
 
 

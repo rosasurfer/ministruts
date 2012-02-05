@@ -104,7 +104,7 @@ abstract class DB extends Object {
     */
    public static function spawn($class, $host, $username, $password, $database = null, array $options = null) {
       if (!is_subclass_of($class, __CLASS__))
-         throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
+         throw new plInvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
 
       $connector = new $class();
       $connector->setHost($host)
@@ -208,7 +208,7 @@ abstract class DB extends Object {
     */
    public function begin() {
       if ($this->transaction < 0)
-         throw new RuntimeException('Negative transaction counter detected: '.$this->transaction);
+         throw new plRuntimeException('Negative transaction counter detected: '.$this->transaction);
 
       if ($this->transaction == 0)
          $this->queryRaw('start transaction');
@@ -226,7 +226,7 @@ abstract class DB extends Object {
     */
    public function commit() {
       if ($this->transaction < 0)
-         throw new RuntimeException('Negative transaction counter detected: '.$this->transaction);
+         throw new plRuntimeException('Negative transaction counter detected: '.$this->transaction);
 
       if ($this->transaction == 0) {
          Logger ::log('No database transaction to commit', L_WARN, __CLASS__);
@@ -249,7 +249,7 @@ abstract class DB extends Object {
     */
    public function rollback() {
       if ($this->transaction < 0)
-         throw new RuntimeException('Negative transaction counter detected: '.$this->transaction);
+         throw new plRuntimeException('Negative transaction counter detected: '.$this->transaction);
 
       if ($this->transaction == 0) {
          Logger ::log('No database transaction to roll back', L_WARN, __CLASS__);

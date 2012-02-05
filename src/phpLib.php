@@ -1,11 +1,11 @@
 <?
 /**
- * Inkludiert die MiniStruts-Library.
+ * Inkludiert die komplette Funktionalität der MiniStruts-Library.
  *
- * Systemvoraussetzung: PHP 5.2.1+
+ * Systemvoraussetzungen: @see ../doc/FAQ
  */
 if (PHP_VERSION < '5.2.1') {
-   echo("Warning: You are working with a buggy PHP version (at least version 5.2.1 is needed).\nAll the hunnies are hollering.");
+   echo('Warning: You are working with a buggy PHP version (at least version 5.2.1 is needed).'.(isSet($_SERVER['REQUEST_METHOD']) ? "<br>":"\n").'All the hunnies are hollering.'.(isSet($_SERVER['REQUEST_METHOD']) ? "<br><br>":"\n\n"));
 }
 
 
@@ -20,7 +20,7 @@ set_exception_handler(create_function('Exception $exception'                    
 register_shutdown_function(create_function(null, '$GLOBALS[\'$__shutting_down\'] = true;'));    // allererste Funktion auf dem Shutdown-Funktion-Stack
 
 
-// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // ggf. Profiler starten
 if (extension_loaded('APD') && isSet($_REQUEST['_PROFILE_'])) {
    $dumpFile = apd_set_pprof_trace(ini_get('apd.dumpdir'));
@@ -70,8 +70,7 @@ function apd_addProfileLink($dumpFile = null) {
       echo("dumpfile = $dumpFile");
    }
 }
-// -----------------------------------------------------------------------------------------------------------------------------------
-
+// ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 // Klassendefinitionen
@@ -106,16 +105,16 @@ $__classes['ClassNotFoundException'         ] = $dir.'php/exceptions/ClassNotFou
 $__classes['ConcurrentModificationException'] = $dir.'php/exceptions/ConcurrentModificationException';
 $__classes['DatabaseException'              ] = $dir.'php/exceptions/DatabaseException';
 $__classes['FileNotFoundException'          ] = $dir.'php/exceptions/FileNotFoundException';
-$__classes['IOException'                    ] = $dir.'php/exceptions/IOException';
 $__classes['IllegalAccessException'         ] = $dir.'php/exceptions/IllegalAccessException';
 $__classes['IllegalStateException'          ] = $dir.'php/exceptions/IllegalStateException';
 $__classes['IllegalTypeException'           ] = $dir.'php/exceptions/IllegalTypeException';
 $__classes['InfrastructureException'        ] = $dir.'php/exceptions/InfrastructureException';
-$__classes['InvalidArgumentException'       ] = $dir.'php/exceptions/InvalidArgumentException';
+$__classes['IOException'                    ] = $dir.'php/exceptions/IOException';
 $__classes['NestableException'              ] = $dir.'php/exceptions/NestableException';
 $__classes['NoPermissionException'          ] = $dir.'php/exceptions/NoPermissionException';
 $__classes['PHPErrorException'              ] = $dir.'php/exceptions/PHPErrorException';
-$__classes['RuntimeException'               ] = $dir.'php/exceptions/RuntimeException';
+$__classes['plInvalidArgumentException'     ] = $dir.'php/exceptions/plInvalidArgumentException';
+$__classes['plRuntimeException'             ] = $dir.'php/exceptions/plRuntimeException';
 $__classes['UnimplementedFeatureException'  ] = $dir.'php/exceptions/UnimplementedFeatureException';
 $__classes['UnsupportedMethodException'     ] = $dir.'php/exceptions/UnsupportedMethodException';
 
@@ -220,10 +219,11 @@ function __autoload($className /*, $throw */) {
       if (isSet($GLOBALS['__classes'][$className])) {
          $className = $GLOBALS['__classes'][$className];
 
-         // Warnen bei relativem Pfad (verschlechtert Performance, ganz besonders mit APC-Setting 'apc.stat=0')
+         // Warnen bei relativem Pfad (relative Pfade verschlechtern Performance, ganz besonders mit APC-Setting 'apc.stat=0')
          $relative = WINDOWS ? !preg_match('/^[a-z]:/i', $className) : ($className{0} != '/');
-         if ($relative)
+         if ($relative) {
             Logger ::log('Relative file name for class definition: '.$className, L_WARN, __CLASS__);
+         }
 
          // clean up the local scope, then include the file
          unset($relative);
@@ -333,7 +333,7 @@ function push_shutdown_function(/*callable*/ $callback = null /*, $args1, $args2
 
    $name = null;
    if (!is_string($callback) && !is_array($callback)) throw new IllegalTypeException('Illegal type of parameter $callback: '.getType($callback));
-   if (!is_callable($callback, false, $name))         throw new InvalidArgumentException('Invalid callback "'.$name.'" passed');
+   if (!is_callable($callback, false, $name))         throw new plInvalidArgumentException('Invalid callback "'.$name.'" passed');
 
    $args = func_get_args();
    array_shift($args);
@@ -354,7 +354,7 @@ function getArgvArray() {
    if (!isSet($GLOBALS['argv']) || !is_array($GLOBALS['argv'])) {
       if (!isSet($_SERVER['argv']) || !is_array($_SERVER['argv'])) {
          if (!isSet($GLOBALS['HTTP_SERVER_VARS']) || isSet($GLOBALS['HTTP_SERVER_VARS']['argv']) || !is_array($GLOBALS['HTTP_SERVER_VARS']['argv'])) {
-            throw new RuntimeException('Could not get command line arguments, "register_argc_argv" = Off ???');
+            throw new plRuntimeException('Could not get command line arguments, "register_argc_argv" = Off ???');
          }
          $array = $GLOBALS['HTTP_SERVER_VARS']['argv'];
       }
@@ -375,7 +375,7 @@ function getArgvArray() {
  */
 function getRandomID($length) {
    if (!isSet($length) || ($length!==(int)$length) || $length < 1)
-      throw new RuntimeException('Invalid argument length: '.$length);
+      throw new plRuntimeException('Invalid argument length: '.$length);
 
    $id = crypt(uniqId(rand(), true));              // zufällige ID erzeugen
    $id = strip_tags(stripSlashes($id));            // Sonder- und leicht zu verwechselnde Zeichen entfernen
@@ -516,8 +516,8 @@ function decodeHtml($html) {
  * @return string - resultierendes Datum
  */
 function addDate($date, $days) {
-   if (!CommonValidator ::isDate($date)) throw new InvalidArgumentException('Invalid argument $date: '.$date);
-   if ($days!==(int)$days)               throw new InvalidArgumentException('Invalid argument $days: '.$days);
+   if (!CommonValidator ::isDate($date)) throw new plInvalidArgumentException('Invalid argument $date: '.$date);
+   if ($days!==(int)$days)               throw new plInvalidArgumentException('Invalid argument $days: '.$days);
 
    $parts = explode('-', $date);
    $year  = (int) $parts[0];
@@ -537,7 +537,7 @@ function addDate($date, $days) {
  * @return string
  */
 function subDate($date, $days) {
-   if ($days!==(int)$days) throw new InvalidArgumentException('Invalid argument $days: '.$days);
+   if ($days!==(int)$days) throw new plInvalidArgumentException('Invalid argument $days: '.$days);
    return addDate($date, -$days);
 }
 
@@ -566,7 +566,7 @@ function formatDate($format, $datetime) {
 
    $timestamp = strToTime($datetime);
    if ($timestamp!==(int)$timestamp)
-      throw new InvalidArgumentException('Invalid argument $datetime: '.$datetime);
+      throw new plInvalidArgumentException('Invalid argument $datetime: '.$datetime);
 
    return date($format, $timestamp);
 }
@@ -591,7 +591,7 @@ function formatMoney($value, $decimals = 2, $decimalSeparator = ',') {
    if ($decimalSeparator == ',')
       return number_format($value, $decimals, ',', '.');
 
-   throw new InvalidArgumentException('Invalid argument $decimalSeparator: '.$decimalSeparator);
+   throw new plInvalidArgumentException('Invalid argument $decimalSeparator: '.$decimalSeparator);
 }
 
 

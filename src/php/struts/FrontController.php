@@ -53,6 +53,7 @@ final class FrontController extends Singleton {
 
             $controller = $cache->get(__CLASS__);
             if (!$controller) {
+
                // neue Instanz erzeugen ...
                $controller = Singleton ::getInstance(__CLASS__);
 
@@ -130,13 +131,13 @@ final class FrontController extends Singleton {
             $module->freeze();
 
             if (isSet($this->modules[$prefix]))
-               throw new RuntimeException('All modules must have unique module prefixes, non-unique prefix: "'.$prefix.'"');
+               throw new plRuntimeException('All modules must have unique module prefixes, non-unique prefix: "'.$prefix.'"');
 
             $this->modules[$prefix] = $module;
          }
       }
       catch (Exception $ex) {
-         throw new RuntimeException('Error loading '.$file, $ex);
+         throw new plRuntimeException('Error loading '.$file, $ex);
       }
    }
 
@@ -174,14 +175,14 @@ final class FrontController extends Singleton {
       $applicationPath = $request->getApplicationPath();
 
       if ($applicationPath && !String ::startsWith($requestPath, $applicationPath))
-         throw new RuntimeException('Can not resolve module prefix from request path: '.$requestPath);
+         throw new plRuntimeException('Can not resolve module prefix from request path: '.$requestPath);
 
       $prefix = subStr($requestPath, $len=strLen($applicationPath), strRPos($requestPath, '/')-$len);
 
       while (!isSet($this->modules[$prefix])) {
          $lastSlash = strRPos($prefix, '/');
          if ($lastSlash === false)
-            throw new RuntimeException('No module configured for request path: '.$requestPath);
+            throw new plRuntimeException('No module configured for request path: '.$requestPath);
          $prefix = subStr($prefix, 0, $lastSlash);
       }
       return $prefix;

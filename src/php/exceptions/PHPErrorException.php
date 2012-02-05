@@ -28,7 +28,7 @@ class PHPErrorException extends NestableException {
    public function __construct($message, $file, $line, array $context) {
       // prüfen, ob wir außerhalb des ErrorHandler aufgerufen wurden
       if (!isSet($GLOBALS['$__PHPErrorException_create']))
-         throw new RuntimeException('Illegal access to non-public constructor of '.__CLASS__.' (see documentation)');
+         throw new plRuntimeException('Illegal access to non-public constructor of '.__CLASS__.' (see documentation)');
 
       unset($GLOBALS['$__PHPErrorException_create']);    // Marker entfernen
 

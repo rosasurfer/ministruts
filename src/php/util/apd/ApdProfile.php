@@ -55,7 +55,7 @@ final class ApdProfile extends Object {
     */
    public function __construct($file) {
       if (!is_string($file)) throw new IllegalTypeException('Illegal type of argument $file: '.getType($file));
-      if (!strLen($file))    throw new InvalidArgumentException('Invalid argument $file: '.$file);
+      if (!strLen($file))    throw new plInvalidArgumentException('Invalid argument $file: '.$file);
       if (!is_file($file))   throw new FileNotFoundException('File not found: '.$file);
 
       // Datei einlesen

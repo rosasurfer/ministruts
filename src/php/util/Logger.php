@@ -69,7 +69,7 @@ class Logger extends StaticClass {
             if     ($level == '')                     $logLevels[$className] = self:: DEFAULT_LOGLEVEL;
             elseif (defined('L_'.strToUpper($level))) $logLevels[$className] = constant('L_'.strToUpper($level));
             else
-               throw new InvalidArgumentException('Invalid log level for class '.$className.': '.$level);
+               throw new plInvalidArgumentException('Invalid log level for class '.$className.': '.$level);
          }
       }
 
@@ -305,7 +305,7 @@ class Logger extends StaticClass {
          $class     = $arg4;
       }
       else {
-         throw new InvalidArgumentException('Invalid number of arguments: '.$args);
+         throw new plInvalidArgumentException('Invalid number of arguments: '.$args);
       }
 
       if ($level!==(int)$level) throw new IllegalTypeException('Illegal type of parameter $level: '.getType($level));
@@ -345,7 +345,7 @@ class Logger extends StaticClass {
       $plainMessage = null;
 
       try {
-         if (!isSet(self::$logLevels[$level])) throw new InvalidArgumentException('Invalid log level: '.$level);
+         if (!isSet(self::$logLevels[$level])) throw new plInvalidArgumentException('Invalid log level: '.$level);
          self ::init();
 
          // 1. Logdaten ermitteln

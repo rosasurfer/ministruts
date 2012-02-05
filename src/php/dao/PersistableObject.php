@@ -207,7 +207,7 @@ abstract class PersistableObject extends Object implements IDaoConnected {
     */
    public static function createInstance(&$class, array &$row) {
       $object = new $class();
-      if (!$object instanceof self) throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
+      if (!$object instanceof self) throw new plInvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
 
       $mappings = $object->dao()->mapping;
 
@@ -230,7 +230,7 @@ abstract class PersistableObject extends Object implements IDaoConnected {
                   $object->$property = strLen($row[$column]) ? explode(',', $row[$column]) : array();
                   break;
                default:
-                  throw new InvalidArgumentException('Unknown data type "'.$type.'" in database mapping of '.$class.'::'.$property);
+                  throw new plInvalidArgumentException('Unknown data type "'.$type.'" in database mapping of '.$class.'::'.$property);
             }
          }
       }

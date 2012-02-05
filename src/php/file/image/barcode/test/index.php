@@ -154,7 +154,7 @@ if (strLen($value) > 0) {
          break;
 
       default:
-         throw new InvalidArgumentException("Unknown barcode type \"$type\"");
+         throw new plInvalidArgumentException("Unknown barcode type \"$type\"");
    }
 }
 else if (isSet($_REQUEST['submit'])) {

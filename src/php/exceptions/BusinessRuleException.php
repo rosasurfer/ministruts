@@ -4,6 +4,6 @@
  *
  * Allgemeine Exception zur Markierung von Fehlern in der Geschäftslogik.
  */
-class BusinessRuleException extends RuntimeException {
+class BusinessRuleException extends plRuntimeException {
 }
 ?>

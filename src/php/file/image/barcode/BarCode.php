@@ -58,61 +58,61 @@ abstract class BarCode extends Object {
       // Parameter validieren und speichern
       // $value
       if (!is_string($value)) throw new IllegalTypeException('Illegal type of argument $value: '.getType($value));
-      if (strLen($value)==0)  throw new InvalidArgumentException('Invalid barcode $value: "'.$value.'"');
+      if (strLen($value)==0)  throw new plInvalidArgumentException('Invalid barcode $value: "'.$value.'"');
       $this->value = $value;
 
       // $width
       if (is_string($width)) {
-         if (!cType_digit($width)) throw new InvalidArgumentException('Invalid barcode $width: "'.$width.'"');
+         if (!cType_digit($width)) throw new plInvalidArgumentException('Invalid barcode $width: "'.$width.'"');
          $width = (int) $width;
       }
       else if (!is_int($width))    throw new IllegalTypeException('Illegal type of argument $width: '.getType($width));
-      if ($width <= 0)             throw new InvalidArgumentException('Invalid barcode $width: "'.$width.'"');
+      if ($width <= 0)             throw new plInvalidArgumentException('Invalid barcode $width: "'.$width.'"');
       $this->width = $width;
 
       // $height
       if (is_string($height)) {
-         if (!cType_digit($height)) throw new InvalidArgumentException('Invalid barcode $height: "'.$height.'"');
+         if (!cType_digit($height)) throw new plInvalidArgumentException('Invalid barcode $height: "'.$height.'"');
          $height = (int) $height;
       }
       else if (!is_int($height))    throw new IllegalTypeException('Illegal type of argument $height: '.getType($height));
-      if ($height <= 0)             throw new InvalidArgumentException('Invalid barcode $height: "'.$height.'"');
+      if ($height <= 0)             throw new plInvalidArgumentException('Invalid barcode $height: "'.$height.'"');
       $this->height = $height;
 
       // $style
       if (!is_null($style)) {
          if (is_string($style)) {
-            if (!cType_digit($style)) throw new InvalidArgumentException('Invalid barcode $style: "'.$style.'"');
+            if (!cType_digit($style)) throw new plInvalidArgumentException('Invalid barcode $style: "'.$style.'"');
             $style = (int) $style;
          }
          else if (!is_int($style))    throw new IllegalTypeException('Illegal type of argument $style: '.getType($style));
          $alignCenter = (bool)($style & self:: STYLE_ALIGN_CENTER);
          $alignLeft   = (bool)($style & self:: STYLE_ALIGN_LEFT  );
          $alignRight  = (bool)($style & self:: STYLE_ALIGN_RIGHT );
-         if ($alignCenter + $alignLeft + $alignRight > 1)                               throw new InvalidArgumentException('Invalid barcode $style, multiple alignment flags given: '.$this->getStyleDescription($style));
-         if (!($style & self:: STYLE_IMAGE_PNG) && !($style & self:: STYLE_IMAGE_JPEG)) throw new InvalidArgumentException('Invalid barcode $style, missing or unknown graphic format: '.$this->getStyleDescription($style));
+         if ($alignCenter + $alignLeft + $alignRight > 1)                               throw new plInvalidArgumentException('Invalid barcode $style, multiple alignment flags given: '.$this->getStyleDescription($style));
+         if (!($style & self:: STYLE_IMAGE_PNG) && !($style & self:: STYLE_IMAGE_JPEG)) throw new plInvalidArgumentException('Invalid barcode $style, missing or unknown graphic format: '.$this->getStyleDescription($style));
          $this->style = $style;
       }
 
       // $xres
       if (!is_null($xres)) {
          if (is_string($xres)) {
-            if (!cType_digit($xres)) throw new InvalidArgumentException('Invalid barcode $xres: "'.$xres.'"');
+            if (!cType_digit($xres)) throw new plInvalidArgumentException('Invalid barcode $xres: "'.$xres.'"');
             $xres = (int) $xres;
          }
          else if (!is_int($xres))    throw new IllegalTypeException('Illegal type of argument $xres: '.getType($xres));
-         if ($xres < 1 || 3 < $xres) throw new InvalidArgumentException('Invalid barcode $xres: "'.$xres.'"');
+         if ($xres < 1 || 3 < $xres) throw new plInvalidArgumentException('Invalid barcode $xres: "'.$xres.'"');
          $this->xres = $xres;
       }
 
       // $font
       if (!is_null($font)) {
          if (is_string($font)) {
-            if (!cType_digit($font)) throw new InvalidArgumentException('Invalid barcode $font: "'.$font.'"');
+            if (!cType_digit($font)) throw new plInvalidArgumentException('Invalid barcode $font: "'.$font.'"');
             $font = (int) $font;
          }
          else if (!is_int($font))    throw new IllegalTypeException('Illegal type of argument $font: '.getType($font));
-         if ($font < 1 || 5 < $font) throw new InvalidArgumentException('Invalid barcode $font: "'.$font.'"');
+         if ($font < 1 || 5 < $font) throw new plInvalidArgumentException('Invalid barcode $font: "'.$font.'"');
          $this->font = $font;
       }
 
@@ -253,7 +253,7 @@ abstract class BarCode extends Object {
             imageLine($this->hImg, $xPos+$i, $yPos, $xPos+$i, $yPos+$ySize, $this->fgColor);
          return;
       }
-      throw new RuntimeException("Drawing position out of range: Increase the image size or choose a smaller xRes value (bar spacing)");
+      throw new plRuntimeException("Drawing position out of range: Increase the image size or choose a smaller xRes value (bar spacing)");
    }
 
    /**

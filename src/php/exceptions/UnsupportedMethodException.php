@@ -2,6 +2,6 @@
 /**
  * UnsupportedMethodException
  */
-class UnsupportedMethodException extends RuntimeException {
+class UnsupportedMethodException extends plRuntimeException {
 }
 ?>

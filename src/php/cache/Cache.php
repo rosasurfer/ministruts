@@ -41,14 +41,15 @@ final class Cache extends StaticClass {
             $key = '';
 
             // neuen Cache instantiieren
-            if (extension_loaded('apc') && ini_get(isSet($_SERVER['REQUEST_METHOD']) ? 'apc.enabled':'apc.enable_cli'))
+            if (extension_loaded('apc') && ini_get(isSet($_SERVER['REQUEST_METHOD']) ? 'apc.enabled':'apc.enable_cli')) {
                self::$default = new ApcCache($label);
-            else
+            }
+            else {
                self::$default = new ReferencePool($label);
+            }
          }
          return self::$default;
       }
-
 
       // spezifischer Cache
       if ($label !== (string)$label)
