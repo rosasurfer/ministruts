@@ -88,14 +88,19 @@ if (!WINDOWS && !extension_loaded('sysvsem'))                                 ec
 // Opcode-Cache
 // ------------
 if (!extension_loaded('apc'))                                                 echoError('Warning: could not find an opcode cache');
-if (extension_loaded('apc')) {
+if ( extension_loaded('apc')) {
    if (!ini_get('apc.enabled'))                                               echoError('Warning: apc.enabled is not On');
-   if ( WINDOWS && !ini_get('apc.stat'))                                      echoError('Warning: apc.stat is not On');     // Off verursacht Fehler (Dateien werden teilweise nicht gecacht)
-   if (!WINDOWS &&  ini_get('apc.stat'))                                      echoError('Warning: apc.stat is not Off');
-   if (!ini_get('apc.cache_by_default'))                                      echoError('Warning: apc.cache_by_default is not On');
-   if (!ini_get('apc.write_lock'))                                            echoError('Warning: apc.write_lock is not On');
-   if (!ini_get('apc.report_autofilter'))                                     echoError('Warning: apc.report_autofilter is not On');
-   if (!ini_get('apc.include_once_override'))                                 echoError('Warning: apc.include_once_override is not On');
+   if (WINDOWS) {       // Entwicklungsumgebung
+      if      (ini_get('apc.stat'))                                           echoError('Warning: apc.stat is not Off');               // "On" läßt manche APC-Versionen crashen (apc-error: cannot redeclare class ***)
+      else if (ini_get('apc.cache_by_default'))                               echoError('Warning: apc.cache_by_default is not Off');   // wenn apc.stat="off" (siehe vorheriger Test), dann *MUSS* diese Option unter Windows aus sein.
+   }
+   else {               // Produktionsumgebung
+      if (!ini_get('apc.cache_by_default'))                                   echoError('Warning: apc.cache_by_default is not On');    // es soll gecacht werden
+      if ( ini_get('apc.stat'))                                               echoError('Warning: apc.stat is not Off');               // für höchstmögliche Performance möglichst "Off" (Dateiänderungen sind live nicht möglich)
+      if (!ini_get('apc.write_lock'))                                         echoError('Warning: apc.write_lock is not On');
+      if (!ini_get('apc.report_autofilter'))                                  echoError('Warning: apc.report_autofilter is not On');
+      if (!ini_get('apc.include_once_override'))                              echoError('Warning: apc.include_once_override is not On');
+   }
 }
 
 
