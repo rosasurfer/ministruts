@@ -1,7 +1,7 @@
 <?
 /**
- * RuntimeException
+ * plRuntimeException
  */
-class RuntimeException extends NestableException {
+class plRuntimeException extends NestableException {
 }
 ?>
