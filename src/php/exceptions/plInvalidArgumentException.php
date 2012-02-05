@@ -1,7 +1,7 @@
 <?
 /**
- * InvalidArgumentException
+ * plInvalidArgumentException
  */
-class InvalidArgumentException extends RuntimeException {
+class plInvalidArgumentException extends plRuntimeException {
 }
 ?>
