@@ -1,3 +1,8 @@
+2012-02-05
+
+   - Namenskonflikte der Library mit gleichnamigen SPL-Klassen aufgelöst
+
+
 2011-02-02
 
    - php/struts/BaseRequest::_construct() - Parsen der POST-Parameter bei Content-Type "multipart/form-data" verbessert
