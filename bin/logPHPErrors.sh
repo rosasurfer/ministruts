@@ -1,7 +1,7 @@
 #!/bin/sh
 ################################################################################################################################
 #                                                                                                                              #
-# Sucht und meldet nicht abgefangene PHP-Fehler.                                                                               #
+# Sucht und meldet fatale, durch PHP selbst nicht abfangbare PHP-Fehler.                                                       #
 #                                                                                                                              #
 #                                                                                                                              #
 # Aufruf:  logPHPErrors.sh  <ERRORLOG_DIRECTORY>                                                                               #
