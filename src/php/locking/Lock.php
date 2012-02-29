@@ -9,7 +9,7 @@
  * konkurrierende PHP-Threads oder -Prozesse dar.
  *
  * Eine Lock-Instanz ist nach Erzeugung gesperrt und die Sperre immer gültig.  Besitzt zum Zeitpunkt
- * des Aufrufs ein anderer Prozeß die gewünschte Sperre des jeweiligen Code-Abschnitts, blockiert
+ * des Aufrufs ein anderer Prozeß die gewünschte Sperre des jeweiligen Code-Abschnitts, blockiert der
  * aufrufende Prozeß, bis er die Sperre erlangt.  Die Sperre bleibt gültig, bis sie durch Aufruf der
  * release()-Methode, durch Zerstörung der Lock-Instanz oder durch Beendigung des Scriptes (je nachdem
  * welches der Ereignisse zuerst eintritt) freigegeben wird.  Die Gültigkeit einer Sperre kann durch
