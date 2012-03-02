@@ -70,14 +70,13 @@ abstract class ActionForm extends Object {
     *
     * @return array - Array mit den zu serialisierenden Eigenschaften
     */
-   final public function __sleep() {
+   public function __sleep() {
       $array = (array) $this;
-
-      $null = chr(0);
-      unset($array["{$null}*{$null}request"  ],    // unset transient properties
-            $array["{$null}*{$null}actionKey"]);
-
-      return array_keys($array);                   // return the remaining keys (= property names)
+                                                //                                  Zugriff auf Class members:
+      unset($array["\0*\0request"  ],           // unset transient properties       --------------------------
+            $array["\0*\0actionKey"]);          //                                  private:    "\0{className}\0{propertyName}"
+                                                //                                  protected:  "\0*\0{propertyName}"
+      return array_keys($array);                // return the remaining keys        public:     "{propertyName}"
    }
 
 
