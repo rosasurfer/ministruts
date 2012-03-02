@@ -233,8 +233,8 @@ class Logger extends StaticClass {
 
                $mailMsg .= "\n\n\nRequest:\n--------\n".$request."\n\n\n"
                         .  "Session: ".($session ? "\n--------\n".$session."\n\n\n" : "  - no session -\n")
-                        .  "Host:      ".$ip."\n"
-                        .  "Timestamp: ".date('Y-m-d H:i:s')."\n";
+                        .  "Host: ".$ip."\n"
+                        .  "Time: ".date('Y-m-d H:i:s')."\n";
             }
             else {
                $mailMsg .= "\n\n\nShell:\n------\n".print_r($_SERVER, true)."\n\n\n";
@@ -421,8 +421,8 @@ class Logger extends StaticClass {
 
                $mailMsg .= "\n\n\nRequest:\n--------\n".$request."\n\n\n"
                         .  "Session: ".($session ? "\n--------\n".$session."\n\n\n" : "  - no session -\n")
-                        .  "Host:      ".$ip."\n"
-                        .  "Timestamp: ".date('Y-m-d H:i:s')."\n";
+                        .  "Host: ".$ip."\n"
+                        .  "Time: ".date('Y-m-d H:i:s')."\n";
             }
             else {
                $mailMsg .= "\n\n\nShell:\n------\n".print_r($_SERVER, true)."\n\n\n";
