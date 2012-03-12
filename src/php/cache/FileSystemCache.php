@@ -33,8 +33,7 @@ final class FileSystemCache extends CachePeer {
       // relativen Pfad als relativ zum WEB-INF-Verzeichnis interpretieren
       $directory = str_replace('\\', '/', $directory);
       if ($directory{0}!='/' && (!WINDOWS || !preg_match('/^[a-z]:/i', $directory)))
-         $directory = dirName($_SERVER['SCRIPT_FILENAME']).'/WEB-INF/'.$directory;
-
+         $directory = str_replace('\\', '/', APPLICATION_ROOT).'/WEB-INF/'.$directory;
 
       // Cache-Verzeichnis ggf. erzeugen
       if (is_file($directory) || (!is_writable($directory) && !mkDir($directory, 0700, true)))

@@ -45,8 +45,7 @@ final class FrontController extends Singleton {
       $controller = $cache->get(__CLASS__);
 
       if (!$controller) {
-         // TODO: Application::getBaseDirectory() implementieren
-         $configFile = dirName($_SERVER['SCRIPT_FILENAME']).'/WEB-INF/struts-config.xml';
+         $configFile = str_replace('\\', '/', APPLICATION_ROOT.'/WEB-INF/struts-config.xml');
 
          // Parsen der struts-config.xml synchronisieren
          $lock = new FileLock($configFile);
@@ -113,7 +112,7 @@ final class FrontController extends Singleton {
 
 
       // Struts-Konfigurationsdateien suchen
-      $appDirectory = dirName($_SERVER['SCRIPT_FILENAME']);
+      $appDirectory = str_replace('\\', '/', APPLICATION_ROOT);
       if (!is_file($appDirectory.'/WEB-INF/struts-config.xml'))
          throw new FileNotFoundException('Configuration file not found: "struts-config.xml"');
 

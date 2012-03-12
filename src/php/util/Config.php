@@ -120,18 +120,14 @@ final class Config extends Object {
     * Konstruktor
     *
     * Lädt die Konfiguration aus allen existierenden config.properties- und config-custom.properties-
-    * Dateien.  Diese config-custom.propertie-Datei sollte nicht im Repository gespeichert werden, so
+    * Dateien.  Die config-custom.propertie-Dateien sollte nicht im Repository gespeichert werden, so
     * daß eine globale und eine lokale Konfiguration mit unterschiedlichen Einstellungen möglich sind.
     * Lokale Einstellungen überschreiben globale Einstellungen.
     */
    private function __construct() {
-
-      // Ausgangsverzeichnis ermitteln und Suchpfad definieren
-      $scriptDir = realPath(dirName($_SERVER['SCRIPT_FILENAME']));
-
-      // Web- oder Consolenanwendung
-      if (isSet($_SERVER['REQUEST_METHOD'])) $path = $scriptDir.DIRECTORY_SEPARATOR.'WEB-INF';
-      else                                   $path = getCwd().PATH_SEPARATOR.$scriptDir;
+      // Suchpfad je nach Web- oder Konsolenanwendung definieren
+      if (isSet($_SERVER['REQUEST_METHOD'])) $path = APPLICATION_ROOT.DIRECTORY_SEPARATOR.'WEB-INF';                 // web:    WEB-INF-Verzeichnis
+      else                                   $path = getCwd().PATH_SEPARATOR.dirName($_SERVER['SCRIPT_FILENAME']);   // console: aktuelles + Scriptverzeichnis
 
       // Include-Pfad anhängen und Suchpfad zerlegen
       $paths = explode(PATH_SEPARATOR, $path.PATH_SEPARATOR.ini_get('include_path'));
