@@ -2,8 +2,8 @@
 /**
  * PageContext
  *
- * Container, in dem für den Renderprozeß benötigte Objekte oder Variablen abgelegt werden. Beim
- * Rendern kann auf diese Daten aus dem HTML zugegriffen werden.  Innerhalb eines Seitenfragments
+ * Container, in dem für den Renderprozeß benötigte Objekte oder Variablen abgelegt werden können.
+ * Beim Rendern kann auf diese Daten aus dem HTML zugegriffen werden.  Innerhalb eines Seitenfragments
  * können auch Daten im Container gespeichert werden, jedoch nur, wenn dabei keine vorhandenen
  * Daten überschrieben werden.
  *
