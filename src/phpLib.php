@@ -4,8 +4,18 @@
  *
  * Systemvoraussetzungen: @see ../doc/FAQ
  */
+define('PHPLIB_ROOT',  dirName(__FILE__));
+
 if (PHP_VERSION < '5.2.1') {
-   echo('Warning: You are working with a buggy PHP version (at least version 5.2.1 is needed).'.(isSet($_SERVER['REQUEST_METHOD']) ? "<br>":"\n").'All the hunnies are hollering.'.(isSet($_SERVER['REQUEST_METHOD']) ? "<br><br>":"\n\n"));
+   echo('Warning: You are working with a buggy PHP version (at least version 5.2.1 is needed).'.(isSet($_SERVER['REQUEST_METHOD']) ? "<br><br>":"\n\n"));
+}
+
+
+// phpInfo()-Aufrufe abfangen
+// --------------------------
+if (subStr($_SERVER['PHP_SELF'], -12) == '/phpinfo.php') {
+   require(PHPLIB_ROOT.'/php/phpinfo.php');
+   exit();
 }
 
 

@@ -3,7 +3,7 @@ if (!defined('WINDOWS')) define('WINDOWS', (strToUpper(subStr(PHP_OS, 0, 3)) ===
 if (!defined('LOCAL'))   define('LOCAL'  , (@$_SERVER['REMOTE_ADDR'] == '127.0.0.1'));       // ob das Script lokal läuft
 
 
-if (PHP_VERSION < '5.2.1')                                                    echoError('Warning: You are working with a buggy PHP version (at least version 5.2.1 is needed)');
+if (!defined('PHPLIB_ROOT') && PHP_VERSION < '5.2.1')                         echoError('Warning: You are working with a buggy PHP version (at least version 5.2.1 is needed)');
 
 if (!ini_get('short_open_tag'))                                               echoError('Warning: short_open_tag is not On');
 if (ini_get('safe_mode'))                                                     echoError('Warning: safe_mode is not Off');
