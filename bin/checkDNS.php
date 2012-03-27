@@ -6,11 +6,12 @@
  */
 set_time_limit(0);
 
+define('APPLICATION_NAME', 'DNS-Checker');
+define('APPLICATION_ROOT',  dirName(__FILE__));
+
+
 // Library einbinden
 require(dirName(__FILE__).'/../src/phpLib.php');
-
-
-define('APPLICATION_NAME', 'DNS-Checker');
 
 
 /**
