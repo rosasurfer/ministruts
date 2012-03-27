@@ -41,7 +41,7 @@ class Module extends Object {
 
 
    /**
-    * Das Default-ActionMapping dieses Moduls, wenn eeines definiert wurde.
+    * Das Default-ActionMapping dieses Moduls, wenn eines definiert wurde.
     */
    protected /*ActionMapping*/ $defaultMapping;
 
