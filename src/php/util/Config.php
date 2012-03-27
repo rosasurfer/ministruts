@@ -126,7 +126,7 @@ final class Config extends Object {
     */
    private function __construct() {
       // Suchpfad je nach Web- oder Konsolenanwendung definieren
-      if (isSet($_SERVER['REQUEST_METHOD'])) $path = APPLICATION_ROOT.DIRECTORY_SEPARATOR.'WEB-INF';                 // web:    WEB-INF-Verzeichnis
+      if (isSet($_SERVER['REQUEST_METHOD'])) $path = APPLICATION_ROOT.DIRECTORY_SEPARATOR.'WEB-INF';                 // web:     WEB-INF-Verzeichnis
       else                                   $path = getCwd().PATH_SEPARATOR.dirName($_SERVER['SCRIPT_FILENAME']);   // console: aktuelles + Scriptverzeichnis
 
       // Include-Pfad anhängen und Suchpfad zerlegen
