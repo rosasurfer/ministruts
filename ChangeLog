@@ -1,3 +1,8 @@
+2012-04-03
+
+   - php/file/pdf/SimplePdfDocument::saveAs() - "Speichern unter..."-Methode für alle PDF-Klassen
+
+
 2012-02-05
 
    - Dateipfade werden möglichst anhand von APPLICATION_ROOT definiert, um Zugriffsprobleme mit symbolischen Links 

@@ -1511,5 +1511,31 @@ class SimplePdfDocument extends BasePdfDocument {
    function toString() {
       return $this->ezOutput();
    }
+
+
+   /**
+    * Speichert dieses PDF-Dokument in einer Datei.
+    *
+    * @param  string $filename - Dateiname
+    *
+    * @return SimplePdfDocument
+    */
+   public function saveAs($filename) {
+      if (!is_string($filename)) throw new IllegalTypeException('Illegal type of parameter $filename: '.getType($filename));
+
+      // Datei schreiben
+      $hFile = fOpen($filename, 'xb');
+      try {
+         fWrite($hFile, $this->toString());
+      }
+      catch (Exception $ex) {
+         if (is_resource($hFile))
+            fClose($hFile);
+         throw $ex;
+      }
+      fClose($hFile);
+
+      return $this;
+   }
 }
 ?>
