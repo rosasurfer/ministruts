@@ -374,13 +374,13 @@ function sortByCalls($a, $b) {
 
 /**
  */
-function sortByRealTime($a, $b) { global $rtimes  ; return compareAsInt($rtimes  [$b], $rtimes  [$a]); }
-function sortByCumulatedRealTime ($a, $b) { global $c_rtimes; return compareAsInt($c_rtimes[$b], $c_rtimes[$a]); }
-function sortBySystemTime   ($a, $b) { global $stimes  ; return compareAsInt($stimes  [$b], $stimes  [$a]); }
-function sortByCumulatedSystemTime ($a, $b) { global $c_stimes; return compareAsInt($c_stimes[$b], $c_stimes[$a]); }
-function sortByUserTime   ($a, $b) { global $utimes  ; return compareAsInt($utimes  [$b], $utimes  [$a]); }
-function sortByCumulatedUserTime ($a, $b) { global $c_utimes; return compareAsInt($c_utimes[$b], $c_utimes[$a]); }
-function sortByMemory  ($a, $b) { global $mem     ; return compareAsInt($mem     [$b], $mem     [$a]); }
+function sortByRealTime           ($a, $b) { global $rtimes  ; return compareAsInt($rtimes  [$b], $rtimes  [$a]); }
+function sortByCumulatedRealTime  ($a, $b) { global $c_rtimes; return compareAsInt($c_rtimes[$b], $c_rtimes[$a]); }
+function sortBySystemTime         ($a, $b) { global $stimes  ; return compareAsInt($stimes  [$b], $stimes  [$a]); }
+function sortByCumulatedSystemTime($a, $b) { global $c_stimes; return compareAsInt($c_stimes[$b], $c_stimes[$a]); }
+function sortByUserTime           ($a, $b) { global $utimes  ; return compareAsInt($utimes  [$b], $utimes  [$a]); }
+function sortByCumulatedUserTime  ($a, $b) { global $c_utimes; return compareAsInt($c_utimes[$b], $c_utimes[$a]); }
+function sortByMemory             ($a, $b) { global $mem     ; return compareAsInt($mem     [$b], $mem     [$a]); }
 
 
 /**
