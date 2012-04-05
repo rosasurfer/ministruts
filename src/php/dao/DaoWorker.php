@@ -37,7 +37,7 @@ class DaoWorker extends Object {
 
 
    /**
-    * single object getters
+    * single object getter
     */
    public function getByQuery($query) {
       $result = $this->executeSql($query);
@@ -46,7 +46,7 @@ class DaoWorker extends Object {
 
 
    /**
-    * object's list getters
+    * object's list getter
     */
    public function getListByQuery($query, $count = false) {
       $result = $this->executeSql($query, $count);
@@ -93,7 +93,7 @@ class DaoWorker extends Object {
    /**
     * Konvertiert ein eindeutiges DB-Resultset in eine PersistableObject-Instanz.
     *
-    * @param array $result - Rückgabewert einer Datenbankabfrage
+    * @param  array $result - Rückgabewert einer Datenbankabfrage
     *
     * @return array - Instanz
     *
@@ -117,7 +117,7 @@ class DaoWorker extends Object {
    /**
     * Konvertiert ein DB-Resultset in PersistableObject-Instanzen.
     *
-    * @param array $result - Rückgabewert einer Datenbankabfrage
+    * @param  array $result - Rückgabewert einer Datenbankabfrage
     *
     * @return array - Instanzen
     */
