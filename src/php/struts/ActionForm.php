@@ -66,17 +66,17 @@ abstract class ActionForm extends Object {
 
 
    /**
-    * Verhindert das Serialisieren transienter Werte.  Wird intern vorm Serialisieren aufgerufen.
+    * Verhindert das Serialisieren transienter Werte.
     *
-    * @return array - Array mit den zu serialisierenden Eigenschaften
+    * @return string[] - Array mit den Namen der zu serialisierenden Eigenschaften
     */
    public function __sleep() {
       $array = (array) $this;
-                                                //                                  Zugriff auf Class members:
-      unset($array["\0*\0request"  ],           // unset transient properties       --------------------------
-            $array["\0*\0actionKey"]);          //                                  private:    "\0{className}\0{propertyName}"
-                                                //                                  protected:  "\0*\0{propertyName}"
-      return array_keys($array);                // return the remaining keys        public:     "{propertyName}"
+                                                // Zugriff auf Class members:
+      unset($array["\0*\0request"  ],           // --------------------------
+            $array["\0*\0actionKey"]);          // private:    "\0{className}\0{propertyName}"
+                                                // protected:  "\0*\0{propertyName}"
+      return array_keys($array);                // public:     "{propertyName}"
    }
 
 
