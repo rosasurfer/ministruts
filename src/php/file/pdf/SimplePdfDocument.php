@@ -1523,6 +1523,10 @@ class SimplePdfDocument extends BasePdfDocument {
    public function saveAs($filename) {
       if (!is_string($filename)) throw new IllegalTypeException('Illegal type of parameter $filename: '.getType($filename));
 
+      // ggf. Verzeichnis erzeugen
+      $directory = dirName($filename);
+      if (is_file($directory) || (!is_writable($directory) && !mkDir($directory, 0700, true))) throw new plInvalidArgumentException("Cannot write to directory \"$directory\"");
+
       // Datei schreiben
       $hFile = fOpen($filename, 'xb');
       try {
@@ -1530,7 +1534,9 @@ class SimplePdfDocument extends BasePdfDocument {
       }
       catch (Exception $ex) {
          if (is_resource($hFile))
-            fClose($hFile);
+            @fClose($hFile);
+         if (is_file($filename))
+            @unlink($filename);
          throw $ex;
       }
       fClose($hFile);
