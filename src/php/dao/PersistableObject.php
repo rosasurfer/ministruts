@@ -22,9 +22,8 @@ abstract class PersistableObject extends Object implements IDaoConnected {
    /**
     * Default-Constructor.
     *
-    * Der Constructor ist final, neue PersistableObject-Instanzen werden mittels einer Helfermethode
-    * erzeugt (vorzugsweise create()). Diese Methode muß implementiert werden, wenn neue Instanzen
-    * erzeugt (und gespeichert) werden können sollen.
+    * Der Constructor ist final, neue PersistableObject-Instanzen können nur per Helfermethode erzeugt werden.
+    *
     *
     * Beispiel:
     * ---------
@@ -33,16 +32,16 @@ abstract class PersistableObject extends Object implements IDaoConnected {
     *
     *    private $property = null;
     *
-    *
     *    public static function create($arg) {
-    *
-    *       // ... parameter validation etc.
-    *
+    *       // parameter validation...
     *       $instance = new self();
     *       $instance->property = $arg;
     *       return $instance;
     *    }
     * }
+    *
+    * $object = MyClass::create('foo');
+    * $object->save();
     */
    final protected function __construct() {
       $this->created = $this->touch();
@@ -154,24 +153,22 @@ abstract class PersistableObject extends Object implements IDaoConnected {
 
 
    /**
-    * Fügt diese Instanz in die Datenbank ein.  Diese Methode muß von der konkreten Klasse implementiert
-    * werden.
+    * Fügt diese Instanz in die Datenbank ein.  Diese Methode muß von der konkreten Klasse implementiert werden.
     *
     * @return PersistableObject
     */
    protected function insert() {
-      throw new UnimplementedFeatureException('Method '.get_class($this).'::'.__FUNCTION__.'() is not implemented');
+      throw new UnimplementedFeatureException('You need to implement '.get_class($this).'->'.__FUNCTION__.'() to insert '.get_class($this).'s.');
    }
 
 
    /**
-    * Aktualisiert diese Instanz in der Datenbank.  Diese Methode muß von der konkreten Klasse implementiert
-    * werden.
+    * Aktualisiert diese Instanz in der Datenbank.  Diese Methode muß von der konkreten Klasse implementiert werden.
     *
     * @return PersistableObject
     */
    protected function update() {
-      throw new UnimplementedFeatureException('Method '.get_class($this).'::'.__FUNCTION__.'() is not implemented');
+      throw new UnimplementedFeatureException('You need to implement '.get_class($this).'->'.__FUNCTION__.'() to update '.get_class($this).'s.');
    }
 
 
@@ -187,13 +184,12 @@ abstract class PersistableObject extends Object implements IDaoConnected {
 
 
    /**
-    * Löscht diese Instanz aus der Datenbank.  Diese Methode muß von der konkreten Klasse implementiert
-    * werden.
+    * Löscht diese Instanz aus der Datenbank.  Diese Methode muß von der konkreten Klasse implementiert werden.
     *
     * @return NULL
     */
    public function delete() {
-      throw new UnimplementedFeatureException('Method '.get_class($this).'::'.__FUNCTION__.'() is not implemented');
+      throw new UnimplementedFeatureException('You need to implement '.get_class($this).'->'.__FUNCTION__.'() to delete '.get_class($this).'s.');
    }
 
 
@@ -201,7 +197,7 @@ abstract class PersistableObject extends Object implements IDaoConnected {
     * Erzeugt eine neue Instanz.
     *
     * @param string $class - Klassenname der zu erzeugenden Instanz
-    * @param array  $row   - Array mit Instanzdaten (Datenbankzeile)
+    * @param array  $row   - Array mit Instanzdaten (entspricht einer Datenbankzeile)
     *
     * @return PersistableObject
     */
