@@ -130,12 +130,14 @@ abstract class BarCode extends Object {
          imageFill($this->hImg, $this->width, $this->height, $this->bgColor);
    }
 
+
    /**
     *
     */
    final public function getWidth() {
       return $this->width;
    }
+
 
    /**
     *
@@ -144,12 +146,14 @@ abstract class BarCode extends Object {
       return $this->height;
    }
 
+
    /**
     *
     */
    final public function getStyle() {
       return $this->style;
    }
+
 
    /**
     *
@@ -178,12 +182,14 @@ abstract class BarCode extends Object {
       return join(' | ', $strings).' ('.$style.')';
    }
 
+
    /**
     *
     */
    final public function getXResolution() {
       return $this->xres;
    }
+
 
    /**
     *
@@ -192,12 +198,14 @@ abstract class BarCode extends Object {
       return $this->font;
    }
 
+
    /**
     *
     */
    final public function getValue() {
       return $this->value;
    }
+
 
    /**
     *
@@ -212,10 +220,12 @@ abstract class BarCode extends Object {
       return null;
    }
 
+
    /**
     * @return the BarCode instance
     */
    abstract protected function render();
+
 
    /**
     *
@@ -223,6 +233,7 @@ abstract class BarCode extends Object {
    protected function drawBorder() {
       imageRectangle($this->hImg, 0, 0, $this->width-1, $this->height-1, $this->fgColor);
    }
+
 
    /**
     *
@@ -232,12 +243,14 @@ abstract class BarCode extends Object {
       return $this;
    }
 
+
    /**
     *
     */
    protected function drawText($xPos, $yPos, $char) {
       imageString($this->hImg, $this->font, round($xPos), round($yPos), $char, $this->fgColor);
    }
+
 
    /**
     *
@@ -256,6 +269,7 @@ abstract class BarCode extends Object {
       throw new plRuntimeException("Drawing position out of range: Increase the image size or choose a smaller xRes value (bar spacing)");
    }
 
+
    /**
     *
     */
@@ -263,12 +277,14 @@ abstract class BarCode extends Object {
       return imageFontHeight($this->font);
    }
 
+
    /**
     *
     */
    protected function getFontWidth() {
       return imageFontWidth($this->font);
    }
+
 
    /**
     * @return the BarCode instance
@@ -284,6 +300,7 @@ abstract class BarCode extends Object {
 
       return $this;
    }
+
 
    /**
     *
@@ -301,22 +318,43 @@ abstract class BarCode extends Object {
       return $this->imgData;
    }
 
+
    /**
-    * Save the barcode image in a file.
+    * Speichert das Barcode-Image in einer Datei.
     *
-    * @param  string $filename - filename
+    * @param  string $filename  - Dateiname
+    * @param  bool   $owerwrite - ob eine vorhandene Datei überschrieben werden soll (default: nein)
     *
     * @return BarCode instance
     */
-   public function saveAs($filename) {
+   public function saveAs($filename, $overwrite=false) {
       if (!is_string($filename)) throw new IllegalTypeException('Illegal type of parameter $filename: '.getType($filename));
+      if (!is_bool($overwrite))  throw new IllegalTypeException('Illegal type of parameter $overwrite: '.getType($overwrite));
 
-      $fH = fOpen($filename, 'xb');
-      fWrite($fH, $this->toString());
-      fClose($fH);
+      // ggf. Verzeichnis erzeugen
+      $directory = dirName($filename);
+      if (is_file($directory) || (!is_writable($directory) && !mkDir($directory, 0700, true))) throw new plInvalidArgumentException('Cannot write to directory "'.$directory.'"');
+
+      $fileExisted = is_file($filename);
+
+      // Datei schreiben
+      $hFile = null;
+      try {
+         $hFile = fOpen($filename, ($overwrite ? 'w':'x').'b');
+         fWrite($hFile, $this->toString());
+         fClose($hFile);
+      }
+      catch (Exception $ex) {
+         if (is_resource($hFile))
+            @fClose($hFile);
+         if (!$fileExisted && is_file($filename))
+            @unlink($filename);
+         throw $ex;
+      }
 
       return $this;
    }
+
 
    /**
     * Destructor

@@ -1470,6 +1470,7 @@ class SimplePdfDocument extends BasePdfDocument {
      }
    }
 
+
    // ------------------------------------------------------------------------------
    function uline($info){
      // a callback function to support underlining
@@ -1505,6 +1506,7 @@ class SimplePdfDocument extends BasePdfDocument {
      }
    }
 
+
    /**
     * Get a string representation of this PDF document.
     */
@@ -1516,30 +1518,35 @@ class SimplePdfDocument extends BasePdfDocument {
    /**
     * Speichert dieses PDF-Dokument in einer Datei.
     *
-    * @param  string $filename - Dateiname
+    * @param  string $filename  - Dateiname
+    * @param  bool   $owerwrite - ob eine vorhandene Datei überschrieben werden soll (default: nein)
     *
     * @return SimplePdfDocument
     */
-   public function saveAs($filename) {
+   public function saveAs($filename, $overwrite=false) {
       if (!is_string($filename)) throw new IllegalTypeException('Illegal type of parameter $filename: '.getType($filename));
+      if (!is_bool($overwrite))  throw new IllegalTypeException('Illegal type of parameter $overwrite: '.getType($overwrite));
 
       // ggf. Verzeichnis erzeugen
       $directory = dirName($filename);
-      if (is_file($directory) || (!is_writable($directory) && !mkDir($directory, 0700, true))) throw new plInvalidArgumentException("Cannot write to directory \"$directory\"");
+      if (is_file($directory) || (!is_writable($directory) && !mkDir($directory, 0700, true))) throw new plInvalidArgumentException('Cannot write to directory "'.$directory.'"');
+
+      $fileExisted = is_file($filename);
 
       // Datei schreiben
-      $hFile = fOpen($filename, 'xb');
+      $hFile = null;
       try {
+         $hFile = fOpen($filename, ($overwrite ? 'w':'x').'b');
          fWrite($hFile, $this->toString());
+         fClose($hFile);
       }
       catch (Exception $ex) {
          if (is_resource($hFile))
             @fClose($hFile);
-         if (is_file($filename))
+         if (!$fileExisted && is_file($filename))
             @unlink($filename);
          throw $ex;
       }
-      fClose($hFile);
 
       return $this;
    }
