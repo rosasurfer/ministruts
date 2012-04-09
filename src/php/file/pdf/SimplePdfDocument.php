@@ -1541,10 +1541,8 @@ class SimplePdfDocument extends BasePdfDocument {
          fClose($hFile);
       }
       catch (Exception $ex) {
-         if (is_resource($hFile))
-            @fClose($hFile);
-         if (!$fileExisted && is_file($filename))
-            @unlink($filename);
+         if (is_resource($hFile))                 @fClose($hFile);
+         if (!$fileExisted && is_file($filename)) @unlink($filename);
          throw $ex;
       }
 

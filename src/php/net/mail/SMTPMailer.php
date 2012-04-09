@@ -8,7 +8,7 @@ class SMTPMailer extends Mailer {
    private static /*bool*/ $logDebug,
                   /*bool*/ $logInfo,
                   /*bool*/ $logNotice,
-                  /*int */ $maxSendingTime = 2;    // benötigt der Versand länger als hier angegeben, wird er im Logelevel DEBUG geloggt
+                  /*int */ $maxSendingTime = 2;    // benötigt der Versand länger als hier angegeben, wird er im Loglevel DEBUG geloggt
 
 
    protected /*string*/ $config = array('host'          => null,     // SMTP server host name
