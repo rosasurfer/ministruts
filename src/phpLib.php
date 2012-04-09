@@ -116,6 +116,7 @@ $__classes['ConcurrentModificationException'] = $dir.'php/exceptions/ConcurrentM
 $__classes['DatabaseException'              ] = $dir.'php/exceptions/DatabaseException';
 $__classes['FileNotFoundException'          ] = $dir.'php/exceptions/FileNotFoundException';
 $__classes['IllegalAccessException'         ] = $dir.'php/exceptions/IllegalAccessException';
+$__classes['IllegalArgumentException'       ] = $dir.'php/exceptions/IllegalArgumentException';
 $__classes['IllegalStateException'          ] = $dir.'php/exceptions/IllegalStateException';
 $__classes['IllegalTypeException'           ] = $dir.'php/exceptions/IllegalTypeException';
 $__classes['InfrastructureException'        ] = $dir.'php/exceptions/InfrastructureException';
