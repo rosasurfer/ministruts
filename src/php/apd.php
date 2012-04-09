@@ -389,7 +389,7 @@ function sortByMemory             ($a, $b) { global $mem     ; return compareAsI
 function parseArguments($pattern) {
    $options = $nonOptions = array();
 
-   $args = getArgvArray();
+   $args = array_slice($_SERVER['argv'], 1);
    if (!$args)
       return array($options, $nonOptions);
 

@@ -172,7 +172,7 @@ fWrite($OUT, $buffer);
  * Liest die Kommandozeilenargumente ein und parst sie.
  */
 function parseArguments($pattern) {
-   $args = getArgvArray();
+   $args = array_slice($_SERVER['argv'], 1);
    if (empty($args))
       return array(array(), array());
 

@@ -355,29 +355,6 @@ function push_shutdown_function(/*callable*/ $callback = null /*, $args1, $args2
 
 
 /**
- * Get the PHP $argv array across different configurations.
- * Will take care on register_globals and register_argc_argv ini settings.
- *
- * @return array - the $argv array
- */
-function getArgvArray() {
-   $array = null;
-   if (!isSet($GLOBALS['argv']) || !is_array($GLOBALS['argv'])) {
-      if (!isSet($_SERVER['argv']) || !is_array($_SERVER['argv'])) {
-         if (!isSet($GLOBALS['HTTP_SERVER_VARS']) || isSet($GLOBALS['HTTP_SERVER_VARS']['argv']) || !is_array($GLOBALS['HTTP_SERVER_VARS']['argv'])) {
-            throw new plRuntimeException('Could not get command line arguments, "register_argc_argv" = Off ???');
-         }
-         $array = $GLOBALS['HTTP_SERVER_VARS']['argv'];
-      }
-      $array = $_SERVER['argv'];
-   }
-   $array = $GLOBALS['argv'];
-   array_shift($array);
-   return $array;
-}
-
-
-/**
  * Erzeugt eine zufällige ID (wegen Verwechselungsgefahr ohne die Zeichen 0 O 1 l I).
  *
  * @param int $length - Länge der ID
