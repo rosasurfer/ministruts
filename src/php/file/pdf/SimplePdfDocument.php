@@ -1529,12 +1529,13 @@ class SimplePdfDocument extends BasePdfDocument {
 
       // ggf. Verzeichnis erzeugen
       $directory = dirName($filename);
-      if (is_file($directory) || (!is_writable($directory) && !mkDir($directory, 0700, true))) throw new plInvalidArgumentException('Cannot write to directory "'.$directory.'"');
-
-      $fileExisted = is_file($filename);
+      if (is_file($directory))                                   throw new plInvalidArgumentException('Cannot write to directory "'.$directory.'" (is file)');
+      if (!is_dir($directory) && !mkDir($directory, 0700, true)) throw new plInvalidArgumentException('Cannot create directory "'.$directory.'"');
+      if (!is_writable($directory))                              throw new plInvalidArgumentException('Cannot write to directory "'.$directory.'"');
 
       // Datei schreiben
-      $hFile = null;
+      $fileExisted = is_file($filename);
+      $hFile       = null;
       try {
          $hFile = fOpen($filename, ($overwrite ? 'w':'x').'b');
          fWrite($hFile, $this->toString());
