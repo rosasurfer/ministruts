@@ -141,17 +141,15 @@ final class String extends StaticClass {
       if (is_array($string)) {
          $array = array();
          foreach ($string as $key => $value) {
-            if ($key === (string)$key)
+            if (is_string($key))
                $key = self:: encodeUtf8($key);
             $array[$key] = self:: encodeUtf8($value);
          }
          return $array;
       }
 
-      if ($string===null || $string==='')
+      if (!is_string($string) || $string==='')
          return $string;
-
-      if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
 
       return utf8_encode($string);
    }
