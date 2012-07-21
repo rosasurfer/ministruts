@@ -14,6 +14,8 @@ elif [ $USERNAME = 'user2' ] ; then
     PORT=2403
 elif [ $USERNAME = 'user3' ] ; then
     PORT=2404
+elif [ $USERNAME = 'user4' ] ; then
+    PORT=2405
 else 
     PORT=2401
 fi
