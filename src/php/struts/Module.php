@@ -515,14 +515,18 @@ class Module extends Object {
             if (strLen($tag) > 0) throw new plRuntimeException('Tile "'.$tile->getName().'", set "'.$name.'": Only a "value" attribute *or* a body value must be specified');
             $value = (string) $tag['value'];
 
-            if ($tag['type'])
+            if ($tag['type']) {
                $type = (string) $tag['type'];
-
-            elseif (String ::startsWith($value, 'layouts/') || String ::startsWith($value, 'tiles/'))
+            }
+            else if ($this->isIncludable($value, $xml)) {
                $type = Tile ::PROP_TYPE_RESOURCE;
-
-            else
-               $type = $this->isIncludable($value, $xml) ? Tile ::PROP_TYPE_RESOURCE : Tile ::PROP_TYPE_STRING;
+            }
+            else if (String ::endsWith($value, '.htm', true) || String ::endsWith($value, '.html', true)) {
+               throw new plRuntimeException('Tile "'.$tile->getName().'", set "'.$name.'": specify a type="string|resource" for ambiguous attribute value="'.$value.'" (looks like a filename but file not found)');
+            }
+            else {
+               $type = Tile ::PROP_TYPE_STRING;
+            }
          }
          else {               // value ist im Body angegeben
             $value = trim((string) $tag);
