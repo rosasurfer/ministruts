@@ -22,7 +22,7 @@ LOGFILE_NAME="php_error_log"
 
 # User und/oder E-Mailadressen für Benachrichtigungen (kommagetrennt, keine Leerzeichen; default: der aktuelle User)
 #
-EMAILS_TO=root
+EMAILS_TO=root,name@domain.tld
 
 
 
@@ -63,6 +63,4 @@ while [ 1 ]; do
 done
 
 exit
-
-
 # ------------------------------------------------------------------------------------------------------------------------------
