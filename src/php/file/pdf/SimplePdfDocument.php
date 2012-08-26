@@ -578,7 +578,7 @@ class SimplePdfDocument extends BasePdfDocument {
    }
 
    // ------------------------------------------------------------------------------
-   function ezTable(&$data,$cols='',$title='',$options=''){
+   function ezTable(&$data, $cols='', $title='', $options='') {
      // add a table of information to the pdf document
      // $data is a two dimensional array
      // $cols (optional) is an associative array, the keys are the names of the columns from $data
