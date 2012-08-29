@@ -1,5 +1,5 @@
 <?
-/**
+/***
  * Inkludiert die komplette Funktionalität der MiniStruts-Library.
  *
  * Systemvoraussetzungen: @see ../doc/FAQ
