@@ -8,22 +8,9 @@ echo Updating $PROJECT ...
 
 PASS=`cat ~/.cvs.shadow`
 
-if   [ $USERNAME = 'user1' ] ; then
-    PORT=2402
-elif [ $USERNAME = 'user2' ] ; then
-    PORT=2403
-elif [ $USERNAME = 'user3' ] ; then
-    PORT=2404
-elif [ $USERNAME = 'user4' ] ; then
-    PORT=2405
-else 
-    PORT=2401
-fi
-
-
 cd $PROJECTS_ROOT
 
-export CVSROOT=:pserver:$USERNAME:$PASS@localhost:$PORT/var/cvs
+export CVSROOT=:pserver:$USERNAME:$PASS@localhost:2401/var/cvs
 cvs -d $CVSROOT login
 
 #cvs -d $CVSROOT -qr checkout -PR -d $PROJECT -r HEAD $PROJECT
