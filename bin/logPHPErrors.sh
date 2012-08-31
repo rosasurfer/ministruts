@@ -22,7 +22,7 @@ LOGFILE_NAME="php_error_log"
 
 # User und/oder E-Mailadressen für Benachrichtigungen (kommagetrennt, keine Leerzeichen; default: der aktuelle User)
 #
-EMAILS_TO=user01@domain.tld
+EMAILS_TO=user01.mail@domain.tld
 
 
 
