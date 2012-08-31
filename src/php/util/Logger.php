@@ -142,6 +142,19 @@ class Logger extends StaticClass {
       if (($error_reporting & $level) != $level) return true;
 
 
+      /**
+       * PHP v5.3 bug: An error triggered at compile-time disables __autoload() (and spl_autoload() at the same time).
+       *               Won't be fixed for PHP5.3 as it may cause lots of other problems.
+       *
+       * @see https://bugs.php.net/bug.php?id=47987
+       *
+       * Wir müssen alle im Errorhandler evt. benötigten Klassen samt Hierarchie manuell laden.
+       * Danke, PHP-Team!!!
+       */
+      __autoload('NestableException', true);
+      __autoload('PHPErrorException', true);
+
+
       // Fehler in Exception kapseln ...
       $GLOBALS['$__PHPErrorException_create'] = true;    // Marker für Konstruktor von PHPErrorException
       $exception = new PHPErrorException($message, $file, $line, $context);

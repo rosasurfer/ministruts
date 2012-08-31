@@ -220,6 +220,9 @@ function apd_addProfileLink($dumpFile = null) {
  *                            seine Existenz reicht für die Erkennung eines manuellen Aufrufs.
  */
 function __autoload($className /*, $throw */) {
+
+   // TODO: Mehrfach-Includes *ohne* Verwendung von include_once() verhindern
+
    try {
       if (isSet($GLOBALS['__classes'][$className])) {
          $className = $GLOBALS['__classes'][$className];
@@ -259,7 +262,9 @@ function __autoload($className /*, $throw */) {
  *
  * @return bool
  *
- * @see __autoload()
+ *
+ * NOTE: Das eine Klasse definiert ist, bedeutet noch nicht, daß sie auch geladen (inkludiert) ist.
+ *       @see __autoload()
  */
 function is_class($name) {
    if (class_exists($name, false))
@@ -287,7 +292,8 @@ function is_class($name) {
  *
  * @return bool
  *
- * @see __autoload()
+ * NOTE: Das ein Interface definiert ist, bedeutet noch nicht, daß es auch geladen (inkludiert) ist.
+ *       @see __autoload()
  */
 function is_interface($name) {
    if (interface_exists($name, false))

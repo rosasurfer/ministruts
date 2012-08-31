@@ -68,7 +68,7 @@ class PageContext extends Singleton {
     * @param  string $name - Name der Eigenschaft
     * @return mixed        - Wert oder NULL, wenn die Eigenschaft nicht existiert
     */
-   private function __get($name) {
+   public function __get($name) {
       return isSet($this->properties[$name]) ? $this->properties[$name] : null;
    }
 
