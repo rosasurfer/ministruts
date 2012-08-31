@@ -102,7 +102,7 @@ foreach ($domains as $domain => $domainValues) {
 
 
 // Reverse-DNS der angegebenen IP-Adressen überprüfen
-$ips = Config::get('dns.ip', array());
+$ips = Config ::get('dns.ip', array());
 
 foreach ($ips as $ip => $value) {
    $result = getHostByAddr($ip);
