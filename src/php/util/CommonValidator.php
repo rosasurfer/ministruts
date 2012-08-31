@@ -73,7 +73,7 @@ class CommonValidator extends StaticClass {
    public static function isIPWanAddress($string) {
       $bytes = self ::isIPAddress($string, true);
 
-      // Die Logik entspricht dem Gegenteil von self::isIPLanAdress() + zusätzlicher Tests.
+      // Die Logik entspricht dem Gegenteil von self:: isIPLanAdress() + zusätzlicher Tests.
       if ($bytes) {
          if ($bytes[0] == 10)                   // 10.0.0.0 - 10.255.255.255
             return false;

@@ -46,7 +46,7 @@ class PageContext extends Singleton {
     * @return mixed - der gespeicherte Wert oder NULL, falls kein solcher Schlüssel existiert
     */
    public static function get($key) {
-      return self::me()->__get($key);
+      return self:: me()->__get($key);
    }
 
 
@@ -57,7 +57,7 @@ class PageContext extends Singleton {
     * @param mixed  $value - der zu speichernde Wert
     */
    public static function set($key, $value) {
-      return self::me()->__set($key, $value);
+      return self:: me()->__set($key, $value);
    }
 
 
@@ -80,7 +80,7 @@ class PageContext extends Singleton {
     * @param string $name  - Name der Eigenschaft
     * @param mixed  $value - Wert
     */
-   private function __set($name, $value) {
+   public function __set($name, $value) {
       if (!is_string($name)) throw new IllegalTypeException('Illegal type of argument $name: '.getType($name));
 
       if ($value !== null) {

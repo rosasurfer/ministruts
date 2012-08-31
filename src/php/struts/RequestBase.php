@@ -942,7 +942,7 @@ abstract class RequestBase extends Singleton {
 
 
    /**
-    * Alias für self::dropActionErrors()
+    * Alias für self:: dropActionErrors()
     *
     * Löscht einzelne oder alle Error-Messages aus dem Request.
     *

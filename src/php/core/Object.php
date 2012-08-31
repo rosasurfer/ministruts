@@ -13,7 +13,7 @@ class Object {
     *
     * @throws plRuntimeException
     */
-   private static function __call($method, array $args) {
+   public function __call($method, array $args) {
       $trace = debug_backTrace();
 
       for ($i=0; $i < sizeOf($trace); $i++) {
@@ -32,7 +32,7 @@ class Object {
     *
     * @throws plRuntimeException
     */
-   private function __set($property, $value) {
+   public function __set($property, $value) {
       $trace = debug_backTrace();
       $class = get_class($trace[0]['object']);
       throw new plRuntimeException("Undefined class variable $class::$property");

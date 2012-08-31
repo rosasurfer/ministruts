@@ -85,7 +85,7 @@ final class DBPool extends Singleton {
 /*
    // @return DB
    public static function getByDao(GenericDAO $dao) {
-      return self::me()->getLink($dao->getLinkName());
+      return self:: me()->getLink($dao->getLinkName());
    }
 }
 */
