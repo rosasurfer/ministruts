@@ -1,4 +1,4 @@
-<?
+<?php
 /**
  * Barcode renderer for "Code-39", an alphanumeric bar code that can encode decimal numbers, upper and lower case
  * alphabetic characters and some special symbols.

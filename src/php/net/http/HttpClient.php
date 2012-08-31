@@ -1,4 +1,4 @@
-<?
+<?php
 /**
  * Basisklasse für konkrete HttpClients.
  */

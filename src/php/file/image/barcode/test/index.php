@@ -1,4 +1,4 @@
-<?
+<?php
 define('APPLICATION_NAME', 'barcode_test');
 
 // input parameters
@@ -124,7 +124,7 @@ $value       = isSet($_REQUEST['value'      ]) ? $_REQUEST['value'      ] : null
 
 </form>
 
-<?
+<?php
 if (strLen($value) > 0) {
    $style  = BarCode ::STYLE_ALIGN_CENTER;
    $style |= ($format     =='png' ) ? BarCode ::STYLE_IMAGE_PNG     : 0;
@@ -150,7 +150,7 @@ if (strLen($value) > 0) {
          $params = "type=$type&value=$value&width=$width&height=$height&style=$style&xres=$xres&font=$font";
          ?>
          <table align="center"><tr><td><a href="image.php?<?=$params?>" target="barcode_image"><img src="data:<?=$contentType?>;base64,<?=$data?>" border=0></a></td></tr></table>
-         <?
+         <?php
          break;
 
       default:
@@ -158,7 +158,7 @@ if (strLen($value) > 0) {
    }
 }
 else if (isSet($_REQUEST['submit'])) {
-   ?> <table align="center"><tr><td><font color="red">missing barcode value</font></td></tr></table> <?
+   ?> <table align="center"><tr><td><font color="red">missing barcode value</font></td></tr></table> <?php
 }
 ?>
 

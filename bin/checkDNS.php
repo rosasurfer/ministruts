@@ -1,5 +1,5 @@
 #!/usr/bin/php -Cq
-<?
+<?php
 /**
  * TODO: Jeder Nameserver muß einzeln abgefragt werden, denn bei fehlerhafter Synchronisierung können
  *       sich die zurückgegebenen Werte der einzelnen Server unterscheiden.

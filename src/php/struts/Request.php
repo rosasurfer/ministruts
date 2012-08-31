@@ -1,4 +1,4 @@
-<?
+<?php
 /**
  * Wrapper für RequestBase
  *

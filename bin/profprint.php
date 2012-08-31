@@ -1,5 +1,5 @@
 #!/usr/bin/php
-<?
+<?php
 define('APPLICATION_NAME', 'profprint');
 define('APPLICATION_ROOT',  dirName(__FILE__));
 

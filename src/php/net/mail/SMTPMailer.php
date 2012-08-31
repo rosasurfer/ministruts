@@ -1,4 +1,4 @@
-<?
+<?php
 /**
  * Mailer, der Mails per SMTP-Protokoll über einen SMTP-Server verschickt.
  */

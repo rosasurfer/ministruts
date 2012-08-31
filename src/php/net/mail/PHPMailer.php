@@ -1,4 +1,4 @@
-<?
+<?php
 /**
  * Mailer, der Mails mit Hilfe der in PHP integrierten mail()-Funktion verschickt.
  */

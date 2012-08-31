@@ -1,4 +1,4 @@
-<?
+<?php
 /**
  * Barcode renderer for "Code 128-C", a numeric only bar code.
  *

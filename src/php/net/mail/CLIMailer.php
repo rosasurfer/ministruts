@@ -1,4 +1,4 @@
-<?
+<?php
 /**
  * Mailer, der Mails über ein Command-Line-Interface verschickt (Aufruf eines Shellprogramms).
  */

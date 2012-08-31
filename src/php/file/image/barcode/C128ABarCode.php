@@ -1,4 +1,4 @@
-<?
+<?php
 /**
  * Barcode renderer for "Code 128-A", a continuous multilevel bar code that includes all numeric and upper case characters
  * and ASCII control characters.

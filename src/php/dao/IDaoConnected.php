@@ -1,4 +1,4 @@
-<?
+<?php
 /**
  * Interface zum Finden des DAO einer Instanz.
  *

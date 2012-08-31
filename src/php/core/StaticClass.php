@@ -1,4 +1,4 @@
-<?
+<?php
 /**
  * Einfache Superklasse für nur statisch zu verwendende Klassen.
  *

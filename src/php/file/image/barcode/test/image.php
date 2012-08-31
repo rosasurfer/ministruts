@@ -1,4 +1,4 @@
-<?
+<?php
 define('APPLICATION_NAME', 'barcode_test');
 
 $type   = isSet($_REQUEST['type'  ]) ? $_REQUEST['type'  ] : null;

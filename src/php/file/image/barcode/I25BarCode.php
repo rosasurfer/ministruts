@@ -1,4 +1,4 @@
-<?
+<?php
 /**
  * Barcode renderer for "Interleaved 2 of 5", a numeric only bar code with an optional check number.
  *

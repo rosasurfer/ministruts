@@ -1,4 +1,4 @@
-<?
+<?php
 // ob das Script in der Konsole oder auf einem Webserver ausgeführt wird
 $console = !isSet($_SERVER['REQUEST_METHOD']);
 

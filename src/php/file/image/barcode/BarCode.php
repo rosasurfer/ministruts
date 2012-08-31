@@ -1,4 +1,4 @@
-<?
+<?php
 /**
  * Barcode renderer class
  *

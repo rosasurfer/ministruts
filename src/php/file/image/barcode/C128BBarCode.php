@@ -1,4 +1,4 @@
-<?
+<?php
 /**
  * Barcode renderer for "Code 128-B", a continuous multilevel and full ASCII bar code.
  *

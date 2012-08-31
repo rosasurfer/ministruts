@@ -1,4 +1,4 @@
-<?
+<?php
 /**
  * NetTools - Internet related utilities
  */

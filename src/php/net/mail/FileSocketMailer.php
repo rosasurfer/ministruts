@@ -1,4 +1,4 @@
-<?
+<?php
 /**
  * Mailer, der Mails über eine FileSocket-Verbindung verschickt.
  */

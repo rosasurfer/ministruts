@@ -1,4 +1,4 @@
-<?
+<?php
 /**
  * Abstract base class for "Code 128" bar codes.
  *

@@ -1,4 +1,4 @@
-<?
+<?php
 /**
  * Template for an index.php file
  * ------------------------------
