@@ -71,7 +71,7 @@ function queryDNS($domain, $type) {
 
 
 // normale DNS-Einträge überprüfen (A, MX, NS, TXT, etc.)
-$domains = Config::get('dns.domain', array());
+$domains = Config ::get('dns.domain', array());
 
 foreach ($domains as $domain => $domainValues) {
    foreach ($domainValues as $type => $value) {
