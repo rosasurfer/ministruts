@@ -128,13 +128,10 @@ else {
 }
 
 
-
-
 // Bestätigung, wenn alles ok ist.
-if (!$isWarning) {
+if (!$isWarning)
    echo 'Configuration OK';
-}
-echo '<p>';
+echo isSet($_SERVER['REQUEST_METHOD']) ? '<p>' : "\n";
 
 
 /**
@@ -161,6 +158,7 @@ assert.active = On
 $str = print_r(get_loaded_extensions(), true);
 echo '<div align="left"><pre style="margin:0; font:normal normal 12px/normal \'Courier New\',courier,serif">'.htmlSpecialChars($str, ENT_QUOTES).'</pre></div>';
 */
+
 
 phpinfo();
 ?>
