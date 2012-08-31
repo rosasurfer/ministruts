@@ -18,7 +18,7 @@ if (!ini_get('auto_globals_jit'))                                             $i
 if (ini_get('variables_order') != 'GPCS')                                     $isWarning |= warn('Warning: variables_order is not \'GPCS\': '.ini_get('variables_order'));
 if (ini_get('always_populate_raw_post_data'))                                 $isWarning |= warn('Warning: always_populate_raw_post_data is not Off');
 if (ini_get('define_syslog_variables'))                                       $isWarning |= warn('Warning: define_syslog_variables is not Off');
-if (ini_get('arg_separator.output') != '&amp;')                               $isWarning |= warn('Warning: arg_separator.output is not \'&amp;amp;\': '.ini_get('arg_separator.output'));
+if (ini_get('arg_separator.output') != '&amp;')                               $isWarning |= warn('Warning: arg_separator.output is not \'&amp;\': '.ini_get('arg_separator.output'));
 if (ini_get('allow_url_fopen'))                                               $isWarning |= warn('Warning: allow_url_fopen is not Off');
 if (ini_get('allow_url_include'))                                             $isWarning |= warn('Warning: allow_url_include is not Off');
 
