@@ -4,15 +4,22 @@
  *
  * Systemvoraussetzungen: @see ../doc/FAQ
  */
-if (PHP_VERSION < '5.2.1') {
-   echo('Warning: You are working with a buggy PHP version (at least version 5.2.1 is needed).'.(isSet($_SERVER['REQUEST_METHOD']) ? "<br><br>":"\n\n"));
+if (PHP_VERSION < '5.2.1') echo('Warning: You are working with a buggy PHP version (at least version 5.2.1 is needed).'.(isSet($_SERVER['REQUEST_METHOD']) ? "<br><br>":"\n\n"));
+
+
+define('PHPLIB_ROOT',  dirName(__FILE__));
+
+
+// phpInfo()-Aufrufe abfangen
+// --------------------------
+if (subStr($_SERVER['PHP_SELF'], -12) == '/phpinfo.php') {
+   require(PHPLIB_ROOT.'/php/phpinfo.php');
+   exit();
 }
 
 
 // Klassendefinitionen
 // -------------------
-define('PHPLIB_ROOT',  dirName(__FILE__));
-
 $__classes['ApcCache'                       ] = PHPLIB_ROOT.'/php/cache/ApcCache';
 $__classes['Cache'                          ] = PHPLIB_ROOT.'/php/cache/Cache';
 $__classes['CachePeer'                      ] = PHPLIB_ROOT.'/php/cache/CachePeer';
@@ -139,15 +146,6 @@ define('SATURDAY' , 6);
 
 // ob wir unter Windows laufen
 define('WINDOWS', (strToUpper(subStr(PHP_OS, 0, 3))==='WIN'));
-
-
-
-// phpInfo()-Aufrufe abfangen
-// --------------------------
-if (subStr($_SERVER['PHP_SELF'], -12) == '/phpinfo.php') {
-   require(PHPLIB_ROOT.'/php/phpinfo.php');
-   exit();
-}
 
 
 // Errorhandler anonym registrieren, damit die Klasse nicht schon hier geladen wird
