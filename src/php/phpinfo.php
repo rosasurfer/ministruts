@@ -80,6 +80,7 @@ if (ini_get('enable_dl'))                                                     $i
 
 // Extensions
 // ----------
+if (!extension_loaded('ctype'))                                               $isWarning |= warn('Warning: ctype extension is not loaded');
 if (!extension_loaded('curl'))                                                $isWarning |= warn('Warning: curl extension is not loaded');
 if (!extension_loaded('iconv'))                                               $isWarning |= warn('Warning: iconv extension is not loaded');
 if (!extension_loaded('json'))                                                $isWarning |= warn('Warning: JSON extension is not loaded');
