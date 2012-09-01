@@ -85,7 +85,7 @@ foreach ($domains as $domain => $domainValues) {
             }
             $ns = queryDNS($domain, 'NS');
             $msg = "DNS error detected for      $domain:   required $type value: $value,   found: $result,   NS: $ns";
-            //echoPre($msg);
+            echoPre($msg);
             $output .= "\n".$msg;
          }
          continue;
@@ -97,7 +97,7 @@ foreach ($domains as $domain => $domainValues) {
             if ($result != $value) {
                $ns = queryDNS($domain, 'NS');
                $msg = 'DNS error detected for '.str_pad($subdomain, 4, ' ', STR_PAD_LEFT).".$domain:   required $type value: $value,   found: $result,   NS: $ns";
-               //echoPre($msg);
+               echoPre($msg);
                $output .= "\n".$msg;
             }
          }
