@@ -24,7 +24,6 @@ require(dirName(__FILE__).'/../src/phpLib.php');
  */
 function queryDNS($domain, $type) {
    $result = null;
-
    //echoPre('query for: '.$domain.'  '.$type.'  record');
 
    switch ($type) {
@@ -65,9 +64,11 @@ function queryDNS($domain, $type) {
    }
 
    //echoPre('result: '.$result);
-
    return $result;
 }
+
+
+$output = null;
 
 
 // normale DNS-Einträge überprüfen (A, MX, NS, TXT, etc.)
@@ -83,7 +84,9 @@ foreach ($domains as $domain => $domainValues) {
                if (String ::contains($result, ' ')) $result = "\"$result\"";
             }
             $ns = queryDNS($domain, 'NS');
-            echoPre("DNS error detected for      $domain:   required $type value: $value,   found: $result,   NS: $ns");
+            $msg = "DNS error detected for      $domain:   required $type value: $value,   found: $result,   NS: $ns";
+            //echoPre($msg);
+            $output .= "\n".$msg;
          }
          continue;
       }
@@ -93,7 +96,9 @@ foreach ($domains as $domain => $domainValues) {
             $result = queryDNS("$subdomain.$domain", $type);
             if ($result != $value) {
                $ns = queryDNS($domain, 'NS');
-               echoPre('DNS error detected for '.str_pad($subdomain, 4, ' ', STR_PAD_LEFT).".$domain:   required $type value: $value,   found: $result,   NS: $ns");
+               $msg = 'DNS error detected for '.str_pad($subdomain, 4, ' ', STR_PAD_LEFT).".$domain:   required $type value: $value,   found: $result,   NS: $ns";
+               //echoPre($msg);
+               $output .= "\n".$msg;
             }
          }
       }
@@ -106,7 +111,16 @@ $ips = Config ::get('dns.ip', array());
 
 foreach ($ips as $ip => $value) {
    $result = getHostByAddr($ip);
-   if ($result != $value)
-      echoPre("Reverse DNS error detected for $ip:   required PTR value: $value,   found: $result");
+   if ($result != $value) {
+      $msg = "Reverse DNS error detected for $ip:   required PTR value: $value,   found: $result";
+      echoPre($msg);
+      $output .= "\n".$msg;
+   }
+}
+
+
+// Ausgabe
+if ($output) {
+   Logger ::log(trim($output), L_WARN, __CLASS__);
 }
 ?>
