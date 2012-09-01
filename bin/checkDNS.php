@@ -121,6 +121,6 @@ foreach ($ips as $ip => $value) {
 
 // Ausgabe
 if ($output) {
-   Logger ::log(trim($output), L_WARN, __CLASS__);
+   Logger ::log(trim($output)."\n", L_WARN, __CLASS__);
 }
 ?>
