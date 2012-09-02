@@ -104,6 +104,9 @@ class CommonValidator extends StaticClass {
     * @return bool
     */
    public static function isEmailAddress($string) {
+
+      // TODO: Adressen in IP-Notation korrekt validieren -> root@[127.0.0.1]
+
       static $pattern = '/^[a-z0-9+-]+[a-z0-9_.+-]*@(([a-z0-9]+|[a-z0-9]+[a-z0-9-]+[a-z0-9]+)\.)*([a-z0-9][a-z0-9-]*[a-z0-9])\.([a-z]{2,4})$/';
       return is_string($string) && strLen($string) && preg_match($pattern, strToLower($string));
    }
@@ -117,6 +120,9 @@ class CommonValidator extends StaticClass {
     * @return bool
     */
    public static function isEmailAddressPattern($string) {
+
+      // TODO: Adressen in IP-Notation korrekt validieren -> root@[127.0.0.1]
+
       static $pattern = '/^[a-z0-9?*+-]+[a-z0-9?*_.+-]*@(([a-z0-9?*]+|[a-z0-9?*]+[a-z0-9?*-]+[a-z0-9?*]+)\.)*(\*|[a-z0-9?*][a-z0-9?*-]*[a-z0-9?*])\.(\*|[a-z?*]{2,4})$/';
       return is_string($string) && strLen($string) && preg_match($pattern, strToLower($string));
    }
