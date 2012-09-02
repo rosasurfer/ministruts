@@ -220,22 +220,31 @@ function apd_addProfileLink($dumpFile = null) {
  *                            seine Existenz reicht für die Erkennung eines manuellen Aufrufs.
  */
 function __autoload($className /*, $throw */) {
-
-   // TODO: Mehrfach-Includes *ohne* Verwendung von include_once() verhindern
-
    try {
       if (isSet($GLOBALS['__classes'][$className])) {
-         $className = $GLOBALS['__classes'][$className];
+         // Fällt der automatische Aufruf der  __autoload()-Funktion aus (z.B. in PHP5.3), muß die Funktion ggf. manuell
+         // aufgerufen werden. Um beim manuellen Aufruf Mehrfach-Includes derselben Klasse *ohne* Verwendung von include_once()
+         // verhindern zu können, setzen wir nach dem ersten Laden ein entsprechendes Flag. Die Verwendung von include_once()
+         // würde den APC-Opcode-Cache gewaltig verlangsamen.
+         //
+         // @see https://bugs.php.net/bug.php?id=47987
+
+         // Rückkehr, wenn Klasse schon geladen
+         if ($GLOBALS['__classes'][$className] === true)
+            return true;
+
+         $fileName = $GLOBALS['__classes'][$className];
 
          // Warnen bei relativem Pfad (relative Pfade verschlechtern Performance, ganz besonders mit APC-Setting 'apc.stat=0')
-         $relative = WINDOWS ? !preg_match('/^[a-z]:/i', $className) : ($className{0} != '/');
-         if ($relative) {
-            Logger ::log('Relative file name for class definition: '.$className, L_WARN, __CLASS__);
-         }
+         $relative = WINDOWS ? !preg_match('/^[a-z]:/i', $fileName) : ($fileName{0} != '/');
+         if ($relative)
+            Logger ::log('Relative file name for class definition: '.$fileName, L_WARN, __CLASS__);
 
-         // clean up the local scope, then include the file
          unset($relative);
-         include($className.'.php');
+         include($fileName.'.php');
+
+         // Klasse als geladen markieren
+         $GLOBALS['__classes'][$className] = true;
          return true;
       }
       throw new ClassNotFoundException("Undefined class '$className'");
@@ -243,6 +252,7 @@ function __autoload($className /*, $throw */) {
    catch (Exception $ex) {
       if (func_num_args() > 1)         // Exceptions nur bei manuellem Aufruf werfen
          throw $ex;
+
       Logger ::handleException($ex);   // Aufruf durch den PHP-Kernel: Exception manuell verarbeiten
       exit(1);
    }                                   // (__autoload darf keine Exceptions werfen)

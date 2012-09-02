@@ -1,7 +1,7 @@
 #!/usr/bin/php -Cq
 <?php
 /**
- * TODO: Jeder Nameserver muß einzeln abgefragt werden, denn bei fehlerhafter Synchronisierung können
+ * TODO: Jeder Nameserver muß einzeln abgefragt werden, denn bei fehlerhafter NS-Synchronisierung können
  *       sich die zurückgegebenen Werte der einzelnen Server unterscheiden.
  */
 set_time_limit(0);
@@ -12,6 +12,10 @@ define('APPLICATION_ROOT',  dirName(__FILE__));
 
 // Library einbinden
 require(dirName(__FILE__).'/../src/phpLib.php');
+
+// dns_* functions are not implemented on Windows
+if (WINDOWS) throw new InfrastructureException("This script can't be run in Windows.");
+
 
 
 /**

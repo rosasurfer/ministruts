@@ -1,0 +1,4 @@
+DIG for Win32
+-------------
+Problem:  error message ";; connection timed out; no servers could be reached"
+Solution: copy "resolv.conf" to your "%systemroot%\system32\drivers\etc\" directory
