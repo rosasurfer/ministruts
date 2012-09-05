@@ -159,6 +159,10 @@ final class ApcCache extends CachePeer {
          Logger ::log('apc_delete() unexpectedly returned FALSE for key "'.$fullKey.'"', L_WARN, __CLASS__);
 
 
+      if (isSet($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR']=='127.0.0.1') {
+         echoPre('storing key "'.$fullKey.'"');
+      }
+
       // Wert speichern:
       // - möglichst apc_add() benutzen (minimiert "[apc-warning] Potential cache slam averted for key '...'")
       // - wegen diverser Bugs keine APC-TTL setzen, die tatsächliche TTL wird in self::isCached() geprüft
