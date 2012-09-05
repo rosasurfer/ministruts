@@ -159,14 +159,16 @@ final class ApcCache extends CachePeer {
          Logger ::log('apc_delete() unexpectedly returned FALSE for key "'.$fullKey.'"', L_WARN, __CLASS__);
 
 
-      // Wert speichern
+      // Wert speichern:
+      // - möglichst apc_add() benutzen (minimiert "[apc-warning] Potential cache slam averted for key '...'")
+      // - wegen diverser Bugs keine APC-TTL setzen, die tatsächliche TTL wird in self::isCached() geprüft
       if (function_exists('apc_add')) {                                          // APC >= 3.0.13
-         if (!apc_add($fullKey, array($created, $expires, serialize($data)), $expires)) {
+         if (!apc_add($fullKey, array($created, $expires, serialize($data)))) {
             $info = ($isKey ? ' (did exist and was deleted, ' : ' (did not exist, ')."new value: created=$created, expires=$expires, data=$data)";
-            //Logger ::log('apc_add() unexpectedly returned FALSE for $key "'.$fullKey.'"'.$info, L_WARN, __CLASS__);
+            Logger ::log('apc_add() unexpectedly returned FALSE for $key "'.$fullKey.'"'.$info, L_WARN, __CLASS__);
          }
       }
-      else if (!apc_store($fullKey, array($created, $expires, serialize($data)), $expires)) {
+      else if (!apc_store($fullKey, array($created, $expires, serialize($data)))) {
          $info = ($isKey ? ' (did exist and was deleted, ' : ' (did not exist, ')."new value: created=$created, expires=$expires, data=$data)";
          Logger ::log('apc_store() unexpectedly returned FALSE for $key "'.$fullKey.'"'.$info, L_WARN, __CLASS__);
       }
