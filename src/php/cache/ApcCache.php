@@ -134,23 +134,32 @@ final class ApcCache extends CachePeer {
       if (!is_int($expires)) throw new IllegalTypeException('Illegal type of parameter $expires: '.getType($expires));
 
       // im Cache wird ein array(created, expires, serialize(array(value, dependency))) gespeichert
+      $fullKey = $this->namespace.'::'.$key;
       $created = time();
       $data    = array($value, $dependency);
 
-      if (!apc_store($this->namespace.'::'.$key, array($created, $expires, serialize($data)), $expires)) {
-         /**
-          * PHP 5.3.3/APC 3.1.3p1
-          * ---------------------
-          * Bug 1: apc_store() unexpectedly returned FALSE
-          *        @see http://stackoverflow.com/questions/1670034/why-would-apc-store-return-false
-          *
-          * Bug 2: Apache error log is filled by "[apc-warning] Potential cache slam averted for key '...'"
-          *        @see https://bugs.php.net/bug.php?id=58832
-          *        @see http://stackoverflow.com/questions/4983370/php-apc-potential-cache-slam-averted-for-key
-          *        @see http://notmysock.org/blog/php/user-cache-timebomb.html
-          *        @see http://serverfault.com/questions/342295/apc-keeps-crashing
-          */
-      }
+      /**
+       * PHP 5.3.3/APC 3.1.3p1
+       * ---------------------
+       * Bug 1: apc_store() unexpectedly returned FALSE
+       *        @see http://stackoverflow.com/questions/1670034/why-would-apc-store-return-false
+       *
+       * Bug 2: Apache error log is filled by "[apc-warning] Potential cache slam averted for key '...'"
+       *        @see https://bugs.php.net/bug.php?id=58832
+       *        @see http://stackoverflow.com/questions/4983370/php-apc-potential-cache-slam-averted-for-key
+       *        @see http://notmysock.org/blog/php/user-cache-timebomb.html
+       *        @see http://serverfault.com/questions/342295/apc-keeps-crashing
+       */
+
+      // wegen Bugs in apc_store() einen existierenden Wert zuerst löschen
+      if (function_exists('apc_exists')) $isKey =        apc_exists($fullKey);         // APC >= 3.1.4
+      else                               $isKey = (bool) apc_fetch ($fullKey);
+      if ($isKey && !apc_delete($fullKey))
+         Logger ::log('apc_delete() unexpectedly returned FALSE for $key = "'.$fullKey.'"', L_WARN, __CLASS__);
+
+      // Wert speichern
+      if (!apc_store($fullKey, array($created, $expires, serialize($data)), $expires))
+         Logger ::log('apc_store() unexpectedly returned FALSE for $key = "'.$fullKey.'"', L_WARN, __CLASS__);
 
       $this->getReferencePool()->set($key, $value, $expires, $dependency);
 
