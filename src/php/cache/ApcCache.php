@@ -141,9 +141,10 @@ final class ApcCache extends CachePeer {
       /**
        * PHP 5.3.3/APC 3.1.3
        * -------------------
-       * Bug 1: [apc-warning] Potential cache slam averted for key '...'
+       * Bug 1: multiple add/store issue
+       *        [apc-warning] Potential cache slam averted for key '...'
        *        apc_add() und apc_store() geben FALSE zurück, wenn sie innerhalb eines Requests für denselben Key
-       *        mehrmals aufgerufen werden.
+       *        mehrmals aufgerufen werden
        *
        *        @see https://bugs.php.net/bug.php?id=58832
        *        @see http://stackoverflow.com/questions/4983370/php-apc-potential-cache-slam-averted-for-key
@@ -161,7 +162,6 @@ final class ApcCache extends CachePeer {
       // wegen Bugs in apc_store() einen existierenden Wert zuerst löschen
       if (function_exists('apc_exists')) $isKey =        apc_exists($fullKey);   // APC >= 3.1.4
       else                               $isKey = (bool) apc_fetch ($fullKey);
-
       if ($isKey && !apc_delete($fullKey))
          Logger ::log('apc_delete() unexpectedly returned FALSE for key "'.$fullKey.'"', L_WARN, __CLASS__);
 
