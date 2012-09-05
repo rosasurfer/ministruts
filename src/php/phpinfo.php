@@ -105,6 +105,11 @@ if ( extension_loaded('apc')) {
       if (!ini_get('apc.report_autofilter'))                                 $isWarning |= warn('Warning: apc.report_autofilter is not On');
       if ( ini_get('apc.include_once_override'))                             $isWarning |= warn('Warning: apc.include_once_override is not Off'); // "On" ist teilweise fehlerhaft implementiert, include_once()/require_once() sollten daher nicht verwendet werden
    }
+   /**
+    * ini_set() does not work for APC settings because they are set to PHP_INI_SYSTEM and can't be overridden
+    *
+    * @see https://bugs.php.net/bug.php?id=58832
+    */
 }
 
 
