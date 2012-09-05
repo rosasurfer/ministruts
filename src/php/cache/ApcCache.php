@@ -137,11 +137,19 @@ final class ApcCache extends CachePeer {
       $created = time();
       $data    = array($value, $dependency);
 
-      // apc_store() appears to only store one level deep, solution: serialize($data)
       if (!apc_store($this->namespace.'::'.$key, array($created, $expires, serialize($data)), $expires)) {
-         //throw new plRuntimeException('Unexpected APC error, apc_store() returned FALSE');
-
-         // TODO: @see http://stackoverflow.com/questions/1670034/why-would-apc-store-return-false
+         /**
+          * PHP 5.3.3/APC 3.1.3p1
+          * ---------------------
+          * Bug 1: apc_store() unexpectedly returned FALSE
+          *        @see http://stackoverflow.com/questions/1670034/why-would-apc-store-return-false
+          *
+          * Bug 2: Apache error log is filled by "[apc-warning] Potential cache slam averted for key '...'"
+          *        @see https://bugs.php.net/bug.php?id=58832
+          *        @see http://stackoverflow.com/questions/4983370/php-apc-potential-cache-slam-averted-for-key
+          *        @see http://notmysock.org/blog/php/user-cache-timebomb.html
+          *        @see http://serverfault.com/questions/342295/apc-keeps-crashing
+          */
       }
 
       $this->getReferencePool()->set($key, $value, $expires, $dependency);
