@@ -155,11 +155,13 @@ final class ApcCache extends CachePeer {
       if (function_exists('apc_exists')) $isKey =        apc_exists($fullKey);         // APC >= 3.1.4
       else                               $isKey = (bool) apc_fetch ($fullKey);
       if ($isKey && !apc_delete($fullKey))
-         Logger ::log('apc_delete() unexpectedly returned FALSE for $key = "'.$fullKey.'"', L_WARN, __CLASS__);
+         Logger ::log('apc_delete() unexpectedly returned FALSE for $key "'.$fullKey.'"', L_WARN, __CLASS__);
 
       // Wert speichern
-      if (!apc_store($fullKey, array($created, $expires, serialize($data)), $expires))
-         Logger ::log('apc_store() unexpectedly returned FALSE for $key = "'.$fullKey.'"', L_WARN, __CLASS__);
+      if (!apc_store($fullKey, array($created, $expires, serialize($data)), $expires)) {
+         $apc_delete_info = $isKey ? ' (was deleted before)' : ' (did not exist before)';
+         Logger ::log('apc_store() unexpectedly returned FALSE for $key "'.$fullKey.'"'.$apc_delete_info, L_WARN, __CLASS__);
+      }
 
       $this->getReferencePool()->set($key, $value, $expires, $dependency);
 
