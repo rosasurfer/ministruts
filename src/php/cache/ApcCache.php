@@ -167,14 +167,12 @@ final class ApcCache extends CachePeer {
       // - wegen diverser Bugs keine APC-TTL setzen, die tatsächliche TTL wird in self::isCached() geprüft
       if (function_exists('apc_add')) {                                          // APC >= 3.0.13
          if (!apc_add($fullKey, array($created, $expires, serialize($data)))) {
-            $info = ($isKey ? ' (did exist and was deleted,' : ' (did not exist,')." new value: created=$created, expires=$expires, data=$data)";
-            Logger ::log('apc_add() unexpectedly returned FALSE for $key "'.$fullKey.'"'.$info, L_WARN, __CLASS__);
+            Logger ::log('apc_add() unexpectedly returned FALSE for $key "'.$fullKey.'" '.($isKey ? '(did exist and was deleted)':'(did not exist)'), L_WARN, __CLASS__);
             return false;
          }
       }
       else if (!apc_store($fullKey, array($created, $expires, serialize($data)))) {
-         $info = ($isKey ? ' (did exist and was deleted,' : ' (did not exist,')." new value: created=$created, expires=$expires, data=$data)";
-         Logger ::log('apc_store() unexpectedly returned FALSE for $key "'.$fullKey.'"'.$info, L_WARN, __CLASS__);
+         Logger ::log('apc_store() unexpectedly returned FALSE for $key "'.$fullKey.'" '.($isKey ? '(did exist and was deleted)':'(did not exist)'), L_WARN, __CLASS__);
          return false;
       }
 
