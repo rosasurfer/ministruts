@@ -161,12 +161,12 @@ final class ApcCache extends CachePeer {
             Logger ::log('apc_delete() unexpectedly returned FALSE for key "'.$fullKey.'"', L_WARN, __CLASS__);
 
          if (isSet($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR']=='127.0.0.1') {
-            echoPre(__METHOD__.' deleted existing key "'.$fullKey.'" isKey(now) = '.(int)(bool)apc_fetch($fullKey));
+            echoPre(__METHOD__.'() deleted existing key "'.$fullKey.'" isKey(now) = '.(int)(bool)apc_fetch($fullKey));
          }
       }
 
       if (isSet($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR']=='127.0.0.1') {
-         echoPre('storing key "'.$fullKey.'"');
+         echoPre(__METHOD__.'() storing key "'.$fullKey.'"');
       }
 
       // Wert speichern:
@@ -176,11 +176,29 @@ final class ApcCache extends CachePeer {
          if (!apc_add($fullKey, array($created, $expires, serialize($data)))) {
             $info = ($isKey ? ' (did exist and was deleted, ' : ' (did not exist, ')."new value: created=$created, expires=$expires, data=$data)";
             Logger ::log('apc_add() unexpectedly returned FALSE for $key "'.$fullKey.'"'.$info, L_WARN, __CLASS__);
+            if (isSet($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR']=='127.0.0.1') {
+               echoPre(__METHOD__.'() trying again to set key "'.$fullKey.'"');
+            }
+            if (!apc_add($fullKey, array($created, $expires, serialize($data)))) {
+               if (isSet($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR']=='127.0.0.1') {
+                  echoPre(__METHOD__.'() apc_add() failed again');
+               }
+               return false;
+            }
          }
       }
       else if (!apc_store($fullKey, array($created, $expires, serialize($data)))) {
          $info = ($isKey ? ' (did exist and was deleted, ' : ' (did not exist, ')."new value: created=$created, expires=$expires, data=$data)";
          Logger ::log('apc_store() unexpectedly returned FALSE for $key "'.$fullKey.'"'.$info, L_WARN, __CLASS__);
+         if (isSet($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR']=='127.0.0.1') {
+            echoPre(__METHOD__.'() trying again to set key "'.$fullKey.'"');
+         }
+         if (!apc_store($fullKey, array($created, $expires, serialize($data)))) {
+            if (isSet($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR']=='127.0.0.1') {
+               echoPre(__METHOD__.'() apc_store() failed again');
+            }
+            return false;
+         }
       }
 
       $this->getReferencePool()->set($key, $value, $expires, $dependency);
