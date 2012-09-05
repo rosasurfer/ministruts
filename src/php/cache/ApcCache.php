@@ -156,7 +156,7 @@ final class ApcCache extends CachePeer {
       else                               $isKey = (bool) apc_fetch ($fullKey);
       if ($isKey && !apc_delete($fullKey))
          Logger ::log('apc_delete() unexpectedly returned FALSE for $key "'.$fullKey.'"', L_WARN, __CLASS__);
-      $keyInfo = $isKey ? ' (was deleted before)' : ' (did not exist before)';
+      $keyInfo = $isKey ? ' (key was deleted before)' : ' (key did not exist before)';
 
       // Wert speichern
       if (function_exists('apc_add')) {                                          // APC >= 3.0.13
