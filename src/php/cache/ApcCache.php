@@ -159,6 +159,7 @@ final class ApcCache extends CachePeer {
       if ($isKey) {
          if (!apc_delete($fullKey))
             Logger ::log('apc_delete() unexpectedly returned FALSE for key "'.$fullKey.'"', L_WARN, __CLASS__);
+
          if (isSet($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR']=='127.0.0.1') {
             echoPre(__METHOD__.' deleted existing key "'.$fullKey.'" isKey(now) = '.(int)(bool)apc_fetch($fullKey));
          }
