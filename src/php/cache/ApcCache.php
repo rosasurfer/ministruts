@@ -151,21 +151,23 @@ final class ApcCache extends CachePeer {
        *        @see http://serverfault.com/questions/342295/apc-keeps-crashing
        */
 
+
       // wegen Bugs in apc_store() einen existierenden Wert zuerst löschen
       if (function_exists('apc_exists')) $isKey =        apc_exists($fullKey);   // APC >= 3.1.4
       else                               $isKey = (bool) apc_fetch ($fullKey);
       if ($isKey && !apc_delete($fullKey))
          Logger ::log('apc_delete() unexpectedly returned FALSE for key "'.$fullKey.'"', L_WARN, __CLASS__);
 
-      $info = ($isKey ? ' (did exist and was deleted, ' : ' (did not exist, ')."new value: created=$created, expires=$expires, data=$data)";
 
       // Wert speichern
       if (function_exists('apc_add')) {                                          // APC >= 3.0.13
          if (!apc_add($fullKey, array($created, $expires, serialize($data)), $expires)) {
-            Logger ::log('apc_add() unexpectedly returned FALSE for $key "'.$fullKey.'"'.$info, L_WARN, __CLASS__);
+            $info = ($isKey ? ' (did exist and was deleted, ' : ' (did not exist, ')."new value: created=$created, expires=$expires, data=$data)";
+            //Logger ::log('apc_add() unexpectedly returned FALSE for $key "'.$fullKey.'"'.$info, L_WARN, __CLASS__);
          }
       }
       else if (!apc_store($fullKey, array($created, $expires, serialize($data)), $expires)) {
+         $info = ($isKey ? ' (did exist and was deleted, ' : ' (did not exist, ')."new value: created=$created, expires=$expires, data=$data)";
          Logger ::log('apc_store() unexpectedly returned FALSE for $key "'.$fullKey.'"'.$info, L_WARN, __CLASS__);
       }
 
