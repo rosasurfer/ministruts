@@ -162,8 +162,8 @@ final class ApcCache extends CachePeer {
       // wegen Bugs in apc_store() einen existierenden Wert zuerst löschen
       if (function_exists('apc_exists')) $isKey =        apc_exists($fullKey);   // APC >= 3.1.4
       else                               $isKey = (bool) apc_fetch ($fullKey);
-      if ($isKey && !apc_delete($fullKey))
-         Logger ::log('apc_delete() unexpectedly returned FALSE for key "'.$fullKey.'"', L_WARN, __CLASS__);
+      if ($isKey)
+         apc_delete($fullKey);
 
 
       // Wert speichern:
