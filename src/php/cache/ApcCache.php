@@ -141,17 +141,15 @@ final class ApcCache extends CachePeer {
       /**
        * PHP 5.3.3/APC 3.1.3
        * -------------------
-       * Bug 1: multiple add/store issue
-       *        [apc-warning] Potential cache slam averted for key '...'
+       * Bug 1: warning "Potential cache slam averted for key '...'"
        *        apc_add() und apc_store() geben FALSE zurück, wenn sie innerhalb eines Requests für denselben Key
        *        mehrmals aufgerufen werden
        *
-       *        @see https://bugs.php.net/bug.php?id=58832
+       *        @see http://bugs.php.net/bug.php?id=58832
        *        @see http://stackoverflow.com/questions/4983370/php-apc-potential-cache-slam-averted-for-key
        *
        *        Lösung für APC >= 3.1.7: re-introduced setting apc.slam_defense=0
-       *        keine Lösung für APC 3.1.3 gefunden
-       *
+       *        keine Lösung für APC 3.1.3 - 3.1.6 gefunden
        *
        *        @see http://serverfault.com/questions/342295/apc-keeps-crashing
        *        @see http://stackoverflow.com/questions/1670034/why-would-apc-store-return-false
@@ -159,17 +157,16 @@ final class ApcCache extends CachePeer {
        */
 
 
-      // wegen Bugs in apc_store() einen existierenden Wert zuerst löschen
-      if (function_exists('apc_exists')) $isKey =        apc_exists($fullKey);   // APC >= 3.1.4
-      else                               $isKey = (bool) apc_fetch ($fullKey);
-      if ($isKey)
-         apc_delete($fullKey);
-
-
       // Wert speichern:
-      // - möglichst apc_add() benutzen (minimiert Lock-Wait)
-      // - keine APC-TTL setzen, die tatsächliche TTL wird in self::isCached() geprüft (diverse APC-Bugs)
-      if (function_exists('apc_add')) {                                          // APC >= 3.0.13
+      // - möglichst apc_add() benutzen (weniger Speicherfragmentierung, minimiert Lock-Wait)
+      // - keine APC-TTL setzen, die tatsächliche TTL wird in self::isCached() geprüft (diverse APC-Bugs bei gesetzter TTL)
+
+      if (function_exists('apc_add')) {                                                // APC >= 3.0.13
+         if (function_exists('apc_exists')) $isKey =        apc_exists($fullKey);      // APC >= 3.1.4
+         else                               $isKey = (bool) apc_fetch ($fullKey);
+         if ($isKey)
+            apc_delete($fullKey);      // apc_delete()+apc_add() fragmentieren den Speicher weniger als apc_store()
+
          if (!apc_add($fullKey, array($created, $expires, serialize($data)))) {
             //Logger ::log('apc_add() unexpectedly returned FALSE for $key "'.$fullKey.'" '.($isKey ? '(did exist and was deleted)':'(did not exist)'), L_WARN, __CLASS__);
             return false;
@@ -179,6 +176,7 @@ final class ApcCache extends CachePeer {
          //Logger ::log('apc_store() unexpectedly returned FALSE for $key "'.$fullKey.'" '.($isKey ? '(did exist and was deleted)':'(did not exist)'), L_WARN, __CLASS__);
          return false;
       }
+
 
       $this->getReferencePool()->set($key, $value, $expires, $dependency);
 
