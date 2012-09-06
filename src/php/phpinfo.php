@@ -5,7 +5,7 @@ if (!function_exists('echoPre')) {
     *
     * @param mixed $var - die auszugebende Variable
     */
-   function printFormatted($var) {
+   function echoPre($var) {
       if (is_object($var) && method_exists($var, '__toString')) {
          $str = $var->__toString();
       }
