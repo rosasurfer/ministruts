@@ -51,7 +51,6 @@ function queryDNS($domain, $type) {
          break;
 
       case 'PTR':
-         $domain = join('.', array_reverse(explode('.', $domain))).'.in-addr.arpa';
          $result = dns_get_record($domain, DNS_PTR);
          $result = ($result && isSet($result[0]['target'])) ? $result[0]['target'] : null;
          break;
@@ -111,8 +110,11 @@ foreach ($domains as $domain => $domainValues) {
 $ips = Config ::get('dns.ip', array());
 
 foreach ($ips as $ip => $value) {
-   $result = queryDNS($ip, 'PTR');
-   if ($result != $value)
-      echoPre("RDNS error for $ip:   required PTR value: $value,   found: $result");
+   $domain = join('.', array_reverse(explode('.', $ip))).'.in-addr.arpa';
+   $result = queryDNS($domain, 'PTR');
+   if ($result != $value) {
+      $ns = queryDNS($domain, 'NS');
+      echoPre("RDNS error for $ip:   required PTR value: $value,   found: $result,   NS: $ns");
+   }
 }
 ?>
