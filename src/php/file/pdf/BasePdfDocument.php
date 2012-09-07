@@ -1538,11 +1538,8 @@ class BasePdfDocument extends Object {
                // load the pfb file, and put that into an object too.
                // note that pdf supports only binary format type 1 font files, though there is a
                // simple utility to convert them from pfa to pfb.
-               $fp = fOpen($fbfile, 'rb');
-               $tmp = get_magic_quotes_runtime();
-               set_magic_quotes_runtime(0);
+               $fp   = fOpen($fbfile, 'rb');
                $data = fRead($fp, fileSize($fbfile));
-               set_magic_quotes_runtime($tmp);
                fClose($fp);
 
                // create the font descriptor
@@ -2687,16 +2684,12 @@ class BasePdfDocument extends Object {
       }
 
       // read in the file
-      $tmp = get_magic_quotes_runtime();
-      set_magic_quotes_runtime(0);
-
       $fp = fOpen($filename, 'rb');
       $data = '';
       while (!fEof($fp)) {
          $data .= fRead($fp, 1024);
       }
       fClose($fp);
-      set_magic_quotes_runtime($tmp);
       $this->addPngImage_common($data, $filename, $x, $y, $w, $h);
    }
 
@@ -2886,14 +2879,10 @@ class BasePdfDocument extends Object {
       if ($w <= 0)            $w = $h / $imageHeight * $imageWidth;
       if ($h <= 0)            $h = $w / $imageWidth * $imageHeight;
 
-      $fp = fOpen($file, 'rb');
-
-      $tmp = get_magic_quotes_runtime();
-      set_magic_quotes_runtime(0);
+      $fp   = fOpen($file, 'rb');
       $data = fRead($fp, fileSize($file));
-      set_magic_quotes_runtime($tmp);
-
       fClose($fp);
+
       $this->addJpegImage_common($data, $x, $y, $w, $h, $imageWidth, $imageHeight, $channels);
    }
 
@@ -2930,8 +2919,6 @@ class BasePdfDocument extends Object {
      imageJpeg($img, $tmpName, $quality);
      $fp = fOpen($tmpName, 'rb');
 
-     $tmp = get_magic_quotes_runtime();
-     set_magic_quotes_runtime(0);
      $fp = fOpen($tmpName, 'rb');
      $data='';
      while(!fEOF($fp)){
@@ -2940,7 +2927,6 @@ class BasePdfDocument extends Object {
      fClose($fp);
 
      // $data = fRead($fp,filesize($tmpName));
-     set_magic_quotes_runtime($tmp);
      // fClose($fp);
      unlink($tmpName);
      $this->addJpegImage_common($data,$x,$y,$w,$h,$imageWidth,$imageHeight);
