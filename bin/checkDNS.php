@@ -29,8 +29,6 @@ if (WINDOWS) throw new InfrastructureException("This script can't be run in Wind
 function queryDNS($domain, $type) {
    $result = null;
 
-   //echoPre('query for: '.$domain.'  '.$type.'  record');
-
    switch ($type) {
       case 'A':
          $result = dns_get_record($domain, DNS_A);
@@ -47,9 +45,15 @@ function queryDNS($domain, $type) {
          $result = ($result && isSet($result[0]['target'])) ? $result[0]['target'] : null;
          break;
 
-      case 'TXT'  :
+      case 'TXT':
          $result = dns_get_record($domain, DNS_TXT);
          $result = ($result && isSet($result[0]['txt'])) ? $result[0]['txt'] : null;
+         break;
+
+      case 'PTR':
+         $domain = join('.', array_reverse(explode('.', $domain))).'.in-addr.arpa';
+         $result = dns_get_record($domain, DNS_PTR);
+         $result = ($result && isSet($result[0]['target'])) ? $result[0]['target'] : null;
          break;
 
       case 'CNAME':
@@ -67,9 +71,6 @@ function queryDNS($domain, $type) {
       default:
          throw new plInvalidArgumentException('Invalid argument $type: '.$type);
    }
-
-   //echoPre('result: '.$result);
-
    return $result;
 }
 
@@ -78,6 +79,7 @@ function queryDNS($domain, $type) {
 $domains = Config ::get('dns.domain', array());
 
 foreach ($domains as $domain => $domainValues) {
+   continue;
    foreach ($domainValues as $type => $value) {
       if ($type != 'subdomain') {
          $result = queryDNS($domain, $type);
@@ -109,7 +111,7 @@ foreach ($domains as $domain => $domainValues) {
 $ips = Config ::get('dns.ip', array());
 
 foreach ($ips as $ip => $value) {
-   $result = getHostByAddr($ip);
+   $result = queryDNS($ip, 'PTR');
    if ($result != $value)
       echoPre("RDNS error for $ip:   required PTR value: $value,   found: $result");
 }
