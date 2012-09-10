@@ -78,7 +78,6 @@ function queryDNS($domain, $type) {
 $domains = Config ::get('dns.domain', array());
 
 foreach ($domains as $domain => $domainValues) {
-   continue;
    foreach ($domainValues as $type => $value) {
       if ($type != 'subdomain') {
          $result = queryDNS($domain, $type);
