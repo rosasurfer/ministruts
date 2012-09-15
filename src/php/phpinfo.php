@@ -119,7 +119,7 @@ if (!WINDOWS && !extension_loaded('sysvsem'))                                $is
 // ------------
 if (!extension_loaded('apc'))                                                $isWarning = 1|echoPre('Warning: could not find APC opcode cache');
 if ( extension_loaded('apc')) {
-   if (phpVersion('apc') >= '3.1.3' && phpVersion('apc') < '3.1.7')          $isWarning = 1|echoPre('Warning: You are working with a buggy APC version (a version < 3.1.3 or >= 3.1.7 is needed)');
+   if (phpVersion('apc') >= '3.1.3' && phpVersion('apc') < '3.1.7')          $isWarning = 1|echoPre('Warning: You are working with a buggy APC version (a version < 3.1.3 or >= 3.1.7 is recommended)');
    if (!ini_get('apc.enabled'))                                              $isWarning = 1|echoPre('Warning: apc.enabled is not On');                   // warning "Potential cache slam averted for key '...'" http://bugs.php.net/bug.php?id=58832
    if ( ini_get('apc.report_autofilter'))                                    $isWarning = 1|echoPre('Warning: apc.report_autofilter is not Off');
 
