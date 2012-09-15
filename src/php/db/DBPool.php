@@ -65,11 +65,11 @@ final class DBPool extends Singleton {
             $class = $config['connector'].'Connector';
          }
 
-         $host    = $config['host'     ];
-         $user    = $config['username' ];
-         $pass    = $config['password' ];
-         $db      = $config['database' ];
-         $options = isSet($config['options']) ? $config['options'] : null;
+         $host    =                             $config['host'    ];
+         $user    =                             $config['username'];
+         $pass    =                             $config['password'];
+         $db      =                             $config['database'];
+         $options = isSet($config['options']) ? $config['options' ] : null;
 
          $connector = DB ::spawn($class, $host, $user, $pass, $db, $options);
          $me->pool[$alias] = $connector;
