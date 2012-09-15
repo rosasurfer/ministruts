@@ -115,6 +115,7 @@ $__classes['CommonValidator'                ] = PHPLIB_ROOT.'/php/util/CommonVal
 $__classes['Config'                         ] = PHPLIB_ROOT.'/php/util/Config';
 $__classes['Date'                           ] = PHPLIB_ROOT.'/php/util/Date';
 $__classes['Logger'                         ] = PHPLIB_ROOT.'/php/util/Logger';
+$__classes['PHP'                            ] = PHPLIB_ROOT.'/php/util/PHP';
 $__classes['String'                         ] = PHPLIB_ROOT.'/php/util/String';
 
 $__classes['ApdProfile'                     ] = PHPLIB_ROOT.'/php/util/apd/ApdProfile';
