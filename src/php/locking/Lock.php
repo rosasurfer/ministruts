@@ -53,15 +53,13 @@ final class Lock extends BaseLock {
          $this->impl = new SystemFiveLock($key);
       }
       else {
-         // alternativ FileLock verwenden, Lock-Dateinamen berechnen ...
-         $name = md5($key);
-         $file = ini_get('session.save_path').DIRECTORY_SEPARATOR.'lock_'.$name;
+         // alternativ FileLock verwenden ...
+         $filename = ini_get('session.save_path').DIRECTORY_SEPARATOR.'lock_'.md5($key);
 
-         // ... und Lock-Datei erzeugen
-         if (!is_file($file) && !touch($file))
-            throw new plRuntimeException('Cannot create lock file "'.$file.'"');
+         if (!is_file($filename) && !touch($filename))
+            throw new plRuntimeException('Cannot create lock file "'.$filename.'"');
 
-         $this->impl = new FileLock($file);
+         $this->impl = new FileLock($filename);
       }
    }
 

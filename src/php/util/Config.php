@@ -11,7 +11,7 @@
  *    - "config-custom.properties" im WEB-INF-Verzeichnis der Anwendung
  *    - "config.properties"        im WEB-INF-Verzeichnis der Anwendung
  *
- *    Für jeden einzelnen Pfad des PHP-Include-Pfades:
+ *    Für jeden einzelnen Pfad des Include-Pfades:
  *    - "config-custom.properties"
  *    - "config.properties"
  *
@@ -23,7 +23,7 @@
  *    - "config-custom.properties" im Scriptverzeichnis
  *    - "config.properties"        im Scriptverzeichnis
  *
- *    Für jeden einzelnen Pfad des PHP-Include-Pfades:
+ *    Für jeden einzelnen Pfad des Include-Pfades:
  *    - "config-custom.properties"
  *    - "config.properties"
  *
@@ -73,7 +73,7 @@ final class Config extends Object {
 
    /**
     * Gibt die Instanz dieser Klasse zurück.  Obwohl Config nicht Singleton implementiert, gibt es im
-    * User-Code nur eine einzige Instanz.  Die Konfiguration wird im Default-Cache gecacht.
+    * User-Code nur eine einzige Instanz.  Diese Instanz wird gecacht.
     *
     * @return Config
     */
