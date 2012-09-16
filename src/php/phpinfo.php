@@ -32,7 +32,7 @@ if (!defined('LOCAL'))   define('LOCAL'  , (@$_SERVER['REMOTE_ADDR'] == '127.0.0
 
 
 if (PHP_VERSION < '5.2.1')                                                   $isWarning = 1|echoPre('Warning: You are running a buggy PHP version (at least version 5.2.1 is recommended).');
-if (strPos(PHP_VERSION, '5.3.') === 0)                                       $isWarning = 1|echoPre('Warning: You are running a buggy PHP version, _autoload() is not always working (a version != 5.3 is recommended, @see bug 47987).');
+if (strPos(PHP_VERSION, '5.3.') === 0)                                       $isWarning = 1|echoPre('Warning: You are running a buggy PHP version (a version != 5.3 is recommended, @see bug 47987).');
 
 if (!ini_get('short_open_tag'))                                              $isWarning = 1|echoPre('Warning: short_open_tag is not On');
 if (ini_get('safe_mode'))                                                    $isWarning = 1|echoPre('Warning: safe_mode is not Off');
@@ -120,7 +120,7 @@ if (!WINDOWS && !extension_loaded('sysvsem'))                                $is
 // ------------
 if (!extension_loaded('apc'))                                                $isWarning = 1|echoPre('Warning: could not find APC opcode cache');
 if ( extension_loaded('apc')) {
-   if (phpVersion('apc') >= '3.1.3' && phpVersion('apc') < '3.1.7')          $isWarning = 1|echoPre('Warning: You are running a buggy APC version (a version < 3.1.3 or >= 3.1.7 is recommended)');
+   if (phpVersion('apc') >= '3.1.3' && phpVersion('apc') < '3.1.7')          $isWarning = 1|echoPre('Warning: You are running a buggy APC version (a version < 3.1.3 or >= 3.1.7 is recommended).');
    if (!ini_get('apc.enabled'))                                              $isWarning = 1|echoPre('Warning: apc.enabled is not On');                   // warning "Potential cache slam averted for key '...'" http://bugs.php.net/bug.php?id=58832
    if ( ini_get('apc.report_autofilter'))                                    $isWarning = 1|echoPre('Warning: apc.report_autofilter is not Off');
 
