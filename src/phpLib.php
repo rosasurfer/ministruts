@@ -600,12 +600,15 @@ function formatMoney($value, $decimals = 2, $decimalSeparator = ',') {
  * @return string
  */
 function byteSize($value) {
-   foreach (array('', 'K', 'M', 'G') as $unit) {
+   if ($value < 1024)
+      return (string) $value;
+
+   foreach (array('K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y') as $unit) {
+      $value /= 1024;
       if ($value < 1024)
          break;
-      $value /= 1024;
    }
-   return sPrintF('%5.1f %sB', $value, $unit);
+   return sPrintF('%.1f%s', $value, $unit);
 }
 
 
