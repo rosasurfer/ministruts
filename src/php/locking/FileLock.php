@@ -18,7 +18,7 @@
  */
 final class FileLock extends BaseLock {
 
-   private static /*Resource[]*/ $handles;
+   private static /*Resource[]*/ $hFiles;
 
    private /*string*/ $filename;
    private /*bool*/   $shared;
@@ -34,20 +34,22 @@ final class FileLock extends BaseLock {
     *                           (default: FALSE = exklusives Lock)
     */
    public function __construct($filename, $shared = false) {
-      if (!is_string($filename))            throw new IllegalTypeException('Illegal type of argument $filename: '.getType($filename));
-      if (!is_bool($shared))                throw new IllegalTypeException('Illegal type of argument $shared: '.getType($shared));
-      if (isSet(self::$handles[$filename])) throw new plRuntimeException('Dead-lock detected: already holding a lock for file "'.$filename.'"');
-      self::$handles[$filename] = false;
 
+      // TODO: Ein das Lock haltender Prozeß kann die Datei bis zum Aufruf von fLock() wieder gelöscht haben.
+
+      if (!is_string($filename))           throw new IllegalTypeException('Illegal type of argument $filename: '.getType($filename));
+      if (!is_bool($shared))               throw new IllegalTypeException('Illegal type of argument $shared: '.getType($shared));
+
+      if (isSet(self::$hFiles[$filename])) throw new plRuntimeException('Dead-lock detected: already holding a lock for file "'.$filename.'"');
+      self::$hFiles[$filename] = false;      // Schlägt der Constructor fehl, verhindert der gesetzte Eintrag ein
+                                             // Dead-lock bei eventuellem Re-Entry.
       $this->filename = $filename;
       $this->shared   = $shared;
 
-      self::$handles[$filename] = fOpen($filename, 'r');
+      self::$hFiles[$filename] = fOpen($filename, 'r');
       $mode = $shared ? LOCK_SH : LOCK_EX;
 
-      // TODO: hier kann ein anderer (das Lock haltender) Prozeß die Datei schon wieder gelöscht haben
-      if (!fLock(self::$handles[$filename], $mode))
-         throw new plRuntimeException('Can not aquire '.($shared ? 'shared':'exclusive').' file lock for "'.$filename.'"');
+      if (!fLock(self::$hFiles[$filename], $mode)) throw new plRuntimeException('Can not aquire '.($shared ? 'shared':'exclusive').' file lock for "'.$filename.'"');
    }
 
 
@@ -83,8 +85,8 @@ final class FileLock extends BaseLock {
     * @return bool
     */
    public function isValid() {
-      if (isSet(self::$handles[$this->filename]))
-         return is_resource(self::$handles[$this->filename]);
+      if (isSet(self::$hFiles[$this->filename]))
+         return is_resource(self::$hFiles[$this->filename]);
 
       return false;
    }
@@ -101,10 +103,10 @@ final class FileLock extends BaseLock {
       if (!is_bool($deleteFile)) throw new IllegalTypeException('Illegal type of argument $deleteFile: '.getType($deleteFile));
 
       if ($this->isValid()) {
-         fClose(self::$handles[$this->filename]);   // see docs: The lock is released also by fClose()...
+         fClose(self::$hFiles[$this->filename]);      // see docs: The lock is released also by fClose()...
          if ($deleteFile)
-            @unlink($this->filename);               // @: theoretisch kann hier schon ein anderer Prozeß das Lock halten
-         unset(self::$handles[$this->filename]);
+            @unlink($this->filename);                 // @: theoretisch kann hier schon ein anderer Prozeß das Lock halten
+         unset(self::$hFiles[$this->filename]);
       }
    }
 }

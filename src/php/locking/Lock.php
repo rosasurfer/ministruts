@@ -55,9 +55,9 @@ final class Lock extends BaseLock {
       else {
          // alternativ FileLock verwenden ...
          $filename = ini_get('session.save_path').DIRECTORY_SEPARATOR.'lock_'.md5($key);
+         if (!is_file($filename) && !touch($filename)) throw new plRuntimeException('Cannot create lock file "'.$filename.'"');
 
-         if (!is_file($filename) && !touch($filename))
-            throw new plRuntimeException('Cannot create lock file "'.$filename.'"');
+         if (!is_file($filename)) throw new FileNotFoundException('Cannot find lock file "'.$filename.'"');
 
          $this->impl = new FileLock($filename);
       }
