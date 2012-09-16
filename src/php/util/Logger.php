@@ -149,7 +149,7 @@ class Logger extends StaticClass {
        * @see https://bugs.php.net/bug.php?id=47987
        *
        * Wir müssen alle im Errorhandler evt. benötigten Klassen samt Hierarchie manuell laden.
-       * Danke, PHP-Team!!!
+       * Danke, PHP-Team!
        */
       __autoload('NestableException', true);
       __autoload('PHPErrorException', true);

@@ -4,10 +4,7 @@
  *
  * Systemvoraussetzungen: @see ../doc/FAQ
  */
-if (PHP_VERSION < '5.2.1') echo('Warning: You are working with a buggy PHP version (at least version 5.2.1 is needed).'.(isSet($_SERVER['REQUEST_METHOD']) ? "<br><br>":"\n\n"));
-
-
-define('PHPLIB_ROOT',  dirName(__FILE__));
+define('PHPLIB_ROOT', dirName(__FILE__));
 
 
 // phpInfo()-Aufrufe abfangen
@@ -16,6 +13,7 @@ if (subStr($_SERVER['PHP_SELF'], -12) == '/phpinfo.php') {
    require(PHPLIB_ROOT.'/php/phpinfo.php');
    exit();
 }
+if (PHP_VERSION < '5.2.1') echoPre('Warning: You are running a buggy PHP version (at least version 5.2.1 is recommended).');
 
 
 // Klassendefinitionen
@@ -55,7 +53,7 @@ $__classes['IllegalTypeException'           ] = PHPLIB_ROOT.'/php/exceptions/Ill
 $__classes['InfrastructureException'        ] = PHPLIB_ROOT.'/php/exceptions/InfrastructureException';
 $__classes['IOException'                    ] = PHPLIB_ROOT.'/php/exceptions/IOException';
 $__classes['NestableException'              ] = PHPLIB_ROOT.'/php/exceptions/NestableException';
-$__classes['NoPermissionException'          ] = PHPLIB_ROOT.'/php/exceptions/NoPermissionException';
+$__classes['PermissionDeniedException'      ] = PHPLIB_ROOT.'/php/exceptions/PermissionDeniedException';
 $__classes['PHPErrorException'              ] = PHPLIB_ROOT.'/php/exceptions/PHPErrorException';
 $__classes['plInvalidArgumentException'     ] = PHPLIB_ROOT.'/php/exceptions/plInvalidArgumentException';
 $__classes['plRuntimeException'             ] = PHPLIB_ROOT.'/php/exceptions/plRuntimeException';
@@ -218,15 +216,15 @@ function apd_addProfileLink($dumpFile = null) {
  *
  * @param string $className - Klassenname
  * @param mixed  $throw     - Ob Exceptions geworfen werfen dürfen. Typ und Wert des Parameters sind unwichtig,
- *                            seine Existenz reicht für die Erkennung eines manuellen Aufrufs.
+ *                            einzig seine Existenz reicht für die Erkennung eines manuellen Aufrufs.
  */
 function __autoload($className /*, $throw */) {
    try {
       if (isSet($GLOBALS['__classes'][$className])) {
-         // Fällt der automatische Aufruf der  __autoload()-Funktion aus (z.B. in PHP5.3), muß die Funktion ggf. manuell
-         // aufgerufen werden. Um beim manuellen Aufruf Mehrfach-Includes derselben Klasse *ohne* Verwendung von include_once()
-         // verhindern zu können, setzen wir nach dem ersten Laden ein entsprechendes Flag. Die Verwendung von include_once()
-         // würde den APC-Opcode-Cache gewaltig verlangsamen.
+         // Fällt der automatische Aufruf der  __autoload()-Funktion aus (z.B. in PHP5.3), wird die Funktion ggf. manuell
+         // aufgerufen.  Um dabei Mehrfach-Includes derselben Klasse *ohne* Verwendung von include_once() verhindern zu können,
+         // setzen wir nach dem ersten Laden ein entsprechendes Flag. Die Verwendung von include_once() würde den Opcode-Cache
+         // verlangsamen.
          //
          // @see https://bugs.php.net/bug.php?id=47987
 
