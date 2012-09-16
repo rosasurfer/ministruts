@@ -4,14 +4,13 @@
  *
  * NOTE:
  * -----
- * Diese Klasse muß "thread-sicher" programmiert sein. Das bedeutet, in den Methoden dürfen keine
- * Instanzvariablen geändert werden.
+ * Diese Klasse muß "thread-sicher" sein. Das bedeutet, in den Methoden dürfen keine Instanzvariablen
+ * geändert werden.
  *
- * Hintergrund ist, daß es nur eine einzige FrontController-Instanz gibt, die aus Performance-
- * Gründen gecacht und bei jedem Request wiederverwendet wird.  Wenn nun z.B. während eines Methoden-
- * aufrufs ein Wert in einer Instanzvariable geändert würde, dann würde sich diese Änderung nicht nur
- * auf diesen, sondern auch auf alle weiteren Prozesse, die diese Instanz verwenden, auswirken,
- * wodurch deren Ablauf gestört werden könnte.
+ * Hintergrund ist, daß es nur eine einzige FrontController-Instanz gibt, die gecacht und bei jedem
+ * Request wiederverwendet wird.  Wenn nun z.B. während eines Methodenaufrufs ein Wert in einer
+ * Instanzvariable geändert werden würde, würde sich diese Änderung nicht nur auf diesen, sondern auch
+ * auf alle weiteren Prozesse, die diese gecachte Instanz verwenden, auswirken und deren Ablauf stören.
  *
  * Als einfache Richtlinie gilt, daß in den Methoden keine Werte in $this oder self geändert werden
  * dürfen.  Wird das eingehalten, ist die Klasse "thread-sicher".
