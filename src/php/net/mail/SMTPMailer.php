@@ -48,7 +48,8 @@ class SMTPMailer extends Mailer {
 
          if (sizeOf($parts) == 1) {
             if (trim($parts[0]) == '') throw new plInvalidArgumentException('Invalid option "host": '.$options['host']);
-            $options['port'] = ini_get('smtp_port');     // TODO: Adresse und Port prüfen
+            if (!isSet($options['port']))
+               $options['port'] = ini_get('smtp_port');  // TODO: Adresse und Port prüfen
          }
          elseif (sizeOf($parts) == 2) {
             if (trim($parts[0])=='' || trim($parts[1])=='') throw new plInvalidArgumentException('Invalid option "host": '.$options['host']);
