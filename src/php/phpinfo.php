@@ -59,7 +59,7 @@ function errorLevelToStr($level=null) {
    if ($level & E_ALL              ) $levels[] = 'E_ALL';
    if ($level & E_STRICT           ) $levels[] = 'E_STRICT';
 
-   return join(' | ', $levels).' ('.$level.')';
+   return join(' | ', $levels);
 }
 // -- end of function definitions -----------------------------------------------------------------------------------------------
 
