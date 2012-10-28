@@ -1,4 +1,7 @@
 <?php
+
+// -- begin of function definitions ---------------------------------------------------------------------------------------------
+
 if (!function_exists('echoPre')) {
    /**
     * Hilfsfunktion zur formatierten Ausgabe einer Variable.
@@ -25,6 +28,42 @@ if (!function_exists('echoPre')) {
 }
 
 
+/**
+ * Gibt einen Errorlevel in lesbarer Form zurück.
+ *
+ * @param int $level - Errorlevel, ohne Angabe wird der aktuellen Errorlevel des laufenden Scriptes ausgewertet.
+ *
+ * @return string
+ */
+function errorLevelToStr($level=null) {
+   if (func_num_args() && $level!==(int)$level) throw new IllegalTypeException('Illegal type of parameter $level: '.getType($level));
+
+   $levels = array();
+   if (!$level)
+      $level = error_reporting();
+
+   if ($level & E_ERROR            ) $levels[] = 'E_ERROR';
+   if ($level & E_WARNING          ) $levels[] = 'E_WARNING';
+   if ($level & E_PARSE            ) $levels[] = 'E_PARSE';
+   if ($level & E_NOTICE           ) $levels[] = 'E_NOTICE';
+   if ($level & E_DEPRECATED       ) $levels[] = 'E_DEPRECATED';
+   if ($level & E_CORE_ERROR       ) $levels[] = 'E_CORE_ERROR';
+   if ($level & E_CORE_WARNING     ) $levels[] = 'E_CORE_WARNING';
+   if ($level & E_COMPILE_ERROR    ) $levels[] = 'E_COMPILE_ERROR';
+   if ($level & E_COMPILE_WARNING  ) $levels[] = 'E_COMPILE_WARNING';
+   if ($level & E_USER_ERROR       ) $levels[] = 'E_USER_ERROR';
+   if ($level & E_USER_WARNING     ) $levels[] = 'E_USER_WARNING';
+   if ($level & E_USER_NOTICE      ) $levels[] = 'E_USER_NOTICE';
+   if ($level & E_USER_DEPRECATED  ) $levels[] = 'E_USER_DEPRECATED';
+   if ($level & E_RECOVERABLE_ERROR) $levels[] = 'E_RECOVERABLE_ERROR';
+   if ($level & E_ALL              ) $levels[] = 'E_ALL';
+   if ($level & E_STRICT           ) $levels[] = 'E_STRICT';
+
+   return join(' | ', $levels).' ('.$level.')';
+}
+// -- end of function definitions -----------------------------------------------------------------------------------------------
+
+
 $isWarning = 0;
 
 if (!defined('WINDOWS')) define('WINDOWS', (strToUpper(subStr(PHP_OS, 0, 3)) === 'WIN'));    // ob das Script unter Windows läuft
@@ -42,10 +81,10 @@ if (ini_get('register_globals'))                                             $is
 if (ini_get('register_long_arrays'))                                         $isWarning = 1|echoPre('Warning: register_long_arrays is not Off');
 if (ini_get('register_argc_argv'))                                           $isWarning = 1|echoPre('Warning: register_argc_argv is not Off');
 if (!ini_get('auto_globals_jit'))                                            $isWarning = 1|echoPre('Warning: auto_globals_jit is not On');
-if (ini_get('variables_order') != 'GPCS')                                    $isWarning = 1|echoPre('Warning: variables_order is not \'GPCS\': '.ini_get('variables_order'));
+if (ini_get('variables_order') != 'GPCS')                                    $isWarning = 1|echoPre('Warning: variables_order is not "GPCS": "'.ini_get('variables_order').'"');
 if (ini_get('always_populate_raw_post_data'))                                $isWarning = 1|echoPre('Warning: always_populate_raw_post_data is not Off');
 if (ini_get('define_syslog_variables'))                                      $isWarning = 1|echoPre('Warning: define_syslog_variables is not Off');
-if (ini_get('arg_separator.output') != '&amp;')                              $isWarning = 1|echoPre('Warning: arg_separator.output is not \'&amp;\': '.ini_get('arg_separator.output'));
+if (ini_get('arg_separator.output') != '&amp;')                              $isWarning = 1|echoPre('Warning: arg_separator.output is not "&amp;": "'.ini_get('arg_separator.output').'"');
 if (ini_get('allow_url_fopen'))                                              $isWarning = 1|echoPre('Warning: allow_url_fopen is not Off');
 if (ini_get('allow_url_include'))                                            $isWarning = 1|echoPre('Warning: allow_url_include is not Off');
 
@@ -54,7 +93,7 @@ if ((int) ini_get('default_socket_timeout') != 60)                           $is
 if (ini_get('implicit_flush'))                                               $isWarning = 1|echoPre('Warning: implicit_flush is not Off');
 if (ini_get('allow_call_time_pass_reference'))                               $isWarning = 1|echoPre('Warning: allow_call_time_pass_reference is not Off');
 if (!ini_get('ignore_user_abort'))                                           $isWarning = 1|echoPre('Warning: ignore_user_abort is not On');
-if (ini_get('session.save_handler') != 'files')                              $isWarning = 1|echoPre('Warning: session.save_handler is not \'files\': '.ini_get('session.save_handler'));
+if (ini_get('session.save_handler') != 'files')                              $isWarning = 1|echoPre('Warning: session.save_handler is not "files": "'.ini_get('session.save_handler').'"');
 /*
 if (ini_get('session.save_handler') == 'files') {
    $domainRoot = realPath($_SERVER['DOCUMENT_ROOT']);
@@ -66,16 +105,16 @@ if (ini_get('session.save_handler') == 'files') {
    if (strPos(realPath(ini_get('session.save_path')), $domainRoot) === false) echoPre('Warning: session.save_path doesn\'t point inside the projects directory tree: '.realPath(ini_get('session.save_path')));
 }
 */
-if (ini_get('session.serialize_handler') != 'php')                           $isWarning = 1|echoPre('Warning: session.serialize_handler is not \'php\': '.ini_get('session.serialize_handler'));
+if (ini_get('session.serialize_handler') != 'php')                           $isWarning = 1|echoPre('Warning: session.serialize_handler is not "php": "'.ini_get('session.serialize_handler').'"');
 if (ini_get('session.auto_start'))                                           $isWarning = 1|echoPre('Warning: session.auto_start is not Off');
 if (!ini_get('session.use_cookies'))                                         $isWarning = 1|echoPre('Warning: session.use_cookies is not On' );
 if (ini_get('session.cookie_httponly'))                                      $isWarning = 1|echoPre('Warning: session.cookie_httponly is not Off' );
 if (!ini_get('session.use_trans_sid'))                                       $isWarning = 1|echoPre('Warning: session.use_trans_sid is not On');
 if (ini_get('url_rewriter.tags') != 'a=href,area=href,frame=src,iframe=src,form=,fieldset=')
-                                                                             $isWarning = 1|echoPre('Warning: url_rewriter.tags is not \'a=href,area=href,frame=src,iframe=src,form=,fieldset=\': '.ini_get('url_rewriter.tags'));
+                                                                             $isWarning = 1|echoPre('Warning: url_rewriter.tags is not "a=href,area=href,frame=src,iframe=src,form=,fieldset=": "'.ini_get('url_rewriter.tags').'"');
 if (ini_get('session.bug_compat_42'))                                        $isWarning = 1|echoPre('Warning: session.bug_compat_42 is not Off');
 if (ini_get('session.bug_compat_42') && !ini_get('session.bug_compat_warn')) $isWarning = 1|echoPre('Warning: session.bug_compat_warn is not On');
-if (ini_get('session.referer_check') != '')                                  $isWarning = 1|echoPre('Warning: session.referer_check is not \'\': '.ini_get('session.referer_check'));
+if (ini_get('session.referer_check') != '')                                  $isWarning = 1|echoPre('Warning: session.referer_check is not "": "'.ini_get('session.referer_check').'"');
 
 if (ini_get('sql.safe_mode'))                                                $isWarning = 1|echoPre('Warning: sql.safe_mode is not Off');
 if (ini_get('magic_quotes_gpc'))                                             $isWarning = 1|echoPre('Warning: magic_quotes_gpc is not Off');
@@ -85,8 +124,8 @@ if (ini_get('magic_quotes_sybase'))                                          $is
 $paths = explode(PATH_SEPARATOR, ini_get('include_path'));
 for ($i=0; $i < sizeOf($paths); ) if (trim($paths[$i++]) == '')              $isWarning = 1|echoPre('Warning: include_path contains empty path on position '.$i);
 if (ini_get('auto_detect_line_endings'))                                     $isWarning = 1|echoPre('Warning: auto_detect_line_endings is not Off');
-if (ini_get('default_mimetype') != 'text/html')                              $isWarning = 1|echoPre('Warning: default_mimetype is not \'text/html\': '.ini_get('default_mimetype'));
-if (ini_get('default_charset') != 'iso-8859-1')                              $isWarning = 1|echoPre('Warning: default_charset is not \'iso-8859-1\': '.ini_get('default_charset'));
+if (ini_get('default_mimetype') != 'text/html')                              $isWarning = 1|echoPre('Warning: default_mimetype is not "text/html": "'.ini_get('default_mimetype').'"');
+if (ini_get('default_charset') != 'iso-8859-1')                              $isWarning = 1|echoPre('Warning: default_charset is not "iso-8859-1": "'.ini_get('default_charset').'"');
 if (ini_get('file_uploads'))                                                 $isWarning = 1|echoPre('Warning: file_uploads is not Off' );
 
 if (ini_get('asp_tags'))                                                     $isWarning = 1|echoPre('Warning: asp_tags is not Off');
@@ -94,12 +133,12 @@ if (!ini_get('y2k_compliance'))                                              $is
 if (!strLen(ini_get('date.timezone')))                                       $isWarning = 1|echoPre('Warning: date.timezone is not set');
 
 $current = (int) ini_get('error_reporting');
-if (($current & (E_ALL | E_STRICT)) != (E_ALL | E_STRICT))                   $isWarning = 1|echoPre('Warning: error_reporting is not E_ALL | E_STRICT: '.ini_get('error_reporting'));
+if (($current & (E_ALL | E_STRICT)) != (E_ALL | E_STRICT))                   $isWarning = 1|echoPre('Warning: error_reporting is not "E_ALL | E_STRICT": "'.errorLevelToStr($current).'"');
 if (ini_get('ignore_repeated_errors'))                                       $isWarning = 1|echoPre('Warning: ignore_repeated_errors is not Off');
 if (ini_get('ignore_repeated_source'))                                       $isWarning = 1|echoPre('Warning: ignore_repeated_source is not Off');
 if (!ini_get('log_errors'))                                                  $isWarning = 1|echoPre('Warning: log_errors is not On');
 if ((int) ini_get('log_errors_max_len') != 0)                                $isWarning = 1|echoPre('Warning: log_errors_max_len is not 0: '.ini_get('log_errors_max_len'));
-if (!ini_get('track_errors'))                                                $isWarning = 1|echoPre('Warning: track_errors is not On');
+if (!ini_get('track_errors'))                                                $isWarning = 1|echoPre('Warning: track_errors is not On (needed for correct request decoding)');
 if (ini_get('html_errors'))                                                  $isWarning = 1|echoPre('Warning: html_errors is not Off');
 
 if (ini_get('enable_dl'))                                                    $isWarning = 1|echoPre('Warning: enable_dl is not Off');
@@ -146,7 +185,7 @@ if ( extension_loaded('apc')) {
 if (WINDOWS && !ini_get('sendmail_path') && !ini_get('sendmail_from') && !isSet($_SERVER['SERVER_ADMIN']))
                                                                              $isWarning = 1|echoPre('Windows warning: neither sendmail_path nor sendmail_from are set');
 if (!WINDOWS && !ini_get('sendmail_path'))                                   $isWarning = 1|echoPre('Warning: sendmail_path is not set');
-if (isSet($_SERVER['REQUEST_METHOD']) && !isSet($_SERVER['SERVER_ADMIN']))   $isWarning = 1|echoPre('Warning: email address $_SERVER[\'SERVER_ADMIN\'] is not set');
+if (isSet($_SERVER['REQUEST_METHOD']) && !isSet($_SERVER['SERVER_ADMIN']))   $isWarning = 1|echoPre('Warning: email address $_SERVER["SERVER_ADMIN"] is not set');
 
 
 // Fehleranzeige etc. auf Entwicklungs- bzw. Produktivsystem

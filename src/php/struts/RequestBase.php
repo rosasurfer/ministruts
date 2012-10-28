@@ -78,7 +78,7 @@ abstract class RequestBase extends Singleton {
     */
    protected function __construct() {
       if (!ini_get('track_errors'))
-         throw new plRuntimeException('PHP configuration setting "track_errors=On" is NOT set but desperately needed for correct request decoding.');
+         throw new plRuntimeException('PHP configuration setting "track_errors" is not "On" but needed for correct request decoding.');
 
       $this->method = $_SERVER['REQUEST_METHOD'];
       /**
