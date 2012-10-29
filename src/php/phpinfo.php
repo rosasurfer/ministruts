@@ -70,7 +70,7 @@ if (!defined('WINDOWS')) define('WINDOWS', (strToUpper(subStr(PHP_OS, 0, 3)) ===
 if (!defined('LOCAL'))   define('LOCAL'  , (@$_SERVER['REMOTE_ADDR'] == '127.0.0.1'));       // ob das Script lokal läuft
 
 
-if (PHP_VERSION < '5.2.1')                                                   $isWarning = 1|echoPre('Warning: You are running a buggy PHP version, at least version 5.2.1 is recommended.');
+if (PHP_VERSION < '5.2.1')                                                   $isWarning = 1|echoPre('Warning: You are running a buggy PHP version, a version >= 5.2.1 is recommended.');
 if (strPos(PHP_VERSION, '5.3.') === 0)                                       $isWarning = 1|echoPre('Warning: You are running a buggy PHP version, a version != 5.3 is recommended (see bug 47987).');
 
 if (!ini_get('short_open_tag'))                                              $isWarning = 1|echoPre('Warning: short_open_tag is not On');

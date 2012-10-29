@@ -34,14 +34,14 @@ class Logger extends StaticClass {
       if (self::$display !== null)
          return;
 
-      $console  = !isSet($_SERVER['REQUEST_METHOD']); // ob wir in einer Shell laufen
-      $terminal = WINDOWS || (bool) getEnv('TERM');   // ob wir ein Terminal haben
+      $console  = !isSet($_SERVER['REQUEST_METHOD']);       // ob wir in einer Shell laufen
+      $terminal = WINDOWS || (bool) getEnv('TERM');         // ob wir ein Terminal haben
 
       self::$display = ($console && $terminal)
                     || (isSet($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR']=='127.0.0.1')
                     || (bool) ini_get('display_errors');
 
-      self::$mail = !self::$display || ($console && !$terminal);
+      self::$mail = !$console || !$terminal;                // Mailversand auch bei $display=TRUE (es könnte ein Ajax-Request sein)
       //echoPre(__METHOD__.'(): $display: '.(int)self::$display.', $mail: '.(int)self::$mail);
    }
 
@@ -145,7 +145,7 @@ class Logger extends StaticClass {
 
 
       /**
-       * PHP v5.3 bug: An error triggered at compile-time disables __autoload() (and spl_autoload() at the same time).
+       * PHP v5.3 bug: An error triggered at compile-time disables __autoload(), and spl_autoload() at the same time.
        *               Won't be fixed for PHP5.3 as it may cause lots of other problems.
        *
        * @see https://bugs.php.net/bug.php?id=47987

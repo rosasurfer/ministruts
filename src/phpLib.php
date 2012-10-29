@@ -2,9 +2,16 @@
 /**
  * Diese Datei inkludiert die komplette Funktionalität dieser Library.
  *
- * Systemvoraussetzungen: @see ../doc/FAQ
+ * Systemvoraussetzungen: @see ../doc/project.skel/index.php
  */
+
+// Mehrfach-Includes abfangen
+if (defined('PHPLIB_ROOT')) return;
 define('PHPLIB_ROOT', dirName(__FILE__));
+
+// Anwendungskonfiguration prüfen
+if (!defined('APPLICATION_NAME')) exit('The constant \'APPLICATION_NAME\' needs to be defined (see "'.PHPLIB_ROOT.DIRECTORY_SEPARATOR.'doc'.DIRECTORY_SEPARATOR.'project.skel'.DIRECTORY_SEPARATOR.'index.php")');
+if (!defined('APPLICATION_ROOT')) exit('The constant \'APPLICATION_ROOT\' needs to be defined (see "'.PHPLIB_ROOT.DIRECTORY_SEPARATOR.'doc'.DIRECTORY_SEPARATOR.'project.skel'.DIRECTORY_SEPARATOR.'index.php")');
 
 
 /**
@@ -22,9 +29,9 @@ define('PHPLIB_ROOT', dirName(__FILE__));
 // --------------------------
 if (subStr($_SERVER['PHP_SELF'], -12) == '/phpinfo.php') {
    require(PHPLIB_ROOT.'/php/phpinfo.php');
-   exit();
+   exit(0);
 }
-if (PHP_VERSION < '5.2.1') echoPre('Warning: You are running a buggy PHP version (at least version 5.2.1 is recommended).');
+if (PHP_VERSION < '5.2.1') echoPre('Warning: You are running a buggy PHP version (at version >= 5.2.1 is recommended).');
 
 
 // Klassendefinitionen
