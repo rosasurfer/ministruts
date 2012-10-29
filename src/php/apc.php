@@ -1119,7 +1119,7 @@ EOB;
         }
 
     } else {
-        echo '<tr class=tr-0><td class="center" colspan=',$cols,'><i>No data</i></td></tr>';
+        echo '<tr class=tr-0><td class="center" colspan=',$cols+1,'><i>No data</i></td></tr>';
     }
     echo <<< EOB
         </tbody></table>
