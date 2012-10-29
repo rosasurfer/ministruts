@@ -3,7 +3,7 @@
   +----------------------------------------------------------------------+
   | APC                                                                  |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2006 The PHP Group                                     |
+  | Copyright (c) 2006-2011 The PHP Group                                |
   +----------------------------------------------------------------------+
   | This source file is subject to version 3.01 of the PHP license,      |
   | that is bundled with this package in the file LICENSE, and is        |
@@ -22,7 +22,7 @@
 
  */
 
-$VERSION='$Id: apc.php,v 3.68 2007/07/22 00:25:48 gopalv Exp $';
+$VERSION='$Id: apc.php 307048 2011-01-03 23:53:17Z kalle $';
 
 ////////// READ OPTIONAL CONFIGURATION FILE ////////////
 if (file_exists("apc.conf.php")) include("apc.conf.php");
@@ -49,6 +49,8 @@ defaults('DATE_FORMAT', 'Y/m/d H:i:s');     // US
 
 defaults('GRAPH_SIZE',200);                 // Image size
 
+//defaults('PROXY', 'tcp://127.0.0.1:8080');
+
 ////////// END OF DEFAULT CONFIG AREA /////////////////////////////////////////////////////////////
 
 
@@ -59,10 +61,13 @@ function defaults($d,$v) {
 
 // rewrite $PHP_SELF to block XSS attacks
 //
-$PHP_SELF= isset($_SERVER['PHP_SELF']) ? htmlentities(strip_tags($_SERVER['PHP_SELF'],''), ENT_QUOTES) : '';
+$PHP_SELF= isset($_SERVER['PHP_SELF']) ? htmlentities(strip_tags($_SERVER['PHP_SELF'],''), ENT_QUOTES, 'UTF-8') : '';
 $time = time();
-$host = getenv('HOSTNAME');
+$host = php_uname('n');
 if($host) { $host = '('.$host.')'; }
+if (isset($_SERVER['SERVER_ADDR'])) {
+  $host .= ' ('.$_SERVER['SERVER_ADDR'].')';
+}
 
 // operation constants
 define('OB_HOST_STATS',1);
@@ -340,21 +345,26 @@ if (isset($MYREQUEST['IMG']))
         for($i=0; $i<$mem['num_seg']; $i++) {
             $ptr = 0;
             $free = $mem['block_lists'][$i];
+            uasort($free, 'block_sort');
             foreach($free as $block) {
                 if($block['offset']!=$ptr) {       // Used block
                     $angle_to = $angle_from+($block['offset']-$ptr)/$s;
                     if(($angle_to+$fuzz)>1) $angle_to = 1;
-                    fill_arc($image,$x,$y,$size,$angle_from*360,$angle_to*360,$col_black,$col_red);
-                    if (($angle_to-$angle_from)>0.05) {
-                        array_push($string_placement, array($angle_from,$angle_to));
+                    if( ($angle_to*360) - ($angle_from*360) >= 1) {
+                        fill_arc($image,$x,$y,$size,$angle_from*360,$angle_to*360,$col_black,$col_red);
+                        if (($angle_to-$angle_from)>0.05) {
+                            array_push($string_placement, array($angle_from,$angle_to));
+                        }
                     }
                     $angle_from = $angle_to;
                 }
                 $angle_to = $angle_from+($block['size'])/$s;
                 if(($angle_to+$fuzz)>1) $angle_to = 1;
-                fill_arc($image,$x,$y,$size,$angle_from*360,$angle_to*360,$col_black,$col_green);
-                if (($angle_to-$angle_from)>0.05) {
-                    array_push($string_placement, array($angle_from,$angle_to));
+                if( ($angle_to*360) - ($angle_from*360) >= 1) {
+                    fill_arc($image,$x,$y,$size,$angle_from*360,$angle_to*360,$col_black,$col_green);
+                    if (($angle_to-$angle_from)>0.05) {
+                        array_push($string_placement, array($angle_from,$angle_to));
+                    }
                 }
                 $angle_from = $angle_to;
                 $ptr = $block['offset']+$block['size'];
@@ -393,6 +403,7 @@ if (isset($MYREQUEST['IMG']))
         for($i=0; $i<$mem['num_seg']; $i++) {
             $ptr = 0;
             $free = $mem['block_lists'][$i];
+            uasort($free, 'block_sort');
             foreach($free as $block) {
                 if($block['offset']!=$ptr) {       // Used block
                     $h=(GRAPH_SIZE-5)*($block['offset']-$ptr)/$s;
@@ -490,6 +501,15 @@ EOB;
         print <<<EOB
             <a href="$MY_SELF&LO=1&OB={$MYREQUEST['OB']}">$s</a>
 EOB;
+    }
+}
+
+function block_sort($array1, $array2)
+{
+    if ($array1['offset'] > $array2['offset']) {
+        return 1;
+    } else {
+        return -1;
     }
 }
 
@@ -726,7 +746,7 @@ echo
 
 if ($AUTHENTICATED) {
     echo <<<EOB
-        <li><a class="aright" href="$MY_SELF&CC=1&OB={$MYREQUEST['OB']}" onClick="javascipt:return confirm('Are you sure?');">Clear $cache_mode Cache</a></li>
+        <li><a class="aright" href="$MY_SELF&CC=1&OB={$MYREQUEST['OB']}" onClick="javascript:return confirm('Are you sure?');">Clear $cache_mode Cache</a></li>
 EOB;
 }
 echo <<<EOB
@@ -928,7 +948,7 @@ EOB;
 // -----------------------------------------------
 case OB_USER_CACHE:
     if (!$AUTHENTICATED) {
-        echo '<div class="authneeded">You need to login to see the user values here!<br/>&nbsp;<br/>';
+    echo '<div class="error">You need to login to see the user values here!<br/>&nbsp;<br/>';
         put_login_link("Login now!");
         echo '</div>';
         break;
@@ -974,14 +994,14 @@ EOB;
                     echo
                         "<tr class=tr-$m>",
                         "<td class=td-0>",ucwords(preg_replace("/_/"," ",$k)),"</td>",
-                        "<td class=td-last>",(preg_match("/time/",$k) && $value!='None') ? date(DATE_FORMAT,$value) : $value,"</td>",
+                        "<td class=td-last>",(preg_match("/time/",$k) && $value!='None') ? date(DATE_FORMAT,$value) : htmlspecialchars($value, ENT_QUOTES, 'UTF-8'),"</td>",
                         "</tr>";
                     $m=1-$m;
                 }
                 if($fieldkey=='info') {
                     echo "<tr class=tr-$m><td class=td-0>Stored Value</td><td class=td-last><pre>";
                     $output = var_export(apc_fetch($entry[$fieldkey]),true);
-               echo htmlspecialchars($output, ENT_QUOTES);
+                    echo htmlspecialchars($output, ENT_QUOTES, 'UTF-8');
                     echo "</pre></td></tr>\n";
                 }
                 break;
@@ -1033,22 +1053,33 @@ EOB;
         '</select>',
     '&nbsp; Search: <input name=SEARCH value="',$MYREQUEST['SEARCH'],'" type=text size=25/>',
         '&nbsp;<input type=submit value="GO!">',
-        '</form></div>',
+        '</form></div>';
 
+  if (isset($MYREQUEST['SEARCH'])) {
+   // Don't use preg_quote because we want the user to be able to specify a
+   // regular expression subpattern.
+   $MYREQUEST['SEARCH'] = '/'.str_replace('/', '\\/', $MYREQUEST['SEARCH']).'/i';
+   if (preg_match($MYREQUEST['SEARCH'], 'test') === false) {
+     echo '<div class="error">Error: enter a valid regular expression as a search query.</div>';
+     break;
+   }
+  }
+
+  echo
         '<div class="info"><table cellspacing=0><tbody>',
         '<tr>',
-      '<th nowrap>',sortheader('S',$fieldheading,  "&OB=".$MYREQUEST['OB']),'</th>',
-      '<th nowrap>',sortheader('H','Hits',         "&OB=".$MYREQUEST['OB']),'</th>',
-      '<th nowrap>',sortheader('Z','Size',         "&OB=".$MYREQUEST['OB']),'</th>',
-      '<th nowrap>',sortheader('A','Last accessed',"&OB=".$MYREQUEST['OB']),'</th>',
-      '<th nowrap>',sortheader('M','Last modified',"&OB=".$MYREQUEST['OB']),'</th>',
-      '<th nowrap>',sortheader('C','Created at',   "&OB=".$MYREQUEST['OB']),'</th>';
+        '<th nowrap>',sortheader('S',$fieldheading,  "&OB=".$MYREQUEST['OB']),'</th>',
+        '<th nowrap>',sortheader('H','Hits',         "&OB=".$MYREQUEST['OB']),'</th>',
+        '<th nowrap>',sortheader('Z','Size',         "&OB=".$MYREQUEST['OB']),'</th>',
+        '<th nowrap>',sortheader('A','Last accessed',"&OB=".$MYREQUEST['OB']),'</th>',
+        '<th nowrap>',sortheader('M','Last modified',"&OB=".$MYREQUEST['OB']),'</th>',
+        '<th nowrap>',sortheader('C','Created at',   "&OB=".$MYREQUEST['OB']),'</th>';
 
     if($fieldname=='info') {
         $cols+=2;
-       echo '<th nowrap>',sortheader('T','Timeout',"&OB=".$MYREQUEST['OB']),'</th>';
+         echo '<th nowrap>',sortheader('T','Timeout',"&OB=".$MYREQUEST['OB']),'</th>';
     }
-   echo '<th nowrap>',sortheader('D','Deleted at',"&OB=".$MYREQUEST['OB']),'</th></tr>';
+    echo '<th nowrap>',sortheader('D','Deleted at',"&OB=".$MYREQUEST['OB']),'</th></tr>';
 
     // builds list with alpha numeric sortable keys
     //
@@ -1066,7 +1097,7 @@ EOB;
         }
         if (!$AUTHENTICATED) {
             // hide all path entries if not logged in
-            $list[$k.$entry[$fieldname]]=preg_replace('/^.*(\\/|\\\\)/','<i>&lt;hidden&gt;</i>/',$entry);
+            $list[$k.$entry[$fieldname]]=preg_replace('/^.*(\\/|\\\\)/','*hidden*/',$entry);
         } else {
             $list[$k.$entry[$fieldname]]=$entry;
         }
@@ -1084,12 +1115,13 @@ EOB;
         // output list
         $i=0;
         foreach($list as $k => $entry) {
-      if(!$MYREQUEST['SEARCH'] || preg_match('/'.$MYREQUEST['SEARCH'].'/i', $entry[$fieldname]) != 0) {
+      if(!$MYREQUEST['SEARCH'] || preg_match($MYREQUEST['SEARCH'], $entry[$fieldname]) != 0) {
+        $field_value = htmlentities(strip_tags($entry[$fieldname],''), ENT_QUOTES, 'UTF-8');
         echo
           '<tr class=tr-',$i%2,'>',
-          "<td class=td-0><a href=\"$MY_SELF&OB=",$MYREQUEST['OB'],"&SH=",md5($entry[$fieldkey]),"\">",$entry[$fieldname],'</a></td>',
-          '<td class="td-n center">',$entry['num_hits'],'</td>',
-          '<td class="td-n right" nowrap>',bsize($entry['mem_size'], false),'</td>',
+          "<td class=td-0 nowrap><a href=\"$MY_SELF&OB=",$MYREQUEST['OB'],"&SH=",md5($entry[$fieldkey]),"\">",$field_value,'</a></td>',
+          '<td class="td-n center" nowrap>',$entry['num_hits'],'</td>',
+          '<td class="td-n right" nowrap>',$entry['mem_size'],'</td>',
           '<td class="td-n center" nowrap>',date(DATE_FORMAT,$entry['access_time']),'</td>',
           '<td class="td-n center" nowrap>',date(DATE_FORMAT,$entry['mtime']),'</td>',
           '<td class="td-n center" nowrap>',date(DATE_FORMAT,$entry['creation_time']),'</td>';
@@ -1106,7 +1138,7 @@ EOB;
         } else if ($MYREQUEST['OB'] == OB_USER_CACHE) {
 
           echo '<td class="td-last center" nowrap>';
-          echo '[<a href="', $MY_SELF, '&OB=', $MYREQUEST['OB'], '&DU=', rawUrlencode($entry[$fieldkey]), '">Delete Now</a>]';
+          echo '[<a href="', $MY_SELF, '&OB=', $MYREQUEST['OB'], '&DU=', urlencode($entry[$fieldkey]), '">Delete Now</a>]';
           echo '</td>';
         } else {
           echo '<td class="td-last center"> &nbsp; </td>';
@@ -1184,12 +1216,12 @@ EOB;
 
         '<div class="info"><table cellspacing=0><tbody>',
         '<tr>',
-      '<th nowrap>',sortheader('S','Directory Name',   "&OB=".$MYREQUEST['OB']),'</th>',
-      '<th nowrap>',sortheader('T','Number of Files',"&OB=".$MYREQUEST['OB']),'</th>',
-      '<th nowrap>',sortheader('H','Total Hits', "&OB=".$MYREQUEST['OB']),'</th>',
-      '<th nowrap>',sortheader('Z','Total Size', "&OB=".$MYREQUEST['OB']),'</th>',
-      '<th nowrap>',sortheader('C','Avg. Hits',  "&OB=".$MYREQUEST['OB']),'</th>',
-      '<th nowrap>',sortheader('A','Avg. Size',  "&OB=".$MYREQUEST['OB']),'</th>',
+        '<th nowrap>',sortheader('S','Directory Name', "&OB=".$MYREQUEST['OB']),'</th>',
+        '<th nowrap>',sortheader('T','Number of Files',"&OB=".$MYREQUEST['OB']),'</th>',
+        '<th nowrap>',sortheader('H','Total Hits', "&OB=".$MYREQUEST['OB']),'</th>',
+        '<th nowrap>',sortheader('Z','Total Size', "&OB=".$MYREQUEST['OB']),'</th>',
+        '<th nowrap>',sortheader('C','Avg. Hits',  "&OB=".$MYREQUEST['OB']),'</th>',
+        '<th nowrap>',sortheader('A','Avg. Size',  "&OB=".$MYREQUEST['OB']),'</th>',
         '</tr>';
 
     // builds list with alpha numeric sortable keys
@@ -1272,8 +1304,12 @@ case OB_VERSION_CHECK:
         <th></th>
         </tr>
 EOB;
-
+  if (defined('PROXY')) {
+    $ctxt = stream_context_create( array( 'http' => array( 'proxy' => PROXY, 'request_fulluri' => true ) ) );
+    $rss = @file_get_contents("http://pecl.php.net/feeds/pkg_apc.rss", false, $ctxt);
+  } else {
     $rss = @file_get_contents("http://pecl.php.net/feeds/pkg_apc.rss");
+  }
     if (!$rss && extension_loaded('curl')) {
         $handle = curl_init('http://pecl.php.net/feeds/pkg_apc.rss');
         curl_setOpt($handle, CURLOPT_BINARYTRANSFER, true);
@@ -1281,6 +1317,7 @@ EOB;
         $rss = curl_exec($handle);
         curl_close($handle);
     }
+
     if (!$rss) {
         echo '<tr class="td-last center"><td>Unable to fetch version information.</td></tr>';
     } else {
@@ -1311,8 +1348,8 @@ EOB;
             } else if (!$i--) {
                 break;
             }
-         echo "<b><a href=\"http://pecl.php.net/package/APC/$ver\">".htmlspecialchars($v, ENT_QUOTES)."</a></b><br><blockquote>";
-         echo nl2br(htmlspecialchars(current($match[2]), ENT_QUOTES))."</blockquote>";
+            echo "<b><a href=\"http://pecl.php.net/package/APC/$ver\">".htmlspecialchars($v, ENT_QUOTES, 'UTF-8')."</a></b><br><blockquote>";
+            echo nl2br(htmlspecialchars(current($match[2]), ENT_QUOTES, 'UTF-8'))."</blockquote>";
             next($match[2]);
         }
         echo '</td></tr>';
