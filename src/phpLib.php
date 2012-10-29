@@ -3,18 +3,8 @@
  * Diese Datei inkludiert die komplette Funktionalität dieser Library.
  *
  * Systemvoraussetzungen: @see ../doc/project.skel/index.php
- */
-
-// Mehrfach-Includes abfangen
-if (defined('PHPLIB_ROOT')) return;
-define('PHPLIB_ROOT', dirName(__FILE__));
-
-// Anwendungskonfiguration prüfen
-if (!defined('APPLICATION_NAME')) exit('The constant \'APPLICATION_NAME\' needs to be defined (see "'.PHPLIB_ROOT.DIRECTORY_SEPARATOR.'doc'.DIRECTORY_SEPARATOR.'project.skel'.DIRECTORY_SEPARATOR.'index.php")');
-if (!defined('APPLICATION_ROOT')) exit('The constant \'APPLICATION_ROOT\' needs to be defined (see "'.PHPLIB_ROOT.DIRECTORY_SEPARATOR.'doc'.DIRECTORY_SEPARATOR.'project.skel'.DIRECTORY_SEPARATOR.'index.php")');
-
-
-/**
+ *
+ *
  * TODO:
  * -----
  * - Konfiguration auf eine Datei (config.properties) reduzieren, Defaults in Klasse Config integrieren
@@ -23,6 +13,15 @@ if (!defined('APPLICATION_ROOT')) exit('The constant \'APPLICATION_ROOT\' needs 
  * - Erkennung von APC und APD verbessern (Exception, wenn Module aktiviert sind, aber nicht geladen werden können)
  * - erfolgreiches Laden notwendiger Module überprüfen (siehe APC-/APD-Bug)
  */
+
+// Mehrfach-Includes abfangen
+if (defined('PHPLIB_ROOT')) return;
+define('PHPLIB_ROOT', dirName(__FILE__));
+
+
+// Anwendungskonfiguration prüfen
+if (!defined('APPLICATION_NAME')) exit('The constant \'APPLICATION_NAME\' needs to be defined (see "'.PHPLIB_ROOT.DIRECTORY_SEPARATOR.'doc'.DIRECTORY_SEPARATOR.'project.skel'.DIRECTORY_SEPARATOR.'index.php")');
+if (!defined('APPLICATION_ROOT')) exit('The constant \'APPLICATION_ROOT\' needs to be defined (see "'.PHPLIB_ROOT.DIRECTORY_SEPARATOR.'doc'.DIRECTORY_SEPARATOR.'project.skel'.DIRECTORY_SEPARATOR.'index.php")');
 
 
 // phpInfo()-Aufrufe abfangen
