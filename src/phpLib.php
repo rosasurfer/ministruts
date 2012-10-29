@@ -1,10 +1,21 @@
 <?php
 /**
- * Inkludiert die komplette Funktionalität der MiniStruts-Library.
+ * Diese Datei inkludiert die komplette Funktionalität dieser Library.
  *
  * Systemvoraussetzungen: @see ../doc/FAQ
  */
 define('PHPLIB_ROOT', dirName(__FILE__));
+
+
+/**
+ * TODO:
+ * -----
+ * - Konfiguration auf eine Datei (config.properties) reduzieren, Defaults in Klasse Config integrieren
+ * - bin/cvs-update.sh muß je nach Aufruf Apache neustarten
+ * - php/locking/SystemV-Lock.php: Bug beheben
+ * - Erkennung von APC und APD verbessern (Exception, wenn Module aktiviert sind, aber nicht geladen werden können)
+ * - erfolgreiches Laden notwendiger Module überprüfen (siehe APC-/APD-Bug)
+ */
 
 
 // phpInfo()-Aufrufe abfangen
