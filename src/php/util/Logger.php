@@ -278,8 +278,8 @@ class Logger extends StaticClass {
             ini_set('sendmail_from', $old_sendmail_from);
          }
 
-         // ... oder Exception ins Error-Log schreiben, falls sie nicht schon angezeigt wurde
-         elseif (!self::$display) {
+         // Exception immer ins Error-Log schreiben, wenn sie nicht per Mail rausgegangen ist (auch bei $display=TRUE)
+         else {
             error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", $plainMessage)), 0);       // Zeilenumbrüche entfernen
          }
       }
