@@ -133,7 +133,8 @@ if (!ini_get('y2k_compliance'))                                              $is
 if (!strLen(ini_get('date.timezone')))                                       $isWarning = 1|echoPre('Warning: date.timezone is not set');
 
 $current = (int) ini_get('error_reporting');
-if (($current & (E_ALL | E_STRICT)) != (E_ALL | E_STRICT))                   $isWarning = 1|echoPre('Warning: error_reporting is not "E_ALL | E_STRICT": "'.errorLevelToStr($current).'"');
+$soll    = E_ALL & ~E_DEPRECATED | E_STRICT;
+if ($current & $soll != $soll)                                               $isWarning = 1|echoPre('Warning: error_reporting is not "E_ALL | E_STRICT": "'.errorLevelToStr($current).'"');
 if (ini_get('ignore_repeated_errors'))                                       $isWarning = 1|echoPre('Warning: ignore_repeated_errors is not Off');
 if (ini_get('ignore_repeated_source'))                                       $isWarning = 1|echoPre('Warning: ignore_repeated_source is not Off');
 if (!ini_get('log_errors'))                                                  $isWarning = 1|echoPre('Warning: log_errors is not On');
