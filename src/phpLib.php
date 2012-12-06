@@ -236,10 +236,10 @@ function apd_addProfileLink($dumpFile = null) {
  *                            einzig seine Existenz reicht für die Erkennung eines manuellen Aufrufs.
  *
  * Note:
- * Prior to 5.3.0, exceptions thrown in the __autoload() function could not be caught in the catch block and would
- * result in a fatal error. From 5.3.0+ exceptions thrown in the __autoload() function can be caught in the catch block,
- * with one provision. If throwing a custom exception, then the custom exception class must be available. The __autoload()
- * function may be used recursively to autoload the custom exception class.
+ * Prior to 5.3 exceptions thrown in the __autoload() function could not be caught in the catch block and would result in
+ * a fatal error. From 5.3+ exceptions thrown in the __autoload() function can be caught in the catch block with one provision.
+ * If throwing a custom exception then the custom exception class must be available. The __autoload() function may be used
+ * recursively to autoload the custom exception class.
  */
 function __autoload($className /*, $throw */) {
    try {
