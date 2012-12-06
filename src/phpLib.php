@@ -234,11 +234,17 @@ function apd_addProfileLink($dumpFile = null) {
  * @param string $className - Klassenname
  * @param mixed  $throw     - Ob Exceptions geworfen werfen dürfen. Typ und Wert des Parameters sind unwichtig,
  *                            einzig seine Existenz reicht für die Erkennung eines manuellen Aufrufs.
+ *
+ * Note:
+ * Prior to 5.3.0, exceptions thrown in the __autoload() function could not be caught in the catch block and would
+ * result in a fatal error. From 5.3.0+ exceptions thrown in the __autoload() function can be caught in the catch block,
+ * with one provision. If throwing a custom exception, then the custom exception class must be available. The __autoload()
+ * function may be used recursively to autoload the custom exception class.
  */
 function __autoload($className /*, $throw */) {
    try {
       if (isSet($GLOBALS['__classes'][$className])) {
-         // Fällt der automatische Aufruf der  __autoload()-Funktion aus (z.B. in PHP5.3), wird die Funktion ggf. manuell
+         // Fällt der automatische Aufruf der  __autoload()-Funktion aus (z.B./u.U. in PHP5.3), wird die Funktion ggf. manuell
          // aufgerufen.  Um dabei Mehrfach-Includes derselben Klasse *ohne* Verwendung von include_once() verhindern zu können,
          // setzen wir nach dem ersten Laden ein entsprechendes Flag. Die Verwendung von include_once() würde den Opcode-Cache
          // verlangsamen.
@@ -271,7 +277,7 @@ function __autoload($className /*, $throw */) {
 
       Logger ::handleException($ex);   // Aufruf durch den PHP-Kernel: Exception manuell verarbeiten
       exit(1);
-   }                                   // (__autoload darf keine Exceptions werfen)
+   }                                   // __autoload() darf in PHP < 5.3 keine Exceptions werfen (siehe NOTE oben)
    return false;
 }
 
