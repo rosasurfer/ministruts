@@ -86,8 +86,12 @@ foreach ($domains as $domain => $domainValues) {
                if (String ::contains($value , ' ')) $value  = "\"$value\"";
                if (String ::contains($result, ' ')) $result = "\"$result\"";
             }
+            if ($result == '0.0.0.0')
+               $result = 'SERVFAIL';
             $ns = queryDNS($domain, 'NS');
             echoPre("DNS error for      $domain:   required $type value: $value,   found: $result,   NS: $ns");
+            if ($result == 'SERVFAIL')
+               continue 2;
          }
          continue;
       }
@@ -96,8 +100,12 @@ foreach ($domains as $domain => $domainValues) {
          foreach ($subdomainValues as $type => $value) {
             $result = queryDNS("$subdomain.$domain", $type);
             if ($result != $value) {
+               if ($result == '0.0.0.0')
+                  $result = 'SERVFAIL';
                $ns = queryDNS($domain, 'NS');
                echoPre('DNS error for '.str_pad($subdomain, 4, ' ', STR_PAD_LEFT).".$domain:   required $type value: $value,   found: $result,   NS: $ns");
+               if ($result == 'SERVFAIL')
+                  continue 4;
             }
          }
       }
