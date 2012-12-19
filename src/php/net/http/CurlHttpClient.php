@@ -234,9 +234,9 @@ final class CurlHttpClient extends HttpClient {
    can present the old order again.  To prevent a double click of the submit button, you can disable it with javascript
    or in your script you can set a flag for that order, which will be recorded into the database. Before accept a new
    submission, the script will check if the same order was not placed before and reject it.  This will work fine, as the
-   script have finished the job before.  Note that if you use ob_start("callback_function") in the begin of your script,
+   script has finished the job before.  Note that if you use ob_start("callback_function") in the begin of your script,
    you can specify a callback function that will act like the shutdown function when our script ends and also will let
-   you to work on the generated page before send it to the visitor.
+   you work on the generated page before it is sent to the visitor.
 
    ej at campbell *dot* name (12-Feb-2004 01:01)
    ---------------------------------------------
