@@ -6,17 +6,17 @@ if (!isSet($_SERVER['REQUEST_METHOD']))            // exit, falls wir in einer S
 $address = getRemoteAddress();
 $name    = getHostByAddr($address);
 
-if ($address == $name) echoPre($address);
-else                   echoPre($address.'  ('.$name.')');
+if ($address == $name) echoPre('current IP address: '.$address);
+else                   echoPre('current IP address: '.$address.'  ('.$name.')');
 
 
 $value = getForwardedRemoteAddress();
 if ($value) {
    if (!isIPAddress($value) || ($value==($name=getHostByAddr($value)))) {
-      echoPre('forwarded for: '.$value);
+      echoPre('forwarded for:      '.$value);
    }
    else {
-      echoPre('forwarded for: '.$value.'  ('.$name.')');
+      echoPre('forwarded for:      '.$value.'  ('.$name.')');
    }
 }
 
