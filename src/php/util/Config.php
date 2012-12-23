@@ -190,7 +190,7 @@ final class Config extends Object {
     * @return mixed - Konfigurationseinstellung
     *
     * @throws plRuntimeException - wenn unter dem angegebenen Schlüssel keine Einstellung existiert und
-    *                            kein Defaultwert angegeben wurde
+    *                              kein Defaultwert angegeben wurde
     */
    public static function get($key, $default = null) {
       if (!is_string($key)) throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
@@ -244,11 +244,11 @@ final class Config extends Object {
 
          if (!is_array($properties) || !isSet($properties[$subkey])) // PHP sucks!!! $some_string[$some_other_string] löst keinen Fehler aus,
             break;                                                   // sondern castet $some_other_string ohne Warnung zu 0
-                                                                     // Ergebnis: $some_string[$some_other_string] = $some_string{0}
+                                                                     // Ergebnis: $some_string[$some_other_string] == $some_string{0}
          if ($i+1 == $size)               // das letzte Element
             return $properties[$subkey];
 
-         $properties =& $properties[$subkey];                        // wieder: $some_string[$some_other_string] = $some_string{0} => ohne Fehler
+         $properties =& $properties[$subkey];                        // wieder: $some_string[$some_other_string] == $some_string{0} => ohne Fehler
       }
       return null;
    }
