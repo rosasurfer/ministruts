@@ -10,7 +10,7 @@ PASS=`cat ~/.cvs.shadow`
 
 cd $PROJECTS_ROOT
 
-export CVSROOT=:pserver:$USERNAME:$PASS@localhost:2401/var/cvs
+export CVSROOT=:pserver:$USERNAME:$PASS@localhost:2401/var/cvs/rosasurfer
 cvs -d $CVSROOT login
 
 #cvs -d $CVSROOT -qr checkout -PR -d $PROJECT -r HEAD $PROJECT
