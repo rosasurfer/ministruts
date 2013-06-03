@@ -4,14 +4,12 @@
  *
  * NOTE:
  * -----
- * Diese Klasse muß thread-sicher sein.  Als einfache Richtlinie gilt, daß in den Methoden keine statischen
- * Variablen verwendet und keine Werte in $this oder self geändert werden dürfen.  Wird dies eingehalten,
- * ist die Klasse thread-sicher.
+ * Diese Klasse muß innerhalb der Applikation "thread-sicher" sein.  Das bedeutet, daß in statischen Variablen
+ * (Werte in self) und Instanzvariablen (Werte in $this) kein dynamischer Laufzeitstatus gespeichert werden darf.
  *
- * Hintergrund ist, daß es nur eine einzige FrontController-Instanz gibt, die gecacht und bei jedem Request
- * wiederverwendet wird.  Wenn nun z.B. während eines Methodenaufrufs ein Wert in einer Instanzvariable
- * geändert werden würde, würde diese Änderung auch in allen weiteren Prozessen, die diese gecachte Instanz
- * verwenden, sichtbar werden und deren Ablauf stören.
+ * Hintergrund ist, daß es je Applikation nur eine FrontController-Instanz gibt, die gecacht und von jedem Request
+ * wiederverwendet wird.  Würde z.B. während eines Requests eine Instanzvariable geändert, würde diese Änderung auch
+ * in allen folgenden Requests, die diese gecachte Instanz verwenden, sichtbar werden und dessen Verarbeitung stören.
  */
 final class FrontController extends Singleton {
 
