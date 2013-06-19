@@ -15,7 +15,8 @@
  */
 
 // Mehrfach-Includes abfangen
-if (defined('PHPLIB_ROOT')) return;
+if (defined('PHPLIB_ROOT'))
+   return;
 define('PHPLIB_ROOT', dirName(__FILE__));
 
 
@@ -235,11 +236,10 @@ function apd_addProfileLink($dumpFile = null) {
  * @param mixed  $throw     - Ob Exceptions geworfen werfen dürfen. Typ und Wert des Parameters sind unwichtig,
  *                            einzig seine Existenz reicht für die Erkennung eines manuellen Aufrufs.
  *
- * Note:
- * Prior to 5.3 exceptions thrown in the __autoload() function could not be caught in the catch block and would result in
- * a fatal error. From 5.3+ exceptions thrown in the __autoload() function can be caught in the catch block with one provision.
- * If throwing a custom exception then the custom exception class must be available. The __autoload() function may be used
- * recursively to autoload the custom exception class.
+ * NOTE: Prior to 5.3 exceptions thrown in the __autoload() function could not be caught in the catch block and would result in
+ *       a fatal error. From 5.3+ exceptions thrown in the __autoload() function can be caught in the catch block with one provision.
+ *       If throwing a custom exception then the custom exception class must be available. The __autoload() function may be used
+ *       recursively to autoload the custom exception class.
  */
 function __autoload($className /*, $throw */) {
    try {
