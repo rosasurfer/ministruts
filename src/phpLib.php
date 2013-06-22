@@ -146,11 +146,12 @@ define('L_ERROR' , 16);
 define('L_FATAL' , 32);
 
 // Zeitkonstanten
-define('SECOND' ,  1          ); define('SECONDS', SECOND);
-define('MINUTE' , 60 * SECONDS); define('MINUTES', MINUTE);
-define('HOUR'   , 60 * MINUTES); define('HOURS'  , HOUR  );
-define('DAY'    , 24 * HOURS  ); define('DAYS'   , DAY   );
-define('WEEK'   ,  7 * DAYS   ); define('WEEKS'  , WEEK  );
+define('SECOND',   1          ); define('SECONDS', SECOND);
+define('MINUTE',  60 * SECONDS); define('MINUTES', MINUTE);
+define('HOUR'  ,  60 * MINUTES); define('HOURS'  , HOUR  );
+define('DAY'   ,  24 * HOURS  ); define('DAYS'   , DAY   );
+define('WEEK'  ,   7 * DAYS   ); define('WEEKS'  , WEEK  );
+define('YEAR'  , 365 * DAYS   ); define('YEARS'  , YEAR  );
 
 // Wochentage
 define('SUNDAY'   , 0);
