@@ -639,6 +639,50 @@ function byteSize($value) {
 
 
 /**
+ * Führt ein Shell-Kommando aus und gibt dessen Standardausgabe als String zurück.
+ *
+ * @param  string $cmd - Shell-Kommando
+ *
+ * @return string - Standardausgabe
+ *
+ *
+ * NOTE: Workaround für shell_exec()-Bug unter Windows, wo das Lesen der Standardausgabe bei Auftreten
+ *       eines DOS-EOF-Characters (0x1A = ASCII 26) abgebrochen wird.
+ */
+function shell_exec_fix($cmd) {
+   if (!WINDOWS)
+      return shell_exec($cmd);
+
+   // pOpen() kann ebenfalls nicht verwendet werden, da dort derselbe Bug auftritt.
+   // Ursache ist vermutlich die gemeinsame Verwendung von feof().
+
+   $descriptors = array(0 => array('pipe', 'r'),         // stdin
+                        1 => array('pipe', 'w'),         // stdout
+                        2 => array('pipe', 'w'));        // stderr
+   $pipes = array();
+   $hProc = proc_open($cmd, $descriptors, $pipes);
+
+   // $pipes now looks like this:
+   // 0 => writeable handle connected to child stdin
+   // 1 => readable handle connected to child stdout
+   // 2 => readable handle connected to child stderr
+
+   if (is_resource($hProc)) {
+      $stdout = stream_get_contents($pipes[1]);
+
+      // close pipes before proc_close() to avoid a deadlock
+      fClose($pipes[0]);
+      fClose($pipes[1]);
+      fClose($pipes[2]);
+
+      proc_close($hProc);
+      return $stdout;
+   }
+   return null;
+}
+
+
+/**
  * date_mysql2german
  * wandelt ein MySQL-DATE (ISO-Date)
  * in ein traditionelles deutsches Datum um.

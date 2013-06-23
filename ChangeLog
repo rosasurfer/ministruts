@@ -1,3 +1,8 @@
+2013-06-23
+
+   - neu: shell_exec_fix(), Workaround für Windows-Bug in shell_exec() (Abbruch der Ausgabe bei DOS-EOF-Marker im Stream)
+
+
 2013-06-22
 
    - neue Zeitkonstanten YEAR und YEARS
