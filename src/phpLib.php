@@ -21,8 +21,8 @@ define('PHPLIB_ROOT', dirName(__FILE__));
 
 
 // Anwendungskonfiguration prüfen
-if (!defined('APPLICATION_NAME')) exit('The constant APPLICATION_NAME needs to be defined (see "'.PHPLIB_ROOT.DIRECTORY_SEPARATOR.'doc'.DIRECTORY_SEPARATOR.'project.skel'.DIRECTORY_SEPARATOR.'index.php")');
-if (!defined('APPLICATION_ROOT')) exit('The constant APPLICATION_ROOT needs to be defined (see "'.PHPLIB_ROOT.DIRECTORY_SEPARATOR.'doc'.DIRECTORY_SEPARATOR.'project.skel'.DIRECTORY_SEPARATOR.'index.php")');
+if (!defined('APPLICATION_NAME')) exit('The PHP constant APPLICATION_NAME must be defined (see "'.PHPLIB_ROOT.DIRECTORY_SEPARATOR.'doc'.DIRECTORY_SEPARATOR.'project.skel'.DIRECTORY_SEPARATOR.'index.php")');
+if (!defined('APPLICATION_ROOT')) exit('The PHP constant APPLICATION_ROOT must be defined (see "'.PHPLIB_ROOT.DIRECTORY_SEPARATOR.'doc'.DIRECTORY_SEPARATOR.'project.skel'.DIRECTORY_SEPARATOR.'index.php")');
 
 
 // phpInfo()-Aufrufe abfangen
