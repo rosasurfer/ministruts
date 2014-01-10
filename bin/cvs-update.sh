@@ -1,4 +1,7 @@
 #!/bin/sh
+#
+# TODO: Falls chmod versucht, per Netzlaufwerk eingebundene Dateien zu bearbeiten, schlägt es fehl (Read-only file system).
+#
 PROJECTS_ROOT=/var/www
 PROJECT=ministruts
 
