@@ -2,7 +2,7 @@
 /**
  * CurlHttpClient
  *
- * Eine Klasse, die mit CURL HttpRequests ausführen kann.
+ * Eine Klasse, die mit cURL HttpRequests ausführen kann.
  */
 final class CurlHttpClient extends HttpClient {
 
@@ -184,7 +184,7 @@ final class CurlHttpClient extends HttpClient {
          $errorNo = self::$errors[$errorNo];
       }
       else {
-         Logger ::log('Unknown CURL error code: '.$errorNo, L_WARN, __CLASS__);
+         Logger ::log('Unknown cURL error code: '.$errorNo, L_WARN, __CLASS__);
       }
 
       return "$errorNo ($errorStr)";
