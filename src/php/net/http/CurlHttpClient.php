@@ -124,11 +124,11 @@ final class CurlHttpClient extends HttpClient {
                        CURLOPT_TIMEOUT        => $this->timeout,
                        CURLOPT_USERAGENT      => $this->userAgent,
 
-                     //CURLOPT_COOKIE         => null, // The "Set-Cookie: " header to be sent with the HTTP request.
-                     //CURLOPT_COOKIEFILE     => null, // The name of a file containing cookie data to use for the request.
-                     //CURLOPT_COOKIEJAR      => null, // The name of a file to save cookie data to when the connection closes.
+                     //CURLOPT_COOKIE         => null,         // The "Set-Cookie: " header to be sent with the HTTP request.
+                     //CURLOPT_COOKIEFILE     => null,         // The name of a file containing cookie data to use for the request.
+                     //CURLOPT_COOKIEJAR      => null,         // The name of a file to save cookie data to when the connection closes.
 
-                       CURLOPT_ENCODING       => '',                                // offers all supported encoding types
+                       CURLOPT_ENCODING       => '',           // sets "Accept-Encoding" header with all supported encoding types
                        CURLOPT_HEADERFUNCTION => array($response, 'writeHeader'),
                        CURLOPT_WRITEFUNCTION  => array($response, 'writeContent'),
                       );
