@@ -1,3 +1,9 @@
+2014-09-06
+
+   - php/net/http/HttpRequest:    neue Methoden zum Lesen und Schreiben von benutzerdefinierten Request-Headern
+   - php/net/http/CurlHttpClient: erweiterte Optionen für benutzerdefinierte Request-Header und Transfer-Encodings
+
+
 2013-06-23
 
    - neu: shell_exec_fix(), Workaround für Windows-Bug in shell_exec() (Abbruch der Ausgabe bei DOS-EOF-Marker im Stream)
