@@ -120,7 +120,7 @@ final class CurlHttpClient extends HttpClient {
       $response = CurlHttpResponse ::create();
 
       // CURL-Session initialisieren
-      $cHandle = curl_init();
+      $hCurl = curl_init();
 
       // Optionen setzen
       $options = array(CURLOPT_URL            => $request->getUrl(),
@@ -141,14 +141,14 @@ final class CurlHttpClient extends HttpClient {
          $options[CURLOPT_URL]        = subStr($request->getUrl(), 0, strPos($request->getUrl(), '?'));
          $options[CURLOPT_POSTFIELDS] = strStr($request->getUrl(), '?');
       }
-      curl_setopt_array($cHandle, $options);
+      curl_setopt_array($hCurl, $options);
 
       // Request ausführen
-      if (curl_exec($cHandle) === false)
-         throw new IOException('CURL error '.self ::getError($cHandle).', url: '.$request->getUrl());
+      if (curl_exec($hCurl) === false)
+         throw new IOException('CURL error '.self ::getError($hCurl).', url: '.$request->getUrl());
 
-      $response->setStatus($status = curl_getinfo($cHandle, CURLINFO_HTTP_CODE));
-      curl_close($cHandle);
+      $response->setStatus($status = curl_getinfo($hCurl, CURLINFO_HTTP_CODE));
+      curl_close($hCurl);
 
       // ggf. manuellen Redirect ausführen (falls "open_basedir" oder "safe_mode" aktiviert ist)
       if (($status==301 || $status==302) && $this->followRedirects && (ini_get('open_basedir') || ini_get('safe_mode'))) {

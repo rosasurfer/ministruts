@@ -104,12 +104,12 @@ final class CurlHttpResponse extends HttpResponse {
    /**
     * Callback für CurlHttpClient, dem die empfangenen Response-Header zeilenweise übergeben werden.
     *
-    * @param resource $cHandle - das CURL-Handle des aktuellen Requests
-    * @param string   $line    - vollständige Headerzeile, bestehend aus dem Namen, einem Doppelpunkt und den Daten
+    * @param resource $hCurl - das CURL-Handle des aktuellen Requests
+    * @param string   $line  - vollständige Headerzeile, bestehend aus dem Namen, einem Doppelpunkt und den Daten
     *
     * @return int - Anzahl der bei diesem Methodenaufruf erhaltenen Bytes
     */
-   public function writeHeader($cHandle, $line) {
+   public function writeHeader($hCurl, $line) {
       self::$logDebug && Logger ::log('Header line received:  '.$line, L_DEBUG, __CLASS__);
 
       $this->headerParser->parseLine($line);
@@ -120,12 +120,12 @@ final class CurlHttpResponse extends HttpResponse {
    /**
     * Callback für CurlHttpClient, dem der empfangene Content des HTTP-Requests chunk-weise übergeben wird.
     *
-    * @param resource $cHandle - das CURL-Handle des aktuellen Requests
-    * @param string   $data    - die empfangenen Daten
+    * @param resource $hCurl - das CURL-Handle des aktuellen Requests
+    * @param string   $data  - die empfangenen Daten
     *
     * @return int - Anzahl der bei diesem Methodenaufruf erhaltenen Bytes
     */
-   public function writeContent($cHandle, $data) {
+   public function writeContent($hCurl, $data) {
       $this->content .= $data;
 
       $obtainedLength = strLen($data);
