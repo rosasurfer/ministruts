@@ -9,7 +9,8 @@ final class CurlHttpClient extends HttpClient {
 
    private static /*bool*/ $logDebug, $logInfo, $logNotice;
 
-   private /*int*/ $currentRedirect = 0;    // für manuelle Redirects (wenn open_basedir|safe_mode aktiv ist und followRedirects TRUE ist)
+   private /*int*/     $currentRedirect = 0;       // Zähler für manuelle Redirects (falls open_basedir|safe_mode aktiv ist)
+   private /*mixed[]*/ $options         = array(); // zusätzliche cURL-Optionen
 
 
    // cURL-Fehlerbeschreibungen
@@ -85,22 +86,29 @@ final class CurlHttpClient extends HttpClient {
 
    /**
     * Erzeugt eine neue Instanz.
+    *
+    * @param mixed[] $options - Array mit zusätzlichen cURL-Optionen (default: keine)
     */
-   public function __construct() {
+   public function __construct(array $options=null) {
       $loglevel        = Logger ::getLogLevel(__CLASS__);
       self::$logDebug  = ($loglevel <= L_DEBUG );
       self::$logInfo   = ($loglevel <= L_INFO  );
       self::$logNotice = ($loglevel <= L_NOTICE);
+
+      if (!is_null($options))
+         $this->options = $options;
    }
 
 
    /**
     * Erzeugt eine neue Instanz der Klasse.
     *
+    * @param mixed[] $options - Array mit zusätzlichen cURL-Optionen (default: keine)
+    *
     * @return CurlHttpClient
     */
-   public static function create() {
-      return new self();
+   public static function create(array $options=null) {
+      return new self($options);
    }
 
 
@@ -119,31 +127,30 @@ final class CurlHttpClient extends HttpClient {
       // CURL-Session initialisieren
       $hCurl = curl_init();
 
-      // Optionen setzen
-      $options = array(CURLOPT_URL            => $request->getUrl(),
-                       CURLOPT_TIMEOUT        => $this->timeout,
-                       CURLOPT_USERAGENT      => $this->userAgent,
-
-                     //CURLOPT_COOKIE         => null,         // The "Set-Cookie: " header to be sent with the HTTP request.
-                     //CURLOPT_COOKIEFILE     => null,         // The name of a file containing cookie data to use for the request.
-                     //CURLOPT_COOKIEJAR      => null,         // The name of a file to save cookie data to when the connection closes.
-
-                       CURLOPT_ENCODING       => '',           // sets "Accept-Encoding" header with all supported encoding types
-                       CURLOPT_HEADERFUNCTION => array($response, 'writeHeader'),
-                       CURLOPT_WRITEFUNCTION  => array($response, 'writeContent'),
-                      );
+      // Optionen setzen, sofern sie nicht schon gesetzt sind
+      $options = $this->options;                             $options[CURLOPT_URL           ] = $request->getUrl();
+      !array_key_exists(CURLOPT_TIMEOUT       , $options) && $options[CURLOPT_TIMEOUT       ] = $this->timeout;
+      !array_key_exists(CURLOPT_USERAGENT     , $options) && $options[CURLOPT_USERAGENT     ] = $this->userAgent;
+      !array_key_exists(CURLOPT_ENCODING      , $options) && $options[CURLOPT_ENCODING      ] = '';         // sets all supported encodings
+      !array_key_exists(CURLOPT_HEADERFUNCTION, $options) && $options[CURLOPT_HEADERFUNCTION] = array($response, 'writeHeader');
+      !array_key_exists(CURLOPT_WRITEFUNCTION , $options) && $options[CURLOPT_WRITEFUNCTION ] = array($response, 'writeContent');
 
       // zusätzliche Header überschreiben automatisch generierte Header
-      $customHeaders = null;
-      foreach ($request->getHeaders() as $key => $value)
-         $customHeaders[] = $key.': '.$value;
-      $options[CURLOPT_HTTPHEADER] = $customHeaders;
-
+      foreach ($request->getHeaders() as $key => $value) {
+         $options[CURLOPT_HTTPHEADER][] = $key.': '.$value;
+      }
 
       // CURLOPT_FOLLOWLOCATION funktioniert nur bei deaktiviertem "open_basedir"-Setting
-      if ($this->followRedirects && !ini_get('open_basedir')) {
-         $options[CURLOPT_FOLLOWLOCATION] = true;
-         $options[CURLOPT_MAXREDIRS]      = $this->maxRedirects;
+      if (!ini_get('open_basedir')) {
+         if ($this->followRedirects) {
+            $options[CURLOPT_FOLLOWLOCATION] = true;
+         }
+         else if (array_key_exists(CURLOPT_FOLLOWLOCATION, $options) && $options[CURLOPT_FOLLOWLOCATION]) {
+            $this->followRedirects(true);
+         }
+         if ($this->followRedirects) {
+            !array_key_exists(CURLOPT_MAXREDIRS, $options) && $options[CURLOPT_MAXREDIRS] = $this->maxRedirects;
+         }
       }
 
       if ($request->getMethod() == 'POST') {
@@ -155,12 +162,12 @@ final class CurlHttpClient extends HttpClient {
 
       // Request ausführen
       if (curl_exec($hCurl) === false)
-         throw new IOException('CURL error '.self ::getError($hCurl).', url: '.$request->getUrl());
+         throw new IOException('cURL error '.self ::getError($hCurl).', url: '.$request->getUrl());
 
       $response->setStatus($status = curl_getinfo($hCurl, CURLINFO_HTTP_CODE));
       curl_close($hCurl);
 
-      // ggf. manuellen Redirect ausführen (falls "open_basedir" oder "safe_mode" aktiviert ist)
+      // ggf. manuellen Redirect ausführen (falls "open_basedir" oder "safe_mode" aktiviert sind)
       if (($status==301 || $status==302) && $this->followRedirects && (ini_get('open_basedir') || ini_get('safe_mode'))) {
          if ($this->currentRedirect >= $this->maxRedirects)
             throw new IOException('CURL error: maxRedirects limit exceeded - '.$this->maxRedirects.', url: '.$request->getUrl());

@@ -1,3 +1,8 @@
+2014-09-07
+
+   - php/net/http/CurlHttpClient: alle CURL-Optionen können benutzerdefiniert angepaßt werden, ermöglicht Lesen und Schreiben
+                                  von vorhandenen Cookies
+
 2014-09-06
 
    - php/net/http/HttpRequest:    neue Methoden zum Lesen und Schreiben von benutzerdefinierten Request-Headern
