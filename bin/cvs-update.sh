@@ -24,7 +24,7 @@ cvs -d $CVSROOT logout
 export -n CVSROOT
 
 
-# may take some time, let's do it in the background
+# The following takes some time, so we do it in the background.
 find $PROJECT -follow                                                               -print0 2>/dev/null | xargs -0r chmod a=r,u+w,a+X
 find $PROJECT -follow -type d \( ! -group apache -o ! -user apache \) ! -name 'CVS' -print0 2>/dev/null | xargs -0r chown    apache:apache && \
 find $PROJECT -follow -type d -name 'cache'                                         -print0 2>/dev/null | xargs -0r chown -R apache:apache && \
