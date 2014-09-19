@@ -599,22 +599,22 @@ function formatDate($format, $datetime) {
  * Formatiert einen Zahlenwert im Währungsformat.
  *
  * @param mixed  $value            - Zahlenwert (integer oder float)
- * @param int    $decimals         - Anzahl der Nachkommastellen
- * @param string $decimalSeparator - Dezimaltrennzeichen (entweder '.' oder ',')
+ * @param int    $decimals         - Anzahl der Nachkommastellen (default: 2)
+ * @param string $decimalSeparator - Dezimaltrennzeichen: '.' oder ',' (default: '.')
  *
  * @return string
  */
-function formatMoney($value, $decimals = 2, $decimalSeparator = ',') {
-   if ($value!==(int)$value && $value!==(float)$value) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
-   if ($decimals!==(int)$decimals)                     throw new IllegalTypeException('Illegal type of parameter $decimals: '.getType($decimals));
+function formatMoney($value, $decimals=2, $decimalSeparator='.') {
+   if (!is_int($value) && is_float($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
+   if (!is_int($decimals))                  throw new IllegalTypeException('Illegal type of parameter $decimals: '.getType($decimals));
 
-   if ($decimalSeparator == '.')
+   if ($decimalSeparator === '.')
       return number_format($value, $decimals, '.', ',');
 
-   if ($decimalSeparator == ',')
+   if ($decimalSeparator === ',')
       return number_format($value, $decimals, ',', '.');
 
-   throw new plInvalidArgumentException('Invalid argument $decimalSeparator: '.$decimalSeparator);
+   throw new plInvalidArgumentException('Invalid argument $decimalSeparator: "'.$decimalSeparator.'"');
 }
 
 

@@ -1,5 +1,10 @@
 2014-09-07
 
+   - Default-Signatur von formatMoney($value, $decimals, $decimalSeparator) auf internationales Format umgestellt
+
+
+2014-09-07
+
    - php/net/http/CurlHttpClient: alle CURL-Optionen können benutzerdefiniert angepaßt werden, ermöglicht Lesen und Schreiben
                                   von vorhandenen Cookies
 
