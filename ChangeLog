@@ -1,4 +1,9 @@
-2014-09-07
+2014-09-20
+
+   - neu: php/dao/PersistableObject::isModified() - öffentlicher Getter für internen isModified-Status
+
+
+2014-09-19
 
    - Default-Signatur von formatMoney($value, $decimals, $decimalSeparator) auf internationales Format umgestellt
 

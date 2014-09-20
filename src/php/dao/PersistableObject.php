@@ -131,6 +131,16 @@ abstract class PersistableObject extends Object implements IDaoConnected {
 
 
    /**
+    * Ob diese Instanz ungespeicherte Änderungen enthält.
+    *
+    * @return bool
+    */
+   public function isModified() {
+      return ($this->modified);
+   }
+
+
+   /**
     * Speichert diese Instanz in der Datenbank.
     *
     * @return PersistableObject
