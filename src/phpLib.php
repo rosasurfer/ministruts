@@ -111,6 +111,9 @@ $__classes['Mailer'                         ] = PHPLIB_ROOT.'/php/net/mail/Maile
 $__classes['PHPMailer'                      ] = PHPLIB_ROOT.'/php/net/mail/PHPMailer';
 $__classes['SMTPMailer'                     ] = PHPLIB_ROOT.'/php/net/mail/SMTPMailer';
 
+$__classes['ClickatellSMSMessanger'         ] = PHPLIB_ROOT.'/php/net/sms/ClickatellSMSMessanger';
+$__classes['SMSMessanger'                   ] = PHPLIB_ROOT.'/php/net/sms/SMSMessanger';
+
 $__classes['Action'                         ] = PHPLIB_ROOT.'/php/struts/Action';
 $__classes['ActionForm'                     ] = PHPLIB_ROOT.'/php/struts/ActionForm';
 $__classes['ActionForward'                  ] = PHPLIB_ROOT.'/php/struts/ActionForward';
