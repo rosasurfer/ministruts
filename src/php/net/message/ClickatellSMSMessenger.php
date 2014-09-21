@@ -1,8 +1,8 @@
 <?php
 /**
- * Messanger, der eine SMS via Clickatell verschickt.
+ * Messenger, der eine SMS via Clickatell verschickt.
  */
-class ClickatellSMSMessanger extends Messanger {
+class ClickatellSMSMessenger extends Messenger {
 
 
    /**

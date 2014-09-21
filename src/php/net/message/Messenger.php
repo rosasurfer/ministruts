@@ -1,16 +1,16 @@
 <?php
 /**
- * Messanger
+ * Messenger
  *
- * Messanger-Factory und abstrakte Basisklasse für alle Messanger-Implementierungen.
+ * Messenger-Factory und abstrakte Basisklasse für alle Messenger-Implementierungen.
  */
-abstract class Messanger extends Object {
+abstract class Messenger extends Object {
 
 
    /**
     * Constructor
     *
-    * @param  array $options - Messanger-Optionen
+    * @param  array $options - Messenger-Optionen
     */
    abstract protected function __construct(array $options);
 
