@@ -120,7 +120,7 @@ final class Config extends Object {
     * Konstruktor
     *
     * Lädt die Konfiguration aus allen existierenden config.properties- und config-custom.properties-
-    * Dateien.  Die config-custom.propertie-Dateien sollte nicht im Repository gespeichert werden, so
+    * Dateien.  Die config-custom.properties-Dateien sollte nicht im Repository gespeichert werden, so
     * daß eine globale und eine lokale Konfiguration mit unterschiedlichen Einstellungen möglich sind.
     * Lokale Einstellungen überschreiben globale Einstellungen.
     */
@@ -144,8 +144,9 @@ final class Config extends Object {
       }
       $this->files = $files;
 
-      // Weiter vorn im include-path stehende Dateien haben Vorrang vor weiter hinten stehenden.  Wir
-      // laden die Dateien von hinten aus und überschreiben mit folgenden Einstellungen bereits vorhandene.
+      // Weiter vorn im include-path stehende Dateien haben Vorrang vor weiter hinten stehenden.  Die Dateien
+      // werden von "hinten" beginnend geladen, dadurch können weiter "vorn" stehende Einstellungen vorhandene
+      // weiter "hinten" stehende Einstellungen überschreiben.
       foreach (array_reverse($files) as $name => $fileExists) {
          if ($fileExists)
             $this->loadFile($name);
