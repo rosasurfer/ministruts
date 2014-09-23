@@ -421,10 +421,10 @@ function getRandomID($length) {
  * Hilfsfunktion zur formatierten Ausgabe einer Variable.
  *
  * @param mixed $var    - die auszugebende Variable
- * @param bool  $return - Ob die Ausgabe auf STDOUT erfolgen soll (FALSE) oder als Rückgabewert der Funktion (TRUE).
- *                        (default: FALSE)
+ * @param bool  $return - Ob die Ausgabe auf STDOUT (FALSE) oder als Rückgabewert der Funktion (TRUE) erfolgen soll.
+ *                        (default: STDOUT)
  *
- * @return string - Rückgabewert, wenn $return TRUE ist, NULL andererseits.
+ * @return string - Rückgabewert, wenn $return TRUE ist, NULL andererseits
  */
 function printFormatted($var, $return = false) {
    if (is_object($var) && method_exists($var, '__toString')) {
