@@ -238,9 +238,9 @@ function apd_addProfileLink($dumpFile = null) {
 /**
  * Class-Loader, lädt die angegebene Klasse.
  *
- * @param string $className - Klassenname
- * @param mixed  $throw     - Ob Exceptions geworfen werfen dürfen. Typ und Wert des Parameters sind unwichtig,
- *                            einzig seine Existenz reicht für die Erkennung eines manuellen Aufrufs.
+ * @param  string $className - Klassenname
+ * @param  mixed  $throw     - Ob Exceptions geworfen werfen dürfen. Typ und Wert des Parameters sind unwichtig,
+ *                             einzig seine Existenz reicht für die Erkennung eines manuellen Aufrufs.
  *
  * NOTE: Prior to 5.3 exceptions thrown in the __autoload() function could not be caught in the catch block and would result in
  *       a fatal error. From 5.3+ exceptions thrown in the __autoload() function can be caught in the catch block with one provision.
@@ -296,7 +296,7 @@ function __autoload($className /*, $throw */) {
  * Wird __autoload() direkt aus dieser Funktion und nicht von PHP aufgerufen, werden Exceptions weitergereicht
  * und der folgende Code kann entsprechend reagieren.
  *
- * @param string $name - Klassenname
+ * @param  string $name - Klassenname
  *
  * @return bool
  *
@@ -326,7 +326,7 @@ function is_class($name) {
  * Wird __autoload() direkt aus dieser Funktion und nicht von PHP aufgerufen, werden Exceptions weitergereicht
  * und der folgende Code kann entsprechend reagieren.
  *
- * @param string $name - Interface-Name
+ * @param  string $name - Interface-Name
  *
  * @return bool
  *
@@ -353,7 +353,8 @@ function is_interface($name) {
  * gelegt und während des Shutdowns von dort abgerufen (stacktypisch Last-In-First-Out).  Alle zusätzlich
  * übergebenen Argumente werden beim Aufruf an die Funktion weitergereicht.
  *
- * @param callable $callback - Funktion oder Methode, die ausgeführt werden soll
+ * @param  callable $callback - Funktion oder Methode, die ausgeführt werden soll
+ *
  *
  * @see register_shutdown_function()
  */
@@ -395,7 +396,7 @@ function push_shutdown_function(/*callable*/ $callback = null /*, $args1, $args2
 /**
  * Erzeugt eine zufällige ID (wegen Verwechselungsgefahr ohne die Zeichen 0 O 1 l I).
  *
- * @param int $length - Länge der ID
+ * @param  int $length - Länge der ID
  *
  * @return string - ID
  */
@@ -418,10 +419,34 @@ function getRandomID($length) {
 
 
 /**
- * Hilfsfunktion zur formatierten Ausgabe einer Variable.
+ * Alias für "echo $var", das ein Language-Construct ist und nicht immer als Funktion verwendet werden kann.
  *
- * @param mixed $var    - die auszugebende Variable
- * @param bool  $return - Ob die Ausgabe auf STDOUT (FALSE) oder als Rückgabewert der Funktion (TRUE) erfolgen soll.
+ * @param  mixed $var - die auszugebende Variable
+ */
+function echos($var) {
+   echo $var;
+}
+
+
+/**
+ * Alias für printFormatted($var, false).
+ *
+ * Hilfsfunktion zur formatierten Ausgabe einer Variable. Die Ausgabe wird immer mit einem Zeilenende-Zeichen
+ * abgeschlossen.
+ *
+ * @param  mixed $var - die auszugebende Variable
+ */
+function echoPre($var) {
+   printFormatted($var, false);
+}
+
+
+/**
+ * Hilfsfunktion zur formatierten Ausgabe einer Variable. Die Ausgabe wird immer mit einem Zeilenende-Zeichen
+ * abgeschlossen.
+ *
+ * @param  mixed $var    - die auszugebende Variable
+ * @param  bool  $return - Ob die Ausgabe auf STDOUT (FALSE) oder als Rückgabewert der Funktion (TRUE) erfolgen soll.
  *                        (default: STDOUT)
  *
  * @return string - Rückgabewert, wenn $return TRUE ist, NULL andererseits
@@ -452,21 +477,11 @@ function printFormatted($var, $return = false) {
 
 
 /**
- * Alias für printFormatted($var, false).
- *
- * @param mixed $var - die auszugebende Variable
- */
-function echoPre($var) {
-   printFormatted($var, false);
-}
-
-
-/**
  * Gibt den Inhalt einer Variable aus.
  *
- * @param mixed $var    - Variable
- * @param bool  $return - TRUE, wenn das Ergebnis zurückgegeben werden soll;
- *                        FALSE, wenn das Ergebnis auf STDOUT ausgegeben werden soll (default)
+ * @param  mixed $var    - Variable
+ * @param  bool  $return - TRUE, wenn das Ergebnis zurückgegeben werden soll;
+ *                         FALSE, wenn das Ergebnis auf STDOUT ausgegeben werden soll (default)
  */
 function dump($var, $return = false) {
    if ($return) ob_start();
@@ -480,7 +495,7 @@ function dump($var, $return = false) {
 /**
  * Gibt einen String als JavaScript aus.
  *
- * @param string $snippet - Code
+ * @param  string $snippet - Code
  */
 function javaScript($snippet) {
    echo '<script language="JavaScript">'.$snippet.'</script>';
@@ -490,7 +505,7 @@ function javaScript($snippet) {
 /**
  * Shortcut-Ersatz für String::htmlSpecialChars()
  *
- * @param string $string - zu kodierender String
+ * @param  string $string - zu kodierender String
  *
  * @return string - kodierter String
  *
@@ -516,7 +531,7 @@ function htmlEncode($string) {
 /**
  * Dekodiert einen HTML-String nach ISO-8859-15.
  *
- * @param string $html - der zu dekodierende String
+ * @param  string $html - der zu dekodierende String
  *
  * @return string
  */
@@ -538,8 +553,8 @@ function decodeHtml($html) {
 /**
  * Addiert zu einem Datum eine Anzahl von Tagen.
  *
- * @param string $date - Ausgangsdatum (Format: yyyy-mm-dd)
- * @param int    $days - Tagesanzahl
+ * @param  string $date - Ausgangsdatum (Format: yyyy-mm-dd)
+ * @param  int    $days - Tagesanzahl
  *
  * @return string - resultierendes Datum
  */
@@ -559,8 +574,8 @@ function addDate($date, $days) {
 /**
  * Subtrahiert von einem Datum eine Anzahl von Tagen.
  *
- * @param string $date - Ausgangsdatum (Format: yyyy-mm-dd)
- * @param int    $days - Tagesanzahl
+ * @param  string $date - Ausgangsdatum (Format: yyyy-mm-dd)
+ * @param  int    $days - Tagesanzahl
  *
  * @return string
  */
@@ -573,8 +588,8 @@ function subDate($date, $days) {
 /**
  * Formatiert einen Date- oder DateTime-Wert mit dem angegebenen Format.
  *
- * @param string $format   - Formatstring (siehe PHP Manual zu date())
- * @param string $datetime - Datum oder Zeit
+ * @param  string $format   - Formatstring (siehe PHP Manual zu date())
+ * @param  string $datetime - Datum oder Zeit
  *
  * @return string
  */
@@ -603,9 +618,9 @@ function formatDate($format, $datetime) {
 /**
  * Formatiert einen Zahlenwert im Währungsformat.
  *
- * @param mixed  $value            - Zahlenwert (integer oder float)
- * @param int    $decimals         - Anzahl der Nachkommastellen (default: 2)
- * @param string $decimalSeparator - Dezimaltrennzeichen: '.' oder ',' (default: '.')
+ * @param  mixed  $value            - Zahlenwert (integer oder float)
+ * @param  int    $decimals         - Anzahl der Nachkommastellen (default: 2)
+ * @param  string $decimalSeparator - Dezimaltrennzeichen: '.' oder ',' (default: '.')
  *
  * @return string
  */
@@ -626,7 +641,7 @@ function formatMoney($value, $decimals=2, $decimalSeparator='.') {
 /**
  * Pretty printer for byte values.
  *
- * @param int $value - byte value
+ * @param  int $value - byte value
  *
  * @return string
  */
@@ -688,46 +703,11 @@ function shell_exec_fix($cmd) {
 
 
 /**
- * date_mysql2german
- * wandelt ein MySQL-DATE (ISO-Date)
- * in ein traditionelles deutsches Datum um.
-function date_mysql2german($datum) {
-    list($jahr, $monat, $tag) = explode("-", $datum);
-
-    return sprintf("%02d.%02d.%04d", $tag, $monat, $jahr);
-}
- */
-
-/**
- * date_german2mysql
- * wandelt ein traditionelles deutsches Datum
- * nach MySQL (ISO-Date).
-function date_german2mysql($datum) {
-    list($tag, $monat, $jahr) = explode(".", $datum);
-
-    return sprintf("%04d-%02d-%02d", $jahr, $monat, $tag);
-}
- */
-
-/**
- * timestamp_mysql2german
- * wandelt ein MySQL-Timestamp
- * in ein traditionelles deutsches Datum um.
-function timestamp_mysql2german($t) {
-    return sprintf("%02d.%02d.%04d",
-                    substr($t, 6, 2),
-                    substr($t, 4, 2),
-                    substr($t, 0, 4));
-}
-*/
-
-
-/**
  * Ist $value nicht NULL, gibt die Funktion $value zurück, ansonsten die Alternative $altValue.
  *
- * @return mixed
+ * @return  mixed
  */
 function ifNull($value, $altValue) {
-   return ($value === null) ? $altValue : $value;
+   return ($value===null) ? $altValue : $value;
 }
 ?>
