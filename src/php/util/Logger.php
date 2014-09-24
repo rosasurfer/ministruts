@@ -74,6 +74,7 @@ class Logger extends StaticClass {
       if (strLen($receivers) == 0)                                      // mail()-Funktion benutzt. Die Konfiguration muß deshalb hier
          $receivers = Config ::get('log.mail.receiver', '');            // selbst auf "mail.address.forced-receiver" geprüft werden.
       foreach (explode(',', $receivers) as $receiver) {
+         // TODO: Adressformat validieren
          if ($receiver=trim($receiver))
             self::$mailReceivers[] = $receiver;
       }
@@ -306,14 +307,11 @@ class Logger extends StaticClass {
             $mailMsg = str_replace(chr(0), "*\x00*", $mailMsg);
 
             foreach (self::$mailReceivers as $address) {
-               // TODO: Adressformat validieren
-               if ($address) {
-                  // TODO: Header mit Fehlermeldung hinzufügen, damit beim Empfänger Messagefilter unterstützt werden
-                  $success = error_log($mailMsg, 1, $address, 'Subject: PHP: [FATAL] Uncaught Exception at '.($request ? $request->getHostname():'').$_SERVER['PHP_SELF']);
-                  if (!$success) {
-                     error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", $plainMessage)), 0);
-                     break;
-                  }
+               // TODO: Header mit Fehlermeldung hinzufügen, damit beim Empfänger Messagefilter unterstützt werden
+               $success = error_log($mailMsg, 1, $address, 'Subject: PHP: [FATAL] Uncaught Exception at '.($request ? $request->getHostname():'').$_SERVER['PHP_SELF']);
+               if (!$success) {
+                  error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", $plainMessage)), 0);
+                  break;
                }
             }
          }
@@ -484,14 +482,11 @@ class Logger extends StaticClass {
             $mailMsg = str_replace(chr(0), "*\x00*", $mailMsg);
 
             foreach (self::$mailReceivers as $address) {
-               // TODO: Adressformat validieren
-               if ($address) {
-                  // TODO: Header mit Fehlermeldung hinzufügen, damit beim Empfänger Messagefilter unterstützt werden
-                  $success = error_log($mailMsg, 1, $address, 'Subject: PHP: '.self::$logLevels[$level].' at '.($request ? $request->getHostname():'').$_SERVER['PHP_SELF']);
-                  if (!$success) {
-                     error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", $plainMessage)), 0);
-                     break;
-                  }
+               // TODO: Header mit Fehlermeldung hinzufügen, damit beim Empfänger Messagefilter unterstützt werden
+               $success = error_log($mailMsg, 1, $address, 'Subject: PHP: '.self::$logLevels[$level].' at '.($request ? $request->getHostname():'').$_SERVER['PHP_SELF']);
+               if (!$success) {
+                  error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", $plainMessage)), 0);
+                  break;
                }
             }
          }
