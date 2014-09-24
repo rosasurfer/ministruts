@@ -2,7 +2,7 @@
 /**
  * CurlHttpClient
  *
- * Eine Klasse, die mit cURL HttpRequests ausführen kann.
+ * Eine Klasse, die mit CURL HttpRequests ausführen kann.
  */
 final class CurlHttpClient extends HttpClient {
 
@@ -10,10 +10,10 @@ final class CurlHttpClient extends HttpClient {
    private static /*bool*/ $logDebug, $logInfo, $logNotice;
 
    private /*int*/     $currentRedirect = 0;       // Zähler für manuelle Redirects (falls open_basedir|safe_mode aktiv ist)
-   private /*mixed[]*/ $options         = array(); // zusätzliche cURL-Optionen
+   private /*mixed[]*/ $options         = array(); // zusätzliche CURL-Optionen
 
 
-   // cURL-Fehlerbeschreibungen
+   // CURL-Fehlerbeschreibungen
    private static $errors = array(CURLE_OK                      => 'CURLE_OK'                     ,
                                   CURLE_UNSUPPORTED_PROTOCOL    => 'CURLE_UNSUPPORTED_PROTOCOL'   ,
                                   CURLE_FAILED_INIT             => 'CURLE_FAILED_INIT'            ,
@@ -87,7 +87,7 @@ final class CurlHttpClient extends HttpClient {
    /**
     * Erzeugt eine neue Instanz.
     *
-    * @param mixed[] $options - Array mit zusätzlichen cURL-Optionen (default: keine)
+    * @param mixed[] $options - Array mit zusätzlichen CURL-Optionen (default: keine)
     */
    public function __construct(array $options=null) {
       $loglevel        = Logger ::getLogLevel(__CLASS__);
@@ -103,7 +103,7 @@ final class CurlHttpClient extends HttpClient {
    /**
     * Erzeugt eine neue Instanz der Klasse.
     *
-    * @param mixed[] $options - Array mit zusätzlichen cURL-Optionen (default: keine)
+    * @param mixed[] $options - Array mit zusätzlichen CURL-Optionen (default: keine)
     *
     * @return CurlHttpClient
     */
@@ -162,7 +162,7 @@ final class CurlHttpClient extends HttpClient {
 
       // Request ausführen
       if (curl_exec($hCurl) === false)
-         throw new IOException('cURL error '.self ::getError($hCurl).', url: '.$request->getUrl());
+         throw new IOException('CURL error '.self ::getError($hCurl).', url: '.$request->getUrl());
 
       $response->setStatus($status = curl_getinfo($hCurl, CURLINFO_HTTP_CODE));
       curl_close($hCurl);
@@ -187,9 +187,9 @@ final class CurlHttpClient extends HttpClient {
 
 
    /**
-    * Gibt eine Beschreibung des letzten cURL-Fehlers zurück.
+    * Gibt eine Beschreibung des letzten CURL-Fehlers zurück.
     *
-    * @param resource $hCurl - cURL-Handle
+    * @param resource $hCurl - CURL-Handle
     *
     * @return string
     */
@@ -201,7 +201,7 @@ final class CurlHttpClient extends HttpClient {
          $errorNo = self::$errors[$errorNo];
       }
       else {
-         Logger ::log('Unknown cURL error code: '.$errorNo, L_WARN, __CLASS__);
+         Logger ::log('Unknown CURL error code: '.$errorNo, L_WARN, __CLASS__);
       }
 
       return "$errorNo ($errorStr)";

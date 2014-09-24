@@ -111,10 +111,10 @@ $__classes['Mailer'                         ] = PHPLIB_ROOT.'/php/net/mail/Maile
 $__classes['PHPMailer'                      ] = PHPLIB_ROOT.'/php/net/mail/PHPMailer';
 $__classes['SMTPMailer'                     ] = PHPLIB_ROOT.'/php/net/mail/SMTPMailer';
 
-$__classes['ClickatellSMSMessenger'         ] = PHPLIB_ROOT.'/php/net/message/ClickatellSMSMessenger';
-$__classes['ICQMessenger'                   ] = PHPLIB_ROOT.'/php/net/message/ICQMessenger';
-$__classes['IRCMessenger'                   ] = PHPLIB_ROOT.'/php/net/message/IRCMessenger';
-$__classes['Messenger'                      ] = PHPLIB_ROOT.'/php/net/message/Messenger';
+$__classes['ClickatellSMSMessenger'         ] = PHPLIB_ROOT.'/php/net/messenger/ClickatellSMSMessenger';
+$__classes['ICQMessenger'                   ] = PHPLIB_ROOT.'/php/net/messenger/ICQMessenger';
+$__classes['IRCMessenger'                   ] = PHPLIB_ROOT.'/php/net/messenger/IRCMessenger';
+$__classes['Messenger'                      ] = PHPLIB_ROOT.'/php/net/messenger/Messenger';
 
 $__classes['Action'                         ] = PHPLIB_ROOT.'/php/struts/Action';
 $__classes['ActionForm'                     ] = PHPLIB_ROOT.'/php/struts/ActionForm';
