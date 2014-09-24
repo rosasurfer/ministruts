@@ -105,9 +105,9 @@ function getHeaders($names = null) {
    if     ($names === null)   $names = array();
    elseif (is_string($names)) $names = array($names);
    elseif (is_array($names)) {
-      foreach ($names as $name)
-         if ($name !== (string)$name)
-            throw new Exception('Illegal argument type in argument $names: '.getType($name));
+      foreach ($names as $name) {
+         if (!is_string($name)) throw new Exception('Illegal argument type in argument $names: '.getType($name));
+      }
    }
    else throw new Exception('Illegal type of argument $names: '.getType($names));
 
@@ -158,7 +158,7 @@ function isIPAddress($string, $returnBytes=false) {
 
       foreach ($bytes as $i => $byte) {
          $b = (int) $byte;
-         if ($byte!==(string)$b || $b > 255)
+         if (!is_string($byte) || $b > 255)
             return false;
          $bytes[$i] = $b;
       }

@@ -634,13 +634,11 @@ abstract class RequestBase extends Singleton {
       if     ($names === null)   $names = array();
       elseif (is_string($names)) $names = array($names);
       elseif (is_array($names)) {
-         foreach ($names as $name)
-            if ($name !== (string)$name)
-               throw new IllegalTypeException('Illegal argument type in argument $names: '.getType($name));
+         foreach ($names as $name) {
+            if (!is_string($name)) throw new IllegalTypeException('Illegal argument type in argument $names: '.getType($name));
+         }
       }
-      else {
-         throw new IllegalTypeException('Illegal type of argument $names: '.getType($names));
-      }
+      else throw new IllegalTypeException('Illegal type of argument $names: '.getType($names));
 
       // einmal alle Header einlesen
       static $headers = null;
@@ -801,7 +799,7 @@ abstract class RequestBase extends Singleton {
       if (!is_int($expires)) throw new IllegalTypeException('Illegal type of argument $expires: '.getType($expires));
       if ($expires < 0)      throw new plInvalidArgumentException('Invalid argument $expires: '.$expires);
 
-      $value = (string) $value;
+      $value = (string)$value;
 
       if ($path === null)
          $path = $this->getApplicationPath().'/';

@@ -24,7 +24,7 @@ class CommonValidator extends StaticClass {
 
          foreach ($bytes as $i => $byte) {
             $b = (int) $byte;
-            if ($byte!==(string)$b || $b > 255)
+            if (!is_string($byte) || $b > 255)
                return false;
             $bytes[$i] = $b;
          }
