@@ -1,23 +1,49 @@
 <?php
 /**
- * Logger
+ * Loggt eine Nachricht, wenn der mit der Nachricht angegebene Loglevel den konfigurierten Mindestloglevel erreicht oder
+ * überschreitet.
+ *
+ * Konfiguration:
+ * --------------
+ * Der Loglevel kann für jede Klasse einzeln konfiguriert werden. Ohne Konfiguration gilt der Default-Loglevel L_NOTICE.
+ * Standardmäßig wird die Logmessage am Bildschirm ausgegeben und per E-Mail verschickt.
+ *
+ *  Beispiel:
+ *  ---------
+ *  log.level.MyClassA = warn                # Messages in MyClassA werden geloggt, wenn sie mindestens den Level L_WARN erreichen.
+ *  log.level.MyClassB = debug               # Messages in MyClassB werden geloggt, wenn sie mindestens den level L_DEBUG erreichen.
+ *
+ *  log.mail.receiver = address1@domain.tld,address2@domain.tld
+ *                                           # Logmessages werden an ein oder mehrere E-Mailempfänger verschickt.
+ *
+ *  log.sms.receiver = +41123456,+417890123  # Logmessages per SMS gehen an ein oder mehrere Rufnummern (internationales Format).
+ *  log.sms.loglevel = error                 # Logmessages werden per SMS verschickt, wenn sie mindestens den Level L_ERROR erreichen.
+ *
  *
  * TODO: Logger muß erweitert werden können
  */
 class Logger extends StaticClass {
-
    /**
-    * Diese Klasse sollte möglichst wenige externe Abhängigkeiten haben, um während der Fehlerverarbeitung
-    * auftretende weitere Fehler zu verhindern.
+    * NOTE:
+    * Diese Klasse muß möglichst wenige externe Abhängigkeiten haben, um das Auftreten weiterer Fehler während der
+    * Fehlerverarbeitung möglichst zu verhindern.
     */
 
+   // Default-Konfiguration (kann angepaßt werden, siehe Klassenbeschreibung)
+   private static /*bool    */ $print         = null;       // ob die Nachricht am Bildschirm angezeigt werden soll
+   private static /*bool    */ $mail;                       // ob die Nachricht per E-Mail verschickt werden soll (alle Loglevel)
+   private static /*string[]*/ $mailReceivers = array();    // E-Mailempfänger
+   private static /*bool    */ $sms;                        // ob die Nachricht per SMS verschickt werden soll
+   private static /*string[]*/ $smsReceivers  = array();    // SMS-Empfänger
+   private static /*int     */ $smsLogLevel   = L_FATAL;    // zusätzlicher Loglevel, der den SMS-Versand aktiviert
+
+
+
+   // Default-Loglevel (kann angepaßt werden, siehe Klassenbeschreibung)
    const DEFAULT_LOGLEVEL = L_NOTICE;
 
 
-   private static /*bool*/ $display,   // Ob das Ereignis angezeigt werden soll.
-                  /*bool*/ $mail;      // Ob eine E-Mail verschickt werden soll.
-
-
+   // Beschreibungen der verfügbaren Loglevel
    private static $logLevels = array(L_DEBUG  => '[Debug]' ,
                                      L_INFO   => '[Info]'  ,
                                      L_NOTICE => '[Notice]',
@@ -31,18 +57,39 @@ class Logger extends StaticClass {
     * Initialisiert die statischen Klassenvariablen.
     */
    private static function init() {
-      if (self::$display !== null)
+      if (!is_null(self::$print))
          return;
 
-      $console  = !isSet($_SERVER['REQUEST_METHOD']);       // ob wir in einer Shell laufen
-      $terminal = WINDOWS || (bool) getEnv('TERM');         // ob wir ein Terminal haben
+      // Standardmäßig ist die Ausgabe am Bildschirm bei lokalem Zugriff an und bei Remote-Zugriff aus, es sei denn,
+      // in der php.ini ist ausdrücklich etwas anderes konfiguriert.
+      self::$print = !isSet($_SERVER['REQUEST_METHOD'])                                            // Konsole
+                  || (isSet($_SERVER['REMOTE_ADDR'   ]) && $_SERVER['REMOTE_ADDR']=='127.0.0.1')   // Webrequest vom lokalen Rechner
+                  || (bool) ini_get('display_errors');
 
-      self::$display = ($console && $terminal)
-                    || (isSet($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR']=='127.0.0.1')
-                    || (bool) ini_get('display_errors');
+      // Der E-Mailversand ist aktiv, wenn in der Projektkonfiguration mindestens eine E-Mailadresse angegeben wurde.
+      self::$mail          = false;
+      self::$mailReceivers = array();
+      $receivers = Config ::get('log.mail.receiver', null);
+      foreach (explode(',', $receivers) as $receiver) {
+         if ($receiver=trim($receiver))
+            self::$mailReceivers[] = $receiver;
+      }
+      self::$mail = (bool) self::$mailReceivers;
 
-      self::$mail = !$console || !$terminal;                // Mailversand auch bei $display=TRUE (es könnte ein Ajax-Request sein)
-      //echoPre(__METHOD__.'(): $display: '.(int)self::$display.', $mail: '.(int)self::$mail);
+      // Der SMS-Versand ist aktiv, wenn in der Projektkonfiguration mindestens eine Rufnummer und ein SMS-Loglevel angegeben wurden.
+      self::$sms          = false;
+      self::$smsReceivers = array();
+      $receivers = Config ::get('log.sms.receiver', null);
+      foreach (explode(',', $receivers) as $receiver) {
+         if ($receiver=trim($receiver))
+            self::$smsReceivers[] = $receiver;
+      }
+      $logLevel = Config ::get('log.sms.loglevel', null);
+      if (strLen($logLevel) > 0) {
+         if (defined('L_'.strToUpper($logLevel))) self::$smsLogLevel = constant('L_'.strToUpper($logLevel));
+         else                                     self::$smsLogLevel = null;
+      }
+      self::$sms = (self::$smsReceivers && self::$smsLogLevel);
    }
 
 
@@ -57,19 +104,16 @@ class Logger extends StaticClass {
       static $logLevels = null;
 
       if ($logLevels === null) {
-         // Loglevel-Konfiguration verarbeiten
-         $logLevels = Config ::get('logger', array());
-         if ($logLevels === (string)$logLevels)
+         // Die konfigurierten Loglevel werden einmal eingelesen und gecacht. Nachfolgende Logger-Aufrufe verwenden nur noch den Cache.
+         $logLevels = Config ::get('log.level', array());
+         if (is_string($logLevels))
             $logLevels = array('' => $logLevels);
 
          foreach ($logLevels as $className => $level) {
-            if ($level!==(string)$level)
-               throw new IllegalTypeException('Illegal log level type ('.getType($level).') for class: '.$className);
-
+            if (!is_string($level)) throw new IllegalTypeException('Illegal log level type for class '.$className.': '.getType($level));
             if     ($level == '')                     $logLevels[$className] = self:: DEFAULT_LOGLEVEL;
             elseif (defined('L_'.strToUpper($level))) $logLevels[$className] = constant('L_'.strToUpper($level));
-            else
-               throw new plInvalidArgumentException('Invalid log level for class '.$className.': '.$level);
+            else                    throw new plInvalidArgumentException('Invalid log level for class '.$className.': '.$level);
          }
       }
 
@@ -203,7 +247,7 @@ class Logger extends StaticClass {
 
 
          // 1. Fehlerdaten ermitteln
-         $message  = ($exception instanceof NestableException) ? (string) $exception : get_class($exception).': '.$exception->getMessage();
+         $message  = ($exception instanceof NestableException) ? (string)$exception : get_class($exception).': '.$exception->getMessage();
          $traceStr = ($exception instanceof NestableException) ? "Stacktrace:\n-----------\n".$exception->printStackTrace(true) : 'Stacktrace not available';
          // TODO: vernestelte, einfache Exceptions geben fehlerhaften Stacktrace zurück
          $file     =  $exception->getFile();
@@ -211,19 +255,18 @@ class Logger extends StaticClass {
          $plainMessage = '[FATAL] Uncaught '.$message."\nin ".$file.' on line '.$line."\n";
 
 
-         // 2. Exception anzeigen (wenn $display TRUE ist)
-         if (self::$display) {
+         // 2. Exception anzeigen (wenn $print TRUE ist)
+         if (self::$print) {
             if (isSet($_SERVER['REQUEST_METHOD'])) {
                echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif"><b>[FATAL] Uncaught</b> '.nl2br(htmlSpecialChars($message, ENT_QUOTES))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
                echo '<br>'.printFormatted($traceStr, true);
                echo "<br></div>\n";
 
                // Wurde ein Redirect-Header gesendet (oder gesetzt), ist die soeben gemachte Ausgabe verloren. Die Ausgabe kann nur durch zusätzliches Mailen "gerettet" werden.
-               // Dies kann vor echo() jedoch nicht zuverlässig ermittelt werden, da der Redirect-Header evt. zwar gesetzt, die Header aber noch nicht gesendet sein können.
+               // Dies kann vor echo() jedoch nicht zuverlässig ermittelt werden, da der Redirect-Header zwar schon gesetzt, die Header aber evt. noch nicht gesendet sein können.
                foreach (headers_list() as $header) {
                   if (striPos($header, 'Location: ') === 0) {
-                     self::$display = false;
-                     self::$mail    = true;
+                     self::$print = false;
                      break;
                   }
                }
@@ -235,7 +278,7 @@ class Logger extends StaticClass {
 
 
          // 3. Exception an die registrierten Adressen mailen (wenn $mail TRUE ist) ...
-         if (self::$mail && ($addresses = Config ::get('mail.address.buglovers'))) {
+         if (self::$mail) {
             $mailMsg  = $plainMessage."\n".$traceStr;
 
             if ($request=Request ::me()) {
@@ -262,11 +305,12 @@ class Logger extends StaticClass {
             if (isSet($_SERVER['SERVER_ADMIN']))
                ini_set('sendmail_from', $_SERVER['SERVER_ADMIN']);                           // nur für Windows relevant
 
-            $addresses = Config ::get('mail.address.forced-receiver', $addresses);
-
-            foreach (explode(',', $addresses) as $address) {
+            $addresses = Config ::get('mail.address.forced-receiver', null);
+            if (strLen($addresses=trim($addresses)) > 0) $addresses = explode(',', $addresses);
+            else                                         $addresses = self::$mailReceivers;
+            foreach ($addresses as $address) {
                // TODO: Adressformat validieren
-               if ($address) {
+               if ($address=trim($address)) {
                   // TODO: Header mit Fehlermeldung hinzufügen, damit beim Empfänger Messagefilter unterstützt werden
                   $success = error_log($mailMsg, 1, $address, 'Subject: PHP: [FATAL] Uncaught Exception at '.($request ? $request->getHostname():'').$_SERVER['PHP_SELF']);
                   if (!$success) {
@@ -278,7 +322,7 @@ class Logger extends StaticClass {
             ini_set('sendmail_from', $old_sendmail_from);
          }
 
-         // Exception immer ins Error-Log schreiben, wenn sie nicht per Mail rausgegangen ist (auch bei $display=TRUE)
+         // Exception ins Error-Log schreiben, wenn sie nicht per Mail rausgegangen ist
          else {
             error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", $plainMessage)), 0);       // Zeilenumbrüche entfernen
          }
@@ -286,11 +330,11 @@ class Logger extends StaticClass {
       catch (Exception $secondEx) {
          $file = $exception->getFile();
          $line = $exception->getLine();
-         error_log('PHP primary '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", (string) $exception).' in '.$file.' on line '.$line), 0);
+         error_log('PHP primary '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", (string)$exception).' in '.$file.' on line '.$line), 0);
 
          $file = $secondEx->getFile();
          $line = $secondEx->getLine();
-         error_log('PHP secondary '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", (string) $secondEx).' in '.$file.' on line '.$line), 0);
+         error_log('PHP secondary '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", (string)$secondEx).' in '.$file.' on line '.$line), 0);
       }
    }
 
@@ -332,7 +376,7 @@ class Logger extends StaticClass {
 
       // Aufruf mit drei Argumenten
       if ($args == 3) {
-         if ($message===null || $message===(string)$message)
+         if (is_null($message) || is_string($message))
             return self:: _log($message, null, $level);        // Logger::log($message  , $level, $class)
          if ($exception instanceof Exception)
             return self:: _log(null, $exception, $level);      // Logger::log($exception, $level, $class)
@@ -396,8 +440,8 @@ class Logger extends StaticClass {
          $plainMessage = self::$logLevels[$level].': '.$message."\nin ".$file.' on line '.$line."\n";
 
 
-         // 2. Logmessage anzeigen (wenn $display TRUE ist)
-         if (self::$display) {
+         // 2. Logmessage anzeigen (wenn $print TRUE ist)
+         if (self::$print) {
             if (isSet($_SERVER['REQUEST_METHOD'])) {
                echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.self::$logLevels[$level].'</b>: '.nl2br(htmlSpecialChars($message, ENT_QUOTES))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
                if ($exception)
@@ -410,8 +454,7 @@ class Logger extends StaticClass {
                // (kann vorher nicht zuverlässig ermittelt werden, da die Header noch nicht gesendet sein können)
                foreach (headers_list() as $header) {
                   if (striPos($header, 'Location: ') === 0) {
-                     self::$display = false;
-                     self::$mail    = true;
+                     self::$print = false;
                      break;
                   }
                }
@@ -423,7 +466,7 @@ class Logger extends StaticClass {
 
 
          // 3. Logmessage an die registrierten Adressen mailen (wenn $mail TRUE ist) ...
-         if (self::$mail && ($addresses = Config ::get('mail.address.buglovers'))) {
+         if (self::$mail) {
             $mailMsg = $plainMessage.($exception ? "\n\n".$exMessage."\n":'')."\n\n".$trace;
 
             if ($request=Request ::me()) {
@@ -450,11 +493,12 @@ class Logger extends StaticClass {
             if (isSet($_SERVER['SERVER_ADMIN']))
                ini_set('sendmail_from', $_SERVER['SERVER_ADMIN']);                           // nur für Windows relevant
 
-            $addresses = Config ::get('mail.address.forced-receiver', $addresses);
-
-            foreach (explode(',', $addresses) as $address) {
+            $addresses = Config ::get('mail.address.forced-receiver', null);
+            if (strLen($addresses=trim($addresses)) > 0) $addresses = explode(',', $addresses);
+            else                                         $addresses = self::$mailReceivers;
+            foreach ($addresses as $address) {
                // TODO: Adressformat validieren
-               if ($address) {
+               if ($address=trim($address)) {
                   // TODO: Header mit Fehlermeldung hinzufügen, damit beim Empfänger Messagefilter unterstützt werden
                   $success = error_log($mailMsg, 1, $address, 'Subject: PHP: '.self::$logLevels[$level].' at '.($request ? $request->getHostname():'').$_SERVER['PHP_SELF']);
                   if (!$success) {
@@ -467,7 +511,7 @@ class Logger extends StaticClass {
          }
 
          // ... oder Logmessage ins Error-Log schreiben, falls sie nicht schon angezeigt wurde
-         elseif (!self::$display) {
+         elseif (!self::$print) {
             error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", $plainMessage)), 0);                           // Zeilenumbrüche entfernen
          }
       }

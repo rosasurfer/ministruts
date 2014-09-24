@@ -58,7 +58,7 @@
  * db.database  = db_test
  *
  * # Kommentar in eigener Zeile
- * logger.Action = warn          # Kommentar am Ende einer Zeile
+ * log.level.Action = warn             # Kommentar am Ende einer Zeile
  */
 final class Config extends Object {
 

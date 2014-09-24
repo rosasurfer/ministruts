@@ -1,3 +1,10 @@
+2014-09-24
+
+   - php/util/Logger: - Logging per E-Mail überarbeitet: Ist eine Mailadresse konfiguriert, wird immer eine Mail verschickt
+                        (auch in der Konsole), ggf. kann der Versand per Konfiguration deaktiviert werden.
+                      - Mailkonfiguration angepaßt: Schlüssel "mail.address.buglovers" zu "log.mail.receiver"
+                      
+
 2014-09-21
 
    - neue Basisklassen für verschiedene Messenger-Implementierungen (ICQ, IRC, SMS)
