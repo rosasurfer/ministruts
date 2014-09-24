@@ -5,7 +5,7 @@
 final class HeaderParser extends Object {
 
 
-   private $header = array();
+   private $headers = array();
    private $currentHeader;
 
 
