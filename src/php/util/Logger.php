@@ -66,15 +66,19 @@ class Logger extends StaticClass {
                   || (isSet($_SERVER['REMOTE_ADDR'   ]) && $_SERVER['REMOTE_ADDR']=='127.0.0.1')   // Webrequest vom lokalen Rechner
                   || (bool) ini_get('display_errors');
 
+
       // Der E-Mailversand ist aktiv, wenn in der Projektkonfiguration mindestens eine E-Mailadresse angegeben wurde.
       self::$mail          = false;
       self::$mailReceivers = array();
-      $receivers = Config ::get('log.mail.receiver', null);
+      $receivers = Config ::get('mail.address.forced-receiver', '');    // Zum mailen wird keine Klasse, sondern die PHP-interne
+      if (strLen($receivers) == 0)                                      // mail()-Funktion benutzt. Die Konfiguration muß deshalb hier
+         $receivers = Config ::get('log.mail.receiver', '');            // selbst auf "mail.address.forced-receiver" geprüft werden.
       foreach (explode(',', $receivers) as $receiver) {
          if ($receiver=trim($receiver))
             self::$mailReceivers[] = $receiver;
       }
       self::$mail = (bool) self::$mailReceivers;
+
 
       // Der SMS-Versand ist aktiv, wenn in der Projektkonfiguration mindestens eine Rufnummer und ein SMS-Loglevel angegeben wurden.
       self::$sms          = false;
@@ -207,8 +211,8 @@ class Logger extends StaticClass {
 
 
       // ... und behandeln
-      if     ($level == E_USER_NOTICE ) self:: _log(null, $exception, L_NOTICE);
-      elseif ($level == E_USER_WARNING) self:: _log(null, $exception, L_WARN  );
+      if     ($level == E_USER_NOTICE ) self:: log_1(null, $exception, L_NOTICE);
+      elseif ($level == E_USER_WARNING) self:: log_1(null, $exception, L_WARN  );
       else {
          // Spezialfälle, die nicht zurückgeworfen werden dürfen/können
          if ($level==E_STRICT || ($file=='Unknown' && $line==0)) {
@@ -301,16 +305,9 @@ class Logger extends StaticClass {
             $mailMsg = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $mailMsg)) : str_replace("\r\n", "\n", $mailMsg);
             $mailMsg = str_replace(chr(0), "*\x00*", $mailMsg);
 
-            $old_sendmail_from = ini_get('sendmail_from');
-            if (isSet($_SERVER['SERVER_ADMIN']))
-               ini_set('sendmail_from', $_SERVER['SERVER_ADMIN']);                           // nur für Windows relevant
-
-            $addresses = Config ::get('mail.address.forced-receiver', null);
-            if (strLen($addresses=trim($addresses)) > 0) $addresses = explode(',', $addresses);
-            else                                         $addresses = self::$mailReceivers;
-            foreach ($addresses as $address) {
+            foreach (self::$mailReceivers as $address) {
                // TODO: Adressformat validieren
-               if ($address=trim($address)) {
+               if ($address) {
                   // TODO: Header mit Fehlermeldung hinzufügen, damit beim Empfänger Messagefilter unterstützt werden
                   $success = error_log($mailMsg, 1, $address, 'Subject: PHP: [FATAL] Uncaught Exception at '.($request ? $request->getHostname():'').$_SERVER['PHP_SELF']);
                   if (!$success) {
@@ -319,7 +316,6 @@ class Logger extends StaticClass {
                   }
                }
             }
-            ini_set('sendmail_from', $old_sendmail_from);
          }
 
          // Exception ins Error-Log schreiben, wenn sie nicht per Mail rausgegangen ist
@@ -340,54 +336,52 @@ class Logger extends StaticClass {
 
 
    /**
-    * Loggt eine Message und/oder eine Exception. Überladene Methode.
+    * Überladene Methode.  Loggt eine Message und/oder eine Exception.
     *
-    * Methodensignaturen:
-    * -------------------
+    * Signaturen:
+    * -----------
     * Logger::log($message,             $level, $class)
     * Logger::log(          $exception, $level, $class)
     * Logger::log($message, $exception, $level, $class)
     */
-   public static function log($arg1 = null, $arg2 = null, $arg3 = null, $arg4 = null) {
+   public static function log($arg1=null, $arg2=null, $arg3=null, $arg4=null) {
+      $argc    = func_num_args();
       $message = $exception = $level = $class = null;
 
-      $args = func_num_args();
-      if ($args == 3) {
+      if ($argc == 3) {
          $message = $exception = $arg1;
          $level   = $arg2;
          $class   = $arg3;
       }
-      elseif ($args == 4) {
+      elseif ($argc == 4) {
          $message   = $arg1;
          $exception = $arg2;
          $level     = $arg3;
          $class     = $arg4;
       }
-      else {
-         throw new plInvalidArgumentException('Invalid number of arguments: '.$args);
-      }
+      else throw new plInvalidArgumentException('Invalid number of arguments: '.$argc);
 
-      if ($level!==(int)$level) throw new IllegalTypeException('Illegal type of parameter $level: '.getType($level));
-      if (!is_string($class))   throw new IllegalTypeException('Illegal type of parameter $class: '.getType($class));
+      if (!is_int($level))    throw new IllegalTypeException('Illegal type of parameter $level: '.getType($level));
+      if (!is_string($class)) throw new IllegalTypeException('Illegal type of parameter $class: '.getType($class));
 
       // was der jeweilige Loglevel nicht abdeckt, wird ignoriert
       if ($level < self ::getLogLevel($class))
          return;
 
       // Aufruf mit drei Argumenten
-      if ($args == 3) {
+      if ($argc == 3) {
          if (is_null($message) || is_string($message))
-            return self:: _log($message, null, $level);        // Logger::log($message  , $level, $class)
+            return self:: log_1($message, null, $level);       // Logger::log($message  , $level, $class)
          if ($exception instanceof Exception)
-            return self:: _log(null, $exception, $level);      // Logger::log($exception, $level, $class)
+            return self:: log_1(null, $exception, $level);     // Logger::log($exception, $level, $class)
          throw new IllegalTypeException('Illegal type of first parameter: '.getType($arg1));
       }
 
       // Aufruf mit vier Argumenten
-      if ($message!==null && !is_string($message))               throw new IllegalTypeException('Illegal type of parameter $message: '.getType($message));
-      if ($exception!==null && !$exception instanceof Exception) throw new IllegalTypeException('Illegal type of parameter $exception: '.(is_object($exception) ? get_class($exception) : getType($exception)));
+      if (!is_null($message) && !is_string($message))               throw new IllegalTypeException('Illegal type of parameter $message: '.(is_object($message) ? get_class($message) : getType($message)));
+      if (!is_null($exception) && !$exception instanceof Exception) throw new IllegalTypeException('Illegal type of parameter $exception: '.(is_object($exception) ? get_class($exception) : getType($exception)));
 
-      return self:: _log($message, $exception, $level);        // Logger::log($message, $exception, $level, $class)
+      return self:: log_1($message, $exception, $level);       // Logger::log($message, $exception, $level, $class)
    }
 
 
@@ -400,7 +394,7 @@ class Logger extends StaticClass {
     * @param Exception $exception - zu loggende Exception
     * @param int       $level     - zu loggender Loglevel
     */
-   private static function _log($message, Exception $exception = null, $level) {
+   private static function log_1($message, Exception $exception=null, $level) {
       $plainMessage = null;
 
       try {
@@ -424,7 +418,7 @@ class Logger extends StaticClass {
             $trace = $exception ? $exception->getTrace() : debug_backtrace();
             $trace = NestableException ::transformToJavaStackTrace($trace);
             array_shift($trace);
-            array_shift($trace);          // die ersten beiden Frames können weg: 1. Logger::_log(), 2: Logger::log()
+            array_shift($trace);          // die ersten beiden Frames können weg: 1. Logger::log_1(), 2: Logger::log()
 
             foreach ($trace as $f) {      // ersten Frame mit __FILE__ suchen
                if (isSet($f['file'])) {
@@ -489,16 +483,9 @@ class Logger extends StaticClass {
             $mailMsg = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $mailMsg)) : str_replace("\r\n", "\n", $mailMsg);
             $mailMsg = str_replace(chr(0), "*\x00*", $mailMsg);
 
-            $old_sendmail_from = ini_get('sendmail_from');
-            if (isSet($_SERVER['SERVER_ADMIN']))
-               ini_set('sendmail_from', $_SERVER['SERVER_ADMIN']);                           // nur für Windows relevant
-
-            $addresses = Config ::get('mail.address.forced-receiver', null);
-            if (strLen($addresses=trim($addresses)) > 0) $addresses = explode(',', $addresses);
-            else                                         $addresses = self::$mailReceivers;
-            foreach ($addresses as $address) {
+            foreach (self::$mailReceivers as $address) {
                // TODO: Adressformat validieren
-               if ($address=trim($address)) {
+               if ($address) {
                   // TODO: Header mit Fehlermeldung hinzufügen, damit beim Empfänger Messagefilter unterstützt werden
                   $success = error_log($mailMsg, 1, $address, 'Subject: PHP: '.self::$logLevels[$level].' at '.($request ? $request->getHostname():'').$_SERVER['PHP_SELF']);
                   if (!$success) {
@@ -507,7 +494,6 @@ class Logger extends StaticClass {
                   }
                }
             }
-            ini_set('sendmail_from', $old_sendmail_from);
          }
 
          // ... oder Logmessage ins Error-Log schreiben, falls sie nicht schon angezeigt wurde

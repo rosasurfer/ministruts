@@ -185,24 +185,22 @@ final class Config extends Object {
     * Gibt die unter dem angegebenen Schlüssel gespeicherte Einstellung zurück.  Existiert die Einstellung
     * nicht, wird der angegebene Defaultwert zurückgegeben.
     *
-    * @param string $key     - Schlüssel
-    * @param mixed  $default - Defaultwert (kann auch NULL sein, um z.B. eine Exception zu verhindern)
+    * @param  string $key     - Schlüssel
+    * @param  mixed  $default - Defaultwert (kann auch NULL sein, um z.B. eine Exception zu verhindern)
     *
     * @return mixed - Konfigurationseinstellung
     *
     * @throws plRuntimeException - wenn unter dem angegebenen Schlüssel keine Einstellung existiert und
     *                              kein Defaultwert angegeben wurde
     */
-   public static function get($key, $default = null) {
+   public static function get($key, $default=null) {
       if (!is_string($key)) throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
 
       // TODO: Typen erkennen und automatisch casten
       $value = self ::me()->getProperty($key);
 
-      if ($value === null) {
-         if (func_num_args() == 1)
-            throw new plRuntimeException('Missing configuration setting for key "'.$key.'"');
-
+      if (is_null($value)) {
+         if (func_num_args() == 1) throw new plRuntimeException('Missing configuration setting for key "'.$key.'"');
          return $default;
       }
 
