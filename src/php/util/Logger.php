@@ -166,20 +166,20 @@ class Logger extends StaticClass {
 
 
    /**
-    * Globaler Handler für herkömmliche PHP-Fehler. Die Fehler werden in einer PHPErrorException
-    * gekapselt und je nach Error-Level behandelt.  E_USER_NOTICE und E_USER_WARNING werden nur
-    * geloggt (kein Scriptabbruch).
+    * Globaler Handler für herkömmliche PHP-Fehler. Die Fehler werden in einer PHPErrorException gekapselt und je nach
+    * Errorlevel behandelt.  E_USER_NOTICE und E_USER_WARNING werden nur geloggt (kein Scriptabbruch).
     *
-    * @param int     $level   - Error-Level
-    * @param string  $message - Error-Message
-    * @param string  $file    - Datei, in der der Fehler auftrat
-    * @param int     $line    - Zeile der Datei, in der der Fehler auftrat
-    * @param mixed[] $context - aktive Symboltabelle des Punktes, an dem der Fehler auftrat
-    *                           (An array that points to the active symbol table at the point the error occurred. In other words, $context will contain an array
-    *                            of every variable that existed in the scope the error was triggered in. User error handler must not modify error context.)
+    * @param  int     $level   - Errorlevel
+    * @param  string  $message - Errormessage
+    * @param  string  $file    - Datei, in der der Fehler auftrat
+    * @param  int     $line    - Zeile der Datei, in der der Fehler auftrat
+    * @param  mixed[] $context - aktive Symboltabelle des Punktes, an dem der Fehler auftrat
+    *                            An array that points to the active symbol table at the point the error occurred. In other words, $context
+    *                            will contain an array of every variable that existed in the scope the error was triggered in. User error
+    *                            handler must not modify this context.
     *
-    * @return bool - TRUE,  wenn der Fehler erfolgreich behandelt wurde, FALSE, wenn der Fehler
-    *                weitergereicht werden soll, als wenn der Errorhandler nicht registriert wäre
+    * @return bool - TRUE,  wenn der Fehler erfolgreich behandelt wurde
+    *                FALSE, wenn der Fehler weitergereicht werden soll, als wenn der Errorhandler nicht registriert wäre
     *
     * NOTE: The error handler must return FALSE to populate $php_errormsg.
     */
@@ -194,13 +194,18 @@ class Logger extends StaticClass {
 
 
       /**
-       * PHP v5.3 bug: An error triggered at compile-time disables __autoload(), and spl_autoload() at the same time.
-       *               Won't be fixed for PHP5.3 as it may cause lots of other problems.
+       * PHP v5.3 bug: An error triggered at compile-time disables __autoload() (and spl_autoload() at the same time).
+       *               Won't be fixed for PHP 5.3 as it may cause lots of other problems.
        *
        * @see https://bugs.php.net/bug.php?id=47987
        *
-       * Wir müssen alle im Errorhandler evt. benötigten Klassen samt Hierarchie manuell laden.
-       * Danke, PHP-Team!
+       * Fixed in PHP 5.4.21  (2013-10-17)
+       *
+       * @see  https://bugs.php.net/bug.php?id=65322
+       *
+       *
+       * Fazit: Wir müssen alle im Errorhandler benötigten Klassen samt Hierarchie manuell laden.
+       *        Danke, PHP-Team!
        */
       __autoload('NestableException', true);
       __autoload('PHPErrorException', true);
@@ -217,7 +222,7 @@ class Logger extends StaticClass {
       else {
          // Spezialfälle, die nicht zurückgeworfen werden dürfen/können
          if ($level==E_STRICT || ($file=='Unknown' && $line==0)) {
-            self ::handleException($exception);
+            self:: handleException($exception);
             exit(1);
          }
 
@@ -240,7 +245,7 @@ class Logger extends StaticClass {
     */
    public static function handleException(Exception $exception, $destructor = false) {
       try {
-         self ::init();
+         self:: init();
 
          // TODO: Fatal error: Ignoring exception from ***::__destruct() while an exception is already active (Uncaught PHPErrorException in E:\Projekte\ministruts\src\php\file\image\barcode\test\image.php on line 19)
          //                    in E:\Projekte\ministruts\src\php\file\image\barcode\test\image.php on line 33
@@ -266,19 +271,10 @@ class Logger extends StaticClass {
                echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif"><b>[FATAL] Uncaught</b> '.nl2br(htmlSpecialChars($message, ENT_QUOTES))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
                echo '<br>'.printFormatted($traceStr, true);
                echo "<br></div>\n";
-
-               // Wurde ein Redirect-Header gesendet (oder gesetzt), ist die soeben gemachte Ausgabe verloren. Die Ausgabe kann nur durch zusätzliches Mailen "gerettet" werden.
-               // Dies kann vor echo() jedoch nicht zuverlässig ermittelt werden, da der Redirect-Header zwar schon gesetzt, die Header aber evt. noch nicht gesendet sein können.
-               foreach (headers_list() as $header) {
-                  if (striPos($header, 'Location: ') === 0) {
-                     self::$print = false;
-                     break;
-                  }
-               }
             }
             else {
-               echo $plainMessage."\n".$traceStr."\n";   // PHP gibt den Fehler unter Linux zusätzlich auf stderr aus,
-            }                                            // also auf der Konsole ggf. unterdrücken
+               echo $plainMessage."\n".$traceStr."\n";            // PHP gibt den Fehler unter Linux zusätzlich auf STDERR aus,
+            }                                                     // also auf der Konsole ggf. unterdrücken
          }
 
 
@@ -316,7 +312,8 @@ class Logger extends StaticClass {
             }
          }
 
-         // Exception ins Error-Log schreiben, wenn sie nicht per Mail rausgegangen ist
+
+         // (4) Logmessage ins Error-Log schreiben, wenn sie nicht per Mail rausging
          else {
             error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", $plainMessage)), 0);       // Zeilenumbrüche entfernen
          }
@@ -363,7 +360,7 @@ class Logger extends StaticClass {
       if (!is_string($class)) throw new IllegalTypeException('Illegal type of parameter $class: '.getType($class));
 
       // was der jeweilige Loglevel nicht abdeckt, wird ignoriert
-      if ($level < self ::getLogLevel($class))
+      if ($level < self:: getLogLevel($class))
          return;
 
       // Aufruf mit drei Argumenten
@@ -397,7 +394,7 @@ class Logger extends StaticClass {
 
       try {
          if (!isSet(self::$logLevels[$level])) throw new plInvalidArgumentException('Invalid log level: '.$level);
-         self ::init();
+         self:: init();
 
          // 1. Logdaten ermitteln
          $exMessage = null;
@@ -416,9 +413,9 @@ class Logger extends StaticClass {
             $trace = $exception ? $exception->getTrace() : debug_backtrace();
             $trace = NestableException ::transformToJavaStackTrace($trace);
             array_shift($trace);
-            array_shift($trace);          // die ersten beiden Frames können weg: 1. Logger::log_1(), 2: Logger::log()
+            array_shift($trace);                // die ersten beiden Frames können weg: 1. Logger::log_1(), 2: Logger::log()
 
-            foreach ($trace as $f) {      // ersten Frame mit __FILE__ suchen
+            foreach ($trace as $f) {            // ersten Frame mit __FILE__ suchen
                if (isSet($f['file'])) {
                   $file = $f['file'];
                   $line = $f['line'];
@@ -441,15 +438,6 @@ class Logger extends StaticClass {
                echo '<br>'.printFormatted($trace, true)."<br></div>";
                if ($request=Request ::me())
                   echo '<br>'.printFormatted("Request:\n--------\n".$request, true)."<br></div><br>";
-
-               // Wurde ein Redirect-Header gesendet, ist die Ausgabe verloren und muß zusätzlich gemailt werden
-               // (kann vorher nicht zuverlässig ermittelt werden, da die Header noch nicht gesendet sein können)
-               foreach (headers_list() as $header) {
-                  if (striPos($header, 'Location: ') === 0) {
-                     self::$print = false;
-                     break;
-                  }
-               }
             }
             else {
                echo $plainMessage.($exception ? "\n".$exMessage."\n":'')."\n".$trace."\n";
@@ -491,8 +479,9 @@ class Logger extends StaticClass {
             }
          }
 
-         // ... oder Logmessage ins Error-Log schreiben, falls sie nicht schon angezeigt wurde
-         elseif (!self::$print) {
+
+         // (4) Logmessage ins Error-Log schreiben, wenn sie nicht per Mail rausging
+         else {
             error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", $plainMessage)), 0);                           // Zeilenumbrüche entfernen
          }
       }
