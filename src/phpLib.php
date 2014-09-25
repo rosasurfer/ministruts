@@ -25,6 +25,10 @@ if (!defined('APPLICATION_NAME')) exit('The PHP constant APPLICATION_NAME must b
 if (!defined('APPLICATION_ROOT')) exit('The PHP constant APPLICATION_ROOT must be defined (see "'.PHPLIB_ROOT.DIRECTORY_SEPARATOR.'doc'.DIRECTORY_SEPARATOR.'project.skel'.DIRECTORY_SEPARATOR.'index.php")');
 
 
+// ob wir unter Windows laufen
+define('WINDOWS', (strToUpper(subStr(PHP_OS, 0, 3))==='WIN'));
+
+
 // phpInfo()-Aufrufe abfangen
 // --------------------------
 if (subStr($_SERVER['PHP_SELF'], -12) == '/phpinfo.php') {
@@ -142,6 +146,11 @@ $__classes['String'                         ] = PHPLIB_ROOT.'/php/util/String';
 $__classes['ApdProfile'                     ] = PHPLIB_ROOT.'/php/util/apd/ApdProfile';
 
 
+// Errorlevel
+!defined('E_RECOVERABLE_ERROR') && define('E_RECOVERABLE_ERROR',  4096);   // since PHP 5.2.0
+!defined('E_DEPRECATED'       ) && define('E_DEPRECATED'       ,  8192);   // since PHP 5.3.0
+!defined('E_USER_DEPRECATED'  ) && define('E_USER_DEPRECATED'  , 16384);   // since PHP 5.3.0
+
 // Loglevel
 define('L_DEBUG' ,  1);
 define('L_INFO'  ,  2);
@@ -150,11 +159,11 @@ define('L_WARN'  ,  8);
 define('L_ERROR' , 16);
 define('L_FATAL' , 32);
 
-// Logdestinations
-define('LOG_SYSLOG'  , 0);                   // message is sent to PHP's system logger
-define('LOG_MAIL'    , 1);                   // message is sent by email
-define('LOG_DEBUGGER', 2);                   // message is sent through the PHP debugging connection
-define('LOG_FILE'    , 3);                   // message is appended to a file destination
+// Logdestinations für die PHP-Funktion error_log()
+define('ERROR_LOG_SYSLOG', 0);                        // message is sent to PHP's system logger
+define('ERROR_LOG_MAIL'  , 1);                        // message is sent by email
+define('ERROR_LOG_DEBUG' , 2);                        // message is sent through the PHP debugging connection
+define('ERROR_LOG_FILE'  , 3);                        // message is appended to a file destination
 
 // Zeitkonstanten
 define('SECOND',   1          ); define('SECONDS', SECOND);
@@ -172,9 +181,6 @@ define('WEDNESDAY', 3);
 define('THURSDAY' , 4);
 define('FRIDAY'   , 5);
 define('SATURDAY' , 6);
-
-// ob wir unter Windows laufen
-define('WINDOWS', (strToUpper(subStr(PHP_OS, 0, 3))==='WIN'));
 
 
 // Errorhandler anonym registrieren, damit die Klasse nicht schon hier geladen wird
@@ -457,7 +463,7 @@ function echoPre($var) {
  *
  * @return string - Rückgabewert, wenn $return TRUE ist, NULL andererseits
  */
-function printFormatted($var, $return = false) {
+function printFormatted($var, $return=false) {
    if (is_object($var) && method_exists($var, '__toString')) {
       $str = $var->__toString();
    }
@@ -715,5 +721,40 @@ function shell_exec_fix($cmd) {
  */
 function ifNull($value, $altValue) {
    return ($value===null) ? $altValue : $value;
+}
+
+
+/**
+ * Gibt den angegebenen Errorlevel in lesbarer Form zurück.
+ *
+ * @param  int $level - Errorlevel, ohne Angabe wird der aktuelle Errorlevel des laufenden Scriptes ausgewertet.
+ *
+ * @return string
+ */
+function errorLevelToStr($level=null) {
+   if (func_num_args() && !is_int($level)) throw new IllegalTypeException('Illegal type of parameter $level: '.getType($level));
+
+   $levels = array();
+   if (!$level)
+      $level = error_reporting();
+
+   if ($level & E_ERROR            ) $levels[] = 'E_ERROR';                //     1
+   if ($level & E_WARNING          ) $levels[] = 'E_WARNING';              //     2
+   if ($level & E_PARSE            ) $levels[] = 'E_PARSE';                //     4
+   if ($level & E_NOTICE           ) $levels[] = 'E_NOTICE';               //     8
+   if ($level & E_CORE_ERROR       ) $levels[] = 'E_CORE_ERROR';           //    16
+   if ($level & E_CORE_WARNING     ) $levels[] = 'E_CORE_WARNING';         //    32
+   if ($level & E_COMPILE_ERROR    ) $levels[] = 'E_COMPILE_ERROR';        //    64
+   if ($level & E_COMPILE_WARNING  ) $levels[] = 'E_COMPILE_WARNING';      //   128
+   if ($level & E_USER_ERROR       ) $levels[] = 'E_USER_ERROR';           //   256
+   if ($level & E_USER_WARNING     ) $levels[] = 'E_USER_WARNING';         //   512
+   if ($level & E_USER_NOTICE      ) $levels[] = 'E_USER_NOTICE';          //  1024
+   if ($level & E_STRICT           ) $levels[] = 'E_STRICT';               //  2048: since PHP 5 but not included in E_ALL until PHP 5.4.0
+   if ($level & E_RECOVERABLE_ERROR) $levels[] = 'E_RECOVERABLE_ERROR';    //  4096: since PHP 5.2.0
+   if ($level & E_DEPRECATED       ) $levels[] = 'E_DEPRECATED';           //  8192: since PHP 5.3.0
+   if ($level & E_USER_DEPRECATED  ) $levels[] = 'E_USER_DEPRECATED';      // 16384: since PHP 5.3.0
+   if ($level & E_ALL              ) $levels[] = 'E_ALL';                  //      : 32767 in PHP 5.4.x, 30719 in PHP 5.3.x, 6143 in PHP 5.2.x, 2047 previously
+
+   return join('|', $levels).' ('.$level.')';
 }
 ?>

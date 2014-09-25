@@ -28,39 +28,48 @@ if (!function_exists('echoPre')) {
 }
 
 
-/**
- * Gibt einen Errorlevel in lesbarer Form zurück.
- *
- * @param int $level - Errorlevel, ohne Angabe wird der aktuellen Errorlevel des laufenden Scriptes ausgewertet.
- *
- * @return string
- */
-function errorLevelToStr($level=null) {
-   if (func_num_args() && $level!==(int)$level) throw new IllegalTypeException('Illegal type of parameter $level: '.getType($level));
+!defined('E_RECOVERABLE_ERROR') && define('E_RECOVERABLE_ERROR',  4096);   // since PHP 5.2.0
+!defined('E_DEPRECATED'       ) && define('E_DEPRECATED'       ,  8192);   // since PHP 5.3.0
+!defined('E_USER_DEPRECATED'  ) && define('E_USER_DEPRECATED'  , 16384);   // since PHP 5.3.0
 
-   $levels = array();
-   if (!$level)
-      $level = error_reporting();
 
-   if ($level & E_ERROR            ) $levels[] = 'E_ERROR';
-   if ($level & E_WARNING          ) $levels[] = 'E_WARNING';
-   if ($level & E_PARSE            ) $levels[] = 'E_PARSE';
-   if ($level & E_NOTICE           ) $levels[] = 'E_NOTICE';
-   if ($level & E_DEPRECATED       ) $levels[] = 'E_DEPRECATED';
-   if ($level & E_CORE_ERROR       ) $levels[] = 'E_CORE_ERROR';
-   if ($level & E_CORE_WARNING     ) $levels[] = 'E_CORE_WARNING';
-   if ($level & E_COMPILE_ERROR    ) $levels[] = 'E_COMPILE_ERROR';
-   if ($level & E_COMPILE_WARNING  ) $levels[] = 'E_COMPILE_WARNING';
-   if ($level & E_USER_ERROR       ) $levels[] = 'E_USER_ERROR';
-   if ($level & E_USER_WARNING     ) $levels[] = 'E_USER_WARNING';
-   if ($level & E_USER_NOTICE      ) $levels[] = 'E_USER_NOTICE';
-   if ($level & E_USER_DEPRECATED  ) $levels[] = 'E_USER_DEPRECATED';
-   if ($level & E_RECOVERABLE_ERROR) $levels[] = 'E_RECOVERABLE_ERROR';
-   if ($level & E_ALL              ) $levels[] = 'E_ALL';
-   if ($level & E_STRICT           ) $levels[] = 'E_STRICT';
+if (!function_exists('errorLevelToStr')) {
+   /**
+    * Gibt einen Errorlevel in lesbarer Form zurück.
+    *
+    * @param int $level - Errorlevel, ohne Angabe wird der aktuelle Errorlevel des laufenden Scriptes ausgewertet.
+    *
+    * @return string
+    */
+   function errorLevelToStr($level=null) {
+      if (func_num_args() && !is_int($level)) throw new IllegalTypeException('Illegal type of parameter $level: '.getType($level));
 
-   return join(' | ', $levels);
+      $levels = array();
+      if (!$level)
+         $level = error_reporting();
+
+      if ($level & E_ERROR            ) $levels[] = 'E_ERROR';
+      if ($level & E_WARNING          ) $levels[] = 'E_WARNING';
+      if ($level & E_PARSE            ) $levels[] = 'E_PARSE';
+      if ($level & E_NOTICE           ) $levels[] = 'E_NOTICE';
+      if ($level & E_DEPRECATED       ) $levels[] = 'E_DEPRECATED';
+      if ($level & E_CORE_ERROR       ) $levels[] = 'E_CORE_ERROR';
+      if ($level & E_CORE_WARNING     ) $levels[] = 'E_CORE_WARNING';
+      if ($level & E_COMPILE_ERROR    ) $levels[] = 'E_COMPILE_ERROR';
+      if ($level & E_COMPILE_WARNING  ) $levels[] = 'E_COMPILE_WARNING';
+      if ($level & E_USER_ERROR       ) $levels[] = 'E_USER_ERROR';
+      if ($level & E_USER_WARNING     ) $levels[] = 'E_USER_WARNING';
+      if ($level & E_USER_NOTICE      ) $levels[] = 'E_USER_NOTICE';
+      if ($level & E_USER_DEPRECATED  ) $levels[] = 'E_USER_DEPRECATED';
+      if ($level & E_RECOVERABLE_ERROR) $levels[] = 'E_RECOVERABLE_ERROR';
+      if ($level & E_ALL              ) $levels[] = 'E_ALL';
+      if ($level & E_STRICT           ) $levels[] = 'E_STRICT';
+
+      return join('|', $levels);
+   }
 }
+
+
 // -- end of function definitions -----------------------------------------------------------------------------------------------
 
 
