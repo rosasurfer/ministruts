@@ -51,7 +51,7 @@ abstract class DB extends Object {
          }
       }
       catch (Exception $ex) {
-         Logger ::handleException($ex, true);
+         Logger ::handleException($ex, $ignoreIfNotInShutdown=true);
          throw $ex;
       }
    }

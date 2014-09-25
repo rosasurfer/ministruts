@@ -10,14 +10,13 @@
  *
  *  Beispiel:
  *  ---------
- *  log.level.MyClassA = warn                # Messages in MyClassA werden geloggt, wenn sie mindestens den Level L_WARN erreichen.
- *  log.level.MyClassB = debug               # Messages in MyClassB werden geloggt, wenn sie mindestens den level L_DEBUG erreichen.
+ *  log.level.MyClassA = warn                   # Messages in MyClassA werden geloggt, wenn sie mindestens den Level L_WARN erreichen.
+ *  log.level.MyClassB = debug                  # Messages in MyClassB werden geloggt, wenn sie mindestens den level L_DEBUG erreichen.
  *
- *  log.mail.receiver = address1@domain.tld,address2@domain.tld
- *                                           # Logmessages werden an ein oder mehrere E-Mailempfänger verschickt.
+ *  log.mail.receiver  = address1@domain.tld    # Logmessages werden an ein oder mehrere E-Mailempfänger verschickt (komma-getrennt).
  *
- *  log.sms.receiver = +41123456,+417890123  # Logmessages per SMS gehen an ein oder mehrere Rufnummern (internationales Format).
- *  log.sms.loglevel = error                 # Logmessages werden per SMS verschickt, wenn sie mindestens den Level L_ERROR erreichen.
+ *  log.sms.receiver   = +491234567,+441234567  # Logmessages per SMS gehen an ein oder mehrere Rufnummern (komma-getrennt, intern. Format).
+ *  log.sms.loglevel   = error                  # Logmessages werden per SMS verschickt, wenn sie mindestens den Level L_ERROR erreichen.
  *
  *
  * TODO: Logger muß erweitert werden können
@@ -101,7 +100,7 @@ class Logger extends StaticClass {
    /**
     * Gibt den Loglevel der angegebenen Klasse zurück.
     *
-    * @param string $class - Klassenname
+    * @param  string $class - Klassenname
     *
     * @return int - Loglevel
     */
@@ -133,8 +132,8 @@ class Logger extends StaticClass {
    /**
     * Gibt den angegebenen Errorlevel in lesbarer Form zurück.
     *
-    * @param int $level - Errorlevel, ohne Angabe wird der aktuellen Errorlevel des laufenden Scriptes
-    *                     ausgewertet.
+    * @param  int $level - Errorlevel, ohne Angabe wird der aktuellen Errorlevel des laufenden Scriptes
+    *                      ausgewertet.
     * @return string
     */
    public static function getErrorLevelAsString($level=null) {
@@ -236,25 +235,32 @@ class Logger extends StaticClass {
 
    /**
     * Globaler Handler für nicht abgefangene Exceptions. Die Exception wird geloggt und das Script beendet.
-    * Der Aufruf kann automatisch (durch globalen Errorhandler) oder manuell (durch Code, der selbst keine Exceptions werfen darf)
+    * Der Aufruf kann automatisch (durch installierten Errorhandler) oder manuell (durch Code, der selbst keine Exceptions werfen darf)
     * erfolgen.
     *
     * NOTE: PHP bricht das Script nach Aufruf dieses Handlers automatisch ab.
     *
-    * @param Exception $exception - die zu behandelnde Exception
+    * @param  Exception $exception             - die zu behandelnde Exception
+    * @param  bool      $ignoreIfNotInShutdown - Ob die Exception ignoriert werden soll (für Exceptions, die in einem Destructor auftreten).
+    *                                            Befindet sich das Script im Sutdown, darf aus einem Destructor keine Exception mehr geworfen
+    *                                            werden.  Daher muß vorm Werfen der Exception diese Funktion mit $ignoreIfNotInShutdown=TRUE
+    *                                            aufgerufen werden,um den Shutdown-Status zu testen und zu behandeln.
+    *                                           (1) Während des Shutdowns wird die Exception so behandelt, als wenn sie durch den installierten
+    *                                               Error-Handler ausgelöst worden wäre.
+    *                                           (2) Befindet sich das Script nicht im Shutdown, wird die Exception ignoriert.
     */
-   public static function handleException(Exception $exception, $destructor = false) {
+   public static function handleException(Exception $exception, $ignoreIfNotInShutdown=false) {
+      if ($ignoreIfNotInShutdown && !isSet($GLOBALS['$__shutting_down']))
+         return;
+
       try {
          self:: init();
 
-         // TODO: Fatal error: Ignoring exception from ***::__destruct() while an exception is already active (Uncaught PHPErrorException in E:\Projekte\ministruts\src\php\file\image\barcode\test\image.php on line 19)
-         //                    in E:\Projekte\ministruts\src\php\file\image\barcode\test\image.php on line 33
-
-         // Bei manuellem Aufruf aus einem Destruktor kann die Exception zurückgereicht werden (STIMMT DAS MIT OBIGEM BUG???), sofern wir nicht im Shutdown sind
-         // (während des Shutdowns dürfen keine Exceptions mehr geworfen werden)
-         if ($destructor && !isSet($GLOBALS['$__shutting_down']))
-            return;
-
+         // TODO: Stimmt dieser Fehler mit der obigen Logik überein???
+         //
+         // Fatal error: Ignoring exception from ***::__destruct() while an exception is already active
+         //              (Uncaught PHPErrorException in E:\Projekte\ministruts\src\php\file\image\barcode\test\image.php on line 19)
+         //              in E:\Projekte\ministruts\src\php\file\image\barcode\test\image.php on line 33
 
          // 1. Fehlerdaten ermitteln
          $message  = ($exception instanceof NestableException) ? (string)$exception : get_class($exception).': '.$exception->getMessage();
@@ -265,7 +271,7 @@ class Logger extends StaticClass {
          $plainMessage = '[FATAL] Uncaught '.$message."\nin ".$file.' on line '.$line."\n";
 
 
-         // 2. Exception anzeigen (wenn $print TRUE ist)
+         // 2. Exception anzeigen
          if (self::$print) {
             if (isSet($_SERVER['REQUEST_METHOD'])) {
                echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif"><b>[FATAL] Uncaught</b> '.nl2br(htmlSpecialChars($message, ENT_QUOTES))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
@@ -278,7 +284,7 @@ class Logger extends StaticClass {
          }
 
 
-         // 3. Exception an die registrierten Adressen mailen (wenn $mail TRUE ist) ...
+         // 3. Exception an die konfigurierten Adressen mailen
          if (self::$mail) {
             $mailMsg  = $plainMessage."\n".$traceStr;
 
@@ -298,34 +304,24 @@ class Logger extends StaticClass {
             else {
                $mailMsg .= "\n\n\nShell:\n------\n".print_r($_SERVER, true)."\n\n\n";
             }
-
-            $mailMsg = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $mailMsg)) : str_replace("\r\n", "\n", $mailMsg);
-            $mailMsg = str_replace(chr(0), "*\x00*", $mailMsg);
-
-            foreach (self::$mailReceivers as $address) {
-               // TODO: Header mit Fehlermeldung hinzufügen, damit beim Empfänger Messagefilter unterstützt werden
-               $success = error_log($mailMsg, 1, $address, 'Subject: PHP: [FATAL] Uncaught Exception at '.($request ? $request->getHostname():'').$_SERVER['PHP_SELF']);
-               if (!$success) {
-                  error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", $plainMessage)), 0);
-                  break;
-               }
-            }
+            $subject = 'PHP: [FATAL] Uncaught Exception at '.($request ? $request->getHostname():'').$_SERVER['PHP_SELF'];
+            self ::mail_log($subject, $mailMsg);
          }
 
 
          // (4) Logmessage ins Error-Log schreiben, wenn sie nicht per Mail rausging
          else {
-            error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", $plainMessage)), 0);       // Zeilenumbrüche entfernen
+            self ::error_log('PHP '.$plainMessage);
          }
       }
       catch (Exception $secondEx) {
          $file = $exception->getFile();
          $line = $exception->getLine();
-         error_log('PHP primary '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", (string)$exception).' in '.$file.' on line '.$line), 0);
+         self ::error_log('PHP primary '.(string)$exception.' in '.$file.' on line '.$line);
 
          $file = $secondEx->getFile();
          $line = $secondEx->getLine();
-         error_log('PHP secondary '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", (string)$secondEx).' in '.$file.' on line '.$line), 0);
+         self ::error_log('PHP secondary '.(string)$secondEx.' in '.$file.' on line '.$line);
       }
    }
 
@@ -429,7 +425,7 @@ class Logger extends StaticClass {
          $plainMessage = self::$logLevels[$level].': '.$message."\nin ".$file.' on line '.$line."\n";
 
 
-         // 2. Logmessage anzeigen (wenn $print TRUE ist)
+         // 2. Logmessage anzeigen
          if (self::$print) {
             if (isSet($_SERVER['REQUEST_METHOD'])) {
                echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.self::$logLevels[$level].'</b>: '.nl2br(htmlSpecialChars($message, ENT_QUOTES))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
@@ -445,7 +441,7 @@ class Logger extends StaticClass {
          }
 
 
-         // 3. Logmessage an die registrierten Adressen mailen (wenn $mail TRUE ist) ...
+         // 3. Logmessage an die konfigurierten Adressen mailen
          if (self::$mail) {
             $mailMsg = $plainMessage.($exception ? "\n\n".$exMessage."\n":'')."\n\n".$trace;
 
@@ -465,29 +461,51 @@ class Logger extends StaticClass {
             else {
                $mailMsg .= "\n\n\nShell:\n------\n".print_r($_SERVER, true)."\n\n\n";
             }
-
-            $mailMsg = WINDOWS ? str_replace("\n", "\r\n", str_replace("\r\n", "\n", $mailMsg)) : str_replace("\r\n", "\n", $mailMsg);
-            $mailMsg = str_replace(chr(0), "*\x00*", $mailMsg);
-
-            foreach (self::$mailReceivers as $address) {
-               // TODO: Header mit Fehlermeldung hinzufügen, damit beim Empfänger Messagefilter unterstützt werden
-               $success = error_log($mailMsg, 1, $address, 'Subject: PHP: '.self::$logLevels[$level].' at '.($request ? $request->getHostname():'').$_SERVER['PHP_SELF']);
-               if (!$success) {
-                  error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", $plainMessage)), 0);
-                  break;
-               }
-            }
+            $subject = 'PHP: '.self::$logLevels[$level].' at '.($request ? $request->getHostname():'').$_SERVER['PHP_SELF'];
+            self ::mail_log($subject, $mailMsg);
          }
 
 
          // (4) Logmessage ins Error-Log schreiben, wenn sie nicht per Mail rausging
          else {
-            error_log('PHP '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", $plainMessage)), 0);                           // Zeilenumbrüche entfernen
+            self ::error_log('PHP '.$plainMessage);
          }
       }
       catch (Exception $ex) {
-         error_log('PHP (0) '.str_replace(array("\r\n", "\n"), ' ', str_replace(chr(0), "*\x00*", $plainMessage ? $plainMessage:$message)), 0); // Zeilenumbrüche entfernen
+         self ::error_log('PHP (0) '.$plainMessage ? $plainMessage:$message);
          throw $ex;
+      }
+   }
+
+
+   /**
+    * Schreibt eine Logmessage ins PHP-interne Error-Log.
+    *
+    * @param  string $message - zu loggende Message
+    */
+   private static function error_log($message) {
+      $message = str_replace(array("\r\n", "\n"), ' ', $message);    // Zeilenumbrüche entfernen
+      $message = str_replace(chr(0), "*\x00*", $message);            // NUL-Characters ersetzen (zerschießen Logfile)
+      error_log($message, LOG_SYSLOG);
+   }
+
+
+   /**
+    * Verschickt eine Logmessage per E-Mail.
+    *
+    * @param  string $subject - Subject der E-Mail
+    * @param  string $message - zu loggende Message
+    */
+   private static function mail_log($subject, $message) {
+      $message = str_replace("\r\n", "\n", $message);                // Linux: Unix-Zeilenumbrüche
+      if (WINDOWS)
+         $message = str_replace("\n", "\r\n", $message);             // Windows: Windows-Zeilenumbrüche
+
+      $message = str_replace(chr(0), "*\x00*", $message);            // NUL-Characters ersetzen (zerschießen E-Mail)
+
+      foreach (self::$mailReceivers as $receiver) {
+         // TODO: durch mail() ersetzen, damit Subject-Header von PHP nicht doppelt geschrieben wird
+         error_log($message, LOG_MAIL, $receiver, 'Subject: '.$subject);
       }
    }
 }

@@ -150,6 +150,12 @@ define('L_WARN'  ,  8);
 define('L_ERROR' , 16);
 define('L_FATAL' , 32);
 
+// Logdestinations
+define('LOG_SYSLOG'  , 0);                   // message is sent to PHP's system logger
+define('LOG_MAIL'    , 1);                   // message is sent by email
+define('LOG_DEBUGGER', 2);                   // message is sent through the PHP debugging connection
+define('LOG_FILE'    , 3);                   // message is appended to a file destination
+
 // Zeitkonstanten
 define('SECOND',   1          ); define('SECONDS', SECOND);
 define('MINUTE',  60 * SECONDS); define('MINUTES', MINUTE);
