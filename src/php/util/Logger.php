@@ -34,8 +34,8 @@ class Logger extends StaticClass {
    private static /*string[]*/ $mailReceivers = array();    // E-Mailempfänger
    private static /*bool    */ $sms;                        // ob die Nachricht per SMS verschickt werden soll
    private static /*string[]*/ $smsReceivers  = array();    // SMS-Empfänger
-   private static /*int     */ $smsLogLevel   = L_FATAL;    // zusätzlicher Loglevel, der den SMS-Versand aktiviert
-
+   private static /*int     */ $smsLogLevel   = L_FATAL;    // notwendiger Loglevel für den SMS-Versand
+   private static /*string[]*/ $smsOptions    = array();    // SMS-Konfiguration
 
 
    // Default-Loglevel (kann angepaßt werden, siehe Klassenbeschreibung)
@@ -93,7 +93,10 @@ class Logger extends StaticClass {
          if (defined('L_'.strToUpper($logLevel))) self::$smsLogLevel = constant('L_'.strToUpper($logLevel));
          else                                     self::$smsLogLevel = null;
       }
-      self::$sms = (self::$smsReceivers && self::$smsLogLevel);
+      $options = Config ::get('sms.clickatell', null);
+      if (!empty($options['username']) && !empty($options['password']) && !empty($options['api_id']))
+         self::$smsOptions = $options;
+      self::$sms = self::$smsReceivers && self::$smsLogLevel && self::$smsOptions;
    }
 
 
@@ -126,41 +129,6 @@ class Logger extends StaticClass {
          return $logLevels[$class];
 
       return self:: DEFAULT_LOGLEVEL;
-   }
-
-
-   /**
-    * Gibt den angegebenen Errorlevel in lesbarer Form zurück.
-    *
-    * @param  int $level - Errorlevel, ohne Angabe wird der aktuellen Errorlevel des laufenden Scriptes
-    *                      ausgewertet.
-    * @return string
-    */
-   public static function getErrorLevelAsString($level=null) {
-      if (func_num_args() && $level!==(int)$level) throw new IllegalTypeException('Illegal type of parameter $level: '.getType($level));
-
-      $levels = array();
-      if (!$level)
-         $level = error_reporting();
-
-      if ($level & E_ERROR            ) $levels[] = 'E_ERROR';
-      if ($level & E_WARNING          ) $levels[] = 'E_WARNING';
-      if ($level & E_PARSE            ) $levels[] = 'E_PARSE';
-      if ($level & E_NOTICE           ) $levels[] = 'E_NOTICE';
-      if ($level & E_DEPRECATED       ) $levels[] = 'E_DEPRECATED';
-      if ($level & E_CORE_ERROR       ) $levels[] = 'E_CORE_ERROR';
-      if ($level & E_CORE_WARNING     ) $levels[] = 'E_CORE_WARNING';
-      if ($level & E_COMPILE_ERROR    ) $levels[] = 'E_COMPILE_ERROR';
-      if ($level & E_COMPILE_WARNING  ) $levels[] = 'E_COMPILE_WARNING';
-      if ($level & E_USER_ERROR       ) $levels[] = 'E_USER_ERROR';
-      if ($level & E_USER_WARNING     ) $levels[] = 'E_USER_WARNING';
-      if ($level & E_USER_NOTICE      ) $levels[] = 'E_USER_NOTICE';
-      if ($level & E_USER_DEPRECATED  ) $levels[] = 'E_USER_DEPRECATED';
-      if ($level & E_RECOVERABLE_ERROR) $levels[] = 'E_RECOVERABLE_ERROR';
-      if ($level & E_ALL              ) $levels[] = 'E_ALL';
-      if ($level & E_STRICT           ) $levels[] = 'E_STRICT';
-
-      return join(' | ', $levels).' ('.$level.')';
    }
 
 
@@ -234,7 +202,7 @@ class Logger extends StaticClass {
 
 
    /**
-    * Globaler Handler für nicht abgefangene Exceptions. Die Exception wird geloggt und das Script beendet.
+    * Globaler Handler für nicht abgefangene Exceptions. Die Exception wird mit dem Loglevel L_FATAL geloggt und das Script beendet.
     * Der Aufruf kann automatisch (durch installierten Errorhandler) oder manuell (durch Code, der selbst keine Exceptions werfen darf)
     * erfolgen.
     *
@@ -312,6 +280,12 @@ class Logger extends StaticClass {
          // (4) Logmessage ins Error-Log schreiben, wenn sie nicht per Mail rausging
          else {
             self ::error_log('PHP '.$plainMessage);
+         }
+
+
+         // (5) Logmessage per SMS verschicken
+         if (self::$sms) {
+            self ::sms_log($plainMessage);
          }
       }
       catch (Exception $secondEx) {
@@ -392,6 +366,7 @@ class Logger extends StaticClass {
          if (!isSet(self::$logLevels[$level])) throw new plInvalidArgumentException('Invalid log level: '.$level);
          self:: init();
 
+
          // 1. Logdaten ermitteln
          $exMessage = null;
          if ($exception) {
@@ -421,7 +396,6 @@ class Logger extends StaticClass {
             $trace = "Stacktrace:\n-----------\n".NestableException ::formatStackTrace($trace);
             // TODO: vernestelte, einfache Exceptions geben fehlerhaften Stacktrace zurück
          }
-
          $plainMessage = self::$logLevels[$level].': '.$message."\nin ".$file.' on line '.$line."\n";
 
 
@@ -470,6 +444,12 @@ class Logger extends StaticClass {
          else {
             self ::error_log('PHP '.$plainMessage);
          }
+
+
+         // (5) Logmessage per SMS verschicken, wenn der konfigurierte SMS-Loglevel erreicht ist
+         if (self::$sms && $level >= self::$smsLogLevel) {
+            self ::sms_log($plainMessage.($exception ? "\n".$exMessage:''));
+         }
       }
       catch (Exception $ex) {
          self ::error_log('PHP (0) '.$plainMessage ? $plainMessage:$message);
@@ -486,7 +466,7 @@ class Logger extends StaticClass {
    private static function error_log($message) {
       $message = str_replace(array("\r\n", "\n"), ' ', $message);    // Zeilenumbrüche entfernen
       $message = str_replace(chr(0), "*\x00*", $message);            // NUL-Characters ersetzen (zerschießen Logfile)
-      error_log($message, LOG_SYSLOG);
+      error_log($message, ERROR_LOG_SYSLOG);
    }
 
 
@@ -500,12 +480,49 @@ class Logger extends StaticClass {
       $message = str_replace("\r\n", "\n", $message);                // Linux: Unix-Zeilenumbrüche
       if (WINDOWS)
          $message = str_replace("\n", "\r\n", $message);             // Windows: Windows-Zeilenumbrüche
-
       $message = str_replace(chr(0), "*\x00*", $message);            // NUL-Characters ersetzen (zerschießen E-Mail)
 
       foreach (self::$mailReceivers as $receiver) {
          // TODO: durch mail() ersetzen, damit Subject-Header von PHP nicht doppelt geschrieben wird
-         error_log($message, LOG_MAIL, $receiver, 'Subject: '.$subject);
+         error_log($message, ERROR_LOG_MAIL, $receiver, 'Subject: '.$subject);
+      }
+   }
+
+
+   /**
+    * Verschickt eine Logmessage per SMS an die konfigurierten Rufnummern.
+    *
+    * @param  string $message - zu loggende Message
+    */
+   private static function sms_log($message) {
+      if (empty($message))
+         return;
+      $message  = str_replace("\r\n", "\n", $message);                     // Unix-Zeilenumbrüche
+      $message  = subStr($message, 0, 150);                                // Länge der Message auf eine SMS begrenzen
+
+      $username = self::$smsOptions['username'];
+      $password = self::$smsOptions['password'];
+      $api_id   = self::$smsOptions['api_id'  ];
+
+      foreach (self::$smsReceivers as $receiver) {
+         if (String ::startsWith($receiver, '+' )) $receiver = subStr($receiver, 1);
+         if (String ::startsWith($receiver, '00')) $receiver = subStr($receiver, 2);
+         if (!ctype_digit($receiver)) throw new plInvalidArgumentException('Invalid argument $receiver: "'.$receiver.'"');
+
+         $url = 'https://api.clickatell.com/http/sendmsg?user='.$username.'&password='.$password.'&api_id='.$api_id.'&to='.$receiver.'&text='.urlEncode($message);
+
+         // TODO: CURL-Abhängigkeiten möglichst durch interne URL-Funktionen ersetzen
+
+         // HTTP-Request erzeugen und ausführen
+         $request  = HttpRequest ::create()->setUrl($url);
+         $options[CURLOPT_SSL_VERIFYPEER] = false;                            // das SSL-Zertifikat kann nicht überprüfbar oder ungültig sein
+         $response = CurlHttpClient ::create($options)->send($request);
+         $status   = $response->getStatus();
+         $content  = $response->getContent();
+         if ($status != 200) throw new plRuntimeException('Unexpected HTTP status code from api.clickatell.com: '.$status.' ('.HttpResponse ::$sc[$status].')');
+
+         if (striPos($content, 'ERR: 113') === 0)                             // ERR: 113, Max message parts exceeded
+            return self ::sms_log(subStr($message, 0, strLen($message)-10));  // mit kürzerer Message wiederholen
       }
    }
 }
