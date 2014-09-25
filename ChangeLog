@@ -1,3 +1,9 @@
+2014-09-25
+
+   - php/util/Logger: - Logmessages können auch per SMS verschickt werden, dazu ist ein Clickatell-Account notwendig.
+                        (Konfiguration siehe Klassenbeschreibung)
+
+
 2014-09-24
 
    - php/util/Logger: - Logging per E-Mail überarbeitet: Ist eine Mailadresse konfiguriert, wird immer eine Mail verschickt
