@@ -339,18 +339,20 @@ abstract class BarCode extends Object {
 
       // Datei schreiben
       $fileExisted = is_file($filename);
-      $hFile       = null;
+      $hFile = $ex = null;
       try {
          $hFile = fOpen($filename, ($overwrite ? 'w':'x').'b');
          fWrite($hFile, $this->toString());
          fClose($hFile);
       }
       catch (Exception $ex) {
-         if (is_resource($hFile))                 @fClose($hFile);
-         if (!$fileExisted && is_file($filename)) @unlink($filename);
+         if (is_resource($hFile))                 fClose($hFile);       // Unter Windows kann die Datei u.U. nicht im Exception-Handler gelöscht werden (gesperrt).
+      }                                                                 // Das File-Handle muß innerhalb UND außerhalb des Exception-Handlers geschlossen werden,
+      if ($ex) {                                                        // erst dann läßt sich die Datei unter Windows löschen.
+         if (is_resource($hFile))                 fClose($hFile);
+         if (!$fileExisted && is_file($filename)) unlink($filename);
          throw $ex;
       }
-
       return $this;
    }
 
