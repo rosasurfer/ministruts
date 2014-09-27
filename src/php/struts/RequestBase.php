@@ -616,7 +616,7 @@ abstract class RequestBase extends Singleton {
     * @return array - Name-Wert-Paar oder NULL, wenn kein Header dieses Namens übertragen wurde
     */
    public function getHeader($name) {
-      if (!is_string($name)) throw new IllegalTypeException('Illegal type of argument $name: '.getType($name));
+      if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
 
       $headers = $this->getHeaders($name);
       return array_shift($headers);
@@ -638,7 +638,7 @@ abstract class RequestBase extends Singleton {
             if (!is_string($name)) throw new IllegalTypeException('Illegal argument type in argument $names: '.getType($name));
          }
       }
-      else throw new IllegalTypeException('Illegal type of argument $names: '.getType($names));
+      else throw new IllegalTypeException('Illegal type of parameter $names: '.getType($names));
 
       // einmal alle Header einlesen
       static $headers = null;
@@ -698,7 +698,7 @@ abstract class RequestBase extends Singleton {
             if (!is_string($name)) throw new IllegalTypeException('Illegal argument type in argument $names: '.getType($name));
       }
       else {
-         throw new IllegalTypeException('Illegal type of argument $names: '.getType($names));
+         throw new IllegalTypeException('Illegal type of parameter $names: '.getType($names));
       }
 
       $headers = $this->getHeaders($names);
@@ -724,7 +724,7 @@ abstract class RequestBase extends Singleton {
             if (!is_string($name)) throw new IllegalTypeException('Illegal argument type in argument $names: '.getType($name));
       }
       else {
-         throw new IllegalTypeException('Illegal type of argument $names: '.getType($names));
+         throw new IllegalTypeException('Illegal type of parameter $names: '.getType($names));
       }
 
       $headers = $this->getHeaders($names);
@@ -795,8 +795,8 @@ abstract class RequestBase extends Singleton {
     * @param string $path    - Pfad, für den der Cookie gültig sein soll
     */
    public function setCookie($name, $value, $expires = 0, $path = null) {
-      if (!is_string($name)) throw new IllegalTypeException('Illegal type of argument $name: '.getType($name));
-      if (!is_int($expires)) throw new IllegalTypeException('Illegal type of argument $expires: '.getType($expires));
+      if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
+      if (!is_int($expires)) throw new IllegalTypeException('Illegal type of parameter $expires: '.getType($expires));
       if ($expires < 0)      throw new plInvalidArgumentException('Invalid argument $expires: '.$expires);
 
       $value = (string)$value;
@@ -804,7 +804,7 @@ abstract class RequestBase extends Singleton {
       if ($path === null)
          $path = $this->getApplicationPath().'/';
 
-      if (!is_string($path)) throw new IllegalTypeException('Illegal type of argument $path: '.getType($path));
+      if (!is_string($path)) throw new IllegalTypeException('Illegal type of parameter $path: '.getType($path));
 
       setCookie($name, $value, $expires, $path);
    }
@@ -818,7 +818,7 @@ abstract class RequestBase extends Singleton {
     * @return bool
     */
    public function isUserInRole($roles) {
-      if (!is_string($roles)) throw new IllegalTypeException('Illegal type of argument $roles: '.getType($roles));
+      if (!is_string($roles)) throw new IllegalTypeException('Illegal type of parameter $roles: '.getType($roles));
 
       // Module holen
       $module = $this->getAttribute(Struts ::MODULE_KEY);

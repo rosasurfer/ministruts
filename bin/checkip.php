@@ -84,7 +84,7 @@ function getHeaderValue($names) {
       foreach ($names as $name)
          if (!is_string($name)) throw new Exception('Illegal argument type in argument $names: '.getType($name));
    }
-   else throw new Exception('Illegal type of argument $names: '.getType($names));
+   else throw new Exception('Illegal type of parameter $names: '.getType($names));
 
    $headers = getHeaders($names);
    if ($headers)
@@ -109,7 +109,7 @@ function getHeaders($names = null) {
          if (!is_string($name)) throw new Exception('Illegal argument type in argument $names: '.getType($name));
       }
    }
-   else throw new Exception('Illegal type of argument $names: '.getType($names));
+   else throw new Exception('Illegal type of parameter $names: '.getType($names));
 
    // einmal alle Header einlesen
    static $headers = null;

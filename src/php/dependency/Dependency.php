@@ -100,7 +100,7 @@ abstract class Dependency extends Object {
     * @return ChainedDependency
     */
    public function setMinValidity($time) {
-      if ($time!==(int)$time) throw new IllegalTypeException('Illegal type of argument $time: '.getType($time));
+      if ($time!==(int)$time) throw new IllegalTypeException('Illegal type of parameter $time: '.getType($time));
       if ($time < 0)          throw new plInvalidArgumentException('Invalid argument $time: '.$time);
 
       $this->minValidity = $time;

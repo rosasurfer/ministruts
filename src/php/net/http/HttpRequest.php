@@ -30,7 +30,7 @@ final class HttpRequest extends Object {
     * @return HttpRequest
     */
    public function setMethod($method) {
-      if (!is_string($method))                 throw new IllegalTypeException('Illegal type of argument $method: '.getType($method));
+      if (!is_string($method))                 throw new IllegalTypeException('Illegal type of parameter $method: '.getType($method));
       if ($method!=='GET' && $method!=='POST') throw new plInvalidArgumentException('Invalid argument $method: '.$method);
 
       $this->method = $method;
@@ -56,7 +56,7 @@ final class HttpRequest extends Object {
     * @return HttpRequest
     */
    public function setUrl($url) {
-      if (!is_string($url)) throw new IllegalTypeException('Illegal type of argument $url: '.getType($url));
+      if (!is_string($url)) throw new IllegalTypeException('Illegal type of parameter $url: '.getType($url));
 
       // TODO: URL genauer validieren
 
@@ -160,7 +160,7 @@ final class HttpRequest extends Object {
          foreach ($names as $name)
             if (!is_string($name)) throw new IllegalTypeException('Illegal parameter type in argument $names: '.getType($name));
       }
-      else                         throw new IllegalTypeException('Illegal type of argument $names: '.getType($names));
+      else                         throw new IllegalTypeException('Illegal type of parameter $names: '.getType($names));
 
       // alle oder nur die gewünschten Header zurückgeben
       if (!$names)
@@ -177,7 +177,7 @@ final class HttpRequest extends Object {
     * @return string - Wert des Headers oder NULL, wenn kein Header dieses Namens konfiguriert wurde
     */
    public function getHeader($name) {
-      if (!is_string($name)) throw new IllegalTypeException('Illegal type of argument $name: '.getType($name));
+      if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
       if (!strLen($name))    throw new plInvalidArgumentException('Invalid argument $name: '.$name);
 
       $headers = $this->getHeaders($name);

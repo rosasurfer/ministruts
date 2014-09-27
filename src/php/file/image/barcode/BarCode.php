@@ -57,7 +57,7 @@ abstract class BarCode extends Object {
    protected function __construct($value, $width, $height, $style=null, $xres=null, $font=null) {
       // Parameter validieren und speichern
       // $value
-      if (!is_string($value)) throw new IllegalTypeException('Illegal type of argument $value: '.getType($value));
+      if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
       if (strLen($value)==0)  throw new plInvalidArgumentException('Invalid barcode $value: "'.$value.'"');
       $this->value = $value;
 
@@ -66,7 +66,7 @@ abstract class BarCode extends Object {
          if (!cType_digit($width)) throw new plInvalidArgumentException('Invalid barcode $width: "'.$width.'"');
          $width = (int) $width;
       }
-      else if (!is_int($width))    throw new IllegalTypeException('Illegal type of argument $width: '.getType($width));
+      else if (!is_int($width))    throw new IllegalTypeException('Illegal type of parameter $width: '.getType($width));
       if ($width <= 0)             throw new plInvalidArgumentException('Invalid barcode $width: "'.$width.'"');
       $this->width = $width;
 
@@ -75,7 +75,7 @@ abstract class BarCode extends Object {
          if (!cType_digit($height)) throw new plInvalidArgumentException('Invalid barcode $height: "'.$height.'"');
          $height = (int) $height;
       }
-      else if (!is_int($height))    throw new IllegalTypeException('Illegal type of argument $height: '.getType($height));
+      else if (!is_int($height))    throw new IllegalTypeException('Illegal type of parameter $height: '.getType($height));
       if ($height <= 0)             throw new plInvalidArgumentException('Invalid barcode $height: "'.$height.'"');
       $this->height = $height;
 
@@ -85,7 +85,7 @@ abstract class BarCode extends Object {
             if (!cType_digit($style)) throw new plInvalidArgumentException('Invalid barcode $style: "'.$style.'"');
             $style = (int) $style;
          }
-         else if (!is_int($style))    throw new IllegalTypeException('Illegal type of argument $style: '.getType($style));
+         else if (!is_int($style))    throw new IllegalTypeException('Illegal type of parameter $style: '.getType($style));
          $alignCenter = (bool)($style & self:: STYLE_ALIGN_CENTER);
          $alignLeft   = (bool)($style & self:: STYLE_ALIGN_LEFT  );
          $alignRight  = (bool)($style & self:: STYLE_ALIGN_RIGHT );
@@ -100,7 +100,7 @@ abstract class BarCode extends Object {
             if (!cType_digit($xres)) throw new plInvalidArgumentException('Invalid barcode $xres: "'.$xres.'"');
             $xres = (int) $xres;
          }
-         else if (!is_int($xres))    throw new IllegalTypeException('Illegal type of argument $xres: '.getType($xres));
+         else if (!is_int($xres))    throw new IllegalTypeException('Illegal type of parameter $xres: '.getType($xres));
          if ($xres < 1 || 3 < $xres) throw new plInvalidArgumentException('Invalid barcode $xres: "'.$xres.'"');
          $this->xres = $xres;
       }
@@ -111,7 +111,7 @@ abstract class BarCode extends Object {
             if (!cType_digit($font)) throw new plInvalidArgumentException('Invalid barcode $font: "'.$font.'"');
             $font = (int) $font;
          }
-         else if (!is_int($font))    throw new IllegalTypeException('Illegal type of argument $font: '.getType($font));
+         else if (!is_int($font))    throw new IllegalTypeException('Illegal type of parameter $font: '.getType($font));
          if ($font < 1 || 5 < $font) throw new plInvalidArgumentException('Invalid barcode $font: "'.$font.'"');
          $this->font = $font;
       }

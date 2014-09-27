@@ -37,8 +37,8 @@ final class FileLock extends BaseLock {
 
       // TODO: Ein das Lock haltender Prozeß kann die Datei bis zum Aufruf von fLock() wieder gelöscht haben.
 
-      if (!is_string($filename))           throw new IllegalTypeException('Illegal type of argument $filename: '.getType($filename));
-      if (!is_bool($shared))               throw new IllegalTypeException('Illegal type of argument $shared: '.getType($shared));
+      if (!is_string($filename))           throw new IllegalTypeException('Illegal type of parameter $filename: '.getType($filename));
+      if (!is_bool($shared))               throw new IllegalTypeException('Illegal type of parameter $shared: '.getType($shared));
 
       if (isSet(self::$hFiles[$filename])) throw new plRuntimeException('Dead-lock detected: already holding a lock for file "'.$filename.'"');
       self::$hFiles[$filename] = false;      // Schlägt der Constructor fehl, verhindert der gesetzte Eintrag ein
@@ -100,7 +100,7 @@ final class FileLock extends BaseLock {
     * @param bool $deleteFile - ob das verwendete Lockfile beim Freigeben des Locks gelöscht werden soll (default: FALSE)
     */
    public function release($deleteFile = false) {
-      if (!is_bool($deleteFile)) throw new IllegalTypeException('Illegal type of argument $deleteFile: '.getType($deleteFile));
+      if (!is_bool($deleteFile)) throw new IllegalTypeException('Illegal type of parameter $deleteFile: '.getType($deleteFile));
 
       if ($this->isValid()) {
          fClose(self::$hFiles[$this->filename]);      // see docs: The lock is released also by fClose()...

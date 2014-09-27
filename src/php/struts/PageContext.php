@@ -81,7 +81,7 @@ class PageContext extends Singleton {
     * @param mixed  $value - Wert
     */
    public function __set($name, $value) {
-      if (!is_string($name)) throw new IllegalTypeException('Illegal type of argument $name: '.getType($name));
+      if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
 
       if ($value !== null) {
          $this->properties[$name] = $value;

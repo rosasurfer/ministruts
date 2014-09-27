@@ -45,7 +45,7 @@ class FileDependency extends Dependency {
     * @param string $fileName - Dateiname
     */
    public function __construct($fileName) {
-      if (!is_string($fileName)) throw new IllegalTypeException('Illegal type of argument $fileName: '.getType($fileName));
+      if (!is_string($fileName)) throw new IllegalTypeException('Illegal type of parameter $fileName: '.getType($fileName));
       if (!strLen($fileName))    throw new plInvalidArgumentException('Invalid argument $fileName: '.$fileName);
 
       if (file_exists($fileName)) {             // existierende Datei
@@ -73,7 +73,7 @@ class FileDependency extends Dependency {
     */
    public static function create($fileNames) {
       if (!is_array($fileNames)) {
-         if (!is_string($fileNames)) throw new IllegalTypeException('Illegal type of argument $fileNames: '.getType($fileNames));
+         if (!is_string($fileNames)) throw new IllegalTypeException('Illegal type of parameter $fileNames: '.getType($fileNames));
          if (!strLen($fileNames))    throw new plInvalidArgumentException('Invalid argument $fileNames: '.$fileNames);
          $fileNames = array($fileNames);
       }

@@ -54,7 +54,7 @@ final class ApdProfile extends Object {
     * @param string $file - Name der Dumpdatei mit den Profilerdaten
     */
    public function __construct($file) {
-      if (!is_string($file)) throw new IllegalTypeException('Illegal type of argument $file: '.getType($file));
+      if (!is_string($file)) throw new IllegalTypeException('Illegal type of parameter $file: '.getType($file));
       if (!strLen($file))    throw new plInvalidArgumentException('Invalid argument $file: '.$file);
       if (!is_file($file))   throw new FileNotFoundException('File not found: '.$file);
 

@@ -37,7 +37,7 @@ final class SystemFiveLock extends BaseLock {
     *                            demselben Schlüssel existiert
     */
    public function __construct($key) /*throws plRuntimeException*/ {
-      if (!is_string($key))                throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
+      if (!is_string($key))                throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
       if (isSet(self::$hSemaphores[$key])) throw new plRuntimeException('Dead-lock detected: already holding a lock for key "'.$key.'"');
       self::$hSemaphores[$key] = false;
 

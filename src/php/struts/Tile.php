@@ -85,7 +85,7 @@ class Tile extends Object {
     */
    public function setName($name) {
       if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($name)) throw new IllegalTypeException('Illegal type of argument $name: '.getType($name));
+      if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
 
       $this->name = $name;
       return $this;
@@ -112,7 +112,7 @@ class Tile extends Object {
     */
    public function setPath($file) {
       if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($file)) throw new IllegalTypeException('Illegal type of argument $file: '.getType($file));
+      if (!is_string($file)) throw new IllegalTypeException('Illegal type of parameter $file: '.getType($file));
 
       $this->path  = $file;
       return $this;
@@ -128,7 +128,7 @@ class Tile extends Object {
     */
    public function setLabel($label) {
       if ($this->configured)  throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($label)) throw new IllegalTypeException('Illegal type of argument $label: '.getType($label));
+      if (!is_string($label)) throw new IllegalTypeException('Illegal type of parameter $label: '.getType($label));
 
       $this->label = $label;
       return $this;
@@ -143,8 +143,8 @@ class Tile extends Object {
     */
    public function setProperty($name, $value) {
       if ($this->configured)                             throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($name))                             throw new IllegalTypeException('Illegal type of argument $name: '.getType($name));
-      if (!$value instanceof self && !is_string($value)) throw new IllegalTypeException('Illegal type of argument $value: '.getType($value));
+      if (!is_string($name))                             throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
+      if (!$value instanceof self && !is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
 
       $this->properties[$name] = $value;
       // TODO: valid types -> string, page or tile

@@ -36,7 +36,7 @@ final class Lock extends BaseLock {
     */
    public function __construct($key = null) {
       if (func_num_args()) {
-         if (!is_string($key)) throw new IllegalTypeException('Illegal type of argument $key: '.getType($key));
+         if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
       }
       else {
          // kein Schlüssel angegeben, __FILE__ + __LINE__ des aufrufenden Codes verwenden

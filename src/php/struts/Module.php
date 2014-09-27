@@ -91,8 +91,8 @@ class Module extends Object {
     * TODO: Module-Encoding entsprechend dem Config-Datei-Encoding implementieren
     */
    public function __construct($fileName, $prefix) {
-      if (!is_string($fileName)) throw new IllegalTypeException('Illegal type of argument $fileName: '.getType($fileName));
-      if (!is_string($prefix))   throw new IllegalTypeException('Illegal type of argument $prefix: '.getType($prefix));
+      if (!is_string($fileName)) throw new IllegalTypeException('Illegal type of parameter $fileName: '.getType($fileName));
+      if (!is_string($prefix))   throw new IllegalTypeException('Illegal type of parameter $prefix: '.getType($prefix));
 
       $loglevel        = Logger ::getLogLevel(__CLASS__);
       self::$logDebug  = ($loglevel <= L_DEBUG);
@@ -170,7 +170,7 @@ class Module extends Object {
     */
    protected function setPrefix($prefix) {
       if ($this->configured)   throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($prefix)) throw new IllegalTypeException('Illegal type of argument $prefix: '.getType($prefix));
+      if (!is_string($prefix)) throw new IllegalTypeException('Illegal type of parameter $prefix: '.getType($prefix));
       if ($prefix!=='' && $prefix{0}!='/')
          throw new IllegalTypeException('Module prefixes must start with a slash "/" character, found "'.$prefix.'"');
 
@@ -577,7 +577,7 @@ class Module extends Object {
     */
    protected function addForward($name, ActionForward $forward) {
       if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($name)) throw new IllegalTypeException('Illegal type of argument $name: '.getType($name));
+      if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
 
       if (isSet($this->forwards[$name]))
          throw new plRuntimeException('Non-unique name detected for global ActionForward "'.$name.'"');
@@ -672,7 +672,7 @@ class Module extends Object {
     */
    protected function setRequestProcessorClass($className) {
       if ($this->configured)                                                     throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($className))                                                throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
+      if (!is_string($className))                                                throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
       if (!is_class($className))                                                 throw new ClassNotFoundException("Undefined class '$className'");
       if (!is_subclass_of($className, Struts ::DEFAULT_REQUEST_PROCESSOR_CLASS)) throw new plInvalidArgumentException('Not a subclass of '.Struts ::DEFAULT_REQUEST_PROCESSOR_CLASS.': '.$className);
 
@@ -698,7 +698,7 @@ class Module extends Object {
     */
    protected function setRoleProcessorClass($className) {
       if ($this->configured)                                               throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($className))                                          throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
+      if (!is_string($className))                                          throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
       if (!is_class($className))                                           throw new ClassNotFoundException("Undefined class '$className'");
       if (!is_subclass_of($className, Struts ::ROLE_PROCESSOR_BASE_CLASS)) throw new plInvalidArgumentException('Not a subclass of '.Struts ::ROLE_PROCESSOR_BASE_CLASS.': '.$className);
 
@@ -729,7 +729,7 @@ class Module extends Object {
     */
    protected function setTilesClass($className) {
       if ($this->configured)                                         throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($className))                                    throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
+      if (!is_string($className))                                    throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
       if (!is_class($className))                                     throw new ClassNotFoundException("Undefined class '$className'");
       if (!is_subclass_of($className, Struts ::DEFAULT_TILES_CLASS)) throw new plInvalidArgumentException('Not a subclass of '.Struts ::DEFAULT_TILES_CLASS.': '.$className);
 
@@ -755,7 +755,7 @@ class Module extends Object {
     */
    protected function setMappingClass($className) {
       if ($this->configured)                                                  throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($className))                                             throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
+      if (!is_string($className))                                             throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
       if (!is_class($className))                                              throw new ClassNotFoundException("Undefined class '$className'");
       if (!is_subclass_of($className, Struts ::DEFAULT_ACTION_MAPPING_CLASS)) throw new plInvalidArgumentException('Not a subclass of '.Struts ::DEFAULT_ACTION_MAPPING_CLASS.': '.$className);
 
@@ -781,7 +781,7 @@ class Module extends Object {
     */
    protected function setForwardClass($className) {
       if ($this->configured)                                                  throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($className))                                             throw new IllegalTypeException('Illegal type of argument $className: '.getType($className));
+      if (!is_string($className))                                             throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
       if (!is_class($className))                                              throw new ClassNotFoundException("Undefined class '$className'");
       if (!is_subclass_of($className, Struts ::DEFAULT_ACTION_FORWARD_CLASS)) throw new plInvalidArgumentException('Not a subclass of '.Struts ::DEFAULT_ACTION_FORWARD_CLASS.': '.$className);
 
