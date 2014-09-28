@@ -183,8 +183,8 @@ define('FRIDAY'   , 5);
 define('SATURDAY' , 6);
 
 
-// Errorhandler anonym registrieren, damit die Klasse nicht schon hier geladen wird
-// --------------------------------------------------------------------------------
+// Error-/Exceptionhandler anonym registrieren, damit die Klasse Logger nicht schon hier geladen wird
+// --------------------------------------------------------------------------------------------------
 set_error_handler    (create_function('$level, $message, $file, $line, array $context', 'return Logger::handleError($level, $message, $file, $line, $context);'));
 set_exception_handler(create_function('Exception $exception'                          , 'Logger::handleException($exception); exit(1);'                        ));   // exit code = 1 forcieren
 
