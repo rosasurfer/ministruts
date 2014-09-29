@@ -511,7 +511,7 @@ class Logger extends StaticClass {
 
          $url = 'https://api.clickatell.com/http/sendmsg?user='.$username.'&password='.$password.'&api_id='.$api_id.'&to='.$receiver.'&text='.urlEncode($message);
 
-         // TODO: CURL-Abhängigkeiten möglichst durch interne URL-Funktionen ersetzen
+         // TODO: CURL-Abhängigkeit möglichst durch interne URL-Funktionen ersetzen
 
          // HTTP-Request erzeugen und ausführen
          $request  = HttpRequest ::create()->setUrl($url);
@@ -521,6 +521,7 @@ class Logger extends StaticClass {
          $content  = $response->getContent();
          if ($status != 200) throw new plRuntimeException('Unexpected HTTP status code from api.clickatell.com: '.$status.' ('.HttpResponse ::$sc[$status].')');
 
+         // TODO: SMS ggf. auf zwei message parts verlängern
          if (striPos($content, 'ERR: 113') === 0)                             // ERR: 113, Max message parts exceeded
             return self ::sms_log(subStr($message, 0, strLen($message)-10));  // mit kürzerer Message wiederholen
       }
