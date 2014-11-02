@@ -1,3 +1,4 @@
+#!/usr/bin/php -Cq
 <?php
 
 // -- begin of function definitions ---------------------------------------------------------------------------------------------
@@ -227,5 +228,6 @@ echoPre(get_loaded_extensions());
 */
 
 
-phpinfo();
+// phpInfo(), wenn das Script von einem Webserver ausgeführt wird
+isSet($_SERVER['REQUEST_METHOD']) && phpinfo();
 ?>
