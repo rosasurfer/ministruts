@@ -1,5 +1,5 @@
 <?php
-// ob das Script in der Konsole oder auf einem Webserver ausgeführt wird
+// ob das Script in der Konsole oder von einem Webserver ausgeführt wird
 $console = !isSet($_SERVER['REQUEST_METHOD']);
 
 if (!$console) {

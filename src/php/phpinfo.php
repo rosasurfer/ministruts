@@ -229,5 +229,5 @@ echoPre(get_loaded_extensions());
 
 
 // phpInfo(), wenn das Script von einem Webserver ausgeführt wird
-isSet($_SERVER['REQUEST_METHOD']) && phpinfo();
+isSet($_SERVER['REQUEST_METHOD']) && phpInfo();
 ?>
