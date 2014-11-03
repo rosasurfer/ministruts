@@ -1,4 +1,10 @@
 <?php
+!defined('E_RECOVERABLE_ERROR') && define('E_RECOVERABLE_ERROR',  4096);   // since PHP 5.2.0
+!defined('E_DEPRECATED'       ) && define('E_DEPRECATED'       ,  8192);   // since PHP 5.3.0
+!defined('E_USER_DEPRECATED'  ) && define('E_USER_DEPRECATED'  , 16384);   // since PHP 5.3.0
+
+$cli = !isSet($_SERVER['REQUEST_METHOD']);      // ob wir in der Konsole oder im Webserver laufen
+
 
 // -- begin of function definitions ---------------------------------------------------------------------------------------------
 
@@ -19,18 +25,14 @@ if (!function_exists('echoPre')) {
          $str = (string) $var;
       }
 
-      if (isSet($_SERVER['REQUEST_METHOD']))
+      global $cli;
+      if (!$cli)
          $str = '<div align="left"><pre style="margin:0; font:normal normal 12px/normal \'Courier New\',courier,serif">'.htmlSpecialChars($str, ENT_QUOTES).'</pre></div>';
       $str .= "\n";
 
       echo $str;
    }
 }
-
-
-!defined('E_RECOVERABLE_ERROR') && define('E_RECOVERABLE_ERROR',  4096);   // since PHP 5.2.0
-!defined('E_DEPRECATED'       ) && define('E_DEPRECATED'       ,  8192);   // since PHP 5.3.0
-!defined('E_USER_DEPRECATED'  ) && define('E_USER_DEPRECATED'  , 16384);   // since PHP 5.3.0
 
 
 if (!function_exists('errorLevelToStr')) {
@@ -86,10 +88,9 @@ if (strPos(PHP_VERSION,  '5.4.')===0 && PHP_VERSION < '5.4.21')              $is
 if (!ini_get('short_open_tag'))                                              $isWarning = 1|echoPre('Warning: short_open_tag is not On');
 if (ini_get('safe_mode'))                             /*entfernt ab v5.4*/   $isWarning = 1|echoPre('Warning: safe_mode is not Off');
 if (ini_get('expose_php'))                                                   $isWarning = 1|echoPre('Warning: expose_php is not Off');
-
 if (ini_get('register_globals'))                                             $isWarning = 1|echoPre('Warning: register_globals is not Off');
 if (ini_get('register_long_arrays'))                                         $isWarning = 1|echoPre('Warning: register_long_arrays is not Off');
-if (ini_get('register_argc_argv') && isSet($_SERVER['REQUEST_METHOD']))      $isWarning = 1|echoPre('Warning: register_argc_argv is not Off');     // hardcoded to On for the CLI SAPI
+if (!$cli && ini_get('register_argc_argv'))                                  $isWarning = 1|echoPre('Warning: register_argc_argv is not Off');                                   // since v5.4 hardcoded to On for the CLI SAPI
 if (!ini_get('auto_globals_jit'))                                            $isWarning = 1|echoPre('Warning: auto_globals_jit is not On');
 if (ini_get('variables_order') != 'GPCS')                                    $isWarning = 1|echoPre('Warning: variables_order is not "GPCS": "'.ini_get('variables_order').'"');
 if (ini_get('always_populate_raw_post_data'))                                $isWarning = 1|echoPre('Warning: always_populate_raw_post_data is not Off');
@@ -97,9 +98,8 @@ if (ini_get('define_syslog_variables'))                                      $is
 if (ini_get('arg_separator.output') != '&amp;')                              $isWarning = 1|echoPre('Warning: arg_separator.output is not "&amp;": "'.ini_get('arg_separator.output').'"');
 if (ini_get('allow_url_fopen'))                                              $isWarning = 1|echoPre('Warning: allow_url_fopen is not Off');
 if (ini_get('allow_url_include'))                                            $isWarning = 1|echoPre('Warning: allow_url_include is not Off');
-
-if ((int) ini_get('max_execution_time') != 30)                               $isWarning = 1|echoPre('Warning: max_execution_time is not 30: '.ini_get('max_execution_time'));
-if ((int) ini_get('default_socket_timeout') != 60)                           $isWarning = 1|echoPre('Warning: default_socket_timeout is not 60: '.ini_get('default_socket_timeout'));
+if (!$cli && (int)ini_get('max_execution_time') != 30)                       $isWarning = 1|echoPre('Warning: max_execution_time is not 30: '.ini_get('max_execution_time'));    // since v5.4 hardcoded to 0 for the CLI SAPI
+if ((int)ini_get('default_socket_timeout') != 60)                            $isWarning = 1|echoPre('Warning: default_socket_timeout is not 60: '.ini_get('default_socket_timeout'));
 if (ini_get('implicit_flush'))                                               $isWarning = 1|echoPre('Warning: implicit_flush is not Off');
 if (ini_get('allow_call_time_pass_reference'))        /*entfernt ab v5.4*/   $isWarning = 1|echoPre('Warning: allow_call_time_pass_reference is not Off');
 if (!ini_get('ignore_user_abort'))                                           $isWarning = 1|echoPre('Warning: ignore_user_abort is not On');
@@ -196,7 +196,7 @@ if ( extension_loaded('apc')) {
 if (WINDOWS && !ini_get('sendmail_path') && !ini_get('sendmail_from') && !isSet($_SERVER['SERVER_ADMIN']))
                                                                              $isWarning = 1|echoPre('Windows warning: neither sendmail_path nor sendmail_from are set');
 if (!WINDOWS && !ini_get('sendmail_path'))                                   $isWarning = 1|echoPre('Warning: sendmail_path is not set');
-if (isSet($_SERVER['REQUEST_METHOD']) && !isSet($_SERVER['SERVER_ADMIN']))   $isWarning = 1|echoPre('Warning: email address $_SERVER["SERVER_ADMIN"] is not set');
+if (!$cli && !isSet($_SERVER['SERVER_ADMIN']))                               $isWarning = 1|echoPre('Warning: email address $_SERVER["SERVER_ADMIN"] is not set');
 
 
 // Fehleranzeige etc. auf Entwicklungs- bzw. Produktivsystem
@@ -216,7 +216,7 @@ else {
 // Bestätigung, wenn alles ok ist
 if (!$isWarning)
    echo 'Configuration OK';
-echo isSet($_SERVER['REQUEST_METHOD']) ? '<p>' : "\n";
+echo $cli ? "\n":'<p>';
 
 
 /*
@@ -227,6 +227,6 @@ echoPre(get_loaded_extensions());
 */
 
 
-// phpInfo() nur, wenn das Script von einem Webserver ausgeführt wird
-isSet($_SERVER['REQUEST_METHOD']) && phpInfo();
+// phpInfo() nur, wenn das Script nicht in der Konsole (also im Webserver) läuft
+!$cli && phpInfo();
 ?>
