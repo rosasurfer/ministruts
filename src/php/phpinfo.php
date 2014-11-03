@@ -100,7 +100,7 @@ if (ini_get('allow_url_fopen'))                                              $is
 if (ini_get('allow_url_include'))                                            $isWarning = 1|echoPre('Warning: allow_url_include is not Off');
 if (!$cli && (int)ini_get('max_execution_time') != 30)                       $isWarning = 1|echoPre('Warning: max_execution_time is not 30: '.ini_get('max_execution_time'));    // since v5.4 hardcoded to 0 for the CLI SAPI
 if ((int)ini_get('default_socket_timeout') != 60)                            $isWarning = 1|echoPre('Warning: default_socket_timeout is not 60: '.ini_get('default_socket_timeout'));
-if ($cli && ini_get('implicit_flush'))                                       $isWarning = 1|echoPre('Warning: implicit_flush is not Off');                                       // since v5.4 hardcoded to On for the CLI SAPI
+if (!$cli && ini_get('implicit_flush'))                                      $isWarning = 1|echoPre('Warning: implicit_flush is not Off');                                       // since v5.4 hardcoded to On for the CLI SAPI
 if (ini_get('allow_call_time_pass_reference'))        /*entfernt ab v5.4*/   $isWarning = 1|echoPre('Warning: allow_call_time_pass_reference is not Off');
 if (!ini_get('ignore_user_abort'))                                           $isWarning = 1|echoPre('Warning: ignore_user_abort is not On');
 if (ini_get('session.save_handler') != 'files')                              $isWarning = 1|echoPre('Warning: session.save_handler is not "files": "'.ini_get('session.save_handler').'"');
