@@ -204,12 +204,12 @@ if (!$cli && !isSet($_SERVER['SERVER_ADMIN']))                                  
 if (LOCAL) {
    if (!ini_get('display_errors'))                                                         $isWarning = 1|echoPre('Warning: display_errors is not On');
    if (!ini_get('display_startup_errors'))                                                 $isWarning = 1|echoPre('Warning: display_startup_errors is not On');
-   if ((int) ini_get('output_buffering') != 0)                                             $isWarning = 1|echoPre('Warning: output_buffering is enabled: '.ini_get('output_buffering'));
+   if (!$cli && (int) ini_get('output_buffering') != 0)                                    $isWarning = 1|echoPre('Warning: output_buffering is enabled: '.ini_get('output_buffering'));  // since v5.4 hardcoded to Off for the CLI SAPI
 }
 else {
    if (ini_get('display_errors'))                                                          $isWarning = 1|echoPre('Warning: display_errors is not Off');
    if (ini_get('display_startup_errors'))                                                  $isWarning = 1|echoPre('Warning: display_startup_errors is not Off');
-   if ((int) ini_get('output_buffering') == 0)                                             $isWarning = 1|echoPre('Warning: output_buffering is not enabled: '.ini_get('output_buffering'));
+   if (!$cli && (int) ini_get('output_buffering') == 0)                                    $isWarning = 1|echoPre('Warning: output_buffering is not enabled: '.ini_get('output_buffering'));
 }
 
 
