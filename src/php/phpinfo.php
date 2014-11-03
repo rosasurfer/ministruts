@@ -84,12 +84,12 @@ if (strPos(PHP_VERSION,  '5.3.')===0)                                        $is
 if (strPos(PHP_VERSION,  '5.4.')===0 && PHP_VERSION < '5.4.21')              $isWarning = 1|echoPre('Warning: You are running a buggy PHP version, a version >= 5.4.21 is recommended (see bug 47987).');
 
 if (!ini_get('short_open_tag'))                                              $isWarning = 1|echoPre('Warning: short_open_tag is not On');
-if (ini_get('safe_mode'))                                                    $isWarning = 1|echoPre('Warning: safe_mode is not Off');
+if (ini_get('safe_mode'))                             /*removed ab v5.4*/    $isWarning = 1|echoPre('Warning: safe_mode is not Off');
 if (ini_get('expose_php'))                                                   $isWarning = 1|echoPre('Warning: expose_php is not Off');
 
 if (ini_get('register_globals'))                                             $isWarning = 1|echoPre('Warning: register_globals is not Off');
 if (ini_get('register_long_arrays'))                                         $isWarning = 1|echoPre('Warning: register_long_arrays is not Off');
-if (ini_get('register_argc_argv'))                                           $isWarning = 1|echoPre('Warning: register_argc_argv is not Off');
+if (ini_get('register_argc_argv') && isSet($_SERVER['REQUEST_METHOD']))      $isWarning = 1|echoPre('Warning: register_argc_argv is not Off');     // hardcoded to On for the CLI SAPI
 if (!ini_get('auto_globals_jit'))                                            $isWarning = 1|echoPre('Warning: auto_globals_jit is not On');
 if (ini_get('variables_order') != 'GPCS')                                    $isWarning = 1|echoPre('Warning: variables_order is not "GPCS": "'.ini_get('variables_order').'"');
 if (ini_get('always_populate_raw_post_data'))                                $isWarning = 1|echoPre('Warning: always_populate_raw_post_data is not Off');
@@ -101,7 +101,7 @@ if (ini_get('allow_url_include'))                                            $is
 if ((int) ini_get('max_execution_time') != 30)                               $isWarning = 1|echoPre('Warning: max_execution_time is not 30: '.ini_get('max_execution_time'));
 if ((int) ini_get('default_socket_timeout') != 60)                           $isWarning = 1|echoPre('Warning: default_socket_timeout is not 60: '.ini_get('default_socket_timeout'));
 if (ini_get('implicit_flush'))                                               $isWarning = 1|echoPre('Warning: implicit_flush is not Off');
-if (ini_get('allow_call_time_pass_reference'))                               $isWarning = 1|echoPre('Warning: allow_call_time_pass_reference is not Off');
+if (ini_get('allow_call_time_pass_reference'))        /*removed ab v5.4*/    $isWarning = 1|echoPre('Warning: allow_call_time_pass_reference is not Off');
 if (!ini_get('ignore_user_abort'))                                           $isWarning = 1|echoPre('Warning: ignore_user_abort is not On');
 if (ini_get('session.save_handler') != 'files')                              $isWarning = 1|echoPre('Warning: session.save_handler is not "files": "'.ini_get('session.save_handler').'"');
 /*
