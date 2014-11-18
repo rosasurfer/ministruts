@@ -182,6 +182,9 @@ define('THURSDAY' , 4);
 define('FRIDAY'   , 5);
 define('SATURDAY' , 6);
 
+// Helper
+define('NL', PHP_EOL);
+
 
 // Error-/Exceptionhandler anonym registrieren, damit die Klasse Logger nicht schon hier geladen wird
 // --------------------------------------------------------------------------------------------------
