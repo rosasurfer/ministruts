@@ -128,12 +128,17 @@ final class CurlHttpClient extends HttpClient {
       $hCurl = curl_init();
 
       // Optionen setzen, sofern sie nicht schon gesetzt sind
-      $options = $this->options;                             $options[CURLOPT_URL           ] = $request->getUrl();
-      !array_key_exists(CURLOPT_TIMEOUT       , $options) && $options[CURLOPT_TIMEOUT       ] = $this->timeout;
-      !array_key_exists(CURLOPT_USERAGENT     , $options) && $options[CURLOPT_USERAGENT     ] = $this->userAgent;
-      !array_key_exists(CURLOPT_ENCODING      , $options) && $options[CURLOPT_ENCODING      ] = '';         // sets all supported encodings
-      !array_key_exists(CURLOPT_HEADERFUNCTION, $options) && $options[CURLOPT_HEADERFUNCTION] = array($response, 'writeHeader');
-      !array_key_exists(CURLOPT_WRITEFUNCTION , $options) && $options[CURLOPT_WRITEFUNCTION ] = array($response, 'writeContent');
+      $options = $this->options;                        $options[CURLOPT_URL      ] = $request->getUrl();
+      !array_key_exists(CURLOPT_TIMEOUT  , $options) && $options[CURLOPT_TIMEOUT  ] = $this->timeout;    // Execution-Timeout
+      !array_key_exists(CURLOPT_USERAGENT, $options) && $options[CURLOPT_USERAGENT] = $this->userAgent;
+      !array_key_exists(CURLOPT_ENCODING , $options) && $options[CURLOPT_ENCODING ] = '';                // sets all supported encodings
+
+      if (!array_key_exists(CURLOPT_WRITEHEADER, $options))
+         if (!array_key_exists(CURLOPT_HEADERFUNCTION, $options)) $options[CURLOPT_HEADERFUNCTION] = array($response, 'writeHeader');
+
+      if (!array_key_exists(CURLOPT_FILE, $options))                 // ein gesetztes CURLOPT_RETURNTRANSFER wird immer überschrieben
+         if (!array_key_exists(CURLOPT_WRITEFUNCTION, $options))  $options[CURLOPT_WRITEFUNCTION ] = array($response, 'writeContent');
+
 
       // zusätzliche Header überschreiben automatisch generierte Header
       foreach ($request->getHeaders() as $key => $value) {
