@@ -171,21 +171,21 @@ if (!WINDOWS && !extension_loaded('sysvsem'))                                   
 if (!extension_loaded('apc'))                                                              $isWarning = 1|echoPre('Warning: APC opcode cache not found');
 if ( extension_loaded('apc')) {
    if (phpVersion('apc') >= '3.1.3' && phpVersion('apc') < '3.1.7')                        $isWarning = 1|echoPre('Warning: You are running a buggy APC version (a version < 3.1.3 or >= 3.1.7 is recommended).');
-   if (!ini_get('apc.enabled'))                                                            $isWarning = 1|echoPre('Warning: apc.enabled is not On');                   // warning "Potential cache slam averted for key '...'" http://bugs.php.net/bug.php?id=58832
+   if (!ini_get('apc.enabled'))                                                            $isWarning = 1|echoPre('Warning: apc.enabled is not On');                    // warning "Potential cache slam averted for key '...'" http://bugs.php.net/bug.php?id=58832
    if ( ini_get('apc.report_autofilter'))                                                  $isWarning = 1|echoPre('Warning: apc.report_autofilter is not Off');
 
    if (WINDOWS) {       // Entwicklungsumgebung
       if      (ini_get('apc.stat'))                                                        $isWarning = 1|echoPre('Warning: apc.stat is not Off');
-      else if (ini_get('apc.cache_by_default'))                                            $isWarning = 1|echoPre('Warning: apc.cache_by_default is not Off');         // "On" läßt manche Windows-APC-Versionen crashen (apc-error: cannot redeclare class ***)
-   }                                                                                                                                                                   // wenn apc.stat="off" (siehe vorheriger Test), dann *MUSS* diese Option unter Windows aus sein.
+      else if (ini_get('apc.cache_by_default'))                                            $isWarning = 1|echoPre('Warning: apc.cache_by_default is not Off');          // "On" läßt manche Windows-APC-Versionen crashen (apc-error: cannot redeclare class ***)
+   }                                                                                                                                                                    // wenn apc.stat="off" (siehe vorheriger Test), dann *MUSS* diese Option unter Windows aus sein.
    else {               // Produktionsumgebung
       if (!ini_get('apc.cache_by_default'))                                                $isWarning = 1|echoPre('Warning: apc.cache_by_default is not On');
-      if ( ini_get('apc.stat'))                                                            $isWarning = 1|echoPre('Warning: apc.stat is not Off');                     // es soll gecacht werden
-      if (!ini_get('apc.write_lock'))                                                      $isWarning = 1|echoPre('Warning: apc.write_lock is not On');                // für beste Performance möglichst "Off" (Dateiänderungen sollen live nicht möglich sein)
+      if ( ini_get('apc.stat'))                                                            $isWarning = 1|echoPre('Warning: apc.stat is not Off');                      // es soll gecacht werden
+      if (!ini_get('apc.write_lock'))                                                      $isWarning = 1|echoPre('Warning: apc.write_lock is not On');                 // für beste Performance möglichst "Off" (Dateiänderungen sollen live nicht möglich sein)
 
       if (phpVersion('apc') >= '3.1.3' && phpVersion('apc') < '3.1.7') {
          if (ini_get('apc.include_once_override'))                                         $isWarning = 1|echoPre('Warning: apc.include_once_override is not Off');
-      }                                                                                                                                                                // include_once()/require_once() sollten möglichst nicht verwendet werden
+      }                                                                                                                                                                 // include_once()/require_once() sollten möglichst nicht verwendet werden
       else if (!ini_get('apc.include_once_override'))                                      $isWarning = 1|echoPre('Warning: apc.include_once_override is not On');
    }
 }
