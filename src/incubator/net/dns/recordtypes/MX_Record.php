@@ -67,4 +67,3 @@ class MX_Record extends DNSResourceRecord {
 
     /* }}} */
 }
-?>

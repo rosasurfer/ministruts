@@ -60,4 +60,3 @@ abstract class Singleton extends Object {
     */
    final private function __clone() {/* do not clone me */}
 }
-?>

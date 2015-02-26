@@ -89,4 +89,3 @@ abstract class BaseC128BarCode extends BarCode {
     */
    abstract protected function getCheckCharValue();
 }
-?>

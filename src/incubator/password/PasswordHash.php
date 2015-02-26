@@ -222,4 +222,3 @@ class PasswordHash {
       return $output;
    }
 }
-?>

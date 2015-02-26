@@ -147,4 +147,3 @@ class DaoWorker extends Object {
       return $this->adapter;
    }
 }
-?>

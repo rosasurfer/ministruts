@@ -345,4 +345,3 @@ class CommonValidator extends StaticClass {
       return is_string($string) && strLen($string) && preg_match($pattern, strToLower($string));
    }
 }
-?>

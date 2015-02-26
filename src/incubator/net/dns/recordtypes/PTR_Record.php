@@ -60,4 +60,3 @@ class PTR_Record extends DNSResourceRecord {
 
     /* }}} */
 }
-?>

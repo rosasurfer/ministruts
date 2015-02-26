@@ -58,4 +58,3 @@ class CNAME_Record extends DNSResourceRecord {
 
     /* }}} */
 }
-?>

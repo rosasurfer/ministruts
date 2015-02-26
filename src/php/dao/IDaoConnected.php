@@ -14,4 +14,3 @@ interface IDaoConnected {
     */
    public static function dao();
 }
-?>

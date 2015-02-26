@@ -23,4 +23,3 @@ abstract class Messenger extends Object {
    */
    abstract public function sendMessage($receiver, $message);
 }
-?>

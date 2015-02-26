@@ -580,4 +580,3 @@ final class ApdProfile extends Object {
       else                               { return  0; }
    }
 }
-?>

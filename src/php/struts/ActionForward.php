@@ -184,4 +184,3 @@ class ActionForward extends Object {
       return $forward;
    }
 }
-?>

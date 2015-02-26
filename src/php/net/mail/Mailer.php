@@ -293,4 +293,3 @@ function composeMessage($from, $fromName, $to, $toName, $subject, $textMsg, $htm
    mail($to, $subject, $message, $headers);
 }
 */
-?>

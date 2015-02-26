@@ -1019,4 +1019,3 @@ abstract class RequestBase extends Singleton {
       return $string;
    }
 }
-?>

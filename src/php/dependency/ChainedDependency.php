@@ -110,4 +110,3 @@ class ChainedDependency extends Dependency {
       throw new plRuntimeException('Unreachable code reached');
    }
 }
-?>

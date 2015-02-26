@@ -207,4 +207,3 @@ class Tile extends Object {
       echo ($this->parent ? "\n<!-- #end: ".$this->label." -->\n" : null);
    }
 }
-?>

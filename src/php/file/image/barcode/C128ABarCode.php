@@ -259,4 +259,3 @@ class C128ABarCode extends BaseC128BarCode {
       return $DrawPos;
    }
 }
-?>

@@ -221,4 +221,3 @@ class C39BarCode extends BarCode {
       return $DrawPos;
    }
 }
-?>

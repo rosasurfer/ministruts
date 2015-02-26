@@ -4,4 +4,3 @@
  */
 class plRuntimeException extends NestableException {
 }
-?>

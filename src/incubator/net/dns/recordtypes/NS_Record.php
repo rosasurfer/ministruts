@@ -59,4 +59,3 @@ class NS_Record extends DNSResourceRecord {
 
     /* }}} */
 }
-?>

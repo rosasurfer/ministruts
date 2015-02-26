@@ -74,4 +74,3 @@ class HINFO_Record extends DNSResourceRecord {
 
     /* }}} */
 }
-?>

@@ -273,4 +273,3 @@ abstract class DB extends Object {
       return ($this->transaction > 0);
    }
 }
-?>

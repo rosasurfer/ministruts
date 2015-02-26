@@ -6,4 +6,3 @@
  */
 class PermissionDeniedException extends plRuntimeException {
 }
-?>

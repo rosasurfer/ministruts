@@ -527,4 +527,3 @@ class Logger extends StaticClass {
       }
    }
 }
-?>

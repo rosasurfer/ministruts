@@ -332,4 +332,3 @@ abstract class HttpResponse extends Object {
     */
    abstract public function getContent();
 }
-?>

@@ -70,4 +70,3 @@ class RP_Record extends DNSResourceRecord {
 
     /* }}} */
 }
-?>

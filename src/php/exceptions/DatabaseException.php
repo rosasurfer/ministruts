@@ -4,4 +4,3 @@
  */
 class DatabaseException extends InfrastructureException {
 }
-?>

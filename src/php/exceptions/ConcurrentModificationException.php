@@ -6,4 +6,3 @@
  */
 class ConcurrentModificationException extends InfrastructureException {
 }
-?>

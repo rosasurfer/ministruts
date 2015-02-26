@@ -194,4 +194,3 @@ final class FrontController extends Singleton {
       return new $class($module);
    }
 }
-?>

@@ -52,4 +52,3 @@ final class Response extends Singleton {
       return $value;    // Referenz auf NULL
    }
 }
-?>

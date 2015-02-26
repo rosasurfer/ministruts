@@ -4,4 +4,3 @@
  */
 class plInvalidArgumentException extends plRuntimeException {
 }
-?>

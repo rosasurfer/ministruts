@@ -9,4 +9,3 @@ abstract class StaticClass extends Object {
 
    final private function __construct() {/* you can't instantiate me */}
 }
-?>

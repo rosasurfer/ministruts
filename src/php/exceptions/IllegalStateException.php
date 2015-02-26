@@ -4,4 +4,3 @@
  */
 class IllegalStateException extends plRuntimeException {
 }
-?>

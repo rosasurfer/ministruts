@@ -15,4 +15,3 @@ class ClickatellSMSMessenger extends Messenger {
       throw new UnimplementedFeatureException('Method '.get_class($this).'::'.__FUNCTION__.'() is not implemented');
    }
 }
-?>

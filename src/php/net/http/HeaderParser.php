@@ -108,4 +108,3 @@ final class HeaderParser extends Object {
       return $this->headers[strToLower($name)];
    }
 }
-?>

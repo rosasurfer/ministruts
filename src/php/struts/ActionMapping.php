@@ -449,4 +449,3 @@ class ActionMapping extends Object {
       return $forward;
    }
 }
-?>

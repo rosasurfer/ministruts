@@ -4,4 +4,3 @@
  */
 class UnsupportedMethodException extends plRuntimeException {
 }
-?>

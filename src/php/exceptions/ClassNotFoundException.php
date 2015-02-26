@@ -4,4 +4,3 @@
  */
 class ClassNotFoundException extends NestableException {
 }
-?>

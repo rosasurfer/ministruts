@@ -98,4 +98,3 @@ class NAPTR_Record extends DNSResourceRecord {
 
     /* }}} */
 }
-?>

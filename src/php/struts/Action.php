@@ -103,4 +103,3 @@ abstract class Action extends Object {
       return $this->mapping->findForward($name);
    }
 }
-?>

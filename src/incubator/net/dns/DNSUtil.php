@@ -449,4 +449,3 @@ class DNSUtil
     /* not completed - DNSUtil::rr_del() {{{*/
     /*}}}*/
 }
-?>

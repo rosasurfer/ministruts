@@ -66,4 +66,3 @@ class PHPErrorException extends NestableException {
       return $trace;
    }
 }
-?>

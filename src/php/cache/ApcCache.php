@@ -183,4 +183,3 @@ final class ApcCache extends CachePeer {
       return true;
    }
 }
-?>

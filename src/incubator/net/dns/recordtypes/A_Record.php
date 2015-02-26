@@ -71,4 +71,3 @@ class A_Record extends DNSResourceRecord {
     /* }}} */
 
 }
-?>

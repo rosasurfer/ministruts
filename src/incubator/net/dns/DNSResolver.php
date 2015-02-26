@@ -1394,4 +1394,3 @@ class DNSResolver
     }
     /* }}} */
 }
-?>

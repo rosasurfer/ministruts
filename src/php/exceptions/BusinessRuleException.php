@@ -6,4 +6,3 @@
  */
 class BusinessRuleException extends plRuntimeException {
 }
-?>

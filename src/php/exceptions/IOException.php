@@ -4,4 +4,3 @@
  */
 class IOException extends NestableException {
 }
-?>

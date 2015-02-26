@@ -143,4 +143,3 @@ abstract class CachePeer extends Object {
       return $this->set($key, $value, $expires, $dependency);
    }
 }
-?>

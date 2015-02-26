@@ -81,12 +81,11 @@ final class DBPool extends Singleton {
       return $connector;
    }
 
-}
-/*
+
+   /*
    // @return DB
    public static function getByDao(GenericDAO $dao) {
       return self:: me()->getLink($dao->getLinkName());
    }
+   */
 }
-*/
-?>

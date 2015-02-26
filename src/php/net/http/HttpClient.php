@@ -100,4 +100,3 @@ abstract class HttpClient extends Object {
     */
    abstract public function send(HttpRequest $request);
 }
-?>

@@ -255,4 +255,3 @@ abstract class PersistableObject extends Object implements IDaoConnected {
       return Singleton ::getInstance($class.'DAO');
    }
 }
-?>

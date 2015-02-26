@@ -386,4 +386,3 @@ class Shm_Load_Protector
         return $v;
     }// getCounterValue
 }// class Shm_Load_Protector
-?>

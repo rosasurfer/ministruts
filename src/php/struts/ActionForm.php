@@ -88,4 +88,3 @@ abstract class ActionForm extends Object {
       $this->__construct(Request ::me());
    }
 }
-?>

@@ -151,4 +151,3 @@ class CommonDAO extends Singleton {
       return $instance;
    }
 }
-?>

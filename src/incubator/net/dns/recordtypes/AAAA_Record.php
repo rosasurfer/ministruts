@@ -108,4 +108,3 @@ class AAAA_Record extends DNSResourceRecord {
 
     /* }}} */
 }
-?>

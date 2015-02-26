@@ -7,4 +7,3 @@
  */
 class InfrastructureException extends plRuntimeException {
 }
-?>

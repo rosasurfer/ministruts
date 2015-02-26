@@ -457,4 +457,3 @@ class SMTPMailer extends Mailer {
     * ...
     */
 }
-?>

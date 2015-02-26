@@ -23,4 +23,3 @@ final class Request extends RequestBase {
       return null;
    }
 }
-?>

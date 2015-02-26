@@ -108,4 +108,3 @@ abstract class Dependency extends Object {
       return $this;
    }
 }
-?>

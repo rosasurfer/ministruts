@@ -336,4 +336,3 @@ final class Config extends Object {
     */
    private function __clone() {/* do not clone me */}
 }
-?>

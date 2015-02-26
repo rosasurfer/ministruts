@@ -48,4 +48,3 @@ class Object {
       return print_r($this, true);
    }
 }
-?>

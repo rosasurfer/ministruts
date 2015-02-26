@@ -36,4 +36,3 @@ class FileSocketMailer extends Mailer {
       $receiver = Config ::get('mail.address.forced-receiver', $receiver);
    }
 }
-?>

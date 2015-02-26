@@ -144,4 +144,3 @@ final class CurlHttpResponse extends HttpResponse {
       return $this->content;
    }
 }
-?>

@@ -4,4 +4,3 @@
  */
 class IllegalTypeException extends plRuntimeException {
 }
-?>

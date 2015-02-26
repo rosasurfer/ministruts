@@ -1550,4 +1550,3 @@ class SimplePdfDocument extends BasePdfDocument {
       return $this;
    }
 }
-?>

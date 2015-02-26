@@ -21,4 +21,3 @@ class HelloWorldAction extends Action {
       return 'error';         // shortkey for $this->findForward('error');
    }
 }
-?>

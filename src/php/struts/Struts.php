@@ -90,4 +90,3 @@ final class Struts extends StaticClass {
     */
    const MODULE_KEY = 'org.apache.struts.action.MODULE';
 }
-?>

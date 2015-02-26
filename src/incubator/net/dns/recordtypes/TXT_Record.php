@@ -77,4 +77,3 @@ class TXT_Record extends DNSResourceRecord {
 
     /* }}} */
 }
-?>
