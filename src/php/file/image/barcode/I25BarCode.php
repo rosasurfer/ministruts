@@ -159,4 +159,3 @@ class I25BarCode extends BarCode {
       return $DrawPos;
    }
 }
-?>
