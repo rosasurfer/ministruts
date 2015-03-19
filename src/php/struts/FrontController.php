@@ -4,12 +4,13 @@
  *
  * NOTE:
  * -----
- * Diese Klasse muß innerhalb der Applikation "thread-sicher" sein.  Das bedeutet, daß in statischen Variablen
- * (Werte in self) und Instanzvariablen (Werte in $this) kein dynamischer Laufzeitstatus gespeichert werden darf.
+ * Diese Klasse muß innerhalb der Applikation "thread-sicher" sein (genauer: "request-sicher").  Das bedeutet,
+ * daß in statischen Membervariablen kein dynamischer Laufzeitstatus gespeichert werden darf. Es gelten dieselben
+ * Regeln wie für thread-sichere Programmierung.
  *
- * Hintergrund ist, daß es je Applikation nur eine FrontController-Instanz gibt, die gecacht und von jedem Request
- * wiederverwendet wird.  Würde z.B. während eines Requests eine Instanzvariable geändert, würde diese Änderung auch
- * in allen folgenden Requests, die diese gecachte Instanz verwenden, sichtbar werden und dessen Verarbeitung stören.
+ * Hintergrund ist, daß es je Applikation nur eine FrontController-Instanz gibt, die gecacht (serialisiert) und von
+ * folgenden Requests wiederverwendet wird. Dadurch muß die XML-Konfiguration nicht bei jedem Request neu eingelesen
+ * werden.
  */
 final class FrontController extends Singleton {
 
