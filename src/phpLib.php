@@ -494,16 +494,19 @@ function printFormatted($var, $return=false) {
 /**
  * Gibt den Inhalt einer Variable aus.
  *
- * @param  mixed $var    - Variable
- * @param  bool  $return - TRUE, wenn das Ergebnis zurückgegeben werden soll;
- *                         FALSE, wenn das Ergebnis auf STDOUT ausgegeben werden soll (default)
+ * @param  mixed $var   - Variable
+ * @param  bool $return - TRUE, wenn das Ergebnis zurückgegeben werden soll;
+ *                        FALSE, wenn das Ergebnis auf STDOUT ausgegeben werden soll (default)
+ *
+ * @return string       - Variableninhalt oder NULL, wenn der Parameter $return FALSE ist
  */
-function dump($var, $return = false) {
+function dump($var, $return=false) {
    if ($return) ob_start();
 
    var_dump($var);
 
    if ($return) return ob_get_clean();
+   return;
 }
 
 
