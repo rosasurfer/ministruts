@@ -122,22 +122,15 @@ class Module extends Object {
       if (!is_file($fileName)) throw new FileNotFoundException('File not found: '.$fileName);
       $content = file_get_contents($fileName, false);
 
-      // die DTD liegt relativ zum Rootverzeichnis der Library
-      $dirs = explode(DIRECTORY_SEPARATOR, dirName(__FILE__));
-      while (($dir=array_pop($dirs)) !== null)
-         if ($dir == 'src')
-            break;
-      if (sizeOf($dirs) == 0) throw new plRuntimeException('Could not resolve root path of library, giving up.');
-      $libroot = join(DIRECTORY_SEPARATOR, $dirs);
-
-      $cwd = getCwd();
+      // die DTD liegt im Struts-Package-Verzeichnis (src/php/struts)
+      $currentDir = getCwd();
+      $packageDir = dirName(__FILE__);
 
       // TODO: XML ohne Verzeichniswechsel validieren
 
-      // ins Rootverzeichnis wechseln
-      try { chDir($libroot); }
-      catch (Exception $ex) { throw new plRuntimeException('Could not change working directory to "'.$libroot.'"', $ex); }
-
+      // ins Packageverzeichnis wechseln
+      try { chDir($packageDir); }
+      catch (Exception $ex) { throw new plRuntimeException('Could not change working directory to "'.$packageDir.'"', $ex); }
 
       // Konfiguration parsen, validieren und Dateinamen hinterlegen
       $xml = new SimpleXMLElement($content, LIBXML_DTDVALID);
@@ -145,8 +138,8 @@ class Module extends Object {
 
 
       // zurück ins Ausgangsverzeichnis wechseln
-      try { chDir($cwd); }
-      catch (Exception $ex) { throw new plRuntimeException('Could not change working directory back to "'.$cwd.'"', $ex); }
+      try { chDir($currentDir); }
+      catch (Exception $ex) { throw new plRuntimeException('Could not change working directory back to "'.$currentDir.'"', $ex); }
 
       return $xml;
    }

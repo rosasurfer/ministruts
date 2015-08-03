@@ -1,3 +1,8 @@
+2015-08-03
+
+   - php/struts/Module: - die Struts4PHP-DTD liegt im Struts-Package-Verzeichnis (src/php/struts)
+
+
 2014-09-25
 
    - php/util/Logger: - Logmessages können auch per SMS verschickt werden, dazu ist ein Clickatell-Account notwendig.
