@@ -434,6 +434,18 @@ function getRandomID($length) {
 
 
 /**
+ * Alias für "getType()" zur sprachenübergreifenden Vereinfachung.
+ *
+ * @param  mixed $var - Variable
+ *
+ * @return string
+ */
+function typeOf($var) {
+   return getType($var);
+}
+
+
+/**
  * Alias für "echo $var", das ein Language-Construct ist und nicht immer als Funktion verwendet werden kann.
  *
  * @param  mixed $var - die auszugebende Variable

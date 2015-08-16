@@ -1,3 +1,8 @@
+2015-08-16
+
+   - Alias typeof() für getType()
+
+
 2015-08-03
 
    - php/struts/Module: - die Struts4PHP-DTD liegt im Struts-Package-Verzeichnis (src/php/struts)
