@@ -258,4 +258,3 @@ pprof2calltree -f <tracefile>
 EOD;
     exit(1);
 }
-?>

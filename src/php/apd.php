@@ -483,4 +483,3 @@ pprofp <flags> <trace file>
 EOD;
     exit(1);
 }
-?>

@@ -124,4 +124,3 @@ foreach ($ips as $ip => $value) {
       echoPre("RDNS error for $ip:   required PTR value: $value,   found: $result,   NS: $ns");
    }
 }
-?>

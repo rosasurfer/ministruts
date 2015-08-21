@@ -230,4 +230,3 @@ echoPre(get_loaded_extensions());
 
 // phpInfo() nur, wenn das Script nicht in der Konsole (also im Webserver) läuft
 !$cli && phpInfo();
-?>

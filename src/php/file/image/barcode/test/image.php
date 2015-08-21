@@ -23,4 +23,3 @@ switch ($type) {
    default:
       throw new plInvalidArgumentException("Unknown barcode type \"$type\"");
 }
-?>

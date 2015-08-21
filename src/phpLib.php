@@ -775,4 +775,3 @@ function errorLevelToStr($level=null) {
 
    return join('|', $levels).' ('.$level.')';
 }
-?>

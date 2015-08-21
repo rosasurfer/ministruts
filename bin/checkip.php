@@ -170,4 +170,3 @@ function isIPAddress($string, $returnBytes=false) {
    }
    return false;
 }
-?>

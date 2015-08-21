@@ -12,4 +12,3 @@ define('APPLICATION_ROOT', dirName(__FILE__));  // Pflicht: Projektverzeichnis, 
 include(APPLICATION_ROOT.'/WEB-INF/classes/classes.php');
 
 FrontController ::processRequest();
-?>

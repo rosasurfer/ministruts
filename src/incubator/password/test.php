@@ -59,9 +59,5 @@ $check = $t_hasher->checkPassword($wrong, $hash);
 if (!$check) $ok++;
 print "Check wrong: '" . $check . "' (should be '0' or '')\n";
 
-if ($ok == 6)
-	print "All tests have PASSED\n";
-else
-	print "Some tests have FAILED\n";
-
-?>
+if ($ok == 6) print "All tests have PASSED\n";
+else          print "Some tests have FAILED\n";

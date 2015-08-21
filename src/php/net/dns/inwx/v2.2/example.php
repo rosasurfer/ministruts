@@ -35,5 +35,3 @@ if ($res['code']==1000) {
 }
 
 $res = $domrobot->logout();
-
-?>
