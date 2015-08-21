@@ -1,4 +1,4 @@
-#!/usr/bin/php -Cq
+#!/usr/bin/php
 <?php
 /**
  * TODO: Jeder Nameserver muß einzeln abgefragt werden, denn bei fehlerhafter NS-Synchronisierung können
