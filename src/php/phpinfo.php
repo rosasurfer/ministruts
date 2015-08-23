@@ -135,7 +135,7 @@ $paths = explode(PATH_SEPARATOR, ini_get('include_path'));
 for ($i=0; $i < sizeOf($paths); ) if (trim($paths[$i++]) == '')                            $isWarning = 1|echoPre('Warning: include_path contains empty path on position '.$i);
 if (ini_get('auto_detect_line_endings'))                                                   $isWarning = 1|echoPre('Warning: auto_detect_line_endings is not Off');
 if (ini_get('default_mimetype') != 'text/html')                                            $isWarning = 1|echoPre('Warning: default_mimetype is not "text/html": "'.ini_get('default_mimetype').'"');
-if (ini_get('default_charset') != 'iso-8859-1')                                            $isWarning = 1|echoPre('Warning: default_charset is not "iso-8859-1": "'.ini_get('default_charset').'"');
+if (ini_get('default_charset') != 'iso-8859-15')                                           $isWarning = 1|echoPre('Warning: default_charset is not "iso-8859-15": "'.ini_get('default_charset').'"');
 if (ini_get('file_uploads'))                                                               $isWarning = 1|echoPre('Warning: file_uploads is not Off' );
 
 if (ini_get('asp_tags'))                                                                   $isWarning = 1|echoPre('Warning: asp_tags is not Off');
