@@ -77,8 +77,8 @@ if (!function_exists('errorLevelToStr')) {
 
 $isWarning = 0;
 
-if (!defined('WINDOWS')) define('WINDOWS', (strToUpper(subStr(PHP_OS, 0, 3)) === 'WIN'));    // ob das Script unter Windows läuft
-if (!defined('LOCAL'))   define('LOCAL'  , (@$_SERVER['REMOTE_ADDR'] == '127.0.0.1'));       // ob das Script lokal läuft
+if (!defined('WINDOWS'  )) define('WINDOWS'  , (strToUpper(subStr(PHP_OS, 0, 3)) === 'WIN'));    // ob das Script unter Windows läuft
+if (!defined('LOCALHOST')) define('LOCALHOST', (@$_SERVER['REMOTE_ADDR'] == '127.0.0.1'));       // ob das Script auf localhost läuft
 
 
 if (       PHP_VERSION < '5.2.1')                                                          $isWarning = 1|echoPre('Warning: You are running a buggy PHP version, a version >= 5.2.1 is recommended.');
@@ -200,9 +200,9 @@ if (!$cli && !isSet($_SERVER['SERVER_ADMIN']))                                  
 if (ini_get('mail.add_x_header'))                                                          $isWarning = 1|echoPre('Warning: mail.add_x_header is not Off');
 
 
-// Fehleranzeige etc. auf Entwicklungs- bzw. Produktivsystem
-// ---------------------------------------------------------
-if (LOCAL) {
+// Fehleranzeige je nach Umgebung
+// ------------------------------
+if ($cli || LOCALHOST) {
    if (!ini_get('display_errors'))                                                         $isWarning = 1|echoPre('Warning: display_errors is not On');
    if (!ini_get('display_startup_errors'))                                                 $isWarning = 1|echoPre('Warning: display_startup_errors is not On');
    if (!$cli && (int) ini_get('output_buffering') != 0)                                    $isWarning = 1|echoPre('Warning: output_buffering is enabled: '.ini_get('output_buffering'));  // since v5.4 hardcoded to Off for the CLI SAPI
@@ -228,5 +228,5 @@ echoPre(get_loaded_extensions());
 */
 
 
-// phpInfo() nur, wenn das Script nicht in der Konsole (also im Webserver) läuft
+// phpInfo() nur aufrufen, wenn das Script nicht in der Konsole (also im Webserver) läuft
 !$cli && phpInfo();
