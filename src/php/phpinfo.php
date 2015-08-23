@@ -168,8 +168,7 @@ if (!WINDOWS && !extension_loaded('sysvsem'))                                   
 
 // Opcode-Cache
 // ------------
-if (!extension_loaded('apc'))                                                              $isWarning = 1|echoPre('Warning: APC opcode cache not found');
-if ( extension_loaded('apc')) {
+if (extension_loaded('apc')) {
    if (phpVersion('apc') >= '3.1.3' && phpVersion('apc') < '3.1.7')                        $isWarning = 1|echoPre('Warning: You are running a buggy APC version (a version < 3.1.3 or >= 3.1.7 is recommended).');
    if (!ini_get('apc.enabled'))                                                            $isWarning = 1|echoPre('Warning: apc.enabled is not On');                    // warning "Potential cache slam averted for key '...'" http://bugs.php.net/bug.php?id=58832
    if ( ini_get('apc.report_autofilter'))                                                  $isWarning = 1|echoPre('Warning: apc.report_autofilter is not Off');
@@ -177,7 +176,7 @@ if ( extension_loaded('apc')) {
    if (WINDOWS) {       // Entwicklungsumgebung
       if      (ini_get('apc.stat'))                                                        $isWarning = 1|echoPre('Warning: apc.stat is not Off');
       else if (ini_get('apc.cache_by_default'))                                            $isWarning = 1|echoPre('Warning: apc.cache_by_default is not Off');          // "On" läßt manche Windows-APC-Versionen crashen (apc-error: cannot redeclare class ***)
-   }                                                                                                                                                                    // wenn apc.stat="off" (siehe vorheriger Test), dann *MUSS* diese Option unter Windows aus sein.
+   }                                                                                                                                                                    // wenn apc.stat="off" (siehe vorheriger Test), dann *MUSS* diese Option unter Windows "Off" sein.
    else {               // Produktionsumgebung
       if (!ini_get('apc.cache_by_default'))                                                $isWarning = 1|echoPre('Warning: apc.cache_by_default is not On');
       if ( ini_get('apc.stat'))                                                            $isWarning = 1|echoPre('Warning: apc.stat is not Off');                      // es soll gecacht werden
@@ -189,6 +188,10 @@ if ( extension_loaded('apc')) {
       else if (!ini_get('apc.include_once_override'))                                      $isWarning = 1|echoPre('Warning: apc.include_once_override is not On');
    }
 }
+else if (extension_loaded('zend opcache')) {
+   if (!ini_get('opcache.enable'))                                                         $isWarning = 1|echoPre('Warning: opcache.enable is not On');
+}
+else                                                                                       $isWarning = 1|echoPre('Warning: Opcode cache not found');
 
 
 // Mailkonfiguration
