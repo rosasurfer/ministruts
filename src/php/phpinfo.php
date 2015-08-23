@@ -194,7 +194,7 @@ if ( extension_loaded('apc')) {
 // Mailkonfiguration
 // -----------------
 if (WINDOWS && !ini_get('sendmail_path') && !ini_get('sendmail_from') && !isSet($_SERVER['SERVER_ADMIN']))
-                                                                                           $isWarning = 1|echoPre('Windows warning: neither sendmail_path nor sendmail_from are set');
+                                                                                           $isWarning = 1|echoPre('Warning: Windows - neither sendmail_path nor sendmail_from are set');
 if (!WINDOWS && !ini_get('sendmail_path'))                                                 $isWarning = 1|echoPre('Warning: sendmail_path is not set');
 if (!$cli && !isSet($_SERVER['SERVER_ADMIN']))                                             $isWarning = 1|echoPre('Warning: email address $_SERVER["SERVER_ADMIN"] is not set');
 if (ini_get('mail.add_x_header'))                                                          $isWarning = 1|echoPre('Warning: mail.add_x_header is not Off');
