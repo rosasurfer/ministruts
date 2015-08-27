@@ -35,7 +35,7 @@ if (subStr($_SERVER['PHP_SELF'], -12) == '/phpinfo.php') {
    require(PHPLIB_ROOT.'/php/phpinfo.php');
    exit(0);
 }
-if (PHP_VERSION < '5.2.1') echoPre('Warning: You are running a buggy PHP version (at version >= 5.2.1 is recommended).');
+if (PHP_VERSION < '5.2.1') echoPre('Warning: You are running a buggy PHP version (a version >= 5.2.1 is recommended).');
 
 
 // Klassendefinitionen
