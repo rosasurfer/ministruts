@@ -485,6 +485,9 @@ function printFormatted($var, $return=false) {
    elseif (is_object($var) || is_array($var)) {
       $str = print_r($var, true);
    }
+   else if ($var === null) {
+      $str = '(NULL)';           // entsprechend typeof(null) = 'NULL';
+   }
    else {
       $str = (string) $var;
    }
