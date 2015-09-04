@@ -202,7 +202,7 @@ final class FileSystemCache extends CachePeer {
          $data = file_get_contents($fileName, false);
       }
       catch (PHPErrorException $ex) {
-         if (String ::endsWith($ex->getMessage(), 'failed to open stream: No such file or directory'))
+         if (strEndsWith($ex->getMessage(), 'failed to open stream: No such file or directory'))
             return null;
          throw $ex;
       }

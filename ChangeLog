@@ -3,6 +3,8 @@
    - Utility-Funktionen: strStartsWith(), strStartsWithI(), strEndsWith(), strEndsWithI(), 
                          strCompare(), strCompareI(), 
                          strLeft(), strRight()
+   - php/util/String::startsWith() und php/util/String::endsWith() durch strStartsWith() bzw. strEndsWith() ersetzt  
+
 
 2015-08-16
 

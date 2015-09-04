@@ -199,7 +199,7 @@ class HttpSession extends Singleton {
       if (isSession()) {
          $keys = array_keys($_SESSION);
          foreach ($keys as $key) {
-            if (!String ::startsWith($key, '__SESSION_'))
+            if (!strStartsWith($key, '__SESSION_'))
                unSet($_SESSION[$key]);
          }
          return true;

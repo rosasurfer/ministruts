@@ -104,7 +104,7 @@ abstract class Mailer extends Object {
       // TODO: DNS und Postannahme prüfen
 
       // es gibt nur aol.com-Adressen, Format siehe: http://postmaster.info.aol.com/faq/mailerfaq.html#syntax
-      if (String ::startsWith($domain, 'aol.') && strRPos($domain, '.')==3)
+      if (strStartsWith($domain, 'aol.') && strRPos($domain, '.')==3)
          return (($domain=='aol.com' || $domain=='aol.de') && preg_match('/^[a-z][a-z0-9]{2,15}$/', $mailbox));
 
       return true;
@@ -125,7 +125,7 @@ abstract class Mailer extends Object {
       $address = trim($address);
 
       // auf schließende Klammer ">" prüfen
-      if (!String ::endsWith($address, '>')) {
+      if (!strEndsWith($address, '>')) {
          // keine, es muß eine einfache E-Mailadresse sein
          if (CommonValidator ::isEmailAddress($address))
             return array('name'    => '',

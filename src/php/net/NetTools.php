@@ -641,6 +641,6 @@ final class NetTools extends StaticClass {
       if (isSet($proxys[$address]))
          return true;
 
-      return ($reverseResolve && String ::endsWith(self ::getHostByAddress($address), '.proxy.aol.com', true));
+      return ($reverseResolve && strEndsWithI(self ::getHostByAddress($address), '.proxy.aol.com'));
    }
 }

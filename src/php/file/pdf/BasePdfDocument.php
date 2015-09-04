@@ -1430,7 +1430,7 @@ class BasePdfDocument extends Object {
       if (!is_file($fontName)) {
          $fontPath = dirName(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'fonts'.DIRECTORY_SEPARATOR;
 
-         if (!String ::endsWith($fontName, '.afm'))
+         if (!strEndsWith($fontName, '.afm'))
             $fontName .= '.afm';
 
          if (!is_file($fontPath.$fontName))

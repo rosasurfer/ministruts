@@ -119,7 +119,7 @@ final class FrontController extends Singleton {
       try {
          foreach ($files as $file) {
             $baseName = baseName($file, '.xml');
-            $prefix = (String ::startsWith($baseName, 'struts-config-')) ? '/'.subStr($baseName, 14) : '';
+            $prefix = (strStartsWith($baseName, 'struts-config-')) ? '/'.subStr($baseName, 14) : '';
 
             $module = new Module($file, $prefix);
             $module->freeze();
@@ -168,7 +168,7 @@ final class FrontController extends Singleton {
       $requestPath     = $request->getPath();
       $applicationPath = $request->getApplicationPath();
 
-      if ($applicationPath && !String ::startsWith($requestPath, $applicationPath))
+      if ($applicationPath && !strStartsWith($requestPath, $applicationPath))
          throw new plRuntimeException('Can not resolve module prefix from request path: '.$requestPath);
 
       $prefix = subStr($requestPath, $len=strLen($applicationPath), strRPos($requestPath, '/')-$len);

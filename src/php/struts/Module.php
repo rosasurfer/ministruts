@@ -514,7 +514,7 @@ class Module extends Object {
             else if ($this->isIncludable($value, $xml)) {
                $type = Tile ::PROP_TYPE_RESOURCE;
             }
-            else if (String ::endsWith($value, '.htm', true) || String ::endsWith($value, '.html', true)) {
+            else if (strEndsWithI($value, '.htm') || strEndsWithI($value, '.html')) {
                throw new plRuntimeException('Tile "'.$tile->getName().'", set "'.$name.'": specify a type="string|resource" for ambiguous attribute value="'.$value.'" (looks like a filename but file not found)');
             }
             else {

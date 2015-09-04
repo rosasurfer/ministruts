@@ -6,46 +6,6 @@ final class String extends StaticClass {
 
 
    /**
-    * Ob ein String mit einem anderen String beginnt.
-    *
-    * @param string $string     - der zu prüfende String
-    * @param string $start      - der zu suchende String
-    * @param bool   $ignoreCase - ob bei der Suche Groß-/Kleinschreibung ignoriert werden soll (Default: nein)
-    *
-    * @return bool
-    */
-   public static function startsWith($string, $start, $ignoreCase = false) {
-      if ($string!==null && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
-      if ($start!==null && !is_string($start))   throw new IllegalTypeException('Illegal type of parameter $start: '.getType($start));
-      if ($start == '')                          throw new plInvalidArgumentException('Invalid argument $start: "'.$start.'"');
-      if ($ignoreCase!==(bool)$ignoreCase)       throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
-
-      if ($ignoreCase)
-         return (striPos($string, $start) === 0);
-
-      return (strPos($string, $start) === 0);
-   }
-
-
-   /**
-    * Ob ein String mit einem anderen String endet.
-    *
-    * @param string $string     - der zu prüfende String
-    * @param string $end        - der zu suchende String
-    * @param bool   $ignoreCase - ob bei der Suche Groß-/Kleinschreibung ignoriert werden soll (Default: nein)
-    *
-    * @return bool
-    */
-   public static function endsWith($string, $end, $ignoreCase = false) {
-      if ($string!==null && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
-      if ($end!==null && !is_string($end))       throw new IllegalTypeException('Illegal type of parameter $end: '.getType($end));
-      if ($ignoreCase!==(bool)$ignoreCase)       throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
-
-      return self:: startsWith(strRev($string), strRev($end), $ignoreCase);
-   }
-
-
-   /**
     * Ob ein String einen anderen String enthält.
     *
     * @param string $haystack - der zu prüfende String

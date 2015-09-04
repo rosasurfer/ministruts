@@ -434,7 +434,7 @@ function getRandomID($length) {
 
 
 /**
- * Dropin-Ersatz für String::startsWith()
+ * Prüft, ob ein String mit einem Teilstring beginnt.
  *
  * @param  string $string
  * @param  string $prefix
@@ -460,7 +460,7 @@ function strStartsWith($string, $prefix, $ignoreCase=false) {
 
 
 /**
- * Dropin-Ersatz für String::startsWith() ohne Unterscheidung von Groß-/Kleinschreibung
+ * Prüft, ob ein String mit einem Teilstring beginnt und ignoriert dabei Groß-/Kleinschreibung.
  *
  * @param  string $string
  * @param  string $prefix
@@ -476,7 +476,7 @@ function strStartsWithI($string, $prefix) {
 
 
 /**
- * Dropin-Ersatz für String::endsWith()
+ * Prüft, ob ein String mit einem Teilstring endet.
  *
  * @param  string $string
  * @param  string $suffix
@@ -499,7 +499,7 @@ function strEndsWith($string, $suffix, $ignoreCase=false) {
 
 
 /**
- * Dropin-Ersatz für String::endsWith() ohne Unterscheidung von Groß-/Kleinschreibung
+ * Prüft, ob ein String mit einem Teilstring endet und ignoriert dabei Groß-/Kleinschreibung.
  *
  * @param  string $string
  * @param  string $prefix
@@ -659,7 +659,7 @@ function printFormatted($var, $return=false) {
    if (isSet($_SERVER['REQUEST_METHOD']))
       $str = '<div align="left"><pre style="margin:0; font:normal normal 12px/normal \'Courier New\',courier,serif">'.htmlSpecialChars($str, ENT_QUOTES).'</pre></div>';
 
-   if (!String ::endsWith($str, "\n"))
+   if (!strEndsWith($str, "\n"))
       $str .= "\n";
 
    if ($return)

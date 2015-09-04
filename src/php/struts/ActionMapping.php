@@ -68,9 +68,9 @@ class ActionMapping extends Object {
     * @return ActionMapping
     */
    public function setPath($path) {
-      if ($this->configured)                throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($path))                throw new IllegalTypeException('Illegal type of parameter $path: '.getType($path));
-      if (!String ::startsWith($path, '/')) throw new plInvalidArgumentException('The "path" attribute of a mapping must begin with a slash "/", found "'.$path.'"');
+      if ($this->configured)          throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($path))          throw new IllegalTypeException('Illegal type of parameter $path: '.getType($path));
+      if (!strStartsWith($path, '/')) throw new plInvalidArgumentException('The "path" attribute of a mapping must begin with a slash "/", found "'.$path.'"');
 
       $this->path = $path;
       return $this;

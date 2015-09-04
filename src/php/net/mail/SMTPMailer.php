@@ -217,7 +217,7 @@ class SMTPMailer extends Mailer {
       $returnPath = $from['address'];
       foreach ($headers as $key => $header) {
          $header = trim($header);
-         if (String ::startsWith($header, 'return-path:', true)) {
+         if (strStartsWithI($header, 'return-path:')) {
             $result = $this->parseAddress(subStr($header, 12));
             if (!$result) throw new plInvalidArgumentException('Invalid Return-Path header: '.$header);
             $returnPath = $result['address'];

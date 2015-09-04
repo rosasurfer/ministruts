@@ -354,7 +354,7 @@ final class MySQLConnector extends DB {
          $block = trim($block);
 
          // Roll back block
-         if (String ::startsWith($block, 'WE ROLL BACK TRANSACTION ', true)) {
+         if (strStartsWithI($block, 'WE ROLL BACK TRANSACTION ')) {
             if (!preg_match('/^WE ROLL BACK TRANSACTION \((\d+)\)$/i', $block, $match)) {
                Logger ::log("Error parsing deadlock status roll back block\n\n".$block, L_ERROR, __CLASS__);
                return null;
@@ -370,7 +370,7 @@ final class MySQLConnector extends DB {
                return null;
             }
             // Transaction block
-            if (String ::startsWith($lines[1], 'TRANSACTION ', true)) {
+            if (strStartsWithI($lines[1], 'TRANSACTION ')) {
                if (!preg_match('/\s*\((\d+)\).*\nTRANSACTION \d+ (\d+), ACTIVE (\d+) sec.+\n(LOCK WAIT )?(\d+) lock struct\(s\), heap size \d+(?:, undo log entries (\d+))?\nMySQL thread id (\d+), query id \d+ (\S+) \S+ (\S+).+?\n(.+)$/is', $block, $match)) {
                   Logger ::log("Error parsing deadlock status transaction block\n\n".$block, L_ERROR, __CLASS__);
                   return null;
@@ -390,7 +390,7 @@ final class MySQLConnector extends DB {
                $transactions[$match[2]] = $transaction;
             }
             // Lock block
-            elseif (String ::startsWith($lines[1], 'RECORD LOCKS ', true)) {
+            elseif (strStartsWithI($lines[1], 'RECORD LOCKS ')) {
                if (!preg_match('/\s*\((\d+)\).*\nRECORD LOCKS space id \d+ page no \d+ n bits \d+ index `(\S+)` of table `([^\/]+)\/([^`]+)` trx id \d+ (\d+) lock(_| )mode (S|X)( locks (.+))?( waiting)?/i', $block, $match)) {
                   Logger ::log("Error parsing deadlock status lock block\n\n".$block, L_ERROR, __CLASS__);
                   return null;
@@ -402,9 +402,9 @@ final class MySQLConnector extends DB {
                              'transaction' => (int) $match[5],
                              'mode'        => strToUpper($match[7]),
                              'special'     => ($special = isSet($match[9]) ? $match[9] : ''),
-                             'waiting'     => (string)(int) (String ::endsWith($special, ' waiting', true) || (isSet($match[10]) && $match[10]==' waiting')),
+                             'waiting'     => (string)(int) (strEndsWithI($special, ' waiting') || (isSet($match[10]) && $match[10]==' waiting')),
                              );
-               if (String ::endsWith($special, ' waiting', true))
+               if (strEndsWithI($special, ' waiting'))
                   $lock['special'] = subStr($special, 0, strLen($special)-8);
                $transactions[$match[5]]['locks'][] = $lock;
             }

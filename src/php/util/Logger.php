@@ -505,8 +505,8 @@ class Logger extends StaticClass {
       $api_id   = self::$smsOptions['api_id'  ];
 
       foreach (self::$smsReceivers as $receiver) {
-         if (String ::startsWith($receiver, '+' )) $receiver = subStr($receiver, 1);
-         if (String ::startsWith($receiver, '00')) $receiver = subStr($receiver, 2);
+         if (strStartsWith($receiver, '+' )) $receiver = subStr($receiver, 1);
+         if (strStartsWith($receiver, '00')) $receiver = subStr($receiver, 2);
          if (!ctype_digit($receiver)) throw new plInvalidArgumentException('Invalid argument $receiver: "'.$receiver.'"');
 
          $url = 'https://api.clickatell.com/http/sendmsg?user='.$username.'&password='.$password.'&api_id='.$api_id.'&to='.$receiver.'&text='.urlEncode($message);
