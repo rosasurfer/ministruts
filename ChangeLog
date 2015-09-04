@@ -1,3 +1,9 @@
+2015-09-04
+
+   - Utility-Funktionen: strStartsWith(), strStartsWithI(), strEndsWith(), strEndsWithI(), 
+                         strCompare(), strCompareI(), 
+                         strLeft(), strRight()
+
 2015-08-16
 
    - Alias typeof() für getType()

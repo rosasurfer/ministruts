@@ -434,6 +434,167 @@ function getRandomID($length) {
 
 
 /**
+ * Dropin-Ersatz für String::startsWith()
+ *
+ * @param  string $string
+ * @param  string $prefix
+ * @param  bool   $ignoreCase - default: nein
+ *
+ * @return bool
+ */
+function strStartsWith($string, $prefix, $ignoreCase=false) {
+   if ($string!==null && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+   if ($prefix!==null && !is_string($prefix)) throw new IllegalTypeException('Illegal type of parameter $prefix: '.getType($prefix));
+   if (!is_bool($ignoreCase))                 throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
+
+   $stringLen = strLen($string);
+   $prefixLen = strLen($prefix);
+
+   if (!$stringLen || !$prefixLen)
+      return false;
+
+   if ($ignoreCase)
+      return (striPos($string, $prefix) === 0);
+   return (strPos($string, $prefix) === 0);
+}
+
+
+/**
+ * Dropin-Ersatz für String::startsWith() ohne Unterscheidung von Groß-/Kleinschreibung
+ *
+ * @param  string $string
+ * @param  string $prefix
+ *
+ * @return bool
+ */
+function strStartsWithI($string, $prefix) {
+   if ($string!==null && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+   if ($prefix!==null && !is_string($prefix)) throw new IllegalTypeException('Illegal type of parameter $prefix: '.getType($prefix));
+
+   return strStartsWith($string, $prefix, true);
+}
+
+
+/**
+ * Dropin-Ersatz für String::endsWith()
+ *
+ * @param  string $string
+ * @param  string $suffix
+ * @param  bool   $ignoreCase - default: nein
+ *
+ * @return bool
+ */
+function strEndsWith($string, $suffix, $ignoreCase=false) {
+   if ($string!==null && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+   if ($suffix!==null && !is_string($suffix)) throw new IllegalTypeException('Illegal type of parameter $suffix: '.getType($suffix));
+   if (!is_bool($ignoreCase))                 throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
+
+   $stringLen = strLen($string);
+   $suffixLen = strLen($suffix);
+
+   if (!$stringLen || !$suffixLen)
+      return false;
+   return (($stringLen-$suffixLen) === strRPos($string, $suffix));
+}
+
+
+/**
+ * Dropin-Ersatz für String::endsWith() ohne Unterscheidung von Groß-/Kleinschreibung
+ *
+ * @param  string $string
+ * @param  string $prefix
+ *
+ * @return bool
+ */
+function strEndsWithI($string, $suffix) {
+   if ($string!==null && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+   if ($suffix!==null && !is_string($suffix)) throw new IllegalTypeException('Illegal type of parameter $suffix: '.getType($suffix));
+
+   return strEndsWith($string, $suffix, true);
+}
+
+
+/**
+ * Dropin-Ersatz für ($stringA === $stringB)
+ *
+ * @param  string $stringA
+ * @param  string $stringB
+ * @param  bool   $ignoreCase - default: nein
+ *
+ * @return bool
+ */
+function strCompare($stringA, $stringB, $ignoreCase=false) {
+   if ($stringA!==null && !is_string($stringA)) throw new IllegalTypeException('Illegal type of parameter $stringA: '.getType($stringA));
+   if ($stringB!==null && !is_string($stringB)) throw new IllegalTypeException('Illegal type of parameter $stringB: '.getType($stringB));
+   if (!is_bool($ignoreCase))                   throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
+
+   if ($ignoreCase)
+      return strCompareI($stringA, $stringB);
+   return ($stringA === $stringB);
+}
+
+
+/**
+ * Dropin-Ersatz für ($stringA === $stringB) ohne Beachtung von Groß-/Kleinschreibung
+ *
+ * @param  string $stringA
+ * @param  string $stringB
+ *
+ * @return bool
+ */
+function strCompareI($stringA, $stringB) {
+   if ($stringA!==null && !is_string($stringA)) throw new IllegalTypeException('Illegal type of parameter $stringA: '.getType($stringA));
+   if ($stringB!==null && !is_string($stringB)) throw new IllegalTypeException('Illegal type of parameter $stringB: '.getType($stringB));
+
+   if ($stringA===null || $stringB===null)
+      return ($stringA === $stringB);
+   return (strToLower($stringA) === strToLower($stringB));
+}
+
+
+/**
+ * Gibt einen linken Teilstring eines Strings zurück.
+ *
+ * @param  string $string
+ * @param  int    $length - Länge des Teilstrings. Ist der Wert negativ, werden alle außer der angegebenen Anzahl
+ *                          rechts stehender Zeichen zurückgegeben.
+ *
+ * @return string - String oder NULL, falls ein NULL-String übergeben wurde
+ */
+function strLeft($string, $length) {
+   if (!is_int($length))    throw new IllegalTypeException('Illegal type of parameter $length: '.getType($length));
+   if ($string === null)
+      return null;
+   if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+
+   return subStr($string, 0, $length);
+}
+
+
+/**
+ * Gibt einen rechten Teilstring eines Strings zurück.
+ *
+ * @param  string $string
+ * @param  int    $length - Länge des Teilstrings. Ist der Wert negativ, werden alle außer der angegebenen Anzahl
+ *                          links stehender Zeichen zurückgegeben.
+ *
+ * @return string - String oder NULL, falls ein NULL-String übergeben wurde
+ */
+function strRight($string, $length) {
+   if (!is_int($length))    throw new IllegalTypeException('Illegal type of parameter $length: '.getType($length));
+   if ($string === null)
+      return null;
+   if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+
+   if ($length == 0)
+      return '';
+
+   $result = subStr($string, -$length);
+   return $result===false ? '' : $result;
+}
+
+
+/**
  * Alias für "getType()" zur sprachenübergreifenden Vereinfachung.
  *
  * @param  mixed $var - Variable
@@ -487,6 +648,9 @@ function printFormatted($var, $return=false) {
    }
    else if ($var === null) {
       $str = '(NULL)';           // entsprechend typeof(null) = 'NULL';
+   }
+   else if (is_bool($var)) {
+      $str = $var ? 'true':'false';
    }
    else {
       $str = (string) $var;
