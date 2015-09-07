@@ -330,8 +330,8 @@ final class MySQLConnector extends DB {
 
       // Datenformat: siehe Ende der Methode
       if (!preg_match('/\nLATEST DETECTED DEADLOCK\n-+\n(.+)\n-+\n/sU', $status, $match)) {
-         if (String ::contains($status, "\nLATEST DETECTED DEADLOCK\n")) $message = "Error parsing InnoDB status:";
-         else                                                            $message = "No deadlock infos found in InnoDB status:";
+         if (strContains($status, "\nLATEST DETECTED DEADLOCK\n")) $message = "Error parsing InnoDB status:";
+         else                                                      $message = "No deadlock infos found in InnoDB status:";
          Logger ::log($message."\n\n".$status, L_ERROR, __CLASS__);
          return null;
       }

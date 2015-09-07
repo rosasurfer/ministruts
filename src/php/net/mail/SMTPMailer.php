@@ -68,7 +68,7 @@ class SMTPMailer extends Mailer {
       $hostName = php_uname('n');
       if (!$hostName)
          $hostName  = 'localhost';
-      if (!String ::contains($hostName, '.'))
+      if (!strContains($hostName, '.'))
          $hostName .= '.localdomain';    // hostname must contain more than one part (see RFC 2821)
       $this->hostName = strToLower($hostName);
    }

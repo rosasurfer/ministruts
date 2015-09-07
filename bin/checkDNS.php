@@ -83,8 +83,8 @@ foreach ($domains as $domain => $domainValues) {
          $result = queryDNS($domain, $type);
          if ($result != $value) {
             if ($type == 'TXT') {
-               if (String ::contains($value , ' ')) $value  = "\"$value\"";
-               if (String ::contains($result, ' ')) $result = "\"$result\"";
+               if (strContains($value , ' ')) $value  = "\"$value\"";
+               if (strContains($result, ' ')) $result = "\"$result\"";
             }
             if ($result == '0.0.0.0')
                $result = 'SERVFAIL';

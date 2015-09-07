@@ -6,27 +6,6 @@ final class String extends StaticClass {
 
 
    /**
-    * Ob ein String einen anderen String enthält.
-    *
-    * @param string $haystack - der zu prüfende String
-    * @param string $needle   - der zu suchende String
-    * @param bool   $case     - ob bei der Suche Groß-/Kleinschreibung beachtet werden soll (Default: ja)
-    *
-    * @return bool
-    */
-   public static function contains($haystack, $needle, $case = true) {
-      if ($haystack!==null && !is_string($haystack)) throw new IllegalTypeException('Illegal type of parameter $haystack: '.getType($haystack));
-      if ($needle  !==null && !is_string($needle))   throw new IllegalTypeException('Illegal type of parameter $needle: '.getType($needle));
-      if ($case    !==true && $case!==false)         throw new IllegalTypeException('Illegal type of parameter $case: '.getType($case));
-
-      if ($case)
-         return (strPos($haystack, $needle) !== false);
-
-      return (striPos($haystack, $needle) !== false);
-   }
-
-
-   /**
     * Ob ein String UTF-8-kodiert ist.
     *
     * @param string $string - der zu prüfende String

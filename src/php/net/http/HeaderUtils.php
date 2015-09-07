@@ -21,7 +21,7 @@ final class HeaderUtils extends StaticClass {
             $found = preg_match_all('/^https?:\/{2,}([a-z0-9-]+(\.[a-z0-9-]+)*)*.*$/', strToLower(trim($url)), $matches, PREG_SET_ORDER);
 
             if (!$found || $matches[0][1]==$request->getHostname())     // SID anhängen
-               $url .= (String ::contains($url, '?') ? '&':'?').SID;
+               $url .= (strContains($url, '?') ? '&':'?').SID;
          }
          session_write_close();
       }
