@@ -1,3 +1,9 @@
+2015-09-07
+
+   - Utility-Funktionen: strContains(), strContainsI() 
+   - php/util/String::contains() durch strContains() bzw. strContainsI() ersetzt  
+
+
 2015-09-04
 
    - Utility-Funktionen: strStartsWith(), strStartsWithI(), strEndsWith(), strEndsWithI(), 

@@ -468,9 +468,6 @@ function strStartsWith($string, $prefix, $ignoreCase=false) {
  * @return bool
  */
 function strStartsWithI($string, $prefix) {
-   if ($string!==null && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
-   if ($prefix!==null && !is_string($prefix)) throw new IllegalTypeException('Illegal type of parameter $prefix: '.getType($prefix));
-
    return strStartsWith($string, $prefix, true);
 }
 
@@ -507,10 +504,46 @@ function strEndsWith($string, $suffix, $ignoreCase=false) {
  * @return bool
  */
 function strEndsWithI($string, $suffix) {
-   if ($string!==null && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
-   if ($suffix!==null && !is_string($suffix)) throw new IllegalTypeException('Illegal type of parameter $suffix: '.getType($suffix));
-
    return strEndsWith($string, $suffix, true);
+}
+
+
+/**
+ * Prüft, ob ein String einen Teilstring enthält.
+ *
+ * @param  string $haystack
+ * @param  string $needle
+ * @param  bool   $ignoreCase - default: nein
+ *
+ * @return bool
+ */
+function strContains($haystack, $needle, $ignoreCase=false) {
+   if ($haystack!==null && !is_string($haystack)) throw new IllegalTypeException('Illegal type of parameter $haystack: '.getType($haystack));
+   if ($needle  !==null && !is_string($needle))   throw new IllegalTypeException('Illegal type of parameter $needle: '.getType($needle));
+   if (!is_bool($ignoreCase))                     throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
+
+   $haystackLen = strLen($haystack);
+   $needleLen   = strLen($needle);
+
+   if (!$haystackLen || !$needleLen)
+      return false;
+
+   if ($ignoreCase)
+      return (striPos($haystack, $needle) !== false);
+   return (strPos($haystack, $needle) !== false);
+}
+
+
+/**
+ * Prüft, ob ein String einen Teilstring enthält und ignoriert dabei Groß-/Kleinschreibung.
+ *
+ * @param  string $haystack
+ * @param  string $needle
+ *
+ * @return bool
+ */
+function strContainsI($haystack, $needle) {
+   return strContains($haystack, $needle, true);
 }
 
 
