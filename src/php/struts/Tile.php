@@ -179,9 +179,9 @@ class Tile extends Object {
     */
    protected function getMergedProperties() {
       if ($this->parent)
-         return(array_merge($this->parent->getMergedProperties(), $this->properties));
+         return array_merge($this->parent->getMergedProperties(), $this->properties);
 
-      return($this->properties);
+      return $this->properties;
    }
 
 

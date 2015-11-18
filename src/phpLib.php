@@ -598,6 +598,8 @@ function strLeft($string, $length) {
    if (!is_int($length))    throw new IllegalTypeException('Illegal type of parameter $length: '.getType($length));
    if ($string === null)
       return null;
+   if (is_int($string))
+      $string = (string)$string;
    if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
 
    return subStr($string, 0, $length);
@@ -617,6 +619,8 @@ function strRight($string, $length) {
    if (!is_int($length))    throw new IllegalTypeException('Illegal type of parameter $length: '.getType($length));
    if ($string === null)
       return null;
+   if (is_int($string))
+      $string = (string)$string;
    if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
 
    if ($length == 0)
