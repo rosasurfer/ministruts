@@ -3,7 +3,7 @@
  * Lock
  *
  * Delegate auf eine konkrete Lock-Implementierung.  Aus Sicht des User-Codes ist nur die Funktionalität
- * interessant, nicht jedoch, wie das Lock konkret implementiert wird.
+ * interessant, nicht wie das Lock konkret implementiert wird.
  *
  * Ein Lock stellt die Sperre eines oder mehrerer Code-Abschnitte gegen gleichzeitigen Zugriff durch
  * konkurrierende PHP-Threads oder -Prozesse dar.
