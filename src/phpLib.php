@@ -910,26 +910,19 @@ function shell_exec_fix($cmd) {
    // pOpen() kann ebenfalls nicht verwendet werden, da dort derselbe Bug auftritt.
    // Ursache ist vermutlich die gemeinsame Verwendung von feof().
 
-   $descriptors = array(0 => array('pipe', 'r'),         // stdin
-                        1 => array('pipe', 'w'),         // stdout
-                        2 => array('pipe', 'w'));        // stderr
+   $descriptors = array(0 => array('pipe', 'rb'),        // stdin
+                        1 => array('pipe', 'wb'),        // stdout
+                        2 => array('pipe', 'wb'));       // stderr
    $pipes = array();
-   $hProc = proc_open($cmd, $descriptors, $pipes);
-
-   // $pipes now looks like this:
-   // 0 => writeable handle connected to child stdin
-   // 1 => readable handle connected to child stdout
-   // 2 => readable handle connected to child stderr
-
-   if (is_resource($hProc)) {
-      $stdout = stream_get_contents($pipes[1]);
-
-      // close pipes before proc_close() to avoid a deadlock
-      fClose($pipes[0]);
+   $hProc = proc_open($cmd, $descriptors, $pipes, null, null, array('bypass_shell'=>true));
+                                                         // $pipes now looks like this:
+   if (is_resource($hProc)) {                            // 0 => writeable handle connected to child stdin
+      $stdout = stream_get_contents($pipes[1]);          // 1 => readable handle connected to child stdout
+      fClose($pipes[0]);                                 // 2 => readable handle connected to child stderr
       fClose($pipes[1]);
       fClose($pipes[2]);
 
-      proc_close($hProc);
+      $exit_code = proc_close($hProc);                   // close pipes before proc_close() to avoid deadlock
       return $stdout;
    }
    return null;
