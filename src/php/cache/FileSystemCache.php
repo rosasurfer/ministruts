@@ -35,10 +35,8 @@ final class FileSystemCache extends CachePeer {
       if ($directory{0}!='/' && (!WINDOWS || !preg_match('/^[a-z]:/i', $directory)))
          $directory = str_replace('\\', '/', APPLICATION_ROOT).'/WEB-INF/'.$directory;
 
-      // Cache-Verzeichnis ggf. erzeugen
-      if (is_file($directory))                                   throw new plInvalidArgumentException('Cannot write to directory "'.$directory.'" (is file)');
-      if (!is_dir($directory) && !mkDir($directory, 0755, true)) throw new plInvalidArgumentException('Cannot create directory "'.$directory.'"');
-      if (!is_writable($directory))                              throw new plInvalidArgumentException('Cannot write to directory "'.$directory.'"');
+      // ggf. Cache-Verzeichnis erzeugen
+      mkDirWritable($directory, 0755);
 
       $this->directory = realPath($directory).DIRECTORY_SEPARATOR;
    }
@@ -223,13 +221,8 @@ final class FileSystemCache extends CachePeer {
     * @return bool - TRUE bei Erfolg, FALSE andererseits
     */
    private function writeFile($fileName, $value, $expires) {
-      // Unterverzeichnis ggf. erzeugen
-      $directory = dirName($fileName);
-      if (is_file($directory))                                   throw new plInvalidArgumentException('Cannot write to directory "'.$directory.'" (is file)');
-      if (!is_dir($directory) && !mkDir($directory, 0755, true)) throw new plInvalidArgumentException('Cannot create directory "'.$directory.'"');
-      if (!is_writable($directory))                              throw new plInvalidArgumentException('Cannot write to directory "'.$directory.'"');
+      mkDirWritable(dirName($fileName), 0755);
 
-      // Datei schreiben
       $fH = fOpen($fileName, 'wb');
       fWrite($fH, serialize($value));
       fClose($fH);

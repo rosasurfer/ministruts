@@ -331,13 +331,8 @@ abstract class BarCode extends Object {
       if (!is_string($filename)) throw new IllegalTypeException('Illegal type of parameter $filename: '.getType($filename));
       if (!is_bool($overwrite))  throw new IllegalTypeException('Illegal type of parameter $overwrite: '.getType($overwrite));
 
-      // ggf. Verzeichnis erzeugen
-      $directory = dirName($filename);
-      if (is_file($directory))                                   throw new plInvalidArgumentException('Cannot write to directory "'.$directory.'" (is file)');
-      if (!is_dir($directory) && !mkDir($directory, 0755, true)) throw new plInvalidArgumentException('Cannot create directory "'.$directory.'"');
-      if (!is_writable($directory))                              throw new plInvalidArgumentException('Cannot write to directory "'.$directory.'"');
-
       // Datei schreiben
+      mkDirWritable(dirName($filename), 0755);
       $fileExisted = is_file($filename);
       $hFile = $ex = null;
       try {

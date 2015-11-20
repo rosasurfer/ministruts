@@ -930,6 +930,27 @@ function shell_exec_fix($cmd) {
 
 
 /**
+ * Prüft, ob ein Verzeichnis existiert und legt es ggf. an. Prüft dann, ob darin Schreibzugriff möglich ist.
+ *
+ * @param  string $path - wie bei mkDir(): Name des Verzeichnisses
+ * @param  int    $mode - wie bei mkDir(): zu setzende Zugriffsberechtigung, falls das Verzeichnis nicht existiert (default: 0777)
+ *
+ * @return  bool - Immer TRUE (nach Verlassen der Funktion existiert das Verzeichnis und Schreibzugriff ist möglich),
+ *                 anderenfalls wird eine Exception ausgelöst.
+ */
+function mkDirWritable($path, $mode=0777) {
+   if (!is_string($path))                            throw new IllegalTypeException('Illegal type of parameter $path: '.getType($path));
+   if (!is_null($mode) && !is_int($mode))            throw new IllegalTypeException('Illegal type of parameter $mode: '.getType($mode));
+
+   if (is_file($path))                               throw new plRuntimeException('Cannot write to directory "'.$path.'" (is file)');
+   if (!is_dir($path) && !mkDir($path, $mode, true)) throw new plRuntimeException('Cannot create directory "'.$path.'"');
+   if (!is_writable($path))                          throw new plRuntimeException('Cannot write to directory "'.$path.'"');
+
+   return true;
+}
+
+
+/**
  * Ist $value nicht NULL, gibt die Funktion $value zurück, ansonsten die Alternative $altValue.
  *
  * @return  mixed
