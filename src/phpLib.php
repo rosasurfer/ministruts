@@ -662,7 +662,7 @@ function echos($var) {
  * @param  mixed $var - die auszugebende Variable
  */
 function echoPre($var) {
-   printFormatted($var, false);
+   printFormatted($var);
 }
 
 
@@ -671,10 +671,10 @@ function echoPre($var) {
  * abgeschlossen.
  *
  * @param  mixed $var    - die auszugebende Variable
- * @param  bool  $return - Ob die Ausgabe auf STDOUT (FALSE) oder als Rückgabewert der Funktion (TRUE) erfolgen soll.
- *                        (default: STDOUT)
+ * @param  bool  $return - ob das Ergebnis zurückgegeben (TRUE) oder auf STDOUT ausgegeben (FALSE) werden soll
+ *                         (default: Ausgabe auf STDOUT)
  *
- * @return string - Rückgabewert, wenn $return TRUE ist, NULL andererseits
+ * @return string - Rückgabewert, wenn der Parameter $return TRUE ist; NULL andererseits
  */
 function printFormatted($var, $return=false) {
    if (is_object($var) && method_exists($var, '__toString')) {
@@ -723,6 +723,36 @@ function dump($var, $return=false) {
 
    if ($return) return ob_get_clean();
    return;
+}
+
+
+/**
+ * Dropin-Replacement für TRUE zum schnellen Debugging.
+ *
+ * @param  string $function - Name der aktuellen Funktion
+ * @param  int    $line     - aktuelle Codezeile
+ * @param  string $id       - optionaler zusätzlicher Identifier
+ *
+ * @return TRUE
+ */
+function _true($function, $line, $id=null) {
+   echoPre($function.'('.$id.'), line '.$line);
+   return true;
+}
+
+
+/**
+ * Dropin-Replacement für FALSE zum schnellen Debugging.
+ *
+ * @param  string $function - Name der aktuellen Funktion
+ * @param  int    $line     - aktuelle Codezeile
+ * @param  string $id       - optionaler zusätzlicher Identifier
+ *
+ * @return FALSE
+ */
+function _false($function, $line, $id=null) {
+   echoPre($function.'('.$id.'), line '.$line);
+   return false;
 }
 
 
