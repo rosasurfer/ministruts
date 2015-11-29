@@ -883,7 +883,7 @@ function formatDate($format, $datetime) {
 /**
  * Formatiert einen Zahlenwert im Währungsformat.
  *
- * @param  mixed  $value            - Zahlenwert (integer oder float)
+ * @param  mixed  $value            - Zahlenwert (int oder double)
  * @param  int    $decimals         - Anzahl der Nachkommastellen (default: 2)
  * @param  string $decimalSeparator - Dezimaltrennzeichen: '.' oder ',' (default: '.')
  *

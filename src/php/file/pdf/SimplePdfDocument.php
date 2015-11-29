@@ -1458,7 +1458,7 @@ class SimplePdfDocument extends BasePdfDocument {
          if ($internal){
            $this->addInternalLink($start['url'],$start['x'],$start['y']+$start['decender'],$info['x'],$start['y']+$start['decender']+$start['height']);
          } else {
-           $a = deg2rad((float)$start['angle']-90.0);
+           $a = deg2rad((double)$start['angle']-90.0);
            $drop = $start['height']*$lineFactor*1.5;
            $dropx = cos($a)*$drop;
            $dropy = -sin($a)*$drop;
@@ -1496,7 +1496,7 @@ class SimplePdfDocument extends BasePdfDocument {
          $i = $info['nCallback'];
          $start = $this->ez['links'][$i];
          // add underlining
-         $a = deg2rad((float)$start['angle']-90.0);
+         $a = deg2rad((double)$start['angle']-90.0);
          $drop = $start['height']*$lineFactor*1.5;
          $dropx = cos($a)*$drop;
          $dropy = -sin($a)*$drop;

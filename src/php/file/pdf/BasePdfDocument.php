@@ -1752,15 +1752,15 @@ class BasePdfDocument extends Object {
        $nSeg=2;
      }
 
-     $astart = deg2rad((float)$astart);
-     $afinish = deg2rad((float)$afinish);
+     $astart = deg2rad((double)$astart);
+     $afinish = deg2rad((double)$afinish);
      $totalAngle =$afinish-$astart;
 
      $dt = $totalAngle/$nSeg;
      $dtm = $dt/3;
 
      if ($angle != 0){
-       $a = -1*deg2rad((float)$angle);
+       $a = -1*deg2rad((double)$angle);
        $tmp = "\n q ";
        $tmp .= sprintf('%.3f',cos($a)).' '.sprintf('%.3f',(-1.0*sin($a))).' '.sprintf('%.3f',sin($a)).' '.sprintf('%.3f',cos($a)).' ';
        $tmp .= sprintf('%.3f',$x0).' '.sprintf('%.3f',$y0).' cm';
@@ -2008,7 +2008,7 @@ class BasePdfDocument extends Object {
      $words = explode(' ',$text);
      $nspaces=count($words)-1;
      $w += $wa*$nspaces;
-     $a = deg2rad((float)$angle);
+     $a = deg2rad((double)$angle);
      return array(cos($a)*$w+$x,-sin($a)*$w+$y);
    }
 
@@ -2196,7 +2196,7 @@ class BasePdfDocument extends Object {
      if ($angle==0){
        $this->objects[$this->currentContents]['c'].="\n".'BT '.sprintf('%.3f',$x).' '.sprintf('%.3f',$y).' Td';
      } else {
-       $a = deg2rad((float)$angle);
+       $a = deg2rad((double)$angle);
        $tmp = "\n".'BT ';
        $tmp .= sprintf('%.3f',cos($a)).' '.sprintf('%.3f',(-1.0*sin($a))).' '.sprintf('%.3f',sin($a)).' '.sprintf('%.3f',cos($a)).' ';
        $tmp .= sprintf('%.3f',$x).' '.sprintf('%.3f',$y).' Tm';
@@ -2232,7 +2232,7 @@ class BasePdfDocument extends Object {
              if ($angle==0){
                $this->objects[$this->currentContents]['c'].="\n".'BT '.sprintf('%.3f',$xp).' '.sprintf('%.3f',$yp).' Td';
              } else {
-               $a = deg2rad((float)$angle);
+               $a = deg2rad((double)$angle);
                $tmp = "\n".'BT ';
                $tmp .= sprintf('%.3f',cos($a)).' '.sprintf('%.3f',(-1.0*sin($a))).' '.sprintf('%.3f',sin($a)).' '.sprintf('%.3f',cos($a)).' ';
                $tmp .= sprintf('%.3f',$xp).' '.sprintf('%.3f',$yp).' Tm';
@@ -2283,7 +2283,7 @@ class BasePdfDocument extends Object {
        $this->selectFont(dirName(__FILE__).'/../fonts/Helvetica');
      }
 
-     // converts a number or a float to a string so it can get the width
+     // converts an integer or a float to a string so it can get the width
      $text = "$text";
 
      // hmm, this is where it all starts to get tricky - use the font information to

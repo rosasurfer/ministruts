@@ -566,9 +566,9 @@ final class ApdProfile extends Object {
    /**
     */
    private static function compareFloats($a, $b) {
-      if     ((float) $a > (float) $b) { return  1; }
-      elseif ((float) $a < (float) $b) { return -1; }
-      else                             { return  0; }
+      if     ((double) $a > (double) $b) { return  1; }
+      elseif ((double) $a < (double) $b) { return -1; }
+      else                               { return  0; }
    }
 
 

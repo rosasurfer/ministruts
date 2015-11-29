@@ -211,27 +211,27 @@ abstract class PersistableObject extends Object implements IDaoConnected {
     *
     * @return PersistableObject
     */
-   public static function createInstance(&$class, array &$row) {
+   public static function createInstance($class, array $row) {
       $object = new $class();
       if (!$object instanceof self) throw new plInvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
 
       $mappings = $object->dao()->mapping;
 
-      foreach ($mappings['fields'] as $property => &$mapping) {
-         $column =& $mapping[0];
+      foreach ($mappings['fields'] as $property => $mapping) {
+         $column = $mapping[0];
 
          if ($row[$column] !== null) {
-            $type =& $mapping[1];
+            $type = $mapping[1];
 
             switch ($type) {
                case CommonDAO ::T_STRING:
-                  $object->$property =&        $row[$column]; break;
+                  $object->$property =&         $row[$column]; break;
                case CommonDAO ::T_INT:
-                  $object->$property =   (int) $row[$column]; break;
+                  $object->$property =    (int) $row[$column]; break;
                case CommonDAO ::T_FLOAT:
-                  $object->$property = (float) $row[$column]; break;
+                  $object->$property = (double) $row[$column]; break;
                case CommonDAO ::T_BOOL:
-                  $object->$property =  (bool) $row[$column]; break;
+                  $object->$property =   (bool) $row[$column]; break;
                case CommonDAO ::T_SET:
                   $object->$property = strLen($row[$column]) ? explode(',', $row[$column]) : array();
                   break;

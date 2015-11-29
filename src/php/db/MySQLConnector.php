@@ -429,7 +429,7 @@ final class MySQLConnector extends DB {
       $lengthUndo   = strLen('Undo'  );
       $lengthQuery  = strLen('Query' );
 
-      foreach ($transactions as &$t) {
+      foreach ($transactions as $t) {
          $lengthId    = max($lengthId   , strLen($t['connection']));
          $lengthUser  = max($lengthUser , strLen($t['user'      ]));
          $lengthHost  = max($lengthHost , strLen($t['host'      ]));
@@ -447,8 +447,8 @@ final class MySQLConnector extends DB {
       $lengthIndex   = strLen('Index'  );
       $lengthSpecial = strLen('Special');
 
-      foreach ($transactions as &$t) {
-         foreach ($t['locks'] as &$l) {
+      foreach ($transactions as $t) {
+         foreach ($t['locks'] as $l) {
             $lengthDb      = max($lengthDb     , strLen($l['db'     ]));
             $lengthTable   = max($lengthTable  , strLen($l['table'  ]));
             $lengthIndex   = max($lengthIndex  , strLen($l['index'  ]));
@@ -479,7 +479,7 @@ final class MySQLConnector extends DB {
               .'  '.        'Query'."\n";
 
       // data lines
-      foreach ($transactions as &$t) {
+      foreach ($transactions as $t) {
          $string .=    str_pad($t['connection'], $lengthId    , ' ', STR_PAD_LEFT )
                  .'  '.str_pad($t['user'      ], $lengthUser  , ' ', STR_PAD_RIGHT)
                  .'  '.str_pad($t['host'      ], $lengthHost  , ' ', STR_PAD_RIGHT)
@@ -508,8 +508,8 @@ final class MySQLConnector extends DB {
               .'  '.str_pad('Special', $lengthSpecial, ' ', STR_PAD_RIGHT)."\n";
 
       // data lines
-      foreach ($transactions as &$t) {
-         foreach ($t['locks'] as &$l) {
+      foreach ($transactions as $t) {
+         foreach ($t['locks'] as $l) {
             $string .=    str_pad($t['connection'], $lengthId     , ' ', STR_PAD_LEFT )
                     .'  '.str_pad($l['waiting'   ], $lengthWaiting, ' ', STR_PAD_LEFT )
                     .'  '.str_pad($l['mode'      ], $lengthMode   , ' ', STR_PAD_RIGHT)

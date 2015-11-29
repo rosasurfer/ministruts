@@ -120,7 +120,7 @@ final class String extends StaticClass {
     */
    public static function htmlSpecialChars($string, $quoteStyle=ENT_QUOTES, $charset='ISO-8859-1', $doubleEncode=true) {
       if (is_array($string)) {
-         foreach ($string as $key => &$value)
+         foreach ($string as $key => $value)
             $string[$key] = self:: htmlSpecialChars($value, $quoteStyle, $charset, $doubleEncode);
          return $string;
       }
@@ -151,7 +151,7 @@ final class String extends StaticClass {
     */
    public static function htmlEntities($string, $quoteStyle=ENT_QUOTES, $charset='ISO-8859-1', $doubleEncode=true) {
       if (is_array($string)) {
-         foreach ($string as $key => &$value)
+         foreach ($string as $key => $value)
             $string[$key] = self:: htmlEntities($value, $quoteStyle, $charset, $doubleEncode);
          return $string;
       }
