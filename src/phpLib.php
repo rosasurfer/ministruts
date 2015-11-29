@@ -184,6 +184,7 @@ define('SATURDAY' , 6);
 
 // Helper
 define('NL', PHP_EOL);
+if (!defined('PHP_INT_MIN')) define('PHP_INT_MIN', ~PHP_INT_MAX);    // since PHP 7.0.0
 
 
 // Error-/Exceptionhandler anonym registrieren, damit die Klasse Logger nicht schon hier geladen wird
@@ -592,12 +593,12 @@ function strCompareI($stringA, $stringB) {
  * @param  int    $length - Länge des Teilstrings. Ist der Wert negativ, werden alle außer der angegebenen Anzahl
  *                          rechts stehender Zeichen zurückgegeben.
  *
- * @return string - String oder NULL, falls ein NULL-String übergeben wurde
+ * @return string - String
  */
 function strLeft($string, $length) {
    if (!is_int($length))    throw new IllegalTypeException('Illegal type of parameter $length: '.getType($length));
    if ($string === null)
-      return null;
+      return '';
    if (is_int($string))
       $string = (string)$string;
    if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
@@ -613,12 +614,12 @@ function strLeft($string, $length) {
  * @param  int    $length - Länge des Teilstrings. Ist der Wert negativ, werden alle außer der angegebenen Anzahl
  *                          links stehender Zeichen zurückgegeben.
  *
- * @return string - String oder NULL, falls ein NULL-String übergeben wurde
+ * @return string - String
  */
 function strRight($string, $length) {
    if (!is_int($length))    throw new IllegalTypeException('Illegal type of parameter $length: '.getType($length));
    if ($string === null)
-      return null;
+      return '';
    if (is_int($string))
       $string = (string)$string;
    if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
