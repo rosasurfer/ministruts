@@ -97,7 +97,7 @@ final class SystemFiveLock extends BaseLock {
          $this->release();
       }
       catch (Exception $ex) {
-         Logger ::handleException($ex, $handleOnlyInShutdown=true);
+         Logger ::handleException($ex, $inShutdownOnly=true);
          throw $ex;
       }
    }

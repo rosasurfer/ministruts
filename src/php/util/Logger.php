@@ -208,17 +208,17 @@ class Logger extends StaticClass {
     *
     * NOTE: PHP bricht das Script nach Aufruf dieses Handlers automatisch ab.
     *
-    * @param  Exception $exception            - die zu behandelnde Exception
-    * @param  bool      $handleOnlyInShutdown - Ob die Exception ggf. ignoriert werden soll (wenn sie in einem Destructor auftritt).
-    *                                           Befindet sich das Script im Shutdown, darf aus einem Destructor keine Exception mehr geworfen
-    *                                           werden.  Daher muß vorm Werfen der Exception diese Funktion mit $handleOnlyInShutdown=TRUE
-    *                                           aufgerufen werden, um den Shutdown-Status zu testen und zu behandeln.
-    *                                          (1) Während des Shutdowns wird die Exception so behandelt, als wenn sie durch den installierten
-    *                                              Error-Handler ausgelöst worden wäre.
-    *                                          (2) Befindet sich das Script nicht im Shutdown, wird die Exception ignoriert.
+    * @param  Exception $exception      - die zu behandelnde Exception
+    * @param  bool      $inShutdownOnly - Ob die Exception ggf. ignoriert werden soll (wenn sie in einem Destructor auftritt).
+    *                                     Befindet sich das Script im Shutdown, darf aus einem Destructor keine Exception mehr geworfen
+    *                                     werden.  Daher muß vorm Werfen der Exception diese Funktion mit $inShutdownOnly=TRUE
+    *                                     aufgerufen werden, um den Shutdown-Status zu testen und zu behandeln.
+    *                                    (1) Während des Shutdowns wird die Exception so behandelt, als wenn sie durch den installierten
+    *                                        Error-Handler ausgelöst worden wäre.
+    *                                    (2) Befindet sich das Script nicht im Shutdown, wird die Exception ignoriert.
     */
-   public static function handleException(Exception $exception, $handleOnlyInShutdown=false) {
-      if ($handleOnlyInShutdown && !isSet($GLOBALS['$__shutting_down']))
+   public static function handleException(Exception $exception, $inShutdownOnly=false) {
+      if ($inShutdownOnly && !isSet($GLOBALS['$__shutting_down']))
          return;
 
       try {
