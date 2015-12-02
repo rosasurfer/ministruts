@@ -356,12 +356,13 @@ abstract class BarCode extends Object {
     * Destructor
     */
    public function __destruct() {
+      // Ein Destructor darf während des Shutdowns keine Exception werfen.
       try {
          if ($this->hImg)
             imageDestroy($this->hImg);
       }
       catch (Exception $ex) {
-         Logger ::handleException($ex, $ignoreIfNotInShutdown=true);
+         Logger ::handleException($ex, $handleOnlyInShutdown=true);
          throw $ex;
       }
    }

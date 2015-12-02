@@ -92,11 +92,12 @@ final class SystemFiveLock extends BaseLock {
     * Sorgt bei Zerstörung der Instanz dafür, daß ein evt. noch gehaltenes Lock freigegeben wird.
     */
    public function __destruct() {
+      // Ein Destructor darf während des Shutdowns keine Exception werfen.
       try {
          $this->release();
       }
       catch (Exception $ex) {
-         Logger ::handleException($ex, $ignoreIfNotInShutdown=true);
+         Logger ::handleException($ex, $handleOnlyInShutdown=true);
          throw $ex;
       }
    }

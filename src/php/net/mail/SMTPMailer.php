@@ -80,11 +80,12 @@ class SMTPMailer extends Mailer {
     * Sorgt bei Zerstörung des Objekts dafür, daß eine noch offene Connection geschlossen werden.
     */
    public function __destruct() {
+      // Ein Destructor darf während des Shutdowns keine Exception werfen.
       try {
          $this->disconnect();
       }
       catch (Exception $ex) {
-         Logger ::handleException($ex, $ignoreIfNotInShutdown=true);
+         Logger ::handleException($ex, $handleOnlyInShutdown=true);
          throw $ex;
       }
    }
