@@ -22,10 +22,10 @@
  * TODO: Logger muß erweitert werden können
  */
 class Logger extends StaticClass {
+
    /**
-    * NOTE:
-    * Diese Klasse muß möglichst wenige externe Abhängigkeiten haben, um das Auftreten weiterer Fehler während der
-    * Fehlerverarbeitung möglichst zu verhindern.
+    * NOTE: Diese Klasse muß möglichst wenige externe Abhängigkeiten haben, um das Auftreten weiterer Fehler während der
+    *       Fehlerverarbeitung möglichst zu verhindern.
     */
 
    // Default-Konfiguration (kann angepaßt werden, siehe Klassenbeschreibung)
