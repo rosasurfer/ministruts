@@ -10,14 +10,14 @@ class RequestProcessor extends Object {
                   /*bool*/ $logNotice;
 
 
-   // Module, zu dem wir gehören
+   // Modul, zu dem wir gehören
    protected /*Module*/ $module;
 
 
    /**
     * Erzeugt einen neuen RequestProcessor.
     *
-    * @param Module $module - Module, dem dieser RequestProcessor zugeordnet ist
+    * @param  Module $module - Modul, dem dieser RequestProcessor zugeordnet ist
     */
    public function __construct(Module $module) {
       $loglevel        = Logger ::getLogLevel(__CLASS__);
@@ -33,8 +33,8 @@ class RequestProcessor extends Object {
     * Verarbeitet den übergebenen Request und gibt entweder den entsprechenden Content aus oder
     * leitet auf eine andere Resource um.
     *
-    * @param Request  $request
-    * @param Response $response
+    * @param  Request  $request
+    * @param  Response $response
     */
    final public function process(Request $request, Response $response) {
 
@@ -98,8 +98,8 @@ class RequestProcessor extends Object {
    /**
     * Wurde mit dem Request eine Session-ID übertragen, wird die entsprechende HttpSession fortgesetzt.
     *
-    * @param Request  $request
-    * @param Response $response
+    * @param  Request  $request
+    * @param  Response $response
     */
    protected function processSession(Request $request, Response $response) {
       if (!$request->isSession() && $request->isSessionId()) {
@@ -113,8 +113,8 @@ class RequestProcessor extends Object {
     *
     * Note: Die Auswahl eines Locale löst automatisch die Erzeugung einer HttpSession aus.
     *
-    * @param Request  $request
-    * @param Response $response
+    * @param  Request  $request
+    * @param  Response $response
     */
    protected function processLocale(Request $request, Response $response) {
    }
@@ -124,11 +124,11 @@ class RequestProcessor extends Object {
     * Verschiebt ActionMessages, die in der HttpSession gespeichert sind, zurück in den aktuellen
     * Request. Wird verwendet, um ActionMessages über einen Redirect hinweg übertragen zu können.
     *
-    * @param Request  $request
-    * @param Response $response
+    * @param  Request  $request
+    * @param  Response $response
     *
-    * @see Request::setActionMessage()
-    * @see RequestProcessor::cacheActionMessages()
+    * @see    Request::setActionMessage()
+    * @see    RequestProcessor::cacheActionMessages()
     */
    protected function processCachedActionMessages(Request $request, Response $response) {
       if ($request->isSession()) {
@@ -152,10 +152,10 @@ class RequestProcessor extends Object {
     * Kopiert alle vorhandenen ActionMessages in die HttpSession. Beim nächsten Request werden diese
     * Messages automatisch zurück in den Request verschoben und stehen wieder zur Verfügung.
     *
-    * @param Request  $request
+    * @param  Request  $request
     *
-    * @see Request::setActionMessage()
-    * @see RequestProcessor::processCachedActionMessages()
+    * @see    Request::setActionMessage()
+    * @see    RequestProcessor::processCachedActionMessages()
     */
    protected function cacheActionMessages(Request $request) {
       $errors = $request->getActionErrors();
@@ -176,8 +176,8 @@ class RequestProcessor extends Object {
     * Wählt das zu benutzende ActionMapping. Kann kein Mapping gefunden werden, wird eine Fehlermeldung
     * erzeugt und NULL zurückgegeben.
     *
-    * @param Request  $request
-    * @param Response $response
+    * @param  Request  $request
+    * @param  Response $response
     *
     * @return ActionMapping - ActionMapping oder NULL
     *
@@ -239,9 +239,9 @@ EOT_404;
     * gewährt werden soll werden soll, oder FALSE, wenn der Zugriff nicht gewährt wird und der Request
     * beendet wurde.
     *
-    * @param Request       $request
-    * @param Response      $response
-    * @param ActionMapping $mapping
+    * @param  Request       $request
+    * @param  Response      $response
+    * @param  ActionMapping $mapping
     *
     * @return bool
     */
@@ -285,9 +285,9 @@ EOT_405;
     * Rollen ist.  Gibt TRUE zurück, wenn die Verarbeitung fortgesetzt und der Zugriff gewährt werden
     * soll, oder FALSE, wenn der Zugriff nicht gewährt wird und der Request beendet wurde.
     *
-    * @param Request       $request
-    * @param Response      $response
-    * @param ActionMapping $mapping
+    * @param  Request       $request
+    * @param  Response      $response
+    * @param  ActionMapping $mapping
     *
     * @return bool
     */
@@ -308,9 +308,9 @@ EOT_405;
     * Erzeugt die ActionForm des angegebenen Mappings bzw. gibt sie zurück. Ist keine ActionForm
     * konfiguriert, wird NULL zurückgegeben.
     *
-    * @param Request       $request
-    * @param Response      $response
-    * @param ActionMapping $mapping
+    * @param  Request       $request
+    * @param  Response      $response
+    * @param  ActionMapping $mapping
     *
     * @return ActionForm
     */
@@ -348,10 +348,10 @@ EOT_405;
     * weitergeleitet.  Gibt TRUE zurück, wenn die Verarbeitung fortgesetzt werden soll, oder FALSE,
     * wenn auf eine andere Resource weitergeleitet und der Request bereits beendet wurde.
     *
-    * @param Request       $request
-    * @param Response      $response
-    * @param ActionMapping $mapping
-    * @param ActionForm    $form
+    * @param  Request       $request
+    * @param  Response      $response
+    * @param  ActionMapping $mapping
+    * @param  ActionForm    $form
     *
     * @return bool
     */
@@ -380,9 +380,9 @@ EOT_405;
     * zurück, wenn die Verarbeitung fortgesetzt werden soll, oder FALSE, wenn der Request bereits
     * beendet wurde.
     *
-    * @param Request       $request
-    * @param Response      $response
-    * @param ActionMapping $mapping
+    * @param  Request       $request
+    * @param  Response      $response
+    * @param  ActionMapping $mapping
     *
     * @return bool
     */
@@ -399,10 +399,10 @@ EOT_405;
    /**
     * Erzeugt und gibt die Action zurück, die für das angegebene Mapping konfiguriert wurde.
     *
-    * @param Request       $request
-    * @param Response      $response
-    * @param ActionMapping $mapping
-    * @param ActionForm    $form     - ActionForm, die konfiguriert wurde oder NULL
+    * @param  Request       $request
+    * @param  Response      $response
+    * @param  ActionMapping $mapping
+    * @param  ActionForm    $form     - ActionForm, die konfiguriert wurde oder NULL
     *
     * @return Action
     */
@@ -417,9 +417,9 @@ EOT_405;
     * Übergibt den Request zur Bearbeitung an die konfigurierte Action und gibt den von ihr
     * zurückgegebenen ActionForward zurück.
     *
-    * @param Request  $request
-    * @param Response $response
-    * @param Action   $action
+    * @param  Request  $request
+    * @param  Response $response
+    * @param  Action   $action
     *
     * @return ActionForward
     */
@@ -465,9 +465,9 @@ EOT_405;
     * Verarbeitet den von der Action zurückgegebenen ActionForward.  Leitet auf die Resource weiter,
     * die der ActionForward bezeichnet.
     *
-    * @param Request       $request
-    * @param Response      $response
-    * @param ActionForward $forward
+    * @param  Request       $request
+    * @param  Response      $response
+    * @param  ActionForward $forward
     */
    protected function processActionForward(Request $request, Response $response, ActionForward $forward) {
       if ($forward->isRedirect()) {
