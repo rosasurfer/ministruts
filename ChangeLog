@@ -1,3 +1,8 @@
+2016-02-10
+
+   - Prozedural-Wrapper is_datetime() für php/util/CommonValidator::isDate() 
+
+
 2015-09-07
 
    - Utility-Funktionen: strContains(), strContainsI() 

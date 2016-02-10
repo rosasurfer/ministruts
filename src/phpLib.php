@@ -364,6 +364,23 @@ function is_interface($name) {
 
 
 /**
+ * Prozedural-Ersatz für CommonValidator::isDate()
+ *
+ * Ob der übergebene String einen gültigen Date/DateTime-Wert darstellt.
+ *
+ * @param string $string - der zu überprüfende String
+ * @param string $format - das Format, dem der String entsprechen soll
+ *
+ * @return bool
+ *
+ * TODO: CommonValidator::isDate() überprüft bis jetzt nur 'Y-m-d [...]' und 'd.m.Y [...]', nicht 'd/m/Y [...]'
+ */
+function is_datetime($string, $format) {
+   return CommonValidator::isDate($string, $format);
+}
+
+
+/**
  * Registriert wie register_shutdown_function() Funktionen zur Ausführung während des Shutdowns.  Die
  * Funktionen werden jedoch nicht in der Reihenfolge der Registrierung aufgerufen, sondern auf einen Stack
  * gelegt und während des Shutdowns von dort abgerufen (stacktypisch Last-In-First-Out).  Alle zusätzlich
