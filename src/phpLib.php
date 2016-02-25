@@ -867,16 +867,17 @@ function subDate($date, $days) {
 
 
 /**
- * Formatiert die String-Repräsentation eines Zeitpunktes mit dem angegebenen Format (entsprechend der lokalen Zeitzone).
+ * Formatiert die String-Repräsentation eines lokalen Zeitpunktes mit dem angegebenen Format. Haupteinsatzgebiet
+ * dieser Funktion ist das schnelle Reformatieren von Zeitangaben, die aus Datenbankabfragen stammen.
  *
- * @param  string $format   - Formatstring (siehe PHP Manual zu date())
  * @param  string $datetime - String-Repräsentation eines Datums oder Zeitpunkts
+ * @param  string $format   - String mit Format-Codes entsprechend der PHP-Funktion date()
  *
- * @return string
+ * @return string - formatierter String unter Berücksichtigung der lokalen Zeitzone
  */
-function formatDate($format, $datetime) {
-   if ($datetime === null)
-      return null;
+function formatDateStr($datetime, $format) {
+   if (!is_string($datetime)) throw new IllegalTypeException('Illegal type of parameter $datetime: '.getType($datetime));
+   if (!is_string($format))   throw new IllegalTypeException('Illegal type of parameter $format: '.getType($format));
 
    if ($datetime < '1970-01-01 00:00:00') {
       if ($format != 'd.m.Y') {

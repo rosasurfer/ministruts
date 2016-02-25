@@ -69,7 +69,7 @@ abstract class PersistableObject extends Object implements IDaoConnected {
       if ($format == 'Y-m-d H:i:s')
          return $this->created;
 
-      return formatDate($format, $this->created);
+      return formatDateStr($this->created, $format);
    }
 
 
@@ -105,7 +105,7 @@ abstract class PersistableObject extends Object implements IDaoConnected {
       if ($format == 'Y-m-d H:i:s')
          return $this->deleted;
 
-      return formatDate($format, $this->deleted);
+      return formatDateStr($this->deleted, $format);
    }
 
 
