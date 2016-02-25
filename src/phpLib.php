@@ -434,8 +434,7 @@ function push_shutdown_function(/*callable*/ $callback = null /*, $args1, $args2
  * @return string - ID
  */
 function getRandomID($length) {
-   if (!isSet($length) || ($length!==(int)$length) || $length < 1)
-      throw new plRuntimeException('Invalid argument length: '.$length);
+   if (!isSet($length) || !is_int($length) || $length < 1) throw new plRuntimeException('Invalid argument length: '.$length);
 
    $id = crypt(uniqId(rand(), true));              // zufällige ID erzeugen
    $id = strip_tags(stripSlashes($id));            // Sonder- und leicht zu verwechselnde Zeichen entfernen
@@ -842,7 +841,7 @@ function decodeHtml($html) {
  */
 function addDate($date, $days) {
    if (!CommonValidator ::isDate($date)) throw new plInvalidArgumentException('Invalid argument $date: '.$date);
-   if ($days!==(int)$days)               throw new plInvalidArgumentException('Invalid argument $days: '.$days);
+   if (!is_int($days))                   throw new plInvalidArgumentException('Invalid argument $days: '.$days);
 
    $parts = explode('-', $date);
    $year  = (int) $parts[0];
@@ -862,7 +861,7 @@ function addDate($date, $days) {
  * @return string
  */
 function subDate($date, $days) {
-   if ($days!==(int)$days) throw new plInvalidArgumentException('Invalid argument $days: '.$days);
+   if (!is_int($days)) throw new plInvalidArgumentException('Invalid argument $days: '.$days);
    return addDate($date, -$days);
 }
 
@@ -890,8 +889,7 @@ function formatDate($format, $datetime) {
    }
 
    $timestamp = strToTime($datetime);
-   if ($timestamp!==(int)$timestamp)
-      throw new plInvalidArgumentException('Invalid argument $datetime: '.$datetime);
+   if (!is_int($timestamp)) throw new plInvalidArgumentException('Invalid argument $datetime: '.$datetime);
 
    return date($format, $timestamp);
 }

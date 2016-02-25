@@ -120,8 +120,8 @@ class ActionForward extends Object {
     * @return ActionForward
     */
    public function setRedirect($redirect) {
-      if ($this->configured)           throw new IllegalStateException('Configuration is frozen');
-      if ($redirect!==(bool)$redirect) throw new IllegalTypeException('Illegal type of parameter $redirect: '.getType($redirect));
+      if ($this->configured)   throw new IllegalStateException('Configuration is frozen');
+      if (!is_bool($redirect)) throw new IllegalTypeException('Illegal type of parameter $redirect: '.getType($redirect));
 
       $this->redirect = $redirect;
       return $this;

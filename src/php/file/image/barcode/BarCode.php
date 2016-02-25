@@ -160,8 +160,7 @@ abstract class BarCode extends Object {
     */
    final public function getStyleDescription($style=null) {
       if (func_num_args()) {
-         if ($style!==(int)$style)
-            throw new IllegalTypeException('Illegal type of parameter $style: '.getType($style));
+         if (!is_int($style)) throw new IllegalTypeException('Illegal type of parameter $style: '.getType($style));
       }
       else {
          $style = $this->style;

@@ -309,8 +309,8 @@ class ActionMapping extends Object {
     * @return ActionMapping
     */
    public function setValidate($validate) {
-      if ($this->configured)           throw new IllegalStateException('Configuration is frozen');
-      if ($validate!==(bool)$validate) throw new IllegalTypeException('Illegal type of parameter $validate: '.getType($validate));
+      if ($this->configured)   throw new IllegalStateException('Configuration is frozen');
+      if (!is_bool($validate)) throw new IllegalTypeException('Illegal type of parameter $validate: '.getType($validate));
 
       $this->validate = $validate;
       return $this;
@@ -337,8 +337,8 @@ class ActionMapping extends Object {
     * @return ActionMapping
     */
    public function setDefault($default) {
-      if ($this->configured)         throw new IllegalStateException('Configuration is frozen');
-      if ($default!==(bool)$default) throw new IllegalTypeException('Illegal type of parameter $default: '.getType($default));
+      if ($this->configured)  throw new IllegalStateException('Configuration is frozen');
+      if (!is_bool($default)) throw new IllegalTypeException('Illegal type of parameter $default: '.getType($default));
 
       $this->default = $default;
       return $this;

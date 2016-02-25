@@ -42,7 +42,7 @@ final class Date extends StaticClass {
    public static function getDateRange($startDate, $days) {
       if (!is_string($startDate))                throw new IllegalTypeException('Illegal type of parameter $startDate: '.getType($startDate));
       if (!CommonValidator ::isDate($startDate)) throw new plInvalidArgumentException('Invalid argument $startDate: "'.$startDate.'"');
-      if ($days!==(int)$days)                    throw new IllegalTypeException('Illegal type of parameter $days: '.getType($days));
+      if (!is_int($days))                        throw new IllegalTypeException('Illegal type of parameter $days: '.getType($days));
       if ($days < 0)                             throw new plInvalidArgumentException('Invalid argument $days: '.$days);
 
       $range = array();
