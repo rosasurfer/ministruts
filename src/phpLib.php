@@ -867,10 +867,10 @@ function subDate($date, $days) {
 
 
 /**
- * Formatiert einen Date- oder DateTime-Wert mit dem angegebenen Format.
+ * Formatiert die String-Repräsentation eines Zeitpunktes mit dem angegebenen Format (entsprechend der lokalen Zeitzone).
  *
  * @param  string $format   - Formatstring (siehe PHP Manual zu date())
- * @param  string $datetime - Datum oder Zeit
+ * @param  string $datetime - String-Repräsentation eines Datums oder Zeitpunkts
  *
  * @return string
  */
