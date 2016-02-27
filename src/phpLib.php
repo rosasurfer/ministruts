@@ -381,6 +381,16 @@ function is_datetime($string, $format) {
 
 
 /**
+ * Ob die Byte-Order der Maschine Little-Endian ist oder nicht (Big-Endian).
+ *
+ * @return bool
+ */
+function isLittleEndian() {
+   return (pack('S', 1) == "\x01\x00");
+}
+
+
+/**
  * Registriert wie register_shutdown_function() Funktionen zur Ausführung während des Shutdowns.  Die
  * Funktionen werden jedoch nicht in der Reihenfolge der Registrierung aufgerufen, sondern auf einen Stack
  * gelegt und während des Shutdowns von dort abgerufen (stacktypisch Last-In-First-Out).  Alle zusätzlich
