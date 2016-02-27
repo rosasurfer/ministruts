@@ -1,6 +1,11 @@
+2016-02-27
+
+   - Helper-Funktion: isLittleEndian() 
+
+
 2016-02-25
 
-   - Funktion umbenannt: \formatDate($format, $datetime) => \formatDateStr($datetime, $format) 
+   - Funktion umbenannt: formatDate($format, $datetime) => \formatDateStr($datetime, $format) 
 
 
 2016-02-10
@@ -10,15 +15,15 @@
 
 2015-09-07
 
-   - Utility-Funktionen: strContains(), strContainsI() 
+   - Helper-Funktionen: strContains(), strContainsI() 
    - php/util/String::contains() durch strContains() bzw. strContainsI() ersetzt  
 
 
 2015-09-04
 
-   - Utility-Funktionen: strStartsWith(), strStartsWithI(), strEndsWith(), strEndsWithI(), 
-                         strCompare(), strCompareI(), 
-                         strLeft(), strRight()
+   - Helper-Funktionen: strStartsWith(), strStartsWithI(), strEndsWith(), strEndsWithI(), 
+                        strCompare(), strCompareI(), 
+                        strLeft(), strRight()
    - php/util/String::startsWith() und php/util/String::endsWith() durch strStartsWith() bzw. strEndsWith() ersetzt  
 
 
