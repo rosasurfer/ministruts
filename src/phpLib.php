@@ -659,6 +659,57 @@ function strRight($string, $length) {
 
 
 /**
+ * Prüft, ob ein String in einfache Anführungszeichen eingefaßt ist.
+ *
+ * @param  string $string
+ *
+ * @return bool
+ */
+function strIsSingleQuoted($string) {
+   if (is_null($string)) return false;
+   if (is_int($string))
+      $string = (string)$string;
+   if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+
+   return (strLen($string)>1 && $string{0}=="'" && strRight($string, 1)=="'");
+}
+
+
+/**
+ * Prüft, ob ein String in doppelte Anführungszeichen eingefaßt ist.
+ *
+ * @param  string $string
+ *
+ * @return bool
+ */
+function strIsDoubleQuoted($string) {
+   if (is_null($string)) return false;
+   if (is_int($string))
+      $string = (string)$string;
+   if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+
+   return (strLen($string)>1 && $string{0}=='"' && strRight($string, 1)=='"');
+}
+
+
+/**
+ * Prüft, ob ein String in einfache oder doppelte Anführungszeichen eingefaßt ist.
+ *
+ * @param  string $string
+ *
+ * @return bool
+ */
+function strIsQuoted($string) {
+   if (is_null($string)) return false;
+   if (is_int($string))
+      $string = (string)$string;
+   if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+
+   return (strLen($string)>1 && (strIsSingleQuoted($string) || strIsDoubleQuoted($string)));
+}
+
+
+/**
  * Alias für "getType()" zur sprachenübergreifenden Vereinfachung.
  *
  * @param  mixed $var - Variable
