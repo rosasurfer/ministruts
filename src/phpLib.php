@@ -627,7 +627,7 @@ function strLeft($string, $length) {
       return '';
    if (is_int($string))
       $string = (string)$string;
-   if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+   else if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
 
    return subStr($string, 0, $length);
 }
@@ -648,7 +648,7 @@ function strRight($string, $length) {
       return '';
    if (is_int($string))
       $string = (string)$string;
-   if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+   else if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
 
    if ($length == 0)
       return '';
@@ -669,7 +669,7 @@ function strIsSingleQuoted($string) {
    if (is_null($string)) return false;
    if (is_int($string))
       $string = (string)$string;
-   if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+   else if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
 
    return (strLen($string)>1 && $string{0}=="'" && strRight($string, 1)=="'");
 }
@@ -686,7 +686,7 @@ function strIsDoubleQuoted($string) {
    if (is_null($string)) return false;
    if (is_int($string))
       $string = (string)$string;
-   if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+   else if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
 
    return (strLen($string)>1 && $string{0}=='"' && strRight($string, 1)=='"');
 }
@@ -703,9 +703,26 @@ function strIsQuoted($string) {
    if (is_null($string)) return false;
    if (is_int($string))
       $string = (string)$string;
-   if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+   else if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
 
    return (strLen($string)>1 && (strIsSingleQuoted($string) || strIsDoubleQuoted($string)));
+}
+
+
+/**
+ * Prüft, ob ein String vollständig aus numerischen Zeichen besteht.
+ *
+ * @param  string $string
+ *
+ * @return bool
+ */
+function strIsDigit($string) {
+   if (is_null($string)) return false;
+   if (is_int($string))
+      $string = (string)$string;
+   else if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+
+   return ctype_digit($string);
 }
 
 
