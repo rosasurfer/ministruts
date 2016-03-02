@@ -1,3 +1,8 @@
+2016-03-02
+
+   - String-Funktionen: strIsSingleQuoted($string), strIsDoubleQuoted($string), strIsQuoted($string)
+
+
 2016-02-27
 
    - Helper-Funktion: isLittleEndian() 
