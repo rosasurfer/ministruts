@@ -371,9 +371,12 @@ function is_interface($name) {
  * @param string $string - der zu überprüfende String
  * @param string $format - das Format, dem der String entsprechen soll
  *
- * @return bool
+ * @return int|bool - Timestamp oder FALSE, wenn der übergebene Wert nicht gültig ist
  *
- * TODO: CommonValidator::isDate() überprüft bis jetzt nur 'Y-m-d [...]' und 'd.m.Y [...]', nicht 'd/m/Y [...]'
+ * Note: Unterstützte Formate: 'Y-m-d [H:i[:s]]'
+ *                             'Y.m.d [H:i[:s]]'
+ *                             'd.m.Y [H:i[:s]]'
+ *                             'd/m/Y [H:i[:s]]'
  */
 function is_datetime($string, $format) {
    return CommonValidator::isDate($string, $format);
@@ -918,8 +921,8 @@ function decodeHtml($html) {
  * @return string - resultierendes Datum
  */
 function addDate($date, $days) {
-   if (!CommonValidator ::isDate($date)) throw new plInvalidArgumentException('Invalid argument $date: '.$date);
-   if (!is_int($days))                   throw new plInvalidArgumentException('Invalid argument $days: '.$days);
+   if (CommonValidator ::isDate($date) === false) throw new plInvalidArgumentException('Invalid argument $date: '.$date);
+   if (!is_int($days))                            throw new plInvalidArgumentException('Invalid argument $days: '.$days);
 
    $parts = explode('-', $date);
    $year  = (int) $parts[0];
