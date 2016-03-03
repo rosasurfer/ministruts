@@ -137,10 +137,10 @@ class CommonValidator extends StaticClass {
     *
     * @return int|bool - Timestamp oder FALSE, wenn der übergebene Wert ungültig ist
     *
-    * Note: Unterstützte Formate: 'Y-m-d [H:i[:s]]'
-    *                             'Y.m.d [H:i[:s]]'
-    *                             'd.m.Y [H:i[:s]]'
-    *                             'd/m/Y [H:i[:s]]'
+    * Unterstützte Formate: 'Y-m-d [H:i[:s]]'
+    *                       'Y.m.d [H:i[:s]]'
+    *                       'd.m.Y [H:i[:s]]'
+    *                       'd/m/Y [H:i[:s]]'
     */
    public static function isDate($date, $format='Y-m-d') {
       if (!is_string($date)) throw new IllegalTypeException('Illegal type of parameter $date: '.getType($date));
@@ -168,6 +168,7 @@ class CommonValidator extends StaticClass {
          return ($data !== false && checkDate($data['tm_mon']+1, $data['tm_mday'], $data['tm_year']+1900) && $data['tm_sec'] <= 59 && $data['unparsed']=='');
       }
       */
+      $year = $month = $day = $hour = $minute = $second = null;
 
       if ($format == 'Y-m-d') {
          if (!preg_match('/^([0-9]{4})-([0-9]{2})-([0-9]{2})$/', $date, $m)) return false;
@@ -177,21 +178,17 @@ class CommonValidator extends StaticClass {
          $hour   = 0;
          $minute = 0;
          $second = 0;
-         $timestamp = mkTime($hour, $minute, $second, (int)$month, (int)$day, (int)$year);
-         return checkDate($month, $day, $year);
       }
-
-      if ($format == 'Y-m-d H:i') {
+      elseif ($format == 'Y-m-d H:i') {
          if (!preg_match('/^([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2})$/', $date, $m)) return false;
          $year   = $m[1];
          $month  = $m[2];
          $day    = $m[3];
          $hour   = $m[4];
          $minute = $m[5];
-         return (checkDate($month, $day, $year) && $hour < 24 && $minute < 60);
+         $second = 0;
       }
-
-      if ($format == 'Y-m-d H:i:s') {
+      elseif ($format == 'Y-m-d H:i:s') {
          if (!preg_match('/^([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})$/', $date, $m)) return false;
          $year   = $m[1];
          $month  = $m[2];
@@ -199,28 +196,26 @@ class CommonValidator extends StaticClass {
          $hour   = $m[4];
          $minute = $m[5];
          $second = $m[6];
-         return (checkDate($month, $day, $year) && $hour < 24 && $minute < 60 && $second < 60);
       }
-
-      if ($format == 'Y.m.d') {
+      elseif ($format == 'Y.m.d') {
          if (!preg_match('/^([0-9]{4})\.([0-9]{2})\.([0-9]{2})$/', $date, $m)) return false;
-         $year  = $m[1];
-         $month = $m[2];
-         $day   = $m[3];
-         return checkDate($month, $day, $year);
+         $year   = $m[1];
+         $month  = $m[2];
+         $day    = $m[3];
+         $hour   = 0;
+         $minute = 0;
+         $second = 0;
       }
-
-      if ($format == 'Y.m.d H:i') {
+      elseif ($format == 'Y.m.d H:i') {
          if (!preg_match('/^([0-9]{4})\.([0-9]{2})\.([0-9]{2}) ([0-9]{2}):([0-9]{2})$/', $date, $m)) return false;
          $year   = $m[1];
          $month  = $m[2];
          $day    = $m[3];
          $hour   = $m[4];
          $minute = $m[5];
-         return (checkDate($month, $day, $year) && $hour < 24 && $minute < 60);
+         $second = 0;
       }
-
-      if ($format == 'Y.m.d H:i:s') {
+      elseif ($format == 'Y.m.d H:i:s') {
          if (!preg_match('/^([0-9]{4})\.([0-9]{2})\.([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})$/', $date, $m)) return false;
          $year   = $m[1];
          $month  = $m[2];
@@ -228,28 +223,26 @@ class CommonValidator extends StaticClass {
          $hour   = $m[4];
          $minute = $m[5];
          $second = $m[6];
-         return (checkDate($month, $day, $year) && $hour < 24 && $minute < 60 && $second < 60);
       }
-
-      if ($format == 'd.m.Y') {
+      elseif ($format == 'd.m.Y') {
          if (!preg_match('/^([0-9]{2})\.([0-9]{2})\.([0-9]{4})$/', $date, $m)) return false;
          $year  = $m[3];
          $month = $m[2];
          $day   = $m[1];
-         return checkDate($month, $day, $year);
+         $hour   = 0;
+         $minute = 0;
+         $second = 0;
       }
-
-      if ($format == 'd.m.Y H:i') {
+      elseif ($format == 'd.m.Y H:i') {
          if (!preg_match('/^([0-9]{2})\.([0-9]{2})\.([0-9]{4}) ([0-9]{2}):([0-9]{2})$/', $date, $m)) return false;
          $day    = $m[1];
          $month  = $m[2];
          $year   = $m[3];
          $hour   = $m[4];
          $minute = $m[5];
-         return (checkDate($month, $day, $year) && $hour < 24 && $minute < 60);
+         $second = 0;
       }
-
-      if ($format == 'd.m.Y H:i:s') {
+      elseif ($format == 'd.m.Y H:i:s') {
          if (!preg_match('/^([0-9]{2})\.([0-9]{2})\.([0-9]{4}) ([0-9]{2}):([0-9]{2}):([0-9]{2})$/', $date, $m)) return false;
          $day    = $m[1];
          $month  = $m[2];
@@ -257,28 +250,26 @@ class CommonValidator extends StaticClass {
          $hour   = $m[4];
          $minute = $m[5];
          $second = $m[6];
-         return (checkDate($month, $day, $year) && $hour < 24 && $minute < 60 && $second < 60);
       }
-
-      if ($format == 'd/m/Y') {
+      elseif ($format == 'd/m/Y') {
          if (!preg_match('/^([0-9]{2})\/([0-9]{2})\/([0-9]{4})$/', $date, $m)) return false;
-         $year  = $m[3];
-         $month = $m[2];
-         $day   = $m[1];
-         return checkDate($month, $day, $year);
+         $year   = $m[3];
+         $month  = $m[2];
+         $day    = $m[1];
+         $hour   = 0;
+         $minute = 0;
+         $second = 0;
       }
-
-      if ($format == 'd/m/Y H:i') {
+      elseif ($format == 'd/m/Y H:i') {
          if (!preg_match('/^([0-9]{2})\/([0-9]{2})\/([0-9]{4}) ([0-9]{2}):([0-9]{2})$/', $date, $m)) return false;
          $day    = $m[1];
          $month  = $m[2];
          $year   = $m[3];
          $hour   = $m[4];
          $minute = $m[5];
-         return (checkDate($month, $day, $year) && $hour < 24 && $minute < 60);
+         $second = 0;
       }
-
-      if ($format == 'd/m/Y H:i:s') {
+      elseif ($format == 'd/m/Y H:i:s') {
          if (!preg_match('/^([0-9]{2})\/([0-9]{2})\/([0-9]{4}) ([0-9]{2}):([0-9]{2}):([0-9]{2})$/', $date, $m)) return false;
          $day    = $m[1];
          $month  = $m[2];
@@ -286,10 +277,11 @@ class CommonValidator extends StaticClass {
          $hour   = $m[4];
          $minute = $m[5];
          $second = $m[6];
-         return (checkDate($month, $day, $year) && $hour < 24 && $minute < 60 && $second < 60);
       }
-
-      return false;
+      else {
+         return false;
+      }
+      return (checkDate($month, $day, $year) && $hour< 24 && $minute< 60 && $second< 60) ? mkTime($hour, $minute, $second, (int)$month, (int)$day, (int)$year) : false;
    }
 
 
