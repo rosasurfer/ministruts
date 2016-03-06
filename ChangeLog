@@ -1,3 +1,8 @@
+2016-03-06
+
+   - String-Funktionen: strLeftTo(), strRightFrom()
+
+
 2016-03-03
 
    - Zeitformate von php/util/CommonValidator::isDate() erweitert
@@ -5,8 +10,8 @@
 
 2016-03-02
 
-   - String-Funktionen: strIsSingleQuoted($string), strIsDoubleQuoted($string), strIsQuoted($string)
-                        strIsDigit($string)
+   - String-Funktionen: strIsSingleQuoted(), strIsDoubleQuoted(), strIsQuoted()
+                        strIsDigit()
 
 
 2016-02-27
@@ -16,7 +21,7 @@
 
 2016-02-25
 
-   - Funktion umbenannt: formatDate($format, $datetime) => \formatDateStr($datetime, $format) 
+   - Funktion umbenannt: formatDate($format, $datetime) => formatDateStr($datetime, $format) 
 
 
 2016-02-10
