@@ -618,7 +618,7 @@ function strCompareI($stringA, $stringB) {
 /**
  * Gibt einen linken Teilstring eines Strings zurück.
  *
- * @param  string $string
+ * @param  string $string - Ausgangsstring
  * @param  int    $length - Länge des Teilstrings. Ist der Wert negativ, werden alle außer der angegebenen Anzahl
  *                          rechts stehender Zeichen zurückgegeben.
  *
@@ -633,6 +633,26 @@ function strLeft($string, $length) {
    else if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
 
    return subStr($string, 0, $length);
+}
+
+
+/**
+ * Gibt den linken Teil eines Strings bis zum Auftreten eines Teilstrings zurück. Das Ergebnis wird ohne den
+ * zu suchenden Teilstring zurückgegeben.
+ *
+ * @param  string $string    - Ausgangsstring
+ * @param  string $substring - der das Ergebnis begrenzende Teilstring
+ *
+ * @return string
+ */
+function strLeftTo($string, $substring) {
+   if (!is_string($string))    throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+   if (!is_string($substring)) throw new IllegalTypeException('Illegal type of parameter $substring: '.getType($substring));
+
+   $pos = strPos($string, $substring);
+   if ($pos === false)
+      return $string;
+   return subStr($string, 0, $pos);
 }
 
 
@@ -658,6 +678,26 @@ function strRight($string, $length) {
 
    $result = subStr($string, -$length);
    return $result===false ? '' : $result;
+}
+
+
+/**
+ * Gibt den rechten Teil eines Strings ab dem Auftreten eines Teilstrings zurück. Das Ergebnis wird ohne den
+ * zu suchenden Teilstring zurückgegeben.
+ *
+ * @param  string $string    - Ausgangsstring
+ * @param  string $substring - der das Ergebnis begrenzende Teilstring
+ *
+ * @return string
+ */
+function strRightFrom($string, $substring) {
+   if (!is_string($string))    throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+   if (!is_string($substring)) throw new IllegalTypeException('Illegal type of parameter $substring: '.getType($substring));
+
+   $pos = strPos($string, $substring);
+   if ($pos === false)
+      return "";
+   return subStr($string, $pos + strLen($substring));
 }
 
 
