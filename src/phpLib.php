@@ -587,9 +587,9 @@ function strContainsI($haystack, $needle) {
  * @return bool
  */
 function strCompare($stringA, $stringB, $ignoreCase=false) {
-   if ($stringA!==null && !is_string($stringA)) throw new IllegalTypeException('Illegal type of parameter $stringA: '.getType($stringA));
-   if ($stringB!==null && !is_string($stringB)) throw new IllegalTypeException('Illegal type of parameter $stringB: '.getType($stringB));
-   if (!is_bool($ignoreCase))                   throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
+   if (!is_null($stringA) && !is_string($stringA)) throw new IllegalTypeException('Illegal type of parameter $stringA: '.getType($stringA));
+   if (!is_null($stringB) && !is_string($stringB)) throw new IllegalTypeException('Illegal type of parameter $stringB: '.getType($stringB));
+   if (!is_bool($ignoreCase))                      throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
 
    if ($ignoreCase)
       return strCompareI($stringA, $stringB);
@@ -606,10 +606,10 @@ function strCompare($stringA, $stringB, $ignoreCase=false) {
  * @return bool
  */
 function strCompareI($stringA, $stringB) {
-   if ($stringA!==null && !is_string($stringA)) throw new IllegalTypeException('Illegal type of parameter $stringA: '.getType($stringA));
-   if ($stringB!==null && !is_string($stringB)) throw new IllegalTypeException('Illegal type of parameter $stringB: '.getType($stringB));
+   if (!is_null($stringA) && !is_string($stringA)) throw new IllegalTypeException('Illegal type of parameter $stringA: '.getType($stringA));
+   if (!is_null($stringB) && !is_string($stringB)) throw new IllegalTypeException('Illegal type of parameter $stringB: '.getType($stringB));
 
-   if ($stringA===null || $stringB===null)
+   if (is_null($stringA) || is_null($stringB))
       return ($stringA === $stringB);
    return (strToLower($stringA) === strToLower($stringB));
 }
