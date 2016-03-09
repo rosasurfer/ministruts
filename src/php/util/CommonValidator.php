@@ -131,9 +131,9 @@ class CommonValidator extends StaticClass {
    /**
     * Ob der übergebene String einen gültigen Date/DateTime-Wert darstellt.
     *
-    * @param string       $string - der zu überprüfende String
-    * @param string|array $format - Format, dem der String entsprechen soll. Sind mehrere angegeben, muß der String
-    *                               mindestens einem davon entsprechen.
+    * @param string    $string - der zu überprüfende String
+    * @param string|[] $format - Format, dem der String entsprechen soll. Sind mehrere angegeben, muß der String
+    *                            mindestens einem davon entsprechen.
     *
     * @return int|bool - Timestamp oder FALSE, wenn der übergebene Wert ungültig ist
     *
@@ -142,7 +142,7 @@ class CommonValidator extends StaticClass {
     *                       'd.m.Y [H:i[:s]]'
     *                       'd/m/Y [H:i[:s]]'
     */
-   public static function isDate($date, $format='Y-m-d') {
+   public static function isDateTime($date, $format='Y-m-d') {
       if (!is_string($date)) throw new IllegalTypeException('Illegal type of parameter $date: '.getType($date));
       if (is_array($format)) {
          $me = __FUNCTION__;

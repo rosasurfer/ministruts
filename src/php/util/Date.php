@@ -14,10 +14,10 @@ final class Date extends StaticClass {
     * @return int - Tage
     */
    public static function diffDays($start, $end) {
-      if (!is_string($start))                         throw new IllegalTypeException('Illegal type of parameter $start: '.getType($start));
-      if (CommonValidator ::isDate($start) === false) throw new plInvalidArgumentException('Invalid argument $start: "'.$start.'"');
-      if (!is_string($end))                           throw new IllegalTypeException('Illegal type of parameter $end: '.getType($end));
-      if (CommonValidator ::isDate($end) === false)   throw new plInvalidArgumentException('Invalid argument $end: "'.$end.'"');
+      if (!is_string($start))                             throw new IllegalTypeException('Illegal type of parameter $start: '.getType($start));
+      if (CommonValidator ::isDateTime($start) === false) throw new plInvalidArgumentException('Invalid argument $start: "'.$start.'"');
+      if (!is_string($end))                               throw new IllegalTypeException('Illegal type of parameter $end: '.getType($end));
+      if (CommonValidator ::isDateTime($end) === false)   throw new plInvalidArgumentException('Invalid argument $end: "'.$end.'"');
 
       $ts1 = strToTime($start.' GMT'); // ohne Angabe einer Zeitzone wird die lokale DST einkalkuliert
       $ts2 = strToTime($end.' GMT');
@@ -40,10 +40,10 @@ final class Date extends StaticClass {
     * @return array
     */
    public static function getDateRange($startDate, $days) {
-      if (!is_string($startDate))                         throw new IllegalTypeException('Illegal type of parameter $startDate: '.getType($startDate));
-      if (CommonValidator ::isDate($startDate) === false) throw new plInvalidArgumentException('Invalid argument $startDate: "'.$startDate.'"');
-      if (!is_int($days))                                 throw new IllegalTypeException('Illegal type of parameter $days: '.getType($days));
-      if ($days < 0)                                      throw new plInvalidArgumentException('Invalid argument $days: '.$days);
+      if (!is_string($startDate))                             throw new IllegalTypeException('Illegal type of parameter $startDate: '.getType($startDate));
+      if (CommonValidator ::isDateTime($startDate) === false) throw new plInvalidArgumentException('Invalid argument $startDate: "'.$startDate.'"');
+      if (!is_int($days))                                     throw new IllegalTypeException('Illegal type of parameter $days: '.getType($days));
+      if ($days < 0)                                          throw new plInvalidArgumentException('Invalid argument $days: '.$days);
 
       $range = array();
       $date  = new DateTime($startDate);

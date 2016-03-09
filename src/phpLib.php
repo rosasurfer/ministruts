@@ -364,22 +364,23 @@ function is_interface($name) {
 
 
 /**
- * Prozedural-Ersatz für CommonValidator::isDate()
+ * Prozedural-Ersatz für CommonValidator::isDateTime()
  *
  * Ob der übergebene String einen gültigen Date/DateTime-Wert darstellt.
  *
- * @param string $string - der zu überprüfende String
- * @param string $format - das Format, dem der String entsprechen soll
+ * @param string    $string - der zu überprüfende String
+ * @param string|[] $format - Format, dem der String entsprechen soll. Sind mehrere angegeben, muß der String
+ *                            mindestens einem davon entsprechen.
  *
  * @return int|bool - Timestamp oder FALSE, wenn der übergebene Wert nicht gültig ist
  *
- * Note: Unterstützte Formate: 'Y-m-d [H:i[:s]]'
- *                             'Y.m.d [H:i[:s]]'
- *                             'd.m.Y [H:i[:s]]'
- *                             'd/m/Y [H:i[:s]]'
+ * Unterstützte Formate: 'Y-m-d [H:i[:s]]'
+ *                       'Y.m.d [H:i[:s]]'
+ *                       'd.m.Y [H:i[:s]]'
+ *                       'd/m/Y [H:i[:s]]'
  */
 function is_datetime($string, $format) {
-   return CommonValidator::isDate($string, $format);
+   return CommonValidator::isDateTime($string, $format);
 }
 
 
@@ -961,8 +962,8 @@ function decodeHtml($html) {
  * @return string - resultierendes Datum
  */
 function addDate($date, $days) {
-   if (CommonValidator ::isDate($date) === false) throw new plInvalidArgumentException('Invalid argument $date: '.$date);
-   if (!is_int($days))                            throw new plInvalidArgumentException('Invalid argument $days: '.$days);
+   if (CommonValidator ::isDateTime($date) === false) throw new plInvalidArgumentException('Invalid argument $date: '.$date);
+   if (!is_int($days))                                throw new plInvalidArgumentException('Invalid argument $days: '.$days);
 
    $parts = explode('-', $date);
    $year  = (int) $parts[0];
