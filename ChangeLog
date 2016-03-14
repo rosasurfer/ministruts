@@ -1,3 +1,9 @@
+2016-03-14
+
+   - Die Stringfunktionen strStartsWith(), strStartsWithI(), strEndsWith() und strEndsWithI() können  
+     zusätzlich ein Array von mehrereren Prefixen bzw. Suffixen verarbeiten.
+
+
 2016-03-06
 
    - String-Funktionen: strLeftTo(), strRightFrom()
@@ -5,7 +11,7 @@
 
 2016-03-03
 
-   - Zeitformate von php/util/CommonValidator::isDate() erweitert
+   - Zeitformate von php/util/CommonValidator::isDateTime() erweitert
 
 
 2016-03-02
@@ -26,7 +32,7 @@
 
 2016-02-10
 
-   - Prozedural-Wrapper is_datetime() für php/util/CommonValidator::isDate() 
+   - Prozedural-Wrapper is_datetime() für php/util/CommonValidator::isDateTime() 
 
 
 2015-09-07
