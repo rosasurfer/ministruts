@@ -467,16 +467,22 @@ function getRandomID($length) {
 /**
  * Prüft, ob ein String mit einem Teilstring beginnt.
  *
- * @param  string $string
- * @param  string $prefix
- * @param  bool   $ignoreCase - default: nein
+ * @param  string    $string
+ * @param  string|[] $prefix     - Teilstring. Sind mehrere angegeben, prüft die Funktion, ob der String mit einem von ihnen beginnt.
+ * @param  bool      $ignoreCase - default: nein
  *
  * @return bool
  */
 function strStartsWith($string, $prefix, $ignoreCase=false) {
-   if ($string!==null && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
-   if ($prefix!==null && !is_string($prefix)) throw new IllegalTypeException('Illegal type of parameter $prefix: '.getType($prefix));
-   if (!is_bool($ignoreCase))                 throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
+   if (is_array($prefix)) {
+      $self = __FUNCTION__;
+      foreach ($prefix as $p) if ($self($string, $p, $ignoreCase))
+         return true;
+      return false;
+   }
+   if (!is_null($string) && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+   if (!is_string($prefix))                      throw new IllegalTypeException('Illegal type of parameter $prefix: '.$prefix.' ('.getType($prefix).')');
+   if (!is_bool($ignoreCase))                    throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
 
    $stringLen = strLen($string);
    $prefixLen = strLen($prefix);
@@ -506,16 +512,22 @@ function strStartsWithI($string, $prefix) {
 /**
  * Prüft, ob ein String mit einem Teilstring endet.
  *
- * @param  string $string
- * @param  string $suffix
- * @param  bool   $ignoreCase - default: nein
+ * @param  string    $string
+ * @param  string|[] $suffix     - Teilstring. Sind mehrere angegeben, prüft die Funktion, ob der String mit einem von ihnen endet.
+ * @param  bool      $ignoreCase - default: nein
  *
  * @return bool
  */
 function strEndsWith($string, $suffix, $ignoreCase=false) {
-   if ($string!==null && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
-   if ($suffix!==null && !is_string($suffix)) throw new IllegalTypeException('Illegal type of parameter $suffix: '.getType($suffix));
-   if (!is_bool($ignoreCase))                 throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
+   if (is_array($suffix)) {
+      $self = __FUNCTION__;
+      foreach ($suffix as $s) if ($self($string, $s, $ignoreCase))
+         return true;
+      return false;
+   }
+   if (!is_null($string) && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+   if (!is_string($suffix))                      throw new IllegalTypeException('Illegal type of parameter $suffix: '.$suffix.' ('.getType($suffix).')');
+   if (!is_bool($ignoreCase))                    throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
 
    $stringLen = strLen($string);
    $suffixLen = strLen($suffix);
@@ -549,9 +561,9 @@ function strEndsWithI($string, $suffix) {
  * @return bool
  */
 function strContains($haystack, $needle, $ignoreCase=false) {
-   if ($haystack!==null && !is_string($haystack)) throw new IllegalTypeException('Illegal type of parameter $haystack: '.getType($haystack));
-   if ($needle  !==null && !is_string($needle))   throw new IllegalTypeException('Illegal type of parameter $needle: '.getType($needle));
-   if (!is_bool($ignoreCase))                     throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
+   if (!is_null($haystack) && !is_string($haystack)) throw new IllegalTypeException('Illegal type of parameter $haystack: '.getType($haystack));
+   if (!is_string($needle))                          throw new IllegalTypeException('Illegal type of parameter $needle: '.getType($needle));
+   if (!is_bool($ignoreCase))                        throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
 
    $haystackLen = strLen($haystack);
    $needleLen   = strLen($needle);
