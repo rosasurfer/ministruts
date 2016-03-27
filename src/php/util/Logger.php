@@ -396,8 +396,10 @@ class Logger extends StaticClass {
          else {
             $trace = $exception ? $exception->getTrace() : debug_backtrace();
             $trace = NestableException ::transformToJavaStackTrace($trace);
-            array_shift($trace);
-            array_shift($trace);                // die ersten beiden Frames können weg: 1. Logger::log_1(), 2: Logger::log()
+            // die Frames des Loggers selbst können weg
+            if ($trace[0]['class'].$trace[0]['type'].$trace[0]['function'] == 'Logger::log_1') array_shift($trace);
+            if ($trace[0]['class'].$trace[0]['type'].$trace[0]['function'] == 'Logger::log'  ) array_shift($trace);
+            if ($trace[0]['class'].$trace[0]['type'].$trace[0]['function'] == 'Logger::warn' ) array_shift($trace);
 
             foreach ($trace as $f) {            // ersten Frame mit __FILE__ suchen
                if (isSet($f['file'])) {
