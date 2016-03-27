@@ -301,6 +301,19 @@ class Logger extends StaticClass {
 
 
    /**
+    *
+    */
+   public static function warn($arg1=null, $arg2=null, $arg3=null) {
+      $argc = func_num_args();
+
+      if ($argc == 2) return self::log($arg1,        L_WARN, $arg2);
+      if ($argc == 3) return self::log($arg1, $arg2, L_WARN, $arg3);
+
+      throw new plInvalidArgumentException('Invalid number of arguments: '.$argc);
+   }
+
+
+   /**
     * Überladene Methode.  Loggt eine Message und/oder eine Exception.
     *
     * Signaturen:
