@@ -77,7 +77,7 @@ abstract class NestableException extends Exception {
     * @return string[][] - java-ähnlicher Stacktrace
     */
    final public static function transformToJavaStackTrace(array $trace) {
-      $trace[] = array('function' => 'main');      // Für die Java-Ähnlichkeit wird ein zusätzlicher Frame fürs Hauptscript angefügt und
+      $trace[] = array('function' => '{main}');    // Für die Java-Ähnlichkeit wird ein zusätzlicher Frame fürs Hauptscript angefügt und
                                                    // alle FILE- und LINE-Felder um eine Position nach hinten verschoben.
       for ($i=sizeOf($trace); $i--;) {
          if (isSet($trace[$i-1]['file']))
