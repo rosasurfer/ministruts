@@ -650,8 +650,8 @@ function strLeft($string, $length) {
 
 
 /**
- * Gibt den linken Teil eines Strings bis zum Auftreten eines Teilstrings zurück. Das Ergebnis wird ohne den
- * zu suchenden Teilstring zurückgegeben.
+ * Gibt den linken Teil eines Strings bis zum Auftreten eines Teilstrings zurück. Das Ergebnis schließt den
+ * zu suchenden Teilstring nicht mit ein.
  *
  * @param  string $string    - Ausgangsstring
  * @param  string $substring - der das Ergebnis begrenzende Teilstring
@@ -695,8 +695,8 @@ function strRight($string, $length) {
 
 
 /**
- * Gibt den rechten Teil eines Strings ab dem Auftreten eines Teilstrings zurück. Das Ergebnis wird ohne den
- * zu suchenden Teilstring zurückgegeben.
+ * Gibt den rechten Teil eines Strings ab dem Auftreten eines Teilstrings zurück. Das Ergebnis schließt den
+ * zu suchenden Teilstring nicht mit ein.
  *
  * @param  string $string    - Ausgangsstring
  * @param  string $substring - der das Ergebnis begrenzende Teilstring
