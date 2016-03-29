@@ -656,7 +656,7 @@ function strLeft($string, $length) {
  * @param  string $string    - Ausgangsstring
  * @param  string $substring - der das Ergebnis begrenzende Teilstring
  *
- * @return string
+ * @return string - Teilstring oder der Ausgangsstring, wenn der zu begrenzende Teilstring nicht gefunden wurde
  */
 function strLeftTo($string, $substring) {
    if (!is_string($string))    throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
@@ -701,7 +701,7 @@ function strRight($string, $length) {
  * @param  string $string    - Ausgangsstring
  * @param  string $substring - der das Ergebnis begrenzende Teilstring
  *
- * @return string
+ * @return string - Teilstring oder ein Leerstring, wenn der begrenzende Teilstring nicht gefunden wurde
  */
 function strRightFrom($string, $substring) {
    if (!is_string($string))    throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
