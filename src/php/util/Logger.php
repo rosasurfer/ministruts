@@ -420,12 +420,14 @@ class Logger extends StaticClass {
                echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.self::$logLevels[$level].'</b>: '.nl2br(htmlSpecialChars($message, ENT_QUOTES))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
                if ($exception)
                   echo '<br>'.htmlSpecialChars($exMessage, ENT_QUOTES).'<br>';
-               echo '<br>'.printFormatted($trace, true)."<br></div>";
+               if ($trace)
+                  echo '<br>'.printFormatted($trace, true).'<br>';
+               echo '</div>';
                if ($request=Request ::me())
-                  echo '<br>'.printFormatted("Request:\n--------\n".$request, true)."<br></div><br>";
+                  echo '<br>'.printFormatted("Request:\n--------\n".$request, true).'<br></div><br>';
             }
             else {
-               echo $plainMessage.($exception ? "\n".$exMessage."\n":'')."\n".$trace."\n";
+               echo $plainMessage.($exception ? "\n".$exMessage."\n":'')."\n".($trace ? $trace."\n":'');
             }
          }
 
