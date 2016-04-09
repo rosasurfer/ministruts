@@ -238,7 +238,7 @@ abstract class BarCode extends Object {
     *
     */
    protected function drawChar($xPos, $yPos, $char) {
-      imageString($this->hImg, $this->font, round($xPos), round($yPos), $char, $this->fgColor);
+      imageString($this->hImg, $this->font, (int)round($xPos), (int)round($yPos), $char, $this->fgColor);
       return $this;
    }
 
@@ -247,7 +247,7 @@ abstract class BarCode extends Object {
     *
     */
    protected function drawText($xPos, $yPos, $char) {
-      imageString($this->hImg, $this->font, round($xPos), round($yPos), $char, $this->fgColor);
+      imageString($this->hImg, $this->font, (int)round($xPos), (int)round($yPos), $char, $this->fgColor);
    }
 
 
@@ -255,10 +255,10 @@ abstract class BarCode extends Object {
     *
     */
    protected function drawSingleBar($xPos, $yPos, $xSize, $ySize) {
-      $xPos  = round($xPos);
-      $yPos  = round($yPos);
-      $xSize = round($xSize);
-      $ySize = round($ySize);
+      $xPos  = (int) round($xPos);
+      $yPos  = (int) round($yPos);
+      $xSize = (int) round($xSize);
+      $ySize = (int) round($ySize);
 
       if ($xPos>=0 && $xPos<=$this->width && ($xPos+$xSize)<=$this->width && $yPos>=0 && $yPos<=$this->height && ($yPos+$ySize)<=$this->height) {
          for ($i=0; $i<$xSize; $i++)

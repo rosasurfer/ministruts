@@ -1270,8 +1270,8 @@ EOB;
                 '<td class="td-n center">',$entry[1],'</td>',
                 '<td class="td-n center">',$entry[2],'</td>',
                 '<td class="td-n center">',$entry[3],'</td>',
-                '<td class="td-n center">',round($entry[2] / $entry[1]),'</td>',
-                '<td class="td-n center">',round($entry[3] / $entry[1]),'</td>',
+                '<td class="td-n center">',(int)round($entry[2] / $entry[1]),'</td>',
+                '<td class="td-n center">',(int)round($entry[3] / $entry[1]),'</td>',
                 '</tr>';
 
             if (++$i == $MYREQUEST['COUNT']) break;

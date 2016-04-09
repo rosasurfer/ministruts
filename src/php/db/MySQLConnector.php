@@ -263,7 +263,7 @@ final class MySQLConnector extends DB {
          $length = 160;
       }
       $lPre   = $lPost = ($length-strLen(' Process List '))/2;
-      $string = str_repeat('_', floor($lPre)).' Process List '.str_repeat('_', (int)ceil($lPost))."\n";
+      $string = str_repeat('_', (int)floor($lPre)).' Process List '.str_repeat('_', (int)ceil($lPost))."\n";
 
       // header line
       $string .=    str_pad('Id'     , $lengthId     , ' ', STR_PAD_RIGHT)
@@ -467,7 +467,7 @@ final class MySQLConnector extends DB {
       }
       $lPre   = $lPost = ($lengthL-strLen(' Deadlock Transactions '))/2;
       $lPost += $lengthT - $lengthL;
-      $string = str_repeat('_', floor($lPre)).' Deadlock Transactions '.str_repeat('_', (int)ceil($lPost))."\n";
+      $string = str_repeat('_', (int)floor($lPre)).' Deadlock Transactions '.str_repeat('_', (int)ceil($lPost))."\n";
 
       // header line
       $string .=    str_pad('ID'    , $lengthId    , ' ', STR_PAD_RIGHT)
@@ -496,7 +496,7 @@ final class MySQLConnector extends DB {
       // Lockanzeige generieren
       // top separator line
       $lPre    = $lPost = ($lengthL-strLen(' Deadlock Locks '))/2;
-      $string .= "\n\n\n".str_repeat('_', floor($lPre)).' Deadlock Locks '.str_repeat('_', (int)ceil($lPost))."\n";
+      $string .= "\n\n\n".str_repeat('_', (int)floor($lPre)).' Deadlock Locks '.str_repeat('_', (int)ceil($lPost))."\n";
 
       // header line
       $string .=    str_pad('ID'     , $lengthId     , ' ', STR_PAD_RIGHT)
