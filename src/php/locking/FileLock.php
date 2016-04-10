@@ -59,12 +59,13 @@ final class FileLock extends BaseLock {
     * Sorgt bei Zerstörung der Instanz dafür, daß ein evt. noch gehaltenes Lock freigegeben wird.
     */
    public function __destruct() {
-      // Ein Destructor darf während des Shutdowns keine Exception werfen.
+      // Attempting to throw an exception from a destructor during script shutdown causes a fatal error.
+      // @see http://php.net/manual/en/language.oop5.decon.php
       try {
          $this->release();
       }
       catch (Exception $ex) {
-         Logger ::handleException($ex, $inShutdownOnly=true);
+         Logger::handleException($ex, $inShutdownOnly=true);
          throw $ex;
       }
    }
