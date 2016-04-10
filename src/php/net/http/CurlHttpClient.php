@@ -109,7 +109,6 @@ final class CurlHttpClient extends HttpClient {
       // @see http://php.net/manual/en/language.oop5.decon.php
       try {
          if (is_resource($this->hCurl)) {
-            echoPre(__METHOD__.'()  closing hCurl='.$this->hCurl);
             $hTmp=$this->hCurl; $this->hCurl=null;
             curl_close($hTmp);
          }
