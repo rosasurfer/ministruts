@@ -24,7 +24,12 @@ cvs -d $CVSROOT logout
 export -n CVSROOT
 
 
-# The following takes some time, so we do it in the background.
+# Update permissions (takes some time, so we do it in the background).
+#
+# The execute bit of files is preserved if set in the repository:
+# @see  http://durak.org/sean/pubs/software/cvsbook/CVS-keeps-changing-file-permissions_003b-why-does-it-do-that_003f.html
+#
+
 #find $PROJECT -follow                                                               -print0 2>/dev/null | xargs -0r chmod a=r,u+w,a+X
 
 find  $PROJECT -follow -type d \( ! -group apache -o ! -user apache \) ! -name 'CVS' -print0 2>/dev/null | xargs -0r chown    apache:apache && \
