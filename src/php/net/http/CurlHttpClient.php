@@ -9,8 +9,9 @@ final class CurlHttpClient extends HttpClient {
 
    private static /*bool*/ $logDebug, $logInfo, $logNotice;
 
-   private /*int*/     $currentRedirect = 0;       // Zähler für manuelle Redirects (falls open_basedir|safe_mode aktiv ist)
-   private /*mixed[]*/ $options         = array(); // zusätzliche CURL-Optionen
+   private /*resource*/ $hCurl;                       // Curl-Handle
+   private /*int*/      $manualRedirects = 0;         // Zähler für manuelle Redirects (falls open_basedir|safe_mode aktiv ist)
+   private /*mixed[]*/  $options         = array();   // zusätzliche CURL-Optionen
 
 
    // CURL-Fehlerbeschreibungen
@@ -90,13 +91,33 @@ final class CurlHttpClient extends HttpClient {
     * @param mixed[] $options - Array mit zusätzlichen CURL-Optionen (default: keine)
     */
    public function __construct(array $options=null) {
-      $loglevel        = Logger ::getLogLevel(__CLASS__);
+      $loglevel        = Logger::getLogLevel(__CLASS__);
       self::$logDebug  = ($loglevel <= L_DEBUG );
       self::$logInfo   = ($loglevel <= L_INFO  );
       self::$logNotice = ($loglevel <= L_NOTICE);
 
       if (!is_null($options))
          $this->options = $options;
+   }
+
+
+   /**
+    * Destructor. Schließt ggf. ein noch offenes CURL-Handle
+    */
+   public function __destruct() {
+      // Attempting to throw an exception from a destructor during script shutdown causes a fatal error.
+      // @see http://php.net/manual/en/language.oop5.decon.php
+      try {
+         if (is_resource($this->hCurl)) {
+            echoPre(__METHOD__.'()  closing hCurl='.$this->hCurl);
+            $hTmp=$this->hCurl; $this->hCurl=null;
+            curl_close($hTmp);
+         }
+      }
+      catch (Exception $ex) {
+         Logger::handleException($ex, $inShutdownOnly=true);
+         throw $ex;
+      }
    }
 
 
@@ -122,23 +143,21 @@ final class CurlHttpClient extends HttpClient {
     * @throws IOException - wenn ein Fehler auftritt
     */
    public function send(HttpRequest $request) {
-      $response = CurlHttpResponse ::create();
+      $response = CurlHttpResponse::create();
 
       // CURL-Session initialisieren
-      $hCurl = curl_init();
+      !is_resource($this->hCurl) && $this->hCurl=curl_init();
 
       // Optionen setzen, sofern sie nicht schon gesetzt sind
-      $options = $this->options;                        $options[CURLOPT_URL      ] = $request->getUrl();
-      !array_key_exists(CURLOPT_TIMEOUT  , $options) && $options[CURLOPT_TIMEOUT  ] = $this->timeout;    // Execution-Timeout
-      !array_key_exists(CURLOPT_USERAGENT, $options) && $options[CURLOPT_USERAGENT] = $this->userAgent;
-      !array_key_exists(CURLOPT_ENCODING , $options) && $options[CURLOPT_ENCODING ] = '';                // sets all supported encodings
+      $options = $this->options;             $options[CURLOPT_URL      ] = $request->getUrl();
+      !isSet($options[CURLOPT_TIMEOUT  ]) && $options[CURLOPT_TIMEOUT  ] = $this->timeout;      // Execution-Timeout
+      !isSet($options[CURLOPT_USERAGENT]) && $options[CURLOPT_USERAGENT] = $this->userAgent;
+      !isSet($options[CURLOPT_ENCODING ]) && $options[CURLOPT_ENCODING ] = '';                  // sets all supported encodings
 
-      if (!array_key_exists(CURLOPT_WRITEHEADER, $options))
-         if (!array_key_exists(CURLOPT_HEADERFUNCTION, $options)) $options[CURLOPT_HEADERFUNCTION] = array($response, 'writeHeader');
-
-      if (!array_key_exists(CURLOPT_FILE, $options))                 // ein gesetztes CURLOPT_RETURNTRANSFER wird immer überschrieben
-         if (!array_key_exists(CURLOPT_WRITEFUNCTION, $options))  $options[CURLOPT_WRITEFUNCTION ] = array($response, 'writeContent');
-
+      if (!isSet($options[CURLOPT_WRITEHEADER]))
+         if (!isSet($options[CURLOPT_HEADERFUNCTION])) $options[CURLOPT_HEADERFUNCTION] = array($response, 'writeHeader');
+      if (!isSet($options[CURLOPT_FILE]))                                                       // ein gesetztes CURLOPT_RETURNTRANSFER wird überschrieben
+         if (!isSet($options[CURLOPT_WRITEFUNCTION]))  $options[CURLOPT_WRITEFUNCTION ] = array($response, 'writeContent');
 
       // zusätzliche Header überschreiben automatisch generierte Header
       foreach ($request->getHeaders() as $key => $value) {
@@ -150,41 +169,38 @@ final class CurlHttpClient extends HttpClient {
          if ($this->followRedirects) {
             $options[CURLOPT_FOLLOWLOCATION] = true;
          }
-         else if (array_key_exists(CURLOPT_FOLLOWLOCATION, $options) && $options[CURLOPT_FOLLOWLOCATION]) {
+         else if (isSet($options[CURLOPT_FOLLOWLOCATION]) && $options[CURLOPT_FOLLOWLOCATION]) {
             $this->followRedirects(true);
          }
          if ($this->followRedirects) {
-            !array_key_exists(CURLOPT_MAXREDIRS, $options) && $options[CURLOPT_MAXREDIRS] = $this->maxRedirects;
+            !isSet($options[CURLOPT_MAXREDIRS]) && $options[CURLOPT_MAXREDIRS]=$this->maxRedirects;
          }
       }
 
       if ($request->getMethod() == 'POST') {
-         $options[CURLOPT_POST]       = true;
-         $options[CURLOPT_URL]        = subStr($request->getUrl(), 0, strPos($request->getUrl(), '?'));
+         $options[CURLOPT_POST      ] = true;
+         $options[CURLOPT_URL       ] = subStr($request->getUrl(), 0, strPos($request->getUrl(), '?'));
          $options[CURLOPT_POSTFIELDS] = strStr($request->getUrl(), '?');
       }
-      curl_setopt_array($hCurl, $options);
+      curl_setopt_array($this->hCurl, $options);
 
       // Request ausführen
-      if (curl_exec($hCurl) === false)
-         throw new IOException('CURL error '.self ::getError($hCurl).', url: '.$request->getUrl());
-
-      $response->setStatus($status = curl_getinfo($hCurl, CURLINFO_HTTP_CODE));
-      curl_close($hCurl);
+      if (curl_exec($this->hCurl) === false) throw new IOException('CURL error '.self::getError($this->hCurl).', url: '.$request->getUrl());
+      $response->setStatus($status=curl_getinfo($this->hCurl, CURLINFO_HTTP_CODE));
 
       // ggf. manuellen Redirect ausführen (falls "open_basedir" oder "safe_mode" aktiviert sind)
       if (($status==301 || $status==302) && $this->followRedirects && (ini_get('open_basedir') || ini_get('safe_mode'))) {
-         if ($this->currentRedirect >= $this->maxRedirects)
+         if ($this->manualRedirects >= $this->maxRedirects)
             throw new IOException('CURL error: maxRedirects limit exceeded - '.$this->maxRedirects.', url: '.$request->getUrl());
 
          // TODO: relative Redirects abfangen
          // TODO: verschachtelte IOExceptions abfangen
-         $this->currentRedirect++;
+         $this->manualRedirects++;
+         self::$logInfo && Logger::log('Performing manual redirect to: '.$response->getHeader('Location'), L_INFO, __CLASS__);
 
-         self::$logInfo && Logger ::log('Performing manual redirect to: '.$response->getHeader('Location'), L_INFO, __CLASS__);
-
-         $request  = HttpRequest ::create()->setUrl($response->getHeader('Location'));
-         $response = $this->send($request);
+         $request  = HttpRequest::create()->setUrl($response->getHeader('Location'));
+         $me       = __FUNCTION__;
+         $response = $this->$me($request);
       }
 
       return $response;
@@ -206,7 +222,7 @@ final class CurlHttpClient extends HttpClient {
          $errorNo = self::$errors[$errorNo];
       }
       else {
-         Logger ::log('Unknown CURL error code: '.$errorNo, L_WARN, __CLASS__);
+         Logger::log('Unknown CURL error code: '.$errorNo, L_WARN, __CLASS__);
       }
 
       return "$errorNo ($errorStr)";
