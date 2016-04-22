@@ -36,7 +36,7 @@ class TorHelper extends StaticClass {
    /**
     * Prüft, ob die übergebene IP-Adresse ein aktueller Tor-Exit-Node ist.
     *
-    * @param string $ip - IP-Adresse
+    * @param  string $ip - IP-Adresse
     *
     * @return bool
     */

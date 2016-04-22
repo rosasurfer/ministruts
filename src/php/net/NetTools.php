@@ -8,7 +8,7 @@ final class NetTools extends StaticClass {
    /**
     * Gibt den Hostnamen einer IP-Adresse zurück.
     *
-    * @param string $address - IP-Adresse
+    * @param  string $address - IP-Adresse
     *
     * @return string - Hostname oder die originale IP-Adresse, wenn diese nicht aufgelöst werden kann
     */
@@ -30,7 +30,7 @@ final class NetTools extends StaticClass {
    /**
     * Gibt die IP-Adresse eines Hostnamens zurück.
     *
-    * @param string $name - Hostname
+    * @param  string $name - Hostname
     *
     * @return string - IP-Adresse oder der originale Hostname, wenn dieser nicht aufgelöst werden kann
     */
@@ -45,8 +45,8 @@ final class NetTools extends StaticClass {
    /**
     * Ob die IP-Adresse auf einen bekannten Proxy-Server weist.
     *
-    * @param string $address - IP-Adresse
-    * @param bool   $reverseResolve - ob die IP-Adresse rück-aufgelöst und überprüft werden soll (Default: FALSE)
+    * @param  string $address - IP-Adresse
+    * @param  bool   $reverseResolve - ob die IP-Adresse rück-aufgelöst und überprüft werden soll (Default: FALSE)
     *
     * @return bool
     */
