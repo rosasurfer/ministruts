@@ -41,7 +41,7 @@ class PageContext extends Singleton {
    /**
     * Gibt einen Wert aus dem PageContext zurück.
     *
-    * @param string $key - Schlüssel, unter dem der Wert gespeichert ist
+    * @param  string $key - Schlüssel, unter dem der Wert gespeichert ist
     *
     * @return mixed - der gespeicherte Wert oder NULL, falls kein solcher Schlüssel existiert
     */
@@ -53,8 +53,8 @@ class PageContext extends Singleton {
    /**
     * Speichert einen Wert im PageContext.
     *
-    * @param string $key   - Schlüssel, unter dem der Wert gespeichert wird
-    * @param mixed  $value - der zu speichernde Wert
+    * @param  string $key   - Schlüssel, unter dem der Wert gespeichert wird
+    * @param  mixed  $value - der zu speichernde Wert
     */
    public static function set($key, $value) {
       return self:: me()->__set($key, $value);
@@ -66,6 +66,7 @@ class PageContext extends Singleton {
     * aufgerufen und ermöglicht den Zugriff auf Eigenschaften mit dynamischen Namen.
     *
     * @param  string $name - Name der Eigenschaft
+    *
     * @return mixed        - Wert oder NULL, wenn die Eigenschaft nicht existiert
     */
    public function __get($name) {
@@ -77,8 +78,8 @@ class PageContext extends Singleton {
     * Magische Methode, die die Eigenschaft mit dem angegebenen Namen setzt.  Wird automatisch
     * aufgerufen und ermöglicht den Zugriff auf Eigenschaften mit dynamischen Namen.
     *
-    * @param string $name  - Name der Eigenschaft
-    * @param mixed  $value - Wert
+    * @param  string $name  - Name der Eigenschaft
+    * @param  mixed  $value - Wert
     */
    public function __set($name, $value) {
       if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));

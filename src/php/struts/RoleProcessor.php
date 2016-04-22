@@ -8,8 +8,8 @@ abstract class RoleProcessor {
    /**
     * Ob der aktuelle User Inhaber der angegebenen Rolle(n) ist.
     *
-    * @param Request $request
-    * @param string  $roles   - Rollenbezeichner
+    * @param  Request $request
+    * @param  string  $roles   - Rollenbezeichner
     *
     * @return bool
     */
@@ -22,8 +22,8 @@ abstract class RoleProcessor {
     * Instanz, wenn der Zugriff nicht gewährt und statt dessen zu dem vom Forward beschriebenen Ziel
     * verzweigt werden soll.
     *
-    * @param Request       $request
-    * @param ActionMapping $mapping
+    * @param  Request       $request
+    * @param  ActionMapping $mapping
     *
     * @return ActionForward oder NULL
     */

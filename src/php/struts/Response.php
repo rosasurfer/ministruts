@@ -28,8 +28,8 @@ final class Response extends Singleton {
    /**
     * Speichert einen Wert unter dem angegebenen Schlüssel im Response.
     *
-    * @param string $key   - Schlüssel, unter dem der Wert gespeichert wird
-    * @param mixed  $value - der zu speichernde Wert
+    * @param  string $key   - Schlüssel, unter dem der Wert gespeichert wird
+    * @param  mixed  $value - der zu speichernde Wert
     */
    public function setAttribute($key, &$value) {
       $this->attributes[$key] = $value;
@@ -40,7 +40,7 @@ final class Response extends Singleton {
     * Gibt den unter dem angegebenen Schlüssel gespeicherten Wert zurück oder NULL, wenn unter diesem
     * Namen kein Wert existiert.
     *
-    * @param string $key - Schlüssel, unter dem der Wert gespeichert ist
+    * @param  string $key - Schlüssel, unter dem der Wert gespeichert ist
     *
     * @return mixed - der gespeicherte Wert oder NULL
     */

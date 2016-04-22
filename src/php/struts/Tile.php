@@ -57,8 +57,8 @@ class Tile extends Object {
    /**
     * Constructor
     *
-    * @param Module $module - Module, zu dem diese Tile gehört
-    * @param Tile   $parent - (Parent-)Instanz der neuen (verschachtelten) Instanz
+    * @param  Module $module - Module, zu dem diese Tile gehört
+    * @param  Tile   $parent - (Parent-)Instanz der neuen (verschachtelten) Instanz
     */
    public function __construct(Module $module, Tile $parent=null) {
       $this->module = $module;
@@ -79,7 +79,7 @@ class Tile extends Object {
    /**
     * Setzt den Namen dieser Tile.
     *
-    * @param string $name
+    * @param  string $name
     *
     * @return Tile
     */
@@ -105,8 +105,8 @@ class Tile extends Object {
    /**
     * Setzt den Dateinamen dieser Tile.
     *
-    * @param string $file  - vollständiger Dateiname
-    * @param string $label - Label für diese Tile (für Kommentare im HTML etc.)
+    * @param  string $file  - vollständiger Dateiname
+    * @param  string $label - Label für diese Tile (für Kommentare im HTML etc.)
     *
     * @return Tile
     */
@@ -122,7 +122,7 @@ class Tile extends Object {
    /**
     * Setzt das Label dieser Tile. Das Label wird in HTML-Kommentaren etc. verwendet.
     *
-    * @param string $label - Label
+    * @param  string $label - Label
     *
     * @return Tile
     */
@@ -138,8 +138,8 @@ class Tile extends Object {
    /**
     * Speichert in der Tile unter dem angegebenen Namen eine zusätzliche Eigenschaft.
     *
-    * @param string $name  - Name der Eigenschaft
-    * @param mixed  $value - der zu speichernde Wert (String oder Tile)
+    * @param  string $name  - Name der Eigenschaft
+    * @param  mixed  $value - der zu speichernde Wert (String oder Tile)
     */
    public function setProperty($name, $value) {
       if ($this->configured)                             throw new IllegalStateException('Configuration is frozen');

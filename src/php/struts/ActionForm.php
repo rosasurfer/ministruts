@@ -22,7 +22,7 @@ abstract class ActionForm extends Object {
     *
     * Erzeugt eine neue ActionForm für den aktuellen Request.
     *
-    * @param Request $request - der aktuelle Request
+    * @param  Request $request - der aktuelle Request
     */
    public function __construct(Request $request) {
       $this->request = $request;
@@ -39,7 +39,7 @@ abstract class ActionForm extends Object {
    /**
     * Liest die im Request übergebenen Parameter ein.  Muß anwendungsabhängig implementiert werden.
     *
-    * @param Request $request - der aktuelle Request
+    * @param  Request $request - der aktuelle Request
     */
    abstract protected function populate(Request $request);
 

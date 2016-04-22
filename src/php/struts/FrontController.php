@@ -160,7 +160,7 @@ final class FrontController extends Singleton {
    /**
     * Ermittelt den Prefix des Moduls, das den Request verarbeiten soll.
     *
-    * @param Request request
+    * @param  Request $request
     *
     * @return string - Modulprefix
     */
@@ -186,7 +186,7 @@ final class FrontController extends Singleton {
    /**
     * Gibt den RequestProcessor zurück, der für das angegebene Module zuständig ist.
     *
-    * @param Module $module
+    * @param  Module $module
     *
     * @return RequestProcessor
     */

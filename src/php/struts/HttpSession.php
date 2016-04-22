@@ -130,8 +130,8 @@ class HttpSession extends Singleton {
     * Gibt den unter dem angegebenen Schlüssel in der Session gespeicherten Wert zurück oder den
     * angegebenen Alternativwert, falls kein Wert unter diesem Schlüssel existiert.
     *
-    * @param string $key     - Schlüssel, unter dem der Wert gespeichert ist
-    * @param mixed  $default - Default- bzw. Alternativwert (kann selbst auch NULL sein)
+    * @param  string $key     - Schlüssel, unter dem der Wert gespeichert ist
+    * @param  mixed  $default - Default- bzw. Alternativwert (kann selbst auch NULL sein)
     *
     * @return mixed - der gespeicherte Wert oder NULL
     */
@@ -150,8 +150,8 @@ class HttpSession extends Singleton {
     * Ist der übergebene Wert NULL, hat dies den selben Effekt wie der Aufruf von
     * HttpSession::removeAttributes($key)
     *
-    * @param string $key   - Schlüssel, unter dem der Wert gespeichert wird
-    * @param mixed  $value - der zu speichernde Wert
+    * @param  string $key   - Schlüssel, unter dem der Wert gespeichert wird
+    * @param  mixed  $value - der zu speichernde Wert
     */
    public function setAttribute($key, $value) {
       if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
@@ -170,7 +170,7 @@ class HttpSession extends Singleton {
     * unter einem Schlüssel kein Wert, macht die Methode gar nichts. Es können mehrere Schlüssel
     * angegeben werden.
     *
-    * @param string $key - Schlüssel, unter dem der Wert gespeichert ist
+    * @param  string $key - Schlüssel, unter dem der Wert gespeichert ist
     */
    public function removeAttributes($key /*, $key2, $key3 ...*/) {
       foreach (func_get_args() as $key)
@@ -181,7 +181,7 @@ class HttpSession extends Singleton {
    /**
     * Ob unter dem angegebenen Schlüssel ein Wert in der Session existiert.
     *
-    * @param string $key - Schlüssel
+    * @param  string $key - Schlüssel
     *
     * @return bool
     */

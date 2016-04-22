@@ -14,8 +14,8 @@ abstract class Action extends Object {
     *
     * Erzeugt eine neue Action.
     *
-    * @param ActionMapping $mapping - das Mapping, zu dem die Action gehört
-    * @param ActionForm    $form    - die ActionForm oder NULL, wenn keine angegeben wurde
+    * @param  ActionMapping $mapping - das Mapping, zu dem die Action gehört
+    * @param  ActionForm    $form    - die ActionForm oder NULL, wenn keine angegeben wurde
     */
    public function __construct(ActionMapping $mapping, ActionForm $form = null) {
       $this->mapping = $mapping;
@@ -42,10 +42,10 @@ abstract class Action extends Object {
     * Note: Zur Vereinfachung kann statt einer Instanz auch der Name eines ActionForward aus der
     *       struts-config.xml zurückgeben werden.
     *
-    * @param Request       $request
-    * @param Response      $response
+    * @param  Request  $request
+    * @param  Response $response
     *
-    * @return mixed ActionForward, string oder NULL
+    * @return ActionForward|string|NULL
     */
    public function executeBefore(Request $request, Response $response) {
       return null;
@@ -59,10 +59,10 @@ abstract class Action extends Object {
     * Note: Zur Vereinfachung kann statt einer Instanz auch der Name eines ActionForward aus der
     *       struts-config.xml zurückgeben werden.
     *
-    * @param Request  $request
-    * @param Response $response
+    * @param  Request  $request
+    * @param  Response $response
     *
-    * @return mixed ActionForward, string oder NULL
+    * @return ActionForward|string|NULL
     */
    abstract public function execute(Request $request, Response $response);
 
@@ -76,9 +76,9 @@ abstract class Action extends Object {
     * Datenbankverbindungen.
     * Die Default-Implementierung macht nichts.
     *
-    * @param Request       $request
-    * @param Response      $response
-    * @param ActionForward $forward  - der originale ActionForward, wie ihn die Action zurückgegeben hat
+    * @param  Request       $request
+    * @param  Response      $response
+    * @param  ActionForward $forward  - der originale ActionForward, wie ihn die Action zurückgegeben hat
     *
     * @return ActionForward - der originale oder ein modifizierter ActionForward (z.B. mit weiteren
     *                         Query-Parameter)
@@ -93,7 +93,7 @@ abstract class Action extends Object {
     * Forwards des ActionMapping der Action durchsucht, danach die globalen Forwards des Modules. Wird
     * kein entsprechender Forward gefunden, wird NULL zurückgegeben.
     *
-    * @param string $name - Bezeichner des ActionForwards
+    * @param  string $name - Bezeichner des ActionForwards
     *
     * @return ActionForward
     *

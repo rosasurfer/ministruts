@@ -85,8 +85,8 @@ class Module extends Object {
    /**
     * Erzeugt ein neues Modul, liest und parst dessen Konfigurationsdatei.
     *
-    * @param string $fileName - Pfad zur Konfigurationsdatei des Modules
-    * @param string $prefix   - Prefix des Modules
+    * @param  string $fileName - Pfad zur Konfigurationsdatei des Modules
+    * @param  string $prefix   - Prefix des Modules
     *
     * TODO: Module-Encoding entsprechend dem Config-Datei-Encoding implementieren
     */
@@ -114,7 +114,7 @@ class Module extends Object {
    /**
     * Validiert die angegebene Konfigurationsdatei und wandelt sie in ein XML-Objekt um.
     *
-    * @param string $fileName - Pfad zur Konfigurationsdatei
+    * @param  string $fileName - Pfad zur Konfigurationsdatei
     *
     * @return SimpleXMLElement
     */
@@ -159,7 +159,7 @@ class Module extends Object {
    /**
     * Setzt den Prefix des Modules.
     *
-    * @param string prefix
+    * @param  string prefix
     */
    protected function setPrefix($prefix) {
       if ($this->configured)   throw new IllegalStateException('Configuration is frozen');
@@ -174,7 +174,7 @@ class Module extends Object {
    /**
     * Setzt das Basisverzeichnis für lokale Resourcen.
     *
-    * @param SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
+    * @param  SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
     */
    protected function setResourceBase(SimpleXMLElement $xml) {
       if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -204,7 +204,7 @@ class Module extends Object {
    /**
     * Verarbeitet die in der Konfiguration definierten globalen ActionForwards.
     *
-    * @param SimpleXMLElement $xml - XML-Konfiguration
+    * @param  SimpleXMLElement $xml - XML-Konfiguration
     */
    protected function processForwards(SimpleXMLElement $xml) {
       // process global 'include' and 'redirect' forwards
@@ -256,7 +256,7 @@ class Module extends Object {
    /**
     * Verarbeitet die in der Konfiguration definierten ActionMappings.
     *
-    * @param SimpleXMLElement $xml - XML-Konfiguration
+    * @param  SimpleXMLElement $xml - XML-Konfiguration
     */
    protected function processMappings(SimpleXMLElement $xml) {
       $elements = $xml->xPath('/struts-config/action-mappings/mapping');
@@ -431,7 +431,7 @@ class Module extends Object {
    /**
     * Durchläuft alle konfigurierten Tiles.
     *
-    * @param SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
+    * @param  SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
     */
    protected function processTiles(SimpleXMLElement $xml) {
       $elements = $xml->xPath('/struts-config/tiles/tile');
@@ -449,8 +449,8 @@ class Module extends Object {
    /**
     * Sucht die Tilesdefinition mit dem angegebenen Namen und gibt die entsprechende Instanz zurück.
     *
-    * @param string           $name - Name der Tile
-    * @param SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration der Tile
+    * @param  string           $name - Name der Tile
+    * @param  SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration der Tile
     *
     * @return Tile instance
     */
@@ -496,8 +496,8 @@ class Module extends Object {
    /**
     * Verarbeitet die in einer Tiles-Definition angegebenen zusätzlichen Properties.
     *
-    * @param Tile             $tile - Tile-Instanz
-    * @param SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration
+    * @param  Tile             $tile - Tile-Instanz
+    * @param  SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration
     */
    private function processTileProperties(Tile $tile, SimpleXMLElement $xml) {
       foreach ($xml->set as $tag) {
@@ -554,7 +554,7 @@ class Module extends Object {
    /**
     * Verarbeitet die in der Konfiguration definierten Error-Einstellungen.
     *
-    * @param SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
+    * @param  SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
     */
    protected function processErrors(SimpleXMLElement $xml) {
    }
@@ -565,8 +565,8 @@ class Module extends Object {
     * Name kann vom internen Namen des Forwards abweichen, sodaß die Definition von Aliassen möglich ist
     * (ein Forward ist unter mehreren Namen auffindbar).
     *
-    * @param string        $name
-    * @param ActionForward $forward
+    * @param  string        $name
+    * @param  ActionForward $forward
     */
    protected function addForward($name, ActionForward $forward) {
       if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -582,7 +582,7 @@ class Module extends Object {
    /**
     * Fügt diesem Module ein ActionMapping hinzu.
     *
-    * @param ActionMapping $mapping
+    * @param  ActionMapping $mapping
     */
    protected function addMapping(ActionMapping $mapping) {
       if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -599,7 +599,7 @@ class Module extends Object {
    /**
     * Fügt diesem Module eine Tile hinzu.
     *
-    * @param Tile $tile
+    * @param  Tile $tile
     */
    protected function addTile(Tile $tile) {
       if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -610,7 +610,7 @@ class Module extends Object {
    /**
     * Gibt das ActionMapping für den angegebenen Pfad zurück.
     *
-    * @param string $path
+    * @param  string $path
     *
     * @return ActionMapping - Mapping oder NULL, wenn kein Mapping gefunden wurde
     */
@@ -635,7 +635,7 @@ class Module extends Object {
    /**
     * Verarbeite Controller-Einstellungen.
     *
-    * @param SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
+    * @param  SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
     */
    protected function processController(SimpleXMLElement $xml) {
       if ($this->configured)
@@ -661,7 +661,7 @@ class Module extends Object {
     * Setzt den Klassennamen der RequestProcessor-Implementierung, die für dieses Module benutzt wird.
     * Diese Klasse muß eine Subklasse von RequestProcessor sein.
     *
-    * @param string $className
+    * @param  string $className
     */
    protected function setRequestProcessorClass($className) {
       if ($this->configured)                                                     throw new IllegalStateException('Configuration is frozen');
@@ -687,7 +687,7 @@ class Module extends Object {
     * Setzt den Klassennamen der RoleProcessor-Implementierung, die für dieses Module benutzt wird.
     * Diese Klasse muß eine Subklasse von RoleProcessor sein.
     *
-    * @param string $className
+    * @param  string $className
     */
    protected function setRoleProcessorClass($className) {
       if ($this->configured)                                               throw new IllegalStateException('Configuration is frozen');
@@ -718,7 +718,7 @@ class Module extends Object {
     * Setzt den Klassennamen der Tiles-Implementierung, die für dieses Modul benutzt wird.
     * Diese Klasse muß eine Subklasse von Tile sein.
     *
-    * @param string $className
+    * @param  string $className
     */
    protected function setTilesClass($className) {
       if ($this->configured)                                         throw new IllegalStateException('Configuration is frozen');
@@ -744,7 +744,7 @@ class Module extends Object {
     * Setzt den Klassennamen der ActionMapping-Implementierung, die für dieses Modul benutzt wird.
     * Diese Klasse muß eine Subklasse von ActionMapping sein.
     *
-    * @param string $className
+    * @param  string $className
     */
    protected function setMappingClass($className) {
       if ($this->configured)                                                  throw new IllegalStateException('Configuration is frozen');
@@ -770,7 +770,7 @@ class Module extends Object {
     * Setzt den Klassennamen der ActionForward-Implementierung, die für dieses Modul benutzt wird.
     * Diese Klasse muß eine Subklasse von ActionForward sein.
     *
-    * @param string $className
+    * @param  string $className
     */
    protected function setForwardClass($className) {
       if ($this->configured)                                                  throw new IllegalStateException('Configuration is frozen');
@@ -818,7 +818,7 @@ class Module extends Object {
     * Sucht und gibt den globalen ActionForward mit dem angegebenen Namen zurück.
     * Wird kein Forward gefunden, wird NULL zurückgegeben.
     *
-    * @param string $name - logischer Name des ActionForwards
+    * @param  string $name - logischer Name des ActionForwards
     *
     * @return ActionForward
     */
@@ -834,7 +834,7 @@ class Module extends Object {
     * Gibt die Tile mit dem angegebenen Namen zurück oder NULL, wenn keine Tile mit diesem Namen
     * gefunden wurde.
     *
-    * @param string $name - logischer Name der Tile
+    * @param  string $name - logischer Name der Tile
     *
     * @return Tile
     */
@@ -850,8 +850,8 @@ class Module extends Object {
     * Ob unter dem angegebenen Namen eine inkludierbare Resource existiert. Dies kann entweder eine
     * Tiles-Definition oder eine Datei sein.
     *
-    * @param string           $name - Name der Resource
-    * @param SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration
+    * @param  string           $name - Name der Resource
+    * @param  SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration
     *
     * @return bool
     */
@@ -863,8 +863,8 @@ class Module extends Object {
    /**
     * Ob unter dem angegebenen Namen eine Tile definiert ist.
     *
-    * @param string           $name - Name der Tile
-    * @param SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration
+    * @param  string           $name - Name der Tile
+    * @param  SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration
     *
     * @return bool
     */
@@ -883,7 +883,7 @@ class Module extends Object {
    /**
     * Ob in den Resource-Verzeichnissen dieses Modules unter dem angegebenen Namen eine Datei existiert.
     *
-    * @param string $path - Pfadangabe
+    * @param  string $path - Pfadangabe
     *
     * @return bool
     */
@@ -898,7 +898,7 @@ class Module extends Object {
     * und gibt den vollständigen Dateinamen zurück, oder NULL, wenn keine Datei mit diesem Namen
     * gefunden wurde.
     *
-    * @param string $name - relativer Dateiname
+    * @param  string $name - relativer Dateiname
     *
     * @return string - Dateiname
     */

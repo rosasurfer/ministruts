@@ -152,7 +152,7 @@ class RequestProcessor extends Object {
     * Kopiert alle vorhandenen ActionMessages in die HttpSession. Beim nächsten Request werden diese
     * Messages automatisch zurück in den Request verschoben und stehen wieder zur Verfügung.
     *
-    * @param  Request  $request
+    * @param  Request $request
     *
     * @see    Request::setActionMessage()
     * @see    RequestProcessor::processCachedActionMessages()

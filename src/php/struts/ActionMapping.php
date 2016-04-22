@@ -63,7 +63,7 @@ class ActionMapping extends Object {
    /**
     * Setzt den Pfad dieses Mappings.
     *
-    * @param string $path
+    * @param  string $path
     *
     * @return ActionMapping
     */
@@ -90,7 +90,7 @@ class ActionMapping extends Object {
    /**
     * Ob das Mapping für die angegebene HTTP-Methode konfiguriert wurde.
     *
-    * @param string $method - HTTP-Methode
+    * @param  string $method - HTTP-Methode
     *
     * @return bool
     */
@@ -105,7 +105,7 @@ class ActionMapping extends Object {
     * Setzt die HTTP-Methoden, die dieses Mapping unterstützt.  Requests einer nicht konfigurierten
     * Methode werden abgewiesen.
     *
-    * @param string $method - HTTP-Methode ("GET", "POST")
+    * @param  string $method - HTTP-Methode: "GET"|"POST"
     *
     * @return ActionMapping
     */
@@ -134,7 +134,7 @@ class ActionMapping extends Object {
     * Setzt die Rollenbeschränkung dieses Mappings.  Requests, die nicht den angebenen Rollen genügen,
     * werden abgewiesen.
     *
-    * @param string - Rollenausdruck
+    * @param  string - Rollenausdruck
     *
     * @return ActionMapping
     */
@@ -164,7 +164,7 @@ class ActionMapping extends Object {
    /**
     * Setzt einen direkt konfigurierten ActionForward (statt einer Action).
     *
-    * @param ActionForward $forward - ActionForward
+    * @param  ActionForward $forward - ActionForward
     *
     * @return ActionMapping
     */
@@ -190,7 +190,7 @@ class ActionMapping extends Object {
    /**
     * Setzt den Klassennamen der auszuführenden Action.
     *
-    * @param string $className
+    * @param  string $className
     *
     * @return ActionMapping
     */
@@ -220,7 +220,7 @@ class ActionMapping extends Object {
    /**
     * Setzt den Klassennamen der zur Action gehörenden ActionForm.
     *
-    * @param string $className
+    * @param  string $className
     *
     * @return ActionMapping
     */
@@ -251,7 +251,7 @@ class ActionMapping extends Object {
     * Wert auf "session" gesetzt, können Formulareingaben über mehrere Requests zur Verfügung stehen
     * (z.B. für Page-Wizards o.ä. mehrseitige Formulare).
     *
-    * @param string $scope - "request" oder "session"
+    * @param  string $scope - "request" oder "session"
     *
     * @return ActionMapping
     */
@@ -304,7 +304,7 @@ class ActionMapping extends Object {
     * ActionForm vor Aufruf der Action validiert werden soll oder nicht.  Ohne entsprechende Angabe
     * in der struts-config.xml wird die ActionForm immer validiert.
     *
-    * @param bool $default
+    * @param  bool $default
     *
     * @return ActionMapping
     */
@@ -332,7 +332,7 @@ class ActionMapping extends Object {
     * werden können, werden von dem Mapping mit gesetztem Default-Flag verarbeitet. Nur ein Mapping
     * innerhalb eines Modules kann dieses Flag gesetzt werden.
     *
-    * @param bool $default
+    * @param  bool $default
     *
     * @return ActionMapping
     */
@@ -362,8 +362,8 @@ class ActionMapping extends Object {
     * Name kann vom internen Namen des Forwards abweichen, sodaß die Definition von Aliassen möglich
     * ist (ein Forward ist unter mehreren Namen auffindbar).
     *
-    * @param string        $name
-    * @param ActionForward $forward
+    * @param  string        $name
+    * @param  ActionForward $forward
     *
     * @return ActionMapping
     */
@@ -420,7 +420,7 @@ class ActionMapping extends Object {
     * unter dem geschützten Bezeichner "__self" ein Redirect-Forward auf das ActionMapping selbst
     * abgerufen werden.
     *
-    * @param string $name - logischer Name
+    * @param  string $name - logischer Name
     *
     * @return ActionForward
     */

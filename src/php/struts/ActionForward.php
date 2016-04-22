@@ -64,7 +64,7 @@ class ActionForward extends Object {
    /**
     * Setzt den Namen dieses Forwards.
     *
-    * @param string $name
+    * @param  string $name
     *
     * @return ActionForward
     */
@@ -81,7 +81,7 @@ class ActionForward extends Object {
    /**
     * Setzt den Pfad dieses Forwards.
     *
-    * @param string $path
+    * @param  string $path
     *
     * @return ActionForward
     */
@@ -98,7 +98,7 @@ class ActionForward extends Object {
    /**
     * Setzt das Label dieses Forwards. Das Label wird in HTML-Kommentaren etc. verwendet.
     *
-    * @param string $label - Label
+    * @param  string $label - Label
     *
     * @return ActionForward
     */
@@ -115,7 +115,7 @@ class ActionForward extends Object {
    /**
     * Setzt das Redirect-Flag dieses Forwards.
     *
-    * @param bool $redirect
+    * @param  bool $redirect
     *
     * @return ActionForward
     */
@@ -131,8 +131,8 @@ class ActionForward extends Object {
    /**
     * Fügt dem Querystring dieses ActionForwards ein weiteres Key-Value-Paar hinzu.
     *
-    * @param string $key   - Schlüssel
-    * @param scalar $value - Wert (int|double|string|bool)
+    * @param  string $key   - Schlüssel
+    * @param  scalar $value - Wert (int|double|string|bool)
     *
     * @return ActionForward
     */

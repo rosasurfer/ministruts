@@ -131,8 +131,8 @@ abstract class RequestBase extends Singleton {
     * Die globalen PHP-Variablen $_GET, $_POST und $_REQUEST entsprechen der Originalimplementierung,
     * mehrfache Werte werden also überschrieben.
     *
-    * @param string $rawData - Parameter-Rohdaten
-    * @param string $target  - Bezeichner für das Zielarray: 'GET' oder 'POST'
+    * @param  string $rawData - Parameter-Rohdaten
+    * @param  string $target  - Bezeichner für das Zielarray: 'GET' oder 'POST'
     *
     * @see RequestBase::getParameter()
     * @see RequestBase::getParameters()
@@ -220,7 +220,7 @@ abstract class RequestBase extends Singleton {
     * Gibt den Requestparameter mit dem angegebenen Namen zurück.  Diese Methode gibt einen einzelnen Wert zurück.
     * Wurden mehrere Parameter dieses Namens übertragen, wird der letzte Parameter zurückgegeben.
     *
-    * @param string $name - Parametername
+    * @param  string $name - Parametername
     *
     * @return string - Parameterwert oder NULL, wenn kein Parameter dieses Namens übertragen wurde
     */
@@ -237,7 +237,7 @@ abstract class RequestBase extends Singleton {
     * Gibt alle Requestparameter mit dem angegebenen Namen zurück.  Diese Methode gibt ein Array mit
     * den übertragenen Parametern zurück.
     *
-    * @param string $name - Parametername
+    * @param  string $name - Parametername
     *
     * @return array - String-Array
     */
@@ -611,7 +611,7 @@ abstract class RequestBase extends Singleton {
     * Gibt den angegebenen Header als Name-Wert-Paar zurück.  Wurden mehrere Header dieses Namens übertragen,
     * wird der erste übertragene Header zurückgegeben.
     *
-    * @param string $name - Name des Headers
+    * @param  string $name - Name des Headers
     *
     * @return array - Name-Wert-Paar oder NULL, wenn kein Header dieses Namens übertragen wurde
     */
@@ -626,7 +626,7 @@ abstract class RequestBase extends Singleton {
    /**
     * Gibt die angegebenen Header als Array von Name-Wert-Paaren zurück (in der übertragenen Reihenfolge).
     *
-    * @param string|array $names - ein oder mehrere Namen; ohne Angabe werden alle Header zurückgegeben
+    * @param  string|[] $names - ein oder mehrere Namen; ohne Angabe werden alle Header zurückgegeben
     *
     * @return array - Name-Wert-Paare
     */
@@ -686,7 +686,7 @@ abstract class RequestBase extends Singleton {
     * mehrere Header des angegebenen Namens übertragen, werden alle Werte dieser Header als eine komma-getrennte Liste
     * zurückgegeben (in der übertragenen Reihenfolge).
     *
-    * @param string|array $names - ein oder mehrere Headernamen
+    * @param  string|[] $names - ein oder mehrere Headernamen
     *
     * @return string - Wert oder NULL, wenn die angegebenen Header nicht gesetzt sind
     */
@@ -712,7 +712,7 @@ abstract class RequestBase extends Singleton {
    /**
     * Gibt die einzelnen Werte aller angegebenen Header als Array zurück (in der übertragenen Reihenfolge).
     *
-    * @param string|array $names - ein oder mehrere Headernamen
+    * @param  string|[] $names - ein oder mehrere Headernamen
     *
     * @return array - Werte
     */
@@ -739,7 +739,7 @@ abstract class RequestBase extends Singleton {
     * Gibt den im Request-Context unter dem angegebenen Schlüssel gespeicherten Wert zurück oder NULL,
     * wenn unter diesem Schlüssel kein Wert existiert.
     *
-    * @param string $key - Schlüssel, unter dem der Wert im Context gespeichert ist
+    * @param  string $key - Schlüssel, unter dem der Wert im Context gespeichert ist
     *
     * @return mixed - der gespeicherte Wert oder NULL
     */
@@ -765,8 +765,8 @@ abstract class RequestBase extends Singleton {
    /**
     * Speichert einen Wert unter dem angegebenen Schlüssel im Request-Context.
     *
-    * @param string $key   - Schlüssel, unter dem der Wert gespeichert wird
-    * @param mixed  $value - der zu speichernde Wert
+    * @param  string $key   - Schlüssel, unter dem der Wert gespeichert wird
+    * @param  mixed  $value - der zu speichernde Wert
     */
    public function setAttribute($key, &$value) {
       $this->attributes[$key] = $value;
@@ -777,7 +777,7 @@ abstract class RequestBase extends Singleton {
     * Löscht die Werte mit den angegebenen Schlüsseln aus dem Request-Context. Es können mehrere Schlüssel
     * angegeben werden.
     *
-    * @param string $key - Schlüssel des zu löschenden Wertes
+    * @param  string $key - Schlüssel des zu löschenden Wertes
     */
    public function removeAttributes($key /*, $key2, $key3 ...*/) {
       foreach (func_get_args() as $key) {
@@ -789,10 +789,10 @@ abstract class RequestBase extends Singleton {
    /**
     * Setzt einen Cookie mit den angegebenen Daten.
     *
-    * @param string $name    - Name des Cookies
-    * @param mixed  $value   - der zu speichernde Wert (wird zu String gecastet)
-    * @param int    $expires - Lebenszeit des Cookies (0: bis zum Schließen des Browsers)
-    * @param string $path    - Pfad, für den der Cookie gültig sein soll
+    * @param  string $name    - Name des Cookies
+    * @param  mixed  $value   - der zu speichernde Wert (wird zu String gecastet)
+    * @param  int    $expires - Lebenszeit des Cookies (0: bis zum Schließen des Browsers)
+    * @param  string $path    - Pfad, für den der Cookie gültig sein soll
     */
    public function setCookie($name, $value, $expires = 0, $path = null) {
       if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
@@ -813,7 +813,7 @@ abstract class RequestBase extends Singleton {
    /**
     * Ob der User, der den Request ausgelöst hat, Inhaber der angegebenen Rolle(n) ist.
     *
-    * @param string $roles - Rollenbezeichner
+    * @param  string $roles - Rollenbezeichner
     *
     * @return bool
     */
@@ -837,7 +837,7 @@ abstract class RequestBase extends Singleton {
     * Gibt die Error-Message für den angegebenen Schlüssel zurück.  Ohne Schlüssel wird die erste
     * vorhandene Error-Message zurückgegeben.
     *
-    * @param string $key - Schlüssel der Error-Message
+    * @param  string $key - Schlüssel der Error-Message
     *
     * @return string - Error-Message
     */
@@ -876,7 +876,7 @@ abstract class RequestBase extends Singleton {
     * Ob unter dem angegebenen Schlüssel eine Error-Message existiert.  Ohne Angabe eines Schlüssel
     * wird geprüft, ob überhaupt irgendeine Error-Message existiert.
     *
-    * @param string $key - Schlüssel
+    * @param  string $key - Schlüssel
     *
     * @return bool
     */
@@ -892,8 +892,8 @@ abstract class RequestBase extends Singleton {
     * Setzt für den angegebenen Schlüssel eine Error-Message. Ist Message NULL, wird die Message mit
     * dem angegebenen Schlüssel aus dem Request gelöscht.
     *
-    * @param string $key     - Schlüssel der Error-Message
-    * @param string $message - Error-Message
+    * @param  string $key     - Schlüssel der Error-Message
+    * @param  string $message - Error-Message
     */
    public function setActionError($key, $message) {
       if ($message === null) {
@@ -912,7 +912,7 @@ abstract class RequestBase extends Singleton {
    /**
     * Löscht einzelne oder alle Error-Messages aus dem Request.
     *
-    * @param string $key - die Schlüssel der zu löschenden Werte (ohne Angabe werden alle Error-Messages gelöscht)
+    * @param  string $key - die Schlüssel der zu löschenden Werte (ohne Angabe werden alle Error-Messages gelöscht)
     *
     * @return array - die gelöschten Error-Messages
     *
@@ -944,7 +944,7 @@ abstract class RequestBase extends Singleton {
     *
     * Löscht einzelne oder alle Error-Messages aus dem Request.
     *
-    * @param string $key - die Schlüssel der zu löschenden Werte (ohne Angabe werden alle Error-Messages gelöscht)
+    * @param  string $key - die Schlüssel der zu löschenden Werte (ohne Angabe werden alle Error-Messages gelöscht)
     *
     * @return array - die gelöschten Error-Messages
     */
