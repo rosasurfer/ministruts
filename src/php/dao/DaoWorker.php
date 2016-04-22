@@ -24,11 +24,11 @@ class DaoWorker extends Object {
 
 
    /**
-    * Konstruktor
+    * Constructor
     *
     * Erzeugt einen neuen Worker für den angegebenen DAO.
     *
-    * @param CommonDAO $dao - CommonDAO
+    * @param  CommonDAO $dao - CommonDAO
     */
    public function __construct(CommonDAO $dao) {
       $this->dao = $dao;

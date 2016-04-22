@@ -61,7 +61,7 @@ abstract class PersistableObject extends Object implements IDaoConnected {
    /**
     * Gibt den Erstellungszeitpunkt dieser Instanz zurück.
     *
-    * @param string $format - Zeitformat
+    * @param  string $format - Zeitformat
     *
     * @return string - Zeitpunkt
     */
@@ -97,7 +97,7 @@ abstract class PersistableObject extends Object implements IDaoConnected {
    /**
     * Gibt den Zeitpunkt des "Soft-Delete" dieser Instanz zurück.
     *
-    * @param string $format - Zeitformat
+    * @param  string $format - Zeitformat
     *
     * @return string - Zeitpunkt
     */
@@ -206,8 +206,8 @@ abstract class PersistableObject extends Object implements IDaoConnected {
    /**
     * Erzeugt eine neue Instanz.
     *
-    * @param string $class - Klassenname der zu erzeugenden Instanz
-    * @param array  $row   - Array mit Instanzdaten (entspricht einer Datenbankzeile)
+    * @param  string $class - Klassenname der zu erzeugenden Instanz
+    * @param  array  $row   - Array mit Instanzdaten (entspricht einer Datenbankzeile)
     *
     * @return PersistableObject
     */
@@ -247,7 +247,7 @@ abstract class PersistableObject extends Object implements IDaoConnected {
    /**
     * Gibt den DAO für diese Instanz zurück.
     *
-    * @param string $class - Klassenname der Instanz
+    * @param  string $class - Klassenname der Instanz
     *
     * @return CommonDAO
     */

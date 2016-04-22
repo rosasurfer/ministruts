@@ -24,8 +24,8 @@ final class ReferencePool extends CachePeer {
     * Erzeugt eine neue Instanz.  Ein evt. angegebenes Label (Namespace) wird ignoriert, da ein ReferencePool
     * Referenzen verwaltet und im Speicher des Prozesses nur ein Namespace existiert.
     *
-    * @param string $label   - Cache-Bezeichner
-    * @param array  $options - zusätzliche Optionen
+    * @param  string $label   - Cache-Bezeichner
+    * @param  array  $options - zusätzliche Optionen
     */
    public function __construct($label = null, array $options = null) {
    }
@@ -48,7 +48,7 @@ final class ReferencePool extends CachePeer {
    /**
     * Ob unter dem angegebenen Schlüssel ein Wert im Cache gespeichert ist.
     *
-    * @param string $key - Schlüssel
+    * @param  string $key - Schlüssel
     *
     * @return bool
     */
@@ -76,8 +76,8 @@ final class ReferencePool extends CachePeer {
     * Gibt einen Wert aus dem Cache zurück.  Existiert der Wert nicht, wird der angegebene Defaultwert
     * zurückgegeben.
     *
-    * @param string $key     - Schlüssel, unter dem der Wert gespeichert ist
-    * @param mixed  $default - Defaultwert (kann selbst auch NULL sein)
+    * @param  string $key     - Schlüssel, unter dem der Wert gespeichert ist
+    * @param  mixed  $default - Defaultwert (kann selbst auch NULL sein)
     *
     * @return mixed - Der gespeicherte Wert oder NULL, falls kein solcher Schlüssel existiert.
     *                 Achtung: Ist im Cache ein NULL-Wert gespeichert, wird ebenfalls NULL zurückgegeben.
@@ -93,7 +93,7 @@ final class ReferencePool extends CachePeer {
    /**
     * Löscht einen Wert aus dem Cache.
     *
-    * @param string $key - Schlüssel, unter dem der Wert gespeichert ist
+    * @param  string $key - Schlüssel, unter dem der Wert gespeichert ist
     *
     * @return bool - TRUE bei Erfolg, FALSE, falls kein solcher Schlüssel existier
     */
@@ -111,10 +111,10 @@ final class ReferencePool extends CachePeer {
     * überschrieben.  Läuft die angegebene Zeitspanne ab oder ändert sich der Status der angegebenen
     * Abhängigkeit, wird der Wert automatisch ungültig.
     *
-    * @param string      $key        - Schlüssel, unter dem der Wert gespeichert wird
-    * @param mixed       $value      - der zu speichernde Wert
-    * @param int         $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfällt
-    * @param Dependency  $dependency - Abhängigkeit der Gültigkeit des gespeicherten Wertes
+    * @param  string      $key        - Schlüssel, unter dem der Wert gespeichert wird
+    * @param  mixed       $value      - der zu speichernde Wert
+    * @param  int         $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfällt
+    * @param  Dependency  $dependency - Abhängigkeit der Gültigkeit des gespeicherten Wertes
     *
     * @return bool - TRUE bei Erfolg, FALSE andererseits
     */

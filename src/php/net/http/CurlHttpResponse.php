@@ -44,7 +44,7 @@ final class CurlHttpResponse extends HttpResponse {
    /**
     * Setzt den HTTP-Status.
     *
-    * @param int $status - HTTP-Statuscode
+    * @param  int $status - HTTP-Statuscode
     *
     * @return CurlHttpResponse
     */
@@ -80,7 +80,7 @@ final class CurlHttpResponse extends HttpResponse {
    /**
     * Ob ein Header mit dem angegebenen Namen existiert.
     *
-    * @param string $name - Name des Headers
+    * @param  string $name - Name des Headers
     *
     * @return bool
     */
@@ -92,7 +92,7 @@ final class CurlHttpResponse extends HttpResponse {
    /**
     * Gibt den Header mit dem angegebenen Namen zurück.
     *
-    * @param string $name - Name des Headers
+    * @param  string $name - Name des Headers
     *
     * @return string
     */
@@ -104,8 +104,8 @@ final class CurlHttpResponse extends HttpResponse {
    /**
     * Callback für CurlHttpClient, dem die empfangenen Response-Header zeilenweise übergeben werden.
     *
-    * @param resource $hCurl - das CURL-Handle des aktuellen Requests
-    * @param string   $line  - vollständige Headerzeile, bestehend aus dem Namen, einem Doppelpunkt und den Daten
+    * @param  resource $hCurl - das CURL-Handle des aktuellen Requests
+    * @param  string   $line  - vollständige Headerzeile, bestehend aus dem Namen, einem Doppelpunkt und den Daten
     *
     * @return int - Anzahl der bei diesem Methodenaufruf erhaltenen Bytes
     */
@@ -120,8 +120,8 @@ final class CurlHttpResponse extends HttpResponse {
    /**
     * Callback für CurlHttpClient, dem der empfangene Content des HTTP-Requests chunk-weise übergeben wird.
     *
-    * @param resource $hCurl - das CURL-Handle des aktuellen Requests
-    * @param string   $data  - die empfangenen Daten
+    * @param  resource $hCurl - das CURL-Handle des aktuellen Requests
+    * @param  string   $data  - die empfangenen Daten
     *
     * @return int - Anzahl der bei diesem Methodenaufruf erhaltenen Bytes
     */

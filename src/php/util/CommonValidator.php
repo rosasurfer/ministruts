@@ -8,10 +8,10 @@ class CommonValidator extends StaticClass {
    /**
     * Ob der übergebene String eine syntaktisch gültige IP-Adresse ist.
     *
-    * @param string $string      - der zu überprüfende String
-    * @param bool   $returnBytes - Typ des Rückgabewertes
-    *                              FALSE: Boolean (default)
-    *                              TRUE:  Array mit den Adressbytes oder FALSE, wenn der String keine gültige IP-Adresse darstellt
+    * @param  string $string      - der zu überprüfende String
+    * @param  bool   $returnBytes - Typ des Rückgabewertes
+    *                               FALSE: Boolean (default)
+    *                               TRUE:  Array mit den Adressbytes oder FALSE, wenn der String keine gültige IP-Adresse darstellt
     * @return bool|array
     */
    public static function isIPAddress($string, $returnBytes = false) {
@@ -41,7 +41,7 @@ class CommonValidator extends StaticClass {
    /**
     * Ob der übergebene String eine syntaktisch gültige IP-Adresse eines lokalen Netzwerks ist.
     *
-    * @param string $string - der zu überprüfende String
+    * @param  string $string - der zu überprüfende String
     *
     * @return bool
     */
@@ -66,7 +66,7 @@ class CommonValidator extends StaticClass {
    /**
     * Ob der übergebene String eine syntaktisch gültige IP-Adresse eines externen Netzwerks ist.
     *
-    * @param string $string - der zu überprüfende String
+    * @param  string $string - der zu überprüfende String
     *
     * @return bool
     */
@@ -99,7 +99,7 @@ class CommonValidator extends StaticClass {
    /**
     * Ob der übergebene String eine syntaktisch gültige E-Mail-Adresse ist.
     *
-    * @param string $string - der zu überprüfende String
+    * @param  string $string - der zu überprüfende String
     *
     * @return bool
     */
@@ -115,7 +115,7 @@ class CommonValidator extends StaticClass {
    /**
     * Ob der übergebene String ein gültiges E-Mail-Adressmuster ist. Wildcards sind ? und *.
     *
-    * @param string $string - der zu überprüfende String
+    * @param  string $string - der zu überprüfende String
     *
     * @return bool
     */
@@ -131,9 +131,9 @@ class CommonValidator extends StaticClass {
    /**
     * Ob der übergebene String einen gültigen Date/DateTime-Wert darstellt.
     *
-    * @param string    $string - der zu überprüfende String
-    * @param string|[] $format - Format, dem der String entsprechen soll. Sind mehrere angegeben, muß der String
-    *                            mindestens einem davon entsprechen.
+    * @param  string    $string - der zu überprüfende String
+    * @param  string|[] $format - Format, dem der String entsprechen soll. Sind mehrere angegeben, muß der String
+    *                             mindestens einem davon entsprechen.
     *
     * @return int|bool - Timestamp oder FALSE, wenn der übergebene Wert ungültig ist
     *
@@ -288,7 +288,7 @@ class CommonValidator extends StaticClass {
    /**
     * Ob der übergebene String ein gültiger Geschlechtsbezeichner ist.
     *
-    * @param string $string - der zu prüfende String
+    * @param  string $string - der zu prüfende String
     *
     * @return bool
     */

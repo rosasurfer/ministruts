@@ -29,7 +29,7 @@ abstract class DB extends Object {
 
 
    /**
-    * Geschützter Default-Konstruktor, Instanzen können nur über DB::spawn() erzeugt werden.
+    * Geschützter Default-Constructor, Instanzen können nur über DB::spawn() erzeugt werden.
     */
    protected function __construct() { /**/ }
 

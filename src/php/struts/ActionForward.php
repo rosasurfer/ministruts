@@ -50,9 +50,9 @@ class ActionForward extends Object {
    /**
     * Erzeugt einen neuen ActionForward mit den angegebenen Daten.
     *
-    * @param string $name     - logischer Name des Forwards
-    * @param string $path     - Pfad der Instanz
-    * @param bool   $redirect - Redirect-Flag für diese Instanz
+    * @param  string $name     - logischer Name des Forwards
+    * @param  string $path     - Pfad der Instanz
+    * @param  bool   $redirect - Redirect-Flag für diese Instanz
     */
    public function __construct($name, $path, $redirect = false) {
       $this->setName($name)

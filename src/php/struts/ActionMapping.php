@@ -43,7 +43,7 @@ class ActionMapping extends Object {
    /**
     * Constructor
     *
-    * @param Module $module - Module, zu dem dieses Mapping gehört
+    * @param  Module $module - Module, zu dem dieses Mapping gehört
     */
    public function __construct(Module $module) {
       $this->module = $module;

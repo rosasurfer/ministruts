@@ -15,7 +15,7 @@ abstract class HttpClient extends Object {
    /**
     * Setzt den Verbindungs-Timeout.
     *
-    * @param int $timeout - Timeout in Sekunden
+    * @param  int $timeout - Timeout in Sekunden
     *
     * @return HttpClient
     */
@@ -41,7 +41,7 @@ abstract class HttpClient extends Object {
    /**
     * Ob Redirect-Headern gefolgt werden soll oder nicht.
     *
-    * @param bool $follow
+    * @param  bool $follow
     *
     * @return HttpClient
     */
@@ -66,7 +66,7 @@ abstract class HttpClient extends Object {
    /**
     * Setzt die maximale Anzahl der Redirects, denen gefolgt werden soll.
     *
-    * @param int $maxRedirects
+    * @param  int $maxRedirects
     *
     * @return HttpClient
     */
@@ -92,7 +92,7 @@ abstract class HttpClient extends Object {
     * Führt den übergebenen Request aus und gibt die empfangene Antwort zurück.  Diese Methode muß
     * von jedem Client implementiert werden.
     *
-    * @param HttpRequest $request
+    * @param  HttpRequest $request
     *
     * @return HttpResponse
     *

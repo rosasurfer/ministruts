@@ -179,7 +179,7 @@ class Logger extends StaticClass {
 
 
       // Fehler in Exception kapseln ...
-      $GLOBALS['$__PHPErrorException_create'] = true;    // Marker für Konstruktor von PHPErrorException
+      $GLOBALS['$__PHPErrorException_create'] = true;    // Marker für Constructor von PHPErrorException
       $exception = new PHPErrorException($message, $file, $line, $context);
 
 
@@ -368,9 +368,9 @@ class Logger extends StaticClass {
     * entweder am Bildschirm angezeigt, an die konfigurierten E-Mailadressen gemailt oder ins PHP-Errorlog
     * geschrieben.
     *
-    * @param string    $message   - zu loggende Message
-    * @param Exception $exception - zu loggende Exception
-    * @param int       $level     - zu loggender Loglevel
+    * @param  string    $message   - zu loggende Message
+    * @param  Exception $exception - zu loggende Exception
+    * @param  int       $level     - zu loggender Loglevel
     */
    private static function log_1($message, Exception $exception=null, $level) {
       $plainMessage = null;

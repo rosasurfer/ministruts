@@ -42,7 +42,7 @@ class FileDependency extends Dependency {
     *
     * Erzeugt eine neue FileDependency, die die angegebene Datei überwacht.
     *
-    * @param string $fileName - Dateiname
+    * @param  string $fileName - Dateiname
     */
    public function __construct($fileName) {
       if (!is_string($fileName)) throw new IllegalTypeException('Illegal type of parameter $fileName: '.getType($fileName));
@@ -67,7 +67,7 @@ class FileDependency extends Dependency {
    /**
     * Erzeugt eine neue FileDependency, die eine oder mehrere Dateien überwacht.
     *
-    * @param mixed $fileNames - einzelner Dateiname (String) oder Array von Dateinamen
+    * @param  mixed $fileNames - einzelner Dateiname (String) oder Array von Dateinamen
     *
     * @return Dependency
     */

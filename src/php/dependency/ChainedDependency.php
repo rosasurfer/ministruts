@@ -20,7 +20,7 @@ class ChainedDependency extends Dependency {
    /**
     * Constructor
     *
-    * @param Dependency $dependency - Abhängigkeit
+    * @param  Dependency $dependency - Abhängigkeit
     */
    private function __construct(Dependency $dependency) {
       $this->dependencies[] = $dependency;
@@ -31,7 +31,7 @@ class ChainedDependency extends Dependency {
    /**
     * Erzeugt eine neue Instanz.
     *
-    * @param Dependency $dependency - Abhängigkeit
+    * @param  Dependency $dependency - Abhängigkeit
     *
     * @return ChainedDependency
     */
@@ -43,7 +43,7 @@ class ChainedDependency extends Dependency {
    /**
     * Kombiniert diese Abhängigkeit mit einer weiteren durch ein logisches UND (AND).
     *
-    * @param Dependency $dependency - Abhängigkeit
+    * @param  Dependency $dependency - Abhängigkeit
     *
     * @return ChainedDependency
     */
@@ -65,7 +65,7 @@ class ChainedDependency extends Dependency {
    /**
     * Kombiniert diese Abhängigkeit mit einer weiteren durch ein logisches ODER (OR).
     *
-    * @param Dependency $dependency - Abhängigkeit
+    * @param  Dependency $dependency - Abhängigkeit
     *
     * @return ChainedDependency
     */

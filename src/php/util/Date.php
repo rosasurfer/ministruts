@@ -8,8 +8,8 @@ final class Date extends StaticClass {
    /**
     * Berechnet die Anzahl von Tagen zwischen zwei Zeitpunkten.
     *
-    * @param string $start - erster Zeitpunkt  (Format: yyyy-mm-dd)
-    * @param string $end   - zweiter Zeitpunkt (Format: yyyy-mm-dd)
+    * @param  string $start - erster Zeitpunkt  (Format: yyyy-mm-dd)
+    * @param  string $end   - zweiter Zeitpunkt (Format: yyyy-mm-dd)
     *
     * @return int - Tage
     */
@@ -34,8 +34,8 @@ final class Date extends StaticClass {
    /**
     * Gibt eine Anzahl von Datumswerten zurück.
     *
-    * @param string $startDate - Startzeitpunkt (Format: yyyy-mm-dd)
-    * @param int    $days      - Anzahl der zurückzugebenden Werte
+    * @param  string $startDate - Startzeitpunkt (Format: yyyy-mm-dd)
+    * @param  int    $days      - Anzahl der zurückzugebenden Werte
     *
     * @return array
     */

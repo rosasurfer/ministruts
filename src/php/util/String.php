@@ -8,7 +8,7 @@ final class String extends StaticClass {
    /**
     * Ob ein String UTF-8-kodiert ist.
     *
-    * @param string $string - der zu prüfende String
+    * @param  string $string - der zu prüfende String
     *
     * @return bool
     */
@@ -26,7 +26,7 @@ final class String extends StaticClass {
     * Dekodiert einen String von UTF-8 nach ISO-8859-1. Enthält der String keine gültige UTF-8-Zeichensequenz,
     * wird der Original-Wert zurückgegeben.
     *
-    * @param mixed $string - der zu dekodierende String oder ein Array mit mehreren zu dekodierenden Strings
+    * @param  mixed $string - der zu dekodierende String oder ein Array mit mehreren zu dekodierenden Strings
     *
     * @return mixed - dekodierte(r) String(s)
     */
@@ -72,7 +72,7 @@ final class String extends StaticClass {
    /**
     * Kodiert Strings von ISO-8859-1 nach UTF-8. Verarbeitet sowohl einzelne Strings als auch String-Arrays.
     *
-    * @param mixed $string - zu kodierende(r) String(s)
+    * @param  mixed $string - zu kodierende(r) String(s)
     *
     * @return mixed - kodierte(r) String(s)
     */
@@ -102,10 +102,10 @@ final class String extends StaticClass {
     *
     * Bedeutung der optionalen Parameter: siehe PHP-Manual
     *
-    * @param mixed  $string       - der/die zu konvertierende/n Strings
-    * @param int    $quoteStyle   - siehe Bemerkungen
-    * @param string $charset      -
-    * @param bool   $doubleEncode - (PHP 5.2.3+)
+    * @param  mixed  $string       - der/die zu konvertierende/n Strings
+    * @param  int    $quoteStyle   - siehe Bemerkungen
+    * @param  string $charset      -
+    * @param  bool   $doubleEncode - (PHP 5.2.3+)
     *
     * @return mixed - der/die konvertierte/n Strings
     *
@@ -142,10 +142,10 @@ final class String extends StaticClass {
     *
     * Bedeutung der optionalen Parameter: siehe PHP-Manual
     *
-    * @param mixed  $string       - der/die zu konvertierende/n Strings
-    * @param int    $quoteStyle   - (see PHP manual)
-    * @param string $charset      -
-    * @param bool   $doubleEncode - (PHP 5.2.3+)
+    * @param  mixed  $string       - der/die zu konvertierende/n Strings
+    * @param  int    $quoteStyle   - (see PHP manual)
+    * @param  string $charset      -
+    * @param  bool   $doubleEncode - (PHP 5.2.3+)
     *
     * @return mixed - der/die konvertierte/n Strings
     */
@@ -169,7 +169,7 @@ final class String extends StaticClass {
     * Entfernt Zeilenumbrüche aus einem String und ersetzt sie mit Leerzeichen.  Mehrere aufeinanderfolgende
     * Zeilenumbrüche werden auf ein Leerzeichen reduziert.
     *
-    * @param string $string - der zu bearbeitende String
+    * @param  string $string - der zu bearbeitende String
     *
     * @return String
     */
@@ -188,7 +188,7 @@ final class String extends StaticClass {
    /**
     * Ersetzt in einem String mehrfache durch einfache Leerzeichen.
     *
-    * @param string $string - der zu bearbeitende String
+    * @param  string $string - der zu bearbeitende String
     *
     * @return String
     */

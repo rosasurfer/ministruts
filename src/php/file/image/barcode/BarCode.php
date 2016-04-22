@@ -52,7 +52,7 @@ abstract class BarCode extends Object {
 
 
    /**
-    * Geschützter Konstruktor, Instanzen können nur von abgeleiteten Klassen erzeugt werden.
+    * Geschützter Constructor, Instanzen können nur von abgeleiteten Klassen erzeugt werden.
     */
    protected function __construct($value, $width, $height, $style=null, $xres=null, $font=null) {
       // Parameter validieren und speichern

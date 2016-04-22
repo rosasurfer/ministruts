@@ -27,7 +27,7 @@ if ($value) {
 /**
  * Hilfsfunktion zur formatierten Ausgabe einer Variable.
  *
- * @param mixed $var - die auszugebende Variable
+ * @param  mixed $var - die auszugebende Variable
  */
 function echoPre($var) {
    if (is_object($var) && method_exists($var, '__toString')) {
@@ -73,7 +73,7 @@ function getForwardedRemoteAddress() {
  * mehrere Header des angegebenen Namens übertragen, werden alle Werte dieser Header als eine komma-getrennte Liste
  * zurückgegeben (in der übertragenen Reihenfolge).
  *
- * @param string|array $names - ein oder mehrere Headernamen
+ * @param  string|array $names - ein oder mehrere Headernamen
  *
  * @return string - Wert oder NULL, wenn die angegebenen Header nicht gesetzt sind
  */
@@ -97,7 +97,7 @@ function getHeaderValue($names) {
 /**
  * Gibt die angegebenen Header als Array von Name-Wert-Paaren zurück (in der übertragenen Reihenfolge).
  *
- * @param string|array $names - ein oder mehrere Namen; ohne Angabe werden alle Header zurückgegeben
+ * @param  string|array $names - ein oder mehrere Namen; ohne Angabe werden alle Header zurückgegeben
  *
  * @return array - Name-Wert-Paare
  */
@@ -142,10 +142,10 @@ function getHeaders($names = null) {
 /**
  * Ob der übergebene String eine syntaktisch gültige IP-Adresse ist.
  *
- * @param string $string      - der zu überprüfende String
- * @param bool   $returnBytes - Typ des Rückgabewertes
- *                              FALSE: Boolean (default)
- *                              TRUE:  Array mit den Adressbytes oder FALSE, wenn der String keine gültige IP-Adresse darstellt
+ * @param  string $string      - der zu überprüfende String
+ * @param  bool   $returnBytes - Typ des Rückgabewertes
+ *                               FALSE: Boolean (default)
+ *                               TRUE:  Array mit den Adressbytes oder FALSE, wenn der String keine gültige IP-Adresse darstellt
  * @return bool|array
  */
 function isIPAddress($string, $returnBytes=false) {

@@ -53,7 +53,7 @@ abstract class Dependency extends Object {
    /**
     * Kombiniert diese Abhängigkeit mit einer weiteren durch ein logisches UND (AND).
     *
-    * @param Dependency $dependency - Abhängigkeit
+    * @param  Dependency $dependency - Abhängigkeit
     *
     * @return ChainedDependency
     */
@@ -69,7 +69,7 @@ abstract class Dependency extends Object {
    /**
     * Kombiniert diese Abhängigkeit mit einer weiteren durch ein logisches ODER (OR).
     *
-    * @param Dependency $dependency - Abhängigkeit
+    * @param  Dependency $dependency - Abhängigkeit
     *
     * @return ChainedDependency
     */
@@ -95,7 +95,7 @@ abstract class Dependency extends Object {
    /**
     * Setzt die Mindestgültigkeit dieser Abhängigkeit.
     *
-    * @param int $time - Mindestgültigkeit in Sekunden
+    * @param  int $time - Mindestgültigkeit in Sekunden
     *
     * @return ChainedDependency
     */

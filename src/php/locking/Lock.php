@@ -32,7 +32,7 @@ final class Lock extends BaseLock {
    /**
     * Constructor
     *
-    * @param string $key - Schlüssel, auf dem ein Lock gehalten werden soll
+    * @param  string $key - Schlüssel, auf dem ein Lock gehalten werden soll
     */
    public function __construct($key = null) {
       if (func_num_args()) {

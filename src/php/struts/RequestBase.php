@@ -4,7 +4,7 @@
  *
  * Diese Klasse stellt den HTTP-Request mit seinen Daten dar, sowie er von PHP an das aufgerufene Script übergeben wird.
  * Da es immer nur einen einzigen Request geben kann, ist er als Singleton implementiert.  Das bedeutet unter anderem,
- * daß es keinen öffentlichen Konstruktor gibt, man kann also nicht selbst einen neuen Request erzeugen (es gibt nur den
+ * daß es keinen öffentlichen Constructor gibt, man kann also nicht selbst einen neuen Request erzeugen (es gibt nur den
  * einen, der vom Server an PHP weitergereicht wurde).
  *
  * Warum eine abstrakte Klasse RequestBase und eine zusätzliche, funktional leere Klasse Request als Implementierung?
@@ -74,7 +74,7 @@ abstract class RequestBase extends Singleton {
 
 
    /**
-    * Konstruktor
+    * Constructor
     */
    protected function __construct() {
       if (!ini_get('track_errors'))

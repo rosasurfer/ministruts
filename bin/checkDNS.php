@@ -21,8 +21,8 @@ if (WINDOWS) throw new InfrastructureException("This script can't be run in Wind
 /**
  * Führt eine DNS-Abfrage durch und gibt den ermittelten Wert zurück
  *
- * @param $string $domain - Domain-Name, für den die Abfrage durchgeführt werden soll
- * @param $string $type   - Typ des abzufragenden Wertes (A, MX, NS, TXT, etc.)
+ * @param  string $domain - Domain-Name, für den die Abfrage durchgeführt werden soll
+ * @param  string $type   - Typ des abzufragenden Wertes (A, MX, NS, TXT, etc.)
  *
  * @return string - Wert
  */

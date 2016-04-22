@@ -8,8 +8,8 @@ class Object {
    /**
     * Magische Methode. Fängt durch unbekannte Methodenaufrufe ausgelöste, fatale PHP-Fehler ab.
     *
-    * @param string $method - Name der aufgerufenen Methode
-    * @param array  $args   - Array mit den der Methode übergebenen Argumenten
+    * @param  string $method - Name der aufgerufenen Methode
+    * @param  array  $args   - Array mit den der Methode übergebenen Argumenten
     *
     * @throws plRuntimeException
     */
@@ -27,8 +27,8 @@ class Object {
    /**
     * Magische Methode. Fängt das Setzen undefinierter Klassenvariablen ab.
     *
-    * @param string $property - Name der undefinierten Variable
-    * @param mixed  $value    - Wert, auf den die Variable gesetzt werden sollte
+    * @param  string $property - Name der undefinierten Variable
+    * @param  mixed  $value    - Wert, auf den die Variable gesetzt werden sollte
     *
     * @throws plRuntimeException
     */

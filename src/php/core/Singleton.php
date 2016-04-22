@@ -14,7 +14,7 @@ abstract class Singleton extends Object {
 
 
    /**
-    * Nicht-öffentlicher Konstruktor
+    * Nicht-öffentlicher Constructor
     */
    protected function __construct() { /* you can't call me from outside ... */ }
 
@@ -22,7 +22,7 @@ abstract class Singleton extends Object {
    /**
     * Gibt die Singleton-Instanz der gewünschten Klasse zurück.
     *
-    * @param string $class - Klassennname
+    * @param  string $class - Klassennname
     *
     * @return Singleton
     */

@@ -117,7 +117,7 @@ final class Config extends Object {
 
 
    /**
-    * Konstruktor
+    * Constructor
     *
     * Lädt die Konfiguration aus allen existierenden config.properties- und config-custom.properties-
     * Dateien.  Die config-custom.properties-Dateien sollte nicht im Repository gespeichert werden, so
@@ -158,7 +158,7 @@ final class Config extends Object {
     * Lädt eine Konfigurationsdatei. Schon vorhandene Einstellungen werden durch folgende Einstellungen
     * überschrieben.
     *
-    * @param string $filename - Dateiname
+    * @param  string $filename - Dateiname
     */
    private function loadFile($filename) {
       $lines = file($filename, FILE_IGNORE_NEW_LINES + FILE_SKIP_EMPTY_LINES);
@@ -214,8 +214,8 @@ final class Config extends Object {
     * zu ändern. Diese Änderungen werden nicht in "config.properties" gespeichert und gehen nach Ende
     * des Requests verloren.
     *
-    * @param string $key   - Schlüssel
-    * @param string $value - Einstellung
+    * @param  string $key   - Schlüssel
+    * @param  string $value - Einstellung
     */
    public static function set($key, $value) {
       if (!is_string($key))   throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
@@ -226,7 +226,7 @@ final class Config extends Object {
 
 
    /**
-    * @param string $key
+    * @param  string $key
     *
     * @return mixed
     *
@@ -254,9 +254,9 @@ final class Config extends Object {
 
 
    /**
-    * @param string $key
-    * @param string $value
-    * @param bool   $persist - (nicht implementiert)
+    * @param  string $key
+    * @param  string $value
+    * @param  bool   $persist - (nicht implementiert)
     *
     * @see Config::set()
     */

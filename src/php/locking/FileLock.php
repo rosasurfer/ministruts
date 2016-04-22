@@ -29,9 +29,9 @@ final class FileLock extends BaseLock {
     *
     * Erzeugt ein neues FileLock für die angegebene Datei.
     *
-    * @param string $filename - Name der Datei, auf der das Lock gehalten werden soll (muß existieren)
-    * @param bool   $shared   - TRUE, um ein shared Lock oder FALSE, um ein exclusive Lock zu setzen
-    *                           (default: FALSE = exklusives Lock)
+    * @param  string $filename - Name der Datei, auf der das Lock gehalten werden soll (muß existieren)
+    * @param  bool   $shared   - TRUE, um ein shared Lock oder FALSE, um ein exclusive Lock zu setzen
+    *                            (default: FALSE = exklusives Lock)
     */
    public function __construct($filename, $shared = false) {
 
@@ -99,7 +99,7 @@ final class FileLock extends BaseLock {
     * markiert es als ungültig (invalid).  Wenn das Lock bereits ungültig (invalid) ist, hat der Aufruf
     * keinen Effekt.
     *
-    * @param bool $deleteFile - ob das verwendete Lockfile beim Freigeben des Locks gelöscht werden soll (default: FALSE)
+    * @param  bool $deleteFile - ob das verwendete Lockfile beim Freigeben des Locks gelöscht werden soll (default: FALSE)
     */
    public function release($deleteFile = false) {
       if (!is_bool($deleteFile)) throw new IllegalTypeException('Illegal type of parameter $deleteFile: '.getType($deleteFile));

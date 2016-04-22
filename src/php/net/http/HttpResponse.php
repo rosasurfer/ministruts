@@ -308,7 +308,7 @@ abstract class HttpResponse extends Object {
    /**
     * Ob ein Header mit dem angegebenen Namen existiert.
     *
-    * @param string $name - Name des Headers
+    * @param  string $name - Name des Headers
     *
     * @return bool
     */
@@ -318,7 +318,7 @@ abstract class HttpResponse extends Object {
    /**
     * Gibt den Header mit dem angegebenen Namen zurück.
     *
-    * @param string $name - Name des Headers
+    * @param  string $name - Name des Headers
     *
     * @return mixed - String oder Array mit dem/den gefundenen Header(n)
     */

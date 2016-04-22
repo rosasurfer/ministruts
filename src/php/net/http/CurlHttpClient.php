@@ -88,7 +88,7 @@ final class CurlHttpClient extends HttpClient {
    /**
     * Erzeugt eine neue Instanz.
     *
-    * @param mixed[] $options - Array mit zusätzlichen CURL-Optionen (default: keine)
+    * @param  mixed[] $options - Array mit zusätzlichen CURL-Optionen (default: keine)
     */
    public function __construct(array $options=null) {
       $loglevel        = Logger::getLogLevel(__CLASS__);
@@ -123,7 +123,7 @@ final class CurlHttpClient extends HttpClient {
    /**
     * Erzeugt eine neue Instanz der Klasse.
     *
-    * @param mixed[] $options - Array mit zusätzlichen CURL-Optionen (default: keine)
+    * @param  mixed[] $options - Array mit zusätzlichen CURL-Optionen (default: keine)
     *
     * @return CurlHttpClient
     */
@@ -135,7 +135,7 @@ final class CurlHttpClient extends HttpClient {
    /**
     * Führt den übergebenen Request aus und gibt die empfangene Antwort zurück.
     *
-    * @param HttpRequest $request
+    * @param  HttpRequest $request
     *
     * @return HttpResponse
     *
@@ -209,7 +209,7 @@ final class CurlHttpClient extends HttpClient {
    /**
     * Gibt eine Beschreibung des letzten CURL-Fehlers zurück.
     *
-    * @param resource $hCurl - CURL-Handle
+    * @param  resource $hCurl - CURL-Handle
     *
     * @return string
     */

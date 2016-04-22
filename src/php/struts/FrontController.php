@@ -66,7 +66,7 @@ final class FrontController extends Singleton {
 
 
    /**
-    * Konstruktor
+    * Constructor
     *
     * Lädt die Struts-Konfiguration und erzeugt einen entsprechenden Objektbaum.
     */

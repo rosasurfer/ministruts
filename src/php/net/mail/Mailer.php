@@ -13,7 +13,7 @@ abstract class Mailer extends Object {
    /**
     * Constructor
     *
-    * @param array $options - Mailer-Optionen
+    * @param  array $options - Mailer-Optionen
     */
    abstract protected function __construct(array $options);
 
@@ -21,11 +21,11 @@ abstract class Mailer extends Object {
    /**
     * Verschickt eine Mail.
     *
-    * @param string $sender   - Absender  (Format: 'Vorname Nachname <user@domain.tld>')
-    * @param string $receiver - Empfänger (Format: 'Vorname Nachname <user@domain.tld>')
-    * @param string $subject  - Betreffzeile der E-Mail
-    * @param string $message  - Inhalt der E-Mail
-    * @param array  $headers  - zusätzliche zu setzende Mail-Header
+    * @param  string $sender   - Absender  (Format: 'Vorname Nachname <user@domain.tld>')
+    * @param  string $receiver - Empfänger (Format: 'Vorname Nachname <user@domain.tld>')
+    * @param  string $subject  - Betreffzeile der E-Mail
+    * @param  string $message  - Inhalt der E-Mail
+    * @param  array  $headers  - zusätzliche zu setzende Mail-Header
     */
    abstract public function sendMail($sender, $receiver, $subject, $message, array $headers = null);
 
@@ -33,7 +33,7 @@ abstract class Mailer extends Object {
    /**
     * Erzeugt eine neue Instanz und gibt sie zurück.
     *
-    * @param array $options - Mailer-Optionen
+    * @param  array $options - Mailer-Optionen
     *
     * @return Mailer
     */
@@ -53,7 +53,7 @@ abstract class Mailer extends Object {
    /**
     * Verschiebt den Versandvorgang dieses Mailers, wenn dies entsprechend konfiguriert ist.
     *
-    * @param array $args - Daten der zu versendenden E-Mail
+    * @param  array $args - Daten der zu versendenden E-Mail
     *
     * @return bool - ob der Versand verschoben wurde.
     */
@@ -114,7 +114,7 @@ abstract class Mailer extends Object {
    /**
     * Zerlegt eine vollständige E-Mailadresse "Name <user@domain>" in ihre beiden Bestandteile.
     *
-    * @param string $address - Adresse
+    * @param  string $address - Adresse
     *
     * @return mixed - ein Array mit den beiden Adressbestandteilen oder FALSE, wenn die übergebene
     *                 Adresse syntaktisch falsch ist

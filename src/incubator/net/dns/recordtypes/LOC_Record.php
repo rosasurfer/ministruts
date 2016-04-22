@@ -62,9 +62,9 @@ class LOC_Record extends DNSResourceRecord {
      * $rr = new LOC_Record($rro, $data, $offset);
      * $rr->parse();
      *
-     * @param        $rro
-     * @param string $data   String to parse
-     * @param int    $offset
+     * @param         $rro
+     * @param  string $data   String to parse
+     * @param  int    $offset
      */
     function LOC_Record($rro, $data, $offset = 0)
     {
@@ -148,8 +148,8 @@ class LOC_Record extends DNSResourceRecord {
     }
 
     /**
-     * @param $packet
-     * @param $offset
+     * @param  $packet
+     * @param  $offset
      *
      * @return string
      */
@@ -183,7 +183,8 @@ class LOC_Record extends DNSResourceRecord {
 
 
     /**
-     * @param $prec
+     * @param  $prec
+     *
      * @return int
      */
     function precsize_ntoval($prec)
@@ -195,7 +196,8 @@ class LOC_Record extends DNSResourceRecord {
     }
 
     /**
-     * @param int $val
+     * @param  int $val
+     *
      * @return int
      */
     function precsize_valton($val)
@@ -215,9 +217,9 @@ class LOC_Record extends DNSResourceRecord {
      *
      * @todo This should not change class state
      *
-     * @param      $rawmsec
-     * @param      $hems
-     * @param bool $is_lat
+     * @param       $rawmsec
+     * @param       $hems
+     * @param  bool $is_lat
      */
     function latlon2dms($rawmsec, $hems, $is_lat = false)
     {

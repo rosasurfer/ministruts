@@ -21,9 +21,9 @@ class HttpSession extends Singleton {
 
 
    /**
-    * Konstruktor
+    * Constructor
     *
-    * @param Request $request - der Request, zu dem die Session gehört
+    * @param  Request $request - der Request, zu dem die Session gehört
     */
    protected function __construct(Request $request) {
       // Prüfen, ob eine Session bereits außerhalb dieser Instanz gestartet wurde

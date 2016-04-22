@@ -8,7 +8,7 @@ final class HeaderUtils extends StaticClass {
    /**
     * Sendet einen Redirect-Header mit der angegebenen URL. Danach wird das Script beendet.
     *
-    * @param string $url - URL
+    * @param  string $url - URL
     */
    public static function redirect($url) {
       $request = Request ::me();

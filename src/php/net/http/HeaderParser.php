@@ -22,7 +22,7 @@ final class HeaderParser extends Object {
    /**
     * Parst einen übergebenen Headerblock.
     *
-    * @param string $data - rohe Headerdaten
+    * @param  string $data - rohe Headerdaten
     *
     * @return HeaderParser
     */
@@ -39,7 +39,7 @@ final class HeaderParser extends Object {
    /**
     * Parst eine einzelne Headerzeile.
     *
-    * @param string $line - Headerzeile
+    * @param  string $line - Headerzeile
     *
     * @return HeaderParser
     */
@@ -88,7 +88,7 @@ final class HeaderParser extends Object {
    /**
     * Ob ein Header mit dem angegebenen Namen existiert.
     *
-    * @param string $name - Name des Headers
+    * @param  string $name - Name des Headers
     *
     * @return bool
     */
@@ -100,7 +100,7 @@ final class HeaderParser extends Object {
    /**
     * Gibt den Header mit dem angegebenen Namen zurück.
     *
-    * @param string $name - Name des Headers
+    * @param  string $name - Name des Headers
     *
     * @return string
     */

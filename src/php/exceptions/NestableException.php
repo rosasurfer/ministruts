@@ -32,8 +32,8 @@ abstract class NestableException extends Exception {
     *    3) new NestableException(string $message)
     *    4) new NestableException(string $message, Exception $cause)
     *
-    * @param mixed     $message - Nachricht (string) oder ursächliche Exception
-    * @param Exception $cause   - ursächliche Exception
+    * @param  mixed     $message - Nachricht (string) oder ursächliche Exception
+    * @param  Exception $cause   - ursächliche Exception
     */
    public function __construct($message = null, Exception $cause = null) {
       $args = func_num_args();
@@ -131,7 +131,7 @@ abstract class NestableException extends Exception {
    /**
     * Gibt den formatierten Stacktrace dieser Exception aus.
     *
-    * @param bool $return - ob die Ausgabe nicht auf STDOUT sondern als Rückgabe erfolgen soll
+    * @param  bool $return - ob die Ausgabe nicht auf STDOUT sondern als Rückgabe erfolgen soll
     *
     * @return string - NULL oder formatierter, java-ähnlicher Stacktrace
     */
@@ -164,7 +164,7 @@ abstract class NestableException extends Exception {
    /**
     * Gibt eine formatierte, lesbare Version eines Stacktrace zurück.
     *
-    * @param array $trace - Stacktrace
+    * @param  array $trace - Stacktrace
     *
     * @return string - lesbarer Stacktrace
     */

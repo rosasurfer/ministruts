@@ -12,7 +12,7 @@ if (!function_exists('echoPre')) {
    /**
     * Hilfsfunktion zur formatierten Ausgabe einer Variable.
     *
-    * @param mixed $var - die auszugebende Variable
+    * @param  mixed $var - die auszugebende Variable
     */
    function echoPre($var) {
       if (is_object($var) && method_exists($var, '__toString')) {
@@ -39,7 +39,7 @@ if (!function_exists('errorLevelToStr')) {
    /**
     * Gibt einen Errorlevel in lesbarer Form zurück.
     *
-    * @param int $level - Errorlevel, ohne Angabe wird der aktuelle Errorlevel des laufenden Scriptes ausgewertet.
+    * @param  int $level - Errorlevel, ohne Angabe wird der aktuelle Errorlevel des laufenden Scriptes ausgewertet.
     *
     * @return string
     */

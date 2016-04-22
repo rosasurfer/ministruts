@@ -60,8 +60,8 @@ abstract class CachePeer extends Object {
     * Gibt einen Wert aus dem Cache zurück.  Existiert der Wert nicht, wird der angegebene Defaultwert
     * zurückgegeben.
     *
-    * @param string $key     - Schlüssel, unter dem der Wert gespeichert ist
-    * @param mixed  $default - Defaultwert (kann selbst auch NULL sein)
+    * @param  string $key     - Schlüssel, unter dem der Wert gespeichert ist
+    * @param  mixed  $default - Defaultwert (kann selbst auch NULL sein)
     *
     * @return mixed - Der gespeicherte Wert, NULL, falls kein solcher Schlüssel existiert oder der
     *                 angegebene Defaultwert
@@ -72,7 +72,7 @@ abstract class CachePeer extends Object {
    /**
     * Löscht einen Wert aus dem Cache.
     *
-    * @param string $key - Schlüssel, unter dem der Wert gespeichert ist
+    * @param  string $key - Schlüssel, unter dem der Wert gespeichert ist
     *
     * @return bool - TRUE bei Erfolg, FALSE, falls kein solcher Schlüssel existiert
     */
@@ -82,7 +82,7 @@ abstract class CachePeer extends Object {
    /**
     * Ob unter dem angegebenen Schlüssel ein Wert im Cache gespeichert ist.
     *
-    * @param string $key - Schlüssel
+    * @param  string $key - Schlüssel
     *
     * @return bool
     */
@@ -94,10 +94,10 @@ abstract class CachePeer extends Object {
     * überschrieben.  Läuft die angegebene Zeitspanne ab oder ändert sich der Status der angegebenen
     * Abhängigkeit, wird der Wert automatisch ungültig.
     *
-    * @param string     $key        - Schlüssel, unter dem der Wert gespeichert wird
-    * @param mixed      $value      - der zu speichernde Wert
-    * @param int        $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfällt
-    * @param Dependency $dependency - Abhängigkeit der Gültigkeit des gespeicherten Wertes
+    * @param  string     $key        - Schlüssel, unter dem der Wert gespeichert wird
+    * @param  mixed      $value      - der zu speichernde Wert
+    * @param  int        $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfällt
+    * @param  Dependency $dependency - Abhängigkeit der Gültigkeit des gespeicherten Wertes
     *
     * @return bool - TRUE bei Erfolg, FALSE andererseits
     */
@@ -109,10 +109,10 @@ abstract class CachePeer extends Object {
     * existiert.  Läuft die angegebene Zeitspanne ab oder ändert sich der Status der angegebenen
     * Abhängigkeit, wird der Wert automatisch ungültig.
     *
-    * @param string     $key        - Schlüssel, unter dem der Wert gespeichert wird
-    * @param mixed      $value      - der zu speichernde Wert
-    * @param int        $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfällt
-    * @param Dependency $dependency - Abhängigkeit der Gültigkeit des gespeicherten Wertes
+    * @param  string     $key        - Schlüssel, unter dem der Wert gespeichert wird
+    * @param  mixed      $value      - der zu speichernde Wert
+    * @param  int        $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfällt
+    * @param  Dependency $dependency - Abhängigkeit der Gültigkeit des gespeicherten Wertes
     *
     * @return bool - TRUE bei Erfolg, FALSE andererseits
     */
@@ -129,10 +129,10 @@ abstract class CachePeer extends Object {
     * existiert.  Läuft die angegebene Zeitspanne ab oder ändert sich der Status der angegebenen
     * Abhängigkeit, wird der Wert automatisch ungültig.
     *
-    * @param string     $key        - Schlüssel, unter dem der Wert gespeichert wird
-    * @param mixed      $value      - der zu speichernde Wert
-    * @param int        $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfällt
-    * @param Dependency $dependency - Abhängigkeit der Gültigkeit des gespeicherten Wertes
+    * @param  string     $key        - Schlüssel, unter dem der Wert gespeichert wird
+    * @param  mixed      $value      - der zu speichernde Wert
+    * @param  int        $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfällt
+    * @param  Dependency $dependency - Abhängigkeit der Gültigkeit des gespeicherten Wertes
     *
     * @return bool - TRUE bei Erfolg, FALSE andererseits
     */

@@ -44,9 +44,11 @@ class DNSUtil
     /**
      * Initializes a resolver object
      *
-     * @see DNSResolver
-     * @param array $defaults
+     * @param  array $defaults
+     *
      * @return DNSUtil
+     *
+     * @see DNSResolver
      */
     function DNSUtil($defaults = array())
     {

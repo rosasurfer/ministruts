@@ -368,9 +368,9 @@ function is_interface($name) {
  *
  * Ob der übergebene String einen gültigen Date/DateTime-Wert darstellt.
  *
- * @param string    $string - der zu überprüfende String
- * @param string|[] $format - Format, dem der String entsprechen soll. Sind mehrere angegeben, muß der String
- *                            mindestens einem davon entsprechen.
+ * @param  string    $string - der zu überprüfende String
+ * @param  string|[] $format - Format, dem der String entsprechen soll. Sind mehrere angegeben, muß der String
+ *                             mindestens einem davon entsprechen.
  *
  * @return int|bool - Timestamp oder FALSE, wenn der übergebene Wert nicht gültig ist
  *

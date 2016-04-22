@@ -18,8 +18,8 @@ final class FileSystemCache extends CachePeer {
    /**
     * Constructor.
     *
-    * @param string $label   - Cache-Bezeichner
-    * @param array  $options - zusätzliche Optionen
+    * @param  string $label   - Cache-Bezeichner
+    * @param  array  $options - zusätzliche Optionen
     */
    public function __construct($label, array $options = null) {
       $this->label     = $label;
@@ -45,7 +45,7 @@ final class FileSystemCache extends CachePeer {
    /**
     * Ob unter dem angegebenen Schlüssel ein Wert im Cache gespeichert ist.
     *
-    * @param string $key - Schlüssel
+    * @param  string $key - Schlüssel
     *
     * @return bool
     */
@@ -109,8 +109,8 @@ final class FileSystemCache extends CachePeer {
     * Gibt einen Wert aus dem Cache zurück.  Existiert der Wert nicht, wird der angegebene Defaultwert
     * zurückgegeben.
     *
-    * @param string $key     - Schlüssel, unter dem der Wert gespeichert ist
-    * @param mixed  $default - Defaultwert (kann selbst auch NULL sein)
+    * @param  string $key     - Schlüssel, unter dem der Wert gespeichert ist
+    * @param  mixed  $default - Defaultwert (kann selbst auch NULL sein)
     *
     * @return mixed - Der gespeicherte Wert oder NULL, falls kein solcher Schlüssel existiert.
     *                 Achtung: Ist im Cache ein NULL-Wert gespeichert, wird ebenfalls NULL zurückgegeben.
@@ -126,7 +126,7 @@ final class FileSystemCache extends CachePeer {
    /**
     * Löscht einen Wert aus dem Cache.
     *
-    * @param string $key - Schlüssel, unter dem der Wert gespeichert ist
+    * @param  string $key - Schlüssel, unter dem der Wert gespeichert ist
     *
     * @return bool - TRUE bei Erfolg, FALSE, falls kein solcher Schlüssel existiert
     */
@@ -152,10 +152,10 @@ final class FileSystemCache extends CachePeer {
     * überschrieben.  Läuft die angegebene Zeitspanne ab oder ändert sich der Status der angegebenen
     * Abhängigkeit, wird der Wert automatisch ungültig.
     *
-    * @param string     $key        - Schlüssel, unter dem der Wert gespeichert wird
-    * @param mixed      $value      - der zu speichernde Wert
-    * @param int        $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfällt
-    * @param Dependency $dependency - Abhängigkeit der Gültigkeit des gespeicherten Wertes
+    * @param  string     $key        - Schlüssel, unter dem der Wert gespeichert wird
+    * @param  mixed      $value      - der zu speichernde Wert
+    * @param  int        $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfällt
+    * @param  Dependency $dependency - Abhängigkeit der Gültigkeit des gespeicherten Wertes
     *
     * @return bool - TRUE bei Erfolg, FALSE andererseits
     */
@@ -178,7 +178,7 @@ final class FileSystemCache extends CachePeer {
    /**
     * Gibt den vollständigen Pfad zur Cache-Datei für den angegebenen Schlüssel zurück.
     *
-    * @param string $key - Schlüssel des Wertes
+    * @param  string $key - Schlüssel des Wertes
     *
     * @return string - Dateipfad
     */
@@ -191,7 +191,7 @@ final class FileSystemCache extends CachePeer {
    /**
     * Liest die Datei mit dem angegebenen Namen ein und gibt den deserialisierten Inhalt zurück.
     *
-    * @param string $fileName - vollständiger Dateiname
+    * @param  string $fileName - vollständiger Dateiname
     *
     * @return mixed - Wert
     */
@@ -215,8 +215,8 @@ final class FileSystemCache extends CachePeer {
    /**
     * Schreibt den angegebenen Wert in die Datei mit dem angegebenen Namen.
     *
-    * @param string $fileName - vollständiger Dateiname
-    * @param mixed  $value    - der in die Datei zu schreibende Wert
+    * @param  string $fileName - vollständiger Dateiname
+    * @param  mixed  $value    - der in die Datei zu schreibende Wert
     *
     * @return bool - TRUE bei Erfolg, FALSE andererseits
     */

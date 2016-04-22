@@ -25,7 +25,7 @@ final class HttpRequest extends Object {
    /**
     * Setzt die HTTP-Methode dieses Requests.
     *
-    * @param string $method - Methode, zur Zeit werden nur GET und POST unterstützt
+    * @param  string $method - Methode, zur Zeit werden nur GET und POST unterstützt
     *
     * @return HttpRequest
     */
@@ -51,7 +51,7 @@ final class HttpRequest extends Object {
    /**
     * Setzt die URL dieses Requests.
     *
-    * @param string $url - URL
+    * @param  string $url - URL
     *
     * @return HttpRequest
     */
@@ -81,8 +81,8 @@ final class HttpRequest extends Object {
    /**
     * Setzt einen HTTP-Header. Ein bereits vorhandener Header desselben Namens wird überschrieben.
     *
-    * @param string $header - Name des Headers
-    * @param string $value  - Wert des Headers, NULL oder ein Leerstring löschen den entsprechenden Header
+    * @param  string $header - Name des Headers
+    * @param  string $value  - Wert des Headers, NULL oder ein Leerstring löschen den entsprechenden Header
     *
     * @return HttpRequest
     */
@@ -115,8 +115,8 @@ final class HttpRequest extends Object {
     * Fügt einen HTTP-Header zu den Headern dieses Requests hinzu. Bereit vorhandene gleichnamige Header werden nicht überschrieben,
     * sondern gemäß RFC zu einem gemeinsamen Header kombiniert.
     *
-    * @param string $header - Name des Headers
-    * @param string $value  - Wert des Headers
+    * @param  string $header - Name des Headers
+    * @param  string $value  - Wert des Headers
     *
     * @return HttpRequest
     *
@@ -149,7 +149,7 @@ final class HttpRequest extends Object {
    /**
     * Gibt die angegebenen Header dieses HttpRequests als Array von Name-Wert-Paaren zurück.
     *
-    * @param string|array $names - ein oder mehrere Namen; ohne Angabe werden alle Header zurückgegeben
+    * @param  string|array $names - ein oder mehrere Namen; ohne Angabe werden alle Header zurückgegeben
     *
     * @return array - Name-Wert-Paare
     */
@@ -172,7 +172,7 @@ final class HttpRequest extends Object {
    /**
     * Gibt den angegebenen Header dieses HttpRequest zurück.
     *
-    * @param string $name - Name des Headers (Groß-/Kleinschreibweise wird ignoriert)
+    * @param  string $name - Name des Headers (Groß-/Kleinschreibweise wird ignoriert)
     *
     * @return string - Wert des Headers oder NULL, wenn kein Header dieses Namens konfiguriert wurde
     */

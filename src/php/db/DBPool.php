@@ -39,7 +39,7 @@ final class DBPool extends Singleton {
    /**
     * Gibt den Connector für den angegebenen Datenbank-Alias zurück.
     *
-    * @param string $alias - Datenbank-Alias
+    * @param  string $alias - Datenbank-Alias
     *
     * @return DB
     */

@@ -28,11 +28,11 @@ class CommonDAO extends Singleton {
 
 
    /**
-    * Konstruktor
+    * Constructor
     *
     * Erzeugt einen neuen DAO.
     *
-    * @param string $alias - Aliasname der Datenbank, mit dem die Entity-Klasse verbunden ist.
+    * @param  string $alias - Aliasname der Datenbank, mit dem die Entity-Klasse verbunden ist.
     */
    protected function __construct() {
       $this->entityClass = subStr(get_class($this), 0, -3);
