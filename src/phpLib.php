@@ -801,6 +801,7 @@ function typeOf($var) {
  */
 function echos($var) {
    echo $var;
+   ob_get_level() && ob_flush();
 }
 
 
@@ -854,6 +855,8 @@ function printFormatted($var, $return=false) {
       return $str;
 
    echo $str;
+   ob_get_level() && ob_flush();
+
    return null;
 }
 
@@ -873,6 +876,8 @@ function dump($var, $return=false) {
    var_dump($var);
 
    if ($return) return ob_get_clean();
+
+   ob_get_level() && ob_flush();
    return;
 }
 
