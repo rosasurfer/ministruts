@@ -108,18 +108,20 @@ abstract class NestableException extends Exception {
          $trace = self ::transformToJavaStackTrace(parent:: getTrace());
 
          // Der erste Frame wird mit den Werten der Exception bestückt.
-         $trace[0]['file'] = $this->file;
-         $trace[0]['line'] = $this->line;
+         $trace[0]['file'] = $this->getFile();
+         $trace[0]['line'] = $this->getLine();
 
          // Wurde die Exception in Object::__set() ausgelöst, Stacktrace modifizieren, so daß der falsche Aufruf im ersten Frame steht.
-         while (strToLower($trace[0]['function']) == '__set')
+         while (strToLower($trace[0]['function']) == '__set') {
             array_shift($trace);
+         }
 
          // Wurde die Exception in Object::__call() ausgelöst, Stacktrace modifizieren, so daß der falsche Aufruf im ersten Frame steht.
          if (strToLower($trace[0]['function']) == '__call') {
-            while (strToLower($trace[0]['function']) == '__call')
+            while (strToLower($trace[0]['function']) == '__call') {
                array_shift($trace);
-            array_shift($trace);
+            }
+            array_shift($trace);                         // one level more than for "__set"
          }
 
          $this->trace =& $trace;
