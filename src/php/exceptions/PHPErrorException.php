@@ -22,8 +22,9 @@ class PHPErrorException extends NestableException {
     * Constructor
     *
     * @param  mixed[] $context - aktive Symboltabelle des Punktes, an dem die Exception auftrat
-    *                            (An array that points to the active symbol table at the point the error occurred. In other words, $context will contain an array
-    *                             of every variable that existed in the scope the error was triggered in. User error handler must not modify error context.)
+    *                            An array that points to the active symbol table at the point the error occurred. In other words,
+    *                            $context will contain an array of every variable that existed in the scope the error was triggered
+    *                            in. User error handler must not modify error context.
     */
    public function __construct($message, $file, $line, array $context) {
       // prüfen, ob wir außerhalb des ErrorHandler aufgerufen wurden
@@ -34,9 +35,9 @@ class PHPErrorException extends NestableException {
 
       parent:: __construct($message);
 
-      $this->file =  $file;
-      $this->line =  $line;
-      $this->vars =& $context;   // ??? statt $this->context wird $this->vars gesetzt ???
+      $this->file    = $file;
+      $this->line    = $line;
+      $this->context = $context;
    }
 
 
