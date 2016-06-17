@@ -21,8 +21,8 @@ define('PHPLIB_ROOT', dirName(__FILE__));
 
 
 // Anwendungskonfiguration prüfen
-if (!defined('APPLICATION_NAME')) exit('The PHP constant APPLICATION_NAME must be defined (see "'.PHPLIB_ROOT.DIRECTORY_SEPARATOR.'doc'.DIRECTORY_SEPARATOR.'project.skel'.DIRECTORY_SEPARATOR.'index.php")');
-if (!defined('APPLICATION_ROOT')) exit('The PHP constant APPLICATION_ROOT must be defined (see "'.PHPLIB_ROOT.DIRECTORY_SEPARATOR.'doc'.DIRECTORY_SEPARATOR.'project.skel'.DIRECTORY_SEPARATOR.'index.php")');
+if (!defined('APPLICATION_NAME')) echoPre('The PHP constant APPLICATION_NAME must be defined (see "'.PHPLIB_ROOT.'/doc/project.skel/index.php")') | exit(1);
+if (!defined('APPLICATION_ROOT')) echoPre('The PHP constant APPLICATION_ROOT must be defined (see "'.PHPLIB_ROOT.'/doc/project.skel/index.php")') | exit(1);
 
 
 // ob wir unter Windows laufen
@@ -35,7 +35,7 @@ if (subStr($_SERVER['PHP_SELF'], -12) == '/phpinfo.php') {
    require(PHPLIB_ROOT.'/php/phpinfo.php');
    exit(0);
 }
-if (PHP_VERSION < '5.2.1') echoPre('Warning: You are running a buggy PHP version (a version >= 5.2.1 is recommended).');
+if (PHP_VERSION < '5.2.1') echoPre('Error: a PHP version >= 5.2.1 is required') | exit(1);
 
 
 // Klassendefinitionen
@@ -164,6 +164,7 @@ define('ERROR_LOG_SYSLOG', 0);                        // message is sent to PHP'
 define('ERROR_LOG_MAIL'  , 1);                        // message is sent by email
 define('ERROR_LOG_DEBUG' , 2);                        // message is sent through the PHP debugging connection
 define('ERROR_LOG_FILE'  , 3);                        // message is appended to a file destination
+define('ERROR_LOG_SAPI'  , 4);                        // message is sent directly to the SAPI logging handler
 
 // Zeitkonstanten
 define('SECOND',   1          ); define('SECONDS', SECOND);
@@ -305,11 +306,10 @@ function __autoload($className/*, $throw*/) {
 
 
 /**
- * Ob der angegebene Klassenname definiert ist.  Diese Funktion ist notwendig, weil eine einfache
- * Abfrage der Art "if (class_exist($className, true))" __autoload() aufruft und bei Nichtexistenz der
- * Klasse das Script mit einem fatalen Fehler beendet (Exceptions statt eines Fehlers sind in __autoload()
- * nicht möglich).
- * Wird __autoload() direkt aus dieser Funktion und nicht von PHP aufgerufen, werden Exceptions weitergereicht
+ * Ob der angegebene Klassenname deklariert ist (im Class-Mapping). Diese Funktion ist notwendig, weil eine einfache
+ * Abfrage der Art "if (class_exist($className, true))" die Funktion __autoload() aufruft und bei Nichtexistenz der
+ * Klasse das Script mit einem fatalen Fehler beendet (Exceptions statt eines Fehlers sind in __autoload() nicht möglich).
+ * Wird die Funktion __autoload() direkt aus dieser Funktion und nicht von PHP aufgerufen, werden Exceptions weitergereicht
  * und der folgende Code kann entsprechend reagieren.
  *
  * @param  string $name - Klassenname
@@ -317,7 +317,7 @@ function __autoload($className/*, $throw*/) {
  * @return bool
  *
  *
- * NOTE: Das eine Klasse definiert ist, bedeutet noch nicht, daß sie auch geladen (inkludiert) ist.
+ * NOTE: Das eine Klasse deklariert ist, bedeutet nicht, daß sie auch definiert (die Klassendatei also inkludiert) ist.
  *       @see __autoload()
  */
 function is_class($name) {
@@ -335,18 +335,17 @@ function is_class($name) {
 
 
 /**
- * Ob der angegebene Interface-Name definiert ist.  Diese Funktion ist notwendig, weil eine einfache
- * Abfrage der Art "if (interface_exist($interfaceName, true))" __autoload() aufruft und bei Nichtexistenz
- * des Interfaces das Script mit einem fatalen Fehler beendet (Exceptions statt eines Fehlers sind in
- * __autoload() nicht möglich).
- * Wird __autoload() direkt aus dieser Funktion und nicht von PHP aufgerufen, werden Exceptions weitergereicht
- * und der folgende Code kann entsprechend reagieren.
+ * Ob der angegebene Interface-Name deklariert ist (im Class-Mapping). Diese Funktion ist notwendig, weil eine einfache
+ * Abfrage der Art "if (interface_exist($interfaceName, true))" die Funktion __autoload() aufruft und bei Nichtexistenz
+ * des Interface das Script mit einem fatalen Fehler beendet (Exceptions statt eines Fehlers sind in __autoload() nicht
+ * möglich). Wird die Funktion __autoload() direkt aus dieser Funktion und nicht von PHP aufgerufen, werden Exceptions
+ * weitergereicht und der folgende Code kann entsprechend reagieren.
  *
  * @param  string $name - Interface-Name
  *
  * @return bool
  *
- * NOTE: Das ein Interface definiert ist, bedeutet noch nicht, daß es auch geladen (inkludiert) ist.
+ * NOTE: Das ein Interface deklariert ist, bedeutet nicht, daß es auch definiert (die Interface-Datei also inkludiert) ist.
  *       @see __autoload()
  */
 function is_interface($name) {
@@ -602,7 +601,7 @@ function strContainsI($haystack, $needle) {
 function strCompare($stringA, $stringB, $ignoreCase=false) {
    if (!is_null($stringA) && !is_string($stringA)) throw new IllegalTypeException('Illegal type of parameter $stringA: '.getType($stringA));
    if (!is_null($stringB) && !is_string($stringB)) throw new IllegalTypeException('Illegal type of parameter $stringB: '.getType($stringB));
-   if (!is_bool($ignoreCase))                      throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
+   if (!is_bool($ignoreCase))          throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
 
    if ($ignoreCase)
       return strCompareI($stringA, $stringB);
@@ -801,6 +800,7 @@ function typeOf($var) {
  */
 function echos($var) {
    echo $var;
+   ob_get_level() && ob_flush();       // flush output buffer if active
 }
 
 
@@ -829,7 +829,7 @@ function echoPre($var) {
  */
 function printFormatted($var, $return=false) {
    if (is_object($var) && method_exists($var, '__toString')) {
-      $str = $var->__toString();
+      $str = (string) $var;
    }
    elseif (is_object($var) || is_array($var)) {
       $str = print_r($var, true);
@@ -873,6 +873,8 @@ function dump($var, $return=false) {
    var_dump($var);
 
    if ($return) return ob_get_clean();
+
+   ob_get_level() && ob_flush();       // flush output buffer if active
    return;
 }
 
