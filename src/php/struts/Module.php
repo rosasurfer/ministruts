@@ -123,7 +123,7 @@ class Module extends Object {
       $content = file_get_contents($fileName, false);
 
       // die DTD liegt im Struts-Package-Verzeichnis (src/php/struts)
-      $currentDir = getCwd();
+      $currentDir = getCwd();                         // typically dirName(APP_ROOT.'/www/index.php');
       $packageDir = dirName(__FILE__);
 
       // TODO: XML ohne Verzeichniswechsel validieren
