@@ -142,7 +142,7 @@
      methods    Comma-delimited list of HTTP method names ("get", "post") the ActionMapping is supporting.
                 [default: "get"]
 
-     roles      Comma-delimited list of role names that are allowed access to the action mapping.
+     roles      Comma-delimited list of required roles to access the action mapping.
                 [default: "none"]
 
      default    Set to "true" if the mapping should be configured as the default action mapping for the module.  If a 
