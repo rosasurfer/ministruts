@@ -321,50 +321,56 @@ abstract class RequestBase extends Singleton {
 
 
    /**
-    * Gibt den Teil der URL des Requests zurück, wie er in der ersten Zeile des HTTP-Protokolls
-    * erscheint, relativ zur Wurzel-URL der Anwendung. Dieser Wert beginnt mit einem Slash "/".
+    * Gibt die URL des Requests relativ zur Base-URL der Anwendung zurück. Der Wert beginnt mit einem Slash "/".
     *
-    * z.B.: /foo/bar.php/info?key=value   (Pfadname + Pfadinfo + Querystring)
+    * z.B.: URL:              "http://a.domain.tld/path/application/module/foo/bar.php/info?key=value"   
+    *       getRelativeURI(): "/module/foo/bar.php/info?key=value"   (Modulname + Pfadname + Pfadinfo + Querystring)
     *
     * @return string
     */
    public function getRelativeURI() {
       // TODO: gibt absoluten Link auf falsches Verzeichnis zurück
-      return subStr($this->getURI(), strLen($this->getApplicationPath()));
+      return strRightFrom($this->getURI(), $this->getApplicationPath());
    }
 
 
    /**
-    * Gibt den Pfadbestandteil der URL des Requests zurück. Dieser Wert beginnt mit einem Slash "/".
+    * Gibt den Pfadbestandteil der URI des Requests zurück. Der Wert beginnt mit einem Slash "/".
     *
-    * z.B.: /myapplication/foo/bar.php   (Pfad ohne Pfadinfo und ohne Querystring)
+    * z.B.: "/application/module/foo/bar.php/info"   (Pfad inkl. Pfadinfo, ohne Querystring)
     *
     * @return string
     */
    public function getPath() {
       if ($this->path === null) {
-         // TODO: schneidet path-info einfach ab
-         $this->path = $_SERVER['PHP_SELF'] = preg_replace('/\/{2,}/', '/', $_SERVER['PHP_SELF']);
+         $value = $this->getURI();
+
+         $value = strLeftTo($value, '?');
+         $value = strLeftTo($value, '#');
+         $value = strLeftTo($value, ';');
+
+         $value = preg_replace('/\/{2,}/', '/', $value);       // mehrfache Slashes löschen
+         $this->path = $value;
       }
       return $this->path;
    }
 
 
    /**
-    * Gibt den Pfadbestandteil der URL des Requests relativ zur Wurzel-URL der Anwendung zurück.
-    * Dieser Wert beginnt mit einem Slash "/".
+    * Gibt den Pfadbestandteil der URL des Requests relativ zur Base-URL der Anwendung zurück.
+    * Der Wert beginnt mit einem Slash "/".
     *
-    * z.B.: /foo/bar.php   (Pfad ohne Pfadinfo und ohne Querystring)
+    * z.B.: /module/foo/bar.php   (Pfad ohne Pfadinfo und ohne Querystring)
     *
     * @return string
     */
    public function getRelativePath() {
-      return subStr($this->getPath(), strLen($this->getApplicationPath()));
+      return strRightFrom($this->getPath(), $this->getApplicationPath());
    }
 
 
    /**
-    * Gibt den Pfadbestandteil der Wurzel-URL der Anwendung zurück. Liegt die Anwendung im Wurzel-
+    * Gibt den Pfadbestandteil der Base-URL der Anwendung zurück. Liegt die Anwendung im Wurzel-
     * verzeichnis des Webservers, ist dieser Wert ein Leerstring "". Anderenfalls beginnt dieser Wert
     * mit einem Slash "/".
     *
@@ -380,8 +386,8 @@ abstract class RequestBase extends Singleton {
          $path = $_SERVER['APPLICATION_PATH'];
 
          // syntaktisch zwar nicht korrekt, doch wir wissen, was mit "/" gemeint ist
-         if ($path == '/')
-            $path = '';
+         if (strEndsWith($path, '/'))
+            $path = strLeft($path, -1);
       }
 
       return $path;
