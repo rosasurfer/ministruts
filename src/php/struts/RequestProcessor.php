@@ -187,7 +187,9 @@ class RequestProcessor extends Object {
       // Pfad für die Mappingauswahl ermitteln ...
       $requestPath     = $request->getPath();
       $applicationPath = $request->getApplicationPath();
-      $path = subStr($requestPath, strLen($applicationPath.$this->module->getPrefix()));
+      $modulePrefix    = $this->module->getPrefix();
+
+      $path = strRightFrom($requestPath, $applicationPath.$modulePrefix);
       $path = String ::decodeUtf8($path);
 
       if ($path == '/')
@@ -198,7 +200,7 @@ class RequestProcessor extends Object {
       self::$logDebug && Logger ::log('Path used for mapping selection: '.$path, L_DEBUG, __CLASS__);
 
       // Mapping suchen und im Request speichern
-      if (($mapping = $this->module->findMapping($path)) || ($mapping = $this->module->getDefaultMapping())) {
+      if (($mapping=$this->module->findMapping($path)) || ($mapping=$this->module->getDefaultMapping())) {
          $request->setAttribute(Struts ::ACTION_MAPPING_KEY, $mapping);
          return $mapping;
       }
