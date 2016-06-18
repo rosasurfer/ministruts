@@ -306,19 +306,15 @@ function __autoload($className/*, $throw*/) {
 
 
 /**
- * Ob der angegebene Klassenname deklariert ist (im Class-Mapping). Diese Funktion ist notwendig, weil eine einfache
- * Abfrage der Art "if (class_exist($className, true))" die Funktion __autoload() aufruft und bei Nichtexistenz der
- * Klasse das Script mit einem fatalen Fehler beendet (Exceptions statt eines Fehlers sind in __autoload() nicht möglich).
- * Wird die Funktion __autoload() direkt aus dieser Funktion und nicht von PHP aufgerufen, werden Exceptions weitergereicht
- * und der folgende Code kann entsprechend reagieren.
+ * Ob die angegebene Klasse definiert ist. Diese Funktion ist notwendig, weil eine einfache Abfrage der Art
+ * "if (class_exist($className, true))" intern die Funktion __autoload() aufruft und bei Nichtexistenz der Klasse das
+ * Script mit einem fatalen Fehler beendet (Exceptions statt eines Fehlers sind in __autoload() nicht erlaubt). Wird die
+ * Funktion __autoload() dagegen manuell und nicht intern von PHP aufgerufen, werden Exceptions weitergereicht und der
+ * folgende Code kann entsprechend reagieren. Während der Prüfung wird die Klasse ggf. geladen.
  *
  * @param  string $name - Klassenname
  *
  * @return bool
- *
- *
- * NOTE: Das eine Klasse deklariert ist, bedeutet nicht, daß sie auch definiert (die Klassendatei also inkludiert) ist.
- *       @see __autoload()
  */
 function is_class($name) {
    if (class_exists($name, false))
@@ -335,18 +331,15 @@ function is_class($name) {
 
 
 /**
- * Ob der angegebene Interface-Name deklariert ist (im Class-Mapping). Diese Funktion ist notwendig, weil eine einfache
- * Abfrage der Art "if (interface_exist($interfaceName, true))" die Funktion __autoload() aufruft und bei Nichtexistenz
- * des Interface das Script mit einem fatalen Fehler beendet (Exceptions statt eines Fehlers sind in __autoload() nicht
- * möglich). Wird die Funktion __autoload() direkt aus dieser Funktion und nicht von PHP aufgerufen, werden Exceptions
- * weitergereicht und der folgende Code kann entsprechend reagieren.
+ * Ob das angegebene Interface definiert ist. Diese Funktion ist notwendig, weil eine einfache Abfrage der Art
+ * "if (interface_exist($interfaceName, true))" intern die Funktion __autoload() aufruft und bei Nichtexistenz des
+ * Interface das Script mit einem fatalen Fehler beendet (Exceptions statt eines Fehlers sind in __autoload() nicht
+ * erlaubt). Wird die Funktion __autoload() dagegen manuell und nicht intern von PHP aufgerufen, werden Exceptions
+ * weitergereicht und der folgende Code kann entsprechend reagieren. Während der Prüfung wird das Interface ggf. geladen.
  *
  * @param  string $name - Interface-Name
  *
  * @return bool
- *
- * NOTE: Das ein Interface deklariert ist, bedeutet nicht, daß es auch definiert (die Interface-Datei also inkludiert) ist.
- *       @see __autoload()
  */
 function is_interface($name) {
    if (interface_exists($name, false))
@@ -384,7 +377,7 @@ function is_datetime($string, $format) {
 
 
 /**
- * Ob die Byte-Order der Maschine Little-Endian ist oder nicht (Big-Endian).
+ * Ob die Byte-Order der Maschine Little-Endian ist oder nicht (dann Big-Endian).
  *
  * @return bool
  */

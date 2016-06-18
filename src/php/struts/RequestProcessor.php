@@ -50,13 +50,13 @@ class RequestProcessor extends Object {
       $this->processCachedActionMessages($request, $response);
 
 
-      // Mapping für den Request ermitteln
+      // Mapping für den Request ermitteln: wird kein Mapping gefunden, generiert processMapping() einen 404-Fehler
       $mapping = $this->processMapping($request, $response);
       if (!$mapping)
          return;
 
 
-      // Methodenbeschränkungen des Mappings überprüfen
+      // Methodenbeschränkungen des Mappings prüfen: wird der Zugriff verweigert, generiert processMethod() einen 405-Fehler
       if (!$this->processMethod($request, $response, $mapping))
          return;
 
