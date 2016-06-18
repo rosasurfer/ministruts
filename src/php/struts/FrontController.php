@@ -40,7 +40,7 @@ final class FrontController extends Singleton {
       $controller = $cache->get(__CLASS__);
 
       if (!$controller) {
-         $configFile = str_replace('\\', '/', APPLICATION_ROOT.'/WEB-INF/struts-config.xml');
+         $configFile = str_replace('\\', '/', APPLICATION_ROOT.'/app/config/struts-config.xml');
 
          // Parsen der struts-config.xml synchronisieren
          $lock = new FileLock($configFile);
@@ -78,41 +78,13 @@ final class FrontController extends Singleton {
 
       // TODO: keine Fehlermeldung bei falschem $_SERVER['APPLICATION_PATH'] ( z.B. 'myapp/' statt '/myapp')
 
-      // Umgebung prüfen:  Ist der Zugriff auf WEB-INF und CVS-Daten gesperrt ?
-      // TODO: apache_lookup_uri() oder virtual() benutzen
-      $baseURL = Request ::me()->getApplicationURL();
-      $locations = array($baseURL.'/WEB-INF',
-                         $baseURL.'/WEB-INF/',
-                         $baseURL.'/WEB-INF/struts-config.xml',
-                         $baseURL.'/CVS',
-                         $baseURL.'/CVS/',
-                         );
-      /*
-      foreach ($locations as $location) {
-         $request  = HttpRequest ::create()->setUrl($location);
-         $response = CurlHttpClient ::create()
-                                    ->setTimeout(5)
-                                    ->send($request);
-         $status = $response->getStatus();
-
-         // TODO: HTTP-Authentication-Support einbauen
-         if ($status == 401) {
-            Logger ::log('Web server configuration check: authentication support not yet implemented for location: "'.$location.'"', L_NOTICE, __CLASS__);
-         }
-         elseif ($status != 403 && $status != 404) {
-            throw new InfrastructureException('Web server configuration error, resource at "'.$location.'" is not blocked: '.$status.' ('.HttpResponse ::$sc[$status].')');
-         }
-      }
-      */
-
-
       // Struts-Konfigurationsdateien suchen
       $appDirectory = str_replace('\\', '/', APPLICATION_ROOT);
-      if (!is_file($appDirectory.'/WEB-INF/struts-config.xml'))
+      if (!is_file($appDirectory.'/app/config/struts-config.xml'))
          throw new FileNotFoundException('Configuration file not found: "struts-config.xml"');
 
-      $files   = glob($appDirectory.'/WEB-INF/struts-config-*.xml', GLOB_ERR);
-      $files[] = $appDirectory.'/WEB-INF/struts-config.xml';
+      $files   = glob($appDirectory.'/app/config/struts-config-*.xml', GLOB_ERR);
+      $files[] = $appDirectory.'/app/config/struts-config.xml';
 
 
       // Für jede Datei ein Modul erzeugen und registrieren
@@ -147,7 +119,7 @@ final class FrontController extends Singleton {
       // Module selektieren
       $prefix = $controller->getModulePrefix($request);
       $module = $controller->modules[$prefix];
-      $request->setAttribute(Struts ::MODULE_KEY, $module);
+      $request->setAttribute(Struts::MODULE_KEY, $module);
 
       // RequestProcessor holen
       $processor = $controller->getRequestProcessor($module);
@@ -171,7 +143,8 @@ final class FrontController extends Singleton {
       if ($applicationPath && !strStartsWith($requestPath, $applicationPath))
          throw new plRuntimeException('Can not resolve module prefix from request path: '.$requestPath);
 
-      $prefix = subStr($requestPath, $len=strLen($applicationPath), strRPos($requestPath, '/')-$len);
+      $value  = strRightFrom($requestPath, $applicationPath);
+      $prefix = strLeftTo($value, '/', -1);
 
       while (!isSet($this->modules[$prefix])) {
          $lastSlash = strRPos($prefix, '/');
