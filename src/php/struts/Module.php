@@ -615,9 +615,18 @@ class Module extends Object {
     * @return ActionMapping - Mapping oder NULL, wenn kein Mapping gefunden wurde
     */
    public function findMapping($path) {
-      if (isSet($this->mappings[$path]))
-         return $this->mappings[$path];
+      // $path = "/"                                      oder
+      // $path = "/test/uploadAccountHistory.php/info"    oder
+      // $path = "/test/uploadAccountHistory.php/info/"
+      $segments = explode('/', $path);
+      array_shift($segments);
 
+      $test = '';
+      while ($segments) {
+         $test = $test.'/'.array_shift($segments);
+         if (isSet($this->mappings[$test]))
+            return $this->mappings[$test];
+      }
       return null;
    }
 
