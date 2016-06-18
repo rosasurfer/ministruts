@@ -72,7 +72,7 @@
 <!ELEMENT global-forwards (forward*)>
 
 
-<!-- The "forward" element describes an ActionForward.  An ActionForward has a logical name and describes an URI, a file 
+<!-- The "forward" element describes an ActionForward. An ActionForward has a logical name and describes an URI, a file 
      or a tiles definition. A "forward" element may be used for both global and local forward definitions. Global
      forwards are available to all actions of the module. Local forwards are nested within a <mapping> element and are 
      available only to the action invoked through that ActionMapping.
