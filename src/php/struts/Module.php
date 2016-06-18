@@ -23,7 +23,7 @@ class Module extends Object {
 
 
    /**
-    * alle Basisverzeichnisse für von diesem Modul einzubindende Resourcen
+    * Basisverzeichnisse für von diesem Modul einzubindende Resourcen
     */
    protected /*string[]*/ $resourceDirectories = array();
 
@@ -132,10 +132,8 @@ class Module extends Object {
       try { chDir($packageDir); }
       catch (Exception $ex) { throw new plRuntimeException('Could not change working directory to "'.$packageDir.'"', $ex); }
 
-      // Konfiguration parsen, validieren und Dateinamen hinterlegen
+      // Konfiguration parsen und validieren
       $xml = new SimpleXMLElement($content, LIBXML_DTDVALID);
-      $xml['config-file'] = $fileName;
-
 
       // zurück ins Ausgangsverzeichnis wechseln
       try { chDir($currentDir); }
@@ -179,21 +177,18 @@ class Module extends Object {
    protected function setResourceBase(SimpleXMLElement $xml) {
       if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
-      $xmlDirectory = dirName((string) $xml['config-file']);
-
-      if (!$xml['doc-base']) {
-         if (!is_dir($xmlDirectory)) throw new FileNotFoundException('Directory not found: "'.$xmlDirectory.'"');
-         $this->resourceDirectories[] = $xmlDirectory;
+      if (!$xml['view-base']) {
+         $this->resourceDirectories[] = APPLICATION_ROOT.'/app/view';
          return;
       }
 
-      $directories = explode(',', (string) $xml['doc-base']);
+      $directories = explode(',', (string) $xml['view-base']);
 
       foreach ($directories as $directory) {
          $dir = str_replace('\\', '/', trim($directory));
 
          if ($dir{0} == '/') $dir = realPath($dir);
-         else                $dir = realPath($xmlDirectory.'/'.$dir);
+         else                $dir = realPath(APPLICATION_ROOT.'/'.$dir);
 
          if (!is_dir($dir)) throw new FileNotFoundException('Directory not found: "'.$directory.'"');
          $this->resourceDirectories[] = $dir;
@@ -923,7 +918,6 @@ class Module extends Object {
             return $name;
          }
       }
-
       return null;
    }
 }
