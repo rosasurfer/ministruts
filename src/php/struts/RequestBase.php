@@ -40,7 +40,7 @@ abstract class RequestBase extends Singleton {
 
 
    private /*string*/ $method;
-   private /*string*/ $hostURL;
+   private /*string*/ $hostUrl;
    private /*string*/ $path;
 
 
@@ -276,15 +276,15 @@ abstract class RequestBase extends Singleton {
     * "https://www.domain.tld:433"
     * </pre>
     */
-   public function getHostURL() {
-      if ($this->hostURL === null) {
+   public function getHostUrl() {
+      if ($this->hostUrl === null) {
          $protocol = isSet($_SERVER['HTTPS']) ? 'https' : 'http';
          $host     = $this->getHostname();
          $port     = $_SERVER['SERVER_PORT']=='80' ? '' : ':'.$_SERVER['SERVER_PORT'];
 
-         $this->hostURL = "$protocol://$host$port";
+         $this->hostUrl = "$protocol://$host$port";
       }
-      return $this->hostURL;
+      return $this->hostUrl;
    }
 
 
@@ -298,8 +298,8 @@ abstract class RequestBase extends Singleton {
     * "https://www.domain.tld:433/myapplication/foo/bar.php/info?key=value"
     * </pre>
     */
-   public function getURL() {
-      return $this->getHostURL().$this->getURI();
+   public function getUrl() {
+      return $this->getHostUrl().$this->getUri();
    }
 
 
@@ -314,7 +314,7 @@ abstract class RequestBase extends Singleton {
     * "/application/foo/bar.php/info?key=value"
     * </pre>
     */
-   public function getURI() {
+   public function getUri() {
       return $_SERVER['REQUEST_URI'];
    }
 
@@ -331,7 +331,7 @@ abstract class RequestBase extends Singleton {
     */
    public function getPath() {
       if ($this->path === null) {
-         $value = $this->getURI();
+         $value = $this->getUri();
 
          $value = strLeftTo($value, '?');
          $value = strLeftTo($value, '#');
@@ -354,9 +354,9 @@ abstract class RequestBase extends Singleton {
     * "https://www.domain.tld:433/application"
     * </pre>
     */
-   public function getApplicationURL() {
-      // TODO: ApplicationURL ist Eigenschaft der Anwendung, nicht des Requests -> auslagern
-      return $this->getHostURL().$this->getApplicationBaseUri();
+   public function getApplicationUrl() {
+      // TODO: ApplicationUrl ist Eigenschaft der Anwendung, nicht des Requests -> auslagern
+      return $this->getHostUrl().$this->getApplicationBaseUri();
    }
 
 
@@ -368,11 +368,11 @@ abstract class RequestBase extends Singleton {
     * @example
     * <pre>
     * $request->getUrl():                    "http://a.domain.tld/path/application/module/foo/bar.php/info?key=value"
-    * $request->getApplicationRelativeURI(): "/module/foo/bar.php/info?key=value"
+    * $request->getApplicationRelativeUri(): "/module/foo/bar.php/info?key=value"
     * </pre>
     */
-   public function getApplicationRelativeURI() {
-      return strRightFrom($this->getURI(), $this->getApplicationBaseUri());
+   public function getApplicationRelativeUri() {
+      return strRightFrom($this->getUri(), $this->getApplicationBaseUri());
    }
 
 
