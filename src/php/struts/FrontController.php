@@ -79,8 +79,6 @@ final class FrontController extends Singleton {
       self::$logInfo   = ($loglevel <= L_INFO  );
       self::$logNotice = ($loglevel <= L_NOTICE);
 
-      // TODO: keine Fehlermeldung bei falschem $_SERVER['APPLICATION_PATH'] ( z.B. 'myapp/' statt '/myapp')
-
       // Struts-Konfigurationsdateien suchen
       $appDirectory = str_replace('\\', '/', APPLICATION_ROOT);
       if (!is_file($appDirectory.'/app/config/struts-config.xml'))
@@ -140,13 +138,13 @@ final class FrontController extends Singleton {
     * @return string - Modulprefix
     */
    private function getModulePrefix(Request $request) {
-      $requestPath     = $request->getPath();
-      $applicationPath = $request->getApplicationPath();
+      $requestPath = $request->getPath();
+      $baseUri     = $request->getApplicationBaseUri();
 
-      if ($applicationPath && !strStartsWith($requestPath, $applicationPath))
+      if ($baseUri && !strStartsWith($requestPath, $baseUri))
          throw new plRuntimeException('Can not resolve module prefix from request path: '.$requestPath);
 
-      $value  = strRightFrom($requestPath, $applicationPath);
+      $value  = strRightFrom($requestPath, $baseUri);
       $prefix = strLeftTo($value, '/', -1);
 
       while (!isSet($this->modules[$prefix])) {

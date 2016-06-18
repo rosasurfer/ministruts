@@ -285,13 +285,13 @@ abstract class RequestBase extends Singleton {
    /**
     * Gibt die Wurzel-URL der Anwendung zurück. Dieser Wert endet NICHT mit einem Slash "/".
     *
-    * z.B.: https://www.domain.tld:433/myapplication   (Protokoll + Hostname + Port + Anwendungspfad)
+    * z.B.: "https://www.domain.tld:433/myapplication"   (Protokoll + Hostname + Port + Anwendungspfad)
     *
     * @return string
     */
    public function getApplicationURL() {
       // TODO: ApplicationURL ist Eigenschaft der Anwendung, nicht des Requests -> auslagern
-      return $this->getHostURL().$this->getApplicationPath();
+      return $this->getHostURL().$this->getApplicationBaseUri();
    }
 
 
@@ -321,16 +321,16 @@ abstract class RequestBase extends Singleton {
 
 
    /**
-    * Gibt die URL des Requests relativ zur Base-URL der Anwendung zurück. Der Wert beginnt mit einem Slash "/".
+    * Gibt die URI des Requests relativ zur Base-URL der Anwendung zurück. Der Wert beginnt mit einem Slash "/".
     *
-    * z.B.: URL:              "http://a.domain.tld/path/application/module/foo/bar.php/info?key=value"   
+    * z.B.: URL:              "http://a.domain.tld/path/application/module/foo/bar.php/info?key=value"
     *       getRelativeURI(): "/module/foo/bar.php/info?key=value"   (Modulname + Pfadname + Pfadinfo + Querystring)
     *
     * @return string
     */
    public function getRelativeURI() {
       // TODO: gibt absoluten Link auf falsches Verzeichnis zurück
-      return strRightFrom($this->getURI(), $this->getApplicationPath());
+      return strRightFrom($this->getURI(), $this->getApplicationBaseUri());
    }
 
 
@@ -365,27 +365,24 @@ abstract class RequestBase extends Singleton {
     * @return string
     */
    public function getRelativePath() {
-      return strRightFrom($this->getPath(), $this->getApplicationPath());
+      return strRightFrom($this->getPath(), $this->getApplicationBaseUri());
    }
 
 
    /**
-    * Gibt den Pfadbestandteil der Base-URL der Anwendung zurück. Liegt die Anwendung im Wurzel-
-    * verzeichnis des Webservers, ist dieser Wert ein Leerstring "". Anderenfalls beginnt dieser Wert
-    * mit einem Slash "/".
+    * Gibt die Base-URI der Anwendung zurück. Liegt die Anwendung im Wurzelverzeichnis des Webservers, ist dieser Wert
+    * ein Leerstring "". Anderenfalls beginnt dieser Wert mit einem Slash "/".
     *
-    * z.B.: /myapplication   (Pfad ohne Pfadinfo und ohne Querystring)
+    * z.B.: "/myapplication"   (Pfad ohne Pfadinfo und Querystring)
     *
     * @return string
     */
-   public function getApplicationPath() {
-      // TODO: ApplicationPath ist Eigenschaft der Anwendung, nicht des Requests -> auslagern
+   public function getApplicationBaseUri() {
+      // TODO: ApplicationBaseUri ist Eigenschaft der Anwendung, nicht des Requests -> auslagern
       static $path = null;
 
-      if ($path === null && isSet($_SERVER['APPLICATION_PATH'])) {
-         $path = $_SERVER['APPLICATION_PATH'];
-
-         // syntaktisch zwar nicht korrekt, doch wir wissen, was mit "/" gemeint ist
+      if ($path === null && isSet($_SERVER['APPLICATION_BASE_URI'])) {
+         $path = $_SERVER['APPLICATION_BASE_URI'];
          if (strEndsWith($path, '/'))
             $path = strLeft($path, -1);
       }
@@ -395,14 +392,14 @@ abstract class RequestBase extends Singleton {
 
 
    /**
-    * Alias für RequestBase::getApplicationPath() (für die Java-Abteilung :-)
+    * Alias für RequestBase::getApplicationBaseUri() für die Java-Abteilung :-)
     *
     * @return string
     *
-    * @see RequestBase::getApplicationPath()
+    * @see RequestBase::getApplicationBaseUri()
     */
    public function getContextPath() {
-      return $this->getApplicationPath();
+      return $this->getApplicationBaseUri();
    }
 
 
@@ -808,7 +805,7 @@ abstract class RequestBase extends Singleton {
       $value = (string)$value;
 
       if ($path === null)
-         $path = $this->getApplicationPath().'/';
+         $path = $this->getApplicationBaseUri().'/';
 
       if (!is_string($path)) throw new IllegalTypeException('Illegal type of parameter $path: '.getType($path));
 

@@ -185,11 +185,11 @@ class RequestProcessor extends Object {
     */
    protected function processMapping(Request $request, Response $response) {
       // Pfad für die Mappingauswahl ermitteln ...
-      $requestPath     = $request->getPath();
-      $applicationPath = $request->getApplicationPath();
-      $modulePrefix    = $this->module->getPrefix();
+      $requestPath  = $request->getPath();
+      $baseUri      = $request->getApplicationBaseUri();
+      $modulePrefix = $this->module->getPrefix();
 
-      $path = strRightFrom($requestPath, $applicationPath.$modulePrefix);
+      $path = strRightFrom($requestPath, $baseUri.$modulePrefix);
       $path = String ::decodeUtf8($path);
 
       if ($path == '/')
@@ -475,9 +475,9 @@ EOT_405;
       if ($forward->isRedirect()) {
          $this->cacheActionMessages($request);
 
-         $applicationPath = $request->getApplicationPath();
+         $baseUri = $request->getApplicationBaseUri();
          // TODO: prüfen, ob der Pfad absolut oder relativ ist
-         $url = $applicationPath.$this->module->getPrefix().$forward->getPath();
+         $url = $baseUri.$this->module->getPrefix().$forward->getPath();
 
          // TODO: QueryString kodieren
          HeaderUtils ::redirect($url);
