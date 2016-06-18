@@ -418,18 +418,6 @@ abstract class RequestBase extends Singleton {
 
 
    /**
-    * Alias für RequestBase::getApplicationBaseUri() für die Java-Abteilung :-)
-    *
-    * @return string
-    *
-    * @see RequestBase::getApplicationBaseUri()
-    */
-   public function getContextPath() {
-      return $this->getApplicationBaseUri();
-   }
-
-
-   /**
     * Gibt den Querystring der URL des Requests zurück.
     *
     * z.B.: key1=value1&key2=value2
