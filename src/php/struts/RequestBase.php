@@ -253,9 +253,12 @@ abstract class RequestBase extends Singleton {
     * Gibt den vollen Hostnamen des Servers zurück, über den der Request läuft.  Dieser Wert enthält
     * eventuelle Subdomains.
     *
-    * z.B.: www.domain.tld
+    * @return string - Hostname
     *
-    * @return string
+    * @example
+    * <pre>
+    * "www.domain.tld"
+    * </pre>
     */
    public function getHostname() {
       return $_SERVER['SERVER_NAME'];
@@ -266,9 +269,12 @@ abstract class RequestBase extends Singleton {
     * Gibt die Wurzel-URL des Webservers zurück, über den der Request läuft. Dieser Wert endet NICHT
     * mit einem Slash "/".
     *
-    * z.B.: https://www.domain.tld:433   (Protokoll + Hostname + Port)
+    * @return string - Host-URL (Protokoll + Hostname + Port)
     *
-    * @return string
+    * @example
+    * <pre>
+    * "https://www.domain.tld:433"
+    * </pre>
     */
    public function getHostURL() {
       if ($this->hostURL === null) {
@@ -283,24 +289,14 @@ abstract class RequestBase extends Singleton {
 
 
    /**
-    * Gibt die Wurzel-URL der Anwendung zurück. Dieser Wert endet NICHT mit einem Slash "/".
-    *
-    * z.B.: "https://www.domain.tld:433/myapplication"   (Protokoll + Hostname + Port + Anwendungspfad)
-    *
-    * @return string
-    */
-   public function getApplicationURL() {
-      // TODO: ApplicationURL ist Eigenschaft der Anwendung, nicht des Requests -> auslagern
-      return $this->getHostURL().$this->getApplicationBaseUri();
-   }
-
-
-   /**
     * Gibt die vollständige URL des Requests zurück.
     *
-    * z.B.: https://www.domain.tld:433/myapplication/foo/bar.php/info?key=value
+    * @return string - vollständige URL (Protokoll + Hostname + Port + PPfad + Pfadinfo + Querystring)
     *
-    * @return string
+    * @example
+    * <pre>
+    * "https://www.domain.tld:433/myapplication/foo/bar.php/info?key=value"
+    * </pre>
     */
    public function getURL() {
       return $this->getHostURL().$this->getURI();
@@ -311,9 +307,12 @@ abstract class RequestBase extends Singleton {
     * Gibt den Teil der URL des Requests zurück, wie er in der ersten Zeile des HTTP-Protokolls
     * erscheint, relativ zum Wurzelverzeichnis des Webservers. Dieser Wert beginnt mit einem Slash "/".
     *
-    * z.B.: /myapplication/foo/bar.php/info?key=value   (Pfadname + Pfadinfo + Querystring)
+    * @return string - URI (Pfad + Pfadinfo + Querystring)
     *
-    * @return string
+    * @example
+    * <pre>
+    * "/application/foo/bar.php/info?key=value"
+    * </pre>
     */
    public function getURI() {
       return $_SERVER['REQUEST_URI'];
@@ -321,25 +320,14 @@ abstract class RequestBase extends Singleton {
 
 
    /**
-    * Gibt die URI des Requests relativ zur Base-URL der Anwendung zurück. Der Wert beginnt mit einem Slash "/".
-    *
-    * z.B.: URL:              "http://a.domain.tld/path/application/module/foo/bar.php/info?key=value"
-    *       getRelativeURI(): "/module/foo/bar.php/info?key=value"   (Modulname + Pfadname + Pfadinfo + Querystring)
-    *
-    * @return string
-    */
-   public function getRelativeURI() {
-      // TODO: gibt absoluten Link auf falsches Verzeichnis zurück
-      return strRightFrom($this->getURI(), $this->getApplicationBaseUri());
-   }
-
-
-   /**
     * Gibt den Pfadbestandteil der URI des Requests zurück. Der Wert beginnt mit einem Slash "/".
     *
-    * z.B.: "/application/module/foo/bar.php/info"   (Pfad inkl. Pfadinfo, ohne Querystring)
+    * @return string - Pfad + Pfadinfo, ohne Querystring
     *
-    * @return string
+    * @example
+    * <pre>
+    * "/application/module/foo/bar.php/info"
+    * </pre>
     */
    public function getPath() {
       if ($this->path === null) {
@@ -357,32 +345,70 @@ abstract class RequestBase extends Singleton {
 
 
    /**
-    * Gibt den Pfadbestandteil der URL des Requests relativ zur Base-URL der Anwendung zurück.
+    * Gibt die URL der Anwendung zurück. Dieser Wert endet nicht mit einem Slash "/".
+    *
+    * @return string - URL (Protokoll + Hostname + Port + Anwendungs-BaseUri)
+    *
+    * @example
+    * <pre>
+    * "https://www.domain.tld:433/application"
+    * </pre>
+    */
+   public function getApplicationURL() {
+      // TODO: ApplicationURL ist Eigenschaft der Anwendung, nicht des Requests -> auslagern
+      return $this->getHostURL().$this->getApplicationBaseUri();
+   }
+
+
+   /**
+    * Gibt die URI des Requests relativ zur Base-URL der Anwendung zurück. Der Wert beginnt mit einem Slash "/".
+    *
+    * @return string - URI (Modulname + Pfad + Pfadinfo + Querystring)
+    *
+    * @example
+    * <pre>
+    * $request->getUrl():                    "http://a.domain.tld/path/application/module/foo/bar.php/info?key=value"
+    * $request->getApplicationRelativeURI(): "/module/foo/bar.php/info?key=value"
+    * </pre>
+    */
+   public function getApplicationRelativeURI() {
+      return strRightFrom($this->getURI(), $this->getApplicationBaseUri());
+   }
+
+
+   /**
+    * Gibt den Pfadbestandteil der URI des Requests relativ zur Base-URL der Anwendung zurück.
     * Der Wert beginnt mit einem Slash "/".
     *
-    * z.B.: /module/foo/bar.php   (Pfad ohne Pfadinfo und ohne Querystring)
+    * @return string - Pfad (Module + Pfad + Pfadinfo) ohne Querystring
     *
-    * @return string
+    * @example
+    * <pre>
+    * "/module/foo/bar.php/info"
+    * </pre>
     */
-   public function getRelativePath() {
+   public function getApplicationRelativePath() {
       return strRightFrom($this->getPath(), $this->getApplicationBaseUri());
    }
 
 
    /**
     * Gibt die Base-URI der Anwendung zurück. Liegt die Anwendung im Wurzelverzeichnis des Webservers, ist dieser Wert
-    * ein Leerstring "". Anderenfalls beginnt dieser Wert mit einem Slash "/".
+    * ein Leerstring "". Anderenfalls beginnt der Wert mit einem Slash "/".
     *
-    * z.B.: "/myapplication"   (Pfad ohne Pfadinfo und Querystring)
+    * @return string - URI (Pfad ohne Pfadinfo und Querystring)
     *
-    * @return string
+    * @example
+    * <pre>
+    * "/application"
+    * </pre>
     */
    public function getApplicationBaseUri() {
       // TODO: ApplicationBaseUri ist Eigenschaft der Anwendung, nicht des Requests -> auslagern
       static $path = null;
 
       if ($path === null && isSet($_SERVER['APPLICATION_BASE_URI'])) {
-         $path = $_SERVER['APPLICATION_BASE_URI'];
+         $path = $_SERVER['APPLICATION_BASE_URI'];          // Validierung durch Fehler, falls nicht gesetzt: ok
          if (strEndsWith($path, '/'))
             $path = strLeft($path, -1);
       }
