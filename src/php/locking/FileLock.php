@@ -37,6 +37,10 @@ final class FileLock extends BaseLock {
 
       // TODO: Ein das Lock haltender Prozeß kann die Datei bis zum Aufruf von fLock() wieder gelöscht haben.
 
+      // TODO: 2016-06-17: Win7/NTFS: Auf einer gesperrten Datei (Handle 1 ) funktionieren die Dateifunktionen
+      //       mit einem anderen Handle (2) nicht mehr (unter Linux schon). Mit dem zum Sperren verwendeten Handle
+      //       funktionieren sie.
+
       if (!is_string($filename))           throw new IllegalTypeException('Illegal type of parameter $filename: '.getType($filename));
       if (!is_bool($shared))               throw new IllegalTypeException('Illegal type of parameter $shared: '.getType($shared));
 

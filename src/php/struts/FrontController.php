@@ -42,9 +42,12 @@ final class FrontController extends Singleton {
       if (!$controller) {
          $configFile = str_replace('\\', '/', APPLICATION_ROOT.'/app/config/struts-config.xml');
 
-         // Parsen der struts-config.xml synchronisieren
-         $lock = new FileLock($configFile);
+         // TODO: Win7/NTFS: Auf einer gesperrten Datei (Handle 1 ) funktionieren fread/file_get_contents im selben Prozeß
+         //       mit einem zweiten Handle (2) nicht mehr (keine Fehlermeldung, unter Linux funktioniert es). Mit dem zum
+         //       Sperren verwendeten Handle funktionieren die Funktionen.
 
+         // Parsen der struts-config.xml synchronisieren
+         //$lock = new FileLock($configFile);
             $controller = $cache->get(__CLASS__);
             if (!$controller) {
 
@@ -59,7 +62,7 @@ final class FrontController extends Singleton {
                $cache->set(__CLASS__, $controller, Cache ::EXPIRES_NEVER, $dependency);
             }
 
-         $lock->release();
+         //$lock->release();
       }
       return $controller;
    }
