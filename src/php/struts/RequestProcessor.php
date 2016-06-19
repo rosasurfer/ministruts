@@ -252,8 +252,7 @@ EOT_404;
          return true;
 
       // Beschränkung nicht erfüllt
-      self::$logDebug && Logger ::log('HTTP method "'.$request->getMethod().'" is not supported by ActionMapping, denying access', L_DEBUG, __CLASS__);
-
+      self::$logDebug && Logger::log('HTTP method "'.$request->getMethod().'" is not supported by ActionMapping, denying access', L_DEBUG, __CLASS__);
 
       // TODO: Status-Code 405 im HttpResponse setzen
 
@@ -273,7 +272,7 @@ EOT_404;
 </head>
 <body>
 <h1>Method Not Allowed</h1>
-<p>The specified HTTP method is not allowed for the URL $requestPath</p>
+<p>The used HTTP method is not allowed for the URL $requestPath</p>
 <hr>
 </body>
 </html>
