@@ -54,7 +54,7 @@ class ActionForward extends Object {
     * @param  string $path     - Pfad der Instanz
     * @param  bool   $redirect - Redirect-Flag für diese Instanz
     */
-   public function __construct($name, $path, $redirect = false) {
+   public function __construct($name, $path, $redirect=false) {
       $this->setName($name)
            ->setPath($path)
            ->setRedirect($redirect);
