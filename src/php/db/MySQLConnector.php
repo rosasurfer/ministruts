@@ -51,9 +51,10 @@ final class MySQLConnector extends DB {
             if (strLen($value)) {
                if (strCompareI($option, 'charset')) {
                   if (!mysql_set_charset($value, $this->link)) throw new InfrastructureException(mysql_error($this->link));
+                  // synonymous with the sql statement "set character set {$value}"
                }
                else {
-                  if (!cType_digit($value))
+                  if (!is_numeric($value))
                      $value = "'$value'";
                   $sql = "set $option = $value";
                   if (!$this->queryRaw($sql)) throw new InfrastructureException(mysql_error($this->link));
