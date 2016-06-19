@@ -49,10 +49,15 @@ final class MySQLConnector extends DB {
       try {
          foreach ($this->options as $option => $value) {
             if (strLen($value)) {
-               if (!cType_digit($value))
-                  $value = "'$value'";
-               $sql = "set $option = $value";
-               if (!$this->queryRaw($sql)) throw new InfrastructureException(mysql_error($this->link));
+               if (strCompareI($option, 'charset')) {
+                  if (!mysql_set_charset($value, $this->link)) throw new InfrastructureException(mysql_error($this->link));
+               }
+               else {
+                  if (!cType_digit($value))
+                     $value = "'$value'";
+                  $sql = "set $option = $value";
+                  if (!$this->queryRaw($sql)) throw new InfrastructureException(mysql_error($this->link));
+               }
             }
          }
       }
