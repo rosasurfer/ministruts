@@ -8,7 +8,7 @@ interface IDaoConnected {
 
 
    /**
-    * Gibt den DAO für die Instanz zurück.
+    * Return the DAO of this class.
     *
     * @return CommonDAO
     */
