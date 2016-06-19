@@ -56,8 +56,7 @@ abstract class Action extends Object {
     * Führt die Action aus und gibt einen ActionForward zurück, der beschreibt, zu welcher Resource
     * verzweigt werden soll. Muß implementiert werden.
     *
-    * Note: Zur Vereinfachung kann statt einer Instanz auch der Name eines ActionForward aus der
-    *       struts-config.xml zurückgeben werden.
+    * NOTE: Statt einer Instanz kann auch der Name eines ActionForward aus der "struts-config.xml" zurückgeben werden.
     *
     * @param  Request  $request
     * @param  Response $response
