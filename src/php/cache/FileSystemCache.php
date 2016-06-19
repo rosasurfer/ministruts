@@ -30,10 +30,10 @@ final class FileSystemCache extends CachePeer {
       if (isSet($options['directory'])) $directory = $options['directory'];
       else                              $directory = 'etc/cache/'.$label;     // Defaultverzeichnis
 
-      // relativen Pfad als relativ zum WEB-INF-Verzeichnis interpretieren
+      // relativen Pfad als relativ zu APPLICATION_ROOT interpretieren
       $directory = str_replace('\\', '/', $directory);
       if ($directory{0}!='/' && (!WINDOWS || !preg_match('/^[a-z]:/i', $directory)))
-         $directory = str_replace('\\', '/', APPLICATION_ROOT).'/WEB-INF/'.$directory;
+         $directory = str_replace('\\', '/', APPLICATION_ROOT).'/'.$directory;
 
       // ggf. Cache-Verzeichnis erzeugen
       mkDirWritable($directory, 0755);

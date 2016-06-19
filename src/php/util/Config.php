@@ -8,8 +8,8 @@
  *
  * Webanwendungen:
  * ---------------
- *    - "config-custom.properties" im WEB-INF-Verzeichnis der Anwendung
- *    - "config.properties"        im WEB-INF-Verzeichnis der Anwendung
+ *    - "config-custom.properties" im Config-Verzeichnis der Anwendung: APPLICATION_ROOT.'/app/config/'
+ *    - "config.properties"        im Config-Verzeichnis der Anwendung: APPLICATION_ROOT.'/app/config/'
  *
  *    Für jeden einzelnen Pfad des Include-Pfades:
  *    - "config-custom.properties"
@@ -126,7 +126,7 @@ final class Config extends Object {
     */
    private function __construct() {
       // Suchpfad je nach Web- oder Konsolenanwendung definieren
-      if (isSet($_SERVER['REQUEST_METHOD'])) $path = APPLICATION_ROOT.DIRECTORY_SEPARATOR.'WEB-INF';                 // web:     WEB-INF-Verzeichnis
+      if (isSet($_SERVER['REQUEST_METHOD'])) $path = APPLICATION_ROOT.'/app/config';                                 // web
       else                                   $path = getCwd().PATH_SEPARATOR.dirName($_SERVER['SCRIPT_FILENAME']);   // console: aktuelles + Scriptverzeichnis
 
       // Include-Pfad anhängen und Suchpfad zerlegen
