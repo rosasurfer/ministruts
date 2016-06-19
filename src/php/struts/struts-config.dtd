@@ -127,8 +127,8 @@
 
      form       Class name of the [ActionForm] subclass, if any, that is associated with the mapping.
 
-     scope      The context ("request" or "session") that is used to store and access the ActionForm, if any.  Optional 
-                if "form" is specified, else not valid.
+     scope      The context ("request" or "session") that is used to store and access the ActionForm, if any. Optional 
+                if the "form" attribute is specified, else not valid.
                 [default: "request"]
 
      validate   Valid only if the "form" attribute is specified. Set to "true" if the ActionForm should be validated 
@@ -136,8 +136,8 @@
                 default behaviour is "false" when an action object or a forward (include, redirect, forward) is 
                 specified, and "true" when no action object and no forward are configured. This means if an action is 
                 configured, per default the action is responsible for input validation. If no action and no forward are 
-                configured, per default the framework validates user input. You must configure two nested action 
-                forwards named "success" and "error" for this to work.
+                configured, per default the framework validates user input. For this to work you must configure two 
+                nested action forwards named "success" and "error".
 
      methods    Comma-delimited list of HTTP method names ("get", "post") the ActionMapping is supporting.
                 [default: "get"]
