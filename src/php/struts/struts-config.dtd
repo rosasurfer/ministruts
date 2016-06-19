@@ -145,7 +145,7 @@
      roles      Comma-delimited list of required roles to access the action mapping.
                 [default: "none"]
 
-     default    Set to "true" if the mapping should be configured as the default action mapping for the module.  If a 
+     default    Set to "true" if the mapping should be configured as the default action mapping for the module. If a 
                 request does not match any other mapping, it will be passed to the action mapping with default set to 
                 "true". Only one action mapping can be marked as "default" within a module.
                 [default: "false"]
