@@ -100,8 +100,11 @@ class HttpSession extends Singleton {
          session_regenerate_id(true);
       }
 
+      // empty the session
+      $this->removeAttributes(array_keys($_SESSION));
+
       // initialize the session
-      // TODO: $request->getHeader() einbauen
+      $request = $this->request;                                              // TODO: $request->getHeader() einbauen
       $_SESSION['__SESSION_CREATED__'  ] = microTime(true);
       $_SESSION['__SESSION_IP__'       ] = $request->getRemoteAddress();      // TODO: forwarded remote IP einbauen
       $_SESSION['__SESSION_USERAGENT__'] = $request->getHeaderValue('User-Agent');
@@ -184,11 +187,22 @@ class HttpSession extends Singleton {
     * unter einem Schlüssel kein Wert, macht die Methode gar nichts. Es können mehrere Schlüssel
     * angegeben werden.
     *
-    * @param  string $key - Schlüssel, unter dem der Wert gespeichert ist
+    * @param  string|array $key - session key of the value to remove
+    * @param  ...               - variable length list of more session keys
     */
-   public function removeAttributes($key /*, $key2, $key3 ...*/) {
-      foreach (func_get_args() as $key)
-         unset($_SESSION[$key]);
+   public function removeAttributes($key /*...*/) {
+      foreach (func_get_args() as $i => $key) {
+         if (is_array($key)) {
+            foreach ($key as $n => $arrayKey) {
+               if (!is_string($arrayKey)) throw new IllegalTypeException('Illegal type of parameter '.$i.'['.$n.']: '.getType($arrayKey));
+               unset($_SESSION[$arrayKey]);
+            }
+         }
+         else {
+            if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter '.$i.': '.getType($key));
+            unset($_SESSION[$key]);
+         }
+      }
    }
 
 
@@ -202,23 +216,4 @@ class HttpSession extends Singleton {
    public function isAttribute($key) {
       return isSet($_SESSION[$key]);
    }
-
-
-   /**
-    * Entfernt alle gespeicherten Informationen aus der aktuellen Session.
-    *
-    * @return bool - TRUE, wenn alle gespeicherten Informationen gelöscht wurden
-    *                FALSE, wenn keine Session existiert
-   function clear() {
-      if (isSession()) {
-         $keys = array_keys($_SESSION);
-         foreach ($keys as $key) {
-            if (!strStartsWith($key, '__SESSION_'))
-               unSet($_SESSION[$key]);
-         }
-         return true;
-      }
-      return false;
-   }
-    */
 }
