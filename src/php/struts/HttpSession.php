@@ -79,20 +79,34 @@ class HttpSession extends Singleton {
          elseif (isSet($_REQUEST[$sessionName]) && $_REQUEST[$sessionName] == $sessionId) $fromUser = true; // ID kommt aus GET/POST
          else                                                                             $fromUser = false;
 
-         if ($fromUser)
-            session_regenerate_id(true);     // neue ID generieren und alte Datei löschen
-
-         // Marker setzen, ab jetzt ist sizeOf($_SESSION) immer > 0
-         // TODO: $request->getHeader() einbauen
-         $_SESSION['__SESSION_CREATED__'  ] = microTime(true);
-         $_SESSION['__SESSION_IP__'       ] = $request->getRemoteAddress();      // TODO: forwarded remote IP einbauen
-         $_SESSION['__SESSION_USERAGENT__'] = $request->getHeaderValue('User-Agent');
-
-         $this->new = true;
+         $this->reset($fromUser);            // if $fromUser=TRUE: generate new session id
       }
       else {                                 // vorhandene Session fortgesetzt
          $this->new = false;
       }
+   }
+
+
+   /**
+    * Reset this session to a clean and new state.
+    *
+    * @param  bool $regenerateId - whether or not to generate a new session id and to delete an old session file
+    */
+   public function reset($regenerateId) {
+      if (!is_bool($regenerateId)) throw new IllegalTypeException('Illegal type of parameter $regenerateId: '.getType($regenerateId));
+
+      if ($regenerateId) {
+         // assign new id, delete old file
+         session_regenerate_id(true);
+      }
+
+      // initialize the session
+      // TODO: $request->getHeader() einbauen
+      $_SESSION['__SESSION_CREATED__'  ] = microTime(true);
+      $_SESSION['__SESSION_IP__'       ] = $request->getRemoteAddress();      // TODO: forwarded remote IP einbauen
+      $_SESSION['__SESSION_USERAGENT__'] = $request->getHeaderValue('User-Agent');
+
+      $this->new = true;
    }
 
 
