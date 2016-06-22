@@ -1,3 +1,8 @@
+2016-06-22
+
+   - set default value for HttpClient::followRedirects to TRUE
+
+
 2016-05-24
 
    - bisherige MiniStruts-Version ohne Namespace-Support in Branch "B_NO_NAMESPACES" ausgelagert
