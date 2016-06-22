@@ -37,7 +37,6 @@ class RequestProcessor extends Object {
     * @param  Response $response
     */
    final public function process(Request $request, Response $response) {
-
       // ggf. Session starten oder fortsetzen
       $this->processSession($request, $response);
 
@@ -191,9 +190,6 @@ class RequestProcessor extends Object {
 
       $path = strRightFrom($requestPath, $baseUri.$modulePrefix);
       $path = String ::decodeUtf8($path);
-
-      if ($path == '/')
-         $path = '/index.php';
 
       // TODO: URL case-insensitive verarbeiten
 
