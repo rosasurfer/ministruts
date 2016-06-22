@@ -7,8 +7,8 @@ abstract class HttpClient extends Object {
 
    // Default-Einstellungen
    protected /*int   */ $timeout         = 30;
-   protected /*bool  */ $followRedirects = false;
-   protected /*int   */ $maxRedirects    = 10;
+   protected /*bool  */ $followRedirects = true;
+   protected /*int   */ $maxRedirects    = 5;
    protected /*string*/ $userAgent       = 'Mozilla/5.0';
 
 
