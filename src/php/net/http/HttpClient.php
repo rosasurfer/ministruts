@@ -45,7 +45,7 @@ abstract class HttpClient extends Object {
     *
     * @return HttpClient
     */
-   public function followRedirects($follow) {
+   public function setFollowRedirects($follow) {
       if (!is_bool($follow)) throw new IllegalTypeException('Illegal type of parameter $follow: '.getType($follow));
 
       $this->followRedirects = $follow;
@@ -58,8 +58,8 @@ abstract class HttpClient extends Object {
     *
     * @return bool
     */
-   public function followsRedirects() {
-      return $this->followRedirects;
+   public function isFollowRedirects() {
+      return (bool) $this->followRedirects;
    }
 
 

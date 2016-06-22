@@ -165,13 +165,13 @@ final class CurlHttpClient extends HttpClient {
 
       // CURLOPT_FOLLOWLOCATION funktioniert nur bei deaktiviertem "open_basedir"-Setting
       if (!ini_get('open_basedir')) {
-         if ($this->followRedirects) {
+         if ($this->isFollowRedirects()) {
             $options[CURLOPT_FOLLOWLOCATION] = true;
          }
          else if (isSet($options[CURLOPT_FOLLOWLOCATION]) && $options[CURLOPT_FOLLOWLOCATION]) {
-            $this->followRedirects(true);
+            $this->setFollowRedirects(true);
          }
-         if ($this->followRedirects) {
+         if ($this->isFollowRedirects()) {
             !isSet($options[CURLOPT_MAXREDIRS]) && $options[CURLOPT_MAXREDIRS]=$this->maxRedirects;
          }
       }
@@ -188,7 +188,7 @@ final class CurlHttpClient extends HttpClient {
       $response->setStatus($status=curl_getinfo($this->hCurl, CURLINFO_HTTP_CODE));
 
       // ggf. manuellen Redirect ausführen (falls "open_basedir" oder "safe_mode" aktiviert sind)
-      if (($status==301 || $status==302) && $this->followRedirects && (ini_get('open_basedir') || ini_get('safe_mode'))) {
+      if (($status==301 || $status==302) && $this->isFollowRedirects() && (ini_get('open_basedir') || ini_get('safe_mode'))) {
          if ($this->manualRedirects >= $this->maxRedirects)
             throw new IOException('CURL error: maxRedirects limit exceeded - '.$this->maxRedirects.', url: '.$request->getUrl());
 
