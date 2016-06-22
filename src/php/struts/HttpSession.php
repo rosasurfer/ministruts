@@ -101,7 +101,7 @@ class HttpSession extends Singleton {
       }
 
       // empty the session
-      $this->removeAttributes(array_keys($_SESSION));
+      $this->removeAttribute(array_keys($_SESSION));
 
       // initialize the session
       $request = $this->request;                                              // TODO: $request->getHeader() einbauen
@@ -165,7 +165,7 @@ class HttpSession extends Singleton {
     * Schlüssel schon vorhandener Wert wird ersetzt.
     *
     * Ist der übergebene Wert NULL, hat dies den selben Effekt wie der Aufruf von
-    * HttpSession::removeAttributes($key)
+    * HttpSession::removeAttribute($key)
     *
     * @param  string $key   - Schlüssel, unter dem der Wert gespeichert wird
     * @param  mixed  $value - der zu speichernde Wert
@@ -177,20 +177,18 @@ class HttpSession extends Singleton {
          $_SESSION[$key] = $value;
       }
       else {
-         $this->removeAttributes($key);
+         $this->removeAttribute($key);
       }
    }
 
 
    /**
-    * Löscht die unter den angegebenen Schlüsseln in der Session gespeicherten Werte. Existiert
-    * unter einem Schlüssel kein Wert, macht die Methode gar nichts. Es können mehrere Schlüssel
-    * angegeben werden.
+    * Delete session values stored under the specified key(s).
     *
-    * @param  string|array $key - session key of the value to remove
-    * @param  ...               - variable length list of more session keys
+    * @param  string|array $key - single session key or array of session keys of values to remove
+    * @param  ...               - variable length list of more keys
     */
-   public function removeAttributes($key /*...*/) {
+   public function removeAttribute($key /*...*/) {
       foreach (func_get_args() as $i => $key) {
          if (is_array($key)) {
             foreach ($key as $n => $arrayKey) {
