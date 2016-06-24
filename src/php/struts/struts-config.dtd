@@ -2,14 +2,14 @@
      DTD for the Struts configuration file of the application
      ========================================================
      
-     To enable validation of your configuration file against this DTD you have multiple options:
+     To enable validation of the configuration file against this DTD you have multiple options:
      
      • Include the following DOCTYPE element at the beginning of your file (after the "xml" declaration):
          <!DOCTYPE struts-config SYSTEM "struts-config.dtd">
        and load the file into your xml parser with the DTD file in the current working directory.
         
      • Modify the content of the xml file on-the-fly and point the DTD location of the DOCTYPE element to an 
-       existing DTD. This might be an URL to an external DTD or a relative path to a local DTD. 
+       existing copy of this DTD. This might be an URL to an external DTD or a relative path to a local DTD. 
        
      • Modify the content of the xml file on-the-fly and include the DTD in the document structure of the xml. 
 -->
