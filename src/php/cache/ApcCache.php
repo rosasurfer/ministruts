@@ -161,6 +161,8 @@ final class ApcCache extends CachePeer {
       // - möglichst apc_add() benutzen (weniger Speicherfragmentierung, minimiert Lock-Wait)
       // - keine APC-TTL setzen, die tatsächliche TTL wird in self::isCached() geprüft (diverse APC-Bugs bei gesetzter TTL)
 
+      // TODO: http://phpdevblog.niknovo.com/2009/11/serialize-vs-var-export-vs-json-encode.html
+
       if (function_exists('apc_add')) {                                                // APC >= 3.0.13
          if (function_exists('apc_exists')) $isKey =        apc_exists($fullKey);      // APC >= 3.1.4
          else                               $isKey = (bool) apc_fetch ($fullKey);
