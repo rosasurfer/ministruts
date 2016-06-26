@@ -1,26 +1,26 @@
 2016-06-22
 
-   - set default value for HttpClient::followRedirects to TRUE
+   - default value for php/net/http/HttpClient::followRedirects is TRUE
 
 
 2016-05-24
 
-   - bisherige MiniStruts-Version ohne Namespace-Support in Branch "B_NO_NAMESPACES" ausgelagert
+   - branch "B_NO_NAMESPACES" for legacy MiniStruts version without namespace support
 
 
 2016-04-10
 
-   - php/net/http/CurlHttpClient ermöglicht Keep-Alive-Connections
+   - php/net/http/CurlHttpClient: enable "Keep-Alive" connections
 
 
 2016-03-28
 
-   - Alias php/util/Logger::warn(...) für php/util/Logger::log(..., L_WARN)
+   - php/util/Logger: method alias Logger::warn(...) for Logger::log(..., L_WARN)
 
 
 2016-03-14
 
-   - Die Stringfunktionen strStartsWith(), strStartsWithI(), strEndsWith() und strEndsWithI() können  
+   - Die Stringfunktionen strStartsWith(), strStartsWithI(), strEndsWith() und strEndsWithI() können
      zusätzlich ein Array von mehrereren Prefixen bzw. Suffixen verarbeiten.
 
 
@@ -42,31 +42,31 @@
 
 2016-02-27
 
-   - Helper-Funktion: isLittleEndian() 
+   - Helper-Funktion: isLittleEndian()
 
 
 2016-02-25
 
-   - Funktion umbenannt: formatDate($format, $datetime) => formatDateStr($datetime, $format) 
+   - Funktion umbenannt: formatDate($format, $datetime) => formatDateStr($datetime, $format)
 
 
 2016-02-10
 
-   - Prozedural-Wrapper is_datetime() für php/util/CommonValidator::isDateTime() 
+   - Prozedural-Wrapper is_datetime() für php/util/CommonValidator::isDateTime()
 
 
 2015-09-07
 
-   - Helper-Funktionen: strContains(), strContainsI() 
-   - php/util/String::contains() durch strContains() bzw. strContainsI() ersetzt  
+   - Helper-Funktionen: strContains(), strContainsI()
+   - php/util/String::contains() durch strContains() bzw. strContainsI() ersetzt
 
 
 2015-09-04
 
-   - Helper-Funktionen: strStartsWith(), strStartsWithI(), strEndsWith(), strEndsWithI(), 
-                        strCompare(), strCompareI(), 
+   - Helper-Funktionen: strStartsWith(), strStartsWithI(), strEndsWith(), strEndsWithI(),
+                        strCompare(), strCompareI(),
                         strLeft(), strRight()
-   - php/util/String::startsWith() und php/util/String::endsWith() durch strStartsWith() bzw. strEndsWith() ersetzt  
+   - php/util/String::startsWith() und php/util/String::endsWith() durch strStartsWith() bzw. strEndsWith() ersetzt
 
 
 2015-08-16
@@ -90,7 +90,7 @@
    - php/util/Logger: - Logging per E-Mail überarbeitet: Ist eine Mailadresse konfiguriert, wird immer eine Mail verschickt
                         (auch in der Konsole), ggf. kann der Versand per Konfiguration deaktiviert werden.
                       - Mailkonfiguration angepaßt: Schlüssel "mail.address.buglovers" zu "log.mail.receiver"
-                      
+
 
 2014-09-21
 
@@ -140,7 +140,7 @@
 
 2012-02-05
 
-   - Dateipfade werden möglichst anhand von APPLICATION_ROOT definiert, um Zugriffsprobleme mit symbolischen Links 
+   - Dateipfade werden möglichst anhand von APPLICATION_ROOT definiert, um Zugriffsprobleme mit symbolischen Links
      in der Projektstruktur zu verhindern
 
 
@@ -159,7 +159,7 @@
    - neu:    php/db/DB ermöglicht die Angabe weiterer Verbindungsoptionen in der DB-Konfiguration
    - neu:    php/dao/CommonDAO::refresh() - globale Methode für alle DAO's
    - Bugfix: php/util/Config - PHP löst bei bestimmten, ungültigen Zugriffen auf Strings keine Fehler aus
-   
+
 
 2011-01-04
 
