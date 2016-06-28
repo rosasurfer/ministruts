@@ -1,1 +1,2 @@
-php_*.afm
+# ignore pre-compiled fonts
+/php_*.afm

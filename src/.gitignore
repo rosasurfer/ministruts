@@ -1,1 +1,2 @@
-config-custom.properties
+# ignore custom configurations
+/config-custom.properties
