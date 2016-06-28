@@ -126,8 +126,13 @@ class Module extends Object {
       $currentDir = getCwd();                         // typically dirName(APP_ROOT.'/www/index.php');
       $packageDir = dirName(__FILE__);
 
-      // TODO: XML ohne Verzeichniswechsel validieren
-      //       @see  http://xmlwriter.net/xml_guide/doctype_declaration.shtml
+      /**
+       * TODO: XML ohne Verzeichniswechsel validieren
+       *
+       * @see  http://xmlwriter.net/xml_guide/doctype_declaration.shtml
+       * @see  DTD to XML schema  https://www.w3.org/2000/04/schema_hack/
+       * @see  DTD to XML schema  http://www.xmlutilities.net/
+       */
 
       // ins Packageverzeichnis wechseln
       try { chDir($packageDir); }
