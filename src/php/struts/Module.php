@@ -127,6 +127,7 @@ class Module extends Object {
       $packageDir = dirName(__FILE__);
 
       // TODO: XML ohne Verzeichniswechsel validieren
+      //       @see  http://xmlwriter.net/xml_guide/doctype_declaration.shtml
 
       // ins Packageverzeichnis wechseln
       try { chDir($packageDir); }
