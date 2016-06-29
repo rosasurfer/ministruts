@@ -1,3 +1,0 @@
-Problem:  Error message ";; connection timed out; no servers could be reached"
-Solution: - Copy "resolv.conf" to your "%systemroot%\system32\drivers\etc\" directory.
-			 - On 64-bit systems create a junction from "%systemroot%\SysWOW64\drivers\etc" to "%systemroot%\system32\drivers\etc".

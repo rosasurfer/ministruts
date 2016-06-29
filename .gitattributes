@@ -9,7 +9,6 @@
 *.js           text eol=lf
 *.json         text eol=lf
 *.lock         text eol=lf
-*.man          text eol=lf
 *.md           text eol=lf
 *.php          text eol=lf
 *.phtml        text eol=lf
