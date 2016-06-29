@@ -11,7 +11,7 @@ define('APPLICATION_ROOT',  dirName(__FILE__));
 
 
 // Library einbinden
-require(dirName(__FILE__).'/../src/phpLib.php');
+require(dirName(__FILE__).'/../src/load.php');
 
 // dns_* functions are not implemented on Windows
 if (WINDOWS) throw new InfrastructureException("This script can't be run in Windows.");

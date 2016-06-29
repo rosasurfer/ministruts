@@ -15,14 +15,14 @@
  */
 
 // Mehrfach-Includes abfangen
-if (defined('PHPLIB_ROOT'))
+if (defined('MINISTRUTS_ROOT'))
    return;
-define('PHPLIB_ROOT', dirName(__FILE__));
+define('MINISTRUTS_ROOT', dirName(__FILE__));
 
 
 // Anwendungskonfiguration prüfen
-if (!defined('APPLICATION_NAME')) echoPre('The PHP constant APPLICATION_NAME must be defined (see "'.PHPLIB_ROOT.'/doc/project.skel/index.php")') | exit(1);
-if (!defined('APPLICATION_ROOT')) echoPre('The PHP constant APPLICATION_ROOT must be defined (see "'.PHPLIB_ROOT.'/doc/project.skel/index.php")') | exit(1);
+if (!defined('APPLICATION_NAME')) echoPre('The PHP constant APPLICATION_NAME must be defined (see "'.MINISTRUTS_ROOT.'/doc/project.skel/index.php")') | exit(1);
+if (!defined('APPLICATION_ROOT')) echoPre('The PHP constant APPLICATION_ROOT must be defined (see "'.MINISTRUTS_ROOT.'/doc/project.skel/index.php")') | exit(1);
 
 
 // ob wir unter Windows laufen
@@ -32,7 +32,7 @@ define('WINDOWS', (strToUpper(subStr(PHP_OS, 0, 3))==='WIN'));
 // phpInfo()-Aufrufe abfangen
 // --------------------------
 if (subStr($_SERVER['PHP_SELF'], -12) == '/phpinfo.php') {
-   require(PHPLIB_ROOT.'/php/phpinfo.php');
+   require(MINISTRUTS_ROOT.'/php/phpinfo.php');
    exit(0);
 }
 if (PHP_VERSION < '5.2.1') echoPre('Error: a PHP version >= 5.2.1 is required') | exit(1);
@@ -40,110 +40,110 @@ if (PHP_VERSION < '5.2.1') echoPre('Error: a PHP version >= 5.2.1 is required') 
 
 // Klassendefinitionen
 // -------------------
-$__classes['ApcCache'                       ] = PHPLIB_ROOT.'/php/cache/ApcCache';
-$__classes['Cache'                          ] = PHPLIB_ROOT.'/php/cache/Cache';
-$__classes['CachePeer'                      ] = PHPLIB_ROOT.'/php/cache/CachePeer';
-$__classes['FileSystemCache'                ] = PHPLIB_ROOT.'/php/cache/FileSystemCache';
-$__classes['ReferencePool'                  ] = PHPLIB_ROOT.'/php/cache/ReferencePool';
+$__classes['ApcCache'                       ] = MINISTRUTS_ROOT.'/php/cache/ApcCache';
+$__classes['Cache'                          ] = MINISTRUTS_ROOT.'/php/cache/Cache';
+$__classes['CachePeer'                      ] = MINISTRUTS_ROOT.'/php/cache/CachePeer';
+$__classes['FileSystemCache'                ] = MINISTRUTS_ROOT.'/php/cache/FileSystemCache';
+$__classes['ReferencePool'                  ] = MINISTRUTS_ROOT.'/php/cache/ReferencePool';
 
-$__classes['Object'                         ] = PHPLIB_ROOT.'/php/core/Object';
-$__classes['Singleton'                      ] = PHPLIB_ROOT.'/php/core/Singleton';
-$__classes['StaticClass'                    ] = PHPLIB_ROOT.'/php/core/StaticClass';
+$__classes['Object'                         ] = MINISTRUTS_ROOT.'/php/core/Object';
+$__classes['Singleton'                      ] = MINISTRUTS_ROOT.'/php/core/Singleton';
+$__classes['StaticClass'                    ] = MINISTRUTS_ROOT.'/php/core/StaticClass';
 
-$__classes['CommonDAO'                      ] = PHPLIB_ROOT.'/php/dao/CommonDAO';
-$__classes['DaoWorker'                      ] = PHPLIB_ROOT.'/php/dao/DaoWorker';
-$__classes['IDaoConnected'                  ] = PHPLIB_ROOT.'/php/dao/IDaoConnected';
-$__classes['PersistableObject'              ] = PHPLIB_ROOT.'/php/dao/PersistableObject';
+$__classes['CommonDAO'                      ] = MINISTRUTS_ROOT.'/php/dao/CommonDAO';
+$__classes['DaoWorker'                      ] = MINISTRUTS_ROOT.'/php/dao/DaoWorker';
+$__classes['IDaoConnected'                  ] = MINISTRUTS_ROOT.'/php/dao/IDaoConnected';
+$__classes['PersistableObject'              ] = MINISTRUTS_ROOT.'/php/dao/PersistableObject';
 
-$__classes['DB'                             ] = PHPLIB_ROOT.'/php/db/DB';
-$__classes['DBPool'                         ] = PHPLIB_ROOT.'/php/db/DBPool';
-$__classes['MySQLConnector'                 ] = PHPLIB_ROOT.'/php/db/MySQLConnector';
+$__classes['DB'                             ] = MINISTRUTS_ROOT.'/php/db/DB';
+$__classes['DBPool'                         ] = MINISTRUTS_ROOT.'/php/db/DBPool';
+$__classes['MySQLConnector'                 ] = MINISTRUTS_ROOT.'/php/db/MySQLConnector';
 
-$__classes['Dependency'                     ] = PHPLIB_ROOT.'/php/dependency/Dependency';
-$__classes['ChainedDependency'              ] = PHPLIB_ROOT.'/php/dependency/ChainedDependency';
-$__classes['FileDependency'                 ] = PHPLIB_ROOT.'/php/dependency/FileDependency';
+$__classes['Dependency'                     ] = MINISTRUTS_ROOT.'/php/dependency/Dependency';
+$__classes['ChainedDependency'              ] = MINISTRUTS_ROOT.'/php/dependency/ChainedDependency';
+$__classes['FileDependency'                 ] = MINISTRUTS_ROOT.'/php/dependency/FileDependency';
 
-$__classes['BusinessRuleException'          ] = PHPLIB_ROOT.'/php/exceptions/BusinessRuleException';
-$__classes['ClassNotFoundException'         ] = PHPLIB_ROOT.'/php/exceptions/ClassNotFoundException';
-$__classes['ConcurrentModificationException'] = PHPLIB_ROOT.'/php/exceptions/ConcurrentModificationException';
-$__classes['DatabaseException'              ] = PHPLIB_ROOT.'/php/exceptions/DatabaseException';
-$__classes['FileNotFoundException'          ] = PHPLIB_ROOT.'/php/exceptions/FileNotFoundException';
-$__classes['IllegalAccessException'         ] = PHPLIB_ROOT.'/php/exceptions/IllegalAccessException';
-$__classes['IllegalArgumentException'       ] = PHPLIB_ROOT.'/php/exceptions/IllegalArgumentException';
-$__classes['IllegalStateException'          ] = PHPLIB_ROOT.'/php/exceptions/IllegalStateException';
-$__classes['IllegalTypeException'           ] = PHPLIB_ROOT.'/php/exceptions/IllegalTypeException';
-$__classes['InfrastructureException'        ] = PHPLIB_ROOT.'/php/exceptions/InfrastructureException';
-$__classes['IOException'                    ] = PHPLIB_ROOT.'/php/exceptions/IOException';
-$__classes['NestableException'              ] = PHPLIB_ROOT.'/php/exceptions/NestableException';
-$__classes['PermissionDeniedException'      ] = PHPLIB_ROOT.'/php/exceptions/PermissionDeniedException';
-$__classes['PHPErrorException'              ] = PHPLIB_ROOT.'/php/exceptions/PHPErrorException';
-$__classes['plInvalidArgumentException'     ] = PHPLIB_ROOT.'/php/exceptions/plInvalidArgumentException';
-$__classes['plRuntimeException'             ] = PHPLIB_ROOT.'/php/exceptions/plRuntimeException';
-$__classes['UnimplementedFeatureException'  ] = PHPLIB_ROOT.'/php/exceptions/UnimplementedFeatureException';
-$__classes['UnsupportedMethodException'     ] = PHPLIB_ROOT.'/php/exceptions/UnsupportedMethodException';
+$__classes['BusinessRuleException'          ] = MINISTRUTS_ROOT.'/php/exceptions/BusinessRuleException';
+$__classes['ClassNotFoundException'         ] = MINISTRUTS_ROOT.'/php/exceptions/ClassNotFoundException';
+$__classes['ConcurrentModificationException'] = MINISTRUTS_ROOT.'/php/exceptions/ConcurrentModificationException';
+$__classes['DatabaseException'              ] = MINISTRUTS_ROOT.'/php/exceptions/DatabaseException';
+$__classes['FileNotFoundException'          ] = MINISTRUTS_ROOT.'/php/exceptions/FileNotFoundException';
+$__classes['IllegalAccessException'         ] = MINISTRUTS_ROOT.'/php/exceptions/IllegalAccessException';
+$__classes['IllegalArgumentException'       ] = MINISTRUTS_ROOT.'/php/exceptions/IllegalArgumentException';
+$__classes['IllegalStateException'          ] = MINISTRUTS_ROOT.'/php/exceptions/IllegalStateException';
+$__classes['IllegalTypeException'           ] = MINISTRUTS_ROOT.'/php/exceptions/IllegalTypeException';
+$__classes['InfrastructureException'        ] = MINISTRUTS_ROOT.'/php/exceptions/InfrastructureException';
+$__classes['IOException'                    ] = MINISTRUTS_ROOT.'/php/exceptions/IOException';
+$__classes['NestableException'              ] = MINISTRUTS_ROOT.'/php/exceptions/NestableException';
+$__classes['PermissionDeniedException'      ] = MINISTRUTS_ROOT.'/php/exceptions/PermissionDeniedException';
+$__classes['PHPErrorException'              ] = MINISTRUTS_ROOT.'/php/exceptions/PHPErrorException';
+$__classes['plInvalidArgumentException'     ] = MINISTRUTS_ROOT.'/php/exceptions/plInvalidArgumentException';
+$__classes['plRuntimeException'             ] = MINISTRUTS_ROOT.'/php/exceptions/plRuntimeException';
+$__classes['UnimplementedFeatureException'  ] = MINISTRUTS_ROOT.'/php/exceptions/UnimplementedFeatureException';
+$__classes['UnsupportedMethodException'     ] = MINISTRUTS_ROOT.'/php/exceptions/UnsupportedMethodException';
 
-$__classes['BarCode'                        ] = PHPLIB_ROOT.'/php/file/image/barcode/BarCode';
-$__classes['BaseC128BarCode'                ] = PHPLIB_ROOT.'/php/file/image/barcode/BaseC128BarCode';
-$__classes['C128ABarCode'                   ] = PHPLIB_ROOT.'/php/file/image/barcode/C128ABarCode';
-$__classes['C128BBarCode'                   ] = PHPLIB_ROOT.'/php/file/image/barcode/C128BBarCode';
-$__classes['C128CBarCode'                   ] = PHPLIB_ROOT.'/php/file/image/barcode/C128CBarCode';
-$__classes['C39BarCode'                     ] = PHPLIB_ROOT.'/php/file/image/barcode/C39BarCode';
-$__classes['I25BarCode'                     ] = PHPLIB_ROOT.'/php/file/image/barcode/I25BarCode';
+$__classes['BarCode'                        ] = MINISTRUTS_ROOT.'/php/file/image/barcode/BarCode';
+$__classes['BaseC128BarCode'                ] = MINISTRUTS_ROOT.'/php/file/image/barcode/BaseC128BarCode';
+$__classes['C128ABarCode'                   ] = MINISTRUTS_ROOT.'/php/file/image/barcode/C128ABarCode';
+$__classes['C128BBarCode'                   ] = MINISTRUTS_ROOT.'/php/file/image/barcode/C128BBarCode';
+$__classes['C128CBarCode'                   ] = MINISTRUTS_ROOT.'/php/file/image/barcode/C128CBarCode';
+$__classes['C39BarCode'                     ] = MINISTRUTS_ROOT.'/php/file/image/barcode/C39BarCode';
+$__classes['I25BarCode'                     ] = MINISTRUTS_ROOT.'/php/file/image/barcode/I25BarCode';
 
-$__classes['BasePdfDocument'                ] = PHPLIB_ROOT.'/php/file/pdf/BasePdfDocument';
-$__classes['SimplePdfDocument'              ] = PHPLIB_ROOT.'/php/file/pdf/SimplePdfDocument';
+$__classes['BasePdfDocument'                ] = MINISTRUTS_ROOT.'/php/file/pdf/BasePdfDocument';
+$__classes['SimplePdfDocument'              ] = MINISTRUTS_ROOT.'/php/file/pdf/SimplePdfDocument';
 
-$__classes['BaseLock'                       ] = PHPLIB_ROOT.'/php/locking/BaseLock';
-$__classes['FileLock'                       ] = PHPLIB_ROOT.'/php/locking/FileLock';
-$__classes['Lock'                           ] = PHPLIB_ROOT.'/php/locking/Lock';
-$__classes['SystemFiveLock'                 ] = PHPLIB_ROOT.'/php/locking/SystemFiveLock';
+$__classes['BaseLock'                       ] = MINISTRUTS_ROOT.'/php/locking/BaseLock';
+$__classes['FileLock'                       ] = MINISTRUTS_ROOT.'/php/locking/FileLock';
+$__classes['Lock'                           ] = MINISTRUTS_ROOT.'/php/locking/Lock';
+$__classes['SystemFiveLock'                 ] = MINISTRUTS_ROOT.'/php/locking/SystemFiveLock';
 
-$__classes['NetTools'                       ] = PHPLIB_ROOT.'/php/net/NetTools';
-$__classes['TorHelper'                      ] = PHPLIB_ROOT.'/php/net/TorHelper';
+$__classes['NetTools'                       ] = MINISTRUTS_ROOT.'/php/net/NetTools';
+$__classes['TorHelper'                      ] = MINISTRUTS_ROOT.'/php/net/TorHelper';
 
-$__classes['CurlHttpClient'                 ] = PHPLIB_ROOT.'/php/net/http/CurlHttpClient';
-$__classes['CurlHttpResponse'               ] = PHPLIB_ROOT.'/php/net/http/CurlHttpResponse';
-$__classes['HeaderParser'                   ] = PHPLIB_ROOT.'/php/net/http/HeaderParser';
-$__classes['HeaderUtils'                    ] = PHPLIB_ROOT.'/php/net/http/HeaderUtils';
-$__classes['HttpClient'                     ] = PHPLIB_ROOT.'/php/net/http/HttpClient';
-$__classes['HttpRequest'                    ] = PHPLIB_ROOT.'/php/net/http/HttpRequest';
-$__classes['HttpResponse'                   ] = PHPLIB_ROOT.'/php/net/http/HttpResponse';
+$__classes['CurlHttpClient'                 ] = MINISTRUTS_ROOT.'/php/net/http/CurlHttpClient';
+$__classes['CurlHttpResponse'               ] = MINISTRUTS_ROOT.'/php/net/http/CurlHttpResponse';
+$__classes['HeaderParser'                   ] = MINISTRUTS_ROOT.'/php/net/http/HeaderParser';
+$__classes['HeaderUtils'                    ] = MINISTRUTS_ROOT.'/php/net/http/HeaderUtils';
+$__classes['HttpClient'                     ] = MINISTRUTS_ROOT.'/php/net/http/HttpClient';
+$__classes['HttpRequest'                    ] = MINISTRUTS_ROOT.'/php/net/http/HttpRequest';
+$__classes['HttpResponse'                   ] = MINISTRUTS_ROOT.'/php/net/http/HttpResponse';
 
-$__classes['CLIMailer'                      ] = PHPLIB_ROOT.'/php/net/mail/CLIMailer';
-$__classes['FileSocketMailer'               ] = PHPLIB_ROOT.'/php/net/mail/FileSocketMailer';
-$__classes['Mailer'                         ] = PHPLIB_ROOT.'/php/net/mail/Mailer';
-$__classes['PHPMailer'                      ] = PHPLIB_ROOT.'/php/net/mail/PHPMailer';
-$__classes['SMTPMailer'                     ] = PHPLIB_ROOT.'/php/net/mail/SMTPMailer';
+$__classes['CLIMailer'                      ] = MINISTRUTS_ROOT.'/php/net/mail/CLIMailer';
+$__classes['FileSocketMailer'               ] = MINISTRUTS_ROOT.'/php/net/mail/FileSocketMailer';
+$__classes['Mailer'                         ] = MINISTRUTS_ROOT.'/php/net/mail/Mailer';
+$__classes['PHPMailer'                      ] = MINISTRUTS_ROOT.'/php/net/mail/PHPMailer';
+$__classes['SMTPMailer'                     ] = MINISTRUTS_ROOT.'/php/net/mail/SMTPMailer';
 
-$__classes['ClickatellSMSMessenger'         ] = PHPLIB_ROOT.'/php/net/messenger/ClickatellSMSMessenger';
-$__classes['ICQMessenger'                   ] = PHPLIB_ROOT.'/php/net/messenger/ICQMessenger';
-$__classes['IRCMessenger'                   ] = PHPLIB_ROOT.'/php/net/messenger/IRCMessenger';
-$__classes['Messenger'                      ] = PHPLIB_ROOT.'/php/net/messenger/Messenger';
+$__classes['ClickatellSMSMessenger'         ] = MINISTRUTS_ROOT.'/php/net/messenger/ClickatellSMSMessenger';
+$__classes['ICQMessenger'                   ] = MINISTRUTS_ROOT.'/php/net/messenger/ICQMessenger';
+$__classes['IRCMessenger'                   ] = MINISTRUTS_ROOT.'/php/net/messenger/IRCMessenger';
+$__classes['Messenger'                      ] = MINISTRUTS_ROOT.'/php/net/messenger/Messenger';
 
-$__classes['Action'                         ] = PHPLIB_ROOT.'/php/struts/Action';
-$__classes['ActionForm'                     ] = PHPLIB_ROOT.'/php/struts/ActionForm';
-$__classes['ActionForward'                  ] = PHPLIB_ROOT.'/php/struts/ActionForward';
-$__classes['ActionMapping'                  ] = PHPLIB_ROOT.'/php/struts/ActionMapping';
-$__classes['FrontController'                ] = PHPLIB_ROOT.'/php/struts/FrontController';
-$__classes['HttpSession'                    ] = PHPLIB_ROOT.'/php/struts/HttpSession';
-$__classes['Module'                         ] = PHPLIB_ROOT.'/php/struts/Module';
-$__classes['PageContext'                    ] = PHPLIB_ROOT.'/php/struts/PageContext';
-$__classes['Request'                        ] = PHPLIB_ROOT.'/php/struts/Request';
-$__classes['RequestBase'                    ] = PHPLIB_ROOT.'/php/struts/RequestBase';
-$__classes['RequestProcessor'               ] = PHPLIB_ROOT.'/php/struts/RequestProcessor';
-$__classes['Response'                       ] = PHPLIB_ROOT.'/php/struts/Response';
-$__classes['RoleProcessor'                  ] = PHPLIB_ROOT.'/php/struts/RoleProcessor';
-$__classes['Struts'                         ] = PHPLIB_ROOT.'/php/struts/Struts';
-$__classes['Tile'                           ] = PHPLIB_ROOT.'/php/struts/Tile';
+$__classes['Action'                         ] = MINISTRUTS_ROOT.'/php/struts/Action';
+$__classes['ActionForm'                     ] = MINISTRUTS_ROOT.'/php/struts/ActionForm';
+$__classes['ActionForward'                  ] = MINISTRUTS_ROOT.'/php/struts/ActionForward';
+$__classes['ActionMapping'                  ] = MINISTRUTS_ROOT.'/php/struts/ActionMapping';
+$__classes['FrontController'                ] = MINISTRUTS_ROOT.'/php/struts/FrontController';
+$__classes['HttpSession'                    ] = MINISTRUTS_ROOT.'/php/struts/HttpSession';
+$__classes['Module'                         ] = MINISTRUTS_ROOT.'/php/struts/Module';
+$__classes['PageContext'                    ] = MINISTRUTS_ROOT.'/php/struts/PageContext';
+$__classes['Request'                        ] = MINISTRUTS_ROOT.'/php/struts/Request';
+$__classes['RequestBase'                    ] = MINISTRUTS_ROOT.'/php/struts/RequestBase';
+$__classes['RequestProcessor'               ] = MINISTRUTS_ROOT.'/php/struts/RequestProcessor';
+$__classes['Response'                       ] = MINISTRUTS_ROOT.'/php/struts/Response';
+$__classes['RoleProcessor'                  ] = MINISTRUTS_ROOT.'/php/struts/RoleProcessor';
+$__classes['Struts'                         ] = MINISTRUTS_ROOT.'/php/struts/Struts';
+$__classes['Tile'                           ] = MINISTRUTS_ROOT.'/php/struts/Tile';
 
-$__classes['CommonValidator'                ] = PHPLIB_ROOT.'/php/util/CommonValidator';
-$__classes['Config'                         ] = PHPLIB_ROOT.'/php/util/Config';
-$__classes['Date'                           ] = PHPLIB_ROOT.'/php/util/Date';
-$__classes['Logger'                         ] = PHPLIB_ROOT.'/php/util/Logger';
-$__classes['PHP'                            ] = PHPLIB_ROOT.'/php/util/PHP';
-$__classes['String'                         ] = PHPLIB_ROOT.'/php/util/String';
+$__classes['CommonValidator'                ] = MINISTRUTS_ROOT.'/php/util/CommonValidator';
+$__classes['Config'                         ] = MINISTRUTS_ROOT.'/php/util/Config';
+$__classes['Date'                           ] = MINISTRUTS_ROOT.'/php/util/Date';
+$__classes['Logger'                         ] = MINISTRUTS_ROOT.'/php/util/Logger';
+$__classes['PHP'                            ] = MINISTRUTS_ROOT.'/php/util/PHP';
+$__classes['String'                         ] = MINISTRUTS_ROOT.'/php/util/String';
 
-$__classes['ApdProfile'                     ] = PHPLIB_ROOT.'/php/util/apd/ApdProfile';
+$__classes['ApdProfile'                     ] = MINISTRUTS_ROOT.'/php/util/apd/ApdProfile';
 
 
 // Errorlevel

@@ -6,8 +6,8 @@ define('APPLICATION_NAME', 'prof2kcachegrind');
 define('APPLICATION_ROOT',  dirName(__FILE__));
 
 
-// MiniStruts einbinden
-require(dirName(__FILE__).'/../src/phpLib.php');
+// Library einbinden
+require(dirName(__FILE__).'/../src/load.php');
 
 
 // Kommandozeilenargumente einlesen
