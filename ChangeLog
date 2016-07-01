@@ -1,3 +1,8 @@
+2016-07-01
+
+   - removed legacy references to APD (Advanced PHP Debugger)
+
+
 2016-06-22
 
    - default value for php/net/http/HttpClient::followRedirects is TRUE
