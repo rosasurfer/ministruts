@@ -134,8 +134,6 @@ $__classes['Logger'                         ] = MINISTRUTS_ROOT.'/php/util/Logge
 $__classes['PHP'                            ] = MINISTRUTS_ROOT.'/php/util/PHP';
 $__classes['String'                         ] = MINISTRUTS_ROOT.'/php/util/String';
 
-$__classes['ApdProfile'                     ] = MINISTRUTS_ROOT.'/php/util/apd/ApdProfile';
-
 
 // Errorlevel
 !defined('E_RECOVERABLE_ERROR') && define('E_RECOVERABLE_ERROR',  4096);   // since PHP 5.2.0
@@ -188,59 +186,6 @@ set_exception_handler(create_function('Exception $exception'                    
 // Beginn des Shutdowns markieren, um fatale Fehler beim Shutdown zu verhindern (siehe Logger)
 // -------------------------------------------------------------------------------------------
 register_shutdown_function(create_function(null, '$GLOBALS[\'$__shutting_down\'] = true;'));    // allererste Funktion auf dem Shutdown-Funktion-Stack
-
-
-// ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// ggf. Profiler starten
-if (extension_loaded('APD') && isSet($_REQUEST['_PROFILE_'])) {
-   $dumpFile = apd_set_pprof_trace(ini_get('apd.dumpdir'));
-   if ($dumpFile) {
-      // tatsächlichen Aufrufer des Scripts in weiterer Datei hinterlegen
-      if (!isSet($_SERVER['REQUEST_METHOD'])) {                      // Konsolenaufruf ...
-         $caller = $_SERVER['PHP_SELF'];
-      }
-      else {                                                         // ... oder Webserver-Request
-         $protocol = isSet($_SERVER['HTTPS']) ? 'https':'http';
-         $host     = $_SERVER['SERVER_NAME'];
-         $port     = $_SERVER['SERVER_PORT']=='80' ? '':':'.$_SERVER['SERVER_PORT'];
-         $caller = "$protocol://$host$port".$_SERVER['REQUEST_URI'];
-      }
-      $fH = fOpen($dumpFile.'.caller', 'wb');
-      fWrite($fH, "caller=$caller\n\nEND_HEADER\n");
-      fClose($fH);
-   }
-   push_shutdown_function('apd_addProfileLink', $dumpFile);          // wird als letzte Shutdown-Funktion ausgeführt
-   unset($dumpFile, $fH, $prot, $host, $port, $caller);
-}
-
-
-/**
- * Nur für Profiler: Shutdown-Function, fügt nach dem Profiling einen Link zum Report in die Seite ein.
- */
-function apd_addProfileLink($dumpFile = null) {
-   if (!headers_sent())
-      flush();
-
-   // überprüfen, ob der aktuelle Content HTML ist (z.B. nicht bei Downloads)
-   $html = false;
-   foreach (headers_list() as $header) {
-      $parts = explode(':', $header, 2);
-      if (strToLower($parts[0]) == 'content-type') {
-         $html = (striPos(trim($parts[1]), 'text/html') === 0);
-         break;
-      }
-   }
-
-   // bei HTML-Content Link auf Profiler-Report ausgeben
-   if ($html) {
-      if ($dumpFile) echo('<p style="clear:both; text-align:left; margin:6px"><a href="/apd/?file='.$dumpFile.'" target="apd">Profiling Report: '.baseName($dumpFile).'</a>');
-      else           echo('<p style="clear:both; text-align:left; margin:6px">Profiling Report: filename not available (console or old APD version ?)');
-   }
-   else if (!isSet($_SERVER['REQUEST_METHOD'])) {  // Konsolenaufruf
-      echo("dumpfile = $dumpFile");
-   }
-}
-// ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 /**
