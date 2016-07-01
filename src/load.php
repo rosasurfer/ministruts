@@ -15,8 +15,8 @@ define('MINISTRUTS_ROOT', dirName(__FILE__));
 
 
 // Anwendungskonfiguration prüfen
-if (!defined('APPLICATION_NAME')) echoPre('The PHP constant APPLICATION_NAME must be defined (see "'.MINISTRUTS_ROOT.'/doc/project.skel/index.php")') | exit(1);
-if (!defined('APPLICATION_ROOT')) echoPre('The PHP constant APPLICATION_ROOT must be defined (see "'.MINISTRUTS_ROOT.'/doc/project.skel/index.php")') | exit(1);
+if (!defined('APPLICATION_NAME')) echoPre('The global constant APPLICATION_NAME must be defined.') | exit(1);
+if (!defined('APPLICATION_ROOT')) echoPre('The global constant APPLICATION_ROOT must be defined.') | exit(1);
 
 
 // ob wir unter Windows laufen
