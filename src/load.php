@@ -12,15 +12,7 @@
 if (defined('MINISTRUTS_ROOT'))
    return;
 define('MINISTRUTS_ROOT', dirName(__FILE__));
-
-
-// Anwendungskonfiguration prüfen
-if (!defined('APPLICATION_NAME')) echoPre('The global constant APPLICATION_NAME must be defined.') | exit(1);
-if (!defined('APPLICATION_ROOT')) echoPre('The global constant APPLICATION_ROOT must be defined.') | exit(1);
-
-
-// ob wir unter Windows laufen
-define('WINDOWS', (strToUpper(subStr(PHP_OS, 0, 3))==='WIN'));
+define('WINDOWS'        , (strToUpper(subStr(PHP_OS, 0, 3))==='WIN'));  // whether or not we run on Windows
 
 
 // phpInfo()-Aufrufe abfangen
@@ -29,7 +21,12 @@ if (subStr($_SERVER['PHP_SELF'], -12) == '/phpinfo.php') {
    require(MINISTRUTS_ROOT.'/php/phpinfo.php');
    exit(0);
 }
-if (PHP_VERSION < '5.2.1') echoPre('Error: a PHP version >= 5.2.1 is required') | exit(1);
+
+
+// Anwendungskonfiguration prüfen
+(PHP_VERSION < '5.2.1')      && exit(1|echoPre('Error: A PHP version >= 5.2.1 is required.'           ));
+!defined('APPLICATION_NAME') && exit(1|echoPre('The global constant APPLICATION_NAME must be defined.'));
+!defined('APPLICATION_ROOT') && exit(1|echoPre('The global constant APPLICATION_ROOT must be defined.'));
 
 
 // Klassendefinitionen
