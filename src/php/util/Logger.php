@@ -249,6 +249,7 @@ class Logger extends StaticClass {
             else {
                echo $plainMessage."\n".$traceStr."\n";            // PHP gibt den Fehler unter Linux zusätzlich auf STDERR aus,
             }                                                     // also auf der Konsole ggf. unterdrücken
+            ob_get_level() && ob_flush();
          }
 
 
@@ -429,6 +430,7 @@ class Logger extends StaticClass {
             else {
                echo $plainMessage.($exception ? "\n".$exMessage."\n":'')."\n".($trace ? $trace."\n":'');
             }
+            ob_get_level() && ob_flush();
          }
 
 
