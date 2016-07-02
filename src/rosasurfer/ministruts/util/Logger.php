@@ -1,4 +1,9 @@
 <?php
+use const rosasurfer\ministruts\CLI       as CLI;
+use const rosasurfer\ministruts\LOCALHOST as LOCALHOST;
+use const rosasurfer\ministruts\WINDOWS   as WINDOWS;
+
+
 /**
  * Loggt eine Nachricht, wenn der mit der Nachricht angegebene Loglevel den konfigurierten Mindestloglevel erreicht oder
  * überschreitet.
@@ -61,8 +66,8 @@ class Logger extends StaticClass {
 
       // Standardmäßig ist die Ausgabe am Bildschirm bei lokalem Zugriff an und bei Remote-Zugriff aus, es sei denn,
       // in der php.ini ist ausdrücklich etwas anderes konfiguriert.
-      self::$print = !isSet($_SERVER['REQUEST_METHOD'])                                            // Konsole
-                  || (isSet($_SERVER['REMOTE_ADDR'   ]) && $_SERVER['REMOTE_ADDR']=='127.0.0.1')   // Webrequest vom lokalen Rechner
+      self::$print = CLI                                                // Konsole
+                  || LOCALHOST                                          // Webrequest vom lokalen Rechner
                   || (bool) ini_get('display_errors');
 
 
@@ -241,7 +246,7 @@ class Logger extends StaticClass {
 
          // 2. Exception anzeigen
          if (self::$print) {
-            if (isSet($_SERVER['REQUEST_METHOD'])) {
+            if (!CLI) {
                echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif"><b>[FATAL] Uncaught</b> '.nl2br(htmlSpecialChars($message, ENT_QUOTES))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
                echo '<br>'.printFormatted($traceStr, true);
                echo "<br></div>\n";
@@ -417,7 +422,7 @@ class Logger extends StaticClass {
 
          // 2. Logmessage anzeigen
          if (self::$print) {
-            if (isSet($_SERVER['REQUEST_METHOD'])) {
+            if (!CLI) {
                echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.self::$logLevels[$level].'</b>: '.nl2br(htmlSpecialChars($message, ENT_QUOTES))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
                if ($exception)
                   echo '<br>'.htmlSpecialChars($exMessage, ENT_QUOTES).'<br>';

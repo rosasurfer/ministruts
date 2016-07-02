@@ -1,4 +1,7 @@
 <?php
+use const rosasurfer\ministruts\CLI as CLI;
+
+
 /**
  * Response
  *
@@ -18,9 +21,8 @@ final class Response extends Singleton {
     * @return Singleton - Instanz oder NULL
     */
    public static function me() {
-      if (isSet($_SERVER['REQUEST_METHOD']))
+      if (!CLI)
          return Singleton ::getInstance(__CLASS__);
-
       return null;
    }
 

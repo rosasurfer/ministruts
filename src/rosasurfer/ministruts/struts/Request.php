@@ -1,4 +1,7 @@
 <?php
+use const rosasurfer\ministruts\CLI as CLI;
+
+
 /**
  * Wrapper für RequestBase
  *
@@ -17,9 +20,8 @@ final class Request extends RequestBase {
     * @return Singleton - Instanz oder NULL
     */
    public static function me() {
-      if (isSet($_SERVER['REQUEST_METHOD']))
+      if (!CLI)
          return Singleton ::getInstance(__CLASS__);
-
       return null;
    }
 }

@@ -1,5 +1,8 @@
 #!/usr/bin/php
 <?php
+use const rosasurfer\ministruts\WINDOWS as WINDOWS;
+
+
 /**
  * TODO: Jeder Nameserver muß einzeln abgefragt werden, denn bei fehlerhafter NS-Synchronisierung können
  *       sich die zurückgegebenen Werte der einzelnen Server unterscheiden.

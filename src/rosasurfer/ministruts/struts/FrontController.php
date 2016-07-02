@@ -1,4 +1,9 @@
 <?php
+use const rosasurfer\ministruts\CLI       as CLI;
+use const rosasurfer\ministruts\LOCALHOST as LOCALHOST;
+use const rosasurfer\ministruts\WINDOWS   as WINDOWS;
+
+
 /**
  * FrontController
  *
@@ -31,8 +36,7 @@ final class FrontController extends Singleton {
     * @return Singleton
     */
    public static function me() {
-      if (!isSet($_SERVER['REQUEST_METHOD']))
-         throw new IllegalStateException('You can not use '.__CLASS__.' in this context.');
+      if (CLI) throw new IllegalStateException('Can not use a '.__CLASS__.' in this context.');
 
       $cache = Cache ::me();
 
@@ -55,7 +59,7 @@ final class FrontController extends Singleton {
                $controller = Singleton ::getInstance(__CLASS__);
 
                $dependency = FileDependency ::create($configFile);
-               if (!WINDOWS || $_SERVER['REMOTE_ADDR']!='127.0.0.1')    // Unterscheidung Production/Development
+               if (!WINDOWS && !LOCALHOST)                           // Unterscheidung Production/Development
                   $dependency->setMinValidity(60 * SECONDS);
 
                // ... und mit FileDependency cachen

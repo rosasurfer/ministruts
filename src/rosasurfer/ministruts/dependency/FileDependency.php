@@ -1,4 +1,7 @@
 <?php
+use const rosasurfer\ministruts\WINDOWS as WINDOWS;
+
+
 /**
  * FileDependency
  *

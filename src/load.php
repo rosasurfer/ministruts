@@ -1,4 +1,10 @@
 <?php
+use const rosasurfer\ministruts\CLI       as CLI;
+use const rosasurfer\ministruts\LOCALHOST as LOCALHOST;
+use const rosasurfer\ministruts\ROOT      as MINISTRUTS_ROOT;
+use const rosasurfer\ministruts\WINDOWS   as WINDOWS;
+
+
 /**
  * (1) block framework re-includes
  * (2) check/adjust PHP environment
@@ -10,10 +16,6 @@
  * (8) define local helper functions
  * (9) define helpers globally if applicable
  */
-use const rosasurfer\ministruts\CLI       as CLI;
-use const rosasurfer\ministruts\LOCALHOST as LOCALHOST;
-use const rosasurfer\ministruts\ROOT      as MINISTRUTS_ROOT;
-use const rosasurfer\ministruts\WINDOWS   as WINDOWS;
 
 
 // (1) block framework re-includes
@@ -76,10 +78,7 @@ if (false) {
  */
 function __autoload($class/*, $throw*/) {
    static $classMap = null;
-   if (is_null($classMap)) {
-      // load class map
-      $classMap = require(__DIR__.'/rosasurfer/ministruts/classmap.php');
-   }
+   !$classMap && $classMap=require(__DIR__.'/rosasurfer/ministruts/classmap.php');
 
    try {
       if (isSet($classMap[$class])) {
@@ -121,7 +120,7 @@ function __autoload($class/*, $throw*/) {
 }
 
 
-
+/*
 
 //$a = new ministruts\A();
 $b = new Object();
@@ -129,7 +128,7 @@ echoPre($b);
 
 exit();
 
-
+*/
 
 
 
@@ -766,7 +765,7 @@ function printFormatted($var, $return=false) {
       $str = (string) $var;
    }
 
-   if (isSet($_SERVER['REQUEST_METHOD']))
+   if (!CLI)
       $str = '<div align="left"><pre style="margin:0; font:normal normal 12px/normal \'Courier New\',courier,serif">'.htmlSpecialChars($str, ENT_QUOTES).'</pre></div>';
 
    if (!strEndsWith($str, "\n"))

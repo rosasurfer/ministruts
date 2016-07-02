@@ -1,4 +1,7 @@
 <?php
+use const rosasurfer\ministruts\CLI as CLI;
+
+
 /**
  * RequestBase
  *
@@ -66,7 +69,7 @@ abstract class RequestBase extends Singleton {
       throw new plRuntimeException('Method '.__METHOD__.'() must not be called directly, it needs to be implemented in the concrete Request class.');
 
       // !!! begin code snippet !!!
-      if (isSet($_SERVER['REQUEST_METHOD']))
+      if (!CLI)
          return Singleton ::getInstance(__CLASS__);
       return null;
       // !!! end code snippet   !!!

@@ -1,4 +1,9 @@
 <?php
+use const rosasurfer\ministruts\CLI       as CLI;
+use const rosasurfer\ministruts\LOCALHOST as LOCALHOST;
+use const rosasurfer\ministruts\WINDOWS   as WINDOWS;
+
+
 /**
  * Config
  *
@@ -103,7 +108,7 @@ final class Config extends Object {
 
                // ... FileDependency erzeugen ...
                $dependency = FileDependency ::create(array_keys($config->files));
-               if (!WINDOWS || (isSet($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR']!='127.0.0.1'))    // Unterscheidung Production/Development
+               if (!WINDOWS && !CLI && !LOCALHOST)                   // Unterscheidung Production/Development
                   $dependency->setMinValidity(60 * SECONDS);
 
                // ... und cachen
@@ -126,8 +131,8 @@ final class Config extends Object {
     */
    private function __construct() {
       // Suchpfad je nach Web- oder Konsolenanwendung definieren
-      if (isSet($_SERVER['REQUEST_METHOD'])) $path = APPLICATION_ROOT.'/app/config';                                 // web
-      else                                   $path = getCwd().PATH_SEPARATOR.dirName($_SERVER['SCRIPT_FILENAME']);   // console: aktuelles + Scriptverzeichnis
+      if (!CLI) $path = APPLICATION_ROOT.'/app/config';                                 // web
+      else      $path = getCwd().PATH_SEPARATOR.dirName($_SERVER['SCRIPT_FILENAME']);   // console: aktuelles + Scriptverzeichnis
 
       // Include-Pfad anhängen und Suchpfad zerlegen
       $paths = explode(PATH_SEPARATOR, $path.PATH_SEPARATOR.ini_get('include_path'));
