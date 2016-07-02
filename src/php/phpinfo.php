@@ -1,8 +1,4 @@
 <?php
-!defined('E_RECOVERABLE_ERROR') && define('E_RECOVERABLE_ERROR',  4096);   // since PHP 5.2.0
-!defined('E_DEPRECATED'       ) && define('E_DEPRECATED'       ,  8192);   // since PHP 5.3.0
-!defined('E_USER_DEPRECATED'  ) && define('E_USER_DEPRECATED'  , 16384);   // since PHP 5.3.0
-
 $cli = !isSet($_SERVER['REQUEST_METHOD']);      // ob wir in der Konsole oder im Webserver laufen
 
 
@@ -86,7 +82,6 @@ if (strPos(PHP_VERSION,  '5.3.')===0)                                           
 if (strPos(PHP_VERSION,  '5.4.')===0 && PHP_VERSION < '5.4.21')                            $isWarning = 1|echoPre('Warning: You are running a buggy PHP version, a version >= 5.4.21 is recommended (see bug 47987).');
 
 if (!ini_get('short_open_tag'))                                                            $isWarning = 1|echoPre('Warning: short_open_tag is not On');
-if (ini_get('safe_mode') && PHP_VERSION < '5.4')                      /*ab v5.4 entfernt*/ $isWarning = 1|echoPre('Warning: safe_mode is not Off');
 if (ini_get('expose_php'))                                                                 $isWarning = 1|echoPre('Warning: expose_php is not Off');
 if (ini_get('register_globals'))                                                           $isWarning = 1|echoPre('Warning: register_globals is not Off');
 if (ini_get('register_long_arrays'))                                                       $isWarning = 1|echoPre('Warning: register_long_arrays is not Off');
