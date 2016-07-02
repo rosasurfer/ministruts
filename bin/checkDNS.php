@@ -6,8 +6,8 @@
  */
 set_time_limit(0);
 
-define('APPLICATION_NAME', 'DNS-Checker');
-define('APPLICATION_ROOT',  dirName(__FILE__));
+define('APPLICATION_ID',  'DNS-Checker');
+define('APPLICATION_ROOT', __DIR__     );
 
 
 // Library einbinden

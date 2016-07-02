@@ -1,144 +1,147 @@
 <?php
 /**
- * TODO:
- * -----
- * - Konfiguration auf eine Datei (config.properties) reduzieren, Defaults in Klasse Config integrieren
- * - php/locking/SystemV-Lock.php: Bug beheben
- * - Erkennung von APC und APD verbessern (Exception, wenn Module aktiviert sind, aber nicht geladen werden können)
- * - erfolgreiches Laden notwendiger Module überprüfen (siehe APC-/APD-Bug)
+ * (1) block framework re-includes
+ * (2) check/adjust PHP environment
+ * (3) execute phpInfo() if applicable
+ * (4) check/adjust application requirements
+ * (5) register class loader
+ * (6) setup error and exception handling
+ * (7) define local helper constants
+ * (8) define local helper functions
+ * (9) define helpers globally if applicable
  */
+use const rosasurfer\ministruts\CLI       as CLI;
+use const rosasurfer\ministruts\LOCALHOST as LOCALHOST;
+use const rosasurfer\ministruts\ROOT      as MINISTRUTS_ROOT;
+use const rosasurfer\ministruts\WINDOWS   as WINDOWS;
 
-// Mehrfach-Includes abfangen
-if (defined('MINISTRUTS_ROOT'))
+
+// (1) block framework re-includes
+if (defined('rosasurfer\ministruts\ROOT'))
    return;
-define('MINISTRUTS_ROOT', dirName(__FILE__));
-define('WINDOWS'        , (strToUpper(subStr(PHP_OS, 0, 3))==='WIN'));  // whether or not we run on Windows
+define('rosasurfer\ministruts\ROOT', dirName(__DIR__));
 
 
-// phpInfo()-Aufrufe abfangen
-// --------------------------
-if (subStr($_SERVER['PHP_SELF'], -12) == '/phpinfo.php') {
-   require(MINISTRUTS_ROOT.'/php/phpinfo.php');
-   exit(0);
+// (2) check/adjust PHP environment
+(PHP_VERSION < '5.6') && exit(1|echoPre('Error: A PHP version >= 5.6 is required (found version '.PHP_VERSION.').'));
+
+define('rosasurfer\ministruts\CLI'      , !isSet($_SERVER['REQUEST_METHOD']));               // whether or not we run on command line interface
+define('rosasurfer\ministruts\LOCALHOST', !CLI && @$_SERVER['REMOTE_ADDR']=='127.0.0.1');    // whether or not we run on localhost
+define('rosasurfer\ministruts\WINDOWS'  , (strToUpper(subStr(PHP_OS, 0, 3))==='WIN'));       // whether or not we run on Windows
+
+ini_set('arg_separator.output'    , '&amp;'                );
+ini_set('auto_detect_line_endings',  1                     );
+ini_set('default_mimetype'        , 'text/html'            );
+ini_set('default_charset'         , 'UTF-8'                );
+ini_set('ignore_repeated_errors'  ,  0                     );
+ini_set('ignore_repeated_source'  ,  0                     );
+ini_set('ignore_user_abort'       ,  1                     );
+ini_set('display_errors'          , (int)(CLI || LOCALHOST));
+ini_set('display_startup_errors'  , (int)(CLI || LOCALHOST));
+ini_set('log_errors'              ,  1                     );
+ini_set('log_errors_max_len'      ,  0                     );
+ini_set('track_errors'            ,  1                     );
+ini_set('html_errors'             ,  0                     );
+ini_set('session.use_cookies'     ,  1                     );
+ini_set('session.use_trans_sid'   ,  0                     );
+ini_set('session.cookie_httponly' ,  1                     );
+ini_set('session.referer_check'   , ''                     );
+
+
+// (3) execute phpInfo() if applicable (if enabled authorization must be handled by the server)
+if (false) {
+   if (!CLI && strEndsWith(strLeftTo($_SERVER['REQUEST_URI'], '?'), '/phpinfo.php'))
+      include(MINISTRUTS_ROOT.'/src/php/phpinfo.php') | exit(0);
 }
 
 
-// Anwendungskonfiguration prüfen
-(PHP_VERSION < '5.2.1')      && exit(1|echoPre('Error: A PHP version >= 5.2.1 is required.'           ));
-!defined('APPLICATION_NAME') && exit(1|echoPre('The global constant APPLICATION_NAME must be defined.'));
-!defined('APPLICATION_ROOT') && exit(1|echoPre('The global constant APPLICATION_ROOT must be defined.'));
+// (4) check/adjust application requirements
+!defined('\APPLICATION_ROOT') && exit(1|echoPre('Error: The global constant APPLICATION_ROOT must be defined.'));
+!defined('\APPLICATION_ID'  ) && define('APPLICATION_ID', md5(\APPLICATION_ROOT));
 
 
-// Klassendefinitionen
-// -------------------
-$__classes['ApcCache'                       ] = MINISTRUTS_ROOT.'/php/cache/ApcCache';
-$__classes['Cache'                          ] = MINISTRUTS_ROOT.'/php/cache/Cache';
-$__classes['CachePeer'                      ] = MINISTRUTS_ROOT.'/php/cache/CachePeer';
-$__classes['FileSystemCache'                ] = MINISTRUTS_ROOT.'/php/cache/FileSystemCache';
-$__classes['ReferencePool'                  ] = MINISTRUTS_ROOT.'/php/cache/ReferencePool';
+/**
+ * (5) register class loader                    @see  https://docs.phalconphp.com/en/latest/reference/loader.html
+ *
+ * Class-Loader, lädt die angegebene Klasse.
+ *
+ * @param  string $className - Klassenname
+ * @param  mixed  $throw     - Ob Exceptions geworfen werfen dürfen. Typ und Wert des Parameters sind unwichtig,
+ *                             einzig seine Existenz reicht für die Erkennung eines manuellen Aufrufs.
+ *
+ * NOTE: Prior to 5.3 exceptions thrown in the __autoload() function could not be caught in the catch block and would result in
+ *       a fatal error. From 5.3+ exceptions thrown in the __autoload() function can be caught in the catch block with one provision.
+ *       If throwing a custom exception then the custom exception class must be available. The __autoload() function may be used
+ *       recursively to autoload the custom exception class.
+ */
+function __autoload($class/*, $throw*/) {
+   static $classMap = null;
+   if (is_null($classMap)) {
+      // load class map
+      $classMap = require(__DIR__.'/rosasurfer/ministruts/classmap.php');
+   }
 
-$__classes['Object'                         ] = MINISTRUTS_ROOT.'/php/core/Object';
-$__classes['Singleton'                      ] = MINISTRUTS_ROOT.'/php/core/Singleton';
-$__classes['StaticClass'                    ] = MINISTRUTS_ROOT.'/php/core/StaticClass';
+   try {
+      if (isSet($classMap[$class])) {
+         // Fällt der automatische Aufruf der  __autoload()-Funktion aus (z.B. at Compile-Time in PHP 5.3-5.4.20), wird die Funktion
+         // u.U. manuell aufgerufen.  Um dabei Mehrfach-Includes derselben Klasse *ohne* Verwendung von include_once() verhindern zu
+         // können, setzen wir nach dem ersten Laden ein entsprechendes Flag. Die Verwendung von include_once() würde den Opcode-Cache
+         // verlangsamen.
+         //
+         // @see https://bugs.php.net/bug.php?id=47987
 
-$__classes['CommonDAO'                      ] = MINISTRUTS_ROOT.'/php/dao/CommonDAO';
-$__classes['DaoWorker'                      ] = MINISTRUTS_ROOT.'/php/dao/DaoWorker';
-$__classes['IDaoConnected'                  ] = MINISTRUTS_ROOT.'/php/dao/IDaoConnected';
-$__classes['PersistableObject'              ] = MINISTRUTS_ROOT.'/php/dao/PersistableObject';
+         // Rückkehr, wenn Klasse schon geladen
+         if ($classMap[$class] === true)
+            return true;
 
-$__classes['DB'                             ] = MINISTRUTS_ROOT.'/php/db/DB';
-$__classes['DBPool'                         ] = MINISTRUTS_ROOT.'/php/db/DBPool';
-$__classes['MySQLConnector'                 ] = MINISTRUTS_ROOT.'/php/db/MySQLConnector';
+         $fileName = $classMap[$class];
 
-$__classes['Dependency'                     ] = MINISTRUTS_ROOT.'/php/dependency/Dependency';
-$__classes['ChainedDependency'              ] = MINISTRUTS_ROOT.'/php/dependency/ChainedDependency';
-$__classes['FileDependency'                 ] = MINISTRUTS_ROOT.'/php/dependency/FileDependency';
+         // Warnen bei relativem Pfad (relative Pfade verschlechtern Performance, ganz besonders mit APC-Setting 'apc.stat=0')
+         $relative = WINDOWS ? !preg_match('/^[a-z]:/i', $fileName) : ($fileName{0} != '/');
+         if ($relative)
+            Logger ::log('Relative file name for class definition: '.$fileName, L_WARN, __CLASS__);
 
-$__classes['BusinessRuleException'          ] = MINISTRUTS_ROOT.'/php/exceptions/BusinessRuleException';
-$__classes['ClassNotFoundException'         ] = MINISTRUTS_ROOT.'/php/exceptions/ClassNotFoundException';
-$__classes['ConcurrentModificationException'] = MINISTRUTS_ROOT.'/php/exceptions/ConcurrentModificationException';
-$__classes['DatabaseException'              ] = MINISTRUTS_ROOT.'/php/exceptions/DatabaseException';
-$__classes['FileNotFoundException'          ] = MINISTRUTS_ROOT.'/php/exceptions/FileNotFoundException';
-$__classes['IllegalAccessException'         ] = MINISTRUTS_ROOT.'/php/exceptions/IllegalAccessException';
-$__classes['IllegalArgumentException'       ] = MINISTRUTS_ROOT.'/php/exceptions/IllegalArgumentException';
-$__classes['IllegalStateException'          ] = MINISTRUTS_ROOT.'/php/exceptions/IllegalStateException';
-$__classes['IllegalTypeException'           ] = MINISTRUTS_ROOT.'/php/exceptions/IllegalTypeException';
-$__classes['InfrastructureException'        ] = MINISTRUTS_ROOT.'/php/exceptions/InfrastructureException';
-$__classes['IOException'                    ] = MINISTRUTS_ROOT.'/php/exceptions/IOException';
-$__classes['NestableException'              ] = MINISTRUTS_ROOT.'/php/exceptions/NestableException';
-$__classes['PermissionDeniedException'      ] = MINISTRUTS_ROOT.'/php/exceptions/PermissionDeniedException';
-$__classes['PHPErrorException'              ] = MINISTRUTS_ROOT.'/php/exceptions/PHPErrorException';
-$__classes['plInvalidArgumentException'     ] = MINISTRUTS_ROOT.'/php/exceptions/plInvalidArgumentException';
-$__classes['plRuntimeException'             ] = MINISTRUTS_ROOT.'/php/exceptions/plRuntimeException';
-$__classes['UnimplementedFeatureException'  ] = MINISTRUTS_ROOT.'/php/exceptions/UnimplementedFeatureException';
-$__classes['UnsupportedMethodException'     ] = MINISTRUTS_ROOT.'/php/exceptions/UnsupportedMethodException';
+         unset($relative);
+         include($fileName.'.php');
 
-$__classes['BarCode'                        ] = MINISTRUTS_ROOT.'/php/file/image/barcode/BarCode';
-$__classes['BaseC128BarCode'                ] = MINISTRUTS_ROOT.'/php/file/image/barcode/BaseC128BarCode';
-$__classes['C128ABarCode'                   ] = MINISTRUTS_ROOT.'/php/file/image/barcode/C128ABarCode';
-$__classes['C128BBarCode'                   ] = MINISTRUTS_ROOT.'/php/file/image/barcode/C128BBarCode';
-$__classes['C128CBarCode'                   ] = MINISTRUTS_ROOT.'/php/file/image/barcode/C128CBarCode';
-$__classes['C39BarCode'                     ] = MINISTRUTS_ROOT.'/php/file/image/barcode/C39BarCode';
-$__classes['I25BarCode'                     ] = MINISTRUTS_ROOT.'/php/file/image/barcode/I25BarCode';
+         // Klasse als geladen markieren
+         $classMap[$class] = true;
+         return true;
+      }
+      throw new ClassNotFoundException("Undefined class '$class'");
+   }
+   catch (Exception $ex) {
+      if (func_num_args() > 1)         // Exceptions nur bei manuellem Aufruf werfen
+         throw $ex;
 
-$__classes['BasePdfDocument'                ] = MINISTRUTS_ROOT.'/php/file/pdf/BasePdfDocument';
-$__classes['SimplePdfDocument'              ] = MINISTRUTS_ROOT.'/php/file/pdf/SimplePdfDocument';
-
-$__classes['BaseLock'                       ] = MINISTRUTS_ROOT.'/php/locking/BaseLock';
-$__classes['FileLock'                       ] = MINISTRUTS_ROOT.'/php/locking/FileLock';
-$__classes['Lock'                           ] = MINISTRUTS_ROOT.'/php/locking/Lock';
-$__classes['SystemFiveLock'                 ] = MINISTRUTS_ROOT.'/php/locking/SystemFiveLock';
-
-$__classes['NetTools'                       ] = MINISTRUTS_ROOT.'/php/net/NetTools';
-$__classes['TorHelper'                      ] = MINISTRUTS_ROOT.'/php/net/TorHelper';
-
-$__classes['CurlHttpClient'                 ] = MINISTRUTS_ROOT.'/php/net/http/CurlHttpClient';
-$__classes['CurlHttpResponse'               ] = MINISTRUTS_ROOT.'/php/net/http/CurlHttpResponse';
-$__classes['HeaderParser'                   ] = MINISTRUTS_ROOT.'/php/net/http/HeaderParser';
-$__classes['HeaderUtils'                    ] = MINISTRUTS_ROOT.'/php/net/http/HeaderUtils';
-$__classes['HttpClient'                     ] = MINISTRUTS_ROOT.'/php/net/http/HttpClient';
-$__classes['HttpRequest'                    ] = MINISTRUTS_ROOT.'/php/net/http/HttpRequest';
-$__classes['HttpResponse'                   ] = MINISTRUTS_ROOT.'/php/net/http/HttpResponse';
-
-$__classes['CLIMailer'                      ] = MINISTRUTS_ROOT.'/php/net/mail/CLIMailer';
-$__classes['FileSocketMailer'               ] = MINISTRUTS_ROOT.'/php/net/mail/FileSocketMailer';
-$__classes['Mailer'                         ] = MINISTRUTS_ROOT.'/php/net/mail/Mailer';
-$__classes['PHPMailer'                      ] = MINISTRUTS_ROOT.'/php/net/mail/PHPMailer';
-$__classes['SMTPMailer'                     ] = MINISTRUTS_ROOT.'/php/net/mail/SMTPMailer';
-
-$__classes['ClickatellSMSMessenger'         ] = MINISTRUTS_ROOT.'/php/net/messenger/ClickatellSMSMessenger';
-$__classes['ICQMessenger'                   ] = MINISTRUTS_ROOT.'/php/net/messenger/ICQMessenger';
-$__classes['IRCMessenger'                   ] = MINISTRUTS_ROOT.'/php/net/messenger/IRCMessenger';
-$__classes['Messenger'                      ] = MINISTRUTS_ROOT.'/php/net/messenger/Messenger';
-
-$__classes['Action'                         ] = MINISTRUTS_ROOT.'/php/struts/Action';
-$__classes['ActionForm'                     ] = MINISTRUTS_ROOT.'/php/struts/ActionForm';
-$__classes['ActionForward'                  ] = MINISTRUTS_ROOT.'/php/struts/ActionForward';
-$__classes['ActionMapping'                  ] = MINISTRUTS_ROOT.'/php/struts/ActionMapping';
-$__classes['FrontController'                ] = MINISTRUTS_ROOT.'/php/struts/FrontController';
-$__classes['HttpSession'                    ] = MINISTRUTS_ROOT.'/php/struts/HttpSession';
-$__classes['Module'                         ] = MINISTRUTS_ROOT.'/php/struts/Module';
-$__classes['PageContext'                    ] = MINISTRUTS_ROOT.'/php/struts/PageContext';
-$__classes['Request'                        ] = MINISTRUTS_ROOT.'/php/struts/Request';
-$__classes['RequestBase'                    ] = MINISTRUTS_ROOT.'/php/struts/RequestBase';
-$__classes['RequestProcessor'               ] = MINISTRUTS_ROOT.'/php/struts/RequestProcessor';
-$__classes['Response'                       ] = MINISTRUTS_ROOT.'/php/struts/Response';
-$__classes['RoleProcessor'                  ] = MINISTRUTS_ROOT.'/php/struts/RoleProcessor';
-$__classes['Struts'                         ] = MINISTRUTS_ROOT.'/php/struts/Struts';
-$__classes['Tile'                           ] = MINISTRUTS_ROOT.'/php/struts/Tile';
-
-$__classes['CommonValidator'                ] = MINISTRUTS_ROOT.'/php/util/CommonValidator';
-$__classes['Config'                         ] = MINISTRUTS_ROOT.'/php/util/Config';
-$__classes['Date'                           ] = MINISTRUTS_ROOT.'/php/util/Date';
-$__classes['Logger'                         ] = MINISTRUTS_ROOT.'/php/util/Logger';
-$__classes['PHP'                            ] = MINISTRUTS_ROOT.'/php/util/PHP';
-$__classes['String'                         ] = MINISTRUTS_ROOT.'/php/util/String';
+      Logger ::handleException($ex);   // Aufruf durch den PHP-Kernel: Exception manuell verarbeiten, denn
+      exit(1);                         // __autoload() darf in PHP < 5.3 keine Exceptions werfen (siehe NOTE oben)
+   }
+   return false;
+}
 
 
-// Errorlevel
-!defined('E_RECOVERABLE_ERROR') && define('E_RECOVERABLE_ERROR',  4096);   // since PHP 5.2.0
-!defined('E_DEPRECATED'       ) && define('E_DEPRECATED'       ,  8192);   // since PHP 5.3.0
-!defined('E_USER_DEPRECATED'  ) && define('E_USER_DEPRECATED'  , 16384);   // since PHP 5.3.0
+
+
+//$a = new ministruts\A();
+$b = new Object();
+echoPre($b);
+
+exit();
+
+
+
+
+
+
+
+// (6) setup error and exception handling
+// (7) define local helper constants
+// (8) define local helper functions
+// (9) define helpers globally if applicable
+
+
+
 
 // Loglevel
 define('L_DEBUG' ,  1);
@@ -188,57 +191,6 @@ set_exception_handler(create_function('Exception $exception'                    
 register_shutdown_function(create_function(null, '$GLOBALS[\'$__shutting_down\'] = true;'));    // allererste Funktion auf dem Shutdown-Funktion-Stack
 
 
-/**
- * Class-Loader, lädt die angegebene Klasse.
- *
- * @param  string $className - Klassenname
- * @param  mixed  $throw     - Ob Exceptions geworfen werfen dürfen. Typ und Wert des Parameters sind unwichtig,
- *                             einzig seine Existenz reicht für die Erkennung eines manuellen Aufrufs.
- *
- * NOTE: Prior to 5.3 exceptions thrown in the __autoload() function could not be caught in the catch block and would result in
- *       a fatal error. From 5.3+ exceptions thrown in the __autoload() function can be caught in the catch block with one provision.
- *       If throwing a custom exception then the custom exception class must be available. The __autoload() function may be used
- *       recursively to autoload the custom exception class.
- */
-function __autoload($className/*, $throw*/) {
-   try {
-      if (isSet($GLOBALS['__classes'][$className])) {
-         // Fällt der automatische Aufruf der  __autoload()-Funktion aus (z.B. at Compile-Time in PHP 5.3-5.4.20), wird die Funktion
-         // u.U. manuell aufgerufen.  Um dabei Mehrfach-Includes derselben Klasse *ohne* Verwendung von include_once() verhindern zu
-         // können, setzen wir nach dem ersten Laden ein entsprechendes Flag. Die Verwendung von include_once() würde den Opcode-Cache
-         // verlangsamen.
-         //
-         // @see https://bugs.php.net/bug.php?id=47987
-
-         // Rückkehr, wenn Klasse schon geladen
-         if ($GLOBALS['__classes'][$className] === true)
-            return true;
-
-         $fileName = $GLOBALS['__classes'][$className];
-
-         // Warnen bei relativem Pfad (relative Pfade verschlechtern Performance, ganz besonders mit APC-Setting 'apc.stat=0')
-         $relative = WINDOWS ? !preg_match('/^[a-z]:/i', $fileName) : ($fileName{0} != '/');
-         if ($relative)
-            Logger ::log('Relative file name for class definition: '.$fileName, L_WARN, __CLASS__);
-
-         unset($relative);
-         include($fileName.'.php');
-
-         // Klasse als geladen markieren
-         $GLOBALS['__classes'][$className] = true;
-         return true;
-      }
-      throw new ClassNotFoundException("Undefined class '$className'");
-   }
-   catch (Exception $ex) {
-      if (func_num_args() > 1)         // Exceptions nur bei manuellem Aufruf werfen
-         throw $ex;
-
-      Logger ::handleException($ex);   // Aufruf durch den PHP-Kernel: Exception manuell verarbeiten, denn
-      exit(1);                         // __autoload() darf in PHP < 5.3 keine Exceptions werfen (siehe NOTE oben)
-   }
-   return false;
-}
 
 
 /**
@@ -623,22 +575,63 @@ function strRight($string, $length) {
 
 
 /**
- * Gibt den rechten Teil eines Strings ab dem Auftreten eines Teilstrings zurück. Das Ergebnis schließt den
- * zu suchenden Teilstring nicht mit ein.
+ * Returns the right part of a string from the specified occurrence of a limiting substring. The result doesn't
+ * include the limiting substring.
  *
- * @param  string $string    - Ausgangsstring
- * @param  string $substring - der das Ergebnis begrenzende Teilstring
+ * @param  string $string     - initial string
+ * @param  string $substring  - limiting substring (can be multiple characters)
+ * @param  int    $count      - if positive, the specified occurrence of the limiting substring counted from the
+ *                              start of the string (default: the first occurrence)
+ *                              if negative, the specified occurrence of the limiting substring counted from the
+ *                              end of the string;
+ *                              if zero, an empty string is returned
+ * @param  mixed  $onNotFound - value of any type to return if the limiting substring is not found;
+ *                              default: the full string
  *
- * @return string - Teilstring oder ein Leerstring, wenn der begrenzende Teilstring nicht gefunden wurde
+ * @return string - right part or the specified $onNotFound value
+ *
+ * @example
+ * <pre>
+ * strRightFrom('abc_abc', 'c')     => '_abc'
+ * strRightFrom('abcabc',  'x')     => 'abcabc'       // limiter not found
+ * strRightFrom('abc_abc', 'a',  2) => 'bc'
+ * strRightFrom('abc_abc', 'b', -2) => 'c_abc'
+ * </pre>
  */
-function strRightFrom($string, $substring) {
+function strRightFrom($string, $substring, $count=1, $onNotFound=null) {
    if (!is_string($string))    throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
    if (!is_string($substring)) throw new IllegalTypeException('Illegal type of parameter $substring: '.getType($substring));
+   if (!is_int($count))        throw new IllegalTypeException('Illegal type of parameter $count: '.getType($count));
 
-   $pos = strPos($string, $substring);
-   if ($pos === false)
-      return "";
-   return subStr($string, $pos + strLen($substring));
+   if ($count > 0) {
+      $pos = -1;
+      while ($count) {
+         $offset = $pos + 1;
+         $pos = strPos($string, $substring, $offset);
+         if ($pos === false)                                      // not found
+            return func_num_args() > 3 ? $onNotFound : $string;
+         $count--;
+      }
+      return subStr($string, $pos + strLen($substring));
+   }
+
+   if ($count < 0) {
+      $len = strLen($string);
+      $pos = $len;
+      while ($count) {
+         $offset = $pos - $len - 1;
+         if ($offset < -$len)                                     // not found
+            return func_num_args() > 3 ? $onNotFound : $string;
+         $pos = strRPos($string, $substring, $offset);
+         if ($pos === false)                                      // not found
+            return func_num_args() > 3 ? $onNotFound : $string;
+         $count++;
+      }
+      return subStr($string, $pos + strLen($substring));
+   }
+
+   // $count == 0
+   return '';
 }
 
 

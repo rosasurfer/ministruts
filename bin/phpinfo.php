@@ -1,6 +1,6 @@
 #!/usr/bin/php
 <?php
 /**
- * Command-Line-Version für phpinfo.php
+ * Command line version of phpinfo.php
  */
-require(dirName(__DIR__).'/src/php/phpinfo.php');
+require(dirName(__DIR__).'/src/rosasurfer/ministruts/phpinfo.php');

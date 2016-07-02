@@ -1,0 +1,108 @@
+<?php
+/**
+ * Class map for class loader (fastest way to load classes)
+ */
+return array(
+   'ApcCache'                        => __DIR__.'/cache/ApcCache',
+   'Cache'                           => __DIR__.'/cache/Cache',
+   'CachePeer'                       => __DIR__.'/cache/CachePeer',
+   'FileSystemCache'                 => __DIR__.'/cache/FileSystemCache',
+   'ReferencePool'                   => __DIR__.'/cache/ReferencePool',
+
+   'Object'                          => __DIR__.'/core/Object',
+   'Singleton'                       => __DIR__.'/core/Singleton',
+   'StaticClass'                     => __DIR__.'/core/StaticClass',
+
+   'CommonDAO'                       => __DIR__.'/dao/CommonDAO',
+   'DaoWorker'                       => __DIR__.'/dao/DaoWorker',
+   'IDaoConnected'                   => __DIR__.'/dao/IDaoConnected',
+   'PersistableObject'               => __DIR__.'/dao/PersistableObject',
+
+   'DB'                              => __DIR__.'/db/DB',
+   'DBPool'                          => __DIR__.'/db/DBPool',
+   'MySQLConnector'                  => __DIR__.'/db/MySQLConnector',
+
+   'Dependency'                      => __DIR__.'/dependency/Dependency',
+   'ChainedDependency'               => __DIR__.'/dependency/ChainedDependency',
+   'FileDependency'                  => __DIR__.'/dependency/FileDependency',
+
+   'BusinessRuleException'           => __DIR__.'/exceptions/BusinessRuleException',
+   'ClassNotFoundException'          => __DIR__.'/exceptions/ClassNotFoundException',
+   'ConcurrentModificationException' => __DIR__.'/exceptions/ConcurrentModificationException',
+   'DatabaseException'               => __DIR__.'/exceptions/DatabaseException',
+   'FileNotFoundException'           => __DIR__.'/exceptions/FileNotFoundException',
+   'IllegalAccessException'          => __DIR__.'/exceptions/IllegalAccessException',
+   'IllegalArgumentException'        => __DIR__.'/exceptions/IllegalArgumentException',
+   'IllegalStateException'           => __DIR__.'/exceptions/IllegalStateException',
+   'IllegalTypeException'            => __DIR__.'/exceptions/IllegalTypeException',
+   'InfrastructureException'         => __DIR__.'/exceptions/InfrastructureException',
+   'IOException'                     => __DIR__.'/exceptions/IOException',
+   'NestableException'               => __DIR__.'/exceptions/NestableException',
+   'PermissionDeniedException'       => __DIR__.'/exceptions/PermissionDeniedException',
+   'PHPErrorException'               => __DIR__.'/exceptions/PHPErrorException',
+   'plInvalidArgumentException'      => __DIR__.'/exceptions/plInvalidArgumentException',
+   'plRuntimeException'              => __DIR__.'/exceptions/plRuntimeException',
+   'UnimplementedFeatureException'   => __DIR__.'/exceptions/UnimplementedFeatureException',
+   'UnsupportedMethodException'      => __DIR__.'/exceptions/UnsupportedMethodException',
+
+   'BarCode'                         => __DIR__.'/file/image/barcode/BarCode',
+   'BaseC128BarCode'                 => __DIR__.'/file/image/barcode/BaseC128BarCode',
+   'C128ABarCode'                    => __DIR__.'/file/image/barcode/C128ABarCode',
+   'C128BBarCode'                    => __DIR__.'/file/image/barcode/C128BBarCode',
+   'C128CBarCode'                    => __DIR__.'/file/image/barcode/C128CBarCode',
+   'C39BarCode'                      => __DIR__.'/file/image/barcode/C39BarCode',
+   'I25BarCode'                      => __DIR__.'/file/image/barcode/I25BarCode',
+
+   'BasePdfDocument'                 => __DIR__.'/file/pdf/BasePdfDocument',
+   'SimplePdfDocument'               => __DIR__.'/file/pdf/SimplePdfDocument',
+
+   'BaseLock'                        => __DIR__.'/locking/BaseLock',
+   'FileLock'                        => __DIR__.'/locking/FileLock',
+   'Lock'                            => __DIR__.'/locking/Lock',
+   'SystemFiveLock'                  => __DIR__.'/locking/SystemFiveLock',
+
+   'NetTools'                        => __DIR__.'/net/NetTools',
+   'TorHelper'                       => __DIR__.'/net/TorHelper',
+
+   'CurlHttpClient'                  => __DIR__.'/net/http/CurlHttpClient',
+   'CurlHttpResponse'                => __DIR__.'/net/http/CurlHttpResponse',
+   'HeaderParser'                    => __DIR__.'/net/http/HeaderParser',
+   'HeaderUtils'                     => __DIR__.'/net/http/HeaderUtils',
+   'HttpClient'                      => __DIR__.'/net/http/HttpClient',
+   'HttpRequest'                     => __DIR__.'/net/http/HttpRequest',
+   'HttpResponse'                    => __DIR__.'/net/http/HttpResponse',
+
+   'CLIMailer'                       => __DIR__.'/net/mail/CLIMailer',
+   'FileSocketMailer'                => __DIR__.'/net/mail/FileSocketMailer',
+   'Mailer'                          => __DIR__.'/net/mail/Mailer',
+   'PHPMailer'                       => __DIR__.'/net/mail/PHPMailer',
+   'SMTPMailer'                      => __DIR__.'/net/mail/SMTPMailer',
+
+   'ClickatellSMSMessenger'          => __DIR__.'/net/messenger/ClickatellSMSMessenger',
+   'ICQMessenger'                    => __DIR__.'/net/messenger/ICQMessenger',
+   'IRCMessenger'                    => __DIR__.'/net/messenger/IRCMessenger',
+   'Messenger'                       => __DIR__.'/net/messenger/Messenger',
+
+   'Action'                          => __DIR__.'/struts/Action',
+   'ActionForm'                      => __DIR__.'/struts/ActionForm',
+   'ActionForward'                   => __DIR__.'/struts/ActionForward',
+   'ActionMapping'                   => __DIR__.'/struts/ActionMapping',
+   'FrontController'                 => __DIR__.'/struts/FrontController',
+   'HttpSession'                     => __DIR__.'/struts/HttpSession',
+   'Module'                          => __DIR__.'/struts/Module',
+   'PageContext'                     => __DIR__.'/struts/PageContext',
+   'Request'                         => __DIR__.'/struts/Request',
+   'RequestBase'                     => __DIR__.'/struts/RequestBase',
+   'RequestProcessor'                => __DIR__.'/struts/RequestProcessor',
+   'Response'                        => __DIR__.'/struts/Response',
+   'RoleProcessor'                   => __DIR__.'/struts/RoleProcessor',
+   'Struts'                          => __DIR__.'/struts/Struts',
+   'Tile'                            => __DIR__.'/struts/Tile',
+
+   'CommonValidator'                 => __DIR__.'/util/CommonValidator',
+   'Config'                          => __DIR__.'/util/Config',
+   'Date'                            => __DIR__.'/util/Date',
+   'Logger'                          => __DIR__.'/util/Logger',
+   'PHP'                             => __DIR__.'/util/PHP',
+   'String'                          => __DIR__.'/util/String',
+);
