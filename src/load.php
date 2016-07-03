@@ -78,10 +78,14 @@ if (false) {
  */
 function __autoload($class/*, $throw*/) {
    static $classMap = null;
-   !$classMap && $classMap=require(__DIR__.'/rosasurfer/ministruts/classmap.php');
+   if (!$classMap) {
+      $classMap = require(__DIR__.'/rosasurfer/ministruts/classmap.php');
+      $classMap = array_change_key_case($classMap, CASE_LOWER);
+   }
 
+   $classLower = strtolower($class);
    try {
-      if (isSet($classMap[$class])) {
+      if (isSet($classMap[$classLower])) {
          // Fällt der automatische Aufruf der  __autoload()-Funktion aus (z.B. at Compile-Time in PHP 5.3-5.4.20), wird die Funktion
          // u.U. manuell aufgerufen.  Um dabei Mehrfach-Includes derselben Klasse *ohne* Verwendung von include_once() verhindern zu
          // können, setzen wir nach dem ersten Laden ein entsprechendes Flag. Die Verwendung von include_once() würde den Opcode-Cache
@@ -90,10 +94,10 @@ function __autoload($class/*, $throw*/) {
          // @see https://bugs.php.net/bug.php?id=47987
 
          // Rückkehr, wenn Klasse schon geladen
-         if ($classMap[$class] === true)
+         if ($classMap[$classLower] === true)
             return true;
 
-         $fileName = $classMap[$class];
+         $fileName = $classMap[$classLower];
 
          // Warnen bei relativem Pfad (relative Pfade verschlechtern Performance, ganz besonders mit APC-Setting 'apc.stat=0')
          $relative = WINDOWS ? !preg_match('/^[a-z]:/i', $fileName) : ($fileName{0} != '/');
@@ -104,10 +108,10 @@ function __autoload($class/*, $throw*/) {
          include($fileName.'.php');
 
          // Klasse als geladen markieren
-         $classMap[$class] = true;
+         $classMap[$classLower] = true;
          return true;
       }
-      throw new ClassNotFoundException("Undefined class '$class'");
+      throw new ClassNotFoundException('Undefined class "'.$class.'"');
    }
    catch (Exception $ex) {
       if (func_num_args() > 1)         // Exceptions nur bei manuellem Aufruf werfen
@@ -121,13 +125,14 @@ function __autoload($class/*, $throw*/) {
 
 
 /*
-
 //$a = new ministruts\A();
-$b = new Object();
+$a = new Object();
+echoPre($a);
+
+$b = new object();
 echoPre($b);
 
 exit();
-
 */
 
 
