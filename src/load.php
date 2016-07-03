@@ -63,77 +63,43 @@ if (false) {
 
 
 /**
- * (5) register class loader                    @see  https://docs.phalconphp.com/en/latest/reference/loader.html
+ * (5) Register case-insensitive class loader
  *
- * Class-Loader, lädt die angegebene Klasse.
- *
- * @param  string $className - Klassenname
- * @param  mixed  $throw     - Ob Exceptions geworfen werfen dürfen. Typ und Wert des Parameters sind unwichtig,
- *                             einzig seine Existenz reicht für die Erkennung eines manuellen Aufrufs.
- *
- * NOTE: Prior to 5.3 exceptions thrown in the __autoload() function could not be caught in the catch block and would result in
- *       a fatal error. From 5.3+ exceptions thrown in the __autoload() function can be caught in the catch block with one provision.
- *       If throwing a custom exception then the custom exception class must be available. The __autoload() function may be used
- *       recursively to autoload the custom exception class.
+ * @param  string $class - name of class to load
  */
-function __autoload($class/*, $throw*/) {
+spl_autoload_register(function($class) {
+   // block manual re-declarations
+   if (class_exists($class, false) || interface_exists($class, false))
+      return;
+
+   // initialize class map
    static $classMap = null;
    if (!$classMap) {
-      $classMap = require(__DIR__.'/classmap.php');
+      $classMap = include(__DIR__.'/classmap.php');
       $classMap = array_change_key_case($classMap, CASE_LOWER);
    }
 
-   $classLower = strtolower($class);
+   $classToLower = strtolower($class);
    try {
-      if (isSet($classMap[$classLower])) {
-         // Fällt der automatische Aufruf der  __autoload()-Funktion aus (z.B. at Compile-Time in PHP 5.3-5.4.20), wird die Funktion
-         // u.U. manuell aufgerufen.  Um dabei Mehrfach-Includes derselben Klasse *ohne* Verwendung von include_once() verhindern zu
-         // können, setzen wir nach dem ersten Laden ein entsprechendes Flag. Die Verwendung von include_once() würde den Opcode-Cache
-         // verlangsamen.
-         //
-         // @see https://bugs.php.net/bug.php?id=47987
+      if (isSet($classMap[$classToLower])) {
+         $fileName = $classMap[$classToLower];
 
-         // Rückkehr, wenn Klasse schon geladen
-         if ($classMap[$classLower] === true)
-            return true;
-
-         $fileName = $classMap[$classLower];
-
-         // Warnen bei relativem Pfad (relative Pfade verschlechtern Performance, ganz besonders mit APC-Setting 'apc.stat=0')
+         // warn if relative path found: decreases performance, especially with APC setting 'apc.stat=0'
          $relative = WINDOWS ? !preg_match('/^[a-z]:/i', $fileName) : ($fileName{0} != '/');
-         if ($relative)
-            Logger ::log('Relative file name for class definition: '.$fileName, L_WARN, __CLASS__);
+         $relative && Logger::log('Relative file name for class '.$class.': "'.$fileName.'"', L_WARN, __CLASS__);
 
-         unset($relative);
+         // load class file
          include($fileName.'.php');
-
-         // Klasse als geladen markieren
-         $classMap[$classLower] = true;
-         return true;
       }
-      throw new ClassNotFoundException('Undefined class "'.$class.'"');
    }
    catch (Exception $ex) {
-      if (func_num_args() > 1)         // Exceptions nur bei manuellem Aufruf werfen
-         throw $ex;
-
-      Logger::handleException($ex);    // Aufruf durch den PHP-Kernel: Exception manuell verarbeiten, denn
-      exit(1);                         // __autoload() darf in PHP < 5.3 keine Exceptions werfen (siehe NOTE oben)
+      if (!$ex instanceof ClassNotFoundException)
+         $ex = new ClassNotFoundException('Cannot load class '.$class, $ex);
+      throw $ex;
    }
-   return false;
-}
+});
 
 
-/*
-//$a = new ministruts\A();
-$a = new Object();
-echoPre($a);
-
-$b = new object();
-echoPre($b);
-
-exit();
-*/
 
 
 
@@ -198,52 +164,70 @@ register_shutdown_function(create_function(null, '$GLOBALS[\'$__shutting_down\']
 
 
 /**
- * Ob die angegebene Klasse definiert ist. Diese Funktion ist notwendig, weil eine einfache Abfrage der Art
- * "if (class_exist($className, true))" intern die Funktion __autoload() aufruft und bei Nichtexistenz der Klasse das
- * Script mit einem fatalen Fehler beendet (Exceptions statt eines Fehlers sind in __autoload() nicht erlaubt). Wird die
- * Funktion __autoload() dagegen manuell und nicht intern von PHP aufgerufen, werden Exceptions weitergereicht und der
- * folgende Code kann entsprechend reagieren. Während der Prüfung wird die Klasse ggf. geladen.
+ * Ob die angegebene Klasse definiert (und kein Interface) ist. Diese Funktion bricht im Gegensatz zum Aufruf von
+ *
+ *    "class_exist($className, true)"
+ *
+ * bei Nichtexistenz der Klasse das Script nicht mit einem fatalen Fehler ab. Die Klasse wird ggf. geladen.
  *
  * @param  string $name - Klassenname
  *
  * @return bool
  */
 function is_class($name) {
-   if (class_exists($name, false))
-      return true;
+   if (class_exists    ($name, false)) return true;
+   if (interface_exists($name, false)) return false;
 
    try {
-      return (bool) __autoload($name, true);
+      $functions = spl_autoload_functions();
+      if (!$functions) {               // no loader nor __autoload() exist: spl_autoload_call() will call spl_autoload()
+         spl_autoload_call($name);     // onError: Uncaught LogicException: Class $name could not be loaded
+      }
+      else if (sizeOf($functions)==1 && is_string($functions[0]) && $functions[0]=='__autoload') {
+         __autoload($name);            // __autoload() exists and is explicit or implicit defined
+      }
+      else {
+         spl_autoload_call($name);     // a regular loader queue is defined
+      }
+      // TODO: make sure spl_autoload() is always the last loader to get an exception
    }
-   catch (ClassNotFoundException $ex) {
-      /* Ja, die Exception wird absichtlich verschluckt. */
-   }
-   return false;
+   catch (ClassNotFoundException $ex) {}
+
+   return class_exists($name, false);
 }
 
 
 /**
- * Ob das angegebene Interface definiert ist. Diese Funktion ist notwendig, weil eine einfache Abfrage der Art
- * "if (interface_exist($interfaceName, true))" intern die Funktion __autoload() aufruft und bei Nichtexistenz des
- * Interface das Script mit einem fatalen Fehler beendet (Exceptions statt eines Fehlers sind in __autoload() nicht
- * erlaubt). Wird die Funktion __autoload() dagegen manuell und nicht intern von PHP aufgerufen, werden Exceptions
- * weitergereicht und der folgende Code kann entsprechend reagieren. Während der Prüfung wird das Interface ggf. geladen.
+ * Ob das angegebene Interface definiert (und keine Klasse) ist. Diese Funktion bricht im Gegensatz zum Aufruf von
+ *
+ *    "interface_exist($interfaceName, true)"
+ *
+ * bei Nichtexistenz des Interface das Script nicht mit einem fatalen Fehler ab. Das Interface wird ggf. geladen.
  *
  * @param  string $name - Interface-Name
  *
  * @return bool
  */
 function is_interface($name) {
-   if (interface_exists($name, false))
-      return true;
+   if (interface_exists($name, false)) return true;
+   if (class_exists    ($name, false)) return false;
 
    try {
-      return (bool) __autoload($name, true);
+      $functions = spl_autoload_functions();
+      if (!$functions) {               // no loader nor __autoload() exist: spl_autoload_call() will call spl_autoload()
+         spl_autoload_call($name);     // onError: Uncaught LogicException: Class $name could not be loaded
+      }
+      else if (sizeOf($functions)==1 && is_string($functions[0]) && $functions[0]=='__autoload') {
+         __autoload($name);            // __autoload() exists and is explicit or implicit defined
+      }
+      else {
+         spl_autoload_call($name);     // a regular loader queue is defined
+      }
+      // TODO: make sure spl_autoload() is always the last loader to get an exception
    }
-   catch (ClassNotFoundException $ex) {
-      /* Ja, die Exception wird absichtlich verschluckt. */
-   }
-   return false;
+   catch (ClassNotFoundException $ex) {}
+
+   return interface_exists($name, false);
 }
 
 
