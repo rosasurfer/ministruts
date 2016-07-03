@@ -117,7 +117,7 @@ function __autoload($class/*, $throw*/) {
       if (func_num_args() > 1)         // Exceptions nur bei manuellem Aufruf werfen
          throw $ex;
 
-      Logger ::handleException($ex);   // Aufruf durch den PHP-Kernel: Exception manuell verarbeiten, denn
+      Logger::handleException($ex);    // Aufruf durch den PHP-Kernel: Exception manuell verarbeiten, denn
       exit(1);                         // __autoload() darf in PHP < 5.3 keine Exceptions werfen (siehe NOTE oben)
    }
    return false;
