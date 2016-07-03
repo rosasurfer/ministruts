@@ -1,20 +1,20 @@
-<?php
+﻿<?php
 namespace rosasurfer\ministruts\exceptions;
 
 
 /**
- * NestableException
+ * MinistrutsException
  *
  * Basisklasse für Exceptions, die weitere ursächliche Exceptions kapseln können.
  */
-abstract class NestableException extends Exception {
+class MinistrutsException extends \Exception {
 
 
    /**
     * Die Exception, die diese Exception ausgelöst hat, oder NULL, wenn diese Exception
     * nicht durch eine andere Exception ausgelöst wurde.
     */
-   private /*Exception*/ $cause;
+   private /*\Exception*/ $cause;
 
 
    /* Cachevariable für den erzeugten Stacktrace */
@@ -26,35 +26,35 @@ abstract class NestableException extends Exception {
 
 
    /**
-    * Erzeugt eine neue NestableException mit der angegebenen Nachricht und Ursache.
+    * Erzeugt eine neue Exception mit der angegebenen Nachricht und Ursache.
     *
     * Überladene Signatur:
     * --------------------
-    *    1) new NestableException()
-    *    2) new NestableException(Exception $cause)
-    *    3) new NestableException(string $message)
-    *    4) new NestableException(string $message, Exception $cause)
+    *    1) new MinistrutsException()
+    *    2) new MinistrutsException(\Exception $cause)
+    *    3) new MinistrutsException(string $message)
+    *    4) new MinistrutsException(string $message, \Exception $cause)
     *
-    * @param  mixed     $message - Nachricht (string) oder ursächliche Exception
-    * @param  Exception $cause   - ursächliche Exception
+    * @param  mixed      $message - Nachricht (string) oder ursächliche Exception
+    * @param  \Exception $cause   - ursächliche Exception
     */
-   public function __construct($message = null, Exception $cause = null) {
+   public function __construct($message = null, \Exception $cause = null) {
       $args = func_num_args();
 
-      if ($args == 0) {                         // new NestableException()
+      if ($args == 0) {                         // new MinistrutsException()
          parent:: __construct();
       }
       elseif ($args == 1) {
-         if ($message instanceof Exception) {   // new NestableException(Exception $cause)
+         if ($message instanceof \Exception) {  // new MinistrutsException(\Exception $cause)
             $cause = $message;
             parent:: __construct();
             $this->cause = $cause;
          }
-         else {                                 // new NestableException(string $message)
+         else {                                 // new MinistrutsException(string $message)
             parent:: __construct($message);
          }
       }
-      else {                                    // new NestableException(string $message, Exception $cause)
+      else {                                    // new MinistrutsException(string $message, \Exception $cause)
          parent:: __construct($message);
          $this->cause = $cause;
       }
@@ -64,8 +64,8 @@ abstract class NestableException extends Exception {
    /**
     * Gibt die Exception zurück, die diese Exception ausgelöst hat.
     *
-    * @return exception - Ursache oder NULL, wenn diese Exception nicht durch eine andere Exception
-    *                     ausgelöst wurde.
+    * @return \Exception - Ursache oder NULL, wenn diese Exception nicht durch eine andere Exception
+    *                      ausgelöst wurde.
     */
    public function getCause() {
       return $this->cause;
@@ -149,7 +149,7 @@ abstract class NestableException extends Exception {
 
          if ($this->cause !== null) {
             $result .= "\n\n\ncaused by\n".$this->cause."\n\nStacktrace:\n-----------\n";
-            if ($this->cause instanceof NestableException)
+            if ($this->cause instanceof MinistrutsException)
                $result .= $this->cause->printStackTrace(true);
             else {
                $result .= self ::formatStackTrace(self ::transformToJavaStackTrace($this->cause->getTrace()));
