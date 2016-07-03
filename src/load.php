@@ -53,7 +53,7 @@ ini_set('session.referer_check'   , ''                     );
 // (3) execute phpInfo() if applicable (if enabled authorization must be handled by the server)
 if (false) {
    if (!CLI && strEndsWith(strLeftTo($_SERVER['REQUEST_URI'], '?'), '/phpinfo.php'))
-      include(MINISTRUTS_ROOT.'/src/php/phpinfo.php') | exit(0);
+      include(MINISTRUTS_ROOT.'/src/phpinfo.php') | exit(0);
 }
 
 
@@ -79,7 +79,7 @@ if (false) {
 function __autoload($class/*, $throw*/) {
    static $classMap = null;
    if (!$classMap) {
-      $classMap = require(__DIR__.'/rosasurfer/ministruts/classmap.php');
+      $classMap = require(__DIR__.'/classmap.php');
       $classMap = array_change_key_case($classMap, CASE_LOWER);
    }
 

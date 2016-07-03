@@ -3,4 +3,4 @@
 /**
  * Command line version of phpinfo.php
  */
-require(dirName(__DIR__).'/src/rosasurfer/ministruts/phpinfo.php');
+require(dirName(__DIR__).'/src/phpinfo.php');
