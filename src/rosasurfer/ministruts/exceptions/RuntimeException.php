@@ -1,6 +1,9 @@
 <?php
+namespace rosasurfer\ministruts\exceptions;
+
+
 /**
- * plRuntimeException
+ * RuntimeException
  */
-class plRuntimeException extends NestableException {
+class RuntimeException extends Exception {
 }

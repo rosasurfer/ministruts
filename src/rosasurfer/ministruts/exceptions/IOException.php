@@ -1,6 +1,9 @@
 <?php
+namespace rosasurfer\ministruts\exceptions;
+
+
 /**
  * IOException
  */
-class IOException extends NestableException {
+class IOException extends Exception {
 }

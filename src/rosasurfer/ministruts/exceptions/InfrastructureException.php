@@ -1,9 +1,9 @@
 <?php
+namespace rosasurfer\ministruts\exceptions;
+
+
 /**
- * InfrastructureException
- *
- * Allgemeine Exception zur Markierung von Fehlern der Infrastruktur (z.B. Datenbank-, Netzwerk-
- * oder Socketfehler).
+ * Exception to mark errors of the infrastructure, ie. database, network or socket errors.
  */
-class InfrastructureException extends plRuntimeException {
+class InfrastructureException extends RuntimeException {
 }

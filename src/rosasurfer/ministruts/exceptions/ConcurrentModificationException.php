@@ -1,8 +1,9 @@
 <?php
+namespace rosasurfer\ministruts\exceptions;
+
+
 /**
- * ConcurrentModificationException
- *
- * Markiert Fehler bei gleichzeitigen Änderungen von Daten durch mehrere Prozesse.
+ * Exception to mark errors caused by non-synchronized modifications of shared resources.
  */
-class ConcurrentModificationException extends InfrastructureException {
+class ConcurrentModificationException extends RuntimeException {
 }

@@ -1,6 +1,9 @@
 <?php
+namespace rosasurfer\ministruts\exceptions;
+
+
 /**
  * UnsupportedMethodException
  */
-class UnsupportedMethodException extends plRuntimeException {
+class UnsupportedMethodException extends RuntimeException {
 }

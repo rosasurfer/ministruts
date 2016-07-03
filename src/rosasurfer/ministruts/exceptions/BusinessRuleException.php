@@ -1,8 +1,9 @@
 <?php
+namespace rosasurfer\ministruts\exceptions;
+
+
 /**
- * BusinessRuleException
- *
- * Allgemeine Exception zur Markierung von Fehlern in der Geschäftslogik.
+ * Exception to mark errors of the business logic.
  */
-class BusinessRuleException extends plRuntimeException {
+class BusinessRuleException extends Exception {
 }

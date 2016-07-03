@@ -1,6 +1,9 @@
 <?php
+namespace rosasurfer\ministruts\exceptions;
+
+
 /**
  * FileNotFoundException
  */
-class FileNotFoundException extends IOException {
+class FileNotFoundException extends RuntimeException {
 }

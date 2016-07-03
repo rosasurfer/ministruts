@@ -1,6 +1,9 @@
 <?php
+namespace rosasurfer\ministruts\exceptions;
+
+
 /**
  * IllegalStateException
  */
-class IllegalStateException extends plRuntimeException {
+class IllegalStateException extends RuntimeException {
 }

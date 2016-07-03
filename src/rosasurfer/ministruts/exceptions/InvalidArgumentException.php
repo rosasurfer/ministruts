@@ -1,6 +1,9 @@
 <?php
+namespace rosasurfer\ministruts\exceptions;
+
+
 /**
- * plInvalidArgumentException
+ * InvalidArgumentException
  */
-class plInvalidArgumentException extends plRuntimeException {
+class InvalidArgumentException extends RuntimeException {
 }

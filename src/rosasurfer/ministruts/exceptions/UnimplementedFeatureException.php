@@ -1,6 +1,9 @@
 <?php
+namespace rosasurfer\ministruts\exceptions;
+
+
 /**
  * UnimplementedFeatureException
  */
-class UnimplementedFeatureException extends plRuntimeException {
+class UnimplementedFeatureException extends RuntimeException {
 }

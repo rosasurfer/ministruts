@@ -1,6 +1,9 @@
 <?php
+namespace rosasurfer\ministruts\exceptions;
+
+
 /**
  * ClassNotFoundException
  */
-class ClassNotFoundException extends NestableException {
+class ClassNotFoundException extends Exception {
 }
