@@ -1,6 +1,4 @@
 <?php
-define('APPLICATION_NAME', 'barcode_test');
-
 // input parameters
 $type        = isSet($_REQUEST['type'       ]) ? $_REQUEST['type'       ] : 'I25';
 $format      = isSet($_REQUEST['format'     ]) ? $_REQUEST['format'     ] : 'png';

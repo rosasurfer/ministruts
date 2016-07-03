@@ -1,8 +1,6 @@
 <?php
-define('APPLICATION_NAME', 'barcode_test');
-
 $type   = isSet($_REQUEST['type'  ]) ? $_REQUEST['type'  ] : null;
-$value  = isSet($_REQUEST['value' ]) ? $_REQUEST['value' ] : "";
+$value  = isSet($_REQUEST['value' ]) ? $_REQUEST['value' ] : '';
 $width  = isSet($_REQUEST['width' ]) ? $_REQUEST['width' ] : null;
 $height = isSet($_REQUEST['height']) ? $_REQUEST['height'] : null;
 $style  = isSet($_REQUEST['style' ]) ? $_REQUEST['style' ] : null;
