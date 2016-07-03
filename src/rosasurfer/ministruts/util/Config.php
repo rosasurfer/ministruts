@@ -98,7 +98,7 @@ final class Config extends Object {
             if (!$locked) {
                // Lock holen und nochmal nachschauen
                $locked = true;
-               $lock   = new Lock(APPLICATION_NAME.'|'.__FILE__.'#'.__LINE__);
+               $lock   = new Lock(APPLICATION_ID.'|'.__FILE__.'#'.__LINE__);
                $config = $cache->get(__CLASS__);
             }
 

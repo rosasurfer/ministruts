@@ -36,7 +36,7 @@ final class Cache extends StaticClass {
     * @return CachePeer
     */
    public static function me($label = null) {
-      // TODO: zufällige Verwendung des APPLICATION_NAME als label abfangen
+      // TODO: zufällige Verwendung der APPLICATION_ID als Label abfangen
 
       // Default-Cache
       if ($label === null) {

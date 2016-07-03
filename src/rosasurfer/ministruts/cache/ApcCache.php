@@ -17,7 +17,7 @@ final class ApcCache extends CachePeer {
     */
    public function __construct($label = null, array $options = null) {
       $this->label     = $label;
-      $this->namespace = ($label===null) ? APPLICATION_NAME : $label;
+      $this->namespace = ($label===null) ? APPLICATION_ID : $label;
       $this->options   = $options;
    }
 
