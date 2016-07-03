@@ -1,3 +1,8 @@
+2016-07-02
+
+   - minimum PHP requirement is version 5.6
+
+
 2016-07-01
 
    - removed legacy references to APD (Advanced PHP Debugger)
