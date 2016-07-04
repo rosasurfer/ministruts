@@ -36,7 +36,7 @@ return array(
    'rosasurfer\ministruts\exceptions\ConcurrentModificationException' => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/exceptions/ConcurrentModificationException',
    'rosasurfer\ministruts\exceptions\DatabaseException'               => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/exceptions/DatabaseException',
    'rosasurfer\ministruts\exceptions\FileNotFoundException'           => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/exceptions/FileNotFoundException',
-   'rosasurfer\ministruts\exceptions\IMinistrutsException'            => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/exceptions/IMinistrutsException',
+   'rosasurfer\ministruts\exceptions\IRosasurferException'            => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/exceptions/IRosasurferException',
    'rosasurfer\ministruts\exceptions\IOException'                     => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/exceptions/IOException',
    'rosasurfer\ministruts\exceptions\IllegalAccessException'          => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/exceptions/IllegalAccessException',
    'rosasurfer\ministruts\exceptions\IllegalArgumentException'        => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/exceptions/IllegalArgumentException',
