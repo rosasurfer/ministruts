@@ -3,9 +3,9 @@ namespace rosasurfer\ministruts\exceptions;
 
 
 /**
- * An interface defining common functionality for SCX exceptions.
+ * An interface defining common functionality for all Rosasurfer exceptions.
  */
-interface IScxException {
+interface IRosasurferException {
 
 
    /**
