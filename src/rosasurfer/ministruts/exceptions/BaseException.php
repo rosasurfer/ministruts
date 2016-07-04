@@ -37,7 +37,7 @@ class BaseException extends \Exception implements IRosasurferException {
     */
    public function getBetterMessage() {
       if (!$this->betterMessage)
-         $this->betterMessage = \Debug::getBetterMessage($this);
+         $this->betterMessage = \DebugTools::getBetterMessage($this);
       return $this->betterMessage;
    }
 
@@ -52,7 +52,7 @@ class BaseException extends \Exception implements IRosasurferException {
 
       if (!$betterTrace) {
          // transform the original stacktrace into a better trace
-         $betterTrace = \Debug::fixTrace($this->getTrace(), $this->getFile(), $this->getLine());
+         $betterTrace = \DebugTools::fixTrace($this->getTrace(), $this->getFile(), $this->getLine());
 
          /*
          // if the exception was thrown in a magic "__set()" shift frames until we reach the erroneous assignment
@@ -84,7 +84,7 @@ class BaseException extends \Exception implements IRosasurferException {
     */
    public function getBetterTraceAsString() {
       if (!$this->betterTraceAsString)
-         $this->betterTraceAsString = \Debug::getBetterTraceAsString($this);
+         $this->betterTraceAsString = \DebugTools::getBetterTraceAsString($this);
       return $this->betterTraceAsString;
    }
 

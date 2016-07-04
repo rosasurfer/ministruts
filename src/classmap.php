@@ -108,7 +108,7 @@ return array(
    'CommonValidator'                                                  => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/util/CommonValidator',
    'Config'                                                           => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/util/Config',
    'Date'                                                             => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/util/Date',
-   'Debug'                                                            => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/util/Debug',
+   'DebugTools'                                                       => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/util/DebugTools',
    'Logger'                                                           => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/util/Logger',
    'PHP'                                                              => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/util/PHP',
    'String'                                                           => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/util/String',

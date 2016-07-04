@@ -2,7 +2,7 @@
 /**
  * Debugging related functionality
  */
-class Debug extends StaticClass {
+class DebugTools extends StaticClass {
 
 
    /**

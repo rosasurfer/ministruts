@@ -114,7 +114,7 @@ class System extends StaticClass {
        *
        *     Workaround: manually call the exception handler
        */
-      $function = Debug::getFQFunctionName($exception->getBetterTrace()[0]);
+      $function = DebugTools::getFQFunctionName($exception->getBetterTrace()[0]);
       if ($function=='require' || $function=='require_once') {
          self::$exceptionHandler->__invoke($exception);           // that's Closure::__invoke()
          return true;
@@ -151,8 +151,8 @@ class System extends StaticClass {
 
       // collect data
       $type       = $exception instanceof \ErrorException ? 'Unexpected':'Unhandled';
-      $exMessage  = trim(Debug::getBetterMessage($exception));
-      $traceStr   = Debug::getBetterTraceAsString($exception);
+      $exMessage  = trim(DebugTools::getBetterMessage($exception));
+      $traceStr   = DebugTools::getBetterTraceAsString($exception);
       $file       = $exception->getFile();
       $line       = $exception->getLine();
       $cliMessage = '[FATAL] '.$type.' '.$exMessage."\n in ".$file.' on line '.$line."\n";

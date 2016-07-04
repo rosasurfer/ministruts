@@ -171,8 +171,8 @@ class Logger extends StaticClass {
 
          // 1. Fehlerdaten ermitteln
          $type       = $exception instanceof \ErrorException ? 'Unexpected':'Unhandled';
-         $exMessage  = trim(Debug::getBetterMessage($exception));
-         $traceStr   = Debug::getBetterTraceAsString($exception);
+         $exMessage  = trim(DebugTools::getBetterMessage($exception));
+         $traceStr   = DebugTools::getBetterTraceAsString($exception);
          $file       = $exception->getFile();
          $line       = $exception->getLine();
          $cliMessage = '[FATAL] '.$type.' '.$exMessage."\n in ".$file.' on line '.$line."\n";

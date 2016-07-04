@@ -39,7 +39,7 @@ class PHPError extends \ErrorException implements IRosasurferException {
     */
    public function getBetterMessage() {
       if (!$this->betterMessage)
-         $this->betterMessage = \Debug::getBetterMessage($this);
+         $this->betterMessage = \DebugTools::getBetterMessage($this);
       return $this->betterMessage;
    }
 
@@ -54,15 +54,15 @@ class PHPError extends \ErrorException implements IRosasurferException {
 
       if (!$trace) {
          // transform the original stacktrace into a better trace
-         $trace = \Debug::fixTrace($this->getTrace());
+         $trace = \DebugTools::fixTrace($this->getTrace());
 
          // drop the first frame if the error was constructed in the error handler (it always should)
-         if (\Debug::getFQFunctionName($trace[0]) == 'scx\commons\SCX::handleError') {
+         if (\DebugTools::getFQFunctionName($trace[0]) == 'scx\commons\SCX::handleError') {
             array_shift($trace);
 
             // if error was triggered by include/require/_once: fix the next frame, it's simply wrong
             if (sizeOf($trace > 1)) {
-               $function = \Debug::getFQFunctionName($trace[0]);
+               $function = \DebugTools::getFQFunctionName($trace[0]);
                if ($function=='include' || $function=='include_once' || $function=='require' || $function=='require_once') {
                   if (isSet($trace[0]['file']) && isSet($trace[1]['file'])) {
                      if ($trace[0]['file'] == $trace[1]['file']) {
@@ -91,7 +91,7 @@ class PHPError extends \ErrorException implements IRosasurferException {
     */
    public function getBetterTraceAsString() {
       if (!$this->betterTraceAsString)
-         $this->betterTraceAsString = \Debug::getBetterTraceAsString($this);
+         $this->betterTraceAsString = \DebugTools::getBetterTraceAsString($this);
       return $this->betterTraceAsString;
    }
 
