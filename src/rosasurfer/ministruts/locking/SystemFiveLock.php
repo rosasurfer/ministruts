@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 use rosasurfer\ministruts\exceptions\IllegalTypeException;
 use rosasurfer\ministruts\exceptions\PHPError;
 use rosasurfer\ministruts\exceptions\RuntimeException;
@@ -10,7 +10,7 @@ use rosasurfer\ministruts\exceptions\RuntimeException;
  * A token representing a lock on a System-V shared memory segment.  Some platforms do not support
  * System-V shared memory (ie. Windows).
  */
-final class SystemFiveLock extends BaseLock {
+class SystemFiveLock extends BaseLock {
 
 
    private static /*bool*/ $logDebug,
