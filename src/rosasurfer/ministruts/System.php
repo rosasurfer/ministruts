@@ -22,8 +22,10 @@ class System extends StaticClass {
     * Setup global error and exception handling.
     */
    public static function setupErrorHandling() {
-    //set_error_handler(self::$errorHandler=__CLASS__.'::handleError', $default=E_ALL);
-      set_error_handler(self::$errorHandler=__CLASS__.'::handleError', error_reporting());
+      $errorLevel = E_ALL;                         // default if unspecified
+      $errorLevel = error_reporting();             // TODO: remove, it disables runtime error level changes
+
+      set_error_handler(self::$errorHandler=__CLASS__.'::handleError', $errorLevel);
 
       set_exception_handler(self::$exceptionHandler=function(\Exception $ex) {
          self::handleException($ex);
