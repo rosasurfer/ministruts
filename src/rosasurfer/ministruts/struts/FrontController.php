@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 use rosasurfer\ministruts\exceptions\FileNotFoundException;
 use rosasurfer\ministruts\exceptions\IllegalStateException;
 use rosasurfer\ministruts\exceptions\RuntimeException;
@@ -112,7 +112,7 @@ final class FrontController extends Singleton {
          }
       }
       catch (\Exception $ex) {
-         throw new RuntimeException('Error loading '.$file, $ex);
+         throw new RuntimeException('Error loading '.$file, null, $ex);
       }
    }
 

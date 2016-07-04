@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 use rosasurfer\ministruts\exceptions\IllegalTypeException;
 use rosasurfer\ministruts\exceptions\PHPError;
 use rosasurfer\ministruts\exceptions\RuntimeException;
@@ -81,7 +81,7 @@ final class SystemFiveLock extends BaseLock {
                continue;
             }
             // Endlosschleife verhindern
-            throw new RuntimeException("Giving up to get lock for key \"$key\" after $i trials".($messages ? ", former errors:\n".join("\n", $messages):null), $ex);
+            throw new RuntimeException("Giving up to get lock for key \"$key\" after $i trials".($messages ? ", former errors:\n".join("\n", $messages):null), null, $ex);
          }
       }
       while (true);

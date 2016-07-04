@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 use rosasurfer\ministruts\exceptions\IllegalTypeException;
 use rosasurfer\ministruts\exceptions\InvalidArgumentException;
 
@@ -25,7 +25,7 @@ final class NetTools extends StaticClass {
       }
       catch (\Exception $ex) {
          if ($ex->getMessage() == 'gethostbyaddr(): Address is not a valid IPv4 or IPv6 address')
-            throw new InvalidArgumentException('Invalid argument $address: "'.$address.'"', $ex);
+            throw new InvalidArgumentException('Invalid argument $address: "'.$address.'"', null, $ex);
          throw $ex;
       }
    }

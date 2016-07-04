@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 use rosasurfer\ministruts\exceptions\ClassNotFoundException;
 use rosasurfer\ministruts\exceptions\FileNotFoundException;
 use rosasurfer\ministruts\exceptions\IllegalStateException;
@@ -144,14 +144,14 @@ class Module extends Object {
 
       // ins Packageverzeichnis wechseln
       try { chDir($packageDir); }
-      catch (\Exception $ex) { throw new RuntimeException('Could not change working directory to "'.$packageDir.'"', $ex); }
+      catch (\Exception $ex) { throw new RuntimeException('Could not change working directory to "'.$packageDir.'"', null, $ex); }
 
       // Konfiguration parsen und validieren
       $xml = new SimpleXMLElement($content, LIBXML_DTDVALID);
 
       // zurück ins Ausgangsverzeichnis wechseln
       try { chDir($currentDir); }
-      catch (\Exception $ex) { throw new RuntimeException('Could not change working directory back to "'.$currentDir.'"', $ex); }
+      catch (\Exception $ex) { throw new RuntimeException('Could not change working directory back to "'.$currentDir.'"', null, $ex); }
 
       return $xml;
    }
