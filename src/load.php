@@ -193,7 +193,6 @@ function is_class($name) {
       else {
          spl_autoload_call($name);     // a regular loader queue is defined
       }
-      // TODO: make sure spl_autoload() is always the last loader to get an exception
    }
    catch (ClassNotFoundException $ex) {}
 
@@ -227,7 +226,6 @@ function is_interface($name) {
       else {
          spl_autoload_call($name);     // a regular loader queue is defined
       }
-      // TODO: make sure spl_autoload() is always the last loader to get an exception
    }
    catch (ClassNotFoundException $ex) {}
 
