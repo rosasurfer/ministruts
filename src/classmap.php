@@ -6,8 +6,6 @@ use const rosasurfer\ministruts\ROOT as MINISTRUTS_ROOT;
  * Class map for class loader (fastest way to load classes)
  */
 return array(
-   'System'                                                           => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/System',
-
    'ApcCache'                                                         => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/cache/ApcCache',
    'Cache'                                                            => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/cache/Cache',
    'CachePeer'                                                        => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/cache/CachePeer',
@@ -112,4 +110,5 @@ return array(
    'Logger'                                                           => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/util/Logger',
    'PHP'                                                              => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/util/PHP',
    'String'                                                           => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/util/String',
+   'System'                                                           => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/util/System',
 );
