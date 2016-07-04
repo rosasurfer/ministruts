@@ -5,5 +5,5 @@ namespace rosasurfer\ministruts\exceptions;
 /**
  * RuntimeException
  */
-class RuntimeException extends MinistrutsException {
+class RuntimeException extends BaseException {
 }

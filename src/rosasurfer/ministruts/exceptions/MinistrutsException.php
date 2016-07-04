@@ -1,13 +1,13 @@
-<?php
+﻿<?php
 namespace rosasurfer\ministruts\exceptions;
 
 
 /**
- * MinistrutsException
+ * BaseException
  *
  * Basisklasse für Exceptions, die weitere ursächliche Exceptions kapseln können.
  */
-class MinistrutsException extends \Exception {
+class BaseException extends \Exception {
 
 
    /**
@@ -30,10 +30,10 @@ class MinistrutsException extends \Exception {
     *
     * Überladene Signatur:
     * --------------------
-    *    1) new MinistrutsException()
-    *    2) new MinistrutsException(\Exception $cause)
-    *    3) new MinistrutsException(string $message)
-    *    4) new MinistrutsException(string $message, \Exception $cause)
+    *    1) new BaseException()
+    *    2) new BaseException(\Exception $cause)
+    *    3) new BaseException(string $message)
+    *    4) new BaseException(string $message, \Exception $cause)
     *
     * @param  mixed      $message - Nachricht (string) oder ursächliche Exception
     * @param  \Exception $cause   - ursächliche Exception
@@ -41,20 +41,20 @@ class MinistrutsException extends \Exception {
    public function __construct($message = null, \Exception $cause = null) {
       $args = func_num_args();
 
-      if ($args == 0) {                         // new MinistrutsException()
+      if ($args == 0) {                         // new BaseException()
          parent:: __construct();
       }
       elseif ($args == 1) {
-         if ($message instanceof \Exception) {  // new MinistrutsException(\Exception $cause)
+         if ($message instanceof \Exception) {  // new BaseException(\Exception $cause)
             $cause = $message;
             parent:: __construct();
             $this->cause = $cause;
          }
-         else {                                 // new MinistrutsException(string $message)
+         else {                                 // new BaseException(string $message)
             parent:: __construct($message);
          }
       }
-      else {                                    // new MinistrutsException(string $message, \Exception $cause)
+      else {                                    // new BaseException(string $message, \Exception $cause)
          parent:: __construct($message);
          $this->cause = $cause;
       }
@@ -149,7 +149,7 @@ class MinistrutsException extends \Exception {
 
          if ($this->cause !== null) {
             $result .= "\n\n\ncaused by\n".$this->cause."\n\nStacktrace:\n-----------\n";
-            if ($this->cause instanceof MinistrutsException)
+            if ($this->cause instanceof self)
                $result .= $this->cause->printStackTrace(true);
             else {
                $result .= self ::formatStackTrace(self ::transformToJavaStackTrace($this->cause->getTrace()));

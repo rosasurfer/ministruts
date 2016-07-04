@@ -1,5 +1,5 @@
-<?php
-use rosasurfer\ministruts\exceptions\MinistrutsException;
+﻿<?php
+use rosasurfer\ministruts\exceptions\BaseException as RosasurferException;
 use rosasurfer\ministruts\exceptions\PHPError;
 
 use const rosasurfer\ministruts\CLI as CLI;
@@ -152,8 +152,8 @@ class System extends StaticClass {
 
       // collect data
       $type       = $exception instanceof \ErrorException ? 'Unexpected':'Unhandled';
-      $exMessage  = trim(MinistrutsException::printBetterMessage($exception, true));
-      $traceStr   = MinistrutsException::printBetterTrace($exception, true);
+      $exMessage  = trim(RosasurferException::printBetterMessage($exception, true));
+      $traceStr   = RosasurferException::printBetterTrace($exception, true);
       $file       = $exception->getFile();
       $line       = $exception->getLine();
       $cliMessage = '[FATAL] '.$type.' '.$exMessage."\n in ".$file.' on line '.$line."\n";

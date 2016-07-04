@@ -31,6 +31,7 @@ return array(
    'ChainedDependency'                                                => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/dependency/ChainedDependency',
    'FileDependency'                                                   => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/dependency/FileDependency',
 
+   'rosasurfer\ministruts\exceptions\BaseException'                   => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/exceptions/BaseException',
    'rosasurfer\ministruts\exceptions\BusinessRuleException'           => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/exceptions/BusinessRuleException',
    'rosasurfer\ministruts\exceptions\ClassNotFoundException'          => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/exceptions/ClassNotFoundException',
    'rosasurfer\ministruts\exceptions\ConcurrentModificationException' => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/exceptions/ConcurrentModificationException',
@@ -44,7 +45,6 @@ return array(
    'rosasurfer\ministruts\exceptions\IllegalTypeException'            => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/exceptions/IllegalTypeException',
    'rosasurfer\ministruts\exceptions\InfrastructureException'         => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/exceptions/InfrastructureException',
    'rosasurfer\ministruts\exceptions\InvalidArgumentException'        => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/exceptions/InvalidArgumentException',
-   'rosasurfer\ministruts\exceptions\MinistrutsException'             => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/exceptions/MinistrutsException',
    'rosasurfer\ministruts\exceptions\PHPError'                        => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/exceptions/PHPError',
    'rosasurfer\ministruts\exceptions\PermissionDeniedException'       => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/exceptions/PermissionDeniedException',
    'rosasurfer\ministruts\exceptions\RuntimeException'                => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/exceptions/RuntimeException',

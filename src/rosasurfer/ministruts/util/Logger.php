@@ -1,7 +1,7 @@
-<?php
+﻿<?php
+use rosasurfer\ministruts\exceptions\BaseException as RosasurferException;
 use rosasurfer\ministruts\exceptions\IllegalTypeException;
 use rosasurfer\ministruts\exceptions\InvalidArgumentException;
-use rosasurfer\ministruts\exceptions\MinistrutsException;
 use rosasurfer\ministruts\exceptions\RuntimeException;
 
 use const rosasurfer\ministruts\CLI       as CLI;
@@ -172,8 +172,8 @@ class Logger extends StaticClass {
          //              in E:\Projekte\ministruts\src\php\file\image\barcode\test\image.php on line 33
 
          // 1. Fehlerdaten ermitteln
-         $message  = ($exception instanceof MinistrutsException) ? (string)$exception : get_class($exception).': '.$exception->getMessage();
-         $traceStr = ($exception instanceof MinistrutsException) ? "Stacktrace:\n-----------\n".$exception->printStackTrace(true) : 'Stacktrace not available';
+         $message  = ($exception instanceof RosasurferException) ? (string)$exception : get_class($exception).': '.$exception->getMessage();
+         $traceStr = ($exception instanceof RosasurferException) ? "Stacktrace:\n-----------\n".$exception->printStackTrace(true) : 'Stacktrace not available';
          // TODO: vernestelte, einfache Exceptions geben fehlerhaften Stacktrace zurück
          $file     =  $exception->getFile();
          $line     =  $exception->getLine();
@@ -326,10 +326,10 @@ class Logger extends StaticClass {
          $exMessage = null;
          if ($exception) {
             $message  .= ($message === null) ? (string) $exception : ' ('.get_class($exception).')';
-            $exMessage = ($exception instanceof MinistrutsException) ? (string) $exception : get_class($exception).': '.$exception->getMessage();;
+            $exMessage = ($exception instanceof RosasurferException) ? (string) $exception : get_class($exception).': '.$exception->getMessage();;
          }
 
-         if ($exception instanceof MinistrutsException) {
+         if ($exception instanceof RosasurferException) {
             $trace = $exception->getStackTrace();
             $file  = $exception->getFile();
             $line  = $exception->getLine();
@@ -337,7 +337,7 @@ class Logger extends StaticClass {
          }
          else {
             $trace = $exception ? $exception->getTrace() : debug_backtrace();
-            $trace = MinistrutsException::transformToJavaStackTrace($trace);
+            $trace = RosasurferException::transformToJavaStackTrace($trace);
             // die Frames des Loggers selbst können weg
             if ($trace[0]['class'].$trace[0]['type'].$trace[0]['function'] == 'Logger::log_1') array_shift($trace);
             if ($trace[0]['class'].$trace[0]['type'].$trace[0]['function'] == 'Logger::log'  ) array_shift($trace);
@@ -350,7 +350,7 @@ class Logger extends StaticClass {
                   break;
                }
             }
-            $trace = "Stacktrace:\n-----------\n".MinistrutsException::formatStackTrace($trace);
+            $trace = "Stacktrace:\n-----------\n".RosasurferException::formatStackTrace($trace);
             // TODO: vernestelte, einfache Exceptions geben fehlerhaften Stacktrace zurück
          }
          $plainMessage = self::$logLevels[$level].': '.$message."\nin ".$file.' on line '.$line."\n";
