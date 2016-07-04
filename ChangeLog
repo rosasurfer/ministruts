@@ -1,6 +1,8 @@
-2016-07-02
+2016-07-04
 
-   - minimum PHP requirement is version 5.6
+   - updated framework requirements:
+     minimum PHP version:      5.6
+     php.ini "short_open_tag": On
 
 
 2016-07-01
