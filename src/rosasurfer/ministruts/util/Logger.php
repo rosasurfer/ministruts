@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 use rosasurfer\ministruts\exceptions\BaseException as RosasurferException;
 use rosasurfer\ministruts\exceptions\IllegalTypeException;
 use rosasurfer\ministruts\exceptions\InvalidArgumentException;
@@ -70,10 +70,8 @@ class Logger extends StaticClass {
          return;
 
       // Standardmäßig ist die Ausgabe am Bildschirm bei lokalem Zugriff an und bei Remote-Zugriff aus, es sei denn,
-      // in der php.ini ist ausdrücklich etwas anderes konfiguriert.
-      self::$print = CLI                                                // Konsole
-                  || LOCALHOST                                          // Webrequest vom lokalen Rechner
-                  || (bool) ini_get('display_errors');
+      // es ist ausdrücklich etwas anderes konfiguriert.
+      self::$print = CLI || LOCALHOST || (bool)ini_get('display_errors');
 
 
       // Der E-Mailversand ist aktiv, wenn in der Projektkonfiguration mindestens eine E-Mailadresse angegeben wurde.
@@ -150,20 +148,20 @@ class Logger extends StaticClass {
     * NOTE: PHP bricht das Script nach Aufruf dieses Handlers automatisch ab.
     *
     * @param  \Exception $exception      - die zu behandelnde Exception
-    * @param  bool      $inShutdownOnly - Ob die Exception ggf. ignoriert werden soll (wenn sie in einem Destructor auftritt).
-    *                                     Befindet sich das Script im Shutdown, darf aus einem Destructor keine Exception mehr geworfen
-    *                                     werden.  Daher muß vorm Werfen der Exception diese Funktion mit $inShutdownOnly=TRUE
-    *                                     aufgerufen werden, um den Shutdown-Status zu testen und zu behandeln.
-    *                                    (1) Während des Shutdowns wird die Exception so behandelt, als wenn sie durch den installierten
-    *                                        Error-Handler ausgelöst worden wäre.
-    *                                    (2) Befindet sich das Script nicht im Shutdown, wird die Exception ignoriert.
+    * @param  bool       $inShutdownOnly - Ob die Exception ggf. ignoriert werden soll (wenn sie in einem Destructor auftritt).
+    *                                      Befindet sich das Script im Shutdown, darf aus einem Destructor keine Exception mehr geworfen
+    *                                      werden.  Daher muß vorm Werfen der Exception diese Funktion mit $inShutdownOnly=TRUE
+    *                                      aufgerufen werden, um den Shutdown-Status zu testen und zu behandeln.
+    *                                     (1) Während des Shutdowns wird die Exception so behandelt, als wenn sie durch den installierten
+    *                                         Error-Handler ausgelöst worden wäre.
+    *                                     (2) Befindet sich das Script nicht im Shutdown, wird die Exception ignoriert.
     */
    public static function handleException(\Exception $exception, $inShutdownOnly=false) {
       if ($inShutdownOnly && !isSet($GLOBALS['$__shutting_down']))
          return;
 
       try {
-         self:: init();
+         self::init();
 
          // TODO: Stimmt dieser Fehler mit der obigen Logik überein???
          //
@@ -172,33 +170,30 @@ class Logger extends StaticClass {
          //              in E:\Projekte\ministruts\src\php\file\image\barcode\test\image.php on line 33
 
          // 1. Fehlerdaten ermitteln
-         $message  = ($exception instanceof RosasurferException) ? (string)$exception : get_class($exception).': '.$exception->getMessage();
-         $traceStr = ($exception instanceof RosasurferException) ? "Stacktrace:\n-----------\n".$exception->printStackTrace(true) : 'Stacktrace not available';
-         // TODO: vernestelte, einfache Exceptions geben fehlerhaften Stacktrace zurück
-         $file     =  $exception->getFile();
-         $line     =  $exception->getLine();
-         $plainMessage = '[FATAL] Uncaught '.$message."\nin ".$file.' on line '.$line."\n";
-
+         $type       = $exception instanceof \ErrorException ? 'Unexpected':'Unhandled';
+         $exMessage  = trim(Debug::getBetterMessage($exception));
+         $traceStr   = Debug::getBetterTraceAsString($exception);
+         $file       = $exception->getFile();
+         $line       = $exception->getLine();
+         $cliMessage = '[FATAL] '.$type.' '.$exMessage."\n in ".$file.' on line '.$line."\n";
 
          // 2. Exception anzeigen
          if (self::$print) {
-            if (!CLI) {
+            if (CLI) {
+               echoPre($cliMessage."\n".$traceStr."\n");
+            }
+            else {
                echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif"><b>[FATAL] Uncaught</b> '.nl2br(htmlSpecialChars($message, ENT_QUOTES))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
                echo '<br>'.printFormatted($traceStr, true);
                echo "<br></div>\n";
             }
-            else {
-               echo $plainMessage."\n".$traceStr."\n";            // PHP gibt den Fehler unter Linux zusätzlich auf STDERR aus,
-            }                                                     // also auf der Konsole ggf. unterdrücken
-            ob_get_level() && ob_flush();
          }
-
 
          // 3. Exception an die konfigurierten Adressen mailen
          if (self::$mail) {
-            $mailMsg  = $plainMessage."\n".$traceStr;
+            $mailMsg = $cliMessage."\n".$traceStr;
 
-            if ($request=Request ::me()) {
+            if ($request=Request::me()) {
                $session = $request->isSession() ? print_r($_SESSION, true) : null;
 
                $ip   = $_SERVER['REMOTE_ADDR'];
@@ -215,29 +210,29 @@ class Logger extends StaticClass {
                $mailMsg .= "\n\n\nShell:\n------\n".print_r($_SERVER, true)."\n\n\n";
             }
             $subject = 'PHP: [FATAL] Uncaught Exception at '.($request ? $request->getHostname():'').$_SERVER['PHP_SELF'];
-            self ::mail_log($subject, $mailMsg);
+            self::mail_log($subject, $mailMsg);
          }
 
 
          // (4) Logmessage ins Error-Log schreiben, wenn sie nicht per Mail rausging
          else {
-            self ::error_log('PHP '.$plainMessage);
+            self::error_log('PHP '.$cliMessage);
          }
 
 
          // (5) Logmessage per SMS verschicken
          if (self::$sms) {
-            self ::sms_log($plainMessage);
+            self::sms_log($cliMessage);
          }
       }
-      catch (\Exception $secondEx) {
+      catch (\Exception $secondary) {
          $file = $exception->getFile();
          $line = $exception->getLine();
-         self ::error_log('PHP primary '.(string)$exception.' in '.$file.' on line '.$line);
+         self::error_log('PHP primary '.(string)$exception.' in '.$file.' on line '.$line);
 
-         $file = $secondEx->getFile();
-         $line = $secondEx->getLine();
-         self ::error_log('PHP secondary '.(string)$secondEx.' in '.$file.' on line '.$line);
+         $file = $secondary->getFile();
+         $line = $secondary->getLine();
+         self::error_log('PHP secondary '.(string)$secondary.' in '.$file.' on line '.$line);
       }
    }
 
@@ -402,7 +397,7 @@ class Logger extends StaticClass {
 
          // (4) Logmessage ins Error-Log schreiben, wenn sie nicht per Mail rausging
          else {
-            self ::error_log('PHP '.$plainMessage);
+            self::error_log('PHP '.$plainMessage);
          }
 
 
@@ -412,7 +407,7 @@ class Logger extends StaticClass {
          }
       }
       catch (\Exception $ex) {
-         self ::error_log('PHP (0) '.$plainMessage ? $plainMessage:$message);
+         self::error_log('PHP (0) '.$plainMessage ? $plainMessage:$message);
          throw $ex;
       }
    }
@@ -425,8 +420,10 @@ class Logger extends StaticClass {
     */
    private static function error_log($message) {
       $message = str_replace(array("\r\n", "\n"), ' ', $message);    // Zeilenumbrüche entfernen
-      $message = str_replace(chr(0), "*\x00*", $message);            // NUL-Characters ersetzen (zerschießen Logfile)
-      error_log($message, ERROR_LOG_SYSLOG);
+      $message = str_replace(chr(0), "*\x00*", $message);            // NUL-Bytes ersetzen (zerschießen Logfile)
+
+      if (!CLI || !self::$print)                                     // verhindern, daß der Fehler ein weiteres Mal
+         error_log($message, ERROR_LOG_SYSLOG);                      // auf STDERR ausgegeben wird
    }
 
 

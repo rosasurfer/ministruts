@@ -1,5 +1,4 @@
-﻿<?php
-use rosasurfer\ministruts\exceptions\BaseException as RosasurferException;
+<?php
 use rosasurfer\ministruts\exceptions\PHPError;
 
 use const rosasurfer\ministruts\CLI as CLI;
@@ -62,9 +61,9 @@ class System extends StaticClass {
       if (!($reportingLevel & $level)) return true;      // error not covered by current reporting level
 
 
-      /**
-       * !!! old legacy version !!!
-       */
+      /*
+      !!! old legacy version !!!
+
       // Error kapseln...
       $exception = new PHPError($message, $file, $line, $context);
       // ...und behandeln
@@ -80,13 +79,14 @@ class System extends StaticClass {
          throw $exception;
       }
       return true;
+      */
 
 
 
 
 
       /**
-       * !!! new version !!!
+       * new version
        */
 
       // wrap error in an exception
@@ -94,8 +94,8 @@ class System extends StaticClass {
 
       // log non-critical errors and continue
       /*
-      if ($level == E_DEPRECATED     ) { Logger::log(null, $exception, L_INFO  ); return true; }
-      if ($level == E_USER_DEPRECATED) { Logger::log(null, $exception, L_INFO  ); return true; }
+      if ($level == E_DEPRECATED     ) { Logger::log(null, $exception, L_NOTICE); return true; }
+      if ($level == E_USER_DEPRECATED) { Logger::log(null, $exception, L_NOTICE); return true; }
       if ($level == E_USER_NOTICE    ) { Logger::log(null, $exception, L_NOTICE); return true; }
       if ($level == E_USER_WARNING   ) { Logger::log(null, $exception, L_WARN  ); return true; }
       */
@@ -151,8 +151,8 @@ class System extends StaticClass {
 
       // collect data
       $type       = $exception instanceof \ErrorException ? 'Unexpected':'Unhandled';
-      $exMessage  = trim(RosasurferException::printBetterMessage($exception, true));
-      $traceStr   = RosasurferException::printBetterTrace($exception, true);
+      $exMessage  = trim(Debug::getBetterMessage($exception));
+      $traceStr   = Debug::getBetterTraceAsString($exception);
       $file       = $exception->getFile();
       $line       = $exception->getLine();
       $cliMessage = '[FATAL] '.$type.' '.$exMessage."\n in ".$file.' on line '.$line."\n";

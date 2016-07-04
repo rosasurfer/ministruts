@@ -3,64 +3,105 @@ namespace rosasurfer\ministruts\exceptions;
 
 
 /**
- * PHPError
- *
- * Ein PHPError darf nur im globalen ErrorHandler erzeugt werden. Eigentlich müßte
- * PHPError daher eine private, innere Klasse des Errorhandlers sein.  Da dies in PHP nicht
- * möglich ist, setzt der Errorhandler vor dem Erzeugen eines neuen PHPError eine Markierung
- * (globale Variable $__PHPError_create), die im Constructor der Exception sofort wieder
- * gelöscht wird.
- *
- * @see Logger::handleError()
+ * Rosasurfer exception for regular PHP errors wrapped in an exception
  */
-class PHPError extends \Exception {
+class PHPError extends \ErrorException implements IRosasurferException {
 
 
-   private /*mixed[]   */ $context;
-   private /*string[][]*/ $trace;         // Stacktrace
-   private /*string    */ $traceString;   // Stacktrace als String formatiert
+   /** @var string */
+   private $betterMessage;                   // better message
+
+   /** @var array */
+   private $betterTrace;                     // better stacktrace
+
+   /** @var string */
+   private $betterTraceAsString;             // better stacktrace as string
 
 
    /**
-    * Constructor
+    * Create a new instance. Parameters are identical to the built-in PHP ErrorException and passed on.
     *
-    * @param  mixed[] $context - aktive Symboltabelle des Punktes, an dem die Exception auftrat
-    *                            An array that points to the active symbol table at the point the error occurred. In other words,
-    *                            $context will contain an array of every variable that existed in the scope the error was triggered
-    *                            in. User error handler must not modify error context.
+    * @param  string $message  - error description
+    * @param  int    $code     - error identifier, usually an application id
+    * @param  int    $severity - the error reporting of the PHP error
+    * @param  string $file     - the name of the file where the error occurred
+    * @param  int    $line     - the line number in the file where the error occurred
     */
-   public function __construct($message, $file, $line, array $context) {
-      parent::__construct($message);
-
-      $this->file    = $file;
-      $this->line    = $line;
-      $this->context = $context;
+   public function __construct($message, $code, $severity, $file, $line) {
+      parent::__construct($message, $code, $severity, $file, $line, $cause=null);
    }
 
 
    /**
-    * Gibt den Stacktrace dieser Exception zurück.
+    * Return the exception's message in a more readable way.
     *
-    * @return string[][] - Stacktrace
+    * @return string - message
     */
-   public function getStackTrace() {
-      $trace =& $this->trace;
+   public function getBetterMessage() {
+      if (!$this->betterMessage)
+         $this->betterMessage = \Debug::getBetterMessage($this);
+      return $this->betterMessage;
+   }
 
-      if ($trace === null) {
-         $trace = parent ::transformToJavaStackTrace(parent:: getTrace());
 
-         // Die ersten beiden Frames können weg: 1. ErrorHandler (Logger::handleError), 2: Handlerdefinition (__lambda_func)
-         array_shift($trace);
-         array_shift($trace);
+   /**
+    * Return the exception's stacktrace in a more readable way (Java-like).
+    *
+    * @return array
+    */
+   public function getBetterTrace() {
+      $trace = $this->betterTrace;
 
-         // Der nächste Frame kann weg, wenn er auf __autoload zeigt.
-         $frame = $trace[0];
-         if (!isSet($frame['class']) && strToLower($frame['function'])=='__autoload')
+      if (!$trace) {
+         // transform the original stacktrace into a better trace
+         $trace = \Debug::fixTrace($this->getTrace());
+
+         // drop the first frame if the error was constructed in the error handler (it always should)
+         if (\Debug::getFQFunctionName($trace[0]) == 'scx\commons\SCX::handleError') {
             array_shift($trace);
 
-         $this->trace =& $trace;
+            // if error was triggered by include/require/_once: fix the next frame, it's simply wrong
+            if (sizeOf($trace > 1)) {
+               $function = \Debug::getFQFunctionName($trace[0]);
+               if ($function=='include' || $function=='include_once' || $function=='require' || $function=='require_once') {
+                  if (isSet($trace[0]['file']) && isSet($trace[1]['file'])) {
+                     if ($trace[0]['file'] == $trace[1]['file']) {
+                        if (isSet($trace[0]['line']) && isSet($trace[1]['line'])) {
+                           if ($trace[0]['line'] == $trace[1]['line']) {
+                              unset($trace[0]['file'], $trace[0]['line']);
+                           }
+                        }
+                     }
+                  }
+               }
+            }
+         }
+         // store the new stacktrace
+         $this->betterTrace = $trace;
       }
-
       return $trace;
+   }
+
+
+   /**
+    * Return a text representation of the exception's stacktrace in a more readable way (Java-like).
+    * The representation also contains informations about nested exceptions.
+    *
+    * @return string
+    */
+   public function getBetterTraceAsString() {
+      if (!$this->betterTraceAsString)
+         $this->betterTraceAsString = \Debug::getBetterTraceAsString($this);
+      return $this->betterTraceAsString;
+   }
+
+
+   /**
+    * Return a description of the exception.
+    *
+    * @return string - description
+    */
+   public function __toString() {
+      return $this->getBetterMessage();
    }
 }

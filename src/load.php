@@ -24,18 +24,19 @@ use const rosasurfer\ministruts\WINDOWS   as WINDOWS;
  * (9) define helpers globally if applicable
  */
 
+
 // (1) block framework re-includes
 if (defined('rosasurfer\ministruts\ROOT'))
    return;
-define('rosasurfer\ministruts\ROOT', dirName(__DIR__));
-
-
-// (2) check/adjust PHP environment
-(PHP_VERSION < '5.6') && exit(1|echoPre('Error: A PHP version >= 5.6 is required (found version '.PHP_VERSION.').'));
-
+define('rosasurfer\ministruts\ROOT'     ,  dirName(__DIR__));
 define('rosasurfer\ministruts\CLI'      , !isSet($_SERVER['REQUEST_METHOD']));               // whether or not we run on command line interface
 define('rosasurfer\ministruts\LOCALHOST', !CLI && @$_SERVER['REMOTE_ADDR']=='127.0.0.1');    // whether or not we run on localhost
 define('rosasurfer\ministruts\WINDOWS'  , (strToUpper(subStr(PHP_OS, 0, 3))==='WIN'));       // whether or not we run on Windows
+
+
+// (2) check/adjust PHP environment
+(PHP_VERSION < '5.6')      && exit(1|echoPre('Error: A PHP version >= 5.6 is required (found version '.PHP_VERSION.').'));
+!ini_get('short_open_tag') && exit(1|echoPre('Error: The PHP configuration value "short_open_tag" must be enabled.'    ));
 
 ini_set('arg_separator.output'    , '&amp;'                );
 ini_set('auto_detect_line_endings',  1                     );
@@ -54,6 +55,7 @@ ini_set('session.use_cookies'     ,  1                     );
 ini_set('session.use_trans_sid'   ,  0                     );
 ini_set('session.cookie_httponly' ,  1                     );
 ini_set('session.referer_check'   , ''                     );
+ini_set('zend.detect_unicode'     ,  1                     );     // automatic BOM header recognition
 
 
 // (3) execute phpInfo() if applicable (authorization must be handled by the server)
@@ -100,7 +102,7 @@ spl_autoload_register(function($class) {
    }
    catch (\Exception $ex) {
       if (!$ex instanceof ClassNotFoundException)
-         $ex = new ClassNotFoundException('Cannot load class '.$class, $ex);
+         $ex = new ClassNotFoundException('Cannot load class '.$class, null, $ex);
       throw $ex;
    }
 });
