@@ -9,7 +9,7 @@ interface IRosasurferException {
 
 
    /**
-    * Returns the exception's message in a more readable way.
+    * Return the exception's message in a more readable way.
     *
     * @return string
     */
@@ -17,7 +17,7 @@ interface IRosasurferException {
 
 
    /**
-    * Returns the exception's stacktrace in a more readable way (Java-like).
+    * Return the exception's stacktrace in a more readable way (Java-like).
     *
     * @return array
     */
@@ -25,7 +25,7 @@ interface IRosasurferException {
 
 
    /**
-    * Returns a text representation of the exception's stacktrace in a more readable way (Java-like).
+    * Return a text representation of the exception's stacktrace in a more readable way (Java-like).
     *
     * @return string
     */
