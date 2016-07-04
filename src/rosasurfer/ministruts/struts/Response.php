@@ -1,5 +1,5 @@
 <?php
-use const rosasurfer\ministruts\CLI as CLI;
+use const rosasurfer\ministruts\CLI;
 
 
 /**

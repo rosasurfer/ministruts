@@ -1,6 +1,6 @@
 #!/usr/bin/php
 <?php
-use const rosasurfer\ministruts\WINDOWS as WINDOWS;
+use const rosasurfer\ministruts\WINDOWS;
 
 
 /**

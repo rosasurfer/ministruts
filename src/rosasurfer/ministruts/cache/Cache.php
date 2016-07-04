@@ -1,7 +1,7 @@
 <?php
 use rosasurfer\ministruts\exceptions\IllegalTypeException;
 
-use const rosasurfer\ministruts\CLI as CLI;
+use const rosasurfer\ministruts\CLI;
 
 
 /**

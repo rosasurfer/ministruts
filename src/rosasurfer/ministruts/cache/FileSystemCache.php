@@ -3,7 +3,7 @@ use rosasurfer\ministruts\exceptions\IllegalTypeException;
 use rosasurfer\ministruts\exceptions\PHPError;
 use rosasurfer\ministruts\exceptions\RuntimeException;
 
-use const rosasurfer\ministruts\WINDOWS as WINDOWS;
+use const rosasurfer\ministruts\WINDOWS;
 
 
 /**

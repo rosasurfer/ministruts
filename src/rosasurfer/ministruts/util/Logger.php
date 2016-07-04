@@ -4,9 +4,9 @@ use rosasurfer\ministruts\exceptions\IllegalTypeException;
 use rosasurfer\ministruts\exceptions\InvalidArgumentException;
 use rosasurfer\ministruts\exceptions\RuntimeException;
 
-use const rosasurfer\ministruts\CLI       as CLI;
-use const rosasurfer\ministruts\LOCALHOST as LOCALHOST;
-use const rosasurfer\ministruts\WINDOWS   as WINDOWS;
+use const rosasurfer\ministruts\CLI;
+use const rosasurfer\ministruts\LOCALHOST;
+use const rosasurfer\ministruts\WINDOWS;
 
 
 /**
@@ -175,23 +175,23 @@ class Logger extends StaticClass {
          $traceStr   = DebugTools::getBetterTraceAsString($exception);
          $file       = $exception->getFile();
          $line       = $exception->getLine();
-         $cliMessage = '[FATAL] '.$type.' '.$exMessage."\n in ".$file.' on line '.$line."\n";
+         $cliMessage = '[FATAL] '.$type.' '.$exMessage.NL.' in '.$file.' on line '.$line.NL;
 
          // 2. Exception anzeigen
          if (self::$print) {
             if (CLI) {
-               echoPre($cliMessage."\n".$traceStr."\n");
+               echoPre($cliMessage.NL.$traceStr.NL);
             }
             else {
                echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif"><b>[FATAL] Uncaught</b> '.nl2br(htmlSpecialChars($message, ENT_QUOTES))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
                echo '<br>'.printFormatted($traceStr, true);
-               echo "<br></div>\n";
+               echo '<br></div>'.NL;
             }
          }
 
          // 3. Exception an die konfigurierten Adressen mailen
          if (self::$mail) {
-            $mailMsg = $cliMessage."\n".$traceStr;
+            $mailMsg = $cliMessage.NL.$traceStr;
 
             if ($request=Request::me()) {
                $session = $request->isSession() ? print_r($_SESSION, true) : null;
@@ -201,13 +201,13 @@ class Logger extends StaticClass {
                if ($host != $ip)
                   $ip = $host.' ('.$ip.')';
 
-               $mailMsg .= "\n\n\nRequest:\n--------\n".$request."\n\n\n"
-                        .  "Session: ".($session ? "\n--------\n".$session."\n\n\n" : "  - no session -\n")
-                        .  "Host: ".$ip."\n"
-                        .  "Time: ".date('Y-m-d H:i:s')."\n";
+               $mailMsg .= NL.NL.NL.'Request:'.NL.'--------'.NL.$request.NL.NL.NL
+                        .  'Session: '.($session ? NL.'--------'.NL.$session.NL.NL.NL : '  - no session -'.NL)
+                        .  'Host: '.$ip.NL
+                        .  'Time: '.date('Y-m-d H:i:s').NL;
             }
             else {
-               $mailMsg .= "\n\n\nShell:\n------\n".print_r($_SERVER, true)."\n\n\n";
+               $mailMsg .= NL.NL.NL.'Shell:'.NL.'------'.NL.print_r($_SERVER, true).NL.NL.NL;
             }
             $subject = 'PHP: [FATAL] Uncaught Exception at '.($request ? $request->getHostname():'').$_SERVER['PHP_SELF'];
             self::mail_log($subject, $mailMsg);
@@ -328,7 +328,7 @@ class Logger extends StaticClass {
             $trace = $exception->getStackTrace();
             $file  = $exception->getFile();
             $line  = $exception->getLine();
-            $trace = "Stacktrace:\n-----------\n".$exception->printStackTrace(true);
+            $trace = 'Stacktrace:'.NL.'-----------'.NL.$exception->printStackTrace(true);
          }
          else {
             $trace = $exception ? $exception->getTrace() : debug_backtrace();
@@ -345,10 +345,10 @@ class Logger extends StaticClass {
                   break;
                }
             }
-            $trace = "Stacktrace:\n-----------\n".RosasurferException::formatStackTrace($trace);
+            $trace = 'Stacktrace:'.NL.'-----------'.NL.RosasurferException::formatStackTrace($trace);
             // TODO: vernestelte, einfache Exceptions geben fehlerhaften Stacktrace zurück
          }
-         $plainMessage = self::$logLevels[$level].': '.$message."\nin ".$file.' on line '.$line."\n";
+         $plainMessage = self::$logLevels[$level].': '.$message.NL.'in '.$file.' on line '.$line.NL;
 
 
          // 2. Logmessage anzeigen
@@ -361,10 +361,10 @@ class Logger extends StaticClass {
                   echo '<br>'.printFormatted($trace, true).'<br>';
                echo '</div>';
                if ($request=Request ::me())
-                  echo '<br>'.printFormatted("Request:\n--------\n".$request, true).'<br></div><br>';
+                  echo '<br>'.printFormatted('Request:'.NL.'--------'.NL.$request, true).'<br></div><br>';
             }
             else {
-               echo $plainMessage.($exception ? "\n".$exMessage."\n":'')."\n".($trace ? $trace."\n":'');
+               echo $plainMessage.($exception ? NL.$exMessage.NL:'').NL.($trace ? $trace.NL:'');
             }
             ob_get_level() && ob_flush();
          }
@@ -372,7 +372,7 @@ class Logger extends StaticClass {
 
          // 3. Logmessage an die konfigurierten Adressen mailen
          if (self::$mail) {
-            $mailMsg = $plainMessage.($exception ? "\n\n".$exMessage."\n":'')."\n\n".$trace;
+            $mailMsg = $plainMessage.($exception ? NL.NL.$exMessage.NL:'').NL.NL.$trace;
 
             if ($request=Request ::me()) {
                $session = $request->isSession() ? print_r($_SESSION, true) : null;
@@ -382,13 +382,13 @@ class Logger extends StaticClass {
                if ($host != $ip)
                   $ip = $host.' ('.$ip.')';
 
-               $mailMsg .= "\n\n\nRequest:\n--------\n".$request."\n\n\n"
-                        .  "Session: ".($session ? "\n--------\n".$session."\n\n\n" : "  - no session -\n")
-                        .  "Host: ".$ip."\n"
-                        .  "Time: ".date('Y-m-d H:i:s')."\n";
+               $mailMsg .= NL.NL.NL.'Request:'.NL.'--------'.NL.$request.NL.NL.NL
+                        .  'Session: '.($session ? NL.'--------'.NL.$session.NL.NL.NL : '  - no session -'.NL)
+                        .  'Host: '.$ip.NL
+                        .  'Time: '.date('Y-m-d H:i:s').NL;
             }
             else {
-               $mailMsg .= "\n\n\nShell:\n------\n".print_r($_SERVER, true)."\n\n\n";
+               $mailMsg .= NL.NL.NL.'Shell:'.NL.'------'.NL.print_r($_SERVER, true).NL.NL.NL;
             }
             $subject = 'PHP: '.self::$logLevels[$level].' at '.($request ? $request->getHostname():'').$_SERVER['PHP_SELF'];
             self ::mail_log($subject, $mailMsg);
@@ -403,7 +403,7 @@ class Logger extends StaticClass {
 
          // (5) Logmessage per SMS verschicken, wenn der konfigurierte SMS-Loglevel erreicht ist
          if (self::$sms && $level >= self::$smsLogLevel) {
-            self ::sms_log($plainMessage.($exception ? "\n".$exMessage:''));
+            self ::sms_log($plainMessage.($exception ? NL.$exMessage:''));
          }
       }
       catch (\Exception $ex) {

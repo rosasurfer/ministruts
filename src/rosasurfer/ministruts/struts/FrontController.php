@@ -1,11 +1,11 @@
-﻿<?php
+<?php
 use rosasurfer\ministruts\exceptions\FileNotFoundException;
 use rosasurfer\ministruts\exceptions\IllegalStateException;
 use rosasurfer\ministruts\exceptions\RuntimeException;
 
-use const rosasurfer\ministruts\CLI       as CLI;
-use const rosasurfer\ministruts\LOCALHOST as LOCALHOST;
-use const rosasurfer\ministruts\WINDOWS   as WINDOWS;
+use const rosasurfer\ministruts\CLI;
+use const rosasurfer\ministruts\LOCALHOST;
+use const rosasurfer\ministruts\WINDOWS;
 
 
 /**

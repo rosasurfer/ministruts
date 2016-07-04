@@ -3,9 +3,9 @@ use rosasurfer\ministruts\exceptions\IllegalTypeException;
 use rosasurfer\ministruts\exceptions\InvalidArgumentException;
 use rosasurfer\ministruts\exceptions\RuntimeException;
 
-use const rosasurfer\ministruts\CLI       as CLI;
-use const rosasurfer\ministruts\LOCALHOST as LOCALHOST;
-use const rosasurfer\ministruts\WINDOWS   as WINDOWS;
+use const rosasurfer\ministruts\CLI;
+use const rosasurfer\ministruts\LOCALHOST;
+use const rosasurfer\ministruts\WINDOWS;
 
 
 /**

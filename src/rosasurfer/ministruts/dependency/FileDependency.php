@@ -2,7 +2,7 @@
 use rosasurfer\ministruts\exceptions\IllegalTypeException;
 use rosasurfer\ministruts\exceptions\InvalidArgumentException;
 
-use const rosasurfer\ministruts\WINDOWS as WINDOWS;
+use const rosasurfer\ministruts\WINDOWS;
 
 
 /**

@@ -1,7 +1,7 @@
 <?php
 use rosasurfer\ministruts\exceptions\PHPError;
 
-use const rosasurfer\ministruts\CLI as CLI;
+use const rosasurfer\ministruts\CLI;
 
 
 /**
