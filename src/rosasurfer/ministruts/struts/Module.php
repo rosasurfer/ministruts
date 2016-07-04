@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 use rosasurfer\ministruts\exceptions\ClassNotFoundException;
 use rosasurfer\ministruts\exceptions\FileNotFoundException;
 use rosasurfer\ministruts\exceptions\IllegalStateException;
@@ -124,7 +124,7 @@ class Module extends Object {
     *
     * @param  string $fileName - Pfad zur Konfigurationsdatei
     *
-    * @return SimpleXMLElement
+    * @return \SimpleXMLElement
     */
    protected function loadConfiguration($fileName) {
       if (!is_file($fileName)) throw new FileNotFoundException('File not found: '.$fileName);
@@ -147,7 +147,7 @@ class Module extends Object {
       catch (\Exception $ex) { throw new RuntimeException('Could not change working directory to "'.$packageDir.'"', null, $ex); }
 
       // Konfiguration parsen und validieren
-      $xml = new SimpleXMLElement($content, LIBXML_DTDVALID);
+      $xml = new \SimpleXMLElement($content, LIBXML_DTDVALID);
 
       // zurück ins Ausgangsverzeichnis wechseln
       try { chDir($currentDir); }
@@ -186,9 +186,9 @@ class Module extends Object {
    /**
     * Setzt das Basisverzeichnis für lokale Resourcen.
     *
-    * @param  SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
+    * @param  \SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
     */
-   protected function setResourceBase(SimpleXMLElement $xml) {
+   protected function setResourceBase(\SimpleXMLElement $xml) {
       if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
       if (!$xml['view-base']) {
@@ -213,9 +213,9 @@ class Module extends Object {
    /**
     * Verarbeitet die in der Konfiguration definierten globalen ActionForwards.
     *
-    * @param  SimpleXMLElement $xml - XML-Konfiguration
+    * @param  \SimpleXMLElement $xml - XML-Konfiguration
     */
-   protected function processForwards(SimpleXMLElement $xml) {
+   protected function processForwards(\SimpleXMLElement $xml) {
       // process global 'include' and 'redirect' forwards
       $elements = $xml->xPath('/struts-config/global-forwards/forward[@include] | /struts-config/global-forwards/forward[@redirect]');
       if ($elements === false)
@@ -265,9 +265,9 @@ class Module extends Object {
    /**
     * Verarbeitet die in der Konfiguration definierten ActionMappings.
     *
-    * @param  SimpleXMLElement $xml - XML-Konfiguration
+    * @param  \SimpleXMLElement $xml - XML-Konfiguration
     */
-   protected function processMappings(SimpleXMLElement $xml) {
+   protected function processMappings(\SimpleXMLElement $xml) {
       $elements = $xml->xPath('/struts-config/action-mappings/mapping');
       if ($elements === false)
          $elements = array(); // xPath() gibt entgegen der Dokumentation *NICHT* immer ein Array zurück
@@ -440,9 +440,9 @@ class Module extends Object {
    /**
     * Durchläuft alle konfigurierten Tiles.
     *
-    * @param  SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
+    * @param  \SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
     */
-   protected function processTiles(SimpleXMLElement $xml) {
+   protected function processTiles(\SimpleXMLElement $xml) {
       $elements = $xml->xPath('/struts-config/tiles/tile');
       if ($elements === false)
          $elements = array(); // xPath() gibt entgegen der Dokumentation NICHT immer ein Array zurück
@@ -458,12 +458,12 @@ class Module extends Object {
    /**
     * Sucht die Tilesdefinition mit dem angegebenen Namen und gibt die entsprechende Instanz zurück.
     *
-    * @param  string           $name - Name der Tile
-    * @param  SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration der Tile
+    * @param  string            $name - Name der Tile
+    * @param  \SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration der Tile
     *
     * @return Tile instance
     */
-   private function getDefinedTile($name, SimpleXMLElement $xml) {
+   private function getDefinedTile($name, \SimpleXMLElement $xml) {
       // if the tile already exists return it
       if (isSet($this->tiles[$name]))
          return $this->tiles[$name];
@@ -505,10 +505,10 @@ class Module extends Object {
    /**
     * Verarbeitet die in einer Tiles-Definition angegebenen zusätzlichen Properties.
     *
-    * @param  Tile             $tile - Tile-Instanz
-    * @param  SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration
+    * @param  Tile              $tile - Tile-Instanz
+    * @param  \SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration
     */
-   private function processTileProperties(Tile $tile, SimpleXMLElement $xml) {
+   private function processTileProperties(Tile $tile, \SimpleXMLElement $xml) {
       foreach ($xml->set as $tag) {
          $name  = (string) $tag['name'];
          // TODO: Name-Value von <set> wird nicht auf Eindeutigkeit überprüft
@@ -563,9 +563,9 @@ class Module extends Object {
    /**
     * Verarbeitet die in der Konfiguration definierten Error-Einstellungen.
     *
-    * @param  SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
+    * @param  \SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
     */
-   protected function processErrors(SimpleXMLElement $xml) {
+   protected function processErrors(\SimpleXMLElement $xml) {
    }
 
 
@@ -653,9 +653,9 @@ class Module extends Object {
    /**
     * Verarbeite Controller-Einstellungen.
     *
-    * @param  SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
+    * @param  \SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
     */
-   protected function processController(SimpleXMLElement $xml) {
+   protected function processController(\SimpleXMLElement $xml) {
       if ($this->configured)
          throw new IllegalStateException('Configuration is frozen');
 
@@ -868,12 +868,12 @@ class Module extends Object {
     * Ob unter dem angegebenen Namen eine inkludierbare Resource existiert. Dies kann entweder eine
     * Tiles-Definition oder eine Datei sein.
     *
-    * @param  string           $name - Name der Resource
-    * @param  SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration
+    * @param  string            $name - Name der Resource
+    * @param  \SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration
     *
     * @return bool
     */
-   private function isIncludable($name, SimpleXMLElement $xml) {
+   private function isIncludable($name, \SimpleXMLElement $xml) {
       return $this->isTile($name, $xml) || $this->isFile($name);
    }
 
@@ -881,12 +881,12 @@ class Module extends Object {
    /**
     * Ob unter dem angegebenen Namen eine Tile definiert ist.
     *
-    * @param  string           $name - Name der Tile
-    * @param  SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration
+    * @param  string            $name - Name der Tile
+    * @param  \SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration
     *
     * @return bool
     */
-   private function isTile($name, SimpleXMLElement $xml) {
+   private function isTile($name, \SimpleXMLElement $xml) {
       $nodes = $xml->xPath("/struts-config/tiles/tile[@name='$name']");
 
       if ($nodes) {                 // xPath() gibt entgegen der Dokumentation NICHT immer ein Array zurück

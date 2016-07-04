@@ -50,7 +50,7 @@ final class Date extends StaticClass {
       if ($days < 0)                                          throw new InvalidArgumentException('Invalid argument $days: '.$days);
 
       $range = array();
-      $date  = new DateTime($startDate);
+      $date  = new \DateTime($startDate);
 
       for ($i=0; $i < $days; ++$i) {
          $range[] = $date->format('Y-m-d');
