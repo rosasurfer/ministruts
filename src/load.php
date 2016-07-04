@@ -19,9 +19,9 @@ use const rosasurfer\ministruts\WINDOWS   as WINDOWS;
  * (4) check/adjust application requirements
  * (5) register class loader
  * (6) setup error and exception handling
- * (7) define local helper constants
- * (8) define local helper functions
- * (9) define helpers globally if applicable
+ * (7) define helper constants
+ * (8) define helper functions
+ * (9) define all helpers globally if applicable
  */
 
 
@@ -31,7 +31,7 @@ if (defined('rosasurfer\ministruts\ROOT'))
 define('rosasurfer\ministruts\ROOT'     ,  dirName(__DIR__));
 define('rosasurfer\ministruts\CLI'      , !isSet($_SERVER['REQUEST_METHOD']));               // whether or not we run on command line interface
 define('rosasurfer\ministruts\LOCALHOST', !CLI && @$_SERVER['REMOTE_ADDR']=='127.0.0.1');    // whether or not we run on localhost
-define('rosasurfer\ministruts\WINDOWS'  , (strToUpper(subStr(PHP_OS, 0, 3))==='WIN'));       // whether or not we run on Windows
+define('rosasurfer\ministruts\WINDOWS'  , (strToUpper(subStr(PHP_OS, 0, 3))=='WIN'));        // whether or not we run on Windows
 
 
 // (2) check/adjust PHP environment
