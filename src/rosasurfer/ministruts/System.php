@@ -23,7 +23,7 @@ class System extends StaticClass {
     */
    public static function setupErrorHandling() {
       $errorLevel = E_ALL;                         // default if unspecified
-      $errorLevel = error_reporting();             // TODO: remove later, it disables runtime error level changes
+      $errorLevel = error_reporting();             // TODO: remove later, it blocks runtime error level changes
       set_error_handler(self::$errorHandler=__CLASS__.'::handleError', $errorLevel);
 
       set_exception_handler(self::$exceptionHandler=function(\Exception $ex) {
