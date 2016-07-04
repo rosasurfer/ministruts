@@ -1,4 +1,9 @@
 <?php
+use rosasurfer\ministruts\exceptions\IllegalStateException;
+use rosasurfer\ministruts\exceptions\IllegalTypeException;
+use rosasurfer\ministruts\exceptions\InvalidArgumentException;
+
+
 /**
  * ActionForward
  *
@@ -71,7 +76,7 @@ class ActionForward extends Object {
    public function setName($name) {
       if ($this->configured) throw new IllegalStateException('Configuration is frozen');
       if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
-      if ($name==='')        throw new plInvalidArgumentException('Invalid argument $name: '.$name);
+      if ($name==='')        throw new InvalidArgumentException('Invalid argument $name: '.$name);
 
       $this->name = $name;
       return $this;
@@ -88,7 +93,7 @@ class ActionForward extends Object {
    public function setPath($path) {
       if ($this->configured) throw new IllegalStateException('Configuration is frozen');
       if (!is_string($path)) throw new IllegalTypeException('Illegal type of parameter $path: '.getType($path));
-      if ($path==='')        throw new plInvalidArgumentException('Invalid argument $path: '.$path);
+      if ($path==='')        throw new InvalidArgumentException('Invalid argument $path: '.$path);
 
       $this->path = $path;
       return $this;
@@ -105,7 +110,7 @@ class ActionForward extends Object {
    public function setLabel($label) {
       if ($this->configured)  throw new IllegalStateException('Configuration is frozen');
       if (!is_string($label)) throw new IllegalTypeException('Illegal type of parameter $label: '.getType($label));
-      if ($label==='')        throw new plInvalidArgumentException('Invalid argument $label: '.$label);
+      if ($label==='')        throw new InvalidArgumentException('Invalid argument $label: '.$label);
 
       $this->label = $label;
       return $this;

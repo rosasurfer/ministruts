@@ -71,7 +71,7 @@ function queryDNS($domain, $type) {
          break;
 
       default:
-         throw new plInvalidArgumentException('Invalid argument $type: '.$type);
+         throw new InvalidArgumentException('Invalid argument $type: '.$type);
    }
    return $result;
 }

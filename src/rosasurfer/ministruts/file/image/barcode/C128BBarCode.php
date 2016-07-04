@@ -1,4 +1,7 @@
 <?php
+use rosasurfer\ministruts\exceptions\InvalidArgumentException;
+
+
 /**
  * Barcode renderer for "Code 128-B", a continuous multilevel and full ASCII bar code.
  *
@@ -125,7 +128,7 @@ class C128BBarCode extends BaseC128BarCode {
       $len = strLen($value);
       for ($i=0; $i<$len; $i++) {
          if ($this->getCharIndex($value[$i]) == -1)
-            throw new plInvalidArgumentException("Invalid barcode value \"$value\" (standard 'Class 128-B' does not contain character '$value[$i]')");
+            throw new InvalidArgumentException("Invalid barcode value \"$value\" (standard 'Class 128-B' does not contain character '$value[$i]')");
       }
    }
 

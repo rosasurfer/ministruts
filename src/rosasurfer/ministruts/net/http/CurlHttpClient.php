@@ -1,4 +1,7 @@
 <?php
+use rosasurfer\ministruts\exceptions\IOException;
+
+
 /**
  * CurlHttpClient
  *
@@ -113,7 +116,7 @@ final class CurlHttpClient extends HttpClient {
             curl_close($hTmp);
          }
       }
-      catch (Exception $ex) {
+      catch (\Exception $ex) {
          Logger::handleException($ex, $inShutdownOnly=true);
          throw $ex;
       }

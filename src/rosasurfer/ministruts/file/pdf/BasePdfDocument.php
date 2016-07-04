@@ -1,4 +1,7 @@
 <?php
+use rosasurfer\ministruts\exceptions\RuntimeException;
+
+
 /**
  * BasePdfDocument
  *
@@ -1434,7 +1437,7 @@ class BasePdfDocument extends Object {
             $fontName .= '.afm';
 
          if (!is_file($fontPath.$fontName))
-            throw new plRuntimeException('File not found: '.$fontPath.$fontName);
+            throw new RuntimeException('File not found: '.$fontPath.$fontName);
 
          $fontName = $fontPath.$fontName;
       }
@@ -2679,7 +2682,7 @@ class BasePdfDocument extends Object {
             }
          }
          if ($found === null)
-            throw new plRuntimeException('File not found: '.$filename);
+            throw new RuntimeException('File not found: '.$filename);
          $filename = $found;
       }
 
@@ -2702,7 +2705,7 @@ class BasePdfDocument extends Object {
       // interpret the image data, then add the image to the system
       $header = chr(137).chr(80).chr(78).chr(71).chr(13).chr(10).chr(26).chr(10);
       if (subStr($data, 0, 8) != $header)
-         throw new plRuntimeException('data="'.$name.'": '.'this image does not have a valid header');
+         throw new RuntimeException('data="'.$name.'": '.'this image does not have a valid header');
 
       // set pointer
       $p = 8;
@@ -2729,8 +2732,8 @@ class BasePdfDocument extends Object {
                $info['interlaceMethod'  ] = ord($data[$p+20]);
                // echoPre($info);
                $haveHeader = 1;
-               if ($info['compressionMethod']!=0) throw new plRuntimeException('data="'.$name.'": '.'unsupported compression method');
-               if ($info['filterMethod'     ]!=0) throw new plRuntimeException('data="'.$name.'": '.'unsupported filter method');
+               if ($info['compressionMethod']!=0) throw new RuntimeException('data="'.$name.'": '.'unsupported compression method');
+               if ($info['filterMethod'     ]!=0) throw new RuntimeException('data="'.$name.'": '.'unsupported filter method');
                break;
 
             case 'PLTE':
@@ -2793,13 +2796,13 @@ class BasePdfDocument extends Object {
       }
 
       if (!$haveHeader)
-         throw new plRuntimeException('data="'.$name.'": '.'information header is missing');
+         throw new RuntimeException('data="'.$name.'": '.'information header is missing');
       if (isset($info['interlaceMethod']) && $info['interlaceMethod'])
-         throw new plRuntimeException('data="'.$name.'": '.'There appears to be no support for interlaced images in pdf.');
+         throw new RuntimeException('data="'.$name.'": '.'There appears to be no support for interlaced images in pdf.');
       if ($info['bitDepth'] > 8)
-         throw new plRuntimeException('data="'.$name.'": '.'only bit depth of 8 or less is supported');
+         throw new RuntimeException('data="'.$name.'": '.'only bit depth of 8 or less is supported');
       if ($info['colorType']!=2 && $info['colorType']!=0 && $info['colorType']!=3)
-         throw new plRuntimeException('data="'.$name.'": '.'transparancey alpha channel not supported, transparency only supported for palette images.');
+         throw new RuntimeException('data="'.$name.'": '.'transparancey alpha channel not supported, transparency only supported for palette images.');
 
       switch ($info['colorType']) {
          case 3:
@@ -2863,7 +2866,7 @@ class BasePdfDocument extends Object {
             }
          }
          if ($found === null)
-            throw new plRuntimeException('File not found: '.$file);
+            throw new RuntimeException('File not found: '.$file);
          $file = $found;
          unset($paths, $path, $found);
       }

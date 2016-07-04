@@ -437,7 +437,7 @@ EOT_405;
          if ($forward === null)
             self::$logInfo && Logger ::log('ActionForward of NULL returned from Action::execute()', L_INFO, __CLASS__);
       }
-      catch (Exception $ex) {
+      catch (\Exception $ex) {
          $throwable = $ex;    // evt. aufgetretene Exception zwischenspeichern
       }
 

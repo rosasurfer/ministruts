@@ -1,4 +1,8 @@
 <?php
+use rosasurfer\ministruts\exceptions\IllegalTypeException;
+use rosasurfer\ministruts\exceptions\InvalidArgumentException;
+
+
 /**
  * HttpRequest
  *
@@ -31,7 +35,7 @@ final class HttpRequest extends Object {
     */
    public function setMethod($method) {
       if (!is_string($method))                 throw new IllegalTypeException('Illegal type of parameter $method: '.getType($method));
-      if ($method!=='GET' && $method!=='POST') throw new plInvalidArgumentException('Invalid argument $method: '.$method);
+      if ($method!=='GET' && $method!=='POST') throw new InvalidArgumentException('Invalid argument $method: '.$method);
 
       $this->method = $method;
       return $this;
@@ -61,7 +65,7 @@ final class HttpRequest extends Object {
       // TODO: URL genauer validieren
 
       if (strPos($url, ' ') !== false)
-         throw new plInvalidArgumentException('Invalid argument $url: '.$url);
+         throw new InvalidArgumentException('Invalid argument $url: '.$url);
 
       $this->url = $url;
       return $this;
@@ -88,7 +92,7 @@ final class HttpRequest extends Object {
     */
    public function setHeader($name, $value) {
       if (!is_string($name))                      throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
-      if (!strLen($name))                         throw new plInvalidArgumentException('Invalid argument $name: '.$name);
+      if (!strLen($name))                         throw new InvalidArgumentException('Invalid argument $name: '.$name);
 
       if (!is_null($value) && !is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
       if (!strLen($value))
@@ -124,10 +128,10 @@ final class HttpRequest extends Object {
     */
    public function addHeader($name, $value) {
       if (!is_string($name))  throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
-      if (!strLen($name))     throw new plInvalidArgumentException('Invalid argument $name: '.$name);
+      if (!strLen($name))     throw new InvalidArgumentException('Invalid argument $name: '.$name);
 
       if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
-      if (!strLen($value))    throw new plInvalidArgumentException('Invalid argument $value: '.$value);
+      if (!strLen($value))    throw new InvalidArgumentException('Invalid argument $value: '.$value);
 
       $name  = trim($name);
       $value = trim($value);
@@ -178,7 +182,7 @@ final class HttpRequest extends Object {
     */
    public function getHeader($name) {
       if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
-      if (!strLen($name))    throw new plInvalidArgumentException('Invalid argument $name: '.$name);
+      if (!strLen($name))    throw new InvalidArgumentException('Invalid argument $name: '.$name);
 
       $headers = $this->getHeaders($name);
       if ($headers)

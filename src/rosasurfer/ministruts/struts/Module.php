@@ -1,4 +1,12 @@
 <?php
+use rosasurfer\ministruts\exceptions\ClassNotFoundException;
+use rosasurfer\ministruts\exceptions\FileNotFoundException;
+use rosasurfer\ministruts\exceptions\IllegalStateException;
+use rosasurfer\ministruts\exceptions\IllegalTypeException;
+use rosasurfer\ministruts\exceptions\InvalidArgumentException;
+use rosasurfer\ministruts\exceptions\RuntimeException;
+
+
 /**
  * Module
  */
@@ -136,14 +144,14 @@ class Module extends Object {
 
       // ins Packageverzeichnis wechseln
       try { chDir($packageDir); }
-      catch (Exception $ex) { throw new plRuntimeException('Could not change working directory to "'.$packageDir.'"', $ex); }
+      catch (\Exception $ex) { throw new RuntimeException('Could not change working directory to "'.$packageDir.'"', $ex); }
 
       // Konfiguration parsen und validieren
       $xml = new SimpleXMLElement($content, LIBXML_DTDVALID);
 
       // zurück ins Ausgangsverzeichnis wechseln
       try { chDir($currentDir); }
-      catch (Exception $ex) { throw new plRuntimeException('Could not change working directory back to "'.$currentDir.'"', $ex); }
+      catch (\Exception $ex) { throw new RuntimeException('Could not change working directory back to "'.$currentDir.'"', $ex); }
 
       return $xml;
    }
@@ -215,10 +223,10 @@ class Module extends Object {
 
       foreach ($elements as $tag) {
          $name = (string) $tag['name'];
-         if (sizeOf($tag->attributes()) > 2) throw new plRuntimeException('Global forward "'.$name.'": Only one attribute of "include", "redirect" or "forward" must be specified');
+         if (sizeOf($tag->attributes()) > 2) throw new RuntimeException('Global forward "'.$name.'": Only one attribute of "include", "redirect" or "forward" must be specified');
 
          if ($path = (string) $tag['include']) {
-            if (!$this->isIncludable($path, $xml)) throw new plRuntimeException('Global forward "'.$name.'", attribute "include": '.($path{0}=='.' ? 'Tiles definition':'File').' "'.$path.'" not found');
+            if (!$this->isIncludable($path, $xml)) throw new RuntimeException('Global forward "'.$name.'", attribute "include": '.($path{0}=='.' ? 'Tiles definition':'File').' "'.$path.'" not found');
 
             if ($this->isTile($path, $xml)) {
                $forward = new $this->forwardClass($name, $path, false);
@@ -243,11 +251,11 @@ class Module extends Object {
 
       foreach ($elements as $tag) {
          $name = (string) $tag['name'];
-         if (sizeOf($tag->attributes()) > 2) throw new plRuntimeException('Global forward "'.$name.'": Only one attribute of "include", "redirect" or "forward" must be specified');
+         if (sizeOf($tag->attributes()) > 2) throw new RuntimeException('Global forward "'.$name.'": Only one attribute of "include", "redirect" or "forward" must be specified');
 
          $alias = (string) $tag['forward'];
          $forward = $this->findForward($alias);
-         if (!$forward) throw new plRuntimeException('Global forward "'.$name.'", attribute "forward": Forward "'.$alias.'" not found');
+         if (!$forward) throw new RuntimeException('Global forward "'.$name.'", attribute "forward": Forward "'.$alias.'" not found');
 
          $this->addForward($name, $forward);
       }
@@ -277,9 +285,9 @@ class Module extends Object {
 
          // process include attribute
          if ($tag['include']) {
-            if ($mapping->getForward()) throw new plRuntimeException('Mapping "'.$mapping->getPath().'": Only one attribute of "action", "include", "redirect" or "forward" must be specified');
+            if ($mapping->getForward()) throw new RuntimeException('Mapping "'.$mapping->getPath().'": Only one attribute of "action", "include", "redirect" or "forward" must be specified');
             $path = (string) $tag['include'];
-            if (!$this->isIncludable($path, $xml)) throw new plRuntimeException('Mapping "'.$mapping->getPath().'", attribute "include": '.($path{0}=='.' ? 'Tiles definition':'File').' "'.$path.'" not found');
+            if (!$this->isIncludable($path, $xml)) throw new RuntimeException('Mapping "'.$mapping->getPath().'", attribute "include": '.($path{0}=='.' ? 'Tiles definition':'File').' "'.$path.'" not found');
 
             if ($this->isTile($path, $xml)) {
                $forward = new $this->forwardClass('generic', $path, false);
@@ -294,7 +302,7 @@ class Module extends Object {
 
          // process redirect attribute
          if ($tag['redirect']) {
-            if ($mapping->getForward()) throw new plRuntimeException('Mapping "'.$mapping->getPath().'": Only one attribute of "action", "include", "redirect" or "forward" must be specified');
+            if ($mapping->getForward()) throw new RuntimeException('Mapping "'.$mapping->getPath().'": Only one attribute of "action", "include", "redirect" or "forward" must be specified');
             $path = (string) $tag['redirect'];
             // TODO: URL validieren
             $forward = new $this->forwardClass('generic', $path, true);
@@ -304,18 +312,18 @@ class Module extends Object {
 
          // process forward attribute
          if ($tag['forward']) {
-            if ($mapping->getForward()) throw new plRuntimeException('Mapping "'.$mapping->getPath().'": Only one attribute of "action", "include", "redirect" or "forward" must be specified');
+            if ($mapping->getForward()) throw new RuntimeException('Mapping "'.$mapping->getPath().'": Only one attribute of "action", "include", "redirect" or "forward" must be specified');
             $path = (string) $tag['forward'];
             $forward = $this->findForward($path);
-            if (!$forward) throw new plRuntimeException('Mapping "'.$mapping->getPath().'", attribute "forward": Forward "'.$path.'" not found');
+            if (!$forward) throw new RuntimeException('Mapping "'.$mapping->getPath().'", attribute "forward": Forward "'.$path.'" not found');
             $mapping->setForward($forward);
          }
-         if ($mapping->getForward() && sizeOf($tag->xPath('./forward'))) throw new plRuntimeException('Mapping "'.$mapping->getPath().'": Only an "include", "redirect" or "forward" attribute *or* nested <forward> elements must be specified');
+         if ($mapping->getForward() && sizeOf($tag->xPath('./forward'))) throw new RuntimeException('Mapping "'.$mapping->getPath().'": Only an "include", "redirect" or "forward" attribute *or* nested <forward> elements must be specified');
 
 
          // process action attribute
          if ($tag['action']) {
-            if ($mapping->getForward()) throw new plRuntimeException('Mapping "'.$mapping->getPath().'": Only one attribute of "action", "include", "redirect" or "forward" must be specified');
+            if ($mapping->getForward()) throw new RuntimeException('Mapping "'.$mapping->getPath().'": Only one attribute of "action", "include", "redirect" or "forward" must be specified');
             $action = (string) $tag['action'];
             // TODO: URL validieren
             $mapping->setActionClassName($action);
@@ -339,13 +347,13 @@ class Module extends Object {
                $validate = $tag['validate'] ? ($tag['validate'] == 'true') : !$action;
             }
             else {
-               if ($tag['validate'] == 'false') throw new plRuntimeException('Mapping "'.$mapping->getPath().'": An "action", "include", "redirect" or "forward" attribute is required when "validate" attribute is set to "false"');
+               if ($tag['validate'] == 'false') throw new RuntimeException('Mapping "'.$mapping->getPath().'": An "action", "include", "redirect" or "forward" attribute is required when "validate" attribute is set to "false"');
                $validate = true;
                // Prüfung auf 'success' und 'error' Forward erfolgt in ActionMapping:freeze()
             }
          }
          elseif ($validate = $tag['validate'] == 'true') {
-            throw new plRuntimeException('Mapping "'.$mapping->getPath().'": A "form" attribute must be specified when the "validate" attribute is set to "true"');
+            throw new RuntimeException('Mapping "'.$mapping->getPath().'": A "form" attribute must be specified when the "validate" attribute is set to "true"');
          }
          $mapping->setValidate($validate);
 
@@ -364,7 +372,7 @@ class Module extends Object {
 
          // process roles attribute
          if ($tag['roles']) {
-            if (!$this->roleProcessorClass) throw new plRuntimeException('Mapping "'.$mapping->getPath().'", attribute "roles": RoleProcessor configuration not found');
+            if (!$this->roleProcessorClass) throw new RuntimeException('Mapping "'.$mapping->getPath().'", attribute "roles": RoleProcessor configuration not found');
             $mapping->setRoles((string) $tag['roles']);
          }
 
@@ -383,10 +391,10 @@ class Module extends Object {
 
          foreach ($subElements as $forwardTag) {
             $name = (string) $forwardTag['name'];
-            if (sizeOf($forwardTag->attributes()) > 2) throw new plRuntimeException('Mapping "'.$mapping->getPath().'", forward "'.$name.'": Only one attribute of "include", "redirect" or "forward" must be specified');
+            if (sizeOf($forwardTag->attributes()) > 2) throw new RuntimeException('Mapping "'.$mapping->getPath().'", forward "'.$name.'": Only one attribute of "include", "redirect" or "forward" must be specified');
 
             if ($path = (string) $forwardTag['include']) {
-               if (!$this->isIncludable($path, $xml)) throw new plRuntimeException('Mapping "'.$mapping->getPath().'", forward "'.$name.'", attribute "include": '.($path{0}=='.' ? 'Tiles definition':'File').' "'.$path.'" not found');
+               if (!$this->isIncludable($path, $xml)) throw new RuntimeException('Mapping "'.$mapping->getPath().'", forward "'.$name.'", attribute "include": '.($path{0}=='.' ? 'Tiles definition':'File').' "'.$path.'" not found');
 
                if ($this->isTile($path, $xml)) {
                   $forward = new $this->forwardClass($name, $path, false);
@@ -411,13 +419,13 @@ class Module extends Object {
 
          foreach ($subElements as $forwardTag) {
             $name = (string) $forwardTag['name'];
-            if (sizeOf($forwardTag->attributes()) > 2) throw new plRuntimeException('Mapping "'.$mapping->getPath().'", forward "'.$name.'": Only one attribute of "include", "redirect" or "forward" must be specified');
+            if (sizeOf($forwardTag->attributes()) > 2) throw new RuntimeException('Mapping "'.$mapping->getPath().'", forward "'.$name.'": Only one attribute of "include", "redirect" or "forward" must be specified');
 
             $alias = (string) $forwardTag['forward'];
-            if ($alias == ActionForward ::__SELF) throw new plRuntimeException('Mapping "'.$mapping->getPath().'", forward "'.$name.'", attribute "forward": Can not use magic keyword "'.$alias.'" as attribute value');
+            if ($alias == ActionForward ::__SELF) throw new RuntimeException('Mapping "'.$mapping->getPath().'", forward "'.$name.'", attribute "forward": Can not use magic keyword "'.$alias.'" as attribute value');
 
             $forward = $mapping->findForward($alias);
-            if (!$forward) throw new plRuntimeException('Mapping "'.$mapping->getPath().'", forward "'.$name.'", attribute "forward": Forward "'.$alias.'" not found');
+            if (!$forward) throw new RuntimeException('Mapping "'.$mapping->getPath().'", forward "'.$name.'", attribute "forward": Forward "'.$alias.'" not found');
 
             $mapping->addForward($name, $forward);
          }
@@ -462,12 +470,12 @@ class Module extends Object {
 
       // find it's definition ...
       $nodes = $xml->xPath("/struts-config/tiles/tile[@name='$name']");
-      if (!$nodes)            throw new plRuntimeException('Tiles definition "'.$name.'" not found'); // FALSE oder leeres Array
-      if (sizeOf($nodes) > 1) throw new plRuntimeException('Non-unique "name" attribute detected for tiles definition "'.$name.'"');
+      if (!$nodes)            throw new RuntimeException('Tiles definition "'.$name.'" not found'); // FALSE oder leeres Array
+      if (sizeOf($nodes) > 1) throw new RuntimeException('Non-unique "name" attribute detected for tiles definition "'.$name.'"');
 
 
       $tag = $nodes[0];
-      if (sizeOf($tag->attributes()) != 2) throw new plRuntimeException('Tile "'.$name.'": Exactly one attribute of "path" or "extends" must be specified');
+      if (sizeOf($tag->attributes()) != 2) throw new RuntimeException('Tile "'.$name.'": Exactly one attribute of "path" or "extends" must be specified');
 
       // create a new instance ...
       if ($tag['path']) {              // 'path' given, it's a simple tile
@@ -506,7 +514,7 @@ class Module extends Object {
          // TODO: Name-Value von <set> wird nicht auf Eindeutigkeit überprüft
 
          if ($tag['value']) { // value ist im Attribut angegeben
-            if (strLen($tag) > 0) throw new plRuntimeException('Tile "'.$tile->getName().'", set "'.$name.'": Only a "value" attribute *or* a body value must be specified');
+            if (strLen($tag) > 0) throw new RuntimeException('Tile "'.$tile->getName().'", set "'.$name.'": Only a "value" attribute *or* a body value must be specified');
             $value = (string) $tag['value'];
 
             if ($tag['type']) {
@@ -516,7 +524,7 @@ class Module extends Object {
                $type = Tile ::PROP_TYPE_RESOURCE;
             }
             else if (strEndsWithI($value, '.htm') || strEndsWithI($value, '.html')) {
-               throw new plRuntimeException('Tile "'.$tile->getName().'", set "'.$name.'": specify a type="string|resource" for ambiguous attribute value="'.$value.'" (looks like a filename but file not found)');
+               throw new RuntimeException('Tile "'.$tile->getName().'", set "'.$name.'": specify a type="string|resource" for ambiguous attribute value="'.$value.'" (looks like a filename but file not found)');
             }
             else {
                $type = Tile ::PROP_TYPE_STRING;
@@ -525,7 +533,7 @@ class Module extends Object {
          else {               // value ist im Body angegeben
             $value = trim((string) $tag);
             $type = ($tag['type']) ? (string) $tag['type'] : Tile ::PROP_TYPE_STRING;
-            if ($type == Tile ::PROP_TYPE_RESOURCE) throw new plRuntimeException('Tile "'.$tile->getName().'", set "'.$name.'": A "value" attribute must be specified when attribute type is set to "resource"');
+            if ($type == Tile ::PROP_TYPE_RESOURCE) throw new RuntimeException('Tile "'.$tile->getName().'", set "'.$name.'": A "value" attribute must be specified when attribute type is set to "resource"');
          }
 
 
@@ -541,7 +549,7 @@ class Module extends Object {
                           ->setLabel(subStr($value, 0, strRPos($value, '.')));
             }
             else {
-               throw new plRuntimeException('Tile "'.$tile->getName().'", set "'.$name.'", attribute "value": '.($value{0}=='.' ? 'Tiles definition':'File').' "'.$value.'" not found');
+               throw new RuntimeException('Tile "'.$tile->getName().'", set "'.$name.'", attribute "value": '.($value{0}=='.' ? 'Tiles definition':'File').' "'.$value.'" not found');
             }
             $value = $nestedTile;
          }
@@ -574,7 +582,7 @@ class Module extends Object {
       if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
 
       if (isSet($this->forwards[$name]))
-         throw new plRuntimeException('Non-unique name detected for global ActionForward "'.$name.'"');
+         throw new RuntimeException('Non-unique name detected for global ActionForward "'.$name.'"');
 
       $this->forwards[$name] = $forward;
    }
@@ -589,7 +597,7 @@ class Module extends Object {
       if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
       if ($mapping->isDefault()) {
-         if ($this->defaultMapping) throw new plRuntimeException('Only one ActionMapping can be marked as "default" within a module.');
+         if ($this->defaultMapping) throw new RuntimeException('Only one ActionMapping can be marked as "default" within a module.');
          $this->defaultMapping = $mapping;
       }
 
@@ -677,7 +685,7 @@ class Module extends Object {
       if ($this->configured)                                                     throw new IllegalStateException('Configuration is frozen');
       if (!is_string($className))                                                throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
       if (!is_class($className))                                                 throw new ClassNotFoundException("Undefined class '$className'");
-      if (!is_subclass_of($className, Struts ::DEFAULT_REQUEST_PROCESSOR_CLASS)) throw new plInvalidArgumentException('Not a subclass of '.Struts ::DEFAULT_REQUEST_PROCESSOR_CLASS.': '.$className);
+      if (!is_subclass_of($className, Struts ::DEFAULT_REQUEST_PROCESSOR_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts ::DEFAULT_REQUEST_PROCESSOR_CLASS.': '.$className);
 
       $this->requestProcessorClass = $className;
    }
@@ -703,7 +711,7 @@ class Module extends Object {
       if ($this->configured)                                               throw new IllegalStateException('Configuration is frozen');
       if (!is_string($className))                                          throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
       if (!is_class($className))                                           throw new ClassNotFoundException("Undefined class '$className'");
-      if (!is_subclass_of($className, Struts ::ROLE_PROCESSOR_BASE_CLASS)) throw new plInvalidArgumentException('Not a subclass of '.Struts ::ROLE_PROCESSOR_BASE_CLASS.': '.$className);
+      if (!is_subclass_of($className, Struts ::ROLE_PROCESSOR_BASE_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts ::ROLE_PROCESSOR_BASE_CLASS.': '.$className);
 
       $this->roleProcessorClass = $className;
    }
@@ -734,7 +742,7 @@ class Module extends Object {
       if ($this->configured)                                         throw new IllegalStateException('Configuration is frozen');
       if (!is_string($className))                                    throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
       if (!is_class($className))                                     throw new ClassNotFoundException("Undefined class '$className'");
-      if (!is_subclass_of($className, Struts ::DEFAULT_TILES_CLASS)) throw new plInvalidArgumentException('Not a subclass of '.Struts ::DEFAULT_TILES_CLASS.': '.$className);
+      if (!is_subclass_of($className, Struts ::DEFAULT_TILES_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts ::DEFAULT_TILES_CLASS.': '.$className);
 
       $this->tilesClass = $className;
    }
@@ -760,7 +768,7 @@ class Module extends Object {
       if ($this->configured)                                                  throw new IllegalStateException('Configuration is frozen');
       if (!is_string($className))                                             throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
       if (!is_class($className))                                              throw new ClassNotFoundException("Undefined class '$className'");
-      if (!is_subclass_of($className, Struts ::DEFAULT_ACTION_MAPPING_CLASS)) throw new plInvalidArgumentException('Not a subclass of '.Struts ::DEFAULT_ACTION_MAPPING_CLASS.': '.$className);
+      if (!is_subclass_of($className, Struts ::DEFAULT_ACTION_MAPPING_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts ::DEFAULT_ACTION_MAPPING_CLASS.': '.$className);
 
       $this->mappingClass = $className;
    }
@@ -786,7 +794,7 @@ class Module extends Object {
       if ($this->configured)                                                  throw new IllegalStateException('Configuration is frozen');
       if (!is_string($className))                                             throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
       if (!is_class($className))                                              throw new ClassNotFoundException("Undefined class '$className'");
-      if (!is_subclass_of($className, Struts ::DEFAULT_ACTION_FORWARD_CLASS)) throw new plInvalidArgumentException('Not a subclass of '.Struts ::DEFAULT_ACTION_FORWARD_CLASS.': '.$className);
+      if (!is_subclass_of($className, Struts ::DEFAULT_ACTION_FORWARD_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts ::DEFAULT_ACTION_FORWARD_CLASS.': '.$className);
 
       $this->forwardClass = $className;
    }
@@ -883,7 +891,7 @@ class Module extends Object {
 
       if ($nodes) {                 // xPath() gibt entgegen der Dokumentation NICHT immer ein Array zurück
          if (sizeOf($nodes) > 1)
-            throw new plRuntimeException('Non-unique tiles definition name "'.$name.'"');
+            throw new RuntimeException('Non-unique tiles definition name "'.$name.'"');
          return true;
       }
       return false;

@@ -1,4 +1,8 @@
 <?php
+use rosasurfer\ministruts\exceptions\IllegalTypeException;
+use rosasurfer\ministruts\exceptions\InvalidArgumentException;
+
+
 /**
  * Dependency
  *
@@ -101,7 +105,7 @@ abstract class Dependency extends Object {
     */
    public function setMinValidity($time) {
       if (!is_int($time)) throw new IllegalTypeException('Illegal type of parameter $time: '.getType($time));
-      if ($time < 0)      throw new plInvalidArgumentException('Invalid argument $time: '.$time);
+      if ($time < 0)      throw new InvalidArgumentException('Invalid argument $time: '.$time);
 
       $this->minValidity = $time;
 

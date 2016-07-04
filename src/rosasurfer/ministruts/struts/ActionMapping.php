@@ -1,4 +1,11 @@
 <?php
+use rosasurfer\ministruts\exceptions\ClassNotFoundException;
+use rosasurfer\ministruts\exceptions\IllegalStateException;
+use rosasurfer\ministruts\exceptions\IllegalTypeException;
+use rosasurfer\ministruts\exceptions\InvalidArgumentException;
+use rosasurfer\ministruts\exceptions\RuntimeException;
+
+
 /**
  * ActionMapping
  */
@@ -70,7 +77,7 @@ class ActionMapping extends Object {
    public function setPath($path) {
       if ($this->configured)          throw new IllegalStateException('Configuration is frozen');
       if (!is_string($path))          throw new IllegalTypeException('Illegal type of parameter $path: '.getType($path));
-      if (!strStartsWith($path, '/')) throw new plInvalidArgumentException('The "path" attribute of a mapping must begin with a slash "/", found "'.$path.'"');
+      if (!strStartsWith($path, '/')) throw new InvalidArgumentException('The "path" attribute of a mapping must begin with a slash "/", found "'.$path.'"');
 
       $this->path = $path;
       return $this;
@@ -113,7 +120,7 @@ class ActionMapping extends Object {
       if ($this->configured)                   throw new IllegalStateException('Configuration is frozen');
       if (!is_string($method))                 throw new IllegalTypeException('Illegal type of parameter $method: '.getType($method));
       $method = strToUpper($method);
-      if ($method!=='GET' && $method!=='POST') throw new plInvalidArgumentException('Invalid argument $method: '.$method);
+      if ($method!=='GET' && $method!=='POST') throw new InvalidArgumentException('Invalid argument $method: '.$method);
 
       $this->methods[$method] = true;
       return $this;
@@ -145,14 +152,14 @@ class ActionMapping extends Object {
       //static $pattern = '/^!?[A-Za-z_][A-Za-z0-9_]*(,!?[A-Za-z_][A-Za-z0-9_]*)*$/';
       static $pattern = '/^!?[A-Za-z_][A-Za-z0-9_]*$/';
 
-      if (!strLen($roles) || !preg_match($pattern, $roles)) throw new plInvalidArgumentException('Invalid argument $roles: "'.$roles.'"');
+      if (!strLen($roles) || !preg_match($pattern, $roles)) throw new InvalidArgumentException('Invalid argument $roles: "'.$roles.'"');
 
       // check for impossible constraints, ie. "Member,!Member"
       $tokens = explode(',', $roles);
       $keys = array_flip($tokens);
 
       foreach ($tokens as $role) {
-         if (isSet($keys['!'.$role])) throw new plInvalidArgumentException('Invalid argument $roles: "'.$roles.'"');
+         if (isSet($keys['!'.$role])) throw new InvalidArgumentException('Invalid argument $roles: "'.$roles.'"');
       }
 
       // remove duplicates
@@ -170,7 +177,7 @@ class ActionMapping extends Object {
     */
    public function setForward(ActionForward $forward) {
       if ($this->configured)      throw new IllegalStateException('Configuration is frozen');
-      if ($this->actionClassName) throw new plRuntimeException('Configuration error: Only one attribute of "action", "include", "redirect" or "forward" can be specified for mapping "'.$this->path.'"');
+      if ($this->actionClassName) throw new RuntimeException('Configuration error: Only one attribute of "action", "include", "redirect" or "forward" can be specified for mapping "'.$this->path.'"');
 
       $this->forward = $forward;
       return $this;
@@ -198,8 +205,8 @@ class ActionMapping extends Object {
       if ($this->configured)                                       throw new IllegalStateException('Configuration is frozen');
       if (!is_string($className))                                  throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
       if (!is_class($className))                                   throw new ClassNotFoundException("Undefined class '$className'");
-      if (!is_subclass_of($className, Struts ::ACTION_BASE_CLASS)) throw new plInvalidArgumentException('Not a subclass of '.Struts ::ACTION_BASE_CLASS.': '.$className);
-      if ($this->forward)                                          throw new plRuntimeException('Configuration error: Only one attribute of "action", "include", "redirect" or "forward" can be specified for mapping "'.$this->path.'"');
+      if (!is_subclass_of($className, Struts ::ACTION_BASE_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts ::ACTION_BASE_CLASS.': '.$className);
+      if ($this->forward)                                          throw new RuntimeException('Configuration error: Only one attribute of "action", "include", "redirect" or "forward" can be specified for mapping "'.$this->path.'"');
 
       $this->actionClassName = $className;
       return $this;
@@ -228,7 +235,7 @@ class ActionMapping extends Object {
       if ($this->configured)                                            throw new IllegalStateException('Configuration is frozen');
       if (!is_string($className))                                       throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
       if (!is_class($className))                                        throw new ClassNotFoundException("Undefined class '$className'");
-      if (!is_subclass_of($className, Struts ::ACTION_FORM_BASE_CLASS)) throw new plInvalidArgumentException('Not a subclass of '.Struts ::ACTION_FORM_BASE_CLASS.': '.$className);
+      if (!is_subclass_of($className, Struts ::ACTION_FORM_BASE_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts ::ACTION_FORM_BASE_CLASS.': '.$className);
 
       $this->formClassName = $className;
       return $this;
@@ -258,7 +265,7 @@ class ActionMapping extends Object {
    public function setScope($scope) {
       if ($this->configured)                        throw new IllegalStateException('Configuration is frozen');
       if (!is_string($scope))                       throw new IllegalTypeException('Illegal type of parameter $scope: '.getType($scope));
-      if ($scope!=='request' && $scope!=='session') throw new plInvalidArgumentException('Invalid argument $scope: '.$scope);
+      if ($scope!=='request' && $scope!=='session') throw new InvalidArgumentException('Invalid argument $scope: '.$scope);
 
       $this->scope = $scope;
       return $this;
@@ -372,7 +379,7 @@ class ActionMapping extends Object {
       if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
 
       if (isSet($this->forwards[$name]))
-         throw new plRuntimeException('Non-unique name detected for local action forward "'.$name.'"');
+         throw new RuntimeException('Non-unique name detected for local action forward "'.$name.'"');
 
       $this->forwards[$name] = $forward;
       return $this;

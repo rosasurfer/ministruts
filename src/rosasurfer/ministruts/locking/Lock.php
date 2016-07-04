@@ -1,4 +1,9 @@
 <?php
+use rosasurfer\ministruts\exceptions\FileNotFoundException;
+use rosasurfer\ministruts\exceptions\IllegalTypeException;
+use rosasurfer\ministruts\exceptions\RuntimeException;
+
+
 /**
  * Lock
  *
@@ -43,7 +48,7 @@ final class Lock extends BaseLock {
          $trace = debug_backtrace();
          $key   = $trace[0]['file'].'#'.$trace[0]['line'];
       }
-      if (isSet(self::$lockedKeys[$key])) throw new plRuntimeException('Dead-lock detected: already holding a lock for key "'.$key.'"');
+      if (isSet(self::$lockedKeys[$key])) throw new RuntimeException('Dead-lock detected: already holding a lock for key "'.$key.'"');
       self::$lockedKeys[$key] = true;
 
       $this->key = $key;
@@ -55,7 +60,7 @@ final class Lock extends BaseLock {
       else {
          // alternativ FileLock verwenden ...
          $filename = ini_get('session.save_path').DIRECTORY_SEPARATOR.'lock_'.md5($key);
-         if (!is_file($filename) && !touch($filename)) throw new plRuntimeException('Cannot create lock file "'.$filename.'"');
+         if (!is_file($filename) && !touch($filename)) throw new RuntimeException('Cannot create lock file "'.$filename.'"');
 
          if (!is_file($filename)) throw new FileNotFoundException('Cannot find lock file "'.$filename.'"');
 
@@ -75,7 +80,7 @@ final class Lock extends BaseLock {
       try {
          $this->release();
       }
-      catch (Exception $ex) {
+      catch (\Exception $ex) {
          Logger::handleException($ex, $inShutdownOnly=true);
          throw $ex;
       }

@@ -3,17 +3,17 @@ namespace rosasurfer\ministruts\exceptions;
 
 
 /**
- * PHPErrorException
+ * PHPError
  *
- * Eine PHPErrorException darf nur im globalen ErrorHandler erzeugt werden. Eigentlich müßte
- * PHPErrorException daher eine private, innere Klasse des Errorhandlers sein.  Da dies in PHP nicht
- * möglich ist, setzt der Errorhandler vor dem Erzeugen einer neuen PHPErrorException eine Markierung
- * (globale Variable $__PHPErrorException_create), die im Constructor der Exception sofort wieder
+ * Ein PHPError darf nur im globalen ErrorHandler erzeugt werden. Eigentlich müßte
+ * PHPError daher eine private, innere Klasse des Errorhandlers sein.  Da dies in PHP nicht
+ * möglich ist, setzt der Errorhandler vor dem Erzeugen eines neuen PHPError eine Markierung
+ * (globale Variable $__PHPError_create), die im Constructor der Exception sofort wieder
  * gelöscht wird.
  *
  * @see Logger::handleError()
  */
-class PHPErrorException extends NestableException {
+class PHPError extends \Exception {
 
 
    private /*mixed[]   */ $context;
@@ -30,13 +30,7 @@ class PHPErrorException extends NestableException {
     *                            in. User error handler must not modify error context.
     */
    public function __construct($message, $file, $line, array $context) {
-      // prüfen, ob wir außerhalb des ErrorHandler aufgerufen wurden
-      if (!isSet($GLOBALS['$__PHPErrorException_create']))
-         throw new plRuntimeException('Illegal access to non-public constructor of '.__CLASS__.' (see documentation)');
-
-      unset($GLOBALS['$__PHPErrorException_create']);    // Marker entfernen
-
-      parent:: __construct($message);
+      parent::__construct($message);
 
       $this->file    = $file;
       $this->line    = $line;

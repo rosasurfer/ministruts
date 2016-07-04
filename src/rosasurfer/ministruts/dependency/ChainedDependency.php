@@ -1,4 +1,7 @@
 <?php
+use rosasurfer\ministruts\exceptions\RuntimeException;
+
+
 /**
  * ChainedDependency
  */
@@ -107,6 +110,6 @@ class ChainedDependency extends Dependency {
          return false;
       }
 
-      throw new plRuntimeException('Unreachable code reached');
+      throw new RuntimeException('Unreachable code reached');
    }
 }

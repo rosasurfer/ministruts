@@ -1,4 +1,7 @@
 <?php
+use rosasurfer\ministruts\exceptions\InvalidArgumentException;
+
+
 /**
  * Barcode renderer for "Code-39", an alphanumeric bar code that can encode decimal numbers, upper and lower case
  * alphabetic characters and some special symbols.
@@ -71,7 +74,7 @@ class C39BarCode extends BarCode {
       $len = strLen($value);
       for ($i=0; $i<$len; $i++) {
          if ($this->getCharIndex($value[$i])==-1 || $value[$i]=='*')
-            throw new plInvalidArgumentException("Invalid barcode value \"$value\" (standard 'C-39' does not contain character '$value[$i]')");
+            throw new InvalidArgumentException("Invalid barcode value \"$value\" (standard 'C-39' does not contain character '$value[$i]')");
       }
    }
 

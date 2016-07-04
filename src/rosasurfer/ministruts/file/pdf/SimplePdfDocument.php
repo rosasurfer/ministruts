@@ -1,4 +1,7 @@
 <?php
+use rosasurfer\ministruts\exceptions\IllegalTypeException;
+
+
 /**
  * SimplePdfDocument
  *
@@ -1536,7 +1539,7 @@ class SimplePdfDocument extends BasePdfDocument {
          fWrite($hFile, $this->toString());
          fClose($hFile);
       }
-      catch (Exception $ex) {
+      catch (\Exception $ex) {
          if (is_resource($hFile))                 @fClose($hFile);
          if (!$fileExisted && is_file($filename)) @unlink($filename);
          throw $ex;

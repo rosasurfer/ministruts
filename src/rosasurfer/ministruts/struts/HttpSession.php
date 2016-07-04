@@ -1,4 +1,9 @@
 <?php
+use rosasurfer\ministruts\exceptions\IllegalStateException;
+use rosasurfer\ministruts\exceptions\IllegalTypeException;
+use rosasurfer\ministruts\exceptions\PHPError;
+
+
 /**
  * HttpSession
  *
@@ -61,7 +66,7 @@ class HttpSession extends Singleton {
       try {
          session_start();
       }
-      catch (PHPErrorException $error) {
+      catch (PHPError $error) {
          if (strPos($error->getMessage(), 'The session id contains illegal characters') === false)
             throw $error;                 // andere Fehler weiterreichen
          session_regenerate_id();         // neue ID generieren

@@ -1,4 +1,8 @@
 <?php
+use rosasurfer\ministruts\exceptions\IllegalTypeException;
+use rosasurfer\ministruts\exceptions\RuntimeException;
+
+
 /**
  * String
  */
@@ -51,7 +55,7 @@ final class String extends StaticClass {
       static $function_exists = null;
       if ($function_exists === null)
          if (!$function_exists = function_exists('iconv'))
-            throw new plRuntimeException('Fatal error: Call to undefined function iconv()');
+            throw new RuntimeException('Fatal error: Call to undefined function iconv()');
 
 
       $php_errormsg = null;

@@ -1,4 +1,8 @@
 <?php
+use rosasurfer\ministruts\exceptions\DatabaseException;
+use rosasurfer\ministruts\exceptions\IllegalTypeException;
+
+
 /**
  * DaoWorker
  *

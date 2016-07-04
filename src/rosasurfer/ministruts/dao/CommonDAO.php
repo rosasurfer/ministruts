@@ -1,4 +1,8 @@
 <?php
+use rosasurfer\ministruts\exceptions\ConcurrentModificationException;
+use rosasurfer\ministruts\exceptions\InvalidArgumentException;
+
+
 /**
  * CommonDAO
  *
@@ -134,8 +138,8 @@ class CommonDAO extends Singleton {
     */
    public final function refresh(PersistableObject $object) {
       $class = $this->getEntityClass();
-      if (!$object instanceof $class) throw new plInvalidArgumentException('Cannot refresh instances of '.get_class($object));
-      if (!$object->isPersistent())   throw new plInvalidArgumentException('Cannot refresh non-persistent '.get_class($object));
+      if (!$object instanceof $class) throw new InvalidArgumentException('Cannot refresh instances of '.get_class($object));
+      if (!$object->isPersistent())   throw new InvalidArgumentException('Cannot refresh non-persistent '.get_class($object));
 
       $mapping   = $this->getMapping();
       $tablename = $mapping['table'];

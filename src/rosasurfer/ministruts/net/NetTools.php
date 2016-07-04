@@ -1,4 +1,8 @@
 <?php
+use rosasurfer\ministruts\exceptions\IllegalTypeException;
+use rosasurfer\ministruts\exceptions\InvalidArgumentException;
+
+
 /**
  * NetTools - Internet related utilities
  */
@@ -14,14 +18,14 @@ final class NetTools extends StaticClass {
     */
    public static function getHostByAddress($address) {
       if (!is_string($address)) throw new IllegalTypeException('Illegal type of parameter $address: '.getType($address));
-      if ($address == '')       throw new plInvalidArgumentException('Invalid argument $address: "'.$address.'"');
+      if ($address == '')       throw new InvalidArgumentException('Invalid argument $address: "'.$address.'"');
 
       try {
          return getHostByAddr($address);
       }
-      catch (Exception $ex) {
+      catch (\Exception $ex) {
          if ($ex->getMessage() == 'gethostbyaddr(): Address is not a valid IPv4 or IPv6 address')
-            throw new plInvalidArgumentException('Invalid argument $address: "'.$address.'"', $ex);
+            throw new InvalidArgumentException('Invalid argument $address: "'.$address.'"', $ex);
          throw $ex;
       }
    }
@@ -36,7 +40,7 @@ final class NetTools extends StaticClass {
     */
    public static function getHostByName($name) {
       if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
-      if ($name == '')       throw new plInvalidArgumentException('Invalid argument $name: "'.$name.'"');
+      if ($name == '')       throw new InvalidArgumentException('Invalid argument $name: "'.$name.'"');
 
       return getHostByName($name);
    }
@@ -52,7 +56,7 @@ final class NetTools extends StaticClass {
     */
    public static function isProxyAddress($address, $reverseResolve = false) {
       if (!is_string($address))      throw new IllegalTypeException('Illegal type of parameter $address: '.getType($address));
-      if (!strLen($address))         throw new plInvalidArgumentException('Invalid argument $address: '.$address);
+      if (!strLen($address))         throw new InvalidArgumentException('Invalid argument $address: '.$address);
       if (!is_bool($reverseResolve)) throw new IllegalTypeException('Illegal type of parameter $reverseResolve: '.getType($reverseResolve));
 
       static $proxys = null;

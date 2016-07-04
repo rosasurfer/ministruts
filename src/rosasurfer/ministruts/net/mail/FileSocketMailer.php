@@ -1,4 +1,7 @@
 <?php
+use rosasurfer\ministruts\exceptions\UnimplementedFeatureException;
+
+
 /**
  * Mailer, der Mails über eine FileSocket-Verbindung verschickt.
  */

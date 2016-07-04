@@ -1,4 +1,8 @@
 <?php
+use rosasurfer\ministruts\exceptions\IllegalTypeException;
+use rosasurfer\ministruts\exceptions\InvalidArgumentException;
+use rosasurfer\ministruts\exceptions\RuntimeException;
+
 use const rosasurfer\ministruts\CLI       as CLI;
 use const rosasurfer\ministruts\LOCALHOST as LOCALHOST;
 use const rosasurfer\ministruts\WINDOWS   as WINDOWS;
@@ -178,7 +182,7 @@ final class Config extends Object {
          // Key und Value trennen
          $parts = explode('=', $line, 2);
          if (sizeOf($parts) < 2)
-            throw new plRuntimeException('Syntax error in configuration file "'.$filename.'" at line: "'.$line.'"');
+            throw new RuntimeException('Syntax error in configuration file "'.$filename.'" at line: "'.$line.'"');
 
          // Eigenschaft setzen
          $this->setProperty(trim($parts[0]), trim($parts[1]), false); // Cache nicht aktualisieren
@@ -195,8 +199,8 @@ final class Config extends Object {
     *
     * @return mixed - Konfigurationseinstellung
     *
-    * @throws plRuntimeException - wenn unter dem angegebenen Schlüssel keine Einstellung existiert und
-    *                              kein Defaultwert angegeben wurde
+    * @throws RuntimeException - wenn unter dem angegebenen Schlüssel keine Einstellung existiert und
+    *                            kein Defaultwert angegeben wurde
     */
    public static function get($key, $default=null) {
       if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
@@ -205,7 +209,7 @@ final class Config extends Object {
       $value = self ::me()->getProperty($key);
 
       if (is_null($value)) {
-         if (func_num_args() == 1) throw new plRuntimeException('Missing configuration setting for key "'.$key.'"');
+         if (func_num_args() == 1) throw new RuntimeException('Missing configuration setting for key "'.$key.'"');
          return $default;
       }
 
@@ -290,14 +294,14 @@ final class Config extends Object {
          }
          else {               // Key beginnt mit Anführungszeichen (")
             $pos = strPos($k, '"',1);
-            if ($pos === false) throw new plInvalidArgumentException('Invalid argument $key: '.$key);
+            if ($pos === false) throw new InvalidArgumentException('Invalid argument $key: '.$key);
 
             $parts[] = subStr($k, 1, $pos-1);
             $k       = trim(subStr($k, $pos+1));
 
             if (!strLen($k))
                break;
-            if (strPos($k, '.') !== 0) throw new plInvalidArgumentException('Invalid argument $key: '.$key);
+            if (strPos($k, '.') !== 0) throw new InvalidArgumentException('Invalid argument $key: '.$key);
             $k = subStr($k, 1);
          }
       }
@@ -307,7 +311,7 @@ final class Config extends Object {
 
       for ($i=0; $i<$size; ++$i) {
          $current = trim($parts[$i]);
-         if ($current == '') throw new plInvalidArgumentException('Invalid argument $key: '.$key);
+         if ($current == '') throw new InvalidArgumentException('Invalid argument $key: '.$key);
 
          if ($i+1 < $size) {
             // noch nicht das letzte Element

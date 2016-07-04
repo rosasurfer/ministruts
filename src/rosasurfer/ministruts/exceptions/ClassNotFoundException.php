@@ -5,5 +5,5 @@ namespace rosasurfer\ministruts\exceptions;
 /**
  * ClassNotFoundException
  */
-class ClassNotFoundException extends Exception {
+class ClassNotFoundException extends MinistrutsException {
 }

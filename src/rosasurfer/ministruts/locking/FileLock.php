@@ -1,4 +1,8 @@
 <?php
+use rosasurfer\ministruts\exceptions\IllegalTypeException;
+use rosasurfer\ministruts\exceptions\RuntimeException;
+
+
 /**
  * FileLock
  *
@@ -44,7 +48,7 @@ final class FileLock extends BaseLock {
       if (!is_string($filename))           throw new IllegalTypeException('Illegal type of parameter $filename: '.getType($filename));
       if (!is_bool($shared))               throw new IllegalTypeException('Illegal type of parameter $shared: '.getType($shared));
 
-      if (isSet(self::$hFiles[$filename])) throw new plRuntimeException('Dead-lock detected: already holding a lock for file "'.$filename.'"');
+      if (isSet(self::$hFiles[$filename])) throw new RuntimeException('Dead-lock detected: already holding a lock for file "'.$filename.'"');
       self::$hFiles[$filename] = false;      // Schlägt der Constructor fehl, verhindert der gesetzte Eintrag ein
                                              // Dead-lock bei eventuellem Re-Entry.
       $this->filename = $filename;
@@ -53,7 +57,7 @@ final class FileLock extends BaseLock {
       self::$hFiles[$filename] = fOpen($filename, 'r');
       $mode = $shared ? LOCK_SH : LOCK_EX;
 
-      if (!fLock(self::$hFiles[$filename], $mode)) throw new plRuntimeException('Can not aquire '.($shared ? 'shared':'exclusive').' file lock for "'.$filename.'"');
+      if (!fLock(self::$hFiles[$filename], $mode)) throw new RuntimeException('Can not aquire '.($shared ? 'shared':'exclusive').' file lock for "'.$filename.'"');
    }
 
 
@@ -68,7 +72,7 @@ final class FileLock extends BaseLock {
       try {
          $this->release();
       }
-      catch (Exception $ex) {
+      catch (\Exception $ex) {
          Logger::handleException($ex, $inShutdownOnly=true);
          throw $ex;
       }

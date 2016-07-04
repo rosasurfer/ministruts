@@ -1,4 +1,9 @@
 <?php
+use rosasurfer\ministruts\exceptions\DatabaseException;
+use rosasurfer\ministruts\exceptions\IllegalTypeException;
+use rosasurfer\ministruts\exceptions\InfrastructureException;
+
+
 /**
  * MySQLConnector
  */
@@ -42,7 +47,7 @@ final class MySQLConnector extends DB {
                                      2                // 2 = CLIENT_FOUND_ROWS
                                      );
       }
-      catch (Exception $ex) {
+      catch (\Exception $ex) {
          throw new InfrastructureException("Can not connect to MySQL server on '$host'", $ex);  // Message enthält den Port
       }
 
@@ -65,7 +70,7 @@ final class MySQLConnector extends DB {
       catch (InfrastructureException $ex) {
          throw $ex;
       }
-      catch (Exception $ex) {
+      catch (\Exception $ex) {
          throw new InfrastructureException("Can not set system variable '$sql'", $ex);
       }
 
@@ -76,7 +81,7 @@ final class MySQLConnector extends DB {
       catch (InfrastructureException $ex) {
          throw $ex;
       }
-      catch (Exception $ex) {
+      catch (\Exception $ex) {
          throw new InfrastructureException("Can not select database '$this->database'", $ex);
       }
 

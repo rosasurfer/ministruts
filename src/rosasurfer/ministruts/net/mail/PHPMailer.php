@@ -1,4 +1,7 @@
 <?php
+use rosasurfer\ministruts\exceptions\UnimplementedFeatureException;
+
+
 /**
  * Mailer, der Mails mit Hilfe der in PHP integrierten mail()-Funktion verschickt.
  */

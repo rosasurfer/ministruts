@@ -1,4 +1,7 @@
-<?php
+﻿<?php
+use rosasurfer\ministruts\exceptions\IllegalTypeException;
+
+
 /**
  * ApcCache
  *

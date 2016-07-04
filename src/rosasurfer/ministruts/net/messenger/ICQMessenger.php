@@ -1,4 +1,7 @@
 <?php
+use rosasurfer\ministruts\exceptions\UnimplementedFeatureException;
+
+
 /**
  * Messenger, der eine Nachricht an einen ICQ-Kontakt verschickt.
  */

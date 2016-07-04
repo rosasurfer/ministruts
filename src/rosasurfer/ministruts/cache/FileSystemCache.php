@@ -1,4 +1,8 @@
 <?php
+use rosasurfer\ministruts\exceptions\IllegalTypeException;
+use rosasurfer\ministruts\exceptions\PHPError;
+use rosasurfer\ministruts\exceptions\RuntimeException;
+
 use const rosasurfer\ministruts\WINDOWS as WINDOWS;
 
 
@@ -143,7 +147,7 @@ final class FileSystemCache extends CachePeer {
             $this->getReferencePool()->drop($key);
             return true;
          }
-         throw new plRuntimeException('Cannot delete file: '.$fileName);
+         throw new RuntimeException('Cannot delete file: '.$fileName);
       }
 
       return false;
@@ -202,14 +206,14 @@ final class FileSystemCache extends CachePeer {
       try {
          $data = file_get_contents($fileName, false);
       }
-      catch (PHPErrorException $ex) {
+      catch (PHPError $ex) {
          if (strEndsWith($ex->getMessage(), 'failed to open stream: No such file or directory'))
             return null;
          throw $ex;
       }
 
       if ($data === false)
-         throw new plRuntimeException('file_get_contents() returned FALSE, $fileName: "'.$fileName);
+         throw new RuntimeException('file_get_contents() returned FALSE, $fileName: "'.$fileName);
 
       return unserialize($data);
    }

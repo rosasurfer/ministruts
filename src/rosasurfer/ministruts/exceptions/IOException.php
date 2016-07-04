@@ -5,5 +5,5 @@ namespace rosasurfer\ministruts\exceptions;
 /**
  * IOException
  */
-class IOException extends Exception {
+class IOException extends MinistrutsException {
 }

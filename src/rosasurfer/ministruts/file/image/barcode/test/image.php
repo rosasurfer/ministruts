@@ -1,4 +1,7 @@
 <?php
+use rosasurfer\ministruts\exceptions\InvalidArgumentException;
+
+
 $type   = isSet($_REQUEST['type'  ]) ? $_REQUEST['type'  ] : null;
 $value  = isSet($_REQUEST['value' ]) ? $_REQUEST['value' ] : '';
 $width  = isSet($_REQUEST['width' ]) ? $_REQUEST['width' ] : null;
@@ -19,5 +22,5 @@ switch ($type) {
       break;
 
    default:
-      throw new plInvalidArgumentException("Unknown barcode type \"$type\"");
+      throw new InvalidArgumentException("Unknown barcode type \"$type\"");
 }

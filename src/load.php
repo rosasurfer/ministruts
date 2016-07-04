@@ -1,4 +1,9 @@
 <?php
+use rosasurfer\ministruts\exceptions\ClassNotFoundException;
+use rosasurfer\ministruts\exceptions\IllegalTypeException;
+use rosasurfer\ministruts\exceptions\InvalidArgumentException;
+use rosasurfer\ministruts\exceptions\RuntimeException;
+
 use const rosasurfer\ministruts\CLI       as CLI;
 use const rosasurfer\ministruts\LOCALHOST as LOCALHOST;
 use const rosasurfer\ministruts\ROOT      as MINISTRUTS_ROOT;
@@ -6,6 +11,8 @@ use const rosasurfer\ministruts\WINDOWS   as WINDOWS;
 
 
 /**
+ * Program flow:
+ *
  * (1) block framework re-includes
  * (2) check/adjust PHP environment
  * (3) execute phpInfo() if applicable
@@ -16,7 +23,6 @@ use const rosasurfer\ministruts\WINDOWS   as WINDOWS;
  * (8) define local helper functions
  * (9) define helpers globally if applicable
  */
-
 
 // (1) block framework re-includes
 if (defined('rosasurfer\ministruts\ROOT'))
@@ -50,7 +56,7 @@ ini_set('session.cookie_httponly' ,  1                     );
 ini_set('session.referer_check'   , ''                     );
 
 
-// (3) execute phpInfo() if applicable (if enabled authorization must be handled by the server)
+// (3) execute phpInfo() if applicable (authorization must be handled by the server)
 if (false) {
    if (!CLI && strEndsWith(strLeftTo($_SERVER['REQUEST_URI'], '?'), '/phpinfo.php'))
       include(MINISTRUTS_ROOT.'/src/phpinfo.php') | exit(0);
@@ -63,12 +69,12 @@ if (false) {
 
 
 /**
- * (5) Register case-insensitive class loader
+ * (5) register case-insensitive class loader
  *
  * @param  string $class - name of class to load
  */
 spl_autoload_register(function($class) {
-   // block manual re-declarations
+   // block re-declarations
    if (class_exists($class, false) || interface_exists($class, false))
       return;
 
@@ -92,7 +98,7 @@ spl_autoload_register(function($class) {
          include($fileName.'.php');
       }
    }
-   catch (Exception $ex) {
+   catch (\Exception $ex) {
       if (!$ex instanceof ClassNotFoundException)
          $ex = new ClassNotFoundException('Cannot load class '.$class, $ex);
       throw $ex;
@@ -100,12 +106,12 @@ spl_autoload_register(function($class) {
 });
 
 
-
-
-
-
-
 // (6) setup error and exception handling
+System::setupErrorHandling();
+
+
+
+
 // (7) define local helper constants
 // (8) define local helper functions
 // (9) define helpers globally if applicable
@@ -150,10 +156,6 @@ define('NL', PHP_EOL);
 if (!defined('PHP_INT_MIN')) define('PHP_INT_MIN', ~PHP_INT_MAX);    // since PHP 7.0.0
 
 
-// Error-/Exceptionhandler anonym registrieren, damit die Klasse Logger nicht schon hier geladen wird
-// --------------------------------------------------------------------------------------------------
-set_error_handler    (create_function('$level, $message, $file, $line, array $context', 'return Logger::handleError($level, $message, $file, $line, $context);'));
-set_exception_handler(create_function('Exception $exception'                          , 'Logger::handleException($exception); exit(1);'                        ));   // exit code = 1 forcieren
 
 
 // Beginn des Shutdowns markieren, um fatale Fehler beim Shutdown zu verhindern (siehe Logger)
@@ -289,7 +291,7 @@ function push_shutdown_function(/*callable*/ $callback = null /*, $args1, $args2
                call_user_func_array($f['name'], $f['args']);
             }
          }
-         catch (Exception $ex) {
+         catch (\Exception $ex) {
             Logger::log($ex, L_FATAL, __CLASS__);
          }
          return;
@@ -298,7 +300,7 @@ function push_shutdown_function(/*callable*/ $callback = null /*, $args1, $args2
 
    $name = null;
    if (!is_string($callback) && !is_array($callback)) throw new IllegalTypeException('Illegal type of parameter $callback: '.getType($callback));
-   if (!is_callable($callback, false, $name))         throw new plInvalidArgumentException('Invalid callback "'.$name.'" passed');
+   if (!is_callable($callback, false, $name))         throw new InvalidArgumentException('Invalid callback "'.$name.'" passed');
 
    $args = func_get_args();
    array_shift($args);
@@ -316,7 +318,7 @@ function push_shutdown_function(/*callable*/ $callback = null /*, $args1, $args2
  * @return string - ID
  */
 function getRandomID($length) {
-   if (!isSet($length) || !is_int($length) || $length < 1) throw new plRuntimeException('Invalid argument length: '.$length);
+   if (!isSet($length) || !is_int($length) || $length < 1) throw new RuntimeException('Invalid argument length: '.$length);
 
    $id = crypt(uniqId(rand(), true));              // zufällige ID erzeugen
    $id = strip_tags(stripSlashes($id));            // Sonder- und leicht zu verwechselnde Zeichen entfernen
@@ -886,8 +888,8 @@ function decodeHtml($html) {
  * @return string - resultierendes Datum
  */
 function addDate($date, $days) {
-   if (CommonValidator ::isDateTime($date) === false) throw new plInvalidArgumentException('Invalid argument $date: '.$date);
-   if (!is_int($days))                                throw new plInvalidArgumentException('Invalid argument $days: '.$days);
+   if (CommonValidator ::isDateTime($date) === false) throw new InvalidArgumentException('Invalid argument $date: '.$date);
+   if (!is_int($days))                                throw new InvalidArgumentException('Invalid argument $days: '.$days);
 
    $parts = explode('-', $date);
    $year  = (int) $parts[0];
@@ -907,7 +909,7 @@ function addDate($date, $days) {
  * @return string
  */
 function subDate($date, $days) {
-   if (!is_int($days)) throw new plInvalidArgumentException('Invalid argument $days: '.$days);
+   if (!is_int($days)) throw new InvalidArgumentException('Invalid argument $days: '.$days);
    return addDate($date, -$days);
 }
 
@@ -936,7 +938,7 @@ function formatDateStr($datetime, $format) {
    }
 
    $timestamp = strToTime($datetime);
-   if (!is_int($timestamp)) throw new plInvalidArgumentException('Invalid argument $datetime: '.$datetime);
+   if (!is_int($timestamp)) throw new InvalidArgumentException('Invalid argument $datetime: '.$datetime);
 
    return date($format, $timestamp);
 }
@@ -961,7 +963,7 @@ function formatMoney($value, $decimals=2, $decimalSeparator='.') {
    if ($decimalSeparator === ',')
       return number_format($value, $decimals, ',', '.');
 
-   throw new plInvalidArgumentException('Invalid argument $decimalSeparator: "'.$decimalSeparator.'"');
+   throw new InvalidArgumentException('Invalid argument $decimalSeparator: "'.$decimalSeparator.'"');
 }
 
 
@@ -1035,9 +1037,9 @@ function mkDirWritable($path, $mode=0777) {
    if (!is_string($path))                            throw new IllegalTypeException('Illegal type of parameter $path: '.getType($path));
    if (!is_null($mode) && !is_int($mode))            throw new IllegalTypeException('Illegal type of parameter $mode: '.getType($mode));
 
-   if (is_file($path))                               throw new plRuntimeException('Cannot write to directory "'.$path.'" (is file)');
-   if (!is_dir($path) && !mkDir($path, $mode, true)) throw new plRuntimeException('Cannot create directory "'.$path.'"');
-   if (!is_writable($path))                          throw new plRuntimeException('Cannot write to directory "'.$path.'"');
+   if (is_file($path))                               throw new RuntimeException('Cannot write to directory "'.$path.'" (is file)');
+   if (!is_dir($path) && !mkDir($path, $mode, true)) throw new RuntimeException('Cannot create directory "'.$path.'"');
+   if (!is_writable($path))                          throw new RuntimeException('Cannot write to directory "'.$path.'"');
 
    return true;
 }
@@ -1054,9 +1056,9 @@ function ifNull($value, $altValue) {
 
 
 /**
- * Gibt den angegebenen Errorlevel in lesbarer Form zurück.
+ * Returns a human-readable form of the specified error reporting level.
  *
- * @param  int $level - Errorlevel, ohne Angabe wird der aktuelle Errorlevel des laufenden Scriptes ausgewertet.
+ * @param  int $level - reporting level (default: the currently active reporting level)
  *
  * @return string
  */
@@ -1064,9 +1066,8 @@ function errorLevelToStr($level=null) {
    if (func_num_args() && !is_int($level)) throw new IllegalTypeException('Illegal type of parameter $level: '.getType($level));
 
    $levels = array();
-   if (!$level)
-      $level = error_reporting();
 
+   if (!$level                     ) $levels[] = '0';                      //  zero
    if ($level & E_ERROR            ) $levels[] = 'E_ERROR';                //     1
    if ($level & E_WARNING          ) $levels[] = 'E_WARNING';              //     2
    if ($level & E_PARSE            ) $levels[] = 'E_PARSE';                //     4
@@ -1078,11 +1079,11 @@ function errorLevelToStr($level=null) {
    if ($level & E_USER_ERROR       ) $levels[] = 'E_USER_ERROR';           //   256
    if ($level & E_USER_WARNING     ) $levels[] = 'E_USER_WARNING';         //   512
    if ($level & E_USER_NOTICE      ) $levels[] = 'E_USER_NOTICE';          //  1024
-   if ($level & E_STRICT           ) $levels[] = 'E_STRICT';               //  2048: since PHP 5 but not included in E_ALL until PHP 5.4.0
+   if ($level & E_STRICT           ) $levels[] = 'E_STRICT';               //  2048: since PHP 5, not included in E_ALL until PHP 5.4.0
    if ($level & E_RECOVERABLE_ERROR) $levels[] = 'E_RECOVERABLE_ERROR';    //  4096: since PHP 5.2.0
    if ($level & E_DEPRECATED       ) $levels[] = 'E_DEPRECATED';           //  8192: since PHP 5.3.0
    if ($level & E_USER_DEPRECATED  ) $levels[] = 'E_USER_DEPRECATED';      // 16384: since PHP 5.3.0
-   if ($level & E_ALL              ) $levels[] = 'E_ALL';                  //      : 32767 in PHP 5.4.x, 30719 in PHP 5.3.x, 6143 in PHP 5.2.x, 2047 previously
+ //if ($level & E_ALL == E_ALL     ) $levels[] = 'E_ALL';                  // 32767 since PHP 5.4.x, 30719 in PHP 5.3.x, 6143 in PHP 5.2.x, 2047 previously
 
-   return join('|', $levels).' ('.$level.')';
+   return join('|', $levels);
 }

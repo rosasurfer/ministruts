@@ -1,4 +1,7 @@
 <?php
+use rosasurfer\ministruts\exceptions\InvalidArgumentException;
+
+
 // input parameters
 $type        = isSet($_REQUEST['type'       ]) ? $_REQUEST['type'       ] : 'I25';
 $format      = isSet($_REQUEST['format'     ]) ? $_REQUEST['format'     ] : 'png';
@@ -152,7 +155,7 @@ if (strLen($value) > 0) {
          break;
 
       default:
-         throw new plInvalidArgumentException("Unknown barcode type \"$type\"");
+         throw new InvalidArgumentException("Unknown barcode type \"$type\"");
    }
 }
 else if (isSet($_REQUEST['submit'])) {

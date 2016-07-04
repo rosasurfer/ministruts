@@ -1,4 +1,9 @@
 <?php
+use rosasurfer\ministruts\exceptions\IllegalTypeException;
+use rosasurfer\ministruts\exceptions\InvalidArgumentException;
+use rosasurfer\ministruts\exceptions\MinistrutsException;
+use rosasurfer\ministruts\exceptions\RuntimeException;
+
 use const rosasurfer\ministruts\CLI       as CLI;
 use const rosasurfer\ministruts\LOCALHOST as LOCALHOST;
 use const rosasurfer\ministruts\WINDOWS   as WINDOWS;
@@ -125,7 +130,7 @@ class Logger extends StaticClass {
             if (!is_string($level)) throw new IllegalTypeException('Illegal log level type for class '.$className.': '.getType($level));
             if     ($level == '')                     $logLevels[$className] = self:: DEFAULT_LOGLEVEL;
             elseif (defined('L_'.strToUpper($level))) $logLevels[$className] = constant('L_'.strToUpper($level));
-            else                    throw new plInvalidArgumentException('Invalid log level for class '.$className.': '.$level);
+            else                    throw new InvalidArgumentException('Invalid log level for class '.$className.': '.$level);
          }
       }
 
@@ -138,82 +143,13 @@ class Logger extends StaticClass {
 
 
    /**
-    * Globaler Handler für herkömmliche PHP-Fehler. Die Fehler werden in einer PHPErrorException gekapselt und je nach
-    * Errorlevel behandelt.  E_USER_NOTICE und E_USER_WARNING werden nur geloggt (kein Scriptabbruch).
-    *
-    * @param  int     $level   - Errorlevel
-    * @param  string  $message - Errormessage
-    * @param  string  $file    - Datei, in der der Fehler auftrat
-    * @param  int     $line    - Zeile der Datei, in der der Fehler auftrat
-    * @param  mixed[] $context - aktive Symboltabelle des Punktes, an dem der Fehler auftrat
-    *                            An array that points to the active symbol table at the point the error occurred. In other words, $context
-    *                            will contain an array of every variable that existed in the scope the error was triggered in. User error
-    *                            handler must not modify this context.
-    *
-    * @return bool - TRUE,  wenn der Fehler erfolgreich behandelt wurde
-    *                FALSE, wenn der Fehler weitergereicht werden soll, als wenn der Errorhandler nicht registriert wäre
-    *
-    * NOTE: The error handler must return FALSE to populate $php_errormsg.
-    */
-   public static function handleError($level, $message, $file, $line, array $context) {
-      //echoPre(__METHOD__.'(): '.self::$logLevels[$level].' '.$message.', $file: '.$file.', $line: '.$line);
-
-      // absichtlich unterdrückte und vom aktuellen Errorlevel nicht abgedeckte Fehler ignorieren
-      $error_reporting = error_reporting();
-
-      if ($error_reporting == 0)                 return false;    // 0: @-Operator (see NOTE)
-      if (($error_reporting & $level) != $level) return true;
-
-
-      /**
-       * PHP v5.3 bug: An error triggered at compile-time disables __autoload() (and spl_autoload() at the same time).
-       *               Won't be fixed for PHP 5.3 as it may cause lots of other problems.
-       *
-       * @see https://bugs.php.net/bug.php?id=47987
-       *
-       * Fixed in PHP 5.4.21  (2013-10-17)
-       *
-       * @see  https://bugs.php.net/bug.php?id=65322
-       *
-       *
-       * Fazit: Wir müssen alle im Errorhandler benötigten Klassen samt Hierarchie manuell laden.
-       *        Danke, PHP-Team!
-       */
-      __autoload('NestableException', true);
-      __autoload('PHPErrorException', true);
-
-
-      // Fehler in Exception kapseln ...
-      $GLOBALS['$__PHPErrorException_create'] = true;    // Marker für Constructor von PHPErrorException
-      $exception = new PHPErrorException($message, $file, $line, $context);
-
-
-      // ... und behandeln
-      if     ($level == E_USER_NOTICE ) self:: log_1(null, $exception, L_NOTICE);
-      elseif ($level == E_USER_WARNING) self:: log_1(null, $exception, L_WARN  );
-      else {
-         // Spezialfälle, die nicht zurückgeworfen werden dürfen/können
-         if ($level==E_STRICT || ($file=='Unknown' && $line==0)) {
-            self:: handleException($exception);
-            exit(1);
-         }
-
-         // alles andere zurückwerfen
-         throw $exception;
-      }
-
-      return true;
-   }
-
-
-   /**
     * Globaler Handler für nicht abgefangene Exceptions. Die Exception wird mit dem Loglevel L_FATAL geloggt und das Script beendet.
     * Der Aufruf kann automatisch (durch installierten Errorhandler) oder manuell (durch Code, der selbst keine Exceptions werfen darf)
     * erfolgen.
     *
     * NOTE: PHP bricht das Script nach Aufruf dieses Handlers automatisch ab.
     *
-    * @param  Exception $exception      - die zu behandelnde Exception
+    * @param  \Exception $exception      - die zu behandelnde Exception
     * @param  bool      $inShutdownOnly - Ob die Exception ggf. ignoriert werden soll (wenn sie in einem Destructor auftritt).
     *                                     Befindet sich das Script im Shutdown, darf aus einem Destructor keine Exception mehr geworfen
     *                                     werden.  Daher muß vorm Werfen der Exception diese Funktion mit $inShutdownOnly=TRUE
@@ -222,7 +158,7 @@ class Logger extends StaticClass {
     *                                        Error-Handler ausgelöst worden wäre.
     *                                    (2) Befindet sich das Script nicht im Shutdown, wird die Exception ignoriert.
     */
-   public static function handleException(Exception $exception, $inShutdownOnly=false) {
+   public static function handleException(\Exception $exception, $inShutdownOnly=false) {
       if ($inShutdownOnly && !isSet($GLOBALS['$__shutting_down']))
          return;
 
@@ -232,12 +168,12 @@ class Logger extends StaticClass {
          // TODO: Stimmt dieser Fehler mit der obigen Logik überein???
          //
          // Fatal error: Ignoring exception from ***::__destruct() while an exception is already active
-         //              (Uncaught PHPErrorException in E:\Projekte\ministruts\src\php\file\image\barcode\test\image.php on line 19)
+         //              (Uncaught PHPError in E:\Projekte\ministruts\src\php\file\image\barcode\test\image.php on line 19)
          //              in E:\Projekte\ministruts\src\php\file\image\barcode\test\image.php on line 33
 
          // 1. Fehlerdaten ermitteln
-         $message  = ($exception instanceof NestableException) ? (string)$exception : get_class($exception).': '.$exception->getMessage();
-         $traceStr = ($exception instanceof NestableException) ? "Stacktrace:\n-----------\n".$exception->printStackTrace(true) : 'Stacktrace not available';
+         $message  = ($exception instanceof MinistrutsException) ? (string)$exception : get_class($exception).': '.$exception->getMessage();
+         $traceStr = ($exception instanceof MinistrutsException) ? "Stacktrace:\n-----------\n".$exception->printStackTrace(true) : 'Stacktrace not available';
          // TODO: vernestelte, einfache Exceptions geben fehlerhaften Stacktrace zurück
          $file     =  $exception->getFile();
          $line     =  $exception->getLine();
@@ -294,7 +230,7 @@ class Logger extends StaticClass {
             self ::sms_log($plainMessage);
          }
       }
-      catch (Exception $secondEx) {
+      catch (\Exception $secondEx) {
          $file = $exception->getFile();
          $line = $exception->getLine();
          self ::error_log('PHP primary '.(string)$exception.' in '.$file.' on line '.$line);
@@ -315,7 +251,7 @@ class Logger extends StaticClass {
       if ($argc == 2) return self::log($arg1,        L_WARN, $arg2);
       if ($argc == 3) return self::log($arg1, $arg2, L_WARN, $arg3);
 
-      throw new plInvalidArgumentException('Invalid number of arguments: '.$argc);
+      throw new InvalidArgumentException('Invalid number of arguments: '.$argc);
    }
 
 
@@ -343,7 +279,7 @@ class Logger extends StaticClass {
          $level     = $arg3;
          $class     = $arg4;
       }
-      else throw new plInvalidArgumentException('Invalid number of arguments: '.$argc);
+      else throw new InvalidArgumentException('Invalid number of arguments: '.$argc);
 
       if (!is_int($level))    throw new IllegalTypeException('Illegal type of parameter $level: '.getType($level));
       if (!is_string($class)) throw new IllegalTypeException('Illegal type of parameter $class: '.getType($class));
@@ -356,14 +292,14 @@ class Logger extends StaticClass {
       if ($argc == 3) {
          if (is_null($message) || is_string($message))
             return self:: log_1($message, null, $level);       // Logger::log($message  , $level, $class)
-         if ($exception instanceof Exception)
+         if ($exception instanceof \Exception)
             return self:: log_1(null, $exception, $level);     // Logger::log($exception, $level, $class)
          throw new IllegalTypeException('Illegal type of first parameter: '.getType($arg1));
       }
 
       // Aufruf mit vier Argumenten
-      if (!is_null($message) && !is_string($message))               throw new IllegalTypeException('Illegal type of parameter $message: '.(is_object($message) ? get_class($message) : getType($message)));
-      if (!is_null($exception) && !$exception instanceof Exception) throw new IllegalTypeException('Illegal type of parameter $exception: '.(is_object($exception) ? get_class($exception) : getType($exception)));
+      if (!is_null($message) && !is_string($message))                throw new IllegalTypeException('Illegal type of parameter $message: '.(is_object($message) ? get_class($message) : getType($message)));
+      if (!is_null($exception) && !$exception instanceof \Exception) throw new IllegalTypeException('Illegal type of parameter $exception: '.(is_object($exception) ? get_class($exception) : getType($exception)));
 
       return self:: log_1($message, $exception, $level);       // Logger::log($message, $exception, $level, $class)
    }
@@ -378,11 +314,11 @@ class Logger extends StaticClass {
     * @param  Exception $exception - zu loggende Exception
     * @param  int       $level     - zu loggender Loglevel
     */
-   private static function log_1($message, Exception $exception=null, $level) {
+   public static function log_1($message, \Exception $exception=null, $level) {
       $plainMessage = null;
 
       try {
-         if (!isSet(self::$logLevels[$level])) throw new plInvalidArgumentException('Invalid log level: '.$level);
+         if (!isSet(self::$logLevels[$level])) throw new InvalidArgumentException('Invalid log level: '.$level);
          self:: init();
 
 
@@ -390,10 +326,10 @@ class Logger extends StaticClass {
          $exMessage = null;
          if ($exception) {
             $message  .= ($message === null) ? (string) $exception : ' ('.get_class($exception).')';
-            $exMessage = ($exception instanceof NestableException) ? (string) $exception : get_class($exception).': '.$exception->getMessage();;
+            $exMessage = ($exception instanceof MinistrutsException) ? (string) $exception : get_class($exception).': '.$exception->getMessage();;
          }
 
-         if ($exception instanceof NestableException) {
+         if ($exception instanceof MinistrutsException) {
             $trace = $exception->getStackTrace();
             $file  = $exception->getFile();
             $line  = $exception->getLine();
@@ -401,7 +337,7 @@ class Logger extends StaticClass {
          }
          else {
             $trace = $exception ? $exception->getTrace() : debug_backtrace();
-            $trace = NestableException ::transformToJavaStackTrace($trace);
+            $trace = MinistrutsException::transformToJavaStackTrace($trace);
             // die Frames des Loggers selbst können weg
             if ($trace[0]['class'].$trace[0]['type'].$trace[0]['function'] == 'Logger::log_1') array_shift($trace);
             if ($trace[0]['class'].$trace[0]['type'].$trace[0]['function'] == 'Logger::log'  ) array_shift($trace);
@@ -414,7 +350,7 @@ class Logger extends StaticClass {
                   break;
                }
             }
-            $trace = "Stacktrace:\n-----------\n".NestableException ::formatStackTrace($trace);
+            $trace = "Stacktrace:\n-----------\n".MinistrutsException::formatStackTrace($trace);
             // TODO: vernestelte, einfache Exceptions geben fehlerhaften Stacktrace zurück
          }
          $plainMessage = self::$logLevels[$level].': '.$message."\nin ".$file.' on line '.$line."\n";
@@ -475,7 +411,7 @@ class Logger extends StaticClass {
             self ::sms_log($plainMessage.($exception ? "\n".$exMessage:''));
          }
       }
-      catch (Exception $ex) {
+      catch (\Exception $ex) {
          self ::error_log('PHP (0) '.$plainMessage ? $plainMessage:$message);
          throw $ex;
       }
@@ -531,7 +467,7 @@ class Logger extends StaticClass {
       foreach (self::$smsReceivers as $receiver) {
          if (strStartsWith($receiver, '+' )) $receiver = subStr($receiver, 1);
          if (strStartsWith($receiver, '00')) $receiver = subStr($receiver, 2);
-         if (!ctype_digit($receiver)) throw new plInvalidArgumentException('Invalid argument $receiver: "'.$receiver.'"');
+         if (!ctype_digit($receiver)) throw new InvalidArgumentException('Invalid argument $receiver: "'.$receiver.'"');
 
          $url = 'https://api.clickatell.com/http/sendmsg?user='.$username.'&password='.$password.'&api_id='.$api_id.'&to='.$receiver.'&text='.urlEncode($message);
 
@@ -543,7 +479,7 @@ class Logger extends StaticClass {
          $response = CurlHttpClient ::create($options)->send($request);
          $status   = $response->getStatus();
          $content  = $response->getContent();
-         if ($status != 200) throw new plRuntimeException('Unexpected HTTP status code from api.clickatell.com: '.$status.' ('.HttpResponse ::$sc[$status].')');
+         if ($status != 200) throw new RuntimeException('Unexpected HTTP status code from api.clickatell.com: '.$status.' ('.HttpResponse ::$sc[$status].')');
 
          // TODO: SMS ggf. auf zwei message parts verlängern
          if (striPos($content, 'ERR: 113') === 0)                             // ERR: 113, Max message parts exceeded

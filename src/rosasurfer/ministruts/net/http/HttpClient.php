@@ -1,4 +1,9 @@
 <?php
+use rosasurfer\ministruts\exceptions\IllegalTypeException;
+use rosasurfer\ministruts\exceptions\InvalidArgumentException;
+use rosasurfer\ministruts\exceptions\IOException;
+
+
 /**
  * Basisklasse für konkrete HttpClients.
  */
@@ -21,7 +26,7 @@ abstract class HttpClient extends Object {
     */
    public function setTimeout($timeout) {
       if (!is_int($timeout)) throw new IllegalTypeException('Illegal type of parameter $timeout: '.getType($timeout));
-      if ($timeout < 1)      throw new plInvalidArgumentException('Invalid argument $timeout: '.$timeout);
+      if ($timeout < 1)      throw new InvalidArgumentException('Invalid argument $timeout: '.$timeout);
 
       $this->timeout = $timeout;
       return $this;

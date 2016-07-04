@@ -1,4 +1,7 @@
 <?php
+use rosasurfer\ministruts\exceptions\InvalidArgumentException;
+
+
 /**
  * Barcode renderer for "Code 128-C", a numeric only bar code.
  *
@@ -131,10 +134,10 @@ class C128CBarCode extends BaseC128BarCode {
       $len = strLen($value);
       for ($i=0; $i<$len; $i++) {
          if (ord($value[$i]) < 48 || ord($value[$i]) > 57)
-            throw new plInvalidArgumentException("Invalid barcode value \"$value\" (standard 'Class 128-C' contains numeric characters only)");
+            throw new InvalidArgumentException("Invalid barcode value \"$value\" (standard 'Class 128-C' contains numeric characters only)");
       }
       if ($len % 2 != 0)
-         throw new plInvalidArgumentException("Invalid length of barcode value \"$value\" (standard 'Class 128-C' requires an even number of characters, pad the value with zeros)");
+         throw new InvalidArgumentException("Invalid length of barcode value \"$value\" (standard 'Class 128-C' requires an even number of characters, pad the value with zeros)");
    }
 
    /**

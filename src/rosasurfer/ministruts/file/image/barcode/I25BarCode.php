@@ -1,4 +1,7 @@
 <?php
+use rosasurfer\ministruts\exceptions\InvalidArgumentException;
+
+
 /**
  * Barcode renderer for "Interleaved 2 of 5", a numeric only bar code with an optional check number.
  *
@@ -36,10 +39,10 @@ class I25BarCode extends BarCode {
       $len = strLen($value);
       for ($i=0; $i<$len; $i++) {
          if (ord($value[$i]) < 48 || ord($value[$i]) > 57)
-            throw new plInvalidArgumentException("Invalid barcode value \"$value\" (standard 'Interleave 2 of 5' contains numeric characters only)");
+            throw new InvalidArgumentException("Invalid barcode value \"$value\" (standard 'Interleave 2 of 5' contains numeric characters only)");
       }
       if ($len % 2 != 0)
-         throw new plInvalidArgumentException("Invalid length of barcode value \"$value\" (standard 'Interleave 2 of 5' requires an even number of characters)");
+         throw new InvalidArgumentException("Invalid length of barcode value \"$value\" (standard 'Interleave 2 of 5' requires an even number of characters)");
    }
 
    /**
