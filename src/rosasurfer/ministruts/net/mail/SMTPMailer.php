@@ -4,6 +4,10 @@ use rosasurfer\ministruts\exceptions\InfrastructureException;
 use rosasurfer\ministruts\exceptions\InvalidArgumentException;
 use rosasurfer\ministruts\exceptions\RuntimeException;
 
+use const rosasurfer\L_DEBUG;
+use const rosasurfer\L_INFO;
+use const rosasurfer\L_NOTICE;
+
 
 /**
  * Mailer, der Mails per SMTP-Protokoll über einen SMTP-Server verschickt.

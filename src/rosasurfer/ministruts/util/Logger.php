@@ -4,9 +4,18 @@ use rosasurfer\ministruts\exceptions\IllegalTypeException;
 use rosasurfer\ministruts\exceptions\InvalidArgumentException;
 use rosasurfer\ministruts\exceptions\RuntimeException;
 
-use const rosasurfer\ministruts\CLI;
-use const rosasurfer\ministruts\LOCALHOST;
-use const rosasurfer\ministruts\WINDOWS;
+use const rosasurfer\CLI;
+use const rosasurfer\ERROR_LOG_MAIL;
+use const rosasurfer\ERROR_LOG_SYSLOG;
+use const rosasurfer\LOCALHOST;
+use const rosasurfer\L_DEBUG;
+use const rosasurfer\L_ERROR;
+use const rosasurfer\L_FATAL;
+use const rosasurfer\L_INFO;
+use const rosasurfer\L_NOTICE;
+use const rosasurfer\L_WARN;
+use const rosasurfer\NL;
+use const rosasurfer\WINDOWS;
 
 
 /**
@@ -184,7 +193,7 @@ class Logger extends StaticClass {
             }
             else {
                echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif"><b>[FATAL] Uncaught</b> '.nl2br(htmlSpecialChars($message, ENT_QUOTES))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
-               echo '<br>'.printFormatted($traceStr, true);
+               echo '<br>'.printPretty($traceStr, true);
                echo '<br></div>'.NL;
             }
          }
@@ -358,10 +367,10 @@ class Logger extends StaticClass {
                if ($exception)
                   echo '<br>'.htmlSpecialChars($exMessage, ENT_QUOTES).'<br>';
                if ($trace)
-                  echo '<br>'.printFormatted($trace, true).'<br>';
+                  echo '<br>'.printPretty($trace, true).'<br>';
                echo '</div>';
                if ($request=Request ::me())
-                  echo '<br>'.printFormatted('Request:'.NL.'--------'.NL.$request, true).'<br></div><br>';
+                  echo '<br>'.printPretty('Request:'.NL.'--------'.NL.$request, true).'<br></div><br>';
             }
             else {
                echo $plainMessage.($exception ? NL.$exMessage.NL:'').NL.($trace ? $trace.NL:'');

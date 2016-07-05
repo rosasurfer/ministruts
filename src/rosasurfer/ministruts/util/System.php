@@ -1,7 +1,8 @@
 <?php
 use rosasurfer\ministruts\exceptions\PHPError;
 
-use const rosasurfer\ministruts\CLI;
+use const rosasurfer\CLI;
+use const rosasurfer\L_WARN;
 
 
 /**

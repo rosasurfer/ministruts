@@ -3,6 +3,10 @@ use rosasurfer\ministruts\exceptions\IllegalTypeException;
 use rosasurfer\ministruts\exceptions\PHPError;
 use rosasurfer\ministruts\exceptions\RuntimeException;
 
+use const rosasurfer\L_DEBUG;
+use const rosasurfer\L_INFO;
+use const rosasurfer\L_NOTICE;
+
 
 /**
  * SystemFiveLock

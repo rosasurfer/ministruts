@@ -1,4 +1,7 @@
 <?php
+use const rosasurfer\NL;
+
+
 /**
  * Debugging related functionality
  */

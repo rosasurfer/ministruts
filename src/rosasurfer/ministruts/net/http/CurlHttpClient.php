@@ -1,6 +1,11 @@
 <?php
 use rosasurfer\ministruts\exceptions\IOException;
 
+use const rosasurfer\L_DEBUG;
+use const rosasurfer\L_INFO;
+use const rosasurfer\L_NOTICE;
+use const rosasurfer\L_WARN;
+
 
 /**
  * CurlHttpClient

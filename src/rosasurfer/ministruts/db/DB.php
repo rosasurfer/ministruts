@@ -2,6 +2,8 @@
 use rosasurfer\ministruts\exceptions\InvalidArgumentException;
 use rosasurfer\ministruts\exceptions\RuntimeException;
 
+use const rosasurfer\L_WARN;
+
 
 /**
  * DB

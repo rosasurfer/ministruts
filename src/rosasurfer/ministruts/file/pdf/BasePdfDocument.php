@@ -1,6 +1,8 @@
 <?php
 use rosasurfer\ministruts\exceptions\RuntimeException;
 
+use const rosasurfer\L_DEBUG;
+
 
 /**
  * BasePdfDocument

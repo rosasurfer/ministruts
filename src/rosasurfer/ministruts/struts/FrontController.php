@@ -3,9 +3,12 @@ use rosasurfer\ministruts\exceptions\FileNotFoundException;
 use rosasurfer\ministruts\exceptions\IllegalStateException;
 use rosasurfer\ministruts\exceptions\RuntimeException;
 
-use const rosasurfer\ministruts\CLI;
-use const rosasurfer\ministruts\LOCALHOST;
-use const rosasurfer\ministruts\WINDOWS;
+use const rosasurfer\CLI;
+use const rosasurfer\LOCALHOST;
+use const rosasurfer\L_DEBUG;
+use const rosasurfer\L_INFO;
+use const rosasurfer\L_NOTICE;
+use const rosasurfer\WINDOWS;
 
 
 /**

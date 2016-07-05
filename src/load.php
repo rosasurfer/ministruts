@@ -2,39 +2,97 @@
 use rosasurfer\ministruts\exceptions\ClassNotFoundException;
 use rosasurfer\ministruts\exceptions\IllegalTypeException;
 use rosasurfer\ministruts\exceptions\InvalidArgumentException;
-use rosasurfer\ministruts\exceptions\RuntimeException;
 
-use const rosasurfer\ministruts\CLI       as CLI;
-use const rosasurfer\ministruts\LOCALHOST as LOCALHOST;
-use const rosasurfer\ministruts\ROOT      as MINISTRUTS_ROOT;
-use const rosasurfer\ministruts\WINDOWS   as WINDOWS;
+use const rosasurfer\CLI;
+use const rosasurfer\DAY;
+use const rosasurfer\DAYS;
+use const rosasurfer\HOUR;
+use const rosasurfer\HOURS;
+use const rosasurfer\LOCALHOST;
+use const rosasurfer\MINUTE;
+use const rosasurfer\MINUTES;
+use const rosasurfer\MONTH;
+use const rosasurfer\NL;
+use const rosasurfer\SECOND;
+use const rosasurfer\SECONDS;
+use const rosasurfer\WEEK;
+use const rosasurfer\WINDOWS;
+use const rosasurfer\YEAR;
+
+use const rosasurfer\ministruts\ROOT as MINISTRUTS_ROOT;
 
 
 /**
  * Program flow:
  *
  * (1) block framework re-includes
- * (2) check/adjust PHP environment
- * (3) execute phpInfo() if applicable
- * (4) check/adjust application requirements
- * (5) register class loader
- * (6) setup error and exception handling
- * (7) define helper constants
+ * (2) define helper constants
+ * (3) check/adjust PHP environment
+ * (4) execute phpInfo() if applicable
+ * (5) check/adjust application requirements
+ * (6) register class loader
+ * (7) setup error and exception handling
  * (8) define helper functions
- * (9) define all helpers globally if applicable
+ * (9) define helper constants and functions globally if applicable
  */
 
 
-// (1) block framework re-includes
-if (defined('rosasurfer\ministruts\ROOT'))
-   return;
-define('rosasurfer\ministruts\ROOT'     ,  dirName(__DIR__));
-define('rosasurfer\ministruts\CLI'      , !isSet($_SERVER['REQUEST_METHOD']));               // whether or not we run on command line interface
-define('rosasurfer\ministruts\LOCALHOST', !CLI && @$_SERVER['REMOTE_ADDR']=='127.0.0.1');    // whether or not we run on localhost
-define('rosasurfer\ministruts\WINDOWS'  , (strToUpper(subStr(PHP_OS, 0, 3))=='WIN'));        // whether or not we run on Windows
+/**
+ * (1) block framework re-includes
+ */
+if (defined('rosasurfer\ministruts\ROOT')) return;
 
 
-// (2) check/adjust PHP environment
+/**
+ * (2) define helper constants
+ */
+define('rosasurfer\ministruts\ROOT',  dirName(__DIR__));
+define('rosasurfer\CLI'            , !isSet($_SERVER['REQUEST_METHOD']));              // whether or not we run on command line interface
+define('rosasurfer\LOCALHOST'      , !CLI && @$_SERVER['REMOTE_ADDR']=='127.0.0.1');   // whether or not we run on localhost
+define('rosasurfer\WINDOWS'        , (strToUpper(subStr(PHP_OS, 0, 3))=='WIN'));       // whether or not we run on Windows
+
+// custom log level
+define('rosasurfer\L_DEBUG' ,  1);
+define('rosasurfer\L_INFO'  ,  2);
+define('rosasurfer\L_NOTICE',  4);
+define('rosasurfer\L_WARN'  ,  8);
+define('rosasurfer\L_ERROR' , 16);
+define('rosasurfer\L_FATAL' , 32);
+
+// log destinations for the built-in function error_log()
+define('rosasurfer\ERROR_LOG_SYSLOG', 0);                                              // message is sent to PHP's system logger
+define('rosasurfer\ERROR_LOG_MAIL'  , 1);                                              // message is sent by email
+define('rosasurfer\ERROR_LOG_DEBUG' , 2);                                              // message is sent through the PHP debugging connection
+define('rosasurfer\ERROR_LOG_FILE'  , 3);                                              // message is appended to a file destination
+define('rosasurfer\ERROR_LOG_SAPI'  , 4);                                              // message is sent directly to the SAPI logging handler
+
+// time periods
+define('rosasurfer\SECOND',   1          ); define('rosasurfer\SECONDS', SECOND);
+define('rosasurfer\MINUTE',  60 * SECONDS); define('rosasurfer\MINUTES', MINUTE);
+define('rosasurfer\HOUR'  ,  60 * MINUTES); define('rosasurfer\HOURS'  , HOUR  );
+define('rosasurfer\DAY'   ,  24 * HOURS  ); define('rosasurfer\DAYS'   , DAY   );
+define('rosasurfer\WEEK'  ,   7 * DAYS   ); define('rosasurfer\WEEKS'  , WEEK  );
+define('rosasurfer\MONTH' ,  31 * DAYS   ); define('rosasurfer\MONTHS' , MONTH );      // fuzzy but garantied to cover any month
+define('rosasurfer\YEAR'  , 366 * DAYS   ); define('rosasurfer\YEARS'  , YEAR  );      // fuzzy but garantied to cover any year
+
+// weekdays
+define('rosasurfer\SUNDAY'   , 0);
+define('rosasurfer\MONDAY'   , 1);
+define('rosasurfer\TUESDAY'  , 2);
+define('rosasurfer\WEDNESDAY', 3);
+define('rosasurfer\THURSDAY' , 4);
+define('rosasurfer\FRIDAY'   , 5);
+define('rosasurfer\SATURDAY' , 6);
+
+// miscellaneous
+define('rosasurfer\EOL', PHP_EOL);
+define('rosasurfer\NL' , "\n"   );
+!defined('PHP_INT_MIN') && define('PHP_INT_MIN', ~PHP_INT_MAX);                     // global definition (built-in since PHP 7.0)
+
+
+/**
+ * (3) check/adjust PHP environment
+ */
 (PHP_VERSION < '5.6')      && exit(1|echoPre('Error: A PHP version >= 5.6 is required (found version '.PHP_VERSION.').'));
 !ini_get('short_open_tag') && exit(1|echoPre('Error: The PHP configuration value "short_open_tag" must be enabled.'    ));
 
@@ -55,199 +113,786 @@ ini_set('session.use_cookies'     ,  1                     );
 ini_set('session.use_trans_sid'   ,  0                     );
 ini_set('session.cookie_httponly' ,  1                     );
 ini_set('session.referer_check'   , ''                     );
-ini_set('zend.detect_unicode'     ,  1                     );     // automatic BOM header recognition
+ini_set('zend.detect_unicode'     ,  1                     );     // BOM header recognition
 
 
-// (3) execute phpInfo() if applicable (authorization must be handled by the server)
-if (false) {
-   if (!CLI && strEndsWith(strLeftTo($_SERVER['REQUEST_URI'], '?'), '/phpinfo.php'))
-      include(MINISTRUTS_ROOT.'/src/phpinfo.php') | exit(0);
+/**
+ * (4) execute phpInfo() if applicable (if enabled authorization must be handled by the server)
+ */
+if (false && !CLI && strEndsWith(strLeftTo($_SERVER['REQUEST_URI'], '?'), '/phpinfo.php')) {
+   include(MINISTRUTS_ROOT.'/src/phpinfo.php');
+   exit(0);
 }
 
 
-// (4) check/adjust application requirements
+/**
+ * (5) check/adjust application requirements
+ */
 !defined('\APPLICATION_ROOT') && exit(1|echoPre('Error: The global constant APPLICATION_ROOT must be defined.'));
 !defined('\APPLICATION_ID'  ) && define('APPLICATION_ID', md5(\APPLICATION_ROOT));
 
 
 /**
- * (5) register case-insensitive class loader
+ * (6) register class loader
  *
- * @param  string $class - name of class to load
+ * @param  string $class
  */
 spl_autoload_register(function($class) {
    // block re-declarations
    if (class_exists($class, false) || interface_exists($class, false))
       return;
 
-   // initialize class map
+   // initialize class map: the loader is case-insensitive
    static $classMap = null;
-   if (!$classMap) {
-      $classMap = include(__DIR__.'/classmap.php');
-      $classMap = array_change_key_case($classMap, CASE_LOWER);
-   }
+   !$classMap && $classMap=array_change_key_case(include(__DIR__.'/classmap.php'), CASE_LOWER);
 
-   $classToLower = strtolower($class);
+   $classToLower = strToLower($class);
    try {
       if (isSet($classMap[$classToLower])) {
          $fileName = $classMap[$classToLower];
 
-         // warn if relative path found: decreases performance, especially with APC setting 'apc.stat=0'
+         // warn if relative path found: decreases performance especially with APC setting 'apc.stat=0'
          $relative = WINDOWS ? !preg_match('/^[a-z]:/i', $fileName) : ($fileName{0} != '/');
-         $relative && Logger::log('Relative file name for class '.$class.': "'.$fileName.'"', L_WARN, __CLASS__);
+         $relative && Logger::log('Found relative file name for class '.$class.': "'.$fileName.'"', L_WARN, __CLASS__);
 
-         // load class file
+         // load file
          include($fileName.'.php');
       }
    }
    catch (\Exception $ex) {
-      if (!$ex instanceof ClassNotFoundException)
-         $ex = new ClassNotFoundException('Cannot load class '.$class, null, $ex);
+      !$ex instanceof ClassNotFoundException && $ex=new ClassNotFoundException('Cannot load class '.$class, null, $ex);
       throw $ex;
    }
 });
 
 
-// (6) setup error and exception handling
+/**
+ * (7) setup error and exception handling
+ */
 System::setupErrorHandling();
 
 
+/**
+ * (8) define helper functions
+ */
 
+/**
+ * Dumps a variable to STDOUT or into a string.
+ *
+ * @param  mixed $var    - variable
+ * @param  bool  $return - TRUE,  if the variable is to be dumped into a string;
+ *                         FALSE, if the variable is to be dumped to STDOUT (default)
+ *
+ * @return string - string if the result is to be returned, NULL otherwise
+ */
+function dump($var, $return=false) {
+   if ($return) ob_start();
+   var_dump($var);
+   if ($return) return ob_get_clean();
 
-// (7) define local helper constants
-// (8) define local helper functions
-// (9) define helpers globally if applicable
-
-
-
-
-// Loglevel
-define('L_DEBUG' ,  1);
-define('L_INFO'  ,  2);
-define('L_NOTICE',  4);
-define('L_WARN'  ,  8);
-define('L_ERROR' , 16);
-define('L_FATAL' , 32);
-
-// Logdestinations für die PHP-Funktion error_log()
-define('ERROR_LOG_SYSLOG', 0);                        // message is sent to PHP's system logger
-define('ERROR_LOG_MAIL'  , 1);                        // message is sent by email
-define('ERROR_LOG_DEBUG' , 2);                        // message is sent through the PHP debugging connection
-define('ERROR_LOG_FILE'  , 3);                        // message is appended to a file destination
-define('ERROR_LOG_SAPI'  , 4);                        // message is sent directly to the SAPI logging handler
-
-// Zeitkonstanten
-define('SECOND',   1          ); define('SECONDS', SECOND);
-define('MINUTE',  60 * SECONDS); define('MINUTES', MINUTE);
-define('HOUR'  ,  60 * MINUTES); define('HOURS'  , HOUR  );
-define('DAY'   ,  24 * HOURS  ); define('DAYS'   , DAY   );
-define('WEEK'  ,   7 * DAYS   ); define('WEEKS'  , WEEK  );
-define('YEAR'  , 365 * DAYS   ); define('YEARS'  , YEAR  );
-
-// Wochentage
-define('SUNDAY'   , 0);
-define('MONDAY'   , 1);
-define('TUESDAY'  , 2);
-define('WEDNESDAY', 3);
-define('THURSDAY' , 4);
-define('FRIDAY'   , 5);
-define('SATURDAY' , 6);
-
-// Helper
-define('NL', PHP_EOL);
-if (!defined('PHP_INT_MIN')) define('PHP_INT_MIN', ~PHP_INT_MAX);    // since PHP 7.0.0
-
-
-
-
-// Beginn des Shutdowns markieren, um fatale Fehler beim Shutdown zu verhindern (siehe Logger)
-// -------------------------------------------------------------------------------------------
-register_shutdown_function(create_function(null, '$GLOBALS[\'$__shutting_down\'] = true;'));    // allererste Funktion auf dem Shutdown-Funktion-Stack
-
-
+   ob_get_level() && ob_flush();          // flush output buffer if active
+   return null;
+}
 
 
 /**
- * Ob die angegebene Klasse definiert (und kein Interface) ist. Diese Funktion bricht im Gegensatz zum Aufruf von
+ * Functional replacement for "echo($var)" which is a language construct and can't be used as a regular function.
  *
- *    "class_exist($className, true)"
+ * @param  mixed $var
+ */
+function echof($var) {
+   echo $var;
+   ob_get_level() && ob_flush();          // flush output buffer if active
+}
+
+
+/**
+ * Alias for printPretty($var, false)
  *
- * bei Nichtexistenz der Klasse das Script nicht mit einem fatalen Fehler ab. Die Klasse wird ggf. geladen.
+ * Prints a variable in a pretty way. Output always ends with a line feed.
  *
- * @param  string $name - Klassenname
+ * @param  mixed $var
+ *
+ * @see    printPretty()
+ */
+function echoPre($var) {
+   printPretty($var, false);
+}
+
+
+/**
+ * Alias for printPretty()
+ *
+ * Prints a variable in a pretty way. Output always ends with a line feed.
+ *
+ * @param  mixed $var    - variable
+ * @param  bool  $return - TRUE,  if the result is to be returned as a string;
+ *                         FALSE, if the result is to be printed to STDOUT (default)
+ *
+ * @return string - string if the result is to be returned, NULL otherwise
+ *
+ * @see    printPretty()
+ */
+function pp($var, $return=false) {
+   return printPretty($var, $return);
+}
+
+
+/**
+ * Prints a variable in a pretty way. Output always ends with a line feed.
+ *
+ * @param  mixed $var    - variable
+ * @param  bool  $return - TRUE,  if the result is to be returned as a string;
+ *                         FALSE, if the result is to be printed to STDOUT (default)
+ *
+ * @return string - string if the result is to be returned, NULL otherwise
+ */
+function printPretty($var, $return=false) {
+   if (is_object($var) && method_exists($var, '__toString')) {
+      $str = (string) $var;
+   }
+   elseif (is_object($var) || is_array($var)) {
+      $str = print_r($var, true);
+   }
+   else if ($var === null) {
+      $str = '(NULL)';                    // analogous to typeof(null) = 'NULL';
+   }
+   else if (is_bool($var)) {
+      $str = $var ? 'true':'false';
+   }
+   else {
+      $str = (string) $var;
+   }
+
+   if (!CLI)
+      $str = '<div align="left"><pre style="margin:0; font:normal normal 12px/normal \'Courier New\',courier,serif">'.htmlSpecialChars($str, ENT_QUOTES).'</pre></div>';
+
+   if (!strEndsWith($str, NL))
+      $str .= NL;
+
+   if ($return)
+      return $str;
+
+   echo $str;
+   ob_get_level() && ob_flush();          // flush output buffer if active
+   return null;
+}
+
+
+/**
+ * Pretty printer for byte values.
+ *
+ * @param  int $value - byte value
+ *
+ * @return string - formatted byte value
+ */
+function prettyBytes($value) {
+   if ($value < 1024)
+      return (string) $value;
+   $value = (int) $value;
+
+   foreach (array('K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y') as $unit) {
+      $value /= 1024;
+      if ($value < 1024)
+         break;
+   }
+   return sPrintF('%.1f%s', $value, $unit);
+}
+
+
+/**
+ * Whether or not the byte order of the machine we are running on is "little endian".
+ *
+ * @return bool
+ */
+function isLittleEndian() {
+   return (pack('S', 1) == "\x01\x00");
+}
+
+
+/**
+ * Functional replacement for ($stringA === $stringB).
+ *
+ * @param  string $stringA
+ * @param  string $stringB
+ * @param  bool   $ignoreCase - default: no
+ *
+ * @return bool
+ */
+function strCompare($stringA, $stringB, $ignoreCase=false) {
+   if (!is_null($stringA) && !is_string($stringB)) throw new IllegalTypeException('Illegal type of parameter $stringA: '.getType($stringA));
+   if (!is_null($stringB) && !is_string($stringB)) throw new IllegalTypeException('Illegal type of parameter $stringB: '.getType($stringB));
+   if (!is_bool($ignoreCase))                      throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
+
+   if ($ignoreCase)
+      return strCompareI($stringA, $stringB);
+   return ($stringA === $stringB);
+}
+
+
+/**
+ * Functional replacement for ($stringA === $stringB) ignoring upper/lower case differences.
+ *
+ * @param  string $stringA
+ * @param  string $stringB
+ *
+ * @return bool
+ */
+function strCompareI($stringA, $stringB) {
+   if (!is_null($stringA) && !is_string($stringA)) throw new IllegalTypeException('Illegal type of parameter $stringA: '.getType($stringA));
+   if (!is_null($stringB) && !is_string($stringB)) throw new IllegalTypeException('Illegal type of parameter $stringB: '.getType($stringB));
+
+   if (is_null($stringA) || is_null($stringB))
+      return ($stringA === $stringB);
+   return (strToLower($stringA) === strToLower($stringB));
+}
+
+
+/**
+ * Whether or not a string contains a substring.
+ *
+ * @param  string $haystack
+ * @param  string $needle
+ * @param  bool   $ignoreCase - default: no
+ *
+ * @return bool
+ */
+function strContains($haystack, $needle, $ignoreCase=false) {
+   if (!is_null($haystack) && !is_string($haystack)) throw new IllegalTypeException('Illegal type of parameter $haystack: '.getType($haystack));
+   if (!is_string($needle))                          throw new IllegalTypeException('Illegal type of parameter $needle: '.getType($needle));
+   if (!is_bool($ignoreCase))                        throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
+
+   $haystackLen = strLen($haystack);
+   $needleLen   = strLen($needle);
+
+   if (!$haystackLen || !$needleLen)
+      return false;
+
+   if ($ignoreCase)
+      return (striPos($haystack, $needle) !== false);
+   return (strPos($haystack, $needle) !== false);
+}
+
+
+/**
+ * Whether or not a string contains a substring ignoring upper/lower case differences.
+ *
+ * @param  string $haystack
+ * @param  string $needle
+ *
+ * @return bool
+ */
+function strContainsI($haystack, $needle) {
+   return strContains($haystack, $needle, true);
+}
+
+
+/**
+ * Whether or not a string starts with a substring. If multiple prefixes are specified whether or not the string starts
+ * with one of them.
+ *
+ * @param  string    $string
+ * @param  string|[] $prefix     - one or more prefixes
+ * @param  bool      $ignoreCase - default: no
+ *
+ * @return bool
+ */
+function strStartsWith($string, $prefix, $ignoreCase=false) {
+   if (is_array($prefix)) {
+      $self = __FUNCTION__;
+      foreach ($prefix as $p) {
+         if ($self($string, $p, $ignoreCase)) return true;
+      }
+      return false;
+   }
+
+   if (!is_null($string) && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+   if (!is_string($prefix))                      throw new IllegalTypeException('Illegal type of parameter $prefix: '.$prefix.' ('.getType($prefix).')');
+   if (!is_bool($ignoreCase))                    throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
+
+   $stringLen = strLen($string);
+   $prefixLen = strLen($prefix);
+
+   if (!$stringLen || !$prefixLen)
+      return false;
+
+   if ($ignoreCase)
+      return (striPos($string, $prefix) === 0);
+   return (strPos($string, $prefix) === 0);
+}
+
+
+/**
+ * Whether or not a string starts with a substring ignoring upper/lower case differences. If multiple prefixes are
+ * specified whether or not the string starts with one of them.
+ *
+ * @param  string    $string
+ * @param  string|[] $prefix - one or more prefixes
+ *
+ * @return bool
+ */
+function strStartsWithI($string, $prefix) {
+   return strStartsWith($string, $prefix, true);
+}
+
+
+/**
+ * Whether or not a string ends with a substring. If multiple suffixes are specified whether or not the string ends
+ * with one of them.
+ *
+ * @param  string    $string
+ * @param  string|[] $suffix     - one or more suffixes
+ * @param  bool      $ignoreCase - default: no
+ *
+ * @return bool
+ */
+function strEndsWith($string, $suffix, $ignoreCase=false) {
+   if (is_array($suffix)) {
+      $self = __FUNCTION__;
+      foreach ($suffix as $s)
+         if ($self($string, $s, $ignoreCase)) return true;
+      return false;
+   }
+   if (!is_null($string) && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+   if (!is_string($suffix))                      throw new IllegalTypeException('Illegal type of parameter $suffix: '.$suffix.' ('.getType($suffix).')');
+   if (!is_bool($ignoreCase))                    throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
+
+   $stringLen = strLen($string);
+   $suffixLen = strLen($suffix);
+
+   if (!$stringLen || !$suffixLen)
+      return false;
+   return (($stringLen-$suffixLen) === strRPos($string, $suffix));
+}
+
+
+/**
+ * Whether or not a string ends with a substring ignoring upper/lower case differences. If multiple suffixes are
+ * specified whether or not the string ends with one of them.
+ *
+ * @param  string    $string
+ * @param  string|[] $suffix - one or more suffixes
+ *
+ * @return bool
+ */
+function strEndsWithI($string, $suffix) {
+   return strEndsWith($string, $suffix, true);
+}
+
+
+/**
+ * Return a left part of a string.
+ *
+ * @param  string $string - initial string
+ * @param  int    $length - greater than/equal to zero: length of the returned substring
+ *                          lower than zero:            all except the specified number of right characters
+ *
+ * @return string - substring
+ *
+ * @example
+ * <pre>
+ * strLeft('abcde',  2) => 'ab'
+ * strLeft('abcde', -1) => 'abcd'
+ * </pre>
+ */
+function strLeft($string, $length) {
+   if (!is_int($length))         throw new IllegalTypeException('Illegal type of parameter $length: '.getType($length));
+   if ($string === null)
+      return '';
+   if (is_int($string))
+      $string = (string)$string;
+   else if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+
+   return subStr($string, 0, $length);
+}
+
+
+/**
+ * Return the left part of a string up to the specified occurrence of a limiting substring.
+ *
+ * @param  string $string         - initial string
+ * @param  string $limiter        - limiting substring (one or more characters)
+ * @param  int    $count          - positive: the specified occurrence of the limiting substring from the start
+ *                                            of the string (default: the first occurrence)
+ *                                  negative: the specified occurrence of the limiting substring from the end of
+ *                                            the string
+ *                                  zero:     an empty string is returned
+ * @param  bool   $includeLimiter - whether or not to include the limiting substring in the returned result
+ *                                  (default: FALSE)
+ * @param  mixed  $onNotFound     - value to return if the specified occurrence of the limiting substring is not found
+ *                                  (default: the initial string)
+ *
+ * @return string - left part of the initial string or the $onNotFound value
+ *
+ * @example
+ * <pre>
+ * strLeftTo('abcde', 'd')      => 'abc'
+ * strLeftTo('abcde', 'x')      => 'abcde'   // limiter not found
+ * strLeftTo('abccc', 'c',   3) => 'abcc'
+ * strLeftTo('abccc', 'c',  -3) => 'ab'
+ * strLeftTo('abccc', 'c', -99) => 'abccc'   // number of occurrences not found
+ * </pre>
+ */
+function strLeftTo($string, $limiter, $count=1, $includeLimiter=false, $onNotFound=null) {
+   if (!is_string($string))       throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+   if (!is_string($limiter))      throw new IllegalTypeException('Illegal type of parameter $limiter: '.getType($limiter));
+   if (!strLen($limiter))         throw new IllegalArgumentException('Illegal limiting substring: "" (empty)');
+   if (!is_int($count))           throw new IllegalTypeException('Illegal type of parameter $count: '.getType($count));
+   if (!is_bool($includeLimiter)) throw new IllegalTypeException('Illegal type of parameter $includeLimiter: '.getType($includeLimiter));
+
+   if ($count > 0) {
+      $pos = -1;
+      while ($count) {
+         $offset = $pos + 1;
+         $pos = strPos($string, $limiter, $offset);
+         if ($pos === false)                                      // not found
+            return func_num_args() > 4 ? $onNotFound : $string;
+         $count--;
+      }
+      $result = subStr($string, 0, $pos);
+      if ($includeLimiter)
+         $result .= $limiter;
+      return $result;
+   }
+
+   if ($count < 0) {
+      $len = strLen($string);
+      $pos = $len;
+      while ($count) {
+         $offset = $pos - $len - 1;
+         if ($offset < -$len)                                     // not found
+            return func_num_args() > 4 ? $onNotFound : $string;
+         $pos = strRPos($string, $limiter, $offset);
+         if ($pos === false)                                      // not found
+            return func_num_args() > 4 ? $onNotFound : $string;
+         $count++;
+      }
+      $result = subStr($string, 0, $pos);
+      if ($includeLimiter)
+         $result .= $limiter;
+      return $result;
+   }
+
+   // $count == 0
+   return '';
+}
+
+
+/**
+ * Return a right part of a string.
+ *
+ * @param  string $string - initial string
+ * @param  int    $length - greater than/equal to zero: length of the returned substring
+ *                          lower than zero:            all except the specified number of left characters
+ *
+ * @return string - substring
+ *
+ * @example
+ * <pre>
+ * strRight('abcde',  1) => 'e'
+ * strRight('abcde', -2) => 'cde'
+ * </pre>
+ */
+function strRight($string, $length) {
+   if (!is_int($length))         throw new IllegalTypeException('Illegal type of parameter $length: '.getType($length));
+   if ($string === null)
+      return '';
+   if (is_int($string))
+      $string = (string)$string;
+   else if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+
+   if ($length == 0)
+      return '';
+
+   $result = subStr($string, -$length);
+   return $result===false ? '' : $result;
+}
+
+
+/**
+ * Return the right part of a string from the specified occurrence of a limiting substring.
+ *
+ * @param  string $string         - initial string
+ * @param  string $limiter        - limiting substring (one or more characters)
+ * @param  int    $count          - positive: the specified occurrence of the limiting substring counted from the
+ *                                            start of the string (default: the first occurrence)
+ *                                  negative: the specified occurrence of the limiting substring counted from the
+ *                                            end of the string
+ *                                  zero:     the initial string is returned
+ * @param  bool   $includeLimiter - whether or not to include the limiting substring in the returned result
+ *                                  (default: FALSE)
+ * @param  mixed  $onNotFound     - value to return if the specified occurrence of the limiting substring is not found
+ *                                  (default: empty string)
+ *
+ * @return string - right part of the initial string or the $onNotFound value
+ *
+ * @example
+ * <pre>
+ * strRightFrom('abc_abc', 'c')     => '_abc'
+ * strRightFrom('abcabc',  'x')     => ''             // limiter not found
+ * strRightFrom('abc_abc', 'a',  2) => 'bc'
+ * strRightFrom('abc_abc', 'b', -2) => 'c_abc'
+ * </pre>
+ */
+function strRightFrom($string, $limiter, $count=1, $includeLimiter=false, $onNotFound=null) {
+   if (!is_string($string))       throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+   if (!is_string($limiter))      throw new IllegalTypeException('Illegal type of parameter $limiter: '.getType($limiter));
+   if (!strLen($limiter))         throw new IllegalArgumentException('Illegal limiting substring: "" (empty)');
+   if (!is_int($count))           throw new IllegalTypeException('Illegal type of parameter $count: '.getType($count));
+   if (!is_bool($includeLimiter)) throw new IllegalTypeException('Illegal type of parameter $includeLimiter: '.getType($includeLimiter));
+
+   if ($count > 0) {
+      $pos = -1;
+      while ($count) {
+         $offset = $pos + 1;
+         $pos = strPos($string, $limiter, $offset);
+         if ($pos === false)                                      // not found
+            return func_num_args() > 4 ? $onNotFound : '';
+         $count--;
+      }
+      $result = subStr($string, $pos + strLen($limiter));
+      if ($includeLimiter)
+         $result = $limiter.$result;
+      return $result;
+   }
+
+   if ($count < 0) {
+      $len = strLen($string);
+      $pos = $len;
+      while ($count) {
+         $offset = $pos - $len - 1;
+         if ($offset < -$len)                                     // not found
+            return func_num_args() > 4 ? $onNotFound : '';
+         $pos = strRPos($string, $limiter, $offset);
+         if ($pos === false)                                      // not found
+            return func_num_args() > 4 ? $onNotFound : '';
+         $count++;
+      }
+      $result = subStr($string, $pos + strLen($limiter));
+      if ($includeLimiter)
+         $result = $limiter.$result;
+      return $result;
+   }
+
+   // $count == 0
+   return $string;
+}
+
+
+/**
+ * Whether or not a string is wrapped in single or double quotes.
+ *
+ * @param  string $value
+ *
+ * @return bool
+ */
+function strIsQuoted($value) {
+   if (is_null($value) || is_int($value))
+      return false;
+   if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
+
+   return strLen($value)>1 && (strIsSingleQuoted($value) || strIsDoubleQuoted($value));
+}
+
+
+/**
+ * Whether or not a string is wrapped in single quotes.
+ *
+ * @param  string $value
+ *
+ * @return bool
+ */
+function strIsSingleQuoted($value) {
+   if (is_null($value) || is_int($value))
+      return false;
+   if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
+
+   return (($len=strLen($value))>1 && $value{0}=="'" && $value{--$len}=="'");
+}
+
+
+/**
+ * Whether or not a string is wrapped in double quotes.
+ *
+ * @param  string $value
+ *
+ * @return bool
+ */
+function strIsDoubleQuoted($value) {
+   if (is_null($value) || is_int($value))
+      return false;
+   if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
+
+   return (($len=strLen($value))>1 && $value{0}=='"' && $value{--$len}=='"');
+}
+
+
+/**
+ * Whether or not a string consists of numerical characters (0-9).
+ *
+ * @param  string $value
+ *
+ * @return bool
+ */
+function strIsDigits($value) {
+   if (is_null($value)) return false;
+   if (is_int($value))  return ($value >= 0);
+   if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
+
+   return ctype_digit($value);
+}
+
+
+/**
+ * Alias for getType() for C/C++ enthusiasts.
+ *
+ * @param  mixed $var
+ *
+ * @return string
+ *
+ * @see    getType()
+ */
+function typeOf($var) {
+   return getType($var);
+}
+
+
+/**
+ * Check whether a directory exists. If not try to create it. Check further if write permission is granted.
+ *
+ * @param  string $path - same as mkDir(): directory name
+ * @param  int    $mode - same as mkDir(): permission mode to set if the directory is created
+ *                                         (default: 0770 = rwxrwx---)
+ */
+function mkDirWritable($path, $mode=0770) {
+   if (!is_string($path))                            throw new IllegalTypeException('Illegal type of parameter $path: '.getType($path));
+   if (!is_null($mode) && !is_int($mode))            throw new IllegalTypeException('Illegal type of parameter $mode: '.getType($mode));
+
+   if (is_file($path))                               throw new IOException('Cannot write to directory "'.$path.'" (is a file)');
+   if (!is_dir($path) && !mkDir($path, $mode, true)) throw new IOException('Cannot create directory "'.$path.'"');
+   if (!is_writable($path))                          throw new IOException('Cannot write to directory "'.$path.'"');
+}
+
+
+/**
+ * Return a human-readable form of the specified error reporting level.
+ *
+ * @param  int $level - reporting level (default: the currently active reporting level)
+ *
+ * @return string
+ */
+function errorLevelToStr($level=null) {
+   if (!func_num_args()) $level = error_reporting();
+   if (!is_int($level)) throw new IllegalTypeException('Illegal type of parameter $level: '.getType($level));
+
+   $levels = array();
+
+   if (!$level                     ) $levels[] = '0';                      //  zero
+   if ($level & E_ERROR            ) $levels[] = 'E_ERROR';                //     1
+   if ($level & E_WARNING          ) $levels[] = 'E_WARNING';              //     2
+   if ($level & E_PARSE            ) $levels[] = 'E_PARSE';                //     4
+   if ($level & E_NOTICE           ) $levels[] = 'E_NOTICE';               //     8
+   if ($level & E_CORE_ERROR       ) $levels[] = 'E_CORE_ERROR';           //    16
+   if ($level & E_CORE_WARNING     ) $levels[] = 'E_CORE_WARNING';         //    32
+   if ($level & E_COMPILE_ERROR    ) $levels[] = 'E_COMPILE_ERROR';        //    64
+   if ($level & E_COMPILE_WARNING  ) $levels[] = 'E_COMPILE_WARNING';      //   128
+   if ($level & E_USER_ERROR       ) $levels[] = 'E_USER_ERROR';           //   256
+   if ($level & E_USER_WARNING     ) $levels[] = 'E_USER_WARNING';         //   512
+   if ($level & E_USER_NOTICE      ) $levels[] = 'E_USER_NOTICE';          //  1024
+   if ($level & E_STRICT           ) $levels[] = 'E_STRICT';               //  2048
+   if ($level & E_RECOVERABLE_ERROR) $levels[] = 'E_RECOVERABLE_ERROR';    //  4096
+   if ($level & E_DEPRECATED       ) $levels[] = 'E_DEPRECATED';           //  8192
+   if ($level & E_USER_DEPRECATED  ) $levels[] = 'E_USER_DEPRECATED';      // 16384
+   if ($level & E_ALL == E_ALL     ) $levels   = ['E_ALL'];                // 32767
+
+   return join('|', $levels);
+}
+
+
+/**
+ * Whether or not the specified class exists (defined or undefined) and is not an interface. The function calls all
+ * registered class loaders. Opposite to a call of
+ * <pre>
+ *    class_exist($name, true)
+ * </pre>
+ * it does not terminate the script if the class can't be loaded.
+ *
+ * @param  string $name - class name
  *
  * @return bool
  */
 function is_class($name) {
-   if (class_exists    ($name, false)) return true;
-   if (interface_exists($name, false)) return false;
+   if (class_exists    ($name, $autoload=false)) return true;
+   if (interface_exists($name, $autoload=false)) return false;
 
    try {
       $functions = spl_autoload_functions();
       if (!$functions) {               // no loader nor __autoload() exist: spl_autoload_call() will call spl_autoload()
          spl_autoload_call($name);     // onError: Uncaught LogicException: Class $name could not be loaded
       }
-      else if (sizeOf($functions)==1 && is_string($functions[0]) && $functions[0]=='__autoload') {
-         __autoload($name);            // __autoload() exists and is explicit or implicit defined
+      else if (sizeOf($functions)==1 && $functions[0]==='__autoload') {
+         __autoload($name);            // __autoload() exists and is explicitely or implicitely registered
       }
       else {
-         spl_autoload_call($name);     // a regular loader queue is defined
+         spl_autoload_call($name);     // a regular SPL loader queue is defined
       }
    }
    catch (ClassNotFoundException $ex) {}
 
-   return class_exists($name, false);
+   return class_exists($name, $autoload=false);
 }
 
 
 /**
- * Ob das angegebene Interface definiert (und keine Klasse) ist. Diese Funktion bricht im Gegensatz zum Aufruf von
+ * Whether or not the specified interface exists (defined or undefined) and is not a class. The function calls all
+ * registered class loaders. Opposite to a call of
+ * <pre>
+ *    interface_exist($name, true)
+ * </pre>
+ * it does not terminate the script if the interface can't be loaded.
  *
- *    "interface_exist($interfaceName, true)"
- *
- * bei Nichtexistenz des Interface das Script nicht mit einem fatalen Fehler ab. Das Interface wird ggf. geladen.
- *
- * @param  string $name - Interface-Name
+ * @param  string $name - interface name
  *
  * @return bool
  */
 function is_interface($name) {
-   if (interface_exists($name, false)) return true;
-   if (class_exists    ($name, false)) return false;
+   if (interface_exists($name, $autoload=false)) return true;
+   if (class_exists    ($name, $autoload=false)) return false;
 
    try {
       $functions = spl_autoload_functions();
       if (!$functions) {               // no loader nor __autoload() exist: spl_autoload_call() will call spl_autoload()
          spl_autoload_call($name);     // onError: Uncaught LogicException: Class $name could not be loaded
       }
-      else if (sizeOf($functions)==1 && is_string($functions[0]) && $functions[0]=='__autoload') {
-         __autoload($name);            // __autoload() exists and is explicit or implicit defined
+      else if (sizeOf($functions)==1 && $functions[0]==='__autoload') {
+         __autoload($name);            // __autoload() exists and is explicitely or implicitely registered
       }
       else {
-         spl_autoload_call($name);     // a regular loader queue is defined
+         spl_autoload_call($name);     // a regular SPL loader queue is defined
       }
    }
    catch (ClassNotFoundException $ex) {}
 
-   return interface_exists($name, false);
+   return interface_exists($name, $autoload=false);
 }
 
 
 /**
- * Prozedural-Ersatz für CommonValidator::isDateTime()
+ * Procedural replacement for rosasurfer\util\CommonValidator::isDateTime()
  *
- * Ob der übergebene String einen gültigen Date/DateTime-Wert darstellt.
+ * Whether or not the specified string value represents a valid date or datetime value.
  *
- * @param  string    $string - der zu überprüfende String
- * @param  string|[] $format - Format, dem der String entsprechen soll. Sind mehrere angegeben, muß der String
- *                             mindestens einem davon entsprechen.
+ * @param  string    $string - string value
+ * @param  string|[] $format - A valid date/datetime format. If multiple values are supplied whether or not the specified
+ *                             string fits at least one of them.
+ *                             Supported format string: 'Y-m-d [H:i[:s]]'
+ *                                                      'Y.m.d [H:i[:s]]'
+ *                                                      'd.m.Y [H:i[:s]]'
+ *                                                      'd/m/Y [H:i[:s]]'
  *
- * @return int|bool - Timestamp oder FALSE, wenn der übergebene Wert nicht gültig ist
+ * @return int|bool - timestamp matching the string or FALSE if the string is not a valid date/datetime value
  *
- * Unterstützte Formate: 'Y-m-d [H:i[:s]]'
- *                       'Y.m.d [H:i[:s]]'
- *                       'd.m.Y [H:i[:s]]'
- *                       'd/m/Y [H:i[:s]]'
+ * @see    rosasurfer\util\CommonValidator::isDateTime()
  */
 function is_datetime($string, $format) {
    return CommonValidator::isDateTime($string, $format);
@@ -255,13 +900,68 @@ function is_datetime($string, $format) {
 
 
 /**
- * Ob die Byte-Order der Maschine Little-Endian ist oder nicht (dann Big-Endian).
+ * Procedural replacement for the value TRUE for quick code analysis.
  *
- * @return bool
+ * @param  mixed $value - ignored
+ *
+ * @return TRUE
  */
-function isLittleEndian() {
-   return (pack('S', 1) == "\x01\x00");
+function _true($value=null) {
+   return true;
 }
+
+
+/**
+ * Procedural replacement for the value FALSE for quick code analysis.
+ *
+ * @param  mixed $value - ignored
+ *
+ * @return FALSE
+ */
+function _false($value=null) {
+   return false;
+}
+
+
+/**
+ * Procedural replacement for the value NULL for quick code analysis.
+ *
+ * @param  mixed $value - ignored
+ *
+ * @return NULL
+ */
+function _null($value=null) {
+   return null;
+}
+
+
+/**
+ * Return $value or $altValue if $value is NULL. Procedural replacement for ternary test for NULL.
+ *
+ * @param  mixed $value
+ * @param  mixed $altValue
+ *
+ * @return mixed
+ */
+function ifNull($value, $altValue) {
+   return ($value===null) ? $altValue : $value;
+}
+
+
+
+// (9) define helper constants and functions globally if applicable
+
+
+
+
+// =====================================================================================================================
+// === Old legacy code =================================================================================================
+// =====================================================================================================================
+
+
+// Beginn des Shutdowns markieren, um fatale Fehler beim Shutdown zu verhindern (siehe Logger)
+// -------------------------------------------------------------------------------------------
+register_shutdown_function(create_function(null, '$GLOBALS[\'$__shutting_down\'] = true;'));    // allererste Funktion auf dem Shutdown-Funktion-Stack
 
 
 /**
@@ -307,527 +1007,6 @@ function push_shutdown_function(/*callable*/ $callback = null /*, $args1, $args2
 
    $stack[] = array('name' => $callback,
                     'args' => $args);
-}
-
-
-/**
- * Erzeugt eine zufällige ID (wegen Verwechselungsgefahr ohne die Zeichen 0 O 1 l I).
- *
- * @param  int $length - Länge der ID
- *
- * @return string - ID
- */
-function getRandomID($length) {
-   if (!isSet($length) || !is_int($length) || $length < 1) throw new RuntimeException('Invalid argument length: '.$length);
-
-   $id = crypt(uniqId(rand(), true));              // zufällige ID erzeugen
-   $id = strip_tags(stripSlashes($id));            // Sonder- und leicht zu verwechselnde Zeichen entfernen
-   $id = strRev(str_replace('/', '', str_replace('.', '', str_replace('$', '', str_replace('0', '', str_replace('O', '', str_replace('1', '', str_replace('l', '', str_replace('I', '', $id)))))))));
-   $len = strLen($id);
-   if ($len < $length) {
-      $id .= getRandomID($length-$len);            // bis zur gewünschten Länge vergrößern ...
-   }
-   else {
-      $id = subStr($id, 0, $length);               // oder auf die gewünschte Länge kürzen
-   }
-   return $id;
-}
-
-
-/**
- * Prüft, ob ein String mit einem Teilstring beginnt.
- *
- * @param  string    $string
- * @param  string|[] $prefix     - Teilstring. Sind mehrere angegeben, prüft die Funktion, ob der String mit einem von ihnen beginnt.
- * @param  bool      $ignoreCase - default: nein
- *
- * @return bool
- */
-function strStartsWith($string, $prefix, $ignoreCase=false) {
-   if (is_array($prefix)) {
-      $self = __FUNCTION__;
-      foreach ($prefix as $p) if ($self($string, $p, $ignoreCase))
-         return true;
-      return false;
-   }
-   if (!is_null($string) && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
-   if (!is_string($prefix))                      throw new IllegalTypeException('Illegal type of parameter $prefix: '.$prefix.' ('.getType($prefix).')');
-   if (!is_bool($ignoreCase))                    throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
-
-   $stringLen = strLen($string);
-   $prefixLen = strLen($prefix);
-
-   if (!$stringLen || !$prefixLen)
-      return false;
-
-   if ($ignoreCase)
-      return (striPos($string, $prefix) === 0);
-   return (strPos($string, $prefix) === 0);
-}
-
-
-/**
- * Prüft, ob ein String mit einem Teilstring beginnt und ignoriert dabei Groß-/Kleinschreibung.
- *
- * @param  string $string
- * @param  string $prefix
- *
- * @return bool
- */
-function strStartsWithI($string, $prefix) {
-   return strStartsWith($string, $prefix, true);
-}
-
-
-/**
- * Prüft, ob ein String mit einem Teilstring endet.
- *
- * @param  string    $string
- * @param  string|[] $suffix     - Teilstring. Sind mehrere angegeben, prüft die Funktion, ob der String mit einem von ihnen endet.
- * @param  bool      $ignoreCase - default: nein
- *
- * @return bool
- */
-function strEndsWith($string, $suffix, $ignoreCase=false) {
-   if (is_array($suffix)) {
-      $self = __FUNCTION__;
-      foreach ($suffix as $s) if ($self($string, $s, $ignoreCase))
-         return true;
-      return false;
-   }
-   if (!is_null($string) && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
-   if (!is_string($suffix))                      throw new IllegalTypeException('Illegal type of parameter $suffix: '.$suffix.' ('.getType($suffix).')');
-   if (!is_bool($ignoreCase))                    throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
-
-   $stringLen = strLen($string);
-   $suffixLen = strLen($suffix);
-
-   if (!$stringLen || !$suffixLen)
-      return false;
-   return (($stringLen-$suffixLen) === strRPos($string, $suffix));
-}
-
-
-/**
- * Prüft, ob ein String mit einem Teilstring endet und ignoriert dabei Groß-/Kleinschreibung.
- *
- * @param  string $string
- * @param  string $prefix
- *
- * @return bool
- */
-function strEndsWithI($string, $suffix) {
-   return strEndsWith($string, $suffix, true);
-}
-
-
-/**
- * Prüft, ob ein String einen Teilstring enthält.
- *
- * @param  string $haystack
- * @param  string $needle
- * @param  bool   $ignoreCase - default: nein
- *
- * @return bool
- */
-function strContains($haystack, $needle, $ignoreCase=false) {
-   if (!is_null($haystack) && !is_string($haystack)) throw new IllegalTypeException('Illegal type of parameter $haystack: '.getType($haystack));
-   if (!is_string($needle))                          throw new IllegalTypeException('Illegal type of parameter $needle: '.getType($needle));
-   if (!is_bool($ignoreCase))                        throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
-
-   $haystackLen = strLen($haystack);
-   $needleLen   = strLen($needle);
-
-   if (!$haystackLen || !$needleLen)
-      return false;
-
-   if ($ignoreCase)
-      return (striPos($haystack, $needle) !== false);
-   return (strPos($haystack, $needle) !== false);
-}
-
-
-/**
- * Prüft, ob ein String einen Teilstring enthält und ignoriert dabei Groß-/Kleinschreibung.
- *
- * @param  string $haystack
- * @param  string $needle
- *
- * @return bool
- */
-function strContainsI($haystack, $needle) {
-   return strContains($haystack, $needle, true);
-}
-
-
-/**
- * Dropin-Ersatz für ($stringA === $stringB)
- *
- * @param  string $stringA
- * @param  string $stringB
- * @param  bool   $ignoreCase - default: nein
- *
- * @return bool
- */
-function strCompare($stringA, $stringB, $ignoreCase=false) {
-   if (!is_null($stringA) && !is_string($stringA)) throw new IllegalTypeException('Illegal type of parameter $stringA: '.getType($stringA));
-   if (!is_null($stringB) && !is_string($stringB)) throw new IllegalTypeException('Illegal type of parameter $stringB: '.getType($stringB));
-   if (!is_bool($ignoreCase))          throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
-
-   if ($ignoreCase)
-      return strCompareI($stringA, $stringB);
-   return ($stringA === $stringB);
-}
-
-
-/**
- * Dropin-Ersatz für ($stringA === $stringB) ohne Beachtung von Groß-/Kleinschreibung
- *
- * @param  string $stringA
- * @param  string $stringB
- *
- * @return bool
- */
-function strCompareI($stringA, $stringB) {
-   if (!is_null($stringA) && !is_string($stringA)) throw new IllegalTypeException('Illegal type of parameter $stringA: '.getType($stringA));
-   if (!is_null($stringB) && !is_string($stringB)) throw new IllegalTypeException('Illegal type of parameter $stringB: '.getType($stringB));
-
-   if (is_null($stringA) || is_null($stringB))
-      return ($stringA === $stringB);
-   return (strToLower($stringA) === strToLower($stringB));
-}
-
-
-/**
- * Gibt einen linken Teilstring eines Strings zurück.
- *
- * @param  string $string - Ausgangsstring
- * @param  int    $length - Länge des Teilstrings. Ist der Wert negativ, werden alle außer der angegebenen Anzahl
- *                          rechts stehender Zeichen zurückgegeben.
- *
- * @return string - String
- */
-function strLeft($string, $length) {
-   if (!is_int($length))    throw new IllegalTypeException('Illegal type of parameter $length: '.getType($length));
-   if ($string === null)
-      return '';
-   if (is_int($string))
-      $string = (string)$string;
-   else if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
-
-   return subStr($string, 0, $length);
-}
-
-
-/**
- * Gibt den linken Teil eines Strings bis zum Auftreten eines Teilstrings zurück. Das Ergebnis schließt den
- * zu suchenden Teilstring nicht mit ein.
- *
- * @param  string $string    - Ausgangsstring
- * @param  string $substring - der das Ergebnis begrenzende Teilstring
- *
- * @return string - Teilstring oder der Ausgangsstring, wenn der zu begrenzende Teilstring nicht gefunden wurde
- */
-function strLeftTo($string, $substring) {
-   if (!is_string($string))    throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
-   if (!is_string($substring)) throw new IllegalTypeException('Illegal type of parameter $substring: '.getType($substring));
-
-   $pos = strPos($string, $substring);
-   if ($pos === false)
-      return $string;
-   return subStr($string, 0, $pos);
-}
-
-
-/**
- * Gibt einen rechten Teilstring eines Strings zurück.
- *
- * @param  string $string
- * @param  int    $length - Länge des Teilstrings. Ist der Wert negativ, werden alle außer der angegebenen Anzahl
- *                          links stehender Zeichen zurückgegeben.
- *
- * @return string - String
- */
-function strRight($string, $length) {
-   if (!is_int($length))    throw new IllegalTypeException('Illegal type of parameter $length: '.getType($length));
-   if ($string === null)
-      return '';
-   if (is_int($string))
-      $string = (string)$string;
-   else if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
-
-   if ($length == 0)
-      return '';
-
-   $result = subStr($string, -$length);
-   return $result===false ? '' : $result;
-}
-
-
-/**
- * Returns the right part of a string from the specified occurrence of a limiting substring. The result doesn't
- * include the limiting substring.
- *
- * @param  string $string     - initial string
- * @param  string $substring  - limiting substring (can be multiple characters)
- * @param  int    $count      - if positive, the specified occurrence of the limiting substring counted from the
- *                              start of the string (default: the first occurrence)
- *                              if negative, the specified occurrence of the limiting substring counted from the
- *                              end of the string;
- *                              if zero, an empty string is returned
- * @param  mixed  $onNotFound - value of any type to return if the limiting substring is not found;
- *                              default: the full string
- *
- * @return string - right part or the specified $onNotFound value
- *
- * @example
- * <pre>
- * strRightFrom('abc_abc', 'c')     => '_abc'
- * strRightFrom('abcabc',  'x')     => 'abcabc'       // limiter not found
- * strRightFrom('abc_abc', 'a',  2) => 'bc'
- * strRightFrom('abc_abc', 'b', -2) => 'c_abc'
- * </pre>
- */
-function strRightFrom($string, $substring, $count=1, $onNotFound=null) {
-   if (!is_string($string))    throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
-   if (!is_string($substring)) throw new IllegalTypeException('Illegal type of parameter $substring: '.getType($substring));
-   if (!is_int($count))        throw new IllegalTypeException('Illegal type of parameter $count: '.getType($count));
-
-   if ($count > 0) {
-      $pos = -1;
-      while ($count) {
-         $offset = $pos + 1;
-         $pos = strPos($string, $substring, $offset);
-         if ($pos === false)                                      // not found
-            return func_num_args() > 3 ? $onNotFound : $string;
-         $count--;
-      }
-      return subStr($string, $pos + strLen($substring));
-   }
-
-   if ($count < 0) {
-      $len = strLen($string);
-      $pos = $len;
-      while ($count) {
-         $offset = $pos - $len - 1;
-         if ($offset < -$len)                                     // not found
-            return func_num_args() > 3 ? $onNotFound : $string;
-         $pos = strRPos($string, $substring, $offset);
-         if ($pos === false)                                      // not found
-            return func_num_args() > 3 ? $onNotFound : $string;
-         $count++;
-      }
-      return subStr($string, $pos + strLen($substring));
-   }
-
-   // $count == 0
-   return '';
-}
-
-
-/**
- * Prüft, ob ein String in einfache Anführungszeichen eingefaßt ist.
- *
- * @param  string $string
- *
- * @return bool
- */
-function strIsSingleQuoted($string) {
-   if (is_null($string)) return false;
-   if (is_int($string))
-      $string = (string)$string;
-   else if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
-
-   return (strLen($string)>1 && $string{0}=="'" && strRight($string, 1)=="'");
-}
-
-
-/**
- * Prüft, ob ein String in doppelte Anführungszeichen eingefaßt ist.
- *
- * @param  string $string
- *
- * @return bool
- */
-function strIsDoubleQuoted($string) {
-   if (is_null($string)) return false;
-   if (is_int($string))
-      $string = (string)$string;
-   else if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
-
-   return (strLen($string)>1 && $string{0}=='"' && strRight($string, 1)=='"');
-}
-
-
-/**
- * Prüft, ob ein String in einfache oder doppelte Anführungszeichen eingefaßt ist.
- *
- * @param  string $string
- *
- * @return bool
- */
-function strIsQuoted($string) {
-   if (is_null($string)) return false;
-   if (is_int($string))
-      $string = (string)$string;
-   else if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
-
-   return (strLen($string)>1 && (strIsSingleQuoted($string) || strIsDoubleQuoted($string)));
-}
-
-
-/**
- * Prüft, ob ein String vollständig aus numerischen Zeichen besteht.
- *
- * @param  string $string
- *
- * @return bool
- */
-function strIsDigit($string) {
-   if (is_null($string)) return false;
-   if (is_int($string))
-      $string = (string)$string;
-   else if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
-
-   return ctype_digit($string);
-}
-
-
-/**
- * Alias für "getType()" zur sprachenübergreifenden Vereinfachung.
- *
- * @param  mixed $var - Variable
- *
- * @return string
- */
-function typeOf($var) {
-   return getType($var);
-}
-
-
-/**
- * Alias für "echo $var", das ein Language-Construct ist und nicht immer als Funktion verwendet werden kann.
- *
- * @param  mixed $var - die auszugebende Variable
- */
-function echos($var) {
-   echo $var;
-   ob_get_level() && ob_flush();       // flush output buffer if active
-}
-
-
-/**
- * Alias für printFormatted($var, false).
- *
- * Hilfsfunktion zur formatierten Ausgabe einer Variable. Die Ausgabe wird immer mit einem Zeilenende-Zeichen
- * abgeschlossen.
- *
- * @param  mixed $var - die auszugebende Variable
- */
-function echoPre($var) {
-   printFormatted($var);
-}
-
-
-/**
- * Hilfsfunktion zur formatierten Ausgabe einer Variable. Die Ausgabe wird immer mit einem Zeilenende-Zeichen
- * abgeschlossen.
- *
- * @param  mixed $var    - die auszugebende Variable
- * @param  bool  $return - ob das Ergebnis zurückgegeben (TRUE) oder auf STDOUT ausgegeben (FALSE) werden soll
- *                         (default: Ausgabe auf STDOUT)
- *
- * @return string - Rückgabewert, wenn der Parameter $return TRUE ist; NULL andererseits
- */
-function printFormatted($var, $return=false) {
-   if (is_object($var) && method_exists($var, '__toString')) {
-      $str = (string) $var;
-   }
-   elseif (is_object($var) || is_array($var)) {
-      $str = print_r($var, true);
-   }
-   else if ($var === null) {
-      $str = '(NULL)';           // entsprechend typeof(null) = 'NULL';
-   }
-   else if (is_bool($var)) {
-      $str = $var ? 'true':'false';
-   }
-   else {
-      $str = (string) $var;
-   }
-
-   if (!CLI)
-      $str = '<div align="left"><pre style="margin:0; font:normal normal 12px/normal \'Courier New\',courier,serif">'.htmlSpecialChars($str, ENT_QUOTES).'</pre></div>';
-
-   if (!strEndsWith($str, "\n"))
-      $str .= "\n";
-
-   if ($return)
-      return $str;
-
-   echo $str;
-   return null;
-}
-
-
-/**
- * Gibt den Inhalt einer Variable aus.
- *
- * @param  mixed $var   - Variable
- * @param  bool $return - TRUE, wenn das Ergebnis zurückgegeben werden soll;
- *                        FALSE, wenn das Ergebnis auf STDOUT ausgegeben werden soll (default)
- *
- * @return string       - Variableninhalt oder NULL, wenn der Parameter $return FALSE ist
- */
-function dump($var, $return=false) {
-   if ($return) ob_start();
-
-   var_dump($var);
-
-   if ($return) return ob_get_clean();
-
-   ob_get_level() && ob_flush();       // flush output buffer if active
-   return;
-}
-
-
-/**
- * Dropin-Replacement für TRUE zum schnellen Debugging.
- *
- * @param  string $function - Name der aktuellen Funktion
- * @param  int    $line     - aktuelle Codezeile
- * @param  string $id       - optionaler zusätzlicher Identifier
- *
- * @return TRUE
- */
-function _true($function, $line, $id=null) {
-   echoPre($function.'('.$id.'), line '.$line);
-   return true;
-}
-
-
-/**
- * Dropin-Replacement für FALSE zum schnellen Debugging.
- *
- * @param  string $function - Name der aktuellen Funktion
- * @param  int    $line     - aktuelle Codezeile
- * @param  string $id       - optionaler zusätzlicher Identifier
- *
- * @return FALSE
- */
-function _false($function, $line, $id=null) {
-   echoPre($function.'('.$id.'), line '.$line);
-   return false;
-}
-
-
-/**
- * Gibt einen String als JavaScript aus.
- *
- * @param  string $snippet - Code
- */
-function javaScript($snippet) {
-   echo '<script language="JavaScript">'.$snippet.'</script>';
 }
 
 
@@ -968,26 +1147,6 @@ function formatMoney($value, $decimals=2, $decimalSeparator='.') {
 
 
 /**
- * Pretty printer for byte values.
- *
- * @param  int $value - byte value
- *
- * @return string
- */
-function byteSize($value) {
-   if ($value < 1024)
-      return (string) $value;
-
-   foreach (array('K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y') as $unit) {
-      $value /= 1024;
-      if ($value < 1024)
-         break;
-   }
-   return sPrintF('%.1f%s', $value, $unit);
-}
-
-
-/**
  * Führt ein Shell-Kommando aus und gibt dessen Standardausgabe als String zurück.
  *
  * @param  string $cmd - Shell-Kommando
@@ -1024,66 +1183,7 @@ function shell_exec_fix($cmd) {
 }
 
 
-/**
- * Prüft, ob ein Verzeichnis existiert und legt es ggf. an. Prüft dann, ob darin Schreibzugriff möglich ist.
- *
- * @param  string $path - wie bei mkDir(): Name des Verzeichnisses
- * @param  int    $mode - wie bei mkDir(): zu setzende Zugriffsberechtigung, falls das Verzeichnis nicht existiert (default: 0777)
- *
- * @return  bool - Immer TRUE (nach Verlassen der Funktion existiert das Verzeichnis und Schreibzugriff ist möglich),
- *                 anderenfalls wird eine Exception ausgelöst.
- */
-function mkDirWritable($path, $mode=0777) {
-   if (!is_string($path))                            throw new IllegalTypeException('Illegal type of parameter $path: '.getType($path));
-   if (!is_null($mode) && !is_int($mode))            throw new IllegalTypeException('Illegal type of parameter $mode: '.getType($mode));
-
-   if (is_file($path))                               throw new RuntimeException('Cannot write to directory "'.$path.'" (is file)');
-   if (!is_dir($path) && !mkDir($path, $mode, true)) throw new RuntimeException('Cannot create directory "'.$path.'"');
-   if (!is_writable($path))                          throw new RuntimeException('Cannot write to directory "'.$path.'"');
-
-   return true;
-}
 
 
-/**
- * Ist $value nicht NULL, gibt die Funktion $value zurück, ansonsten die Alternative $altValue.
- *
- * @return  mixed
- */
-function ifNull($value, $altValue) {
-   return ($value===null) ? $altValue : $value;
-}
 
 
-/**
- * Returns a human-readable form of the specified error reporting level.
- *
- * @param  int $level - reporting level (default: the currently active reporting level)
- *
- * @return string
- */
-function errorLevelToStr($level=null) {
-   if (func_num_args() && !is_int($level)) throw new IllegalTypeException('Illegal type of parameter $level: '.getType($level));
-
-   $levels = array();
-
-   if (!$level                     ) $levels[] = '0';                      //  zero
-   if ($level & E_ERROR            ) $levels[] = 'E_ERROR';                //     1
-   if ($level & E_WARNING          ) $levels[] = 'E_WARNING';              //     2
-   if ($level & E_PARSE            ) $levels[] = 'E_PARSE';                //     4
-   if ($level & E_NOTICE           ) $levels[] = 'E_NOTICE';               //     8
-   if ($level & E_CORE_ERROR       ) $levels[] = 'E_CORE_ERROR';           //    16
-   if ($level & E_CORE_WARNING     ) $levels[] = 'E_CORE_WARNING';         //    32
-   if ($level & E_COMPILE_ERROR    ) $levels[] = 'E_COMPILE_ERROR';        //    64
-   if ($level & E_COMPILE_WARNING  ) $levels[] = 'E_COMPILE_WARNING';      //   128
-   if ($level & E_USER_ERROR       ) $levels[] = 'E_USER_ERROR';           //   256
-   if ($level & E_USER_WARNING     ) $levels[] = 'E_USER_WARNING';         //   512
-   if ($level & E_USER_NOTICE      ) $levels[] = 'E_USER_NOTICE';          //  1024
-   if ($level & E_STRICT           ) $levels[] = 'E_STRICT';               //  2048: since PHP 5, not included in E_ALL until PHP 5.4.0
-   if ($level & E_RECOVERABLE_ERROR) $levels[] = 'E_RECOVERABLE_ERROR';    //  4096: since PHP 5.2.0
-   if ($level & E_DEPRECATED       ) $levels[] = 'E_DEPRECATED';           //  8192: since PHP 5.3.0
-   if ($level & E_USER_DEPRECATED  ) $levels[] = 'E_USER_DEPRECATED';      // 16384: since PHP 5.3.0
- //if ($level & E_ALL == E_ALL     ) $levels[] = 'E_ALL';                  // 32767 since PHP 5.4.x, 30719 in PHP 5.3.x, 6143 in PHP 5.2.x, 2047 previously
-
-   return join('|', $levels);
-}
