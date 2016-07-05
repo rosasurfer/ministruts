@@ -60,7 +60,7 @@ abstract class Mailer extends Object {
     *
     * @return bool - ob der Versand verschoben wurde.
     */
-   final protected function sendLater(array $args) {
+   protected function sendLater(array $args) {
       if (isSet($this->config['send-later']) && $this->config['send-later']) {
 
          $callable = array($this, 'sendMail');
@@ -78,8 +78,7 @@ abstract class Mailer extends Object {
           * vorzuschicken und den Versand im Hintergrund weiterlaufen zu lassen.  Da der Output-Buffer bei einem
           * Redirect nie voll ist, wartet PHP immer, ob die Shutdown-Funktion noch Content ausgibt.
           *
-          * Lösung:  Versand nicht während des Shutdowns, sondern per Message-Queue in einem anderen Prozeß ausführen.
-          *          (siehe https://www.dropr.org/)
+          * Lösung: Versand per Message-Queue in einem anderen Prozeß ausführen
           */
       }
       return false;

@@ -21,9 +21,9 @@ class BaseException extends \Exception implements IRosasurferException {
    /**
     * Create a new instance. Parameters are identical to the built-in PHP Exception and passed on.
     *
-    * @param  string     $message - exception description                           (default: null)
-    * @param  int        $code    - exception identifier, usually an application id (default: null)
-    * @param  \Exception $cause   - another exception causing this exception
+    * @param  string    $message - exception description                           (default: null)
+    * @param  int       $code    - exception identifier, usually an application id (default: null)
+    * @param  Exception $cause   - another exception causing this exception
     */
    public function __construct($message=null, $code=null, \Exception $cause=null) {
       parent::__construct($message, $code, $cause);

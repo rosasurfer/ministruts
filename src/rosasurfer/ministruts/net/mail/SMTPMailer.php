@@ -96,7 +96,7 @@ class SMTPMailer extends Mailer {
          $this->disconnect();
       }
       catch (\Exception $ex) {
-         Logger::handleException($ex, $inShutdownOnly=true);
+         System::handleDestructorException($ex);
          throw $ex;
       }
    }

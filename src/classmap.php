@@ -15,6 +15,7 @@ return array(
    'Object'                                                           => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/core/Object',
    'Singleton'                                                        => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/core/Singleton',
    'StaticClass'                                                      => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/core/StaticClass',
+   'ISurfable'                                                        => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/core/ISurfable',
 
    'CommonDAO'                                                        => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/dao/CommonDAO',
    'DaoWorker'                                                        => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/dao/DaoWorker',

@@ -81,7 +81,7 @@ final class Lock extends BaseLock {
          $this->release();
       }
       catch (\Exception $ex) {
-         Logger::handleException($ex, $inShutdownOnly=true);
+         System::handleDestructorException($ex);
          throw $ex;
       }
    }

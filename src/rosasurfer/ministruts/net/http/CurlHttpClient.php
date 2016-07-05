@@ -122,7 +122,7 @@ final class CurlHttpClient extends HttpClient {
          }
       }
       catch (\Exception $ex) {
-         Logger::handleException($ex, $inShutdownOnly=true);
+         System::handleDestructorException($ex);
          throw $ex;
       }
    }

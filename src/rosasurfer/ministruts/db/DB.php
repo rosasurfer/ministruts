@@ -59,7 +59,7 @@ abstract class DB extends Object {
          }
       }
       catch (\Exception $ex) {
-         Logger ::handleException($ex, $inShutdownOnly=true);
+         System::handleDestructorException($ex);
          throw $ex;
       }
    }

@@ -17,6 +17,19 @@ class System extends StaticClass {
    /** @var callable */
    private static $exceptionHandler;               // the registered exception handler
 
+   /** @var bool */
+   private static $inShutdown;                     // whether or not the script is in shutdown phase
+
+
+   /**
+    * Whether or not the script is currently in shutdown phase.
+    *
+    * @return bool
+    */
+   public static function isInShutdown() {
+      return (bool) self::$inShutdown;
+   }
+
 
    /**
     * Setup global error and exception handling.
@@ -28,7 +41,15 @@ class System extends StaticClass {
 
       set_exception_handler(self::$exceptionHandler=function(\Exception $ex) {
          self::handleException($ex);
-         exit(1);                                  // exit and signal the error
+      });
+
+      /**
+       * Attempting to throw an exception from a destructor during script shutdown causes a fatal error.
+       *
+       * @see  http://php.net/manual/en/language.oop5.decon.php
+       */
+      register_shutdown_function(function() {      // Detect entering of the shutdown phase. Should be the very first
+         self::$inShutdown = true;                 // function on the shutdown function stack.
       });
    }
 
@@ -52,45 +73,16 @@ class System extends StaticClass {
     * NOTE: The error handler must return FALSE to populate the internal PHP variable $php_errormsg.
     */
    public static function handleError($level, $message, $file, $line, array $context) {
-      //echoPre(__METHOD__.'()  error_reporting='.error_reporting().'  '.errorLevelToStr($level).': $message='.$message.', $file='.$file.', $line='.$line);
-
       // TODO: detect and handle recursive calls
+
+      //echoPre(__METHOD__.'(1)  '.errorLevelToStr($level).': $message='.$message.', $file='.$file.', $line='.$line);
 
       // ignore suppressed errors and errors not covered by the current reporting level
       $reportingLevel = error_reporting();
       if (!$reportingLevel)            return false;     // 0: the @ operator was specified
       if (!($reportingLevel & $level)) return true;      // error not covered by current reporting level
 
-
-      /*
-      !!! old legacy version !!!
-
-      // Error kapseln...
-      $exception = new PHPError($message, $file, $line, $context);
-      // ...und behandeln
-      if     ($level == E_USER_NOTICE ) Logger::log_1(null, $exception, L_NOTICE);
-      elseif ($level == E_USER_WARNING) Logger::log_1(null, $exception, L_WARN  );
-      else {
-         // Spezialfälle, die nicht zurückgeworfen werden dürfen/können
-         if ($level==E_STRICT || ($file=='Unknown' && $line==0)) {
-            self::handleException($exception);
-            exit(1);
-         }
-         // alles andere zurückwerfen
-         throw $exception;
-      }
-      return true;
-      */
-
-
-
-
-
-      /**
-       * new version
-       */
-
-      // wrap error in an exception
+      // wrap error in an \ErrorException
       $exception = new PHPError($message, $code=null, $severity=$level, $file, $line);
 
       // log non-critical errors and continue
@@ -102,7 +94,9 @@ class System extends StaticClass {
       */
 
 
-      // Handle cases where throwing an exception is not possible or not allowed.
+      /**
+       * Handle cases where throwing an exception is not possible or not allowed.
+       */
 
       /**
        * (1) Errors triggered by require() or require_once()
@@ -113,7 +107,7 @@ class System extends StaticClass {
        *
        *     @see  http://stackoverflow.com/questions/25584494/php-set-exception-handler-not-working-for-error-thrown-in-set-error-handler-cal
        *
-       *     Workaround: manually call the exception handler
+       *     Solution: manually call the exception handler
        */
       $function = DebugTools::getFQFunctionName($exception->getBetterTrace()[0]);
       if ($function=='require' || $function=='require_once') {
@@ -121,52 +115,79 @@ class System extends StaticClass {
          return true;
       }
 
-      /*
-      if ($level==E_STRICT || ($file=='Unknown' && $line==0)) {
-         self::$exceptionHandler->__invoke($exception);
-         return true;
-      }
-      */
-
       // throw back everything else
       throw $exception;
    }
 
 
    /**
-    * Global handler for otherwise unhandled exceptions. Exceptions are logged with level L_FATAL and the script is
-    * terminated.
+    * Handler for exceptions occurring in object destructors. This method is only called manually. If the script currently
+    * is in the shutdown phase the exception is passed on to the global exception handler (whereafter script execution
+    * always terminates). If the script is currently not in shutdown phase the exception is ignored.
     *
-    * @param  \Exception $exception - the unhandled exception
+    * @param   Exception $exception
+    *
+    * @see     http://php.net/manual/en/language.oop5.decon.php
+    *          Attempting to throw an exception from a destructor during script shutdown causes a fatal error.
+    *
+    * @example sample destructor:
+    *
+    * <pre>
+    * /**
+    *  * Destructor
+    *  *\/
+    * public function __destruct() {
+    *    try {
+    *       //...some work that might trigger an exception
+    *    }
+    *    catch (\Exception $ex) {
+    *       System::handleDestructorException($ex);
+    *       throw $ex;
+    *    }
+    * }
+    * </pre>
     */
-   public static function handleException(\Exception $exception) {
-      /**
-       * !!! old legacy version !!!
-       */
+   public static function handleDestructorException(\Exception $exception) {
+      if (self::isInShutdown()) {
+         self::handleException($exception);
+         exit(1);                            // exit und signal the error
+      }
+   }
+
+
+   /**
+    * Global handler for otherwise unhandled exceptions. The exception is logged with level L_FATAL and script execution
+    * is terminated.
+    *
+    * @param  Exception $exception - the unhandled exception
+    */
+   private static function handleException(\Exception $exception) {
+      // TODO: detect and handle recursive calls
+
+      // !!! old legacy version !!!
       Logger::handleException($exception);
       return;
 
 
-
-      // TODO: detect and handle recursive calls
-
       // collect data
       $type       = $exception instanceof \ErrorException ? 'Unexpected':'Unhandled';
       $exMessage  = trim(DebugTools::getBetterMessage($exception));
-      $traceStr   = DebugTools::getBetterTraceAsString($exception);
+      $indent     = ' ';
+      $traceStr   = $indent.'Stacktrace:'.NL.' -----------'.NL;
+      $traceStr  .= DebugTools::getBetterTraceAsString($exception, $indent);
       $file       = $exception->getFile();
       $line       = $exception->getLine();
-      $cliMessage = '[FATAL] '.$type.' '.$exMessage."\n in ".$file.' on line '.$line."\n";
+      $cliMessage = '[FATAL] '.$type.' '.$exMessage.NL.$indent.'in '.$file.' on line '.$line.NL;
 
       // display it
       if (CLI) {
-         echoPre($cliMessage."\n".$traceStr."\n");
+         echoPre($cliMessage.NL.$traceStr.NL);
       }
       else {
          echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif"><b>[FATAL]</b> '.$type.' '.nl2br(htmlSpecialChars($exMessage, ENT_QUOTES))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
          echo '<br>'.printPretty($traceStr, true);
-         echo "<br></div>\n";
+         echo '<br></div>'.NL;
       }
-      return true;
+      exit(1);                               // exit und signal the error
    }
 }

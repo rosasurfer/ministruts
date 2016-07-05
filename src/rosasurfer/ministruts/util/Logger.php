@@ -156,35 +156,21 @@ class Logger extends StaticClass {
     *
     * NOTE: PHP bricht das Script nach Aufruf dieses Handlers automatisch ab.
     *
-    * @param  \Exception $exception      - die zu behandelnde Exception
-    * @param  bool       $inShutdownOnly - Ob die Exception ggf. ignoriert werden soll (wenn sie in einem Destructor auftritt).
-    *                                      Befindet sich das Script im Shutdown, darf aus einem Destructor keine Exception mehr geworfen
-    *                                      werden.  Daher muß vorm Werfen der Exception diese Funktion mit $inShutdownOnly=TRUE
-    *                                      aufgerufen werden, um den Shutdown-Status zu testen und zu behandeln.
-    *                                     (1) Während des Shutdowns wird die Exception so behandelt, als wenn sie durch den installierten
-    *                                         Error-Handler ausgelöst worden wäre.
-    *                                     (2) Befindet sich das Script nicht im Shutdown, wird die Exception ignoriert.
+    * @param  Exception $exception - die zu behandelnde Exception
     */
-   public static function handleException(\Exception $exception, $inShutdownOnly=false) {
-      if ($inShutdownOnly && !isSet($GLOBALS['$__shutting_down']))
-         return;
-
+   public static function handleException(\Exception $exception) {
       try {
          self::init();
-
-         // TODO: Stimmt dieser Fehler mit der obigen Logik überein???
-         //
-         // Fatal error: Ignoring exception from ***::__destruct() while an exception is already active
-         //              (Uncaught PHPError in E:\Projekte\ministruts\src\php\file\image\barcode\test\image.php on line 19)
-         //              in E:\Projekte\ministruts\src\php\file\image\barcode\test\image.php on line 33
 
          // 1. Fehlerdaten ermitteln
          $type       = $exception instanceof \ErrorException ? 'Unexpected':'Unhandled';
          $exMessage  = trim(DebugTools::getBetterMessage($exception));
-         $traceStr   = DebugTools::getBetterTraceAsString($exception);
+         $indent     = ' ';
+         $traceStr   = $indent.'Stacktrace:'.NL.' -----------'.NL;
+         $traceStr  .= DebugTools::getBetterTraceAsString($exception, $indent);
          $file       = $exception->getFile();
          $line       = $exception->getLine();
-         $cliMessage = '[FATAL] '.$type.' '.$exMessage.NL.' in '.$file.' on line '.$line.NL;
+         $cliMessage = '[FATAL] '.$type.' '.$exMessage.NL.$indent.'in '.$file.' on line '.$line.NL;
 
          // 2. Exception anzeigen
          if (self::$print) {
@@ -242,6 +228,9 @@ class Logger extends StaticClass {
          $file = $secondary->getFile();
          $line = $secondary->getLine();
          self::error_log('PHP secondary '.(string)$secondary.' in '.$file.' on line '.$line);
+      }
+      finally {
+         exit(1);                               // exit und signal the error
       }
    }
 

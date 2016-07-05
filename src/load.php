@@ -957,12 +957,10 @@ function ifNull($value, $altValue) {
 // =====================================================================================================================
 
 
-// Beginn des Shutdowns markieren, um fatale Fehler beim Shutdown zu verhindern (siehe Logger)
-// -------------------------------------------------------------------------------------------
-register_shutdown_function(create_function(null, '$GLOBALS[\'$__shutting_down\'] = true;'));    // allererste Funktion auf dem Shutdown-Funktion-Stack
-
 
 /**
+ * TODO: Wird nur in Mailer::sendLater() aufgerufen
+ *
  * Registriert wie register_shutdown_function() Funktionen zur Ausführung während des Shutdowns.  Die
  * Funktionen werden jedoch nicht in der Reihenfolge der Registrierung aufgerufen, sondern auf einen Stack
  * gelegt und während des Shutdowns von dort abgerufen (stacktypisch Last-In-First-Out).  Alle zusätzlich
@@ -970,8 +968,7 @@ register_shutdown_function(create_function(null, '$GLOBALS[\'$__shutting_down\']
  *
  * @param  callable $callback - Funktion oder Methode, die ausgeführt werden soll
  *
- *
- * @see register_shutdown_function()
+ * @see  register_shutdown_function()
  */
 function push_shutdown_function(/*callable*/ $callback = null /*, $args1, $args2, ...*/) {
    static $stack = array();

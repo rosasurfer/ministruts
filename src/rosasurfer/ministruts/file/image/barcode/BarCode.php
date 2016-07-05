@@ -367,7 +367,7 @@ abstract class BarCode extends Object {
             imageDestroy($this->hImg);
       }
       catch (\Exception $ex) {
-         Logger ::handleException($ex, $inShutdownOnly=true);
+         System::handleDestructorException($ex);
          throw $ex;
       }
    }

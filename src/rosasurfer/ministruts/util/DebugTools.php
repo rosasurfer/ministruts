@@ -201,7 +201,7 @@ class DebugTools extends StaticClass {
    /**
     * Return a more readable version of an exception's message.
     *
-    * @param  \Exception $exception - any exception (not only RosasurferExceptions)
+    * @param  Exception $exception - any exception (not only RosasurferExceptions)
     *
     * @return string - message
     */
@@ -219,23 +219,24 @@ class DebugTools extends StaticClass {
 
 
    /**
-    * Return a more readable version of an exception's stacktrace. This representation also contains informations about
+    * Return a more readable version of an exception's stacktrace. The representation also contains informations about
     * nested exceptions.
     *
-    * @param  \Exception $exception - any exception (not only RosasurferExceptions)
+    * @param  Exception $exception - any exception (not only RosasurferExceptions)
+    * @param  string    $indent    - indent the resulting lines by this value (default: empty string)
     *
     * @return string - readable stacktrace
     */
-   public static function getBetterTraceAsString(\Exception $exception) {
+   public static function getBetterTraceAsString(\Exception $exception, $indent='') {
       if ($exception instanceof IRosasurferException) $trace = $exception->getBetterTrace();
       else                                            $trace = self::fixTrace($exception->getTrace(), $exception->getFile(), $exception->getLine());
-      $result = self::formatTrace($trace, ' ');
+      $result = self::formatTrace($trace, $indent);
 
       if ($cause=$exception->getPrevious()) {
          // recursively add stacktraces of all nested exceptions
          $message = self::getBetterMessage($cause);
-         $result .= NL.NL.'caused by'.NL.$message.NL.NL;
-         $result .= self::{__FUNCTION__}($cause);                    // recursion
+         $result .= NL.$indent.'caused by'.NL.$indent.$message.NL;
+         $result .= self::{__FUNCTION__}($cause, $indent);              // recursion
       }
       return $result;
    }
