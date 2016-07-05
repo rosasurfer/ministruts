@@ -9,6 +9,7 @@ use const rosasurfer\DAYS;
 use const rosasurfer\HOUR;
 use const rosasurfer\HOURS;
 use const rosasurfer\LOCALHOST;
+use const rosasurfer\MINISTRUTS_ROOT;
 use const rosasurfer\MINUTE;
 use const rosasurfer\MINUTES;
 use const rosasurfer\MONTH;
@@ -18,8 +19,6 @@ use const rosasurfer\SECONDS;
 use const rosasurfer\WEEK;
 use const rosasurfer\WINDOWS;
 use const rosasurfer\YEAR;
-
-use const rosasurfer\ministruts\ROOT as MINISTRUTS_ROOT;
 
 
 /**
@@ -40,16 +39,16 @@ use const rosasurfer\ministruts\ROOT as MINISTRUTS_ROOT;
 /**
  * (1) block framework re-includes
  */
-if (defined('rosasurfer\ministruts\ROOT')) return;
+if (defined('rosasurfer\MINISTRUTS_ROOT')) return;
+define('rosasurfer\MINISTRUTS_ROOT', dirName(__DIR__));
 
 
 /**
  * (2) define helper constants
  */
-define('rosasurfer\ministruts\ROOT',  dirName(__DIR__));
-define('rosasurfer\CLI'            , !isSet($_SERVER['REQUEST_METHOD']));              // whether or not we run on command line interface
-define('rosasurfer\LOCALHOST'      , !CLI && @$_SERVER['REMOTE_ADDR']=='127.0.0.1');   // whether or not we run on localhost
-define('rosasurfer\WINDOWS'        , (strToUpper(subStr(PHP_OS, 0, 3))=='WIN'));       // whether or not we run on Windows
+define('rosasurfer\CLI'      , !isSet($_SERVER['REQUEST_METHOD']));                 // whether or not we run on command line interface
+define('rosasurfer\LOCALHOST', !CLI && @$_SERVER['REMOTE_ADDR']=='127.0.0.1');      // whether or not we run on localhost
+define('rosasurfer\WINDOWS'  , (strToUpper(subStr(PHP_OS, 0, 3))=='WIN'));          // whether or not we run on Windows
 
 // custom log level
 define('rosasurfer\L_DEBUG' ,  1);
@@ -60,11 +59,11 @@ define('rosasurfer\L_ERROR' , 16);
 define('rosasurfer\L_FATAL' , 32);
 
 // log destinations for the built-in function error_log()
-define('rosasurfer\ERROR_LOG_SYSLOG', 0);                                              // message is sent to PHP's system logger
-define('rosasurfer\ERROR_LOG_MAIL'  , 1);                                              // message is sent by email
-define('rosasurfer\ERROR_LOG_DEBUG' , 2);                                              // message is sent through the PHP debugging connection
-define('rosasurfer\ERROR_LOG_FILE'  , 3);                                              // message is appended to a file destination
-define('rosasurfer\ERROR_LOG_SAPI'  , 4);                                              // message is sent directly to the SAPI logging handler
+define('rosasurfer\ERROR_LOG_SYSLOG', 0);                                           // message is sent to PHP's system logger
+define('rosasurfer\ERROR_LOG_MAIL'  , 1);                                           // message is sent by email
+define('rosasurfer\ERROR_LOG_DEBUG' , 2);                                           // message is sent through the PHP debugging connection
+define('rosasurfer\ERROR_LOG_FILE'  , 3);                                           // message is appended to a file destination
+define('rosasurfer\ERROR_LOG_SAPI'  , 4);                                           // message is sent directly to the SAPI logging handler
 
 // time periods
 define('rosasurfer\SECOND',   1          ); define('rosasurfer\SECONDS', SECOND);
@@ -72,8 +71,8 @@ define('rosasurfer\MINUTE',  60 * SECONDS); define('rosasurfer\MINUTES', MINUTE)
 define('rosasurfer\HOUR'  ,  60 * MINUTES); define('rosasurfer\HOURS'  , HOUR  );
 define('rosasurfer\DAY'   ,  24 * HOURS  ); define('rosasurfer\DAYS'   , DAY   );
 define('rosasurfer\WEEK'  ,   7 * DAYS   ); define('rosasurfer\WEEKS'  , WEEK  );
-define('rosasurfer\MONTH' ,  31 * DAYS   ); define('rosasurfer\MONTHS' , MONTH );      // fuzzy but garantied to cover any month
-define('rosasurfer\YEAR'  , 366 * DAYS   ); define('rosasurfer\YEARS'  , YEAR  );      // fuzzy but garantied to cover any year
+define('rosasurfer\MONTH' ,  31 * DAYS   ); define('rosasurfer\MONTHS' , MONTH );   // fuzzy but garantied to cover any month
+define('rosasurfer\YEAR'  , 366 * DAYS   ); define('rosasurfer\YEARS'  , YEAR  );   // fuzzy but garantied to cover any year
 
 // weekdays
 define('rosasurfer\SUNDAY'   , 0);
@@ -160,8 +159,7 @@ spl_autoload_register(function($class) {
       }
    }
    catch (\Exception $ex) {
-      !$ex instanceof ClassNotFoundException && $ex=new ClassNotFoundException('Cannot load class '.$class, null, $ex);
-      throw $ex;
+      throw ($ex instanceof ClassNotFoundException) ? $ex : new ClassNotFoundException('Cannot load class '.$class, null, $ex);
    }
 });
 

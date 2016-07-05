@@ -1,5 +1,5 @@
 <?php
-use const rosasurfer\ministruts\ROOT as MINISTRUTS_ROOT;
+use const rosasurfer\MINISTRUTS_ROOT;
 
 
 /**
