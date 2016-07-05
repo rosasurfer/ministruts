@@ -224,11 +224,11 @@ class Logger extends StaticClass {
       try {
          self:: init();
 
-         // TODO: Stimmt dieser Fehler mit der obigen Logik überein???
-         //
+         // Überbleibsel aus PHP 5.1 und 5.2:
          // Fatal error: Ignoring exception from ***::__destruct() while an exception is already active
-         //              (Uncaught PHPErrorException in E:\Projekte\ministruts\src\php\file\image\barcode\test\image.php on line 19)
-         //              in E:\Projekte\ministruts\src\php\file\image\barcode\test\image.php on line 33
+         //
+         // @see  http://stackoverflow.com/questions/7341768/is-it-possible-to-know-if-youre-already-in-an-exception-in-php
+         // @see  https://3v4l.org/P7M1h
 
          // 1. Fehlerdaten ermitteln
          $message  = ($exception instanceof NestableException) ? (string)$exception : get_class($exception).': '.$exception->getMessage();
