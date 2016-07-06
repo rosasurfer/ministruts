@@ -44,7 +44,7 @@ class Logger extends StaticClass {
 
    /**
     * NOTE: Diese Klasse muß möglichst wenige externe Abhängigkeiten haben, um das Auftreten weiterer Fehler während der
-    *       Fehlerverarbeitung möglichst zu verhindern.
+    *       Fehlerverarbeitung zu vermindern.
     */
 
    // Default-Konfiguration (kann angepaßt werden, siehe Klassenbeschreibung)
@@ -80,19 +80,18 @@ class Logger extends StaticClass {
 
       // Standardmäßig ist die Ausgabe am Bildschirm bei lokalem Zugriff an und bei Remote-Zugriff aus, es sei denn,
       // es ist ausdrücklich etwas anderes konfiguriert.
-      self::$print = CLI || LOCALHOST || (bool)ini_get('display_errors');
+      self::$print = CLI || LOCALHOST || (bool) ini_get('display_errors');
 
 
       // Der E-Mailversand ist aktiv, wenn in der Projektkonfiguration mindestens eine E-Mailadresse angegeben wurde.
       self::$mail          = false;
       self::$mailReceivers = array();
-      $receivers = Config ::get('mail.address.forced-receiver', '');    // Zum mailen wird keine Klasse, sondern die PHP-interne
+      $receivers = Config::get('mail.address.forced-receiver', '');     // Zum mailen wird keine Klasse, sondern die PHP-interne
       if (strLen($receivers) == 0)                                      // mail()-Funktion benutzt. Die Konfiguration muß deshalb hier
          $receivers = Config ::get('log.mail.receiver', '');            // selbst auf "mail.address.forced-receiver" geprüft werden.
       foreach (explode(',', $receivers) as $receiver) {
-         // TODO: Adressformat validieren
          if ($receiver=trim($receiver))
-            self::$mailReceivers[] = $receiver;
+            self::$mailReceivers[] = $receiver;                         // TODO: Adressformat validieren
       }
       self::$mail = (bool) self::$mailReceivers;
 
@@ -100,17 +99,17 @@ class Logger extends StaticClass {
       // Der SMS-Versand ist aktiv, wenn in der Projektkonfiguration mindestens eine Rufnummer und ein SMS-Loglevel angegeben wurden.
       self::$sms          = false;
       self::$smsReceivers = array();
-      $receivers = Config ::get('log.sms.receiver', null);
+      $receivers = Config::get('log.sms.receiver', null);
       foreach (explode(',', $receivers) as $receiver) {
          if ($receiver=trim($receiver))
             self::$smsReceivers[] = $receiver;
       }
-      $logLevel = Config ::get('log.sms.loglevel', null);
+      $logLevel = Config::get('log.sms.loglevel', null);
       if (strLen($logLevel) > 0) {
          if (defined('L_'.strToUpper($logLevel))) self::$smsLogLevel = constant('L_'.strToUpper($logLevel));
          else                                     self::$smsLogLevel = null;
       }
-      $options = Config ::get('sms.clickatell', null);
+      $options = Config::get('sms.clickatell', null);
       if (!empty($options['username']) && !empty($options['password']) && !empty($options['api_id']))
          self::$smsOptions = $options;
       self::$sms = self::$smsReceivers && self::$smsLogLevel && self::$smsOptions;
@@ -178,7 +177,7 @@ class Logger extends StaticClass {
                echoPre($cliMessage.NL.$traceStr.NL);
             }
             else {
-               echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif"><b>[FATAL] Uncaught</b> '.nl2br(htmlSpecialChars($message, ENT_QUOTES))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
+               echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif"><b>[FATAL] Uncaught</b> '.nl2br(htmlSpecialChars($exMessage, ENT_QUOTES))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
                echo '<br>'.printPretty($traceStr, true);
                echo '<br></div>'.NL;
             }
