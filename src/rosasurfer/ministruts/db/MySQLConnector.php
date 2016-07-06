@@ -217,6 +217,37 @@ final class MySQLConnector extends DB {
 
 
    /**
+    * Ersetzt in einem String mehrfache durch einfache Leerzeichen.
+    *
+    * @param  string $string - der zu bearbeitende String
+    *
+    * @return string
+    */
+   private static function stripDoubleSpaces($string) {
+      if ($string===null || $string==='')
+         return $string;
+      return preg_replace('/\s+/', ' ', $string);
+   }
+
+
+   /**
+    * Entfernt Zeilenumbrüche aus einem String und ersetzt sie mit Leerzeichen.  Mehrere aufeinanderfolgende
+    * Zeilenumbrüche werden auf ein Leerzeichen reduziert.
+    *
+    * @param  string $string - der zu bearbeitende String
+    *
+    * @return string
+    */
+   public static function stripLineBreaks($string) {
+      if ($string===null || $string==='')
+         return $string;
+      return str_replace(array("\r\n", "\r", "\n"),
+                         array("\n"  , "\n", " " ),
+                         $string);
+   }
+
+
+   /**
     * Liest die aktuell laufenden und für diese Connection sichtbaren Prozesse aus.
     *
     * @return array - Report mit Processlist-Daten
@@ -260,7 +291,7 @@ final class MySQLConnector extends DB {
       foreach ($list as &$p) {
          if (($i=striPos($p['Host'], '.localdomain:')) || ($i=striPos($p['Host'], ':')))
             $p['Host'] = subStr($p['Host'], 0, $i);
-         $p['Info'] = trim(String ::stripDoubleSpaces($p['Info']));
+         $p['Info'] = trim(self::stripDoubleSpaces($p['Info']));
 
          $lengthId      = max($lengthId     , strLen($p['Id'     ]));
          $lengthUser    = max($lengthUser   , strLen($p['User'   ]));
@@ -400,7 +431,7 @@ final class MySQLConnector extends DB {
                                     'connection'  => (int) $match[7],
                                     'host'        =>       $match[8],
                                     'user'        =>       $match[9],
-                                    'query'       => trim(String ::stripDoubleSpaces(String ::stripLineBreaks($match[10]))),
+                                    'query'       => trim(self::stripDoubleSpaces(self::stripLineBreaks($match[10]))),
                                     'locks'       => array(),
                                     );
                $transactions[$match[2]] = $transaction;

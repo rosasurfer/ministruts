@@ -995,54 +995,6 @@ function push_shutdown_function(/*callable*/ $callback = null /*, $args1, $args2
 
 
 /**
- * Shortcut-Ersatz für String::htmlSpecialChars()
- *
- * @param  string $string - zu kodierender String
- *
- * @return string - kodierter String
- *
- * Note:
- * -----
- * The translations performed are:
- *    '&' (ampersand) becomes '&amp;'
- *    '"' (double quote) becomes '&quot;' when ENT_NOQUOTES is not set
- *    ''' (single quote) becomes '&#039;' only when ENT_QUOTES is set
- *    '<' (less than) becomes '&lt;'
- *    '>' (greater than) becomes '&gt;'
- *
- * @see String::htmlSpecialChars()
- */
-function htmlEncode($string) {
-   if (PHP_VERSION < '5.2.3')
-      return htmlSpecialChars($string, ENT_QUOTES, 'ISO-8859-1');
-
-   return htmlSpecialChars($string, ENT_QUOTES, 'ISO-8859-1', true);
-}
-
-
-/**
- * Dekodiert einen HTML-String nach ISO-8859-15.
- *
- * @param  string $html - der zu dekodierende String
- *
- * @return string
- */
-function decodeHtml($html) {
-   if ($html === null || $html === '')
-      return $html;
-
-   static $table = null;
-   if ($table === null) {
-      $table = array_flip(get_html_translation_table(HTML_ENTITIES, ENT_QUOTES));
-      $table['&nbsp;'] = ' ';
-      $table['&euro;'] = '€';
-   }
-   $string = strTr($html, $table);
-   return preg_replace('/&#(\d+);/me', "chr('\\1')", $string);
-}
-
-
-/**
  * Addiert zu einem Datum eine Anzahl von Tagen.
  *
  * @param  string $date - Ausgangsdatum (Format: yyyy-mm-dd)
