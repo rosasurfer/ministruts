@@ -1,5 +1,6 @@
 <?php
 use rosasurfer\ministruts\exceptions\IllegalTypeException;
+use rosasurfer\ministruts\exceptions\IRosasurferException;
 
 use const rosasurfer\NL;
 
