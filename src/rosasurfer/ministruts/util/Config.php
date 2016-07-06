@@ -5,6 +5,7 @@ use rosasurfer\ministruts\exceptions\RuntimeException;
 
 use const rosasurfer\CLI;
 use const rosasurfer\LOCALHOST;
+use const rosasurfer\SECONDS;
 use const rosasurfer\WINDOWS;
 
 
