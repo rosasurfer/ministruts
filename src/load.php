@@ -511,10 +511,11 @@ function strLeft($string, $length) {
  * @param  string $string         - initial string
  * @param  string $limiter        - limiting substring (one or more characters)
  * @param  int    $count          - positive: the specified occurrence of the limiting substring from the start
- *                                            of the string (default: the first occurrence)
+ *                                            of the string
  *                                  negative: the specified occurrence of the limiting substring from the end of
  *                                            the string
  *                                  zero:     an empty string is returned
+ *                                  (default: 1 = the first occurrence)
  * @param  bool   $includeLimiter - whether or not to include the limiting substring in the returned result
  *                                  (default: FALSE)
  * @param  mixed  $onNotFound     - value to return if the specified occurrence of the limiting substring is not found
@@ -613,10 +614,11 @@ function strRight($string, $length) {
  * @param  string $string         - initial string
  * @param  string $limiter        - limiting substring (one or more characters)
  * @param  int    $count          - positive: the specified occurrence of the limiting substring counted from the
- *                                            start of the string (default: the first occurrence)
+ *                                            start of the string
  *                                  negative: the specified occurrence of the limiting substring counted from the
  *                                            end of the string
  *                                  zero:     the initial string is returned
+ *                                  (default: 1 = the first occurrence)
  * @param  bool   $includeLimiter - whether or not to include the limiting substring in the returned result
  *                                  (default: FALSE)
  * @param  mixed  $onNotFound     - value to return if the specified occurrence of the limiting substring is not found
