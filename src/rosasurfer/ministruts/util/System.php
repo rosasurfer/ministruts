@@ -191,4 +191,17 @@ class System extends StaticClass {
       }
       exit(1);                               // exit und signal the error
    }
+
+
+   /**
+    * Triggers execution of the garbage collector.
+    */
+   public static function collectGarbage() {
+      $wasEnabled = gc_enabled();
+      if (!$wasEnabled) gc_enable();
+
+      gc_collect_cycles();
+
+      if (!$wasEnabled) gc_disable();
+   }
 }

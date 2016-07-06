@@ -133,9 +133,6 @@ final class String extends StaticClass {
       if (!strLen($string))
          return $string;
 
-      if (PHP_VERSION < '5.2.3')
-         return htmlSpecialChars($string, $quoteStyle, $charset);
-
       return htmlSpecialChars($string, $quoteStyle, $charset, $doubleEncode);
    }
 
@@ -163,9 +160,6 @@ final class String extends StaticClass {
       }
       if (!strLen($string))
          return $string;
-
-      if (PHP_VERSION < '5.2.3')
-         return htmlEntities($string, $quoteStyle, $charset);
 
       return htmlEntities($string, $quoteStyle, $charset, $doubleEncode);
    }
