@@ -2,6 +2,7 @@
 use rosasurfer\ministruts\exceptions\IllegalTypeException;
 use rosasurfer\ministruts\exceptions\InvalidArgumentException;
 
+use const rosasurfer\DAYS;
 use const rosasurfer\L_WARN;
 
 

@@ -3,6 +3,7 @@ use rosasurfer\ministruts\exceptions\PHPError;
 
 use const rosasurfer\CLI;
 use const rosasurfer\L_WARN;
+use const rosasurfer\NL;
 
 
 /**
