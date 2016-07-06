@@ -178,6 +178,9 @@ class Logger extends StaticClass {
                echo '<br></div>'.NL;
             }
          }
+         else {
+            echoPre('application error');
+         }
 
          // 3. Exception an die konfigurierten Adressen mailen
          if (self::$mail) {
