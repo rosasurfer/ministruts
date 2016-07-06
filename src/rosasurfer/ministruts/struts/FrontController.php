@@ -8,6 +8,7 @@ use const rosasurfer\LOCALHOST;
 use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_INFO;
 use const rosasurfer\L_NOTICE;
+use const rosasurfer\SECONDS;
 use const rosasurfer\WINDOWS;
 
 
