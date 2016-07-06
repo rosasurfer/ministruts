@@ -42,19 +42,14 @@ use const rosasurfer\WINDOWS;
  */
 class Logger extends StaticClass {
 
-   /**
-    * NOTE: Diese Klasse muß möglichst wenige externe Abhängigkeiten haben, um das Auftreten weiterer Fehler während der
-    *       Fehlerverarbeitung zu vermindern.
-    */
 
-   // Default-Konfiguration (kann angepaßt werden, siehe Klassenbeschreibung)
-   private static /*bool    */ $print         = null;       // ob die Nachricht am Bildschirm angezeigt werden soll
+   private static /*bool    */ $print;                      // ob die Nachricht am Bildschirm angezeigt werden soll
    private static /*bool    */ $mail;                       // ob die Nachricht per E-Mail verschickt werden soll (alle Loglevel)
-   private static /*string[]*/ $mailReceivers = array();    // E-Mailempfänger
+   private static /*string[]*/ $mailReceivers = [];         // E-Mailempfänger
    private static /*bool    */ $sms;                        // ob die Nachricht per SMS verschickt werden soll
-   private static /*string[]*/ $smsReceivers  = array();    // SMS-Empfänger
+   private static /*string[]*/ $smsReceivers  = [];         // SMS-Empfänger
    private static /*int     */ $smsLogLevel   = L_FATAL;    // notwendiger Loglevel für den SMS-Versand
-   private static /*string[]*/ $smsOptions    = array();    // SMS-Konfiguration
+   private static /*string[]*/ $smsOptions    = [];         // SMS-Konfiguration
 
 
    // Default-Loglevel (kann angepaßt werden, siehe Klassenbeschreibung)
@@ -74,8 +69,9 @@ class Logger extends StaticClass {
    /**
     * Initialisiert die statischen Klassenvariablen.
     */
-   private static function init() {
-      if (!is_null(self::$print))
+   public static function init() {
+      static $initialized = false;
+      if ($initialized)
          return;
 
       // Standardmäßig ist die Ausgabe am Bildschirm bei lokalem Zugriff an und bei Remote-Zugriff aus, es sei denn,
@@ -113,6 +109,8 @@ class Logger extends StaticClass {
       if (!empty($options['username']) && !empty($options['password']) && !empty($options['api_id']))
          self::$smsOptions = $options;
       self::$sms = self::$smsReceivers && self::$smsLogLevel && self::$smsOptions;
+
+      $initialized = true;
    }
 
 
@@ -159,8 +157,6 @@ class Logger extends StaticClass {
     */
    public static function handleException(\Exception $exception) {
       try {
-         self::init();
-
          // 1. Fehlerdaten ermitteln
          $type       = $exception instanceof \ErrorException ? 'Unexpected':'Unhandled';
          $exMessage  = trim(DebugTools::getBetterMessage($exception));
@@ -177,7 +173,7 @@ class Logger extends StaticClass {
                echoPre($cliMessage.NL.$traceStr.NL);
             }
             else {
-               echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif"><b>[FATAL] Uncaught</b> '.nl2br(htmlSpecialChars($exMessage, ENT_QUOTES))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
+               echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif"><b>[FATAL]</b> '.$type.' '.nl2br(htmlSpecialChars($exMessage, ENT_QUOTES))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
                echo '<br>'.printPretty($traceStr, true);
                echo '<br></div>'.NL;
             }
@@ -311,8 +307,6 @@ class Logger extends StaticClass {
 
       try {
          if (!isSet(self::$logLevels[$level])) throw new InvalidArgumentException('Invalid log level: '.$level);
-         self:: init();
-
 
          // 1. Logdaten ermitteln
          $exMessage = null;
@@ -481,3 +475,4 @@ class Logger extends StaticClass {
       }
    }
 }
+Logger::init();

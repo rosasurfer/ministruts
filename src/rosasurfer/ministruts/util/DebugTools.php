@@ -1,4 +1,6 @@
 <?php
+use rosasurfer\ministruts\exceptions\IllegalTypeException;
+
 use const rosasurfer\NL;
 
 
@@ -18,7 +20,6 @@ class DebugTools extends StaticClass {
     * @return array - new fixed stacktrace
     *
     * @example
-    *
     * original stacktrace:
     * <pre>
     *   require_once()  # line 5,  file: /var/www/phalcon/vokuro/vendor/autoload.php
@@ -206,12 +207,13 @@ class DebugTools extends StaticClass {
     * @return string - message
     */
    public static function getBetterMessage(\Exception $exception) {
-      $class = get_class($exception);
-      if (($pos=strRPos($class, '\\')) !== false)
-         $class = strToLower(subStr($class, 0, $pos)).subStr($class, $pos);
-      $result = $class;
+      $class     = get_class($exception);
+      $namespace = strLeftTo   ($class, '\\', -1, true,  ''    );
+      $name      = strRightFrom($class, '\\', -1, false, $class);
+      $result    = strToLower($namespace).$name;
+
       if ($exception instanceof \ErrorException)
-         $result .= ' ('.errorLevelToStr($exception->getSeverity()).')';
+         $result .= ' '.self::errorLevelToStr($exception->getSeverity());
       $result .= (strLen($message=$exception->getMessage()) ? ': ':'').$message;
 
       return $result;
@@ -239,5 +241,40 @@ class DebugTools extends StaticClass {
          $result .= self::{__FUNCTION__}($cause, $indent);              // recursion
       }
       return $result;
+   }
+
+
+   /**
+    * Return a human-readable form of the specified error reporting level.
+    *
+    * @param  int $level - reporting level (default: the currently active reporting level)
+    *
+    * @return string
+    */
+   public static function errorLevelToStr($level=null) {
+      if (!func_num_args()) $level = error_reporting();
+      if (!is_int($level)) throw new IllegalTypeException('Illegal type of parameter $level: '.getType($level));
+
+      $levels = array();
+
+      if (!$level                     ) $levels[] = '0';                      //  zero
+      if ($level & E_ERROR            ) $levels[] = 'E_ERROR';                //     1
+      if ($level & E_WARNING          ) $levels[] = 'E_WARNING';              //     2
+      if ($level & E_PARSE            ) $levels[] = 'E_PARSE';                //     4
+      if ($level & E_NOTICE           ) $levels[] = 'E_NOTICE';               //     8
+      if ($level & E_CORE_ERROR       ) $levels[] = 'E_CORE_ERROR';           //    16
+      if ($level & E_CORE_WARNING     ) $levels[] = 'E_CORE_WARNING';         //    32
+      if ($level & E_COMPILE_ERROR    ) $levels[] = 'E_COMPILE_ERROR';        //    64
+      if ($level & E_COMPILE_WARNING  ) $levels[] = 'E_COMPILE_WARNING';      //   128
+      if ($level & E_USER_ERROR       ) $levels[] = 'E_USER_ERROR';           //   256
+      if ($level & E_USER_WARNING     ) $levels[] = 'E_USER_WARNING';         //   512
+      if ($level & E_USER_NOTICE      ) $levels[] = 'E_USER_NOTICE';          //  1024
+      if ($level & E_STRICT           ) $levels[] = 'E_STRICT';               //  2048
+      if ($level & E_RECOVERABLE_ERROR) $levels[] = 'E_RECOVERABLE_ERROR';    //  4096
+      if ($level & E_DEPRECATED       ) $levels[] = 'E_DEPRECATED';           //  8192
+      if ($level & E_USER_DEPRECATED  ) $levels[] = 'E_USER_DEPRECATED';      // 16384
+      if ($level & E_ALL == E_ALL     ) $levels   = ['E_ALL'];                // 32767
+
+      return join('|', $levels);
    }
 }

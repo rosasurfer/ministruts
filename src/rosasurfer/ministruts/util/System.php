@@ -75,7 +75,7 @@ class System extends StaticClass {
    public static function handleError($level, $message, $file, $line, array $context) {
       // TODO: detect and handle recursive calls
 
-      //echoPre(__METHOD__.'(1)  '.errorLevelToStr($level).': $message='.$message.', $file='.$file.', $line='.$line);
+      //echoPre(__METHOD__.'(1)  '.DebugTools::errorLevelToStr($level).': $message='.$message.', $file='.$file.', $line='.$line);
 
       // ignore suppressed errors and errors not covered by the current reporting level
       $reportingLevel = error_reporting();
