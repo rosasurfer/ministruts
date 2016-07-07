@@ -12,44 +12,44 @@ use const rosasurfer\WINDOWS;
 /**
  * Config
  *
- * Klasse zur Anwendungskonfiguration.  Einstellungen werden in Dateien "config.properties" und
- * "config-custom.properties" abgelegt, die in folgender Reihenfolge gesucht und verarbeitet werden:
+ * Klasse zur Anwendungskonfiguration. Einstellungen werden in Dateien "config.properties" und
+ * "config-default.properties" abgelegt, die in folgender Reihenfolge gesucht und verarbeitet werden:
  *
  *
  * Webanwendungen:
  * ---------------
- *    - "config-custom.properties" im Config-Verzeichnis der Anwendung: APPLICATION_ROOT.'/app/config/'
- *    - "config.properties"        im Config-Verzeichnis der Anwendung: APPLICATION_ROOT.'/app/config/'
+ *    - "config.properties"         im Config-Verzeichnis der Anwendung: APPLICATION_ROOT.'/app/config/'
+ *    - "config-default.properties" im Config-Verzeichnis der Anwendung: APPLICATION_ROOT.'/app/config/'
  *
  *    Für jeden einzelnen Pfad des Include-Pfades:
- *    - "config-custom.properties"
  *    - "config.properties"
+ *    - "config-default.properties"
  *
  *
  * Konsolenanwendungen:
  * --------------------
- *    - "config-custom.properties" im aktuellen Verzeichnis
- *    - "config.properties"        im aktuellen Verzeichnis
- *    - "config-custom.properties" im Scriptverzeichnis
- *    - "config.properties"        im Scriptverzeichnis
+ *    - "config.properties"         im aktuellen Verzeichnis
+ *    - "config-default.properties" im aktuellen Verzeichnis
+ *    - "config.properties"         im Scriptverzeichnis
+ *    - "config-default.properties" im Scriptverzeichnis
  *
  *    Für jeden einzelnen Pfad des Include-Pfades:
- *    - "config-custom.properties"
  *    - "config.properties"
+ *    - "config-default.properties"
  *
  *
  * Durch diese Reihenfolge können mehrere Dateien gleichen Namens geladen werden, z.B. eine für die
  * Konfiguration einer Bibliothek (liegt im Include-Path der Bibliothek) und eine weitere für die
- * Konfiguration eines einzelnen Projektes (liegt im WEB-INF-Verzeichnis des Projektes).  Dabei haben
- * die zuerst eingelesenen Einstellungen eine höhere Priorität als die später eingelesenen.  Allgemeine
+ * Konfiguration eines einzelnen Projektes (liegt im WEB-INF-Verzeichnis des Projektes). Dabei haben
+ * die zuerst eingelesenen Einstellungen eine höhere Priorität als die später eingelesenen. Allgemeine
  * Einstellungen in einer Bibliothek können so durch eigene Einstellungen im Projektverzeichnis
- * überschrieben werden.  Einstellungen in "config-custom.properties" haben eine höhere Priorität als
- * die entsprechenden Einstellungen einer "config.properties" im selben Verzeichnis.
+ * überschrieben werden. Einstellungen in "config.properties" haben eine höhere Priorität als die
+ * entsprechenden Einstellungen einer "config-default.properties" im selben Verzeichnis.
  *
- * Die Datei "config.properties" enthält allgemeingültige oder Default-Einstellungen eines Projektes.
- * Diese Datei wird im Repository gespeichert.  Die Datei "config-custom.properties" hingegen enthält
- * arbeitsplatzspezifische Einstellungen für den Entwicklungsbetrieb oder spezielle, nicht öffentliche
- * Einstellungen für den Produktivbetrieb.  Sie wird nicht im Repository gespeichert.
+ * Die Datei "config-default.properties" enthält allgemeingültige oder Default-Einstellungen eines Projektes.
+ * Diese Datei wird im Repository gespeichert. Die Datei "config.properties" hingegen enthält arbeitsplatzspezifische
+ * Einstellungen für den Entwicklungsbetrieb oder spezielle, nicht öffentliche Einstellungen für den Produktivbetrieb.
+ * Sie wird nicht im Repository gespeichert.
  *
  * Dateiformat:
  * ------------
@@ -82,8 +82,8 @@ final class Config extends Object {
 
 
    /**
-    * Gibt die Instanz dieser Klasse zurück.  Obwohl Config nicht Singleton implementiert, gibt es im
-    * User-Code nur eine einzige Instanz.  Diese Instanz wird gecacht.
+    * Gibt die Instanz dieser Klasse zurück. Obwohl Config nicht Singleton implementiert, gibt es im
+    * User-Code nur eine einzige Instanz. Diese Instanz wird gecacht.
     *
     * @return Config
     */
@@ -129,15 +129,15 @@ final class Config extends Object {
    /**
     * Constructor
     *
-    * Lädt die Konfiguration aus allen existierenden config.properties- und config-custom.properties-
-    * Dateien.  Die config-custom.properties-Dateien sollte nicht im Repository gespeichert werden, so
-    * daß eine globale und eine lokale Konfiguration mit unterschiedlichen Einstellungen möglich sind.
-    * Lokale Einstellungen überschreiben globale Einstellungen.
+    * Lädt die Konfiguration aus allen existierenden config-default.properties- und config.properties-Dateien.
+    * Die config.properties-Dateien sollten nicht im Repository gespeichert werden, so daß eine globale und eine
+    * lokale Konfiguration mit unterschiedlichen Einstellungen möglich sind. Lokale Einstellungen überschreiben
+    * globale Einstellungen.
     */
    private function __construct() {
       // Suchpfad je nach Web- oder Konsolenanwendung definieren
-      if (!CLI) $path = APPLICATION_ROOT.'/app/config';                                 // web
-      else      $path = getCwd().PATH_SEPARATOR.dirName($_SERVER['SCRIPT_FILENAME']);   // console: aktuelles + Scriptverzeichnis
+      if (CLI) $path = getCwd().PATH_SEPARATOR.dirName($_SERVER['SCRIPT_FILENAME']);   // console: aktuelles + Scriptverzeichnis
+      else     $path = APPLICATION_ROOT.'/app/config';                                 // web
 
       // Include-Pfad anhängen und Suchpfad zerlegen
       $paths = explode(PATH_SEPARATOR, $path.PATH_SEPARATOR.ini_get('include_path'));
@@ -148,13 +148,13 @@ final class Config extends Object {
          $path = realPath($path);
          if ($path) {
             $file = null;
-            $files[$file] = is_file($file = $path.DIRECTORY_SEPARATOR.'config-custom.properties');
-            $files[$file] = is_file($file = $path.DIRECTORY_SEPARATOR.'config.properties');
+            $files[$file] = is_file($file = $path.'/config.properties');
+            $files[$file] = is_file($file = $path.'/config-default.properties');
          }
       }
       $this->files = $files;
 
-      // Weiter vorn im include-path stehende Dateien haben Vorrang vor weiter hinten stehenden.  Die Dateien
+      // Weiter vorn im Include-Path stehende Dateien haben Vorrang vor weiter hinten stehenden. Die Dateien
       // werden von "hinten" beginnend geladen, dadurch können weiter "vorn" stehende Einstellungen vorhandene
       // weiter "hinten" stehende Einstellungen überschreiben.
       foreach (array_reverse($files) as $name => $fileExists) {
@@ -251,13 +251,13 @@ final class Config extends Object {
       for ($i=0; $i<$size; ++$i) {
          $subkey = $parts[$i];
 
-         if (!is_array($properties) || !isSet($properties[$subkey])) // PHP sucks!!! $some_string[$some_other_string] löst keinen Fehler aus,
-            break;                                                   // sondern castet $some_other_string ohne Warnung zu 0
-                                                                     // Ergebnis: $some_string[$some_other_string] == $some_string{0}
+         if (!is_array($properties) || !isSet($properties[$subkey])) // PHP sucks!!! $some_string[$other_string] löst keinen Fehler aus,
+            break;                                                   // sondern castet $other_string ohne Warnung zu 0
+                                                                     // Ergebnis: $some_string[$other_string] == $some_string{0}
          if ($i+1 == $size)               // das letzte Element
             return $properties[$subkey];
-
-         $properties =& $properties[$subkey];                        // wieder: $some_string[$some_other_string] == $some_string{0} => ohne Fehler
+                                                                     // wieder:
+         $properties =& $properties[$subkey];                        // $some_string[$other_string] == $some_string{0} (ohne Fehler)
       }
       return null;
    }
