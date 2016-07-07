@@ -194,13 +194,18 @@ class Logger extends StaticClass {
                if ($host != $ip)
                   $ip = $host.' ('.$ip.')';
 
-               $mailMsg .= NL.NL.NL.'Request:'.NL.'--------'.NL.$request.NL.NL.NL
-                        .  'Session: '.($session ? NL.'--------'.NL.$session.NL.NL.NL : '  - no session -'.NL)
-                        .  'Host: '.$ip.NL
-                        .  'Time: '.date('Y-m-d H:i:s').NL;
+               $mailMsg .= NL
+                        .  NL
+                        . 'Request:'                                                                .NL
+                        . '--------'                                                                .NL
+                        .  $request                                                                 .NL
+                        .                                                                            NL
+                        . 'Session: '.($session ? NL.'--------'.NL.$session.NL : '  - no session -').NL
+                        . 'Host: '.$ip                                                              .NL
+                        . 'Time: '.date('Y-m-d H:i:s')                                              .NL;
             }
             else {
-               $mailMsg .= NL.NL.NL.'Shell:'.NL.'------'.NL.print_r($_SERVER, true).NL.NL.NL;
+               $mailMsg .= NL.NL.'Shell:'.NL.'------'.NL.print_r($_SERVER, true).NL.NL;
             }
             $subject = 'PHP: [FATAL] Uncaught Exception at '.($request ? $request->getHostname():'').$_SERVER['PHP_SELF'];
             self::mail_log($subject, $mailMsg);
