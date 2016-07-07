@@ -207,7 +207,7 @@ class Logger extends StaticClass {
             else {
                $mailMsg .= NL.NL.'Shell:'.NL.'------'.NL.print_r($_SERVER, true).NL.NL;
             }
-            $subject = 'PHP: [FATAL] Uncaught Exception at '.($request ? $request->getHostname():'').$_SERVER['PHP_SELF'];
+            $subject = 'PHP [FATAL] Unhandled Exception at '.($request ? $request->getHostname():'').$_SERVER['PHP_SELF'];
             self::mail_log($subject, $mailMsg);
          }
 
