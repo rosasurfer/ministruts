@@ -209,12 +209,14 @@ class DebugTools extends StaticClass {
     */
    public static function getBetterMessage(\Exception $exception) {
       $class     = get_class($exception);
-      $namespace = strLeftTo   ($class, '\\', -1, true,  ''    );
+      $namespace = strToLower(strLeftTo($class, '\\', -1, true, ''));
       $name      = strRightFrom($class, '\\', -1, false, $class);
-      $result    = strToLower($namespace).$name;
+
+      if ($namespace != 'rosasurfer\\ministruts\\exceptions\\') $result = $namespace.$name;
+      else                                                      $result = $name;    // just the base name for improved readability
 
       if ($exception instanceof \ErrorException)
-         $result .= ' '.self::errorLevelToStr($exception->getSeverity());
+         $result .= '('.self::errorLevelToStr($exception->getSeverity()).')';
       $result .= (strLen($message=$exception->getMessage()) ? ': ':'').$message;
 
       return $result;
