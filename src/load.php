@@ -995,36 +995,6 @@ function push_shutdown_function(/*callable*/ $callback = null /*, $args1, $args2
 
 
 /**
- * Formatiert die String-Repräsentation eines lokalen Zeitpunktes mit dem angegebenen Format. Haupteinsatzgebiet
- * dieser Funktion ist das schnelle Reformatieren von Zeitangaben, die aus Datenbankabfragen stammen.
- *
- * @param  string $datetime - String-Repräsentation eines Datums oder Zeitpunkts
- * @param  string $format   - String mit Format-Codes entsprechend der PHP-Funktion date()
- *
- * @return string - formatierter String unter Berücksichtigung der lokalen Zeitzone
- */
-function formatDateStr($datetime, $format) {
-   if (!is_string($datetime)) throw new IllegalTypeException('Illegal type of parameter $datetime: '.getType($datetime));
-   if (!is_string($format))   throw new IllegalTypeException('Illegal type of parameter $format: '.getType($format));
-
-   if ($datetime < '1970-01-01 00:00:00') {
-      if ($format != 'd.m.Y') {
-         Logger ::log('Cannot format early datetime "'.$datetime.'" with format "'.$format.'"', L_INFO, __CLASS__);
-         return preg_replace('/[1-9]/', '0', date($format, time()));
-      }
-
-      $parts = explode('-', substr($datetime, 0, 10));
-      return $parts[2].'.'.$parts[1].'.'.$parts[0];
-   }
-
-   $timestamp = strToTime($datetime);
-   if (!is_int($timestamp)) throw new InvalidArgumentException('Invalid argument $datetime: '.$datetime);
-
-   return date($format, $timestamp);
-}
-
-
-/**
  * Formatiert einen Zahlenwert im Währungsformat.
  *
  * @param  mixed  $value            - Zahlenwert (int oder double)

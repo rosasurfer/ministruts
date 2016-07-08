@@ -82,4 +82,33 @@ class Date extends StaticClass {
 
       return date('Y-m-d', mkTime(0, 0, 0, $month, $day+$days, $year));
    }
+
+
+   /**
+    * Format a datetime string with the specified format. Useful for quick formating of date/datetime values originating
+    * from database queries.
+    *
+    * @param  string $datetime - date/datetime value
+    * @param  string $format   - string with format codes according to the PHP function date()
+    *
+    * @return string - formatted date/datetime value in the local timezone
+    */
+   public static function format($datetime, $format) {
+      if (!is_string($datetime)) throw new IllegalTypeException('Illegal type of parameter $datetime: '.getType($datetime));
+      if (!is_string($format))   throw new IllegalTypeException('Illegal type of parameter $format: '.getType($format));
+
+      if ($datetime < '1970-01-01 00:00:00') {
+         if ($format != 'd.m.Y') {
+            trigger_error('Cannot format datetime before 1970-01-01 ("'.$datetime.'") with format "'.$format.'"', E_USER_NOTICE);
+            return preg_replace('/[1-9]/', '0', date($format, time()));
+         }
+         $parts = explode('-', substr($datetime, 0, 10));
+         return $parts[2].'.'.$parts[1].'.'.$parts[0];
+      }
+
+      $timestamp = strToTime($datetime);
+      if (!is_int($timestamp)) throw new InvalidArgumentException('Invalid argument $datetime: '.$datetime);
+
+      return date($format, $timestamp);
+   }
 }
