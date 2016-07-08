@@ -4,6 +4,11 @@ use rosasurfer\ministruts\exceptions\IllegalTypeException;
 use rosasurfer\ministruts\exceptions\InvalidArgumentException;
 use rosasurfer\ministruts\exceptions\RuntimeException;
 
+use function rosasurfer\strEndsWith;
+use function rosasurfer\strLeft;
+use function rosasurfer\strLeftTo;
+use function rosasurfer\strRightFrom;
+
 use const rosasurfer\CLI;
 use const rosasurfer\DAY;
 use const rosasurfer\L_NOTICE;

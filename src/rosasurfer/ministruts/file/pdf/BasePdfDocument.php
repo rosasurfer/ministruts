@@ -1,6 +1,9 @@
 <?php
 use rosasurfer\ministruts\exceptions\RuntimeException;
 
+use const rosasurfer\echoPre;
+use const rosasurfer\strEndsWith;
+
 use const rosasurfer\L_DEBUG;
 
 

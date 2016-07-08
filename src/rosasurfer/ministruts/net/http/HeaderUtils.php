@@ -1,8 +1,11 @@
 <?php
+use const rosasurfer\strContains;
+
+
 /**
  * Header Utilities
  */
-final class HeaderUtils extends StaticClass {
+class HeaderUtils extends StaticClass {
 
 
    /**

@@ -1,6 +1,8 @@
 <?php
 use rosasurfer\ministruts\exceptions\IllegalTypeException;
 
+use const rosasurfer\mkDirWritable;
+
 
 /**
  * SimplePdfDocument

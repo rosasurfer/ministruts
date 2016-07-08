@@ -3,6 +3,12 @@ use rosasurfer\ministruts\exceptions\DatabaseException;
 use rosasurfer\ministruts\exceptions\IllegalTypeException;
 use rosasurfer\ministruts\exceptions\InfrastructureException;
 
+use function rosasurfer\echoPre;
+use function rosasurfer\strCompareI;
+use function rosasurfer\strContains;
+use function rosasurfer\strEndsWithI;
+use function rosasurfer\strStartsWithI;
+
 use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_ERROR;
 use const rosasurfer\L_INFO;

@@ -4,16 +4,20 @@ use rosasurfer\ministruts\exceptions\IllegalTypeException;
 use rosasurfer\ministruts\exceptions\InvalidArgumentException;
 use rosasurfer\ministruts\exceptions\RuntimeException;
 
+use function rosasurfer\echoPre;
+use function rosasurfer\printPretty;
+use function rosasurfer\strStartsWith;
+
 use const rosasurfer\CLI;
 use const rosasurfer\ERROR_LOG_MAIL;
 use const rosasurfer\ERROR_LOG_SYSLOG;
-use const rosasurfer\LOCALHOST;
 use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_ERROR;
 use const rosasurfer\L_FATAL;
 use const rosasurfer\L_INFO;
 use const rosasurfer\L_NOTICE;
 use const rosasurfer\L_WARN;
+use const rosasurfer\LOCALHOST;
 use const rosasurfer\NL;
 use const rosasurfer\WINDOWS;
 

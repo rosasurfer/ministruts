@@ -1,4 +1,6 @@
 <?php
+use function rosasurfer\strRightFrom;
+
 use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_INFO;
 use const rosasurfer\L_NOTICE;

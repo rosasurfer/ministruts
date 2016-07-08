@@ -3,6 +3,8 @@ use rosasurfer\ministruts\exceptions\IllegalTypeException;
 use rosasurfer\ministruts\exceptions\InvalidArgumentException;
 use rosasurfer\ministruts\exceptions\RuntimeException;
 
+use const rosasurfer\mkDirWritable;
+
 
 /**
  * Barcode renderer class

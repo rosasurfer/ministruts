@@ -1,45 +1,8 @@
 <?php
+namespace rosasurfer {
+
 use rosasurfer\ministruts\exceptions\ClassNotFoundException;
 use rosasurfer\ministruts\exceptions\IllegalTypeException;
-
-use const rosasurfer\CLI;
-use const rosasurfer\DAY;
-use const rosasurfer\DAYS;
-use const rosasurfer\EOL;
-use const rosasurfer\ERROR_LOG_DEBUG;
-use const rosasurfer\ERROR_LOG_FILE;
-use const rosasurfer\ERROR_LOG_MAIL;
-use const rosasurfer\ERROR_LOG_SAPI;
-use const rosasurfer\ERROR_LOG_SYSLOG;
-use const rosasurfer\FRIDAY;
-use const rosasurfer\HOUR;
-use const rosasurfer\HOURS;
-use const rosasurfer\LOCALHOST;
-use const rosasurfer\L_DEBUG;
-use const rosasurfer\L_ERROR;
-use const rosasurfer\L_FATAL;
-use const rosasurfer\L_INFO;
-use const rosasurfer\L_NOTICE;
-use const rosasurfer\L_WARN;
-use const rosasurfer\MINISTRUTS_ROOT;
-use const rosasurfer\MINUTE;
-use const rosasurfer\MINUTES;
-use const rosasurfer\MONDAY;
-use const rosasurfer\MONTH;
-use const rosasurfer\MONTHS;
-use const rosasurfer\NL;
-use const rosasurfer\SATURDAY;
-use const rosasurfer\SECOND;
-use const rosasurfer\SECONDS;
-use const rosasurfer\SUNDAY;
-use const rosasurfer\THURSDAY;
-use const rosasurfer\TUESDAY;
-use const rosasurfer\WEDNESDAY;
-use const rosasurfer\WEEK;
-use const rosasurfer\WEEKS;
-use const rosasurfer\WINDOWS;
-use const rosasurfer\YEAR;
-use const rosasurfer\YEARS;
 
 
 /**
@@ -188,7 +151,7 @@ spl_autoload_register(function($class) {
 /**
  * (7) setup error and exception handling
  */
-System::setupErrorHandling();
+\System::setupErrorHandling();
 
 
 /**
@@ -881,7 +844,7 @@ function is_interface($name) {
  * @see    rosasurfer\util\CommonValidator::isDateTime()
  */
 function is_datetime($string, $format) {
-   return CommonValidator::isDateTime($string, $format);
+   return \CommonValidator::isDateTime($string, $format);
 }
 
 
@@ -932,7 +895,87 @@ function _null($value=null) {
 function ifNull($value, $altValue) {
    return ($value===null) ? $altValue : $value;
 }
+}
 
 
+/**
+ * (9) define helper constants and functions globally if applicable
+ */
+namespace {
 
-// (9) define helper constants and functions globally if applicable
+   define('CLI'      , rosasurfer\CLI      );                                    // whether or not we run on command line interface
+   define('LOCALHOST', rosasurfer\LOCALHOST);                                    // whether or not we run on localhost
+   define('WINDOWS'  , rosasurfer\WINDOWS  );                                    // whether or not we run on Windows
+
+   // custom log level
+   define('L_DEBUG' , rosasurfer\L_DEBUG );
+   define('L_INFO'  , rosasurfer\L_INFO  );
+   define('L_NOTICE', rosasurfer\L_NOTICE);
+   define('L_WARN'  , rosasurfer\L_WARN  );
+   define('L_ERROR' , rosasurfer\L_ERROR );
+   define('L_FATAL' , rosasurfer\L_FATAL );
+
+   // log destinations for the built-in function error_log()
+   define('ERROR_LOG_SYSLOG', rosasurfer\ERROR_LOG_SYSLOG);                      // message is sent to PHP's sy stem logger
+   define('ERROR_LOG_MAIL'  , rosasurfer\ERROR_LOG_MAIL  );                      // message is sent by email
+   define('ERROR_LOG_DEBUG' , rosasurfer\ERROR_LOG_DEBUG );                      // message is sent through the PHP debugging connection
+   define('ERROR_LOG_FILE'  , rosasurfer\ERROR_LOG_FILE  );                      // message is appended to a file destination
+   define('ERROR_LOG_SAPI'  , rosasurfer\ERROR_LOG_SAPI  );                      // message is sent directly to the SAPI logging handler
+
+   // time periods
+   define('SECOND', rosasurfer\SECOND); define('SECONDS', rosasurfer\SECONDS);
+   define('MINUTE', rosasurfer\MINUTE); define('MINUTES', rosasurfer\MINUTES);
+   define('HOUR'  , rosasurfer\HOUR  ); define('HOURS'  , rosasurfer\HOURS  );
+   define('DAY'   , rosasurfer\DAY   ); define('DAYS'   , rosasurfer\DAYS   );
+   define('WEEK'  , rosasurfer\WEEK  ); define('WEEKS'  , rosasurfer\WEEKS  );
+   define('MONTH' , rosasurfer\MONTH ); define('MONTHS' , rosasurfer\MONTHS );   // fuzzy but garantied to cover any month
+   define('YEAR'  , rosasurfer\YEAR  ); define('YEARS'  , rosasurfer\YEARS  );   // fuzzy but garantied to cover any year
+
+   // weekdays
+   define('SUNDAY'   , rosasurfer\SUNDAY   );
+   define('MONDAY'   , rosasurfer\MONDAY   );
+   define('TUESDAY'  , rosasurfer\TUESDAY  );
+   define('WEDNESDAY', rosasurfer\WEDNESDAY);
+   define('THURSDAY' , rosasurfer\THURSDAY );
+   define('FRIDAY'   , rosasurfer\FRIDAY   );
+   define('SATURDAY' , rosasurfer\SATURDAY );
+
+   // miscellaneous
+   define('EOL', rosasurfer\EOL);
+   define('NL' , rosasurfer\NL );
+
+
+   // TODO: Repeat parameter definitions and their documentation so as not to break the IDE's code assistance.
+   function dump             ($var, $return=false)                                                  { return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args()); }
+   function echof            ($var)                                                                 { return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args()); }
+   function echoPre          ($var)                                                                 { return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args()); }
+   function pp               ($var, $return=false)                                                  { return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args()); }
+   function printPretty      ($var, $return=false)                                                  { return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args()); }
+   function prettyBytes      ($value)                                                               { return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args()); }
+   function isLittleEndian   ()                                                                     { return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args()); }
+   function strCompare       ($stringA, $stringB, $ignoreCase=false)                                { return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args()); }
+   function strCompareI      ($stringA, $stringB)                                                   { return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args()); }
+   function strContains      ($haystack, $needle, $ignoreCase=false)                                { return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args()); }
+   function strContainsI     ($haystack, $needle)                                                   { return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args()); }
+   function strStartsWith    ($string, $prefix, $ignoreCase=false)                                  { return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args()); }
+   function strStartsWithI   ($string, $prefix)                                                     { return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args()); }
+   function strEndsWith      ($string, $suffix, $ignoreCase=false)                                  { return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args()); }
+   function strEndsWithI     ($string, $suffix)                                                     { return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args()); }
+   function strLeft          ($string, $length)                                                     { return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args()); }
+   function strLeftTo        ($string, $limiter, $count=1, $includeLimiter=false, $onNotFound=null) { return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args()); }
+   function strRight         ($string, $length)                                                     { return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args()); }
+   function strRightFrom     ($string, $limiter, $count=1, $includeLimiter=false, $onNotFound=null) { return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args()); }
+   function strIsQuoted      ($value)                                                               { return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args()); }
+   function strIsSingleQuoted($value)                                                               { return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args()); }
+   function strIsDoubleQuoted($value)                                                               { return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args()); }
+   function strIsDigits      ($value)                                                               { return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args()); }
+   function typeOf           ($var)                                                                 { return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args()); }
+   function mkDirWritable    ($path, $mode=0770)                                                    { return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args()); }
+   function is_class         ($name)                                                                { return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args()); }
+   function is_interface     ($name)                                                                { return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args()); }
+   function is_datetime      ($string, $format)                                                     { return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args()); }
+   function _true            ($value=null)                                                          { return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args()); }
+   function _false           ($value=null)                                                          { return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args()); }
+   function _null            ($value=null)                                                          { return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args()); }
+   function ifNull           ($value, $altValue)                                                    { return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args()); }
+}

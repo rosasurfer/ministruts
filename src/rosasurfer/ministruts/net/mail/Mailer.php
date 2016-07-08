@@ -1,6 +1,9 @@
 <?php
 use rosasurfer\ministruts\exceptions\IllegalTypeException;
 
+use const rosasurfer\strEndsWith;
+use const rosasurfer\strStartsWith;
+
 
 /**
  * Mailer

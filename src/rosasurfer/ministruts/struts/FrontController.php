@@ -3,11 +3,15 @@ use rosasurfer\ministruts\exceptions\FileNotFoundException;
 use rosasurfer\ministruts\exceptions\IllegalStateException;
 use rosasurfer\ministruts\exceptions\RuntimeException;
 
+use function rosasurfer\strLeftTo;
+use function rosasurfer\strRightFrom;
+use function rosasurfer\strStartsWith;
+
 use const rosasurfer\CLI;
-use const rosasurfer\LOCALHOST;
 use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_INFO;
 use const rosasurfer\L_NOTICE;
+use const rosasurfer\LOCALHOST;
 use const rosasurfer\SECONDS;
 use const rosasurfer\WINDOWS;
 

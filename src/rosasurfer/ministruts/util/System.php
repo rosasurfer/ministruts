@@ -2,6 +2,9 @@
 use rosasurfer\ministruts\exceptions\IllegalTypeException;
 use rosasurfer\ministruts\exceptions\PHPError;
 
+use function rosasurfer\echoPre;
+use function rosasurfer\printPretty;
+
 use const rosasurfer\CLI;
 use const rosasurfer\L_WARN;
 use const rosasurfer\NL;

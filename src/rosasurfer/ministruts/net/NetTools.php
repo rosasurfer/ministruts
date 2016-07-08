@@ -1,6 +1,8 @@
-﻿<?php
+<?php
 use rosasurfer\ministruts\exceptions\IllegalTypeException;
 use rosasurfer\ministruts\exceptions\InvalidArgumentException;
+
+use function rosasurfer\strEndsWithI;
 
 
 /**

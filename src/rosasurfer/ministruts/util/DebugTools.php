@@ -2,6 +2,10 @@
 use rosasurfer\ministruts\exceptions\IllegalTypeException;
 use rosasurfer\ministruts\exceptions\IRosasurferException;
 
+use function rosasurfer\strLeftTo;
+use function rosasurfer\strRightFrom;
+use function rosasurfer\strStartsWith;
+
 use const rosasurfer\NL;
 
 
