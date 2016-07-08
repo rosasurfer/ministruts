@@ -114,8 +114,8 @@ define('rosasurfer\NL' , "\n"   );
 /**
  * (3) check/adjust PHP environment
  */
-(PHP_VERSION < '5.6')      && exit(1|echoPre('Error: A PHP version >= 5.6 is required (found version '.PHP_VERSION.').'));
-!ini_get('short_open_tag') && exit(1|echoPre('Error: The PHP configuration value "short_open_tag" must be enabled.'    ));
+(PHP_VERSION < '5.6')      && echoPre('application error') && exit(255|error_log('Error: A PHP version >= 5.6 is required (found version '.PHP_VERSION.').'));
+!ini_get('short_open_tag') && echoPre('application error') && exit(255|error_log('Error: The PHP configuration value "short_open_tag" must be enabled.'));
 
 ini_set('arg_separator.output'    , '&amp;'                );
 ini_set('auto_detect_line_endings',  1                     );
@@ -149,7 +149,7 @@ if (false && !CLI && strEndsWith(strLeftTo($_SERVER['REQUEST_URI'], '?'), '/phpi
 /**
  * (5) check/adjust application requirements
  */
-!defined('\APPLICATION_ROOT') && exit(1|echoPre('Error: The global constant APPLICATION_ROOT must be defined.'));
+!defined('\APPLICATION_ROOT') && echoPre('application error') && exit(255|error_log('Error: The global constant APPLICATION_ROOT must be defined.'));
 !defined('\APPLICATION_ID'  ) && define('APPLICATION_ID', md5(\APPLICATION_ROOT));
 
 
