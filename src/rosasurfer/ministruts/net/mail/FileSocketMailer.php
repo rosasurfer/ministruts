@@ -31,11 +31,7 @@ class FileSocketMailer extends Mailer {
       throw new UnimplementedFeatureException('Method '.get_class($this).'::'.__FUNCTION__.'() is not implemented');
 
       // Versand je nach Konfiguration verschieben (um z.B. Transaktionen nicht zu blockieren)
-      $args = func_get_args();
-      $args[1] = $receiver;         // per 'mail.address.forced-receiver' überschriebenen Empfänger merken
-      if ($this->sendLater($args))
+      if ($this->sendLater($sender, $receiver, $subject, $message, $headers))
          return;
-
-      $receiver = Config ::get('mail.address.forced-receiver', $receiver);
    }
 }

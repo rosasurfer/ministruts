@@ -1,7 +1,6 @@
 <?php
 use rosasurfer\ministruts\exceptions\ClassNotFoundException;
 use rosasurfer\ministruts\exceptions\IllegalTypeException;
-use rosasurfer\ministruts\exceptions\InvalidArgumentException;
 
 use const rosasurfer\CLI;
 use const rosasurfer\DAY;
@@ -937,58 +936,3 @@ function ifNull($value, $altValue) {
 
 
 // (9) define helper constants and functions globally if applicable
-
-
-
-
-// =====================================================================================================================
-// === Old legacy code =================================================================================================
-// =====================================================================================================================
-
-
-
-/**
- * TODO: Wird nur in Mailer::sendLater() aufgerufen
- *
- * Registriert wie register_shutdown_function() Funktionen zur Ausführung während des Shutdowns.  Die
- * Funktionen werden jedoch nicht in der Reihenfolge der Registrierung aufgerufen, sondern auf einen Stack
- * gelegt und während des Shutdowns von dort abgerufen (stacktypisch Last-In-First-Out).  Alle zusätzlich
- * übergebenen Argumente werden beim Aufruf an die Funktion weitergereicht.
- *
- * @param  callable $callback - Funktion oder Methode, die ausgeführt werden soll
- *
- * @see  register_shutdown_function()
- */
-function push_shutdown_function(/*callable*/ $callback = null /*, $args1, $args2, ...*/) {
-   static $stack = array();
-   if (!$stack)
-      register_shutdown_function(__FUNCTION__);    // beim 1. Aufruf wird die Funktion selbst als Shutdown-Handler registriert
-
-   if ($callback === null) {
-      $trace = debug_backTrace();
-      $frame = array_pop($trace);
-
-      if (!isSet($frame['file']) && !isSet($frame['line'])) {     // wenn Aufruf aus PHP-Core (also während Shutdown) ...
-         try {
-            for ($i=sizeOf($stack); $i; ) {                       // ... alle Funktionen auf dem Stack abarbeiten
-               $f = $stack[--$i];
-               call_user_func_array($f['name'], $f['args']);
-            }
-         }
-         catch (\Exception $ex) {
-            Logger::log($ex, L_FATAL, __CLASS__);
-         }
-         return;
-      }
-   }
-
-   $name = null;
-   if (!is_string($callback) && !is_array($callback)) throw new IllegalTypeException('Illegal type of parameter $callback: '.getType($callback));
-   if (!is_callable($callback, false, $name))         throw new InvalidArgumentException('Invalid callback "'.$name.'" passed');
-
-   $args = func_get_args();
-   array_shift($args);
-
-   $stack[] = array('name' => $callback,
-                    'args' => $args);
-}
