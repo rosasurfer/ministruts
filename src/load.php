@@ -174,7 +174,7 @@ spl_autoload_register(function($class) {
 
          // warn if relative path found: decreases performance especially with APC setting 'apc.stat=0'
          $relative = WINDOWS ? !preg_match('/^[a-z]:/i', $fileName) : ($fileName{0} != '/');
-         $relative && Logger::log('Found relative file name for class '.$class.': "'.$fileName.'"', L_WARN, __CLASS__);
+         $relative && trigger_error('Found relative file name for class '.$class.': "'.$fileName.'"', E_USER_WARNING);
 
          // load file
          include($fileName.'.php');
