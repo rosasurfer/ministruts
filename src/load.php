@@ -995,41 +995,6 @@ function push_shutdown_function(/*callable*/ $callback = null /*, $args1, $args2
 
 
 /**
- * Addiert zu einem Datum eine Anzahl von Tagen.
- *
- * @param  string $date - Ausgangsdatum (Format: yyyy-mm-dd)
- * @param  int    $days - Tagesanzahl
- *
- * @return string - resultierendes Datum
- */
-function addDate($date, $days) {
-   if (CommonValidator ::isDateTime($date) === false) throw new InvalidArgumentException('Invalid argument $date: '.$date);
-   if (!is_int($days))                                throw new InvalidArgumentException('Invalid argument $days: '.$days);
-
-   $parts = explode('-', $date);
-   $year  = (int) $parts[0];
-   $month = (int) $parts[1];
-   $day   = (int) $parts[2];
-
-   return date('Y-m-d', mkTime(0, 0, 0, $month, $day+$days, $year));
-}
-
-
-/**
- * Subtrahiert von einem Datum eine Anzahl von Tagen.
- *
- * @param  string $date - Ausgangsdatum (Format: yyyy-mm-dd)
- * @param  int    $days - Tagesanzahl
- *
- * @return string
- */
-function subDate($date, $days) {
-   if (!is_int($days)) throw new InvalidArgumentException('Invalid argument $days: '.$days);
-   return addDate($date, -$days);
-}
-
-
-/**
  * Formatiert die String-Repräsentation eines lokalen Zeitpunktes mit dem angegebenen Format. Haupteinsatzgebiet
  * dieser Funktion ist das schnelle Reformatieren von Zeitangaben, die aus Datenbankabfragen stammen.
  *

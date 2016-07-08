@@ -9,7 +9,7 @@ use const rosasurfer\L_WARN;
 /**
  * Date
  */
-final class Date extends StaticClass {
+class Date extends StaticClass {
 
 
    /**
@@ -60,5 +60,26 @@ final class Date extends StaticClass {
          $date->modify('+1 day');
       }
       return $range;
+   }
+
+
+   /**
+    * Add a number of days to a date.
+    *
+    * @param  string $date - initial date (format: yyyy-mm-dd)
+    * @param  int    $days - number of days to add
+    *
+    * @return string - reslting date
+    */
+   public static function addDays($date, $days) {
+      if (CommonValidator::isDateTime($date) === false) throw new InvalidArgumentException('Invalid argument $date: '.$date);
+      if (!is_int($days))                               throw new IllegalTypeException('Illegal type of parameter $days: '.getType($days));
+
+      $parts = explode('-', $date);
+      $year  = (int) $parts[0];
+      $month = (int) $parts[1];
+      $day   = (int) $parts[2];
+
+      return date('Y-m-d', mkTime(0, 0, 0, $month, $day+$days, $year));
    }
 }
