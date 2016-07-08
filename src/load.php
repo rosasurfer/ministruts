@@ -992,26 +992,3 @@ function push_shutdown_function(/*callable*/ $callback = null /*, $args1, $args2
    $stack[] = array('name' => $callback,
                     'args' => $args);
 }
-
-
-/**
- * Formatiert einen Zahlenwert im Währungsformat.
- *
- * @param  mixed  $value            - Zahlenwert (int oder double)
- * @param  int    $decimals         - Anzahl der Nachkommastellen (default: 2)
- * @param  string $decimalSeparator - Dezimaltrennzeichen: '.' oder ',' (default: '.')
- *
- * @return string
- */
-function formatMoney($value, $decimals=2, $decimalSeparator='.') {
-   if (!is_int($value) && !is_float($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
-   if (!is_int($decimals))                   throw new IllegalTypeException('Illegal type of parameter $decimals: '.getType($decimals));
-
-   if ($decimalSeparator === '.')
-      return number_format($value, $decimals, '.', ',');
-
-   if ($decimalSeparator === ',')
-      return number_format($value, $decimals, ',', '.');
-
-   throw new InvalidArgumentException('Invalid argument $decimalSeparator: "'.$decimalSeparator.'"');
-}
