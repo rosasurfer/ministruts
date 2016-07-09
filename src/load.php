@@ -1,4 +1,7 @@
 <?php
+/**
+ * Load the Ministruts framework.
+ */
 namespace rosasurfer;
 
 use rosasurfer\ministruts\exceptions\ClassNotFoundException;
@@ -6,8 +9,8 @@ use rosasurfer\ministruts\exceptions\IllegalTypeException;
 
 
 /**
- * Program flow:
- *
+ * Program flow
+ * ------------
  * (1) block framework re-includes
  * (2) define helper constants
  * (3) check/adjust PHP environment
