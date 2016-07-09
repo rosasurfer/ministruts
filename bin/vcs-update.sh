@@ -12,6 +12,7 @@ cd "$PROJECT_DIR"
 [ ! -d ".git" ] && echo error: .git directory not found in project "$PROJECT_DIR" && exit
 echo Updating $(basename "$PROJECT_DIR")...
 
+git status                                                                        || exit
 git fetch origin                                                                  || exit
 git reset --hard origin/legacy-no-namespaces                                      || exit
 
