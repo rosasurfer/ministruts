@@ -14,6 +14,7 @@ echo Updating $(basename "$PROJECT_DIR")...
 
 git fetch origin                                                                  || exit
 git reset --hard origin/master                                                    || exit
+git status                                                                        || exit
 
 
 # (3) check/update additional requirements: dependencies, submodules, permissions
