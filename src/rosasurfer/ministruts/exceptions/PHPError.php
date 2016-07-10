@@ -7,15 +7,11 @@ namespace rosasurfer\ministruts\exceptions;
  */
 class PHPError extends \ErrorException implements IRosasurferException {
 
+   use /*trait*/ TRosasurferException;
 
-   /** @var string */
-   private $betterMessage;                   // better message
 
    /** @var array */
    private $betterTrace;                     // better stacktrace
-
-   /** @var string */
-   private $betterTraceAsString;             // better stacktrace as string
 
 
    /**
@@ -29,18 +25,6 @@ class PHPError extends \ErrorException implements IRosasurferException {
     */
    public function __construct($message, $code, $severity, $file, $line) {
       parent::__construct($message, $code, $severity, $file, $line, $cause=null);
-   }
-
-
-   /**
-    * Return the exception's message in a more readable way.
-    *
-    * @return string - message
-    */
-   public function getBetterMessage() {
-      if (!$this->betterMessage)
-         $this->betterMessage = \DebugTools::getBetterMessage($this);
-      return $this->betterMessage;
    }
 
 
@@ -80,28 +64,5 @@ class PHPError extends \ErrorException implements IRosasurferException {
          $this->betterTrace = $trace;
       }
       return $trace;
-   }
-
-
-   /**
-    * Return a text representation of the exception's stacktrace in a more readable way (Java-like).
-    * The representation also contains informations about nested exceptions.
-    *
-    * @return string
-    */
-   public function getBetterTraceAsString() {
-      if (!$this->betterTraceAsString)
-         $this->betterTraceAsString = \DebugTools::getBetterTraceAsString($this);
-      return $this->betterTraceAsString;
-   }
-
-
-   /**
-    * Return a description of the exception.
-    *
-    * @return string - description
-    */
-   public function __toString() {
-      return $this->getBetterMessage();
    }
 }

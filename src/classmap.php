@@ -15,7 +15,6 @@ return array(
    'Object'                                                           => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/core/Object',
    'Singleton'                                                        => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/core/Singleton',
    'StaticClass'                                                      => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/core/StaticClass',
-   'ISurfable'                                                        => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/core/ISurfable',
 
    'CommonDAO'                                                        => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/dao/CommonDAO',
    'DaoWorker'                                                        => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/dao/DaoWorker',
@@ -26,8 +25,8 @@ return array(
    'DBPool'                                                           => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/db/DBPool',
    'MySQLConnector'                                                   => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/db/MySQLConnector',
 
-   'Dependency'                                                       => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/dependency/Dependency',
    'ChainedDependency'                                                => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/dependency/ChainedDependency',
+   'Dependency'                                                       => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/dependency/Dependency',
    'FileDependency'                                                   => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/dependency/FileDependency',
 
    'rosasurfer\ministruts\exceptions\BaseException'                   => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/exceptions/BaseException',
@@ -36,8 +35,8 @@ return array(
    'rosasurfer\ministruts\exceptions\ConcurrentModificationException' => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/exceptions/ConcurrentModificationException',
    'rosasurfer\ministruts\exceptions\DatabaseException'               => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/exceptions/DatabaseException',
    'rosasurfer\ministruts\exceptions\FileNotFoundException'           => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/exceptions/FileNotFoundException',
-   'rosasurfer\ministruts\exceptions\IRosasurferException'            => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/exceptions/IRosasurferException',
    'rosasurfer\ministruts\exceptions\IOException'                     => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/exceptions/IOException',
+   'rosasurfer\ministruts\exceptions\IRosasurferException'            => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/exceptions/IRosasurferException',
    'rosasurfer\ministruts\exceptions\IllegalAccessException'          => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/exceptions/IllegalAccessException',
    'rosasurfer\ministruts\exceptions\IllegalArgumentException'        => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/exceptions/IllegalArgumentException',
    'rosasurfer\ministruts\exceptions\IllegalStateException'           => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/exceptions/IllegalStateException',
@@ -47,6 +46,7 @@ return array(
    'rosasurfer\ministruts\exceptions\PHPError'                        => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/exceptions/PHPError',
    'rosasurfer\ministruts\exceptions\PermissionDeniedException'       => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/exceptions/PermissionDeniedException',
    'rosasurfer\ministruts\exceptions\RuntimeException'                => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/exceptions/RuntimeException',
+   'rosasurfer\ministruts\exceptions\TRosasurferException'            => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/exceptions/TRosasurferException',
    'rosasurfer\ministruts\exceptions\UnimplementedFeatureException'   => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/exceptions/UnimplementedFeatureException',
    'rosasurfer\ministruts\exceptions\UnsupportedMethodException'      => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/exceptions/UnsupportedMethodException',
 
