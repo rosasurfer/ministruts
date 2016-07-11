@@ -19,4 +19,4 @@ git reset --hard origin/master                                                  
 git status                                                                        || exit
 
 
-# (3) check/update additional requirements: dependencies, submodules, permissions
+# (3) check/update additional requirements: dependencies, submodules, file permissions
