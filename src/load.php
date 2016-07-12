@@ -782,7 +782,7 @@ function is_class($name) {
          spl_autoload_call($name);     // onError: Uncaught LogicException: Class $name could not be loaded
       }
       else if (sizeOf($functions)==1 && $functions[0]==='__autoload') {
-         __autoload($name);            // __autoload() exists and is explicitely or implicitely registered
+         __autoload($name);            // __autoload() exists and is explicitly or implicitly registered
       }
       else {
          spl_autoload_call($name);     // a regular SPL loader queue is defined
@@ -816,7 +816,7 @@ function is_interface($name) {
          spl_autoload_call($name);     // onError: Uncaught LogicException: Class $name could not be loaded
       }
       else if (sizeOf($functions)==1 && $functions[0]==='__autoload') {
-         __autoload($name);            // __autoload() exists and is explicitely or implicitely registered
+         __autoload($name);            // __autoload() exists and is explicitly or implicitly registered
       }
       else {
          spl_autoload_call($name);     // a regular SPL loader queue is defined
