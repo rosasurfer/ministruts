@@ -14,7 +14,7 @@ echo Updating $(basename "$PROJECT_DIR")...
 
 git fetch origin                                                                  || exit
 git status                                                                        || exit
-git diff  --stat --ignore-space-at-eol  HEAD origin                               || exit
+git diff  --stat --ignore-space-at-eol  HEAD origin/legacy-no-namespaces          || exit
 git reset --hard origin/legacy-no-namespaces                                      || exit
 git status                                                                        || exit
 
