@@ -92,7 +92,6 @@ return array(
    'ActionForm'                                                       => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/struts/ActionForm',
    'ActionForward'                                                    => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/struts/ActionForward',
    'ActionMapping'                                                    => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/struts/ActionMapping',
-   'FrontController'                                                  => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/struts/FrontController',
    'HttpSession'                                                      => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/struts/HttpSession',
    'Module'                                                           => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/struts/Module',
    'PageContext'                                                      => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/struts/PageContext',
@@ -102,6 +101,7 @@ return array(
    'Response'                                                         => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/struts/Response',
    'RoleProcessor'                                                    => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/struts/RoleProcessor',
    'Struts'                                                           => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/struts/Struts',
+   'StrutsController'                                                 => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/struts/StrutsController',
    'Tile'                                                             => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/struts/Tile',
 
    'CommonValidator'                                                  => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/util/CommonValidator',

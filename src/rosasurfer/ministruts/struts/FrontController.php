@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 use rosasurfer\ministruts\exception\FileNotFoundException;
 use rosasurfer\ministruts\exception\IllegalStateException;
 use rosasurfer\ministruts\exception\RuntimeException;
@@ -17,7 +17,7 @@ use const rosasurfer\WINDOWS;
 
 
 /**
- * FrontController
+ * StrutsController
  *
  * NOTE:
  * -----
@@ -25,11 +25,11 @@ use const rosasurfer\WINDOWS;
  * daß in statischen Membervariablen kein dynamischer Laufzeitstatus gespeichert werden darf. Es gelten dieselben
  * Regeln wie für thread-sichere Programmierung.
  *
- * Hintergrund ist, daß es je Applikation nur eine FrontController-Instanz gibt, die gecacht (serialisiert) und von
+ * Hintergrund ist, daß es je Applikation nur eine StrutsController-Instanz gibt, die gecacht (serialisiert) und von
  * folgenden Requests wiederverwendet wird. Dadurch muß die XML-Konfiguration nicht bei jedem Request neu eingelesen
  * werden.
  */
-final class FrontController extends Singleton {
+final class StrutsController extends Singleton {
 
 
    private static /*bool*/ $logDebug, $logInfo, $logNotice;
