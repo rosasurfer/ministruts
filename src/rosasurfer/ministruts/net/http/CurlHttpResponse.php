@@ -1,6 +1,6 @@
-<?php
-use rosasurfer\ministruts\exceptions\IllegalTypeException;
-use rosasurfer\ministruts\exceptions\InvalidArgumentException;
+﻿<?php
+use rosasurfer\ministruts\exception\IllegalTypeException;
+use rosasurfer\ministruts\exception\InvalidArgumentException;
 
 use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_INFO;

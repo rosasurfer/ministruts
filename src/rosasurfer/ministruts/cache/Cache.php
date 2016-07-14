@@ -1,5 +1,5 @@
-<?php
-use rosasurfer\ministruts\exceptions\IllegalTypeException;
+﻿<?php
+use rosasurfer\ministruts\exception\IllegalTypeException;
 
 use const rosasurfer\CLI;
 

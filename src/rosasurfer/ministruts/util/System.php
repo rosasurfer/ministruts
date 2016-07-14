@@ -1,6 +1,6 @@
 <?php
-use rosasurfer\ministruts\exceptions\IllegalTypeException;
-use rosasurfer\ministruts\exceptions\PHPError;
+use rosasurfer\ministruts\exception\IllegalTypeException;
+use rosasurfer\ministruts\exception\PHPError;
 
 use function rosasurfer\echoPre;
 use function rosasurfer\printPretty;

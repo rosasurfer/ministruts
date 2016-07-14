@@ -1,5 +1,5 @@
 <?php
-use rosasurfer\ministruts\exceptions\InvalidArgumentException;
+use rosasurfer\ministruts\exception\InvalidArgumentException;
 
 
 $type   = isSet($_REQUEST['type'  ]) ? $_REQUEST['type'  ] : null;

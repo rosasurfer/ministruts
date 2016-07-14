@@ -1,7 +1,7 @@
-<?php
-use rosasurfer\ministruts\exceptions\IllegalStateException;
-use rosasurfer\ministruts\exceptions\IllegalTypeException;
-use rosasurfer\ministruts\exceptions\PHPError;
+﻿<?php
+use rosasurfer\ministruts\exception\IllegalStateException;
+use rosasurfer\ministruts\exception\IllegalTypeException;
+use rosasurfer\ministruts\exception\PHPError;
 
 
 /**

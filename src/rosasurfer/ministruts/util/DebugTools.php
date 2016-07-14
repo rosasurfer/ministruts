@@ -1,6 +1,6 @@
 <?php
-use rosasurfer\ministruts\exceptions\IllegalTypeException;
-use rosasurfer\ministruts\exceptions\IRosasurferException;
+use rosasurfer\ministruts\exception\IllegalTypeException;
+use rosasurfer\ministruts\exception\IRosasurferException;
 
 use function rosasurfer\strLeftTo;
 use function rosasurfer\strRightFrom;

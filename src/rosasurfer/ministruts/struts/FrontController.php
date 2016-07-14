@@ -1,7 +1,7 @@
-<?php
-use rosasurfer\ministruts\exceptions\FileNotFoundException;
-use rosasurfer\ministruts\exceptions\IllegalStateException;
-use rosasurfer\ministruts\exceptions\RuntimeException;
+﻿<?php
+use rosasurfer\ministruts\exception\FileNotFoundException;
+use rosasurfer\ministruts\exception\IllegalStateException;
+use rosasurfer\ministruts\exception\RuntimeException;
 
 use function rosasurfer\strLeftTo;
 use function rosasurfer\strRightFrom;

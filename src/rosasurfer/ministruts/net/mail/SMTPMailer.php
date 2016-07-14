@@ -1,8 +1,8 @@
-<?php
-use rosasurfer\ministruts\exceptions\IllegalTypeException;
-use rosasurfer\ministruts\exceptions\InfrastructureException;
-use rosasurfer\ministruts\exceptions\InvalidArgumentException;
-use rosasurfer\ministruts\exceptions\RuntimeException;
+﻿<?php
+use rosasurfer\ministruts\exception\IllegalTypeException;
+use rosasurfer\ministruts\exception\InfrastructureException;
+use rosasurfer\ministruts\exception\InvalidArgumentException;
+use rosasurfer\ministruts\exception\RuntimeException;
 
 use function rosasurfer\strContains;
 use function rosasurfer\strStartsWithI;

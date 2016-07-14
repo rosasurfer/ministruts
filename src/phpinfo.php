@@ -1,5 +1,5 @@
-<?php
-use rosasurfer\ministruts\exceptions\IllegalTypeException;
+﻿<?php
+use rosasurfer\ministruts\exception\IllegalTypeException;
 
 
 $cli = !isSet($_SERVER['REQUEST_METHOD']);      // ob wir in der Konsole oder im Webserver laufen

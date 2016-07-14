@@ -1,6 +1,6 @@
-<?php
-use rosasurfer\ministruts\exceptions\ConcurrentModificationException;
-use rosasurfer\ministruts\exceptions\InvalidArgumentException;
+﻿<?php
+use rosasurfer\ministruts\exception\ConcurrentModificationException;
+use rosasurfer\ministruts\exception\InvalidArgumentException;
 
 
 /**

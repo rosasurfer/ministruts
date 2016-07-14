@@ -1,7 +1,7 @@
-<?php
-use rosasurfer\ministruts\exceptions\FileNotFoundException;
-use rosasurfer\ministruts\exceptions\IllegalTypeException;
-use rosasurfer\ministruts\exceptions\RuntimeException;
+﻿<?php
+use rosasurfer\ministruts\exception\FileNotFoundException;
+use rosasurfer\ministruts\exception\IllegalTypeException;
+use rosasurfer\ministruts\exception\RuntimeException;
 
 
 /**

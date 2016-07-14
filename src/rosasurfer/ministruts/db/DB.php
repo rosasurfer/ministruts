@@ -1,6 +1,6 @@
-<?php
-use rosasurfer\ministruts\exceptions\InvalidArgumentException;
-use rosasurfer\ministruts\exceptions\RuntimeException;
+﻿<?php
+use rosasurfer\ministruts\exception\InvalidArgumentException;
+use rosasurfer\ministruts\exception\RuntimeException;
 
 use const rosasurfer\L_WARN;
 

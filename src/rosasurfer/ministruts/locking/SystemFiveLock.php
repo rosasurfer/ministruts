@@ -1,7 +1,7 @@
-<?php
-use rosasurfer\ministruts\exceptions\IllegalTypeException;
-use rosasurfer\ministruts\exceptions\PHPError;
-use rosasurfer\ministruts\exceptions\RuntimeException;
+﻿<?php
+use rosasurfer\ministruts\exception\IllegalTypeException;
+use rosasurfer\ministruts\exception\PHPError;
+use rosasurfer\ministruts\exception\RuntimeException;
 
 use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_INFO;

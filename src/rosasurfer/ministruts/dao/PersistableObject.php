@@ -1,6 +1,6 @@
-<?php
-use rosasurfer\ministruts\exceptions\InvalidArgumentException;
-use rosasurfer\ministruts\exceptions\UnimplementedFeatureException;
+﻿<?php
+use rosasurfer\ministruts\exception\InvalidArgumentException;
+use rosasurfer\ministruts\exception\UnimplementedFeatureException;
 
 
 /**

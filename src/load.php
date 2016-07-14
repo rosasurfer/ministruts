@@ -4,8 +4,8 @@
  */
 namespace rosasurfer;
 
-use rosasurfer\ministruts\exceptions\ClassNotFoundException;
-use rosasurfer\ministruts\exceptions\IllegalTypeException;
+use rosasurfer\ministruts\exception\ClassNotFoundException;
+use rosasurfer\ministruts\exception\IllegalTypeException;
 
 
 /**

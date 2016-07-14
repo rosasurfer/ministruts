@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\ministruts\exceptions;
+namespace rosasurfer\ministruts\exception;
 
 
 /**

@@ -1,6 +1,6 @@
-<?php
-use rosasurfer\ministruts\exceptions\IllegalTypeException;
-use rosasurfer\ministruts\exceptions\RuntimeException;
+﻿<?php
+use rosasurfer\ministruts\exception\IllegalTypeException;
+use rosasurfer\ministruts\exception\RuntimeException;
 
 use const rosasurfer\L_NOTICE;
 

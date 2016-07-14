@@ -1,5 +1,5 @@
-<?php
-use rosasurfer\ministruts\exceptions\IllegalStateException;
+﻿<?php
+use rosasurfer\ministruts\exception\IllegalStateException;
 
 
 /**

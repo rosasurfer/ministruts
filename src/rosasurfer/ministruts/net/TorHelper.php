@@ -1,6 +1,6 @@
-<?php
-use rosasurfer\ministruts\exceptions\IllegalTypeException;
-use rosasurfer\ministruts\exceptions\IOException;
+﻿<?php
+use rosasurfer\ministruts\exception\IllegalTypeException;
+use rosasurfer\ministruts\exception\IOException;
 
 use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_ERROR;

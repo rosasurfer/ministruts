@@ -1,7 +1,7 @@
-<?php
-use rosasurfer\ministruts\exceptions\DatabaseException;
-use rosasurfer\ministruts\exceptions\IllegalTypeException;
-use rosasurfer\ministruts\exceptions\InfrastructureException;
+﻿<?php
+use rosasurfer\ministruts\exception\DatabaseException;
+use rosasurfer\ministruts\exception\IllegalTypeException;
+use rosasurfer\ministruts\exception\InfrastructureException;
 
 use function rosasurfer\echoPre;
 use function rosasurfer\strCompareI;
