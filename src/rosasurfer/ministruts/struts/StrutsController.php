@@ -12,70 +12,58 @@ use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_INFO;
 use const rosasurfer\L_NOTICE;
 use const rosasurfer\LOCALHOST;
-use const rosasurfer\SECONDS;
+use const rosasurfer\MINUTE;
 use const rosasurfer\WINDOWS;
 
 
 /**
  * StrutsController
  *
- * NOTE:
- * -----
- * Diese Klasse muß innerhalb der Applikation "thread-sicher" sein (genauer: "request-sicher").  Das bedeutet,
- * daß in statischen Membervariablen kein dynamischer Laufzeitstatus gespeichert werden darf. Es gelten dieselben
- * Regeln wie für thread-sichere Programmierung.
- *
- * Hintergrund ist, daß es je Applikation nur eine StrutsController-Instanz gibt, die gecacht (serialisiert) und von
- * folgenden Requests wiederverwendet wird. Dadurch muß die XML-Konfiguration nicht bei jedem Request neu eingelesen
- * werden.
+ * To avoid repeated loading and parsing of the XML configuration after instantiation the one and only StrutsController
+ * instance is serialized, cached and re-used across following HTTP requests (until cache invalidation). For this reason
+ * the class implementation is "request safe" (in analogy to "thread safety") and holds no variable runtime status.
  */
 final class StrutsController extends Singleton {
 
 
-   private static /*bool*/ $logDebug, $logInfo, $logNotice;
-
+   /** @var bool */
+   private static $logDebug, $logInfo, $logNotice;
 
    /**
-    * alle registrierten Module, Schlüssel ist ihr Prefix
+    * @var Module[] - all registered Modules, array key is the Module prefix
     */
-   private /*Module[]*/ $modules = array();
+   private $modules = [];
 
 
    /**
-    * Gibt die Singleton-Instanz dieser Klasse zurück. Ist ein Cache installiert, wird sie gecacht.
-    * Dadurch muß die XML-Konfiguration nicht bei jedem Request neu eingelesen werden.
+    * Return the singleton instance of this class. The instance might be loaded from a Cache.
     *
     * @return Singleton
     */
    public static function me() {
       if (CLI) throw new IllegalStateException('Can not use a '.__CLASS__.' in this context.');
 
-      $cache = Cache ::me();
+      $cache = Cache::me();
 
-      // Ist schon eine Instanz im Cache ?
+      // cache hit?
       $controller = $cache->get(__CLASS__);
-
       if (!$controller) {
-         $configFile = str_replace('\\', '/', APPLICATION_ROOT.'/app/config/struts-config.xml');
-
-         // TODO: Win7/NTFS: Auf einer gesperrten Datei (Handle 1 ) funktionieren fread/file_get_contents im selben Prozeß
-         //       mit einem zweiten Handle (2) nicht mehr (keine Fehlermeldung, unter Linux funktioniert es). Mit dem zum
-         //       Sperren verwendeten Handle funktionieren die Funktionen.
-
-         // Parsen der struts-config.xml synchronisieren
+         // TODO: fix wrong lock usage (see TODO file)
+         // synchronize parsing of the struts-config.xml
          //$lock = new FileLock($configFile);
-            $controller = $cache->get(__CLASS__);
+         //   $controller = $cache->get(__CLASS__);                    // re-check after the lock is aquired
+
             if (!$controller) {
+               // create new controller instance...
+               $controller = Singleton::getInstance(__CLASS__);
 
-               // neue Instanz erzeugen ...
-               $controller = Singleton ::getInstance(__CLASS__);
+               $configFile = str_replace('\\', '/', APPLICATION_ROOT.'/app/config/struts-config.xml');
+               $dependency = FileDependency::create($configFile);
+               if (!WINDOWS && !LOCALHOST)                           // distinction dev/production
+                  $dependency->setMinValidity(1 * MINUTE);
 
-               $dependency = FileDependency ::create($configFile);
-               if (!WINDOWS && !LOCALHOST)                           // Unterscheidung Production/Development
-                  $dependency->setMinValidity(60 * SECONDS);
-
-               // ... und mit FileDependency cachen
-               $cache->set(__CLASS__, $controller, Cache ::EXPIRES_NEVER, $dependency);
+               // ...and cache it with a FileDependency
+               $cache->set(__CLASS__, $controller, Cache::EXPIRES_NEVER, $dependency);
             }
 
          //$lock->release();
@@ -87,7 +75,7 @@ final class StrutsController extends Singleton {
    /**
     * Constructor
     *
-    * Lädt die Struts-Konfiguration und erzeugt einen entsprechenden Objektbaum.
+    * Load and parse the Struts configuration and create the corresponding object hierarchy.
     */
    protected function __construct() {
       $loglevel        = Logger ::getLogLevel(__CLASS__);
@@ -95,7 +83,7 @@ final class StrutsController extends Singleton {
       self::$logInfo   = ($loglevel <= L_INFO  );
       self::$logNotice = ($loglevel <= L_NOTICE);
 
-      // Struts-Konfigurationsdateien suchen
+      // lookup configuration files
       $appDirectory = str_replace('\\', '/', APPLICATION_ROOT);
       if (!is_file($appDirectory.'/app/config/struts-config.xml'))
          throw new FileNotFoundException('Configuration file not found: "struts-config.xml"');
@@ -104,7 +92,7 @@ final class StrutsController extends Singleton {
       $files[] = $appDirectory.'/app/config/struts-config.xml';
 
 
-      // Für jede Datei ein Modul erzeugen und registrieren
+      // create and register a Module for each found file
       try {
          foreach ($files as $file) {
             $baseName = baseName($file, '.xml');
@@ -126,32 +114,32 @@ final class StrutsController extends Singleton {
 
 
    /**
-    * Verarbeitet den aktuellen Request.
+    * Process the current HTTP request.
     */
    public static function processRequest() {
-      $controller = self     ::me();
-      $request    = Request  ::me();
-      $response   = Response ::me();
+      $controller = self    ::me();
+      $request    = Request ::me();
+      $response   = Response::me();
 
-      // Module selektieren
+      // select Module
       $prefix = $controller->getModulePrefix($request);
       $module = $controller->modules[$prefix];
       $request->setAttribute(Struts::MODULE_KEY, $module);
 
-      // RequestProcessor holen
+      // get RequestProcessor
       $processor = $controller->getRequestProcessor($module);
 
-      // Request verarbeiten
+      // process Request
       $processor->process($request, $response);
    }
 
 
    /**
-    * Ermittelt den Prefix des Moduls, das den Request verarbeiten soll.
+    * Resolve the prefix of the Module responsible for processing of the given Request
     *
     * @param  Request $request
     *
-    * @return string - Modulprefix
+    * @return string - Module prefix
     */
    private function getModulePrefix(Request $request) {
       $requestPath = $request->getPath();
@@ -165,8 +153,7 @@ final class StrutsController extends Singleton {
 
       while (!isSet($this->modules[$prefix])) {
          $lastSlash = strRPos($prefix, '/');
-         if ($lastSlash === false)
-            throw new RuntimeException('No module configured for request path: '.$requestPath);
+         if ($lastSlash === false) throw new RuntimeException('No module configured for request path: '.$requestPath);
          $prefix = subStr($prefix, 0, $lastSlash);
       }
       return $prefix;
@@ -174,7 +161,7 @@ final class StrutsController extends Singleton {
 
 
    /**
-    * Gibt den RequestProcessor zurück, der für das angegebene Module zuständig ist.
+    * Get the RequestProcessor instance responsible forthe given Module.
     *
     * @param  Module $module
     *
