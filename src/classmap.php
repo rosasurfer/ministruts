@@ -6,6 +6,12 @@ use const rosasurfer\MINISTRUTS_ROOT;
  * Class map for class loader (fastest way to load classes)
  */
 return array(
+   'rosasurfer\ministruts\acl\AclManager'                             => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/acl/AclManager',
+   'rosasurfer\ministruts\acl\IAccessControlled'                      => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/acl/IAccessControlled',
+   'rosasurfer\ministruts\acl\IRoleAware'                             => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/acl/IRoleAware',
+   'rosasurfer\ministruts\acl\Policy'                                 => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/acl/Policy',
+   'rosasurfer\ministruts\acl\Role'                                   => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/acl/Role',
+
    'ApcCache'                                                         => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/cache/ApcCache',
    'Cache'                                                            => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/cache/Cache',
    'CachePeer'                                                        => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/cache/CachePeer',
