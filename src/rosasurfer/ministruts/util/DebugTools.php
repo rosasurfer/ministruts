@@ -192,11 +192,12 @@ class DebugTools extends StaticClass {
 
          if (isSet($frame['class'])) {
             $class = $frame['class'];
-            if (($pos=strRPos($class, '\\')) !== false)
+            if (is_int($pos=strRPos($class, '\\'))) {
                $class = strToLower(subStr($class, 0, $pos)).subStr($class, $pos);
+            }
             $class = $class.$frame['type'];
          }
-         else if (($pos=strRPos($function, '\\')) !== false) {
+         else if (is_int($pos=strRPos($function, '\\'))) {
             $function = strToLower(subStr($function, 0, $pos)).subStr($function, $pos);
          }
       }
