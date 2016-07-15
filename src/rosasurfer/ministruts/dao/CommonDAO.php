@@ -1,4 +1,6 @@
 ﻿<?php
+use rosasurfer\ministruts\core\Singleton;
+
 use rosasurfer\ministruts\exception\ConcurrentModificationException;
 use rosasurfer\ministruts\exception\InvalidArgumentException;
 

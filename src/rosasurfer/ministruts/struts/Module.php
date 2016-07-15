@@ -1,4 +1,6 @@
 ﻿<?php
+use rosasurfer\ministruts\core\Object;
+
 use rosasurfer\ministruts\exception\ClassNotFoundException;
 use rosasurfer\ministruts\exception\FileNotFoundException;
 use rosasurfer\ministruts\exception\IllegalStateException;

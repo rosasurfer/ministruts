@@ -1,6 +1,9 @@
 <?php
+namespace rosasurfer\ministruts\core;
+
+
 /**
- * An interface to the world for surfers. Can do anything. For example make coffee. Or go to the dark side of the Moon.
+ * An interface for surfers. Can do many things. For example make coffee. Or go to the dark side of the Moon.
  */
 interface ISurfable {
 

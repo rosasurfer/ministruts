@@ -1,4 +1,6 @@
 ﻿<?php
+use rosasurfer\ministruts\core\Object;
+
 use rosasurfer\ministruts\exception\IllegalStateException;
 use rosasurfer\ministruts\exception\IllegalTypeException;
 

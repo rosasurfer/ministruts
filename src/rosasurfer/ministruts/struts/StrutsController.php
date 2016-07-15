@@ -1,4 +1,6 @@
 <?php
+use rosasurfer\ministruts\core\Singleton;
+
 use rosasurfer\ministruts\exception\FileNotFoundException;
 use rosasurfer\ministruts\exception\IllegalStateException;
 use rosasurfer\ministruts\exception\RuntimeException;

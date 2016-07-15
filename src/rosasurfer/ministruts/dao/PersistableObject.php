@@ -1,4 +1,7 @@
 ﻿<?php
+use rosasurfer\ministruts\core\Object;
+use rosasurfer\ministruts\core\Singleton;
+
 use rosasurfer\ministruts\exception\InvalidArgumentException;
 use rosasurfer\ministruts\exception\UnimplementedFeatureException;
 
@@ -256,6 +259,6 @@ abstract class PersistableObject extends Object implements IDaoConnected {
     * @return CommonDAO
     */
    protected static function getDAO($class) {
-      return Singleton ::getInstance($class.'DAO');
+      return Singleton::getInstance($class.'DAO');
    }
 }

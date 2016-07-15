@@ -1,4 +1,6 @@
 <?php
+use rosasurfer\ministruts\core\StaticClass;
+
 use const rosasurfer\strContains;
 
 

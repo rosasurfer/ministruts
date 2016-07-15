@@ -1,4 +1,6 @@
-<?php
+﻿<?php
+use rosasurfer\ministruts\core\Object;
+
 use function rosasurfer\strRightFrom;
 
 use const rosasurfer\L_DEBUG;

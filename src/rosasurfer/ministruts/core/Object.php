@@ -1,49 +1,60 @@
 ﻿<?php
+namespace rosasurfer\ministruts\core;
+
 use rosasurfer\ministruts\exception\RuntimeException;
+
+use function rosasurfer\strLeftTo;
+use function rosasurfer\strRightFrom;
 
 
 /**
- * Object
+ * Super class for all rosasurfer classes.
  */
 class Object {
 
 
    /**
-    * Magische Methode. Fängt durch unbekannte Methodenaufrufe ausgelöste, fatale PHP-Fehler ab.
+    * Magic method. Catches other-wise fatal errors triggered by calls to non-existing methods.
     *
-    * @param  string $method - Name der aufgerufenen Methode
-    * @param  array  $args   - Array mit den der Methode übergebenen Argumenten
+    * @param  string $method - name of the non-existing method
+    * @param  array  $args   - arguments passed to the method call
     *
     * @throws RuntimeException
     */
    public function __call($method, array $args) {
-      $trace = debug_backTrace();
+      $trace = debug_backTrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+      $class = '{unknown_class}';
 
-      for ($i=0; $i < sizeOf($trace); $i++) {
-         if (strToLower($trace[$i]['function']) !== '__call')
+      foreach ($trace as $frame) {
+         if (strToLower($frame['function']) !== '__call') {
+            $class     = $frame['class'];
+            $namespace = strLeftTo   ($class, '\\', -1, true, ''     );
+            $name      = strRightFrom($class, '\\', -1, false, $class);
+            $class     = strToLower($namespace).$name;
             break;
+         }
       }
-      throw new RuntimeException('Call to undefined method '.$trace[$i]['class']."::$method()");
+      throw new RuntimeException('Call to undefined method '.$class.'::'.$method.'()');
    }
 
 
    /**
-    * Magische Methode. Fängt das Setzen undefinierter Klassenvariablen ab.
+    * Magic method. Catches the other-wise unnoticed setting of undefined class properties.
     *
-    * @param  string $property - Name der undefinierten Variable
-    * @param  mixed  $value    - Wert, auf den die Variable gesetzt werden sollte
+    * @param  string $property - name of the undefined property
+    * @param  mixed  $value    - passed value for the undefined property
     *
     * @throws RuntimeException
     */
    public function __set($property, $value) {
-      $trace = debug_backTrace();
+      $trace = debug_backTrace(DEBUG_BACKTRACE_IGNORE_ARGS|DEBUG_BACKTRACE_PROVIDE_OBJECT);
       $class = get_class($trace[0]['object']);
-      throw new RuntimeException("Undefined class variable $class::$property");
+      throw new RuntimeException('Undefined class variable '.$class.'::'.$property);
    }
 
 
    /**
-    * Gibt eine lesbare Version der Instanz zurück.
+    * Returns a human-readable version of this instance.
     *
     * @return string
     */

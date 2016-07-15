@@ -1,11 +1,15 @@
 <?php
+namespace rosasurfer\ministruts\core;
+
+
 /**
- * Einfache Superklasse für nur statisch zu verwendende Klassen.
- *
- * Klassen, die von StaticClass abgeleitet sind, können nicht instantiiert werden.
+ * Super class for classes meant to be called only statical. Derived classes cannot be instantiated.
  */
 abstract class StaticClass extends Object {
 
 
-   final private function __construct() {/* you can't instantiate me */}
+   /**
+    * Locked constructor
+    */
+   final private function __construct() {/* you can't call me */}
 }

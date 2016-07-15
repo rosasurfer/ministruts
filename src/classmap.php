@@ -12,9 +12,9 @@ return array(
    'FileSystemCache'                                                  => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/cache/FileSystemCache',
    'ReferencePool'                                                    => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/cache/ReferencePool',
 
-   'Object'                                                           => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/core/Object',
-   'Singleton'                                                        => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/core/Singleton',
-   'StaticClass'                                                      => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/core/StaticClass',
+   'rosasurfer\ministruts\core\Object'                                => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/core/Object',
+   'rosasurfer\ministruts\core\Singleton'                             => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/core/Singleton',
+   'rosasurfer\ministruts\core\StaticClass'                           => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/core/StaticClass',
 
    'CommonDAO'                                                        => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/dao/CommonDAO',
    'DaoWorker'                                                        => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/dao/DaoWorker',

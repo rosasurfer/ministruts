@@ -1,4 +1,6 @@
-<?php
+﻿<?php
+use rosasurfer\ministruts\core\Singleton;
+
 use const rosasurfer\CLI;
 
 
@@ -21,7 +23,7 @@ final class Request extends RequestBase {
     */
    public static function me() {
       if (!CLI)
-         return Singleton ::getInstance(__CLASS__);
+         return Singleton::getInstance(__CLASS__);
       return null;
    }
 }
