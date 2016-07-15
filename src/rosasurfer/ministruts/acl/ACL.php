@@ -5,7 +5,7 @@ namespace rosasurfer\ministruts\acl;
 /**
  * ACL constants
  */
-final class ACL extends StaticClass {
+class ACL extends StaticClass {
 
 
    /**
