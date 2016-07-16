@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 namespace rosasurfer\ministruts\core;
 
 use rosasurfer\ministruts\exception\RuntimeException;
