@@ -3,7 +3,23 @@ namespace rosasurfer\ministruts\acl;
 
 
 /**
- * Marker interface for access requesting Role holders (subjects).
+ * Interface implemented by access requesting Role holders (subjects).
  */
-interface IRoleAware {
+interface IRoleAware extends IIdentityNode {
+
+
+   /**
+    * Return the name of the identity.
+    *
+    * @return string
+    */
+   public function getIdentityName();
+
+
+   /**
+    * Return the ID of the identity.
+    *
+    * @return int
+    */
+   public function getIdentityId();
 }

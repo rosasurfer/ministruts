@@ -10,6 +10,7 @@ return array(
    'rosasurfer\ministruts\acl\AclManager'                             => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/acl/AclManager',
    'rosasurfer\ministruts\acl\DbAdapter'                              => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/acl/DbAdapter',
    'rosasurfer\ministruts\acl\IAccessControlled'                      => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/acl/IAccessControlled',
+   'rosasurfer\ministruts\acl\IIdentityNode'                          => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/acl/IIdentityNode',
    'rosasurfer\ministruts\acl\IniFileAdapter'                         => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/acl/IniFileAdapter',
    'rosasurfer\ministruts\acl\IPolicyAware'                           => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/acl/IPolicyAware',
    'rosasurfer\ministruts\acl\IRoleAware'                             => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/acl/IRoleAware',

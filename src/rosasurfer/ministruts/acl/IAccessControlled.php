@@ -3,7 +3,23 @@ namespace rosasurfer\ministruts\acl;
 
 
 /**
- * Marker interface for access controlled resources (objects).
+ * Interface implemented by access controlled resources (objects).
  */
-interface IAccessControlled {
+interface IAccessControlled extends IIdentityNode {
+
+
+   /**
+    * Return the name of the resource.
+    *
+    * @return string
+    */
+   public function getResourceName();
+
+
+   /**
+    * Return the ID of the resource.
+    *
+    * @return int
+    */
+   public function getResourceId();
 }
