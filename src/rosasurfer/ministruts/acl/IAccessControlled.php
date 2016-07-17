@@ -9,17 +9,17 @@ interface IAccessControlled extends IIdentityNode {
 
 
    /**
-    * Return the name of the resource.
+    * Return the type of the resource, e.g. the class name "Order" or the alias "route".
     *
     * @return string
     */
-   public function getResourceName();
+   public function getResourceType();
 
 
    /**
-    * Return the ID of the resource.
+    * Return the ID of the resource. Can be anything uniquely identifying all instances of its type.
     *
-    * @return int
+    * @return string
     */
    public function getResourceId();
 }

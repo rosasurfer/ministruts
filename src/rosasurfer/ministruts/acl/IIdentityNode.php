@@ -5,15 +5,31 @@ namespace rosasurfer\ministruts\acl;
 /**
  * Interface implemented by ACL identities. Identitites are organized in a multi-root-node hierarchy. Each identity
  * can have multiple super-identities (parent nodes) and multiple sub-identities (child nodes). If an identity has no
- * parent nodes it is a root node identity. If an identity has no child nodes it is an end node identity.
+ * parent node it is a root node. If an identity has no child nodes it is an end node.
  */
 interface IIdentityNode {
 
 
    /**
-    * Return the parent nodes of the identity (if any).
+    * Return the name of the node, e.g. the class name (ie. not unique).
     *
-    * @return IIdentityNode[] - array of nodes or an empty value if the identity is a root node
+    * @return string
+    */
+   public function getNodeName();
+
+
+   /**
+    * Return the ID of the node. Can be anything uniquely identifying all nodes with the same name.
+    *
+    * @return string
+    */
+   public function getNodeId();
+
+
+   /**
+    * Return the parent nodes of the node (if any).
+    *
+    * @return IIdentityNode[] - array of nodes or an empty value if the node is a root node
     */
    public function getParentNodes();
 }
