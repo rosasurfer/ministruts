@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\ministruts\acl;
+namespace rosasurfer\ministruts\acl\adapter;
 
 use rosasurfer\ministruts\core\Object;
 
