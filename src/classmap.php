@@ -8,14 +8,14 @@ use const rosasurfer\MINISTRUTS_ROOT;
 return array(
    'rosasurfer\ministruts\acl\ACL'                                    => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/acl/ACL',
    'rosasurfer\ministruts\acl\AclManager'                             => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/acl/AclManager',
-   'rosasurfer\ministruts\acl\DbAdapter'                              => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/acl/DbAdapter',
    'rosasurfer\ministruts\acl\IAccessControlled'                      => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/acl/IAccessControlled',
    'rosasurfer\ministruts\acl\IIdentityNode'                          => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/acl/IIdentityNode',
-   'rosasurfer\ministruts\acl\IniFileAdapter'                         => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/acl/IniFileAdapter',
    'rosasurfer\ministruts\acl\IPolicyAware'                           => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/acl/IPolicyAware',
    'rosasurfer\ministruts\acl\IRoleAware'                             => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/acl/IRoleAware',
    'rosasurfer\ministruts\acl\Policy'                                 => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/acl/Policy',
    'rosasurfer\ministruts\acl\Role'                                   => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/acl/Role',
+   'rosasurfer\ministruts\acl\adapter\DbAdapter'                      => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/acl/adapter/DbAdapter',
+   'rosasurfer\ministruts\acl\adapter\IniFileAdapter'                 => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/acl/adapter/IniFileAdapter',
 
    'ApcCache'                                                         => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/cache/ApcCache',
    'Cache'                                                            => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/cache/Cache',
