@@ -5,9 +5,9 @@ use rosasurfer\ministruts\core\Object;
 
 
 /**
- * ACL adapter reading ACLs from a plain .ini file.
+ * ACL adapter reading ACLs from the application's main configuration.
  */
-class IniFileAdapter extends Object {
+class ConfigAdapter extends Object {
 
 
    /**

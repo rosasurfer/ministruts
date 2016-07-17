@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 use rosasurfer\ministruts\core\Object;
 
 use rosasurfer\ministruts\exception\IllegalTypeException;
@@ -7,91 +7,92 @@ use rosasurfer\ministruts\exception\RuntimeException;
 
 use const rosasurfer\CLI;
 use const rosasurfer\LOCALHOST;
+use const rosasurfer\MINISTRUTS_ROOT;
 use const rosasurfer\SECONDS;
 use const rosasurfer\WINDOWS;
 
 
 /**
- * Config
+ * Default application configuration. Settings in the defined configuration directories are read from the file
+ * "config-default.properties" (if it exists) and "config.properties" (if it exists). Config files in the directories
+ * are looked-up and processed in the following order:
  *
- * Klasse zur Anwendungskonfiguration. Einstellungen werden in Dateien "config.properties" und
- * "config-default.properties" abgelegt, die in folgender Reihenfolge gesucht und verarbeitet werden:
+ * CLI applications:
+ * <pre>
+ *   "config.properties"         in the directory containing the main running script
+ *   "config-default.properties" in the same directory
+ * </pre>
  *
+ * All applications (web + CLI):
+ * <pre>
+ *   "config.properties"         in the application's config directory, that's: APPLICATION_ROOT.'/app/config/'
+ *   "config-default.properties" in the same directory
  *
- * Webanwendungen:
- * ---------------
- *    - "config.properties"         im Config-Verzeichnis der Anwendung: APPLICATION_ROOT.'/app/config/'
- *    - "config-default.properties" im Config-Verzeichnis der Anwendung: APPLICATION_ROOT.'/app/config/'
- *
- *    Für jeden einzelnen Pfad des Include-Pfades:
- *    - "config.properties"
- *    - "config-default.properties"
- *
- *
- * Konsolenanwendungen:
- * --------------------
- *    - "config.properties"         im aktuellen Verzeichnis
- *    - "config-default.properties" im aktuellen Verzeichnis
- *    - "config.properties"         im Scriptverzeichnis
- *    - "config-default.properties" im Scriptverzeichnis
- *
- *    Für jeden einzelnen Pfad des Include-Pfades:
- *    - "config.properties"
- *    - "config-default.properties"
+ *   "config.properties"         in the framework's config directory, that's: MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/'
+ *   "config-default.properties" in the same directory
+ * </pre>
  *
  *
- * Durch diese Reihenfolge können mehrere Dateien gleichen Namens geladen werden, z.B. eine für die
- * Konfiguration einer Bibliothek (liegt im Include-Path der Bibliothek) und eine weitere für die
- * Konfiguration eines einzelnen Projektes (liegt im WEB-INF-Verzeichnis des Projektes). Dabei haben
- * die zuerst eingelesenen Einstellungen eine höhere Priorität als die später eingelesenen. Allgemeine
- * Einstellungen in einer Bibliothek können so durch eigene Einstellungen im Projektverzeichnis
- * überschrieben werden. Einstellungen in "config.properties" haben eine höhere Priorität als die
- * entsprechenden Einstellungen einer "config-default.properties" im selben Verzeichnis.
+ * - The settings of the found files are merged, whether a single setting is defined in one file or another doesn't matter.
+ *   If multiple occurrences of the same setting are found the first encountered setting "wins".
  *
- * Die Datei "config-default.properties" enthält allgemeingültige oder Default-Einstellungen eines Projektes.
- * Diese Datei wird im Repository gespeichert. Die Datei "config.properties" hingegen enthält arbeitsplatzspezifische
- * Einstellungen für den Entwicklungsbetrieb oder spezielle, nicht öffentliche Einstellungen für den Produktivbetrieb.
- * Sie wird nicht im Repository gespeichert.
+ * - A "config-default.properties" file should contain common global settings identical for all developers. It is meant
+ *   to be stored in the code repository and is the place to store default settings.
  *
- * Dateiformat:
- * ------------
- * Einstellungen werden als "name = wert" abgelegt. Kommentare werden mit einem Hash "#" eingeleitet.
- * Leerzeilen, führende und abschließende Leerzeichen werden ignoriert.  Durch Gruppierung können
- * Strukturen definiert werden, eine solche Struktur kann im ganzen (Rückgabewert: Array) oder als
- * einzelner Wert (Rückgabewert: String) abgefragt werden.
+ * - A "config.properties" file should contain custom user or working place specific settings and is not meant to be stored
+ *   in the code repository. It is the place to store specific settings, e.g. production settings.
  *
  *
- * Beispiel:
- * ---------
+ * File format:<br>
+ * Settings are defined as "key = value" pairs. Empty lines and enclosing white space are ignored. Sub-keys can be used
+ * to create array structures which can be queried as a whole (array) or as single values (string).
+ *
+ *
+ * @example
+ * <pre>
  * db.connector = mysql
  * db.host      = localhost:3306
- * db.username  = myapp_user
- * db.password  = plainpassword
- * db.database  = db_test
+ * db.username  = username
+ * db.password  = password
+ * db.database  = schema
  *
- * # Kommentar in eigener Zeile
- * log.level.Action = warn             # Kommentar am Ende einer Zeile
+ * # comment on its own line
+ * log.level.Action                            = warn             # comment at the end of line
+ * log.level.rosasurfer\ministruts\util\Config = notice           # keys may contain namespaces
+ *
+ * key.subkey with spaces = value                                 # subkeys may contain spaces
+ * key.   indented subkey = value                                 # enclosing space around subkeys is ignored
+ *
+ * key."double.quoted.subkey.with.separators"            = value  # quoted subkeys can contain otherwise illegal characters
+ * key.'single.quoted.subkey.with.separators'            = value
+ *
+ * key."quote characters \" in a subkey must be escaped" = value
+ * key.'quote characters \' in a subkey must be escaped' = value
+ * </pre>
  */
-final class Config extends Object {
-
-
-   // Namen der gefundenen Config-Files
-   private /*string[]*/ $files = array();
-
-
-   // Property-Pool
-   private $properties = array();
+class Config extends Object {
 
 
    /**
-    * Gibt die Instanz dieser Klasse zurück. Obwohl Config nicht Singleton implementiert, gibt es im
-    * User-Code nur eine einzige Instanz. Diese Instanz wird gecacht.
+    * @var string[] - config file names (existing and non-existing) of all config directories
+    */
+   private $files = [];
+
+   /**
+    * @var string[] - property pool
+    */
+   private $properties = [];
+
+
+   /**
+    * Gibt die Instanz dieser Klasse zurück. Obwohl Config nicht Singleton implementiert, gibt es im User-Code nur eine
+    * einzige Instanz. Diese Instanz wird gecacht.
     *
     * @return Config
     */
    public static function me() {
-      static /*Config*/ $config = null;      // emuliert Singleton (Config kann nicht Singleton sein)
-      static /*bool  */ $locked = false;     // Hilfsvariable, falls me() rekursiv aufgerufen wird
+      static /*Config*/ $config = null;      // emuliert Singleton (Config kann nicht Singleton sein, um serialisiert werden zu können)
+      static /*bool  */ $locked = false;     // detect recursive calls
 
       $cache = null;
 
@@ -114,12 +115,12 @@ final class Config extends Object {
                $config = new self();
 
                // ... FileDependency erzeugen ...
-               $dependency = FileDependency ::create(array_keys($config->files));
+               $dependency = FileDependency::create(array_keys($config->files));
                if (!WINDOWS && !CLI && !LOCALHOST)                   // Unterscheidung Production/Development
                   $dependency->setMinValidity(60 * SECONDS);
 
                // ... und cachen
-               $cache->set(__CLASS__, $config, Cache ::EXPIRES_NEVER, $dependency);
+               $cache->set(__CLASS__, $config, Cache::EXPIRES_NEVER, $dependency);
             }
          }
       }
@@ -132,36 +133,39 @@ final class Config extends Object {
     * Constructor
     *
     * Lädt die Konfiguration aus allen existierenden config-default.properties- und config.properties-Dateien.
-    * Die config.properties-Dateien sollten nicht im Repository gespeichert werden, so daß eine globale und eine
-    * lokale Konfiguration mit unterschiedlichen Einstellungen möglich sind. Lokale Einstellungen überschreiben
-    * globale Einstellungen.
+    * Die config.properties-Dateien sollen nicht im Repository gespeichert werden, so daß eine Default- und eine
+    * Custom-Konfiguration mit unterschiedlichen Einstellungen möglich sind. Custom-Einstellungen überschreiben
+    * Default-Einstellungen.
     */
    private function __construct() {
-      // Suchpfad je nach Web- oder Konsolenanwendung definieren
-      if (CLI) $path = getCwd().PATH_SEPARATOR.dirName($_SERVER['SCRIPT_FILENAME']);   // console: aktuelles + Scriptverzeichnis
-      else     $path = APPLICATION_ROOT.'/app/config';                                 // web
+      // define config paths according to runtime context
+      $paths = [];
+      CLI && $paths[] = dirName($_SERVER['SCRIPT_FILENAME']);           // cli:   script directory
+      $paths[]        = APPLICATION_ROOT.'/app/config';                 // all: + app config directory
+      $paths[]        = MINISTRUTS_ROOT.'/src/rosasurfer/ministruts';   // all: + framework config directory
 
-      // Include-Pfad anhängen und Suchpfad zerlegen
-      $paths = explode(PATH_SEPARATOR, $path.PATH_SEPARATOR.ini_get('include_path'));
-
-      // Config-Dateien suchen
-      $files = array();
-      foreach ($paths as $key => $path) {
-         $path = realPath($path);
-         if ($path) {
-            $file = null;
-            $files[$file] = is_file($file = $path.'/config.properties');
-            $files[$file] = is_file($file = $path.'/config-default.properties');
+      // normalize paths and remove duplicates
+      foreach ($paths as $i => $path) {
+         if (!is_dir($path)) {
+            unset($paths[$i]);                                          // app config directory might not exist
+            continue;
          }
+         $paths[$i] = realPath($path);
+      }
+      $paths = array_unique($paths);
+
+      // look-up existing config files
+      $files = [];
+      foreach ($paths as $path) {
+         $files[$file] = is_file($file=$path.DIRECTORY_SEPARATOR.'config.properties');
+         $files[$file] = is_file($file=$path.DIRECTORY_SEPARATOR.'config-default.properties');
       }
       $this->files = $files;
 
-      // Weiter vorn im Include-Path stehende Dateien haben Vorrang vor weiter hinten stehenden. Die Dateien
-      // werden von "hinten" beginnend geladen, dadurch können weiter "vorn" stehende Einstellungen vorhandene
-      // weiter "hinten" stehende Einstellungen überschreiben.
-      foreach (array_reverse($files) as $name => $fileExists) {
-         if ($fileExists)
-            $this->loadFile($name);
+      // Load config files in reverse order. This way we don't need to track defined settings and incoming settings
+      // simply over-write existing ones.
+      foreach (array_reverse($files) as $fileName => $fileExists) {
+         $fileExists && $this->loadFile($fileName);
       }
    }
 
@@ -209,7 +213,7 @@ final class Config extends Object {
       if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
 
       // TODO: Typen erkennen und automatisch casten
-      $value = self ::me()->getProperty($key);
+      $value = self::me()->getProperty($key);
 
       if (is_null($value)) {
          if (func_num_args() == 1) throw new RuntimeException('Missing configuration setting for key "'.$key.'"');
@@ -233,7 +237,7 @@ final class Config extends Object {
       if (!is_string($key))   throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
       if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
 
-      return self ::me()->setProperty($key, $value);
+      return self::me()->setProperty($key, $value);
    }
 
 
