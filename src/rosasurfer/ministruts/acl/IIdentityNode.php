@@ -11,7 +11,7 @@ interface IIdentityNode {
 
 
    /**
-    * Return the name of the node, e.g. the class name (ie. not unique).
+    * Return the name of the node, e.g. the class name (i.e. not unique).
     *
     * @return string
     */
