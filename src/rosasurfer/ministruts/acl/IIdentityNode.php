@@ -11,7 +11,7 @@ interface IIdentityNode {
 
 
    /**
-    * Return the parent nodes of the identity (groups, if any).
+    * Return the parent nodes of the identity (if any).
     *
     * @return IIdentityNode[] - array of nodes or an empty value if the identity is a root node
     */
