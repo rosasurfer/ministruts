@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 use rosasurfer\ministruts\core\StaticClass;
 
 use rosasurfer\ministruts\exception\BaseException as RosasurferException;
@@ -56,10 +56,6 @@ class Logger extends StaticClass {
    private static /*string[]*/ $smsReceivers  = [];         // SMS-Empfänger
    private static /*int     */ $smsLogLevel   = L_FATAL;    // notwendiger Loglevel für den SMS-Versand
    private static /*string[]*/ $smsOptions    = [];         // SMS-Konfiguration
-
-
-   // Default-Loglevel (kann angepaßt werden, siehe Klassenbeschreibung)
-   const DEFAULT_LOGLEVEL = L_NOTICE;
 
 
    // Beschreibungen der verfügbaren Loglevel
@@ -138,7 +134,7 @@ class Logger extends StaticClass {
 
          foreach ($logLevels as $className => $level) {
             if (!is_string($level)) throw new IllegalTypeException('Illegal log level type for class '.$className.': '.getType($level));
-            if     ($level == '')                     $logLevels[$className] = self:: DEFAULT_LOGLEVEL;
+            if     ($level == '')                     $logLevels[$className] = System::DEFAULT_LOGLEVEL;
             elseif (defined('L_'.strToUpper($level))) $logLevels[$className] = constant('L_'.strToUpper($level));
             else                    throw new InvalidArgumentException('Invalid log level for class '.$className.': '.$level);
          }
@@ -148,7 +144,7 @@ class Logger extends StaticClass {
       if (isSet($logLevels[$class]))
          return $logLevels[$class];
 
-      return self:: DEFAULT_LOGLEVEL;
+      return System::DEFAULT_LOGLEVEL;
    }
 
 

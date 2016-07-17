@@ -8,6 +8,7 @@ use function rosasurfer\echoPre;
 use function rosasurfer\printPretty;
 
 use const rosasurfer\CLI;
+use const rosasurfer\L_NOTICE;
 use const rosasurfer\L_WARN;
 use const rosasurfer\NL;
 use const rosasurfer\WINDOWS;
@@ -17,6 +18,14 @@ use const rosasurfer\WINDOWS;
  * Framework system class: general system-wide functionality
  */
 class System extends StaticClass {
+
+
+   /**
+    * Application-wide default loglevel.
+    *
+    * @see \Logger - for class specific loglevel configuration
+    */
+   const DEFAULT_LOGLEVEL = L_NOTICE;
 
 
    /** @var callable */
