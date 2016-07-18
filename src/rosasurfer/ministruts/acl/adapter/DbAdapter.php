@@ -7,5 +7,5 @@ use rosasurfer\ministruts\core\Object;
 /**
  * ACL adapter reading ACLs from a database.
  */
-class DbAdapter extends Object implements IAclAdapter {
+class DbAdapter extends Object implements AdapterInterface {
 }
