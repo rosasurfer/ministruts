@@ -69,7 +69,7 @@ class Logger extends StaticClass {
 
 
    /**
-    * Initialisiert die statischen Klassenvariablen.
+    * Initialize the static config properties.
     */
    public static function init() {
       static $initialized = false;
@@ -82,16 +82,22 @@ class Logger extends StaticClass {
 
 
       // Der E-Mailversand ist aktiv, wenn in der Projektkonfiguration mindestens eine E-Mailadresse angegeben wurde.
-      self::$mail          = false;
-      self::$mailReceivers = array();
-      $receivers = Config::get('mail.address.forced-receiver', '');     // Zum mailen wird keine Klasse, sondern die PHP-interne
-      if (strLen($receivers) == 0)                                      // mail()-Funktion benutzt. Die Konfiguration muß deshalb hier
-         $receivers = Config ::get('log.mail.receiver', '');            // selbst auf "mail.address.forced-receiver" geprüft werden.
-      foreach (explode(',', $receivers) as $receiver) {
+      $receivers = [];
+      foreach (explode(',', Config::get('log.mail.receiver', '')) as $receiver) {
          if ($receiver=trim($receiver))
-            self::$mailReceivers[] = $receiver;                         // TODO: Adressformat validieren
+            $receivers[] = $receiver;                       // TODO: Adressformat validieren
       }
-      self::$mail = (bool) self::$mailReceivers;
+      if ($receivers) {
+         if ($forced=Config::get('mail.address.forced-receiver', null)) {
+            $receivers = [];                                // Um Fehler zu vermeiden, wird zum Mailen keine Klasse, sondern
+            foreach (explode(',', $forced) as $receiver) {  // die PHP-interne Funktion mail() benutzt. Die Konfiguration muß
+               if ($receiver=trim($receiver))               // deshalb hier selbst auf "mail.address.forced-receiver" geprüft
+                  $receivers[] = $receiver;                 // werden.
+            }
+         }
+      }
+      self::$mail          = (bool) $receivers;
+      self::$mailReceivers =        $receivers;
 
 
       // Der SMS-Versand ist aktiv, wenn in der Projektkonfiguration mindestens eine Rufnummer und ein SMS-Loglevel angegeben wurden.
@@ -228,11 +234,15 @@ class Logger extends StaticClass {
       catch (\Exception $secondary) {
          $file = $exception->getFile();
          $line = $exception->getLine();
-         self::error_log('PHP primary '.(string)$exception.' in '.$file.' on line '.$line);
+         $msg  = 'PHP primary '.(string)$exception.' in '.$file.' on line '.$line;
+         self::$print && echoPre($msg);
+         self::error_log($msg);
 
          $file = $secondary->getFile();
          $line = $secondary->getLine();
-         self::error_log('PHP secondary '.(string)$secondary.' in '.$file.' on line '.$line);
+         $msg  = 'PHP secondary '.(string)$secondary.' in '.$file.' on line '.$line;
+         self::$print && echoPre($msg);
+         self::error_log($msg);
       }
       finally {
          exit(1);                               // exit und signal the error
@@ -408,7 +418,9 @@ class Logger extends StaticClass {
          }
       }
       catch (\Exception $ex) {
-         self::error_log('PHP (0) '.$plainMessage ? $plainMessage:$message);
+         $msg = 'PHP (0) '.$plainMessage ? $plainMessage:$message;
+         self::$print && echoPre($msg);
+         self::error_log($msg);
          throw $ex;
       }
    }
@@ -420,11 +432,22 @@ class Logger extends StaticClass {
     * @param  string $message - zu loggende Message
     */
    private static function error_log($message) {
-      $message = str_replace(array("\r\n", "\n"), ' ', $message);    // Zeilenumbrüche entfernen
-      $message = str_replace(chr(0), "*\x00*", $message);            // NUL-Bytes ersetzen (zerschießen Logfile)
+      $message = str_replace(["\r\n", "\n"], ' ', $message);   // Zeilenumbrüche entfernen
+      $message = str_replace(chr(0), "*\x00*", $message);      // NUL-Bytes ersetzen (zerschießen Logfile)
 
-      if (!CLI || !self::$print)                                     // verhindern, daß der Fehler ein weiteres Mal
-         error_log($message, ERROR_LOG_SYSLOG);                      // auf STDERR ausgegeben wird
+      /**
+       * ini_get('error_log')
+       *
+       * Name of the file where script errors should be logged. If the special value "syslog" is used, errors are sent
+       * to the system logger instead. On Unix, this means syslog(3) and on Windows NT it means the event log.
+       * If this directive is not set, errors are sent to the SAPI error logger. For example, it is an error log in Apache
+       * or STDERR in CLI.
+       */
+      if (CLI && !ini_get('error_log')) {                      // TODO: Augabe auf STDERR nur in interaktiven Terminals
+      }                                                        //       unterdrücken.
+      else {
+         error_log($message, ERROR_LOG_SYSLOG);
+      }
    }
 
 

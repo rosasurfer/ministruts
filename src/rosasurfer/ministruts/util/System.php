@@ -92,7 +92,7 @@ class System extends StaticClass {
    public static function handleError($level, $message, $file, $line, array $context) {
       // TODO: detect and handle recursive calls
 
-      //echoPre(__METHOD__.'(1)  '.DebugTools::errorLevelToStr($level).': $message='.$message.', $file='.$file.', $line='.$line);
+      //echoPre(__METHOD__.'()  '.DebugTools::errorLevelToStr($level).': $message='.$message.', $file='.$file.', $line='.$line);
 
       // ignore suppressed errors and errors not covered by the current reporting level
       $reportingLevel = error_reporting();
@@ -116,15 +116,16 @@ class System extends StaticClass {
        */
 
       /**
-       * (1) Errors triggered by require() or require_once()
+       * Errors triggered by require() or require_once()
        *
-       *     PHP errors triggered by require() or require_once() are non-catchable errors and do not follow regular
-       *     application flow. PHP terminates the script after leaving the error handler, thrown exceptions are ignored.
-       *     In fact this termination is intended behaviour and the main difference to include() and include_once().
+       * Problem: PHP errors triggered by require() or require_once() are non-catchable errors and do not follow
+       *          regular application flow. PHP terminates the script after leaving the error handler, thrown
+       *          exceptions are ignored. This termination is intended behaviour and the main difference to include()
+       *          and include_once().
        *
-       *     @see  http://stackoverflow.com/questions/25584494/php-set-exception-handler-not-working-for-error-thrown-in-set-error-handler-cal
+       * Solution: Manually call the exception handler.
        *
-       *     Solution: manually call the exception handler
+       * @see  http://stackoverflow.com/questions/25584494/php-set-exception-handler-not-working-for-error-thrown-in-set-error-handler-cal
        */
       $function = DebugTools::getFQFunctionName($exception->getBetterTrace()[0]);
       if ($function=='require' || $function=='require_once') {
@@ -180,6 +181,8 @@ class System extends StaticClass {
     */
    private static function handleException(\Exception $exception) {
       // TODO: detect and handle recursive calls
+
+      //echoPre(__METHOD__.'()  '.DebugTools::getBetterMessage($exception));
 
       // !!! old legacy version !!!
       Logger::handleException($exception);
