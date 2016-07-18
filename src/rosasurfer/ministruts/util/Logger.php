@@ -11,8 +11,8 @@ use function rosasurfer\printPretty;
 use function rosasurfer\strStartsWith;
 
 use const rosasurfer\CLI;
+use const rosasurfer\ERROR_LOG_DEFAULT;
 use const rosasurfer\ERROR_LOG_MAIL;
-use const rosasurfer\ERROR_LOG_SYSLOG;
 use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_ERROR;
 use const rosasurfer\L_FATAL;
@@ -446,7 +446,7 @@ class Logger extends StaticClass {
       if (CLI && !ini_get('error_log')) {                      // TODO: Augabe auf STDERR nur in interaktiven Terminals
       }                                                        //       unterdrücken.
       else {
-         error_log($message, ERROR_LOG_SYSLOG);
+         error_log($message, ERROR_LOG_DEFAULT);
       }
    }
 

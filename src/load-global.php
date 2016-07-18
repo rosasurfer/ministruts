@@ -10,7 +10,8 @@ if (defined('rosasurfer\MINISTRUTS_ROOT')) return;
  */
 if (PHP_VERSION < '5.6') {
    echo 'application error'.PHP_EOL;
-   exit(255|error_log('Error: A PHP version >= 5.6 is required (found version '.PHP_VERSION.').'));
+   error_log('Error: A PHP version >= 5.6 is required (found version '.PHP_VERSION.').');
+   exit(1);
 }
 
 
@@ -36,11 +37,11 @@ define('L_ERROR' , rosasurfer\L_ERROR );
 define('L_FATAL' , rosasurfer\L_FATAL );
 
 // log destinations for the built-in function error_log()
-define('ERROR_LOG_SYSLOG', rosasurfer\ERROR_LOG_SYSLOG);                      // message is sent to PHP's sy stem logger
-define('ERROR_LOG_MAIL'  , rosasurfer\ERROR_LOG_MAIL  );                      // message is sent by email
-define('ERROR_LOG_DEBUG' , rosasurfer\ERROR_LOG_DEBUG );                      // message is sent through the PHP debugging connection
-define('ERROR_LOG_FILE'  , rosasurfer\ERROR_LOG_FILE  );                      // message is appended to a file destination
-define('ERROR_LOG_SAPI'  , rosasurfer\ERROR_LOG_SAPI  );                      // message is sent directly to the SAPI logging handler
+define('ERROR_LOG_DEFAULT', rosasurfer\ERROR_LOG_DEFAULT);                    // message is sent to the configured log or the system logger
+define('ERROR_LOG_MAIL'   , rosasurfer\ERROR_LOG_MAIL   );                    // message is sent by email
+define('ERROR_LOG_DEBUG'  , rosasurfer\ERROR_LOG_DEBUG  );                    // message is sent through the PHP debugging connection
+define('ERROR_LOG_FILE'   , rosasurfer\ERROR_LOG_FILE   );                    // message is appended to a file destination
+define('ERROR_LOG_SAPI'   , rosasurfer\ERROR_LOG_SAPI   );                    // message is sent directly to the SAPI logging handler
 
 // time periods
 define('SECOND', rosasurfer\SECOND); define('SECONDS', rosasurfer\SECONDS);

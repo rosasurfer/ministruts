@@ -32,7 +32,7 @@ class HeaderUtils extends StaticClass {
       }
       // TODO: QueryString muß kodiert werden
       header('Location: '.$url);
-      exit();                       // Ausgabe weiteren Contents verhindern
+      exit(0);                      // Ausgabe weiteren Contents verhindern
 
       /** TODO: HTTP/1.1 requires an absolute URI as argument to 'Location:' including the scheme, hostname and
        *        absolute path, but some clients accept relative URIs. You can usually use $_SERVER['HTTP_HOST'],

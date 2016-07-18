@@ -45,11 +45,11 @@ define('rosasurfer\L_ERROR' , 16);
 define('rosasurfer\L_FATAL' , 32);
 
 // log destinations for the built-in function error_log()
-define('rosasurfer\ERROR_LOG_SYSLOG', 0);                                           // message is sent to PHP's system logger
-define('rosasurfer\ERROR_LOG_MAIL'  , 1);                                           // message is sent by email
-define('rosasurfer\ERROR_LOG_DEBUG' , 2);                                           // message is sent through the PHP debugging connection
-define('rosasurfer\ERROR_LOG_FILE'  , 3);                                           // message is appended to a file destination
-define('rosasurfer\ERROR_LOG_SAPI'  , 4);                                           // message is sent directly to the SAPI logging handler
+define('rosasurfer\ERROR_LOG_DEFAULT', 0);                                          // message is sent to the configured log or the system logger
+define('rosasurfer\ERROR_LOG_MAIL'   , 1);                                          // message is sent by email
+define('rosasurfer\ERROR_LOG_DEBUG'  , 2);                                          // message is sent through the PHP debugging connection
+define('rosasurfer\ERROR_LOG_FILE'   , 3);                                          // message is appended to a file destination
+define('rosasurfer\ERROR_LOG_SAPI'   , 4);                                          // message is sent directly to the SAPI logging handler
 
 // time periods
 define('rosasurfer\SECOND',   1          ); define('rosasurfer\SECONDS', SECOND);
@@ -78,8 +78,8 @@ define('rosasurfer\NL' , "\n"   );
 /**
  * (3) check/adjust PHP environment
  */
-(PHP_VERSION < '5.6')      && echoPre('application error') && exit(255|error_log('Error: A PHP version >= 5.6 is required (found version '.PHP_VERSION.').'));
-!ini_get('short_open_tag') && echoPre('application error') && exit(255|error_log('Error: The PHP configuration value "short_open_tag" must be enabled.'));
+(PHP_VERSION < '5.6')      && exit(1|echoPre('application error')|error_log('Error: A PHP version >= 5.6 is required (found version '.PHP_VERSION.').'));
+!ini_get('short_open_tag') && exit(1|echoPre('application error')|error_log('Error: The PHP configuration value "short_open_tag" must be enabled.'));
 
 ini_set('arg_separator.output'    , '&amp;'                );
 ini_set('auto_detect_line_endings',  1                     );
@@ -113,7 +113,7 @@ if (false && !CLI && strEndsWith(strLeftTo($_SERVER['REQUEST_URI'], '?'), '/phpi
 /**
  * (5) check/adjust application requirements
  */
-!defined('\APPLICATION_ROOT') && echoPre('application error') && exit(255|error_log('Error: The global constant APPLICATION_ROOT must be defined.'));
+!defined('\APPLICATION_ROOT') && exit(1|echoPre('application error')|error_log('Error: The global constant APPLICATION_ROOT must be defined.'));
 !defined('\APPLICATION_ID'  ) && define('APPLICATION_ID', md5(\APPLICATION_ROOT));
 
 
