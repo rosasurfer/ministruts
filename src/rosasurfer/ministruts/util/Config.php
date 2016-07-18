@@ -154,7 +154,7 @@ class Config extends Object {
       }
       $paths = array_unique($paths);
 
-      // look-up existing config files
+      // look-up existence of all config files
       $files = [];
       foreach ($paths as $path) {
          $files[$file] = is_file($file=$path.DIRECTORY_SEPARATOR.'config.properties');
@@ -162,8 +162,7 @@ class Config extends Object {
       }
       $this->files = $files;
 
-      // Load config files in reverse order. This way we don't need to track defined settings and incoming settings
-      // simply over-write existing ones.
+      // Load config files in reverse order. This way duplicate incoming settings over-write existing ones.
       foreach (array_reverse($files) as $fileName => $fileExists) {
          $fileExists && $this->loadFile($fileName);
       }
@@ -177,7 +176,7 @@ class Config extends Object {
     * @param  string $filename - Dateiname
     */
    private function loadFile($filename) {
-      $lines = file($filename, FILE_IGNORE_NEW_LINES + FILE_SKIP_EMPTY_LINES);
+      $lines = file($filename, FILE_IGNORE_NEW_LINES|FILE_SKIP_EMPTY_LINES);
 
       foreach ($lines as $line) {
          // Kommentare entfernen
@@ -188,8 +187,7 @@ class Config extends Object {
 
          // Key und Value trennen
          $parts = explode('=', $line, 2);
-         if (sizeOf($parts) < 2)
-            throw new RuntimeException('Syntax error in configuration file "'.$filename.'" at line: "'.$line.'"');
+         if (sizeOf($parts) < 2) throw new RuntimeException('Syntax error in configuration file "'.$filename.'" at line: "'.$line.'"');
 
          // Eigenschaft setzen
          $this->setProperty(trim($parts[0]), trim($parts[1]), false); // Cache nicht aktualisieren
