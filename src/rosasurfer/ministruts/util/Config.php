@@ -28,7 +28,7 @@ use const rosasurfer\WINDOWS;
  *   "config.properties"         in the application's config directory, that's: APPLICATION_ROOT.'/app/config/'
  *   "config-default.properties" in the same directory
  *
- *   "config.properties"         in the framework's config directory, that's: MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/'
+ *   "config.properties"         in the framework's config directory, that's: MINISTRUTS_ROOT.'/src/'
  *   "config-default.properties" in the same directory
  * </pre>
  *
@@ -142,7 +142,7 @@ class Config extends Object {
       $paths = [];
       CLI && $paths[] = dirName($_SERVER['SCRIPT_FILENAME']);           // cli:   script directory
       $paths[]        = APPLICATION_ROOT.'/app/config';                 // all: + app config directory
-      $paths[]        = MINISTRUTS_ROOT.'/src/rosasurfer/ministruts';   // all: + framework config directory
+      $paths[]        = MINISTRUTS_ROOT.'/src';                         // all: + framework config directory
 
       // normalize paths and remove duplicates
       foreach ($paths as $i => $path) {

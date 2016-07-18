@@ -24,3 +24,4 @@
 # ignore the following directories and files
 /etc/
 /vendor/
+config.properties
