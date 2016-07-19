@@ -761,12 +761,9 @@ function mkDirWritable($path, $mode=0770) {
 
 
 /**
- * Whether or not the specified class exists (defined or undefined) and is not an interface. The function calls all
- * registered class loaders. Opposite to a call of
- * <pre>
- *    class_exist($name, true)
- * </pre>
- * it does not terminate the script if the class can't be loaded.
+ * Whether or not the specified class exists (defined or undefined) and is not an interface or a trait. The function calls
+ * all registered class loaders. Opposite to a call of <pre>class_exist($name, true)</pre> it does not terminate the script
+ * if the class can't be loaded.
  *
  * @param  string $name - class name
  *
@@ -775,6 +772,7 @@ function mkDirWritable($path, $mode=0770) {
 function is_class($name) {
    if (class_exists    ($name, $autoload=false)) return true;
    if (interface_exists($name, $autoload=false)) return false;
+   if (trait_exists    ($name, $autoload=false)) return false;
 
    try {
       $functions = spl_autoload_functions();
@@ -795,12 +793,9 @@ function is_class($name) {
 
 
 /**
- * Whether or not the specified interface exists (defined or undefined) and is not a class. The function calls all
- * registered class loaders. Opposite to a call of
- * <pre>
- *    interface_exist($name, true)
- * </pre>
- * it does not terminate the script if the interface can't be loaded.
+ * Whether or not the specified interface exists (defined or undefined) and is not a class or a trait. The function calls
+ * all registered class loaders. Opposite to a call of <pre>interface_exist($name, true)</pre> it does not terminate the
+ * script if the interface can't be loaded.
  *
  * @param  string $name - interface name
  *
@@ -809,6 +804,7 @@ function is_class($name) {
 function is_interface($name) {
    if (interface_exists($name, $autoload=false)) return true;
    if (class_exists    ($name, $autoload=false)) return false;
+   if (trait_exists    ($name, $autoload=false)) return false;
 
    try {
       $functions = spl_autoload_functions();
@@ -825,6 +821,38 @@ function is_interface($name) {
    catch (ClassNotFoundException $ex) {}
 
    return interface_exists($name, $autoload=false);
+}
+
+
+/**
+ * Whether or not the specified trait exists (defined or undefined) and is not a class or an interface. The function calls
+ * all registered class loaders. Opposite to a call of <pre>trait_exist($name, true)</pre> it does not terminate the script
+ * if the trait can't be loaded.
+ *
+ * @param  string $name - trait name
+ *
+ * @return bool
+ */
+function is_trait($name) {
+   if (trait_exists    ($name, $autoload=false)) return true;
+   if (class_exists    ($name, $autoload=false)) return false;
+   if (interface_exists($name, $autoload=false)) return false;
+
+   try {
+      $functions = spl_autoload_functions();
+      if (!$functions) {               // no loader nor __autoload() exist: spl_autoload_call() will call spl_autoload()
+         spl_autoload_call($name);     // onError: Uncaught LogicException: Class $name could not be loaded
+      }
+      else if (sizeOf($functions)==1 && $functions[0]==='__autoload') {
+         __autoload($name);            // __autoload() exists and is explicitly or implicitly registered
+      }
+      else {
+         spl_autoload_call($name);     // a regular SPL loader queue is defined
+      }
+   }
+   catch (ClassNotFoundException $ex) {}
+
+   return trait_exists($name, $autoload=false);
 }
 
 

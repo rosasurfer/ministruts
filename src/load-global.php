@@ -448,12 +448,9 @@ function mkDirWritable($path, $mode=0770) {
 
 
 /**
- * Whether or not the specified class exists (defined or undefined) and is not an interface. The function calls all
- * registered class loaders. Opposite to a call of
- * <pre>
- *    class_exist($name, true)
- * </pre>
- * it does not terminate the script if the class can't be loaded.
+ * Whether or not the specified class exists (defined or undefined) and is not an interface or a trait. The function calls
+ * all registered class loaders. Opposite to a call of <pre>class_exist($name, true)</pre> it does not terminate the script
+ * if the class can't be loaded.
  *
  * @param  string $name - class name
  *
@@ -465,18 +462,29 @@ function is_class($name) {
 
 
 /**
- * Whether or not the specified interface exists (defined or undefined) and is not a class. The function calls all
- * registered class loaders. Opposite to a call of
- * <pre>
- *    interface_exist($name, true)
- * </pre>
- * it does not terminate the script if the interface can't be loaded.
+ * Whether or not the specified interface exists (defined or undefined) and is not a class or a trait. The function calls
+ * all registered class loaders. Opposite to a call of <pre>interface_exist($name, true)</pre> it does not terminate the
+ * script if the interface can't be loaded.
  *
  * @param  string $name - interface name
  *
  * @return bool
  */
 function is_interface($name) {
+   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+}
+
+
+/**
+ * Whether or not the specified trait exists (defined or undefined) and is not a class or an interface. The function calls
+ * all registered class loaders. Opposite to a call of <pre>trait_exist($name, true)</pre> it does not terminate the script
+ * if the trait can't be loaded.
+ *
+ * @param  string $name - trait name
+ *
+ * @return bool
+ */
+function is_trait($name) {
    return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
 }
 
