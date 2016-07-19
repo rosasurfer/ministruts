@@ -27,7 +27,7 @@ interface IPolicyAware extends IIdentityNode {
    /**
     * Return the Policies the identity is holding.
     *
-    * @return IPolicy[]
+    * @return PolicyInterface[]
     */
    public function getPolicies();
 }

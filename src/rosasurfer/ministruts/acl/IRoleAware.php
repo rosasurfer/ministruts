@@ -27,7 +27,7 @@ interface IRoleAware extends IIdentityNode {
    /**
     * Return the Roles the identity is holding.
     *
-    * @return IRole[]
+    * @return RoleInterface[]
     */
    public function getRoles();
 
