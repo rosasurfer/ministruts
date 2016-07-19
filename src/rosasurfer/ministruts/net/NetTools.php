@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 use rosasurfer\ministruts\core\StaticClass;
 
 use rosasurfer\ministruts\exception\IllegalTypeException;
@@ -69,7 +69,7 @@ final class NetTools extends StaticClass {
          $proxys = array();
 
          // Config einlesen
-         $value = Config ::get('proxys', null);
+         $value = Config::getDefault()->get('proxys', null);
          foreach (explode(',', $value) as $value) {
             $value = trim($value);
             if (strLen($value)) {

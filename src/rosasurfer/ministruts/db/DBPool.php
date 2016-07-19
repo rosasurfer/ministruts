@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 use rosasurfer\ministruts\core\Singleton;
 
 use rosasurfer\ministruts\exception\IllegalStateException;
@@ -59,7 +59,7 @@ final class DBPool extends Singleton {
       elseif (isSet($me->pool[$alias])) {                   // schon im Pool ?
          $connector = $me->pool[$alias];
       }
-      elseif ($config=Config ::get('db.'.$alias, null)) {   // nein, Config holen und Connector laden
+      elseif ($config=Config::getDefault()->get('db.'.$alias, null)) {   // nein, Config holen und Connector laden
          // bekannte Namen trotz unterschiedlicher Schreibweisen erkennen
          $name = strToLower($config['connector']);
 

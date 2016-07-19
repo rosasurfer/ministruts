@@ -78,7 +78,7 @@ function queryDNS($domain, $type) {
 
 
 // normale DNS-Einträge überprüfen (A, MX, NS, TXT, etc.)
-$domains = Config ::get('dns.domain', array());
+$domains = Config::getDefault()->get('dns.domain', array());
 
 foreach ($domains as $domain => $domainValues) {
    foreach ($domainValues as $type => $value) {
@@ -117,7 +117,7 @@ foreach ($domains as $domain => $domainValues) {
 
 
 // Reverse-DNS der angegebenen IP-Adressen überprüfen
-$ips = Config ::get('dns.ip', array());
+$ips = Config::getDefault()->get('dns.ip', array());
 
 foreach ($ips as $ip => $value) {
    $domain = join('.', array_reverse(explode('.', $ip))).'.in-addr.arpa';

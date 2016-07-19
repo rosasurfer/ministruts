@@ -82,12 +82,12 @@ class Logger extends StaticClass {
 
       // Der E-Mailversand ist aktiv, wenn in der Projektkonfiguration mindestens eine E-Mailadresse angegeben wurde.
       $receivers = [];
-      foreach (explode(',', Config::get('log.mail.receiver', '')) as $receiver) {
+      foreach (explode(',', Config::getDefault()->get('log.mail.receiver', '')) as $receiver) {
          if ($receiver=trim($receiver))
             $receivers[] = $receiver;                       // TODO: Adressformat validieren
       }
       if ($receivers) {
-         if ($forced=Config::get('mail.address.forced-receiver', null)) {
+         if ($forced=Config::getDefault()->get('mail.address.forced-receiver', null)) {
             $receivers = [];                                // Um Fehler zu vermeiden, wird zum Mailen keine Klasse, sondern
             foreach (explode(',', $forced) as $receiver) {  // die PHP-interne Funktion mail() benutzt. Die Konfiguration muß
                if ($receiver=trim($receiver))               // deshalb hier selbst auf "mail.address.forced-receiver" geprüft
@@ -102,17 +102,17 @@ class Logger extends StaticClass {
       // Der SMS-Versand ist aktiv, wenn in der Projektkonfiguration mindestens eine Rufnummer und ein SMS-Loglevel angegeben wurden.
       self::$sms          = false;
       self::$smsReceivers = array();
-      $receivers = Config::get('log.sms.receiver', null);
+      $receivers = Config::getDefault()->get('log.sms.receiver', null);
       foreach (explode(',', $receivers) as $receiver) {
          if ($receiver=trim($receiver))
             self::$smsReceivers[] = $receiver;
       }
-      $logLevel = Config::get('log.sms.loglevel', null);
+      $logLevel = Config::getDefault()->get('log.sms.loglevel', null);
       if (strLen($logLevel) > 0) {
          if (defined('L_'.strToUpper($logLevel))) self::$smsLogLevel = constant('L_'.strToUpper($logLevel));
          else                                     self::$smsLogLevel = null;
       }
-      $options = Config::get('sms.clickatell', null);
+      $options = Config::getDefault()->get('sms.clickatell', null);
       if (!empty($options['username']) && !empty($options['password']) && !empty($options['api_id']))
          self::$smsOptions = $options;
       self::$sms = self::$smsReceivers && self::$smsLogLevel && self::$smsOptions;
@@ -135,7 +135,7 @@ class Logger extends StaticClass {
 
       if ($logLevels === null) {
          // Die konfigurierten Loglevel werden einmal eingelesen und gecacht. Nachfolgende Logger-Aufrufe verwenden nur noch den Cache.
-         $logLevels = Config::get('log.level', array());
+         $logLevels = Config::getDefault()->get('log.level', array());
          if (is_string($logLevels))
             $logLevels = array('' => $logLevels);
 
