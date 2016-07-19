@@ -219,8 +219,8 @@ class DebugTools extends StaticClass {
       $namespace = strToLower(strLeftTo($class, '\\', -1, true, ''));
       $name      = strRightFrom($class, '\\', -1, false, $class);
 
-      if ($namespace != 'rosasurfer\\ministruts\\exceptions\\') $result = $namespace.$name;
-      else                                                      $result = $name;    // just the base name for improved readability
+      if ($namespace == 'rosasurfer\\ministruts\\exception\\') $result = $name;              // only base name for improved readability
+      else                                                     $result = $namespace.$name;
 
       if ($exception instanceof \ErrorException)
          $result .= '('.self::errorLevelToStr($exception->getSeverity()).')';
