@@ -6,6 +6,7 @@ namespace rosasurfer;
 
 use rosasurfer\ministruts\exception\ClassNotFoundException;
 use rosasurfer\ministruts\exception\IllegalTypeException;
+use rosasurfer\ministruts\exception\InvalidArgumentException;
 
 
 /**
@@ -124,10 +125,10 @@ if (false && !CLI && strEndsWith(strLeftTo($_SERVER['REQUEST_URI'], '?'), '/phpi
  */
 spl_autoload_register(function($class) {
    // block re-declarations
-   if (class_exists($class, false) || interface_exists($class, false))
+   if (class_exists($class, false) || interface_exists($class, false) || trait_exists($class, false))
       return;
 
-   // initialize class map: the loader is case-insensitive
+   // load and initialize class map
    static $classMap = null;
    !$classMap && $classMap=array_change_key_case(include(__DIR__.'/classmap.php'), CASE_LOWER);
 
@@ -145,7 +146,12 @@ spl_autoload_register(function($class) {
       }
    }
    catch (\Exception $ex) {
-      throw ($ex instanceof ClassNotFoundException) ? $ex : new ClassNotFoundException('Cannot load class '.$class, null, $ex);
+      if (class_exists($class, false) || interface_exists($class, false) || trait_exists($class, false)) {
+         \Logger::warn(ucFirst(metaTypeToStr($class)).' '.$class.' was loaded successfully but caused an exception', $ex, __CLASS__);
+      }
+      else {
+         throw ($ex instanceof ClassNotFoundException) ? $ex : new ClassNotFoundException('Cannot load class '.$class, null, $ex);
+      }
    }
 });
 
@@ -853,6 +859,25 @@ function is_trait($name) {
    catch (ClassNotFoundException $ex) {}
 
    return trait_exists($name, $autoload=false);
+}
+
+
+/**
+ * Return one of the metatypes "class", "interface" or "trait" for an object type identifier (a name).
+ *
+ * @param  string $name - name
+ *
+ * @return string metatype
+ */
+function metaTypeToStr($name) {
+   if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
+   if ($name == '')       throw new InvalidArgumentException('Invalid argument $name: ""');
+
+   if (is_class    ($name)) return 'class';
+   if (is_interface($name)) return 'interface';
+   if (is_trait    ($name)) return 'trait';
+
+   return '(unknown type)';
 }
 
 

@@ -490,6 +490,18 @@ function is_trait($name) {
 
 
 /**
+ * Return one of the metatypes "class", "interface" or "trait" for an object type identifier (a name).
+ *
+ * @param  string $name - name
+ *
+ * @return string metatype
+ */
+function metaTypeToStr($name) {
+   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+}
+
+
+/**
  * Procedural replacement for rosasurfer\util\CommonValidator::isDateTime()
  *
  * Whether or not the specified string value represents a valid date or datetime value.
