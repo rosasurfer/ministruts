@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 use rosasurfer\ministruts\exception\IOException;
 
 use const rosasurfer\L_DEBUG;
@@ -203,7 +203,7 @@ final class CurlHttpClient extends HttpClient {
          // TODO: relative Redirects abfangen
          // TODO: verschachtelte IOExceptions abfangen
          $this->manualRedirects++;
-         self::$logInfo && Logger::log('Performing manual redirect to: '.$response->getHeader('Location'), L_INFO, __CLASS__);
+         self::$logInfo && Logger::log('Performing manual redirect to: '.$response->getHeader('Location'), null, L_INFO, __CLASS__);
 
          $request  = HttpRequest::create()->setUrl($response->getHeader('Location'));
          $me       = __FUNCTION__;
@@ -229,7 +229,7 @@ final class CurlHttpClient extends HttpClient {
          $errorNo = self::$errors[$errorNo];
       }
       else {
-         Logger::log('Unknown CURL error code: '.$errorNo, L_WARN, __CLASS__);
+         Logger::log('Unknown CURL error code: '.$errorNo, null, L_WARN, __CLASS__);
       }
 
       return "$errorNo ($errorStr)";

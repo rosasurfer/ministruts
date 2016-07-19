@@ -104,10 +104,10 @@ class System extends StaticClass {
 
       // log non-critical errors and continue
       /*
-      if ($level == E_DEPRECATED     ) { Logger::log(null, $exception, L_NOTICE); return true; }
-      if ($level == E_USER_DEPRECATED) { Logger::log(null, $exception, L_NOTICE); return true; }
-      if ($level == E_USER_NOTICE    ) { Logger::log(null, $exception, L_NOTICE); return true; }
-      if ($level == E_USER_WARNING   ) { Logger::log(null, $exception, L_WARN  ); return true; }
+      if ($level == E_DEPRECATED     ) { Logger::log(null, $exception, L_NOTICE, __CLASS__); return true; }
+      if ($level == E_USER_DEPRECATED) { Logger::log(null, $exception, L_NOTICE, __CLASS__); return true; }
+      if ($level == E_USER_NOTICE    ) { Logger::log(null, $exception, L_NOTICE, __CLASS__); return true; }
+      if ($level == E_USER_WARNING   ) { Logger::log(null, $exception, L_WARN  , __CLASS__); return true; }
       */
 
 

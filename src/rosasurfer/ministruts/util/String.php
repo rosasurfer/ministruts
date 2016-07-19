@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 use rosasurfer\ministruts\core\StaticClass;
 
 use rosasurfer\ministruts\exception\IllegalTypeException;
@@ -51,7 +51,7 @@ final class String extends StaticClass {
       if (isSet($php_errormsg)) {
          if ($php_errormsg != 'iconv(): Detected an illegal character in input string' &&
              $php_errormsg != 'iconv(): Detected an incomplete multibyte character in input string') {
-            Logger ::log($php_errormsg.': '.$string, L_NOTICE, __CLASS__);
+            Logger::log($php_errormsg.': '.$string, null, L_NOTICE, __CLASS__);
          }
          return $string;
       }

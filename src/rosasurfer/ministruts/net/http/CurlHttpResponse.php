@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 use rosasurfer\ministruts\exception\IllegalTypeException;
 use rosasurfer\ministruts\exception\InvalidArgumentException;
 
@@ -118,7 +118,7 @@ final class CurlHttpResponse extends HttpResponse {
     * @return int - Anzahl der bei diesem Methodenaufruf erhaltenen Bytes
     */
    public function writeHeader($hCurl, $line) {
-      self::$logDebug && Logger ::log('Header line received:  '.$line, L_DEBUG, __CLASS__);
+      self::$logDebug && Logger::log('Header line received:  '.$line, null, L_DEBUG, __CLASS__);
 
       $this->headerParser->parseLine($line);
       return strLen($line);

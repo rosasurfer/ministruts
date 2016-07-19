@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 use rosasurfer\ministruts\core\Singleton;
 
 use rosasurfer\ministruts\exception\IllegalStateException;
@@ -517,7 +517,7 @@ abstract class RequestBase extends Singleton {
                if (CommonValidator ::isIPWanAddress($ip)) {
                   $guessed = $ip;
                   //if ($ip == NetTools ::getHostByAddress($ip))
-                  //   Logger::log('Guessed a non-resolvable IP address as a WAN address: '.$ip, L_DEBUG, __CLASS__);
+                  //   Logger::log('Guessed a non-resolvable IP address as a WAN address: '.$ip, null, L_DEBUG, __CLASS__);
                   break;
                }
             }
@@ -704,7 +704,7 @@ abstract class RequestBase extends Singleton {
                       'HTTP-X-UP-Forwarded-For' => 1,
                       'HTTP_X-UP-Forwarded-For' => 1);
          if (array_intersect_ukey($headers, $tmp, 'strCaseCmp'))
-            Logger ::log('Invalid X-Forwarded-For header found', L_NOTICE, __CLASS__);
+            Logger::log('Invalid X-Forwarded-For header found', null, L_NOTICE, __CLASS__);
       }
 
       // alle oder nur die gewünschten Header zurückgeben

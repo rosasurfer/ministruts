@@ -257,7 +257,7 @@ class Logger extends StaticClass {
    public static function warn($arg1=null, $arg2=null, $arg3=null) {
       $argc = func_num_args();
 
-      if ($argc == 2) return self::log($arg1,        L_WARN, $arg2);
+      if ($argc == 2) return self::log($arg1, null,  L_WARN, $arg2);
       if ($argc == 3) return self::log($arg1, $arg2, L_WARN, $arg3);
 
       throw new InvalidArgumentException('Invalid number of arguments: '.$argc);
@@ -265,72 +265,36 @@ class Logger extends StaticClass {
 
 
    /**
-    * Überladene Methode.  Loggt eine Message und/oder eine Exception.
+    * Loggt eine Message und/oder eine Exception.
     *
-    * Signaturen:
-    * -----------
-    * Logger::log($message,             $level, $class)
-    * Logger::log(          $exception, $level, $class)
-    * Logger::log($message, $exception, $level, $class)
+    * @param  string     $message   - zu loggende Message
+    * @param  \Exception $exception - zu loggende Exception
+    * @param  int        $level     - LogLevel
+    * @param  string     $class     - Name der Klasse, vonder aus geloggt wurde
     */
-   public static function log($arg1=null, $arg2=null, $arg3=null, $arg4=null) {
-      // (1) Lock method against recursive calls
-      static $isActive = false;
-      if ($isActive)     return echoPre(__METHOD__.'()  Sending circular log message to SYSLOG:  '.$arg1.', '.$arg2);
+   public static function log($message, $exception, $level, $class) {
+      // Parameter-Validation
+      if (!is_null($message) && !is_string($message))                throw new IllegalTypeException('Illegal type of parameter $message: '.getType($message));
+      if (!is_null($exception) && !$exception instanceof \Exception) throw new IllegalTypeException('Illegal type of parameter $exception: '.(is_object($exception) ? get_class($exception) : getType($exception)));
+      if (!is_int($level))                                           throw new IllegalTypeException('Illegal type of parameter $level: '.getType($level));
+      if (!is_string($class))                                        throw new IllegalTypeException('Illegal type of parameter $class: '.getType($class));
+
+      // lock method against circular calls
+      static $isActive = false;                                      // TODO: SYSLOG implementieren
+      if ($isActive)     return echoPre(__METHOD__.'()  Sending circular log message to SYSLOG:  '.$message.', '.$exception);
       $isActive        = true;
 
-
-      // (2) Parameter-Zuordnung und -Validation
-      $argc    = func_num_args();
-      $message = $exception = $level = $class = null;
-
-      if ($argc == 3) {
-         $message = $exception = $arg1;
-         $level   = $arg2;
-         $class   = $arg3;
-      }
-      elseif ($argc == 4) {
-         $message   = $arg1;
-         $exception = $arg2;
-         $level     = $arg3;
-         $class     = $arg4;
-      }
-      else throw new InvalidArgumentException('Invalid number of arguments: '.$argc);
-
-      if (!is_int($level))    throw new IllegalTypeException('Illegal type of parameter $level: '.getType($level));
-      if (!is_string($class)) throw new IllegalTypeException('Illegal type of parameter $class: '.getType($class));
-
-
-      // (3) Logging: was der jeweilige Loglevel nicht abdeckt, wird ignoriert
       if ($level >= self::getLogLevel($class)) {
-         // Aufruf entweder mit drei Argumenten...
-         if ($argc == 3) {
-            if (is_null($message) || is_string($message)) {
-               self::log_1($message, null, $level);                  // Logger::log($message  , $level, $class)
-            }
-            else if ($exception instanceof \Exception) {
-               self::log_1(null, $exception, $level);                // Logger::log($exception, $level, $class)
-            }
-            else throw new IllegalTypeException('Illegal type of first parameter: '.getType($arg1));
-         }
-         // ...oder mit vier Argumenten
-         else {
-            if (!is_null($message) && !is_string($message))                throw new IllegalTypeException('Illegal type of parameter $message: '.(is_object($message) ? get_class($message) : getType($message)));
-            if (!is_null($exception) && !$exception instanceof \Exception) throw new IllegalTypeException('Illegal type of parameter $exception: '.(is_object($exception) ? get_class($exception) : getType($exception)));
-            self::log_1($message, $exception, $level);               // Logger::log($message, $exception, $level, $class)
-         }
+         self::log_1($message, $exception, $level);
       }
 
-
-      // (4) Unlock method
+      // unlock method
       $isActive = false;
    }
 
 
    /**
-    * Loggt eine Message und/oder eine Exception.  Je nach aktueller Laufzeitumgebung wird die Logmeldung
-    * entweder am Bildschirm angezeigt, an die konfigurierten E-Mailadressen gemailt oder ins PHP-Errorlog
-    * geschrieben.
+    * Loggt eine Message und/oder eine Exception.
     *
     * @param  string    $message   - zu loggende Message
     * @param  Exception $exception - zu loggende Exception

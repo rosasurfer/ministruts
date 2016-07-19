@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 use rosasurfer\ministruts\core\Object;
 
 use rosasurfer\ministruts\exception\InvalidArgumentException;
@@ -239,7 +239,7 @@ abstract class DB extends Object {
          throw new RuntimeException('Negative transaction counter detected: '.$this->transaction);
 
       if ($this->transaction == 0) {
-         Logger ::log('No database transaction to commit', L_WARN, __CLASS__);
+         Logger::log('No database transaction to commit', null, L_WARN, __CLASS__);
       }
       else {
          if ($this->transaction == 1)
@@ -262,7 +262,7 @@ abstract class DB extends Object {
          throw new RuntimeException('Negative transaction counter detected: '.$this->transaction);
 
       if ($this->transaction == 0) {
-         Logger ::log('No database transaction to roll back', L_WARN, __CLASS__);
+         Logger::log('No database transaction to roll back', null, L_WARN, __CLASS__);
       }
       else {
          if ($this->transaction == 1)

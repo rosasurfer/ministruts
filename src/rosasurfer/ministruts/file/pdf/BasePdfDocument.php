@@ -3038,7 +3038,7 @@ class BasePdfDocument extends Object {
     */
    private function addMessage($message){
      $this->messages .= $message."\n";
-     Logger ::log($message, L_DEBUG, __CLASS__);
+     Logger::log($message, null, L_DEBUG, __CLASS__);
    }
 
    /**

@@ -188,7 +188,7 @@ class Config extends Object {
          // Key und Value trennen
          $parts = explode('=', $line, 2);
          if (sizeOf($parts) < 2) {
-            Logger::log('Skipping syntax error in configuration file "'.$filename.'" at line: "'.$line.'": missing key-value separator', L_NOTICE, __CLASS__);
+            Logger::log('Skipping syntax error in configuration file "'.$filename.'" at line: "'.$line.'": missing key-value separator', null, L_NOTICE, __CLASS__);
             continue;
          }
 

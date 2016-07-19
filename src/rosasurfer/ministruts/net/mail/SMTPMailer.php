@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 use rosasurfer\ministruts\exception\IllegalTypeException;
 use rosasurfer\ministruts\exception\InfrastructureException;
 use rosasurfer\ministruts\exception\InvalidArgumentException;
@@ -331,7 +331,7 @@ class SMTPMailer extends Mailer {
       if (self::$logDebug) {
          $neededTime = round($end - $start, 4);
          if ($neededTime > self::$maxSendingTime)
-            Logger ::log(__METHOD__.'() to '.$to['address'].' took more than '.self::$maxSendingTime.' seconds: '.$neededTime, L_DEBUG, __CLASS__);
+            Logger::log(__METHOD__.'() to '.$to['address'].' took more than '.self::$maxSendingTime.' seconds: '.$neededTime, null, L_DEBUG, __CLASS__);
       }
    }
 

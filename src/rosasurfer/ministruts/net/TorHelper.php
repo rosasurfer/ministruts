@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 use rosasurfer\ministruts\core\StaticClass;
 
 use rosasurfer\ministruts\exception\IllegalTypeException;
@@ -92,12 +92,12 @@ class TorHelper extends StaticClass {
                      $status = $response->getStatus();
 
                      if ($status != 200) {
-                        self::$logNotice && Logger ::log('Could not get TOR exit nodes from '.self::$torMirrors[$i].', HTTP status '.$status.' ('.HttpResponse ::$sc[$status]."),\n url: ".$request->getUrl(), L_NOTICE, __CLASS__);
+                        self::$logNotice && Logger::log('Could not get TOR exit nodes from '.self::$torMirrors[$i].', HTTP status '.$status.' ('.HttpResponse ::$sc[$status]."),\n url: ".$request->getUrl(), null, L_NOTICE, __CLASS__);
                         continue;
                      }
                   }
                   catch (IOException $ex) {
-                     self::$logNotice && Logger ::log('Could not get TOR exit nodes from '.self::$torMirrors[$i], $ex, L_NOTICE, __CLASS__);
+                     self::$logNotice && Logger::log('Could not get TOR exit nodes from '.self::$torMirrors[$i], $ex, L_NOTICE, __CLASS__);
                      continue;
                   }
 
@@ -108,7 +108,7 @@ class TorHelper extends StaticClass {
                $nodes = strLen($content) ? array_flip(explode("\n", str_replace("\r\n", "\n", $content))) : array();
 
                if (!$nodes)
-                  Logger ::log('Could not get TOR exit nodes from any server', L_ERROR, __CLASS__);
+                  Logger::log('Could not get TOR exit nodes from any server', null, L_ERROR, __CLASS__);
 
                $cache->set($key, $nodes, 30 * MINUTES);
             }
