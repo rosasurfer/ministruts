@@ -187,7 +187,10 @@ class Config extends Object {
 
          // Key und Value trennen
          $parts = explode('=', $line, 2);
-         if (sizeOf($parts) < 2) throw new RuntimeException('Syntax error in configuration file "'.$filename.'" at line: "'.$line.'"');
+         if (sizeOf($parts) < 2) {
+            Logger::log('Skipping syntax error in configuration file "'.$filename.'" at line: "'.$line.'": missing key-value separator', L_NOTICE, __CLASS__);
+            continue;
+         }
 
          // Eigenschaft setzen
          $this->setProperty(trim($parts[0]), trim($parts[1]), false); // Cache nicht aktualisieren
