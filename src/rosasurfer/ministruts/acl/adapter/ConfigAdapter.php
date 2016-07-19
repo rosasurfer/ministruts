@@ -9,7 +9,7 @@ use rosasurfer\ministruts\exception\UnimplementedFeatureException;
 /**
  * ACL adapter reading ACLs from a configuration file.
  */
-class ConfigAdapter extends Object implements AdapterInterface {
+class ConfigFileAdapter extends Object implements AdapterInterface {
 
 
    /**

@@ -17,7 +17,7 @@ return array(
    'rosasurfer\ministruts\acl\Role'                                   => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/acl/Role',
    'rosasurfer\ministruts\acl\RoleInterface'                          => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/acl/RoleInterface',
    'rosasurfer\ministruts\acl\adapter\AdapterInterface'               => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/acl/adapter/AdapterInterface',
-   'rosasurfer\ministruts\acl\adapter\ConfigAdapter'                  => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/acl/adapter/ConfigAdapter',
+   'rosasurfer\ministruts\acl\adapter\ConfigFileAdapter'              => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/acl/adapter/ConfigFileAdapter',
    'rosasurfer\ministruts\acl\adapter\DbAdapter'                      => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/acl/adapter/DbAdapter',
    'rosasurfer\ministruts\acl\adapter\IniFileAdapter'                 => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/acl/adapter/IniFileAdapter',
 
