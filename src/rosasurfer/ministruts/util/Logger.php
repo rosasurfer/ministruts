@@ -1,7 +1,6 @@
 <?php
 use rosasurfer\ministruts\core\StaticClass;
 
-use rosasurfer\ministruts\exception\BaseException as RosasurferException;
 use rosasurfer\ministruts\exception\IllegalTypeException;
 use rosasurfer\ministruts\exception\InvalidArgumentException;
 use rosasurfer\ministruts\exception\RuntimeException;
@@ -49,10 +48,10 @@ use const rosasurfer\WINDOWS;
 class Logger extends StaticClass {
 
 
-   private static /*bool    */ $print;                      // ob die Nachricht am Bildschirm angezeigt werden soll
-   private static /*bool    */ $mail;                       // ob die Nachricht per E-Mail verschickt werden soll (alle Loglevel)
+   private static /*bool    */ $print         = false;      // ob die Nachricht am Bildschirm angezeigt werden soll
+   private static /*bool    */ $mail          = false;      // ob die Nachricht per E-Mail verschickt werden soll (alle Loglevel)
    private static /*string[]*/ $mailReceivers = [];         // E-Mailempfänger
-   private static /*bool    */ $sms;                        // ob die Nachricht per SMS verschickt werden soll
+   private static /*bool    */ $sms           = false;      // ob die Nachricht per SMS verschickt werden soll
    private static /*string[]*/ $smsReceivers  = [];         // SMS-Empfänger
    private static /*int     */ $smsLogLevel   = L_FATAL;    // notwendiger Loglevel für den SMS-Versand
    private static /*string[]*/ $smsOptions    = [];         // SMS-Konfiguration
@@ -130,11 +129,13 @@ class Logger extends StaticClass {
     * @return int - Loglevel
     */
    public static function getLogLevel($class) {
+      if ($class == '') return System::DEFAULT_LOGLEVEL;       // Aufruf von außerhalb einer Klasse
+
       static $logLevels = null;
 
       if ($logLevels === null) {
          // Die konfigurierten Loglevel werden einmal eingelesen und gecacht. Nachfolgende Logger-Aufrufe verwenden nur noch den Cache.
-         $logLevels = Config ::get('log.level', array());
+         $logLevels = Config::get('log.level', array());
          if (is_string($logLevels))
             $logLevels = array('' => $logLevels);
 
@@ -273,6 +274,13 @@ class Logger extends StaticClass {
     * Logger::log($message, $exception, $level, $class)
     */
    public static function log($arg1=null, $arg2=null, $arg3=null, $arg4=null) {
+      // (1) Lock method against recursive calls
+      static $isActive = false;
+      if ($isActive)     return echoPre(__METHOD__.'()  Sending circular log message to SYSLOG:  '.$arg1.', '.$arg2);
+      $isActive        = true;
+
+
+      // (2) Parameter-Zuordnung und -Validation
       $argc    = func_num_args();
       $message = $exception = $level = $class = null;
 
@@ -292,24 +300,30 @@ class Logger extends StaticClass {
       if (!is_int($level))    throw new IllegalTypeException('Illegal type of parameter $level: '.getType($level));
       if (!is_string($class)) throw new IllegalTypeException('Illegal type of parameter $class: '.getType($class));
 
-      // was der jeweilige Loglevel nicht abdeckt, wird ignoriert
-      if ($level < self:: getLogLevel($class))
-         return;
 
-      // Aufruf mit drei Argumenten
-      if ($argc == 3) {
-         if (is_null($message) || is_string($message))
-            return self:: log_1($message, null, $level);       // Logger::log($message  , $level, $class)
-         if ($exception instanceof \Exception)
-            return self:: log_1(null, $exception, $level);     // Logger::log($exception, $level, $class)
-         throw new IllegalTypeException('Illegal type of first parameter: '.getType($arg1));
+      // (3) Logging: was der jeweilige Loglevel nicht abdeckt, wird ignoriert
+      if ($level >= self::getLogLevel($class)) {
+         // Aufruf entweder mit drei Argumenten...
+         if ($argc == 3) {
+            if (is_null($message) || is_string($message)) {
+               self::log_1($message, null, $level);                  // Logger::log($message  , $level, $class)
+            }
+            else if ($exception instanceof \Exception) {
+               self::log_1(null, $exception, $level);                // Logger::log($exception, $level, $class)
+            }
+            else throw new IllegalTypeException('Illegal type of first parameter: '.getType($arg1));
+         }
+         // ...oder mit vier Argumenten
+         else {
+            if (!is_null($message) && !is_string($message))                throw new IllegalTypeException('Illegal type of parameter $message: '.(is_object($message) ? get_class($message) : getType($message)));
+            if (!is_null($exception) && !$exception instanceof \Exception) throw new IllegalTypeException('Illegal type of parameter $exception: '.(is_object($exception) ? get_class($exception) : getType($exception)));
+            self::log_1($message, $exception, $level);               // Logger::log($message, $exception, $level, $class)
+         }
       }
 
-      // Aufruf mit vier Argumenten
-      if (!is_null($message) && !is_string($message))                throw new IllegalTypeException('Illegal type of parameter $message: '.(is_object($message) ? get_class($message) : getType($message)));
-      if (!is_null($exception) && !$exception instanceof \Exception) throw new IllegalTypeException('Illegal type of parameter $exception: '.(is_object($exception) ? get_class($exception) : getType($exception)));
 
-      return self:: log_1($message, $exception, $level);       // Logger::log($message, $exception, $level, $class)
+      // (4) Unlock method
+      $isActive = false;
    }
 
 
@@ -323,59 +337,53 @@ class Logger extends StaticClass {
     * @param  int       $level     - zu loggender Loglevel
     */
    public static function log_1($message, \Exception $exception=null, $level) {
-      $plainMessage = null;
+      $cliMessage = null;
 
       try {
          if (!isSet(self::$logLevels[$level])) throw new InvalidArgumentException('Invalid log level: '.$level);
 
          // 1. Logdaten ermitteln
-         $exMessage = null;
+         $exMessage = $exTraceStr = null;
          if ($exception) {
-            $message  .= ($message === null) ? (string) $exception : ' ('.get_class($exception).')';
-            $exMessage = ($exception instanceof RosasurferException) ? (string) $exception : get_class($exception).': '.$exception->getMessage();;
+            $exMessage   = trim(DebugTools::getBetterMessage($exception));
+            $indent      = ' ';
+            $exTraceStr  = $indent.'Stacktrace:'.NL.' -----------'.NL;
+            $exTraceStr .= DebugTools::getBetterTraceAsString($exception, $indent);
          }
 
-         if ($exception instanceof RosasurferException) {
-            $trace = $exception->getStackTrace();
-            $file  = $exception->getFile();
-            $line  = $exception->getLine();
-            $trace = 'Stacktrace:'.NL.'-----------'.NL.$exception->printStackTrace(true);
-         }
-         else {
-            $trace = $exception ? $exception->getTrace() : debug_backtrace();
-            $trace = RosasurferException::transformToJavaStackTrace($trace);
-            // die Frames des Loggers selbst können weg
-            if ($trace[0]['class'].$trace[0]['type'].$trace[0]['function'] == 'Logger::log_1') array_shift($trace);
-            if ($trace[0]['class'].$trace[0]['type'].$trace[0]['function'] == 'Logger::log'  ) array_shift($trace);
-            if ($trace[0]['class'].$trace[0]['type'].$trace[0]['function'] == 'Logger::warn' ) array_shift($trace);
+         $trace = DebugTools::fixTrace(debug_backtrace());  // die Frames des Loggers selbst können weg
+         if ($trace[0]['class'].$trace[0]['type'].$trace[0]['function'] == 'Logger::log_1') array_shift($trace);
+         if ($trace[0]['class'].$trace[0]['type'].$trace[0]['function'] == 'Logger::log'  ) array_shift($trace);
+         if ($trace[0]['class'].$trace[0]['type'].$trace[0]['function'] == 'Logger::warn' ) array_shift($trace);
 
-            foreach ($trace as $f) {            // ersten Frame mit __FILE__ suchen
-               if (isSet($f['file'])) {
-                  $file = $f['file'];
-                  $line = $f['line'];
-                  break;
-               }
+         $file = $line = null;
+         foreach ($trace as $frame) {                       // ersten Frame mit __FILE__ suchen
+            if (isSet($frame['file'])) {
+               $file = $frame['file'];
+               $line = $frame['line'];
+               break;
             }
-            $trace = 'Stacktrace:'.NL.'-----------'.NL.RosasurferException::formatStackTrace($trace);
-            // TODO: vernestelte, einfache Exceptions geben fehlerhaften Stacktrace zurück
          }
-         $plainMessage = self::$logLevels[$level].': '.$message.NL.'in '.$file.' on line '.$line.NL;
+         $cliMessage = self::$logLevels[$level].'  '.$message.NL.'in '.$file.' on line '.$line;
 
 
          // 2. Logmessage anzeigen
          if (self::$print) {
-            if (!CLI) {
-               echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.self::$logLevels[$level].'</b>: '.nl2br(htmlSpecialChars($message, ENT_QUOTES))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
-               if ($exception)
-                  echo '<br>'.htmlSpecialChars($exMessage, ENT_QUOTES).'<br>';
-               if ($trace)
-                  echo '<br>'.printPretty($trace, true).'<br>';
-               echo '</div>';
-               if ($request=Request ::me())
-                  echo '<br>'.printPretty('Request:'.NL.'--------'.NL.$request, true).'<br></div><br>';
+            if (CLI) {
+               echoPre($cliMessage.NL);
+               if ($exception) {
+                  echoPre(NL.$exMessage.NL.NL.$exTraceStr.NL);
+               }
             }
             else {
-               echo $plainMessage.($exception ? NL.$exMessage.NL:'').NL.($trace ? $trace.NL:'');
+               echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.self::$logLevels[$level].'</b>: '.nl2br(htmlSpecialChars($message, ENT_QUOTES))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
+               if ($exception) {
+                  echo '<br>'.htmlSpecialChars($exMessage, ENT_QUOTES).'<br>';
+                  echo '<br>'.printPretty($exTraceStr, true).'<br>';
+               }
+               if ($request=Request::me()) {
+                  echo '<br>'.printPretty('Request:'.NL.'--------'.NL.$request, true).'<br></div>'.NL;
+               }
             }
             ob_get_level() && ob_flush();
          }
@@ -383,9 +391,9 @@ class Logger extends StaticClass {
 
          // 3. Logmessage an die konfigurierten Adressen mailen
          if (self::$mail) {
-            $mailMsg = $plainMessage.($exception ? NL.NL.$exMessage.NL:'').NL.NL.$trace;
+            $mailMsg = $cliMessage.NL.($exception ? NL.$exMessage.NL.NL.$exTraceStr.NL : '');
 
-            if ($request=Request ::me()) {
+            if ($request=Request::me()) {
                $session = $request->isSession() ? print_r($_SESSION, true) : null;
 
                $ip   = $_SERVER['REMOTE_ADDR'];
@@ -408,17 +416,17 @@ class Logger extends StaticClass {
 
          // (4) Logmessage ins Error-Log schreiben, wenn sie nicht per Mail rausging
          else {
-            self::error_log('PHP '.$plainMessage);
+            self::error_log('PHP '.$cliMessage);
          }
 
 
          // (5) Logmessage per SMS verschicken, wenn der konfigurierte SMS-Loglevel erreicht ist
          if (self::$sms && $level >= self::$smsLogLevel) {
-            self ::sms_log($plainMessage.($exception ? NL.$exMessage:''));
+            self ::sms_log($cliMessage.($exception ? NL.$exMessage:''));
          }
       }
       catch (\Exception $ex) {
-         $msg = 'PHP (0) '.$plainMessage ? $plainMessage:$message;
+         $msg = 'PHP (0) '.$cliMessage ? $cliMessage:$message;
          self::$print && echoPre($msg);
          self::error_log($msg);
          throw $ex;
@@ -433,7 +441,7 @@ class Logger extends StaticClass {
     */
    private static function error_log($message) {
       $message = str_replace(["\r\n", "\n"], ' ', $message);   // Zeilenumbrüche entfernen
-      $message = str_replace(chr(0), "*\x00*", $message);      // NUL-Bytes ersetzen (zerschießen Logfile)
+      $message = str_replace(chr(0), "…", $message);           // NUL-Bytes ersetzen (zerschießen Logfile)
 
       /**
        * ini_get('error_log')
