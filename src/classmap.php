@@ -27,6 +27,8 @@ return array(
    'FileSystemCache'                                                  => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/cache/FileSystemCache',
    'ReferencePool'                                                    => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/cache/ReferencePool',
 
+   'Config'                                                           => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/config/Config',
+
    'rosasurfer\ministruts\core\Object'                                => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/core/Object',
    'rosasurfer\ministruts\core\Singleton'                             => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/core/Singleton',
    'rosasurfer\ministruts\core\StaticClass'                           => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/core/StaticClass',
@@ -120,7 +122,6 @@ return array(
    'Tile'                                                             => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/struts/Tile',
 
    'CommonValidator'                                                  => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/util/CommonValidator',
-   'Config'                                                           => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/util/Config',
    'Date'                                                             => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/util/Date',
    'DebugTools'                                                       => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/util/DebugTools',
    'Logger'                                                           => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/util/Logger',
