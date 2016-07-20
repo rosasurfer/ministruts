@@ -14,9 +14,11 @@ use const rosasurfer\WINDOWS;
 
 
 /**
- * General application configuration. Settings for the application's default configuration are read from the config files
- * "config-default.properties" (if it exists) and "config.properties" (if it exists). Files from multiple directories are
- * processed and merged in the following order:
+ * General application configuration via property files.
+ *
+ * Settings for the application's default configuration are read from the config files "config-default.properties"
+ * (if exists) and "config.properties" (if exists). Files in multiple directories are processed and merged in the
+ * following order:
  *
  * All applications (Web + CLI):
  * <pre>
@@ -34,19 +36,18 @@ use const rosasurfer\WINDOWS;
  * </pre>
  *
  *
- * - Settings of all loaded files are merged. Multiple occurrences of the same setting overwrite each other, the last
- *   encountered setting "wins".
+ * • Configurations consisting of multiple files are merged. Multiple occurrences of one setting overwrite each other,
+ *   the last encountered setting "wins".
  *
- * - Files "config-default.properties" should contain global settings identical for all developers. These files is meant
+ * • Files "config-default.properties" should contain global settings identical for all developers. These files are meant
  *   to be stored in the code repository and are the place to store default settings.
  *
- * - Files "config.properties" should contain custom user or working place specific settings and are not meant to be
+ * • Files "config.properties" should contain custom user or working place specific settings and are not meant to be
  *   stored in the code repository. This files are the place to store user specific settings.
  *
- *
- * File format:<br>
- * Settings are defined as "key = value" pairs. Empty lines and enclosing white space are ignored. Subkeys can be used
- * to create structures which can be queried as a whole (array) or as single values.
+ * • File format:<br>
+ *   Settings are defined as "key = value" pairs. Empty lines and enclosing white space are ignored. Subkeys can be used
+ *   to create structures which can be queried as a whole (array) or as single values.
  *
  *
  * @example
