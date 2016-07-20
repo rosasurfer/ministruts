@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 use rosasurfer\ministruts\core\Singleton;
 
 use const rosasurfer\CLI;
