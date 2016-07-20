@@ -70,11 +70,11 @@ use const rosasurfer\WINDOWS;
  * key."subkey.with.key.separators" = value                 # quoted keys can contain otherwise illegal characters
  * </pre>
  */
-class Config extends Object {
+class Config extends Object implements ConfigInterface {
 
 
    /**
-    * @var Config - default configuration; this is the instance returned by Config::getDefault()
+    * @var ConfigInterface - default configuration; this is the instance returned by Config::getDefault()
     */
    private static $defaultConfig;
 
@@ -297,7 +297,7 @@ class Config extends Object {
     * Get the default configuration. This is the configuration set by Config::setDefault(). If none was set yet, one is
     * created. The default configuration is cached.
     *
-    * @return Config
+    * @return ConfigInterface
     */
    public static function getDefault() {
       $config = self::$defaultConfig;
@@ -361,18 +361,18 @@ class Config extends Object {
 
 
    /**
-    * Set the default configuration to be returned by Config::getDefault()
+    * Set the default configuration to be returned by Config::getDefault().
     *
-    * @param  Config $configuration
+    * @param  ConfigInterface $configuration
     */
-   public static function setDefault(Config $configuration) {
+   public static function setDefault(ConfigInterface $configuration) {
       self::$defaultConfig = $configuration;
       // TODO: update cache config
    }
 
 
    /**
-    * Reset the internal default configuration
+    * Reset the internal default configuration.
     */
    public static function resetDefault() {
       self::$defaultConfig = null;

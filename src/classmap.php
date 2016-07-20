@@ -28,6 +28,7 @@ return array(
    'ReferencePool'                                                    => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/cache/ReferencePool',
 
    'Config'                                                           => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/config/Config',
+   'ConfigInterface'                                                  => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/config/ConfigInterface',
 
    'rosasurfer\ministruts\core\Object'                                => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/core/Object',
    'rosasurfer\ministruts\core\Singleton'                             => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/core/Singleton',
