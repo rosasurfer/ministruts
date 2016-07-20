@@ -14,8 +14,9 @@ use const rosasurfer\WINDOWS;
 
 
 /**
- * Default application configuration. Settings are read from the config files "config-default.properties" (if it exists)
- * and "config.properties" (if it exists). Files from multiple directories are processed and merged in the following order:
+ * General application configuration. Settings for the application's default configuration are read from the config files
+ * "config-default.properties" (if it exists) and "config.properties" (if it exists). Files from multiple directories are
+ * processed and merged in the following order:
  *
  * All applications (Web + CLI):
  * <pre>
@@ -28,7 +29,7 @@ use const rosasurfer\WINDOWS;
  *
  * CLI applications:
  * <pre>
- *   "config-default.properties" in the directory containing the main script
+ *   "config-default.properties" in the directory containing the running main script
  *   "config.properties"         in the same directory
  * </pre>
  *
@@ -36,16 +37,16 @@ use const rosasurfer\WINDOWS;
  * - Settings of all loaded files are merged. Multiple occurrences of the same setting overwrite each other, the last
  *   encountered setting "wins".
  *
- * - Files "config-default.properties" should contain global settings identical for all developers. It is meant to be
- *   stored in the code repository and is the place to store default settings.
+ * - Files "config-default.properties" should contain global settings identical for all developers. These files is meant
+ *   to be stored in the code repository and are the place to store default settings.
  *
  * - Files "config.properties" should contain custom user or working place specific settings and are not meant to be
  *   stored in the code repository. This files are the place to store user specific settings.
  *
  *
  * File format:<br>
- * Settings are defined as "key = value" pairs. Empty lines and enclosing white space are ignored. Sub-keys can be used
- * to create array structures which can be queried as a whole array or as single values.
+ * Settings are defined as "key = value" pairs. Empty lines and enclosing white space are ignored. Subkeys can be used
+ * to create structures which can be queried as a whole (array) or as single values.
  *
  *
  * @example
@@ -61,8 +62,8 @@ use const rosasurfer\WINDOWS;
  * db.options[] = option_3
  *
  * # comment on its own line
- * log.level.Action                            = warn       # comment at the end of line
- * log.level.rosasurfer\ministruts\util\Config = notice     # keys may contain namespaces
+ * log.level.Action                 = warn                  # comment at the end of line
+ * log.level.foo\bar\MyClass        = notice                # keys may contain namespaces
  *
  * key.subkey with spaces           = value                 # keys may contain spaces
  * key.   indented subkey           = value                 # enclosing space around keys is ignored
