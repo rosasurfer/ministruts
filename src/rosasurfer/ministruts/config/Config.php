@@ -51,13 +51,13 @@ use const rosasurfer\WINDOWS;
  *
  * @example
  * <pre>
- * db.connector = mysql                                     # subkeys create an associative array structure
+ * db.connector = mysql                                     # subkeys create associative array structures
  * db.host      = localhost:3306
  * db.username  = username
  * db.password  = password
  * db.database  = schema
  *
- * db.options[] = option_1                                  # bracket notation creates a numeric array structure
+ * db.options[] = option_1                                  # bracket notation create numeric array structures
  * db.options[] = option_2
  * db.options[] = option_3
  *
