@@ -4,6 +4,7 @@ use rosasurfer\ministruts\core\Object;
 use rosasurfer\ministruts\exception\IllegalTypeException;
 use rosasurfer\ministruts\exception\InvalidArgumentException;
 use rosasurfer\ministruts\exception\RuntimeException;
+use rosasurfer\ministruts\exception\UnimplementedFeatureException;
 
 use const rosasurfer\CLI;
 use const rosasurfer\LOCALHOST;
@@ -13,96 +14,302 @@ use const rosasurfer\WINDOWS;
 
 
 /**
- * Default application configuration. Settings in the defined configuration directories are read from the file
- * "config-default.properties" (if it exists) and "config.properties" (if it exists). Config files in the directories
- * are looked-up and processed in the following order:
+ * Default application configuration. Settings are read from the config files "config-default.properties" (if it exists)
+ * and "config.properties" (if it exists). Files from multiple directories are processed and merged in the following order:
+ *
+ * All applications (Web + CLI):
+ * <pre>
+ *   "config-default.properties" in the framework's config directory, that's: MINISTRUTS_ROOT.'/src/'
+ *   "config.properties"         in the same directory
+ *
+ *   "config-default.properties" in the application's config directory, that's: APPLICATION_ROOT.'/app/config/'
+ *   "config.properties"         in the same directory
+ * </pre>
  *
  * CLI applications:
  * <pre>
- *   "config.properties"         in the directory containing the main running script
- *   "config-default.properties" in the same directory
- * </pre>
- *
- * All applications (web + CLI):
- * <pre>
- *   "config.properties"         in the application's config directory, that's: APPLICATION_ROOT.'/app/config/'
- *   "config-default.properties" in the same directory
- *
- *   "config.properties"         in the framework's config directory, that's: MINISTRUTS_ROOT.'/src/'
- *   "config-default.properties" in the same directory
+ *   "config-default.properties" in the directory containing the main script
+ *   "config.properties"         in the same directory
  * </pre>
  *
  *
- * - The settings of the found files are merged, whether a single setting is defined in one file or another doesn't matter.
- *   If multiple occurrences of the same setting are found the first encountered setting "wins".
+ * - Settings of all loaded files are merged. Multiple occurrences of the same setting overwrite each other, the last
+ *   encountered setting "wins".
  *
- * - A "config-default.properties" file should contain common global settings identical for all developers. It is meant
- *   to be stored in the code repository and is the place to store default settings.
+ * - Files "config-default.properties" should contain global settings identical for all developers. It is meant to be
+ *   stored in the code repository and is the place to store default settings.
  *
- * - A "config.properties" file should contain custom user or working place specific settings and is not meant to be stored
- *   in the code repository. It is the place to store specific settings, e.g. production settings.
+ * - Files "config.properties" should contain custom user or working place specific settings and are not meant to be
+ *   stored in the code repository. This files are the place to store user specific settings.
  *
  *
  * File format:<br>
  * Settings are defined as "key = value" pairs. Empty lines and enclosing white space are ignored. Sub-keys can be used
- * to create array structures which can be queried as a whole (array) or as single values (string).
+ * to create array structures which can be queried as a whole array or as single values.
  *
  *
  * @example
  * <pre>
- * db.connector = mysql
+ * db.connector = mysql                                     # subkeys create an associative array structure
  * db.host      = localhost:3306
  * db.username  = username
  * db.password  = password
  * db.database  = schema
  *
+ * db.options[] = option_1                                  # bracket notation creates a numeric array structure
+ * db.options[] = option_2
+ * db.options[] = option_3
+ *
  * # comment on its own line
- * log.level.Action                            = warn             # comment at the end of line
- * log.level.rosasurfer\ministruts\util\Config = notice           # keys may contain namespaces
+ * log.level.Action                            = warn       # comment at the end of line
+ * log.level.rosasurfer\ministruts\util\Config = notice     # keys may contain namespaces
  *
- * key.subkey with spaces = value                                 # subkeys may contain spaces
- * key.   indented subkey = value                                 # enclosing space around subkeys is ignored
+ * key.subkey with spaces           = value                 # keys may contain spaces
+ * key.   indented subkey           = value                 # enclosing space around keys is ignored
  *
- * key."double.quoted.subkey.with.separators"            = value  # quoted subkeys can contain otherwise illegal characters
- * key.'single.quoted.subkey.with.separators'            = value
- *
- * key."quote characters \" in a subkey must be escaped" = value
- * key.'quote characters \' in a subkey must be escaped' = value
+ * key."subkey.with.key.separators" = value                 # quoted keys can contain otherwise illegal characters
  * </pre>
  */
 class Config extends Object {
 
 
    /**
-    * @var string[] - config file names (existing and non-existing) of all config directories
+    * @var Config - default configuration; this is the instance returned by Config::getDefault()
     */
-   private $files = [];
+   private static $defaultConfig;
+
 
    /**
-    * @var string[] - property pool
+    * @var string[] - names of the looked-up config files (existing and non-existing)
+    */
+   public $files = [];
+
+   /**
+    * @var string[] - tree structure of the found configuration values
     */
    private $properties = [];
 
 
    /**
-    * Gibt die Instanz dieser Klasse zurück. Obwohl Config nicht Singleton implementiert, gibt es im User-Code nur eine
-    * einzige Instanz. Diese Instanz wird gecacht.
+    * Constructor
+    *
+    * Create a new instance and load the specified property files.
+    *
+    * @param  string[] $files - array of filenames to load
+    */
+   public function __construct(array $files) {
+      // check and remember existence of the specified config files
+      $checkedFiles = [];
+      foreach ($files as $file) {
+         $checkedFiles[$file] = is_file($file);
+         $checkedFiles[$file] = is_file($file);
+      }
+      $this->files = $checkedFiles;
+
+      // load existing config files
+      foreach ($this->files as $fileName => $fileExists) {
+         $fileExists && $this->loadFile($fileName);
+      }
+   }
+
+
+   /**
+    * Load a single properties file. New settings overwrite existing ones.
+    *
+    * @param  string $filename
+    */
+   private function loadFile($filename) {
+      $lines = file($filename, FILE_IGNORE_NEW_LINES);
+
+      foreach ($lines as $i => $line) {
+         $parts = explode('#', $line, 2);
+         $line  = trim($parts[0]);                    // drop comments
+         if (!strLen($line))                          // skip empty lines
+            continue;
+
+         $parts = explode('=', $line, 2);             // separate key/value
+         if (sizeOf($parts) < 2) {
+            Logger::log(__METHOD__.'()  Skipping syntax error in "'.$filename.'", line '.($i+1).': missing key-value separator', null, L_NOTICE, __CLASS__);
+            continue;
+         }
+         $key   = trim($parts[0]);
+         $value = trim($parts[1]);
+
+         // parse and store property value
+         $this->setProperty($key, $value, $filename, $i+1);
+      }
+   }
+
+
+   /**
+    * Return the config setting with the specified key or the specified alternative value if no such is found.
+    *
+    * @param  string $key        - key
+    * @param  mixed  $onNotFound - alternative value
+    *
+    * @return mixed - config setting
+    *
+    * @throws RuntimeException - if no such setting is found and no alternative value was specified
+    */
+   public function get($key, $onNotFound=null) {
+      if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
+
+      $value = $this->getProperty($key);
+
+      if (is_null($value)) {
+         if (func_num_args() == 1) throw new RuntimeException('No configuration found for key "'.$key.'"');
+         return $onNotFound;
+      }
+      return $value;
+   }
+
+
+   /**
+    * Set/modify the config setting with the specified key. Modified values are not persistet and get lost with script
+    * termination.
+    *
+    * @param  string $key
+    * @param  string $value
+    */
+   public function set($key, $value) {
+      if (!is_string($key))   throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
+      if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
+
+      $this->setProperty($key, $value);
+   }
+
+
+   /**
+    * Look-up a property and return its value.
+    *
+    * @param  string $key
+    *
+    * @return string|[] - a string, a string array or NULL if no such setting is found
+    */
+   private function getProperty($key) {
+      $properties  = $this->properties;
+      $subkeys     = $this->parseSubkeys($key);
+      $subKeysSize = sizeOf($subkeys);
+
+      for ($i=0; $i < $subKeysSize; ++$i) {
+         $subkey = trim($subkeys[$i]);
+         if (!is_array($properties) || !isSet($properties[$subkey]))
+            break;                                    // not found
+         if ($i+1 == $subKeysSize)                    // return at the last subkey
+            return $properties[$subkey];
+         $properties = $properties[$subkey];          // go to the next sublevel
+      }
+      return null;
+   }
+
+
+   /**
+    * Set/modify the property with the specified key.
+    *
+    * @param  string $key
+    * @param  string $value
+    */
+   private function setProperty($key, $value, $file=null, $line=null) {
+
+      // set the property depending on the existing data structure
+      $properties =& $this->properties;
+      $subkeys     = $this->parseSubkeys($key);
+      $subkeysSize = sizeOf($subkeys);
+
+      for ($i=0; $i < $subkeysSize; ++$i) {
+         $subkey = trim($subkeys[$i]);
+         if (!strLen($subkey)) throw new InvalidArgumentException('Invalid argument $key: '.$key);
+
+         if ($i+1 < $subkeysSize) {
+            // not yet the last subkey
+            if (!isSet($properties[$subkey])) {
+               $properties[$subkey] = [];                            // create another array level
+            }
+            elseif (!is_array($properties[$subkey])) {
+               $properties[$subkey] = ['' => $properties[$subkey]];  // create another array level and keep the
+            }                                                        // existing non-array value   TODO: how to access?
+            $properties =& $properties[$subkey];                     // reference the new array level
+         }
+         else {
+            // the last subkey
+            if (!isSet($properties[$subkey])) {
+               $properties[$subkey] = $value;                        // store the value
+            }
+            else if (!is_array($properties[$subkey])) {
+               $properties[$subkey] = $value;                        // overwrite the existing non-array value
+            }
+            else {
+               $where = $file ? ' in "'.$file.'", line '.$line : '';
+               Logger::log(__METHOD__.'()  Overwriting existing properties array "'.$key.'" with simple value'.$where, null, L_NOTICE, __CLASS__);
+               $properties[$subkey] = $value;                        // overwrite the existing array value
+            }
+         }
+      }
+
+      // TODO: update the cache if the instance is a cached instance
+   }
+
+
+   /**
+    * Parse the specified into subkeys. Subkeys can consist of quoted strings.
+    *
+    * @param  string $key
+    *
+    * @return string[] - array of subkeys
+    */
+   private function parseSubkeys($key) {
+      $k          = $key;
+      $subkeys    = [];
+      $quoteChars = ["'", '"'];                    // single and double quotes
+
+      while (true) {
+         $k = trim($k);
+
+         foreach ($quoteChars as $char) {
+            if (strPos($k, $char) === 0) {         // subkey starts with a quote char
+               $pos = strPos($k, $char, 1);        // find the ending quote char
+               if ($pos === false) throw new InvalidArgumentException('Invalid argument $key: '.$key);
+               $subkeys[] = subStr($k, 1, $pos-1);
+               $k         = trim(subStr($k, $pos+1));
+               if (!strLen($k))                    // last subkey or next char is a key separator
+                  break 2;
+               if (strPos($k, '.') !== 0) throw new InvalidArgumentException('Invalid argument $key: '.$key);
+               $k = subStr($k, 1);
+               continue 2;
+            }
+         }
+
+         // key is not quoted
+         $pos = strPos($k, '.');                   // find next key separator
+         if ($pos === false) {
+            $subkeys[] = $k;                       // last subkey
+            break;
+         }
+         $subkeys[] = trim(subStr($k, 0, $pos));
+         $k         = subStr($k, $pos+1);          // next subkey
+      }
+
+      return $subkeys;
+   }
+
+
+   /**
+    * Get the default configuration. This is the configuration set by Config::setDefault(). If none was set yet, one is
+    * created. The default configuration is cached.
     *
     * @return Config
     */
-   public static function me() {
-      static /*Config*/ $config = null;      // emuliert Singleton (Config kann nicht Singleton sein, um serialisiert werden zu können)
-      static /*bool  */ $locked = false;     // detect recursive calls
-
-      $cache = null;
+   public static function getDefault() {
+      $config = self::$defaultConfig;
 
       if (!$config) {
-         $cache  = Cache ::me();
-         $config = $cache->get(__CLASS__);   // gibt es bereits eine Config im Cache ?
+         $cache  = Cache::me();
+         $config = $cache->get(__CLASS__);                              // is there a cached instance?
 
          if (!$config) {
             $lock = null;
 
+            static $locked = false;                                     // detect recursive calls (non-sense here ???)
             if (!$locked) {
                // Lock holen und nochmal nachschauen
                $locked = true;
@@ -111,245 +318,73 @@ class Config extends Object {
             }
 
             if (!$config) {
-               // Config existiert tatsächlich noch nicht, also neu einlesen ...
-               $config = new self();
+               // default config does not yet exist, create a new instance
+               // define config paths according to runtime context
+               $paths = [];
+               $paths[]        = MINISTRUTS_ROOT.'/src';                // all:   framework config directory
+               $paths[]        = APPLICATION_ROOT.'/app/config';        // all: + app config directory
+               CLI && $paths[] = dirName($_SERVER['SCRIPT_FILENAME']);  // cli: + script directory
 
-               // ... FileDependency erzeugen ...
+               // normalize paths and remove duplicates
+               foreach ($paths as $i => $path) {
+                  if (!is_dir($path)) {                                 // drop entries of non-existing directories,
+                     unset($paths[$i]);                                 // e.g. the app config directory
+                     continue;
+                  }
+                  $paths[$i] = realPath($path);
+               }
+               $paths = array_unique($paths);
+
+               // define application config files
+               $files = [];
+               foreach ($paths as $path) {
+                  $files[] = $path.DIRECTORY_SEPARATOR.'config-default.properties';
+                  $files[] = $path.DIRECTORY_SEPARATOR.'config.properties';
+               }
+
+               // create the instance
+               $config = new self($files);
+
+               // create FileDependency and the cache instance
                $dependency = FileDependency::create(array_keys($config->files));
-               if (!WINDOWS && !CLI && !LOCALHOST)                   // Unterscheidung Production/Development
+               if (!WINDOWS && !CLI && !LOCALHOST)                      // distinction dev/production (sense???)
                   $dependency->setMinValidity(60 * SECONDS);
-
-               // ... und cachen
                $cache->set(__CLASS__, $config, Cache::EXPIRES_NEVER, $dependency);
             }
          }
+         self::$defaultConfig = $config;
       }
-      // evt. Lock wird durch GarbageCollector freigegeben
+
+      // an aquired lock will get released by the garbage collector
       return $config;
    }
 
 
    /**
-    * Constructor
+    * Set the default configuration to be returned by Config::getDefault()
     *
-    * Lädt die Konfiguration aus allen existierenden config-default.properties- und config.properties-Dateien.
-    * Die config.properties-Dateien sollen nicht im Repository gespeichert werden, so daß eine Default- und eine
-    * Custom-Konfiguration mit unterschiedlichen Einstellungen möglich sind. Custom-Einstellungen überschreiben
-    * Default-Einstellungen.
+    * @param  Config $configuration
     */
-   private function __construct() {
-      // define config paths according to runtime context
-      $paths = [];
-      CLI && $paths[] = dirName($_SERVER['SCRIPT_FILENAME']);           // cli:   script directory
-      $paths[]        = APPLICATION_ROOT.'/app/config';                 // all: + app config directory
-      $paths[]        = MINISTRUTS_ROOT.'/src';                         // all: + framework config directory
-
-      // normalize paths and remove duplicates
-      foreach ($paths as $i => $path) {
-         if (!is_dir($path)) {
-            unset($paths[$i]);                                          // app config directory might not exist
-            continue;
-         }
-         $paths[$i] = realPath($path);
-      }
-      $paths = array_unique($paths);
-
-      // look-up existence of all config files
-      $files = [];
-      foreach ($paths as $path) {
-         $files[$file] = is_file($file=$path.DIRECTORY_SEPARATOR.'config.properties');
-         $files[$file] = is_file($file=$path.DIRECTORY_SEPARATOR.'config-default.properties');
-      }
-      $this->files = $files;
-
-      // Load config files in reverse order. This way duplicate incoming settings over-write existing ones.
-      foreach (array_reverse($files) as $fileName => $fileExists) {
-         $fileExists && $this->loadFile($fileName);
-      }
+   public static function setDefault(Config $configuration) {
+      self::$defaultConfig = $configuration;
+      // TODO: update cache config
    }
 
 
    /**
-    * Lädt eine Konfigurationsdatei. Schon vorhandene Einstellungen werden durch folgende Einstellungen
-    * überschrieben.
-    *
-    * @param  string $filename - Dateiname
+    * Reset the internal default configuration
     */
-   private function loadFile($filename) {
-      $lines = file($filename, FILE_IGNORE_NEW_LINES|FILE_SKIP_EMPTY_LINES);
-
-      foreach ($lines as $line) {
-         // Kommentare entfernen
-         $parts = explode('#', $line, 2);
-         $line  = trim($parts[0]);
-         if ($line == '')
-            continue;
-
-         // Key und Value trennen
-         $parts = explode('=', $line, 2);
-         if (sizeOf($parts) < 2) {
-            Logger::log('Skipping syntax error in configuration file "'.$filename.'" at line: "'.$line.'": missing key-value separator', null, L_NOTICE, __CLASS__);
-            continue;
-         }
-
-         // Eigenschaft setzen
-         $this->setProperty(trim($parts[0]), trim($parts[1]), false); // Cache nicht aktualisieren
-      }
+   public static function resetDefault() {
+      self::$defaultConfig = null;
+      // TODO: update cache config
    }
 
 
    /**
-    * Gibt die unter dem angegebenen Schlüssel gespeicherte Einstellung zurück.  Existiert die Einstellung
-    * nicht, wird der angegebene Defaultwert zurückgegeben.
-    *
-    * @param  string $key     - Schlüssel
-    * @param  mixed  $default - Defaultwert (kann auch NULL sein, um z.B. eine Exception zu verhindern)
-    *
-    * @return mixed - Konfigurationseinstellung
-    *
-    * @throws RuntimeException - wenn unter dem angegebenen Schlüssel keine Einstellung existiert und
-    *                            kein Defaultwert angegeben wurde
+    * Handle clones (public but can't be called manually).
     */
-   public static function get($key, $default=null) {
-      if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
-
-      // TODO: Typen erkennen und automatisch casten
-      $value = self::me()->getProperty($key);
-
-      if (is_null($value)) {
-         if (func_num_args() == 1) throw new RuntimeException('Missing configuration setting for key "'.$key.'"');
-         return $default;
-      }
-
-      return $value;
+   public function __clone() {
+      throw new UnimplementedFeatureException(__METHOD__.'() not yet implemented');
+      // TODO: update cache id or disable caching of this instance
    }
-
-
-   /**
-    * Setzt oder überschreibt die Einstellung mit dem angegebenen Schlüssel. Wert muß ein String sein.
-    * Diese Methode kann aus der Anwendung heraus aufgerufen werden, um zur Laufzeit Einstellungen zu
-    * zu ändern. Diese Änderungen werden nicht in "config.properties" gespeichert und gehen nach Ende
-    * des Requests verloren.
-    *
-    * @param  string $key   - Schlüssel
-    * @param  string $value - Einstellung
-    */
-   public static function set($key, $value) {
-      if (!is_string($key))   throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
-      if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
-
-      return self::me()->setProperty($key, $value);
-   }
-
-
-   /**
-    * @param  string $key
-    *
-    * @return mixed
-    *
-    * @see Config::get()
-    */
-   private function getProperty($key) {
-      $properties =& $this->properties;
-
-      $parts = explode('.', $key);
-      $size  = sizeOf($parts);
-
-      for ($i=0; $i<$size; ++$i) {
-         $subkey = $parts[$i];
-
-         if (!is_array($properties) || !isSet($properties[$subkey])) // PHP sucks!!! $some_string[$other_string] löst keinen Fehler aus,
-            break;                                                   // sondern castet $other_string ohne Warnung zu 0
-                                                                     // Ergebnis: $some_string[$other_string] == $some_string{0}
-         if ($i+1 == $size)               // das letzte Element
-            return $properties[$subkey];
-                                                                     // wieder:
-         $properties =& $properties[$subkey];                        // $some_string[$other_string] == $some_string{0} (ohne Fehler)
-      }
-      return null;
-   }
-
-
-   /**
-    * @param  string $key
-    * @param  string $value
-    * @param  bool   $persist - (nicht implementiert)
-    *
-    * @see Config::set()
-    */
-   private function setProperty($key, $value, $persist = false) {
-      $properties =& $this->properties;
-
-      // alt: $parts = explode('.', $key);
-
-      // neu
-      $parts = array();
-      $k = $key;
-
-      while (true) {
-         $k = trim($k);
-
-         if ($k{0} != '"') {  // normaler Key ohne Anführungszeichen (")
-            $pos = strPos($k, '.');
-            if ($pos === false) {
-               $parts[] = $k;
-               break;
-            }
-            else {
-               $parts[] = trim(subStr($k, 0, $pos));
-               $k       = subStr($k, $pos+1);
-            }
-         }
-         else {               // Key beginnt mit Anführungszeichen (")
-            $pos = strPos($k, '"',1);
-            if ($pos === false) throw new InvalidArgumentException('Invalid argument $key: '.$key);
-
-            $parts[] = subStr($k, 1, $pos-1);
-            $k       = trim(subStr($k, $pos+1));
-
-            if (!strLen($k))
-               break;
-            if (strPos($k, '.') !== 0) throw new InvalidArgumentException('Invalid argument $key: '.$key);
-            $k = subStr($k, 1);
-         }
-      }
-      // end: neu
-
-      $size = sizeOf($parts);
-
-      for ($i=0; $i<$size; ++$i) {
-         $current = trim($parts[$i]);
-         if ($current == '') throw new InvalidArgumentException('Invalid argument $key: '.$key);
-
-         if ($i+1 < $size) {
-            // noch nicht das letzte Element
-            if (!isSet($properties[$current])) {
-               $properties[$current] = array();                            // weitere Ebene
-            }
-            elseif (is_string($properties[$current])) {
-               $properties[$current] = array('' => $properties[$current]); // weitere Ebene und alter Wert
-            }
-            $properties =& $properties[$current];
-         }
-         else {
-            // das letzte Element
-            if (!isSet($properties[$current]) || is_string($properties[$current])) {
-               $properties[$current] = $value;           // überschreiben
-            }
-            else {
-               $properties[$current][''] = $value;       // Wurzeleintrag eines Arrays
-            }
-         }
-      }
-
-      // Cache aktualisieren, falls die Config-Instanz dort gespeichert ist
-      //if ($persist && Cache ::me()->isCached($class=get_class($this)))
-      //   Cache ::me()->set($class, $this);
-   }
-
-
-   /**
-    * Verhindert das Clonen der Config-Instanz.
-    */
-   private function __clone() {/* do not clone me */}
 }
