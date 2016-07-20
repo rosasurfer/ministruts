@@ -1,3 +1,9 @@
+2016-07-20
+
+   - Config classes support multiple custom configurations with an application default configuration  
+   - function rosasurfer\is_trait()  
+
+
 2016-07-06
 
    - functions rosasurfer\strLeftTo() and rosasurfer\strRightFrom() support two optional parameters: 
