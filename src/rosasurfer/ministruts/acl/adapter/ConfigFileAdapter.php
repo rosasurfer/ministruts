@@ -23,8 +23,6 @@ class ConfigFileAdapter extends Object implements AdapterInterface {
          if (!is_string($file)) throw new IllegalTypeException('Illegal type of parameter $file: '.getType($file));
          throw new UnimplementedFeatureException('Support for custom config files not yet implemented');
       }
-
-      $acl = \Config::me()->get('acl', null);
-      echoPre($acl);
+      $config = \Config::getDefault()->get('acl.config', null);
    }
 }
