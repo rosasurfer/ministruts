@@ -463,7 +463,7 @@ class SMTPMailer extends Mailer {
     * Date: Sun, 21 Dec 2008 13:18:13 +0100
     * From: local.domain.tld <user@domain.tld>
     * To: User Name <user@domain.tld>
-    * Subject: *********************************** an User Name
+    * Subject: *********************************** a User Name
     * Content-Type: text/plain; charset=iso-8859-1
     *
     * Hallo User Name,
