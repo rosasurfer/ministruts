@@ -1438,7 +1438,7 @@ class BasePdfDocument extends Object {
     */
    function selectFont($fontName, $encoding='', $set=1) {
       if (!is_file($fontName)) {
-         $fontPath = dirName(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'fonts'.DIRECTORY_SEPARATOR;
+         $fontPath = __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'fonts'.DIRECTORY_SEPARATOR;
 
          if (!strEndsWith($fontName, '.afm'))
             $fontName .= '.afm';
@@ -1969,7 +1969,7 @@ class BasePdfDocument extends Object {
     */
    function getFontHeight($size){
      if (!$this->numFonts){
-       $this->selectFont(dirName(__FILE__).'/../fonts/Helvetica');
+       $this->selectFont(__DIR__.'/../fonts/Helvetica');
      }
      // for the current font, and the given size, what is the height of the font in user units
      $h = $this->fonts[$this->currentFont]['FontBBox'][3]-$this->fonts[$this->currentFont]['FontBBox'][1];
@@ -1984,7 +1984,7 @@ class BasePdfDocument extends Object {
    function getFontDecender($size){
      // note that this will most likely return a negative value
      if (!$this->numFonts){
-       $this->selectFont(dirName(__FILE__).'/../fonts/Helvetica');
+       $this->selectFont(__DIR__.'/../fonts/Helvetica');
      }
      $h = $this->fonts[$this->currentFont]['FontBBox'][1];
      return $size*$h/1000;
@@ -2191,7 +2191,7 @@ class BasePdfDocument extends Object {
     */
    function addText($x,$y,$size,$text,$angle=0,$wordSpaceAdjust=0){
      if (!$this->numFonts) {
-        $this->selectFont(dirName(__FILE__).'/../fonts/Helvetica');
+        $this->selectFont(__DIR__.'/../fonts/Helvetica');
      }
 
      // if there are any open callbacks, then they should be called, to show the start of the line
@@ -2290,7 +2290,7 @@ class BasePdfDocument extends Object {
      $store_currentTextState = $this->currentTextState;
 
      if (!$this->numFonts){
-       $this->selectFont(dirName(__FILE__).'/../fonts/Helvetica');
+       $this->selectFont(__DIR__.'/../fonts/Helvetica');
      }
 
      // converts an integer or a float to a string so it can get the width
@@ -2375,7 +2375,7 @@ class BasePdfDocument extends Object {
      $store_currentTextState = $this->currentTextState;
 
      if (!$this->numFonts) {
-        $this->selectFont(dirName(__FILE__).'/../fonts/Helvetica');
+        $this->selectFont(__DIR__.'/../fonts/Helvetica');
      }
      if ($width<=0){
        // error, pretend it printed ok, otherwise risking a loop
