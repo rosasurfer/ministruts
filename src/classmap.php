@@ -36,7 +36,6 @@ return array(
 
    'CommonDAO'                                                        => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/dao/CommonDAO',
    'DaoWorker'                                                        => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/dao/DaoWorker',
-   'IDaoConnected'                                                    => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/dao/IDaoConnected',
    'PersistableObject'                                                => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/dao/PersistableObject',
 
    'DB'                                                               => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/db/DB',

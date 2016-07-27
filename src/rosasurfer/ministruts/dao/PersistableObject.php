@@ -11,7 +11,7 @@ use rosasurfer\ministruts\exception\UnimplementedFeatureException;
  *
  * Abstrakte Basisklasse für gespeicherte Objekte.
  */
-abstract class PersistableObject extends Object implements IDaoConnected {
+abstract class PersistableObject extends Object {
 
 
    // Flag für den aktuellen Änderungsstatus der Instanz
@@ -252,13 +252,12 @@ abstract class PersistableObject extends Object implements IDaoConnected {
 
 
    /**
-    * Gibt den DAO für diese Instanz zurück.
-    *
-    * @param  string $class - Klassenname der Instanz
+    * Return the DAO for the calling class.
     *
     * @return CommonDAO
     */
-   protected static function getDAO($class) {
-      return Singleton::getInstance($class.'DAO');
+   public static function dao() {
+      // TODO: the calling class may be a derived class with the DAO being one of its parents
+      return Singleton::getInstance(static::CLASS.'DAO');
    }
 }
