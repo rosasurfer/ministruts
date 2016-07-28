@@ -6,6 +6,8 @@ use rosasurfer\ministruts\exception\IllegalTypeException;
 use rosasurfer\ministruts\exception\InvalidArgumentException;
 use rosasurfer\ministruts\exception\RuntimeException;
 
+use rosasurfer\ministruts\util\Validator;
+
 use function rosasurfer\strEndsWith;
 use function rosasurfer\strLeft;
 use function rosasurfer\strLeftTo;
@@ -507,14 +509,14 @@ abstract class RequestBase extends Singleton {
                if ($value === '') {
                   continue;
                }
-               elseif (CommonValidator ::isIPAddress($value)) {
+               elseif (Validator::isIPAddress($value)) {
                   $ip = $value;
                }
                elseif ($value=='unknown' || $value=='localhost' || $value==($ip=NetTools ::getHostByName($value))) {
                   continue;
                }
 
-               if (CommonValidator ::isIPWanAddress($ip)) {
+               if (Validator::isIPWanAddress($ip)) {
                   $guessed = $ip;
                   //if ($ip == NetTools ::getHostByAddress($ip))
                   //   Logger::log('Guessed a non-resolvable IP address as a WAN address: '.$ip, null, L_DEBUG, __CLASS__);

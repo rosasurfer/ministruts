@@ -8,6 +8,8 @@ use rosasurfer\ministruts\exception\ClassNotFoundException;
 use rosasurfer\ministruts\exception\IllegalTypeException;
 use rosasurfer\ministruts\exception\InvalidArgumentException;
 
+use rosasurfer\ministruts\util\Validator;
+
 
 /**
  * Program flow
@@ -882,7 +884,7 @@ function metaTypeToStr($name) {
 
 
 /**
- * Procedural replacement for rosasurfer\util\CommonValidator::isDateTime()
+ * Procedural replacement for rosasurfer\ministruts\util\Validator::isDateTime()
  *
  * Whether or not the specified string value represents a valid date or datetime value.
  *
@@ -896,10 +898,10 @@ function metaTypeToStr($name) {
  *
  * @return int|bool - timestamp matching the string or FALSE if the string is not a valid date/datetime value
  *
- * @see    rosasurfer\util\CommonValidator::isDateTime()
+ * @see    rosasurfer\ministruts\util\Validator::isDateTime()
  */
 function is_datetime($string, $format) {
-   return \CommonValidator::isDateTime($string, $format);
+   return Validator::isDateTime($string, $format);
 }
 
 

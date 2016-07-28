@@ -1,7 +1,7 @@
 <?php
 use rosasurfer\ministruts\core\Object;
-
 use rosasurfer\ministruts\exception\IllegalTypeException;
+use rosasurfer\ministruts\util\Validator;
 
 use const rosasurfer\strEndsWith;
 use const rosasurfer\strStartsWith;
@@ -136,7 +136,7 @@ abstract class Mailer extends Object {
       // auf schließende Klammer ">" prüfen
       if (!strEndsWith($address, '>')) {
          // keine, es muß eine einfache E-Mailadresse sein
-         if (CommonValidator ::isEmailAddress($address))
+         if (Validator::isEmailAddress($address))
             return array('name'    => '',
                          'address' => $address);
          return false;
@@ -150,7 +150,7 @@ abstract class Mailer extends Object {
       $name    = trim(subStr($address, 0, $open));
       $address = subStr($address, $open+1, strLen($address)-$open-2);
 
-      if (CommonValidator ::isEmailAddress($address))
+      if (Validator::isEmailAddress($address))
          return array('name'    => $name==$address ? '': $name,
                       'address' => $address);
 

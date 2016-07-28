@@ -1,13 +1,14 @@
 <?php
-use rosasurfer\ministruts\core\StaticClass;
+namespace rosasurfer\ministruts\util;
 
+use rosasurfer\ministruts\core\StaticClass;
 use rosasurfer\ministruts\exception\IllegalTypeException;
 
 
 /**
- * CommonValidator
+ * Validator
  */
-class CommonValidator extends StaticClass {
+class Validator extends StaticClass {
 
 
    /**
