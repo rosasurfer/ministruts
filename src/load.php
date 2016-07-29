@@ -151,9 +151,7 @@ spl_autoload_register(function($class) {
       if (class_exists($class, false) || interface_exists($class, false) || trait_exists($class, false)) {
          \Logger::warn(ucFirst(metaTypeToStr($class)).' '.$class.' was loaded successfully but caused an exception', $ex, __CLASS__);
       }
-      else {
-         throw ($ex instanceof ClassNotFoundException) ? $ex : new ClassNotFoundException('Cannot load class '.$class, null, $ex);
-      }
+      else throw ($ex instanceof ClassNotFoundException) ? $ex : new ClassNotFoundException('Cannot load class '.$class, null, $ex);
    }
 });
 
