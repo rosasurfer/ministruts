@@ -792,7 +792,9 @@ function is_class($name) {
          spl_autoload_call($name);     // a regular SPL loader queue is defined
       }
    }
-   catch (ClassNotFoundException $ex) {}
+   catch (ClassNotFoundException $ex) {
+      // TODO: loaders might trigger any kind of error/throw any kind of exception
+   }
 
    return class_exists($name, $autoload=false);
 }
@@ -824,7 +826,9 @@ function is_interface($name) {
          spl_autoload_call($name);     // a regular SPL loader queue is defined
       }
    }
-   catch (ClassNotFoundException $ex) {}
+   catch (ClassNotFoundException $ex) {
+      // TODO: loaders might trigger any kind of error/throw any kind of exception
+   }
 
    return interface_exists($name, $autoload=false);
 }
@@ -856,7 +860,9 @@ function is_trait($name) {
          spl_autoload_call($name);     // a regular SPL loader queue is defined
       }
    }
-   catch (ClassNotFoundException $ex) {}
+   catch (ClassNotFoundException $ex) {
+      // TODO: loaders might trigger any kind of error/throw any kind of exception
+   }
 
    return trait_exists($name, $autoload=false);
 }
