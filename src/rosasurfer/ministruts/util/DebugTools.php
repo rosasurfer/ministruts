@@ -247,8 +247,8 @@ class DebugTools extends StaticClass {
       if ($cause=$exception->getPrevious()) {
          // recursively add stacktraces of all nested exceptions
          $message = self::getBetterMessage($cause);
-         $result .= NL.$indent.'caused by'.NL.$indent.$message.NL;
-         $result .= self::{__FUNCTION__}($cause, $indent);              // recursion
+         $result .= NL.$indent.'caused by'.NL.$indent.$message.' in'.NL.NL;
+         $result .= self::{__FUNCTION__}($cause, $indent);                 // recursion
       }
       return $result;
    }
