@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 use rosasurfer\ministruts\core\Singleton;
 
 use rosasurfer\ministruts\exception\IllegalStateException;
@@ -19,26 +19,12 @@ use const rosasurfer\L_NOTICE;
 
 
 /**
- * RequestBase
+ * Request
  *
  * Diese Klasse stellt den HTTP-Request mit seinen Daten dar, sowie er von PHP an das aufgerufene Script übergeben wird.
  * Da es immer nur einen einzigen Request geben kann, ist er als Singleton implementiert.  Das bedeutet unter anderem,
  * daß es keinen öffentlichen Constructor gibt, man kann also nicht selbst einen neuen Request erzeugen (es gibt nur den
  * einen, der vom Server an PHP weitergereicht wurde).
- *
- * Warum eine abstrakte Klasse RequestBase und eine zusätzliche, funktional leere Klasse Request als Implementierung?
- *
- * Wird eine projektspezifische Implementierung oder Erweiterung der Klasse Request benötigt, müßte eine Projektklasse von
- * der Basisklasse der Library abgeleitet werden. Da PHP 5.2 keine Namespaces hat, würde für das Projekt der Klassenname
- * Request für diese erweiterte Klasse nicht mehr zur Verfügung stehen (Überlappung mit Klasse desselben Namens in der Library).
- * Durch die abstrakte Klasse RequestBase kann im Projekt eigene Funktionalität implementiert werden, und der Klassenname
- * Request steht trotz fehlender Namespaces weiterhin frei zur Verfügung. Dieser Workaround wird erst mit Umstellung der Library
- * auf PHP 5.3 überflüssig.
- *
- * Bis dahin beten wir zu den Göttern... und wenn es dann soweit ist: Da war ihres "Allah" Rufens kein Ende.¹
- *
- * ¹ Wörtlich: es war hoch ihr <i>takbìr</i>, d.h. sie begannen, als Zeichen größten Staunens, immer wieder <i>Allah akbar</i>
- *   "Gott ist groß" zu rufen.
  *
  *
  * NOTE:
@@ -49,13 +35,13 @@ use const rosasurfer\L_NOTICE;
  * Die globalen PHP-Variablen $_GET, $_POST und $_REQUEST entsprechen der Originalimplementierung,
  * mehrfache Werte werden also überschrieben.
  *
- * @see RequestBase::getParameter()
- * @see RequestBase::getParameters()
+ * @see  Request::getParameter()
+ * @see  Request::getParameters()
  *
  * TODO: LinkTool implementieren, um path-info verwenden zu können
  * TODO: Versions-String in css- und js-Links einfügen
  */
-abstract class RequestBase extends Singleton {
+class Request extends Singleton {
 
 
    private /*string*/ $method;
@@ -73,22 +59,15 @@ abstract class RequestBase extends Singleton {
 
 
    /**
-    * Gibt die Singleton-Instanz des konkreten Requests zurück, wenn das Script im Kontext eines HTTP-Requestes
-    * aufgerufen wurde. In allen anderen Fällen, z.B. bei Aufruf in der Konsole, wird NULL zurückgegeben.
+    * Gibt die Singleton-Instanz des Requests zurück, wenn das Script im Kontext eines HTTP-Requestes aufgerufen wurde.
+    * In allen anderen Fällen, z.B. bei Aufruf in der Konsole, wird NULL zurückgegeben.
     *
     * @return Singleton - Instanz oder NULL
-    *
-    * NOTE: Diese Methode muß nicht hier, sondern in der konkreten Request-Klasse implementiert werden.
-    *       Der entsprechende Code ist nachfolgend angegeben und muß unverändert übernommen werden.
     */
    public static function me() {
-      throw new RuntimeException('Method '.__METHOD__.'() must not be called directly, it needs to be implemented in the concrete Request class.');
-
-      // !!! begin code snippet !!!
       if (!CLI)
-         return Singleton ::getInstance(__CLASS__);
+         return Singleton::getInstance(__CLASS__);
       return null;
-      // !!! end code snippet   !!!
    }
 
 
@@ -153,8 +132,8 @@ abstract class RequestBase extends Singleton {
     * @param  string $rawData - Parameter-Rohdaten
     * @param  string $target  - Bezeichner für das Zielarray: 'GET' oder 'POST'
     *
-    * @see RequestBase::getParameter()
-    * @see RequestBase::getParameters()
+    * @see  Request::getParameter()
+    * @see  Request::getParameters()
     */
    protected function parseParameters($rawData, $target) {
       $pairs = explode('&', $rawData);
