@@ -5,6 +5,8 @@ use rosasurfer\ministruts\exception\IllegalTypeException;
 use rosasurfer\ministruts\exception\InvalidArgumentException;
 use rosasurfer\ministruts\exception\RuntimeException;
 
+use rosasurfer\ministruts\struts\Request;
+
 use function rosasurfer\echoPre;
 use function rosasurfer\printPretty;
 use function rosasurfer\strStartsWith;

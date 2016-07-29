@@ -5,6 +5,8 @@ use rosasurfer\ministruts\exception\FileNotFoundException;
 use rosasurfer\ministruts\exception\IllegalStateException;
 use rosasurfer\ministruts\exception\RuntimeException;
 
+use rosasurfer\ministruts\struts\Request;
+
 use function rosasurfer\strLeftTo;
 use function rosasurfer\strRightFrom;
 use function rosasurfer\strStartsWith;

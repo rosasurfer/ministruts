@@ -1,4 +1,6 @@
-﻿<?php
+<?php
+namespace rosasurfer\ministruts\struts;
+
 use rosasurfer\ministruts\core\Singleton;
 
 use rosasurfer\ministruts\exception\IllegalStateException;
@@ -38,8 +40,8 @@ use const rosasurfer\L_NOTICE;
  * @see  Request::getParameter()
  * @see  Request::getParameters()
  *
- * TODO: LinkTool implementieren, um path-info verwenden zu können
- * TODO: Versions-String in css- und js-Links einfügen
+ * TODO: implement LinkTool
+ * TODO: implement version hashs for CSS- and JS links
  */
 class Request extends Singleton {
 
@@ -76,7 +78,7 @@ class Request extends Singleton {
     */
    protected function __construct() {
       if (!ini_get('track_errors'))
-         throw new RuntimeException('PHP configuration setting "track_errors" is not "On" but needed for correct request decoding.');
+         throw new RuntimeException('PHP configuration setting "track_errors" is not "On" but is needed for correct request decoding.');
 
       $this->method = $_SERVER['REQUEST_METHOD'];
       /**
@@ -101,8 +103,8 @@ class Request extends Singleton {
             // Wir behalten das originale $_POST-Array mit der PHP-Implementierung bei und überschreiben $_REQUEST
 
             foreach ($_POST as $name => $value) {
-               $name  = String ::decodeUtf8($name);                  // (3) UTF8-Values dekodieren
-               $value = String ::decodeUtf8($value);
+               $name  = \String::decodeUtf8($name);                  // (3) UTF8-Values dekodieren
+               $value = \String::decodeUtf8($value);
 
                if (strPos($name, '_') != false)                      // (1) evt. modifizierte Parameter restaurieren
                   $_REQUEST[str_replace('_', '.', $name)] = $value;
@@ -112,7 +114,7 @@ class Request extends Singleton {
          }
       }
 
-      // GET-Parameter (nicht per $this->isGet(), denn sie können auch in anderen Requests vorhanden sein)
+      // GET-Parameter: GET-Prüfung nicht mit $this->isGet(), denn URL-Parameter können mit allen HTTP-Methoden übergeben werden
       if (strLen($_SERVER['QUERY_STRING']))
          $this->parseParameters($_SERVER['QUERY_STRING'], 'GET');
    }
@@ -143,8 +145,8 @@ class Request extends Singleton {
          if (($name = trim(urlDecode($parts[0]))) == '')
             continue;
          // UTF8-Values nach ISO-8859 konvertieren (Internet Explorer etc.)
-         $name  =                          String ::decodeUtf8($name);
-         $value = sizeOf($parts)==1 ? '' : String ::decodeUtf8(urlDecode($parts[1]));
+         $name  =                          \String::decodeUtf8($name);
+         $value = sizeOf($parts)==1 ? '' : \String::decodeUtf8(urlDecode($parts[1]));
          $key   = null;
 
          // TODO: Arrays rekursiv verarbeiten
@@ -405,7 +407,7 @@ class Request extends Singleton {
       // TODO: ApplicationBaseUri ist Eigenschaft der Anwendung, nicht des Requests -> auslagern
       static $path = null;
 
-      if ($path === null && isSet($_SERVER['APPLICATION_BASE_URI'])) {
+      if ($path===null && isSet($_SERVER['APPLICATION_BASE_URI'])) {
          $path = $_SERVER['APPLICATION_BASE_URI'];          // Validierung durch Fehler, falls nicht gesetzt: ok
          if (strEndsWith($path, '/'))
             $path = strLeft($path, -1);
@@ -491,14 +493,14 @@ class Request extends Singleton {
                elseif (Validator::isIPAddress($value)) {
                   $ip = $value;
                }
-               elseif ($value=='unknown' || $value=='localhost' || $value==($ip=NetTools ::getHostByName($value))) {
+               elseif ($value=='unknown' || $value=='localhost' || $value==($ip=\NetTools::getHostByName($value))) {
                   continue;
                }
 
                if (Validator::isIPWanAddress($ip)) {
                   $guessed = $ip;
-                  //if ($ip == NetTools ::getHostByAddress($ip))
-                  //   Logger::log('Guessed a non-resolvable IP address as a WAN address: '.$ip, null, L_DEBUG, __CLASS__);
+                  //if ($ip == \NetTools::getHostByAddress($ip))
+                  //   \Logger::log('Guessed a non-resolvable IP address as a WAN address: '.$ip, null, L_DEBUG, __CLASS__);
                   break;
                }
             }
@@ -600,7 +602,7 @@ class Request extends Singleton {
     * @return HttpSession
     */
    public function getSession() {
-      return Singleton ::getInstance('HttpSession', $this);
+      return Singleton::getInstance('HttpSession', $this);
    }
 
 
@@ -685,7 +687,7 @@ class Request extends Singleton {
                       'HTTP-X-UP-Forwarded-For' => 1,
                       'HTTP_X-UP-Forwarded-For' => 1);
          if (array_intersect_ukey($headers, $tmp, 'strCaseCmp'))
-            Logger::log('Invalid X-Forwarded-For header found', null, L_NOTICE, __CLASS__);
+            \Logger::log('Invalid X-Forwarded-For header found', null, L_NOTICE, __CLASS__);
       }
 
       // alle oder nur die gewünschten Header zurückgeben
@@ -712,9 +714,7 @@ class Request extends Singleton {
          foreach ($names as $name)
             if (!is_string($name)) throw new IllegalTypeException('Illegal argument type in argument $names: '.getType($name));
       }
-      else {
-         throw new IllegalTypeException('Illegal type of parameter $names: '.getType($names));
-      }
+      else                         throw new IllegalTypeException('Illegal type of parameter $names: '.getType($names));
 
       $headers = $this->getHeaders($names);
       if ($headers)
@@ -738,9 +738,7 @@ class Request extends Singleton {
          foreach ($names as $name)
             if (!is_string($name)) throw new IllegalTypeException('Illegal argument type in argument $names: '.getType($name));
       }
-      else {
-         throw new IllegalTypeException('Illegal type of parameter $names: '.getType($names));
-      }
+      else                         throw new IllegalTypeException('Illegal type of parameter $names: '.getType($names));
 
       $headers = $this->getHeaders($names);
       if ($headers)
@@ -836,12 +834,12 @@ class Request extends Singleton {
       if (!is_string($roles)) throw new IllegalTypeException('Illegal type of parameter $roles: '.getType($roles));
 
       // Module holen
-      $module = $this->getAttribute(Struts ::MODULE_KEY);
-      if (!$module) throw new RuntimeException('You can not call '.get_class($this).__FUNCTION__.'() in this context');
+      $module = $this->getAttribute(\Struts::MODULE_KEY);
+      if (!$module) throw new RuntimeException('You can not call '.__METHOD__.'() in this context');
 
       // RoleProcessor holen ...
       $processor = $module->getRoleProcessor();
-      if (!$processor) throw new RuntimeException('You can not call '.get_class($this).__FUNCTION__.'() without configuring a RoleProcessor');
+      if (!$processor) throw new RuntimeException('You can not call '.__METHOD__.'() without configuring a RoleProcessor');
 
       // ... und Aufruf weiterreichen
       return $processor->isUserInRole($this, $roles);
@@ -857,7 +855,7 @@ class Request extends Singleton {
     * @return string - Error-Message
     */
    public function getActionError($key = null) {
-      $errors =& $this->getAttribute(Struts ::ACTION_ERRORS_KEY);
+      $errors =& $this->getAttribute(\Struts::ACTION_ERRORS_KEY);
 
       if ($key === null) {       // die erste zurückgeben
          if ($errors) {
@@ -878,7 +876,7 @@ class Request extends Singleton {
     * @return array - Error-Messages
     */
    public function getActionErrors() {
-      $errors =& $this->getAttribute(Struts ::ACTION_ERRORS_KEY);
+      $errors =& $this->getAttribute(\Struts::ACTION_ERRORS_KEY);
 
       if ($errors === null)
          $errors = array();
@@ -899,7 +897,7 @@ class Request extends Singleton {
       if ($key !== null) {
          return ($this->getActionError($key) !== null);
       }
-      return (sizeOf($this->getAttribute(Struts ::ACTION_ERRORS_KEY)) > 0);
+      return (sizeOf($this->getAttribute(\Struts::ACTION_ERRORS_KEY)) > 0);
    }
 
 
@@ -912,11 +910,11 @@ class Request extends Singleton {
     */
    public function setActionError($key, $message) {
       if ($message === null) {
-         if (isSet($this->attributes[Struts ::ACTION_ERRORS_KEY][$key]))
-            unset($this->attributes[Struts ::ACTION_ERRORS_KEY][$key]);
+         if (isSet($this->attributes[\Struts::ACTION_ERRORS_KEY][$key]))
+            unset($this->attributes[\Struts::ACTION_ERRORS_KEY][$key]);
       }
       elseif (is_string($message)) {
-         $this->attributes[Struts ::ACTION_ERRORS_KEY][$key] = $message;
+         $this->attributes[\Struts::ACTION_ERRORS_KEY][$key] = $message;
       }
       else {
          throw new IllegalTypeException('Illegal type of parameter $message: '.getType($message));
@@ -949,7 +947,7 @@ class Request extends Singleton {
       }
 
       $dropped = $this->getActionErrors();
-      unset($this->attributes[Struts ::ACTION_ERRORS_KEY]);
+      unset($this->attributes[\Struts::ACTION_ERRORS_KEY]);
       return $dropped;
    }
 
@@ -974,7 +972,7 @@ class Request extends Singleton {
     * @return ActionMapping - Mapping oder NULL, wenn die Request-Instance außerhalb des Struts-Frameworks benutzt wird.
     */
    public final function getMapping() {
-      return $this->getAttribute(Struts ::ACTION_MAPPING_KEY);
+      return $this->getAttribute(\Struts::ACTION_MAPPING_KEY);
    }
 
 
@@ -984,7 +982,7 @@ class Request extends Singleton {
     * @return Module - Module oder NULL, wenn die Request-Instance außerhalb des Struts-Frameworks benutzt wird.
     */
    public final function getModule() {
-      return $this->getAttribute(Struts ::MODULE_KEY);
+      return $this->getAttribute(\Struts::MODULE_KEY);
    }
 
 
@@ -992,7 +990,7 @@ class Request extends Singleton {
     * Verhindert das Serialisieren von Request-Instanzen.
     */
    final public function __sleep() {
-      throw new IllegalStateException('You cannot serialize me: '.get_class($this));
+      throw new IllegalStateException('You cannot serialize me: '.__CLASS__);
    }
 
 
@@ -1000,7 +998,7 @@ class Request extends Singleton {
     * Verhindert das Deserialisieren von Request-Instanzen.
     */
    final public function __wakeUp() {
-      throw new IllegalStateException('You cannot deserialize me: '.get_class($this));
+      throw new IllegalStateException('You cannot deserialize me: '.__CLASS__);
    }
 
 

@@ -5,6 +5,8 @@ use rosasurfer\ministruts\exception\IllegalStateException;
 use rosasurfer\ministruts\exception\IllegalTypeException;
 use rosasurfer\ministruts\exception\PHPError;
 
+use rosasurfer\ministruts\struts\Request;
+
 
 /**
  * HttpSession

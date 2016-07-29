@@ -7,6 +7,8 @@ use rosasurfer\ministruts\exception\IllegalTypeException;
 use rosasurfer\ministruts\exception\InvalidArgumentException;
 use rosasurfer\ministruts\exception\RuntimeException;
 
+use rosasurfer\ministruts\struts\Request;
+
 use function rosasurfer\is_class;
 use function rosasurfer\strStartsWith;
 

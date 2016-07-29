@@ -112,7 +112,7 @@ return array(
    'HttpSession'                                                      => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/struts/HttpSession',
    'Module'                                                           => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/struts/Module',
    'PageContext'                                                      => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/struts/PageContext',
-   'Request'                                                          => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/struts/Request',
+   'rosasurfer\ministruts\struts\Request'                             => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/struts/Request',
    'RequestProcessor'                                                 => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/struts/RequestProcessor',
    'Response'                                                         => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/struts/Response',
    'RoleProcessor'                                                    => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/struts/RoleProcessor',
