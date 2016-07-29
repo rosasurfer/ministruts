@@ -78,7 +78,7 @@ class Config extends Object implements ConfigInterface {
    /**
     * @var ConfigInterface - default configuration; this is the instance returned by Config::getDefault()
     */
-   private static $defaultConfig;
+   private static $defaultInstance;
 
 
    /**
@@ -112,6 +112,8 @@ class Config extends Object implements ConfigInterface {
       foreach ($this->files as $fileName => $fileExists) {
          $fileExists && $this->loadFile($fileName);
       }
+
+      !self::$defaultInstance && self::setDefault($this);
    }
 
 
@@ -296,13 +298,13 @@ class Config extends Object implements ConfigInterface {
 
 
    /**
-    * Get the default configuration. This is the configuration set by Config::setDefault(). If none was set yet, one is
+    * Get the default configuration. This is the configuration set by Config::setDefault(). If none was yet set, one is
     * created. The default configuration is cached.
     *
     * @return ConfigInterface
     */
    public static function getDefault() {
-      $config = self::$defaultConfig;
+      $config = self::$defaultInstance;
 
       if (!$config) {
          $cache  = Cache::me();
@@ -347,14 +349,14 @@ class Config extends Object implements ConfigInterface {
                // create the instance
                $config = new self($files);
 
-               // create FileDependency and the cache instance
+               // create FileDependency and cache the instance
                $dependency = FileDependency::create(array_keys($config->files));
                if (!WINDOWS && !CLI && !LOCALHOST)                      // distinction dev/production (sense???)
                   $dependency->setMinValidity(60 * SECONDS);
                $cache->set(__CLASS__, $config, Cache::EXPIRES_NEVER, $dependency);
             }
          }
-         self::$defaultConfig = $config;
+         self::setDefault($config);
       }
 
       // an aquired lock will get released by the garbage collector
@@ -368,7 +370,7 @@ class Config extends Object implements ConfigInterface {
     * @param  ConfigInterface $configuration
     */
    public static function setDefault(ConfigInterface $configuration) {
-      self::$defaultConfig = $configuration;
+      self::$defaultInstance = $configuration;
       // TODO: update cache config
    }
 
@@ -377,7 +379,7 @@ class Config extends Object implements ConfigInterface {
     * Reset the internal default configuration.
     */
    public static function resetDefault() {
-      self::$defaultConfig = null;
+      self::$defaultInstance = null;
       // TODO: update cache config
    }
 
