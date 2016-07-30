@@ -24,6 +24,7 @@ use const rosasurfer\LOCALHOST;
 use const rosasurfer\NL;
 use const rosasurfer\WINDOWS;
 use function rosasurfer\ksort_r;
+use function rosasurfer\strLeftTo;
 
 
 /**
@@ -223,7 +224,7 @@ class Logger extends StaticClass {
             else {
                $mailMsg .= NL.NL.'Shell:'.NL.'------'.NL.print_r(ksort_r($_SERVER), true).NL.NL;
             }
-            $subject = 'PHP [FATAL] Unhandled Exception at '.($request ? $request->getHostname():'').$_SERVER['PHP_SELF'];
+            $subject = 'PHP [FATAL] Unhandled Exception at '.($request ? strLeftTo($request->getUrl(), '?') : $_SERVER['PHP_SELF']);
             self::mail_log($subject, $mailMsg);
          }
 
@@ -380,8 +381,8 @@ class Logger extends StaticClass {
             else {
                $mailMsg .= NL.NL.NL.'Shell:'.NL.'------'.NL.print_r(ksort_r($_SERVER), true).NL.NL.NL;
             }
-            $subject = 'PHP: '.self::$logLevels[$level].' at '.($request ? $request->getHostname():'').$_SERVER['PHP_SELF'];
-            self ::mail_log($subject, $mailMsg);
+            $subject = 'PHP: '.self::$logLevels[$level].' at '.($request ? strLeftTo($request->getUrl(), '?') : $_SERVER['PHP_SELF']);
+            self::mail_log($subject, $mailMsg);
          }
 
 
@@ -393,7 +394,7 @@ class Logger extends StaticClass {
 
          // (5) Logmessage per SMS verschicken, wenn der konfigurierte SMS-Loglevel erreicht ist
          if (self::$sms && $level >= self::$smsLogLevel) {
-            self ::sms_log($cliMessage.($exception ? NL.$exMessage:''));
+            self::sms_log($cliMessage.($exception ? NL.$exMessage:''));
          }
       }
       catch (\Exception $ex) {
