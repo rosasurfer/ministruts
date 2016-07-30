@@ -23,6 +23,7 @@ use const rosasurfer\L_WARN;
 use const rosasurfer\LOCALHOST;
 use const rosasurfer\NL;
 use const rosasurfer\WINDOWS;
+use function rosasurfer\ksort_r;
 
 
 /**
@@ -198,25 +199,29 @@ class Logger extends StaticClass {
             $mailMsg = $cliMessage.NL.$traceStr;
 
             if ($request=Request::me()) {
-               $session = $request->isSession() ? print_r($_SESSION, true) : null;
-
-               $ip   = $_SERVER['REMOTE_ADDR'];
-               $host = getHostByAddr($ip);
+               $session = $request->isSession() ? print_r(ksort_r($_SESSION), true) : null;
+               $ip      = $_SERVER['REMOTE_ADDR'];
+               $host    = getHostByAddr($ip);
                if ($host != $ip)
                   $ip = $host.' ('.$ip.')';
 
                $mailMsg .= NL
                         .  NL
-                        . 'Request:'                                                                .NL
-                        . '--------'                                                                .NL
-                        .  $request                                                                 .NL
-                        .                                                                            NL
-                        . 'Session: '.($session ? NL.'--------'.NL.$session.NL : '  - no session -').NL
-                        . 'Host: '.$ip                                                              .NL
-                        . 'Time: '.date('Y-m-d H:i:s')                                              .NL;
+                        . 'Request:'                                                             .NL
+                        . '--------'                                                             .NL
+                        .  $request                                                              .NL
+                        .                                                                         NL
+                        . 'Session: '.($session ? NL.'--------'.NL.$session : '  - no session -').NL
+                        .                                                                         NL
+                        . 'Server:'                                                              .NL
+                        . '-------'                                                              .NL
+                        .  print_r(ksort_r($_SERVER), true)                                      .NL
+                        .                                                                         NL
+                        . 'Host: '.$ip                                                           .NL
+                        . 'Time: '.date('Y-m-d H:i:s')                                           .NL;
             }
             else {
-               $mailMsg .= NL.NL.'Shell:'.NL.'------'.NL.print_r($_SERVER, true).NL.NL;
+               $mailMsg .= NL.NL.'Shell:'.NL.'------'.NL.print_r(ksort_r($_SERVER), true).NL.NL;
             }
             $subject = 'PHP [FATAL] Unhandled Exception at '.($request ? $request->getHostname():'').$_SERVER['PHP_SELF'];
             self::mail_log($subject, $mailMsg);
@@ -360,20 +365,20 @@ class Logger extends StaticClass {
             $mailMsg = $cliMessage.NL.($exception ? NL.$exMessage.NL.NL.$exTraceStr.NL : '');
 
             if ($request=Request::me()) {
-               $session = $request->isSession() ? print_r($_SESSION, true) : null;
-
-               $ip   = $_SERVER['REMOTE_ADDR'];
-               $host = getHostByAddr($ip);
+               $session = $request->isSession() ? print_r(ksort_r($_SESSION), true) : null;
+               $ip      = $_SERVER['REMOTE_ADDR'];
+               $host    = getHostByAddr($ip);
                if ($host != $ip)
                   $ip = $host.' ('.$ip.')';
 
                $mailMsg .= NL.NL.NL.'Request:'.NL.'--------'.NL.$request.NL.NL.NL
-                        .  'Session: '.($session ? NL.'--------'.NL.$session.NL.NL.NL : '  - no session -'.NL)
+                        .  'Session: '.($session ? NL.'--------'.NL.$session : '  - no session -').NL.NL.NL
+                        .  'Server: '.NL.'-------'.NL.print_r(ksort_r($_SERVER), true).NL.NL.NL
                         .  'Host: '.$ip.NL
                         .  'Time: '.date('Y-m-d H:i:s').NL;
             }
             else {
-               $mailMsg .= NL.NL.NL.'Shell:'.NL.'------'.NL.print_r($_SERVER, true).NL.NL.NL;
+               $mailMsg .= NL.NL.NL.'Shell:'.NL.'------'.NL.print_r(ksort_r($_SERVER), true).NL.NL.NL;
             }
             $subject = 'PHP: '.self::$logLevels[$level].' at '.($request ? $request->getHostname():'').$_SERVER['PHP_SELF'];
             self ::mail_log($subject, $mailMsg);
