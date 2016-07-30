@@ -895,10 +895,10 @@ function metaTypeToStr($name) {
  * @param  string    $string - string value
  * @param  string|[] $format - A valid date/datetime format. If multiple values are supplied whether or not the specified
  *                             string fits at least one of them.
- *                             Supported format string: 'Y-m-d [H:i[:s]]'
- *                                                      'Y.m.d [H:i[:s]]'
- *                                                      'd.m.Y [H:i[:s]]'
- *                                                      'd/m/Y [H:i[:s]]'
+ *                             Supported format strings: 'Y-m-d [H:i[:s]]'
+ *                                                       'Y.m.d [H:i[:s]]'
+ *                                                       'd.m.Y [H:i[:s]]'
+ *                                                       'd/m/Y [H:i[:s]]'
  *
  * @return int|bool - timestamp matching the string or FALSE if the string is not a valid date/datetime value
  *
@@ -910,7 +910,7 @@ function is_datetime($string, $format) {
 
 
 /**
- * Procedural replacement for the value TRUE for quick code analysis.
+ * Procedural replacement for the value TRUE.
  *
  * @param  mixed $value - ignored
  *
@@ -922,7 +922,7 @@ function _true($value=null) {
 
 
 /**
- * Procedural replacement for the value FALSE for quick code analysis.
+ * Procedural replacement for the value FALSE.
  *
  * @param  mixed $value - ignored
  *
@@ -934,7 +934,7 @@ function _false($value=null) {
 
 
 /**
- * Procedural replacement for the value NULL for quick code analysis.
+ * Procedural replacement for the value NULL.
  *
  * @param  mixed $value - ignored
  *
