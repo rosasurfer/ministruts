@@ -92,7 +92,7 @@ class Request extends Singleton {
        */
       $_REQUEST = $_GET = array();
 
-      // POST-Parameter haben höhere Priorität als GET und werden zuerst verarbeitet
+      // POST-Parameter haben höhere Priorität als URL-Parameter und werden zuerst verarbeitet
       if ($this->isPost()) {
          if ($this->getContentType() != 'multipart/form-data') {
             $_POST = array();
@@ -114,9 +114,10 @@ class Request extends Singleton {
          }
       }
 
-      // GET-Parameter: GET-Prüfung nicht mit $this->isGet(), denn URL-Parameter können mit allen HTTP-Methoden übergeben werden
-      if (strLen($_SERVER['QUERY_STRING']))
-         $this->parseParameters($_SERVER['QUERY_STRING'], 'GET');
+      // URL-Parameter: keine GET-Prüfung, denn URL-Parameter können mit allen HTTP-Methoden übergeben werden
+      $query = $this->getQueryString();
+      if (strLen($query))
+         $this->parseParameters($query, 'GET');
    }
 
 
@@ -418,14 +419,18 @@ class Request extends Singleton {
 
 
    /**
-    * Gibt den Querystring der URL des Requests zurück.
-    *
-    * z.B.: key1=value1&key2=value2
+    * Return the query string of the current url.
     *
     * @return string
+    *
+    * @example
+    * <pre>
+    *   "key1=value1&key2=value2"
+    * </pre>
     */
    public function getQueryString() {
-      return isSet($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : null;
+      // do not use $_SERVER['QUERY_STRING'], at times it might be not available e.g. in NginX
+      return strRightFrom($_SERVER['REQUEST_URI'], '?');
    }
 
 
