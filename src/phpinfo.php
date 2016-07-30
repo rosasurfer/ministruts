@@ -1,11 +1,8 @@
 <?php
-use rosasurfer\ministruts\exception\IllegalTypeException;
+!defined('CLI'      ) && define('CLI',       !isSet($_SERVER['REQUEST_METHOD']));               // whether or not we run on command line interface
+!defined('LOCALHOST') && define('LOCALHOST', !CLI && @$_SERVER['REMOTE_ADDR']=='127.0.0.1');    // whether or not we run on localhost
+!defined('WINDOWS'  ) && define('WINDOWS',   (strToUpper(subStr(PHP_OS, 0, 3))=='WIN'));        // whether or not we run on Windows
 
-
-$cli = !isSet($_SERVER['REQUEST_METHOD']);      // ob wir in der Konsole oder im Webserver laufen
-
-
-// -- begin of function definitions ---------------------------------------------------------------------------------------------
 
 if (!function_exists('echoPre')) {
    /**
@@ -15,21 +12,27 @@ if (!function_exists('echoPre')) {
     */
    function echoPre($var) {
       if (is_object($var) && method_exists($var, '__toString')) {
-         $str = $var->__toString();
+         $str = (string) $var;
       }
       elseif (is_object($var) || is_array($var)) {
          $str = print_r($var, true);
+      }
+      else if ($var === null) {
+         $str = '(NULL)';                    // analogous to typeof(null) = 'NULL';
+      }
+      else if (is_bool($var)) {
+         $str = $var ? 'true':'false';
       }
       else {
          $str = (string) $var;
       }
 
-      global $cli;
-      if (!$cli)
+      if (!CLI)
          $str = '<div align="left"><pre style="margin:0; font:normal normal 12px/normal \'Courier New\',courier,serif">'.htmlSpecialChars($str, ENT_QUOTES).'</pre></div>';
       $str .= "\n";
 
       echo $str;
+      ob_get_level() && ob_flush();          // flush output buffer if active
    }
 }
 
@@ -43,8 +46,6 @@ if (!function_exists('errorLevelToStr')) {
     * @return string
     */
    function errorLevelToStr($level=null) {
-      if (func_num_args() && !is_int($level)) throw new IllegalTypeException('Illegal type of parameter $level: '.getType($level));
-
       $levels = array();
       if (!$level)
          $level = error_reporting();
@@ -71,34 +72,23 @@ if (!function_exists('errorLevelToStr')) {
 }
 
 
-// -- end of function definitions -----------------------------------------------------------------------------------------------
-
-
 $isWarning = 0;
 
-if (!defined('WINDOWS'  )) define('WINDOWS'  , (strToUpper(subStr(PHP_OS, 0, 3)) === 'WIN'));    // ob das Script unter Windows läuft
-if (!defined('LOCALHOST')) define('LOCALHOST', (@$_SERVER['REMOTE_ADDR'] == '127.0.0.1'));       // ob das Script auf localhost läuft
-
-
-if (       PHP_VERSION < '5.2.1')                                                          $isWarning = 1|echoPre('Warning: You are running a buggy PHP version, a version >= 5.2.1 is recommended.');
-if (strPos(PHP_VERSION,  '5.3.')===0)                                                      $isWarning = 1|echoPre('Warning: You are running a buggy PHP version, a version != 5.3 is recommended (see bug 47987).');
-if (strPos(PHP_VERSION,  '5.4.')===0 && PHP_VERSION < '5.4.21')                            $isWarning = 1|echoPre('Warning: You are running a buggy PHP version, a version >= 5.4.21 is recommended (see bug 47987).');
-
+if (PHP_VERSION < '5.4.21')                                                                $isWarning = 1|echoPre('Warning: You are running a buggy PHP version.');
 if (!ini_get('short_open_tag'))                                                            $isWarning = 1|echoPre('Warning: short_open_tag is not On');
 if (ini_get('expose_php'))                                                                 $isWarning = 1|echoPre('Warning: expose_php is not Off');
 if (ini_get('register_globals'))                                                           $isWarning = 1|echoPre('Warning: register_globals is not Off');
 if (ini_get('register_long_arrays'))                                                       $isWarning = 1|echoPre('Warning: register_long_arrays is not Off');
-if (!$cli && ini_get('register_argc_argv'))                                                $isWarning = 1|echoPre('Warning: register_argc_argv is not Off');                                   // since v5.4 hardcoded to On for the CLI SAPI
+if (!CLI && ini_get('register_argc_argv'))                                                 $isWarning = 1|echoPre('Warning: register_argc_argv is not Off');                                   // since v5.4 hardcoded to On for the CLI SAPI
 if (!ini_get('auto_globals_jit'))                                                          $isWarning = 1|echoPre('Warning: auto_globals_jit is not On');
 if (ini_get('variables_order') != 'GPCS')                                                  $isWarning = 1|echoPre('Warning: variables_order is not "GPCS": "'.ini_get('variables_order').'"');
 if (ini_get('always_populate_raw_post_data'))                                              $isWarning = 1|echoPre('Warning: always_populate_raw_post_data is not Off');
 if (ini_get('define_syslog_variables'))                                                    $isWarning = 1|echoPre('Warning: define_syslog_variables is not Off');
 if (ini_get('arg_separator.output') != '&amp;')                                            $isWarning = 1|echoPre('Warning: arg_separator.output is not "&amp;": "'.ini_get('arg_separator.output').'"');
-if (ini_get('allow_url_fopen'))                                                            $isWarning = 1|echoPre('Warning: allow_url_fopen is not Off');
 if (ini_get('allow_url_include'))                                                          $isWarning = 1|echoPre('Warning: allow_url_include is not Off');
-if (!$cli && (int)ini_get('max_execution_time') != 30)                                     $isWarning = 1|echoPre('Warning: max_execution_time is not 30: '.ini_get('max_execution_time'));    // since v5.4 hardcoded to 0 for the CLI SAPI
+if (!CLI && (int)ini_get('max_execution_time') != 30)                                      $isWarning = 1|echoPre('Warning: max_execution_time is not 30: '.ini_get('max_execution_time'));    // since v5.4 hardcoded to 0 for the CLI SAPI
 if ((int)ini_get('default_socket_timeout') != 60)                                          $isWarning = 1|echoPre('Warning: default_socket_timeout is not 60: '.ini_get('default_socket_timeout'));
-if (!$cli && ini_get('implicit_flush'))                                                    $isWarning = 1|echoPre('Warning: implicit_flush is not Off');                                       // since v5.4 hardcoded to On for the CLI SAPI
+if (!CLI && ini_get('implicit_flush'))                                                     $isWarning = 1|echoPre('Warning: implicit_flush is not Off');                                       // since v5.4 hardcoded to On for the CLI SAPI
 if (ini_get('allow_call_time_pass_reference') && PHP_VERSION < '5.4') /*ab v5.4 entfernt*/ $isWarning = 1|echoPre('Warning: allow_call_time_pass_reference is not Off');
 if (!ini_get('ignore_user_abort'))                                                         $isWarning = 1|echoPre('Warning: ignore_user_abort is not On');
 if (ini_get('session.save_handler') != 'files')                                            $isWarning = 1|echoPre('Warning: session.save_handler is not "files": "'.ini_get('session.save_handler').'"');
@@ -116,8 +106,8 @@ if (ini_get('session.save_handler') == 'files') {
 if (ini_get('session.serialize_handler') != 'php')                                         $isWarning = 1|echoPre('Warning: session.serialize_handler is not "php": "'.ini_get('session.serialize_handler').'"');
 if (ini_get('session.auto_start'))                                                         $isWarning = 1|echoPre('Warning: session.auto_start is not Off');
 if (!ini_get('session.use_cookies'))                                                       $isWarning = 1|echoPre('Warning: session.use_cookies is not On' );
-if (ini_get('session.cookie_httponly'))                                                    $isWarning = 1|echoPre('Warning: session.cookie_httponly is not Off' );
-if (!ini_get('session.use_trans_sid'))                                                     $isWarning = 1|echoPre('Warning: session.use_trans_sid is not On');
+if (!ini_get('session.cookie_httponly'))                                                   $isWarning = 1|echoPre('Warning: session.cookie_httponly is not On' );
+if (ini_get('session.use_trans_sid'))                                                      $isWarning = 1|echoPre('Warning: session.use_trans_sid is not Off');
 if (ini_get('url_rewriter.tags') != 'a=href,area=href,frame=src,iframe=src,form=,fieldset=')
                                                                                            $isWarning = 1|echoPre('Warning: url_rewriter.tags is not "a=href,area=href,frame=src,iframe=src,form=,fieldset=": "'.ini_get('url_rewriter.tags').'"');
 if (ini_get('session.bug_compat_42'))                                                      $isWarning = 1|echoPre('Warning: session.bug_compat_42 is not Off');
@@ -131,9 +121,8 @@ if (ini_get('magic_quotes_sybase'))                                             
 
 $paths = explode(PATH_SEPARATOR, ini_get('include_path'));
 for ($i=0; $i < sizeOf($paths); ) if (trim($paths[$i++]) == '')                            $isWarning = 1|echoPre('Warning: include_path contains empty path on position '.$i);
-if (ini_get('auto_detect_line_endings'))                                                   $isWarning = 1|echoPre('Warning: auto_detect_line_endings is not Off');
 if (ini_get('default_mimetype') != 'text/html')                                            $isWarning = 1|echoPre('Warning: default_mimetype is not "text/html": "'.ini_get('default_mimetype').'"');
-if (ini_get('default_charset') != 'iso-8859-15')                                           $isWarning = 1|echoPre('Warning: default_charset is not "iso-8859-15": "'.ini_get('default_charset').'"');
+if (strToLower(ini_get('default_charset')) != 'utf-8')                                     $isWarning = 1|echoPre('Warning: default_charset is not "UTF-8": "'.ini_get('default_charset').'"');
 if (ini_get('file_uploads'))                                                               $isWarning = 1|echoPre('Warning: file_uploads is not Off' );
 
 if (ini_get('asp_tags'))                                                                   $isWarning = 1|echoPre('Warning: asp_tags is not Off');
@@ -197,28 +186,28 @@ else                                                                            
 if (WINDOWS && !ini_get('sendmail_path') && !ini_get('sendmail_from') && !isSet($_SERVER['SERVER_ADMIN']))
                                                                                            $isWarning = 1|echoPre('Warning: Windows - neither sendmail_path nor sendmail_from are set');
 if (!WINDOWS && !ini_get('sendmail_path'))                                                 $isWarning = 1|echoPre('Warning: sendmail_path is not set');
-if (!$cli && !isSet($_SERVER['SERVER_ADMIN']))                                             $isWarning = 1|echoPre('Warning: email address $_SERVER["SERVER_ADMIN"] is not set');
+if (!CLI && !isSet($_SERVER['SERVER_ADMIN']))                                              $isWarning = 1|echoPre('Warning: email address $_SERVER["SERVER_ADMIN"] is not set');
 if (ini_get('mail.add_x_header'))                                                          $isWarning = 1|echoPre('Warning: mail.add_x_header is not Off');
 
 
 // Fehleranzeige je nach Umgebung
 // ------------------------------
-if ($cli || LOCALHOST) {
+if (CLI || LOCALHOST) {
    if (!ini_get('display_errors'))                                                         $isWarning = 1|echoPre('Warning: display_errors is not On');
    if (!ini_get('display_startup_errors'))                                                 $isWarning = 1|echoPre('Warning: display_startup_errors is not On');
-   if (!$cli && (int) ini_get('output_buffering') != 0)                                    $isWarning = 1|echoPre('Warning: output_buffering is enabled: '.ini_get('output_buffering'));  // since v5.4 hardcoded to Off for the CLI SAPI
+   if (!CLI && (int) ini_get('output_buffering') != 0)                                     $isWarning = 1|echoPre('Warning: output_buffering is enabled: '.ini_get('output_buffering'));  // since v5.4 hardcoded to Off for the CLI SAPI
 }
 else {
    if (ini_get('display_errors'))                                                          $isWarning = 1|echoPre('Warning: display_errors is not Off');
    if (ini_get('display_startup_errors'))                                                  $isWarning = 1|echoPre('Warning: display_startup_errors is not Off');
-   if (!$cli && (int) ini_get('output_buffering') == 0)                                    $isWarning = 1|echoPre('Warning: output_buffering is not enabled: '.ini_get('output_buffering'));
+   if (!CLI && (int) ini_get('output_buffering') == 0)                                     $isWarning = 1|echoPre('Warning: output_buffering is not enabled: '.ini_get('output_buffering'));
 }
 
 
 // Bestätigung, wenn alles ok ist
 if (!$isWarning)
    echo 'Configuration OK';
-echo $cli ? "\n":'<p>';
+echo CLI ? "\n":'<p>';
 
 
 /*
@@ -230,4 +219,4 @@ echoPre(get_loaded_extensions());
 
 
 // phpInfo() nur aufrufen, wenn das Script nicht in der Konsole (also im Webserver) läuft
-!$cli && phpInfo();
+!CLI && phpInfo();

@@ -105,9 +105,9 @@ ini_set('zend.detect_unicode'     ,  1                     );     // BOM header 
 
 
 /**
- * (4) execute phpInfo() if applicable (if enabled authorization must be handled by the server)
+ * (4) execute phpInfo() if applicable: authorization must be handled by the server
  */
-if (false && !CLI && strEndsWith(strLeftTo($_SERVER['REQUEST_URI'], '?'), '/phpinfo.php')) {
+if (!CLI && strEndsWith(strLeftTo($_SERVER['REQUEST_URI'], '?'), '/phpinfo.php')) {
    include(MINISTRUTS_ROOT.'/src/phpinfo.php');
    exit(0);
 }
