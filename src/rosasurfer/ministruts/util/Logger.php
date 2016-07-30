@@ -204,7 +204,7 @@ class Logger extends StaticClass {
                $ip      = $_SERVER['REMOTE_ADDR'];
                $host    = getHostByAddr($ip);
                if ($host != $ip)
-                  $ip = $host.' ('.$ip.')';
+                  $ip .= ' ('.$host.')';
 
                $mailMsg .= NL
                         .  NL
@@ -218,7 +218,7 @@ class Logger extends StaticClass {
                         . '-------'                                                              .NL
                         .  print_r(ksort_r($_SERVER), true)                                      .NL
                         .                                                                         NL
-                        . 'Host: '.$ip                                                           .NL
+                        . 'IP:   '.$ip                                                           .NL
                         . 'Time: '.date('Y-m-d H:i:s')                                           .NL;
             }
             else {
@@ -370,12 +370,12 @@ class Logger extends StaticClass {
                $ip      = $_SERVER['REMOTE_ADDR'];
                $host    = getHostByAddr($ip);
                if ($host != $ip)
-                  $ip = $host.' ('.$ip.')';
+                  $ip .= ' ('.$host.')';
 
                $mailMsg .= NL.NL.NL.'Request:'.NL.'--------'.NL.$request.NL.NL.NL
                         .  'Session: '.($session ? NL.'--------'.NL.$session : '  - no session -').NL.NL.NL
                         .  'Server: '.NL.'-------'.NL.print_r(ksort_r($_SERVER), true).NL.NL.NL
-                        .  'Host: '.$ip.NL
+                        .  'IP:   '.$ip.NL
                         .  'Time: '.date('Y-m-d H:i:s').NL;
             }
             else {
