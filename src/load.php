@@ -956,3 +956,19 @@ function _null($value=null) {
 function ifNull($value, $altValue) {
    return ($value===null) ? $altValue : $value;
 }
+
+
+/**
+ * Return a sorted copy of the specified array using the algorythm and parameters of ksort().
+ *
+ * @param  array $values
+ * @param  int   $sort_flags
+ *
+ * @return array
+ *
+ * @see    ksort()
+ */
+function ksort_r(array $values, $sort_flags=SORT_REGULAR) {
+   ksort($values, $sort_flags);
+   return $values;
+}

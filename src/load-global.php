@@ -570,3 +570,18 @@ function _null($value=null) {
 function ifNull($value, $altValue) {
    return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
 }
+
+
+/**
+ * Return a sorted copy of the specified array using the algorythm and parameters of ksort().
+ *
+ * @param  array $values
+ * @param  int   $sort_flags
+ *
+ * @return array
+ *
+ * @see    ksort()
+ */
+function ksort_r(array $values, $sort_flags=SORT_REGULAR) {
+   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+}
