@@ -643,7 +643,8 @@ function strRightFrom($string, $limiter, $count=1, $includeLimiter=false, $onNot
             return func_num_args() > 4 ? $onNotFound : '';
          $count--;
       }
-      $result = subStr($string, $pos + strLen($limiter));
+      $pos   += strLen($limiter);
+      $result = ($pos >= strLen($string)) ? '' : subStr($string, $pos);
       if ($includeLimiter)
          $result = $limiter.$result;
       return $result;
@@ -661,7 +662,8 @@ function strRightFrom($string, $limiter, $count=1, $includeLimiter=false, $onNot
             return func_num_args() > 4 ? $onNotFound : '';
          $count++;
       }
-      $result = subStr($string, $pos + strLen($limiter));
+      $pos   += strLen($limiter);
+      $result = ($pos >= strLen($string)) ? '' : subStr($string, $pos);
       if ($includeLimiter)
          $result = $limiter.$result;
       return $result;
