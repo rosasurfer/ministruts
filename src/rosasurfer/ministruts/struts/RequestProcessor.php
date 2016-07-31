@@ -200,7 +200,6 @@ class RequestProcessor extends Object {
       $modulePrefix = $this->module->getPrefix();
 
       $path = strRightFrom($requestPath, $baseUri.$modulePrefix);
-      $path = String ::decodeUtf8($path);
 
       // TODO: URL case-insensitive verarbeiten
 

@@ -288,7 +288,7 @@ class Module extends Object {
          // ----------
          // process path attribute
          // TODO: die konfigurierten Pfade werden nicht auf Eindeutigkeit geprüft, mehrfache Definitionen derselben URL abfangen
-         $path = String ::decodeUtf8((string) $tag['path']);
+         $path = (string) $tag['path'];
          $mapping->setPath($path);
 
 

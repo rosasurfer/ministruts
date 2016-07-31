@@ -123,7 +123,6 @@ return array(
    'Date'                                                             => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/util/Date',
    'DebugTools'                                                       => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/util/DebugTools',
    'Logger'                                                           => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/util/Logger',
-   'String'                                                           => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/util/String',
    'System'                                                           => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/util/System',
    'rosasurfer\ministruts\util\Validator'                             => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/util/Validator',
 );
