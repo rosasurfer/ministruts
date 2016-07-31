@@ -81,7 +81,7 @@ class Request extends Singleton {
     *
     * @param  string $data - raw query string
     */
-   protected function parseQueryString($data, $target) {
+   protected function parseQueryString($data) {
       $params = explode('&', $data);
 
       foreach ($params as $param) {
