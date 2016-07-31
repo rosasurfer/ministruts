@@ -88,7 +88,8 @@ abstract class RequestBase extends Singleton {
        * (1) - Parameternamen werden modifiziert (image.x => image_x, image.y => image_y)
        * (2) - später auftretende Werte überschreiben vorhergehende, statt in einem Array abgelegt zu werden ("?a=1&a=2" => a=2)
        * (3) - UTF8-kodierte Parameternamen (wie sie beim Internet Explorer häufig auftreten) werden nicht dekodiert
-       * (4) - Cookies sind kein User-Input, werden aber in $_REQUEST eingefügt und überschreiben dort existierende Parameter.
+       * (4) - Cookies sind kein User-Input, werden aber in PHP < 5.3 in $_REQUEST eingefügt und überschreiben dort existierende
+       *       Parameter (ab v5.3 kann dies per .ini-Direktive "request_order" deaktiviert werden)
        */
       $_REQUEST = $_GET = array();
 
