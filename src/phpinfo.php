@@ -137,7 +137,7 @@ if (ini_get('ignore_repeated_errors'))                                          
 if (ini_get('ignore_repeated_source'))                                                     $isWarning = 1|echoPre('Warning: ignore_repeated_source is not Off');
 if (!ini_get('log_errors'))                                                                $isWarning = 1|echoPre('Warning: log_errors is not On');
 if ((int) ini_get('log_errors_max_len') != 0)                                              $isWarning = 1|echoPre('Warning: log_errors_max_len is not 0: '.ini_get('log_errors_max_len'));
-if (!ini_get('track_errors'))                                                              $isWarning = 1|echoPre('Warning: track_errors is not On (needed for request decoding)');
+if (!ini_get('track_errors'))                                                              $isWarning = 1|echoPre('Warning: track_errors is not On');
 if (ini_get('html_errors'))                                                                $isWarning = 1|echoPre('Warning: html_errors is not Off');
 
 if (ini_get('enable_dl'))                                                                  $isWarning = 1|echoPre('Warning: enable_dl is not Off');
