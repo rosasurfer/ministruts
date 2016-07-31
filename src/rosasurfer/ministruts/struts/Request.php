@@ -8,12 +8,11 @@ use rosasurfer\ministruts\exception\IllegalTypeException;
 use rosasurfer\ministruts\exception\InvalidArgumentException;
 use rosasurfer\ministruts\exception\RuntimeException;
 
-use rosasurfer\ministruts\util\Validator;
-
 use function rosasurfer\strEndsWith;
 use function rosasurfer\strLeft;
 use function rosasurfer\strLeftTo;
 use function rosasurfer\strRightFrom;
+use function rosasurfer\strStartsWith;
 
 use const rosasurfer\DAY;
 use const rosasurfer\L_NOTICE;
@@ -51,7 +50,7 @@ class Request extends Singleton {
    /**
     * Return the <Singleton> instance.
     *
-    * @return Singleton - instance
+    * @return Singleton
     *
     * @throws RuntimeException if not called from the web interface
     */
@@ -68,8 +67,8 @@ class Request extends Singleton {
    protected function __construct() {
       $this->method = $_SERVER['REQUEST_METHOD'];
 
-      // If $_SERVER['QUERY_STRING'] is empty (e.g. at times in nginx) PHP will not parse url parameters,
-      // it must be done manually.
+      // If $_SERVER['QUERY_STRING'] is empty (e.g. at times in nginx) PHP will not parse url parameters
+      // and it needs to be done manually.
       $query = $this->getQueryString();
       if (strLen($query) && !$_GET)
          $this->parseQueryString($query);
@@ -171,11 +170,11 @@ class Request extends Singleton {
     * @return string[] - values or an empty array if no such parameters exist
     */
    public function getParameters($name) {
-      if (isSet($_REQUEST[$name]))
+      if (isSet($_REQUEST[$name])) {
          $value = $_REQUEST[$name];
-         if (!is_array($value))
-            $value = [$value];
+         !is_array($value) && $value=[$value];
          return $value;
+      }
       return [];
    }
 
@@ -196,7 +195,7 @@ class Request extends Singleton {
 
 
    /**
-    * Return the root url of the server the request was made to. This value ends with a slash "/".
+    * Return the root url of the server the request was made to. This value always ends with a slash "/".
     *
     * @return string - root url: protocol + host_name + port
     *
@@ -221,8 +220,7 @@ class Request extends Singleton {
     * Return the full url of the current request.
     *
     * @return string - full url: protocol + host_name + port + path + query_string
-    *                  Whether or not the path fragment contains a "path info" is a matter of interpretation. As urls
-    *                  in this framework are always virtual there is no difference between "paths" and "path infos".
+    *                  All urls in this framework are virtual, there is no "path info" as such.
     * @example
     * <pre>
     * "https://www.domain.tld:433/myapplication/foo/bar.html?key=value"
@@ -234,12 +232,11 @@ class Request extends Singleton {
 
 
    /**
-    * Return the uri of the current request (the value in the first line of the HTTP protocol). This value starts with
-    * a slash "/".
+    * Return the uri of the current request (the value in the first line of the HTTP protocol). This value always starts
+    * with a slash "/".
     *
     * @return string - uri: path + query_string
-    *                  Whether or not the path fragment contains a "path info" is a matter of interpretation. As urls
-    *                  in this framework are always virtual there is no difference between "paths" and "path infos".
+    *                  All urls in this framework are virtual, there is no "path info" as such.
     * @example
     * <pre>
     * "/application/foo/bar.html?key=value"
@@ -251,11 +248,10 @@ class Request extends Singleton {
 
 
    /**
-    * Return the path fragment of the current request's uri. This value starts with a slash "/".
+    * Return the path fragment of the current request's uri. This value always starts with a slash "/".
     *
-    * @return string - path without a query string
-    *                  Whether or not the path fragment contains a "path info" is a matter of interpretation. As urls
-    *                  in this framework are always virtual there is no difference between "paths" and "path infos".
+    * @return string - path without query string
+    *                  All urls in this framework are virtual, there is no "path info" as such.
     * @example
     * <pre>
     * "/application/module/foo/bar.html"
@@ -274,13 +270,13 @@ class Request extends Singleton {
 
 
    /**
-    * Return the root url of the current application. This value does not end with a slash "/".
+    * Return the root url of the current application. This value always ends with a slash "/".
     *
     * @return string - url: protocol + host_name + port + application_base_uri
     *
     * @example
     * <pre>
-    * "https://www.domain.tld:433/myapplication"
+    * "https://www.domain.tld:433/myapplication/"
     * </pre>
     */
    public function getApplicationUrl() {
@@ -290,74 +286,72 @@ class Request extends Singleton {
 
 
    /**
-    * Gibt die URI des Requests relativ zur Base-URL der Anwendung zurück. Der Wert beginnt mit einem Slash "/".
+    * Return the current request's uri relative to the application's base url. This value always starts with a slash "/".
     *
-    * @return string - URI (Modulname + Pfad + Pfadinfo + Querystring)
-    *
+    * @return string - uri: slash + module_prefix + path + query_string
+    *                  All urls in this framework are virtual, there is no "path info" as such.
     * @example
     * <pre>
-    * $request->getUrl():                    "http://a.domain.tld/path/application/module/foo/bar.php/info?key=value"
-    * $request->getApplicationRelativeUri(): "/module/foo/bar.php/info?key=value"
+    * $request->getUrl():                    "http://a.domain.tld/path/myapplication/module/foo/bar.html?key=value"
+    * $request->getApplicationRelativeUri(): "/module/foo/bar.html?key=value"
     * </pre>
     */
    public function getApplicationRelativeUri() {
-      return strRightFrom($this->getUri(), $this->getApplicationBaseUri());
+      return strRightFrom($this->getUri(), $this->getApplicationBaseUri()).'/';
    }
 
 
    /**
-    * Gibt den Pfadbestandteil der URI des Requests relativ zur Base-URL der Anwendung zurück.
-    * Der Wert beginnt mit einem Slash "/".
+    * Return the current request's path fragment relative to the application's base url. This value always starts with
+    * a slash "/".
     *
-    * @return string - Pfad (Module + Pfad + Pfadinfo) ohne Querystring
-    *
+    * @return string - path fragment: slash + module_prefix + path (without query string)
+    *                  All urls in this framework are virtual, there is no "path info" as such.
     * @example
     * <pre>
-    * "/module/foo/bar.php/info"
+    * "/module/foo/bar.html"
     * </pre>
     */
    public function getApplicationRelativePath() {
-      return strRightFrom($this->getPath(), $this->getApplicationBaseUri());
+      return strRightFrom($this->getPath(), $this->getApplicationBaseUri()).'/';
    }
 
 
    /**
-    * Gibt die Base-URI der Anwendung zurück. Liegt die Anwendung im Wurzelverzeichnis des Webservers, ist dieser Wert
-    * ein Leerstring "". Anderenfalls beginnt der Wert mit einem Slash "/".
+    * Return the application's base uri. This value always starts and ends with a slash "/".
     *
-    * @return string - URI (Pfad ohne Pfadinfo und Querystring)
+    * @return string - uri: path (without query string)
     *
     * @example
     * <pre>
-    * "/application"
+    * "/application/"
     * </pre>
     */
    public function getApplicationBaseUri() {
-      // TODO: ApplicationBaseUri ist Eigenschaft der Anwendung, nicht des Requests -> auslagern
+      // TODO: Move to application as this uri is not a property of the request.
       static $path = null;
-
-      if ($path===null && isSet($_SERVER['APPLICATION_BASE_URI'])) {
-         $path = $_SERVER['APPLICATION_BASE_URI'];          // Validierung durch Fehler, falls nicht gesetzt: ok
-         if (strEndsWith($path, '/'))
-            $path = strLeft($path, -1);
+      if (!$path && isSet($_SERVER['APPLICATION_BASE_URI'])) {
+         $path = $_SERVER['APPLICATION_BASE_URI'];             // triggers error if not set, which is OK
+         !strStartsWith($path, '/') && $path  = '/'.$path;
+         !strEndsWith  ($path, '/') && $path .= '/';
       }
       return $path;
    }
 
 
    /**
-    * Return the query string part of the current url.
+    * Return the query string of the current url.
     *
     * @return string
     *
     * @example
     * <pre>
-    *   "key1=value1&key2=value2"
+    * "key1=value1&key2=value2"
     * </pre>
     */
    public function getQueryString() {
-      // The variable $_SERVER['QUERY_STRING'] is set by the server and can differ
-      // e.g. it might hold additional parameters or it might be empty (nginx).
+      // The variable $_SERVER['QUERY_STRING'] is set by the server and can differ, e.g. it might hold additional
+      // parameters or it might be empty (nginx).
 
       if (isSet($_SERVER['QUERY_STRING']) && strLen($_SERVER['QUERY_STRING'])) {
          $query = $_SERVER['QUERY_STRING'];
@@ -370,9 +364,9 @@ class Request extends Singleton {
 
 
    /**
-    * Gibt die IP-Adresse zurück, von der aus der Request ausgelöst wurde.
+    * Return the remote IP address the current request is made from.
     *
-    * @return string - IP-Adresse
+    * @return string - IP address
     */
    public function getRemoteAddress() {
       return $_SERVER['REMOTE_ADDR'];
@@ -380,73 +374,14 @@ class Request extends Singleton {
 
 
    /**
-    * Gibt den Hostnamen zurück, von dem aus der Request ausgelöst wurde.
+    * Return the remote host name the current request is made from.
     *
-    * @return string
+    * @return string - host name
     */
    public function getRemoteHostname() {
       static $hostname = null;
-      !$hostname && $hostname = getHostByAddr($this->getRemoteAddress());
+      !$hostname && $hostname=getHostByAddr($this->getRemoteAddress());
       return $hostname;
-   }
-
-
-   /**
-    * Versucht, unter Berücksichtigung evt. zwischengeschalteter Proxys die tatsächliche IP-Adresse, von der
-    * aus der Request gemacht wurde, zu ermitteln.  Kann diese Adresse nicht ermittelt werden, wird die letzte
-    * ermittelbare Adresse zurückgegeben, unter Umständen also die herkömmliche Remote-Adresse.
-    *
-    * @return string - IP-Adresse
-    */
-   public function getRealRemoteAddress() {
-      /**
-       * I am just starting to try to tackle this issue of getting the real ip address.
-       * One flaw I see in the preceding notes is that none will bring up a true live ip address when the first proxy
-       * is behind a nat router/firewall.  I am about to try and nut this out but from the data I see so far the true
-       * ip address (live ip of the nat router) is included in $_SERVER['HTTP_CACHE_CONTROL'] as bypass-client=xx.xx.xx.xx
-       * $_SERVER['HTTP_X_FORWARDED_FOR'] contains the proxy behind the nat router.  $_SERVER['REMOTE_ADDR'] is the isp
-       * proxy (from what I read this can be a list of proxies if you go through more than one).  I am not sure if
-       * bypass-client holds true when you get routed through several proxies along the way.
-       *
-       * TODO: Diese IP kann einfach gefaked werden, wenn der Angreifer selbst einen x-beliebigen Forwarded-Header setzt.
-       *       Abhilfe: Es müßten immer Remote-Adresse UND ALLE Forwarded-Header gespeichert werden. Sind einige oder alle
-       *       Forwarded-Header gefaked, hat man immer noch die Remote-Adresse.
-       */
-      static $guessed = null;
-
-      if ($guessed === null) {
-         $names[] = 'X-Forwarded-For';
-         $names[] = 'X-UP-Forwarded-For'; // mobile device
-
-         $values = $this->getHeaderValues($names);
-
-         if ($values) {
-            foreach ($values as $value) {
-               if ($value === '') {
-                  continue;
-               }
-               elseif (Validator::isIPAddress($value)) {
-                  $ip = $value;
-               }
-               elseif ($value=='unknown' || $value=='localhost' || $value==($ip=\NetTools::getHostByName($value))) {
-                  continue;
-               }
-
-               if (Validator::isIPWanAddress($ip)) {
-                  $guessed = $ip;
-                  //if ($ip == \NetTools::getHostByAddress($ip))
-                  //   \Logger::log('Guessed a non-resolvable IP address as a WAN address: '.$ip, null, L_DEBUG, __CLASS__);
-                  break;
-               }
-            }
-         }
-
-         // Fallback
-         if ($guessed === null)
-            $guessed = $this->getRemoteAddress();
-      }
-
-      return $guessed;
    }
 
 
@@ -463,8 +398,9 @@ class Request extends Singleton {
    /**
     * Gibt den Content dieses Requests zurück. Der Content ist ein ggf. übertragener Request-Body (nur bei POST-Requests).
     *
-    * @return mixed - Request-Body oder NULL, wenn im Body keine Daten übertragen wurden.  Ist der Content-Typ des Requests "multipart/form-data"
-    *                 (File-Upload), wird statt des Request-Bodies ein Array mit den geposteten File-Informationen zurückgegeben.
+    * @return mixed - Request-Body oder NULL, wenn im Body keine Daten übertragen wurden.  Ist der Content-Typ des Requests
+    *                 "multipart/form-data" (File-Upload), wird statt des Request-Bodies ein Array mit den geposteten
+    *                 File-Informationen zurückgegeben.
     */
    public function getContent() {
       static $content = null;
@@ -515,7 +451,7 @@ class Request extends Singleton {
     */
    public function isSessionId() {
       $name = session_name();
-      return (isSet($_COOKIE [$name]) || isSet($_REQUEST[$name]));
+      return (isSet($_COOKIE[$name]) || isSet($_REQUEST[$name]));
    }
 
 
@@ -748,7 +684,7 @@ class Request extends Singleton {
       $value = (string)$value;
 
       if ($path === null)
-         $path = $this->getApplicationBaseUri().'/';
+         $path = $this->getApplicationBaseUri();
 
       if (!is_string($path)) throw new IllegalTypeException('Illegal type of parameter $path: '.getType($path));
 

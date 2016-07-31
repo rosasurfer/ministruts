@@ -190,8 +190,6 @@ class RequestProcessor extends Object {
     * @param  Response $response
     *
     * @return ActionMapping - ActionMapping oder NULL
-    *
-    * TODO: verschiedene Encodings berücksichtigen (iso-8859-1, utf-8) und URL in Module-Encoding konvertieren
     */
    protected function processMapping(Request $request, Response $response) {
       // Pfad für die Mappingauswahl ermitteln ...
@@ -200,8 +198,7 @@ class RequestProcessor extends Object {
       $modulePrefix = $this->module->getPrefix();
 
       $path = strRightFrom($requestPath, $baseUri.$modulePrefix);
-
-      // TODO: URL case-insensitive verarbeiten
+      !strStartsWith($path, '/') && $path='/'.$path;
 
       self::$logDebug && Logger::log('Path used for mapping selection: '.$path, null, L_DEBUG, __CLASS__);
 
@@ -481,8 +478,12 @@ EOT_405;
          $this->cacheActionMessages($request);
 
          $baseUri = $request->getApplicationBaseUri();
-         // TODO: prüfen, ob der Pfad absolut oder relativ ist
-         $url = $baseUri.$this->module->getPrefix().$forward->getPath();
+         $url     = $baseUri.$this->module->getPrefix();
+         !strEndsWith($url, '/') && $url.='/';
+
+         $path = $forward->getPath();
+         strStartsWith($path, '/') && $path=strRight($path, -1);
+         $url .= $path;
 
          // TODO: QueryString kodieren
          HeaderUtils ::redirect($url);

@@ -61,7 +61,7 @@ class HttpSession extends Singleton {
       // Session-Cookie auf Application beschränken, um mehrere Projekte je Domain zu ermöglichen
       $params = session_get_cookie_params();
       session_set_cookie_params($params['lifetime'],
-                                $request->getApplicationBaseUri().'/',
+                                $request->getApplicationBaseUri(),
                                 $params['domain'],
                                 $params['secure'],
                                 $params['httponly']);

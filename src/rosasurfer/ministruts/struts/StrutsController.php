@@ -149,18 +149,12 @@ final class StrutsController extends Singleton {
       $requestPath = $request->getPath();
       $baseUri     = $request->getApplicationBaseUri();
 
-      if ($baseUri && !strStartsWith($requestPath, $baseUri))
-         throw new RuntimeException('Can not resolve module prefix from request path: '.$requestPath);
+      if (!strStartsWith($requestPath, $baseUri)) throw new RuntimeException('Can not resolve module prefix from request path: '.$requestPath);
 
-      $value  = strRightFrom($requestPath, $baseUri);
-      $prefix = strLeftTo($value, '/', -1);
+      $value = strRightFrom($requestPath, $baseUri);
+      $value = strLeftTo($value, '/');
 
-      while (!isSet($this->modules[$prefix])) {
-         $lastSlash = strRPos($prefix, '/');
-         if ($lastSlash === false) throw new RuntimeException('No module configured for request path: '.$requestPath);
-         $prefix = subStr($prefix, 0, $lastSlash);
-      }
-      return $prefix;
+      return isSet($this->modules[$value]) ? $value : '';
    }
 
 
