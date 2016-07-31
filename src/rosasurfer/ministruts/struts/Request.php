@@ -15,61 +15,50 @@ use function rosasurfer\strLeft;
 use function rosasurfer\strLeftTo;
 use function rosasurfer\strRightFrom;
 
-use const rosasurfer\CLI;
 use const rosasurfer\DAY;
 use const rosasurfer\L_NOTICE;
+use const rosasurfer\NL;
 
 
 /**
- * Request
+ * An object representing the current HTTP request. It provides an additional variables container (a context) with the
+ * life-time of the HTTP request.
  *
- * Diese Klasse stellt den HTTP-Request mit seinen Daten dar, sowie er von PHP an das aufgerufene Script übergeben wird.
- * Da es immer nur einen einzigen Request geben kann, ist er als Singleton implementiert.  Das bedeutet unter anderem,
- * daß es keinen öffentlichen Constructor gibt, man kann also nicht selbst einen neuen Request erzeugen (es gibt nur den
- * einen, der vom Server an PHP weitergereicht wurde).
+ * @see  Request::getAttribute()
+ * @see  Request::getAttributes()
+ * @see  Request::setAttribute()
+ * @see  Request::removeAttributes()
  *
- *
- * NOTE:
- * -----
- * Diese Klasse verarbeitet die Request-Parameter intern wie in Java, mehrfache Werte je Parameter mit
- * numerischen oder assoziativen Schlüsseln werden automatisch verarbeitet ("a=1&a=2&a=3&a[]=4&a[key]=5").
- *
- * Die globalen PHP-Variablen $_GET, $_POST und $_REQUEST entsprechen der Originalimplementierung,
- * mehrfache Werte werden also überschrieben.
- *
- * @see  Request::getParameter()
- * @see  Request::getParameters()
  *
  * TODO: implement LinkTool
- * TODO: implement version hashs for CSS- and JS links
+ * TODO: implement version hashes for CSS and JS links
  */
 class Request extends Singleton {
 
+   /** @var string */
+   private $method;
 
-   private /*string*/ $method;
-   private /*string*/ $hostUrl;
-   private /*string*/ $path;
+   /** @var string */
+   private $hostUrl;
 
+   /** @var string */
+   private $path;
 
-   // Parameterhalter
-   private $parameters = array('REQUEST' => array(),
-                               'GET'     => array(),
-                               'POST'    => array());
-
-   // Attribute-Pool
-   private $attributes = array();
+   /** @var mixed[] - additional variables context */
+   private $attributes = [];
 
 
    /**
-    * Gibt die Singleton-Instanz des Requests zurück, wenn das Script im Kontext eines HTTP-Requestes aufgerufen wurde.
-    * In allen anderen Fällen, z.B. bei Aufruf in der Konsole, wird NULL zurückgegeben.
+    * Return the <Singleton> instance.
     *
-    * @return Singleton - Instanz oder NULL
+    * @return Singleton - instance
+    *
+    * @throws RuntimeException if not called from the web interface
     */
    public static function me() {
-      if (!CLI)
+      if (isSet($_SERVER['REQUEST_METHOD']))
          return Singleton::getInstance(__CLASS__);
-      return null;
+      throw new RuntimeException('Cannot create a '.__CLASS__.' instance in a non-web context.');
    }
 
 
@@ -77,184 +66,124 @@ class Request extends Singleton {
     * Constructor
     */
    protected function __construct() {
-      if (!ini_get('track_errors'))
-         throw new RuntimeException('PHP configuration setting "track_errors" is not "On" but is needed for correct request decoding.');
-
       $this->method = $_SERVER['REQUEST_METHOD'];
-      /**
-       * Die Arrays mit den Requestparametern $_GET, $_POST und $_REQUEST werden manuell erstellt.
-       * Die PHP-Implementierung ist aus den folgenden Gründen indiskutabel:
-       *
-       * (1) - Parameternamen werden modifiziert (image.x => image_x, image.y => image_y)
-       * (2) - später auftretende Werte überschreiben vorhergehende, statt in einem Array abgelegt zu werden ("?a=1&a=2" => a=2)
-       * (3) - UTF8-kodierte Parameternamen (wie sie beim Internet Explorer häufig auftreten) werden nicht dekodiert
-       * (4) - Cookies sind kein User-Input, werden aber in $_REQUEST eingefügt und überschreiben dort existierende Parameter.
-       */
-      $_REQUEST = $_GET = array();
 
-      // POST-Parameter haben höhere Priorität als URL-Parameter und werden zuerst verarbeitet
-      if ($this->isPost()) {
-         if ($this->getContentType() != 'multipart/form-data') {
-            $_POST = array();
-            $this->parseParameters(file_get_contents('php://input'), 'POST');
-         }
-         else {
-            // php://input is not available with enctype="multipart/form-data"
-            // Wir behalten das originale $_POST-Array mit der PHP-Implementierung bei und überschreiben $_REQUEST
-
-            foreach ($_POST as $name => $value) {
-               $name  = \String::decodeUtf8($name);                  // (3) UTF8-Values dekodieren
-               $value = \String::decodeUtf8($value);
-
-               if (strPos($name, '_') != false)                      // (1) evt. modifizierte Parameter restaurieren
-                  $_REQUEST[str_replace('_', '.', $name)] = $value;
-               $_REQUEST[$name] = $value;
-            }
-            $_POST = $_REQUEST;                                      // $_POST mit neuer Version überschreiben
-         }
-      }
-
-      // URL-Parameter: keine GET-Prüfung, denn URL-Parameter können mit allen HTTP-Methoden übergeben werden
+      // If $_SERVER['QUERY_STRING'] is empty (e.g. at times in nginx) PHP will not parse url parameters,
+      // it must be done manually.
       $query = $this->getQueryString();
-      if (strLen($query))
-         $this->parseParameters($query, 'GET');
+      if (strLen($query) && !$_GET)
+         $this->parseQueryString($query);
    }
 
 
    /**
-    * Parst die Parameter im übergebenen String und speichert die Ergebnisse in den entsprechenden Arrays.
+    * Parse the specified query string and store parameters in $GET and $_REQUEST.
     *
-    * NOTE:
-    * -----
-    * Die Request-Parameter werden wie in Java verarbeitet, es sind also mehrfache Werte je Parameter
-    * möglich ("a=1&a=2&a=3&a[]=4&a[key]=5").
-    *
-    * Die globalen PHP-Variablen $_GET, $_POST und $_REQUEST entsprechen der Originalimplementierung,
-    * mehrfache Werte werden also überschrieben.
-    *
-    * @param  string $rawData - Parameter-Rohdaten
-    * @param  string $target  - Bezeichner für das Zielarray: 'GET' oder 'POST'
-    *
-    * @see  Request::getParameter()
-    * @see  Request::getParameters()
+    * @param  string $data - raw query string
     */
-   protected function parseParameters($rawData, $target) {
-      $pairs = explode('&', $rawData);
+   protected function parseQueryString($data, $target) {
+      $params = explode('&', $data);
 
-      foreach ($pairs as $pair) {
-         $parts = explode('=', $pair, 2);
-         if (($name = trim(urlDecode($parts[0]))) == '')
-            continue;
-         // UTF8-Values nach ISO-8859 konvertieren (Internet Explorer etc.)
-         $name  =                          \String::decodeUtf8($name);
-         $value = sizeOf($parts)==1 ? '' : \String::decodeUtf8(urlDecode($parts[1]));
-         $key   = null;
+      foreach ($params as $param) {
+         $parts = explode('=', $param, 2);
+         $name  = trim(urlDecode($parts[0])); if (!strLen($name)) continue;
+       //$name  = str_replace(['.', ' '], '_', $name);                           // replace as the PHP implementation does
+         $value = sizeOf($parts)==1 ? '' : urlDecode($parts[1]);
 
-         // TODO: Arrays rekursiv verarbeiten
+         // TODO: process multi-dimensional arrays
+
          if (($open=strPos($name, '[')) && ($close=strPos($name, ']')) && strLen($name)==$close+1) {
-            // Arrayindex angegeben
-            $key  = trim(subStr($name, $open+1, $close-$open-1));
+            // name is an array index
             $name = trim(subStr($name, 0, $open));
+            $key  = trim(subStr($name, $open+1, $close-$open-1));
 
-            if (!strLen($key)) $this->parameters['REQUEST'][$name][]     = $this->parameters[$target][$name][]     = $value;
-            else               $this->parameters['REQUEST'][$name][$key] = $this->parameters[$target][$name][$key] = $value;
-
-            if ($target == 'GET') {
-               if     (!strLen($key))               $_REQUEST[$name][]     = $value;
-               elseif (!isSet($_POST[$name][$key])) $_REQUEST[$name][$key] = $value;   // GET darf POST nicht überschreiben
-
-               if (!strLen($key)) $_GET[$name][]     = $value;
-               else               $_GET[$name][$key] = $value;
+            if (!strLen($key)) {
+               $_GET[$name][] = $_REQUEST[$name][] = $value;
             }
             else {
-               if (!strLen($key)) $_REQUEST[$name][]     = $_POST[$name][]     = $value;
-               else               $_REQUEST[$name][$key] = $_POST[$name][$key] = $value;
+               $_GET[$name][$key]                                    = $value;
+               !isSet($_POST[$name][$key]) && $_REQUEST[$name][$key] = $value;   // GET must not over-write POST
             }
          }
          else {
-            // normaler Name, kein Array
-            $this->parameters['REQUEST'][$name][] = $this->parameters[$target][$name][] = $value;
-
-            if ($target == 'GET') {
-               if (!isSet($_POST[$name])) $_REQUEST[$name] = $value;                   // GET darf POST nicht überschreiben
-               $_GET[$name] = $value;
-            }
-            else {
-               $_REQUEST[$name] = $_POST[$name] = $value;
-            }
+            // name is not an array index
+            $_GET[$name]                              = $value;
+            !isSet($_POST[$name]) && $_REQUEST[$name] = $value;                  // GET must not over-write POST
          }
       }
    }
 
 
    /**
-    * Gibt die HTTP-Methode des Requests zurück.
+    * Return the HTTP methode of the current request.
     *
     * @return string
     */
-   final public function getMethod() {
+   public function getMethod() {
       return $this->method;
    }
 
 
    /**
-    * Ob der Request ein GET-Request ist.
+    * Whether or not the current request is a GET request.
     *
     * @return bool
     */
-   final public function isGet() {
-      return ($this->method === 'GET');
+   public function isGet() {
+      return ($this->method == 'GET');
    }
 
 
    /**
-    * Ob der Request ein POST-Request ist.
+    * Whether or not the current request is a POST request.
     *
     * @return bool
     */
-   final public function isPost() {
-      return ($this->method === 'POST');
+   public function isPost() {
+      return ($this->method == 'POST');
    }
 
 
    /**
-    * Gibt den Requestparameter mit dem angegebenen Namen zurück.  Diese Methode gibt einen einzelnen Wert zurück.
-    * Wurden mehrere Parameter dieses Namens übertragen, wird der letzte Parameter zurückgegeben.
+    * Return the request parameter with the specified name. Returns always a single value. If multiple parameters with
+    * the name exist, it returns the last value.
     *
-    * @param  string $name - Parametername
+    * @param  string $name - parameter name
     *
-    * @return string - Parameterwert oder NULL, wenn kein Parameter dieses Namens übertragen wurde
+    * @return string - value or NULL if no such parameter exists
     */
    public function getParameter($name) {
-      if (isSet($this->parameters['REQUEST'][$name])) {
-         $values = $this->parameters['REQUEST'][$name];
-         return $values[sizeOf($values)-1];
+      if (isSet($_REQUEST[$name])) {
+         $value = $_REQUEST[$name];
+         if (is_array($value))
+            return $value[sizeOf($value)-1];
+         return $value;
       }
       return null;
    }
 
 
    /**
-    * Gibt alle Requestparameter mit dem angegebenen Namen zurück.  Diese Methode gibt ein Array mit
-    * den übertragenen Parametern zurück.
+    * Return all request parameters with the specified name. Returns always an array.
     *
-    * @param  string $name - Parametername
+    * @param  string $name - parameter name
     *
-    * @return array - String-Array
+    * @return string[] - values or an empty array if no such parameters exist
     */
    public function getParameters($name) {
-      if (isSet($this->parameters['REQUEST'][$name]))
-         return $this->parameters['REQUEST'][$name];
-
-      return array();
+      if (isSet($_REQUEST[$name]))
+         $value = $_REQUEST[$name];
+         if (!is_array($value))
+            $value = [$value];
+         return $value;
+      return [];
    }
 
 
    /**
-    * Gibt den vollen Hostnamen des Servers zurück, über den der Request läuft.  Dieser Wert enthält
-    * eventuelle Subdomains.
+    * Return the host name the request was made to.
     *
-    * @return string - Hostname
+    * @return string - host name
     *
     * @example
     * <pre>
@@ -267,52 +196,53 @@ class Request extends Singleton {
 
 
    /**
-    * Gibt die Wurzel-URL des Webservers zurück, über den der Request läuft. Dieser Wert endet NICHT
-    * mit einem Slash "/".
+    * Return the root url of the server the request was made to. This value ends with a slash "/".
     *
-    * @return string - Host-URL (Protokoll + Hostname + Port)
+    * @return string - root url: protocol + host_name + port
     *
     * @example
     * <pre>
-    * "https://www.domain.tld:433"
+    * "https://www.domain.tld:433/"
     * </pre>
     */
    public function getHostUrl() {
-      if ($this->hostUrl === null) {
+      if (!$this->hostUrl) {
          $protocol = isSet($_SERVER['HTTPS']) ? 'https' : 'http';
          $host     = $this->getHostname();
          $port     = $_SERVER['SERVER_PORT']=='80' ? '' : ':'.$_SERVER['SERVER_PORT'];
 
-         $this->hostUrl = "$protocol://$host$port";
+         $this->hostUrl = $protocol.'://'.$host.$port.'/';
       }
       return $this->hostUrl;
    }
 
 
    /**
-    * Gibt die vollständige URL des Requests zurück.
+    * Return the full url of the current request.
     *
-    * @return string - vollständige URL (Protokoll + Hostname + Port + PPfad + Pfadinfo + Querystring)
-    *
+    * @return string - full url: protocol + host_name + port + path + query_string
+    *                  Whether or not the path fragment contains a "path info" is a matter of interpretation. As urls
+    *                  in this framework are always virtual there is no difference between "paths" and "path infos".
     * @example
     * <pre>
-    * "https://www.domain.tld:433/myapplication/foo/bar.php/info?key=value"
+    * "https://www.domain.tld:433/myapplication/foo/bar.html?key=value"
     * </pre>
     */
    public function getUrl() {
-      return $this->getHostUrl().$this->getUri();
+      return strLeft($this->getHostUrl(), -1).$this->getUri();
    }
 
 
    /**
-    * Gibt den Teil der URL des Requests zurück, wie er in der ersten Zeile des HTTP-Protokolls
-    * erscheint, relativ zum Wurzelverzeichnis des Webservers. Dieser Wert beginnt mit einem Slash "/".
+    * Return the uri of the current request (the value in the first line of the HTTP protocol). This value starts with
+    * a slash "/".
     *
-    * @return string - URI (Pfad + Pfadinfo + Querystring)
-    *
+    * @return string - uri: path + query_string
+    *                  Whether or not the path fragment contains a "path info" is a matter of interpretation. As urls
+    *                  in this framework are always virtual there is no difference between "paths" and "path infos".
     * @example
     * <pre>
-    * "/application/foo/bar.php/info?key=value"
+    * "/application/foo/bar.html?key=value"
     * </pre>
     */
    public function getUri() {
@@ -321,24 +251,22 @@ class Request extends Singleton {
 
 
    /**
-    * Gibt den Pfadbestandteil der URI des Requests zurück. Der Wert beginnt mit einem Slash "/".
+    * Return the path fragment of the current request's uri. This value starts with a slash "/".
     *
-    * @return string - Pfad + Pfadinfo, ohne Querystring
-    *
+    * @return string - path without a query string
+    *                  Whether or not the path fragment contains a "path info" is a matter of interpretation. As urls
+    *                  in this framework are always virtual there is no difference between "paths" and "path infos".
     * @example
     * <pre>
-    * "/application/module/foo/bar.php/info"
+    * "/application/module/foo/bar.html"
     * </pre>
     */
    public function getPath() {
-      if ($this->path === null) {
+      if (!$this->path) {
          $value = $this->getUri();
-
          $value = strLeftTo($value, '?');
          $value = strLeftTo($value, '#');
-         $value = strLeftTo($value, ';');
 
-         $value = preg_replace('/\/{2,}/', '/', $value);       // mehrfache Slashes löschen
          $this->path = $value;
       }
       return $this->path;
@@ -346,18 +274,18 @@ class Request extends Singleton {
 
 
    /**
-    * Gibt die URL der Anwendung zurück. Dieser Wert endet nicht mit einem Slash "/".
+    * Return the root url of the current application. This value does not end with a slash "/".
     *
-    * @return string - URL (Protokoll + Hostname + Port + Anwendungs-BaseUri)
+    * @return string - url: protocol + host_name + port + application_base_uri
     *
     * @example
     * <pre>
-    * "https://www.domain.tld:433/application"
+    * "https://www.domain.tld:433/myapplication"
     * </pre>
     */
    public function getApplicationUrl() {
-      // TODO: ApplicationUrl ist Eigenschaft der Anwendung, nicht des Requests -> auslagern
-      return $this->getHostUrl().$this->getApplicationBaseUri();
+      // TODO: Move to application as this url is not a property of the request.
+      return strLeft($this->getHostUrl(), -1).$this->getApplicationBaseUri();
    }
 
 
@@ -413,13 +341,12 @@ class Request extends Singleton {
          if (strEndsWith($path, '/'))
             $path = strLeft($path, -1);
       }
-
       return $path;
    }
 
 
    /**
-    * Return the query string part of the used url.
+    * Return the query string part of the current url.
     *
     * @return string
     *
@@ -459,10 +386,7 @@ class Request extends Singleton {
     */
    public function getRemoteHostname() {
       static $hostname = null;
-
-      if ($hostname === null)
-         $hostname = getHostByAddr($this->getRemoteAddress());
-
+      !$hostname && $hostname = getHostByAddr($this->getRemoteAddress());
       return $hostname;
    }
 
@@ -476,20 +400,18 @@ class Request extends Singleton {
     */
    public function getRealRemoteAddress() {
       /**
-      I am just starting to try to tackle this issue of getting the real ip address.
-      One flaw I see in the preceding notes is that none will bring up a true live ip address when the first proxy
-      is behind a nat router/firewall.  I am about to try and nut this out but from the data I see so far the true
-      ip address (live ip of the nat router) is included in $_SERVER['HTTP_CACHE_CONTROL'] as bypass-client=xx.xx.xx.xx
-      $_SERVER['HTTP_X_FORWARDED_FOR'] contains the proxy behind the nat router.  $_SERVER['REMOTE_ADDR'] is the isp
-      proxy (from what I read this can be a list of proxies if you go through more than one).  I am not sure if
-      bypass-client holds true when you get routed through several proxies along the way.
-       *
+       * I am just starting to try to tackle this issue of getting the real ip address.
+       * One flaw I see in the preceding notes is that none will bring up a true live ip address when the first proxy
+       * is behind a nat router/firewall.  I am about to try and nut this out but from the data I see so far the true
+       * ip address (live ip of the nat router) is included in $_SERVER['HTTP_CACHE_CONTROL'] as bypass-client=xx.xx.xx.xx
+       * $_SERVER['HTTP_X_FORWARDED_FOR'] contains the proxy behind the nat router.  $_SERVER['REMOTE_ADDR'] is the isp
+       * proxy (from what I read this can be a list of proxies if you go through more than one).  I am not sure if
+       * bypass-client holds true when you get routed through several proxies along the way.
        *
        * TODO: Diese IP kann einfach gefaked werden, wenn der Angreifer selbst einen x-beliebigen Forwarded-Header setzt.
        *       Abhilfe: Es müßten immer Remote-Adresse UND ALLE Forwarded-Header gespeichert werden. Sind einige oder alle
        *       Forwarded-Header gefaked, hat man immer noch die Remote-Adresse.
        */
-
       static $guessed = null;
 
       if ($guessed === null) {
@@ -539,7 +461,7 @@ class Request extends Singleton {
 
 
    /**
-    * Gibt den Content dieses Requests zurück.  Der Content ist ein ggf. übertragener Request-Body (nur bei POST-Requests).
+    * Gibt den Content dieses Requests zurück. Der Content ist ein ggf. übertragener Request-Body (nur bei POST-Requests).
     *
     * @return mixed - Request-Body oder NULL, wenn im Body keine Daten übertragen wurden.  Ist der Content-Typ des Requests "multipart/form-data"
     *                 (File-Upload), wird statt des Request-Bodies ein Array mit den geposteten File-Informationen zurückgegeben.
@@ -562,7 +484,6 @@ class Request extends Singleton {
          }
          $read = true;
       }
-
       return $content;
    }
 
@@ -583,7 +504,6 @@ class Request extends Singleton {
          $values      = explode(';', $contentType, 2);
          $contentType = trim(array_shift($values));
       }
-
       return $contentType;
    }
 
@@ -936,7 +856,7 @@ class Request extends Singleton {
 
 
    /**
-    * Löscht einzelne oder alle Error-Messages aus dem Request.
+    * Löscht Error-Messages aus dem Request.
     *
     * @param  string $key - die Schlüssel der zu löschenden Werte (ohne Angabe werden alle Error-Messages gelöscht)
     *
@@ -944,7 +864,7 @@ class Request extends Singleton {
     *
     * TODO: Error-Messages auch aus der Session löschen
     */
-   public function dropActionErrors(/*$key1, $key2, $key3 ...*/) {
+   public function removeActionErrors(/*$key1, $key2, $key3 ...*/) {
       $dropped = array();
 
       $args = func_get_args();
@@ -962,20 +882,6 @@ class Request extends Singleton {
       $dropped = $this->getActionErrors();
       unset($this->attributes[\Struts::ACTION_ERRORS_KEY]);
       return $dropped;
-   }
-
-
-   /**
-    * Alias für self:: dropActionErrors()
-    *
-    * Löscht einzelne oder alle Error-Messages aus dem Request.
-    *
-    * @param  string $key - die Schlüssel der zu löschenden Werte (ohne Angabe werden alle Error-Messages gelöscht)
-    *
-    * @return array - die gelöschten Error-Messages
-    */
-   public function removeActionErrors() {
-      return $this->dropActionErrors();
    }
 
 
@@ -1000,18 +906,18 @@ class Request extends Singleton {
 
 
    /**
-    * Verhindert das Serialisieren von Request-Instanzen.
+    * Reject serialization of Request instances.
     */
    final public function __sleep() {
-      throw new IllegalStateException('You cannot serialize me: '.__CLASS__);
+      throw new IllegalStateException('You must not serialize a '.__CLASS__);
    }
 
 
    /**
-    * Verhindert das Deserialisieren von Request-Instanzen.
+    * Reject de-serialization of Request instances.
     */
    final public function __wakeUp() {
-      throw new IllegalStateException('You cannot deserialize me: '.__CLASS__);
+      throw new IllegalStateException('You must not deserialize a '.__CLASS__);
    }
 
 
@@ -1022,7 +928,7 @@ class Request extends Singleton {
     */
    public function __toString() {
       // Request
-      $string = $_SERVER['REQUEST_METHOD'].' '.$_SERVER['REQUEST_URI'].' '.$_SERVER['SERVER_PROTOCOL']."\n";
+      $string = $_SERVER['REQUEST_METHOD'].' '.$_SERVER['REQUEST_URI'].' '.$_SERVER['SERVER_PROTOCOL'].NL;
 
       // Header
       $headers = $this->getHeaders();
@@ -1032,14 +938,14 @@ class Request extends Singleton {
       }
       $maxLen++; // +1 Zeichen für ':'
       foreach ($headers as $key => $value) {
-         $string .= str_pad($key.':', $maxLen).' '.$value."\n";
+         $string .= str_pad($key.':', $maxLen).' '.$value.NL;
       }
 
       // Content (Body)
       if ($this->isPost()) {
          $content = $this->getContent();
          if (strLen($content))
-            $string .= "\n".$content."\n";
+            $string .= NL.$content.NL;
       }
 
       return $string;
