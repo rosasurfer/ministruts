@@ -80,9 +80,10 @@ if (ini_get('expose_php'))                                                      
 if (ini_get('register_globals'))                                                           $isWarning = 1|echoPre('Warning: register_globals is not Off');
 if (ini_get('register_long_arrays'))                                                       $isWarning = 1|echoPre('Warning: register_long_arrays is not Off');
 if (!CLI && ini_get('register_argc_argv'))                                                 $isWarning = 1|echoPre('Warning: register_argc_argv is not Off');                                   // since v5.4 hardcoded to On for the CLI SAPI
-if (!ini_get('auto_globals_jit'))                                                          $isWarning = 1|echoPre('Warning: auto_globals_jit is not On');
 if (ini_get('variables_order') != 'GPCS')                                                  $isWarning = 1|echoPre('Warning: variables_order is not "GPCS": "'.ini_get('variables_order').'"');
+if (ini_get('request_order') != 'GP')                                                      $isWarning = 1|echoPre('Warning: request_order is not "GP": "'.ini_get('request_order').'"');
 if (ini_get('always_populate_raw_post_data'))                                              $isWarning = 1|echoPre('Warning: always_populate_raw_post_data is not Off');
+if (!ini_get('auto_globals_jit'))                                                          $isWarning = 1|echoPre('Warning: auto_globals_jit is not On');
 if (ini_get('define_syslog_variables'))                                                    $isWarning = 1|echoPre('Warning: define_syslog_variables is not Off');
 if (ini_get('arg_separator.output') != '&amp;')                                            $isWarning = 1|echoPre('Warning: arg_separator.output is not "&amp;": "'.ini_get('arg_separator.output').'"');
 if (ini_get('allow_url_include'))                                                          $isWarning = 1|echoPre('Warning: allow_url_include is not Off');
