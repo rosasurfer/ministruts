@@ -419,7 +419,7 @@ class Request extends Singleton {
 
 
    /**
-    * Return the query string of the current url.
+    * Return the query string part of the used url.
     *
     * @return string
     *
@@ -429,8 +429,16 @@ class Request extends Singleton {
     * </pre>
     */
    public function getQueryString() {
-      // do not use $_SERVER['QUERY_STRING'], at times it might be not available e.g. in NginX
-      return strRightFrom($_SERVER['REQUEST_URI'], '?');
+      // The variable $_SERVER['QUERY_STRING'] is set by the server and can differ
+      // e.g. it might hold additional parameters or it might be empty (nginx).
+
+      if (isSet($_SERVER['QUERY_STRING']) && strLen($_SERVER['QUERY_STRING'])) {
+         $query = $_SERVER['QUERY_STRING'];
+      }
+      else {
+         $query = strRightFrom($_SERVER['REQUEST_URI'], '?');
+      }
+      return $query;
    }
 
 
