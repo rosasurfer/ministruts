@@ -9,16 +9,11 @@ use rosasurfer\ministruts\Request;
 abstract class ActionForm extends Object {
 
 
-   /**
-    * Request, zu dem wir gehören
-    */
-   protected /*transient Request*/ $request;
+   /** @var Request^transient - the (current) Request the form belongs to */
+   protected $request;
 
-
-   /**
-    * DispatchAction-Key
-    */
-   protected /*transient string*/  $actionKey;
+   /** @var string^transient - DispatchAction key */
+   protected $actionKey;
 
 
    /**
@@ -70,17 +65,15 @@ abstract class ActionForm extends Object {
 
 
    /**
-    * Verhindert das Serialisieren transienter Werte.
-    *
-    * @return string[] - Array mit den Namen der zu serialisierenden Eigenschaften
-    */
-   public function __sleep() {
+    * Prevent serialization of transient properties.                    // access level encoding:
+    *                                                                   // ----------------------
+    * @return string[] - array of property names to serialize           // private:    "\0{className}\0{propertyName}"
+    */                                                                  // protected:  "\0*\0{propertyName}"
+   public function __sleep() {                                          // public:     "{propertyName}"
       $array = (array) $this;
-                                                // Zugriff auf Class members:
-      unset($array["\0*\0request"  ],           // --------------------------
-            $array["\0*\0actionKey"]);          // private:    "\0{className}\0{propertyName}"
-                                                // protected:  "\0*\0{propertyName}"
-      return array_keys($array);                // public:     "{propertyName}"
+      unset($array["\0*\0request"  ]);
+      unset($array["\0*\0actionKey"]);
+      return array_keys($array);
    }
 
 
@@ -88,7 +81,7 @@ abstract class ActionForm extends Object {
     * Reinitialisiert die transienten Werte dieser Instanz.  Wird intern nach dem Deserialisieren
     * aufgerufen.
     */
-   final public function __wakeUp() {
-      $this->__construct(Request ::me());
+   public function __wakeUp() {
+      $this->__construct(Request::me());
    }
 }
