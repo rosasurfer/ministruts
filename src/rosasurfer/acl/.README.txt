@@ -30,5 +30,5 @@
    • Actors and Resources are both identities. Thus both can be organized in groups. 
 
  - A Resource can become an Actor, an Actor can become a Resource. Both can be converted as required. An identity can be 
-   both Actor (subject) and Resource (object) at the same time (e.g. a user updating its user profile).
+   both Actor (subject) and Resource (object) at the same time (e.g. a user updating his user profile).
    
