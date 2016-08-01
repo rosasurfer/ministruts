@@ -9,10 +9,10 @@ use rosasurfer\ministruts\Request;
 abstract class ActionForm extends Object {
 
 
-   /** @var Request^transient - the (current) Request the form belongs to */
+   /** @var Request^transient - the current Request the form belongs to */
    protected $request;
 
-   /** @var string^transient - DispatchAction key */
+   /** @var string^transient - dispatch action key */
    protected $actionKey;
 
 
