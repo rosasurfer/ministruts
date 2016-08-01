@@ -1,13 +1,13 @@
 <?php
-use rosasurfer\ministruts\core\Object;
+use rosasurfer\core\Object;
 
-use rosasurfer\ministruts\exception\ClassNotFoundException;
-use rosasurfer\ministruts\exception\IllegalStateException;
-use rosasurfer\ministruts\exception\IllegalTypeException;
-use rosasurfer\ministruts\exception\InvalidArgumentException;
-use rosasurfer\ministruts\exception\RuntimeException;
+use rosasurfer\exception\ClassNotFoundException;
+use rosasurfer\exception\IllegalStateException;
+use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\exception\InvalidArgumentException;
+use rosasurfer\exception\RuntimeException;
 
-use rosasurfer\ministruts\struts\Request;
+use rosasurfer\ministruts\Request;
 
 use function rosasurfer\is_class;
 use function rosasurfer\strStartsWith;

@@ -1,12 +1,12 @@
 <?php
-namespace rosasurfer\ministruts\struts;
+namespace rosasurfer\ministruts;
 
-use rosasurfer\ministruts\core\Singleton;
+use rosasurfer\core\Singleton;
 
-use rosasurfer\ministruts\exception\IllegalStateException;
-use rosasurfer\ministruts\exception\IllegalTypeException;
-use rosasurfer\ministruts\exception\InvalidArgumentException;
-use rosasurfer\ministruts\exception\RuntimeException;
+use rosasurfer\exception\IllegalStateException;
+use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\exception\InvalidArgumentException;
+use rosasurfer\exception\RuntimeException;
 
 use function rosasurfer\strEndsWith;
 use function rosasurfer\strLeft;

@@ -1,7 +1,7 @@
 <?php
-use rosasurfer\ministruts\core\Object;
+use rosasurfer\core\Object;
 
-use rosasurfer\ministruts\struts\Request;
+use rosasurfer\ministruts\Request;
 
 use function rosasurfer\strRightFrom;
 

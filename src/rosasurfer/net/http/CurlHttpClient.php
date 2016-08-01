@@ -1,5 +1,5 @@
 <?php
-use rosasurfer\ministruts\exception\IOException;
+use rosasurfer\exception\IOException;
 
 use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_INFO;

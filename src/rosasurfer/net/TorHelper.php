@@ -1,8 +1,8 @@
 <?php
-use rosasurfer\ministruts\core\StaticClass;
+use rosasurfer\core\StaticClass;
 
-use rosasurfer\ministruts\exception\IllegalTypeException;
-use rosasurfer\ministruts\exception\IOException;
+use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\exception\IOException;
 
 use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_ERROR;

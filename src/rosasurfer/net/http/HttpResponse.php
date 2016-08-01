@@ -1,5 +1,5 @@
 <?php
-use rosasurfer\ministruts\core\Object;
+use rosasurfer\core\Object;
 
 
 /**

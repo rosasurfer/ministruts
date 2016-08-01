@@ -1,7 +1,7 @@
 <?php
-use rosasurfer\ministruts\core\Singleton;
+use rosasurfer\core\Singleton;
 
-use rosasurfer\ministruts\exception\IllegalTypeException;
+use rosasurfer\exception\IllegalTypeException;
 
 
 /**

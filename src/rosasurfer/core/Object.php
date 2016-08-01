@@ -1,7 +1,7 @@
 <?php
-namespace rosasurfer\ministruts\core;
+namespace rosasurfer\core;
 
-use rosasurfer\ministruts\exception\RuntimeException;
+use rosasurfer\exception\RuntimeException;
 
 use function rosasurfer\strLeftTo;
 use function rosasurfer\strRightFrom;

@@ -1,7 +1,6 @@
 <?php
-use rosasurfer\ministruts\core\Object;
-
-use rosasurfer\ministruts\exception\IllegalTypeException;
+use rosasurfer\core\Object;
+use rosasurfer\exception\IllegalTypeException;
 
 
 /**

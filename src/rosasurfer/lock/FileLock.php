@@ -1,6 +1,6 @@
 <?php
-use rosasurfer\ministruts\exception\IllegalTypeException;
-use rosasurfer\ministruts\exception\RuntimeException;
+use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\exception\RuntimeException;
 
 
 /**

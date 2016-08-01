@@ -1,8 +1,8 @@
 <?php
-use rosasurfer\ministruts\core\Object;
+use rosasurfer\core\Object;
 
-use rosasurfer\ministruts\exception\DatabaseException;
-use rosasurfer\ministruts\exception\IllegalTypeException;
+use rosasurfer\exception\DatabaseException;
+use rosasurfer\exception\IllegalTypeException;
 
 
 /**

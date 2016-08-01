@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\ministruts\acl\adapter;
+namespace rosasurfer\acl\adapter;
 
 
 /**

@@ -1,5 +1,5 @@
 <?php
-use rosasurfer\ministruts\exception\InvalidArgumentException;
+use rosasurfer\exception\InvalidArgumentException;
 
 
 /**

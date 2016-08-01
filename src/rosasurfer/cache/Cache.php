@@ -1,7 +1,6 @@
 <?php
-use rosasurfer\ministruts\core\StaticClass;
-
-use rosasurfer\ministruts\exception\IllegalTypeException;
+use rosasurfer\core\StaticClass;
+use rosasurfer\exception\IllegalTypeException;
 
 use const rosasurfer\CLI;
 

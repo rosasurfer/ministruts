@@ -1,11 +1,11 @@
 <?php
-use rosasurfer\ministruts\core\Singleton;
+use rosasurfer\core\Singleton;
 
-use rosasurfer\ministruts\exception\IllegalStateException;
-use rosasurfer\ministruts\exception\IllegalTypeException;
-use rosasurfer\ministruts\exception\PHPError;
+use rosasurfer\exception\IllegalStateException;
+use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\exception\PHPError;
 
-use rosasurfer\ministruts\struts\Request;
+use rosasurfer\ministruts\Request;
 
 
 /**

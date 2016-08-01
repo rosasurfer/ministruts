@@ -1,8 +1,8 @@
 <?php
-namespace rosasurfer\ministruts\util;
+namespace rosasurfer\util;
 
-use rosasurfer\ministruts\core\StaticClass;
-use rosasurfer\ministruts\exception\IllegalTypeException;
+use rosasurfer\core\StaticClass;
+use rosasurfer\exception\IllegalTypeException;
 
 
 /**

@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\ministruts\core;
+namespace rosasurfer\core;
 
 
 /**

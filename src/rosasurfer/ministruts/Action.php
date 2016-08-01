@@ -1,7 +1,6 @@
 <?php
-use rosasurfer\ministruts\core\Object;
-
-use rosasurfer\ministruts\struts\Request;
+use rosasurfer\core\Object;
+use rosasurfer\ministruts\Request;
 
 
 /**

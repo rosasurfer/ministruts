@@ -1,9 +1,10 @@
 <?php
-namespace rosasurfer\ministruts\acl\adapter;
+namespace rosasurfer\acl\adapter;
 
-use rosasurfer\ministruts\core\Object;
-use rosasurfer\ministruts\exception\IllegalTypeException;
-use rosasurfer\ministruts\exception\UnimplementedFeatureException;
+use rosasurfer\core\Object;
+
+use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\exception\UnimplementedFeatureException;
 
 
 /**

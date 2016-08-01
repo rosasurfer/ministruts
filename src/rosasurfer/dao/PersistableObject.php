@@ -1,9 +1,9 @@
 <?php
-use rosasurfer\ministruts\core\Object;
-use rosasurfer\ministruts\core\Singleton;
+use rosasurfer\core\Object;
+use rosasurfer\core\Singleton;
 
-use rosasurfer\ministruts\exception\InvalidArgumentException;
-use rosasurfer\ministruts\exception\UnimplementedFeatureException;
+use rosasurfer\exception\InvalidArgumentException;
+use rosasurfer\exception\UnimplementedFeatureException;
 
 
 /**

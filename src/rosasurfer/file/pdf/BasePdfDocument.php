@@ -1,7 +1,7 @@
 <?php
-use rosasurfer\ministruts\core\Object;
+use rosasurfer\core\Object;
 
-use rosasurfer\ministruts\exception\RuntimeException;
+use rosasurfer\exception\RuntimeException;
 
 use const rosasurfer\echoPre;
 use const rosasurfer\strEndsWith;

@@ -1,11 +1,11 @@
 <?php
-use rosasurfer\ministruts\core\Singleton;
+use rosasurfer\core\Singleton;
 
-use rosasurfer\ministruts\exception\FileNotFoundException;
-use rosasurfer\ministruts\exception\IllegalStateException;
-use rosasurfer\ministruts\exception\RuntimeException;
+use rosasurfer\exception\FileNotFoundException;
+use rosasurfer\exception\IllegalStateException;
+use rosasurfer\exception\RuntimeException;
 
-use rosasurfer\ministruts\struts\Request;
+use rosasurfer\ministruts\Request;
 
 use function rosasurfer\strLeftTo;
 use function rosasurfer\strRightFrom;

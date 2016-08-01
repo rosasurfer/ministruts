@@ -1,7 +1,6 @@
 <?php
-use rosasurfer\ministruts\core\StaticClass;
-
-use rosasurfer\ministruts\struts\Request;
+use rosasurfer\core\StaticClass;
+use rosasurfer\ministruts\Request;
 
 use const rosasurfer\strContains;
 

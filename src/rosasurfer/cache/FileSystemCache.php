@@ -1,7 +1,7 @@
 <?php
-use rosasurfer\ministruts\exception\IllegalTypeException;
-use rosasurfer\ministruts\exception\PHPError;
-use rosasurfer\ministruts\exception\RuntimeException;
+use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\exception\PHPError;
+use rosasurfer\exception\RuntimeException;
 
 use function rosasurfer\mkDirWritable;
 use function rosasurfer\strEndsWith;

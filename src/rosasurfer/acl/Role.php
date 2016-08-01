@@ -1,7 +1,7 @@
 <?php
-namespace rosasurfer\ministruts\acl;
+namespace rosasurfer\acl;
 
-use rosasurfer\ministruts\core\Object;
+use rosasurfer\core\Object;
 
 
 /**

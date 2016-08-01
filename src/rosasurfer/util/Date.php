@@ -1,10 +1,10 @@
 <?php
-use rosasurfer\ministruts\core\StaticClass;
+use rosasurfer\core\StaticClass;
 
-use rosasurfer\ministruts\exception\IllegalTypeException;
-use rosasurfer\ministruts\exception\InvalidArgumentException;
+use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\exception\InvalidArgumentException;
 
-use rosasurfer\ministruts\util\Validator;
+use rosasurfer\util\Validator;
 
 use const rosasurfer\DAYS;
 use const rosasurfer\L_WARN;

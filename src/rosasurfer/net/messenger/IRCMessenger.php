@@ -1,5 +1,5 @@
 <?php
-use rosasurfer\ministruts\exception\UnimplementedFeatureException;
+use rosasurfer\exception\UnimplementedFeatureException;
 
 
 /**
