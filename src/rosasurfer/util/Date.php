@@ -89,10 +89,9 @@ class Date extends StaticClass {
 
 
    /**
-    * Format a datetime string with the specified format. Useful for quick formating of date/datetime values originating
-    * from database queries.
+    * Format a datetime string with the specified format.
     *
-    * @param  string $datetime - date/datetime value
+    * @param  string $datetime - date/datetime string parsable by strToTime()
     * @param  string $format   - string with format codes according to the PHP function date()
     *
     * @return string - formatted date/datetime value in the local timezone
