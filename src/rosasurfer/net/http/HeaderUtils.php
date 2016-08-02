@@ -35,28 +35,7 @@ class HeaderUtils extends StaticClass {
       header('Location: '.$url);
       exit(0);                      // Ausgabe weiteren Contents verhindern
 
-      /** TODO: HTTP/1.1 requires an absolute URI as argument to 'Location:' including the scheme, hostname and
-       *        absolute path, but some clients accept relative URIs. You can usually use $_SERVER['HTTP_HOST'],
-       *        $_SERVER['PHP_SELF'] and dirname() to make an absolute URI from a relative one yourself.
-       */
+      // TODO: HTTP/1.1 requires an absolute URI as argument to 'Location:' including the scheme, hostname and
+      //       absolute path, but some clients accept relative URIs.
    }
 }
-/*
-# Author: Eric O
-# Date: July 13, 2006
-# Creating Automatic Self-Redirect To Secure Version
-# of Website as Seen on Paypal and other secure sites
-# Changes HTTP to HTTPS
-
-#gets the URI of the script
-$url =  $_SERVER['SCRIPT_URI']; // nur mit mod_rewrite on
-#chops URI into bits BORK BORK BORK
-$chopped = parse_url($url);
-#HOST and PATH portions of your final destination
-$destination = $chopped[host].$chopped[path];
-#if you are not HTTPS, then do something about it
-if($chopped[scheme] != "https"){
-   #forwards to HTTP version of URI with secure certificate
-   header("Location: https://$destination");
-}
-*/
