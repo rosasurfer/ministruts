@@ -60,13 +60,13 @@ class RequestProcessor extends Object {
       $this->processCachedActionMessages($request, $response);
 
 
-      // Mapping für den Request ermitteln: wird kein Mapping gefunden, generiert processMapping() einen 404-Fehler
+      // Mapping für den Request ermitteln: wird kein Mapping gefunden, generiert die Methode einen 404-Fehler
       $mapping = $this->processMapping($request, $response);
       if (!$mapping)
          return;
 
 
-      // Methodenbeschränkungen des Mappings prüfen: wird der Zugriff verweigert, generiert processMethod() einen 405-Fehler
+      // Methodenbeschränkungen des Mappings prüfen: wird der Zugriff verweigert, generiert die Methode einen 405-Fehler
       if (!$this->processMethod($request, $response, $mapping))
          return;
 
@@ -474,27 +474,34 @@ EOT_405;
     * @param  ActionForward $forward
     */
    protected function processActionForward(Request $request, Response $response, ActionForward $forward) {
+      $module = $this->module;
+
       if ($forward->isRedirect()) {
          $this->cacheActionMessages($request);
 
-         $baseUri = $request->getApplicationBaseUri();
-         $url     = $baseUri.$this->module->getPrefix();
-         !strEndsWith($url, '/') && $url.='/';
-
          $path = $forward->getPath();
-         strStartsWith($path, '/') && $path=strRight($path, -1);
-         $url .= $path;
+
+         // prüfen, ob der Forward eine URL "http://www..." oder einen Path "/target?..." enthält
+         if (strStartsWith($path, 'http')) {
+            $url = $path;
+         }
+         else {
+            $baseUri = $request->getApplicationBaseUri();
+            $url     = $baseUri.$module->getPrefix();
+            !strEndsWith($url, '/') && $url.='/';
+            $url    .= lTrim($path, '/');
+         }
 
          // TODO: QueryString kodieren
-         HeaderUtils ::redirect($url);
+         HeaderUtils::redirect($url);
       }
       else {
          $path = $forward->getPath();
-         $tile = $this->module->findTile($path);
+         $tile = $module->findTile($path);
 
          if (!$tile) {
             // $path ist ein Dateiname, einfache Tile erzeugen, damit render() existiert
-            $class = $this->module->getTilesClass();
+            $class = $module->getTilesClass();
             $tile = new $class($this->module);
             $tile->setName('generic')
                  ->setPath($path)
