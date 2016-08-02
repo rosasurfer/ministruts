@@ -645,7 +645,7 @@ class Request extends Singleton {
 
 
    /**
-    * Speichert einen Wert unter dem angegebenen Schlüssel im Request-Context.
+    * Store a value in the <Request> context. Can be used to transfer data from controllers or <Actions> to views.
     *
     * @param  string $key   - Schlüssel, unter dem der Wert gespeichert wird
     * @param  mixed  $value - der zu speichernde Wert
