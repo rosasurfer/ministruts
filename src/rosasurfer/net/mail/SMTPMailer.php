@@ -193,7 +193,8 @@ class SMTPMailer extends Mailer {
       if (!$from) throw new InvalidArgumentException('Invalid argument $sender: '.$sender);
 
       if (!is_string($receiver)) throw new IllegalTypeException('Illegal type of parameter $receiver: '.getType($receiver));
-      $receiver = Config::getDefault()->get('mail.address.forced-receiver', $receiver);
+      $forced   = Config::getDefault()->get('mail.address.forced-receiver', null);
+      $receiver = $forced ?: $receiver;
       $to = $this->parseAddress($receiver);
       if (!$to) throw new InvalidArgumentException('Invalid argument $receiver: '.$receiver);
 
