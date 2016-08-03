@@ -913,7 +913,7 @@ function is_datetime($string, $format='Y-m-d') {
 
 
 /**
- * Procedural replacement for the value TRUE.
+ * Functional equivalent of the value TRUE.
  *
  * @param  mixed $value - ignored
  *
@@ -925,7 +925,7 @@ function _true($value=null) {
 
 
 /**
- * Procedural replacement for the value FALSE.
+ * Functional equivalent of the value FALSE.
  *
  * @param  mixed $value - ignored
  *
@@ -937,7 +937,7 @@ function _false($value=null) {
 
 
 /**
- * Procedural replacement for the value NULL.
+ * Functional equivalent of the value NULL.
  *
  * @param  mixed $value - ignored
  *
@@ -949,15 +949,32 @@ function _null($value=null) {
 
 
 /**
- * Return $value or $altValue if $value is NULL. Procedural replacement for ternary test for NULL.
+ * Return $value or $altValue if $value is NULL. Functional equivalent of ternary test for NULL.
  *
  * @param  mixed $value
  * @param  mixed $altValue
  *
  * @return mixed
+ *
+ * @see    is_null()
  */
 function ifNull($value, $altValue) {
    return ($value===null) ? $altValue : $value;
+}
+
+
+/**
+ * Return $value or $altValue if $value is empty. Functional equivalent of ternary test for empty().
+ *
+ * @param  mixed $value
+ * @param  mixed $altValue
+ *
+ * @return mixed
+ *
+ * @see    empty()
+ */
+function ifEmpty($value, $altValue) {
+   return empty($value) ? $altValue : $value;
 }
 
 
