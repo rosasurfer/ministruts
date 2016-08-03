@@ -518,7 +518,7 @@ function metaTypeToStr($name) {
  *
  * @see    rosasurfer\util\Validator::isDateTime()
  */
-function is_datetime($string, $format) {
+function is_datetime($string, $format='Y-m-d') {
    return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
 }
 

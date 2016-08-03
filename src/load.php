@@ -907,7 +907,7 @@ function metaTypeToStr($name) {
  *
  * @see    rosasurfer\util\Validator::isDateTime()
  */
-function is_datetime($string, $format) {
+function is_datetime($string, $format='Y-m-d') {
    return Validator::isDateTime($string, $format);
 }
 
