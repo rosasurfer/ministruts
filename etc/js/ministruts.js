@@ -8,7 +8,7 @@ if (!String.prototype.decodeEntities ) String.prototype.decodeEntities  = functi
 if (!String.prototype.startsWith     ) String.prototype.startsWith      = function(/*string*/ prefix) { return (this.indexOf(prefix) === 0); }
 if (!String.prototype.endsWith       ) String.prototype.endsWith        = function(/*string*/ suffix) { var pos = this.lastIndexOf(suffix); return (pos!=-1 && this.length==pos+suffix.length); }
 if (!String.prototype.trim           ) String.prototype.trim            = function()                  { return this.replace(/(^\s+)|(\s+$)/g, ''); }
-if ('ab'.substr(-1) != 'b') {                                        / broken Internet Explorer
+if ('ab'.substr(-1) != 'b') {                                        // broken Internet Explorer
    String.prototype.substr = function(start, length) {
       var from = start;
          if (from < 0) from += this.length;
