@@ -15,6 +15,6 @@ class ClickatellSMSMessenger extends Messenger {
     * @param  string $message  - Nachricht
    */
    public function sendMessage($receiver, $message) {
-      throw new UnimplementedFeatureException('Method '.get_class($this).'::'.__FUNCTION__.'() is not implemented');
+      throw new UnimplementedFeatureException(__METHOD__.'() not yet implemented');
    }
 }
