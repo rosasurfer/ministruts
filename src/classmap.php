@@ -100,10 +100,12 @@ return array(
    'PHPMailer'                                            => MINISTRUTS_ROOT.'/src/rosasurfer/net/mail/PHPMailer',
    'SMTPMailer'                                           => MINISTRUTS_ROOT.'/src/rosasurfer/net/mail/SMTPMailer',
 
-   'ClickatellSMSMessenger'                               => MINISTRUTS_ROOT.'/src/rosasurfer/net/messenger/ClickatellSMSMessenger',
-   'ICQMessenger'                                         => MINISTRUTS_ROOT.'/src/rosasurfer/net/messenger/ICQMessenger',
-   'IRCMessenger'                                         => MINISTRUTS_ROOT.'/src/rosasurfer/net/messenger/IRCMessenger',
+
    'Messenger'                                            => MINISTRUTS_ROOT.'/src/rosasurfer/net/messenger/Messenger',
+   'ICQMessenger'                                         => MINISTRUTS_ROOT.'/src/rosasurfer/net/messenger/icq/ICQMessenger',
+   'IRCMessenger'                                         => MINISTRUTS_ROOT.'/src/rosasurfer/net/messenger/irc/IRCMessenger',
+   'ClickatellSMSMessenger'                               => MINISTRUTS_ROOT.'/src/rosasurfer/net/messenger/sms/ClickatellSMSMessenger',
+   'NexmoSMSMessenger'                                    => MINISTRUTS_ROOT.'/src/rosasurfer/net/messenger/sms/NexmoSMSMessenger',
 
    'Action'                                               => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/Action',
    'ActionForm'                                           => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/ActionForm',
