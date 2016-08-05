@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\net\messenger\sms;
+namespace rosasurfer\net\messenger\sms\nexmo;
 
 use rosasurfer\exception\UnimplementedFeatureException;
 
