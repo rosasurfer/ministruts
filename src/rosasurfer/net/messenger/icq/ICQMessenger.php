@@ -1,4 +1,6 @@
 <?php
+namespace rosasurfer\net\messenger\icq;
+
 use rosasurfer\exception\UnimplementedFeatureException;
 
 

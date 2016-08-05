@@ -1,18 +1,22 @@
 <?php
+namespace rosasurfer\net\messenger\sms;
+
 use rosasurfer\exception\UnimplementedFeatureException;
 
 
 /**
- * Messenger, der eine SMS via Nexmo verschickt.
+ * A messenger client sending text messages via Nexmo.
+ *
+ * @see  https://docs.nexmo.com/messaging/sms-api
  */
-class NexmoSMSMessenger extends Messenger {
+class NexmoSMSMessenger {
 
 
    /**
-    * Verschickt eine SMS.
+    * Send a text message to the specified receiver.
     *
-    * @param  string $receiver - Empfänger (internationales Format)
-    * @param  string $message  - Nachricht
+    * @param  string $receiver - phone number
+    * @param  string $message  - message
    */
    public function sendMessage($receiver, $message) {
       throw new UnimplementedFeatureException(__METHOD__.'() not yet implemented');

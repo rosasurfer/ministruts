@@ -1,18 +1,22 @@
 <?php
+namespace rosasurfer\net\messenger\sms;
+
 use rosasurfer\exception\UnimplementedFeatureException;
 
 
 /**
- * Messenger, der eine SMS via Clickatell verschickt.
+ * A messenger client sending text messages via Clickatell.
+ *
+ * @see  https://www.clickatell.com/developers/
  */
-class ClickatellSMSMessenger extends Messenger {
+class ClickatellSMSMessenger {
 
 
    /**
-    * Verschickt eine SMS.
+    * Send an SMS.
     *
-    * @param  string $receiver - Empfänger (internationales Format)
-    * @param  string $message  - Nachricht
+    * @param  string $receiver - phone number
+    * @param  string $message  - message
    */
    public function sendMessage($receiver, $message) {
       throw new UnimplementedFeatureException(__METHOD__.'() not yet implemented');

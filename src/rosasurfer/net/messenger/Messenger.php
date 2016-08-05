@@ -1,4 +1,6 @@
 <?php
+namespace rosasurfer\net\messenger;
+
 use rosasurfer\core\Object;
 
 
