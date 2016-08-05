@@ -9,7 +9,7 @@ use rosasurfer\exception\UnimplementedFeatureException;
  *
  * @see  https://docs.nexmo.com/messaging/sms-api
  */
-class NexmoSMSMessenger {
+class NexmoMessenger {
 
 
    /**

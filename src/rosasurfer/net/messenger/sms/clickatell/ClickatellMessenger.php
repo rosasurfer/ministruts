@@ -9,7 +9,7 @@ use rosasurfer\exception\UnimplementedFeatureException;
  *
  * @see  https://www.clickatell.com/developers/
  */
-class ClickatellSMSMessenger {
+class ClickatellMessenger {
 
 
    /**
