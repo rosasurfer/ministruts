@@ -1,6 +1,6 @@
 2016-08-03
 
-   - function rosasurfer\isEmpty($value, $altValue)
+   - function rosasurfer\ifEmpty($value, $altValue)
 
 
 2016-07-20
