@@ -14,7 +14,7 @@ class Object {
 
 
    /**
-    * Magic method. Catches other-wise fatal errors triggered by calls to non-existing methods.
+    * Magic method. Catches other-wise fatal errors triggered by calls to non-existing instance methods.
     *
     * @param  string $method - name of the non-existing method
     * @param  array  $args   - arguments passed to the method call
@@ -35,6 +35,20 @@ class Object {
          }
       }
       throw new RuntimeException('Call to undefined method '.$class.'::'.$method.'()');
+   }
+
+
+   /**
+    * Magic method. Catches other-wise fatal errors triggered by calls to non-existing static methods.
+    *
+    * @param  string $method - name of the non-existing method
+    * @param  array  $args   - arguments passed to the method call
+    *
+    * @throws RuntimeException
+    */
+   public static function __callStatic($method, array $args) {
+      // TODO: adjust error message according to stacktrace
+      throw new RuntimeException('Call to undefined method '.static::CLASS.'::'.$method.'()');
    }
 
 
