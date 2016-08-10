@@ -2965,7 +2965,7 @@ class BasePdfDocument extends Object {
     */
    function openHere($style,$a=0,$b=0,$c=0){
      // this function will open the document at a specified page, in a specified style
-     // the values for style, and the required paramters are:
+     // the values for style, and the required parameters are:
      // 'XYZ'  left, top, zoom
      // 'Fit'
      // 'FitH' top
