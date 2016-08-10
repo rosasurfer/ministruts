@@ -602,3 +602,17 @@ function ifEmpty($value, $altValue) {
 function ksort_r(array $values, $sort_flags=SORT_REGULAR) {
    return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
 }
+
+
+/**
+ * Return a pluralized message according to the specified number of items.
+ *
+ * @param  int   $count     - the number of items to determine the message form from
+ * @param  string $singular - singular form of message
+ * @param  string $plural   - plural form of message
+ *
+ * @return string
+ */
+function pluralize($count, $singular='', $plural='s') {
+   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+}
