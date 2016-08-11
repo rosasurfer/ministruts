@@ -4,7 +4,7 @@
 if (!String.prototype.capitalize     ) String.prototype.capitalize      = function()                  { return this.charAt(0).toUpperCase() + this.slice(1); }
 if (!String.prototype.capitalizeWords) String.prototype.capitalizeWords = function()                  { return this.replace(/\w\S*/g, function(word) { return word.capitalize(); }); }
 if (!String.prototype.contains       ) String.prototype.contains        = function(/*string*/ string) { var pos = this.indexOf(string); return (pos != -1); }
-if (!String.prototype.decodeEntities ) String.prototype.decodeEntities  = function()                  { return this.replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&Auml;/g, 'Ä').replace(/&Ouml;/g, 'Ö').replace(/&Uuml;/g, 'Ü').replace(/&auml;/g, 'ä').replace(/&ouml;/g, 'ö').replace(/&uuml;/g, 'ü').replace(/&szlig;/g, 'ß'); }
+if (!String.prototype.decodeEntities ) String.prototype.decodeEntities  = function()                  { var txt = document.createElement('textarea'); txt.innerHTML = this; return txt.value; }
 if (!String.prototype.startsWith     ) String.prototype.startsWith      = function(/*string*/ prefix) { return (this.indexOf(prefix) === 0); }
 if (!String.prototype.endsWith       ) String.prototype.endsWith        = function(/*string*/ suffix) { var pos = this.lastIndexOf(suffix); return (pos!=-1 && this.length==pos+suffix.length); }
 if (!String.prototype.trim           ) String.prototype.trim            = function()                  { return this.replace(/(^\s+)|(\s+$)/g, ''); }
