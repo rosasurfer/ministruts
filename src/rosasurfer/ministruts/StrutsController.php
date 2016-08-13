@@ -7,8 +7,6 @@ use rosasurfer\exception\FileNotFoundException;
 use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\RuntimeException;
 
-use rosasurfer\ministruts\Struts;
-
 use function rosasurfer\strLeftTo;
 use function rosasurfer\strRightFrom;
 use function rosasurfer\strStartsWith;
@@ -49,7 +47,7 @@ class StrutsController extends Singleton {
    public static function me() {
       if (CLI) throw new IllegalStateException('Can not use a '.__CLASS__.' in this context.');
 
-      $cache = Cache::me();
+      $cache = \Cache::me();
 
       // cache hit?
       $controller = $cache->get(__CLASS__);
@@ -130,7 +128,7 @@ class StrutsController extends Singleton {
       // select Module
       $prefix = $controller->getModulePrefix($request);
       $module = $controller->modules[$prefix];
-      $request->setAttribute(Struts::MODULE_KEY, $module);
+      $request->setAttribute(MODULE_KEY, $module);
 
       // get RequestProcessor
       $processor = $controller->getRequestProcessor($module);
@@ -172,3 +170,6 @@ class StrutsController extends Singleton {
       return new $class($module);
    }
 }
+
+
+!defined(__NAMESPACE__.'\MODULE_KEY') && include(__DIR__.'/definitions.php');

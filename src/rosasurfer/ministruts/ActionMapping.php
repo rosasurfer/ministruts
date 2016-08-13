@@ -8,12 +8,14 @@ use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
 
 use rosasurfer\ministruts\Request;
-use rosasurfer\ministruts\Struts;
 
 use function rosasurfer\is_class;
 use function rosasurfer\strStartsWith;
 
-use rosasurfer\L_WARN;
+use const rosasurfer\L_WARN;
+
+use const rosasurfer\ministruts\ACTION_BASE_CLASS;
+use const rosasurfer\ministruts\ACTION_FORM_BASE_CLASS;
 
 
 /**
@@ -212,11 +214,11 @@ class ActionMapping extends Object {
     * @return ActionMapping
     */
    public function setActionClassName($className) {
-      if ($this->configured)                                      throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($className))                                 throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
-      if (!is_class($className))                                  throw new ClassNotFoundException("Undefined class '$className'");
-      if (!is_subclass_of($className, Struts::ACTION_BASE_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts::ACTION_BASE_CLASS.': '.$className);
-      if ($this->forward)                                         throw new RuntimeException('Configuration error: Only one attribute of "action", "include", "redirect" or "forward" can be specified for mapping "'.$this->path.'"');
+      if ($this->configured)                              throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($className))                         throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
+      if (!is_class($className))                          throw new ClassNotFoundException("Undefined class '$className'");
+      if (!is_subclass_of($className, ACTION_BASE_CLASS)) throw new InvalidArgumentException('Not a subclass of '.ACTION_BASE_CLASS.': '.$className);
+      if ($this->forward)                                 throw new RuntimeException('Configuration error: Only one attribute of "action", "include", "redirect" or "forward" can be specified for mapping "'.$this->path.'"');
 
       $this->actionClassName = $className;
       return $this;
@@ -242,10 +244,10 @@ class ActionMapping extends Object {
     * @return ActionMapping
     */
    public function setFormClassName($className) {
-      if ($this->configured)                                           throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($className))                                      throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
-      if (!is_class($className))                                       throw new ClassNotFoundException("Undefined class '$className'");
-      if (!is_subclass_of($className, Struts::ACTION_FORM_BASE_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts::ACTION_FORM_BASE_CLASS.': '.$className);
+      if ($this->configured)                                   throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($className))                              throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
+      if (!is_class($className))                               throw new ClassNotFoundException("Undefined class '$className'");
+      if (!is_subclass_of($className, ACTION_FORM_BASE_CLASS)) throw new InvalidArgumentException('Not a subclass of '.ACTION_FORM_BASE_CLASS.': '.$className);
 
       $this->formClassName = $className;
       return $this;
@@ -466,3 +468,6 @@ class ActionMapping extends Object {
       return $forward;
    }
 }
+
+
+!defined('rosasurfer\ministruts\MODULE_KEY') && include(__DIR__.'/definitions.php');

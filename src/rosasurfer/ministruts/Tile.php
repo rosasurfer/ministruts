@@ -5,7 +5,8 @@ use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\IllegalTypeException;
 
 use rosasurfer\ministruts\Request;
-use rosasurfer\ministruts\Struts;
+
+use const rosasurfer\ministruts\ACTION_FORM_KEY;
 
 
 /**
@@ -206,7 +207,7 @@ class Tile extends Object {
       $request  = Request ::me();
       $response = Response::me();
       $session  = $request->isSession() ? $request->getSession() : null;
-      $form     = $request->getAttribute(Struts::ACTION_FORM_KEY);
+      $form     = $request->getAttribute(ACTION_FORM_KEY);
       $PAGE     = PageContext::me();
 
       echo ($this->parent ? "\n<!-- #begin: ".$this->label." -->\n" : null);
@@ -216,3 +217,6 @@ class Tile extends Object {
       echo ($this->parent ? "\n<!-- #end: ".$this->label." -->\n" : null);
    }
 }
+
+
+!defined('rosasurfer\ministruts\MODULE_KEY') && include(__DIR__.'/definitions.php');

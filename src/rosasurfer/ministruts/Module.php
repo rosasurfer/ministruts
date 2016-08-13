@@ -8,14 +8,18 @@ use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
 
-use rosasurfer\ministruts\Struts;
-
 use function rosasurfer\is_class;
 use function rosasurfer\strEndsWithI;
 
 use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_INFO;
 use const rosasurfer\L_NOTICE;
+
+use const rosasurfer\ministruts\DEFAULT_REQUEST_PROCESSOR_CLASS;
+use const rosasurfer\ministruts\DEFAULT_ACTION_FORWARD_CLASS;
+use const rosasurfer\ministruts\DEFAULT_ACTION_MAPPING_CLASS;
+use const rosasurfer\ministruts\DEFAULT_TILES_CLASS;
+use const rosasurfer\ministruts\ROLE_PROCESSOR_BASE_CLASS;
 
 
 /**
@@ -74,25 +78,25 @@ class Module extends Object {
    /**
     * Der Klassenname der RequestProcessor-Implementierung, die für dieses Modul definiert ist.
     */
-   protected /*string*/ $requestProcessorClass = Struts::DEFAULT_REQUEST_PROCESSOR_CLASS;
+   protected /*string*/ $requestProcessorClass = DEFAULT_REQUEST_PROCESSOR_CLASS;
 
 
    /**
     * Der Klassenname der ActionForward-Implementierung, die für dieses Modul definiert ist.
     */
-   protected /*string*/ $forwardClass = Struts::DEFAULT_ACTION_FORWARD_CLASS;
+   protected /*string*/ $forwardClass = DEFAULT_ACTION_FORWARD_CLASS;
 
 
    /**
     * Der Klassenname der ActionMapping-Implementierung, die für dieses Modul definiert ist.
     */
-   protected /*string*/ $mappingClass = Struts::DEFAULT_ACTION_MAPPING_CLASS;
+   protected /*string*/ $mappingClass = DEFAULT_ACTION_MAPPING_CLASS;
 
 
    /**
     * Der Klassenname der Tiles-Implementierung, die für dieses Modul definiert ist.
     */
-   protected /*string*/ $tilesClass = Struts::DEFAULT_TILES_CLASS;
+   protected /*string*/ $tilesClass = DEFAULT_TILES_CLASS;
 
 
    /**
@@ -693,10 +697,10 @@ class Module extends Object {
     * @param  string $className
     */
    protected function setRequestProcessorClass($className) {
-      if ($this->configured)                                                    throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($className))                                               throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
-      if (!is_class($className))                                                throw new ClassNotFoundException("Undefined class '$className'");
-      if (!is_subclass_of($className, Struts::DEFAULT_REQUEST_PROCESSOR_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts::DEFAULT_REQUEST_PROCESSOR_CLASS.': '.$className);
+      if ($this->configured)                                            throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($className))                                       throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
+      if (!is_class($className))                                        throw new ClassNotFoundException("Undefined class '$className'");
+      if (!is_subclass_of($className, DEFAULT_REQUEST_PROCESSOR_CLASS)) throw new InvalidArgumentException('Not a subclass of '.DEFAULT_REQUEST_PROCESSOR_CLASS.': '.$className);
 
       $this->requestProcessorClass = $className;
    }
@@ -719,10 +723,10 @@ class Module extends Object {
     * @param  string $className
     */
    protected function setRoleProcessorClass($className) {
-      if ($this->configured)                                              throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($className))                                         throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
-      if (!is_class($className))                                          throw new ClassNotFoundException("Undefined class '$className'");
-      if (!is_subclass_of($className, Struts::ROLE_PROCESSOR_BASE_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts::ROLE_PROCESSOR_BASE_CLASS.': '.$className);
+      if ($this->configured)                                      throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($className))                                 throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
+      if (!is_class($className))                                  throw new ClassNotFoundException("Undefined class '$className'");
+      if (!is_subclass_of($className, ROLE_PROCESSOR_BASE_CLASS)) throw new InvalidArgumentException('Not a subclass of '.ROLE_PROCESSOR_BASE_CLASS.': '.$className);
 
       $this->roleProcessorClass = $className;
    }
@@ -750,10 +754,10 @@ class Module extends Object {
     * @param  string $className
     */
    protected function setTilesClass($className) {
-      if ($this->configured)                                        throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($className))                                   throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
-      if (!is_class($className))                                    throw new ClassNotFoundException("Undefined class '$className'");
-      if (!is_subclass_of($className, Struts::DEFAULT_TILES_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts::DEFAULT_TILES_CLASS.': '.$className);
+      if ($this->configured)                                throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($className))                           throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
+      if (!is_class($className))                            throw new ClassNotFoundException("Undefined class '$className'");
+      if (!is_subclass_of($className, DEFAULT_TILES_CLASS)) throw new InvalidArgumentException('Not a subclass of '.DEFAULT_TILES_CLASS.': '.$className);
 
       $this->tilesClass = $className;
    }
@@ -776,10 +780,10 @@ class Module extends Object {
     * @param  string $className
     */
    protected function setMappingClass($className) {
-      if ($this->configured)                                                 throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($className))                                            throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
-      if (!is_class($className))                                             throw new ClassNotFoundException("Undefined class '$className'");
-      if (!is_subclass_of($className, Struts::DEFAULT_ACTION_MAPPING_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts::DEFAULT_ACTION_MAPPING_CLASS.': '.$className);
+      if ($this->configured)                                         throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($className))                                    throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
+      if (!is_class($className))                                     throw new ClassNotFoundException("Undefined class '$className'");
+      if (!is_subclass_of($className, DEFAULT_ACTION_MAPPING_CLASS)) throw new InvalidArgumentException('Not a subclass of '.DEFAULT_ACTION_MAPPING_CLASS.': '.$className);
 
       $this->mappingClass = $className;
    }
@@ -802,10 +806,10 @@ class Module extends Object {
     * @param  string $className
     */
    protected function setForwardClass($className) {
-      if ($this->configured)                                                 throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($className))                                            throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
-      if (!is_class($className))                                             throw new ClassNotFoundException("Undefined class '$className'");
-      if (!is_subclass_of($className, Struts::DEFAULT_ACTION_FORWARD_CLASS)) throw new InvalidArgumentException('Not a subclass of '.Struts::DEFAULT_ACTION_FORWARD_CLASS.': '.$className);
+      if ($this->configured)                                         throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($className))                                    throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
+      if (!is_class($className))                                     throw new ClassNotFoundException("Undefined class '$className'");
+      if (!is_subclass_of($className, DEFAULT_ACTION_FORWARD_CLASS)) throw new InvalidArgumentException('Not a subclass of '.DEFAULT_ACTION_FORWARD_CLASS.': '.$className);
 
       $this->forwardClass = $className;
    }
@@ -946,3 +950,6 @@ class Module extends Object {
       return null;
    }
 }
+
+
+!defined('rosasurfer\ministruts\MODULE_KEY') && include(__DIR__.'/definitions.php');

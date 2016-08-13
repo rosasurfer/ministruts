@@ -56,3 +56,6 @@ final class Response extends Singleton {
       return $value;    // Referenz auf NULL
    }
 }
+
+
+!defined('rosasurfer\ministruts\MODULE_KEY') && include(__DIR__.'/definitions.php');

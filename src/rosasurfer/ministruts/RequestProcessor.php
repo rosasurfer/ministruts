@@ -1,14 +1,17 @@
 <?php
 use rosasurfer\core\Object;
-
 use rosasurfer\ministruts\Request;
-use rosasurfer\ministruts\Struts;
 
 use function rosasurfer\strRightFrom;
 
 use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_INFO;
 use const rosasurfer\L_NOTICE;
+
+use const rosasurfer\ministruts\ACTION_ERRORS_KEY;
+use const rosasurfer\ministruts\ACTION_FORM_KEY;
+use const rosasurfer\ministruts\ACTION_MAPPING_KEY;
+use const rosasurfer\ministruts\ACTION_MESSAGES_KEY;
 
 
 /**
@@ -143,16 +146,16 @@ class RequestProcessor extends Object {
     */
    protected function processCachedActionMessages(Request $request, Response $response) {
       if ($request->isSession()) {
-         if (isSet($_SESSION[Struts::ACTION_MESSAGES_KEY])) {
-            $messages = $_SESSION[Struts::ACTION_MESSAGES_KEY];
-            $request->setAttribute(Struts::ACTION_MESSAGES_KEY, $messages);
-            unset($_SESSION[Struts::ACTION_MESSAGES_KEY]);
+         if (isSet($_SESSION[ACTION_MESSAGES_KEY])) {
+            $messages = $_SESSION[ACTION_MESSAGES_KEY];
+            $request->setAttribute(ACTION_MESSAGES_KEY, $messages);
+            unset($_SESSION[ACTION_MESSAGES_KEY]);
          }
 
-         if (isSet($_SESSION[Struts::ACTION_ERRORS_KEY])) {
-            $errors = $_SESSION[Struts::ACTION_ERRORS_KEY];
-            $request->setAttribute(Struts::ACTION_ERRORS_KEY, $errors);
-            unset($_SESSION[Struts::ACTION_ERRORS_KEY]);
+         if (isSet($_SESSION[ACTION_ERRORS_KEY])) {
+            $errors = $_SESSION[ACTION_ERRORS_KEY];
+            $request->setAttribute(ACTION_ERRORS_KEY, $errors);
+            unset($_SESSION[ACTION_ERRORS_KEY]);
          }
          // TODO: ActionError -> ActionMessage
       }
@@ -176,7 +179,7 @@ class RequestProcessor extends Object {
       $session = $request->getSession();
 
       foreach ($errors as $key => $value) {
-         $_SESSION[Struts::ACTION_ERRORS_KEY][$key] = $value;
+         $_SESSION[ACTION_ERRORS_KEY][$key] = $value;
       }
 
       // TODO: ActionMessages verarbeiten
@@ -205,7 +208,7 @@ class RequestProcessor extends Object {
 
       // Mapping suchen und im Request speichern
       if (($mapping=$this->module->findMapping($path)) || ($mapping=$this->module->getDefaultMapping())) {
-         $request->setAttribute(Struts::ACTION_MAPPING_KEY, $mapping);
+         $request->setAttribute(ACTION_MAPPING_KEY, $mapping);
          return $mapping;
       }
 
@@ -336,7 +339,7 @@ EOT_405;
 
 
       // Instanz im Request ...
-      $request->setAttribute(Struts::ACTION_FORM_KEY, $form);
+      $request->setAttribute(ACTION_FORM_KEY, $form);
 
       // ... und ggf. auch in der Session speichern
       if ($mapping->isSessionScope())
@@ -514,3 +517,6 @@ EOT_405;
       }
    }
 }
+
+
+!defined('rosasurfer\ministruts\MODULE_KEY') && include(__DIR__.'/definitions.php');

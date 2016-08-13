@@ -32,3 +32,6 @@ abstract class RoleProcessor {
     */
    abstract public function processRoles(Request $request, ActionMapping $mapping);
 }
+
+
+!defined('rosasurfer\ministruts\MODULE_KEY') && include(__DIR__.'/definitions.php');

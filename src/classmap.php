@@ -117,7 +117,6 @@ return array(
    'RequestProcessor'                                            => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/RequestProcessor',
    'Response'                                                    => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/Response',
    'RoleProcessor'                                               => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/RoleProcessor',
-   'rosasurfer\ministruts\Struts'                                => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/Struts',
    'rosasurfer\ministruts\StrutsController'                      => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/StrutsController',
    'Tile'                                                        => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/Tile',
 

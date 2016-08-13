@@ -191,3 +191,6 @@ class ActionForward extends Object {
       return $forward;
    }
 }
+
+
+!defined('rosasurfer\ministruts\MODULE_KEY') && include(__DIR__.'/definitions.php');

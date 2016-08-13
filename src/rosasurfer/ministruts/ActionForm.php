@@ -85,3 +85,6 @@ abstract class ActionForm extends Object {
       $this->__construct(Request::me());
    }
 }
+
+
+!defined('rosasurfer\ministruts\MODULE_KEY') && include(__DIR__.'/definitions.php');

@@ -97,3 +97,6 @@ class PageContext extends Singleton {
       }
    }
 }
+
+
+!defined('rosasurfer\ministruts\MODULE_KEY') && include(__DIR__.'/definitions.php');
