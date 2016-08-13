@@ -1,4 +1,6 @@
 <?php
+namespace rosasurfer\ministruts;
+
 use rosasurfer\core\StaticClass;
 
 

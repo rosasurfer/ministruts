@@ -2,6 +2,7 @@
 use rosasurfer\core\Object;
 
 use rosasurfer\ministruts\Request;
+use rosasurfer\ministruts\Struts;
 
 use function rosasurfer\strRightFrom;
 
@@ -142,16 +143,16 @@ class RequestProcessor extends Object {
     */
    protected function processCachedActionMessages(Request $request, Response $response) {
       if ($request->isSession()) {
-         if (isSet($_SESSION[Struts ::ACTION_MESSAGES_KEY])) {
-            $messages = $_SESSION[Struts ::ACTION_MESSAGES_KEY];
-            $request->setAttribute(Struts ::ACTION_MESSAGES_KEY, $messages);
-            unset($_SESSION[Struts ::ACTION_MESSAGES_KEY]);
+         if (isSet($_SESSION[Struts::ACTION_MESSAGES_KEY])) {
+            $messages = $_SESSION[Struts::ACTION_MESSAGES_KEY];
+            $request->setAttribute(Struts::ACTION_MESSAGES_KEY, $messages);
+            unset($_SESSION[Struts::ACTION_MESSAGES_KEY]);
          }
 
-         if (isSet($_SESSION[Struts ::ACTION_ERRORS_KEY])) {
-            $errors = $_SESSION[Struts ::ACTION_ERRORS_KEY];
-            $request->setAttribute(Struts ::ACTION_ERRORS_KEY, $errors);
-            unset($_SESSION[Struts ::ACTION_ERRORS_KEY]);
+         if (isSet($_SESSION[Struts::ACTION_ERRORS_KEY])) {
+            $errors = $_SESSION[Struts::ACTION_ERRORS_KEY];
+            $request->setAttribute(Struts::ACTION_ERRORS_KEY, $errors);
+            unset($_SESSION[Struts::ACTION_ERRORS_KEY]);
          }
          // TODO: ActionError -> ActionMessage
       }
@@ -175,7 +176,7 @@ class RequestProcessor extends Object {
       $session = $request->getSession();
 
       foreach ($errors as $key => $value) {
-         $_SESSION[Struts ::ACTION_ERRORS_KEY][$key] = $value;
+         $_SESSION[Struts::ACTION_ERRORS_KEY][$key] = $value;
       }
 
       // TODO: ActionMessages verarbeiten
@@ -204,7 +205,7 @@ class RequestProcessor extends Object {
 
       // Mapping suchen und im Request speichern
       if (($mapping=$this->module->findMapping($path)) || ($mapping=$this->module->getDefaultMapping())) {
-         $request->setAttribute(Struts ::ACTION_MAPPING_KEY, $mapping);
+         $request->setAttribute(Struts::ACTION_MAPPING_KEY, $mapping);
          return $mapping;
       }
 
@@ -335,7 +336,7 @@ EOT_405;
 
 
       // Instanz im Request ...
-      $request->setAttribute(Struts ::ACTION_FORM_KEY, $form);
+      $request->setAttribute(Struts::ACTION_FORM_KEY, $form);
 
       // ... und ggf. auch in der Session speichern
       if ($mapping->isSessionScope())

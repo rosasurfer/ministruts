@@ -5,6 +5,7 @@ use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\IllegalTypeException;
 
 use rosasurfer\ministruts\Request;
+use rosasurfer\ministruts\Struts;
 
 
 /**
@@ -202,11 +203,11 @@ class Tile extends Object {
       // alle Properties holen und im Context dieser Methode ablegen
       extract($this->getMergedProperties());
 
-      $request  = Request  ::me();
-      $response = Response ::me();
+      $request  = Request ::me();
+      $response = Response::me();
       $session  = $request->isSession() ? $request->getSession() : null;
-      $form     = $request->getAttribute(Struts ::ACTION_FORM_KEY);
-      $PAGE     = PageContext ::me();
+      $form     = $request->getAttribute(Struts::ACTION_FORM_KEY);
+      $PAGE     = PageContext::me();
 
       echo ($this->parent ? "\n<!-- #begin: ".$this->label." -->\n" : null);
 

@@ -703,7 +703,7 @@ class Request extends Singleton {
       if (!is_string($roles)) throw new IllegalTypeException('Illegal type of parameter $roles: '.getType($roles));
 
       // Module holen
-      $module = $this->getAttribute(\Struts::MODULE_KEY);
+      $module = $this->getAttribute(Struts::MODULE_KEY);
       if (!$module) throw new RuntimeException('You can not call '.__METHOD__.'() in this context');
 
       // RoleProcessor holen ...
@@ -724,7 +724,7 @@ class Request extends Singleton {
     * @return string - Error-Message
     */
    public function getActionError($key = null) {
-      $errors =& $this->getAttribute(\Struts::ACTION_ERRORS_KEY);
+      $errors =& $this->getAttribute(Struts::ACTION_ERRORS_KEY);
 
       if ($key === null) {       // die erste zurückgeben
          if ($errors) {
@@ -745,7 +745,7 @@ class Request extends Singleton {
     * @return array - Error-Messages
     */
    public function getActionErrors() {
-      $errors =& $this->getAttribute(\Struts::ACTION_ERRORS_KEY);
+      $errors =& $this->getAttribute(Struts::ACTION_ERRORS_KEY);
 
       if ($errors === null)
          $errors = array();
@@ -766,7 +766,7 @@ class Request extends Singleton {
       if ($key !== null) {
          return ($this->getActionError($key) !== null);
       }
-      return (sizeOf($this->getAttribute(\Struts::ACTION_ERRORS_KEY)) > 0);
+      return (sizeOf($this->getAttribute(Struts::ACTION_ERRORS_KEY)) > 0);
    }
 
 
@@ -779,11 +779,11 @@ class Request extends Singleton {
     */
    public function setActionError($key, $message) {
       if ($message === null) {
-         if (isSet($this->attributes[\Struts::ACTION_ERRORS_KEY][$key]))
-            unset($this->attributes[\Struts::ACTION_ERRORS_KEY][$key]);
+         if (isSet($this->attributes[Struts::ACTION_ERRORS_KEY][$key]))
+            unset($this->attributes[Struts::ACTION_ERRORS_KEY][$key]);
       }
       elseif (is_string($message)) {
-         $this->attributes[\Struts::ACTION_ERRORS_KEY][$key] = $message;
+         $this->attributes[Struts::ACTION_ERRORS_KEY][$key] = $message;
       }
       else {
          throw new IllegalTypeException('Illegal type of parameter $message: '.getType($message));
@@ -816,7 +816,7 @@ class Request extends Singleton {
       }
 
       $dropped = $this->getActionErrors();
-      unset($this->attributes[\Struts::ACTION_ERRORS_KEY]);
+      unset($this->attributes[Struts::ACTION_ERRORS_KEY]);
       return $dropped;
    }
 
@@ -827,7 +827,7 @@ class Request extends Singleton {
     * @return ActionMapping - Mapping oder NULL, wenn die Request-Instance außerhalb des Struts-Frameworks benutzt wird.
     */
    public final function getMapping() {
-      return $this->getAttribute(\Struts::ACTION_MAPPING_KEY);
+      return $this->getAttribute(Struts::ACTION_MAPPING_KEY);
    }
 
 
@@ -837,7 +837,7 @@ class Request extends Singleton {
     * @return Module - Module oder NULL, wenn die Request-Instance außerhalb des Struts-Frameworks benutzt wird.
     */
    public final function getModule() {
-      return $this->getAttribute(\Struts::MODULE_KEY);
+      return $this->getAttribute(Struts::MODULE_KEY);
    }
 
 

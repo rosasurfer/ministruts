@@ -1,11 +1,13 @@
 <?php
+namespace rosasurfer\ministruts;
+
 use rosasurfer\core\Singleton;
 
 use rosasurfer\exception\FileNotFoundException;
 use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\RuntimeException;
 
-use rosasurfer\ministruts\Request;
+use rosasurfer\ministruts\Struts;
 
 use function rosasurfer\strLeftTo;
 use function rosasurfer\strRightFrom;
@@ -27,7 +29,7 @@ use const rosasurfer\WINDOWS;
  * instance is serialized, cached and re-used across following HTTP requests (until cache invalidation). For this reason
  * the class implementation is "request safe" (in analogy to "thread safety") and holds no variable runtime status.
  */
-final class StrutsController extends Singleton {
+class StrutsController extends Singleton {
 
 
    /** @var bool */
@@ -62,12 +64,12 @@ final class StrutsController extends Singleton {
                $controller = Singleton::getInstance(__CLASS__);
 
                $configFile = str_replace('\\', '/', APPLICATION_ROOT.'/app/config/struts-config.xml');
-               $dependency = FileDependency::create($configFile);
+               $dependency = \FileDependency::create($configFile);
                if (!WINDOWS && !LOCALHOST)                           // distinction dev/production
                   $dependency->setMinValidity(1 * MINUTE);
 
                // ...and cache it with a FileDependency
-               $cache->set(__CLASS__, $controller, Cache::EXPIRES_NEVER, $dependency);
+               $cache->set(__CLASS__, $controller, \Cache::EXPIRES_NEVER, $dependency);
             }
 
          //$lock->release();
@@ -82,7 +84,7 @@ final class StrutsController extends Singleton {
     * Load and parse the Struts configuration and create the corresponding object hierarchy.
     */
    protected function __construct() {
-      $loglevel        = Logger ::getLogLevel(__CLASS__);
+      $loglevel        = \Logger ::getLogLevel(__CLASS__);
       self::$logDebug  = ($loglevel <= L_DEBUG );
       self::$logInfo   = ($loglevel <= L_INFO  );
       self::$logNotice = ($loglevel <= L_NOTICE);
@@ -102,7 +104,7 @@ final class StrutsController extends Singleton {
             $baseName = baseName($file, '.xml');
             $prefix = (strStartsWith($baseName, 'struts-config-')) ? '/'.subStr($baseName, 14) : '';
 
-            $module = new Module($file, $prefix);
+            $module = new \Module($file, $prefix);
             $module->freeze();
 
             if (isSet($this->modules[$prefix]))
@@ -121,9 +123,9 @@ final class StrutsController extends Singleton {
     * Process the current HTTP request.
     */
    public static function processRequest() {
-      $controller = self    ::me();
-      $request    = Request ::me();
-      $response   = Response::me();
+      $controller = self     ::me();
+      $request    =  Request ::me();
+      $response   = \Response::me();
 
       // select Module
       $prefix = $controller->getModulePrefix($request);
@@ -165,7 +167,7 @@ final class StrutsController extends Singleton {
     *
     * @return RequestProcessor
     */
-   private function getRequestProcessor(Module $module) {
+   private function getRequestProcessor(\Module $module) {
       $class = $module->getRequestProcessorClass();
       return new $class($module);
    }
