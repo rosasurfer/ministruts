@@ -23,4 +23,6 @@
 
 # ignore the following directories and files
 /vendor/
+/Todo*
+/TODO*
 config.properties
