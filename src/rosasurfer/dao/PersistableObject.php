@@ -258,6 +258,6 @@ abstract class PersistableObject extends Object {
     */
    public static function dao() {
       // TODO: the calling class may be a derived class with the DAO being one of its parents
-      return Singleton::getInstance(static::CLASS.'DAO');
+      return Singleton::getInstance(static::class.'DAO');
    }
 }

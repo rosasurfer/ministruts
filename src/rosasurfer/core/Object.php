@@ -48,7 +48,7 @@ class Object {
     */
    public static function __callStatic($method, array $args) {
       // TODO: adjust error message according to stacktrace
-      throw new RuntimeException('Call to undefined method '.static::CLASS.'::'.$method.'()');
+      throw new RuntimeException('Call to undefined method '.static::class.'::'.$method.'()');
    }
 
 
