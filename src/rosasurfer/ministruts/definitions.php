@@ -3,84 +3,84 @@ namespace rosasurfer\ministruts;
 
 
 /**
- * @var string - Der Klassenname der Default-RequestProcessor-Implementierung.
+ * @var string - default <RequestProcessor> class
  */
 const DEFAULT_REQUEST_PROCESSOR_CLASS = 'RequestProcessor';
 
 
 /**
- * @var string - Der Klassenname der Default-ActionForward-Implementierung.
+ * @var string - default <ActionForward> class
  */
 const DEFAULT_ACTION_FORWARD_CLASS = 'ActionForward';
 
 
 /**
- * @var string - Der Klassenname der Default-ActionMapping-Implementierung.
+ * @var string - default <ActionMapping> class
  */
 const DEFAULT_ACTION_MAPPING_CLASS = 'ActionMapping';
 
 
 /**
- * @var string - Der Klassenname der Default-Tiles-Implementierung.
+ * @var string - default <Tile> class
  */
 const DEFAULT_TILES_CLASS = 'Tile';
 
 
 /**
- * @var string - Der Basisklassenname der Action-Implementierung.
+ * @var string - <Action> base class
  */
 const ACTION_BASE_CLASS = 'Action';
 
 
 /**
- * @var string - Der Basisklassenname der ActionForm-Implementierung.
+ * @var string - <ActionForm> base class
  */
 const ACTION_FORM_BASE_CLASS = 'ActionForm';
 
 
 /**
- * @var string - Der Basisklassenname der RoleProcessor-Implementierung.
+ * @var string - <RoleProcessor> base class
  */
 const ROLE_PROCESSOR_BASE_CLASS = 'RoleProcessor';
 
 
 /**
- * @var string - Request- oder Session-Key, unter dem eventuelle ActionErrors gespeichert sind.
- */
-const ACTION_ERRORS_KEY = 'org.apache.struts.action.ERRORS';
-
-
-/**
- * @var string - Request- oder Session-Key, unter dem die aktuelle ActionForm-Instanz gespeichert ist.
- */
-const ACTION_FORM_KEY = 'org.apache.struts.action.FORM';
-
-
-/**
- * @var string - Request-Key, unter dem das aktuelle ActionMapping gespeichert ist.
- */
-const ACTION_MAPPING_KEY = 'org.apache.struts.action.MAPPING';
-
-
-/**
- * @var string - Request- oder Session-Key, unter dem eventuelle ActionMessages gespeichert sind.
+ * @var string - request or session key where <ActionMessages> are stored (if any)
  */
 const ACTION_MESSAGES_KEY = 'org.apache.struts.action.MESSAGES';
 
 
 /**
- * @var string - Session-Key, unter dem ein vom User gewähltes Locale gespeichert ist.
+ * @var string - request or session key where <ActionErrors> are stored (if any)
+ */
+const ACTION_ERRORS_KEY = 'org.apache.struts.action.ERRORS';
+
+
+/**
+ * @var string - request or session key where the current request's <ActionForm> is stored
+ */
+const ACTION_FORM_KEY = 'org.apache.struts.action.FORM';
+
+
+/**
+ * @var string - request key where the current request's <ActionMapping> is stored
+ */
+const ACTION_MAPPING_KEY = 'org.apache.struts.action.MAPPING';
+
+
+/**
+ * @var string - session key where the currently selected <Locale> is stored
  */
 const LOCALE_KEY = 'org.apache.struts.action.LOCALE';
 
 
 /**
- * @var string - Request-Key, unter dem die verfügbaren MessageResources gespeichert sind (für Internationalisierung).
+ * @var string - request key where available <MessageResources> are stored (i18n)
  */
 const MESSAGES_KEY = 'org.apache.struts.action.MESSAGE_RESOURCES';
 
 
 /**
- * @var string - Request-Key, unter dem das diesem Request zugeordnete Modul gespeichert ist.
+ * @var string - request key where the current request's <Module> is stored
  */
 const MODULE_KEY = 'org.apache.struts.action.MODULE';
