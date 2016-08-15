@@ -23,7 +23,7 @@
 2016-07-04
 
    - updated framework requirements:
-     minimum PHP version:      5.6
+     minimum PHP version: 5.6
      php.ini "short_open_tag": On
 
 
@@ -54,69 +54,65 @@
 
 2016-03-14
 
-   - Die Stringfunktionen strStartsWith(), strStartsWithI(), strEndsWith() und strEndsWithI() können
-     zusätzlich ein Array von mehrereren Prefixen bzw. Suffixen verarbeiten.
+   - the functions strStartsWith(), strStartsWithI(), strEndsWith() and strEndsWithI() can process a single prefix/suffix
+     or an array of prefixes/suffixes
 
 
 2016-03-06
 
-   - String-Funktionen: strLeftTo(), strRightFrom()
+   - new string functions strLeftTo(), strRightFrom()
 
 
 2016-03-03
 
-   - Zeitformate von php/util/CommonValidator::isDateTime() erweitert
+   - more date/time formats for php/util/CommonValidator::isDateTime()
 
 
 2016-03-02
 
-   - String-Funktionen: strIsSingleQuoted(), strIsDoubleQuoted(), strIsQuoted()
-                        strIsDigit()
+   - new string functions strIsSingleQuoted(), strIsDoubleQuoted(), strIsQuoted(), strIsDigit()
 
 
 2016-02-27
 
-   - Helper-Funktion: isLittleEndian()
+   - new helper function isLittleEndian()
 
 
 2016-02-25
 
-   - Funktion umbenannt: formatDate($format, $datetime) => formatDateStr($datetime, $format)
-
+   - function formatDate($format, $datetime) renamed to formatDateStr($datetime, $format)
+   
 
 2016-02-10
 
-   - Prozedural-Wrapper is_datetime() für php/util/CommonValidator::isDateTime()
+   - new helper function is_datetime() as alias for php/util/CommonValidator::isDateTime() 
 
 
 2015-09-07
 
-   - Helper-Funktionen: strContains(), strContainsI()
-   - php/util/String::contains() durch strContains() bzw. strContainsI() ersetzt
+   - new string functions strContains() and strContainsI() replace php/util/String::contains() 
 
 
 2015-09-04
 
-   - Helper-Funktionen: strStartsWith(), strStartsWithI(), strEndsWith(), strEndsWithI(),
-                        strCompare(), strCompareI(),
-                        strLeft(), strRight()
-   - php/util/String::startsWith() und php/util/String::endsWith() durch strStartsWith() bzw. strEndsWith() ersetzt
+   - new string function strStartsWith() and strStartsWithI() replace php/util/String::startsWith() 
+   - new string function strEndsWith() and strEndsWithI() replace php/util/String::endsWith()
+   - new string functions strCompare(), strCompareI(), strLeft(), strRight()
 
 
 2015-08-16
 
-   - Alias typeof() für getType()
+   - new alias typeof() for function getType()
 
 
 2015-08-03
 
-   - php/struts/Module: - die Struts4PHP-DTD liegt im Struts-Package-Verzeichnis (src/php/struts)
+   - php/struts/Module: the Struts DTD file is now loacted in the Struts package (src/php/struts)
 
 
 2014-09-25
 
-   - php/util/Logger: - Logmessages können auch per SMS verschickt werden, dazu ist ein Clickatell-Account notwendig.
-                        (Konfiguration siehe Klassenbeschreibung)
+   - php/util/Logger: log messages can be sent by SMS (Clickatell account required), for configuration @see class description
 
 
 2014-09-24
