@@ -536,6 +536,19 @@ function _true($value=null) {
 
 
 /**
+ * Return $value or $altValue if $value is TRUE. Functional equivalent of ternary test for TRUE.
+ *
+ * @param  mixed $value
+ * @param  mixed $altValue
+ *
+ * @return mixed
+ */
+function ifTrue($value, $altValue) {
+   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+}
+
+
+/**
  * Functional equivalent of the value FALSE.
  *
  * @param  mixed $value - ignored
@@ -543,6 +556,19 @@ function _true($value=null) {
  * @return FALSE
  */
 function _false($value=null) {
+   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+}
+
+
+/**
+ * Return $value or $altValue if $value is FALSE. Functional equivalent of ternary test for FALSE.
+ *
+ * @param  mixed $value
+ * @param  mixed $altValue
+ *
+ * @return mixed
+ */
+function ifFalse($value, $altValue) {
    return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
 }
 

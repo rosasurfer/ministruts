@@ -925,6 +925,19 @@ function _true($value=null) {
 
 
 /**
+ * Return $value or $altValue if $value is TRUE. Functional equivalent of ternary test for TRUE.
+ *
+ * @param  mixed $value
+ * @param  mixed $altValue
+ *
+ * @return mixed
+ */
+function ifTrue($value, $altValue) {
+   return ($value===true) ? $altValue : $value;
+}
+
+
+/**
  * Functional equivalent of the value FALSE.
  *
  * @param  mixed $value - ignored
@@ -933,6 +946,19 @@ function _true($value=null) {
  */
 function _false($value=null) {
    return false;
+}
+
+
+/**
+ * Return $value or $altValue if $value is FALSE. Functional equivalent of ternary test for FALSE.
+ *
+ * @param  mixed $value
+ * @param  mixed $altValue
+ *
+ * @return mixed
+ */
+function ifFalse($value, $altValue) {
+   return ($value===false) ? $altValue : $value;
 }
 
 
