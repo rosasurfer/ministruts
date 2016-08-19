@@ -225,7 +225,7 @@ class RequestProcessor extends Object {
       }
       else {
          // ...andererseits einfache Fehlermeldung ausgeben
-         echo <<<ERROR_SC_404
+         echo <<<PROCESS_MAPPING_ERROR_SC_404
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
 <html>
 <head>
@@ -237,7 +237,7 @@ class RequestProcessor extends Object {
 <hr>
 </body>
 </html>
-ERROR_SC_404;
+PROCESS_MAPPING_ERROR_SC_404;
       }
       return null;
    }
@@ -272,7 +272,7 @@ ERROR_SC_404;
       }
       else {
          // ...andererseits einfache Fehlermeldung ausgeben
-         echo <<<ERROR_SC_405
+         echo <<<PROCESS_METHOD_ERROR_SC_405
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
 <html>
 <head>
@@ -284,7 +284,7 @@ ERROR_SC_404;
 <hr>
 </body>
 </html>
-ERROR_SC_405;
+PROCESS_METHOD_ERROR_SC_405;
       }
       return false;
    }
