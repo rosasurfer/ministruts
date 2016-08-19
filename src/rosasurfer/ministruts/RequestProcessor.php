@@ -215,17 +215,17 @@ class RequestProcessor extends Object {
       // kein Mapping gefunden
       self::$logInfo && Logger::log('Could not find a mapping for path: '.$path, null, L_INFO, __CLASS__);
 
+      // Status-Code 404 setzen, bevor Content ausgegeben wird
+      header('HTTP/1.1 404 Not Found', true);
 
-      // TODO: Status-Code 404 im HttpResponse setzen
-
-      // falls vorhanden, ein 404-Layout einbinden
-      if ($forward = $this->module->findForward((string) HttpResponse ::SC_NOT_FOUND)) {
+      // konfiguriertes 404-Layout suchen
+      if ($forward=$this->module->findForward((string) HttpResponse::SC_NOT_FOUND)) {
+         // falls vorhanden, einbinden...
          $this->processActionForward($request, $response, $forward);
-         return null;
       }
-
-      // einfache Fehlermeldung ausgeben
-      echo <<<EOT_404
+      else {
+         // ...andererseits einfache Fehlermeldung ausgeben
+         echo <<<ERROR_SC_404
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
 <html>
 <head>
@@ -233,11 +233,12 @@ class RequestProcessor extends Object {
 </head>
 <body>
 <h1>Not Found</h1>
-<p>The requested URL $requestPath was not found on this server.</p>
+<p>The requested URL was not found on this server.</p>
 <hr>
 </body>
 </html>
-EOT_404;
+ERROR_SC_404;
+      }
       return null;
    }
 
@@ -261,17 +262,17 @@ EOT_404;
       // Beschränkung nicht erfüllt
       self::$logDebug && Logger::log('HTTP method "'.$request->getMethod().'" is not supported by ActionMapping, denying access', null, L_DEBUG, __CLASS__);
 
-      // TODO: Status-Code 405 im HttpResponse setzen
+      // Status-Code 405 setzen, bevor Content ausgegeben wird
+      header('HTTP/1.1 405 Method Not Allowed', true);
 
-      // falls vorhanden, ein 405-Layout einbinden
-      if ($forward = $this->module->findForward((string) HttpResponse ::SC_METHOD_NOT_ALLOWED)) {
+      // konfiguriertes 405-Layout suchen
+      if ($forward=$this->module->findForward((string) HttpResponse::SC_METHOD_NOT_ALLOWED)) {
+         // falls vorhanden, einbinden...
          $this->processActionForward($request, $response, $forward);
-         return false;
       }
-
-      // einfache Fehlermeldung ausgeben
-      $requestPath = $request->getPath();
-      echo <<<EOT_405
+      else {
+         // ...andererseits einfache Fehlermeldung ausgeben
+         echo <<<ERROR_SC_405
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
 <html>
 <head>
@@ -279,11 +280,12 @@ EOT_404;
 </head>
 <body>
 <h1>Method Not Allowed</h1>
-<p>The used HTTP method is not allowed for the URL $requestPath</p>
+<p>The used HTTP method is not allowed for the requested URL.</p>
 <hr>
 </body>
 </html>
-EOT_405;
+ERROR_SC_405;
+      }
       return false;
    }
 

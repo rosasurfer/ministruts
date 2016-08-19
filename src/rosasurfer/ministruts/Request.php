@@ -223,7 +223,7 @@ class Request extends Singleton {
     *                  All urls in this framework are virtual, there is no "path info" as such.
     * @example
     * <pre>
-    * "https://www.domain.tld:433/myapplication/foo/bar.html?key=value"
+    * "https://www.domain.tld:433/myapplication/module/foo/bar.html?key=value"
     * </pre>
     */
    public function getUrl() {
@@ -239,7 +239,7 @@ class Request extends Singleton {
     *                  All urls in this framework are virtual, there is no "path info" as such.
     * @example
     * <pre>
-    * "/application/foo/bar.html?key=value"
+    * "/application/module/foo/bar.html?key=value"
     * </pre>
     */
    public function getUri() {
