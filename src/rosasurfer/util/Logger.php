@@ -8,7 +8,9 @@ use rosasurfer\exception\RuntimeException;
 use rosasurfer\ministruts\Request;
 
 use function rosasurfer\echoPre;
+use function rosasurfer\ksort_r;
 use function rosasurfer\printPretty;
+use function rosasurfer\strLeftTo;
 use function rosasurfer\strStartsWith;
 
 use const rosasurfer\CLI;
@@ -23,8 +25,6 @@ use const rosasurfer\L_WARN;
 use const rosasurfer\LOCALHOST;
 use const rosasurfer\NL;
 use const rosasurfer\WINDOWS;
-use function rosasurfer\ksort_r;
-use function rosasurfer\strLeftTo;
 
 
 /**
@@ -199,7 +199,8 @@ class Logger extends StaticClass {
          if (self::$mail) {
             $mailMsg = $cliMessage.NL.$traceStr;
 
-            if ($request=Request::me()) {
+            if (!CLI) {
+               $request = Request::me();
                $session = $request->isSession() ? print_r(ksort_r($_SESSION), true) : null;
                $ip      = $_SERVER['REMOTE_ADDR'];
                $host    = getHostByAddr($ip);
@@ -309,6 +310,7 @@ class Logger extends StaticClass {
     * @param  int       $level     - zu loggender Loglevel
     */
    public static function log_1($message, \Exception $exception=null, $level) {
+      $request    = CLI ? null : Request::me();
       $cliMessage = null;
 
       try {
@@ -353,9 +355,7 @@ class Logger extends StaticClass {
                   echo '<br>'.htmlSpecialChars($exMessage, ENT_QUOTES).'<br>';
                   echo '<br>'.printPretty($exTraceStr, true).'<br>';
                }
-               if ($request=Request::me()) {
-                  echo '<br>'.printPretty('Request:'.NL.'--------'.NL.$request, true).'<br></div>'.NL;
-               }
+               echo '<br>'.printPretty('Request:'.NL.'--------'.NL.$request, true).'<br></div>'.NL;
             }
             ob_get_level() && ob_flush();
          }
@@ -365,7 +365,10 @@ class Logger extends StaticClass {
          if (self::$mail) {
             $mailMsg = $cliMessage.NL.($exception ? NL.$exMessage.NL.NL.$exTraceStr.NL : '');
 
-            if ($request=Request::me()) {
+            if (CLI) {
+               $mailMsg .= NL.NL.NL.'Shell:'.NL.'------'.NL.print_r(ksort_r($_SERVER), true).NL.NL.NL;
+            }
+            else {
                $session = $request->isSession() ? print_r(ksort_r($_SESSION), true) : null;
                $ip      = $_SERVER['REMOTE_ADDR'];
                $host    = getHostByAddr($ip);
@@ -377,9 +380,6 @@ class Logger extends StaticClass {
                         .  'Server: '.NL.'-------'.NL.print_r(ksort_r($_SERVER), true).NL.NL.NL
                         .  'IP:   '.$ip.NL
                         .  'Time: '.date('Y-m-d H:i:s').NL;
-            }
-            else {
-               $mailMsg .= NL.NL.NL.'Shell:'.NL.'------'.NL.print_r(ksort_r($_SERVER), true).NL.NL.NL;
             }
             $subject = 'PHP: '.self::$logLevels[$level].' at '.($request ? strLeftTo($request->getUrl(), '?') : $_SERVER['PHP_SELF']);
             self::mail_log($subject, $mailMsg);
