@@ -198,8 +198,12 @@ class Logger extends StaticClass {
          // 3. Exception an die konfigurierten Adressen mailen
          if (self::$mail) {
             $mailMsg = $cliMessage.NL.$traceStr;
+            $request = null;
 
-            if (!CLI) {
+            if (CLI) {
+               $mailMsg .= NL.NL.'Shell:'.NL.'------'.NL.print_r(ksort_r($_SERVER), true).NL.NL;
+            }
+            else {
                $request = Request::me();
                $session = $request->isSession() ? print_r(ksort_r($_SESSION), true) : null;
                $ip      = $_SERVER['REMOTE_ADDR'];
@@ -221,9 +225,6 @@ class Logger extends StaticClass {
                         .                                                                         NL
                         . 'IP:   '.$ip                                                           .NL
                         . 'Time: '.date('Y-m-d H:i:s')                                           .NL;
-            }
-            else {
-               $mailMsg .= NL.NL.'Shell:'.NL.'------'.NL.print_r(ksort_r($_SERVER), true).NL.NL;
             }
             $subject = 'PHP [FATAL] Unhandled Exception at '.($request ? strLeftTo($request->getUrl(), '?') : $_SERVER['PHP_SELF']);
             self::mail_log($subject, $mailMsg);
