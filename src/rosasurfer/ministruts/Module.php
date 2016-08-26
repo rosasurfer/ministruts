@@ -145,21 +145,19 @@ class Module extends Object {
       if (!is_file($fileName)) throw new FileNotFoundException('File not found: '.$fileName);
       $content = file_get_contents($fileName, false);
 
-      // die DTD liegt im Struts-Package-Verzeichnis (src/php/struts)
-      $currentDir = getCwd();                         // typically dirName(APP_ROOT.'/www/index.php');
-      $packageDir = __DIR__;
-
       /**
-       * TODO: XML ohne Verzeichniswechsel validieren
+       * TODO: struts-config.xml ohne Verzeichniswechsel validieren
        *
        * @see  http://xmlwriter.net/xml_guide/doctype_declaration.shtml
        * @see  DTD to XML schema  https://www.w3.org/2000/04/schema_hack/
        * @see  DTD to XML schema  http://www.xmlutilities.net/
        */
+      $currentDir = getCwd();                         // typically dirName(APP_ROOT.'/www/index.php');
 
-      // ins Packageverzeichnis wechseln
-      try { chDir($packageDir); }
-      catch (\Exception $ex) { throw new RuntimeException('Could not change working directory to "'.$packageDir.'"', null, $ex); }
+      // ins DTD-Verzeichnis wechseln: rosasurfer/ministruts/xml
+      $dtdDir = __DIR__.'/xml';
+      try { chDir($dtdDir); }
+      catch (\Exception $ex) { throw new RuntimeException('Could not change working directory to "'.$dtdDir.'"', null, $ex); }
 
       // Konfiguration parsen und validieren
       $xml = new \SimpleXMLElement($content, LIBXML_DTDVALID);
