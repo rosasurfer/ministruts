@@ -92,10 +92,20 @@ const MODULE_KEY = 'org.apache.struts.action.MODULE';
  * @return Url
  */
 function url() {
-   return new Url();
+  return new \rosasurfer\ministruts\url\Url();
    /*
    function ksort_r(array $values, $sort_flags=SORT_REGULAR) {
       return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
    }
    */
+}
+
+
+/**
+ * Return a new version-aware URL instance.
+ *
+ * @return VersionedUrl
+ */
+function vUrl() {
+  return new \rosasurfer\ministruts\url\VersionedUrl();
 }

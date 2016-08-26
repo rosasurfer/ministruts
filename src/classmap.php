@@ -120,6 +120,7 @@ return array(
    'rosasurfer\ministruts\StrutsController'                      => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/StrutsController',
    'Tile'                                                        => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/Tile',
    'rosasurfer\ministruts\url\Url'                               => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/url/Url',
+   'rosasurfer\ministruts\url\VersionedUrl'                      => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/url/VersionedUrl',
 
    'Date'                                                        => MINISTRUTS_ROOT.'/src/rosasurfer/util/Date',
    'DebugTools'                                                  => MINISTRUTS_ROOT.'/src/rosasurfer/util/DebugTools',

@@ -1,13 +1,11 @@
 <?php
 namespace rosasurfer\ministruts\url;
 
-use rosasurfer\core\Object;
-
 
 /**
  * URL generation helper
  */
-class Url extends Object {
+class VersionedUrl extends Url {
 
 
    /**
