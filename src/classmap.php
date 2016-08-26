@@ -119,7 +119,7 @@ return array(
    'RoleProcessor'                                               => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/RoleProcessor',
    'rosasurfer\ministruts\StrutsController'                      => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/StrutsController',
    'Tile'                                                        => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/Tile',
-   'rosasurfer\ministruts\Url'                                   => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/Url',
+   'rosasurfer\ministruts\url\Url'                               => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/url/Url',
 
    'Date'                                                        => MINISTRUTS_ROOT.'/src/rosasurfer/util/Date',
    'DebugTools'                                                  => MINISTRUTS_ROOT.'/src/rosasurfer/util/DebugTools',
