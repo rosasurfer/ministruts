@@ -24,9 +24,10 @@ class RequestProcessor extends Object {
                   /*bool*/ $logInfo,
                   /*bool*/ $logNotice;
 
-
-   // Modul, zu dem wir gehören
-   protected /*Module*/ $module;
+   /**
+    * @var Module - Modul, zu dem wir gehören
+    */
+   protected $module;
 
 
    /**

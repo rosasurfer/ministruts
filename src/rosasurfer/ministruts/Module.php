@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 use rosasurfer\core\Object;
 
 use rosasurfer\exception\ClassNotFoundException;
@@ -534,24 +534,24 @@ class Module extends Object {
                $type = (string) $tag['type'];
             }
             else if ($this->isIncludable($value, $xml)) {
-               $type = Tile ::PROP_TYPE_RESOURCE;
+               $type = Tile::PROPERTY_TYPE_RESOURCE;
             }
             else if (strEndsWithI($value, '.htm') || strEndsWithI($value, '.html')) {
                throw new RuntimeException('Tile "'.$tile->getName().'", set "'.$name.'": specify a type="string|resource" for ambiguous attribute value="'.$value.'" (looks like a filename but file not found)');
             }
             else {
-               $type = Tile ::PROP_TYPE_STRING;
+               $type = Tile::PROPERTY_TYPE_STRING;
             }
          }
          else {               // value ist im Body angegeben
             $value = trim((string) $tag);
-            $type = ($tag['type']) ? (string) $tag['type'] : Tile ::PROP_TYPE_STRING;
-            if ($type == Tile ::PROP_TYPE_RESOURCE) throw new RuntimeException('Tile "'.$tile->getName().'", set "'.$name.'": A "value" attribute must be specified when attribute type is set to "resource"');
+            $type = ($tag['type']) ? (string) $tag['type'] : Tile::PROPERTY_TYPE_STRING;
+            if ($type == Tile::PROPERTY_TYPE_RESOURCE) throw new RuntimeException('Tile "'.$tile->getName().'", set "'.$name.'": A "value" attribute must be specified when attribute type is set to "resource"');
          }
 
 
          // Ist value eine Tile, diese initialisieren.
-         if ($type == Tile ::PROP_TYPE_RESOURCE) {
+         if ($type == Tile::PROPERTY_TYPE_RESOURCE) {
             if ($this->isTile($value, $xml)) {
                $nestedTile = $this->getDefinedTile($value, $xml);
             }

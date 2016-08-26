@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 use rosasurfer\core\Object;
 
 use rosasurfer\exception\IllegalStateException;
@@ -18,8 +18,8 @@ class Tile extends Object {
    /**
     * Typenbezeichner für in einzelne Tiles mit dem <set>-Tag eingebundene, zusätzliche Eigenschaften.
     */
-   const PROP_TYPE_STRING   = 'string';
-   const PROP_TYPE_RESOURCE = 'resource';
+   const PROPERTY_TYPE_STRING   = 'string';
+   const PROPERTY_TYPE_RESOURCE = 'resource';
 
 
    /**
