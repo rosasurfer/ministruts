@@ -1,3 +1,8 @@
+2016-08-26
+
+   - new view helpers rosasurfer\ministruts\url\Url and rosasurfer\ministruts\url\VersionedUrl 
+
+
 2016-08-11
 
    - function rosasurfer\pluralize($items, $singular, $plural) for simple message forming without gettext extension
