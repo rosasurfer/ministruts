@@ -3,18 +3,10 @@ namespace rosasurfer\ministruts\url;
 
 
 /**
- * URL generation helper
+ * Version-aware URL generation helper. Appends a hash of size and last modification time of a local file to the
+ * generated URL to automatically invalidate browser and proxy caches.
  */
 class VersionedUrl extends Url {
-
-
-   /**
-    * Constructor
-    *
-    * Create a new Url instance.
-    */
-   public function __construct() {
-   }
 
 
    /**
@@ -23,6 +15,14 @@ class VersionedUrl extends Url {
     * @return string
     */
    public function __toString() {
-      return print_r($this, true);
+      $url = parent::__toString();
+
+      if (file_exists($fileName=APPLICATION_ROOT.'/www/'.$this->uri)) {
+         $version = decHex(crc32(fileSize($fileName).'|'.fileMtime($fileName)));
+
+         if (!$this->parameters) $url .= '?'.$version;
+         else                    $url .= $this->argSeparator.$version;
+      }
+      return $url;
    }
 }
