@@ -1,14 +1,24 @@
 /**
  * Extend objects.
  */
+// Internet Explorer 8 support
+if (!Array.prototype.forEach  ) Array.prototype.forEach   = function(/*function*/ func, scope) { for (var i=0, len=this.length; i < len; ++i) func.call(scope, this[i], i, this); }
+
+if (!Date.prototype.addDays   ) Date.prototype.addDays    = function(/*int*/ days)    { this.setTime(this.getTime() + (days*24*60*60*1000)); return this; }
+if (!Date.prototype.addHours  ) Date.prototype.addHours   = function(/*int*/ hours)   { this.setTime(this.getTime() + (  hours*60*60*1000)); return this; }
+if (!Date.prototype.addMinutes) Date.prototype.addMinutes = function(/*int*/ minutes) { this.setTime(this.getTime() + (   minutes*60*1000)); return this; }
+if (!Date.prototype.addSeconds) Date.prototype.addSeconds = function(/*int*/ seconds) { this.setTime(this.getTime() + (      seconds*1000)); return this; }
+
 if (!String.prototype.capitalize     ) String.prototype.capitalize      = function()                  { return this.charAt(0).toUpperCase() + this.slice(1); }
 if (!String.prototype.capitalizeWords) String.prototype.capitalizeWords = function()                  { return this.replace(/\w\S*/g, function(word) { return word.capitalize(); }); }
+if (!String.prototype.decodeEntities ) String.prototype.decodeEntities  = function()                  { if (!String.prototype.decodeEntities.textarea) /*static*/ String.prototype.decodeEntities.textarea = document.createElement('textarea'); String.prototype.decodeEntities.textarea.innerHTML = this; return String.prototype.decodeEntities.textarea.value; }
+if (!String.prototype.trim           ) String.prototype.trim            = function()                  { return this.replace(/(^\s+)|(\s+$)/g, ''); }
 if (!String.prototype.contains       ) String.prototype.contains        = function(/*string*/ string) { var pos = this.indexOf(string); return (pos != -1); }
-if (!String.prototype.decodeEntities ) String.prototype.decodeEntities  = function()                  { var txt = document.createElement('textarea'); txt.innerHTML = this; return txt.value; }
 if (!String.prototype.startsWith     ) String.prototype.startsWith      = function(/*string*/ prefix) { return (this.indexOf(prefix) === 0); }
 if (!String.prototype.endsWith       ) String.prototype.endsWith        = function(/*string*/ suffix) { var pos = this.lastIndexOf(suffix); return (pos!=-1 && this.length==pos+suffix.length); }
-if (!String.prototype.trim           ) String.prototype.trim            = function()                  { return this.replace(/(^\s+)|(\s+$)/g, ''); }
-if ('ab'.substr(-1) != 'b') {                                        // broken Internet Explorer
+
+// fix broken Internet Explorer substr()
+if ('ab'.substr(-1) != 'b') {
    String.prototype.substr = function(start, length) {
       var from = start;
          if (from < 0) from += this.length;
@@ -17,22 +27,13 @@ if ('ab'.substr(-1) != 'b') {                                        // broken I
          if (from > to) to = from;
       return this.substring(from, to);
    }
-   /*
-   String.prototype.substr = function(substr) {
-      return function(start, length) {
-         if (start < 0)
-            start = this.length + start;
-         return substr.call(this, start, length);
-      }
-   }(String.prototype.substr);
-   */
-}                                                                    // Internet Explorer 8 support
-if (!Array.prototype.forEach  ) Array.prototype.forEach   = function(/*function*/fn, scope) { for (var i=0, len=this.length; i < len; ++i) fn.call(scope, this[i], i, this); }
+}
 
-if (!Date.prototype.addDays   ) Date.prototype.addDays    = function(days)    { this.setTime(this.getTime() + (days*24*60*60*1000)); return this; }
-if (!Date.prototype.addHours  ) Date.prototype.addHours   = function(hours)   { this.setTime(this.getTime() + (  hours*60*60*1000)); return this; }
-if (!Date.prototype.addMinutes) Date.prototype.addMinutes = function(minutes) { this.setTime(this.getTime() + (   minutes*60*1000)); return this; }
-if (!Date.prototype.addSeconds) Date.prototype.addSeconds = function(seconds) { this.setTime(this.getTime() + (      seconds*1000)); return this; }
+
+/**
+ * Define our namespace.
+ */
+var rs = rs || {};
 
 
 /**
