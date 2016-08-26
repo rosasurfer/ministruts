@@ -84,3 +84,18 @@ const MESSAGES_KEY = 'org.apache.struts.action.MESSAGE_RESOURCES';
  * @var string - request key where the current request's <Module> is stored
  */
 const MODULE_KEY = 'org.apache.struts.action.MODULE';
+
+
+/**
+ * Return a new URL instance.
+ *
+ * @return Url
+ */
+function url() {
+   return new Url();
+   /*
+   function ksort_r(array $values, $sort_flags=SORT_REGULAR) {
+      return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   }
+   */
+}
