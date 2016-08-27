@@ -1,19 +1,20 @@
 <?php
-/**
- * Load the Ministruts framework.
- */
 namespace rosasurfer;
 
 use rosasurfer\exception\ClassNotFoundException;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 
+use rosasurfer\ministruts\url\Url;
+use rosasurfer\ministruts\url\VersionedUrl;
+
 use rosasurfer\util\Validator;
 
 
 /**
- * Program flow
- * ------------
+ * Load the Ministruts framework.
+ *
+ * Program flow:
  * (1) block framework re-includes
  * (2) define helper constants
  * (3) check/adjust PHP environment
@@ -1034,4 +1035,30 @@ function pluralize($count, $singular='', $plural='s') {
    if (abs($count) == 1)
       return $singular;
    return $plural;
+}
+
+
+/**
+ * Return a new URL helper instance. Procedural replacement for
+ * <tt>new \rosasurfer\ministruts\url\Url(...)</tt>.
+ *
+ * @param  string $uri - URI part of the URL to generate
+ *
+ * @return Url
+ */
+function url($uri) {
+   return new Url(...func_get_args());
+}
+
+
+/**
+ * Return a new version-aware URL helper instance. Procedural replacement for
+ * <tt>new \rosasurfer\ministruts\url\VersionedUrl(...)</tt>.
+ *
+ * @param  string $uri - URI part of the URL to generate
+ *
+ * @return VersionedUrl
+ */
+function vUrl($uri) {
+   return new VersionedUrl(...func_get_args());
 }

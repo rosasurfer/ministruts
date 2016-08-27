@@ -1,9 +1,6 @@
 <?php
 namespace rosasurfer\ministruts;
 
-use rosasurfer\ministruts\url\Url;
-use rosasurfer\ministruts\url\VersionedUrl;
-
 
 /**
  * @var string - default <tt>RequestProcessor</tt> class
@@ -87,28 +84,3 @@ const MESSAGES_KEY = 'org.apache.struts.action.MESSAGE_RESOURCES';
  * @var string - request key where the current request's <tt>Module</tt> is stored
  */
 const MODULE_KEY = 'org.apache.struts.action.MODULE';
-
-
-/**
- * Return a new URL instance. Procedural replacement for <tt>new \rosasurfer\ministruts\url\Url(...)</tt>.
- *
- * @param  string $uri - URI part of the URL to generate
- *
- * @return Url
- */
-function url($uri) {
-   return new Url(...func_get_args());
-}
-
-
-/**
- * Return a new version-aware URL instance. Procedural replacement for
- * <tt>new \rosasurfer\ministruts\url\VersionedUrl(...)</tt>.
- *
- * @param  string $uri - URI part of the URL to generate
- *
- * @return VersionedUrl
- */
-function vUrl($uri) {
-   return new VersionedUrl(...func_get_args());
-}

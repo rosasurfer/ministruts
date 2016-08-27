@@ -642,3 +642,29 @@ function ksort_r(array $values, $sort_flags=SORT_REGULAR) {
 function pluralize($count, $singular='', $plural='s') {
    return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
 }
+
+
+/**
+ * Return a new URL helper instance. Procedural replacement for
+ * <tt>new \rosasurfer\ministruts\url\Url(...)</tt>.
+ *
+ * @param  string $uri - URI part of the URL to generate
+ *
+ * @return Url
+ */
+function url($uri) {
+   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+}
+
+
+/**
+ * Return a new version-aware URL helper instance. Procedural replacement for
+ * <tt>new \rosasurfer\ministruts\url\VersionedUrl(...)</tt>.
+ *
+ * @param  string $uri - URI part of the URL to generate
+ *
+ * @return VersionedUrl
+ */
+function vUrl($uri) {
+   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+}
