@@ -76,7 +76,7 @@ define('NL' , rosasurfer\NL );
  * @return string - string if the result is to be returned, NULL otherwise
  */
 function dump($var, $return=false) {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\dump(...func_get_args());
 }
 
 
@@ -86,7 +86,7 @@ function dump($var, $return=false) {
  * @param  mixed $var
  */
 function echof($var) {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\echof(...func_get_args());
 }
 
 
@@ -100,7 +100,7 @@ function echof($var) {
  * @see    printPretty()
  */
 function echoPre($var) {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\echoPre(...func_get_args());
 }
 
 
@@ -118,7 +118,7 @@ function echoPre($var) {
  * @see    printPretty()
  */
 function pp($var, $return=false) {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\pp(...func_get_args());
 }
 
 
@@ -132,7 +132,7 @@ function pp($var, $return=false) {
  * @return string - string if the result is to be returned, NULL otherwise
  */
 function printPretty($var, $return=false) {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\printPretty(...func_get_args());
 }
 
 
@@ -144,7 +144,7 @@ function printPretty($var, $return=false) {
  * @return string - formatted byte value
  */
 function prettyBytes($value) {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\prettyBytes(...func_get_args());
 }
 
 
@@ -154,7 +154,7 @@ function prettyBytes($value) {
  * @return bool
  */
 function isLittleEndian() {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\isLittleEndian(...func_get_args());
 }
 
 
@@ -168,7 +168,7 @@ function isLittleEndian() {
  * @return bool
  */
 function strCompare($stringA, $stringB, $ignoreCase=false) {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\strCompare(...func_get_args());
 }
 
 
@@ -181,7 +181,7 @@ function strCompare($stringA, $stringB, $ignoreCase=false) {
  * @return bool
  */
 function strCompareI($stringA, $stringB) {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\strCompareI(...func_get_args());
 }
 
 
@@ -195,7 +195,7 @@ function strCompareI($stringA, $stringB) {
  * @return bool
  */
 function strContains($haystack, $needle, $ignoreCase=false) {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\strContains(...func_get_args());
 }
 
 
@@ -208,7 +208,7 @@ function strContains($haystack, $needle, $ignoreCase=false) {
  * @return bool
  */
 function strContainsI($haystack, $needle) {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\strContainsI(...func_get_args());
 }
 
 
@@ -223,7 +223,7 @@ function strContainsI($haystack, $needle) {
  * @return bool
  */
 function strStartsWith($string, $prefix, $ignoreCase=false) {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\strStartsWith(...func_get_args());
 }
 
 
@@ -237,7 +237,7 @@ function strStartsWith($string, $prefix, $ignoreCase=false) {
  * @return bool
  */
 function strStartsWithI($string, $prefix) {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\strStartsWithI(...func_get_args());
 }
 
 
@@ -252,7 +252,7 @@ function strStartsWithI($string, $prefix) {
  * @return bool
  */
 function strEndsWith($string, $suffix, $ignoreCase=false) {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\strEndsWith(...func_get_args());
 }
 
 
@@ -266,7 +266,7 @@ function strEndsWith($string, $suffix, $ignoreCase=false) {
  * @return bool
  */
 function strEndsWithI($string, $suffix) {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\strEndsWithI(...func_get_args());
 }
 
 
@@ -286,7 +286,7 @@ function strEndsWithI($string, $suffix) {
  * </pre>
  */
 function strLeft($string, $length) {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\strLeft(...func_get_args());
 }
 
 
@@ -318,7 +318,7 @@ function strLeft($string, $length) {
  * </pre>
  */
 function strLeftTo($string, $limiter, $count=1, $includeLimiter=false, $onNotFound=null) {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\strLeftTo(...func_get_args());
 }
 
 
@@ -338,7 +338,7 @@ function strLeftTo($string, $limiter, $count=1, $includeLimiter=false, $onNotFou
  * </pre>
  */
 function strRight($string, $length) {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\strRight(...func_get_args());
 }
 
 
@@ -369,7 +369,7 @@ function strRight($string, $length) {
  * </pre>
  */
 function strRightFrom($string, $limiter, $count=1, $includeLimiter=false, $onNotFound=null) {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\strRightFrom(...func_get_args());
 }
 
 
@@ -381,7 +381,7 @@ function strRightFrom($string, $limiter, $count=1, $includeLimiter=false, $onNot
  * @return bool
  */
 function strIsQuoted($value) {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\strIsQuoted(...func_get_args());
 }
 
 
@@ -393,7 +393,7 @@ function strIsQuoted($value) {
  * @return bool
  */
 function strIsSingleQuoted($value) {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\strIsSingleQuoted(...func_get_args());
 }
 
 
@@ -405,7 +405,7 @@ function strIsSingleQuoted($value) {
  * @return bool
  */
 function strIsDoubleQuoted($value) {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\strIsDoubleQuoted(...func_get_args());
 }
 
 
@@ -417,7 +417,7 @@ function strIsDoubleQuoted($value) {
  * @return bool
  */
 function strIsDigits($value) {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\strIsDigits(...func_get_args());
 }
 
 
@@ -431,7 +431,7 @@ function strIsDigits($value) {
  * @see    getType()
  */
 function typeOf($var) {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\typeOf(...func_get_args());
 }
 
 
@@ -443,7 +443,7 @@ function typeOf($var) {
  *                                         (default: 0770 = rwxrwx---)
  */
 function mkDirWritable($path, $mode=0770) {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\mkDirWritable(...func_get_args());
 }
 
 
@@ -457,7 +457,7 @@ function mkDirWritable($path, $mode=0770) {
  * @return bool
  */
 function is_class($name) {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\is_class(...func_get_args());
 }
 
 
@@ -471,7 +471,7 @@ function is_class($name) {
  * @return bool
  */
 function is_interface($name) {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\is_interface(...func_get_args());
 }
 
 
@@ -485,7 +485,7 @@ function is_interface($name) {
  * @return bool
  */
 function is_trait($name) {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\is_trait(...func_get_args());
 }
 
 
@@ -497,7 +497,7 @@ function is_trait($name) {
  * @return string metatype
  */
 function metaTypeToStr($name) {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\metaTypeToStr(...func_get_args());
 }
 
 
@@ -519,7 +519,7 @@ function metaTypeToStr($name) {
  * @see    rosasurfer\util\Validator::isDateTime()
  */
 function is_datetime($string, $format='Y-m-d') {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\is_datetime(...func_get_args());
 }
 
 
@@ -531,7 +531,7 @@ function is_datetime($string, $format='Y-m-d') {
  * @return TRUE
  */
 function _true($value=null) {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\_true(...func_get_args());
 }
 
 
@@ -544,7 +544,7 @@ function _true($value=null) {
  * @return mixed
  */
 function ifTrue($value, $altValue) {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\ifTrue(...func_get_args());
 }
 
 
@@ -556,7 +556,7 @@ function ifTrue($value, $altValue) {
  * @return FALSE
  */
 function _false($value=null) {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\_false(...func_get_args());
 }
 
 
@@ -569,7 +569,7 @@ function _false($value=null) {
  * @return mixed
  */
 function ifFalse($value, $altValue) {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\ifFalse(...func_get_args());
 }
 
 
@@ -581,7 +581,7 @@ function ifFalse($value, $altValue) {
  * @return NULL
  */
 function _null($value=null) {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\_null(...func_get_args());
 }
 
 
@@ -596,7 +596,7 @@ function _null($value=null) {
  * @see    is_null()
  */
 function ifNull($value, $altValue) {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\ifNull(...func_get_args());
 }
 
 
@@ -611,7 +611,7 @@ function ifNull($value, $altValue) {
  * @see    empty()
  */
 function ifEmpty($value, $altValue) {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\ifEmpty(...func_get_args());
 }
 
 
@@ -626,7 +626,7 @@ function ifEmpty($value, $altValue) {
  * @see    ksort()
  */
 function ksort_r(array $values, $sort_flags=SORT_REGULAR) {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\ksort_r(...func_get_args());
 }
 
 
@@ -640,7 +640,7 @@ function ksort_r(array $values, $sort_flags=SORT_REGULAR) {
  * @return string
  */
 function pluralize($count, $singular='', $plural='s') {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\pluralize(...func_get_args());
 }
 
 
@@ -653,7 +653,7 @@ function pluralize($count, $singular='', $plural='s') {
  * @return Url
  */
 function url($uri) {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\url(...func_get_args());
 }
 
 
@@ -666,5 +666,5 @@ function url($uri) {
  * @return VersionedUrl
  */
 function vUrl($uri) {
-   return call_user_func_array('rosasurfer\\'.__FUNCTION__, func_get_args());
+   return \rosasurfer\vUrl(...func_get_args());
 }
