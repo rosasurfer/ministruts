@@ -48,7 +48,7 @@ class Request extends Singleton {
 
 
    /**
-    * Return the <Singleton> instance.
+    * Return the <tt>Singleton</tt> instance.
     *
     * @return Singleton
     *
@@ -645,7 +645,7 @@ class Request extends Singleton {
 
 
    /**
-    * Store a value in the <Request> context. Can be used to transfer data from controllers or <Actions> to views.
+    * Store a value in the <tt>Request</tt> context. Can be used to transfer data from controllers or <tt>Action</tt>s to views.
     *
     * @param  string $key   - Schlüssel, unter dem der Wert gespeichert wird
     * @param  mixed  $value - der zu speichernde Wert
