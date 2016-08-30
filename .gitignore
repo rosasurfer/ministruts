@@ -1,18 +1,27 @@
 # ignore Eclipse directories and files
-.externalToolBuilders/
-.settings/
+/.externalToolBuilders/
+/.settings/
 /.buildpath
 /.project*
+
 # ignore IntelliJ directories and files
-.idea/
+/.idea/
+
 # ignore NetBeans directories and files
-.nb-gradle/
-build/
-dist/
-nbbuild/
-nbdist/
-nbproject/
+/.nb-gradle/
+/build/
+/dist/
+/nbbuild/
+/nbdist/
+/nbproject/
 /nbactions.xml
-# do not ignore the following files (globally)
+
+# do not ignore the following files
 !.gitattributes
 !.htaccess
+
+# ignore the following directories and files
+/vendor/
+/Todo*
+/TODO*
+config.properties

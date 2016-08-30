@@ -1,2 +1,5 @@
+# ignore folder "rosasurfer" (when switching branches)
+/rosasurfer/
+
 # ignore custom configurations
 /config-custom.properties
