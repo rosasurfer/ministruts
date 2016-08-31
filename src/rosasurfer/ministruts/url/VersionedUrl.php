@@ -3,8 +3,8 @@ namespace rosasurfer\ministruts\url;
 
 
 /**
- * Version-aware URL generation helper. Appends a hash of size and last modification time of a local file to the
- * generated URL to automatically invalidate browser and proxy caches.
+ * Version-aware URL generation helper. Appends a hash of file size and file last modification time of a local file
+ * to the generated URL to automatically invalidate browser and proxy caches.
  */
 class VersionedUrl extends Url {
 

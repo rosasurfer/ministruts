@@ -1058,6 +1058,8 @@ function url($uri) {
  * @param  string $uri - URI part of the URL to generate
  *
  * @return VersionedUrl
+ *
+ * @see    Url
  */
 function vUrl($uri) {
    return new VersionedUrl(...func_get_args());

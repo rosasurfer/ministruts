@@ -664,6 +664,8 @@ function url($uri) {
  * @param  string $uri - URI part of the URL to generate
  *
  * @return VersionedUrl
+ *
+ * @see    Url
  */
 function vUrl($uri) {
    return \rosasurfer\vUrl(...func_get_args());
