@@ -22,7 +22,7 @@
 
 
 # ignore the following directories and files
-/vendor/
+/composer.lock
+config.properties
 /Todo*
 /TODO*
-config.properties
