@@ -123,35 +123,24 @@ if (!CLI && (strEndsWith(strLeftTo($_SERVER['REQUEST_URI'], '?'), '/=phpinfo') |
 
 
 /**
- * (6) register class loader
+ * (6) register case-insensitive class loader
  *
  * @param  string $class
  */
 spl_autoload_register(function($class) {
-   // block re-declarations
-   if (class_exists($class, false) || interface_exists($class, false) || trait_exists($class, false))
-      return;
-
    // load and initialize class map
    static $classMap = null;
    !$classMap && $classMap=array_change_key_case(include(__DIR__.'/classmap.php'), CASE_LOWER);
 
    $classToLower = strToLower($class);
    try {
-      if (isSet($classMap[$classToLower])) {
-         $fileName = $classMap[$classToLower];
-
-         // warn if relative path found: decreases performance especially with APC setting 'apc.stat=0'
-         $relative = WINDOWS ? !preg_match('/^[a-z]:/i', $fileName) : ($fileName{0} != '/');
-         $relative && trigger_error('Found relative file name for class '.$class.': "'.$fileName.'"', E_USER_WARNING);
-
-         // load file
-         include($fileName.'.php');
-      }
+      // load file
+      if (isSet($classMap[$classToLower]))
+         include($classMap[$classToLower].'.php');
    }
    catch (\Exception $ex) {
       if (class_exists($class, false) || interface_exists($class, false) || trait_exists($class, false)) {
-         \Logger::warn(ucFirst(metaTypeToStr($class)).' '.$class.' was loaded successfully but caused an exception', $ex, __CLASS__);
+         \Logger::warn(ucFirst(metaTypeToStr($class)).' '.$class.' was loaded but file caused an exception', $ex, __CLASS__);
       }
       else throw ($ex instanceof ClassNotFoundException) ? $ex : new ClassNotFoundException('Cannot load class '.$class, null, $ex);
    }
@@ -780,9 +769,9 @@ function mkDirWritable($path, $mode=0770) {
  * @return bool
  */
 function is_class($name) {
-   if (class_exists    ($name, $autoload=false)) return true;
-   if (interface_exists($name, $autoload=false)) return false;
-   if (trait_exists    ($name, $autoload=false)) return false;
+   if (class_exists    ($name, false)) return true;
+   if (interface_exists($name, false)) return false;
+   if (trait_exists    ($name, false)) return false;
 
    try {
       $functions = spl_autoload_functions();
@@ -800,7 +789,7 @@ function is_class($name) {
       // TODO: loaders might trigger any kind of error/throw any kind of exception
    }
 
-   return class_exists($name, $autoload=false);
+   return class_exists($name, false);
 }
 
 
@@ -814,9 +803,9 @@ function is_class($name) {
  * @return bool
  */
 function is_interface($name) {
-   if (interface_exists($name, $autoload=false)) return true;
-   if (class_exists    ($name, $autoload=false)) return false;
-   if (trait_exists    ($name, $autoload=false)) return false;
+   if (interface_exists($name, false)) return true;
+   if (class_exists    ($name, false)) return false;
+   if (trait_exists    ($name, false)) return false;
 
    try {
       $functions = spl_autoload_functions();
@@ -834,7 +823,7 @@ function is_interface($name) {
       // TODO: loaders might trigger any kind of error/throw any kind of exception
    }
 
-   return interface_exists($name, $autoload=false);
+   return interface_exists($name, false);
 }
 
 
@@ -848,9 +837,9 @@ function is_interface($name) {
  * @return bool
  */
 function is_trait($name) {
-   if (trait_exists    ($name, $autoload=false)) return true;
-   if (class_exists    ($name, $autoload=false)) return false;
-   if (interface_exists($name, $autoload=false)) return false;
+   if (trait_exists    ($name, false)) return true;
+   if (class_exists    ($name, false)) return false;
+   if (interface_exists($name, false)) return false;
 
    try {
       $functions = spl_autoload_functions();
@@ -868,7 +857,7 @@ function is_trait($name) {
       // TODO: loaders might trigger any kind of error/throw any kind of exception
    }
 
-   return trait_exists($name, $autoload=false);
+   return trait_exists($name, false);
 }
 
 
