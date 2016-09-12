@@ -29,6 +29,48 @@ if ('ab'.substr(-1) != 'b') {
    }
 }
 
+// fix inaccurate Number.toFixed()
+(function() {
+   /**
+    * Decimal adjustment of a number.
+    *
+    * @param  String  type  The type of adjustment.
+    * @param  Number  value The number.
+    * @param  Integer exp   The exponent (the 10 logarithm of the adjustment base).
+    *
+    * @return Number  The adjusted value.
+    *
+    * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/round#Example:_Decimal_rounding
+    */
+   function decimalAdjust(type, value, exp) {
+      // if the exp is undefined or zero...
+      if (typeof exp === 'undefined' || +exp === 0) {
+         return Math[type](value);
+      }
+      value = +value;
+      exp = +exp;
+      // if the value is not a number or the exp is not an integer...
+      if (isNaN(value) || !(typeof exp === 'number' && exp % 1 === 0)) {
+         return NaN;
+      }
+      // shift
+      value = value.toString().split('e');
+      value = Math[type](+(value[0] + 'e' + (value[1] ? (+value[1] - exp) : -exp)));
+      // shift back
+      value = value.toString().split('e');
+      return +(value[0] + 'e' + (value[1] ? (+value[1] + exp) : exp));
+   }
+
+   // decimal round, floor and ceil
+   if (!Math.round10) Math.round10 = function(value, exp) { return decimalAdjust('round', value, exp); };
+   if (!Math.floor10) Math.floor10 = function(value, exp) { return decimalAdjust('floor', value, exp); };
+   if (!Math.ceil10)  Math.ceil10  = function(value, exp) { return decimalAdjust('ceil',  value, exp); };
+
+   Number.prototype.toFixed10 = function(precision) {
+      return Math.round10(this, -precision).toFixed(precision);
+   }
+})();
+
 
 /**
  * Define our namespace.
