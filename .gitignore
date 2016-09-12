@@ -25,5 +25,3 @@
 /vendor/
 /composer.lock
 config.properties
-/Todo*
-/TODO*
