@@ -4,10 +4,9 @@
     "type":        "library",
     "homepage":    "http://ministruts.rosasurfer.com/",
     "license":     "RSL",
-    "authors": [{
-        "name":  "Peter Walther",
-        "email": "ministruts@rosasurfer.com"
-    }],
+    "authors": [
+        { "name": "Peter Walther", "email": "ministruts@rosasurfer.com" }
+    ],
     "config": {
         "vendor-dir":            "etc/vendor",
         "classmap-authoritative": true
