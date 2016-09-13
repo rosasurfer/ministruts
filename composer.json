@@ -3,10 +3,11 @@
     "description": "Struts 1.2 like MVC web framework for PHP",
     "type":        "library",
     "homepage":    "http://ministruts.rosasurfer.com/",
-    "license":     "RSL",
-    "authors": [
-        { "name": "Peter Walther", "email": "ministruts@rosasurfer.com" }
-    ],
+    "license":     "WTFPL",
+    "authors": [{ 
+        "name":  "Peter Walther", 
+        "email": "ministruts@rosasurfer.com" 
+    }],
     "config": {
         "vendor-dir":            "etc/vendor",
         "classmap-authoritative": true
