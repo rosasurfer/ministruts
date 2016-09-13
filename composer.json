@@ -8,13 +8,14 @@
         "name":  "Peter Walther",
         "email": "ministruts@rosasurfer.com"
     }],
+    "config": {
+        "vendor-dir":            "etc/vendor",
+        "classmap-authoritative": true
+    },
     "require": {
         "php": ">=5.6"
     },
     "autoload": {
         "classmap": ["src/"]
-    },   
-    "config": {
-        "classmap-authoritative": true
-    }
+    }   
 }

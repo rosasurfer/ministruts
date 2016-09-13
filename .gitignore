@@ -22,6 +22,6 @@
 
 
 # ignore the following folders and files
-/vendor/
+vendor/
 /composer.lock
 config.properties
