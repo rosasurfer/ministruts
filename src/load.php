@@ -82,7 +82,6 @@ define('rosasurfer\NL' , "\n"   );
 /**
  * (3) check/adjust PHP environment
  */
-(PHP_VERSION < '5.6')            && exit(1|echoPre('application error')|error_log('Error: A PHP version >= 5.6 is required (found version '.PHP_VERSION.').'));
 !ini_get('short_open_tag')       && exit(1|echoPre('application error')|error_log('Error: The PHP configuration value "short_open_tag" must be enabled.'));
 ini_get('request_order') != 'GP' && exit(1|echoPre('application error')|error_log('Error: The PHP configuration value "request_order" must be "GP".'));
 
