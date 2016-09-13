@@ -1,13 +1,13 @@
-# ignore Eclipse directories and files
+# ignore Eclipse folders and files
 /.externalToolBuilders/
 /.settings/
 /.buildpath
 /.project*
 
-# ignore IntelliJ directories and files
+# ignore IntelliJ folders and files
 /.idea/
 
-# ignore NetBeans directories and files
+# ignore NetBeans folders and files
 /.nb-gradle/
 /build/
 /dist/
@@ -20,8 +20,8 @@
 !.gitattributes
 !.htaccess
 
-# ignore the following directories and files
+
+# ignore the following folders and files
 /vendor/
-/Todo*
-/TODO*
+/composer.lock
 config.properties
