@@ -1,19 +1,20 @@
 {
-   "name":        "rosasurfer/ministruts",
-   "description": "Struts 1.2 like MVC web framework for PHP",
-   "type":        "library",
-   "license":     "RSL",
-   "authors": [{
-      "name":  "Peter Walther",
-      "email": "ministruts@rosasurfer.com"
-   }],
-   "require": {
-      "php": ">=5.6"
-   },
-   "autoload": {
-      "classmap": ["src/"]
-   },   
-   "config": {
-      "classmap-authoritative": true
-   }
+    "name":        "rosasurfer/ministruts",
+    "description": "Struts 1.2 like MVC web framework for PHP",
+    "type":        "library",
+    "homepage":    "http://ministruts.rosasurfer.com/",
+    "license":     "RSL",
+    "authors": [{
+        "name":  "Peter Walther",
+        "email": "ministruts@rosasurfer.com"
+    }],
+    "require": {
+        "php": ">=5.6"
+    },
+    "autoload": {
+        "classmap": ["src/"]
+    },   
+    "config": {
+        "classmap-authoritative": true
+    }
 }
