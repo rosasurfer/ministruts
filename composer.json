@@ -2,7 +2,7 @@
    "name":        "rosasurfer/ministruts",
    "description": "Struts 1.2 like MVC web framework for PHP",
    "type":        "library",
-   "license":     "Beerware",
+   "license":     "RSL",
    "authors": [{
       "name":  "Peter Walther",
       "email": "ministruts@rosasurfer.com"
