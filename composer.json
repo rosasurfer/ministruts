@@ -9,8 +9,7 @@
         "email": "ministruts@rosasurfer.com" 
     }],
     "config": {
-        "vendor-dir":            "etc/vendor",
-        "classmap-authoritative": true
+        "vendor-dir": "etc/vendor"
     },
     "require": {
         "php": ">=5.6"
