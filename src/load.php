@@ -18,7 +18,7 @@ use rosasurfer\util\Validator;
  * (1) block framework re-includes
  * (2) define helper constants
  * (3) check/adjust PHP environment
- * (4) execute phpinfo() if applicable
+ * (4) execute phpinfo() if magic parameter specified
  * (5) check/adjust application requirements
  * (6) register class loader
  * (7) include namespaced functions and constants
@@ -107,9 +107,9 @@ ini_set('zend.detect_unicode'     ,  1                     );     // BOM header 
 
 
 /**
- * (4) execute phpInfo() if applicable: authorization must be handled by the server
+ * (4) execute phpInfo() if magic parameter specified
  */
-if (!CLI && (strEndsWith(strLeftTo($_SERVER['REQUEST_URI'], '?'), '/=phpinfo') || strEndsWith(strLeftTo($_SERVER['REQUEST_URI'], '?'), '/=phpinfo.php'))) {
+if (LOCALHOST && (strEndsWith(strLeftTo($_SERVER['REQUEST_URI'], '?'), '/=phpinfo') || strEndsWith(strLeftTo($_SERVER['REQUEST_URI'], '?'), '/=phpinfo.php'))) {
    include(MINISTRUTS_ROOT.'/src/rosasurfer/util/phpinfo.php');
    exit(0);
 }
@@ -130,7 +130,7 @@ if (!CLI && (strEndsWith(strLeftTo($_SERVER['REQUEST_URI'], '?'), '/=phpinfo') |
 spl_autoload_register(function($class) {
    // load and initialize class map
    static $classMap = null;
-   !$classMap && $classMap=array_change_key_case(include(__DIR__.'/classmap.php'), CASE_LOWER);
+   !$classMap && $classMap=array_change_key_case(include(MINISTRUTS_ROOT.'/src/rosasurfer/loader/classmap.php'), CASE_LOWER);
 
    $classToLower = strToLower($class);
    try {
