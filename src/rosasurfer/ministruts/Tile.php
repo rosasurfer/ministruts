@@ -217,6 +217,3 @@ class Tile extends Object {
       echo ($this->parent ? "\n<!-- #end: ".$this->label." -->\n" : null);
    }
 }
-
-
-!defined('rosasurfer\ministruts\MODULE_KEY') && include(__DIR__.'/definitions.php');

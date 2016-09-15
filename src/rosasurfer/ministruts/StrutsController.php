@@ -170,6 +170,3 @@ class StrutsController extends Singleton {
       return new $class($module);
    }
 }
-
-
-!defined(__NAMESPACE__.'\MODULE_KEY') && include(__DIR__.'/definitions.php');

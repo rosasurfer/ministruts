@@ -106,6 +106,3 @@ abstract class Action extends Object {
       return $this->mapping->findForward($name);
    }
 }
-
-
-!defined('rosasurfer\ministruts\MODULE_KEY') && include(__DIR__.'/definitions.php');

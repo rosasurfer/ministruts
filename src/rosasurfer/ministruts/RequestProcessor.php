@@ -520,6 +520,3 @@ PROCESS_METHOD_ERROR_SC_405;
       }
    }
 }
-
-
-!defined('rosasurfer\ministruts\MODULE_KEY') && include(__DIR__.'/definitions.php');

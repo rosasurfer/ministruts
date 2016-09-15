@@ -21,8 +21,9 @@ use rosasurfer\util\Validator;
  * (4) execute phpinfo() if applicable
  * (5) check/adjust application requirements
  * (6) register class loader
- * (7) setup error and exception handling
- * (8) define helper functions
+ * (7) include namespaced functions and constants
+ * (8) setup error and exception handling
+ * (9) define helper functions
  */
 
 
@@ -147,13 +148,19 @@ spl_autoload_register(function($class) {
 
 
 /**
- * (7) setup error and exception handling
+ * (7) include namespaced functions and constants
+ */
+include(MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/ns_definitions.php');
+
+
+/**
+ * (8) setup error and exception handling
  */
 \System::setupErrorHandling();
 
 
 /**
- * (8) define namespaced helper functions
+ * (9) define namespaced helper functions
  */
 
 /**

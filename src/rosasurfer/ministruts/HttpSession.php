@@ -224,6 +224,3 @@ class HttpSession extends Singleton {
       return isSet($_SESSION[$key]);
    }
 }
-
-
-!defined('rosasurfer\ministruts\MODULE_KEY') && include(__DIR__.'/definitions.php');

@@ -887,6 +887,3 @@ class Request extends Singleton {
       return $string;
    }
 }
-
-
-!defined(__NAMESPACE__.'\MODULE_KEY') && include(__DIR__.'/definitions.php');

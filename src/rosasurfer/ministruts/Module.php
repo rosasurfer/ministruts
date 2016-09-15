@@ -948,6 +948,3 @@ class Module extends Object {
       return null;
    }
 }
-
-
-!defined('rosasurfer\ministruts\MODULE_KEY') && include(__DIR__.'/definitions.php');
