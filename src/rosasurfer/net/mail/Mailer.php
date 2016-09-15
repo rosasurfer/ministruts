@@ -3,8 +3,8 @@ use rosasurfer\core\Object;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\util\Validator;
 
-use const rosasurfer\strEndsWith;
-use const rosasurfer\strStartsWith;
+use function rosasurfer\strEndsWith;
+use function rosasurfer\strStartsWith;
 
 
 /**

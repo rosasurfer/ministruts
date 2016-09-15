@@ -5,7 +5,7 @@ use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
 
-use const rosasurfer\mkDirWritable;
+use function rosasurfer\mkDirWritable;
 
 
 /**

@@ -2,7 +2,9 @@
 use rosasurfer\core\Object;
 use rosasurfer\ministruts\Request;
 
+use function rosasurfer\strEndsWith;
 use function rosasurfer\strRightFrom;
+use function rosasurfer\strStartsWith;
 
 use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_INFO;

@@ -2,7 +2,7 @@
 use rosasurfer\core\StaticClass;
 use rosasurfer\ministruts\Request;
 
-use const rosasurfer\strContains;
+use function rosasurfer\strContains;
 
 
 /**

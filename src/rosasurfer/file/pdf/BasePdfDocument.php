@@ -3,8 +3,8 @@ use rosasurfer\core\Object;
 
 use rosasurfer\exception\RuntimeException;
 
-use const rosasurfer\echoPre;
-use const rosasurfer\strEndsWith;
+use function rosasurfer\echoPre;
+use function rosasurfer\strEndsWith;
 
 use const rosasurfer\L_DEBUG;
 

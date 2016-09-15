@@ -1,7 +1,7 @@
 <?php
 use rosasurfer\exception\IllegalTypeException;
 
-use const rosasurfer\mkDirWritable;
+use function rosasurfer\mkDirWritable;
 
 
 /**
