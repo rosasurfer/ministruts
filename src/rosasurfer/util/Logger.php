@@ -213,18 +213,18 @@ class Logger extends StaticClass {
 
                $mailMsg .= NL
                         .  NL
-                        . 'Request:'                                                             .NL
-                        . '--------'                                                             .NL
-                        .  $request                                                              .NL
-                        .                                                                         NL
-                        . 'Session: '.($session ? NL.'--------'.NL.$session : '  - no session -').NL
-                        .                                                                         NL
-                        . 'Server:'                                                              .NL
-                        . '-------'                                                              .NL
-                        .  print_r(ksort_r($_SERVER), true)                                      .NL
-                        .                                                                         NL
-                        . 'IP:   '.$ip                                                           .NL
-                        . 'Time: '.date('Y-m-d H:i:s')                                           .NL;
+                        . 'Request:'                                                   .NL
+                        . '--------'                                                   .NL
+                        .  $request                                                    .NL
+                        .                                                               NL
+                        . 'Session: '.($session ? NL.'--------'.NL.$session : '(none)').NL
+                        .                                                               NL
+                        . 'Server:'                                                    .NL
+                        . '-------'                                                    .NL
+                        .  print_r(ksort_r($_SERVER), true)                            .NL
+                        .                                                               NL
+                        . 'IP:   '.$ip                                                 .NL
+                        . 'Time: '.date('Y-m-d H:i:s')                                 .NL;
             }
             $subject = 'PHP [FATAL] Unhandled Exception at '.($request ? strLeftTo($request->getUrl(), '?') : $_SERVER['PHP_SELF']);
             self::mail_log($subject, $mailMsg);
@@ -377,7 +377,7 @@ class Logger extends StaticClass {
                   $ip .= ' ('.$host.')';
 
                $mailMsg .= NL.NL.NL.'Request:'.NL.'--------'.NL.$request.NL.NL.NL
-                        .  'Session: '.($session ? NL.'--------'.NL.$session : '  - no session -').NL.NL.NL
+                        .  'Session: '.($session ? NL.'--------'.NL.$session : '(none)').NL.NL.NL
                         .  'Server: '.NL.'-------'.NL.print_r(ksort_r($_SERVER), true).NL.NL.NL
                         .  'IP:   '.$ip.NL
                         .  'Time: '.date('Y-m-d H:i:s').NL;
