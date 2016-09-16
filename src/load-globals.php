@@ -1,58 +1,59 @@
 <?php
 /**
- * block framework re-includes
+ * Load the Ministruts framework.
+ *
+ * If the framework is loaded via this script the framework helper constants and functions are additionally mapped
+ * to the global namespace. Otherwise there are no differences.
  */
-if (defined('rosasurfer\MINISTRUTS_ROOT')) return;
 
+// block re-includes
+if (defined('rosasurfer\MINISTRUTS_ROOT'))
+   return;
 
-/**
- * require namespaced loader
- */
+// regularily load the framework
 require(__DIR__.'/load.php');
 
 
-/**
- * define namespaced helper constants and functions globally
- */
-define('CLI'      , rosasurfer\CLI      );                                    // whether or not we run on a command line interface
-define('LOCALHOST', rosasurfer\LOCALHOST);                                    // whether or not we run on localhost
-define('WINDOWS'  , rosasurfer\WINDOWS  );                                    // whether or not we run on Windows
 
+// map framework helpers to global namespace (@see descriptions in load.php)
 // custom log level
-define('L_DEBUG' , rosasurfer\L_DEBUG );
-define('L_INFO'  , rosasurfer\L_INFO  );
-define('L_NOTICE', rosasurfer\L_NOTICE);
-define('L_WARN'  , rosasurfer\L_WARN  );
-define('L_ERROR' , rosasurfer\L_ERROR );
-define('L_FATAL' , rosasurfer\L_FATAL );
+const L_DEBUG           = \rosasurfer\L_DEBUG;
+const L_INFO            = \rosasurfer\L_INFO;
+const L_NOTICE          = \rosasurfer\L_NOTICE;
+const L_WARN            = \rosasurfer\L_WARN;
+const L_ERROR           = \rosasurfer\L_ERROR;
+const L_FATAL           = \rosasurfer\L_FATAL;
 
 // log destinations for the built-in function error_log()
-define('ERROR_LOG_DEFAULT', rosasurfer\ERROR_LOG_DEFAULT);                    // message is sent to the configured log or the system logger
-define('ERROR_LOG_MAIL'   , rosasurfer\ERROR_LOG_MAIL   );                    // message is sent by email
-define('ERROR_LOG_DEBUG'  , rosasurfer\ERROR_LOG_DEBUG  );                    // message is sent through the PHP debugging connection
-define('ERROR_LOG_FILE'   , rosasurfer\ERROR_LOG_FILE   );                    // message is appended to a file destination
-define('ERROR_LOG_SAPI'   , rosasurfer\ERROR_LOG_SAPI   );                    // message is sent directly to the SAPI logging handler
+const ERROR_LOG_DEFAULT = \rosasurfer\ERROR_LOG_DEFAULT;
+const ERROR_LOG_MAIL    = \rosasurfer\ERROR_LOG_MAIL;
+const ERROR_LOG_DEBUG   = \rosasurfer\ERROR_LOG_DEBUG;
+const ERROR_LOG_FILE    = \rosasurfer\ERROR_LOG_FILE;
+const ERROR_LOG_SAPI    = \rosasurfer\ERROR_LOG_SAPI;
 
 // time periods
-define('SECOND', rosasurfer\SECOND); define('SECONDS', rosasurfer\SECONDS);
-define('MINUTE', rosasurfer\MINUTE); define('MINUTES', rosasurfer\MINUTES);
-define('HOUR'  , rosasurfer\HOUR  ); define('HOURS'  , rosasurfer\HOURS  );
-define('DAY'   , rosasurfer\DAY   ); define('DAYS'   , rosasurfer\DAYS   );
-define('WEEK'  , rosasurfer\WEEK  ); define('WEEKS'  , rosasurfer\WEEKS  );
-define('MONTH' , rosasurfer\MONTH ); define('MONTHS' , rosasurfer\MONTHS );   // fuzzy but garantied to cover any month
-define('YEAR'  , rosasurfer\YEAR  ); define('YEARS'  , rosasurfer\YEARS  );   // fuzzy but garantied to cover any year
+const SECOND            = \rosasurfer\SECOND; const SECONDS = SECOND;
+const MINUTE            = \rosasurfer\MINUTE; const MINUTES = MINUTE;
+const HOUR              = \rosasurfer\HOUR;   const HOURS   = HOUR;
+const DAY               = \rosasurfer\DAY;    const DAYS    = DAY;
+const WEEK              = \rosasurfer\WEEK;   const WEEKS   = WEEK;
+const MONTH             = \rosasurfer\MONTH;  const MONTHS  = MONTH;
+const YEAR              = \rosasurfer\YEAR;   const YEARS   = YEAR;
 
 // weekdays
-define('SUNDAY'   , rosasurfer\SUNDAY   );
-define('MONDAY'   , rosasurfer\MONDAY   );
-define('TUESDAY'  , rosasurfer\TUESDAY  );
-define('WEDNESDAY', rosasurfer\WEDNESDAY);
-define('THURSDAY' , rosasurfer\THURSDAY );
-define('FRIDAY'   , rosasurfer\FRIDAY   );
-define('SATURDAY' , rosasurfer\SATURDAY );
+const SUNDAY            = \rosasurfer\SUNDAY;
+const MONDAY            = \rosasurfer\MONDAY;
+const TUESDAY           = \rosasurfer\TUESDAY;
+const WEDNESDAY         = \rosasurfer\WEDNESDAY;
+const THURSDAY          = \rosasurfer\THURSDAY;
+const FRIDAY            = \rosasurfer\FRIDAY;
+const SATURDAY          = \rosasurfer\SATURDAY;
 
 // miscellaneous
-define('NL', rosasurfer\NL);
+const CLI               = \rosasurfer\CLI;
+const LOCALHOST         = \rosasurfer\LOCALHOST;
+const WINDOWS           = \rosasurfer\WINDOWS;
+const NL                = \rosasurfer\NL;
 
 
 /**
