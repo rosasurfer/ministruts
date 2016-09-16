@@ -13,29 +13,26 @@ define('rosasurfer\MINISTRUTS_ROOT', dirName(__DIR__));
  * Load the Ministruts framework.
  *
  * Program flow:
- * (1) define helper constants
- * (2) include required non-class files (helper definitions)
+ * (1) include required non-class files
  *
- * (3) register class loader
- * (4) setup error handling
+ * (2) register class loader
+ * (3) setup error handling
  *
- * (6) check/adjust application requirements
+ * (4) check/adjust application requirements
  * (5) check/adjust PHP requirements
- * (7) execute phpinfo() if applicable
+ * (6) execute phpinfo() if applicable
  */
 
 
-
-
 /**
- * (2) include always required non-class files (utility constants and functions)
+ * (1) include utility constants and helper functions (non-class files)
  */
-include(MINISTRUTS_ROOT.'/src/rosasurfer/ns_definitions.php');
-include(MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/ns_definitions.php');
+include(MINISTRUTS_ROOT.'/src/rosasurfer/utils.php');
+include(MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/utils.php');
 
 
 /**
- * (3) register case-insensitive class loader
+ * (2) register case-insensitive class loader
  *
  * @param  string $class
  */
@@ -60,20 +57,20 @@ spl_autoload_register(function($class) {
 
 
 /**
- * (4) setup error handling
+ * (3) setup error handling
  */
 \System::setupErrorHandling();
 
 
 /**
- * (5) check/adjust application requirements
+ * (4) check/adjust application requirements
  */
 !defined('\APPLICATION_ROOT') && exit(1|echoPre('application error')|error_log('Error: The global constant APPLICATION_ROOT must be defined.'));
 !defined('\APPLICATION_ID'  ) && define('APPLICATION_ID', md5(\APPLICATION_ROOT));
 
 
 /**
- * (6) check/adjust PHP requirements
+ * (5) check/adjust PHP requirements
  */
 !ini_get('short_open_tag')       && exit(1|echoPre('application error')|error_log('Error: The PHP configuration value "short_open_tag" must be enabled.'));
 ini_get('request_order') != 'GP' && exit(1|echoPre('application error')|error_log('Error: The PHP configuration value "request_order" must be "GP".'));
@@ -99,7 +96,7 @@ ini_set('zend.detect_unicode'     ,  1                     );     // BOM header 
 
 
 /**
- * (7) execute phpInfo() if magic parameter specified (localhost only)
+ * (6) execute phpInfo() if magic parameter specified (localhost only)
  */
 if (LOCALHOST && (strEndsWith(strLeftTo($_SERVER['REQUEST_URI'], '?'), '/=phpinfo') || strEndsWith(strLeftTo($_SERVER['REQUEST_URI'], '?'), '/=phpinfo.php'))) {
    include(MINISTRUTS_ROOT.'/src/rosasurfer/util/phpinfo.php');
