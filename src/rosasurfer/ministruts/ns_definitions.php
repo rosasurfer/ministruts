@@ -1,5 +1,13 @@
 <?php
+/**
+ * Package constants and functions.
+ */
 namespace rosasurfer\ministruts;
+
+
+// block re-includes
+if (defined(__NAMESPACE__.'\DEFAULT_REQUEST_PROCESSOR_CLASS'))
+   return;
 
 
 /**

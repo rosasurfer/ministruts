@@ -14,7 +14,7 @@ require(__DIR__.'/load.php');
 /**
  * define namespaced helper constants and functions globally
  */
-define('CLI'      , rosasurfer\CLI      );                                    // whether or not we run on command line interface
+define('CLI'      , rosasurfer\CLI      );                                    // whether or not we run on a command line interface
 define('LOCALHOST', rosasurfer\LOCALHOST);                                    // whether or not we run on localhost
 define('WINDOWS'  , rosasurfer\WINDOWS  );                                    // whether or not we run on Windows
 
