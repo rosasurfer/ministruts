@@ -15,8 +15,53 @@ use rosasurfer\util\Validator;
 
 
 // block re-includes
-if (function_exists(__NAMESPACE__.'\dump'))
+if (defined(__NAMESPACE__.'\CLI'))
    return;
+
+
+/**
+ * helper constants
+ */
+define(__NAMESPACE__.'\CLI'      , !isSet($_SERVER['REQUEST_METHOD']));              // whether or not we run on a command line interface
+define(__NAMESPACE__.'\LOCALHOST', !CLI && @$_SERVER['REMOTE_ADDR']=='127.0.0.1');   // whether or not we run on localhost
+define(__NAMESPACE__.'\WINDOWS'  , (strToUpper(subStr(PHP_OS, 0, 3))=='WIN'));       // whether or not we run on Windows
+
+// custom log level
+const L_DEBUG           =  1;
+const L_INFO            =  2;
+const L_NOTICE          =  4;
+const L_WARN            =  8;
+const L_ERROR           = 16;
+const L_FATAL           = 32;
+
+// log destinations for the built-in function error_log()
+const ERROR_LOG_DEFAULT =  0;                                        // message is sent to the configured log or the system logger
+const ERROR_LOG_MAIL    =  1;                                        // message is sent by email
+const ERROR_LOG_DEBUG   =  2;                                        // message is sent through the PHP debugging connection
+const ERROR_LOG_FILE    =  3;                                        // message is appended to a file destination
+const ERROR_LOG_SAPI    =  4;                                        // message is sent directly to the SAPI logging handler
+
+// time periods
+const SECOND            =   1;           const SECONDS = SECOND;
+const MINUTE            =  60 * SECONDS; const MINUTES = MINUTE;
+const HOUR              =  60 * MINUTES; const HOURS   = HOUR;
+const DAY               =  24 * HOURS;   const DAYS    = DAY;
+const WEEK              =   7 * DAYS;    const WEEKS   = WEEK;
+const MONTH             =  31 * DAYS;    const MONTHS  = MONTH;      // fuzzy but garantied to cover any month
+const YEAR              = 366 * DAYS;    const YEARS   = YEAR;       // fuzzy but garantied to cover any year
+
+// weekdays
+const SUNDAY            = 0;
+const MONDAY            = 1;
+const TUESDAY           = 2;
+const WEDNESDAY         = 3;
+const THURSDAY          = 4;
+const FRIDAY            = 5;
+const SATURDAY          = 6;
+
+// miscellaneous
+const NL                = "\n";
+!defined('PHP_INT_MIN') && define('PHP_INT_MIN', ~PHP_INT_MAX);      // global definition (built-in since PHP 7.0)
 
 
 /**

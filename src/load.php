@@ -14,7 +14,7 @@ define('rosasurfer\MINISTRUTS_ROOT', dirName(__DIR__));
  *
  * Program flow:
  * (1) define helper constants
- * (2) include required non-class files
+ * (2) include required non-class files (helper definitions)
  *
  * (3) register class loader
  * (4) setup error handling
@@ -25,49 +25,6 @@ define('rosasurfer\MINISTRUTS_ROOT', dirName(__DIR__));
  */
 
 
-/**
- * (1) define namespaced helper constants
- */
-define('rosasurfer\CLI'      , !isSet($_SERVER['REQUEST_METHOD']));                 // whether or not we run on a command line interface
-define('rosasurfer\LOCALHOST', !CLI && @$_SERVER['REMOTE_ADDR']=='127.0.0.1');      // whether or not we run on localhost
-define('rosasurfer\WINDOWS'  , (strToUpper(subStr(PHP_OS, 0, 3))=='WIN'));          // whether or not we run on Windows
-
-// custom log level
-define('rosasurfer\L_DEBUG' ,  1);
-define('rosasurfer\L_INFO'  ,  2);
-define('rosasurfer\L_NOTICE',  4);
-define('rosasurfer\L_WARN'  ,  8);
-define('rosasurfer\L_ERROR' , 16);
-define('rosasurfer\L_FATAL' , 32);
-
-// log destinations for the built-in function error_log()
-define('rosasurfer\ERROR_LOG_DEFAULT', 0);                                          // message is sent to the configured log or the system logger
-define('rosasurfer\ERROR_LOG_MAIL'   , 1);                                          // message is sent by email
-define('rosasurfer\ERROR_LOG_DEBUG'  , 2);                                          // message is sent through the PHP debugging connection
-define('rosasurfer\ERROR_LOG_FILE'   , 3);                                          // message is appended to a file destination
-define('rosasurfer\ERROR_LOG_SAPI'   , 4);                                          // message is sent directly to the SAPI logging handler
-
-// time periods
-define('rosasurfer\SECOND',   1          ); define('rosasurfer\SECONDS', SECOND);
-define('rosasurfer\MINUTE',  60 * SECONDS); define('rosasurfer\MINUTES', MINUTE);
-define('rosasurfer\HOUR'  ,  60 * MINUTES); define('rosasurfer\HOURS'  , HOUR  );
-define('rosasurfer\DAY'   ,  24 * HOURS  ); define('rosasurfer\DAYS'   , DAY   );
-define('rosasurfer\WEEK'  ,   7 * DAYS   ); define('rosasurfer\WEEKS'  , WEEK  );
-define('rosasurfer\MONTH' ,  31 * DAYS   ); define('rosasurfer\MONTHS' , MONTH );   // fuzzy but garantied to cover any month
-define('rosasurfer\YEAR'  , 366 * DAYS   ); define('rosasurfer\YEARS'  , YEAR  );   // fuzzy but garantied to cover any year
-
-// weekdays
-define('rosasurfer\SUNDAY'   , 0);
-define('rosasurfer\MONDAY'   , 1);
-define('rosasurfer\TUESDAY'  , 2);
-define('rosasurfer\WEDNESDAY', 3);
-define('rosasurfer\THURSDAY' , 4);
-define('rosasurfer\FRIDAY'   , 5);
-define('rosasurfer\SATURDAY' , 6);
-
-// miscellaneous
-define('rosasurfer\NL', "\n");
-!defined('PHP_INT_MIN') && define('PHP_INT_MIN', ~PHP_INT_MAX);                     // global definition (built-in since PHP 7.0)
 
 
 /**
