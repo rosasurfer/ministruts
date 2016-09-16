@@ -66,8 +66,7 @@ define('rosasurfer\FRIDAY'   , 5);
 define('rosasurfer\SATURDAY' , 6);
 
 // miscellaneous
-define('rosasurfer\EOL', PHP_EOL);
-define('rosasurfer\NL' , "\n"   );
+define('rosasurfer\NL', "\n");
 !defined('PHP_INT_MIN') && define('PHP_INT_MIN', ~PHP_INT_MAX);                     // global definition (built-in since PHP 7.0)
 
 

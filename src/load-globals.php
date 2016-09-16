@@ -52,8 +52,7 @@ define('FRIDAY'   , rosasurfer\FRIDAY   );
 define('SATURDAY' , rosasurfer\SATURDAY );
 
 // miscellaneous
-define('EOL', rosasurfer\EOL);
-define('NL' , rosasurfer\NL );
+define('NL', rosasurfer\NL);
 
 
 /**
