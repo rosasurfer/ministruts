@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\net\messenger\sms\clickatell;
+namespace rosasurfer\net\messenger\sms;
 
 use rosasurfer\exception\UnimplementedFeatureException;
 
