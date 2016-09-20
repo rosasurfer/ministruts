@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\net\messenger\irc;
+namespace rosasurfer\net\messenger\im;
 
 use rosasurfer\exception\UnimplementedFeatureException;
 
