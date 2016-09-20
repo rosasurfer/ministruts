@@ -1,4 +1,6 @@
 <?php
+namespace rosasurfer\cache;
+
 use rosasurfer\core\StaticClass;
 use rosasurfer\exception\IllegalTypeException;
 
@@ -63,8 +65,8 @@ final class Cache extends StaticClass {
 
       if (!isSet(self::$caches[$label])) {
          // Cache-Konfiguration auslesen und Cache instantiieren
-         $class   = Config::getDefault()->get('cache.'.$label.'.class');
-         $options = Config::getDefault()->get('cache.'.$label.'.options', null);
+         $class   = \Config::getDefault()->get('cache.'.$label.'.class');
+         $options = \Config::getDefault()->get('cache.'.$label.'.options', null);
 
          self::$caches[$label] = new $class($label, $options);
       }

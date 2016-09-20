@@ -1,4 +1,6 @@
 <?php
+use rosasurfer\cache\Cache;
+
 use rosasurfer\core\StaticClass;
 
 use rosasurfer\exception\IllegalTypeException;
@@ -72,7 +74,7 @@ class TorHelper extends StaticClass {
     * @return array - assoziatives Array mit den IP-Adressen aller Exit-Nodes
     */
    private static function &getExitNodes() {
-      $cache = Cache ::me(__CLASS__);
+      $cache = Cache::me(__CLASS__);
       $nodes = $cache->get($key='tor_exit_nodes');
 
       if ($nodes == null) {

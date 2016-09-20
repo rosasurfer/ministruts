@@ -1,4 +1,6 @@
 <?php
+use rosasurfer\cache\Cache;
+
 use rosasurfer\core\Object;
 
 use rosasurfer\exception\IllegalTypeException;

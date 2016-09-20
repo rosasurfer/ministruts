@@ -21,11 +21,11 @@ return array(
    'rosasurfer\acl\adapter\DbAdapter'                            => MINISTRUTS_ROOT.'/src/rosasurfer/acl/adapter/DbAdapter',
    'rosasurfer\acl\adapter\IniFileAdapter'                       => MINISTRUTS_ROOT.'/src/rosasurfer/acl/adapter/IniFileAdapter',
 
-   'ApcCache'                                                    => MINISTRUTS_ROOT.'/src/rosasurfer/cache/ApcCache',
-   'Cache'                                                       => MINISTRUTS_ROOT.'/src/rosasurfer/cache/Cache',
-   'CachePeer'                                                   => MINISTRUTS_ROOT.'/src/rosasurfer/cache/CachePeer',
-   'FileSystemCache'                                             => MINISTRUTS_ROOT.'/src/rosasurfer/cache/FileSystemCache',
-   'ReferencePool'                                               => MINISTRUTS_ROOT.'/src/rosasurfer/cache/ReferencePool',
+   'rosasurfer\cache\ApcCache'                                   => MINISTRUTS_ROOT.'/src/rosasurfer/cache/ApcCache',
+   'rosasurfer\cache\Cache'                                      => MINISTRUTS_ROOT.'/src/rosasurfer/cache/Cache',
+   'rosasurfer\cache\CachePeer'                                  => MINISTRUTS_ROOT.'/src/rosasurfer/cache/CachePeer',
+   'rosasurfer\cache\FileSystemCache'                            => MINISTRUTS_ROOT.'/src/rosasurfer/cache/FileSystemCache',
+   'rosasurfer\cache\ReferencePool'                              => MINISTRUTS_ROOT.'/src/rosasurfer/cache/ReferencePool',
 
    'Config'                                                      => MINISTRUTS_ROOT.'/src/rosasurfer/config/Config',
    'ConfigInterface'                                             => MINISTRUTS_ROOT.'/src/rosasurfer/config/ConfigInterface',

@@ -1,6 +1,8 @@
 <?php
 namespace rosasurfer\ministruts;
 
+use rosasurfer\cache\Cache;
+
 use rosasurfer\core\Singleton;
 
 use rosasurfer\exception\FileNotFoundException;
@@ -47,7 +49,7 @@ class StrutsController extends Singleton {
    public static function me() {
       if (CLI) throw new IllegalStateException('Can not use a '.__CLASS__.' in this context.');
 
-      $cache = \Cache::me();
+      $cache = Cache::me();
 
       // cache hit?
       $controller = $cache->get(__CLASS__);
@@ -67,7 +69,7 @@ class StrutsController extends Singleton {
                   $dependency->setMinValidity(1 * MINUTE);
 
                // ...and cache it with a FileDependency
-               $cache->set(__CLASS__, $controller, \Cache::EXPIRES_NEVER, $dependency);
+               $cache->set(__CLASS__, $controller, Cache::EXPIRES_NEVER, $dependency);
             }
 
          //$lock->release();
