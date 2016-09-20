@@ -20,5 +20,7 @@ class NexmoMessenger {
    */
    public function sendMessage($receiver, $message) {
       throw new UnimplementedFeatureException(__METHOD__.'() not yet implemented');
+
+      // https://rest.nexmo.com/sms/json?api_key={api_key}&api_secret={api_secret}&to={receiver}&from={sender}&text={message};
    }
 }
