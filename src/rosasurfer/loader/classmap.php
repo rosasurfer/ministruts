@@ -101,7 +101,6 @@ return array(
    'SMTPMailer'                                                  => MINISTRUTS_ROOT.'/src/rosasurfer/net/mail/SMTPMailer',
 
    'rosasurfer\net\messenger\Messenger'                          => MINISTRUTS_ROOT.'/src/rosasurfer/net/messenger/Messenger',
-   'rosasurfer\net\messenger\icq\ICQMessenger'                   => MINISTRUTS_ROOT.'/src/rosasurfer/net/messenger/icq/ICQMessenger',
    'rosasurfer\net\messenger\irc\IRCMessenger'                   => MINISTRUTS_ROOT.'/src/rosasurfer/net/messenger/irc/IRCMessenger',
    'rosasurfer\net\messenger\sms\clickatell\ClickatellMessenger' => MINISTRUTS_ROOT.'/src/rosasurfer/net/messenger/sms/clickatell/ClickatellMessenger',
    'rosasurfer\net\messenger\sms\nexmo\NexmoMessenger'           => MINISTRUTS_ROOT.'/src/rosasurfer/net/messenger/sms/nexmo/NexmoMessenger',
