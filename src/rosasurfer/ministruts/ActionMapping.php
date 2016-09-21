@@ -9,6 +9,8 @@ use rosasurfer\exception\RuntimeException;
 
 use rosasurfer\ministruts\Request;
 
+use rosasurfer\util\Logger;
+
 use function rosasurfer\is_class;
 use function rosasurfer\strStartsWith;
 

@@ -1,4 +1,6 @@
 <?php
+namespace rosasurfer\util;
+
 use rosasurfer\core\StaticClass;
 
 use rosasurfer\exception\IllegalTypeException;
@@ -23,7 +25,7 @@ class System extends StaticClass {
    /**
     * Application-wide default loglevel.
     *
-    * @see \Logger - for class specific loglevel configuration
+    * @see Logger - for class specific loglevel configuration
     */
    const DEFAULT_LOGLEVEL = L_NOTICE;
 

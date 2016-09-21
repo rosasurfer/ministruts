@@ -4,6 +4,8 @@ namespace rosasurfer\net\http;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 
+use rosasurfer\util\Logger;
+
 use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_INFO;
 use const rosasurfer\L_NOTICE;
@@ -32,7 +34,7 @@ final class CurlHttpResponse extends HttpResponse {
     * Erzeugt eine neue Instanz.
     */
    public function __construct() {
-      $loglevel        = \Logger::getLogLevel(__CLASS__);
+      $loglevel        = Logger::getLogLevel(__CLASS__);
       self::$logDebug  = ($loglevel <= L_DEBUG );
       self::$logInfo   = ($loglevel <= L_INFO  );
       self::$logNotice = ($loglevel <= L_NOTICE);
@@ -120,7 +122,7 @@ final class CurlHttpResponse extends HttpResponse {
     * @return int - Anzahl der bei diesem Methodenaufruf erhaltenen Bytes
     */
    public function writeHeader($hCurl, $line) {
-      self::$logDebug && \Logger::log('Header line received:  '.$line, null, L_DEBUG, __CLASS__);
+      self::$logDebug && Logger::log('Header line received:  '.$line, null, L_DEBUG, __CLASS__);
 
       $this->headerParser->parseLine($line);
       return strLen($line);

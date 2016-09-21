@@ -8,6 +8,10 @@ use rosasurfer\exception\InfrastructureException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
 
+use rosasurfer\util\Date;
+use rosasurfer\util\Logger;
+use rosasurfer\util\System;
+
 use function rosasurfer\strContains;
 use function rosasurfer\strStartsWithI;
 
@@ -48,7 +52,7 @@ class SMTPMailer extends Mailer {
     * @param  array $options - Mailer-Optionen
     */
    protected function __construct(array $options) {
-      $loglevel        = \Logger::getLogLevel(__CLASS__);
+      $loglevel        = Logger::getLogLevel(__CLASS__);
       self::$logDebug  = ($loglevel <= L_DEBUG );
       self::$logInfo   = ($loglevel <= L_INFO  );
       self::$logNotice = ($loglevel <= L_NOTICE);
@@ -103,7 +107,7 @@ class SMTPMailer extends Mailer {
          $this->disconnect();
       }
       catch (\Exception $ex) {
-         \System::handleDestructorException($ex);
+         System::handleDestructorException($ex);
          throw $ex;
       }
    }
@@ -337,7 +341,7 @@ class SMTPMailer extends Mailer {
       if (self::$logDebug) {
          $neededTime = round($end - $start, 4);
          if ($neededTime > self::$maxSendingTime)
-            \Logger::log(__METHOD__.'() to '.$to['address'].' took more than '.self::$maxSendingTime.' seconds: '.$neededTime, null, L_DEBUG, __CLASS__);
+            Logger::log(__METHOD__.'() to '.$to['address'].' took more than '.self::$maxSendingTime.' seconds: '.$neededTime, null, L_DEBUG, __CLASS__);
       }
    }
 

@@ -7,6 +7,9 @@ use rosasurfer\core\Singleton;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\UnimplementedFeatureException;
 
+use rosasurfer\util\Date;
+use rosasurfer\util\Logger;
+
 
 /**
  * PersistableObject
@@ -78,7 +81,7 @@ abstract class PersistableObject extends Object {
       if ($format == 'Y-m-d H:i:s')
          return $this->created;
 
-      return \Date::format($this->created, $format);
+      return Date::format($this->created, $format);
    }
 
 
@@ -114,7 +117,7 @@ abstract class PersistableObject extends Object {
       if ($format == 'Y-m-d H:i:s')
          return $this->deleted;
 
-      return \Date::format($this->deleted, $format);
+      return Date::format($this->deleted, $format);
    }
 
 
@@ -162,7 +165,7 @@ abstract class PersistableObject extends Object {
          $this->update();
       }
       else {
-         // \Logger::log('Nothing to save, '.get_class($this).' instance is in sync with the database.', null, L_NOTICE, __CLASS__);
+         //Logger::log('Nothing to save, '.get_class($this).' instance is in sync with the database.', null, L_NOTICE, __CLASS__);
       }
       $this->updateLinks();
       $this->modified = false;

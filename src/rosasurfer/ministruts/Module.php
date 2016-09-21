@@ -8,6 +8,8 @@ use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
 
+use rosasurfer\util\Logger;
+
 use function rosasurfer\is_class;
 use function rosasurfer\strEndsWithI;
 
@@ -117,7 +119,7 @@ class Module extends Object {
       if (!is_string($fileName)) throw new IllegalTypeException('Illegal type of parameter $fileName: '.getType($fileName));
       if (!is_string($prefix))   throw new IllegalTypeException('Illegal type of parameter $prefix: '.getType($prefix));
 
-      $loglevel        = Logger ::getLogLevel(__CLASS__);
+      $loglevel        = Logger::getLogLevel(__CLASS__);
       self::$logDebug  = ($loglevel <= L_DEBUG);
       self::$logInfo   = ($loglevel <= L_INFO);
       self::$logNotice = ($loglevel <= L_NOTICE);

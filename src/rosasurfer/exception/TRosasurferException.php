@@ -1,6 +1,8 @@
 <?php
 namespace rosasurfer\exception;
 
+use rosasurfer\util\DebugTools;
+
 
 /**
  * A trait implementing common functionality for all Rosasurfer exceptions.
@@ -22,7 +24,7 @@ trait TRosasurferException {
     */
    public function getBetterMessage() {
       if (!$this->betterMessage)
-         $this->betterMessage = \DebugTools::getBetterMessage($this);
+         $this->betterMessage = DebugTools::getBetterMessage($this);
       return $this->betterMessage;
    }
 
@@ -34,7 +36,7 @@ trait TRosasurferException {
     */
    public function getBetterTraceAsString() {
       if (!$this->betterTraceAsString)
-         $this->betterTraceAsString = \DebugTools::getBetterTraceAsString($this);
+         $this->betterTraceAsString = DebugTools::getBetterTraceAsString($this);
       return $this->betterTraceAsString;
    }
 

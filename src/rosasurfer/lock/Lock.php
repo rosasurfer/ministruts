@@ -5,6 +5,8 @@ use rosasurfer\exception\FileNotFoundException;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RuntimeException;
 
+use rosasurfer\util\System;
+
 
 /**
  * Lock
@@ -83,7 +85,7 @@ final class Lock extends BaseLock {
          $this->release();
       }
       catch (\Exception $ex) {
-         \System::handleDestructorException($ex);
+         System::handleDestructorException($ex);
          throw $ex;
       }
    }

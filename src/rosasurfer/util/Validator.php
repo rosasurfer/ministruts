@@ -77,7 +77,7 @@ class Validator extends StaticClass {
     * @return bool
     */
    public static function isIPWanAddress($string) {
-      $bytes = self ::isIPAddress($string, true);
+      $bytes = self::isIPAddress($string, true);
 
       // Die Logik entspricht dem Gegenteil von self:: isIPLanAdress() + zusätzlicher Tests.
       if ($bytes) {
@@ -364,7 +364,7 @@ class Validator extends StaticClass {
     * @return bool
     */
    public static function isLastName($string) {
-      return self:: isFirstName($string);
+      return self::isFirstName($string);
    }
 
 

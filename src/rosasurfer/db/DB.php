@@ -6,6 +6,9 @@ use rosasurfer\core\Object;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
 
+use rosasurfer\util\Logger;
+use rosasurfer\util\System;
+
 use const rosasurfer\L_WARN;
 
 
@@ -63,7 +66,7 @@ abstract class DB extends Object {
          }
       }
       catch (\Exception $ex) {
-         \System::handleDestructorException($ex);
+         System::handleDestructorException($ex);
          throw $ex;
       }
    }
@@ -238,7 +241,7 @@ abstract class DB extends Object {
       if ($this->transaction < 0) throw new RuntimeException('Negative transaction counter detected: '.$this->transaction);
 
       if ($this->transaction == 0) {
-         \Logger::log('No database transaction to commit', null, L_WARN, __CLASS__);
+         Logger::log('No database transaction to commit', null, L_WARN, __CLASS__);
       }
       else {
          if ($this->transaction == 1)
@@ -260,7 +263,7 @@ abstract class DB extends Object {
       if ($this->transaction < 0) throw new RuntimeException('Negative transaction counter detected: '.$this->transaction);
 
       if ($this->transaction == 0) {
-         \Logger::log('No database transaction to roll back', null, L_WARN, __CLASS__);
+         Logger::log('No database transaction to roll back', null, L_WARN, __CLASS__);
       }
       else {
          if ($this->transaction == 1)

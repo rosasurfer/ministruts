@@ -11,6 +11,8 @@ use rosasurfer\exception\FileNotFoundException;
 use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\RuntimeException;
 
+use rosasurfer\util\Logger;
+
 use function rosasurfer\strLeftTo;
 use function rosasurfer\strRightFrom;
 use function rosasurfer\strStartsWith;
@@ -86,7 +88,7 @@ class StrutsController extends Singleton {
     * Load and parse the Struts configuration and create the corresponding object hierarchy.
     */
    protected function __construct() {
-      $loglevel        = \Logger ::getLogLevel(__CLASS__);
+      $loglevel        = Logger ::getLogLevel(__CLASS__);
       self::$logDebug  = ($loglevel <= L_DEBUG );
       self::$logInfo   = ($loglevel <= L_INFO  );
       self::$logNotice = ($loglevel <= L_NOTICE);

@@ -110,9 +110,9 @@ return array(
    'rosasurfer\\ministruts\\url\\Url'                       => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/url/Url',
    'rosasurfer\\ministruts\\url\\VersionedUrl'              => MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/url/VersionedUrl',
 
-   'Date'                                                   => MINISTRUTS_ROOT.'/src/rosasurfer/util/Date',
-   'DebugTools'                                             => MINISTRUTS_ROOT.'/src/rosasurfer/util/DebugTools',
-   'Logger'                                                 => MINISTRUTS_ROOT.'/src/rosasurfer/util/Logger',
-   'System'                                                 => MINISTRUTS_ROOT.'/src/rosasurfer/util/System',
+   'rosasurfer\\util\\Date'                                 => MINISTRUTS_ROOT.'/src/rosasurfer/util/Date',
+   'rosasurfer\\util\\DebugTools'                           => MINISTRUTS_ROOT.'/src/rosasurfer/util/DebugTools',
+   'rosasurfer\\util\\Logger'                               => MINISTRUTS_ROOT.'/src/rosasurfer/util/Logger',
+   'rosasurfer\\util\\System'                               => MINISTRUTS_ROOT.'/src/rosasurfer/util/System',
    'rosasurfer\\util\\Validator'                            => MINISTRUTS_ROOT.'/src/rosasurfer/util/Validator',
 );

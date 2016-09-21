@@ -1,4 +1,6 @@
 <?php
+namespace rosasurfer\util;
+
 use rosasurfer\core\StaticClass;
 
 use rosasurfer\config\Config;
@@ -495,4 +497,5 @@ class Logger extends StaticClass {
       }
    }
 }
+
 Logger::init();

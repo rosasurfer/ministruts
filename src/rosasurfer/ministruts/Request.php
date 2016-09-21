@@ -8,6 +8,8 @@ use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
 
+use rosasurfer\util\Logger;
+
 use function rosasurfer\strEndsWith;
 use function rosasurfer\strLeft;
 use function rosasurfer\strLeftTo;
@@ -556,7 +558,7 @@ class Request extends Singleton {
                       'HTTP-X-UP-Forwarded-For' => 1,
                       'HTTP_X-UP-Forwarded-For' => 1);
          if (array_intersect_ukey($headers, $tmp, 'strCaseCmp'))
-            \Logger::log('Invalid X-Forwarded-For header found', null, L_NOTICE, __CLASS__);
+            Logger::log('Invalid X-Forwarded-For header found', null, L_NOTICE, __CLASS__);
       }
 
       // alle oder nur die gewünschten Header zurückgeben

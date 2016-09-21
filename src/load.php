@@ -3,6 +3,9 @@ namespace rosasurfer;
 
 use rosasurfer\exception\ClassNotFoundException;
 
+use rosasurfer\util\Logger;
+use rosasurfer\util\System;
+
 
 // block re-includes
 if (defined('rosasurfer\MINISTRUTS_ROOT')) return;
@@ -49,7 +52,7 @@ spl_autoload_register(function($class) {
    }
    catch (\Exception $ex) {
       if (class_exists($class, false) || interface_exists($class, false) || trait_exists($class, false)) {
-         \Logger::warn(ucFirst(metaTypeToStr($class)).' '.$class.' was successfully auto-loaded but file caused an exception', $ex, __CLASS__);
+         Logger::warn(ucFirst(metaTypeToStr($class)).' '.$class.' was successfully auto-loaded but file caused an exception', $ex, __CLASS__);
       }
       else throw ($ex instanceof ClassNotFoundException) ? $ex : new ClassNotFoundException('Cannot auto-load '.$class, null, $ex);
    }
@@ -59,7 +62,7 @@ spl_autoload_register(function($class) {
 /**
  * (3) setup error handling
  */
-\System::setupErrorHandling();
+System::setupErrorHandling();
 
 
 /**

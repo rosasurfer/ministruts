@@ -14,6 +14,8 @@ use rosasurfer\net\http\CurlHttpClient;
 use rosasurfer\net\http\HttpRequest;
 use rosasurfer\net\http\HttpResponse;
 
+use rosasurfer\util\Logger;
+
 use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_ERROR;
 use const rosasurfer\L_INFO;
@@ -47,7 +49,7 @@ class TorHelper extends StaticClass {
     */
    private static function init() {
       if (self::$logDebug === null) {
-         $loglevel        = \Logger::getLogLevel(__CLASS__);
+         $loglevel        = Logger::getLogLevel(__CLASS__);
          self::$logDebug  = ($loglevel <= L_DEBUG );
          self::$logInfo   = ($loglevel <= L_INFO  );
          self::$logNotice = ($loglevel <= L_NOTICE);
@@ -102,12 +104,12 @@ class TorHelper extends StaticClass {
                      $status = $response->getStatus();
 
                      if ($status != 200) {
-                        self::$logNotice && \Logger::log('Could not get TOR exit nodes from '.self::$torMirrors[$i].', HTTP status '.$status.' ('.HttpResponse ::$sc[$status]."),\n url: ".$request->getUrl(), null, L_NOTICE, __CLASS__);
+                        self::$logNotice && Logger::log('Could not get TOR exit nodes from '.self::$torMirrors[$i].', HTTP status '.$status.' ('.HttpResponse ::$sc[$status]."),\n url: ".$request->getUrl(), null, L_NOTICE, __CLASS__);
                         continue;
                      }
                   }
                   catch (IOException $ex) {
-                     self::$logNotice && \Logger::log('Could not get TOR exit nodes from '.self::$torMirrors[$i], $ex, L_NOTICE, __CLASS__);
+                     self::$logNotice && Logger::log('Could not get TOR exit nodes from '.self::$torMirrors[$i], $ex, L_NOTICE, __CLASS__);
                      continue;
                   }
 
@@ -117,7 +119,7 @@ class TorHelper extends StaticClass {
 
                $nodes = strLen($content) ? array_flip(explode("\n", str_replace("\r\n", "\n", $content))) : array();
 
-               if (!$nodes) \Logger::log('Could not get TOR exit nodes from any server', null, L_ERROR, __CLASS__);
+               if (!$nodes) Logger::log('Could not get TOR exit nodes from any server', null, L_ERROR, __CLASS__);
 
                $cache->set($key, $nodes, 30 * MINUTES);
             }

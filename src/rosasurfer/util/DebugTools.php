@@ -1,4 +1,6 @@
 <?php
+namespace rosasurfer\util;
+
 use rosasurfer\core\StaticClass;
 
 use rosasurfer\exception\IllegalTypeException;
