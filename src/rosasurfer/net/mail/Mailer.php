@@ -1,4 +1,6 @@
 <?php
+namespace rosasurfer\net\mail;
+
 use rosasurfer\core\Object;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\util\Validator;

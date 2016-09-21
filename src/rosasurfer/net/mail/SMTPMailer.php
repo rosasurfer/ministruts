@@ -1,4 +1,6 @@
 <?php
+namespace rosasurfer\net\mail;
+
 use rosasurfer\config\Config;
 
 use rosasurfer\exception\IllegalTypeException;
@@ -46,7 +48,7 @@ class SMTPMailer extends Mailer {
     * @param  array $options - Mailer-Optionen
     */
    protected function __construct(array $options) {
-      $loglevel        = Logger ::getLogLevel(__CLASS__);
+      $loglevel        = \Logger::getLogLevel(__CLASS__);
       self::$logDebug  = ($loglevel <= L_DEBUG );
       self::$logInfo   = ($loglevel <= L_INFO  );
       self::$logNotice = ($loglevel <= L_NOTICE);
@@ -101,7 +103,7 @@ class SMTPMailer extends Mailer {
          $this->disconnect();
       }
       catch (\Exception $ex) {
-         System::handleDestructorException($ex);
+         \System::handleDestructorException($ex);
          throw $ex;
       }
    }
@@ -192,7 +194,7 @@ class SMTPMailer extends Mailer {
    public function sendMail($sender, $receiver, $subject, $message, array $headers = null) {
       if (!is_string($sender)) throw new IllegalTypeException('Illegal type of parameter $sender: '.getType($sender));
       $from = $this->parseAddress($sender);
-      if (!$from) throw new InvalidArgumentException('Invalid argument $sender: '.$sender);
+      if (!$from)              throw new InvalidArgumentException('Invalid argument $sender: '.$sender);
 
       if (!is_string($receiver)) throw new IllegalTypeException('Illegal type of parameter $receiver: '.getType($receiver));
       $forced = Config::getDefault()->get('mail.address.forced-receiver', null);
@@ -205,8 +207,9 @@ class SMTPMailer extends Mailer {
 
       if ($headers === null)
          $headers = array();
-      foreach ($headers as $key => $header)
+      foreach ($headers as $key => $header) {
          if (!is_string($header)) throw new IllegalTypeException('Illegal parameter type in argument $headers[$key]: '.getType($header));
+      }
 
 
       // Versand je nach Konfiguration verschieben (um z.B. Transaktionen nicht zu blockieren)
@@ -334,7 +337,7 @@ class SMTPMailer extends Mailer {
       if (self::$logDebug) {
          $neededTime = round($end - $start, 4);
          if ($neededTime > self::$maxSendingTime)
-            Logger::log(__METHOD__.'() to '.$to['address'].' took more than '.self::$maxSendingTime.' seconds: '.$neededTime, null, L_DEBUG, __CLASS__);
+            \Logger::log(__METHOD__.'() to '.$to['address'].' took more than '.self::$maxSendingTime.' seconds: '.$neededTime, null, L_DEBUG, __CLASS__);
       }
    }
 

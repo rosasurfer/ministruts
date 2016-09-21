@@ -83,11 +83,11 @@ return array(
    'rosasurfer\\net\\http\\HttpRequest'                     => MINISTRUTS_ROOT.'/src/rosasurfer/net/http/HttpRequest',
    'rosasurfer\\net\\http\\HttpResponse'                    => MINISTRUTS_ROOT.'/src/rosasurfer/net/http/HttpResponse',
 
-   'CLIMailer'                                              => MINISTRUTS_ROOT.'/src/rosasurfer/net/mail/CLIMailer',
-   'FileSocketMailer'                                       => MINISTRUTS_ROOT.'/src/rosasurfer/net/mail/FileSocketMailer',
-   'Mailer'                                                 => MINISTRUTS_ROOT.'/src/rosasurfer/net/mail/Mailer',
-   'PHPMailer'                                              => MINISTRUTS_ROOT.'/src/rosasurfer/net/mail/PHPMailer',
-   'SMTPMailer'                                             => MINISTRUTS_ROOT.'/src/rosasurfer/net/mail/SMTPMailer',
+   'rosasurfer\\net\\mail\\CLIMailer'                       => MINISTRUTS_ROOT.'/src/rosasurfer/net/mail/CLIMailer',
+   'rosasurfer\\net\\mail\\FileSocketMailer'                => MINISTRUTS_ROOT.'/src/rosasurfer/net/mail/FileSocketMailer',
+   'rosasurfer\\net\\mail\\Mailer'                          => MINISTRUTS_ROOT.'/src/rosasurfer/net/mail/Mailer',
+   'rosasurfer\\net\\mail\\PHPMailer'                       => MINISTRUTS_ROOT.'/src/rosasurfer/net/mail/PHPMailer',
+   'rosasurfer\\net\\mail\\SMTPMailer'                      => MINISTRUTS_ROOT.'/src/rosasurfer/net/mail/SMTPMailer',
 
    'rosasurfer\\net\\messenger\\Messenger'                  => MINISTRUTS_ROOT.'/src/rosasurfer/net/messenger/Messenger',
    'rosasurfer\\net\\messenger\\im\\IRCMessenger'           => MINISTRUTS_ROOT.'/src/rosasurfer/net/messenger/im/IRCMessenger',
