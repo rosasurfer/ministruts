@@ -10,6 +10,10 @@ use rosasurfer\exception\IOException;
 
 use rosasurfer\lock\Lock;
 
+use rosasurfer\net\http\CurlHttpClient;
+use rosasurfer\net\http\HttpRequest;
+use rosasurfer\net\http\HttpResponse;
+
 use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_ERROR;
 use const rosasurfer\L_INFO;

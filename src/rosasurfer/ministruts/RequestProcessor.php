@@ -1,6 +1,10 @@
 <?php
 use rosasurfer\core\Object;
+
 use rosasurfer\ministruts\Request;
+
+use rosasurfer\net\http\HeaderUtils;
+use rosasurfer\net\http\HttpResponse;
 
 use function rosasurfer\strEndsWith;
 use function rosasurfer\strRightFrom;

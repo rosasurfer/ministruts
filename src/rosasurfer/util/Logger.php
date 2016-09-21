@@ -9,6 +9,10 @@ use rosasurfer\exception\RuntimeException;
 
 use rosasurfer\ministruts\Request;
 
+use rosasurfer\net\http\CurlHttpClient;
+use rosasurfer\net\http\HttpRequest;
+use rosasurfer\net\http\HttpResponse;
+
 use function rosasurfer\echoPre;
 use function rosasurfer\ksort_r;
 use function rosasurfer\printPretty;
@@ -478,9 +482,9 @@ class Logger extends StaticClass {
          // TODO: CURL-Abhängigkeit möglichst durch interne URL-Funktionen ersetzen
 
          // HTTP-Request erzeugen und ausführen
-         $request  = HttpRequest ::create()->setUrl($url);
+         $request  = HttpRequest::create()->setUrl($url);
          $options[CURLOPT_SSL_VERIFYPEER] = false;                            // das SSL-Zertifikat kann nicht überprüfbar oder ungültig sein
-         $response = CurlHttpClient ::create($options)->send($request);
+         $response = CurlHttpClient::create($options)->send($request);
          $status   = $response->getStatus();
          $content  = $response->getContent();
          if ($status != 200) throw new RuntimeException('Unexpected HTTP status code from api.clickatell.com: '.$status.' ('.HttpResponse ::$sc[$status].')');

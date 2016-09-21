@@ -1,4 +1,6 @@
 <?php
+namespace rosasurfer\net\http;
+
 use rosasurfer\core\StaticClass;
 use rosasurfer\ministruts\Request;
 
@@ -17,7 +19,7 @@ class HeaderUtils extends StaticClass {
     * @param  string $url - URL
     */
    public static function redirect($url) {
-      $request = Request ::me();
+      $request = Request::me();
 
       // TODO: Umleitung auf relative URL's funktioniert nicht: home "./" -> http://domain/content./
       if ($request->isSession()) {

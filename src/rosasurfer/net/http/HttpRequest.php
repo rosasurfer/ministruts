@@ -1,4 +1,6 @@
 <?php
+namespace rosasurfer\net\http;
+
 use rosasurfer\core\Object;
 
 use rosasurfer\exception\IllegalTypeException;
@@ -163,8 +165,9 @@ final class HttpRequest extends Object {
       if     (is_null($names))   $names = array();
       elseif (is_string($names)) $names = array($names);
       elseif (is_array($names)) {
-         foreach ($names as $name)
+         foreach ($names as $name) {
             if (!is_string($name)) throw new IllegalTypeException('Illegal parameter type in argument $names: '.getType($name));
+         }
       }
       else                         throw new IllegalTypeException('Illegal type of parameter $names: '.getType($names));
 
