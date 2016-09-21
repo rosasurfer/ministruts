@@ -34,9 +34,9 @@ return array(
    'rosasurfer\\core\\Singleton'                            => MINISTRUTS_ROOT.'/src/rosasurfer/core/Singleton',
    'rosasurfer\\core\\StaticClass'                          => MINISTRUTS_ROOT.'/src/rosasurfer/core/StaticClass',
 
-   'CommonDAO'                                              => MINISTRUTS_ROOT.'/src/rosasurfer/dao/CommonDAO',
-   'DaoWorker'                                              => MINISTRUTS_ROOT.'/src/rosasurfer/dao/DaoWorker',
-   'PersistableObject'                                      => MINISTRUTS_ROOT.'/src/rosasurfer/dao/PersistableObject',
+   'rosasurfer\\dao\\CommonDAO'                             => MINISTRUTS_ROOT.'/src/rosasurfer/dao/CommonDAO',
+   'rosasurfer\\dao\\DaoWorker'                             => MINISTRUTS_ROOT.'/src/rosasurfer/dao/DaoWorker',
+   'rosasurfer\\dao\\PersistableObject'                     => MINISTRUTS_ROOT.'/src/rosasurfer/dao/PersistableObject',
 
    'DB'                                                     => MINISTRUTS_ROOT.'/src/rosasurfer/db/DB',
    'DBPool'                                                 => MINISTRUTS_ROOT.'/src/rosasurfer/db/DBPool',

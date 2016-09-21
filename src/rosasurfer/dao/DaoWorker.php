@@ -1,4 +1,6 @@
 <?php
+namespace rosasurfer\dao;
+
 use rosasurfer\core\Object;
 
 use rosasurfer\exception\DatabaseException;
@@ -113,7 +115,7 @@ class DaoWorker extends Object {
 
       if ($result['rows']) {
          $row = mysql_fetch_assoc($result['set']);
-         $instance = PersistableObject ::createInstance($this->entityClass, $row);
+         $instance = PersistableObject::createInstance($this->entityClass, $row);
       }
 
       return $instance;
@@ -133,7 +135,7 @@ class DaoWorker extends Object {
       $instances = array();
 
       while ($row = mysql_fetch_assoc($result['set'])) {
-         $instances[] = PersistableObject ::createInstance($this->entityClass, $row);
+         $instances[] = PersistableObject::createInstance($this->entityClass, $row);
       }
 
       return $instances;
@@ -148,7 +150,7 @@ class DaoWorker extends Object {
    public function getDB() {
       if (!$this->adapter) {
          $mapping = $this->dao->getMapping();
-         $this->adapter = DBPool ::getDB($mapping['link']);
+         $this->adapter = \DBPool::getDB($mapping['link']);
       }
       return $this->adapter;
    }

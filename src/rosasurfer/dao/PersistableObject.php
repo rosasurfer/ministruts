@@ -1,4 +1,6 @@
 <?php
+namespace rosasurfer\dao;
+
 use rosasurfer\core\Object;
 use rosasurfer\core\Singleton;
 
@@ -76,7 +78,7 @@ abstract class PersistableObject extends Object {
       if ($format == 'Y-m-d H:i:s')
          return $this->created;
 
-      return Date::format($this->created, $format);
+      return \Date::format($this->created, $format);
    }
 
 
@@ -112,7 +114,7 @@ abstract class PersistableObject extends Object {
       if ($format == 'Y-m-d H:i:s')
          return $this->deleted;
 
-      return Date::format($this->deleted, $format);
+      return \Date::format($this->deleted, $format);
    }
 
 
@@ -160,7 +162,7 @@ abstract class PersistableObject extends Object {
          $this->update();
       }
       else {
-         // Logger::log('Nothing to save, '.get_class($this).' instance is in sync with the database.', null, L_NOTICE, __CLASS__);
+         // \Logger::log('Nothing to save, '.get_class($this).' instance is in sync with the database.', null, L_NOTICE, __CLASS__);
       }
       $this->updateLinks();
       $this->modified = false;
@@ -231,15 +233,15 @@ abstract class PersistableObject extends Object {
             $type = $mapping[1];
 
             switch ($type) {
-               case CommonDAO ::T_STRING:
+               case CommonDAO::T_STRING:
                   $object->$property =&         $row[$column]; break;
-               case CommonDAO ::T_INT:
+               case CommonDAO::T_INT:
                   $object->$property =    (int) $row[$column]; break;
-               case CommonDAO ::T_FLOAT:
+               case CommonDAO::T_FLOAT:
                   $object->$property = (double) $row[$column]; break;
-               case CommonDAO ::T_BOOL:
+               case CommonDAO::T_BOOL:
                   $object->$property =   (bool) $row[$column]; break;
-               case CommonDAO ::T_SET:
+               case CommonDAO::T_SET:
                   $object->$property = strLen($row[$column]) ? explode(',', $row[$column]) : array();
                   break;
                default:
