@@ -67,17 +67,6 @@ return array(
    'rosasurfer\\exception\\UnimplementedFeatureException'   => MINISTRUTS_ROOT.'/src/rosasurfer/exception/UnimplementedFeatureException',
    'rosasurfer\\exception\\UnsupportedMethodException'      => MINISTRUTS_ROOT.'/src/rosasurfer/exception/UnsupportedMethodException',
 
-   'BarCode'                                                => MINISTRUTS_ROOT.'/src/rosasurfer/file/image/barcode/BarCode',
-   'BaseC128BarCode'                                        => MINISTRUTS_ROOT.'/src/rosasurfer/file/image/barcode/BaseC128BarCode',
-   'C128ABarCode'                                           => MINISTRUTS_ROOT.'/src/rosasurfer/file/image/barcode/C128ABarCode',
-   'C128BBarCode'                                           => MINISTRUTS_ROOT.'/src/rosasurfer/file/image/barcode/C128BBarCode',
-   'C128CBarCode'                                           => MINISTRUTS_ROOT.'/src/rosasurfer/file/image/barcode/C128CBarCode',
-   'C39BarCode'                                             => MINISTRUTS_ROOT.'/src/rosasurfer/file/image/barcode/C39BarCode',
-   'I25BarCode'                                             => MINISTRUTS_ROOT.'/src/rosasurfer/file/image/barcode/I25BarCode',
-
-   'BasePdfDocument'                                        => MINISTRUTS_ROOT.'/src/rosasurfer/file/pdf/BasePdfDocument',
-   'SimplePdfDocument'                                      => MINISTRUTS_ROOT.'/src/rosasurfer/file/pdf/SimplePdfDocument',
-
    'rosasurfer\\lock\\BaseLock'                             => MINISTRUTS_ROOT.'/src/rosasurfer/lock/BaseLock',
    'rosasurfer\\lock\\FileLock'                             => MINISTRUTS_ROOT.'/src/rosasurfer/lock/FileLock',
    'rosasurfer\\lock\\Lock'                                 => MINISTRUTS_ROOT.'/src/rosasurfer/lock/Lock',
