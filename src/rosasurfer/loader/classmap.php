@@ -27,8 +27,8 @@ return array(
    'rosasurfer\cache\FileSystemCache'                            => MINISTRUTS_ROOT.'/src/rosasurfer/cache/FileSystemCache',
    'rosasurfer\cache\ReferencePool'                              => MINISTRUTS_ROOT.'/src/rosasurfer/cache/ReferencePool',
 
-   'Config'                                                      => MINISTRUTS_ROOT.'/src/rosasurfer/config/Config',
-   'ConfigInterface'                                             => MINISTRUTS_ROOT.'/src/rosasurfer/config/ConfigInterface',
+   'rosasurfer\config\Config'                                    => MINISTRUTS_ROOT.'/src/rosasurfer/config/Config',
+   'rosasurfer\config\ConfigInterface'                           => MINISTRUTS_ROOT.'/src/rosasurfer/config/ConfigInterface',
 
    'rosasurfer\core\Object'                                      => MINISTRUTS_ROOT.'/src/rosasurfer/core/Object',
    'rosasurfer\core\Singleton'                                   => MINISTRUTS_ROOT.'/src/rosasurfer/core/Singleton',

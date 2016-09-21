@@ -1,6 +1,8 @@
 <?php
 namespace rosasurfer\acl\adapter;
 
+use rosasurfer\config\Config;
+
 use rosasurfer\core\Object;
 
 use rosasurfer\exception\IllegalTypeException;
@@ -24,6 +26,6 @@ class ConfigFileAdapter extends Object implements AdapterInterface {
          if (!is_string($file)) throw new IllegalTypeException('Illegal type of parameter $file: '.getType($file));
          throw new UnimplementedFeatureException('Support for custom config files not yet implemented');
       }
-      $config = \Config::getDefault()->get('acl.config', null);
+      $config = Config::getDefault()->get('acl.config', null);
    }
 }

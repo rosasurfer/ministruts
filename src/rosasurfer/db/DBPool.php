@@ -1,4 +1,6 @@
 <?php
+use rosasurfer\config\Config;
+
 use rosasurfer\core\Singleton;
 use rosasurfer\exception\IllegalStateException;
 

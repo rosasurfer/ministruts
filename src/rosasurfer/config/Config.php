@@ -1,4 +1,6 @@
 <?php
+namespace rosasurfer\config;
+
 use rosasurfer\cache\Cache;
 
 use rosasurfer\core\Object;

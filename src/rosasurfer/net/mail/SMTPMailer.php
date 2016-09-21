@@ -1,4 +1,6 @@
 <?php
+use rosasurfer\config\Config;
+
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InfrastructureException;
 use rosasurfer\exception\InvalidArgumentException;

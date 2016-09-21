@@ -1,6 +1,8 @@
 <?php
 use rosasurfer\core\StaticClass;
 
+use rosasurfer\config\Config;
+
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
@@ -280,7 +282,7 @@ class Logger extends StaticClass {
     * @param  string     $message   - zu loggende Message
     * @param  \Exception $exception - zu loggende Exception
     * @param  int        $level     - LogLevel
-    * @param  string     $class     - Name der Klasse, vonder aus geloggt wurde
+    * @param  string     $class     - Name der Klasse, von der aus geloggt wurde
     */
    public static function log($message, $exception, $level, $class) {
       // Parameter-Validation

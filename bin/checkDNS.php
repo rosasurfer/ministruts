@@ -1,5 +1,7 @@
 #!/usr/bin/php
 <?php
+use rosasurfer\config\Config;
+
 use const rosasurfer\WINDOWS;
 
 

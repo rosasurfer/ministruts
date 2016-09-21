@@ -1,4 +1,7 @@
 <?php
+namespace rosasurfer\config;
+
+
 /**
  * Interface to implement by custom configuration classes.
  */
@@ -6,14 +9,14 @@ interface ConfigInterface {
 
 
    /**
-    * Return the config setting with the specified key or the specified alternative value if no such is found.
+    * Return the config setting with the specified key or the specified alternative value if no such setting is found.
     *
     * @param  string $key        - key
     * @param  mixed  $onNotFound - alternative value
     *
     * @return mixed - config setting
     *
-    * @throws RuntimeException - if no such setting is found and no alternative value was specified
+    * @throws RuntimeException - if the setting is not found and no alternative value was specified
     */
    public function get($key, $onNotFound=null);
 
