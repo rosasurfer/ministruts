@@ -30,9 +30,10 @@ final class DBPool extends Singleton {
    /**
     * verschiedene Schreibweisen
     */
-   private static $knownConnectors = array('mysql'          => 'MySQLConnector',
-                                           'mysqlconnector' => 'MySQLConnector',
-                                           );
+   private static $internalConnectors = [
+      'mysql'          => __NAMESPACE__.'\MySQLConnector',
+      'mysqlconnector' => __NAMESPACE__.'\MySQLConnector',
+   ];
 
    /**
     * Gibt die Singleton-Instanz dieser Klasse zurück.
@@ -52,7 +53,7 @@ final class DBPool extends Singleton {
     * @return DB
     */
    public static function getDB($alias = null) {
-      $me = self ::me();
+      $me = self::me();
 
       if ($alias === null) {                                // single db project
          if (!$me->default) throw new IllegalStateException('Invalid default database configuration: null');
@@ -65,8 +66,8 @@ final class DBPool extends Singleton {
          // bekannte Namen trotz unterschiedlicher Schreibweisen erkennen
          $name = strToLower($config['connector']);
 
-         if (isSet(self::$knownConnectors[$name])) {
-            $class = self::$knownConnectors[$name];
+         if (isSet(self::$internalConnectors[$name])) {
+            $class = self::$internalConnectors[$name];
          }
          else {   // unbekannt, Fall-back zu "{$name}Connector"
             $class = $config['connector'].'Connector';

@@ -152,7 +152,7 @@ class DaoWorker extends Object {
    public function getDB() {
       if (!$this->adapter) {
          $mapping = $this->dao->getMapping();
-         $this->adapter = \DBPool::getDB($mapping['link']);
+         $this->adapter = DBPool::getDB($mapping['link']);
       }
       return $this->adapter;
    }
