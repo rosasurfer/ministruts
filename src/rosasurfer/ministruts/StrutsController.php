@@ -58,8 +58,8 @@ class StrutsController extends Singleton {
       if (!$controller) {
          // TODO: fix wrong lock usage (see TODO file)
          // synchronize parsing of the struts-config.xml
-         //$lock = new FileLock($configFile);
-         //   $controller = $cache->get(__CLASS__);                    // re-check after the lock is aquired
+         // $lock = new FileLock($configFile);
+         // $controller = $cache->get(__CLASS__);                    // re-check after the lock is aquired
 
             if (!$controller) {
                // create new controller instance...

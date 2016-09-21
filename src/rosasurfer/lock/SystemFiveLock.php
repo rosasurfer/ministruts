@@ -1,4 +1,6 @@
 <?php
+namespace rosasurfer\lock;
+
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\PHPError;
 use rosasurfer\exception\RuntimeException;
@@ -50,7 +52,7 @@ class SystemFiveLock extends BaseLock {
       if (isSet(self::$hSemaphores[$key])) throw new RuntimeException('Dead-lock detected: already holding a lock for key "'.$key.'"');
       self::$hSemaphores[$key] = false;
 
-      $loglevel        = Logger ::getLogLevel(__CLASS__);
+      $loglevel        = \Logger::getLogLevel(__CLASS__);
       self::$logDebug  = ($loglevel <= L_DEBUG );
       self::$logInfo   = ($loglevel <= L_INFO  );
       self::$logNotice = ($loglevel <= L_NOTICE);
@@ -79,7 +81,7 @@ class SystemFiveLock extends BaseLock {
                                 || $message == 'sem_get(): failed releasing SYSVSEM_SETVAL for key 0x'.$hexId.': Identifier removed'
                                 || $message == 'sem_acquire(): failed to acquire key 0x'.$hexId.': Invalid argument'
                                 || $message == 'sem_acquire(): failed to acquire key 0x'.$hexId.': Identifier removed')) {
-               self::$logDebug && Logger::log($message.', trying again ... ('.($i+1).')', null, L_DEBUG, __CLASS__);
+               self::$logDebug && \Logger::log($message.', trying again ... ('.($i+1).')', null, L_DEBUG, __CLASS__);
                $messages[] = $message;
                uSleep(200000); // 200 msec. warten
                continue;
@@ -107,7 +109,7 @@ class SystemFiveLock extends BaseLock {
          $this->release();
       }
       catch (\Exception $ex) {
-         System::handleDestructorException($ex);
+         \System::handleDestructorException($ex);
          throw $ex;
       }
    }
@@ -133,9 +135,7 @@ class SystemFiveLock extends BaseLock {
     */
    public function release() {
       if ($this->isValid()) {
-         if (!sem_remove(self::$hSemaphores[$this->key]))
-            throw new RuntimeException('Cannot remove semaphore for key "'.$this->key.'"');
-
+         if (!sem_remove(self::$hSemaphores[$this->key])) throw new RuntimeException('Cannot remove semaphore for key "'.$this->key.'"');
          unset(self::$hSemaphores[$this->key]);
       }
    }

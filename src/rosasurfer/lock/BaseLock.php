@@ -1,6 +1,7 @@
 <?php
-use rosasurfer\core\Object;
+namespace rosasurfer\lock;
 
+use rosasurfer\core\Object;
 use rosasurfer\exception\IllegalStateException;
 
 

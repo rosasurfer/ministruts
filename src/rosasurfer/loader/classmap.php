@@ -78,10 +78,10 @@ return array(
    'BasePdfDocument'                                        => MINISTRUTS_ROOT.'/src/rosasurfer/file/pdf/BasePdfDocument',
    'SimplePdfDocument'                                      => MINISTRUTS_ROOT.'/src/rosasurfer/file/pdf/SimplePdfDocument',
 
-   'BaseLock'                                               => MINISTRUTS_ROOT.'/src/rosasurfer/lock/BaseLock',
-   'FileLock'                                               => MINISTRUTS_ROOT.'/src/rosasurfer/lock/FileLock',
-   'Lock'                                                   => MINISTRUTS_ROOT.'/src/rosasurfer/lock/Lock',
-   'SystemFiveLock'                                         => MINISTRUTS_ROOT.'/src/rosasurfer/lock/SystemFiveLock',
+   'rosasurfer\\lock\\BaseLock'                             => MINISTRUTS_ROOT.'/src/rosasurfer/lock/BaseLock',
+   'rosasurfer\\lock\\FileLock'                             => MINISTRUTS_ROOT.'/src/rosasurfer/lock/FileLock',
+   'rosasurfer\\lock\\Lock'                                 => MINISTRUTS_ROOT.'/src/rosasurfer/lock/Lock',
+   'rosasurfer\\lock\\SystemFiveLock'                       => MINISTRUTS_ROOT.'/src/rosasurfer/lock/SystemFiveLock',
 
    'NetTools'                                               => MINISTRUTS_ROOT.'/src/rosasurfer/net/NetTools',
    'TorHelper'                                              => MINISTRUTS_ROOT.'/src/rosasurfer/net/TorHelper',

@@ -12,6 +12,8 @@ use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
 use rosasurfer\exception\UnimplementedFeatureException;
 
+use rosasurfer\lock\Lock;
+
 use const rosasurfer\CLI;
 use const rosasurfer\LOCALHOST;
 use const rosasurfer\MINISTRUTS_ROOT;
@@ -323,7 +325,7 @@ class Config extends Object implements ConfigInterface {
             if (!$locked) {
                // Lock holen und nochmal nachschauen
                $locked = true;
-               $lock   = new \Lock(APPLICATION_ID.'|'.__FILE__.'#'.__LINE__);
+               $lock   = new Lock(APPLICATION_ID.'|'.__FILE__.'#'.__LINE__);
                $config = $cache->get(__CLASS__);
             }
 

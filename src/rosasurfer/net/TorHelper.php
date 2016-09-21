@@ -6,6 +6,8 @@ use rosasurfer\core\StaticClass;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\IOException;
 
+use rosasurfer\lock\Lock;
+
 use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_ERROR;
 use const rosasurfer\L_INFO;
