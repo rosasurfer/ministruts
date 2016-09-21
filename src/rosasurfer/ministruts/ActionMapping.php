@@ -1,4 +1,6 @@
 <?php
+namespace rosasurfer\ministruts;
+
 use rosasurfer\core\Object;
 
 use rosasurfer\exception\ClassNotFoundException;
@@ -7,17 +9,12 @@ use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
 
-use rosasurfer\ministruts\Request;
-
 use rosasurfer\util\Logger;
 
 use function rosasurfer\is_class;
 use function rosasurfer\strStartsWith;
 
 use const rosasurfer\L_WARN;
-
-use const rosasurfer\ministruts\ACTION_BASE_CLASS;
-use const rosasurfer\ministruts\ACTION_FORM_BASE_CLASS;
 
 
 /**
@@ -449,7 +446,7 @@ class ActionMapping extends Object {
       if (isSet($this->forwards[$name]))
          return $this->forwards[$name];
 
-      if ($name === ActionForward ::__SELF) {
+      if ($name === ActionForward::__SELF) {
          $url = $this->path;
 
          $query = Request ::me()->getQueryString();

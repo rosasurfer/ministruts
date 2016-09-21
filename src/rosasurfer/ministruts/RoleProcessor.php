@@ -1,5 +1,5 @@
 <?php
-use rosasurfer\ministruts\Request;
+namespace rosasurfer\ministruts;
 
 
 /**

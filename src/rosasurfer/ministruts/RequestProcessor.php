@@ -1,7 +1,7 @@
 <?php
-use rosasurfer\core\Object;
+namespace rosasurfer\ministruts;
 
-use rosasurfer\ministruts\Request;
+use rosasurfer\core\Object;
 
 use rosasurfer\net\http\HeaderUtils;
 use rosasurfer\net\http\HttpResponse;
@@ -15,11 +15,6 @@ use function rosasurfer\strStartsWith;
 use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_INFO;
 use const rosasurfer\L_NOTICE;
-
-use const rosasurfer\ministruts\ACTION_ERRORS_KEY;
-use const rosasurfer\ministruts\ACTION_FORM_KEY;
-use const rosasurfer\ministruts\ACTION_MAPPING_KEY;
-use const rosasurfer\ministruts\ACTION_MESSAGES_KEY;
 
 
 /**
@@ -44,7 +39,7 @@ class RequestProcessor extends Object {
     * @param  Module $module - Modul, dem dieser RequestProcessor zugeordnet ist
     */
    public function __construct(Module $module) {
-      $loglevel        = Logger ::getLogLevel(__CLASS__);
+      $loglevel        = Logger::getLogLevel(__CLASS__);
       self::$logDebug  = ($loglevel <= L_DEBUG );
       self::$logInfo   = ($loglevel <= L_INFO  );
       self::$logNotice = ($loglevel <= L_NOTICE);
@@ -385,7 +380,7 @@ PROCESS_METHOD_ERROR_SC_405;
 
       $forward = $mapping->getForward();
       if (!$forward) {
-         $key = $success ? ActionForward ::VALIDATION_SUCCESS_KEY : ActionForward ::VALIDATION_ERROR_KEY;
+         $key = $success ? ActionForward::VALIDATION_SUCCESS_KEY : ActionForward::VALIDATION_ERROR_KEY;
          $forward = $mapping->findForward($key);
       }
 

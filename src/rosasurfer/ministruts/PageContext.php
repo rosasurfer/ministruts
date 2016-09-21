@@ -1,6 +1,7 @@
 <?php
-use rosasurfer\core\Singleton;
+namespace rosasurfer\ministruts;
 
+use rosasurfer\core\Singleton;
 use rosasurfer\exception\IllegalTypeException;
 
 
@@ -39,7 +40,7 @@ class PageContext extends Singleton {
     * @return Singleton
     */
    public static function me() {
-      return Singleton ::getInstance(__CLASS__);
+      return Singleton::getInstance(__CLASS__);
    }
 
 
@@ -51,7 +52,7 @@ class PageContext extends Singleton {
     * @return mixed - der gespeicherte Wert oder NULL, falls kein solcher Schlüssel existiert
     */
    public static function get($key) {
-      return self:: me()->__get($key);
+      return self::me()->__get($key);
    }
 
 
@@ -62,7 +63,7 @@ class PageContext extends Singleton {
     * @param  mixed  $value - der zu speichernde Wert
     */
    public static function set($key, $value) {
-      return self:: me()->__set($key, $value);
+      return self::me()->__set($key, $value);
    }
 
 

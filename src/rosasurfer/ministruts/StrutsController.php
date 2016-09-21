@@ -108,7 +108,7 @@ class StrutsController extends Singleton {
             $baseName = baseName($file, '.xml');
             $prefix = (strStartsWith($baseName, 'struts-config-')) ? '/'.subStr($baseName, 14) : '';
 
-            $module = new \Module($file, $prefix);
+            $module = new Module($file, $prefix);
             $module->freeze();
 
             if (isSet($this->modules[$prefix]))
@@ -127,9 +127,9 @@ class StrutsController extends Singleton {
     * Process the current HTTP request.
     */
    public static function processRequest() {
-      $controller = self     ::me();
-      $request    =  Request ::me();
-      $response   = \Response::me();
+      $controller = self    ::me();
+      $request    = Request ::me();
+      $response   = Response::me();
 
       // select Module
       $prefix = $controller->getModulePrefix($request);
@@ -171,7 +171,7 @@ class StrutsController extends Singleton {
     *
     * @return RequestProcessor
     */
-   private function getRequestProcessor(\Module $module) {
+   private function getRequestProcessor(Module $module) {
       $class = $module->getRequestProcessorClass();
       return new $class($module);
    }

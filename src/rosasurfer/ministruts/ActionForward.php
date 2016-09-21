@@ -1,4 +1,6 @@
 <?php
+namespace rosasurfer\ministruts;
+
 use rosasurfer\core\Object;
 
 use rosasurfer\exception\IllegalStateException;
@@ -146,7 +148,7 @@ class ActionForward extends Object {
    public function addQueryData($key, $value) {
       if ($this->configured)      throw new IllegalStateException('Configuration is frozen');
       if (!is_string($key))       throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
-      if ($value === null)        $value = '';
+      if (is_null($value))        $value = '';
       elseif (is_bool($value))    $value = (int) $value;
       elseif (!is_scalar($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
 

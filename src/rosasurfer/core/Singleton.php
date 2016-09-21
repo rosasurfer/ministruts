@@ -50,8 +50,7 @@ abstract class Singleton extends Object {
 
       // TODO: Was, wenn $args = false ist
       $instance = $args ? new $class($args) : new $class();
-      if (!$instance instanceof self)
-         throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
+      if (!$instance instanceof self) throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
       self::$instances[$class] = $instance;
 
       // Marker für rekursiven Aufruf zurücksetzen

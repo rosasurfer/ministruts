@@ -1,4 +1,6 @@
 <?php
+namespace rosasurfer\ministruts;
+
 use rosasurfer\core\Singleton;
 
 use const rosasurfer\CLI;
@@ -24,7 +26,7 @@ final class Response extends Singleton {
     */
    public static function me() {
       if (!CLI)
-         return Singleton ::getInstance(__CLASS__);
+         return Singleton::getInstance(__CLASS__);
       return null;
    }
 

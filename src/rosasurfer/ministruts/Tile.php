@@ -1,12 +1,10 @@
 <?php
+namespace rosasurfer\ministruts;
+
 use rosasurfer\core\Object;
 
 use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\IllegalTypeException;
-
-use rosasurfer\ministruts\Request;
-
-use const rosasurfer\ministruts\ACTION_FORM_KEY;
 
 
 /**

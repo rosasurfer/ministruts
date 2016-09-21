@@ -1,4 +1,6 @@
 <?php
+namespace rosasurfer\ministruts;
+
 use rosasurfer\core\Object;
 
 use rosasurfer\exception\ClassNotFoundException;
@@ -16,12 +18,6 @@ use function rosasurfer\strEndsWithI;
 use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_INFO;
 use const rosasurfer\L_NOTICE;
-
-use const rosasurfer\ministruts\DEFAULT_REQUEST_PROCESSOR_CLASS;
-use const rosasurfer\ministruts\DEFAULT_ACTION_FORWARD_CLASS;
-use const rosasurfer\ministruts\DEFAULT_ACTION_MAPPING_CLASS;
-use const rosasurfer\ministruts\DEFAULT_TILES_CLASS;
-use const rosasurfer\ministruts\ROLE_PROCESSOR_BASE_CLASS;
 
 
 /**
@@ -740,7 +736,7 @@ class Module extends Object {
    public function getRoleProcessor() {
       static $instance = null;
 
-      if (!$instance && ($class = $this->roleProcessorClass))
+      if (!$instance && ($class=$this->roleProcessorClass))
          $instance = new $class;
 
       return $instance;

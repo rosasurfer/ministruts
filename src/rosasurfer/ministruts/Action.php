@@ -1,6 +1,7 @@
 <?php
+namespace rosasurfer\ministruts;
+
 use rosasurfer\core\Object;
-use rosasurfer\ministruts\Request;
 
 
 /**
