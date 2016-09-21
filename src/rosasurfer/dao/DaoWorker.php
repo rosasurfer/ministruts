@@ -3,6 +3,8 @@ namespace rosasurfer\dao;
 
 use rosasurfer\core\Object;
 
+use rosasurfer\db\DBPool;
+
 use rosasurfer\exception\DatabaseException;
 use rosasurfer\exception\IllegalTypeException;
 

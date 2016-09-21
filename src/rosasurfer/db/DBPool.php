@@ -1,4 +1,6 @@
 <?php
+namespace rosasurfer\db;
+
 use rosasurfer\config\Config;
 
 use rosasurfer\core\Singleton;
@@ -38,7 +40,7 @@ final class DBPool extends Singleton {
     * @return Singleton
     */
    public static function me() {
-      return Singleton ::getInstance(__CLASS__);
+      return Singleton::getInstance(__CLASS__);
    }
 
 
@@ -53,8 +55,7 @@ final class DBPool extends Singleton {
       $me = self ::me();
 
       if ($alias === null) {                                // single db project
-         if (!$me->default)
-            throw new IllegalStateException('Invalid default database configuration: null');
+         if (!$me->default) throw new IllegalStateException('Invalid default database configuration: null');
          $connector = $me->default;
       }
       elseif (isSet($me->pool[$alias])) {                   // schon im Pool ?
@@ -77,7 +78,7 @@ final class DBPool extends Singleton {
          $db      =                             $config['schema'  ];
          $options = isSet($config['options']) ? $config['options' ] : null;
 
-         $connector = DB ::spawn($class, $host, $user, $pass, $db, $options);
+         $connector = DB::spawn($class, $host, $user, $pass, $db, $options);
          $me->pool[$alias] = $connector;
       }
       else {

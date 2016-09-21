@@ -1,4 +1,6 @@
 <?php
+namespace rosasurfer\db;
+
 use rosasurfer\exception\DatabaseException;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InfrastructureException;
@@ -31,7 +33,7 @@ final class MySQLConnector extends DB {
     * Erzeugt eine neue MySQLConnector-Instanz.
     */
    protected function __construct() {
-      $loglevel        = Logger ::getLogLevel(__CLASS__);
+      $loglevel        = \Logger::getLogLevel(__CLASS__);
       self::$logDebug  = ($loglevel <= L_DEBUG );
       self::$logInfo   = ($loglevel <= L_INFO  );
       self::$logNotice = ($loglevel <= L_NOTICE);
@@ -149,20 +151,16 @@ final class MySQLConnector extends DB {
       if (!$this->isConnected())
          $this->connect();
 
-
       // ggf. Startzeitpunkt speichern
       if (self::$logDebug)
          $start = microTime(true);
 
-
       // Statement ausführen
       $result = mysql_query($sql, $this->link);
-
 
       // ggf. Endzeitpunkt speichern
       if (self::$logDebug)
          $end = microTime(true);
-
 
       // Ergebnis auswerten
       if (!$result) {
@@ -187,8 +185,8 @@ final class MySQLConnector extends DB {
       if (self::$logDebug) {
          $neededTime = round($end - $start, 4);
          if ($neededTime > self::$maxQueryTime)
-            Logger::log('SQL statement took more than '.self::$maxQueryTime." seconds: $neededTime\n$sql", null, L_DEBUG, __CLASS__);
-           //Logger::log($this->printDeadlockStatus(true), null, L_DEBUG, __CLASS__);
+            \Logger::log('SQL statement took more than '.self::$maxQueryTime." seconds: $neededTime\n$sql", null, L_DEBUG, __CLASS__);
+           //\Logger::log($this->printDeadlockStatus(true), null, L_DEBUG, __CLASS__);
       }
       return $result;
    }
@@ -385,7 +383,7 @@ final class MySQLConnector extends DB {
       if (!preg_match('/\nLATEST DETECTED DEADLOCK\n-+\n(.+)\n-+\n/sU', $status, $match)) {
          if (strContains($status, "\nLATEST DETECTED DEADLOCK\n")) $message = "Error parsing InnoDB status:";
          else                                                      $message = "No deadlock infos found in InnoDB status:";
-         Logger::log($message."\n\n".$status, null, L_ERROR, __CLASS__);
+         \Logger::log($message."\n\n".$status, null, L_ERROR, __CLASS__);
          return null;
       }
       $status = $match[1];
@@ -394,7 +392,7 @@ final class MySQLConnector extends DB {
       // Blöcke trennen
       $blocks = explode("\n*** ", $status);
       if (!$blocks) {
-         Logger::log("Error parsing deadlock status\n\n".$status, null, L_ERROR, __CLASS__);
+         \Logger::log("Error parsing deadlock status\n\n".$status, null, L_ERROR, __CLASS__);
          return null;
       }
       array_shift($blocks); // führende Timestring-Zeile entfernen
@@ -409,7 +407,7 @@ final class MySQLConnector extends DB {
          // Roll back block
          if (strStartsWithI($block, 'WE ROLL BACK TRANSACTION ')) {
             if (!preg_match('/^WE ROLL BACK TRANSACTION \((\d+)\)$/i', $block, $match)) {
-               Logger::log("Error parsing deadlock status roll back block\n\n".$block, null, L_ERROR, __CLASS__);
+               \Logger::log("Error parsing deadlock status roll back block\n\n".$block, null, L_ERROR, __CLASS__);
                return null;
             }
             foreach ($transactions as &$transaction) {
@@ -419,13 +417,13 @@ final class MySQLConnector extends DB {
          else {
             $lines = explode("\n", $block);
             if (sizeOf($lines) < 2) {
-               Logger::log("Error parsing deadlock status block\n\n".$block, null, L_ERROR, __CLASS__);
+               \Logger::log("Error parsing deadlock status block\n\n".$block, null, L_ERROR, __CLASS__);
                return null;
             }
             // Transaction block
             if (strStartsWithI($lines[1], 'TRANSACTION ')) {
                if (!preg_match('/\s*\((\d+)\).*\nTRANSACTION \d+ (\d+), ACTIVE (\d+) sec.+\n(LOCK WAIT )?(\d+) lock struct\(s\), heap size \d+(?:, undo log entries (\d+))?\nMySQL thread id (\d+), query id \d+ (\S+) \S+ (\S+).+?\n(.+)$/is', $block, $match)) {
-                  Logger::log("Error parsing deadlock status transaction block\n\n".$block, null, L_ERROR, __CLASS__);
+                  \Logger::log("Error parsing deadlock status transaction block\n\n".$block, null, L_ERROR, __CLASS__);
                   return null;
                }
 
@@ -445,7 +443,7 @@ final class MySQLConnector extends DB {
             // Lock block
             elseif (strStartsWithI($lines[1], 'RECORD LOCKS ')) {
                if (!preg_match('/\s*\((\d+)\).*\nRECORD LOCKS space id \d+ page no \d+ n bits \d+ index `(\S+)` of table `([^\/]+)\/([^`]+)` trx id \d+ (\d+) lock(_| )mode (S|X)( locks (.+))?( waiting)?/i', $block, $match)) {
-                  Logger::log("Error parsing deadlock status lock block\n\n".$block, null, L_ERROR, __CLASS__);
+                  \Logger::log("Error parsing deadlock status lock block\n\n".$block, null, L_ERROR, __CLASS__);
                   return null;
                }
                $lock = array('no'          => (int) $match[1],
@@ -462,7 +460,7 @@ final class MySQLConnector extends DB {
                $transactions[$match[5]]['locks'][] = $lock;
             }
             else {
-               Logger::log("Error parsing deadlock status block\n\n".$block, null, L_ERROR, __CLASS__);
+               \Logger::log("Error parsing deadlock status block\n\n".$block, null, L_ERROR, __CLASS__);
                return null;
             }
          }

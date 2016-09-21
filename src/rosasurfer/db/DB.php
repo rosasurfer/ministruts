@@ -1,4 +1,6 @@
 <?php
+namespace rosasurfer\db;
+
 use rosasurfer\core\Object;
 
 use rosasurfer\exception\InvalidArgumentException;
@@ -61,7 +63,7 @@ abstract class DB extends Object {
          }
       }
       catch (\Exception $ex) {
-         System::handleDestructorException($ex);
+         \System::handleDestructorException($ex);
          throw $ex;
       }
    }
@@ -113,8 +115,7 @@ abstract class DB extends Object {
     * @return DB - Connector
     */
    public static function spawn($class, $host, $username, $password, $database = null, array $options = null) {
-      if (!is_subclass_of($class, __CLASS__))
-         throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
+      if (!is_subclass_of($class, __CLASS__)) throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
 
       $connector = new $class();
       $connector->setHost($host)
@@ -217,8 +218,7 @@ abstract class DB extends Object {
     * @return DB
     */
    public function begin() {
-      if ($this->transaction < 0)
-         throw new RuntimeException('Negative transaction counter detected: '.$this->transaction);
+      if ($this->transaction < 0) throw new RuntimeException('Negative transaction counter detected: '.$this->transaction);
 
       if ($this->transaction == 0)
          $this->queryRaw('start transaction');
@@ -235,11 +235,10 @@ abstract class DB extends Object {
     * @return DB
     */
    public function commit() {
-      if ($this->transaction < 0)
-         throw new RuntimeException('Negative transaction counter detected: '.$this->transaction);
+      if ($this->transaction < 0) throw new RuntimeException('Negative transaction counter detected: '.$this->transaction);
 
       if ($this->transaction == 0) {
-         Logger::log('No database transaction to commit', null, L_WARN, __CLASS__);
+         \Logger::log('No database transaction to commit', null, L_WARN, __CLASS__);
       }
       else {
          if ($this->transaction == 1)
@@ -258,11 +257,10 @@ abstract class DB extends Object {
     * @return DB
     */
    public function rollback() {
-      if ($this->transaction < 0)
-         throw new RuntimeException('Negative transaction counter detected: '.$this->transaction);
+      if ($this->transaction < 0) throw new RuntimeException('Negative transaction counter detected: '.$this->transaction);
 
       if ($this->transaction == 0) {
-         Logger::log('No database transaction to roll back', null, L_WARN, __CLASS__);
+         \Logger::log('No database transaction to roll back', null, L_WARN, __CLASS__);
       }
       else {
          if ($this->transaction == 1)

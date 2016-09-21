@@ -3,7 +3,7 @@ use const rosasurfer\MINISTRUTS_ROOT;
 
 
 /**
- * Class map for class loader (fastest way to load classes)
+ * Class map for the internal class loader
  */
 return array(
    'rosasurfer\\acl\\ACL'                                   => MINISTRUTS_ROOT.'/src/rosasurfer/acl/ACL',
@@ -38,9 +38,9 @@ return array(
    'rosasurfer\\dao\\DaoWorker'                             => MINISTRUTS_ROOT.'/src/rosasurfer/dao/DaoWorker',
    'rosasurfer\\dao\\PersistableObject'                     => MINISTRUTS_ROOT.'/src/rosasurfer/dao/PersistableObject',
 
-   'DB'                                                     => MINISTRUTS_ROOT.'/src/rosasurfer/db/DB',
-   'DBPool'                                                 => MINISTRUTS_ROOT.'/src/rosasurfer/db/DBPool',
-   'MySQLConnector'                                         => MINISTRUTS_ROOT.'/src/rosasurfer/db/MySQLConnector',
+   'rosasurfer\\db\\DB'                                     => MINISTRUTS_ROOT.'/src/rosasurfer/db/DB',
+   'rosasurfer\\db\\DBPool'                                 => MINISTRUTS_ROOT.'/src/rosasurfer/db/DBPool',
+   'rosasurfer\\db\\MySQLConnector'                         => MINISTRUTS_ROOT.'/src/rosasurfer/db/MySQLConnector',
 
    'ChainedDependency'                                      => MINISTRUTS_ROOT.'/src/rosasurfer/dependency/ChainedDependency',
    'Dependency'                                             => MINISTRUTS_ROOT.'/src/rosasurfer/dependency/Dependency',
