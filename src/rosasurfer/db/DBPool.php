@@ -31,8 +31,10 @@ final class DBPool extends Singleton {
     * verschiedene Schreibweisen
     */
    private static $internalConnectors = [
-      'mysql'          => __NAMESPACE__.'\MySQLConnector',
-      'mysqlconnector' => __NAMESPACE__.'\MySQLConnector',
+           'mysql'                         => __NAMESPACE__.'\MySQLConnector',
+           'mysqlconnector'                => __NAMESPACE__.'\MySQLConnector',
+           __NAMESPACE__.'\mysqlconnector' => __NAMESPACE__.'\MySQLConnector',
+      '\\'.__NAMESPACE__.'\mysqlconnector' => __NAMESPACE__.'\MySQLConnector',
    ];
 
    /**
