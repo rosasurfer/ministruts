@@ -1,6 +1,7 @@
 <?php
 namespace rosasurfer\cache;
 
+use rosasurfer\dependency\Dependency;
 use rosasurfer\exception\IllegalTypeException;
 
 
@@ -134,7 +135,7 @@ final class ApcCache extends CachePeer {
     *
     * @return bool - TRUE bei Erfolg, FALSE andererseits
     */
-   public function set($key, &$value, $expires = Cache::EXPIRES_NEVER, \Dependency $dependency = null) {
+   public function set($key, &$value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null) {
       if (!is_string($key))  throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
       if (!is_int($expires)) throw new IllegalTypeException('Illegal type of parameter $expires: '.getType($expires));
 

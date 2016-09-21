@@ -5,6 +5,8 @@ use rosasurfer\cache\Cache;
 
 use rosasurfer\core\Singleton;
 
+use rosasurfer\dependency\FileDependency;
+
 use rosasurfer\exception\FileNotFoundException;
 use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\RuntimeException;
@@ -64,7 +66,7 @@ class StrutsController extends Singleton {
                $controller = Singleton::getInstance(__CLASS__);
 
                $configFile = str_replace('\\', '/', APPLICATION_ROOT.'/app/config/struts-config.xml');
-               $dependency = \FileDependency::create($configFile);
+               $dependency = FileDependency::create($configFile);
                if (!WINDOWS && !LOCALHOST)                           // distinction dev/production
                   $dependency->setMinValidity(1 * MINUTE);
 

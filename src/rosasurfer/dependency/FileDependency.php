@@ -1,4 +1,6 @@
 <?php
+namespace rosasurfer\dependency;
+
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 

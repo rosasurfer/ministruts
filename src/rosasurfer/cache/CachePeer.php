@@ -2,6 +2,7 @@
 namespace rosasurfer\cache;
 
 use rosasurfer\core\Object;
+use rosasurfer\dependency\Dependency;
 
 
 /**
@@ -106,7 +107,7 @@ abstract class CachePeer extends Object {
     *
     * @return bool - TRUE bei Erfolg, FALSE andererseits
     */
-   abstract public function set($key, &$value, $expires = Cache::EXPIRES_NEVER, \Dependency $dependency = null);
+   abstract public function set($key, &$value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null);
 
 
    /**
@@ -121,7 +122,7 @@ abstract class CachePeer extends Object {
     *
     * @return bool - TRUE bei Erfolg, FALSE andererseits
     */
-   final public function add($key, &$value, $expires = Cache::EXPIRES_NEVER, \Dependency $dependency = null) {
+   final public function add($key, &$value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null) {
       if ($this->isCached($key))
          return false;
 
@@ -141,7 +142,7 @@ abstract class CachePeer extends Object {
     *
     * @return bool - TRUE bei Erfolg, FALSE andererseits
     */
-   final public function replace($key, &$value, $expires = Cache::EXPIRES_NEVER, \Dependency $dependency = null) {
+   final public function replace($key, &$value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null) {
       if (!$this->isCached($key))
          return false;
 

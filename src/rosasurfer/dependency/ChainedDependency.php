@@ -1,4 +1,6 @@
 <?php
+namespace rosasurfer\dependency;
+
 use rosasurfer\exception\RuntimeException;
 
 
@@ -55,7 +57,7 @@ class ChainedDependency extends Dependency {
          return $this;
 
       if ($this->type == 'OR')
-         return self ::create($this)->andDependency($dependency);
+         return self::create($this)->andDependency($dependency);
 
       $this->type           = 'AND';
       $this->dependencies[] = $dependency;
@@ -77,7 +79,7 @@ class ChainedDependency extends Dependency {
          return $this;
 
       if ($this->type == 'AND')
-         return self ::create($this)->orDependency($dependency);
+         return self::create($this)->orDependency($dependency);
 
       $this->type           = 'OR';
       $this->dependencies[] = $dependency;

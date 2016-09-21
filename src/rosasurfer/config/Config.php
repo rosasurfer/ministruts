@@ -5,6 +5,8 @@ use rosasurfer\cache\Cache;
 
 use rosasurfer\core\Object;
 
+use rosasurfer\dependency\FileDependency;
+
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
@@ -354,7 +356,7 @@ class Config extends Object implements ConfigInterface {
                $config = new self($files);
 
                // create FileDependency and cache the instance
-               $dependency = \FileDependency::create(array_keys($config->files));
+               $dependency = FileDependency::create(array_keys($config->files));
                if (!WINDOWS && !CLI && !LOCALHOST)                      // distinction dev/production (sense???)
                   $dependency->setMinValidity(60 * SECONDS);
                $cache->set(__CLASS__, $config, Cache::EXPIRES_NEVER, $dependency);

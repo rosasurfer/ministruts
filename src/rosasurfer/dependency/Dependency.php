@@ -1,4 +1,6 @@
 <?php
+namespace rosasurfer\dependency;
+
 use rosasurfer\core\Object;
 
 use rosasurfer\exception\IllegalTypeException;
@@ -67,8 +69,8 @@ abstract class Dependency extends Object {
       if ($dependency === $this)
          return $this;
 
-      return ChainedDependency ::create($this)
-                               ->andDependency($dependency);
+      return ChainedDependency::create($this)
+                              ->andDependency($dependency);
    }
 
 
@@ -83,8 +85,8 @@ abstract class Dependency extends Object {
       if ($dependency === $this)
          return $this;
 
-      return ChainedDependency ::create($this)
-                               ->orDependency($dependency);
+      return ChainedDependency::create($this)
+                              ->orDependency($dependency);
    }
 
 

@@ -42,9 +42,9 @@ return array(
    'rosasurfer\\db\\DBPool'                                 => MINISTRUTS_ROOT.'/src/rosasurfer/db/DBPool',
    'rosasurfer\\db\\MySQLConnector'                         => MINISTRUTS_ROOT.'/src/rosasurfer/db/MySQLConnector',
 
-   'ChainedDependency'                                      => MINISTRUTS_ROOT.'/src/rosasurfer/dependency/ChainedDependency',
-   'Dependency'                                             => MINISTRUTS_ROOT.'/src/rosasurfer/dependency/Dependency',
-   'FileDependency'                                         => MINISTRUTS_ROOT.'/src/rosasurfer/dependency/FileDependency',
+   'rosasurfer\\dependency\\ChainedDependency'              => MINISTRUTS_ROOT.'/src/rosasurfer/dependency/ChainedDependency',
+   'rosasurfer\\dependency\\Dependency'                     => MINISTRUTS_ROOT.'/src/rosasurfer/dependency/Dependency',
+   'rosasurfer\\dependency\\FileDependency'                 => MINISTRUTS_ROOT.'/src/rosasurfer/dependency/FileDependency',
 
    'rosasurfer\\exception\\BaseException'                   => MINISTRUTS_ROOT.'/src/rosasurfer/exception/BaseException',
    'rosasurfer\\exception\\BusinessRuleException'           => MINISTRUTS_ROOT.'/src/rosasurfer/exception/BusinessRuleException',
