@@ -72,8 +72,8 @@ return array(
    'rosasurfer\\lock\\Lock'                                 => MINISTRUTS_ROOT.'/src/rosasurfer/lock/Lock',
    'rosasurfer\\lock\\SystemFiveLock'                       => MINISTRUTS_ROOT.'/src/rosasurfer/lock/SystemFiveLock',
 
-   'NetTools'                                               => MINISTRUTS_ROOT.'/src/rosasurfer/net/NetTools',
-   'TorHelper'                                              => MINISTRUTS_ROOT.'/src/rosasurfer/net/TorHelper',
+   'rosasurfer\\net\\NetTools'                              => MINISTRUTS_ROOT.'/src/rosasurfer/net/NetTools',
+   'rosasurfer\\net\\TorHelper'                             => MINISTRUTS_ROOT.'/src/rosasurfer/net/TorHelper',
 
    'CurlHttpClient'                                         => MINISTRUTS_ROOT.'/src/rosasurfer/net/http/CurlHttpClient',
    'CurlHttpResponse'                                       => MINISTRUTS_ROOT.'/src/rosasurfer/net/http/CurlHttpResponse',

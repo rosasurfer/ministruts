@@ -1,4 +1,6 @@
 <?php
+namespace rosasurfer\net;
+
 use rosasurfer\cache\Cache;
 
 use rosasurfer\core\StaticClass;
@@ -41,7 +43,7 @@ class TorHelper extends StaticClass {
     */
    private static function init() {
       if (self::$logDebug === null) {
-         $loglevel        = Logger ::getLogLevel(__CLASS__);
+         $loglevel        = \Logger::getLogLevel(__CLASS__);
          self::$logDebug  = ($loglevel <= L_DEBUG );
          self::$logInfo   = ($loglevel <= L_INFO  );
          self::$logNotice = ($loglevel <= L_NOTICE);
@@ -57,7 +59,7 @@ class TorHelper extends StaticClass {
     * @return bool
     */
    public static function isExitNode($ip) {
-      self:: init();
+      self::init();
 
       if (!is_string($ip)) throw new IllegalTypeException('Illegal type of parameter $ip: '.getType($ip));
 
@@ -65,7 +67,7 @@ class TorHelper extends StaticClass {
       if ($ip == '127.0.0.1')
          return false;
 
-      $nodes =& self:: getExitNodes();
+      $nodes =& self::getExitNodes();
       return isSet($nodes[$ip]);
    }
 
@@ -88,20 +90,20 @@ class TorHelper extends StaticClass {
                $size = sizeOf(self::$torMirrors);
 
                for ($i=0; $i < $size; ++$i) {
-                  $request = HttpRequest ::create()->setUrl('http://'.self::$torMirrors[$i].'/ip_list_exit.php/Tor_ip_list_EXIT.csv');
+                  $request = \HttpRequest::create()->setUrl('http://'.self::$torMirrors[$i].'/ip_list_exit.php/Tor_ip_list_EXIT.csv');
                   try {
                      // TODO: Warnung ausgeben und Reihenfolge ändern, wenn ein Server nicht antwortet
-                     $response = CurlHttpClient ::create()
+                     $response = \CurlHttpClient::create()
                                                 ->send($request);
                      $status = $response->getStatus();
 
                      if ($status != 200) {
-                        self::$logNotice && Logger::log('Could not get TOR exit nodes from '.self::$torMirrors[$i].', HTTP status '.$status.' ('.HttpResponse ::$sc[$status]."),\n url: ".$request->getUrl(), null, L_NOTICE, __CLASS__);
+                        self::$logNotice && \Logger::log('Could not get TOR exit nodes from '.self::$torMirrors[$i].', HTTP status '.$status.' ('.HttpResponse ::$sc[$status]."),\n url: ".$request->getUrl(), null, L_NOTICE, __CLASS__);
                         continue;
                      }
                   }
                   catch (IOException $ex) {
-                     self::$logNotice && Logger::log('Could not get TOR exit nodes from '.self::$torMirrors[$i], $ex, L_NOTICE, __CLASS__);
+                     self::$logNotice && \Logger::log('Could not get TOR exit nodes from '.self::$torMirrors[$i], $ex, L_NOTICE, __CLASS__);
                      continue;
                   }
 
@@ -111,8 +113,7 @@ class TorHelper extends StaticClass {
 
                $nodes = strLen($content) ? array_flip(explode("\n", str_replace("\r\n", "\n", $content))) : array();
 
-               if (!$nodes)
-                  Logger::log('Could not get TOR exit nodes from any server', null, L_ERROR, __CLASS__);
+               if (!$nodes) \Logger::log('Could not get TOR exit nodes from any server', null, L_ERROR, __CLASS__);
 
                $cache->set($key, $nodes, 30 * MINUTES);
             }

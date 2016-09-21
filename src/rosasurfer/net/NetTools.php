@@ -1,4 +1,6 @@
 <?php
+namespace rosasurfer\net;
+
 use rosasurfer\config\Config;
 
 use rosasurfer\core\StaticClass;
