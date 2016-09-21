@@ -123,7 +123,7 @@ function echoPre($var) {
  * @see    printPretty()
  */
 function pp($var, $return=false) {
-   return printPretty($var, $return);
+   return printPretty(...func_get_args());
 }
 
 
@@ -628,8 +628,8 @@ function strIsDoubleQuoted($value) {
  * @return bool
  */
 function strIsDigits($value) {
-   if (is_null($value)) return false;
-   if (is_int($value))  return ($value >= 0);
+   if (is_null($value))    return false;
+   if (is_int($value))     return ($value >= 0);
    if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
 
    return ctype_digit($value);
@@ -646,7 +646,7 @@ function strIsDigits($value) {
  * @see    getType()
  */
 function typeOf($var) {
-   return getType($var);
+   return getType(...func_get_args());
 }
 
 
