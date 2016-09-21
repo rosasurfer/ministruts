@@ -137,7 +137,7 @@ class Config extends Object implements ConfigInterface {
 
          $parts = explode('=', $line, 2);             // separate key/value
          if (sizeOf($parts) < 2) {
-            Logger::log(__METHOD__.'()  Skipping syntax error in "'.$filename.'", line '.($i+1).': missing key-value separator', null, L_NOTICE, __CLASS__);
+            \Logger::log(__METHOD__.'()  Skipping syntax error in "'.$filename.'", line '.($i+1).': missing key-value separator', null, L_NOTICE, __CLASS__);
             continue;
          }
          $key   = trim($parts[0]);
@@ -220,9 +220,9 @@ class Config extends Object implements ConfigInterface {
    private function setProperty($key, $value, $file=null, $line=null) {
 
       // set the property depending on the existing data structure
-      $properties =& $this->properties;
-      $subkeys     = $this->parseSubkeys($key);
-      $subkeysSize = sizeOf($subkeys);
+      $properties  =& $this->properties;
+      $subkeys     =  $this->parseSubkeys($key);
+      $subkeysSize =  sizeOf($subkeys);
 
       for ($i=0; $i < $subkeysSize; ++$i) {
          $subkey = trim($subkeys[$i]);
@@ -248,7 +248,7 @@ class Config extends Object implements ConfigInterface {
             }
             else {
                $where = $file ? ' in "'.$file.'", line '.$line : '';
-               Logger::log(__METHOD__.'()  Overwriting existing properties array "'.$key.'" with simple value'.$where, null, L_NOTICE, __CLASS__);
+               \Logger::log(__METHOD__.'()  Overwriting existing properties array "'.$key.'" with simple value'.$where, null, L_NOTICE, __CLASS__);
                $properties[$subkey] = $value;                        // overwrite the existing array value
             }
          }
@@ -321,7 +321,7 @@ class Config extends Object implements ConfigInterface {
             if (!$locked) {
                // Lock holen und nochmal nachschauen
                $locked = true;
-               $lock   = new Lock(APPLICATION_ID.'|'.__FILE__.'#'.__LINE__);
+               $lock   = new \Lock(APPLICATION_ID.'|'.__FILE__.'#'.__LINE__);
                $config = $cache->get(__CLASS__);
             }
 
@@ -354,7 +354,7 @@ class Config extends Object implements ConfigInterface {
                $config = new self($files);
 
                // create FileDependency and cache the instance
-               $dependency = FileDependency::create(array_keys($config->files));
+               $dependency = \FileDependency::create(array_keys($config->files));
                if (!WINDOWS && !CLI && !LOCALHOST)                      // distinction dev/production (sense???)
                   $dependency->setMinValidity(60 * SECONDS);
                $cache->set(__CLASS__, $config, Cache::EXPIRES_NEVER, $dependency);
