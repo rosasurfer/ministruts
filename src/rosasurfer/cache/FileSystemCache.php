@@ -23,10 +23,8 @@ use const rosasurfer\WINDOWS;
 final class FileSystemCache extends CachePeer {
 
 
-   /**
-    * Cache-Directory
-    */
-   private /*string*/ $directory;
+   /** @var string - Cache-Directory */
+   private $directory;
 
 
    /**

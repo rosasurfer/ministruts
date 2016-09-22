@@ -18,19 +18,16 @@ use const rosasurfer\CLI;
 final class Cache extends StaticClass {
 
 
-   const /*int*/ EXPIRES_NEVER = 0;
+   /** @var int */
+   const EXPIRES_NEVER = 0;
 
 
-   /**
-    * Default-Cache-Implementierung
-    */
-   private static /*CachePeer*/   $default;
+   /** @var CachePeer - Default-Cache-Implementierung */
+   private static $default;
 
 
-   /**
-    * weitere Cache-Implementierungen
-    */
-   private static /*CachePeer[]*/ $caches;
+   /** @var CachePeer[] - weitere Cache-Implementierungen */
+   private static $caches;
 
 
    /**

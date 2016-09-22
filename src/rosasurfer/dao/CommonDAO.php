@@ -27,12 +27,12 @@ class CommonDAO extends Singleton {
    const T_NOT_NULL = false;           // not null
 
 
-   // Worker dieses DAO's
-   private /*DB*/ $worker;
+   /** @var DB - Worker dieses DAO's */
+   private $worker;
 
 
-   // Name der Entityklasse, für die der DAO zuständig ist
-   private /*string*/ $entityClass;
+   /** @var string - Name der Entityklasse, für die der DAO zuständig ist */
+   private $entityClass;
 
 
    /**

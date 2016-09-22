@@ -18,19 +18,17 @@ use rosasurfer\exception\IllegalTypeException;
 class DaoWorker extends Object {
 
 
-   // DAO der Entity-Klasse dieses Workers
-   private /*CommonDAO*/ $dao;
+   /** @var CommonDAO - DAO der Entity-Klasse dieses Workers */
+   private $dao;
 
+   /** @var string - Name der Entity-Klasse dieses Workers */
+   protected $entityClass;
 
-   // Name der Entity-Klasse dieses Workers
-   protected /*string*/ $entityClass;
+   /** @var DB - DB-Adapter der Entity-Klasse dieses Workers */
+   private $adapter;
 
-
-   // DB-Adapter der Entity-Klasse dieses Workers
-   private /*DB*/ $adapter;
-
-
-   private /*int*/ $foundItemsCounter = 0;
+   /** @var int */
+   private $foundItemsCounter = 0;
 
 
    /**

@@ -21,10 +21,8 @@ use rosasurfer\exception\IllegalTypeException;
 final class ReferencePool extends CachePeer {
 
 
-   /**
-    * Array mit den gespeicherten Referenzen
-    */
-   private /*mixed[][4]*/ $pool;
+   /** @var mixed[] - Array mit den gespeicherten Referenzen */
+   private $pool;
 
 
    /**

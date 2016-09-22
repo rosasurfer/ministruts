@@ -13,10 +13,8 @@ use rosasurfer\exception\RuntimeException;
 abstract class Singleton extends Object {
 
 
-   /**
-    * Pool der momentan existierenden Singletons
-    */
-   private static $instances = array();
+   /** @var Singleton[] - Pool der momentan existierenden Singletons */
+   private static $instances = [];
 
 
    /**

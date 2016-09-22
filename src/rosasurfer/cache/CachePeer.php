@@ -44,10 +44,17 @@ use rosasurfer\dependency\Dependency;
 abstract class CachePeer extends Object {
 
 
-   protected /*string       */ $label;
-   protected /*string       */ $namespace;
-   protected /*string[]     */ $options;
-   private   /*ReferencePool*/ $referencePool;
+   /** @var string */
+   protected $label;
+
+   /** @var string */
+   protected $namespace;
+
+   /** @var string */
+   protected $options;
+
+   /** @var ReferencePool */
+   private $referencePool;
 
 
    /**

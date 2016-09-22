@@ -19,16 +19,26 @@ use rosasurfer\util\Logger;
 abstract class PersistableObject extends Object {
 
 
-   // Flag für den aktuellen Änderungsstatus der Instanz
-   protected /*bool*/     $modified = false;
-   protected /*string[]*/ $modifications;
+   /** @var bool - Flag für den aktuellen Änderungsstatus der Instanz */
+   protected $modified = false;
+
+   /** @var string[] */
+   protected $modifications;
 
 
    // Standard-Properties jeder Instanz
-   protected /*int*/    $id;           // Primary Key
-   protected /*string*/ $created;      // Erzeugungszeitpunkt: datetime
-   protected /*string*/ $version;      // Versionsnummer:      timestamp
-   protected /*string*/ $deleted;      // Löschzeitpunkt:      datetime
+
+   /** @var int - Primary Key */
+   protected $id;
+
+   /** @var string - Erzeugungszeitpunkt (datetime) */
+   protected $created;
+
+   /** @var string - Versionsnummer (timestamp) */
+   protected $version;
+
+   /** @var string - Löschzeitpunkt (datetime) */
+   protected $deleted;
 
 
    /**
