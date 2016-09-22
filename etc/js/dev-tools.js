@@ -34,31 +34,31 @@ if ('ab'.substr(-1) != 'b') {
    /**
     * Decimal adjustment of a number.
     *
-    * @param  String  type  The type of adjustment.
-    * @param  Number  value The number.
-    * @param  Integer exp   The exponent (the 10 logarithm of the adjustment base).
+    * @param  string  type  - The type of adjustment.
+    * @param  number  value - The number.
+    * @param  int     exp   - The exponent (the 10 logarithm of the adjustment base).
     *
-    * @return Number  The adjusted value.
+    * @return number - The adjusted value.
     *
-    * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/round#Example:_Decimal_rounding
+    * @see    https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/round#Example:_Decimal_rounding
     */
    function decimalAdjust(type, value, exp) {
       // if the exp is undefined or zero...
-      if (typeof exp === 'undefined' || +exp === 0) {
+      if (typeof(exp)=='undefined' || +exp===0) {
          return Math[type](value);
       }
       value = +value;
-      exp = +exp;
+      exp   = +exp;
       // if the value is not a number or the exp is not an integer...
-      if (isNaN(value) || !(typeof exp === 'number' && exp % 1 === 0)) {
+      if (isNaN(value) || typeof(exp)!='number' || exp%1===0) {
          return NaN;
       }
       // shift
       value = value.toString().split('e');
-      value = Math[type](+(value[0] + 'e' + (value[1] ? (+value[1] - exp) : -exp)));
+      value = Math[type](+(value[0] +'e'+ (value[1] ? (+value[1]-exp) : -exp)));
       // shift back
       value = value.toString().split('e');
-      return +(value[0] + 'e' + (value[1] ? (+value[1] + exp) : exp));
+      return +(value[0] +'e'+ (value[1] ? (+value[1]+exp) : exp));
    }
 
    // decimal round, floor and ceil
@@ -83,7 +83,7 @@ var rs = rs || {};
  *
  * @param  url   - static URL to get query parameters from (if not given, the current page's url is used)
  *
- * @return Array - [key1=>value1, key2=>value2, ..., keyN=>valueN]
+ * @return array - [key1=>value1, key2=>value2, ..., keyN=>valueN]
  */
 function getQueryParameters(/*string*/url) {
    var pos, search;
