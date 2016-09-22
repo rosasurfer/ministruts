@@ -13,43 +13,43 @@ if (defined(__NAMESPACE__.'\DEFAULT_REQUEST_PROCESSOR_CLASS'))
 /**
  * @var string - default <tt>RequestProcessor</tt> class
  */
-const DEFAULT_REQUEST_PROCESSOR_CLASS = __NAMESPACE__.'\RequestProcessor';
+const DEFAULT_REQUEST_PROCESSOR_CLASS = RequestProcessor::class;
 
 
 /**
  * @var string - default <tt>ActionForward</tt> class
  */
-const DEFAULT_ACTION_FORWARD_CLASS = __NAMESPACE__.'\ActionForward';
+const DEFAULT_ACTION_FORWARD_CLASS = ActionForward::class;
 
 
 /**
  * @var string - default <tt>ActionMapping</tt> class
  */
-const DEFAULT_ACTION_MAPPING_CLASS = __NAMESPACE__.'\ActionMapping';
+const DEFAULT_ACTION_MAPPING_CLASS = ActionMapping::class;
 
 
 /**
  * @var string - default <tt>Tile</tt> class
  */
-const DEFAULT_TILES_CLASS = __NAMESPACE__.'\Tile';
+const DEFAULT_TILES_CLASS = Tile::class;
 
 
 /**
  * @var string - <tt>Action</tt> base class
  */
-const ACTION_BASE_CLASS = __NAMESPACE__.'\Action';
+const ACTION_BASE_CLASS = Action::class;
 
 
 /**
  * @var string - <tt>ActionForm</tt> base class
  */
-const ACTION_FORM_BASE_CLASS = __NAMESPACE__.'\ActionForm';
+const ACTION_FORM_BASE_CLASS = ActionForm::class;
 
 
 /**
  * @var string - <tt>RoleProcessor</tt> base class
  */
-const ROLE_PROCESSOR_BASE_CLASS = __NAMESPACE__.'\RoleProcessor';
+const ROLE_PROCESSOR_BASE_CLASS = RoleProcessor::class;
 
 
 /**

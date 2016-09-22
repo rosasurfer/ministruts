@@ -30,11 +30,9 @@ final class DBPool extends Singleton {
    /**
     * verschiedene Schreibweisen
     */
-   private static $internalConnectors = [
-           'mysql'                         => __NAMESPACE__.'\MySQLConnector',
-           'mysqlconnector'                => __NAMESPACE__.'\MySQLConnector',
-           __NAMESPACE__.'\mysqlconnector' => __NAMESPACE__.'\MySQLConnector',
-      '\\'.__NAMESPACE__.'\mysqlconnector' => __NAMESPACE__.'\MySQLConnector',
+   private static $connectorAliases = [
+           'mysql'                         => MySQLConnector::class,
+           __NAMESPACE__.'\mysqlconnector' => MySQLConnector::class,
    ];
 
    /**
@@ -57,7 +55,7 @@ final class DBPool extends Singleton {
    public static function getDB($alias = null) {
       $me = self::me();
 
-      if ($alias === null) {                                // single db project
+      if (is_null($alias)) {                                // single db project
          if (!$me->default) throw new IllegalStateException('Invalid default database configuration: null');
          $connector = $me->default;
       }
@@ -65,15 +63,13 @@ final class DBPool extends Singleton {
          $connector = $me->pool[$alias];
       }
       elseif ($config=Config::getDefault()->get('db.'.$alias, null)) {   // nein, Config holen und Connector laden
-         // bekannte Namen trotz unterschiedlicher Schreibweisen erkennen
-         $name = strToLower($config['connector']);
+         $name = $config['connector'];
+         if ($name[0]=='//') $name = substr($name, 1);
 
-         if (isSet(self::$internalConnectors[$name])) {
-            $class = self::$internalConnectors[$name];
-         }
-         else {   // unbekannt, Fall-back zu "{$name}Connector"
-            $class = $config['connector'].'Connector';
-         }
+         // Aliase durch Klassennamen ersetzen
+         $lName = strToLower($name);
+         if (isSet(self::$connectorAliases[$lName]))
+            $class = self::$connectorAliases[$lName];
 
          $host    =                             $config['host'    ];
          $user    =                             $config['username'];

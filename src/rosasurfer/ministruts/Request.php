@@ -473,7 +473,7 @@ class Request extends Singleton {
     * @return HttpSession
     */
    public function getSession() {
-      return Singleton::getInstance(__NAMESPACE__.'\HttpSession', $this);
+      return Singleton::getInstance(HttpSession::class, $this);
    }
 
 
