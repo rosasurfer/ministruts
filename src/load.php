@@ -28,7 +28,7 @@ define('rosasurfer\MINISTRUTS_ROOT', dirName(__DIR__));
 
 
 /**
- * (1) include required non-class files (utility constants and helper functions)
+ * (1) include required non-class files (helper constants and functions)
  */
 include(MINISTRUTS_ROOT.'/src/rosasurfer/utils.php');
 include(MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/utils.php');
