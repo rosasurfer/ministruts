@@ -1,8 +1,4 @@
 <?php
-/**
- * Helper functions and constant definitions. If Ministruts is loaded via "load-globals.php" all symbols of this file
- * are additionally mapped to the global namespace.
- */
 namespace rosasurfer;
 
 use rosasurfer\exception\ClassNotFoundException;
@@ -15,13 +11,24 @@ use rosasurfer\ministruts\url\VersionedUrl;
 use rosasurfer\util\Validator;
 
 
+/**
+ * Helper functions and constant definitions. If Ministruts is loaded via "load-globals.php" all symbols of this file
+ * are additionally mapped to the global namespace.
+ */
+
+
 // block re-includes
-if (defined(__NAMESPACE__.'\CLI'))
+if (defined(__NAMESPACE__.'\INIT_GLOBAL_HELPERS'))
    return;
 
 
+// Framework initialization flags
+const INIT_GLOBAL_HELPERS   = 1;
+const INIT_REPLACE_COMPOSER = 2;
+
+
 /**
- * helper constants
+ * Helper constants and functions
  */
 define(__NAMESPACE__.'\CLI'      , !isSet($_SERVER['REQUEST_METHOD']));              // whether or not we run on a command line interface
 define(__NAMESPACE__.'\LOCALHOST', !CLI && @$_SERVER['REMOTE_ADDR']=='127.0.0.1');   // whether or not we run on localhost
@@ -62,7 +69,7 @@ const SATURDAY          = 6;
 
 // miscellaneous
 const NL                = "\n";
-!defined('PHP_INT_MIN') && define('PHP_INT_MIN', ~PHP_INT_MAX);      // global definition (built-in since PHP 7.0)
+!defined('PHP_INT_MIN') && define('PHP_INT_MIN', ~PHP_INT_MAX);      // global (built-in since PHP 7.0)
 
 
 /**
@@ -770,13 +777,13 @@ function is_trait($name) {
 
 
 /**
- * Return one of the metatypes "class", "interface" or "trait" for an object type identifier (a name).
+ * Return one of the metatypes "class", "interface" or "trait" for an object type identifier.
  *
  * @param  string $name - name
  *
  * @return string metatype
  */
-function metaTypeToStr($name) {
+function metaTypeOf($name) {
    if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
    if ($name == '')       throw new InvalidArgumentException('Invalid argument $name: ""');
 

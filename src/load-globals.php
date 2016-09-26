@@ -480,14 +480,14 @@ function is_trait($name) {
 
 
 /**
- * Return one of the metatypes "class", "interface" or "trait" for an object type identifier (a name).
+ * Return one of the metatypes "class", "interface" or "trait" for an object type identifier.
  *
  * @param  string $name - name
  *
  * @return string metatype
  */
-function metaTypeToStr($name) {
-   return \rosasurfer\metaTypeToStr(...func_get_args());
+function metaTypeOf($name) {
+   return \rosasurfer\metaTypeOf(...func_get_args());
 }
 
 

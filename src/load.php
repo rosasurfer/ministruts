@@ -8,8 +8,8 @@ use rosasurfer\util\System;
 
 
 // block re-includes
-if (defined('rosasurfer\MINISTRUTS_ROOT')) return;
-define('rosasurfer\MINISTRUTS_ROOT', dirName(__DIR__));
+if (defined(__NAMESPACE__.'\MINISTRUTS_ROOT')) return;
+define(__NAMESPACE__.'\MINISTRUTS_ROOT', dirName(__DIR__));
 
 
 /**
@@ -23,12 +23,12 @@ define('rosasurfer\MINISTRUTS_ROOT', dirName(__DIR__));
  *
  * (4) check/adjust application requirements
  * (5) check/adjust PHP requirements
- * (6) execute phpinfo() if applicable
+ * (6) execute phpinfo() if applicable (on localhost only)
  */
 
 
 /**
- * (1) include required non-class files (helper constants and functions)
+ * (1) include required non-class files (helper functions and constants)
  */
 include(MINISTRUTS_ROOT.'/src/rosasurfer/utils.php');
 include(MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/utils.php');
@@ -42,19 +42,24 @@ include(MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/utils.php');
 spl_autoload_register(function($class) {
    // load and initialize class map
    static $classMap = null;
-   !$classMap && $classMap=array_change_key_case(include(MINISTRUTS_ROOT.'/src/rosasurfer/loader/classmap.php'), CASE_LOWER);
+   !$classMap && $classMap=array_change_key_case(include(MINISTRUTS_ROOT.'/etc/vendor/composer/autoload_classmap.php'), CASE_LOWER);
 
    $classToLower = strToLower($class);
    try {
       // load file
       if (isSet($classMap[$classToLower]))
-         include($classMap[$classToLower].'.php');
+         include($classMap[$classToLower]);
    }
    catch (\Exception $ex) {
       if (class_exists($class, false) || interface_exists($class, false) || trait_exists($class, false)) {
-         Logger::warn(ucFirst(metaTypeToStr($class)).' '.$class.' was successfully auto-loaded but file caused an exception', $ex, __CLASS__);
+         Logger::warn(ucFirst(metaTypeOf($class)).' '.$class.' was successfully auto-loaded but file caused an exception', $ex, __CLASS__);
       }
-      else throw ($ex instanceof ClassNotFoundException) ? $ex : new ClassNotFoundException('Cannot auto-load '.$class, null, $ex);
+      elseif ($ex instanceof ClassNotFoundException) {
+         throw $ex;
+      }
+      else {
+         throw new ClassNotFoundException('Cannot auto-load '.$class, null, $ex);
+      }
    }
 });
 
@@ -99,9 +104,9 @@ ini_set('zend.detect_unicode'     ,  1                     );     // BOM header 
 
 
 /**
- * (6) execute phpInfo() if magic parameter specified (localhost only)
+ * (6) execute phpInfo() if URI ends with magic path (on localhost only)
  */
-if (LOCALHOST && (strEndsWith(strLeftTo($_SERVER['REQUEST_URI'], '?'), '/=phpinfo') || strEndsWith(strLeftTo($_SERVER['REQUEST_URI'], '?'), '/=phpinfo.php'))) {
-   include(MINISTRUTS_ROOT.'/src/rosasurfer/util/phpinfo.php');
+if (LOCALHOST && strEndsWith(strLeftTo($_SERVER['REQUEST_URI'], '?'), '/__phpinfo__')) {
+   include(MINISTRUTS_ROOT.'/src/rosasurfer/debug/phpinfo.php');
    exit(0);
 }
