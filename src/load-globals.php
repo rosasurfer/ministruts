@@ -2,8 +2,8 @@
 /**
  * Load the Ministruts framework.
  *
- * If the framework is loaded via this script the framework helper constants and functions are additionally mapped
- * to the global namespace. Otherwise there are no differences.
+ * If the framework is loaded via this script the helper constants and functions in "rosasurfer/utils.php" are additionally
+ * mapped to the global namespace. Otherwise there are no differences.
  */
 
 // block re-includes
@@ -14,8 +14,13 @@ if (defined('rosasurfer\MINISTRUTS_ROOT'))
 require(__DIR__.'/load.php');
 
 
+// map framework helpers to global namespace (@see documentation in load.php)
+// miscellaneous
+const CLI               = \rosasurfer\CLI;
+const LOCALHOST         = \rosasurfer\LOCALHOST;
+const WINDOWS           = \rosasurfer\WINDOWS;
+const NL                = \rosasurfer\NL;
 
-// map framework helpers to global namespace (@see descriptions in load.php)
 // custom log level
 const L_DEBUG           = \rosasurfer\L_DEBUG;
 const L_INFO            = \rosasurfer\L_INFO;
@@ -48,12 +53,6 @@ const WEDNESDAY         = \rosasurfer\WEDNESDAY;
 const THURSDAY          = \rosasurfer\THURSDAY;
 const FRIDAY            = \rosasurfer\FRIDAY;
 const SATURDAY          = \rosasurfer\SATURDAY;
-
-// miscellaneous
-const CLI               = \rosasurfer\CLI;
-const LOCALHOST         = \rosasurfer\LOCALHOST;
-const WINDOWS           = \rosasurfer\WINDOWS;
-const NL                = \rosasurfer\NL;
 
 
 /**

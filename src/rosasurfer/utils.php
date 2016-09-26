@@ -12,8 +12,7 @@ use rosasurfer\util\Validator;
 
 
 /**
- * Helper functions and constant definitions. If Ministruts is loaded via "load-globals.php" all symbols of this file
- * are additionally mapped to the global namespace.
+ * Helper functions and constant definitions.
  */
 
 
