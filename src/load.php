@@ -7,11 +7,6 @@ use rosasurfer\util\Logger;
 use rosasurfer\util\System;
 
 
-// block re-includes
-if (defined(__NAMESPACE__.'\MINISTRUTS_ROOT')) return;
-define(__NAMESPACE__.'\MINISTRUTS_ROOT', dirName(__DIR__));
-
-
 /**
  * Load the Ministruts framework.
  *
@@ -25,6 +20,10 @@ define(__NAMESPACE__.'\MINISTRUTS_ROOT', dirName(__DIR__));
  * (5) check/adjust PHP requirements
  * (6) execute phpinfo() if applicable (on localhost only)
  */
+
+// block re-includes
+if (defined(__NAMESPACE__.'\MINISTRUTS_ROOT')) return;
+define(__NAMESPACE__.'\MINISTRUTS_ROOT', dirName(__DIR__));
 
 
 /**
