@@ -1,10 +1,9 @@
-<?php
+﻿<?php
 namespace rosasurfer\net\http;
 
+use rosasurfer\debug\ErrorHandler;
 use rosasurfer\exception\IOException;
-
-use rosasurfer\util\Logger;
-use rosasurfer\util\System;
+use rosasurfer\log\Logger;
 
 use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_INFO;
@@ -127,7 +126,7 @@ final class CurlHttpClient extends HttpClient {
          }
       }
       catch (\Exception $ex) {
-         System::handleDestructorException($ex);
+         ErrorHandler::handleDestructorException($ex);
          throw $ex;
       }
    }

@@ -1,13 +1,14 @@
-<?php
+﻿<?php
 namespace rosasurfer\db;
 
 use rosasurfer\core\Object;
 
+use rosasurfer\debug\ErrorHandler;
+
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
 
-use rosasurfer\util\Logger;
-use rosasurfer\util\System;
+use rosasurfer\log\Logger;
 
 use const rosasurfer\L_WARN;
 
@@ -66,7 +67,7 @@ abstract class DB extends Object {
          }
       }
       catch (\Exception $ex) {
-         System::handleDestructorException($ex);
+         ErrorHandler::handleDestructorException($ex);
          throw $ex;
       }
    }

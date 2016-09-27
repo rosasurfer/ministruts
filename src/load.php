@@ -1,10 +1,9 @@
 <?php
 namespace rosasurfer;
 
+use rosasurfer\debug\ErrorHandler;
 use rosasurfer\exception\ClassNotFoundException;
-
-use rosasurfer\util\Logger;
-use rosasurfer\util\System;
+use rosasurfer\log\Logger;
 
 
 /**
@@ -66,7 +65,7 @@ spl_autoload_register(function($class) {
 /**
  * (3) setup error handling
  */
-System::setupErrorHandling();
+ErrorHandler::setupErrorHandling();
 
 
 /**

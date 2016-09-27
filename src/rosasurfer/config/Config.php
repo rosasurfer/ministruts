@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 namespace rosasurfer\config;
 
 use rosasurfer\cache\Cache;
@@ -14,7 +14,7 @@ use rosasurfer\exception\UnimplementedFeatureException;
 
 use rosasurfer\lock\Lock;
 
-use rosasurfer\util\Logger;
+use rosasurfer\log\Logger;
 
 use const rosasurfer\CLI;
 use const rosasurfer\LOCALHOST;

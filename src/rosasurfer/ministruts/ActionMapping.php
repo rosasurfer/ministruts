@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 namespace rosasurfer\ministruts;
 
 use rosasurfer\core\Object;
@@ -9,7 +9,7 @@ use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
 
-use rosasurfer\util\Logger;
+use rosasurfer\log\Logger;
 
 use function rosasurfer\is_class;
 use function rosasurfer\strStartsWith;

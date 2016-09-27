@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 namespace rosasurfer\ministruts;
 
 use rosasurfer\core\Object;
@@ -6,7 +6,7 @@ use rosasurfer\core\Object;
 use rosasurfer\net\http\HeaderUtils;
 use rosasurfer\net\http\HttpResponse;
 
-use rosasurfer\util\Logger;
+use rosasurfer\log\Logger;
 
 use function rosasurfer\strEndsWith;
 use function rosasurfer\strRightFrom;

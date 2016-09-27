@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 namespace rosasurfer\dao;
 
 use rosasurfer\core\Object;
@@ -7,8 +7,9 @@ use rosasurfer\core\Singleton;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\UnimplementedFeatureException;
 
+use rosasurfer\log\Logger;
+
 use rosasurfer\util\Date;
-use rosasurfer\util\Logger;
 
 
 /**

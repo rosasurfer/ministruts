@@ -11,7 +11,7 @@ use rosasurfer\exception\FileNotFoundException;
 use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\RuntimeException;
 
-use rosasurfer\util\Logger;
+use rosasurfer\log\Logger;
 
 use function rosasurfer\strLeftTo;
 use function rosasurfer\strRightFrom;

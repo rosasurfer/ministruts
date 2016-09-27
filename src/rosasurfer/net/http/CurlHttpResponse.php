@@ -1,10 +1,10 @@
-<?php
+﻿<?php
 namespace rosasurfer\net\http;
 
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 
-use rosasurfer\util\Logger;
+use rosasurfer\log\Logger;
 
 use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_INFO;

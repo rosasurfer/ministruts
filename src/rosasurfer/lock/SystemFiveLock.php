@@ -1,11 +1,14 @@
-<?php
+﻿<?php
 namespace rosasurfer\lock;
+
+use rosasurfer\debug\ErrorHandler;
 
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\PHPError;
 use rosasurfer\exception\RuntimeException;
 
-use rosasurfer\util\Logger;
+use rosasurfer\log\Logger;
+
 use rosasurfer\util\System;
 
 use const rosasurfer\L_DEBUG;
@@ -112,7 +115,7 @@ class SystemFiveLock extends BaseLock {
          $this->release();
       }
       catch (\Exception $ex) {
-         System::handleDestructorException($ex);
+         ErrorHandler::handleDestructorException($ex);
          throw $ex;
       }
    }
