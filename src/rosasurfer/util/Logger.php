@@ -36,12 +36,12 @@ use const rosasurfer\WINDOWS;
 
 
 /**
- * Loggt eine Nachricht, wenn der mit der Nachricht angegebene Loglevel den konfigurierten Mindestloglevel erreicht oder
- * überschreitet.
+ * Loggt eine Nachricht, wenn der angegebene Loglevel den konfigurierten Loglevel erreicht oder überschreitet.
+ *
  *
  * Konfiguration:
  * --------------
- * Der Loglevel kann für jede Klasse einzeln konfiguriert werden. Ohne Konfiguration gilt der Default-Loglevel L_NOTICE.
+ * Der Loglevel kann je Klasse konfiguriert werden. Für eine Klasse ohne Konfiguration gilt der Default-Loglevel.
  * Standardmäßig wird die Logmessage am Bildschirm ausgegeben und per E-Mail verschickt.
  *
  *  Beispiel:
@@ -53,9 +53,6 @@ use const rosasurfer\WINDOWS;
  *
  *  log.sms.receiver   = +491234567,+441234567  # Logmessages per SMS gehen an ein oder mehrere Rufnummern (komma-getrennt, intern. Format).
  *  log.sms.loglevel   = error                  # Logmessages werden per SMS verschickt, wenn sie mindestens den Level L_ERROR erreichen.
- *
- *
- * TODO: Logger muß erweitert werden können
  */
 class Logger extends StaticClass {
 
