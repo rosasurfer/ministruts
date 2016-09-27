@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 namespace rosasurfer\net\http;
 
 use rosasurfer\debug\ErrorHandler;

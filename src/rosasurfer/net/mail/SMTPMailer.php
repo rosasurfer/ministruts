@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 namespace rosasurfer\net\mail;
 
 use rosasurfer\config\Config;

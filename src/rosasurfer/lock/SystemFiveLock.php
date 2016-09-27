@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 namespace rosasurfer\lock;
 
 use rosasurfer\debug\ErrorHandler;

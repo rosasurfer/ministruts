@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 namespace rosasurfer\net;
 
 use rosasurfer\cache\Cache;

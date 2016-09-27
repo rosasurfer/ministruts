@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 namespace rosasurfer\ministruts;
 
 use rosasurfer\core\Singleton;

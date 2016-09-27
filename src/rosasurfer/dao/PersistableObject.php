@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 namespace rosasurfer\dao;
 
 use rosasurfer\core\Object;
