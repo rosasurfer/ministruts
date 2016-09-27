@@ -36,6 +36,7 @@ return array(
     'rosasurfer\\db\\DB' => $baseDir . '/src/rosasurfer/db/DB.php',
     'rosasurfer\\db\\DBPool' => $baseDir . '/src/rosasurfer/db/DBPool.php',
     'rosasurfer\\db\\MySQLConnector' => $baseDir . '/src/rosasurfer/db/MySQLConnector.php',
+    'rosasurfer\\debug\\ErrorHandler' => $baseDir . '/src/rosasurfer/debug/ErrorHandler.php',
     'rosasurfer\\dependency\\ChainedDependency' => $baseDir . '/src/rosasurfer/dependency/ChainedDependency.php',
     'rosasurfer\\dependency\\Dependency' => $baseDir . '/src/rosasurfer/dependency/Dependency.php',
     'rosasurfer\\dependency\\FileDependency' => $baseDir . '/src/rosasurfer/dependency/FileDependency.php',
