@@ -191,9 +191,10 @@ class ErrorHandler extends StaticClass {
     * phase the exception is passed on to the regular exception handler and the script is terminated. If the script is
     * currently not in the shutdown phase this method ignores the exception.
     *
-    * @param   Exception $exception
+    * @param  \Exception $exception
     *
     * @see     http://php.net/manual/en/language.oop5.decon.php
+    *
     * @example For a code example see this namespace's README file.
     */
    public static function handleDestructorException(\Exception $exception) {
