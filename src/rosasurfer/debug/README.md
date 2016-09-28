@@ -24,4 +24,3 @@ class Foo {
 }
 ```
 The recommended practice is to simply use it for all destructors.
-
