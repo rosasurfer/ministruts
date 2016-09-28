@@ -195,7 +195,7 @@ class ErrorHandler extends StaticClass {
     *
     * @see     http://php.net/manual/en/language.oop5.decon.php
     *
-    * @example For a code example see this namespace's README file.
+    * @example For a code example see this namespace's {@link README.md} file.
     */
    public static function handleDestructorException(\Exception $exception) {
       if (self::isInShutdown()) {
