@@ -1,7 +1,7 @@
 Error handling of destructor exceptions
 ---------------------------------------
 
-Attempting to throw an exception from an object's
+Attempting to throw an exception from an object's two spaces  
 destructor during script shutdown causes a fatal PHP error. Therefore
 special care needs to be paid to destructors that might trigger an
 exception.
