@@ -15,7 +15,7 @@ class Foo {
       }
       catch (\Exception $ex) {
          ErrorHandler::handleDestructorException($ex);
-         throw $ex;     // only in shutdown this line is never reached
+         throw $ex;     // in shutdown this line is never reached
       }
    }
 }
