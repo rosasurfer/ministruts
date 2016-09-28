@@ -13,7 +13,7 @@ use rosasurfer\debug\ErrorHandler;
 class Foo {
    public function __destruct() {
       try {
-         //...a task that might trigger an exception
+         //...a task that might throw an exception
       }
       catch (\Exception $ex) {
          ErrorHandler::handleDestructorException($ex);
