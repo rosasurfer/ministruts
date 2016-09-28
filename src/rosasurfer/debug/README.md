@@ -1,24 +1,24 @@
-Handling of object destructor exceptions
-----------------------------------------
+Error handling of destructor exceptions
+---------------------------------------
+
+Attempting to throw an exception from an object's destructor during script shutdown causes a fatal PHP error. Therefore
+special care needs to be paid to destructors that might trigger an exception. It is recommended to wrap all user land
+destructors with the following code to protect against such errors.
 
 ```php
 use rosasurfer\debug\ErrorHandler;
 
-/**
- * Example class with a destructor
- */
 class Foo {
-   /**
-    * Destructor
-    */
    public function __destruct() {
       try {
-         //...some work that might trigger an exception
+         //...a task that might trigger an exception
       }
       catch (\Exception $ex) {
          ErrorHandler::handleDestructorException($ex);
-         throw $ex;
+         throw $ex;     // only in shutdown this line is never reached
       }
    }
 }
 ```
+
+@see http://php.net/manual/en/language.oop5.decon.php
