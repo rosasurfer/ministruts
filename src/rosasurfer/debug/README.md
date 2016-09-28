@@ -1,12 +1,9 @@
 Error handling of destructor exceptions
 ---------------------------------------
 
-Attempting to throw an exception from an object's two spaces  
-destructor during script shutdown causes a fatal PHP error. Therefore
-special care needs to be paid to destructors that might trigger an
-exception.
+Attempting to throw an exception from an object's destructor during script shutdown causes a fatal PHP error. Therefore special care needs to be paid to destructors that might trigger an exception.
 
-Paragraph break. It is recommended to wrap all user land destructors with the following code to protect against such errors.
+It is recommended to wrap all user land destructors with the following code to protect against such errors.
 
 ```php
 use rosasurfer\debug\ErrorHandler;
