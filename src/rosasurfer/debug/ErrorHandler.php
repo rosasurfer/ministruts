@@ -7,6 +7,7 @@ use rosasurfer\log\Logger;
 use rosasurfer\util\DebugTools;
 
 use function rosasurfer\_true;
+use function rosasurfer\echoPre;
 
 
 /**
@@ -86,13 +87,15 @@ class ErrorHandler extends StaticClass {
       if (!$reportingLevel)            return false;     // the @ operator was specified
       if (!($reportingLevel & $level)) return true;      // error is not covered by current reporting level
 
+      $logContext = [];
+
       // (2) Process errors according to their severity level.
       switch ($level) {
          // log non-critical errors and continue normally
-         case E_DEPRECATED:      return _true(Logger::log('E_DEPRECATED: '     .$message, L_NOTICE));
-         case E_USER_DEPRECATED: return _true(Logger::log('E_USER_DEPRECATED: '.$message, L_NOTICE));
-         case E_USER_NOTICE:     return _true(Logger::log('E_USER_NOTICE: '    .$message, L_NOTICE));
-         case E_USER_WARNING:    return _true(Logger::log('E_USER_WARNING: '   .$message, L_WARN  ));
+         case E_DEPRECATED:      return _true(Logger::log('E_DEPRECATED: '     .$message, L_NOTICE, $logContext));
+         case E_USER_DEPRECATED: return _true(Logger::log('E_USER_DEPRECATED: '.$message, L_NOTICE, $logContext));
+         case E_USER_NOTICE:     return _true(Logger::log('E_USER_NOTICE: '    .$message, L_NOTICE, $logContext));
+         case E_USER_WARNING:    return _true(Logger::log('E_USER_WARNING: '   .$message, L_WARN  , $logContext));
 
          // wrap everything else in the matching PHPErrorException
          /*
@@ -140,46 +143,20 @@ class ErrorHandler extends StaticClass {
    /**
     * Global handler for otherwise unhandled exceptions.
     *
-    * The exception is sent to the current default logger (with loglevel L_FATAL). After the handler returns PHP will
+    * The exception is sent to the current default logger with loglevel L_FATAL. After the handler returns PHP will
     * terminate the script.
     *
     * @param \Exception $exception - the unhandled exception
     */
    public static function handleException(\Exception $exception) {
+      //echoPre(__METHOD__.'()  '.DebugTools::getBetterMessage($exception));
       // TODO: detect and handle recursive calls
 
+      $context = ['file' => $exception->getFile()];   // if the location is not preset the Logger will correctly
+      $context = ['line' => $exception->getLine()];   // resolve this method as the originating location
+      $context = ['type' => 'unhandled'          ];
 
-      Logger::logNew($exception, null, L_FATAL);
-      return;
-
-
-
-      // legacy handler
-      Logger::handleException($exception);
-      return;
-
-
-      // PrintHandler
-      //
-      // format data
-      $type       = $exception instanceof \ErrorException ? 'Unexpected':'Unhandled';
-      $exMessage  = trim(DebugTools::getBetterMessage($exception));
-      $indent     = ' ';
-      $traceStr   = $indent.'Stacktrace:'.NL.' -----------'.NL;
-      $traceStr  .= DebugTools::getBetterTraceAsString($exception, $indent);
-      $file       = $exception->getFile();
-      $line       = $exception->getLine();
-      $cliMessage = '[FATAL] '.$type.' '.$exMessage.NL.$indent.'in '.$file.' on line '.$line.NL;
-
-      // display it
-      if (CLI) {
-         echoPre($cliMessage.NL.$traceStr.NL);
-      }
-      else {
-         echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif"><b>[FATAL]</b> '.$type.' '.nl2br(htmlSpecialChars($exMessage, ENT_QUOTES))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
-         echo '<br>'.printPretty($traceStr, true);
-         echo '<br></div>'.NL;
-      }
+      Logger::log($exception, L_FATAL, $context);     // log with the highest level
    }
 
 
@@ -201,6 +178,10 @@ class ErrorHandler extends StaticClass {
       if (self::isInShutdown()) {
          self::handleException($exception);
          exit(1);                            // exit und signal the error
+
+         // Calling exit() is the only way to prevent the immediately following non-catchable fatal error.
+         // However, calling exit() in a destructor will also prevent any remaining shutdown routines from executing.
+         // @see above link
       }
    }
 }

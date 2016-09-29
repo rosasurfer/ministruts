@@ -5,6 +5,8 @@ use rosasurfer\config\Config;
 
 use rosasurfer\core\StaticClass;
 
+use rosasurfer\debug\ErrorHandler;
+
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
@@ -39,132 +41,548 @@ use const rosasurfer\WINDOWS;
 
 
 /**
- * Loggt eine Nachricht, wenn der angegebene Loglevel den konfigurierten Loglevel erreicht oder überschreitet.
+ * Log a message through a chain of standard log handlers.
+ *
+ * This is the frameworks default logger implementation which is used if no other logger is registered. The logger
+ * passes the message to a chain of handlers. Each handler is invoked depending on the application's runtime environment
+ * (CLI vs. web server, local vs. remote access) and the application configuration.
+ *
+ *  • PrintHandler    - Display the message on the standard device (STDOUT on a terminal, HTTP response for SAPI). The
+ *                      handler is invoked if the script runs on CLI or as a result of a local web request. For remote
+ *                      web requests it displays the message only if the PHP configuration value "display_errors" is set.
+ *
+ *  • MailHandler     - Send the message to the configured mail receivers (email addresses). The handler is invoked if
+ *                      the application configuration contains one or more mail receivers for log messages.
+ *
+ *                      Example:
+ *                      --------
+ *                      log.mail.receiver = address1@domain.tld, address2@another-domain.tld
+ *
+ *  • SMSHandler      - Send the message to the configured SMS receivers (phone numbers). The handler is invoked if the
+ *                      application configuration contains one or more phone numbers for log messages and a valid SMS
+ *                      operator configuration (at log time). For text messages an additional loglevel constraint can be
+ *                      specified (on top of the default loglevel constraint).
+ *
+ *                      Example:
+ *                      --------
+ *                      log.sms.level    = error                           # additional loglevel constraint for SMS
+ *                      log.sms.receiver = +3591234567, +441234567         # international number format
+ *
+ *  • ErrorLogHandler - The last resort log handler. Passes the message to the PHP default error log mechanism as defined
+ *                      by the PHP configuration value "error_log". The handler is invoked if the MailHandler was not
+ *                      invoked or if a circular or similar fatal error occurred. Typically this handler writes into the
+ *                      PHP error log file which again should be monitored by a logwatch script.
  *
  *
- * Konfiguration:
- * --------------
- * Der Loglevel kann je Klasse konfiguriert werden. Für eine Klasse ohne Konfiguration gilt der Default-Loglevel.
- * Standardmäßig wird die Logmessage am Bildschirm ausgegeben und per E-Mail verschickt.
+ * Loglevel configuration:
+ * -----------------------
+ * The loglevel can be configured per class. For a class without a specific configuration the specified application
+ * loglevel applies. Without a specified application loglevel the built-in default loglevel of L_NOTICE is used.
  *
- *  Beispiel:
- *  ---------
- *  log.level.MyClassA = warn                   # Messages in MyClassA werden geloggt, wenn sie mindestens den Level L_WARN erreichen.
- *  log.level.MyClassB = debug                  # Messages in MyClassB werden geloggt, wenn sie mindestens den level L_DEBUG erreichen.
+ * Example:
+ *  log.level                  = warn              # the general application loglevel is set to L_WARN
+ *  log.level.MyClassA         = debug             # the loglevel for "MyClassA" is set to L_DEBUG
+ *  log.level.foo\bar\MyClassB = notice            # the loglevel for "foo\bar\MyClassB" is set to L_NOTICE
+ *  log.sms.level              = error             # the loglevel for text messages is set a bit higher to L_ERROR
  *
- *  log.mail.receiver  = address1@domain.tld    # Logmessages werden an ein oder mehrere E-Mailempfänger verschickt (komma-getrennt).
  *
- *  log.sms.receiver   = +491234567,+441234567  # Logmessages per SMS gehen an ein oder mehrere Rufnummern (komma-getrennt, intern. Format).
- *  log.sms.loglevel   = error                  # Logmessages werden per SMS verschickt, wenn sie mindestens den Level L_ERROR erreichen.
+ * @TODO: Logger::resolveLogCaller()   - test with Closure and internal PHP functions
+ * @TODO: Logger::composeHtmlMessage() - append an existing context exception
+ *
+ * @TODO: refactor and separate handlers into single classes
+ * @TODO: implement \Psr\Log\LoggerInterface and remove static crap
+ * @TODO: implement full mail address support as in "Joe Blow <address@domain.tld>"
  */
 class Logger extends StaticClass {
 
 
-   private static /*bool    */ $print         = false;      // ob die Nachricht am Bildschirm angezeigt werden soll
-   private static /*bool    */ $mail          = false;      // ob die Nachricht per E-Mail verschickt werden soll (alle Loglevel)
-   private static /*string[]*/ $mailReceivers = [];         // E-Mailempfänger
-   private static /*bool    */ $sms           = false;      // ob die Nachricht per SMS verschickt werden soll
-   private static /*string[]*/ $smsReceivers  = [];         // SMS-Empfänger
-   private static /*int     */ $smsLogLevel   = L_FATAL;    // notwendiger Loglevel für den SMS-Versand
-   private static /*string[]*/ $smsOptions    = [];         // SMS-Konfiguration
+   /** @var int - built-in default loglevel; used if no application loglevel is configured */
+   const DEFAULT_LOGLEVEL = L_NOTICE;
 
 
-   // Beschreibungen der verfügbaren Loglevel
-   private static $logLevels = array(L_DEBUG  => '[Debug]' ,
-                                     L_INFO   => '[Info]'  ,
-                                     L_NOTICE => '[Notice]',
-                                     L_WARN   => '[Warn]'  ,
-                                     L_ERROR  => '[Error]' ,
-                                     L_FATAL  => '[Fatal]' ,
-   );
+   /** @var int - application loglevel */
+   private static $appLogLevel = null;
+
+
+   /** @var bool - whether or not the PrintHandler is enabled */
+   private static $printHandler = false;
+
+   /** @var bool - whether or not the PrintHandler displays the full message */
+   private static $printFullMessage = false;
+
+
+   /** @var bool - whether or not the MailHandler is enabled */
+   private static $mailHandler = false;
+
+   /** @var string[] - mail receivers */
+   private static $mailReceivers = [];
+
+
+   /** @var bool - whether or not the SMSHandler is enabled */
+   private static $smsHandler = false;
+
+   /** @var string[] - SMS receivers */
+   private static $smsReceivers = [];
+
+   /** @var int - additional SMS loglevel constraint */
+   private static $smsLogLevel = null;
+
+   /** @var string[] - SMS options; resolved at log message time */
+   private static $smsOptions = [];
+
+
+   /** @var bool - whether or not the ErrorLogHandler is enabled */
+   private static $errorLogHandler = false;
+
+
+   /** @var string[] - loglevel descriptions for message formatter */
+   private static $logLevels = [
+      L_DEBUG  => '[Debug]' ,
+      L_INFO   => '[Info]'  ,
+      L_NOTICE => '[Notice]',
+      L_WARN   => '[Warn]'  ,
+      L_ERROR  => '[Error]' ,
+      L_FATAL  => '[Fatal]' ,
+   ];
 
 
    /**
-    * Initialize the static config properties.
+    * Initialize the Logger configuration.
     */
    public static function init() {
       static $initialized = false;
-      if ($initialized)
-         return;
+      if ($initialized) return;
 
-      // Standardmäßig ist die Ausgabe am Bildschirm bei lokalem Zugriff an und bei Remote-Zugriff aus, es sei denn,
-      // es ist ausdrücklich etwas anderes konfiguriert.
-      self::$print = CLI || LOCALHOST || (bool) ini_get('display_errors');
+      // (1) application default loglevel: if not configured the built-in default loglevel
+      $logLevel = Config::getDefault()->get('log.level', null);
 
+      if (is_string($logLevel) || isSet($logLevel[''])) {   // the application and/or some class loglevels are configured
+         if (is_array($logLevel))
+            $logLevel = $logLevel[''];
+         $logLevel = self::logLevelToId($logLevel);
+         !$logLevel && $logLevel=self::DEFAULT_LOGLEVEL;
+      }
+      else {                                                // no loglevels are configured
+         $logLevel = self::DEFAULT_LOGLEVEL;
+      }
+      self::$appLogLevel = $logLevel;
 
-      // Der E-Mailversand ist aktiv, wenn in der Projektkonfiguration mindestens eine E-Mailadresse angegeben wurde.
+      // (2) PrintHandler: enabled for local access or if explicitely enabled
+      self::$printHandler = CLI || LOCALHOST || ini_get('display_errors');
+
+      // (3) MailHandler: enabled if mail receivers are configured
       $receivers = [];
       foreach (explode(',', Config::getDefault()->get('log.mail.receiver', '')) as $receiver) {
          if ($receiver=trim($receiver))
-            $receivers[] = $receiver;                       // TODO: Adressformat validieren
+            $receivers[] = $receiver;                                // @TODO: validate address format
       }
       if ($receivers) {
-         if ($forced=Config::getDefault()->get('mail.address.forced-receiver', null)) {
-            $receivers = [];                                // Um Fehler zu vermeiden, wird zum Mailen keine Klasse, sondern
-            foreach (explode(',', $forced) as $receiver) {  // die PHP-interne Funktion mail() benutzt. Die Konfiguration muß
-               if ($receiver=trim($receiver))               // deshalb hier selbst auf "mail.address.forced-receiver" geprüft
-                  $receivers[] = $receiver;                 // werden.
+         if ($forcedReceivers=Config::getDefault()->get('mail.address.forced-receiver', null)) {
+            $receivers = [];                                         // To reduce possible errors we use internal PHP mailing
+            foreach (explode(',', $forcedReceivers) as $receiver) {  // functions (not a class) which means we have to manually
+               if ($receiver=trim($receiver))                        // check the config for the setting "mail.address.forced-receiver"
+                  $receivers[] = $receiver;                          // (which the SMTPMailer would do automatically).
             }
          }
       }
-      self::$mail          = (bool) $receivers;
+      self::$mailHandler   = (bool) $receivers;
       self::$mailReceivers =        $receivers;
 
-
-      // Der SMS-Versand ist aktiv, wenn in der Projektkonfiguration mindestens eine Rufnummer und ein SMS-Loglevel angegeben wurden.
-      self::$sms          = false;
-      self::$smsReceivers = array();
-      $receivers = Config::getDefault()->get('log.sms.receiver', null);
-      foreach (explode(',', $receivers) as $receiver) {
+      // (4) SMSHandler: enabled if SMS receivers are configured (operator settings are checked at log message time)
+      self::$smsReceivers = [];
+      foreach (explode(',', Config::getDefault()->get('log.sms.receiver', '')) as $receiver) {
          if ($receiver=trim($receiver))
             self::$smsReceivers[] = $receiver;
       }
-      $logLevel = Config::getDefault()->get('log.sms.loglevel', null);
-      if (strLen($logLevel) > 0) {
-         if (defined('L_'.strToUpper($logLevel))) self::$smsLogLevel = constant('L_'.strToUpper($logLevel));
-         else                                     self::$smsLogLevel = null;
+      self::$smsHandler = (bool) self::$smsReceivers;
+
+      $logLevel = Config::getDefault()->get('log.sms.level', self::$appLogLevel);
+      if (is_string($logLevel)) {                                    // a string if a configured value
+         $logLevel = self::logLevelToId($logLevel);
+         !$logLevel && $logLevel=self::$appLogLevel;
       }
-      $options = Config::getDefault()->get('sms.clickatell', null);
-      if (!empty($options['username']) && !empty($options['password']) && !empty($options['api_id']))
-         self::$smsOptions = $options;
-      self::$sms = self::$smsReceivers && self::$smsLogLevel && self::$smsOptions;
+      self::$smsLogLevel = $logLevel;
+
+      // (5) ErrorLogHandler: enabled if the MailHandler is disabled
+      self::$errorLogHandler = !self::$mailHandler;
 
       $initialized = true;
    }
 
 
    /**
-    * Gibt den Loglevel der angegebenen Klasse zurück.
+    * Convert a loglevel description into a loglevel constant.
     *
-    * @param  string $class - Klassenname
+    * @param  string $value - loglevel description
     *
-    * @return int - Loglevel
+    * @return int - loglevel constant or NULL, if $value is not a valid loglevel description
     */
-   public static function getLogLevel($class) {
-      if ($class == '') return System::DEFAULT_LOGLEVEL;       // Aufruf von außerhalb einer Klasse
+   public static function logLevelToId($value) {
+      if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
 
+      switch (strToLower($value)) {
+         case 'debug' : return L_DEBUG;
+         case 'info'  : return L_INFO;
+         case 'notice': return L_NOTICE;
+         case 'warn'  : return L_WARN;
+         case 'error' : return L_ERROR;
+         case 'fatal' : return L_FATAL;
+         default:
+            return null;
+      }
+   }
+
+
+   /**
+    * Resolve the loglevel of the specified class.
+    *
+    * @param  string $class - class name
+    *
+    * @return int - configured loglevel or the application loglevel if no class specific loglevel is configured
+    */
+   public static function getLogLevel($class = '') {
+      if (!is_string($class)) throw new IllegalTypeException('Illegal type of parameter $class: '.getType($class));
+
+      // read the configured class specific loglevels
       static $logLevels = null;
-
       if ($logLevels === null) {
-         // Die konfigurierten Loglevel werden einmal eingelesen und gecacht. Nachfolgende Logger-Aufrufe verwenden nur noch den Cache.
-         $logLevels = Config::getDefault()->get('log.level', array());
-         if (is_string($logLevels))
-            $logLevels = array('' => $logLevels);
+         $logLevels = Config::getDefault()->get('log.level', []);
+         if (is_string($logLevels))                                  // only the general application loglevel is configured
+            $logLevels = ['' => $logLevels];
 
          foreach ($logLevels as $className => $level) {
-            if (!is_string($level)) throw new IllegalTypeException('Illegal log level type for class '.$className.': '.getType($level));
-            if     ($level == '')                     $logLevels[$className] = System::DEFAULT_LOGLEVEL;
-            elseif (defined('L_'.strToUpper($level))) $logLevels[$className] = constant('L_'.strToUpper($level));
-            else                    throw new InvalidArgumentException('Invalid log level for class '.$className.': '.$level);
+            if (!is_string($level)) throw new IllegalTypeException('Illegal configuration value for "log.level.'.$className.'": '.getType($level));
+
+            if ($level == '') {                                      // classes with empty values fall back to the application loglevel
+               unset($logLevels[$className]);
+            }
+            else {
+               $logLevel = self::logLevelToId($level);
+               if (!$logLevel)      throw new InvalidArgumentException('Invalid configuration value for "log.level.'.$className.'" = '.$level);
+               $logLevels[$className] = $logLevel;
+
+               if (strStartsWith($className, '\\')) {                // normalize class names: remove leading back slash
+                  unset($logLevels[$className]);
+                  $className = subStr($className, 1);
+                  $logLevels[$className] = $logLevel;
+               }
+            }
          }
+         $logLevels = array_change_key_case($logLevels, CASE_LOWER); // normalize class names: lower-case for case-insensitive look-up
       }
 
-      // Loglevel abfragen
+      // look-up the loglevel for the specified class
+      $class = strToLower($class);
       if (isSet($logLevels[$class]))
          return $logLevels[$class];
 
-      return System::DEFAULT_LOGLEVEL;
+      // return the general application loglevel if no class specific loglevel is configured
+      return self::$appLogLevel;
    }
+
+
+   /**
+    * Log a message.
+    *
+    * @param  mixed   $loggable - a message or an object implementing <tt>__toString()</tt>
+    * @param  int     $level    - loglevel
+    * @param  mixed[] $context  - optional logging context with additional data
+    */
+   public static function log($loggable, $level, array $context=[]) {
+      // (1) validate parameters
+      if (!is_string($loggable)) {
+         if (!is_object($loggable))                   throw new IllegalTypeException('Illegal type of parameter $loggable: '.getType($loggable));
+         if (!method_exists($loggable, '__toString')) throw new IllegalTypeException('Illegal type of parameter $loggable: '.get_class($loggable).'::__toString() not found');
+         if (!$loggable instanceof \Exception)
+            $loggable = (string) $loggable;
+      }
+      if (!is_int($level))                            throw new IllegalTypeException('Illegal type of parameter $level: '.getType($level));
+      if (!isSet(self::$logLevels[$level]))           throw new InvalidArgumentException('Invalid argument $level: '.$level.' (not a loglevel)');
+
+
+      // (2) filter messages not covered by the current loglevel
+      if ($level == L_FATAL) {
+         // Not necessary for the highest level. This will cover all calls from the global exception handler
+         // which always calls with the highest level (L_FATAL).
+      }
+      else {
+         // resolve the calling class and check its loglevel
+         !isSet($context['class']) && self::resolveLogCaller($loggable, $level, $context);
+         $class = $context['class'];
+         if ($level < self::getLogLevel($class))      // return if message is not covered
+            return;
+      }
+
+
+      // (3) invoke all active log handlers
+      self::$printHandler    && self::invokePrintHandler   ($loggable, $level, $context);
+      self::$mailHandler     && self::invokeMailHandler    ($loggable, $level, $context);
+      self::$smsHandler      && self::invokeSmsHandler     ($loggable, $level, $context);
+      self::$errorLogHandler && self::invokeErrorLogHandler($loggable, $level, $context);
+   }
+
+
+   /**
+    * Display the message on the standard device (STDOUT on a terminal, HTTP response for a web request).
+    *
+    * @param  mixed    $loggable - message or exception to log
+    * @param  int      $level    - loglevel of the loggable
+    * @param  mixed[] &$context  - reference to the log context with additional data
+    */
+   private static function invokePrintHandler($loggable, $level, array &$context) {
+      if (!self::$printHandler) return;
+      $message = null;
+
+      if (CLI) {
+         !isSet($context['cliMessage']) && self::composeCliMessage($loggable, $level, $context);
+         $message = $context['cliMessage'];
+         if (isSet($context['cliExtra']))
+            $message .= $context['cliExtra'];
+      }
+      else {
+         !isSet($context['htmlMessage']) && self::composeHtmlMessage($loggable, $level, $context);
+         $message = $context['htmlMessage'];
+      }
+
+      echo $message;
+      ob_get_level() && ob_flush();
+   }
+
+
+   /**
+    * Send the message to the configured mail receivers (email addresses).
+    *
+    * @param  mixed    $loggable - message or exception to log
+    * @param  int      $level    - loglevel of the loggable
+    * @param  mixed[] &$context  - reference to the log context with additional data
+    */
+   private static function invokeMailHandler($loggable, $level, array &$context) {
+      if (!self::$mailHandler) return;
+
+      echoPre(__METHOD__.'() not yet implemented');
+
+      !isSet($context['cliMessage']) && self::composeCliMessage($loggable, $level, $context);
+      $cliMessage = $context['cliMessage'];
+   }
+
+
+   /**
+    * Send the message to the configured SMS receivers (phone numbers).
+    *
+    * @param  mixed    $loggable - message or exception to log
+    * @param  int      $level    - loglevel of the loggable
+    * @param  mixed[] &$context  - reference to the log context with additional data
+    */
+   private static function invokeSmsHandler($loggable, $level, array &$context) {
+      if (!self::$smsHandler) return;
+
+      echoPre(__METHOD__.'() not yet implemented');
+
+      !isSet($context['cliMessage']) && self::composeCliMessage($loggable, $level, $context);
+      $cliMessage = $context['cliMessage'];
+   }
+
+
+   /**
+    * Pass the message to the PHP default error log mechanism as defined by the PHP configuration value "error_log".
+    *
+    * ini_get('error_log')
+    *
+    * Name of the file where script errors should be logged. If the special value "syslog" is used, errors are sent
+    * to the system logger instead. On Unix, this means syslog(3) and on Windows NT it means the event log.
+    * If this directive is not set, errors are sent to the SAPI error logger. For example, it is an error log in Apache
+    * or STDERR in CLI.
+    *
+    * @param  mixed    $loggable - message or exception to log
+    * @param  int      $level    - loglevel of the loggable
+    * @param  mixed[] &$context  - reference to the log context with additional data
+    */
+   private static function invokeErrorLogHandler($loggable, $level, array &$context) {
+      if (!self::$errorLogHandler) return;
+      !isSet($context['cliMessage']) && self::composeCliMessage($loggable, $level, $context);
+
+      $message = 'PHP '.$context['cliMessage'];                // skip "cliExtra"
+      $message = str_replace(["\r\n", "\n"], ' ', $message);   // remove line breaks
+      $message = str_replace(chr(0), "…", $message);           // replace NUL bytes which mess up the logfile
+
+      if (!ini_get('error_log') && CLI) {
+         // suppress duplicated output to STDERR, the PrintHandler already wrote to STDOUT
+         // @TODO: suppress output to STDERR in interactive terminals only (i.e. not in cron)
+      }
+      else {
+         error_log($message, ERROR_LOG_DEFAULT);
+      }
+   }
+
+
+   /**
+    * Compose a CLI log message and store it in the passed log context under the keys "cliMessage" and "cliExtra".
+    *
+    * @param  mixed    $loggable - message or exception to log
+    * @param  int      $level    - loglevel of the loggable
+    * @param  mixed[] &$context  - reference to the log context
+    */
+   private static function composeCliMessage($loggable, $level, array &$context) {
+      if (!isSet($context['file']) || !isSet($context['line'])) self::resolveLogLocation($loggable, $level, $context);
+      $file = $context['file'];
+      $line = $context['line'];
+
+      $text = $extra = null;
+      $indent = ' ';
+
+      // compose message
+      if (is_string($loggable)) {
+         // simple message
+         $msg  = $loggable;
+         $text = self::$logLevels[$level].'  '.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
+      }
+      else {
+         // exception
+         $type = isSet($context['type']) ? ucFirst($context['type']).' ' : '';
+         $msg  = $type.trim(DebugTools::getBetterMessage($loggable));
+         $text = self::$logLevels[$level].'  '.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
+
+         // the stack trace will go into "cliExtra"
+         $traceStr  = $indent.'Stacktrace:'.NL.' -----------'.NL;
+         $traceStr .= DebugTools::getBetterTraceAsString($loggable, $indent);
+         $extra    .= NL.$traceStr.NL;
+      }
+
+      // append an existing context exception to "cliExtra"
+      if (isSet($context['exception'])) {
+         $exception = $context['exception'];
+         $msg       = trim(DebugTools::getBetterMessage($exception));
+         $traceStr  = $indent.'Stacktrace:'.NL.' -----------'.NL;
+         $traceStr .= DebugTools::getBetterTraceAsString($exception, $indent);
+         $extra    .= NL.$msg.NL.NL.$traceStr.NL;
+      }
+
+      // store main and extra message
+      $context['cliMessage'] = $text;
+      if ($extra)
+         $context['cliExtra'] = $extra;
+   }
+
+
+   /**
+    * Compose a HTML log message and store it in the passed log context under the key "htmlMessage".
+    *
+    * @param  mixed    $loggable - message or exception to log
+    * @param  int      $level    - loglevel of the loggable
+    * @param  mixed[] &$context  - reference to the log context
+    */
+   private static function composeHtmlMessage($loggable, $level, array &$context) {
+      if (!isSet($context['file']) || !isSet($context['line'])) self::resolveLogLocation($loggable, $level, $context);
+      $file = $context['file'];
+      $line = $context['line'];
+
+      // break out of unfortunate HTML tags
+      $html   = '</script></img></select></textarea></font></span></div></i></b>';
+      $html  .= '<div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif">';
+      $indent = ' ';
+
+      // compose message
+      if (is_string($loggable)) {
+         // simple message
+         $msg   = $loggable;
+         $html .= '<b>'.self::$logLevels[$level].'</b> '.nl2br(htmlSpecialChars($msg, ENT_QUOTES|ENT_SUBSTITUTE))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
+      }
+      else {
+         // exception
+         $type      = isSet($context['type']) ? ucFirst($context['type']).' ' : '';
+         $msg       = $type.DebugTools::getBetterMessage($loggable);
+         $html     .= '<b>'.self::$logLevels[$level].'</b> '.nl2br(htmlSpecialChars($msg, ENT_QUOTES|ENT_SUBSTITUTE))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
+         $traceStr  = $indent.'Stacktrace:'.NL.' -----------'.NL;
+         $traceStr .= DebugTools::getBetterTraceAsString($loggable, $indent);
+         $html     .= '<br>'.printPretty($traceStr, true).'<br>';
+      }
+
+      // append an existing context exception
+      if (isSet($context['exception'])) {
+         $exception = $context['exception'];
+         $msg       = DebugTools::getBetterMessage($exception);
+         $html     .= '<br>'.nl2br(htmlSpecialChars($msg, ENT_QUOTES|ENT_SUBSTITUTE)).'<br>';
+         $traceStr  = $indent.'Stacktrace:'.NL.' -----------'.NL;
+         $traceStr .= DebugTools::getBetterTraceAsString($exception, $indent);
+         $html     .= '<br>'.printPretty($traceStr, true);
+     }
+
+      // append the current HTTP request
+      if (!CLI) {
+         $html .= '<br>'.printPretty('Request:'.NL.'--------'.NL.Request::me(), true).'<br>';
+      }
+
+      // close and store the HTML tag
+      $html .= '</div>';
+      $context['htmlMessage'] = $html;
+   }
+
+
+   /**
+    * Resolve the location the current log statement originated from and store it in the passed log context under the
+    * keys "file" and "line".
+    *
+    * @param  mixed    $loggable - message or exception to log
+    * @param  int      $level    - loglevel of the loggable
+    * @param  mixed[] &$context  - reference to the log context
+    */
+   private static function resolveLogLocation($loggable, $level, array &$context) {
+      !isSet($context['trace']) && $context['trace']=debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+      $trace = $context['trace'];
+
+      foreach ($trace as $i => $frame) {           // find the first non-logger frame with "file"
+         if (isSet($frame['class']) && $frame['class']==__CLASS__)
+            continue;
+         if (!isSet($trace[$i-1]['file']))         // first non-logger frame, "file" and "line" are in the previous frame
+            continue;                              // skip internal PHP functions
+         $context['file'] = $trace[$i-1]['file'];
+         $context['line'] = $trace[$i-1]['line'];
+         break;
+      }
+      // intentionally cause an error if not found (should never happen)
+   }
+
+
+   /**
+    * Resolve the class calling the logger and store it in the passed log context under the key "class".
+    *
+    * @param  mixed    $loggable - message or exception to log
+    * @param  int      $level    - loglevel of the loggable
+    * @param  mixed[] &$context  - reference to the log context
+    *
+    *
+    * @TODO:  test with Closure and internal PHP functions
+    */
+   private static function resolveLogCaller($loggable, $level, array &$context) {
+      !isSet($context['trace']) && $context['trace']=debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+      $trace = $context['trace'];
+
+      $class = '';
+      foreach ($trace as $frame) {                 // find the frame calling this logger
+         if (!isSet($frame['class']))              // logger was called from a non-class context
+            break;
+         if ($frame['class'] != __CLASS__) {       // logger was called from another class
+            $class = $frame['class'];
+            break;
+         }
+      }
+      $context['class'] = $class;
+   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
    /**
@@ -263,22 +681,6 @@ class Logger extends StaticClass {
          self::$print && echoPre($msg);
          self::error_log($msg);
       }
-      finally {
-         exit(1);                               // exit und signal the error
-      }
-   }
-
-
-   /**
-    *
-    */
-   public static function warn($arg1=null, $arg2=null, $arg3=null) {
-      $argc = func_num_args();
-
-      if ($argc == 2) return self::log($arg1, null,  L_WARN, $arg2);
-      if ($argc == 3) return self::log($arg1, $arg2, L_WARN, $arg3);
-
-      throw new InvalidArgumentException('Invalid number of arguments: '.$argc);
    }
 
 
@@ -290,13 +692,7 @@ class Logger extends StaticClass {
     * @param  int        $level     - LogLevel
     * @param  string     $class     - Name der Klasse, von der aus geloggt wurde
     */
-   public static function log($message, $exception, $level, $class) {
-      // Parameter-Validation
-      if (!is_null($message) && !is_string($message))                throw new IllegalTypeException('Illegal type of parameter $message: '.getType($message));
-      if (!is_null($exception) && !$exception instanceof \Exception) throw new IllegalTypeException('Illegal type of parameter $exception: '.(is_object($exception) ? get_class($exception) : getType($exception)));
-      if (!is_int($level))                                           throw new IllegalTypeException('Illegal type of parameter $level: '.getType($level));
-      if (!is_string($class))                                        throw new IllegalTypeException('Illegal type of parameter $class: '.getType($class));
-
+   public static function log_old($message, $exception, $level, $class) {
       // lock method against circular calls
       static $isActive = false;                                      // TODO: SYSLOG implementieren
       if ($isActive)     return echoPre(__METHOD__.'()  Sending circular log message to SYSLOG:  '.$message.', '.$exception);
@@ -318,13 +714,11 @@ class Logger extends StaticClass {
     * @param  Exception $exception - zu loggende Exception
     * @param  int       $level     - zu loggender Loglevel
     */
-   public static function log_1($message, \Exception $exception=null, $level) {
+   private static function log_1($message, \Exception $exception=null, $level) {
       $request    = CLI ? null : Request::me();
       $cliMessage = null;
 
       try {
-         if (!isSet(self::$logLevels[$level])) throw new InvalidArgumentException('Invalid log level: '.$level);
-
          // 1. Logdaten ermitteln
          $exMessage = $exTraceStr = null;
          if ($exception) {
@@ -335,9 +729,8 @@ class Logger extends StaticClass {
          }
 
          $trace = DebugTools::fixTrace(debug_backtrace());  // die Frames des Loggers selbst können weg
-         if ($trace[0]['class'].$trace[0]['type'].$trace[0]['function'] == 'Logger::log_1') array_shift($trace);
-         if ($trace[0]['class'].$trace[0]['type'].$trace[0]['function'] == 'Logger::log'  ) array_shift($trace);
-         if ($trace[0]['class'].$trace[0]['type'].$trace[0]['function'] == 'Logger::warn' ) array_shift($trace);
+         if ($trace[0]['class'].'::'.$trace[0]['function'] == 'Logger::log_1') array_shift($trace);
+         if ($trace[0]['class'].'::'.$trace[0]['function'] == 'Logger::log'  ) array_shift($trace);
 
          $file = $line = null;
          foreach ($trace as $frame) {                       // ersten Frame mit __FILE__ suchen
@@ -353,9 +746,9 @@ class Logger extends StaticClass {
          // 2. Logmessage anzeigen
          if (self::$print) {
             if (CLI) {
-               echoPre($cliMessage.NL);
+               echo $cliMessage.NL;
                if ($exception) {
-                  echoPre(NL.$exMessage.NL.NL.$exTraceStr.NL);
+                  echo NL.$exMessage.NL.NL.$exTraceStr.NL;
                }
             }
             else {
@@ -411,31 +804,6 @@ class Logger extends StaticClass {
          self::$print && echoPre($msg);
          self::error_log($msg);
          throw $ex;
-      }
-   }
-
-
-   /**
-    * Schreibt eine Logmessage ins PHP-interne Error-Log.
-    *
-    * @param  string $message - zu loggende Message
-    */
-   private static function error_log($message) {
-      $message = str_replace(["\r\n", "\n"], ' ', $message);   // Zeilenumbrüche entfernen
-      $message = str_replace(chr(0), "…", $message);           // NUL-Bytes ersetzen (zerschießen Logfile)
-
-      /**
-       * ini_get('error_log')
-       *
-       * Name of the file where script errors should be logged. If the special value "syslog" is used, errors are sent
-       * to the system logger instead. On Unix, this means syslog(3) and on Windows NT it means the event log.
-       * If this directive is not set, errors are sent to the SAPI error logger. For example, it is an error log in Apache
-       * or STDERR in CLI.
-       */
-      if (CLI && !ini_get('error_log')) {                      // TODO: Augabe auf STDERR nur in interaktiven Terminals
-      }                                                        //       unterdrücken.
-      else {
-         error_log($message, ERROR_LOG_DEFAULT);
       }
    }
 
@@ -497,5 +865,4 @@ class Logger extends StaticClass {
       }
    }
 }
-
 Logger::init();

@@ -160,7 +160,7 @@ class DebugTools extends StaticClass {
       for ($i=0; $i < $size; $i++) {               // align FILE and LINE
          $frame =& $trace[$i];
 
-         $call = self::getFQFunctionName($frame);
+         $call = self::getFQFunctionName($frame, $nsLowerCase=true);
          $call!='{main}' && $call!='{closure}' && $call.='()';
          $callLen = max($callLen, strLen($call));
          $frame['call'] = $call;
@@ -184,11 +184,12 @@ class DebugTools extends StaticClass {
    /**
     * Return the fully qualified function or method name of a stacktrace's frame.
     *
-    * @param  array $frame - frame
+    * @param  array $frame       - frame
+    * @param  bool  $nsLowerCase - whether or not the namespace part of the name to return in lower case (default: no)
     *
-    * @return string - fully qualified name (namespace part all lower-case)
+    * @return string - fully qualified name
     */
-   public static function getFQFunctionName(array $frame) {
+   public static function getFQFunctionName(array $frame, $nsLowerCase=false) {
       $class = $function = '';
 
       if (isSet($frame['function'])) {
@@ -196,12 +197,11 @@ class DebugTools extends StaticClass {
 
          if (isSet($frame['class'])) {
             $class = $frame['class'];
-            if (is_int($pos=strRPos($class, '\\'))) {
+            if ($nsLowerCase && is_int($pos=strRPos($class, '\\')))
                $class = strToLower(subStr($class, 0, $pos)).subStr($class, $pos);
-            }
             $class = $class.$frame['type'];
          }
-         else if (is_int($pos=strRPos($function, '\\'))) {
+         elseif ($nsLowerCase && is_int($pos=strRPos($function, '\\'))) {
             $function = strToLower(subStr($function, 0, $pos)).subStr($function, $pos);
          }
       }
@@ -267,7 +267,7 @@ class DebugTools extends StaticClass {
       if (!func_num_args()) $level = error_reporting();
       if (!is_int($level)) throw new IllegalTypeException('Illegal type of parameter $level: '.getType($level));
 
-      $levels = array();
+      $levels = [];
 
       if (!$level                     ) $levels[] = '0';                      //  zero
       if ($level & E_ERROR            ) $levels[] = 'E_ERROR';                //     1

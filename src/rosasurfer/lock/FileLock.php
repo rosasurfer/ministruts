@@ -1,10 +1,9 @@
 <?php
 namespace rosasurfer\lock;
 
+use rosasurfer\debug\ErrorHandler;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RuntimeException;
-
-use rosasurfer\util\System;
 
 
 /**
@@ -77,7 +76,7 @@ final class FileLock extends BaseLock {
          $this->release();
       }
       catch (\Exception $ex) {
-         System::handleDestructorException($ex);
+         ErrorHandler::handleDestructorException($ex);
          throw $ex;
       }
    }

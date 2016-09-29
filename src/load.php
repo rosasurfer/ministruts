@@ -50,7 +50,7 @@ spl_autoload_register(function($class) {
    }
    catch (\Exception $ex) {
       if (class_exists($class, false) || interface_exists($class, false) || trait_exists($class, false)) {
-         Logger::warn(ucFirst(metaTypeOf($class)).' '.$class.' was successfully auto-loaded but file caused an exception', $ex, __CLASS__);
+         Logger::log(ucFirst(metaTypeOf($class)).' '.$class.' was successfully auto-loaded but file caused an exception', $ex, L_WARN, __CLASS__);
       }
       elseif ($ex instanceof ClassNotFoundException) {
          throw $ex;
