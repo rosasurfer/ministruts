@@ -5,6 +5,7 @@ use rosasurfer\config\Config;
 
 use rosasurfer\core\StaticClass;
 
+use rosasurfer\debug\DebugTools;
 use rosasurfer\debug\ErrorHandler;
 
 use rosasurfer\exception\IllegalTypeException;
@@ -17,7 +18,6 @@ use rosasurfer\net\http\CurlHttpClient;
 use rosasurfer\net\http\HttpRequest;
 use rosasurfer\net\http\HttpResponse;
 
-use rosasurfer\util\DebugTools;
 use rosasurfer\util\System;
 
 use function rosasurfer\echoPre;

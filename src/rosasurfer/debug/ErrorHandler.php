@@ -2,9 +2,9 @@
 namespace rosasurfer\debug;
 
 use rosasurfer\core\StaticClass;
+use rosasurfer\debug\DebugTools;
 use rosasurfer\exception\PHPError;
 use rosasurfer\log\Logger;
-use rosasurfer\util\DebugTools;
 
 use function rosasurfer\_true;
 use function rosasurfer\echoPre;
