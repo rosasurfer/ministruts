@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\util;
+namespace rosasurfer\debug;
 
 use rosasurfer\core\StaticClass;
 
