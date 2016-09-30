@@ -304,28 +304,26 @@ class Validator extends StaticClass {
 
 
    /**
-    * Ob der übergebene String eine gültige Festnetztelefunnummer ist.
+    * Whether or not the passed string represents a valid phone number.
     *
-    * @param  string $string - der zu prüfende String
-    *
-    * @return bool
-    */
-   public static function isFixedPhoneNo($string) {                        // !!! To-do: implementieren und Länderflag übergeben
-      static $pattern = '/^\+?[0-9]{7,}$/';
-      return is_string($string) && strLen($string) && preg_match($pattern, $string);
-   }
-
-
-   /**
-    * Ob der übergebene String eine gültige Mobilfunknummer ist.
-    *
-    * @param  string $string - der zu prüfende String
+    * @param  string $value
     *
     * @return bool
     */
-   public static function isCellPhoneNo($string) {                         // !!! To-do: implementieren und Länderflag übergeben
-      static $pattern = '/^\+?[0-9]{7,}$/';
-      return is_string($string) && strLen($string) && preg_match($pattern, $string);
+   public static function isPhoneNumber($value) {
+      if (!is_string($value)) return false;
+
+      // handle empty value
+      $value = trim($value);
+      if (!strLen($value)) return false;
+
+      // remove spaces
+      $value = str_replace(' ', '', $value);
+
+      // match numbers from BE, ES, BG, CH, A, UK, DE
+      return (bool) preg_match('/^(00|\+)(32|34|359|41|43|44|49)-?[1-9](-?[0-9]){2,}$/', $value);
+
+      // @TODO: implement via https://github.com/giggsey/libphonenumber-for-php
    }
 
 
