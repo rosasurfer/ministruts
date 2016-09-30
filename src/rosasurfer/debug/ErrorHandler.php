@@ -2,7 +2,6 @@
 namespace rosasurfer\debug;
 
 use rosasurfer\core\StaticClass;
-use rosasurfer\debug\DebugTools;
 use rosasurfer\exception\PHPError;
 use rosasurfer\log\Logger;
 
@@ -87,7 +86,7 @@ class ErrorHandler extends StaticClass {
       if (!$reportingLevel)            return false;     // the @ operator was specified
       if (!($reportingLevel & $level)) return true;      // error is not covered by current reporting level
 
-      $logContext = [];
+      $logContext = ['file'=>$file, 'line'=>$line];
 
       // (2) Process errors according to their severity level.
       switch ($level) {
@@ -172,7 +171,7 @@ class ErrorHandler extends StaticClass {
     *
     * @see     http://php.net/manual/en/language.oop5.decon.php
     *
-    * @example For a code example see this namespace's README file.
+    * @example For a code example see this folders's README file.
     */
    public static function handleDestructorException(\Exception $exception) {
       if (self::isInShutdown()) {
