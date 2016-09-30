@@ -60,7 +60,8 @@ use const rosasurfer\WINDOWS;
  *  • SMSHandler      - Send the message to the configured SMS receivers (phone numbers). The handler is invoked if the
  *                      application configuration contains one or more phone numbers for log messages and a valid SMS
  *                      operator configuration (at log time). For text messages an additional loglevel constraint can be
- *                      specified (on top of the default loglevel constraint).
+ *                      specified (on top of the default loglevel constraint). At the moment the message providers
+ *                      Clickatell and Nexmo are supported.
  *
  *                      Example:
  *                      --------
