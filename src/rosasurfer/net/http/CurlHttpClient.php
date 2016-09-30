@@ -16,7 +16,7 @@ use const rosasurfer\L_WARN;
  *
  * Eine Klasse, die mit CURL HttpRequests ausführen kann.
  */
-final class CurlHttpClient extends HttpClient {
+class CurlHttpClient extends HttpClient {
 
 
    private static /*bool*/ $logDebug, $logInfo, $logNotice;
