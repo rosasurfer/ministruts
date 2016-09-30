@@ -208,7 +208,7 @@ class RequestProcessor extends Object {
       $path = strRightFrom($requestPath, $baseUri.$modulePrefix);
       !strStartsWith($path, '/') && $path='/'.$path;
 
-      self::$logDebug && Logger::log('Path used for mapping selection: '.$path, null, L_DEBUG, __CLASS__);
+      self::$logDebug && Logger::log('Path used for mapping selection: '.$path, L_DEBUG);
 
       // Mapping suchen und im Request speichern
       if (($mapping=$this->module->findMapping($path)) || ($mapping=$this->module->getDefaultMapping())) {
@@ -217,7 +217,7 @@ class RequestProcessor extends Object {
       }
 
       // kein Mapping gefunden
-      self::$logInfo && Logger::log('Could not find a mapping for path: '.$path, null, L_INFO, __CLASS__);
+      self::$logInfo && Logger::log('Could not find a mapping for path: '.$path, L_INFO);
 
       // Status-Code 404 setzen, bevor Content ausgegeben wird
       header('HTTP/1.1 404 Not Found', true);
@@ -264,7 +264,7 @@ PROCESS_MAPPING_ERROR_SC_404;
          return true;
 
       // Beschränkung nicht erfüllt
-      self::$logDebug && Logger::log('HTTP method "'.$request->getMethod().'" is not supported by ActionMapping, denying access', null, L_DEBUG, __CLASS__);
+      self::$logDebug && Logger::log('HTTP method "'.$request->getMethod().'" is not supported by ActionMapping, denying access', L_DEBUG);
 
       // Status-Code 405 setzen, bevor Content ausgegeben wird
       header('HTTP/1.1 405 Method Not Allowed', true);
@@ -452,7 +452,7 @@ PROCESS_METHOD_ERROR_SC_405;
             $forward = $action->execute($request, $response);
 
          if ($forward === null)
-            self::$logInfo && Logger::log('ActionForward of NULL returned from Action::execute()', null, L_INFO, __CLASS__);
+            self::$logInfo && Logger::log('ActionForward of NULL returned from Action::execute()', L_INFO);
       }
       catch (\Exception $ex) {
          $throwable = $ex;    // evt. aufgetretene Exception zwischenspeichern

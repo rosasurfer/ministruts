@@ -176,12 +176,12 @@ final class ApcCache extends CachePeer {
             apc_delete($fullKey);      // apc_delete()+apc_add() fragmentieren den Speicher weniger als apc_store()
 
          if (!apc_add($fullKey, array($created, $expires, serialize($data)))) {
-            //Logger::log('apc_add() unexpectedly returned FALSE for $key "'.$fullKey.'" '.($isKey ? '(did exist and was deleted)':'(did not exist)'), null, L_WARN, __CLASS__);
+            //Logger::log('apc_add() unexpectedly returned FALSE for $key "'.$fullKey.'" '.($isKey ? '(did exist and was deleted)':'(did not exist)'), L_WARN);
             return false;
          }
       }
       else if (!apc_store($fullKey, array($created, $expires, serialize($data)))) {
-         //Logger::log('apc_store() unexpectedly returned FALSE for $key "'.$fullKey.'" '.($isKey ? '(did exist and was deleted)':'(did not exist)'), null, L_WARN, __CLASS__);
+         //Logger::log('apc_store() unexpectedly returned FALSE for $key "'.$fullKey.'" '.($isKey ? '(did exist and was deleted)':'(did not exist)'), L_WARN);
          return false;
       }
 

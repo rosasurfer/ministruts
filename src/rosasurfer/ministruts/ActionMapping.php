@@ -462,7 +462,7 @@ class ActionMapping extends Object {
       $forward = $this->module->findForward($name);
 
       if ($this->configured && !$forward)
-         Logger::log('No ActionForward found for name "'.$name.'"', null, L_WARN, __CLASS__);
+         Logger::log('No ActionForward found for name "'.$name.'"', L_WARN);
 
       return $forward;
    }

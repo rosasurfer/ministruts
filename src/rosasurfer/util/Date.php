@@ -36,7 +36,7 @@ class Date extends StaticClass {
       $diff = $ts2 - $ts1;
 
       if ($diff % DAYS)
-         Logger::log("($ts2-$ts1) % DAYS != 0: ".($diff%DAYS), null, L_WARN, __CLASS__);
+         Logger::log("($ts2-$ts1) % DAYS != 0: ".($diff%DAYS), L_WARN);
 
       return (int) ($diff / DAYS);
    }

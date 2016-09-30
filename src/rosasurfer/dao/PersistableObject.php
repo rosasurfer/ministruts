@@ -176,7 +176,7 @@ abstract class PersistableObject extends Object {
          $this->update();
       }
       else {
-         //Logger::log('Nothing to save, '.get_class($this).' instance is in sync with the database.', null, L_NOTICE, __CLASS__);
+         //Logger::log('Nothing to save, '.get_class($this).' instance is in sync with the database.', L_NOTICE);
       }
       $this->updateLinks();
       $this->modified = false;

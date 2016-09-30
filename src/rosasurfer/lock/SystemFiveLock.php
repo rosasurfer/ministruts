@@ -87,7 +87,7 @@ class SystemFiveLock extends BaseLock {
                                 || $message == 'sem_get(): failed releasing SYSVSEM_SETVAL for key 0x'.$hexId.': Identifier removed'
                                 || $message == 'sem_acquire(): failed to acquire key 0x'.$hexId.': Invalid argument'
                                 || $message == 'sem_acquire(): failed to acquire key 0x'.$hexId.': Identifier removed')) {
-               self::$logDebug && Logger::log($message.', trying again ... ('.($i+1).')', null, L_DEBUG, __CLASS__);
+               self::$logDebug && Logger::log($message.', trying again ... ('.($i+1).')', L_DEBUG);
                $messages[] = $message;
                uSleep(200000); // 200 msec. warten
                continue;

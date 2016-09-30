@@ -558,7 +558,7 @@ class Request extends Singleton {
                       'HTTP-X-UP-Forwarded-For' => 1,
                       'HTTP_X-UP-Forwarded-For' => 1);
          if (array_intersect_ukey($headers, $tmp, 'strCaseCmp'))
-            Logger::log('Invalid X-Forwarded-For header found', null, L_NOTICE, __CLASS__);
+            Logger::log('Invalid X-Forwarded-For header found', L_NOTICE);
       }
 
       // alle oder nur die gewünschten Header zurückgeben
