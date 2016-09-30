@@ -6,11 +6,9 @@ use rosasurfer\config\Config;
 use rosasurfer\core\StaticClass;
 
 use rosasurfer\debug\DebugTools;
-use rosasurfer\debug\ErrorHandler;
 
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
-use rosasurfer\exception\RuntimeException;
 
 use rosasurfer\ministruts\Request;
 
@@ -25,6 +23,7 @@ use function rosasurfer\ksort_r;
 use function rosasurfer\printPretty;
 use function rosasurfer\strLeftTo;
 use function rosasurfer\strStartsWith;
+use function rosasurfer\strStartsWithI;
 
 use const rosasurfer\CLI;
 use const rosasurfer\ERROR_LOG_DEFAULT;
@@ -106,9 +105,6 @@ class Logger extends StaticClass {
 
    /** @var bool - whether or not the PrintHandler is enabled */
    private static $printHandler = false;
-
-   /** @var bool - whether or not the PrintHandler displays the full message */
-   private static $printFullMessage = false;
 
 
    /** @var bool - whether or not the MailHandler is enabled */
@@ -194,14 +190,14 @@ class Logger extends StaticClass {
          if ($receiver=trim($receiver))
             self::$smsReceivers[] = $receiver;
       }
-      self::$smsHandler = (bool) self::$smsReceivers;
-
       $logLevel = Config::getDefault()->get('log.sms.level', self::$appLogLevel);
       if (is_string($logLevel)) {                                    // a string if a configured value
          $logLevel = self::logLevelToId($logLevel);
          !$logLevel && $logLevel=self::$appLogLevel;
       }
       self::$smsLogLevel = $logLevel;
+      self::$smsOptions  = Config::getDefault()->get('sms', []);
+      self::$smsHandler  = (bool)self::$smsReceivers && self::$smsOptions;
 
       // (5) ErrorLogHandler: enabled if the MailHandler is disabled
       self::$errorLogHandler = !self::$mailHandler;
@@ -308,8 +304,7 @@ class Logger extends StaticClass {
       else {
          // resolve the calling class and check its loglevel
          !isSet($context['class']) && self::resolveLogCaller($loggable, $level, $context);
-         $class = $context['class'];
-         if ($level < self::getLogLevel($class))      // return if message is not covered
+         if ($level < self::getLogLevel($context['class']))          // return if message is not covered
             return;
       }
 
@@ -319,6 +314,19 @@ class Logger extends StaticClass {
       self::$mailHandler     && self::invokeMailHandler    ($loggable, $level, $context);
       self::$smsHandler      && self::invokeSmsHandler     ($loggable, $level, $context);
       self::$errorLogHandler && self::invokeErrorLogHandler($loggable, $level, $context);
+
+
+      /*
+      // legacy: lock method against circular calls
+      static $isActive = false;                                      // TODO: SYSLOG implementieren
+      if ($isActive)     return echoPre(__METHOD__.'()  Sending circular log message to SYSLOG:  '.$message.', '.$exception);
+      $isActive        = true;
+
+      ($level >= self::getLogLevel($class)) && self::log_1($message, $exception, $level);
+
+      // unlock method
+      $isActive = false;
+      */
    }
 
 
@@ -358,11 +366,21 @@ class Logger extends StaticClass {
     */
    private static function invokeMailHandler($loggable, $level, array &$context) {
       if (!self::$mailHandler) return;
+      if (!isSet($context['mailSubject']) || !isSet($context['mailMessage']))
+         self::composeMailMessage($loggable, $level, $context);
 
-      echoPre(__METHOD__.'() not yet implemented');
+      $subject = $context['mailSubject'];
+      $message = $context['mailMessage'];
 
-      !isSet($context['cliMessage']) && self::composeCliMessage($loggable, $level, $context);
-      $cliMessage = $context['cliMessage'];
+      $message = str_replace("\r\n", "\n", $message);                // use Unix line-breaks on Linux
+      if (WINDOWS)                                                   // and Windows line-breaks on Windows
+         $message = str_replace("\n", "\r\n", $message);
+      $message = str_replace(chr(0), "?", $message);                 // replace NUL bytes which destroy the mail
+
+      foreach (self::$mailReceivers as $receiver) {
+         // @TODO: replace with mail() to prevent multiple "Subject" headers
+         error_log($message, ERROR_LOG_MAIL, $receiver, 'Subject: '.$subject);
+      }
    }
 
 
@@ -372,14 +390,103 @@ class Logger extends StaticClass {
     * @param  mixed    $loggable - message or exception to log
     * @param  int      $level    - loglevel of the loggable
     * @param  mixed[] &$context  - reference to the log context with additional data
+    *
+    * @TODO:  replace CURL dependency with internal PHP functions
     */
    private static function invokeSmsHandler($loggable, $level, array &$context) {
       if (!self::$smsHandler) return;
+      if (!isSet($context['cliMessage']))
+         self::composeCliMessage($loggable, $level, $context);
 
-      echoPre(__METHOD__.'() not yet implemented');
+      // (1) CURL options (all service providers)
+      $curlOptions[CURLOPT_SSL_VERIFYPEER] = false;                  // the SSL certifikat may be self-signed or invalid
+    //$curlOptions[CURLOPT_VERBOSE       ] = true;                   // enable debugging
 
-      !isSet($context['cliMessage']) && self::composeCliMessage($loggable, $level, $context);
-      $cliMessage = $context['cliMessage'];
+
+      // (2) clean-up message
+      $message = trim($context['cliMessage']);
+      $message = str_replace("\r\n", "\n", $message);                // enforce Unix line-breaks
+      $message = subStr($message, 0, 150);                           // limit length to about one text message
+
+
+      // (3) validate the configured SMS receivers
+      $receivers = [];
+      foreach (self::$smsReceivers as $receiver) {
+         if (strStartsWith($receiver, '+' )) $receiver = subStr($receiver, 1);
+         if (strStartsWith($receiver, '00')) $receiver = subStr($receiver, 2);
+         if (!ctype_digit($receiver)) {
+            Logger::log('Invalid SMS receiver configuration: "'.$receiver.'"', L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
+            continue;
+         }
+         $receivers[] = $receiver;
+      }
+      if (!$receivers) return;
+
+
+      // (4) check availability and use Clickatell
+      if (isSet(self::$smsOptions['clickatell'])) {
+         $smsOptions = self::$smsOptions['clickatell'];
+         if (!empty($smsOptions['user']) && !empty($smsOptions['password']) && !empty($smsOptions['api_id'])) {
+            $params = [];
+            $params['user'    ] = $smsOptions['user'    ];
+            $params['password'] = $smsOptions['password'];
+            $params['api_id'  ] = $smsOptions['api_id'  ];
+            $params['text'    ] = $message;
+
+            foreach ($receivers as $receiver) {
+               $params['to'] = $receiver;
+               $url      = 'https://api.clickatell.com/http/sendmsg?'.http_build_query($params, null, '&');
+               $request  = HttpRequest::create()->setUrl($url);
+               $client   = CurlHttpClient::create($curlOptions);
+               $response = $client->send($request);
+               $status   = $response->getStatus();
+               $content  = $response->getContent();
+
+               if ($status != 200) {
+                  Logger::log('Unexpected HTTP status code '.$status.' ('.HttpResponse::$sc[$status].') for url: '.$request->getUrl(), L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
+                  continue;
+               }
+               if (strStartsWithI($content, 'ERR: 113')) {
+                  // @TODO: 'ERR: 113' => max message parts exceeded, repeat with shortened message
+                  // @TODO:               consider to send concatenated messages
+               }
+            }
+            return;
+         }
+      }
+
+
+      // (5) check availability and use Nexmo
+      // @TODO encoding issues when sending to Bulgarian receivers (some chars are auto-converted to ciryllic crap)
+      if (isSet(self::$smsOptions['nexmo'])) {
+         $smsOptions = self::$smsOptions['nexmo'];
+         if (!empty($smsOptions['api_key']) && !empty($smsOptions['api_secret'])) {
+            $params = [];
+            $params['api_key'   ] =        $smsOptions['api_key'   ];
+            $params['api_secret'] =        $smsOptions['api_secret'];
+            $params['from'      ] = !empty($smsOptions['from'      ]) ? $smsOptions['from'] : 'PHP Logger';
+            $params['text'      ] =        $message;
+
+            foreach ($receivers as $receiver) {
+               $params['to'] = $receiver;
+               $url      = 'https://rest.nexmo.com/sms/json?'.http_build_query($params, null, '&');
+               $request  = HttpRequest::create()->setUrl($url);
+               $client   = CurlHttpClient::create($curlOptions);
+               $response = $client->send($request);
+               $status   = $response->getStatus();
+               $content  = $response->getContent();
+               if ($status != 200) {
+                  Logger::log('Unexpected HTTP status code '.$status.' ('.HttpResponse::$sc[$status].') for url: '.$request->getUrl(), L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
+                  continue;
+               }
+               if (is_null($content)) {
+                  Logger::log('Empty reply from server, url: '.$request->getUrl(), L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
+                  continue;
+               }
+            }
+            return;
+         }
+      }
    }
 
 
@@ -389,7 +496,7 @@ class Logger extends StaticClass {
     * ini_get('error_log')
     *
     * Name of the file where script errors should be logged. If the special value "syslog" is used, errors are sent
-    * to the system logger instead. On Unix, this means syslog(3) and on Windows NT it means the event log.
+    * to the system logger instead. On Unix, this means syslog(3) and on Windows it means the event log.
     * If this directive is not set, errors are sent to the SAPI error logger. For example, it is an error log in Apache
     * or STDERR in CLI.
     *
@@ -399,14 +506,18 @@ class Logger extends StaticClass {
     */
    private static function invokeErrorLogHandler($loggable, $level, array &$context) {
       if (!self::$errorLogHandler) return;
-      !isSet($context['cliMessage']) && self::composeCliMessage($loggable, $level, $context);
+      if (!isSet($context['cliMessage']))
+         self::composeCliMessage($loggable, $level, $context);
 
       $message = 'PHP '.$context['cliMessage'];                // skip "cliExtra"
       $message = str_replace(["\r\n", "\n"], ' ', $message);   // remove line breaks
-      $message = str_replace(chr(0), "…", $message);           // replace NUL bytes which mess up the logfile
+      $message = str_replace(chr(0), "?", $message);           // replace NUL bytes which mess up the logfile
 
       if (!ini_get('error_log') && CLI) {
-         // suppress duplicated output to STDERR, the PrintHandler already wrote to STDOUT
+         // Suppress duplicated output to STDERR, the PrintHandler already wrote to STDOUT.
+         // Instead of messing around here the PrintHandler must not print to STDOUT if the ErrorLogHandler
+         // is active and prints to STDERR.
+         //
          // @TODO: suppress output to STDERR in interactive terminals only (i.e. not in cron)
       }
       else {
@@ -423,7 +534,8 @@ class Logger extends StaticClass {
     * @param  mixed[] &$context  - reference to the log context
     */
    private static function composeCliMessage($loggable, $level, array &$context) {
-      if (!isSet($context['file']) || !isSet($context['line'])) self::resolveLogLocation($loggable, $level, $context);
+      if (!isSet($context['file']) || !isSet($context['line']))
+         self::resolveLogLocation($loggable, $level, $context);
       $file = $context['file'];
       $line = $context['line'];
 
@@ -445,22 +557,69 @@ class Logger extends StaticClass {
          // the stack trace will go into "cliExtra"
          $traceStr  = $indent.'Stacktrace:'.NL.' -----------'.NL;
          $traceStr .= DebugTools::getBetterTraceAsString($loggable, $indent);
-         $extra    .= NL.$traceStr.NL;
+         $extra    .= NL.$traceStr;
       }
 
       // append an existing context exception to "cliExtra"
       if (isSet($context['exception'])) {
          $exception = $context['exception'];
-         $msg       = trim(DebugTools::getBetterMessage($exception));
+         $msg       = $indent.trim(DebugTools::getBetterMessage($exception));
+         $extra    .= NL.$msg.NL;
          $traceStr  = $indent.'Stacktrace:'.NL.' -----------'.NL;
          $traceStr .= DebugTools::getBetterTraceAsString($exception, $indent);
-         $extra    .= NL.$msg.NL.NL.$traceStr.NL;
+         $extra    .= NL.$traceStr;
       }
 
       // store main and extra message
       $context['cliMessage'] = $text;
       if ($extra)
          $context['cliExtra'] = $extra;
+   }
+
+
+   /**
+    * Compose a mail log message and store it in the passed log context under the keys "mailSubject" and "mailMessage".
+    *
+    * @param  mixed    $loggable - message or exception to log
+    * @param  int      $level    - loglevel of the loggable
+    * @param  mixed[] &$context  - reference to the log context
+    */
+   private static function composeMailMessage($loggable, $level, array &$context) {
+      if (!isSet($context['cliMessage']))
+         self::composeCliMessage($loggable, $level, $context);
+
+      $msg = $context['cliMessage'];
+      if (isSet($context['cliExtra']))
+         $msg .= $context['cliExtra'];
+      $type     = isSet($context['type']) ? $context['type'] : null;
+      $location = null;
+
+      // compose message
+      if (CLI) {
+         $msg     .= NL.NL.'Shell:'.NL.'------'.NL.print_r(ksort_r($_SERVER), true).NL;
+         $location = $_SERVER['PHP_SELF'];
+      }
+      else {
+         $request  = Request::me();
+         $location = strLeftTo($request->getUrl(), '?');
+         $session  = $request->isSession() ? print_r(ksort_r($_SESSION), true) : null;
+         $ip       = $_SERVER['REMOTE_ADDR'];
+         $host     = getHostByAddr($ip);
+         if ($host != $ip)
+            $ip .= ' ('.$host.')';
+         $msg .= NL.NL.'Request:'.NL.'--------'.NL.$request.NL.NL
+              . 'Session: '.($session ? NL.'--------'.NL.$session : '(none)').NL.NL
+              . 'Server:'.NL.'-------'.NL.print_r(ksort_r($_SERVER), true).NL.NL
+              . 'IP:   '.$ip.NL
+              . 'Time: '.date('Y-m-d H:i:s').NL;
+      }
+
+      if ($loggable instanceof \Exception && $type=='unhandled')
+         $type = 'Unhandled Exception ';
+
+      // store subject and message
+      $context['mailSubject'] = 'PHP '.self::$logLevels[$level].' '.$type.'at '.$location;
+      $context['mailMessage'] = $msg;
    }
 
 
@@ -472,7 +631,8 @@ class Logger extends StaticClass {
     * @param  mixed[] &$context  - reference to the log context
     */
    private static function composeHtmlMessage($loggable, $level, array &$context) {
-      if (!isSet($context['file']) || !isSet($context['line'])) self::resolveLogLocation($loggable, $level, $context);
+      if (!isSet($context['file']) || !isSet($context['line']))
+         self::resolveLogLocation($loggable, $level, $context);
       $file = $context['file'];
       $line = $context['line'];
 
@@ -527,7 +687,8 @@ class Logger extends StaticClass {
     * @param  mixed[] &$context  - reference to the log context
     */
    private static function resolveLogLocation($loggable, $level, array &$context) {
-      !isSet($context['trace']) && $context['trace']=debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+      if (!isSet($context['trace']))
+         $context['trace'] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
       $trace = $context['trace'];
 
       foreach ($trace as $i => $frame) {           // find the first non-logger frame with "file"
@@ -539,6 +700,7 @@ class Logger extends StaticClass {
          $context['line'] = $trace[$i-1]['line'];
          break;
       }
+
       // intentionally cause an error if not found (should never happen)
    }
 
@@ -554,7 +716,8 @@ class Logger extends StaticClass {
     * @TODO:  test with Closure and internal PHP functions
     */
    private static function resolveLogCaller($loggable, $level, array &$context) {
-      !isSet($context['trace']) && $context['trace']=debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+      if (!isSet($context['trace']))
+         $context['trace'] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
       $trace = $context['trace'];
 
       $class = '';
@@ -577,96 +740,36 @@ class Logger extends StaticClass {
 
 
 
-
-
-
-
-
-
+   /**
+    * Loggt eine Message und/oder eine Exception.
+    *
+    * @param  string    $message
+    * @param \Exception $exception
+    * @param  int       $level
+    */
+   public static function old_log($message, \Exception $exception=null, $level) {
+      try {
+         // ...
+         self::$sms && $level >= self::$smsLogLevel && self::sms_log($cliMessage);
+      }
+      catch (\Exception $ex) {
+         $msg = 'PHP (0) '.$cliMessage ? $cliMessage:$message;
+         self::$print && echoPre($msg);
+         self::error_log($msg);
+         throw $ex;
+      }
+   }
 
 
    /**
-    * Globaler Handler für nicht abgefangene Exceptions. Die Exception wird mit dem Loglevel L_FATAL geloggt und das Script beendet.
-    * Der Aufruf kann automatisch (durch installierten Errorhandler) oder manuell (durch Code, der selbst keine Exceptions werfen darf)
-    * erfolgen.
+    * Loggt eine nicht abgefangene Exceptions.
     *
-    * NOTE: PHP bricht das Script nach Aufruf dieses Handlers automatisch ab.
-    *
-    * @param  Exception $exception - die zu behandelnde Exception
+    * @param  \Exception $exception
     */
-   public static function handleException(\Exception $exception) {
+   public static function old_handleException(\Exception $exception) {
       try {
-         // 1. Fehlerdaten ermitteln
-         $type       = $exception instanceof \ErrorException ? 'Unexpected':'Unhandled';
-         $exMessage  = trim(DebugTools::getBetterMessage($exception));
-         $indent     = ' ';
-         $traceStr   = $indent.'Stacktrace:'.NL.' -----------'.NL;
-         $traceStr  .= DebugTools::getBetterTraceAsString($exception, $indent);
-         $file       = $exception->getFile();
-         $line       = $exception->getLine();
-         $cliMessage = '[FATAL] '.$type.' '.$exMessage.NL.$indent.'in '.$file.' on line '.$line.NL;
-
-         // 2. Exception anzeigen
-         if (self::$print) {
-            if (CLI) {
-               echoPre($cliMessage.NL.$traceStr.NL);
-            }
-            else {
-               echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif"><b>[FATAL]</b> '.$type.' '.nl2br(htmlSpecialChars($exMessage, ENT_QUOTES))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
-               echo '<br>'.printPretty($traceStr, true);
-               echo '<br></div>'.NL;
-            }
-         }
-         else {
-            echoPre('application error');
-         }
-
-         // 3. Exception an die konfigurierten Adressen mailen
-         if (self::$mail) {
-            $mailMsg = $cliMessage.NL.$traceStr;
-            $request = null;
-
-            if (CLI) {
-               $mailMsg .= NL.NL.'Shell:'.NL.'------'.NL.print_r(ksort_r($_SERVER), true).NL.NL;
-            }
-            else {
-               $request = Request::me();
-               $session = $request->isSession() ? print_r(ksort_r($_SESSION), true) : null;
-               $ip      = $_SERVER['REMOTE_ADDR'];
-               $host    = getHostByAddr($ip);
-               if ($host != $ip)
-                  $ip .= ' ('.$host.')';
-
-               $mailMsg .= NL
-                        .  NL
-                        . 'Request:'                                                   .NL
-                        . '--------'                                                   .NL
-                        .  $request                                                    .NL
-                        .                                                               NL
-                        . 'Session: '.($session ? NL.'--------'.NL.$session : '(none)').NL
-                        .                                                               NL
-                        . 'Server:'                                                    .NL
-                        . '-------'                                                    .NL
-                        .  print_r(ksort_r($_SERVER), true)                            .NL
-                        .                                                               NL
-                        . 'IP:   '.$ip                                                 .NL
-                        . 'Time: '.date('Y-m-d H:i:s')                                 .NL;
-            }
-            $subject = 'PHP [FATAL] Unhandled Exception at '.($request ? strLeftTo($request->getUrl(), '?') : $_SERVER['PHP_SELF']);
-            self::mail_log($subject, $mailMsg);
-         }
-
-
-         // (4) Logmessage ins Error-Log schreiben, wenn sie nicht per Mail rausging
-         else {
-            self::error_log('PHP '.$cliMessage);
-         }
-
-
-         // (5) Logmessage per SMS verschicken
-         if (self::$sms) {
-            self::sms_log($cliMessage);
-         }
+         // ...
+         self::$sms && self::sms_log($cliMessage);
       }
       catch (\Exception $secondary) {
          $file = $exception->getFile();
@@ -680,188 +783,6 @@ class Logger extends StaticClass {
          $msg  = 'PHP secondary '.(string)$secondary.' in '.$file.' on line '.$line;
          self::$print && echoPre($msg);
          self::error_log($msg);
-      }
-   }
-
-
-   /**
-    * Loggt eine Message und/oder eine Exception.
-    *
-    * @param  string     $message   - zu loggende Message
-    * @param  \Exception $exception - zu loggende Exception
-    * @param  int        $level     - LogLevel
-    * @param  string     $class     - Name der Klasse, von der aus geloggt wurde
-    */
-   public static function log_old($message, $exception, $level, $class) {
-      // lock method against circular calls
-      static $isActive = false;                                      // TODO: SYSLOG implementieren
-      if ($isActive)     return echoPre(__METHOD__.'()  Sending circular log message to SYSLOG:  '.$message.', '.$exception);
-      $isActive        = true;
-
-      if ($level >= self::getLogLevel($class)) {
-         self::log_1($message, $exception, $level);
-      }
-
-      // unlock method
-      $isActive = false;
-   }
-
-
-   /**
-    * Loggt eine Message und/oder eine Exception.
-    *
-    * @param  string    $message   - zu loggende Message
-    * @param  Exception $exception - zu loggende Exception
-    * @param  int       $level     - zu loggender Loglevel
-    */
-   private static function log_1($message, \Exception $exception=null, $level) {
-      $request    = CLI ? null : Request::me();
-      $cliMessage = null;
-
-      try {
-         // 1. Logdaten ermitteln
-         $exMessage = $exTraceStr = null;
-         if ($exception) {
-            $exMessage   = trim(DebugTools::getBetterMessage($exception));
-            $indent      = ' ';
-            $exTraceStr  = $indent.'Stacktrace:'.NL.' -----------'.NL;
-            $exTraceStr .= DebugTools::getBetterTraceAsString($exception, $indent);
-         }
-
-         $trace = DebugTools::fixTrace(debug_backtrace());  // die Frames des Loggers selbst können weg
-         if ($trace[0]['class'].'::'.$trace[0]['function'] == 'Logger::log_1') array_shift($trace);
-         if ($trace[0]['class'].'::'.$trace[0]['function'] == 'Logger::log'  ) array_shift($trace);
-
-         $file = $line = null;
-         foreach ($trace as $frame) {                       // ersten Frame mit __FILE__ suchen
-            if (isSet($frame['file'])) {
-               $file = $frame['file'];
-               $line = $frame['line'];
-               break;
-            }
-         }
-         $cliMessage = self::$logLevels[$level].'  '.$message.NL.'in '.$file.' on line '.$line;
-
-
-         // 2. Logmessage anzeigen
-         if (self::$print) {
-            if (CLI) {
-               echo $cliMessage.NL;
-               if ($exception) {
-                  echo NL.$exMessage.NL.NL.$exTraceStr.NL;
-               }
-            }
-            else {
-               echo '</script></img></select></textarea></font></span></div></i></b><div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif"><b>'.self::$logLevels[$level].'</b>: '.nl2br(htmlSpecialChars($message, ENT_QUOTES))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
-               if ($exception) {
-                  echo '<br>'.htmlSpecialChars($exMessage, ENT_QUOTES).'<br>';
-                  echo '<br>'.printPretty($exTraceStr, true).'<br>';
-               }
-               echo '<br>'.printPretty('Request:'.NL.'--------'.NL.$request, true).'<br></div>'.NL;
-            }
-            ob_get_level() && ob_flush();
-         }
-
-
-         // 3. Logmessage an die konfigurierten Adressen mailen
-         if (self::$mail) {
-            $mailMsg = $cliMessage.NL.($exception ? NL.$exMessage.NL.NL.$exTraceStr.NL : '');
-
-            if (CLI) {
-               $mailMsg .= NL.NL.NL.'Shell:'.NL.'------'.NL.print_r(ksort_r($_SERVER), true).NL.NL.NL;
-            }
-            else {
-               $session = $request->isSession() ? print_r(ksort_r($_SESSION), true) : null;
-               $ip      = $_SERVER['REMOTE_ADDR'];
-               $host    = getHostByAddr($ip);
-               if ($host != $ip)
-                  $ip .= ' ('.$host.')';
-
-               $mailMsg .= NL.NL.NL.'Request:'.NL.'--------'.NL.$request.NL.NL.NL
-                        .  'Session: '.($session ? NL.'--------'.NL.$session : '(none)').NL.NL.NL
-                        .  'Server: '.NL.'-------'.NL.print_r(ksort_r($_SERVER), true).NL.NL.NL
-                        .  'IP:   '.$ip.NL
-                        .  'Time: '.date('Y-m-d H:i:s').NL;
-            }
-            $subject = 'PHP: '.self::$logLevels[$level].' at '.($request ? strLeftTo($request->getUrl(), '?') : $_SERVER['PHP_SELF']);
-            self::mail_log($subject, $mailMsg);
-         }
-
-
-         // (4) Logmessage ins Error-Log schreiben, wenn sie nicht per Mail rausging
-         else {
-            self::error_log('PHP '.$cliMessage);
-         }
-
-
-         // (5) Logmessage per SMS verschicken, wenn der konfigurierte SMS-Loglevel erreicht ist
-         if (self::$sms && $level >= self::$smsLogLevel) {
-            self::sms_log($cliMessage.($exception ? NL.$exMessage:''));
-         }
-      }
-      catch (\Exception $ex) {
-         $msg = 'PHP (0) '.$cliMessage ? $cliMessage:$message;
-         self::$print && echoPre($msg);
-         self::error_log($msg);
-         throw $ex;
-      }
-   }
-
-
-   /**
-    * Verschickt eine Logmessage per E-Mail.
-    *
-    * @param  string $subject - Subject der E-Mail
-    * @param  string $message - zu loggende Message
-    */
-   private static function mail_log($subject, $message) {
-      $message = str_replace("\r\n", "\n", $message);                // Linux: Unix-Zeilenumbrüche
-      if (WINDOWS)
-         $message = str_replace("\n", "\r\n", $message);             // Windows: Windows-Zeilenumbrüche
-      $message = str_replace(chr(0), "*\x00*", $message);            // NUL-Characters ersetzen (zerschießen E-Mail)
-
-      foreach (self::$mailReceivers as $receiver) {
-         // TODO: durch mail() ersetzen, damit Subject-Header von PHP nicht doppelt geschrieben wird
-         error_log($message, ERROR_LOG_MAIL, $receiver, 'Subject: '.$subject);
-      }
-   }
-
-
-   /**
-    * Verschickt eine Logmessage per SMS an die konfigurierten Rufnummern.
-    *
-    * @param  string $message - zu loggende Message
-    */
-   private static function sms_log($message) {
-      if (empty($message))
-         return;
-      $message  = str_replace("\r\n", "\n", $message);                     // Unix-Zeilenumbrüche
-      $message  = subStr($message, 0, 150);                                // Länge der Message auf eine SMS begrenzen
-
-      $username = self::$smsOptions['username'];
-      $password = self::$smsOptions['password'];
-      $api_id   = self::$smsOptions['api_id'  ];
-
-      foreach (self::$smsReceivers as $receiver) {
-         if (strStartsWith($receiver, '+' )) $receiver = subStr($receiver, 1);
-         if (strStartsWith($receiver, '00')) $receiver = subStr($receiver, 2);
-         if (!ctype_digit($receiver)) throw new InvalidArgumentException('Invalid argument $receiver: "'.$receiver.'"');
-
-         $url = 'https://api.clickatell.com/http/sendmsg?user='.$username.'&password='.$password.'&api_id='.$api_id.'&to='.$receiver.'&text='.urlEncode($message);
-
-         // TODO: CURL-Abhängigkeit möglichst durch interne URL-Funktionen ersetzen
-
-         // HTTP-Request erzeugen und ausführen
-         $request  = HttpRequest::create()->setUrl($url);
-         $options[CURLOPT_SSL_VERIFYPEER] = false;                            // das SSL-Zertifikat kann nicht überprüfbar oder ungültig sein
-         $response = CurlHttpClient::create($options)->send($request);
-         $status   = $response->getStatus();
-         $content  = $response->getContent();
-         if ($status != 200) throw new RuntimeException('Unexpected HTTP status code from api.clickatell.com: '.$status.' ('.HttpResponse ::$sc[$status].')');
-
-         // TODO: SMS ggf. auf zwei message parts verlängern
-         if (striPos($content, 'ERR: 113') === 0)                             // ERR: 113, Max message parts exceeded
-            return self ::sms_log(subStr($message, 0, strLen($message)-10));  // mit kürzerer Message wiederholen
       }
    }
 }
