@@ -151,16 +151,17 @@ class ErrorHandler extends StaticClass {
       //echoPre(__METHOD__.'()  '.DebugTools::getBetterMessage($exception));
       // TODO: detect and handle recursive calls
 
-      $context = ['file' => $exception->getFile()];   // if the location is not preset the Logger will correctly
-      $context = ['line' => $exception->getLine()];   // resolve this method as the originating location
-      $context = ['type' => 'unhandled'          ];
+      $context = ['file'  => $exception->getFile()];  // if the location is not preset the Logger will correctly
+      $context = ['line'  => $exception->getLine()];  // resolve this method as the originating location
+      $context = ['class' => __CLASS__            ];  // atm not required but somewhen somewhere somebody might ask for it
+      $context = ['type'  => 'unhandled'          ];
 
       Logger::log($exception, L_FATAL, $context);     // log with the highest level
    }
 
 
    /**
-    * Global handler for otherwise unhandled exceptions occurring in object destructors.
+    * Manually called handler for exceptions occurring in object destructors.
     *
     * Attempting to throw an exception from a destructor during script shutdown causes a fatal error. Therefore this
     * method has to be called manually from object destructors if an exception occurred. If the script is in the shutdown
@@ -171,7 +172,7 @@ class ErrorHandler extends StaticClass {
     *
     * @see     http://php.net/manual/en/language.oop5.decon.php
     *
-    * @example For a code example see this folders's README file.
+    * @example For an example see this folders's README file.
     */
    public static function handleDestructorException(\Exception $exception) {
       if (self::isInShutdown()) {
