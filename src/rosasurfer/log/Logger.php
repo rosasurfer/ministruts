@@ -547,13 +547,13 @@ class Logger extends StaticClass {
       if (is_string($loggable)) {
          // simple message
          $msg  = $loggable;
-         $text = self::$logLevels[$level].'  '.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
+         $text = strToUpper(self::$logLevels[$level]).' '.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
       }
       else {
          // exception
          $type = isSet($context['type']) ? ucFirst($context['type']).' ' : '';
          $msg  = $type.trim(DebugTools::getBetterMessage($loggable));
-         $text = self::$logLevels[$level].'  '.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
+         $text = strToUpper(self::$logLevels[$level]).' '.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
 
          // the stack trace will go into "cliExtra"
          $traceStr  = $indent.'Stacktrace:'.NL.' -----------'.NL;
