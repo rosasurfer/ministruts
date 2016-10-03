@@ -646,13 +646,13 @@ class Logger extends StaticClass {
       if (is_string($loggable)) {
          // simple message
          $msg   = $loggable;
-         $html .= '<b>'.self::$logLevels[$level].'</b> '.nl2br(htmlSpecialChars($msg, ENT_QUOTES|ENT_SUBSTITUTE))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
+         $html .= '<b>'.strToUpper(self::$logLevels[$level]).'</b> '.nl2br(htmlSpecialChars($msg, ENT_QUOTES|ENT_SUBSTITUTE))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
       }
       else {
          // exception
          $type      = isSet($context['type']) ? ucFirst($context['type']).' ' : '';
          $msg       = $type.DebugTools::getBetterMessage($loggable);
-         $html     .= '<b>'.self::$logLevels[$level].'</b> '.nl2br(htmlSpecialChars($msg, ENT_QUOTES|ENT_SUBSTITUTE))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
+         $html     .= '<b>'.strToUpper(self::$logLevels[$level]).'</b> '.nl2br(htmlSpecialChars($msg, ENT_QUOTES|ENT_SUBSTITUTE))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
          $traceStr  = $indent.'Stacktrace:'.NL.' -----------'.NL;
          $traceStr .= DebugTools::getBetterTraceAsString($loggable, $indent);
          $html     .= '<br>'.printPretty($traceStr, true).'<br>';
