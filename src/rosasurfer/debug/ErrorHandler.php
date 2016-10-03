@@ -86,7 +86,8 @@ class ErrorHandler extends StaticClass {
       if (!$reportingLevel)            return false;     // the @ operator was specified
       if (!($reportingLevel & $level)) return true;      // error is not covered by current reporting level
 
-      $logContext = ['file'=>$file, 'line'=>$line];
+      $logContext['file'] = $file;
+      $logContext['line'] = $line;
 
       // (2) Process errors according to their severity level.
       switch ($level) {
@@ -151,10 +152,10 @@ class ErrorHandler extends StaticClass {
       //echoPre(__METHOD__.'()  '.DebugTools::getBetterMessage($exception));
       // TODO: detect and handle recursive calls
 
-      $context = ['file'  => $exception->getFile()];  // if the location is not preset the Logger will correctly
-      $context = ['line'  => $exception->getLine()];  // resolve this method as the originating location
-      $context = ['class' => __CLASS__            ];  // atm not required but somewhen somewhere somebody might ask for it
-      $context = ['type'  => 'unhandled'          ];
+      $context['class'] = __CLASS__;                  // atm not required but somewhen somewhere somebody might ask for it
+      $context['file' ] = $exception->getFile();      // if the location is not preset the Logger will correctly
+      $context['line' ] = $exception->getLine();      // resolve this method as the originating location
+      $context['type' ] = 'unhandled';
 
       Logger::log($exception, L_FATAL, $context);     // log with the highest level
    }
