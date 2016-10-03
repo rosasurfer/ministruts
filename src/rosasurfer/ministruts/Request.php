@@ -8,8 +8,6 @@ use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
 
-use rosasurfer\log\Logger;
-
 use function rosasurfer\strEndsWith;
 use function rosasurfer\strLeft;
 use function rosasurfer\strLeftTo;
@@ -17,7 +15,6 @@ use function rosasurfer\strRightFrom;
 use function rosasurfer\strStartsWith;
 
 use const rosasurfer\DAY;
-use const rosasurfer\L_NOTICE;
 use const rosasurfer\NL;
 
 
@@ -398,11 +395,11 @@ class Request extends Singleton {
 
 
    /**
-    * Gibt den Content dieses Requests zurück. Der Content ist ein ggf. übertragener Request-Body (nur bei POST-Requests).
+    * Return the content of the current request (the request body).
     *
-    * @return mixed - Request-Body oder NULL, wenn im Body keine Daten übertragen wurden.  Ist der Content-Typ des Requests
-    *                 "multipart/form-data" (File-Upload), wird statt des Request-Bodies ein Array mit den geposteten
-    *                 File-Informationen zurückgegeben.
+    * @return string - Request body or NULL if the request body was empty. If the "Content-Type" header of the request
+    *                  is "multipart/form-data" (in fact a POST file upload) an array with the posted file's informations
+    *                  is returned.
     */
    public function getContent() {
       static $content = null;
@@ -427,10 +424,10 @@ class Request extends Singleton {
 
 
    /**
-    * Gibt den Content-Type dieses Requests zurück. Werden unsinnigerweise mehrere "Content-Type"-Header übertragen, wird
-    * der erste gefundene Header zurückgegeben.
+    * Return the "Content-Type" header of the request. If multiple "Content-Type" headers have been transmitted the first
+    * one is returned.
     *
-    * @return string - Content-Type oder NULL, wenn kein "Content-Type"-Header übertragen wurde.
+    * @return string - "Content-Type" header or NULL if no "Content-Type" header was transmitted.
     */
    public function getContentType() {
       $contentType = $this->getHeaderValue('Content-Type');
@@ -458,7 +455,7 @@ class Request extends Singleton {
 
 
    /**
-    * Ob eine aktuelle HttpSession existiert oder nicht.
+    * Whether or not an HTTP session exists.
     *
     * @return bool
     */
@@ -512,11 +509,11 @@ class Request extends Singleton {
 
 
    /**
-    * Gibt die angegebenen Header als Array von Name-Wert-Paaren zurück (in der übertragenen Reihenfolge).
+    * Return the specified headers as an array of name-value pairs (in transmitted order).
     *
-    * @param  string|[] $names - ein oder mehrere Namen; ohne Angabe werden alle Header zurückgegeben
+    * @param  string|[] $names - one or more header names; without a name all headers are returned
     *
-    * @return array - Name-Wert-Paare
+    * @return array - name-value pairs
     */
    public function getHeaders($names = null) {
       if     ($names === null)   $names = array();
@@ -528,7 +525,7 @@ class Request extends Singleton {
       }
       else throw new IllegalTypeException('Illegal type of parameter $names: '.getType($names));
 
-      // einmal alle Header einlesen
+      // read all headers once
       static $headers = null;
       if ($headers === null) {
          if (function_exists('getAllHeaders')) {
@@ -536,8 +533,9 @@ class Request extends Singleton {
             if ($headers === false) throw new RuntimeException('Error reading request headers, getAllHeaders() returned: FALSE');
          }
          else {
-            // TODO: in der PHP-Umgebung fehlen einige Header
-            // z.B. 'Authorization' (Digest), Basic authorization prüfen, $_FILES prüfen !!!
+            // @TODO: some transmitted headers are missing in the PHP $_SERVER array, e.g. 'Authorization' (digest)
+            // @TODO: check basic authorization
+            // @TODO: check $_FILES array
             $headers = array();
             foreach ($_SERVER as $key => $value) {
                if(subStr($key, 0, 5) == 'HTTP_') {
@@ -551,32 +549,22 @@ class Request extends Singleton {
                if (isSet($_SERVER['CONTENT_LENGTH'])) $headers['Content-Length'] = $_SERVER['CONTENT_LENGTH'];
             }
          }
-
-         // Schauen wir mal, ob es immer noch solche falschen Header gibt...
-         $tmp = array('HTTP-X-Forwarded-For'    => 1,
-                      'HTTP_X-Forwarded-For'    => 1,
-                      'HTTP-X-UP-Forwarded-For' => 1,
-                      'HTTP_X-UP-Forwarded-For' => 1);
-         if (array_intersect_ukey($headers, $tmp, 'strCaseCmp'))
-            Logger::log('Invalid X-Forwarded-For header found', L_NOTICE);
       }
 
-      // alle oder nur die gewünschten Header zurückgeben
+      // return all or just the specified headers
       if (!$names)
          return $headers;
-
       return array_intersect_ukey($headers, array_flip($names), 'strCaseCmp');
    }
 
 
    /**
-    * Gibt den Wert des angegebenen Headers als String zurück. Wird ein Array mit mehreren Namen angegeben oder wurden
-    * mehrere Header des angegebenen Namens übertragen, werden alle Werte dieser Header als eine komma-getrennte Liste
-    * zurückgegeben (in der übertragenen Reihenfolge).
+    * Return the value of the specified header. If multiple headers are specified or multiple headers have been
+    * transmitted, return all values as a comma-separated list (in transmission order).
     *
-    * @param  string|[] $names - ein oder mehrere Headernamen
+    * @param  string|[] $names - one or more header names
     *
-    * @return string - Wert oder NULL, wenn die angegebenen Header nicht gesetzt sind
+    * @return string - Value(s) or NULL if no such headers have been transmitted.
     */
    public function getHeaderValue($names) {
       if (is_string($names))
@@ -860,26 +848,26 @@ class Request extends Singleton {
 
 
    /**
-    * Gibt eine lesbare Representation des Request zurück.
+    * Return a human-readable version of this request.
     *
     * @return string
     */
    public function __toString() {
-      // Request
+      // request
       $string = $_SERVER['REQUEST_METHOD'].' '.$_SERVER['REQUEST_URI'].' '.$_SERVER['SERVER_PROTOCOL'].NL;
 
-      // Header
+      // headers
       $headers = $this->getHeaders();
       $maxLen  = 0;
       foreach ($headers as $key => $value) {
          $maxLen = max(strLen($key), $maxLen);
       }
-      $maxLen++; // +1 Zeichen für ':'
+      $maxLen++; // add a char for ':'
       foreach ($headers as $key => $value) {
          $string .= str_pad($key.':', $maxLen).' '.$value.NL;
       }
 
-      // Content (Body)
+      // content (body)
       if ($this->isPost()) {
          $content = $this->getContent();
          if (strLen($content))
