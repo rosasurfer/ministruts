@@ -219,10 +219,8 @@ class Helper extends StaticClass {
    public static function getBetterMessage(\Exception $exception) {
       $class     = get_class($exception);
       $namespace = strToLower(strLeftTo($class, '\\', -1, true, ''));
-      $name      = strRightFrom($class, '\\', -1, false, $class);
-
-      if ($namespace == 'rosasurfer\\ministruts\\exception\\') $result = $name;              // only base name for improved readability
-      else                                                     $result = $namespace.$name;
+      $baseName  = strRightFrom($class, '\\', -1, false, $class);
+      $result    = $namespace.$baseName;
 
       if ($exception instanceof \ErrorException)
          $result .= '('.self::errorLevelToStr($exception->getSeverity()).')';
