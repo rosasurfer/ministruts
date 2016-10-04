@@ -1,5 +1,6 @@
 <?php
 namespace rosasurfer;
+echo __FILE__."<br>\n";
 
 use rosasurfer\exception\ClassNotFoundException;
 use rosasurfer\exception\IllegalTypeException;
@@ -12,23 +13,10 @@ use rosasurfer\util\Validator;
 
 
 /**
- * Helper functions and constants.
- */
-
-
-// block re-includes
-if (defined(__NAMESPACE__.'\INIT_GLOBAL_HELPERS'))
-   return;
-
-
-// Framework initialization flags
-const INIT_GLOBAL_HELPERS   = 1;
-const INIT_REPLACE_COMPOSER = 2;
-
-
-/**
  * Helper constants and functions
  */
+if (defined(__NAMESPACE__.'\CLI')) return;
+
 define(__NAMESPACE__.'\CLI'      , !isSet($_SERVER['REQUEST_METHOD']));              // whether or not we run on a command line interface
 define(__NAMESPACE__.'\LOCALHOST', !CLI && @$_SERVER['REMOTE_ADDR']=='127.0.0.1');   // whether or not we run on localhost
 define(__NAMESPACE__.'\WINDOWS'  , (strToUpper(subStr(PHP_OS, 0, 3))=='WIN'));       // whether or not we run on Windows

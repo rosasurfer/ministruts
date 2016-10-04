@@ -1,11 +1,11 @@
 <?php
+namespace rosasurfer\ministruts;
+echo __FILE__."<br>\n";
+
+
 /**
  * Package constants and functions.
  */
-namespace rosasurfer\ministruts;
-
-
-// block re-includes
 if (defined(__NAMESPACE__.'\DEFAULT_REQUEST_PROCESSOR_CLASS'))
    return;
 
