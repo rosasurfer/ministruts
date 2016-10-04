@@ -37,7 +37,7 @@ class System extends StaticClass {
    public static function shell_exec($cmd) {
       if (!is_string($cmd)) throw new IllegalTypeException('Illegal type of parameter $cmd: '.getType($cmd));
 
-      if (!WINDOWS) return shell_exec($cmd);
+      if (!WINDOWS) return \shell_exec($cmd);
 
       // pOpen() suffers from the same bug, probably caused by both using feof()
 
