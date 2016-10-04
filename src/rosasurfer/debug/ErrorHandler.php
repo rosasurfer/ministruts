@@ -9,6 +9,10 @@ use rosasurfer\log\Logger;
 use function rosasurfer\_true;
 use function rosasurfer\echoPre;
 
+use const rosasurfer\L_FATAL;
+use const rosasurfer\L_NOTICE;
+use const rosasurfer\L_WARN;
+
 
 /**
  * Gobal error handling
