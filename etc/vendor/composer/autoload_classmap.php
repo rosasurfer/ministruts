@@ -6,6 +6,7 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname(dirname($vendorDir));
 
 return array(
+    'rosasurfer\\MiniStruts' => $baseDir . '/src/rosasurfer/MiniStruts.php',
     'rosasurfer\\acl\\ACL' => $baseDir . '/src/rosasurfer/acl/ACL.php',
     'rosasurfer\\acl\\AclManager' => $baseDir . '/src/rosasurfer/acl/AclManager.php',
     'rosasurfer\\acl\\IAccessControlled' => $baseDir . '/src/rosasurfer/acl/IAccessControlled.php',
