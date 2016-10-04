@@ -2,6 +2,7 @@
 namespace rosasurfer\debug;
 
 use rosasurfer\core\StaticClass;
+use rosasurfer\debug\Helper as DebugHelper;
 use rosasurfer\exception\PHPError;
 use rosasurfer\log\Logger;
 
@@ -78,7 +79,7 @@ class ErrorHandler extends StaticClass {
     * @throws PHPErrorException
     */
    public static function handleError($level, $message, $file, $line, array $context) {
-      // echoPre(__METHOD__.'()  '.DebugTools::errorLevelToStr($level).': $message='.$message.', $file='.$file.', $line='.$line);
+      // echoPre(__METHOD__.'()  '.DebugHelper::errorLevelToStr($level).': $message='.$message.', $file='.$file.', $line='.$line);
       // TODO: detect and handle recursive calls
 
       // (1) Ignore suppressed errors and errors not covered by the current reporting level.
@@ -129,7 +130,7 @@ class ErrorHandler extends StaticClass {
        *
        * @see  http://stackoverflow.com/questions/25584494/php-set-exception-handler-not-working-for-error-thrown-in-set-error-handler-cal
        */
-      $function = DebugTools::getFQFunctionName($exception->getBetterTrace()[0]);
+      $function = DebugHelper::getFQFunctionName($exception->getBetterTrace()[0]);
       if ($function=='require' || $function=='require_once') {
          self::$exceptionHandler->__invoke($exception);           // that's Closure::__invoke()
          return true;                                             // PHP will terminate the script anyway
@@ -149,7 +150,7 @@ class ErrorHandler extends StaticClass {
     * @param \Exception $exception - the unhandled exception
     */
    public static function handleException(\Exception $exception) {
-      //echoPre(__METHOD__.'()  '.DebugTools::getBetterMessage($exception));
+      //echoPre(__METHOD__.'()  '.DebugHelper::getBetterMessage($exception));
       // TODO: detect and handle recursive calls
 
       $context['class'] = __CLASS__;                  // atm not required but somewhen somewhere somebody might ask for it

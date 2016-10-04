@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\exception;
 
-use rosasurfer\debug\DebugTools;
+use rosasurfer\debug\Helper as DebugHelper;
 
 
 /**
@@ -38,7 +38,7 @@ class BaseException extends \Exception implements IRosasurferException {
 
       if (!$betterTrace) {
          // transform the original stacktrace into a better trace
-         $betterTrace = DebugTools::fixTrace($this->getTrace(), $this->getFile(), $this->getLine());
+         $betterTrace = DebugHelper::fixTrace($this->getTrace(), $this->getFile(), $this->getLine());
 
          /*
          // if the exception was thrown in a magic "__set()" shift frames until we reach the erroneous assignment

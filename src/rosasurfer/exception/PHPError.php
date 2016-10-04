@@ -1,8 +1,8 @@
 <?php
 namespace rosasurfer\exception;
 
-use rosasurfer\debug\DebugTools;
 use rosasurfer\debug\ErrorHandler;
+use rosasurfer\debug\Helper as DebugHelper;
 
 
 /**
@@ -41,15 +41,15 @@ class PHPError extends \ErrorException implements IRosasurferException {
 
       if (!$trace) {
          // transform the original stacktrace into a better trace
-         $trace = DebugTools::fixTrace($this->getTrace());
+         $trace = DebugHelper::fixTrace($this->getTrace());
 
          // drop the first frame if the exception was created in the registered error handler (it always should)
-         if (DebugTools::getFQFunctionName($trace[0]) == ErrorHandler::class.'::handleError') {
+         if (DebugHelper::getFQFunctionName($trace[0]) == ErrorHandler::class.'::handleError') {
             array_shift($trace);
 
             // if error was triggered by include/require/_once: fix the next frame, it's simply wrong
             if (sizeOf($trace > 1)) {
-               $function = DebugTools::getFQFunctionName($trace[0]);
+               $function = DebugHelper::getFQFunctionName($trace[0]);
                if ($function=='include' || $function=='include_once' || $function=='require' || $function=='require_once') {
                   if (isSet($trace[0]['file']) && isSet($trace[1]['file'])) {
                      if ($trace[0]['file'] == $trace[1]['file']) {

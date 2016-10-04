@@ -5,7 +5,7 @@ use rosasurfer\config\Config;
 
 use rosasurfer\core\StaticClass;
 
-use rosasurfer\debug\DebugTools;
+use rosasurfer\debug\Helper as DebugHelper;
 
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
@@ -552,22 +552,22 @@ class Logger extends StaticClass {
       else {
          // exception
          $type = isSet($context['type']) ? ucFirst($context['type']).' ' : '';
-         $msg  = $type.trim(DebugTools::getBetterMessage($loggable));
+         $msg  = $type.trim(DebugHelper::getBetterMessage($loggable));
          $text = strToUpper(self::$logLevels[$level]).' '.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
 
          // the stack trace will go into "cliExtra"
          $traceStr  = $indent.'Stacktrace:'.NL.' -----------'.NL;
-         $traceStr .= DebugTools::getBetterTraceAsString($loggable, $indent);
+         $traceStr .= DebugHelper::getBetterTraceAsString($loggable, $indent);
          $extra    .= NL.$traceStr;
       }
 
       // append an existing context exception to "cliExtra"
       if (isSet($context['exception'])) {
          $exception = $context['exception'];
-         $msg       = $indent.trim(DebugTools::getBetterMessage($exception));
+         $msg       = $indent.trim(DebugHelper::getBetterMessage($exception));
          $extra    .= NL.$msg.NL;
          $traceStr  = $indent.'Stacktrace:'.NL.' -----------'.NL;
-         $traceStr .= DebugTools::getBetterTraceAsString($exception, $indent);
+         $traceStr .= DebugHelper::getBetterTraceAsString($exception, $indent);
          $extra    .= NL.$traceStr;
       }
 
@@ -651,20 +651,20 @@ class Logger extends StaticClass {
       else {
          // exception
          $type      = isSet($context['type']) ? ucFirst($context['type']).' ' : '';
-         $msg       = $type.DebugTools::getBetterMessage($loggable);
+         $msg       = $type.DebugHelper::getBetterMessage($loggable);
          $html     .= '<b>'.strToUpper(self::$logLevels[$level]).'</b> '.nl2br(htmlSpecialChars($msg, ENT_QUOTES|ENT_SUBSTITUTE))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
          $traceStr  = $indent.'Stacktrace:'.NL.' -----------'.NL;
-         $traceStr .= DebugTools::getBetterTraceAsString($loggable, $indent);
+         $traceStr .= DebugHelper::getBetterTraceAsString($loggable, $indent);
          $html     .= '<br>'.printPretty($traceStr, true).'<br>';
       }
 
       // append an existing context exception
       if (isSet($context['exception'])) {
          $exception = $context['exception'];
-         $msg       = DebugTools::getBetterMessage($exception);
+         $msg       = DebugHelper::getBetterMessage($exception);
          $html     .= '<br>'.nl2br(htmlSpecialChars($msg, ENT_QUOTES|ENT_SUBSTITUTE)).'<br>';
          $traceStr  = $indent.'Stacktrace:'.NL.' -----------'.NL;
-         $traceStr .= DebugTools::getBetterTraceAsString($exception, $indent);
+         $traceStr .= DebugHelper::getBetterTraceAsString($exception, $indent);
          $html     .= '<br>'.printPretty($traceStr, true);
      }
 

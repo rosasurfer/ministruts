@@ -14,9 +14,9 @@ use const rosasurfer\NL;
 
 
 /**
- * Debugging related functionality
+ * Debug helper.
  */
-class DebugTools extends StaticClass {
+class Helper extends StaticClass {
 
 
    /**
