@@ -140,7 +140,7 @@ class CurlHttpClient extends HttpClient {
     * @return CurlHttpClient
     */
    public static function create(array $options=null) {
-      return new self($options);
+      return new static($options);
    }
 
 

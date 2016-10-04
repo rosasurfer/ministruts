@@ -7,7 +7,7 @@ use rosasurfer\core\Object;
 /**
  * HeaderParser
  */
-final class HeaderParser extends Object {
+class HeaderParser extends Object {
 
 
    private $headers = array();
@@ -20,7 +20,7 @@ final class HeaderParser extends Object {
     * @return HeaderParser
     */
    public static function create() {
-      return new self();
+      return new static();
    }
 
 

@@ -12,7 +12,7 @@ use rosasurfer\exception\InvalidArgumentException;
  *
  * Stellt einen HttpRequest dar.
  */
-final class HttpRequest extends Object {
+class HttpRequest extends Object {
 
 
    private /*string*/ $url;
@@ -26,7 +26,7 @@ final class HttpRequest extends Object {
     * @return HttpRequest
     */
    public static function create() {
-      return new self();
+      return new static();
    }
 
 

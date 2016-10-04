@@ -90,8 +90,8 @@ class FileDependency extends Dependency {
       $dependency = null;
 
       foreach ($fileNames as $name) {
-         if (!$dependency) $dependency = new self($name);
-         else              $dependency = $dependency->andDependency(new self($name));
+         if (!$dependency) $dependency = new static($name);
+         else              $dependency = $dependency->andDependency(new static($name));
       }
 
       return $dependency;

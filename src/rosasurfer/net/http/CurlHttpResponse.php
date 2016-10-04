@@ -16,7 +16,7 @@ use const rosasurfer\L_NOTICE;
  *
  * Stellt die Anwort auf einen von Curl gestellten HttpRequest dar.
  */
-final class CurlHttpResponse extends HttpResponse {
+class CurlHttpResponse extends HttpResponse {
 
 
    private static /*bool*/ $logDebug, $logInfo, $logNotice;
@@ -49,7 +49,7 @@ final class CurlHttpResponse extends HttpResponse {
     * @return CurlHttpResponse
     */
    public static function create() {
-      return new self();
+      return new static();
    }
 
 

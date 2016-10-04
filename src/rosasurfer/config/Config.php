@@ -357,7 +357,7 @@ class Config extends Object implements ConfigInterface {
                }
 
                // create the instance
-               $config = new self($files);
+               $config = new static($files);
 
                // create FileDependency and cache the instance
                $dependency = FileDependency::create(array_keys($config->files));

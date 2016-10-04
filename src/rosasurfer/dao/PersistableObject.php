@@ -57,7 +57,7 @@ abstract class PersistableObject extends Object {
     *
     *    public static function create($arg) {
     *       // parameter validation...
-    *       $instance = new self();
+    *       $instance = new static();
     *       $instance->property = $arg;
     *       return $instance;
     *    }
