@@ -12,7 +12,7 @@ use rosasurfer\util\Validator;
 
 
 /**
- * Helper functions and constant definitions.
+ * Helper functions and constants.
  */
 
 
