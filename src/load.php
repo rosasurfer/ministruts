@@ -10,7 +10,7 @@ use rosasurfer\log\Logger;
  * Load the Ministruts framework.
  *
  * Program flow:
- * (1) include required non-class files
+ * (1) include helper functions and constants
  *
  * (2) register class loader
  * (3) setup error handling
@@ -26,7 +26,7 @@ define(__NAMESPACE__.'\MINISTRUTS_ROOT', dirName(__DIR__));
 
 
 /**
- * (1) include required non-class files (helper functions and constants)
+ * (1) include helper functions and constants
  */
 include(MINISTRUTS_ROOT.'/src/rosasurfer/helpers.php');
 include(MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/helpers.php');
@@ -102,9 +102,9 @@ ini_set('zend.detect_unicode'     ,  1                     );     // BOM header 
 
 
 /**
- * (6) execute phpInfo() if URI ends with magic path (on localhost only)
+ * (6) execute phpInfo() if URI ends with magic path (localhost only)
  */
-if (LOCALHOST && strEndsWith(strLeftTo($_SERVER['REQUEST_URI'], '?'), '/__phpinfo__')) {
+if (LOCALHOST && strEndsWithI(strLeftTo($_SERVER['REQUEST_URI'], '?'), '/__phpinfo__')) {
    include(MINISTRUTS_ROOT.'/src/rosasurfer/debug/phpinfo.php');
    exit(0);
 }
