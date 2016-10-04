@@ -28,8 +28,8 @@ define(__NAMESPACE__.'\MINISTRUTS_ROOT', dirName(__DIR__));
 /**
  * (1) include required non-class files (helper functions and constants)
  */
-include(MINISTRUTS_ROOT.'/src/rosasurfer/utils.php');
-include(MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/utils.php');
+include(MINISTRUTS_ROOT.'/src/rosasurfer/helpers.php');
+include(MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/helpers.php');
 
 
 /**

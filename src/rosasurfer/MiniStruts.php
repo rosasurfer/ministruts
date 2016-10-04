@@ -20,10 +20,12 @@ class MiniStruts extends StaticClass {
     * • 'replaceComposer'  - Boolean: If this option is set to TRUE, the framework replaces an existing Composer class
     *                        loader (non-standard compliant) with it's own standard compliant version. Use this option if
     *                        the case-sensitivity of Composer's class loader causes errors.
+    *
     *                        Default: FALSE
     *
     * • 'handleErrors'     - Integer: Flag specifying how to handle regular PHP errors. Possible values:
     *                        ERROR_HANDLER_LOG:   PHP errors are logged by the built-in default logger.
+    *                                             @see rosasurfer\log\Logger
     *
     *                        ERROR_HANDLER_THROW: PHP errors are converted to PHP ErrorExceptions and thrown back. If this
     *                                             option is used it is required to either configure the frameworks exception
@@ -33,17 +35,21 @@ class MiniStruts extends StaticClass {
     *                        Default: NULL (no error handling)
     *
     * • 'handleExceptions' - Boolean: If this option is set to TRUE, the framework will send otherwise unhandled exceptions
-    *                        to the built-in default logger before PHP will terminate the script. Enabling this option is
-    *                        required if the option 'handleErrors' is set to ERROR_HANDLER_THROW and you don't provide your
-    *                        own exception handling mechanism.
+    *                        to the built-in default logger before PHP will terminate the script.
+    *                        @see rosasurfer\log\Logger
+    *
+    *                        Enabling this option is required if the option 'handleErrors' is set to ERROR_HANDLER_THROW
+    *                        and you don't provide your own exception handling mechanism.
+    *
     *                        Default: FALSE (no exception handling)
     *
     * • 'globalHelpers'    - Boolean: If this option is set to TRUE, the helper functions and constants defined in the
     *                        namespace "rosasurfer\" are additionally mapped to the global namespace.
-    *                        (see "src/rosasurfer/helpers.php")
+    *                        @see "rosasurfer/helpers.php"
+    *
     *                        Default: FALSE (no global helpers)
     *
-    * @param  array $options - An options array supporting the following settings:
+    * @param  array $options
     */
    public static function init(array $options = []) {
    }
