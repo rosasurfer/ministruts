@@ -8,7 +8,7 @@ use rosasurfer\debug\Helper as DebugHelper;
 /**
  * Rosasurfer exception for regular PHP errors wrapped in an exception
  */
-class PHPError extends \ErrorException implements IRosasurferException {
+class PHPError extends \ErrorException implements RosasurferExceptionInterface {
 
    use RosasurferExceptionTrait;
 

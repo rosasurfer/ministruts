@@ -4,7 +4,7 @@ namespace rosasurfer\debug;
 use rosasurfer\core\StaticClass;
 
 use rosasurfer\exception\IllegalTypeException;
-use rosasurfer\exception\IRosasurferException;
+use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 
 use function rosasurfer\strLeftTo;
 use function rosasurfer\strRightFrom;

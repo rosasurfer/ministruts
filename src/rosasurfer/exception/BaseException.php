@@ -7,7 +7,7 @@ use rosasurfer\debug\Helper as DebugHelper;
 /**
  * Base exception for all Rosasurfer exceptions
  */
-class BaseException extends \Exception implements IRosasurferException {
+class BaseException extends \Exception implements RosasurferExceptionInterface {
 
    use RosasurferExceptionTrait;
 
