@@ -1,6 +1,5 @@
 <?php
 namespace rosasurfer\ministruts;
-echo __FILE__."<br>\n";
 
 
 /**

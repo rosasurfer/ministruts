@@ -1,6 +1,5 @@
 <?php
 namespace rosasurfer;
-echo __FILE__."<br>\n";
 
 use rosasurfer\exception\ClassNotFoundException;
 use rosasurfer\exception\IllegalTypeException;
