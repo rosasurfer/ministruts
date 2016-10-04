@@ -9,11 +9,11 @@ use rosasurfer\debug\Helper as DebugHelper;
  */
 class BaseException extends \Exception implements IRosasurferException {
 
-   use /*trait*/ TRosasurferException;
+   use RosasurferExceptionTrait;
 
 
-   /** @var array */
-   private $betterTrace;                     // better stacktrace
+   /** @var array - better stacktrace */
+   private $betterTrace;
 
 
    /**

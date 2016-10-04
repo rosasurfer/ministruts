@@ -7,14 +7,14 @@ use rosasurfer\debug\Helper as DebugHelper;
 /**
  * A trait implementing common functionality for all Rosasurfer exceptions.
  */
-trait TRosasurferException {
+trait RosasurferExceptionTrait {
 
 
-   /** @var string */
-   private $betterMessage;                   // better message
+   /** @var string - better message */
+   private $betterMessage;
 
-   /** @var string */
-   private $betterTraceAsString;             // better stacktrace as string
+   /** @var string - better stacktrace as string */
+   private $betterTraceAsString;
 
 
    /**

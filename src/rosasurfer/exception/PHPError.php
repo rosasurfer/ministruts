@@ -10,11 +10,11 @@ use rosasurfer\debug\Helper as DebugHelper;
  */
 class PHPError extends \ErrorException implements IRosasurferException {
 
-   use /*trait*/ TRosasurferException;
+   use RosasurferExceptionTrait;
 
 
-   /** @var array */
-   private $betterTrace;                     // better stacktrace
+   /** @var array - better stacktrace */
+   private $betterTrace;
 
 
    /**
