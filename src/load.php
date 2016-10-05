@@ -22,7 +22,7 @@ include(MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/helpers.php');
  * Register the framework's class loader.
  *
  * If the framework is used in a project not using Composer a class loader for the framework's classes is required.
- * If on the other hand Composer is used this registration has no effect but is done anyway because detecting Composer
+ * On the other hand if Composer is used this registration has no effect but is done anyway because detecting Composer
  * is not reliable and might fail in the future.
  *
  * The loader is registered after any other registered SPL loaders. To provide backward compatibility an existing
