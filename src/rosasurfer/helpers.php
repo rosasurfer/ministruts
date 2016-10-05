@@ -136,10 +136,10 @@ function printPretty($var, $return=false) {
    elseif (is_object($var) || is_array($var)) {
       $str = print_r($var, true);
    }
-   else if ($var === null) {
+   elseif ($var === null) {
       $str = '(NULL)';                    // analogous to typeof(null) = 'NULL';
    }
-   else if (is_bool($var)) {
+   elseif (is_bool($var)) {
       $str = $var ? 'true':'false';
    }
    else {
@@ -383,7 +383,7 @@ function strLeft($string, $length) {
       return '';
    if (is_int($string))
       $string = (string)$string;
-   else if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+   elseif (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
 
    return subStr($string, 0, $length);
 }
@@ -477,12 +477,12 @@ function strLeftTo($string, $limiter, $count=1, $includeLimiter=false, $onNotFou
  * </pre>
  */
 function strRight($string, $length) {
-   if (!is_int($length))         throw new IllegalTypeException('Illegal type of parameter $length: '.getType($length));
+   if (!is_int($length))        throw new IllegalTypeException('Illegal type of parameter $length: '.getType($length));
    if ($string === null)
       return '';
    if (is_int($string))
       $string = (string)$string;
-   else if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+   elseif (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
 
    if ($length == 0)
       return '';
@@ -679,7 +679,7 @@ function is_class($name) {
       if (!$functions) {               // no loader nor __autoload() exist: spl_autoload_call() will call spl_autoload()
          spl_autoload_call($name);     // onError: Uncaught LogicException: Class $name could not be loaded
       }
-      else if (sizeOf($functions)==1 && $functions[0]==='__autoload') {
+      elseif (sizeOf($functions)==1 && $functions[0]==='__autoload') {
          __autoload($name);            // __autoload() exists and is explicitly or implicitly registered
       }
       else {
@@ -713,7 +713,7 @@ function is_interface($name) {
       if (!$functions) {               // no loader nor __autoload() exist: spl_autoload_call() will call spl_autoload()
          spl_autoload_call($name);     // onError: Uncaught LogicException: Class $name could not be loaded
       }
-      else if (sizeOf($functions)==1 && $functions[0]==='__autoload') {
+      elseif (sizeOf($functions)==1 && $functions[0]==='__autoload') {
          __autoload($name);            // __autoload() exists and is explicitly or implicitly registered
       }
       else {
@@ -747,7 +747,7 @@ function is_trait($name) {
       if (!$functions) {               // no loader nor __autoload() exist: spl_autoload_call() will call spl_autoload()
          spl_autoload_call($name);     // onError: Uncaught LogicException: Class $name could not be loaded
       }
-      else if (sizeOf($functions)==1 && $functions[0]==='__autoload') {
+      elseif (sizeOf($functions)==1 && $functions[0]==='__autoload') {
          __autoload($name);            // __autoload() exists and is explicitly or implicitly registered
       }
       else {

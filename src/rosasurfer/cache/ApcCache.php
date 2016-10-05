@@ -180,7 +180,7 @@ final class ApcCache extends CachePeer {
             return false;
          }
       }
-      else if (!apc_store($fullKey, array($created, $expires, serialize($data)))) {
+      elseif (!apc_store($fullKey, array($created, $expires, serialize($data)))) {
          //Logger::log('apc_store() unexpectedly returned FALSE for $key "'.$fullKey.'" '.($isKey ? '(did exist and was deleted)':'(did not exist)'), L_WARN);
          return false;
       }

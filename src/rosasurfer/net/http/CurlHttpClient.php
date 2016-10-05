@@ -180,7 +180,7 @@ class CurlHttpClient extends HttpClient {
          if ($this->isFollowRedirects()) {
             $options[CURLOPT_FOLLOWLOCATION] = true;
          }
-         else if (isSet($options[CURLOPT_FOLLOWLOCATION]) && $options[CURLOPT_FOLLOWLOCATION]) {
+         elseif (isSet($options[CURLOPT_FOLLOWLOCATION]) && $options[CURLOPT_FOLLOWLOCATION]) {
             $this->setFollowRedirects(true);
          }
          if ($this->isFollowRedirects()) {

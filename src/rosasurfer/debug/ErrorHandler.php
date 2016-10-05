@@ -20,8 +20,18 @@ use const rosasurfer\L_WARN;
 class ErrorHandler extends StaticClass {
 
 
+   /** @var int - error handling mode in which regular PHP errors are logged */
+   const LOG_ERRORS = 1;
+
+   /** @var int - error handling mode in which regular PHP errors are converted to exceptions and thrown back */
+   const THROW_ERRORS = 2;
+
+
    /** @var callable - the registered error handler */
    private static $errorHandler;
+
+   /** @var int - the mode the error handler is configured for, can be either self::LOG_ERRORS or self::THROW_ERRORS */
+   private static $errorMode;
 
    /** @var callable - the registered exception handler */
    private static $exceptionHandler;
@@ -41,11 +51,24 @@ class ErrorHandler extends StaticClass {
 
 
    /**
-    * Setup global error and exception handling.
+    * Setup global error handling.
+    *
+    * @param  int $mode - mode the error handler to setup for
+    *                     can be either self::LOG_ERRORS or self::THROW_ERRORS
     */
-   public static function setupErrorHandling() {
+   public static function setupErrorHandling($mode) {
+      if     ($mode === self::LOG_ERRORS  ) self::$errorMode = self::LOG_ERRORS;
+      elseif ($mode === self::THROW_ERRORS) self::$errorMode = self::THROW_ERRORS;
+      else                                  return;
+
       set_error_handler(self::$errorHandler=__CLASS__.'::handleError', E_ALL);   // E_ALL because error_reporting()
-                                                                                 // may change at runtime
+   }                                                                             // may change at runtime
+
+
+   /**
+    * Setup global exception handling.
+    */
+   public static function setupExceptionHandling() {
       set_exception_handler(self::$exceptionHandler=function(\Exception $ex) {
          self::handleException($ex);
       });

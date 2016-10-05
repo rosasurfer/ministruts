@@ -531,10 +531,10 @@ class Module extends Object {
             if ($tag['type']) {
                $type = (string) $tag['type'];
             }
-            else if ($this->isIncludable($value, $xml)) {
+            elseif ($this->isIncludable($value, $xml)) {
                $type = Tile::PROPERTY_TYPE_RESOURCE;
             }
-            else if (strEndsWithI($value, '.htm') || strEndsWithI($value, '.html')) {
+            elseif (strEndsWithI($value, '.htm') || strEndsWithI($value, '.html')) {
                throw new RuntimeException('Tile "'.$tile->getName().'", set "'.$name.'": specify a type="string|resource" for ambiguous attribute value="'.$value.'" (looks like a filename but file not found)');
             }
             else {

@@ -249,7 +249,7 @@ class Config extends Object implements ConfigInterface {
             if (!isSet($properties[$subkey])) {
                $properties[$subkey] = $value;                        // store the value
             }
-            else if (!is_array($properties[$subkey])) {
+            elseif (!is_array($properties[$subkey])) {
                $properties[$subkey] = $value;                        // overwrite the existing non-array value
             }
             else {
