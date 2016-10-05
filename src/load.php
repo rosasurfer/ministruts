@@ -29,7 +29,7 @@ include(MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/helpers.php');
  * __autoload() function is registered first if no other SPL loader is yet registered.
  */
 \Closure::bind(function() {                                             // prevent modifications of global scope
-   // check the existing legacy auto-loader configuration
+   // check an existing legacy auto-loader
    $legacyAutoLoad = function_exists('__autoload');
    if ($legacyAutoLoad) {
       $splLoaders = spl_autoload_functions();
@@ -51,7 +51,7 @@ include(MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/helpers.php');
    (new ClassLoader())->register();
    spl_autoload_unregister($callable);
 
-   // register an otherwise lost legay auto-loader
+   // register an otherwise lost legacy auto-loader
    if ($legacyAutoLoad && spl_autoload_functions()[0]!='__autoload') {
       spl_autoload_register('__autoload', $throw=true, $prepend=true);
    }
