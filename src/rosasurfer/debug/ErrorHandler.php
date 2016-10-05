@@ -41,6 +41,26 @@ class ErrorHandler extends StaticClass {
 
 
    /**
+    * Get the registered error handler (if any).
+    *
+    * @return callable
+    */
+   public static function getErrorHandler() {
+      return self::$errorHandler;
+   }
+
+
+   /**
+    * Get the registered exception handler (if any).
+    *
+    * @return callable
+    */
+   public static function getExceptionHandler() {
+      return self::$exceptionHandler;
+   }
+
+
+   /**
     * Whether or not the script is in the shutdown phase.
     *
     * @return bool
@@ -90,8 +110,9 @@ class ErrorHandler extends StaticClass {
     * Global handler for traditional PHP errors.
     *
     * Errors are handled only if covered by the currently configured error reporting level. Errors of the levels
-    * E_DEPRECATED, E_USER_DEPRECATED, E_USER_NOTICE and E_USER_WARNING are logged and script execution continuous
-    * normally. All other errors are wrapped in a PHPErrorException and thrown back.
+    * E_DEPRECATED, E_USER_DEPRECATED, E_USER_NOTICE and E_USER_WARNING are always logged and script execution
+    * continues normally. All other errors are logged according to the configured error handling mode. Either they
+    * are logged and script exceution continues normally, or they are wrapped in a PHPErrorException and thrown back.
     *
     * @param  int     $level   - PHP error severity level
     * @param  string  $message - error message
@@ -119,32 +140,40 @@ class ErrorHandler extends StaticClass {
 
       // (2) Process errors according to their severity level.
       switch ($level) {
-         // log non-critical errors and continue normally
+         // always log non-critical and user errors and continue normally (without a stacktrace)
          case E_DEPRECATED:      return _true(Logger::log('E_DEPRECATED: '     .$message, L_NOTICE, $logContext));
          case E_USER_DEPRECATED: return _true(Logger::log('E_USER_DEPRECATED: '.$message, L_NOTICE, $logContext));
          case E_USER_NOTICE:     return _true(Logger::log('E_USER_NOTICE: '    .$message, L_NOTICE, $logContext));
          case E_USER_WARNING:    return _true(Logger::log('E_USER_WARNING: '   .$message, L_WARN  , $logContext));
+      }
 
-         // wrap everything else in the matching PHPErrorException
+      // (3) Wrap everything else in the matching PHPErrorException.
+      switch ($level) {
          /*
-         case E_PARSE:            break;
-         case E_COMPILE_WARNING:  break;
-         case E_COMPILE_ERROR:    break;
-         case E_CORE_WARNING:     break;
-         case E_CORE_ERROR:       break;
-         case E_STRICT:           break;
-         case E_NOTICE:           break;
-         case E_WARNING:          break;
-         case E_ERROR:            break;
-         case E_RECOVERABLE_ERROR break;
-         case E_USER_ERROR:       break;
-         default:                 $errno_str = 'UNKNOWN';
+         case E_PARSE:             break;
+         case E_COMPILE_WARNING:   break;
+         case E_COMPILE_ERROR:     break;
+         case E_CORE_WARNING:      break;
+         case E_CORE_ERROR:        break;
+         case E_STRICT:            break;
+         case E_NOTICE:            break;
+         case E_WARNING:           break;
+         case E_ERROR:             break;
+         case E_RECOVERABLE_ERROR: break;
+         case E_USER_ERROR:        break;
          */
          default:
+            $errno_str = 'UNKNOWN';
             $exception = new PHPError($message, $code=null, $severity=$level, $file, $line);
       }
 
-      // (3) Handle cases where throwing an exception is not possible or not allowed.
+      // (4) Handle the exception according to the configuration.
+      if (self::$errorMode == self::LOG_ERRORS) {
+         Logger::log($exception, L_ERROR, $logContext);
+         return true;
+      }
+
+      // (5) Handle cases where throwing an exception is not possible or not allowed.
 
       /**
        * Errors triggered by require() or require_once()
@@ -163,7 +192,7 @@ class ErrorHandler extends StaticClass {
          return true;                                             // PHP will terminate the script anyway
       }
 
-      // (4) Throw back everything else.
+      // (6) Throw back everything else.
       throw $exception;
    }
 

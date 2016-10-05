@@ -5,6 +5,7 @@ use rosasurfer\config\Config;
 
 use rosasurfer\core\StaticClass;
 
+use rosasurfer\debug\ErrorHandler;
 use rosasurfer\debug\Helper as DebugHelper;
 
 use rosasurfer\exception\IllegalTypeException;
@@ -42,7 +43,7 @@ use const rosasurfer\WINDOWS;
 /**
  * Log a message through a chain of standard log handlers.
  *
- * This is the frameworks default logger implementation which is used if no other logger is registered. The logger
+ * This is the framework's default logger implementation which is used if no other logger is registered. The logger
  * passes the message to a chain of handlers. Each handler is invoked depending on the application's runtime environment
  * (CLI vs. web server, local vs. remote access) and the application configuration.
  *
@@ -726,19 +727,16 @@ class Logger extends StaticClass {
          if (!isSet($frame['class']))              // logger was called from a non-class context
             break;
          if ($frame['class'] != __CLASS__) {       // logger was called from another class
+            $function     = DebugHelper::getFQFunctionName($frame);
+            $errorHandler = ErrorHandler::getErrorHandler();
+            if ($function == $errorHandler)        // continue if the caller is the registered error handler
+               continue;
             $class = $frame['class'];
             break;
          }
       }
       $context['class'] = $class;
    }
-
-
-
-
-
-
-
 
 
    /**

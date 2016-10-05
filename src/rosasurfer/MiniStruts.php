@@ -35,7 +35,7 @@ class MiniStruts extends StaticClass {
     *                                     see {@link \rosasurfer\log\Logger}
     *
     *                       THROW_ERRORS: PHP errors are converted to PHP ErrorExceptions and thrown back. If this
-    *                                     option is used it is required to either configure the frameworks exception
+    *                                     option is used it is required to either configure the framework's exception
     *                                     handler or to register your own exception handling mechanism. Without an
     *                                     exception handler PHP will terminate a script with a FATAL error after
     *                                     such an exception.
@@ -59,11 +59,11 @@ class MiniStruts extends StaticClass {
    public static function init(array $options = []) {
       foreach ($options as $key => $value) {
          switch ($key) {
-            case 'config'           : self::useConfiguration ($value); continue;
-            case 'global-helpers'   : self::loadGlobalHelpers($value); continue; // ok
-            case 'handle-errors'    : self::handleErrors     ($value); continue; // ok except in ErrorHandler
-            case 'handle-exceptions': self::handleExceptions ($value); continue; // ok
-            case 'replace-composer' : self::replaceComposer  ($value); continue;
+            case 'config'           : self::useConfiguration ($value); continue;    // todo
+            case 'global-helpers'   : self::loadGlobalHelpers($value); continue;
+            case 'handle-errors'    : self::handleErrors     ($value); continue;
+            case 'handle-exceptions': self::handleExceptions ($value); continue;
+            case 'replace-composer' : self::replaceComposer  ($value); continue;    // todo
          }
       }
 
