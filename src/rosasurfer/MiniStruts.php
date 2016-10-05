@@ -95,5 +95,5 @@ class MiniStruts extends StaticClass {
 }
 
 
-// ensure the framework is loaded (i.e. if loaded by Composer)
+// ensure the full framework is loaded (e.g. if only this class is loaded by Composer)
 include(__DIR__.'/../load.php');
