@@ -2,6 +2,7 @@
 namespace rosasurfer;
 
 use rosasurfer\core\StaticClass;
+use rosasurfer\debug\ErrorHandler;
 
 
 /**
@@ -11,47 +12,88 @@ class MiniStruts extends StaticClass {
 
 
    /**
-    * Initialize the framework. This method expects an array with the following case-insensitive options:
+    * Initialize the framework. This method expects an array with the following options:
     *
-    * • 'config'           - String: Full path to a custom application configuration file to use. The default is to use
-    *                        the configuration found in "APPLICATION_ROOT/app/config/config.properties". If the application
-    *                        structure follows its own standards use this setting to provide a custom configuration file.
+    * "config"            - String: Full path to a custom application configuration file to use. The default is to use
+    *                       the configuration found in "APPLICATION_ROOT/app/config/config.properties". If the application
+    *                       structure follows its own standards use this setting to provide a custom configuration file.
     *
-    * • 'replaceComposer'  - Boolean: If this option is set to TRUE, the framework replaces an existing Composer class
-    *                        loader (non-standard compliant) with it's own standard compliant version. Use this option if
-    *                        the case-sensitivity of Composer's class loader causes errors.
+    * "replace-composer"  - Boolean: If this option is set to TRUE, the framework replaces an existing Composer class
+    *                       loader (non-standard compliant) with it's own standard compliant version. Use this option if
+    *                       the case-sensitivity of Composer's class loader causes errors.
+    *                       Default: FALSE
     *
-    *                        Default: FALSE
+    * "handle-errors"     - Integer: Flag specifying how to handle regular PHP errors. Possible values:
+    *                       ERROR_HANDLER_LOG:   PHP errors are logged by the built-in default logger.<br>
+    *                                            see {@link \rosasurfer\log\Logger}
     *
-    * • 'handleErrors'     - Integer: Flag specifying how to handle regular PHP errors. Possible values:
-    *                        ERROR_HANDLER_LOG:   PHP errors are logged by the built-in default logger.
-    *                                             @see rosasurfer\log\Logger
+    *                       ERROR_HANDLER_THROW: PHP errors are converted to PHP ErrorExceptions and thrown back. If this
+    *                                            option is used it is required to either configure the frameworks exception
+    *                                            handler or to register your own exception handling mechanism. Without an
+    *                                            exception handler PHP will terminate a script with a FATAL error after
+    *                                            such an exception.
+    *                       Default: NULL (no error handling)
     *
-    *                        ERROR_HANDLER_THROW: PHP errors are converted to PHP ErrorExceptions and thrown back. If this
-    *                                             option is used it is required to either configure the frameworks exception
-    *                                             handler or to register your own exception handling mechanism. Without an
-    *                                             exception handler PHP will terminate a script with a FATAL error after
-    *                                             such an exception.
-    *                        Default: NULL (no error handling)
+    * "handle-exceptions" - Boolean: If this option is set to TRUE, the framework will send otherwise unhandled exceptions
+    *                       to the built-in default logger before PHP will terminate the script.<br>
+    *                       see {@link \rosasurfer\log\Logger}
     *
-    * • 'handleExceptions' - Boolean: If this option is set to TRUE, the framework will send otherwise unhandled exceptions
-    *                        to the built-in default logger before PHP will terminate the script.
-    *                        @see rosasurfer\log\Logger
+    *                       Enabling this option is required if the option "handle-errors" is set to ERROR_HANDLER_THROW
+    *                       and you don't provide your own exception handling mechanism.
+    *                       Default: FALSE (no exception handling)
     *
-    *                        Enabling this option is required if the option 'handleErrors' is set to ERROR_HANDLER_THROW
-    *                        and you don't provide your own exception handling mechanism.
-    *
-    *                        Default: FALSE (no exception handling)
-    *
-    * • 'globalHelpers'    - Boolean: If this option is set to TRUE, the helper functions and constants defined in the
-    *                        namespace "rosasurfer\" are additionally mapped to the global namespace.
-    *                        @see "rosasurfer/helpers.php"
-    *
-    *                        Default: FALSE (no global helpers)
+    * "global-helpers"    - Boolean: If this option is set to TRUE, the helper functions and constants defined in the
+    *                       namespace "rosasurfer\" are additionally mapped to the global namespace.
+    *                       see {@link ./helpers.php}
+    *                       Default: FALSE (no global helpers)
     *
     * @param  array $options
     */
    public static function init(array $options = []) {
+      // (1) replace Composer's class loader
+
+
+      // (2) setup error handling
+      ErrorHandler::setupErrorHandling();
+
+
+      // (3) check/adjust application requirements
+      !defined('\APPLICATION_ROOT') && exit(1|echoPre('application error')|error_log('Error: The global constant APPLICATION_ROOT must be defined.'));
+      !defined('\APPLICATION_ID'  ) && define('APPLICATION_ID', md5(\APPLICATION_ROOT));
+
+
+      // (4) check/adjust PHP requirements
+      !ini_get('short_open_tag')       && exit(1|echoPre('application error')|error_log('Error: The PHP configuration value "short_open_tag" must be enabled.'));
+      ini_get('request_order') != 'GP' && exit(1|echoPre('application error')|error_log('Error: The PHP configuration value "request_order" must be "GP".'));
+
+      ini_set('arg_separator.output'    , '&amp;'                );
+      ini_set('auto_detect_line_endings',  1                     );
+      ini_set('default_mimetype'        , 'text/html'            );
+      ini_set('default_charset'         , 'UTF-8'                );
+      ini_set('ignore_repeated_errors'  ,  0                     );
+      ini_set('ignore_repeated_source'  ,  0                     );
+      ini_set('ignore_user_abort'       ,  1                     );
+      ini_set('display_errors'          , (int)(CLI || LOCALHOST));
+      ini_set('display_startup_errors'  , (int)(CLI || LOCALHOST));
+      ini_set('log_errors'              ,  1                     );
+      ini_set('log_errors_max_len'      ,  0                     );
+      ini_set('track_errors'            ,  1                     );
+      ini_set('html_errors'             ,  0                     );
+      ini_set('session.use_cookies'     ,  1                     );
+      ini_set('session.use_trans_sid'   ,  0                     );
+      ini_set('session.cookie_httponly' ,  1                     );
+      ini_set('session.referer_check'   , ''                     );
+      ini_set('zend.detect_unicode'     ,  1                     );     // BOM header recognition
+
+
+      // (5) execute phpinfo() if magic parameter "__phpinfo__" is set (localhost only)
+      if (LOCALHOST && isSet($_REQUEST['__phpinfo__'])) {
+         include(MINISTRUTS_ROOT.'/src/rosasurfer/debug/phpinfo.php');
+         exit(0);
+      }
    }
 }
 
+
+// ensure the framework is loaded (i.e. if loaded by Composer)
+include(__DIR__.'/../load.php');
