@@ -62,6 +62,7 @@ return array(
     'rosasurfer\\exception\\RuntimeException' => $baseDir . '/src/rosasurfer/exception/RuntimeException.php',
     'rosasurfer\\exception\\UnimplementedFeatureException' => $baseDir . '/src/rosasurfer/exception/UnimplementedFeatureException.php',
     'rosasurfer\\exception\\UnsupportedMethodException' => $baseDir . '/src/rosasurfer/exception/UnsupportedMethodException.php',
+    'rosasurfer\\loader\\ClassLoader' => $baseDir . '/src/rosasurfer/loader/ClassLoader.php',
     'rosasurfer\\lock\\BaseLock' => $baseDir . '/src/rosasurfer/lock/BaseLock.php',
     'rosasurfer\\lock\\FileLock' => $baseDir . '/src/rosasurfer/lock/FileLock.php',
     'rosasurfer\\lock\\Lock' => $baseDir . '/src/rosasurfer/lock/Lock.php',
