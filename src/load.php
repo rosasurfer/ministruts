@@ -51,7 +51,7 @@ call_user_func(function() {                           // encapsulated to protect
    (new ClassLoader())->register();
    spl_autoload_unregister($callable);
 
-   // save an otherwise lost legay auto-loader
+   // register an otherwise lost legay auto-loader
    if ($legacyAutoLoad && spl_autoload_functions()[0]!='__autoload') {
       spl_autoload_register('__autoload', $throw=true, $prepend=true);
    }
