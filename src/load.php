@@ -28,7 +28,7 @@ include(MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/helpers.php');
  * The loader is registered after any other registered SPL loaders. To provide backward compatibility an existing
  * __autoload() function is registered first if no other SPL loader is yet registered.
  */
-call_user_func(function() {                           // encapsulated to protect the global scope
+call_user_func(function() {                                                   // encapsulated to protect global scope
    // check for an existing legacy auto-loader configuration
    $legacyAutoLoad = function_exists('__autoload');
    if ($legacyAutoLoad) {
