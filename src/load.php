@@ -46,13 +46,10 @@ call_user_func(function() {                           // encapsulated to protect
       }
    };
 
-   // load and instantiate the class ClassLoader
+   // register the framwork's class loader
    spl_autoload_register($callable, $throw=true, $prepend=true);
-   $loader = new ClassLoader();
+   (new ClassLoader())->register();
    spl_autoload_unregister($callable);
-
-   // register the class loader
-   $loader->register();
 
    // save an otherwise lost legay auto-loader
    if ($legacyAutoLoad && spl_autoload_functions()[0]!='__autoload') {
