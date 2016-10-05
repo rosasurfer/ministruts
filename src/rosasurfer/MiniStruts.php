@@ -12,10 +12,10 @@ class MiniStruts extends StaticClass {
 
 
    /** @var int - error handling mode in which regular PHP errors are logged */
-   const LOG_ERRORS = ErrorHandler::LOG_ERRORS;
+   const LOG_ERRORS       = ErrorHandler::LOG_ERRORS;
 
    /** @var int - error handling mode in which regular PHP errors are converted to exceptions and thrown back */
-   const THROW_ERRORS = ErrorHandler::THROW_ERRORS;
+   const THROW_EXCEPTIONS = ErrorHandler::THROW_EXCEPTIONS;
 
 
    /**
@@ -31,14 +31,15 @@ class MiniStruts extends StaticClass {
     *                       Default: FALSE (no global helpers)
     *
     * "handle-errors"     - Integer: Flag specifying how to handle regular PHP errors. Possible values:
-    *                       LOG_ERRORS:   PHP errors are logged by the built-in default logger.<br>
-    *                                     see {@link \rosasurfer\log\Logger}
     *
-    *                       THROW_ERRORS: PHP errors are converted to PHP ErrorExceptions and thrown back. If this
-    *                                     option is used it is required to either configure the framework's exception
-    *                                     handler or to register your own exception handling mechanism. Without an
-    *                                     exception handler PHP will terminate a script with a FATAL error after
-    *                                     such an exception.
+    *                       LOG_ERRORS: PHP errors are logged by the built-in default logger.<br>
+    *                                   see {@link \rosasurfer\log\Logger}
+    *
+    *                       THROW_EXCEPTIONS: PHP errors are converted to PHP ErrorExceptions and thrown back. If this
+    *                                   option is used it is required to either configure the framework's exception
+    *                                   handler or to register your own exception handling mechanism. Without an
+    *                                   exception handler PHP will terminate a script with a FATAL error after such an
+    *                                   exception.
     *                       Default: NULL (no error handling)
     *
     * "handle-exceptions" - Boolean: If this option is set to TRUE, the framework will send otherwise unhandled exceptions
@@ -143,13 +144,13 @@ class MiniStruts extends StaticClass {
    private static function handleErrors($value) {
       $flag = null;
       if (is_int($value)) {
-         if     ($value == self::LOG_ERRORS  ) $flag = self::LOG_ERRORS;
-         elseif ($value == self::THROW_ERRORS) $flag = self::THROW_ERRORS;
+         if     ($value == self::LOG_ERRORS      ) $flag = self::LOG_ERRORS;
+         elseif ($value == self::THROW_EXCEPTIONS) $flag = self::THROW_EXCEPTIONS;
       }
       elseif (is_string($value)) {
          $value = trim(strToUpper($value));
-         if     ($value=='LOG_ERRORS'   || $value=='LOG'  ) $flag = self::LOG_ERRORS;
-         elseif ($value=='THROW_ERRORS' || $value=='THROW') $flag = self::THROW_ERRORS;
+         if     ($value=='LOG_ERRORS'       || $value=='LOG'  ) $flag = self::LOG_ERRORS;
+         elseif ($value=='THROW_EXCEPTIONS' || $value=='THROW') $flag = self::THROW_EXCEPTIONS;
       }
 
       if ($flag) {
