@@ -18,7 +18,7 @@ class MiniStruts extends StaticClass {
    const THROW_EXCEPTIONS = ErrorHandler::THROW_EXCEPTIONS;
 
    /** @var string - the applications main config directory */
-   private $configDir;
+   private static $configDir;
 
 
    /**
