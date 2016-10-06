@@ -1,6 +1,8 @@
 <?php
 namespace rosasurfer\ministruts;
 
+use rosasurfer\MiniStruts;
+
 use rosasurfer\cache\Cache;
 
 use rosasurfer\core\Singleton;
@@ -67,7 +69,7 @@ class StrutsController extends Singleton {
                // create new controller instance...
                $controller = Singleton::getInstance(__CLASS__);
 
-               $configFile = str_replace('\\', '/', APPLICATION_ROOT.'/app/config/struts-config.xml');
+               $configFile = str_replace('\\', '/', MiniStruts::getConfigDir().'/struts-config.xml');
                $dependency = FileDependency::create($configFile);
                if (!WINDOWS && !LOCALHOST)                           // distinction dev/production
                   $dependency->setMinValidity(1 * MINUTE);
@@ -94,12 +96,12 @@ class StrutsController extends Singleton {
       self::$logNotice = ($loglevel <= L_NOTICE);
 
       // lookup configuration files
-      $appDirectory = str_replace('\\', '/', APPLICATION_ROOT);
-      if (!is_file($appDirectory.'/app/config/struts-config.xml'))
-         throw new FileNotFoundException('Configuration file not found: "struts-config.xml"');
+      $configDir = str_replace('\\', '/', MiniStruts::getConfigDir());
+      if (!is_file($configDir.'/struts-config.xml'))
+         throw new FileNotFoundException('Configuration file not found: "'.$configDir.'/struts-config.xml"');
 
-      $files   = glob($appDirectory.'/app/config/struts-config-*.xml', GLOB_ERR);
-      $files[] = $appDirectory.'/app/config/struts-config.xml';
+      $files   = glob($configDir.'/struts-config-*.xml', GLOB_ERR);
+      $files[] = $configDir.'/struts-config.xml';
 
 
       // create and register a Module for each found file

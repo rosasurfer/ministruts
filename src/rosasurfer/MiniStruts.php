@@ -17,13 +17,16 @@ class MiniStruts extends StaticClass {
    /** @var int - error handling mode in which regular PHP errors are converted to exceptions and thrown back */
    const THROW_EXCEPTIONS = ErrorHandler::THROW_EXCEPTIONS;
 
+   /** @var string - the applications main config directory */
+   private $configDir;
+
 
    /**
     * Initialize the framework. This method expects an array with any of the following options:
     *
-    * "config"            - String: Full path to a custom application configuration file to use. The default is to use
-    *                       the configuration found in "APPLICATION_ROOT/app/config/config.properties". If the application
-    *                       structure follows its own standards use this setting to provide a custom configuration file.
+    * "config-dir"        - String: Path of a custom application config directory. If the application structure follows
+    *                       its own standards this setting can be used to read config files from a non-standard directory.
+    *                       Default: Read config files from the directory "APPLICATION_ROOT/app/config/".
     *
     * "global-helpers"    - Boolean: If this option is set to TRUE, the helper functions and constants defined in
     *                       namespace "rosasurfer\" are additionally mapped to the global namespace.
@@ -60,7 +63,7 @@ class MiniStruts extends StaticClass {
    public static function init(array $options = []) {
       foreach ($options as $key => $value) {
          switch ($key) {
-            case 'config'           : self::useConfiguration ($value); continue;    // todo
+            case 'config-dir'       : self::setConfigDir     ($value); continue;
             case 'global-helpers'   : self::loadGlobalHelpers($value); continue;
             case 'handle-errors'    : self::handleErrors     ($value); continue;
             case 'handle-exceptions': self::handleExceptions ($value); continue;
@@ -107,11 +110,29 @@ class MiniStruts extends StaticClass {
 
 
    /**
-    * Use the specified file as the application's main configuration file.
+    * Get the application's main config directory.
+    *
+    * @return string
+    */
+   public static function getConfigDir() {
+      if (self::$configDir === null) {
+         self::$configDir = APPLICATION_ROOT.'/etc/config';
+      }
+      return self::$configDir;
+   }
+
+
+   /**
+    * Set the specified directory as the application's main config directory.
     *
     * @param  mixed $value - configuration value as passed to the framework loader
     */
-   private static function useConfiguration($value) {
+   private static function setConfigDir($value) {
+      if (is_string($value)) {
+         if (is_dir($value)) {
+            self::$configDir = $value;
+         }
+      }
    }
 
 

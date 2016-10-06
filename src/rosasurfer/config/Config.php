@@ -1,6 +1,8 @@
 <?php
 namespace rosasurfer\config;
 
+use rosasurfer\MiniStruts;
+
 use rosasurfer\cache\Cache;
 
 use rosasurfer\core\Object;
@@ -308,8 +310,8 @@ class Config extends Object implements ConfigInterface {
 
 
    /**
-    * Get the default configuration. This is the configuration set by Config::setDefault(). If none was yet set, one is
-    * created. The default configuration is cached.
+    * Get the application's default configuration. This is the configuration set by Config::setDefault(). If none was
+    * yet set, one is created. The configuration is cached.
     *
     * @return ConfigInterface
     */
@@ -335,9 +337,9 @@ class Config extends Object implements ConfigInterface {
                // default config does not yet exist, create a new instance
                // define config paths according to runtime context
                $paths = [];
-               $paths[]        = MINISTRUTS_ROOT.'/src';                // all:   framework config directory
-               $paths[]        = APPLICATION_ROOT.'/app/config';        // all: + app config directory
-               CLI && $paths[] = dirName($_SERVER['SCRIPT_FILENAME']);  // cli: + script directory
+               $paths[]          = MINISTRUTS_ROOT.'/src';              // all:   framework config directory
+               $paths[]          = MiniStruts::getConfigDir();          // all: + app config directory
+               if (CLI) $paths[] = dirName($_SERVER['SCRIPT_FILENAME']);// cli: + script directory
 
                // normalize paths and remove duplicates
                foreach ($paths as $i => $path) {
@@ -366,6 +368,8 @@ class Config extends Object implements ConfigInterface {
                $cache->set(__CLASS__, $config, Cache::EXPIRES_NEVER, $dependency);
             }
          }
+
+         // set it as default
          self::setDefault($config);
       }
 
