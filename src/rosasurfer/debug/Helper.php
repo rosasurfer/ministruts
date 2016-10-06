@@ -11,6 +11,7 @@ use function rosasurfer\strRightFrom;
 use function rosasurfer\strStartsWith;
 
 use const rosasurfer\NL;
+use rosasurfer\exception\php\PHPError;
 
 
 /**
@@ -222,8 +223,11 @@ class Helper extends StaticClass {
       $baseName  = strRightFrom($class, '\\', -1, false, $class);
       $result    = $namespace.$baseName;
 
-      if ($exception instanceof \ErrorException)
-         $result .= '('.self::errorLevelToStr($exception->getSeverity()).')';
+      if ($exception instanceof \ErrorException) {
+         if (!$exception instanceof PHPError) {
+            $result .= '('.self::errorLevelToStr($exception->getSeverity()).')';
+         }
+      }
       $result .= (strLen($message=$exception->getMessage()) ? ': ':'').$message;
 
       return $result;
