@@ -255,8 +255,8 @@ class Config extends Object implements ConfigInterface {
                $properties[$subkey] = $value;                        // overwrite the existing non-array value
             }
             else {
-               $where = $file ? ' in "'.$file.'", line '.$line : '';
-               Logger::log(__METHOD__.'()  Overwriting existing properties array "'.$key.'" with simple value'.$where, L_NOTICE);
+               $where = $file ? ' from "'.$file.'", line '.$line : '';
+               Logger::log(__METHOD__.'()  Overwriting existing properties array "'.$key.'" with plain value'.$where, L_NOTICE);
                $properties[$subkey] = $value;                        // overwrite the existing array value
             }
          }
@@ -319,61 +319,61 @@ class Config extends Object implements ConfigInterface {
       $config = self::$defaultInstance;
 
       if (!$config) {
+         // detect and handle recursive calls
+         static $isActive = 0;
+         if ($isActive++) {                                             // lock the method
+            $msg = 'Blocking recursive method call';
+            if     ($isActive == 1) Logger::log($msg, L_ERROR);         // be as defensive as possible
+            elseif ($isActive == 2) error_log('PHP [ERROR] '.__METHOD__.'()  '.$msg.' in '.__FILE__.' on line '.__LINE__, ERROR_LOG_DEFAULT);
+            return null;
+         }
+
          $cache  = Cache::me();
          $config = $cache->get(__CLASS__);                              // is there a cached instance?
 
          if (!$config) {
-            $lock = null;
+            // default config does not yet exist, create a new instance
+            // define config paths according to runtime context
+            $paths = [];
+            $paths[]          = MINISTRUTS_ROOT.'/src';                 // all:   framework config directory
+            $paths[]          = MiniStruts::getConfigDir();             // all: + app config directory
+            if (CLI) $paths[] = dirName($_SERVER['SCRIPT_FILENAME']);   // cli: + script directory
 
-            static $locked = false;                                     // detect recursive calls (non-sense here ???)
-            if (!$locked) {
-               // Lock holen und nochmal nachschauen
-               $locked = true;
-               $lock   = new Lock(APPLICATION_ID.'|'.__FILE__.'#'.__LINE__);
-               $config = $cache->get(__CLASS__);
+            // normalize paths and remove duplicates
+            foreach ($paths as $i => $path) {
+               if (!is_dir($path)) {                                    // drop entries of non-existing directories,
+                  unset($paths[$i]);                                    // e.g. the app config directory
+                  continue;
+               }
+               $paths[$i] = realPath($path);
+            }
+            $paths = array_unique($paths);
+
+            // define application config files
+            $files = [];
+            foreach ($paths as $path) {
+               $files[] = $path.DIRECTORY_SEPARATOR.'config-default.properties';
+               $files[] = $path.DIRECTORY_SEPARATOR.'config.properties';
             }
 
-            if (!$config) {
-               // default config does not yet exist, create a new instance
-               // define config paths according to runtime context
-               $paths = [];
-               $paths[]          = MINISTRUTS_ROOT.'/src';              // all:   framework config directory
-               $paths[]          = MiniStruts::getConfigDir();          // all: + app config directory
-               if (CLI) $paths[] = dirName($_SERVER['SCRIPT_FILENAME']);// cli: + script directory
+            // create the instance
+            $config = new static($files);
 
-               // normalize paths and remove duplicates
-               foreach ($paths as $i => $path) {
-                  if (!is_dir($path)) {                                 // drop entries of non-existing directories,
-                     unset($paths[$i]);                                 // e.g. the app config directory
-                     continue;
-                  }
-                  $paths[$i] = realPath($path);
-               }
-               $paths = array_unique($paths);
+            // create FileDependency and cache the instance
+            $dependency = FileDependency::create(array_keys($config->files));
+            if (!WINDOWS && !CLI && !LOCALHOST)                         // distinction dev/production (sense???)
+               $dependency->setMinValidity(60 * SECONDS);
+            $cache->set(__CLASS__, $config, Cache::EXPIRES_NEVER, $dependency);
 
-               // define application config files
-               $files = [];
-               foreach ($paths as $path) {
-                  $files[] = $path.DIRECTORY_SEPARATOR.'config-default.properties';
-                  $files[] = $path.DIRECTORY_SEPARATOR.'config.properties';
-               }
-
-               // create the instance
-               $config = new static($files);
-
-               // create FileDependency and cache the instance
-               $dependency = FileDependency::create(array_keys($config->files));
-               if (!WINDOWS && !CLI && !LOCALHOST)                      // distinction dev/production (sense???)
-                  $dependency->setMinValidity(60 * SECONDS);
-               $cache->set(__CLASS__, $config, Cache::EXPIRES_NEVER, $dependency);
-            }
          }
 
          // set it as default
-         self::setDefault($config);
-      }
+         if ($config)
+            self::setDefault($config);
 
-      // an aquired lock will get released by the garbage collector
+         // unlock the method
+         $isActive--;
+      }
       return $config;
    }
 
