@@ -175,10 +175,10 @@ class Logger extends StaticClass {
             $receivers[] = $receiver;                                // @TODO: validate address format
       }
       if ($receivers) {
-         if ($forcedReceivers=Config::getDefault()->get('mail.address.forced-receiver', null)) {
+         if ($forcedReceivers=Config::getDefault()->get('mail.forced-receiver', null)) {
             $receivers = [];                                         // To reduce possible errors we use internal PHP mailing
             foreach (explode(',', $forcedReceivers) as $receiver) {  // functions (not a class) which means we have to manually
-               if ($receiver=trim($receiver))                        // check the config for the setting "mail.address.forced-receiver"
+               if ($receiver=trim($receiver))                        // check the config for the setting "mail.forced-receiver"
                   $receivers[] = $receiver;                          // (which the SMTPMailer would do automatically).
             }
          }
