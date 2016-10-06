@@ -610,7 +610,7 @@ class Logger extends StaticClass {
          if ($host != $ip)
             $ip .= ' ('.$host.')';
          $msg .= NL.NL.'Request:'.NL.'--------'.NL.$request.NL.NL
-              . 'Session: '.($session ? NL.'--------'.NL.$session : '(none)').NL.NL
+              . 'Session: '.($session ? NL.'--------'.NL.$session : '(none)'.NL.'--------'.NL).NL.NL
               . 'Server:'.NL.'-------'.NL.print_r(ksort_r($_SERVER), true).NL.NL
               . 'IP:   '.$ip.NL
               . 'Time: '.date('Y-m-d H:i:s').NL;
