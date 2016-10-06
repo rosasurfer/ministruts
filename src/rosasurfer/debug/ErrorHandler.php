@@ -2,8 +2,22 @@
 namespace rosasurfer\debug;
 
 use rosasurfer\core\StaticClass;
+
 use rosasurfer\debug\Helper as DebugHelper;
-use rosasurfer\exception\PHPError;
+
+use rosasurfer\exception\php\PHPCompileError;
+use rosasurfer\exception\php\PHPCompileWarning;
+use rosasurfer\exception\php\PHPCoreError;
+use rosasurfer\exception\php\PHPCoreWarning;
+use rosasurfer\exception\php\PHPError;
+use rosasurfer\exception\php\PHPNotice;
+use rosasurfer\exception\php\PHPParseError;
+use rosasurfer\exception\php\PHPRecoverableError;
+use rosasurfer\exception\php\PHPStrictError;
+use rosasurfer\exception\php\PHPUnknownError;
+use rosasurfer\exception\php\PHPUserError;
+use rosasurfer\exception\php\PHPWarning;
+
 use rosasurfer\log\Logger;
 
 use function rosasurfer\_true;
@@ -74,7 +88,7 @@ class ErrorHandler extends StaticClass {
     * Setup global error handling.
     *
     * @param  int $mode - mode the error handler to setup for
-    *                     can either be self::LOG_ERRORS or self::THROW_EXCEPTIONS
+    *                     can be either self::LOG_ERRORS or self::THROW_EXCEPTIONS
     */
    public static function setupErrorHandling($mode) {
       if     ($mode === self::LOG_ERRORS      ) self::$errorMode = self::LOG_ERRORS;
@@ -141,30 +155,27 @@ class ErrorHandler extends StaticClass {
       // (2) Process errors according to their severity level.
       switch ($level) {
          // always log non-critical and user errors and continue normally (without a stacktrace)
-         case E_DEPRECATED:      return _true(Logger::log('E_DEPRECATED: '     .$message, L_NOTICE, $logContext));
+         case E_DEPRECATED     : return _true(Logger::log('E_DEPRECATED: '     .$message, L_NOTICE, $logContext));
          case E_USER_DEPRECATED: return _true(Logger::log('E_USER_DEPRECATED: '.$message, L_NOTICE, $logContext));
-         case E_USER_NOTICE:     return _true(Logger::log('E_USER_NOTICE: '    .$message, L_NOTICE, $logContext));
-         case E_USER_WARNING:    return _true(Logger::log('E_USER_WARNING: '   .$message, L_WARN  , $logContext));
+         case E_USER_NOTICE    : return _true(Logger::log('E_USER_NOTICE: '    .$message, L_NOTICE, $logContext));
+         case E_USER_WARNING   : return _true(Logger::log('E_USER_WARNING: '   .$message, L_WARN  , $logContext));
       }
 
       // (3) Wrap everything else in the matching PHPErrorException.
       switch ($level) {
-         /*
-         case E_PARSE:             break;
-         case E_COMPILE_WARNING:   break;
-         case E_COMPILE_ERROR:     break;
-         case E_CORE_WARNING:      break;
-         case E_CORE_ERROR:        break;
-         case E_STRICT:            break;
-         case E_NOTICE:            break;
-         case E_WARNING:           break;
-         case E_ERROR:             break;
-         case E_RECOVERABLE_ERROR: break;
-         case E_USER_ERROR:        break;
-         */
+         case E_PARSE            : $exception = new PHPParseError      ($message, $code=null, $severity=$level, $file, $line); break;
+         case E_COMPILE_WARNING  : $exception = new PHPCompileWarning  ($message, $code=null, $severity=$level, $file, $line); break;
+         case E_COMPILE_ERROR    : $exception = new PHPCompileError    ($message, $code=null, $severity=$level, $file, $line); break;
+         case E_CORE_WARNING     : $exception = new PHPCoreWarning     ($message, $code=null, $severity=$level, $file, $line); break;
+         case E_CORE_ERROR       : $exception = new PHPCoreError       ($message, $code=null, $severity=$level, $file, $line); break;
+         case E_STRICT           : $exception = new PHPStrictError     ($message, $code=null, $severity=$level, $file, $line); break;
+         case E_NOTICE           : $exception = new PHPNotice          ($message, $code=null, $severity=$level, $file, $line); break;
+         case E_WARNING          : $exception = new PHPWarning         ($message, $code=null, $severity=$level, $file, $line); break;
+         case E_ERROR            : $exception = new PHPError           ($message, $code=null, $severity=$level, $file, $line); break;
+         case E_RECOVERABLE_ERROR: $exception = new PHPRecoverableError($message, $code=null, $severity=$level, $file, $line); break;
+         case E_USER_ERROR       : $exception = new PHPUserError       ($message, $code=null, $severity=$level, $file, $line); break;
          default:
-            $errno_str = 'UNKNOWN';
-            $exception = new PHPError($message, $code=null, $severity=$level, $file, $line);
+            $exception = new PHPUnknownError($message, $code=null, $severity=$level, $file, $line);
       }
 
       // (4) Handle the exception according to the configuration.
