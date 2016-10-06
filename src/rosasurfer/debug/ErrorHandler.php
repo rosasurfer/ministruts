@@ -126,7 +126,7 @@ class ErrorHandler extends StaticClass {
     * Errors are handled only if covered by the currently configured error reporting level. Errors of the levels
     * E_DEPRECATED, E_USER_DEPRECATED, E_USER_NOTICE and E_USER_WARNING are always logged and script execution
     * continues normally. All other errors are logged according to the configured error handling mode. Either they
-    * are logged and script exceution continues normally, or they are wrapped in a PHPErrorException and thrown back.
+    * are logged and script exceution continues normally, or they are wrapped in a PHPError exception and thrown back.
     *
     * @param  int     $level   - PHP error severity level
     * @param  string  $message - error message
@@ -138,7 +138,7 @@ class ErrorHandler extends StaticClass {
     *                FALSE, if the error shall be processed as if no error handler was installed.
     *                The error handler must return FALSE to populate the internal PHP variable <tt>$php_errormsg</tt>.
     *
-    * @throws PHPErrorException
+    * @throws PHPError
     */
    public static function handleError($level, $message, $file, $line, array $context) {
       // echoPre(__METHOD__.'()  '.DebugHelper::errorLevelToStr($level).': $message='.$message.', $file='.$file.', $line='.$line);
@@ -161,7 +161,7 @@ class ErrorHandler extends StaticClass {
          case E_USER_WARNING   : return _true(Logger::log('E_USER_WARNING: '   .$message, L_WARN  , $logContext));
       }
 
-      // (3) Wrap everything else in the matching PHPErrorException.
+      // (3) Wrap everything else in the matching PHPError exception.
       switch ($level) {
          case E_PARSE            : $exception = new PHPParseError      ($message, $code=null, $severity=$level, $file, $line); break;
          case E_COMPILE_WARNING  : $exception = new PHPCompileWarning  ($message, $code=null, $severity=$level, $file, $line); break;
