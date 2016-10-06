@@ -116,7 +116,7 @@ class MiniStruts extends StaticClass {
     */
    public static function getConfigDir() {
       if (self::$configDir === null) {
-         self::$configDir = APPLICATION_ROOT.'/etc/config';
+         self::$configDir = APPLICATION_ROOT.'/app/config';
       }
       return self::$configDir;
    }
