@@ -6,12 +6,13 @@ use rosasurfer\core\StaticClass;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 
+use rosasurfer\exception\php\PHPError;
+
 use function rosasurfer\strLeftTo;
 use function rosasurfer\strRightFrom;
 use function rosasurfer\strStartsWith;
 
 use const rosasurfer\NL;
-use rosasurfer\exception\php\PHPError;
 
 
 /**
