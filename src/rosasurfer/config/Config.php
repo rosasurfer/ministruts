@@ -319,7 +319,7 @@ class Config extends Object implements ConfigInterface {
       $config = self::$defaultInstance;
 
       if (!$config) {
-         // detect and handle recursive calls
+         // detect and prevent recursive calls
          static $isActive = 0;
          if ($isActive++)                                               // lock the method
             throw new RuntimeException('Blocking recursive call to '.__METHOD__.'()');
