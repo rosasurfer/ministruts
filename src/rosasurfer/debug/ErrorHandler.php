@@ -211,21 +211,59 @@ class ErrorHandler extends StaticClass {
    /**
     * Global handler for otherwise unhandled exceptions.
     *
-    * The exception is sent to the current default logger with loglevel L_FATAL. After the handler returns PHP will
-    * terminate the script.
+    * The exception is sent to the default logger with loglevel L_FATAL. After the handler returns PHP will terminate
+    * the script.
     *
     * @param \Exception $exception - the unhandled exception
     */
    public static function handleException(\Exception $exception) {
-      //echoPre(__METHOD__.'()  '.DebugHelper::getBetterMessage($exception));
-      // TODO: detect and handle recursive calls
+      $context = [];
 
-      $context['class'] = __CLASS__;                  // atm not required but somewhen somewhere somebody might ask for it
-      $context['file' ] = $exception->getFile();      // if the location is not preset the Logger will correctly
-      $context['line' ] = $exception->getLine();      // resolve this method as the originating location
-      $context['type' ] = 'unhandled';
+      // Exceptions thrown from within the exception handler will not be passed back to the handler again. Instead the
+      // script terminates with an uncatchable fatal error.
+      try {
+         $context['class'] = __CLASS__;                  // atm not required but somewhen somewhere somebody might ask for it
+         $context['file' ] = $exception->getFile();      // if the location is not preset the Logger will correctly
+         $context['line' ] = $exception->getLine();      // resolve this method as the originating location
+         $context['type' ] = 'unhandled';
 
-      Logger::log($exception, L_FATAL, $context);     // log with the highest level
+         Logger::log($exception, L_FATAL, $context);     // log with the highest level
+      }
+
+      catch (\Exception $secondary) {
+         // Things are messed up and the application is crashing. Last try to log.
+         $indent = ' ';
+
+         // secondary exception
+         $msg2  = 'PHP [FATAL] Unhandled '.trim(DebugHelper::getBetterMessage($secondary)).NL;
+         $file  = $secondary->getFile();
+         $line  = $secondary->getLine();
+         $msg2 .= $indent.'in '.$file.' on line '.$line.NL.NL;
+         $msg2 .= $indent.'Stacktrace:'.NL.' -----------'.NL;
+         $msg2 .= DebugHelper::getBetterTraceAsString($secondary, $indent);
+
+         // primary (the causing) exception
+         if (isSet($context['cliMessage'])) {
+            $msg1 = $context['cliMessage'];
+            if (isSet($context['cliExtra']))
+               $msg1 .= $context['cliExtra'];
+         }
+         else {
+            $msg1  = $indent.'Unhandled '.trim(DebugHelper::getBetterMessage($exception)).NL;
+            $file  = $exception->getFile();
+            $line  = $exception->getLine();
+            $msg1 .= $indent.'in '.$file.' on line '.$line.NL.NL;
+            $msg1 .= $indent.'Stacktrace:'.NL.' -----------'.NL;
+            $msg1 .= DebugHelper::getBetterTraceAsString($exception, $indent);
+         }
+
+         $msg  = $msg2.NL;
+         $msg .= $indent.'caused by'.NL;
+         $msg .= $msg1;
+         $msg  = str_replace(chr(0), "?", $msg);                  // replace NUL bytes which mess up the logfile
+
+         error_log(trim($msg), ERROR_LOG_DEFAULT);
+      }
    }
 
 
