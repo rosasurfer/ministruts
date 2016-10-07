@@ -3,7 +3,7 @@ namespace rosasurfer\exception\php;
 
 
 /**
- * Rosasurfer exception for recoverable PHP errors.
+ * Rosasurfer exception for a recoverable PHP error.
  */
 class PHPRecoverableError extends PHPError {
 }

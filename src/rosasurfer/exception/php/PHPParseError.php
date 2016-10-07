@@ -3,7 +3,7 @@ namespace rosasurfer\exception\php;
 
 
 /**
- * Rosasurfer exception for PHP parse errors.
+ * Rosasurfer exception for a PHP parse error.
  */
-class PHPParseErrors extends PHPError {
+class PHPParseError extends PHPError {
 }

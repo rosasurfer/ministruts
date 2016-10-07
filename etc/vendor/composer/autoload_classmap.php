@@ -68,7 +68,7 @@ return array(
     'rosasurfer\\exception\\php\\PHPDeprecation' => $baseDir . '/src/rosasurfer/exception/php/PHPDeprecation.php',
     'rosasurfer\\exception\\php\\PHPError' => $baseDir . '/src/rosasurfer/exception/php/PHPError.php',
     'rosasurfer\\exception\\php\\PHPNotice' => $baseDir . '/src/rosasurfer/exception/php/PHPNotice.php',
-    'rosasurfer\\exception\\php\\PHPParseErrors' => $baseDir . '/src/rosasurfer/exception/php/PHPParseError.php',
+    'rosasurfer\\exception\\php\\PHPParseError' => $baseDir . '/src/rosasurfer/exception/php/PHPParseError.php',
     'rosasurfer\\exception\\php\\PHPRecoverableError' => $baseDir . '/src/rosasurfer/exception/php/PHPRecoverableError.php',
     'rosasurfer\\exception\\php\\PHPStrictError' => $baseDir . '/src/rosasurfer/exception/php/PHPStrictError.php',
     'rosasurfer\\exception\\php\\PHPUnknownError' => $baseDir . '/src/rosasurfer/exception/php/PHPUnknownError.php',

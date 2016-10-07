@@ -3,7 +3,7 @@ namespace rosasurfer\exception\php;
 
 
 /**
- * Rosasurfer exception for PHP warning.
+ * Rosasurfer exception for a PHP warning.
  */
 class PHPWarning extends PHPError {
 }
