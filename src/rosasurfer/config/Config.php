@@ -226,7 +226,6 @@ class Config extends Object implements ConfigInterface {
     * @param  string $value
     */
    private function setProperty($key, $value, $file=null, $line=null) {
-
       // set the property depending on the existing data structure
       $properties  =& $this->properties;
       $subkeys     =  $this->parseSubkeys($key);
@@ -249,15 +248,13 @@ class Config extends Object implements ConfigInterface {
          else {
             // the last subkey
             if (!isSet($properties[$subkey])) {
-               $properties[$subkey] = $value;                        // store the value
+               $properties[$subkey] = $value;                        // store the value regularily
             }
             elseif (!is_array($properties[$subkey])) {
                $properties[$subkey] = $value;                        // overwrite the existing non-array value
             }
             else {
-               $where = $file ? ' from "'.$file.'", line '.$line : '';
-               Logger::log(__METHOD__.'()  Overwriting existing properties array "'.$key.'" with plain value'.$where, L_NOTICE);
-               $properties[$subkey] = $value;                        // overwrite the existing array value
+               $properties[$subkey][''] = $value;                    // overwrite the array default value
             }
          }
       }
