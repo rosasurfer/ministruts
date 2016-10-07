@@ -319,10 +319,10 @@ class Config extends Object implements ConfigInterface {
       $config = self::$defaultInstance;
 
       if (!$config) {
-         // detect and prevent recursive calls
-         static $isActive = 0;
-         if ($isActive++)                                               // lock the method
-            throw new RuntimeException('Blocking recursive call to '.__METHOD__.'()');
+         // block recursive calls
+         static $isActive = false;
+         if ($isActive) throw new RuntimeException('Blocking recursive call to '.__METHOD__.'()');
+         $isActive = true;                                              // lock the method
 
          $cache  = Cache::me();
          $config = $cache->get(__CLASS__);                              // is there a cached instance?
@@ -368,7 +368,7 @@ class Config extends Object implements ConfigInterface {
             self::setDefault($config);
 
          // unlock the method
-         $isActive--;
+         $isActive = false;
       }
       return $config;
    }

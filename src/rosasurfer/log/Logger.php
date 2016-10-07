@@ -294,6 +294,12 @@ class Logger extends StaticClass {
     * @param  mixed[] $context  - optional logging context with additional data
     */
    public static function log($loggable, $level, array $context=[]) {
+      // block recursive calls
+      static $isActive = false;
+      if ($isActive) throw new RuntimeException('Blocking recursive call to '.__METHOD__.'()');
+      $isActive = true;                                              // lock the method
+
+
       // (1) validate parameters
       if (!is_string($loggable)) {
          if (!is_object($loggable))                   throw new IllegalTypeException('Illegal type of parameter $loggable: '.getType($loggable));
@@ -306,23 +312,29 @@ class Logger extends StaticClass {
 
 
       // (2) filter messages not covered by the current loglevel
+      $filtered = false;
       if ($level == L_FATAL) {
          // Not necessary for the highest level. This will cover all calls from the global exception handler
-         // which always calls with the highest level (L_FATAL).
+         // which always logs with the highest level (L_FATAL).
       }
       else {
          // resolve the calling class and check its loglevel
          !isSet($context['class']) && self::resolveLogCaller($loggable, $level, $context);
-         if ($level < self::getLogLevel($context['class']))          // return if message is not covered
-            return;
+         if ($level < self::getLogLevel($context['class']))
+            $filtered = true;                                        // message is not covered
       }
 
 
       // (3) invoke all active log handlers
-      self::$printHandler    && self::invokePrintHandler   ($loggable, $level, $context);
-      self::$mailHandler     && self::invokeMailHandler    ($loggable, $level, $context);
-      self::$smsHandler      && self::invokeSmsHandler     ($loggable, $level, $context);
-      self::$errorLogHandler && self::invokeErrorLogHandler($loggable, $level, $context);
+      if (!$filtered) {
+         self::$printHandler    && self::invokePrintHandler   ($loggable, $level, $context);
+         self::$mailHandler     && self::invokeMailHandler    ($loggable, $level, $context);
+         self::$smsHandler      && self::invokeSmsHandler     ($loggable, $level, $context);
+         self::$errorLogHandler && self::invokeErrorLogHandler($loggable, $level, $context);
+      }
+
+      // unlock the method
+      $isActive = false;
    }
 
 
