@@ -49,11 +49,8 @@ class Helper extends StaticClass {
     */
    public static function fixTrace(array $trace, $file='unknown', $line=0) {
       // check if the stacktrace is already fixed
-      if ($trace) {
-         $lastFrame = $trace[sizeOf($trace)-1];
-         if (isSet($lastFrame['function']) && $lastFrame['function']=='{main}')
-            return $trace;                               // already fixed
-      }
+      if ($trace && isSet($trace[0]['fixed']))
+            return $trace;
 
       // add a frame for the main script to the bottom (end of array)
       $trace[] = ['function' => '{main}'];
@@ -66,6 +63,7 @@ class Helper extends StaticClass {
          if (isSet($trace[$i-1]['line'])) $trace[$i]['line'] = $trace[$i-1]['line'];
          else                       unset($trace[$i]['line']);
 
+         $trace[$i]['fixed'] = true;
          /*
          if (isSet($trace[$i]['args'])) {             // skip content of large vars
             foreach ($trace[$i]['args'] as &$arg) {
@@ -80,6 +78,11 @@ class Helper extends StaticClass {
       $trace[0]['file'] = $file;
       $trace[0]['line'] = $line;
 
+      // remove the last frame if it points to an unknown location (PHP core)
+      $size = sizeOf($trace);
+      if (!isSet($trace[$size-1]['file'])) {
+         array_pop($trace);
+      }
       return $trace;
 
       /**
@@ -99,59 +102,6 @@ class Helper extends StaticClass {
     * @param  string $indent - indent the formatted lines by this value (default: empty string)
     *
     * @return string
-    *
-    * @example
-    *
-    * original stacktrace format:
-    * <pre>
-    *   #0 [internal function]: PDO->__construct('mysql:host=127....', 'root', '', Array)
-    *   #1 [internal function]: Phalcon\Db\Adapter\Pdo->connect(Array)
-    *   #2 /var/www/phalcon/vokuro/app/config/services.php(72): Phalcon/Db/Adapter/Pdo->__construct(Array)
-    *   #3 [internal function]: {closure}()
-    *   #4 [internal function]: Phalcon\Di\Service->resolve(NULL, Object(Phalcon\Di\FactoryDefault))
-    *   #5 [internal function]: Phalcon\Di->get('db', NULL)
-    *   #6 [internal function]: Phalcon\Di->getShared('db')
-    *   #7 [internal function]: Phalcon\Mvc\Model\Manager->_getConnection(Object(Vokuro\Models\Users), NULL)
-    *   #8 [internal function]: Phalcon\Mvc\Model\Manager->getReadConnection(Object(Vokuro\Models\Users))
-    *   #9 [internal function]: Phalcon\Mvc\Model->getReadConnection()
-    *   #10 [internal function]: Phalcon\Mvc\Model\MetaData\Strategy\Introspection->getMetaData(Object(Vokuro\Models\Users), Object(Phalcon\Di\FactoryDefault))
-    *   #11 [internal function]: Phalcon\Mvc\Model\MetaData->_initialize(Object(Vokuro\Models\Users), 'vokuro\\models\\u...', 'users', '')
-    *   #12 [internal function]: Phalcon\Mvc\Model\MetaData->readMetaDataIndex(Object(Vokuro\Models\Users), 4)
-    *   #13 [internal function]: Phalcon\Mvc\Model\MetaData->getDataTypes(Object(Vokuro\Models\Users))
-    *   #14 [internal function]: Phalcon\Mvc\Model::_invokeFinder('findFirstByEmai...', Array)
-    *   #15 /var/www/phalcon/vokuro/app/library/Auth/Auth.php(27): Phalcon/Mvc/Model::__callStatic('findFirstByEmai...', Array)
-    *   #16 /var/www/phalcon/vokuro/app/library/Auth/Auth.php(27): Vokuro/Models/Users::findFirstByEmail('demo@phalconphp...')
-    *   #17 /var/www/phalcon/vokuro/app/controllers/SessionController.php(90): Vokuro/Auth/Auth->check(Array)
-    *   #18 [internal function]: Vokuro\Controllers\SessionController->loginAction()
-    *   #19 [internal function]: Phalcon\Dispatcher->dispatch()
-    *   #20 /var/www/phalcon/vokuro/public/index.php(36): Phalcon/Mvc/Application->handle()
-    *   #21 {main}
-    * </pre>
-    *
-    * new stacktrace format:
-    * <pre>
-    *   PDO->__construct()                                                # line 72, file: /var/www/phalcon/vokuro/app/config/services.php
-    *   phalcon\db\adapter\Pdo->connect()                                            [php-phalcon]
-    *   phalcon\db\adapter\Pdo->__construct()                                        [php-phalcon]
-    *   {closure}                                                         # line 72, file: /var/www/phalcon/vokuro/app/config/services.php
-    *   phalcon\di\Service->resolve()                                                [php-phalcon]
-    *   phalcon\Di->get()                                                            [php-phalcon]
-    *   phalcon\Di->getShared()                                                      [php-phalcon]
-    *   phalcon\mvc\model\Manager->_getConnection()                                  [php-phalcon]
-    *   phalcon\mvc\model\Manager->getReadConnection()                               [php-phalcon]
-    *   phalcon\mvc\Model->getReadConnection()                                       [php-phalcon]
-    *   phalcon\mvc\model\metadata\strategy\Introspection->getMetaData()             [php-phalcon]
-    *   phalcon\mvc\model\MetaData->_initialize()                                    [php-phalcon]
-    *   phalcon\mvc\model\MetaData->readMetaDataIndex()                              [php-phalcon]
-    *   phalcon\mvc\model\MetaData->getDataTypes()                                   [php-phalcon]
-    *   phalcon\mvc\Model::_invokeFinder()                                           [php-phalcon]
-    *   phalcon\mvc\Model::__callStatic()                                            [php-phalcon]
-    *   vokuro\auth\Auth->check()                                         # line 27, file: /var/www/phalcon/vokuro/app/library/Auth/Auth.php
-    *   vokuro\controllers\SessionController->loginAction()               # line 90, file: /var/www/phalcon/vokuro/app/controllers/SessionController.php
-    *   phalcon\Dispatcher->dispatch()                                               [php-phalcon]
-    *   phalcon\mvc\Application->handle()                                            [php-phalcon]
-    *   {main}                                                            # line 36, file: /var/www/phalcon/vokuro/public/index.php
-    * </pre>
     */
    public static function formatTrace(array $trace, $indent='') {
       $result = null;
