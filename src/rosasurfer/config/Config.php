@@ -321,12 +321,8 @@ class Config extends Object implements ConfigInterface {
       if (!$config) {
          // detect and handle recursive calls
          static $isActive = 0;
-         if ($isActive++) {                                             // lock the method
-            $msg = 'Blocking recursive method call';
-            if     ($isActive == 1) Logger::log($msg, L_ERROR);         // be as defensive as possible
-            elseif ($isActive == 2) error_log('PHP [ERROR] '.__METHOD__.'()  '.$msg.' in '.__FILE__.' on line '.__LINE__, ERROR_LOG_DEFAULT);
-            return null;
-         }
+         if ($isActive++)                                               // lock the method
+            throw new RuntimeException('Blocking recursive call to '.__METHOD__.'()');
 
          $cache  = Cache::me();
          $config = $cache->get(__CLASS__);                              // is there a cached instance?
