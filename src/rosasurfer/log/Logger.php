@@ -590,7 +590,7 @@ class Logger extends StaticClass {
       }
       else {
          // exception
-         $type = isSet($context['type']) ? ucFirst($context['type']).' ' : '';
+         $type = isSet($context['unhandled']) ? 'Unhandled ' : '';
          $msg  = $type.trim(DebugHelper::getBetterMessage($loggable));
          $text = strToUpper(self::$logLevels[$level]).' '.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
 
@@ -631,7 +631,6 @@ class Logger extends StaticClass {
       $msg = $context['cliMessage'];
       if (isSet($context['cliExtra']))
          $msg .= $context['cliExtra'];
-      $type     = isSet($context['type']) ? $context['type'] : null;
       $location = null;
 
       // compose message
@@ -653,9 +652,7 @@ class Logger extends StaticClass {
               . 'IP:   '.$ip.NL
               . 'Time: '.date('Y-m-d H:i:s').NL;
       }
-
-      if ($loggable instanceof \Exception && $type=='unhandled')
-         $type = 'Unhandled Exception ';
+      $type = ($loggable instanceof \Exception && isSet($context['unhandled'])) ? 'Unhandled Exception ':'';
 
       // store subject and message
       $context['mailSubject'] = 'PHP '.self::$logLevels[$level].' '.$type.'at '.$location;
@@ -689,7 +686,7 @@ class Logger extends StaticClass {
       }
       else {
          // exception
-         $type      = isSet($context['type']) ? ucFirst($context['type']).' ' : '';
+         $type      = isSet($context['unhandled']) ? 'Unhandled ' : '';
          $msg       = $type.DebugHelper::getBetterMessage($loggable);
          $html     .= '<b>'.strToUpper(self::$logLevels[$level]).'</b> '.nl2br(htmlSpecialChars($msg, ENT_QUOTES|ENT_SUBSTITUTE))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
          $traceStr  = $indent.'Stacktrace:'.NL.' -----------'.NL;

@@ -220,10 +220,10 @@ class ErrorHandler extends StaticClass {
       $context = [];
 
       try {
-         $context['class'] = __CLASS__;                  // atm not required but somewhen somewhere somebody might ask for it
-         $context['file' ] = $exception->getFile();      // if the location is not preset the Logger will correctly
-         $context['line' ] = $exception->getLine();      // resolve this method as the originating location
-         $context['type' ] = 'unhandled';
+         $context['class'    ] = __CLASS__;              // atm not required but somewhen somewhere somebody might ask for it
+         $context['file'     ] = $exception->getFile();  // if the location is not preset the Logger will correctly
+         $context['line'     ] = $exception->getLine();  // resolve this method as the originating location
+         $context['unhandled'] = true;
 
          Logger::log($exception, L_FATAL, $context);     // log with the highest level
       }
