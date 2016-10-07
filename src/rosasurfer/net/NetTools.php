@@ -7,6 +7,7 @@ use rosasurfer\core\StaticClass;
 
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
+use rosasurfer\exception\RuntimeException;
 
 use function rosasurfer\strEndsWithI;
 
@@ -72,8 +73,11 @@ final class NetTools extends StaticClass {
       if ($proxys === null) {
          $proxys = array();
 
+         if (!$config=Config::getDefault())
+            throw new RuntimeException('Service locator returned invalid default config: '.getType($config));
+
          // Config einlesen
-         $value = Config::getDefault()->get('proxys', null);
+         $value = $config->get('proxys', null);
          foreach (explode(',', $value) as $value) {
             $value = trim($value);
             if (strLen($value)) {

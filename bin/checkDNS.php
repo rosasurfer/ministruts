@@ -1,6 +1,7 @@
 #!/usr/bin/php
 <?php
 use rosasurfer\config\Config;
+use rosasurfer\exception\RuntimeException;
 
 use const rosasurfer\WINDOWS;
 
@@ -19,7 +20,7 @@ define('APPLICATION_ROOT', __DIR__     );
 require(dirName(__DIR__).'/src/load.php');
 
 // dns_* functions are not implemented on Windows
-if (WINDOWS) throw new InfrastructureException("This script can't be run in Windows.");
+if (WINDOWS) throw new InfrastructureException("This script cannot run on Windows.");
 
 
 
@@ -79,8 +80,12 @@ function queryDNS($domain, $type) {
 }
 
 
+if (!$config=Config::getDefault())
+   throw new RuntimeException('Service locator returned invalid default config: '.getType($config));
+
+
 // normale DNS-Einträge überprüfen (A, MX, NS, TXT, etc.)
-$domains = Config::getDefault()->get('dns.domain', array());
+$domains = $config->get('dns.domain', array());
 
 foreach ($domains as $domain => $domainValues) {
    foreach ($domainValues as $type => $value) {
@@ -119,7 +124,7 @@ foreach ($domains as $domain => $domainValues) {
 
 
 // Reverse-DNS der angegebenen IP-Adressen überprüfen
-$ips = Config::getDefault()->get('dns.ip', array());
+$ips = $config->get('dns.ip', array());
 
 foreach ($ips as $ip => $value) {
    $domain = join('.', array_reverse(explode('.', $ip))).'.in-addr.arpa';

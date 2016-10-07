@@ -10,6 +10,7 @@ use rosasurfer\debug\Helper as DebugHelper;
 
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
+use rosasurfer\exception\RuntimeException;
 
 use rosasurfer\ministruts\Request;
 
@@ -102,7 +103,7 @@ class Logger extends StaticClass {
 
 
    /** @var int - application loglevel */
-   private static $appLogLevel = null;
+   private static $appLogLevel = self::DEFAULT_LOGLEVEL;
 
 
    /** @var bool - whether or not the PrintHandler is enabled */
@@ -130,7 +131,7 @@ class Logger extends StaticClass {
 
 
    /** @var bool - whether or not the ErrorLogHandler is enabled */
-   private static $errorLogHandler = false;
+   private static $errorLogHandler = true;
 
 
    /** @var string[] - loglevel descriptions for message formatter */
@@ -151,8 +152,11 @@ class Logger extends StaticClass {
       static $initialized = false;
       if ($initialized) return;
 
+      if (!$config=Config::getDefault())
+         throw new RuntimeException('Service locator returned invalid default config: '.getType($config));
+
       // (1) application default loglevel: if not configured the built-in default loglevel
-      $logLevel = Config::getDefault()->get('log.level', null);
+      $logLevel = $config->get('log.level', null);
 
       if (is_string($logLevel) || isSet($logLevel[''])) {   // the application and/or some class loglevels are configured
          if (is_array($logLevel))
@@ -170,12 +174,12 @@ class Logger extends StaticClass {
 
       // (3) MailHandler: enabled if mail receivers are configured
       $receivers = [];
-      foreach (explode(',', Config::getDefault()->get('log.mail.receiver', '')) as $receiver) {
+      foreach (explode(',', $config->get('log.mail.receiver', '')) as $receiver) {
          if ($receiver=trim($receiver))
             $receivers[] = $receiver;                                // @TODO: validate address format
       }
       if ($receivers) {
-         if ($forcedReceivers=Config::getDefault()->get('mail.forced-receiver', null)) {
+         if ($forcedReceivers=$config->get('mail.forced-receiver', null)) {
             $receivers = [];                                         // To reduce possible errors we use internal PHP mailing
             foreach (explode(',', $forcedReceivers) as $receiver) {  // functions (not a class) which means we have to manually
                if ($receiver=trim($receiver))                        // check the config for the setting "mail.forced-receiver"
@@ -188,17 +192,17 @@ class Logger extends StaticClass {
 
       // (4) SMSHandler: enabled if SMS receivers are configured (operator settings are checked at log message time)
       self::$smsReceivers = [];
-      foreach (explode(',', Config::getDefault()->get('log.sms.receiver', '')) as $receiver) {
+      foreach (explode(',', $config->get('log.sms.receiver', '')) as $receiver) {
          if ($receiver=trim($receiver))
             self::$smsReceivers[] = $receiver;
       }
-      $logLevel = Config::getDefault()->get('log.sms.level', self::$appLogLevel);
+      $logLevel = $config->get('log.sms.level', self::$appLogLevel);
       if (is_string($logLevel)) {                                    // a string if a configured value
          $logLevel = self::logLevelToId($logLevel);
          !$logLevel && $logLevel=self::$appLogLevel;
       }
       self::$smsLogLevel = $logLevel;
-      self::$smsOptions  = Config::getDefault()->get('sms', []);
+      self::$smsOptions  = $config->get('sms', []);
       self::$smsHandler  = (bool)self::$smsReceivers && self::$smsOptions;
 
       // (5) ErrorLogHandler: enabled if the MailHandler is disabled
@@ -244,7 +248,10 @@ class Logger extends StaticClass {
       // read the configured class specific loglevels
       static $logLevels = null;
       if ($logLevels === null) {
-         $logLevels = Config::getDefault()->get('log.level', []);
+         if (!$config=Config::getDefault())
+            throw new RuntimeException('Service locator returned invalid default config: '.getType($config));
+
+         $logLevels = $config->get('log.level', []);
          if (is_string($logLevels))                                  // only the general application loglevel is configured
             $logLevels = ['' => $logLevels];
 

@@ -198,12 +198,16 @@ class SMTPMailer extends Mailer {
     * @param  array  $headers  - zusätzliche zu setzende Mail-Header
     */
    public function sendMail($sender, $receiver, $subject, $message, array $headers = null) {
-      if (!is_string($sender)) throw new IllegalTypeException('Illegal type of parameter $sender: '.getType($sender));
+      if (!is_string($sender))   throw new IllegalTypeException('Illegal type of parameter $sender: '.getType($sender));
       $from = $this->parseAddress($sender);
-      if (!$from)              throw new InvalidArgumentException('Invalid argument $sender: '.$sender);
+      if (!$from)                throw new InvalidArgumentException('Invalid argument $sender: '.$sender);
 
       if (!is_string($receiver)) throw new IllegalTypeException('Illegal type of parameter $receiver: '.getType($receiver));
-      $forced = Config::getDefault()->get('mail.forced-receiver', null);
+
+      if (!$config=Config::getDefault())
+         throw new RuntimeException('Service locator returned invalid default config: '.getType($config));
+
+      $forced = $config->get('mail.forced-receiver', null);
       strLen($forced) && $receiver=$forced;
       $to = $this->parseAddress($receiver);
       if (!$to) throw new InvalidArgumentException('Invalid argument $receiver: '.$receiver);

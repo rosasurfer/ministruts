@@ -4,7 +4,9 @@ namespace rosasurfer\db;
 use rosasurfer\config\Config;
 
 use rosasurfer\core\Singleton;
+
 use rosasurfer\exception\IllegalStateException;
+use rosasurfer\exception\RuntimeException;
 
 
 /**
@@ -55,15 +57,21 @@ final class DBPool extends Singleton {
    public static function getDB($alias = null) {
       $me = self::me();
 
-      if (is_null($alias)) {                                // single db project
+      if (is_null($alias)) {                                            // single db project
          if (!$me->default) throw new IllegalStateException('Invalid default database configuration: null');
          $connector = $me->default;
       }
-      elseif (isSet($me->pool[$alias])) {                   // schon im Pool ?
+      elseif (isSet($me->pool[$alias])) {                               // schon im Pool ?
          $connector = $me->pool[$alias];
       }
-      elseif ($config=Config::getDefault()->get('db.'.$alias, null)) {   // nein, Config holen und Connector laden
-         $name = $config['connector'];
+      else {                                                            // nein, Config holen
+         if (!$config=Config::getDefault())
+            throw new RuntimeException('Service locator returned invalid default config: '.getType($config));
+
+         $config = $config->get('db.'.$alias, null);
+         if (!$config) throw new IllegalStateException('No configuration found for database alias "'.$alias.'"');
+
+         $name = $config['connector'];                                  // Connector laden
          if ($name[0]=='//') $name = substr($name, 1);
 
          // Aliase durch Klassennamen ersetzen
@@ -80,10 +88,6 @@ final class DBPool extends Singleton {
          $connector = DB::spawn($class, $host, $user, $pass, $db, $options);
          $me->pool[$alias] = $connector;
       }
-      else {
-         throw new IllegalStateException('No database configuration found for db alias "'.$alias.'"');
-      }
-
       return $connector;
    }
 
