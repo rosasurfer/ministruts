@@ -323,19 +323,6 @@ class Logger extends StaticClass {
       self::$mailHandler     && self::invokeMailHandler    ($loggable, $level, $context);
       self::$smsHandler      && self::invokeSmsHandler     ($loggable, $level, $context);
       self::$errorLogHandler && self::invokeErrorLogHandler($loggable, $level, $context);
-
-
-      /*
-      // legacy: lock method against circular calls
-      static $isActive = false;                                      // TODO: SYSLOG implementieren
-      if ($isActive)     return echoPre(__METHOD__.'()  Sending circular log message to SYSLOG:  '.$message.', '.$exception);
-      $isActive        = true;
-
-      ($level >= self::getLogLevel($class)) && self::log_1($message, $exception, $level);
-
-      // unlock method
-      $isActive = false;
-      */
    }
 
 
@@ -518,9 +505,10 @@ class Logger extends StaticClass {
       if (!isSet($context['cliMessage']))
          self::composeCliMessage($loggable, $level, $context);
 
-      $message = 'PHP '.$context['cliMessage'];                // skip "cliExtra"
-      $message = str_replace(["\r\n", "\n"], ' ', $message);   // remove line breaks
-      $message = str_replace(chr(0), "?", $message);           // replace NUL bytes which mess up the logfile
+      $msg = 'PHP '.$context['cliMessage'];
+      if (isSet($context['cliExtra']))
+         $msg .= $context['cliExtra'];
+      $msg = str_replace(chr(0), "?", $msg);                   // replace NUL bytes which mess up the logfile
 
       if (!ini_get('error_log') && CLI) {
          // Suppress duplicated output to STDERR, the PrintHandler already wrote to STDOUT.
@@ -530,7 +518,7 @@ class Logger extends StaticClass {
          // @TODO: suppress output to STDERR in interactive terminals only (i.e. not in cron)
       }
       else {
-         error_log($message, ERROR_LOG_DEFAULT);
+         error_log(trim($msg), ERROR_LOG_DEFAULT);
       }
    }
 
@@ -756,7 +744,6 @@ class Logger extends StaticClass {
    public static function old_log($message, \Exception $exception=null, $level) {
       try {
          // ...
-         self::$sms && $level >= self::$smsLogLevel && self::sms_log($cliMessage);
       }
       catch (\Exception $ex) {
          $msg = 'PHP (0) '.$cliMessage ? $cliMessage:$message;
@@ -775,7 +762,6 @@ class Logger extends StaticClass {
    public static function old_handleException(\Exception $exception) {
       try {
          // ...
-         self::$sms && self::sms_log($cliMessage);
       }
       catch (\Exception $secondary) {
          $file = $exception->getFile();
