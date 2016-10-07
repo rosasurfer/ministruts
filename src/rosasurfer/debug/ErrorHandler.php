@@ -219,8 +219,6 @@ class ErrorHandler extends StaticClass {
    public static function handleException(\Exception $exception) {
       $context = [];
 
-      // Exceptions thrown from within the exception handler will not be passed back to the handler again. Instead the
-      // script terminates with an uncatchable fatal error.
       try {
          $context['class'] = __CLASS__;                  // atm not required but somewhen somewhere somebody might ask for it
          $context['file' ] = $exception->getFile();      // if the location is not preset the Logger will correctly
@@ -230,8 +228,9 @@ class ErrorHandler extends StaticClass {
          Logger::log($exception, L_FATAL, $context);     // log with the highest level
       }
 
-      catch (\Exception $secondary) {
-         // Things are messed up and the application is crashing. Last try to log.
+      // Exceptions thrown from within the exception handler will not be passed back to the handler again. Instead the
+      // script terminates with an uncatchable fatal error.
+      catch (\Exception $secondary) {                    // the application is crashing, last try to log
          $indent = ' ';
 
          // secondary exception
