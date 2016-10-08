@@ -11,7 +11,7 @@ use const rosasurfer\CLI;
  *
  * Wrapper für den HTTP-Response.
  */
-final class Response extends Singleton {
+class Response extends Singleton {
 
 
    // Attribute-Pool
@@ -25,8 +25,7 @@ final class Response extends Singleton {
     * @return Singleton - Instanz oder NULL
     */
    public static function me() {
-      if (!CLI)
-         return Singleton::getInstance(__CLASS__);
+      if (!CLI) return Singleton::getInstance(static::class);
       return null;
    }
 

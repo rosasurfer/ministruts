@@ -46,7 +46,7 @@ abstract class BaseLock extends Object {
     * Verhindert das Serialisieren von Lock-Instanzen.
     */
    final public function __sleep() {
-      throw new IllegalStateException('You cannot serialize me: '.__CLASS__);
+      throw new IllegalStateException('You cannot serialize me: '.get_class($this));
    }
 
 
@@ -54,6 +54,6 @@ abstract class BaseLock extends Object {
     * Verhindert das Deserialisieren von Lock-Instanzen.
     */
    final public function __wakeUp() {
-      throw new IllegalStateException('You cannot unserialize me: '.__CLASS__);
+      throw new IllegalStateException('You cannot unserialize me: '.get_class($this));
    }
 }

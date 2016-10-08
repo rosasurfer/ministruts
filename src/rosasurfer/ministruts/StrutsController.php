@@ -53,21 +53,22 @@ class StrutsController extends Singleton {
     * @return Singleton
     */
    public static function me() {
-      if (CLI) throw new IllegalStateException('Can not use a '.__CLASS__.' in this context.');
+      $class = static::class;
+      if (CLI) throw new IllegalStateException('Can not use '.$class.' in this context.');
 
       $cache = Cache::me();
 
       // cache hit?
-      $controller = $cache->get(__CLASS__);
+      $controller = $cache->get($class);
       if (!$controller) {
          // TODO: fix wrong lock usage (see TODO file)
          // synchronize parsing of the struts-config.xml
          // $lock = new FileLock($configFile);
-         // $controller = $cache->get(__CLASS__);                    // re-check after the lock is aquired
+         // $controller = $cache->get($class);                       // re-check after the lock is aquired
 
             if (!$controller) {
                // create new controller instance...
-               $controller = Singleton::getInstance(__CLASS__);
+               $controller = Singleton::getInstance($class);
 
                $configFile = str_replace('\\', '/', MiniStruts::getConfigDir().'/struts-config.xml');
                $dependency = FileDependency::create($configFile);
@@ -75,7 +76,7 @@ class StrutsController extends Singleton {
                   $dependency->setMinValidity(1 * MINUTE);
 
                // ...and cache it with a FileDependency
-               $cache->set(__CLASS__, $controller, Cache::EXPIRES_NEVER, $dependency);
+               $cache->set($class, $controller, Cache::EXPIRES_NEVER, $dependency);
             }
 
          //$lock->release();

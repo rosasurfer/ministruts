@@ -55,8 +55,8 @@ class Request extends Singleton {
     */
    public static function me() {
       if (isSet($_SERVER['REQUEST_METHOD']))
-         return Singleton::getInstance(__CLASS__);
-      throw new RuntimeException('Cannot create a '.__CLASS__.' instance in a non-web context.');
+         return Singleton::getInstance(static::class);
+      throw new RuntimeException('Cannot create a '.static::class.' instance in a non-web context.');
    }
 
 
@@ -835,7 +835,7 @@ class Request extends Singleton {
     * Reject serialization of Request instances.
     */
    final public function __sleep() {
-      throw new IllegalStateException('You must not serialize a '.__CLASS__);
+      throw new IllegalStateException('You must not serialize a '.get_class($this));
    }
 
 
@@ -843,7 +843,7 @@ class Request extends Singleton {
     * Reject de-serialization of Request instances.
     */
    final public function __wakeUp() {
-      throw new IllegalStateException('You must not deserialize a '.__CLASS__);
+      throw new IllegalStateException('You must not deserialize a '.get_class($this));
    }
 
 

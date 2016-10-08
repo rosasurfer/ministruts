@@ -167,7 +167,7 @@ class Tile extends Object {
    public function freeze() {
       if (!$this->configured) {
          if (!$this->name) throw new IllegalStateException('No name configured for this '.$this);
-         if (!$this->path) throw new IllegalStateException('No path configured for '.__CLASS__.' "'.$this->name.'"');
+         if (!$this->path) throw new IllegalStateException('No path configured for '.get_class($this).' "'.$this->name.'"');
 
          foreach ($this->properties as $property) {
             if ($property instanceof self)

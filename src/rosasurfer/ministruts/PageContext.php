@@ -40,7 +40,7 @@ class PageContext extends Singleton {
     * @return Singleton
     */
    public static function me() {
-      return Singleton::getInstance(__CLASS__);
+      return Singleton::getInstance(static::class);
    }
 
 

@@ -322,7 +322,7 @@ class Config extends Object implements ConfigInterface {
          $isActive = true;                                              // lock the method
 
          $cache  = Cache::me();
-         $config = $cache->get(__CLASS__);                              // is there a cached instance?
+         $config = $cache->get(static::class);                          // is there a cached instance?
 
          if (!$config) {
             // default config does not yet exist, create a new instance
@@ -356,7 +356,7 @@ class Config extends Object implements ConfigInterface {
             $dependency = FileDependency::create(array_keys($config->files));
             if (!WINDOWS && !CLI && !LOCALHOST)                         // distinction dev/production (sense???)
                $dependency->setMinValidity(60 * SECONDS);
-            $cache->set(__CLASS__, $config, Cache::EXPIRES_NEVER, $dependency);
+            $cache->set(static::class, $config, Cache::EXPIRES_NEVER, $dependency);
 
          }
 

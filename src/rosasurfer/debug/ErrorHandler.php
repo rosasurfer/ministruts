@@ -95,8 +95,8 @@ class ErrorHandler extends StaticClass {
       elseif ($mode === self::THROW_EXCEPTIONS) self::$errorMode = self::THROW_EXCEPTIONS;
       else                                  return;
 
-      set_error_handler(self::$errorHandler=__CLASS__.'::handleError', E_ALL);   // E_ALL because error_reporting()
-   }                                                                             // may change at runtime
+      set_error_handler(self::$errorHandler=static::class.'::handleError', E_ALL);  // E_ALL because error_reporting()
+   }                                                                                // may change at runtime
 
 
    /**
@@ -220,7 +220,7 @@ class ErrorHandler extends StaticClass {
       $context = [];
 
       try {
-         $context['class'    ] = __CLASS__;              // atm not required but somewhen somewhere somebody might ask for it
+         $context['class'    ] = static::class;          // atm not required but somewhen somewhere somebody might ask for it
          $context['file'     ] = $exception->getFile();  // if the location is not preset the Logger will correctly
          $context['line'     ] = $exception->getLine();  // resolve this method as the originating location
          $context['unhandled'] = true;
