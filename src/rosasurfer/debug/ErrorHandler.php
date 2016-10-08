@@ -27,6 +27,9 @@ use const rosasurfer\L_ERROR;
 use const rosasurfer\L_FATAL;
 use const rosasurfer\L_NOTICE;
 use const rosasurfer\L_WARN;
+use rosasurfer\exception\php\PHPDeprecation;
+use rosasurfer\exception\php\PHPUserNotice;
+use rosasurfer\exception\php\PHPUserWarning;
 
 
 /**
@@ -161,6 +164,11 @@ class ErrorHandler extends StaticClass {
 
       // (3) Wrap everything else in the matching PHPError exception.
       switch ($level) {
+         case E_DEPRECATED       : $exception = new PHPDeprecation     ($message, $code=null, $severity=$level, $file, $line); break;
+         case E_USER_DEPRECATED  : $exception = new PHPUserDeprecation ($message, $code=null, $severity=$level, $file, $line); break;
+         case E_USER_NOTICE      : $exception = new PHPUserNotice      ($message, $code=null, $severity=$level, $file, $line); break;
+         case E_USER_WARNING     : $exception = new PHPUserWarning     ($message, $code=null, $severity=$level, $file, $line); break;
+
          case E_PARSE            : $exception = new PHPParseError      ($message, $code=null, $severity=$level, $file, $line); break;
          case E_COMPILE_WARNING  : $exception = new PHPCompileWarning  ($message, $code=null, $severity=$level, $file, $line); break;
          case E_COMPILE_ERROR    : $exception = new PHPCompileError    ($message, $code=null, $severity=$level, $file, $line); break;
