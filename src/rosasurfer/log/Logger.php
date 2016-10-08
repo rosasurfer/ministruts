@@ -304,8 +304,52 @@ class Logger extends StaticClass {
     * @param  mixed[] $context  - optional logging context with additional data
     */
    public static function log($loggable, $level, array $context=[]) {
+      // Prevent user generated log messages from getting lost if logging fails.
       try {
-         self::log_intern($loggable, $level, $context);
+
+         // block recursive calls
+         // @TODO: don't block recursive calls; instead block duplicate log messages
+         static $isActive = false;
+         if ($isActive) throw new RuntimeException('Blocking recursive call to '.__METHOD__.'()');
+         $isActive = true;                                           // lock the method
+
+
+         // (1) validate parameters
+         if (!is_string($loggable)) {
+            if (!is_object($loggable))                   throw new IllegalTypeException('Illegal type of parameter $loggable: '.getType($loggable));
+            if (!method_exists($loggable, '__toString')) throw new IllegalTypeException('Illegal type of parameter $loggable: '.get_class($loggable).'::__toString() not found');
+            if (!$loggable instanceof \Exception)
+               $loggable = (string) $loggable;
+         }
+         if (!is_int($level))                            throw new IllegalTypeException('Illegal type of parameter $level: '.getType($level));
+         if (!isSet(self::$logLevels[$level]))           throw new InvalidArgumentException('Invalid argument $level: '.$level.' (not a loglevel)');
+
+
+         // (2) filter messages not covered by the current loglevel
+         $filtered = false;
+         if ($level == L_FATAL) {
+            // Not necessary for the highest level. This will cover all calls from the global exception handler
+            // which always logs with the highest level (L_FATAL).
+         }
+         else {
+            // resolve the calling class and check its loglevel
+            !isSet($context['class']) && self::resolveLogCaller($loggable, $level, $context);
+            if ($level < self::getLogLevel($context['class']))
+               $filtered = true;                                     // message is not covered
+         }
+
+
+         // (3) invoke all active log handlers
+         if (!$filtered) {
+            self::$printHandler    && self::invokePrintHandler   ($loggable, $level, $context);
+            self::$mailHandler     && self::invokeMailHandler    ($loggable, $level, $context);
+            self::$smsHandler      && self::invokeSmsHandler     ($loggable, $level, $context);
+            self::$errorLogHandler && self::invokeErrorLogHandler($loggable, $level, $context);
+         }
+
+         // unlock the method
+         $isActive = false;
+
       }
       catch (\Exception $ex) {
          // Prevent user generated log messages from getting lost if logging fails. In the context of this method
@@ -319,58 +363,6 @@ class Logger extends StaticClass {
          }
          throw $ex;
       }
-   }
-
-
-   /**
-    * Log a message.
-    *
-    * @param  mixed    $loggable - a message or an object implementing <tt>__toString()</tt>
-    * @param  int      $level    - loglevel
-    * @param  mixed[] &$context  - reference to the log context with additional data
-    */
-   private static function log_intern($loggable, $level, array &$context) {
-      // block recursive calls
-      static $isActive = false;
-      if ($isActive) throw new RuntimeException('Blocking recursive call to '.__METHOD__.'()');
-      $isActive = true;                                              // lock the method
-
-
-      // (1) validate parameters
-      if (!is_string($loggable)) {
-         if (!is_object($loggable))                   throw new IllegalTypeException('Illegal type of parameter $loggable: '.getType($loggable));
-         if (!method_exists($loggable, '__toString')) throw new IllegalTypeException('Illegal type of parameter $loggable: '.get_class($loggable).'::__toString() not found');
-         if (!$loggable instanceof \Exception)
-            $loggable = (string) $loggable;
-      }
-      if (!is_int($level))                            throw new IllegalTypeException('Illegal type of parameter $level: '.getType($level));
-      if (!isSet(self::$logLevels[$level]))           throw new InvalidArgumentException('Invalid argument $level: '.$level.' (not a loglevel)');
-
-
-      // (2) filter messages not covered by the current loglevel
-      $filtered = false;
-      if ($level == L_FATAL) {
-         // Not necessary for the highest level. This will cover all calls from the global exception handler
-         // which always logs with the highest level (L_FATAL).
-      }
-      else {
-         // resolve the calling class and check its loglevel
-         !isSet($context['class']) && self::resolveLogCaller($loggable, $level, $context);
-         if ($level < self::getLogLevel($context['class']))
-            $filtered = true;                                        // message is not covered
-      }
-
-
-      // (3) invoke all active log handlers
-      if (!$filtered) {
-         self::$printHandler    && self::invokePrintHandler   ($loggable, $level, $context);
-         self::$mailHandler     && self::invokeMailHandler    ($loggable, $level, $context);
-         self::$smsHandler      && self::invokeSmsHandler     ($loggable, $level, $context);
-         self::$errorLogHandler && self::invokeErrorLogHandler($loggable, $level, $context);
-      }
-
-      // unlock the method
-      $isActive = false;
    }
 
 
