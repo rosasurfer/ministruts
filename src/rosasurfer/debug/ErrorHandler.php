@@ -94,19 +94,17 @@ class ErrorHandler extends StaticClass {
    public static function setupErrorHandling($mode) {
       if     ($mode === self::LOG_ERRORS      ) self::$errorMode = self::LOG_ERRORS;
       elseif ($mode === self::THROW_EXCEPTIONS) self::$errorMode = self::THROW_EXCEPTIONS;
-      else                                  return;
+      else                                      return;
 
-      set_error_handler(self::$errorHandler=static::class.'::handleError', E_ALL);  // E_ALL because error_reporting()
-   }                                                                                // may change at runtime
+      set_error_handler(self::$errorHandler=__CLASS__.'::handleError', E_ALL);   // E_ALL because error_reporting()
+   }                                                                             // may change at runtime
 
 
    /**
     * Setup global exception handling.
     */
    public static function setupExceptionHandling() {
-      set_exception_handler(self::$exceptionHandler=function(\Exception $ex) {
-         self::handleException($ex);
-      });
+      set_exception_handler(self::$exceptionHandler=__CLASS__.'::handleException');
 
       /**
        * Detect entering of the script's shutdown phase to be capable of handling destructor exceptions during shutdown
@@ -143,7 +141,6 @@ class ErrorHandler extends StaticClass {
     */
    public static function handleError($level, $message, $file, $line, array $context) {
       // echoPre(__METHOD__.'()  '.DebugHelper::errorLevelToStr($level).': $message='.$message.', $file='.$file.', $line='.$line);
-      // TODO: detect and handle recursive calls
 
       // (1) Ignore suppressed errors and errors not covered by the current reporting level.
       $reportingLevel = error_reporting();
@@ -200,7 +197,7 @@ class ErrorHandler extends StaticClass {
        */
       $function = DebugHelper::getFQFunctionName($exception->getBetterTrace()[0]);
       if ($function=='require' || $function=='require_once') {
-         self::$exceptionHandler->__invoke($exception);           // that's Closure::__invoke()
+         call_user_func(self::$exceptionHandler, $exception);
          return true;                                             // PHP will terminate the script anyway
       }
 
@@ -221,7 +218,7 @@ class ErrorHandler extends StaticClass {
       $context = [];
 
       try {
-         $context['class'    ] = static::class;          // atm not required but somewhen somewhere somebody might ask for it
+         $context['class'    ] = __CLASS__;              // atm not required but somewhen somewhere somebody might ask for it
          $context['file'     ] = $exception->getFile();  // if the location is not preset the Logger will correctly
          $context['line'     ] = $exception->getLine();  // resolve this method as the originating location
          $context['unhandled'] = true;
