@@ -203,7 +203,7 @@ class Helper extends StaticClass {
          // recursively add stacktraces of all nested exceptions
          $message = self::getBetterMessage($cause);
          $result .= NL.$indent.'caused by'.NL.$indent.$message.' in'.NL.NL;
-         $result .= self::{__FUNCTION__}($cause, $indent);                 // recursion
+         $result .= self::getBetterTraceAsString($cause, $indent);               // recursion
       }
       return $result;
    }
