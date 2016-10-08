@@ -135,12 +135,12 @@ class Logger extends StaticClass {
 
    /** @var string[] - loglevel descriptions for message formatter */
    private static $logLevels = [
-      L_DEBUG  => '[Debug]' ,
-      L_INFO   => '[Info]'  ,
-      L_NOTICE => '[Notice]',
-      L_WARN   => '[Warn]'  ,
-      L_ERROR  => '[Error]' ,
-      L_FATAL  => '[Fatal]' ,
+      L_DEBUG  => 'Debug' ,
+      L_INFO   => 'Info'  ,
+      L_NOTICE => 'Notice',
+      L_WARN   => 'Warn'  ,
+      L_ERROR  => 'Error' ,
+      L_FATAL  => 'Fatal' ,
    ];
 
 
@@ -358,7 +358,7 @@ class Logger extends StaticClass {
          if ($level!=L_FATAL || !$loggable instanceof \Exception) {
             $file = isSet($context['file']) ? $context['file'] : '';
             $line = isSet($context['line']) ? $context['line'] : '';
-            $msg  = 'PHP '.strToUpper(self::$logLevels[$level]).' '.$loggable.NL.' in '.$file.' on line '.$line;
+            $msg  = 'PHP ['.strToUpper(self::$logLevels[$level]).'] '.$loggable.NL.' in '.$file.' on line '.$line;
             error_log(trim($msg), ERROR_LOG_DEFAULT);
          }
          throw $ex;
@@ -578,13 +578,13 @@ class Logger extends StaticClass {
       if (is_string($loggable)) {
          // simple message
          $msg  = $loggable;
-         $text = strToUpper(self::$logLevels[$level]).' '.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
+         $text = '['.strToUpper(self::$logLevels[$level]).'] '.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
       }
       else {
          // exception
          $type = isSet($context['unhandled']) ? 'Unhandled ' : '';
          $msg  = $type.trim(DebugHelper::getBetterMessage($loggable));
-         $text = strToUpper(self::$logLevels[$level]).' '.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
+         $text = '['.strToUpper(self::$logLevels[$level]).'] '.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
 
          // the stack trace will go into "cliExtra"
          $traceStr  = $indent.'Stacktrace:'.NL.' -----------'.NL;
@@ -647,7 +647,7 @@ class Logger extends StaticClass {
       $type = ($loggable instanceof \Exception && isSet($context['unhandled'])) ? 'Unhandled Exception ':'';
 
       // store subject and message
-      $context['mailSubject'] = 'PHP '.self::$logLevels[$level].' '.$type.'at '.$location;
+      $context['mailSubject'] = 'PHP ['.self::$logLevels[$level].'] '.$type.'at '.$location;
       $context['mailMessage'] = $msg;
    }
 
@@ -674,13 +674,13 @@ class Logger extends StaticClass {
       if (is_string($loggable)) {
          // simple message
          $msg   = $loggable;
-         $html .= '<b>'.strToUpper(self::$logLevels[$level]).'</b> '.nl2br(htmlSpecialChars($msg, ENT_QUOTES|ENT_SUBSTITUTE))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
+         $html .= '<b>['.strToUpper(self::$logLevels[$level]).']</b> '.nl2br(htmlSpecialChars($msg, ENT_QUOTES|ENT_SUBSTITUTE))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
       }
       else {
          // exception
          $type      = isSet($context['unhandled']) ? 'Unhandled ' : '';
          $msg       = $type.DebugHelper::getBetterMessage($loggable);
-         $html     .= '<b>'.strToUpper(self::$logLevels[$level]).'</b> '.nl2br(htmlSpecialChars($msg, ENT_QUOTES|ENT_SUBSTITUTE))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
+         $html     .= '<b>['.strToUpper(self::$logLevels[$level]).']</b> '.nl2br(htmlSpecialChars($msg, ENT_QUOTES|ENT_SUBSTITUTE))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
          $traceStr  = $indent.'Stacktrace:'.NL.' -----------'.NL;
          $traceStr .= DebugHelper::getBetterTraceAsString($loggable, $indent);
          $html     .= '<br>'.printPretty($traceStr, true).'<br>';
