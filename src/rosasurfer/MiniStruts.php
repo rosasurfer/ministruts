@@ -115,8 +115,8 @@ class MiniStruts extends StaticClass {
     * @return string
     */
    public static function getConfigDir() {
-      if (self::$configDir === null) {
-         self::$configDir = APPLICATION_ROOT.'/app/config';
+      if (!self::$configDir) {
+         self::$configDir = realPath(APPLICATION_ROOT.'/app/config');
       }
       return self::$configDir;
    }
@@ -130,7 +130,7 @@ class MiniStruts extends StaticClass {
    private static function setConfigDir($value) {
       if (is_string($value)) {
          if (is_dir($value)) {
-            self::$configDir = $value;
+            self::$configDir = realPath($value);
          }
       }
    }
