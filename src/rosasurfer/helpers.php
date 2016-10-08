@@ -116,7 +116,7 @@ function echoPre($var) {
  * @see    printPretty()
  */
 function pp($var, $return=false) {
-   return printPretty(...func_get_args());
+   return printPretty($var, $return);
 }
 
 
@@ -639,7 +639,7 @@ function strIsDigits($value) {
  * @see    getType()
  */
 function typeOf($var) {
-   return getType(...func_get_args());
+   return getType($var);
 }
 
 
@@ -937,7 +937,7 @@ function pluralize($count, $singular='', $plural='s') {
  * @return Url
  */
 function url($uri) {
-   return new Url(...func_get_args());
+   return new Url($uri);
 }
 
 
@@ -952,5 +952,5 @@ function url($uri) {
  * @see    rosasurfer\ministruts\url\Url
  */
 function vUrl($uri) {
-   return new VersionedUrl(...func_get_args());
+   return new VersionedUrl($uri);
 }
