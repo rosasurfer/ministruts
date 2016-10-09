@@ -9,13 +9,17 @@ use rosasurfer\exception\php\PHPCompileError;
 use rosasurfer\exception\php\PHPCompileWarning;
 use rosasurfer\exception\php\PHPCoreError;
 use rosasurfer\exception\php\PHPCoreWarning;
+use rosasurfer\exception\php\PHPDeprecation;
 use rosasurfer\exception\php\PHPError;
 use rosasurfer\exception\php\PHPNotice;
 use rosasurfer\exception\php\PHPParseError;
 use rosasurfer\exception\php\PHPRecoverableError;
 use rosasurfer\exception\php\PHPStrictError;
 use rosasurfer\exception\php\PHPUnknownError;
+use rosasurfer\exception\php\PHPUserDeprecation;
 use rosasurfer\exception\php\PHPUserError;
+use rosasurfer\exception\php\PHPUserNotice;
+use rosasurfer\exception\php\PHPUserWarning;
 use rosasurfer\exception\php\PHPWarning;
 
 use rosasurfer\log\Logger;
