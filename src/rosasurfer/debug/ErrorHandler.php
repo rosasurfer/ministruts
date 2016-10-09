@@ -3,8 +3,6 @@ namespace rosasurfer\debug;
 
 use rosasurfer\core\StaticClass;
 
-use rosasurfer\debug\Helper as DebugHelper;
-
 use rosasurfer\exception\php\PHPCompileError;
 use rosasurfer\exception\php\PHPCompileWarning;
 use rosasurfer\exception\php\PHPCoreError;

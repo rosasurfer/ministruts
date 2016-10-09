@@ -5,8 +5,8 @@ use rosasurfer\config\Config;
 
 use rosasurfer\core\StaticClass;
 
+use rosasurfer\debug\DebugHelper;
 use rosasurfer\debug\ErrorHandler;
-use rosasurfer\debug\Helper as DebugHelper;
 
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;

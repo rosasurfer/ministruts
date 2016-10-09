@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\exception;
 
-use rosasurfer\debug\Helper as DebugHelper;
+use rosasurfer\debug\DebugHelper;
 
 
 /**

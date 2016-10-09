@@ -1,8 +1,8 @@
 <?php
 namespace rosasurfer\exception\php;
 
+use rosasurfer\debug\DebugHelper;
 use rosasurfer\debug\ErrorHandler;
-use rosasurfer\debug\Helper as DebugHelper;
 
 use rosasurfer\exception\RosasurferExceptionInterface;
 use rosasurfer\exception\RosasurferExceptionTrait;
