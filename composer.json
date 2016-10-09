@@ -9,7 +9,8 @@
         "email": "ministruts@rosasurfer.com" 
     }],
     "config": {
-        "vendor-dir": "etc/vendor"
+        "vendor-dir":         "etc/vendor",
+        "optimize-autoloader": true
     },
     "require": {
         "php": ">=5.6"
