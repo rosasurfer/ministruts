@@ -29,9 +29,6 @@ use const rosasurfer\L_ERROR;
 use const rosasurfer\L_FATAL;
 use const rosasurfer\L_NOTICE;
 use const rosasurfer\L_WARN;
-use rosasurfer\exception\php\PHPDeprecation;
-use rosasurfer\exception\php\PHPUserNotice;
-use rosasurfer\exception\php\PHPUserWarning;
 
 
 /**
