@@ -33,7 +33,7 @@ abstract class DB extends Object {
    protected /*string*/   $username;
    protected /*string*/   $password;
    protected /*string*/   $database;
-   protected /*string[]*/ $options;
+   protected /*string[]*/ $options = [];
 
 
    /**
@@ -198,8 +198,8 @@ abstract class DB extends Object {
     * @return DB
     */
    protected function setOptions($options) {
-      if (is_null($options))
-         $options = array();
+      if ($options === null)
+         $options = [];
       $this->options = $options;
       return $this;
    }

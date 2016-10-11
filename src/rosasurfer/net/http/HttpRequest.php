@@ -95,10 +95,10 @@ class HttpRequest extends Object {
     * @return HttpRequest
     */
    public function setHeader($name, $value) {
-      if (!is_string($name))                      throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
-      if (!strLen($name))                         throw new InvalidArgumentException('Invalid argument $name: '.$name);
+      if (!is_string($name))                   throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
+      if (!strLen($name))                      throw new InvalidArgumentException('Invalid argument $name: '.$name);
 
-      if (!is_null($value) && !is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
+      if ($value!==null && !is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
       if (!strLen($value))
          $value = null;
 
@@ -112,7 +112,7 @@ class HttpRequest extends Object {
       }
 
       // ggf. neuen Header setzen
-      if (!is_null($value))
+      if ($value !== null)
          $this->headers[$name] = $value;
 
       return $this;
@@ -161,8 +161,8 @@ class HttpRequest extends Object {
     *
     * @return array - Name-Wert-Paare
     */
-   public function getHeaders($names=null) {
-      if     (is_null($names))   $names = array();
+   public function getHeaders($names = null) {
+      if     ($names === null)   $names = array();
       elseif (is_string($names)) $names = array($names);
       elseif (is_array($names)) {
          foreach ($names as $name) {

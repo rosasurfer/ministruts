@@ -507,7 +507,7 @@ class Logger extends StaticClass {
                   catch (\Exception $ex) {/*eat it*/}
                   continue;
                }
-               if (is_null($content)) {
+               if ($content === null) {
                   try {
                      Logger::log('Empty reply from server, url: '.$request->getUrl(), L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
                   }

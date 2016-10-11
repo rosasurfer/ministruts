@@ -202,9 +202,9 @@ function isLittleEndian() {
  * @return bool
  */
 function strCompare($stringA, $stringB, $ignoreCase=false) {
-   if (!is_null($stringA) && !is_string($stringB)) throw new IllegalTypeException('Illegal type of parameter $stringA: '.getType($stringA));
-   if (!is_null($stringB) && !is_string($stringB)) throw new IllegalTypeException('Illegal type of parameter $stringB: '.getType($stringB));
-   if (!is_bool($ignoreCase))                      throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
+   if ($stringA!==null && !is_string($stringA)) throw new IllegalTypeException('Illegal type of parameter $stringA: '.getType($stringA));
+   if ($stringB!==null && !is_string($stringB)) throw new IllegalTypeException('Illegal type of parameter $stringB: '.getType($stringB));
+   if (!is_bool($ignoreCase))                   throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
 
    if ($ignoreCase)
       return strCompareI($stringA, $stringB);
@@ -221,10 +221,10 @@ function strCompare($stringA, $stringB, $ignoreCase=false) {
  * @return bool
  */
 function strCompareI($stringA, $stringB) {
-   if (!is_null($stringA) && !is_string($stringA)) throw new IllegalTypeException('Illegal type of parameter $stringA: '.getType($stringA));
-   if (!is_null($stringB) && !is_string($stringB)) throw new IllegalTypeException('Illegal type of parameter $stringB: '.getType($stringB));
+   if ($stringA!==null && !is_string($stringA)) throw new IllegalTypeException('Illegal type of parameter $stringA: '.getType($stringA));
+   if ($stringB!==null && !is_string($stringB)) throw new IllegalTypeException('Illegal type of parameter $stringB: '.getType($stringB));
 
-   if (is_null($stringA) || is_null($stringB))
+   if ($stringA===null || $stringB===null)
       return ($stringA === $stringB);
    return (strToLower($stringA) === strToLower($stringB));
 }
@@ -240,9 +240,9 @@ function strCompareI($stringA, $stringB) {
  * @return bool
  */
 function strContains($haystack, $needle, $ignoreCase=false) {
-   if (!is_null($haystack) && !is_string($haystack)) throw new IllegalTypeException('Illegal type of parameter $haystack: '.getType($haystack));
-   if (!is_string($needle))                          throw new IllegalTypeException('Illegal type of parameter $needle: '.getType($needle));
-   if (!is_bool($ignoreCase))                        throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
+   if ($haystack!==null && !is_string($haystack)) throw new IllegalTypeException('Illegal type of parameter $haystack: '.getType($haystack));
+   if (!is_string($needle))                       throw new IllegalTypeException('Illegal type of parameter $needle: '.getType($needle));
+   if (!is_bool($ignoreCase))                     throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
 
    $haystackLen = strLen($haystack);
    $needleLen   = strLen($needle);
@@ -288,9 +288,9 @@ function strStartsWith($string, $prefix, $ignoreCase=false) {
       return false;
    }
 
-   if (!is_null($string) && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
-   if (!is_string($prefix))                      throw new IllegalTypeException('Illegal type of parameter $prefix: '.$prefix.' ('.getType($prefix).')');
-   if (!is_bool($ignoreCase))                    throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
+   if ($string!==null && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+   if (!is_string($prefix))                   throw new IllegalTypeException('Illegal type of parameter $prefix: '.$prefix.' ('.getType($prefix).')');
+   if (!is_bool($ignoreCase))                 throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
 
    $stringLen = strLen($string);
    $prefixLen = strLen($prefix);
@@ -335,9 +335,9 @@ function strEndsWith($string, $suffix, $ignoreCase=false) {
          if ($self($string, $s, $ignoreCase)) return true;
       return false;
    }
-   if (!is_null($string) && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
-   if (!is_string($suffix))                      throw new IllegalTypeException('Illegal type of parameter $suffix: '.$suffix.' ('.getType($suffix).')');
-   if (!is_bool($ignoreCase))                    throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
+   if ($string!==null && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+   if (!is_string($suffix))                   throw new IllegalTypeException('Illegal type of parameter $suffix: '.$suffix.' ('.getType($suffix).')');
+   if (!is_bool($ignoreCase))                 throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
 
    $stringLen = strLen($string);
    $suffixLen = strLen($suffix);
@@ -573,7 +573,7 @@ function strRightFrom($string, $limiter, $count=1, $includeLimiter=false, $onNot
  * @return bool
  */
 function strIsQuoted($value) {
-   if (is_null($value) || is_int($value))
+   if ($value===null || is_int($value))
       return false;
    if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
 
@@ -589,7 +589,7 @@ function strIsQuoted($value) {
  * @return bool
  */
 function strIsSingleQuoted($value) {
-   if (is_null($value) || is_int($value))
+   if ($value===null || is_int($value))
       return false;
    if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
 
@@ -605,7 +605,7 @@ function strIsSingleQuoted($value) {
  * @return bool
  */
 function strIsDoubleQuoted($value) {
-   if (is_null($value) || is_int($value))
+   if ($value===null || is_int($value))
       return false;
    if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
 
@@ -621,7 +621,7 @@ function strIsDoubleQuoted($value) {
  * @return bool
  */
 function strIsDigits($value) {
-   if (is_null($value))    return false;
+   if ($value === null)    return false;
    if (is_int($value))     return ($value >= 0);
    if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
 
@@ -652,7 +652,7 @@ function typeOf($var) {
  */
 function mkDirWritable($path, $mode=0770) {
    if (!is_string($path))                            throw new IllegalTypeException('Illegal type of parameter $path: '.getType($path));
-   if (!is_null($mode) && !is_int($mode))            throw new IllegalTypeException('Illegal type of parameter $mode: '.getType($mode));
+   if ($mode!==null && !is_int($mode))               throw new IllegalTypeException('Illegal type of parameter $mode: '.getType($mode));
 
    if (is_file($path))                               throw new IOException('Cannot write to directory "'.$path.'" (is a file)');
    if (!is_dir($path) && !mkDir($path, $mode, true)) throw new IOException('Cannot create directory "'.$path.'"');

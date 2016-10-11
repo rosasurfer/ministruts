@@ -1,6 +1,6 @@
 <?php
 !defined('CLI'      ) && define('CLI',       !isSet($_SERVER['REQUEST_METHOD']));               // whether or not we run on command line interface
-!defined('LOCALHOST') && define('LOCALHOST', !CLI && @$_SERVER['REMOTE_ADDR']=='127.0.0.1');    // whether or not we run on localhost
+!defined('LOCALHOST') && define('LOCALHOST', !CLI && $_SERVER['REMOTE_ADDR']=='127.0.0.1');     // whether or not we run on localhost
 !defined('WINDOWS'  ) && define('WINDOWS',   (strToUpper(subStr(PHP_OS, 0, 3))=='WIN'));        // whether or not we run on Windows
 
 
@@ -209,14 +209,6 @@ else {
 if (!$isWarning)
    echo 'Configuration OK';
 echo CLI ? "\n":'<p>';
-
-
-/*
-zlib.output_compression = Off
-mysql.trace_mode = Off
-assert.active = On
-echoPre(get_loaded_extensions());
-*/
 
 
 // phpInfo() nur aufrufen, wenn das Script nicht in der Konsole (also im Webserver) läuft

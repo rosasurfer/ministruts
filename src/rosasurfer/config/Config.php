@@ -172,7 +172,7 @@ class Config extends Object implements ConfigInterface {
 
       $value = $this->getProperty($key);
 
-      if (is_null($value)) {
+      if ($value === null) {
          if (func_num_args() == 1) throw new RuntimeException('No configuration found for key "'.$key.'"');
          return $onNotFound;
       }

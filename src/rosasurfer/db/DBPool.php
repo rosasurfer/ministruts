@@ -57,7 +57,7 @@ final class DBPool extends Singleton {
    public static function getDB($alias = null) {
       $me = self::me();
 
-      if (is_null($alias)) {                                            // single db project
+      if ($alias === null) {                                            // single db project
          if (!$me->default) throw new IllegalStateException('Invalid default database configuration: null');
          $connector = $me->default;
       }

@@ -102,13 +102,13 @@ class CurlHttpClient extends HttpClient {
     *
     * @param  mixed[] $options - Array mit zusätzlichen CURL-Optionen (default: keine)
     */
-   public function __construct(array $options=null) {
+   public function __construct(array $options = null) {
       $loglevel        = Logger::getLogLevel(__CLASS__);
       self::$logDebug  = ($loglevel <= L_DEBUG );
       self::$logInfo   = ($loglevel <= L_INFO  );
       self::$logNotice = ($loglevel <= L_NOTICE);
 
-      if (!is_null($options))
+      if ($options)
          $this->options = $options;
    }
 
