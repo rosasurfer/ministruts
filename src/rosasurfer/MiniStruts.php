@@ -1,6 +1,7 @@
 <?php
 namespace rosasurfer;
 
+use rosasurfer\config\Config;
 use rosasurfer\core\StaticClass;
 use rosasurfer\debug\ErrorHandler;
 
@@ -72,12 +73,33 @@ class MiniStruts extends StaticClass {
       }
 
 
-      // (1) check/adjust application requirements
+      // (1) check application settings
       !defined('\APPLICATION_ROOT') && exit(1|echoPre('application error')|error_log('Error: The global constant APPLICATION_ROOT must be defined.'));
       !defined('\APPLICATION_ID'  ) && define('APPLICATION_ID', md5(\APPLICATION_ROOT));
 
 
-      // (2) check/adjust PHP requirements
+      // (2) execute magic tasks if on localhost
+      if (!CLI && (LOCALHOST || $_SERVER['REMOTE_ADDR']==$_SERVER['SERVER_ADDR'])) {
+         // phpinfo()
+         if (isSet($_REQUEST['__phpinfo__'])) {
+            include(MINISTRUTS_ROOT.'/src/rosasurfer/debug/phpinfo.php');
+            exit(0);
+         }
+         // apc-console
+         if (isSet($_REQUEST['__apc__'])) {
+            //include(MINISTRUTS_ROOT.'/src/rosasurfer/debug/apc.php');    // TODO: not yet implemented
+            exit(0);
+         }
+         // configuration
+         if (isSet($_REQUEST['__config__'])) {
+            $config = Config::getDefault();
+            //$config && $config->show();                                  // TODO: not yet implemented
+            exit(0);
+         }
+      }
+
+
+      // (3) check/adjust PHP settings
       !ini_get('short_open_tag')       && exit(1|echoPre('application error')|error_log('Error: The PHP configuration value "short_open_tag" must be enabled.'));
       ini_get('request_order') != 'GP' && exit(1|echoPre('application error')|error_log('Error: The PHP configuration value "request_order" must be "GP".'));
 
@@ -99,13 +121,6 @@ class MiniStruts extends StaticClass {
       ini_set('session.cookie_httponly' ,  1                     );
       ini_set('session.referer_check'   , ''                     );
       ini_set('zend.detect_unicode'     ,  1                     );     // BOM header recognition
-
-
-      // (3) execute phpinfo() if magic parameter "__phpinfo__" is set (localhost only)
-      if (LOCALHOST && isSet($_REQUEST['__phpinfo__'])) {
-         include(MINISTRUTS_ROOT.'/src/rosasurfer/debug/phpinfo.php');
-         exit(0);
-      }
    }
 
 
