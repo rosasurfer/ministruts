@@ -667,7 +667,7 @@ class Logger extends StaticClass {
 
       // break out of unfortunate HTML tags
       $html   = '</script></img></select></textarea></font></span></div></i></b>';
-      $html  .= '<div align="left" style="clear:both; font:normal normal 12px/normal arial,helvetica,sans-serif">';
+      $html  .= '<div align="left" style="clear:both; z-index:65535; font:normal normal 12px/normal arial,helvetica,sans-serif">';
       $indent = ' ';
 
       // compose message

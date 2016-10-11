@@ -147,7 +147,7 @@ function printPretty($var, $return=false) {
    }
 
    if (!CLI)
-      $str = '<div align="left"><pre style="margin:0; font:normal normal 12px/normal \'Courier New\',courier,serif">'.htmlSpecialChars($str, ENT_QUOTES).'</pre></div>';
+      $str = '<div align="left"><pre style="z-index:65535; margin:0; font:normal normal 12px/normal \'Courier New\',courier,serif">'.htmlSpecialChars($str, ENT_QUOTES).'</pre></div>';
 
    if (!strEndsWith($str, NL))
       $str .= NL;
