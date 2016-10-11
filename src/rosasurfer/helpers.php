@@ -16,9 +16,9 @@ use rosasurfer\util\Validator;
  */
 if (defined(__NAMESPACE__.'\CLI')) return;
 
-define(__NAMESPACE__.'\CLI'      , !isSet($_SERVER['REQUEST_METHOD']));              // whether or not we run on a command line interface
-define(__NAMESPACE__.'\LOCALHOST', !CLI && @$_SERVER['REMOTE_ADDR']=='127.0.0.1');   // whether or not we run on localhost
-define(__NAMESPACE__.'\WINDOWS'  , (strToUpper(subStr(PHP_OS, 0, 3))=='WIN'));       // whether or not we run on Windows
+define(__NAMESPACE__.'\CLI'      , !isSet($_SERVER['REQUEST_METHOD']));             // whether or not we run on a command line interface
+define(__NAMESPACE__.'\LOCALHOST', !CLI && $_SERVER['REMOTE_ADDR']=='127.0.0.1');   // whether or not we run on localhost
+define(__NAMESPACE__.'\WINDOWS'  , (strToUpper(subStr(PHP_OS, 0, 3))=='WIN'));      // whether or not we run on Windows
 
 // custom log level
 const L_DEBUG           =  1;
