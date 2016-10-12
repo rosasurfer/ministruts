@@ -183,10 +183,13 @@ class ErrorHandler extends StaticClass {
             $exception = new PHPUnknownError($message, $code=null, $severity=$level, $file, $line);
       }
 
-      // (4) Handle the exception according to the configuration.
+      // (4) Handle the error according to the error configuration.
       if (self::$errorMode == self::LOG_ERRORS) {
          Logger::log($exception, L_ERROR, $logContext);
          return true;
+      }
+      else {
+         //self::$errorMode == self::THROW_EXCEPTIONS
       }
 
       // (5) Handle cases where throwing an exception is not possible or not allowed.
