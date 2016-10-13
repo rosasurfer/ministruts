@@ -31,7 +31,6 @@ use function rosasurfer\strStartsWithI;
 
 use const rosasurfer\CLI;
 use const rosasurfer\ERROR_LOG_DEFAULT;
-use const rosasurfer\ERROR_LOG_MAIL;
 use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_ERROR;
 use const rosasurfer\L_FATAL;
@@ -434,9 +433,15 @@ class Logger extends StaticClass {
          $message = str_replace("\n", "\r\n", $message);
       $message = str_replace(chr(0), "?", $message);                 // replace NUL bytes which destroy the mail
 
+      if (!$config=Config::getDefault()) throw new RuntimeException('Service locator returned invalid default config: '.getType($config));
+      $sender  = $config->get('mail.from', null);
+      $headers = [];
+      $sender && $headers[]='From: '.$sender;
+
       foreach (self::$mailReceivers as $receiver) {
-         // @TODO: replace with mail() to prevent multiple "Subject" headers
-         error_log($message, ERROR_LOG_MAIL, $receiver, 'Subject: '.$subject);
+         // Windows: mail() fails if "sendmail_from" is not set and "From:" header is missing
+         // Linux:   "From:" header is not reqired but set if provided
+         mail($receiver, $subject, $message, join("\r\n", $headers));
       }
    }
 
