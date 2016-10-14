@@ -4,6 +4,7 @@ namespace rosasurfer;
 use rosasurfer\config\Config;
 use rosasurfer\core\StaticClass;
 use rosasurfer\debug\ErrorHandler;
+use rosasurfer\util\PHP;
 
 
 /**
@@ -82,7 +83,7 @@ class MiniStruts extends StaticClass {
       if (!CLI && (LOCALHOST || $_SERVER['REMOTE_ADDR']==$_SERVER['SERVER_ADDR'])) {
          // phpinfo()
          if (isSet($_REQUEST['__phpinfo__'])) {
-            include(MINISTRUTS_ROOT.'/src/rosasurfer/debug/phpinfo.php');
+            PHP::phpInfo();
             exit(0);
          }
          // apc-console
