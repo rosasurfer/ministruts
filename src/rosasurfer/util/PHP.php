@@ -8,9 +8,9 @@ use const rosasurfer\WINDOWS;
 
 
 /**
- * General system-wide functionality
+ * PHP system-related functionality.
  */
-class System extends StaticClass {
+class PHP extends StaticClass {
 
 
    /**

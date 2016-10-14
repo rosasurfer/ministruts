@@ -118,6 +118,6 @@ return array(
     'rosasurfer\\net\\messenger\\sms\\NexmoMessenger' => $baseDir . '/src/rosasurfer/net/messenger/sms/NexmoMessenger.php',
     'rosasurfer\\util\\Date' => $baseDir . '/src/rosasurfer/util/Date.php',
     'rosasurfer\\util\\Number' => $baseDir . '/src/rosasurfer/util/Number.php',
-    'rosasurfer\\util\\System' => $baseDir . '/src/rosasurfer/util/System.php',
+    'rosasurfer\\util\\PHP' => $baseDir . '/src/rosasurfer/util/PHP.php',
     'rosasurfer\\util\\Validator' => $baseDir . '/src/rosasurfer/util/Validator.php',
 );
