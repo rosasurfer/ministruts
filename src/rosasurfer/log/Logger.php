@@ -20,8 +20,6 @@ use rosasurfer\net\http\CurlHttpClient;
 use rosasurfer\net\http\HttpRequest;
 use rosasurfer\net\http\HttpResponse;
 
-use rosasurfer\util\System;
-
 use function rosasurfer\ksort_r;
 use function rosasurfer\printPretty;
 use function rosasurfer\strContains;
@@ -49,32 +47,32 @@ use const rosasurfer\WINDOWS;
  * passes the message to a chain of handlers. Each handler is invoked depending on the application's runtime environment
  * (CLI vs. web server, local vs. remote access) and the application configuration.
  *
- *  • PrintHandler    - Display the message on the standard device (STDOUT on a terminal, HTTP response for SAPI). The
- *                      handler is invoked if the script runs on CLI or as a result of a local web request. For remote
- *                      web requests it displays the message only if the PHP configuration value "display_errors" is set.
+ *  - PrintHandler:    Display the message on the standard device (STDOUT on a terminal, HTTP response for SAPI). The
+ *                     handler is invoked if the script runs on CLI or as a result of a local web request. For remote
+ *                     web requests it displays the message only if the PHP configuration value "display_errors" is set.
  *
- *  • MailHandler     - Send the message to the configured mail receivers (email addresses). The handler is invoked if
- *                      the application configuration contains one or more mail receivers for log messages.
+ *  - MailHandler:     Send the message to the configured mail receivers (email addresses). The handler is invoked if
+ *                     the application configuration contains one or more mail receivers for log messages.
  *
- *                      Example:
- *                      --------
- *                      log.mail.receiver = address1@domain.tld, address2@another-domain.tld
+ *                     Example:
+ *                     --------
+ *                     log.mail.receiver = address1@domain.tld, address2@another-domain.tld
  *
- *  • SMSHandler      - Send the message to the configured SMS receivers (phone numbers). The handler is invoked if the
- *                      application configuration contains one or more phone numbers for log messages and a valid SMS
- *                      operator configuration (at log time). For text messages an additional loglevel constraint can be
- *                      specified (on top of the default loglevel constraint). At the moment the message providers
- *                      Clickatell and Nexmo are supported.
+ *  - SMSHandler:      Send the message to the configured SMS receivers (phone numbers). The handler is invoked if the
+ *                     application configuration contains one or more phone numbers for log messages and a valid SMS
+ *                     operator configuration (at log time). For text messages an additional loglevel constraint can be
+ *                     specified (on top of the default loglevel constraint). At the moment the message providers
+ *                     Clickatell and Nexmo are supported.
  *
- *                      Example:
- *                      --------
- *                      log.sms.level    = error                           # additional loglevel constraint for SMS
- *                      log.sms.receiver = +3591234567, +441234567         # international number format
+ *                     Example:
+ *                     --------
+ *                     log.sms.level    = error                           # additional loglevel constraint for SMS
+ *                     log.sms.receiver = +3591234567, +441234567         # international number format
  *
- *  • ErrorLogHandler - The last resort log handler. Passes the message to the PHP default error log mechanism as defined
- *                      by the PHP configuration value "error_log". The handler is invoked if the MailHandler was not
- *                      invoked or if a circular or similar fatal error occurred. Typically this handler writes into the
- *                      PHP error log file which again should be monitored by a logwatch script.
+ *  - ErrorLogHandler: The last resort log handler. Passes the message to the PHP default error log mechanism as defined
+ *                     by the PHP configuration value "error_log". The handler is invoked if the MailHandler was not
+ *                     invoked or if a circular or similar fatal error occurred. Typically this handler writes into the
+ *                     PHP error log file which again should be monitored by a logwatch script.
  *
  *
  * Loglevel configuration:
