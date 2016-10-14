@@ -40,7 +40,7 @@ class PHP extends StaticClass {
     *
     * @return string - content of STDOUT
     */
-   public static function shell_exec($cmd) {
+   public static function shellExec($cmd) {
       if (!is_string($cmd)) throw new IllegalTypeException('Illegal type of parameter $cmd: '.getType($cmd));
 
       if (!WINDOWS) return \shell_exec($cmd);
