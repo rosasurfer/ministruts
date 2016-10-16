@@ -69,41 +69,61 @@ class MiniStruts extends StaticClass {
             case 'global-helpers'   : self::loadGlobalHelpers($value); continue;
             case 'handle-errors'    : self::handleErrors     ($value); continue;
             case 'handle-exceptions': self::handleExceptions ($value); continue;
-            case 'replace-composer' : self::replaceComposer  ($value); continue;    // todo
+            case 'replace-composer' : self::replaceComposer  ($value); continue;    // TODO
          }
       }
 
 
-      // (1) check application settings
-      !defined('\APPLICATION_ROOT') && exit(1|echoPre('application error')|error_log('Error: The global constant APPLICATION_ROOT must be defined.'));
+      // (1) check application settings                              // TODO: remove APPLICATION_ROOT dependency
+      !defined('\APPLICATION_ROOT') && exit(1|echoPre('application error (see error log)')|error_log('Error: The global constant APPLICATION_ROOT must be defined.'));
       !defined('\APPLICATION_ID'  ) && define('APPLICATION_ID', md5(\APPLICATION_ROOT));
 
 
-      // (2) execute magic tasks if on localhost
+      // (2) check for and execute magic task if on localhost
+      $executedTasks = $cacheTask = false;
       if (!CLI && (LOCALHOST || $_SERVER['REMOTE_ADDR']==$_SERVER['SERVER_ADDR'])) {
-         // phpinfo()
-         if (isSet($_REQUEST['__phpinfo__'])) {
-            PHP::phpInfo();
-            exit(0);
+         foreach ($_REQUEST as $param => $value) {
+            if ($param == '__phpinfo__') {
+               PHP::info();
+               $executedTasks = true;
+            }
+            else if ($param == '__config__') {
+               //Config::getDefault()->show();                       // TODO: not yet implemented
+               $executedTasks = true;
+               self::updatePhpConfig();
+            }
+            else if ($param == '__cache__') {
+               if (!$executedTasks) {                                // ignore if there are already other tasks
+                  $cacheTask = true;                                 // delayed after PHP's configuration update (if any)
+                  break;
+               }
+            }
          }
-         // apc-console
-         if (isSet($_REQUEST['__apc__'])) {
-            //include(MINISTRUTS_ROOT.'/src/rosasurfer/debug/apc.php');    // TODO: not yet implemented
-            exit(0);
-         }
-         // configuration
-         if (isSet($_REQUEST['__config__'])) {
-            $config = Config::getDefault();
-            //$config && $config->show();                                  // TODO: not yet implemented
-            exit(0);
-         }
+         $executedTasks && exit(0);
       }
 
 
-      // (3) check/adjust PHP settings
-      !ini_get('short_open_tag')       && exit(1|echoPre('application error')|error_log('Error: The PHP configuration value "short_open_tag" must be enabled.'));
-      ini_get('request_order') != 'GP' && exit(1|echoPre('application error')|error_log('Error: The PHP configuration value "request_order" must be "GP".'));
+      // (3) update PHP configuration
+      self::updatePhpConfig();
 
+
+      // (4) execute opcode cache task (if enabled)
+      if ($cacheTask) {
+         //include(MINISTRUTS_ROOT.'/src/rosasurfer/debug/apc.php'); // TODO: not yet implemented
+         exit(0);
+      }
+
+
+      // (5) enforce PHP requirements
+      !ini_get('short_open_tag')       && exit(1|echoPre('application error (see error log)')|error_log('Error: The PHP configuration value "short_open_tag" must be enabled (security).'));
+      ini_get('request_order') != 'GP' && exit(1|echoPre('application error (see error log)')|error_log('Error: The PHP configuration value "request_order" must be "GP".'));
+   }
+
+
+   /**
+    * Update the PHP configuration with user defined settings.
+    */
+   private static function updatePhpConfig() {
       ini_set('arg_separator.output'    , '&amp;'                );
       ini_set('auto_detect_line_endings',  1                     );
       ini_set('default_mimetype'        , 'text/html'            );

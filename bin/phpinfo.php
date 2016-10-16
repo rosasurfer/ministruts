@@ -23,4 +23,4 @@ MiniStruts::init($options);
 
 
 // call phpInfo();
-PHP::phpInfo();
+PHP::info();
