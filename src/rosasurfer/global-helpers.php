@@ -46,6 +46,11 @@ const THURSDAY          = \rosasurfer\THURSDAY;
 const FRIDAY            = \rosasurfer\FRIDAY;
 const SATURDAY          = \rosasurfer\SATURDAY;
 
+// byte sizes
+const KB                = \rosasurfer\KB;
+const MB                = \rosasurfer\MB;
+const GB                = \rosasurfer\GB;
+
 
 /**
  * Dumps a variable to STDOUT or into a string.

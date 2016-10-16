@@ -53,6 +53,11 @@ const THURSDAY          = 4;
 const FRIDAY            = 5;
 const SATURDAY          = 6;
 
+// byte sizes
+const KB                = 1024;
+const MB                = 1024 * KB;
+const GB                = 1024 * MB;
+
 // miscellaneous
 const NL                = "\n";
 !defined('PHP_INT_MIN') && define('PHP_INT_MIN', ~PHP_INT_MAX);      // global (built-in since PHP 7.0)
