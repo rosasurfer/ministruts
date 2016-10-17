@@ -79,86 +79,96 @@ class PHP extends StaticClass {
 
       // (1) core configuration
       // ----------------------
-      /*PHP_INI_PERDIR*/ if (!self::ini_get_bool('short_open_tag'                ))                             $issues[] = 'Error: short_open_tag is not On  [security]';
-      /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('asp_tags'                      ) && PHP_VERSION_ID <  70000)  $issues[] = 'Info:  asp_tags is not Off  [code quality]';
-      /*PHP_INI_ONLY  */ if ( self::ini_get_bool('expose_php'                    ))                             $issues[] = 'Warn:  expose_php is not Off  [security]';
-      /*PHP_INI_ALL   */ if ( self::ini_get_int ('max_execution_time'            ) != 30 && !CLI/*hardcoded*/)  $issues[] = 'Info:  max_execution_time is not 30: '.ini_get('max_execution_time').'  [resources]';
-      /*PHP_INI_ALL   */ if ( self::ini_get_int ('default_socket_timeout'        ) != 60)                       $issues[] = 'Info:  default_socket_timeout is not 60: '.ini_get('default_socket_timeout').'  [resources]';
+      /*PHP_INI_PERDIR*/ if (!self::ini_get_bool('short_open_tag'                ))                               $issues[] = 'Error: short_open_tag is not On  [security]';
+      /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('asp_tags'                      ) && PHP_VERSION_ID <  70000)    $issues[] = 'Info:  asp_tags is not Off  [code quality]';
+      /*PHP_INI_ONLY  */ if ( self::ini_get_bool('expose_php'                    ))                               $issues[] = 'Warn:  expose_php is not Off  [security]';
+      /*PHP_INI_ALL   */ if ( self::ini_get_int ('max_execution_time'            ) != 30 && !CLI/*hardcoded*/)    $issues[] = 'Info:  max_execution_time is not 30: '.ini_get('max_execution_time').'  [resources]';
+      /*PHP_INI_ALL   */ if ( self::ini_get_int ('default_socket_timeout'        ) != 60)                         $issues[] = 'Info:  default_socket_timeout is not 60: '.ini_get('default_socket_timeout').'  [resources]';
       /*PHP_INI_ALL   */ $bytes = self::ini_get_bytes('memory_limit'             );
-         if      ($bytes ==     -1)                                                                             $issues[] = 'Warn:  memory_limit is unlimited  [resources]';
-         else if ($bytes <=      0)                                                                             $issues[] = 'Error: memory_limit is invalid: '.ini_get('memory_limit');
-         else if ($bytes <  4 * MB)                                                                             $issues[] = 'Info:  memory_limit is very low: '.ini_get('memory_limit').'  [resources]';
-         else if ($bytes > 32 * MB)                                                                             $issues[] = 'Info:  memory_limit is very high: '.ini_get('memory_limit').'  [resources]';
-      /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('register_globals'              ) && PHP_VERSION_ID <  50400)  $issues[] = 'Error: register_globals is not Off  [security]';
-      /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('register_long_arrays'          ) && PHP_VERSION_ID <  50400)  $issues[] = 'Info:  register_long_arrays is not Off  [performance]';
-      /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('register_argc_argv'            ) && !CLI/*hardcoded*/)        $issues[] = 'Info:  register_argc_argv is not Off  [performance]';
-      /*PHP_INI_PERDIR*/ if (!self::ini_get_bool('auto_globals_jit'              ))                             $issues[] = 'Info:  auto_globals_jit is not On  [performance]';
-      /*PHP_INI_ALL   */ if ( self::ini_get_bool('define_syslog_variables'       ) && PHP_VERSION_ID <  50400)  $issues[] = 'Info:  define_syslog_variables is not Off  [performance]';
-      /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('allow_call_time_pass_reference') && PHP_VERSION_ID <  50400)  $issues[] = 'Info:  allow_call_time_pass_reference is not Off  [code quality]';
-      /*PHP_INI_ALL   */ if (!self::ini_get_bool('y2k_compliance'                ) && PHP_VERSION_ID <  50400)  $issues[] = 'Info:  y2k_compliance is not On  [functionality]';
+         if      ($bytes ==     -1)                                                                               $issues[] = 'Warn:  memory_limit is unlimited  [resources]';
+         else if ($bytes <=      0)                                                                               $issues[] = 'Error: memory_limit is invalid: '.ini_get('memory_limit');
+         else if ($bytes <  4 * MB)                                                                               $issues[] = 'Info:  memory_limit is very low: '.ini_get('memory_limit').'  [resources]';
+         else if ($bytes > 32 * MB)                                                                               $issues[] = 'Info:  memory_limit is very high: '.ini_get('memory_limit').'  [resources]';
+      /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('register_globals'              ) && PHP_VERSION_ID <  50400)    $issues[] = 'Error: register_globals is not Off  [security]';
+      /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('register_long_arrays'          ) && PHP_VERSION_ID <  50400)    $issues[] = 'Info:  register_long_arrays is not Off  [performance]';
+      /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('register_argc_argv'            ) && !CLI/*hardcoded*/)          $issues[] = 'Info:  register_argc_argv is not Off  [performance]';
+      /*PHP_INI_PERDIR*/ if (!self::ini_get_bool('auto_globals_jit'              ))                               $issues[] = 'Info:  auto_globals_jit is not On  [performance]';
+      /*PHP_INI_ALL   */ if ( self::ini_get_bool('define_syslog_variables'       ) && PHP_VERSION_ID <  50400)    $issues[] = 'Info:  define_syslog_variables is not Off  [performance]';
+      /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('allow_call_time_pass_reference') && PHP_VERSION_ID <  50400)    $issues[] = 'Info:  allow_call_time_pass_reference is not Off  [code quality]';
+      /*PHP_INI_ALL   */ if (!self::ini_get_bool('y2k_compliance'                ) && PHP_VERSION_ID <  50400)    $issues[] = 'Info:  y2k_compliance is not On  [functionality]';
       /*PHP_INI_ALL   */ $timezone = ini_get    ('date.timezone'                 );
-         if (empty($timezone) && (!isSet($_ENV['TZ'])                              || PHP_VERSION_ID >= 50400)) $issues[] = 'Warn:  date.timezone is not set  [functionality]';
-      /*PHP_INI_SYSTEM*/ if ( self::ini_get_bool('safe_mode'                     ) && PHP_VERSION_ID <  50400)  $issues[] = 'Info:  safe_mode is not Off  [performance]';
-      /*PHP_INI_ALL   */ if (!empty(ini_get     ('open_basedir'                  )))                            $issues[] = 'Info:  open_basedir is not empty: "'.ini_get('open_basedir').'"  [performance]';
-      /*PHP_INI_ALL   */ if (!self::ini_get_bool('auto_detect_line_endings'      ))                             $issues[] = 'Info:  auto_detect_line_endings is not On  [funtionality]';
-      /*PHP_INI_SYSTEM*/ if (!self::ini_get_bool('allow_url_fopen'               ))                             $issues[] = 'Info:  allow_url_fopen is not On  [functionality]';
-      /*PHP_INI_SYSTEM*/ if ( self::ini_get_bool('allow_url_include'))                                          $issues[] = 'Error: allow_url_include is not Off  [security]';
+         if (empty($timezone) && (!isSet($_ENV['TZ'])                              || PHP_VERSION_ID >= 50400))   $issues[] = 'Warn:  date.timezone is not set  [functionality]';
+      /*PHP_INI_SYSTEM*/ if ( self::ini_get_bool('safe_mode'                     ) && PHP_VERSION_ID <  50400)    $issues[] = 'Info:  safe_mode is not Off  [performance]';
+      /*PHP_INI_ALL   */ if (!empty(ini_get     ('open_basedir'                  )))                              $issues[] = 'Info:  open_basedir is not empty: "'.ini_get('open_basedir').'"  [performance]';
+      /*PHP_INI_ALL   */ if (!self::ini_get_bool('auto_detect_line_endings'      ))                               $issues[] = 'Info:  auto_detect_line_endings is not On  [funtionality]';
+      /*PHP_INI_SYSTEM*/ if (!self::ini_get_bool('allow_url_fopen'               ))                               $issues[] = 'Info:  allow_url_fopen is not On  [functionality]';
+      /*PHP_INI_SYSTEM*/ if ( self::ini_get_bool('allow_url_include'))                                            $issues[] = 'Error: allow_url_include is not Off  [security]';
       /*PHP_INI_ALL   */ foreach (explode(PATH_SEPARATOR, ini_get('include_path' )) as $path) {
-         if (!strLen($path)) {                                                                                  $issues[] = 'Warn:  include_path contains empty path: "'.ini_get('include_path').'"  [functionality]';
+         if (!strLen($path)) {                                                                                    $issues[] = 'Warn:  include_path contains empty path: "'.ini_get('include_path').'"  [functionality]';
             break;
       }}
 
 
       // (2) error handling
-      // ------------------                                                                                     /* E_STRICT =  2048 =    100000000000            */
-      /*PHP_INI_ALL   */ $current = self::ini_get_int('error_reporting');                                       /* E_ALL    = 30719 = 111011111111111  (PHP 5.3) */
-      $target = E_ALL|E_STRICT & ~E_DEPRECATED;                                                                 /* E_ALL    = 32767 = 111111111111111  (PHP 5.4) */
-      if ($current & $target != $target)                                                                        $issues[] = 'Warn:  error_reporting is not E_ALL: '.DebugHelper::errorLevelToStr($current).'  [code quality]';
+      // ------------------                                                                                       /* E_STRICT =  2048 =    100000000000            */
+      /*PHP_INI_ALL   */ $current = self::ini_get_int('error_reporting');                                         /* E_ALL    = 30719 = 111011111111111  (PHP 5.3) */
+      $target = E_ALL|E_STRICT & ~E_DEPRECATED;                                                                   /* E_ALL    = 32767 = 111111111111111  (PHP 5.4) */
+      if ($current & $target != $target)                                                                          $issues[] = 'Warn:  error_reporting is not E_ALL: '.DebugHelper::errorLevelToStr($current).'  [code quality]';
       if (WINDOWS) {/*always development*/
-         /*PHP_INI_ALL*/ if (!self::ini_get_bool('display_errors'                )) /*bool|string:stderr*/      $issues[] = 'Info:  display_errors is not On  [functionality]';
-         /*PHP_INI_ALL*/ if (!self::ini_get_bool('display_startup_errors'        ))                             $issues[] = 'Info:  display_startup_errors is not On  [functionality]';
+         /*PHP_INI_ALL*/ if (!self::ini_get_bool('display_errors'                )) /*bool|string:stderr*/        $issues[] = 'Info:  display_errors is not On  [functionality]';
+         /*PHP_INI_ALL*/ if (!self::ini_get_bool('display_startup_errors'        ))                               $issues[] = 'Info:  display_startup_errors is not On  [functionality]';
       }
       else {
-         /*PHP_INI_ALL*/ if ( self::ini_get_bool('display_errors'                )) /*bool|string:stderr*/      $issues[] = 'Warn:  display_errors is not Off  [security]';
-         /*PHP_INI_ALL*/ if ( self::ini_get_bool('display_startup_errors'        ))                             $issues[] = 'Warn:  display_startup_errors is not Off  [security]';
+         /*PHP_INI_ALL*/ if ( self::ini_get_bool('display_errors'                )) /*bool|string:stderr*/        $issues[] = 'Warn:  display_errors is not Off  [security]';
+         /*PHP_INI_ALL*/ if ( self::ini_get_bool('display_startup_errors'        ))                               $issues[] = 'Warn:  display_startup_errors is not Off  [security]';
       }
-      /*PHP_INI_ALL   */ if ( self::ini_get_bool('ignore_repeated_errors'        ))                             $issues[] = 'Info:  ignore_repeated_errors is not Off  [resources]';
-      /*PHP_INI_ALL   */ if ( self::ini_get_bool('ignore_repeated_source'        ))                             $issues[] = 'Info:  ignore_repeated_source is not Off  [resources]';
-      /*PHP_INI_ALL   */ if (!self::ini_get_bool('track_errors'                  ))                             $issues[] = 'Info:  track_errors is not On  [functionality]';
-      /*PHP_INI_ALL   */ if ( self::ini_get_bool('html_errors'                   ))                             $issues[] = 'Warn:  html_errors is not Off  [functionality]';
-      /*PHP_INI_ALL   */ if (!self::ini_get_bool('log_errors'                    ))                             $issues[] = 'Error: log_errors is not On  [code quality]';
+      /*PHP_INI_ALL   */ if ( self::ini_get_bool('ignore_repeated_errors'        ))                               $issues[] = 'Info:  ignore_repeated_errors is not Off  [resources]';
+      /*PHP_INI_ALL   */ if ( self::ini_get_bool('ignore_repeated_source'        ))                               $issues[] = 'Info:  ignore_repeated_source is not Off  [resources]';
+      /*PHP_INI_ALL   */ if (!self::ini_get_bool('track_errors'                  ))                               $issues[] = 'Info:  track_errors is not On  [functionality]';
+      /*PHP_INI_ALL   */ if ( self::ini_get_bool('html_errors'                   ))                               $issues[] = 'Warn:  html_errors is not Off  [functionality]';
+      /*PHP_INI_ALL   */ if (!self::ini_get_bool('log_errors'                    ))                               $issues[] = 'Error: log_errors is not On  [code quality]';
       /*PHP_INI_ALL   */ $bytes = self::ini_get_bytes('log_errors_max_len'       );
-         if      ($bytes===null || $bytes < 0)                                                                  $issues[] = 'Error: log_errors_max_len is invalid: '.ini_get('log_errors_max_len');
-         else if ($bytes != 0) /*doesn't affect error_log()*/                                                   $issues[] = 'Warn:  log_errors_max_len is not 0: '.ini_get('log_errors_max_len').'  [functionality]';
+         if      ($bytes===null || $bytes < 0)                                                                    $issues[] = 'Error: log_errors_max_len is invalid: '.ini_get('log_errors_max_len');
+         else if ($bytes != 0) /*doesn't affect error_log()*/                                                     $issues[] = 'Warn:  log_errors_max_len is not 0: '.ini_get('log_errors_max_len').'  [functionality]';
       // TODO: check "error_log"
 
 
       // (3) input sanitizing
       // --------------------
       if (PHP_VERSION_ID < 50400) {
-         /*PHP_INI_ALL   */ if (self::ini_get_bool('magic_quotes_sybase'  )) /*overrides 'magic_quotes_gpc'*/   $issues[] = 'Error: magic_quotes_sybase is not Off  [input]';
-         /*PHP_INI_PERDIR*/ else if (self::ini_get_bool('magic_quotes_gpc'))                                    $issues[] = 'Error: magic_quotes_gpc is not Off  [input]';
-         /*PHP_INI_ALL   */ if (self::ini_get_bool('magic_quotes_runtime' ))                                    $issues[] = 'Error: magic_quotes_runtime is not Off  [input]';
+         /*PHP_INI_ALL   */ if (self::ini_get_bool('magic_quotes_sybase'  )) /*overrides 'magic_quotes_gpc'*/     $issues[] = 'Error: magic_quotes_sybase is not Off  [input]';
+         /*PHP_INI_PERDIR*/ else if (self::ini_get_bool('magic_quotes_gpc'))                                      $issues[] = 'Error: magic_quotes_gpc is not Off  [input]';
+         /*PHP_INI_ALL   */ if (self::ini_get_bool('magic_quotes_runtime' ))                                      $issues[] = 'Error: magic_quotes_runtime is not Off  [input]';
       }
-      /*PHP_INI_SYSTEM*/ if (self::ini_get_bool('sql.safe_mode'           ))                                    $issues[] = 'Warn:  sql.safe_mode is not Off  [functionality]';
+      /*PHP_INI_SYSTEM*/ if ( self::ini_get_bool('sql.safe_mode'          ))                                      $issues[] = 'Warn:  sql.safe_mode is not Off  [functionality]';
 
 
       // (4) request & HTML handling
       // ---------------------------
-      /*PHP_INI_PERDIR*/ if (       ini_get     ('request_order'                 ) != 'GP')                     $issues[] = 'Error: request_order is not "GP": "'.ini_get('request_order').'"  [functionality]';
-      /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('always_populate_raw_post_data' ) && PHP_VERSION_ID <  70000)  $issues[] = 'Info:  always_populate_raw_post_data is not Off  [performance]';
-      /*PHP_INI_ALL   */ if (       ini_get     ('arg_separator.output'          ) != '&amp;')                  $issues[] = 'Info:  arg_separator.output is not "&amp;": "'.ini_get('arg_separator.output').'"  [functionality]';
-      /*PHP_INI_ALL   */ if (!self::ini_get_bool('ignore_user_abort'             ))                             $issues[] = 'Warn:  ignore_user_abort is not On  [functionality]';
-      /*PHP_INI_SYSTEM*/ if ( self::ini_get_bool('file_uploads'                  )) {                           $issues[] = 'Info:  file_uploads is not Off  [security]';
+      /*PHP_INI_PERDIR*/ $order = ini_get('request_order'); /*overrides order of GPC in 'variables_order'*/
+      if (empty($order)) {
+         /*PHP_INI_PERDIR*/ $order = ini_get('variables_order');
+         $newOrder = '';
+         $len      = strLen($order);
+         for ($i=0; $i < $len; $i++) {
+            if (in_array($char=$order[$i], ['G','P','C']))
+               $newOrder .= $char;
+         }
+         $order = $newOrder;
+      }                  if ($order != 'GP')                                                                      $issues[] = 'Error: request_order is not "GP": "'.$order.'"  [functionality]';
+      /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('always_populate_raw_post_data' ) && PHP_VERSION_ID <  70000)    $issues[] = 'Info:  always_populate_raw_post_data is not Off  [performance]';
+      /*PHP_INI_ALL   */ if (       ini_get     ('arg_separator.output'          ) != '&amp;')                    $issues[] = 'Info:  arg_separator.output is not "&amp;": "'.ini_get('arg_separator.output').'"  [functionality]';
+      /*PHP_INI_ALL   */ if (!self::ini_get_bool('ignore_user_abort'             ))                               $issues[] = 'Warn:  ignore_user_abort is not On  [functionality]';
+      /*PHP_INI_SYSTEM*/ if ( self::ini_get_bool('file_uploads'                  )) {                             $issues[] = 'Info:  file_uploads is not Off  [security]';
          // TODO: check "upload_tmp_dir"
       }
-      /*PHP_INI_ALL   */ if (            ini_get('default_mimetype'              )  != 'text/html')             $issues[] = 'Info:  default_mimetype is not "text/html": "'.ini_get('default_mimetype').'"  [functionality]';
-      /*PHP_INI_ALL   */ if ( strToLower(ini_get('default_charset'               )) != 'utf-8')                 $issues[] = 'Info:  default_charset is not "UTF-8": "'.ini_get('default_charset').'"  [functionality]';
-      /*PHP_INI_ALL   */ if ( self::ini_get_bool('implicit_flush'                ) && !CLI/*hardcoded*/)        $issues[] = 'Warn:  implicit_flush is not Off  [performance]';
-      /*PHP_INI_PERDIR*/ $buffer = self::ini_get_bytes('output_buffering');
+      /*PHP_INI_ALL   */ if (            ini_get('default_mimetype'              )  != 'text/html')               $issues[] = 'Info:  default_mimetype is not "text/html": "'.ini_get('default_mimetype').'"  [functionality]';
+      /*PHP_INI_ALL   */ if ( strToLower(ini_get('default_charset'               )) != 'utf-8')                   $issues[] = 'Info:  default_charset is not "UTF-8": "'.ini_get('default_charset').'"  [functionality]';
+      /*PHP_INI_ALL   */ if ( self::ini_get_bool('implicit_flush'                ) && !CLI/*hardcoded*/)          $issues[] = 'Warn:  implicit_flush is not Off  [performance]';
+      /*PHP_INI_PERDIR*/ $buffer = self::ini_get_bytes('output_buffering'        );
       if (!CLI) {
-         if      ($buffer===null || $buffer < 0)                                                                $issues[] = 'Error: output_buffering is invalid: '.ini_get('output_buffering');
-         else if (!$buffer)                                                                                     $issues[] = 'Info:  output_buffering is not enabled  [performance]';
+         if      ($buffer===null || $buffer < 0)                                                                  $issues[] = 'Error: output_buffering is invalid: '.ini_get('output_buffering');
+         else if (!$buffer)                                                                                       $issues[] = 'Info:  output_buffering is not enabled  [performance]';
       }
       // TODO: /*PHP_INI_ALL*/ "zlib.output_compression"
 
