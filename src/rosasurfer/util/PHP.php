@@ -112,8 +112,8 @@ class PHP extends StaticClass {
       // (2) error handling
       // ------------------                                                                                       /* E_STRICT =  2048 =    100000000000            */
       /*PHP_INI_ALL   */ $current = self::ini_get_int('error_reporting');                                         /* E_ALL    = 30719 = 111011111111111  (PHP 5.3) */
-      $target = E_ALL|E_STRICT & ~E_DEPRECATED;                                                                   /* E_ALL    = 32767 = 111111111111111  (PHP 5.4) */
-      if ($current & $target != $target)                                                                          $issues[] = 'Warn:  error_reporting is not E_ALL: '.DebugHelper::errorLevelToStr($current).'  [code quality]';
+      $target = E_ALL|E_STRICT;                                                                                   /* E_ALL    = 32767 = 111111111111111  (PHP 5.4) */
+      if ($notCovered=($target ^ $current) & $target)                                                             $issues[] = 'Warn:  error_reporting does not cover '.DebugHelper::errorLevelToStr($notCovered).'  [code quality]';
       if (WINDOWS) {/*always development*/
          /*PHP_INI_ALL*/ if (!self::ini_get_bool('display_errors'                )) /*bool|string:stderr*/        $issues[] = 'Info:  display_errors is not On  [functionality]';
          /*PHP_INI_ALL*/ if (!self::ini_get_bool('display_startup_errors'        ))                               $issues[] = 'Info:  display_startup_errors is not On  [functionality]';
@@ -129,8 +129,21 @@ class PHP extends StaticClass {
       /*PHP_INI_ALL   */ if (!self::ini_get_bool('log_errors'                    ))                               $issues[] = 'Error: log_errors is not On  [code quality]';
       /*PHP_INI_ALL   */ $bytes = self::ini_get_bytes('log_errors_max_len'       );
          if      ($bytes===null || $bytes < 0)                                                                    $issues[] = 'Error: log_errors_max_len is invalid: '.ini_get('log_errors_max_len');
-         else if ($bytes != 0) /*doesn't affect error_log()*/                                                     $issues[] = 'Warn:  log_errors_max_len is not 0: '.ini_get('log_errors_max_len').'  [functionality]';
-      // TODO: check "error_log"
+         else if ($bytes != 0) /*'log_errors_max_len' doesn't affect the function error_log()*/                   $issues[] = 'Warn:  log_errors_max_len is not 0: '.ini_get('log_errors_max_len').'  [functionality]';
+      /*PHP_INI_ALL   */ $errorLog = ini_get('error_log');
+      if (!empty($errorLog) && $errorLog!='syslog') {
+         if (is_file($errorLog)) {
+            $hFile = @fOpen($errorLog, 'ab');         // try to open
+            if (is_resource($hFile)) fClose($hFile);
+            else                                                                                                  $issues[] = 'Error: error_log "'.$errorLog.'" is not writable  [infrastructure]';
+         }
+         else {
+            $hFile = @fOpen($errorLog, 'wb');         // try to create
+            if (is_resource($hFile)) fClose($hFile);
+            else                                                                                                  $issues[] = 'Error: error_log "'.$errorLog.'" is not writable  [infrastructure]';
+            is_file($errorLog) && @unlink($errorLog);
+         }
+      }
 
 
       // (3) input sanitizing
@@ -188,6 +201,7 @@ class PHP extends StaticClass {
       // (5) session related
       // -------------------
       /*PHP_INI_ALL   */ if (ini_get('session.save_handler') != 'files')                                                  $issues[] = 'Warn:  session.save_handler is not "files": "'.ini_get('session.save_handler').'"';
+      // TODO: check "session.save_path"
       /*PHP_INI_ALL   */ if (ini_get('session.serialize_handler') != 'php')                                               $issues[] = 'Warn:  session.serialize_handler is not "php": "'.ini_get('session.serialize_handler').'"';
       /*PHP_INI_PERDIR*/ if (ini_get('session.auto_start'))                                                               $issues[] = 'Warn:  session.auto_start is not Off';
       /*PHP_INI_ALL   */ if (!ini_get('session.use_cookies'))                                                             $issues[] = 'Warn:  session.use_cookies is not On' ;
@@ -221,30 +235,30 @@ class PHP extends StaticClass {
 
       // (8) Opcode cache
       // ----------------
-      if (extension_loaded('apc')) {
-         if (phpVersion('apc') >= '3.1.3' && phpVersion('apc') < '3.1.7')                                                 $issues[] = 'Warn:  You are running a buggy APC version (a version < 3.1.3 or >= 3.1.7 is recommended): '.phpVersion('apc');
-         /*PHP_INI_SYSTEM*/ if (!ini_get('apc.enabled'))                                                                  $issues[] = 'Warn:  apc.enabled is not On';                   // warning "Potential cache slam averted for key '...'" http://bugs.php.net/bug.php?id=58832
-         /*PHP_INI_SYSTEM*/ if ( ini_get('apc.report_autofilter'))                                                        $issues[] = 'Warn:  apc.report_autofilter is not Off';
-
-         if (WINDOWS) {       // development
-            /*PHP_INI_SYSTEM*/ if     (ini_get('apc.stat'))                                                               $issues[] = 'Warn:  apc.stat is not Off';
-            /*PHP_INI_ALL   */ elseif (ini_get('apc.cache_by_default'))                                                   $issues[] = 'Warn:  apc.cache_by_default is not Off';         // "On" may crash some Windows APC versions (apc-error: cannot redeclare class ***)
-         }                                                                                                                                                                              // Windows: if apc.stat="Off" this option MUST be "Off"
-         else {               // production
-            /*PHP_INI_ALL   */ if (!ini_get('apc.cache_by_default'))                                                      $issues[] = 'Warn:  apc.cache_by_default is not On';
-            /*PHP_INI_SYSTEM*/ if ( ini_get('apc.stat'))                                                                  $issues[] = 'Warn:  apc.stat is not Off';                     // we want to cache fs-stat calls
-            /*PHP_INI_SYSTEM*/ if (!ini_get('apc.write_lock'))                                                            $issues[] = 'Warn:  apc.write_lock is not On';                // "Off" for perfomance; file modifications in production shall be disabled
-
-            if (phpVersion('apc') >= '3.1.3' && phpVersion('apc') < '3.1.7') {
-               /*PHP_INI_SYSTEM*/ if (ini_get('apc.include_once_override'))                                               $issues[] = 'Warn:  apc.include_once_override is not Off';    // never use slow include_once()/require_once()
-            }
-            /*PHP_INI_SYSTEM*/ elseif (!ini_get('apc.include_once_override'))                                             $issues[] = 'Warn:  apc.include_once_override is not On';
-         }
-      }
-      elseif (extension_loaded('zend opcache')) {
-         /*PHP_INI_ALL   */ if (!ini_get('opcache.enable'))                                                               $issues[] = 'Warn:  opcache.enable is not On';
-      }
-      else                                                                                                                $issues[] = 'Warn:  Opcode cache not found';
+      //if (extension_loaded('apc')) {
+      //   if (phpVersion('apc') >= '3.1.3' && phpVersion('apc') < '3.1.7')                                                 $issues[] = 'Warn:  You are running a buggy APC version (a version < 3.1.3 or >= 3.1.7 is recommended): '.phpVersion('apc');
+      //   /*PHP_INI_SYSTEM*/ if (!ini_get('apc.enabled'))                                                                  $issues[] = 'Warn:  apc.enabled is not On';                   // warning "Potential cache slam averted for key '...'" http://bugs.php.net/bug.php?id=58832
+      //   /*PHP_INI_SYSTEM*/ if ( ini_get('apc.report_autofilter'))                                                        $issues[] = 'Warn:  apc.report_autofilter is not Off';
+      //
+      //   if (WINDOWS) {       // development
+      //      /*PHP_INI_SYSTEM*/ if     (ini_get('apc.stat'))                                                               $issues[] = 'Warn:  apc.stat is not Off';
+      //      /*PHP_INI_ALL   */ elseif (ini_get('apc.cache_by_default'))                                                   $issues[] = 'Warn:  apc.cache_by_default is not Off';         // "On" may crash some Windows APC versions (apc-error: cannot redeclare class ***)
+      //   }                                                                                                                                                                              // Windows: if apc.stat="Off" this option MUST be "Off"
+      //   else {               // production
+      //      /*PHP_INI_ALL   */ if (!ini_get('apc.cache_by_default'))                                                      $issues[] = 'Warn:  apc.cache_by_default is not On';
+      //      /*PHP_INI_SYSTEM*/ if ( ini_get('apc.stat'))                                                                  $issues[] = 'Warn:  apc.stat is not Off';                     // we want to cache fs-stat calls
+      //      /*PHP_INI_SYSTEM*/ if (!ini_get('apc.write_lock'))                                                            $issues[] = 'Warn:  apc.write_lock is not On';                // "Off" for perfomance; file modifications in production shall be disabled
+      //
+      //      if (phpVersion('apc') >= '3.1.3' && phpVersion('apc') < '3.1.7') {
+      //         /*PHP_INI_SYSTEM*/ if (ini_get('apc.include_once_override'))                                               $issues[] = 'Warn:  apc.include_once_override is not Off';    // never use slow include_once()/require_once()
+      //      }
+      //      /*PHP_INI_SYSTEM*/ elseif (!ini_get('apc.include_once_override'))                                             $issues[] = 'Warn:  apc.include_once_override is not On';
+      //   }
+      //}
+      //elseif (extension_loaded('zend opcache')) {
+      //   /*PHP_INI_ALL   */ if (!ini_get('opcache.enable'))                                                               $issues[] = 'Warn:  opcache.enable is not On';
+      //}
+      //else                                                                                                                $issues[] = 'Warn:  Opcode cache not found';
 
 
 
