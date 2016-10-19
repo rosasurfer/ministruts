@@ -260,4 +260,6 @@ class MiniStruts extends StaticClass {
 
 
 // make sure the framework is loaded (e.g. if only this class is loaded by Composer)
-include(__DIR__.'/../load.php');
+if (!defined(__NAMESPACE__.'\MINISTRUTS_ROOT')) {
+   include(__DIR__.'/../load.php');
+}

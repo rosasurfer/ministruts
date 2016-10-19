@@ -6,9 +6,8 @@ use rosasurfer\loader\ClassLoader;
 
 
 // block re-includes
-if (defined(__NAMESPACE__.'\MINISTRUTS_ROOT'))
-   return;
-define(__NAMESPACE__.'\MINISTRUTS_ROOT', dirName(__DIR__));
+if (defined(__NAMESPACE__.'\MINISTRUTS_ROOT')) return;
+    define (__NAMESPACE__.'\MINISTRUTS_ROOT', dirName(__DIR__));
 
 
 /**
@@ -21,15 +20,17 @@ include(MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/helpers.php');
 /**
  * Register the framework's class loader.
  *
- * If the framework is used in a project not using Composer a class loader for the framework's classes is registered.
+ * If the framework is used in a project not using Composer a class loader for the framework's classes is required.
  * On the other hand if Composer is used this registration has no effect but is done anyway because detecting Composer
  * is not reliable and might fail in the future.
  *
  * The loader is registered after any other registered SPL loaders. To provide backward compatibility an existing
  * __autoload() function is registered first if no other SPL loader is yet registered.
+ *
+ * Everything is wrapped in a function to prevent modifications of the global scope.
  */
-\Closure::bind(function() {                                             // prevent modifications of global scope
-   // check an existing legacy auto-loader
+function bootstrap() {
+   // check for an existing legacy auto-loader
    $legacyAutoLoad = function_exists('__autoload');
    if ($legacyAutoLoad) {
       $splLoaders = spl_autoload_functions();
@@ -38,7 +39,7 @@ include(MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/helpers.php');
       }
    }
 
-   // create a bootstrap loader for the class ClassLoader
+   // create a bootstrap loader for the class rosasurfer\loader\ClassLoader
    $callable = function($class) {
       switch ($class) {
          case Object::class:      require(__DIR__.'/rosasurfer/core/Object.php'       ); break;
@@ -48,11 +49,13 @@ include(MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/helpers.php');
 
    // instantiate and register the framwork's class loader
    spl_autoload_register($callable, $throw=true, $prepend=true);
-   (new ClassLoader())->register();
+   $loader = new ClassLoader();
+   $loader->register();
    spl_autoload_unregister($callable);
 
    // register an otherwise lost legacy auto-loader
    if ($legacyAutoLoad && spl_autoload_functions()[0]!='__autoload') {
       spl_autoload_register('__autoload', $throw=true, $prepend=true);
    }
-}, null)->__invoke();
+}
+bootstrap();
