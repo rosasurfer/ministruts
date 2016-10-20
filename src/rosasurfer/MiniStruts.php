@@ -124,6 +124,7 @@ class MiniStruts extends StaticClass {
     * Update the PHP configuration with user defined settings.
     */
    private static function updatePhpConfig() {
+      /*
       ini_set('arg_separator.output'    , '&amp;'                );
       ini_set('auto_detect_line_endings',  1                     );
       ini_set('default_mimetype'        , 'text/html'            );
@@ -142,6 +143,7 @@ class MiniStruts extends StaticClass {
       ini_set('session.cookie_httponly' ,  1                     );
       ini_set('session.referer_check'   , ''                     );
       ini_set('zend.detect_unicode'     ,  1                     );     // BOM header recognition
+      */
    }
 
 
