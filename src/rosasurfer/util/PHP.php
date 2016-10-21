@@ -66,11 +66,11 @@ class PHP extends StaticClass {
 
 
    /**
-    * Check PHP settings, display issues and call phpInfo().
+    * Check PHP settings, print issues and call phpInfo().
     *
     * PHP_INI_ALL    - entry can be set anywhere
     * PHP_INI_USER   - entry can be set in scripts
-    * PHP_INI_ONLY   - entry can be set in php.ini
+    * PHP_INI_ONLY   - entry can be set in php.ini only
     * PHP_INI_SYSTEM - entry can be set in php.ini or in httpd.conf
     * PHP_INI_PERDIR - entry can be set in php.ini, httpd.conf or in .htaccess
     */
@@ -80,7 +80,7 @@ class PHP extends StaticClass {
       // (1) core configuration
       // ----------------------
       /*PHP_INI_PERDIR*/ if (!self::ini_get_bool('short_open_tag'                ))                               $issues[] = 'Error: short_open_tag is not On  [security]';
-      /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('asp_tags'                      ) && PHP_VERSION_ID <  70000)    $issues[] = 'Info:  asp_tags is not Off  [code quality]';
+      /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('asp_tags'                      ) && PHP_VERSION_ID <  70000)    $issues[] = 'Info:  asp_tags is not Off  [standards]';
       /*PHP_INI_ONLY  */ if ( self::ini_get_bool('expose_php'                    ))                               $issues[] = 'Warn:  expose_php is not Off  [security]';
       /*PHP_INI_ALL   */ if ( self::ini_get_int ('max_execution_time'            ) != 30 && !CLI/*hardcoded*/)    $issues[] = 'Info:  max_execution_time is not 30: '.ini_get('max_execution_time').'  [resources]';
       /*PHP_INI_ALL   */ if ( self::ini_get_int ('default_socket_timeout'        ) != 60)                         $issues[] = 'Info:  default_socket_timeout is not 60: '.ini_get('default_socket_timeout').'  [resources]';
@@ -94,17 +94,17 @@ class PHP extends StaticClass {
       /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('register_argc_argv'            ) && !CLI/*hardcoded*/)          $issues[] = 'Info:  register_argc_argv is not Off  [performance]';
       /*PHP_INI_PERDIR*/ if (!self::ini_get_bool('auto_globals_jit'              ))                               $issues[] = 'Info:  auto_globals_jit is not On  [performance]';
       /*PHP_INI_ALL   */ if ( self::ini_get_bool('define_syslog_variables'       ) && PHP_VERSION_ID <  50400)    $issues[] = 'Info:  define_syslog_variables is not Off  [performance]';
-      /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('allow_call_time_pass_reference') && PHP_VERSION_ID <  50400)    $issues[] = 'Info:  allow_call_time_pass_reference is not Off  [code quality]';
-      /*PHP_INI_ALL   */ if (!self::ini_get_bool('y2k_compliance'                ) && PHP_VERSION_ID <  50400)    $issues[] = 'Info:  y2k_compliance is not On  [functionality]';
+      /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('allow_call_time_pass_reference') && PHP_VERSION_ID <  50400)    $issues[] = 'Info:  allow_call_time_pass_reference is not Off  [standards]';
+      /*PHP_INI_ALL   */ if (!self::ini_get_bool('y2k_compliance'                ) && PHP_VERSION_ID <  50400)    $issues[] = 'Info:  y2k_compliance is not On  [standards]';
       /*PHP_INI_ALL   */ $timezone = ini_get    ('date.timezone'                 );
-         if (empty($timezone) && (!isSet($_ENV['TZ'])                              || PHP_VERSION_ID >= 50400))   $issues[] = 'Warn:  date.timezone is not set  [functionality]';
+         if (empty($timezone) && (!isSet($_ENV['TZ'])                              || PHP_VERSION_ID >= 50400))   $issues[] = 'Warn:  date.timezone is not set  [setup]';
       /*PHP_INI_SYSTEM*/ if ( self::ini_get_bool('safe_mode'                     ) && PHP_VERSION_ID <  50400)    $issues[] = 'Info:  safe_mode is not Off  [performance]';
       /*PHP_INI_ALL   */ if (!empty(ini_get     ('open_basedir'                  )))                              $issues[] = 'Info:  open_basedir is not empty: "'.ini_get('open_basedir').'"  [performance]';
       /*PHP_INI_ALL   */ if (!self::ini_get_bool('auto_detect_line_endings'      ))                               $issues[] = 'Info:  auto_detect_line_endings is not On  [funtionality]';
       /*PHP_INI_SYSTEM*/ if (!self::ini_get_bool('allow_url_fopen'               ))                               $issues[] = 'Info:  allow_url_fopen is not On  [functionality]';
       /*PHP_INI_SYSTEM*/ if ( self::ini_get_bool('allow_url_include'))                                            $issues[] = 'Error: allow_url_include is not Off  [security]';
       /*PHP_INI_ALL   */ foreach (explode(PATH_SEPARATOR, ini_get('include_path' )) as $path) {
-         if (!strLen($path)) {                                                                                    $issues[] = 'Warn:  include_path contains empty path: "'.ini_get('include_path').'"  [functionality]';
+         if (!strLen($path)) {                                                                                    $issues[] = 'Warn:  include_path contains empty path: "'.ini_get('include_path').'"  [setup]';
             break;
       }}
 
@@ -113,10 +113,10 @@ class PHP extends StaticClass {
       // ------------------                                                                                       /* E_STRICT =  2048 =    100000000000            */
       /*PHP_INI_ALL   */ $current = self::ini_get_int('error_reporting');                                         /* E_ALL    = 30719 = 111011111111111  (PHP 5.3) */
       $target = E_ALL|E_STRICT;                                                                                   /* E_ALL    = 32767 = 111111111111111  (PHP 5.4) */
-      if ($notCovered=($target ^ $current) & $target)                                                             $issues[] = 'Warn:  error_reporting does not cover '.DebugHelper::errorLevelToStr($notCovered).'  [code quality]';
+      if ($notCovered=($target ^ $current) & $target)                                                             $issues[] = 'Warn:  error_reporting does not cover '.DebugHelper::errorLevelToStr($notCovered).'  [standards]';
       if (WINDOWS) {/*always development*/
-         /*PHP_INI_ALL*/ if (!self::ini_get_bool('display_errors'                )) /*bool|string:stderr*/        $issues[] = 'Info:  display_errors is not On  [functionality]';
-         /*PHP_INI_ALL*/ if (!self::ini_get_bool('display_startup_errors'        ))                               $issues[] = 'Info:  display_startup_errors is not On  [functionality]';
+         /*PHP_INI_ALL*/ if (!self::ini_get_bool('display_errors'                )) /*bool|string:stderr*/        $issues[] = 'Info:  display_errors is not On  [setup]';
+         /*PHP_INI_ALL*/ if (!self::ini_get_bool('display_startup_errors'        ))                               $issues[] = 'Info:  display_startup_errors is not On  [setup]';
       }
       else {
          /*PHP_INI_ALL*/ if ( self::ini_get_bool('display_errors'                )) /*bool|string:stderr*/        $issues[] = 'Warn:  display_errors is not Off  [security]';
@@ -126,7 +126,7 @@ class PHP extends StaticClass {
       /*PHP_INI_ALL   */ if ( self::ini_get_bool('ignore_repeated_source'        ))                               $issues[] = 'Info:  ignore_repeated_source is not Off  [resources]';
       /*PHP_INI_ALL   */ if (!self::ini_get_bool('track_errors'                  ))                               $issues[] = 'Info:  track_errors is not On  [functionality]';
       /*PHP_INI_ALL   */ if ( self::ini_get_bool('html_errors'                   ))                               $issues[] = 'Warn:  html_errors is not Off  [functionality]';
-      /*PHP_INI_ALL   */ if (!self::ini_get_bool('log_errors'                    ))                               $issues[] = 'Error: log_errors is not On  [code quality]';
+      /*PHP_INI_ALL   */ if (!self::ini_get_bool('log_errors'                    ))                               $issues[] = 'Error: log_errors is not On  [setup]';
       /*PHP_INI_ALL   */ $bytes = self::ini_get_bytes('log_errors_max_len'       );
          if      ($bytes===null || $bytes < 0)                                                                    $issues[] = 'Error: log_errors_max_len is invalid: '.ini_get('log_errors_max_len');
          else if ($bytes != 0) /*'log_errors_max_len' doesn't affect the function error_log()*/                   $issues[] = 'Warn:  log_errors_max_len is not 0: '.ini_get('log_errors_max_len').'  [functionality]';
@@ -135,12 +135,12 @@ class PHP extends StaticClass {
          if (is_file($errorLog)) {
             $hFile = @fOpen($errorLog, 'ab');         // try to open
             if (is_resource($hFile)) fClose($hFile);
-            else                                                                                                  $issues[] = 'Error: error_log "'.$errorLog.'" is not writable  [infrastructure]';
+            else                                                                                                  $issues[] = 'Error: error_log "'.$errorLog.'" is not writable  [setup]';
          }
          else {
             $hFile = @fOpen($errorLog, 'wb');         // try to create
             if (is_resource($hFile)) fClose($hFile);
-            else                                                                                                  $issues[] = 'Error: error_log "'.$errorLog.'" is not writable  [infrastructure]';
+            else                                                                                                  $issues[] = 'Error: error_log "'.$errorLog.'" is not writable  [setup]';
             is_file($errorLog) && @unlink($errorLog);
          }
       }
@@ -149,11 +149,11 @@ class PHP extends StaticClass {
       // (3) input sanitizing
       // --------------------
       if (PHP_VERSION_ID < 50400) {
-         /*PHP_INI_ALL   */ if (self::ini_get_bool('magic_quotes_sybase'  )) /*overrides 'magic_quotes_gpc'*/     $issues[] = 'Error: magic_quotes_sybase is not Off  [input]';
-         /*PHP_INI_PERDIR*/ else if (self::ini_get_bool('magic_quotes_gpc'))                                      $issues[] = 'Error: magic_quotes_gpc is not Off  [input]';
-         /*PHP_INI_ALL   */ if (self::ini_get_bool('magic_quotes_runtime' ))                                      $issues[] = 'Error: magic_quotes_runtime is not Off  [input]';
+         /*PHP_INI_ALL   */ if (self::ini_get_bool('magic_quotes_sybase'  )) /*overrides 'magic_quotes_gpc'*/     $issues[] = 'Error: magic_quotes_sybase is not Off  [standards]';
+         /*PHP_INI_PERDIR*/ else if (self::ini_get_bool('magic_quotes_gpc'))                                      $issues[] = 'Error: magic_quotes_gpc is not Off  [standards]';
+         /*PHP_INI_ALL   */ if (self::ini_get_bool('magic_quotes_runtime' ))                                      $issues[] = 'Error: magic_quotes_runtime is not Off  [standards]';
       }
-      /*PHP_INI_SYSTEM*/ if ( self::ini_get_bool('sql.safe_mode'          ))                                      $issues[] = 'Warn:  sql.safe_mode is not Off  [functionality]';
+      /*PHP_INI_SYSTEM*/ if ( self::ini_get_bool('sql.safe_mode'          ))                                      $issues[] = 'Warn:  sql.safe_mode is not Off  [setup]';
 
 
       // (4) request & HTML handling
@@ -168,15 +168,15 @@ class PHP extends StaticClass {
                $newOrder .= $char;
          }
          $order = $newOrder;
-      }                  if ($order != 'GP')                                                                      $issues[] = 'Error: request_order is not "GP": "'.$order.'"  [functionality]';
+      }                  if ($order != 'GP')                                                                      $issues[] = 'Error: request_order is not "GP": "'.$order.'"  [standards]';
       /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('always_populate_raw_post_data' ) && PHP_VERSION_ID <  70000)    $issues[] = 'Info:  always_populate_raw_post_data is not Off  [performance]';
-      /*PHP_INI_ALL   */ if (       ini_get     ('arg_separator.output'          ) != '&amp;')                    $issues[] = 'Info:  arg_separator.output is not "&amp;": "'.ini_get('arg_separator.output').'"  [functionality]';
-      /*PHP_INI_ALL   */ if (!self::ini_get_bool('ignore_user_abort'             ))                               $issues[] = 'Warn:  ignore_user_abort is not On  [functionality]';
+      /*PHP_INI_ALL   */ if (       ini_get     ('arg_separator.output'          ) != '&')                        $issues[] = 'Warn:  arg_separator.output is not "&": "'.ini_get('arg_separator.output').'"  [standards]';
+      /*PHP_INI_ALL   */ if (!self::ini_get_bool('ignore_user_abort'             ))                               $issues[] = 'Warn:  ignore_user_abort is not On  [standards]';
       /*PHP_INI_SYSTEM*/ if ( self::ini_get_bool('file_uploads'                  )) {                             $issues[] = 'Info:  file_uploads is not Off  [security]';
          // TODO: check "upload_tmp_dir"
       }
-      /*PHP_INI_ALL   */ if (            ini_get('default_mimetype'              )  != 'text/html')               $issues[] = 'Info:  default_mimetype is not "text/html": "'.ini_get('default_mimetype').'"  [functionality]';
-      /*PHP_INI_ALL   */ if ( strToLower(ini_get('default_charset'               )) != 'utf-8')                   $issues[] = 'Info:  default_charset is not "UTF-8": "'.ini_get('default_charset').'"  [functionality]';
+      /*PHP_INI_ALL   */ if (            ini_get('default_mimetype'              )  != 'text/html')               $issues[] = 'Info:  default_mimetype is not "text/html": "'.ini_get('default_mimetype').'"  [standards]';
+      /*PHP_INI_ALL   */ if ( strToLower(ini_get('default_charset'               )) != 'utf-8')                   $issues[] = 'Info:  default_charset is not "UTF-8": "'.ini_get('default_charset').'"  [standards]';
       /*PHP_INI_ALL   */ if ( self::ini_get_bool('implicit_flush'                ) && !CLI/*hardcoded*/)          $issues[] = 'Warn:  implicit_flush is not Off  [performance]';
       /*PHP_INI_PERDIR*/ $buffer = self::ini_get_bytes('output_buffering'        );
       if (!CLI) {
