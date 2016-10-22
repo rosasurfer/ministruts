@@ -69,10 +69,10 @@ class PHP extends StaticClass {
     * Check PHP settings, print issues and call phpInfo().
     *
     * PHP_INI_ALL    - entry can be set anywhere
-    * PHP_INI_USER   - entry can be set in scripts
+    * PHP_INI_USER   - entry can be set in scripts and in .user.ini
     * PHP_INI_ONLY   - entry can be set in php.ini only
-    * PHP_INI_SYSTEM - entry can be set in php.ini or in httpd.conf
-    * PHP_INI_PERDIR - entry can be set in php.ini, httpd.conf or in .htaccess
+    * PHP_INI_SYSTEM - entry can be set in php.ini and in httpd.conf
+    * PHP_INI_PERDIR - entry can be set in php.ini, httpd.conf, .htaccess and in .user.ini
     */
    public static function info() {
       $issues = [];

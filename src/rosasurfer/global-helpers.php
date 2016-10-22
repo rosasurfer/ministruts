@@ -51,6 +51,13 @@ const KB                = \rosasurfer\KB;
 const MB                = \rosasurfer\MB;
 const GB                = \rosasurfer\GB;
 
+// php.ini changable modes
+const PHP_INI_ALL       = \rosasurfer\PHP_INI_ALL;
+const PHP_INI_USER      = \rosasurfer\PHP_INI_USER;
+const PHP_INI_ONLY      = \rosasurfer\PHP_INI_ONLY;
+const PHP_INI_SYSTEM    = \rosasurfer\PHP_INI_SYSTEM;
+const PHP_INI_PERDIR    = \rosasurfer\PHP_INI_PERDIR;
+
 
 /**
  * Dumps a variable to STDOUT or into a string.
