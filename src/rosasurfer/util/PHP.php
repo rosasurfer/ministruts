@@ -277,11 +277,13 @@ class PHP extends StaticClass {
    /**
     * Return the value of a php.ini option as a boolean.
     *
+    * NOTE: Never use ini_get() to read a php.ini bool value as it will return the plain string passed to ini_set().
+    *
     * @param  string $option
     *
     * @return bool
     */
-   private static function ini_get_bool($option) {
+   public static function ini_get_bool($option) {
       $value = ini_get($option);
 
       switch (strToLower($value)) {
@@ -300,11 +302,13 @@ class PHP extends StaticClass {
    /**
     * Return the value of a php.ini option as an integer.
     *
+    * NOTE: Never use ini_get() to read a php.ini integer value as it will return the plain string passed to ini_set().
+    *
     * @param  string $option
     *
     * @return int
     */
-   private static function ini_get_int($option) {
+   public static function ini_get_int($option) {
       return (int)ini_get($option);
    }
 
@@ -312,11 +316,13 @@ class PHP extends StaticClass {
    /**
     * Return the value of a php.ini option as a byte value.
     *
+    * NOTE: Never use ini_get() to read a php.ini byte value as it will return the plain string passed to ini_set().
+    *
     * @param  string $option
     *
     * @return int
     */
-   private static function ini_get_bytes($option) {
+   public static function ini_get_bytes($option) {
       $sValue = $value = ini_get($option);
 
       if (!strLen($value))     return null;

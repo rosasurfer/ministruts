@@ -8,6 +8,8 @@ use rosasurfer\core\StaticClass;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RuntimeException;
 
+use rosasurfer\util\PHP;
+
 use const rosasurfer\CLI;
 
 
@@ -50,7 +52,7 @@ final class Cache extends StaticClass {
             $key = '';
 
             // neuen Cache instantiieren
-            if (extension_loaded('apc') && ini_get(CLI ? 'apc.enable_cli':'apc.enabled')) {
+            if (extension_loaded('apc') && PHP::ini_get_bool(CLI ? 'apc.enable_cli':'apc.enabled')) {
                self::$default = new ApcCache($label);
             }
             else {

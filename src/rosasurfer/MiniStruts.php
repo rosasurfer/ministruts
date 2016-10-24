@@ -115,8 +115,8 @@ class MiniStruts extends StaticClass {
 
 
       // (5) enforce PHP requirements
-      !ini_get('short_open_tag')       && exit(1|echoPre('application error (see error log)')|error_log('Error: The PHP configuration value "short_open_tag" must be enabled (security).'));
-      ini_get('request_order') != 'GP' && exit(1|echoPre('application error (see error log)')|error_log('Error: The PHP configuration value "request_order" must be "GP".'));
+      !PHP::ini_get_bool('short_open_tag') && exit(1|echoPre('application error (see error log)')|error_log('Error: The PHP configuration value "short_open_tag" must be enabled (security).'));
+      ini_get('request_order') != 'GP'     && exit(1|echoPre('application error (see error log)')|error_log('Error: The PHP configuration value "request_order" must be "GP".'));
    }
 
 
