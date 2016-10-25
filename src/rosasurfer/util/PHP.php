@@ -158,7 +158,7 @@ class PHP extends StaticClass {
 
       // (4) request & HTML handling
       // ---------------------------
-      /*PHP_INI_PERDIR*/ $order = ini_get('request_order'); /*overrides order of GPC in 'variables_order'*/
+      /*PHP_INI_PERDIR*/ $order = ini_get('request_order'); /*if empty fall-back to order of GPC in 'variables_order'*/
       if (empty($order)) {
          /*PHP_INI_PERDIR*/ $order = ini_get('variables_order');
          $newOrder = '';
