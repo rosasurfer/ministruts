@@ -29,35 +29,30 @@ use const rosasurfer\WINDOWS;
  * General application configuration via property files.
  *
  * Settings for the application's default configuration are read from the config files "config-default.properties"
- * (if exists) and "config.properties" (if exists). Files in multiple directories are processed and merged in the
- * following order:
+ * (if it exists) and "config.properties" (if it exists). Files in multiple directories are processed and merged in
+ * the following order:
  *
- * All applications (Web + CLI):
- * <pre>
- *   "config-default.properties" in the framework's config directory, that's: MINISTRUTS_ROOT.'/src/'
- *   "config.properties"         in the same directory
+ * - "config-default.properties" in the framework's configuration directory (MINISTRUTS_ROOT.'/src/')
+ * - "config.properties"         in the same directory
  *
- *   "config-default.properties" in the application's config directory, that's: APPLICATION_ROOT.'/app/config/'
- *   "config.properties"         in the same directory
- * </pre>
+ * - "config-default.properties" in the application's configuration directory (APPLICATION_ROOT.'/app/config/')
+ * - "config.properties"         in the same directory
  *
- * CLI applications:
- * <pre>
- *   "config-default.properties" in the directory containing the running main script
- *   "config.properties"         in the same directory
- * </pre>
+ * Additional configuration for CLI applications:
+ * - "config-default.properties" in the directory of the running script
+ * - "config.properties"         in the same directory
  *
  *
- * • Configurations consisting of multiple files are merged. Multiple occurrences of one setting overwrite each other,
- *   the last encountered setting "wins".
+ * - Configurations consisting of multiple files are merged. Multiple occurrences of the same setting overwrite each
+ *   other, the last encountered setting "wins".
  *
- * • Files "config-default.properties" should contain global settings identical for all developers. These files are meant
- *   to be stored in the code repository and are the place to store default settings.
+ * - Files "config-default.properties" contain global settings identical for all developers. These files are meant
+ *   to be stored in the code repository and hold default settings.
  *
- * • Files "config.properties" should contain custom user or working place specific settings and are not meant to be
- *   stored in the code repository. This files are the place to store user specific settings.
+ * - Files "config.properties" contain custom developer specific settings and are not meant to be stored in the code
+ *   repository. This files hold user or environment specific settings.
  *
- * • File format:<br>
+ * - File format:
  *   Settings are defined as "key = value" pairs. Empty lines and enclosing white space are ignored. Subkeys can be used
  *   to create structures which can be queried as a whole (array) or as single values.
  *
