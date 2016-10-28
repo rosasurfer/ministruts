@@ -56,7 +56,7 @@ const SATURDAY          = 6;
 // byte sizes
 const KB                = 1024;
 const MB                = 1024 * KB;
-const GB                = 1024 * MB;                              // not TB, it doesn't fit in 32 bits
+const GB                = 1024 * MB;                              // no TB (doesn't fit in 32 bits)
 
 // php.ini changable modes
 const PHP_INI_ALL       = 0;                                      // entry can be set anywhere
