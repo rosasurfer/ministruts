@@ -7,6 +7,7 @@ use rosasurfer\exception\IllegalTypeException;
 
 use function rosasurfer\echoPre;
 use function rosasurfer\strRight;
+use function rosasurfer\strRightFrom;
 use function rosasurfer\strStartsWith;
 
 use const rosasurfer\CLI;
@@ -270,7 +271,24 @@ class PHP extends StaticClass {
 
 
       // (10) call phpInfo() if we run via a web server
-      !CLI && phpInfo();
+      if (!CLI) {
+         $queryStr = self::getUrlQueryString();
+         $hash     = self::getUrlHash();
+         $params   = [];
+         parse_str($queryStr, $params);
+         unset($params['__phpinfo__'], $params['__config__'], $params['__shutdown__']);
+         $scriptStartQuery = http_build_query($params + ['__phpinfo__'  => '']                     , null, '&');
+         $appStartQuery    = http_build_query($params + ['__config__'   => '', '__phpinfo__' => ''], null, '&');
+         $scriptEndQuery   = http_build_query($params + ['__shutdown__' => '', '__phpinfo__' => ''], null, '&');
+         ?>
+         <div style="text-align:center; margin-bottom:15px; padding-top:20px; font-size:80%; font-weight:bold; font-family:sans-serif">
+            <a href="?<?=$scriptStartQuery.$hash?>" style="display:inline-block; min-width:130px; margin:0 10px; padding:10px; background-color:#ccf; color:#222; border:1px outset #666" title="PHP configuration at start of the script">     At Script Start</a>
+            <a href="?<?=$appStartQuery   .$hash?>" style="display:inline-block; min-width:130px; margin:0 10px; padding:10px; background-color:#ccf; color:#222; border:1px outset #666" title="PHP configuration at start of the application">At Application Start</a>
+            <a href="?<?=$scriptEndQuery  .$hash?>" style="display:inline-block; min-width:130px; margin:0 10px; padding:10px; background-color:#ccf; color:#222; border:1px outset #666" title="PHP configuration at end of the script">       At Script End</a>
+         </div>
+         <?php
+         phpInfo();
+      }
    }
 
 
@@ -355,5 +373,35 @@ class PHP extends StaticClass {
       if (!strLen($sValue))     return null;
       if (ctype_digit($sValue)) return $sign * (int)$sValue * $factor;
       return null;
+   }
+
+
+   /**
+    * Return the query string of the current url (if any).
+    *
+    * @return string
+    */
+   private static function getUrlQueryString() {
+      // The variable $_SERVER['QUERY_STRING'] is set by the server and can differ, e.g. it might hold additional
+      // parameters or it might be empty (nginx).
+
+      if (isSet($_SERVER['QUERY_STRING']) && strLen($_SERVER['QUERY_STRING'])) {
+         $query = $_SERVER['QUERY_STRING'];
+      }
+      else {
+         $query = strRightFrom($_SERVER['REQUEST_URI'], '?');
+      }
+      return $query;
+   }
+
+
+   /**
+    * Return the hash string of the current url (if any).
+    *
+    * @return string - hash including the hash mark or an empty string
+    */
+   private static function getUrlHash() {
+      $queryStr = self::getUrlQueryString();
+      return strRightFrom($queryStr, '#', 1, true);
    }
 }
