@@ -73,48 +73,72 @@ class MiniStruts extends StaticClass {
          }
       }
 
-
       // (1) check application settings                              // TODO: remove APPLICATION_ROOT dependency
       !defined('\APPLICATION_ROOT') && exit(1|echoPre('application error (see error log)')|error_log('Error: The global constant APPLICATION_ROOT must be defined.'));
       !defined('\APPLICATION_ID'  ) && define('APPLICATION_ID', md5(\APPLICATION_ROOT));
 
+      // (2) check for admin tasks if on localhost
+      // __phpinfo__               : show PHP config at start of script
+      // __config__                : show application config (may contain further PHP config settings)
+      // __config__   + __phpinfo__: show PHP config after application configuration
+      // __shutdown__ + __phpinfo__: show PHP config at shutdown (end of script)
+      // __cache__                 : show cache admin interface
+      $phpInfoTaskAfterConfig = $showConfigTask = $showCacheTask = $atShutdown = false;
 
-      // (2) check for and execute magic task if on localhost
-      $executedTasks = $cacheTask = false;
       if (!CLI && (LOCALHOST || $_SERVER['REMOTE_ADDR']==$_SERVER['SERVER_ADDR'])) {
          foreach ($_REQUEST as $param => $value) {
             if ($param == '__phpinfo__') {
-               PHP::phpInfo();
-               $executedTasks = true;
+               if ($atShutdown) {
+                  register_shutdown_function(function() {
+                     PHP::phpInfo();
+                     exit(0);
+                  });
+               }
+               else if ($showConfigTask) {
+                  $showConfigTask         = false;       // cancel show-config task
+                  $phpInfoTaskAfterConfig = true;
+               }
+               else {
+                  PHP::phpInfo();
+                  exit(0);
+               }
+               break;                                    // stop parsing after "__phpinfo__"
             }
             else if ($param == '__config__') {
-               //Config::getDefault()->show();                       // TODO: not yet implemented
-               $executedTasks = true;
-               self::updatePhpConfig();
+               $showConfigTask = true;
             }
             else if ($param == '__cache__') {
-               if (!$executedTasks) {                                // ignore if there are already other tasks
-                  $cacheTask = true;                                 // delayed after PHP's configuration update (if any)
-                  break;
-               }
+               $showCacheTask = true;
+               break;                                    // stop parsing after "__cache__"
+            }
+            else if ($param == '__shutdown__') {
+               $atShutdown = true;
             }
          }
-         $executedTasks && exit(0);
       }
 
+      // (3) load any further PHP config settings from the application's main configuration
+      self::configurePhp();
 
-      // (3) update PHP configuration
-      self::updatePhpConfig();
+      // (4) execute "show-config" task if enabled
+      if ($showConfigTask) {
+         //Config::getDefault()->show();                       // TODO: not yet implemented
+         //exit(0);
+      }
 
+      // (5) execute "phpinfo" after-config task if enabled
+      if ($phpInfoTaskAfterConfig) {
+         PHP::phpInfo();
+         exit(0);
+      }
 
-      // (4) execute opcode cache task (if enabled)
-      if ($cacheTask) {
+      // (6) execute "show-cache" task if enabled
+      if ($showCacheTask) {
          //include(MINISTRUTS_ROOT.'/src/rosasurfer/debug/apc.php'); // TODO: not yet implemented
          exit(0);
       }
 
-
-      // (5) enforce PHP requirements
+      // (7) enforce PHP requirements (last step to be able to run admin tasks with erroneous PHP settings)
       !PHP::ini_get_bool('short_open_tag') && exit(1|echoPre('application error (see error log)')|error_log('Error: The PHP configuration value "short_open_tag" must be enabled (security).'));
       ini_get('request_order') != 'GP'     && exit(1|echoPre('application error (see error log)')|error_log('Error: The PHP configuration value "request_order" must be "GP".'));
    }
@@ -123,7 +147,7 @@ class MiniStruts extends StaticClass {
    /**
     * Update the PHP configuration with user defined settings.
     */
-   private static function updatePhpConfig() {
+   private static function configurePhp() {
       /*
       ini_set('arg_separator.output'    , '&amp;'                );
       ini_set('auto_detect_line_endings',  1                     );

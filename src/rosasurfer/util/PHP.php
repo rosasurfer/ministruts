@@ -262,10 +262,8 @@ class PHP extends StaticClass {
       //else                                                                                                                $issues[] = 'Warn:  Opcode cache not found';
 
 
-
-
-
       // (9) show issues or confirm if none are found
+      if (!CLI)    echo '<!DOCTYPE html>'.NL.'<html><head></head><body><a name="#phpinfo"></a>'.NL;
       if ($issues) echoPre('PHP configuration issues:'.NL.'-------------------------'.NL.join(NL, $issues));
       else         echoPre('PHP configuration OK');
 
@@ -273,7 +271,6 @@ class PHP extends StaticClass {
       // (10) call phpInfo() if we run via a web server
       if (!CLI) {
          $queryStr = self::getUrlQueryString();
-         $hash     = self::getUrlHash();
          $params   = [];
          parse_str($queryStr, $params);
          unset($params['__phpinfo__'], $params['__config__'], $params['__shutdown__']);
@@ -282,9 +279,9 @@ class PHP extends StaticClass {
          $scriptEndQuery   = http_build_query($params + ['__shutdown__' => '', '__phpinfo__' => ''], null, '&');
          ?>
          <div style="text-align:center; margin-bottom:15px; padding-top:20px; font-size:12px; font-weight:bold; font-family:sans-serif">
-            <a href="?<?=$scriptStartQuery.$hash?>" style="display:inline-block; min-width:130px; margin:0 10px; padding:10px; background-color:#ccf; color:#222; border:1px outset #666" title="PHP configuration at start of the script">     At Script Start</a>
-            <a href="?<?=$appStartQuery   .$hash?>" style="display:inline-block; min-width:130px; margin:0 10px; padding:10px; background-color:#ccf; color:#222; border:1px outset #666" title="PHP configuration at start of the application">At Application Start</a>
-            <a href="?<?=$scriptEndQuery  .$hash?>" style="display:inline-block; min-width:130px; margin:0 10px; padding:10px; background-color:#ccf; color:#222; border:1px outset #666" title="PHP configuration at end of the script">       At Script End</a>
+            <a href="?<?=$scriptStartQuery.'#phpinfo'?>" style="display:inline-block; min-width:130px; margin:0 10px; padding:10px; background-color:#ccf; color:#222; border:1px outset #666" title="PHP configuration at start of the script">     At Script Start</a>
+            <a href="?<?=$appStartQuery   .'#phpinfo'?>" style="display:inline-block; min-width:130px; margin:0 10px; padding:10px; background-color:#ccf; color:#222; border:1px outset #666" title="PHP configuration at start of the application">At Application Start</a>
+            <a href="?<?=$scriptEndQuery  .'#phpinfo'?>" style="display:inline-block; min-width:130px; margin:0 10px; padding:10px; background-color:#ccf; color:#222; border:1px outset #666" title="PHP configuration at end of the script">       At Script End</a>
          </div>
          <?php
          phpInfo();
