@@ -75,7 +75,7 @@ class PHP extends StaticClass {
     * PHP_INI_SYSTEM - entry can be set in php.ini and in httpd.conf
     * PHP_INI_PERDIR - entry can be set in php.ini, httpd.conf, .htaccess and in .user.ini
     */
-   public static function info() {
+   public static function phpInfo() {
       $issues = [];
 
       // (1) core configuration

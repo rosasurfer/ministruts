@@ -84,7 +84,7 @@ class MiniStruts extends StaticClass {
       if (!CLI && (LOCALHOST || $_SERVER['REMOTE_ADDR']==$_SERVER['SERVER_ADDR'])) {
          foreach ($_REQUEST as $param => $value) {
             if ($param == '__phpinfo__') {
-               PHP::info();
+               PHP::phpInfo();
                $executedTasks = true;
             }
             else if ($param == '__config__') {
