@@ -281,7 +281,7 @@ class PHP extends StaticClass {
          $appStartQuery    = http_build_query($params + ['__config__'   => '', '__phpinfo__' => ''], null, '&');
          $scriptEndQuery   = http_build_query($params + ['__shutdown__' => '', '__phpinfo__' => ''], null, '&');
          ?>
-         <div style="text-align:center; margin-bottom:15px; padding-top:20px; font-size:80%; font-weight:bold; font-family:sans-serif">
+         <div style="text-align:center; margin-bottom:15px; padding-top:20px; font-size:12px; font-weight:bold; font-family:sans-serif">
             <a href="?<?=$scriptStartQuery.$hash?>" style="display:inline-block; min-width:130px; margin:0 10px; padding:10px; background-color:#ccf; color:#222; border:1px outset #666" title="PHP configuration at start of the script">     At Script Start</a>
             <a href="?<?=$appStartQuery   .$hash?>" style="display:inline-block; min-width:130px; margin:0 10px; padding:10px; background-color:#ccf; color:#222; border:1px outset #666" title="PHP configuration at start of the application">At Application Start</a>
             <a href="?<?=$scriptEndQuery  .$hash?>" style="display:inline-block; min-width:130px; margin:0 10px; padding:10px; background-color:#ccf; color:#222; border:1px outset #666" title="PHP configuration at end of the script">       At Script End</a>
