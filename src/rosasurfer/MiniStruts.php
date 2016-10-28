@@ -65,11 +65,11 @@ class MiniStruts extends StaticClass {
    public static function init(array $options = []) {
       foreach ($options as $key => $value) {
          switch ($key) {
-            case 'config-dir'       : self::setConfigDir     ($value); continue;
-            case 'global-helpers'   : self::loadGlobalHelpers($value); continue;
-            case 'handle-errors'    : self::handleErrors     ($value); continue;
-            case 'handle-exceptions': self::handleExceptions ($value); continue;
-            case 'replace-composer' : self::replaceComposer  ($value); continue;    // TODO
+            case 'config-dir'       : self::setConfigDir          ($value); continue;
+            case 'global-helpers'   : self::loadGlobalHelpers     ($value); continue;
+            case 'handle-errors'    : self::setupErrorHandling    ($value); continue;
+            case 'handle-exceptions': self::setupExceptionHandling($value); continue;
+            case 'replace-composer' : self::replaceComposer       ($value); continue;     // TODO
          }
       }
 
@@ -200,7 +200,7 @@ class MiniStruts extends StaticClass {
     *
     * @param  mixed $value - configuration value as passed to the framework loader
     */
-   private static function handleErrors($value) {
+   private static function setupErrorHandling($value) {
       $flag = null;
       if (is_int($value)) {
          if     ($value == self::LOG_ERRORS      ) $flag = self::LOG_ERRORS;
@@ -223,7 +223,7 @@ class MiniStruts extends StaticClass {
     *
     * @param  mixed $value - configuration value as passed to the framework loader
     */
-   private static function handleExceptions($value) {
+   private static function setupExceptionHandling($value) {
       $enabled = false;
       if (is_bool($value) || is_int($value)) {
          $enabled = (bool) $value;
