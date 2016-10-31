@@ -1,9 +1,11 @@
 <?php
 namespace rosasurfer\config;
 
+use rosasurfer\exception\RuntimeException;
+
 
 /**
- * Interface to implement by custom configuration classes.
+ * Interface to be implemented by concrete configurations.
  */
 interface ConfigInterface {
 
@@ -18,7 +20,7 @@ interface ConfigInterface {
     *
     * @throws RuntimeException - if the setting is not found and no alternative value was specified
     */
-   public function get($key, $onNotFound=null);
+   public function get($key, $onNotFound = null);
 
 
    /**
