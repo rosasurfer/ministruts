@@ -5,16 +5,18 @@ use rosasurfer\core\Object;
 use rosasurfer\loader\ClassLoader;
 
 
-// block re-includes
+// Block re-includes.
 if (defined(__NAMESPACE__.'\MINISTRUTS_ROOT')) return;
     define (__NAMESPACE__.'\MINISTRUTS_ROOT', dirName(__DIR__));
 
 
-/**
- * Include helper functions and constants which can't be auto-loaded.
- */
+// Include helper functions and constants which can't be auto-loaded.
 include(MINISTRUTS_ROOT.'/src/rosasurfer/helpers.php');
 include(MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/helpers.php');
+
+
+// Register the framework's class loader.
+registerClassLoader();
 
 
 /**
@@ -29,7 +31,7 @@ include(MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/helpers.php');
  *
  * Everything is wrapped in a function to prevent modifications of the global scope.
  */
-function bootstrap() {
+function registerClassLoader() {
    // check for an existing legacy auto-loader
    $legacyAutoLoad = function_exists('__autoload');
    if ($legacyAutoLoad) {
@@ -40,22 +42,21 @@ function bootstrap() {
    }
 
    // create a bootstrap loader for the class rosasurfer\loader\ClassLoader
-   $callable = function($class) {
+   $bootstrap = function($class) {
       switch ($class) {
          case Object::class:      require(__DIR__.'/rosasurfer/core/Object.php'       ); break;
          case ClassLoader::class: require(__DIR__.'/rosasurfer/loader/ClassLoader.php'); break;
       }
    };
+   spl_autoload_register($bootstrap, $throw=true, $prepend=true);
 
-   // instantiate and register the framwork's class loader
-   spl_autoload_register($callable, $throw=true, $prepend=true);
+   // instantiate and register the framework's class loader
    $loader = new ClassLoader();
    $loader->register();
-   spl_autoload_unregister($callable);
+   spl_autoload_unregister($bootstrap);
 
-   // register an otherwise lost legacy auto-loader
+   // register and save an otherwise lost legacy auto-loader
    if ($legacyAutoLoad && spl_autoload_functions()[0]!='__autoload') {
       spl_autoload_register('__autoload', $throw=true, $prepend=true);
    }
 }
-bootstrap();
