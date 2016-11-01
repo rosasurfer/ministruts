@@ -6,8 +6,9 @@ use rosasurfer\loader\ClassLoader;
 
 
 // Block re-includes.
-if (defined(__NAMESPACE__.'\MINISTRUTS_ROOT')) return;
-    define (__NAMESPACE__.'\MINISTRUTS_ROOT', dirName(__DIR__));
+if (defined('rosasurfer\MINISTRUTS_ROOT'))
+   return;
+define('rosasurfer\MINISTRUTS_ROOT', dirName(__DIR__));
 
 
 // Include helper functions and constants which can't be auto-loaded.
