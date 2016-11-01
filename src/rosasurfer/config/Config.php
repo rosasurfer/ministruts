@@ -16,6 +16,7 @@ use rosasurfer\lock\Lock;
 use rosasurfer\log\Logger;
 
 use const rosasurfer\CLI;
+use const rosasurfer\L_NOTICE;
 use const rosasurfer\LOCALHOST;
 use const rosasurfer\MINISTRUTS_ROOT;
 use const rosasurfer\WINDOWS;
@@ -328,7 +329,9 @@ class Config extends Object implements ConfigInterface {
          //$config = $cache->get('default');
 
          // if no cached config exist, create a new instance
-         if (!$config) $config = new DefaultConfig();
+         if (!$config) $config = new MainConfig();
+
+         self::setDefault($config);
 
          // unlock the method
          $isActive = false;
