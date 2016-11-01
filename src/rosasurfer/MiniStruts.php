@@ -81,7 +81,7 @@ class MiniStruts extends StaticClass {
       // __config__   + __phpinfo__: show PHP config after application configuration
       // __shutdown__ + __phpinfo__: show PHP config at shutdown (end of script)
       // __cache__                 : show cache admin interface
-      $phpInfoTaskAfterConfig = $showConfigTask = $showCacheTask = $atShutdown = false;
+      $phpInfoTaskAfterConfig = $configInfoTask = $cacheInfoTask = $atShutdown = false;
 
       if (!CLI && (LOCALHOST || $_SERVER['REMOTE_ADDR']==$_SERVER['SERVER_ADDR'])) {
          foreach ($_REQUEST as $param => $value) {
@@ -92,8 +92,8 @@ class MiniStruts extends StaticClass {
                      exit(0);
                   });
                }
-               else if ($showConfigTask) {
-                  $showConfigTask         = false;       // cancel show-config task
+               else if ($configInfoTask) {
+                  $configInfoTask         = false;       // cancel config-info task
                   $phpInfoTaskAfterConfig = true;
                }
                else {
@@ -103,10 +103,10 @@ class MiniStruts extends StaticClass {
                break;                                    // stop parsing after "__phpinfo__"
             }
             else if ($param == '__config__') {
-               $showConfigTask = true;
+               $configInfoTask = true;
             }
             else if ($param == '__cache__') {
-               $showCacheTask = true;
+               $cacheInfoTask = true;
                break;                                    // stop parsing after "__cache__"
             }
             else if ($param == '__shutdown__') {
@@ -118,10 +118,10 @@ class MiniStruts extends StaticClass {
       // (3) load any further PHP config settings from the application's main configuration
       self::configurePhp();
 
-      // (4) execute "show-config" task if enabled
-      if ($showConfigTask) {
-         //Config::getDefault()->show();                       // TODO: not yet implemented
-         //exit(0);
+      // (4) execute "config-info" task if enabled
+      if ($configInfoTask) {
+         echoPre(Config::getDefault()->info());
+         exit(0);
       }
 
       // (5) execute "phpinfo" after-config task if enabled
@@ -130,8 +130,8 @@ class MiniStruts extends StaticClass {
          exit(0);
       }
 
-      // (6) execute "show-cache" task if enabled
-      if ($showCacheTask) {
+      // (6) execute "cache-info" task if enabled
+      if ($cacheInfoTask) {
          //include(MINISTRUTS_ROOT.'/src/rosasurfer/debug/apc.php'); // TODO: not yet implemented
          exit(0);
       }

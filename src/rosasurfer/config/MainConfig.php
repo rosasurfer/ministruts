@@ -76,4 +76,14 @@ class MainConfig extends Config {
       //   $dependency->setMinValidity(60 * SECONDS);
       //$cache->set('default', $config, Cache::EXPIRES_NEVER, $dependency);
    }
+
+
+   /**
+    * Return an informative text describing the instance.
+    *
+    * @return string
+    */
+   public function info() {
+      return __METHOD__.'()  not yet implemented';
+   }
 }
