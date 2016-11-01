@@ -2,8 +2,13 @@
 namespace rosasurfer;
 
 use rosasurfer\config\Config;
+use rosasurfer\config\MainConfig;
+use rosasurfer\config\ConfigInterface as IConfig;
+
 use rosasurfer\core\StaticClass;
+
 use rosasurfer\debug\ErrorHandler;
+
 use rosasurfer\util\PHP;
 
 
@@ -19,27 +24,21 @@ class MiniStruts extends StaticClass {
    /** @var int - error handling mode in which regular PHP errors are converted to exceptions and thrown back */
    const THROW_EXCEPTIONS = ErrorHandler::THROW_EXCEPTIONS;
 
-   /** @var string - the applications main config directory */
-   private static $configDir;
-
 
    /**
     * Initialize the framework. This method expects an array with any of the following options:
     *
-    * "config-dir"        - String: Path of a custom application config directory. If the application structure follows
-    *                       its own standards this setting can be used to read config files from a non-standard directory.
-    *                       Default: Read config files from the directory "APPLICATION_ROOT/app/config/".
+    * "config"            - ConfigInterface: config instance
+    *                     - String: Configuration location, can either be a config directory or a config file.
     *
-    * "global-helpers"    - Boolean: If this option is set to TRUE, the helper functions and constants defined in
-    *                       namespace "rosasurfer\" are additionally mapped to the global namespace.
-    *                       see {@link ./global-helpers.php}
+    * "global-helpers"    - Boolean: If set to TRUE, the helper functions and constants defined in namespace "rosasurfer\"
+    *                       are additionally mapped to the global namespace.
+    *                       see  {@link ./global-helpers.php}
     *                       Default: FALSE (no global helpers)
     *
     * "handle-errors"     - Integer: Flag specifying how to handle regular PHP errors. Possible values:
-    *
     *                       LOG_ERRORS: PHP errors are logged by the built-in default logger.<br>
-    *                                   see {@link \rosasurfer\log\Logger}
-    *
+    *                                   see  {@link \rosasurfer\log\Logger}
     *                       THROW_EXCEPTIONS: PHP errors are converted to PHP ErrorExceptions and thrown back. If this
     *                                   option is used it is required to either configure the framework's exception
     *                                   handler or to register your own exception handling mechanism. Without an
@@ -47,25 +46,24 @@ class MiniStruts extends StaticClass {
     *                                   exception.
     *                       Default: NULL (no error handling)
     *
-    * "handle-exceptions" - Boolean: If this option is set to TRUE, the framework will send otherwise unhandled exceptions
-    *                       to the built-in default logger before PHP will terminate the script.<br>
-    *                       see {@link \rosasurfer\log\Logger}
-    *
+    * "handle-exceptions" - Boolean: If set to TRUE, the framework will send otherwise unhandled exceptions to the built-in
+    *                       default logger before PHP will terminate the script.<br>
+    *                       see  {@link \rosasurfer\log\Logger}
     *                       Enabling this option is required if the option "handle-errors" is set to ERROR_HANDLER_THROW
     *                       and you don't provide your own exception handling mechanism.
     *                       Default: FALSE (no exception handling)
     *
-    * "replace-composer"  - Boolean: If this option is set to TRUE, the framework replaces an existing Composer class
-    *                       loader (non-standard compliant) with it's own standard compliant version. Use this option if
-    *                       the case-sensitivity of Composer's class loader causes errors.
+    * "replace-composer"  - Boolean: If set to TRUE, the framework replaces an existing Composer class loader (non-standard
+    *                       compliant) with it's own standard compliant version. Use this option if the case-sensitivity of
+    *                       Composer's class loader causes errors.
     *                       Default: FALSE
     *
-    * @param  array $options
+    * @param  mixed[] $options
     */
    public static function init(array $options = []) {
       foreach ($options as $key => $value) {
          switch ($key) {
-            case 'config-dir'       : self::setConfigDir          ($value); continue;
+            case 'config'           : self::setConfiguration      ($value); continue;
             case 'global-helpers'   : self::loadGlobalHelpers     ($value); continue;
             case 'handle-errors'    : self::setupErrorHandling    ($value); continue;
             case 'handle-exceptions': self::setupExceptionHandling($value); continue;
@@ -172,29 +170,14 @@ class MiniStruts extends StaticClass {
 
 
    /**
-    * Get the application's main config directory.
+    * Set the specified configuration as the application's main configuration or create one.
     *
-    * @return string
+    * @param  string|IConfig $config - configuration or config location as passed to the framework loader
     */
-   public static function getConfigDir() {
-      if (!self::$configDir) {
-         self::$configDir = realPath(APPLICATION_ROOT.'/app/config');
-      }
-      return self::$configDir;
-   }
-
-
-   /**
-    * Set the specified directory as the application's main config directory.
-    *
-    * @param  mixed $value - configuration value as passed to the framework loader
-    */
-   private static function setConfigDir($value) {
-      if (is_string($value)) {
-         if (is_dir($value)) {
-            self::$configDir = realPath($value);
-         }
-      }
+   private static function setConfiguration($config) {
+      if (is_string($config))
+         $config = new MainConfig($config);
+      Config::setDefault($config);
    }
 
 
@@ -286,6 +269,6 @@ class MiniStruts extends StaticClass {
 
 
 // make sure the framework is loaded (e.g. if only this class is loaded by Composer)
-if (!defined(__NAMESPACE__.'\MINISTRUTS_ROOT')) {
+if (!defined('rosasurfer\MINISTRUTS_ROOT')) {
    include(__DIR__.'/../load.php');
 }

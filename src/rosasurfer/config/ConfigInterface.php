@@ -30,4 +30,20 @@ interface ConfigInterface {
     * @param  string $value - new value
     */
    public function set($key, $value);
+
+
+   /**
+    * Get the instance's configuration directory.
+    *
+    * @return string
+    */
+   public function getDirectory();
+
+
+   /**
+    * Return an informative text describing the instance (specifics are open to the implementor).
+    *
+    * @return string
+    */
+   public function info();
 }

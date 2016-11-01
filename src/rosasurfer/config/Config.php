@@ -1,13 +1,10 @@
 <?php
 namespace rosasurfer\config;
 
-use rosasurfer\MiniStruts;
 
 use rosasurfer\cache\Cache;
 
 use rosasurfer\core\Object;
-
-use rosasurfer\dependency\FileDependency;
 
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
@@ -21,7 +18,6 @@ use rosasurfer\log\Logger;
 use const rosasurfer\CLI;
 use const rosasurfer\LOCALHOST;
 use const rosasurfer\MINISTRUTS_ROOT;
-use const rosasurfer\SECONDS;
 use const rosasurfer\WINDOWS;
 
 
@@ -65,38 +61,33 @@ use const rosasurfer\WINDOWS;
  * db.password  = password
  * db.database  = schema
  *
- * db.options[] = option_1                                  # bracket notation create numeric array structures
- * db.options[] = option_2
- * db.options[] = option_3
+ * options[] = value-at-index-0                             # bracket notation creates numeric array structures
+ * options[] = value-at-index-1
+ * options[] = value-at-index-2
  *
  * # comment on its own line
  * log.level.Action                 = warn                  # comment at the end of line
  * log.level.foo\bar\MyClass        = notice                # keys may contain namespaces
  *
  * key.subkey with spaces           = value                 # keys may contain spaces
- * key.   indented subkey           = value                 # enclosing space around keys is ignored
- *
- * key."subkey.with.key.separators" = value                 # quoted keys can contain otherwise illegal characters
+ * key.   indented subkey           = value                 # enclosing space around subkeys is ignored
+ * key."subkey.with.key.separators" = value                 # quoted keys can contain otherwise illegal key characters
  * </pre>
  */
 class Config extends Object implements ConfigInterface {
 
 
-   /**
-    * @var ConfigInterface - default configuration; this is the instance returned by Config::getDefault()
-    */
+   /** @var ConfigInterface - the application's current default configuration */
    private static $defaultInstance;
 
+   /** @var string[] - config file names (existing and non-existing ones) */
+   protected $files = [];
 
-   /**
-    * @var string[] - names of the looked-up config files (existing and non-existing)
-    */
-   public $files = [];
+   /** @var string - config directory (the last requested configuration file's directory) */
+   protected $directory;
 
-   /**
-    * @var string[] - tree structure of the found configuration values
-    */
-   private $properties = [];
+   /** @var string[] - tree structure of configuration values */
+   protected $properties = [];
 
 
    /**
@@ -104,23 +95,29 @@ class Config extends Object implements ConfigInterface {
     *
     * Create a new instance and load the specified property files.
     *
-    * @param  string[] $files - array of filenames to load
+    * @param  string|[] $files - filename or array of filenames to load
     */
-   public function __construct(array $files) {
-      // check and remember existence of the specified config files
+   public function __construct($files) {
+      if      (is_string($files)) $files = [$files];
+      else if (!is_array($files)) throw new IllegalTypeException('Illegal type of parameter $files: '.getType($files));
+
+      // check and remember existence of the specified files
       $checkedFiles = [];
-      foreach ($files as $file) {
+      foreach ($files as $i => $file) {
+         if (!is_string($file)) throw new IllegalTypeException('Illegal type of parameter $files['.$i.']: '.getType($file));
+
          $checkedFiles[$file] = is_file($file);
-         $checkedFiles[$file] = is_file($file);
+
+         $relative = WINDOWS ? !preg_match('/^[a-z]:/i', $file) : ($file[0] != '/');
+         $relative && $file=getCwd().PATH_SEPARATOR.$file;
+         $this->directory = dirName($file);                          // save absolute path to the last specified file
       }
       $this->files = $checkedFiles;
 
-      // load existing config files
+      // load existing files
       foreach ($this->files as $fileName => $fileExists) {
          $fileExists && $this->loadFile($fileName);
       }
-
-      !self::$defaultInstance && self::setDefault($this);
    }
 
 
@@ -129,7 +126,7 @@ class Config extends Object implements ConfigInterface {
     *
     * @param  string $filename
     */
-   private function loadFile($filename) {
+   protected function loadFile($filename) {
       $lines = file($filename, FILE_IGNORE_NEW_LINES);
 
       foreach ($lines as $i => $line) {
@@ -149,6 +146,16 @@ class Config extends Object implements ConfigInterface {
          // parse and store property value
          $this->setProperty($key, $value, $filename, $i+1);
       }
+   }
+
+
+   /**
+    * Get this instance's configuration directory. This is the directory of the last configuration file specified.
+    *
+    * @return string
+    */
+   public function getDirectory() {
+      return $this->directory;
    }
 
 
@@ -197,7 +204,7 @@ class Config extends Object implements ConfigInterface {
     *
     * @return string|[] - a string, a string array or NULL if no such setting is found
     */
-   private function getProperty($key) {
+   protected function getProperty($key) {
       $properties  = $this->properties;
       $subkeys     = $this->parseSubkeys($key);
       $subKeysSize = sizeOf($subkeys);
@@ -220,7 +227,7 @@ class Config extends Object implements ConfigInterface {
     * @param  string $key
     * @param  string $value
     */
-   private function setProperty($key, $value, $file=null, $line=null) {
+   protected function setProperty($key, $value, $file=null, $line=null) {
       // set the property depending on the existing data structure
       $properties  =& $this->properties;
       $subkeys     =  $this->parseSubkeys($key);
@@ -259,13 +266,13 @@ class Config extends Object implements ConfigInterface {
 
 
    /**
-    * Parse the specified into subkeys. Subkeys can consist of quoted strings.
+    * Parse the specified key into subkeys. Subkeys can consist of quoted strings.
     *
     * @param  string $key
     *
     * @return string[] - array of subkeys
     */
-   private function parseSubkeys($key) {
+   protected function parseSubkeys($key) {
       $k          = $key;
       $subkeys    = [];
       $quoteChars = ["'", '"'];                    // single and double quotes
@@ -302,8 +309,8 @@ class Config extends Object implements ConfigInterface {
 
 
    /**
-    * Get the application's default configuration. This is the configuration set by Config::setDefault(). If none was
-    * yet set, one is created. The configuration is cached.
+    * Get the current default configuration. This is the configuration set by Config::setDefault(). If none was yet set,
+    * one is created.
     *
     * @return ConfigInterface
     */
@@ -314,50 +321,14 @@ class Config extends Object implements ConfigInterface {
          // block recursive calls
          static $isActive = false;
          if ($isActive) throw new RuntimeException('Blocking recursive call to '.__METHOD__.'()');
-         $isActive = true;                                              // lock the method
+         $isActive = true;                                     // lock the method
 
-         $cache  = Cache::me();
-         $config = $cache->get(static::class);                          // is there a cached instance?
+         // default config does not yet exist, look-up cached one or create a new instance
+         //$cache  = Cache::me();
+         //$config = $cache->get('default');
 
-         if (!$config) {
-            // default config does not yet exist, create a new instance
-            // define config paths according to runtime context
-            $paths = [];
-            $paths[]          = MINISTRUTS_ROOT.'/src';                 // all:   framework config directory
-            $paths[]          = MiniStruts::getConfigDir();             // all: + app config directory
-            if (CLI) $paths[] = dirName($_SERVER['SCRIPT_FILENAME']);   // cli: + script directory
-
-            // normalize paths and remove duplicates
-            foreach ($paths as $i => $path) {
-               if (!is_dir($path)) {                                    // drop entries of non-existing directories,
-                  unset($paths[$i]);                                    // e.g. the app config directory
-                  continue;
-               }
-               $paths[$i] = realPath($path);
-            }
-            $paths = array_unique($paths);
-
-            // define application config files
-            $files = [];
-            foreach ($paths as $path) {
-               $files[] = $path.DIRECTORY_SEPARATOR.'config-default.properties';
-               $files[] = $path.DIRECTORY_SEPARATOR.'config.properties';
-            }
-
-            // create the instance
-            $config = new static($files);
-
-            // create FileDependency and cache the instance
-            $dependency = FileDependency::create(array_keys($config->files));
-            if (!WINDOWS && !CLI && !LOCALHOST)                         // distinction dev/production (sense???)
-               $dependency->setMinValidity(60 * SECONDS);
-            $cache->set(static::class, $config, Cache::EXPIRES_NEVER, $dependency);
-
-         }
-
-         // set it as default
-         if ($config)
-            self::setDefault($config);
+         // if no cached config exist, create a new instance
+         if (!$config) $config = new DefaultConfig();
 
          // unlock the method
          $isActive = false;
@@ -387,10 +358,26 @@ class Config extends Object implements ConfigInterface {
 
 
    /**
-    * Handle clones (public but can't be called manually).
+    * Handle clones (public but can't be called).
     */
    public function __clone() {
       throw new UnimplementedFeatureException(__METHOD__.'() not yet implemented');
       // TODO: update cache id or disable caching of this instance
    }
+
+
+   /**
+    * Return an informative text describing the instance.
+    *
+    * @return string
+    */
+   public function info() {
+      return __METHOD__.'()  not yet implemented';
+   }
+}
+
+
+// make sure the framework is loaded (e.g. if only this class is loaded by Composer)
+if (!defined('rosasurfer\MINISTRUTS_ROOT')) {
+   include(__DIR__.'/../../load.php');
 }

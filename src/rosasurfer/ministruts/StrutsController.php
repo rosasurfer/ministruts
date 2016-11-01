@@ -26,6 +26,7 @@ use const rosasurfer\L_NOTICE;
 use const rosasurfer\LOCALHOST;
 use const rosasurfer\MINUTE;
 use const rosasurfer\WINDOWS;
+use rosasurfer\config\Config;
 
 
 /**
@@ -70,7 +71,8 @@ class StrutsController extends Singleton {
                // create new controller instance...
                $controller = Singleton::getInstance($class);
 
-               $configFile = str_replace('\\', '/', MiniStruts::getConfigDir().'/struts-config.xml');
+               $configDir  = Config::getDefault()->getDirectory();
+               $configFile = str_replace('\\', '/', $configDir.'/struts-config.xml');
                $dependency = FileDependency::create($configFile);
                if (!WINDOWS && !LOCALHOST)                           // distinction dev/production
                   $dependency->setMinValidity(1 * MINUTE);
@@ -97,7 +99,8 @@ class StrutsController extends Singleton {
       self::$logNotice = ($loglevel <= L_NOTICE);
 
       // lookup configuration files
-      $configDir = str_replace('\\', '/', MiniStruts::getConfigDir());
+      $configDir = Config::getDefault()->getDirectory();
+      $configDir = str_replace('\\', '/', $configDir);
       if (!is_file($configDir.'/struts-config.xml'))
          throw new FileNotFoundException('Configuration file not found: "'.$configDir.'/struts-config.xml"');
 
