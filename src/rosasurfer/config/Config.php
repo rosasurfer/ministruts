@@ -11,8 +11,6 @@ use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
 use rosasurfer\exception\UnimplementedFeatureException;
 
-use rosasurfer\lock\Lock;
-
 use rosasurfer\log\Logger;
 
 use const rosasurfer\CLI;
@@ -81,13 +79,13 @@ class Config extends Object implements ConfigInterface {
    /** @var ConfigInterface - the application's current default configuration */
    private static $defaultInstance;
 
-   /** @var string[] - config file names (existing and non-existing ones) */
+   /** @var string[] - config file names */
    protected $files = [];
 
    /** @var string - config directory (the last requested configuration file's directory) */
    protected $directory;
 
-   /** @var string[] - tree structure of configuration values */
+   /** @var string[] - tree structure of config values */
    protected $properties = [];
 
 
@@ -310,33 +308,13 @@ class Config extends Object implements ConfigInterface {
 
 
    /**
-    * Get the current default configuration. This is the configuration set by Config::setDefault(). If none was yet set,
-    * one is created.
+    * Get the current default configuration. This is the configuration set by Config::setDefault().
     *
     * @return ConfigInterface
     */
    public static function getDefault() {
-      $config = self::$defaultInstance;
-
-      if (!$config) {
-         // block recursive calls
-         static $isActive = false;
-         if ($isActive) throw new RuntimeException('Blocking recursive call to '.__METHOD__.'()');
-         $isActive = true;                                     // lock the method
-
-         // default config does not yet exist, look-up cached one or create a new instance
-         //$cache  = Cache::me();
-         //$config = $cache->get('default');
-
-         // if no cached config exist, create a new instance
-         if (!$config) $config = new MainConfig();
-
-         self::setDefault($config);
-
-         // unlock the method
-         $isActive = false;
-      }
-      return $config;
+      // intentionally cause an error if $defaultInstance was not yet set
+      return self::$defaultInstance;
    }
 
 

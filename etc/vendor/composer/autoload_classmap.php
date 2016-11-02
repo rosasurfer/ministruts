@@ -28,7 +28,7 @@ return array(
     'rosasurfer\\cache\\ReferencePool' => $baseDir . '/src/rosasurfer/cache/ReferencePool.php',
     'rosasurfer\\config\\Config' => $baseDir . '/src/rosasurfer/config/Config.php',
     'rosasurfer\\config\\ConfigInterface' => $baseDir . '/src/rosasurfer/config/ConfigInterface.php',
-    'rosasurfer\\config\\MainConfig' => $baseDir . '/src/rosasurfer/config/MainConfig.php',
+    'rosasurfer\\config\\StdConfig' => $baseDir . '/src/rosasurfer/config/StdConfig.php',
     'rosasurfer\\core\\Object' => $baseDir . '/src/rosasurfer/core/Object.php',
     'rosasurfer\\core\\Singleton' => $baseDir . '/src/rosasurfer/core/Singleton.php',
     'rosasurfer\\core\\StaticClass' => $baseDir . '/src/rosasurfer/core/StaticClass.php',

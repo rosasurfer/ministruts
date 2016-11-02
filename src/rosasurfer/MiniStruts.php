@@ -2,8 +2,8 @@
 namespace rosasurfer;
 
 use rosasurfer\config\Config;
-use rosasurfer\config\MainConfig;
 use rosasurfer\config\ConfigInterface as IConfig;
+use rosasurfer\config\StdConfig;
 
 use rosasurfer\core\StaticClass;
 
@@ -176,7 +176,7 @@ class MiniStruts extends StaticClass {
     */
    private static function setConfiguration($config) {
       if (is_string($config))
-         $config = new MainConfig($config);
+         $config = new StdConfig($config);
       Config::setDefault($config);
    }
 

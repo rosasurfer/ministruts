@@ -11,17 +11,14 @@ use const rosasurfer\MINISTRUTS_ROOT;
 /**
  * An application's main configuration using property files.
  *
- * A MainConfig is a stacked configuration where multiple configurations are stacked on each other and finally merged into
- * a single configuration instance. A MainConfig consists of the framework configuration and the project configuration.
- *
- * The framework configuration is created from "config-default.properties", "config-cli.properties" (if true) and
- * "config.properties".
- *
- * The application configuration is created from "config-default.properties", "config-cli.properties" (if true) and an
- * optional user-defined configuration (e.g. "config-production.properties"). If no custom config file is specified the
- * default user configuration "config.properties" is used.
+ * A StdConfig is a standard configuration which typically is used as an application's main configuration. It differs
+ * from a non-standard configuration in automatically loading a standardized set of configuration files. These are the
+ * framework configuration files ("config-default.properties", "config-cli.properties" if true and "config.properties")
+ * and the project configuration files ("config-default.properties", "config-cli.properties" if true and an optional
+ * user-defined configuration, e.g. "config-production.properties"). If no user-defined configuration file is specified
+ * the default user configuration "config.properties" is loaded.
  */
-class MainConfig extends Config {
+class StdConfig extends Config {
 
 
    /**
