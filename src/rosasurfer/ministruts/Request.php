@@ -49,7 +49,7 @@ class Request extends Singleton {
    /**
     * Return the <tt>Singleton</tt> instance.
     *
-    * @return Singleton
+    * @return static
     *
     * @throws RuntimeException if not called from the web interface
     */
