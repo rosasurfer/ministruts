@@ -1,10 +1,7 @@
 <?php
 namespace rosasurfer\cache;
 
-use rosasurfer\core\Object;
-
 use rosasurfer\dependency\Dependency;
-
 use rosasurfer\exception\IllegalTypeException;
 
 
