@@ -2,6 +2,9 @@
 /**
  * Map the helper constants and functions in "rosasurfer/helpers.php" to the global namespace.
  */
+use rosasurfer\ministruts\url\Url;
+use rosasurfer\ministruts\url\VersionedUrl;
+
 
 // block re-includes
 if (defined('CLI')) return;
