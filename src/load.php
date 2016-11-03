@@ -1,4 +1,10 @@
 <?php
+/**
+ * Framework loader.
+ *
+ * Load helper functions and constants and register the internal class loader. If Composer is running the class loader
+ * automatically replaces Composer and drops it.
+ */
 namespace rosasurfer;
 
 use rosasurfer\core\Object;
