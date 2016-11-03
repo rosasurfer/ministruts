@@ -266,9 +266,3 @@ class MiniStruts extends StaticClass {
       }
    }
 }
-
-
-// make sure the framework is loaded (e.g. if only this class is loaded by Composer)
-if (!defined('rosasurfer\MINISTRUTS_ROOT')) {
-   include(__DIR__.'/../load.php');
-}

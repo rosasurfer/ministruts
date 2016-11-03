@@ -356,9 +356,3 @@ class Config extends Object implements ConfigInterface {
       return __METHOD__.'()  not yet implemented';
    }
 }
-
-
-// make sure the framework is loaded (e.g. if only this class is loaded by Composer)
-if (!defined('rosasurfer\MINISTRUTS_ROOT')) {
-   include(__DIR__.'/../../load.php');
-}
