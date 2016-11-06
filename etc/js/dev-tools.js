@@ -13,8 +13,8 @@ if (!String.prototype.capitalize     ) String.prototype.capitalize      = functi
 if (!String.prototype.capitalizeWords) String.prototype.capitalizeWords = function()                  { return this.replace(/\w\S*/g, function(word) { return word.capitalize(); }); }
 if (!String.prototype.decodeEntities ) String.prototype.decodeEntities  = function()                  { if (!String.prototype.decodeEntities.textarea) /*static*/ String.prototype.decodeEntities.textarea = document.createElement('textarea'); String.prototype.decodeEntities.textarea.innerHTML = this; return String.prototype.decodeEntities.textarea.value; }
 if (!String.prototype.trim           ) String.prototype.trim            = function()                  { return this.replace(/(^\s+)|(\s+$)/g, ''); }
-if (!String.prototype.contains       ) String.prototype.contains        = function(/*string*/ string) { var pos = this.indexOf(string); return (pos != -1); }
 if (!String.prototype.startsWith     ) String.prototype.startsWith      = function(/*string*/ prefix) { return (this.indexOf(prefix) === 0); }
+if (!String.prototype.contains       ) String.prototype.contains        = function(/*string*/ string) { return (this.indexOf(string) != -1); }
 if (!String.prototype.endsWith       ) String.prototype.endsWith        = function(/*string*/ suffix) { var pos = this.lastIndexOf(suffix); return (pos!=-1 && this.length==pos+suffix.length); }
 
 // fix broken Internet Explorer substr()
