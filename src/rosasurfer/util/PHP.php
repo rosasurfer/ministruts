@@ -373,6 +373,22 @@ class PHP extends StaticClass {
 
 
    /**
+    * Set the specified php.ini setting. Opposite to the built-in function ini_set() this method does not return the
+    * previously set option value but a boolean success status. Used to detect assignment errors if the access level
+    * of the specified option is not PHP_INI_ALL or PHP_INI_USER or the option is locked by the server configuration
+    * (php_admin_value/php_admin_flag).
+    *
+    * @param  string $option
+    * @param  string $value
+    *
+    * @return bool - success status
+    */
+   public static function ini_set($option, $value) {
+      return (ini_set($option, $value) !== false);
+   }
+
+
+   /**
     * Return the query string of the current url (if any).
     *
     * @return string
