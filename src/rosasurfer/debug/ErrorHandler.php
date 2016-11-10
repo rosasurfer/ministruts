@@ -31,6 +31,7 @@ use const rosasurfer\L_ERROR;
 use const rosasurfer\L_FATAL;
 use const rosasurfer\L_NOTICE;
 use const rosasurfer\L_WARN;
+use const rosasurfer\LOCALHOST;
 use const rosasurfer\NL;
 
 
@@ -274,8 +275,8 @@ class ErrorHandler extends StaticClass {
 
          error_log(trim($msg), ERROR_LOG_DEFAULT);
       }
-
-      !CLI && echoPre('application error (see error log)');       // display a minimal hint to prevent an empty web page
+                                                                  // display a minimal hint to prevent an empty web page
+      !CLI && !LOCALHOST && echoPre('application error (see error log)');
    }
 
 
