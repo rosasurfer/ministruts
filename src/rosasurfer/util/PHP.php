@@ -384,7 +384,7 @@ class PHP extends StaticClass {
     * @return bool - success status
     */
    public static function ini_set($option, $value) {
-      return (ini_set($option, $value) === false);
+      return (ini_set($option, $value) !== false);
    }
 
 
