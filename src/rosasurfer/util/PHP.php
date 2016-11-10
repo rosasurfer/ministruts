@@ -11,7 +11,6 @@ use function rosasurfer\strRightFrom;
 use function rosasurfer\strStartsWith;
 
 use const rosasurfer\CLI;
-use const rosasurfer\ERROR_LOG_DEFAULT;
 use const rosasurfer\MB;
 use const rosasurfer\NL;
 use const rosasurfer\WINDOWS;
@@ -385,11 +384,7 @@ class PHP extends StaticClass {
     * @return bool - success status
     */
    public static function ini_set($option, $value) {
-      $result = ini_set($option, $value);
-      if ($result === false) {
-         error_log('cannot set php.ini option "'.$option.'"', ERROR_LOG_DEFAULT);
-      }
-      return $result;
+      return (ini_set($option, $value) === false);
    }
 
 
