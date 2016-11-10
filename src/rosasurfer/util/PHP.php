@@ -136,12 +136,12 @@ class PHP extends StaticClass {
          if (is_file($errorLog)) {
             $hFile = @fOpen($errorLog, 'ab');         // try to open
             if (is_resource($hFile)) fClose($hFile);
-            else                                                                                                  $issues[] = 'Error: error_log "'.$errorLog.'" is not writable  [setup]';
+            else                                                                                                  $issues[] = 'Error: error_log "'.$errorLog.'" file is not writable  [setup]';
          }
          else {
             $hFile = @fOpen($errorLog, 'wb');         // try to create
             if (is_resource($hFile)) fClose($hFile);
-            else                                                                                                  $issues[] = 'Error: error_log "'.$errorLog.'" is not writable  [setup]';
+            else                                                                                                  $issues[] = 'Error: error_log "'.$errorLog.'" directory is not writable  [setup]';
             is_file($errorLog) && @unlink($errorLog);
          }
       }
