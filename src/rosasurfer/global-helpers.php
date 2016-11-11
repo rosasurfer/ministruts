@@ -65,14 +65,15 @@ const PHP_INI_PERDIR    = \rosasurfer\PHP_INI_PERDIR;
 /**
  * Dumps a variable to STDOUT or into a string.
  *
- * @param  mixed $var    - variable
- * @param  bool  $return - TRUE,  if the variable is to be dumped into a string;
- *                         FALSE, if the variable is to be dumped to STDOUT (default)
+ * @param  mixed $var          - variable
+ * @param  bool  $return       - TRUE,  if the variable is to be dumped into a string;
+ *                               FALSE, if the variable is to be dumped to STDOUT (default)
+ * @param  bool  $flushBuffers - whether or not to flush output buffers on output (default: TRUE)
  *
  * @return string - string if the result is to be returned, NULL otherwise
  */
-function dump($var, $return=false) {
-   return \rosasurfer\dump($var, $return);
+function dump($var, $return=false, $flushBuffers=true) {
+   return \rosasurfer\dump($var, $return, $flushBuffers);
 }
 
 
@@ -80,23 +81,25 @@ function dump($var, $return=false) {
  * Functional replacement for "echo($var)" which is a language construct and can't be used as a regular function.
  *
  * @param  mixed $var
+ * @param  bool  $flushBuffers - whether or not to flush output buffers (default: TRUE)
  */
-function echof($var) {
-   return \rosasurfer\echof($var);
+function echof($var, $flushBuffers=true) {
+   return \rosasurfer\echof($var, $flushBuffers);
 }
 
 
 /**
- * Alias for printPretty($var, false)
+ * Alias for printPretty($var, false, $flushBuffers)
  *
  * Prints a variable in a pretty way. Output always ends with a line feed.
  *
  * @param  mixed $var
+ * @param  bool  $flushBuffers - whether or not to flush output buffers (default: TRUE)
  *
  * @see    printPretty()
  */
-function echoPre($var) {
-   return \rosasurfer\echoPre($var);
+function echoPre($var, $flushBuffers=true) {
+   return \rosasurfer\echoPre($var, $flushBuffers);
 }
 
 
@@ -105,30 +108,32 @@ function echoPre($var) {
  *
  * Prints a variable in a pretty way. Output always ends with a line feed.
  *
- * @param  mixed $var    - variable
- * @param  bool  $return - TRUE,  if the result is to be returned as a string;
- *                         FALSE, if the result is to be printed to STDOUT (default)
+ * @param  mixed $var          - variable
+ * @param  bool  $return       - TRUE,  if the result is to be returned as a string;
+ *                               FALSE, if the result is to be printed to STDOUT (default)
+ * @param  bool  $flushBuffers - whether or not to flush output buffers on output (default: TRUE)
  *
  * @return string - string if the result is to be returned, NULL otherwise
  *
  * @see    printPretty()
  */
-function pp($var, $return=false) {
-   return \rosasurfer\pp($var, $return);
+function pp($var, $return=false, $flushBuffers=true) {
+   return \rosasurfer\pp($var, $return, $flushBuffers);
 }
 
 
 /**
  * Prints a variable in a pretty way. Output always ends with a line feed.
  *
- * @param  mixed $var    - variable
- * @param  bool  $return - TRUE,  if the result is to be returned as a string;
- *                         FALSE, if the result is to be printed to STDOUT (default)
+ * @param  mixed $var          - variable
+ * @param  bool  $return       - TRUE,  if the result is to be returned as a string;
+ *                               FALSE, if the result is to be printed to STDOUT (default)
+ * @param  bool  $flushBuffers - whether or not to flush output buffers on output (default: TRUE)
  *
  * @return string - string if the result is to be returned, NULL otherwise
  */
-function printPretty($var, $return=false) {
-   return \rosasurfer\printPretty($var, $return);
+function printPretty($var, $return=false, $flushBuffers=true) {
+   return \rosasurfer\printPretty($var, $return, $flushBuffers);
 }
 
 

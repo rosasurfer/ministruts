@@ -74,18 +74,20 @@ const NL                = "\n";
 /**
  * Dumps a variable to STDOUT or into a string.
  *
- * @param  mixed $var    - variable
- * @param  bool  $return - TRUE,  if the variable is to be dumped into a string;
- *                         FALSE, if the variable is to be dumped to STDOUT (default)
+ * @param  mixed $var          - variable
+ * @param  bool  $return       - TRUE,  if the variable is to be dumped into a string;
+ *                               FALSE, if the variable is to be dumped to STDOUT (default)
+ * @param  bool  $flushBuffers - whether or not to flush output buffers on output (default: TRUE)
  *
  * @return string - string if the result is to be returned, NULL otherwise
  */
-function dump($var, $return=false) {
+function dump($var, $return=false, $flushBuffers=true) {
    if ($return) ob_start();
    var_dump($var);
    if ($return) return ob_get_clean();
 
-   ob_get_level() && ob_flush();          // flush output buffer if active
+   if ($flushBuffers)
+      ob_get_level() && ob_flush();
    return null;
 }
 
@@ -94,24 +96,27 @@ function dump($var, $return=false) {
  * Functional replacement for "echo($var)" which is a language construct and can't be used as a regular function.
  *
  * @param  mixed $var
+ * @param  bool  $flushBuffers - whether or not to flush output buffers (default: TRUE)
  */
-function echof($var) {
+function echof($var, $flushBuffers=true) {
    echo $var;
-   ob_get_level() && ob_flush();          // flush output buffer if active
+   if ($flushBuffers)
+      ob_get_level() && ob_flush();
 }
 
 
 /**
- * Alias for printPretty($var, false)
+ * Alias for printPretty($var, false, $flushBuffers)
  *
  * Prints a variable in a pretty way. Output always ends with a line feed.
  *
  * @param  mixed $var
+ * @param  bool  $flushBuffers - whether or not to flush output buffers (default: TRUE)
  *
  * @see    printPretty()
  */
-function echoPre($var) {
-   printPretty($var, false);
+function echoPre($var, $flushBuffers=true) {
+   printPretty($var, false, $flushBuffers);
 }
 
 
@@ -120,29 +125,31 @@ function echoPre($var) {
  *
  * Prints a variable in a pretty way. Output always ends with a line feed.
  *
- * @param  mixed $var    - variable
- * @param  bool  $return - TRUE,  if the result is to be returned as a string;
- *                         FALSE, if the result is to be printed to STDOUT (default)
+ * @param  mixed $var          - variable
+ * @param  bool  $return       - TRUE,  if the result is to be returned as a string;
+ *                               FALSE, if the result is to be printed to STDOUT (default)
+ * @param  bool  $flushBuffers - whether or not to flush output buffers on output (default: TRUE)
  *
  * @return string - string if the result is to be returned, NULL otherwise
  *
  * @see    printPretty()
  */
-function pp($var, $return=false) {
-   return printPretty($var, $return);
+function pp($var, $return=false, $flushBuffers=true) {
+   return printPretty($var, $return, $flushBuffers);
 }
 
 
 /**
  * Prints a variable in a pretty way. Output always ends with a line feed.
  *
- * @param  mixed $var    - variable
- * @param  bool  $return - TRUE,  if the result is to be returned as a string;
- *                         FALSE, if the result is to be printed to STDOUT (default)
+ * @param  mixed $var          - variable
+ * @param  bool  $return       - TRUE,  if the result is to be returned as a string;
+ *                               FALSE, if the result is to be printed to STDOUT (default)
+ * @param  bool  $flushBuffers - whether or not to flush output buffers on output (default: TRUE)
  *
  * @return string - string if the result is to be returned, NULL otherwise
  */
-function printPretty($var, $return=false) {
+function printPretty($var, $return=false, $flushBuffers=true) {
    if (is_object($var) && method_exists($var, '__toString')) {
       $str = (string) $var;
    }
@@ -169,7 +176,9 @@ function printPretty($var, $return=false) {
       return $str;
 
    echo $str;
-   ob_get_level() && ob_flush();          // flush output buffer if active
+
+   if ($flushBuffers)
+      ob_get_level() && ob_flush();
    return null;
 }
 
