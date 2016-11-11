@@ -2,8 +2,11 @@
 namespace rosasurfer\util;
 
 use rosasurfer\core\StaticClass;
+
 use rosasurfer\debug\DebugHelper;
+
 use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\exception\RuntimeException;
 
 use function rosasurfer\echoPre;
 use function rosasurfer\strRight;
@@ -380,11 +383,26 @@ class PHP extends StaticClass {
     *
     * @param  string $option
     * @param  string $value
+    * @param  bool   $suppressErrors - whether or not to suppress errors setting the option (default: FALSE)
     *
     * @return bool - success status
     */
-   public static function ini_set($option, $value) {
-      return (ini_set($option, $value) !== false);
+   public static function ini_set($option, $value, $suppressErrors=false) {
+      $result = ini_set($option, $value);
+      if ($result === false) {
+         $sValue   = (string) $value;
+         $oldValue = ini_get($option);
+         if ($oldValue == $sValue) {         // ini_set() caused an error but the values remain the same
+            $result = true;                  // => the error can be ignored
+         }
+         else if (!$suppressErrors) {        // ini_set() caused an error and the error can't be ignored
+            throw new RuntimeException('Cannot set php.ini option "'.$option.'" (former value="'.$oldValue.'")');
+         }
+      }
+      else {
+         $result = true;
+      }
+      return $result;
    }
 
 
