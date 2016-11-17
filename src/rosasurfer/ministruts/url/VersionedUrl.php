@@ -18,10 +18,9 @@ class VersionedUrl extends Url {
       $url = parent::__toString();
 
       if (file_exists($fileName=APPLICATION_ROOT.'/www/'.$this->uri)) {
-         $version = decHex(crc32(fileSize($fileName).'|'.fileMtime($fileName)));
-
-         if (!$this->parameters) $url .= '?'.$version;
-         else                    $url .= $this->argSeparator.$version;
+         if (strPos($url, '?') === false) $url .= '?';
+         else                             $url .= '&';
+         $url .= decHex(crc32(fileSize($fileName).'|'.fileMtime($fileName)));
       }
       return $url;
    }

@@ -12,9 +12,6 @@ class Url extends Object {
 
 
    /** @var string */
-   protected $argSeparator;
-
-   /** @var string */
    protected $uri;
 
    /** @var string[] */
@@ -30,9 +27,7 @@ class Url extends Object {
     */
    public function __construct($uri) {
       if (!is_string($uri)) throw new IllegalTypeException('Illegal type of parameter $uri: '.getType($uri));
-
-      $this->uri          = $uri;
-      $this->argSeparator = ini_get('arg_separator.output');
+      $this->uri = $uri;
    }
 
 
@@ -43,8 +38,11 @@ class Url extends Object {
     */
    public function __toString() {
       $url = $this->uri;
-      if ($this->parameters)
-         $url .= '?'.http_build_query($this->parameters);
+      if ($this->parameters) {
+         if (strPos($url, '?') === false) $url .= '?';
+         else                             $url .= '&';
+         $url .= http_build_query($this->parameters, null, '&');
+      }
       return $url;
    }
 }
