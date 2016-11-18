@@ -37,12 +37,12 @@ class Url extends Object {
     * @return string
     */
    public function __toString() {
-      $url = $this->uri;
+      $uri = $this->uri;
       if ($this->parameters) {
-         if (strPos($url, '?') === false) $url .= '?';
-         else                             $url .= '&';
-         $url .= http_build_query($this->parameters, null, '&');
+         if (strPos($uri, '?') === false) $uri .= '?';
+         else                             $uri .= '&';
+         $uri .= http_build_query($this->parameters, null, '&');
       }
-      return $url;
+      return $uri;
    }
 }

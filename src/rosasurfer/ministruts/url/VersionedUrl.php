@@ -15,13 +15,16 @@ class VersionedUrl extends Url {
     * @return string
     */
    public function __toString() {
-      $url = parent::__toString();
+      $uri = parent::__toString();
 
-      if (file_exists($fileName=APPLICATION_ROOT.'/www/'.$this->uri)) {
-         if (strPos($url, '?') === false) $url .= '?';
-         else                             $url .= '&';
-         $url .= decHex(crc32(fileSize($fileName).'|'.fileMtime($fileName)));
+      if (($pos=strPos($uri, '?')) === false) $name = $uri;
+      else                                    $name = subStr($uri, 0, $pos);
+
+      if (file_exists($fileName=APPLICATION_ROOT.'/www/'.$name)) {
+         if ($pos === false) $uri .= '?';
+         else                $uri .= '&';
+         $uri .= decHex(crc32(fileSize($fileName).'|'.fileMtime($fileName)));
       }
-      return $url;
+      return $uri;
    }
 }
