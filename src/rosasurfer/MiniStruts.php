@@ -83,7 +83,7 @@ class MiniStruts extends StaticClass {
       // __cache__                 : show cache admin interface
       $phpInfoTaskAfterConfig = $configInfoTask = $cacheInfoTask = $atShutdown = false;
 
-      if (!CLI && (LOCALHOST || $_SERVER['REMOTE_ADDR']==$_SERVER['SERVER_ADDR'])) {
+      if (LOCALHOST) {
          foreach ($_REQUEST as $param => $value) {
             if ($param == '__phpinfo__') {
                if ($atShutdown) {

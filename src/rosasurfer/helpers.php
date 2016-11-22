@@ -17,9 +17,10 @@ use rosasurfer\util\Validator;
 if (defined('rosasurfer\CLI'))
    return;
 
-define('rosasurfer\CLI'      , !isSet($_SERVER['REQUEST_METHOD']));           // whether or not we run on a command line interface
-define('rosasurfer\LOCALHOST', !CLI && $_SERVER['REMOTE_ADDR']=='127.0.0.1'); // whether or not we run on localhost
-define('rosasurfer\WINDOWS'  , (strToUpper(subStr(PHP_OS, 0, 3))=='WIN'));    // whether or not we run on Windows
+// whether or not we run on a command line interface, on localhost and on Windows
+define('rosasurfer\CLI'      , !isSet($_SERVER['REQUEST_METHOD']));
+define('rosasurfer\LOCALHOST', !CLI && in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1', $_SERVER['SERVER_ADDR']]));
+define('rosasurfer\WINDOWS'  , (strToUpper(subStr(PHP_OS, 0, 3))=='WIN'));
 
 // custom log level
 const L_DEBUG           =  1;
