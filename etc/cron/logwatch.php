@@ -2,10 +2,11 @@
 <?php
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //                                                                                                                    //
-//  This file is a template script, it cannot run by itself. Copy this file in your project's CRON directory and      //
-//  adjust the path to your application's init script in line 30.  Then setup a cron job to run the script by CRON.   //
+//  This file is a template script, it cannot run by itself. Copy this file to your project's CRON directory and      //
+//  adjust the path in line 34 to your application's init script.  Then setup a cron job to run the script by CRON.   //
 //                                                                                                                    //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 /**
  * Scans the application's PHP error log file for entries and notifies by email of any findings. Mails will be sent to
