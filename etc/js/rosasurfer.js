@@ -137,40 +137,25 @@ function showProperties(/*mixed*/arg) {
    if (typeof(arg) == 'undefined') return alert('showProperties()\n\nUndefined parameter: arg');
 
    var properties=[], property='';
+   var name = (arg.constructor===Array) ? 'array' : arg.toString();
 
    for (var i in arg) {
       try {
-         property = arg.toString() +'.'+ i +' = '+ arg[i];
+         property = name +'.'+ i +' = '+ arg[i];
       }
       catch (ex) {
          break;
-         property = arg.toString() +'.'+ i +' = Exception while reading property (name: '+ ex.name +', message: '+ ex.message +')';
+         property = name +'.'+ i +' = Exception while reading property (name: '+ ex.name +', message: '+ ex.message +')';
       }
       properties[properties.length] = property.replace(/</g, '&lt;').replace(/>/g, '&gt;');
    }
 
    if (properties.length) {
-      if (true || navigator.userAgent.endsWith('/4.0')) {
-         log(properties.sort().join('<br>\n'));                      // workaround for flawed GreaseMonkey in Firefox 4.0
-      }
-      else {
-         var popup = open('', 'show_properties', 'resizable,scrollbars,width=700,height=800');
-         if (!popup) return alert('showProperties()\n\nCannot open popup for '+ location +'\nPlease disable popup blocker.');
-
-         var div = popup.document.createElement('div');
-         div.style.fontSize   = '13px';
-         div.style.fontFamily = 'arial,helvetica,sans-serif';
-         div.innerHTML        = properties.sort().join('<br>\n');
-
-         popup.document.getElementsByTagName('body')[0].appendChild(div);
-         popup.focus();
-      }
+      log(properties.sort().join('<br>\n'));
    }
    else {
-      var type = typeof(arg);
-      if (type == 'function') type = '';
-      else                    type = type.charAt(0).toUpperCase() + type.slice(1);
-      alert('showProperties()\n\n'+ (type +' '+ arg +' has no known properties.').trim());
+      var type = (arg.constructor===Array) ? 'array' : typeof(arg);
+      alert('showProperties()\n\n'+ type.toLowerCase() +' '+ arg +' has no known properties.');
    }
 }
 
