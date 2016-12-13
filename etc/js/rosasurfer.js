@@ -206,40 +206,49 @@ var rosasurfer = {
 
 
    /**
-    * Log a message to the current window.
+    * Log a message to the top or bottom of the current page. It is sufficient to provide the 'target' argument only once
+    * for every log target change.
     *
-    * @param  mixed msg
+    * @param  mixed  msg
+    * @param  string target - whether to log to the top or the bottom of the current page (default: top)
     */
-   log: function log(msg) {
-      if (!this.logDiv) {
-         this.logDiv = document.createElement('div');
-         this.logDiv.setAttribute('id', 'rosasurfer.log');
-         this.logDiv.style.zIndex          = ''+ (0xFFFFFFFFFFFF+1);
-         this.logDiv.style.position        = 'absolute';
-         this.logDiv.style.left            = '10px';
-         this.logDiv.style.top             = '10px';
-         this.logDiv.style.padding         = '10px';
-         this.logDiv.style.textAlign       = 'left';
-         this.logDiv.style.fontSize        = '13px';
-         this.logDiv.style.fontFamily      = 'arial,helvetica,sans-serif';
-         this.logDiv.style.color           = 'black';
-         this.logDiv.style.backgroundColor = 'lightgray';
+   log: function log(msg, target) {
+      if (this.log.top===undefined) this.log.top = true;
+      if      (target == 'top'   )  this.log.top = true;
+      else if (target == 'bottom')  this.log.top = false;
 
+      var div = this.log.top ? 'log.top' : 'log.bottom';
+      if (!this[div]) {
+         this[div] = document.createElement('div');
+         this[div].setAttribute('id', 'rosasurfer.'+ div);
+         this[div].style.zIndex          = ''+ (0xFFFFFFFFFFFF+1);
+         this[div].style.padding         = '10px';
+         this[div].style.textAlign       = 'left';
+         this[div].style.fontSize        = '12px';
+         this[div].style.fontFamily      = 'arial,helvetica,sans-serif';
+         this[div].style.color           = 'black';
+         this[div].style.backgroundColor = 'lightgray';
+         if (this.log.top) {
+            this[div].style.position     = 'absolute';
+            this[div].style.left         = '10px';
+            this[div].style.top          = '10px';
+         }
          var bodies = document.getElementsByTagName('body');
          if (!bodies || !bodies.length)
-            return alert('rosasurfer.log()\n\nError: You must log from inside the <body> tag!');
-         bodies[0].appendChild(this.logDiv);
+            return alert('rosasurfer.log()\n\nError: You cannot log from outside the <body> tag!');
+         bodies[0].appendChild(this[div]);
       }
-      this.logDiv.innerHTML += msg +'<br>\n';
+      this[div].innerHTML += msg +'<br>\n';
    },
 
 
    /**
-    * Clear the log output in the current window.
+    * Clear the last log output in the current page.
     */
    clearLog: function clearLog() {
-      if (this.logDiv)
-         this.logDiv.innerHTML = '';
+      var div = (this.log.top!==false) ? 'log.top' : 'log.bottom';
+      if (this[div])
+         this[div].innerHTML = '';
    },
 
 
