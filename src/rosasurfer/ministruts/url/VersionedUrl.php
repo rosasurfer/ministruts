@@ -20,6 +20,8 @@ class VersionedUrl extends Url {
       if (($pos=strPos($uri, '?')) === false) $name = $uri;
       else                                    $name = subStr($uri, 0, $pos);
 
+      // TODO: replace static web directory reference by configuration value
+
       if (file_exists($fileName=APPLICATION_ROOT.'/www/'.$name)) {
          if ($pos === false) $uri .= '?';
          else                $uri .= '&';
