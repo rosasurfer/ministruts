@@ -153,11 +153,11 @@ class PHP extends StaticClass {
       // (3) input sanitizing
       // --------------------
       if (PHP_VERSION_ID < 50400) {
-         /*PHP_INI_ALL   */ if (self::ini_get_bool('magic_quotes_sybase'  )) /*overrides 'magic_quotes_gpc'*/     $issues[] = 'Error: magic_quotes_sybase is not Off  [standards]';
+         /*PHP_INI_ALL   */ if      (self::ini_get_bool('magic_quotes_sybase' )) /*overrides 'magic_quotes_gpc'*/ $issues[] = 'Error: magic_quotes_sybase is not Off  [standards]';
          /*PHP_INI_PERDIR*/ else if (self::ini_get_bool('magic_quotes_gpc'))                                      $issues[] = 'Error: magic_quotes_gpc is not Off  [standards]';
-         /*PHP_INI_ALL   */ if (self::ini_get_bool('magic_quotes_runtime' ))                                      $issues[] = 'Error: magic_quotes_runtime is not Off  [standards]';
+         /*PHP_INI_ALL   */ if      (self::ini_get_bool('magic_quotes_runtime'))                                  $issues[] = 'Error: magic_quotes_runtime is not Off  [standards]';
       }
-      /*PHP_INI_SYSTEM*/ if ( self::ini_get_bool('sql.safe_mode'          ))                                      $issues[] = 'Warn:  sql.safe_mode is not Off  [setup]';
+      /*PHP_INI_SYSTEM*/    if      (self::ini_get_bool('sql.safe_mode'       ))                                  $issues[] = 'Warn:  sql.safe_mode is not Off  [setup]';
 
 
       // (4) request & HTML handling
@@ -190,30 +190,27 @@ class PHP extends StaticClass {
       // TODO: /*PHP_INI_ALL*/ "zlib.output_compression"
 
 
-
-
-
-
-
-
-
-
-
-
-
-
       // (5) session related
       // -------------------
-      /*PHP_INI_ALL   */ if (ini_get('session.save_handler') != 'files')                                                  $issues[] = 'Warn:  session.save_handler is not "files": "'.ini_get('session.save_handler').'"';
+      /*PHP_INI_ALL   */ if (       ini_get     ('session.save_handler') != 'files')                              $issues[] = 'Info:  session.save_handler is not "files": "'.ini_get('session.save_handler').'"';
       // TODO: check "session.save_path"
-      /*PHP_INI_ALL   */ if (ini_get('session.serialize_handler') != 'php')                                               $issues[] = 'Warn:  session.serialize_handler is not "php": "'.ini_get('session.serialize_handler').'"';
-      /*PHP_INI_PERDIR*/ if (ini_get('session.auto_start'))                                                               $issues[] = 'Warn:  session.auto_start is not Off';
-      /*PHP_INI_ALL   */ if (!ini_get('session.use_cookies'))                                                             $issues[] = 'Warn:  session.use_cookies is not On' ;
-      /*PHP_INI_ALL   */ if (ini_get('session.use_trans_sid'))                                                            $issues[] = 'Warn:  session.use_trans_sid is not Off';
-      /*PHP_INI_ALL   */ if (ini_get('session.bug_compat_42'))                                       /*removed since 5.4*/$issues[] = 'Warn:  session.bug_compat_42 is not Off';
-      /*PHP_INI_ALL   */ if (ini_get('session.bug_compat_42') && !ini_get('session.bug_compat_warn'))/*removed since 5.4*/$issues[] = 'Warn:  session.bug_compat_warn is not On';
-      /*PHP_INI_ALL   */ if (ini_get('session.referer_check') != '')                                                      $issues[] = 'Warn:  session.referer_check is not "": "'.ini_get('session.referer_check').'"';
-      /*PHP_INI_ALL   */ if (ini_get('url_rewriter.tags') != 'a=href,area=href,frame=src,iframe=src,form=,fieldset=')     $issues[] = 'Warn:  url_rewriter.tags is not "a=href,area=href,frame=src,iframe=src,form=,fieldset=": "'.ini_get('url_rewriter.tags').'"';
+      /*PHP_INI_ALL   */ if (       ini_get     ('session.serialize_handler') != 'php')                           $issues[] = 'Info:  session.serialize_handler is not "php": "'.ini_get('session.serialize_handler').'"';
+      /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('session.auto_start'))                                           $issues[] = 'Info:  session.auto_start is not Off  [performance]';
+      if (PHP_VERSION_ID < 50400) {
+         /*PHP_INI_ALL*/ if ( self::ini_get_bool('session.bug_compat_42')) {                                      $issues[] = 'Info:  session.bug_compat_42 is not Off';
+         /*PHP_INI_ALL*/ if (!self::ini_get_bool('session.bug_compat_warn'))                                      $issues[] = 'Info:  session.bug_compat_warn is not On';
+      }}
+      /*PHP_INI_ALL   */ if (       ini_get     ('session.referer_check') != '')                                  $issues[] = 'Warn:  session.referer_check is not "": "'.ini_get('session.referer_check').'"  [functionality]';
+      /*PHP_INI_ALL   */ if (!self::ini_get_bool('session.use_strict_mode') && PHP_VERSION_ID >= 50502)           $issues[] = 'Warn:  session.use_strict_mode is not On  [security]';
+      /*PHP_INI_ALL   */ if (!self::ini_get_bool('session.use_cookies'))                                          $issues[] = 'Warn:  session.use_cookies is not On  [security]';
+      /*PHP_INI_ALL   */ if (!self::ini_get_bool('session.use_only_cookies'))                                     $issues[] = 'Warn:  session.use_only_cookies is not On  [security]';
+      /*PHP_INI_ALL   */ if ( self::ini_get_bool('session.use_trans_sid')) {
+                         if (!self::ini_get_bool('session.use_only_cookies'))                                     $issues[] = 'Warn:  session.use_trans_sid is On  [security]';
+                         else                                                                                     $issues[] = 'Info:  session.use_trans_sid is On';
+      }
+
+
+
 
 
       // (6) mail related
