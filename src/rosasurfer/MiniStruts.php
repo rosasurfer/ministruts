@@ -85,6 +85,7 @@ class MiniStruts extends StaticClass {
 
       if (LOCALHOST) {
          foreach ($_REQUEST as $param => $value) {
+            $param = strToLower($param);
             if ($param == '__phpinfo__') {
                if ($atShutdown) {
                   register_shutdown_function(function() {
