@@ -20,12 +20,14 @@ class VersionedUrl extends Url {
       if (($pos=strPos($uri, '?')) === false) $name = $uri;
       else                                    $name = subStr($uri, 0, $pos);
 
-      // TODO: replace static web directory reference by configuration value
-
-      if (file_exists($fileName=APPLICATION_ROOT.'/www/'.$name)) {
-         if ($pos === false) $uri .= '?';
-         else                $uri .= '&';
-         $uri .= decHex(crc32(fileSize($fileName).'|'.fileMtime($fileName)));
+      // TODO: replace static directory references by configuration value
+      foreach (['/public/', '/web/', '/www/'] as $dir) {
+         if (file_exists($fileName=APPLICATION_ROOT.$dir.$name)) {
+            if ($pos === false) $uri .= '?';
+            else                $uri .= '&';
+            $uri .= decHex(crc32(fileSize($fileName).'|'.fileMtime($fileName)));
+            break;
+         }
       }
       return $uri;
    }
