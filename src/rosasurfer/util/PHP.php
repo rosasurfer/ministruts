@@ -209,7 +209,6 @@ class PHP extends StaticClass {
       /*PHP_INI_ALL   */ if (ini_get('session.serialize_handler') != 'php')                                               $issues[] = 'Warn:  session.serialize_handler is not "php": "'.ini_get('session.serialize_handler').'"';
       /*PHP_INI_PERDIR*/ if (ini_get('session.auto_start'))                                                               $issues[] = 'Warn:  session.auto_start is not Off';
       /*PHP_INI_ALL   */ if (!ini_get('session.use_cookies'))                                                             $issues[] = 'Warn:  session.use_cookies is not On' ;
-      /*PHP_INI_ALL   */ if (!ini_get('session.cookie_httponly'))                                                         $issues[] = 'Warn:  session.cookie_httponly is not On';
       /*PHP_INI_ALL   */ if (ini_get('session.use_trans_sid'))                                                            $issues[] = 'Warn:  session.use_trans_sid is not Off';
       /*PHP_INI_ALL   */ if (ini_get('session.bug_compat_42'))                                       /*removed since 5.4*/$issues[] = 'Warn:  session.bug_compat_42 is not Off';
       /*PHP_INI_ALL   */ if (ini_get('session.bug_compat_42') && !ini_get('session.bug_compat_warn'))/*removed since 5.4*/$issues[] = 'Warn:  session.bug_compat_warn is not On';
