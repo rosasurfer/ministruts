@@ -329,7 +329,7 @@ class Request extends Singleton {
    public function getApplicationBaseUri() {
       // TODO: Move to application as this uri is not a property of the request.
       static $path = null;
-      if (!$path && isSet($_SERVER['APPLICATION_BASE_URI'])) {
+      if (!$path) {
          $path = $_SERVER['APPLICATION_BASE_URI'];             // triggers error if not set, which is OK
          !strStartsWith($path, '/') && $path  = '/'.$path;
          !strEndsWith  ($path, '/') && $path .= '/';
