@@ -6,9 +6,7 @@ use rosasurfer\config\ConfigInterface as IConfig;
 use rosasurfer\config\StdConfig;
 
 use rosasurfer\core\StaticClass;
-
 use rosasurfer\debug\ErrorHandler;
-
 use rosasurfer\util\PHP;
 
 
@@ -29,35 +27,28 @@ class MiniStruts extends StaticClass {
     * Initialize the framework. This method expects an array with any of the following options:
     *
     * "config"            - ConfigInterface: config instance
-    *                     - String: Configuration location, can either be a config directory or a config file.
+    *                     - string:  Configuration location, can either be a config directory or a config file.
     *
-    * "global-helpers"    - Boolean: If set to TRUE, the helper functions and constants defined in namespace "rosasurfer\"
-    *                       are additionally mapped to the global namespace.
-    *                       see  {@link ./global-helpers.php}
-    *                       Default: FALSE (no global helpers)
+    * "global-helpers"    - boolean: If set to TRUE, the helper functions and constants defined in namespace "rosasurfer\"
+    *                                are additionally mapped to the global namespace.
+    *                                default: FALSE (no global helpers)
+    *                                see  {@link ./global-helpers.php}
     *
-    * "handle-errors"     - Integer: Flag specifying how to handle regular PHP errors. Possible values:
-    *                       LOG_ERRORS: PHP errors are logged by the built-in default logger.<br>
-    *                                   see  {@link \rosasurfer\log\Logger}
-    *                       THROW_EXCEPTIONS: PHP errors are converted to PHP ErrorExceptions and thrown back. If this
-    *                                   option is used it is required to either configure the framework's exception
-    *                                   handler or to register your own exception handling mechanism. Without an
-    *                                   exception handler PHP will terminate a script with a FATAL error after such an
-    *                                   exception.
-    *                       Default: NULL (no error handling)
+    * "handle-errors"     - integer: Flag specifying how to handle regular PHP errors. Possible values:
+    *                        LOG_ERRORS: PHP errors are logged by the built-in default logger.<br>
+    *                                see  {@link \rosasurfer\log\Logger}
+    *                        THROW_EXCEPTIONS: PHP errors are converted to PHP ErrorExceptions and thrown back. If this option
+    *                                is used it is required to either configure the framework's exception handler or to register
+    *                                your own exception handling mechanism. Without an exception handler PHP will terminate a
+    *                                script with a FATAL error after such an exception.
+    *                                default: NULL (no error handling)
     *
-    * "handle-exceptions" - Boolean: If set to TRUE, the framework will send otherwise unhandled exceptions to the built-in
-    *                       default logger before PHP will terminate the script.<br>
-    *                       see  {@link \rosasurfer\log\Logger}
-    *                       Enabling this option is required if the option "handle-errors" is set to ERROR_HANDLER_THROW
-    *                       and you don't provide your own exception handling mechanism.
-    *                       Default: FALSE (no exception handling)
-    *
-    * "replace-composer"  - Boolean: If set to TRUE, the framework replaces an existing Composer class loader (non-standard
-    *                       compliant) with it's own standard compliant version. Use this option if the case-sensitivity of
-    *                       Composer's class loader causes errors.
-    *                       Default: FALSE
-    *
+    * "handle-exceptions" - boolean: If set to TRUE, the framework will send otherwise unhandled exceptions to the built-in
+    *                                default logger before PHP will terminate the script.<br>
+    *                                see  {@link \rosasurfer\log\Logger}
+    *                                Enabling this option is required if the option "handle-errors" is set to ERROR_HANDLER_THROW
+    *                                and you don't provide your own exception handling mechanism.
+    *                                default: FALSE (no exception handling)
     * @param  mixed[] $options
     */
    public static function init(array $options = []) {
@@ -67,7 +58,7 @@ class MiniStruts extends StaticClass {
             case 'global-helpers'   : self::loadGlobalHelpers     ($value); continue;
             case 'handle-errors'    : self::setupErrorHandling    ($value); continue;
             case 'handle-exceptions': self::setupExceptionHandling($value); continue;
-            case 'replace-composer' : self::replaceComposer       ($value); continue;     // TODO
+          //case 'replace-composer' : self::replaceComposer       ($value); continue;     // TODO
          }
       }
 
