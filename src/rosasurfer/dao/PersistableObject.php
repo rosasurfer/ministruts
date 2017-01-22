@@ -8,63 +8,54 @@ use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\UnimplementedFeatureException;
 
 use rosasurfer\log\Logger;
-
 use rosasurfer\util\Date;
 
 
 /**
  * PersistableObject
  *
- * Abstrakte Basisklasse für gespeicherte Objekte.
+ * Abstract base class for stored objects.
  */
 abstract class PersistableObject extends Object {
 
 
-   /** @var bool - Flag für den aktuellen Änderungsstatus der Instanz */
+   /** @var bool     - current modification status */
    protected $modified = false;
 
-   /** @var string[] */
+   /** @var string[] - modified and unsaved properties */
    protected $modifications;
 
 
-   // Standard-Properties jeder Instanz
+   // standard properties
 
-   /** @var int - Primary Key */
+   /** @var int - primary key */
    protected $id;
 
-   /** @var string - Erzeugungszeitpunkt (datetime) */
+   /** @var (string)datetime - time of creation */
    protected $created;
 
-   /** @var string - Versionsnummer (timestamp) */
+   /** @var (string)datetime - time of last modification */
    protected $version;
 
-   /** @var string - Löschzeitpunkt (datetime) */
+   /** @var (string)datetime - time of soft deletion */
    protected $deleted;
 
 
    /**
-    * Default-Constructor.
+    * Default constructor. Final and used only by the ORM. To create new instances define and use static helper methods.
     *
-    * Der Constructor ist final, neue PersistableObject-Instanzen können nur per Helfermethode erzeugt werden.
+    * @example
+    *  class MyClass extends PersistableObject {
     *
+    *     public static function create($properties, ...) {
+    *        $instance = new static();
+    *        // define properties...
+    *        return $instance;
+    *     }
+    *  }
     *
-    * Beispiel:
-    * ---------
-    *
-    * class MyClass extends PersistableObject {
-    *
-    *    private $property = null;
-    *
-    *    public static function create($arg) {
-    *       // parameter validation...
-    *       $instance = new static();
-    *       $instance->property = $arg;
-    *       return $instance;
-    *    }
-    * }
-    *
-    * $object = MyClass::create('foo');
-    * $object->save();
+    *  $object = MyClass::create('foo');
+    *  $object->save();
     */
    final protected function __construct() {
       $this->created = $this->touch();
@@ -72,9 +63,9 @@ abstract class PersistableObject extends Object {
 
 
    /**
-    * Gibt die ID dieser Instanz zurück.
+    * Return the id (the primary key) of the instance.
     *
-    * @return int - ID (primary key)
+    * @return int - id
     */
    public function getId() {
       return $this->id;
@@ -82,24 +73,23 @@ abstract class PersistableObject extends Object {
 
 
    /**
-    * Gibt den Erstellungszeitpunkt dieser Instanz zurück.
+    * Return the creation time of the instance.
     *
-    * @param  string $format - Zeitformat
+    * @param  string $format - format as used by date($format, $timestamp)
     *
-    * @return string - Zeitpunkt
+    * @return string - creation time
     */
    public function getCreated($format = 'Y-m-d H:i:s')  {
       if ($format == 'Y-m-d H:i:s')
          return $this->created;
-
       return Date::format($this->created, $format);
    }
 
 
    /**
-    * Gibt die Versionsnummer dieser Instanz zurück.
+    * Return the version string of the instance. The default implementation returns the last modification time.
     *
-    * @return string - Versionsnummer (Zeitpunkt der letzten Änderung)
+    * @return string - version
     */
    public function getVersion() {
       return $this->version;
@@ -107,33 +97,31 @@ abstract class PersistableObject extends Object {
 
 
    /**
-    * Aktualisiert die Versions-Nr. dieser Instanz und gibt den neuen Wert zurück.  Wird zur externen
-    * Generierung der Versions-Informationen verwendet.
+    * Update the version string of the instance and return it.
     *
-    * @return string - Versionsnummer (Zeitpunkt der letzten Änderung)
+    * @return string - version
     */
-   final protected function touch() {
+   protected function touch() {
       return $this->version = date('Y-m-d H:i:s');
    }
 
 
    /**
-    * Gibt den Zeitpunkt des "Soft-Delete" dieser Instanz zurück.
+    * Return the soft deletion time of the instance (if applicable).
     *
-    * @param  string $format - Zeitformat
+    * @param  string $format - format as used by date($format, $timestamp)
     *
-    * @return string - Zeitpunkt
+    * @return string - deletion time
     */
    public function getDeleted($format = 'Y-m-d H:i:s')  {
       if ($format == 'Y-m-d H:i:s')
          return $this->deleted;
-
       return Date::format($this->deleted, $format);
    }
 
 
    /**
-    * Ob diese Instanz in der Datenbank als "gelöscht" markiert ist (Soft-Delete).
+    * Whether or not the instance is marked as "soft deleted".
     *
     * @return bool
     */
@@ -143,8 +131,8 @@ abstract class PersistableObject extends Object {
 
 
    /**
-    * Zeigt an, ob die aktuelle Instanz bereits gespeichert ist oder nicht.
-    * Muß überschrieben werden, wenn die Primary Key-Spalte der Klasse nicht 'id' heißt.
+    * Whether or not the instance was already saved. If the instance was saved it has a unique id assigned to it (the primary
+    * key). If the instance was not yet saved the id is NULL. Overwrite this method if the name of the primary key is not "id".
     *
     * @return bool
     */
@@ -154,7 +142,7 @@ abstract class PersistableObject extends Object {
 
 
    /**
-    * Ob diese Instanz ungespeicherte Änderungen enthält.
+    * Whether or not the instance contains unsaved  modifications.
     *
     * @return bool
     */
@@ -164,9 +152,9 @@ abstract class PersistableObject extends Object {
 
 
    /**
-    * Speichert diese Instanz in der Datenbank.
+    * Save the instance in the storage mechanism.
     *
-    * @return PersistableObject
+    * @return self
     */
    final public function save() {
       if (!$this->isPersistent()) {
@@ -186,9 +174,9 @@ abstract class PersistableObject extends Object {
 
 
    /**
-    * Fügt diese Instanz in die Datenbank ein.  Diese Methode muß von der konkreten Klasse implementiert werden.
+    * Insert this instance into the storage mechanism. Needs to be implemented by the actual class.
     *
-    * @return PersistableObject
+    * @return self
     */
    protected function insert() {
       throw new UnimplementedFeatureException('You must implement '.get_class($this).'->'.__FUNCTION__.'() to insert a '.get_class($this).'.');
@@ -196,9 +184,9 @@ abstract class PersistableObject extends Object {
 
 
    /**
-    * Aktualisiert diese Instanz in der Datenbank.  Diese Methode muß von der konkreten Klasse implementiert werden.
+    * Update the instance in the storage mechanism. Needs to be implemented by the actual class.
     *
-    * @return PersistableObject
+    * @return self
     */
    protected function update() {
       throw new UnimplementedFeatureException('You must implement '.get_class($this).'->'.__FUNCTION__.'() to update a '.get_class($this).'.');
@@ -206,10 +194,9 @@ abstract class PersistableObject extends Object {
 
 
    /**
-    * Aktualisiert die Kreuzverknüpfungen dieser Instanz in der Datenbank.  Diese Methode muß von der
-    * konkreten Klasse implementiert werden.
+    * Update the relational cross-links of the instance. Needs to be implemented by the actual class.
     *
-    * @return PersistableObject
+    * @return self
     */
    protected function updateLinks() {
       return $this;
@@ -217,7 +204,7 @@ abstract class PersistableObject extends Object {
 
 
    /**
-    * Löscht diese Instanz aus der Datenbank.  Diese Methode muß von der konkreten Klasse implementiert werden.
+    * Delete the instance from the storage mechanism. Needs to be implemented by the actual class.
     *
     * @return NULL
     */
@@ -227,12 +214,13 @@ abstract class PersistableObject extends Object {
 
 
    /**
-    * Erzeugt eine neue Instanz.
+    * Create a new instance and populate it with the specified properties. This method is called by the ORM to transform
+    * rows originating from database queries to objects of the respective model class.
     *
-    * @param  string $class - Klassenname der zu erzeugenden Instanz
-    * @param  array  $row   - Array mit Instanzdaten (entspricht einer Datenbankzeile)
+    * @param  string $class - class name of the model
+    * @param  array  $row   - array holding property values (typically a single row from a database table)
     *
-    * @return PersistableObject
+    * @return self
     */
    public static function createInstance($class, array $row) {
       $object = new $class();
