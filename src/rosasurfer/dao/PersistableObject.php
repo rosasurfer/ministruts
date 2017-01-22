@@ -191,7 +191,7 @@ abstract class PersistableObject extends Object {
     * @return PersistableObject
     */
    protected function insert() {
-      throw new UnimplementedFeatureException('You must implement '.get_class($this).'->'.__FUNCTION__.'() to insert '.get_class($this).'s.');
+      throw new UnimplementedFeatureException('You must implement '.get_class($this).'->'.__FUNCTION__.'() to insert a '.get_class($this).'.');
    }
 
 
@@ -201,7 +201,7 @@ abstract class PersistableObject extends Object {
     * @return PersistableObject
     */
    protected function update() {
-      throw new UnimplementedFeatureException('You must implement '.get_class($this).'->'.__FUNCTION__.'() to update '.get_class($this).'s.');
+      throw new UnimplementedFeatureException('You must implement '.get_class($this).'->'.__FUNCTION__.'() to update a '.get_class($this).'.');
    }
 
 
@@ -222,7 +222,7 @@ abstract class PersistableObject extends Object {
     * @return NULL
     */
    public function delete() {
-      throw new UnimplementedFeatureException('You must implement '.get_class($this).'->'.__FUNCTION__.'() to delete '.get_class($this).'s.');
+      throw new UnimplementedFeatureException('You must implement '.get_class($this).'->'.__FUNCTION__.'() to delete a '.get_class($this).'.');
    }
 
 
