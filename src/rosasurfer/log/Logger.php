@@ -396,7 +396,8 @@ class Logger extends StaticClass {
 
       if (CLI) {
          !isSet($context['cliMessage']) && self::composeCliMessage($loggable, $level, $context);
-         $message = $context['cliMessage'];
+         if (self::$printCounter) $message = NL;
+         $message .= $context['cliMessage'];
          if (isSet($context['cliExtra']))
             $message .= $context['cliExtra'];
       }
