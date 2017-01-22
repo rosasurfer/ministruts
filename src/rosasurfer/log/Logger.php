@@ -2,7 +2,6 @@
 namespace rosasurfer\log;
 
 use rosasurfer\config\Config;
-
 use rosasurfer\core\StaticClass;
 
 use rosasurfer\debug\DebugHelper;
@@ -20,10 +19,13 @@ use rosasurfer\net\http\CurlHttpClient;
 use rosasurfer\net\http\HttpRequest;
 use rosasurfer\net\http\HttpResponse;
 
+use rosasurfer\util\PHP;
+
 use function rosasurfer\ksort_r;
 use function rosasurfer\printPretty;
 use function rosasurfer\strContains;
 use function rosasurfer\strLeftTo;
+use function rosasurfer\strRightFrom;
 use function rosasurfer\strStartsWith;
 use function rosasurfer\strStartsWithI;
 
@@ -38,7 +40,6 @@ use const rosasurfer\L_WARN;
 use const rosasurfer\LOCALHOST;
 use const rosasurfer\NL;
 use const rosasurfer\WINDOWS;
-use rosasurfer\util\PHP;
 
 
 /**
@@ -608,9 +609,16 @@ class Logger extends StaticClass {
       }
       else {
          // exception
-         $type = isSet($context['unhandled']) ? 'Unhandled ' : '';
-         $msg  = $type.trim(DebugHelper::getBetterMessage($loggable));
-         $text = '['.strToUpper(self::$logLevels[$level]).'] '.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
+         $type = null;
+         $msg  = trim(DebugHelper::getBetterMessage($loggable));
+         if (isSet($context['unhandled'])) {
+            $type = 'Unhandled ';
+            if ($loggable instanceof PHPError) {
+               $msg   = strRightFrom($msg, ':');
+               $type .= 'PHP error:';
+            }
+         }
+         $text = '['.strToUpper(self::$logLevels[$level]).'] '.$type.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
 
          // the stack trace will go into "cliExtra"
          $traceStr  = $indent.'Stacktrace:'.NL.' -----------'.NL;
@@ -704,9 +712,16 @@ class Logger extends StaticClass {
       }
       else {
          // exception
-         $type      = isSet($context['unhandled']) ? 'Unhandled ' : '';
-         $msg       = $type.DebugHelper::getBetterMessage($loggable);
-         $html     .= '<b>['.strToUpper(self::$logLevels[$level]).']</b> '.nl2br(htmlSpecialChars($msg, ENT_QUOTES|ENT_SUBSTITUTE))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
+         $type = null;
+         $msg  = trim(DebugHelper::getBetterMessage($loggable));
+         if (isSet($context['unhandled'])) {
+            $type = 'Unhandled ';
+            if ($loggable instanceof PHPError) {
+               $msg   = strRightFrom($msg, ':');
+               $type .= 'PHP error:';
+            }
+         }
+         $html     .= '<b>['.strToUpper(self::$logLevels[$level]).']</b> '.nl2br(htmlSpecialChars($type.$msg, ENT_QUOTES|ENT_SUBSTITUTE))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
          $traceStr  = $indent.'Stacktrace:'.NL.' -----------'.NL;
          $traceStr .= DebugHelper::getBetterTraceAsString($loggable, $indent);
          $html     .= '<br>'.printPretty($traceStr, true).'<br>';
