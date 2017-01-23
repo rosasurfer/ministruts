@@ -14,12 +14,12 @@ use rosasurfer\loader\ClassLoader;
 // Block re-includes.
 if (defined('rosasurfer\MINISTRUTS_ROOT'))
    return;
-define('rosasurfer\MINISTRUTS_ROOT', dirName(__DIR__));
+define('rosasurfer\MINISTRUTS_ROOT', dirName(dirName(__DIR__)));
 
 
 // Include helper functions and constants which can't be auto-loaded.
-include(MINISTRUTS_ROOT.'/src/rosasurfer/helpers.php');
-include(MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/helpers.php');
+require(MINISTRUTS_ROOT.'/src/rosasurfer/helpers.php');
+require(MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/helpers.php');
 
 
 // Register the framework's class loader.
@@ -51,8 +51,8 @@ function registerClassLoader() {
    // create a bootstrap loader for the class rosasurfer\loader\ClassLoader
    $bootstrap = function($class) {
       switch ($class) {
-         case Object::class:      require(__DIR__.'/rosasurfer/core/Object.php'       ); break;
-         case ClassLoader::class: require(__DIR__.'/rosasurfer/loader/ClassLoader.php'); break;
+         case Object::class:      require(MINISTRUTS_ROOT.'/src/rosasurfer/core/Object.php'       ); break;
+         case ClassLoader::class: require(MINISTRUTS_ROOT.'/src/rosasurfer/loader/ClassLoader.php'); break;
       }
    };
    spl_autoload_register($bootstrap, $throw=true, $prepend=true);

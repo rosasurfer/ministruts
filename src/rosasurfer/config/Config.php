@@ -15,7 +15,6 @@ use rosasurfer\log\Logger;
 
 use const rosasurfer\CLI;
 use const rosasurfer\L_NOTICE;
-use const rosasurfer\MINISTRUTS_ROOT;
 use const rosasurfer\WINDOWS;
 
 
