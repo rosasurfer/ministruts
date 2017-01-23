@@ -1,0 +1,26 @@
+{
+    "name":        "example-namespace/example-app",
+    "description": "Example application using the Ministruts framework",
+    "type":        "project",
+    "license":     "proprietary",
+    "config": {
+        "preferred-install": {
+            "*": "dist"
+        },        
+        "optimize-autoloader": true
+    },
+    "repositories": [
+        {
+            "type": "vcs", 
+            "url":  "https://github.com/rosasurfer/ministruts" 
+        }
+    ],       
+    "require": {
+        "php":                   ">=5.6",
+        "rosasurfer/ministruts": "dev-master"
+    },
+    "minimum-stability": "stable",
+    "autoload": {
+        "classmap": ["app/"]
+    }
+}

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts-config SYSTEM "struts-config.dtd">
+
+<struts-config view-base="app/view">
+
+
+   <!-- ================================================= Action Mappings ================================================= -->
+   <action-mappings>
+      <mapping path="/"  include=".home"/>
+   </action-mappings>
+
+
+   <!-- ====================================================== Tiles ====================================================== -->
+   <tiles>
+      <!-- global base layout -->
+      <tile name=".default" path="layouts/default.phtml">
+      </tile>
+
+      <!-- home -->
+      <tile name=".home"  extends=".default">
+         <set name="content"  value="tiles/home.phtml"/>
+      </tile>
+   </tiles>
+
+</struts-config>
