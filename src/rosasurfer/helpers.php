@@ -649,6 +649,22 @@ function strIsDigits($value) {
 
 
 /**
+ * Whether or not a string consists only of numerical characters and represents a numerical value.
+ * Opposite to the PHP built-in function is_numeric() this function returns FALSE if the string
+ * begins with non-numerical characters (e.g. white space).
+ *
+ * @param  string $value
+ *
+ * @return bool
+ */
+function strIsNumeric($value) {
+   if (!is_string($value))  return false;
+   if (!is_numeric($value)) return false;
+   return ctype_graph($value);
+}
+
+
+/**
  * Alias for getType() for C/C++ enthusiasts.
  *
  * @param  mixed $var
