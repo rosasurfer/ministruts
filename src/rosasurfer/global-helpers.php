@@ -411,7 +411,7 @@ function strIsDoubleQuoted($value) {
 
 
 /**
- * Whether or not a string consists of numerical characters (0-9).
+ * Whether or not a string consists only of digits (0-9).
  *
  * @param  string $value
  *

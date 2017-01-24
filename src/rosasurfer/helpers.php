@@ -637,17 +637,13 @@ function strIsDoubleQuoted($value) {
 
 
 /**
- * Whether or not a string consists of numerical characters (0-9).
+ * Whether or not a string consists only of digits (0-9).
  *
  * @param  string $value
  *
  * @return bool
  */
 function strIsDigits($value) {
-   if ($value === null)    return false;
-   if (is_int($value))     return ($value >= 0);
-   if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
-
    return ctype_digit($value);
 }
 
