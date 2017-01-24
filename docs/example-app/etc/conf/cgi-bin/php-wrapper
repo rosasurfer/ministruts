@@ -1,11 +1,10 @@
 #!/bin/sh
 #
 
-# PHP FastCGI processes exit after 500 requests by default.
-export PHP_FCGI_MAX_REQUESTS=2000
+# By default PHP FastCGI processes exit after 500 requests.
+export PHP_FCGI_MAX_REQUESTS=5000
 
-# identical to: php -c <path>|<file>    Look for php.ini file in this directory
+# custom php.ini, same as CLI option: -c <path>|<file>  (look for php.ini file in this directory)
 #export PHPRC=./
 
 exec php-cgi $* 2>&1
-
