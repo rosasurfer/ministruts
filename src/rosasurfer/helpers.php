@@ -596,10 +596,8 @@ function strRightFrom($string, $limiter, $count=1, $includeLimiter=false, $onNot
  * @return bool
  */
 function strIsQuoted($value) {
-   if ($value===null || is_int($value))
+   if (!is_string($value))
       return false;
-   if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
-
    return strLen($value)>1 && (strIsSingleQuoted($value) || strIsDoubleQuoted($value));
 }
 
@@ -612,10 +610,8 @@ function strIsQuoted($value) {
  * @return bool
  */
 function strIsSingleQuoted($value) {
-   if ($value===null || is_int($value))
+   if (!is_string($value))
       return false;
-   if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
-
    return (($len=strLen($value))>1 && $value{0}=="'" && $value{--$len}=="'");
 }
 
@@ -628,10 +624,8 @@ function strIsSingleQuoted($value) {
  * @return bool
  */
 function strIsDoubleQuoted($value) {
-   if ($value===null || is_int($value))
+   if (!is_string($value))
       return false;
-   if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
-
    return (($len=strLen($value))>1 && $value{0}=='"' && $value{--$len}=='"');
 }
 
@@ -658,8 +652,11 @@ function strIsDigits($value) {
  * @return bool
  */
 function strIsNumeric($value) {
-   if (!is_string($value))  return false;
-   if (!is_numeric($value)) return false;
+   if (!is_string($value))
+      return false;
+
+   if (!is_numeric($value))
+      return false;
    return ctype_graph($value);
 }
 
