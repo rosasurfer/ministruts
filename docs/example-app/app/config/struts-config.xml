@@ -13,11 +13,10 @@
    <!-- ====================================================== Tiles ====================================================== -->
    <tiles>
       <!-- global base layout -->
-      <tile name=".default" path="layouts/default.phtml">
-      </tile>
+      <tile name=".default" file="layouts/default.phtml"/>
 
       <!-- home -->
-      <tile name=".home"  extends=".default">
+      <tile name=".home"  extends-tile=".default">
          <set name="content"  value="tiles/home.phtml"/>
       </tile>
    </tiles>
