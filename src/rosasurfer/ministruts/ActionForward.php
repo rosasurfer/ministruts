@@ -97,7 +97,7 @@ class ActionForward extends Object {
    public function setPath($path) {
       if ($this->configured) throw new IllegalStateException('Configuration is frozen');
       if (!is_string($path)) throw new IllegalTypeException('Illegal type of parameter $path: '.getType($path));
-      if ($path==='')        throw new InvalidArgumentException('Invalid argument $path: '.$path);
+      if ($path === '')      throw new InvalidArgumentException('Invalid argument $path: '.$path);
 
       $this->path = $path;
       return $this;

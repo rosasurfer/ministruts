@@ -346,32 +346,32 @@ class Module extends Object {
             $mapping->setFormClassName((string) $tag['form']);
 
 
-         // process scope attribute
-         if ($tag['scope'])
-            $mapping->setScope((string) $tag['scope']);
+         // process form-scope attribute
+         if ($tag['form-scope'])
+            $mapping->setFormScope((string) $tag['form-scope']);
 
 
-         // process validate attribute
+         // process validate-before attribute
          if ($mapping->getFormClassName()) {
             $action = $mapping->getActionClassName();
             if ($action || $mapping->getForward()) {
-               $validate = $tag['validate'] ? ($tag['validate'] == 'true') : !$action;
+               $validateBefore = $tag['validate-before'] ? ($tag['validate-before'] == 'true') : !$action;
             }
             else {
-               if ($tag['validate'] == 'false') throw new RuntimeException('Mapping "'.$mapping->getPath().'": An "action", "include", "redirect" or "forward" attribute is required when "validate" attribute is set to "false"');
-               $validate = true;
+               if ($tag['validate-before'] == 'false') throw new RuntimeException('Mapping "'.$mapping->getPath().'": An "action", "include", "redirect" or "forward" attribute is required when "validate-before" attribute is set to "false"');
+               $validateBefore = true;
                // Prüfung auf 'success' und 'error' Forward erfolgt in ActionMapping:freeze()
             }
          }
-         elseif ($validate = $tag['validate'] == 'true') {
-            throw new RuntimeException('Mapping "'.$mapping->getPath().'": A "form" attribute must be specified when the "validate" attribute is set to "true"');
+         elseif ($validateBefore = $tag['validate-before'] == 'true') {
+            throw new RuntimeException('Mapping "'.$mapping->getPath().'": A "form" attribute must be specified when the "validate-before" attribute is set to "true"');
          }
-         $mapping->setValidate($validate);
+         $mapping->setValidateBefore($validateBefore);
 
 
          // process method attributes
-         if ($tag['methods' ]) {
-            $methods = explode(',', (string) $tag['methods']);
+         if ($tag['http-methods' ]) {
+            $methods = explode(',', (string) $tag['http-methods']);
             foreach ($methods as $method) {
                $mapping->setMethod(trim($method));
             }
@@ -486,20 +486,20 @@ class Module extends Object {
 
 
       $tag = $nodes[0];
-      if (sizeOf($tag->attributes()) != 2) throw new RuntimeException('Tile "'.$name.'": Exactly one attribute of "path" or "extends" must be specified');
+      if (sizeOf($tag->attributes()) != 2) throw new RuntimeException('Tile "'.$name.'": Exactly one attribute of "file" or "extends-tile" must be specified');
 
       // create a new instance ...
-      if ($tag['path']) {              // 'path' given, it's a simple tile
-         $path = (string) $tag['path'];
+      if ($tag['file']) {                 // 'file' given
+         $path = (string) $tag['file'];
          $file = $this->findFile($path);
-         if (!$file) throw new FileNotFoundException('Tile "'.$name.'", attribute "path": File "'.$path.'" not found');
+         if (!$file) throw new FileNotFoundException('Tile "'.$name.'", attribute "file": File "'.$path.'" not found');
 
          $tile = new $this->tilesClass($this);
-         $tile->setPath($file)
+         $tile->setFileName($file)
               ->setLabel(subStr($path, 0, strRPos($path, '.')));
       }
-      else {                           // 'path' not given, it's an extended tile (get and clone it's parent)
-         $parent = $this->getDefinedTile((string) $tag['extends'], $xml);
+      else {                           // 'file' not given, it's an extended tile (get and clone it's parent)
+         $parent = $this->getDefinedTile((string) $tag['extends-tile'], $xml);
          $tile = clone $parent;
       }
       $tile->setName($name);
@@ -556,7 +556,7 @@ class Module extends Object {
             elseif ($this->isFile($value)) {       // einfache Tile erzeugen, damit render() existiert
                $nestedTile = new $this->tilesClass($this, $tile);
                $nestedTile->setName('generic')
-                          ->setPath($this->findFile($value))
+                          ->setFileName($this->findFile($value))
                           ->setLabel(subStr($value, 0, strRPos($value, '.')));
             }
             else {

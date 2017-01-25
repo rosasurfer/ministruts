@@ -42,7 +42,7 @@ class Tile extends Object {
    /**
     * vollständiger Dateiname dieser Tile
     */
-   protected /*string*/ $path;
+   protected /*string*/ $fileName;
 
 
    /**
@@ -103,26 +103,26 @@ class Tile extends Object {
    /**
     * Gibt den Pfad dieser Tile zurück.
     *
-    * @return string $path
+    * @return string
     */
-   public function getPath() {
-      return $this->path;
+   public function getFileName() {
+      return $this->fileName;
    }
 
 
    /**
     * Setzt den Dateinamen dieser Tile.
     *
-    * @param  string $file  - vollständiger Dateiname
-    * @param  string $label - Label für diese Tile (für Kommentare im HTML etc.)
+    * @param  string $filename - vollständiger Dateiname
+    * @param  string $label    - Label für diese Tile (für Kommentare im HTML etc.)
     *
     * @return Tile
     */
-   public function setPath($file) {
-      if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($file)) throw new IllegalTypeException('Illegal type of parameter $file: '.getType($file));
+   public function setFileName($filename) {
+      if ($this->configured)     throw new IllegalStateException('Configuration is frozen');
+      if (!is_string($filename)) throw new IllegalTypeException('Illegal type of parameter $filename: '.getType($filename));
 
-      $this->path  = $file;
+      $this->fileName = $filename;
       return $this;
    }
 
@@ -166,8 +166,8 @@ class Tile extends Object {
     */
    public function freeze() {
       if (!$this->configured) {
-         if (!$this->name) throw new IllegalStateException('No name configured for this '.$this);
-         if (!$this->path) throw new IllegalStateException('No path configured for '.get_class($this).' "'.$this->name.'"');
+         if (!$this->name)     throw new IllegalStateException('No name configured for this '.$this);
+         if (!$this->fileName) throw new IllegalStateException('No file configured for '.get_class($this).' "'.$this->name.'"');
 
          foreach ($this->properties as $property) {
             if ($property instanceof self)
@@ -210,7 +210,7 @@ class Tile extends Object {
 
       echo ($this->parent ? "\n<!-- #begin: ".$this->label." -->\n" : null);
 
-      include($this->path);
+      include($this->fileName);
 
       echo ($this->parent ? "\n<!-- #end: ".$this->label." -->\n" : null);
    }

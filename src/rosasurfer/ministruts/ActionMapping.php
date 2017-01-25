@@ -33,8 +33,8 @@ class ActionMapping extends Object {
    protected /*string */ $path;
    protected /*string */ $actionClassName;
    protected /*string */ $formClassName;
-   protected /*string */ $scope = 'request';
-   protected /*bool   */ $validate;
+   protected /*string */ $formScope = 'request';
+   protected /*bool   */ $validateBefore;
    protected /*bool[] */ $methods;
    protected /*string */ $roles;
    protected /*bool   */ $default = false;
@@ -269,16 +269,16 @@ class ActionMapping extends Object {
     * Wert auf "session" gesetzt, können Formulareingaben über mehrere Requests zur Verfügung stehen
     * (z.B. für Page-Wizards o.ä. mehrseitige Formulare).
     *
-    * @param  string $scope - "request" oder "session"
+    * @param  string $value - "request" oder "session"
     *
     * @return ActionMapping
     */
-   public function setScope($scope) {
+   public function setFormScope($value) {
       if ($this->configured)                        throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($scope))                       throw new IllegalTypeException('Illegal type of parameter $scope: '.getType($scope));
-      if ($scope!=='request' && $scope!=='session') throw new InvalidArgumentException('Invalid argument $scope: '.$scope);
+      if (!is_string($value))                       throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
+      if ($value!=='request' && $value!=='session') throw new InvalidArgumentException('Invalid argument $value: '.$value);
 
-      $this->scope = $scope;
+      $this->formScope = $value;
       return $this;
    }
 
@@ -288,8 +288,8 @@ class ActionMapping extends Object {
     *
     * @return string - Scope-Bezeichner
     */
-   public function getScope() {
-      return $this->scope;
+   public function getFormScope() {
+      return $this->formScope;
    }
 
 
@@ -298,10 +298,10 @@ class ActionMapping extends Object {
     *
     * @return bool
     *
-    * @see ActionMapping::setScope()
+    * @see ActionMapping::setFormScope()
     */
    public function isRequestScope() {
-      return ($this->scope == 'request');
+      return ($this->formScope == 'request');
    }
 
 
@@ -310,27 +310,27 @@ class ActionMapping extends Object {
     *
     * @return bool
     *
-    * @see ActionMapping::setScope()
+    * @see ActionMapping::setFormScope()
     */
    public function isSessionScope() {
-      return ($this->scope == 'session');
+      return ($this->formScope == 'session');
    }
 
 
    /**
-    * Setzt das Validate-Flag für die ActionForm des ActionMappings.  Das Flag zeigt an, ob die
+    * Setzt das ValidateBefore-Flag für die ActionForm des ActionMappings.  Das Flag zeigt an, ob die
     * ActionForm vor Aufruf der Action validiert werden soll oder nicht.  Ohne entsprechende Angabe
     * in der struts-config.xml wird die ActionForm immer validiert.
     *
-    * @param  bool $default
+    * @param  bool $mode
     *
     * @return ActionMapping
     */
-   public function setValidate($validate) {
-      if ($this->configured)   throw new IllegalStateException('Configuration is frozen');
-      if (!is_bool($validate)) throw new IllegalTypeException('Illegal type of parameter $validate: '.getType($validate));
+   public function setValidateBefore($mode) {
+      if ($this->configured) throw new IllegalStateException('Configuration is frozen');
+      if (!is_bool($mode))   throw new IllegalTypeException('Illegal type of parameter $mode: '.getType($mode));
 
-      $this->validate = $validate;
+      $this->validateBefore = $mode;
       return $this;
    }
 
@@ -340,8 +340,8 @@ class ActionMapping extends Object {
     *
     * @return bool
     */
-   public function isValidate() {
-      return ($this->validate);
+   public function isValidateBefore() {
+      return ($this->validateBefore);
    }
 
 
@@ -404,16 +404,16 @@ class ActionMapping extends Object {
     */
    public function freeze() {
       if (!$this->configured) {
-         if (!$this->path)                                 throw new IllegalStateException('A "path" attribute must be configured for mapping "'.$this->path.'"');
-         if (!$this->formClassName && $this->validate)     throw new IllegalStateException('A "form" must be configured for "validate" attribute value "true" in mapping "'.$this->path.'"');
+         if (!$this->path)                                       throw new IllegalStateException('A "path" attribute must be configured for mapping "'.$this->path.'"');
+         if (!$this->formClassName && $this->validateBefore)     throw new IllegalStateException('A "form" must be configured for "validate-before" attribute value "true" in mapping "'.$this->path.'"');
 
          if (!$this->actionClassName && !$this->forward) {
-            if (!$this->formClassName || !$this->validate) throw new IllegalStateException('Either an "action", "include", "redirect" or "forward" attribute must be specified for mapping "'.$this->path.'"');
+            if (!$this->formClassName || !$this->validateBefore) throw new IllegalStateException('Either an "action", "include", "redirect" or "forward" attribute must be specified for mapping "'.$this->path.'"');
 
-            if (!$this->formClassName || !$this->validate) {
+            if (!$this->formClassName || !$this->validateBefore) {
                throw new IllegalStateException('Either an "action", "include", "redirect" or "forward" attribute must be specified for mapping "'.$this->path.'"');
             }
-            elseif ($this->formClassName && $this->validate) {
+            elseif ($this->formClassName && $this->validateBefore) {
                if (!isSet($this->forwards[ActionForward ::VALIDATION_SUCCESS_KEY]) || !isSet($this->forwards[ActionForward ::VALIDATION_ERROR_KEY]))
                   throw new IllegalStateException('A "success" and an "error" forward must be configured for validation of mapping "'.$this->path.'"');
             }

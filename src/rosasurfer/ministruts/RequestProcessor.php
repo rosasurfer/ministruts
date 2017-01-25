@@ -370,7 +370,7 @@ PROCESS_METHOD_ERROR_SC_405;
     * @return bool
     */
    protected function processActionFormValidate(Request $request, Response $response, ActionMapping $mapping, ActionForm $form) {
-      if (!$mapping->isValidate())
+      if (!$mapping->isValidateBefore())
          return true;
 
       $success = $form->validate();
@@ -514,7 +514,7 @@ PROCESS_METHOD_ERROR_SC_405;
             $class = $module->getTilesClass();
             $tile = new $class($this->module);
             $tile->setName('generic')
-                 ->setPath($path)
+                 ->setFileName($path)
                  ->setLabel($forward->getLabel())
                  ->freeze();
          }
