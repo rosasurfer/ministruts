@@ -643,7 +643,7 @@ function strIsDigits($value) {
 
 
 /**
- * Whether or not a string consists only of numerical characters and represents a numerical value.
+ * Whether or not a string consists only of numerical characters and represents a valid numerical value.
  * Opposite to the PHP built-in function is_numeric() this function returns FALSE if the string
  * begins with non-numerical characters (e.g. white space).
  *
@@ -658,6 +658,41 @@ function strIsNumeric($value) {
    if (!is_numeric($value))
       return false;
    return ctype_graph($value);
+}
+
+
+/**
+ * Convert a boolean representation to a boolean.
+ *
+ * @param  mixed $value - boolean representation
+ *
+ * @return bool - boolean or NULL if the parameter doesn't represent a boolean
+ */
+function strToBool($value) {
+   if (is_bool($value)) return $value;
+
+   if (is_int($value) || is_float($value)) {
+      if (!$value)
+         return false;
+      return ($value==1.) ? true : null;
+   }
+   if (!is_string($value)) return null;
+
+   switch (strToLower($value)) {
+      case 'true' :
+      case 'on'   :
+      case 'yes'  : return true;
+      case 'false':
+      case 'off'  :
+      case 'no'   : return false;
+   }
+
+   if (strIsNumeric($value)) {
+      $value = (float) $value;               // skip leading zeros of numeric strings
+      if (!$value)      return false;
+      if ($value == 1.) return true;
+   }
+   return null;
 }
 
 

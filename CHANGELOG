@@ -1,14 +1,14 @@
 2017-01-25
 
    - redefine Struts config DTD for improved clarity:
-
      /struts-config/action-mappings/mapping[@methods]  => [@http-methods]
      /struts-config/action-mappings/mapping[@scope]    => [@form-scope]
      /struts-config/action-mappings/mapping[@validate] => [@validate-before]
-     
-     /struts-config/tiles/tile[@path]    => [@file]
-     /struts-config/tiles/tile[@extends] => [@extends-tile]
+     /struts-config/tiles/tile[@path]                  => [@file]
+     /struts-config/tiles/tile[@extends]               => [@extends-tile]
 
+   - helper function rosasurfer\strToBool()
+    
 
 2017-01-22
 

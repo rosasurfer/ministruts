@@ -423,7 +423,7 @@ function strIsDigits($value) {
 
 
 /**
- * Whether or not a string consists only of numerical characters and represents a numerical value.
+ * Whether or not a string consists only of numerical characters and represents a valid numerical value.
  * Opposite to the PHP built-in function is_numeric() this function returns FALSE if the string
  * begins with non-numerical characters (e.g. white space).
  *
@@ -433,6 +433,18 @@ function strIsDigits($value) {
  */
 function strIsNumeric($value) {
    return \rosasurfer\strIsNumeric($value);
+}
+
+
+/**
+ * Convert a boolean representation to a boolean.
+ *
+ * @param  mixed $value - boolean representation
+ *
+ * @return bool - boolean or NULL if the parameter doesn't represent a boolean
+ */
+function strToBool($value) {
+   return \rosasurfer\strToBool($value);
 }
 
 
