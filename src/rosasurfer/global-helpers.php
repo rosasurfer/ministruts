@@ -442,8 +442,6 @@ function strIsNumeric($value) {
  * @param  mixed $var
  *
  * @return string
- *
- * @see    getType()
  */
 function typeOf($var) {
    return \rosasurfer\typeOf($var);
