@@ -1,14 +1,14 @@
 #!/bin/sh
 #
-# Set desired PHP_FCGI_* environment variables.
+# Set desired environment variables.
 #
 
 # By default PHP FastCGI processes exit after 500 requests.
 # FcgidMaxRequestsPerProcess should be <= PHP_FCGI_MAX_REQUESTS.
 export PHP_FCGI_MAX_REQUESTS=10000
 
-# Enable if you want to provide a custom php.ini (same as PHP CLI option: -c <path>|<file>)
+# Enable to specify a custom php.ini (same as PHP CLI option: -c <path>|<file>).
 #export PHPRC=./
 
 # Replace with the path to your FastCGI-enabled PHP executable.
-exec php-cgi
+exec php-cgi "$@"
