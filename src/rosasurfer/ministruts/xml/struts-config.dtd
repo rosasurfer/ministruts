@@ -73,6 +73,8 @@
    override a global forward by defining a local <forward> of the same name.
 -->
 <!ELEMENT global-forwards (forward*)>
+<!ATTLIST global-forwards
+>
 
 
 <!-- 
@@ -107,6 +109,8 @@
    given url-pattern. Individual ActionMappings are configured through nested <mapping> elements.
 -->
 <!ELEMENT action-mappings (mapping+)>
+<!ATTLIST action-mappings
+>
 
 
 <!-- 
@@ -177,6 +181,8 @@
    elements.
 -->
 <!ELEMENT tiles (tile*)>
+<!ATTLIST tiles
+>
 
 
 <!-- 
@@ -225,7 +231,7 @@
    request-processor  Class name of the RequestProcessor subclass that will perform request processing for the module.
                       [default: "RequestProcessor"]
 
-   role-processor     Class name of the [RoleProcessor] subclass that will perform role checking for the module.
+   role-processor     Class name of the RoleProcessor subclass that will perform role checking for the module.
                       [default: "none"]
 -->
 <!ELEMENT controller EMPTY>
