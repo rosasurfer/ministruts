@@ -6,6 +6,8 @@ use rosasurfer\core\Object;
 use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\IllegalTypeException;
 
+use const rosasurfer\LOCALHOST;
+
 
 /**
  * Tile
@@ -18,6 +20,9 @@ class Tile extends Object {
     */
    const PROPERTY_TYPE_STRING   = 'string';
    const PROPERTY_TYPE_RESOURCE = 'resource';
+
+
+   const GENERIC_NAME = 'generic';
 
 
    /**
@@ -114,7 +119,6 @@ class Tile extends Object {
     * Setzt den Dateinamen dieser Tile.
     *
     * @param  string $filename - vollständiger Dateiname
-    * @param  string $label    - Label für diese Tile (für Kommentare im HTML etc.)
     *
     * @return Tile
     */
@@ -194,10 +198,9 @@ class Tile extends Object {
 
 
    /**
-    * Gibt den Inhalt dieser Tile aus.
+    * Render the Tile.
     */
    public function render() {
-      // alle Properties holen und im Context dieser Methode ablegen
       $properties = $this->getMergedProperties();
       $request = Request::me();
 
@@ -207,9 +210,17 @@ class Tile extends Object {
       $properties['form'    ] = $request->getAttribute(ACTION_FORM_KEY);
       $properties['PAGE'    ] = PageContext::me();
 
-      echo ($this->parent ? "\n<!-- #begin: ".$this->label." -->\n" : null);
+      if (LOCALHOST && $this->parent) {
+         if ($this->name != self::GENERIC_NAME) echo "\n<!-- #begin: ".$this->name.' ('.$this->fileName.") -->\n";
+         else                                   echo "\n<!-- #begin: ".                 $this->fileName ." -->\n";
+      }
+
       includeFile($this->fileName, $properties);
-      echo ($this->parent ? "\n<!-- #end: ".  $this->label." -->\n" : null);
+
+      if (LOCALHOST && $this->parent) {
+         if ($this->name != self::GENERIC_NAME) echo "\n<!-- #end: ".$this->name.' ('.$this->fileName.") -->\n";
+         else                                   echo "\n<!-- #end: ".                 $this->fileName ." -->\n";
+      }
    }
 }
 
@@ -218,10 +229,11 @@ class Tile extends Object {
  * Populate the function context with the passed properties and include the specified file. Prevents the view from accessing
  * the Tile instance (variable $this is not available).
  *
- * @param  string $fileName
- * @param  array  $properties - context properties accessible to the view
+ * @param  string $___        - name of the file to include (somewhat obfuscated)
+ * @param  array  $properties - properties accessible to the view
  */
-function includeFile($fileName, array $properties) {
+function includeFile($___, array $properties) {
    extract($properties);
-   include($fileName);
+   unset($properties);
+   include($___);
 }

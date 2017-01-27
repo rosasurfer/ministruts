@@ -555,7 +555,7 @@ class Module extends Object {
             }
             elseif ($this->isFile($value)) {       // einfache Tile erzeugen, damit render() existiert
                $nestedTile = new $this->tilesClass($this, $tile);
-               $nestedTile->setName('generic')
+               $nestedTile->setName(Tile::GENERIC_NAME)
                           ->setFileName($this->findFile($value))
                           ->setLabel(subStr($value, 0, strRPos($value, '.')));
             }

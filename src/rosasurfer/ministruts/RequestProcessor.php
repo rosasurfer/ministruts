@@ -510,15 +510,14 @@ PROCESS_METHOD_ERROR_SC_405;
          $tile = $module->findTile($path);
 
          if (!$tile) {
-            // $path ist ein Dateiname, einfache Tile erzeugen, damit render() existiert
+            // $path ist ein Dateiname, einfache Tile erzeugen
             $class = $module->getTilesClass();
             $tile = new $class($this->module);
-            $tile->setName('generic')
+            $tile->setName(Tile::GENERIC_NAME)
                  ->setFileName($path)
                  ->setLabel($forward->getLabel())
                  ->freeze();
          }
-
          $tile->render();
       }
    }

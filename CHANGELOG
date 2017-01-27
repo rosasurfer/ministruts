@@ -1,6 +1,8 @@
 2017-01-27
 
    - ministruts/Tile: remove access to the Tile instance from the view (variable $this)
+   - ministruts/Tile: restrict Tile hints in the view's source code to the local machine
+   - ministruts/Tile: show Tile hints in the view's source code with full paths
 
 
 2017-01-25
