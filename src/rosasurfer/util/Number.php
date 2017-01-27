@@ -15,10 +15,10 @@ class Number extends StaticClass {
     * Format a numeric value with a currency format. Opposite to the PHP built-in function number_format() this function
     * can be called with any number of optional arguments.
     *
-    * @param  int|double $value              - numeric value
-    * @param  int        $decimals           - number of decimals  (default:   2)
-    * @param  string     $decimalsSeparator  - decimals separator  (default: ".")
-    * @param  string     $thousandsSeparator - thousands separator (default:  "")
+    * @param  int|float $value              - numeric value
+    * @param  int       $decimals           - number of decimals  (default:   2)
+    * @param  string    $decimalsSeparator  - decimals separator  (default: ".")
+    * @param  string    $thousandsSeparator - thousands separator (default:  "")
     *
     * @return string
     */

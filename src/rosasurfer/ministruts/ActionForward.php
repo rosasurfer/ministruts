@@ -141,7 +141,7 @@ class ActionForward extends Object {
     * Fügt dem Querystring dieses ActionForwards ein weiteres Key-Value-Paar hinzu.
     *
     * @param  string $key   - Schlüssel
-    * @param  scalar $value - Wert (int|double|string|bool)
+    * @param  scalar $value - Wert (int|float|string|bool)
     *
     * @return ActionForward
     */

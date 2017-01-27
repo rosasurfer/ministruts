@@ -236,13 +236,13 @@ abstract class PersistableObject extends Object {
 
             switch ($type) {
                case CommonDAO::T_STRING:
-                  $object->$property =          $row[$column]; break;
+                  $object->$property =         $row[$column]; break;
                case CommonDAO::T_INT:
-                  $object->$property =    (int) $row[$column]; break;
+                  $object->$property =   (int) $row[$column]; break;
                case CommonDAO::T_FLOAT:
-                  $object->$property = (double) $row[$column]; break;
+                  $object->$property = (float) $row[$column]; break;
                case CommonDAO::T_BOOL:
-                  $object->$property =   (bool) $row[$column]; break;
+                  $object->$property =  (bool) $row[$column]; break;
                case CommonDAO::T_SET:
                   $object->$property = strLen($row[$column]) ? explode(',', $row[$column]) : array();
                   break;
