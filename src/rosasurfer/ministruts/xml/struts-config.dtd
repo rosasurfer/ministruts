@@ -19,7 +19,7 @@
 
 
 <!-- 
-   A "Boolean" is the string representation of a boolean (true or false) variable. 
+   A "Boolean" is the string representation of a boolean variable (true or false). 
 -->
 <!ENTITY % Boolean "(true|false)">
 
@@ -37,7 +37,7 @@
 
 
 <!-- 
-   A "RequestPath" is a module-relative URI path beginning with a slash "/", that identifies a mapped resource within the web 
+   A "RequestPath" is a module-relative URI path beginning with a slash "/" that identifies a mapped resource within the web 
    application.
 -->
 <!ENTITY % RequestPath "CDATA">
