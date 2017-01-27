@@ -50,14 +50,8 @@ class Tile extends Object {
    protected /*string*/ $fileName;
 
 
-   /**
-    * Label dieser Tile (für Kommentare etc.)
-    */
-   protected /*string*/ $label;
-
-
    // Property-Pool
-   protected $properties = array();
+   protected $properties = [];
 
 
    /**
@@ -127,22 +121,6 @@ class Tile extends Object {
       if (!is_string($filename)) throw new IllegalTypeException('Illegal type of parameter $filename: '.getType($filename));
 
       $this->fileName = $filename;
-      return $this;
-   }
-
-
-   /**
-    * Setzt das Label dieser Tile. Das Label wird in HTML-Kommentaren etc. verwendet.
-    *
-    * @param  string $label - Label
-    *
-    * @return Tile
-    */
-   public function setLabel($label) {
-      if ($this->configured)  throw new IllegalStateException('Configuration is frozen');
-      if (!is_string($label)) throw new IllegalTypeException('Illegal type of parameter $label: '.getType($label));
-
-      $this->label = $label;
       return $this;
    }
 

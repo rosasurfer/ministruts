@@ -472,7 +472,7 @@ class Module extends Object {
     * @param  string            $name - Name der Tile
     * @param  \SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration der Tile
     *
-    * @return Tile instance
+    * @return Tile
     */
    private function getDefinedTile($name, \SimpleXMLElement $xml) {
       // if the tile already exists return it
@@ -490,13 +490,12 @@ class Module extends Object {
 
       // create a new instance ...
       if ($tag['file']) {                 // 'file' given
-         $path = (string) $tag['file'];
-         $file = $this->findFile($path);
-         if (!$file) throw new FileNotFoundException('Tile "'.$name.'", attribute "file": File "'.$path.'" not found');
+         $fileAttr = (string) $tag['file'];
+         $filePath = $this->findFile($fileAttr);
+         if (!$filePath) throw new FileNotFoundException('Tile "'.$name.'", attribute "file": File "'.$fileAttr.'" not found');
 
          $tile = new $this->tilesClass($this);
-         $tile->setFileName($file)
-              ->setLabel(subStr($path, 0, strRPos($path, '.')));
+         $tile->setFileName($filePath);
       }
       else {                           // 'file' not given, it's an extended tile (get and clone it's parent)
          $parent = $this->getDefinedTile((string) $tag['extends-tile'], $xml);
@@ -553,11 +552,10 @@ class Module extends Object {
             if ($this->isTile($value, $xml)) {
                $nestedTile = $this->getDefinedTile($value, $xml);
             }
-            elseif ($this->isFile($value)) {       // einfache Tile erzeugen, damit render() existiert
+            elseif ($this->isFile($value)) {       // generische Tile erzeugen, damit render() existiert
                $nestedTile = new $this->tilesClass($this, $tile);
                $nestedTile->setName(Tile::GENERIC_NAME)
-                          ->setFileName($this->findFile($value))
-                          ->setLabel(subStr($value, 0, strRPos($value, '.')));
+                          ->setFileName($this->findFile($value));
             }
             else {
                throw new RuntimeException('Tile "'.$tile->getName().'", set "'.$name.'", attribute "value": '.($value{0}=='.' ? 'Tiles definition':'File').' "'.$value.'" not found');
