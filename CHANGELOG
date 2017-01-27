@@ -1,3 +1,8 @@
+2017-01-27
+
+   - ministruts/Tile: remove access to the Tile instance from the view (variable $this)
+
+
 2017-01-25
 
    - redefine Struts config DTD for improved clarity:

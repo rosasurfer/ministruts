@@ -197,21 +197,31 @@ class Tile extends Object {
     * Gibt den Inhalt dieser Tile aus.
     */
    public function render() {
-      // TODO: Framework vor $this-Zugriff aus der HTML-Seite schützen
-
       // alle Properties holen und im Context dieser Methode ablegen
-      extract($this->getMergedProperties());
+      $properties = $this->getMergedProperties();
+      $request = Request::me();
 
-      $request  = Request ::me();
-      $response = Response::me();
-      $session  = $request->isSession() ? $request->getSession() : null;
-      $form     = $request->getAttribute(ACTION_FORM_KEY);
-      $PAGE     = PageContext::me();
+      $properties['request' ] = $request;
+      $properties['response'] = Response::me();
+      $properties['session' ] = $request->isSession() ? $request->getSession() : null;
+      $properties['form'    ] = $request->getAttribute(ACTION_FORM_KEY);
+      $properties['PAGE'    ] = PageContext::me();
 
       echo ($this->parent ? "\n<!-- #begin: ".$this->label." -->\n" : null);
-
-      include($this->fileName);
-
-      echo ($this->parent ? "\n<!-- #end: ".$this->label." -->\n" : null);
+      includeFile($this->fileName, $properties);
+      echo ($this->parent ? "\n<!-- #end: ".  $this->label." -->\n" : null);
    }
+}
+
+
+/**
+ * Populate the function context with the passed properties and include the specified file. Prevents the view from accessing
+ * the Tile instance (variable $this is not available).
+ *
+ * @param  string $fileName
+ * @param  array  $properties - context properties accessible to the view
+ */
+function includeFile($fileName, array $properties) {
+   extract($properties);
+   include($fileName);
 }
