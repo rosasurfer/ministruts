@@ -27,10 +27,11 @@ abstract class Singleton extends Object {
     * Gibt die Singleton-Instanz der gewünschten Klasse zurück.
     *
     * @param  string $class - Klassennname
+    * @param  ...           - variable number of parameters
     *
     * @return Singleton
     */
-   final public static function getInstance($class, $args = null /*, ... */) {
+   final public static function getInstance($class/*, ...*/) {
       if (isSet(self::$instances[$class]))
          return self::$instances[$class];
 
@@ -41,13 +42,14 @@ abstract class Singleton extends Object {
       $currentCreations[$class] = true;
 
       // Parameter ermitteln
-      if (func_num_args() > 2) {
+      $args = null;
+      if (func_num_args() > 1) {
          $args = func_get_args();
          array_shift($args);
       }
 
-      // TODO: Was, wenn $args = false ist
-      $instance = $args ? new $class($args) : new $class();
+      // argument unpacking
+      $instance = $args ? new $class(...$args) : new $class();
       if (!$instance instanceof self) throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
       self::$instances[$class] = $instance;
 
