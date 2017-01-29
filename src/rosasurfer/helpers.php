@@ -152,7 +152,7 @@ function pp($var, $return=false, $flushBuffers=true) {
  */
 function printPretty($var, $return=false, $flushBuffers=true) {
    if (is_object($var) && method_exists($var, '__toString')) {
-      $str = (string) $var;
+      $str = $var->__toString($levels=PHP_INT_MAX);
    }
    elseif (is_object($var) || is_array($var)) {
       $str = print_r($var, true);

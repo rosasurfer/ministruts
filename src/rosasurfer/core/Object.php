@@ -70,9 +70,17 @@ class Object {
    /**
     * Returns a human-readable version of this instance.
     *
+    * @param  int $levels - how many levels of an object graph to completely display
+    *                       (default: all)
     * @return string
     */
-   public function __toString() {
+   public function __toString(/*$levels=PHP_INT_MAX*/) {
+      if (func_num_args()) {
+         $levels = func_get_arg(0);
+         if ($levels != PHP_INT_MAX) {
+            // TODO
+         }
+      }
       return print_r($this, true);
    }
 }
