@@ -1,3 +1,8 @@
+2017-01-30
+
+   - dao/DAOWorker: rename db mapping property 'link' to 'connection'
+
+
 2017-01-27
 
    - ministruts/Tile: remove access to the Tile instance from the view (variable $this)
