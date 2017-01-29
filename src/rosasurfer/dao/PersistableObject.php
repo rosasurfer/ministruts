@@ -102,7 +102,7 @@ abstract class PersistableObject extends Object {
     * @return string - version
     */
    protected function touch() {
-      return $this->version = date('Y-m-d H:i:s');
+      return $this->version = gmDate('Y-m-d H:i:s');
    }
 
 
