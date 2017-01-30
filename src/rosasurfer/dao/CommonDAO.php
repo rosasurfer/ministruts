@@ -8,11 +8,11 @@ use rosasurfer\exception\InvalidArgumentException;
 
 
 /**
- * CommonDAO
+ * CommonDao
  *
  * Ein einfacher DAO, der die Grundfunktionalität bereitstellt.  Kann anwendungsspezifisch erweitert werden.
  */
-class CommonDAO extends Singleton {
+class CommonDao extends Singleton {
 
 
    // Mapping-Constanten
