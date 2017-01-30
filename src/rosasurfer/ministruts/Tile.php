@@ -7,6 +7,7 @@ use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\IllegalTypeException;
 
 use const rosasurfer\LOCALHOST;
+use function rosasurfer\strRightFrom;
 
 
 /**
@@ -189,15 +190,19 @@ class Tile extends Object {
       $properties['PAGE'    ] = PageContext::me();
 
       if (LOCALHOST && $this->parent) {
-         if ($this->name != self::GENERIC_NAME) echo "\n<!-- #begin: ".$this->name.' ('.$this->fileName.") -->\n";
-         else                                   echo "\n<!-- #begin: ".                 $this->fileName ." -->\n";
+         $file = $this->fileName;
+         $file = strRightFrom($file, APPLICATION_ROOT.DIRECTORY_SEPARATOR, 1, false, $file);
+         $file = str_replace('\\', '/', $file);
+
+         if ($this->name == self::GENERIC_NAME) $tileHint = $file;
+         else                                   $tileHint = $this->name.' ('.$file.')';
+         echo "\n<!-- #begin: ".$tileHint." -->\n";
       }
 
       includeFile($this->fileName, $properties);
 
       if (LOCALHOST && $this->parent) {
-         if ($this->name != self::GENERIC_NAME) echo "\n<!-- #end: ".$this->name.' ('.$this->fileName.") -->\n";
-         else                                   echo "\n<!-- #end: ".                 $this->fileName ." -->\n";
+         echo "\n<!-- #end: ".$tileHint." -->\n";
       }
    }
 }
