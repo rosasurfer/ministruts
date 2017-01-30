@@ -54,7 +54,7 @@ final class DBPool extends Singleton {
     *
     * @return DB
     */
-   public static function getDB($alias = null) {
+   public static function getDb($alias = null) {
       $me = self::me();
 
       if ($alias === null) {                                            // single db project

@@ -114,8 +114,8 @@ class CommonDAO extends Singleton {
     *
     * @return DB
     */
-   final public function getDB() {
-      return $this->getWorker()->getDB();
+   final public function getDb() {
+      return $this->getWorker()->getDb();
    }
 
 
