@@ -10,11 +10,11 @@ use rosasurfer\exception\RuntimeException;
 
 
 /**
- * DBPool
+ * ConnectorPool
  *
  * Connector-Pool für Datenbankverbindungen zu mehreren Datenbanken.
  */
-final class DBPool extends Singleton {
+final class ConnectorPool extends Singleton {
 
 
    /**
