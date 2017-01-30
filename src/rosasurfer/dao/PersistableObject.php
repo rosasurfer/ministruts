@@ -9,6 +9,7 @@ use rosasurfer\exception\UnimplementedFeatureException;
 
 use rosasurfer\log\Logger;
 use rosasurfer\util\Date;
+use rosasurfer\db\Connector;
 
 
 /**
@@ -263,5 +264,27 @@ abstract class PersistableObject extends Object {
    public static function dao() {
       // TODO: the calling class may be a derived class with the DAO being one of its parents
       return Singleton::getInstance(static::class.'Dao');
+   }
+
+
+   /**
+    * Return the DB adapter for the calling class.
+    *
+    * @return Connector
+    */
+   public static function getConnector() {
+      return self::dao()->getConnector();
+   }
+
+
+   /**
+    * Alias for self::getConnector()
+    *
+    * Return the DB adapter for the calling class.
+    *
+    * @return Connector
+    */
+   final public static function getDb() {
+      return self::getConnector();
    }
 }
