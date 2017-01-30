@@ -1,6 +1,7 @@
 2017-01-30
 
    - dao/DAOWorker: rename db mapping property 'link' to 'connection'
+   - by default ministruts/url/Url and ministruts/url/VersionedUrl include the application base URI   
 
 
 2017-01-27

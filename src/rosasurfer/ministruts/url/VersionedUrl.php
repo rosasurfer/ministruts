@@ -3,8 +3,8 @@ namespace rosasurfer\ministruts\url;
 
 
 /**
- * Version-aware URL generation helper. Appends a hash of file size and file last modification time of a local file
- * to the generated URL to automatically invalidate browser and proxy caches.
+ * Version-aware URL generation helper. Appends a hash of size and last modification time of a local file to the generated
+ * URL to automatically invalidate browser and proxy caches.
  */
 class VersionedUrl extends Url {
 
@@ -17,8 +17,9 @@ class VersionedUrl extends Url {
    public function __toString() {
       $uri = parent::__toString();
 
-      if (($pos=strPos($uri, '?')) === false) $name = $uri;
-      else                                    $name = subStr($uri, 0, $pos);
+      $relativeUri = $this->appRelativeUri;
+      if (($pos=strPos($relativeUri, '?')) === false) $name = $relativeUri;
+      else                                            $name = subStr($relativeUri, 0, $pos);
 
       // TODO: replace static directory references by configuration value
       foreach (['/public/', '/web/', '/www/'] as $dir) {

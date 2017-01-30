@@ -169,10 +169,12 @@ class Module extends Object {
 
 
    /**
-    * Gibt den Prefix dieses Modules zurück. Anhand dieses Prefix werde die verschiedenen Module der
+    * Gibt den Prefix dieses Modules zurück. Anhand des Prefixes werden die verschiedenen Module der
     * Anwendung unterschieden.
     *
     * @return string
+    *
+    * TODO: If non-empty the prefix must never start and always end with a slash "/".
     */
    public function getPrefix() {
       return $this->prefix;
@@ -183,6 +185,8 @@ class Module extends Object {
     * Setzt den Prefix des Modules.
     *
     * @param  string prefix
+    *
+    * TODO: If non-empty the prefix must never start and always end with a slash "/".
     */
    protected function setPrefix($prefix) {
       if ($this->configured)   throw new IllegalStateException('Configuration is frozen');

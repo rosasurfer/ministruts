@@ -995,10 +995,13 @@ function pluralize($count, $singular='', $plural='s') {
 
 /**
  * Return a new URL helper instance. Procedural replacement for
+ * <br>
  * <tt>new \rosasurfer\ministruts\url\Url(...)</tt>.
  *
- * @param  string $uri - URI part of the URL to generate
- *
+ * @param  string $uri - URI part of the URL to generate. If the URI starts with a slash "/" it is interpreted as relative
+ *                       to the application's base URI. If the URI doesn't start with a slash "/" it is interpreted as
+ *                       relative to the current application <tt>Module</tt>'s base URI (the module the current HTTP request
+ *                       belongs to).
  * @return Url
  */
 function url($uri) {
@@ -1008,13 +1011,14 @@ function url($uri) {
 
 /**
  * Return a new version-aware URL helper instance. Procedural replacement for
+ * <br>
  * <tt>new \rosasurfer\ministruts\url\VersionedUrl(...)</tt>.
  *
- * @param  string $uri - URI part of the URL to generate
- *
+ * @param  string $uri - URI part of the URL to generate. If the URI starts with a slash "/" it is interpreted as relative
+ *                       to the application's base URI. If the URI doesn't start with a slash "/" it is interpreted as
+ *                       relative to the current application <tt>Module</tt>'s base URI (the module the current HTTP request
+ *                       belongs to).
  * @return VersionedUrl
- *
- * @see    rosasurfer\ministruts\url\Url
  */
 function versionedUrl($uri) {
    return new VersionedUrl($uri);

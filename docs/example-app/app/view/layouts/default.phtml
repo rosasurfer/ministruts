@@ -1,13 +1,10 @@
-<?
-$baseUri = strLeft($request->getApplicationBaseUri(), -1);
-?>
 <!DOCTYPE html>
 <html>
 <head>
    <meta charset="utf-8">
    <title>Example App</title>
-   <link rel="stylesheet" type="text/css" href="<?=$baseUri.vUrl('/css/app.css')?>"/>
-   <script type="text/javascript" src="<?=$baseUri.vUrl('/js/app.js')?>"></script>
+   <link rel="stylesheet" type="text/css" href="<?=versionedUrl('css/app.css')?>"/>
+   <script type="text/javascript" src="<?=versionedUrl('js/app.js')?>"></script>
 </head>
 
 <body>
