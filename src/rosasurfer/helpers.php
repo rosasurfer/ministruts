@@ -1016,6 +1016,6 @@ function url($uri) {
  *
  * @see    rosasurfer\ministruts\url\Url
  */
-function vUrl($uri) {
+function versionedUrl($uri) {
    return new VersionedUrl($uri);
 }

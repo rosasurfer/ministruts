@@ -670,7 +670,7 @@ function pluralize($count, $singular='', $plural='s') {
 
 
 /**
- * Return a new URL helper instance. Procedural replacement for
+ * Return a new URL helper instance. Procedural replacement for<br>
  * <tt>new \rosasurfer\ministruts\url\Url(...)</tt>.
  *
  * @param  string $uri - URI part of the URL to generate
@@ -683,15 +683,13 @@ function url($uri) {
 
 
 /**
- * Return a new version-aware URL helper instance. Procedural replacement for
+ * Return a new version-aware URL helper instance. Procedural replacement for<br>
  * <tt>new \rosasurfer\ministruts\url\VersionedUrl(...)</tt>.
  *
  * @param  string $uri - URI part of the URL to generate
  *
  * @return VersionedUrl
- *
- * @see    Url
  */
-function vUrl($uri) {
-   return \rosasurfer\vUrl($uri);
+function versionedUrl($uri) {
+   return \rosasurfer\versionedUrl($uri);
 }
