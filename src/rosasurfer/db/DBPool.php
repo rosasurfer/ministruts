@@ -20,13 +20,13 @@ final class DBPool extends Singleton {
    /**
     * connector pool
     */
-   private /*DB[]*/ $pool = array();
+   private /*Connector[]*/ $pool = array();
 
 
    /**
     * default connector
     */
-   private /*DB*/ $default;
+   private /*Connector*/ $default;
 
 
    /**
@@ -52,7 +52,7 @@ final class DBPool extends Singleton {
     *
     * @param  string $alias - Datenbank-Alias
     *
-    * @return DB
+    * @return Connector
     */
    public static function getDb($alias = null) {
       $me = self::me();
@@ -85,7 +85,7 @@ final class DBPool extends Singleton {
          $db      =                             $config['schema'  ];
          $options = isSet($config['options']) ? $config['options' ] : null;
 
-         $connector = DB::spawn($class, $host, $user, $pass, $db, $options);
+         $connector = Connector::spawn($class, $host, $user, $pass, $db, $options);
          $me->pool[$alias] = $connector;
       }
       return $connector;

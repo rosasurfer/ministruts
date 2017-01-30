@@ -24,7 +24,7 @@ use const rosasurfer\L_NOTICE;
 /**
  * MySQLConnector
  */
-class MySqlConnector extends DB {
+class MySqlConnector extends Connector {
 
 
    private static /*bool*/ $logDebug,

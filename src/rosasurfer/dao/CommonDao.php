@@ -27,7 +27,7 @@ class CommonDao extends Singleton {
    const T_NOT_NULL = false;           // not null
 
 
-   /** @var DB - Worker dieses DAO's */
+   /** @var DaoWorker - Worker dieses DAO's */
    private $worker;
 
 
@@ -112,7 +112,7 @@ class CommonDao extends Singleton {
    /**
     * Gibt den für die persistente Klasse dieses DAO zuständigen DB-Adapter zurück.
     *
-    * @return DB
+    * @return Connector
     */
    final public function getDb() {
       return $this->getWorker()->getDb();

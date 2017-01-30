@@ -24,7 +24,7 @@ class DaoWorker extends Object {
    /** @var string - Name der Entity-Klasse dieses Workers */
    protected $entityClass;
 
-   /** @var DB - DB-Adapter der Entity-Klasse dieses Workers */
+   /** @var Connector - DB-Adapter der Entity-Klasse dieses Workers */
    private $adapter;
 
    /** @var int */
@@ -145,7 +145,7 @@ class DaoWorker extends Object {
    /**
     * Gibt den der persistenten Klasse zugrunde liegenden DB-Adapter zurück.
     *
-    * @return DB
+    * @return Connector
     */
    public function getDb() {
       if (!$this->adapter) {

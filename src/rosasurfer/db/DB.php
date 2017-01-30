@@ -14,11 +14,11 @@ use const rosasurfer\L_WARN;
 
 
 /**
- * DB
+ * Connector
  *
  * Abstrakte Superklasse für verschiedene Datenbank-Connectoren.
  */
-abstract class DB extends Object {
+abstract class Connector extends Object {
 
 
    /**
@@ -43,7 +43,7 @@ abstract class DB extends Object {
 
 
    /**
-    * Geschützter Default-Constructor, Instanzen können nur über DB::spawn() erzeugt werden.
+    * Geschützter Default-Constructor, Instanzen können nur über Connector::spawn() erzeugt werden.
     */
    protected function __construct() { /**/ }
 
@@ -116,7 +116,7 @@ abstract class DB extends Object {
     * @param  string   $database - vorzuselektierende Datenbank
     * @param  string[] $options  - weitere Verbindungsoptionen
     *
-    * @return DB - Connector
+    * @return self
     */
    public static function spawn($class, $host, $username, $password, $database = null, array $options = null) {
       if (!is_subclass_of($class, __CLASS__)) throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
@@ -136,7 +136,7 @@ abstract class DB extends Object {
     *
     * @param  string $host
     *
-    * @return DB
+    * @return self
     */
    protected function setHost($host) {
       $port = null;
@@ -156,7 +156,7 @@ abstract class DB extends Object {
     *
     * @param  string $name
     *
-    * @return DB
+    * @return self
     */
    protected function setUsername($name) {
       $this->username = $name;
@@ -169,7 +169,7 @@ abstract class DB extends Object {
     *
     * @param  string $password
     *
-    * @return DB
+    * @return self
     */
    protected function setPassword($password) {
       $this->password = $password;
@@ -182,7 +182,7 @@ abstract class DB extends Object {
     *
     * @param  string $name - Datenbankname
     *
-    * @return DB
+    * @return self
     */
    protected function setDatabase($name) {
       $this->database = $name;
@@ -195,7 +195,7 @@ abstract class DB extends Object {
     *
     * @param  string[] $options - Optionen
     *
-    * @return DB
+    * @return self
     */
    protected function setOptions($options) {
       if ($options === null)
@@ -219,7 +219,7 @@ abstract class DB extends Object {
     * Befindet sich der Connector in *keiner* Transaktion, wird eine neue Transaktion gestartet und der Transaktionszähler erhöht.
     * Befindet er sich bereits in einer Transaktion, wird nur der Transaktionszähler erhöht.
     *
-    * @return DB
+    * @return self
     */
    public function begin() {
       if ($this->transaction < 0) throw new RuntimeException('Negative transaction counter detected: '.$this->transaction);
@@ -236,7 +236,7 @@ abstract class DB extends Object {
     * Befindet sich der Connector in genau *einer* Transaktion, wird diese Transaktion abgeschlossen.
     * Befindet er sich in einer verschachtelten Transaktion, wird nur der Transaktionszähler heruntergezählt.
     *
-    * @return DB
+    * @return self
     */
    public function commit() {
       if ($this->transaction < 0) throw new RuntimeException('Negative transaction counter detected: '.$this->transaction);
@@ -258,7 +258,7 @@ abstract class DB extends Object {
     * Befindet sich der Connector in GENAU einer Transaktion, wird diese Transaktion zurückgerollt.
     * Befindet er sich in einer verschachtelten Transaktion, wird der Aufruf ignoriert.
     *
-    * @return DB
+    * @return self
     */
    public function rollback() {
       if ($this->transaction < 0) throw new RuntimeException('Negative transaction counter detected: '.$this->transaction);
