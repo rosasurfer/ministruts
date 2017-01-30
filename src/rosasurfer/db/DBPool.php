@@ -33,8 +33,8 @@ final class DBPool extends Singleton {
     * verschiedene Schreibweisen
     */
    private static $connectorAliases = [
-      'mysql'                         => MySQLConnector::class,
-      __NAMESPACE__.'\mysqlconnector' => MySQLConnector::class,
+      'mysql'                         => MySqlConnector::class,
+      __NAMESPACE__.'\mysqlconnector' => MySqlConnector::class,
    ];
 
    /**
