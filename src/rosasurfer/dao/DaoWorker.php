@@ -71,7 +71,7 @@ class DaoWorker extends Object {
     *              ['rows'] - Anzahl der betroffenen Datensätze (nur bei SELECT/INSERT/UPDATE-Statement)
     */
    public function executeSql($sql, $count = false) {
-      $result = $this->getDb()->executeSql($sql);
+      $result = $this->getConnector()->executeSql($sql);
 
       if ($count) {
          $result2 = $this->executeSql('select found_rows()');
@@ -146,10 +146,10 @@ class DaoWorker extends Object {
     *
     * @return Connector
     */
-   public function getDb() {
+   public function getConnector() {
       if (!$this->adapter) {
          $mapping = $this->dao->getMapping();
-         $this->adapter = ConnectorPool::getDb($mapping['connection']);
+         $this->adapter = ConnectorPool::getConnector($mapping['connection']);
       }
       return $this->adapter;
    }

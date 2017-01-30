@@ -114,8 +114,20 @@ class CommonDao extends Singleton {
     *
     * @return Connector
     */
+   final public function getConnector() {
+      return $this->getWorker()->getConnector();
+   }
+
+
+   /**
+    * Alias for self::getConnector()
+    *
+    * Gibt den für die persistente Klasse dieses DAO zuständigen DB-Adapter zurück.
+    *
+    * @return Connector
+    */
    final public function getDb() {
-      return $this->getWorker()->getDb();
+      return $this->getConnector();
    }
 
 

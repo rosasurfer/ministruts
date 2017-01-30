@@ -54,7 +54,7 @@ final class ConnectorPool extends Singleton {
     *
     * @return Connector
     */
-   public static function getDb($alias = null) {
+   public static function getConnector($alias = null) {
       $me = self::me();
 
       if ($alias === null) {                                            // single db project
