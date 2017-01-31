@@ -14,18 +14,18 @@ use rosasurfer\exception\RuntimeException;
 /**
  * ConnectionPool
  *
- * Connection-Pool für Datenbankverbindungen zu mehreren Datenbanken.
+ * A pool for multiple database adapter instances. Each instance represents a connection.
  */
 final class ConnectionPool extends Singleton {
 
 
-   /** @var Connector[] - connector pool */
+   /** @var Connector[] - adapter pool */
    private $pool = [];
 
-   /** @var Connector - default connector */
+   /** @var Connector - default adapter */
    private $default;
 
-   /** @var string[] - verschiedene Connector-Schreibweisen */
+   /** @var string[] - common adapter spellings */
    private static $aliases = [
       'mysql'                                         => MySqlConnector::class,
       __NAMESPACE__.'\\mysql\\mysqlconnector'         => MySqlConnector::class,
@@ -41,7 +41,7 @@ final class ConnectionPool extends Singleton {
 
 
    /**
-    * Gibt die Singleton-Instanz dieser Klasse zurück.
+    * Return the Singleton instance of this class.
     *
     * @return self
     */
@@ -51,43 +51,45 @@ final class ConnectionPool extends Singleton {
 
 
    /**
-    * Gibt den Connector für den angegebenen Datenbank-Alias zurück.
+    * Return the Connector instance for the specified connection identifier.
     *
-    * @param  string $alias - Datenbank-Alias
+    * @param  string $id - connection identifier
     *
-    * @return Connector
+    * @return Connector - database adapter for the specified identifier
     */
-   public static function getConnector($alias = null) {
+   public static function getConnector($id = null) {
       $me = self::me();
 
-      if ($alias === null) {                                            // single db project
+      if ($id === null) {                                      // a single db project
          if (!$me->default) throw new IllegalStateException('Invalid default database configuration: null');
          $connector = $me->default;
       }
-      elseif (isSet($me->pool[$alias])) {                               // schon im Pool ?
-         $connector = $me->pool[$alias];
+      elseif (isSet($me->pool[$id])) {                         // is the connection already known?
+         $connector = $me->pool[$id];
       }
-      else {                                                            // nein, Config holen
+      else {                                                   // no, get the connection's config
          if (!$config=Config::getDefault())
             throw new RuntimeException('Service locator returned invalid default config: '.getType($config));
 
-         $config = $config->get('db.'.$alias, null);
-         if (!$config) throw new IllegalStateException('No configuration found for database alias "'.$alias.'"');
+         $config = $config->get('db.'.$id, null);
+         if (!$config) throw new IllegalStateException('No configuration found for database alias "'.$id.'"');
 
-         $name = $config['connector'];                                  // Connector ermitteln
+         // resolve the class name to use for the Connector
+         $name = $config['connector'];
          $name = str_replace('/', '\\', $name);
          if ($name[0]=='\\') $name = subStr($name, 1);
 
-         // Aliase durch Klassennamen ersetzen
+         // check known aliases for class name
          $lName = strToLower($name);
          if (isSet(self::$aliases[$lName]))
             $class = self::$aliases[$lName];
 
-         // separate config and option values
+         // separate connection configuration and additional options
          $options = isSet($config['options']) ? $config['options'] : [];
          unset($config['connector'], $config['options']);
 
-         $me->pool[$alias] = $connector = Connector::create($class, $config, $options);
+         // instantiate and save a new Connector
+         $me->pool[$id] = $connector = Connector::create($class, $config, $options);
       }
       return $connector;
    }

@@ -26,7 +26,7 @@ use const rosasurfer\L_WARN;
 
 
 /**
- * MySQLConnector
+ * MySqlConnector
  */
 class MySqlConnector extends Connector {
 
@@ -40,10 +40,10 @@ class MySqlConnector extends Connector {
    /** @var bool */
    private static $logNotice = false;
 
-   /** @var int - Benötigt eine Query länger als hier angegeben, wird sie im Loglevel L_DEBUG geloggt. */
-   private static $maxQueryTime = 3;
+   /** @var int - Queries spending more time for completion than specified are logged with level L_DEBUG. */
+   private static $maxQueryTime = 3;      // in seconds
 
-   /** @var string */                     // Verbindungs- und Zugangsdaten
+   /** @var string */                     // connection details
    protected $host;
 
    /** @var string */
@@ -61,18 +61,20 @@ class MySqlConnector extends Connector {
    /** @var string[] */
    protected $options = [];
 
-   /** @var resource - Handle auf das interne Connection-Objekt. */
+   /** @var resource - internal connection handle */
    protected $hConnection;
 
-   /** @var int - Transaktionszähler (0: keine aktive Transaktion) */
+   /** @var int - transaction counter: 0=no transaction; 1: transaction; >1: nested transaction */
    protected $transaction = 0;
 
 
    /**
-    * Erzeugt einen neue MySQLConnector.
+    * Constructor
     *
-    * @param  string[] $config  - Verbindungskonfiguration
-    * @param  string[] $options - weitere MySQL-spezifische Optionen (default: keine)
+    * Create a new MySqlConnector instance.
+    *
+    * @param  string[] $config  - connection configuration
+    * @param  string[] $options - additional MySQL typical options (default: none)
     */
    protected function __construct(array $config, array $options=[]) {
       $loglevel        = Logger::getLogLevel(__CLASS__);
@@ -91,28 +93,28 @@ class MySqlConnector extends Connector {
 
 
    /**
-    * Setzt Namen und Port des Datenbankservers.
+    * Set the database server's hostname, and port (if any).
     *
-    * @param  string $host
+    * @param  string $hostname - format: "hostname[:port]"
     *
     * @return self
     */
-   protected function setHost($host) {
-      if (!is_string($host)) throw new IllegalTypeException('Illegal type of parameter $host: '.getType($host));
-      if (!strLen($host))    throw new InvalidArgumentException('Invalid parameter $host: "'.$host.'" (empty)');
+   protected function setHost($hostname) {
+      if (!is_string($hostname)) throw new IllegalTypeException('Illegal type of parameter $hostname: '.getType($hostname));
+      if (!strLen($hostname))    throw new InvalidArgumentException('Invalid parameter $hostname: "'.$hostname.'" (empty)');
 
-      $host_orig = $host;
+      $host = $hostname;
       $port = null;
 
       if (strPos($host, ':') !== false) {
          list($host, $port) = explode(':', $host, 2);
          $host = trim($host);
-         if (!strLen($host)) throw new InvalidArgumentException('Invalid parameter $host: "'.$host_orig.'" (empty host name)');
+         if (!strLen($host)) throw new InvalidArgumentException('Invalid parameter $hostname: "'.$hostname.'" (empty host name)');
 
          $port = trim($port);
-         if (!ctype_digit($port)) throw new InvalidArgumentException('Invalid parameter $host: "'.$host_orig.'" (not a port)');
+         if (!ctype_digit($port)) throw new InvalidArgumentException('Invalid parameter $hostname: "'.$hostname.'" (not a port)');
          $port = (int) $port;
-         if (!$port || $port > 65535) throw new InvalidArgumentException('Invalid parameter $host: "'.$host_orig.'" (illegal port)');
+         if (!$port || $port > 65535) throw new InvalidArgumentException('Invalid parameter $hostname: "'.$hostname.'" (illegal port)');
       }
 
       $this->host = $host;
@@ -122,7 +124,7 @@ class MySqlConnector extends Connector {
 
 
    /**
-    * Setzt den Benutzernamen.
+    * Set the username for the connection.
     *
     * @param  string $name
     *
@@ -138,9 +140,9 @@ class MySqlConnector extends Connector {
 
 
    /**
-    * Setzt das Passwort.
+    * Set the password for the connection (if any).
     *
-    * @param  string $password - possibly empty password
+    * @param  string $password - may be empty or NULL (no password)
     *
     * @return self
     */
@@ -154,9 +156,9 @@ class MySqlConnector extends Connector {
 
 
    /**
-    * Setzt den Namen des Datenbankschemas.
+    * Set the name of the default database schema to use.
     *
-    * @param  string $name - Datenbankname
+    * @param  string $name - schema name
     *
     * @return self
     */
@@ -171,9 +173,9 @@ class MySqlConnector extends Connector {
 
 
    /**
-    * Setzt weitere Verbindungsoptionen.
+    * Set additonal connection options.
     *
-    * @param  string[] $options - Optionen
+    * @param  string[] $options
     *
     * @return self
     */
@@ -184,7 +186,7 @@ class MySqlConnector extends Connector {
 
 
    /**
-    * Stellt die Verbindung zur Datenbank her.
+    * Open the connection to the database.
     *
     * @return self
     */
@@ -264,7 +266,7 @@ class MySqlConnector extends Connector {
 
 
    /**
-    * Trennt die Verbindung des Connectors zur Datenbank.
+    * Close the connection to the database.
     *
     * @return self
     */
@@ -278,7 +280,7 @@ class MySqlConnector extends Connector {
 
 
    /**
-    * Ob eine Connection zur Datenbank besteht.
+    * Whether or not a connection to the databse is currently established.
     *
     * @return bool
     */
@@ -288,12 +290,12 @@ class MySqlConnector extends Connector {
 
 
    /**
-    * Führt eine SQL-Anweisung aus. Gibt das Ergebnis als mehrdimensionales Array zurück.
+    * Execute a SQL statement and return the result set.
     *
-    * @param  string $sql - SQL-Anweisung
+    * @param  string $sql - SQL statement
     *
-    * @return array['set' ] - das zurückgegebene Resultset (nur bei SELECT-Statement)
-    *              ['rows'] - Anzahl der betroffenen Datensätze (nur bei SELECT/INSERT/UPDATE-Statement)
+    * @return array['set' ] - a result set (for SELECT statements only)
+    *              ['rows'] - number of affected or modified rows (for SELECT/INSERT/UPDATE statements only)
     */
    public function executeSql($sql) {
       $result = array('set'  => null,
@@ -303,12 +305,12 @@ class MySqlConnector extends Connector {
 
       if (is_resource($rawResult)) {
          $result['set']  = $rawResult;
-         $result['rows'] = mysql_num_rows($rawResult);                  // Anzahl der erhaltenen Zeilen
+         $result['rows'] = mysql_num_rows($rawResult);                  // number of returned rows
       }
       else {
          $sql = strToLower($sql);
          if (subStr($sql, 0, 6)=='insert' || subStr($sql, 0, 7)=='replace' || subStr($sql, 0, 6)=='update' || subStr($sql, 0, 6)=='delete') {
-            $result['rows'] = mysql_affected_rows($this->hConnection);  // Anzahl der modifizierten Zeilen
+            $result['rows'] = mysql_affected_rows($this->hConnection);  // number of affected rows
          }
       }
       return $result;
@@ -316,11 +318,11 @@ class MySqlConnector extends Connector {
 
 
    /**
-    * Führt eine SQL-Anweisung aus und gibt das Ergebnis als Resource zurück.
+    * Execute a SQL statement and return the internal response object.
     *
-    * @param  string $sql - SQL-Anweisung
+    * @param  string $sql - SQL statement
     *
-    * @return array|bool - je nach Statement ein ResultSet oder ein Boolean
+    * @return mixed - depending on the statement type a result set or a boolean
     */
    public function queryRaw($sql) {
       if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
@@ -328,18 +330,18 @@ class MySqlConnector extends Connector {
       if (!$this->isConnected())
          $this->connect();
 
-      // ggf. Startzeitpunkt speichern
+      // memorize starting time
       if (self::$logDebug)
          $start = microTime(true);
 
-      // Statement ausführen
+      // execute statement
       $result = mysql_query($sql, $this->hConnection);
 
-      // ggf. Endzeitpunkt speichern
+      // memorize end time
       if (self::$logDebug)
          $end = microTime(true);
 
-      // Ergebnis auswerten
+      // calculate statement duration
       if (!$result) {
          $message = ($errno = mysql_errno()) ? "SQL-Error $errno: ".mysql_error() : 'Can not connect to MySQL server';
 
@@ -349,16 +351,16 @@ class MySqlConnector extends Connector {
          $message .= "\nSQL: ".$sql;
 
          if ($errno == 1205)           // 1205: Lock wait timeout exceeded
-            $message .= "\n\n".$this->printProcessList(true);
+            $message .= "\n\n".$this->printProcessList($return=true);
 
          if ($errno == 1213)           // 1213: Deadlock found when trying to get lock
-            $message .= "\n\n".$this->printDeadlockStatus(true);
+            $message .= "\n\n".$this->printDeadlockStatus($return=true);
 
          throw new DatabaseException($message);
       }
 
 
-      // Zu lang dauernde Statements loggen
+      // log statements exceeding $maxQueryTime
       if (self::$logDebug) {
          $neededTime = round($end - $start, 4);
          if ($neededTime > self::$maxQueryTime)
@@ -370,8 +372,7 @@ class MySqlConnector extends Connector {
 
 
    /**
-    * Befindet sich der Connector in *keiner* Transaktion, wird eine neue Transaktion gestartet und der Transaktionszähler erhöht.
-    * Befindet er sich bereits in einer Transaktion, wird nur der Transaktionszähler erhöht.
+    * Start a new transaction. If a transaction is already pending only the transaction counter is increased.
     *
     * @return self
     */
@@ -387,8 +388,7 @@ class MySqlConnector extends Connector {
 
 
    /**
-    * Befindet sich der Connector in genau *einer* Transaktion, wird diese Transaktion abgeschlossen.
-    * Befindet er sich in einer verschachtelten Transaktion, wird nur der Transaktionszähler heruntergezählt.
+    * Commit a pending transaction. If a nested transaction is pending only the transaction counter is decreased.
     *
     * @return self
     */
@@ -409,8 +409,8 @@ class MySqlConnector extends Connector {
 
 
    /**
-    * Befindet sich der Connector in GENAU einer Transaktion, wird diese Transaktion zurückgerollt.
-    * Befindet er sich in einer verschachtelten Transaktion, wird der Aufruf ignoriert.
+    * Roll back a pending transaction. If a nested transaction is pending the call is ignored. If the last transaction is
+    * pending (counter=1) the transaction is rolled back.
     *
     * @return self
     */
@@ -431,7 +431,7 @@ class MySqlConnector extends Connector {
 
 
    /**
-    * Ob der Connector sich im Moment in einer Transaktion befindet.
+    * Whether or not the connection currently is in a pending transaction.
     *
     * @return bool
     */
@@ -441,9 +441,9 @@ class MySqlConnector extends Connector {
 
 
    /**
-    * Liest die aktuell laufenden und für diese Connection sichtbaren Prozesse aus.
+    * Read the currently running and visible processes.
     *
-    * @return array - Report mit Processlist-Daten
+    * @return array[] - process data
     */
    private function getProcessList() {
       ($oldLogDebug=self::$logDebug) && self::$logDebug = false;
@@ -461,14 +461,14 @@ class MySqlConnector extends Connector {
 
 
    /**
-    * Hilfsfunktion zur formatierten Ausgabe der aktuell laufenden Prozesse.
+    * Helper: Format a list of currently running processes.
     *
-    * @param  bool $return - Ob die Ausgabe auf STDOUT (FALSE) oder als Rückgabewert der Funktion (TRUE) erfolgen soll.
-    *                        (default: FALSE)
+    * @param  bool $return - Whether to return the list as a regular return value (TRUE) or to print the list to STDOUT
+    *                        (FALSE).
     *
-    * @return string - wenn $return TRUE ist, die Ausgabe, andererseits NULL
+    * @return string - string or NULL if parameter $return is FALSE
     */
-   private function printProcessList($return = false) {
+   private function printProcessList($return) {
       $list = $this->getProcessList();
 
       $lengthId      = strLen('Id'     );
@@ -538,14 +538,14 @@ class MySqlConnector extends Connector {
 
 
    /**
-    * Liest den aktuellen InnoDB-Status der Datenbank aus.
+    * Read the current MySQL InnoDB status.
     *
-    * @return string - Report mit Status-Daten
+    * @return string - status report
     */
    private function getInnoDbStatus() {
       ($oldLogDebug=self::$logDebug) && self::$logDebug = false;
 
-      // TODO: Vorsicht vor 1227: Access denied; you need the SUPER privilege for this operation
+      // TODO: special attention: 1227: Access denied; you need the SUPER privilege for this operation
       $result = $this->queryRaw('show engine innodb status');
 
       self::$logDebug = $oldLogDebug;
@@ -555,17 +555,17 @@ class MySqlConnector extends Connector {
 
 
    /**
-    * Gibt eine aufbereitete und formatierte Version des aktuellen InnoDB-Deadlock-Status der Datenbank aus.
+    * Return a formatted version of the current MySQL InnoDB deadlock status of the database.
     *
-    * @param  bool $return - Ob die Ausgabe auf STDOUT (FALSE) oder als Rückgabewert der Funktion (TRUE) erfolgen soll.
-    *                        (default: FALSE)
+    * @param  bool $return - Whether to return the result as a regular return value (TRUE) or to print the result to STDOUT
+    *                        (FALSE).
     *
-    * @return string - Rückgabewert, wenn $return TRUE ist, NULL andererseits
+    * @return string - string or NULL if parameter $return is FALSE
     */
-   private function printDeadlockStatus($return = false) {
+   private function printDeadlockStatus($return) {
       $status = $this->getInnoDbStatus();
 
-      // Datenformat: siehe Ende der Methode
+      // source data format: @see end of method
       if (!preg_match('/\nLATEST DETECTED DEADLOCK\n-+\n(.+)\n-+\n/sU', $status, $match)) {
          if (strContains($status, "\nLATEST DETECTED DEADLOCK\n")) $message = "Error parsing InnoDB status:";
          else                                                      $message = "No deadlock infos found in InnoDB status:";
@@ -575,22 +575,22 @@ class MySqlConnector extends Connector {
       $status = $match[1];
 
 
-      // Blöcke trennen
+      // separate blocks
       $blocks = explode("\n*** ", $status);
       if (!$blocks) {
          Logger::log("Error parsing deadlock status\n\n".$status, L_ERROR);
          return null;
       }
-      array_shift($blocks); // führende Timestring-Zeile entfernen
+      array_shift($blocks);                     // skip leading timestamp row
 
       $transactions = array();
 
 
-      // Blöcke parsen
+      // parse blocks
       foreach ($blocks as $block) {
          $block = trim($block);
 
-         // Roll back block
+         // "roll back" block
          if (strStartsWithI($block, 'WE ROLL BACK TRANSACTION ')) {
             if (!preg_match('/^WE ROLL BACK TRANSACTION \((\d+)\)$/i', $block, $match)) {
                Logger::log("Error parsing deadlock status roll back block\n\n".$block, L_ERROR);
@@ -606,7 +606,7 @@ class MySqlConnector extends Connector {
                Logger::log("Error parsing deadlock status block\n\n".$block, L_ERROR);
                return null;
             }
-            // Transaction block
+            // "transaction" block
             if (strStartsWithI($lines[1], 'TRANSACTION ')) {
                if (!preg_match('/\s*\((\d+)\).*\nTRANSACTION \d+ (\d+), ACTIVE (\d+) sec.+\n(LOCK WAIT )?(\d+) lock struct\(s\), heap size \d+(?:, undo log entries (\d+))?\nMySQL thread id (\d+), query id \d+ (\S+) \S+ (\S+).+?\n(.+)$/is', $block, $match)) {
                   Logger::log("Error parsing deadlock status transaction block\n\n".$block, L_ERROR);
@@ -626,7 +626,7 @@ class MySqlConnector extends Connector {
                                     );
                $transactions[$match[2]] = $transaction;
             }
-            // Lock block
+            // "lock" block
             elseif (strStartsWithI($lines[1], 'RECORD LOCKS ')) {
                if (!preg_match('/\s*\((\d+)\).*\nRECORD LOCKS space id \d+ page no \d+ n bits \d+ index `(\S+)` of table `([^\/]+)\/([^`]+)` trx id \d+ (\d+) lock(_| )mode (S|X)( locks (.+))?( waiting)?/i', $block, $match)) {
                   Logger::log("Error parsing deadlock status lock block\n\n".$block, L_ERROR);
@@ -653,11 +653,11 @@ class MySqlConnector extends Connector {
       }
 
 
-      // Transaktionen nach Transaktions-Nr. sortieren
+      // sort transactions by transaction number
       kSort($transactions);
 
 
-      // Längen der Transaktionsanzeige ermitteln
+      // resolve length of lines to display
       $lengthId     = strLen('Id'    );
       $lengthUser   = strLen('User'  );
       $lengthHost   = strLen('Host'  );
@@ -676,7 +676,7 @@ class MySqlConnector extends Connector {
       }
 
 
-      // Längen der Lockanzeige ermitteln
+      // resolve lengths of "lock" display
       $lengthWaiting = strLen('Waiting');
       $lengthMode    = strLen('Mode'   );
       $lengthDb      = strLen('DB'     );
@@ -694,7 +694,7 @@ class MySqlConnector extends Connector {
       }
 
 
-      // Transaktionsanzeige generieren
+      // generate "transaction" display
       // top separator line
       $lengthT = $lengthId+2+$lengthUser+2+$lengthHost+2+$lengthVictim+2+$lengthTime+2+$lengthUndo+2+$lengthQuery;
       $lengthL = $lengthId+2+$lengthWaiting+2+$lengthMode+2+$lengthDb+2+$lengthTable+2+$lengthIndex+2+$lengthSpecial;
@@ -730,7 +730,7 @@ class MySqlConnector extends Connector {
       $string .= str_repeat('_', $lengthT)."\n";
 
 
-      // Lockanzeige generieren
+      // generate "lock" display
       // top separator line
       $lPre    = $lPost = ($lengthL-strLen(' Deadlock Locks '))/2;
       $string .= "\n\n\n".str_repeat('_', (int)floor($lPre)).' Deadlock Locks '.str_repeat('_', (int)ceil($lPost))."\n";
@@ -830,9 +830,9 @@ TRANSACTIONS
 
 
    /**
-    * Ersetzt in einem String mehrfache durch einfache Leerzeichen.
+    * Replace multiple spaces with a single one.
     *
-    * @param  string $string - der zu bearbeitende String
+    * @param  string $string
     *
     * @return string
     */

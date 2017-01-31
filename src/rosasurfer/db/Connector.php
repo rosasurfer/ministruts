@@ -9,22 +9,24 @@ use rosasurfer\exception\InvalidArgumentException;
 /**
  * Connector
  *
- * Abstrakte Superklasse für verschiedene Datenbank-Connectoren.
+ * Abstract super class for concrete storage mechanism adapters.
  */
 abstract class Connector extends Object {
 
 
    /**
-    * Geschützter Default-Constructor, Instanzen können nur über self::create() erzeugt werden.
+    * Constructor
+    *
+    * Default constructor. To create an instance use self::create().
     */
-   protected function __construct() {}
+   protected function __construct() {
+   }
 
 
    /**
     * Destructor
     *
-    * Sorgt bei Zerstörung des Objekts dafür, daß eine evt. noch offene Transaktion zurückgerollt
-    * und die Verbindung zur Datenbank geschlossen wird.
+    * Make sure that on destruction of the instance a pending transaction is rolled back and the connection is closed.
     */
    public function __destruct() {
       try {
@@ -44,11 +46,11 @@ abstract class Connector extends Object {
 
 
    /**
-    * Erzeugt einen neuen Connector und initialisiert ihn.
+    * Create a new Connector and initialize it with connection specific configuration values.
     *
-    * @param  string   $class   - Klassenname des Connectors
-    * @param  string[] $config  - Connector-Konfiguration
-    * @param  string[] $options - weitere Connector-Optionen (default: keine)
+    * @param  string   $class   - Connector class name
+    * @param  string[] $config  - connection configuration
+    * @param  string[] $options - additional connection options (default: none)
     *
     * @return self
     */
@@ -59,19 +61,19 @@ abstract class Connector extends Object {
 
 
    /**
-    * Verbindet den Connector mit der Datenbank.
+    * Connect the adapter with the database.
     */
    abstract protected function connect();
 
 
    /**
-    * Trennt die Verbindung des Connectors zur Datenbank.
+    * Disconnect the adapter from the database.
     */
    abstract protected function disconnect();
 
 
    /**
-    * Ob eine Connection zur Datenbank besteht.
+    * Whether or not the adapter currently is connected to the database.
     *
     * @return bool
     */
@@ -79,28 +81,28 @@ abstract class Connector extends Object {
 
 
    /**
-    * Führt eine SQL-Anweisung aus. Gibt das Ergebnis als mehrdimensionales Array zurück.
+    * Execute a SQL statement and return the result set.
     *
-    * @param  string $sql - SQL-Anweisung
+    * @param  string $sql - SQL statement
     *
-    * @return array['set' ] - das zurückgegebene Resultset (nur bei SELECT-Statement)
-    *              ['rows'] - Anzahl der betroffenen Datensätze (nur bei SELECT/INSERT/UPDATE-Statement)
+    * @return array['set' ] - a result set (for SELECT statements only)
+    *              ['rows'] - number of affected or modified rows (for SELECT/INSERT/UPDATE statements only)
     */
    abstract public function executeSql($sql);
 
 
    /**
-    * Führt eine SQL-Anweisung aus.
+    * Execute a SQL statement and return the original internal response object.
     *
-    * @param  string $sql - SQL-Anweisung
+    * @param  string $sql - SQL statement
     *
-    * @return mixed - je nach Connector
+    * @return mixed
     */
    abstract public function queryRaw($sql);
 
 
    /**
-    * Beginnt eine neue Transaktion.
+    * Start a new transaction.
     *
     * @return self
     */
@@ -108,7 +110,7 @@ abstract class Connector extends Object {
 
 
    /**
-    * Schließt eine Transaktion ab.
+    * Commit a pending transaction.
     *
     * @return self
     */
@@ -116,7 +118,7 @@ abstract class Connector extends Object {
 
 
    /**
-    * Rollt eine Transaktion zurück.
+    * Roll back a pending transaction.
     *
     * @return self
     */
@@ -124,7 +126,7 @@ abstract class Connector extends Object {
 
 
    /**
-    * Ob der Connector sich in einer Transaktion befindet.
+    * Whether or not the connection currently is in a pending transaction.
     *
     * @return bool
     */
