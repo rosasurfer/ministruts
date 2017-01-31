@@ -1,12 +1,13 @@
 <?php
-namespace rosasurfer\db;
+namespace rosasurfer\db\mysql;
+
+use rosasurfer\db\Connector;
 
 use rosasurfer\exception\DatabaseException;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InfrastructureException;
 
 use rosasurfer\log\Logger;
-
 use rosasurfer\util\Date;
 
 use function rosasurfer\echoPre;
