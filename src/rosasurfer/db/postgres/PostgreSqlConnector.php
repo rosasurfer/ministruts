@@ -7,5 +7,5 @@ use rosasurfer\db\Connector;
 /**
  * PostgreSqlConnector
  */
-class PostgreSqlConnector extends Connector {
+abstract class PostgreSqlConnector extends Connector {
 }

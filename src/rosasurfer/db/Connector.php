@@ -46,19 +46,15 @@ abstract class Connector extends Object {
    /**
     * Erzeugt einen neuen Connector und initialisiert ihn.
     *
-    * @param  string   $class    - Klassenname des konkreten Connectors
-    * @param  string   $host     - Hostname(:Port) des Datenbankservers
-    * @param  string   $username - Benutzername
-    * @param  string   $password - Passwort
-    * @param  string   $database - vorzuselektierende Datenbank (default: keine)
-    * @param  string[] $options  - weitere Verbindungsoptionen (default: keine)
+    * @param  string   $class   - Klassenname des Connectors
+    * @param  string[] $config  - Connector-Konfiguration
+    * @param  string[] $options - weitere Connector-Optionen (default: keine)
     *
     * @return self
     */
-   public static function create($class, $host, $username, $password, $database=null, array $options=[]) {
+   public static function create($class, array $config, array $options=[]) {
       if (!is_subclass_of($class, __CLASS__)) throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
-
-      return new $class($host, $username, $password, $database, $options);
+      return new $class($config, $options);
    }
 
 

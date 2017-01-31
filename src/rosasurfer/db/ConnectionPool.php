@@ -83,23 +83,11 @@ final class ConnectionPool extends Singleton {
          if (isSet(self::$aliases[$lName]))
             $class = self::$aliases[$lName];
 
-         if ($old = 1) {
-            // old
-            $host    =                             $config['host'    ];
-            $user    =                             $config['username'];
-            $pass    =                             $config['password'];
-            $db      =                             $config['schema'  ];
-            $options = isSet($config['options']) ? $config['options' ] : null;
-            $connector = Connector::create($class, $host, $user, $pass, $db, $options);
-         }
-         else {
-            // new: clean-up and separate config and options
-            $options = isSet($config['options']) ? $config['options'] : [];
-            unset($config['connector'], $config['options']);
-            $connector = Connector::create($config, $options);
-         }
+         // separate config and option values
+         $options = isSet($config['options']) ? $config['options'] : [];
+         unset($config['connector'], $config['options']);
 
-         $me->pool[$alias] = $connector;
+         $me->pool[$alias] = $connector = Connector::create($class, $config, $options);
       }
       return $connector;
    }

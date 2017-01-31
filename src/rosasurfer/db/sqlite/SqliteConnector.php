@@ -7,5 +7,5 @@ use rosasurfer\db\Connector;
 /**
  * SqliteConnector
  */
-class SqliteConnector extends Connector {
+abstract class SqliteConnector extends Connector {
 }

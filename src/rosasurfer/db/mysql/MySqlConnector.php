@@ -69,27 +69,23 @@ class MySqlConnector extends Connector {
 
 
    /**
-    * Erzeugt eine neue MySQLConnector-Instanz.
+    * Erzeugt einen neue MySQLConnector.
     *
-    * @param  string   $host     - Hostname(:Port) des Datenbankservers
-    * @param  string   $username - Benutzername
-    * @param  string   $password - Passwort
-    * @param  string   $database - vorzuselektierende Datenbank (default: keine)
-    * @param  string[] $options  - weitere Verbindungsoptionen (default: keine)
+    * @param  string[] $config  - Verbindungskonfiguration
+    * @param  string[] $options - weitere MySQL-spezifische Optionen (default: keine)
     */
-   protected function __construct($host, $username, $password, $database=null, array $options=[]) {
+   protected function __construct(array $config, array $options=[]) {
       $loglevel        = Logger::getLogLevel(__CLASS__);
       self::$logDebug  = ($loglevel <= L_DEBUG );
       self::$logInfo   = ($loglevel <= L_INFO  );
       self::$logNotice = ($loglevel <= L_NOTICE);
 
-      $this->setHost($host)
-           ->setUsername($username)
-           ->setPassword($password)
-           ->setOptions($options);
+      $this->setHost    ($config['host'    ])
+           ->setUsername($config['username'])
+           ->setOptions ($options);
+      if (isSet($config['password'])) $this->setPassword($config['password']);
+      if (isSet($config['schema'  ])) $this->setDatabase($config['schema'  ]);
 
-      if (!is_null($database))
-         $this->setDataBase($database);
       parent::__construct();
    }
 
