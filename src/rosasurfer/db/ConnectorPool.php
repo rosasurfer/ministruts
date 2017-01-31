@@ -17,21 +17,13 @@ use rosasurfer\exception\RuntimeException;
 final class ConnectorPool extends Singleton {
 
 
-   /**
-    * connector pool
-    */
-   private /*Connector[]*/ $pool = array();
+   /** @var Connector[] - connector pool */
+   private $pool = [];
 
+   /** @var Connector - default connector */
+   private $default;
 
-   /**
-    * default connector
-    */
-   private /*Connector*/ $default;
-
-
-   /**
-    * verschiedene Schreibweisen
-    */
+   /** @var string[] - verschiedene Connector-Schreibweisen */
    private static $connectorAliases = [
       'mysql'                           => MySqlConnector ::class,
       __NAMESPACE__.'\\mysqlconnector'  => MySqlConnector ::class,
@@ -40,10 +32,11 @@ final class ConnectorPool extends Singleton {
       __NAMESPACE__.'\\sqliteconnector' => SqliteConnector::class,
    ];
 
+
    /**
     * Gibt die Singleton-Instanz dieser Klasse zurück.
     *
-    * @return Singleton
+    * @return self
     */
    public static function me() {
       return Singleton::getInstance(static::class);

@@ -27,10 +27,17 @@ use const rosasurfer\L_NOTICE;
 class MySqlConnector extends Connector {
 
 
-   private static /*bool*/ $logDebug,
-                  /*bool*/ $logInfo,
-                  /*bool*/ $logNotice,
-                  /*int*/  $maxQueryTime = 3; // benötigt eine Query länger als hier angegeben, wird sie im Logelevel DEBUG geloggt
+   /** @var bool */
+   private static $logDebug;
+
+   /** @var bool */
+   private static $logInfo;
+
+   /** @var bool */
+   private static $logNotice;
+
+   /** @var int - benötigt eine Query länger als hier angegeben, wird sie im Logelevel DEBUG geloggt */
+   private static $maxQueryTime = 3;
 
 
    /**
@@ -49,7 +56,7 @@ class MySqlConnector extends Connector {
    /**
     * Stellt die Verbindung zur Datenbank her.
     *
-    * @return MySQLConnector
+    * @return self
     */
    protected function connect() {
       $host = $this->host;
@@ -129,7 +136,7 @@ class MySqlConnector extends Connector {
    /**
     * Trennt die Verbindung des Connectors zur Datenbank.
     *
-    * @return MySQLConnector
+    * @return self
     */
    protected function disconnect() {
       if ($this->isConnected()) {
@@ -145,7 +152,7 @@ class MySqlConnector extends Connector {
     *
     * @param  string $sql - SQL-Anweisung
     *
-    * @return mixed - je nach Statement ein ResultSet oder ein Boolean
+    * @return array|bool - je nach Statement ein ResultSet oder ein Boolean
     */
    public function queryRaw($sql) {
       if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));

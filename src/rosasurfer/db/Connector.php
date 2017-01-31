@@ -21,31 +21,35 @@ use const rosasurfer\L_WARN;
 abstract class Connector extends Object {
 
 
-   /**
-    * Handle auf das interne, originale Connection-Objekt.
-    */
-   protected /*hResource*/ $link;
+   /** @var resource - Handle auf das interne Connection-Objekt. */
+   protected $link;
 
+   /** @var string */
+   protected $host;                       // Verbindungs- und Zugangsdaten
 
-   // Verbindungs- und Zugangsdaten
-   protected /*string*/   $host;
-   protected /*string*/   $port;
-   protected /*string*/   $username;
-   protected /*string*/   $password;
-   protected /*string*/   $database;
-   protected /*string[]*/ $options = [];
+   /** @var string */
+   protected $port;
 
+   /** @var string */
+   protected $username;
 
-   /**
-    * Transaktionszähler (0 = keine aktive Transaktion)
-    */
-   private /*int*/ $transaction = 0;
+   /** @var string */
+   protected $password;
+
+   /** @var string */
+   protected $database;
+
+   /** @var string[] */
+   protected $options = [];
+
+   /** @var int - Transaktionszähler (0: keine aktive Transaktion) */
+   private $transaction = 0;
 
 
    /**
     * Geschützter Default-Constructor, Instanzen können nur über Connector::spawn() erzeugt werden.
     */
-   protected function __construct() { /**/ }
+   protected function __construct() {}
 
 
    /**
