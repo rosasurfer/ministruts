@@ -2,8 +2,10 @@
 namespace rosasurfer\db;
 
 use rosasurfer\config\Config;
-
 use rosasurfer\core\Singleton;
+
+use rosasurfer\db\mysql\MySqlConnector;
+use rosasurfer\db\sqlite\SqliteConnector;
 
 use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\RuntimeException;
@@ -25,11 +27,11 @@ final class ConnectorPool extends Singleton {
 
    /** @var string[] - verschiedene Connector-Schreibweisen */
    private static $connectorAliases = [
-      'mysql'                           => MySqlConnector ::class,
-      __NAMESPACE__.'\\mysqlconnector'  => MySqlConnector ::class,
-      'sqlite'                          => SqliteConnector::class,
-      'sqlite3'                         => SqliteConnector::class,
-      __NAMESPACE__.'\\sqliteconnector' => SqliteConnector::class,
+      'mysql'                                   => MySqlConnector ::class,
+      __NAMESPACE__.'\\mysql\\mysqlconnector'   => MySqlConnector ::class,
+      'sqlite'                                  => SqliteConnector::class,
+      'sqlite3'                                 => SqliteConnector::class,
+      __NAMESPACE__.'\\sqlite\\sqliteconnector' => SqliteConnector::class,
    ];
 
 
