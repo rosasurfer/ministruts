@@ -33,8 +33,11 @@ final class ConnectorPool extends Singleton {
     * verschiedene Schreibweisen
     */
    private static $connectorAliases = [
-      'mysql'                         => MySqlConnector::class,
-      __NAMESPACE__.'\mysqlconnector' => MySqlConnector::class,
+      'mysql'                           => MySqlConnector ::class,
+      __NAMESPACE__.'\\mysqlconnector'  => MySqlConnector ::class,
+      'sqlite'                          => SqliteConnector::class,
+      'sqlite3'                         => SqliteConnector::class,
+      __NAMESPACE__.'\\sqliteconnector' => SqliteConnector::class,
    ];
 
    /**
@@ -72,7 +75,8 @@ final class ConnectorPool extends Singleton {
          if (!$config) throw new IllegalStateException('No configuration found for database alias "'.$alias.'"');
 
          $name = $config['connector'];                                  // Connector laden
-         if ($name[0]=='//') $name = substr($name, 1);
+         $name = str_replace('/', '\\', $name);
+         if ($name[0]=='\\') $name = subStr($name, 1);
 
          // Aliase durch Klassennamen ersetzen
          $lName = strToLower($name);
