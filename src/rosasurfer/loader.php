@@ -20,7 +20,6 @@ define('rosasurfer\MINISTRUTS_ROOT', dirName(dirName(__DIR__)));
 // Include helper functions and constants which can't be auto-loaded.
 require(MINISTRUTS_ROOT.'/src/rosasurfer/helpers.php');
 require(MINISTRUTS_ROOT.'/src/rosasurfer/ministruts/helpers.php');
-registerClassLoader();
 
 
 /**
@@ -59,8 +58,9 @@ function registerClassLoader() {
    $loader->register();
    spl_autoload_unregister($bootstrap);
 
-   // register and save an otherwise lost legacy auto-loader
+   // register an otherwise lost legacy auto-loader
    if ($legacyAutoLoad && spl_autoload_functions()[0]!='__autoload') {
       spl_autoload_register('__autoload', $throw=true, $prepend=true);
    }
 }
+registerClassLoader();
