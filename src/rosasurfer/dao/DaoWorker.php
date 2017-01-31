@@ -2,7 +2,7 @@
 namespace rosasurfer\dao;
 
 use rosasurfer\core\Object;
-use rosasurfer\db\ConnectorPool;
+use rosasurfer\db\ConnectionPool;
 
 use rosasurfer\exception\DatabaseException;
 use rosasurfer\exception\IllegalTypeException;
@@ -149,7 +149,7 @@ class DaoWorker extends Object {
    public function getConnector() {
       if (!$this->adapter) {
          $mapping = $this->dao->getMapping();
-         $this->adapter = ConnectorPool::getConnector($mapping['connection']);
+         $this->adapter = ConnectionPool::getConnector($mapping['connection']);
       }
       return $this->adapter;
    }
