@@ -75,7 +75,7 @@ class ActionForward extends Object {
     *
     * @param  string $name
     *
-    * @return ActionForward
+    * @return self
     */
    public function setName($name) {
       if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -92,7 +92,7 @@ class ActionForward extends Object {
     *
     * @param  string $path
     *
-    * @return ActionForward
+    * @return self
     */
    public function setPath($path) {
       if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -109,7 +109,7 @@ class ActionForward extends Object {
     *
     * @param  string $label - Label
     *
-    * @return ActionForward
+    * @return self
     */
    public function setLabel($label) {
       if ($this->configured)  throw new IllegalStateException('Configuration is frozen');
@@ -126,7 +126,7 @@ class ActionForward extends Object {
     *
     * @param  bool $redirect
     *
-    * @return ActionForward
+    * @return self
     */
    public function setRedirect($redirect) {
       if ($this->configured)   throw new IllegalStateException('Configuration is frozen');
@@ -143,7 +143,7 @@ class ActionForward extends Object {
     * @param  string $key   - Schlüssel
     * @param  scalar $value - Wert (int|float|string|bool)
     *
-    * @return ActionForward
+    * @return self
     */
    public function addQueryData($key, $value) {
       if ($this->configured)      throw new IllegalStateException('Configuration is frozen');
@@ -168,7 +168,7 @@ class ActionForward extends Object {
     * Friert die Konfiguration dieser Komponente ein. Nachdem Aufruf dieser Methode kann die Konfiguration
     * der Komponente nicht mehr verändert werden.
     *
-    * @return ActionForward
+    * @return self
     */
    public function freeze() {
       if (!$this->configured)
@@ -183,7 +183,7 @@ class ActionForward extends Object {
     * Forwards ist noch nicht eingefroren, sodaß diese Methode zum "Modifizieren" vorhandener Forwards
     * benutzt werden kann.
     *
-    * @return ActionForward
+    * @return self
     *
     * @see ActionForward::freeze()
     */

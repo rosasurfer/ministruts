@@ -83,7 +83,7 @@ class ActionMapping extends Object {
     *
     * @param  string $path
     *
-    * @return ActionMapping
+    * @return self
     */
    public function setPath($path) {
       if ($this->configured)          throw new IllegalStateException('Configuration is frozen');
@@ -125,7 +125,7 @@ class ActionMapping extends Object {
     *
     * @param  string $method - HTTP-Methode: "GET"|"POST"
     *
-    * @return ActionMapping
+    * @return self
     */
    public function setMethod($method) {
       if ($this->configured)                   throw new IllegalStateException('Configuration is frozen');
@@ -154,7 +154,7 @@ class ActionMapping extends Object {
     *
     * @param  string - Rollenausdruck
     *
-    * @return ActionMapping
+    * @return self
     */
    public function setRoles($roles) {
       if ($this->configured)  throw new IllegalStateException('Configuration is frozen');
@@ -184,7 +184,7 @@ class ActionMapping extends Object {
     *
     * @param  ActionForward $forward - ActionForward
     *
-    * @return ActionMapping
+    * @return self
     */
    public function setForward(ActionForward $forward) {
       if ($this->configured)      throw new IllegalStateException('Configuration is frozen');
@@ -210,7 +210,7 @@ class ActionMapping extends Object {
     *
     * @param  string $className
     *
-    * @return ActionMapping
+    * @return self
     */
    public function setActionClassName($className) {
       if ($this->configured)                              throw new IllegalStateException('Configuration is frozen');
@@ -240,7 +240,7 @@ class ActionMapping extends Object {
     *
     * @param  string $className
     *
-    * @return ActionMapping
+    * @return self
     */
    public function setFormClassName($className) {
       if ($this->configured)                                   throw new IllegalStateException('Configuration is frozen');
@@ -271,7 +271,7 @@ class ActionMapping extends Object {
     *
     * @param  string $value - "request" oder "session"
     *
-    * @return ActionMapping
+    * @return self
     */
    public function setFormScope($value) {
       if ($this->configured)                        throw new IllegalStateException('Configuration is frozen');
@@ -324,7 +324,7 @@ class ActionMapping extends Object {
     *
     * @param  bool $mode
     *
-    * @return ActionMapping
+    * @return self
     */
    public function setValidateBefore($mode) {
       if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -352,7 +352,7 @@ class ActionMapping extends Object {
     *
     * @param  bool $default
     *
-    * @return ActionMapping
+    * @return self
     */
    public function setDefault($default) {
       if ($this->configured)  throw new IllegalStateException('Configuration is frozen');
@@ -383,7 +383,7 @@ class ActionMapping extends Object {
     * @param  string        $name
     * @param  ActionForward $forward
     *
-    * @return ActionMapping
+    * @return self
     */
    public function addForward($name, ActionForward $forward) {
       if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -400,7 +400,7 @@ class ActionMapping extends Object {
    /**
     * Friert die Konfiguration dieser Komponente ein.
     *
-    * @return Actionmapping
+    * @return self
     */
    public function freeze() {
       if (!$this->configured) {

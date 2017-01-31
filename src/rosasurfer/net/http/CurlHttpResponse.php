@@ -46,7 +46,7 @@ class CurlHttpResponse extends HttpResponse {
    /**
     * Erzeugt eine neue Instanz.
     *
-    * @return CurlHttpResponse
+    * @return self
     */
    public static function create() {
       return new static();
@@ -58,7 +58,7 @@ class CurlHttpResponse extends HttpResponse {
     *
     * @param  int $status - HTTP-Statuscode
     *
-    * @return CurlHttpResponse
+    * @return self
     */
    public function setStatus($status) {
       if (!is_int($status)) throw new IllegalTypeException('Illegal type of parameter $status: '.getType($status));

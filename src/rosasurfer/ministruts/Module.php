@@ -826,7 +826,7 @@ class Module extends Object {
    /**
     * Friert die Konfiguration ein, sodaß sie nicht mehr geändert werden kann.
     *
-    * @return Module
+    * @return self
     */
    public function freeze() {
       if (!$this->configured) {

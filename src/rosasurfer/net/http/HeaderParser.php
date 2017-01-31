@@ -17,7 +17,7 @@ class HeaderParser extends Object {
    /**
     * Erzeugt eine neue Instanz.
     *
-    * @return HeaderParser
+    * @return self
     */
    public static function create() {
       return new static();
@@ -29,7 +29,7 @@ class HeaderParser extends Object {
     *
     * @param  string $data - rohe Headerdaten
     *
-    * @return HeaderParser
+    * @return self
     */
    public function parseLines($data) {
       $lines = explode("\n", $data);
@@ -46,7 +46,7 @@ class HeaderParser extends Object {
     *
     * @param  string $line - Headerzeile
     *
-    * @return HeaderParser
+    * @return self
     */
    public function parseLine($line) {
       $line = trim($line, "\r\n");

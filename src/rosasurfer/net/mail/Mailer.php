@@ -45,7 +45,7 @@ abstract class Mailer extends Object {
     *
     * @param  array $options - Mailer-Optionen
     *
-    * @return Mailer
+    * @return self
     */
    final public static function create(array $options = null) {
       if ($options === null)

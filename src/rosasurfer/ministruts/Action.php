@@ -50,7 +50,7 @@ abstract class Action extends Object {
     * @param  Request  $request
     * @param  Response $response
     *
-    * @return ActionForward|string|NULL
+    * @return ActionForward|string
     */
    public function executeBefore(Request $request, Response $response) {
       return null;
@@ -66,7 +66,7 @@ abstract class Action extends Object {
     * @param  Request  $request
     * @param  Response $response
     *
-    * @return ActionForward|string|NULL
+    * @return ActionForward|string
     */
    abstract public function execute(Request $request, Response $response);
 

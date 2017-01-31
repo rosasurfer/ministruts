@@ -29,7 +29,7 @@ interface IIdentityNode {
    /**
     * Return the parent nodes of the node (if any).
     *
-    * @return IIdentityNode[] - array of nodes or an empty value if the node is a root node
+    * @return self[] - array of nodes or an empty value if the node is a root node
     */
    public function getParentNodes();
 }

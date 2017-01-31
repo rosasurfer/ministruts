@@ -37,7 +37,7 @@ class PageContext extends Singleton {
    /**
     * Gibt die Singleton-Instanz dieser Klasse zurück.
     *
-    * @return Singleton
+    * @return self
     */
    public static function me() {
       return Singleton::getInstance(static::class);

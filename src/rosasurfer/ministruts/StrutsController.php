@@ -51,7 +51,7 @@ class StrutsController extends Singleton {
    /**
     * Return the singleton instance of this class. The instance might be loaded from a cache.
     *
-    * @return Singleton
+    * @return self
     */
    public static function me() {
       $class = static::class;

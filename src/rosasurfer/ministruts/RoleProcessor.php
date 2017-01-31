@@ -28,7 +28,7 @@ abstract class RoleProcessor {
     * @param  Request       $request
     * @param  ActionMapping $mapping
     *
-    * @return ActionForward oder NULL
+    * @return ActionForward
     */
    abstract public function processRoles(Request $request, ActionMapping $mapping);
 }

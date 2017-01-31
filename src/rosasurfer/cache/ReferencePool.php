@@ -40,7 +40,7 @@ final class ReferencePool extends CachePeer {
     * weiteren ReferencePool.  Diese Methode gibt daher einen Zeiger auf die Instanz selbst zurück und
     * überschreibt damit die Default-Implementierung in CachePeer.
     *
-    * @return ReferencePool
+    * @return self
     *
     * @see CachePeer::getReferencePool()
     */

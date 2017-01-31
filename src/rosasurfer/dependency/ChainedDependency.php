@@ -38,7 +38,7 @@ class ChainedDependency extends Dependency {
     *
     * @param  Dependency $dependency - Abhängigkeit
     *
-    * @return ChainedDependency
+    * @return self
     */
    protected static function create(Dependency $dependency) {
       return new static($dependency);
@@ -50,7 +50,7 @@ class ChainedDependency extends Dependency {
     *
     * @param  Dependency $dependency - Abhängigkeit
     *
-    * @return ChainedDependency
+    * @return self
     */
    public function andDependency(Dependency $dependency) {
       if ($dependency === $this)
@@ -72,7 +72,7 @@ class ChainedDependency extends Dependency {
     *
     * @param  Dependency $dependency - Abhängigkeit
     *
-    * @return ChainedDependency
+    * @return self
     */
    public function orDependency(Dependency $dependency) {
       if ($dependency === $this)

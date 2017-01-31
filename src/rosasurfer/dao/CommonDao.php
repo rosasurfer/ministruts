@@ -150,7 +150,7 @@ class CommonDao extends Singleton {
     *
     * @param  PersistableObject $object - PersistableObject-Instanz
     *
-    * @return PersistableObject instance
+    * @return PersistableObject
     */
    public final function refresh(PersistableObject $object) {
       $class = $this->getEntityClass();

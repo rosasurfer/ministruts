@@ -89,7 +89,7 @@ class Tile extends Object {
     *
     * @param  string $name
     *
-    * @return Tile
+    * @return self
     */
    public function setName($name) {
       if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -115,7 +115,7 @@ class Tile extends Object {
     *
     * @param  string $filename - vollständiger Dateiname
     *
-    * @return Tile
+    * @return self
     */
    public function setFileName($filename) {
       if ($this->configured)     throw new IllegalStateException('Configuration is frozen');
@@ -145,7 +145,7 @@ class Tile extends Object {
    /**
     * Friert die Konfiguration dieser Komponente ein.
     *
-    * @return Tile
+    * @return self
     */
    public function freeze() {
       if (!$this->configured) {
