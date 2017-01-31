@@ -12,11 +12,11 @@ use rosasurfer\exception\RuntimeException;
 
 
 /**
- * ConnectorPool
+ * ConnectionPool
  *
- * Connector-Pool für Datenbankverbindungen zu mehreren Datenbanken.
+ * Connection-Pool für Datenbankverbindungen zu mehreren Datenbanken.
  */
-final class ConnectorPool extends Singleton {
+final class ConnectionPool extends Singleton {
 
 
    /** @var Connector[] - connector pool */
