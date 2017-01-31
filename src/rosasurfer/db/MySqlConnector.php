@@ -42,7 +42,7 @@ class MySqlConnector extends Connector {
       self::$logInfo   = ($loglevel <= L_INFO  );
       self::$logNotice = ($loglevel <= L_NOTICE);
 
-      parent ::__construct();
+      parent::__construct();
    }
 
 
@@ -60,12 +60,12 @@ class MySqlConnector extends Connector {
          $this->link = mysql_connect($host,
                                      $this->username,
                                      $this->password,
-                                     true,
-                                     2                // 2 = CLIENT_FOUND_ROWS
+                                     $createNewLink=true,
+                                     $flags=2               // CLIENT_FOUND_ROWS
                                      );
       }
       catch (\Exception $ex) {
-         throw new InfrastructureException("Can not connect to MySQL server on '$host'", null, $ex);  // Message enthält den Port
+         throw new InfrastructureException('Can not connect to MySQL server on "'.$host.'"', null, $ex);
       }
 
       try {
@@ -84,22 +84,20 @@ class MySqlConnector extends Connector {
             }
          }
       }
-      catch (InfrastructureException $ex) {
-         throw $ex;
-      }
       catch (\Exception $ex) {
-         throw new InfrastructureException("Can not set system variable '$sql'", null, $ex);
+         if (!$ex instanceof InfrastructureException)
+            $ex = new InfrastructureException('Can not set system variable "'.$sql.'"', null, $ex);
+         throw $ex;
       }
 
       try {
          if ($this->database && !mysql_select_db($this->database, $this->link))
             throw new InfrastructureException(mysql_error($this->link));
       }
-      catch (InfrastructureException $ex) {
-         throw $ex;
-      }
       catch (\Exception $ex) {
-         throw new InfrastructureException("Can not select database '$this->database'", null, $ex);
+         if (!$ex instanceof InfrastructureException)
+            $ex = new InfrastructureException('Can not select database "'.$this->database.'"', null, $ex);
+         throw $ex;
       }
 
       return $this;
@@ -232,9 +230,9 @@ class MySqlConnector extends Connector {
     * @return string
     */
    private static function stripDoubleSpaces($string) {
-      if ($string===null || $string==='')
+      if (!strLen($string))
          return $string;
-      return preg_replace('/\s+/', ' ', $string);
+      return preg_replace('/\s{2,}/', ' ', $string);
    }
 
 
