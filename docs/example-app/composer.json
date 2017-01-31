@@ -4,9 +4,6 @@
     "type":        "project",
     "license":     "proprietary",
     "config": {
-        "preferred-install": {
-            "*": "dist"
-        },        
         "optimize-autoloader": true
     },
     "repositories": [
