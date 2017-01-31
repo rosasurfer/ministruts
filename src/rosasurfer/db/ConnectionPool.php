@@ -26,12 +26,17 @@ final class ConnectionPool extends Singleton {
    private $default;
 
    /** @var string[] - verschiedene Connector-Schreibweisen */
-   private static $connectorAliases = [
-      'mysql'                                   => MySqlConnector ::class,
-      __NAMESPACE__.'\\mysql\\mysqlconnector'   => MySqlConnector ::class,
-      'sqlite'                                  => SqliteConnector::class,
-      'sqlite3'                                 => SqliteConnector::class,
-      __NAMESPACE__.'\\sqlite\\sqliteconnector' => SqliteConnector::class,
+   private static $aliases = [
+      'mysql'                                         => MySqlConnector::class,
+      __NAMESPACE__.'\\mysql\\mysqlconnector'         => MySqlConnector::class,
+
+      'postgres'                                      => PostgreSqlConnector::class,
+      'postgresql'                                    => PostgreSqlConnector::class,
+      __NAMESPACE__.'\\postgres\\postgresqlconnector' => PostgreSqlConnector::class,
+
+      'sqlite'                                        => SqliteConnector::class,
+      'sqlite3'                                       => SqliteConnector::class,
+      __NAMESPACE__.'\\sqlite\\sqliteconnector'       => SqliteConnector::class,
    ];
 
 
@@ -75,8 +80,8 @@ final class ConnectionPool extends Singleton {
 
          // Aliase durch Klassennamen ersetzen
          $lName = strToLower($name);
-         if (isSet(self::$connectorAliases[$lName]))
-            $class = self::$connectorAliases[$lName];
+         if (isSet(self::$aliases[$lName]))
+            $class = self::$aliases[$lName];
 
          if ($old = 1) {
             // old
