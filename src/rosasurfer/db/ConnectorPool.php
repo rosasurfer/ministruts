@@ -69,7 +69,7 @@ final class ConnectorPool extends Singleton {
          $config = $config->get('db.'.$alias, null);
          if (!$config) throw new IllegalStateException('No configuration found for database alias "'.$alias.'"');
 
-         $name = $config['connector'];                                  // Connector laden
+         $name = $config['connector'];                                  // Connector ermitteln
          $name = str_replace('/', '\\', $name);
          if ($name[0]=='\\') $name = subStr($name, 1);
 
@@ -78,13 +78,22 @@ final class ConnectorPool extends Singleton {
          if (isSet(self::$connectorAliases[$lName]))
             $class = self::$connectorAliases[$lName];
 
-         $host    =                             $config['host'    ];
-         $user    =                             $config['username'];
-         $pass    =                             $config['password'];
-         $db      =                             $config['schema'  ];
-         $options = isSet($config['options']) ? $config['options' ] : null;
+         if ($old = 1) {
+            // old
+            $host    =                             $config['host'    ];
+            $user    =                             $config['username'];
+            $pass    =                             $config['password'];
+            $db      =                             $config['schema'  ];
+            $options = isSet($config['options']) ? $config['options' ] : null;
+            $connector = Connector::create($class, $host, $user, $pass, $db, $options);
+         }
+         else {
+            // new: clean-up and separate config and options
+            $options = isSet($config['options']) ? $config['options'] : [];
+            unset($config['connector'], $config['options']);
+            $connector = Connector::create($config, $options);
+         }
 
-         $connector = Connector::spawn($class, $host, $user, $pass, $db, $options);
          $me->pool[$alias] = $connector;
       }
       return $connector;

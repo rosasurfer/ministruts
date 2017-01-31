@@ -6,6 +6,8 @@ use rosasurfer\db\Connector;
 use rosasurfer\exception\DatabaseException;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InfrastructureException;
+use rosasurfer\exception\InvalidArgumentException;
+use rosasurfer\exception\RuntimeException;
 
 use rosasurfer\log\Logger;
 use rosasurfer\util\Date;
@@ -20,6 +22,7 @@ use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_ERROR;
 use const rosasurfer\L_INFO;
 use const rosasurfer\L_NOTICE;
+use const rosasurfer\L_WARN;
 
 
 /**
@@ -29,28 +32,158 @@ class MySqlConnector extends Connector {
 
 
    /** @var bool */
-   private static $logDebug;
+   private static $logDebug  = false;
 
    /** @var bool */
-   private static $logInfo;
+   private static $logInfo   = false;
 
    /** @var bool */
-   private static $logNotice;
+   private static $logNotice = false;
 
-   /** @var int - benötigt eine Query länger als hier angegeben, wird sie im Logelevel DEBUG geloggt */
+   /** @var int - Benötigt eine Query länger als hier angegeben, wird sie im Loglevel L_DEBUG geloggt. */
    private static $maxQueryTime = 3;
+
+   /** @var string */                     // Verbindungs- und Zugangsdaten
+   protected $host;
+
+   /** @var string */
+   protected $port;
+
+   /** @var string */
+   protected $username;
+
+   /** @var string */
+   protected $password;
+
+   /** @var string */
+   protected $database;
+
+   /** @var string[] */
+   protected $options = [];
+
+   /** @var resource - Handle auf das interne Connection-Objekt. */
+   protected $hConnection;
+
+   /** @var int - Transaktionszähler (0: keine aktive Transaktion) */
+   protected $transaction = 0;
 
 
    /**
     * Erzeugt eine neue MySQLConnector-Instanz.
+    *
+    * @param  string   $host     - Hostname(:Port) des Datenbankservers
+    * @param  string   $username - Benutzername
+    * @param  string   $password - Passwort
+    * @param  string   $database - vorzuselektierende Datenbank (default: keine)
+    * @param  string[] $options  - weitere Verbindungsoptionen (default: keine)
     */
-   protected function __construct() {
+   protected function __construct($host, $username, $password, $database=null, array $options=[]) {
       $loglevel        = Logger::getLogLevel(__CLASS__);
       self::$logDebug  = ($loglevel <= L_DEBUG );
       self::$logInfo   = ($loglevel <= L_INFO  );
       self::$logNotice = ($loglevel <= L_NOTICE);
 
+      $this->setHost($host)
+           ->setUsername($username)
+           ->setPassword($password)
+           ->setOptions($options);
+
+      if (!is_null($database))
+         $this->setDataBase($database);
       parent::__construct();
+   }
+
+
+   /**
+    * Setzt Namen und Port des Datenbankservers.
+    *
+    * @param  string $host
+    *
+    * @return self
+    */
+   protected function setHost($host) {
+      if (!is_string($host)) throw new IllegalTypeException('Illegal type of parameter $host: '.getType($host));
+      if (!strLen($host))    throw new InvalidArgumentException('Invalid parameter $host: "'.$host.'" (empty)');
+
+      $host_orig = $host;
+      $port = null;
+
+      if (strPos($host, ':') !== false) {
+         list($host, $port) = explode(':', $host, 2);
+         $host = trim($host);
+         if (!strLen($host)) throw new InvalidArgumentException('Invalid parameter $host: "'.$host_orig.'" (empty host name)');
+
+         $port = trim($port);
+         if (!ctype_digit($port)) throw new InvalidArgumentException('Invalid parameter $host: "'.$host_orig.'" (not a port)');
+         $port = (int) $port;
+         if (!$port || $port > 65535) throw new InvalidArgumentException('Invalid parameter $host: "'.$host_orig.'" (illegal port)');
+      }
+
+      $this->host = $host;
+      $this->port = $port;
+      return $this;
+   }
+
+
+   /**
+    * Setzt den Benutzernamen.
+    *
+    * @param  string $name
+    *
+    * @return self
+    */
+   protected function setUsername($name) {
+      if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
+      if (!strLen($name))    throw new InvalidArgumentException('Invalid parameter $name: "'.$name.'" (empty)');
+
+      $this->username = $name;
+      return $this;
+   }
+
+
+   /**
+    * Setzt das Passwort.
+    *
+    * @param  string $password - possibly empty password
+    *
+    * @return self
+    */
+   protected function setPassword($password) {
+      if (is_null($password)) $password = '';
+      else if (!is_string($password)) throw new IllegalTypeException('Illegal type of parameter $password: '.getType($password));
+
+      $this->password = $password;
+      return $this;
+   }
+
+
+   /**
+    * Setzt den Namen des Datenbankschemas.
+    *
+    * @param  string $name - Datenbankname
+    *
+    * @return self
+    */
+   protected function setDatabase($name) {
+      if (!is_null($name) && !is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
+      if (!strLen($name))
+         $name = null;
+
+      $this->database = $name;
+      return $this;
+   }
+
+
+   /**
+    * Setzt weitere Verbindungsoptionen.
+    *
+    * @param  string[] $options - Optionen
+    *
+    * @return self
+    */
+   protected function setOptions(array $options) {
+      $this->options = $options;
+      return $this;
    }
 
 
@@ -65,12 +198,12 @@ class MySqlConnector extends Connector {
          $host .= ':'.$this->port;
 
       try {
-         $this->link = mysql_connect($host,
-                                     $this->username,
-                                     $this->password,
-                                     $createNewLink=true,
-                                     $flags=2               // CLIENT_FOUND_ROWS
-                                     );
+         $this->hConnection = mysql_connect($host,
+                                            $this->username,
+                                            $this->password,
+                                            $createNewLink=true,
+                                            $flags=2               // CLIENT_FOUND_ROWS
+                                            );
       }
       catch (\Exception $ex) {
          throw new InfrastructureException('Can not connect to MySQL server on "'.$host.'"', null, $ex);
@@ -80,14 +213,14 @@ class MySqlConnector extends Connector {
          foreach ($this->options as $option => $value) {
             if (strLen($value)) {
                if (strCompareI($option, 'charset')) {
-                  if (!mysql_set_charset($value, $this->link)) throw new InfrastructureException(mysql_error($this->link));
+                  if (!mysql_set_charset($value, $this->hConnection)) throw new InfrastructureException(mysql_error($this->hConnection));
                   // synonymous with the sql statement "set character set {$value}"
                }
                else {
                   if (!is_numeric($value))
                      $value = "'$value'";
                   $sql = "set $option = $value";
-                  if (!$this->queryRaw($sql)) throw new InfrastructureException(mysql_error($this->link));
+                  if (!$this->queryRaw($sql)) throw new InfrastructureException(mysql_error($this->hConnection));
                }
             }
          }
@@ -99,8 +232,8 @@ class MySqlConnector extends Connector {
       }
 
       try {
-         if ($this->database && !mysql_select_db($this->database, $this->link))
-            throw new InfrastructureException(mysql_error($this->link));
+         if ($this->database && !mysql_select_db($this->database, $this->hConnection))
+            throw new InfrastructureException(mysql_error($this->hConnection));
       }
       catch (\Exception $ex) {
          if (!$ex instanceof InfrastructureException)
@@ -141,10 +274,48 @@ class MySqlConnector extends Connector {
     */
    protected function disconnect() {
       if ($this->isConnected()) {
-         mysql_close($this->link);
-         $this->link = null;
+         mysql_close($this->hConnection);
+         $this->hConnection = null;
       }
       return $this;
+   }
+
+
+   /**
+    * Ob eine Connection zur Datenbank besteht.
+    *
+    * @return bool
+    */
+   protected function isConnected() {
+      return is_resource($this->hConnection);
+   }
+
+
+   /**
+    * Führt eine SQL-Anweisung aus. Gibt das Ergebnis als mehrdimensionales Array zurück.
+    *
+    * @param  string $sql - SQL-Anweisung
+    *
+    * @return array['set' ] - das zurückgegebene Resultset (nur bei SELECT-Statement)
+    *              ['rows'] - Anzahl der betroffenen Datensätze (nur bei SELECT/INSERT/UPDATE-Statement)
+    */
+   public function executeSql($sql) {
+      $result = array('set'  => null,
+                      'rows' => 0);
+
+      $rawResult = $this->queryRaw($sql);
+
+      if (is_resource($rawResult)) {
+         $result['set']  = $rawResult;
+         $result['rows'] = mysql_num_rows($rawResult);                  // Anzahl der erhaltenen Zeilen
+      }
+      else {
+         $sql = strToLower($sql);
+         if (subStr($sql, 0, 6)=='insert' || subStr($sql, 0, 7)=='replace' || subStr($sql, 0, 6)=='update' || subStr($sql, 0, 6)=='delete') {
+            $result['rows'] = mysql_affected_rows($this->hConnection);  // Anzahl der modifizierten Zeilen
+         }
+      }
+      return $result;
    }
 
 
@@ -166,7 +337,7 @@ class MySqlConnector extends Connector {
          $start = microTime(true);
 
       // Statement ausführen
-      $result = mysql_query($sql, $this->link);
+      $result = mysql_query($sql, $this->hConnection);
 
       // ggf. Endzeitpunkt speichern
       if (self::$logDebug)
@@ -203,61 +374,73 @@ class MySqlConnector extends Connector {
 
 
    /**
-    * Führt eine SQL-Anweisung aus. Gibt das Ergebnis als mehrdimensionales Array zurück.
+    * Befindet sich der Connector in *keiner* Transaktion, wird eine neue Transaktion gestartet und der Transaktionszähler erhöht.
+    * Befindet er sich bereits in einer Transaktion, wird nur der Transaktionszähler erhöht.
     *
-    * @param  string $sql - SQL-Anweisung
-    *
-    * @return array['set' ] - das zurückgegebene Resultset (nur bei SELECT-Statement)
-    *              ['rows'] - Anzahl der betroffenen Datensätze (nur bei SELECT/INSERT/UPDATE-Statement)
+    * @return self
     */
-   public function executeSql($sql) {
-      $result = array('set'  => null,
-                      'rows' => 0);
+   public function begin() {
+      if ($this->transaction < 0) throw new RuntimeException('Negative transaction counter detected: '.$this->transaction);
 
-      $rawResult = $this->queryRaw($sql);
+      if ($this->transaction == 0)
+         $this->queryRaw('start transaction');
 
-      if (is_resource($rawResult)) {
-         $result['set']  = $rawResult;
-         $result['rows'] = mysql_num_rows($rawResult);            // Anzahl der erhaltenen Zeilen
+      $this->transaction++;
+      return $this;
+   }
+
+
+   /**
+    * Befindet sich der Connector in genau *einer* Transaktion, wird diese Transaktion abgeschlossen.
+    * Befindet er sich in einer verschachtelten Transaktion, wird nur der Transaktionszähler heruntergezählt.
+    *
+    * @return self
+    */
+   public function commit() {
+      if ($this->transaction < 0) throw new RuntimeException('Negative transaction counter detected: '.$this->transaction);
+
+      if ($this->transaction == 0) {
+         Logger::log('No database transaction to commit', L_WARN);
       }
       else {
-         $sql = strToLower($sql);
-         if (subStr($sql, 0, 6)=='insert' || subStr($sql, 0, 7)=='replace' || subStr($sql, 0, 6)=='update' || subStr($sql, 0, 6)=='delete') {
-            $result['rows'] = mysql_affected_rows($this->link);   // Anzahl der modifizierten Zeilen
-         }
+         if ($this->transaction == 1)
+            $this->queryRaw('commit');
+
+         $this->transaction--;
       }
-      return $result;
+      return $this;
    }
 
 
    /**
-    * Ersetzt in einem String mehrfache durch einfache Leerzeichen.
+    * Befindet sich der Connector in GENAU einer Transaktion, wird diese Transaktion zurückgerollt.
+    * Befindet er sich in einer verschachtelten Transaktion, wird der Aufruf ignoriert.
     *
-    * @param  string $string - der zu bearbeitende String
-    *
-    * @return string
+    * @return self
     */
-   private static function stripDoubleSpaces($string) {
-      if (!strLen($string))
-         return $string;
-      return preg_replace('/\s{2,}/', ' ', $string);
+   public function rollback() {
+      if ($this->transaction < 0) throw new RuntimeException('Negative transaction counter detected: '.$this->transaction);
+
+      if ($this->transaction == 0) {
+         Logger::log('No database transaction to roll back', L_WARN);
+      }
+      else {
+         if ($this->transaction == 1)
+            $this->queryRaw('rollback');
+
+         $this->transaction--;
+      }
+      return $this;
    }
 
 
    /**
-    * Entfernt Zeilenumbrüche aus einem String und ersetzt sie mit Leerzeichen.  Mehrere aufeinanderfolgende
-    * Zeilenumbrüche werden auf ein Leerzeichen reduziert.
+    * Ob der Connector sich im Moment in einer Transaktion befindet.
     *
-    * @param  string $string - der zu bearbeitende String
-    *
-    * @return string
+    * @return bool
     */
-   public static function stripLineBreaks($string) {
-      if ($string===null || $string==='')
-         return $string;
-      return str_replace(array("\r\n", "\r", "\n"),
-                         array("\n"  , "\n", " " ),
-                         $string);
+   public function isInTransaction() {
+      return ($this->transaction > 0);
    }
 
 
@@ -267,15 +450,14 @@ class MySqlConnector extends Connector {
     * @return array - Report mit Processlist-Daten
     */
    private function getProcessList() {
-      $oldLogDebug = self::$logDebug;
-      if ($oldLogDebug)
-         self::$logDebug = false;
+      ($oldLogDebug=self::$logDebug) && self::$logDebug = false;
 
       $result = $this->queryRaw('show full processlist');
 
       self::$logDebug = $oldLogDebug;
 
-      while ($data[] = mysql_fetch_assoc($result));
+      while ($data[] = mysql_fetch_assoc($result)) {
+      }
       array_pop($data);
 
       return $data;
@@ -305,7 +487,7 @@ class MySqlConnector extends Connector {
       foreach ($list as &$p) {
          if (($i=striPos($p['Host'], '.localdomain:')) || ($i=striPos($p['Host'], ':')))
             $p['Host'] = subStr($p['Host'], 0, $i);
-         $p['Info'] = trim(self::stripDoubleSpaces($p['Info']));
+         $p['Info'] = trim($this->collapseSpaces($p['Info']));
 
          $lengthId      = max($lengthId     , strLen($p['Id'     ]));
          $lengthUser    = max($lengthUser   , strLen($p['User'   ]));
@@ -365,9 +547,7 @@ class MySqlConnector extends Connector {
     * @return string - Report mit Status-Daten
     */
    private function getInnoDbStatus() {
-      $oldLogDebug = self::$logDebug;
-      if ($oldLogDebug)
-         self::$logDebug = false;
+      ($oldLogDebug=self::$logDebug) && self::$logDebug = false;
 
       // TODO: Vorsicht vor 1227: Access denied; you need the SUPER privilege for this operation
       $result = $this->queryRaw('show engine innodb status');
@@ -445,7 +625,7 @@ class MySqlConnector extends Connector {
                                     'connection'  => (int) $match[7],
                                     'host'        =>       $match[8],
                                     'user'        =>       $match[9],
-                                    'query'       => trim(self::stripDoubleSpaces(self::stripLineBreaks($match[10]))),
+                                    'query'       => trim($this->collapseSpaces($this->joinLines($match[10]))),
                                     'locks'       => array(),
                                     );
                $transactions[$match[2]] = $transaction;
@@ -638,4 +818,31 @@ Record lock, heap no 341 PHYSICAL RECORD: n_fields 5; compact format; info bits 
 TRANSACTIONS
 ------------";
 */
+
+   /**
+    * Replace line breaks with spaces.
+    *
+    * @param  string $string
+    *
+    * @return string
+    */
+   private function joinLines($string) {
+      if (!strLen($string))
+         return $string;
+      return str_replace(["\r\n", "\r", "\n"], ' ', $string);
+   }
+
+
+   /**
+    * Ersetzt in einem String mehrfache durch einfache Leerzeichen.
+    *
+    * @param  string $string - der zu bearbeitende String
+    *
+    * @return string
+    */
+   private function collapseSpaces($string) {
+      if (!strLen($string))
+         return $string;
+      return preg_replace('/\s{2,}/', ' ', $string);
+   }
 }

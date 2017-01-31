@@ -2,15 +2,8 @@
 namespace rosasurfer\db;
 
 use rosasurfer\core\Object;
-
 use rosasurfer\debug\ErrorHandler;
-
 use rosasurfer\exception\InvalidArgumentException;
-use rosasurfer\exception\RuntimeException;
-
-use rosasurfer\log\Logger;
-
-use const rosasurfer\L_WARN;
 
 
 /**
@@ -21,33 +14,8 @@ use const rosasurfer\L_WARN;
 abstract class Connector extends Object {
 
 
-   /** @var resource - Handle auf das interne Connection-Objekt. */
-   protected $link;
-
-   /** @var string */
-   protected $host;                       // Verbindungs- und Zugangsdaten
-
-   /** @var string */
-   protected $port;
-
-   /** @var string */
-   protected $username;
-
-   /** @var string */
-   protected $password;
-
-   /** @var string */
-   protected $database;
-
-   /** @var string[] */
-   protected $options = [];
-
-   /** @var int - Transaktionszähler (0: keine aktive Transaktion) */
-   private $transaction = 0;
-
-
    /**
-    * Geschützter Default-Constructor, Instanzen können nur über Connector::spawn() erzeugt werden.
+    * Geschützter Default-Constructor, Instanzen können nur über self::create() erzeugt werden.
     */
    protected function __construct() {}
 
@@ -59,21 +27,38 @@ abstract class Connector extends Object {
     * und die Verbindung zur Datenbank geschlossen wird.
     */
    public function __destruct() {
-      // Attempting to throw an exception from a destructor during script shutdown causes a fatal error.
-      // @see http://php.net/manual/en/language.oop5.decon.php
       try {
          if ($this->isConnected()) {
-
-            if ($this->transaction)
+            if ($this->isInTransaction())
                $this->rollback();
-
             $this->disconnect();
          }
       }
       catch (\Exception $ex) {
+         // Attempting to throw an exception from a destructor during script shutdown causes a fatal error.
+         // @see  http://php.net/manual/en/language.oop5.decon.php
          ErrorHandler::handleDestructorException($ex);
          throw $ex;
       }
+   }
+
+
+   /**
+    * Erzeugt einen neuen Connector und initialisiert ihn.
+    *
+    * @param  string   $class    - Klassenname des konkreten Connectors
+    * @param  string   $host     - Hostname(:Port) des Datenbankservers
+    * @param  string   $username - Benutzername
+    * @param  string   $password - Passwort
+    * @param  string   $database - vorzuselektierende Datenbank (default: keine)
+    * @param  string[] $options  - weitere Verbindungsoptionen (default: keine)
+    *
+    * @return self
+    */
+   public static function create($class, $host, $username, $password, $database=null, array $options=[]) {
+      if (!is_subclass_of($class, __CLASS__)) throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
+
+      return new $class($host, $username, $password, $database, $options);
    }
 
 
@@ -90,13 +75,11 @@ abstract class Connector extends Object {
 
 
    /**
-    * Führt eine SQL-Anweisung aus.
+    * Ob eine Connection zur Datenbank besteht.
     *
-    * @param  string $sql - SQL-Anweisung
-    *
-    * @return mixed - je nach Connector
+    * @return bool
     */
-   abstract public function queryRaw($sql);
+   abstract protected function isConnected();
 
 
    /**
@@ -111,181 +94,43 @@ abstract class Connector extends Object {
 
 
    /**
-    * Erzeugt einen neuen Connector und initialisiert ihn.
+    * Führt eine SQL-Anweisung aus.
     *
-    * @param  string   $class    - Klassenname des konkreten Connectors
-    * @param  string   $host     - Hostname(:Port) des Datenbankservers
-    * @param  string   $username - Benutzername
-    * @param  string   $password - Passwort
-    * @param  string   $database - vorzuselektierende Datenbank
-    * @param  string[] $options  - weitere Verbindungsoptionen
+    * @param  string $sql - SQL-Anweisung
     *
-    * @return self
+    * @return mixed - je nach Connector
     */
-   public static function spawn($class, $host, $username, $password, $database = null, array $options = null) {
-      if (!is_subclass_of($class, __CLASS__)) throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
-
-      $connector = new $class();
-      $connector->setHost($host)
-                ->setUsername($username)
-                ->setPassword($password)
-                ->setDataBase($database)
-                ->setOptions($options);
-      return $connector;
-   }
+   abstract public function queryRaw($sql);
 
 
    /**
-    * Setzt Namen und Port des Datenbankservers.
-    *
-    * @param  string $host
+    * Beginnt eine neue Transaktion.
     *
     * @return self
     */
-   protected function setHost($host) {
-      $port = null;
-
-      if (strPos($host, ':') !== false)
-         list($host, $port) = explode(':', $host, 2);
-
-      $this->host = $host;
-      $this->port = $port;
-
-      return $this;
-   }
+   abstract public function begin();
 
 
    /**
-    * Setzt den Benutzernamen.
-    *
-    * @param  string $name
+    * Schließt eine Transaktion ab.
     *
     * @return self
     */
-   protected function setUsername($name) {
-      $this->username = $name;
-      return $this;
-   }
+   abstract public function commit();
 
 
    /**
-    * Setzt das Passwort.
-    *
-    * @param  string $password
+    * Rollt eine Transaktion zurück.
     *
     * @return self
     */
-   protected function setPassword($password) {
-      $this->password = $password;
-      return $this;
-   }
+   abstract public function rollback();
 
 
    /**
-    * Setzt den Namen des Datenbankschemas.
-    *
-    * @param  string $name - Datenbankname
-    *
-    * @return self
-    */
-   protected function setDatabase($name) {
-      $this->database = $name;
-      return $this;
-   }
-
-
-   /**
-    * Setzt weitere Verbindungsoptionen.
-    *
-    * @param  string[] $options - Optionen
-    *
-    * @return self
-    */
-   protected function setOptions($options) {
-      if ($options === null)
-         $options = [];
-      $this->options = $options;
-      return $this;
-   }
-
-
-   /**
-    * Ob eine Connection zur Datenbank besteht.
+    * Ob der Connector sich in einer Transaktion befindet.
     *
     * @return bool
     */
-   protected function isConnected() {
-      return ($this->link && is_resource($this->link));
-   }
-
-
-   /**
-    * Befindet sich der Connector in *keiner* Transaktion, wird eine neue Transaktion gestartet und der Transaktionszähler erhöht.
-    * Befindet er sich bereits in einer Transaktion, wird nur der Transaktionszähler erhöht.
-    *
-    * @return self
-    */
-   public function begin() {
-      if ($this->transaction < 0) throw new RuntimeException('Negative transaction counter detected: '.$this->transaction);
-
-      if ($this->transaction == 0)
-         $this->queryRaw('start transaction');
-
-      $this->transaction++;
-      return $this;
-   }
-
-
-   /**
-    * Befindet sich der Connector in genau *einer* Transaktion, wird diese Transaktion abgeschlossen.
-    * Befindet er sich in einer verschachtelten Transaktion, wird nur der Transaktionszähler heruntergezählt.
-    *
-    * @return self
-    */
-   public function commit() {
-      if ($this->transaction < 0) throw new RuntimeException('Negative transaction counter detected: '.$this->transaction);
-
-      if ($this->transaction == 0) {
-         Logger::log('No database transaction to commit', L_WARN);
-      }
-      else {
-         if ($this->transaction == 1)
-            $this->queryRaw('commit');
-
-         $this->transaction--;
-      }
-      return $this;
-   }
-
-
-   /**
-    * Befindet sich der Connector in GENAU einer Transaktion, wird diese Transaktion zurückgerollt.
-    * Befindet er sich in einer verschachtelten Transaktion, wird der Aufruf ignoriert.
-    *
-    * @return self
-    */
-   public function rollback() {
-      if ($this->transaction < 0) throw new RuntimeException('Negative transaction counter detected: '.$this->transaction);
-
-      if ($this->transaction == 0) {
-         Logger::log('No database transaction to roll back', L_WARN);
-      }
-      else {
-         if ($this->transaction == 1)
-            $this->queryRaw('rollback');
-
-         $this->transaction--;
-      }
-      return $this;
-   }
-
-
-   /**
-    * Ob der Connector sich im Moment in einer Transaktion befindet.
-    *
-    * @return bool
-    */
-   public function inTransaction() {
-      return ($this->transaction > 0);
-   }
+   abstract public function isInTransaction();
 }
