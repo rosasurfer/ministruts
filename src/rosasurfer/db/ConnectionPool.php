@@ -27,16 +27,17 @@ final class ConnectionPool extends Singleton {
 
    /** @var string[] - common adapter spellings */
    private static $aliases = [
-      'mysql'                                         => MySqlConnector::class,
-      __NAMESPACE__.'\\mysql\\mysqlconnector'         => MySqlConnector::class,
+      'mysql'                                    => MySqlConnector::class,
+      __NAMESPACE__.'\\mysql\\mysqlconnector'    => MySqlConnector::class,
 
-      'postgres'                                      => PostgreSqlConnector::class,
-      'postgresql'                                    => PostgreSqlConnector::class,
-      __NAMESPACE__.'\\postgres\\postgresqlconnector' => PostgreSqlConnector::class,
+      'pgsql'                                    => PostgresConnector::class,
+      'postgres'                                 => PostgresConnector::class,
+      'postgresql'                               => PostgresConnector::class,
+      __NAMESPACE__.'\\pgsql\\postgresconnector' => PostgresConnector::class,
 
-      'sqlite'                                        => SqliteConnector::class,
-      'sqlite3'                                       => SqliteConnector::class,
-      __NAMESPACE__.'\\sqlite\\sqliteconnector'       => SqliteConnector::class,
+      'sqlite'                                   => SqliteConnector::class,
+      'sqlite3'                                  => SqliteConnector::class,
+      __NAMESPACE__.'\\sqlite\\sqliteconnector'  => SqliteConnector::class,
    ];
 
 

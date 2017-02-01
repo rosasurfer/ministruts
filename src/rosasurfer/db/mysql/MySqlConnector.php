@@ -32,7 +32,7 @@ use const rosasurfer\SECONDS;
 class MySqlConnector extends Connector {
 
 
-   /** @var bool */
+   /** @var bool */                             // logging
    private static $logDebug  = false;
 
    /** @var bool */
@@ -43,6 +43,7 @@ class MySqlConnector extends Connector {
 
    /** @var int - Queries spending more time for completion than specified are logged with level L_DEBUG. */
    private static $maxQueryTime = 3 * SECONDS;
+
 
    /** @var string */                           // connection details
    protected $host;
