@@ -50,7 +50,7 @@ class DebugHelper extends StaticClass {
    public static function fixTrace(array $trace, $file='unknown', $line=0) {
       // check if the stacktrace is already fixed
       if ($trace && isSet($trace[0]['fixed']))
-            return $trace;
+         return $trace;
 
       // add a frame for the main script to the bottom (end of array)
       $trace[] = ['function' => '{main}'];
@@ -65,7 +65,7 @@ class DebugHelper extends StaticClass {
 
          $trace[$i]['fixed'] = true;
          /*
-         if (isSet($trace[$i]['args'])) {             // skip content of large vars
+         if (isSet($trace[$i]['args'])) {                   // skip content of large vars
             foreach ($trace[$i]['args'] as &$arg) {
                if     (is_object($arg)) $arg = get_class($arg);
                elseif (is_array ($arg)) $arg = 'Array()';
@@ -74,9 +74,14 @@ class DebugHelper extends StaticClass {
          */
       }
 
-      // add location details to the top (beginning of array)
-      $trace[0]['file'] = $file;
-      $trace[0]['line'] = $line;
+      // add the location details to the beginning of the array only if they differ from the old values (now in frame 1)
+      if (!isSet($trace[1]['file']) || !isSet($trace[1]['line']) || $trace[1]['file']!=$file || $trace[1]['line']!=$line) {
+         $trace[0]['file'] = $file;                         // test with:
+         $trace[0]['line'] = $line;                         // \SQLite3::enableExceptions(true|false);
+      }                                                     // \SQLite3::exec($invalid_sql);
+      else {
+         unset($trace[0]['file'], $trace[0]['line']);       // otherwise delete them
+      }
 
       // remove the last frame if it points to an unknown location (PHP core)
       $size = sizeOf($trace);
@@ -86,7 +91,7 @@ class DebugHelper extends StaticClass {
       return $trace;
 
       /**
-       * @TODO: fix wrong stacktrace frames originating from calls to virtual static functions
+       * @TODO: fix wrong stack frames originating from calls to virtual static functions
        *
        * phalcon\mvc\Model::__callStatic()                  [php-phalcon]
        * vokuro\models\Users::findFirstByEmail() # line 27, file: F:\Projekte\phalcon\sample-apps\vokuro\app\library\Auth\Auth.php
