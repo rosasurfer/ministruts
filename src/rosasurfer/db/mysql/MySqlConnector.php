@@ -23,6 +23,7 @@ use const rosasurfer\L_ERROR;
 use const rosasurfer\L_INFO;
 use const rosasurfer\L_NOTICE;
 use const rosasurfer\L_WARN;
+use const rosasurfer\SECONDS;
 
 
 /**
@@ -41,9 +42,9 @@ class MySqlConnector extends Connector {
    private static $logNotice = false;
 
    /** @var int - Queries spending more time for completion than specified are logged with level L_DEBUG. */
-   private static $maxQueryTime = 3;      // in seconds
+   private static $maxQueryTime = 3 * SECONDS;
 
-   /** @var string */                     // connection details
+   /** @var string */                           // connection details
    protected $host;
 
    /** @var string */
@@ -431,7 +432,7 @@ class MySqlConnector extends Connector {
 
 
    /**
-    * Whether or not the connection currently is in a pending transaction.
+    * Whether or not the connection currently is in a transaction.
     *
     * @return bool
     */

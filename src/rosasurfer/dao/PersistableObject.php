@@ -227,7 +227,7 @@ abstract class PersistableObject extends Object {
       $object = new $class();
       if (!$object instanceof self) throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
 
-      $mappings = $object->dao()->mapping;
+      $mappings = $object->dao()->getMapping();
 
       foreach ($mappings['fields'] as $property => $mapping) {
          $column = $mapping[0];

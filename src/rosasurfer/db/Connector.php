@@ -126,7 +126,7 @@ abstract class Connector extends Object {
 
 
    /**
-    * Whether or not the connection currently is in a pending transaction.
+    * Whether or not the connection currently is in a transaction.
     *
     * @return bool
     */

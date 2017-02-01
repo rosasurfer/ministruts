@@ -61,7 +61,7 @@ class StdConfig extends Config {
       if ($configDir != realPath(MINISTRUTS_ROOT.'/src')) {
          $files[]        = $configDir.'/config-default.properties';
          CLI && $files[] = $configDir.'/config-cli.properties';
-         $files[]        = $configFile ? $configFile : $configDir.'/config.properties';
+         $files[]        = $configFile ?: $configDir.'/config.properties';
       }
 
       // load the files

@@ -10,9 +10,9 @@ use rosasurfer\exception\InvalidArgumentException;
 /**
  * CommonDao
  *
- * Ein einfacher DAO, der die Grundfunktionalität bereitstellt.  Kann anwendungsspezifisch erweitert werden.
+ * Abstract DAO base class.
  */
-class CommonDao extends Singleton {
+abstract class CommonDao extends Singleton {
 
 
    // Mapping-Constanten
@@ -27,9 +27,11 @@ class CommonDao extends Singleton {
    const T_NOT_NULL = false;           // not null
 
 
+   /** @var array - database mapping; "abstract" member, must be re-defined in the concrete DAO */
+   protected $mapping = [];
+
    /** @var DaoWorker - Worker dieses DAO's */
    private $worker;
-
 
    /** @var string - Name der Entityklasse, für die der DAO zuständig ist */
    private $entityClass;
@@ -39,8 +41,6 @@ class CommonDao extends Singleton {
     * Constructor
     *
     * Erzeugt einen neuen DAO.
-    *
-    * @param  string $alias - Aliasname der Datenbank, mit dem die Entity-Klasse verbunden ist.
     */
    protected function __construct() {
       $this->entityClass = subStr(get_class($this), 0, -3);
