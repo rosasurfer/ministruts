@@ -15,9 +15,9 @@ abstract class Connector extends Object {
 
 
    /**
-    * Constructor
+    * Default constructor.
     *
-    * Default constructor. To create an instance use self::create().
+    * To create an instance use self::create().
     */
    protected function __construct() {
    }
