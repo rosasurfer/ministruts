@@ -62,16 +62,16 @@ class CommonDao extends Singleton {
    /**
     * single object getter
     */
-   final public function getByQuery($query) {
-      return $this->getWorker()->getByQuery($query);
+   final public function getByQuery($sql) {
+      return $this->getWorker()->getByQuery($sql);
    }
 
 
    /**
     * object list getter
     */
-   final public function getListByQuery($query, $count = false) {
-      return $this->getWorker()->getListByQuery($query, $count);
+   final public function listByQuery($sql, $count = false) {
+      return $this->getWorker()->listByQuery($sql, $count);
    }
 
 

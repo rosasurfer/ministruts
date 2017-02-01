@@ -290,7 +290,7 @@ class MySqlConnector extends Connector {
 
 
    /**
-    * Execute a SQL statement and return the result set.
+    * Execute a SQL statement and return the result.
     *
     * @param  string $sql - SQL statement
     *
@@ -318,7 +318,7 @@ class MySqlConnector extends Connector {
 
 
    /**
-    * Execute a SQL statement and return the original internal response.
+    * Execute a SQL statement and return the internal driver's raw response.
     *
     * @param  string $sql - SQL statement
     *
