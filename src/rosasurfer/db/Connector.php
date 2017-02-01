@@ -92,13 +92,13 @@ abstract class Connector extends Object {
 
 
    /**
-    * Execute a SQL statement and return the original internal response object.
+    * Execute a SQL statement and return the original internal response.
     *
     * @param  string $sql - SQL statement
     *
     * @return mixed
     */
-   abstract public function queryRaw($sql);
+   abstract public function executeRaw($sql);
 
 
    /**

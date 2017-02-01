@@ -218,7 +218,7 @@ class MySqlConnector extends Connector {
                   if (!is_numeric($value))
                      $value = "'$value'";
                   $sql = "set $option = $value";
-                  if (!$this->queryRaw($sql)) throw new InfrastructureException(mysql_error($this->hConnection));
+                  if (!$this->executeRaw($sql)) throw new InfrastructureException(mysql_error($this->hConnection));
                }
             }
          }
@@ -295,19 +295,19 @@ class MySqlConnector extends Connector {
     * @param  string $sql - SQL statement
     *
     * @return array['set' ] - a result set (for SELECT statements only)
-    *              ['rows'] - number of affected or modified rows (for SELECT/INSERT/UPDATE statements only)
+    *              ['rows'] - number of affected or modified rows (for SELECT/INSERT/UPDATE/DELETE/REPLACE statements only)
     */
    public function executeSql($sql) {
       $result = array('set'  => null,
                       'rows' => 0);
 
-      $rawResult = $this->queryRaw($sql);
+      $rawResult = $this->executeRaw($sql);
 
       if (is_resource($rawResult)) {
          $result['set']  = $rawResult;
          $result['rows'] = mysql_num_rows($rawResult);                  // number of returned rows
       }
-      else {
+      else /*($result===true)*/ {
          $sql = strToLower($sql);
          if (subStr($sql, 0, 6)=='insert' || subStr($sql, 0, 7)=='replace' || subStr($sql, 0, 6)=='update' || subStr($sql, 0, 6)=='delete') {
             $result['rows'] = mysql_affected_rows($this->hConnection);  // number of affected rows
@@ -318,13 +318,13 @@ class MySqlConnector extends Connector {
 
 
    /**
-    * Execute a SQL statement and return the internal response object.
+    * Execute a SQL statement and return the original internal response.
     *
     * @param  string $sql - SQL statement
     *
-    * @return mixed - depending on the statement type a result set or a boolean
+    * @return resource|bool - depending on the statement type a result resource or a boolean
     */
-   public function queryRaw($sql) {
+   public function executeRaw($sql) {
       if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
 
       if (!$this->isConnected())
@@ -343,10 +343,10 @@ class MySqlConnector extends Connector {
 
       // calculate statement duration
       if (!$result) {
-         $message = ($errno = mysql_errno()) ? "SQL-Error $errno: ".mysql_error() : 'Can not connect to MySQL server';
+         $message = ($errno=mysql_errno()) ? "SQL-Error $errno: ".mysql_error() : 'Can not connect to MySQL server';
 
          if (self::$logDebug)
-            $message .= ' (taken time: '.round($end - $start, 4).' seconds)';
+            $message .= ' (taken time: '.round($end-$start, 4).' seconds)';
 
          $message .= "\nSQL: ".$sql;
 
@@ -362,9 +362,9 @@ class MySqlConnector extends Connector {
 
       // log statements exceeding $maxQueryTime
       if (self::$logDebug) {
-         $neededTime = round($end - $start, 4);
-         if ($neededTime > self::$maxQueryTime)
-            Logger::log('SQL statement took more than '.self::$maxQueryTime." seconds: $neededTime\n$sql", L_DEBUG);
+         $spentTime = round($end-$start, 4);
+         if ($spentTime > self::$maxQueryTime)
+            Logger::log('SQL statement took more than '.self::$maxQueryTime." seconds: $spentTime\n$sql", L_DEBUG);
            //Logger::log($this->printDeadlockStatus(true), L_DEBUG);
       }
       return $result;
@@ -380,7 +380,7 @@ class MySqlConnector extends Connector {
       if ($this->transaction < 0) throw new RuntimeException('Negative transaction counter detected: '.$this->transaction);
 
       if ($this->transaction == 0)
-         $this->queryRaw('start transaction');
+         $this->executeRaw('start transaction');
 
       $this->transaction++;
       return $this;
@@ -400,7 +400,7 @@ class MySqlConnector extends Connector {
       }
       else {
          if ($this->transaction == 1)
-            $this->queryRaw('commit');
+            $this->executeRaw('commit');
 
          $this->transaction--;
       }
@@ -422,7 +422,7 @@ class MySqlConnector extends Connector {
       }
       else {
          if ($this->transaction == 1)
-            $this->queryRaw('rollback');
+            $this->executeRaw('rollback');
 
          $this->transaction--;
       }
@@ -448,7 +448,7 @@ class MySqlConnector extends Connector {
    private function getProcessList() {
       ($oldLogDebug=self::$logDebug) && self::$logDebug = false;
 
-      $result = $this->queryRaw('show full processlist');
+      $result = $this->executeRaw('show full processlist');
 
       self::$logDebug = $oldLogDebug;
 
@@ -546,7 +546,7 @@ class MySqlConnector extends Connector {
       ($oldLogDebug=self::$logDebug) && self::$logDebug = false;
 
       // TODO: special attention: 1227: Access denied; you need the SUPER privilege for this operation
-      $result = $this->queryRaw('show engine innodb status');
+      $result = $this->executeRaw('show engine innodb status');
 
       self::$logDebug = $oldLogDebug;
 
