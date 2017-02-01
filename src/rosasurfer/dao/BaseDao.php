@@ -8,11 +8,11 @@ use rosasurfer\exception\InvalidArgumentException;
 
 
 /**
- * CommonDao
+ * BaseDao
  *
  * Abstract DAO base class.
  */
-abstract class CommonDao extends Singleton {
+abstract class BaseDao extends Singleton {
 
 
    // Mapping-Constanten

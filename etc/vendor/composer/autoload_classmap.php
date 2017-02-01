@@ -32,7 +32,7 @@ return array(
     'rosasurfer\\core\\Object' => $baseDir . '/src/rosasurfer/core/Object.php',
     'rosasurfer\\core\\Singleton' => $baseDir . '/src/rosasurfer/core/Singleton.php',
     'rosasurfer\\core\\StaticClass' => $baseDir . '/src/rosasurfer/core/StaticClass.php',
-    'rosasurfer\\dao\\CommonDao' => $baseDir . '/src/rosasurfer/dao/CommonDao.php',
+    'rosasurfer\\dao\\BaseDao' => $baseDir . '/src/rosasurfer/dao/BaseDao.php',
     'rosasurfer\\dao\\DaoWorker' => $baseDir . '/src/rosasurfer/dao/DaoWorker.php',
     'rosasurfer\\dao\\PersistableObject' => $baseDir . '/src/rosasurfer/dao/PersistableObject.php',
     'rosasurfer\\db\\ConnectionPool' => $baseDir . '/src/rosasurfer/db/ConnectionPool.php',
