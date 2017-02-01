@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\db\postgres;
+namespace rosasurfer\db\pgsql;
 
 use rosasurfer\db\Connector;
 
@@ -7,5 +7,5 @@ use rosasurfer\db\Connector;
 /**
  * PostgreSqlConnector
  */
-abstract class PostgreSqlConnector extends Connector {
+abstract class PostgresConnector extends Connector {
 }
