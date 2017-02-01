@@ -236,15 +236,15 @@ abstract class PersistableObject extends Object {
             $type = $mapping[1];
 
             switch ($type) {
-               case CommonDao::T_STRING:
+               case BaseDao::T_STRING:
                   $object->$property =         $row[$column]; break;
-               case CommonDao::T_INT:
+               case BaseDao::T_INT   :
                   $object->$property =   (int) $row[$column]; break;
-               case CommonDao::T_FLOAT:
+               case BaseDao::T_FLOAT :
                   $object->$property = (float) $row[$column]; break;
-               case CommonDao::T_BOOL:
+               case BaseDao::T_BOOL  :
                   $object->$property =  (bool) $row[$column]; break;
-               case CommonDao::T_SET:
+               case BaseDao::T_SET   :
                   $object->$property = strLen($row[$column]) ? explode(',', $row[$column]) : array();
                   break;
                default:
@@ -259,7 +259,7 @@ abstract class PersistableObject extends Object {
    /**
     * Return the DAO for the calling class.
     *
-    * @return CommonDao
+    * @return BaseDao
     */
    public static function dao() {
       // TODO: the calling class may be a derived class with the DAO being one of its parents

@@ -17,7 +17,7 @@ use rosasurfer\exception\IllegalTypeException;
 class DaoWorker extends Object {
 
 
-   /** @var CommonDao - DAO der Entity-Klasse dieses Workers */
+   /** @var BaseDao - DAO der Entity-Klasse dieses Workers */
    private $dao;
 
    /** @var string - Name der Entity-Klasse dieses Workers */
@@ -35,9 +35,9 @@ class DaoWorker extends Object {
     *
     * Erzeugt einen neuen Worker für den angegebenen DAO.
     *
-    * @param  CommonDao $dao
+    * @param  BaseDao $dao
     */
-   public function __construct(CommonDao $dao) {
+   public function __construct(BaseDao $dao) {
       $this->dao = $dao;
       $this->entityClass = $dao->getEntityClass();
    }
