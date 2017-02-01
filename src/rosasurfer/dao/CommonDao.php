@@ -62,16 +62,16 @@ abstract class CommonDao extends Singleton {
    /**
     * single object getter
     */
-   final public function getByQuery($sql) {
-      return $this->getWorker()->getByQuery($sql);
+   final public function fetchOne($sql) {
+      return $this->getWorker()->fetchOne($sql);
    }
 
 
    /**
     * object list getter
     */
-   final public function listByQuery($sql, $count = false) {
-      return $this->getWorker()->listByQuery($sql, $count);
+   final public function fetchAll($sql, $count = false) {
+      return $this->getWorker()->fetchAll($sql, $count);
    }
 
 
@@ -164,7 +164,7 @@ abstract class CommonDao extends Singleton {
       $sql = "select *
                  from `$tablename`
                  where id = $id";
-      $instance = $this->getByQuery($sql);
+      $instance = $this->fetchOne($sql);
 
       if (!$instance) throw new ConcurrentModificationException('Error refreshing '.get_class($object).' ('.$id.'), data row not found');
 

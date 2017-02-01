@@ -1,3 +1,9 @@
+2017-02-01
+
+   - dao/BaseDao: remove public access of property $mapping
+   - dao/BaseDao: rename finder methods to fetchOne() and fetchAll()
+
+
 2017-01-30
 
    - by default ministruts/url/Url and ministruts/url/VersionedUrl include the application base URI   

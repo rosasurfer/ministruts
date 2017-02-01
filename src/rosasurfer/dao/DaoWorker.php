@@ -46,7 +46,7 @@ class DaoWorker extends Object {
    /**
     * single object getter
     */
-   public function getByQuery($sql) {
+   public function fetchOne($sql) {
       $result = $this->executeSql($sql);
       return $this->makeObject($result);
    }
@@ -55,7 +55,7 @@ class DaoWorker extends Object {
    /**
     * object's list getter
     */
-   public function listByQuery($sql, $count = false) {
+   public function fetchAll($sql, $count = false) {
       $result = $this->executeSql($sql, $count);
       return $this->makeObjects($result);
    }
