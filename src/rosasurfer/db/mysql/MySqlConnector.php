@@ -369,12 +369,12 @@ class MySqlConnector extends Connector {
     * @return self
     */
    public function begin() {
-      if ($this->transaction < 0) throw new RuntimeException('Negative transaction counter detected: '.$this->transaction);
+      if ($this->transactions < 0) throw new RuntimeException('Negative transaction counter detected: '.$this->transactions);
 
-      if ($this->transaction == 0)
+      if (!$this->transactions)
          $this->executeRaw('start transaction');
 
-      $this->transaction++;
+      $this->transactions++;
       return $this;
    }
 
@@ -385,16 +385,16 @@ class MySqlConnector extends Connector {
     * @return self
     */
    public function commit() {
-      if ($this->transaction < 0) throw new RuntimeException('Negative transaction counter detected: '.$this->transaction);
+      if ($this->transactions < 0) throw new RuntimeException('Negative transaction counter detected: '.$this->transactions);
 
-      if ($this->transaction == 0) {
+      if (!$this->transactions) {
          Logger::log('No database transaction to commit', L_WARN);
       }
       else {
-         if ($this->transaction == 1)
+         if ($this->transactions == 1)
             $this->executeRaw('commit');
 
-         $this->transaction--;
+         $this->transactions--;
       }
       return $this;
    }
@@ -407,16 +407,16 @@ class MySqlConnector extends Connector {
     * @return self
     */
    public function rollback() {
-      if ($this->transaction < 0) throw new RuntimeException('Negative transaction counter detected: '.$this->transaction);
+      if ($this->transactions < 0) throw new RuntimeException('Negative transaction counter detected: '.$this->transactions);
 
-      if ($this->transaction == 0) {
+      if (!$this->transactions) {
          Logger::log('No database transaction to roll back', L_WARN);
       }
       else {
-         if ($this->transaction == 1)
+         if ($this->transactions == 1)
             $this->executeRaw('rollback');
 
-         $this->transaction--;
+         $this->transactions--;
       }
       return $this;
    }
