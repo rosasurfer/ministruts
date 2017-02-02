@@ -1,12 +1,8 @@
 <?php
-namespace rosasurfer\db\connector;
+namespace rosasurfer\db;
 
 use rosasurfer\config\Config;
 use rosasurfer\core\Singleton;
-
-use rosasurfer\db\connector\MysqlConnector;
-use rosasurfer\db\connector\PostgresConnector;
-use rosasurfer\db\connector\SqliteConnector;
 
 use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\RuntimeException;

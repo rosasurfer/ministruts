@@ -1,7 +1,5 @@
 <?php
-namespace rosasurfer\db\connector;
-
-use rosasurfer\db\connector\Connector;
+namespace rosasurfer\db;
 
 use rosasurfer\exception\DatabaseException;
 use rosasurfer\exception\InfrastructureException;
