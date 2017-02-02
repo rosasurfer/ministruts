@@ -9,15 +9,15 @@ use rosasurfer\exception\IllegalTypeException;
 
 
 /**
- * DaoWorker
+ * Worker
  *
- * Ein DaoWorker implementiert eine konkrete Caching-Strategie. Zu jeder persistenten Klasse gehört
- * genau ein DaoWorker.
+ * Ein Worker implementiert eine konkrete Caching-Strategie. Zu jeder persistenten Klasse gehört
+ * genau ein Worker.
  */
-class DaoWorker extends Object {
+class Worker extends Object {
 
 
-   /** @var BaseDao - DAO der Entity-Klasse dieses Workers */
+   /** @var Dao - DAO der Entity-Klasse dieses Workers */
    private $dao;
 
    /** @var string - Name der Entity-Klasse dieses Workers */
@@ -35,9 +35,9 @@ class DaoWorker extends Object {
     *
     * Erzeugt einen neuen Worker für den angegebenen DAO.
     *
-    * @param  BaseDao $dao
+    * @param  Dao $dao
     */
-   public function __construct(BaseDao $dao) {
+   public function __construct(Dao $dao) {
       $this->dao = $dao;
       $this->entityClass = $dao->getEntityClass();
    }
