@@ -298,7 +298,7 @@ class MySqlConnector extends Connector {
     *
     * @param  string $sql - SQL statement
     *
-    * @return array['set' ] - a result set (for SELECT statements only)
+    * @return array['set' ] - a result resource (for SELECT statements only)
     *              ['rows'] - number of affected or modified rows (for SELECT/INSERT/UPDATE/DELETE/REPLACE statements only)
     */
    public function executeSql($sql) {
@@ -308,7 +308,7 @@ class MySqlConnector extends Connector {
       $rawResult = $this->executeRaw($sql);
 
       if (is_resource($rawResult)) {
-         $result['set']  = $rawResult;
+         $result['set' ] = $rawResult;
          $result['rows'] = mysql_num_rows($rawResult);                  // number of returned rows
       }
       else /*($result===true)*/ {
