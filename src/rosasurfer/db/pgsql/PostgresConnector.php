@@ -2,9 +2,12 @@
 namespace rosasurfer\db\pgsql;
 
 use rosasurfer\db\Connector;
-use rosasurfer\exception\UnimplementedFeatureException;
-use rosasurfer\exception\InfrastructureException;
+
 use rosasurfer\exception\DatabaseException;
+use rosasurfer\exception\InfrastructureException;
+use rosasurfer\exception\UnimplementedFeatureException;
+
+use function rosasurfer\strContains;
 
 
 /**

@@ -3,11 +3,11 @@ namespace rosasurfer\db\sqlite;
 
 use rosasurfer\db\Connector;
 
+use rosasurfer\exception\DatabaseException;
 use rosasurfer\exception\InfrastructureException;
 use rosasurfer\exception\UnimplementedFeatureException;
 
-use const rosasurfer\NL;
-use rosasurfer\exception\DatabaseException;
+use rosasurfer\NL;
 
 
 /**
