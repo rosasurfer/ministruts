@@ -5,9 +5,12 @@ use rosasurfer\db\connector\Connector;
 
 use rosasurfer\exception\DatabaseException;
 use rosasurfer\exception\InfrastructureException;
-use rosasurfer\exception\UnimplementedFeatureException;
+use rosasurfer\exception\RuntimeException;
 
-use rosasurfer\NL;
+use rosasurfer\log\Logger;
+
+use const rosasurfer\L_WARN;
+use const rosasurfer\NL;
 
 
 /**
@@ -38,8 +41,8 @@ class SqliteConnector extends Connector {
     * @param  string[] $options - additional SQLite typical options (default: none)
     */
    protected function __construct(array $config, array $options=[]) {
-      $this->setFile   ($config['file'])
-           ->setOptions($options);
+      $this->setFile($config['file']);
+      $this->setOptions($options);
       parent::__construct();
    }
 
@@ -80,7 +83,7 @@ class SqliteConnector extends Connector {
     */
    protected function connect() {
       try {                                                          // available flags:
-         $flags = SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE;      // SQLITE3_OPEN_READONLY
+         $flags = SQLITE3_OPEN_READWRITE ;      // SQLITE3_OPEN_READONLY| SQLITE3_OPEN_CREATE
                                                                      // SQLITE3_OPEN_READWRITE
          $handler = new \SQLite3($this->file, $flags);               // SQLITE3_OPEN_CREATE
       }
@@ -182,12 +185,18 @@ class SqliteConnector extends Connector {
 
 
    /**
-    * Start a new transaction.
+    * Start a new transaction. If there is already an active transaction only the transaction counter is increased.
     *
     * @return self
     */
    public function begin() {
-      throw new UnimplementedFeatureException();
+      if ($this->transactions < 0) throw new RuntimeException('Negative transaction counter detected: '.$this->transactions);
+
+      if (!$this->transactions)
+         $this->executeRaw('begin');
+
+      $this->transactions++;
+      return $this;
    }
 
 
@@ -197,17 +206,40 @@ class SqliteConnector extends Connector {
     * @return self
     */
    public function commit() {
-      throw new UnimplementedFeatureException();
+      if ($this->transactions < 0) throw new RuntimeException('Negative transaction counter detected: '.$this->transactions);
+
+      if (!$this->transactions) {
+         Logger::log('No database transaction to commit', L_WARN);
+      }
+      else {
+         if ($this->transactions == 1)
+            $this->executeRaw('commit');
+
+         $this->transactions--;
+      }
+      return $this;
    }
 
 
    /**
-    * Roll back a pending transaction.
+    * Roll back an active transaction. If a nested transaction is active only the transaction counter is decreased. If only
+    * one (the outer most) transaction is active the transaction is rolled back.
     *
     * @return self
     */
    public function rollback() {
-      throw new UnimplementedFeatureException();
+      if ($this->transactions < 0) throw new RuntimeException('Negative transaction counter detected: '.$this->transactions);
+
+      if (!$this->transactions) {
+         Logger::log('No database transaction to roll back', L_WARN);
+      }
+      else {
+         if ($this->transactions == 1)
+            $this->executeRaw('rollback');
+
+         $this->transactions--;
+      }
+      return $this;
    }
 
 
