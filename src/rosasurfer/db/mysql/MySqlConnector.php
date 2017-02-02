@@ -364,7 +364,7 @@ class MySqlConnector extends Connector {
 
 
    /**
-    * Start a new transaction. If a transaction is already pending only the transaction counter is increased.
+    * Start a new transaction. If there is already an active transaction only the transaction counter is increased.
     *
     * @return self
     */
@@ -380,7 +380,7 @@ class MySqlConnector extends Connector {
 
 
    /**
-    * Commit a pending transaction. If a nested transaction is pending only the transaction counter is decreased.
+    * Commit an active transaction. If a nested transaction is active only the transaction counter is decreased.
     *
     * @return self
     */
@@ -401,8 +401,8 @@ class MySqlConnector extends Connector {
 
 
    /**
-    * Roll back a pending transaction. If a nested transaction is pending the call is ignored. If the last transaction is
-    * pending (counter=1) the transaction is rolled back.
+    * Roll back an active transaction. If a nested transaction is active only the transaction counter is decreased. If only
+    * one (the outer most) transaction is active the transaction is rolled back.
     *
     * @return self
     */

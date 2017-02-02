@@ -5,9 +5,13 @@ use rosasurfer\db\Connector;
 
 use rosasurfer\exception\DatabaseException;
 use rosasurfer\exception\InfrastructureException;
-use rosasurfer\exception\UnimplementedFeatureException;
+use rosasurfer\exception\RuntimeException;
+
+use rosasurfer\log\Logger;
 
 use function rosasurfer\strContains;
+
+use const rosasurfer\L_WARN;
 
 
 /**
@@ -213,12 +217,18 @@ class PostgresConnector extends Connector {
 
 
    /**
-    * Start a new transaction.
+    * Start a new transaction. If there is already an active transaction only the transaction counter is increased.
     *
     * @return self
     */
    public function begin() {
-      throw new UnimplementedFeatureException();
+      if ($this->transactions < 0) throw new RuntimeException('Negative transaction counter detected: '.$this->transactions);
+
+      if (!$this->transactions)
+         $this->executeRaw('begin');
+
+      $this->transactions++;
+      return $this;
    }
 
 
@@ -228,17 +238,40 @@ class PostgresConnector extends Connector {
     * @return self
     */
    public function commit() {
-      throw new UnimplementedFeatureException();
+      if ($this->transactions < 0) throw new RuntimeException('Negative transaction counter detected: '.$this->transactions);
+
+      if (!$this->transactions) {
+         Logger::log('No database transaction to commit', L_WARN);
+      }
+      else {
+         if ($this->transactions == 1)
+            $this->executeRaw('commit');
+
+         $this->transactions--;
+      }
+      return $this;
    }
 
 
    /**
-    * Roll back a pending transaction.
+    * Roll back an active transaction. If a nested transaction is active only the transaction counter is decreased. If only
+    * one (the outer most) transaction is active the transaction is rolled back.
     *
     * @return self
     */
    public function rollback() {
-      throw new UnimplementedFeatureException();
+      if ($this->transactions < 0) throw new RuntimeException('Negative transaction counter detected: '.$this->transactions);
+
+      if (!$this->transactions) {
+         Logger::log('No database transaction to roll back', L_WARN);
+      }
+      else {
+         if ($this->transactions == 1)
+            $this->executeRaw('rollback');
+
+         $this->transactions--;
+      }
+      return $this;
    }
 
 

@@ -114,7 +114,7 @@ abstract class Connector extends Object {
 
 
    /**
-    * Commit a pending transaction.
+    * Commit an active transaction.
     *
     * @return self
     */
@@ -122,7 +122,7 @@ abstract class Connector extends Object {
 
 
    /**
-    * Roll back a pending transaction.
+    * Roll back an active transaction.
     *
     * @return self
     */
