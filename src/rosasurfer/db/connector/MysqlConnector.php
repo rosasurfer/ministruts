@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\db\connector\mysql;
+namespace rosasurfer\db\connector;
 
 use rosasurfer\db\connector\Connector;
 

@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\db\connector\pgsql;
+namespace rosasurfer\db\connector;
 
 use rosasurfer\db\connector\Connector;
 

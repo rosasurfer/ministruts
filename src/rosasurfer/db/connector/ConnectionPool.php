@@ -4,9 +4,9 @@ namespace rosasurfer\db\connector;
 use rosasurfer\config\Config;
 use rosasurfer\core\Singleton;
 
-use rosasurfer\db\connector\mysql\MysqlConnector;
-use rosasurfer\db\connector\pgsql\PostgresConnector;
-use rosasurfer\db\connector\sqlite\SqliteConnector;
+use rosasurfer\db\connector\MysqlConnector;
+use rosasurfer\db\connector\PostgresConnector;
+use rosasurfer\db\connector\SqliteConnector;
 
 use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\RuntimeException;
@@ -28,17 +28,17 @@ final class ConnectionPool extends Singleton {
 
    /** @var string[] - common adapter spellings */
    private static $aliases = [
-      'mysql'                                    => MysqlConnector::class,
-      __NAMESPACE__.'\\mysql\\mysqlconnector'    => MysqlConnector::class,
+      'mysql'                             => MysqlConnector::class,
+      __NAMESPACE__.'\\mysqlconnector'    => MysqlConnector::class,
 
-      'pgsql'                                    => PostgresConnector::class,
-      'postgres'                                 => PostgresConnector::class,
-      'postgresql'                               => PostgresConnector::class,
-      __NAMESPACE__.'\\pgsql\\postgresconnector' => PostgresConnector::class,
+      'pgsql'                             => PostgresConnector::class,
+      'postgres'                          => PostgresConnector::class,
+      'postgresql'                        => PostgresConnector::class,
+      __NAMESPACE__.'\\postgresconnector' => PostgresConnector::class,
 
-      'sqlite'                                   => SqliteConnector::class,
-      'sqlite3'                                  => SqliteConnector::class,
-      __NAMESPACE__.'\\sqlite\\sqliteconnector'  => SqliteConnector::class,
+      'sqlite'                            => SqliteConnector::class,
+      'sqlite3'                           => SqliteConnector::class,
+      __NAMESPACE__.'\\sqliteconnector'   => SqliteConnector::class,
    ];
 
 
