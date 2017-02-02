@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\dao;
+namespace rosasurfer\db\orm;
 
 use rosasurfer\core\Singleton;
 

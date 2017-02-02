@@ -1,7 +1,7 @@
 <?php
-namespace rosasurfer\db\mysql;
+namespace rosasurfer\db\connector\mysql;
 
-use rosasurfer\db\Connector;
+use rosasurfer\db\connector\Connector;
 
 use rosasurfer\exception\DatabaseException;
 use rosasurfer\exception\IllegalTypeException;

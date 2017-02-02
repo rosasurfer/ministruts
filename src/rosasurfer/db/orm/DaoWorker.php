@@ -1,8 +1,8 @@
 <?php
-namespace rosasurfer\dao;
+namespace rosasurfer\db\orm;
 
 use rosasurfer\core\Object;
-use rosasurfer\db\ConnectionPool;
+use rosasurfer\db\connector\ConnectionPool;
 
 use rosasurfer\exception\DatabaseException;
 use rosasurfer\exception\IllegalTypeException;

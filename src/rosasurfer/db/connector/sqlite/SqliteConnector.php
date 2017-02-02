@@ -1,7 +1,7 @@
 <?php
-namespace rosasurfer\db\sqlite;
+namespace rosasurfer\db\connector\sqlite;
 
-use rosasurfer\db\Connector;
+use rosasurfer\db\connector\Connector;
 
 use rosasurfer\exception\DatabaseException;
 use rosasurfer\exception\InfrastructureException;

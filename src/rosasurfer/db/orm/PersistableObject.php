@@ -1,15 +1,16 @@
 <?php
-namespace rosasurfer\dao;
+namespace rosasurfer\db\orm;
 
 use rosasurfer\core\Object;
 use rosasurfer\core\Singleton;
+
+use rosasurfer\db\connector\Connector;
 
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\UnimplementedFeatureException;
 
 use rosasurfer\log\Logger;
 use rosasurfer\util\Date;
-use rosasurfer\db\Connector;
 
 
 /**

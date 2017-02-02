@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\db;
+namespace rosasurfer\db\connector;
 
 use rosasurfer\core\Object;
 
