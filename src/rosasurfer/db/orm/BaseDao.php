@@ -8,11 +8,11 @@ use rosasurfer\exception\InvalidArgumentException;
 
 
 /**
- * BaseDao
+ * Dao
  *
  * Abstract DAO base class.
  */
-abstract class BaseDao extends Singleton {
+abstract class Dao extends Singleton {
 
 
    // Mapping-Constanten
@@ -30,7 +30,7 @@ abstract class BaseDao extends Singleton {
    /** @var array - database mapping; "abstract" member, must be re-defined in the concrete DAO */
    protected $mapping = [];
 
-   /** @var DaoWorker - Worker dieses DAO's */
+   /** @var Worker - Worker dieses DAO's */
    private $worker;
 
    /** @var string - Name der Entityklasse, für die der DAO zuständig ist */
@@ -135,11 +135,11 @@ abstract class BaseDao extends Singleton {
     * Gibt den Worker dieses DAO zurück. Ein Worker implementiert eine konkrete Caching-Strategie und
     * kann Entity-spezifisch konfiguriert werden.
     *
-    * @return DaoWorker
+    * @return Worker
     */
    private function getWorker() {
       if (!$this->worker) {
-         $this->worker = new DaoWorker($this);
+         $this->worker = new Worker($this);
       }
       return $this->worker;
    }

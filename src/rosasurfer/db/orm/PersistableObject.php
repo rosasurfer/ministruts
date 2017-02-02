@@ -237,19 +237,13 @@ abstract class PersistableObject extends Object {
             $type = $mapping[1];
 
             switch ($type) {
-               case BaseDao::T_STRING:
-                  $object->$property =         $row[$column]; break;
-               case BaseDao::T_INT   :
-                  $object->$property =   (int) $row[$column]; break;
-               case BaseDao::T_FLOAT :
-                  $object->$property = (float) $row[$column]; break;
-               case BaseDao::T_BOOL  :
-                  $object->$property =  (bool) $row[$column]; break;
-               case BaseDao::T_SET   :
-                  $object->$property = strLen($row[$column]) ? explode(',', $row[$column]) : array();
-                  break;
-               default:
-                  throw new InvalidArgumentException('Unknown data type "'.$type.'" in database mapping of '.$class.'::'.$property);
+               case Dao::T_STRING: $object->$property =         $row[$column]; break;
+               case Dao::T_INT   : $object->$property =   (int) $row[$column]; break;
+               case Dao::T_FLOAT : $object->$property = (float) $row[$column]; break;
+               case Dao::T_BOOL  : $object->$property =  (bool) $row[$column]; break;
+               case Dao::T_SET   : $object->$property = strLen($row[$column]) ? explode(',', $row[$column]) : []; break;
+
+               default: throw new InvalidArgumentException('Unknown data type "'.$type.'" in database mapping of '.$class.'::'.$property);
             }
          }
       }
@@ -260,7 +254,7 @@ abstract class PersistableObject extends Object {
    /**
     * Return the DAO for the calling class.
     *
-    * @return BaseDao
+    * @return Dao
     */
    public static function dao() {
       // TODO: the calling class may be a derived class with the DAO being one of its parents
