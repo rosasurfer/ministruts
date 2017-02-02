@@ -23,6 +23,7 @@ use const rosasurfer\L_ERROR;
 use const rosasurfer\L_INFO;
 use const rosasurfer\L_NOTICE;
 use const rosasurfer\L_WARN;
+use const rosasurfer\NL;
 use const rosasurfer\SECONDS;
 
 
@@ -45,6 +46,10 @@ class MySqlConnector extends Connector {
    private static $maxQueryTime = 3 * SECONDS;
 
 
+   /** @var resource - connection handle */
+   protected $hConnection;
+
+
    /** @var string */                           // connection details
    protected $host;
 
@@ -63,11 +68,8 @@ class MySqlConnector extends Connector {
    /** @var string[] */
    protected $options = [];
 
-   /** @var resource - internal connection handle */
-   protected $hConnection;
-
-   /** @var int - transaction counter: 0=no transaction; 1: transaction; >1: nested transaction */
-   protected $transaction = 0;
+   /** @var int - transaction nesting level */
+   protected $transactions = 0;
 
 
    /**
@@ -188,7 +190,7 @@ class MySqlConnector extends Connector {
 
 
    /**
-    * Open the connection to the database.
+    * Connect the adapter to the database.
     *
     * @return self
     */
@@ -196,7 +198,6 @@ class MySqlConnector extends Connector {
       $host = $this->host;
       if ($this->port)
          $host .= ':'.$this->port;
-
       try {
          $this->hConnection = mysql_connect($host,
                                             $this->username,
@@ -268,26 +269,27 @@ class MySqlConnector extends Connector {
 
 
    /**
-    * Close the connection to the database.
+    * Disconnect the adapter from the database.
     *
     * @return self
     */
    protected function disconnect() {
       if ($this->isConnected()) {
-         mysql_close($this->hConnection);
+         $hTmp = $this->hConnection;
          $this->hConnection = null;
+         mysql_close($hTmp);
       }
       return $this;
    }
 
 
    /**
-    * Whether or not a connection to the databse is currently established.
+    * Whether or not the adapter currently is connected to the database.
     *
     * @return bool
     */
    protected function isConnected() {
-      return is_resource($this->hConnection);
+      return ($this->hConnection != null);
    }
 
 
@@ -329,34 +331,22 @@ class MySqlConnector extends Connector {
    public function executeRaw($sql) {
       if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
 
-      if (!$this->isConnected())
-         $this->connect();
+      !$this->isConnected() && $this->connect();
+      self::$logDebug && $startTime=microTime(true);
 
-      // memorize starting time
-      if (self::$logDebug)
-         $start = microTime(true);
-
-      // execute statement
+      // execute statement (it seems mysql_query() never triggers errors on invalid SQL)
       $result = mysql_query($sql, $this->hConnection);
 
-      // memorize end time
-      if (self::$logDebug)
-         $end = microTime(true);
+      self::$logDebug && $endTime=microTime(true);
 
       // calculate statement duration
       if (!$result) {
-         $message = ($errno=mysql_errno()) ? "SQL-Error $errno: ".mysql_error() : 'Can not connect to MySQL server';
+         $message = ($errno=mysql_errno()) ? 'SQL-Error '.$errno.': '.mysql_error() : 'Can not connect to MySQL server';
 
-         if (self::$logDebug)
-            $message .= ' (taken time: '.round($end-$start, 4).' seconds)';
-
-         $message .= "\nSQL: ".$sql;
-
-         if ($errno == 1205)           // 1205: Lock wait timeout exceeded
-            $message .= "\n\n".$this->printProcessList($return=true);
-
-         if ($errno == 1213)           // 1213: Deadlock found when trying to get lock
-            $message .= "\n\n".$this->printDeadlockStatus($return=true);
+         self::$logDebug &&  $message .=  ' (time: '.round($endTime-$startTime, 4).' seconds)';
+                             $message .= NL.' SQL: "'.$sql.'"';
+         if ($errno == 1205) $message .= NL.NL.$this->printProcessList   ($return=true); // Lock wait timeout exceeded
+         if ($errno == 1213) $message .= NL.NL.$this->printDeadlockStatus($return=true); // Deadlock found when trying to get lock
 
          throw new DatabaseException($message);
       }
@@ -364,9 +354,9 @@ class MySqlConnector extends Connector {
 
       // log statements exceeding $maxQueryTime
       if (self::$logDebug) {
-         $spentTime = round($end-$start, 4);
+         $spentTime = round($endTime-$startTime, 4);
          if ($spentTime > self::$maxQueryTime)
-            Logger::log('SQL statement took more than '.self::$maxQueryTime." seconds: $spentTime\n$sql", L_DEBUG);
+            Logger::log('SQL statement took more than '.self::$maxQueryTime.' seconds: '.$spentTime.NL.$sql, L_DEBUG);
            //Logger::log($this->printDeadlockStatus(true), L_DEBUG);
       }
       return $result;
@@ -438,7 +428,7 @@ class MySqlConnector extends Connector {
     * @return bool
     */
    public function isInTransaction() {
-      return ($this->transaction > 0);
+      return ($this->transactions > 0);
    }
 
 
