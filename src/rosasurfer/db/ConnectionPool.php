@@ -5,6 +5,7 @@ use rosasurfer\config\Config;
 use rosasurfer\core\Singleton;
 
 use rosasurfer\db\mysql\MySqlConnector;
+use rosasurfer\db\pgsql\PostgresConnector;
 use rosasurfer\db\sqlite\SqliteConnector;
 
 use rosasurfer\exception\IllegalStateException;

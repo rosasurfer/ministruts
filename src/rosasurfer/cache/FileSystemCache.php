@@ -45,7 +45,7 @@ final class FileSystemCache extends CachePeer {
 
       // relativen Pfad als relativ zu APPLICATION_ROOT interpretieren
       $directory = str_replace('\\', '/', $directory);
-      if ($directory{0}!='/' && (!WINDOWS || !preg_match('/^[a-z]:/i', $directory)))
+      if ($directory[0]!='/' && (!WINDOWS || !preg_match('/^[a-z]:/i', $directory)))
          $directory = str_replace('\\', '/', APPLICATION_ROOT).'/'.$directory;
 
       // ggf. Cache-Verzeichnis erzeugen

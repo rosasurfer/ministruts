@@ -61,13 +61,17 @@ abstract class Connector extends Object {
 
 
    /**
-    * Connect the adapter with the database.
+    * Connect the adapter to the database.
+    *
+    * @return self
     */
    abstract protected function connect();
 
 
    /**
     * Disconnect the adapter from the database.
+    *
+    * @return self
     */
    abstract protected function disconnect();
 
