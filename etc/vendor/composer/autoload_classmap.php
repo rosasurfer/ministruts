@@ -38,7 +38,7 @@ return array(
     'rosasurfer\\db\\ConnectionPool' => $baseDir . '/src/rosasurfer/db/ConnectionPool.php',
     'rosasurfer\\db\\Connector' => $baseDir . '/src/rosasurfer/db/Connector.php',
     'rosasurfer\\db\\Result' => $baseDir . '/src/rosasurfer/db/Result.php',
-    'rosasurfer\\db\\mysql\\MySqlConnector' => $baseDir . '/src/rosasurfer/db/mysql/MySqlConnector.php',
+    'rosasurfer\\db\\mysql\\MysqlConnector' => $baseDir . '/src/rosasurfer/db/mysql/MysqlConnector.php',
     'rosasurfer\\db\\pgsql\\PostgresConnector' => $baseDir . '/src/rosasurfer/db/pgsql/PostgresConnector.php',
     'rosasurfer\\db\\sqlite\\SqliteConnector' => $baseDir . '/src/rosasurfer/db/sqlite/SqliteConnector.php',
     'rosasurfer\\debug\\DebugHelper' => $baseDir . '/src/rosasurfer/debug/DebugHelper.php',

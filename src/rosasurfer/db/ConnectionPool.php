@@ -4,7 +4,7 @@ namespace rosasurfer\db;
 use rosasurfer\config\Config;
 use rosasurfer\core\Singleton;
 
-use rosasurfer\db\mysql\MySqlConnector;
+use rosasurfer\db\mysql\MysqlConnector;
 use rosasurfer\db\pgsql\PostgresConnector;
 use rosasurfer\db\sqlite\SqliteConnector;
 
@@ -28,8 +28,8 @@ final class ConnectionPool extends Singleton {
 
    /** @var string[] - common adapter spellings */
    private static $aliases = [
-      'mysql'                                    => MySqlConnector::class,
-      __NAMESPACE__.'\\mysql\\mysqlconnector'    => MySqlConnector::class,
+      'mysql'                                    => MysqlConnector::class,
+      __NAMESPACE__.'\\mysql\\mysqlconnector'    => MysqlConnector::class,
 
       'pgsql'                                    => PostgresConnector::class,
       'postgres'                                 => PostgresConnector::class,

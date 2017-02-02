@@ -1,3 +1,7 @@
+# do not ignore the following files
+!.gitattributes
+!.htaccess
+
 # ignore Eclipse folders and files
 /.externalToolBuilders/
 /.settings/
@@ -16,11 +20,7 @@
 /nbproject/
 /nbactions.xml
 
-# do not ignore the following files
-!.gitattributes
-!.htaccess
-
-
 # ignore the following folders and files
 vendor/
+/composer.lock
 config.properties

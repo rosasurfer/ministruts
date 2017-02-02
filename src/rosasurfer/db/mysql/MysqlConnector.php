@@ -28,9 +28,9 @@ use const rosasurfer\SECONDS;
 
 
 /**
- * MySqlConnector
+ * MysqlConnector
  */
-class MySqlConnector extends Connector {
+class MysqlConnector extends Connector {
 
 
    /** @var bool */                             // logging
@@ -75,7 +75,7 @@ class MySqlConnector extends Connector {
    /**
     * Constructor
     *
-    * Create a new MySqlConnector instance.
+    * Create a new MysqlConnector instance.
     *
     * @param  string[] $config  - connection configuration
     * @param  string[] $options - additional MySQL typical options (default: none)
