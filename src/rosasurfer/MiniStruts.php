@@ -32,7 +32,7 @@ class MiniStruts extends StaticClass {
     * "global-helpers"    - boolean: If set to TRUE, the helper functions and constants defined in namespace "rosasurfer\"
     *                                are additionally mapped to the global namespace.
     *                                default: FALSE (no global helpers)
-    *                                see  {@link ./global-helpers.php}
+    *                                see  {@link ./globals.php}
     *
     * "handle-errors"     - integer: Flag specifying how to handle regular PHP errors. Possible values:
     *                        LOG_ERRORS: PHP errors are logged by the built-in default logger.<br>
@@ -189,7 +189,7 @@ class MiniStruts extends StaticClass {
       }
 
       if ($enabled) {
-         include(MINISTRUTS_ROOT.'/src/rosasurfer/global-helpers.php');
+         include(MINISTRUTS_ROOT.'/src/rosasurfer/globals.php');
       }
    }
 
