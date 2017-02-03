@@ -1,3 +1,10 @@
+2017-02-03
+
+   - reorganize database packages
+   - add db connectors for PostgreSQL and SQLite  
+   - flatten the directory structure (PSR-4 conforming)
+
+
 2017-02-01
 
    - dao/BaseDao: remove public access of property $mapping
