@@ -2,8 +2,7 @@
 /**
  * Framework loader.
  *
- * Load helper functions and constants and register the internal class loader. If Composer is running the class loader
- * automatically replaces it.
+ * Load helper functions and constants and register the internal class loader.
  */
 namespace rosasurfer;
 
@@ -25,14 +24,11 @@ require(MINISTRUTS_ROOT.'/src/ministruts/defines.php');
 /**
  * Register the framework's class loader.
  *
- * If the framework is used in a project not using Composer a class loader for the framework's classes is required.
- * On the other hand if Composer is used this registration has no effect but is done anyway because detecting Composer
- * is not reliable and might fail in the future.
- *
- * The loader is registered after any other registered SPL loaders. To provide backward compatibility an existing
- * __autoload() function is registered first if no other SPL loader is yet registered.
- *
- * Everything is wrapped in a function to prevent modifications of the global scope.
+ * - If the framework is used without Composer a loader for the framework classes is required. If Composer is used this
+ *   class loader simply has no effect.
+ * - The loader is registered after already registered SPL class loaders. To provide backward compatibility to non-SPL
+ *   projects an existing __autoload() function is registered first.
+ * - The registration is wrapped in a function call to prevent modifications of the global scope.
  */
 function registerClassLoader() {
    // check for an existing legacy auto-loader
