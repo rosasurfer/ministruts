@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\struts\url;
+namespace rosasurfer\ministruts\url;
 
 
 /**

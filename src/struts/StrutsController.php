@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\struts;
+namespace rosasurfer\ministruts;
 
 use rosasurfer\cache\Cache;
 use rosasurfer\config\Config;

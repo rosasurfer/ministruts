@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\struts;
+namespace rosasurfer\ministruts;
 
 use rosasurfer\core\Object;
 
@@ -152,7 +152,7 @@ class Module extends Object {
        */
       $currentDir = getCwd();                         // typically dirName(APP_ROOT.'/www/index.php');
 
-      // ins DTD-Verzeichnis wechseln: rosasurfer/struts/xml
+      // ins DTD-Verzeichnis wechseln: src/ministruts/xml
       $dtdDir = __DIR__.'/xml';
       try { chDir($dtdDir); }
       catch (\Exception $ex) { throw new RuntimeException('Could not change working directory to "'.$dtdDir.'"', null, $ex); }

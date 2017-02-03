@@ -17,7 +17,7 @@ use rosasurfer\net\http\CurlHttpClient;
 use rosasurfer\net\http\HttpRequest;
 use rosasurfer\net\http\HttpResponse;
 
-use rosasurfer\struts\Request;
+use rosasurfer\ministruts\Request;
 use rosasurfer\util\PHP;
 
 use function rosasurfer\ksort_r;

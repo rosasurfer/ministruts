@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\struts;
+namespace rosasurfer\ministruts;
 
 use rosasurfer\core\Singleton;
 use rosasurfer\exception\IllegalTypeException;
