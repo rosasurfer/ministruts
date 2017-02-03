@@ -1,7 +1,7 @@
 <?php
 if (PHP_VERSION_ID < 50600) exit('[FATAL] This application requires PHP >= 5.6');
 
-use rosasurfer\ministruts\StrutsController;
+use rosasurfer\struts\StrutsController;
 
 // configure and init the app
 !defined('APPLICATION_ROOT') && define('APPLICATION_ROOT', dirName(__DIR__));

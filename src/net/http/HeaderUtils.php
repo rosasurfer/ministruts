@@ -2,7 +2,7 @@
 namespace rosasurfer\net\http;
 
 use rosasurfer\core\StaticClass;
-use rosasurfer\ministruts\Request;
+use rosasurfer\struts\Request;
 
 use function rosasurfer\strContains;
 

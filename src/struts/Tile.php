@@ -1,13 +1,14 @@
 <?php
-namespace rosasurfer\ministruts;
+namespace rosasurfer\struts;
 
 use rosasurfer\core\Object;
 
 use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\IllegalTypeException;
 
-use const rosasurfer\LOCALHOST;
 use function rosasurfer\strRightFrom;
+
+use const rosasurfer\LOCALHOST;
 
 
 /**

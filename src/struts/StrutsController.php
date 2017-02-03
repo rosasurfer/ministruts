@@ -1,12 +1,9 @@
 <?php
-namespace rosasurfer\ministruts;
-
-use rosasurfer\MiniStruts;
+namespace rosasurfer\struts;
 
 use rosasurfer\cache\Cache;
-
+use rosasurfer\config\Config;
 use rosasurfer\core\Singleton;
-
 use rosasurfer\dependency\FileDependency;
 
 use rosasurfer\exception\FileNotFoundException;
@@ -26,7 +23,6 @@ use const rosasurfer\L_NOTICE;
 use const rosasurfer\LOCALHOST;
 use const rosasurfer\MINUTE;
 use const rosasurfer\WINDOWS;
-use rosasurfer\config\Config;
 
 
 /**

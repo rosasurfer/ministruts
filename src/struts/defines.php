@@ -1,11 +1,11 @@
 <?php
-namespace rosasurfer\ministruts;
+namespace rosasurfer\struts;
 
 
 /**
  * Package constants and functions.
  */
-if (defined('rosasurfer\ministruts\DEFAULT_REQUEST_PROCESSOR_CLASS'))
+if (defined('rosasurfer\struts\DEFAULT_REQUEST_PROCESSOR_CLASS'))
    return;
 
 

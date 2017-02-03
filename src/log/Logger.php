@@ -13,12 +13,11 @@ use rosasurfer\exception\RuntimeException;
 
 use rosasurfer\exception\php\PHPError;
 
-use rosasurfer\ministruts\Request;
-
 use rosasurfer\net\http\CurlHttpClient;
 use rosasurfer\net\http\HttpRequest;
 use rosasurfer\net\http\HttpResponse;
 
+use rosasurfer\struts\Request;
 use rosasurfer\util\PHP;
 
 use function rosasurfer\ksort_r;

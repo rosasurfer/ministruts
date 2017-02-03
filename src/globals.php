@@ -1,9 +1,9 @@
 <?php
 /**
- * Map the helper constants and functions in "rosasurfer/helpers.php" to the global namespace.
+ * Map the helper constants and functions in namespace \rosasurfer to the global namespace.
  */
-use rosasurfer\ministruts\url\Url;
-use rosasurfer\ministruts\url\VersionedUrl;
+use rosasurfer\struts\url\Url;
+use rosasurfer\struts\url\VersionedUrl;
 
 
 // block re-includes
@@ -672,7 +672,7 @@ function pluralize($count, $singular='', $plural='s') {
 /**
  * Return a new URL helper instance. Procedural replacement for
  * <br>
- * <tt>new \rosasurfer\ministruts\url\Url(...)</tt>.
+ * <tt>new \rosasurfer\struts\url\Url(...)</tt>.
  *
  * @param  string $uri - URI part of the URL to generate. If the URI starts with a slash "/" it is interpreted as relative
  *                       to the application's base URI. If the URI doesn't start with a slash "/" it is interpreted as
@@ -688,7 +688,7 @@ function url($uri) {
 /**
  * Return a new version-aware URL helper instance. Procedural replacement for
  * <br>
- * <tt>new \rosasurfer\ministruts\url\VersionedUrl(...)</tt>.
+ * <tt>new \rosasurfer\struts\url\VersionedUrl(...)</tt>.
  *
  * @param  string $uri - URI part of the URL to generate. If the URI starts with a slash "/" it is interpreted as relative
  *                       to the application's base URI. If the URI doesn't start with a slash "/" it is interpreted as

@@ -7,4 +7,4 @@ if (PHP_VERSION_ID < 50600) exit('[FATAL] This library requires PHP >= 5.6'.PHP_
 
 
 // include the framework
-require(__DIR__.'/rosasurfer/loader.php');
+require(__DIR__.'/framework.php');

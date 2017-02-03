@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\ministruts;
+namespace rosasurfer\struts;
 
 use rosasurfer\core\Object;
 

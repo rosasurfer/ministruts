@@ -29,7 +29,7 @@ class MiniStruts extends StaticClass {
     * "config"            - ConfigInterface: config instance
     *                     - string:  Configuration location, can either be a config directory or a config file.
     *
-    * "global-helpers"    - boolean: If set to TRUE, the helper functions and constants defined in namespace "rosasurfer\"
+    * "global-helpers"    - boolean: If set to TRUE, the helper functions and constants defined in namespace \rosasurfer
     *                                are additionally mapped to the global namespace.
     *                                default: FALSE (no global helpers)
     *                                see  {@link ./globals.php}
@@ -124,7 +124,7 @@ class MiniStruts extends StaticClass {
 
       // (6) execute "cache-info" task if enabled
       if ($cacheInfoTask) {
-         //include(MINISTRUTS_ROOT.'/src/rosasurfer/debug/apc.php'); // TODO: not yet implemented
+         //include(MINISTRUTS_ROOT.'/src/debug/apc.php'); // TODO: not yet implemented
          exit(0);
       }
 
@@ -174,7 +174,7 @@ class MiniStruts extends StaticClass {
 
 
    /**
-    * Map the helper constants and functions in "rosasurfer/helpers.php" to the global namespace.
+    * Map the helper constants and functions in namespace \rosasurfer to the global namespace.
     *
     * @param  mixed $value - configuration value as passed to the framework loader
     */
@@ -189,7 +189,7 @@ class MiniStruts extends StaticClass {
       }
 
       if ($enabled) {
-         include(MINISTRUTS_ROOT.'/src/rosasurfer/globals.php');
+         include(MINISTRUTS_ROOT.'/src/globals.php');
       }
    }
 

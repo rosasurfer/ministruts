@@ -1,11 +1,11 @@
 <?php
-namespace rosasurfer\ministruts\url;
+namespace rosasurfer\struts\url;
 
 use rosasurfer\core\Object;
 use rosasurfer\exception\IllegalTypeException;
-use rosasurfer\ministruts\Request;
+use rosasurfer\struts\Request;
 
-use const rosasurfer\ministruts\MODULE_KEY;
+use const rosasurfer\struts\MODULE_KEY;
 
 
 /**
