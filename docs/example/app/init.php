@@ -7,7 +7,7 @@ use rosasurfer\util\PHP;
 
 // check app configuration
 !defined('APPLICATION_ROOT') && define('APPLICATION_ROOT', dirname(__DIR__));
-!defined('APPLICATION_ID'  ) && define('APPLICATION_ID',  'example-app');
+!defined('APPLICATION_ID'  ) && define('APPLICATION_ID',  'example');
 
 
 // load Composer
