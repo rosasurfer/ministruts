@@ -47,7 +47,7 @@ abstract class Mailer extends Object {
     *
     * @return self
     */
-   final public static function create(array $options = null) {
+   public static final function create(array $options = null) {
       if ($options === null)
          $options = array();
 
@@ -130,7 +130,7 @@ abstract class Mailer extends Object {
     * @return mixed - ein Array mit den beiden Adressbestandteilen oder FALSE, wenn die übergebene
     *                 Adresse syntaktisch falsch ist
     */
-   final protected function parseAddress($address) {
+   protected final function parseAddress($address) {
       if (!is_string($address)) throw new IllegalTypeException('Illegal type of parameter $address: '.getType($address));
 
       $address = trim($address);

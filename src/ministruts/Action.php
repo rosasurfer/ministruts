@@ -33,7 +33,7 @@ abstract class Action extends Object {
     *
     * @return ActionMapping
     */
-   final public function getMapping() {
+   public final function getMapping() {
       return $this->mapping;
    }
 

@@ -834,7 +834,7 @@ class Request extends Singleton {
    /**
     * Reject serialization of Request instances.
     */
-   final public function __sleep() {
+   public final function __sleep() {
       throw new IllegalStateException('You must not serialize a '.get_class($this));
    }
 
@@ -842,7 +842,7 @@ class Request extends Singleton {
    /**
     * Reject de-serialization of Request instances.
     */
-   final public function __wakeUp() {
+   public final function __wakeUp() {
       throw new IllegalStateException('You must not deserialize a '.get_class($this));
    }
 

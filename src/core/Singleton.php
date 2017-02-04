@@ -31,7 +31,7 @@ abstract class Singleton extends Object {
     *
     * @return self
     */
-   final public static function getInstance($class/*, ...*/) {
+   public static final function getInstance($class/*, ...*/) {
       if (isSet(self::$instances[$class]))
          return self::$instances[$class];
 
@@ -49,7 +49,7 @@ abstract class Singleton extends Object {
       }
 
       // argument unpacking
-      $instance = $args ? new $class(...$args) : new $class();
+      $instance = !$args ? new $class() : new $class(...$args);
       if (!$instance instanceof self) throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
       self::$instances[$class] = $instance;
 
@@ -63,5 +63,5 @@ abstract class Singleton extends Object {
    /**
     * Verhindert das Clonen von Singleton-Instanzen.
     */
-   final private function __clone() {/* do not clone me */}
+   private final function __clone() {/* do not clone me */}
 }

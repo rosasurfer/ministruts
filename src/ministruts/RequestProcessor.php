@@ -55,7 +55,7 @@ class RequestProcessor extends Object {
     * @param  Request  $request
     * @param  Response $response
     */
-   final public function process(Request $request, Response $response) {
+   public final function process(Request $request, Response $response) {
       // ggf. Session starten oder fortsetzen
       $this->processSession($request, $response);
 

@@ -11,5 +11,5 @@ abstract class StaticClass extends Object {
    /**
     * Locked constructor
     */
-   final private function __construct() {/* you can't call me */}
+   private final function __construct() {/* you can't call me */}
 }
