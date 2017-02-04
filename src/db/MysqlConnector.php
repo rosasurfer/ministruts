@@ -43,12 +43,7 @@ class MysqlConnector extends Connector {
    /** @var int - Queries spending more time for completion than specified are logged with level L_DEBUG. */
    private static $maxQueryTime = 3 * SECONDS;
 
-
-   /** @var resource - connection handle */
-   protected $connection;
-
-
-   /** @var string */                           // connection details
+   /** @var string */
    protected $host;
 
    /** @var string */
@@ -66,8 +61,11 @@ class MysqlConnector extends Connector {
    /** @var string[] */
    protected $options = [];
 
+   /** @var resource - connection handle */
+   protected $connection;
+
    /** @var int - transaction nesting level */
-   protected $transactions = 0;
+   protected $transactionLevel = 0;
 
 
    /**
@@ -296,26 +294,29 @@ class MysqlConnector extends Connector {
     *
     * @param  string $sql - SQL statement
     *
-    * @return array['set' ] - a result resource (for SELECT statements only)
-    *              ['rows'] - number of affected or modified rows (for SELECT/INSERT/UPDATE/DELETE/REPLACE statements only)
+    * @return MysqlResult - Depending on the statement the result may or may not contain a result set.
     */
    public function executeSql($sql) {
-      $result = array('set'  => null,
-                      'rows' => 0);
+      $response = $this->executeRaw($sql);
+      if ($response === true)
+         $response = null;
+      return new MysqlResult($this, $sql, $response);
 
+      /*
       $rawResult = $this->executeRaw($sql);
 
       if (is_resource($rawResult)) {
          $result['set' ] = $rawResult;
          $result['rows'] = mysql_num_rows($rawResult);                  // number of returned rows
       }
-      else /*($result===true)*/ {
+      else {
          $sql = strToLower($sql);
          if (subStr($sql, 0, 6)=='insert' || subStr($sql, 0, 7)=='replace' || subStr($sql, 0, 6)=='update' || subStr($sql, 0, 6)=='delete') {
             $result['rows'] = mysql_affected_rows($this->connection);   // number of affected rows
          }
       }
       return $result;
+      */
    }
 
 
@@ -324,7 +325,7 @@ class MysqlConnector extends Connector {
     *
     * @param  string $sql - SQL statement
     *
-    * @return resource|bool - depending on the statement type a result resource or a boolean
+    * @return resource|bool - a result resource or TRUE (depending on the statement type)
     */
    public function executeRaw($sql) {
       if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
@@ -332,7 +333,7 @@ class MysqlConnector extends Connector {
       !$this->isConnected() && $this->connect();
       self::$logDebug && $startTime=microTime(true);
 
-      // execute statement (it seems mysql_query() never triggers errors on invalid SQL)
+      // execute statement (seems it never triggers an error on invalid SQL but instead only returns FALSE)
       $result = mysql_query($sql, $this->connection);
 
       self::$logDebug && $endTime=microTime(true);
@@ -362,59 +363,59 @@ class MysqlConnector extends Connector {
 
 
    /**
-    * Start a new transaction. If there is already an active transaction only the transaction counter is increased.
+    * Start a new transaction. If there is already an active transaction only the transaction nesting level is increased.
     *
     * @return self
     */
    public function begin() {
-      if ($this->transactions < 0) throw new RuntimeException('Negative transaction counter detected: '.$this->transactions);
+      if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
 
-      if (!$this->transactions)
+      if (!$this->transactionLevel)
          $this->executeRaw('start transaction');
 
-      $this->transactions++;
+      $this->transactionLevel++;
       return $this;
    }
 
 
    /**
-    * Commit an active transaction. If a nested transaction is active only the transaction counter is decreased.
+    * Commit an active transaction. If a nested transaction is active only the transaction nesting level is decreased.
     *
     * @return self
     */
    public function commit() {
-      if ($this->transactions < 0) throw new RuntimeException('Negative transaction counter detected: '.$this->transactions);
+      if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
 
-      if (!$this->transactions) {
+      if (!$this->transactionLevel) {
          Logger::log('No database transaction to commit', L_WARN);
       }
       else {
-         if ($this->transactions == 1)
+         if ($this->transactionLevel == 1)
             $this->executeRaw('commit');
 
-         $this->transactions--;
+         $this->transactionLevel--;
       }
       return $this;
    }
 
 
    /**
-    * Roll back an active transaction. If a nested transaction is active only the transaction counter is decreased. If only
-    * one (the outer most) transaction is active the transaction is rolled back.
+    * Roll back an active transaction. If a nested transaction is active only the transaction nesting level is decreased.
+    * If only one (the outer most) transaction is active the transaction is rolled back.
     *
     * @return self
     */
    public function rollback() {
-      if ($this->transactions < 0) throw new RuntimeException('Negative transaction counter detected: '.$this->transactions);
+      if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
 
-      if (!$this->transactions) {
+      if (!$this->transactionLevel) {
          Logger::log('No database transaction to roll back', L_WARN);
       }
       else {
-         if ($this->transactions == 1)
+         if ($this->transactionLevel == 1)
             $this->executeRaw('rollback');
 
-         $this->transactions--;
+         $this->transactionLevel--;
       }
       return $this;
    }
@@ -426,7 +427,7 @@ class MysqlConnector extends Connector {
     * @return bool
     */
    public function isInTransaction() {
-      return ($this->transactions > 0);
+      return ($this->transactionLevel > 0);
    }
 
 

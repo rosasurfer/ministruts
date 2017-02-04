@@ -89,8 +89,7 @@ abstract class Connector extends Object {
     *
     * @param  string $sql - SQL statement
     *
-    * @return array['set' ] - a result set (for SELECT statements only)
-    *              ['rows'] - number of affected or modified rows (for SELECT/INSERT/UPDATE statements only)
+    * @return Result - Depending on the statement the result may or may not contain a result set.
     */
    abstract public function executeSql($sql);
 
@@ -100,7 +99,7 @@ abstract class Connector extends Object {
     *
     * @param  string $sql - SQL statement
     *
-    * @return mixed
+    * @return mixed - raw driver response
     */
    abstract public function executeRaw($sql);
 

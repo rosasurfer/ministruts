@@ -31,7 +31,7 @@ class PostgresConnector extends Connector {
    private $connectionStr;
 
    /** @var int - transaction nesting level */
-   protected $transactions = 0;
+   protected $transactionLevel = 0;
 
 
    /**
@@ -171,13 +171,11 @@ class PostgresConnector extends Connector {
     *
     * @param  string $sql - SQL statement
     *
-    * @return array['set' ] - a result resource (for SELECT statements only)
-    *              ['rows'] - number of affected or modified rows (for SELECT/INSERT/UPDATE statements only)
+    * @return PostgresResult - Depending on the statement the result may or may not contain a result set.
     */
    public function executeSql($sql) {
-      $result['set' ] = $this->executeRaw($sql);
-      $result['rows'] = -1;                                    // supported but not yet implemented
-      return $result;
+      $response = $this->executeRaw($sql);
+      return new PostgresResult($this, $sql, $response);
    }
 
 
@@ -186,7 +184,7 @@ class PostgresConnector extends Connector {
     *
     * @param  string $sql - SQL statement
     *
-    * @return resource - a result resource
+    * @return resource - always a result resource
     */
    public function executeRaw($sql) {
       if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
@@ -215,17 +213,17 @@ class PostgresConnector extends Connector {
 
 
    /**
-    * Start a new transaction. If there is already an active transaction only the transaction counter is increased.
+    * Start a new transaction. If there is already an active transaction only the transaction nesting level is increased.
     *
     * @return self
     */
    public function begin() {
-      if ($this->transactions < 0) throw new RuntimeException('Negative transaction counter detected: '.$this->transactions);
+      if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
 
-      if (!$this->transactions)
+      if (!$this->transactionLevel)
          $this->executeRaw('begin');
 
-      $this->transactions++;
+      $this->transactionLevel++;
       return $this;
    }
 
@@ -236,38 +234,38 @@ class PostgresConnector extends Connector {
     * @return self
     */
    public function commit() {
-      if ($this->transactions < 0) throw new RuntimeException('Negative transaction counter detected: '.$this->transactions);
+      if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
 
-      if (!$this->transactions) {
+      if (!$this->transactionLevel) {
          Logger::log('No database transaction to commit', L_WARN);
       }
       else {
-         if ($this->transactions == 1)
+         if ($this->transactionLevel == 1)
             $this->executeRaw('commit');
 
-         $this->transactions--;
+         $this->transactionLevel--;
       }
       return $this;
    }
 
 
    /**
-    * Roll back an active transaction. If a nested transaction is active only the transaction counter is decreased. If only
-    * one (the outer most) transaction is active the transaction is rolled back.
+    * Roll back an active transaction. If a nested transaction is active only the transaction nesting level is decreased.
+    * If only one (the outer most) transaction is active the transaction is rolled back.
     *
     * @return self
     */
    public function rollback() {
-      if ($this->transactions < 0) throw new RuntimeException('Negative transaction counter detected: '.$this->transactions);
+      if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
 
-      if (!$this->transactions) {
+      if (!$this->transactionLevel) {
          Logger::log('No database transaction to roll back', L_WARN);
       }
       else {
-         if ($this->transactions == 1)
+         if ($this->transactionLevel == 1)
             $this->executeRaw('rollback');
 
-         $this->transactions--;
+         $this->transactionLevel--;
       }
       return $this;
    }
@@ -279,6 +277,6 @@ class PostgresConnector extends Connector {
     * @return bool
     */
    public function isInTransaction() {
-      return ($this->transactions > 0);
+      return ($this->transactionLevel > 0);
    }
 }

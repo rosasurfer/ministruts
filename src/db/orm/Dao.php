@@ -2,6 +2,7 @@
 namespace rosasurfer\db\orm;
 
 use rosasurfer\core\Singleton;
+use rosasurfer\db\Result;
 
 use rosasurfer\exception\ConcurrentModificationException;
 use rosasurfer\exception\InvalidArgumentException;
@@ -16,15 +17,13 @@ abstract class Dao extends Singleton {
 
 
    // Mapping-Constanten
-   const T_BOOL     = 1;               // bool
-   const T_BOOLEAN  = self::T_BOOL;
-   const T_INT      = 2;               // int
-   const T_INTEGER  = self::T_INT;
-   const T_FLOAT    = 3;               // float
-   const T_STRING   = 4;               // string
-   const T_SET      = 5;               // set
-   const T_NULL     = true;            // null
-   const T_NOT_NULL = false;           // not null
+   const T_BOOL     = 1;
+   const T_INT      = 2;
+   const T_FLOAT    = 3;
+   const T_STRING   = 4;
+   const T_SET      = 5;
+   const T_NULL     = true;
+   const T_NOT_NULL = false;
 
 
    /** @var array - database mapping; "abstract" member, must be re-defined in the concrete DAO */
@@ -60,32 +59,38 @@ abstract class Dao extends Singleton {
 
 
    /**
-    * single object getter
+    * Find a single record and convert it to an object of the model class.
+    *
+    * @param  string $query - SQL query
+    *
+    * @return PersistableObject
     */
-   final public function fetchOne($sql) {
-      return $this->getWorker()->fetchOne($sql);
+   public function findOne($query) {
+      return $this->getWorker()->findOne($query);
    }
 
 
    /**
-    * object list getter
+    * Find multiple records and convert them to objects of the model class.
+    *
+    * @param  string $query - SQL query
+    *
+    * @return PersistableObject[]
     */
-   final public function fetchAll($sql, $count = false) {
-      return $this->getWorker()->fetchAll($sql, $count);
+   public function findMany($query) {
+      return $this->getWorker()->findMany($query);
    }
 
 
    /**
-    * Führt eine SQL-Anweisung aus. Gibt das Ergebnis als mehrdimensionales Array zurück.
+    * Execute a SQL statement and return the result.
     *
-    * @param  string $sql   - SQL-Anweisung
-    * @param  bool   $count - ob der interne Ergebniszähler aktualisiert werden soll
+    * @param  string $sql - SQL statement
     *
-    * @return array['set' ] - das zurückgegebene Resultset (nur bei SELECT-Statement)
-    *              ['rows'] - Anzahl der betroffenen Datensätze (nur bei SELECT/INSERT/UPDATE-Statement)
+    * @return Result - Depending on the statement type the result may or may not contain a result set.
     */
-   final public function executeSql($sql, $count = false) {
-      return $this->getWorker()->executeSql($sql, $count);
+   public function executeSql($sql) {
+      return $this->getWorker()->executeSql($sql);
    }
 
 
@@ -94,7 +99,7 @@ abstract class Dao extends Singleton {
     *
     * @return array
     */
-   final public function getMapping() {
+   public final function getMapping() {
       return $this->mapping;
    }
 
@@ -104,7 +109,7 @@ abstract class Dao extends Singleton {
     *
     * @return string - Klassenname
     */
-   final public function getEntityClass() {
+   public final function getEntityClass() {
       return $this->entityClass;
    }
 
@@ -114,7 +119,7 @@ abstract class Dao extends Singleton {
     *
     * @return Connector
     */
-   final public function getConnector() {
+   public final function getConnector() {
       return $this->getWorker()->getConnector();
    }
 
@@ -126,7 +131,7 @@ abstract class Dao extends Singleton {
     *
     * @return Connector
     */
-   final public function getDb() {
+   public final function getDb() {
       return $this->getConnector();
    }
 
@@ -152,7 +157,7 @@ abstract class Dao extends Singleton {
     *
     * @return PersistableObject
     */
-   public final function refresh(PersistableObject $object) {
+   public function refresh(PersistableObject $object) {
       $class = $this->getEntityClass();
       if (!$object instanceof $class) throw new InvalidArgumentException('Cannot refresh instances of '.get_class($object));
       if (!$object->isPersistent())   throw new InvalidArgumentException('Cannot refresh non-persistent '.get_class($object));
@@ -162,9 +167,9 @@ abstract class Dao extends Singleton {
       $id        = $object->getId();
 
       $sql = "select *
-                 from `$tablename`
+                 from $tablename
                  where id = $id";
-      $instance = $this->fetchOne($sql);
+      $instance = $this->findOne($sql);
 
       if (!$instance) throw new ConcurrentModificationException('Error refreshing '.get_class($object).' ('.$id.'), data row not found');
 

@@ -2,38 +2,34 @@
 namespace rosasurfer\db\orm;
 
 use rosasurfer\core\Object;
-use rosasurfer\db\ConnectionPool;
 
-use rosasurfer\exception\DatabaseException;
-use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\db\ConnectionPool;
+use rosasurfer\db\Result;
 
 
 /**
  * Worker
  *
- * Ein Worker implementiert eine konkrete Caching-Strategie. Zu jeder persistenten Klasse gehört
- * genau ein Worker.
+ * A Worker converts database records to PHP objects. For every model class exists exactly one Worker instance.
+ * Only one PHP object is created for database records returned multiple times (e.g. by multiple queries).
  */
 class Worker extends Object {
 
 
-   /** @var Dao - DAO der Entity-Klasse dieses Workers */
-   private $dao;
+   /** @var Dao - Dao of the Worker's model class */
+   private   $dao;
 
-   /** @var string - Name der Entity-Klasse dieses Workers */
+   /** @var string - class name of the Worker's model */
    protected $entityClass;
 
-   /** @var Connector - DB-Adapter der Entity-Klasse dieses Workers */
-   private $adapter;
-
-   /** @var int */
-   private $foundItemsCounter = 0;
+   /** @var Connector - database adapter of the Worker's model */
+   private   $connector;
 
 
    /**
     * Constructor
     *
-    * Erzeugt einen neuen Worker für den angegebenen DAO.
+    * Create a new Worker for the specified Dao.
     *
     * @param  Dao $dao
     */
@@ -44,113 +40,90 @@ class Worker extends Object {
 
 
    /**
-    * single object getter
+    * Find a single record and convert it to an object of the model class.
+    *
+    * @param  string $query - SQL query
+    *
+    * @return PersistableObject
     */
-   public function fetchOne($sql) {
-      $result = $this->executeSql($sql);
+   public function findOne($query) {
+      $result = $this->executeSql($query);
       return $this->makeObject($result);
    }
 
 
    /**
-    * object's list getter
+    * Find multiple records and convert them to objects of the model class.
+    *
+    * @param  string $query - SQL query
+    *
+    * @return PersistableObject[]
     */
-   public function fetchAll($sql, $count = false) {
-      $result = $this->executeSql($sql, $count);
+   public function findMany($query) {
+      $result = $this->executeSql($query);
       return $this->makeObjects($result);
    }
 
 
    /**
-    * Führt eine SQL-Anweisung aus. Gibt das Ergebnis als mehrdimensionales Array zurück.
+    * Execute a SQL statement and return the result.
     *
-    * @param  string $sql   - SQL-Anweisung
-    * @param  bool   $count - ob der interne Ergebniszähler aktualisiert werden soll
+    * @param  string $sql - SQL statement
     *
-    * @return array['set' ] - das zurückgegebene Resultset (nur bei SELECT-Statement)
-    *              ['rows'] - Anzahl der betroffenen Datensätze (nur bei SELECT/INSERT/UPDATE-Statement)
+    * @return Result - Depending on the statement type the result may or may not contain a result set.
     */
-   public function executeSql($sql, $count = false) {
-      $result = $this->getConnector()->executeSql($sql);
-
-      if ($count) {
-         $result2 = $this->executeSql('select found_rows()');
-         $this->foundItemsCounter = (int) mysql_result($result2['set'], 0);
-      }
-      else {
-         $this->foundItemsCounter = $result['rows'];
-      }
-
-      return $result;
+   public function executeSql($sql) {
+      return $this->getConnector()->executeSql($sql);
    }
 
 
    /**
-    * Gibt den Wert des internen Ergebniszählers zurück. Kann bei seitenweiser Ergebnisanzeige
-    * statt einer zweiten Datenbankabfrage benutzt werden.
-    * (siehe found_rows():  http://dev.mysql.com/doc/refman/5.1/en/information-functions.html)
+    * Convert the next row of a Result to an object of the model class.
     *
-    * @return int - Gesamtanzahl von Ergebnissen der letzten Abfrage (ohne Berücksichtigung einer LIMIT-Klausel)
+    * @param  Result $result
+    *
+    * @return PersistableObject - instance or NULL if the Result doesn't hold any more rows
     */
-   public function countFoundItems() {
-      return $this->foundItemsCounter;
+   protected function makeObject(Result $result) {
+
+      // TODO: Lookup and return an existing instance instead of a copy.
+
+      $row = $result->fetchNext();
+      if ($row)
+         return PersistableObject::createInstance($this->entityClass, $row);
+      return null;
    }
 
 
    /**
-    * Konvertiert ein eindeutiges DB-Resultset in eine PersistableObject-Instanz.
+    * Convert all remaining rows of a Result to objects of the model class.
     *
-    * @param  array $result - Rückgabewert einer Datenbankabfrage
+    * @param  Result $result
     *
-    * @return array - Instanz
-    *
-    * @throws DatabaseException - wenn ein mehrzeiliges Resultset übergeben wird
+    * @return PersistableObject[] - arry of instances or an empty array if the Result doesn't hold any more rows
     */
-   public function makeObject(array $result) {
-      if (getType($result['set']) != 'resource') throw new IllegalTypeException('Illegal type of parameter $result[set]: '.getType($result['set']));
-      if ($result['rows'] > 1)                   throw new DatabaseException('Unexpected non-unique query result: '.$result);
+   protected function makeObjects(Result $result) {
 
-      $instance = null;
-
-      if ($result['rows']) {
-         $row = mysql_fetch_assoc($result['set']);
-         $instance = PersistableObject::createInstance($this->entityClass, $row);
-      }
-
-      return $instance;
-   }
-
-
-   /**
-    * Konvertiert ein DB-Resultset in PersistableObject-Instanzen.
-    *
-    * @param  array $result - Rückgabewert einer Datenbankabfrage
-    *
-    * @return array - Instanzen
-    */
-   public function makeObjects(array $result) {
-      if (getType($result['set']) != 'resource') throw new IllegalTypeException('Illegal type of parameter $result[set]: '.getType($result['set']));
+      // TODO: Lookup and return existing instances instead of copies.
 
       $instances = array();
-
-      while ($row = mysql_fetch_assoc($result['set'])) {
+      while ($row = $result->fetchNext()) {
          $instances[] = PersistableObject::createInstance($this->entityClass, $row);
       }
-
       return $instances;
    }
 
 
    /**
-    * Gibt den der persistenten Klasse zugrunde liegenden DB-Adapter zurück.
+    * Return the database adapter of the Worker's model class.
     *
     * @return Connector
     */
    public function getConnector() {
-      if (!$this->adapter) {
+      if (!$this->connector) {
          $mapping = $this->dao->getMapping();
-         $this->adapter = ConnectionPool::getConnector($mapping['connection']);
+         $this->connector = ConnectionPool::getConnector($mapping['connection']);
       }
-      return $this->adapter;
+      return $this->connector;
    }
 }

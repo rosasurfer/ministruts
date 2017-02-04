@@ -1,6 +1,9 @@
 <?php
 namespace rosasurfer\db;
 
+use \SQLite3;
+use \SQLite3Result;
+
 use rosasurfer\exception\DatabaseException;
 use rosasurfer\exception\InfrastructureException;
 use rosasurfer\exception\RuntimeException;
@@ -17,17 +20,17 @@ use const rosasurfer\NL;
 class SqliteConnector extends Connector {
 
 
-   /** @var \SQLite3 - the handler instance */
+   /** @var SQLite3 - database handler instance */
    protected $handler;
 
-   /** @var string - the database file to connect to */
+   /** @var string - database file to connect to */
    protected $file;
 
    /** @var string[] */
    protected $options = [];
 
    /** @var int - transaction nesting level */
-   protected $transactions = 0;
+   protected $transactionLevel = 0;
 
 
    /**
@@ -81,9 +84,9 @@ class SqliteConnector extends Connector {
     */
    protected function connect() {
       try {                                                          // available flags:
-         $flags = SQLITE3_OPEN_READWRITE ;      // SQLITE3_OPEN_READONLY| SQLITE3_OPEN_CREATE
+         $flags = SQLITE3_OPEN_READWRITE ;   // SQLITE3_OPEN_READONLY| SQLITE3_OPEN_CREATE
                                                                      // SQLITE3_OPEN_READWRITE
-         $handler = new \SQLite3($this->file, $flags);               // SQLITE3_OPEN_CREATE
+         $handler = new SQLite3($this->file, $flags);                // SQLITE3_OPEN_CREATE
       }
       catch (\Exception $ex) {
          $file = $this->file;
@@ -136,16 +139,13 @@ class SqliteConnector extends Connector {
     *
     * @param  string $sql - SQL statement
     *
-    * @return array['set' ] - \SQLite3Result (for SELECT statements only)
-    *              ['rows'] - number of affected or modified rows (for SELECT/INSERT/UPDATE statements only)
+    * @return SqliteResult - Depending on the statement the result may or may not contain a result set.
     */
    public function executeSql($sql) {
-      $retval = $this->executeRaw($sql);
-
-      $result['set' ] = is_object($retval) ? $retval : null;
-      $result['rows'] = -1;                                          // no SQLite row count support
-
-      return $result;
+      $response = $this->executeRaw($sql);
+      if ($response === true)
+         $response = null;
+      return new SqliteResult($this, $sql, $response);
    }
 
 
@@ -154,7 +154,7 @@ class SqliteConnector extends Connector {
     *
     * @param  string $sql - SQL statement
     *
-    * @return \SQLite3Result|bool - SQLite3Result or TRUE (depending on the statement)
+    * @return SQLite3Result|bool - SQLite3Result or TRUE (depending on the statement)
     */
    public function executeRaw($sql) {
       if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
@@ -183,17 +183,17 @@ class SqliteConnector extends Connector {
 
 
    /**
-    * Start a new transaction. If there is already an active transaction only the transaction counter is increased.
+    * Start a new transaction. If there is already an active transaction only the transaction nesting level is increased.
     *
     * @return self
     */
    public function begin() {
-      if ($this->transactions < 0) throw new RuntimeException('Negative transaction counter detected: '.$this->transactions);
+      if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
 
-      if (!$this->transactions)
+      if (!$this->transactionLevel)
          $this->executeRaw('begin');
 
-      $this->transactions++;
+      $this->transactionLevel++;
       return $this;
    }
 
@@ -204,38 +204,38 @@ class SqliteConnector extends Connector {
     * @return self
     */
    public function commit() {
-      if ($this->transactions < 0) throw new RuntimeException('Negative transaction counter detected: '.$this->transactions);
+      if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
 
-      if (!$this->transactions) {
+      if (!$this->transactionLevel) {
          Logger::log('No database transaction to commit', L_WARN);
       }
       else {
-         if ($this->transactions == 1)
+         if ($this->transactionLevel == 1)
             $this->executeRaw('commit');
 
-         $this->transactions--;
+         $this->transactionLevel--;
       }
       return $this;
    }
 
 
    /**
-    * Roll back an active transaction. If a nested transaction is active only the transaction counter is decreased. If only
-    * one (the outer most) transaction is active the transaction is rolled back.
+    * Roll back an active transaction. If a nested transaction is active only the transaction nesting level is decreased.
+    * If only one (the outer most) transaction is active the transaction is rolled back.
     *
     * @return self
     */
    public function rollback() {
-      if ($this->transactions < 0) throw new RuntimeException('Negative transaction counter detected: '.$this->transactions);
+      if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
 
-      if (!$this->transactions) {
+      if (!$this->transactionLevel) {
          Logger::log('No database transaction to roll back', L_WARN);
       }
       else {
-         if ($this->transactions == 1)
+         if ($this->transactionLevel == 1)
             $this->executeRaw('rollback');
 
-         $this->transactions--;
+         $this->transactionLevel--;
       }
       return $this;
    }
@@ -247,6 +247,6 @@ class SqliteConnector extends Connector {
     * @return bool
     */
    public function isInTransaction() {
-      return ($this->transactions > 0);
+      return ($this->transactionLevel > 0);
    }
 }

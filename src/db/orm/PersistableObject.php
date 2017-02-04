@@ -3,7 +3,6 @@ namespace rosasurfer\db\orm;
 
 use rosasurfer\core\Object;
 use rosasurfer\core\Singleton;
-
 use rosasurfer\db\Connector;
 
 use rosasurfer\exception\InvalidArgumentException;
@@ -47,11 +46,12 @@ abstract class PersistableObject extends Object {
     * Default constructor. Final and used only by the ORM. To create new instances define and use static helper methods.
     *
     * @example
+    *
     *  class MyClass extends PersistableObject {
     *
     *     public static function create($properties, ...) {
     *        $instance = new static();
-    *        // define properties...
+    *        // set properties...
     *        return $instance;
     *     }
     *  }
@@ -59,7 +59,7 @@ abstract class PersistableObject extends Object {
     *  $object = MyClass::create('foo');
     *  $object->save();
     */
-   final protected function __construct() {
+   protected final function __construct() {
       $this->created = $this->touch();
    }
 
@@ -158,7 +158,7 @@ abstract class PersistableObject extends Object {
     *
     * @return self
     */
-   final public function save() {
+   public final function save() {
       if (!$this->isPersistent()) {
          $this->insert();
       }
@@ -220,7 +220,7 @@ abstract class PersistableObject extends Object {
     * rows originating from database queries to objects of the respective model class.
     *
     * @param  string $class - class name of the model
-    * @param  array  $row   - array holding property values (typically a single row from a database table)
+    * @param  array  $row   - array with property values (typically a row from a database table)
     *
     * @return self
     */
@@ -228,20 +228,23 @@ abstract class PersistableObject extends Object {
       $object = new $class();
       if (!$object instanceof self) throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
 
+      echoPre($row);
+
+      $row      = array_change_key_case($row, CASE_LOWER);
       $mappings = $object->dao()->getMapping();
 
       foreach ($mappings['fields'] as $property => $mapping) {
-         $column = $mapping[0];
+         $column = strToLower($mapping[0]);
 
          if ($row[$column] !== null) {
             $type = $mapping[1];
 
             switch ($type) {
                case Dao::T_STRING: $object->$property =         $row[$column]; break;
+               case Dao::T_BOOL  : $object->$property =  (bool) $row[$column]; break;
                case Dao::T_INT   : $object->$property =   (int) $row[$column]; break;
                case Dao::T_FLOAT : $object->$property = (float) $row[$column]; break;
-               case Dao::T_BOOL  : $object->$property =  (bool) $row[$column]; break;
-               case Dao::T_SET   : $object->$property = strLen($row[$column]) ? explode(',', $row[$column]) : []; break;
+               case Dao::T_SET   : $object->$property =  strLen($row[$column]) ? explode(',', $row[$column]) : []; break;
 
                default: throw new InvalidArgumentException('Unknown data type "'.$type.'" in database mapping of '.$class.'::'.$property);
             }
@@ -279,7 +282,7 @@ abstract class PersistableObject extends Object {
     *
     * @return Connector
     */
-   final public static function getDb() {
+   public static final function getDb() {
       return self::getConnector();
    }
 }
