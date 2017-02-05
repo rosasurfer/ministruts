@@ -63,6 +63,9 @@ class MysqlConnector extends Connector {
    /** @var resource - connection handle */
    protected $connection;
 
+   /** @var int - last number of affected rows */
+   protected $affectedRows = 0;
+
    /** @var int - transaction nesting level */
    protected $transactionLevel = 0;
 
@@ -300,22 +303,6 @@ class MysqlConnector extends Connector {
       if ($response === true)
          $response = null;
       return new MysqlResult($this, $sql, $response);
-
-      /*
-      $rawResult = $this->executeRaw($sql);
-
-      if (is_resource($rawResult)) {
-         $result['set' ] = $rawResult;
-         $result['rows'] = mysql_num_rows($rawResult);                  // number of returned rows
-      }
-      else {
-         $sql = strToLower($sql);
-         if (subStr($sql, 0, 6)=='insert' || subStr($sql, 0, 7)=='replace' || subStr($sql, 0, 6)=='update' || subStr($sql, 0, 6)=='delete') {
-            $result['rows'] = mysql_affected_rows($this->connection);   // number of affected rows
-         }
-      }
-      return $result;
-      */
    }
 
 
@@ -329,35 +316,48 @@ class MysqlConnector extends Connector {
    public function executeRaw($sql) {
       if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
 
-      !$this->isConnected() && $this->connect();
+      if (!$this->isConnected())
+         $this->connect();
       self::$logDebug && $startTime=microTime(true);
 
       // execute statement (seems it never triggers an error on invalid SQL but instead only returns FALSE)
       $result = mysql_query($sql, $this->connection);
 
-      self::$logDebug && $endTime=microTime(true);
-
-      // calculate statement duration
       if (!$result) {
          $message = ($errno=mysql_errno()) ? 'SQL-Error '.$errno.': '.mysql_error() : 'Can not connect to MySQL server';
-
-         self::$logDebug &&  $message .=  ' (time: '.round($endTime-$startTime, 4).' seconds)';
                              $message .= NL.' SQL: "'.$sql.'"';
          if ($errno == 1205) $message .= NL.NL.$this->printProcessList   ($return=true); // Lock wait timeout exceeded
          if ($errno == 1213) $message .= NL.NL.$this->printDeadlockStatus($return=true); // Deadlock found when trying to get lock
-
          throw new DatabaseException($message);
       }
 
+      // Get number of rows affected by the last INSERT/UPDATE/DELETE/REPLACE statement. The PHP mysqlnd driver updates this
+      // value for all SQL statements, special care has to be taken to not lose the original correct value.
+      $s = strToLower(subStr(trim($sql), 0, 7));
+      if (strPos($s, 'insert')===0 || strPos($s, 'update')===0 || strPos($s, 'delete')===0 || strPos($s, 'replace')===0) {
+         $this->affectedRows = mysql_affected_rows($this->connection);
+      }
 
-      // log statements exceeding $maxQueryTime
+      // L_DEBUG: log statements exceeding $maxQueryTime
       if (self::$logDebug) {
+         $endTime   = microTime(true);
          $spentTime = round($endTime-$startTime, 4);
          if ($spentTime > self::$maxQueryTime)
             Logger::log('SQL statement took more than '.self::$maxQueryTime.' seconds: '.$spentTime.NL.$sql, L_DEBUG);
            //Logger::log($this->printDeadlockStatus(true), L_DEBUG);
       }
       return $result;
+   }
+
+
+   /**
+    * Return the number of rows affected by the last INSERT/UPDATE/DELETE/REPLACE statement. REPLACE is a MySQL extension
+    * standing for a DELETE followed by an INSERT.
+    *
+    * @return int
+    */
+   public function affectedRows() {
+      return (int) $this->affectedRows;
    }
 
 

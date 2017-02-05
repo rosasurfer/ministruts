@@ -33,24 +33,24 @@ abstract class Result extends Object {
    /**
     * Fetch a single field of a row from the result set.
     *
-    * @param  string|int $column   - name or offset of the column to fetch from (default: 0)
-    * @param  int        $row      - row to fetch from, starting at 0 (default: the next row)
-    * @param  mixed      $onNoRows - alternative value to return if no (more) rows are available
+    * @param  string|int $column       - name or offset of the column to fetch from (default: 0)
+    * @param  int        $row          - row to fetch from, starting at 0 (default: the next row)
+    * @param  mixed      $onNoMoreRows - alternative value to return if no (more) rows are available
     *
     * @return mixed - content of a single cell (can be NULL)
     *
     * @throws NoMoreRowsException if no (more) rows are available and parameter $alt was not specified
     */
-   public function fetchField($column=0, $row=null, $onNoRows=null) {
+   public function fetchField($column=0, $row=null, $onNoMoreRows=null) {
       if (!is_null($row)) throw new UnimplementedFeatureException('$row='.$row.' (!= NULL)');
 
-      // TODO: This is a cross-platform implementation. A Connector might be able to fetch a specific field more efficiently.
+      // TODO: This cross-platform implementation might not be as efficient as a driver-specific Result could be.
 
       $row = $this->fetchNext(ARRAY_BOTH);
 
       if (!$row) {
          if (func_num_args() < 3) throw new NoMoreRowsException();
-         return $onNoRows;
+         return $onNoMoreRows;
       }
 
       if ($column===0 || is_null($column))
@@ -70,6 +70,14 @@ abstract class Result extends Object {
 
 
    /**
+    * Return the number of rows in the result set.
+    *
+    * @return int
+    */
+   abstract public function numRows();
+
+
+   /**
     * Get the underlying driver's original result object.
     *
     * @return mixed
@@ -78,25 +86,29 @@ abstract class Result extends Object {
 
 
    /**
-    * Gibt den Wert des internen Ergebniszählers zurück. Kann bei seitenweiser Ergebnisanzeige
+    * Gibt den Wert des internen Ergebniszaehlers zurück. Kann bei seitenweiser Ergebnisanzeige
     * statt einer zweiten Datenbankabfrage benutzt werden.
-    * (siehe found_rows():  http://dev.mysql.com/doc/refman/5.1/en/information-functions.html)
     *
-    * @return int - Gesamtanzahl von Ergebnissen der letzten Abfrage (ohne Berücksichtigung einer LIMIT-Klausel)
+    * @return int - Gesamtanzahl von Ergebnissen der letzten Abfrage (ohne Beruecksichtigung einer LIMIT-Klausel)
     *
    public function countFoundItems() {
       return $this->foundItemsCounter;
-
       /*
       if ($count) {
-         $result2 = $this->executeSql('select found_rows()');
-         $this->foundItemsCounter = (int) mysql_result($result2['set'], 0);
+         $result = $this->executeSql('select found_rows()');
+         $this->foundItemsCounter = (int) $result->fetchField();
       }
-      else {
-         $this->foundItemsCounter = $result['rows'];
-      }
-      return $result;
       *\/
+   }
+   */
+
+
+   /*
+   $rawResult = $this->executeRaw($sql);
+
+   if (is_resource($rawResult)) {
+      $resultSet     = $rawResult;
+      $resultNumRows = mysql_num_rows($rawResult);                   // number of returned rows
    }
    */
 }

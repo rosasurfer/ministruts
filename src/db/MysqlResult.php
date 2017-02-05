@@ -24,6 +24,9 @@ class MysqlResult extends Result {
    /** @var resource - the underlying driver's original result resource */
    protected $resultSet;
 
+   /** @var int */
+   protected $numRows;
+
 
    /**
     * Constructor
@@ -67,20 +70,32 @@ class MysqlResult extends Result {
 
 
    /**
+    * Return the number of rows in the result set.
+    *
+    * @return int
+    */
+   public function numRows() {
+      if ($this->numRows === null) {
+         if ($this->resultSet) $this->numRows = mysql_num_rows($this->resultSet);
+         else                  $this->numRows = 0;
+      }
+      return $this->numRows;
+   }
+
+
+   /**
     * Fetch a single field of a row from the result set.
     *
-    * @param  string|int $column   - name or offset of the column to fetch from (default: 0)
-    * @param  int        $row      - row to fetch from, starting at 0 (default: the next row)
-    * @param  mixed      $onNoRows - alternative value to return if no (more) rows are available
+    * @param  string|int $column       - name or offset of the column to fetch from (default: 0)
+    * @param  int        $row          - row to fetch from, starting at 0 (default: the next row)
+    * @param  mixed      $onNoMoreRows - alternative value to return if no (more) rows are available
     *
     * @return mixed - content of a single cell (can be NULL)
     *
     * @throws NoMoreRowsException if no (more) rows are available and parameter $alt was not specified
     *
-   public function fetchField($column=null, $row=null, $onNoRows=null) {
-
+   public function fetchField($column=null, $row=null, $onNoMoreRows=null) {
       // TODO: mysql_result() compares column names in a case-insensitive way (no manual fiddling needed)
-
       return mysql_result($this->resultSet, $row=0, $column);
    }
    */

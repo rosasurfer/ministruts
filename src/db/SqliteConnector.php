@@ -11,6 +11,7 @@ use rosasurfer\log\Logger;
 
 use const rosasurfer\L_WARN;
 use const rosasurfer\NL;
+use rosasurfer\exception\UnimplementedFeatureException;
 
 
 /**
@@ -178,6 +179,16 @@ class SqliteConnector extends Connector {
          throw $ex;
       }
       return $result;
+   }
+
+
+   /**
+    * Return the number of rows affected by the last INSERT/UPDATE/DELETE statement.
+    *
+    * @return int
+    */
+   public function affectedRows() {
+      throw new UnimplementedFeatureException();
    }
 
 

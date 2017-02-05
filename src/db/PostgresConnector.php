@@ -9,6 +9,7 @@ use rosasurfer\log\Logger;
 use function rosasurfer\strContains;
 
 use const rosasurfer\L_WARN;
+use rosasurfer\exception\UnimplementedFeatureException;
 
 
 /**
@@ -208,6 +209,16 @@ class PostgresConnector extends Connector {
          throw $ex;
       }
       return $result;
+   }
+
+
+   /**
+    * Return the number of rows affected by the last INSERT/UPDATE/DELETE statement.
+    *
+    * @return int
+    */
+   public function affectedRows() {
+      throw new UnimplementedFeatureException();
    }
 
 

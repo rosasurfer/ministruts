@@ -24,6 +24,9 @@ class PostgresResult extends Result {
    /** @var resource - the underlying driver's original result resource */
    protected $resultSet;
 
+   /** @var int */
+   protected $numRows;
+
 
    /**
     * Constructor
@@ -63,6 +66,20 @@ class PostgresResult extends Result {
          default:          $mode = PGSQL_BOTH;
       }
       return pg_fetch_array($this->resultSet, null, $mode) ?: null;
+   }
+
+
+   /**
+    * Return the number of rows in the result set.
+    *
+    * @return int
+    */
+   public function numRows() {
+      if ($this->numRows === null) {
+         if ($this->resultSet) $this->numRows = pg_num_rows($this->resultSet);
+         else                  $this->numRows = 0;
+      }
+      return $this->numRows;
    }
 
 

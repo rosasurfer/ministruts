@@ -105,6 +105,14 @@ abstract class Connector extends Object {
 
 
    /**
+    * Return the number of rows affected by the last INSERT/UPDATE/DELETE statement.
+    *
+    * @return int
+    */
+   abstract public function affectedRows();
+
+
+   /**
     * Start a new transaction.
     *
     * @return self

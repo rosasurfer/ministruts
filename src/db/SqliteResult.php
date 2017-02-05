@@ -9,6 +9,7 @@ use rosasurfer\exception\IllegalTypeException;
 use const rosasurfer\ARRAY_ASSOC;
 use const rosasurfer\ARRAY_BOTH;
 use const rosasurfer\ARRAY_NUM;
+use rosasurfer\exception\UnimplementedFeatureException;
 
 
 /**
@@ -26,6 +27,9 @@ class SqliteResult extends Result {
 
    /** @var SQLite3Result - the underlying driver's original result object */
    protected $resultSet;
+
+   /** @var int */
+   protected $numRows;
 
 
    /**
@@ -66,6 +70,22 @@ class SqliteResult extends Result {
          default:          $mode = SQLITE3_BOTH;
       }
       return $this->resultSet->fetchArray($mode) ?: null;
+   }
+
+
+   /**
+    * Return the number of rows in the result set.
+    *
+    * @return int
+    */
+   public function numRows() {
+      throw new UnimplementedFeatureException();
+
+      if ($this->numRows === null) {
+         if ($this->resultSet) $this->numRows = mysql_num_rows($this->resultSet);
+         else                  $this->numRows = 0;
+      }
+      return $this->numRows;
    }
 
 
