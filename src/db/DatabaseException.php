@@ -1,9 +1,11 @@
 <?php
-namespace rosasurfer\exception;
+namespace rosasurfer\db;
+
+use rosasurfer\exception\RuntimeException;
 
 
 /**
  * DatabaseException
  */
-class DatabaseException extends InfrastructureException {
+class DatabaseException extends RuntimeException {
 }
