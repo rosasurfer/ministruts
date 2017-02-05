@@ -63,7 +63,7 @@ class Object {
    public function __set($property, $value) {
       $trace = debug_backTrace(DEBUG_BACKTRACE_IGNORE_ARGS|DEBUG_BACKTRACE_PROVIDE_OBJECT);
       $class = get_class($trace[0]['object']);
-      throw new RuntimeException('Undefined class variable '.$class.'::'.$property);
+      throw new RuntimeException('Undefined class variable '.$class.'::$'.$property);
    }
 
 

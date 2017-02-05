@@ -3,6 +3,14 @@ namespace rosasurfer\db;
 
 use rosasurfer\core\Object;
 
+use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\exception\InvalidArgumentException;
+use rosasurfer\exception\UnimplementedFeatureException;
+
+use const rosasurfer\ARRAY_ASSOC;
+use const rosasurfer\ARRAY_BOTH;
+use const rosasurfer\ARRAY_NUM;
+
 
 /**
  * Represents the result of an executed SQL statement. Depending on the statement type the result may or may not contain
@@ -12,11 +20,61 @@ abstract class Result extends Object {
 
 
    /**
-    * Fetch the next row from the result set (if any).
+    * Fetch the next row from the result set.
     *
-    * @return mixed[] - associative array of columns or NULL if no more rows are available
+    * @param  int $mode - Controls how the returned array is indexed. Can take one of the following values:
+    *                     ARRAY_ASSOC, ARRAY_NUM, or ARRAY_BOTH (default).
+    *
+    * @return array - array of columns or NULL if no (more) rows are available
     */
-   abstract public function fetchNext();
+   abstract public function fetchNext($mode=ARRAY_BOTH);
+
+
+   /**
+    * Fetch a single field of a row from the result set.
+    *
+    * @param  string|int $column   - name or offset of the column to fetch from (default: 0)
+    * @param  int        $row      - row to fetch from, starting at 0 (default: the next row)
+    * @param  mixed      $onNoRows - alternative value to return if no (more) rows are available
+    *
+    * @return mixed - content of a single cell (can be NULL)
+    *
+    * @throws NoMoreRowsException if no (more) rows are available and parameter $alt was not specified
+    */
+   public function fetchField($column=0, $row=null, $onNoRows=null) {
+      if (!is_null($row)) throw new UnimplementedFeatureException('$row='.$row.' (!= NULL)');
+
+      // TODO: This is a cross-platform implementation. A Connector might be able to fetch a specific field more efficiently.
+
+      $row = $this->fetchNext(ARRAY_BOTH);
+
+      if (!$row) {
+         if (func_num_args() < 3) throw new NoMoreRowsException();
+         return $onNoRows;
+      }
+
+      if ($column===0 || is_null($column))
+         return $row[0];
+
+      if (!array_key_exists($column, $row)) {
+         if (is_int($column))     throw new InvalidArgumentException('Invalid $column: '.$column.' (no such column)');
+         if (!is_string($column)) throw new IllegalTypeException('Illegal type of parameter $column: '.getType($column));
+
+         $row    = array_change_key_case($row, CASE_LOWER);
+         $column = strToLower($column);
+         if (!array_key_exists($column, $row))
+            throw new InvalidArgumentException('Invalid $column: "'.$column.'" (no such column)');
+      }
+      return $row[$column];
+   }
+
+
+   /**
+    * Get the underlying driver's original result object.
+    *
+    * @return mixed
+    */
+   abstract public function getInternalResult();
 
 
    /**

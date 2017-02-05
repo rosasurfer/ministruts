@@ -2,6 +2,8 @@
 namespace rosasurfer\db\orm;
 
 use rosasurfer\core\Singleton;
+
+use rosasurfer\db\Connector;
 use rosasurfer\db\Result;
 
 use rosasurfer\exception\ConcurrentModificationException;

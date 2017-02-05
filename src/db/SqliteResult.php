@@ -6,6 +6,10 @@ use \SQLite3Result;
 use rosasurfer\exception\IllegalArgumentException;
 use rosasurfer\exception\IllegalTypeException;
 
+use const rosasurfer\ARRAY_ASSOC;
+use const rosasurfer\ARRAY_BOTH;
+use const rosasurfer\ARRAY_NUM;
+
 
 /**
  * Represents the result of an executed SQL statement. Depending on the statement type the result may or may not contain
@@ -20,8 +24,8 @@ class SqliteResult extends Result {
    /** @var string - SQL statement the result was generated from */
    protected $sql;
 
-   /** @var SQLite3Result */
-   protected $set;
+   /** @var SQLite3Result - the underlying driver's original result object */
+   protected $resultSet;
 
 
    /**
@@ -40,18 +44,37 @@ class SqliteResult extends Result {
 
       $this->connector = $connector;
       $this->sql       = $sql;
-      $this->set       = $result;
+      $this->resultSet = $result;
    }
 
 
    /**
-    * Fetch the next row from the result set (if any).
+    * Fetch the next row from the result set.
     *
-    * @return mixed[] - associative array of columns or NULL if no more rows are available
+    * @param  int $mode - Controls how the returned array is indexed. Can take one of the following values:
+    *                     ARRAY_ASSOC, ARRAY_NUM, or ARRAY_BOTH (default).
+    *
+    * @return array - array of columns or NULL if no (more) rows are available
     */
-   public function fetchNext() {
-      if (!$this->set)
+   public function fetchNext($mode=ARRAY_BOTH) {
+      if (!$this->resultSet)
          return null;
-      return $this->set->fetchArray(SQLITE3_ASSOC) ?: null;
+
+      switch ($mode) {
+         case ARRAY_ASSOC: $mode = SQLITE3_ASSOC; break;
+         case ARRAY_NUM:   $mode = SQLITE3_NUM;   break;
+         default:          $mode = SQLITE3_BOTH;
+      }
+      return $this->resultSet->fetchArray($mode) ?: null;
+   }
+
+
+   /**
+    * Get the underlying driver's original result object.
+    *
+    * @return SQLite3Result
+    */
+   public function getInternalResult() {
+      return $this->resultSet;
    }
 }

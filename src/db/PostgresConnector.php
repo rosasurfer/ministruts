@@ -1,7 +1,6 @@
 <?php
 namespace rosasurfer\db;
 
-use rosasurfer\exception\DatabaseException;
 use rosasurfer\exception\InfrastructureException;
 use rosasurfer\exception\RuntimeException;
 

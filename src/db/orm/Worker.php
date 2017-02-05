@@ -6,6 +6,8 @@ use rosasurfer\core\Object;
 use rosasurfer\db\ConnectionPool;
 use rosasurfer\db\Result;
 
+use const rosasurfer\ARRAY_ASSOC;
+
 
 /**
  * Worker
@@ -88,7 +90,7 @@ class Worker extends Object {
 
       // TODO: Lookup and return an existing instance instead of a copy.
 
-      $row = $result->fetchNext();
+      $row = $result->fetchNext(ARRAY_ASSOC);
       if ($row)
          return PersistableObject::createInstance($this->entityClass, $row);
       return null;
@@ -107,7 +109,7 @@ class Worker extends Object {
       // TODO: Lookup and return existing instances instead of copies.
 
       $instances = array();
-      while ($row = $result->fetchNext()) {
+      while ($row = $result->fetchNext(ARRAY_ASSOC)) {
          $instances[] = PersistableObject::createInstance($this->entityClass, $row);
       }
       return $instances;

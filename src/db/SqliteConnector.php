@@ -4,7 +4,6 @@ namespace rosasurfer\db;
 use \SQLite3;
 use \SQLite3Result;
 
-use rosasurfer\exception\DatabaseException;
 use rosasurfer\exception\InfrastructureException;
 use rosasurfer\exception\RuntimeException;
 

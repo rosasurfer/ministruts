@@ -1,7 +1,6 @@
 <?php
 namespace rosasurfer\db;
 
-use rosasurfer\exception\DatabaseException;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InfrastructureException;
 use rosasurfer\exception\InvalidArgumentException;
@@ -541,7 +540,7 @@ class MysqlConnector extends Connector {
 
       self::$logDebug = $oldLogDebug;
 
-      return trim(mysql_result($result, 0))."\n";
+      return trim(mysql_result($result, 0)).NL;
    }
 
 
