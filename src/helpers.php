@@ -1,4 +1,7 @@
 <?php
+/**
+ * Helper constants and functions
+ */
 namespace rosasurfer;
 
 use rosasurfer\exception\ClassNotFoundException;
@@ -11,13 +14,11 @@ use rosasurfer\ministruts\url\VersionedUrl;
 use rosasurfer\util\Validator;
 
 
-/**
- * Helper constants and functions
- */
+// prevent multiple includes
 if (defined('rosasurfer\CLI'))
    return;
 
-// whether or not we run on a command line interface, on localhost and on Windows
+// whether or not we run on a command line interface, on localhost and/or on Windows
 define('rosasurfer\CLI'      , !isSet($_SERVER['REQUEST_METHOD']));
 define('rosasurfer\LOCALHOST', !CLI && in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1', $_SERVER['SERVER_ADDR']]));
 define('rosasurfer\WINDOWS'  , (strToUpper(subStr(PHP_OS, 0, 3))=='WIN'));
@@ -59,6 +60,11 @@ const SATURDAY          = 6;
 const KB                = 1024;
 const MB                = 1024 * KB;
 const GB                = 1024 * MB;                              // no TB (doesn't fit in 32 bits)
+
+// array indexing types
+const ARRAY_ASSOC       = 1;
+const ARRAY_NUM         = 2;
+const ARRAY_BOTH        = 3;
 
 // php.ini changable modes
 const PHP_INI_ALL       = 0;                                      // entry can be set anywhere
