@@ -228,8 +228,6 @@ abstract class PersistableObject extends Object {
       $object = new $class();
       if (!$object instanceof self) throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
 
-      echoPre($row);
-
       $row      = array_change_key_case($row, CASE_LOWER);
       $mappings = $object->dao()->getMapping();
 
