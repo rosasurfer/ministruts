@@ -89,7 +89,7 @@ abstract class Connector extends Object {
     *
     * @param  string $sql - SQL statement
     *
-    * @return Result - may or may not contain a result set
+    * @return Result
     */
    abstract public function query($sql);
 

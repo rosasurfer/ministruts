@@ -264,23 +264,11 @@ abstract class PersistableObject extends Object {
 
 
    /**
-    * Return the DB adapter for the calling class.
+    * Return the database adapter for the calling class.
     *
     * @return Connector
     */
-   public static function getConnector() {
+   public static function db() {
       return self::dao()->getConnector();
-   }
-
-
-   /**
-    * Alias for self::getConnector()
-    *
-    * Return the DB adapter for the calling class.
-    *
-    * @return Connector
-    */
-   public static final function getDb() {
-      return self::getConnector();
    }
 }

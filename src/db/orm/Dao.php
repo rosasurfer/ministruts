@@ -77,7 +77,7 @@ abstract class Dao extends Singleton {
     *
     * @param  string $sql - SQL statement
     *
-    * @return Result - may or may not contain a result set
+    * @return Result
     */
    public function query($sql) {
       return $this->getWorker()->query($sql);
@@ -105,24 +105,12 @@ abstract class Dao extends Singleton {
 
 
    /**
-    * Gibt den für die persistente Klasse dieses DAO zuständigen DB-Adapter zurück.
+    * Return the database adapter for the Dao's entity class.
     *
     * @return Connector
     */
-   public final function getConnector() {
+   public final function db() {
       return $this->getWorker()->getConnector();
-   }
-
-
-   /**
-    * Alias for self::getConnector()
-    *
-    * Gibt den für die persistente Klasse dieses DAO zuständigen DB-Adapter zurück.
-    *
-    * @return Connector
-    */
-   public final function getDb() {
-      return $this->getConnector();
    }
 
 

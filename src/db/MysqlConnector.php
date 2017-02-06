@@ -296,7 +296,7 @@ class MysqlConnector extends Connector {
     *
     * @param  string $sql - SQL statement
     *
-    * @return Result - may or may not contain a result set
+    * @return Result
     */
    public function query($sql) {
       $response = $this->executeRaw($sql);
