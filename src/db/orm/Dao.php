@@ -49,18 +49,6 @@ abstract class Dao extends Singleton {
 
 
    /**
-    * Gibt den Wert des internen Ergebniszählers zurück. Kann bei seitenweiser Ergebnisanzeige
-    * statt einer zweiten Datenbankabfrage benutzt werden.
-    * (siehe found_rows():  http://dev.mysql.com/doc/refman/5.1/en/information-functions.html)
-    *
-    * @return int - Gesamtanzahl von Ergebnissen der letzten Abfrage (ohne Berücksichtigung einer LIMIT-Klausel)
-    */
-   public function countFoundItems() {
-      return $this->getWorker()->countFoundItems();
-   }
-
-
-   /**
     * Find a single record and convert it to an object of the model class.
     *
     * @param  string $query - SQL query
@@ -85,14 +73,14 @@ abstract class Dao extends Singleton {
 
 
    /**
-    * Execute a SQL statement and return the result.
+    * Execute a SQL statement and return the result. This method should be used if the SQL statement returns rows.
     *
     * @param  string $sql - SQL statement
     *
-    * @return Result - Depending on the statement type the result may or may not contain a result set.
+    * @return Result - may or may not contain a result set
     */
-   public function executeSql($sql) {
-      return $this->getWorker()->executeSql($sql);
+   public function query($sql) {
+      return $this->getWorker()->query($sql);
    }
 
 

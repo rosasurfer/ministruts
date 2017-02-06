@@ -167,13 +167,13 @@ class PostgresConnector extends Connector {
 
 
    /**
-    * Execute a SQL statement and return the result.
+    * Execute a SQL statement and return the result. This method should be used if the SQL statement returns rows.
     *
     * @param  string $sql - SQL statement
     *
-    * @return PostgresResult - Depending on the statement the result may or may not contain a result set.
+    * @return Result - may or may not contain a result set
     */
-   public function executeSql($sql) {
+   public function query($sql) {
       $response = $this->executeRaw($sql);
       return new PostgresResult($this, $sql, $response);
    }

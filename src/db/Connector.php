@@ -85,13 +85,13 @@ abstract class Connector extends Object {
 
 
    /**
-    * Execute a SQL statement and return the result.
+    * Execute a SQL statement and return the result. This method should be used if the SQL statement returns rows.
     *
     * @param  string $sql - SQL statement
     *
-    * @return Result - Depending on the statement the result may or may not contain a result set.
+    * @return Result - may or may not contain a result set
     */
-   abstract public function executeSql($sql);
+   abstract public function query($sql);
 
 
    /**

@@ -49,7 +49,7 @@ class Worker extends Object {
     * @return PersistableObject
     */
    public function findOne($query) {
-      $result = $this->executeSql($query);
+      $result = $this->query($query);
       return $this->makeObject($result);
    }
 
@@ -62,20 +62,20 @@ class Worker extends Object {
     * @return PersistableObject[]
     */
    public function findMany($query) {
-      $result = $this->executeSql($query);
+      $result = $this->query($query);
       return $this->makeObjects($result);
    }
 
 
    /**
-    * Execute a SQL statement and return the result.
+    * Execute a SQL statement and return the result. This method should be used if the SQL statement returns rows.
     *
     * @param  string $sql - SQL statement
     *
-    * @return Result - Depending on the statement type the result may or may not contain a result set.
+    * @return Result - may or may not contain a result set
     */
-   public function executeSql($sql) {
-      return $this->getConnector()->executeSql($sql);
+   public function query($sql) {
+      return $this->getConnector()->query($sql);
    }
 
 

@@ -95,7 +95,7 @@ abstract class Result extends Object {
       return $this->foundItemsCounter;
       /*
       if ($count) {
-         $result = $this->executeSql('select found_rows()');
+         $result = $this->query('select found_rows()');
          $this->foundItemsCounter = (int) $result->fetchField();
       }
       *\/
