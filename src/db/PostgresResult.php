@@ -36,20 +36,20 @@ class PostgresResult extends Result {
     *
     * Create a new PostgresResult instance. Called only when execution of a SQL statement returned successful.
     *
-    * @param  PostgresConnector $connector - Connector managing the database connection
-    * @param  string            $sql       - executed SQL statement
-    * @param  resource          $result    - A result resource or NULL for result-less SQL statements. SELECT queries not
-    *                                        matching any rows produce an empty result resource.
+    * @param  PostgresConnector $connector    - Connector managing the database connection
+    * @param  string            $sql          - executed SQL statement
+    * @param  resource          $result       - A result resource or NULL for result-less SQL statements. SELECT queries not
+    *                                           matching any rows produce an empty result resource.
+    * @param  int               $affectedRows - number of rows modified by the statement
     */
-   public function __construct(PostgresConnector $connector, $sql, $result) {
+   public function __construct(PostgresConnector $connector, $sql, $result, $affectedRows) {
       if (!is_string($sql))                        throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
       if (!is_resource($result) && $result!==null) throw new IllegalTypeException('Illegal type of parameter $result: '.getType($result));
 
-      $this->connector = $connector;
-      $this->sql       = $sql;
-      $this->result    = $result;
-
-      //echoPre(str_pad(explode(' ', $sql, 2)[0].':', 9).' affectedRows='.pg_affected_rows($result).'  my='.$this->affectedRows());
+      $this->connector    = $connector;
+      $this->sql          = $sql;
+      $this->result       = $result;
+      $this->affectedRows = $affectedRows;
    }
 
 
@@ -75,27 +75,13 @@ class PostgresResult extends Result {
 
 
    /**
-    * Return the number of rows affected if the SQL was an INSERT/UPDATE/DELETE statement. Considered unreliable for
-    * specific UPDATE statements (matched but unmodified rows are reported as changed) and for multiple statement queries.
+    * Return the number of rows affected if the SQL was an INSERT/UPDATE/DELETE statement. Unreliable for specific UPDATE
+    * statements (matched but unmodified rows are reported as changed) and for multiple statement queries.
     *
     * @return int
     */
    public function affectedRows() {
-      if ($this->affectedRows === null) {
-         if ($this->result) {
-            $rows = pg_affected_rows($this->result);
-            if ($rows) {
-               $str = strToLower(subStr(trim($this->sql), 0, 6));
-               if ($str!='insert' && $str!='update' && $str!='delete')
-                  $rows = 0;
-            }
-         }
-         else {
-            $rows = 0;
-         }
-         $this->affectedRows = $rows;
-      }
-      return $this->affectedRows;
+      return (int) $this->affectedRows;
    }
 
 

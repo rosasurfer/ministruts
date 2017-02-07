@@ -1,17 +1,11 @@
 <?php
 namespace rosasurfer\db;
 
-use \SQLite3;
-use \SQLite3Result;
-
-use rosasurfer\exception\InfrastructureException;
 use rosasurfer\exception\RuntimeException;
-
 use rosasurfer\log\Logger;
 
 use const rosasurfer\L_WARN;
 use const rosasurfer\NL;
-use rosasurfer\exception\UnimplementedFeatureException;
 
 
 /**
@@ -29,14 +23,17 @@ class SqliteConnector extends Connector {
    /** @var string[] */
    protected $options = [];
 
-   /** @var SQLite3 - internal database handler instance */
+   /** @var \SQLite3 - internal database handler instance */
    protected $handler;
 
-   /** @var int - last value of SQLite3::changes() */
+   /** @var int - last value of \SQLite3::changes() */
    protected $lastChanges = 0;
 
    /** @var int - transaction nesting level */
    protected $transactionLevel = 0;
+
+   /** @var bool - whether or not a query to execute can skip results */
+   private $execSkipResults = false;
 
 
    /**
@@ -92,7 +89,7 @@ class SqliteConnector extends Connector {
       try {                                                          // available flags:
          $flags = SQLITE3_OPEN_READWRITE ;   // SQLITE3_OPEN_READONLY| SQLITE3_OPEN_CREATE
                                                                      // SQLITE3_OPEN_READWRITE
-         $handler = new SQLite3($this->file, $flags);                // SQLITE3_OPEN_CREATE
+         $handler = new \SQLite3($this->file, $flags);               // SQLITE3_OPEN_CREATE
       }
       catch (\Exception $ex) {
          $file = $this->file;
@@ -109,7 +106,7 @@ class SqliteConnector extends Connector {
             else                                                  $absolutePath = false;
             if (!$absolutePath) $where = ' in "'.getCwd().'"';
          }
-         throw new InfrastructureException('Cannot '.$what.' SQLite database file "'.$file.'"'.$where, null, $ex);
+         throw new RuntimeException('Cannot '.$what.' SQLite database file "'.$file.'"'.$where, null, $ex);
       }
       $this->handler = $handler;
    }
@@ -150,11 +147,19 @@ class SqliteConnector extends Connector {
     * @throws DatabaseException in case of failure
     */
    public function query($sql) {
-      $affectedRows = 0;
-      $response = $this->executeRaw($sql, $affectedRows);
-      if ($response === true)
-         $response = null;
-      return new SqliteResult($this, $sql, $response, $affectedRows);
+      try {
+         $lastExecType = $this->execSkipResults;
+         $this->execSkipResults = false;
+
+         $affectedRows = 0;
+         $response = $this->executeRaw($sql, $affectedRows);
+         if ($response === true)
+            $response = null;
+         return new SqliteResult($this, $sql, $response, $affectedRows);
+      }
+      finally {
+         $this->execSkipResults = $lastExecType;
+      }
    }
 
 
@@ -169,7 +174,17 @@ class SqliteConnector extends Connector {
     * @throws DatabaseException in case of failure
     */
    public function execute($sql) {
-      throw new UnimplementedFeatureException();
+      try {
+         $lastExecType = $this->execSkipResults;
+         $this->execSkipResults = true;
+
+         $affectedRows = 0;
+         $this->executeRaw($sql, $affectedRows);
+         return $affectedRows;
+      }
+      finally {
+         $this->execSkipResults = $lastExecType;
+      }
    }
 
 
@@ -177,23 +192,28 @@ class SqliteConnector extends Connector {
     * Execute a SQL statement and return the internal driver's raw response.
     *
     * @param  _IN_  string $sql          - SQL statement
-    * @param  _OUT_ int   &$affectedRows - A variable receiving the number of affected rows. Considered unreliable for
-    *                                      specific UPDATE statements (matched but unmodified rows are reported as changed)
-    *                                      and for multiple statement queries.
+    * @param  _OUT_ int   &$affectedRows - A variable receiving the number of affected rows. Unreliable for specific UPDATE
+    *                                      statements (matched but unmodified rows are reported as changed) and for multiple
+    *                                      statement queries.
     *
-    * @return SQLite3Result|bool - SQLite3Result or TRUE (depending on the statement)
+    * @return \SQLite3Result|bool - SQLite3Result or TRUE (depending on the statement)
     *
     * @throws DatabaseException in case of failure
     */
    public function executeRaw($sql, &$affectedRows=0) {
       if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
+      $affectedRows = 0;
 
       if (!$this->isConnected())
          $this->connect();
 
       try {
-         if (1) $result = $this->handler->query($sql);      // SQLite3Result or bool for result-less statements
-         else   $result = $this->handler->exec($sql);       // TRUE on success, FALSE on error
+         if ($this->execSkipResults) {
+            $result = $this->handler->exec($sql);           // TRUE on success, FALSE on error
+         }
+         else {
+            $result = $this->handler->query($sql);          // SQLite3Result or bool for result-less statements
+         }
 
          if (!$result) {
             $message  = 'Error '.$this->handler->lastErrorCode().', '.$this->handler->lastErrorMsg();
@@ -201,19 +221,19 @@ class SqliteConnector extends Connector {
             throw new DatabaseException($message, null, $ex);
          }
 
-         // Get number of rows affected by an INSERT/UPDATE/DELETE statement.
+         // Calculate number of rows affected by an INSERT/UPDATE/DELETE statement.
          //
-         // - SQLite3::changes() returns the number of rows affected by the last INSERT/UPDATE/DELETE statement, the value
-         //   is not updated for every statement.
+         // - SQLite3::changes() is not updated for every statement.
+         // - SQLite3::changes() returns the matched, not the modified rows of a result.
          // - SQLite3::query('DELETE...') returns an empty SQLite3Result, thus a result set is no valid criterion.
-         // - SQLite3 supports multiple statements per query, affecting followed by non-affecting statements are possible.
+         // - SQLite3 supports multiple statements per query.
          //
-         // The below code works under the assumption of one single statement per query:
+         // The following logic assumes a single statement query with matched = modified rows:
          //
          $changes = $this->handler->changes();
          if ($changes && $changes==$this->lastChanges) {
             $str = strToLower(subStr(trim($sql), 0, 6));
-            if ($str!='insert' && $str!='update' && $str!='delete')  // no INSERT/UPDATE/DELETE
+            if ($str!='insert' && $str!='update' && $str!='delete')
                $changes = 0;
          }
          $affectedRows      = $changes;
@@ -303,7 +323,7 @@ class SqliteConnector extends Connector {
    /**
     * Return the connector's internal connection object.
     *
-    * @return SQLite3 - the internal connection handler
+    * @return \SQLite3 - the internal connection handler
     */
    public function getInternalHandler() {
       return $this->handler;

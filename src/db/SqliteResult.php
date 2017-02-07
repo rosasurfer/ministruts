@@ -1,8 +1,6 @@
 <?php
 namespace rosasurfer\db;
 
-use \SQLite3Result;
-
 use rosasurfer\exception\IllegalArgumentException;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\UnimplementedFeatureException;
@@ -25,7 +23,7 @@ class SqliteResult extends Result {
    /** @var string - SQL statement the result was generated from */
    protected $sql;
 
-   /** @var SQLite3Result - the underlying driver's original result object */
+   /** @var \SQLite3Result - the underlying driver's original result object */
    protected $result;
 
    /** @var int - number of rows modified by the statement */
@@ -42,11 +40,11 @@ class SqliteResult extends Result {
     *
     * @param  SqliteConnector $connector    - Connector managing the database connection
     * @param  string          $sql          - executed SQL statement
-    * @param  SQLite3Result   $result       - A SQLite3Result or NULL for result-less SQL statements. SELECT queries not
+    * @param  \SQLite3Result  $result       - A SQLite3Result or NULL for result-less SQL statements. SELECT queries not
     *                                         matching any rows and DELETE statements produce an empty SQLite3Result.
     * @param  int             $affectedRows - number of rows modified by the statement
     */
-   public function __construct(SqliteConnector $connector, $sql, SQLite3Result $result=null, $affectedRows=0) {
+   public function __construct(SqliteConnector $connector, $sql, \SQLite3Result $result=null, $affectedRows=0) {
       if (func_num_args() < 4) throw new IllegalArgumentException('Illegal number of arguments: '.func_num_args());
       if (!is_string($sql))    throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
 
@@ -54,8 +52,6 @@ class SqliteResult extends Result {
       $this->sql          = $sql;
       $this->result       = $result;
       $this->affectedRows = $affectedRows;
-
-      //echoPre(str_pad(explode(' ', $sql, 2)[0].':', 9).' $affectedRows='.$affectedRows);
    }
 
 
@@ -81,8 +77,8 @@ class SqliteResult extends Result {
 
 
    /**
-    * Return the number of rows affected if the SQL was an INSERT/UPDATE/DELETE statement. Considered unreliable for
-    * specific UPDATE statements (matched but unmodified rows are reported as changed) and for multiple statement queries.
+    * Return the number of rows affected if the SQL was an INSERT/UPDATE/DELETE statement. Unreliable for specific UPDATE
+    * statements (matched but unmodified rows are reported as changed) and for multiple statement queries.
     *
     * @return int
     */
@@ -110,7 +106,7 @@ class SqliteResult extends Result {
    /**
     * Get the underlying driver's original result object.
     *
-    * @return SQLite3Result
+    * @return \SQLite3Result
     */
    public function getInternalResult() {
       return $this->result;

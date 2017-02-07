@@ -50,8 +50,6 @@ class MysqlResult extends Result {
       $this->sql          = $sql;
       $this->result       = $result;
       $this->affectedRows = $affectedRows;
-
-      //echoPre(str_pad(explode(' ', $sql, 2)[0].':', 9).' $affectedRows='.$affectedRows);
    }
 
 
@@ -77,13 +75,12 @@ class MysqlResult extends Result {
 
 
    /**
-    * Return the number of rows affected if the SQL was an INSERT/UPDATE/DELETE/REPLACE statement. Considered unreliable for
-    * specific UPDATE statements (matched but unmodified rows are reported as changed) and for multiple statement queries.
+    * Return the number of rows affected if the SQL was an INSERT/UPDATE/DELETE/REPLACE statement. Unreliable for specific
+    * UPDATE statements. Matched but unmodified rows are reported as changed if the connection flag CLIENT_FOUND_ROWS is set.
     *
     * @return int
     */
    public function affectedRows() {
-      // @see  https://www.drupal.org/node/805858
       return (int) $this->affectedRows;
    }
 

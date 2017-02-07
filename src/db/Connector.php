@@ -102,7 +102,8 @@ abstract class Connector extends Object {
     *
     * @param  string $sql - SQL statement
     *
-    * @return int - Number of affected rows as reported by the database system. This value may be unreliable.
+    * @return int - Number of rows affected by the statement. This value may be unreliable.
+    *               (see the specific connector implementation)
     *
     * @throws DatabaseException in case of failure
     */
@@ -113,8 +114,8 @@ abstract class Connector extends Object {
     * Execute a SQL statement and return the internal driver's raw response.
     *
     * @param  _IN_  string $sql          - SQL statement
-    * @param  _OUT_ int   &$affectedRows - A variable receiving the number of affected rows. This value may be unreliable
-    *                                      (see the specific connector implementation).
+    * @param  _OUT_ int   &$affectedRows - A variable receiving the number of affected rows. This value may be unreliable.
+    *                                      (see the specific connector implementation)
     * @return mixed - raw driver response
     *
     * @throws DatabaseException in case of failure

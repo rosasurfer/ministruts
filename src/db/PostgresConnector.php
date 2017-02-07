@@ -1,15 +1,12 @@
 <?php
 namespace rosasurfer\db;
 
-use rosasurfer\exception\InfrastructureException;
 use rosasurfer\exception\RuntimeException;
-
 use rosasurfer\log\Logger;
 
 use function rosasurfer\strContains;
 
 use const rosasurfer\L_WARN;
-use rosasurfer\exception\UnimplementedFeatureException;
 
 
 /**
@@ -104,7 +101,7 @@ class PostgresConnector extends Connector {
       catch (\Exception $ex) {
          $this->connection    = null;
          $this->connectionStr = null;
-         throw new InfrastructureException('Cannot connect to PostgreSQL server with connection string: "'.$connStr.'"', null, $ex);
+         throw new RuntimeException('Cannot connect to PostgreSQL server with connection string: "'.$connStr.'"', null, $ex);
       }
       return $this;
 
@@ -179,8 +176,9 @@ class PostgresConnector extends Connector {
     * @throws DatabaseException in case of failure
     */
    public function query($sql) {
-      $response = $this->executeRaw($sql);
-      return new PostgresResult($this, $sql, $response);
+      $affectedRows = 0;
+      $response = $this->executeRaw($sql, $affectedRows);                  // pass on $affectedRows to avoid
+      return new PostgresResult($this, $sql, $response, $affectedRows);    // multiple calculations
    }
 
 
@@ -190,12 +188,17 @@ class PostgresConnector extends Connector {
     *
     * @param  string $sql - SQL statement
     *
-    * @return int - Number of affected rows as reported by the database system. This value may be unreliable.
+    * @return int - Number of rows affected by the statement. Unreliable for specific UPDATE statements (matched but
+    *               unmodified rows are reported as changed) and for multiple statement queries.
     *
     * @throws DatabaseException in case of failure
     */
    public function execute($sql) {
-      throw new UnimplementedFeatureException();
+      $affectedRows = 0;
+      $result = $this->executeRaw($sql, $affectedRows);
+      if (is_resource($result))
+         pg_free_result($result);
+      return $affectedRows;
    }
 
 
@@ -203,9 +206,9 @@ class PostgresConnector extends Connector {
     * Execute a SQL statement and return the internal driver's raw response.
     *
     * @param  _IN_  string $sql          - SQL statement
-    * @param  _OUT_ int   &$affectedRows - A variable receiving the number of affected rows. Considered unreliable for
-    *                                      specific UPDATE statements (matched but unmodified rows are reported as changed)
-    *                                      and for multiple statement queries.
+    * @param  _OUT_ int   &$affectedRows - A variable receiving the number of affected rows. Unreliable for specific UPDATE
+    *                                      statements (matched but unmodified rows are reported as changed) and for multiple
+    *                                      statement queries.
     *
     * @return resource - a result resource
     *
@@ -213,6 +216,7 @@ class PostgresConnector extends Connector {
     */
    public function executeRaw($sql, &$affectedRows=0) {
       if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
+      $affectedRows = 0;
 
       if (!$this->isConnected())
          $this->connect();
@@ -225,6 +229,21 @@ class PostgresConnector extends Connector {
             $message .= NL.' SQL: "'.$sql.'"';
             throw new DatabaseException($message, null, $ex);
          }
+
+         // Calculate number of rows affected by an INSERT/UPDATE/DELETE statement.
+         //
+         // - pg_affected_rows($result) returns the matched, not the modified rows of a result.
+         // - PostgreSQL supports multi-statement queries.
+         //
+         // The following logic assumes a single statement query with matched = modified rows:
+         //
+         $rows = pg_affected_rows($result);
+         if ($rows) {
+            $str = strToLower(subStr(trim($sql), 0, 6));
+            if ($str!='insert' && $str!='update' && $str!='delete')
+               $rows = 0;
+         }
+         $affectedRows = $rows;
       }
       catch (\Exception $ex) {
          if (!$ex instanceof DatabaseException) {

@@ -2,7 +2,6 @@
 namespace rosasurfer\db;
 
 use rosasurfer\exception\IllegalTypeException;
-use rosasurfer\exception\InfrastructureException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
 
@@ -22,7 +21,6 @@ use const rosasurfer\L_NOTICE;
 use const rosasurfer\L_WARN;
 use const rosasurfer\NL;
 use const rosasurfer\SECONDS;
-use rosasurfer\exception\UnimplementedFeatureException;
 
 
 /**
@@ -197,59 +195,61 @@ class MysqlConnector extends Connector {
       $host = $this->host;
       if ($this->port)
          $host .= ':'.$this->port;
-      try {
-         $this->connection = mysql_connect($host,
-                                           $this->username,
-                                           $this->password,
-                                           $createNewLink=true,
-                                           $flags=2               // CLIENT_FOUND_ROWS
-                                           );
+      $user = $this->username;
+      $pass = $this->password;
+      try {                                                                   // CLIENT_FOUND_ROWS
+         $this->connection = mysql_connect($host, $user, $pass, $newLink=true/*, $flags=2 */);
       }
       catch (\Exception $ex) {
-         throw new InfrastructureException('Can not connect to MySQL server on "'.$host.'"', null, $ex);
+         throw new RuntimeException('Can not connect to MySQL server on "'.$host.'"', null, $ex);
       }
 
       try {
          foreach ($this->options as $option => $value) {
             if (strLen($value)) {
                if (strCompareI($option, 'charset')) {
-                  if (!mysql_set_charset($value, $this->connection)) throw new InfrastructureException(mysql_error($this->connection));
+                  if (!mysql_set_charset($value, $this->connection)) throw new DatabaseException(mysql_error($this->connection));
                   // synonymous with the sql statement "set character set {$value}"
                }
                else {
                   if (!is_numeric($value))
                      $value = "'$value'";
                   $sql = "set $option = $value";
-                  if (!$this->executeRaw($sql)) throw new InfrastructureException(mysql_error($this->connection));
+                  if (!$this->executeRaw($sql)) throw new DatabaseException(mysql_error($this->connection));
                }
             }
          }
       }
       catch (\Exception $ex) {
-         if (!$ex instanceof InfrastructureException)
-            $ex = new InfrastructureException('Can not set system variable "'.$sql.'"', null, $ex);
+         if (!$ex instanceof DatabaseException)
+            $ex = new DatabaseException('Can not set system variable "'.$sql.'"', null, $ex);
          throw $ex;
       }
 
       try {
          if ($this->database && !mysql_select_db($this->database, $this->connection))
-            throw new InfrastructureException(mysql_error($this->connection));
+            throw new DatabaseException(mysql_error($this->connection));
       }
       catch (\Exception $ex) {
-         if (!$ex instanceof InfrastructureException)
-            $ex = new InfrastructureException('Can not select database "'.$this->database.'"', null, $ex);
+         if (!$ex instanceof DatabaseException)
+            $ex = new DatabaseException('Can not select database "'.$this->database.'"', null, $ex);
          throw $ex;
       }
-
       return $this;
-      /*                         #define CLIENT_LONG_PASSWORD          1             // new more secure passwords
+
+      /*
+      @see also: http://nl1.php.net/manual/en/mysql.constants.php#mysql.client-flags
+                 http://nl1.php.net/manual/en/mysqli.real-connect.php
+                 http://nl1.php.net/manual/en/mysqli.options.php
+
+                                 #define CLIENT_LONG_PASSWORD          1             // new more secure passwords
                                  #define CLIENT_FOUND_ROWS             2             // found instead of affected rows
                                  #define CLIENT_LONG_FLAG              4             // get all column flags
                                  #define CLIENT_CONNECT_WITH_DB        8             // one can specify db on connect
                                  #define CLIENT_NO_SCHEMA             16             // don't allow database.table.column
       MYSQL_CLIENT_COMPRESS      #define CLIENT_COMPRESS              32             // can use compression protocol
                                  #define CLIENT_ODBC                  64             // ODBC client
-                                 #define CLIENT_LOCAL_FILES          128             // can use LOAD DATA LOCAL
+                                 #define CLIENT_LOCAL_FILES          128             // enable LOAD DATA LOCAL
       MYSQL_CLIENT_IGNORE_SPACE  #define CLIENT_IGNORE_SPACE         256             // ignore spaces before '('
                                  #define CLIENT_CHANGE_USER          512             // support the mysql_change_user()    alt: #define CLIENT_PROTOCOL_41  512  // new 4.1 protocol
       MYSQL_CLIENT_INTERACTIVE   #define CLIENT_INTERACTIVE         1024             // this is an interactive client
@@ -316,12 +316,19 @@ class MysqlConnector extends Connector {
     *
     * @param  string $sql - SQL statement
     *
-    * @return int - Number of affected rows as reported by the database system.
+    * @return int - Number of rows affected by the statement. Unreliable for specific UPDATE statements. Matched but
+    *               unmodified rows are reported as changed if the connection flag CLIENT_FOUND_ROWS is set.
     *
     * @throws DatabaseException in case of failure
     */
    public function execute($sql) {
-      throw new UnimplementedFeatureException();
+      // TODO: check mysql_unbuffered_query() with mysql_free_result() for larger result sets
+
+      $affectedRows = 0;
+      $response = $this->executeRaw($sql, $affectedRows);
+      if (is_resource($response))
+         mysql_free_result($response);
+      return $affectedRows;
    }
 
 
@@ -329,9 +336,9 @@ class MysqlConnector extends Connector {
     * Execute a SQL statement and return the internal driver's raw response.
     *
     * @param  _IN_  string $sql          - SQL statement
-    * @param  _OUT_ int   &$affectedRows - A variable receiving the number of affected rows. Considered unreliable for
-    *                                      specific UPDATE statements (matched but unmodified rows are reported as changed)
-    *                                      and for multiple statement queries.
+    * @param  _OUT_ int   &$affectedRows - A variable receiving the number of affected rows. Unreliable for specific UPDATE
+    *                                      statements. Matched but unmodified rows are reported as changed if the connection
+    *                                      flag CLIENT_FOUND_ROWS is set.
     *
     * @return resource|bool - a result resource or TRUE (depending on the statement type)
     *
@@ -339,7 +346,8 @@ class MysqlConnector extends Connector {
     */
    public function executeRaw($sql, &$affectedRows=0) {
       if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
-      $logDebug = self::$logDebug;
+      $logDebug     = self::$logDebug;
+      $affectedRows = 0;
 
       if (!$this->isConnected())
          $this->connect();
@@ -356,12 +364,13 @@ class MysqlConnector extends Connector {
          throw new DatabaseException($message);
       }
 
-      // Get number of rows affected by an INSERT/UPDATE/DELETE/REPLACE statement. mysql_affected_rows() is updated for
-      // every single SQL statement (php_mysql, mysqlnd, mysql-5.0.37). There might be issues with UPDATE statements.
-      // @see  https://www.drupal.org/node/805858
+      // Calculate number of rows affected by an INSERT/UPDATE/DELETE/REPLACE statement.
+      // mysql_affected_rows() is updated for every single SQL statement.
       //
-      if ($result === true) $affectedRows = mysql_affected_rows($this->connection);    // no result set
-      else                  $affectedRows = 0;                                         // result set
+      // TODO: check mysql_info() for match/modified discrepancies
+      //
+      if ($result === true)                                       // no result set
+         $affectedRows = mysql_affected_rows($this->connection);
 
       // log statements exceeding $maxQueryTime (if activated)
       if ($logDebug) {
