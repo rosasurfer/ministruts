@@ -384,6 +384,8 @@ class PHP extends StaticClass {
     * @return bool - success status
     */
    public static function ini_set($option, $value, $suppressErrors=false) {
+      if (is_bool($value))
+         $value = (int) $value;
       $result = ini_set($option, $value);
       if ($result === false) {
          $sValue   = (string) $value;
