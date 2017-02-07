@@ -80,7 +80,7 @@ class PostgresConnector extends Connector {
     *
     * @return self
     */
-   protected function connect() {
+   public function connect() {
       $connStr = '';
       foreach ($this->config as $key => $value) {
          if (!strLen($value)) {
@@ -142,7 +142,7 @@ class PostgresConnector extends Connector {
     *
     * @return self
     */
-   protected function disconnect() {
+   public function disconnect() {
       if ($this->isConnected()) {
          $tmp = $this->connection;
          $this->connection = null;
@@ -161,7 +161,7 @@ class PostgresConnector extends Connector {
     *
     * @return bool
     */
-   protected function isConnected() {
+   public function isConnected() {
       return ($this->connection != null);
    }
 

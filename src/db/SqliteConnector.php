@@ -85,7 +85,7 @@ class SqliteConnector extends Connector {
     *
     * @return self
     */
-   protected function connect() {
+   public function connect() {
       try {                                                          // available flags:
          $flags = SQLITE3_OPEN_READWRITE ;   // SQLITE3_OPEN_READONLY| SQLITE3_OPEN_CREATE
                                                                      // SQLITE3_OPEN_READWRITE
@@ -117,7 +117,7 @@ class SqliteConnector extends Connector {
     *
     * @return self
     */
-   protected function disconnect() {
+   public function disconnect() {
       if ($this->isConnected()) {
          $handler = $this->handler;
          $this->handler = null;
@@ -132,7 +132,7 @@ class SqliteConnector extends Connector {
     *
     * @return bool
     */
-   protected function isConnected() {
+   public function isConnected() {
       return ($this->handler != null);
    }
 
@@ -169,7 +169,8 @@ class SqliteConnector extends Connector {
     *
     * @param  string $sql - SQL statement
     *
-    * @return int - Number of affected rows as reported by the database system. This value may be unreliable.
+    * @return int - Number of rows affected by the statement. Unreliable for specific UPDATE statements (matched but
+    *               unmodified rows are reported as changed) and for multiple statement queries.
     *
     * @throws DatabaseException in case of failure
     */

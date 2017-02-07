@@ -191,7 +191,7 @@ class MysqlConnector extends Connector {
     *
     * @return self
     */
-   protected function connect() {
+   public function connect() {
       $host = $this->host;
       if ($this->port)
          $host .= ':'.$this->port;
@@ -272,7 +272,7 @@ class MysqlConnector extends Connector {
     *
     * @return self
     */
-   protected function disconnect() {
+   public function disconnect() {
       if ($this->isConnected()) {
          $tmp = $this->connection;
          $this->connection = null;
@@ -287,7 +287,7 @@ class MysqlConnector extends Connector {
     *
     * @return bool
     */
-   protected function isConnected() {
+   public function isConnected() {
       return ($this->connection != null);
    }
 
@@ -322,7 +322,10 @@ class MysqlConnector extends Connector {
     * @throws DatabaseException in case of failure
     */
    public function execute($sql) {
+      //
       // TODO: check mysql_unbuffered_query() with mysql_free_result() for larger result sets
+      //       @see  https://www.percona.com/blog/2006/06/26/handling-of-big-parts-of-data/
+      //       @see  https://dev.mysql.com/doc/refman/5.7/en/mysql-use-result.html
 
       $affectedRows = 0;
       $response = $this->executeRaw($sql, $affectedRows);

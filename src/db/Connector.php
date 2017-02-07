@@ -65,7 +65,7 @@ abstract class Connector extends Object {
     *
     * @return self
     */
-   abstract protected function connect();
+   abstract public function connect();
 
 
    /**
@@ -73,7 +73,7 @@ abstract class Connector extends Object {
     *
     * @return self
     */
-   abstract protected function disconnect();
+   abstract public function disconnect();
 
 
    /**
@@ -81,7 +81,7 @@ abstract class Connector extends Object {
     *
     * @return bool
     */
-   abstract protected function isConnected();
+   abstract public function isConnected();
 
 
    /**
