@@ -1,5 +1,9 @@
 <?php
-namespace rosasurfer\db;
+namespace rosasurfer\db\mysql;
+
+use rosasurfer\db\Connector;
+use rosasurfer\db\NoMoreRowsException;
+use rosasurfer\db\Result;
 
 use rosasurfer\exception\IllegalTypeException;
 

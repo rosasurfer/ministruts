@@ -1,5 +1,8 @@
 <?php
-namespace rosasurfer\db;
+namespace rosasurfer\db\pgsql;
+
+use rosasurfer\db\Connector;
+use rosasurfer\db\Result;
 
 use rosasurfer\exception\IllegalTypeException;
 

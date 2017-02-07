@@ -4,6 +4,10 @@ namespace rosasurfer\db;
 use rosasurfer\config\Config;
 use rosasurfer\core\Singleton;
 
+use rosasurfer\db\mysql\MysqlConnector;
+use rosasurfer\db\pgsql\PostgresConnector;
+use rosasurfer\db\sqlite\SqliteConnector;
+
 use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\RuntimeException;
 
@@ -24,17 +28,20 @@ final class ConnectionPool extends Singleton {
 
    /** @var string[] - common adapter spellings */
    private static $aliases = [
-      'mysql'                             => MysqlConnector::class,
-      __NAMESPACE__.'\\mysqlconnector'    => MysqlConnector::class,
+      'maria'                                     => MysqlConnector::class,
+      'mariadb'                                   => MysqlConnector::class,
+      'maria-db'                                  => MysqlConnector::class,
+      'mysql'                                     => MysqlConnector::class,
+      __NAMESPACE__.'\\mysql\\ mysqlconnector'    => MysqlConnector::class,
 
-      'pgsql'                             => PostgresConnector::class,
-      'postgres'                          => PostgresConnector::class,
-      'postgresql'                        => PostgresConnector::class,
-      __NAMESPACE__.'\\postgresconnector' => PostgresConnector::class,
+      'pgsql'                                     => PostgresConnector::class,
+      'postgres'                                  => PostgresConnector::class,
+      'postgresql'                                => PostgresConnector::class,
+      __NAMESPACE__.'\\pgsql\\ postgresconnector' => PostgresConnector::class,
 
-      'sqlite'                            => SqliteConnector::class,
-      'sqlite3'                           => SqliteConnector::class,
-      __NAMESPACE__.'\\sqliteconnector'   => SqliteConnector::class,
+      'sqlite'                                    => SqliteConnector::class,
+      'sqlite3'                                   => SqliteConnector::class,
+      __NAMESPACE__.'\\sqlite\\sqliteconnector'   => SqliteConnector::class,
    ];
 
 

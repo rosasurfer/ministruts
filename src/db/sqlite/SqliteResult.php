@@ -1,5 +1,8 @@
 <?php
-namespace rosasurfer\db;
+namespace rosasurfer\db\sqlite;
+
+use rosasurfer\db\Connector;
+use rosasurfer\db\Result;
 
 use rosasurfer\exception\IllegalArgumentException;
 use rosasurfer\exception\IllegalTypeException;
