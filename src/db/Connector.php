@@ -85,31 +85,41 @@ abstract class Connector extends Object {
 
 
    /**
-    * Execute a SQL statement and return the result. This method should be used if the SQL statement returns rows.
+    * Execute a SQL statement and return the result. This method should be used for SQL statements returning rows.
     *
     * @param  string $sql - SQL statement
     *
     * @return Result
+    *
+    * @throws DatabaseException in case of failure
     */
    abstract public function query($sql);
 
 
    /**
-    * Execute a SQL statement and return the internal driver's raw response.
+    * Execute a SQL statement and skip result set processing. This method should be used for SQL statements not returning
+    * rows. If the database driver does not support this functionality the statement is forwarded to Connector::query().
     *
     * @param  string $sql - SQL statement
     *
-    * @return mixed - raw driver response
+    * @return int - Number of affected rows as reported by the database system. This value may be unreliable.
+    *
+    * @throws DatabaseException in case of failure
     */
-   abstract public function executeRaw($sql);
+   abstract public function execute($sql);
 
 
    /**
-    * Return the number of rows affected by the last INSERT/UPDATE/DELETE statement.
+    * Execute a SQL statement and return the internal driver's raw response.
     *
-    * @return int
+    * @param  _IN_  string $sql          - SQL statement
+    * @param  _OUT_ int   &$affectedRows - A variable receiving the number of affected rows. This value may be unreliable
+    *                                      (see the specific connector implementation).
+    * @return mixed - raw driver response
+    *
+    * @throws DatabaseException in case of failure
     */
-   abstract public function affectedRows();
+   abstract public function executeRaw($sql, &$affectedRows=0);
 
 
    /**
@@ -142,4 +152,22 @@ abstract class Connector extends Object {
     * @return bool
     */
    abstract public function isInTransaction();
+
+
+   /**
+    * Return the type of the database system the connector is used for.
+    *
+    * @return string
+    */
+   public function getType() {
+      return $this->type;
+   }
+
+
+   /**
+    * Return the connector's internal connection object.
+    *
+    * @return resource|object - resource or connection handler instance
+    */
+   abstract public function getInternalHandler();
 }

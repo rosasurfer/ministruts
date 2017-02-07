@@ -22,6 +22,7 @@ use const rosasurfer\L_NOTICE;
 use const rosasurfer\L_WARN;
 use const rosasurfer\NL;
 use const rosasurfer\SECONDS;
+use rosasurfer\exception\UnimplementedFeatureException;
 
 
 /**
@@ -29,6 +30,9 @@ use const rosasurfer\SECONDS;
  */
 class MysqlConnector extends Connector {
 
+
+   /** @var string - database system type */
+   protected $type = 'mysql';
 
    /** @var bool */                             // logging
    private static $logDebug  = false;
@@ -60,11 +64,8 @@ class MysqlConnector extends Connector {
    /** @var string[] */
    protected $options = [];
 
-   /** @var resource - connection handle */
+   /** @var resource - internal connection handle */
    protected $connection;
-
-   /** @var int - last number of affected rows */
-   protected $affectedRows = 0;
 
    /** @var int - transaction nesting level */
    protected $transactionLevel = 0;
@@ -292,35 +293,59 @@ class MysqlConnector extends Connector {
 
 
    /**
-    * Execute a SQL statement and return the result. This method should be used if the SQL statement returns rows.
+    * Execute a SQL statement and return the result. This method should be used for SQL statements returning rows.
     *
     * @param  string $sql - SQL statement
     *
     * @return Result
+    *
+    * @throws DatabaseException in case of failure
     */
    public function query($sql) {
-      $response = $this->executeRaw($sql);
+      $affectedRows = 0;
+      $response = $this->executeRaw($sql, $affectedRows);
       if ($response === true)
          $response = null;
-      return new MysqlResult($this, $sql, $response);
+      return new MysqlResult($this, $sql, $response, $affectedRows);
+   }
+
+
+   /**
+    * Execute a SQL statement and skip result set processing. This method should be used for SQL statements
+    * not returning rows.
+    *
+    * @param  string $sql - SQL statement
+    *
+    * @return int - Number of affected rows as reported by the database system.
+    *
+    * @throws DatabaseException in case of failure
+    */
+   public function execute($sql) {
+      throw new UnimplementedFeatureException();
    }
 
 
    /**
     * Execute a SQL statement and return the internal driver's raw response.
     *
-    * @param  string $sql - SQL statement
+    * @param  _IN_  string $sql          - SQL statement
+    * @param  _OUT_ int   &$affectedRows - A variable receiving the number of affected rows. Considered unreliable for
+    *                                      specific UPDATE statements (matched but unmodified rows are reported as changed)
+    *                                      and for multiple statement queries.
     *
     * @return resource|bool - a result resource or TRUE (depending on the statement type)
+    *
+    * @throws DatabaseException in case of failure
     */
-   public function executeRaw($sql) {
+   public function executeRaw($sql, &$affectedRows=0) {
       if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
+      $logDebug = self::$logDebug;
 
       if (!$this->isConnected())
          $this->connect();
-      self::$logDebug && $startTime=microTime(true);
+      $logDebug && $startTime=microTime(true);
 
-      // execute statement (seems it never triggers an error on invalid SQL but instead only returns FALSE)
+      // execute statement (never triggers an error on invalid SQL; instead it returns FALSE)
       $result = mysql_query($sql, $this->connection);
 
       if (!$result) {
@@ -331,33 +356,23 @@ class MysqlConnector extends Connector {
          throw new DatabaseException($message);
       }
 
-      // Get number of rows affected by the last INSERT/UPDATE/DELETE/REPLACE statement. The PHP mysqlnd driver updates this
-      // value for all SQL statements, special care has to be taken to not lose the original correct value.
-      $s = strToLower(subStr(trim($sql), 0, 7));
-      if (strPos($s, 'insert')===0 || strPos($s, 'update')===0 || strPos($s, 'delete')===0 || strPos($s, 'replace')===0) {
-         $this->affectedRows = mysql_affected_rows($this->connection);
-      }
+      // Get number of rows affected by an INSERT/UPDATE/DELETE/REPLACE statement. mysql_affected_rows() is updated for
+      // every single SQL statement (php_mysql, mysqlnd, mysql-5.0.37). There might be issues with UPDATE statements.
+      // @see  https://www.drupal.org/node/805858
+      //
+      if ($result === true) $affectedRows = mysql_affected_rows($this->connection);    // no result set
+      else                  $affectedRows = 0;                                         // result set
 
-      // L_DEBUG: log statements exceeding $maxQueryTime
-      if (self::$logDebug) {
+      // log statements exceeding $maxQueryTime (if activated)
+      if ($logDebug) {
          $endTime   = microTime(true);
          $spentTime = round($endTime-$startTime, 4);
-         if ($spentTime > self::$maxQueryTime)
+         if ($spentTime > self::$maxQueryTime) {
             Logger::log('SQL statement took more than '.self::$maxQueryTime.' seconds: '.$spentTime.NL.$sql, L_DEBUG);
-           //Logger::log($this->printDeadlockStatus(true), L_DEBUG);
+            //Logger::log($this->printDeadlockStatus(true), L_DEBUG);
+         }
       }
       return $result;
-   }
-
-
-   /**
-    * Return the number of rows affected by the last INSERT/UPDATE/DELETE/REPLACE statement. REPLACE is a MySQL extension
-    * standing for a DELETE followed by an INSERT.
-    *
-    * @return int
-    */
-   public function affectedRows() {
-      return (int) $this->affectedRows;
    }
 
 
@@ -427,6 +442,16 @@ class MysqlConnector extends Connector {
     */
    public function isInTransaction() {
       return ($this->transactionLevel > 0);
+   }
+
+
+   /**
+    * Return the connector's internal connection object.
+    *
+    * @return resource - the internal connection handle
+    */
+   public function getInternalHandler() {
+      return $this->connection;
    }
 
 

@@ -22,9 +22,12 @@ class PostgresResult extends Result {
    protected $sql;
 
    /** @var resource - the underlying driver's original result resource */
-   protected $resultSet;
+   protected $result;
 
-   /** @var int */
+   /** @var int - number of rows modified by the statement */
+   protected $affectedRows;
+
+   /** @var int - number of rows in the result set (if any) */
    protected $numRows;
 
 
@@ -44,7 +47,9 @@ class PostgresResult extends Result {
 
       $this->connector = $connector;
       $this->sql       = $sql;
-      $this->resultSet = $result;
+      $this->result    = $result;
+
+      //echoPre(str_pad(explode(' ', $sql, 2)[0].':', 9).' affectedRows='.pg_affected_rows($result).'  my='.$this->affectedRows());
    }
 
 
@@ -57,7 +62,7 @@ class PostgresResult extends Result {
     * @return array - array of columns or NULL if no (more) rows are available
     */
    public function fetchNext($mode=ARRAY_BOTH) {
-      if (!$this->resultSet)
+      if (!$this->result)
          return null;
 
       switch ($mode) {
@@ -65,7 +70,32 @@ class PostgresResult extends Result {
          case ARRAY_NUM:   $mode = PGSQL_NUM;   break;
          default:          $mode = PGSQL_BOTH;
       }
-      return pg_fetch_array($this->resultSet, null, $mode) ?: null;
+      return pg_fetch_array($this->result, null, $mode) ?: null;
+   }
+
+
+   /**
+    * Return the number of rows affected if the SQL was an INSERT/UPDATE/DELETE statement. Considered unreliable for
+    * specific UPDATE statements (matched but unmodified rows are reported as changed) and for multiple statement queries.
+    *
+    * @return int
+    */
+   public function affectedRows() {
+      if ($this->affectedRows === null) {
+         if ($this->result) {
+            $rows = pg_affected_rows($this->result);
+            if ($rows) {
+               $str = strToLower(subStr(trim($this->sql), 0, 6));
+               if ($str!='insert' && $str!='update' && $str!='delete')
+                  $rows = 0;
+            }
+         }
+         else {
+            $rows = 0;
+         }
+         $this->affectedRows = $rows;
+      }
+      return $this->affectedRows;
    }
 
 
@@ -76,8 +106,8 @@ class PostgresResult extends Result {
     */
    public function numRows() {
       if ($this->numRows === null) {
-         if ($this->resultSet) $this->numRows = pg_num_rows($this->resultSet);
-         else                  $this->numRows = 0;
+         if ($this->result) $this->numRows = pg_num_rows($this->result);
+         else               $this->numRows = 0;
       }
       return $this->numRows;
    }
@@ -89,6 +119,6 @@ class PostgresResult extends Result {
     * @return resource
     */
    public function getInternalResult() {
-      return $this->resultSet;
+      return $this->result;
    }
 }

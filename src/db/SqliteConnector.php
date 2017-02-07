@@ -20,14 +20,20 @@ use rosasurfer\exception\UnimplementedFeatureException;
 class SqliteConnector extends Connector {
 
 
-   /** @var SQLite3 - database handler instance */
-   protected $handler;
+   /** @var string - database system type */
+   protected $type = 'sqlite';
 
    /** @var string - database file to connect to */
    protected $file;
 
    /** @var string[] */
    protected $options = [];
+
+   /** @var SQLite3 - internal database handler instance */
+   protected $handler;
+
+   /** @var int - last value of SQLite3::changes() */
+   protected $lastChanges = 0;
 
    /** @var int - transaction nesting level */
    protected $transactionLevel = 0;
@@ -135,40 +141,83 @@ class SqliteConnector extends Connector {
 
 
    /**
-    * Execute a SQL statement and return the result. This method should be used if the SQL statement returns rows.
+    * Execute a SQL statement and return the result. This method should be used for SQL statements returning rows.
     *
     * @param  string $sql - SQL statement
     *
     * @return Result
+    *
+    * @throws DatabaseException in case of failure
     */
    public function query($sql) {
-      $response = $this->executeRaw($sql);
+      $affectedRows = 0;
+      $response = $this->executeRaw($sql, $affectedRows);
       if ($response === true)
          $response = null;
-      return new SqliteResult($this, $sql, $response);
+      return new SqliteResult($this, $sql, $response, $affectedRows);
+   }
+
+
+   /**
+    * Execute a SQL statement and skip result set processing. This method should be used for SQL statements
+    * not returning rows.
+    *
+    * @param  string $sql - SQL statement
+    *
+    * @return int - Number of affected rows as reported by the database system. This value may be unreliable.
+    *
+    * @throws DatabaseException in case of failure
+    */
+   public function execute($sql) {
+      throw new UnimplementedFeatureException();
    }
 
 
    /**
     * Execute a SQL statement and return the internal driver's raw response.
     *
-    * @param  string $sql - SQL statement
+    * @param  _IN_  string $sql          - SQL statement
+    * @param  _OUT_ int   &$affectedRows - A variable receiving the number of affected rows. Considered unreliable for
+    *                                      specific UPDATE statements (matched but unmodified rows are reported as changed)
+    *                                      and for multiple statement queries.
     *
     * @return SQLite3Result|bool - SQLite3Result or TRUE (depending on the statement)
+    *
+    * @throws DatabaseException in case of failure
     */
-   public function executeRaw($sql) {
+   public function executeRaw($sql, &$affectedRows=0) {
       if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
 
-      !$this->isConnected() && $this->connect();
+      if (!$this->isConnected())
+         $this->connect();
+
       try {
-         $result = $this->handler->query($sql);
-         //$result = $this->handler->exec($sql);
+         if (1) $result = $this->handler->query($sql);      // SQLite3Result or bool for result-less statements
+         else   $result = $this->handler->exec($sql);       // TRUE on success, FALSE on error
 
          if (!$result) {
             $message  = 'Error '.$this->handler->lastErrorCode().', '.$this->handler->lastErrorMsg();
             $message .= NL.' SQL: "'.$sql.'"';
             throw new DatabaseException($message, null, $ex);
          }
+
+         // Get number of rows affected by an INSERT/UPDATE/DELETE statement.
+         //
+         // - SQLite3::changes() returns the number of rows affected by the last INSERT/UPDATE/DELETE statement, the value
+         //   is not updated for every statement.
+         // - SQLite3::query('DELETE...') returns an empty SQLite3Result, thus a result set is no valid criterion.
+         // - SQLite3 supports multiple statements per query, affecting followed by non-affecting statements are possible.
+         //
+         // The below code works under the assumption of one single statement per query:
+         //
+         $changes = $this->handler->changes();
+         if ($changes && $changes==$this->lastChanges) {
+            $str = strToLower(subStr(trim($sql), 0, 6));
+            if ($str!='insert' && $str!='update' && $str!='delete')  // no INSERT/UPDATE/DELETE
+               $changes = 0;
+         }
+         $affectedRows      = $changes;
+         $this->lastChanges = $this->handler->changes();
       }
       catch (\Exception $ex) {
          if (!$ex instanceof DatabaseException) {
@@ -179,16 +228,6 @@ class SqliteConnector extends Connector {
          throw $ex;
       }
       return $result;
-   }
-
-
-   /**
-    * Return the number of rows affected by the last INSERT/UPDATE/DELETE statement.
-    *
-    * @return int
-    */
-   public function affectedRows() {
-      throw new UnimplementedFeatureException();
    }
 
 
@@ -258,5 +297,15 @@ class SqliteConnector extends Connector {
     */
    public function isInTransaction() {
       return ($this->transactionLevel > 0);
+   }
+
+
+   /**
+    * Return the connector's internal connection object.
+    *
+    * @return SQLite3 - the internal connection handler
+    */
+   public function getInternalHandler() {
+      return $this->handler;
    }
 }

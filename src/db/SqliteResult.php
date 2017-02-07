@@ -5,11 +5,11 @@ use \SQLite3Result;
 
 use rosasurfer\exception\IllegalArgumentException;
 use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\exception\UnimplementedFeatureException;
 
 use const rosasurfer\ARRAY_ASSOC;
 use const rosasurfer\ARRAY_BOTH;
 use const rosasurfer\ARRAY_NUM;
-use rosasurfer\exception\UnimplementedFeatureException;
 
 
 /**
@@ -26,9 +26,12 @@ class SqliteResult extends Result {
    protected $sql;
 
    /** @var SQLite3Result - the underlying driver's original result object */
-   protected $resultSet;
+   protected $result;
 
-   /** @var int */
+   /** @var int - number of rows modified by the statement */
+   protected $affectedRows;
+
+   /** @var int - number of rows in the result set (if any) */
    protected $numRows;
 
 
@@ -37,18 +40,22 @@ class SqliteResult extends Result {
     *
     * Create a new SqliteResult instance. Called only when execution of a SQL statement returned successful.
     *
-    * @param  SqliteConnector $connector - Connector managing the database connection
-    * @param  string          $sql       - executed SQL statement
-    * @param  SQLite3Result   $result    - A SQLite3Result or NULL for result-less SQL statements. SELECT queries not
-    *                                      matching any rows produce an empty SQLite3Result.
+    * @param  SqliteConnector $connector    - Connector managing the database connection
+    * @param  string          $sql          - executed SQL statement
+    * @param  SQLite3Result   $result       - A SQLite3Result or NULL for result-less SQL statements. SELECT queries not
+    *                                         matching any rows and DELETE statements produce an empty SQLite3Result.
+    * @param  int             $affectedRows - number of rows modified by the statement
     */
-   public function __construct(SqliteConnector $connector, $sql, SQLite3Result $result=null) {
-      if (func_num_args() < 3) throw new IllegalArgumentException('Illegal number of arguments: '.func_num_args());
+   public function __construct(SqliteConnector $connector, $sql, SQLite3Result $result=null, $affectedRows=0) {
+      if (func_num_args() < 4) throw new IllegalArgumentException('Illegal number of arguments: '.func_num_args());
       if (!is_string($sql))    throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
 
-      $this->connector = $connector;
-      $this->sql       = $sql;
-      $this->resultSet = $result;
+      $this->connector    = $connector;
+      $this->sql          = $sql;
+      $this->result       = $result;
+      $this->affectedRows = $affectedRows;
+
+      //echoPre(str_pad(explode(' ', $sql, 2)[0].':', 9).' $affectedRows='.$affectedRows);
    }
 
 
@@ -61,7 +68,7 @@ class SqliteResult extends Result {
     * @return array - array of columns or NULL if no (more) rows are available
     */
    public function fetchNext($mode=ARRAY_BOTH) {
-      if (!$this->resultSet)
+      if (!$this->result)
          return null;
 
       switch ($mode) {
@@ -69,7 +76,18 @@ class SqliteResult extends Result {
          case ARRAY_NUM:   $mode = SQLITE3_NUM;   break;
          default:          $mode = SQLITE3_BOTH;
       }
-      return $this->resultSet->fetchArray($mode) ?: null;
+      return $this->result->fetchArray($mode) ?: null;
+   }
+
+
+   /**
+    * Return the number of rows affected if the SQL was an INSERT/UPDATE/DELETE statement. Considered unreliable for
+    * specific UPDATE statements (matched but unmodified rows are reported as changed) and for multiple statement queries.
+    *
+    * @return int
+    */
+   public function affectedRows() {
+      return (int) $this->affectedRows;
    }
 
 
@@ -82,8 +100,8 @@ class SqliteResult extends Result {
       throw new UnimplementedFeatureException();
 
       if ($this->numRows === null) {
-         if ($this->resultSet) $this->numRows = mysql_num_rows($this->resultSet);
-         else                  $this->numRows = 0;
+         if ($this->result) $this->numRows = mysql_num_rows($this->result);
+         else               $this->numRows = 0;
       }
       return $this->numRows;
    }
@@ -95,6 +113,6 @@ class SqliteResult extends Result {
     * @return SQLite3Result
     */
    public function getInternalResult() {
-      return $this->resultSet;
+      return $this->result;
    }
 }

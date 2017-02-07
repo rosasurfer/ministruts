@@ -70,6 +70,17 @@ abstract class Result extends Object {
 
 
    /**
+    * Return the number of rows affected if the SQL was an INSERT/UPDATE/DELETE statement.
+    *
+    * This value is provided for userland code only and must not be used in the framework. The implementation may be
+    * unreliable (see the specific result implementation).
+    *
+    * @return int
+    */
+   abstract public function affectedRows();
+
+
+   /**
     * Return the number of rows in the result set.
     *
     * @return int

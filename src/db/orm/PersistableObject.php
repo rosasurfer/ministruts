@@ -10,6 +10,7 @@ use rosasurfer\exception\UnimplementedFeatureException;
 
 use rosasurfer\log\Logger;
 use rosasurfer\util\Date;
+use rosasurfer\exception\IllegalAccessException;
 
 
 /**
@@ -225,8 +226,9 @@ abstract class PersistableObject extends Object {
     * @return self
     */
    public static function createInstance($class, array $row) {
+      if (static::class != __CLASS__) throw new IllegalAccessException('Cannot access method '.__METHOD__.'() from a model class.');
       $object = new $class();
-      if (!$object instanceof self) throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
+      if (!$object instanceof self)   throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
 
       $row      = array_change_key_case($row, CASE_LOWER);
       $mappings = $object->dao()->getMapping();
@@ -258,8 +260,10 @@ abstract class PersistableObject extends Object {
     * @return Dao
     */
    public static function dao() {
-      // TODO: the calling class may be a derived class with the DAO being one of its parents
+      if (static::class == __CLASS__) throw new IllegalAccessException('Use a model class to access method '.__METHOD__.'()');
       return Singleton::getInstance(static::class.'Dao');
+
+      // TODO: The calling class may be a derived class with the DAO being one of its parents.
    }
 
 
@@ -269,6 +273,7 @@ abstract class PersistableObject extends Object {
     * @return Connector
     */
    public static function db() {
-      return self::dao()->getConnector();
+      if (static::class == __CLASS__) throw new IllegalAccessException('Use a model class to access method '.__METHOD__.'()');
+      return self::dao()->db();
    }
 }

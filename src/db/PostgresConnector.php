@@ -18,8 +18,8 @@ use rosasurfer\exception\UnimplementedFeatureException;
 class PostgresConnector extends Connector {
 
 
-   /** @var resource - connection handle */
-   protected $connection;
+   /** @var string - database system type */
+   protected $type = 'pgsql';
 
    /** @var string[] */
    protected $config = [];
@@ -28,7 +28,10 @@ class PostgresConnector extends Connector {
    protected $options = [];
 
    /** @var string - the resulting connection string as passed to pg_connect() */
-   private $connectionStr;
+   protected $connectionStr;
+
+   /** @var resource - internal connection handle */
+   protected $connection;
 
    /** @var int - transaction nesting level */
    protected $transactionLevel = 0;
@@ -167,11 +170,13 @@ class PostgresConnector extends Connector {
 
 
    /**
-    * Execute a SQL statement and return the result. This method should be used if the SQL statement returns rows.
+    * Execute a SQL statement and return the result. This method should be used for SQL statements returning rows.
     *
     * @param  string $sql - SQL statement
     *
     * @return Result
+    *
+    * @throws DatabaseException in case of failure
     */
    public function query($sql) {
       $response = $this->executeRaw($sql);
@@ -180,18 +185,39 @@ class PostgresConnector extends Connector {
 
 
    /**
-    * Execute a SQL statement and return the internal driver's raw response.
+    * Execute a SQL statement and skip result set processing. This method should be used for SQL statements
+    * not returning rows.
     *
     * @param  string $sql - SQL statement
     *
-    * @return resource - always a result resource
+    * @return int - Number of affected rows as reported by the database system. This value may be unreliable.
+    *
+    * @throws DatabaseException in case of failure
     */
-   public function executeRaw($sql) {
+   public function execute($sql) {
+      throw new UnimplementedFeatureException();
+   }
+
+
+   /**
+    * Execute a SQL statement and return the internal driver's raw response.
+    *
+    * @param  _IN_  string $sql          - SQL statement
+    * @param  _OUT_ int   &$affectedRows - A variable receiving the number of affected rows. Considered unreliable for
+    *                                      specific UPDATE statements (matched but unmodified rows are reported as changed)
+    *                                      and for multiple statement queries.
+    *
+    * @return resource - a result resource
+    *
+    * @throws DatabaseException in case of failure
+    */
+   public function executeRaw($sql, &$affectedRows=0) {
       if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
 
-      !$this->isConnected() && $this->connect();
-      try {
+      if (!$this->isConnected())
+         $this->connect();
 
+      try {
          $result = pg_query($this->connection, $sql);          // automatically wraps multiple statements in a transaction
 
          if (!$result) {
@@ -209,16 +235,6 @@ class PostgresConnector extends Connector {
          throw $ex;
       }
       return $result;
-   }
-
-
-   /**
-    * Return the number of rows affected by the last INSERT/UPDATE/DELETE statement.
-    *
-    * @return int
-    */
-   public function affectedRows() {
-      throw new UnimplementedFeatureException();
    }
 
 
@@ -288,5 +304,15 @@ class PostgresConnector extends Connector {
     */
    public function isInTransaction() {
       return ($this->transactionLevel > 0);
+   }
+
+
+   /**
+    * Return the connector's internal connection object.
+    *
+    * @return resource - the internal connection handle
+    */
+   public function getInternalHandler() {
+      return $this->connection;
    }
 }

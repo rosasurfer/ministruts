@@ -22,9 +22,12 @@ class MysqlResult extends Result {
    protected $sql;
 
    /** @var resource - the underlying driver's original result resource */
-   protected $resultSet;
+   protected $result;
 
-   /** @var int */
+   /** @var int - number of rows modified by the statement */
+   protected $affectedRows;
+
+   /** @var int - number of rows in the result set (if any) */
    protected $numRows;
 
 
@@ -33,18 +36,22 @@ class MysqlResult extends Result {
     *
     * Create a new MysqlResult instance. Called only when execution of a SQL statement returned successful.
     *
-    * @param  MysqlConnector $connector - Connector managing the database connection
-    * @param  string         $sql       - executed SQL statement
-    * @param  resource       $result    - A result resource or NULL for result-less SQL statements. SELECT queries not
-    *                                     matching any rows produce an empty result resource.
+    * @param  MysqlConnector $connector    - Connector managing the database connection
+    * @param  string         $sql          - executed SQL statement
+    * @param  resource       $result       - A result resource or NULL for result-less SQL statements. SELECT queries not
+    *                                        matching any rows produce an empty result resource.
+    * @param  int            $affectedRows - number of rows modified by the statement
     */
-   public function __construct(MysqlConnector $connector, $sql, $result) {
+   public function __construct(MysqlConnector $connector, $sql, $result, $affectedRows) {
       if (!is_string($sql))                        throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
       if (!is_resource($result) && $result!==null) throw new IllegalTypeException('Illegal type of parameter $result: '.getType($result));
 
-      $this->connector = $connector;
-      $this->sql       = $sql;
-      $this->resultSet = $result;
+      $this->connector    = $connector;
+      $this->sql          = $sql;
+      $this->result       = $result;
+      $this->affectedRows = $affectedRows;
+
+      //echoPre(str_pad(explode(' ', $sql, 2)[0].':', 9).' $affectedRows='.$affectedRows);
    }
 
 
@@ -57,7 +64,7 @@ class MysqlResult extends Result {
     * @return array - array of columns or NULL if no (more) rows are available
     */
    public function fetchNext($mode=ARRAY_BOTH) {
-      if (!$this->resultSet)
+      if (!$this->result)
          return null;
 
       switch ($mode) {
@@ -65,7 +72,19 @@ class MysqlResult extends Result {
          case ARRAY_NUM:   $mode = MYSQL_NUM;   break;
          default:          $mode = MYSQL_BOTH;
       }
-      return mysql_fetch_array($this->resultSet, $mode) ?: null;
+      return mysql_fetch_array($this->result, $mode) ?: null;
+   }
+
+
+   /**
+    * Return the number of rows affected if the SQL was an INSERT/UPDATE/DELETE/REPLACE statement. Considered unreliable for
+    * specific UPDATE statements (matched but unmodified rows are reported as changed) and for multiple statement queries.
+    *
+    * @return int
+    */
+   public function affectedRows() {
+      // @see  https://www.drupal.org/node/805858
+      return (int) $this->affectedRows;
    }
 
 
@@ -76,8 +95,8 @@ class MysqlResult extends Result {
     */
    public function numRows() {
       if ($this->numRows === null) {
-         if ($this->resultSet) $this->numRows = mysql_num_rows($this->resultSet);
-         else                  $this->numRows = 0;
+         if ($this->result) $this->numRows = mysql_num_rows($this->result);
+         else               $this->numRows = 0;
       }
       return $this->numRows;
    }
@@ -107,6 +126,6 @@ class MysqlResult extends Result {
     * @return resource
     */
    public function getInternalResult() {
-      return $this->resultSet;
+      return $this->result;
    }
 }
