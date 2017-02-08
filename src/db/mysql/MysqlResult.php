@@ -106,8 +106,7 @@ class MysqlResult extends Result {
    /**
     * Return the ID generated for an AUTO_INCREMENT column by the previous SQL statement (usually INSERT).
     *
-    * @return int|bool - Generated ID or 0 (zero) if the previous query did not generate an AUTO_INCREMENT value;
-    *                    FALSE in case of an error
+    * @return int - Generated ID or 0 (zero) if the previous query did not generate an AUTO_INCREMENT value.
     *
     * Notes:
     * - Internally the return value of the native MySQL C API function mysql_insert_id() will be converted to a PHP integer.
@@ -120,8 +119,8 @@ class MysqlResult extends Result {
     * - The value of the MySQL SQL function LAST_INSERT_ID() always contains the most recently generated AUTO_INCREMENT
     *   value and is not reset between queries.
     */
-   public function getLastInsertId() {
-      $this->connector->getLastInsertId();
+   public function lastInsertId() {
+      $this->connector->lastInsertId();
    }
 
 
