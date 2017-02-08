@@ -41,7 +41,7 @@ return array(
     'rosasurfer\\db\\ResultInterface' => $baseDir . '/src/db/ResultInterface.php',
     'rosasurfer\\db\\mysql\\MysqlConnector' => $baseDir . '/src/db/mysql/MysqlConnector.php',
     'rosasurfer\\db\\mysql\\MysqlResult' => $baseDir . '/src/db/mysql/MysqlResult.php',
-    'rosasurfer\\db\\orm\\Dao' => $baseDir . '/src/db/orm/Dao.php',
+    'rosasurfer\\db\\orm\\DAO' => $baseDir . '/src/db/orm/DAO.php',
     'rosasurfer\\db\\orm\\PersistableObject' => $baseDir . '/src/db/orm/PersistableObject.php',
     'rosasurfer\\db\\orm\\PersistableSet' => $baseDir . '/src/db/orm/PersistableSet.php',
     'rosasurfer\\db\\orm\\Worker' => $baseDir . '/src/db/orm/Worker.php',

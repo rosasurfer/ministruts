@@ -11,11 +11,11 @@ use rosasurfer\exception\InvalidArgumentException;
 
 
 /**
- * Dao
+ * DAO
  *
  * Abstract DAO base class.
  */
-abstract class Dao extends Singleton {
+abstract class DAO extends Singleton {
 
 
    // Mapping-Constanten
@@ -105,7 +105,7 @@ abstract class Dao extends Singleton {
 
 
    /**
-    * Return the database adapter for the Dao's entity class.
+    * Return the database adapter for the DAO's entity class.
     *
     * @return IConnector
     */
