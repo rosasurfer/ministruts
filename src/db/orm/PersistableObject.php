@@ -240,11 +240,11 @@ abstract class PersistableObject extends Object {
             $type = $mapping[1];
 
             switch ($type) {
-               case Dao::T_STRING: $object->$property =         $row[$column]; break;
-               case Dao::T_BOOL  : $object->$property =  (bool) $row[$column]; break;
-               case Dao::T_INT   : $object->$property =   (int) $row[$column]; break;
-               case Dao::T_FLOAT : $object->$property = (float) $row[$column]; break;
-               case Dao::T_SET   : $object->$property =  strLen($row[$column]) ? explode(',', $row[$column]) : []; break;
+               case DAO::T_STRING: $object->$property =         $row[$column]; break;
+               case DAO::T_BOOL  : $object->$property =  (bool) $row[$column]; break;
+               case DAO::T_INT   : $object->$property =   (int) $row[$column]; break;
+               case DAO::T_FLOAT : $object->$property = (float) $row[$column]; break;
+               case DAO::T_SET   : $object->$property =  strLen($row[$column]) ? explode(',', $row[$column]) : []; break;
 
                default: throw new InvalidArgumentException('Unknown data type "'.$type.'" in database mapping of '.$class.'::'.$property);
             }
@@ -257,11 +257,11 @@ abstract class PersistableObject extends Object {
    /**
     * Return the DAO for the calling class.
     *
-    * @return Dao
+    * @return DAO
     */
    public static function dao() {
       if (static::class == __CLASS__) throw new IllegalAccessException('Use a model class to access method '.__METHOD__.'()');
-      return Singleton::getInstance(static::class.'Dao');
+      return Singleton::getInstance(static::class.'DAO');
 
       // TODO: The calling class may be a derived class with the DAO being one of its parents.
    }

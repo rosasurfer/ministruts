@@ -19,7 +19,7 @@ use const rosasurfer\ARRAY_ASSOC;
 class Worker extends Object {
 
 
-   /** @var Dao - Dao of the Worker's model class */
+   /** @var DAO - DAO of the Worker's model class */
    private   $dao;
 
    /** @var string - class name of the Worker's model */
@@ -32,11 +32,11 @@ class Worker extends Object {
    /**
     * Constructor
     *
-    * Create a new Worker for the specified Dao.
+    * Create a new Worker for the specified DAO.
     *
-    * @param  Dao $dao
+    * @param  DAO $dao
     */
-   public function __construct(Dao $dao) {
+   public function __construct(DAO $dao) {
       $this->dao = $dao;
       $this->entityClass = $dao->getEntityClass();
    }
