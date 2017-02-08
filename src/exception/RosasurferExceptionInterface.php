@@ -3,7 +3,7 @@ namespace rosasurfer\exception;
 
 
 /**
- * An interface defining common functionality for all Rosasurfer exceptions.
+ * An interface defining common functionality for all rosasurfer exceptions.
  */
 interface RosasurferExceptionInterface {
 

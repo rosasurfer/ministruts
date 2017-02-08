@@ -4,14 +4,14 @@ namespace rosasurfer\exception\php;
 use rosasurfer\debug\DebugHelper;
 use rosasurfer\debug\ErrorHandler;
 
-use rosasurfer\exception\RosasurferExceptionInterface;
+use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\exception\RosasurferExceptionTrait;
 
 
 /**
  * Rosasurfer exception for regular PHP errors wrapped in an exception
  */
-class PHPError extends \ErrorException implements RosasurferExceptionInterface {
+class PHPError extends \ErrorException implements IRosasurferException {
 
    use RosasurferExceptionTrait;
 
@@ -43,7 +43,7 @@ class PHPError extends \ErrorException implements RosasurferExceptionInterface {
       $trace = $this->betterTrace;
 
       if (!$trace) {
-         // transform the original stacktrace into a better trace
+         // transform the original stacktrace into a better one
          $trace = DebugHelper::fixTrace($this->getTrace());
 
          // drop the first frame if the exception was created in the registered error handler (it always should)
