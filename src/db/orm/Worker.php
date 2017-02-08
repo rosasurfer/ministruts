@@ -4,7 +4,8 @@ namespace rosasurfer\db\orm;
 use rosasurfer\core\Object;
 
 use rosasurfer\db\ConnectionPool;
-use rosasurfer\db\Result;
+use rosasurfer\db\ConnectorInterface as Connector;
+use rosasurfer\db\ResultInterface    as Result;
 
 use const rosasurfer\ARRAY_ASSOC;
 

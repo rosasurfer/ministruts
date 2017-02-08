@@ -2,7 +2,12 @@
 namespace rosasurfer\db;
 
 use rosasurfer\core\Object;
+
+use rosasurfer\db\ConnectorInterface as IConnector;
+use rosasurfer\db\ResultInterface    as IResult;
+
 use rosasurfer\debug\ErrorHandler;
+
 use rosasurfer\exception\InvalidArgumentException;
 
 
@@ -11,7 +16,7 @@ use rosasurfer\exception\InvalidArgumentException;
  *
  * Abstract super class for concrete storage mechanism adapters.
  */
-abstract class Connector extends Object {
+abstract class Connector extends Object implements ConnectorInterface {
 
 
    /**
@@ -46,16 +51,16 @@ abstract class Connector extends Object {
 
 
    /**
-    * Create a new Connector and initialize it with connection specific configuration values.
+    * Create a new connector and initialize it with connection specific configuration values.
     *
-    * @param  string   $class   - Connector class name
+    * @param  string   $class   - IConnector class name
     * @param  string[] $config  - connection configuration
     * @param  string[] $options - additional connection options (default: none)
     *
     * @return self
     */
    public static function create($class, array $config, array $options=[]) {
-      if (!is_subclass_of($class, __CLASS__)) throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
+      if (!is_subclass_of($class, IConnector::class)) throw new InvalidArgumentException('Not a '.IConnector::class.': '.$class);
       return new $class($config, $options);
    }
 
@@ -89,7 +94,7 @@ abstract class Connector extends Object {
     *
     * @param  string $sql - SQL statement
     *
-    * @return Result
+    * @return IResult
     *
     * @throws DatabaseException in case of failure
     */
@@ -129,7 +134,7 @@ abstract class Connector extends Object {
     * @return int|bool - Generated ID or 0 (zero) if the previous statement did not generate an ID.
     *                    FALSE if the database system doesn't support this functionality or in case of an error.
     */
-   abstract function lastInsertId();
+   abstract public function lastInsertId();
 
 
    /**

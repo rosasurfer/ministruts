@@ -3,8 +3,8 @@ namespace rosasurfer\db\orm;
 
 use rosasurfer\core\Singleton;
 
-use rosasurfer\db\Connector;
-use rosasurfer\db\Result;
+use rosasurfer\db\ConnectorInterface as Connector;
+use rosasurfer\db\ResultInterface    as Result;
 
 use rosasurfer\exception\ConcurrentModificationException;
 use rosasurfer\exception\InvalidArgumentException;

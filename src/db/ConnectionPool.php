@@ -4,6 +4,8 @@ namespace rosasurfer\db;
 use rosasurfer\config\Config;
 use rosasurfer\core\Singleton;
 
+use rosasurfer\db\ConnectorInterface as IConnector;
+
 use rosasurfer\db\mysql\MysqlConnector;
 use rosasurfer\db\pgsql\PostgresConnector;
 use rosasurfer\db\sqlite\SqliteConnector;
@@ -20,10 +22,10 @@ use rosasurfer\exception\RuntimeException;
 final class ConnectionPool extends Singleton {
 
 
-   /** @var Connector[] - adapter pool */
+   /** @var IConnector[] - adapter pool */
    private $pool = [];
 
-   /** @var Connector - default adapter */
+   /** @var IConnector - default adapter */
    private $default;
 
    /** @var string[] - common adapter spellings */
@@ -56,11 +58,11 @@ final class ConnectionPool extends Singleton {
 
 
    /**
-    * Return the Connector instance for the specified connection identifier.
+    * Return the connector instance for the specified connection identifier.
     *
     * @param  string $id - connection identifier
     *
-    * @return Connector - database adapter for the specified identifier
+    * @return IConnector - database adapter for the specified identifier
     */
    public static function getConnector($id = null) {
       $me = self::me();
@@ -79,7 +81,7 @@ final class ConnectionPool extends Singleton {
          $config = $config->get('db.'.$id, null);
          if (!$config) throw new IllegalStateException('No configuration found for database alias "'.$id.'"');
 
-         // resolve the class name to use for the Connector
+         // resolve the class name to use for the connector
          $name = $config['connector'];
          $name = str_replace('/', '\\', $name);
          if ($name[0]=='\\') $name = subStr($name, 1);
@@ -93,7 +95,7 @@ final class ConnectionPool extends Singleton {
          $options = isSet($config['options']) ? $config['options'] : [];
          unset($config['connector'], $config['options']);
 
-         // instantiate and save a new Connector
+         // instantiate and save a new connector
          $me->pool[$id] = $connector = Connector::create($class, $config, $options);
       }
       return $connector;

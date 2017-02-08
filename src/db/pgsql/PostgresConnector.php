@@ -3,7 +3,6 @@ namespace rosasurfer\db\pgsql;
 
 use rosasurfer\db\Connector;
 use rosasurfer\db\DatabaseException;
-use rosasurfer\db\Result;
 
 use rosasurfer\exception\RosasurferExceptionInterface as RosasurferException;
 use rosasurfer\exception\RuntimeException;
@@ -177,7 +176,7 @@ class PostgresConnector extends Connector {
     *
     * @param  string $sql - SQL statement
     *
-    * @return Result
+    * @return PostgresResult
     *
     * @throws DatabaseException in case of failure
     */

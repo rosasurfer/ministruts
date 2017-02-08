@@ -3,7 +3,7 @@ namespace rosasurfer\db\orm;
 
 use rosasurfer\core\Object;
 use rosasurfer\core\Singleton;
-use rosasurfer\db\Connector;
+use rosasurfer\db\ConnectorInterface as Connector;
 
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\UnimplementedFeatureException;

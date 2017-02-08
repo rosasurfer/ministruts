@@ -16,7 +16,7 @@ use const rosasurfer\ARRAY_NUM;
  * Represents the result of an executed SQL statement. Depending on the statement type the result may or may not contain
  * a result set.
  */
-abstract class Result extends Object {
+abstract class Result extends Object implements ResultInterface {
 
 
    /**
@@ -94,7 +94,7 @@ abstract class Result extends Object {
     * @return int|bool - Generated ID or 0 (zero) if the previous statement did not generate an ID.
     *                    FALSE if the database system doesn't support this functionality or in case of an error.
     */
-   abstract function lastInsertId();
+   abstract public function lastInsertId();
 
 
    /**

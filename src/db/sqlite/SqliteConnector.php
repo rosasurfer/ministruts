@@ -3,7 +3,6 @@ namespace rosasurfer\db\sqlite;
 
 use rosasurfer\db\Connector;
 use rosasurfer\db\DatabaseException;
-use rosasurfer\db\Result;
 
 use rosasurfer\exception\RosasurferExceptionInterface as RosasurferException;
 use rosasurfer\exception\RuntimeException;
@@ -148,7 +147,7 @@ class SqliteConnector extends Connector {
     *
     * @param  string $sql - SQL statement
     *
-    * @return Result
+    * @return SqliteResult
     *
     * @throws DatabaseException in case of failure
     */
