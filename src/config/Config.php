@@ -1,9 +1,8 @@
 <?php
 namespace rosasurfer\config;
 
-
 use rosasurfer\cache\Cache;
-
+use rosasurfer\config\ConfigInterface as IConfig;
 use rosasurfer\core\Object;
 
 use rosasurfer\exception\IllegalTypeException;
@@ -74,7 +73,7 @@ use const rosasurfer\WINDOWS;
 class Config extends Object implements ConfigInterface {
 
 
-   /** @var ConfigInterface - the application's current default configuration */
+   /** @var IConfig - the application's current default configuration */
    private static $defaultInstance;
 
    /** @var string[] - config file names */
@@ -308,7 +307,7 @@ class Config extends Object implements ConfigInterface {
    /**
     * Get the current default configuration. This is the configuration set by Config::setDefault().
     *
-    * @return ConfigInterface
+    * @return IConfig
     */
    public static function getDefault() {
       // intentionally cause an error if $defaultInstance was not yet set
@@ -319,9 +318,9 @@ class Config extends Object implements ConfigInterface {
    /**
     * Set the default configuration to be returned by Config::getDefault().
     *
-    * @param  ConfigInterface $configuration
+    * @param  IConfig $configuration
     */
-   public static function setDefault(ConfigInterface $configuration) {
+   public static function setDefault(IConfig $configuration) {
       self::$defaultInstance = $configuration;
       // TODO: update cache config
    }

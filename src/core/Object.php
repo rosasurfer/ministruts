@@ -8,7 +8,7 @@ use function rosasurfer\strRightFrom;
 
 
 /**
- * Super class for all rosasurfer classes.
+ * Super class for all "rosasurfer" classes.
  */
 class Object {
 

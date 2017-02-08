@@ -2,12 +2,13 @@
 namespace rosasurfer\exception;
 
 use rosasurfer\debug\DebugHelper;
+use rosasurfer\exception\RosasurferExceptionInterface as RosasurferException;
 
 
 /**
- * Base exception for all Rosasurfer exceptions
+ * Base exception for all "rosasurfer" exceptions
  */
-class BaseException extends \Exception implements RosasurferExceptionInterface {
+class BaseException extends \Exception implements RosasurferException {
 
    use RosasurferExceptionTrait;
 

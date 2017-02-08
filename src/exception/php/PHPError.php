@@ -4,14 +4,14 @@ namespace rosasurfer\exception\php;
 use rosasurfer\debug\DebugHelper;
 use rosasurfer\debug\ErrorHandler;
 
-use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
+use rosasurfer\exception\RosasurferExceptionInterface as RosasurferException;
 use rosasurfer\exception\RosasurferExceptionTrait;
 
 
 /**
- * Rosasurfer exception for regular PHP errors wrapped in an exception
+ * "rosasurfer" exception for regular PHP errors wrapped in an exception
  */
-class PHPError extends \ErrorException implements IRosasurferException {
+class PHPError extends \ErrorException implements RosasurferException {
 
    use RosasurferExceptionTrait;
 

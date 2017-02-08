@@ -26,7 +26,7 @@ class MiniStruts extends StaticClass {
    /**
     * Initialize the framework. This method expects an array with any of the following options:
     *
-    * "config"            - ConfigInterface: config instance
+    * "config"            - IConfig: config instance
     *                     - string:  Configuration location, can either be a config directory or a config file.
     *
     * "global-helpers"    - boolean: If set to TRUE, the helper functions and constants defined in namespace \rosasurfer
@@ -164,7 +164,7 @@ class MiniStruts extends StaticClass {
    /**
     * Set the specified configuration as the application's main configuration or create one.
     *
-    * @param  string|IConfig $config - configuration or config location as passed to the framework loader
+    * @param  IConfig|string $config - configuration or config location as passed to the framework loader
     */
    private static function setConfiguration($config) {
       if (is_string($config))

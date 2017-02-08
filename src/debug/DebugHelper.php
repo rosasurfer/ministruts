@@ -5,16 +5,15 @@ use rosasurfer\core\StaticClass;
 
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RosasurferExceptionInterface as RosasurferException;
-
 use rosasurfer\exception\php\PHPError;
 
+use function rosasurfer\normalizeEOL;
+use function rosasurfer\strEndsWith;
 use function rosasurfer\strLeftTo;
 use function rosasurfer\strRightFrom;
 use function rosasurfer\strStartsWith;
 
 use const rosasurfer\NL;
-use function rosasurfer\strEndsWith;
-use function rosasurfer\normalizeEOL;
 
 
 /**
