@@ -229,13 +229,72 @@ class PostgresConnector extends Connector {
          $this->connect();
 
       try {
-         $result = pg_query($this->connection, $sql);          // automatically wraps multiple statements in a transaction
+         $result = pg_query($this->connection, $sql);             // wraps multi-statement queries in a transaction
 
          if (!$result) {
             $message  = pg_last_error($this->connection);
             $message .= NL.' SQL: "'.$sql.'"';
             throw new DatabaseException($message, null, $ex);
          }
+
+         //
+         // TODO: All queries must be sent via pg_send_query()/pg_get_result(). All errors must be analyzed per result
+         //       via pg_result_error(). This way we get access to SQLSTATE codes and to custom exception handling.
+         //
+
+         /*
+         pg_send_query($this->connection, $sql);
+         $result = pg_get_result($this->connection);     // get one result per statement from a multi-statement query
+
+         echoPre(pg_result_error($result));              // analyze errors
+
+         echoPre('PGSQL_DIAG_SEVERITY           = '.pg_result_error_field($result, PGSQL_DIAG_SEVERITY          ));
+         echoPre('PGSQL_DIAG_SQLSTATE           = '.pg_result_error_field($result, PGSQL_DIAG_SQLSTATE          ));
+         echoPre('PGSQL_DIAG_MESSAGE_PRIMARY    = '.pg_result_error_field($result, PGSQL_DIAG_MESSAGE_PRIMARY   ));
+         echoPre('PGSQL_DIAG_MESSAGE_DETAIL     = '.pg_result_error_field($result, PGSQL_DIAG_MESSAGE_DETAIL    ));
+         echoPre('PGSQL_DIAG_MESSAGE_HINT       = '.pg_result_error_field($result, PGSQL_DIAG_MESSAGE_HINT      ));
+         echoPre('PGSQL_DIAG_STATEMENT_POSITION = '.pg_result_error_field($result, PGSQL_DIAG_STATEMENT_POSITION));
+         echoPre('PGSQL_DIAG_INTERNAL_POSITION  = '.pg_result_error_field($result, PGSQL_DIAG_INTERNAL_POSITION ));
+         echoPre('PGSQL_DIAG_INTERNAL_QUERY     = '.pg_result_error_field($result, PGSQL_DIAG_INTERNAL_QUERY    ));
+         echoPre('PGSQL_DIAG_CONTEXT            = '.pg_result_error_field($result, PGSQL_DIAG_CONTEXT           ));
+         echoPre('PGSQL_DIAG_SOURCE_FILE        = '.pg_result_error_field($result, PGSQL_DIAG_SOURCE_FILE       ));
+         echoPre('PGSQL_DIAG_SOURCE_LINE        = '.pg_result_error_field($result, PGSQL_DIAG_SOURCE_LINE       ));
+         echoPre('PGSQL_DIAG_SOURCE_FUNCTION    = '.pg_result_error_field($result, PGSQL_DIAG_SOURCE_FUNCTION   ));
+         // ----------------------------------------------------------------------------------------------------------
+
+         $>  select lastval()
+         ERROR:  lastval is not yet defined in this session
+         PGSQL_DIAG_SEVERITY           = ERROR
+         PGSQL_DIAG_SQLSTATE           = 55000
+         PGSQL_DIAG_MESSAGE_PRIMARY    = lastval is not yet defined in this session
+         PGSQL_DIAG_MESSAGE_DETAIL     =
+         PGSQL_DIAG_MESSAGE_HINT       =
+         PGSQL_DIAG_STATEMENT_POSITION =
+         PGSQL_DIAG_INTERNAL_POSITION  =
+         PGSQL_DIAG_INTERNAL_QUERY     =
+         PGSQL_DIAG_CONTEXT            =
+         PGSQL_DIAG_SOURCE_FILE        = sequence.c
+         PGSQL_DIAG_SOURCE_LINE        = 794
+         PGSQL_DIAG_SOURCE_FUNCTION    = lastval
+         // ----------------------------------------------------------------------------------------------------------
+
+         $>  insert into t_doesnotexist (name) values ('a')
+         ERROR:  relation "t_doesnotexist" does not exist
+         LINE 1: insert into t_doesnotexist (name) values ('a'), ('b'), ('c')
+                             ^
+         PGSQL_DIAG_SEVERITY           = ERROR
+         PGSQL_DIAG_SQLSTATE           = 42P01
+         PGSQL_DIAG_MESSAGE_PRIMARY    = relation "t_doesnotexist" does not exist
+         PGSQL_DIAG_MESSAGE_DETAIL     =
+         PGSQL_DIAG_MESSAGE_HINT       =
+         PGSQL_DIAG_STATEMENT_POSITION = 13
+         PGSQL_DIAG_INTERNAL_POSITION  =
+         PGSQL_DIAG_INTERNAL_QUERY     =
+         PGSQL_DIAG_CONTEXT            =
+         PGSQL_DIAG_SOURCE_FILE        = parse_relation.c
+         PGSQL_DIAG_SOURCE_LINE        = 866
+         PGSQL_DIAG_SOURCE_FUNCTION    = parserOpenTable
+         */
 
          // Calculate number of rows affected by an INSERT/UPDATE/DELETE statement.
          //
