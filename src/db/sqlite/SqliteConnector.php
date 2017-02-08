@@ -5,7 +5,9 @@ use rosasurfer\db\Connector;
 use rosasurfer\db\DatabaseException;
 use rosasurfer\db\Result;
 
+use rosasurfer\exception\RosasurferExceptionInterface as RosasurferException;
 use rosasurfer\exception\RuntimeException;
+
 use rosasurfer\log\Logger;
 
 use const rosasurfer\L_WARN;
@@ -37,7 +39,7 @@ class SqliteConnector extends Connector {
    protected $transactionLevel = 0;
 
    /** @var bool - whether or not a query to execute can skip results */
-   private $execSkipResults = false;
+   private $skipResults = false;
 
 
    /**
@@ -152,8 +154,8 @@ class SqliteConnector extends Connector {
     */
    public function query($sql) {
       try {
-         $lastExecType = $this->execSkipResults;
-         $this->execSkipResults = false;
+         $lastExecMode = $this->skipResults;
+         $this->skipResults = false;
 
          $affectedRows = 0;
          $response = $this->executeRaw($sql, $affectedRows);
@@ -162,7 +164,7 @@ class SqliteConnector extends Connector {
          return new SqliteResult($this, $sql, $response, $affectedRows);
       }
       finally {
-         $this->execSkipResults = $lastExecType;
+         $this->skipResults = $lastExecMode;
       }
    }
 
@@ -180,15 +182,15 @@ class SqliteConnector extends Connector {
     */
    public function execute($sql) {
       try {
-         $lastExecType = $this->execSkipResults;
-         $this->execSkipResults = true;
+         $lastExecMode = $this->skipResults;
+         $this->skipResults = true;
 
          $affectedRows = 0;
          $this->executeRaw($sql, $affectedRows);
          return $affectedRows;
       }
       finally {
-         $this->execSkipResults = $lastExecType;
+         $this->skipResults = $lastExecMode;
       }
    }
 
@@ -213,16 +215,12 @@ class SqliteConnector extends Connector {
          $this->connect();
 
       try {
-         if ($this->execSkipResults) {
-            $result = $this->handler->exec($sql);           // TRUE on success, FALSE on error
-         }
-         else {
-            $result = $this->handler->query($sql);          // SQLite3Result or bool for result-less statements
-         }
+         if ($this->skipResults) $result = $this->handler->exec($sql);  // TRUE on success, FALSE on error
+         else                    $result = $this->handler->query($sql); // SQLite3Result or bool for result-less statements
 
          if (!$result) {
             $message  = 'Error '.$this->handler->lastErrorCode().', '.$this->handler->lastErrorMsg();
-            $message .= NL.' SQL: "'.$sql.'"';
+            $message .= NL.'SQL: "'.$sql.'"';
             throw new DatabaseException($message, null, $ex);
          }
 
@@ -244,11 +242,12 @@ class SqliteConnector extends Connector {
          $affectedRows      = $changes;
          $this->lastChanges = $this->handler->changes();
       }
-      catch (\Exception $ex) {
-         if (!$ex instanceof DatabaseException) {
-            $message  = 'Error '.$this->handler->lastErrorCode().', '.$this->handler->lastErrorMsg();
-            $message .= NL.' SQL: "'.$sql.'"';
-            $ex = new DatabaseException($message, null, $ex);
+      catch (RosasurferException $ex) {
+         $frame = $ex->getBetterTrace()[0];
+         $class = isSet($frame['class']) ? $frame['class'] : '';
+         if ($this->handler instanceof $class) {
+            if ($frame['function']=='exec' || $frame['function']=='query')
+               $ex->addMessage('SQL: "'.$sql.'"');
          }
          throw $ex;
       }

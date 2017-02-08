@@ -224,9 +224,9 @@ class MysqlConnector extends Connector {
             }
          }
       }
-      catch (\Exception $ex) {
-         if (!$ex instanceof DatabaseException)
-            $ex = new DatabaseException('Can not set system variable "'.$sql.'"', null, $ex);
+      catch (RosasurferException $ex) {
+         if ($ex->getFunctionName() == 'mysql_set_charset')
+            $ex->addMessage('Can not set system variable "'.$value.'"');
          throw $ex;
       }
 
@@ -234,9 +234,9 @@ class MysqlConnector extends Connector {
          if ($this->database && !mysql_select_db($this->database, $this->connection))
             throw new DatabaseException(mysql_error($this->connection));
       }
-      catch (\Exception $ex) {
-         if (!$ex instanceof DatabaseException)
-            $ex = new DatabaseException('Can not select database "'.$this->database.'"', null, $ex);
+      catch (RosasurferException $ex) {
+         if ($ex->getFunctionName() == 'mysql_select_db')
+            $ex->addMessage('Can not select database "'.$this->database.'"');
          throw $ex;
       }
       return $this;
@@ -365,7 +365,7 @@ class MysqlConnector extends Connector {
 
       if (!$result) {
          $message = ($errno=mysql_errno()) ? 'SQL-Error '.$errno.': '.mysql_error() : 'Can not connect to MySQL server';
-                             $message .= NL.' SQL: "'.$sql.'"';
+                             $message .= NL.'SQL: "'.$sql.'"';
          if ($errno == 1205) $message .= NL.NL.$this->printProcessList   ($return=true); // Lock wait timeout exceeded
          if ($errno == 1213) $message .= NL.NL.$this->printDeadlockStatus($return=true); // Deadlock found when trying to get lock
          throw new DatabaseException($message);
@@ -389,6 +389,28 @@ class MysqlConnector extends Connector {
          }
       }
       return $result;
+   }
+
+
+   /**
+    * Return the ID generated for an AUTO_INCREMENT column by the previous SQL statement (usually INSERT).
+    *
+    * @return int|bool - Generated ID or 0 (zero) if the previous query did not generate an AUTO_INCREMENT value;
+    *                    FALSE in case of an error.
+    *
+    * Notes:
+    * - Internally the return value of the native MySQL C API function mysql_insert_id() will be converted to a PHP integer.
+    *   If your AUTO_INCREMENT column has a type of BIGINT (64 bits) the conversion may result in an incorrect value.
+    *   In this case use the internal MySQL function LAST_INSERT_ID() in a SQL query.
+    *
+    * - Internally mysql_insert_id() acts on the last performed query. Call getLastInsertId() immediately after the query
+    *   that generates the value.
+    *
+    * - The value of the MySQL SQL function LAST_INSERT_ID() always contains the most recently generated AUTO_INCREMENT
+    *   value and is not reset between queries.
+    */
+   public function getLastInsertId() {
+      return mysql_insert_id($this->connection);
    }
 
 

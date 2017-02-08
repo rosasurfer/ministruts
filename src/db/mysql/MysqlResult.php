@@ -63,7 +63,7 @@ class MysqlResult extends Result {
     * @param  int $mode - Controls how the returned array is indexed. Can take one of the following values:
     *                     ARRAY_ASSOC, ARRAY_NUM, or ARRAY_BOTH (default).
     *
-    * @return array - array of columns or NULL if no (more) rows are available
+    * @return array - array of columns or NULL if no more rows are available
     */
    public function fetchNext($mode=ARRAY_BOTH) {
       if (!$this->result)
@@ -104,15 +104,37 @@ class MysqlResult extends Result {
 
 
    /**
+    * Return the ID generated for an AUTO_INCREMENT column by the previous SQL statement (usually INSERT).
+    *
+    * @return int|bool - Generated ID or 0 (zero) if the previous query did not generate an AUTO_INCREMENT value;
+    *                    FALSE in case of an error
+    *
+    * Notes:
+    * - Internally the return value of the native MySQL C API function mysql_insert_id() will be converted to a PHP integer.
+    *   If your AUTO_INCREMENT column has a type of BIGINT (64 bits) the conversion may result in an incorrect value.
+    *   In this case use the internal MySQL function LAST_INSERT_ID() in a SQL query.
+    *
+    * - Internally mysql_insert_id() acts on the last performed query. Call getLastInsertId() immediately after the query
+    *   that generates the value.
+    *
+    * - The value of the MySQL SQL function LAST_INSERT_ID() always contains the most recently generated AUTO_INCREMENT
+    *   value and is not reset between queries.
+    */
+   public function getLastInsertId() {
+      $this->connector->getLastInsertId();
+   }
+
+
+   /**
     * Fetch a single field of a row from the result set.
     *
     * @param  string|int $column       - name or offset of the column to fetch from (default: 0)
     * @param  int        $row          - row to fetch from, starting at 0 (default: the next row)
-    * @param  mixed      $onNoMoreRows - alternative value to return if no (more) rows are available
+    * @param  mixed      $onNoMoreRows - alternative value to return if no more rows are available
     *
     * @return mixed - content of a single cell (can be NULL)
     *
-    * @throws NoMoreRowsException if no (more) rows are available and parameter $alt was not specified
+    * @throws NoMoreRowsException if no more rows are available and parameter $onNoMoreRows was not set
     *
    public function fetchField($column=null, $row=null, $onNoMoreRows=null) {
       // TODO: mysql_result() compares column names in a case-insensitive way (no manual fiddling needed)
