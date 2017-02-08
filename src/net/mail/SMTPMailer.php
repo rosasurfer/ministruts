@@ -2,7 +2,6 @@
 namespace rosasurfer\net\mail;
 
 use rosasurfer\config\Config;
-
 use rosasurfer\debug\ErrorHandler;
 
 use rosasurfer\exception\IllegalTypeException;
@@ -11,12 +10,13 @@ use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
 
 use rosasurfer\log\Logger;
-
 use rosasurfer\util\Date;
 
+use function rosasurfer\normalizeEOL;
 use function rosasurfer\strContains;
 use function rosasurfer\strStartsWithI;
 
+use const rosasurfer\EOL_WINDOWS;
 use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_INFO;
 use const rosasurfer\L_NOTICE;
@@ -306,7 +306,7 @@ class SMTPMailer extends Mailer {
       $maxLineLength = 990;   // eigentlich 998, doch FastMail nimmt auch nur 990
 
       // mail body
-      $message = str_replace(array("\r\n", "\r"), array("\n", "\n"), $message);
+      $message = normalizeEOL($message);
       $lines = explode("\n", $message);
       foreach ($lines as $line) {
 
@@ -414,7 +414,7 @@ class SMTPMailer extends Mailer {
     * Daten in die Socketverbindung schreiben
     */
    private function writeData($data) {
-      $count = fWrite($this->connection, $data."\r\n", strLen($data)+2);
+      $count = fWrite($this->connection, $data.EOL_WINDOWS, strLen($data)+2);
 
       if ($count != strLen($data)+2)
          throw new RuntimeException('Error writing to socket, length of data: '.(strLen($data)+2).', bytes written: '.$count."\ndata: ".$data."\n\nTransfer log:\n-------------\n".$this->logBuffer);

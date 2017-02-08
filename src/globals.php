@@ -10,11 +10,10 @@ use rosasurfer\ministruts\url\VersionedUrl;
 if (defined('CLI')) return;
 
 
-// miscellaneous
+// runtime environment
 const CLI               = \rosasurfer\CLI;
 const LOCALHOST         = \rosasurfer\LOCALHOST;
 const WINDOWS           = \rosasurfer\WINDOWS;
-const NL                = \rosasurfer\NL;
 
 // custom log level
 const L_DEBUG           = \rosasurfer\L_DEBUG;
@@ -65,6 +64,13 @@ const PHP_INI_USER      = \rosasurfer\PHP_INI_USER;
 const PHP_INI_ONLY      = \rosasurfer\PHP_INI_ONLY;
 const PHP_INI_SYSTEM    = \rosasurfer\PHP_INI_SYSTEM;
 const PHP_INI_PERDIR    = \rosasurfer\PHP_INI_PERDIR;
+
+// miscellaneous
+const NL                = \rosasurfer\NL;                      // = EOL_UNIX
+const EOL_MAC           = \rosasurfer\EOL_MAC;                 // "\r"       CR       0D       13
+const EOL_NETSCAPE      = \rosasurfer\EOL_NETSCAPE;            // "\r\r\n"   CRCRLF   0D0D0A   13,13,10
+const EOL_UNIX          = \rosasurfer\EOL_UNIX;                // "\n"       LF       0A       10
+const EOL_WINDOWS       = \rosasurfer\EOL_WINDOWS;             // "\r\n"     CRLF     0D0A     13,10
 
 
 /**
@@ -450,6 +456,24 @@ function strIsNumeric($value) {
  */
 function strToBool($value) {
    return \rosasurfer\strToBool($value);
+}
+
+
+/**
+ * Normalize line endings in a string. If the string contains mixed line endings the number of lines of the original
+ * and the resulting string may differ. Netscape line endings are honored only if all line endings are Netscape format
+ * (no mixed mode).
+ *
+ * @param  string $string - string to normalize
+ * @param  string $mode   - format of the resulting string, can be one of:
+ *                          EOL_MAC:      line endings are converted to Mac format      "\r"
+ *                          EOL_NETSCAPE: line endings are converted to Netscape format "\r\r\n"
+ *                          EOL_UNIX:     line endings are converted to Unix format     "\n" (default)
+ *                          EOL_WINDOWS:  line endings are converted to Windows format  "\r\n"
+ * @return string
+ */
+function normalizeEOL($string, $mode = EOL_UNIX) {
+   return \rosasurfer\normalizeEOL($string, $mode);
 }
 
 

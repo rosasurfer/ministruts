@@ -74,7 +74,12 @@ const PHP_INI_SYSTEM    = 3;                                      // entry can b
 const PHP_INI_PERDIR    = 4;                                      // entry can be set in php.ini, httpd.conf, .htaccess and in .user.ini
 
 // miscellaneous
-const NL                = "\n";
+const NL                = "\n";                                   // - ctrl --- hex --- dec ----
+const EOL_MAC           = "\r";                                   //   CR       0D      13
+const EOL_NETSCAPE      = "\r\r\n";                               //   CRCRLF   0D0D0A  13,13,10
+const EOL_UNIX          = "\n";                                   //   LF       0A      10
+const EOL_WINDOWS       = "\r\n";                                 //   CRLF     0D0A    13,10
+
 !defined('PHP_INT_MIN') && define('PHP_INT_MIN', ~PHP_INT_MAX);   // built-in since PHP 7.0 (global)
 
 
@@ -699,6 +704,46 @@ function strToBool($value) {
       if ($value == 1.) return true;
    }
    return null;
+}
+
+
+/**
+ * Normalize line endings in a string. If the string contains mixed line endings the number of lines of the original
+ * and the resulting string may differ. Netscape line endings are honored only if all line endings are Netscape format
+ * (no mixed mode).
+ *
+ * @param  string $string - string to normalize
+ * @param  string $mode   - format of the resulting string, can be one of:
+ *                          EOL_MAC:      line endings are converted to Mac format      "\r"
+ *                          EOL_NETSCAPE: line endings are converted to Netscape format "\r\r\n"
+ *                          EOL_UNIX:     line endings are converted to Unix format     "\n" (default)
+ *                          EOL_WINDOWS:  line endings are converted to Windows format  "\r\n"
+ * @return string
+ */
+function normalizeEOL($string, $mode = EOL_UNIX) {
+   if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+
+   $done = false;
+
+   if (strContains($string, EOL_NETSCAPE)) {
+      $tmp = str_replace(EOL_NETSCAPE, EOL_UNIX, $string, $count1);
+      if (!strContains($tmp, EOL_MAC)) {
+         str_replace(EOL_UNIX, '.', $tmp, $count2);
+         if ($count1 == $count2) {
+            $string = $tmp;            // only Netscape => OK
+            $done   = true;
+         }
+      }
+   }
+   if (!$done) $string = str_replace([EOL_WINDOWS, EOL_MAC], EOL_UNIX, $string);
+
+   if ($mode===EOL_MAC || $mode===EOL_NETSCAPE || $mode===EOL_WINDOWS) {
+      $string = str_replace(EOL_UNIX, $mode, $string);
+   }
+   else if ($mode !== EOL_UNIX) {
+      throw new InvalidArgumentException('Invalid parameter $mode: '.is_array($mode) ? 'array':$mode);
+   }
+   return $string;
 }
 
 

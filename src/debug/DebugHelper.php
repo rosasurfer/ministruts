@@ -14,6 +14,7 @@ use function rosasurfer\strStartsWith;
 
 use const rosasurfer\NL;
 use function rosasurfer\strEndsWith;
+use function rosasurfer\normalizeEOL;
 
 
 /**
@@ -189,8 +190,7 @@ class DebugHelper extends StaticClass {
       $message = $exception->getMessage();
 
       if (strLen($indent)) {
-         // indent multiline messages
-         $lines = explode(NL, str_replace(["\r\n", "\r"], NL, $message));
+         $lines = explode(NL, normalizeEOL($message));                              // indent multiline messages
          $eom = '';
          if (strEndsWith($message, NL)) {
             array_pop($lines);

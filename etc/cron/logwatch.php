@@ -24,9 +24,12 @@ use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\util\PHP;
 
 use function rosasurfer\echoPre;
+use function rosasurfer\normalizeEOL;
 use function rosasurfer\strStartsWith;
 
 use const rosasurfer\CLI;
+use const rosasurfer\EOL_UNIX;
+use const rosasurfer\EOL_WINDOWS;
 use const rosasurfer\NL;
 use const rosasurfer\WINDOWS;
 
@@ -144,9 +147,9 @@ function processEntry($entry) {
    global $quiet, $sender, $receivers;
 
    // normalize line-breaks
-   $entry = str_replace(["\r\n", "\r"], "\n", $entry);            // use Unix line-breaks by default but...
+   $entry = normalizeEOL($entry);                                 // use Unix line-breaks by default but...
    if (WINDOWS)                                                   // use Windows line-breaks on Windows
-      $entry = str_replace("\n", "\r\n", $entry);
+      $entry = str_replace(EOL_UNIX, EOL_WINDOWS, $entry);
    $entry = str_replace(chr(0), "?", $entry);                     // replace NUL bytes which destroy the mail
 
    $subject = strTok($entry, "\r\n");                             // that's CR or LF, not CRLF

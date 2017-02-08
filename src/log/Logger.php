@@ -10,7 +10,6 @@ use rosasurfer\debug\ErrorHandler;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
-
 use rosasurfer\exception\php\PHPError;
 
 use rosasurfer\net\http\CurlHttpClient;
@@ -21,14 +20,18 @@ use rosasurfer\ministruts\Request;
 use rosasurfer\util\PHP;
 
 use function rosasurfer\ksort_r;
+use function rosasurfer\normalizeEOL;
 use function rosasurfer\printPretty;
 use function rosasurfer\strContains;
+use function rosasurfer\strEndsWith;
 use function rosasurfer\strLeftTo;
 use function rosasurfer\strRightFrom;
 use function rosasurfer\strStartsWith;
 use function rosasurfer\strStartsWithI;
 
 use const rosasurfer\CLI;
+use const rosasurfer\EOL_UNIX;
+use const rosasurfer\EOL_WINDOWS;
 use const rosasurfer\ERROR_LOG_DEFAULT;
 use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_ERROR;
@@ -39,7 +42,6 @@ use const rosasurfer\L_WARN;
 use const rosasurfer\LOCALHOST;
 use const rosasurfer\NL;
 use const rosasurfer\WINDOWS;
-use function rosasurfer\strEndsWith;
 
 
 /**
@@ -429,9 +431,9 @@ class Logger extends StaticClass {
       $subject = $context['mailSubject'];
       $message = $context['mailMessage'];
 
-      $message = str_replace("\r\n", "\n", $message);                // use Unix line-breaks on Linux
+      $message = normalizeEOL($message);                             // use Unix line-breaks on Linux
       if (WINDOWS)                                                   // and Windows line-breaks on Windows
-         $message = str_replace("\n", "\r\n", $message);
+         $message = str_replace(EOL_UNIX, EOL_WINDOWS, $message);
       $message = str_replace(chr(0), "?", $message);                 // replace NUL bytes which destroy the mail
 
       if (!$config=Config::getDefault()) throw new RuntimeException('Service locator returned invalid default config: '.getType($config));
@@ -442,7 +444,7 @@ class Logger extends StaticClass {
       foreach (self::$mailReceivers as $receiver) {
          // Windows: mail() fails if "sendmail_from" is not set and "From:" header is missing
          // Linux:   "From:" header is not reqired but set if provided
-         mail($receiver, $subject, $message, join("\r\n", $headers));
+         mail($receiver, $subject, $message, join(EOL_WINDOWS, $headers));
       }
    }
 
@@ -468,7 +470,7 @@ class Logger extends StaticClass {
 
       // (2) clean-up message
       $message = trim($context['cliMessage']);
-      $message = str_replace("\r\n", "\n", $message);                // enforce Unix line-breaks
+      $message = normalizeEOL($message);                             // enforce Unix line-breaks
       $message = subStr($message, 0, 150);                           // limit length to about one text message
 
 
@@ -607,7 +609,7 @@ class Logger extends StaticClass {
          $msg = $loggable;
 
          if (strLen($indent)) {                    // indent multiline messages
-            $lines = explode(NL, str_replace(["\r\n", "\r"], NL, $msg));
+            $lines = explode(NL, normalizeEOL($msg));
             $eom = '';
             if (strEndsWith($msg, NL)) {
                array_pop($lines);

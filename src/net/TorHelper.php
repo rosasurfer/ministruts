@@ -2,19 +2,19 @@
 namespace rosasurfer\net;
 
 use rosasurfer\cache\Cache;
-
 use rosasurfer\core\StaticClass;
 
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\IOException;
 
 use rosasurfer\lock\Lock;
-
 use rosasurfer\log\Logger;
 
 use rosasurfer\net\http\CurlHttpClient;
 use rosasurfer\net\http\HttpRequest;
 use rosasurfer\net\http\HttpResponse;
+
+use function rosasurfer\normalizeEOL;
 
 use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_ERROR;
@@ -117,7 +117,7 @@ class TorHelper extends StaticClass {
                   break;
                }
 
-               $nodes = strLen($content) ? array_flip(explode("\n", str_replace("\r\n", "\n", $content))) : array();
+               $nodes = strLen($content) ? array_flip(explode("\n", normalizeEOL($content))) : array();
 
                if (!$nodes) Logger::log('Could not get TOR exit nodes from any server', L_ERROR);
 
