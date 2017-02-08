@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\db\mysql;
 
-use rosasurfer\db\ConnectorInterface as Connector;
+use rosasurfer\db\ConnectorInterface as IConnector;
 use rosasurfer\db\NoMoreRowsException;
 use rosasurfer\db\Result;
 
@@ -19,7 +19,7 @@ use const rosasurfer\ARRAY_NUM;
 class MysqlResult extends Result {
 
 
-   /** @var Connector - used database connector */
+   /** @var IConnector - used database connector */
    protected $connector;
 
    /** @var string - SQL statement the result was generated from */
@@ -40,13 +40,13 @@ class MysqlResult extends Result {
     *
     * Create a new MysqlResult instance. Called only when execution of a SQL statement returned successful.
     *
-    * @param  Connector $connector    - Connector managing the database connection
-    * @param  string    $sql          - executed SQL statement
-    * @param  resource  $result       - A result resource or NULL for result-less SQL statements. SELECT queries not
-    *                                   matching any rows produce an empty result resource.
-    * @param  int       $affectedRows - number of rows modified by the statement
+    * @param  IConnector $connector    - Connector managing the database connection
+    * @param  string     $sql          - executed SQL statement
+    * @param  resource   $result       - A result resource or NULL for result-less SQL statements. SELECT queries not
+    *                                    matching any rows produce an empty result resource.
+    * @param  int        $affectedRows - number of rows modified by the statement
     */
-   public function __construct(Connector $connector, $sql, $result, $affectedRows) {
+   public function __construct(IConnector $connector, $sql, $result, $affectedRows) {
       if (!is_string($sql))                        throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
       if (!is_resource($result) && $result!==null) throw new IllegalTypeException('Illegal type of parameter $result: '.getType($result));
 

@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\db\sqlite;
 
-use rosasurfer\db\ConnectorInterface as Connector;
+use rosasurfer\db\ConnectorInterface as IConnector;
 use rosasurfer\db\Result;
 
 use rosasurfer\exception\IllegalArgumentException;
@@ -20,7 +20,7 @@ use const rosasurfer\ARRAY_NUM;
 class SqliteResult extends Result {
 
 
-   /** @var Connector - used database connector */
+   /** @var IConnector - used database connector */
    protected $connector;
 
    /** @var string - SQL statement the result was generated from */
@@ -41,13 +41,13 @@ class SqliteResult extends Result {
     *
     * Create a new SqliteResult instance. Called only when execution of a SQL statement returned successful.
     *
-    * @param  Connector      $connector    - Connector managing the database connection
+    * @param  IConnector     $connector    - Connector managing the database connection
     * @param  string         $sql          - executed SQL statement
     * @param  \SQLite3Result $result       - A SQLite3Result or NULL for result-less SQL statements. SELECT queries not
     *                                        matching any rows and DELETE statements produce an empty SQLite3Result.
     * @param  int            $affectedRows - number of rows modified by the statement
     */
-   public function __construct(Connector $connector, $sql, \SQLite3Result $result=null, $affectedRows=0) {
+   public function __construct(IConnector $connector, $sql, \SQLite3Result $result=null, $affectedRows=0) {
       if (func_num_args() < 4) throw new IllegalArgumentException('Illegal number of arguments: '.func_num_args());
       if (!is_string($sql))    throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
 

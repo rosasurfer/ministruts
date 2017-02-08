@@ -3,8 +3,8 @@ namespace rosasurfer\db\orm;
 
 use rosasurfer\core\Singleton;
 
-use rosasurfer\db\ConnectorInterface as Connector;
-use rosasurfer\db\ResultInterface    as Result;
+use rosasurfer\db\ConnectorInterface as IConnector;
+use rosasurfer\db\ResultInterface    as IResult;
 
 use rosasurfer\exception\ConcurrentModificationException;
 use rosasurfer\exception\InvalidArgumentException;
@@ -77,7 +77,7 @@ abstract class Dao extends Singleton {
     *
     * @param  string $sql - SQL statement
     *
-    * @return Result
+    * @return IResult
     */
    public function query($sql) {
       return $this->getWorker()->query($sql);
@@ -107,7 +107,7 @@ abstract class Dao extends Singleton {
    /**
     * Return the database adapter for the Dao's entity class.
     *
-    * @return Connector
+    * @return IConnector
     */
    public final function db() {
       return $this->getWorker()->getConnector();

@@ -7,7 +7,7 @@ use rosasurfer\core\Object;
 /**
  * PersistableSet
  *
- * Abstract base class for sets of <tt>PersistableObject</tt>s.
+ * Abstract base class for sets of <tt>PersistableObject</tt>'s.
  */
 abstract class PersistableSet extends Object {
 }

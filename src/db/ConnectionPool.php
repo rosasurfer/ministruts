@@ -28,7 +28,7 @@ final class ConnectionPool extends Singleton {
    /** @var IConnector - default adapter */
    private $default;
 
-   /** @var string[] - common adapter spellings */
+   /** @var string[] - common adapter aliases */
    private static $aliases = [
       'maria'                                     => MysqlConnector::class,
       'mariadb'                                   => MysqlConnector::class,

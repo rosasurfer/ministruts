@@ -57,7 +57,7 @@ abstract class Connector extends Object implements ConnectorInterface {
     * @param  string[] $config  - connection configuration
     * @param  string[] $options - additional connection options (default: none)
     *
-    * @return self
+    * @return IConnector
     */
    public static function create($class, array $config, array $options=[]) {
       if (!is_subclass_of($class, IConnector::class)) throw new InvalidArgumentException('Not a '.IConnector::class.': '.$class);

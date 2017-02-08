@@ -4,8 +4,8 @@ namespace rosasurfer\db\orm;
 use rosasurfer\core\Object;
 
 use rosasurfer\db\ConnectionPool;
-use rosasurfer\db\ConnectorInterface as Connector;
-use rosasurfer\db\ResultInterface    as Result;
+use rosasurfer\db\ConnectorInterface as IConnector;
+use rosasurfer\db\ResultInterface    as IResult;
 
 use const rosasurfer\ARRAY_ASSOC;
 
@@ -25,7 +25,7 @@ class Worker extends Object {
    /** @var string - class name of the Worker's model */
    protected $entityClass;
 
-   /** @var Connector - database adapter of the Worker's model */
+   /** @var IConnector - database adapter of the Worker's model */
    private   $connector;
 
 
@@ -73,7 +73,7 @@ class Worker extends Object {
     *
     * @param  string $sql - SQL statement
     *
-    * @return Result
+    * @return IResult
     */
    public function query($sql) {
       return $this->getConnector()->query($sql);
@@ -81,13 +81,13 @@ class Worker extends Object {
 
 
    /**
-    * Convert the next row of a Result to an object of the model class.
+    * Convert the next row of a result to an object of the model class.
     *
-    * @param  Result $result
+    * @param  IResult $result
     *
-    * @return PersistableObject - instance or NULL if the Result doesn't hold any more rows
+    * @return PersistableObject - instance or NULL if the result doesn't hold any more rows
     */
-   protected function makeObject(Result $result) {
+   protected function makeObject(IResult $result) {
 
       // TODO: Lookup and return an existing instance instead of a copy.
 
@@ -99,13 +99,13 @@ class Worker extends Object {
 
 
    /**
-    * Convert all remaining rows of a Result to objects of the model class.
+    * Convert all remaining rows of a result to objects of the model class.
     *
-    * @param  Result $result
+    * @param  IResult $result
     *
-    * @return PersistableObject[] - arry of instances or an empty array if the Result doesn't hold any more rows
+    * @return PersistableObject[] - arry of instances or an empty array if the result doesn't hold any more rows
     */
-   protected function makeObjects(Result $result) {
+   protected function makeObjects(IResult $result) {
 
       // TODO: Lookup and return existing instances instead of copies.
 
@@ -120,7 +120,7 @@ class Worker extends Object {
    /**
     * Return the database adapter of the Worker's model class.
     *
-    * @return Connector
+    * @return IConnector
     */
    public function getConnector() {
       if (!$this->connector) {

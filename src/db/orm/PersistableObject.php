@@ -3,7 +3,7 @@ namespace rosasurfer\db\orm;
 
 use rosasurfer\core\Object;
 use rosasurfer\core\Singleton;
-use rosasurfer\db\ConnectorInterface as Connector;
+use rosasurfer\db\ConnectorInterface as IConnector;
 
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\UnimplementedFeatureException;
@@ -270,7 +270,7 @@ abstract class PersistableObject extends Object {
    /**
     * Return the database adapter for the calling class.
     *
-    * @return Connector
+    * @return IConnector
     */
    public static function db() {
       if (static::class == __CLASS__) throw new IllegalAccessException('Use a model class to access method '.__METHOD__.'()');
