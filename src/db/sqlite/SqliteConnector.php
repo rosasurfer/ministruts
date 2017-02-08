@@ -245,10 +245,8 @@ class SqliteConnector extends Connector {
       catch (RosasurferException $ex) {
          $frame = $ex->getBetterTrace()[0];
          $class = isSet($frame['class']) ? $frame['class'] : '';
-         if ($this->handler instanceof $class) {
-            if ($frame['function']=='exec' || $frame['function']=='query')
-               $ex->addMessage('SQL: "'.$sql.'"');
-         }
+         if ($this->handler instanceof $class)
+            $ex->addMessage('SQL: "'.$sql.'"');
          throw $ex;
       }
       return $result;

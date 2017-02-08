@@ -241,6 +241,11 @@ class PostgresConnector extends Connector {
          // TODO: All queries must be sent via pg_send_query()/pg_get_result(). All errors must be analyzed per result
          //       via pg_result_error(). This way we get access to SQLSTATE codes and to custom exception handling.
          //
+         //       PDO and missing support for asynchronous queries:
+         // @see  http://grokbase.com/t/php/php-pdo/09b2hywmak/asynchronous-requests
+         // @see  http://stackoverflow.com/questions/865017/pg-send-query-cannot-set-connection-to-blocking-mode
+         // @see  https://bugs.php.net/bug.php?id=65015
+         //
 
          /*
          pg_send_query($this->connection, $sql);
