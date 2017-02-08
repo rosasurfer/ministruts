@@ -2,6 +2,7 @@
 
    - helper function \rosasurfer\normalizeEOL()  
    - end-of-line constants EOL_MAC, EOL_NETSCAPE, EOL_UNIX, EOL_WINDOWS
+   - add IRosasurferException::addMessage() and PHPError::getSimpleType() 
 
 
 2017-02-03

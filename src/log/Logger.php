@@ -627,7 +627,7 @@ class Logger extends StaticClass {
             $type = 'Unhandled ';
             if ($loggable instanceof PHPError) {
                $msg   = strRightFrom($msg, ':');
-               $type .= 'PHP error:';
+               $type .= 'PHP Error:';
             }
          }
          $text = '['.strToUpper(self::$logLevels[$level]).'] '.$type.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
@@ -730,7 +730,7 @@ class Logger extends StaticClass {
             $type = 'Unhandled ';
             if ($loggable instanceof PHPError) {
                $msg   = strRightFrom($msg, ':');
-               $type .= 'PHP error:';
+               $type .= 'PHP Error:';
             }
          }
          $html     .= '<b>['.strToUpper(self::$logLevels[$level]).']</b> '.nl2br(htmlSpecialChars($type.$msg, ENT_QUOTES|ENT_SUBSTITUTE))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';

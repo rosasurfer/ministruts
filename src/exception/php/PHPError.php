@@ -71,4 +71,14 @@ class PHPError extends \ErrorException implements RosasurferException {
       }
       return $trace;
    }
+
+
+   /**
+    * Return the simple PHP type description of this PHPError.
+    *
+    * @return string
+    */
+   public function getSimpleType() {
+      return 'PHP Error';
+   }
 }

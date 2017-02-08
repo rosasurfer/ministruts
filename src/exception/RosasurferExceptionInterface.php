@@ -3,9 +3,18 @@ namespace rosasurfer\exception;
 
 
 /**
- * An interface defining common functionality for all rosasurfer exceptions.
+ * An interface defining common functionality for all "rosasurfer" exceptions.
  */
 interface RosasurferExceptionInterface {
+
+
+   /**
+    * Add a message to the exception's existing message. Used during up-bubbling to add additional information to an
+    * exception's original message.
+    *
+    * @param  string $message
+    */
+   public function addMessage($message);
 
 
    /**
@@ -30,4 +39,12 @@ interface RosasurferExceptionInterface {
     * @return string
     */
    public function getBetterTraceAsString();
+
+
+   /**
+    * Return the name of the function (if any) where the exception occurred.
+    *
+    * @return string
+    */
+   public function getFunctionName();
 }

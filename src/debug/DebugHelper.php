@@ -176,15 +176,17 @@ class DebugHelper extends StaticClass {
     * @return string - message
     */
    public static function getBetterMessage(\Exception $exception, $indent='') {
-      $class     = get_class($exception);
-      $namespace = strToLower(strLeftTo($class, '\\', -1, true, ''));
-      $baseName  = strRightFrom($class, '\\', -1, false, $class);
-      $result    = $indent.$namespace.$baseName;
+      if ($exception instanceof PHPError) {
+         $result    = $exception->getSimpleType();
+      }
+      else {
+         $class     = get_class($exception);
+         $namespace = strToLower(strLeftTo($class, '\\', -1, true, ''));
+         $baseName  = strRightFrom($class, '\\', -1, false, $class);
+         $result    = $indent.$namespace.$baseName;
 
-      if ($exception instanceof \ErrorException) {                                  // A PHP error exception not created
-         if (!$exception instanceof PHPError) {                                     // by the framework.
-            $result .= '('.self::errorLevelToStr($exception->getSeverity()).')';
-         }
+         if ($exception instanceof \ErrorException)                                 // A PHP error exception not created
+            $result .= '('.self::errorLevelToStr($exception->getSeverity()).')';    // by the framework.
       }
       $message = $exception->getMessage();
 

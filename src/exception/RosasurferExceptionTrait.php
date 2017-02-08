@@ -3,9 +3,11 @@ namespace rosasurfer\exception;
 
 use rosasurfer\debug\DebugHelper;
 
+use const rosasurfer\NL;
+
 
 /**
- * A trait implementing common functionality for all Rosasurfer exceptions.
+ * A trait implementing common functionality of all "rosasurfer" exceptions.
  */
 trait RosasurferExceptionTrait {
 
@@ -15,6 +17,17 @@ trait RosasurferExceptionTrait {
 
    /** @var string - better stacktrace as string */
    private $betterTraceAsString;
+
+
+   /**
+    * Add a message to the exception's existing message. Used during up-bubbling to add additional information to an
+    * exception's original message.
+    *
+    * @param  string $message
+    */
+   public function addMessage($message) {
+      $this->message = trim($this->message).NL.trim($message);
+   }
 
 
    /**
@@ -38,6 +51,16 @@ trait RosasurferExceptionTrait {
       if (!$this->betterTraceAsString)
          $this->betterTraceAsString = DebugHelper::getBetterTraceAsString($this);
       return $this->betterTraceAsString;
+   }
+
+
+   /**
+    * Return the name of the function (if any) where the exception occurred.
+    *
+    * @return string
+    */
+   public function getFunctionName() {
+      return DebugHelper::getFQFunctionName($this->getBetterTrace()[0]);
    }
 
 
