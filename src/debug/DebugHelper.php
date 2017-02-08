@@ -4,7 +4,7 @@ namespace rosasurfer\debug;
 use rosasurfer\core\StaticClass;
 
 use rosasurfer\exception\IllegalTypeException;
-use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
+use rosasurfer\exception\RosasurferExceptionInterface as RosasurferException;
 
 use rosasurfer\exception\php\PHPError;
 
@@ -181,8 +181,8 @@ class DebugHelper extends StaticClass {
       $baseName  = strRightFrom($class, '\\', -1, false, $class);
       $result    = $indent.$namespace.$baseName;
 
-      if ($exception instanceof \ErrorException) {
-         if (!$exception instanceof PHPError) {
+      if ($exception instanceof \ErrorException) {                                  // A PHP error exception not created
+         if (!$exception instanceof PHPError) {                                     // by the framework.
             $result .= '('.self::errorLevelToStr($exception->getSeverity()).')';
          }
       }
@@ -214,14 +214,14 @@ class DebugHelper extends StaticClass {
     * @return string - readable stacktrace
     */
    public static function getBetterTraceAsString(\Exception $exception, $indent='') {
-      if ($exception instanceof IRosasurferException) $trace = $exception->getBetterTrace();
-      else                                            $trace = self::fixTrace($exception->getTrace(), $exception->getFile(), $exception->getLine());
+      if ($exception instanceof RosasurferException) $trace = $exception->getBetterTrace();
+      else                                           $trace = self::fixTrace($exception->getTrace(), $exception->getFile(), $exception->getLine());
       $result = self::formatTrace($trace, $indent);
 
       if ($cause=$exception->getPrevious()) {
-         // recursively add stacktraces of all nested exceptions
-         $message = self::getBetterMessage($cause, $indent);
-         $result .= NL.$indent.'caused by'.NL.$message.' in'.NL.NL;
+         // recursively add stacktraces of nested exceptions
+         $message = trim(self::getBetterMessage($cause, $indent));
+         $result .= NL.$indent.'caused by'.NL.$indent.$message.NL.NL;
          $result .= self::{__FUNCTION__}($cause, $indent);                 // recursion
       }
       return $result;
