@@ -13,6 +13,7 @@ use function rosasurfer\strRightFrom;
 use function rosasurfer\strStartsWith;
 
 use const rosasurfer\NL;
+use function rosasurfer\strEndsWith;
 
 
 /**
@@ -169,23 +170,36 @@ class DebugHelper extends StaticClass {
    /**
     * Return a more readable version of an exception's message.
     *
-    * @param  Exception $exception - any exception (not only RosasurferExceptions)
+    * @param  \Exception $exception - any exception (not only RosasurferExceptions)
+    * @param  string     $indent    - indent lines by this value (default: empty string)
     *
     * @return string - message
     */
-   public static function getBetterMessage(\Exception $exception) {
+   public static function getBetterMessage(\Exception $exception, $indent='') {
       $class     = get_class($exception);
       $namespace = strToLower(strLeftTo($class, '\\', -1, true, ''));
       $baseName  = strRightFrom($class, '\\', -1, false, $class);
-      $result    = $namespace.$baseName;
+      $result    = $indent.$namespace.$baseName;
 
       if ($exception instanceof \ErrorException) {
          if (!$exception instanceof PHPError) {
             $result .= '('.self::errorLevelToStr($exception->getSeverity()).')';
          }
       }
-      $result .= (strLen($message=$exception->getMessage()) ? ': ':'').$message;
+      $message = $exception->getMessage();
 
+      if (strLen($indent)) {
+         // indent multiline messages
+         $lines = explode(NL, str_replace(["\r\n", "\r"], NL, $message));
+         $eom = '';
+         if (strEndsWith($message, NL)) {
+            array_pop($lines);
+            $eom = NL;
+         }
+         $message = join(NL.$indent, $lines).$eom;
+      }
+
+      $result .= (strLen($message) ? ': ':'').$message;
       return $result;
    }
 
@@ -194,8 +208,8 @@ class DebugHelper extends StaticClass {
     * Return a more readable version of an exception's stacktrace. The representation also contains informations about
     * nested exceptions.
     *
-    * @param  Exception $exception - any exception (not only RosasurferExceptions)
-    * @param  string    $indent    - indent the resulting lines by this value (default: empty string)
+    * @param  \Exception $exception - any exception (not only RosasurferExceptions)
+    * @param  string     $indent    - indent the resulting lines by this value (default: empty string)
     *
     * @return string - readable stacktrace
     */
@@ -206,8 +220,8 @@ class DebugHelper extends StaticClass {
 
       if ($cause=$exception->getPrevious()) {
          // recursively add stacktraces of all nested exceptions
-         $message = self::getBetterMessage($cause);
-         $result .= NL.$indent.'caused by'.NL.$indent.$message.' in'.NL.NL;
+         $message = self::getBetterMessage($cause, $indent);
+         $result .= NL.$indent.'caused by'.NL.$message.' in'.NL.NL;
          $result .= self::{__FUNCTION__}($cause, $indent);                 // recursion
       }
       return $result;

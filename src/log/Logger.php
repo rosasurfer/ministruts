@@ -39,6 +39,7 @@ use const rosasurfer\L_WARN;
 use const rosasurfer\LOCALHOST;
 use const rosasurfer\NL;
 use const rosasurfer\WINDOWS;
+use function rosasurfer\strEndsWith;
 
 
 /**
@@ -603,13 +604,23 @@ class Logger extends StaticClass {
       // compose message
       if (is_string($loggable)) {
          // simple message
-         $msg  = $loggable;
+         $msg = $loggable;
+
+         if (strLen($indent)) {                    // indent multiline messages
+            $lines = explode(NL, str_replace(["\r\n", "\r"], NL, $msg));
+            $eom = '';
+            if (strEndsWith($msg, NL)) {
+               array_pop($lines);
+               $eom = NL;
+            }
+            $msg = join(NL.$indent, $lines).$eom;
+         }
          $text = '['.strToUpper(self::$logLevels[$level]).'] '.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
       }
       else {
          // exception
          $type = null;
-         $msg  = trim(DebugHelper::getBetterMessage($loggable));
+         $msg  = trim(DebugHelper::getBetterMessage($loggable, $indent));
          if (isSet($context['unhandled'])) {
             $type = 'Unhandled ';
             if ($loggable instanceof PHPError) {
@@ -628,7 +639,7 @@ class Logger extends StaticClass {
       // append an existing context exception to "cliExtra"
       if (isSet($context['exception'])) {
          $exception = $context['exception'];
-         $msg       = $indent.trim(DebugHelper::getBetterMessage($exception));
+         $msg       = $indent.trim(DebugHelper::getBetterMessage($exception, $indent));
          $extra    .= NL.$msg.NL;
          $traceStr  = $indent.'Stacktrace:'.NL.' -----------'.NL;
          $traceStr .= DebugHelper::getBetterTraceAsString($exception, $indent);
