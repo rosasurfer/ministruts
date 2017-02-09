@@ -13,6 +13,8 @@ interface RosasurferExceptionInterface {
     * exception's original message.
     *
     * @param  string $message
+    *
+    * @return self
     */
    public function addMessage($message);
 

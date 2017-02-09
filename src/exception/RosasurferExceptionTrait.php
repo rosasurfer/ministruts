@@ -24,9 +24,12 @@ trait RosasurferExceptionTrait {
     * exception's original message.
     *
     * @param  string $message
+    *
+    * @return self
     */
    public function addMessage($message) {
       $this->message = trim($this->message).NL.trim($message);
+      return $this;
    }
 
 

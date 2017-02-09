@@ -132,7 +132,7 @@ class PostgresConnector extends Connector {
 
       - host=/tmp                                                             // connect to socket
       - options='--application_name=$appName'                                 // send $appName to backend (pgAdmin, logs)
-      - options='--client_encoding=UTF8'                                      // mset client encoding
+      - options='--client_encoding=UTF8'                                      // set client encoding
 
       - putEnv('PGSERVICEFILE=/path/to/your/service/file/pg_service.conf');   // external connection configuration
         pg_connect("service=testdb");
@@ -226,107 +226,111 @@ class PostgresConnector extends Connector {
       if (!$this->isConnected())
          $this->connect();
 
+      $result = null;
       try {
+         // execute statement
          $result = pg_query($this->connection, $sql);             // wraps multi-statement queries in a transaction
-
-         if (!$result) {
-            $message  = pg_last_error($this->connection);
-            $message .= NL.' SQL: "'.$sql.'"';
-            throw new DatabaseException($message, null, $ex);
-         }
-
-         //
-         // TODO: All queries must be sent via pg_send_query()/pg_get_result(). All errors must be analyzed per result
-         //       via pg_result_error(). This way we get access to SQLSTATE codes and to custom exception handling.
-         //
-         //       PDO and missing support for asynchronous queries:
-         // @see  http://grokbase.com/t/php/php-pdo/09b2hywmak/asynchronous-requests
-         // @see  http://stackoverflow.com/questions/865017/pg-send-query-cannot-set-connection-to-blocking-mode
-         // @see  https://bugs.php.net/bug.php?id=65015
-         //
-
-         /*
-         pg_send_query($this->connection, $sql);
-         $result = pg_get_result($this->connection);     // get one result per statement from a multi-statement query
-
-         echoPre(pg_result_error($result));              // analyze errors
-
-         echoPre('PGSQL_DIAG_SEVERITY           = '.pg_result_error_field($result, PGSQL_DIAG_SEVERITY          ));
-         echoPre('PGSQL_DIAG_SQLSTATE           = '.pg_result_error_field($result, PGSQL_DIAG_SQLSTATE          ));
-         echoPre('PGSQL_DIAG_MESSAGE_PRIMARY    = '.pg_result_error_field($result, PGSQL_DIAG_MESSAGE_PRIMARY   ));
-         echoPre('PGSQL_DIAG_MESSAGE_DETAIL     = '.pg_result_error_field($result, PGSQL_DIAG_MESSAGE_DETAIL    ));
-         echoPre('PGSQL_DIAG_MESSAGE_HINT       = '.pg_result_error_field($result, PGSQL_DIAG_MESSAGE_HINT      ));
-         echoPre('PGSQL_DIAG_STATEMENT_POSITION = '.pg_result_error_field($result, PGSQL_DIAG_STATEMENT_POSITION));
-         echoPre('PGSQL_DIAG_INTERNAL_POSITION  = '.pg_result_error_field($result, PGSQL_DIAG_INTERNAL_POSITION ));
-         echoPre('PGSQL_DIAG_INTERNAL_QUERY     = '.pg_result_error_field($result, PGSQL_DIAG_INTERNAL_QUERY    ));
-         echoPre('PGSQL_DIAG_CONTEXT            = '.pg_result_error_field($result, PGSQL_DIAG_CONTEXT           ));
-         echoPre('PGSQL_DIAG_SOURCE_FILE        = '.pg_result_error_field($result, PGSQL_DIAG_SOURCE_FILE       ));
-         echoPre('PGSQL_DIAG_SOURCE_LINE        = '.pg_result_error_field($result, PGSQL_DIAG_SOURCE_LINE       ));
-         echoPre('PGSQL_DIAG_SOURCE_FUNCTION    = '.pg_result_error_field($result, PGSQL_DIAG_SOURCE_FUNCTION   ));
-         // ----------------------------------------------------------------------------------------------------------
-
-         $>  select lastval()
-         ERROR:  lastval is not yet defined in this session
-         PGSQL_DIAG_SEVERITY           = ERROR
-         PGSQL_DIAG_SQLSTATE           = 55000
-         PGSQL_DIAG_MESSAGE_PRIMARY    = lastval is not yet defined in this session
-         PGSQL_DIAG_MESSAGE_DETAIL     =
-         PGSQL_DIAG_MESSAGE_HINT       =
-         PGSQL_DIAG_STATEMENT_POSITION =
-         PGSQL_DIAG_INTERNAL_POSITION  =
-         PGSQL_DIAG_INTERNAL_QUERY     =
-         PGSQL_DIAG_CONTEXT            =
-         PGSQL_DIAG_SOURCE_FILE        = sequence.c
-         PGSQL_DIAG_SOURCE_LINE        = 794
-         PGSQL_DIAG_SOURCE_FUNCTION    = lastval
-         // ----------------------------------------------------------------------------------------------------------
-
-         $>  insert into t_doesnotexist (name) values ('a')
-         ERROR:  relation "t_doesnotexist" does not exist
-         LINE 1: insert into t_doesnotexist (name) values ('a'), ('b'), ('c')
-                             ^
-         PGSQL_DIAG_SEVERITY           = ERROR
-         PGSQL_DIAG_SQLSTATE           = 42P01
-         PGSQL_DIAG_MESSAGE_PRIMARY    = relation "t_doesnotexist" does not exist
-         PGSQL_DIAG_MESSAGE_DETAIL     =
-         PGSQL_DIAG_MESSAGE_HINT       =
-         PGSQL_DIAG_STATEMENT_POSITION = 13
-         PGSQL_DIAG_INTERNAL_POSITION  =
-         PGSQL_DIAG_INTERNAL_QUERY     =
-         PGSQL_DIAG_CONTEXT            =
-         PGSQL_DIAG_SOURCE_FILE        = parse_relation.c
-         PGSQL_DIAG_SOURCE_LINE        = 866
-         PGSQL_DIAG_SOURCE_FUNCTION    = parserOpenTable
-         */
-
-         // Calculate number of rows affected by an INSERT/UPDATE/DELETE statement.
-         //
-         // - pg_affected_rows($result) returns the matched, not the modified rows of a result.
-         // - PostgreSQL supports multi-statement queries.
-         //
-         // The following logic assumes a single statement query with matched = modified rows:
-         //
-         $rows = pg_affected_rows($result);
-         if ($rows) {
-            $str = strToLower(subStr(trim($sql), 0, 6));
-            if ($str!='insert' && $str!='update' && $str!='delete')
-               $rows = 0;
-         }
-         $affectedRows = $rows;
       }
       catch (RosasurferException $ex) {
-         if ($ex->getFunctionName() == 'pg_query')
-            $ex->addMessage('SQL: "'.$sql.'"');
-         throw $ex;
+         throw $ex->addMessage('SQL: "'.$sql.'"');
       }
+
+      if (!$result) {
+         $message  = pg_last_error($this->connection);
+         $message .= NL.' SQL: "'.$sql.'"';
+         throw new DatabaseException($message, null, $ex);
+      }
+      //
+      // TODO: All queries must be sent via pg_send_query()/pg_get_result(). All errors must be analyzed per result
+      //       via pg_result_error(). This way we get access to SQLSTATE codes and to custom exception handling.
+      //
+      //       PDO and missing support for asynchronous queries:
+      // @see  http://grokbase.com/t/php/php-pdo/09b2hywmak/asynchronous-requests
+      // @see  http://stackoverflow.com/questions/865017/pg-send-query-cannot-set-connection-to-blocking-mode
+      // @see  https://bugs.php.net/bug.php?id=65015
+      //
+
+      /*
+      pg_send_query($this->connection, $sql);
+      $result = pg_get_result($this->connection);     // get one result per statement from a multi-statement query
+
+      echoPre(pg_result_error($result));              // analyze errors
+
+      echoPre('PGSQL_DIAG_SEVERITY           = '.pg_result_error_field($result, PGSQL_DIAG_SEVERITY          ));
+      echoPre('PGSQL_DIAG_SQLSTATE           = '.pg_result_error_field($result, PGSQL_DIAG_SQLSTATE          ));
+      echoPre('PGSQL_DIAG_MESSAGE_PRIMARY    = '.pg_result_error_field($result, PGSQL_DIAG_MESSAGE_PRIMARY   ));
+      echoPre('PGSQL_DIAG_MESSAGE_DETAIL     = '.pg_result_error_field($result, PGSQL_DIAG_MESSAGE_DETAIL    ));
+      echoPre('PGSQL_DIAG_MESSAGE_HINT       = '.pg_result_error_field($result, PGSQL_DIAG_MESSAGE_HINT      ));
+      echoPre('PGSQL_DIAG_STATEMENT_POSITION = '.pg_result_error_field($result, PGSQL_DIAG_STATEMENT_POSITION));
+      echoPre('PGSQL_DIAG_INTERNAL_POSITION  = '.pg_result_error_field($result, PGSQL_DIAG_INTERNAL_POSITION ));
+      echoPre('PGSQL_DIAG_INTERNAL_QUERY     = '.pg_result_error_field($result, PGSQL_DIAG_INTERNAL_QUERY    ));
+      echoPre('PGSQL_DIAG_CONTEXT            = '.pg_result_error_field($result, PGSQL_DIAG_CONTEXT           ));
+      echoPre('PGSQL_DIAG_SOURCE_FILE        = '.pg_result_error_field($result, PGSQL_DIAG_SOURCE_FILE       ));
+      echoPre('PGSQL_DIAG_SOURCE_LINE        = '.pg_result_error_field($result, PGSQL_DIAG_SOURCE_LINE       ));
+      echoPre('PGSQL_DIAG_SOURCE_FUNCTION    = '.pg_result_error_field($result, PGSQL_DIAG_SOURCE_FUNCTION   ));
+      // ----------------------------------------------------------------------------------------------------------
+
+      $>  select lastval()
+      ERROR:  lastval is not yet defined in this session
+      PGSQL_DIAG_SEVERITY           = ERROR
+      PGSQL_DIAG_SQLSTATE           = 55000
+      PGSQL_DIAG_MESSAGE_PRIMARY    = lastval is not yet defined in this session
+      PGSQL_DIAG_MESSAGE_DETAIL     =
+      PGSQL_DIAG_MESSAGE_HINT       =
+      PGSQL_DIAG_STATEMENT_POSITION =
+      PGSQL_DIAG_INTERNAL_POSITION  =
+      PGSQL_DIAG_INTERNAL_QUERY     =
+      PGSQL_DIAG_CONTEXT            =
+      PGSQL_DIAG_SOURCE_FILE        = sequence.c
+      PGSQL_DIAG_SOURCE_LINE        = 794
+      PGSQL_DIAG_SOURCE_FUNCTION    = lastval
+      // ----------------------------------------------------------------------------------------------------------
+
+      $>  insert into t_doesnotexist (name) values ('a')
+      ERROR:  relation "t_doesnotexist" does not exist
+      LINE 1: insert into t_doesnotexist (name) values ('a'), ('b'), ('c')
+                          ^
+      PGSQL_DIAG_SEVERITY           = ERROR
+      PGSQL_DIAG_SQLSTATE           = 42P01
+      PGSQL_DIAG_MESSAGE_PRIMARY    = relation "t_doesnotexist" does not exist
+      PGSQL_DIAG_MESSAGE_DETAIL     =
+      PGSQL_DIAG_MESSAGE_HINT       =
+      PGSQL_DIAG_STATEMENT_POSITION = 13
+      PGSQL_DIAG_INTERNAL_POSITION  =
+      PGSQL_DIAG_INTERNAL_QUERY     =
+      PGSQL_DIAG_CONTEXT            =
+      PGSQL_DIAG_SOURCE_FILE        = parse_relation.c
+      PGSQL_DIAG_SOURCE_LINE        = 866
+      PGSQL_DIAG_SOURCE_FUNCTION    = parserOpenTable
+      */
+
+
+      // Calculate number of rows affected by an INSERT/UPDATE/DELETE statement.
+      //
+      // - pg_affected_rows($result) returns the matched, not the modified rows of a result.
+      // - PostgreSQL supports multi-statement queries.
+      //
+      // The following logic assumes a single statement query with matched = modified rows:
+      //
+      $rows = pg_affected_rows($result);
+      if ($rows) {
+         $str = strToLower(subStr(trim($sql), 0, 6));
+         if ($str!='insert' && $str!='update' && $str!='delete')
+            $rows = 0;
+      }
+      $affectedRows = $rows;
+
       return $result;
    }
 
 
    /**
-    * Return the ID generated by the last SQL statement.
+    * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement (usually an INSERT).
     *
-    * @return int|bool - Generated ID or 0 (zero) if the previous statement did not generate an ID.
+    * This function returnes the most recently generated ID. It's value is not reset between queries.
+    *
+    * @return int - generated ID or 0 (zero) if no previous statement yet generated an ID;
+    *               -1 if the PostgreSQL server version doesn't support this functionality
     */
    public function lastInsertId() {
       return (int) $this->query("select lastval()")->fetchField();
