@@ -876,7 +876,7 @@ function is_trait($name) {
  *
  * @return string metatype
  */
-function metaTypeOf($name) {
+function metatypeOf($name) {
    if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
    if ($name == '')       throw new InvalidArgumentException('Invalid argument $name: ""');
 

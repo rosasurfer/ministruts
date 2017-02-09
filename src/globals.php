@@ -550,8 +550,8 @@ function is_trait($name) {
  *
  * @return string metatype
  */
-function metaTypeOf($name) {
-   return \rosasurfer\metaTypeOf($name);
+function metatypeOf($name) {
+   return \rosasurfer\metatypeOf($name);
 }
 
 
