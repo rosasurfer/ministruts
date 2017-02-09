@@ -502,9 +502,9 @@ function mkDirWritable($path, $mode=0770) {
 
 
 /**
- * Whether or not the specified class exists (defined or undefined) and is not an interface or a trait. The function calls
- * all registered class loaders. Opposite to a call of <pre>class_exist($name, true)</pre> it does not terminate the script
- * if the class can't be loaded.
+ * Whether or not the specified class exists (loaded or not) and is not an interface or a trait. If necessary the function
+ * calls the registered class loaders. Opposite to a call of <pre>class_exists($name, true)</pre> it returnes FALSE if one
+ * of the class loaders triggers an exception.
  *
  * @param  string $name - class name
  *
@@ -516,9 +516,9 @@ function is_class($name) {
 
 
 /**
- * Whether or not the specified interface exists (defined or undefined) and is not a class or a trait. The function calls
- * all registered class loaders. Opposite to a call of <pre>interface_exist($name, true)</pre> it does not terminate the
- * script if the interface can't be loaded.
+ * Whether or not the specified interface exists (loaded or not) and is not a class or a trait. If necessary the function
+ * calls the registered class loaders. Opposite to a call of <pre>interface_exists($name, true)</pre> it returnes FALSE if
+ * one of the class loaders triggers an exception.
  *
  * @param  string $name - interface name
  *
@@ -530,9 +530,9 @@ function is_interface($name) {
 
 
 /**
- * Whether or not the specified trait exists (defined or undefined) and is not a class or an interface. The function calls
- * all registered class loaders. Opposite to a call of <pre>trait_exist($name, true)</pre> it does not terminate the script
- * if the trait can't be loaded.
+ * Whether or not the specified trait exists (loaded or not) and is not a class or an interface. If necessary the function
+ * calls the registered class loaders. Opposite to a call of <pre>trait_exists($name, true)</pre> it returnes FALSE if one
+ * of the class loaders triggers an exception.
  *
  * @param  string $name - trait name
  *

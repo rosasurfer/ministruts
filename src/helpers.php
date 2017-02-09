@@ -769,33 +769,18 @@ function mkDirWritable($path, $mode=0770) {
 
 /**
  * Whether or not the specified class exists (loaded or not) and is not an interface or a trait. If necessary the function
- * calls all registered class loaders. Opposite to a call of <pre>class_exist($name, true)</pre> it does not terminate the
- * script if loading the class fails.
+ * calls the registered class loaders. Opposite to a call of <pre>class_exists($name, true)</pre> it returnes FALSE if one
+ * of the class loaders triggers an exception.
  *
  * @param  string $name - class name
  *
  * @return bool
  */
 function is_class($name) {
-   if (class_exists    ($name, false)) return true;
-   if (interface_exists($name, false)) return false;
-   if (trait_exists    ($name, false)) return false;
-
    try {
-      $functions = spl_autoload_functions();
-      if (!$functions) {               // no loader nor __autoload() exist: spl_autoload_call() will call spl_autoload()
-         spl_autoload_call($name);     // onError: Uncaught LogicException: Class $name could not be loaded
-      }
-      elseif (sizeOf($functions)==1 && $functions[0]==='__autoload') {
-         __autoload($name);            // __autoload() exists and is explicitly or implicitly registered
-      }
-      else {
-         spl_autoload_call($name);     // a regular SPL loader queue is defined
-      }
+      return class_exists($name, true);
    }
-   catch (\Exception $ex) {
-      // class loaders might wrongly throw exceptions which would block the function from continuation
-   }
+   catch (\Exception $ex) {/* loaders might wrongly throw exceptions blocking us from continuation */}
 
    return class_exists($name, false);
 }
@@ -803,33 +788,18 @@ function is_class($name) {
 
 /**
  * Whether or not the specified interface exists (loaded or not) and is not a class or a trait. If necessary the function
- * calls all registered class loaders. Opposite to a call of <pre>interface_exist($name, true)</pre> it does not terminate
- * the script if loading the interface fails.
+ * calls the registered class loaders. Opposite to a call of <pre>interface_exists($name, true)</pre> it returnes FALSE if
+ * one of the class loaders triggers an exception.
  *
  * @param  string $name - interface name
  *
  * @return bool
  */
 function is_interface($name) {
-   if (interface_exists($name, false)) return true;
-   if (class_exists    ($name, false)) return false;
-   if (trait_exists    ($name, false)) return false;
-
    try {
-      $functions = spl_autoload_functions();
-      if (!$functions) {               // no loader nor __autoload() exist: spl_autoload_call() will call spl_autoload()
-         spl_autoload_call($name);     // onError: Uncaught LogicException: Class $name could not be loaded
-      }
-      elseif (sizeOf($functions)==1 && $functions[0]==='__autoload') {
-         __autoload($name);            // __autoload() exists and is explicitly or implicitly registered
-      }
-      else {
-         spl_autoload_call($name);     // a regular SPL loader queue is defined
-      }
+      return interface_exists($name, true);
    }
-   catch (\Exception $ex) {
-      // class loaders might wrongly throw exceptions which would block the function from continuation
-   }
+   catch (\Exception $ex) {/* loaders might wrongly throw exceptions blocking us from continuation */}
 
    return interface_exists($name, false);
 }
@@ -837,33 +807,18 @@ function is_interface($name) {
 
 /**
  * Whether or not the specified trait exists (loaded or not) and is not a class or an interface. If necessary the function
- * calls all registered class loaders. Opposite to a call of <pre>trait_exist($name, true)</pre> it does not terminate the
- * script if loading the trait fails.
+ * calls the registered class loaders. Opposite to a call of <pre>trait_exists($name, true)</pre> it returnes FALSE if one
+ * of the class loaders triggers an exception.
  *
  * @param  string $name - trait name
  *
  * @return bool
  */
 function is_trait($name) {
-   if (trait_exists    ($name, false)) return true;
-   if (class_exists    ($name, false)) return false;
-   if (interface_exists($name, false)) return false;
-
    try {
-      $functions = spl_autoload_functions();
-      if (!$functions) {               // no loader nor __autoload() exist: spl_autoload_call() will call spl_autoload()
-         spl_autoload_call($name);     // onError: Uncaught LogicException: Class $name could not be loaded
-      }
-      elseif (sizeOf($functions)==1 && $functions[0]==='__autoload') {
-         __autoload($name);            // __autoload() exists and is explicitly or implicitly registered
-      }
-      else {
-         spl_autoload_call($name);     // a regular SPL loader queue is defined
-      }
+      return trait_exists($name, true);
    }
-   catch (\Exception $ex) {
-      // class loaders might wrongly throw exceptions which would block the function from continuation
-   }
+   catch (\Exception $ex) {/* loaders might wrongly throw exceptions blocking us from continuation */}
 
    return trait_exists($name, false);
 }
