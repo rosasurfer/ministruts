@@ -17,7 +17,7 @@ use const rosasurfer\ARRAY_NUM;
  * Represents the result of an executed SQL statement. Depending on the statement type the result may or may not contain
  * a result set.
  */
-class SqliteResult extends Result {
+class SQLiteResult extends Result {
 
 
    /** @var IConnector - used database connector */
@@ -39,7 +39,7 @@ class SqliteResult extends Result {
    /**
     * Constructor
     *
-    * Create a new SqliteResult instance. Called only when execution of a SQL statement returned successful.
+    * Create a new SQLiteResult instance. Called only when execution of a SQL statement returned successful.
     *
     * @param  IConnector     $connector    - Connector managing the database connection
     * @param  string         $sql          - executed SQL statement

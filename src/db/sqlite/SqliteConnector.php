@@ -14,9 +14,9 @@ use const rosasurfer\NL;
 
 
 /**
- * SqliteConnector
+ * SQLiteConnector
  */
-class SqliteConnector extends Connector {
+class SQLiteConnector extends Connector {
 
 
    /** @var string - database system type */
@@ -44,7 +44,7 @@ class SqliteConnector extends Connector {
    /**
     * Constructor
     *
-    * Create a new SqliteConnector instance.
+    * Create a new SQLiteConnector instance.
     *
     * @param  string[] $config  - connection configuration
     * @param  string[] $options - additional SQLite typical options (default: none)
@@ -147,7 +147,7 @@ class SqliteConnector extends Connector {
     *
     * @param  string $sql - SQL statement
     *
-    * @return SqliteResult
+    * @return SQLiteResult
     *
     * @throws DatabaseException in case of failure
     */
@@ -160,7 +160,7 @@ class SqliteConnector extends Connector {
          $response = $this->executeRaw($sql, $affectedRows);
          if ($response === true)
             $response = null;
-         return new SqliteResult($this, $sql, $response, $affectedRows);
+         return new SQLiteResult($this, $sql, $response, $affectedRows);
       }
       finally {
          $this->skipResults = $lastExecMode;

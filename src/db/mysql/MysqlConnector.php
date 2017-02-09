@@ -28,9 +28,9 @@ use const rosasurfer\SECONDS;
 
 
 /**
- * MysqlConnector
+ * MySQLConnector
  */
-class MysqlConnector extends Connector {
+class MySQLConnector extends Connector {
 
 
    /** @var string - database system type */
@@ -76,7 +76,7 @@ class MysqlConnector extends Connector {
    /**
     * Constructor
     *
-    * Create a new MysqlConnector instance.
+    * Create a new MySQLConnector instance.
     *
     * @param  string[] $config  - connection configuration
     * @param  string[] $options - additional MySQL typical options (default: none)
@@ -301,7 +301,7 @@ class MysqlConnector extends Connector {
     *
     * @param  string $sql - SQL statement
     *
-    * @return MysqlResult
+    * @return MySQLResult
     *
     * @throws DatabaseException in case of failure
     */
@@ -310,7 +310,7 @@ class MysqlConnector extends Connector {
       $response = $this->executeRaw($sql, $affectedRows);
       if ($response === true)
          $response = null;
-      return new MysqlResult($this, $sql, $response, $affectedRows);
+      return new MySQLResult($this, $sql, $response, $affectedRows);
    }
 
 

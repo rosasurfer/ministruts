@@ -16,7 +16,7 @@ use const rosasurfer\ARRAY_NUM;
  * Represents the result of an executed SQL statement. Depending on the statement type the result may or may not contain
  * a result set.
  */
-class MysqlResult extends Result {
+class MySQLResult extends Result {
 
 
    /** @var IConnector - used database connector */
@@ -38,7 +38,7 @@ class MysqlResult extends Result {
    /**
     * Constructor
     *
-    * Create a new MysqlResult instance. Called only when execution of a SQL statement returned successful.
+    * Create a new MySQLResult instance. Called only when execution of a SQL statement returned successful.
     *
     * @param  IConnector $connector    - Connector managing the database connection
     * @param  string     $sql          - executed SQL statement

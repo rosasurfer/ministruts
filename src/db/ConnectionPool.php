@@ -6,9 +6,9 @@ use rosasurfer\core\Singleton;
 
 use rosasurfer\db\ConnectorInterface as IConnector;
 
-use rosasurfer\db\mysql\MysqlConnector;
+use rosasurfer\db\mysql\MySQLConnector;
 use rosasurfer\db\pgsql\PostgresConnector;
-use rosasurfer\db\sqlite\SqliteConnector;
+use rosasurfer\db\sqlite\SQLiteConnector;
 
 use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\RuntimeException;
@@ -30,20 +30,20 @@ final class ConnectionPool extends Singleton {
 
    /** @var string[] - common adapter aliases */
    private static $aliases = [
-      'maria'                                     => MysqlConnector::class,
-      'mariadb'                                   => MysqlConnector::class,
-      'maria-db'                                  => MysqlConnector::class,
-      'mysql'                                     => MysqlConnector::class,
-      __NAMESPACE__.'\\mysql\\ mysqlconnector'    => MysqlConnector::class,
+      'maria'                                     => MySQLConnector::class,
+      'mariadb'                                   => MySQLConnector::class,
+      'maria-db'                                  => MySQLConnector::class,
+      'mysql'                                     => MySQLConnector::class,
+      __NAMESPACE__.'\\mysql\\ mysqlconnector'    => MySQLConnector::class,
 
       'pgsql'                                     => PostgresConnector::class,
       'postgres'                                  => PostgresConnector::class,
       'postgresql'                                => PostgresConnector::class,
       __NAMESPACE__.'\\pgsql\\ postgresconnector' => PostgresConnector::class,
 
-      'sqlite'                                    => SqliteConnector::class,
-      'sqlite3'                                   => SqliteConnector::class,
-      __NAMESPACE__.'\\sqlite\\sqliteconnector'   => SqliteConnector::class,
+      'sqlite'                                    => SQLiteConnector::class,
+      'sqlite3'                                   => SQLiteConnector::class,
+      __NAMESPACE__.'\\sqlite\\sqliteconnector'   => SQLiteConnector::class,
    ];
 
 
