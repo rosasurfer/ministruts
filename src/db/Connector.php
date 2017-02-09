@@ -120,7 +120,7 @@ abstract class Connector extends Object implements ConnectorInterface {
     *
     * @param  _IN_  string $sql          - SQL statement
     * @param  _OUT_ int   &$affectedRows - A variable receiving the number of affected rows. This value may be unreliable.
-    *                                      (see the specific connector implementation)
+    *                                      (see the specific Connector implementation)
     * @return mixed - raw driver response
     *
     * @throws DatabaseException in case of failure
@@ -130,7 +130,7 @@ abstract class Connector extends Object implements ConnectorInterface {
 
    /**
     * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement (usually an INSERT). The value may or
-    * may not be reset between queries (see the specific connector implementation).
+    * may not be reset between queries (see the specific Connector implementation).
     *
     * @return int - generated ID or 0 (zero) if no ID was generated;
     *               -1 if the database system doesn't support this functionality.

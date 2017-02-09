@@ -60,7 +60,7 @@ interface ConnectorInterface {
     * Execute a SQL statement and return the internal driver's raw response.
     *
     * @param  _IN_  string $sql          - SQL statement
-    * @param  _OUT_ int   &$affectedRows - A variable receiving the number of affected rows.
+    * @param  _OUT_ int   &$affectedRows - a variable receiving the number of affected rows
     *
     * @return mixed - raw driver response
     *

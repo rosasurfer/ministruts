@@ -307,7 +307,8 @@ class PostgresConnector extends Connector {
 
       // Calculate number of rows affected by an INSERT/UPDATE/DELETE statement.
       //
-      // - pg_affected_rows($result) returns the matched, not the modified rows of a result.
+      // - pg_affected_rows($result) actually is matchedRows(), it also shows values for SELECT statements (but not for
+      //   other statements generating a result set)
       // - PostgreSQL supports multi-statement queries.
       //
       // The following logic assumes a single statement query with matched = modified rows:
@@ -337,6 +338,8 @@ class PostgresConnector extends Connector {
       /*
       PHP Warning: pg_query(): Query failed: ERROR:  lastval is not yet defined in this session
        SQL: "select lastval()"
+
+      @see  https://www.postgresql.org/docs/9.6/static/functions-sequence.html
 
       @see  http://stackoverflow.com/questions/6485778/php-postgres-get-last-insert-id/6488840
       @see  http://stackoverflow.com/questions/22530585/how-to-turn-off-multiple-statements-in-postgres

@@ -73,7 +73,7 @@ abstract class Result extends Object implements ResultInterface {
     * Return the number of rows affected if the SQL was an INSERT/UPDATE/DELETE statement.
     *
     * This value is provided for userland code only and must not be used in the framework. The implementation may be
-    * unreliable (see the specific result implementation).
+    * unreliable (see the specific Result implementation).
     *
     * @return int
     */

@@ -231,10 +231,10 @@ class SQLiteConnector extends Connector {
 
       // Calculate number of rows affected by an INSERT/UPDATE/DELETE statement.
       //
-      // - SQLite3::changes() is not updated for every statement.
-      // - SQLite3::changes() returns the matched, not the modified rows of a result.
+      // - SQLite3::changes() actually is matchedRows().
+      // - SQLite3::changes() is not reset between queries.
       // - SQLite3::query('DELETE...') returns an empty SQLite3Result, thus a result set is no valid criterion.
-      // - SQLite3 supports multiple statements per query.
+      // - SQLite3 supports multi-statement queries.
       //
       // The following logic assumes a single statement query with matched = modified rows:
       //

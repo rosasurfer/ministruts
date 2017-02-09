@@ -379,7 +379,9 @@ class MySQLConnector extends Connector {
       }
 
       // Calculate number of rows affected by an INSERT/UPDATE/DELETE/REPLACE statement.
-      // mysql_affected_rows() is updated for every single SQL statement.
+      //
+      // - mysql_affected_rows() actually is matchedRows(), it's reset between queries and also shows values of statements
+      //   generating a result set.
       //
       // TODO: check mysql_info() for match/modified discrepancies
       //
