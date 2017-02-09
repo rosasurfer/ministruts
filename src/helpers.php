@@ -4,15 +4,6 @@
  */
 namespace rosasurfer;
 
-use rosasurfer\exception\ClassNotFoundException;
-use rosasurfer\exception\IllegalTypeException;
-use rosasurfer\exception\InvalidArgumentException;
-
-use rosasurfer\ministruts\url\Url;
-use rosasurfer\ministruts\url\VersionedUrl;
-
-use rosasurfer\util\Validator;
-
 
 // prevent multiple includes
 if (defined('rosasurfer\CLI'))
@@ -802,8 +793,8 @@ function is_class($name) {
          spl_autoload_call($name);     // a regular SPL loader queue is defined
       }
    }
-   catch (ClassNotFoundException $ex) {
-      // TODO: loaders might trigger any kind of error/throw any kind of exception
+   catch (\Exception $ex) {
+      // class loaders might wrongly throw exceptions which would block the function from continuation
    }
 
    return class_exists($name, false);
@@ -836,8 +827,8 @@ function is_interface($name) {
          spl_autoload_call($name);     // a regular SPL loader queue is defined
       }
    }
-   catch (ClassNotFoundException $ex) {
-      // TODO: loaders might trigger any kind of error/throw any kind of exception
+   catch (\Exception $ex) {
+      // class loaders might wrongly throw exceptions which would block the function from continuation
    }
 
    return interface_exists($name, false);
@@ -870,8 +861,8 @@ function is_trait($name) {
          spl_autoload_call($name);     // a regular SPL loader queue is defined
       }
    }
-   catch (ClassNotFoundException $ex) {
-      // TODO: loaders might trigger any kind of error/throw any kind of exception
+   catch (\Exception $ex) {
+      // class loaders might wrongly throw exceptions which would block the function from continuation
    }
 
    return trait_exists($name, false);
