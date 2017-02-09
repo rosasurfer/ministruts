@@ -768,9 +768,8 @@ function mkDirWritable($path, $mode=0770) {
 
 
 /**
- * Whether or not the specified class exists (loaded or not) and is not an interface or a trait. If necessary the function
- * calls the registered class loaders. Opposite to a call of <pre>class_exists($name, true)</pre> it returnes FALSE if one
- * of the class loaders triggers an exception.
+ * Whether or not the specified class exists (loaded or not) and is not an interface or a trait. Identical to
+ * <pre>class_exists($name, true)</pre> except it also returnes FALSE if auto loading triggers an exception.
  *
  * @param  string $name - class name
  *
@@ -787,9 +786,9 @@ function is_class($name) {
 
 
 /**
- * Whether or not the specified interface exists (loaded or not) and is not a class or a trait. If necessary the function
- * calls the registered class loaders. Opposite to a call of <pre>interface_exists($name, true)</pre> it returnes FALSE if
- * one of the class loaders triggers an exception.
+ * Whether or not the specified interface exists (loaded or not) and is not a class or a trait. Identical to
+ * <pre>interface_exists($name, true)</pre> except it also returnes FALSE if auto loading triggers an exception.
+ *
  *
  * @param  string $name - interface name
  *
@@ -806,9 +805,8 @@ function is_interface($name) {
 
 
 /**
- * Whether or not the specified trait exists (loaded or not) and is not a class or an interface. If necessary the function
- * calls the registered class loaders. Opposite to a call of <pre>trait_exists($name, true)</pre> it returnes FALSE if one
- * of the class loaders triggers an exception.
+ * Whether or not the specified trait exists (loaded or not) and is not a class or an interface. Identical to
+ * <pre>trait_exists($name, true)</pre> except it also returnes FALSE if auto loading triggers an exception.
  *
  * @param  string $name - trait name
  *
