@@ -1,5 +1,5 @@
 
-#### last inserted ID
+#### Last inserted ID
 
 | database   | function                        | recent query | last query | reset between queries |
 |------------|---------------------------------|--------------|------------|-----------------------|
