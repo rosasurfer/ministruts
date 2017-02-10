@@ -334,7 +334,7 @@ class PostgresConnector extends Connector {
     *               -1 if the PostgreSQL server version doesn't support this functionality
     */
    public function lastInsertId() {
-      return (int) $this->query("select lastval()")->fetchField();
+      return $this->query("select lastval()")->fetchAsInt();
       /*
       PHP Warning: pg_query(): Query failed: ERROR:  lastval is not yet defined in this session
        SQL: "select lastval()"

@@ -668,7 +668,8 @@ function strIsNumeric($value) {
  *
  * @param  mixed $value - boolean representation
  *
- * @return bool - boolean or NULL if the parameter doesn't represent a boolean
+ * @return bool - Boolean or NULL if the parameter doesn't represent a boolean. The accepted values of a boolean's
+ *                numerical string representation (integer or float) are 0 (zero) and 1 (one).
  */
 function strToBool($value) {
    if (is_bool($value)) return $value;

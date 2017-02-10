@@ -1,3 +1,9 @@
+
+2017-02-10
+
+   - methods db\IResult::fetchAsBool(), db\IResult::fetchAsInt(), db\IResult::fetchAsFloat() for any result set field
+
+
 2017-02-09
 
    - fix implementation of is_class()/is_interface()/is_trait()  
@@ -8,7 +14,7 @@
    - helper function \rosasurfer\normalizeEOL()  
    - end-of-line constants EOL_MAC, EOL_NETSCAPE, EOL_UNIX, EOL_WINDOWS
    - add IRosasurferException::addMessage() and PHPError::getSimpleType() 
-   - db/Connector and db/Result implement interfaces 
+   - db\Connector and db\Result implement interfaces 
 
 
 2017-02-03

@@ -23,17 +23,70 @@ interface ResultInterface {
 
 
    /**
-    * Fetch a single field of a row from the result set.
+    * Fetch a single field from the result set as a string.
     *
     * @param  string|int $column       - name or offset of the column to fetch from (default: 0)
     * @param  int        $row          - row to fetch from, starting at 0 (default: the next row)
-    * @param  mixed      $onNoMoreRows - alternative value to return if no more rows are available
+    * @param  mixed      $onNull       - value to return if the cell value is NULL (default: NULL)
+    * @param  mixed      $onNoMoreRows - value to return if no more rows are available
     *
-    * @return mixed - content of a single cell (can be NULL)
+    * @return string - string value of a single cell or $onNull if the cell value is NULL
     *
-    * @throws NoMoreRowsException if no more rows are available and parameter $onNoMoreRows was not set
+    * @throws NoMoreRowsException if no more rows are available and parameter $onNoMoreRows was not set.
     */
-   public function fetchField($column=0, $row=null, $onNoMoreRows=null);
+   public function fetchField($column=0, $row=null, $onNull=null, $onNoMoreRows=null);
+
+
+   /**
+    * Fetch a single field from the result set as a boolean.
+    *
+    * @param  string|int $column       - name or offset of the column to fetch from (default: 0)
+    * @param  int        $row          - row to fetch from, starting at 0 (default: the next row)
+    * @param  mixed      $onNull       - value to return if the cell value is NULL (default: NULL)
+    * @param  mixed      $onNoMoreRows - value to return if no more rows are available
+    *
+    * @return bool - boolean value of a single cell or $onNull if the cell value is NULL
+    *
+    * @throws NoMoreRowsException       if no more rows are available and parameter $onNoMoreRows was not set.
+    * @throws \UnexpectedValueException if the cell value is not NULL and does not represent a boolean. Accepted string
+    *                                   representations are "true" and "false", "on" and "off", "yes" and "no', and
+    *                                   numerical representations.
+    */
+   public function fetchAsBool($column=0, $row=null, $onNull=null, $onNoMoreRows=null);
+
+
+   /**
+    * Fetch a single field from the result set as an integer.
+    *
+    * @param  string|int $column       - name or offset of the column to fetch from (default: 0)
+    * @param  int        $row          - row to fetch from, starting at 0 (default: the next row)
+    * @param  mixed      $onNull       - value to return if the cell value is NULL (default: NULL)
+    * @param  mixed      $onNoMoreRows - value to return if no more rows are available
+    *
+    * @return int - integer value of a single cell or $onNull if the cell value is NULL
+    *
+    * @throws NoMoreRowsException       if no more rows are available and parameter $onNoMoreRows was not set.
+    * @throws \UnexpectedValueException if the cell value is not NULL and does not represent an integer. The accepted
+    *                                   floating point values must have a fractional part equal to 0 (zero).
+    *                                   Use "self::fetchAsFloat()" to interpret more floating point values as integer.
+    */
+   public function fetchAsInt($column=0, $row=null, $onNull=null, $onNoMoreRows=null);
+
+
+   /**
+    * Fetch a single field from the result set as a floating point value.
+    *
+    * @param  string|int $column       - name or offset of the column to fetch from (default: 0)
+    * @param  int        $row          - row to fetch from, starting at 0 (default: the next row)
+    * @param  mixed      $onNull       - value to return if the cell value is NULL (default: NULL)
+    * @param  mixed      $onNoMoreRows - value to return if no more rows are available
+    *
+    * @return float - floating point value of a single cell or $onNull if the cell value is NULL
+    *
+    * @throws NoMoreRowsException       if no more rows are available and parameter $onNoMoreRows was not set.
+    * @throws \UnexpectedValueException if the cell value is not NULL and does not represent a floating point value.
+    */
+   public function fetchAsFloat($column=0, $row=null, $onNull=null, $onNoMoreRows=null);
 
 
    /**

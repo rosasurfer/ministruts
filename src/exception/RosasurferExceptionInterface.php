@@ -44,7 +44,7 @@ interface RosasurferExceptionInterface {
 
 
    /**
-    * Return the name of the function (if any) where the exception occurred.
+    * Return the name of the function (if any) where the exception was raised.
     *
     * @return string
     */
