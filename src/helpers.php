@@ -4,6 +4,14 @@
  */
 namespace rosasurfer;
 
+use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\exception\InvalidArgumentException;
+
+use rosasurfer\ministruts\url\Url;
+use rosasurfer\ministruts\url\VersionedUrl;
+
+use rosasurfer\util\Validator;
+
 
 // prevent multiple includes
 if (defined('rosasurfer\CLI'))
