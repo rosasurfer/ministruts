@@ -36,6 +36,7 @@ return array(
     'rosasurfer\\db\\Connector' => $baseDir . '/src/db/Connector.php',
     'rosasurfer\\db\\ConnectorInterface' => $baseDir . '/src/db/ConnectorInterface.php',
     'rosasurfer\\db\\DatabaseException' => $baseDir . '/src/db/DatabaseException.php',
+    'rosasurfer\\db\\MultipleRowsException' => $baseDir . '/src/db/MultipleRowsException.php',
     'rosasurfer\\db\\NoMoreRowsException' => $baseDir . '/src/db/NoMoreRowsException.php',
     'rosasurfer\\db\\Result' => $baseDir . '/src/db/Result.php',
     'rosasurfer\\db\\ResultInterface' => $baseDir . '/src/db/ResultInterface.php',
