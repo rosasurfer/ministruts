@@ -1,10 +1,12 @@
 
-#### Last inserted ID
+#### Last inserted row ID
 
-| database   | function                        | recent query | current query | reset between queries |
-|------------|---------------------------------|--------------|---------------|-----------------------|
-| MySQL      | php: mysql_insert_id()          | -            | yes           | yes                   |
-| MySQL      | sql: last_insert_id()           | yes          | -             | no                    |
-| PostgreSQL | sql: insert into ... return ... | -            | yes           | yes                   |
-| PostgreSQL | sql: lastval()                  | yes          | -             | no                    |
-| SQLite3    | php: SQLite3::lastInsertRowID() | yes          | -             | no                    |
+| interface   | function                      | recent query | current query | reset between queries |
+|-------------|-------------------------------|--------------|---------------|-----------------------|
+| MySQL       | SELECT last_insert_id()       | yes          | -             | no                    |
+| php_mysql   | mysql_insert_id()             | -            | yes           | yes                   |
+| PostgreSQL  | SELECT lastval()              | yes          | -             | no                    |
+| PostgreSQL  | INSERT INTO ... RETURNING ... | -            | yes           | yes                   |
+| php_pgsql   | -                             |              |               |                       |
+| SQLite      | SELECT last_insert_rowid()    | yes          | -             | no                    |
+| php_sqlite3 | SQLite3::lastInsertRowID()    | yes          | -             | no                    |

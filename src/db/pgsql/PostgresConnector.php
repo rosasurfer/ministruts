@@ -313,6 +313,8 @@ class PostgresConnector extends Connector {
       //
       // The following logic assumes a single statement query with matched = modified rows:
       //
+      // TODO: Most important, the following is obviously big bullocks in PostgreSQL.
+      //
       $rows = pg_affected_rows($result);
       if ($rows) {
          $str = strToLower(subStr(trim($sql), 0, 6));
