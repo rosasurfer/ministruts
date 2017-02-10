@@ -11,4 +11,4 @@
 | SQLite      | SELECT last_insert_rowid()                   | yes          | -             | no                    |
 | php_sqlite3 | SQLite3::lastInsertRowID()                   | yes          | -             | no                    |
 
-<small>1</small> - since version 8.1
+<small><sup>1</sup></small> - since version 8.1

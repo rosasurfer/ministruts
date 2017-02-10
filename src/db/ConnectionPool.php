@@ -30,10 +30,10 @@ final class ConnectionPool extends Singleton {
 
    /** @var string[] - common adapter aliases */
    private static $aliases = [
+      'mysql'                                     => MySQLConnector::class,
       'maria'                                     => MySQLConnector::class,
       'mariadb'                                   => MySQLConnector::class,
       'maria-db'                                  => MySQLConnector::class,
-      'mysql'                                     => MySQLConnector::class,
       __NAMESPACE__.'\\mysql\\ mysqlconnector'    => MySQLConnector::class,
 
       'pgsql'                                     => PostgresConnector::class,
