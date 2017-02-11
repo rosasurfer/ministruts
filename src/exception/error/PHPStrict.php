@@ -3,9 +3,9 @@ namespace rosasurfer\exception\error;
 
 
 /**
- * "rosasurfer" exception for a strict PHP error.
+ * "rosasurfer" exception for a PHP strict message.
  */
-class PHPStrictError extends PHPError {
+class PHPStrict extends PHPError {
 
 
    /**

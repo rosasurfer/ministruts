@@ -3,9 +3,9 @@ namespace rosasurfer\exception\error;
 
 
 /**
- * "rosasurfer" exception for a PHP user deprecation message.
+ * "rosasurfer" exception for a PHP user deprecated message.
  */
-class PHPUserDeprecation extends PHPError {
+class PHPUserDeprecated extends PHPError {
 
 
    /**
