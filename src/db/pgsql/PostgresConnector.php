@@ -104,7 +104,6 @@ class PostgresConnector extends Connector {
          $this->connection = pg_connect($connStr, PGSQL_CONNECT_FORCE_NEW);
       }
       catch (\Exception $ex) {
-         $this->connection    = null;
          $this->connectionStr = null;
          throw new RuntimeException('Cannot connect to PostgreSQL server with connection string: "'.$connStr.'"', null, $ex);
       }

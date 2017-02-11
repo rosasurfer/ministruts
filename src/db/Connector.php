@@ -129,11 +129,10 @@ abstract class Connector extends Object implements ConnectorInterface {
 
 
    /**
-    * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement. The value may or may not be reset
-    * between queries (see the README and the specific connector implementation).
+    * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement (connector specific, see the README).
     *
     * @return int - generated ID or 0 (zero) if no ID was generated;
-    *               -1 if the database system doesn't support this functionality
+    *               -1 if the dbms doesn't support this functionality
     */
    abstract public function lastInsertId();
 

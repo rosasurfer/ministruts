@@ -13,7 +13,6 @@ use rosasurfer\log\Logger;
 use rosasurfer\util\Date;
 
 use function rosasurfer\echoPre;
-use function rosasurfer\strCompareI;
 use function rosasurfer\strContains;
 use function rosasurfer\strEndsWithI;
 use function rosasurfer\strStartsWithI;
@@ -71,6 +70,9 @@ class MySQLConnector extends Connector {
 
    /** @var int - transaction nesting level */
    protected $transactionLevel = 0;
+
+   /** @var int - the last inserted row id (not reset between queries) */
+   protected $lastInsertId = 0;
 
 
    /**
@@ -203,15 +205,17 @@ class MySQLConnector extends Connector {
       $pass = $this->password;
       try {                                                                   // CLIENT_FOUND_ROWS
          $this->connection = mysql_connect($host, $user, $pass, $newLink=true/*, $flags=2 */);
+
+         if (!is_resource($this->connection)) throw new RuntimeException();
       }
-      catch (\Exception $ex) {
-         throw new RuntimeException('Can not connect to MySQL server on "'.$host.'"', null, $ex);
+      catch (RosasurferException $ex) {
+         throw $ex->addMessage('Can not connect to MySQL server on "'.$host.'"');
       }
 
       try {
          foreach ($this->options as $option => $value) {
             if (strLen($value)) {
-               if (strCompareI($option, 'charset')) {
+               if (strToLower($option) == 'charset') {
                   if (!mysql_set_charset($value, $this->connection)) throw new DatabaseException(mysql_error($this->connection));
                   // synonymous with the sql statement "set character set {$value}"
                }
@@ -231,13 +235,12 @@ class MySQLConnector extends Connector {
       }
 
       try {
-         if ($this->database && !mysql_select_db($this->database, $this->connection))
-            throw new DatabaseException(mysql_error($this->connection));
+         if ($this->database) {
+            if (!mysql_select_db($this->database, $this->connection)) throw new DatabaseException(mysql_error($this->connection));
+         }
       }
       catch (RosasurferException $ex) {
-         if ($ex->getFunctionName() == 'mysql_select_db')
-            $ex->addMessage('Can not select database "'.$this->database.'"');
-         throw $ex;
+         throw $ex->addMessage('Can not select database "'.$this->database.'"');
       }
       return $this;
 
@@ -292,7 +295,7 @@ class MySQLConnector extends Connector {
     * @return bool
     */
    public function isConnected() {
-      return ($this->connection != null);
+      return is_resource($this->connection);
    }
 
 
@@ -310,7 +313,7 @@ class MySQLConnector extends Connector {
       $response = $this->executeRaw($sql, $affectedRows);
       if ($response === true)
          $response = null;
-      return new MySQLResult($this, $sql, $response, $affectedRows);
+      return new MySQLResult($this, $sql, $response, $affectedRows, $this->lastInsertId);
    }
 
 
@@ -378,17 +381,32 @@ class MySQLConnector extends Connector {
          throw new DatabaseException($message);
       }
 
-      // Calculate number of rows affected by an INSERT/UPDATE/DELETE/REPLACE statement.
-      //
-      // - mysql_affected_rows() actually is matchedRows(), it's reset between queries and also shows values of statements
-      //   generating a result set.
-      //
-      // TODO: check mysql_info() for match/modified discrepancies
-      //
+      // Determine number of rows affected by an INSERT/UPDATE/DELETE statement.
       if ($result === true)                                       // no result set
          $affectedRows = mysql_affected_rows($this->connection);
 
-      // log statements exceeding $maxQueryTime (if activated)
+      // Track last_insert_id
+      if ($id = mysql_insert_id($this->connection)) {
+         $this->lastInsertId = $id + mysql_affected_rows($this->connection) - 1;
+         /*
+         drop:      insert_id=0   affected_rows=0   result_set=0   num_rows=0   info=""
+         create:    insert_id=0   affected_rows=0   result_set=0   num_rows=0   info=""
+         insert(4): insert_id=1   affected_rows=4   result_set=0   num_rows=0   info="Records: 4  Duplicates: 0  Warnings: 0"
+         set:       insert_id=0   affected_rows=0   result_set=0   num_rows=0   info=""
+         explain:   insert_id=0   affected_rows=1   result_set=1   num_rows=1   info=""
+         update(0): insert_id=0   affected_rows=0   result_set=0   num_rows=0   info="Rows matched: 1  Changed: 0  Warnings: 0"
+         select:    insert_id=0   affected_rows=2   result_set=1   num_rows=2   info=""
+         update(1): insert_id=0   affected_rows=1   result_set=0   num_rows=0   info="Rows matched: 1  Changed: 1  Warnings: 0"
+         select:    insert_id=0   affected_rows=1   result_set=1   num_rows=1   info=""
+         select(0): insert_id=0   affected_rows=0   result_set=1   num_rows=0   info=""
+         delete(2): insert_id=0   affected_rows=2   result_set=0   num_rows=0   info=""
+         insert(2): insert_id=5   affected_rows=2   result_set=0   num_rows=0   info="Records: 2  Duplicates: 0  Warnings: 0"
+         insert(1): insert_id=7   affected_rows=1   result_set=0   num_rows=0   info=""    <- single row inserts produce no info
+         explain:   insert_id=0   affected_rows=1   result_set=1   num_rows=1   info=""
+         */
+      }
+
+      // log statements exceeding $maxQueryTime
       if ($logDebug) {
          $endTime   = microTime(true);
          $spentTime = round($endTime-$startTime, 4);
@@ -402,13 +420,13 @@ class MySQLConnector extends Connector {
 
 
    /**
-    * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement. The value is reset between queries.
+    * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement. The value is not reset between queries.
     * (see the README)
     *
-    * @return int - generated ID or 0 (zero) if the last executed statement did not generate a new ID
+    * @return int - generated ID or 0 (zero) if no ID was yet generated
     */
    public function lastInsertId() {
-      return mysql_insert_id($this->connection);
+      return $this->lastInsertId;
    }
 
 
@@ -436,7 +454,10 @@ class MySQLConnector extends Connector {
    public function commit() {
       if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
 
-      if (!$this->transactionLevel) {
+      if (!$this->isConnected()) {
+         Logger::log('Not connected', L_WARN);
+      }
+      else if (!$this->transactionLevel) {
          Logger::log('No database transaction to commit', L_WARN);
       }
       else {
@@ -458,7 +479,10 @@ class MySQLConnector extends Connector {
    public function rollback() {
       if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
 
-      if (!$this->transactionLevel) {
+      if (!$this->isConnected()) {
+         Logger::log('Not connected', L_WARN);
+      }
+      else if (!$this->transactionLevel) {
          Logger::log('No database transaction to roll back', L_WARN);
       }
       else {
@@ -477,7 +501,9 @@ class MySQLConnector extends Connector {
     * @return bool
     */
    public function isInTransaction() {
-      return ($this->transactionLevel > 0);
+      if ($this->isConnected())
+         return ($this->transactionLevel > 0);
+      return false;
    }
 
 
@@ -487,7 +513,9 @@ class MySQLConnector extends Connector {
     * @return resource - the internal connection handle
     */
    public function getInternalHandler() {
-      return $this->connection;
+      if (is_resource($this->connection))
+         return $this->connection;
+      return null;
    }
 
 
