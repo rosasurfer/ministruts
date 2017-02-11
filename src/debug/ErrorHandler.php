@@ -7,14 +7,14 @@ use rosasurfer\exception\error\PHPCompileError;
 use rosasurfer\exception\error\PHPCompileWarning;
 use rosasurfer\exception\error\PHPCoreError;
 use rosasurfer\exception\error\PHPCoreWarning;
-use rosasurfer\exception\error\PHPDeprecation;
+use rosasurfer\exception\error\PHPDeprecated;
 use rosasurfer\exception\error\PHPError;
 use rosasurfer\exception\error\PHPNotice;
 use rosasurfer\exception\error\PHPParseError;
 use rosasurfer\exception\error\PHPRecoverableError;
-use rosasurfer\exception\error\PHPStrictError;
+use rosasurfer\exception\error\PHPStrict;
 use rosasurfer\exception\error\PHPUnknownError;
-use rosasurfer\exception\error\PHPUserDeprecation;
+use rosasurfer\exception\error\PHPUserDeprecated;
 use rosasurfer\exception\error\PHPUserError;
 use rosasurfer\exception\error\PHPUserNotice;
 use rosasurfer\exception\error\PHPUserWarning;
@@ -167,8 +167,8 @@ class ErrorHandler extends StaticClass {
 
       // (3) Wrap everything else in the matching PHPError exception.
       switch ($level) {
-         case E_DEPRECATED       : $exception = new PHPDeprecation     ($message, $code=null, $severity=$level, $file, $line); break;
-         case E_USER_DEPRECATED  : $exception = new PHPUserDeprecation ($message, $code=null, $severity=$level, $file, $line); break;
+         case E_DEPRECATED       : $exception = new PHPDeprecated      ($message, $code=null, $severity=$level, $file, $line); break;
+         case E_USER_DEPRECATED  : $exception = new PHPUserDeprecated  ($message, $code=null, $severity=$level, $file, $line); break;
          case E_USER_NOTICE      : $exception = new PHPUserNotice      ($message, $code=null, $severity=$level, $file, $line); break;
          case E_USER_WARNING     : $exception = new PHPUserWarning     ($message, $code=null, $severity=$level, $file, $line); break;
 
@@ -177,7 +177,7 @@ class ErrorHandler extends StaticClass {
          case E_COMPILE_ERROR    : $exception = new PHPCompileError    ($message, $code=null, $severity=$level, $file, $line); break;
          case E_CORE_WARNING     : $exception = new PHPCoreWarning     ($message, $code=null, $severity=$level, $file, $line); break;
          case E_CORE_ERROR       : $exception = new PHPCoreError       ($message, $code=null, $severity=$level, $file, $line); break;
-         case E_STRICT           : $exception = new PHPStrictError     ($message, $code=null, $severity=$level, $file, $line); break;
+         case E_STRICT           : $exception = new PHPStrict          ($message, $code=null, $severity=$level, $file, $line); break;
          case E_NOTICE           : $exception = new PHPNotice          ($message, $code=null, $severity=$level, $file, $line); break;
          case E_WARNING          : $exception = new PHPWarning         ($message, $code=null, $severity=$level, $file, $line); break;
          case E_ERROR            : $exception = new PHPError           ($message, $code=null, $severity=$level, $file, $line); break;
