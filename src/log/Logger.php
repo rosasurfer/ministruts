@@ -622,7 +622,7 @@ class Logger extends StaticClass {
       else {
          // exception
          $type = null;
-         $msg  = trim(DebugHelper::getBetterMessage($loggable, $indent));
+         $msg  = trim(DebugHelper::composeBetterMessage($loggable, $indent));
          if (isSet($context['unhandled'])) {
             $type = 'Unhandled ';
             if ($loggable instanceof PHPError) {
@@ -641,7 +641,7 @@ class Logger extends StaticClass {
       // append an existing context exception to "cliExtra"
       if (isSet($context['exception'])) {
          $exception = $context['exception'];
-         $msg       = $indent.trim(DebugHelper::getBetterMessage($exception, $indent));
+         $msg       = $indent.trim(DebugHelper::composeBetterMessage($exception, $indent));
          $extra    .= NL.$msg.NL;
          $traceStr  = $indent.'Stacktrace:'.NL.' -----------'.NL;
          $traceStr .= DebugHelper::getBetterTraceAsString($exception, $indent);
@@ -725,7 +725,7 @@ class Logger extends StaticClass {
       else {
          // exception
          $type = null;
-         $msg  = trim(DebugHelper::getBetterMessage($loggable));
+         $msg  = trim(DebugHelper::composeBetterMessage($loggable));
          if (isSet($context['unhandled'])) {
             $type = 'Unhandled ';
             if ($loggable instanceof PHPError) {
@@ -742,7 +742,7 @@ class Logger extends StaticClass {
       // append an existing context exception
       if (isSet($context['exception'])) {
          $exception = $context['exception'];
-         $msg       = DebugHelper::getBetterMessage($exception);
+         $msg       = DebugHelper::composeBetterMessage($exception);
          $html     .= '<br>'.nl2br(htmlSpecialChars($msg, ENT_QUOTES|ENT_SUBSTITUTE)).'<br>';
          $traceStr  = $indent.'Stacktrace:'.NL.' -----------'.NL;
          $traceStr .= DebugHelper::getBetterTraceAsString($exception, $indent);

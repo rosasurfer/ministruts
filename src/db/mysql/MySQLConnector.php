@@ -6,7 +6,7 @@ use rosasurfer\db\DatabaseException;
 
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
-use rosasurfer\exception\RosasurferExceptionInterface as RosasurferException;
+use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\exception\RuntimeException;
 
 
@@ -174,7 +174,7 @@ class MySQLConnector extends Connector {
          $this->connection  = mysql_connect($host, $user, $pass, $newLink=true/*, $flags=2 */);
          $this->connection || trigger_error(@$php_errormsg, E_USER_ERROR);
       }
-      catch (RosasurferException $ex) {
+      catch (IRosasurferException $ex) {
          throw $ex->addMessage('Can not connect to MySQL server on "'.$host.'"');
       }
 
@@ -195,7 +195,7 @@ class MySQLConnector extends Connector {
             }
          }
       }
-      catch (RosasurferException $ex) {
+      catch (IRosasurferException $ex) {
          throw $ex->addMessage('Can not set system variable "'.$value.'"')->setCode(mysql_errno($this->connection));
       }
 
@@ -204,7 +204,7 @@ class MySQLConnector extends Connector {
          try {
             mysql_select_db($this->database, $this->connection) || trigger_error(mysql_error($this->connection), E_USER_ERROR);
          }
-         catch (RosasurferException $ex) {
+         catch (IRosasurferException $ex) {
             throw $ex->addMessage('Can not select database "'.$this->database.'"')->setCode(mysql_errno($this->connection));
          }
       }
@@ -333,7 +333,7 @@ class MySQLConnector extends Connector {
          $result  = mysql_query($sql, $this->connection);
          $result || trigger_error('SQL-Error '.mysql_errno($this->connection).': '.mysql_error($this->connection), E_USER_ERROR);
       }
-      catch (RosasurferException $ex) {
+      catch (IRosasurferException $ex) {
          throw $ex->addMessage('SQL: "'.$sql.'"')->setCode(mysql_errno($this->connection));
       }
 

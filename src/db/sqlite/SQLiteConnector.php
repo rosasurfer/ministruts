@@ -4,7 +4,7 @@ namespace rosasurfer\db\sqlite;
 use rosasurfer\db\Connector;
 use rosasurfer\db\DatabaseException;
 
-use rosasurfer\exception\RosasurferExceptionInterface as RosasurferException;
+use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\exception\RuntimeException;
 
 use rosasurfer\log\Logger;
@@ -219,7 +219,7 @@ class SQLiteConnector extends Connector {
          if ($this->skipResults) $result = $this->handler->exec($sql);  // TRUE on success, FALSE on error
          else                    $result = $this->handler->query($sql); // SQLite3Result or bool for result-less statements
       }
-      catch (RosasurferException $ex) {
+      catch (IRosasurferException $ex) {
          throw $ex->addMessage('SQL: "'.$sql.'"');
       }
 

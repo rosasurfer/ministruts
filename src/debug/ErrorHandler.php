@@ -246,7 +246,7 @@ class ErrorHandler extends StaticClass {
          $indent = ' ';
 
          // secondary exception
-         $msg2  = 'PHP [FATAL] Unhandled '.trim(DebugHelper::getBetterMessage($secondary)).NL;
+         $msg2  = 'PHP [FATAL] Unhandled '.trim(DebugHelper::composeBetterMessage($secondary)).NL;
          $file  = $secondary->getFile();
          $line  = $secondary->getLine();
          $msg2 .= $indent.'in '.$file.' on line '.$line.NL.NL;
@@ -260,7 +260,7 @@ class ErrorHandler extends StaticClass {
                $msg1 .= $context['cliExtra'];
          }
          else {
-            $msg1  = $indent.'Unhandled '.trim(DebugHelper::getBetterMessage($exception)).NL;
+            $msg1  = $indent.'Unhandled '.trim(DebugHelper::composeBetterMessage($exception)).NL;
             $file  = $exception->getFile();
             $line  = $exception->getLine();
             $msg1 .= $indent.'in '.$file.' on line '.$line.NL.NL;

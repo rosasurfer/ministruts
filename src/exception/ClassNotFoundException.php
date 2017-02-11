@@ -5,5 +5,5 @@ namespace rosasurfer\exception;
 /**
  * ClassNotFoundException
  */
-class ClassNotFoundException extends BaseException {
+class ClassNotFoundException extends RosasurferException {
 }

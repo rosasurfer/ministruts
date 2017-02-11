@@ -4,7 +4,7 @@ namespace rosasurfer\db\pgsql;
 use rosasurfer\db\Connector;
 use rosasurfer\db\DatabaseException;
 
-use rosasurfer\exception\RosasurferExceptionInterface as RosasurferException;
+use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\exception\RuntimeException;
 
 use rosasurfer\log\Logger;
@@ -230,7 +230,7 @@ class PostgresConnector extends Connector {
          // execute statement
          $result = pg_query($this->connection, $sql);             // wraps multi-statement queries in a transaction
       }
-      catch (RosasurferException $ex) {
+      catch (IRosasurferException $ex) {
          throw $ex->addMessage('SQL: "'.$sql.'"');
       }
 

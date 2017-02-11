@@ -5,5 +5,5 @@ namespace rosasurfer\exception;
 /**
  * IOException
  */
-class IOException extends BaseException {
+class IOException extends RosasurferException {
 }

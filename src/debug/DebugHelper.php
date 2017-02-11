@@ -4,7 +4,7 @@ namespace rosasurfer\debug;
 use rosasurfer\core\StaticClass;
 
 use rosasurfer\exception\IllegalTypeException;
-use rosasurfer\exception\RosasurferExceptionInterface as RosasurferException;
+use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\exception\error\PHPError;
 
 use function rosasurfer\normalizeEOL;
@@ -175,7 +175,7 @@ class DebugHelper extends StaticClass {
     *
     * @return string - message
     */
-   public static function getBetterMessage(\Exception $exception, $indent='') {
+   public static function composeBetterMessage(\Exception $exception, $indent='') {
       if ($exception instanceof PHPError) {
          $result    = $exception->getSimpleType();
       }
@@ -215,13 +215,13 @@ class DebugHelper extends StaticClass {
     * @return string - readable stacktrace
     */
    public static function getBetterTraceAsString(\Exception $exception, $indent='') {
-      if ($exception instanceof RosasurferException) $trace = $exception->getBetterTrace();
-      else                                           $trace = self::fixTrace($exception->getTrace(), $exception->getFile(), $exception->getLine());
+      if ($exception instanceof IRosasurferException) $trace = $exception->getBetterTrace();
+      else                                            $trace = self::fixTrace($exception->getTrace(), $exception->getFile(), $exception->getLine());
       $result = self::formatTrace($trace, $indent);
 
       if ($cause=$exception->getPrevious()) {
          // recursively add stacktraces of nested exceptions
-         $message = trim(self::getBetterMessage($cause, $indent));
+         $message = trim(self::composeBetterMessage($cause, $indent));
          $result .= NL.$indent.'caused by'.NL.$indent.$message.NL.NL;
          $result .= self::{__FUNCTION__}($cause, $indent);                 // recursion
       }

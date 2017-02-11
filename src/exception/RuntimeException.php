@@ -5,5 +5,5 @@ namespace rosasurfer\exception;
 /**
  * RuntimeException
  */
-class RuntimeException extends BaseException {
+class RuntimeException extends RosasurferException {
 }
