@@ -20,6 +20,17 @@ interface RosasurferExceptionInterface {
 
 
    /**
+    * Set the error code of an exception. Used during up-bubbling to add additional information to an existing exception.
+    * Ignored if the exception's error code is already set.
+    *
+    * @param  mixed $code
+    *
+    * @return self
+    */
+   public function setCode($code);
+
+
+   /**
     * Return the exception's message in a more readable way.
     *
     * @return string

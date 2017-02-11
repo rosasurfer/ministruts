@@ -34,7 +34,7 @@ class MySQLResult extends Result {
    /** @var int - number of rows in the result set (if any) */
    protected $numRows;
 
-   /** @var int - the last inserted row id at instance creation time */
+   /** @var int - the last inserted row id of the connection at instance creation time */
    protected $lastInsertId;
 
 
@@ -48,7 +48,7 @@ class MySQLResult extends Result {
     * @param  resource   $result       - A result resource or NULL for result-less SQL statements. SELECT queries not
     *                                    matching any rows produce an empty result resource.
     * @param  int        $affectedRows - number of rows modified by the statement
-    * @param  int        $lastInsertId - value of last_insert_id after query execution
+    * @param  int        $lastInsertId - last inserted ID of the connection
     */
    public function __construct(IConnector $connector, $sql, $result, $affectedRows, $lastInsertId) {
       if (!is_string($sql))                        throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
@@ -57,8 +57,8 @@ class MySQLResult extends Result {
       $this->connector    = $connector;
       $this->sql          = $sql;
       $this->result       = $result;
-      $this->affectedRows = $affectedRows;
       $this->lastInsertId = $lastInsertId;
+      $this->affectedRows = $affectedRows;
    }
 
 

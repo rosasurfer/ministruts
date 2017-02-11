@@ -28,8 +28,23 @@ trait RosasurferExceptionTrait {
     * @return self
     */
    public function addMessage($message) {
-      $this->message = trim($this->message).NL.trim($message);
+      $this->message = trim(trim($this->message).NL.$message);
       return $this;
+   }
+
+
+   /**
+    * Set the error code of the exception. Used during up-bubbling to add additional information to the instance.
+    * Ignored if the exception's error code is already set.
+    *
+    * @param  mixed $code
+    *
+    * @return self
+    */
+   public function setCode($code) {
+      if (!isSet($this->code)) {
+         $this->code = $code;
+      }
    }
 
 
