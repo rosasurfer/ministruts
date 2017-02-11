@@ -3,7 +3,7 @@ namespace rosasurfer\exception;
 
 
 /**
- * Exception to mark errors of the business logic.
+ * Exception to mark errors in the business logic.
  */
 class BusinessRuleException extends BaseException {
 }
