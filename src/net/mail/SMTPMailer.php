@@ -109,8 +109,7 @@ class SMTPMailer extends Mailer {
          $this->disconnect();
       }
       catch (\Exception $ex) {
-         ErrorHandler::handleDestructorException($ex);
-         throw $ex;
+         throw ErrorHandler::handleDestructorException($ex);
       }
    }
 

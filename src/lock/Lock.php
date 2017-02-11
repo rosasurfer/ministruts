@@ -85,8 +85,7 @@ final class Lock extends BaseLock {
          $this->release();
       }
       catch (\Exception $ex) {
-         ErrorHandler::handleDestructorException($ex);
-         throw $ex;
+         throw ErrorHandler::handleDestructorException($ex);
       }
    }
 

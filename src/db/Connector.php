@@ -42,10 +42,7 @@ abstract class Connector extends Object implements ConnectorInterface {
          }
       }
       catch (\Exception $ex) {
-         // Attempting to throw an exception from a destructor during script shutdown causes a fatal error.
-         // @see  http://php.net/manual/en/language.oop5.decon.php
-         ErrorHandler::handleDestructorException($ex);
-         throw $ex;
+         throw ErrorHandler::handleDestructorException($ex);
       }
    }
 

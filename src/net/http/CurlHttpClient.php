@@ -152,8 +152,7 @@ class CurlHttpClient extends HttpClient {
          }
       }
       catch (\Exception $ex) {
-         ErrorHandler::handleDestructorException($ex);
-         throw $ex;
+         throw ErrorHandler::handleDestructorException($ex);
       }
    }
 
