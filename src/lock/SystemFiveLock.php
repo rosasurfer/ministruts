@@ -6,7 +6,7 @@ use rosasurfer\debug\ErrorHandler;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RuntimeException;
 
-use rosasurfer\exception\php\PHPError;
+use rosasurfer\exception\error\PHPError;
 
 use rosasurfer\log\Logger;
 

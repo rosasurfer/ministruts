@@ -10,7 +10,7 @@ use rosasurfer\debug\ErrorHandler;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
-use rosasurfer\exception\php\PHPError;
+use rosasurfer\exception\error\PHPError;
 
 use rosasurfer\net\http\CurlHttpClient;
 use rosasurfer\net\http\HttpRequest;

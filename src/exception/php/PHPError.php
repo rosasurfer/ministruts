@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\exception\php;
+namespace rosasurfer\exception\error;
 
 use rosasurfer\debug\DebugHelper;
 use rosasurfer\debug\ErrorHandler;

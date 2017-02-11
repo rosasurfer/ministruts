@@ -3,22 +3,22 @@ namespace rosasurfer\debug;
 
 use rosasurfer\core\StaticClass;
 
-use rosasurfer\exception\php\PHPCompileError;
-use rosasurfer\exception\php\PHPCompileWarning;
-use rosasurfer\exception\php\PHPCoreError;
-use rosasurfer\exception\php\PHPCoreWarning;
-use rosasurfer\exception\php\PHPDeprecation;
-use rosasurfer\exception\php\PHPError;
-use rosasurfer\exception\php\PHPNotice;
-use rosasurfer\exception\php\PHPParseError;
-use rosasurfer\exception\php\PHPRecoverableError;
-use rosasurfer\exception\php\PHPStrictError;
-use rosasurfer\exception\php\PHPUnknownError;
-use rosasurfer\exception\php\PHPUserDeprecation;
-use rosasurfer\exception\php\PHPUserError;
-use rosasurfer\exception\php\PHPUserNotice;
-use rosasurfer\exception\php\PHPUserWarning;
-use rosasurfer\exception\php\PHPWarning;
+use rosasurfer\exception\error\PHPCompileError;
+use rosasurfer\exception\error\PHPCompileWarning;
+use rosasurfer\exception\error\PHPCoreError;
+use rosasurfer\exception\error\PHPCoreWarning;
+use rosasurfer\exception\error\PHPDeprecation;
+use rosasurfer\exception\error\PHPError;
+use rosasurfer\exception\error\PHPNotice;
+use rosasurfer\exception\error\PHPParseError;
+use rosasurfer\exception\error\PHPRecoverableError;
+use rosasurfer\exception\error\PHPStrictError;
+use rosasurfer\exception\error\PHPUnknownError;
+use rosasurfer\exception\error\PHPUserDeprecation;
+use rosasurfer\exception\error\PHPUserError;
+use rosasurfer\exception\error\PHPUserNotice;
+use rosasurfer\exception\error\PHPUserWarning;
+use rosasurfer\exception\error\PHPWarning;
 
 use rosasurfer\log\Logger;
 

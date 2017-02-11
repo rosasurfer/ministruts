@@ -5,7 +5,7 @@ use rosasurfer\core\StaticClass;
 
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RosasurferExceptionInterface as RosasurferException;
-use rosasurfer\exception\php\PHPError;
+use rosasurfer\exception\error\PHPError;
 
 use function rosasurfer\normalizeEOL;
 use function rosasurfer\strEndsWith;

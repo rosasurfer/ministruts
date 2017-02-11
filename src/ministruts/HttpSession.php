@@ -6,7 +6,7 @@ use rosasurfer\core\Singleton;
 use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\IllegalTypeException;
 
-use rosasurfer\exception\php\PHPError;
+use rosasurfer\exception\error\PHPError;
 
 
 /**
