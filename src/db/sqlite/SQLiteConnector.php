@@ -101,8 +101,9 @@ class SQLiteConnector extends Connector {
          $flags = SQLITE3_OPEN_READWRITE ;   // SQLITE3_OPEN_READONLY| SQLITE3_OPEN_CREATE
                                                                      // SQLITE3_OPEN_READWRITE
          $handler = new \SQLite3($this->file, $flags);               // SQLITE3_OPEN_CREATE
+         !$handler && trigger_error(@$php_errormsg, E_USER_ERROR);
       }
-      catch (\Exception $ex) {
+      catch (IRosasurferException $ex) {
          $file = $this->file;
          $what = $where = null;
          if (file_exists($file)) {
@@ -117,7 +118,7 @@ class SQLiteConnector extends Connector {
             else                                                  $absolutePath = false;
             if (!$absolutePath) $where = ' in "'.getCwd().'"';
          }
-         throw new RuntimeException('Cannot '.$what.' SQLite database file "'.$file.'"'.$where, null, $ex);
+         throw $ex->addMessage('Cannot '.$what.' SQLite database file "'.$file.'"'.$where);
       }
       $this->handler = $handler;
    }
@@ -286,9 +287,11 @@ class SQLiteConnector extends Connector {
 
    /**
     * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement. The value is not reset between queries.
-    * (see the README)
+    * (see the db README)
     *
     * @return int - generated ID or 0 (zero) if no new ID was yet generated in the current session
+    *
+    * @link   http://github.com/rosasurfer/ministruts/tree/master/src/db
     */
    public function lastInsertId() {
       if (!$this->isConnected())
@@ -321,12 +324,8 @@ class SQLiteConnector extends Connector {
    public function commit() {
       if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
 
-      if (!$this->isConnected()) {
-         trigger_error('Not connected', E_USER_WARNING);
-      }
-      else if (!$this->transactionLevel) {
-         trigger_error('No database transaction to commit', E_USER_WARNING);
-      }
+      if      (!$this->isConnected())    trigger_error('Not connected', E_USER_WARNING);
+      else if (!$this->transactionLevel) trigger_error('No database transaction to commit', E_USER_WARNING);
       else {
          if ($this->transactionLevel == 1)
             $this->execute('commit');
@@ -345,12 +344,8 @@ class SQLiteConnector extends Connector {
    public function rollback() {
       if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
 
-      if (!$this->isConnected()) {
-         trigger_error('Not connected', E_USER_WARNING);
-      }
-      else if (!$this->transactionLevel) {
-         trigger_error('No database transaction to roll back', E_USER_WARNING);
-      }
+      if      (!$this->isConnected())    trigger_error('Not connected', E_USER_WARNING);
+      else if (!$this->transactionLevel) trigger_error('No database transaction to roll back', E_USER_WARNING);
       else {
          if ($this->transactionLevel == 1)
             $this->execute('rollback');

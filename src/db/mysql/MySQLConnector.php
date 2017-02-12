@@ -172,7 +172,7 @@ class MySQLConnector extends Connector {
       // connect
       try {                                                                   // CLIENT_FOUND_ROWS
          $this->connection  = mysql_connect($host, $user, $pass, $newLink=true/*, $flags=2 */);
-         $this->connection || trigger_error(@$php_errormsg, E_USER_ERROR);
+         !$this->connection && trigger_error(@$php_errormsg, E_USER_ERROR);
       }
       catch (IRosasurferException $ex) {
          throw $ex->addMessage('Can not connect to MySQL server on "'.$host.'"');
@@ -330,7 +330,7 @@ class MySQLConnector extends Connector {
 
       // execute statement
       try {
-         $result  = mysql_query($sql, $this->connection);
+         $result = mysql_query($sql, $this->connection);
          $result || trigger_error('SQL-Error '.mysql_errno($this->connection).': '.mysql_error($this->connection), E_USER_ERROR);
       }
       catch (IRosasurferException $ex) {
@@ -388,9 +388,11 @@ class MySQLConnector extends Connector {
 
    /**
     * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement. The value is not reset between queries.
-    * (see the README)
+    * (see the db README)
     *
     * @return int - generated ID or 0 (zero) if no new ID was yet generated in the current session
+    *
+    * @link   http://github.com/rosasurfer/ministruts/tree/master/src/db
     */
    public function lastInsertId() {
       return (int) $this->lastInsertId;
@@ -421,12 +423,8 @@ class MySQLConnector extends Connector {
    public function commit() {
       if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
 
-      if (!$this->isConnected()) {
-         trigger_error('Not connected', E_USER_WARNING);
-      }
-      else if (!$this->transactionLevel) {
-         trigger_error('No database transaction to commit', E_USER_WARNING);
-      }
+      if      (!$this->isConnected())    trigger_error('Not connected', E_USER_WARNING);
+      else if (!$this->transactionLevel) trigger_error('No database transaction to commit', E_USER_WARNING);
       else {
          if ($this->transactionLevel == 1)
             $this->execute('commit');
@@ -445,12 +443,8 @@ class MySQLConnector extends Connector {
    public function rollback() {
       if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
 
-      if (!$this->isConnected()) {
-         trigger_error('Not connected', E_USER_WARNING);
-      }
-      else if (!$this->transactionLevel) {
-         trigger_error('No database transaction to roll back', E_USER_WARNING);
-      }
+      if      (!$this->isConnected())    trigger_error('Not connected', E_USER_WARNING);
+      else if (!$this->transactionLevel) trigger_error('No database transaction to roll back', E_USER_WARNING);
       else {
          if ($this->transactionLevel == 1)
             $this->execute('rollback');
@@ -478,6 +472,6 @@ class MySQLConnector extends Connector {
     * @return resource - the internal connection handle
     */
    public function getInternalHandler() {
-      $this->connection;
+      return $this->connection;
    }
 }

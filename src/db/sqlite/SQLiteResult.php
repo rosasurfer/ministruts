@@ -117,9 +117,11 @@ class SQLiteResult extends Result {
 
    /**
     * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement up to creation time of this instance.
-    * The value is not reset between queries (see the README).
+    * The value is not reset between queries (see the db README).
     *
     * @return int - generated ID or 0 (zero) if no new ID was yet generated in the current session
+    *
+    * @link   http://github.com/rosasurfer/ministruts/tree/master/src/db
     */
    public function lastInsertId() {
       return (int) $this->lastInsertId;

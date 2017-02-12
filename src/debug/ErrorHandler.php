@@ -286,7 +286,7 @@ class ErrorHandler extends StaticClass {
     * Attempting to throw an exception from a destructor during script shutdown causes a fatal error. Therefore this
     * method has to be called manually from object destructors if an exception occurred. If the script is in the shutdown
     * phase the exception is passed on to the regular exception handler and the script is terminated. If the script is
-    * currently not in the shutdown phase this method ignores the exception. For an example see this folder's README.
+    * currently not in the shutdown phase this method ignores the exception. For an example see this package's README.
     *
     * @param  \Exception $exception
     *

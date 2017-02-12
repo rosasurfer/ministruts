@@ -7,11 +7,7 @@ use rosasurfer\db\DatabaseException;
 use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\exception\RuntimeException;
 
-use rosasurfer\log\Logger;
-
 use function rosasurfer\strContains;
-
-use const rosasurfer\L_WARN;
 
 
 /**
@@ -28,9 +24,6 @@ class PostgresConnector extends Connector {
 
    /** @var string[] */
    protected $options = [];
-
-   /** @var string - the resulting connection string as passed to pg_connect() */
-   protected $connectionStr;
 
    /** @var resource - internal connection handle */
    protected $connection;
@@ -98,14 +91,14 @@ class PostgresConnector extends Connector {
          }
          $connStr .= $key.'='.$value.' ';
       }
-      $this->connectionStr = $connStr = trim($connStr);
+      $connStr = trim($connStr);
 
       try {
          $this->connection = pg_connect($connStr, PGSQL_CONNECT_FORCE_NEW);
+         !$this->connection && trigger_error(@$php_errormsg, E_USER_ERROR);
       }
-      catch (\Exception $ex) {
-         $this->connectionStr = null;
-         throw new RuntimeException('Cannot connect to PostgreSQL server with connection string: "'.$connStr.'"', null, $ex);
+      catch (IRosasurferException $ex) {
+         throw $ex->addMessage('Cannot connect to PostgreSQL server with connection string: "'.$connStr.'"');
       }
       return $this;
 
@@ -181,8 +174,8 @@ class PostgresConnector extends Connector {
     */
    public function query($sql) {
       $affectedRows = 0;
-      $response = $this->executeRaw($sql, $affectedRows);                  // pass on $affectedRows to avoid
-      return new PostgresResult($this, $sql, $response, $affectedRows);    // multiple calculations
+      $result = $this->executeRaw($sql, $affectedRows);                  // pass on $affectedRows to avoid
+      return new PostgresResult($this, $sql, $result, $affectedRows);    // multiple calculations
    }
 
 
@@ -220,25 +213,21 @@ class PostgresConnector extends Connector {
     */
    public function executeRaw($sql, &$affectedRows=0) {
       if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
-      $affectedRows = 0;
-
       if (!$this->isConnected())
          $this->connect();
 
-      $result = null;
+      $result       = null;
+      $affectedRows = 0;
+
+      // execute statement
       try {
-         // execute statement
          $result = pg_query($this->connection, $sql);             // wraps multi-statement queries in a transaction
+         $result || trigger_error(pg_last_error($this->connection), E_USER_ERROR);
       }
       catch (IRosasurferException $ex) {
          throw $ex->addMessage('SQL: "'.$sql.'"');
       }
 
-      if (!$result) {
-         $message  = pg_last_error($this->connection);
-         $message .= NL.' SQL: "'.$sql.'"';
-         throw new DatabaseException($message, null, $ex);
-      }
       //
       // TODO: All queries must be sent via pg_send_query()/pg_get_result(). All errors must be analyzed per result
       //       via pg_result_error(). This way we get access to SQLSTATE codes and to custom exception handling.
@@ -312,8 +301,8 @@ class PostgresConnector extends Connector {
       //
       // The following logic assumes a single statement query with matched = modified rows:
       //
-      // TODO: Most important, the following is obviously big bullocks in PostgreSQL.
-      //
+
+      // TODO: The following is obviously big bullocks in PostgreSQL.
       $rows = pg_affected_rows($result);
       if ($rows) {
          $str = strToLower(subStr(trim($sql), 0, 6));
@@ -361,7 +350,7 @@ class PostgresConnector extends Connector {
       if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
 
       if (!$this->transactionLevel)
-         $this->executeRaw('begin');
+         $this->execute('begin');
 
       $this->transactionLevel++;
       return $this;
@@ -376,13 +365,11 @@ class PostgresConnector extends Connector {
    public function commit() {
       if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
 
-      if (!$this->transactionLevel) {
-         Logger::log('No database transaction to commit', L_WARN);
-      }
+      if      (!$this->isConnected())    trigger_error('Not connected', E_USER_WARNING);
+      else if (!$this->transactionLevel) trigger_error('No database transaction to commit', E_USER_WARNING);
       else {
          if ($this->transactionLevel == 1)
-            $this->executeRaw('commit');
-
+            $this->execute('commit');
          $this->transactionLevel--;
       }
       return $this;
@@ -398,13 +385,11 @@ class PostgresConnector extends Connector {
    public function rollback() {
       if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
 
-      if (!$this->transactionLevel) {
-         Logger::log('No database transaction to roll back', L_WARN);
-      }
+      if      (!$this->isConnected())    trigger_error('Not connected', E_USER_WARNING);
+      else if (!$this->transactionLevel) trigger_error('No database transaction to roll back', E_USER_WARNING);
       else {
          if ($this->transactionLevel == 1)
-            $this->executeRaw('rollback');
-
+            $this->execute('rollback');
          $this->transactionLevel--;
       }
       return $this;
@@ -417,7 +402,9 @@ class PostgresConnector extends Connector {
     * @return bool
     */
    public function isInTransaction() {
-      return ($this->transactionLevel > 0);
+      if ($this->isConnected())
+         return ($this->transactionLevel > 0);
+      return false;
    }
 
 

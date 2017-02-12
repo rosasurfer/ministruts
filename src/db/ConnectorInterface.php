@@ -106,10 +106,12 @@ interface ConnectorInterface {
 
 
    /**
-    * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement (connector specific, see the README).
+    * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement (connector specific, see the db README).
     *
     * @return int - generated ID or 0 (zero) if no ID was generated;
     *               -1 if the DBMS doesn't support this functionality
+    *
+    * @link   http://github.com/rosasurfer/ministruts/tree/master/src/db
     */
    public function lastInsertId();
 
