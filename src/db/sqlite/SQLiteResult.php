@@ -4,7 +4,6 @@ namespace rosasurfer\db\sqlite;
 use rosasurfer\db\ConnectorInterface as IConnector;
 use rosasurfer\db\Result;
 
-use rosasurfer\exception\IllegalArgumentException;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\UnimplementedFeatureException;
 
@@ -35,26 +34,36 @@ class SQLiteResult extends Result {
    /** @var int - number of rows in the result set (if any) */
    protected $numRows;
 
+   /** @var int - the last inserted row id of the connection at instance creation time */
+   protected $lastInsertId;
+
 
    /**
     * Constructor
     *
     * Create a new SQLiteResult instance. Called only when execution of a SQL statement returned successful.
     *
-    * @param  IConnector     $connector    - Connector managing the database connection
+    * @param  IConnector     $connector    - connector managing the database connection
     * @param  string         $sql          - executed SQL statement
-    * @param  \SQLite3Result $result       - A SQLite3Result or NULL for result-less SQL statements. SELECT queries not
-    *                                        matching any rows and DELETE statements produce an empty SQLite3Result.
+    * @param  \SQLite3Result $result       - result-less queries produce an empty SQLite3Result
     * @param  int            $affectedRows - number of rows modified by the statement
+    * @param  int            $lastInsertId - last inserted ID of the connection
     */
-   public function __construct(IConnector $connector, $sql, \SQLite3Result $result=null, $affectedRows=0) {
-      if (func_num_args() < 4) throw new IllegalArgumentException('Illegal number of arguments: '.func_num_args());
-      if (!is_string($sql))    throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
+   public function __construct(IConnector $connector, $sql, \SQLite3Result $result, $affectedRows, $lastInsertId) {
+      if (!is_string($sql))       throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
+      if (!is_int($affectedRows)) throw new IllegalTypeException('Illegal type of parameter $affectedRows: '.getType($affectedRows));
+      if (!is_int($lastInsertId)) throw new IllegalTypeException('Illegal type of parameter $lastInsertId: '.getType($lastInsertId));
 
       $this->connector    = $connector;
       $this->sql          = $sql;
-      $this->result       = $result;
       $this->affectedRows = $affectedRows;
+      $this->lastInsertId = $lastInsertId;
+
+      if (!$result->numColumns()) {       // close empty results and release them to prevent access
+         $result->finalize();             // @see bug in SQLite3Result::fetchArray()
+         $result = null;
+      }
+      $this->result = $result;
    }
 
 
@@ -107,21 +116,20 @@ class SQLiteResult extends Result {
 
 
    /**
-    * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement (usually an INSERT).
+    * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement up to creation time of this instance.
+    * The value is not reset between queries (see the README).
     *
-    * This function returnes the most recently generated ID. It's value is not reset between queries.
-    *
-    * @return int - generated ID or 0 (zero) if no previous statement yet generated an ID
+    * @return int - generated ID or 0 (zero) if no new ID was yet generated in the current session
     */
    public function lastInsertId() {
-      return $this->connector->lastInsertId();
+      return (int) $this->lastInsertId;
    }
 
 
    /**
-    * Get the underlying driver's original result object.
+    * Return the Result's internal result object.
     *
-    * @return \SQLite3Result
+    * @return \SQLite3Result - instance or NULL for result-less queries
     */
    public function getInternalResult() {
       return $this->result;

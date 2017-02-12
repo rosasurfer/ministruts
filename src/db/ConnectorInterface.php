@@ -1,6 +1,9 @@
 <?php
 namespace rosasurfer\db;
 
+use rosasurfer\db\ConnectorInterface as IConnector;
+use rosasurfer\db\ResultInterface    as IResult;
+
 
 /**
  * Interface for storage mechanism adapters.
@@ -33,11 +36,11 @@ interface ConnectorInterface {
 
 
    /**
-    * Execute a SQL statement and return the result.
+    * Execute a SQL statement and return the result. This method should be used for SQL statements returning rows.
     *
     * @param  string $sql - SQL statement
     *
-    * @return ResultInterface
+    * @return IResult
     *
     * @throws DatabaseException in case of failure
     */
@@ -45,11 +48,12 @@ interface ConnectorInterface {
 
 
    /**
-    * Execute a SQL statement and skip result set processing.
+    * Execute a SQL statement and skip result set processing. This method should be used for SQL statements not returning
+    * rows. If the database driver does not support this functionality the statement is forwarded to IConnector::query().
     *
     * @param  string $sql - SQL statement
     *
-    * @return int - Number of rows affected by the statement.
+    * @return int - Number of rows affected if the statement was an INSERT/UPDATE/DELETE statement
     *
     * @throws DatabaseException in case of failure
     */
@@ -60,22 +64,13 @@ interface ConnectorInterface {
     * Execute a SQL statement and return the internal driver's raw response.
     *
     * @param  _IN_  string $sql          - SQL statement
-    * @param  _OUT_ int   &$affectedRows - a variable receiving the number of affected rows
+    * @param  _OUT_ int   &$affectedRows - A variable receiving the number of affected rows.
     *
     * @return mixed - raw driver response
     *
     * @throws DatabaseException in case of failure
     */
    public function executeRaw($sql, &$affectedRows=0);
-
-
-   /**
-    * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement (connector specific, see the README).
-    *
-    * @return int - generated ID or 0 (zero) if no ID was generated;
-    *               -1 if the dbms doesn't support this functionality
-    */
-   public function lastInsertId();
 
 
    /**
@@ -111,6 +106,15 @@ interface ConnectorInterface {
 
 
    /**
+    * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement (connector specific, see the README).
+    *
+    * @return int - generated ID or 0 (zero) if no ID was generated;
+    *               -1 if the DBMS doesn't support this functionality
+    */
+   public function lastInsertId();
+
+
+   /**
     * Return the type of the database system the connector is used for.
     *
     * @return string
@@ -121,7 +125,7 @@ interface ConnectorInterface {
    /**
     * Return the connector's internal connection object.
     *
-    * @return resource|object - resource or connection handler instance
+    * @return resource|object - connection handle or handler instance
     */
    public function getInternalHandler();
 }

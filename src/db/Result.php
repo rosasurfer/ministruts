@@ -7,9 +7,7 @@ use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\UnimplementedFeatureException;
 
-use const rosasurfer\ARRAY_ASSOC;
 use const rosasurfer\ARRAY_BOTH;
-use const rosasurfer\ARRAY_NUM;
 use function rosasurfer\strToBool;
 use function rosasurfer\strIsNumeric;
 
@@ -19,17 +17,6 @@ use function rosasurfer\strIsNumeric;
  * a result set.
  */
 abstract class Result extends Object implements ResultInterface {
-
-
-   /**
-    * Fetch the next row from the result set.
-    *
-    * @param  int $mode - Controls how the returned array is indexed. Can take one of the following values:
-    *                     ARRAY_ASSOC, ARRAY_NUM, or ARRAY_BOTH (default).
-    *
-    * @return array - array of columns or NULL if no more rows are available
-    */
-   abstract public function fetchNext($mode=ARRAY_BOTH);
 
 
    /**
@@ -168,42 +155,6 @@ abstract class Result extends Object implements ResultInterface {
 
       return (float) $sValue;                // skip leading zeros of numeric strings
    }
-
-
-   /**
-    * Return the number of rows affected if the SQL was an INSERT/UPDATE/DELETE statement.
-    *
-    * This value is provided for userland code only and must not be used in the framework. The implementation may be
-    * unreliable (see the specific Result implementation).
-    *
-    * @return int
-    */
-   abstract public function affectedRows();
-
-
-   /**
-    * Return the number of rows in the result set.
-    *
-    * @return int
-    */
-   abstract public function numRows();
-
-
-   /**
-    * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement (connector specific, see the README).
-    *
-    * @return int - generated ID or 0 (zero) if no ID was generated;
-    *               -1 if the dbms doesn't support this functionality
-    */
-   abstract public function lastInsertId();
-
-
-   /**
-    * Get the underlying driver's original result object.
-    *
-    * @return mixed
-    */
-   abstract public function getInternalResult();
 
 
    /**

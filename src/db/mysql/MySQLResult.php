@@ -53,12 +53,20 @@ class MySQLResult extends Result {
    public function __construct(IConnector $connector, $sql, $result, $affectedRows, $lastInsertId) {
       if (!is_string($sql))                        throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
       if (!is_resource($result) && $result!==null) throw new IllegalTypeException('Illegal type of parameter $result: '.getType($result));
+      if (!is_int($affectedRows))                  throw new IllegalTypeException('Illegal type of parameter $affectedRows: '.getType($affectedRows));
+      if (!is_int($lastInsertId))                  throw new IllegalTypeException('Illegal type of parameter $lastInsertId: '.getType($lastInsertId));
 
       $this->connector    = $connector;
       $this->sql          = $sql;
       $this->result       = $result;
-      $this->lastInsertId = $lastInsertId;
       $this->affectedRows = $affectedRows;
+      $this->lastInsertId = $lastInsertId;
+
+      if (!mysql_num_fields($result)) {      // close empty results and release them
+         mysql_free_result($result);
+         $result = null;
+      }
+      $this->result = $result;
    }
 
 
@@ -112,7 +120,7 @@ class MySQLResult extends Result {
     * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement up to creation time of this instance.
     * The value is not reset between queries (see the README).
     *
-    * @return int - generated ID or 0 (zero) if no ID was yet generated
+    * @return int - generated ID or 0 (zero) if no new ID was yet generated in the current session
     */
    public function lastInsertId() {
       return (int) $this->lastInsertId;
@@ -138,13 +146,11 @@ class MySQLResult extends Result {
 
 
    /**
-    * Get the underlying driver's original result object.
+    * Return the Result's internal result object.
     *
-    * @return resource
+    * @return resource - result handle or NULL for result-less queries
     */
    public function getInternalResult() {
-      if (is_resource($this->result))
-         return $this->result;
-      return null;
+      return $this->result;
    }
 }

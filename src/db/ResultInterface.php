@@ -90,6 +90,15 @@ interface ResultInterface {
 
 
    /**
+    * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement (connector specific, see the README).
+    *
+    * @return int - generated ID or 0 (zero) if no ID was generated;
+    *               -1 if the DBMS doesn't support this functionality
+    */
+   public function lastInsertId();
+
+
+   /**
     * Return the number of rows affected if the SQL was an INSERT/UPDATE/DELETE statement.
     *
     * @return int
@@ -106,18 +115,9 @@ interface ResultInterface {
 
 
    /**
-    * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement (connector specific, see the README).
+    * Return the Result's internal result object.
     *
-    * @return int - generated ID or 0 (zero) if no ID was generated;
-    *               -1 if the dbms doesn't support this functionality
-    */
-   public function lastInsertId();
-
-
-   /**
-    * Get the underlying driver's original result object.
-    *
-    * @return mixed
+    * @return resource|object - result handle or instance
     */
    public function getInternalResult();
 }

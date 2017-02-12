@@ -190,7 +190,7 @@ class MySQLConnector extends Connector {
                   if (!is_numeric($value))
                      $value = "'$value'";
                   $sql = "set $option = $value";
-                  $this->executeRaw($sql) || trigger_error(mysql_error($this->connection), E_USER_ERROR);
+                  $this->execute($sql) || trigger_error(mysql_error($this->connection), E_USER_ERROR);
                }
             }
          }
@@ -276,10 +276,10 @@ class MySQLConnector extends Connector {
     */
    public function query($sql) {
       $affectedRows = 0;
-      $response = $this->executeRaw($sql, $affectedRows);
-      if ($response === true)
-         $response = null;
-      return new MySQLResult($this, $sql, $response, $affectedRows, $this->lastInsertId);
+      $result = $this->executeRaw($sql, $affectedRows);
+      if ($result === true)
+         $result = null;
+      return new MySQLResult($this, $sql, $result, $affectedRows, $this->lastInsertId);
    }
 
 
@@ -301,9 +301,9 @@ class MySQLConnector extends Connector {
       //       @see  https://dev.mysql.com/doc/refman/5.7/en/mysql-use-result.html
 
       $affectedRows = 0;
-      $response = $this->executeRaw($sql, $affectedRows);
-      if (is_resource($response))
-         mysql_free_result($response);
+      $result = $this->executeRaw($sql, $affectedRows);
+      if (is_resource($result))
+         mysql_free_result($result);
       return $affectedRows;
    }
 
@@ -348,20 +348,41 @@ class MySQLConnector extends Connector {
       return $result;
    }
    /*
-   drop:      insert_id=0   affected_rows=0   result_set=0   num_rows=0   info=""
-   create:    insert_id=0   affected_rows=0   result_set=0   num_rows=0   info=""
-   insert(4): insert_id=1   affected_rows=4   result_set=0   num_rows=0   info="Records: 4  Duplicates: 0  Warnings: 0"
-   set:       insert_id=0   affected_rows=0   result_set=0   num_rows=0   info=""
-   explain:   insert_id=0   affected_rows=1   result_set=1   num_rows=1   info=""
-   update(0): insert_id=0   affected_rows=0   result_set=0   num_rows=0   info="Rows matched: 1  Changed: 0  Warnings: 0"
-   select:    insert_id=0   affected_rows=2   result_set=1   num_rows=2   info=""
-   update(1): insert_id=0   affected_rows=1   result_set=0   num_rows=0   info="Rows matched: 1  Changed: 1  Warnings: 0"
-   select:    insert_id=0   affected_rows=1   result_set=1   num_rows=1   info=""
-   select(0): insert_id=0   affected_rows=0   result_set=1   num_rows=0   info=""
-   delete(2): insert_id=0   affected_rows=2   result_set=0   num_rows=0   info=""
-   insert(2): insert_id=5   affected_rows=2   result_set=0   num_rows=0   info="Records: 2  Duplicates: 0  Warnings: 0"
-   insert(1): insert_id=7   affected_rows=1   result_set=0   num_rows=0   info=""    <- single row inserts produce no info
-   explain:   insert_id=0   affected_rows=1   result_set=1   num_rows=1   info=""
+   $db->query("drop table if exists t_test");
+   $db->query("create table t_test (id int auto_increment primary key, name varchar(100) not null)");
+   $db->query("insert into t_test (name) values ('a'), ('b'), ('c'), ('123')");
+   $db->query("set @a = 5");
+   $db->query("explain select count(*) from t_test");
+   $db->query("update t_test set name='c' where name in ('c')");
+   $db->query("select * from t_test where name in ('a','b')");
+   $db->query("select * from t_test where name in ('a','b') limit 1");
+   $db->query("update t_test set name='aa' where name in ('c')");
+   $db->query("select count(*) from t_test");
+   $db->query("select * from t_test where name = 'no-one'");
+   $db->query("delete from t_test where name = 'a' or name = 'b'");
+   $db->query("insert into t_test (name) values ('y'), ('z')");
+   $db->query("insert into t_test (name) values ('x')");
+   $db->query("explain select count(*) from t_test");
+
+   $result  = $db->query($sql)->getInternalResult();
+   $handler = $db->getInternalHandler();
+   echoPre(str_pad(explode(' ', $sql, 2)[0].':', 9).' insert_id='.mysql_insert_id($handler).'   affected_rows='.mysql_affected_rows($handler).'   result_set='.(is_resource($result) ? '1':' ').'   num_rows='.(int)@mysql_num_rows($result).'   info='.mysql_info($handler));
+
+   drop:     insert_id=0   affected_rows=0   result_set=    num_rows=0   info=
+   create:   insert_id=0   affected_rows=0   result_set=    num_rows=0   info=
+   insert:   insert_id=1   affected_rows=4   result_set=    num_rows=0   info=Records: 4  Duplicates: 0  Warnings: 0
+   set:      insert_id=0   affected_rows=0   result_set=    num_rows=0   info=
+   explain:  insert_id=0   affected_rows=1   result_set=1   num_rows=1   info=
+   update:   insert_id=0   affected_rows=0   result_set=    num_rows=0   info=Rows matched: 1  Changed: 0  Warnings: 0
+   select:   insert_id=0   affected_rows=2   result_set=1   num_rows=2   info=
+   select:   insert_id=0   affected_rows=1   result_set=1   num_rows=1   info=
+   update:   insert_id=0   affected_rows=1   result_set=    num_rows=0   info=Rows matched: 1  Changed: 1  Warnings: 0
+   select:   insert_id=0   affected_rows=1   result_set=1   num_rows=1   info=
+   select:   insert_id=0   affected_rows=0   result_set=1   num_rows=0   info=
+   delete:   insert_id=0   affected_rows=2   result_set=    num_rows=0   info=
+   insert:   insert_id=5   affected_rows=2   result_set=    num_rows=0   info=Records: 2  Duplicates: 0  Warnings: 0
+   insert:   insert_id=7   affected_rows=1   result_set=    num_rows=0   info=               <- single row inserts, no info
+   explain:  insert_id=0   affected_rows=1   result_set=1   num_rows=1   info=
    */
 
 
@@ -369,7 +390,7 @@ class MySQLConnector extends Connector {
     * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement. The value is not reset between queries.
     * (see the README)
     *
-    * @return int - generated ID or 0 (zero) if no ID was yet generated
+    * @return int - generated ID or 0 (zero) if no new ID was yet generated in the current session
     */
    public function lastInsertId() {
       return (int) $this->lastInsertId;
@@ -385,7 +406,7 @@ class MySQLConnector extends Connector {
       if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
 
       if (!$this->transactionLevel)
-         $this->executeRaw('start transaction');
+         $this->execute('start transaction');
 
       $this->transactionLevel++;
       return $this;
@@ -408,8 +429,7 @@ class MySQLConnector extends Connector {
       }
       else {
          if ($this->transactionLevel == 1)
-            $this->executeRaw('commit');
-
+            $this->execute('commit');
          $this->transactionLevel--;
       }
       return $this;
@@ -433,8 +453,7 @@ class MySQLConnector extends Connector {
       }
       else {
          if ($this->transactionLevel == 1)
-            $this->executeRaw('rollback');
-
+            $this->execute('rollback');
          $this->transactionLevel--;
       }
       return $this;
@@ -459,8 +478,6 @@ class MySQLConnector extends Connector {
     * @return resource - the internal connection handle
     */
    public function getInternalHandler() {
-      if (is_resource($this->connection))
-         return $this->connection;
-      return null;
+      $this->connection;
    }
 }

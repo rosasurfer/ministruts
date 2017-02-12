@@ -7,14 +7,20 @@ use rosasurfer\db\DatabaseException;
 use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\exception\RuntimeException;
 
-use rosasurfer\log\Logger;
-
-use const rosasurfer\L_WARN;
-use const rosasurfer\NL;
-
 
 /**
  * SQLiteConnector
+ *
+ * Connector for SQLite/SQLite3 databases.
+ *
+ * Known bugs in php_sqlite3 v0.7-dev (PHP 5.6):
+ * ---------------------------------------------
+ * SQLite3Result::fetchArray()  In contrast to the documentation SQLite3::query() always returns a SQLite3Result instance,
+ *                              not only for queries returning rows (SELECT, EXPLAIN). Each time SQLite3Result::fetchArray()
+ *                              is called on a result from a result-less query internally the query is executed again, thus
+ *                              breaking the application.
+ *
+ * Workaround: Check with SQLite3Result::numColumns() for an empty result before calling SQLite3Result::fetchArray().
  */
 class SQLiteConnector extends Connector {
 
@@ -138,7 +144,7 @@ class SQLiteConnector extends Connector {
     * @return bool
     */
    public function isConnected() {
-      return ($this->handler != null);
+      return is_object($this->handler);
    }
 
 
@@ -157,10 +163,8 @@ class SQLiteConnector extends Connector {
          $this->skipResults = false;
 
          $affectedRows = 0;
-         $response = $this->executeRaw($sql, $affectedRows);
-         if ($response === true)
-            $response = null;
-         return new SQLiteResult($this, $sql, $response, $affectedRows);
+         $result = $this->executeRaw($sql, $affectedRows);
+         return new SQLiteResult($this, $sql, $result, $affectedRows, $this->lastInsertId());
       }
       finally {
          $this->skipResults = $lastExecMode;
@@ -185,7 +189,7 @@ class SQLiteConnector extends Connector {
          $this->skipResults = true;
 
          $affectedRows = 0;
-         $this->executeRaw($sql, $affectedRows);
+         $this->executeRaw($sql, $affectedRows)->finalize();         // destroy the result
          return $affectedRows;
       }
       finally {
@@ -201,40 +205,32 @@ class SQLiteConnector extends Connector {
     * @param  _OUT_ int   &$affectedRows - A variable receiving the number of affected rows. Unreliable for specific UPDATE
     *                                      statements (matched but unmodified rows are reported as changed) and for multiple
     *                                      statement queries.
-    *
-    * @return \SQLite3Result|bool - SQLite3Result or TRUE (depending on the statement)
+    * @return \SQLite3Result
     *
     * @throws DatabaseException in case of failure
     */
    public function executeRaw($sql, &$affectedRows=0) {
       if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
-      $affectedRows = 0;
-
       if (!$this->isConnected())
          $this->connect();
 
-      $result = null;
+      $result       = null;
+      $affectedRows = 0;
+
+      // execute statement
       try {
-         // execute statement
-         if ($this->skipResults) $result = $this->handler->exec($sql);  // TRUE on success, FALSE on error
-         else                    $result = $this->handler->query($sql); // SQLite3Result or bool for result-less statements
+         if ($this->skipResults) $result = $this->handler->exec($sql);     // TRUE on success, FALSE on error
+         else                    $result = $this->handler->query($sql);    // bug: always SQLite3Result, never boolean
+         $result || trigger_error('Error '.$this->handler->lastErrorCode().', '.$this->handler->lastErrorMsg(), E_USER_ERROR);
       }
       catch (IRosasurferException $ex) {
          throw $ex->addMessage('SQL: "'.$sql.'"');
       }
 
-      if (!$result) {
-         $message  = 'Error '.$this->handler->lastErrorCode().', '.$this->handler->lastErrorMsg();
-         $message .= NL.'SQL: "'.$sql.'"';
-         throw new DatabaseException($message, null, $ex);
-      }
-
       // Calculate number of rows affected by an INSERT/UPDATE/DELETE statement.
       //
-      // - SQLite3::changes() actually is matchedRows().
+      // - SQLite3::changes() is matchedRows().
       // - SQLite3::changes() is not reset between queries.
-      // - SQLite3::query('DELETE...') returns an empty SQLite3Result, thus a result set is no valid criterion.
-      // - SQLite3 supports multi-statement queries.
       //
       // The following logic assumes a single statement query with matched = modified rows:
       //
@@ -249,16 +245,54 @@ class SQLiteConnector extends Connector {
 
       return $result;
    }
+   /*
+   $db->query("drop table if exists t_test");
+   $db->query("create table t_test (id integer primary key, name text not null)");
+   $db->query("insert into t_test (name) values ('a'), ('b'), ('c'), ('123')");
+   $db->query("explain select count(*) from t_test");
+   $db->query("update t_test set name='c' where name in ('c')");
+   $db->query("select * from t_test where name in ('a','b')");
+   $db->query("select * from t_test where name in ('a','b') limit 1");
+   $db->query("update t_test set name='aa' where name in ('c')");
+   $db->query("select * from t_test where name = 'no-one'");
+   $db->query("select count(*) from t_test");
+   $db->query("delete from t_test where name = 'a' or name = 'b'");
+   $db->query("select count(*) from t_test");
+   $db->query("insert into t_test (name) values ('y'), ('z')");
+   $db->query("insert into t_test (name) values ('x')");
+   $db->query("explain select count(*) from t_test");
+   $db->query("select * from t_test");
+   $db->query("select * from t_test where name = 'no-one'");
+
+   drop:     lastInsertRowID=0  changes=0  result=object  num_rows=0
+   create:   lastInsertRowID=0  changes=0  result=object  num_rows=0
+   insert:   lastInsertRowID=4  changes=4  result=object  num_rows=0
+   explain:  lastInsertRowID=4  changes=4  result=object  num_rows=10
+   update:   lastInsertRowID=4  changes=1  result=object  num_rows=0
+   select:   lastInsertRowID=4  changes=1  result=object  num_rows=2
+   select:   lastInsertRowID=4  changes=1  result=object  num_rows=1
+   update:   lastInsertRowID=4  changes=1  result=object  num_rows=0
+   select:   lastInsertRowID=4  changes=1  result=object  num_rows=0
+   select:   lastInsertRowID=4  changes=1  result=object  num_rows=1
+   delete:   lastInsertRowID=4  changes=2  result=object  num_rows=0
+   select:   lastInsertRowID=4  changes=2  result=object  num_rows=1
+   insert:   lastInsertRowID=6  changes=2  result=object  num_rows=0
+   insert:   lastInsertRowID=7  changes=1  result=object  num_rows=0
+   explain:  lastInsertRowID=7  changes=1  result=object  num_rows=10
+   select:   lastInsertRowID=7  changes=1  result=object  num_rows=5
+   select:   lastInsertRowID=7  changes=1  result=object  num_rows=0
+   */
 
 
    /**
-    * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement (usually an INSERT).
+    * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement. The value is not reset between queries.
+    * (see the README)
     *
-    * This function returnes the most recently generated ID. It's value is not reset between queries.
-    *
-    * @return int - generated ID or 0 (zero) if no previous statement yet generated an ID
+    * @return int - generated ID or 0 (zero) if no new ID was yet generated in the current session
     */
    public function lastInsertId() {
+      if (!$this->isConnected())
+         return 0;
       return $this->handler->lastInsertRowID();
    }
 
@@ -272,7 +306,7 @@ class SQLiteConnector extends Connector {
       if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
 
       if (!$this->transactionLevel)
-         $this->executeRaw('begin');
+         $this->execute('begin');
 
       $this->transactionLevel++;
       return $this;
@@ -287,13 +321,15 @@ class SQLiteConnector extends Connector {
    public function commit() {
       if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
 
-      if (!$this->transactionLevel) {
-         Logger::log('No database transaction to commit', L_WARN);
+      if (!$this->isConnected()) {
+         trigger_error('Not connected', E_USER_WARNING);
+      }
+      else if (!$this->transactionLevel) {
+         trigger_error('No database transaction to commit', E_USER_WARNING);
       }
       else {
          if ($this->transactionLevel == 1)
-            $this->executeRaw('commit');
-
+            $this->execute('commit');
          $this->transactionLevel--;
       }
       return $this;
@@ -309,13 +345,15 @@ class SQLiteConnector extends Connector {
    public function rollback() {
       if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
 
-      if (!$this->transactionLevel) {
-         Logger::log('No database transaction to roll back', L_WARN);
+      if (!$this->isConnected()) {
+         trigger_error('Not connected', E_USER_WARNING);
+      }
+      else if (!$this->transactionLevel) {
+         trigger_error('No database transaction to roll back', E_USER_WARNING);
       }
       else {
          if ($this->transactionLevel == 1)
-            $this->executeRaw('rollback');
-
+            $this->execute('rollback');
          $this->transactionLevel--;
       }
       return $this;
@@ -328,7 +366,9 @@ class SQLiteConnector extends Connector {
     * @return bool
     */
    public function isInTransaction() {
-      return ($this->transactionLevel > 0);
+      if ($this->isConnected())
+         return ($this->transactionLevel > 0);
+      return false;
    }
 
 
