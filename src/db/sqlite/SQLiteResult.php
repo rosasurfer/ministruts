@@ -4,6 +4,8 @@ namespace rosasurfer\db\sqlite;
 use rosasurfer\db\ConnectorInterface as IConnector;
 use rosasurfer\db\Result;
 
+use rosasurfer\debug\ErrorHandler;
+
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\UnimplementedFeatureException;
 
@@ -64,6 +66,24 @@ class SQLiteResult extends Result {
          $result = null;
       }
       $this->result = $result;
+   }
+
+
+   /**
+    * Destructor
+    *
+    * Release an internal result set.
+    */
+   public function __destruct() {
+      try {
+         if ($this->result) {
+            $this->result->finalize();
+            $this->result = null;
+         }
+      }
+      catch (\Exception $ex) {
+         throw ErrorHandler::handleDestructorException($ex);
+      }
    }
 
 

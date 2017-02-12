@@ -4,6 +4,7 @@ namespace rosasurfer\db\pgsql;
 use rosasurfer\db\ConnectorInterface as IConnector;
 use rosasurfer\db\Result;
 
+use rosasurfer\debug\ErrorHandler;
 use rosasurfer\exception\IllegalTypeException;
 
 use const rosasurfer\ARRAY_ASSOC;
@@ -53,6 +54,24 @@ class PostgresResult extends Result {
       $this->sql          = $sql;
       $this->result       = $result;
       $this->affectedRows = $affectedRows;
+   }
+
+
+   /**
+    * Destructor
+    *
+    * Release an internal result set.
+    */
+   public function __destruct() {
+      try {
+         if ($this->result) {
+            pg_free_result($this->result);
+            $this->result = null;
+         }
+      }
+      catch (\Exception $ex) {
+         throw ErrorHandler::handleDestructorException($ex);
+      }
    }
 
 

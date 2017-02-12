@@ -364,25 +364,23 @@ class MySQLConnector extends Connector {
    $db->query("insert into t_test (name) values ('x')");
    $db->query("explain select count(*) from t_test");
 
-   $result  = $db->query($sql)->getInternalResult();
-   $handler = $db->getInternalHandler();
    echoPre(str_pad(explode(' ', $sql, 2)[0].':', 9).' insert_id='.mysql_insert_id($handler).'   affected_rows='.mysql_affected_rows($handler).'   result_set='.(is_resource($result) ? '1':' ').'   num_rows='.(int)@mysql_num_rows($result).'   info='.mysql_info($handler));
 
-   drop:     insert_id=0   affected_rows=0   result_set=    num_rows=0   info=
-   create:   insert_id=0   affected_rows=0   result_set=    num_rows=0   info=
-   insert:   insert_id=1   affected_rows=4   result_set=    num_rows=0   info=Records: 4  Duplicates: 0  Warnings: 0
-   set:      insert_id=0   affected_rows=0   result_set=    num_rows=0   info=
-   explain:  insert_id=0   affected_rows=1   result_set=1   num_rows=1   info=
-   update:   insert_id=0   affected_rows=0   result_set=    num_rows=0   info=Rows matched: 1  Changed: 0  Warnings: 0
-   select:   insert_id=0   affected_rows=2   result_set=1   num_rows=2   info=
-   select:   insert_id=0   affected_rows=1   result_set=1   num_rows=1   info=
-   update:   insert_id=0   affected_rows=1   result_set=    num_rows=0   info=Rows matched: 1  Changed: 1  Warnings: 0
-   select:   insert_id=0   affected_rows=1   result_set=1   num_rows=1   info=
-   select:   insert_id=0   affected_rows=0   result_set=1   num_rows=0   info=
-   delete:   insert_id=0   affected_rows=2   result_set=    num_rows=0   info=
-   insert:   insert_id=5   affected_rows=2   result_set=    num_rows=0   info=Records: 2  Duplicates: 0  Warnings: 0
-   insert:   insert_id=7   affected_rows=1   result_set=    num_rows=0   info=               <- single row inserts, no info
-   explain:  insert_id=0   affected_rows=1   result_set=1   num_rows=1   info=
+   drop:     insert_id=0   affected_rows=0   result=           num_rows=0   info=
+   create:   insert_id=0   affected_rows=0   result=           num_rows=0   info=
+   insert:   insert_id=1   affected_rows=4   result=           num_rows=0   info=Records: 4  Duplicates: 0  Warnings: 0
+   set:      insert_id=0   affected_rows=0   result=           num_rows=0   info=
+   explain:  insert_id=0   affected_rows=1   result=resource   num_rows=1   info=
+   update:   insert_id=0   affected_rows=0   result=           num_rows=0   info=Rows matched: 1  Changed: 0  Warnings: 0
+   select:   insert_id=0   affected_rows=2   result=resource   num_rows=2   info=
+   select:   insert_id=0   affected_rows=1   result=resource   num_rows=1   info=
+   update:   insert_id=0   affected_rows=1   result=           num_rows=0   info=Rows matched: 1  Changed: 1  Warnings: 0
+   select:   insert_id=0   affected_rows=1   result=resource   num_rows=1   info=
+   select:   insert_id=0   affected_rows=0   result=resource   num_rows=0   info=
+   delete:   insert_id=0   affected_rows=2   result=           num_rows=0   info=
+   insert:   insert_id=5   affected_rows=2   result=           num_rows=0   info=Records: 2  Duplicates: 0  Warnings: 0
+   insert:   insert_id=7   affected_rows=1   result=           num_rows=0   info=               <- single row inserts, no info
+   explain:  insert_id=0   affected_rows=1   result=resource   num_rows=1   info=
    */
 
 

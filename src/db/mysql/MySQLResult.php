@@ -5,6 +5,7 @@ use rosasurfer\db\ConnectorInterface as IConnector;
 use rosasurfer\db\NoMoreRowsException;
 use rosasurfer\db\Result;
 
+use rosasurfer\debug\ErrorHandler;
 use rosasurfer\exception\IllegalTypeException;
 
 use const rosasurfer\ARRAY_ASSOC;
@@ -67,6 +68,24 @@ class MySQLResult extends Result {
          $result = null;
       }
       $this->result = $result;
+   }
+
+
+   /**
+    * Destructor
+    *
+    * Release an internal result set.
+    */
+   public function __destruct() {
+      try {
+         if ($this->result) {
+            mysql_free_result($this->result);
+            $this->result = null;
+         }
+      }
+      catch (\Exception $ex) {
+         throw ErrorHandler::handleDestructorException($ex);
+      }
    }
 
 

@@ -265,6 +265,8 @@ class SQLiteConnector extends Connector {
    $db->query("select * from t_test");
    $db->query("select * from t_test where name = 'no-one'");
 
+   echoPre(str_pad(explode(' ', $sql, 2)[0].':', 9).'  lastInsertRowID='.$handler->lastInsertRowID().'  changes='.$handler->changes().'  result='.(is_object($result) ? 'object':'      ').'  num_rows='.$this->sqlite3_num_rows($result));
+
    drop:     lastInsertRowID=0  changes=0  result=object  num_rows=0
    create:   lastInsertRowID=0  changes=0  result=object  num_rows=0
    insert:   lastInsertRowID=4  changes=4  result=object  num_rows=0

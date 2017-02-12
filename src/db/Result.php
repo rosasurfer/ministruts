@@ -20,6 +20,14 @@ abstract class Result extends Object implements ResultInterface {
 
 
    /**
+    * Destructor
+    */
+   abstract public function __destruct(
+      // enforce a destructor to release a result set
+   );
+
+
+   /**
     * Fetch a single field from the result set as a string.
     *
     * @param  string|int $column       - name or offset of the column to fetch from (default: 0)
