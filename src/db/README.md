@@ -15,8 +15,8 @@
 | rosasurfer\db\sqlite\SQLiteConnector | `SQLiteConnector::lastInsertId()`<br>`SQLiteResult::lastInsertId()`               | yes <small><sup>4</sup></small> | -                                             |
 
 <small><sup>1</sup></small> &nbsp;&nbsp;The value is reset between queries.  
-<small><sup>2</sup></small> &nbsp;&nbsp;First inserted row ID. `lastInsertId = mysql_insert_id() + mysql_affected_rows() - 1`.  
-<small><sup>3</sup></small> &nbsp;&nbsp;First inserted row ID. `lastInsertId = mysqli_insert_id() + mysqli_affected_rows() - 1`.  
+<small><sup>2</sup></small> &nbsp;&nbsp;Returns first inserted row ID. `lastInsertId = mysql_insert_id() + mysql_affected_rows() - 1`.  
+<small><sup>3</sup></small> &nbsp;&nbsp;Returns first inserted row ID. `lastInsertId = mysqli_insert_id() + mysqli_affected_rows() - 1`.  
 <small><sup>4</sup></small> `Result::lastInsertId()` returns the value of `Connector::lastInsertId()` at instance creation time.  
 <small><sup>5</sup></small> &nbsp;&nbsp;since PostgreSQL version 8.1  
 
