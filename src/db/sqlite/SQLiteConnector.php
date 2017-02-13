@@ -37,11 +37,14 @@ class SQLiteConnector extends Connector {
    /** @var \SQLite3 - internal database handler instance */
    protected $handler;
 
-   /** @var int - last value of \SQLite3::changes() */
-   protected $lastChanges = 0;
-
    /** @var int - transaction nesting level */
    protected $transactionLevel = 0;
+
+   /** @var int - the last inserted row id (not reset between queries) */
+   protected $lastInsertId = 0;
+
+   /** @var int - the last number of affected rows (not reset between queries) */
+   protected $lastAffectedRows = 0;
 
    /** @var bool - whether or not a query to execute can skip results */
    private $skipResults = false;
@@ -97,11 +100,10 @@ class SQLiteConnector extends Connector {
     * @return self
     */
    public function connect() {
-      try {                                                          // available flags:
-         $flags = SQLITE3_OPEN_READWRITE ;   // SQLITE3_OPEN_READONLY| SQLITE3_OPEN_CREATE
-                                                                     // SQLITE3_OPEN_READWRITE
-         $handler = new \SQLite3($this->file, $flags);               // SQLITE3_OPEN_CREATE
-         !$handler && trigger_error(@$php_errormsg, E_USER_ERROR);
+      try {                                                                // available flags:
+         $flags = SQLITE3_OPEN_READWRITE;                                  // SQLITE3_OPEN_CREATE
+         $handler = new \SQLite3($this->file, $flags);                     // SQLITE3_OPEN_READONLY
+         !$handler && trigger_error(@$php_errormsg, E_USER_ERROR);         // SQLITE3_OPEN_READWRITE
       }
       catch (IRosasurferException $ex) {
          $file = $this->file;
@@ -163,9 +165,8 @@ class SQLiteConnector extends Connector {
          $lastExecMode = $this->skipResults;
          $this->skipResults = false;
 
-         $affectedRows = 0;
-         $result = $this->executeRaw($sql, $affectedRows);
-         return new SQLiteResult($this, $sql, $result, $affectedRows, $this->lastInsertId());
+         $result = $this->executeRaw($sql);
+         return new SQLiteResult($this, $sql, $result, $this->lastInsertId(), $this->lastAffectedRows());
       }
       finally {
          $this->skipResults = $lastExecMode;
@@ -189,9 +190,8 @@ class SQLiteConnector extends Connector {
          $lastExecMode = $this->skipResults;
          $this->skipResults = true;
 
-         $affectedRows = 0;
-         $this->executeRaw($sql, $affectedRows)->finalize();         // destroy the result
-         return $affectedRows;
+         $this->executeRaw($sql)->finalize();            // release the result
+         return $this->lastAffectedRows();
       }
       finally {
          $this->skipResults = $lastExecMode;
@@ -215,8 +215,7 @@ class SQLiteConnector extends Connector {
       if (!$this->isConnected())
          $this->connect();
 
-      $result       = null;
-      $affectedRows = 0;
+      $result = null;
 
       // execute statement
       try {
@@ -228,28 +227,19 @@ class SQLiteConnector extends Connector {
          throw $ex->addMessage('SQL: "'.$sql.'"');
       }
 
-      // Calculate number of rows affected by an INSERT/UPDATE/DELETE statement.
-      //
-      // - SQLite3::changes() is matchedRows().
-      // - SQLite3::changes() is not reset between queries.
-      //
-      // The following logic assumes a single statement query with matched = modified rows:
-      //
-      $changes = $this->handler->changes();
-      if ($changes && $changes==$this->lastChanges) {
-         $str = strToLower(subStr(trim($sql), 0, 6));
-         if ($str!='insert' && $str!='update' && $str!='delete')
-            $changes = 0;
-      }
-      $affectedRows      = $changes;
-      $this->lastChanges = $this->handler->changes();
+      // track last_insert_id
+      $this->lastInsertId = $this->handler->lastInsertRowID();
+
+      // track last_affected_rows
+      $this->lastAffectedRows = $affectedRows = $this->handler->changes();
 
       return $result;
    }
    /*
    $db->query("drop table if exists t_test");
-   $db->query("create table t_test (id integer primary key, name text not null)");
+   $db->query("create table t_test (id integer primary key, name varchar(100) not null)");
    $db->query("insert into t_test (name) values ('a'), ('b'), ('c'), ('123')");
+   $db->query("set @a = 5");
    $db->query("explain select count(*) from t_test");
    $db->query("update t_test set name='c' where name in ('c')");
    $db->query("select * from t_test where name in ('a','b')");
@@ -265,25 +255,27 @@ class SQLiteConnector extends Connector {
    $db->query("select * from t_test");
    $db->query("select * from t_test where name = 'no-one'");
 
-   echoPre(str_pad(explode(' ', $sql, 2)[0].':', 9).'  lastInsertRowID='.$handler->lastInsertRowID().'  changes='.$handler->changes().'  result='.(is_object($result) ? 'object':'      ').'  num_rows='.$this->sqlite3_num_rows($result));
+   $result  = $db->query($sql);
+   $handler = $db->getInternalHandler();
+   echoPre(str_pad(explode(' ', $sql, 2)[0].':', 9).'  lastInsertRowID='.$handler->lastInsertRowID().'  lastInsertId='.$db->lastInsertId().'  changes='.$handler->changes().'  lastAffectedRows='.$db->lastAffectedRows().'  total_changes='.$db->query('select total_changes()')->fetchAsInt().'  result='.(is_object($result->getInternalResult()) ? 'object':'      ').'  num_rows='.$this->sqlite3_num_rows($result->getInternalResult()));
 
-   drop:     lastInsertRowID=0  changes=0  result=object  num_rows=0
-   create:   lastInsertRowID=0  changes=0  result=object  num_rows=0
-   insert:   lastInsertRowID=4  changes=4  result=object  num_rows=0
-   explain:  lastInsertRowID=4  changes=4  result=object  num_rows=10
-   update:   lastInsertRowID=4  changes=1  result=object  num_rows=0
-   select:   lastInsertRowID=4  changes=1  result=object  num_rows=2
-   select:   lastInsertRowID=4  changes=1  result=object  num_rows=1
-   update:   lastInsertRowID=4  changes=1  result=object  num_rows=0
-   select:   lastInsertRowID=4  changes=1  result=object  num_rows=0
-   select:   lastInsertRowID=4  changes=1  result=object  num_rows=1
-   delete:   lastInsertRowID=4  changes=2  result=object  num_rows=0
-   select:   lastInsertRowID=4  changes=2  result=object  num_rows=1
-   insert:   lastInsertRowID=6  changes=2  result=object  num_rows=0
-   insert:   lastInsertRowID=7  changes=1  result=object  num_rows=0
-   explain:  lastInsertRowID=7  changes=1  result=object  num_rows=10
-   select:   lastInsertRowID=7  changes=1  result=object  num_rows=5
-   select:   lastInsertRowID=7  changes=1  result=object  num_rows=0
+   drop:      lastInsertRowID=0  lastInsertId=0  changes=0  lastAffectedRows=0  total_changes=0  result=        num_rows=0
+   create:    lastInsertRowID=0  lastInsertId=0  changes=0  lastAffectedRows=0  total_changes=0  result=        num_rows=0
+   insert:    lastInsertRowID=4  lastInsertId=4  changes=4  lastAffectedRows=4  total_changes=4  result=        num_rows=0
+   explain:   lastInsertRowID=4  lastInsertId=4  changes=4  lastAffectedRows=4  total_changes=4  result=object  num_rows=10
+   update:    lastInsertRowID=4  lastInsertId=4  changes=1  lastAffectedRows=1  total_changes=5  result=        num_rows=0
+   select:    lastInsertRowID=4  lastInsertId=4  changes=1  lastAffectedRows=1  total_changes=5  result=object  num_rows=2
+   select:    lastInsertRowID=4  lastInsertId=4  changes=1  lastAffectedRows=1  total_changes=5  result=object  num_rows=1
+   update:    lastInsertRowID=4  lastInsertId=4  changes=1  lastAffectedRows=1  total_changes=6  result=        num_rows=0
+   select:    lastInsertRowID=4  lastInsertId=4  changes=1  lastAffectedRows=1  total_changes=6  result=object  num_rows=0
+   select:    lastInsertRowID=4  lastInsertId=4  changes=1  lastAffectedRows=1  total_changes=6  result=object  num_rows=1
+   delete:    lastInsertRowID=4  lastInsertId=4  changes=2  lastAffectedRows=2  total_changes=8  result=        num_rows=0
+   select:    lastInsertRowID=4  lastInsertId=4  changes=2  lastAffectedRows=2  total_changes=8  result=object  num_rows=1
+   insert:    lastInsertRowID=6  lastInsertId=6  changes=2  lastAffectedRows=2  total_changes=10  result=        num_rows=0
+   insert:    lastInsertRowID=7  lastInsertId=7  changes=1  lastAffectedRows=1  total_changes=11  result=        num_rows=0
+   explain:   lastInsertRowID=7  lastInsertId=7  changes=1  lastAffectedRows=1  total_changes=11  result=object  num_rows=10
+   select:    lastInsertRowID=7  lastInsertId=7  changes=1  lastAffectedRows=1  total_changes=11  result=object  num_rows=5
+   select:    lastInsertRowID=7  lastInsertId=7  changes=1  lastAffectedRows=1  total_changes=11  result=object  num_rows=0
    */
 
 
@@ -363,9 +355,52 @@ class SQLiteConnector extends Connector {
     * @link   http://github.com/rosasurfer/ministruts/tree/master/src/db
     */
    public function lastInsertId() {
-      if (!$this->isConnected())
-         return 0;
-      return $this->handler->lastInsertRowID();
+      return (int) $this->lastInsertId;
+   }
+
+
+   /**
+    * Return the number of rows affected by the last INSERT, UPDATE or DELETE statement. For UPDATE or DELETE statements
+    * this is the number of matched rows. The value is not reset between queries (see the db README).
+    *
+    * @return int - last number of affected rows or 0 (zero) if no rows were affected yet in the current session
+    *
+    * @link   http://github.com/rosasurfer/ministruts/tree/master/src/db
+    */
+   public function lastAffectedRows() {
+      return (int) $this->lastAffectedRows;
+   }
+
+
+   /**
+    * Return the version of the DBMS the connector is used for.
+    *
+    * @return string - e.g. "3.5.9"
+    */
+   public function getVersion() {
+      static $version;
+      if (is_null($version)) {
+         if (!$this->isConnected())
+            $this->connect();
+         $version = $this->handler->version()['versionString'];
+      }
+      return $version;
+   }
+
+
+   /**
+    * Return the version ID of the DBMS the connector is used for as an integer.
+    *
+    * @return int - e.g. 3005009 for version string "3.5.9"
+    */
+   public function getVersionId() {
+      static $version;
+      if (is_null($version)) {
+         if (!$this->isConnected())
+            $this->connect();
+         $version = $this->handler->version()['versionNumber'];
+      }
+      return $version;
    }
 
 

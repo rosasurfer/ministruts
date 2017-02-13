@@ -138,7 +138,7 @@ interface ConnectorInterface {
    /**
     * Return the version of the DBMS the connector is used for.
     *
-    * @return mixed
+    * @return string
     */
    public function getVersion();
 
@@ -146,7 +146,7 @@ interface ConnectorInterface {
    /**
     * Return the version ID of the DBMS the connector is used for as an integer.
     *
-    * @return int - e.g. 50037 for version "5.0.37-community-log"
+    * @return int
     */
    public function getVersionId();
 

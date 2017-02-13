@@ -44,7 +44,7 @@ abstract class Result extends Object implements ResultInterface {
 
       // Generic default implementation: A connector-specific implementation will be faster and more efficient.
 
-      $row = $this->fetchNext(ARRAY_BOTH);
+      $row = $this->fetchNext(ARRAY_BOTH);            // returned field types depend on the DBMS
 
       if (!$row) {
          if (func_num_args() < 4) throw new NoMoreRowsException();
@@ -121,20 +121,30 @@ abstract class Result extends Object implements ResultInterface {
     *                                   Use "self::fetchAsFloat()" to interpret more floating point values as integer.
     */
    public function fetchAsInt($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
-      if (func_num_args() < 4) $sValue = $this->fetchField($column, $row, null);
-      else                     $sValue = $this->fetchField($column, $row, null, $onNoMoreRows);
+      if (func_num_args() < 4) $value = $this->fetchField($column, $row, null);
+      else                     $value = $this->fetchField($column, $row, null, $onNoMoreRows);
 
-      if (is_null($sValue))
+      if (is_null($value))
          return $onNull;
 
-      if (strIsNumeric($sValue)) {
-         $fValue = (float) $sValue;             // skip leading zeros of numeric strings
+      if (is_int($value))
+         return $value;
+
+      if (is_float($value)) {
+         $iValue = (int) $value;
+         if ($iValue == $value)
+            return $iValue;
+         throw new \UnexpectedValueException('unexpected float value: "'.$value.'" (not an integer)');
+      }
+
+      if (strIsNumeric($value)) {
+         $fValue = (float) $value;              // skip leading zeros of numeric strings
          $iValue = (int) $fValue;
 
          if ($iValue == $fValue)
             return $iValue;
       }
-      throw new \UnexpectedValueException('unexpected string value: "'.$sValue.'" (not an integer)');
+      throw new \UnexpectedValueException('unexpected string value: "'.$value.'" (not an integer)');
    }
 
 

@@ -47,7 +47,7 @@ class MySQLConnector extends Connector {
    /** @var int - the last inserted row id (not reset between queries) */
    protected $lastInsertId = 0;
 
-   /** @var int - the last number of modified rows (not reset between queries) */
+   /** @var int - the last number of affected rows (not reset between queries) */
    protected $lastAffectedRows = 0;
 
 
@@ -303,11 +303,10 @@ class MySQLConnector extends Connector {
       //       @see  https://www.percona.com/blog/2006/06/26/handling-of-big-parts-of-data/
       //       @see  https://dev.mysql.com/doc/refman/5.7/en/mysql-use-result.html
 
-      $affectedRows = 0;
-      $result = $this->executeRaw($sql, $affectedRows);
+      $result = $this->executeRaw($sql);
       if (is_resource($result))
-         mysql_free_result($result);
-      return $affectedRows;
+         mysql_free_result($result);               // release the result
+      return $this->lastAffectedRows();
    }
 
 
@@ -339,6 +338,10 @@ class MySQLConnector extends Connector {
          throw $ex->addMessage('SQL: "'.$sql.'"')->setCode(mysql_errno($this->hConnection));
       }
 
+      // track last_insert_id
+      $id = mysql_insert_id($this->hConnection);
+      $id && $this->lastInsertId = $id + mysql_affected_rows($this->hConnection) - 1;
+
       // track last_affected_rows
       if (!is_resource($result)) {           // a row returning statement never modifies rows
          $version = $this->getVersion();
@@ -348,11 +351,6 @@ class MySQLConnector extends Connector {
             $this->lastAffectedRows = $affectedRows = mysql_affected_rows($this->hConnection);
          }
       }
-
-      // track last_insert_id
-      $id = mysql_insert_id($this->hConnection);
-      $id && $this->lastInsertId = $id + mysql_affected_rows($this->hConnection) - 1;
-
       return $result;
    }
    /*
@@ -496,18 +494,6 @@ class MySQLConnector extends Connector {
 
 
    /**
-    * Return the connector's internal connection object.
-    *
-    * @return resource - the internal connection handle
-    */
-   public function getInternalHandler() {
-      if (!$this->isConnected())
-         $this->connect();
-      return $this->hConnection;
-   }
-
-
-   /**
     * Return the version of the DBMS the connector is used for.
     *
     * @return string - e.g. "5.0.37-community-log"
@@ -526,9 +512,21 @@ class MySQLConnector extends Connector {
    /**
     * Return the version ID of the DBMS the connector is used for as an integer.
     *
-    * @return int - e.g. 50037 for version "5.0.37-community-log"
+    * @return int - e.g. 50037 for version string "5.0.37-community-log"
     */
    public function getVersionId() {
       throw new UnimplementedFeatureException();
+   }
+
+
+   /**
+    * Return the connector's internal connection object.
+    *
+    * @return resource - the internal connection handle
+    */
+   public function getInternalHandler() {
+      if (!$this->isConnected())
+         $this->connect();
+      return $this->hConnection;
    }
 }
