@@ -662,6 +662,9 @@ function strIsDigits($value) {
  * @return bool
  */
 function strIsNumeric($value) {
+   if (is_int($value) || is_float($value))
+      return true;
+
    if (!is_string($value))
       return false;
 
