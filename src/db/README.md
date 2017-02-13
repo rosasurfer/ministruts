@@ -18,7 +18,7 @@
 <small><sup>2</sup></small> &nbsp;&nbsp;Returns the first inserted row ID. `lastInsertId = mysql_insert_id() + mysql_affected_rows() - 1`.  
 <small><sup>3</sup></small> &nbsp;&nbsp;Returns the first inserted row ID. `lastInsertId = mysqli_insert_id() + mysqli_affected_rows() - 1`.  
 <small><sup>4</sup></small> `Result::lastInsertId()` returns the value of `Connector::lastInsertId()` at instance creation time.  
-<small><sup>5</sup></small> &nbsp;&nbsp;since PostgreSQL 8.1  
+<small><sup>5</sup></small> &nbsp;&nbsp;Since PostgreSQL 8.1, will raise SQL error 55000 until the first row is inserted.  
 
 _ _ _
 
