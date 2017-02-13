@@ -316,32 +316,6 @@ class PostgresConnector extends Connector {
 
 
    /**
-    * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement (usually an INSERT).
-    *
-    * This function returnes the most recently generated ID. It's value is not reset between queries.
-    *
-    * @return int - generated ID or 0 (zero) if no previous statement yet generated an ID;
-    *               -1 if the PostgreSQL server version doesn't support this functionality
-    */
-   public function lastInsertId() {
-      return $this->query("select lastval()")->fetchAsInt();
-      /*
-      PHP Warning: pg_query(): Query failed: ERROR:  lastval is not yet defined in this session
-       SQL: "select lastval()"
-
-      @see  https://www.postgresql.org/docs/9.6/static/functions-sequence.html
-
-      @see  http://stackoverflow.com/questions/6485778/php-postgres-get-last-insert-id/6488840
-      @see  http://stackoverflow.com/questions/22530585/how-to-turn-off-multiple-statements-in-postgres
-      @see  http://php.net/manual/en/function.pg-query-params.php
-      @see  http://stackoverflow.com/questions/24182521/how-to-find-out-if-a-sequence-was-initialized-in-this-session
-      @see  http://stackoverflow.com/questions/32991564/how-to-check-in-postgres-that-lastval-is-defined
-      @see  http://stackoverflow.com/questions/55956/mysql-insert-id-alternative-for-postgresql
-      */
-   }
-
-
-   /**
     * Start a new transaction. If there is already an active transaction only the transaction nesting level is increased.
     *
     * @return self
@@ -409,11 +383,39 @@ class PostgresConnector extends Connector {
 
 
    /**
+    * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement (usually an INSERT).
+    *
+    * This function returnes the most recently generated ID. It's value is not reset between queries.
+    *
+    * @return int - generated ID or 0 (zero) if no previous statement generated yet an ID;
+    *               -1 if the PostgreSQL server version doesn't support this functionality
+    */
+   public function lastInsertId() {
+      return $this->query("select lastval()")->fetchAsInt();
+      /*
+      PHP Warning: pg_query(): Query failed: ERROR:  lastval is not yet defined in this session
+       SQL: "select lastval()"
+
+      @see  https://www.postgresql.org/docs/9.6/static/functions-sequence.html
+
+      @see  http://stackoverflow.com/questions/6485778/php-postgres-get-last-insert-id/6488840
+      @see  http://stackoverflow.com/questions/22530585/how-to-turn-off-multiple-statements-in-postgres
+      @see  http://php.net/manual/en/function.pg-query-params.php
+      @see  http://stackoverflow.com/questions/24182521/how-to-find-out-if-a-sequence-was-initialized-in-this-session
+      @see  http://stackoverflow.com/questions/32991564/how-to-check-in-postgres-that-lastval-is-defined
+      @see  http://stackoverflow.com/questions/55956/mysql-insert-id-alternative-for-postgresql
+      */
+   }
+
+
+   /**
     * Return the connector's internal connection object.
     *
     * @return resource - the internal connection handle
     */
    public function getInternalHandler() {
+      if (!$this->isConnected())
+         $this->connect();
       return $this->connection;
    }
 }

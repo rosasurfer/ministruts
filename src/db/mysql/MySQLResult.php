@@ -29,14 +29,14 @@ class MySQLResult extends Result {
    /** @var resource - the underlying driver's original result resource */
    protected $result;
 
-   /** @var int - number of rows modified by the statement */
-   protected $affectedRows;
+   /** @var int - last inserted row id of the connection at instance creation time (not reset between queries) */
+   protected $lastInsertId = 0;
+
+   /** @var int - last number of modified rows (not reset between queries) */
+   protected $lastAffectedRows = 0;
 
    /** @var int - number of rows in the result set (if any) */
-   protected $numRows;
-
-   /** @var int - the last inserted row id of the connection at instance creation time */
-   protected $lastInsertId;
+   protected $numRows = 0;
 
 
    /**
@@ -44,26 +44,26 @@ class MySQLResult extends Result {
     *
     * Create a new MySQLResult instance. Called only when execution of a SQL statement returned successful.
     *
-    * @param  IConnector $connector    - Connector managing the database connection
-    * @param  string     $sql          - executed SQL statement
-    * @param  resource   $result       - A result resource or NULL for result-less SQL statements. SELECT queries not
-    *                                    matching any rows produce an empty result resource.
-    * @param  int        $affectedRows - number of rows modified by the statement
-    * @param  int        $lastInsertId - last inserted ID of the connection
+    * @param  IConnector $connector        - connector managing the database connection
+    * @param  string     $sql              - executed SQL statement
+    * @param  resource   $result           - result resource or NULL for result-less SQL query; SELECT queries not matching
+    *                                        any rows produce an empty result resource
+    * @param  int        $lastInsertId     - last inserted ID of the connection
+    * @param  int        $lastAffectedRows - last number of modified rows of the connection
     */
-   public function __construct(IConnector $connector, $sql, $result, $affectedRows, $lastInsertId) {
-      if (!is_string($sql))                        throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
-      if (!is_resource($result) && $result!==null) throw new IllegalTypeException('Illegal type of parameter $result: '.getType($result));
-      if (!is_int($affectedRows))                  throw new IllegalTypeException('Illegal type of parameter $affectedRows: '.getType($affectedRows));
-      if (!is_int($lastInsertId))                  throw new IllegalTypeException('Illegal type of parameter $lastInsertId: '.getType($lastInsertId));
+   public function __construct(IConnector $connector, $sql, $result, $lastInsertId, $lastAffectedRows) {
+      if (!is_string($sql))                           throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
+      if (!is_resource($result) && !is_null($result)) throw new IllegalTypeException('Illegal type of parameter $result: '.getType($result));
+      if (!is_int($lastInsertId))                     throw new IllegalTypeException('Illegal type of parameter $lastInsertId: '.getType($lastInsertId));
+      if (!is_int($lastAffectedRows))                 throw new IllegalTypeException('Illegal type of parameter $lastAffectedRows: '.getType($lastAffectedRows));
 
-      $this->connector    = $connector;
-      $this->sql          = $sql;
-      $this->result       = $result;
-      $this->affectedRows = $affectedRows;
-      $this->lastInsertId = $lastInsertId;
+      $this->connector        = $connector;
+      $this->sql              = $sql;
+      $this->result           = $result;
+      $this->lastInsertId     = $lastInsertId;
+      $this->lastAffectedRows = $lastAffectedRows;
 
-      if (!mysql_num_fields($result)) {      // close empty results and release them
+      if ($result && !mysql_num_fields($result)) {    // close empty results and release them
          mysql_free_result($result);
          $result = null;
       }
@@ -111,13 +111,29 @@ class MySQLResult extends Result {
 
 
    /**
-    * Return the number of rows affected if the SQL was an INSERT/UPDATE/DELETE/REPLACE statement. Unreliable for specific
-    * UPDATE statements. Matched but unmodified rows are reported as changed if the connection flag CLIENT_FOUND_ROWS is set.
+    * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement up to creation time of this instance.
+    * The value is not reset between queries (see the db README).
     *
-    * @return int
+    * @return int - last generated ID or 0 (zero) if no ID was generated yet in the current session
+    *
+    * @link   http://github.com/rosasurfer/ministruts/tree/master/src/db
     */
-   public function affectedRows() {
-      return (int) $this->affectedRows;
+   public function lastInsertId() {
+      return (int) $this->lastInsertId;
+   }
+
+
+   /**
+    * Return the number of rows affected by the last INSERT, UPDATE or DELETE statement up to creation time of this instance.
+    * Since MySQL 5.5.5 this value also includes rows affected by ALTER TABLE and LOAD DATA INFILE statements. The value is
+    * not reset between queries (see the db README).
+    *
+    * @return int - last number of affected rows or 0 (zero) if no rows were modified yet in the current session;
+    *
+    * @link   http://github.com/rosasurfer/ministruts/tree/master/src/db
+    */
+   public function lastAffectedRows() {
+      return (int) $this->lastAffectedRows;
    }
 
 
@@ -132,19 +148,6 @@ class MySQLResult extends Result {
          else               $this->numRows = 0;
       }
       return $this->numRows;
-   }
-
-
-   /**
-    * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement up to creation time of this instance.
-    * The value is not reset between queries (see the db README).
-    *
-    * @return int - generated ID or 0 (zero) if no new ID was yet generated in the current session
-    *
-    * @link   http://github.com/rosasurfer/ministruts/tree/master/src/db
-    */
-   public function lastInsertId() {
-      return (int) $this->lastInsertId;
    }
 
 

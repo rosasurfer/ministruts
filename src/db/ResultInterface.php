@@ -92,7 +92,7 @@ interface ResultInterface {
    /**
     * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement (connector specific, see the db README).
     *
-    * @return int - generated ID or 0 (zero) if no ID was generated;
+    * @return int - last generated ID or 0 (zero) if no ID was generated yet in the current session;
     *               -1 if the DBMS doesn't support this functionality
     *
     * @link   http://github.com/rosasurfer/ministruts/tree/master/src/db
@@ -101,11 +101,14 @@ interface ResultInterface {
 
 
    /**
-    * Return the number of rows affected if the SQL was an INSERT/UPDATE/DELETE statement.
+    * Return the last number of rows affected by a row modifying statement (connector specific, see the db README).
     *
-    * @return int
+    * @return int - last number of affected rows or 0 (zero) if no rows were modified yet in the current session;
+    *               -1 if the DBMS doesn't support this functionality
+    *
+    * @link   http://github.com/rosasurfer/ministruts/tree/master/src/db
     */
-   public function affectedRows();
+   public function lastAffectedRows();
 
 
    /**

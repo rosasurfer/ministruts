@@ -8,6 +8,7 @@ use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\exception\RuntimeException;
+use rosasurfer\exception\UnimplementedFeatureException;
 
 
 /**
@@ -38,13 +39,16 @@ class MySQLConnector extends Connector {
    protected $options = [];
 
    /** @var resource - internal connection handle */
-   protected $connection;
+   protected $hConnection;
 
    /** @var int - transaction nesting level */
    protected $transactionLevel = 0;
 
    /** @var int - the last inserted row id (not reset between queries) */
    protected $lastInsertId = 0;
+
+   /** @var int - the last number of modified rows (not reset between queries) */
+   protected $lastAffectedRows = 0;
 
 
    /**
@@ -171,8 +175,8 @@ class MySQLConnector extends Connector {
 
       // connect
       try {                                                                   // CLIENT_FOUND_ROWS
-         $this->connection  = mysql_connect($host, $user, $pass, $newLink=true/*, $flags=2 */);
-         !$this->connection && trigger_error(@$php_errormsg, E_USER_ERROR);
+         $this->hConnection = mysql_connect($host, $user, $pass, $newLink=true/*, $flags=2 */);
+         !$this->hConnection && trigger_error(@$php_errormsg, E_USER_ERROR);
       }
       catch (IRosasurferException $ex) {
          throw $ex->addMessage('Can not connect to MySQL server on "'.$host.'"');
@@ -183,29 +187,29 @@ class MySQLConnector extends Connector {
          foreach ($this->options as $option => $value) {
             if (strLen($value)) {
                if (strToLower($option) == 'charset') {
-                  mysql_set_charset($value, $this->connection) || trigger_error(mysql_error($this->connection), E_USER_ERROR);
+                  mysql_set_charset($value, $this->hConnection) || trigger_error(mysql_error($this->hConnection), E_USER_ERROR);
                   // synonymous with the sql statement "set character set {$value}"
                }
                else {
                   if (!is_numeric($value))
                      $value = "'$value'";
                   $sql = "set $option = $value";
-                  $this->execute($sql) || trigger_error(mysql_error($this->connection), E_USER_ERROR);
+                  $this->execute($sql); // || trigger_error(mysql_error($this->hConnection), E_USER_ERROR);
                }
             }
          }
       }
       catch (IRosasurferException $ex) {
-         throw $ex->addMessage('Can not set system variable "'.$value.'"')->setCode(mysql_errno($this->connection));
+         throw $ex->addMessage('Can not set system variable "'.$value.'"')->setCode(mysql_errno($this->hConnection));
       }
 
       // use specified database
       if ($this->database) {
          try {
-            mysql_select_db($this->database, $this->connection) || trigger_error(mysql_error($this->connection), E_USER_ERROR);
+            mysql_select_db($this->database, $this->hConnection) || trigger_error(mysql_error($this->hConnection), E_USER_ERROR);
          }
          catch (IRosasurferException $ex) {
-            throw $ex->addMessage('Can not select database "'.$this->database.'"')->setCode(mysql_errno($this->connection));
+            throw $ex->addMessage('Can not select database "'.$this->database.'"')->setCode(mysql_errno($this->hConnection));
          }
       }
 
@@ -247,8 +251,8 @@ class MySQLConnector extends Connector {
     */
    public function disconnect() {
       if ($this->isConnected()) {
-         $tmp = $this->connection;
-         $this->connection = null;
+         $tmp = $this->hConnection;
+         $this->hConnection = null;
          mysql_close($tmp);
       }
       return $this;
@@ -261,7 +265,7 @@ class MySQLConnector extends Connector {
     * @return bool
     */
    public function isConnected() {
-      return is_resource($this->connection);
+      return is_resource($this->hConnection);
    }
 
 
@@ -275,17 +279,16 @@ class MySQLConnector extends Connector {
     * @throws DatabaseException in case of failure
     */
    public function query($sql) {
-      $affectedRows = 0;
-      $result = $this->executeRaw($sql, $affectedRows);
-      if ($result === true)
+      $result = $this->executeRaw($sql);
+      if (!is_resource($result))
          $result = null;
-      return new MySQLResult($this, $sql, $result, $affectedRows, $this->lastInsertId);
+      return new MySQLResult($this, $sql, $result, $this->lastInsertId(), $this->lastAffectedRows());
    }
 
 
    /**
-    * Execute a SQL statement and skip result set processing. This method should be used for SQL statements
-    * not returning rows.
+    * Execute a SQL statement and skip result set processing. This method should be used for SQL statements not
+    * returning rows.
     *
     * @param  string $sql - SQL statement
     *
@@ -312,11 +315,10 @@ class MySQLConnector extends Connector {
     * Execute a SQL statement and return the internal driver's raw response.
     *
     * @param  _IN_  string $sql          - SQL statement
-    * @param  _OUT_ int   &$affectedRows - A variable receiving the number of affected rows. Unreliable for specific UPDATE
-    *                                      statements. Matched but unmodified rows are reported as changed if the connection
-    *                                      flag CLIENT_FOUND_ROWS is set.
+    * @param  _OUT_ int   &$affectedRows - A variable receiving the number of affected rows. Matched but unmodified rows are
+    *                                      reported as changed if the connection flag CLIENT_FOUND_ROWS is set.
     *
-    * @return resource|bool - a result resource or TRUE (depending on the statement type)
+    * @return resource|bool - a result resource or a boolean (depending on the statement type)
     *
     * @throws DatabaseException in case of failure
     */
@@ -330,20 +332,26 @@ class MySQLConnector extends Connector {
 
       // execute statement
       try {
-         $result = mysql_query($sql, $this->connection);
-         $result || trigger_error('SQL-Error '.mysql_errno($this->connection).': '.mysql_error($this->connection), E_USER_ERROR);
+         $result = mysql_query($sql, $this->hConnection);
+         $result || trigger_error('SQL-Error '.mysql_errno($this->hConnection).': '.mysql_error($this->hConnection), E_USER_ERROR);
       }
       catch (IRosasurferException $ex) {
-         throw $ex->addMessage('SQL: "'.$sql.'"')->setCode(mysql_errno($this->connection));
+         throw $ex->addMessage('SQL: "'.$sql.'"')->setCode(mysql_errno($this->hConnection));
       }
 
-      // determine number of rows affected by an INSERT/UPDATE/DELETE statement.
-      if ($result === true)                                       // no result set
-         $affectedRows = mysql_affected_rows($this->connection);
+      // track last_affected_rows
+      if (!is_resource($result)) {           // a row returning statement never modifies rows
+         $version = $this->getVersion();
+         if ($version < '5.5.5') $pattern = '/^\s*(INSERT|UPDATE|DELETE)\b/i';
+         else                    $pattern = '/^\s*(INSERT|UPDATE|DELETE|ALTER\s+TABLE|LOAD\s+DATA\s+INFILE)\b/i';
+         if (preg_match($pattern, $sql)) {
+            $this->lastAffectedRows = $affectedRows = mysql_affected_rows($this->hConnection);
+         }
+      }
 
       // track last_insert_id
-      if ($id = mysql_insert_id($this->connection))
-         $this->lastInsertId = $id + mysql_affected_rows($this->connection) - 1;
+      $id = mysql_insert_id($this->hConnection);
+      $id && $this->lastInsertId = $id + mysql_affected_rows($this->hConnection) - 1;
 
       return $result;
    }
@@ -357,44 +365,39 @@ class MySQLConnector extends Connector {
    $db->query("select * from t_test where name in ('a','b')");
    $db->query("select * from t_test where name in ('a','b') limit 1");
    $db->query("update t_test set name='aa' where name in ('c')");
-   $db->query("select count(*) from t_test");
    $db->query("select * from t_test where name = 'no-one'");
+   $db->query("select count(*) from t_test");
    $db->query("delete from t_test where name = 'a' or name = 'b'");
+   $db->query("select count(*) from t_test");
    $db->query("insert into t_test (name) values ('y'), ('z')");
    $db->query("insert into t_test (name) values ('x')");
    $db->query("explain select count(*) from t_test");
+   $db->query("select * from t_test");
+   $db->query("select * from t_test where name = 'no-one'");
 
-   echoPre(str_pad(explode(' ', $sql, 2)[0].':', 9).' insert_id='.mysql_insert_id($handler).'   affected_rows='.mysql_affected_rows($handler).'   result_set='.(is_resource($result) ? '1':' ').'   num_rows='.(int)@mysql_num_rows($result).'   info='.mysql_info($handler));
+   $result  = $db->query($sql);
+   $handler = $db->getInternalHandler();
+   echoPre(str_pad(explode(' ', $sql, 2)[0].':', 9).'  insert_id='.mysql_insert_id($handler).'  lastInsertID='.$db->lastInsertId().'  affected_rows='.mysql_affected_rows($handler).'  lastAffectedRows='.$db->lastAffectedRows().'  result='.($result->getInternalResult() ? 'resource' : '        ').'  num_rows='.($result->getInternalResult() ? mysql_num_rows($result->getInternalResult()) : 0).'  info='.mysql_info($handler));
 
-   drop:     insert_id=0   affected_rows=0   result=           num_rows=0   info=
-   create:   insert_id=0   affected_rows=0   result=           num_rows=0   info=
-   insert:   insert_id=1   affected_rows=4   result=           num_rows=0   info=Records: 4  Duplicates: 0  Warnings: 0
-   set:      insert_id=0   affected_rows=0   result=           num_rows=0   info=
-   explain:  insert_id=0   affected_rows=1   result=resource   num_rows=1   info=
-   update:   insert_id=0   affected_rows=0   result=           num_rows=0   info=Rows matched: 1  Changed: 0  Warnings: 0
-   select:   insert_id=0   affected_rows=2   result=resource   num_rows=2   info=
-   select:   insert_id=0   affected_rows=1   result=resource   num_rows=1   info=
-   update:   insert_id=0   affected_rows=1   result=           num_rows=0   info=Rows matched: 1  Changed: 1  Warnings: 0
-   select:   insert_id=0   affected_rows=1   result=resource   num_rows=1   info=
-   select:   insert_id=0   affected_rows=0   result=resource   num_rows=0   info=
-   delete:   insert_id=0   affected_rows=2   result=           num_rows=0   info=
-   insert:   insert_id=5   affected_rows=2   result=           num_rows=0   info=Records: 2  Duplicates: 0  Warnings: 0
-   insert:   insert_id=7   affected_rows=1   result=           num_rows=0   info=               <- single row inserts, no info
-   explain:  insert_id=0   affected_rows=1   result=resource   num_rows=1   info=
+   drop:      insert_id=0  lastInsertID=0  affected_rows=0  lastAffectedRows=0  result=          num_rows=0  info=
+   create:    insert_id=0  lastInsertID=0  affected_rows=0  lastAffectedRows=0  result=          num_rows=0  info=
+   insert:    insert_id=1  lastInsertID=4  affected_rows=4  lastAffectedRows=4  result=          num_rows=0  info=Records: 4  Duplicates: 0  Warnings: 0
+   set:       insert_id=0  lastInsertID=4  affected_rows=0  lastAffectedRows=4  result=          num_rows=0  info=
+   explain:   insert_id=0  lastInsertID=4  affected_rows=1  lastAffectedRows=4  result=resource  num_rows=1  info=
+   update:    insert_id=0  lastInsertID=4  affected_rows=0  lastAffectedRows=0  result=          num_rows=0  info=Rows matched: 1  Changed: 0  Warnings: 0
+   select:    insert_id=0  lastInsertID=4  affected_rows=2  lastAffectedRows=0  result=resource  num_rows=2  info=
+   select:    insert_id=0  lastInsertID=4  affected_rows=1  lastAffectedRows=0  result=resource  num_rows=1  info=
+   update:    insert_id=0  lastInsertID=4  affected_rows=1  lastAffectedRows=1  result=          num_rows=0  info=Rows matched: 1  Changed: 1  Warnings: 0
+   select:    insert_id=0  lastInsertID=4  affected_rows=0  lastAffectedRows=1  result=resource  num_rows=0  info=
+   select:    insert_id=0  lastInsertID=4  affected_rows=1  lastAffectedRows=1  result=resource  num_rows=1  info=
+   delete:    insert_id=0  lastInsertID=4  affected_rows=2  lastAffectedRows=2  result=          num_rows=0  info=
+   select:    insert_id=0  lastInsertID=4  affected_rows=1  lastAffectedRows=2  result=resource  num_rows=1  info=
+   insert:    insert_id=5  lastInsertID=6  affected_rows=2  lastAffectedRows=2  result=          num_rows=0  info=Records: 2  Duplicates: 0  Warnings: 0
+   insert:    insert_id=7  lastInsertID=7  affected_rows=1  lastAffectedRows=1  result=          num_rows=0  info=
+   explain:   insert_id=0  lastInsertID=7  affected_rows=1  lastAffectedRows=1  result=resource  num_rows=1  info=
+   select:    insert_id=0  lastInsertID=7  affected_rows=5  lastAffectedRows=1  result=resource  num_rows=5  info=
+   select:    insert_id=0  lastInsertID=7  affected_rows=0  lastAffectedRows=1  result=resource  num_rows=0  info=
    */
-
-
-   /**
-    * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement. The value is not reset between queries.
-    * (see the db README)
-    *
-    * @return int - generated ID or 0 (zero) if no new ID was yet generated in the current session
-    *
-    * @link   http://github.com/rosasurfer/ministruts/tree/master/src/db
-    */
-   public function lastInsertId() {
-      return (int) $this->lastInsertId;
-   }
 
 
    /**
@@ -465,11 +468,67 @@ class MySQLConnector extends Connector {
 
 
    /**
+    * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement. The value is not reset between queries.
+    * (see the db README)
+    *
+    * @return int - last generated ID or 0 (zero) if no ID was generated yet in the current session
+    *
+    * @link   http://github.com/rosasurfer/ministruts/tree/master/src/db
+    */
+   public function lastInsertId() {
+      return (int) $this->lastInsertId;
+   }
+
+
+   /**
+    * Return the number of rows affected by the last INSERT, UPDATE or DELETE statement. Since MySQL 5.5.5 this value also
+    * includes rows affected by ALTER TABLE and LOAD DATA INFILE statements. The value is not reset between queries (see the
+    * db README).
+    *
+    * @return int - last number of affected rows or 0 (zero) if no rows were modified yet in the current session
+    *
+    * @link   http://github.com/rosasurfer/ministruts/tree/master/src/db
+    * @link   http://dev.mysql.com/doc/refman/5.5/en/information-functions.html#function_row-count
+    */
+   public function lastAffectedRows() {
+      return (int) $this->lastAffectedRows;
+   }
+
+
+   /**
     * Return the connector's internal connection object.
     *
     * @return resource - the internal connection handle
     */
    public function getInternalHandler() {
-      return $this->connection;
+      if (!$this->isConnected())
+         $this->connect();
+      return $this->hConnection;
+   }
+
+
+   /**
+    * Return the version of the DBMS the connector is used for.
+    *
+    * @return string - e.g. "5.0.37-community-log"
+    */
+   public function getVersion() {
+      static $version;
+      if (is_null($version)) {
+         if (!$this->isConnected())
+            $this->connect();
+         $version = mysql_get_server_info($this->hConnection);
+      }
+      return $version;
+   }
+
+
+   /**
+    * Return the version ID of the DBMS the connector is used for as an integer.
+    *
+    * @return int - e.g. 50037 for version "5.0.37-community-log"
+    */
+   public function getVersionId() {
+      throw new UnimplementedFeatureException();
    }
 }

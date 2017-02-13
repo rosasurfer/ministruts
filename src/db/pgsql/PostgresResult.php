@@ -47,8 +47,8 @@ class PostgresResult extends Result {
     * @param  int        $affectedRows - number of rows modified by the statement
     */
    public function __construct(IConnector $connector, $sql, $result, $affectedRows) {
-      if (!is_string($sql))                        throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
-      if (!is_resource($result) && $result!==null) throw new IllegalTypeException('Illegal type of parameter $result: '.getType($result));
+      if (!is_string($sql))                           throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
+      if (!is_resource($result) && !is_null($result)) throw new IllegalTypeException('Illegal type of parameter $result: '.getType($result));
 
       $this->connector    = $connector;
       $this->sql          = $sql;
@@ -126,7 +126,7 @@ class PostgresResult extends Result {
     *
     * This function returnes the most recently generated ID. It's value is not reset between queries.
     *
-    * @return int - generated ID or 0 (zero) if no previous statement yet generated an ID;
+    * @return int - generated ID or 0 (zero) if no previous statement generated yet an ID;
     *               -1 if the PostgreSQL server version doesn't support this functionality
     */
    public function lastInsertId() {

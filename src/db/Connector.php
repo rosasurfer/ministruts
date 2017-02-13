@@ -59,7 +59,7 @@ abstract class Connector extends Object implements ConnectorInterface {
 
 
    /**
-    * Return the type of the database system the connector is used for.
+    * Return the type of the DBMS the connector is used for.
     *
     * @return string
     */

@@ -288,21 +288,6 @@ class SQLiteConnector extends Connector {
 
 
    /**
-    * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement. The value is not reset between queries.
-    * (see the db README)
-    *
-    * @return int - generated ID or 0 (zero) if no new ID was yet generated in the current session
-    *
-    * @link   http://github.com/rosasurfer/ministruts/tree/master/src/db
-    */
-   public function lastInsertId() {
-      if (!$this->isConnected())
-         return 0;
-      return $this->handler->lastInsertRowID();
-   }
-
-
-   /**
     * Start a new transaction. If there is already an active transaction only the transaction nesting level is increased.
     *
     * @return self
@@ -370,11 +355,28 @@ class SQLiteConnector extends Connector {
 
 
    /**
+    * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement. The value is not reset between queries.
+    * (see the db README)
+    *
+    * @return int - last generated ID or 0 (zero) if no ID was generated yet in the current session
+    *
+    * @link   http://github.com/rosasurfer/ministruts/tree/master/src/db
+    */
+   public function lastInsertId() {
+      if (!$this->isConnected())
+         return 0;
+      return $this->handler->lastInsertRowID();
+   }
+
+
+   /**
     * Return the connector's internal connection object.
     *
     * @return \SQLite3 - the internal connection handler
     */
    public function getInternalHandler() {
+      if (!$this->isConnected())
+         $this->connect();
       return $this->handler;
    }
 }

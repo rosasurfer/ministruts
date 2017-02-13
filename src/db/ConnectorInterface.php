@@ -108,7 +108,7 @@ interface ConnectorInterface {
    /**
     * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement (connector specific, see the db README).
     *
-    * @return int - generated ID or 0 (zero) if no ID was generated;
+    * @return int - last generated ID or 0 (zero) if no ID was generated yet in the current session;
     *               -1 if the DBMS doesn't support this functionality
     *
     * @link   http://github.com/rosasurfer/ministruts/tree/master/src/db
@@ -117,11 +117,38 @@ interface ConnectorInterface {
 
 
    /**
-    * Return the type of the database system the connector is used for.
+    * Return the number of rows affected by the last row modifying statement (connector specific, see the db README).
+    *
+    * @return int - last number of affected rows or 0 (zero) if no rows were modified yet in the current session;
+    *               -1 if the DBMS doesn't support this functionality
+    *
+    * @link   http://github.com/rosasurfer/ministruts/tree/master/src/db
+    */
+   public function lastAffectedRows();
+
+
+   /**
+    * Return the type of the DBMS the connector is used for.
     *
     * @return string
     */
    public function getType();
+
+
+   /**
+    * Return the version of the DBMS the connector is used for.
+    *
+    * @return mixed
+    */
+   public function getVersion();
+
+
+   /**
+    * Return the version ID of the DBMS the connector is used for as an integer.
+    *
+    * @return int - e.g. 50037 for version "5.0.37-community-log"
+    */
+   public function getVersionId();
 
 
    /**
