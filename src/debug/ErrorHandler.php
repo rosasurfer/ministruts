@@ -159,10 +159,10 @@ class ErrorHandler extends StaticClass {
       // (2) Process errors according to their severity level.
       switch ($level) {
          // always log non-critical and user errors and continue normally (without a stacktrace)
-         case E_DEPRECATED     : return _true(Logger::log('E_DEPRECATED: '     .$message, L_NOTICE, $logContext));
-         case E_USER_DEPRECATED: return _true(Logger::log('E_USER_DEPRECATED: '.$message, L_NOTICE, $logContext));
-         case E_USER_NOTICE    : return _true(Logger::log('E_USER_NOTICE: '    .$message, L_NOTICE, $logContext));
-         case E_USER_WARNING   : return _true(Logger::log('E_USER_WARNING: '   .$message, L_WARN  , $logContext));
+         case E_DEPRECATED     : return _true(Logger::log($message, L_NOTICE, $logContext));
+         case E_USER_DEPRECATED: return _true(Logger::log($message, L_NOTICE, $logContext));
+         case E_USER_NOTICE    : return _true(Logger::log($message, L_NOTICE, $logContext));
+         case E_USER_WARNING   : return _true(Logger::log($message, L_WARN  , $logContext));
       }
 
       // (3) Wrap everything else in the matching PHPError exception.
