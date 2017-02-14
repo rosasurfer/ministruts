@@ -1,4 +1,4 @@
-<?php
+g rows  <?php
 namespace rosasurfer\db\sqlite;
 
 use rosasurfer\db\Connector;
@@ -13,14 +13,11 @@ use rosasurfer\exception\RuntimeException;
  *
  * Connector for SQLite/SQLite3 databases.
  *
- * Known bugs in php_sqlite3 v0.7-dev (PHP 5.6):
- * ---------------------------------------------
- * SQLite3Result::fetchArray()  In contrast to the documentation SQLite3::query() always returns a SQLite3Result instance,
- *                              not only for queries returning rows (SELECT, EXPLAIN). Each time SQLite3Result::fetchArray()
- *                              is called on a result from a result-less query internally the query is executed again, thus
- *                              breaking the application.
+ * The php_sqlite3 extension v0.7-dev is broken. SQLite3Result::fetchArray() executes the originating query again.
+ * The workaround for DDL and DML statements is to check with SQLite3Result::numColumns() for an empty result before
+ * calling fetchArray(). There is no workaround for multiple executions of SELECT queries.
  *
- * Workaround: Check with SQLite3Result::numColumns() for an empty result before calling SQLite3Result::fetchArray().
+ * @see  http://bugs.php.net/bug.php?id=64531
  */
 class SQLiteConnector extends Connector {
 
