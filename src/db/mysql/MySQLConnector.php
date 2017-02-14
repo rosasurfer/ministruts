@@ -194,7 +194,7 @@ class MySQLConnector extends Connector {
                   if (!is_numeric($value))
                      $value = "'$value'";
                   $sql = "set $option = $value";
-                  $this->execute($sql); // || trigger_error(mysql_error($this->hConnection), E_USER_ERROR);
+                  $this->execute($sql) || trigger_error(mysql_error($this->hConnection), E_USER_ERROR);
                }
             }
          }
@@ -287,12 +287,12 @@ class MySQLConnector extends Connector {
 
 
    /**
-    * Execute a SQL statement and skip result set processing. This method should be used for SQL statements not
+    * Execute a SQL statement and skip potential result set processing. This method should be used for SQL statements not
     * returning rows.
     *
     * @param  string $sql - SQL statement
     *
-    * @return int - Number of rows affected by the statement.
+    * @return self
     *
     * @throws DatabaseException in case of failure
     */
@@ -305,21 +305,20 @@ class MySQLConnector extends Connector {
       $result = $this->executeRaw($sql);
       if (is_resource($result))
          mysql_free_result($result);               // release the result
-      return $this->lastAffectedRows();
+      return $this;
    }
 
 
    /**
     * Execute a SQL statement and return the internal driver's raw response.
     *
-    * @param  _IN_  string $sql              - SQL statement
-    * @param  _OUT_ int   &$lastAffectedRows - variable receiving the last number of affected rows
+    * @param  string $sql - SQL statement
     *
-    * @return resource|bool - a result resource or a boolean (depending on the statement type)
+    * @return resource|bool - result handle or boolean (depending on the statement type)
     *
     * @throws DatabaseException in case of failure
     */
-   public function executeRaw($sql, &$lastAffectedRows=0) {
+   public function executeRaw($sql) {
       if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
       if (!$this->isConnected())
          $this->connect();
@@ -339,7 +338,7 @@ class MySQLConnector extends Connector {
       if ($id) $this->lastInsertId = $id + ($affected=mysql_affected_rows($this->hConnection)) - 1;
 
       // track last_affected_rows
-      if (!is_resource($result)) {           // a row returning statement never modifies rows
+      if (!is_resource($result)) {                 // a row returning statement never modifies rows
          $version = $this->getVersion();
          if ($version < '5.5.5') $pattern = '/^\s*(INSERT|UPDATE|DELETE)\b/i';
          else                    $pattern = '/^\s*(INSERT|UPDATE|DELETE|ALTER\s+TABLE|LOAD\s+DATA\s+INFILE)\b/i';
@@ -348,8 +347,6 @@ class MySQLConnector extends Connector {
             $this->lastAffectedRows = $affected;
          }
       }
-      $lastAffectedRows = $this->lastAffectedRows;
-
       return $result;
    }
    /*

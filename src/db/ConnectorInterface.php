@@ -48,12 +48,12 @@ interface ConnectorInterface {
 
 
    /**
-    * Execute a SQL statement and skip result set processing. This method should be used for SQL statements not returning
-    * rows. If the database driver does not support this functionality the statement is forwarded to IConnector::query().
+    * Execute a SQL statement and skip potential result set processing. This method should be used for SQL statements not
+    * returning rows. If the database driver does not support it the statement is forwarded to IConnector::query().
     *
     * @param  string $sql - SQL statement
     *
-    * @return int - Number of rows affected if the statement was an INSERT/UPDATE/DELETE statement
+    * @return self
     *
     * @throws DatabaseException in case of failure
     */
@@ -63,14 +63,13 @@ interface ConnectorInterface {
    /**
     * Execute a SQL statement and return the internal driver's raw response.
     *
-    * @param  _IN_  string $sql          - SQL statement
-    * @param  _OUT_ int   &$affectedRows - A variable receiving the number of affected rows.
+    * @param  string $sql - SQL statement
     *
     * @return mixed - raw driver response
     *
     * @throws DatabaseException in case of failure
     */
-   public function executeRaw($sql, &$affectedRows=0);
+   public function executeRaw($sql);
 
 
    /**

@@ -187,12 +187,12 @@ class PostgresConnector extends Connector {
 
 
    /**
-    * Execute a SQL statement and skip result set processing. This method should be used for SQL statements not returning
-    * rows.
+    * Execute a SQL statement and skip potential result set processing. This method should be used for SQL statements not
+    * returning rows.
     *
     * @param  string $sql - SQL statement
     *
-    * @return int - Number of rows affected by the statement.
+    * @return self
     *
     * @throws DatabaseException in case of failure
     */
@@ -200,28 +200,26 @@ class PostgresConnector extends Connector {
       $result = $this->executeRaw($sql);
       if (is_resource($result))
          pg_free_result($result);
-      return $this->lastAffectedRows();
+      return $this;
    }
 
 
    /**
     * Execute a SQL statement and return the internal driver's raw response.
     *
-    * @param  _IN_  string $sql              - SQL statement
-    * @param  _OUT_ int   &$lastAffectedRows - variable receiving the last number of affected rows
+    * @param  string $sql - SQL statement
     *
-    * @return resource - a result handle
+    * @return resource - result handle
     *
     * @throws DatabaseException in case of failure
     */
-   public function executeRaw($sql, &$lastAffectedRows=0) {
+   public function executeRaw($sql) {
       if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
       if (!$this->isConnected())
          $this->connect();
 
-      $result = null;
-
       // execute statement
+      $result = null;
       try {
          $result = pg_query($this->hConnection, $sql);         // wraps multi-statement queries in a transaction
          $result || trigger_error(pg_last_error($this->hConnection), E_USER_ERROR);
@@ -229,6 +227,7 @@ class PostgresConnector extends Connector {
       catch (IRosasurferException $ex) {
          throw $ex->addMessage('SQL: "'.$sql.'"');
       }
+
       $status_string = pg_result_status($result, PGSQL_STATUS_STRING);
 
       // reset last_insert_id on INSERTs, afterwards it's resolved on request as it requires an extra SQL query
@@ -239,7 +238,6 @@ class PostgresConnector extends Connector {
       $pattern = '/^(INSERT|UPDATE|DELETE)\b/i';
       if (preg_match($pattern, $status_string))
          $this->lastAffectedRows = pg_affected_rows($result);
-      $lastAffectedRows = $this->lastAffectedRows;
 
       return $result;
       /*

@@ -176,24 +176,13 @@ abstract class Result extends Object implements ResultInterface {
 
 
    /**
-    * Gibt den Wert des internen Ergebniszaehlers zurueck. Kann bei seitenweiser Ergebnisanzeige
-    * statt einer zweiten Datenbankabfrage benutzt werden.
     *
-    * @return int - Gesamtanzahl von Ergebnissen der letzten Abfrage (ohne Beruecksichtigung einer LIMIT-Klausel)
     *
    public function countFoundItems() {
       return $this->foundItemsCounter;
 
       //$result = $this->query('select found_rows()');
       //$this->foundItemsCounter = $result->fetchAsInt();
-   }
-   */
-
-   /*
-   $rawResult = $this->executeRaw($sql);
-   if (is_resource($rawResult)) {
-      $resultSet     = $rawResult;
-      $resultNumRows = mysql_num_rows($rawResult);       // number of returned rows
    }
    */
 }

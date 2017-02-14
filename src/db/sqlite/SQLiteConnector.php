@@ -172,13 +172,12 @@ class SQLiteConnector extends Connector {
 
 
    /**
-    * Execute a SQL statement and skip result set processing. This method should be used for SQL statements
-    * not returning rows.
+    * Execute a SQL statement and skip potential result set processing. This method should be used for SQL statements not
+    * returning rows.
     *
     * @param  string $sql - SQL statement
     *
-    * @return int - Number of rows affected by the statement. Unreliable for specific UPDATE statements (matched but
-    *               unmodified rows are reported as changed) and for multiple statement queries.
+    * @return self
     *
     * @throws DatabaseException in case of failure
     */
@@ -187,8 +186,10 @@ class SQLiteConnector extends Connector {
          $lastExecMode = $this->skipResults;
          $this->skipResults = true;
 
-         $this->executeRaw($sql)->finalize();            // release the result
-         return $this->lastAffectedRows();
+         $result = $this->executeRaw($sql);           // In contrast to the documentation SQLite3::exec() and therefore
+         $result->finalize();                         // self::executeRaw() always return a SQLite3Result, never a boolean.
+                                                      // Thus it is safe to unconditionally call finalize().
+         return $this;
       }
       finally {
          $this->skipResults = $lastExecMode;
@@ -199,21 +200,19 @@ class SQLiteConnector extends Connector {
    /**
     * Execute a SQL statement and return the internal driver's raw response.
     *
-    * @param  _IN_  string $sql              - SQL statement
-    * @param  _OUT_ int   &$lastAffectedRows - variable receiving the last number of affected rows
+    * @param  string $sql - SQL statement
     *
     * @return \SQLite3Result
     *
     * @throws DatabaseException in case of failure
     */
-   public function executeRaw($sql, &$lastAffectedRows=0) {
+   public function executeRaw($sql) {
       if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
       if (!$this->isConnected())
          $this->connect();
 
-      $result = null;
-
       // execute statement
+      $result = null;
       try {
          if ($this->skipResults) $result = $this->handler->exec($sql);     // TRUE on success, FALSE on error
          else                    $result = $this->handler->query($sql);    // bug: always SQLite3Result, never boolean
@@ -227,7 +226,7 @@ class SQLiteConnector extends Connector {
       $this->lastInsertId = $this->handler->lastInsertRowID();
 
       // track last_affected_rows
-      $this->lastAffectedRows = $lastAffectedRows = $this->handler->changes();
+      $this->lastAffectedRows = $this->handler->changes();
 
       return $result;
    }
