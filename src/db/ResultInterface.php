@@ -125,4 +125,10 @@ interface ResultInterface {
     * @return resource|object - result handle or instance
     */
    public function getInternalResult();
+
+
+   /**
+    * Release the internal resources held by the Result.
+    */
+   public function release();
 }

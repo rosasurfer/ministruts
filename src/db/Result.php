@@ -2,14 +2,16 @@
 namespace rosasurfer\db;
 
 use rosasurfer\core\Object;
+use rosasurfer\debug\ErrorHandler;
 
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\UnimplementedFeatureException;
 
-use const rosasurfer\ARRAY_BOTH;
 use function rosasurfer\strToBool;
 use function rosasurfer\strIsNumeric;
+
+use const rosasurfer\ARRAY_BOTH;
 
 
 /**
@@ -21,10 +23,17 @@ abstract class Result extends Object implements ResultInterface {
 
    /**
     * Destructor
+    *
+    * Release the Result's internal resoruces.
     */
-   abstract public function __destruct(
-      // enforce a destructor to release a result set
-   );
+   public function __destruct() {
+      try {
+         $this->release();
+      }
+      catch (\Exception $ex) {
+         throw ErrorHandler::handleDestructorException($ex);
+      }
+   }
 
 
    /**

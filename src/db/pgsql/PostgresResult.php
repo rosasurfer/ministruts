@@ -4,7 +4,6 @@ namespace rosasurfer\db\pgsql;
 use rosasurfer\db\ConnectorInterface as IConnector;
 use rosasurfer\db\Result;
 
-use rosasurfer\debug\ErrorHandler;
 use rosasurfer\exception\IllegalTypeException;
 
 use const rosasurfer\ARRAY_ASSOC;
@@ -85,25 +84,6 @@ class PostgresResult extends Result {
 
 
    /**
-    * Destructor
-    *
-    * Release an internal result set.
-    */
-   public function __destruct() {
-      try {
-         if ($this->hResult) {
-            $tmp = $this->hResult;
-            $this->hResult = null;
-            pg_free_result($tmp);
-         }
-      }
-      catch (\Exception $ex) {
-         throw ErrorHandler::handleDestructorException($ex);
-      }
-   }
-
-
-   /**
     * Fetch the next row from the result set.
     *
     * @param  int $mode - Controls how the returned array is indexed. Can take one of the following values:
@@ -173,6 +153,18 @@ class PostgresResult extends Result {
     */
    public function getInternalResult() {
       return $this->hResult;
+   }
+
+
+   /**
+    * Release the internal resources held by the Result.
+    */
+   public function release() {
+      if ($this->hResult) {
+         $tmp = $this->hResult;
+         $this->hResult = null;
+         pg_free_result($tmp);
+      }
    }
 
 
