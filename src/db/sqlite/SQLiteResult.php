@@ -77,8 +77,9 @@ class SQLiteResult extends Result {
    public function __destruct() {
       try {
          if ($this->result) {
-            $this->result->finalize();
+            $tmp = $this->result;
             $this->result = null;
+            $tmp->finalize();
          }
       }
       catch (\Exception $ex) {
@@ -93,7 +94,10 @@ class SQLiteResult extends Result {
     * @param  int $mode - Controls how the returned array is indexed. Can take one of the following values:
     *                     ARRAY_ASSOC, ARRAY_NUM, or ARRAY_BOTH (default).
     *
-    * @return array - array of columns or NULL if no more rows are available
+    * @return array - Array of columns or NULL if no more rows are available. The types of the values of the returned array
+    *                 are mapped from SQLite3 types as follows: integers are mapped to int if they fit into the range
+    *                 PHP_INT_MIN..PHP_INT_MAX, and to string otherwise. Floats are mapped to float, NULL values are mapped
+    *                 to null, and strings and blobs are mapped to string.
     */
    public function fetchNext($mode=ARRAY_BOTH) {
       if (!$this->result)

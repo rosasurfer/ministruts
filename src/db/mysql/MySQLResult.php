@@ -15,7 +15,7 @@ use const rosasurfer\ARRAY_NUM;
 
 /**
  * Represents the result of an executed SQL statement. Depending on the statement type the result may or may not contain
- * a result set.
+ * returned rows.
  */
 class MySQLResult extends Result {
 
@@ -27,7 +27,7 @@ class MySQLResult extends Result {
    protected $sql;
 
    /** @var resource - the underlying driver's original result resource */
-   protected $result;
+   protected $hResult;
 
    /** @var int - last inserted row id of the connection at instance creation time (not reset between queries) */
    protected $lastInsertId = 0;
@@ -46,28 +46,28 @@ class MySQLResult extends Result {
     *
     * @param  IConnector $connector        - connector managing the database connection
     * @param  string     $sql              - executed SQL statement
-    * @param  resource   $result           - result resource or NULL for result-less SQL query; SELECT queries not matching
+    * @param  resource   $hResult          - result handle or NULL for result-less SQL query; SELECT queries not matching
     *                                        any rows produce an empty result resource
     * @param  int        $lastInsertId     - last inserted ID of the connection
     * @param  int        $lastAffectedRows - last number of affected rows of the connection
     */
-   public function __construct(IConnector $connector, $sql, $result, $lastInsertId, $lastAffectedRows) {
-      if (!is_string($sql))                           throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
-      if (!is_resource($result) && !is_null($result)) throw new IllegalTypeException('Illegal type of parameter $result: '.getType($result));
-      if (!is_int($lastInsertId))                     throw new IllegalTypeException('Illegal type of parameter $lastInsertId: '.getType($lastInsertId));
-      if (!is_int($lastAffectedRows))                 throw new IllegalTypeException('Illegal type of parameter $lastAffectedRows: '.getType($lastAffectedRows));
+   public function __construct(IConnector $connector, $sql, $hResult, $lastInsertId, $lastAffectedRows) {
+      if (!is_string($sql))                             throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
+      if (!is_resource($hResult) && !is_null($hResult)) throw new IllegalTypeException('Illegal type of parameter $hResult: '.getType($hResult));
+      if (!is_int($lastInsertId))                       throw new IllegalTypeException('Illegal type of parameter $lastInsertId: '.getType($lastInsertId));
+      if (!is_int($lastAffectedRows))                   throw new IllegalTypeException('Illegal type of parameter $lastAffectedRows: '.getType($lastAffectedRows));
 
       $this->connector        = $connector;
       $this->sql              = $sql;
-      $this->result           = $result;
+      $this->hResult          = $hResult;
       $this->lastInsertId     = $lastInsertId;
       $this->lastAffectedRows = $lastAffectedRows;
 
-      if ($result && !mysql_num_fields($result)) {    // close empty results and release them
-         mysql_free_result($result);
-         $result = null;
+      if ($hResult && !mysql_num_fields($hResult)) {     // close empty results and release them
+         mysql_free_result($hResult);
+         $hResult = null;
       }
-      $this->result = $result;
+      $this->hResult = $hResult;
    }
 
 
@@ -78,9 +78,10 @@ class MySQLResult extends Result {
     */
    public function __destruct() {
       try {
-         if ($this->result) {
-            mysql_free_result($this->result);
-            $this->result = null;
+         if ($this->hResult) {
+            $tmp = $this->hResult;
+            $this->hResult = null;
+            mysql_free_result($tmp);
          }
       }
       catch (\Exception $ex) {
@@ -98,7 +99,7 @@ class MySQLResult extends Result {
     * @return array - array of columns or NULL if no more rows are available
     */
    public function fetchNext($mode=ARRAY_BOTH) {
-      if (!$this->result)
+      if (!$this->hResult)
          return null;
 
       switch ($mode) {
@@ -106,7 +107,7 @@ class MySQLResult extends Result {
          case ARRAY_NUM:   $mode = MYSQL_NUM;   break;
          default:          $mode = MYSQL_BOTH;
       }
-      return mysql_fetch_array($this->result, $mode) ?: null;
+      return mysql_fetch_array($this->hResult, $mode) ?: null;
    }
 
 
@@ -144,8 +145,8 @@ class MySQLResult extends Result {
     */
    public function numRows() {
       if ($this->numRows === null) {
-         if ($this->result) $this->numRows = mysql_num_rows($this->result);
-         else               $this->numRows = 0;
+         if ($this->hResult) $this->numRows = mysql_num_rows($this->hResult);
+         else                $this->numRows = 0;
       }
       return $this->numRows;
    }
@@ -175,6 +176,6 @@ class MySQLResult extends Result {
     * @return resource - result handle or NULL for result-less queries
     */
    public function getInternalResult() {
-      return $this->result;
+      return $this->hResult;
    }
 }

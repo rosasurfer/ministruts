@@ -26,10 +26,16 @@ class PostgresConnector extends Connector {
    protected $options = [];
 
    /** @var resource - internal connection handle */
-   protected $connection;
+   protected $hConnection;
 
    /** @var int - transaction nesting level */
    protected $transactionLevel = 0;
+
+   /** @var int - the last inserted row id (not reset between queries) */
+   protected $lastInsertId = 0;
+
+   /** @var int - the last number of affected rows (not reset between queries) */
+   protected $lastAffectedRows = 0;
 
 
    /**
@@ -61,7 +67,7 @@ class PostgresConnector extends Connector {
 
 
    /**
-    * Set additonal connection options.
+    * Set additional connection options.
     *
     * @param  string[] $options
     *
@@ -94,8 +100,8 @@ class PostgresConnector extends Connector {
       $connStr = trim($connStr);
 
       try {
-         $this->connection = pg_connect($connStr, PGSQL_CONNECT_FORCE_NEW);
-         !$this->connection && trigger_error(@$php_errormsg, E_USER_ERROR);
+         $this->hConnection = pg_connect($connStr, PGSQL_CONNECT_FORCE_NEW);
+         !$this->hConnection && trigger_error(@$php_errormsg, E_USER_ERROR);
       }
       catch (IRosasurferException $ex) {
          throw $ex->addMessage('Cannot connect to PostgreSQL server with connection string: "'.$connStr.'"');
@@ -141,8 +147,8 @@ class PostgresConnector extends Connector {
     */
    public function disconnect() {
       if ($this->isConnected()) {
-         $tmp = $this->connection;
-         $this->connection = null;
+         $tmp = $this->hConnection;
+         $this->hConnection = null;
          pg_close($tmp);
       }
       return $this;
@@ -159,7 +165,7 @@ class PostgresConnector extends Connector {
     * @return bool
     */
    public function isConnected() {
-      return ($this->connection != null);
+      return is_resource($this->hConnection);
    }
 
 
@@ -173,62 +179,85 @@ class PostgresConnector extends Connector {
     * @throws DatabaseException in case of failure
     */
    public function query($sql) {
-      $affectedRows = 0;
-      $result = $this->executeRaw($sql, $affectedRows);                  // pass on $affectedRows to avoid
-      return new PostgresResult($this, $sql, $result, $affectedRows);    // multiple calculations
+      $result = $this->executeRaw($sql);
+      return new PostgresResult($this, $sql, $result, $this->lastAffectedRows());
    }
 
 
    /**
-    * Execute a SQL statement and skip result set processing. This method should be used for SQL statements
-    * not returning rows.
+    * Execute a SQL statement and skip result set processing. This method should be used for SQL statements not returning
+    * rows.
     *
     * @param  string $sql - SQL statement
     *
-    * @return int - Number of rows affected by the statement. Unreliable for specific UPDATE statements (matched but
-    *               unmodified rows are reported as changed) and for multiple statement queries.
+    * @return int - Number of rows affected by the statement.
     *
     * @throws DatabaseException in case of failure
     */
    public function execute($sql) {
-      $affectedRows = 0;
-      $result = $this->executeRaw($sql, $affectedRows);
+      $result = $this->executeRaw($sql);
       if (is_resource($result))
          pg_free_result($result);
-      return $affectedRows;
+      return $this->lastAffectedRows();
    }
 
 
    /**
     * Execute a SQL statement and return the internal driver's raw response.
     *
-    * @param  _IN_  string $sql          - SQL statement
-    * @param  _OUT_ int   &$affectedRows - A variable receiving the number of affected rows. Unreliable for specific UPDATE
-    *                                      statements (matched but unmodified rows are reported as changed) and for multiple
-    *                                      statement queries.
+    * @param  _IN_  string $sql              - SQL statement
+    * @param  _OUT_ int   &$lastAffectedRows - variable receiving the last number of affected rows
     *
-    * @return resource - a result resource
+    * @return resource - a result handle
     *
     * @throws DatabaseException in case of failure
     */
-   public function executeRaw($sql, &$affectedRows=0) {
+   public function executeRaw($sql, &$lastAffectedRows=0) {
       if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
       if (!$this->isConnected())
          $this->connect();
 
-      $result       = null;
-      $affectedRows = 0;
+      $result = null;
 
       // execute statement
       try {
-         $result = pg_query($this->connection, $sql);             // wraps multi-statement queries in a transaction
-         $result || trigger_error(pg_last_error($this->connection), E_USER_ERROR);
+         $result = pg_query($this->hConnection, $sql);         // wraps multi-statement queries in a transaction
+         $result || trigger_error(pg_last_error($this->hConnection), E_USER_ERROR);
       }
       catch (IRosasurferException $ex) {
          throw $ex->addMessage('SQL: "'.$sql.'"');
       }
 
-      //
+      // track last_insert_id only on request as it requires an extra SQL query
+
+      // track last_affected_rows
+      $pattern = '/^(INSERT|UPDATE|DELETE)\b/i';
+      if (preg_match($pattern, pg_result_status($result, PGSQL_STATUS_STRING)))
+         $this->lastAffectedRows = pg_affected_rows($result);
+      $lastAffectedRows = $this->lastAffectedRows;
+
+      return $result;
+      /*
+      drop:      lastval=?  lastInsertID=?  affected_rows=0  lastAffectedRows=0  num_rows=0  status_long=PGSQL_COMMAND_OK  status_string=DROP TABLE
+      create:    lastval=?  lastInsertID=?  affected_rows=0  lastAffectedRows=0  num_rows=0  status_long=PGSQL_COMMAND_OK  status_string=CREATE TABLE
+      insert:    lastval=?  lastInsertID=?  affected_rows=4  lastAffectedRows=4  num_rows=0  status_long=PGSQL_COMMAND_OK  status_string=INSERT 0 4
+      explain:   lastval=?  lastInsertID=?  affected_rows=0  lastAffectedRows=4  num_rows=2  status_long=PGSQL_TUPLES_OK   status_string=EXPLAIN
+      update:    lastval=?  lastInsertID=?  affected_rows=1  lastAffectedRows=1  num_rows=0  status_long=PGSQL_COMMAND_OK  status_string=UPDATE 1
+      select:    lastval=?  lastInsertID=?  affected_rows=2  lastAffectedRows=1  num_rows=2  status_long=PGSQL_TUPLES_OK   status_string=SELECT 2
+      select:    lastval=?  lastInsertID=?  affected_rows=1  lastAffectedRows=1  num_rows=1  status_long=PGSQL_TUPLES_OK   status_string=SELECT 1
+      update:    lastval=?  lastInsertID=?  affected_rows=1  lastAffectedRows=1  num_rows=0  status_long=PGSQL_COMMAND_OK  status_string=UPDATE 1
+      select:    lastval=?  lastInsertID=?  affected_rows=0  lastAffectedRows=1  num_rows=0  status_long=PGSQL_TUPLES_OK   status_string=SELECT 0
+      select:    lastval=?  lastInsertID=?  affected_rows=1  lastAffectedRows=1  num_rows=1  status_long=PGSQL_TUPLES_OK   status_string=SELECT 1
+      delete:    lastval=?  lastInsertID=?  affected_rows=2  lastAffectedRows=2  num_rows=0  status_long=PGSQL_COMMAND_OK  status_string=DELETE 2
+      select:    lastval=?  lastInsertID=?  affected_rows=1  lastAffectedRows=2  num_rows=1  status_long=PGSQL_TUPLES_OK   status_string=SELECT 1
+      insert:    lastval=?  lastInsertID=?  affected_rows=2  lastAffectedRows=2  num_rows=2  status_long=PGSQL_TUPLES_OK   status_string=INSERT 0 2
+      insert:    lastval=?  lastInsertID=?  affected_rows=1  lastAffectedRows=1  num_rows=0  status_long=PGSQL_COMMAND_OK  status_string=INSERT 0 1
+      explain:   lastval=?  lastInsertID=?  affected_rows=0  lastAffectedRows=1  num_rows=2  status_long=PGSQL_TUPLES_OK   status_string=EXPLAIN
+      select:    lastval=?  lastInsertID=?  affected_rows=5  lastAffectedRows=1  num_rows=5  status_long=PGSQL_TUPLES_OK   status_string=SELECT 5
+      begin:     lastval=?  lastInsertID=?  affected_rows=0  lastAffectedRows=1  num_rows=0  status_long=PGSQL_COMMAND_OK  status_string=COMMIT
+      select:    lastval=?  lastInsertID=?  affected_rows=0  lastAffectedRows=1  num_rows=0  status_long=PGSQL_TUPLES_OK   status_string=SELECT 0
+      */
+
       // TODO: All queries must be sent via pg_send_query()/pg_get_result(). All errors must be analyzed per result
       //       via pg_result_error(). This way we get access to SQLSTATE codes and to custom exception handling.
       //
@@ -236,11 +265,10 @@ class PostgresConnector extends Connector {
       // @see  http://grokbase.com/t/php/php-pdo/09b2hywmak/asynchronous-requests
       // @see  http://stackoverflow.com/questions/865017/pg-send-query-cannot-set-connection-to-blocking-mode
       // @see  https://bugs.php.net/bug.php?id=65015
-      //
 
       /*
-      pg_send_query($this->connection, $sql);
-      $result = pg_get_result($this->connection);     // get one result per statement from a multi-statement query
+      pg_send_query($this->hConnection, $sql);
+      $result = pg_get_result($this->hConnection);    // get one result per statement from a multi-statement query
 
       echoPre(pg_result_error($result));              // analyze errors
 
@@ -291,27 +319,6 @@ class PostgresConnector extends Connector {
       PGSQL_DIAG_SOURCE_LINE        = 866
       PGSQL_DIAG_SOURCE_FUNCTION    = parserOpenTable
       */
-
-
-      // Calculate number of rows affected by an INSERT/UPDATE/DELETE statement.
-      //
-      // - pg_affected_rows($result) actually is matchedRows(), it also shows values for SELECT statements (but not for
-      //   other statements generating a result set)
-      // - PostgreSQL supports multi-statement queries.
-      //
-      // The following logic assumes a single statement query with matched = modified rows:
-      //
-
-      // TODO: The following is obviously big bullocks in PostgreSQL.
-      $rows = pg_affected_rows($result);
-      if ($rows) {
-         $str = strToLower(subStr(trim($sql), 0, 6));
-         if ($str!='insert' && $str!='update' && $str!='delete')
-            $rows = 0;
-      }
-      $affectedRows = $rows;
-
-      return $result;
    }
 
 
@@ -383,15 +390,18 @@ class PostgresConnector extends Connector {
 
 
    /**
-    * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement (usually an INSERT).
+    * Return the last ID generated for a SERIAL column by a SQL statement. The value is not reset between queries (see the
+    * db README).
     *
-    * This function returnes the most recently generated ID. It's value is not reset between queries.
+    * @return int - last generated ID or 0 (zero) if no ID was generated yet in the current session
+    *               -1 if the PostgreSQL version doesn't support this functionality
     *
-    * @return int - generated ID or 0 (zero) if no previous statement generated yet an ID;
-    *               -1 if the PostgreSQL server version doesn't support this functionality
+    * @link   http://github.com/rosasurfer/ministruts/tree/master/src/db
     */
    public function lastInsertId() {
+      return '?';
       return $this->query("select lastval()")->fetchAsInt();
+      return (int) $this->lastInsertId;
       /*
       PHP Warning: pg_query(): Query failed: ERROR:  lastval is not yet defined in this session
        SQL: "select lastval()"
@@ -409,6 +419,62 @@ class PostgresConnector extends Connector {
 
 
    /**
+    * Return the number of rows affected by the last INSERT, UPDATE or DELETE statement. For UPDATE and DELETE statements
+    * this is the number of matched rows. The value is not reset between queries (see the db README).
+    *
+    * @return int - last number of affected rows or 0 (zero) if no rows were affected yet in the current session
+    *
+    * @link   http://github.com/rosasurfer/ministruts/tree/master/src/db
+    */
+   public function lastAffectedRows() {
+      return (int) $this->lastAffectedRows;
+   }
+
+
+   /**
+    * Return the version of the DBMS the connector is used for.
+    *
+    * @return string - e.g. "9.1.23"
+    */
+   public function getVersion() {
+      static $version;
+      if (is_null($version)) {
+         if (!$this->isConnected())
+            $this->connect();
+         $version = pg_version($this->hConnection)['server'];
+      }
+      return $version;
+      /*
+      array(
+         [client]                      => "9.4.1"     (string)
+         [protocol]                    => 3           (int)
+         [server]                      => "9.1.23"    (string)
+         [server_encoding]             => "UTF8"      (string)
+         [client_encoding]             => "UTF8"      (string)
+         [is_superuser]                => "off"       (string)
+         [session_authorization]       => "zalker"    (string)
+         [DateStyle]                   => "ISO, MDY"  (string)
+         [IntervalStyle]               => "postgres"  (string)
+         [TimeZone]                    => "localtime" (string)
+         [integer_datetimes]           => "on"        (string)
+         [standard_conforming_strings] => "on"        (string)
+         [application_name]            => ""          (string)
+      )
+      */
+   }
+
+
+   /**
+    * Return the version ID of the DBMS the connector is used for as an integer.
+    *
+    * @return int - e.g. 9001023 for version string "9.1.23-rc"
+    */
+   public function getVersionId() {
+      throw new UnimplementedFeatureException();
+   }
+
+
+   /**
     * Return the connector's internal connection object.
     *
     * @return resource - the internal connection handle
@@ -416,6 +482,6 @@ class PostgresConnector extends Connector {
    public function getInternalHandler() {
       if (!$this->isConnected())
          $this->connect();
-      return $this->connection;
+      return $this->hConnection;
    }
 }

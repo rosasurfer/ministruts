@@ -14,9 +14,36 @@ use const rosasurfer\ARRAY_NUM;
 
 /**
  * Represents the result of an executed SQL statement. Depending on the statement type the result may or may not contain
- * a result set.
+ * returned rows.
  */
 class PostgresResult extends Result {
+
+
+   // For documentation: status codes returned by pg_result_status(PGSQL_STATUS_LONG)
+
+   /** @var int - The string sent to the server was empty. */
+   const STATUS_EMPTY_QUERY    = \PGSQL_EMPTY_QUERY;
+
+   /** @var int - Successful completion of a command returning no rows. */
+   const STATUS_COMMAND_OK     = \PGSQL_COMMAND_OK;
+
+   /** @var int - Successful completion of a command returning rows. */
+   const STATUS_TUPLES_OK      = \PGSQL_TUPLES_OK;
+
+   /** @var int - Copy Out (from server) data transfer started. */
+   const STATUS_COPY_OUT       = \PGSQL_COPY_OUT;
+
+   /** @var int - Copy In (to server) data transfer started. */
+   const STATUS_COPY_IN        = \PGSQL_COPY_IN;
+
+   /** @var int - The server's response was not understood. */
+   const STATUS_BAD_RESPONSE   = \PGSQL_BAD_RESPONSE;
+
+   /** @var int - A nonfatal error (a notice or warning) occurred. */
+   const STATUS_NONFATAL_ERROR = \PGSQL_NONFATAL_ERROR;
+
+   /** @var int - A fatal error occurred. */
+   const STATUS_FATAL_ERROR    = \PGSQL_FATAL_ERROR;
 
 
    /** @var IConnector - used database connector */
@@ -26,10 +53,10 @@ class PostgresResult extends Result {
    protected $sql;
 
    /** @var resource - the underlying driver's original result resource */
-   protected $result;
+   protected $hResult;
 
-   /** @var int - number of rows modified by the statement */
-   protected $affectedRows;
+   /** @var int - last number of affected rows (not reset between queries) */
+   protected $lastAffectedRows = 0;
 
    /** @var int - number of rows in the result set (if any) */
    protected $numRows;
@@ -40,20 +67,20 @@ class PostgresResult extends Result {
     *
     * Create a new PostgresResult instance. Called only when execution of a SQL statement returned successful.
     *
-    * @param  IConnector $connector    - Connector managing the database connection
-    * @param  string     $sql          - executed SQL statement
-    * @param  resource   $result       - A result resource or NULL for result-less SQL statements. SELECT queries not
-    *                                    matching any rows produce an empty result resource.
-    * @param  int        $affectedRows - number of rows modified by the statement
+    * @param  IConnector $connector        - Connector managing the database connection
+    * @param  string     $sql              - executed SQL statement
+    * @param  resource   $hResult          - result handle
+    * @param  int        $lastAffectedRows - last number of affected rows of the connection
     */
-   public function __construct(IConnector $connector, $sql, $result, $affectedRows) {
-      if (!is_string($sql))                           throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
-      if (!is_resource($result) && !is_null($result)) throw new IllegalTypeException('Illegal type of parameter $result: '.getType($result));
+   public function __construct(IConnector $connector, $sql, $hResult, $lastAffectedRows) {
+      if (!is_string($sql))           throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
+      if (!is_resource($hResult))     throw new IllegalTypeException('Illegal type of parameter $hResult: '.getType($hResult));
+      if (!is_int($lastAffectedRows)) throw new IllegalTypeException('Illegal type of parameter $lastAffectedRows: '.getType($lastAffectedRows));
 
-      $this->connector    = $connector;
-      $this->sql          = $sql;
-      $this->result       = $result;
-      $this->affectedRows = $affectedRows;
+      $this->connector        = $connector;
+      $this->sql              = $sql;
+      $this->hResult          = $hResult;
+      $this->lastAffectedRows = $lastAffectedRows;
    }
 
 
@@ -64,9 +91,10 @@ class PostgresResult extends Result {
     */
    public function __destruct() {
       try {
-         if ($this->result) {
-            pg_free_result($this->result);
-            $this->result = null;
+         if ($this->hResult) {
+            $tmp = $this->hResult;
+            $this->hResult = null;
+            pg_free_result($tmp);
          }
       }
       catch (\Exception $ex) {
@@ -84,7 +112,7 @@ class PostgresResult extends Result {
     * @return array - array of columns or NULL if no more rows are available
     */
    public function fetchNext($mode=ARRAY_BOTH) {
-      if (!$this->result)
+      if (!$this->hResult)
          return null;
 
       switch ($mode) {
@@ -92,18 +120,35 @@ class PostgresResult extends Result {
          case ARRAY_NUM:   $mode = PGSQL_NUM;   break;
          default:          $mode = PGSQL_BOTH;
       }
-      return pg_fetch_array($this->result, null, $mode) ?: null;
+      return pg_fetch_array($this->hResult, null, $mode) ?: null;
    }
 
 
    /**
-    * Return the number of rows affected if the SQL was an INSERT/UPDATE/DELETE statement. Unreliable for specific UPDATE
-    * statements (matched but unmodified rows are reported as changed) and for multiple statement queries.
+    * Return the last ID generated for a SERIAL column by a SQL statement. The value is not reset between queries
+    * (see the db README).
     *
-    * @return int
+    * @return int - last generated ID or 0 (zero) if no ID was generated yet in the current session;
+    *               -1 if the PostgreSQL server version doesn't support this functionality
+    *
+    * @link   http://github.com/rosasurfer/ministruts/tree/master/src/db
     */
-   public function affectedRows() {
-      return (int) $this->affectedRows;
+   public function lastInsertId() {
+      return $this->connector->lastInsertId();
+   }
+
+
+   /**
+    * Return the number of rows affected by the last INSERT, UPDATE or DELETE statement up to creation time of this instance.
+    * For UPDATE and DELETE statements this is the number of matched rows. The value is not reset between queries
+    * (see the db README).
+    *
+    * @return int - last number of affected rows or 0 (zero) if no rows were affected yet in the current session
+    *
+    * @link   http://github.com/rosasurfer/ministruts/tree/master/src/db
+    */
+   public function lastAffectedRows() {
+      return (int) $this->lastAffectedRows;
    }
 
 
@@ -114,23 +159,10 @@ class PostgresResult extends Result {
     */
    public function numRows() {
       if ($this->numRows === null) {
-         if ($this->result) $this->numRows = pg_num_rows($this->result);
-         else               $this->numRows = 0;
+         if ($this->hResult) $this->numRows = pg_num_rows($this->hResult);
+         else                $this->numRows = 0;
       }
       return $this->numRows;
-   }
-
-
-   /**
-    * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement (usually an INSERT).
-    *
-    * This function returnes the most recently generated ID. It's value is not reset between queries.
-    *
-    * @return int - generated ID or 0 (zero) if no previous statement generated yet an ID;
-    *               -1 if the PostgreSQL server version doesn't support this functionality
-    */
-   public function lastInsertId() {
-      return $this->connector->lastInsertId();
    }
 
 
@@ -140,6 +172,30 @@ class PostgresResult extends Result {
     * @return resource
     */
    public function getInternalResult() {
-      return $this->result;
+      return $this->hResult;
+   }
+
+
+   /**
+    * Return a readable version of a result status code.
+    *
+    * @param  int $status - status code as returned by pg_result_status(PGSQL_STATUS_LONG)
+    *
+    * @return string
+    */
+   public static function statusToStr($status) {
+      if (!is_int($status)) throw new IllegalTypeException('Illegal type of parameter $status: '.getType($status));
+
+      switch ($status) {
+         case PGSQL_EMPTY_QUERY   : return 'PGSQL_EMPTY_QUERY';
+         case PGSQL_COMMAND_OK    : return 'PGSQL_COMMAND_OK';
+         case PGSQL_TUPLES_OK     : return 'PGSQL_TUPLES_OK';
+         case PGSQL_COPY_OUT      : return 'PGSQL_COPY_OUT';
+         case PGSQL_COPY_IN       : return 'PGSQL_COPY_IN';
+         case PGSQL_BAD_RESPONSE  : return 'PGSQL_BAD_RESPONSE';
+         case PGSQL_NONFATAL_ERROR: return 'PGSQL_NONFATAL_ERROR';
+         case PGSQL_FATAL_ERROR   : return 'PGSQL_FATAL_ERROR';
+      }
+      return (string) $status;
    }
 }

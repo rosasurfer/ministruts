@@ -202,15 +202,14 @@ class SQLiteConnector extends Connector {
    /**
     * Execute a SQL statement and return the internal driver's raw response.
     *
-    * @param  _IN_  string $sql          - SQL statement
-    * @param  _OUT_ int   &$affectedRows - A variable receiving the number of affected rows. Unreliable for specific UPDATE
-    *                                      statements (matched but unmodified rows are reported as changed) and for multiple
-    *                                      statement queries.
+    * @param  _IN_  string $sql              - SQL statement
+    * @param  _OUT_ int   &$lastAffectedRows - variable receiving the last number of affected rows
+    *
     * @return \SQLite3Result
     *
     * @throws DatabaseException in case of failure
     */
-   public function executeRaw($sql, &$affectedRows=0) {
+   public function executeRaw($sql, &$lastAffectedRows=0) {
       if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
       if (!$this->isConnected())
          $this->connect();
@@ -231,7 +230,7 @@ class SQLiteConnector extends Connector {
       $this->lastInsertId = $this->handler->lastInsertRowID();
 
       // track last_affected_rows
-      $this->lastAffectedRows = $affectedRows = $this->handler->changes();
+      $this->lastAffectedRows = $lastAffectedRows = $this->handler->changes();
 
       return $result;
    }
@@ -360,7 +359,7 @@ class SQLiteConnector extends Connector {
 
 
    /**
-    * Return the number of rows affected by the last INSERT, UPDATE or DELETE statement. For UPDATE or DELETE statements
+    * Return the number of rows affected by the last INSERT, UPDATE or DELETE statement. For UPDATE and DELETE statements
     * this is the number of matched rows. The value is not reset between queries (see the db README).
     *
     * @return int - last number of affected rows or 0 (zero) if no rows were affected yet in the current session

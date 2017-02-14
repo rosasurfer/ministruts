@@ -292,8 +292,7 @@ class MySQLConnector extends Connector {
     *
     * @param  string $sql - SQL statement
     *
-    * @return int - Number of rows affected by the statement. Unreliable for specific UPDATE statements. Matched but
-    *               unmodified rows are reported as changed if the connection flag CLIENT_FOUND_ROWS is set.
+    * @return int - Number of rows affected by the statement.
     *
     * @throws DatabaseException in case of failure
     */
@@ -313,23 +312,20 @@ class MySQLConnector extends Connector {
    /**
     * Execute a SQL statement and return the internal driver's raw response.
     *
-    * @param  _IN_  string $sql          - SQL statement
-    * @param  _OUT_ int   &$affectedRows - A variable receiving the number of affected rows. Matched but unmodified rows are
-    *                                      reported as changed if the connection flag CLIENT_FOUND_ROWS is set.
+    * @param  _IN_  string $sql              - SQL statement
+    * @param  _OUT_ int   &$lastAffectedRows - variable receiving the last number of affected rows
     *
     * @return resource|bool - a result resource or a boolean (depending on the statement type)
     *
     * @throws DatabaseException in case of failure
     */
-   public function executeRaw($sql, &$affectedRows=0) {
+   public function executeRaw($sql, &$lastAffectedRows=0) {
       if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
       if (!$this->isConnected())
          $this->connect();
 
-      $result       = null;
-      $affectedRows = 0;
-
       // execute statement
+      $result = null;
       try {
          $result = mysql_query($sql, $this->hConnection);
          $result || trigger_error('SQL-Error '.mysql_errno($this->hConnection).': '.mysql_error($this->hConnection), E_USER_ERROR);
@@ -340,7 +336,7 @@ class MySQLConnector extends Connector {
 
       // track last_insert_id
       $id = mysql_insert_id($this->hConnection);
-      $id && $this->lastInsertId = $id + mysql_affected_rows($this->hConnection) - 1;
+      if ($id) $this->lastInsertId = $id + ($affected=mysql_affected_rows($this->hConnection)) - 1;
 
       // track last_affected_rows
       if (!is_resource($result)) {           // a row returning statement never modifies rows
@@ -348,9 +344,12 @@ class MySQLConnector extends Connector {
          if ($version < '5.5.5') $pattern = '/^\s*(INSERT|UPDATE|DELETE)\b/i';
          else                    $pattern = '/^\s*(INSERT|UPDATE|DELETE|ALTER\s+TABLE|LOAD\s+DATA\s+INFILE)\b/i';
          if (preg_match($pattern, $sql)) {
-            $this->lastAffectedRows = $affectedRows = mysql_affected_rows($this->hConnection);
+            if (!$id) $affected = mysql_affected_rows($this->hConnection);
+            $this->lastAffectedRows = $affected;
          }
       }
+      $lastAffectedRows = $this->lastAffectedRows;
+
       return $result;
    }
    /*
@@ -466,8 +465,8 @@ class MySQLConnector extends Connector {
 
 
    /**
-    * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement. The value is not reset between queries.
-    * (see the db README)
+    * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement. The value is not reset between queries
+    * (see the db README).
     *
     * @return int - last generated ID or 0 (zero) if no ID was generated yet in the current session
     *
@@ -483,7 +482,7 @@ class MySQLConnector extends Connector {
     * includes rows affected by ALTER TABLE and LOAD DATA INFILE statements. The value is not reset between queries (see the
     * db README).
     *
-    * @return int - last number of affected rows or 0 (zero) if no rows were modified yet in the current session
+    * @return int - last number of affected rows or 0 (zero) if no rows were affected yet in the current session
     *
     * @link   http://github.com/rosasurfer/ministruts/tree/master/src/db
     * @link   http://dev.mysql.com/doc/refman/5.5/en/information-functions.html#function_row-count
