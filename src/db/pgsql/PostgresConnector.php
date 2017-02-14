@@ -8,6 +8,8 @@ use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\exception\RuntimeException;
 
 use function rosasurfer\strContains;
+use function rosasurfer\strContainsI;
+use function rosasurfer\strStartsWithI;
 
 
 /**
@@ -32,7 +34,7 @@ class PostgresConnector extends Connector {
    protected $transactionLevel = 0;
 
    /** @var int - the last inserted row id (not reset between queries) */
-   protected $lastInsertId = 0;
+   protected $lastInsertId = null;        // distinguish between "not yet set" and "zero"
 
    /** @var int - the last number of affected rows (not reset between queries) */
    protected $lastAffectedRows = 0;
@@ -227,35 +229,63 @@ class PostgresConnector extends Connector {
       catch (IRosasurferException $ex) {
          throw $ex->addMessage('SQL: "'.$sql.'"');
       }
+      $status_string = pg_result_status($result, PGSQL_STATUS_STRING);
 
-      // track last_insert_id only on request as it requires an extra SQL query
+      // reset last_insert_id on INSERTs, afterwards it's resolved on request as it requires an extra SQL query
+      if (strStartsWithI($status_string, 'INSERT '))
+         $this->lastInsertId = null;
 
       // track last_affected_rows
       $pattern = '/^(INSERT|UPDATE|DELETE)\b/i';
-      if (preg_match($pattern, pg_result_status($result, PGSQL_STATUS_STRING)))
+      if (preg_match($pattern, $status_string))
          $this->lastAffectedRows = pg_affected_rows($result);
       $lastAffectedRows = $this->lastAffectedRows;
 
       return $result;
       /*
-      drop:      lastval=?  lastInsertID=?  affected_rows=0  lastAffectedRows=0  num_rows=0  status_long=PGSQL_COMMAND_OK  status_string=DROP TABLE
-      create:    lastval=?  lastInsertID=?  affected_rows=0  lastAffectedRows=0  num_rows=0  status_long=PGSQL_COMMAND_OK  status_string=CREATE TABLE
-      insert:    lastval=?  lastInsertID=?  affected_rows=4  lastAffectedRows=4  num_rows=0  status_long=PGSQL_COMMAND_OK  status_string=INSERT 0 4
-      explain:   lastval=?  lastInsertID=?  affected_rows=0  lastAffectedRows=4  num_rows=2  status_long=PGSQL_TUPLES_OK   status_string=EXPLAIN
-      update:    lastval=?  lastInsertID=?  affected_rows=1  lastAffectedRows=1  num_rows=0  status_long=PGSQL_COMMAND_OK  status_string=UPDATE 1
-      select:    lastval=?  lastInsertID=?  affected_rows=2  lastAffectedRows=1  num_rows=2  status_long=PGSQL_TUPLES_OK   status_string=SELECT 2
-      select:    lastval=?  lastInsertID=?  affected_rows=1  lastAffectedRows=1  num_rows=1  status_long=PGSQL_TUPLES_OK   status_string=SELECT 1
-      update:    lastval=?  lastInsertID=?  affected_rows=1  lastAffectedRows=1  num_rows=0  status_long=PGSQL_COMMAND_OK  status_string=UPDATE 1
-      select:    lastval=?  lastInsertID=?  affected_rows=0  lastAffectedRows=1  num_rows=0  status_long=PGSQL_TUPLES_OK   status_string=SELECT 0
-      select:    lastval=?  lastInsertID=?  affected_rows=1  lastAffectedRows=1  num_rows=1  status_long=PGSQL_TUPLES_OK   status_string=SELECT 1
-      delete:    lastval=?  lastInsertID=?  affected_rows=2  lastAffectedRows=2  num_rows=0  status_long=PGSQL_COMMAND_OK  status_string=DELETE 2
-      select:    lastval=?  lastInsertID=?  affected_rows=1  lastAffectedRows=2  num_rows=1  status_long=PGSQL_TUPLES_OK   status_string=SELECT 1
-      insert:    lastval=?  lastInsertID=?  affected_rows=2  lastAffectedRows=2  num_rows=2  status_long=PGSQL_TUPLES_OK   status_string=INSERT 0 2
-      insert:    lastval=?  lastInsertID=?  affected_rows=1  lastAffectedRows=1  num_rows=0  status_long=PGSQL_COMMAND_OK  status_string=INSERT 0 1
-      explain:   lastval=?  lastInsertID=?  affected_rows=0  lastAffectedRows=1  num_rows=2  status_long=PGSQL_TUPLES_OK   status_string=EXPLAIN
-      select:    lastval=?  lastInsertID=?  affected_rows=5  lastAffectedRows=1  num_rows=5  status_long=PGSQL_TUPLES_OK   status_string=SELECT 5
-      begin:     lastval=?  lastInsertID=?  affected_rows=0  lastAffectedRows=1  num_rows=0  status_long=PGSQL_COMMAND_OK  status_string=COMMIT
-      select:    lastval=?  lastInsertID=?  affected_rows=0  lastAffectedRows=1  num_rows=0  status_long=PGSQL_TUPLES_OK   status_string=SELECT 0
+      $db->query("drop table if exists t_test");
+      $db->query("create table t_test (id serial primary key, name varchar(100) not null)");
+      $db->query("insert into t_test (name) values ('a'), ('b'), ('c'), ('123')");
+      $db->query("explain select count(*) from t_test");
+      $db->query("update t_test set name='c' where name in ('c')");
+      $db->query("select * from t_test where name in ('a','b')");
+      $db->query("select * from t_test where name in ('a','b') limit 1");
+      $db->query("update t_test set name='aa' where name in ('c')");
+      $db->query("select * from t_test where name = 'no-one'");
+      $db->query("select count(*) from t_test");
+      $db->query("delete from t_test where name = 'a' or name = 'b'");
+      $db->query("select count(*) from t_test");
+      $db->query("insert into t_test (name) values ('y'), ('z') returning id");
+      $db->query("insert into t_test (name) values ('x')");
+      $db->query("explain select count(*) from t_test");
+      $db->query("select * from t_test");
+      $db->query("begin; select * from t_test; commit");
+      $db->query("select * from t_test where name = 'no-one'");
+
+      $result  = $db->query($sql);
+      $handler = $db->getInternalHandler();
+      $msg = str_pad(explode(' ', $sql, 2)[0].':', 9).'  lastInsertId=%s'.'  affected_rows='.pg_affected_rows($result->getInternalResult()).'  lastAffectedRows='.$db->lastAffectedRows().'  num_rows='.pg_num_rows($result->getInternalResult()).'  status_long='.str_pad(PostgresResult::statusToStr(pg_result_status($result->getInternalResult(), PGSQL_STATUS_LONG)), 16).'  status_string='.pg_result_status($result->getInternalResult(), PGSQL_STATUS_STRING);
+      $msg = sprintf($msg, $db->lastInsertId());
+      echoPre($msg);
+
+      drop:      lastInsertId=0  affected_rows=0  lastAffectedRows=0  num_rows=0  status_long=PGSQL_COMMAND_OK  status_string=DROP TABLE
+      create:    lastInsertId=0  affected_rows=0  lastAffectedRows=0  num_rows=0  status_long=PGSQL_COMMAND_OK  status_string=CREATE TABLE
+      insert:    lastInsertId=4  affected_rows=4  lastAffectedRows=4  num_rows=0  status_long=PGSQL_COMMAND_OK  status_string=INSERT 0 4
+      explain:   lastInsertId=4  affected_rows=0  lastAffectedRows=4  num_rows=2  status_long=PGSQL_TUPLES_OK   status_string=EXPLAIN
+      update:    lastInsertId=4  affected_rows=1  lastAffectedRows=1  num_rows=0  status_long=PGSQL_COMMAND_OK  status_string=UPDATE 1
+      select:    lastInsertId=4  affected_rows=2  lastAffectedRows=1  num_rows=2  status_long=PGSQL_TUPLES_OK   status_string=SELECT 2
+      select:    lastInsertId=4  affected_rows=1  lastAffectedRows=1  num_rows=1  status_long=PGSQL_TUPLES_OK   status_string=SELECT 1
+      update:    lastInsertId=4  affected_rows=1  lastAffectedRows=1  num_rows=0  status_long=PGSQL_COMMAND_OK  status_string=UPDATE 1
+      select:    lastInsertId=4  affected_rows=0  lastAffectedRows=1  num_rows=0  status_long=PGSQL_TUPLES_OK   status_string=SELECT 0
+      select:    lastInsertId=4  affected_rows=1  lastAffectedRows=1  num_rows=1  status_long=PGSQL_TUPLES_OK   status_string=SELECT 1
+      delete:    lastInsertId=4  affected_rows=2  lastAffectedRows=2  num_rows=0  status_long=PGSQL_COMMAND_OK  status_string=DELETE 2
+      select:    lastInsertId=4  affected_rows=1  lastAffectedRows=2  num_rows=1  status_long=PGSQL_TUPLES_OK   status_string=SELECT 1
+      insert:    lastInsertId=6  affected_rows=2  lastAffectedRows=2  num_rows=2  status_long=PGSQL_TUPLES_OK   status_string=INSERT 0 2
+      insert:    lastInsertId=7  affected_rows=1  lastAffectedRows=1  num_rows=0  status_long=PGSQL_COMMAND_OK  status_string=INSERT 0 1
+      explain:   lastInsertId=7  affected_rows=0  lastAffectedRows=1  num_rows=2  status_long=PGSQL_TUPLES_OK   status_string=EXPLAIN
+      select:    lastInsertId=7  affected_rows=5  lastAffectedRows=1  num_rows=5  status_long=PGSQL_TUPLES_OK   status_string=SELECT 5
+      begin:     lastInsertId=7  affected_rows=0  lastAffectedRows=1  num_rows=0  status_long=PGSQL_COMMAND_OK  status_string=COMMIT
+      select:    lastInsertId=7  affected_rows=0  lastAffectedRows=1  num_rows=0  status_long=PGSQL_TUPLES_OK   status_string=SELECT 0
       */
 
       // TODO: All queries must be sent via pg_send_query()/pg_get_result(). All errors must be analyzed per result
@@ -399,15 +429,25 @@ class PostgresConnector extends Connector {
     * @link   http://github.com/rosasurfer/ministruts/tree/master/src/db
     */
    public function lastInsertId() {
-      return '?';
-      return $this->query("select lastval()")->fetchAsInt();
+      if ($this->lastInsertId === null) {
+         $version = $this->getVersion();
+         if ($version < '8.1') {
+            $this->lastInsertId = -1;
+         }
+         else {
+            try {
+               $this->lastInsertId = $this->query("select lastVal()")->fetchAsInt();
+            }
+            catch (\Exception $ex) {
+               if (!strContainsI($ex->getMessage(), 'ERROR:  lastval is not yet defined in this session'))
+                  throw $ex;
+               $this->lastInsertId = 0;
+            }
+         }
+      }
       return (int) $this->lastInsertId;
       /*
-      PHP Warning: pg_query(): Query failed: ERROR:  lastval is not yet defined in this session
-       SQL: "select lastval()"
-
       @see  https://www.postgresql.org/docs/9.6/static/functions-sequence.html
-
       @see  http://stackoverflow.com/questions/6485778/php-postgres-get-last-insert-id/6488840
       @see  http://stackoverflow.com/questions/22530585/how-to-turn-off-multiple-statements-in-postgres
       @see  http://php.net/manual/en/function.pg-query-params.php
