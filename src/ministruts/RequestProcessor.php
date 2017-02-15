@@ -201,14 +201,33 @@ class RequestProcessor extends Object {
     */
    protected function processMapping(Request $request, Response $response) {
       // Pfad für die Mappingauswahl ermitteln ...
-      $requestPath  = $request->getPath();
-      $baseUri      = $request->getApplicationBaseUri();
-      $modulePrefix = $this->module->getPrefix();
+      $requestPath = '/'.trim(preg_replace('|/{2,}|', '/', $request->getPath()), '/').'/';   // normalize request path
+      if ($requestPath=='//') $requestPath = '/';
+      // /
+      // /controller/action/
+      // /module/
+      // /module/controller/action/
 
-      $path = strRightFrom($requestPath, $baseUri.$modulePrefix);
-      !strStartsWith($path, '/') && $path='/'.$path;
+      $appBaseUri = trim($request->getApplicationBaseUri(), '/');
+      // ""
+      // app
 
-      self::$logDebug && Logger::log('Path used for mapping selection: '.$path, L_DEBUG);
+      $modulePrefix = trim($this->module->getPrefix(), '/');
+      // ""
+      // module
+
+      $modulePath = '/'.trim($appBaseUri.'/'.$modulePrefix, '/').'/';
+      if ($modulePath=='//') $modulePath = '/';
+      // /
+      // /app/
+      // /module/
+      // /app/module/
+
+      $path = '/'.strRightFrom($requestPath, $modulePath);
+      // /
+      // /controller/action/
+
+      self::$logDebug && Logger::log('Path used for mapping selection: "'.$path.'"', L_DEBUG);
 
       // Mapping suchen und im Request speichern
       if (($mapping=$this->module->findMapping($path)) || ($mapping=$this->module->getDefaultMapping())) {
@@ -231,16 +250,14 @@ class RequestProcessor extends Object {
          // ...andererseits einfache Fehlermeldung ausgeben
          echo <<<PROCESS_MAPPING_ERROR_SC_404
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
-<html>
-<head>
+<html><head>
 <title>404 Not Found</title>
-</head>
-<body>
+</head><body>
 <h1>Not Found</h1>
 <p>The requested URL was not found on this server.</p>
 <hr>
-</body>
-</html>
+<address>...lamented the MiniStruts.</address>
+</body></html>
 PROCESS_MAPPING_ERROR_SC_404;
       }
       return null;
@@ -278,16 +295,14 @@ PROCESS_MAPPING_ERROR_SC_404;
          // ...andererseits einfache Fehlermeldung ausgeben
          echo <<<PROCESS_METHOD_ERROR_SC_405
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
-<html>
-<head>
+<html><head>
 <title>405 Method Not Allowed</title>
-</head>
-<body>
+</head><body>
 <h1>Method Not Allowed</h1>
 <p>The used HTTP method is not allowed for the requested URL.</p>
 <hr>
-</body>
-</html>
+<address>...lamented the MiniStruts.</address>
+</body></html>
 PROCESS_METHOD_ERROR_SC_405;
       }
       return false;

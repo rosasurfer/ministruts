@@ -14,6 +14,7 @@ use rosasurfer\log\Logger;
 
 use function rosasurfer\is_class;
 use function rosasurfer\strEndsWithI;
+use function rosasurfer\strLeftTo;
 
 use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_INFO;
@@ -216,7 +217,7 @@ class Module extends Object {
       foreach ($directories as $directory) {
          $dir = str_replace('\\', '/', trim($directory));
 
-         if ($dir{0} == '/') $dir = realPath($dir);
+         if ($dir[0] == '/') $dir = realPath($dir);
          else                $dir = realPath(APPLICATION_ROOT.'/'.$dir);
 
          if (!is_dir($dir)) throw new FileNotFoundException('Directory not found: "'.$directory.'"');
@@ -285,7 +286,7 @@ class Module extends Object {
    protected function processMappings(\SimpleXMLElement $xml) {
       $elements = $xml->xPath('/struts-config/action-mappings/mapping');
       if ($elements === false)
-         $elements = array(); // xPath() gibt entgegen der Dokumentation *NICHT* immer ein Array zurück
+         $elements = [];      // xPath() gibt entgegen der Dokumentation *NICHT* immer ein Array zurück
 
       foreach ($elements as $tag) {
          $mapping = new $this->mappingClass($this);
@@ -293,7 +294,6 @@ class Module extends Object {
          // attributes
          // ----------
          // process path attribute
-         // TODO: die konfigurierten Pfade werden nicht auf Eindeutigkeit geprüft, mehrfache Definitionen derselben URL abfangen
          $path = (string) $tag['path'];
          $mapping->setPath($path);
 
@@ -614,7 +614,11 @@ class Module extends Object {
          $this->defaultMapping = $mapping;
       }
 
-      $this->mappings[$mapping->getPath()] = $mapping;
+      $path = $mapping->getPath();
+      if (isSet($this->mappings[$path]))
+         throw new RuntimeException('All action mappings must have unique path attributes, non-unique path: "'.$path.'"');
+
+      $this->mappings[$path] = $mapping;
    }
 
 
@@ -637,17 +641,18 @@ class Module extends Object {
     * @return ActionMapping - Mapping oder NULL, wenn kein Mapping gefunden wurde
     */
    public function findMapping($path) {
-      // $path = "/"                                      oder
-      // $path = "/test/uploadAccountHistory.php/info"    oder
-      // $path = "/test/uploadAccountHistory.php/info/"
-      $segments = explode('/', $path);
-      array_shift($segments);
+      // $path: /
+      // $path: /action/
+      // $path: /controller/action/
+      // $path: /controller/action/parameter/
 
-      $test = '';
-      while ($segments) {
-         $test = $test.'/'.array_shift($segments);
-         if (isSet($this->mappings[$test]))
-            return $this->mappings[$test];
+      $pattern = $path;
+      while (strLen($pattern)) {                      // mappings start and end with a slash "/"
+         if (isSet($this->mappings[$pattern]))
+            return $this->mappings[$pattern];
+         $pattern = strLeftTo($pattern, '/', $count=-2, $includeLimiter=true);
+         if ($pattern == '/')
+            break;
       }
       return null;
    }
@@ -664,7 +669,7 @@ class Module extends Object {
 
 
    /**
-    * Verarbeite Controller-Einstellungen.
+    * Verarbeitet Controller-Einstellungen.
     *
     * @param  \SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
     */

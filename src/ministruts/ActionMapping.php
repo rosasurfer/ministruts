@@ -15,6 +15,7 @@ use function rosasurfer\is_class;
 use function rosasurfer\strStartsWith;
 
 use const rosasurfer\L_WARN;
+use function rosasurfer\strEndsWith;
 
 
 /**
@@ -89,6 +90,9 @@ class ActionMapping extends Object {
       if ($this->configured)          throw new IllegalStateException('Configuration is frozen');
       if (!is_string($path))          throw new IllegalTypeException('Illegal type of parameter $path: '.getType($path));
       if (!strStartsWith($path, '/')) throw new InvalidArgumentException('The "path" attribute of a mapping must begin with a slash "/", found "'.$path.'"');
+
+      if (!strEndsWith($path, '/'))       // mapping paths must start and end with a slash "/"
+         $path .= '/';
 
       $this->path = $path;
       return $this;
