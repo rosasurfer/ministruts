@@ -129,8 +129,8 @@ class StrutsController extends Singleton {
     * Process the current HTTP request.
     */
    public static function processRequest() {
-      $controller = self    ::me();
-      $request    = Request ::me();
+      $controller = self::me();
+      $request    = Request::me();
       $response   = Response::me();
 
       // select Module
