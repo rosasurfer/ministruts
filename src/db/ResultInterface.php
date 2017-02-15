@@ -112,7 +112,7 @@ interface ResultInterface {
 
 
    /**
-    * Return the number of rows in the result set.
+    * Return the number of rows returned by the query.
     *
     * @return int
     */
@@ -120,9 +120,9 @@ interface ResultInterface {
 
 
    /**
-    * Return the Result's internal result object.
+    * Return the result's internal result object.
     *
-    * @return resource|object - result handle or instance
+    * @return resource|object - result handle, handler or NULL for a result-less query
     */
    public function getInternalResult();
 

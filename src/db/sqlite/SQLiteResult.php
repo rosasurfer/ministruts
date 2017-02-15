@@ -5,7 +5,6 @@ use rosasurfer\db\ConnectorInterface as IConnector;
 use rosasurfer\db\Result;
 
 use rosasurfer\exception\IllegalTypeException;
-use rosasurfer\exception\UnimplementedFeatureException;
 
 use const rosasurfer\ARRAY_ASSOC;
 use const rosasurfer\ARRAY_BOTH;
@@ -34,8 +33,11 @@ class SQLiteResult extends Result {
    /** @var int - last number of affected rows (not reset between queries) */
    protected $lastAffectedRows = 0;
 
-   /** @var int - number of rows in the result set (if any) */
-   protected $numRows;
+   /** @var int - number of rows returned by the query */
+   protected $numRows = null;          // NULL to distinguish between an unset and a zero value
+
+   /** @var int - index of the next row to be fetched; NULL if we stepped over the edge */
+   protected $nextRowPointer = 0;
 
 
    /**
@@ -61,7 +63,12 @@ class SQLiteResult extends Result {
 
       if (!$result->numColumns()) {       // close empty results and release them to prevent access
          $result->finalize();             // @see bug in SQLite3Result::fetchArray()
-         $result = null;
+         $result               = null;
+         $this->nextRowPointer = null;
+         $this->numRows        = 0;
+      }
+      else {
+         $this->nextRowPointer = 0;
       }
       $this->result = $result;
    }
@@ -74,12 +81,14 @@ class SQLiteResult extends Result {
     *                     ARRAY_ASSOC, ARRAY_NUM, or ARRAY_BOTH (default).
     *
     * @return array - Array of columns or NULL if no more rows are available. The types of the values of the returned array
-    *                 are mapped from SQLite3 types as follows: integers are mapped to int if they fit into the range
-    *                 PHP_INT_MIN..PHP_INT_MAX, and to string otherwise. Floats are mapped to float, NULL values are mapped
-    *                 to null, and strings and blobs are mapped to string.
+    *                 are mapped from SQLite3 types as follows:
+    *                 - Integers are mapped to int if they fit into the range PHP_INT_MIN..PHP_INT_MAX, otherwise to string.
+    *                 - Floats are mapped to float.
+    *                 - NULL values are mapped to NULL.
+    *                 - Strings and blobs are mapped to string.
     */
    public function fetchNext($mode=ARRAY_BOTH) {
-      if (!$this->result)
+      if (!$this->result || $this->nextRowPointer===null)   // no automatic result reset()
          return null;
 
       switch ($mode) {
@@ -87,7 +96,19 @@ class SQLiteResult extends Result {
          case ARRAY_NUM:   $mode = SQLITE3_NUM;   break;
          default:          $mode = SQLITE3_BOTH;
       }
-      return $this->result->fetchArray($mode) ?: null;
+
+      $row = $this->result->fetchArray($mode);
+      if ($row) {
+         $this->nextRowPointer++;
+      }
+      else {
+         if ($this->numRows === null) {                     // update $numRows on-the-fly if not yet happened
+            $this->numRows = $this->nextRowPointer;
+         }
+         $row                  = null;                      // prevent fetchArray() to trigger an automatic reset()
+         $this->nextRowPointer = null;                      // on second $row == null
+      }
+      return $row;
    }
 
 
@@ -119,27 +140,44 @@ class SQLiteResult extends Result {
 
 
    /**
-    * Return the number of rows in the result set.
+    * Return the number of rows returned by the query.
     *
     * @return int
     */
    public function numRows() {
-      throw new UnimplementedFeatureException();
-
       if ($this->numRows === null) {
-         if ($this->result) $this->numRows = mysql_num_rows($this->result);
-         else               $this->numRows = 0;
+         // No support for num_rows() in SQLite3, we need to count rows manually.
+         //
+         // TODO: All we need to do is to use fetchNext() to step over the edge and go back.
+         //       It updates $numRows automatically.
+
+         $result  = $this->result;
+         $pointer = $this->nextRowPointer;
+         $rows    = 0;
+
+         while ($result->fetchArray(SQLITE3_ASSOC)) { // step from the current position to the end
+            ++$rows;
+            ++$this->nextRowPointer;
+         }
+                                                      // !$nextRowPointer = no rows at all should never happen here
+         $result->reset();
+         $this->nextRowPointer = 0;                   // step back to start
+
+         while ($pointer--) {                         // step back to the former "current" position
+            $result->fetchArray(SQLITE3_ASSOC);
+            ++$rows;
+            ++$this->nextRowPointer;
+         }
+         $this->numRows = $rows;
       }
       return $this->numRows;
    }
 
 
-
-
    /**
-    * Return the Result's internal result object.
+    * Return the result's internal result object.
     *
-    * @return \SQLite3Result - instance or NULL for result-less queries
+    * @return \SQLite3Result - result handler or NULL for result-less queries
     */
    public function getInternalResult() {
       return $this->result;
@@ -152,7 +190,8 @@ class SQLiteResult extends Result {
    public function release() {
       if ($this->result) {
          $tmp = $this->result;
-         $this->result = null;
+         $this->result         = null;
+         $this->nextRowPointer = null;
          $tmp->finalize();
       }
    }

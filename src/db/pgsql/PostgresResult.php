@@ -57,8 +57,8 @@ class PostgresResult extends Result {
    /** @var int - last number of affected rows (not reset between queries) */
    protected $lastAffectedRows = 0;
 
-   /** @var int - number of rows in the result set (if any) */
-   protected $numRows;
+   /** @var int - number of rows returned by the query */
+   protected $numRows = null;          // NULL to distinguish between an unset and a zero value
 
 
    /**
@@ -133,7 +133,7 @@ class PostgresResult extends Result {
 
 
    /**
-    * Return the number of rows in the result set.
+    * Return the number of rows returned by the query.
     *
     * @return int
     */
@@ -147,9 +147,9 @@ class PostgresResult extends Result {
 
 
    /**
-    * Get the underlying driver's original result object.
+    * Return the result's internal result object.
     *
-    * @return resource
+    * @return resource - result handle
     */
    public function getInternalResult() {
       return $this->hResult;

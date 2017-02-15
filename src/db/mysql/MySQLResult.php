@@ -34,8 +34,8 @@ class MySQLResult extends Result {
    /** @var int - last number of affected rows (not reset between queries) */
    protected $lastAffectedRows = 0;
 
-   /** @var int - number of rows in the result set (if any) */
-   protected $numRows = 0;
+   /** @var int - number of rows returned by the query */
+   protected $numRows = null;          // NULL to distinguish between an unset and a zero value
 
 
    /**
@@ -119,7 +119,7 @@ class MySQLResult extends Result {
 
 
    /**
-    * Return the number of rows in the result set.
+    * Return the number of rows returned by the query.
     *
     * @return int
     */
@@ -151,9 +151,9 @@ class MySQLResult extends Result {
 
 
    /**
-    * Return the Result's internal result object.
+    * Return the result's internal result object.
     *
-    * @return resource - result handle or NULL for result-less queries
+    * @return resource - result handle or NULL for a result-less query
     */
    public function getInternalResult() {
       return $this->hResult;
