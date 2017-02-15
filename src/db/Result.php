@@ -37,23 +37,24 @@ abstract class Result extends Object implements ResultInterface {
 
 
    /**
-    * Fetch a single field from the result set as a string.
+    * Fetch a single field from the result set.
     *
     * @param  string|int $column       - name or offset of the column to fetch from (default: 0)
     * @param  int        $row          - row to fetch from, starting at 0 (default: the next row)
     * @param  mixed      $onNull       - value to return if the cell value is NULL (default: NULL)
     * @param  mixed      $onNoMoreRows - value to return if no more rows are available
     *
-    * @return string - string value of a single cell or $onNull if the cell value is NULL
+    * @return mixed - value of a single cell (driver dependent type) or $onNull if the cell value is NULL
     *
     * @throws NoMoreRowsException if no more rows are available and parameter $onNoMoreRows was not set.
     */
    public function fetchField($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
       if (!is_null($row)) throw new UnimplementedFeatureException('$row='.$row.' (!= NULL)');
 
-      // Generic default implementation: A connector-specific implementation will be faster and more efficient.
+      // Generic default implementation:
+      // A connector-specific implementation will be faster and more efficient.
 
-      $row = $this->fetchNext(ARRAY_BOTH);            // returned field types depend on the DBMS
+      $row = $this->fetchNext(ARRAY_BOTH);            // field types depend on the DBMS/driver
 
       if (!$row) {
          if (func_num_args() < 4) throw new NoMoreRowsException();
@@ -70,8 +71,7 @@ abstract class Result extends Object implements ResultInterface {
 
             $row    = array_change_key_case($row, CASE_LOWER);
             $column = strToLower($column);
-            if (!array_key_exists($column, $row))
-               throw new InvalidArgumentException('Invalid $column: "'.$column.'" (no such column)');
+            if (!array_key_exists($column, $row)) throw new InvalidArgumentException('Invalid $column: "'.$column.'" (no such column)');
          }
          $value = $row[$column];
       }
@@ -79,6 +79,32 @@ abstract class Result extends Object implements ResultInterface {
       if (is_null($value))
          return $onNull;
       return $value;
+   }
+
+
+   /**
+    * Fetch a single field from the result set as a string value.
+    *
+    * @param  string|int $column       - name or offset of the column to fetch from (default: 0)
+    * @param  int        $row          - row to fetch from, starting at 0 (default: the next row)
+    * @param  mixed      $onNull       - value to return if the cell value is NULL (default: NULL)
+    * @param  mixed      $onNoMoreRows - value to return if no more rows are available
+    *
+    * @return string - string value of a single cell or $onNull if the cell value is NULL
+    *
+    * @throws NoMoreRowsException       if no more rows are available and parameter $onNoMoreRows was not set.
+    * @throws \UnexpectedValueException if the cell value is not NULL and does not represent a floating point value.
+    */
+   public function fetchAsString($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
+      if (func_num_args() < 4) $value = $this->fetchField($column, $row, null);
+      else                     $value = $this->fetchField($column, $row, null, $onNoMoreRows);
+
+      if (is_string($value)) return $value;
+      if (is_null($value))   return $onNull;
+
+      if (is_bool($value))
+         $value = (int) $value;
+      return (string) $value;
    }
 
 
@@ -98,17 +124,17 @@ abstract class Result extends Object implements ResultInterface {
     *                                   numerical representations.
     */
    public function fetchAsBool($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
-      if (func_num_args() < 4) $sValue = $this->fetchField($column, $row, null);
-      else                     $sValue = $this->fetchField($column, $row, null, $onNoMoreRows);
+      if (func_num_args() < 4) $value = $this->fetchField($column, $row, null);
+      else                     $value = $this->fetchField($column, $row, null, $onNoMoreRows);
 
-      if (is_null($sValue))
-         return $onNull;
+      if (is_bool($value)) return $value;
+      if (is_null($value)) return $onNull;
 
-      $bValue = strToBool($sValue);
+      $bValue = strToBool($value);
 
       if (is_null($bValue)) {
-         if (!strIsNumeric($sValue)) throw new \UnexpectedValueException('unexpected numerical value for a boolean: "'.$sValue.'"');
-         $bValue = (bool)(float) $sValue;       // skip leading zeros of numeric strings
+         if (!strIsNumeric($value)) throw new \UnexpectedValueException('unexpected numerical value for a boolean: "'.$value.'"');
+         $bValue = (bool)(float) $value;        // skip leading zeros of numeric strings
       }
       return $bValue;
    }
@@ -133,11 +159,8 @@ abstract class Result extends Object implements ResultInterface {
       if (func_num_args() < 4) $value = $this->fetchField($column, $row, null);
       else                     $value = $this->fetchField($column, $row, null, $onNoMoreRows);
 
-      if (is_null($value))
-         return $onNull;
-
-      if (is_int($value))
-         return $value;
+      if (is_int($value))  return $value;
+      if (is_null($value)) return $onNull;
 
       if (is_float($value)) {
          $iValue = (int) $value;
@@ -149,7 +172,6 @@ abstract class Result extends Object implements ResultInterface {
       if (strIsNumeric($value)) {
          $fValue = (float) $value;              // skip leading zeros of numeric strings
          $iValue = (int) $fValue;
-
          if ($iValue == $fValue)
             return $iValue;
       }
@@ -171,16 +193,14 @@ abstract class Result extends Object implements ResultInterface {
     * @throws \UnexpectedValueException if the cell value is not NULL and does not represent a floating point value.
     */
    public function fetchAsFloat($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
-      if (func_num_args() < 4) $sValue = $this->fetchField($column, $row, null);
-      else                     $sValue = $this->fetchField($column, $row, null, $onNoMoreRows);
+      if (func_num_args() < 4) $value = $this->fetchField($column, $row, null);
+      else                     $value = $this->fetchField($column, $row, null, $onNoMoreRows);
 
-      if (is_null($sValue))
-         return $onNull;
+      if (is_float($value)) return $value;
+      if (is_null($value))  return $onNull;
 
-      if (!strIsNumeric($sValue))
-         throw new \UnexpectedValueException('unexpected string value: "'.$sValue.'" (not a float)');
-
-      return (float) $sValue;                // skip leading zeros of numeric strings
+      if (!strIsNumeric($value)) throw new \UnexpectedValueException('unexpected string value: "'.$value.'" (not a float)');
+      return (float) $value;                 // skip leading zeros of numeric strings
    }
 
 

@@ -23,7 +23,22 @@ interface ResultInterface {
 
 
    /**
-    * Fetch a single field from the result set as a string.
+    * Fetch a single field from the result set.
+    *
+    * @param  string|int $column       - name or offset of the column to fetch from (default: 0)
+    * @param  int        $row          - row to fetch from, starting at 0 (default: the next row)
+    * @param  mixed      $onNull       - value to return if the cell value is NULL (default: NULL)
+    * @param  mixed      $onNoMoreRows - value to return if no more rows are available
+    *
+    * @return mixed - value of a single cell (driver dependent type) or $onNull if the cell value is NULL
+    *
+    * @throws NoMoreRowsException if no more rows are available and parameter $onNoMoreRows was not set.
+    */
+   public function fetchField($column=0, $row=null, $onNull=null, $onNoMoreRows=null);
+
+
+   /**
+    * Fetch a single field from the result set as a string value.
     *
     * @param  string|int $column       - name or offset of the column to fetch from (default: 0)
     * @param  int        $row          - row to fetch from, starting at 0 (default: the next row)
@@ -32,9 +47,10 @@ interface ResultInterface {
     *
     * @return string - string value of a single cell or $onNull if the cell value is NULL
     *
-    * @throws NoMoreRowsException if no more rows are available and parameter $onNoMoreRows was not set.
+    * @throws NoMoreRowsException       if no more rows are available and parameter $onNoMoreRows was not set.
+    * @throws \UnexpectedValueException if the cell value is not NULL and does not represent a floating point value.
     */
-   public function fetchField($column=0, $row=null, $onNull=null, $onNoMoreRows=null);
+   public function fetchAsString($column=0, $row=null, $onNull=null, $onNoMoreRows=null);
 
 
    /**
