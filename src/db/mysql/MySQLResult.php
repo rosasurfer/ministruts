@@ -109,7 +109,7 @@ class MySQLResult extends Result {
     * Since MySQL 5.5.5 this value also includes rows affected by ALTER TABLE and LOAD DATA INFILE statements. The value is
     * not reset between queries (see the db README).
     *
-    * @return int - last number of affected rows or 0 (zero) if no rows were modified yet in the current session;
+    * @return int - last number of affected rows or 0 (zero) if no rows were affected yet in the current session
     *
     * @link   http://github.com/rosasurfer/ministruts/tree/master/src/db
     */

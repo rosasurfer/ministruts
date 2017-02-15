@@ -103,7 +103,7 @@ interface ResultInterface {
    /**
     * Return the last number of rows affected by a row modifying statement (connector specific, see the db README).
     *
-    * @return int - last number of affected rows or 0 (zero) if no rows were modified yet in the current session;
+    * @return int - last number of affected rows or 0 (zero) if no rows were affected yet in the current session;
     *               -1 if the DBMS doesn't support this functionality
     *
     * @link   http://github.com/rosasurfer/ministruts/tree/master/src/db
