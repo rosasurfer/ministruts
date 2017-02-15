@@ -24,7 +24,7 @@ class SQLiteResult extends Result {
    /** @var string - SQL statement the result was generated from */
    protected $sql;
 
-   /** @var \SQLite3Result - the underlying driver's original result object */
+   /** @var \SQLite3Result - the database connector's original result object */
    protected $result;
 
    /** @var int - last inserted row id of the connection at instance creation time (not reset between queries) */
@@ -33,11 +33,11 @@ class SQLiteResult extends Result {
    /** @var int - last number of affected rows (not reset between queries) */
    protected $lastAffectedRows = 0;
 
-   /** @var int - number of rows returned by the query */
-   protected $numRows = null;          // NULL to distinguish between an unset and a zero value
+   /** @var int - number of rows returned by the statement (NULL to distinguish between an unset and a zero value) */
+   protected $numRows = null;
 
-   /** @var int - index of the next row to be fetched; NULL if we stepped over the edge */
-   protected $nextRowPointer = 0;
+   /** @var int - index of the row fetched by the next unqualified fetch* method call or -1 when hit the end */
+   protected $nextRowIndex = 0;
 
 
    /**
@@ -63,12 +63,12 @@ class SQLiteResult extends Result {
 
       if (!$result->numColumns()) {       // close empty results and release them to prevent access
          $result->finalize();             // @see bug in SQLite3Result::fetchArray()
-         $result               = null;
-         $this->nextRowPointer = null;
-         $this->numRows        = 0;
+         $result             = null;
+         $this->numRows      = 0;
+         $this->nextRowIndex = -1;
       }
       else {
-         $this->nextRowPointer = 0;
+         $this->nextRowIndex = 0;
       }
       $this->result = $result;
    }
@@ -88,7 +88,7 @@ class SQLiteResult extends Result {
     *                 - Strings and blobs are mapped to string.
     */
    public function fetchNext($mode=ARRAY_BOTH) {
-      if (!$this->result || $this->nextRowPointer===null)   // no automatic result reset()
+      if (!$this->result || $this->nextRowIndex < 0)        // no automatic result reset()
          return null;
 
       switch ($mode) {
@@ -99,14 +99,13 @@ class SQLiteResult extends Result {
 
       $row = $this->result->fetchArray($mode);
       if ($row) {
-         $this->nextRowPointer++;
+         $this->nextRowIndex++;
       }
       else {
-         if ($this->numRows === null) {                     // update $numRows on-the-fly if not yet happened
-            $this->numRows = $this->nextRowPointer;
-         }
-         $row                  = null;                      // prevent fetchArray() to trigger an automatic reset()
-         $this->nextRowPointer = null;                      // on second $row == null
+         if ($this->numRows === null)                       // update $numRows on-the-fly if not yet happened
+            $this->numRows = $this->nextRowIndex;
+         $row                = null;                        // prevent fetchArray() to trigger an automatic reset()
+         $this->nextRowIndex = -1;                          // on second $row == null
       }
       return $row;
    }
@@ -146,29 +145,18 @@ class SQLiteResult extends Result {
     */
    public function numRows() {
       if ($this->numRows === null) {
-         // No support for num_rows() in SQLite3, we need to count rows manually.
-         //
-         // TODO: All we need to do is to use fetchNext() to step over the edge and go back.
-         //       It updates $numRows automatically.
+         // no support for num_rows() in SQLite3, need to count manually
+         $previous = $this->nextRowIndex;
 
-         $result  = $this->result;
-         $pointer = $this->nextRowPointer;
-         $rows    = 0;
+         while ($this->fetchNext());                        // loop from current position to the end
 
-         while ($result->fetchArray(SQLITE3_ASSOC)) { // step from the current position to the end
-            ++$rows;
-            ++$this->nextRowPointer;
+         // we hit the end
+         if ($this->numRows) {
+            $this->result->reset();                         // back to start
+            $this->nextRowIndex = 0;
+            while ($previous--)                             // loop back to former position
+               $this->fetchNext();
          }
-                                                      // !$nextRowPointer = no rows at all should never happen here
-         $result->reset();
-         $this->nextRowPointer = 0;                   // step back to start
-
-         while ($pointer--) {                         // step back to the former "current" position
-            $result->fetchArray(SQLITE3_ASSOC);
-            ++$rows;
-            ++$this->nextRowPointer;
-         }
-         $this->numRows = $rows;
       }
       return $this->numRows;
    }
@@ -190,8 +178,8 @@ class SQLiteResult extends Result {
    public function release() {
       if ($this->result) {
          $tmp = $this->result;
-         $this->result         = null;
-         $this->nextRowPointer = null;
+         $this->result       = null;
+         $this->nextRowIndex = -1;
          $tmp->finalize();
       }
    }

@@ -185,6 +185,17 @@ abstract class Result extends Object implements ResultInterface {
 
 
    /**
+    * Return the index of the row beeing fetched by the next unqualified fetch* method call.
+    *
+    * @return int - row index (starting at 0) or -1 after reaching the end
+    */
+   public function nextRowIndex() {
+      return (int) $this->nextRowIndex;
+   }
+
+
+
+   /**
     *
     *
    public function countFoundItems() {

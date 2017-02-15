@@ -1,4 +1,13 @@
 
+2017-02-15
+
+   - methods db\*\(Connector|Result)::lastInsertId()
+   - methods db\*\(Connector|Result)::lastAffectedRows()
+   - methods db\*\Result::numRows()
+   - methods db\*\Result::nextRowIndex()
+   - methods db\*\Result::release()
+
+
 2017-02-10
 
    - methods db\IResult::fetchAsBool(), db\IResult::fetchAsInt(), db\IResult::fetchAsFloat() for any result set field

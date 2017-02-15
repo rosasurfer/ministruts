@@ -18,7 +18,7 @@ use const rosasurfer\ARRAY_NUM;
 class PostgresResult extends Result {
 
 
-   // For documentation: status codes returned by pg_result_status(PGSQL_STATUS_LONG)
+   // Status codes as returned by pg_result_status(PGSQL_STATUS_LONG)
 
    /** @var int - The string sent to the server was empty. */
    const STATUS_EMPTY_QUERY    = \PGSQL_EMPTY_QUERY;
@@ -51,14 +51,17 @@ class PostgresResult extends Result {
    /** @var string - SQL statement the result was generated from */
    protected $sql;
 
-   /** @var resource - the underlying driver's original result resource */
+   /** @var resource - the database connector's original result handle */
    protected $hResult;
 
    /** @var int - last number of affected rows (not reset between queries) */
    protected $lastAffectedRows = 0;
 
-   /** @var int - number of rows returned by the query */
-   protected $numRows = null;          // NULL to distinguish between an unset and a zero value
+   /** @var int - number of rows returned by the statement (NULL to distinguish between an unset and a zero value) */
+   protected $numRows = null;
+
+   /** @var int - index of the row fetched by the next unqualified fetch* method call or -1 when hit the end */
+   protected $nextRowIndex = 0;
 
 
    /**
@@ -78,8 +81,16 @@ class PostgresResult extends Result {
 
       $this->connector        = $connector;
       $this->sql              = $sql;
-      $this->hResult          = $hResult;
       $this->lastAffectedRows = $lastAffectedRows;
+
+      if (!pg_num_fields($hResult)) {
+         $this->numRows      = 0;
+         $this->nextRowIndex = -1;
+      }
+      else {
+         $this->nextRowIndex = 0;
+      }
+      $this->hResult = $hResult;
    }
 
 
@@ -92,7 +103,7 @@ class PostgresResult extends Result {
     * @return array - array of columns or NULL if no more rows are available
     */
    public function fetchNext($mode=ARRAY_BOTH) {
-      if (!$this->hResult)
+      if (!$this->hResult || $this->nextRowIndex < 0)
          return null;
 
       switch ($mode) {
@@ -100,7 +111,16 @@ class PostgresResult extends Result {
          case ARRAY_NUM:   $mode = PGSQL_NUM;   break;
          default:          $mode = PGSQL_BOTH;
       }
-      return pg_fetch_array($this->hResult, null, $mode) ?: null;
+
+      $row = pg_fetch_array($this->hResult, null, $mode);
+      if ($row) {
+         $this->nextRowIndex++;
+      }
+      else {
+         $row                = null;
+         $this->nextRowIndex = -1;
+      }
+      return $row;
    }
 
 
@@ -162,7 +182,8 @@ class PostgresResult extends Result {
    public function release() {
       if ($this->hResult) {
          $tmp = $this->hResult;
-         $this->hResult = null;
+         $this->hResult      = null;
+         $this->nextRowIndex = -1;
          pg_free_result($tmp);
       }
    }

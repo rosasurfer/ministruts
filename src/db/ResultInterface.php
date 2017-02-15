@@ -120,6 +120,14 @@ interface ResultInterface {
 
 
    /**
+    * Return the index of the row beeing fetched by the next unqualified fetch* method call.
+    *
+    * @return int - row index (starting at 0) or -1 after reaching the end
+    */
+   public function nextRowIndex();
+
+
+   /**
     * Return the result's internal result object.
     *
     * @return resource|object - result handle, handler or NULL for a result-less query

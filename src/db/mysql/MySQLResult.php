@@ -25,7 +25,7 @@ class MySQLResult extends Result {
    /** @var string - SQL statement the result was generated from */
    protected $sql;
 
-   /** @var resource - the underlying driver's original result resource */
+   /** @var resource - the database connector's original result handle */
    protected $hResult;
 
    /** @var int - last inserted row id of the connection at instance creation time (not reset between queries) */
@@ -34,8 +34,11 @@ class MySQLResult extends Result {
    /** @var int - last number of affected rows (not reset between queries) */
    protected $lastAffectedRows = 0;
 
-   /** @var int - number of rows returned by the query */
-   protected $numRows = null;          // NULL to distinguish between an unset and a zero value
+   /** @var int - number of rows returned by the statement (NULL to distinguish between an unset and a zero value) */
+   protected $numRows = null;
+
+   /** @var int - index of the row fetched by the next unqualified fetch* method call or -1 when hit the end */
+   protected $nextRowIndex = 0;
 
 
    /**
@@ -64,7 +67,12 @@ class MySQLResult extends Result {
 
       if ($hResult && !mysql_num_fields($hResult)) {     // close empty results and release them
          mysql_free_result($hResult);
-         $hResult = null;
+         $hResult            = null;
+         $this->numRows      = 0;
+         $this->nextRowIndex = -1;
+      }
+      else {
+         $this->nextRowIndex = 0;
       }
       $this->hResult = $hResult;
    }
@@ -79,7 +87,7 @@ class MySQLResult extends Result {
     * @return array - array of columns or NULL if no more rows are available
     */
    public function fetchNext($mode=ARRAY_BOTH) {
-      if (!$this->hResult)
+      if (!$this->hResult || $this->nextRowIndex < 0)
          return null;
 
       switch ($mode) {
@@ -87,7 +95,16 @@ class MySQLResult extends Result {
          case ARRAY_NUM:   $mode = MYSQL_NUM;   break;
          default:          $mode = MYSQL_BOTH;
       }
-      return mysql_fetch_array($this->hResult, $mode) ?: null;
+
+      $row = mysql_fetch_array($this->hResult, $mode);
+      if ($row) {
+         $this->nextRowIndex++;
+      }
+      else {
+         $row                = null;
+         $this->nextRowIndex = -1;
+      }
+      return $row;
    }
 
 
@@ -166,7 +183,8 @@ class MySQLResult extends Result {
    public function release() {
       if ($this->hResult) {
          $tmp = $this->hResult;
-         $this->hResult = null;
+         $this->hResult      = null;
+         $this->nextRowIndex = -1;
          mysql_free_result($tmp);
       }
    }
