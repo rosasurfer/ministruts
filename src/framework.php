@@ -11,8 +11,7 @@ use rosasurfer\loader\ClassLoader;
 
 
 // Block re-includes.
-if (defined('rosasurfer\MINISTRUTS_ROOT'))
-   return;
+if (defined('rosasurfer\MINISTRUTS_ROOT')) return;
 define('rosasurfer\MINISTRUTS_ROOT', dirName(__DIR__));
 
 

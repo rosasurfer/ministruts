@@ -18,30 +18,17 @@ use rosasurfer\exception\InvalidArgumentException;
 abstract class DAO extends Singleton {
 
 
-   // Mapping-Constanten
-   const T_BOOL     = 1;
-   const T_INT      = 2;
-   const T_FLOAT    = 3;
-   const T_STRING   = 4;
-   const T_SET      = 5;
-   const T_NULL     = true;
-   const T_NOT_NULL = false;
+   /** @var Worker - the worker this DAO uses */
+   protected $worker;
 
-
-   /** @var array - database mapping; "abstract" member, must be re-defined in the concrete DAO */
-   protected $mapping = [];
-
-   /** @var Worker - Worker dieses DAO's */
-   private $worker;
-
-   /** @var string - Name der Entityklasse, für die der DAO zuständig ist */
-   private $entityClass;
+   /** @var string - the name of the DAO's entity class */
+   protected $entityClass;
 
 
    /**
     * Constructor
     *
-    * Erzeugt einen neuen DAO.
+    * Create a new DAO.
     */
    protected function __construct() {
       $this->entityClass = subStr(get_class($this), 0, -3);
@@ -88,7 +75,7 @@ abstract class DAO extends Singleton {
 
 
    /**
-    * Gibt das Mapping der Entity-Klasse des DAO zurück.
+    * Return the mapping of the DAO's entity class.
     *
     * @return array
     */
@@ -98,9 +85,9 @@ abstract class DAO extends Singleton {
 
 
    /**
-    * Gibt den Namen der Entity-Klasse dieses DAO's zurück.
+    * Return the name of the DAO's entity class.
     *
-    * @return string - Klassenname
+    * @return string
     */
    public final function getEntityClass() {
       return $this->entityClass;
@@ -118,8 +105,7 @@ abstract class DAO extends Singleton {
 
 
    /**
-    * Gibt den Worker dieses DAO zurück. Ein Worker implementiert eine konkrete Caching-Strategie und
-    * kann Entity-spezifisch konfiguriert werden.
+    * Return the Worker the DAO uses.
     *
     * @return Worker
     */
@@ -132,11 +118,11 @@ abstract class DAO extends Singleton {
 
 
    /**
-    * Gibt die aktuelle Version des übergebenen Objects zurück.
+    * Reload and return a fresh version of the specified object.
     *
-    * @param  PersistableObject $object - PersistableObject-Instanz
+    * @param  PersistableObject $object
     *
-    * @return PersistableObject
+    * @return PersistableObject - refreshed version (a new and different instance)
     */
    public function refresh(PersistableObject $object) {
       $class = $this->getEntityClass();

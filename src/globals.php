@@ -65,6 +65,13 @@ const PHP_INI_ONLY      = \rosasurfer\PHP_INI_ONLY;
 const PHP_INI_SYSTEM    = \rosasurfer\PHP_INI_SYSTEM;
 const PHP_INI_PERDIR    = \rosasurfer\PHP_INI_PERDIR;
 
+// PHP types
+const PHP_TYPE_BOOL     = \rosasurfer\PHP_TYPE_BOOL;
+const PHP_TYPE_INT      = \rosasurfer\PHP_TYPE_INT;
+const PHP_TYPE_FLOAT    = \rosasurfer\PHP_TYPE_FLOAT;
+const PHP_TYPE_STRING   = \rosasurfer\PHP_TYPE_STRING;
+const PHP_TYPE_ARRAY    = \rosasurfer\PHP_TYPE_ARRAY;
+
 // miscellaneous
 const NL                = \rosasurfer\NL;                      // = EOL_UNIX
 const EOL_MAC           = \rosasurfer\EOL_MAC;                 // "\r"       CR       0D       13

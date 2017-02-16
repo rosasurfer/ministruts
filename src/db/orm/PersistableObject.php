@@ -5,12 +5,18 @@ use rosasurfer\core\Object;
 use rosasurfer\core\Singleton;
 use rosasurfer\db\ConnectorInterface as IConnector;
 
+use rosasurfer\exception\IllegalAccessException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\UnimplementedFeatureException;
 
 use rosasurfer\log\Logger;
 use rosasurfer\util\Date;
-use rosasurfer\exception\IllegalAccessException;
+
+use const rosasurfer\PHP_TYPE_ARRAY;
+use const rosasurfer\PHP_TYPE_BOOL;
+use const rosasurfer\PHP_TYPE_FLOAT;
+use const rosasurfer\PHP_TYPE_INT;
+use const rosasurfer\PHP_TYPE_STRING;
 
 
 /**
@@ -233,20 +239,20 @@ abstract class PersistableObject extends Object {
       $row      = array_change_key_case($row, CASE_LOWER);
       $mappings = $object->dao()->getMapping();
 
-      foreach ($mappings['fields'] as $property => $mapping) {
+      foreach ($mappings['columns'] as $phpName => $mapping) {
          $column = strToLower($mapping[0]);
 
          if ($row[$column] !== null) {
-            $type = $mapping[1];
+            $phpType = $mapping[1];
 
-            switch ($type) {
-               case DAO::T_STRING: $object->$property =         $row[$column]; break;
-               case DAO::T_BOOL  : $object->$property =  (bool) $row[$column]; break;
-               case DAO::T_INT   : $object->$property =   (int) $row[$column]; break;
-               case DAO::T_FLOAT : $object->$property = (float) $row[$column]; break;
-               case DAO::T_SET   : $object->$property =  strLen($row[$column]) ? explode(',', $row[$column]) : []; break;
+            switch ($phpType) {
+               case PHP_TYPE_BOOL  : $object->$phpName =   (bool) $row[$column]; break;
+               case PHP_TYPE_INT   : $object->$phpName =    (int) $row[$column]; break;
+               case PHP_TYPE_FLOAT : $object->$phpName =  (float) $row[$column]; break;
+               case PHP_TYPE_STRING: $object->$phpName = (string) $row[$column]; break;
+               case PHP_TYPE_ARRAY : $object->$phpName =   strLen($row[$column]) ? explode(',', $row[$column]) : []; break;
 
-               default: throw new InvalidArgumentException('Unknown data type "'.$type.'" in database mapping of '.$class.'::'.$property);
+               default: throw new InvalidArgumentException('Unknown PHP type "'.$phpType.'" in database mapping of '.$class.'::'.$phpName);
             }
          }
       }

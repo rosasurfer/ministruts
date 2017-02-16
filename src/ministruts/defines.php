@@ -5,8 +5,7 @@ namespace rosasurfer\ministruts;
 /**
  * Package constants and functions.
  */
-if (defined('rosasurfer\ministruts\DEFAULT_REQUEST_PROCESSOR_CLASS'))
-   return;
+if (defined('rosasurfer\ministruts\DEFAULT_REQUEST_PROCESSOR_CLASS')) return;
 
 
 /**

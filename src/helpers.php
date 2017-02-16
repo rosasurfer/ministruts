@@ -14,8 +14,7 @@ use rosasurfer\util\Validator;
 
 
 // prevent multiple includes
-if (defined('rosasurfer\CLI'))
-   return;
+if (defined('rosasurfer\CLI')) return;
 
 // whether or not we run on a command line interface, on localhost and/or on Windows
 define('rosasurfer\CLI'      , !isSet($_SERVER['REQUEST_METHOD']));
@@ -71,6 +70,13 @@ const PHP_INI_USER      = 1;                                      // entry can b
 const PHP_INI_ONLY      = 2;                                      // entry can be set in php.ini only
 const PHP_INI_SYSTEM    = 3;                                      // entry can be set in php.ini and in httpd.conf
 const PHP_INI_PERDIR    = 4;                                      // entry can be set in php.ini, httpd.conf, .htaccess and in .user.ini
+
+// PHP types
+const PHP_TYPE_BOOL     = 1;
+const PHP_TYPE_INT      = 2;
+const PHP_TYPE_FLOAT    = 3;
+const PHP_TYPE_STRING   = 4;
+const PHP_TYPE_ARRAY    = 5;
 
 // miscellaneous
 const NL                = "\n";                                   // - ctrl --- hex --- dec ----
