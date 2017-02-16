@@ -51,12 +51,15 @@ abstract class DAO extends Singleton {
    /**
     * Find a single matching record and convert it to an object of the model class.
     *
-    * @param  string $query - SQL query
+    * @param  string $query     - SQL query
+    * @param  bool   $allowMany - whether or not the query is allowed to return a multi-row result (default: no)
     *
     * @return PersistableObject
+    *
+    * @throws MultipleRowsException if the query returned multiple rows and $allowMany was not set to TRUE.
     */
-   public function findOne($query) {
-      return $this->getWorker()->findOne($query);
+   public function findOne($query, $allowMany=false) {
+      return $this->getWorker()->findOne($query, $allowMany);
    }
 
 

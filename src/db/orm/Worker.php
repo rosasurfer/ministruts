@@ -8,6 +8,7 @@ use rosasurfer\db\ConnectorInterface as IConnector;
 use rosasurfer\db\ResultInterface    as IResult;
 
 use const rosasurfer\ARRAY_ASSOC;
+use rosasurfer\db\MultipleRowsException;
 
 
 /**
@@ -45,13 +46,20 @@ class Worker extends Object {
    /**
     * Find a single matching record and convert it to an object of the model class.
     *
-    * @param  string $query - SQL query
+    * @param  string $query     - SQL query
+    * @param  bool   $allowMany - whether or not the query is allowed to return a multi-row result (default: no)
     *
     * @return PersistableObject
+    *
+    * @throws MultipleRowsException if the query returned multiple rows and $allowMany was not set to TRUE.
     */
-   public function findOne($query) {
+   public function findOne($query, $allowMany=false) {
       $result = $this->query($query);
-      return $this->makeObject($result);
+
+      $object = $this->makeObject($result);
+      if ($object && !$allowMany && $result->numRows() > 1) throw new MultipleRowsException();
+                                    // TODO: numRows() is slow on SQLite; the check can be improved by fetchNext()
+      return $object;               //       when reset(-1) and internal record caching are implemented.
    }
 
 
