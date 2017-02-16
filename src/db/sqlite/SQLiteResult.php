@@ -163,16 +163,6 @@ class SQLiteResult extends Result {
 
 
    /**
-    * Return the result's internal result object.
-    *
-    * @return \SQLite3Result - result handler or NULL for result-less queries
-    */
-   public function getInternalResult() {
-      return $this->result;
-   }
-
-
-   /**
     * Release the internal resources held by the Result.
     */
    public function release() {
@@ -182,5 +172,15 @@ class SQLiteResult extends Result {
          $this->nextRowIndex = -1;
          $tmp->finalize();
       }
+   }
+
+
+   /**
+    * Return the result's internal result object.
+    *
+    * @return \SQLite3Result - result handler or NULL for result-less queries
+    */
+   public function getInternalResult() {
+      return $this->result;
    }
 }

@@ -168,16 +168,6 @@ class MySQLResult extends Result {
 
 
    /**
-    * Return the result's internal result object.
-    *
-    * @return resource - result handle or NULL for a result-less query
-    */
-   public function getInternalResult() {
-      return $this->hResult;
-   }
-
-
-   /**
     * Release the internal resources held by the Result.
     */
    public function release() {
@@ -187,5 +177,15 @@ class MySQLResult extends Result {
          $this->nextRowIndex = -1;
          mysql_free_result($tmp);
       }
+   }
+
+
+   /**
+    * Return the result's internal result object.
+    *
+    * @return resource - result handle or NULL for a result-less query
+    */
+   public function getInternalResult() {
+      return $this->hResult;
    }
 }

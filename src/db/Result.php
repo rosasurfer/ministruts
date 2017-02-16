@@ -214,7 +214,6 @@ abstract class Result extends Object implements ResultInterface {
    }
 
 
-
    /**
     *
     *
@@ -225,4 +224,34 @@ abstract class Result extends Object implements ResultInterface {
       //$this->foundItemsCounter = $result->fetchAsInt();
    }
    */
+
+
+   /**
+    * Return the type of the DBMS the result is generated from.
+    *
+    * @return string
+    */
+   public function getType() {
+      return $this->connector->getType();
+   }
+
+
+   /**
+    * Return the version of the DBMS the result is generated from as a string.
+    *
+    * @return string
+    */
+   public function getVersionString() {
+      return $this->connector->getVersionString();
+   }
+
+
+   /**
+    * Return the version ID of the DBMS the result is generated from as an integer.
+    *
+    * @return int
+    */
+   public function getVersionNumber() {
+      return $this->connector->getVersionNumber();
+   }
 }

@@ -1,16 +1,21 @@
+2017-02-16
+
+   - methods db/(Connector|Result)::getVersion(String|Number)()
+   - method  db/Result::fetchAsString()
+
 
 2017-02-15
 
-   - methods db\*\(Connector|Result)::lastInsertId()
-   - methods db\*\(Connector|Result)::lastAffectedRows()
-   - methods db\*\Result::numRows()
-   - methods db\*\Result::nextRowIndex()
-   - methods db\*\Result::release()
+   - methods db/(Connector|Result)::lastInsertId()
+   - methods db/(Connector|Result)::lastAffectedRows()
+   - methods db/Result::numRows()
+   - methods db/Result::nextRowIndex()
+   - methods db/Result::release()
 
 
 2017-02-10
 
-   - methods db\IResult::fetchAsBool(), db\IResult::fetchAsInt(), db\IResult::fetchAsFloat() for any result set field
+   - methods db/IResult::fetchAsBool(), db/IResult::fetchAsInt(), db/IResult::fetchAsFloat() for any result set field
 
 
 2017-02-09
@@ -20,10 +25,10 @@
 
 2017-02-08
 
-   - helper function \rosasurfer\normalizeEOL()  
+   - helper function rosasurfer/normalizeEOL()  
    - end-of-line constants EOL_MAC, EOL_NETSCAPE, EOL_UNIX, EOL_WINDOWS
    - add IRosasurferException::addMessage() and PHPError::getSimpleType() 
-   - db\Connector and db\Result implement interfaces 
+   - db/Connector and db/Result implement interfaces 
 
 
 2017-02-03
@@ -62,38 +67,38 @@
      /struts-config/tiles/tile[@path]                  => [@file]
      /struts-config/tiles/tile[@extends]               => [@extends-tile]
 
-   - helper function rosasurfer\strToBool()
+   - helper function rosasurfer/strToBool()
     
 
 2017-01-22
 
-   - helper function rosasurfer\strIsNumeric() 
+   - helper function rosasurfer/strIsNumeric() 
 
 
 2016-08-26
 
-   - view helpers rosasurfer\ministruts\url\Url and rosasurfer\ministruts\url\VersionedUrl 
+   - view helpers rosasurfer/ministruts/url/Url and rosasurfer/ministruts/url/VersionedUrl 
 
 
 2016-08-11
 
-   - helper function rosasurfer\pluralize($items, $singular, $plural) for simple message forming without gettext extension
+   - helper function rosasurfer/pluralize($items, $singular, $plural) for simple message forming without gettext extension
 
 
 2016-08-03
 
-   - helper function rosasurfer\ifEmpty($value, $altValue)
+   - helper function rosasurfer/ifEmpty($value, $altValue)
 
 
 2016-07-20
 
    - Config classes support multiple custom configurations with an application default configuration.  
-   - helper function rosasurfer\is_trait()  
+   - helper function rosasurfer/is_trait()  
 
 
 2016-07-06
 
-   - helper functions rosasurfer\strLeftTo() and rosasurfer\strRightFrom() support two optional parameters: 
+   - helper functions rosasurfer/strLeftTo() and rosasurfer/strRightFrom() support two optional parameters: 
      $includeLimiter, $onNotFound
    
 

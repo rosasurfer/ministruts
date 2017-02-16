@@ -144,6 +144,12 @@ interface ResultInterface {
 
 
    /**
+    * Release the internal resources held by the Result.
+    */
+   public function release();
+
+
+   /**
     * Return the result's internal result object.
     *
     * @return resource|object - result handle, handler or NULL for a result-less query
@@ -152,7 +158,25 @@ interface ResultInterface {
 
 
    /**
-    * Release the internal resources held by the Result.
+    * Return the type of the DBMS the result is generated from.
+    *
+    * @return string
     */
-   public function release();
+   public function getType();
+
+
+   /**
+    * Return the version of the DBMS the result is generated from as a string.
+    *
+    * @return string
+    */
+   public function getVersionString();
+
+
+   /**
+    * Return the version ID of the DBMS the result is generated from as an integer.
+    *
+    * @return int
+    */
+   public function getVersionNumber();
 }

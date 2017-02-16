@@ -167,16 +167,6 @@ class PostgresResult extends Result {
 
 
    /**
-    * Return the result's internal result object.
-    *
-    * @return resource - result handle
-    */
-   public function getInternalResult() {
-      return $this->hResult;
-   }
-
-
-   /**
     * Release the internal resources held by the Result.
     */
    public function release() {
@@ -186,6 +176,16 @@ class PostgresResult extends Result {
          $this->nextRowIndex = -1;
          pg_free_result($tmp);
       }
+   }
+
+
+   /**
+    * Return the result's internal result object.
+    *
+    * @return resource - result handle
+    */
+   public function getInternalResult() {
+      return $this->hResult;
    }
 
 
