@@ -150,6 +150,16 @@ class MySQLResult extends Result {
 
 
    /**
+    *
+    *
+   public function countFoundItems() {
+      $result = $this->query('select found_rows()');
+      return $this->foundItemsCounter = $result->fetchInt();
+   }
+   */
+
+
+   /**
     * Fetch a single field of a row from the result set.
     *
     * @param  string|int $column       - name or offset of the column to fetch from (default: 0)

@@ -215,18 +215,6 @@ abstract class Result extends Object implements ResultInterface {
 
 
    /**
-    *
-    *
-   public function countFoundItems() {
-      return $this->foundItemsCounter;
-
-      //$result = $this->query('select found_rows()');
-      //$this->foundItemsCounter = $result->fetchInt();
-   }
-   */
-
-
-   /**
     * Return the type of the DBMS the result is generated from.
     *
     * @return string
