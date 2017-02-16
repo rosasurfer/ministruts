@@ -35,7 +35,7 @@ class ActionMapping extends Object {
    protected /*string */ $actionClassName;
    protected /*string */ $formClassName;
    protected /*string */ $formScope = 'request';
-   protected /*bool   */ $validateBefore;
+   protected /*bool   */ $formValidateFirst;
    protected /*bool[] */ $methods;
    protected /*string */ $roles;
    protected /*bool   */ $default = false;
@@ -322,7 +322,7 @@ class ActionMapping extends Object {
 
 
    /**
-    * Setzt das ValidateBefore-Flag für die ActionForm des ActionMappings.  Das Flag zeigt an, ob die
+    * Setzt das FormValidateFirst-Flag für die ActionForm des ActionMappings.  Das Flag zeigt an, ob die
     * ActionForm vor Aufruf der Action validiert werden soll oder nicht.  Ohne entsprechende Angabe
     * in der struts-config.xml wird die ActionForm immer validiert.
     *
@@ -330,11 +330,11 @@ class ActionMapping extends Object {
     *
     * @return self
     */
-   public function setValidateBefore($mode) {
+   public function setFormValidateFirst($mode) {
       if ($this->configured) throw new IllegalStateException('Configuration is frozen');
       if (!is_bool($mode))   throw new IllegalTypeException('Illegal type of parameter $mode: '.getType($mode));
 
-      $this->validateBefore = $mode;
+      $this->formValidateFirst = $mode;
       return $this;
    }
 
@@ -344,8 +344,8 @@ class ActionMapping extends Object {
     *
     * @return bool
     */
-   public function isValidateBefore() {
-      return ($this->validateBefore);
+   public function isFormValidateFirst() {
+      return (bool) $this->formValidateFirst;
    }
 
 
@@ -408,16 +408,16 @@ class ActionMapping extends Object {
     */
    public function freeze() {
       if (!$this->configured) {
-         if (!$this->path)                                       throw new IllegalStateException('A "path" attribute must be configured for mapping "'.$this->path.'"');
-         if (!$this->formClassName && $this->validateBefore)     throw new IllegalStateException('A "form" must be configured for "validate-before" attribute value "true" in mapping "'.$this->path.'"');
+         if (!$this->path)                                          throw new IllegalStateException('A "path" attribute must be configured for mapping "'.$this->path.'"');
+         if (!$this->formClassName && $this->formValidateFirst)     throw new IllegalStateException('A "form" must be configured for "form-validate-first" attribute value "true" in mapping "'.$this->path.'"');
 
          if (!$this->actionClassName && !$this->forward) {
-            if (!$this->formClassName || !$this->validateBefore) throw new IllegalStateException('Either an "action", "include", "redirect" or "forward" attribute must be specified for mapping "'.$this->path.'"');
+            if (!$this->formClassName || !$this->formValidateFirst) throw new IllegalStateException('Either an "action", "include", "redirect" or "forward" attribute must be specified for mapping "'.$this->path.'"');
 
-            if (!$this->formClassName || !$this->validateBefore) {
+            if (!$this->formClassName || !$this->formValidateFirst) {
                throw new IllegalStateException('Either an "action", "include", "redirect" or "forward" attribute must be specified for mapping "'.$this->path.'"');
             }
-            elseif ($this->formClassName && $this->validateBefore) {
+            elseif ($this->formClassName && $this->formValidateFirst) {
                if (!isSet($this->forwards[ActionForward ::VALIDATION_SUCCESS_KEY]) || !isSet($this->forwards[ActionForward ::VALIDATION_ERROR_KEY]))
                   throw new IllegalStateException('A "success" and an "error" forward must be configured for validation of mapping "'.$this->path.'"');
             }

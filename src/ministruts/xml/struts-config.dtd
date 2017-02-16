@@ -19,7 +19,7 @@
 
 
 <!-- 
-   A "Boolean" is the string representation of a boolean variable (true or false). 
+   A "Boolean" is the string representation of a boolean variable ('true' or 'false'). 
 -->
 <!ENTITY % Boolean "(true|false)">
 
@@ -117,62 +117,62 @@
    The "mapping" element describes an ActionMapping object that is to be used to process a request for a specific 
    module-relative URI. The following attributes are defined:
 
-   path             The module-relative path of the request, starting with a slash "/" character.
-                    
-   include          The name of a tiles definition or file to include, instead of passing the request to an action. Tiles 
-                    definition names must start with a dot ".", file system locations must not start with a dot ".". Not 
-                    valid if the "action" attribute is specified. Only one of "include", "redirect" or "forward" can be 
-                    specified.
-                    
-   redirect         The module-relative path of the location to which a redirect instruction should be issued, instead of 
-                    passing the request to an action. Not valid if the "action" attribute is specified. Only one of 
-                    "include", "redirect" or "forward" can be specified.
+   path                 The module-relative path of the request, starting with a slash "/" character.
+                        
+   include              The name of a tiles definition or file to include, instead of passing the request to an action. 
+                        Tiles definition names must start with a dot ".", file system locations must not start with a dot. 
+                        Not valid if the "action" attribute is specified. Only one of "include", "redirect" or "forward" can 
+                        be specified.
+                        
+   redirect             The module-relative path of the location to which a redirect instruction should be issued, instead 
+                        of passing the request to an action. Not valid if the "action" attribute is specified. Only one of 
+                        "include", "redirect" or "forward" can be specified.
+                        
+   forward              The name of a global ActionForward to forward control to, instead of passing the request to an 
+                        action. Not valid if the "action" attribute is specified. Only one of "include", "redirect" or 
+                        "forward" can be specified.
+                        
+   action               Class name of an Action subclass that will process requests for the action mapping. Not valid if the 
+                        "include", "redirect" or "forward" attribute is specified.
+                        
+   form                 Class name of an ActionForm subclass, if any, that is associated with the mapping.
+                        
+   form-scope           The context ("request" or "session") that is used to store and access the ActionForm, if any. 
+                        Optional if the "form" attribute is specified, else not valid.
+                        [default: "request"]
 
-   forward          The name of a global ActionForward to forward control to, instead of passing the request to an action. 
-                    Not valid if the "action" attribute is specified. Only one of "include", "redirect" or "forward" can be 
-                    specified.
-                    
-   action           Class name of an Action subclass that will process requests for the action mapping. Not valid if the 
-                    "include", "redirect" or "forward" attribute is specified.
-                    
-   form             Class name of an ActionForm subclass, if any, that is associated with the mapping.
-                    
-   form-scope       The context ("request" or "session") that is used to store and access the ActionForm, if any. Optional if 
-                    the "form" attribute is specified, else not valid.
-                    [default: "request"]
-
-   validate-before  Valid only if the "form" attribute is specified. Set to "true" if the ActionForm should be validated 
-                    prior to calling the Action object, or set to "false" if you don't want validation at that time. The 
-                    default behaviour is "false" when an action object or a forward (include, redirect, forward) are 
-                    configured, and "true" when no action object and no forward are configured. 
-                    This means if an action is configured, per default the action is responsible for input validation. If no 
-                    action and no forward are configured, per default the framework validates user input. For this framework 
-                    validation two nested ActionForwards named "success" and "error" must be configured.
-
-   http-methods     Comma-delimited list of HTTP method verbs ("get", "post") the ActionMapping supports.
-                    [default: "get"]
-
-   roles            Comma-delimited list of required roles to access the action mapping.
-                    [default: "none"]
-
-   default          Set to "true" if the mapping should be configured as the default action mapping for the module. If a 
-                    request does not match any other mapping, it will be passed to the action mapping with default set to 
-                    "true". Only one action mapping can be marked as "default" within a module.
-                    [default: "false"]
+   form-validate-first  Valid only if the "form" attribute is specified. Set to "true" if the ActionForm should be validated 
+                        prior to calling the Action object, or set to "false" if you don't want automated validation at that 
+                        time. The default behaviour is "false" if an action object or a forward (include, redirect, forward) 
+                        are configured, and "true" if no action object and no forward are configured.
+                        This means per default a configured action is responsible for input validation. If no action and no 
+                        forward are configured per default the framework will perform input validation. For validation by 
+                        the framework two nested ActionForwards named "success" and "error" must be configured.
+                  
+   http-methods         Comma-delimited list of HTTP method verbs ("get", "post") the ActionMapping supports.
+                        [default: "get"]
+                        
+   roles                Comma-delimited list of required roles to access the action mapping.
+                        [default: "none"]
+                        
+   default              Set to "true" if the mapping should be configured as the default action mapping for the module. If a 
+                        request does not match any other mapping, it will be passed to the action mapping with default set 
+                        to "true". Only one action mapping can be marked as "default" within a module.
+                        [default: "false"]
 -->
 <!ELEMENT mapping (set-property*, forward*)>
 <!ATTLIST mapping
-          path               %RequestPath;        #REQUIRED
-          include            %ResourcePath;       #IMPLIED
-          redirect           %RequestPath;        #IMPLIED
-          forward            %LogicalName;        #IMPLIED
-          action             %ClassName;          #IMPLIED
-          form               %ClassName;          #IMPLIED
-          form-scope         (request|session)    "request"
-          validate-before    %Boolean;            "true"
-          http-methods       CDATA                "get"
-          roles              CDATA                #IMPLIED
-          default            %Boolean;            "false"
+          path                 %RequestPath;        #REQUIRED
+          include              %ResourcePath;       #IMPLIED
+          redirect             %RequestPath;        #IMPLIED
+          forward              %LogicalName;        #IMPLIED
+          action               %ClassName;          #IMPLIED
+          form                 %ClassName;          #IMPLIED
+          form-scope           (request|session)    "request"
+          form-validate-first  %Boolean;            "true"
+          http-methods         CDATA                "get"
+          roles                CDATA                #IMPLIED
+          default              %Boolean;            "false"
 >
 
 
@@ -245,11 +245,11 @@
 
 
 <!-- 
-   The "set-property" element specifies the method name and initial value of an additional class configuration property. When 
-   the object representing the surrounding element is instantiated, the accessor for the indicated property is called and 
-   passed the indicated value. The "set-property" element is especially useful when a custom subclass is used with <forward> 
-   or <mapping> elements. The subclass can be passed whatever other properties may be required to configure the object 
-   without changing how the struts-config is parsed.
+   The "set-property" element specifies the method name and initial value of an additional class configuration property. 
+   When the object representing the surrounding element is instantiated, the accessor for the indicated property is called 
+   and passed the indicated value. The "set-property" element is especially useful when a custom subclass is used with 
+   <forward> or <mapping> elements. The subclass can be passed whatever other properties may be required to configure the 
+   object without changing how the struts-config is parsed.
 
    property  Name of the class property whose setter method will be called.
 

@@ -355,22 +355,22 @@ class Module extends Object {
             $mapping->setFormScope((string) $tag['form-scope']);
 
 
-         // process validate-before attribute
+         // process form-validate-first attribute
          if ($mapping->getFormClassName()) {
             $action = $mapping->getActionClassName();
             if ($action || $mapping->getForward()) {
-               $validateBefore = $tag['validate-before'] ? ($tag['validate-before'] == 'true') : !$action;
+               $formValidateFirst = $tag['form-validate-first'] ? ($tag['form-validate-first']=='true') : !$action;
             }
             else {
-               if ($tag['validate-before'] == 'false') throw new RuntimeException('Mapping "'.$mapping->getPath().'": An "action", "include", "redirect" or "forward" attribute is required when "validate-before" attribute is set to "false"');
-               $validateBefore = true;
+               if ($tag['form-validate-first']=='false') throw new RuntimeException('Mapping "'.$mapping->getPath().'": An "action", "include", "redirect" or "forward" attribute is required when "form-validate-first" attribute is set to "false"');
+               $formValidateFirst = true;
                // Prüfung auf 'success' und 'error' Forward erfolgt in ActionMapping:freeze()
             }
          }
-         elseif ($validateBefore = $tag['validate-before'] == 'true') {
-            throw new RuntimeException('Mapping "'.$mapping->getPath().'": A "form" attribute must be specified when the "validate-before" attribute is set to "true"');
+         elseif ($formValidateFirst = $tag['form-validate-first']=='true') {
+            throw new RuntimeException('Mapping "'.$mapping->getPath().'": A "form" attribute must be specified when the "form-validate-first" attribute is set to "true"');
          }
-         $mapping->setValidateBefore($validateBefore);
+         $mapping->setFormValidateFirst($formValidateFirst);
 
 
          // process method attributes

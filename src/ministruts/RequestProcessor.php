@@ -385,7 +385,7 @@ PROCESS_METHOD_ERROR_SC_405;
     * @return bool
     */
    protected function processActionFormValidate(Request $request, Response $response, ActionMapping $mapping, ActionForm $form) {
-      if (!$mapping->isValidateBefore())
+      if (!$mapping->isFormValidateFirst())
          return true;
 
       $success = $form->validate();

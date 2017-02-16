@@ -5,6 +5,7 @@
    - rename methods db/Result::fetchAs(Bool|Int|Float)() to fetch(Bool|Int|Float)() 
    - rename db/orm/DAO::findMany() to findAll() 
    - method db/orm/DAO::findOne() - add parameter $allowMany=false 
+   - rename attribute /struts-config/action-mappings/mapping[@validate-before] to [@form-validate-first]
 
 
 2017-02-15
