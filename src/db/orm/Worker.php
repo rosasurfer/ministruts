@@ -43,7 +43,7 @@ class Worker extends Object {
 
 
    /**
-    * Find a single record and convert it to an object of the model class.
+    * Find a single matching record and convert it to an object of the model class.
     *
     * @param  string $query - SQL query
     *
@@ -56,13 +56,13 @@ class Worker extends Object {
 
 
    /**
-    * Find multiple records and convert them to objects of the model class.
+    * Find all matching records and convert them to objects of the model class.
     *
     * @param  string $query - SQL query
     *
     * @return PersistableObject[]
     */
-   public function findMany($query) {
+   public function findAll($query) {
       $result = $this->query($query);
       return $this->makeObjects($result);
    }

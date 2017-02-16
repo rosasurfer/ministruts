@@ -49,7 +49,7 @@ abstract class DAO extends Singleton {
 
 
    /**
-    * Find a single record and convert it to an object of the model class.
+    * Find a single matching record and convert it to an object of the model class.
     *
     * @param  string $query - SQL query
     *
@@ -61,14 +61,14 @@ abstract class DAO extends Singleton {
 
 
    /**
-    * Find multiple records and convert them to objects of the model class.
+    * Find all matching records and convert them to objects of the model class.
     *
     * @param  string $query - SQL query
     *
     * @return PersistableObject[]
     */
-   public function findMany($query) {
-      return $this->getWorker()->findMany($query);
+   public function findAll($query) {
+      return $this->getWorker()->findAll($query);
    }
 
 
