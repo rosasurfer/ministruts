@@ -80,6 +80,7 @@ abstract class DAO extends Singleton {
     * @return array
     */
    public final function getMapping() {
+      if (!isSet($this->mapping)) throw new UnimplementedFeatureException('You must implement '.get_class($this).'->mapping[] to work with this DAO.');
       return $this->mapping;
    }
 
