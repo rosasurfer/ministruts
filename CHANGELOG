@@ -1,8 +1,9 @@
 2017-02-16
 
    - methods db/(Connector|Result)::getVersion(String|Number)()
-   - method db/Result::fetchAsString()
    - rename db/orm/DAO::findMany() to findAll() 
+   - rename methods db/Result::fetchAs(Bool|Int|Float)() to fetch(Bool|Int|Float)() 
+   - method db/Result::fetchString()
 
 
 2017-02-15

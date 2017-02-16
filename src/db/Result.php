@@ -95,7 +95,7 @@ abstract class Result extends Object implements ResultInterface {
     * @throws NoMoreRowsException       if no more rows are available and parameter $onNoMoreRows was not set.
     * @throws \UnexpectedValueException if the cell value is not NULL and does not represent a floating point value.
     */
-   public function fetchAsString($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
+   public function fetchString($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
       if (func_num_args() < 4) $value = $this->fetchField($column, $row, null);
       else                     $value = $this->fetchField($column, $row, null, $onNoMoreRows);
 
@@ -123,7 +123,7 @@ abstract class Result extends Object implements ResultInterface {
     *                                   representations are "true" and "false", "on" and "off", "yes" and "no', and
     *                                   numerical representations.
     */
-   public function fetchAsBool($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
+   public function fetchBool($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
       if (func_num_args() < 4) $value = $this->fetchField($column, $row, null);
       else                     $value = $this->fetchField($column, $row, null, $onNoMoreRows);
 
@@ -153,9 +153,9 @@ abstract class Result extends Object implements ResultInterface {
     * @throws NoMoreRowsException       if no more rows are available and parameter $onNoMoreRows was not set.
     * @throws \UnexpectedValueException if the cell value is not NULL and does not represent an integer. The accepted
     *                                   floating point values must have a fractional part equal to 0 (zero).
-    *                                   Use "self::fetchAsFloat()" to interpret more floating point values as integer.
+    *                                   Use "self::fetchFloat()" to interpret more floating point values as integer.
     */
-   public function fetchAsInt($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
+   public function fetchInt($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
       if (func_num_args() < 4) $value = $this->fetchField($column, $row, null);
       else                     $value = $this->fetchField($column, $row, null, $onNoMoreRows);
 
@@ -192,7 +192,7 @@ abstract class Result extends Object implements ResultInterface {
     * @throws NoMoreRowsException       if no more rows are available and parameter $onNoMoreRows was not set.
     * @throws \UnexpectedValueException if the cell value is not NULL and does not represent a floating point value.
     */
-   public function fetchAsFloat($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
+   public function fetchFloat($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
       if (func_num_args() < 4) $value = $this->fetchField($column, $row, null);
       else                     $value = $this->fetchField($column, $row, null, $onNoMoreRows);
 
@@ -221,7 +221,7 @@ abstract class Result extends Object implements ResultInterface {
       return $this->foundItemsCounter;
 
       //$result = $this->query('select found_rows()');
-      //$this->foundItemsCounter = $result->fetchAsInt();
+      //$this->foundItemsCounter = $result->fetchInt();
    }
    */
 

@@ -50,7 +50,7 @@ interface ResultInterface {
     * @throws NoMoreRowsException       if no more rows are available and parameter $onNoMoreRows was not set.
     * @throws \UnexpectedValueException if the cell value is not NULL and does not represent a floating point value.
     */
-   public function fetchAsString($column=0, $row=null, $onNull=null, $onNoMoreRows=null);
+   public function fetchString($column=0, $row=null, $onNull=null, $onNoMoreRows=null);
 
 
    /**
@@ -68,7 +68,7 @@ interface ResultInterface {
     *                                   representations are "true" and "false", "on" and "off", "yes" and "no', and
     *                                   numerical representations.
     */
-   public function fetchAsBool($column=0, $row=null, $onNull=null, $onNoMoreRows=null);
+   public function fetchBool($column=0, $row=null, $onNull=null, $onNoMoreRows=null);
 
 
    /**
@@ -84,9 +84,9 @@ interface ResultInterface {
     * @throws NoMoreRowsException       if no more rows are available and parameter $onNoMoreRows was not set.
     * @throws \UnexpectedValueException if the cell value is not NULL and does not represent an integer. The accepted
     *                                   floating point values must have a fractional part equal to 0 (zero).
-    *                                   Use "self::fetchAsFloat()" to interpret more floating point values as integer.
+    *                                   Use "self::fetchFloat()" to interpret more floating point values as integer.
     */
-   public function fetchAsInt($column=0, $row=null, $onNull=null, $onNoMoreRows=null);
+   public function fetchInt($column=0, $row=null, $onNull=null, $onNoMoreRows=null);
 
 
    /**
@@ -102,7 +102,7 @@ interface ResultInterface {
     * @throws NoMoreRowsException       if no more rows are available and parameter $onNoMoreRows was not set.
     * @throws \UnexpectedValueException if the cell value is not NULL and does not represent a floating point value.
     */
-   public function fetchAsFloat($column=0, $row=null, $onNull=null, $onNoMoreRows=null);
+   public function fetchFloat($column=0, $row=null, $onNull=null, $onNoMoreRows=null);
 
 
    /**

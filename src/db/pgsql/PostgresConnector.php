@@ -440,7 +440,7 @@ class PostgresConnector extends Connector {
          }
          else {
             try {
-               $this->lastInsertId = $this->query("select lastVal()")->fetchAsInt();
+               $this->lastInsertId = $this->query("select lastVal()")->fetchInt();
             }
             catch (\Exception $ex) {
                if (!strContainsI($ex->getMessage(), 'ERROR:  lastval is not yet defined in this session'))

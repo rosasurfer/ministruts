@@ -258,7 +258,7 @@ class SQLiteConnector extends Connector {
 
    $result  = $db->query($sql);
    $handler = $db->getInternalHandler();
-   echoPre(str_pad(explode(' ', $sql, 2)[0].':', 9).'  lastInsertRowID='.$handler->lastInsertRowID().'  lastInsertId='.$db->lastInsertId().'  changes='.$handler->changes().'  lastAffectedRows='.$db->lastAffectedRows().'  total_changes='.$db->query('select total_changes()')->fetchAsInt().'  result='.(is_object($result->getInternalResult()) ? 'object':'      ').'  numRows='.$result->numRows());
+   echoPre(str_pad(explode(' ', $sql, 2)[0].':', 9).'  lastInsertRowID='.$handler->lastInsertRowID().'  lastInsertId='.$db->lastInsertId().'  changes='.$handler->changes().'  lastAffectedRows='.$db->lastAffectedRows().'  total_changes='.$db->query('select total_changes()')->fetchInt().'  result='.(is_object($result->getInternalResult()) ? 'object':'      ').'  numRows='.$result->numRows());
 
    drop:      lastInsertRowID=0  lastInsertId=0  changes=0  lastAffectedRows=0  total_changes=0  result=        num_rows=0
    create:    lastInsertRowID=0  lastInsertId=0  changes=0  lastAffectedRows=0  total_changes=0  result=        num_rows=0
