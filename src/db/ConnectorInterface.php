@@ -127,6 +127,14 @@ interface ConnectorInterface {
 
 
    /**
+    * Return the connector's internal connection object.
+    *
+    * @return resource|object - connection handle or handler instance
+    */
+   public function getInternalHandler();
+
+
+   /**
     * Return the type of the DBMS the connector is used for.
     *
     * @return string
@@ -135,11 +143,11 @@ interface ConnectorInterface {
 
 
    /**
-    * Return the version of the DBMS the connector is used for.
+    * Return the version of the DBMS the connector is used for as a string.
     *
     * @return string
     */
-   public function getVersion();
+   public function getVersionString();
 
 
    /**
@@ -147,13 +155,5 @@ interface ConnectorInterface {
     *
     * @return int
     */
-   public function getVersionId();
-
-
-   /**
-    * Return the connector's internal connection object.
-    *
-    * @return resource|object - connection handle or handler instance
-    */
-   public function getInternalHandler();
+   public function getVersionNumber();
 }

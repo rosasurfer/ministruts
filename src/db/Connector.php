@@ -56,14 +56,4 @@ abstract class Connector extends Object implements ConnectorInterface {
       if (!is_subclass_of($class, IConnector::class)) throw new InvalidArgumentException('Not a '.IConnector::class.': '.$class);
       return new $class($config, $options);
    }
-
-
-   /**
-    * Return the type of the DBMS the connector is used for.
-    *
-    * @return string
-    */
-   public function getType() {
-      return $this->type;
-   }
 }

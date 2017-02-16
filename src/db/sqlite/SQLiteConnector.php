@@ -22,8 +22,14 @@ use rosasurfer\exception\RuntimeException;
 class SQLiteConnector extends Connector {
 
 
-   /** @var string - database system type */
+   /** @var string - DBMS type */
    protected $type = 'sqlite';
+
+   /** @var string - DBMS version string */
+   protected $versionString;
+
+   /** @var int - DBMS version number */
+   protected $versionNumber;
 
    /** @var string - database file to connect to */
    protected $file;
@@ -368,38 +374,6 @@ class SQLiteConnector extends Connector {
 
 
    /**
-    * Return the version of the DBMS the connector is used for.
-    *
-    * @return string - e.g. "3.5.9"
-    */
-   public function getVersion() {
-      static $version;
-      if (is_null($version)) {
-         if (!$this->isConnected())
-            $this->connect();
-         $version = $this->handler->version()['versionString'];
-      }
-      return $version;
-   }
-
-
-   /**
-    * Return the version ID of the DBMS the connector is used for as an integer.
-    *
-    * @return int - e.g. 3005009 for version string "3.5.9"
-    */
-   public function getVersionId() {
-      static $version;
-      if (is_null($version)) {
-         if (!$this->isConnected())
-            $this->connect();
-         $version = $this->handler->version()['versionNumber'];
-      }
-      return $version;
-   }
-
-
-   /**
     * Return the connector's internal connection object.
     *
     * @return \SQLite3 - the internal connection handler
@@ -408,5 +382,45 @@ class SQLiteConnector extends Connector {
       if (!$this->isConnected())
          $this->connect();
       return $this->handler;
+   }
+
+
+   /**
+    * Return the type of the DBMS the connector is used for.
+    *
+    * @return string
+    */
+   public function getType() {
+      return $this->type;
+   }
+
+
+   /**
+    * Return the version of the DBMS the connector is used for as a string.
+    *
+    * @return string - e.g. "3.5.9-rc"
+    */
+   public function getVersionString() {
+      if (is_null($this->versionString)) {
+         if (!$this->isConnected())
+            $this->connect();
+         $this->versionString = $this->handler->version()['versionString'];
+      }
+      return $this->versionString;
+   }
+
+
+   /**
+    * Return the version ID of the DBMS the connector is used for as an integer.
+    *
+    * @return int - e.g. 3005009 for version string "3.5.9-rc"
+    */
+   public function getVersionNumber() {
+      if (is_null($this->versionNumber)) {
+         if (!$this->isConnected())
+            $this->connect();
+         $this->versionNumber = $this->handler->version()['versionNumber'];
+      }
+      return $this->versionNumber;
    }
 }

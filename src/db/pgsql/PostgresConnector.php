@@ -18,8 +18,14 @@ use function rosasurfer\strStartsWithI;
 class PostgresConnector extends Connector {
 
 
-   /** @var string - database system type */
+   /** @var string - DBMS type */
    protected $type = 'pgsql';
+
+   /** @var string - DBMS version string */
+   protected $versionString;
+
+   /** @var int - DBMS version number */
+   protected $versionNumber;
 
    /** @var string[] */
    protected $config = [];
@@ -428,8 +434,8 @@ class PostgresConnector extends Connector {
     */
    public function lastInsertId() {
       if ($this->lastInsertId === null) {
-         $version = $this->getVersion();
-         if ($version < '8.1') {
+         $version = $this->getVersionNumber();
+         if ($version < 8001000) {              // 8.1
             $this->lastInsertId = -1;
          }
          else {
@@ -470,49 +476,6 @@ class PostgresConnector extends Connector {
 
 
    /**
-    * Return the version of the DBMS the connector is used for.
-    *
-    * @return string - e.g. "9.1.23"
-    */
-   public function getVersion() {
-      static $version;
-      if (is_null($version)) {
-         if (!$this->isConnected())
-            $this->connect();
-         $version = pg_version($this->hConnection)['server'];
-      }
-      return $version;
-      /*
-      array(
-         [client]                      => "9.4.1"     (string)
-         [protocol]                    => 3           (int)
-         [server]                      => "9.1.23"    (string)
-         [server_encoding]             => "UTF8"      (string)
-         [client_encoding]             => "UTF8"      (string)
-         [is_superuser]                => "off"       (string)
-         [session_authorization]       => "zalker"    (string)
-         [DateStyle]                   => "ISO, MDY"  (string)
-         [IntervalStyle]               => "postgres"  (string)
-         [TimeZone]                    => "localtime" (string)
-         [integer_datetimes]           => "on"        (string)
-         [standard_conforming_strings] => "on"        (string)
-         [application_name]            => ""          (string)
-      )
-      */
-   }
-
-
-   /**
-    * Return the version ID of the DBMS the connector is used for as an integer.
-    *
-    * @return int - e.g. 9001023 for version string "9.1.23-rc"
-    */
-   public function getVersionId() {
-      throw new UnimplementedFeatureException();
-   }
-
-
-   /**
     * Return the connector's internal connection object.
     *
     * @return resource - the internal connection handle
@@ -521,5 +484,51 @@ class PostgresConnector extends Connector {
       if (!$this->isConnected())
          $this->connect();
       return $this->hConnection;
+   }
+
+
+   /**
+    * Return the type of the DBMS the connector is used for.
+    *
+    * @return string
+    */
+   public function getType() {
+      return $this->type;
+   }
+
+
+   /**
+    * Return the version of the DBMS the connector is used for as a string.
+    *
+    * @return string - e.g. "9.1.23-rc"
+    */
+   public function getVersionString() {
+      if (is_null($this->versionString)) {
+         if (!$this->isConnected())
+            $this->connect();
+         $this->versionString = pg_version($this->hConnection)['server'];
+      }
+      return $this->versionString;
+   }
+
+
+   /**
+    * Return the version ID of the DBMS the connector is used for as an integer.
+    *
+    * @return int - e.g. 9001023 for version string "9.1.23-rc"
+    */
+   public function getVersionNumber() {
+      if (is_null($this->versionNumber)) {
+         $version = $this->getVersionString();
+         if (!preg_match('/^(\d+)\.(\d+).(\d+)/', $version, $match))
+            throw new \UnexpectedValueException('Unexpected version string "'.$version.'"');
+
+         $major   = (int) $match[1];
+         $minor   = (int) $match[2];
+         $release = (int) $match[3];
+
+         $this->versionNumber = $major*1000000 + $minor*1000 + $release;
+      }
+      return $this->versionNumber;
    }
 }
