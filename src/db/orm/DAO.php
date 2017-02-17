@@ -18,8 +18,11 @@ use rosasurfer\exception\InvalidArgumentException;
 abstract class DAO extends Singleton {
 
 
+   /** @var IConnector - the db connector for this DAO */
+   private $connector;
+
    /** @var Worker - the worker this DAO uses */
-   protected $worker;
+   private $worker;
 
    /** @var string - the name of the DAO's entity class */
    protected $entityClass;
@@ -101,7 +104,10 @@ abstract class DAO extends Singleton {
     * @return IConnector
     */
    public final function db() {
-      return $this->getWorker()->getConnector();
+      if (!$this->connector) {
+         $this->connector = $this->getWorker()->getConnector();
+      }
+      return $this->connector;
    }
 
 
@@ -115,6 +121,44 @@ abstract class DAO extends Singleton {
          $this->worker = new Worker($this);
       }
       return $this->worker;
+   }
+
+
+   /**
+    * Escape a DBMS identifier, i.e. the name of a database object (schema, table, view, column etc.). The resulting string
+    * can be used in queries "as-is" and doesn't need additional quoting.
+    *
+    * @param  string $name - identifier to escape
+    *
+    * @return string - escaped and quoted identifier
+    */
+   public function escapeIdentifier($name) {
+      return $this->db()->escapeIdentifier($name);
+   }
+
+
+   /**
+    * Escape a DBMS string literal, i.e. a string value. The resulting string can be used in queries "as-is" and doesn't
+    * need additional quoting.
+    *
+    * @param  string $value - value to escape
+    *
+    * @return string - escaped and quoted string value
+    */
+   public function escapeLiteral($value) {
+      return $this->db()->escapeLiteral($value);
+   }
+
+
+   /**
+    * Escape a string value. The resulting string must be quoted according to the DBMS before it can be used in queries.
+    *
+    * @param  string $value - value to escape
+    *
+    * @return string - escaped but not quoted string value
+    */
+   public function escapeString($value) {
+      return $this->db()->escapeString($value);
    }
 
 
