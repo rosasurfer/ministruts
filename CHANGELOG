@@ -2,6 +2,7 @@
 2017-02-17
 
    - methods db/*/Connector::escape(Identifier|Literal|String)()
+   - methods db/orm/DAO::escape(Identifier|Literal|String)()
 
 
 2017-02-16
