@@ -1,0 +1,21 @@
+engines:
+  csslint:
+    enabled: false
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - php
+  eslint:
+    enabled: false      
+  fixme:
+    enabled: true
+  phpmd:
+    enabled: true
+    checks:
+      Controversial/Superglobals:
+        enabled: false
+ratings:
+  paths:
+  - "**.php"
+exclude_paths: []
