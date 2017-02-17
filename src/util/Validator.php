@@ -12,12 +12,12 @@ class Validator extends StaticClass {
 
 
    /**
-    * Ob der übergebene String eine syntaktisch gültige IP-Adresse ist.
+    * Ob der uebergebene String eine syntaktisch gueltige IP-Adresse ist.
     *
-    * @param  string $string      - der zu überprüfende String
-    * @param  bool   $returnBytes - Typ des Rückgabewertes
+    * @param  string $string      - der zu ueberpruefende String
+    * @param  bool   $returnBytes - Typ des Rueckgabewertes
     *                               FALSE: Boolean (default)
-    *                               TRUE:  Array mit den Adressbytes oder FALSE, wenn der String keine gültige IP-Adresse darstellt
+    *                               TRUE:  Array mit den Adressbytes oder FALSE, wenn der String keine gueltige IP-Adresse darstellt
     * @return bool|array
     */
    public static function isIPAddress($string, $returnBytes = false) {
@@ -45,9 +45,9 @@ class Validator extends StaticClass {
 
 
    /**
-    * Ob der übergebene String eine syntaktisch gültige IP-Adresse eines lokalen Netzwerks ist.
+    * Ob der uebergebene String eine syntaktisch gueltige IP-Adresse eines lokalen Netzwerks ist.
     *
-    * @param  string $string - der zu überprüfende String
+    * @param  string $string - der zu ueberpruefende String
     *
     * @return bool
     */
@@ -70,16 +70,16 @@ class Validator extends StaticClass {
 
 
    /**
-    * Ob der übergebene String eine syntaktisch gültige IP-Adresse eines externen Netzwerks ist.
+    * Ob der uebergebene String eine syntaktisch gueltige IP-Adresse eines externen Netzwerks ist.
     *
-    * @param  string $string - der zu überprüfende String
+    * @param  string $string - der zu ueberpruefende String
     *
     * @return bool
     */
    public static function isIPWanAddress($string) {
       $bytes = self::isIPAddress($string, true);
 
-      // Die Logik entspricht dem Gegenteil von self:: isIPLanAdress() + zusätzlicher Tests.
+      // Die Logik entspricht dem Gegenteil von self:: isIPLanAdress() + zusaetzlicher Tests.
       if ($bytes) {
          if ($bytes[0] == 10)                   // 10.0.0.0 - 10.255.255.255
             return false;
@@ -103,9 +103,9 @@ class Validator extends StaticClass {
 
 
    /**
-    * Ob der übergebene String eine syntaktisch gültige E-Mail-Adresse ist.
+    * Ob der uebergebene String eine syntaktisch gueltige E-Mail-Adresse ist.
     *
-    * @param  string $string - der zu überprüfende String
+    * @param  string $string - der zu ueberpruefende String
     *
     * @return bool
     */
@@ -119,9 +119,9 @@ class Validator extends StaticClass {
 
 
    /**
-    * Ob der übergebene String ein gültiges E-Mail-Adressmuster ist. Wildcards sind ? und *.
+    * Ob der uebergebene String ein gueltiges E-Mail-Adressmuster ist. Wildcards sind ? und *.
     *
-    * @param  string $string - der zu überprüfende String
+    * @param  string $string - der zu ueberpruefende String
     *
     * @return bool
     */
@@ -135,15 +135,15 @@ class Validator extends StaticClass {
 
 
    /**
-    * Ob der übergebene String einen gültigen Date/DateTime-Wert darstellt.
+    * Ob der uebergebene String einen gueltigen Date/DateTime-Wert darstellt.
     *
-    * @param  string    $string - der zu überprüfende String
-    * @param  string|[] $format - Format, dem der String entsprechen soll. Sind mehrere angegeben, muß der String
+    * @param  string    $string - der zu ueberpruefende String
+    * @param  string|[] $format - Format, dem der String entsprechen soll. Sind mehrere angegeben, muss der String
     *                             mindestens einem davon entsprechen.
     *
-    * @return int|bool - Timestamp oder FALSE, wenn der übergebene Wert ungültig ist
+    * @return int|bool - Timestamp oder FALSE, wenn der uebergebene Wert ungueltig ist
     *
-    * Unterstützte Formate: 'Y-m-d [H:i[:s]]'
+    * Unterstuetzte Formate: 'Y-m-d [H:i[:s]]'
     *                       'Y.m.d [H:i[:s]]'
     *                       'd.m.Y [H:i[:s]]'
     *                       'd/m/Y [H:i[:s]]'
@@ -162,7 +162,7 @@ class Validator extends StaticClass {
       if (!is_string($format)) throw new IllegalTypeException('Illegal type of parameter $format: '.getType($format));
 
       /*
-      // !!! deaktiviert!!!: strPTime() hält sich nicht 100% an das angegebene Format sondern versucht, intelligent zu sein
+      // !!! deaktiviert!!!: strPTime() haelt sich nicht 100% an das angegebene Format sondern versucht, intelligent zu sein
       if (!WINDOWS) {
          if     ($format == 'Y-m-d'      ) $data = strPTime($date, '%Y-%m-%d');
          elseif ($format == 'Y-m-d H:i'  ) $data = strPTime($date, '%Y-%m-%d %H:%M');
@@ -292,9 +292,9 @@ class Validator extends StaticClass {
 
 
    /**
-    * Ob der übergebene String ein gültiger Geschlechtsbezeichner ist.
+    * Ob der uebergebene String ein gueltiger Geschlechtsbezeichner ist.
     *
-    * @param  string $string - der zu prüfende String
+    * @param  string $string - der zu pruefende String
     *
     * @return bool
     */
@@ -328,9 +328,9 @@ class Validator extends StaticClass {
 
 
    /**
-    * Ob der übergebene String ein vollständiger Straßenname ist (Landstr. [23]).
+    * Ob der uebergebene String ein vollstaendiger Strassenname ist (Landstr. [23]).
     *
-    * @param  string $string - der zu prüfende String
+    * @param  string $string - der zu pruefende String
     *
     * @return bool
     */
@@ -342,9 +342,9 @@ class Validator extends StaticClass {
 
 
    /**
-    * Ob der übergebene String ein gültiger Vorname ist.
+    * Ob der uebergebene String ein gueltiger Vorname ist.
     *
-    * @param  string $string - der zu prüfende String
+    * @param  string $string - der zu pruefende String
     *
     * @return bool
     */
@@ -355,9 +355,9 @@ class Validator extends StaticClass {
 
 
    /**
-    * Ob der übergebene String ein gültiger Nachname ist.
+    * Ob der uebergebene String ein gueltiger Nachname ist.
     *
-    * @param  string $string - der zu prüfende String
+    * @param  string $string - der zu pruefende String
     *
     * @return bool
     */
@@ -367,9 +367,9 @@ class Validator extends StaticClass {
 
 
    /**
-    * Ob der übergebene String ein gültiger Ortsname ist.
+    * Ob der uebergebene String ein gueltiger Ortsname ist.
     *
-    * @param  string $string - der zu prüfende String
+    * @param  string $string - der zu pruefende String
     *
     * @return bool
     */
@@ -380,9 +380,9 @@ class Validator extends StaticClass {
 
 
    /**
-    * Ob der übergebene String ein gültiger Straßenname ist.
+    * Ob der uebergebene String ein gueltiger Strassenname ist.
     *
-    * @param  string $string - der zu prüfende String
+    * @param  string $string - der zu pruefende String
     *
     * @return bool
     */
@@ -393,9 +393,9 @@ class Validator extends StaticClass {
 
 
    /**
-    * Ob der übergebene String eine gültige Hausnummer ist.
+    * Ob der uebergebene String eine gueltige Hausnummer ist.
     *
-    * @param  string $string - der zu prüfende String
+    * @param  string $string - der zu pruefende String
     *
     * @return bool
     */

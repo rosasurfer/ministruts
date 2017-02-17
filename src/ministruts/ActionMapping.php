@@ -25,8 +25,8 @@ class ActionMapping extends Object {
 
 
    /**
-    * Ob diese Komponente vollständig konfiguriert ist. Wenn dieses Flag gesetzt ist, wirft jeder Versuch,
-    * die Komponente zu ändern, eine IllegalStateException.
+    * Ob diese Komponente vollstaendig konfiguriert ist. Wenn dieses Flag gesetzt ist, wirft jeder Versuch,
+    * die Komponente zu aendern, eine IllegalStateException.
     */
    protected /*bool*/ $configured = false;
 
@@ -54,7 +54,7 @@ class ActionMapping extends Object {
 
 
    /**
-    * Module, zu dem das Mapping gehört
+    * Module, zu dem das Mapping gehoert
     */
    protected /*Module*/ $module;
 
@@ -62,7 +62,7 @@ class ActionMapping extends Object {
    /**
     * Constructor
     *
-    * @param  Module $module - Module, zu dem dieses Mapping gehört
+    * @param  Module $module - Module, zu dem dieses Mapping gehoert
     */
    public function __construct(Module $module) {
       $this->module = $module;
@@ -70,7 +70,7 @@ class ActionMapping extends Object {
 
 
    /**
-    * Gibt das Module, zu dem dieses Mapping gehört, zurück.
+    * Gibt das Module, zu dem dieses Mapping gehoert, zurueck.
     *
     * @return Module instance
     */
@@ -100,7 +100,7 @@ class ActionMapping extends Object {
 
 
    /**
-    * Gibt den Pfad dieses Mappings zurück.
+    * Gibt den Pfad dieses Mappings zurueck.
     *
     * @return string
     */
@@ -110,7 +110,7 @@ class ActionMapping extends Object {
 
 
    /**
-    * Ob das Mapping für die angegebene HTTP-Methode konfiguriert wurde.
+    * Ob das Mapping fuer die angegebene HTTP-Methode konfiguriert wurde.
     *
     * @param  string $method - HTTP-Methode
     *
@@ -124,7 +124,7 @@ class ActionMapping extends Object {
 
 
    /**
-    * Setzt die HTTP-Methoden, die dieses Mapping unterstützt.  Requests einer nicht konfigurierten
+    * Setzt die HTTP-Methoden, die dieses Mapping unterstuetzt.  Requests einer nicht konfigurierten
     * Methode werden abgewiesen.
     *
     * @param  string $method - HTTP-Methode: "GET"|"POST"
@@ -143,7 +143,7 @@ class ActionMapping extends Object {
 
 
    /**
-    * Gibt die Rollenbeschränkung dieses Mappings zurück.
+    * Gibt die Rollenbeschraenkung dieses Mappings zurueck.
     *
     * @return string - Rollenbezeichner
     */
@@ -153,7 +153,7 @@ class ActionMapping extends Object {
 
 
    /**
-    * Setzt die Rollenbeschränkung dieses Mappings.  Requests, die nicht den angebenen Rollen genügen,
+    * Setzt die Rollenbeschraenkung dieses Mappings.  Requests, die nicht den angebenen Rollen genuegen,
     * werden abgewiesen.
     *
     * @param  string - Rollenausdruck
@@ -200,7 +200,7 @@ class ActionMapping extends Object {
 
 
    /**
-    * Gibt den direkt konfigurierten ActionForward zurück, oder NULL, wenn eine Action konfiguriert wurde.
+    * Gibt den direkt konfigurierten ActionForward zurueck, oder NULL, wenn eine Action konfiguriert wurde.
     *
     * @return ActionForward
     */
@@ -210,7 +210,7 @@ class ActionMapping extends Object {
 
 
    /**
-    * Setzt den Klassennamen der auszuführenden Action.
+    * Setzt den Klassennamen der auszufuehrenden Action.
     *
     * @param  string $className
     *
@@ -229,7 +229,7 @@ class ActionMapping extends Object {
 
 
    /**
-    * Gibt den Klassennamen der auszuführenden Action zurück, oder NULL, wenn keine Action konfiguriert
+    * Gibt den Klassennamen der auszufuehrenden Action zurueck, oder NULL, wenn keine Action konfiguriert
     * wurde.
     *
     * @return string - Klassenname
@@ -240,7 +240,7 @@ class ActionMapping extends Object {
 
 
    /**
-    * Setzt den Klassennamen der zur Action gehörenden ActionForm.
+    * Setzt den Klassennamen der zur Action gehoerenden ActionForm.
     *
     * @param  string $className
     *
@@ -258,7 +258,7 @@ class ActionMapping extends Object {
 
 
    /**
-    * Gibt den Klassennamen der ActionForm oder NULL, wenn keine ActionForm konfiguriert wurde, zurück.
+    * Gibt den Klassennamen der ActionForm oder NULL, wenn keine ActionForm konfiguriert wurde, zurueck.
     *
     * @return string - Klassenname
     */
@@ -270,8 +270,8 @@ class ActionMapping extends Object {
    /**
     * Setzt das Scope-Attribute der ActionForm dieses Mappings.  Das Scope-Attribute bestimmt, in
     * welchem Kontext auf die ActionForm-Instanz zugegriffen wird.  Default ist "request".  Wird dieser
-    * Wert auf "session" gesetzt, können Formulareingaben über mehrere Requests zur Verfügung stehen
-    * (z.B. für Page-Wizards o.ä. mehrseitige Formulare).
+    * Wert auf "session" gesetzt, koennen Formulareingaben ueber mehrere Requests zur Verfuegung stehen
+    * (z.B. fuer Page-Wizards o.ae. mehrseitige Formulare).
     *
     * @param  string $value - "request" oder "session"
     *
@@ -288,7 +288,7 @@ class ActionMapping extends Object {
 
 
    /**
-    * Gibt den Bezeichner des Kontexts zurück, in dem auf die ActionForm dieses Mappings zugegriffen wird.
+    * Gibt den Bezeichner des Kontexts zurueck, in dem auf die ActionForm dieses Mappings zugegriffen wird.
     *
     * @return string - Scope-Bezeichner
     */
@@ -322,7 +322,7 @@ class ActionMapping extends Object {
 
 
    /**
-    * Setzt das FormValidateFirst-Flag für die ActionForm des ActionMappings.  Das Flag zeigt an, ob die
+    * Setzt das FormValidateFirst-Flag fuer die ActionForm des ActionMappings.  Das Flag zeigt an, ob die
     * ActionForm vor Aufruf der Action validiert werden soll oder nicht.  Ohne entsprechende Angabe
     * in der struts-config.xml wird die ActionForm immer validiert.
     *
@@ -350,8 +350,8 @@ class ActionMapping extends Object {
 
 
    /**
-    * Setzt das Default-Flag für dieses ActionMapping. Requests, die keinem anderen Mapping zugeordnet
-    * werden können, werden von dem Mapping mit gesetztem Default-Flag verarbeitet. Nur ein Mapping
+    * Setzt das Default-Flag fuer dieses ActionMapping. Requests, die keinem anderen Mapping zugeordnet
+    * werden koennen, werden von dem Mapping mit gesetztem Default-Flag verarbeitet. Nur ein Mapping
     * innerhalb eines Modules kann dieses Flag gesetzt werden.
     *
     * @param  bool $default
@@ -368,7 +368,7 @@ class ActionMapping extends Object {
 
 
    /**
-    * Ob für dieses ActionMapping das Default-Flag gesetzt ist.
+    * Ob fuer dieses ActionMapping das Default-Flag gesetzt ist.
     *
     * @return bool
     *
@@ -380,8 +380,8 @@ class ActionMapping extends Object {
 
 
    /**
-    * Fügt dem ActionMapping unter dem angegebenen Namen einen ActionForward hinzu. Der angegebene
-    * Name kann vom internen Namen des Forwards abweichen, sodaß die Definition von Aliassen möglich
+    * Fuegt dem ActionMapping unter dem angegebenen Namen einen ActionForward hinzu. Der angegebene
+    * Name kann vom internen Namen des Forwards abweichen, sodass die Definition von Aliassen moeglich
     * ist (ein Forward ist unter mehreren Namen auffindbar).
     *
     * @param  string        $name
@@ -436,10 +436,10 @@ class ActionMapping extends Object {
 
 
    /**
-    * Sucht und gibt den ActionForward mit dem angegebenen Namen zurück. Zuerst werden die lokalen
+    * Sucht und gibt den ActionForward mit dem angegebenen Namen zurueck. Zuerst werden die lokalen
     * Forwards des Mappings durchsucht, danach die globalen Forwards des Modules.  Wird kein Forward
-    * gefunden, wird NULL zurückgegeben.  Zusätzlich zu den konfigurierten Forwards kann zur Laufzeit
-    * unter dem geschützten Bezeichner "__self" ein Redirect-Forward auf das ActionMapping selbst
+    * gefunden, wird NULL zurueckgegeben.  Zusaetzlich zu den konfigurierten Forwards kann zur Laufzeit
+    * unter dem geschuetzten Bezeichner "__self" ein Redirect-Forward auf das ActionMapping selbst
     * abgerufen werden.
     *
     * @param  string $name - logischer Name

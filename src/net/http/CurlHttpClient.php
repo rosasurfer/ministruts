@@ -14,7 +14,7 @@ use const rosasurfer\L_WARN;
 /**
  * CurlHttpClient
  *
- * Eine Klasse, die mit CURL HttpRequests ausführen kann.
+ * Eine Klasse, die mit CURL HttpRequests ausfuehren kann.
  */
 class CurlHttpClient extends HttpClient {
 
@@ -22,8 +22,8 @@ class CurlHttpClient extends HttpClient {
    private static /*bool*/ $logDebug, $logInfo, $logNotice;
 
    private /*resource*/ $hCurl;                       // Curl-Handle
-   private /*int*/      $manualRedirects = 0;         // Zähler für manuelle Redirects (falls "open_basedir" aktiv ist)
-   private /*mixed[]*/  $options         = array();   // zusätzliche CURL-Optionen
+   private /*int*/      $manualRedirects = 0;         // Zaehler fuer manuelle Redirects (falls "open_basedir" aktiv ist)
+   private /*mixed[]*/  $options         = array();   // zusaetzliche CURL-Optionen
 
 
    // CURL-Fehlerbeschreibungen
@@ -126,7 +126,7 @@ class CurlHttpClient extends HttpClient {
    /**
     * Erzeugt eine neue Instanz.
     *
-    * @param  mixed[] $options - Array mit zusätzlichen CURL-Optionen (default: keine)
+    * @param  mixed[] $options - Array mit zusaetzlichen CURL-Optionen (default: keine)
     */
    public function __construct(array $options = null) {
       $loglevel        = Logger::getLogLevel(__CLASS__);
@@ -140,7 +140,7 @@ class CurlHttpClient extends HttpClient {
 
 
    /**
-    * Destructor. Schließt ggf. ein noch offenes CURL-Handle
+    * Destructor. Schliesst ggf. ein noch offenes CURL-Handle
     */
    public function __destruct() {
       // Attempting to throw an exception from a destructor during script shutdown causes a fatal error.
@@ -160,7 +160,7 @@ class CurlHttpClient extends HttpClient {
    /**
     * Erzeugt eine neue Instanz der Klasse.
     *
-    * @param  mixed[] $options - Array mit zusätzlichen CURL-Optionen (default: keine)
+    * @param  mixed[] $options - Array mit zusaetzlichen CURL-Optionen (default: keine)
     *
     * @return self
     */
@@ -170,7 +170,7 @@ class CurlHttpClient extends HttpClient {
 
 
    /**
-    * Führt den übergebenen Request aus und gibt die empfangene Antwort zurück.
+    * Fuehrt den uebergebenen Request aus und gibt die empfangene Antwort zurueck.
     *
     * @param  HttpRequest $request
     *
@@ -192,10 +192,10 @@ class CurlHttpClient extends HttpClient {
 
       if (!isSet($options[CURLOPT_WRITEHEADER]))
          if (!isSet($options[CURLOPT_HEADERFUNCTION])) $options[CURLOPT_HEADERFUNCTION] = array($response, 'writeHeader');
-      if (!isSet($options[CURLOPT_FILE]))                                                       // ein gesetztes CURLOPT_RETURNTRANSFER wird überschrieben
+      if (!isSet($options[CURLOPT_FILE]))                                                       // ein gesetztes CURLOPT_RETURNTRANSFER wird ueberschrieben
          if (!isSet($options[CURLOPT_WRITEFUNCTION]))  $options[CURLOPT_WRITEFUNCTION ] = array($response, 'writeContent');
 
-      // zusätzliche Header überschreiben automatisch generierte Header
+      // zusaetzliche Header ueberschreiben automatisch generierte Header
       foreach ($request->getHeaders() as $key => $value) {
          $options[CURLOPT_HTTPHEADER][] = $key.': '.$value;
       }
@@ -220,11 +220,11 @@ class CurlHttpClient extends HttpClient {
       }
       curl_setopt_array($this->hCurl, $options);
 
-      // Request ausführen
+      // Request ausfuehren
       if (curl_exec($this->hCurl) === false) throw new IOException('CURL error '.self::getError($this->hCurl).', url: '.$request->getUrl());
       $response->setStatus($status=curl_getinfo($this->hCurl, CURLINFO_HTTP_CODE));
 
-      // ggf. manuellen Redirect ausführen (falls "open_basedir" aktiviert ist)
+      // ggf. manuellen Redirect ausfuehren (falls "open_basedir" aktiviert ist)
       if (($status==301 || $status==302) && $this->isFollowRedirects() && ini_get('open_basedir')) {
          if ($this->manualRedirects >= $this->maxRedirects)
             throw new IOException('CURL error: maxRedirects limit exceeded - '.$this->maxRedirects.', url: '.$request->getUrl());
@@ -244,7 +244,7 @@ class CurlHttpClient extends HttpClient {
 
 
    /**
-    * Gibt eine Beschreibung des letzten CURL-Fehlers zurück.
+    * Gibt eine Beschreibung des letzten CURL-Fehlers zurueck.
     *
     * @param  resource $hCurl - CURL-Handle
     *

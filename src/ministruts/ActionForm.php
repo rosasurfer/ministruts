@@ -20,7 +20,7 @@ abstract class ActionForm extends Object {
    /**
     * Constructor
     *
-    * Erzeugt eine neue ActionForm für den aktuellen Request.
+    * Erzeugt eine neue ActionForm fuer den aktuellen Request.
     *
     * @param  Request $request - der aktuelle Request
     */
@@ -37,7 +37,7 @@ abstract class ActionForm extends Object {
 
 
    /**
-    * Liest die im Request übergebenen Parameter ein.  Muß anwendungsabhängig implementiert werden.
+    * Liest die im Request uebergebenen Parameter ein.  Muss anwendungsabhaengig implementiert werden.
     *
     * @param  Request $request - der aktuelle Request
     */
@@ -45,10 +45,10 @@ abstract class ActionForm extends Object {
 
 
    /**
-    * Ob die eingelesenen Parameter gültig sind. Muß anwendungsabhängig überschrieben werden.
+    * Ob die eingelesenen Parameter gueltig sind. Muss anwendungsabhaengig ueberschrieben werden.
     *
-    * @return bool - TRUE, wenn die übergebenen Parameter gültig sind, FALSE andererseits
-    *                (diese Default-Implementierung gibt immer TRUE zurück)
+    * @return bool - TRUE, wenn die uebergebenen Parameter gueltig sind, FALSE andererseits
+    *                (diese Default-Implementierung gibt immer TRUE zurueck)
     */
    public function validate() {
       return true;
@@ -56,7 +56,7 @@ abstract class ActionForm extends Object {
 
 
    /**
-    * Gibt den DispatchAction-Key zurück (Beschreibung: siehe java.struts.DispatchAction).
+    * Gibt den DispatchAction-Key zurueck (Beschreibung: siehe java.struts.DispatchAction).
     *
     * @return string - Action-Key oder NULL, wenn kein Wert angegeben wurde
     */

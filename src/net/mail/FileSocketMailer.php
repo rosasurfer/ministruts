@@ -5,7 +5,7 @@ use rosasurfer\exception\UnimplementedFeatureException;
 
 
 /**
- * Mailer, der Mails über eine FileSocket-Verbindung verschickt.
+ * Mailer, der Mails ueber eine FileSocket-Verbindung verschickt.
  */
 class FileSocketMailer extends Mailer {
 
@@ -24,10 +24,10 @@ class FileSocketMailer extends Mailer {
     * Verschickt eine Mail.
     *
     * @param  string $sender   - Absender  (Format: 'Vorname Nachname <user@domain.tld>')
-    * @param  string $receiver - Empfänger (Format: 'Vorname Nachname <user@domain.tld>')
+    * @param  string $receiver - Empfaenger (Format: 'Vorname Nachname <user@domain.tld>')
     * @param  string $subject  - Betreffzeile der E-Mail
     * @param  string $message  - Inhalt der E-Mail
-    * @param  array  $headers  - zusätzliche zu setzende Mail-Header
+    * @param  array  $headers  - zusaetzliche zu setzende Mail-Header
     */
    public function sendMail($sender, $receiver, $subject, $message, array $headers = null) {
       throw new UnimplementedFeatureException('Method '.get_class($this).'::'.__FUNCTION__.'() is not implemented');

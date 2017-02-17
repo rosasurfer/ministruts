@@ -12,7 +12,7 @@ abstract class BaseLock extends Object {
 
 
    /**
-    * Ob dieses Lock gültig (valid) ist.
+    * Ob dieses Lock gueltig (valid) ist.
     *
     * @return bool
     */
@@ -20,8 +20,8 @@ abstract class BaseLock extends Object {
 
 
    /**
-    * Wenn dieses Lock gültig (valid) ist, gibt der Aufruf dieser Methode das gehaltene Lock frei und
-    * markiert es als ungültig (invalid).  Wenn das Lock bereits ungültig (invalid) ist, hat der Aufruf
+    * Wenn dieses Lock gueltig (valid) ist, gibt der Aufruf dieser Methode das gehaltene Lock frei und
+    * markiert es als ungueltig (invalid).  Wenn das Lock bereits ungueltig (invalid) ist, hat der Aufruf
     * keinen Effekt.
     *
     * @see Lock::isValid()
@@ -30,9 +30,9 @@ abstract class BaseLock extends Object {
 
 
    /**
-    * Transformiert einen Schlüssel (String) in einen eindeutigen numerischen Wert (Integer).
+    * Transformiert einen Schluessel (String) in einen eindeutigen numerischen Wert (Integer).
     *
-    * @param  string $key - Schlüssel
+    * @param  string $key - Schluessel
     *
     * @return int
     */

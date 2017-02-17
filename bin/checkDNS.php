@@ -7,8 +7,8 @@ use const rosasurfer\WINDOWS;
 
 
 /**
- * TODO: Jeder Nameserver muß einzeln abgefragt werden, denn bei fehlerhafter NS-Synchronisierung können
- *       sich die zurückgegebenen Werte der einzelnen Server unterscheiden.
+ * TODO: Jeder Nameserver muss einzeln abgefragt werden, denn bei fehlerhafter NS-Synchronisierung koennen
+ *       sich die zurueckgegebenen Werte der einzelnen Server unterscheiden.
  */
 set_time_limit(0);
 
@@ -25,9 +25,9 @@ if (WINDOWS) throw new InfrastructureException("This script cannot run on Window
 
 
 /**
- * Führt eine DNS-Abfrage durch und gibt den ermittelten Wert zurück
+ * Fuehrt eine DNS-Abfrage durch und gibt den ermittelten Wert zurueck
  *
- * @param  string $domain - Domain-Name, für den die Abfrage durchgeführt werden soll
+ * @param  string $domain - Domain-Name, fuer den die Abfrage durchgefuehrt werden soll
  * @param  string $type   - Typ des abzufragenden Wertes (A, MX, NS, TXT, etc.)
  *
  * @return string - Wert
@@ -84,7 +84,7 @@ if (!$config=Config::getDefault())
    throw new RuntimeException('Service locator returned invalid default config: '.getType($config));
 
 
-// normale DNS-Einträge überprüfen (A, MX, NS, TXT, etc.)
+// normale DNS-Eintraege ueberpruefen (A, MX, NS, TXT, etc.)
 $domains = $config->get('dns.domain', array());
 
 foreach ($domains as $domain => $domainValues) {
@@ -123,7 +123,7 @@ foreach ($domains as $domain => $domainValues) {
 }
 
 
-// Reverse-DNS der angegebenen IP-Adressen überprüfen
+// Reverse-DNS der angegebenen IP-Adressen ueberpruefen
 $ips = $config->get('dns.ip', array());
 
 foreach ($ips as $ip => $value) {

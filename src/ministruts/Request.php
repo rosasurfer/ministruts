@@ -385,7 +385,7 @@ class Request extends Singleton {
 
 
    /**
-    * Gibt den Wert des 'X-Forwarded-For'-Headers des aktuellen Requests zurück.
+    * Gibt den Wert des 'X-Forwarded-For'-Headers des aktuellen Requests zurueck.
     *
     * @return string - Wert (ein oder mehrere IP-Adressen oder Hostnamen) oder NULL, wenn der Header nicht gesetzt ist
     */
@@ -444,7 +444,7 @@ class Request extends Singleton {
 
 
    /**
-    * Ob mit dem Request eine Session-ID übertragen wurde.
+    * Ob mit dem Request eine Session-ID uebertragen wurde.
     *
     * @return bool
     */
@@ -465,7 +465,7 @@ class Request extends Singleton {
 
 
    /**
-    * Gibt die aktuelle HttpSession zurück. Existiert noch keine Session, wird eine erzeugt.
+    * Gibt die aktuelle HttpSession zurueck. Existiert noch keine Session, wird eine erzeugt.
     *
     * @return HttpSession
     */
@@ -475,17 +475,17 @@ class Request extends Singleton {
 
 
    /**
-    * Zerstört die aktuelle HttpSession des Requests.
+    * Zerstoert die aktuelle HttpSession des Requests.
     *
     * @return bool
     */
    public function destroySession() {
       if ($this->isSession()) {
-         // TODO: 1. Cookie mit 2. überschreiben statt einen weiteren hinzuzufügen
-         // besser einen schon gesetzten Cookie mit header($replace = true) überschreiben
-         // außerdem soll $value = '' nicht immer funktionieren, besser: $value = sess_id()
+         // TODO: 1. Cookie mit 2. ueberschreiben statt einen weiteren hinzuzufuegen
+         // besser einen schon gesetzten Cookie mit header($replace = true) ueberschreiben
+         // ausserdem soll $value = '' nicht immer funktionieren, besser: $value = sess_id()
 
-         // TODO: SID und die gesamte Session zurücksetzen
+         // TODO: SID und die gesamte Session zuruecksetzen
          setcookie(session_name(), '', time() - 1*DAY, '/');
          session_destroy();
       }
@@ -493,12 +493,12 @@ class Request extends Singleton {
 
 
    /**
-    * Gibt den angegebenen Header als Name-Wert-Paar zurück.  Wurden mehrere Header dieses Namens übertragen,
-    * wird der erste übertragene Header zurückgegeben.
+    * Gibt den angegebenen Header als Name-Wert-Paar zurueck.  Wurden mehrere Header dieses Namens uebertragen,
+    * wird der erste uebertragene Header zurueckgegeben.
     *
     * @param  string $name - Name des Headers
     *
-    * @return array - Name-Wert-Paar oder NULL, wenn kein Header dieses Namens übertragen wurde
+    * @return array - Name-Wert-Paar oder NULL, wenn kein Header dieses Namens uebertragen wurde
     */
    public function getHeader($name) {
       if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
@@ -584,7 +584,7 @@ class Request extends Singleton {
 
 
    /**
-    * Gibt die einzelnen Werte aller angegebenen Header als Array zurück (in der übertragenen Reihenfolge).
+    * Gibt die einzelnen Werte aller angegebenen Header als Array zurueck (in der uebertragenen Reihenfolge).
     *
     * @param  string|[] $names - ein oder mehrere Headernamen
     *
@@ -608,10 +608,10 @@ class Request extends Singleton {
 
 
    /**
-    * Gibt den im Request-Context unter dem angegebenen Schlüssel gespeicherten Wert zurück oder NULL,
-    * wenn unter diesem Schlüssel kein Wert existiert.
+    * Gibt den im Request-Context unter dem angegebenen Schluessel gespeicherten Wert zurueck oder NULL,
+    * wenn unter diesem Schluessel kein Wert existiert.
     *
-    * @param  string $key - Schlüssel, unter dem der Wert im Context gespeichert ist
+    * @param  string $key - Schluessel, unter dem der Wert im Context gespeichert ist
     *
     * @return mixed - der gespeicherte Wert oder NULL
     */
@@ -625,7 +625,7 @@ class Request extends Singleton {
 
 
    /**
-    * Gibt alle im Request-Context gespeicherten Werte zurück.
+    * Gibt alle im Request-Context gespeicherten Werte zurueck.
     *
     * @return array - Werte-Array
     */
@@ -637,7 +637,7 @@ class Request extends Singleton {
    /**
     * Store a value in the <tt>Request</tt> context. Can be used to transfer data from controllers or <tt>Action</tt>s to views.
     *
-    * @param  string $key   - Schlüssel, unter dem der Wert gespeichert wird
+    * @param  string $key   - Schluessel, unter dem der Wert gespeichert wird
     * @param  mixed  $value - der zu speichernde Wert
     */
    public function setAttribute($key, &$value) {
@@ -646,10 +646,10 @@ class Request extends Singleton {
 
 
    /**
-    * Löscht die Werte mit den angegebenen Schlüsseln aus dem Request-Context. Es können mehrere Schlüssel
+    * Loescht die Werte mit den angegebenen Schluesseln aus dem Request-Context. Es koennen mehrere Schluessel
     * angegeben werden.
     *
-    * @param  string $key - Schlüssel des zu löschenden Wertes
+    * @param  string $key - Schluessel des zu loeschenden Wertes
     */
    public function removeAttributes($key /*, $key2, $key3 ...*/) {
       foreach (func_get_args() as $key) {
@@ -663,8 +663,8 @@ class Request extends Singleton {
     *
     * @param  string $name    - Name des Cookies
     * @param  mixed  $value   - der zu speichernde Wert (wird zu String gecastet)
-    * @param  int    $expires - Lebenszeit des Cookies (0: bis zum Schließen des Browsers)
-    * @param  string $path    - Pfad, für den der Cookie gültig sein soll
+    * @param  int    $expires - Lebenszeit des Cookies (0: bis zum Schliessen des Browsers)
+    * @param  string $path    - Pfad, fuer den der Cookie gueltig sein soll
     */
    public function setCookie($name, $value, $expires = 0, $path = null) {
       if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
@@ -683,7 +683,7 @@ class Request extends Singleton {
 
 
    /**
-    * Ob der User, der den Request ausgelöst hat, Inhaber der angegebenen Rolle(n) ist.
+    * Ob der User, der den Request ausgeloest hat, Inhaber der angegebenen Rolle(n) ist.
     *
     * @param  string $roles - Rollenbezeichner
     *
@@ -706,22 +706,22 @@ class Request extends Singleton {
 
 
    /**
-    * Gibt die Error-Message für den angegebenen Schlüssel zurück.  Ohne Schlüssel wird die erste
-    * vorhandene Error-Message zurückgegeben.
+    * Gibt die Error-Message fuer den angegebenen Schluessel zurueck.  Ohne Schluessel wird die erste
+    * vorhandene Error-Message zurueckgegeben.
     *
-    * @param  string $key - Schlüssel der Error-Message
+    * @param  string $key - Schluessel der Error-Message
     *
     * @return string - Error-Message
     */
    public function getActionError($key = null) {
       $errors =& $this->getAttribute(ACTION_ERRORS_KEY);
 
-      if ($key === null) {       // die erste zurückgeben
+      if ($key === null) {       // die erste zurueckgeben
          if ($errors) {
             foreach ($errors as $error)
                return $error;
          }
-      }                          // eine bestimmte zurückgeben
+      }                          // eine bestimmte zurueckgeben
       elseif (isSet($errors[$key])) {
          return $errors[$key];
       }
@@ -730,7 +730,7 @@ class Request extends Singleton {
 
 
    /**
-    * Gibt alle vorhandenen Error-Messages zurück.
+    * Gibt alle vorhandenen Error-Messages zurueck.
     *
     * @return array - Error-Messages
     */
@@ -745,10 +745,10 @@ class Request extends Singleton {
 
 
    /**
-    * Ob unter dem angegebenen Schlüssel eine Error-Message existiert.  Ohne Angabe eines Schlüssel
-    * wird geprüft, ob überhaupt irgendeine Error-Message existiert.
+    * Ob unter dem angegebenen Schluessel eine Error-Message existiert.  Ohne Angabe eines Schluessel
+    * wird geprueft, ob ueberhaupt irgendeine Error-Message existiert.
     *
-    * @param  string $key - Schlüssel
+    * @param  string $key - Schluessel
     *
     * @return bool
     */
@@ -761,10 +761,10 @@ class Request extends Singleton {
 
 
    /**
-    * Setzt für den angegebenen Schlüssel eine Error-Message. Ist Message NULL, wird die Message mit
-    * dem angegebenen Schlüssel aus dem Request gelöscht.
+    * Setzt fuer den angegebenen Schluessel eine Error-Message. Ist Message NULL, wird die Message mit
+    * dem angegebenen Schluessel aus dem Request geloescht.
     *
-    * @param  string $key     - Schlüssel der Error-Message
+    * @param  string $key     - Schluessel der Error-Message
     * @param  string $message - Error-Message
     */
    public function setActionError($key, $message) {
@@ -782,13 +782,13 @@ class Request extends Singleton {
 
 
    /**
-    * Löscht Error-Messages aus dem Request.
+    * Loescht Error-Messages aus dem Request.
     *
-    * @param  string $key - die Schlüssel der zu löschenden Werte (ohne Angabe werden alle Error-Messages gelöscht)
+    * @param  string $key - die Schluessel der zu loeschenden Werte (ohne Angabe werden alle Error-Messages geloescht)
     *
-    * @return array - die gelöschten Error-Messages
+    * @return array - die geloeschten Error-Messages
     *
-    * TODO: Error-Messages auch aus der Session löschen
+    * TODO: Error-Messages auch aus der Session loeschen
     */
    public function removeActionErrors(/*$key1, $key2, $key3 ...*/) {
       $dropped = array();
@@ -812,9 +812,9 @@ class Request extends Singleton {
 
 
    /**
-    * Gibt das diesem Request zugeordnete ActionMapping zurück.
+    * Gibt das diesem Request zugeordnete ActionMapping zurueck.
     *
-    * @return ActionMapping - Mapping oder NULL, wenn die Request-Instance außerhalb des Struts-Frameworks benutzt wird.
+    * @return ActionMapping - Mapping oder NULL, wenn die Request-Instance ausserhalb des Struts-Frameworks benutzt wird.
     */
    public final function getMapping() {
       return $this->getAttribute(ACTION_MAPPING_KEY);
@@ -822,9 +822,9 @@ class Request extends Singleton {
 
 
    /**
-    * Gibt das diesem Request zugeordnete Struts-Module zurück.
+    * Gibt das diesem Request zugeordnete Struts-Module zurueck.
     *
-    * @return Module - Module oder NULL, wenn die Request-Instance außerhalb des Struts-Frameworks benutzt wird.
+    * @return Module - Module oder NULL, wenn die Request-Instance ausserhalb des Struts-Frameworks benutzt wird.
     */
    public final function getModule() {
       return $this->getAttribute(MODULE_KEY);

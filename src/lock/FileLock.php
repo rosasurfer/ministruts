@@ -34,15 +34,15 @@ final class FileLock extends BaseLock {
    /**
     * Constructor
     *
-    * Erzeugt ein neues FileLock für die angegebene Datei.
+    * Erzeugt ein neues FileLock fuer die angegebene Datei.
     *
-    * @param  string $filename - Name der Datei, auf der das Lock gehalten werden soll (muß existieren)
+    * @param  string $filename - Name der Datei, auf der das Lock gehalten werden soll (muss existieren)
     * @param  bool   $shared   - TRUE, um ein shared Lock oder FALSE, um ein exclusive Lock zu setzen
     *                            (default: FALSE = exklusives Lock)
     */
    public function __construct($filename, $shared = false) {
 
-      // TODO: Ein das Lock haltender Prozeß kann die Datei bis zum Aufruf von fLock() wieder gelöscht haben.
+      // TODO: Ein das Lock haltender Prozess kann die Datei bis zum Aufruf von fLock() wieder geloescht haben.
 
       // TODO: 2016-06-17: Win7/NTFS: Auf einer gesperrten Datei (Handle 1 ) funktionieren die Dateifunktionen
       //       mit einem anderen Handle (2) nicht mehr (unter Linux schon). Mit dem zum Sperren verwendeten Handle
@@ -52,7 +52,7 @@ final class FileLock extends BaseLock {
       if (!is_bool($shared))               throw new IllegalTypeException('Illegal type of parameter $shared: '.getType($shared));
 
       if (isSet(self::$hFiles[$filename])) throw new RuntimeException('Dead-lock detected: already holding a lock for file "'.$filename.'"');
-      self::$hFiles[$filename] = false;      // Schlägt der Constructor fehl, verhindert der gesetzte Eintrag ein
+      self::$hFiles[$filename] = false;      // Schlaegt der Constructor fehl, verhindert der gesetzte Eintrag ein
                                              // Dead-lock bei eventuellem Re-Entry.
       $this->filename = $filename;
       $this->shared   = $shared;
@@ -67,7 +67,7 @@ final class FileLock extends BaseLock {
    /**
     * Destructor
     *
-    * Sorgt bei Zerstörung der Instanz dafür, daß ein evt. noch gehaltenes Lock freigegeben wird.
+    * Sorgt bei Zerstoerung der Instanz dafuer, dass ein evt. noch gehaltenes Lock freigegeben wird.
     */
    public function __destruct() {
       // Attempting to throw an exception from a destructor during script shutdown causes a fatal error.
@@ -92,7 +92,7 @@ final class FileLock extends BaseLock {
 
 
    /**
-    * Ob dieses Lock gültig (valid) ist.
+    * Ob dieses Lock gueltig (valid) ist.
     *
     * @return bool
     */
@@ -105,11 +105,11 @@ final class FileLock extends BaseLock {
 
 
    /**
-    * Wenn dieses Lock gültig (valid) ist, gibt der Aufruf dieser Methode das gehaltene Lock frei und
-    * markiert es als ungültig (invalid).  Wenn das Lock bereits ungültig (invalid) ist, hat der Aufruf
+    * Wenn dieses Lock gueltig (valid) ist, gibt der Aufruf dieser Methode das gehaltene Lock frei und
+    * markiert es als ungueltig (invalid).  Wenn das Lock bereits ungueltig (invalid) ist, hat der Aufruf
     * keinen Effekt.
     *
-    * @param  bool $deleteFile - ob das verwendete Lockfile beim Freigeben des Locks gelöscht werden soll (default: FALSE)
+    * @param  bool $deleteFile - ob das verwendete Lockfile beim Freigeben des Locks geloescht werden soll (default: FALSE)
     */
    public function release($deleteFile = false) {
       if (!is_bool($deleteFile)) throw new IllegalTypeException('Illegal type of parameter $deleteFile: '.getType($deleteFile));
@@ -117,7 +117,7 @@ final class FileLock extends BaseLock {
       if ($this->isValid()) {
          fClose(self::$hFiles[$this->filename]);      // see docs: The lock is released also by fClose()...
          if ($deleteFile)
-            @unlink($this->filename);                 // @: theoretisch kann hier schon ein anderer Prozeß das Lock halten
+            @unlink($this->filename);                 // @: theoretisch kann hier schon ein anderer Prozess das Lock halten
          unset(self::$hFiles[$this->filename]);
       }
    }

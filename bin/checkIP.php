@@ -49,7 +49,7 @@ function echoPre($var) {
 
 
 /**
- * Gibt die IP-Adresse zurück, von der aus der Request ausgelöst wurde.
+ * Gibt die IP-Adresse zurueck, von der aus der Request ausgeloest wurde.
  *
  * @return string - IP-Adresse
  */
@@ -59,7 +59,7 @@ function getRemoteAddress() {
 
 
 /**
- * Gibt den Wert des 'X-Forwarded-For'-Headers des aktuellen Requests zurück.
+ * Gibt den Wert des 'X-Forwarded-For'-Headers des aktuellen Requests zurueck.
  *
  * @return string - Wert (ein oder mehrere IP-Adressen oder Hostnamen) oder NULL, wenn der Header nicht gesetzt ist
  */
@@ -69,9 +69,9 @@ function getForwardedRemoteAddress() {
 
 
 /**
- * Gibt den Wert des angegebenen Headers als String zurück. Wird ein Array mit mehreren Namen angegeben oder wurden
- * mehrere Header des angegebenen Namens übertragen, werden alle Werte dieser Header als eine komma-getrennte Liste
- * zurückgegeben (in der übertragenen Reihenfolge).
+ * Gibt den Wert des angegebenen Headers als String zurueck. Wird ein Array mit mehreren Namen angegeben oder wurden
+ * mehrere Header des angegebenen Namens uebertragen, werden alle Werte dieser Header als eine komma-getrennte Liste
+ * zurueckgegeben (in der uebertragenen Reihenfolge).
  *
  * @param  string|array $names - ein oder mehrere Headernamen
  *
@@ -95,9 +95,9 @@ function getHeaderValue($names) {
 
 
 /**
- * Gibt die angegebenen Header als Array von Name-Wert-Paaren zurück (in der übertragenen Reihenfolge).
+ * Gibt die angegebenen Header als Array von Name-Wert-Paaren zurueck (in der uebertragenen Reihenfolge).
  *
- * @param  string|array $names - ein oder mehrere Namen; ohne Angabe werden alle Header zurückgegeben
+ * @param  string|array $names - ein oder mehrere Namen; ohne Angabe werden alle Header zurueckgegeben
  *
  * @return array - Name-Wert-Paare
  */
@@ -131,7 +131,7 @@ function getHeaders($names = null) {
       }
    }
 
-   // alle oder nur die gewünschten Header zurückgeben
+   // alle oder nur die gewuenschten Header zurueckgeben
    if (!$names)
       return $headers;
 
@@ -140,12 +140,12 @@ function getHeaders($names = null) {
 
 
 /**
- * Ob der übergebene String eine syntaktisch gültige IP-Adresse ist.
+ * Ob der uebergebene String eine syntaktisch gueltige IP-Adresse ist.
  *
- * @param  string $string      - der zu überprüfende String
- * @param  bool   $returnBytes - Typ des Rückgabewertes
+ * @param  string $string      - der zu ueberpruefende String
+ * @param  bool   $returnBytes - Typ des Rueckgabewertes
  *                               FALSE: Boolean (default)
- *                               TRUE:  Array mit den Adressbytes oder FALSE, wenn der String keine gültige IP-Adresse darstellt
+ *                               TRUE:  Array mit den Adressbytes oder FALSE, wenn der String keine gueltige IP-Adresse darstellt
  * @return bool|array
  */
 function isIPAddress($string, $returnBytes=false) {

@@ -36,9 +36,9 @@ class SystemFiveLock extends BaseLock {
    /**
     * Constructor
     *
-    * Erzeugt für den angegebenen Schlüssel eine neue Lock-Instanz.  Um über Prozess-/Threadgrenzen
-    * hinweg dieselbe Instanz ansprechen zu können, ist ein fest definierter, jedoch trotzdem eindeutiger
-    * Schlüssel notwendig.  Es empfiehlt sich die Verwendung von Dateiname + Zeilen-Nr. der Code-Zeile,
+    * Erzeugt fuer den angegebenen Schluessel eine neue Lock-Instanz.  Um ueber Prozess-/Threadgrenzen
+    * hinweg dieselbe Instanz ansprechen zu koennen, ist ein fest definierter, jedoch trotzdem eindeutiger
+    * Schluessel notwendig.  Es empfiehlt sich die Verwendung von Dateiname + Zeilen-Nr. der Code-Zeile,
     * an der das Lock erzeugt wird.
     *
     * Example:
@@ -47,10 +47,10 @@ class SystemFiveLock extends BaseLock {
     *  $lock = new SystemFiveLock(__FILE__.'#'.__LINE__);
     *
     *
-    * @param  string $key - eindeutiger Schlüssel der Instanz
+    * @param  string $key - eindeutiger Schluessel der Instanz
     *
     * @throws RuntimeException - wenn im aktuellen Prozess oder Thread bereits eine Lock-Instanz unter
-    *                            demselben Schlüssel existiert
+    *                            demselben Schluessel existiert
     */
    public function __construct($key) /*throws RuntimeException*/ {
       if (!is_string($key))                throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
@@ -69,13 +69,13 @@ class SystemFiveLock extends BaseLock {
       $messages = null;
       do {
          try {
-            // TODO: bei hoher Last können sem_get() oder sem_acquire() scheitern
+            // TODO: bei hoher Last koennen sem_get() oder sem_acquire() scheitern
             $hSemaphore = sem_get($integer, 1, 0666);   // Semaphore-Handle holen
             sem_acquire($hSemaphore);
             break;
          }
          catch (PHPError $ex) {
-            // TODO: Quellcode umschreiben (ext/sysvsem/sysvsem.c) und Fehler lokalisieren (vermutlich wird ein File-Limit überschritten)
+            // TODO: Quellcode umschreiben (ext/sysvsem/sysvsem.c) und Fehler lokalisieren (vermutlich wird ein File-Limit ueberschritten)
             $message = $ex->getMessage();
             $hexId   = decHex($integer);
             if (++$i < $trials && ($message == 'sem_get(): failed for key 0x'.$hexId.': Invalid argument'
@@ -105,7 +105,7 @@ class SystemFiveLock extends BaseLock {
    /**
     * Destructor
     *
-    * Sorgt bei Zerstörung der Instanz dafür, daß ein evt. noch gehaltenes Lock freigegeben wird.
+    * Sorgt bei Zerstoerung der Instanz dafuer, dass ein evt. noch gehaltenes Lock freigegeben wird.
     */
    public function __destruct() {
       // Attempting to throw an exception from a destructor during script shutdown causes a fatal error.
@@ -120,7 +120,7 @@ class SystemFiveLock extends BaseLock {
 
 
    /**
-    * Ob dieses Lock gültig (valid) ist.
+    * Ob dieses Lock gueltig (valid) ist.
     *
     * @return bool
     */
@@ -133,8 +133,8 @@ class SystemFiveLock extends BaseLock {
 
 
    /**
-    * Wenn dieses Lock gültig (valid) ist, gibt der Aufruf dieser Methode das gehaltene Lock frei und
-    * markiert es als ungültig (invalid).  Wenn das Lock bereits ungültig (invalid) ist, hat der Aufruf
+    * Wenn dieses Lock gueltig (valid) ist, gibt der Aufruf dieser Methode das gehaltene Lock frei und
+    * markiert es als ungueltig (invalid).  Wenn das Lock bereits ungueltig (invalid) ist, hat der Aufruf
     * keinen Effekt.
     */
    public function release() {

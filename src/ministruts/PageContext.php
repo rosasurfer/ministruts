@@ -8,10 +8,10 @@ use rosasurfer\exception\IllegalTypeException;
 /**
  * PageContext
  *
- * Container, in dem für den Renderprozeß benötigte Objekte oder Variablen abgelegt werden können.
+ * Container, in dem fuer den Renderprozess benoetigte Objekte oder Variablen abgelegt werden koennen.
  * Beim Rendern kann auf diese Daten aus dem HTML zugegriffen werden.  Innerhalb eines Seitenfragments
- * können auch Daten im Container gespeichert werden, jedoch nur, wenn dabei keine vorhandenen
- * Daten überschrieben werden.
+ * koennen auch Daten im Container gespeichert werden, jedoch nur, wenn dabei keine vorhandenen
+ * Daten ueberschrieben werden.
  *
  * Beispiel:
  * ---------
@@ -21,9 +21,9 @@ use rosasurfer\exception\IllegalTypeException;
  *
  *    $var = $PAGE->title;
  *
- * Gibt die gespeicherte Eigenschaft mit dem Namen "title" zurück.
+ * Gibt die gespeicherte Eigenschaft mit dem Namen "title" zurueck.
  *
- * TODO: Properties aus dem Tiles-Context müssen auch im PageContext erreichbar sein
+ * TODO: Properties aus dem Tiles-Context muessen auch im PageContext erreichbar sein
  */
 class PageContext extends Singleton {
 
@@ -35,7 +35,7 @@ class PageContext extends Singleton {
 
 
    /**
-    * Gibt die Singleton-Instanz dieser Klasse zurück.
+    * Gibt die Singleton-Instanz dieser Klasse zurueck.
     *
     * @return self
     */
@@ -45,11 +45,11 @@ class PageContext extends Singleton {
 
 
    /**
-    * Gibt einen Wert aus dem PageContext zurück.
+    * Gibt einen Wert aus dem PageContext zurueck.
     *
-    * @param  string $key - Schlüssel, unter dem der Wert gespeichert ist
+    * @param  string $key - Schluessel, unter dem der Wert gespeichert ist
     *
-    * @return mixed - der gespeicherte Wert oder NULL, falls kein solcher Schlüssel existiert
+    * @return mixed - der gespeicherte Wert oder NULL, falls kein solcher Schluessel existiert
     */
    public static function get($key) {
       return self::me()->__get($key);
@@ -59,7 +59,7 @@ class PageContext extends Singleton {
    /**
     * Speichert einen Wert im PageContext.
     *
-    * @param  string $key   - Schlüssel, unter dem der Wert gespeichert wird
+    * @param  string $key   - Schluessel, unter dem der Wert gespeichert wird
     * @param  mixed  $value - der zu speichernde Wert
     */
    public static function set($key, $value) {
@@ -68,8 +68,8 @@ class PageContext extends Singleton {
 
 
    /**
-    * Magische PHP-Methode, die die Eigenschaft mit dem angegebenen Namen zurückgibt. Wird automatisch
-    * aufgerufen und ermöglicht den Zugriff auf Eigenschaften mit dynamischen Namen.
+    * Magische PHP-Methode, die die Eigenschaft mit dem angegebenen Namen zurueckgibt. Wird automatisch
+    * aufgerufen und ermoeglicht den Zugriff auf Eigenschaften mit dynamischen Namen.
     *
     * @param  string $name - Name der Eigenschaft
     *
@@ -82,7 +82,7 @@ class PageContext extends Singleton {
 
    /**
     * Magische Methode, die die Eigenschaft mit dem angegebenen Namen setzt.  Wird automatisch
-    * aufgerufen und ermöglicht den Zugriff auf Eigenschaften mit dynamischen Namen.
+    * aufgerufen und ermoeglicht den Zugriff auf Eigenschaften mit dynamischen Namen.
     *
     * @param  string $name  - Name der Eigenschaft
     * @param  mixed  $value - Wert

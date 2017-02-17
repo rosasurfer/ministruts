@@ -19,11 +19,11 @@ final class NetTools extends StaticClass {
 
 
    /**
-    * Gibt den Hostnamen einer IP-Adresse zurück.
+    * Gibt den Hostnamen einer IP-Adresse zurueck.
     *
     * @param  string $address - IP-Adresse
     *
-    * @return string - Hostname oder die originale IP-Adresse, wenn diese nicht aufgelöst werden kann
+    * @return string - Hostname oder die originale IP-Adresse, wenn diese nicht aufgeloest werden kann
     */
    public static function getHostByAddress($address) {
       if (!is_string($address)) throw new IllegalTypeException('Illegal type of parameter $address: '.getType($address));
@@ -41,11 +41,11 @@ final class NetTools extends StaticClass {
 
 
    /**
-    * Gibt die IP-Adresse eines Hostnamens zurück.
+    * Gibt die IP-Adresse eines Hostnamens zurueck.
     *
     * @param  string $name - Hostname
     *
-    * @return string - IP-Adresse oder der originale Hostname, wenn dieser nicht aufgelöst werden kann
+    * @return string - IP-Adresse oder der originale Hostname, wenn dieser nicht aufgeloest werden kann
     */
    public static function getHostByName($name) {
       if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
@@ -59,7 +59,7 @@ final class NetTools extends StaticClass {
     * Ob die IP-Adresse auf einen bekannten Proxy-Server weist.
     *
     * @param  string $address - IP-Adresse
-    * @param  bool   $reverseResolve - ob die IP-Adresse rück-aufgelöst und überprüft werden soll (Default: FALSE)
+    * @param  bool   $reverseResolve - ob die IP-Adresse rueck-aufgeloest und ueberprueft werden soll (Default: FALSE)
     *
     * @return bool
     */
@@ -85,7 +85,7 @@ final class NetTools extends StaticClass {
                   $proxys[$value] = $value;
                }
                else {
-                  // TODO: Unterstützung für CIDR-Notation integrieren
+                  // TODO: Unterstuetzung fuer CIDR-Notation integrieren
                   $proxys['194.8.74.0'  ] = '194.8.74.0';
                   $proxys['194.8.74.1'  ] = '194.8.74.1';
                   $proxys['194.8.74.2'  ] = '194.8.74.2';

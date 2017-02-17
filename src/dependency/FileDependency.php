@@ -10,9 +10,9 @@ use const rosasurfer\WINDOWS;
 /**
  * FileDependency
  *
- * Abhängigkeit vom letzten Änderungszeitpunkt einer Datei.  Die Abhängigkeit ist erfüllt, wenn sich
- * der Zustand der Datei seit dem letzten Aufruf nicht geändert hat.  Auch die Abhängigkeit von einer
- * nicht existierenden Datei ist möglich, die Abhängigkeit ist in diesem Falle solange erfüllt, wie
+ * Abhaengigkeit vom letzten Aenderungszeitpunkt einer Datei.  Die Abhaengigkeit ist erfuellt, wenn sich
+ * der Zustand der Datei seit dem letzten Aufruf nicht geaendert hat.  Auch die Abhaengigkeit von einer
+ * nicht existierenden Datei ist moeglich, die Abhaengigkeit ist in diesem Falle solange erfuellt, wie
  * die Datei weiterhin nicht existiert.
  *
  * Anwendungsbeispiel:
@@ -25,10 +25,10 @@ use const rosasurfer\WINDOWS;
  *       // irgendeine Aktion
  *    }
  *
- * Dieses Beispiel definiert eine Abhängigkeit vom Änderungszeitpunkt der Datei '/etc/crontab'.
- * Solange die Datei nicht verändert wird, bleibt die Abhängigkeit erfüllt und der Aufruf von
- * $dependency->isValid() gibt TRUE zurück.  Nach Änderung oder Löschen der Datei gibt der Aufruf von
- * $dependency->isValid() FALSE zurück.
+ * Dieses Beispiel definiert eine Abhaengigkeit vom Aenderungszeitpunkt der Datei '/etc/crontab'.
+ * Solange die Datei nicht veraendert wird, bleibt die Abhaengigkeit erfuellt und der Aufruf von
+ * $dependency->isValid() gibt TRUE zurueck.  Nach Aenderung oder Loeschen der Datei gibt der Aufruf von
+ * $dependency->isValid() FALSE zurueck.
  */
 class FileDependency extends Dependency {
 
@@ -40,7 +40,7 @@ class FileDependency extends Dependency {
 
 
    /**
-    * letzter Änderungszeitpunkt der Datei (Unix-Timestamp)
+    * letzter Aenderungszeitpunkt der Datei (Unix-Timestamp)
     */
    private /*int*/ $lastModified;
 
@@ -48,7 +48,7 @@ class FileDependency extends Dependency {
    /**
     * Constructor
     *
-    * Erzeugt eine neue FileDependency, die die angegebene Datei überwacht.
+    * Erzeugt eine neue FileDependency, die die angegebene Datei ueberwacht.
     *
     * @param  string $fileName - Dateiname
     */
@@ -73,7 +73,7 @@ class FileDependency extends Dependency {
 
 
    /**
-    * Erzeugt eine neue FileDependency, die eine oder mehrere Dateien überwacht.
+    * Erzeugt eine neue FileDependency, die eine oder mehrere Dateien ueberwacht.
     *
     * @param  mixed $fileNames - einzelner Dateiname (String) oder Array von Dateinamen
     *
@@ -99,13 +99,13 @@ class FileDependency extends Dependency {
 
 
    /**
-    * Ob die der Abhängigkeit zugrunde liegende Datei weiterhin unverändert ist.
+    * Ob die der Abhaengigkeit zugrunde liegende Datei weiterhin unveraendert ist.
     *
-    * @return bool - TRUE, wenn die Datei sich nicht geändert hat.
-    *                FALSE, wenn die Datei sich geändert hat.
+    * @return bool - TRUE, wenn die Datei sich nicht geaendert hat.
+    *                FALSE, wenn die Datei sich geaendert hat.
     */
    public function isValid() {
-      // TODO: stat-Cache bei wiederholten Aufrufen löschen, siehe clearStatCache()
+      // TODO: stat-Cache bei wiederholten Aufrufen loeschen, siehe clearStatCache()
 
       if (file_exists($this->fileName)) {
          if ($this->lastModified !== fileMTime($this->fileName))

@@ -32,7 +32,7 @@ final class FileSystemCache extends CachePeer {
     * Constructor.
     *
     * @param  string $label   - Cache-Bezeichner
-    * @param  array  $options - zusätzliche Optionen
+    * @param  array  $options - zusaetzliche Optionen
     */
    public function __construct($label, array $options = null) {
       $this->label     = $label;
@@ -56,16 +56,16 @@ final class FileSystemCache extends CachePeer {
 
 
    /**
-    * Ob unter dem angegebenen Schlüssel ein Wert im Cache gespeichert ist.
+    * Ob unter dem angegebenen Schluessel ein Wert im Cache gespeichert ist.
     *
-    * @param  string $key - Schlüssel
+    * @param  string $key - Schluessel
     *
     * @return bool
     */
    public function isCached($key) {
-      // Hier wird die eigentliche Arbeit gemacht. Die Methode prüft nicht nur, ob der Wert im Cache
-      // existiert, sondern speichert ihn auch im lokalen ReferencePool. Folgende Abfragen müssen so
-      // nicht ein weiteres Mal auf den Cache zugreifen, sondern können aus dem lokalen Pool bedient
+      // Hier wird die eigentliche Arbeit gemacht. Die Methode prueft nicht nur, ob der Wert im Cache
+      // existiert, sondern speichert ihn auch im lokalen ReferencePool. Folgende Abfragen muessen so
+      // nicht ein weiteres Mal auf den Cache zugreifen, sondern koennen aus dem lokalen Pool bedient
       // werden.
 
       // ReferencePool abfragen
@@ -85,13 +85,13 @@ final class FileSystemCache extends CachePeer {
          $value      = $data[2];
          $dependency = $data[3];
 
-         // expires prüfen
+         // expires pruefen
          if ($expires && $created+$expires < time()) {
             $this->drop($key);
             return false;
          }
 
-         // Dependency prüfen
+         // Dependency pruefen
          if ($dependency) {
             $minValid = $dependency->getMinValidity();
 
@@ -119,14 +119,14 @@ final class FileSystemCache extends CachePeer {
 
 
    /**
-    * Gibt einen Wert aus dem Cache zurück.  Existiert der Wert nicht, wird der angegebene Defaultwert
-    * zurückgegeben.
+    * Gibt einen Wert aus dem Cache zurueck.  Existiert der Wert nicht, wird der angegebene Defaultwert
+    * zurueckgegeben.
     *
-    * @param  string $key     - Schlüssel, unter dem der Wert gespeichert ist
+    * @param  string $key     - Schluessel, unter dem der Wert gespeichert ist
     * @param  mixed  $default - Defaultwert (kann selbst auch NULL sein)
     *
-    * @return mixed - Der gespeicherte Wert oder NULL, falls kein solcher Schlüssel existiert.
-    *                 Achtung: Ist im Cache ein NULL-Wert gespeichert, wird ebenfalls NULL zurückgegeben.
+    * @return mixed - Der gespeicherte Wert oder NULL, falls kein solcher Schluessel existiert.
+    *                 Achtung: Ist im Cache ein NULL-Wert gespeichert, wird ebenfalls NULL zurueckgegeben.
     */
    public function get($key, $default = null) {
       if ($this->isCached($key))
@@ -137,11 +137,11 @@ final class FileSystemCache extends CachePeer {
 
 
    /**
-    * Löscht einen Wert aus dem Cache.
+    * Loescht einen Wert aus dem Cache.
     *
-    * @param  string $key - Schlüssel, unter dem der Wert gespeichert ist
+    * @param  string $key - Schluessel, unter dem der Wert gespeichert ist
     *
-    * @return bool - TRUE bei Erfolg, FALSE, falls kein solcher Schlüssel existiert
+    * @return bool - TRUE bei Erfolg, FALSE, falls kein solcher Schluessel existiert
     */
    public function drop($key) {
       $fileName = $this->getFilePath($key);
@@ -161,14 +161,14 @@ final class FileSystemCache extends CachePeer {
 
 
    /**
-    * Speichert einen Wert im Cache.  Ein schon vorhandener Wert unter demselben Schlüssel wird
-    * überschrieben.  Läuft die angegebene Zeitspanne ab oder ändert sich der Status der angegebenen
-    * Abhängigkeit, wird der Wert automatisch ungültig.
+    * Speichert einen Wert im Cache.  Ein schon vorhandener Wert unter demselben Schluessel wird
+    * ueberschrieben.  Laeuft die angegebene Zeitspanne ab oder aendert sich der Status der angegebenen
+    * Abhaengigkeit, wird der Wert automatisch ungueltig.
     *
-    * @param  string     $key        - Schlüssel, unter dem der Wert gespeichert wird
+    * @param  string     $key        - Schluessel, unter dem der Wert gespeichert wird
     * @param  mixed      $value      - der zu speichernde Wert
-    * @param  int        $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfällt
-    * @param  Dependency $dependency - Abhängigkeit der Gültigkeit des gespeicherten Wertes
+    * @param  int        $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfaellt
+    * @param  Dependency $dependency - Abhaengigkeit der Gueltigkeit des gespeicherten Wertes
     *
     * @return bool - TRUE bei Erfolg, FALSE andererseits
     */
@@ -189,9 +189,9 @@ final class FileSystemCache extends CachePeer {
 
 
    /**
-    * Gibt den vollständigen Pfad zur Cache-Datei für den angegebenen Schlüssel zurück.
+    * Gibt den vollstaendigen Pfad zur Cache-Datei fuer den angegebenen Schluessel zurueck.
     *
-    * @param  string $key - Schlüssel des Wertes
+    * @param  string $key - Schluessel des Wertes
     *
     * @return string - Dateipfad
     */
@@ -202,9 +202,9 @@ final class FileSystemCache extends CachePeer {
 
 
    /**
-    * Liest die Datei mit dem angegebenen Namen ein und gibt den deserialisierten Inhalt zurück.
+    * Liest die Datei mit dem angegebenen Namen ein und gibt den deserialisierten Inhalt zurueck.
     *
-    * @param  string $fileName - vollständiger Dateiname
+    * @param  string $fileName - vollstaendiger Dateiname
     *
     * @return mixed - Wert
     */
@@ -228,7 +228,7 @@ final class FileSystemCache extends CachePeer {
    /**
     * Schreibt den angegebenen Wert in die Datei mit dem angegebenen Namen.
     *
-    * @param  string $fileName - vollständiger Dateiname
+    * @param  string $fileName - vollstaendiger Dateiname
     * @param  mixed  $value    - der in die Datei zu schreibende Wert
     *
     * @return bool - TRUE bei Erfolg, FALSE andererseits

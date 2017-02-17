@@ -21,8 +21,8 @@ abstract class RoleProcessor {
 
    /**
     * Ob der aktuelle User Inhaber der definierten Rolle(n) des angegebenen Mappings ist.  Gibt NULL
-    * zurück, wenn die Verarbeitung fortgesetzt und der Zugriff gewährt, oder eine ActionForward-
-    * Instanz, wenn der Zugriff nicht gewährt und statt dessen zu dem vom Forward beschriebenen Ziel
+    * zurueck, wenn die Verarbeitung fortgesetzt und der Zugriff gewaehrt, oder eine ActionForward-
+    * Instanz, wenn der Zugriff nicht gewaehrt und statt dessen zu dem vom Forward beschriebenen Ziel
     * verzweigt werden soll.
     *
     * @param  Request       $request

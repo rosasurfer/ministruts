@@ -18,7 +18,7 @@ class Tile extends Object {
 
 
    /**
-    * Typenbezeichner für in einzelne Tiles mit dem <set>-Tag eingebundene, zusätzliche Eigenschaften.
+    * Typenbezeichner fuer in einzelne Tiles mit dem <set>-Tag eingebundene, zusaetzliche Eigenschaften.
     */
    const PROPERTY_TYPE_STRING   = 'string';
    const PROPERTY_TYPE_RESOURCE = 'resource';
@@ -28,14 +28,14 @@ class Tile extends Object {
 
 
    /**
-    * Ob diese Komponente vollständig konfiguriert ist. Wenn dieses Flag gesetzt ist, wirft jeder
-    * Versuch, die Komponente zu ändern, eine IllegalStateException.
+    * Ob diese Komponente vollstaendig konfiguriert ist. Wenn dieses Flag gesetzt ist, wirft jeder
+    * Versuch, die Komponente zu aendern, eine IllegalStateException.
     */
    protected $configured = false;
 
 
    /**
-    * Module, zu dem diese Tile gehört
+    * Module, zu dem diese Tile gehoert
     */
    protected /*Module*/ $module;
 
@@ -47,7 +47,7 @@ class Tile extends Object {
 
 
    /**
-    * vollständiger Dateiname dieser Tile
+    * vollstaendiger Dateiname dieser Tile
     */
    protected /*string*/ $fileName;
 
@@ -57,7 +57,7 @@ class Tile extends Object {
 
 
    /**
-    * Die zur Laufzeit diese Tile-Instanz umgebende Instanz oder NULL, wenn diese Instanz das äußerste
+    * Die zur Laufzeit diese Tile-Instanz umgebende Instanz oder NULL, wenn diese Instanz das aeusserste
     * Fragment der Ausgabe darstellt.
     */
    protected /*Tile*/ $parent;
@@ -66,7 +66,7 @@ class Tile extends Object {
    /**
     * Constructor
     *
-    * @param  Module $module - Module, zu dem diese Tile gehört
+    * @param  Module $module - Module, zu dem diese Tile gehoert
     * @param  Tile   $parent - (Parent-)Instanz der neuen (verschachtelten) Instanz
     */
    public function __construct(Module $module, Tile $parent=null) {
@@ -76,7 +76,7 @@ class Tile extends Object {
 
 
    /**
-    * Gibt den Namen dieser Tile zurück.
+    * Gibt den Namen dieser Tile zurueck.
     *
     * @return string $name
     */
@@ -102,7 +102,7 @@ class Tile extends Object {
 
 
    /**
-    * Gibt den Pfad dieser Tile zurück.
+    * Gibt den Pfad dieser Tile zurueck.
     *
     * @return string
     */
@@ -114,7 +114,7 @@ class Tile extends Object {
    /**
     * Setzt den Dateinamen dieser Tile.
     *
-    * @param  string $filename - vollständiger Dateiname
+    * @param  string $filename - vollstaendiger Dateiname
     *
     * @return self
     */
@@ -128,7 +128,7 @@ class Tile extends Object {
 
 
    /**
-    * Speichert in der Tile unter dem angegebenen Namen eine zusätzliche Eigenschaft.
+    * Speichert in der Tile unter dem angegebenen Namen eine zusaetzliche Eigenschaft.
     *
     * @param  string $name  - Name der Eigenschaft
     * @param  mixed  $value - der zu speichernde Wert (String oder Tile)
@@ -165,7 +165,7 @@ class Tile extends Object {
 
 
    /**
-    * Gibt die eigenen und die geerbten Properties dieser Tile zurück. Eigene Properties überschreiben geerbte Properties mit demselben Namen.
+    * Gibt die eigenen und die geerbten Properties dieser Tile zurueck. Eigene Properties ueberschreiben geerbte Properties mit demselben Namen.
     *
     * @return array - Properties
     */

@@ -7,7 +7,7 @@ use rosasurfer\core\Object;
 /**
  * HttpResponse
  *
- * Abstrakte Basisklasse für HttpResponse-Implementierungen.
+ * Abstrakte Basisklasse fuer HttpResponse-Implementierungen.
  *
  * TODO: toString()-Methode implementieren, die alle Header anzeigt
  */
@@ -250,7 +250,7 @@ abstract class HttpResponse extends Object {
    /**
     * HTTP status code descriptions
     *
-    * TODO: HttpResponse::$sc - unmöglicher Name
+    * TODO: HttpResponse::$sc - unmoeglicher Name
     */
    public static $sc = array(self::SC_CONTINUE                        => 'SC_CONTINUE'                       ,
                              self::SC_SWITCHING_PROTOCOLS             => 'SC_SWITCHING_PROTOCOLS'            ,
@@ -295,7 +295,7 @@ abstract class HttpResponse extends Object {
                              );
 
    /**
-    * Gibt den HTTP-Status zurück.
+    * Gibt den HTTP-Status zurueck.
     *
     * @return int - Statuscode
     */
@@ -303,7 +303,7 @@ abstract class HttpResponse extends Object {
 
 
    /**
-    * Gibt die erhaltenen Header zurück.
+    * Gibt die erhaltenen Header zurueck.
     *
     * @return array - Array mit Headern
     */
@@ -321,7 +321,7 @@ abstract class HttpResponse extends Object {
 
 
    /**
-    * Gibt den Header mit dem angegebenen Namen zurück.
+    * Gibt den Header mit dem angegebenen Namen zurueck.
     *
     * @param  string $name - Name des Headers
     *
@@ -331,7 +331,7 @@ abstract class HttpResponse extends Object {
 
 
    /**
-    * Gibt den Content des HttpResponse zurück.
+    * Gibt den Content des HttpResponse zurueck.
     *
     * @return string - Content
     */

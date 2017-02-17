@@ -9,7 +9,7 @@ use const rosasurfer\CLI;
 /**
  * Response
  *
- * Wrapper für den HTTP-Response.
+ * Wrapper fuer den HTTP-Response.
  */
 class Response extends Singleton {
 
@@ -19,8 +19,8 @@ class Response extends Singleton {
 
 
    /**
-    * Gibt die Singleton-Instanz dieser Klasse zurück, wenn das Script im Kontext eines HTTP-Requestes aufgerufen
-    * wurde. In allen anderen Fällen, z.B. bei Aufruf in der Konsole, wird NULL zurückgegeben.
+    * Gibt die Singleton-Instanz dieser Klasse zurueck, wenn das Script im Kontext eines HTTP-Requestes aufgerufen
+    * wurde. In allen anderen Faellen, z.B. bei Aufruf in der Konsole, wird NULL zurueckgegeben.
     *
     * @return self - Instanz oder NULL
     */
@@ -31,9 +31,9 @@ class Response extends Singleton {
 
 
    /**
-    * Speichert einen Wert unter dem angegebenen Schlüssel im Response.
+    * Speichert einen Wert unter dem angegebenen Schluessel im Response.
     *
-    * @param  string $key   - Schlüssel, unter dem der Wert gespeichert wird
+    * @param  string $key   - Schluessel, unter dem der Wert gespeichert wird
     * @param  mixed  $value - der zu speichernde Wert
     */
    public function setAttribute($key, &$value) {
@@ -42,10 +42,10 @@ class Response extends Singleton {
 
 
    /**
-    * Gibt den unter dem angegebenen Schlüssel gespeicherten Wert zurück oder NULL, wenn unter diesem
+    * Gibt den unter dem angegebenen Schluessel gespeicherten Wert zurueck oder NULL, wenn unter diesem
     * Namen kein Wert existiert.
     *
-    * @param  string $key - Schlüssel, unter dem der Wert gespeichert ist
+    * @param  string $key - Schluessel, unter dem der Wert gespeichert ist
     *
     * @return mixed - der gespeicherte Wert oder NULL
     */

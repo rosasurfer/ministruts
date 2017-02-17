@@ -10,14 +10,14 @@ use rosasurfer\exception\InvalidArgumentException;
 /**
  * Dependency
  *
- * Abstrakte Basisklasse für Abhängigkeiten von bestimmten Zuständen oder Bedingungen.  Wird benutzt,
- * um abhängig von einer Änderung Aktionen auszulösen.  Jede Implementierung dieser Klasse bildet eine
- * Abhängigkeit von einem bestimmten Zustand oder einer bestimmten Bedingung ab.  Soll ein Zustand
- * prozeßübergreifend verfolgt werden, muß die Instanz in einem entprechenden Persistenz-Container
- * gespeichert werden (Session, Datenbank, Dateisystem etc.).  Die Implementierungen müssen serialisierbar
+ * Abstrakte Basisklasse fuer Abhaengigkeiten von bestimmten Zustaenden oder Bedingungen.  Wird benutzt,
+ * um abhaengig von einer Aenderung Aktionen auszuloesen.  Jede Implementierung dieser Klasse bildet eine
+ * Abhaengigkeit von einem bestimmten Zustand oder einer bestimmten Bedingung ab.  Soll ein Zustand
+ * prozessuebergreifend verfolgt werden, muss die Instanz in einem entprechenden Persistenz-Container
+ * gespeichert werden (Session, Datenbank, Dateisystem etc.).  Die Implementierungen muessen serialisierbar
  * sein.
  *
- * Mehrere Abhängigkeiten können durch logisches UND oder ODER kombiniert werden.
+ * Mehrere Abhaengigkeiten koennen durch logisches UND oder ODER kombiniert werden.
  *
  * Beispiel:
  * ---------
@@ -28,14 +28,14 @@ use rosasurfer\exception\InvalidArgumentException;
  *    ...
  *
  *    if (!$dependency->isValid()) {
- *       // Zustand hat sich geändert, beliebige Aktion ausführen
+ *       // Zustand hat sich geaendert, beliebige Aktion ausfuehren
  *    }
  *
- * Dieses Beispiel definiert eine gemeinsame Abhängigkeit vom Zustand dreier Dateien '/etc/crontab',
- * '/etc/hosts' und '/etc/resolv.conf' (AND-Verknüpfung).  Solange keine dieser Dateien verändert oder
- * gelöscht wird, bleibt die Abhängigkeit erfüllt und der Aufruf von $dependency->isValid() gibt TRUE
- * zurück.  Nach Änderung oder Löschen einer dieser Dateien gibt der Aufruf von $dependency->isValid()
- * FALSE zurück.
+ * Dieses Beispiel definiert eine gemeinsame Abhaengigkeit vom Zustand dreier Dateien '/etc/crontab',
+ * '/etc/hosts' und '/etc/resolv.conf' (AND-Verknuepfung).  Solange keine dieser Dateien veraendert oder
+ * geloescht wird, bleibt die Abhaengigkeit erfuellt und der Aufruf von $dependency->isValid() gibt TRUE
+ * zurueck.  Nach Aenderung oder Loeschen einer dieser Dateien gibt der Aufruf von $dependency->isValid()
+ * FALSE zurueck.
  *
  * @see ChainedDependency
  * @see FileDependency
@@ -44,24 +44,24 @@ abstract class Dependency extends Object {
 
 
    /**
-    * Mindestgültigkeit
+    * Mindestgueltigkeit
     */
    private /*int*/ $minValidity = 0;
 
 
    /**
-    * Ob das zu überwachende Ereignis oder ein Zustandswechsel eingetreten sind oder nicht.
+    * Ob das zu ueberwachende Ereignis oder ein Zustandswechsel eingetreten sind oder nicht.
     *
-    * @return bool - TRUE, wenn die Abhängigkeit weiterhin erfüllt ist.
-    *                FALSE, wenn der Zustandswechsel eingetreten ist und die Abhängigkeit nicht mehr erfüllt ist.
+    * @return bool - TRUE, wenn die Abhaengigkeit weiterhin erfuellt ist.
+    *                FALSE, wenn der Zustandswechsel eingetreten ist und die Abhaengigkeit nicht mehr erfuellt ist.
     */
    abstract public function isValid();
 
 
    /**
-    * Kombiniert diese Abhängigkeit mit einer weiteren durch ein logisches UND (AND).
+    * Kombiniert diese Abhaengigkeit mit einer weiteren durch ein logisches UND (AND).
     *
-    * @param  Dependency $dependency - Abhängigkeit
+    * @param  Dependency $dependency - Abhaengigkeit
     *
     * @return ChainedDependency
     */
@@ -75,9 +75,9 @@ abstract class Dependency extends Object {
 
 
    /**
-    * Kombiniert diese Abhängigkeit mit einer weiteren durch ein logisches ODER (OR).
+    * Kombiniert diese Abhaengigkeit mit einer weiteren durch ein logisches ODER (OR).
     *
-    * @param  Dependency $dependency - Abhängigkeit
+    * @param  Dependency $dependency - Abhaengigkeit
     *
     * @return ChainedDependency
     */
@@ -91,9 +91,9 @@ abstract class Dependency extends Object {
 
 
    /**
-    * Gibt die Mindestgültigkeit dieser Abhängigkeit zurück.
+    * Gibt die Mindestgueltigkeit dieser Abhaengigkeit zurueck.
     *
-    * @return int - Mindestgültigkeit in Sekunden
+    * @return int - Mindestgueltigkeit in Sekunden
     */
    public function getMinValidity() {
       return $this->minValidity;
@@ -101,9 +101,9 @@ abstract class Dependency extends Object {
 
 
    /**
-    * Setzt die Mindestgültigkeit dieser Abhängigkeit.
+    * Setzt die Mindestgueltigkeit dieser Abhaengigkeit.
     *
-    * @param  int $time - Mindestgültigkeit in Sekunden
+    * @param  int $time - Mindestgueltigkeit in Sekunden
     *
     * @return ChainedDependency
     */

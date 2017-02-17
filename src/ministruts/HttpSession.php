@@ -12,13 +12,13 @@ use rosasurfer\exception\error\PHPError;
 /**
  * HttpSession
  *
- * Wrapper für die aktuelle HttpSession des Users.
+ * Wrapper fuer die aktuelle HttpSession des Users.
  */
 class HttpSession extends Singleton {
 
 
    /**
-    * der Request, zu dem wir gehören
+    * der Request, zu dem wir gehoeren
     */
    protected /*Request*/ $request;
 
@@ -33,10 +33,10 @@ class HttpSession extends Singleton {
    /**
     * Constructor
     *
-    * @param  Request $request - der Request, zu dem die Session gehört
+    * @param  Request $request - der Request, zu dem die Session gehoert
     */
    protected function __construct(Request $request) {
-      // Prüfen, ob eine Session bereits außerhalb dieser Instanz gestartet wurde
+      // Pruefen, ob eine Session bereits ausserhalb dieser Instanz gestartet wurde
       if ($request->isSession())
          throw new IllegalStateException('Cannot initialize '.get_class($this).', found already started session. Use this class *only* for session handling!');
 
@@ -50,16 +50,16 @@ class HttpSession extends Singleton {
     */
    protected function init() {
       /**
-       * PHP läßt sich ohne weiteres manipulierte Session-IDs unterschieben, solange diese keine ungültigen Zeichen enthalten
-       * (IDs wie PHPSESSID=111 werden anstandslos akzeptiert).  Wenn session_start() zurückkehrt, gibt es mit den vorhandenen
-       * PHP-Mitteln keine vernünftige Möglichkeit mehr, festzustellen, ob die Session-ID von PHP oder (künstlich?) vom User
-       * generiert wurde.  Daher wird in dieser Methode jede neue Session mit einer zusätzliche Markierung versehen.  Fehlt diese
-       * Markierung nach Rückkehr von session_start(), wurde die ID nicht von PHP generiert.  Aus Sicherheitsgründen wird eine
+       * PHP laesst sich ohne weiteres manipulierte Session-IDs unterschieben, solange diese keine ungueltigen Zeichen enthalten
+       * (IDs wie PHPSESSID=111 werden anstandslos akzeptiert).  Wenn session_start() zurueckkehrt, gibt es mit den vorhandenen
+       * PHP-Mitteln keine vernuenftige Moeglichkeit mehr, festzustellen, ob die Session-ID von PHP oder (kuenstlich?) vom User
+       * generiert wurde.  Daher wird in dieser Methode jede neue Session mit einer zusaetzliche Markierung versehen.  Fehlt diese
+       * Markierung nach Rueckkehr von session_start(), wurde die ID nicht von PHP generiert.  Aus Sicherheitsgruenden wird eine
        * solche Session verworfen und eine neue ID erzeugt.
        */
       $request = $this->request;
 
-      // Session-Cookie auf Application beschränken, um mehrere Projekte je Domain zu ermöglichen
+      // Session-Cookie auf Application beschraenken, um mehrere Projekte je Domain zu ermoeglichen
       $params = session_get_cookie_params();
       session_set_cookie_params($params['lifetime'],
                                 $request->getApplicationBaseUri(),
@@ -78,11 +78,11 @@ class HttpSession extends Singleton {
       }
 
 
-      // Inhalt der Session prüfen
-      // TODO: Session verwerfen, wenn der User zwischen Cookie- und URL-Übertragung wechselt
-      if (sizeOf($_SESSION) == 0) {          // 0 bedeutet, die Session ist (für diese Methode) neu
+      // Inhalt der Session pruefen
+      // TODO: Session verwerfen, wenn der User zwischen Cookie- und URL-Uebertragung wechselt
+      if (sizeOf($_SESSION) == 0) {          // 0 bedeutet, die Session ist (fuer diese Methode) neu
          $sessionName = session_name();
-         $sessionId   = session_id();        // prüfen, woher die ID kommt ...
+         $sessionId   = session_id();        // pruefen, woher die ID kommt ...
 
          // TODO: Verwendung von $_COOKIE und $_REQUEST ist unsicher
          if     (isSet($_COOKIE [$sessionName]) && $_COOKIE [$sessionName] == $sessionId) $fromUser = true; // ID kommt vom Cookie
@@ -134,7 +134,7 @@ class HttpSession extends Singleton {
 
 
    /**
-    * Gibt die Session-ID der Session zurück.
+    * Gibt die Session-ID der Session zurueck.
     *
     * @return string - Session-ID
     */
@@ -144,7 +144,7 @@ class HttpSession extends Singleton {
 
 
    /**
-    * Gibt den Namen der Sessionvariable zurück.
+    * Gibt den Namen der Sessionvariable zurueck.
     *
     * @return string - Name
     */
@@ -154,10 +154,10 @@ class HttpSession extends Singleton {
 
 
    /**
-    * Gibt den unter dem angegebenen Schlüssel in der Session gespeicherten Wert zurück oder den
-    * angegebenen Alternativwert, falls kein Wert unter diesem Schlüssel existiert.
+    * Gibt den unter dem angegebenen Schluessel in der Session gespeicherten Wert zurueck oder den
+    * angegebenen Alternativwert, falls kein Wert unter diesem Schluessel existiert.
     *
-    * @param  string $key     - Schlüssel, unter dem der Wert gespeichert ist
+    * @param  string $key     - Schluessel, unter dem der Wert gespeichert ist
     * @param  mixed  $default - Default- bzw. Alternativwert (kann selbst auch NULL sein)
     *
     * @return mixed - der gespeicherte Wert oder NULL
@@ -171,13 +171,13 @@ class HttpSession extends Singleton {
 
 
    /**
-    * Speichert in der Session unter dem angegebenen Schlüssel einen Wert.  Ein unter dem selben
-    * Schlüssel schon vorhandener Wert wird ersetzt.
+    * Speichert in der Session unter dem angegebenen Schluessel einen Wert.  Ein unter dem selben
+    * Schluessel schon vorhandener Wert wird ersetzt.
     *
-    * Ist der übergebene Wert NULL, hat dies den selben Effekt wie der Aufruf von
+    * Ist der uebergebene Wert NULL, hat dies den selben Effekt wie der Aufruf von
     * HttpSession::removeAttribute($key)
     *
-    * @param  string $key   - Schlüssel, unter dem der Wert gespeichert wird
+    * @param  string $key   - Schluessel, unter dem der Wert gespeichert wird
     * @param  mixed  $value - der zu speichernde Wert
     */
    public function setAttribute($key, $value) {
@@ -215,9 +215,9 @@ class HttpSession extends Singleton {
 
 
    /**
-    * Ob unter dem angegebenen Schlüssel ein Wert in der Session existiert.
+    * Ob unter dem angegebenen Schluessel ein Wert in der Session existiert.
     *
-    * @param  string $key - Schlüssel
+    * @param  string $key - Schluessel
     *
     * @return bool
     */

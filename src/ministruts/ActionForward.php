@@ -16,7 +16,7 @@ use rosasurfer\exception\InvalidArgumentException;
  *
  *   name     - logischer Name, unter dem der ActionForward gefunden werden kann
  *   path     - physische Resource (z.B. HTML-Datei), Klassenname eines Layouts oder URL
- *   redirect - ob ein Redirect ausgelöst werden soll (nur bei URL, default: false)
+ *   redirect - ob ein Redirect ausgeloest werden soll (nur bei URL, default: false)
  */
 class ActionForward extends Object {
 
@@ -34,7 +34,7 @@ class ActionForward extends Object {
 
 
    /**
-    * Geschützter Forward-Bezeichner, über den zur Laufzeit ein Redirect-Forward auf die URL des aktuell
+    * Geschuetzter Forward-Bezeichner, ueber den zur Laufzeit ein Redirect-Forward auf die URL des aktuell
     * verwendeten ActionMappings erzeugt werden kann.
     */
    const /*string*/ __SELF = '__self';
@@ -45,7 +45,7 @@ class ActionForward extends Object {
    protected /*string*/ $label;
    protected /*bool*/   $redirect;
 
-   // ob diese Komponente vollständig konfiguriert ist
+   // ob diese Komponente vollstaendig konfiguriert ist
    protected /*bool*/ $configured = false;
 
 
@@ -61,7 +61,7 @@ class ActionForward extends Object {
     *
     * @param  string $name     - logischer Name des Forwards
     * @param  string $path     - Pfad der Instanz
-    * @param  bool   $redirect - Redirect-Flag für diese Instanz
+    * @param  bool   $redirect - Redirect-Flag fuer diese Instanz
     */
    public function __construct($name, $path, $redirect=false) {
       $this->setName($name)
@@ -138,9 +138,9 @@ class ActionForward extends Object {
 
 
    /**
-    * Fügt dem Querystring dieses ActionForwards ein weiteres Key-Value-Paar hinzu.
+    * Fuegt dem Querystring dieses ActionForwards ein weiteres Key-Value-Paar hinzu.
     *
-    * @param  string $key   - Schlüssel
+    * @param  string $key   - Schluessel
     * @param  scalar $value - Wert (int|float|string|bool)
     *
     * @return self
@@ -154,7 +154,7 @@ class ActionForward extends Object {
 
       $value = (string) $value;
 
-      // TODO: Übergabe von mehreren Werten ermöglichen
+      // TODO: Uebergabe von mehreren Werten ermoeglichen
 
       $separator = (strPos($this->path, '?')!==false) ? '&' : '?';
 
@@ -166,7 +166,7 @@ class ActionForward extends Object {
 
    /**
     * Friert die Konfiguration dieser Komponente ein. Nachdem Aufruf dieser Methode kann die Konfiguration
-    * der Komponente nicht mehr verändert werden.
+    * der Komponente nicht mehr veraendert werden.
     *
     * @return self
     */
@@ -180,7 +180,7 @@ class ActionForward extends Object {
 
    /**
     * Erzeugt einen neuen ActionForward, der auf dieser Instanz basiert. Die Konfiguration des neuen
-    * Forwards ist noch nicht eingefroren, sodaß diese Methode zum "Modifizieren" vorhandener Forwards
+    * Forwards ist noch nicht eingefroren, sodass diese Methode zum "Modifizieren" vorhandener Forwards
     * benutzt werden kann.
     *
     * @return self

@@ -12,7 +12,7 @@ use function rosasurfer\strStartsWith;
 /**
  * Mailer
  *
- * Mailer-Factory und abstrakte Basisklasse für alle Mailer-Implementierungen.
+ * Mailer-Factory und abstrakte Basisklasse fuer alle Mailer-Implementierungen.
  */
 abstract class Mailer extends Object {
 
@@ -32,16 +32,16 @@ abstract class Mailer extends Object {
     * Verschickt eine Mail.
     *
     * @param  string $sender   - Absender  (Format: 'Vorname Nachname <user@domain.tld>')
-    * @param  string $receiver - Empfänger (Format: 'Vorname Nachname <user@domain.tld>')
+    * @param  string $receiver - Empfaenger (Format: 'Vorname Nachname <user@domain.tld>')
     * @param  string $subject  - Betreffzeile der E-Mail
     * @param  string $message  - Inhalt der E-Mail
-    * @param  array  $headers  - zusätzliche zu setzende Mail-Header
+    * @param  array  $headers  - zusaetzliche zu setzende Mail-Header
     */
    abstract public function sendMail($sender, $receiver, $subject, $message, array $headers = null);
 
 
    /**
-    * Erzeugt eine neue Instanz und gibt sie zurück.
+    * Erzeugt eine neue Instanz und gibt sie zurueck.
     *
     * @param  array $options - Mailer-Optionen
     *
@@ -64,10 +64,10 @@ abstract class Mailer extends Object {
     * Verschiebt den Versandvorgang dieses Mailers, wenn dies entsprechend konfiguriert ist.
     *
     * @param  string   $sender   - Absender  (Format: 'Vorname Nachname <user@domain.tld>')
-    * @param  string   $receiver - Empfänger (Format: 'Vorname Nachname <user@domain.tld>')
+    * @param  string   $receiver - Empfaenger (Format: 'Vorname Nachname <user@domain.tld>')
     * @param  string   $subject  - Betreffzeile der E-Mail
     * @param  string   $message  - Inhalt der E-Mail
-    * @param  string[] $headers  - zusätzliche zu setzende Mail-Header (default: keine)
+    * @param  string[] $headers  - zusaetzliche zu setzende Mail-Header (default: keine)
     *
     * @return bool - ob der Versand verschoben wurde.
     */
@@ -83,11 +83,11 @@ abstract class Mailer extends Object {
          /**
           * TODO: Message-Queue implementieren
           *
-          * Noch keine Möglichkeit gefunden, bei Redirect-Header und aktiviertem "output_buffering" die Header
+          * Noch keine Moeglichkeit gefunden, bei Redirect-Header und aktiviertem "output_buffering" die Header
           * vorzuschicken und den Versand im Hintergrund weiterlaufen zu lassen.  Da der Output-Buffer bei einem
           * Redirect nie voll ist, wartet PHP immer, ob die Shutdown-Funktion noch Content ausgibt.
           *
-          * Lösung: Versand per Message-Queue in einem anderen Prozeß ausführen
+          * Loesung: Versand per Message-Queue in einem anderen Prozess ausfuehren
           */
       }
       return false;
@@ -95,10 +95,10 @@ abstract class Mailer extends Object {
 
 
    /**
-    * Testet die übergebene E-Mailadresse. Dabei wird geprüft, ob die Domain existiert und ob Mail
-    * für das Postfach angenommen wird (wenn möglich).
+    * Testet die uebergebene E-Mailadresse. Dabei wird geprueft, ob die Domain existiert und ob Mail
+    * fuer das Postfach angenommen wird (wenn moeglich).
     *
-    * @param  string $address - zu prüfende E-Mail-Adresse
+    * @param  string $address - zu pruefende E-Mail-Adresse
     *
     * @return bool
     */
@@ -112,7 +112,7 @@ abstract class Mailer extends Object {
       $mailbox = $parts[0];
       $domain  = $parts[1];
 
-      // TODO: DNS und Postannahme prüfen
+      // TODO: DNS und Postannahme pruefen
 
       // es gibt nur aol.com-Adressen, Format siehe: http://postmaster.info.aol.com/faq/mailerfaq.html#syntax
       if (strStartsWith($domain, 'aol.') && strRPos($domain, '.')==3)
@@ -123,11 +123,11 @@ abstract class Mailer extends Object {
 
 
    /**
-    * Zerlegt eine vollständige E-Mailadresse "Name <user@domain>" in ihre beiden Bestandteile.
+    * Zerlegt eine vollstaendige E-Mailadresse "Name <user@domain>" in ihre beiden Bestandteile.
     *
     * @param  string $address - Adresse
     *
-    * @return mixed - ein Array mit den beiden Adressbestandteilen oder FALSE, wenn die übergebene
+    * @return mixed - ein Array mit den beiden Adressbestandteilen oder FALSE, wenn die uebergebene
     *                 Adresse syntaktisch falsch ist
     */
    protected final function parseAddress($address) {
@@ -135,16 +135,16 @@ abstract class Mailer extends Object {
 
       $address = trim($address);
 
-      // auf schließende Klammer ">" prüfen
+      // auf schliessende Klammer ">" pruefen
       if (!strEndsWith($address, '>')) {
-         // keine, es muß eine einfache E-Mailadresse sein
+         // keine, es muss eine einfache E-Mailadresse sein
          if (Validator::isEmailAddress($address))
             return array('name'    => '',
                          'address' => $address);
          return false;
       }
 
-      // schließende Klammer existiert, auf öffnende Klammer "<" prüfen
+      // schliessende Klammer existiert, auf oeffnende Klammer "<" pruefen
       $open = strRPos($address, '<');
       if ($open === false)
          return false;

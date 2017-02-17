@@ -9,7 +9,7 @@ use rosasurfer\exception\IOException;
 
 
 /**
- * Basisklasse für konkrete HttpClients.
+ * Basisklasse fuer konkrete HttpClients.
  */
 abstract class HttpClient extends Object {
 
@@ -38,7 +38,7 @@ abstract class HttpClient extends Object {
 
 
    /**
-    * Gibt den eingestellten Verbindungs-Timeout zurück.
+    * Gibt den eingestellten Verbindungs-Timeout zurueck.
     *
     * @return int - Timeout in Sekunden
     */
@@ -63,7 +63,7 @@ abstract class HttpClient extends Object {
 
 
    /**
-    * Gibt die aktuelle Redirect-Einstellung zurück.
+    * Gibt die aktuelle Redirect-Einstellung zurueck.
     *
     * @return bool
     */
@@ -88,7 +88,7 @@ abstract class HttpClient extends Object {
 
 
    /**
-    * Gibt die Anzahl der Redirects zurück, denen gefolgt wird.
+    * Gibt die Anzahl der Redirects zurueck, denen gefolgt wird.
     *
     * @return int
     */
@@ -98,7 +98,7 @@ abstract class HttpClient extends Object {
 
 
    /**
-    * Führt den übergebenen Request aus und gibt die empfangene Antwort zurück.  Diese Methode muß
+    * Fuehrt den uebergebenen Request aus und gibt die empfangene Antwort zurueck.  Diese Methode muss
     * von jedem Client implementiert werden.
     *
     * @param  HttpRequest $request

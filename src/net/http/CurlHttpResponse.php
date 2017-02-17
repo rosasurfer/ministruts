@@ -26,7 +26,7 @@ class CurlHttpResponse extends HttpResponse {
    private /*int*/          $status;         // HTTP-Statuscode
    private /*string*/       $content;        // Content
 
-   // aktuelle Länge des gelesenen Contents in Byte
+   // aktuelle Laenge des gelesenen Contents in Byte
    private /*int*/ $currentContentLength = 0;
 
 
@@ -70,7 +70,7 @@ class CurlHttpResponse extends HttpResponse {
 
 
    /**
-    * Gibt den HTTP-Status zurück.
+    * Gibt den HTTP-Status zurueck.
     *
     * @return int - Statuscode
     */
@@ -80,7 +80,7 @@ class CurlHttpResponse extends HttpResponse {
 
 
    /**
-    * Gibt die empfangenen Header zurück.
+    * Gibt die empfangenen Header zurueck.
     *
     * @return array - Array mit Headern
     */
@@ -102,7 +102,7 @@ class CurlHttpResponse extends HttpResponse {
 
 
    /**
-    * Gibt den Header mit dem angegebenen Namen zurück.
+    * Gibt den Header mit dem angegebenen Namen zurueck.
     *
     * @param  string $name - Name des Headers
     *
@@ -114,10 +114,10 @@ class CurlHttpResponse extends HttpResponse {
 
 
    /**
-    * Callback für CurlHttpClient, dem die empfangenen Response-Header zeilenweise übergeben werden.
+    * Callback fuer CurlHttpClient, dem die empfangenen Response-Header zeilenweise uebergeben werden.
     *
     * @param  resource $hCurl - das CURL-Handle des aktuellen Requests
-    * @param  string   $line  - vollständige Headerzeile, bestehend aus dem Namen, einem Doppelpunkt und den Daten
+    * @param  string   $line  - vollstaendige Headerzeile, bestehend aus dem Namen, einem Doppelpunkt und den Daten
     *
     * @return int - Anzahl der bei diesem Methodenaufruf erhaltenen Bytes
     */
@@ -130,7 +130,7 @@ class CurlHttpResponse extends HttpResponse {
 
 
    /**
-    * Callback für CurlHttpClient, dem der empfangene Content des HTTP-Requests chunk-weise übergeben wird.
+    * Callback fuer CurlHttpClient, dem der empfangene Content des HTTP-Requests chunk-weise uebergeben wird.
     *
     * @param  resource $hCurl - das CURL-Handle des aktuellen Requests
     * @param  string   $data  - die empfangenen Daten
@@ -148,7 +148,7 @@ class CurlHttpResponse extends HttpResponse {
 
 
    /**
-    * Gibt den Content des HttpResponse zurück.
+    * Gibt den Content des HttpResponse zurueck.
     *
     * @return string - Content
     */

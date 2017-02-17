@@ -8,7 +8,7 @@ use rosasurfer\exception\RuntimeException;
 /**
  * Singleton
  *
- * Abstraktes Grundgerüst für Implementierungen des Singleton-Patterns.
+ * Abstraktes Grundgeruest fuer Implementierungen des Singleton-Patterns.
  */
 abstract class Singleton extends Object {
 
@@ -18,13 +18,13 @@ abstract class Singleton extends Object {
 
 
    /**
-    * Nicht-öffentlicher Constructor
+    * Nicht-oeffentlicher Constructor
     */
    protected function __construct() { /* you can't call me from outside ... */ }
 
 
    /**
-    * Gibt die Singleton-Instanz der gewünschten Klasse zurück.
+    * Gibt die Singleton-Instanz der gewuenschten Klasse zurueck.
     *
     * @param  string $class - Klassennname
     * @param  ...           - variable number of parameters
@@ -53,7 +53,7 @@ abstract class Singleton extends Object {
       if (!$instance instanceof self) throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
       self::$instances[$class] = $instance;
 
-      // Marker für rekursiven Aufruf zurücksetzen
+      // Marker fuer rekursiven Aufruf zuruecksetzen
       unset($currentCreations[$class]);
 
       return $instance;

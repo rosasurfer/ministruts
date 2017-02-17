@@ -28,7 +28,7 @@ class RequestProcessor extends Object {
                   /*bool*/ $logNotice;
 
    /**
-    * @var Module - Modul, zu dem wir gehören
+    * @var Module - Modul, zu dem wir gehoeren
     */
    protected $module;
 
@@ -49,7 +49,7 @@ class RequestProcessor extends Object {
 
 
    /**
-    * Verarbeitet den übergebenen Request und gibt entweder den entsprechenden Content aus oder
+    * Verarbeitet den uebergebenen Request und gibt entweder den entsprechenden Content aus oder
     * leitet auf eine andere Resource um.
     *
     * @param  Request  $request
@@ -64,22 +64,22 @@ class RequestProcessor extends Object {
       $this->processLocale($request, $response);
 
 
-      // ActionMessages aus der Session löschen
+      // ActionMessages aus der Session loeschen
       $this->processCachedActionMessages($request, $response);
 
 
-      // Mapping für den Request ermitteln: wird kein Mapping gefunden, generiert die Methode einen 404-Fehler
+      // Mapping fuer den Request ermitteln: wird kein Mapping gefunden, generiert die Methode einen 404-Fehler
       $mapping = $this->processMapping($request, $response);
       if (!$mapping)
          return;
 
 
-      // Methodenbeschränkungen des Mappings prüfen: wird der Zugriff verweigert, generiert die Methode einen 405-Fehler
+      // Methodenbeschraenkungen des Mappings pruefen: wird der Zugriff verweigert, generiert die Methode einen 405-Fehler
       if (!$this->processMethod($request, $response, $mapping))
          return;
 
 
-      // benötigte Rollen überprüfen
+      // benoetigte Rollen ueberpruefen
       if (!$this->processRoles($request, $response, $mapping))
          return;
 
@@ -98,7 +98,7 @@ class RequestProcessor extends Object {
          return;
 
 
-      // Action erzeugen (Form und Mapping werden schon hier übergeben, damit User-Code einfacher wird)
+      // Action erzeugen (Form und Mapping werden schon hier uebergeben, damit User-Code einfacher wird)
       $action = $this->processActionCreate($request, $response, $mapping, $form);
 
 
@@ -108,13 +108,13 @@ class RequestProcessor extends Object {
          return;
 
 
-      // den zurückgegebenen ActionForward verarbeiten
+      // den zurueckgegebenen ActionForward verarbeiten
       $this->processActionForward($request, $response, $forward);
    }
 
 
    /**
-    * Wurde mit dem Request eine Session-ID übertragen, wird die entsprechende HttpSession fortgesetzt.
+    * Wurde mit dem Request eine Session-ID uebertragen, wird die entsprechende HttpSession fortgesetzt.
     *
     * @param  Request  $request
     * @param  Response $response
@@ -127,9 +127,9 @@ class RequestProcessor extends Object {
 
 
    /**
-    * Wählt bei Bedarf ein Locale für den aktuellen User aus.
+    * Waehlt bei Bedarf ein Locale fuer den aktuellen User aus.
     *
-    * Note: Die Auswahl eines Locale löst automatisch die Erzeugung einer HttpSession aus.
+    * Note: Die Auswahl eines Locale loest automatisch die Erzeugung einer HttpSession aus.
     *
     * @param  Request  $request
     * @param  Response $response
@@ -139,8 +139,8 @@ class RequestProcessor extends Object {
 
 
    /**
-    * Verschiebt ActionMessages, die in der HttpSession gespeichert sind, zurück in den aktuellen
-    * Request. Wird verwendet, um ActionMessages über einen Redirect hinweg übertragen zu können.
+    * Verschiebt ActionMessages, die in der HttpSession gespeichert sind, zurueck in den aktuellen
+    * Request. Wird verwendet, um ActionMessages ueber einen Redirect hinweg uebertragen zu koennen.
     *
     * @param  Request  $request
     * @param  Response $response
@@ -167,8 +167,8 @@ class RequestProcessor extends Object {
 
 
    /**
-    * Kopiert alle vorhandenen ActionMessages in die HttpSession. Beim nächsten Request werden diese
-    * Messages automatisch zurück in den Request verschoben und stehen wieder zur Verfügung.
+    * Kopiert alle vorhandenen ActionMessages in die HttpSession. Beim naechsten Request werden diese
+    * Messages automatisch zurueck in den Request verschoben und stehen wieder zur Verfuegung.
     *
     * @param  Request $request
     *
@@ -191,8 +191,8 @@ class RequestProcessor extends Object {
 
 
    /**
-    * Wählt das zu benutzende ActionMapping. Kann kein Mapping gefunden werden, wird eine Fehlermeldung
-    * erzeugt und NULL zurückgegeben.
+    * Waehlt das zu benutzende ActionMapping. Kann kein Mapping gefunden werden, wird eine Fehlermeldung
+    * erzeugt und NULL zurueckgegeben.
     *
     * @param  Request  $request
     * @param  Response $response
@@ -200,7 +200,7 @@ class RequestProcessor extends Object {
     * @return ActionMapping - ActionMapping oder NULL
     */
    protected function processMapping(Request $request, Response $response) {
-      // Pfad für die Mappingauswahl ermitteln ...
+      // Pfad fuer die Mappingauswahl ermitteln ...
       $requestPath = '/'.trim(preg_replace('|/{2,}|', '/', $request->getPath()), '/').'/';   // normalize request path
       if ($requestPath=='//') $requestPath = '/';
       // /
@@ -265,9 +265,9 @@ PROCESS_MAPPING_ERROR_SC_404;
 
 
    /**
-    * Wenn für das ActionMapping Methodenbeschränkungen definiert sind, sicherstellen, daß der Request
-    * diese Beschränkungen erfüllt. Gibt TRUE zurück, wenn die Verarbeitung fortgesetzt und der Zugriff
-    * gewährt werden soll werden soll, oder FALSE, wenn der Zugriff nicht gewährt wird und der Request
+    * Wenn fuer das ActionMapping Methodenbeschraenkungen definiert sind, sicherstellen, dass der Request
+    * diese Beschraenkungen erfuellt. Gibt TRUE zurueck, wenn die Verarbeitung fortgesetzt und der Zugriff
+    * gewaehrt werden soll werden soll, oder FALSE, wenn der Zugriff nicht gewaehrt wird und der Request
     * beendet wurde.
     *
     * @param  Request       $request
@@ -280,7 +280,7 @@ PROCESS_MAPPING_ERROR_SC_404;
       if ($mapping->isSupportedMethod($request->getMethod()))
          return true;
 
-      // Beschränkung nicht erfüllt
+      // Beschraenkung nicht erfuellt
       self::$logDebug && Logger::log('HTTP method "'.$request->getMethod().'" is not supported by ActionMapping, denying access', L_DEBUG);
 
       // Status-Code 405 setzen, bevor Content ausgegeben wird
@@ -310,9 +310,9 @@ PROCESS_METHOD_ERROR_SC_405;
 
 
    /**
-    * Wenn die Action Zugriffsbeschränkungen hat, sicherstellen, daß der User Inhaber der angegebenen
-    * Rollen ist.  Gibt TRUE zurück, wenn die Verarbeitung fortgesetzt und der Zugriff gewährt werden
-    * soll, oder FALSE, wenn der Zugriff nicht gewährt wird und der Request beendet wurde.
+    * Wenn die Action Zugriffsbeschraenkungen hat, sicherstellen, dass der User Inhaber der angegebenen
+    * Rollen ist.  Gibt TRUE zurueck, wenn die Verarbeitung fortgesetzt und der Zugriff gewaehrt werden
+    * soll, oder FALSE, wenn der Zugriff nicht gewaehrt wird und der Request beendet wurde.
     *
     * @param  Request       $request
     * @param  Response      $response
@@ -334,8 +334,8 @@ PROCESS_METHOD_ERROR_SC_405;
 
 
    /**
-    * Erzeugt die ActionForm des angegebenen Mappings bzw. gibt sie zurück. Ist keine ActionForm
-    * konfiguriert, wird NULL zurückgegeben.
+    * Erzeugt die ActionForm des angegebenen Mappings bzw. gibt sie zurueck. Ist keine ActionForm
+    * konfiguriert, wird NULL zurueckgegeben.
     *
     * @param  Request       $request
     * @param  Response      $response
@@ -371,10 +371,10 @@ PROCESS_METHOD_ERROR_SC_405;
 
 
    /**
-    * Validiert die ActionForm, wenn entprechend konfiguriert.  Ist für das ActionMapping ein direkter
+    * Validiert die ActionForm, wenn entprechend konfiguriert.  Ist fuer das ActionMapping ein direkter
     * Forward konfiguriert, wird nach der Validierung auf diesen Forward weitergeleitet. Ist kein
     * allgemeiner Forward definiert, wird auf die konfigurierte "success" oder "error"-Resource
-    * weitergeleitet.  Gibt TRUE zurück, wenn die Verarbeitung fortgesetzt werden soll, oder FALSE,
+    * weitergeleitet.  Gibt TRUE zurueck, wenn die Verarbeitung fortgesetzt werden soll, oder FALSE,
     * wenn auf eine andere Resource weitergeleitet und der Request bereits beendet wurde.
     *
     * @param  Request       $request
@@ -406,7 +406,7 @@ PROCESS_METHOD_ERROR_SC_405;
 
    /**
     * Verarbeitet einen direkt im ActionMapping angegebenen ActionForward (wenn angegeben). Gibt TRUE
-    * zurück, wenn die Verarbeitung fortgesetzt werden soll, oder FALSE, wenn der Request bereits
+    * zurueck, wenn die Verarbeitung fortgesetzt werden soll, oder FALSE, wenn der Request bereits
     * beendet wurde.
     *
     * @param  Request       $request
@@ -426,7 +426,7 @@ PROCESS_METHOD_ERROR_SC_405;
 
 
    /**
-    * Erzeugt und gibt die Action zurück, die für das angegebene Mapping konfiguriert wurde.
+    * Erzeugt und gibt die Action zurueck, die fuer das angegebene Mapping konfiguriert wurde.
     *
     * @param  Request       $request
     * @param  Response      $response
@@ -443,8 +443,8 @@ PROCESS_METHOD_ERROR_SC_405;
 
 
    /**
-    * Übergibt den Request zur Bearbeitung an die konfigurierte Action und gibt den von ihr
-    * zurückgegebenen ActionForward zurück.
+    * Uebergibt den Request zur Bearbeitung an die konfigurierte Action und gibt den von ihr
+    * zurueckgegebenen ActionForward zurueck.
     *
     * @param  Request  $request
     * @param  Response $response
@@ -457,12 +457,12 @@ PROCESS_METHOD_ERROR_SC_405;
       $throwable = null;
 
       // Alles kapseln, damit Postprocessing-Hook auch nach Auftreten einer Exception aufgerufen
-      // werden kann (z.B. Transaction-Rollback o.ä.)
+      // werden kann (z.B. Transaction-Rollback o.ae.)
       try {
          // allgemeinen Preprocessing-Hook aufrufen
          $forward = $action->executeBefore($request, $response);
 
-         // Action nur ausführen, wenn executeBefore() nicht schon Abbruch signalisiert hat
+         // Action nur ausfuehren, wenn executeBefore() nicht schon Abbruch signalisiert hat
          if ($forward === null)
             $forward = $action->execute($request, $response);
 
@@ -473,7 +473,7 @@ PROCESS_METHOD_ERROR_SC_405;
          $throwable = $ex;    // evt. aufgetretene Exception zwischenspeichern
       }
 
-      // falls statt eines ActionForwards ein String-Identifier zurückgegeben wurde, diesen auflösen
+      // falls statt eines ActionForwards ein String-Identifier zurueckgegeben wurde, diesen aufloesen
       if (is_string($forward))
          $forward = $action->getMapping()->findForward($forward);
 
@@ -491,7 +491,7 @@ PROCESS_METHOD_ERROR_SC_405;
 
 
    /**
-    * Verarbeitet den von der Action zurückgegebenen ActionForward.  Leitet auf die Resource weiter,
+    * Verarbeitet den von der Action zurueckgegebenen ActionForward.  Leitet auf die Resource weiter,
     * die der ActionForward bezeichnet.
     *
     * @param  Request       $request
@@ -506,7 +506,7 @@ PROCESS_METHOD_ERROR_SC_405;
 
          $path = $forward->getPath();
 
-         // prüfen, ob der Forward eine URL "http://www..." oder einen Path "/target?..." enthält
+         // pruefen, ob der Forward eine URL "http://www..." oder einen Path "/target?..." enthaelt
          if (strStartsWith($path, 'http')) {
             $url = $path;
          }

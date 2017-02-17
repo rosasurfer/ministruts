@@ -8,7 +8,7 @@ use rosasurfer\dependency\Dependency;
 /**
  * CachePeer
  *
- * Abstrakte Basisklasse für Cache-Implementierungen.
+ * Abstrakte Basisklasse fuer Cache-Implementierungen.
  *
  * Anwendung:
  * ----------
@@ -18,7 +18,7 @@ use rosasurfer\dependency\Dependency;
  *       CachePeer::set($key, $value, $expires);
  *
  *
- *    Wert hinzufügen (nur speichern, wenn er noch nicht im Cache existiert):
+ *    Wert hinzufuegen (nur speichern, wenn er noch nicht im Cache existiert):
  *
  *       CachePeer::add($key, $value, $expires)
  *
@@ -33,7 +33,7 @@ use rosasurfer\dependency\Dependency;
  *       $value = CachePeer::get($key);
  *
  *
- *    Wert löschen:
+ *    Wert loeschen:
  *
  *       CachePeer::drop($key);
  *
@@ -58,7 +58,7 @@ abstract class CachePeer extends Object {
 
 
    /**
-    * Gibt den lokalen ReferencePool zurück.
+    * Gibt den lokalen ReferencePool zurueck.
     *
     * @return ReferencePool
     */
@@ -70,32 +70,32 @@ abstract class CachePeer extends Object {
 
 
    /**
-    * Gibt einen Wert aus dem Cache zurück.  Existiert der Wert nicht, wird der angegebene Defaultwert
-    * zurückgegeben.
+    * Gibt einen Wert aus dem Cache zurueck.  Existiert der Wert nicht, wird der angegebene Defaultwert
+    * zurueckgegeben.
     *
-    * @param  string $key     - Schlüssel, unter dem der Wert gespeichert ist
+    * @param  string $key     - Schluessel, unter dem der Wert gespeichert ist
     * @param  mixed  $default - Defaultwert (kann selbst auch NULL sein)
     *
-    * @return mixed - Der gespeicherte Wert, NULL, falls kein solcher Schlüssel existiert oder der
+    * @return mixed - Der gespeicherte Wert, NULL, falls kein solcher Schluessel existiert oder der
     *                 angegebene Defaultwert
     */
    abstract public function get($key, $default = null);
 
 
    /**
-    * Löscht einen Wert aus dem Cache.
+    * Loescht einen Wert aus dem Cache.
     *
-    * @param  string $key - Schlüssel, unter dem der Wert gespeichert ist
+    * @param  string $key - Schluessel, unter dem der Wert gespeichert ist
     *
-    * @return bool - TRUE bei Erfolg, FALSE, falls kein solcher Schlüssel existiert
+    * @return bool - TRUE bei Erfolg, FALSE, falls kein solcher Schluessel existiert
     */
    abstract public function drop($key);
 
 
    /**
-    * Ob unter dem angegebenen Schlüssel ein Wert im Cache gespeichert ist.
+    * Ob unter dem angegebenen Schluessel ein Wert im Cache gespeichert ist.
     *
-    * @param  string $key - Schlüssel
+    * @param  string $key - Schluessel
     *
     * @return bool
     */
@@ -103,14 +103,14 @@ abstract class CachePeer extends Object {
 
 
    /**
-    * Speichert einen Wert im Cache.  Ein schon vorhandener Wert unter demselben Schlüssel wird
-    * überschrieben.  Läuft die angegebene Zeitspanne ab oder ändert sich der Status der angegebenen
-    * Abhängigkeit, wird der Wert automatisch ungültig.
+    * Speichert einen Wert im Cache.  Ein schon vorhandener Wert unter demselben Schluessel wird
+    * ueberschrieben.  Laeuft die angegebene Zeitspanne ab oder aendert sich der Status der angegebenen
+    * Abhaengigkeit, wird der Wert automatisch ungueltig.
     *
-    * @param  string     $key        - Schlüssel, unter dem der Wert gespeichert wird
+    * @param  string     $key        - Schluessel, unter dem der Wert gespeichert wird
     * @param  mixed      $value      - der zu speichernde Wert
-    * @param  int        $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfällt
-    * @param  Dependency $dependency - Abhängigkeit der Gültigkeit des gespeicherten Wertes
+    * @param  int        $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfaellt
+    * @param  Dependency $dependency - Abhaengigkeit der Gueltigkeit des gespeicherten Wertes
     *
     * @return bool - TRUE bei Erfolg, FALSE andererseits
     */
@@ -118,14 +118,14 @@ abstract class CachePeer extends Object {
 
 
    /**
-    * Speichert einen Wert im Cache nur dann, wenn noch kein Wert unter dem angegebenen Schlüssel
-    * existiert.  Läuft die angegebene Zeitspanne ab oder ändert sich der Status der angegebenen
-    * Abhängigkeit, wird der Wert automatisch ungültig.
+    * Speichert einen Wert im Cache nur dann, wenn noch kein Wert unter dem angegebenen Schluessel
+    * existiert.  Laeuft die angegebene Zeitspanne ab oder aendert sich der Status der angegebenen
+    * Abhaengigkeit, wird der Wert automatisch ungueltig.
     *
-    * @param  string     $key        - Schlüssel, unter dem der Wert gespeichert wird
+    * @param  string     $key        - Schluessel, unter dem der Wert gespeichert wird
     * @param  mixed      $value      - der zu speichernde Wert
-    * @param  int        $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfällt
-    * @param  Dependency $dependency - Abhängigkeit der Gültigkeit des gespeicherten Wertes
+    * @param  int        $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfaellt
+    * @param  Dependency $dependency - Abhaengigkeit der Gueltigkeit des gespeicherten Wertes
     *
     * @return bool - TRUE bei Erfolg, FALSE andererseits
     */
@@ -138,14 +138,14 @@ abstract class CachePeer extends Object {
 
 
    /**
-    * Speichert einen Wert im Cache nur dann, wenn unter dem angegebenen Schlüssel bereits ein Wert
-    * existiert.  Läuft die angegebene Zeitspanne ab oder ändert sich der Status der angegebenen
-    * Abhängigkeit, wird der Wert automatisch ungültig.
+    * Speichert einen Wert im Cache nur dann, wenn unter dem angegebenen Schluessel bereits ein Wert
+    * existiert.  Laeuft die angegebene Zeitspanne ab oder aendert sich der Status der angegebenen
+    * Abhaengigkeit, wird der Wert automatisch ungueltig.
     *
-    * @param  string     $key        - Schlüssel, unter dem der Wert gespeichert wird
+    * @param  string     $key        - Schluessel, unter dem der Wert gespeichert wird
     * @param  mixed      $value      - der zu speichernde Wert
-    * @param  int        $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfällt
-    * @param  Dependency $dependency - Abhängigkeit der Gültigkeit des gespeicherten Wertes
+    * @param  int        $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfaellt
+    * @param  Dependency $dependency - Abhaengigkeit der Gueltigkeit des gespeicherten Wertes
     *
     * @return bool - TRUE bei Erfolg, FALSE andererseits
     */

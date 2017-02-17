@@ -11,13 +11,13 @@ class ChainedDependency extends Dependency {
 
 
    /**
-    * Abhängigkeiten des Gesamtausdrucks
+    * Abhaengigkeiten des Gesamtausdrucks
     */
    private /*Dependency[]*/ $dependencies;
 
 
    /**
-    * logischer Typ der Gesamtabhängigkeit (AND oder OR)
+    * logischer Typ der Gesamtabhaengigkeit (AND oder OR)
     */
    private /*string*/ $type;
 
@@ -25,7 +25,7 @@ class ChainedDependency extends Dependency {
    /**
     * Constructor
     *
-    * @param  Dependency $dependency - Abhängigkeit
+    * @param  Dependency $dependency - Abhaengigkeit
     */
    private function __construct(Dependency $dependency) {
       $this->dependencies[] = $dependency;
@@ -36,7 +36,7 @@ class ChainedDependency extends Dependency {
    /**
     * Erzeugt eine neue Instanz.
     *
-    * @param  Dependency $dependency - Abhängigkeit
+    * @param  Dependency $dependency - Abhaengigkeit
     *
     * @return self
     */
@@ -46,9 +46,9 @@ class ChainedDependency extends Dependency {
 
 
    /**
-    * Kombiniert diese Abhängigkeit mit einer weiteren durch ein logisches UND (AND).
+    * Kombiniert diese Abhaengigkeit mit einer weiteren durch ein logisches UND (AND).
     *
-    * @param  Dependency $dependency - Abhängigkeit
+    * @param  Dependency $dependency - Abhaengigkeit
     *
     * @return self
     */
@@ -68,9 +68,9 @@ class ChainedDependency extends Dependency {
 
 
    /**
-    * Kombiniert diese Abhängigkeit mit einer weiteren durch ein logisches ODER (OR).
+    * Kombiniert diese Abhaengigkeit mit einer weiteren durch ein logisches ODER (OR).
     *
-    * @param  Dependency $dependency - Abhängigkeit
+    * @param  Dependency $dependency - Abhaengigkeit
     *
     * @return self
     */
@@ -90,10 +90,10 @@ class ChainedDependency extends Dependency {
 
 
    /**
-    * Ob das zu überwachende Ereignis oder der Zustandswechsel eingetreten sind oder nicht.
+    * Ob das zu ueberwachende Ereignis oder der Zustandswechsel eingetreten sind oder nicht.
     *
-    * @return bool - TRUE, wenn die Abhängigkeit weiterhin erfüllt ist.
-    *                FALSE, wenn der Zustandswechsel eingetreten ist und die Abhängigkeit nicht mehr erfüllt ist.
+    * @return bool - TRUE, wenn die Abhaengigkeit weiterhin erfuellt ist.
+    *                FALSE, wenn der Zustandswechsel eingetreten ist und die Abhaengigkeit nicht mehr erfuellt ist.
     */
    public function isValid() {
       if ($this->type == 'AND') {

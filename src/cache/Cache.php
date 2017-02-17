@@ -16,7 +16,7 @@ use const rosasurfer\CLI;
 /**
  * Cache
  *
- * Factory für verschiedene Cache-Implementierungen.
+ * Factory fuer verschiedene Cache-Implementierungen.
  *
  * @see CachePeer
  */
@@ -36,15 +36,15 @@ final class Cache extends StaticClass {
 
 
    /**
-    * Gibt die Cache-Implementierung für den angegebenen Bezeichner zurück. Verschiedene Bezeichner
-    * stehen für verschiedene Cache-Implementierungen, z.B. APC-Cache, Dateisystem-Cache, MemCache.
+    * Gibt die Cache-Implementierung fuer den angegebenen Bezeichner zurueck. Verschiedene Bezeichner
+    * stehen fuer verschiedene Cache-Implementierungen, z.B. APC-Cache, Dateisystem-Cache, MemCache.
     *
     * @param  string $label - Bezeichner
     *
     * @return CachePeer
     */
    public static function me($label = null) {
-      // TODO: zufällige Verwendung der APPLICATION_ID als Label abfangen
+      // TODO: zufaellige Verwendung der APPLICATION_ID als Label abfangen
 
       // Default-Cache
       if ($label === null) {

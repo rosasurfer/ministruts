@@ -25,7 +25,7 @@ class HeaderParser extends Object {
 
 
    /**
-    * Parst einen übergebenen Headerblock.
+    * Parst einen uebergebenen Headerblock.
     *
     * @param  string $data - rohe Headerdaten
     *
@@ -81,7 +81,7 @@ class HeaderParser extends Object {
 
 
    /**
-    * Gibt alle empfangenen Header zurück.
+    * Gibt alle empfangenen Header zurueck.
     *
     * @return array - assoziatives Array mit Headern (name => value)
     */
@@ -103,7 +103,7 @@ class HeaderParser extends Object {
 
 
    /**
-    * Gibt den Header mit dem angegebenen Namen zurück.
+    * Gibt den Header mit dem angegebenen Namen zurueck.
     *
     * @param  string $name - Name des Headers
     *

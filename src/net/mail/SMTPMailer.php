@@ -23,7 +23,7 @@ use const rosasurfer\L_NOTICE;
 
 
 /**
- * Mailer, der Mails per SMTP-Protokoll über einen SMTP-Server verschickt.
+ * Mailer, der Mails per SMTP-Protokoll ueber einen SMTP-Server verschickt.
  */
 class SMTPMailer extends Mailer {
 
@@ -31,7 +31,7 @@ class SMTPMailer extends Mailer {
    private static /*bool*/ $logDebug,
                   /*bool*/ $logInfo,
                   /*bool*/ $logNotice,
-                  /*int */ $maxSendingTime = 2;    // benötigt der Versand länger als hier angegeben, wird er im Loglevel DEBUG geloggt
+                  /*int */ $maxSendingTime = 2;    // benoetigt der Versand laenger als hier angegeben, wird er im Loglevel DEBUG geloggt
 
 
    protected /*string*/ $config = array('host'          => null,     // SMTP server host name
@@ -59,7 +59,7 @@ class SMTPMailer extends Mailer {
       self::$logInfo   = ($loglevel <= L_INFO  );
       self::$logNotice = ($loglevel <= L_NOTICE);
 
-      // fehlende Optionen mit PHP-Defaults bestücken
+      // fehlende Optionen mit PHP-Defaults bestuecken
       if (!isSet($options['host'])) {
          $options['host'] = ini_get('SMTP');
          $options['port'] = ini_get('smtp_port');
@@ -72,11 +72,11 @@ class SMTPMailer extends Mailer {
          if (sizeOf($parts) == 1) {
             if (trim($parts[0]) == '') throw new InvalidArgumentException('Invalid option "host": '.$options['host']);
             if (!isSet($options['port']))
-               $options['port'] = ini_get('smtp_port');  // TODO: Adresse und Port prüfen
+               $options['port'] = ini_get('smtp_port');  // TODO: Adresse und Port pruefen
          }
          elseif (sizeOf($parts) == 2) {
             if (trim($parts[0])=='' || trim($parts[1])=='') throw new InvalidArgumentException('Invalid option "host": '.$options['host']);
-            $options['host'] = $parts[0];                // TODO: Adresse und Port prüfen
+            $options['host'] = $parts[0];                // TODO: Adresse und Port pruefen
             $options['port'] = $parts[1];
          }
          else {
@@ -84,7 +84,7 @@ class SMTPMailer extends Mailer {
          }
       }
 
-      // vorgegebene mit übergebenen Optionen mergen
+      // vorgegebene mit uebergebenen Optionen mergen
       $this->config = array_merge($this->config, $options);
 
       // get our hostname
@@ -100,7 +100,7 @@ class SMTPMailer extends Mailer {
    /**
     * Destructor
     *
-    * Sorgt bei Zerstörung des Objekts dafür, daß eine noch offene Connection geschlossen werden.
+    * Sorgt bei Zerstoerung des Objekts dafuer, dass eine noch offene Connection geschlossen werden.
     */
    public function __destruct() {
       // Attempting to throw an exception from a destructor during script shutdown causes a fatal error.
@@ -123,7 +123,7 @@ class SMTPMailer extends Mailer {
                               $errorCode,
                               $errorMsg,
                               $this->config['timeout']);
-      // TODO: connect() bleibt ohne Fehlermeldung hängen, wenn keine Verbindung zustande kommt
+      // TODO: connect() bleibt ohne Fehlermeldung haengen, wenn keine Verbindung zustande kommt
       if (!$connection)
          throw new RuntimeException("Could not open socket: $errorMsg (error $errorCode)");
 
@@ -191,10 +191,10 @@ class SMTPMailer extends Mailer {
     * Verschickt eine Mail.
     *
     * @param  string $sender   - Absender  (Format: 'Vorname Nachname <user@domain.tld>')
-    * @param  string $receiver - Empfänger (Format: 'Vorname Nachname <user@domain.tld>')
+    * @param  string $receiver - Empfaenger (Format: 'Vorname Nachname <user@domain.tld>')
     * @param  string $subject  - Betreffzeile der E-Mail
     * @param  string $message  - Inhalt der E-Mail
-    * @param  array  $headers  - zusätzliche zu setzende Mail-Header
+    * @param  array  $headers  - zusaetzliche zu setzende Mail-Header
     */
    public function sendMail($sender, $receiver, $subject, $message, array $headers = null) {
       if (!is_string($sender))   throw new IllegalTypeException('Illegal type of parameter $sender: '.getType($sender));
@@ -295,7 +295,7 @@ class SMTPMailer extends Mailer {
 
       // custom headers
       foreach ($headers as $header) {
-         // TODO: Header syntaktisch überprüfen
+         // TODO: Header syntaktisch ueberpruefen
          $header = preg_replace('~([\xA0-\xFF])~e', '"=?ISO-8859-1?Q?=".strToUpper(decHex(ord("$1")))."?="', $header);
          $this->writeData($header);
       }

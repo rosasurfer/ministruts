@@ -31,8 +31,8 @@ class Module extends Object {
 
 
    /**
-    * Ob diese Komponente vollständig konfiguriert ist. Wenn dieses Flag gesetzt ist, wirft jeder Versuch,
-    * die Komponente zu ändern, eine IllegalStateException.
+    * Ob diese Komponente vollstaendig konfiguriert ist. Wenn dieses Flag gesetzt ist, wirft jeder Versuch,
+    * die Komponente zu aendern, eine IllegalStateException.
     */
    protected /*bool*/ $configured = false;
 
@@ -45,7 +45,7 @@ class Module extends Object {
 
 
    /**
-    * Basisverzeichnisse für von diesem Modul einzubindende Resourcen
+    * Basisverzeichnisse fuer von diesem Modul einzubindende Resourcen
     */
    protected /*string[]*/ $resourceDirectories = array();
 
@@ -75,31 +75,31 @@ class Module extends Object {
 
 
    /**
-    * Der Klassenname der RequestProcessor-Implementierung, die für dieses Modul definiert ist.
+    * Der Klassenname der RequestProcessor-Implementierung, die fuer dieses Modul definiert ist.
     */
    protected /*string*/ $requestProcessorClass = DEFAULT_REQUEST_PROCESSOR_CLASS;
 
 
    /**
-    * Der Klassenname der ActionForward-Implementierung, die für dieses Modul definiert ist.
+    * Der Klassenname der ActionForward-Implementierung, die fuer dieses Modul definiert ist.
     */
    protected /*string*/ $forwardClass = DEFAULT_ACTION_FORWARD_CLASS;
 
 
    /**
-    * Der Klassenname der ActionMapping-Implementierung, die für dieses Modul definiert ist.
+    * Der Klassenname der ActionMapping-Implementierung, die fuer dieses Modul definiert ist.
     */
    protected /*string*/ $mappingClass = DEFAULT_ACTION_MAPPING_CLASS;
 
 
    /**
-    * Der Klassenname der Tiles-Implementierung, die für dieses Modul definiert ist.
+    * Der Klassenname der Tiles-Implementierung, die fuer dieses Modul definiert ist.
     */
    protected /*string*/ $tilesClass = DEFAULT_TILES_CLASS;
 
 
    /**
-    * Der Klassenname der RoleProcessor-Implementierung, die für dieses Modul definiert ist.
+    * Der Klassenname der RoleProcessor-Implementierung, die fuer dieses Modul definiert ist.
     */
    protected /*string*/ $roleProcessorClass;
 
@@ -161,7 +161,7 @@ class Module extends Object {
       // Konfiguration parsen und validieren
       $xml = new \SimpleXMLElement($content, LIBXML_DTDVALID);
 
-      // zurück ins Ausgangsverzeichnis wechseln
+      // zurueck ins Ausgangsverzeichnis wechseln
       try { chDir($currentDir); }
       catch (\Exception $ex) { throw new RuntimeException('Could not change working directory back to "'.$currentDir.'"', null, $ex); }
 
@@ -170,7 +170,7 @@ class Module extends Object {
 
 
    /**
-    * Gibt den Prefix dieses Modules zurück. Anhand des Prefixes werden die verschiedenen Module der
+    * Gibt den Prefix dieses Modules zurueck. Anhand des Prefixes werden die verschiedenen Module der
     * Anwendung unterschieden.
     *
     * @return string
@@ -200,7 +200,7 @@ class Module extends Object {
 
 
    /**
-    * Setzt das Basisverzeichnis für lokale Resourcen.
+    * Setzt das Basisverzeichnis fuer lokale Resourcen.
     *
     * @param  \SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
     */
@@ -235,7 +235,7 @@ class Module extends Object {
       // process global 'include' and 'redirect' forwards
       $elements = $xml->xPath('/struts-config/global-forwards/forward[@include] | /struts-config/global-forwards/forward[@redirect]');
       if ($elements === false)
-         $elements = array(); // xPath() gibt entgegen der Dokumentation NICHT immer ein Array zurück
+         $elements = array(); // xPath() gibt entgegen der Dokumentation NICHT immer ein Array zurueck
 
       foreach ($elements as $tag) {
          $name = (string) $tag['name'];
@@ -260,10 +260,10 @@ class Module extends Object {
          $this->addForward($name, $forward);
       }
 
-      // process global 'forward' forwards (fragwürdig, aber möglich)
+      // process global 'forward' forwards (fragwuerdig, aber moeglich)
       $elements = $xml->xPath('/struts-config/global-forwards/forward[@forward]');
       if ($elements === false)
-         $elements = array(); // xPath() gibt entgegen der Dokumentation NICHT immer ein Array zurück
+         $elements = array(); // xPath() gibt entgegen der Dokumentation NICHT immer ein Array zurueck
 
       foreach ($elements as $tag) {
          $name = (string) $tag['name'];
@@ -286,7 +286,7 @@ class Module extends Object {
    protected function processMappings(\SimpleXMLElement $xml) {
       $elements = $xml->xPath('/struts-config/action-mappings/mapping');
       if ($elements === false)
-         $elements = [];      // xPath() gibt entgegen der Dokumentation *NICHT* immer ein Array zurück
+         $elements = [];      // xPath() gibt entgegen der Dokumentation *NICHT* immer ein Array zurueck
 
       foreach ($elements as $tag) {
          $mapping = new $this->mappingClass($this);
@@ -364,7 +364,7 @@ class Module extends Object {
             else {
                if ($tag['form-validate-first']=='false') throw new RuntimeException('Mapping "'.$mapping->getPath().'": An "action", "include", "redirect" or "forward" attribute is required when "form-validate-first" attribute is set to "false"');
                $formValidateFirst = true;
-               // Prüfung auf 'success' und 'error' Forward erfolgt in ActionMapping:freeze()
+               // Pruefung auf 'success' und 'error' Forward erfolgt in ActionMapping:freeze()
             }
          }
          elseif ($formValidateFirst = $tag['form-validate-first']=='true') {
@@ -402,7 +402,7 @@ class Module extends Object {
          // process local 'include' and 'redirect' forwards
          $subElements = $tag->xPath('./forward[@include] | ./forward[@redirect]');
          if ($subElements === false)
-            $subElements = array(); // xPath() gibt entgegen der Dokumentation NICHT immer ein Array zurück
+            $subElements = array(); // xPath() gibt entgegen der Dokumentation NICHT immer ein Array zurueck
 
          foreach ($subElements as $forwardTag) {
             $name = (string) $forwardTag['name'];
@@ -430,7 +430,7 @@ class Module extends Object {
          // process local 'forward' forwards
          $subElements = $tag->xPath('./forward[@forward]');
          if ($subElements === false)
-            $subElements = array(); // xPath() gibt entgegen der Dokumentation NICHT immer ein Array zurück
+            $subElements = array(); // xPath() gibt entgegen der Dokumentation NICHT immer ein Array zurueck
 
          foreach ($subElements as $forwardTag) {
             $name = (string) $forwardTag['name'];
@@ -453,14 +453,14 @@ class Module extends Object {
 
 
    /**
-    * Durchläuft alle konfigurierten Tiles.
+    * Durchlaeuft alle konfigurierten Tiles.
     *
     * @param  \SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
     */
    protected function processTiles(\SimpleXMLElement $xml) {
       $elements = $xml->xPath('/struts-config/tiles/tile');
       if ($elements === false)
-         $elements = array(); // xPath() gibt entgegen der Dokumentation NICHT immer ein Array zurück
+         $elements = array(); // xPath() gibt entgegen der Dokumentation NICHT immer ein Array zurueck
 
       foreach ($elements as $tag) {
          $name = (string) $tag['name'];
@@ -471,7 +471,7 @@ class Module extends Object {
 
 
    /**
-    * Sucht die Tilesdefinition mit dem angegebenen Namen und gibt die entsprechende Instanz zurück.
+    * Sucht die Tilesdefinition mit dem angegebenen Namen und gibt die entsprechende Instanz zurueck.
     *
     * @param  string            $name - Name der Tile
     * @param  \SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration der Tile
@@ -517,7 +517,7 @@ class Module extends Object {
 
 
    /**
-    * Verarbeitet die in einer Tiles-Definition angegebenen zusätzlichen Properties.
+    * Verarbeitet die in einer Tiles-Definition angegebenen zusaetzlichen Properties.
     *
     * @param  Tile              $tile - Tile-Instanz
     * @param  \SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration
@@ -525,7 +525,7 @@ class Module extends Object {
    private function processTileProperties(Tile $tile, \SimpleXMLElement $xml) {
       foreach ($xml->set as $tag) {
          $name  = (string) $tag['name'];
-         // TODO: Name-Value von <set> wird nicht auf Eindeutigkeit überprüft
+         // TODO: Name-Value von <set> wird nicht auf Eindeutigkeit ueberprueft
 
          if ($tag['value']) { // value ist im Attribut angegeben
             if (strLen($tag) > 0) throw new RuntimeException('Tile "'.$tile->getName().'", set "'.$name.'": Only a "value" attribute *or* a body value must be specified');
@@ -567,7 +567,7 @@ class Module extends Object {
             $value = $nestedTile;
          }
 
-         // TODO: bei extended Tiles Typübereinstimmung überladener Properties prüfen
+         // TODO: bei extended Tiles Typuebereinstimmung ueberladener Properties pruefen
          $tile->setProperty($name, $value);
       }
    }
@@ -583,8 +583,8 @@ class Module extends Object {
 
 
    /**
-    * Fügt diesem Module einen globalen ActionForward unter dem angegebenen Namen hinzu.  Der angegebene
-    * Name kann vom internen Namen des Forwards abweichen, sodaß die Definition von Aliassen möglich ist
+    * Fuegt diesem Module einen globalen ActionForward unter dem angegebenen Namen hinzu.  Der angegebene
+    * Name kann vom internen Namen des Forwards abweichen, sodass die Definition von Aliassen moeglich ist
     * (ein Forward ist unter mehreren Namen auffindbar).
     *
     * @param  string        $name
@@ -602,7 +602,7 @@ class Module extends Object {
 
 
    /**
-    * Fügt diesem Module ein ActionMapping hinzu.
+    * Fuegt diesem Module ein ActionMapping hinzu.
     *
     * @param  ActionMapping $mapping
     */
@@ -623,7 +623,7 @@ class Module extends Object {
 
 
    /**
-    * Fügt diesem Module eine Tile hinzu.
+    * Fuegt diesem Module eine Tile hinzu.
     *
     * @param  Tile $tile
     */
@@ -634,7 +634,7 @@ class Module extends Object {
 
 
    /**
-    * Gibt das ActionMapping für den angegebenen Pfad zurück.
+    * Gibt das ActionMapping fuer den angegebenen Pfad zurueck.
     *
     * @param  string $path
     *
@@ -659,7 +659,7 @@ class Module extends Object {
 
 
    /**
-    * Gibt das Default-ActionMapping dieses Moduls zurück.
+    * Gibt das Default-ActionMapping dieses Moduls zurueck.
     *
     * @return ActionMapping - Mapping oder NULL, wenn kein Default-Mapping definiert ist
     */
@@ -679,7 +679,7 @@ class Module extends Object {
 
       $elements = $xml->xPath('/struts-config/controller');
       if ($elements === false)
-         $elements = array(); // xPath() gibt entgegen der Dokumentation NICHT immer ein Array zurück
+         $elements = array(); // xPath() gibt entgegen der Dokumentation NICHT immer ein Array zurueck
 
       foreach ($elements as $controller) {
          if ($controller['request-processor']) {
@@ -694,8 +694,8 @@ class Module extends Object {
 
 
    /**
-    * Setzt den Klassennamen der RequestProcessor-Implementierung, die für dieses Module benutzt wird.
-    * Diese Klasse muß eine Subklasse von RequestProcessor sein.
+    * Setzt den Klassennamen der RequestProcessor-Implementierung, die fuer dieses Module benutzt wird.
+    * Diese Klasse muss eine Subklasse von RequestProcessor sein.
     *
     * @param  string $className
     */
@@ -710,7 +710,7 @@ class Module extends Object {
 
 
    /**
-    * Gibt den Klassennamen der RequestProcessor-Implementierung zurück.
+    * Gibt den Klassennamen der RequestProcessor-Implementierung zurueck.
     *
     * @return string
     */
@@ -720,8 +720,8 @@ class Module extends Object {
 
 
    /**
-    * Setzt den Klassennamen der RoleProcessor-Implementierung, die für dieses Module benutzt wird.
-    * Diese Klasse muß eine Subklasse von RoleProcessor sein.
+    * Setzt den Klassennamen der RoleProcessor-Implementierung, die fuer dieses Module benutzt wird.
+    * Diese Klasse muss eine Subklasse von RoleProcessor sein.
     *
     * @param  string $className
     */
@@ -736,7 +736,7 @@ class Module extends Object {
 
 
    /**
-    * Gibt die RoleProcessor-Implementierung dieses Moduls zurück.
+    * Gibt die RoleProcessor-Implementierung dieses Moduls zurueck.
     *
     * @return RoleProcessor
     */
@@ -751,8 +751,8 @@ class Module extends Object {
 
 
    /**
-    * Setzt den Klassennamen der Tiles-Implementierung, die für dieses Modul benutzt wird.
-    * Diese Klasse muß eine Subklasse von Tile sein.
+    * Setzt den Klassennamen der Tiles-Implementierung, die fuer dieses Modul benutzt wird.
+    * Diese Klasse muss eine Subklasse von Tile sein.
     *
     * @param  string $className
     */
@@ -767,7 +767,7 @@ class Module extends Object {
 
 
    /**
-    * Gibt den Klassennamen der Tiles-Implementierung zurück.
+    * Gibt den Klassennamen der Tiles-Implementierung zurueck.
     *
     * @return string
     */
@@ -777,8 +777,8 @@ class Module extends Object {
 
 
    /**
-    * Setzt den Klassennamen der ActionMapping-Implementierung, die für dieses Modul benutzt wird.
-    * Diese Klasse muß eine Subklasse von ActionMapping sein.
+    * Setzt den Klassennamen der ActionMapping-Implementierung, die fuer dieses Modul benutzt wird.
+    * Diese Klasse muss eine Subklasse von ActionMapping sein.
     *
     * @param  string $className
     */
@@ -793,7 +793,7 @@ class Module extends Object {
 
 
    /**
-    * Gibt den Klassennamen der ActionMapping-Implementierung zurück.
+    * Gibt den Klassennamen der ActionMapping-Implementierung zurueck.
     *
     * @return string
     */
@@ -803,8 +803,8 @@ class Module extends Object {
 
 
    /**
-    * Setzt den Klassennamen der ActionForward-Implementierung, die für dieses Modul benutzt wird.
-    * Diese Klasse muß eine Subklasse von ActionForward sein.
+    * Setzt den Klassennamen der ActionForward-Implementierung, die fuer dieses Modul benutzt wird.
+    * Diese Klasse muss eine Subklasse von ActionForward sein.
     *
     * @param  string $className
     */
@@ -819,7 +819,7 @@ class Module extends Object {
 
 
    /**
-    * Gibt den Klassennamen der ActionForward-Implementierung zurück.
+    * Gibt den Klassennamen der ActionForward-Implementierung zurueck.
     *
     * @return string
     */
@@ -829,7 +829,7 @@ class Module extends Object {
 
 
    /**
-    * Friert die Konfiguration ein, sodaß sie nicht mehr geändert werden kann.
+    * Friert die Konfiguration ein, sodass sie nicht mehr geaendert werden kann.
     *
     * @return self
     */
@@ -851,8 +851,8 @@ class Module extends Object {
 
 
    /**
-    * Sucht und gibt den globalen ActionForward mit dem angegebenen Namen zurück.
-    * Wird kein Forward gefunden, wird NULL zurückgegeben.
+    * Sucht und gibt den globalen ActionForward mit dem angegebenen Namen zurueck.
+    * Wird kein Forward gefunden, wird NULL zurueckgegeben.
     *
     * @param  string $name - logischer Name des ActionForwards
     *
@@ -867,7 +867,7 @@ class Module extends Object {
 
 
    /**
-    * Gibt die Tile mit dem angegebenen Namen zurück oder NULL, wenn keine Tile mit diesem Namen
+    * Gibt die Tile mit dem angegebenen Namen zurueck oder NULL, wenn keine Tile mit diesem Namen
     * gefunden wurde.
     *
     * @param  string $name - logischer Name der Tile
@@ -907,7 +907,7 @@ class Module extends Object {
    private function isTile($name, \SimpleXMLElement $xml) {
       $nodes = $xml->xPath("/struts-config/tiles/tile[@name='$name']");
 
-      if ($nodes) {                 // xPath() gibt entgegen der Dokumentation NICHT immer ein Array zurück
+      if ($nodes) {                 // xPath() gibt entgegen der Dokumentation NICHT immer ein Array zurueck
          if (sizeOf($nodes) > 1)
             throw new RuntimeException('Non-unique tiles definition name "'.$name.'"');
          return true;
@@ -931,7 +931,7 @@ class Module extends Object {
 
    /**
     * Sucht in den Resource-Verzeichnissen dieses Modules nach einer Datei mit dem angegebenen Namen
-    * und gibt den vollständigen Dateinamen zurück, oder NULL, wenn keine Datei mit diesem Namen
+    * und gibt den vollstaendigen Dateinamen zurueck, oder NULL, wenn keine Datei mit diesem Namen
     * gefunden wurde.
     *
     * @param  string $name - relativer Dateiname

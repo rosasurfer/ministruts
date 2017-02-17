@@ -58,7 +58,7 @@ class TorHelper extends StaticClass {
 
 
    /**
-    * Prüft, ob die übergebene IP-Adresse ein aktueller Tor-Exit-Node ist.
+    * Prueft, ob die uebergebene IP-Adresse ein aktueller Tor-Exit-Node ist.
     *
     * @param  string $ip - IP-Adresse
     *
@@ -79,7 +79,7 @@ class TorHelper extends StaticClass {
 
 
    /**
-    * Gibt die aktuellen Exit-Nodes zurück.
+    * Gibt die aktuellen Exit-Nodes zurueck.
     *
     * @return array - assoziatives Array mit den IP-Adressen aller Exit-Nodes
     */
@@ -98,7 +98,7 @@ class TorHelper extends StaticClass {
                for ($i=0; $i < $size; ++$i) {
                   $request = HttpRequest::create()->setUrl('http://'.self::$torMirrors[$i].'/ip_list_exit.php/Tor_ip_list_EXIT.csv');
                   try {
-                     // TODO: Warnung ausgeben und Reihenfolge ändern, wenn ein Server nicht antwortet
+                     // TODO: Warnung ausgeben und Reihenfolge aendern, wenn ein Server nicht antwortet
                      $response = CurlHttpClient::create()
                                                ->send($request);
                      $status = $response->getStatus();
