@@ -28,12 +28,12 @@ class HeaderUtils extends StaticClass {
             // TODO: kompletter Unfug
             $found = preg_match_all('/^https?:\/{2,}([a-z0-9-]+(\.[a-z0-9-]+)*)*.*$/', strToLower(trim($url)), $matches, PREG_SET_ORDER);
 
-            if (!$found || $matches[0][1]==$request->getHostname())     // SID anhängen
+            if (!$found || $matches[0][1]==$request->getHostname())     // SID anhaengen
                $url .= (strContains($url, '?') ? '&':'?').SID;
          }
          session_write_close();
       }
-      // TODO: QueryString muß kodiert werden
+      // TODO: QueryString muss kodiert werden
       header('Location: '.$url);
       exit(0);                      // Ausgabe weiteren Contents verhindern
 

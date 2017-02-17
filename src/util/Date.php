@@ -43,10 +43,10 @@ class Date extends StaticClass {
 
 
    /**
-    * Gibt eine Anzahl von Datumswerten zurück.
+    * Gibt eine Anzahl von Datumswerten zurueck.
     *
     * @param  string $startDate - Startzeitpunkt (Format: yyyy-mm-dd)
-    * @param  int    $days      - Anzahl der zurückzugebenden Werte
+    * @param  int    $days      - Anzahl der zurueckzugebenden Werte
     *
     * @return array
     */

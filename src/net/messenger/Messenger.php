@@ -7,7 +7,7 @@ use rosasurfer\core\Object;
 /**
  * Messenger
  *
- * Messenger-Factory und abstrakte Basisklasse für alle Messenger-Implementierungen.
+ * Messenger-Factory und abstrakte Basisklasse fuer alle Messenger-Implementierungen.
  */
 abstract class Messenger extends Object {
 
@@ -23,7 +23,7 @@ abstract class Messenger extends Object {
    /**
     * Verschickt eine Message.
     *
-    * @param  string $receiver - Empfänger (internationales Format)
+    * @param  string $receiver - Empfaenger (internationales Format)
     * @param  string $message  - Nachricht
    */
    abstract public function sendMessage($receiver, $message);
