@@ -2,11 +2,19 @@ engines:
   phpmd:
     enabled: true
     checks:
+      CleanCode/ElseExpression:
+        enabled: false
       Controversial/Superglobals:
         enabled: false
-    checks:
+      Naming/ShortVariable:
+        enabled: false
+      Naming/LongVariable:
+        enabled: false
       UnusedLocalVariable:
         enabled: false
+    exclude_fingerprints:
+    - 01d1e57a3b8d772c3e2a95427c6e4751
+    - 4c7df643fa7763eeab56801355fae61f
 
   duplication:
     enabled: true
