@@ -1,10 +1,16 @@
+
+2017-02-17
+
+   - methods db/*/Connector::escape(Identifier|Literal|String)()
+
+
 2017-02-16
 
    - methods db/(Connector|Result)::getVersion(String|Number)()
    - method db/Result::fetchString()
-   - rename methods db/Result::fetchAs(Bool|Int|Float)() to fetch(Bool|Int|Float)() 
-   - rename db/orm/DAO::findMany() to findAll() 
-   - method db/orm/DAO::findOne() - add parameter $allowMany=false 
+   - rename methods db/Result::fetchAs(Bool|Int|Float)() to fetch(Bool|Int|Float)()
+   - rename db/orm/DAO::findMany() to findAll()
+   - method db/orm/DAO::findOne() - add parameter $allowMany=false
    - rename attribute /struts-config/action-mappings/mapping[@validate-before] to [@form-validate-first]
 
 
@@ -24,21 +30,21 @@
 
 2017-02-09
 
-   - fix implementation of is_class()/is_interface()/is_trait()  
+   - fix implementation of is_class()/is_interface()/is_trait()
 
 
 2017-02-08
 
-   - helper function rosasurfer/normalizeEOL()  
+   - helper function rosasurfer/normalizeEOL()
    - end-of-line constants EOL_MAC, EOL_NETSCAPE, EOL_UNIX, EOL_WINDOWS
-   - add IRosasurferException::addMessage() and PHPError::getSimpleType() 
-   - db/Connector and db/Result implement interfaces 
+   - add IRosasurferException::addMessage() and PHPError::getSimpleType()
+   - db/Connector and db/Result implement interfaces
 
 
 2017-02-03
 
    - reorganize database packages
-   - add db connectors for PostgreSQL and SQLite  
+   - add db connectors for PostgreSQL and SQLite
    - flatten the directory structure (PSR-4 conforming)
 
 
@@ -50,7 +56,7 @@
 
 2017-01-30
 
-   - by default ministruts/url/Url and ministruts/url/VersionedUrl include the application base URI   
+   - by default ministruts/url/Url and ministruts/url/VersionedUrl include the application base URI
    - dao/DAOWorker:         rename db mapping property 'link' to 'connection'
    - dao/PersistableObject: add method getConnector() and alias
 
@@ -72,16 +78,16 @@
      /struts-config/tiles/tile[@extends]               => [@extends-tile]
 
    - helper function rosasurfer/strToBool()
-    
+
 
 2017-01-22
 
-   - helper function rosasurfer/strIsNumeric() 
+   - helper function rosasurfer/strIsNumeric()
 
 
 2016-08-26
 
-   - view helpers rosasurfer/ministruts/url/Url and rosasurfer/ministruts/url/VersionedUrl 
+   - view helpers rosasurfer/ministruts/url/Url and rosasurfer/ministruts/url/VersionedUrl
 
 
 2016-08-11
@@ -96,15 +102,15 @@
 
 2016-07-20
 
-   - Config classes support multiple custom configurations with an application default configuration.  
-   - helper function rosasurfer/is_trait()  
+   - Config classes support multiple custom configurations with an application default configuration.
+   - helper function rosasurfer/is_trait()
 
 
 2016-07-06
 
-   - helper functions rosasurfer/strLeftTo() and rosasurfer/strRightFrom() support two optional parameters: 
+   - helper functions rosasurfer/strLeftTo() and rosasurfer/strRightFrom() support two optional parameters:
      $includeLimiter, $onNotFound
-   
+
 
 2016-07-04
 
@@ -167,21 +173,21 @@
 2016-02-25
 
    - function formatDate($format, $datetime) renamed to formatDateStr($datetime, $format)
-   
+
 
 2016-02-10
 
-   - new helper function is_datetime() as alias for php/util/CommonValidator::isDateTime() 
+   - new helper function is_datetime() as alias for php/util/CommonValidator::isDateTime()
 
 
 2015-09-07
 
-   - new string functions strContains() and strContainsI() replace php/util/String::contains() 
+   - new string functions strContains() and strContainsI() replace php/util/String::contains()
 
 
 2015-09-04
 
-   - new string function strStartsWith() and strStartsWithI() replace php/util/String::startsWith() 
+   - new string function strStartsWith() and strStartsWithI() replace php/util/String::startsWith()
    - new string function strEndsWith() and strEndsWithI() replace php/util/String::endsWith()
    - new string functions strCompare(), strCompareI(), strLeft(), strRight()
 
