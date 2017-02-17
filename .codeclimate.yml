@@ -1,21 +1,27 @@
 engines:
-  csslint:
-    enabled: false
-  duplication:
-    enabled: true
-    config:
-      languages:
-      - php
-  eslint:
-    enabled: false
-  fixme:
-    enabled: true
   phpmd:
     enabled: true
     checks:
       Controversial/Superglobals:
         enabled: false
+    checks:
+      UnusedLocalVariable:
+        enabled: false
+
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - php
+
+  fixme:
+    enabled: true
+    checks:
+      TODO:
+        enabled: false
+
 ratings:
   paths:
   - "**.php"
+
 exclude_paths: []
