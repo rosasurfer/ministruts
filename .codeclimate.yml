@@ -7,7 +7,7 @@ engines:
       languages:
       - php
   eslint:
-    enabled: false      
+    enabled: false
   fixme:
     enabled: true
   phpmd:
