@@ -36,6 +36,38 @@ interface ConnectorInterface {
 
 
    /**
+    * Escape a DBMS identifier, i.e. the name of a database object (schema, table, view, column etc.). The resulting string
+    * can be used in queries "as-is" and doesn't need additional quoting.
+    *
+    * @param  string $name - identifier to escape
+    *
+    * @return string - escaped and quoted identifier
+    */
+   public function escapeIdentifier($value);
+
+
+   /**
+    * Escape a DBMS string literal, i.e. a string value. The resulting string can be used in queries "as-is" and doesn't
+    * need additional quoting.
+    *
+    * @param  string $value - value to escape
+    *
+    * @return string - escaped and quoted string value
+    */
+   public function escapeLiteral($value);
+
+
+   /**
+    * Escape a string value. The resulting string must be quoted according to the DBMS before it can be used in queries.
+    *
+    * @param  string $value - value to escape
+    *
+    * @return string - escaped but not quoted string value
+    */
+   public function escapeString($value);
+
+
+   /**
     * Execute a SQL statement and return the result. This method should be used for SQL statements returning rows.
     *
     * @param  string $sql - SQL statement

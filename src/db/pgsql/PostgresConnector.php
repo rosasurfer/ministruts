@@ -178,6 +178,50 @@ class PostgresConnector extends Connector {
 
 
    /**
+    * Escape a DBMS identifier, i.e. the name of a database object (schema, table, view, column etc.). The resulting string
+    * can be used in queries "as-is" and doesn't need additional quoting.
+    *
+    * @param  string $name - identifier to escape
+    *
+    * @return string - escaped and quoted identifier; PostgreSQL:  "{$name}"
+    */
+   public function escapeIdentifier($value) {
+      if (!$this->isConnected())
+         $this->connect();
+      return pg_escape_identifier($this->hConnection, $value);
+   }
+
+
+   /**
+    * Escape a DBMS string literal, i.e. a string value. The resulting string can be used in queries "as-is" and doesn't
+    * need additional quoting.
+    *
+    * @param  string $value - value to escape
+    *
+    * @return string - escaped and quoted string value; PostgreSQL:  E'{escape($value)}'
+    */
+   public function escapeLiteral($value) {
+      if (!$this->isConnected())
+         $this->connect();
+      return pg_escape_literal($this->hConnection, $value);
+   }
+
+
+   /**
+    * Escape a string value. The resulting string must be quoted according to the DBMS before it can be used in queries.
+    *
+    * @param  string $value - value to escape
+    *
+    * @return string - escaped but not quoted string value; PostgreSQL:  {escape_chars($value, ['\', "'"])}
+    */
+   public function escapeString($value) {
+      if (!$this->isConnected())
+         $this->connect();
+      return pg_escape_string($this->hConnection, $value);
+   }
+
+
+   /**
     * Execute a SQL statement and return the result. This method should be used for SQL statements returning rows.
     *
     * @param  string $sql - SQL statement

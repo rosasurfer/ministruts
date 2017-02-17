@@ -8,6 +8,7 @@ use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\exception\RuntimeException;
+use function rosasurfer\strContains;
 
 
 /**
@@ -192,8 +193,8 @@ class MySQLConnector extends Connector {
          foreach ($this->options as $option => $value) {
             if (strLen($value)) {
                if (strToLower($option) == 'charset') {
+                  // use built-in function instead of "set character set {$value}" for valid mysql_real_escape_string()
                   mysql_set_charset($value, $this->hConnection) || trigger_error(mysql_error($this->hConnection), E_USER_ERROR);
-                  // synonymous with the sql statement "set character set {$value}"
                }
                else {
                   if (!is_numeric($value))
@@ -271,6 +272,61 @@ class MySQLConnector extends Connector {
     */
    public function isConnected() {
       return is_resource($this->hConnection);
+   }
+
+
+   /**
+    * Escape a DBMS identifier, i.e. the name of a database object (schema, table, view, column etc.). The resulting string
+    * can be used in queries "as-is" and doesn't need additional quoting.
+    *
+    * @param  string $name - identifier to escape
+    *
+    * @return string - escaped and quoted identifier; MySQL: `{$name}`.`{$subname}`
+    */
+   public function escapeIdentifier($value) {
+      if (!$this->isConnected())
+         $this->connect();
+
+      if (strContains($value, '.')) {
+         $names = explode('.', $value);
+
+         foreach ($names as &$name) {
+            $name = '`'.str_replace('`', '``', $name).'`';
+         }; unset($name);
+
+         return join('.', $names);
+      }
+      return '`'.str_replace('`', '``', $value).'`';
+   }
+
+
+   /**
+    * Escape a DBMS string literal, i.e. a string value. The resulting string can be used in queries "as-is" and doesn't
+    * need additional quoting.
+    *
+    * @param  string $value - value to escape
+    *
+    * @return string - escaped and quoted string value; MySQL: '{$this->escapeString($value)}'
+    */
+   public function escapeLiteral($value) {
+      if (!$this->isConnected())
+         $this->connect();
+      $escaped = $this->escapeString($value);
+      return "'".$escaped."'";
+   }
+
+
+   /**
+    * Escape a string value. The resulting string must be quoted according to the DBMS before it can be used in queries.
+    *
+    * @param  string $value - value to escape
+    *
+    * @return string - escaped but not quoted string value; MySQL: {addSlashes($value, ['\', "'", '"'])}
+    */
+   public function escapeString($value) {
+      if (!$this->isConnected())
+         $this->connect();
+      return mysql_real_escape_string($value, $this->hConnection);
    }
 
 

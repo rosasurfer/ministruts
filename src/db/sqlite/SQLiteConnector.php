@@ -155,6 +155,51 @@ class SQLiteConnector extends Connector {
 
 
    /**
+    * Escape a DBMS identifier, i.e. the name of a database object (schema, table, view, column etc.). The resulting string
+    * can be used in queries "as-is" and doesn't need additional quoting.
+    *
+    * @param  string $name - identifier to escape
+    *
+    * @return string - escaped and quoted identifier; SQLite:  "{$name}"
+    */
+   public function escapeIdentifier($value) {
+      if (!$this->isConnected())
+         $this->connect();
+      return '"'.str_replace('"', '""', $value).'"';
+   }
+
+
+   /**
+    * Escape a DBMS string literal, i.e. a string value. The resulting string can be used in queries "as-is" and doesn't
+    * need additional quoting.
+    *
+    * @param  string $value - value to escape
+    *
+    * @return string - escaped and quoted string value; SQLite: '{$this->escapeString($value)}'
+    */
+   public function escapeLiteral($value) {
+      if (!$this->isConnected())
+         $this->connect();
+      $escaped = $this->escapeString($value);
+      return "'".$escaped."'";
+   }
+
+
+   /**
+    * Escape a string value. The resulting string must be quoted according to the DBMS before it can be used in queries.
+    *
+    * @param  string $value - value to escape
+    *
+    * @return string - escaped but not quoted string value; SQLite: {escape($value, $chars=["'"], $escape_character="'")}
+    */
+   public function escapeString($value) {
+      if (!$this->isConnected())
+         $this->connect();
+      return $this->handler->escapeString($value);
+   }
+
+
+   /**
     * Execute a SQL statement and return the result. This method should be used for SQL statements returning rows.
     *
     * @param  string $sql - SQL statement
