@@ -283,20 +283,20 @@ class MySQLConnector extends Connector {
     *
     * @return string - escaped and quoted identifier; MySQL: `{$name}`.`{$subname}`
     */
-   public function escapeIdentifier($value) {
+   public function escapeIdentifier($name) {
       if (!$this->isConnected())
          $this->connect();
 
-      if (strContains($value, '.')) {
-         $names = explode('.', $value);
+      if (strContains($name, '.')) {
+         $names = explode('.', $name);
 
-         foreach ($names as &$name) {
-            $name = '`'.str_replace('`', '``', $name).'`';
-         }; unset($name);
+         foreach ($names as &$subname) {
+            $subname = '`'.str_replace('`', '``', $subname).'`';
+         }; unset($subname);
 
          return join('.', $names);
       }
-      return '`'.str_replace('`', '``', $value).'`';
+      return '`'.str_replace('`', '``', $name).'`';
    }
 
 

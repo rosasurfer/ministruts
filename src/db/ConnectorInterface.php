@@ -43,7 +43,7 @@ interface ConnectorInterface {
     *
     * @return string - escaped and quoted identifier
     */
-   public function escapeIdentifier($value);
+   public function escapeIdentifier($name);
 
 
    /**

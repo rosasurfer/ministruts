@@ -162,10 +162,10 @@ class SQLiteConnector extends Connector {
     *
     * @return string - escaped and quoted identifier; SQLite:  "{$name}"
     */
-   public function escapeIdentifier($value) {
+   public function escapeIdentifier($name) {
       if (!$this->isConnected())
          $this->connect();
-      return '"'.str_replace('"', '""', $value).'"';
+      return '"'.str_replace('"', '""', $name).'"';
    }
 
 

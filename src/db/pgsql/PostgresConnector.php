@@ -185,10 +185,10 @@ class PostgresConnector extends Connector {
     *
     * @return string - escaped and quoted identifier; PostgreSQL:  "{$name}"
     */
-   public function escapeIdentifier($value) {
+   public function escapeIdentifier($name) {
       if (!$this->isConnected())
          $this->connect();
-      return pg_escape_identifier($this->hConnection, $value);
+      return pg_escape_identifier($this->hConnection, $name);
    }
 
 
