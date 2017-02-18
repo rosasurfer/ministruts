@@ -43,10 +43,8 @@ use rosasurfer\exception\InvalidArgumentException;
 abstract class Dependency extends Object {
 
 
-   /**
-    * Mindestgueltigkeit
-    */
-   private /*int*/ $minValidity = 0;
+   /** @var int - Mindestgueltigkeit */
+   private $minValidity = 0;
 
 
    /**

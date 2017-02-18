@@ -33,16 +33,11 @@ use const rosasurfer\WINDOWS;
 class FileDependency extends Dependency {
 
 
-   /**
-    * Dateiname
-    */
-   private /*string*/ $fileName;
+   /** @var string - Dateiname */
+   private $fileName;
 
-
-   /**
-    * letzter Aenderungszeitpunkt der Datei (Unix-Timestamp)
-    */
-   private /*int*/ $lastModified;
+   /** @var int - letzter Aenderungszeitpunkt der Datei (Unix-Timestamp) */
+   private $lastModified;
 
 
    /**

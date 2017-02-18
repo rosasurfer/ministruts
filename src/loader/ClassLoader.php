@@ -15,7 +15,6 @@ class ClassLoader extends Object {
    /** @var string[] - class map */
    private $classMap;
 
-
    /** @var bool - whether or not this instance is registered */
    private $registered;
 

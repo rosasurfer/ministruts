@@ -10,16 +10,11 @@ use rosasurfer\exception\RuntimeException;
 class ChainedDependency extends Dependency {
 
 
-   /**
-    * Abhaengigkeiten des Gesamtausdrucks
-    */
-   private /*Dependency[]*/ $dependencies;
+   /** @var Dependency[] - Abhaengigkeiten des Gesamtausdrucks */
+   private $dependencies;
 
-
-   /**
-    * logischer Typ der Gesamtabhaengigkeit (AND oder OR)
-    */
-   private /*string*/ $type;
+   /** @var string - logischer Typ der Gesamtabhaengigkeit (AND oder OR) */
+   private $type;
 
 
    /**
