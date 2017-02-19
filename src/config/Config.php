@@ -90,7 +90,7 @@ class Config extends Object implements ConfigInterface {
     *
     * Create a new instance and load the specified property files.
     *
-    * @param  string|[] $files - single or multiple filenames to load
+    * @param  string|string[] $files - single or multiple filenames to load
     */
    public function __construct($files) {
       if      (is_string($files)) $files = [$files];
@@ -203,7 +203,7 @@ class Config extends Object implements ConfigInterface {
     *
     * @param  string $key
     *
-    * @return string|[] - a string, a string array or NULL if no such setting is found
+    * @return string|string[] - a string, a string array or NULL if no such setting is found
     */
    protected function getProperty($key) {
       $properties  = $this->properties;
