@@ -84,7 +84,7 @@ final class ConnectionPool extends Singleton {
          // resolve the class name to use for the connector
          $className = $options['connector']; unset($options['connector']);
          $className = str_replace('/', '\\', $className);
-         if ($className[0]=='\\') $className = subStr($name, 1);
+         if ($className[0]=='\\') $className = subStr($className, 1);
 
          // check known aliases for a match
          $lName = strToLower($className);
