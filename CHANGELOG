@@ -1,4 +1,10 @@
 
+2017-02-19
+
+   - the db/*/Connector constructor is part of interface db/ConnectorInterface
+   - new marker interface core/DiAware for all classes
+
+
 2017-02-17
 
    - methods db/*/Connector::escape(Identifier|Literal|String)()
