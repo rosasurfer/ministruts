@@ -27,7 +27,7 @@ require(MINISTRUTS_ROOT.'/src/ministruts/defines.php');
  *   class loader simply has no effect.
  * - The loader is registered after already registered SPL class loaders. To provide backward compatibility to non-SPL
  *   projects an existing __autoload() function is registered first.
- * - The registration is wrapped in a function call to prevent modifications of the global scope.
+ * - The registration is wrapped in a function call to scope isolate its execution.
  */
 function registerClassLoader() {
    // check for an existing legacy auto-loader
