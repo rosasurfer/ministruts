@@ -5,7 +5,9 @@ use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 
 use const rosasurfer\CLI;
+use const rosasurfer\LOCALHOST;
 use const rosasurfer\MINISTRUTS_ROOT;
+use const rosasurfer\WINDOWS;
 
 
 /**

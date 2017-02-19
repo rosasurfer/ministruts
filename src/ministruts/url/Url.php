@@ -5,6 +5,7 @@ use rosasurfer\core\Object;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\ministruts\Request;
 
+use const rosasurfer\CLI;
 use const rosasurfer\ministruts\MODULE_KEY;
 
 
