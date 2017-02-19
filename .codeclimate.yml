@@ -10,12 +10,20 @@ engines:
         enabled: false
       Naming/LongVariable:
         enabled: false
+      UnusedFormalParameter:
+        enabled: false
       UnusedLocalVariable:
         enabled: false
-    exclude_fingerprints:
-    - 01d1e57a3b8d772c3e2a95427c6e4751
-    - 4c7df643fa7763eeab56801355fae61f
+      UnusedPrivateField:
+        enabled: false
+      UnusedPrivateMethod:
+        enabled: false
 
+    exclude_fingerprints:
+    # The method src/MiniStruts::init() contains an exit expression.
+    - fce18df2a012e7a27124db9a0cba9148
+    - 57a63391d77425e3c2731e26b562982f
+    
   duplication:
     enabled: true
     config:
