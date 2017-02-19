@@ -29,6 +29,7 @@ return array(
     'rosasurfer\\config\\Config' => $baseDir . '/src/config/Config.php',
     'rosasurfer\\config\\ConfigInterface' => $baseDir . '/src/config/ConfigInterface.php',
     'rosasurfer\\config\\StdConfig' => $baseDir . '/src/config/StdConfig.php',
+    'rosasurfer\\core\\DiAware' => $baseDir . '/src/core/DiAware.php',
     'rosasurfer\\core\\Object' => $baseDir . '/src/core/Object.php',
     'rosasurfer\\core\\Singleton' => $baseDir . '/src/core/Singleton.php',
     'rosasurfer\\core\\StaticClass' => $baseDir . '/src/core/StaticClass.php',

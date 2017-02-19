@@ -8,9 +8,9 @@ use function rosasurfer\strRightFrom;
 
 
 /**
- * Super class for all "rosasurfer" classes.
+ * Super class for all "rosasurfer" classes
  */
-class Object {
+class Object implements DiAware {
 
 
    /**
@@ -68,9 +68,9 @@ class Object {
 
 
    /**
-    * Returns a human-readable version of this instance.
+    * Return a human-readable version of this instance.
     *
-    * @param  int $levels - how many levels of an object graph to completely display
+    * @param  int $levels - how many levels of an object graph to recurse into
     *                       (default: all)
     * @return string
     */
