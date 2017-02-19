@@ -377,9 +377,9 @@ class PHP extends StaticClass {
     * of the specified option is not PHP_INI_ALL or PHP_INI_USER or the option is locked by the server configuration
     * (php_admin_value/php_admin_flag).
     *
-    * @param  string $option
-    * @param  string $value
-    * @param  bool   $suppressErrors - whether or not to suppress errors setting the option (default: FALSE)
+    * @param  string          $option
+    * @param  bool|int|string $value
+    * @param  bool            $suppressErrors - whether or not to suppress errors setting the option (default: FALSE)
     *
     * @return bool - success status
     */
