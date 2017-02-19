@@ -25,10 +25,7 @@ engines:
     - 57a63391d77425e3c2731e26b562982f
     
   duplication:
-    enabled: true
-    config:
-      languages:
-      - php
+    enabled: false
 
   fixme:
     enabled: true

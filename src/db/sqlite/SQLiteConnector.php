@@ -11,12 +11,17 @@ use rosasurfer\exception\RuntimeException;
 /**
  * SQLiteConnector
  *
- * Connector for SQLite/SQLite3 databases.
+ * Connector for SQLite/SQLite3 databases. Supported configuration values in the constructor's options array:
  *
- * The php_sqlite3 extension v0.7-dev is broken. The first initial call of SQLite3Result::fetchArray() or calls after a
- * SQLite3Result::reset() execute the originating query again. The workaround for DDL and DML statements is to check with
- * SQLite3Result::numColumns() for an empty result before calling fetchArray(). There is no workaround to prevent multiple
- * executions of SELECT queries.
+ *  "file"   The database file to connect to. A relative location is resolved relative to the application's root directory
+ *           as defined by APPLICATION_ROOT. By default the file is opened in mode SQLITE3_OPEN_READWRITE.
+ *
+ * Note:
+ * -----
+ * The php_sqlite3 extension v0.7-dev is broken. The first initial call of SQLite3Result::fetchArray() and calls after a
+ * SQLite3Result::reset() trigger the re-execution of an already executed query. The workaround for DDL and DML statements
+ * is to check with SQLite3Result::numColumns() for an empty result before calling fetchArray(). There is no workaround to
+ * prevent multiple executions of SELECT queries except of using the PDO adapter.
  *
  * @see  http://bugs.php.net/bug.php?id=64531
  */
@@ -59,7 +64,7 @@ class SQLiteConnector extends Connector {
     *
     * Create a new SQLiteConnector instance.
     *
-    * @param  mixed[] $options - SQLite typical configuration options
+    * @param  mixed[] $options - SQLite typical configuration options. See the class description for supported values.
     */
    public function __construct(array $options) {
       if (isSet($options['file'])) $this->setFile($options['file']);
