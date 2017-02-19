@@ -62,7 +62,7 @@ class MySQLConnector extends Connector {
     *
     * Create a new MySQLConnector instance.
     *
-    * @param  string[] $options - MySQL typical configuration options
+    * @param  mixed[] $options - MySQL typical configuration options
     */
    public function __construct(array $options) {
       if (isSet($options['host'    ])) $this->setHost    ($options['host'    ]);
