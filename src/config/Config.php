@@ -10,10 +10,9 @@ use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
 use rosasurfer\exception\UnimplementedFeatureException;
 
-use rosasurfer\log\Logger;
+use rosasurfer\util\PHP;
 
 use const rosasurfer\CLI;
-use const rosasurfer\L_NOTICE;
 use const rosasurfer\WINDOWS;
 
 
@@ -51,23 +50,23 @@ use const rosasurfer\WINDOWS;
  *
  * @example
  * <pre>
- * db.connector = mysql                                     # subkeys create associative array structures
+ * db.connector = mysql                               # subkey notation creates associative option arrays
  * db.host      = localhost:3306
  * db.username  = username
  * db.password  = password
  * db.database  = schema
  *
- * options[] = value-at-index-0                             # bracket notation creates numeric array structures
- * options[] = value-at-index-1
- * options[] = value-at-index-2
+ * db.options[] = value-at-index-0                    # bracket notation creates numeric option arrays
+ * db.options[] = value-at-index-1
+ * db.options[] = value-at-index-2
  *
  * # comment on its own line
- * log.level.Action                 = warn                  # comment at the end of line
- * log.level.foo\bar\MyClass        = notice                # keys may contain namespaces
+ * log.level.Action          = warn                   # comment at the end of line
+ * log.level.foo\bar\MyClass = notice                 # keys may contain namespaces
  *
- * key.subkey with spaces           = value                 # keys may contain spaces
- * key.   indented subkey           = value                 # enclosing space around subkeys is ignored
- * key."subkey.with.key.separators" = value                 # quoted keys can contain otherwise illegal key characters
+ * key.subkey with spaces    = value                  # keys may contain spaces
+ * key.   indented.subkey    = value                  # enclosing space around subkeys is ignored
+ * key."subkey.with.dots"    = value                  # quoted keys can contain otherwise illegal key characters
  * </pre>
  */
 class Config extends Object implements ConfigInterface {
@@ -91,7 +90,7 @@ class Config extends Object implements ConfigInterface {
     *
     * Create a new instance and load the specified property files.
     *
-    * @param  string|[] $files - filename or array of filenames to load
+    * @param  string|[] $files - single or multiple filenames to load
     */
    public function __construct($files) {
       if      (is_string($files)) $files = [$files];
@@ -106,14 +105,20 @@ class Config extends Object implements ConfigInterface {
 
          $relative = WINDOWS ? !preg_match('/^[a-z]:/i', $file) : ($file[0] != '/');
          $relative && $file=getCwd().PATH_SEPARATOR.$file;
-         $this->directory = dirName($file);                          // save absolute path to the last specified file
+         $this->directory = dirName($file);                          // save absolute path of the last specified file
       }
       $this->files = $checkedFiles;
 
+
       // load existing files
+      $oldDetectStatus = PHP::ini_get_bool('auto_detect_line_endings');
+      PHP::ini_set('auto_detect_line_endings', true);
+
       foreach ($this->files as $fileName => $fileExists) {
          $fileExists && $this->loadFile($fileName);
       }
+
+      PHP::ini_set('auto_detect_line_endings', $oldDetectStatus);
    }
 
 
@@ -133,14 +138,14 @@ class Config extends Object implements ConfigInterface {
 
          $parts = explode('=', $line, 2);             // separate key/value
          if (sizeOf($parts) < 2) {
-            Logger::log(__METHOD__.'()  Skipping syntax error in "'.$filename.'", line '.($i+1).': missing key-value separator', L_NOTICE);
+            trigger_error(__METHOD__.'()  Skipping syntax error in "'.$filename.'", line '.($i+1).': missing key-value separator', E_USER_NOTICE);
             continue;
          }
          $key   = trim($parts[0]);
          $value = trim($parts[1]);
 
          // parse and store property value
-         $this->setProperty($key, $value, $filename, $i+1);
+         $this->setProperty($key, $value);
       }
    }
 
@@ -223,7 +228,7 @@ class Config extends Object implements ConfigInterface {
     * @param  string $key
     * @param  string $value
     */
-   protected function setProperty($key, $value, $file=null, $line=null) {
+   protected function setProperty($key, $value) {
       // set the property depending on the existing data structure
       $properties  =& $this->properties;
       $subkeys     =  $this->parseSubkeys($key);
@@ -244,15 +249,30 @@ class Config extends Object implements ConfigInterface {
             $properties =& $properties[$subkey];                     // reference the new array level
          }
          else {
-            // the last subkey
-            if (!isSet($properties[$subkey])) {
-               $properties[$subkey] = $value;                        // store the value regularily
-            }
-            elseif (!is_array($properties[$subkey])) {
-               $properties[$subkey] = $value;                        // overwrite the existing non-array value
+            // the last subkey: check for bracket notation
+            if (preg_match('/(.+)\b *\[ *\]$/', $subkey, $match)) {
+               // bracket notation
+               $subkey = $match[1];
+               if (!isSet($properties[$subkey])) {
+                  $properties[$subkey] = [$value];                   // create a new array value
+               }
+               else {
+                  if (is_string($properties[$subkey]))               // make the string the array default value
+                     $properties[$subkey] = ['' => $properties[$subkey]];
+                  $properties[$subkey][] = $value;                   // add an arry value
+               }
             }
             else {
-               $properties[$subkey][''] = $value;                    // overwrite the array default value
+               // regular non-bracket notation
+               if (!isSet($properties[$subkey])) {
+                  $properties[$subkey] = $value;                     // store the value regularily
+               }
+               elseif (is_string($properties[$subkey])) {
+                  $properties[$subkey] = $value;                     // override the existing string value
+               }
+               else {
+                  $properties[$subkey][''] = $value;                 // set/override the array default value
+               }
             }
          }
       }
@@ -299,7 +319,6 @@ class Config extends Object implements ConfigInterface {
          $subkeys[] = trim(subStr($k, 0, $pos));
          $k         = subStr($k, $pos+1);          // next subkey
       }
-
       return $subkeys;
    }
 
