@@ -12,6 +12,14 @@ interface ConnectorInterface {
 
 
    /**
+    * Constructor.
+    *
+    * @param  string[] $options - connector-specific configuration options
+    */
+   public function __construct(array $options);
+
+
+   /**
     * Connect the adapter to the database.
     *
     * @return self

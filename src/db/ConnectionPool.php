@@ -78,25 +78,21 @@ final class ConnectionPool extends Singleton {
          if (!$config=Config::getDefault())
             throw new RuntimeException('Service locator returned invalid default config: '.getType($config));
 
-         $config = $config->get('db.'.$id, null);
-         if (!$config) throw new IllegalStateException('No configuration found for database alias "'.$id.'"');
+         $options = $config->get('db.'.$id, null);
+         if (!$options) throw new IllegalStateException('No configuration found for database alias "'.$id.'"');
 
          // resolve the class name to use for the connector
-         $name = $config['connector'];
-         $name = str_replace('/', '\\', $name);
-         if ($name[0]=='\\') $name = subStr($name, 1);
+         $className = $options['connector']; unset($options['connector']);
+         $className = str_replace('/', '\\', $className);
+         if ($className[0]=='\\') $className = subStr($name, 1);
 
-         // check known aliases for class name
-         $lName = strToLower($name);
+         // check known aliases for a match
+         $lName = strToLower($className);
          if (isSet(self::$aliases[$lName]))
-            $class = self::$aliases[$lName];
-
-         // separate connection configuration and additional options
-         $options = isSet($config['options']) ? $config['options'] : [];
-         unset($config['connector'], $config['options']);
+            $className = self::$aliases[$lName];
 
          // instantiate and save a new connector
-         $me->pool[$id] = $connector = Connector::create($class, $config, $options);
+         $me->pool[$id] = $connector = Connector::create($className, $options);
       }
       return $connector;
    }

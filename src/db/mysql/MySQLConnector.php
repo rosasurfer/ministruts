@@ -41,7 +41,7 @@ class MySQLConnector extends Connector {
    /** @var string */
    protected $database;
 
-   /** @var string[] */
+   /** @var string[] - configuration options */
    protected $options = [];
 
    /** @var resource - internal connection handle */
@@ -62,17 +62,14 @@ class MySQLConnector extends Connector {
     *
     * Create a new MySQLConnector instance.
     *
-    * @param  string[] $config  - connection configuration
-    * @param  string[] $options - additional MySQL typical options (default: none)
+    * @param  string[] $options - MySQL typical configuration options
     */
-   protected function __construct(array $config, array $options=[]) {
-      $this->setHost    ($config['host'    ])
-           ->setUsername($config['username'])
-           ->setOptions ($options);
-      if (isSet($config['password'])) $this->setPassword($config['password']);
-      if (isSet($config['schema'  ])) $this->setDatabase($config['schema'  ]);
-
-      parent::__construct();
+   public function __construct(array $options) {
+      if (isSet($options['host'    ])) $this->setHost    ($options['host'    ]);
+      if (isSet($options['username'])) $this->setUsername($options['username']);
+      if (isSet($options['password'])) $this->setPassword($options['password']);
+      if (isSet($options['schema'  ])) $this->setDatabase($options['schema'  ]);
+      if (isSet($options['options' ])) $this->setOptions ($options['options' ]);
    }
 
 
@@ -164,6 +161,7 @@ class MySQLConnector extends Connector {
     * @return self
     */
    protected function setOptions(array $options) {
+      // Here we might filter for known options.
       $this->options = $options;
       return $this;
    }

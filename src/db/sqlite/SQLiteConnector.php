@@ -13,9 +13,10 @@ use rosasurfer\exception\RuntimeException;
  *
  * Connector for SQLite/SQLite3 databases.
  *
- * The php_sqlite3 extension v0.7-dev is broken. SQLite3Result::fetchArray() executes the originating query again.
- * The workaround for DDL and DML statements is to check with SQLite3Result::numColumns() for an empty result before
- * calling fetchArray(). There is no workaround for multiple executions of SELECT queries.
+ * The php_sqlite3 extension v0.7-dev is broken. The first initial call of SQLite3Result::fetchArray() or calls after a
+ * SQLite3Result::reset() execute the originating query again. The workaround for DDL and DML statements is to check with
+ * SQLite3Result::numColumns() for an empty result before calling fetchArray(). There is no workaround to prevent multiple
+ * executions of SELECT queries.
  *
  * @see  http://bugs.php.net/bug.php?id=64531
  */
@@ -34,7 +35,7 @@ class SQLiteConnector extends Connector {
    /** @var string - database file to connect to */
    protected $file;
 
-   /** @var string[] */
+   /** @var string[] - configuration options */
    protected $options = [];
 
    /** @var \SQLite3 - internal database handler instance */
@@ -58,13 +59,11 @@ class SQLiteConnector extends Connector {
     *
     * Create a new SQLiteConnector instance.
     *
-    * @param  string[] $config  - connection configuration
-    * @param  string[] $options - additional SQLite typical options (default: none)
+    * @param  string[] $options - SQLite typical configuration options
     */
-   protected function __construct(array $config, array $options=[]) {
-      $this->setFile($config['file']);
+   public function __construct(array $options) {
+      if (isSet($options['file'])) $this->setFile($options['file']);
       $this->setOptions($options);
-      parent::__construct();
    }
 
 

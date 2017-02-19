@@ -16,15 +16,6 @@ abstract class Connector extends Object implements ConnectorInterface {
 
 
    /**
-    * Default constructor.
-    *
-    * To create an instance use self::create().
-    */
-   protected function __construct() {
-   }
-
-
-   /**
     * Destructor
     *
     * Make sure that on destruction of the instance a pending transaction is rolled back and the connection is closed.
@@ -44,16 +35,15 @@ abstract class Connector extends Object implements ConnectorInterface {
 
 
    /**
-    * Create a new connector and initialize it with connection specific configuration values.
+    * Create a new connector with the specified configuration options.
     *
-    * @param  string   $class   - IConnector class name
-    * @param  string[] $config  - connection configuration
-    * @param  string[] $options - additional connection options (default: none)
+    * @param  string   $class   - name of class implementing IConnector
+    * @param  string[] $options - configuration options
     *
     * @return IConnector
     */
-   public static function create($class, array $config, array $options=[]) {
-      if (!is_subclass_of($class, IConnector::class)) throw new InvalidArgumentException('Not a '.IConnector::class.': '.$class);
-      return new $class($config, $options);
+   public static function create($class, array $options) {
+      if (!is_subclass_of($class, IConnector::class)) throw new InvalidArgumentException('Not a '.IConnector::class.' implementing class: '.$class);
+      return new $class($options);
    }
 }

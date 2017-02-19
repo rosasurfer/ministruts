@@ -27,10 +27,7 @@ class PostgresConnector extends Connector {
    /** @var int - DBMS version number */
    protected $versionNumber;
 
-   /** @var string[] */
-   protected $config = [];
-
-   /** @var string[] */
+   /** @var string[] - configuration options */
    protected $options = [];
 
    /** @var resource - internal connection handle */
@@ -51,26 +48,10 @@ class PostgresConnector extends Connector {
     *
     * Create a new PostgresConnector instance.
     *
-    * @param  string[] $config  - connection configuration (default: none)
-    * @param  string[] $options - additional PostgreSQL typical options (default: none)
+    * @param  string[] $options - PostgreSQL typical configuration options
     */
-   protected function __construct(array $config=[], array $options=[]) {
-      $this->setConfig($config);
+   public function __construct(array $options) {
       $this->setOptions($options);
-      parent::__construct();
-   }
-
-
-   /**
-    * Set the connection configuration.
-    *
-    * @param  string[] $config
-    *
-    * @return self
-    */
-   protected function setConfig(array $config) {
-      $this->config = $config;
-      return $this;
    }
 
 
@@ -94,7 +75,9 @@ class PostgresConnector extends Connector {
     */
    public function connect() {
       $connStr = '';
-      foreach ($this->config as $key => $value) {
+      foreach ($this->options as $key => $value) {
+         if ($key=='options' || is_array($value))
+            continue;
          if (!strLen($value)) {
             $value = "''";
          }
@@ -312,7 +295,7 @@ class PostgresConnector extends Connector {
 
       $result  = $db->query($sql);
       $handler = $db->getInternalHandler();
-      $msg = str_pad(explode(' ', $sql, 2)[0].':', 9).'  lastInsertId=%s'.'  affected_rows='.pg_affected_rows($result->getInternalResult()).'  lastAffectedRows='.$db->lastAffectedRows().'  num_rows='.pg_num_rows($result->getInternalResult()).'  status_long='.str_pad(PostgresResult::statusToStr(pg_result_status($result->getInternalResult(), PGSQL_STATUS_LONG)), 16).'  status_string='.pg_result_status($result->getInternalResult(), PGSQL_STATUS_STRING);
+      $msg = str_pad(explode(' ', $sql, 2)[0].':', 9).'  lastInsertId=%s'.'  affected_rows='.pg_affected_rows($result->getInternalResult()).'  lastAffectedRows='.$db->lastAffectedRows().'  num_rows='.pg_num_rows($result->getInternalResult()).'  status_long='.str_pad(\rosasurfer\db\pgsql\PostgresResult::statusToStr(pg_result_status($result->getInternalResult(), PGSQL_STATUS_LONG)), 16).'  status_string='.pg_result_status($result->getInternalResult(), PGSQL_STATUS_STRING);
       $msg = sprintf($msg, $db->lastInsertId());
       echoPre($msg);
 
