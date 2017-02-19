@@ -7,11 +7,13 @@ use rosasurfer\db\DatabaseException;
 use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\exception\RuntimeException;
 
+use rosasurfer\WINDOWS;
+
 
 /**
  * SQLiteConnector
  *
- * Connector for SQLite/SQLite3 databases. Supported configuration values in the constructor's options array:
+ * Connector for SQLite/SQLite3 databases. Supported configuration values (see constructor):
  *
  *  "file"   The database file to connect to. A relative location is resolved relative to the application's root directory
  *           as defined by APPLICATION_ROOT. By default the file is opened in mode SQLITE3_OPEN_READWRITE.
@@ -75,15 +77,18 @@ class SQLiteConnector extends Connector {
    /**
     * Set the file name of the database to connect to. May be ":memory:" to use an in-memory database.
     *
-    * @param  string $fileName
+    * @param  string $file
     *
     * @return self
     */
-   protected function setFile($fileName) {
-      if (!is_string($fileName)) throw new IllegalTypeException('Illegal type of parameter $fileName: '.getType($fileName));
-      if (!strLen($fileName))    throw new InvalidArgumentException('Invalid parameter $fileName: "'.$fileName.'" (empty)');
+   protected function setFile($file) {
+      if (!is_string($file)) throw new IllegalTypeException('Illegal type of parameter $file: '.getType($file));
+      if (!strLen($file))    throw new InvalidArgumentException('Invalid parameter $file: "'.$file.'" (empty)');
 
-      $this->file = $fileName;
+      $relativePath = WINDOWS ? !preg_match('/^[a-z]:/i', $file) : ($file[0]!='/');
+      $relativePath && $file=APPLICATION_ROOT.DIRECTORY_SEPARATOR.$file;
+
+      $this->file = $file;
       return $this;
    }
 
@@ -107,6 +112,8 @@ class SQLiteConnector extends Connector {
     * @return self
     */
    public function connect() {
+      echoPre('$file: '.$this->file);
+
       try {                                                                // available flags:
          $flags = SQLITE3_OPEN_READWRITE;                                  // SQLITE3_OPEN_CREATE
          $handler = new \SQLite3($this->file, $flags);                     // SQLITE3_OPEN_READONLY
