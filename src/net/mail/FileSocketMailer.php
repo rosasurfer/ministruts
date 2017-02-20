@@ -27,9 +27,9 @@ class FileSocketMailer extends Mailer {
     * @param  string $receiver - Empfaenger (Format: 'Vorname Nachname <user@domain.tld>')
     * @param  string $subject  - Betreffzeile der E-Mail
     * @param  string $message  - Inhalt der E-Mail
-    * @param  array  $headers  - zusaetzliche zu setzende Mail-Header
+    * @param  array  $headers  - zusaetzliche zu setzende Mail-Header (default: none)
     */
-   public function sendMail($sender, $receiver, $subject, $message, array $headers = null) {
+   public function sendMail($sender, $receiver, $subject, $message, array $headers=[]) {
       throw new UnimplementedFeatureException('Method '.get_class($this).'::'.__FUNCTION__.'() is not implemented');
 
       // Versand je nach Konfiguration verschieben (um z.B. Transaktionen nicht zu blockieren)

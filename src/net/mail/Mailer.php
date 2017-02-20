@@ -35,9 +35,9 @@ abstract class Mailer extends Object {
     * @param  string $receiver - Empfaenger (Format: 'Vorname Nachname <user@domain.tld>')
     * @param  string $subject  - Betreffzeile der E-Mail
     * @param  string $message  - Inhalt der E-Mail
-    * @param  array  $headers  - zusaetzliche zu setzende Mail-Header
+    * @param  array  $headers  - zusaetzliche zu setzende Mail-Header (default: none)
     */
-   abstract public function sendMail($sender, $receiver, $subject, $message, array $headers = null);
+   abstract public function sendMail($sender, $receiver, $subject, $message, array $headers=[]);
 
 
    /**
@@ -71,7 +71,7 @@ abstract class Mailer extends Object {
     *
     * @return bool - ob der Versand verschoben wurde.
     */
-   protected function sendLater($sender, $receiver, $subject, $message, array $headers = null) {
+   protected function sendLater($sender, $receiver, $subject, $message, array $headers=[]) {
       if (isSet($this->config['send-later']) && $this->config['send-later']) {
 
          $callable = [$this, 'sendMail'];

@@ -194,9 +194,9 @@ class SMTPMailer extends Mailer {
     * @param  string $receiver - Empfaenger (Format: 'Vorname Nachname <user@domain.tld>')
     * @param  string $subject  - Betreffzeile der E-Mail
     * @param  string $message  - Inhalt der E-Mail
-    * @param  array  $headers  - zusaetzliche zu setzende Mail-Header
+    * @param  array  $headers  - zusaetzliche zu setzende Mail-Header (default: none)
     */
-   public function sendMail($sender, $receiver, $subject, $message, array $headers = null) {
+   public function sendMail($sender, $receiver, $subject, $message, array $headers=[]) {
       if (!is_string($sender))   throw new IllegalTypeException('Illegal type of parameter $sender: '.getType($sender));
       $from = $this->parseAddress($sender);
       if (!$from)                throw new InvalidArgumentException('Invalid argument $sender: '.$sender);
@@ -214,8 +214,6 @@ class SMTPMailer extends Mailer {
       if (!is_string($subject)) throw new IllegalTypeException('Illegal type of parameter $subject: '.getType($subject));
       if (!is_string($message)) throw new IllegalTypeException('Illegal type of parameter $message: '.getType($message));
 
-      if ($headers === null)
-         $headers = array();
       foreach ($headers as $key => $header) {
          if (!is_string($header)) throw new IllegalTypeException('Illegal parameter type in argument $headers[$key]: '.getType($header));
       }
