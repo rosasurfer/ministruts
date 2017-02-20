@@ -816,7 +816,7 @@ class Request extends Singleton {
     *
     * @return ActionMapping - Mapping oder NULL, wenn die Request-Instance ausserhalb des Struts-Frameworks benutzt wird.
     */
-   public final function getMapping() {
+   final public function getMapping() {
       return $this->getAttribute(ACTION_MAPPING_KEY);
    }
 
@@ -826,7 +826,7 @@ class Request extends Singleton {
     *
     * @return Module - Module oder NULL, wenn die Request-Instance ausserhalb des Struts-Frameworks benutzt wird.
     */
-   public final function getModule() {
+   final public function getModule() {
       return $this->getAttribute(MODULE_KEY);
    }
 
@@ -834,7 +834,7 @@ class Request extends Singleton {
    /**
     * Reject serialization of Request instances.
     */
-   public final function __sleep() {
+   final public function __sleep() {
       throw new IllegalStateException('You must not serialize a '.get_class($this));
    }
 
@@ -842,7 +842,7 @@ class Request extends Singleton {
    /**
     * Reject de-serialization of Request instances.
     */
-   public final function __wakeUp() {
+   final public function __wakeUp() {
       throw new IllegalStateException('You must not deserialize a '.get_class($this));
    }
 

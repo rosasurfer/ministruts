@@ -31,7 +31,7 @@ abstract class Singleton extends Object {
     *
     * @return self
     */
-   public static final function getInstance($class/*, ...*/) {
+   final public static function getInstance($class/*, ...*/) {
       if (isSet(self::$instances[$class]))
          return self::$instances[$class];
 
@@ -63,5 +63,5 @@ abstract class Singleton extends Object {
    /**
     * Verhindert das Clonen von Singleton-Instanzen.
     */
-   private final function __clone() {/* do not clone me */}
+   final private function __clone() {/* do not clone me */}
 }

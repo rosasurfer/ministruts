@@ -82,7 +82,7 @@ abstract class DAO extends Singleton {
     *
     * @return array
     */
-   public final function getMapping() {
+   final public function getMapping() {
       if (!isSet($this->mapping)) throw new UnimplementedFeatureException('You must implement '.get_class($this).'->mapping[] to work with this DAO.');
       return $this->mapping;
    }
@@ -93,7 +93,7 @@ abstract class DAO extends Singleton {
     *
     * @return string
     */
-   public final function getEntityClass() {
+   final public function getEntityClass() {
       return $this->entityClass;
    }
 
@@ -103,7 +103,7 @@ abstract class DAO extends Singleton {
     *
     * @return IConnector
     */
-   public final function db() {
+   final public function db() {
       if (!$this->connector) {
          $this->connector = $this->getWorker()->getConnector();
       }

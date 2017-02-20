@@ -129,7 +129,7 @@ abstract class CachePeer extends Object {
     *
     * @return bool - TRUE bei Erfolg, FALSE andererseits
     */
-   public final function add($key, &$value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null) {
+   final public function add($key, &$value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null) {
       if ($this->isCached($key))
          return false;
 
@@ -149,7 +149,7 @@ abstract class CachePeer extends Object {
     *
     * @return bool - TRUE bei Erfolg, FALSE andererseits
     */
-   public final function replace($key, &$value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null) {
+   final public function replace($key, &$value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null) {
       if (!$this->isCached($key))
          return false;
 

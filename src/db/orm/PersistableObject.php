@@ -66,7 +66,7 @@ abstract class PersistableObject extends Object {
     *  $object = MyClass::create('foo');
     *  $object->save();
     */
-   protected final function __construct() {
+   final protected function __construct() {
       $this->created = $this->touch();
    }
 
@@ -165,7 +165,7 @@ abstract class PersistableObject extends Object {
     *
     * @return self
     */
-   public final function save() {
+   final public function save() {
       if (!$this->isPersistent()) {
          $this->insert();
       }
