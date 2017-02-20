@@ -24,6 +24,8 @@ abstract class Mailer extends Object {
     * Constructor
     *
     * @param  array $options - Mailer-Optionen
+    *
+    * @return void
     */
    abstract protected function __construct(array $options);
 
@@ -36,6 +38,8 @@ abstract class Mailer extends Object {
     * @param  string $subject  - Betreffzeile der E-Mail
     * @param  string $message  - Inhalt der E-Mail
     * @param  array  $headers  - zusaetzliche zu setzende Mail-Header (default: none)
+    *
+    * @return void
     */
    abstract public function sendMail($sender, $receiver, $subject, $message, array $headers=[]);
 
