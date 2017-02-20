@@ -24,8 +24,6 @@ abstract class Mailer extends Object {
     * Constructor
     *
     * @param  array $options - Mailer-Optionen
-    *
-    * @return void
     */
    abstract protected function __construct(array $options);
 
