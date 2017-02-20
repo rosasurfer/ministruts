@@ -112,8 +112,6 @@ class SQLiteConnector extends Connector {
     * @return self
     */
    public function connect() {
-      echoPre('$file: '.$this->file);
-
       try {                                                                // available flags:
          $flags = SQLITE3_OPEN_READWRITE;                                  // SQLITE3_OPEN_CREATE
          $handler = new \SQLite3($this->file, $flags);                     // SQLITE3_OPEN_READONLY
