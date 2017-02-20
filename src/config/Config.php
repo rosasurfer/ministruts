@@ -19,25 +19,25 @@ use const rosasurfer\WINDOWS;
 /**
  * General application configuration via property files.
  *
- * Settings for the application's default configuration are read from the config files "config-default.properties"
+ * Settings for the application's default configuration are read from the config files "config.dist.properties"
  * (if it exists) and "config.properties" (if it exists). Files in multiple directories are processed and merged in
  * the following order:
  *
- * - "config-default.properties" in the framework's configuration directory (MINISTRUTS_ROOT.'/src/')
- * - "config.properties"         in the same directory
+ * - "config.dist.properties" in the framework's configuration directory (MINISTRUTS_ROOT.'/src/')
+ * - "config.properties"      in the same directory
  *
- * - "config-default.properties" in the application's configuration directory (APPLICATION_ROOT.'/app/config/')
- * - "config.properties"         in the same directory
+ * - "config.dist.properties" in the application's configuration directory (APPLICATION_ROOT.'/app/config/')
+ * - "config.properties"      in the same directory
  *
  * Additional configuration for CLI applications:
- * - "config-default.properties" in the directory of the running script
- * - "config.properties"         in the same directory
+ * - "config.dist.properties" in the directory of the running script
+ * - "config.properties"      in the same directory
  *
  *
  * - Configurations consisting of multiple files are merged. Multiple occurrences of the same setting overwrite each
  *   other, the last encountered setting "wins".
  *
- * - Files "config-default.properties" contain global settings identical for all developers. These files are meant
+ * - Files "config.dist.properties" contain global settings identical for all developers. These files are meant
  *   to be stored in the code repository and hold default settings.
  *
  * - Files "config.properties" contain custom developer specific settings and are not meant to be stored in the code

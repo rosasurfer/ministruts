@@ -15,9 +15,9 @@ use const rosasurfer\WINDOWS;
  *
  * A StdConfig is a standard configuration which typically is used as an application's main configuration. It differs
  * from a non-standard configuration in automatically loading a standardized set of configuration files. These are the
- * framework configuration files ("config-default.properties", "config-cli.properties" if true and "config.properties")
- * and the project configuration files ("config-default.properties", "config-cli.properties" if true and an optional
- * user-defined configuration, e.g. "config-production.properties"). If no user-defined configuration file is specified
+ * framework configuration files ("config.dist.properties", "config.cli.properties" if true and "config.properties")
+ * and the project configuration files ("config.dist.properties", "config.cli.properties" if true and an optional
+ * user-defined configuration, e.g. "config.production.properties"). If no user-defined configuration file is specified
  * the default user configuration "config.properties" is loaded.
  */
 class StdConfig extends Config {
@@ -55,14 +55,14 @@ class StdConfig extends Config {
 
 
       // define framework config files
-      $files[]        = MINISTRUTS_ROOT.'/src/config-default.properties';
-      CLI && $files[] = MINISTRUTS_ROOT.'/src/config-cli.properties';
+      $files[]        = MINISTRUTS_ROOT.'/src/config.dist.properties';
+      CLI && $files[] = MINISTRUTS_ROOT.'/src/config.cli.properties';
       $files[]        = MINISTRUTS_ROOT.'/src/config.properties';
 
       // add application config files (skip if equal to framework which can happen during CLI testing)
       if ($configDir != realPath(MINISTRUTS_ROOT.'/src')) {
-         $files[]        = $configDir.'/config-default.properties';
-         CLI && $files[] = $configDir.'/config-cli.properties';
+         $files[]        = $configDir.'/config.default.properties';
+         CLI && $files[] = $configDir.'/config.cli.properties';
          $files[]        = $configFile ?: $configDir.'/config.properties';
       }
 

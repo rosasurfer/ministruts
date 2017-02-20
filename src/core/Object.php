@@ -10,7 +10,7 @@ use function rosasurfer\strRightFrom;
 /**
  * Super class for all "rosasurfer" classes
  */
-class Object implements DiAware {
+class Object {
 
 
    /**
