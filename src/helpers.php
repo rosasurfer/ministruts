@@ -312,9 +312,9 @@ function strContainsI($haystack, $needle) {
  * Whether or not a string starts with a substring. If multiple prefixes are specified whether or not the string starts
  * with one of them.
  *
- * @param  string    $string
- * @param  string|[] $prefix     - one or more prefixes
- * @param  bool      $ignoreCase - default: no
+ * @param  string          $string
+ * @param  string|string[] $prefix     - one or more prefixes
+ * @param  bool            $ignoreCase - default: no
  *
  * @return bool
  */
@@ -347,8 +347,8 @@ function strStartsWith($string, $prefix, $ignoreCase=false) {
  * Whether or not a string starts with a substring ignoring upper/lower case differences. If multiple prefixes are
  * specified whether or not the string starts with one of them.
  *
- * @param  string    $string
- * @param  string|[] $prefix - one or more prefixes
+ * @param  string          $string
+ * @param  string|string[] $prefix - one or more prefixes
  *
  * @return bool
  */
@@ -361,9 +361,9 @@ function strStartsWithI($string, $prefix) {
  * Whether or not a string ends with a substring. If multiple suffixes are specified whether or not the string ends
  * with one of them.
  *
- * @param  string    $string
- * @param  string|[] $suffix     - one or more suffixes
- * @param  bool      $ignoreCase - default: no
+ * @param  string          $string
+ * @param  string|string[] $suffix     - one or more suffixes
+ * @param  bool            $ignoreCase - default: no
  *
  * @return bool
  */
@@ -391,8 +391,8 @@ function strEndsWith($string, $suffix, $ignoreCase=false) {
  * Whether or not a string ends with a substring ignoring upper/lower case differences. If multiple suffixes are
  * specified whether or not the string ends with one of them.
  *
- * @param  string    $string
- * @param  string|[] $suffix - one or more suffixes
+ * @param  string          $string
+ * @param  string|string[] $suffix - one or more suffixes
  *
  * @return bool
  */
@@ -864,13 +864,13 @@ function metatypeOf($name) {
  *
  * Whether or not the specified string value represents a valid date or datetime value.
  *
- * @param  string    $string - string value
- * @param  string|[] $format - A valid date/datetime format. If multiple values are supplied whether or not the specified
- *                             string fits at least one of them.
- *                             Supported format strings: 'Y-m-d [H:i[:s]]'
- *                                                       'Y.m.d [H:i[:s]]'
- *                                                       'd.m.Y [H:i[:s]]'
- *                                                       'd/m/Y [H:i[:s]]'
+ * @param  string          $string - string value
+ * @param  string|string[] $format - A valid date/datetime format. If multiple values are supplied whether or not the specified
+ *                                   string fits at least one of them.
+ *                                   Supported format strings: 'Y-m-d [H:i[:s]]'
+ *                                                              'Y.m.d [H:i[:s]]'
+ *                                                              'd.m.Y [H:i[:s]]'
+ *                                                              'd/m/Y [H:i[:s]]'
  *
  * @return int|bool - timestamp matching the string or FALSE if the string is not a valid date/datetime value
  *

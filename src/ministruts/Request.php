@@ -511,7 +511,7 @@ class Request extends Singleton {
    /**
     * Return the specified headers as an array of name-value pairs (in transmitted order).
     *
-    * @param  string|[] $names - one or more header names; without a name all headers are returned
+    * @param  string|string[] $names - one or more header names; without a name all headers are returned
     *
     * @return array - name-value pairs
     */
@@ -562,7 +562,7 @@ class Request extends Singleton {
     * Return the value of the specified header. If multiple headers are specified or multiple headers have been
     * transmitted, return all values as a comma-separated list (in transmission order).
     *
-    * @param  string|[] $names - one or more header names
+    * @param  string|string[] $names - one or more header names
     *
     * @return string - Value(s) or NULL if no such headers have been transmitted.
     */
@@ -586,7 +586,7 @@ class Request extends Singleton {
    /**
     * Gibt die einzelnen Werte aller angegebenen Header als Array zurueck (in der uebertragenen Reihenfolge).
     *
-    * @param  string|[] $names - ein oder mehrere Headernamen
+    * @param  string|string[] $names - ein oder mehrere Headernamen
     *
     * @return array - Werte
     */

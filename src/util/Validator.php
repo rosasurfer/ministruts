@@ -139,9 +139,9 @@ class Validator extends StaticClass {
    /**
     * Ob der uebergebene String einen gueltigen Date/DateTime-Wert darstellt.
     *
-    * @param  string    $string - der zu ueberpruefende String
-    * @param  string|[] $format - Format, dem der String entsprechen soll. Sind mehrere angegeben, muss der String
-    *                             mindestens einem davon entsprechen.
+    * @param  string          $string - der zu ueberpruefende String
+    * @param  string|string[] $format - Format, dem der String entsprechen soll. Sind mehrere angegeben, muss der String
+    *                                   mindestens einem davon entsprechen.
     *
     * @return int|bool - Timestamp oder FALSE, wenn der uebergebene Wert ungueltig ist
     *
