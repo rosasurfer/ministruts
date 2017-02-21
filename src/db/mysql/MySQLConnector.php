@@ -392,6 +392,8 @@ class MySQLConnector extends Connector {
          throw $ex->addMessage('SQL: "'.$sql.'"')->setCode(mysql_errno($this->hConnection));
       }
 
+      $affected = 0;
+
       // track last_insert_id
       $id = mysql_insert_id($this->hConnection);
       if ($id) $this->lastInsertId = $id + ($affected=mysql_affected_rows($this->hConnection)) - 1;
