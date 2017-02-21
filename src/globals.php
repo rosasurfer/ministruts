@@ -88,7 +88,7 @@ const EOL_WINDOWS       = \rosasurfer\EOL_WINDOWS;             // "\r\n"     CRL
  *                               FALSE, if the variable is to be dumped to STDOUT (default)
  * @param  bool  $flushBuffers - whether or not to flush output buffers on output (default: TRUE)
  *
- * @return string - string if the result is to be returned, NULL otherwise
+ * @return string|null - string if the result is to be returned, NULL otherwise
  */
 function dump($var, $return=false, $flushBuffers=true) {
    return \rosasurfer\dump($var, $return, $flushBuffers);
@@ -459,8 +459,8 @@ function strIsNumeric($value) {
  *
  * @param  mixed $value - boolean representation
  *
- * @return bool - Boolean or NULL if the parameter doesn't represent a boolean. The accepted values of a boolean's
- *                numerical string representation (integer or float) are 0 (zero) and 1 (one).
+ * @return bool|null - Boolean or NULL if the parameter doesn't represent a boolean. The accepted values of a boolean's
+ *                     numerical string representation (integer or float) are 0 (zero) and 1 (one).
  */
 function strToBool($value) {
    return \rosasurfer\strToBool($value);
@@ -587,7 +587,7 @@ function is_datetime($string, $format='Y-m-d') {
  *
  * @param  mixed $value - ignored
  *
- * @return TRUE
+ * @return bool - TRUE
  */
 function _true($value=null) {
    return \rosasurfer\_true($value);
@@ -612,7 +612,7 @@ function ifTrue($value, $altValue) {
  *
  * @param  mixed $value - ignored
  *
- * @return FALSE
+ * @return bool - FALSE
  */
 function _false($value=null) {
    return \rosasurfer\_false($value);

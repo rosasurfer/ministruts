@@ -49,7 +49,7 @@ class Worker extends Object {
     * @param  string $query     - SQL query
     * @param  bool   $allowMany - whether or not the query is allowed to return a multi-row result (default: no)
     *
-    * @return PersistableObject
+    * @return PersistableObject|null
     *
     * @throws MultipleRowsException if the query returned multiple rows and $allowMany was not set to TRUE.
     */
@@ -94,7 +94,7 @@ class Worker extends Object {
     *
     * @param  IResult $result
     *
-    * @return PersistableObject - instance or NULL if the result doesn't hold any more rows
+    * @return PersistableObject|null - instance or NULL if the result doesn't hold any more rows
     */
    protected function makeObject(IResult $result) {
 

@@ -110,7 +110,7 @@ class DebugHelper extends StaticClass {
     * @return string
     */
    public static function formatTrace(array $trace, $indent='') {
-      $result = null;
+      $result = '';
 
       $size = sizeOf($trace);
       $callLen = $lineLen = 0;
@@ -232,7 +232,7 @@ class DebugHelper extends StaticClass {
    /**
     * Return a human-readable form of the specified error reporting level.
     *
-    * @param  int $level - reporting level (default: the currently active reporting level)
+    * @param  int|null $level - reporting level (default: the currently active reporting level)
     *
     * @return string
     */
