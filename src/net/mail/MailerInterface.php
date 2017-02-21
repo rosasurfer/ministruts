@@ -13,7 +13,7 @@ interface MailerInterface {
     *
     * @param  array $options - Mailer-Optionen
     */
-   protected function __construct(array $options);
+   public function __construct(array $options);
 
 
    /**

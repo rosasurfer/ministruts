@@ -53,7 +53,7 @@ class SMTPMailer extends Mailer {
     *
     * @param  array $options - Mailer-Optionen
     */
-   protected function __construct(array $options) {
+   public function __construct(array $options) {
       $loglevel        = Logger::getLogLevel(__CLASS__);
       self::$logDebug  = ($loglevel <= L_DEBUG );
       self::$logInfo   = ($loglevel <= L_INFO  );
