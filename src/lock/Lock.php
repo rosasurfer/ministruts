@@ -28,14 +28,17 @@ use rosasurfer\exception\RuntimeException;
  * Im Lebenszyklus einer Lock-Instanz kann sich nur die Gueltigkeit der Sperre aendern, alle anderen Aspekte
  * der Instanz sind unveraenderlich.
  */
-final class Lock extends BaseLock {
+class Lock extends BaseLock {
 
 
-    // alle Schluessel der im Moment gehaltenen Locks
-    private static /*string[]*/ $lockedKeys;
+    /** @var string[] - alle Schluessel der im Moment gehaltenen Locks */
+    private static $lockedKeys;
 
-    private /*Lock*/   $impl;  // aktuelle Implementierung der Instanz
-    private /*string*/ $key;   // aktueller Schluessel der Instanz
+    /** @var Lock - aktuelle Implementierung der Instanz */
+    private $impl;
+
+    /** @var string - aktueller Schluessel der Instanz */
+    private $key;
 
 
     /**
@@ -79,8 +82,6 @@ final class Lock extends BaseLock {
      * Sorgt bei Zerstoerung der Instanz dafuer, dass eine evt. erzeugte Lockdatei wieder geloescht wird.
      */
     public function __destruct() {
-        // Attempting to throw an exception from a destructor during script shutdown causes a fatal error.
-        // @see http://php.net/manual/en/language.oop5.decon.php
         try {
             $this->release();
         }
@@ -98,7 +99,6 @@ final class Lock extends BaseLock {
     public function isValid() {
         if ($this->impl)
             return $this->impl->isValid();
-
         return false;
     }
 

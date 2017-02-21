@@ -298,7 +298,7 @@ class ErrorHandler extends StaticClass {
     public static function handleDestructorException(\Exception $exception) {
         if (self::isInShutdown()) {
             self::handleException($exception);
-            exit(1);                            // exit und signal the error
+            exit(1);                                                // exit and signal the error
 
             // Calling exit() is the only way to prevent the immediately following non-catchable fatal error.
             // However, calling exit() in a destructor will also prevent any remaining shutdown routines from executing.

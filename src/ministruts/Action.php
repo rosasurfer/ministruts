@@ -10,8 +10,11 @@ use rosasurfer\core\Object;
 abstract class Action extends Object {
 
 
-    protected /*ActionMapping*/ $mapping;
-    protected /*ActionForm   */ $form;
+    /** @var ActionMapping */
+    protected $mapping;
+
+    /** @var ActionForm */
+    protected $form;
 
 
     /**
@@ -33,7 +36,7 @@ abstract class Action extends Object {
      *
      * @return ActionMapping
      */
-    final public function getMapping() {
+    public function getMapping() {
         return $this->mapping;
     }
 

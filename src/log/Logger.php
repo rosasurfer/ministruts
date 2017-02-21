@@ -115,13 +115,11 @@ class Logger extends StaticClass {
     /** @var int - counter for messages handled by the PrintHandler */
     private static $printCounter = 0;
 
-
     /** @var bool - whether or not the MailHandler is enabled */
     private static $mailHandler = false;
 
     /** @var string[] - mail receivers */
     private static $mailReceivers = [];
-
 
     /** @var bool - whether or not the SMSHandler is enabled */
     private static $smsHandler = false;
@@ -135,10 +133,8 @@ class Logger extends StaticClass {
     /** @var string[] - SMS options; resolved at log message time */
     private static $smsOptions = [];
 
-
     /** @var bool - whether or not the ErrorLogHandler is enabled */
     private static $errorLogHandler = true;
-
 
     /** @var string[] - loglevel descriptions for message formatter */
     private static $logLevels = [
@@ -230,11 +226,11 @@ class Logger extends StaticClass {
 
 
     /**
-     * Convert a loglevel description into a loglevel constant.
+     * Convert a loglevel description to a loglevel constant.
      *
      * @param  string $value - loglevel description
      *
-     * @return int - loglevel constant or NULL, if $value is not a valid loglevel description
+     * @return int|null - loglevel constant or NULL, if $value is not a valid loglevel description
      */
     public static function logLevelToId($value) {
         if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));

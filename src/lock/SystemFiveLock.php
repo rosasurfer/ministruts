@@ -23,12 +23,17 @@ use const rosasurfer\L_NOTICE;
  */
 class SystemFiveLock extends BaseLock {
 
+    /** @var bool */
+    private static $logDebug;
 
-    private static /*bool*/ $logDebug,
-                        /*bool*/ $logInfo,
-                        /*bool*/ $logNotice;
+    /** @var bool */
+    private static $logInfo;
 
-    private static /*Resource[]*/ $hSemaphores;     // Semaphore-Handles
+    /** @var bool */
+    private static $logNotice;
+
+    /** @var resource[] - semaphore handles */
+    private static $hSemaphores;
 
     private /*string*/ $key;
 
@@ -49,10 +54,10 @@ class SystemFiveLock extends BaseLock {
      *
      * @param  string $key - eindeutiger Schluessel der Instanz
      *
-     * @throws RuntimeException - wenn im aktuellen Prozess oder Thread bereits eine Lock-Instanz unter
-     *                            demselben Schluessel existiert
+     * @throws RuntimeException wenn im aktuellen Prozess oder Thread bereits eine Lock-Instanz unter demselben Schluessel
+     *                          existiert
      */
-    public function __construct($key) /*throws RuntimeException*/ {
+    public function __construct($key) {
         if (!is_string($key))                throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
         if (isSet(self::$hSemaphores[$key])) throw new RuntimeException('Dead-lock detected: already holding a lock for key "'.$key.'"');
         self::$hSemaphores[$key] = false;
@@ -108,8 +113,6 @@ class SystemFiveLock extends BaseLock {
      * Sorgt bei Zerstoerung der Instanz dafuer, dass ein evt. noch gehaltenes Lock freigegeben wird.
      */
     public function __destruct() {
-        // Attempting to throw an exception from a destructor during script shutdown causes a fatal error.
-        // @see http://php.net/manual/en/language.oop5.decon.php
         try {
             $this->release();
         }

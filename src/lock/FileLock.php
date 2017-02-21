@@ -25,10 +25,15 @@ use rosasurfer\exception\RuntimeException;
  */
 final class FileLock extends BaseLock {
 
-    private static /*resource[]*/ $hFiles;
 
-    private /*string*/ $filename;
-    private /*bool*/   $shared;
+    /** @var resource[] */
+    private static $hFiles;
+
+    /** @var string */
+    private $filename;
+
+    /** @var bool */
+    private $shared;
 
 
     /**
@@ -70,8 +75,6 @@ final class FileLock extends BaseLock {
      * Sorgt bei Zerstoerung der Instanz dafuer, dass ein evt. noch gehaltenes Lock freigegeben wird.
      */
     public function __destruct() {
-        // Attempting to throw an exception from a destructor during script shutdown causes a fatal error.
-        // @see http://php.net/manual/en/language.oop5.decon.php
         try {
             $this->release();
         }
@@ -109,7 +112,7 @@ final class FileLock extends BaseLock {
      * markiert es als ungueltig (invalid).  Wenn das Lock bereits ungueltig (invalid) ist, hat der Aufruf
      * keinen Effekt.
      *
-     * @param  bool $deleteFile - ob das verwendete Lockfile beim Freigeben des Locks geloescht werden soll (default: FALSE)
+     * @param  bool $deleteFile - ob das verwendete Lockfile beim Freigeben des Locks geloescht werden soll (default: no)
      */
     public function release($deleteFile = false) {
         if (!is_bool($deleteFile)) throw new IllegalTypeException('Illegal type of parameter $deleteFile: '.getType($deleteFile));

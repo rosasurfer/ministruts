@@ -21,39 +21,32 @@ use rosasurfer\exception\InvalidArgumentException;
 class ActionForward extends Object {
 
 
-    /**
-     * Der Default-Bezeichner, mit dem nach erfolgreicher Validierung nach einem ActionForward gesucht wird.
-     */
-    const /*string*/ VALIDATION_SUCCESS_KEY = 'success';
+    /** @var string - Default-Bezeichner, mit dem nach erfolgreicher Validierung nach einem ActionForward gesucht wird. */
+    const VALIDATION_SUCCESS_KEY = 'success';
 
-
-    /**
-     * Der Default-Bezeichner, mit dem nach fehlgeschlagener Validierung nach einem ActionForward gesucht wird.
-     */
-    const /*string*/ VALIDATION_ERROR_KEY   = 'error';
-
+    /** @var string - Default-Bezeichner, mit dem nach fehlgeschlagener Validierung nach einem ActionForward gesucht wird. */
+    const VALIDATION_ERROR_KEY   = 'error';
 
     /**
-     * Geschuetzter Forward-Bezeichner, ueber den zur Laufzeit ein Redirect-Forward auf die URL des aktuell
-     * verwendeten ActionMappings erzeugt werden kann.
+     *  @var string - Geschuetzter Forward-Bezeichner, ueber den zur Laufzeit ein Redirect-Forward auf die URL des aktuell
+     *                verwendeten ActionMappings erzeugt werden kann.
      */
-    const /*string*/ __SELF = '__self';
+    const __SELF = '__self';
 
+    /** @var string */
+    protected $name;
 
-    protected /*string*/ $name;
-    protected /*string*/ $path;
-    protected /*string*/ $label;
-    protected /*bool*/   $redirect;
+    /** @var string */
+    protected $path;
 
-    // ob diese Komponente vollstaendig konfiguriert ist
-    protected /*bool*/ $configured = false;
+    /** @var string */
+    protected $label;
 
+    /** @var bool */
+    protected $redirect;
 
-    // Getter
-    public /*string*/ function getName()    { return $this->name;     }
-    public /*string*/ function getPath()    { return $this->path;     }
-    public /*string*/ function getLabel()   { return $this->label;    }
-    public /*bool*/   function isRedirect() { return $this->redirect; }
+    /** @var bool - ob diese Komponente vollstaendig konfiguriert ist */
+    protected $configured = false;
 
 
     /**
@@ -67,6 +60,46 @@ class ActionForward extends Object {
         $this->setName($name)
            ->setPath($path)
            ->setRedirect($redirect);
+    }
+
+
+    /**
+     * Get den Namen dieses Forwards.
+     *
+     * @return string
+     */
+    public function getName() {
+        return $this->name;
+    }
+
+
+    /**
+     * Return the path of dieses Forwards.
+     *
+     * @return string
+     */
+    public function getPath() {
+        return $this->path;
+    }
+
+
+    /**
+     * Return the label of dieses Forwards.
+     *
+     * @return string
+     */
+    public function getLabel() {
+        return $this->label;
+    }
+
+
+    /**
+     * Return the redirect property of dieses Forwards.
+     *
+     * @return bool
+     */
+    public function isRedirect() {
+        return $this->redirect;
     }
 
 
