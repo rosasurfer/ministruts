@@ -212,7 +212,7 @@ function prettyBytes($value) {
         return (string) $value;
     $value = (int) $value;
 
-    foreach (array('K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y') as $unit) {
+    foreach (['K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'] as $unit) {
         $value /= 1024;
         if ($value < 1024)
             break;
