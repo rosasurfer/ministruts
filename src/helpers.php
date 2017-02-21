@@ -886,7 +886,7 @@ function is_datetime($string, $format='Y-m-d') {
  *
  * @param  mixed $value - ignored
  *
- * @return bool- TRUE
+ * @return bool - TRUE
  */
 function _true($value=null) {
    return true;
