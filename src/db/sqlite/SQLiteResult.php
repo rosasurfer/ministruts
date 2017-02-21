@@ -75,17 +75,15 @@ class SQLiteResult extends Result {
 
 
    /**
-    * Fetch the next row from the result set.
+    * Fetch  the next row from the result set.
     *
-    * @param  int $mode - Controls how the returned array is indexed. Can take one of the following values:
-    *                     ARRAY_ASSOC, ARRAY_NUM, or ARRAY_BOTH (default).
+    * The types of the values of the returned array are mapped from SQLite3 types as follows:<br>
+    *  - Integers are mapped to int if they fit into the range PHP_INT_MIN..PHP_INT_MAX, otherwise to string.<br>
+    *  - Floats are mapped to float.<br>
+    *  - NULL values are mapped to NULL.<br>
+    *  - Strings and blobs are mapped to string.<br>
     *
-    * @return array - Array of columns or NULL if no more rows are available. The types of the values of the returned array
-    *                 are mapped from SQLite3 types as follows:
-    *                 - Integers are mapped to int if they fit into the range PHP_INT_MIN..PHP_INT_MAX, otherwise to string.
-    *                 - Floats are mapped to float.
-    *                 - NULL values are mapped to NULL.
-    *                 - Strings and blobs are mapped to string.
+    * {@inheritDoc}
     */
    public function fetchNext($mode=ARRAY_BOTH) {
       if (!$this->result || $this->nextRowIndex < 0)        // no automatic result reset()
@@ -163,7 +161,7 @@ class SQLiteResult extends Result {
 
 
    /**
-    * Release the internal resources held by the Result.
+    * {@inheritDoc}
     */
    public function release() {
       if ($this->result) {
