@@ -102,7 +102,7 @@ function dump($var, $return=false, $flushBuffers=true) {
  * @param  bool  $flushBuffers - whether or not to flush output buffers (default: TRUE)
  */
 function echof($var, $flushBuffers=true) {
-   return \rosasurfer\echof($var, $flushBuffers);
+   \rosasurfer\echof($var, $flushBuffers);
 }
 
 
@@ -117,7 +117,7 @@ function echof($var, $flushBuffers=true) {
  * @see    printPretty()
  */
 function echoPre($var, $flushBuffers=true) {
-   return \rosasurfer\echoPre($var, $flushBuffers);
+   \rosasurfer\echoPre($var, $flushBuffers);
 }
 
 
@@ -131,7 +131,7 @@ function echoPre($var, $flushBuffers=true) {
  *                               FALSE, if the result is to be printed to STDOUT (default)
  * @param  bool  $flushBuffers - whether or not to flush output buffers on output (default: TRUE)
  *
- * @return string - string if the result is to be returned, NULL otherwise
+ * @return string|null - string if the result is to be returned, NULL otherwise
  *
  * @see    printPretty()
  */
@@ -148,7 +148,7 @@ function pp($var, $return=false, $flushBuffers=true) {
  *                               FALSE, if the result is to be printed to STDOUT (default)
  * @param  bool  $flushBuffers - whether or not to flush output buffers on output (default: TRUE)
  *
- * @return string - string if the result is to be returned, NULL otherwise
+ * @return string|null - string if the result is to be returned, NULL otherwise
  */
 function printPretty($var, $return=false, $flushBuffers=true) {
    return \rosasurfer\printPretty($var, $return, $flushBuffers);

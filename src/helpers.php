@@ -147,7 +147,7 @@ function echoPre($var, $flushBuffers=true) {
  *                               FALSE, if the result is to be printed to STDOUT (default)
  * @param  bool  $flushBuffers - whether or not to flush output buffers on output (default: TRUE)
  *
- * @return string - string if the result is to be returned, NULL otherwise
+ * @return string|null - string if the result is to be returned, NULL otherwise
  *
  * @see    printPretty()
  */
@@ -164,7 +164,7 @@ function pp($var, $return=false, $flushBuffers=true) {
  *                               FALSE, if the result is to be printed to STDOUT (default)
  * @param  bool  $flushBuffers - whether or not to flush output buffers on output (default: TRUE)
  *
- * @return string - string if the result is to be returned, NULL otherwise
+ * @return string|null - string if the result is to be returned, NULL otherwise
  */
 function printPretty($var, $return=false, $flushBuffers=true) {
    if (is_object($var) && method_exists($var, '__toString')) {

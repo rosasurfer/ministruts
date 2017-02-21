@@ -20,7 +20,7 @@ define('APPLICATION_ROOT', __DIR__     );
 require(dirName(__DIR__).'/src/load.php');
 
 // dns_* functions are not implemented on Windows
-if (WINDOWS) throw new InfrastructureException("This script cannot run on Windows.");
+if (WINDOWS) throw new InfrastructureException('This script cannot run on Windows.');
 
 
 
@@ -93,8 +93,8 @@ foreach ($domains as $domain => $domainValues) {
          $result = queryDNS($domain, $type);
          if ($result != $value) {
             if ($type == 'TXT') {
-               if (strContains($value , ' ')) $value  = "\"$value\"";
-               if (strContains($result, ' ')) $result = "\"$result\"";
+               if (strContains($value , ' ')) $value  = '"'.$value.'"';
+               if (strContains($result, ' ')) $result = '"'.$result.'"';
             }
             if ($result == '0.0.0.0')
                $result = 'SERVFAIL';
