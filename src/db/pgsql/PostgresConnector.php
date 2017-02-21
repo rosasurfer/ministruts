@@ -48,7 +48,7 @@ class PostgresConnector extends Connector {
     *
     * Create a new PostgresConnector instance.
     *
-    * @param  mixed[] $options - PostgreSQL typical configuration options
+    * @param  array $options - PostgreSQL typical configuration options
     */
    public function __construct(array $options) {
       $this->setOptions($options);

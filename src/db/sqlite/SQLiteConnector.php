@@ -66,7 +66,7 @@ class SQLiteConnector extends Connector {
     *
     * Create a new SQLiteConnector instance.
     *
-    * @param  mixed[] $options - SQLite typical configuration options. See the class description for supported values.
+    * @param  array $options - SQLite typical configuration options. See the class description for supported values.
     */
    public function __construct(array $options) {
       if (isSet($options['file'])) $this->setFile($options['file']);

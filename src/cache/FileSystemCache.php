@@ -32,9 +32,9 @@ final class FileSystemCache extends CachePeer {
     * Constructor.
     *
     * @param  string $label   - Cache-Bezeichner
-    * @param  array  $options - zusaetzliche Optionen
+    * @param  array  $options - zusaetzliche Optionen (default: none)
     */
-   public function __construct($label, array $options = null) {
+   public function __construct($label, array $options=[]) {
       $this->label     = $label;
       $this->namespace = $label;
       $this->options   = $options;
@@ -165,10 +165,10 @@ final class FileSystemCache extends CachePeer {
     * ueberschrieben.  Laeuft die angegebene Zeitspanne ab oder aendert sich der Status der angegebenen
     * Abhaengigkeit, wird der Wert automatisch ungueltig.
     *
-    * @param  string     $key        - Schluessel, unter dem der Wert gespeichert wird
-    * @param  mixed      $value      - der zu speichernde Wert
-    * @param  int        $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfaellt
-    * @param  Dependency $dependency - Abhaengigkeit der Gueltigkeit des gespeicherten Wertes
+    * @param  string          $key        - Schluessel, unter dem der Wert gespeichert wird
+    * @param  mixed           $value      - der zu speichernde Wert
+    * @param  int             $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfaellt
+    * @param  Dependency|null $dependency - Abhaengigkeit der Gueltigkeit des gespeicherten Wertes (default: none)
     *
     * @return bool - TRUE bei Erfolg, FALSE andererseits
     */

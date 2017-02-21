@@ -42,7 +42,7 @@ class Request extends Singleton {
    /** @var string */
    private $path;
 
-   /** @var mixed[] - additional variables context */
+   /** @var array - additional variables context */
    private $attributes = [];
 
 

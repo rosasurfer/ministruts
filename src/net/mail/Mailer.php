@@ -14,7 +14,7 @@ use function rosasurfer\strStartsWith;
  *
  * Mailer-Factory und abstrakte Basisklasse fuer alle Mailer-Implementierungen.
  */
-abstract class Mailer extends Object {
+abstract class Mailer extends Object implements MailerInterface {
 
 
    protected /*string[]*/ $config;
@@ -25,21 +25,9 @@ abstract class Mailer extends Object {
     *
     * @param  array $options - Mailer-Optionen
     */
-   abstract protected function __construct(array $options);
-
-
-   /**
-    * Verschickt eine Mail.
-    *
-    * @param  string $sender   - Absender  (Format: 'Vorname Nachname <user@domain.tld>')
-    * @param  string $receiver - Empfaenger (Format: 'Vorname Nachname <user@domain.tld>')
-    * @param  string $subject  - Betreffzeile der E-Mail
-    * @param  string $message  - Inhalt der E-Mail
-    * @param  array  $headers  - zusaetzliche zu setzende Mail-Header (default: none)
-    *
-    * @return void
-    */
-   abstract public function sendMail($sender, $receiver, $subject, $message, array $headers=[]);
+   protected function __construct(array $options) {
+      throw new UnimplementedFeatureException('Method '.get_class($this).'::'.__FUNCTION__.'() is not implemented');
+   }
 
 
    /**
@@ -49,14 +37,11 @@ abstract class Mailer extends Object {
     *
     * @return self
     */
-   final public static function create(array $options = null) {
-      if ($options === null)
-         $options = array();
-
+   final public static function create(array $options=[]) {
       if (!isSet($options['class']))
          $options['class'] = 'PHPMailer';
 
-      $class = $options['class'];
+         $class = $options['class'];
 
       return new $class($options);
    }
@@ -132,7 +117,7 @@ abstract class Mailer extends Object {
     * @return mixed - ein Array mit den beiden Adressbestandteilen oder FALSE, wenn die uebergebene
     *                 Adresse syntaktisch falsch ist
     */
-   final protected function parseAddress($address) {
+   protected function parseAddress($address) {
       if (!is_string($address)) throw new IllegalTypeException('Illegal type of parameter $address: '.getType($address));
 
       $address = trim($address);

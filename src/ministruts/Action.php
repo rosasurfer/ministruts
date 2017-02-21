@@ -19,8 +19,8 @@ abstract class Action extends Object {
     *
     * Erzeugt eine neue Action.
     *
-    * @param  ActionMapping $mapping - das Mapping, zu dem die Action gehoert
-    * @param  ActionForm    $form    - die ActionForm oder NULL, wenn keine angegeben wurde
+    * @param  ActionMapping   $mapping - das Mapping, zu dem die Action gehoert
+    * @param  ActionForm|null $form    - die ActionForm (default: none)
     */
    public function __construct(ActionMapping $mapping, ActionForm $form = null) {
       $this->mapping = $mapping;
@@ -50,7 +50,7 @@ abstract class Action extends Object {
     * @param  Request  $request
     * @param  Response $response
     *
-    * @return ActionForward|string
+    * @return ActionForward|string|null
     */
    public function executeBefore(Request $request, Response $response) {
       return null;
@@ -80,12 +80,12 @@ abstract class Action extends Object {
     * Datenbankverbindungen.
     * Die Default-Implementierung macht nichts.
     *
-    * @param  Request       $request
-    * @param  Response      $response
-    * @param  ActionForward $forward  - der originale ActionForward, wie ihn die Action zurueckgegeben hat
+    * @param  Request            $request
+    * @param  Response           $response
+    * @param  ActionForward|null $forward  - der originale ActionForward, wie ihn die Action zurueckgegeben hat
     *
-    * @return ActionForward - der originale oder ein modifizierter ActionForward (z.B. mit weiteren
-    *                         Query-Parameter)
+    * @return ActionForward|null - der originale oder ein modifizierter ActionForward (z.B. mit weiteren
+    *                              Query-Parameter)
     */
    public function executeAfter(Request $request, Response $response, ActionForward $forward = null) {
       return $forward;

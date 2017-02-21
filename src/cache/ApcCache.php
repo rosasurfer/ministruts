@@ -12,16 +12,16 @@ use rosasurfer\exception\IllegalTypeException;
  *
  * TODO: Cache-Values in Wrapperobjekt speichern und CREATED, EXPIRES etc. verarbeiten
  */
-final class ApcCache extends CachePeer {
+class ApcCache extends CachePeer {
 
 
    /**
     * Constructor.
     *
-    * @param  string $label   - Cache-Bezeichner
-    * @param  array  $options - zusaetzliche Optionen
+    * @param  string|null $label   - Cache-Bezeichner
+    * @param  array       $options - zusaetzliche Optionen (default: none)
     */
-   public function __construct($label = null, array $options = null) {
+   public function __construct($label=null, array $options=[]) {
       $this->label     = $label;
       $this->namespace = ($label===null) ? APPLICATION_ID : $label;
       $this->options   = $options;
@@ -128,10 +128,10 @@ final class ApcCache extends CachePeer {
     * ueberschrieben.  Laeuft die angegebene Zeitspanne ab oder aendert sich der Status der angegebenen
     * Abhaengigkeit, wird der Wert automatisch ungueltig.
     *
-    * @param  string     $key        - Schluessel, unter dem der Wert gespeichert wird
-    * @param  mixed      $value      - der zu speichernde Wert
-    * @param  int        $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfaellt
-    * @param  Dependency $dependency - Abhaengigkeit der Gueltigkeit des gespeicherten Wertes
+    * @param  string          $key        - Schluessel, unter dem der Wert gespeichert wird
+    * @param  mixed           $value      - der zu speichernde Wert
+    * @param  int             $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfaellt
+    * @param  Dependency|null $dependency - Abhaengigkeit der Gueltigkeit des gespeicherten Wertes (if any)
     *
     * @return bool - TRUE bei Erfolg, FALSE andererseits
     */

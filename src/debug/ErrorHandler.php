@@ -133,11 +133,11 @@ class ErrorHandler extends StaticClass {
     * continues normally. All other errors are logged according to the configured error handling mode. Either they
     * are logged and script exceution continues normally, or they are wrapped in a PHPError exception and thrown back.
     *
-    * @param  int     $level   - PHP error severity level
-    * @param  string  $message - error message
-    * @param  string  $file    - name of file where the error occurred
-    * @param  int     $line    - line of file where the error occurred
-    * @param  mixed[] $context - symbols of the point where the error occurred (variable scope at error trigger time)
+    * @param  int    $level   - PHP error severity level
+    * @param  string $message - error message
+    * @param  string $file    - name of file where the error occurred
+    * @param  int    $line    - line of file where the error occurred
+    * @param  array  $context - symbols of the point where the error occurred (variable scope at error trigger time)
     *
     * @return bool - TRUE,  if the error was successfully handled.
     *                FALSE, if the error shall be processed as if no error handler was installed.

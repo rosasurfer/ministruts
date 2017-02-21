@@ -18,7 +18,7 @@ use rosasurfer\exception\IllegalTypeException;
 final class ReferencePool extends CachePeer {
 
 
-   /** @var mixed[] - Array mit den gespeicherten Referenzen */
+   /** @var array - Array mit den gespeicherten Referenzen */
    private $pool;
 
 
@@ -28,10 +28,10 @@ final class ReferencePool extends CachePeer {
     * Erzeugt eine neue Instanz.  Ein evt. angegebenes Label (Namespace) wird ignoriert, da ein ReferencePool
     * Referenzen verwaltet und im Speicher des Prozesses nur ein Namespace existiert.
     *
-    * @param  string $label   - Cache-Bezeichner
-    * @param  array  $options - zusaetzliche Optionen
+    * @param  string|null $label   - Cache-Bezeichner (default: none)
+    * @param  array|null  $options - zusaetzliche Optionen (default: none)
     */
-   public function __construct($label = null, array $options = null) {
+   public function __construct($label=null, array $options=[]) {
    }
 
 
@@ -115,10 +115,10 @@ final class ReferencePool extends CachePeer {
     * ueberschrieben.  Laeuft die angegebene Zeitspanne ab oder aendert sich der Status der angegebenen
     * Abhaengigkeit, wird der Wert automatisch ungueltig.
     *
-    * @param  string      $key        - Schluessel, unter dem der Wert gespeichert wird
-    * @param  mixed       $value      - der zu speichernde Wert
-    * @param  int         $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfaellt
-    * @param  Dependency  $dependency - Abhaengigkeit der Gueltigkeit des gespeicherten Wertes
+    * @param  string          $key        - Schluessel, unter dem der Wert gespeichert wird
+    * @param  mixed           $value      - der zu speichernde Wert
+    * @param  int             $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfaellt
+    * @param  Dependency|null $dependency - Abhaengigkeit der Gueltigkeit des gespeicherten Wertes (default: none)
     *
     * @return bool - TRUE bei Erfolg, FALSE andererseits
     */

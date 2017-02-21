@@ -123,6 +123,7 @@ return array(
     'rosasurfer\\net\\mail\\CLIMailer' => $baseDir . '/src/net/mail/CLIMailer.php',
     'rosasurfer\\net\\mail\\FileSocketMailer' => $baseDir . '/src/net/mail/FileSocketMailer.php',
     'rosasurfer\\net\\mail\\Mailer' => $baseDir . '/src/net/mail/Mailer.php',
+    'rosasurfer\\net\\mail\\MailerInterface' => $baseDir . '/src/net/mail/MailerInterface.php',
     'rosasurfer\\net\\mail\\PHPMailer' => $baseDir . '/src/net/mail/PHPMailer.php',
     'rosasurfer\\net\\mail\\SMTPMailer' => $baseDir . '/src/net/mail/SMTPMailer.php',
     'rosasurfer\\net\\messenger\\Messenger' => $baseDir . '/src/net/messenger/Messenger.php',

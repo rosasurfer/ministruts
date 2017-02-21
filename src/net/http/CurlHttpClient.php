@@ -23,7 +23,7 @@ class CurlHttpClient extends HttpClient {
 
    private /*resource*/ $hCurl;                       // Curl-Handle
    private /*int*/      $manualRedirects = 0;         // Zaehler fuer manuelle Redirects (falls "open_basedir" aktiv ist)
-   private /*mixed[]*/  $options         = array();   // zusaetzliche CURL-Optionen
+   private /*array*/    $options         = [];        // zusaetzliche CURL-Optionen
 
 
    // CURL-Fehlerbeschreibungen
@@ -126,16 +126,15 @@ class CurlHttpClient extends HttpClient {
    /**
     * Erzeugt eine neue Instanz.
     *
-    * @param  mixed[] $options - Array mit zusaetzlichen CURL-Optionen (default: keine)
+    * @param  array $options - Array mit zusaetzlichen CURL-Optionen (default: keine)
     */
-   public function __construct(array $options = null) {
+   public function __construct(array $options=[]) {
       $loglevel        = Logger::getLogLevel(__CLASS__);
       self::$logDebug  = ($loglevel <= L_DEBUG );
       self::$logInfo   = ($loglevel <= L_INFO  );
       self::$logNotice = ($loglevel <= L_NOTICE);
 
-      if ($options)
-         $this->options = $options;
+      $this->options = $options;
    }
 
 
@@ -160,11 +159,11 @@ class CurlHttpClient extends HttpClient {
    /**
     * Erzeugt eine neue Instanz der Klasse.
     *
-    * @param  mixed[] $options - Array mit zusaetzlichen CURL-Optionen (default: keine)
+    * @param  array $options - Array mit zusaetzlichen CURL-Optionen (default: keine)
     *
     * @return self
     */
-   public static function create(array $options=null) {
+   public static function create(array $options=[]) {
       return new static($options);
    }
 

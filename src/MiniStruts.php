@@ -49,7 +49,7 @@ class MiniStruts extends StaticClass {
     *                                Enabling this option is required if the option "handle-errors" is set to ERROR_HANDLER_THROW
     *                                and you don't provide your own exception handling mechanism.
     *                                default: FALSE (no exception handling)
-    * @param  mixed[] $options
+    * @param  array $options
     */
    public static function init(array $options = []) {
       foreach ($options as $key => $value) {

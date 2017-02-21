@@ -306,9 +306,9 @@ class Logger extends StaticClass {
    /**
     * Log a message.
     *
-    * @param  mixed   $loggable - a message or an object implementing <tt>__toString()</tt>
-    * @param  int     $level    - loglevel
-    * @param  mixed[] $context  - optional logging context with additional data
+    * @param  string|object $loggable - a message or an object implementing <tt>__toString()</tt>
+    * @param  int           $level    - loglevel
+    * @param  array         $context  - optional logging context with additional data
     */
    public static function log($loggable, $level, array $context=[]) {
       // Wrap everything in a try-catch block to prevent user generated log messages
@@ -389,9 +389,9 @@ class Logger extends StaticClass {
    /**
     * Display the message on the standard device (STDOUT on a terminal, HTTP response for a web request).
     *
-    * @param  mixed    $loggable - message or exception to log
-    * @param  int      $level    - loglevel of the loggable
-    * @param  mixed[] &$context  - reference to the log context with additional data
+    * @param  string|object $loggable - message or exception to log
+    * @param  int           $level    - loglevel of the loggable
+    * @param  array        &$context  - reference to the log context with additional data
     */
    private static function invokePrintHandler($loggable, $level, array &$context) {
       if (!self::$printHandler) return;
@@ -419,9 +419,9 @@ class Logger extends StaticClass {
    /**
     * Send the message to the configured mail receivers (email addresses).
     *
-    * @param  mixed    $loggable - message or exception to log
-    * @param  int      $level    - loglevel of the loggable
-    * @param  mixed[] &$context  - reference to the log context with additional data
+    * @param  string|object $loggable - message or exception to log
+    * @param  int           $level    - loglevel of the loggable
+    * @param  array        &$context  - reference to the log context with additional data
     */
    private static function invokeMailHandler($loggable, $level, array &$context) {
       if (!self::$mailHandler) return;
@@ -452,9 +452,9 @@ class Logger extends StaticClass {
    /**
     * Send the message to the configured SMS receivers (phone numbers).
     *
-    * @param  mixed    $loggable - message or exception to log
-    * @param  int      $level    - loglevel of the loggable
-    * @param  mixed[] &$context  - reference to the log context with additional data
+    * @param  string|object $loggable - message or exception to log
+    * @param  int           $level    - loglevel of the loggable
+    * @param  array        &$context  - reference to the log context with additional data
     *
     * @TODO:  replace CURL dependency with internal PHP functions
     */
@@ -560,9 +560,9 @@ class Logger extends StaticClass {
     * If this directive is not set, errors are sent to the SAPI error logger. For example, it is an error log in Apache
     * or STDERR in CLI.
     *
-    * @param  mixed    $loggable - message or exception to log
-    * @param  int      $level    - loglevel of the loggable
-    * @param  mixed[] &$context  - reference to the log context with additional data
+    * @param  string|object $loggable - message or exception to log
+    * @param  int           $level    - loglevel of the loggable
+    * @param  array        &$context  - reference to the log context with additional data
     */
    private static function invokeErrorLogHandler($loggable, $level, array &$context) {
       if (!self::$errorLogHandler) return;
@@ -590,9 +590,9 @@ class Logger extends StaticClass {
    /**
     * Compose a CLI log message and store it in the passed log context under the keys "cliMessage" and "cliExtra".
     *
-    * @param  mixed    $loggable - message or exception to log
-    * @param  int      $level    - loglevel of the loggable
-    * @param  mixed[] &$context  - reference to the log context
+    * @param  string|object $loggable - message or exception to log
+    * @param  int           $level    - loglevel of the loggable
+    * @param  array        &$context  - reference to the log context
     */
    private static function composeCliMessage($loggable, $level, array &$context) {
       if (!isSet($context['file']) || !isSet($context['line']))
@@ -658,9 +658,9 @@ class Logger extends StaticClass {
    /**
     * Compose a mail log message and store it in the passed log context under the keys "mailSubject" and "mailMessage".
     *
-    * @param  mixed    $loggable - message or exception to log
-    * @param  int      $level    - loglevel of the loggable
-    * @param  mixed[] &$context  - reference to the log context
+    * @param  string|object $loggable - message or exception to log
+    * @param  int           $level    - loglevel of the loggable
+    * @param  array        &$context  - reference to the log context
     */
    private static function composeMailMessage($loggable, $level, array &$context) {
       if (!isSet($context['cliMessage']))
@@ -701,9 +701,9 @@ class Logger extends StaticClass {
    /**
     * Compose a HTML log message and store it in the passed log context under the key "htmlMessage".
     *
-    * @param  mixed    $loggable - message or exception to log
-    * @param  int      $level    - loglevel of the loggable
-    * @param  mixed[] &$context  - reference to the log context
+    * @param  string|object $loggable - message or exception to log
+    * @param  int           $level    - loglevel of the loggable
+    * @param  array        &$context  - reference to the log context
     */
    private static function composeHtmlMessage($loggable, $level, array &$context) {
       if (!isSet($context['file']) || !isSet($context['line']))
@@ -764,9 +764,9 @@ class Logger extends StaticClass {
     * Resolve the location the current log statement originated from and store it in the passed log context under the
     * keys "file" and "line".
     *
-    * @param  mixed    $loggable - message or exception to log
-    * @param  int      $level    - loglevel of the loggable
-    * @param  mixed[] &$context  - reference to the log context
+    * @param  string|object $loggable - message or exception to log
+    * @param  int           $level    - loglevel of the loggable
+    * @param  array        &$context  - reference to the log context
     */
    private static function resolveLogLocation($loggable, $level, array &$context) {
       if (!isSet($context['trace']))
@@ -790,9 +790,9 @@ class Logger extends StaticClass {
    /**
     * Resolve the class calling the logger and store it in the passed log context under the key "class".
     *
-    * @param  mixed    $loggable - message or exception to log
-    * @param  int      $level    - loglevel of the loggable
-    * @param  mixed[] &$context  - reference to the log context
+    * @param  string|object $loggable - message or exception to log
+    * @param  int           $level    - loglevel of the loggable
+    * @param  array        &$context  - reference to the log context
     *
     *
     * @TODO:  test with Closure and internal PHP functions
