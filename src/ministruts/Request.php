@@ -379,7 +379,9 @@ class Request extends Singleton {
     */
    public function getRemoteHostname() {
       static $hostname = null;
-      !$hostname && $hostname=getHostByAddr($this->getRemoteAddress());
+      if (!$hostname) {
+         $hostname = getHostByAddr($this->getRemoteAddress());
+      }
       return $hostname;
    }
 
