@@ -1,6 +1,6 @@
 <?php
 if (!isSet($_SERVER['REQUEST_METHOD']))            // exit, falls wir in einer Shell laufen
-   exit(0);
+    exit(0);
 
 
 $address = getRemoteAddress();
@@ -12,12 +12,12 @@ else                   echoPre('current IP address: '.$address.'  ('.$name.')');
 
 $value = getForwardedRemoteAddress();
 if ($value) {
-   if (!isIPAddress($value) || ($value==($name=getHostByAddr($value)))) {
-      echoPre('forwarded for:      '.$value);
-   }
-   else {
-      echoPre('forwarded for:      '.$value.'  ('.$name.')');
-   }
+    if (!isIPAddress($value) || ($value==($name=getHostByAddr($value)))) {
+        echoPre('forwarded for:      '.$value);
+    }
+    else {
+        echoPre('forwarded for:      '.$value.'  ('.$name.')');
+    }
 }
 
 
@@ -30,21 +30,21 @@ if ($value) {
  * @param  mixed $var - die auszugebende Variable
  */
 function echoPre($var) {
-   if (is_object($var) && method_exists($var, '__toString')) {
-      $str = $var->__toString();
-   }
-   elseif (is_object($var) || is_array($var)) {
-      $str = print_r($var, true);
-   }
-   else {
-      $str = (string) $var;
-   }
+    if (is_object($var) && method_exists($var, '__toString')) {
+        $str = $var->__toString();
+    }
+    elseif (is_object($var) || is_array($var)) {
+        $str = print_r($var, true);
+    }
+    else {
+        $str = (string) $var;
+    }
 
-   if (isSet($_SERVER['REQUEST_METHOD']))
-      $str = '<div align="left"><pre style="z-index:65535; margin:0; font:normal normal 12px/normal \'Courier New\',courier,serif">'.htmlSpecialChars($str, ENT_QUOTES).'</pre></div>';
-   $str .= "\n";
+    if (isSet($_SERVER['REQUEST_METHOD']))
+        $str = '<div align="left"><pre style="z-index:65535; margin:0; font:normal normal 12px/normal \'Courier New\',courier,serif">'.htmlSpecialChars($str, ENT_QUOTES).'</pre></div>';
+    $str .= "\n";
 
-   echo $str;
+    echo $str;
 }
 
 
@@ -54,7 +54,7 @@ function echoPre($var) {
  * @return string - IP-Adresse
  */
 function getRemoteAddress() {
-   return $_SERVER['REMOTE_ADDR'];
+    return $_SERVER['REMOTE_ADDR'];
 }
 
 
@@ -64,7 +64,7 @@ function getRemoteAddress() {
  * @return string - Wert (ein oder mehrere IP-Adressen oder Hostnamen) oder NULL, wenn der Header nicht gesetzt ist
  */
 function getForwardedRemoteAddress() {
-   return getHeaderValue(array('X-Forwarded-For', 'X-UP-Forwarded-For'));
+    return getHeaderValue(array('X-Forwarded-For', 'X-UP-Forwarded-For'));
 }
 
 
@@ -78,19 +78,19 @@ function getForwardedRemoteAddress() {
  * @return string - Wert oder NULL, wenn die angegebenen Header nicht gesetzt sind
  */
 function getHeaderValue($names) {
-   if (is_string($names))
-      $names = array($names);
-   elseif (is_array($names)) {
-      foreach ($names as $name)
-         if (!is_string($name)) throw new Exception('Illegal argument type in argument $names: '.getType($name));
-   }
-   else throw new Exception('Illegal type of parameter $names: '.getType($names));
+    if (is_string($names))
+        $names = array($names);
+    elseif (is_array($names)) {
+        foreach ($names as $name)
+            if (!is_string($name)) throw new Exception('Illegal argument type in argument $names: '.getType($name));
+    }
+    else throw new Exception('Illegal type of parameter $names: '.getType($names));
 
-   $headers = getHeaders($names);
-   if ($headers)
-      return join(',', $headers);
+    $headers = getHeaders($names);
+    if ($headers)
+        return join(',', $headers);
 
-   return null;
+    return null;
 }
 
 
@@ -102,40 +102,40 @@ function getHeaderValue($names) {
  * @return array - Name-Wert-Paare
  */
 function getHeaders($names = null) {
-   if     ($names === null)   $names = array();
-   elseif (is_string($names)) $names = array($names);
-   elseif (is_array($names)) {
-      foreach ($names as $name) {
-         if (!is_string($name)) throw new Exception('Illegal argument type in argument $names: '.getType($name));
-      }
-   }
-   else throw new Exception('Illegal type of parameter $names: '.getType($names));
+    if     ($names === null)   $names = array();
+    elseif (is_string($names)) $names = array($names);
+    elseif (is_array($names)) {
+        foreach ($names as $name) {
+            if (!is_string($name)) throw new Exception('Illegal argument type in argument $names: '.getType($name));
+        }
+    }
+    else throw new Exception('Illegal type of parameter $names: '.getType($names));
 
-   // einmal alle Header einlesen
-   static $headers = null;
-   if ($headers === null) {
-      if (function_exists('getAllHeaders')) {
-         $headers = getAllHeaders();
-         if ($headers === false)
-            throw new Exception('Error reading request headers, getAllHeaders() returned: FALSE');
-      }
-      else {
-         $headers = array();
-         foreach ($_SERVER as $key => $value) {
-            if(subStr($key, 0, 5) == 'HTTP_') {
-               $key = strToLower(subStr($key, 5));
-               $key = str_replace(' ', '-', ucWords(str_replace('_', ' ', $key)));
-               $headers[$key] = $value;
+    // einmal alle Header einlesen
+    static $headers = null;
+    if ($headers === null) {
+        if (function_exists('getAllHeaders')) {
+            $headers = getAllHeaders();
+            if ($headers === false)
+                throw new Exception('Error reading request headers, getAllHeaders() returned: FALSE');
+        }
+        else {
+            $headers = array();
+            foreach ($_SERVER as $key => $value) {
+                if(subStr($key, 0, 5) == 'HTTP_') {
+                    $key = strToLower(subStr($key, 5));
+                    $key = str_replace(' ', '-', ucWords(str_replace('_', ' ', $key)));
+                    $headers[$key] = $value;
+                }
             }
-         }
-      }
-   }
+        }
+    }
 
-   // alle oder nur die gewuenschten Header zurueckgeben
-   if (!$names)
-      return $headers;
+    // alle oder nur die gewuenschten Header zurueckgeben
+    if (!$names)
+        return $headers;
 
-   return array_intersect_ukey($headers, array_flip($names), 'strCaseCmp');
+    return array_intersect_ukey($headers, array_flip($names), 'strCaseCmp');
 }
 
 
@@ -149,24 +149,24 @@ function getHeaders($names = null) {
  * @return bool|array
  */
 function isIPAddress($string, $returnBytes=false) {
-   static $pattern = '/^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/';
+    static $pattern = '/^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/';
 
-   $result = is_string($string) && strLen($string) && preg_match($pattern, $string, $bytes);
+    $result = is_string($string) && strLen($string) && preg_match($pattern, $string, $bytes);
 
-   if ($result) {
-      array_shift($bytes);
+    if ($result) {
+        array_shift($bytes);
 
-      foreach ($bytes as $i => $byte) {
-         $b = (int) $byte;
-         if (!is_string($byte) || $b > 255)
+        foreach ($bytes as $i => $byte) {
+            $b = (int) $byte;
+            if (!is_string($byte) || $b > 255)
+                return false;
+            $bytes[$i] = $b;
+        }
+
+        if ($bytes[0] == 0)
             return false;
-         $bytes[$i] = $b;
-      }
 
-      if ($bytes[0] == 0)
-         return false;
-
-      return $returnBytes ? $bytes : true;
-   }
-   return false;
+        return $returnBytes ? $bytes : true;
+    }
+    return false;
 }

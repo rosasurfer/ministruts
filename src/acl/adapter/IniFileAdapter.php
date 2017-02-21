@@ -10,11 +10,11 @@ use rosasurfer\core\Object;
 class IniFileAdapter extends Object implements AdapterInterface {
 
 
-   /**
-    * Constructor
-    */
-   public function __construct() {
-      // check from where to load the ACLs
-      // load and create object hierarchy
-   }
+    /**
+     * Constructor
+     */
+    public function __construct() {
+        // check from where to load the ACLs
+        // load and create object hierarchy
+    }
 }

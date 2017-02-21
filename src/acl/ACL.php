@@ -10,14 +10,14 @@ use rosasurfer\core\StaticClass;
 class ACL extends StaticClass {
 
 
-   /**
-    * Access mode "access allowed".
-    */
-   const ALLOW = 1;
+    /**
+     * Access mode "access allowed".
+     */
+    const ALLOW = 1;
 
 
-   /**
-    * Access mode "access denied".
-    */
-   const DENY = 0;
+    /**
+     * Access mode "access denied".
+     */
+    const DENY = 0;
 }

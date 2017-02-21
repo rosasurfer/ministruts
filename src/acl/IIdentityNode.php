@@ -10,26 +10,26 @@ namespace rosasurfer\acl;
 interface IIdentityNode {
 
 
-   /**
-    * Return the name of the node, e.g. the class name (i.e. not unique).
-    *
-    * @return string
-    */
-   public function getNodeName();
+    /**
+     * Return the name of the node, e.g. the class name (i.e. not unique).
+     *
+     * @return string
+     */
+    public function getNodeName();
 
 
-   /**
-    * Return the ID of the node. Can be anything uniquely identifying all nodes with the same name.
-    *
-    * @return string
-    */
-   public function getNodeId();
+    /**
+     * Return the ID of the node. Can be anything uniquely identifying all nodes with the same name.
+     *
+     * @return string
+     */
+    public function getNodeId();
 
 
-   /**
-    * Return the parent nodes of the node (if any).
-    *
-    * @return self[] - array of nodes or an empty value if the node is a root node
-    */
-   public function getParentNodes();
+    /**
+     * Return the parent nodes of the node (if any).
+     *
+     * @return self[] - array of nodes or an empty value if the node is a root node
+     */
+    public function getParentNodes();
 }

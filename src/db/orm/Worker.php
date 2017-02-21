@@ -20,122 +20,122 @@ use rosasurfer\db\MultipleRowsException;
 class Worker extends Object {
 
 
-   /** @var DAO - DAO of the Worker's model class */
-   private   $dao;
+    /** @var DAO - DAO of the Worker's model class */
+    private   $dao;
 
-   /** @var string - class name of the Worker's model */
-   protected $entityClass;
+    /** @var string - class name of the Worker's model */
+    protected $entityClass;
 
-   /** @var IConnector - database adapter of the Worker's model */
-   private   $connector;
-
-
-   /**
-    * Constructor
-    *
-    * Create a new Worker for the specified DAO.
-    *
-    * @param  DAO $dao
-    */
-   public function __construct(DAO $dao) {
-      $this->dao = $dao;
-      $this->entityClass = $dao->getEntityClass();
-   }
+    /** @var IConnector - database adapter of the Worker's model */
+    private   $connector;
 
 
-   /**
-    * Find a single matching record and convert it to an object of the model class.
-    *
-    * @param  string $query     - SQL query
-    * @param  bool   $allowMany - whether or not the query is allowed to return a multi-row result (default: no)
-    *
-    * @return PersistableObject|null
-    *
-    * @throws MultipleRowsException if the query returned multiple rows and $allowMany was not set to TRUE.
-    */
-   public function findOne($query, $allowMany=false) {
-      $result = $this->query($query);
-
-      $object = $this->makeObject($result);
-      if ($object && !$allowMany && $result->numRows() > 1) throw new MultipleRowsException();
-                                    //       numRows() is not available on SQLite or with PDO, the emulation is slow.
-                                    // TODO: the check can be improved by fetchNext() when reset(-1) and internal record
-      return $object;               //       caching are implemented.
-   }
+    /**
+     * Constructor
+     *
+     * Create a new Worker for the specified DAO.
+     *
+     * @param  DAO $dao
+     */
+    public function __construct(DAO $dao) {
+        $this->dao = $dao;
+        $this->entityClass = $dao->getEntityClass();
+    }
 
 
-   /**
-    * Find all matching records and convert them to objects of the model class.
-    *
-    * @param  string $query - SQL query
-    *
-    * @return PersistableObject[]
-    */
-   public function findAll($query) {
-      $result = $this->query($query);
-      return $this->makeObjects($result);
-   }
+    /**
+     * Find a single matching record and convert it to an object of the model class.
+     *
+     * @param  string $query     - SQL query
+     * @param  bool   $allowMany - whether or not the query is allowed to return a multi-row result (default: no)
+     *
+     * @return PersistableObject|null
+     *
+     * @throws MultipleRowsException if the query returned multiple rows and $allowMany was not set to TRUE.
+     */
+    public function findOne($query, $allowMany=false) {
+        $result = $this->query($query);
+
+        $object = $this->makeObject($result);
+        if ($object && !$allowMany && $result->numRows() > 1) throw new MultipleRowsException();
+                                                //       numRows() is not available on SQLite or with PDO, the emulation is slow.
+                                                // TODO: the check can be improved by fetchNext() when reset(-1) and internal record
+        return $object;               //       caching are implemented.
+    }
 
 
-   /**
-    * Execute a SQL statement and return the result. This method should be used if the SQL statement returns rows.
-    *
-    * @param  string $sql - SQL statement
-    *
-    * @return IResult
-    */
-   public function query($sql) {
-      return $this->getConnector()->query($sql);
-   }
+    /**
+     * Find all matching records and convert them to objects of the model class.
+     *
+     * @param  string $query - SQL query
+     *
+     * @return PersistableObject[]
+     */
+    public function findAll($query) {
+        $result = $this->query($query);
+        return $this->makeObjects($result);
+    }
 
 
-   /**
-    * Convert the next row of a result to an object of the model class.
-    *
-    * @param  IResult $result
-    *
-    * @return PersistableObject|null - instance or NULL if the result doesn't hold any more rows
-    */
-   protected function makeObject(IResult $result) {
-
-      // TODO: Lookup and return an existing instance instead of a copy.
-
-      $row = $result->fetchNext(ARRAY_ASSOC);
-      if ($row)
-         return PersistableObject::createInstance($this->entityClass, $row);
-      return null;
-   }
+    /**
+     * Execute a SQL statement and return the result. This method should be used if the SQL statement returns rows.
+     *
+     * @param  string $sql - SQL statement
+     *
+     * @return IResult
+     */
+    public function query($sql) {
+        return $this->getConnector()->query($sql);
+    }
 
 
-   /**
-    * Convert all remaining rows of a result to objects of the model class.
-    *
-    * @param  IResult $result
-    *
-    * @return PersistableObject[] - arry of instances or an empty array if the result doesn't hold any more rows
-    */
-   protected function makeObjects(IResult $result) {
+    /**
+     * Convert the next row of a result to an object of the model class.
+     *
+     * @param  IResult $result
+     *
+     * @return PersistableObject|null - instance or NULL if the result doesn't hold any more rows
+     */
+    protected function makeObject(IResult $result) {
 
-      // TODO: Lookup and return existing instances instead of copies.
+        // TODO: Lookup and return an existing instance instead of a copy.
 
-      $instances = array();
-      while ($row = $result->fetchNext(ARRAY_ASSOC)) {
-         $instances[] = PersistableObject::createInstance($this->entityClass, $row);
-      }
-      return $instances;
-   }
+        $row = $result->fetchNext(ARRAY_ASSOC);
+        if ($row)
+            return PersistableObject::createInstance($this->entityClass, $row);
+        return null;
+    }
 
 
-   /**
-    * Return the database adapter of the Worker's model class.
-    *
-    * @return IConnector
-    */
-   public function getConnector() {
-      if (!$this->connector) {
-         $mapping = $this->dao->getMapping();
-         $this->connector = ConnectionPool::getConnector($mapping['connection']);
-      }
-      return $this->connector;
-   }
+    /**
+     * Convert all remaining rows of a result to objects of the model class.
+     *
+     * @param  IResult $result
+     *
+     * @return PersistableObject[] - arry of instances or an empty array if the result doesn't hold any more rows
+     */
+    protected function makeObjects(IResult $result) {
+
+        // TODO: Lookup and return existing instances instead of copies.
+
+        $instances = array();
+        while ($row = $result->fetchNext(ARRAY_ASSOC)) {
+            $instances[] = PersistableObject::createInstance($this->entityClass, $row);
+        }
+        return $instances;
+    }
+
+
+    /**
+     * Return the database adapter of the Worker's model class.
+     *
+     * @return IConnector
+     */
+    public function getConnector() {
+        if (!$this->connector) {
+            $mapping = $this->dao->getMapping();
+            $this->connector = ConnectionPool::getConnector($mapping['connection']);
+        }
+        return $this->connector;
+    }
 }

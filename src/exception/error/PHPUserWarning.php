@@ -8,12 +8,12 @@ namespace rosasurfer\exception\error;
 class PHPUserWarning extends PHPError {
 
 
-   /**
-    * Return the simple PHP type description of this PHPError.
-    *
-    * @return string
-    */
-   public function getSimpleType() {
-      return 'PHP User Warning';
-   }
+    /**
+     * Return the simple PHP type description of this PHPError.
+     *
+     * @return string
+     */
+    public function getSimpleType() {
+        return 'PHP User Warning';
+    }
 }

@@ -25,100 +25,100 @@ use rosasurfer\exception\RuntimeException;
  */
 final class FileLock extends BaseLock {
 
-   private static /*resource[]*/ $hFiles;
+    private static /*resource[]*/ $hFiles;
 
-   private /*string*/ $filename;
-   private /*bool*/   $shared;
-
-
-   /**
-    * Constructor
-    *
-    * Erzeugt ein neues FileLock fuer die angegebene Datei.
-    *
-    * @param  string $filename - Name der Datei, auf der das Lock gehalten werden soll (muss existieren)
-    * @param  bool   $shared   - TRUE, um ein shared Lock oder FALSE, um ein exclusive Lock zu setzen
-    *                            (default: FALSE = exklusives Lock)
-    */
-   public function __construct($filename, $shared = false) {
-
-      // TODO: Ein das Lock haltender Prozess kann die Datei bis zum Aufruf von fLock() wieder geloescht haben.
-
-      // TODO: 2016-06-17: Win7/NTFS: Auf einer gesperrten Datei (Handle 1 ) funktionieren die Dateifunktionen
-      //       mit einem anderen Handle (2) nicht mehr (unter Linux schon). Mit dem zum Sperren verwendeten Handle
-      //       funktionieren sie.
-
-      if (!is_string($filename))           throw new IllegalTypeException('Illegal type of parameter $filename: '.getType($filename));
-      if (!is_bool($shared))               throw new IllegalTypeException('Illegal type of parameter $shared: '.getType($shared));
-
-      if (isSet(self::$hFiles[$filename])) throw new RuntimeException('Dead-lock detected: already holding a lock for file "'.$filename.'"');
-      self::$hFiles[$filename] = false;      // Schlaegt der Constructor fehl, verhindert der gesetzte Eintrag ein
-                                             // Dead-lock bei eventuellem Re-Entry.
-      $this->filename = $filename;
-      $this->shared   = $shared;
-
-      self::$hFiles[$filename] = fOpen($filename, 'r');
-      $mode = $shared ? LOCK_SH : LOCK_EX;
-
-      if (!fLock(self::$hFiles[$filename], $mode)) throw new RuntimeException('Can not aquire '.($shared ? 'shared':'exclusive').' file lock for "'.$filename.'"');
-   }
+    private /*string*/ $filename;
+    private /*bool*/   $shared;
 
 
-   /**
-    * Destructor
-    *
-    * Sorgt bei Zerstoerung der Instanz dafuer, dass ein evt. noch gehaltenes Lock freigegeben wird.
-    */
-   public function __destruct() {
-      // Attempting to throw an exception from a destructor during script shutdown causes a fatal error.
-      // @see http://php.net/manual/en/language.oop5.decon.php
-      try {
-         $this->release();
-      }
-      catch (\Exception $ex) {
-         throw ErrorHandler::handleDestructorException($ex);
-      }
-   }
+    /**
+     * Constructor
+     *
+     * Erzeugt ein neues FileLock fuer die angegebene Datei.
+     *
+     * @param  string $filename - Name der Datei, auf der das Lock gehalten werden soll (muss existieren)
+     * @param  bool   $shared   - TRUE, um ein shared Lock oder FALSE, um ein exclusive Lock zu setzen
+     *                            (default: FALSE = exklusives Lock)
+     */
+    public function __construct($filename, $shared = false) {
+
+        // TODO: Ein das Lock haltender Prozess kann die Datei bis zum Aufruf von fLock() wieder geloescht haben.
+
+        // TODO: 2016-06-17: Win7/NTFS: Auf einer gesperrten Datei (Handle 1 ) funktionieren die Dateifunktionen
+        //       mit einem anderen Handle (2) nicht mehr (unter Linux schon). Mit dem zum Sperren verwendeten Handle
+        //       funktionieren sie.
+
+        if (!is_string($filename))           throw new IllegalTypeException('Illegal type of parameter $filename: '.getType($filename));
+        if (!is_bool($shared))               throw new IllegalTypeException('Illegal type of parameter $shared: '.getType($shared));
+
+        if (isSet(self::$hFiles[$filename])) throw new RuntimeException('Dead-lock detected: already holding a lock for file "'.$filename.'"');
+        self::$hFiles[$filename] = false;      // Schlaegt der Constructor fehl, verhindert der gesetzte Eintrag ein
+                                                            // Dead-lock bei eventuellem Re-Entry.
+        $this->filename = $filename;
+        $this->shared   = $shared;
+
+        self::$hFiles[$filename] = fOpen($filename, 'r');
+        $mode = $shared ? LOCK_SH : LOCK_EX;
+
+        if (!fLock(self::$hFiles[$filename], $mode)) throw new RuntimeException('Can not aquire '.($shared ? 'shared':'exclusive').' file lock for "'.$filename.'"');
+    }
 
 
-   /**
-    * Ob dieses Lock ein shared oder ein exclusive Lock ist.
-    *
-    * @return bool
-    */
-   public function isShared() {
-      return $this->shared;
-   }
+    /**
+     * Destructor
+     *
+     * Sorgt bei Zerstoerung der Instanz dafuer, dass ein evt. noch gehaltenes Lock freigegeben wird.
+     */
+    public function __destruct() {
+        // Attempting to throw an exception from a destructor during script shutdown causes a fatal error.
+        // @see http://php.net/manual/en/language.oop5.decon.php
+        try {
+            $this->release();
+        }
+        catch (\Exception $ex) {
+            throw ErrorHandler::handleDestructorException($ex);
+        }
+    }
 
 
-   /**
-    * Ob dieses Lock gueltig (valid) ist.
-    *
-    * @return bool
-    */
-   public function isValid() {
-      if (isSet(self::$hFiles[$this->filename]))
-         return is_resource(self::$hFiles[$this->filename]);
-
-      return false;
-   }
+    /**
+     * Ob dieses Lock ein shared oder ein exclusive Lock ist.
+     *
+     * @return bool
+     */
+    public function isShared() {
+        return $this->shared;
+    }
 
 
-   /**
-    * Wenn dieses Lock gueltig (valid) ist, gibt der Aufruf dieser Methode das gehaltene Lock frei und
-    * markiert es als ungueltig (invalid).  Wenn das Lock bereits ungueltig (invalid) ist, hat der Aufruf
-    * keinen Effekt.
-    *
-    * @param  bool $deleteFile - ob das verwendete Lockfile beim Freigeben des Locks geloescht werden soll (default: FALSE)
-    */
-   public function release($deleteFile = false) {
-      if (!is_bool($deleteFile)) throw new IllegalTypeException('Illegal type of parameter $deleteFile: '.getType($deleteFile));
+    /**
+     * Ob dieses Lock gueltig (valid) ist.
+     *
+     * @return bool
+     */
+    public function isValid() {
+        if (isSet(self::$hFiles[$this->filename]))
+            return is_resource(self::$hFiles[$this->filename]);
 
-      if ($this->isValid()) {
-         fClose(self::$hFiles[$this->filename]);      // see docs: The lock is released also by fClose()...
-         if ($deleteFile)
-            @unlink($this->filename);                 // @: theoretisch kann hier schon ein anderer Prozess das Lock halten
-         unset(self::$hFiles[$this->filename]);
-      }
-   }
+        return false;
+    }
+
+
+    /**
+     * Wenn dieses Lock gueltig (valid) ist, gibt der Aufruf dieser Methode das gehaltene Lock frei und
+     * markiert es als ungueltig (invalid).  Wenn das Lock bereits ungueltig (invalid) ist, hat der Aufruf
+     * keinen Effekt.
+     *
+     * @param  bool $deleteFile - ob das verwendete Lockfile beim Freigeben des Locks geloescht werden soll (default: FALSE)
+     */
+    public function release($deleteFile = false) {
+        if (!is_bool($deleteFile)) throw new IllegalTypeException('Illegal type of parameter $deleteFile: '.getType($deleteFile));
+
+        if ($this->isValid()) {
+            fClose(self::$hFiles[$this->filename]);      // see docs: The lock is released also by fClose()...
+            if ($deleteFile)
+                @unlink($this->filename);                 // @: theoretisch kann hier schon ein anderer Prozess das Lock halten
+            unset(self::$hFiles[$this->filename]);
+        }
+    }
 }

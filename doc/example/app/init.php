@@ -21,9 +21,9 @@ PHP::ini_set('error_log', APPLICATION_ROOT.'/etc/log/php-error.log');
 
 // initialize Ministruts
 $options = [
-   'config'            => APPLICATION_ROOT.'/app/config',
-   'handle-errors'     => MiniStruts::THROW_EXCEPTIONS,
-   'handle-exceptions' => true,
-   'global-helpers'    => true,
+    'config'            => APPLICATION_ROOT.'/app/config',
+    'handle-errors'     => MiniStruts::THROW_EXCEPTIONS,
+    'handle-exceptions' => true,
+    'global-helpers'    => true,
 ];
 MiniStruts::init($options);

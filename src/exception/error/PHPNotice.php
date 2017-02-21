@@ -8,12 +8,12 @@ namespace rosasurfer\exception\error;
 class PHPNotice extends PHPError {
 
 
-   /**
-    * Return the simple PHP type description of this PHPError.
-    *
-    * @return string
-    */
-   public function getSimpleType() {
-      return 'PHP Notice';
-   }
+    /**
+     * Return the simple PHP type description of this PHPError.
+     *
+     * @return string
+     */
+    public function getSimpleType() {
+        return 'PHP Notice';
+    }
 }

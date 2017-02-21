@@ -4,9 +4,9 @@
     "type":        "library",
     "homepage":    "http://ministruts.rosasurfer.com/",
     "license":     "WTFPL",
-    "authors": [{ 
-        "name":  "Peter Walther", 
-        "email": "ministruts@rosasurfer.com" 
+    "authors": [{
+        "name":  "Peter Walther",
+        "email": "ministruts@rosasurfer.com"
     }],
     "config": {
         "platform": {
@@ -21,5 +21,5 @@
     "autoload": {
         "classmap": ["src/"],
         "files":    ["src/load.php"]
-    }   
+    }
 }

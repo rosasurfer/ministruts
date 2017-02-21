@@ -10,55 +10,55 @@ use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
  */
 class RosasurferException extends \Exception implements IRosasurferException {
 
-   use RosasurferExceptionTrait;
+    use RosasurferExceptionTrait;
 
 
-   /** @var array - better stacktrace */
-   private $betterTrace;
+    /** @var array - better stacktrace */
+    private $betterTrace;
 
 
-   /**
-    * Create a new instance. Parameters are identical to the built-in PHP Exception and passed on.
-    *
-    * @param  string|null     $message - exception description                           (default: none)
-    * @param  int|null        $code    - exception identifier, usually an application id (default: none)
-    * @param  \Exception|null $cause   - another exception causing this exception        (default: none)
-    */
-   public function __construct($message=null, $code=null, \Exception $cause=null) {
-      parent::__construct($message, $code, $cause);
-   }
+    /**
+     * Create a new instance. Parameters are identical to the built-in PHP Exception and passed on.
+     *
+     * @param  string|null     $message - exception description                           (default: none)
+     * @param  int|null        $code    - exception identifier, usually an application id (default: none)
+     * @param  \Exception|null $cause   - another exception causing this exception        (default: none)
+     */
+    public function __construct($message=null, $code=null, \Exception $cause=null) {
+        parent::__construct($message, $code, $cause);
+    }
 
 
-   /**
-    * Return the exception's stacktrace in a more readable way (Java-like).
-    *
-    * @return array
-    */
-   public function getBetterTrace() {
-      $betterTrace = $this->betterTrace;
+    /**
+     * Return the exception's stacktrace in a more readable way (Java-like).
+     *
+     * @return array
+     */
+    public function getBetterTrace() {
+        $betterTrace = $this->betterTrace;
 
-      if (!$betterTrace) {
-         // transform the original stacktrace into a better trace
-         $betterTrace = DebugHelper::fixTrace($this->getTrace(), $this->getFile(), $this->getLine());
+        if (!$betterTrace) {
+            // transform the original stacktrace into a better trace
+            $betterTrace = DebugHelper::fixTrace($this->getTrace(), $this->getFile(), $this->getLine());
 
-         /*
-         // if the exception was thrown in a magic "__set()" shift frames until we reach the erroneous assignment
-         while (strToLower($trace[0]['function']) == '__set') {
-            array_shift($trace);
-         }
-
-         // if the exception was thrown in a magic "__call()" shift frames until we reach the erroneous call
-         if (strToLower($trace[0]['function']) == '__call') {
-            while (strToLower($trace[0]['function']) == '__call') {
-               array_shift($trace);
+            /*
+            // if the exception was thrown in a magic "__set()" shift frames until we reach the erroneous assignment
+            while (strToLower($trace[0]['function']) == '__set') {
+                array_shift($trace);
             }
-            array_shift($trace);                               // that's one level more than for "__set()"
-         }
+
+            // if the exception was thrown in a magic "__call()" shift frames until we reach the erroneous call
+            if (strToLower($trace[0]['function']) == '__call') {
+                while (strToLower($trace[0]['function']) == '__call') {
+                    array_shift($trace);
+                }
+                array_shift($trace);                               // that's one level more than for "__set()"
+            }
          */
 
-         // store the new stacktrace
-         $this->betterTrace = $betterTrace;
-      }
-      return $betterTrace;
-   }
+            // store the new stacktrace
+            $this->betterTrace = $betterTrace;
+        }
+        return $betterTrace;
+    }
 }

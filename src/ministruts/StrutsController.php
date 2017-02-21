@@ -35,146 +35,146 @@ use const rosasurfer\WINDOWS;
 class StrutsController extends Singleton {
 
 
-   /** @var bool */
-   private static $logDebug, $logInfo, $logNotice;
+    /** @var bool */
+    private static $logDebug, $logInfo, $logNotice;
 
-   /**
-    * @var Module[] - all registered Modules, array key is the Module prefix
-    */
-   private $modules = [];
+    /**
+     * @var Module[] - all registered Modules, array key is the Module prefix
+     */
+    private $modules = [];
 
 
-   /**
-    * Return the singleton instance of this class. The instance might be loaded from a cache.
-    *
-    * @return self
-    */
-   public static function me() {
-      $class = static::class;
-      if (CLI) throw new IllegalStateException('Can not use '.$class.' in this context.');
+    /**
+     * Return the singleton instance of this class. The instance might be loaded from a cache.
+     *
+     * @return self
+     */
+    public static function me() {
+        $class = static::class;
+        if (CLI) throw new IllegalStateException('Can not use '.$class.' in this context.');
 
-      $cache = Cache::me();
+        $cache = Cache::me();
 
-      // cache hit?
-      $controller = $cache->get($class);
-      if (!$controller) {
-         // TODO: fix wrong lock usage (see TODO file)
-         // synchronize parsing of the struts-config.xml
-         // $lock = new FileLock($configFile);
-         // $controller = $cache->get($class);                       // re-check after the lock is aquired
+        // cache hit?
+        $controller = $cache->get($class);
+        if (!$controller) {
+            // TODO: fix wrong lock usage (see TODO file)
+            // synchronize parsing of the struts-config.xml
+            // $lock = new FileLock($configFile);
+            // $controller = $cache->get($class);                       // re-check after the lock is aquired
 
-            if (!$controller) {
-               // create new controller instance...
-               $controller = Singleton::getInstance($class);
+                if (!$controller) {
+                    // create new controller instance...
+                    $controller = Singleton::getInstance($class);
 
-               $configDir  = Config::getDefault()->getDirectory();
-               $configFile = str_replace('\\', '/', $configDir.'/struts-config.xml');
-               $dependency = FileDependency::create($configFile);
-               if (!WINDOWS && !LOCALHOST)                           // distinction dev/production
-                  $dependency->setMinValidity(1 * MINUTE);
+                    $configDir  = Config::getDefault()->getDirectory();
+                    $configFile = str_replace('\\', '/', $configDir.'/struts-config.xml');
+                    $dependency = FileDependency::create($configFile);
+                    if (!WINDOWS && !LOCALHOST)                           // distinction dev/production
+                        $dependency->setMinValidity(1 * MINUTE);
 
-               // ...and cache it with a FileDependency
-               $cache->set($class, $controller, Cache::EXPIRES_NEVER, $dependency);
+                    // ...and cache it with a FileDependency
+                    $cache->set($class, $controller, Cache::EXPIRES_NEVER, $dependency);
+                }
+
+            //$lock->release();
+        }
+        return $controller;
+    }
+
+
+    /**
+     * Constructor
+     *
+     * Load and parse the Struts configuration and create the corresponding object hierarchy.
+     */
+    protected function __construct() {
+        $loglevel        = Logger ::getLogLevel(__CLASS__);
+        self::$logDebug  = ($loglevel <= L_DEBUG );
+        self::$logInfo   = ($loglevel <= L_INFO  );
+        self::$logNotice = ($loglevel <= L_NOTICE);
+
+        // lookup configuration files
+        $configDir = Config::getDefault()->getDirectory();
+        $configDir = str_replace('\\', '/', $configDir);
+        if (!is_file($configDir.'/struts-config.xml'))
+            throw new FileNotFoundException('Configuration file not found: "'.$configDir.'/struts-config.xml"');
+
+        $files   = glob($configDir.'/struts-config-*.xml', GLOB_ERR);
+        $files[] = $configDir.'/struts-config.xml';
+
+
+        // create and register a Module for each found file
+        try {
+            foreach ($files as $file) {
+                $baseName = baseName($file, '.xml');
+                $prefix = (strStartsWith($baseName, 'struts-config-')) ? '/'.subStr($baseName, 14) : '';
+
+                $module = new Module($file, $prefix);
+                $module->freeze();
+
+                if (isSet($this->modules[$prefix]))
+                    throw new RuntimeException('All modules must have unique module prefixes, non-unique prefix: "'.$prefix.'"');
+
+                $this->modules[$prefix] = $module;
             }
-
-         //$lock->release();
-      }
-      return $controller;
-   }
-
-
-   /**
-    * Constructor
-    *
-    * Load and parse the Struts configuration and create the corresponding object hierarchy.
-    */
-   protected function __construct() {
-      $loglevel        = Logger ::getLogLevel(__CLASS__);
-      self::$logDebug  = ($loglevel <= L_DEBUG );
-      self::$logInfo   = ($loglevel <= L_INFO  );
-      self::$logNotice = ($loglevel <= L_NOTICE);
-
-      // lookup configuration files
-      $configDir = Config::getDefault()->getDirectory();
-      $configDir = str_replace('\\', '/', $configDir);
-      if (!is_file($configDir.'/struts-config.xml'))
-         throw new FileNotFoundException('Configuration file not found: "'.$configDir.'/struts-config.xml"');
-
-      $files   = glob($configDir.'/struts-config-*.xml', GLOB_ERR);
-      $files[] = $configDir.'/struts-config.xml';
+        }
+        catch (\Exception $ex) {
+            throw new RuntimeException('Error loading '.$file, null, $ex);
+        }
+    }
 
 
-      // create and register a Module for each found file
-      try {
-         foreach ($files as $file) {
-            $baseName = baseName($file, '.xml');
-            $prefix = (strStartsWith($baseName, 'struts-config-')) ? '/'.subStr($baseName, 14) : '';
+    /**
+     * Process the current HTTP request.
+     */
+    public static function processRequest() {
+        $controller = self::me();
+        $request    = Request::me();
+        $response   = Response::me();
 
-            $module = new Module($file, $prefix);
-            $module->freeze();
+        // select Module
+        $prefix = $controller->getModulePrefix($request);
+        $module = $controller->modules[$prefix];
+        $request->setAttribute(MODULE_KEY, $module);
 
-            if (isSet($this->modules[$prefix]))
-               throw new RuntimeException('All modules must have unique module prefixes, non-unique prefix: "'.$prefix.'"');
+        // get RequestProcessor
+        $processor = $controller->getRequestProcessor($module);
 
-            $this->modules[$prefix] = $module;
-         }
-      }
-      catch (\Exception $ex) {
-         throw new RuntimeException('Error loading '.$file, null, $ex);
-      }
-   }
-
-
-   /**
-    * Process the current HTTP request.
-    */
-   public static function processRequest() {
-      $controller = self::me();
-      $request    = Request::me();
-      $response   = Response::me();
-
-      // select Module
-      $prefix = $controller->getModulePrefix($request);
-      $module = $controller->modules[$prefix];
-      $request->setAttribute(MODULE_KEY, $module);
-
-      // get RequestProcessor
-      $processor = $controller->getRequestProcessor($module);
-
-      // process Request
-      $processor->process($request, $response);
-   }
+        // process Request
+        $processor->process($request, $response);
+    }
 
 
-   /**
-    * Resolve the prefix of the Module responsible for processing of the given Request
-    *
-    * @param  Request $request
-    *
-    * @return string - Module prefix
-    */
-   private function getModulePrefix(Request $request) {
-      $requestPath = $request->getPath();
-      $baseUri     = $request->getApplicationBaseUri();
+    /**
+     * Resolve the prefix of the Module responsible for processing of the given Request
+     *
+     * @param  Request $request
+     *
+     * @return string - Module prefix
+     */
+    private function getModulePrefix(Request $request) {
+        $requestPath = $request->getPath();
+        $baseUri     = $request->getApplicationBaseUri();
 
-      if (!strStartsWith($requestPath, $baseUri)) throw new RuntimeException('Can not resolve module prefix from request path: '.$requestPath);
+        if (!strStartsWith($requestPath, $baseUri)) throw new RuntimeException('Can not resolve module prefix from request path: '.$requestPath);
 
-      $value = strRightFrom($requestPath, $baseUri);
-      $value = strLeftTo($value, '/');
+        $value = strRightFrom($requestPath, $baseUri);
+        $value = strLeftTo($value, '/');
 
-      return isSet($this->modules[$value]) ? $value : '';
-   }
+        return isSet($this->modules[$value]) ? $value : '';
+    }
 
 
-   /**
-    * Get the RequestProcessor instance responsible forthe given Module.
-    *
-    * @param  Module $module
-    *
-    * @return RequestProcessor
-    */
-   private function getRequestProcessor(Module $module) {
-      $class = $module->getRequestProcessorClass();
-      return new $class($module);
-   }
+    /**
+     * Get the RequestProcessor instance responsible forthe given Module.
+     *
+     * @param  Module $module
+     *
+     * @return RequestProcessor
+     */
+    private function getRequestProcessor(Module $module) {
+        $class = $module->getRequestProcessorClass();
+        return new $class($module);
+    }
 }

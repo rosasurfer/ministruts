@@ -10,13 +10,13 @@ use rosasurfer\exception\UnimplementedFeatureException;
 class IRCMessenger extends Messenger {
 
 
-   /**
-    * Verschickt eine Nachricht.
-    *
-    * @param  string $channel - IRC-Channel
-    * @param  string $message - Nachricht
+    /**
+     * Verschickt eine Nachricht.
+     *
+     * @param  string $channel - IRC-Channel
+     * @param  string $message - Nachricht
    */
-   public function sendMessage($receiver, $message) {
-      throw new UnimplementedFeatureException(__METHOD__.'() not yet implemented');
-   }
+    public function sendMessage($receiver, $message) {
+        throw new UnimplementedFeatureException(__METHOD__.'() not yet implemented');
+    }
 }

@@ -19,15 +19,15 @@ use const rosasurfer\L_WARN;
 class CurlHttpClient extends HttpClient {
 
 
-   private static /*bool*/ $logDebug, $logInfo, $logNotice;
+    private static /*bool*/ $logDebug, $logInfo, $logNotice;
 
-   private /*resource*/ $hCurl;                       // Curl-Handle
-   private /*int*/      $manualRedirects = 0;         // Zaehler fuer manuelle Redirects (falls "open_basedir" aktiv ist)
-   private /*array*/    $options         = [];        // zusaetzliche CURL-Optionen
+    private /*resource*/ $hCurl;                       // Curl-Handle
+    private /*int*/      $manualRedirects = 0;         // Zaehler fuer manuelle Redirects (falls "open_basedir" aktiv ist)
+    private /*array*/    $options         = [];        // zusaetzliche CURL-Optionen
 
 
-   // CURL-Fehlerbeschreibungen
-   private static $errors = array(CURLE_OK                      => 'CURLE_OK'                      ,
+    // CURL-Fehlerbeschreibungen
+    private static $errors = array(CURLE_OK                      => 'CURLE_OK'                      ,
                                   CURLE_UNSUPPORTED_PROTOCOL    => 'CURLE_UNSUPPORTED_PROTOCOL'    ,
                                   CURLE_FAILED_INIT             => 'CURLE_FAILED_INIT'             ,
                                   CURLE_URL_MALFORMAT           => 'CURLE_URL_MALFORMAT'           ,
@@ -85,181 +85,181 @@ class CurlHttpClient extends HttpClient {
                                   CURLE_SEND_ERROR              => 'CURLE_SEND_ERROR'              ,
                                   CURLE_RECV_ERROR              => 'CURLE_RECV_ERROR'              ,
                                // 57
-                                 CURLE_SSL_CERTPROBLEM         => 'CURLE_SSL_CERTPROBLEM'         ,
-                                 CURLE_SSL_CIPHER              => 'CURLE_SSL_CIPHER'              ,
-                                 CURLE_SSL_CACERT              => 'CURLE_SSL_CACERT'              ,
-                                 CURLE_BAD_CONTENT_ENCODING    => 'CURLE_BAD_CONTENT_ENCODING'    ,
-                                 CURLE_LDAP_INVALID_URL        => 'CURLE_LDAP_INVALID_URL'        ,
-                                 CURLE_FILESIZE_EXCEEDED       => 'CURLE_FILESIZE_EXCEEDED'       ,
-                                 64                            => 'CURLE_USE_SSL_FAILED'          ,
-                                 65                            => 'CURLE_SEND_FAIL_REWIND'        ,
-                                 66                            => 'CURLE_SSL_ENGINE_INITFAILED'   ,
-                                 67                            => 'CURLE_LOGIN_DENIED'            ,
-                                 68                            => 'CURLE_TFTP_NOTFOUND'           ,
-                                 69                            => 'CURLE_TFTP_PERM'               ,
-                                 70                            => 'CURLE_REMOTE_DISK_FULL'        ,
-                                 71                            => 'CURLE_TFTP_ILLEGAL'            ,
-                                 72                            => 'CURLE_TFTP_UNKNOWNID'          ,
-                                 73                            => 'CURLE_REMOTE_FILE_EXISTS'      ,
-                                 74                            => 'CURLE_TFTP_NOSUCHUSER'         ,
-                                 75                            => 'CURLE_CONV_FAILED'             ,
-                                 76                            => 'CURLE_CONV_REQD'               ,
-                                 77                            => 'CURLE_SSL_CACERT_BADFILE'      ,
-                                 78                            => 'CURLE_REMOTE_FILE_NOT_FOUND'   ,
-                                 79                            => 'CURLE_SSH'                     ,
-                                 80                            => 'CURLE_SSL_SHUTDOWN_FAILED'     ,
-                                 81                            => 'CURLE_AGAIN'                   ,
-                                 82                            => 'CURLE_SSL_CRL_BADFILE'         ,
-                                 83                            => 'CURLE_SSL_ISSUER_ERROR'        ,
-                                 84                            => 'CURLE_FTP_PRET_FAILED'         ,
-                                 85                            => 'CURLE_RTSP_CSEQ_ERROR'         ,
-                                 86                            => 'CURLE_RTSP_SESSION_ERROR'      ,
-                                 87                            => 'CURLE_FTP_BAD_FILE_LIST'       ,
-                                 88                            => 'CURLE_CHUNK_FAILED'            ,
-                                 89                            => 'CURLE_NO_CONNECTION_AVAILABLE' ,
-                                 90                            => 'CURLE_SSL_PINNEDPUBKEYNOTMATCH',
-                                 91                            => 'CURLE_SSL_INVALIDCERTSTATUS'   ,
-                                 92                            => 'CURLE_HTTP2_STREAM'            ,
-   );
+                                            CURLE_SSL_CERTPROBLEM         => 'CURLE_SSL_CERTPROBLEM'         ,
+                                            CURLE_SSL_CIPHER              => 'CURLE_SSL_CIPHER'              ,
+                                            CURLE_SSL_CACERT              => 'CURLE_SSL_CACERT'              ,
+                                            CURLE_BAD_CONTENT_ENCODING    => 'CURLE_BAD_CONTENT_ENCODING'    ,
+                                            CURLE_LDAP_INVALID_URL        => 'CURLE_LDAP_INVALID_URL'        ,
+                                            CURLE_FILESIZE_EXCEEDED       => 'CURLE_FILESIZE_EXCEEDED'       ,
+                                            64                            => 'CURLE_USE_SSL_FAILED'          ,
+                                            65                            => 'CURLE_SEND_FAIL_REWIND'        ,
+                                            66                            => 'CURLE_SSL_ENGINE_INITFAILED'   ,
+                                            67                            => 'CURLE_LOGIN_DENIED'            ,
+                                            68                            => 'CURLE_TFTP_NOTFOUND'           ,
+                                            69                            => 'CURLE_TFTP_PERM'               ,
+                                            70                            => 'CURLE_REMOTE_DISK_FULL'        ,
+                                            71                            => 'CURLE_TFTP_ILLEGAL'            ,
+                                            72                            => 'CURLE_TFTP_UNKNOWNID'          ,
+                                            73                            => 'CURLE_REMOTE_FILE_EXISTS'      ,
+                                            74                            => 'CURLE_TFTP_NOSUCHUSER'         ,
+                                            75                            => 'CURLE_CONV_FAILED'             ,
+                                            76                            => 'CURLE_CONV_REQD'               ,
+                                            77                            => 'CURLE_SSL_CACERT_BADFILE'      ,
+                                            78                            => 'CURLE_REMOTE_FILE_NOT_FOUND'   ,
+                                            79                            => 'CURLE_SSH'                     ,
+                                            80                            => 'CURLE_SSL_SHUTDOWN_FAILED'     ,
+                                            81                            => 'CURLE_AGAIN'                   ,
+                                            82                            => 'CURLE_SSL_CRL_BADFILE'         ,
+                                            83                            => 'CURLE_SSL_ISSUER_ERROR'        ,
+                                            84                            => 'CURLE_FTP_PRET_FAILED'         ,
+                                            85                            => 'CURLE_RTSP_CSEQ_ERROR'         ,
+                                            86                            => 'CURLE_RTSP_SESSION_ERROR'      ,
+                                            87                            => 'CURLE_FTP_BAD_FILE_LIST'       ,
+                                            88                            => 'CURLE_CHUNK_FAILED'            ,
+                                            89                            => 'CURLE_NO_CONNECTION_AVAILABLE' ,
+                                            90                            => 'CURLE_SSL_PINNEDPUBKEYNOTMATCH',
+                                            91                            => 'CURLE_SSL_INVALIDCERTSTATUS'   ,
+                                            92                            => 'CURLE_HTTP2_STREAM'            ,
+    );
 
 
-   /**
-    * Erzeugt eine neue Instanz.
-    *
-    * @param  array $options - Array mit zusaetzlichen CURL-Optionen (default: keine)
-    */
-   public function __construct(array $options=[]) {
-      $loglevel        = Logger::getLogLevel(__CLASS__);
-      self::$logDebug  = ($loglevel <= L_DEBUG );
-      self::$logInfo   = ($loglevel <= L_INFO  );
-      self::$logNotice = ($loglevel <= L_NOTICE);
+    /**
+     * Erzeugt eine neue Instanz.
+     *
+     * @param  array $options - Array mit zusaetzlichen CURL-Optionen (default: keine)
+     */
+    public function __construct(array $options=[]) {
+        $loglevel        = Logger::getLogLevel(__CLASS__);
+        self::$logDebug  = ($loglevel <= L_DEBUG );
+        self::$logInfo   = ($loglevel <= L_INFO  );
+        self::$logNotice = ($loglevel <= L_NOTICE);
 
-      $this->options = $options;
-   }
-
-
-   /**
-    * Destructor. Schliesst ggf. ein noch offenes CURL-Handle
-    */
-   public function __destruct() {
-      // Attempting to throw an exception from a destructor during script shutdown causes a fatal error.
-      // @see http://php.net/manual/en/language.oop5.decon.php
-      try {
-         if (is_resource($this->hCurl)) {
-            $hTmp=$this->hCurl; $this->hCurl=null;
-            curl_close($hTmp);
-         }
-      }
-      catch (\Exception $ex) {
-         throw ErrorHandler::handleDestructorException($ex);
-      }
-   }
+        $this->options = $options;
+    }
 
 
-   /**
-    * Erzeugt eine neue Instanz der Klasse.
-    *
-    * @param  array $options - Array mit zusaetzlichen CURL-Optionen (default: keine)
-    *
-    * @return self
-    */
-   public static function create(array $options=[]) {
-      return new static($options);
-   }
+    /**
+     * Destructor. Schliesst ggf. ein noch offenes CURL-Handle
+     */
+    public function __destruct() {
+        // Attempting to throw an exception from a destructor during script shutdown causes a fatal error.
+        // @see http://php.net/manual/en/language.oop5.decon.php
+        try {
+            if (is_resource($this->hCurl)) {
+                $hTmp=$this->hCurl; $this->hCurl=null;
+                curl_close($hTmp);
+            }
+        }
+        catch (\Exception $ex) {
+            throw ErrorHandler::handleDestructorException($ex);
+        }
+    }
 
 
-   /**
-    * Fuehrt den uebergebenen Request aus und gibt die empfangene Antwort zurueck.
-    *
-    * @param  HttpRequest $request
-    *
-    * @return HttpResponse
-    *
-    * @throws IOException - wenn ein Fehler auftritt
-    */
-   public function send(HttpRequest $request) {
-      $response = CurlHttpResponse::create();
-
-      // CURL-Session initialisieren
-      !is_resource($this->hCurl) && $this->hCurl=curl_init();
-
-      // Optionen setzen, sofern sie nicht schon gesetzt sind
-      $options = $this->options;             $options[CURLOPT_URL      ] = $request->getUrl();
-      !isSet($options[CURLOPT_TIMEOUT  ]) && $options[CURLOPT_TIMEOUT  ] = $this->timeout;      // Execution-Timeout
-      !isSet($options[CURLOPT_USERAGENT]) && $options[CURLOPT_USERAGENT] = $this->userAgent;
-      !isSet($options[CURLOPT_ENCODING ]) && $options[CURLOPT_ENCODING ] = '';                  // sets all supported encodings
-
-      if (!isSet($options[CURLOPT_WRITEHEADER]))
-         if (!isSet($options[CURLOPT_HEADERFUNCTION])) $options[CURLOPT_HEADERFUNCTION] = array($response, 'writeHeader');
-      if (!isSet($options[CURLOPT_FILE]))                                                       // ein gesetztes CURLOPT_RETURNTRANSFER wird ueberschrieben
-         if (!isSet($options[CURLOPT_WRITEFUNCTION]))  $options[CURLOPT_WRITEFUNCTION ] = array($response, 'writeContent');
-
-      // zusaetzliche Header ueberschreiben automatisch generierte Header
-      foreach ($request->getHeaders() as $key => $value) {
-         $options[CURLOPT_HTTPHEADER][] = $key.': '.$value;
-      }
-
-      // CURLOPT_FOLLOWLOCATION funktioniert nur bei deaktiviertem "open_basedir"-Setting
-      if (!ini_get('open_basedir')) {
-         if ($this->isFollowRedirects()) {
-            $options[CURLOPT_FOLLOWLOCATION] = true;
-         }
-         elseif (isSet($options[CURLOPT_FOLLOWLOCATION]) && $options[CURLOPT_FOLLOWLOCATION]) {
-            $this->setFollowRedirects(true);
-         }
-         if ($this->isFollowRedirects()) {
-            !isSet($options[CURLOPT_MAXREDIRS]) && $options[CURLOPT_MAXREDIRS]=$this->maxRedirects;
-         }
-      }
-
-      if ($request->getMethod() == 'POST') {
-         $options[CURLOPT_POST      ] = true;
-         $options[CURLOPT_URL       ] = subStr($request->getUrl(), 0, strPos($request->getUrl(), '?'));
-         $options[CURLOPT_POSTFIELDS] = strStr($request->getUrl(), '?');
-      }
-      curl_setopt_array($this->hCurl, $options);
-
-      // Request ausfuehren
-      if (curl_exec($this->hCurl) === false) throw new IOException('CURL error '.self::getError($this->hCurl).', url: '.$request->getUrl());
-      $response->setStatus($status=curl_getinfo($this->hCurl, CURLINFO_HTTP_CODE));
-
-      // ggf. manuellen Redirect ausfuehren (falls "open_basedir" aktiviert ist)
-      if (($status==301 || $status==302) && $this->isFollowRedirects() && ini_get('open_basedir')) {
-         if ($this->manualRedirects >= $this->maxRedirects)
-            throw new IOException('CURL error: maxRedirects limit exceeded - '.$this->maxRedirects.', url: '.$request->getUrl());
-
-         // TODO: relative Redirects abfangen
-         // TODO: verschachtelte IOExceptions abfangen
-         $this->manualRedirects++;
-         self::$logInfo && Logger::log('Performing manual redirect to: '.$response->getHeader('Location'), L_INFO);
-
-         $request  = HttpRequest::create()->setUrl($response->getHeader('Location'));
-         $me       = __FUNCTION__;
-         $response = $this->$me($request);
-      }
-
-      return $response;
-   }
+    /**
+     * Erzeugt eine neue Instanz der Klasse.
+     *
+     * @param  array $options - Array mit zusaetzlichen CURL-Optionen (default: keine)
+     *
+     * @return self
+     */
+    public static function create(array $options=[]) {
+        return new static($options);
+    }
 
 
-   /**
-    * Gibt eine Beschreibung des letzten CURL-Fehlers zurueck.
-    *
-    * @param  resource $hCurl - CURL-Handle
-    *
-    * @return string
-    */
-   private static function getError(&$hCurl) {
-      $errorNo  = curl_errno($hCurl);
-      $errorStr = curl_error($hCurl);
+    /**
+     * Fuehrt den uebergebenen Request aus und gibt die empfangene Antwort zurueck.
+     *
+     * @param  HttpRequest $request
+     *
+     * @return HttpResponse
+     *
+     * @throws IOException - wenn ein Fehler auftritt
+     */
+    public function send(HttpRequest $request) {
+        $response = CurlHttpResponse::create();
 
-      if (isSet(self::$errors[$errorNo])) {
-         $errorNo = self::$errors[$errorNo];
-      }
-      else {
-         Logger::log('Unknown CURL error code: '.$errorNo, L_WARN);
-      }
+        // CURL-Session initialisieren
+        !is_resource($this->hCurl) && $this->hCurl=curl_init();
 
-      return "$errorNo ($errorStr)";
-   }
+        // Optionen setzen, sofern sie nicht schon gesetzt sind
+        $options = $this->options;             $options[CURLOPT_URL      ] = $request->getUrl();
+        !isSet($options[CURLOPT_TIMEOUT  ]) && $options[CURLOPT_TIMEOUT  ] = $this->timeout;      // Execution-Timeout
+        !isSet($options[CURLOPT_USERAGENT]) && $options[CURLOPT_USERAGENT] = $this->userAgent;
+        !isSet($options[CURLOPT_ENCODING ]) && $options[CURLOPT_ENCODING ] = '';                  // sets all supported encodings
+
+        if (!isSet($options[CURLOPT_WRITEHEADER]))
+            if (!isSet($options[CURLOPT_HEADERFUNCTION])) $options[CURLOPT_HEADERFUNCTION] = array($response, 'writeHeader');
+        if (!isSet($options[CURLOPT_FILE]))                                                       // ein gesetztes CURLOPT_RETURNTRANSFER wird ueberschrieben
+            if (!isSet($options[CURLOPT_WRITEFUNCTION]))  $options[CURLOPT_WRITEFUNCTION ] = array($response, 'writeContent');
+
+        // zusaetzliche Header ueberschreiben automatisch generierte Header
+        foreach ($request->getHeaders() as $key => $value) {
+            $options[CURLOPT_HTTPHEADER][] = $key.': '.$value;
+        }
+
+        // CURLOPT_FOLLOWLOCATION funktioniert nur bei deaktiviertem "open_basedir"-Setting
+        if (!ini_get('open_basedir')) {
+            if ($this->isFollowRedirects()) {
+                $options[CURLOPT_FOLLOWLOCATION] = true;
+            }
+            elseif (isSet($options[CURLOPT_FOLLOWLOCATION]) && $options[CURLOPT_FOLLOWLOCATION]) {
+                $this->setFollowRedirects(true);
+            }
+            if ($this->isFollowRedirects()) {
+                !isSet($options[CURLOPT_MAXREDIRS]) && $options[CURLOPT_MAXREDIRS]=$this->maxRedirects;
+            }
+        }
+
+        if ($request->getMethod() == 'POST') {
+            $options[CURLOPT_POST      ] = true;
+            $options[CURLOPT_URL       ] = subStr($request->getUrl(), 0, strPos($request->getUrl(), '?'));
+            $options[CURLOPT_POSTFIELDS] = strStr($request->getUrl(), '?');
+        }
+        curl_setopt_array($this->hCurl, $options);
+
+        // Request ausfuehren
+        if (curl_exec($this->hCurl) === false) throw new IOException('CURL error '.self::getError($this->hCurl).', url: '.$request->getUrl());
+        $response->setStatus($status=curl_getinfo($this->hCurl, CURLINFO_HTTP_CODE));
+
+        // ggf. manuellen Redirect ausfuehren (falls "open_basedir" aktiviert ist)
+        if (($status==301 || $status==302) && $this->isFollowRedirects() && ini_get('open_basedir')) {
+            if ($this->manualRedirects >= $this->maxRedirects)
+                throw new IOException('CURL error: maxRedirects limit exceeded - '.$this->maxRedirects.', url: '.$request->getUrl());
+
+            // TODO: relative Redirects abfangen
+            // TODO: verschachtelte IOExceptions abfangen
+            $this->manualRedirects++;
+            self::$logInfo && Logger::log('Performing manual redirect to: '.$response->getHeader('Location'), L_INFO);
+
+            $request  = HttpRequest::create()->setUrl($response->getHeader('Location'));
+            $me       = __FUNCTION__;
+            $response = $this->$me($request);
+        }
+
+        return $response;
+    }
+
+
+    /**
+     * Gibt eine Beschreibung des letzten CURL-Fehlers zurueck.
+     *
+     * @param  resource $hCurl - CURL-Handle
+     *
+     * @return string
+     */
+    private static function getError(&$hCurl) {
+        $errorNo  = curl_errno($hCurl);
+        $errorStr = curl_error($hCurl);
+
+        if (isSet(self::$errors[$errorNo])) {
+            $errorNo = self::$errors[$errorNo];
+        }
+        else {
+            Logger::log('Unknown CURL error code: '.$errorNo, L_WARN);
+        }
+
+        return "$errorNo ($errorStr)";
+    }
 }

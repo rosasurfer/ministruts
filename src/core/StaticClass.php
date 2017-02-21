@@ -8,8 +8,8 @@ namespace rosasurfer\core;
 abstract class StaticClass extends Object {
 
 
-   /**
-    * Locked constructor
-    */
-   final private function __construct() {/* you can't call me */}
+    /**
+     * Locked constructor
+     */
+    final private function __construct() {/* you can't call me */}
 }

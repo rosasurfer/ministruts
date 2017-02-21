@@ -12,19 +12,19 @@ use rosasurfer\core\Object;
 abstract class Messenger extends Object {
 
 
-   /**
-    * Constructor
-    *
-    * @param  array $options - Messenger-Optionen
-    */
-   abstract protected function __construct(array $options);
+    /**
+     * Constructor
+     *
+     * @param  array $options - Messenger-Optionen
+     */
+    abstract protected function __construct(array $options);
 
 
-   /**
-    * Verschickt eine Message.
-    *
-    * @param  string $receiver - Empfaenger (internationales Format)
-    * @param  string $message  - Nachricht
+    /**
+     * Verschickt eine Message.
+     *
+     * @param  string $receiver - Empfaenger (internationales Format)
+     * @param  string $message  - Nachricht
    */
-   abstract public function sendMessage($receiver, $message);
+    abstract public function sendMessage($receiver, $message);
 }

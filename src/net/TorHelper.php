@@ -29,11 +29,11 @@ use const rosasurfer\MINUTES;
 class TorHelper extends StaticClass {
 
 
-   private static /*bool*/ $logDebug, $logInfo, $logNotice;
+    private static /*bool*/ $logDebug, $logInfo, $logNotice;
 
 
-   // TODO: Serverliste bei Fehlern dynamisch anpassen
-   private static $torMirrors = array('torstatus.blutmagie.de'   ,
+    // TODO: Serverliste bei Fehlern dynamisch anpassen
+    private static $torMirrors = array('torstatus.blutmagie.de'   ,
                                       'torstatus.cyberphunk.org' ,
                                       'tns.hermetix.org'         ,
                                       'arachne.doesntexist.org'  ,
@@ -41,91 +41,91 @@ class TorHelper extends StaticClass {
                                       'torstatus.kgprog.com'     ,
                                       'torstatus.amorphis.eu'    ,
                                       'torstat.kleine-eismaus.de',
-                           // https://'kradense.whsites.net/tns' ,
+                                    // https://'kradense.whsites.net/tns' ,
                                      );
 
-   /**
-    * Initialisiert die Klasse.
-    */
-   private static function init() {
-      if (self::$logDebug === null) {
-         $loglevel        = Logger::getLogLevel(__CLASS__);
-         self::$logDebug  = ($loglevel <= L_DEBUG );
-         self::$logInfo   = ($loglevel <= L_INFO  );
-         self::$logNotice = ($loglevel <= L_NOTICE);
-      }
-   }
+    /**
+     * Initialisiert die Klasse.
+     */
+    private static function init() {
+        if (self::$logDebug === null) {
+            $loglevel        = Logger::getLogLevel(__CLASS__);
+            self::$logDebug  = ($loglevel <= L_DEBUG );
+            self::$logInfo   = ($loglevel <= L_INFO  );
+            self::$logNotice = ($loglevel <= L_NOTICE);
+        }
+    }
 
 
-   /**
-    * Prueft, ob die uebergebene IP-Adresse ein aktueller Tor-Exit-Node ist.
-    *
-    * @param  string $ip - IP-Adresse
-    *
-    * @return bool
-    */
-   public static function isExitNode($ip) {
-      self::init();
+    /**
+     * Prueft, ob die uebergebene IP-Adresse ein aktueller Tor-Exit-Node ist.
+     *
+     * @param  string $ip - IP-Adresse
+     *
+     * @return bool
+     */
+    public static function isExitNode($ip) {
+        self::init();
 
-      if (!is_string($ip)) throw new IllegalTypeException('Illegal type of parameter $ip: '.getType($ip));
+        if (!is_string($ip)) throw new IllegalTypeException('Illegal type of parameter $ip: '.getType($ip));
 
-      // TODO: mit Filter-Extension lokale Netze abfangen
-      if ($ip == '127.0.0.1')
-         return false;
+        // TODO: mit Filter-Extension lokale Netze abfangen
+        if ($ip == '127.0.0.1')
+            return false;
 
-      $nodes =& self::getExitNodes();
-      return isSet($nodes[$ip]);
-   }
+        $nodes =& self::getExitNodes();
+        return isSet($nodes[$ip]);
+    }
 
 
-   /**
-    * Gibt die aktuellen Exit-Nodes zurueck.
-    *
-    * @return array - assoziatives Array mit den IP-Adressen aller Exit-Nodes
-    */
-   private static function &getExitNodes() {
-      $cache = Cache::me(__CLASS__);
-      $nodes = $cache->get($key='tor_exit_nodes');
+    /**
+     * Gibt die aktuellen Exit-Nodes zurueck.
+     *
+     * @return array - assoziatives Array mit den IP-Adressen aller Exit-Nodes
+     */
+    private static function &getExitNodes() {
+        $cache = Cache::me(__CLASS__);
+        $nodes = $cache->get($key='tor_exit_nodes');
 
-      if ($nodes == null) {
-         $lock = new Lock();              // Einlesen der Nodes synchronisieren
-            $nodes = $cache->get($key);
+        if ($nodes == null) {
+            $lock = new Lock();              // Einlesen der Nodes synchronisieren
+                $nodes = $cache->get($key);
 
-            if ($nodes == null) {
-               $content = null;
-               $size = sizeOf(self::$torMirrors);
+                if ($nodes == null) {
+                    $content = null;
+                    $size = sizeOf(self::$torMirrors);
 
-               for ($i=0; $i < $size; ++$i) {
-                  $request = HttpRequest::create()->setUrl('http://'.self::$torMirrors[$i].'/ip_list_exit.php/Tor_ip_list_EXIT.csv');
-                  try {
-                     // TODO: Warnung ausgeben und Reihenfolge aendern, wenn ein Server nicht antwortet
-                     $response = CurlHttpClient::create()
+                    for ($i=0; $i < $size; ++$i) {
+                        $request = HttpRequest::create()->setUrl('http://'.self::$torMirrors[$i].'/ip_list_exit.php/Tor_ip_list_EXIT.csv');
+                        try {
+                            // TODO: Warnung ausgeben und Reihenfolge aendern, wenn ein Server nicht antwortet
+                            $response = CurlHttpClient::create()
                                                ->send($request);
-                     $status = $response->getStatus();
+                            $status = $response->getStatus();
 
-                     if ($status != 200) {
-                        self::$logNotice && Logger::log('Could not get TOR exit nodes from '.self::$torMirrors[$i].', HTTP status '.$status.' ('.HttpResponse ::$sc[$status]."),\n url: ".$request->getUrl(), L_NOTICE);
-                        continue;
-                     }
-                  }
-                  catch (IOException $ex) {
-                     self::$logNotice && Logger::log('Could not get TOR exit nodes from '.self::$torMirrors[$i], L_NOTICE, ['exception'=>$ex]);
-                     continue;
-                  }
+                            if ($status != 200) {
+                                self::$logNotice && Logger::log('Could not get TOR exit nodes from '.self::$torMirrors[$i].', HTTP status '.$status.' ('.HttpResponse ::$sc[$status]."),\n url: ".$request->getUrl(), L_NOTICE);
+                                continue;
+                            }
+                        }
+                        catch (IOException $ex) {
+                            self::$logNotice && Logger::log('Could not get TOR exit nodes from '.self::$torMirrors[$i], L_NOTICE, ['exception'=>$ex]);
+                            continue;
+                        }
 
-                  $content = trim($response->getContent());
-                  break;
-               }
+                        $content = trim($response->getContent());
+                        break;
+                    }
 
-               $nodes = strLen($content) ? array_flip(explode("\n", normalizeEOL($content))) : array();
+                    $nodes = strLen($content) ? array_flip(explode("\n", normalizeEOL($content))) : array();
 
-               if (!$nodes) Logger::log('Could not get TOR exit nodes from any server', L_ERROR);
+                    if (!$nodes) Logger::log('Could not get TOR exit nodes from any server', L_ERROR);
 
-               $cache->set($key, $nodes, 30 * MINUTES);
-            }
+                    $cache->set($key, $nodes, 30 * MINUTES);
+                }
 
-         $lock->release();
-      }
-      return $nodes;
-   }
+            $lock->release();
+        }
+        return $nodes;
+    }
 }

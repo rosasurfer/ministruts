@@ -4,22 +4,22 @@
 <struts-config view-base="app/view">
 
 
-   <!-- =============================================== Action Mappings ================================================= -->
-   <action-mappings>
-      <mapping path="/"  include=".home"/>
-   </action-mappings>
+    <!-- =============================================== Action Mappings ================================================= -->
+    <action-mappings>
+    	<mapping path="/"  include=".home"/>
+    </action-mappings>
 
                                                           
-   <!-- ==================================================== Tiles ====================================================== -->
-   <tiles>
-      <!-- default layout -->
-      <tile name=".default" file="layouts/default.phtml"/>
+    <!-- ==================================================== Tiles ====================================================== -->
+    <tiles>
+    	<!-- default layout -->
+    	<tile name=".default" file="layouts/default.phtml"/>
 
 
-      <!-- home -->
-      <tile name=".home"  extends-tile=".default">
-         <set name="content"  value="tiles/home.phtml"/>
-      </tile>
-   </tiles>
+    	<!-- home -->
+    	<tile name=".home"  extends-tile=".default">
+    		<set name="content"  value="tiles/home.phtml"/>
+    	</tile>
+    </tiles>
 
 </struts-config>

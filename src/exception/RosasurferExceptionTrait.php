@@ -12,83 +12,83 @@ use const rosasurfer\NL;
 trait RosasurferExceptionTrait {
 
 
-   /** @var string - better message */
-   private $betterMessage;
+    /** @var string - better message */
+    private $betterMessage;
 
-   /** @var string - better stacktrace as string */
-   private $betterTraceAsString;
-
-
-   /**
-    * Add a message to the exception's existing message. Used during up-bubbling to add additional information to an
-    * exception's original message.
-    *
-    * @param  string $message
-    *
-    * @return self
-    */
-   public function addMessage($message) {
-      $this->message = trim(trim($this->message).NL.$message);
-      return $this;
-   }
+    /** @var string - better stacktrace as string */
+    private $betterTraceAsString;
 
 
-   /**
-    * Set the error code of the exception. Used during up-bubbling to add additional information to the instance.
-    * Ignored if the exception's error code is already set.
-    *
-    * @param  mixed $code
-    *
-    * @return self
-    */
-   public function setCode($code) {
-      if (!isSet($this->code)) {
-         $this->code = $code;
-      }
-      return $this;
-   }
+    /**
+     * Add a message to the exception's existing message. Used during up-bubbling to add additional information to an
+     * exception's original message.
+     *
+     * @param  string $message
+     *
+     * @return self
+     */
+    public function addMessage($message) {
+        $this->message = trim(trim($this->message).NL.$message);
+        return $this;
+    }
 
 
-   /**
-    * Return the exception's message in a more readable way.
-    *
-    * @return string - message
-    */
-   public function getBetterMessage() {
-      if (!$this->betterMessage)
-         $this->betterMessage = DebugHelper::composeBetterMessage($this);
-      return $this->betterMessage;
-   }
+    /**
+     * Set the error code of the exception. Used during up-bubbling to add additional information to the instance.
+     * Ignored if the exception's error code is already set.
+     *
+     * @param  mixed $code
+     *
+     * @return self
+     */
+    public function setCode($code) {
+        if (!isSet($this->code)) {
+            $this->code = $code;
+        }
+        return $this;
+    }
 
 
-   /**
-    * Return a text representation of the exception's stacktrace in a more readable way (Java-like).
-    *
-    * @return string
-    */
-   public function getBetterTraceAsString() {
-      if (!$this->betterTraceAsString)
-         $this->betterTraceAsString = DebugHelper::getBetterTraceAsString($this);
-      return $this->betterTraceAsString;
-   }
+    /**
+     * Return the exception's message in a more readable way.
+     *
+     * @return string - message
+     */
+    public function getBetterMessage() {
+        if (!$this->betterMessage)
+            $this->betterMessage = DebugHelper::composeBetterMessage($this);
+        return $this->betterMessage;
+    }
 
 
-   /**
-    * Return the name of the function (if any) where the exception was raised.
-    *
-    * @return string
-    */
-   public function getFunctionName() {
-      return DebugHelper::getFQFunctionName($this->getBetterTrace()[0]);
-   }
+    /**
+     * Return a text representation of the exception's stacktrace in a more readable way (Java-like).
+     *
+     * @return string
+     */
+    public function getBetterTraceAsString() {
+        if (!$this->betterTraceAsString)
+            $this->betterTraceAsString = DebugHelper::getBetterTraceAsString($this);
+        return $this->betterTraceAsString;
+    }
 
 
-   /**
-    * Return a description of the exception.
-    *
-    * @return string - description
-    */
-   public function __toString() {
-      return $this->getBetterMessage();
-   }
+    /**
+     * Return the name of the function (if any) where the exception was raised.
+     *
+     * @return string
+     */
+    public function getFunctionName() {
+        return DebugHelper::getFQFunctionName($this->getBetterTrace()[0]);
+    }
+
+
+    /**
+     * Return a description of the exception.
+     *
+     * @return string - description
+     */
+    public function __toString() {
+        return $this->getBetterMessage();
+    }
 }

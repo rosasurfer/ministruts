@@ -43,74 +43,74 @@ use rosasurfer\exception\InvalidArgumentException;
 abstract class Dependency extends Object {
 
 
-   /** @var int - Mindestgueltigkeit */
-   private $minValidity = 0;
+    /** @var int - Mindestgueltigkeit */
+    private $minValidity = 0;
 
 
-   /**
-    * Ob das zu ueberwachende Ereignis oder ein Zustandswechsel eingetreten sind oder nicht.
-    *
-    * @return bool - TRUE, wenn die Abhaengigkeit weiterhin erfuellt ist.
-    *                FALSE, wenn der Zustandswechsel eingetreten ist und die Abhaengigkeit nicht mehr erfuellt ist.
-    */
-   abstract public function isValid();
+    /**
+     * Ob das zu ueberwachende Ereignis oder ein Zustandswechsel eingetreten sind oder nicht.
+     *
+     * @return bool - TRUE, wenn die Abhaengigkeit weiterhin erfuellt ist.
+     *                FALSE, wenn der Zustandswechsel eingetreten ist und die Abhaengigkeit nicht mehr erfuellt ist.
+     */
+    abstract public function isValid();
 
 
-   /**
-    * Kombiniert diese Abhaengigkeit mit einer weiteren durch ein logisches UND (AND).
-    *
-    * @param  Dependency $dependency - Abhaengigkeit
-    *
-    * @return ChainedDependency
-    */
-   public function andDependency(Dependency $dependency) {
-      if ($dependency === $this)
-         return $this;
+    /**
+     * Kombiniert diese Abhaengigkeit mit einer weiteren durch ein logisches UND (AND).
+     *
+     * @param  Dependency $dependency - Abhaengigkeit
+     *
+     * @return ChainedDependency
+     */
+    public function andDependency(Dependency $dependency) {
+        if ($dependency === $this)
+            return $this;
 
-      return ChainedDependency::create($this)
-                              ->andDependency($dependency);
-   }
-
-
-   /**
-    * Kombiniert diese Abhaengigkeit mit einer weiteren durch ein logisches ODER (OR).
-    *
-    * @param  Dependency $dependency - Abhaengigkeit
-    *
-    * @return ChainedDependency
-    */
-   public function orDependency(Dependency $dependency) {
-      if ($dependency === $this)
-         return $this;
-
-      return ChainedDependency::create($this)
-                              ->orDependency($dependency);
-   }
+        return ChainedDependency::create($this)
+                                        ->andDependency($dependency);
+    }
 
 
-   /**
-    * Gibt die Mindestgueltigkeit dieser Abhaengigkeit zurueck.
-    *
-    * @return int - Mindestgueltigkeit in Sekunden
-    */
-   public function getMinValidity() {
-      return $this->minValidity;
-   }
+    /**
+     * Kombiniert diese Abhaengigkeit mit einer weiteren durch ein logisches ODER (OR).
+     *
+     * @param  Dependency $dependency - Abhaengigkeit
+     *
+     * @return ChainedDependency
+     */
+    public function orDependency(Dependency $dependency) {
+        if ($dependency === $this)
+            return $this;
+
+        return ChainedDependency::create($this)
+                                        ->orDependency($dependency);
+    }
 
 
-   /**
-    * Setzt die Mindestgueltigkeit dieser Abhaengigkeit.
-    *
-    * @param  int $time - Mindestgueltigkeit in Sekunden
-    *
-    * @return ChainedDependency
-    */
-   public function setMinValidity($time) {
-      if (!is_int($time)) throw new IllegalTypeException('Illegal type of parameter $time: '.getType($time));
-      if ($time < 0)      throw new InvalidArgumentException('Invalid argument $time: '.$time);
+    /**
+     * Gibt die Mindestgueltigkeit dieser Abhaengigkeit zurueck.
+     *
+     * @return int - Mindestgueltigkeit in Sekunden
+     */
+    public function getMinValidity() {
+        return $this->minValidity;
+    }
 
-      $this->minValidity = $time;
 
-      return $this;
-   }
+    /**
+     * Setzt die Mindestgueltigkeit dieser Abhaengigkeit.
+     *
+     * @param  int $time - Mindestgueltigkeit in Sekunden
+     *
+     * @return ChainedDependency
+     */
+    public function setMinValidity($time) {
+        if (!is_int($time)) throw new IllegalTypeException('Illegal type of parameter $time: '.getType($time));
+        if ($time < 0)      throw new InvalidArgumentException('Invalid argument $time: '.$time);
+
+        $this->minValidity = $time;
+
+        return $this;
+    }
 }

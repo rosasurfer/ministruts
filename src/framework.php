@@ -30,32 +30,32 @@ require(MINISTRUTS_ROOT.'/src/ministruts/defines.php');
  * - The registration is wrapped in a function call to scope isolate its execution.
  */
 function registerClassLoader() {
-   // check for an existing legacy auto-loader
-   $legacyAutoLoad = function_exists('__autoload');
-   if ($legacyAutoLoad) {
-      $splLoaders = spl_autoload_functions();
-      if ($splLoaders) {
-         $legacyAutoLoad = (sizeOf($splLoaders)==1 && $splLoaders[0]=='__autoload');
-      }
-   }
+    // check for an existing legacy auto-loader
+    $legacyAutoLoad = function_exists('__autoload');
+    if ($legacyAutoLoad) {
+        $splLoaders = spl_autoload_functions();
+        if ($splLoaders) {
+            $legacyAutoLoad = (sizeOf($splLoaders)==1 && $splLoaders[0]=='__autoload');
+        }
+    }
 
-   // create a bootstrap loader for the class rosasurfer\loader\ClassLoader
-   $bootstrap = function($class) {
-      switch ($class) {
-         case Object::class:      require(MINISTRUTS_ROOT.'/src/core/Object.php'       ); break;
-         case ClassLoader::class: require(MINISTRUTS_ROOT.'/src/loader/ClassLoader.php'); break;
-      }
-   };
-   spl_autoload_register($bootstrap, $throw=true, $prepend=true);
+    // create a bootstrap loader for the class rosasurfer\loader\ClassLoader
+    $bootstrap = function($class) {
+        switch ($class) {
+            case Object::class:      require(MINISTRUTS_ROOT.'/src/core/Object.php'       ); break;
+            case ClassLoader::class: require(MINISTRUTS_ROOT.'/src/loader/ClassLoader.php'); break;
+        }
+    };
+    spl_autoload_register($bootstrap, $throw=true, $prepend=true);
 
-   // instantiate and register the framework's class loader
-   $loader = new ClassLoader();
-   $loader->register();
-   spl_autoload_unregister($bootstrap);
+    // instantiate and register the framework's class loader
+    $loader = new ClassLoader();
+    $loader->register();
+    spl_autoload_unregister($bootstrap);
 
-   // register an otherwise lost legacy auto-loader
-   if ($legacyAutoLoad && spl_autoload_functions()[0]!='__autoload') {
-      spl_autoload_register('__autoload', $throw=true, $prepend=true);
-   }
+    // register an otherwise lost legacy auto-loader
+    if ($legacyAutoLoad && spl_autoload_functions()[0]!='__autoload') {
+        spl_autoload_register('__autoload', $throw=true, $prepend=true);
+    }
 }
 registerClassLoader();

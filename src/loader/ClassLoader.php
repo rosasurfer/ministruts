@@ -12,61 +12,61 @@ use const rosasurfer\MINISTRUTS_ROOT;
 class ClassLoader extends Object {
 
 
-   /** @var string[] - class map */
-   private $classMap;
+    /** @var string[] - class map */
+    private $classMap;
 
-   /** @var bool - whether or not this instance is registered */
-   private $registered;
-
-
-   /**
-    * Constructor
-    */
-   public function __construct() {
-      // initialize a case-insensitive class map
-      $classMap = require(MINISTRUTS_ROOT.'/etc/vendor/composer/autoload_classmap.php');
-      $this->classMap = array_change_key_case($classMap, CASE_LOWER);
-   }
+    /** @var bool - whether or not this instance is registered */
+    private $registered;
 
 
-   /**
-    * Register this instance.
-    *
-    * @return $this
-    */
-   public function register() {
-      if (!$this->registered) {
-         spl_autoload_register([$this, 'autoLoad'], $throw=true, $prepend=false);
-         $this->registered = true;
-      }
-      return $this;
-   }
+    /**
+     * Constructor
+     */
+    public function __construct() {
+        // initialize a case-insensitive class map
+        $classMap = require(MINISTRUTS_ROOT.'/etc/vendor/composer/autoload_classmap.php');
+        $this->classMap = array_change_key_case($classMap, CASE_LOWER);
+    }
 
 
-   /**
-    * Unregister this instance.
-    *
-    * @return $this
-    */
-   public function unregister() {
-      if ($this->registered) {
-         spl_autoload_unregister([$this, 'autoLoad']);
-         $this->registered = false;
-      }
-      return $this;
-   }
+    /**
+     * Register this instance.
+     *
+     * @return $this
+     */
+    public function register() {
+        if (!$this->registered) {
+            spl_autoload_register([$this, 'autoLoad'], $throw=true, $prepend=false);
+            $this->registered = true;
+        }
+        return $this;
+    }
 
 
-   /**
-    * Load the specified class.
-    *
-    * @param  string $class
-    */
-   public function autoLoad($class) {
-      $lowerClass = strToLower($class);
+    /**
+     * Unregister this instance.
+     *
+     * @return $this
+     */
+    public function unregister() {
+        if ($this->registered) {
+            spl_autoload_unregister([$this, 'autoLoad']);
+            $this->registered = false;
+        }
+        return $this;
+    }
 
-      if (isSet($this->classMap[$lowerClass])) {
-         include($this->classMap[$lowerClass]);
-      }
-   }
+
+    /**
+     * Load the specified class.
+     *
+     * @param  string $class
+     */
+    public function autoLoad($class) {
+        $lowerClass = strToLower($class);
+
+        if (isSet($this->classMap[$lowerClass])) {
+            include($this->classMap[$lowerClass]);
+        }
+    }
 }

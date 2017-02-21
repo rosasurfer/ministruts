@@ -12,13 +12,13 @@ use rosasurfer\exception\UnimplementedFeatureException;
 class ClickatellMessenger {
 
 
-   /**
-    * Send an SMS.
-    *
-    * @param  string $receiver - phone number
-    * @param  string $message  - message
+    /**
+     * Send an SMS.
+     *
+     * @param  string $receiver - phone number
+     * @param  string $message  - message
    */
-   public function sendMessage($receiver, $message) {
-      throw new UnimplementedFeatureException(__METHOD__.'() not yet implemented');
-   }
+    public function sendMessage($receiver, $message) {
+        throw new UnimplementedFeatureException(__METHOD__.'() not yet implemented');
+    }
 }

@@ -91,7 +91,7 @@ const EOL_WINDOWS       = \rosasurfer\EOL_WINDOWS;             // "\r\n"     CRL
  * @return string|null - string if the result is to be returned, NULL otherwise
  */
 function dump($var, $return=false, $flushBuffers=true) {
-   return \rosasurfer\dump($var, $return, $flushBuffers);
+    return \rosasurfer\dump($var, $return, $flushBuffers);
 }
 
 
@@ -102,7 +102,7 @@ function dump($var, $return=false, $flushBuffers=true) {
  * @param  bool  $flushBuffers - whether or not to flush output buffers (default: TRUE)
  */
 function echof($var, $flushBuffers=true) {
-   \rosasurfer\echof($var, $flushBuffers);
+    \rosasurfer\echof($var, $flushBuffers);
 }
 
 
@@ -117,7 +117,7 @@ function echof($var, $flushBuffers=true) {
  * @see    printPretty()
  */
 function echoPre($var, $flushBuffers=true) {
-   \rosasurfer\echoPre($var, $flushBuffers);
+    \rosasurfer\echoPre($var, $flushBuffers);
 }
 
 
@@ -136,7 +136,7 @@ function echoPre($var, $flushBuffers=true) {
  * @see    printPretty()
  */
 function pp($var, $return=false, $flushBuffers=true) {
-   return \rosasurfer\pp($var, $return, $flushBuffers);
+    return \rosasurfer\pp($var, $return, $flushBuffers);
 }
 
 
@@ -151,7 +151,7 @@ function pp($var, $return=false, $flushBuffers=true) {
  * @return string|null - string if the result is to be returned, NULL otherwise
  */
 function printPretty($var, $return=false, $flushBuffers=true) {
-   return \rosasurfer\printPretty($var, $return, $flushBuffers);
+    return \rosasurfer\printPretty($var, $return, $flushBuffers);
 }
 
 
@@ -163,7 +163,7 @@ function printPretty($var, $return=false, $flushBuffers=true) {
  * @return string - formatted byte value
  */
 function prettyBytes($value) {
-   return \rosasurfer\prettyBytes($value);
+    return \rosasurfer\prettyBytes($value);
 }
 
 
@@ -173,7 +173,7 @@ function prettyBytes($value) {
  * @return bool
  */
 function isLittleEndian() {
-   return \rosasurfer\isLittleEndian();
+    return \rosasurfer\isLittleEndian();
 }
 
 
@@ -187,7 +187,7 @@ function isLittleEndian() {
  * @return bool
  */
 function strCompare($stringA, $stringB, $ignoreCase=false) {
-   return \rosasurfer\strCompare($stringA, $stringB, $ignoreCase);
+    return \rosasurfer\strCompare($stringA, $stringB, $ignoreCase);
 }
 
 
@@ -200,7 +200,7 @@ function strCompare($stringA, $stringB, $ignoreCase=false) {
  * @return bool
  */
 function strCompareI($stringA, $stringB) {
-   return \rosasurfer\strCompareI($stringA, $stringB);
+    return \rosasurfer\strCompareI($stringA, $stringB);
 }
 
 
@@ -214,7 +214,7 @@ function strCompareI($stringA, $stringB) {
  * @return bool
  */
 function strContains($haystack, $needle, $ignoreCase=false) {
-   return \rosasurfer\strContains($haystack, $needle, $ignoreCase);
+    return \rosasurfer\strContains($haystack, $needle, $ignoreCase);
 }
 
 
@@ -227,7 +227,7 @@ function strContains($haystack, $needle, $ignoreCase=false) {
  * @return bool
  */
 function strContainsI($haystack, $needle) {
-   return \rosasurfer\strContainsI($haystack, $needle);
+    return \rosasurfer\strContainsI($haystack, $needle);
 }
 
 
@@ -242,7 +242,7 @@ function strContainsI($haystack, $needle) {
  * @return bool
  */
 function strStartsWith($string, $prefix, $ignoreCase=false) {
-   return \rosasurfer\strStartsWith($string, $prefix, $ignoreCase);
+    return \rosasurfer\strStartsWith($string, $prefix, $ignoreCase);
 }
 
 
@@ -256,7 +256,7 @@ function strStartsWith($string, $prefix, $ignoreCase=false) {
  * @return bool
  */
 function strStartsWithI($string, $prefix) {
-   return \rosasurfer\strStartsWithI($string, $prefix);
+    return \rosasurfer\strStartsWithI($string, $prefix);
 }
 
 
@@ -271,7 +271,7 @@ function strStartsWithI($string, $prefix) {
  * @return bool
  */
 function strEndsWith($string, $suffix, $ignoreCase=false) {
-   return \rosasurfer\strEndsWith($string, $suffix, $ignoreCase);
+    return \rosasurfer\strEndsWith($string, $suffix, $ignoreCase);
 }
 
 
@@ -285,7 +285,7 @@ function strEndsWith($string, $suffix, $ignoreCase=false) {
  * @return bool
  */
 function strEndsWithI($string, $suffix) {
-   return \rosasurfer\strEndsWithI($string, $suffix);
+    return \rosasurfer\strEndsWithI($string, $suffix);
 }
 
 
@@ -305,7 +305,7 @@ function strEndsWithI($string, $suffix) {
  * </pre>
  */
 function strLeft($string, $length) {
-   return \rosasurfer\strLeft($string, $length);
+    return \rosasurfer\strLeft($string, $length);
 }
 
 
@@ -337,7 +337,7 @@ function strLeft($string, $length) {
  * </pre>
  */
 function strLeftTo($string, $limiter, $count=1, $includeLimiter=false, $onNotFound=null) {
-   return \rosasurfer\strLeftTo(...func_get_args());
+    return \rosasurfer\strLeftTo(...func_get_args());
 }
 
 
@@ -357,7 +357,7 @@ function strLeftTo($string, $limiter, $count=1, $includeLimiter=false, $onNotFou
  * </pre>
  */
 function strRight($string, $length) {
-   return \rosasurfer\strRight($string, $length);
+    return \rosasurfer\strRight($string, $length);
 }
 
 
@@ -388,7 +388,7 @@ function strRight($string, $length) {
  * </pre>
  */
 function strRightFrom($string, $limiter, $count=1, $includeLimiter=false, $onNotFound=null) {
-   return \rosasurfer\strRightFrom(...func_get_args());
+    return \rosasurfer\strRightFrom(...func_get_args());
 }
 
 
@@ -400,7 +400,7 @@ function strRightFrom($string, $limiter, $count=1, $includeLimiter=false, $onNot
  * @return bool
  */
 function strIsQuoted($value) {
-   return \rosasurfer\strIsQuoted($value);
+    return \rosasurfer\strIsQuoted($value);
 }
 
 
@@ -412,7 +412,7 @@ function strIsQuoted($value) {
  * @return bool
  */
 function strIsSingleQuoted($value) {
-   return \rosasurfer\strIsSingleQuoted($value);
+    return \rosasurfer\strIsSingleQuoted($value);
 }
 
 
@@ -424,7 +424,7 @@ function strIsSingleQuoted($value) {
  * @return bool
  */
 function strIsDoubleQuoted($value) {
-   return \rosasurfer\strIsDoubleQuoted($value);
+    return \rosasurfer\strIsDoubleQuoted($value);
 }
 
 
@@ -436,7 +436,7 @@ function strIsDoubleQuoted($value) {
  * @return bool
  */
 function strIsDigits($value) {
-   return \rosasurfer\strIsDigits($value);
+    return \rosasurfer\strIsDigits($value);
 }
 
 
@@ -450,7 +450,7 @@ function strIsDigits($value) {
  * @return bool
  */
 function strIsNumeric($value) {
-   return \rosasurfer\strIsNumeric($value);
+    return \rosasurfer\strIsNumeric($value);
 }
 
 
@@ -463,7 +463,7 @@ function strIsNumeric($value) {
  *                     numerical string representation (integer or float) are 0 (zero) and 1 (one).
  */
 function strToBool($value) {
-   return \rosasurfer\strToBool($value);
+    return \rosasurfer\strToBool($value);
 }
 
 
@@ -481,7 +481,7 @@ function strToBool($value) {
  * @return string
  */
 function normalizeEOL($string, $mode = EOL_UNIX) {
-   return \rosasurfer\normalizeEOL($string, $mode);
+    return \rosasurfer\normalizeEOL($string, $mode);
 }
 
 
@@ -493,7 +493,7 @@ function normalizeEOL($string, $mode = EOL_UNIX) {
  * @return string
  */
 function typeOf($var) {
-   return \rosasurfer\typeOf($var);
+    return \rosasurfer\typeOf($var);
 }
 
 
@@ -505,7 +505,7 @@ function typeOf($var) {
  *                                         (default: 0770 = rwxrwx---)
  */
 function mkDirWritable($path, $mode=0770) {
-   return \rosasurfer\mkDirWritable($path, $mode);
+    return \rosasurfer\mkDirWritable($path, $mode);
 }
 
 
@@ -518,7 +518,7 @@ function mkDirWritable($path, $mode=0770) {
  * @return bool
  */
 function is_class($name) {
-   return \rosasurfer\is_class($name);
+    return \rosasurfer\is_class($name);
 }
 
 
@@ -531,7 +531,7 @@ function is_class($name) {
  * @return bool
  */
 function is_interface($name) {
-   return \rosasurfer\is_interface($name);
+    return \rosasurfer\is_interface($name);
 }
 
 
@@ -544,7 +544,7 @@ function is_interface($name) {
  * @return bool
  */
 function is_trait($name) {
-   return \rosasurfer\is_trait($name);
+    return \rosasurfer\is_trait($name);
 }
 
 
@@ -556,7 +556,7 @@ function is_trait($name) {
  * @return string metatype
  */
 function metatypeOf($name) {
-   return \rosasurfer\metatypeOf($name);
+    return \rosasurfer\metatypeOf($name);
 }
 
 
@@ -578,7 +578,7 @@ function metatypeOf($name) {
  * @see    rosasurfer\util\Validator::isDateTime()
  */
 function is_datetime($string, $format='Y-m-d') {
-   return \rosasurfer\is_datetime($string, $format);
+    return \rosasurfer\is_datetime($string, $format);
 }
 
 
@@ -590,7 +590,7 @@ function is_datetime($string, $format='Y-m-d') {
  * @return bool - TRUE
  */
 function _true($value=null) {
-   return \rosasurfer\_true($value);
+    return \rosasurfer\_true($value);
 }
 
 
@@ -603,7 +603,7 @@ function _true($value=null) {
  * @return mixed
  */
 function ifTrue($value, $altValue) {
-   return \rosasurfer\ifTrue($value, $altValue);
+    return \rosasurfer\ifTrue($value, $altValue);
 }
 
 
@@ -615,7 +615,7 @@ function ifTrue($value, $altValue) {
  * @return bool - FALSE
  */
 function _false($value=null) {
-   return \rosasurfer\_false($value);
+    return \rosasurfer\_false($value);
 }
 
 
@@ -628,7 +628,7 @@ function _false($value=null) {
  * @return mixed
  */
 function ifFalse($value, $altValue) {
-   return \rosasurfer\ifFalse($value, $altValue);
+    return \rosasurfer\ifFalse($value, $altValue);
 }
 
 
@@ -640,7 +640,7 @@ function ifFalse($value, $altValue) {
  * @return NULL
  */
 function _null($value=null) {
-   return \rosasurfer\_null($value);
+    return \rosasurfer\_null($value);
 }
 
 
@@ -655,7 +655,7 @@ function _null($value=null) {
  * @see    is_null()
  */
 function ifNull($value, $altValue) {
-   return \rosasurfer\ifNull($value, $altValue);
+    return \rosasurfer\ifNull($value, $altValue);
 }
 
 
@@ -670,7 +670,7 @@ function ifNull($value, $altValue) {
  * @see    empty()
  */
 function ifEmpty($value, $altValue) {
-   return \rosasurfer\ifEmpty($value, $altValue);
+    return \rosasurfer\ifEmpty($value, $altValue);
 }
 
 
@@ -685,7 +685,7 @@ function ifEmpty($value, $altValue) {
  * @see    ksort()
  */
 function ksort_r(array $values, $sort_flags=SORT_REGULAR) {
-   return \rosasurfer\ksort_r($values, $sort_flags);
+    return \rosasurfer\ksort_r($values, $sort_flags);
 }
 
 
@@ -699,7 +699,7 @@ function ksort_r(array $values, $sort_flags=SORT_REGULAR) {
  * @return string
  */
 function pluralize($count, $singular='', $plural='s') {
-   return \rosasurfer\pluralize($count, $singular, $plural);
+    return \rosasurfer\pluralize($count, $singular, $plural);
 }
 
 
@@ -715,7 +715,7 @@ function pluralize($count, $singular='', $plural='s') {
  * @return Url
  */
 function url($uri) {
-   return \rosasurfer\url($uri);
+    return \rosasurfer\url($uri);
 }
 
 
@@ -731,5 +731,5 @@ function url($uri) {
  * @return VersionedUrl
  */
 function versionedUrl($uri) {
-   return \rosasurfer\versionedUrl($uri);
+    return \rosasurfer\versionedUrl($uri);
 }

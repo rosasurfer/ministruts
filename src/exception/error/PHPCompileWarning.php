@@ -8,12 +8,12 @@ namespace rosasurfer\exception\error;
 class PHPCompileWarning extends PHPError {
 
 
-   /**
-    * Return the simple PHP type description of this PHPError.
-    *
-    * @return string
-    */
-   public function getSimpleType() {
-      return 'PHP Compile Warning';
-   }
+    /**
+     * Return the simple PHP type description of this PHPError.
+     *
+     * @return string
+     */
+    public function getSimpleType() {
+        return 'PHP Compile Warning';
+    }
 }

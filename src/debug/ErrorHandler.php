@@ -41,164 +41,164 @@ use const rosasurfer\NL;
 class ErrorHandler extends StaticClass {
 
 
-   /** @var int - error handling mode in which regular PHP errors are logged */
-   const LOG_ERRORS       = 1;
+    /** @var int - error handling mode in which regular PHP errors are logged */
+    const LOG_ERRORS       = 1;
 
-   /** @var int - error handling mode in which regular PHP errors are converted to exceptions and thrown back */
-   const THROW_EXCEPTIONS = 2;
-
-
-   /** @var callable - the registered error handler */
-   private static $errorHandler;
-
-   /** @var int - the mode the error handler is configured for, can be either self::LOG_ERRORS or self::THROW_EXCEPTIONS */
-   private static $errorMode;
-
-   /** @var callable - the registered exception handler */
-   private static $exceptionHandler;
-
-   /** @var bool - whether or not the script is in the shutdown phase */
-   private static $inShutdown;
+    /** @var int - error handling mode in which regular PHP errors are converted to exceptions and thrown back */
+    const THROW_EXCEPTIONS = 2;
 
 
-   /**
-    * Get the registered error handler (if any).
-    *
-    * @return callable
-    */
-   public static function getErrorHandler() {
-      return self::$errorHandler;
-   }
+    /** @var callable - the registered error handler */
+    private static $errorHandler;
+
+    /** @var int - the mode the error handler is configured for, can be either self::LOG_ERRORS or self::THROW_EXCEPTIONS */
+    private static $errorMode;
+
+    /** @var callable - the registered exception handler */
+    private static $exceptionHandler;
+
+    /** @var bool - whether or not the script is in the shutdown phase */
+    private static $inShutdown;
 
 
-   /**
-    * Get the registered exception handler (if any).
-    *
-    * @return callable
-    */
-   public static function getExceptionHandler() {
-      return self::$exceptionHandler;
-   }
+    /**
+     * Get the registered error handler (if any).
+     *
+     * @return callable
+     */
+    public static function getErrorHandler() {
+        return self::$errorHandler;
+    }
 
 
-   /**
-    * Whether or not the script is in the shutdown phase.
-    *
-    * @return bool
-    */
-   public static function isInShutdown() {
-      return (bool) self::$inShutdown;
-   }
+    /**
+     * Get the registered exception handler (if any).
+     *
+     * @return callable
+     */
+    public static function getExceptionHandler() {
+        return self::$exceptionHandler;
+    }
 
 
-   /**
-    * Setup global error handling.
-    *
-    * @param  int $mode - mode the error handler to setup for
-    *                     can be either self::LOG_ERRORS or self::THROW_EXCEPTIONS
-    */
-   public static function setupErrorHandling($mode) {
-      if     ($mode === self::LOG_ERRORS      ) self::$errorMode = self::LOG_ERRORS;
-      elseif ($mode === self::THROW_EXCEPTIONS) self::$errorMode = self::THROW_EXCEPTIONS;
-      else                                      return;
-
-      set_error_handler(self::$errorHandler=__CLASS__.'::handleError', E_ALL);   // E_ALL because error_reporting()
-   }                                                                             // may change at runtime
+    /**
+     * Whether or not the script is in the shutdown phase.
+     *
+     * @return bool
+     */
+    public static function isInShutdown() {
+        return (bool) self::$inShutdown;
+    }
 
 
-   /**
-    * Setup global exception handling.
-    */
-   public static function setupExceptionHandling() {
-      set_exception_handler(self::$exceptionHandler=__CLASS__.'::handleException');
+    /**
+     * Setup global error handling.
+     *
+     * @param  int $mode - mode the error handler to setup for
+     *                     can be either self::LOG_ERRORS or self::THROW_EXCEPTIONS
+     */
+    public static function setupErrorHandling($mode) {
+        if     ($mode === self::LOG_ERRORS      ) self::$errorMode = self::LOG_ERRORS;
+        elseif ($mode === self::THROW_EXCEPTIONS) self::$errorMode = self::THROW_EXCEPTIONS;
+        else                                      return;
 
-      /**
+        set_error_handler(self::$errorHandler=__CLASS__.'::handleError', E_ALL);   // E_ALL because error_reporting()
+    }                                                                             // may change at runtime
+
+
+    /**
+     * Setup global exception handling.
+     */
+    public static function setupExceptionHandling() {
+        set_exception_handler(self::$exceptionHandler=__CLASS__.'::handleException');
+
+        /**
        * Detect entering of the script's shutdown phase to be capable of handling destructor exceptions during shutdown
        * differently and avoid otherwise fatal errors. Should be the very first function on the shutdown function stack.
        *
        * @see  http://php.net/manual/en/language.oop5.decon.php
        * @see  ErrorHandler::handleDestructorException()
        */
-      register_shutdown_function(function() {
-         self::$inShutdown = true;
-      });
-   }
+        register_shutdown_function(function() {
+            self::$inShutdown = true;
+        });
+    }
 
 
-   /**
-    * Global handler for traditional PHP errors.
-    *
-    * Errors are handled only if covered by the currently configured error reporting level. Errors of the levels
-    * E_DEPRECATED, E_USER_DEPRECATED, E_USER_NOTICE and E_USER_WARNING are always logged and script execution
-    * continues normally. All other errors are logged according to the configured error handling mode. Either they
-    * are logged and script exceution continues normally, or they are wrapped in a PHPError exception and thrown back.
-    *
-    * @param  int    $level   - PHP error severity level
-    * @param  string $message - error message
-    * @param  string $file    - name of file where the error occurred
-    * @param  int    $line    - line of file where the error occurred
-    * @param  array  $context - symbols of the point where the error occurred (variable scope at error trigger time)
-    *
-    * @return bool - TRUE,  if the error was successfully handled.
-    *                FALSE, if the error shall be processed as if no error handler was installed.
-    *                The error handler must return FALSE to populate the internal PHP variable <tt>$php_errormsg</tt>.
-    *
-    * @throws PHPError
-    */
-   public static function handleError($level, $message, $file, $line, array $context) {
-      // echoPre(__METHOD__.'()  '.DebugHelper::errorLevelToStr($level).': $message='.$message.', $file='.$file.', $line='.$line);
+    /**
+     * Global handler for traditional PHP errors.
+     *
+     * Errors are handled only if covered by the currently configured error reporting level. Errors of the levels
+     * E_DEPRECATED, E_USER_DEPRECATED, E_USER_NOTICE and E_USER_WARNING are always logged and script execution
+     * continues normally. All other errors are logged according to the configured error handling mode. Either they
+     * are logged and script exceution continues normally, or they are wrapped in a PHPError exception and thrown back.
+     *
+     * @param  int    $level   - PHP error severity level
+     * @param  string $message - error message
+     * @param  string $file    - name of file where the error occurred
+     * @param  int    $line    - line of file where the error occurred
+     * @param  array  $context - symbols of the point where the error occurred (variable scope at error trigger time)
+     *
+     * @return bool - TRUE,  if the error was successfully handled.
+     *                FALSE, if the error shall be processed as if no error handler was installed.
+     *                The error handler must return FALSE to populate the internal PHP variable <tt>$php_errormsg</tt>.
+     *
+     * @throws PHPError
+     */
+    public static function handleError($level, $message, $file, $line, array $context) {
+        // echoPre(__METHOD__.'()  '.DebugHelper::errorLevelToStr($level).': $message='.$message.', $file='.$file.', $line='.$line);
 
-      // (1) Ignore suppressed errors and errors not covered by the current reporting level.
-      $reportingLevel = error_reporting();
-      if (!$reportingLevel)            return false;     // the @ operator was specified
-      if (!($reportingLevel & $level)) return true;      // error is not covered by current reporting level
+        // (1) Ignore suppressed errors and errors not covered by the current reporting level.
+        $reportingLevel = error_reporting();
+        if (!$reportingLevel)            return false;     // the @ operator was specified
+        if (!($reportingLevel & $level)) return true;      // error is not covered by current reporting level
 
-      $logContext['file'] = $file;
-      $logContext['line'] = $line;
+        $logContext['file'] = $file;
+        $logContext['line'] = $line;
 
-      // (2) Process errors according to their severity level.
-      switch ($level) {
-         // always log non-critical and user errors and continue normally (without a stacktrace)
-         case E_DEPRECATED     : return _true(Logger::log($message, L_NOTICE, $logContext));
-         case E_USER_DEPRECATED: return _true(Logger::log($message, L_NOTICE, $logContext));
-         case E_USER_NOTICE    : return _true(Logger::log($message, L_NOTICE, $logContext));
-         case E_USER_WARNING   : return _true(Logger::log($message, L_WARN  , $logContext));
-      }
+        // (2) Process errors according to their severity level.
+        switch ($level) {
+            // always log non-critical and user errors and continue normally (without a stacktrace)
+            case E_DEPRECATED     : return _true(Logger::log($message, L_NOTICE, $logContext));
+            case E_USER_DEPRECATED: return _true(Logger::log($message, L_NOTICE, $logContext));
+            case E_USER_NOTICE    : return _true(Logger::log($message, L_NOTICE, $logContext));
+            case E_USER_WARNING   : return _true(Logger::log($message, L_WARN  , $logContext));
+        }
 
-      // (3) Wrap everything else in the matching PHPError exception.
-      switch ($level) {
-         case E_DEPRECATED       : $exception = new PHPDeprecated      ($message, $code=null, $severity=$level, $file, $line); break;
-         case E_USER_DEPRECATED  : $exception = new PHPUserDeprecated  ($message, $code=null, $severity=$level, $file, $line); break;
-         case E_USER_NOTICE      : $exception = new PHPUserNotice      ($message, $code=null, $severity=$level, $file, $line); break;
-         case E_USER_WARNING     : $exception = new PHPUserWarning     ($message, $code=null, $severity=$level, $file, $line); break;
+        // (3) Wrap everything else in the matching PHPError exception.
+        switch ($level) {
+            case E_DEPRECATED       : $exception = new PHPDeprecated      ($message, $code=null, $severity=$level, $file, $line); break;
+            case E_USER_DEPRECATED  : $exception = new PHPUserDeprecated  ($message, $code=null, $severity=$level, $file, $line); break;
+            case E_USER_NOTICE      : $exception = new PHPUserNotice      ($message, $code=null, $severity=$level, $file, $line); break;
+            case E_USER_WARNING     : $exception = new PHPUserWarning     ($message, $code=null, $severity=$level, $file, $line); break;
 
-         case E_PARSE            : $exception = new PHPParseError      ($message, $code=null, $severity=$level, $file, $line); break;
-         case E_COMPILE_WARNING  : $exception = new PHPCompileWarning  ($message, $code=null, $severity=$level, $file, $line); break;
-         case E_COMPILE_ERROR    : $exception = new PHPCompileError    ($message, $code=null, $severity=$level, $file, $line); break;
-         case E_CORE_WARNING     : $exception = new PHPCoreWarning     ($message, $code=null, $severity=$level, $file, $line); break;
-         case E_CORE_ERROR       : $exception = new PHPCoreError       ($message, $code=null, $severity=$level, $file, $line); break;
-         case E_STRICT           : $exception = new PHPStrict          ($message, $code=null, $severity=$level, $file, $line); break;
-         case E_NOTICE           : $exception = new PHPNotice          ($message, $code=null, $severity=$level, $file, $line); break;
-         case E_WARNING          : $exception = new PHPWarning         ($message, $code=null, $severity=$level, $file, $line); break;
-         case E_ERROR            : $exception = new PHPError           ($message, $code=null, $severity=$level, $file, $line); break;
-         case E_RECOVERABLE_ERROR: $exception = new PHPRecoverableError($message, $code=null, $severity=$level, $file, $line); break;
-         case E_USER_ERROR       : $exception = new PHPUserError       ($message, $code=null, $severity=$level, $file, $line); break;
-         default:
-            $exception = new PHPUnknownError($message, $code=null, $severity=$level, $file, $line);
-      }
+            case E_PARSE            : $exception = new PHPParseError      ($message, $code=null, $severity=$level, $file, $line); break;
+            case E_COMPILE_WARNING  : $exception = new PHPCompileWarning  ($message, $code=null, $severity=$level, $file, $line); break;
+            case E_COMPILE_ERROR    : $exception = new PHPCompileError    ($message, $code=null, $severity=$level, $file, $line); break;
+            case E_CORE_WARNING     : $exception = new PHPCoreWarning     ($message, $code=null, $severity=$level, $file, $line); break;
+            case E_CORE_ERROR       : $exception = new PHPCoreError       ($message, $code=null, $severity=$level, $file, $line); break;
+            case E_STRICT           : $exception = new PHPStrict          ($message, $code=null, $severity=$level, $file, $line); break;
+            case E_NOTICE           : $exception = new PHPNotice          ($message, $code=null, $severity=$level, $file, $line); break;
+            case E_WARNING          : $exception = new PHPWarning         ($message, $code=null, $severity=$level, $file, $line); break;
+            case E_ERROR            : $exception = new PHPError           ($message, $code=null, $severity=$level, $file, $line); break;
+            case E_RECOVERABLE_ERROR: $exception = new PHPRecoverableError($message, $code=null, $severity=$level, $file, $line); break;
+            case E_USER_ERROR       : $exception = new PHPUserError       ($message, $code=null, $severity=$level, $file, $line); break;
+            default:
+                $exception = new PHPUnknownError($message, $code=null, $severity=$level, $file, $line);
+        }
 
-      // (4) Handle the error according to the error configuration.
-      if (self::$errorMode == self::LOG_ERRORS) {
-         Logger::log($exception, L_ERROR, $logContext);
-         return true;
-      }
-      else {
-         //self::$errorMode == self::THROW_EXCEPTIONS
-      }
+        // (4) Handle the error according to the error configuration.
+        if (self::$errorMode == self::LOG_ERRORS) {
+            Logger::log($exception, L_ERROR, $logContext);
+            return true;
+        }
+        else {
+            //self::$errorMode == self::THROW_EXCEPTIONS
+        }
 
-      // (5) Handle cases where throwing an exception is not possible or not allowed.
+        // (5) Handle cases where throwing an exception is not possible or not allowed.
 
-      /**
+        /**
        * Errors triggered by require() or require_once()
        *
        * Problem:  PHP errors triggered by require() or require_once() are non-catchable errors and do not follow
@@ -209,100 +209,100 @@ class ErrorHandler extends StaticClass {
        *
        * @see  http://stackoverflow.com/questions/25584494/php-set-exception-handler-not-working-for-error-thrown-in-set-error-handler-cal
        */
-      $function = DebugHelper::getFQFunctionName($exception->getBetterTrace()[0]);
-      if ($function=='require' || $function=='require_once') {
-         call_user_func(self::$exceptionHandler, $exception);
-         return true;                                             // PHP will terminate the script anyway
-      }
+        $function = DebugHelper::getFQFunctionName($exception->getBetterTrace()[0]);
+        if ($function=='require' || $function=='require_once') {
+            call_user_func(self::$exceptionHandler, $exception);
+            return true;                                             // PHP will terminate the script anyway
+        }
 
-      // (6) Throw back everything else.
-      throw $exception;
-   }
+        // (6) Throw back everything else.
+        throw $exception;
+    }
 
 
-   /**
-    * Global handler for otherwise unhandled exceptions.
-    *
-    * The exception is sent to the default logger with loglevel L_FATAL. After the handler returns PHP will terminate
-    * the script.
-    *
-    * @param \Exception $exception - the unhandled exception
-    */
-   public static function handleException(\Exception $exception) {
-      $context = [];
+    /**
+     * Global handler for otherwise unhandled exceptions.
+     *
+     * The exception is sent to the default logger with loglevel L_FATAL. After the handler returns PHP will terminate
+     * the script.
+     *
+     * @param \Exception $exception - the unhandled exception
+     */
+    public static function handleException(\Exception $exception) {
+        $context = [];
 
-      try {
-         $context['class'    ] = __CLASS__;              // atm not required but somewhen somewhere somebody might ask for it
-         $context['file'     ] = $exception->getFile();  // if the location is not preset the Logger will correctly
-         $context['line'     ] = $exception->getLine();  // resolve this method as the originating location
-         $context['unhandled'] = true;
+        try {
+            $context['class'    ] = __CLASS__;              // atm not required but somewhen somewhere somebody might ask for it
+            $context['file'     ] = $exception->getFile();  // if the location is not preset the Logger will correctly
+            $context['line'     ] = $exception->getLine();  // resolve this method as the originating location
+            $context['unhandled'] = true;
 
-         Logger::log($exception, L_FATAL, $context);     // log with the highest level
-      }
+            Logger::log($exception, L_FATAL, $context);     // log with the highest level
+        }
 
-      // Exceptions thrown from within the exception handler will not be passed back to the handler again. Instead the
-      // script terminates with an uncatchable fatal error.
-      catch (\Exception $secondary) {                    // the application is crashing, last try to log
-         $indent = ' ';
+        // Exceptions thrown from within the exception handler will not be passed back to the handler again. Instead the
+        // script terminates with an uncatchable fatal error.
+        catch (\Exception $secondary) {                    // the application is crashing, last try to log
+            $indent = ' ';
 
-         // secondary exception
-         $msg2  = 'PHP [FATAL] Unhandled '.trim(DebugHelper::composeBetterMessage($secondary)).NL;
-         $file  = $secondary->getFile();
-         $line  = $secondary->getLine();
-         $msg2 .= $indent.'in '.$file.' on line '.$line.NL.NL;
-         $msg2 .= $indent.'Stacktrace:'.NL.' -----------'.NL;
-         $msg2 .= DebugHelper::getBetterTraceAsString($secondary, $indent);
+            // secondary exception
+            $msg2  = 'PHP [FATAL] Unhandled '.trim(DebugHelper::composeBetterMessage($secondary)).NL;
+            $file  = $secondary->getFile();
+            $line  = $secondary->getLine();
+            $msg2 .= $indent.'in '.$file.' on line '.$line.NL.NL;
+            $msg2 .= $indent.'Stacktrace:'.NL.' -----------'.NL;
+            $msg2 .= DebugHelper::getBetterTraceAsString($secondary, $indent);
 
-         // primary (the causing) exception
-         if (isSet($context['cliMessage'])) {
-            $msg1 = $context['cliMessage'];
-            if (isSet($context['cliExtra']))
-               $msg1 .= $context['cliExtra'];
-         }
-         else {
-            $msg1  = $indent.'Unhandled '.trim(DebugHelper::composeBetterMessage($exception)).NL;
-            $file  = $exception->getFile();
-            $line  = $exception->getLine();
-            $msg1 .= $indent.'in '.$file.' on line '.$line.NL.NL;
-            $msg1 .= $indent.'Stacktrace:'.NL.' -----------'.NL;
-            $msg1 .= DebugHelper::getBetterTraceAsString($exception, $indent);
-         }
+            // primary (the causing) exception
+            if (isSet($context['cliMessage'])) {
+                $msg1 = $context['cliMessage'];
+                if (isSet($context['cliExtra']))
+                    $msg1 .= $context['cliExtra'];
+            }
+            else {
+                $msg1  = $indent.'Unhandled '.trim(DebugHelper::composeBetterMessage($exception)).NL;
+                $file  = $exception->getFile();
+                $line  = $exception->getLine();
+                $msg1 .= $indent.'in '.$file.' on line '.$line.NL.NL;
+                $msg1 .= $indent.'Stacktrace:'.NL.' -----------'.NL;
+                $msg1 .= DebugHelper::getBetterTraceAsString($exception, $indent);
+            }
 
-         $msg  = $msg2.NL;
-         $msg .= $indent.'caused by'.NL;
-         $msg .= $msg1;
-         $msg  = str_replace(chr(0), "?", $msg);                  // replace NUL bytes which mess up the logfile
+            $msg  = $msg2.NL;
+            $msg .= $indent.'caused by'.NL;
+            $msg .= $msg1;
+            $msg  = str_replace(chr(0), "?", $msg);                  // replace NUL bytes which mess up the logfile
 
-         error_log(trim($msg), ERROR_LOG_DEFAULT);
-      }
+            error_log(trim($msg), ERROR_LOG_DEFAULT);
+        }
                                                                   // display a minimal hint to prevent an empty web page
-      !CLI && !LOCALHOST && echoPre('application error (see error log)');
-   }
+        !CLI && !LOCALHOST && echoPre('application error (see error log)');
+    }
 
 
-   /**
-    * Manually called handler for exceptions occurring in object destructors.
-    *
-    * Attempting to throw an exception from a destructor during script shutdown causes a fatal error. Therefore this
-    * method has to be called manually from object destructors if an exception occurred. If the script is in the shutdown
-    * phase the exception is passed on to the regular exception handler and the script is terminated. If the script is
-    * currently not in the shutdown phase this method ignores the exception. For an example see this package's README.
-    *
-    * @param  \Exception $exception
-    *
-    * @return \Exception - the same exception
-    *
-    * @link    http://php.net/manual/en/language.oop5.decon.php
-    */
-   public static function handleDestructorException(\Exception $exception) {
-      if (self::isInShutdown()) {
-         self::handleException($exception);
-         exit(1);                            // exit und signal the error
+    /**
+     * Manually called handler for exceptions occurring in object destructors.
+     *
+     * Attempting to throw an exception from a destructor during script shutdown causes a fatal error. Therefore this
+     * method has to be called manually from object destructors if an exception occurred. If the script is in the shutdown
+     * phase the exception is passed on to the regular exception handler and the script is terminated. If the script is
+     * currently not in the shutdown phase this method ignores the exception. For an example see this package's README.
+     *
+     * @param  \Exception $exception
+     *
+     * @return \Exception - the same exception
+     *
+     * @link    http://php.net/manual/en/language.oop5.decon.php
+     */
+    public static function handleDestructorException(\Exception $exception) {
+        if (self::isInShutdown()) {
+            self::handleException($exception);
+            exit(1);                            // exit und signal the error
 
-         // Calling exit() is the only way to prevent the immediately following non-catchable fatal error.
-         // However, calling exit() in a destructor will also prevent any remaining shutdown routines from executing.
-         // @see above link
-      }
-      return $exception;
-   }
+            // Calling exit() is the only way to prevent the immediately following non-catchable fatal error.
+            // However, calling exit() in a destructor will also prevent any remaining shutdown routines from executing.
+            // @see above link
+        }
+        return $exception;
+    }
 }

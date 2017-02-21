@@ -16,20 +16,20 @@ use rosasurfer\exception\UnimplementedFeatureException;
 class ConfigFileAdapter extends Object implements AdapterInterface {
 
 
-   /**
-    * Constructor
-    *
-    * @param  string $file - name of the config file to read ACL settings from
-    *                        (default: the application configuration)
-    */
-   public function __construct($file=null) {
-      if (func_num_args()) {
-         if (!is_string($file)) throw new IllegalTypeException('Illegal type of parameter $file: '.getType($file));
-         throw new UnimplementedFeatureException('Support for custom config files not yet implemented');
-      }
-      if (!$config=Config::getDefault())
-         throw new RuntimeException('Service locator returned invalid default config: '.getType($config));
+    /**
+     * Constructor
+     *
+     * @param  string $file - name of the config file to read ACL settings from
+     *                        (default: the application configuration)
+     */
+    public function __construct($file=null) {
+        if (func_num_args()) {
+            if (!is_string($file)) throw new IllegalTypeException('Illegal type of parameter $file: '.getType($file));
+            throw new UnimplementedFeatureException('Support for custom config files not yet implemented');
+        }
+        if (!$config=Config::getDefault())
+            throw new RuntimeException('Service locator returned invalid default config: '.getType($config));
 
-      $config = $config->get('acl.config', null);
-   }
+        $config = $config->get('acl.config', null);
+    }
 }
