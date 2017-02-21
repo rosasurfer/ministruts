@@ -399,9 +399,9 @@ class Request extends Singleton {
    /**
     * Return the content of the current request (the request body).
     *
-    * @return string - Request body or NULL if the request body was empty. If the "Content-Type" header of the request
-    *                  is "multipart/form-data" (in fact a POST file upload) an array with the posted file's informations
-    *                  is returned.
+    * @return string|null - Request body for POST requests or NULL otherwise. If the "Content-Type" header of a POST request
+    *                       is "multipart/form-data" (a file upload) a string with the posted file's informations is
+    *                       returned.
     */
    public function getContent() {
       static $content = null;
@@ -478,8 +478,6 @@ class Request extends Singleton {
 
    /**
     * Zerstoert die aktuelle HttpSession des Requests.
-    *
-    * @return bool
     */
    public function destroySession() {
       if ($this->isSession()) {
@@ -517,9 +515,8 @@ class Request extends Singleton {
     *
     * @return array - name-value pairs
     */
-   public function getHeaders($names = null) {
-      if     ($names === null)   $names = array();
-      elseif (is_string($names)) $names = array($names);
+   public function getHeaders($names = []) {
+      if (is_string($names)) $names = [$names];
       elseif (is_array($names)) {
          foreach ($names as $name) {
             if (!is_string($name)) throw new IllegalTypeException('Illegal argument type in argument $names: '.getType($name));
@@ -663,10 +660,10 @@ class Request extends Singleton {
    /**
     * Setzt einen Cookie mit den angegebenen Daten.
     *
-    * @param  string $name    - Name des Cookies
-    * @param  mixed  $value   - der zu speichernde Wert (wird zu String gecastet)
-    * @param  int    $expires - Lebenszeit des Cookies (0: bis zum Schliessen des Browsers)
-    * @param  string $path    - Pfad, fuer den der Cookie gueltig sein soll
+    * @param  string      $name    - Name des Cookies
+    * @param  mixed       $value   - der zu speichernde Wert (wird zu String gecastet)
+    * @param  int         $expires - Lebenszeit des Cookies (0: bis zum Schliessen des Browsers)
+    * @param  string|null $path    - Pfad, fuer den der Cookie gueltig sein soll (default: whole domain)
     */
    public function setCookie($name, $value, $expires = 0, $path = null) {
       if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
@@ -711,7 +708,7 @@ class Request extends Singleton {
     * Gibt die Error-Message fuer den angegebenen Schluessel zurueck.  Ohne Schluessel wird die erste
     * vorhandene Error-Message zurueckgegeben.
     *
-    * @param  string $key - Schluessel der Error-Message
+    * @param  string|null $key - Schluessel der Error-Message (default: none)
     *
     * @return string - Error-Message
     */
@@ -750,7 +747,7 @@ class Request extends Singleton {
     * Ob unter dem angegebenen Schluessel eine Error-Message existiert.  Ohne Angabe eines Schluessel
     * wird geprueft, ob ueberhaupt irgendeine Error-Message existiert.
     *
-    * @param  string $key - Schluessel
+    * @param  string|null $key - Schluessel (default: none)
     *
     * @return bool
     */
