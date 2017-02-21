@@ -1,6 +1,26 @@
 <?php
-if (!isSet($_SERVER['REQUEST_METHOD']))            // exit, falls wir in einer Shell laufen
-    exit(0);
+use rosasurfer\MiniStruts;
+
+use function rosasurfer\echoPre;
+
+
+// configuration
+isSet($_SERVER['REQUEST_METHOD']) && exit(1);                           // in case we are running on CLI
+!defined('APPLICATION_ROOT') && define('APPLICATION_ROOT', __DIR__);
+ini_set('error_log', __DIR__.'/php_error.log');
+error_reporting(E_ALL & ~E_DEPRECATED);
+
+// configure and load the framework
+require(APPLICATION_ROOT.'/src/load.php');
+$options = array(
+    'global-helpers'    => true,
+    'handle-errors'     => MiniStruts::THROW_EXCEPTIONS,
+    'handle-exceptions' => true,
+);
+MiniStruts::init($options);
+
+
+// --- start ----------------------------------------------------------------------------------------------------------------
 
 
 $address = getRemoteAddress();
@@ -20,32 +40,10 @@ if ($value) {
     }
 }
 
+exit(0);
 
-// --------------------------------------------------
 
-
-/**
- * Hilfsfunktion zur formatierten Ausgabe einer Variable.
- *
- * @param  mixed $var - die auszugebende Variable
- */
-function echoPre($var) {
-    if (is_object($var) && method_exists($var, '__toString')) {
-        $str = $var->__toString();
-    }
-    elseif (is_object($var) || is_array($var)) {
-        $str = print_r($var, true);
-    }
-    else {
-        $str = (string) $var;
-    }
-
-    if (isSet($_SERVER['REQUEST_METHOD']))
-        $str = '<div align="left"><pre style="z-index:65535; margin:0; font:normal normal 12px/normal \'Courier New\',courier,serif">'.htmlSpecialChars($str, ENT_QUOTES).'</pre></div>';
-    $str .= "\n";
-
-    echo $str;
-}
+// --- functions ------------------------------------------------------------------------------------------------------------
 
 
 /**
