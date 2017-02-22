@@ -29,26 +29,23 @@ class MiniStruts extends StaticClass {
      * "config"            - IConfig: config instance
      *                     - string:  Configuration location, can either be a config directory or a config file.
      *
-     * "global-helpers"    - boolean: If set to TRUE, the helper functions and constants defined in namespace \rosasurfer
-     *                                are additionally mapped to the global namespace.
-     *                                default: FALSE (no global helpers)
-     *                                see  {@link ./globals.php}
+     * "global-helpers"    - bool: If set to TRUE, the helper functions and constants defined in namespace \rosasurfer
+     *                             are additionally mapped to the global namespace.
+     *                             default: FALSE (no global helpers)
+     *                             see  {@link ./globals.php}
      *
-     * "handle-errors"     - integer: Flag specifying how to handle regular PHP errors. Possible values:
-     *                        LOG_ERRORS: PHP errors are logged by the built-in default logger.<br>
-     *                                see  {@link \rosasurfer\log\Logger}
-     *                        THROW_EXCEPTIONS: PHP errors are converted to PHP ErrorExceptions and thrown back. If this option
-     *                                is used it is required to either configure the framework's exception handler or to register
-     *                                your own exception handling mechanism. Without an exception handler PHP will terminate a
-     *                                script with a FATAL error after such an exception.
-     *                                default: NULL (no error handling)
+     * "handle-errors"     - int:  Flag specifying how to handle regular PHP errors. Possible values:
+     *                         LOG_ERRORS:       PHP errors are sent to the configured default logger.<br>
+     *                         THROW_EXCEPTIONS: PHP errors are converted to PHP ErrorExceptions and thrown back. If this
+     *                             option is used it is required to either configure the framework's exception handler or
+     *                             to register your own exception handling mechanism. Without an exception handler PHP
+     *                             will terminate a script with a FATAL error after such an exception.
+     *                             default: NULL (no error handling)
      *
-     * "handle-exceptions" - boolean: If set to TRUE, the framework will send otherwise unhandled exceptions to the built-in
-     *                                default logger before PHP will terminate the script.<br>
-     *                                see  {@link \rosasurfer\log\Logger}
-     *                                Enabling this option is required if the option "handle-errors" is set to ERROR_HANDLER_THROW
-     *                                and you don't provide your own exception handling mechanism.
-     *                                default: FALSE (no exception handling)
+     * "handle-exceptions" - bool: If set to TRUE exceptions are handled by the built-in exception handler.<br>
+     *                             Enabling this option is required if the option "handle-errors" is set to
+     *                             THROW_EXCEPTIONS and you don't provide your own exception handling mechanism.
+     *                             default: FALSE (no exception handling)
      * @param  array $options
      */
     public static function init(array $options = []) {
@@ -58,7 +55,7 @@ class MiniStruts extends StaticClass {
                 case 'global-helpers'   : self::loadGlobalHelpers     ($value); continue;
                 case 'handle-errors'    : self::setupErrorHandling    ($value); continue;
                 case 'handle-exceptions': self::setupExceptionHandling($value); continue;
-          //case 'replace-composer' : self::replaceComposer       ($value); continue;     // TODO
+              //case 'replace-composer' : self::replaceComposer       ($value); continue;     // TODO
             }
         }
 
@@ -197,7 +194,7 @@ class MiniStruts extends StaticClass {
     /**
      * Setup the application's error handling.
      *
-     * @param  mixed $value - configuration value as passed to the framework loader
+     * @param  int|string $value - configuration value as passed to the framework loader
      */
     private static function setupErrorHandling($value) {
         $flag = null;
@@ -220,7 +217,7 @@ class MiniStruts extends StaticClass {
     /**
      * Setup the application's exception handling.
      *
-     * @param  mixed $value - configuration value as passed to the framework loader
+     * @param  bool|int|string $value - configuration value as passed to the framework loader
      */
     private static function setupExceptionHandling($value) {
         $enabled = false;
