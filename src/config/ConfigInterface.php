@@ -16,7 +16,7 @@ interface ConfigInterface {
      * @param  string $key        - key
      * @param  mixed  $onNotFound - alternative value
      *
-     * @return mixed - config setting
+     * @return string|array - config setting
      *
      * @throws RuntimeException - if the setting is not found and no alternative value was specified
      */
@@ -24,7 +24,7 @@ interface ConfigInterface {
 
 
     /**
-     * Set the config setting with the specified key.
+     * Set/modify the config setting with the specified key.
      *
      * @param  string $key   - key
      * @param  string $value - new value
@@ -41,7 +41,7 @@ interface ConfigInterface {
 
 
     /**
-     * Return an informative text describing the instance (specifics are open to the implementor).
+     * Return an informative text describing the instance.
      *
      * @return string
      */

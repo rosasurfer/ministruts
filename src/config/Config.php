@@ -153,7 +153,7 @@ class Config extends Object implements ConfigInterface {
     /**
      * Get this instance's configuration directory. This is the directory of the last configuration file specified.
      *
-     * @return string
+     * {@inheritDoc}
      */
     public function getDirectory() {
         return $this->directory;
@@ -161,14 +161,7 @@ class Config extends Object implements ConfigInterface {
 
 
     /**
-     * Return the config setting with the specified key or the specified alternative value if no such is found.
-     *
-     * @param  string $key        - key
-     * @param  mixed  $onNotFound - alternative value
-     *
-     * @return mixed - config setting
-     *
-     * @throws RuntimeException - if no such setting is found and no alternative value was specified
+     * {@inheritDoc}
      */
     public function get($key, $onNotFound=null) {
         if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
@@ -187,8 +180,7 @@ class Config extends Object implements ConfigInterface {
      * Set/modify the config setting with the specified key. Modified values are not persistet and get lost with script
      * termination.
      *
-     * @param  string $key
-     * @param  string $value
+     * {@inheritDoc}
      */
     public function set($key, $value) {
         if (!is_string($key))   throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
@@ -364,9 +356,7 @@ class Config extends Object implements ConfigInterface {
 
 
     /**
-     * Return an informative text describing the instance.
-     *
-     * @return string
+     * {@inheritDoc}
      */
     public function info() {
         return __METHOD__.'()  not yet implemented';

@@ -78,9 +78,7 @@ class StdConfig extends Config {
 
 
     /**
-     * Return an informative text describing the instance.
-     *
-     * @return string
+     * {@inheritDoc}
      */
     public function info() {
         return __METHOD__.'()  not yet implemented';

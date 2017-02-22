@@ -266,8 +266,8 @@ class Logger extends StaticClass {
                 throw new RuntimeException('Service locator returned invalid default config: '.getType($config));
 
             $logLevels = $config->get('log.level', []);
-            if (is_string($logLevels)) $logLevels = ['' => $logLevels]; // only the general application loglevel is configured
-            else                       $logLevels = (array)$logLevels;  // should be an array anyway
+            if (is_string($logLevels))
+                $logLevels = ['' => $logLevels];                        // only the general application loglevel is configured
 
             foreach ($logLevels as $className => $level) {
                 if (!is_string($level)) throw new IllegalTypeException('Illegal configuration value for "log.level.'.$className.'": '.getType($level));
