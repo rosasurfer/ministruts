@@ -78,8 +78,9 @@ final class ConnectionPool extends Singleton {
             if (!$config=Config::getDefault())
                 throw new RuntimeException('Service locator returned invalid default config: '.getType($config));
 
-            $options = $config->get('db.'.$id, null);
-            if (!$options) throw new IllegalStateException('No configuration found for database alias "'.$id.'"');
+            $options = $config->get('db.'.$id, []);
+            if (!is_array($options)) throw new IllegalTypeException('Invalid config value "db.'.$id.'": '.getType($options).' (not array)');
+            if (!$options)           throw new IllegalStateException('No configuration found for database alias "'.$id.'"');
 
             // resolve the class name to use for the connector
             $className = $options['connector']; unset($options['connector']);

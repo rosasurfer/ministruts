@@ -214,8 +214,12 @@ class Logger extends StaticClass {
             if (!$logLevel) $logLevel=self::$appLogLevel;
         }
         self::$smsLogLevel = $logLevel;
-        self::$smsOptions  = $config->get('sms', []);
-        self::$smsHandler  = self::$smsReceivers && self::$smsOptions;
+
+        $options = $config->get('sms', []);
+        if (!is_array($options)) throw new IllegalTypeException('Invalid type of config value "sms": '.getType($options).' (not array)');
+        self::$smsOptions = $options;
+
+        self::$smsHandler = self::$smsReceivers && self::$smsOptions;
 
 
         // (5) ErrorLogHandler: enabled if the MailHandler is disabled

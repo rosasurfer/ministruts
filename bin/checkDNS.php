@@ -85,7 +85,8 @@ if (!$config=Config::getDefault())
 
 
 // normale DNS-Eintraege ueberpruefen (A, MX, NS, TXT, etc.)
-$domains = $config->get('dns.domain', array());
+$domains = $config->get('dns.domain', []);
+if (!is_array($domains)) throw new IllegalTypeException('Invalid config value "dns.domain": '.getType($domains).' (not array)');
 
 foreach ($domains as $domain => $domainValues) {
     foreach ($domainValues as $type => $value) {
