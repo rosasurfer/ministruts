@@ -20,6 +20,7 @@ use const rosasurfer\EOL_WINDOWS;
 use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_INFO;
 use const rosasurfer\L_NOTICE;
+use const rosasurfer\NL;
 
 
 /**
@@ -270,26 +271,26 @@ class SMTPMailer extends Mailer {
 
 
         // init mail
-        $this->writeData("MAIL FROM: <$returnPath>");
+        $this->writeData('MAIL FROM: <'.$returnPath.'>');
         $response = $this->readResponse();
 
         $this->parseResponse($response);
         if ($this->responseStatus != 250)
-            throw new RuntimeException("MAIL FROM: <$returnPath> command not accepted: ".$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
+            throw new RuntimeException('MAIL FROM: <'.$returnPath.'> command not accepted: '.$this->responseStatus.' '.$this->response.NL.NL.'Transfer log:'.NL.'-------------'.NL.$this->logBuffer);
 
-        $this->writeData("RCPT TO: <$to[address]>");
+        $this->writeData('RCPT TO: <'.$to['address'].'>');
         $response = $this->readResponse();     // TODO: macht der MTA ein DNS-Lookup, kann es in readResponse() zum Time-out kommen
 
         $this->parseResponse($response);
         if ($this->responseStatus != 250 && $this->responseStatus != 251)
-            throw new RuntimeException("RCPT TO: <$to[address]> command not accepted: ".$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
+            throw new RuntimeException('RCPT TO: <'.$to['address'].'> command not accepted: '.$this->responseStatus.' '.$this->response.NL.NL.'Transfer log:'.NL.'-------------'.NL.$this->logBuffer);
 
         $this->writeData('DATA');
         $response = $this->readResponse();
 
         $this->parseResponse($response);
         if ($this->responseStatus != 354)
-            throw new RuntimeException('DATA command not accepted: '.$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
+            throw new RuntimeException('DATA command not accepted: '.$this->responseStatus.' '.$this->response.NL.NL.'Transfer log:'.NL.'-------------'.NL.$this->logBuffer);
 
         // TODO: zu lange Header umbrechen
 
@@ -297,15 +298,15 @@ class SMTPMailer extends Mailer {
         $this->writeData('Date: '.date('r'));
 
         $from = preg_replace('~([\xA0-\xFF])~e', '"=?ISO-8859-1?Q?=".strToUpper(decHex(ord("$1")))."?="', $from);
-        $this->writeData("From: $from[name] <$from[address]>");
+        $this->writeData('From: '.$from['name'].' <'.$from['address'].'>');
 
         $to = preg_replace('~([\xA0-\xFF])~e', '"=?ISO-8859-1?Q?=".strToUpper(decHex(ord("$1")))."?="', $to);
-        $this->writeData("To: $to[name] <$to[address]>");
+        $this->writeData('To: '.$to['name'].' <'.$to['address'].'>');
 
         $subject = preg_replace('~([\xA0-\xFF])~e', '"=?ISO-8859-1?Q?=".strToUpper(decHex(ord("$1")))."?="', $subject);
-        $this->writeData("Subject: $subject");
-        $this->writeData("X-Mailer: Microsoft Office Outlook 11");     // save us from Hotmail junk folder
-        $this->writeData("X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2900.2180");
+        $this->writeData('Subject: '.$subject);
+        $this->writeData('X-Mailer: Microsoft Office Outlook 11');     // save us from Hotmail junk folder
+        $this->writeData('X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2900.2180');
 
 
         // custom headers
@@ -349,19 +350,14 @@ class SMTPMailer extends Mailer {
 
         $this->parseResponse($response);
         if ($this->responseStatus != 250)
-            throw new RuntimeException('Sent data not accepted: '.$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
+            throw new RuntimeException('Sent data not accepted: '.$this->responseStatus.' '.$this->response.NL.NL.'Transfer log:'.NL.'-------------'.NL.$this->logBuffer);
 
-
-        // ggf. Endzeitpunkt speichern
-        if (self::$logDebug)
-            $end = microTime(true);
-
-
-        // Zu lang dauernden Versand loggen
+        // ggf. zu lang dauernden Versand loggen
         if (self::$logDebug) {
-            $neededTime = round($end - $start, 4);
-            if ($neededTime > self::$maxSendingTime)
-                Logger::log(__METHOD__.'() to '.$to['address'].' took more than '.self::$maxSendingTime.' seconds: '.$neededTime, L_DEBUG);
+            $end = microTime(true);
+            $timeTaken = round($end - $start, 4);
+            if ($timeTaken > self::$maxSendingTime)
+                Logger::log(__METHOD__.'() to '.$to['address'].' took more than '.self::$maxSendingTime.' seconds: '.$timeTaken, L_DEBUG);
         }
     }
 
@@ -378,7 +374,7 @@ class SMTPMailer extends Mailer {
 
         $this->parseResponse($response);
         if ($this->responseStatus != 250)
-            throw new RuntimeException('RSET command not accepted: '.$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
+            throw new RuntimeException('RSET command not accepted: '.$this->responseStatus.' '.$this->response.NL.NL.'Transfer log:'.NL.'-------------'.NL.$this->logBuffer);
     }
 
 
@@ -397,7 +393,7 @@ class SMTPMailer extends Mailer {
 
             $this->parseResponse($response);
             if ($this->responseStatus != 221)
-                throw new RuntimeException('QUIT command not accepted: '.$this->responseStatus.' '.$this->response."\n\nTransfer log:\n-------------\n".$this->logBuffer);
+                throw new RuntimeException('QUIT command not accepted: '.$this->responseStatus.' '.$this->response.NL.NL.'Transfer log:'.NL.'-------------'.NL.$this->logBuffer);
         }
 
         fClose($this->connection);
@@ -431,7 +427,7 @@ class SMTPMailer extends Mailer {
         $count = fWrite($this->connection, $data.EOL_WINDOWS, strLen($data)+2);
 
         if ($count != strLen($data)+2)
-            throw new RuntimeException('Error writing to socket, length of data: '.(strLen($data)+2).', bytes written: '.$count."\ndata: ".$data."\n\nTransfer log:\n-------------\n".$this->logBuffer);
+            throw new RuntimeException('Error writing to socket, length of data: '.(strLen($data)+2).', bytes written: '.$count.NL.'data: '.$data.NL.NL.'Transfer log:'.NL.'-------------'.NL.$this->logBuffer);
 
         $this->logSentData($data);
     }
