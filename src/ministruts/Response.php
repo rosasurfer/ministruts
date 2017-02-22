@@ -14,8 +14,8 @@ use const rosasurfer\CLI;
 class Response extends Singleton {
 
 
-    // Attribute-Pool
-    private $attributes = array();
+    /** @var array - Attribute-Pool */
+    private $attributes = [];
 
 
     /**

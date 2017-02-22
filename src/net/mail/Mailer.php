@@ -17,7 +17,8 @@ use function rosasurfer\strStartsWith;
 abstract class Mailer extends Object implements MailerInterface {
 
 
-    protected /*string[]*/ $config;
+    /** @var string[] */
+    protected $config;
 
 
     /**

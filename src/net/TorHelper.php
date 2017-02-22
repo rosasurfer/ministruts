@@ -29,25 +29,36 @@ use const rosasurfer\MINUTES;
 class TorHelper extends StaticClass {
 
 
-    private static /*bool*/ $logDebug, $logInfo, $logNotice;
+    /** @var bool */
+    private static $logDebug;
 
+    /** @var bool */
+    private static $logInfo;
 
-    // TODO: Serverliste bei Fehlern dynamisch anpassen
-    private static $torMirrors = array('torstatus.blutmagie.de'   ,
-                                      'torstatus.cyberphunk.org' ,
-                                      'tns.hermetix.org'         ,
-                                      'arachne.doesntexist.org'  ,
-                                      'torstatus.all.de'         ,
-                                      'torstatus.kgprog.com'     ,
-                                      'torstatus.amorphis.eu'    ,
-                                      'torstat.kleine-eismaus.de',
-                                    // https://'kradense.whsites.net/tns' ,
-                                     );
+    /** @var bool */
+    private static $logNotice;
+
+    /**
+     * TODO: Serverliste bei Fehlern dynamisch anpassen
+     *
+     * @var string[] */
+    private static $torMirrors = [
+        'torstatus.blutmagie.de'   ,
+        'torstatus.cyberphunk.org' ,
+        'tns.hermetix.org'         ,
+        'arachne.doesntexist.org'  ,
+        'torstatus.all.de'         ,
+        'torstatus.kgprog.com'     ,
+        'torstatus.amorphis.eu'    ,
+        'torstat.kleine-eismaus.de',
+      //'kradense.whsites.net/tns' ,
+    ];
+
 
     /**
      * Initialisiert die Klasse.
      */
-    private static function init() {
+    public static function init() {
         if (self::$logDebug === null) {
             $loglevel        = Logger::getLogLevel(__CLASS__);
             self::$logDebug  = ($loglevel <= L_DEBUG );
@@ -65,8 +76,6 @@ class TorHelper extends StaticClass {
      * @return bool
      */
     public static function isExitNode($ip) {
-        self::init();
-
         if (!is_string($ip)) throw new IllegalTypeException('Illegal type of parameter $ip: '.getType($ip));
 
         // TODO: mit Filter-Extension lokale Netze abfangen
@@ -129,3 +138,4 @@ class TorHelper extends StaticClass {
         return $nodes;
     }
 }
+TorHelper::init();

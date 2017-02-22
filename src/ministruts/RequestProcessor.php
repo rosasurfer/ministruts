@@ -23,20 +23,23 @@ use const rosasurfer\L_NOTICE;
 class RequestProcessor extends Object {
 
 
-    private static /*bool*/ $logDebug,
-                        /*bool*/ $logInfo,
-                        /*bool*/ $logNotice;
+    /** @var bool */
+    private static $logDebug;
 
-    /**
-     * @var Module - Modul, zu dem wir gehoeren
-     */
+    /** @var bool */
+    private static $logInfo;
+
+    /** @var bool */
+    private static $logNotice;
+
+    /** @var Module - Modul, zu dem wir gehoeren */
     protected $module;
 
 
     /**
      * Erzeugt einen neuen RequestProcessor.
      *
-     * @param  Module $module - Modul, dem dieser RequestProcessor zugeordnet ist
+     * @param  Module $module - Module, dem dieser RequestProcessor zugeordnet ist
      */
     public function __construct(Module $module) {
         $loglevel        = Logger::getLogLevel(__CLASS__);

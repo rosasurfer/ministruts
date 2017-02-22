@@ -19,15 +19,26 @@ use const rosasurfer\L_NOTICE;
 class CurlHttpResponse extends HttpResponse {
 
 
-    private static /*bool*/ $logDebug, $logInfo, $logNotice;
+    /** @var bool */
+    private static $logDebug;
 
+    /** @var bool */
+    private static $logInfo;
 
-    private /*HeaderParser*/ $headerParser;
-    private /*int*/          $status;         // HTTP-Statuscode
-    private /*string*/       $content;        // Content
+    /** @var bool */
+    private static $logNotice;
 
-    // aktuelle Laenge des gelesenen Contents in Byte
-    private /*int*/ $currentContentLength = 0;
+    /** @var HeaderParser */
+    private $headerParser;
+
+    /** @var int - HTTP-Statuscode */
+    private $status;
+
+    /** @var string - Content */
+    private $content;
+
+    /** @var int - aktuelle Laenge des gelesenen Contents in Byte */
+    private $currentContentLength = 0;
 
 
     /**

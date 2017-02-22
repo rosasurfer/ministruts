@@ -15,9 +15,14 @@ use rosasurfer\exception\InvalidArgumentException;
 class HttpRequest extends Object {
 
 
-    private /*string*/ $url;
-    private /*string*/ $method  = 'GET';      // HTTP-Methode (default: GET)
-    private /*array*/  $headers = array();    // zusaetzliche benutzerdefinierte HTTP-Header
+    /** @var string */
+    private $url;
+
+    /** @var string - HTTP-Methode (default: GET) */
+    private $method = 'GET';
+
+    /** @var string[] - zusaetzliche benutzerdefinierte HTTP-Header */
+    private $headers = [];
 
 
     /**

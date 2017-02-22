@@ -36,11 +36,15 @@ class StrutsController extends Singleton {
 
 
     /** @var bool */
-    private static $logDebug, $logInfo, $logNotice;
+    private static $logDebug;
 
-    /**
-     * @var Module[] - all registered Modules, array key is the Module prefix
-     */
+    /** @var bool */
+    private static $logInfo;
+
+    /** @var bool */
+    private static $logNotice;
+
+    /** @var Module[] - all registered Modules, array key is the Module prefix */
     private $modules = [];
 
 

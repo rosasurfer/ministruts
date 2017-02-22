@@ -28,24 +28,41 @@ use const rosasurfer\L_NOTICE;
 class SMTPMailer extends Mailer {
 
 
-    private static /*bool*/ $logDebug,
-                        /*bool*/ $logInfo,
-                        /*bool*/ $logNotice,
-                        /*int */ $maxSendingTime = 2;    // benoetigt der Versand laenger als hier angegeben, wird er im Loglevel DEBUG geloggt
+    /** @var bool */
+    private static $logDebug;
 
+    /** @var bool */
+    private static $logInfo;
 
-    protected /*string*/ $config = array('host'          => null,     // SMTP server host name
-                                        'port'          => null,     // SMTP server port
-                                        'timeout'       => 300,      // socket timeout: sendmail braucht ewig
-                                        'auth_username' => null,     // authentification username
-                                        'auth_password' => null,     // authentification password
-                                        );
+    /** @var bool */
+    private static $logNotice;
 
-    private /*string  */ $hostName;
-    private /*resource*/ $connection;
-    private /*int     */ $responseStatus = 0;
-    private /*string  */ $response;
-    private /*string  */ $logBuffer;
+    /** @var int - benoetigt der Versand laenger als hier angegeben, wird er im Loglevel DEBUG geloggt */
+    private static $maxSendingTime = 2;
+
+    /** @var array */
+    protected $config = [
+        'host'          => null,        // SMTP server host name
+        'port'          => null,        // SMTP server port
+        'timeout'       => 300,         // socket timeout: sendmail braucht ewig
+        'auth_username' => null,        // authentification username
+        'auth_password' => null,        // authentification password
+    ];
+
+    /** @var string */
+    private $hostName;
+
+    /** @var resource */
+    private $connection;
+
+    /** @var int */
+    private $responseStatus = 0;
+
+    /** @var string */
+    private $response;
+
+    /** @var string */
+    private $logBuffer;
 
 
     /**

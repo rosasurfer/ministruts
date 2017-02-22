@@ -17,50 +17,38 @@ use const rosasurfer\LOCALHOST;
 class Tile extends Object {
 
 
-    /**
-     * Typenbezeichner fuer in einzelne Tiles mit dem <set>-Tag eingebundene, zusaetzliche Eigenschaften.
-     */
-    const PROPERTY_TYPE_STRING   = 'string';
+    /** @var string - Typenbezeichner fuer in einzelne Tiles mit dem <set>-Tag eingebundene, zusaetzliche Eigenschaften. */
+    const PROPERTY_TYPE_STRING = 'string';
+
+    /** @var string - Typenbezeichner fuer in einzelne Tiles mit dem <set>-Tag eingebundene, zusaetzliche Eigenschaften. */
     const PROPERTY_TYPE_RESOURCE = 'resource';
 
-
+    /** @var string - runtime generated name for anonymous tiles */
     const GENERIC_NAME = 'generic';
 
-
     /**
-     * Ob diese Komponente vollstaendig konfiguriert ist. Wenn dieses Flag gesetzt ist, wirft jeder
-     * Versuch, die Komponente zu aendern, eine IllegalStateException.
+     * @var bool - Ob diese Komponente vollstaendig konfiguriert ist. Wenn dieses Flag gesetzt ist, wirft jeder
+     *             Versuch, die Komponente zu aendern, eine IllegalStateException.
      */
     protected $configured = false;
 
+    /** @var Module - Module, zu dem diese Tile gehoert */
+    protected $module;
 
-    /**
-     * Module, zu dem diese Tile gehoert
-     */
-    protected /*Module*/ $module;
+    /** @var string - eindeutige Name dieser Tile */
+    protected $name;
 
+    /** @var string - vollstaendiger Dateiname dieser Tile */
+    protected $fileName;
 
-    /**
-     * eindeutige Name dieser Tile
-     */
-    protected /*string*/ $name;
-
-
-    /**
-     * vollstaendiger Dateiname dieser Tile
-     */
-    protected /*string*/ $fileName;
-
-
-    // Property-Pool
+    /** @var array - Property-Pool */
     protected $properties = [];
 
-
     /**
-     * Die zur Laufzeit diese Tile-Instanz umgebende Instanz oder NULL, wenn diese Instanz das aeusserste
-     * Fragment der Ausgabe darstellt.
+     * @var Tile - Die zur Laufzeit diese Tile-Instanz umgebende Instanz oder NULL, wenn diese Instanz das aeusserste
+     *             Fragment der Ausgabe darstellt.
      */
-    protected /*Tile*/ $parent;
+    protected $parent;
 
 
     /**

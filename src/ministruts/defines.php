@@ -1,92 +1,121 @@
 <?php
+/**
+ * Package constants
+ */
 namespace rosasurfer\ministruts;
 
 
-/**
- * Package constants and functions.
- */
+// block re-includes
 if (defined('rosasurfer\ministruts\DEFAULT_REQUEST_PROCESSOR_CLASS')) return;
 
 
 /**
- * @var string - default <tt>RequestProcessor</tt> class
+ * Default {@link RequestProcessor} class.
+ *
+ * @var string
  */
 const DEFAULT_REQUEST_PROCESSOR_CLASS = RequestProcessor::class;
 
 
 /**
- * @var string - default <tt>ActionForward</tt> class
+ * Default {@link ActionForward} class.
+ *
+ * @var string
  */
 const DEFAULT_ACTION_FORWARD_CLASS = ActionForward::class;
 
 
 /**
- * @var string - default <tt>ActionMapping</tt> class
+ * Default {@link ActionMapping} class.
+ *
+ * @var string
  */
 const DEFAULT_ACTION_MAPPING_CLASS = ActionMapping::class;
 
 
 /**
- * @var string - default <tt>Tile</tt> class
+ * Default {@link Tile} class.
+ *
+ * @var string
  */
 const DEFAULT_TILES_CLASS = Tile::class;
 
 
 /**
- * @var string - <tt>Action</tt> base class
+ * {@link Action} base class.
+ *
+ * @var string
  */
 const ACTION_BASE_CLASS = Action::class;
 
 
 /**
- * @var string - <tt>ActionForm</tt> base class
+ * {@link ActionForm} base class.
+ *
+ * @var string
  */
 const ACTION_FORM_BASE_CLASS = ActionForm::class;
 
 
 /**
- * @var string - <tt>RoleProcessor</tt> base class
+ * {@link RoleProcessor} base class.
+ *
+ * @var string
  */
 const ROLE_PROCESSOR_BASE_CLASS = RoleProcessor::class;
 
 
 /**
- * @var string - request or session key where <tt>ActionMessage</tt>s are stored (if any)
+ * Request or session key where {@link ActionMessage}s are stored (if any).
+ *
+ * @var string
  */
 const ACTION_MESSAGES_KEY = 'org.apache.struts.action.MESSAGES';
 
 
 /**
- * @var string - request or session key where <tt>ActionError</tt>s are stored (if any)
+ * Request or session key where {@link ActionError}s are stored (if any).
+ *
+ * @var string
  */
 const ACTION_ERRORS_KEY = 'org.apache.struts.action.ERRORS';
 
 
 /**
- * @var string - request or session key where the current request's <tt>ActionForm</tt> is stored
+ * Request or session key where the current request's {@link ActionForm} is stored.
+ *
+ * @var string
  */
 const ACTION_FORM_KEY = 'org.apache.struts.action.FORM';
 
 
 /**
- * @var string - request key where the current request's <tt>ActionMapping</tt> is stored
+ * Request key where the current request's {@link ActionMapping} is stored.
+ *
+ * @var string
  */
 const ACTION_MAPPING_KEY = 'org.apache.struts.action.MAPPING';
 
 
 /**
- * @var string - session key where the currently selected <tt>Locale</tt> is stored
+ * Session key where the currently selected {@link Locale} is stored.
+ *
+ * @var string
  */
 const LOCALE_KEY = 'org.apache.struts.action.LOCALE';
 
 
 /**
- * @var string - request key where available <tt>MessageResource</tt>s are stored (i18n)
+ * Request key where available {@link MessageResource}s are stored (i18n).
+ *
+ * @var string -
  */
 const MESSAGES_KEY = 'org.apache.struts.action.MESSAGE_RESOURCES';
 
 
 /**
- * @var string - request key where the current request's <tt>Module</tt> is stored
+ * Request key where the current request's {@link Module} is stored.
+ *
+ * @var string
  */
 const MODULE_KEY = 'org.apache.struts.action.MODULE';

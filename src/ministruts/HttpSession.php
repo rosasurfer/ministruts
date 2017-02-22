@@ -17,17 +17,11 @@ use rosasurfer\exception\error\PHPError;
 class HttpSession extends Singleton {
 
 
-    /**
-     * der Request, zu dem wir gehoeren
-     */
-    protected /*Request*/ $request;
+    /** @var Request - Der Request, zu dem wir gehoeren. */
+    protected $request;
 
-
-    /**
-     * Ob die Session neu ist oder nicht. Die Session ist neu, wenn der User die Session-ID noch nicht
-     * kennt.
-     */
-    protected /*bool*/ $new = null;
+    /** @var bool - Ob die Session neu ist oder nicht. Die Session ist neu, wenn der User die Session-ID noch nicht kennt. */
+    protected $new = null;
 
 
     /**

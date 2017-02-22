@@ -10,7 +10,10 @@ use rosasurfer\core\Object;
 class HeaderParser extends Object {
 
 
-    private $headers = array();
+    /** @var string[] */
+    private $headers = [];
+
+    /** @var string */
     private $currentHeader;
 
 

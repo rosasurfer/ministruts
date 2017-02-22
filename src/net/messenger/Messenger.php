@@ -25,6 +25,6 @@ abstract class Messenger extends Object {
      *
      * @param  string $receiver - Empfaenger (internationales Format)
      * @param  string $message  - Nachricht
-   */
+     */
     abstract public function sendMessage($receiver, $message);
 }

@@ -24,39 +24,41 @@ use function rosasurfer\strEndsWith;
 class ActionMapping extends Object {
 
 
-    /**
-     * Ob diese Komponente vollstaendig konfiguriert ist. Wenn dieses Flag gesetzt ist, wirft jeder Versuch,
-     * die Komponente zu aendern, eine IllegalStateException.
-     */
-    protected /*bool*/ $configured = false;
+    /** @var bool - Ob diese Komponente vollstaendig konfiguriert ist. */
+    protected $configured = false;
 
+    /** @var string */
+    protected $path;
 
-    protected /*string */ $path;
-    protected /*string */ $actionClassName;
-    protected /*string */ $formClassName;
-    protected /*string */ $formScope = 'request';
-    protected /*bool   */ $formValidateFirst;
-    protected /*bool[] */ $methods;
-    protected /*string */ $roles;
-    protected /*bool   */ $default = false;
+    /** @var string */
+    protected $actionClassName;
 
+    /** @var string */
+    protected $formClassName;
 
-    /**
-     * Im Mapping statt einer Action konfigurierter ActionForward.
-     */
-    protected /*ActionForward*/ $forward;
+    /** @var string */
+    protected $formScope = 'request';
 
+    /** @var bool */
+    protected $formValidateFirst;
 
-    /**
-     * Die lokalen Forwards dieses Mappings.
-     */
-    protected /*ActionForward[]*/ $forwards = array();
+    /** @var bool[] */
+    protected $methods;
 
+    /** @var string */
+    protected $roles;
 
-    /**
-     * Module, zu dem das Mapping gehoert
-     */
-    protected /*Module*/ $module;
+    /** @var bool */
+    protected $default = false;
+
+    /** @var ActionForward - Im Mapping statt einer Action konfigurierter ActionForward. */
+    protected $forward;
+
+    /** @var ActionForward[] - Die lokalen Forwards dieses Mappings. */
+    protected $forwards = [];
+
+    /** @var Module - Module, zu dem das Mapping gehoert */
+    protected $module;
 
 
     /**

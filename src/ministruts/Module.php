@@ -27,81 +27,55 @@ use const rosasurfer\L_NOTICE;
 class Module extends Object {
 
 
-    private static /*bool*/ $logDebug, $logInfo, $logNotice;
+    /** @var bool */
+    private static $logDebug;
 
+    /** @var bool */
+    private static $logInfo;
 
-    /**
-     * Ob diese Komponente vollstaendig konfiguriert ist. Wenn dieses Flag gesetzt ist, wirft jeder Versuch,
-     * die Komponente zu aendern, eine IllegalStateException.
-     */
-    protected /*bool*/ $configured = false;
+    /** @var bool */
+    private static $logNotice;
 
+    /** @var bool - Ob diese Komponente vollstaendig konfiguriert ist. */
+    protected $configured = false;
 
     /**
      * Der Prefix dieses Modules relative zur ROOT_URL der Anwendung.  Die Prefixe innerhalb einer Anwendung
      * sind eindeutig. Das Module mit einem Leerstring als Prefix ist das Default-Module der Anwendung.
+     *
+     * @var string
      */
-    protected /*string*/ $prefix;
+    protected $prefix;
 
+    /** @var string[] - Basisverzeichnisse fuer von diesem Modul einzubindende Resourcen */
+    protected $resourceDirectories = [];
 
-    /**
-     * Basisverzeichnisse fuer von diesem Modul einzubindende Resourcen
-     */
-    protected /*string[]*/ $resourceDirectories = array();
+    /** @var ActionForward[] - Die globalen Forwards dieses Moduls. */
+    protected $forwards = [];
 
+    /** @var ActionMapping[] - Die ActionMappings dieses Moduls. */
+    protected $mappings = [];
 
-    /**
-     * Die globalen Forwards dieses Moduls.
-     */
-    protected /*ActionForward[]*/ $forwards = array();
+    /** @var ActionMapping - Das Default-ActionMapping dieses Moduls, wenn eines definiert wurde. */
+    protected $defaultMapping;
 
+    /** @var Tile[] - Die Tiles dieses Moduls. */
+    protected $tiles = [];
 
-    /**
-     * Die ActionMappings dieses Moduls.
-     */
-    protected /*ActionMapping[]*/ $mappings = array();
+    /** @var string - Der Klassenname der RequestProcessor-Implementierung, die fuer dieses Modul definiert ist. */
+    protected $requestProcessorClass = DEFAULT_REQUEST_PROCESSOR_CLASS;
 
+    /** @var string - Der Klassenname der ActionForward-Implementierung, die fuer dieses Modul definiert ist. */
+    protected $forwardClass = DEFAULT_ACTION_FORWARD_CLASS;
 
-    /**
-     * Das Default-ActionMapping dieses Moduls, wenn eines definiert wurde.
-     */
-    protected /*ActionMapping*/ $defaultMapping;
+    /** @var string - Der Klassenname der ActionMapping-Implementierung, die fuer dieses Modul definiert ist. */
+    protected $mappingClass = DEFAULT_ACTION_MAPPING_CLASS;
 
+    /** @var string - Der Klassenname der Tiles-Implementierung, die fuer dieses Modul definiert ist. */
+    protected $tilesClass = DEFAULT_TILES_CLASS;
 
-    /**
-     * Die Tiles dieses Moduls.
-     */
-    protected /*Tile[]*/ $tiles = array();
-
-
-    /**
-     * Der Klassenname der RequestProcessor-Implementierung, die fuer dieses Modul definiert ist.
-     */
-    protected /*string*/ $requestProcessorClass = DEFAULT_REQUEST_PROCESSOR_CLASS;
-
-
-    /**
-     * Der Klassenname der ActionForward-Implementierung, die fuer dieses Modul definiert ist.
-     */
-    protected /*string*/ $forwardClass = DEFAULT_ACTION_FORWARD_CLASS;
-
-
-    /**
-     * Der Klassenname der ActionMapping-Implementierung, die fuer dieses Modul definiert ist.
-     */
-    protected /*string*/ $mappingClass = DEFAULT_ACTION_MAPPING_CLASS;
-
-
-    /**
-     * Der Klassenname der Tiles-Implementierung, die fuer dieses Modul definiert ist.
-     */
-    protected /*string*/ $tilesClass = DEFAULT_TILES_CLASS;
-
-
-    /**
-     * Der Klassenname der RoleProcessor-Implementierung, die fuer dieses Modul definiert ist.
-     */
-    protected /*string*/ $roleProcessorClass;
+    /** @var string - Der Klassenname der RoleProcessor-Implementierung, die fuer dieses Modul definiert ist. */
+    protected $roleProcessorClass;
 
 
     /**
@@ -145,12 +119,12 @@ class Module extends Object {
         $content = file_get_contents($fileName, false);
 
         /**
-       * TODO: struts-config.xml ohne Verzeichniswechsel validieren
-       *
-       * @see  http://xmlwriter.net/xml_guide/doctype_declaration.shtml
-       * @see  DTD to XML schema  https://www.w3.org/2000/04/schema_hack/
-       * @see  DTD to XML schema  http://www.xmlutilities.net/
-       */
+         * TODO: struts-config.xml ohne Verzeichniswechsel validieren
+         *
+         * @see  http://xmlwriter.net/xml_guide/doctype_declaration.shtml
+         * @see  DTD to XML schema  https://www.w3.org/2000/04/schema_hack/
+         * @see  DTD to XML schema  http://www.xmlutilities.net/
+         */
         $currentDir = getCwd();                         // typically dirName(APP_ROOT.'/www/index.php');
 
         // ins DTD-Verzeichnis wechseln: src/ministruts/xml

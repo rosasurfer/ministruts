@@ -28,10 +28,8 @@ use rosasurfer\exception\IllegalTypeException;
 class PageContext extends Singleton {
 
 
-    /**
-     * Property-Pool
-     */
-    protected $properties = array();
+    /** @var array - Property-Pool */
+    protected $properties = [];
 
 
     /**
