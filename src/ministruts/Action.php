@@ -102,7 +102,7 @@ abstract class Action extends Object {
      *
      * @param  string $name - Bezeichner des ActionForwards
      *
-     * @return ActionForward
+     * @return ActionForward|null
      *
      * @see ActionMapping::findForward()
      */

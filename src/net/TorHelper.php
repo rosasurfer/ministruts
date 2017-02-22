@@ -58,7 +58,7 @@ class TorHelper extends StaticClass {
     /**
      * Initialisiert die Klasse.
      */
-    public static function init() {
+    private static function init() {
         if (self::$logDebug === null) {
             $loglevel        = Logger::getLogLevel(__CLASS__);
             self::$logDebug  = ($loglevel <= L_DEBUG );
@@ -76,6 +76,7 @@ class TorHelper extends StaticClass {
      * @return bool
      */
     public static function isExitNode($ip) {
+        self::init();
         if (!is_string($ip)) throw new IllegalTypeException('Illegal type of parameter $ip: '.getType($ip));
 
         // TODO: mit Filter-Extension lokale Netze abfangen
@@ -138,4 +139,4 @@ class TorHelper extends StaticClass {
         return $nodes;
     }
 }
-TorHelper::init();
+

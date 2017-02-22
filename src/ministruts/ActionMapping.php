@@ -204,7 +204,7 @@ class ActionMapping extends Object {
     /**
      * Gibt den direkt konfigurierten ActionForward zurueck, oder NULL, wenn eine Action konfiguriert wurde.
      *
-     * @return ActionForward
+     * @return ActionForward|null
      */
     public function getForward() {
         return $this->forward;
@@ -446,7 +446,7 @@ class ActionMapping extends Object {
      *
      * @param  string $name - logischer Name
      *
-     * @return ActionForward
+     * @return ActionForward|null
      */
     public function findForward($name) {
         if (isSet($this->forwards[$name]))

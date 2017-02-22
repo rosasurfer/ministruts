@@ -56,7 +56,7 @@ class Module extends Object {
     /** @var ActionMapping[] - Die ActionMappings dieses Moduls. */
     protected $mappings = [];
 
-    /** @var ActionMapping - Das Default-ActionMapping dieses Moduls, wenn eines definiert wurde. */
+    /** @var ActionMapping|null - Das Default-ActionMapping dieses Moduls, wenn eines definiert wurde. */
     protected $defaultMapping;
 
     /** @var Tile[] - Die Tiles dieses Moduls. */
@@ -76,6 +76,9 @@ class Module extends Object {
 
     /** @var string - Der Klassenname der RoleProcessor-Implementierung, die fuer dieses Modul definiert ist. */
     protected $roleProcessorClass;
+
+    /** @var RoleProcessor - Die RoleProcessor-Implementierung, die fuer dieses Modul definiert ist. */
+    protected $roleProcessor;
 
 
     /**
@@ -612,7 +615,7 @@ class Module extends Object {
      *
      * @param  string $path
      *
-     * @return ActionMapping - Mapping oder NULL, wenn kein Mapping gefunden wurde
+     * @return ActionMapping|null - Mapping oder NULL, wenn kein Mapping gefunden wurde
      */
     public function findMapping($path) {
         // $path: /
@@ -635,7 +638,7 @@ class Module extends Object {
     /**
      * Gibt das Default-ActionMapping dieses Moduls zurueck.
      *
-     * @return ActionMapping - Mapping oder NULL, wenn kein Default-Mapping definiert ist
+     * @return ActionMapping|null - Mapping oder NULL, wenn kein Default-Mapping definiert ist
      */
     public function getDefaultMapping() {
         return $this->defaultMapping;
@@ -676,7 +679,7 @@ class Module extends Object {
     protected function setRequestProcessorClass($className) {
         if ($this->configured)                                            throw new IllegalStateException('Configuration is frozen');
         if (!is_string($className))                                       throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
-        if (!is_class($className))                                        throw new ClassNotFoundException("Undefined class '$className'");
+        if (!is_class($className))                                        throw new ClassNotFoundException('Undefined class "'.$className.'"');
         if (!is_subclass_of($className, DEFAULT_REQUEST_PROCESSOR_CLASS)) throw new InvalidArgumentException('Not a subclass of '.DEFAULT_REQUEST_PROCESSOR_CLASS.': '.$className);
 
         $this->requestProcessorClass = $className;
@@ -715,12 +718,11 @@ class Module extends Object {
      * @return RoleProcessor
      */
     public function getRoleProcessor() {
-        static $instance = null;
-
-        if (!$instance && ($class=$this->roleProcessorClass))
-            $instance = new $class;
-
-        return $instance;
+        if (!$this->roleProcessor) {
+            $class = $this->roleProcessorClass;
+            $this->roleProcessor = new $class();
+        }
+        return $this->roleProcessor;
     }
 
 
@@ -733,7 +735,7 @@ class Module extends Object {
     protected function setTilesClass($className) {
         if ($this->configured)                                throw new IllegalStateException('Configuration is frozen');
         if (!is_string($className))                           throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
-        if (!is_class($className))                            throw new ClassNotFoundException("Undefined class '$className'");
+        if (!is_class($className))                            throw new ClassNotFoundException('Undefined class "'.$className.'"');
         if (!is_subclass_of($className, DEFAULT_TILES_CLASS)) throw new InvalidArgumentException('Not a subclass of '.DEFAULT_TILES_CLASS.': '.$className);
 
         $this->tilesClass = $className;
@@ -830,7 +832,7 @@ class Module extends Object {
      *
      * @param  string $name - logischer Name des ActionForwards
      *
-     * @return ActionForward
+     * @return ActionForward|null
      */
     public function findForward($name) {
         if (isSet($this->forwards[$name]))
@@ -846,7 +848,7 @@ class Module extends Object {
      *
      * @param  string $name - logischer Name der Tile
      *
-     * @return Tile
+     * @return Tile|null
      */
     public function findTile($name) {
         if (isSet($this->tiles[$name]))

@@ -33,7 +33,7 @@ class CurlHttpClient extends HttpClient {
     /** @var int - Zaehler fuer manuelle Redirects (falls "open_basedir" aktiv ist) */
     private $manualRedirects = 0;
 
-    /** @var arry - zusaetzliche CURL-Optionen */
+    /** @var array - zusaetzliche CURL-Optionen */
     private $options = [];
 
     /** @var string[] - CURL-Fehlerbeschreibungen */

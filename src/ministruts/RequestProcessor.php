@@ -2,6 +2,7 @@
 namespace rosasurfer\ministruts;
 
 use rosasurfer\core\Object;
+use rosasurfer\exception\RuntimeException;
 use rosasurfer\log\Logger;
 
 use rosasurfer\net\http\HeaderUtils;
@@ -401,6 +402,7 @@ PROCESS_METHOD_ERROR_SC_405;
             $key = $success ? ActionForward::VALIDATION_SUCCESS_KEY : ActionForward::VALIDATION_ERROR_KEY;
             $forward = $mapping->findForward($key);
         }
+        if (!$forward) throw new RuntimeException('ActionForward for mapping "'.$mapping->getPath().'" not found (Module validation error?)');
 
         $this->processActionForward($request, $response, $forward);
         return false;
