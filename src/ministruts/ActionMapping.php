@@ -420,7 +420,7 @@ class ActionMapping extends Object {
                     throw new IllegalStateException('Either an "action", "include", "redirect" or "forward" attribute must be specified for mapping "'.$this->path.'"');
                 }
                 elseif ($this->formClassName && $this->formValidateFirst) {
-                    if (!isSet($this->forwards[ActionForward ::VALIDATION_SUCCESS_KEY]) || !isSet($this->forwards[ActionForward ::VALIDATION_ERROR_KEY]))
+                    if (!isSet($this->forwards[ActionForward::VALIDATION_SUCCESS_KEY]) || !isSet($this->forwards[ActionForward::VALIDATION_ERROR_KEY]))
                         throw new IllegalStateException('A "success" and an "error" forward must be configured for validation of mapping "'.$this->path.'"');
                 }
             }
@@ -455,7 +455,7 @@ class ActionMapping extends Object {
         if ($name === ActionForward::__SELF) {
             $url = $this->path;
 
-            $query = Request ::me()->getQueryString();
+            $query = Request::me()->getQueryString();
             if (strLen($query))
                 $url .= '?'.$query;
 

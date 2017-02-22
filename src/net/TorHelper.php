@@ -114,7 +114,7 @@ class TorHelper extends StaticClass {
                             $status = $response->getStatus();
 
                             if ($status != 200) {
-                                self::$logNotice && Logger::log('Could not get TOR exit nodes from '.self::$torMirrors[$i].', HTTP status '.$status.' ('.HttpResponse ::$sc[$status]."),\n url: ".$request->getUrl(), L_NOTICE);
+                                self::$logNotice && Logger::log('Could not get TOR exit nodes from '.self::$torMirrors[$i].', HTTP status '.$status.' ('.HttpResponse::$sc[$status]."),\n url: ".$request->getUrl(), L_NOTICE);
                                 continue;
                             }
                         }

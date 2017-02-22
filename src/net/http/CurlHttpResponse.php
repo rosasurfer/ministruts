@@ -50,7 +50,7 @@ class CurlHttpResponse extends HttpResponse {
         self::$logInfo   = ($loglevel <= L_INFO  );
         self::$logNotice = ($loglevel <= L_NOTICE);
 
-        $this->headerParser = HeaderParser ::create();
+        $this->headerParser = HeaderParser::create();
     }
 
 

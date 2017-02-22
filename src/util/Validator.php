@@ -54,7 +54,7 @@ class Validator extends StaticClass {
      * @return bool
      */
     public static function isIPLanAddress($string) {
-        $bytes = self ::isIPAddress($string, true);
+        $bytes = self::isIPAddress($string, true);
 
         if ($bytes) {
             if ($bytes[0] == 10)                   // 10.0.0.0 - 10.255.255.255
