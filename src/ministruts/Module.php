@@ -414,7 +414,7 @@ class Module extends Object {
                 if (sizeOf($forwardTag->attributes()) > 2) throw new RuntimeException('Mapping "'.$mapping->getPath().'", forward "'.$name.'": Only one attribute of "include", "redirect" or "forward" must be specified');
 
                 $alias = (string) $forwardTag['forward'];
-                if ($alias == ActionForward ::__SELF) throw new RuntimeException('Mapping "'.$mapping->getPath().'", forward "'.$name.'", attribute "forward": Can not use magic keyword "'.$alias.'" as attribute value');
+                if ($alias == ActionForward::__SELF) throw new RuntimeException('Mapping "'.$mapping->getPath().'", forward "'.$name.'", attribute "forward": Can not use magic keyword "'.$alias.'" as attribute value');
 
                 $forward = $mapping->findForward($alias);
                 if (!$forward) throw new RuntimeException('Mapping "'.$mapping->getPath().'", forward "'.$name.'", attribute "forward": Forward "'.$alias.'" not found');
@@ -437,11 +437,11 @@ class Module extends Object {
     protected function processTiles(\SimpleXMLElement $xml) {
         $elements = $xml->xPath('/struts-config/tiles/tile');
         if ($elements === false)
-            $elements = array(); // xPath() gibt entgegen der Dokumentation NICHT immer ein Array zurueck
+            $elements = array();        // xPath() gibt entgegen der Dokumentation NICHT immer ein Array zurueck
 
         foreach ($elements as $tag) {
             $name = (string) $tag['name'];
-            $tile = $this->getDefinedTile($name, $xml);
+            /*$tile=*/$this->getDefinedTile($name, $xml);
         }
         // TODO: rekursive Tiles-Definitionen abfangen
     }
@@ -461,7 +461,7 @@ class Module extends Object {
             return $this->tiles[$name];
 
         // find it's definition ...
-        $nodes = $xml->xPath("/struts-config/tiles/tile[@name='$name']");
+        $nodes = $xml->xPath("/struts-config/tiles/tile[@name='".$name."']");
         if (!$nodes)            throw new RuntimeException('Tiles definition "'.$name.'" not found'); // FALSE oder leeres Array
         if (sizeOf($nodes) > 1) throw new RuntimeException('Non-unique "name" attribute detected for tiles definition "'.$name.'"');
 
@@ -912,7 +912,7 @@ class Module extends Object {
      *
      * @param  string $name - relativer Dateiname
      *
-     * @return string - Dateiname
+     * @return string|null - Dateiname
      */
     private function findFile($name) {
         // strip query string

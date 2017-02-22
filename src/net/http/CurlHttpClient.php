@@ -271,6 +271,6 @@ class CurlHttpClient extends HttpClient {
             Logger::log('Unknown CURL error code: '.$errorNo, L_WARN);
         }
 
-        return "$errorNo ($errorStr)";
+        return $errorNo.' ('.$errorStr.')';
     }
 }

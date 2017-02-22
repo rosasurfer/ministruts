@@ -130,7 +130,7 @@ class Logger extends StaticClass {
     /** @var int - additional SMS loglevel constraint */
     private static $smsLogLevel = null;
 
-    /** @var string[] - SMS options; resolved at log message time */
+    /** @var array - SMS options; resolved at log message time */
     private static $smsOptions = [];
 
     /** @var bool - whether or not the ErrorLogHandler is enabled */
@@ -150,7 +150,7 @@ class Logger extends StaticClass {
     /**
      * Initialize the Logger configuration.
      */
-    public static function init() {
+    private static function init() {
         static $initialized = false;
         if ($initialized) return;
 
@@ -202,7 +202,7 @@ class Logger extends StaticClass {
                 if (strStartsWith($receiver, '+' )) $receiver = subStr($receiver, 1);
                 if (strStartsWith($receiver, '00')) $receiver = subStr($receiver, 2);
                 if (!ctype_digit($receiver)) {
-                    Logger::log('Invalid SMS receiver configuration: "'.$receiver.'"', L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
+                    self::log('Invalid SMS receiver configuration: "'.$receiver.'"', L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
                     continue;
                 }
                 self::$smsReceivers[] = $receiver;
@@ -257,6 +257,7 @@ class Logger extends StaticClass {
      */
     public static function getLogLevel($class = '') {
         if (!is_string($class)) throw new IllegalTypeException('Illegal type of parameter $class: '.getType($class));
+        self::init();
 
         // read the configured class specific loglevels
         static $logLevels = null;
@@ -265,13 +266,13 @@ class Logger extends StaticClass {
                 throw new RuntimeException('Service locator returned invalid default config: '.getType($config));
 
             $logLevels = $config->get('log.level', []);
-            if (is_string($logLevels))                                  // only the general application loglevel is configured
-                $logLevels = ['' => $logLevels];
+            if (is_string($logLevels)) $logLevels = ['' => $logLevels]; // only the general application loglevel is configured
+            else                       $logLevels = (array)$logLevels;  // should be an array anyway
 
             foreach ($logLevels as $className => $level) {
                 if (!is_string($level)) throw new IllegalTypeException('Illegal configuration value for "log.level.'.$className.'": '.getType($level));
 
-                if ($level == '') {                                      // classes with empty values fall back to the application loglevel
+                if ($level == '') {                                     // classes with empty values fall back to the application loglevel
                     unset($logLevels[$className]);
                 }
                 else {
@@ -279,7 +280,7 @@ class Logger extends StaticClass {
                     if (!$logLevel) throw new InvalidArgumentException('Invalid configuration value for "log.level.'.$className.'" = '.$level);
                     $logLevels[$className] = $logLevel;
 
-                    if (strStartsWith($className, '\\')) {                // normalize class names: remove leading back slash
+                    if (strStartsWith($className, '\\')) {              // normalize class names: remove leading back slash
                         unset($logLevels[$className]);
                         $className = subStr($className, 1);
                         $logLevels[$className] = $logLevel;
@@ -307,6 +308,8 @@ class Logger extends StaticClass {
      * @param  array         $context  - optional logging context with additional data
      */
     public static function log($loggable, $level, array $context=[]) {
+        self::init();
+
         // Wrap everything in a try-catch block to prevent user generated log messages
         // from getting lost if logging fails.
         try {
@@ -337,7 +340,7 @@ class Logger extends StaticClass {
             }
             else {
                 // resolve the calling class and check its loglevel
-                !isSet($context['class']) && self::resolveLogCaller($loggable, $level, $context);
+                !isSet($context['class']) && self::resolveLogCaller($context);
                 if ($level < self::getLogLevel($context['class']))
                     $filtered = true;                                     // message is not covered
             }
@@ -430,7 +433,7 @@ class Logger extends StaticClass {
         $message = normalizeEOL($message);                             // use Unix line-breaks on Linux
         if (WINDOWS)                                                   // and Windows line-breaks on Windows
             $message = str_replace(EOL_UNIX, EOL_WINDOWS, $message);
-        $message = str_replace(chr(0), "?", $message);                 // replace NUL bytes which destroy the mail
+        $message = str_replace(chr(0), '?', $message);                 // replace NUL bytes which destroy the mail
 
         if (!$config=Config::getDefault()) throw new RuntimeException('Service locator returned invalid default config: '.getType($config));
         $sender  = $config->get('mail.from', null);
@@ -460,8 +463,9 @@ class Logger extends StaticClass {
             self::composeCliMessage($loggable, $level, $context);
 
         // (1) CURL options (all service providers)
+        $curlOptions = [];
         $curlOptions[CURLOPT_SSL_VERIFYPEER] = false;                  // the SSL certifikat may be self-signed or invalid
-    //$curlOptions[CURLOPT_VERBOSE       ] = true;                   // enable debugging
+      //$curlOptions[CURLOPT_VERBOSE       ] = true;                   // enable debugging
 
 
         // (2) clean-up message
@@ -491,7 +495,7 @@ class Logger extends StaticClass {
 
                     if ($status != 200) {
                         try {
-                            Logger::log('Unexpected HTTP status code '.$status.' ('.HttpResponse::$sc[$status].') for url: '.$request->getUrl(), L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
+                            self::log('Unexpected HTTP status code '.$status.' ('.HttpResponse::$sc[$status].') for url: '.$request->getUrl(), L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
                         }
                         catch (\Exception $ex) {/*eat it*/}
                         continue;
@@ -527,14 +531,14 @@ class Logger extends StaticClass {
                     $content  = $response->getContent();
                     if ($status != 200) {
                         try {
-                            Logger::log('Unexpected HTTP status code '.$status.' ('.HttpResponse::$sc[$status].') for url: '.$request->getUrl(), L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
+                            self::log('Unexpected HTTP status code '.$status.' ('.HttpResponse::$sc[$status].') for url: '.$request->getUrl(), L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
                         }
                         catch (\Exception $ex) {/*eat it*/}
                         continue;
                     }
                     if ($content === null) {
                         try {
-                            Logger::log('Empty reply from server, url: '.$request->getUrl(), L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
+                            self::log('Empty reply from server, url: '.$request->getUrl(), L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
                         }
                         catch (\Exception $ex) {/*eat it*/}
                         continue;
@@ -568,7 +572,7 @@ class Logger extends StaticClass {
         $msg = 'PHP '.$context['cliMessage'];
         if (isSet($context['cliExtra']))
             $msg .= $context['cliExtra'];
-        $msg = str_replace(chr(0), "?", $msg);                   // replace NUL bytes which mess up the logfile
+        $msg = str_replace(chr(0), '?', $msg);                   // replace NUL bytes which mess up the logfile
 
         if (!ini_get('error_log') && CLI) {
             // Suppress duplicated output to STDERR, the PrintHandler already wrote to STDOUT.
@@ -592,7 +596,7 @@ class Logger extends StaticClass {
      */
     private static function composeCliMessage($loggable, $level, array &$context) {
         if (!isSet($context['file']) || !isSet($context['line']))
-            self::resolveLogLocation($loggable, $level, $context);
+            self::resolveLogLocation($context);
         $file = $context['file'];
         $line = $context['line'];
 
@@ -703,7 +707,7 @@ class Logger extends StaticClass {
      */
     private static function composeHtmlMessage($loggable, $level, array &$context) {
         if (!isSet($context['file']) || !isSet($context['line']))
-            self::resolveLogLocation($loggable, $level, $context);
+            self::resolveLogLocation($context);
         $file = $context['file'];
         $line = $context['line'];
 
@@ -716,7 +720,7 @@ class Logger extends StaticClass {
         if (is_string($loggable)) {
             // simple message
             $msg   = $loggable;
-            $html .= '<b>['.strToUpper(self::$logLevels[$level]).']</b> '.nl2br(htmlSpecialChars($msg, ENT_QUOTES|ENT_SUBSTITUTE))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
+            $html .= '<b>['.strToUpper(self::$logLevels[$level]).']</b> '.nl2br(htmlSpecialChars($msg, ENT_QUOTES|ENT_SUBSTITUTE)).'<br>in <b>'.$file.'</b> on line <b>'.$line.'</b><br>';
         }
         else {
             // exception
@@ -729,7 +733,7 @@ class Logger extends StaticClass {
                     $type .= 'PHP Error:';
                 }
             }
-            $html     .= '<b>['.strToUpper(self::$logLevels[$level]).']</b> '.nl2br(htmlSpecialChars($type.$msg, ENT_QUOTES|ENT_SUBSTITUTE))."<br>in <b>".$file.'</b> on line <b>'.$line.'</b><br>';
+            $html     .= '<b>['.strToUpper(self::$logLevels[$level]).']</b> '.nl2br(htmlSpecialChars($type.$msg, ENT_QUOTES|ENT_SUBSTITUTE)).'<br>in <b>'.$file.'</b> on line <b>'.$line.'</b><br>';
             $traceStr  = $indent.'Stacktrace:'.NL.' -----------'.NL;
             $traceStr .= DebugHelper::getBetterTraceAsString($loggable, $indent);
             $html     .= '<br>'.printPretty($traceStr, true).'<br>';
@@ -757,23 +761,20 @@ class Logger extends StaticClass {
 
 
     /**
-     * Resolve the location the current log statement originated from and store it in the passed log context under the
-     * keys "file" and "line".
+     * Resolve the location the logger was called from and store it in the log context under the keys "file" and "line".
      *
-     * @param  string|object $loggable - message or exception to log
-     * @param  int           $level    - loglevel of the loggable
-     * @param  array        &$context  - reference to the log context
+     * @param  array &$context - reference to the log context
      */
-    private static function resolveLogLocation($loggable, $level, array &$context) {
+    private static function resolveLogLocation(array &$context) {
         if (!isSet($context['trace']))
             $context['trace'] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
         $trace = $context['trace'];
 
-        foreach ($trace as $i => $frame) {           // find the first non-logger frame with "file"
+        foreach ($trace as $i => $frame) {              // find the first non-logger frame with "file"
             if (isSet($frame['class']) && $frame['class']==__CLASS__)
                 continue;
-            if (!isSet($trace[$i-1]['file']))         // first non-logger frame, "file" and "line" are in the previous frame
-                continue;                              // skip internal PHP functions
+            if (!isSet($trace[$i-1]['file']))           // first non-logger frame, "file" and "line" are in the previous frame
+                continue;                               // skip internal PHP functions
             $context['file'] = $trace[$i-1]['file'];
             $context['line'] = $trace[$i-1]['line'];
             break;
@@ -784,16 +785,14 @@ class Logger extends StaticClass {
 
 
     /**
-     * Resolve the class calling the logger and store it in the passed log context under the key "class".
+     * Resolve the class the logger was called from and store it in the log context under the key "class".
      *
-     * @param  string|object $loggable - message or exception to log
-     * @param  int           $level    - loglevel of the loggable
-     * @param  array        &$context  - reference to the log context
+     * @param  array &$context - reference to the log context
      *
      *
      * @TODO:  test with Closure and internal PHP functions
      */
-    private static function resolveLogCaller($loggable, $level, array &$context) {
+    private static function resolveLogCaller(array &$context) {
         if (!isSet($context['trace']))
             $context['trace'] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
         $trace = $context['trace'];
@@ -814,4 +813,4 @@ class Logger extends StaticClass {
         $context['class'] = $class;
     }
 }
-Logger::init();
+

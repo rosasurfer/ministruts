@@ -123,7 +123,7 @@ class DebugHelper extends StaticClass {
             $callLen = max($callLen, strLen($call));
             $frame['call'] = $call;
 
-            $frame['line'] = isSet($frame['line']) ? " # line $frame[line]," : '';
+            $frame['line'] = isSet($frame['line']) ? ' # line '.$frame['line'].',' : '';
             $lineLen = max($lineLen, strLen($frame['line']));
 
             if (isSet($frame['file']))                 $frame['file'] = ' file: '.$frame['file'];
