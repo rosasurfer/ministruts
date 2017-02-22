@@ -34,7 +34,7 @@ class Lock extends BaseLock {
     /** @var string[] - alle Schluessel der im Moment gehaltenen Locks */
     private static $lockedKeys;
 
-    /** @var Lock - aktuelle Implementierung der Instanz */
+    /** @var BaseLock - aktuelle Implementierung der Instanz */
     private $impl;
 
     /** @var string - aktueller Schluessel der Instanz */
@@ -112,7 +112,7 @@ class Lock extends BaseLock {
      */
     public function release() {
         if ($this->impl) {
-            $this->impl->release(true);            // true: Lockfile eines evt. FileLocks loeschen lassen
+            $this->impl->release(/*true*/);            // true: Lockfile eines evt. FileLocks loeschen lassen
             unset(self::$lockedKeys[$this->key]);
         }
     }

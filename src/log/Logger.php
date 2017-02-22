@@ -164,7 +164,7 @@ class Logger extends StaticClass {
             if (is_array($logLevel))
                 $logLevel = $logLevel[''];
             $logLevel = self::logLevelToId($logLevel);
-            !$logLevel && $logLevel=self::DEFAULT_LOGLEVEL;
+            if (!$logLevel) $logLevel=self::DEFAULT_LOGLEVEL;
         }
         else {                                                // no loglevels are configured
             $logLevel = self::DEFAULT_LOGLEVEL;
@@ -211,7 +211,7 @@ class Logger extends StaticClass {
         $logLevel = $config->get('log.sms.level', self::$appLogLevel);
         if (is_string($logLevel)) {                                    // a string if a configured value
             $logLevel = self::logLevelToId($logLevel);
-            !$logLevel && $logLevel=self::$appLogLevel;
+            if (!$logLevel) $logLevel=self::$appLogLevel;
         }
         self::$smsLogLevel = $logLevel;
         self::$smsOptions  = $config->get('sms', []);
@@ -276,7 +276,7 @@ class Logger extends StaticClass {
                 }
                 else {
                     $logLevel = self::logLevelToId($level);
-                    if (!$logLevel)      throw new InvalidArgumentException('Invalid configuration value for "log.level.'.$className.'" = '.$level);
+                    if (!$logLevel) throw new InvalidArgumentException('Invalid configuration value for "log.level.'.$className.'" = '.$level);
                     $logLevels[$className] = $logLevel;
 
                     if (strStartsWith($className, '\\')) {                // normalize class names: remove leading back slash

@@ -705,7 +705,7 @@ class Module extends Object {
     protected function setRoleProcessorClass($className) {
         if ($this->configured)                                      throw new IllegalStateException('Configuration is frozen');
         if (!is_string($className))                                 throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
-        if (!is_class($className))                                  throw new ClassNotFoundException("Undefined class '$className'");
+        if (!is_class($className))                                  throw new ClassNotFoundException('Undefined class "'.$className.'"');
         if (!is_subclass_of($className, ROLE_PROCESSOR_BASE_CLASS)) throw new InvalidArgumentException('Not a subclass of '.ROLE_PROCESSOR_BASE_CLASS.': '.$className);
 
         $this->roleProcessorClass = $className;
@@ -787,7 +787,7 @@ class Module extends Object {
     protected function setForwardClass($className) {
         if ($this->configured)                                         throw new IllegalStateException('Configuration is frozen');
         if (!is_string($className))                                    throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
-        if (!is_class($className))                                     throw new ClassNotFoundException("Undefined class '$className'");
+        if (!is_class($className))                                     throw new ClassNotFoundException('Undefined class "'.$className.'"');
         if (!is_subclass_of($className, DEFAULT_ACTION_FORWARD_CLASS)) throw new InvalidArgumentException('Not a subclass of '.DEFAULT_ACTION_FORWARD_CLASS.': '.$className);
 
         $this->forwardClass = $className;

@@ -455,7 +455,7 @@ PROCESS_METHOD_ERROR_SC_405;
      * @param  Response $response
      * @param  Action   $action
      *
-     * @return ActionForward
+     * @return ActionForward|null
      */
     protected function processActionExecute(Request $request, Response $response, Action $action) {
         $forward   = null;
