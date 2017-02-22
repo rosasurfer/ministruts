@@ -10,16 +10,11 @@ use rosasurfer\exception\FileNotFoundException;
 use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\RuntimeException;
 
-use rosasurfer\log\Logger;
-
 use function rosasurfer\strLeftTo;
 use function rosasurfer\strRightFrom;
 use function rosasurfer\strStartsWith;
 
 use const rosasurfer\CLI;
-use const rosasurfer\L_DEBUG;
-use const rosasurfer\L_INFO;
-use const rosasurfer\L_NOTICE;
 use const rosasurfer\LOCALHOST;
 use const rosasurfer\MINUTE;
 use const rosasurfer\WINDOWS;
@@ -34,15 +29,6 @@ use const rosasurfer\WINDOWS;
  */
 class StrutsController extends Singleton {
 
-
-    /** @var bool */
-    private static $logDebug;
-
-    /** @var bool */
-    private static $logInfo;
-
-    /** @var bool */
-    private static $logNotice;
 
     /** @var Module[] - all registered Modules, array key is the Module prefix */
     private $modules = [];
@@ -93,11 +79,6 @@ class StrutsController extends Singleton {
      * Load and parse the Struts configuration and create the corresponding object hierarchy.
      */
     protected function __construct() {
-        $loglevel        = Logger::getLogLevel(__CLASS__);
-        self::$logDebug  = ($loglevel <= L_DEBUG );
-        self::$logInfo   = ($loglevel <= L_INFO  );
-        self::$logNotice = ($loglevel <= L_NOTICE);
-
         // lookup configuration files
         $configDir = Config::getDefault()->getDirectory();
         $configDir = str_replace('\\', '/', $configDir);
