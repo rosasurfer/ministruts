@@ -465,9 +465,16 @@ class Module extends Object {
         if (!$nodes)            throw new RuntimeException('Tiles definition "'.$name.'" not found'); // FALSE oder leeres Array
         if (sizeOf($nodes) > 1) throw new RuntimeException('Non-unique "name" attribute detected for tiles definition "'.$name.'"');
 
-
         $tag = $nodes[0];
-        if (sizeOf($tag->attributes()) != 2) throw new RuntimeException('Tile "'.$name.'": Exactly one attribute of "file" or "extends-tile" must be specified');
+        if (sizeOf($tag->attributes()) != 2) throw new RuntimeException('Tile "'.$name.'": Exactly one attribute of "file", "extends-tile" or "alias" must be specified');
+
+        // check for an alias
+        if ($tag['alias']) {
+            $alias = (string) $tag['alias'];
+            $tile  = $this->getDefinedTile($alias, $xml);
+            $this->addTile($tile, $name);
+            return $tile;
+        }
 
         // create a new instance ...
         if ($tag['file']) {                 // 'file' given
@@ -505,7 +512,7 @@ class Module extends Object {
             // TODO: Name-Value von <set> wird nicht auf Eindeutigkeit ueberprueft
 
             if ($tag['value']) { // value ist im Attribut angegeben
-                if (strLen($tag) > 0) throw new RuntimeException('Tile "'.$tile->getName().'", set "'.$name.'": Only a "value" attribute *or* a body value must be specified');
+                if (strLen($tag) > 0) throw new RuntimeException('Tile "'.$tile->getName().'", child <set name="'.$name.'": Only a "value" attribute *or* a body value must be specified');
                 $value = (string) $tag['value'];
 
                 if ($tag['type']) {
@@ -514,8 +521,8 @@ class Module extends Object {
                 elseif ($this->isIncludable($value, $xml)) {
                     $type = Tile::PROPERTY_TYPE_RESOURCE;
                 }
-                elseif (strEndsWithI($value, '.htm') || strEndsWithI($value, '.html')) {
-                    throw new RuntimeException('Tile "'.$tile->getName().'", set "'.$name.'": specify a type="string|resource" for ambiguous attribute value="'.$value.'" (looks like a filename but file not found)');
+                elseif (strEndsWithI($value, ['.htm', '.html', '.inc', '.phtm', '.phtml', '.php'])) {
+                    throw new RuntimeException('Tile "'.$tile->getName().'", child <set name="'.$name.'": specify a type="string|resource" for ambiguous value="'.$value.'" (looks like a filename but file not found)');
                 }
                 else {
                     $type = Tile::PROPERTY_TYPE_STRING;
@@ -524,7 +531,7 @@ class Module extends Object {
             else {               // value ist im Body angegeben
                 $value = trim((string) $tag);
                 $type = ($tag['type']) ? (string) $tag['type'] : Tile::PROPERTY_TYPE_STRING;
-                if ($type == Tile::PROPERTY_TYPE_RESOURCE) throw new RuntimeException('Tile "'.$tile->getName().'", set "'.$name.'": A "value" attribute must be specified when attribute type is set to "resource"');
+                if ($type == Tile::PROPERTY_TYPE_RESOURCE) throw new RuntimeException('Tile "'.$tile->getName().'", child <set name="'.$name.'": A "value" attribute must be specified when attribute type is set to "resource"');
             }
 
 
@@ -536,10 +543,10 @@ class Module extends Object {
                 elseif ($this->isFile($value)) {       // generische Tile erzeugen, damit render() existiert
                     $nestedTile = new $this->tilesClass($this, $tile);
                     $nestedTile->setName(Tile::GENERIC_NAME)
-                          ->setFileName($this->findFile($value));
+                               ->setFileName($this->findFile($value));
                 }
                 else {
-                    throw new RuntimeException('Tile "'.$tile->getName().'", set "'.$name.'", attribute "value": '.($value{0}=='.' ? 'Tiles definition':'File').' "'.$value.'" not found');
+                    throw new RuntimeException('Tile "'.$tile->getName().'", child <set name="'.$name.'" value="'.$value.'": '.($value{0}=='.' ? 'Tiles definition':'File').'  not found');
                 }
                 $value = $nestedTile;
             }
@@ -602,11 +609,23 @@ class Module extends Object {
     /**
      * Fuegt diesem Module eine Tile hinzu.
      *
-     * @param  Tile $tile
+     * @param  Tile        $tile
+     * @param  string|null $alias - alias name of the tile (default: none)
      */
-    protected function addTile(Tile $tile) {
+    protected function addTile(Tile $tile, $alias=null) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-        $this->tiles[$tile->getName()] = $tile;
+
+        $name = $tile->getName();
+
+        if (!isSet($this->tiles[$name])) {
+            $this->tiles[$name] = $tile;
+        }
+
+        if (!is_null($alias)) {
+            if (!isSet($this->tiles[$alias])) {
+                $this->tiles[$alias] = $tile;
+            }
+        }
     }
 
 
@@ -811,14 +830,9 @@ class Module extends Object {
      */
     public function freeze() {
         if (!$this->configured) {
-            foreach ($this->forwards as $forward)
-                $forward->freeze();
-
-            foreach ($this->mappings as $mapping)
-                $mapping->freeze();
-
-            foreach ($this->tiles as $tile)
-                $tile->freeze();
+            foreach ($this->forwards as $forward) $forward->freeze();
+            foreach ($this->mappings as $mapping) $mapping->freeze();
+            foreach ($this->tiles    as $tile)    $tile->freeze();
 
             $this->configured = true;
         }
