@@ -730,6 +730,6 @@ function url($uri) {
  *                       belongs to).
  * @return VersionedUrl
  */
-function versionedUrl($uri) {
-    return \rosasurfer\versionedUrl($uri);
+function vUrl($uri) {
+    return \rosasurfer\vUrl($uri);
 }

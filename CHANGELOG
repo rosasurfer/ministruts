@@ -1,4 +1,10 @@
 
+2017-02-23
+
+   - move application base URI from $_SERVER['APPLICATION_BASE_URI'] to Config::get('application.base-uri');
+   - simplify helper function versionedUrl() to vUrl()
+
+
 2017-02-19
 
    - the db/*/Connector constructor is part of interface db/ConnectorInterface

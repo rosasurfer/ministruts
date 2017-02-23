@@ -16,6 +16,7 @@ use function rosasurfer\strStartsWith;
 
 use const rosasurfer\DAY;
 use const rosasurfer\NL;
+use rosasurfer\config\Config;
 
 
 /**
@@ -327,14 +328,20 @@ class Request extends Singleton {
      * </pre>
      */
     public function getApplicationBaseUri() {
+
         // TODO: Move to application as this uri is not a property of the request.
-        static $path = null;
-        if (!$path) {
-            $path = $_SERVER['APPLICATION_BASE_URI'];             // triggers error if not set, which is OK
-            !strStartsWith($path, '/') && $path  = '/'.$path;
-            !strEndsWith  ($path, '/') && $path .= '/';
+
+        static $baseUri = null;
+        if (!$baseUri) {
+            $baseUri = Config::getDefault()->get('application.base-uri', false);
+            if (!$baseUri) {
+                // fall-back to old behaviour (triggers an error if not set, which is OK)
+                $baseUri = $_SERVER['APPLICATION_BASE_URI'];
+            }
+            !strStartsWith($baseUri, '/') && $baseUri  = '/'.$baseUri;
+            !strEndsWith  ($baseUri, '/') && $baseUri .= '/';
         }
-        return $path;
+        return $baseUri;
     }
 
 

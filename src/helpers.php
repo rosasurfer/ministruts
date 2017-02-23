@@ -1033,6 +1033,6 @@ function url($uri) {
  *                       belongs to).
  * @return VersionedUrl
  */
-function versionedUrl($uri) {
+function vUrl($uri) {
     return new VersionedUrl($uri);
 }
