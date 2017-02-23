@@ -1,4 +1,10 @@
 
+2017-02-24
+
+   - struts-config: tiles definitions may be aliased
+     e.g.: <tile name=".guest.login"  alias=".guest.home" />
+
+
 2017-02-23
 
    - move application base URI from $_SERVER['APPLICATION_BASE_URI'] to Config::get('application.base-uri');
