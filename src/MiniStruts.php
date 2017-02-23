@@ -26,8 +26,8 @@ class MiniStruts extends StaticClass {
     /**
      * Initialize the framework. This method expects an array with any of the following options:
      *
-     * "config"            - IConfig: config instance
-     *                     - string:  Configuration location, can either be a config directory or a config file.
+     * "config"            - IConfig: configuration instance
+     *                     - string:  configuration location, can either be a directory or a file.
      *
      * "global-helpers"    - bool: If set to TRUE, the helper functions and constants defined in namespace \rosasurfer
      *                             are additionally mapped to the global namespace.
@@ -35,17 +35,21 @@ class MiniStruts extends StaticClass {
      *                             see  {@link ./globals.php}
      *
      * "handle-errors"     - int:  Flag specifying how to handle regular PHP errors. Possible values:
-     *                         LOG_ERRORS:       PHP errors are sent to the configured default logger.<br>
-     *                         THROW_EXCEPTIONS: PHP errors are converted to PHP ErrorExceptions and thrown back. If this
+     *                       LOG_ERRORS:       PHP errors are sent to the configured default logger.<br>
+     *                       THROW_EXCEPTIONS: PHP errors are converted to PHP ErrorExceptions and thrown back. If this
      *                             option is used it is required to either configure the framework's exception handler or
      *                             to register your own exception handling mechanism. Without an exception handler PHP
      *                             will terminate a script with a FATAL error after such an exception.
      *                             default: NULL (no error handling)
+     * strict|ignore
+     *
      *
      * "handle-exceptions" - bool: If set to TRUE exceptions are handled by the built-in exception handler.<br>
      *                             Enabling this option is required if the option "handle-errors" is set to
      *                             THROW_EXCEPTIONS and you don't provide your own exception handling mechanism.
      *                             default: FALSE (no exception handling)
+     * true|false
+     *
      * @param  array $options
      */
     public static function init(array $options = []) {
