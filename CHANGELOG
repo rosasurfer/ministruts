@@ -2,7 +2,11 @@
 2017-02-23
 
    - move application base URI from $_SERVER['APPLICATION_BASE_URI'] to Config::get('application.base-uri');
-   - simplify helper function versionedUrl() to vUrl()
+   - simplify helper function rosasurfer\versionedUrl() to vUrl()
+   - application initialization options:
+     change options for "handle-errors" to "[strict|weak|ignore]" with default "strict" 
+     change default for option "handle-exception" to TRUE 
+     rename option "global-helpers" to "globals"
 
 
 2017-02-19

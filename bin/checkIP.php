@@ -12,12 +12,7 @@ error_reporting(E_ALL & ~E_DEPRECATED);
 
 // configure and load the framework
 require(APPLICATION_ROOT.'/src/load.php');
-$options = array(
-    'global-helpers'    => true,
-    'handle-errors'     => MiniStruts::THROW_EXCEPTIONS,
-    'handle-exceptions' => true,
-);
-MiniStruts::init($options);
+MiniStruts::init(['globals' => true]);
 
 
 // --- start ----------------------------------------------------------------------------------------------------------------

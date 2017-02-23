@@ -26,39 +26,37 @@ class MiniStruts extends StaticClass {
     /**
      * Initialize the framework. This method expects an array with any of the following options:
      *
-     * "config"            - IConfig: configuration instance
-     *                     - string:  configuration location, can either be a directory or a file.
+     * "config"            - IConfig: configuration instance<br>
+     *                     - string:  configuration location, can either be a directory or a file.<br>
      *
-     * "global-helpers"    - bool: If set to TRUE, the helper functions and constants defined in namespace \rosasurfer
-     *                             are additionally mapped to the global namespace.
-     *                             default: FALSE (no global helpers)
-     *                             see  {@link ./globals.php}
+     * "handle-errors"     - string:  How to handle regular PHP errors. If set to 'strict' errors are converted to PHP
+     *                                ErrorExceptions and thrown. If set to 'weak' errors are logged and execution continues.
+     *                                If set to 'ignore' you have to setup your own error handling mechanism.<br>
+     *                                default: 'strict' <br>
      *
-     * "handle-errors"     - int:  Flag specifying how to handle regular PHP errors. Possible values:
-     *                       LOG_ERRORS:       PHP errors are sent to the configured default logger.<br>
-     *                       THROW_EXCEPTIONS: PHP errors are converted to PHP ErrorExceptions and thrown back. If this
-     *                             option is used it is required to either configure the framework's exception handler or
-     *                             to register your own exception handling mechanism. Without an exception handler PHP
-     *                             will terminate a script with a FATAL error after such an exception.
-     *                             default: NULL (no error handling)
-     * strict|ignore
+     * "handle-exceptions" - bool:    If set to TRUE exceptions are handled by the built-in exception handler. If set to
+     *                                FALSE you have to setup your own exception handling mechanism.<br>
+     *                                default: TRUE <br>
      *
-     *
-     * "handle-exceptions" - bool: If set to TRUE exceptions are handled by the built-in exception handler.<br>
-     *                             Enabling this option is required if the option "handle-errors" is set to
-     *                             THROW_EXCEPTIONS and you don't provide your own exception handling mechanism.
-     *                             default: FALSE (no exception handling)
-     * true|false
+     * "globals"           - bool:    If set to TRUE, the helper functions and constants defined in "rosasurfer/helpers.php"
+     *                                are mapped to and available in the global namespace. This can simplify HTML views as
+     *                                no additional PHP "use" declarations are needed.<br>
+     *                                default: FALSE <br>
      *
      * @param  array $options
      */
     public static function init(array $options = []) {
+        // set default values
+        if (!isSet($options['handle-errors'    ])) $options['handle-errors'    ] = 'strict';
+        if (!isSet($options['handle-exceptions'])) $options['handle-exceptions'] = true;
+        if (!isSet($options['globals'          ])) $options['globals'          ] = false;
+
         foreach ($options as $key => $value) {
             switch ($key) {
                 case 'config'           : self::setConfiguration      ($value); continue;
-                case 'global-helpers'   : self::loadGlobalHelpers     ($value); continue;
                 case 'handle-errors'    : self::setupErrorHandling    ($value); continue;
                 case 'handle-exceptions': self::setupExceptionHandling($value); continue;
+                case 'globals'          : self::loadGlobalHelpers     ($value); continue;
               //case 'replace-composer' : self::replaceComposer       ($value); continue;     // TODO
             }
         }
@@ -175,6 +173,46 @@ class MiniStruts extends StaticClass {
 
 
     /**
+     * Setup the application's error handling.
+     *
+     * @param  int|string $value - configuration value as passed to the framework loader
+     */
+    private static function setupErrorHandling($value) {
+        $flag = self::THROW_EXCEPTIONS;
+        if (is_string($value)) {
+            $value = trim(strToUpper($value));
+            if      ($value == 'weak'  ) $flag = self::LOG_ERRORS;  // default: THROW_EXCEPTIONS
+            else if ($value == 'ignore') $flag = null;
+        }
+        if ($flag) {
+            ErrorHandler::setupErrorHandling($flag);
+        }
+    }
+
+
+    /**
+     * Setup the application's exception handling.
+     *
+     * @param  bool|int|string $value - configuration value as passed to the framework loader
+     */
+    private static function setupExceptionHandling($value) {
+        $enabled = true;
+        if (is_bool($value) || is_int($value)) {
+            $enabled = (bool) $value;
+        }
+        elseif (is_string($value)) {
+            $value = trim(strToLower($value));
+            if ($value=='0' || $value=='off' || $value=='false')
+                $enabled = false;                                   // default: true
+        }
+
+        if ($enabled) {
+            ErrorHandler::setupExceptionHandling();
+        }
+    }
+
+
+    /**
      * Map the helper constants and functions in namespace \rosasurfer to the global namespace.
      *
      * @param  mixed $value - configuration value as passed to the framework loader
@@ -191,50 +229,6 @@ class MiniStruts extends StaticClass {
 
         if ($enabled) {
             include(MINISTRUTS_ROOT.'/src/globals.php');
-        }
-    }
-
-
-    /**
-     * Setup the application's error handling.
-     *
-     * @param  int|string $value - configuration value as passed to the framework loader
-     */
-    private static function setupErrorHandling($value) {
-        $flag = null;
-        if (is_int($value)) {
-            if     ($value == self::LOG_ERRORS      ) $flag = self::LOG_ERRORS;
-            elseif ($value == self::THROW_EXCEPTIONS) $flag = self::THROW_EXCEPTIONS;
-        }
-        elseif (is_string($value)) {
-            $value = trim(strToUpper($value));
-            if     ($value=='LOG_ERRORS'       || $value=='LOG'  ) $flag = self::LOG_ERRORS;
-            elseif ($value=='THROW_EXCEPTIONS' || $value=='THROW') $flag = self::THROW_EXCEPTIONS;
-        }
-
-        if ($flag) {
-            ErrorHandler::setupErrorHandling($flag);
-        }
-    }
-
-
-    /**
-     * Setup the application's exception handling.
-     *
-     * @param  bool|int|string $value - configuration value as passed to the framework loader
-     */
-    private static function setupExceptionHandling($value) {
-        $enabled = false;
-        if (is_bool($value) || is_int($value)) {
-            $enabled = (bool) $value;
-        }
-        elseif (is_string($value)) {
-            $value   = trim(strToLower($value));
-            $enabled = ($value=='1' || $value=='on' || $value=='true');
-        }
-
-        if ($enabled) {
-            ErrorHandler::setupExceptionHandling();
         }
     }
 

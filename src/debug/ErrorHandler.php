@@ -102,8 +102,8 @@ class ErrorHandler extends StaticClass {
         elseif ($mode === self::THROW_EXCEPTIONS) self::$errorMode = self::THROW_EXCEPTIONS;
         else                                      return;
 
-        set_error_handler(self::$errorHandler=__CLASS__.'::handleError', E_ALL);   // E_ALL because error_reporting()
-    }                                                                             // may change at runtime
+        set_error_handler(self::$errorHandler=__CLASS__.'::handleError', E_ALL);    // E_ALL because error_reporting()
+    }                                                                               // may change at runtime
 
 
     /**
@@ -113,12 +113,12 @@ class ErrorHandler extends StaticClass {
         set_exception_handler(self::$exceptionHandler=__CLASS__.'::handleException');
 
         /**
-       * Detect entering of the script's shutdown phase to be capable of handling destructor exceptions during shutdown
-       * differently and avoid otherwise fatal errors. Should be the very first function on the shutdown function stack.
-       *
-       * @see  http://php.net/manual/en/language.oop5.decon.php
-       * @see  ErrorHandler::handleDestructorException()
-       */
+         * Detect entering of the script's shutdown phase to be capable of handling destructor exceptions during shutdown
+         * differently and avoid otherwise fatal errors. Should be the very first function on the shutdown function stack.
+         *
+         * @see  http://php.net/manual/en/language.oop5.decon.php
+         * @see  ErrorHandler::handleDestructorException()
+         */
         register_shutdown_function(function() {
             self::$inShutdown = true;
         });
@@ -151,7 +151,7 @@ class ErrorHandler extends StaticClass {
         // (1) Ignore suppressed errors and errors not covered by the current reporting level.
         $reportingLevel = error_reporting();
         if (!$reportingLevel)            return false;     // the @ operator was specified
-        if (!($reportingLevel & $level)) return true;      // error is not covered by current reporting level
+        if (!($reportingLevel & $level)) return true;      // the error is not covered by current reporting level
 
         $logContext         = [];
         $logContext['file'] = $file;
@@ -193,23 +193,20 @@ class ErrorHandler extends StaticClass {
             Logger::log($exception, L_ERROR, $logContext);
             return true;
         }
-        else {
-            //self::$errorMode == self::THROW_EXCEPTIONS
-        }
 
         // (5) Handle cases where throwing an exception is not possible or not allowed.
 
         /**
-       * Errors triggered by require() or require_once()
-       *
-       * Problem:  PHP errors triggered by require() or require_once() are non-catchable errors and do not follow
-       *           regular application flow. PHP terminates the script after leaving the error handler, thrown
-       *           exceptions are ignored. This termination is intended behaviour and the main difference to include()
-       *           and include_once().
-       * Solution: Manually call the exception handler.
-       *
-       * @see  http://stackoverflow.com/questions/25584494/php-set-exception-handler-not-working-for-error-thrown-in-set-error-handler-cal
-       */
+         * Errors triggered by require() or require_once()
+         *
+         * Problem:  PHP errors triggered by require() or require_once() are non-catchable errors and do not follow
+         *           regular application flow. PHP terminates the script after leaving the error handler, thrown
+         *           exceptions are ignored. This termination is intended behaviour and the main difference to include()
+         *           and include_once().
+         * Solution: Manually call the exception handler.
+         *
+         * @see  http://stackoverflow.com/questions/25584494/php-set-exception-handler-not-working-for-error-thrown-in-set-error-handler-cal
+         */
         $function = DebugHelper::getFQFunctionName($exception->getBetterTrace()[0]);
         if ($function=='require' || $function=='require_once') {
             call_user_func(self::$exceptionHandler, $exception);

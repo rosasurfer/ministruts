@@ -9,10 +9,6 @@ use rosasurfer\util\PHP;
  */
 !defined('APPLICATION_ROOT') && define('APPLICATION_ROOT', dirname(__DIR__));
 require(APPLICATION_ROOT.'/src/load.php');
-$options = [
-    'handle-errors'     => MiniStruts::THROW_EXCEPTIONS,
-    'handle-exceptions' => true,
-];
-MiniStruts::init($options);
+MiniStruts::init(['globals' => true]);
 
 PHP::phpInfo();
