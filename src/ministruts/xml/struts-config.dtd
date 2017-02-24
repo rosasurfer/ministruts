@@ -1,39 +1,44 @@
 <!--
 
                                      DTD for the Struts configuration of the application
-                                    =====================================================                                   
+                                    =====================================================
+
+
+   Struts 1.x general design and overview:
+   ---------------------------------------
+   @see  http://en.wikipedia.org/wiki/Apache_Struts_1
 -->
 
 
 <!-- ====== Type Definitions ============================================================================================ -->
 
 
-<!-- 
-   A "Boolean" is the string representation of a boolean variable ('true' or 'false'). 
+<!--
+   A "Boolean" is the string representation of a boolean variable ('true' or 'false').
 -->
 <!ENTITY % Boolean "(true|false)">
 
 
-<!-- 
+<!--
    A "ClassName" is the name of a PHP class that is instantiated to provide the functionality of the enclosing element.
 -->
 <!ENTITY % ClassName "CDATA">
 
 
-<!-- 
+<!--
    A "LogicalName" is the logical name used to reference an element.
 -->
 <!ENTITY % LogicalName "CDATA">
 
 
-<!-- 
-   A "RequestPath" is a module-relative URI path beginning with a slash "/" that identifies a mapped resource within the web 
+<!--
+   A "RequestPath" is a module-relative URI path beginning with a slash "/" that identifies a mapped resource within the web
    application.
 -->
 <!ENTITY % RequestPath "CDATA">
 
 
-<!-- 
+<!--
    A "ResourcePath" is the relative location of a file system resource or a logical name pointing to another resource.
 -->
 <!ENTITY % ResourcePath "CDATA">
@@ -43,11 +48,11 @@
 <!-- ====== Top Level Elements ========================================================================================== -->
 
 
-<!-- 
-   The "struts-config" element is the root of the configuration file hierarchy, and contains nested elements for all of the 
+<!--
+   The "struts-config" element is the root of the configuration file hierarchy, and contains nested elements for all of the
    other configuration settings.
 
-   view-base  Comma-delimited list of directories to lookup views (templates, layouts, tiles, partials etc). Values may be 
+   view-base  Comma-delimited list of directories to lookup views (templates, layouts, tiles, partials etc). Values may be
               absolute or relative to the application root directory.
               [default: "app/view"]
 -->
@@ -57,9 +62,9 @@
 >
 
 
-<!-- 
-   The "global-forwards" element describes a set of ActionForward objects that are available to all Action objects as a 
-   return value. The individual ActionForwards are configured through nested "forward" elements. A "mapping" element may 
+<!--
+   The "global-forwards" element describes a set of ActionForward objects that are available to all Action objects as a
+   return value. The individual ActionForwards are configured through nested "forward" elements. A "mapping" element may
    override a global forward by defining a local (i.e. nested) "forward" element of the same name.
 -->
 <!ELEMENT global-forwards (forward*)>
@@ -67,22 +72,22 @@
 >
 
 
-<!-- 
-   The "forward" element describes an ActionForward. An ActionForward has a logical name and describes an URI, a file or a 
-   tiles definition. A "forward" element may be used for both global and local forward definitions. Global forwards are 
-   available to all mappings of the module. Local forwards are nested within a "mapping" element and are available only to 
+<!--
+   The "forward" element describes an ActionForward. An ActionForward has a logical name and describes an URI, a file or a
+   tiles definition. A "forward" element may be used for both global and local forward definitions. Global forwards are
+   available to all mappings of the module. Local forwards are nested within a "mapping" element and are available only to
    the action invoked through that mapping.
 
    name      The unique identifier of the forward. Used to select the resource that should complete the request/response.
 
-   include   The name of a tiles definition or a file to include. Tiles definition names must start with a dot ".", file 
-             system locations must not start with a dot ".". Exactly one of "include", "redirect" or "forward" must be 
+   include   The name of a tiles definition or a file to include. Tiles definition names must start with a dot ".", file
+             system locations must not start with a dot ".". Exactly one of "include", "redirect" or "forward" must be
              specified.
 
-   redirect  The module-relative path of the location to which a redirect instruction should be issued. Exactly one of 
+   redirect  The module-relative path of the location to which a redirect instruction should be issued. Exactly one of
              "include", "redirect" or "forward" must be specified.
 
-   forward   The name of another "forward" element to use instead of the current one (local forwards are preferred over 
+   forward   The name of another "forward" element to use instead of the current one (local forwards are preferred over
              global ones). Exactly one of "include", "redirect" or "forward" must be specified.
 -->
 <!ELEMENT forward (set-property*)>
@@ -94,8 +99,8 @@
 >
 
 
-<!-- 
-   The "action-mappings" element describes a set of ActionMapping objects that are available to process requests matching the 
+<!--
+   The "action-mappings" element describes a set of ActionMapping objects that are available to process requests matching the
    given URL pattern. Individual ActionMappings are configured through nested "mapping" elements.
 -->
 <!ELEMENT action-mappings (mapping+)>
@@ -103,49 +108,49 @@
 >
 
 
-<!-- 
-   The "mapping" element describes an ActionMapping object that is to be used to process a request for a specific 
+<!--
+   The "mapping" element describes an ActionMapping object that is to be used to process a request for a specific
    module-relative URI. The following attributes are defined:
 
    path                 The module-relative path of the request, starting with a slash "/" character.
-                        
-   include              The name of a tiles definition or a file to include, instead of passing the request to an action. 
-                        Tiles definition names must start with a dot ".", file system locations must not start with a dot. 
-                        Not valid if the "action" attribute is specified. Only one of "include", "redirect" or "forward" can 
+
+   include              The name of a tiles definition or a file to include, instead of passing the request to an action.
+                        Tiles definition names must start with a dot ".", file system locations must not start with a dot.
+                        Not valid if the "action" attribute is specified. Only one of "include", "redirect" or "forward" can
                         be specified.
-                        
-   redirect             The module-relative path of the location to which a redirect instruction should be issued, instead 
-                        of passing the request to an action. Not valid if the "action" attribute is specified. Only one of 
+
+   redirect             The module-relative path of the location to which a redirect instruction should be issued, instead
+                        of passing the request to an action. Not valid if the "action" attribute is specified. Only one of
                         "include", "redirect" or "forward" can be specified.
-                        
-   forward              The name of a global "forward" element to forward control to, instead of passing the request to an 
-                        action. Not valid if the "action" attribute is specified. Only one of "include", "redirect" or 
+
+   forward              The name of a global "forward" element to forward control to, instead of passing the request to an
+                        action. Not valid if the "action" attribute is specified. Only one of "include", "redirect" or
                         "forward" can be specified.
-                        
-   action               Class name of an Action subclass that will process requests for action mapping. Not valid if the 
+
+   action               Class name of an Action subclass that will process requests for action mapping. Not valid if the
                         "include", "redirect" or "forward" attribute is specified.
-                        
+
    form                 Class name of an ActionForm subclass, if any, that is associated with the mapping.
-                        
-   form-scope           The context ("request" or "session") that is used to store and access the ActionForm, if any. 
+
+   form-scope           The context ("request" or "session") that is used to store and access the ActionForm, if any.
                         Optional if the "form" attribute is specified, else not valid.
                         [default: "request"]
 
-   form-validate-first  Valid only if the "form" attribute is specified. Set to "true" if the ActionForm should be validated 
-                        prior to calling the Action object, or set to "false" if you don't want validation at that time. The 
-                        default behaviour is "false" if an action object or a forward (include, redirect, forward) are 
+   form-validate-first  Valid only if the "form" attribute is specified. Set to "true" if the ActionForm should be validated
+                        prior to calling the Action object, or set to "false" if you don't want validation at that time. The
+                        default behaviour is "false" if an action object or a forward (include, redirect, forward) are
                         configured, and "true" if no action object and no forward are configured.
-                        This means per default a configured action is responsible for input validation. If neither an action 
-                        nor a forward are configured the framework will perform input validation. For validation by the 
+                        This means per default a configured action is responsible for input validation. If neither an action
+                        nor a forward are configured the framework will perform input validation. For validation by the
                         framework two nested "forward" elements named "success" and "error" must be configured.
-                  
+
    http-methods         Comma-delimited list of HTTP method verbs ("get", "post") the action mapping supports.
                         [default: "get"]
-                        
+
    roles                Comma-delimited list of required roles to access the action mapping.
                         [default: "none"]
-                        
-   default              Set to "true" if the mapping should be configured as the default action mapping for the module. If a 
+
+   default              Set to "true" if the mapping should be configured as the default action mapping for the module. If a
                         request does not match any other mapping, it will be passed to the action mapping with the "default"
                         attribute set to "true". Only one mapping can be marked as "default" within a module.
                         [default: "false"]
@@ -166,8 +171,8 @@
 >
 
 
-<!-- 
-   The "tiles" element describes the set of available Tiles objects. Individual tiles are configured through nested "tile" 
+<!--
+   The "tiles" element describes the set of available Tiles objects. Individual tiles are configured through nested "tile"
    elements.
 -->
 <!ELEMENT tiles (tile*)>
@@ -175,22 +180,22 @@
 >
 
 
-<!-- 
+<!--
    The "tile" element describes a single Tile that can be inserted in a page. It is identified by its logical name.
 
-   name          The unique identifier for this tile. Tile names must start with a dot ".". It is recommended to name tile 
-                 template definitions (partals/layouts which must be etxended) and tile view definitions (partials which are 
-                 ready to be inserted) differently, e.g. templates as ".{name}.tpl" and insertables as ".{name}". 
-                 
-   file          The path of the file to insert relative to the "view-base" directory of the module. Exactly one of "file", 
+   name          The unique identifier for this tile. Tile names must start with a dot ".". It is recommended to name tile
+                 template definitions (partals/layouts which must be etxended) and tile view definitions (partials which are
+                 ready to be inserted) differently, e.g. templates as ".{name}.tpl" and insertables as ".{name}".
+
+   file          The path of the file to insert relative to the "view-base" directory of the module. Exactly one of "file",
                  "extends-tile" or "alias" must be specified.
 
-   extends-tile  Name of a tile that is used as ancestor of this tile. Tile names must start with a dot ".". All attributes 
-                 from the ancestor are available to the new tile. Any attribute inherited from the ancestor can be 
+   extends-tile  Name of a tile that is used as ancestor of this tile. Tile names must start with a dot ".". All attributes
+                 from the ancestor are available to the new tile. Any attribute inherited from the ancestor can be
                  overwritten by providing a new value. Exactly one of "file", "extends-tile" or "alias" must be specified.
-   
-   alias         Name of another tile that this tile's name is an alias for. Tile names must start with a dot ".". If this 
-                 attribute is set the tile can not have nested child elements. Exactly one of "file", "extends-tile" or 
+
+   alias         Name of another tile that this tile's name is an alias for. Tile names must start with a dot ".". If this
+                 attribute is set the tile can not have nested child elements. Exactly one of "file", "extends-tile" or
                  "alias" must be specified.
 -->
 <!ELEMENT tile (set*, set-property*)>
@@ -202,14 +207,14 @@
 >
 
 
-<!-- 
-   The "set" element describes an additional property passed to a tiles definition. The value of this property can be 
+<!--
+   The "set" element describes an additional property passed to a tiles definition. The value of this property can be
    specified as an XML attribute or in the body of the <set> tag.
 
    name   The unique identifier for this property.
 
-   type   The type of the passed value. Optional, can be "string" or "resource". If no type is specified and a resource with 
-          a name matching the attribute value of the property is found, the type "resource" is used. Otherwise the type 
+   type   The type of the passed value. Optional, can be "string" or "resource". If no type is specified and a resource with
+          a name matching the attribute value of the property is found, the type "resource" is used. Otherwise the type
           "string" is used.
 
    value  The value of the property. The value can be specified as an XML attribute, or in the body of the <set> tag.
@@ -222,7 +227,7 @@
 >
 
 
-<!-- 
+<!--
    The "controller" element describes controller related settings.
 
    request-processor  Class name of the RequestProcessor subclass that will perform request processing for the module.
@@ -241,13 +246,13 @@
 <!-- ====== Subordinate Elements ======================================================================================== -->
 
 
-<!-- 
-   TODO: Documentation needs to be extended and clarified. 
-   
-   The "set-property" element specifies the method name and initial value of an additional class configuration property. 
-   When the object representing the surrounding element is instantiated, the accessor for the indicated property is called 
-   and passed the indicated value. The "set-property" element is especially useful when a custom class is used with "forward" 
-   or "mapping" elements. The custom class can be passed whatever properties may be required to configure it without changing 
+<!--
+   TODO: Documentation needs to be extended and clarified.
+
+   The "set-property" element specifies the method name and initial value of an additional class configuration property.
+   When the object representing the surrounding element is instantiated, the accessor for the indicated property is called
+   and passed the indicated value. The "set-property" element is especially useful when a custom class is used with "forward"
+   or "mapping" elements. The custom class can be passed whatever properties may be required to configure it without changing
    the syntax of the struts-config file or the way it is parsed.
 
    property  Name of the class property whose setter method will be called.
