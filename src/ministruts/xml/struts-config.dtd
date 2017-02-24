@@ -193,7 +193,7 @@
                  attribute is set the tile can not have nested child elements. Exactly one of "file", "extends-tile" or 
                  "alias" must be specified.
 -->
-<!ELEMENT tile (set*)>
+<!ELEMENT tile (set*, set-property*)>
 <!ATTLIST tile
           name            %LogicalName;     #REQUIRED
           file            %ResourcePath;    #IMPLIED
@@ -242,6 +242,8 @@
 
 
 <!-- 
+   TODO: Documentation needs to be extended and clarified. 
+   
    The "set-property" element specifies the method name and initial value of an additional class configuration property. 
    When the object representing the surrounding element is instantiated, the accessor for the indicated property is called 
    and passed the indicated value. The "set-property" element is especially useful when a custom class is used with "forward" 
