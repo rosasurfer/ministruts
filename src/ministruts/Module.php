@@ -437,11 +437,11 @@ class Module extends Object {
     protected function processTiles(\SimpleXMLElement $xml) {
         $elements = $xml->xPath('/struts-config/tiles/tile');
         if ($elements === false)
-            $elements = array();        // xPath() gibt entgegen der Dokumentation NICHT immer ein Array zurueck
+            $elements = array();                            // xPath() gibt entgegen der Dokumentation *nicht* immer ein Array zurueck
 
         foreach ($elements as $tag) {
             $name = (string) $tag['name'];
-            /*$tile=*/$this->getDefinedTile($name, $xml);
+            $tile = $this->getDefinedTile($name, $xml);     // throws exception on configuration errors
         }
         // TODO: rekursive Tiles-Definitionen abfangen
     }
