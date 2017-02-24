@@ -178,7 +178,9 @@
 <!-- 
    The "tile" element describes a single Tile that can be inserted in a page. It is identified by its logical name.
 
-   name          The unique identifier for this tile. Tile names must start with a dot ".".
+   name          The unique identifier for this tile. Tile names must start with a dot ".". It is recommended to name tile 
+                 template definitions (partals/layouts which must be etxended) and tile view definitions (partials which are 
+                 ready to be inserted) differently, e.g. templates as ".{name}.tpl" and insertables as ".{name}". 
                  
    file          The path of the file to insert relative to the "view-base" directory of the module. Exactly one of "file", 
                  "extends-tile" or "alias" must be specified.
