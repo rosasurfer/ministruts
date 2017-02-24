@@ -176,7 +176,7 @@ class Tile extends Object {
         $properties['response'] = Response::me();
         $properties['session' ] = $request->isSession() ? $request->getSession() : null;
         $properties['form'    ] = $request->getAttribute(ACTION_FORM_KEY);
-        $properties['PAGE'    ] = PageContext::me();
+        $properties['page'    ] = PageContext::me();
 
         if (LOCALHOST && $this->parent) {
             $file = $this->fileName;

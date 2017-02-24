@@ -15,11 +15,11 @@ use rosasurfer\exception\IllegalTypeException;
  *
  * Beispiel:
  * ---------
- *    $PAGE->title = 'HTML-Title';
+ *    $page->title = 'HTML-Title';
  *
  * Speichert die Variable "title" mit dem Wert 'HTML-Title' im PageContext
  *
- *    $var = $PAGE->title;
+ *    $var = $page->title;
  *
  * Gibt die gespeicherte Eigenschaft mit dem Namen "title" zurueck.
  *
