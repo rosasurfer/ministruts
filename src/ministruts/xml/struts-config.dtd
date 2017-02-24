@@ -1,17 +1,7 @@
 <!--
-     DTD for the Struts configuration file of the application
-     ========================================================
-     
-     To enable validation of the configuration file against this DTD you can either:
-     
-     - Include the following DOCTYPE element at the beginning of your file (after the "xml" declaration):
-       <!DOCTYPE struts-config SYSTEM "struts-config.dtd">
-       and load the file into your XML parser with the DTD file in the current working directory.
-        
-     - Modify the content of the XML file on-the-fly and point the DTD location of the DOCTYPE element to an 
-       existing copy of this DTD. This might be an URL to an external DTD or a relative path to a local DTD. 
-       
-     - Modify the content of the XML file on-the-fly and include the DTD in the document structure of the xml. 
+
+                                     DTD for the Struts configuration of the application
+                                    =====================================================                                   
 -->
 
 
@@ -252,13 +242,13 @@
 <!-- 
    The "set-property" element specifies the method name and initial value of an additional class configuration property. 
    When the object representing the surrounding element is instantiated, the accessor for the indicated property is called 
-   and passed the indicated value. The "set-property" element is especially useful when a custom subclass is used with 
-   "forward" or "mapping" elements. The subclass can be passed whatever other properties may be required to configure the 
-   object without changing how the struts-config is parsed.
+   and passed the indicated value. The "set-property" element is especially useful when a custom class is used with "forward" 
+   or "mapping" elements. The custom class can be passed whatever properties may be required to configure it without changing 
+   the syntax of the struts-config file or the way it is parsed.
 
    property  Name of the class property whose setter method will be called.
 
-   value     String representation of the value to which this property will be set, after suitable type conversion.
+   value     String representation of the value to which the property will be set.
 -->
 <!ELEMENT set-property EMPTY>
 <!ATTLIST set-property
