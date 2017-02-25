@@ -5,14 +5,16 @@ use rosasurfer\debug\ErrorHandler;
 
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RuntimeException;
-
 use rosasurfer\exception\error\PHPError;
 
 use rosasurfer\log\Logger;
 
+use function rosasurfer\strStartsWith;
+
 use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_INFO;
 use const rosasurfer\L_NOTICE;
+use const rosasurfer\NL;
 
 
 /**
@@ -81,23 +83,26 @@ class SystemFiveLock extends BaseLock {
             }
             catch (PHPError $ex) {
                 // TODO: Quellcode umschreiben (ext/sysvsem/sysvsem.c) und Fehler lokalisieren (vermutlich wird ein File-Limit ueberschritten)
-                $message = $ex->getMessage();
-                $hexId   = decHex($integer);
-                if (++$i < $trials && ($message == 'sem_get(): failed for key 0x'.$hexId.': Invalid argument'
-                                || $message == 'sem_get(): failed for key 0x'.$hexId.': Identifier removed'
-                                || $message == 'sem_get(): failed acquiring SYSVSEM_SETVAL for key 0x'.$hexId.': Invalid argument'
-                                || $message == 'sem_get(): failed acquiring SYSVSEM_SETVAL for key 0x'.$hexId.': Identifier removed'
-                                || $message == 'sem_get(): failed releasing SYSVSEM_SETVAL for key 0x'.$hexId.': Invalid argument'
-                                || $message == 'sem_get(): failed releasing SYSVSEM_SETVAL for key 0x'.$hexId.': Identifier removed'
-                                || $message == 'sem_acquire(): failed to acquire key 0x'.$hexId.': Invalid argument'
-                                || $message == 'sem_acquire(): failed to acquire key 0x'.$hexId.': Identifier removed')) {
+                $message  = $ex->getMessage();
+                $hexId    = decHex($integer);
+                $prefixes = [
+                    'sem_get(): failed for key 0x'.$hexId.': Invalid argument',
+                    'sem_get(): failed for key 0x'.$hexId.': Identifier removed',
+                    'sem_get(): failed acquiring SYSVSEM_SETVAL for key 0x'.$hexId.': Invalid argument',
+                    'sem_get(): failed acquiring SYSVSEM_SETVAL for key 0x'.$hexId.': Identifier removed',
+                    'sem_get(): failed releasing SYSVSEM_SETVAL for key 0x'.$hexId.': Invalid argument',
+                    'sem_get(): failed releasing SYSVSEM_SETVAL for key 0x'.$hexId.': Identifier removed',
+                    'sem_acquire(): failed to acquire key 0x'.$hexId.': Invalid argument',
+                    'sem_acquire(): failed to acquire key 0x'.$hexId.': Identifier removed',
+                ];
+                if (++$i < $trials && strStartsWith($message, $prefixes)) {
                     self::$logDebug && Logger::log($message.', trying again ... ('.($i+1).')', L_DEBUG);
                     $messages[] = $message;
                     uSleep(200000); // 200 msec. warten
                     continue;
                 }
                 // Endlosschleife verhindern
-                throw new RuntimeException("Giving up to get lock for key \"$key\" after $i trials".($messages ? ", former errors:\n".join("\n", $messages):null), null, $ex);
+                throw $ex->addMessage('Giving up to get lock for key "$key" after '.$i.' trials'.($messages ? ', former errors:'.NL.join(NL, $messages) : ''));
             }
         }
         while (true);

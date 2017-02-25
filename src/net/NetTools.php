@@ -29,14 +29,7 @@ final class NetTools extends StaticClass {
         if (!is_string($address)) throw new IllegalTypeException('Illegal type of parameter $address: '.getType($address));
         if ($address == '')       throw new InvalidArgumentException('Invalid argument $address: "'.$address.'"');
 
-        try {
-            return getHostByAddr($address);
-        }
-        catch (\Exception $ex) {
-            if ($ex->getMessage() == 'gethostbyaddr(): Address is not a valid IPv4 or IPv6 address')
-                throw new InvalidArgumentException('Invalid argument $address: "'.$address.'"', null, $ex);
-            throw $ex;
-        }
+        return getHostByAddr($address);
     }
 
 

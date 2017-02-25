@@ -53,10 +53,19 @@ class DebugHelper extends StaticClass {
         if ($trace && isSet($trace[0]['fixed']))
             return $trace;
 
-        // add a frame for the main script to the bottom (end of array)
+        // Fix an incomplete frame[0][line] if parameters are provided and $file matches (e.g. with \SimpleXMLElement).
+        if ($file!='unknown' && $line) {
+            if (isSet($trace[0]['file']) && $trace[0]['file']==$file) {
+                if (isSet($trace[0]['line']) && $trace[0]['line']===0) {
+                    $trace[0]['line'] = $line;
+                }
+            }
+        }
+
+        // Add a frame for the main script to the bottom (end of array).
         $trace[] = ['function' => '{main}'];
 
-        // move FILE and LINE fields down (to the end) by one position
+        // Move FILE and LINE fields down (to the end) by one position.
         for ($i=sizeOf($trace); $i--;) {
             if (isSet($trace[$i-1]['file'])) $trace[$i]['file'] = $trace[$i-1]['file'];
             else                       unset($trace[$i]['file']);
@@ -75,16 +84,16 @@ class DebugHelper extends StaticClass {
          */
         }
 
-        // add the location details to the beginning of the array only if they differ from the old values (now in frame 1)
+        // Add location details from parameters to frame[0] only if they differ from the old values (now in frame[1])
         if (!isSet($trace[1]['file']) || !isSet($trace[1]['line']) || $trace[1]['file']!=$file || $trace[1]['line']!=$line) {
-            $trace[0]['file'] = $file;                         // test with:
-            $trace[0]['line'] = $line;                         // \SQLite3::enableExceptions(true|false);
-        }                                                     // \SQLite3::exec($invalid_sql);
+            $trace[0]['file'] = $file;                          // test with:
+            $trace[0]['line'] = $line;                          // \SQLite3::enableExceptions(true|false);
+        }                                                       // \SQLite3::exec($invalid_sql);
         else {
-            unset($trace[0]['file'], $trace[0]['line']);       // otherwise delete them
+            unset($trace[0]['file'], $trace[0]['line']);        // otherwise delete them
         }
 
-        // remove the last frame if it points to an unknown location (PHP core)
+        // Remove the last frame (the one we added for the main script) if it now points to an unknown location (PHP core).
         $size = sizeOf($trace);
         if (!isSet($trace[$size-1]['file'])) {
             array_pop($trace);
