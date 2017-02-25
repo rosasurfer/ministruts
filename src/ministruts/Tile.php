@@ -17,45 +17,39 @@ use const rosasurfer\LOCALHOST;
 class Tile extends Object {
 
 
-    /** @var string - Typenbezeichner fuer in einzelne Tiles mit dem <set>-Tag eingebundene, zusaetzliche Eigenschaften. */
-    const PROPERTY_TYPE_STRING = 'string';
-
-    /** @var string - Typenbezeichner fuer in einzelne Tiles mit dem <set>-Tag eingebundene, zusaetzliche Eigenschaften. */
-    const PROPERTY_TYPE_RESOURCE = 'resource';
-
     /** @var string - runtime generated name for anonymous tiles */
-    const GENERIC_NAME = 'generic';
-
-    /**
-     * @var bool - Ob diese Komponente vollstaendig konfiguriert ist. Wenn dieses Flag gesetzt ist, wirft jeder
-     *             Versuch, die Komponente zu aendern, eine IllegalStateException.
-     */
-    protected $configured = false;
+    const GENERIC_NAME = 'generic';                     // TODO: make generic names unique
 
     /** @var Module - Module, zu dem diese Tile gehoert */
     protected $module;
 
-    /** @var string - eindeutige Name dieser Tile */
+    /** @var string - eindeutiger Name dieser Tile */
     protected $name;
 
     /** @var string - vollstaendiger Dateiname dieser Tile */
     protected $fileName;
 
+    /** @var Tile[] - nested tiles */
+    protected $nestedTiles = [];
+
     /** @var array - Property-Pool */
     protected $properties = [];
 
     /**
-     * @var Tile - Die zur Laufzeit diese Tile-Instanz umgebende Instanz oder NULL, wenn diese Instanz das aeusserste
-     *             Fragment der Ausgabe darstellt.
+     * @var Tile|null - Die zur Laufzeit diese Tile-Instanz umgebende Instanz oder NULL, wenn diese Instanz das aeusserste
+     *                  Fragment der Ausgabe darstellt.
      */
     protected $parent;
+
+    /** @var bool - Ob diese Komponente noch modifiziert werden kann oder bereits vollstaendig konfiguriert ist. */
+    protected $configured = false;
 
 
     /**
      * Constructor
      *
-     * @param  Module $module - Module, zu dem diese Tile gehoert
-     * @param  Tile   $parent - (Parent-)Instanz der neuen (verschachtelten) Instanz
+     * @param  Module    $module - Module, zu dem diese Tile gehoert
+     * @param  Tile|null $parent - (Parent-)Instanz der neuen (verschachtelten) Instanz
      */
     public function __construct(Module $module, Tile $parent=null) {
         $this->module = $module;
@@ -116,18 +110,30 @@ class Tile extends Object {
 
 
     /**
+     * Speichert in der Tile unter dem angegebenen Namen eine Child-Tile.
+     *
+     * @param  string    $name  - Name der Tile
+     * @param  self|null $child - die zu speichernde Tile oder NULL, wenn die Child-Deklaration abstrakt ist
+     */
+    public function setNestedTile($name, self $tile=null) {
+        if ($this->configured) throw new IllegalStateException('Configuration is frozen');
+        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
+
+        $this->nestedTiles[$name] = $tile;
+    }
+
+
+    /**
      * Speichert in der Tile unter dem angegebenen Namen eine zusaetzliche Eigenschaft.
      *
      * @param  string $name  - Name der Eigenschaft
-     * @param  mixed  $value - der zu speichernde Wert (String oder Tile)
+     * @param  mixed  $value - der zu speichernde Wert
      */
     public function setProperty($name, $value) {
         if ($this->configured)                             throw new IllegalStateException('Configuration is frozen');
         if (!is_string($name))                             throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
-        if (!$value instanceof self && !is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
 
         $this->properties[$name] = $value;
-        // TODO: valid types -> string, page or tile
     }
 
 
@@ -141,11 +147,9 @@ class Tile extends Object {
             if (!$this->name)     throw new IllegalStateException('No name configured for this '.$this);
             if (!$this->fileName) throw new IllegalStateException('No file configured for '.get_class($this).' "'.$this->name.'"');
 
-            foreach ($this->properties as $property) {
-                if ($property instanceof self)
-                    $property->freeze();
+            foreach ($this->nestedTiles as $tile) {
+                $tile && $tile->freeze();
             }
-
             $this->configured = true;
         }
         return $this;
@@ -153,14 +157,15 @@ class Tile extends Object {
 
 
     /**
-     * Gibt die eigenen und die geerbten Properties dieser Tile zurueck. Eigene Properties ueberschreiben geerbte Properties mit demselben Namen.
+     * Gibt die eigenen und die geerbten Properties dieser Tile zurueck. Eigene Properties ueberschreiben geerbte Properties
+     * mit demselben Namen.
      *
      * @return array - Properties
      */
     protected function getMergedProperties() {
-        if ($this->parent)
+        if ($this->parent) {
             return array_merge($this->parent->getMergedProperties(), $this->properties);
-
+        }
         return $this->properties;
     }
 
@@ -169,8 +174,9 @@ class Tile extends Object {
      * Render the Tile.
      */
     public function render() {
-        $properties = $this->getMergedProperties();
-        $request = Request::me();
+        $nestedTiles = $this->nestedTiles;
+        $properties  = $this->getMergedProperties();
+        $request     = Request::me();
 
         $properties['request' ] = $request;
         $properties['response'] = Response::me();
@@ -187,8 +193,7 @@ class Tile extends Object {
             else                                   $tileHint = $this->name.' ('.$file.')';
             echo "\n<!-- #begin: ".$tileHint." -->\n";
         }
-
-        includeFile($this->fileName, $properties);
+        includeFile($this->fileName, $nestedTiles + $properties);
 
         if (LOCALHOST && $this->parent) {
             echo "\n<!-- #end: ".$tileHint." -->\n";

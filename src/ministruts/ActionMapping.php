@@ -3,7 +3,6 @@ namespace rosasurfer\ministruts;
 
 use rosasurfer\core\Object;
 
-use rosasurfer\exception\ClassNotFoundException;
 use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
@@ -12,10 +11,10 @@ use rosasurfer\exception\RuntimeException;
 use rosasurfer\log\Logger;
 
 use function rosasurfer\is_class;
+use function rosasurfer\strEndsWith;
 use function rosasurfer\strStartsWith;
 
 use const rosasurfer\L_WARN;
-use function rosasurfer\strEndsWith;
 
 
 /**
@@ -132,12 +131,14 @@ class ActionMapping extends Object {
      * @param  string $method - HTTP-Methode: "GET"|"POST"
      *
      * @return self
+     *
+     * @throws StrutsConfigException on configuration errors
      */
     public function setMethod($method) {
-        if ($this->configured)                   throw new IllegalStateException('Configuration is frozen');
-        if (!is_string($method))                 throw new IllegalTypeException('Illegal type of parameter $method: '.getType($method));
+        if ($this->configured)                 throw new IllegalStateException('Configuration is frozen');
+        if (!is_string($method))               throw new IllegalTypeException('Illegal type of parameter $method: '.getType($method));
         $method = strToUpper($method);
-        if ($method!=='GET' && $method!=='POST') throw new InvalidArgumentException('Invalid argument $method: '.$method);
+        if ($method!='GET' && $method!='POST') throw new StrutsConfigException('Invalid HTTP method "'.$method.'"');
 
         $this->methods[$method] = true;
         return $this;
@@ -161,6 +162,8 @@ class ActionMapping extends Object {
      * @param  string - Rollenausdruck
      *
      * @return self
+     *
+     * @throws StrutsConfigException on configuration errors
      */
     public function setRoles($roles) {
         if ($this->configured)  throw new IllegalStateException('Configuration is frozen');
@@ -169,14 +172,14 @@ class ActionMapping extends Object {
         //static $pattern = '/^!?[A-Za-z_][A-Za-z0-9_]*(,!?[A-Za-z_][A-Za-z0-9_]*)*$/';
         static $pattern = '/^!?[A-Za-z_][A-Za-z0-9_]*$/';
 
-        if (!strLen($roles) || !preg_match($pattern, $roles)) throw new InvalidArgumentException('Invalid argument $roles: "'.$roles.'"');
+        if (!strLen($roles) || !preg_match($pattern, $roles)) throw new StrutsConfigException('Invalid role expression: "'.$roles.'"');
 
         // check for impossible constraints, ie. "Member,!Member"
         $tokens = explode(',', $roles);
         $keys = array_flip($tokens);
 
         foreach ($tokens as $role) {
-            if (isSet($keys['!'.$role])) throw new InvalidArgumentException('Invalid argument $roles: "'.$roles.'"');
+            if (isSet($keys['!'.$role])) throw new StrutsConfigException('Invalid role expression: "'.$roles.'"');
         }
 
         // remove duplicates
@@ -217,13 +220,15 @@ class ActionMapping extends Object {
      * @param  string $className
      *
      * @return self
+     *
+     * @throws StrutsConfigException on configuration errors
      */
     public function setActionClassName($className) {
         if ($this->configured)                              throw new IllegalStateException('Configuration is frozen');
         if (!is_string($className))                         throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
-        if (!is_class($className))                          throw new ClassNotFoundException("Undefined class '$className'");
-        if (!is_subclass_of($className, ACTION_BASE_CLASS)) throw new InvalidArgumentException('Not a subclass of '.ACTION_BASE_CLASS.': '.$className);
-        if ($this->forward)                                 throw new RuntimeException('Configuration error: Only one attribute of "action", "include", "redirect" or "forward" can be specified for mapping "'.$this->path.'"');
+        if (!is_class($className))                          throw new StrutsConfigException('Class "'.$className.'" not found');
+        if (!is_subclass_of($className, ACTION_BASE_CLASS)) throw new StrutsConfigException('Not a subclass of '.ACTION_BASE_CLASS.': "'.$className.'"');
+        if ($this->forward)                                 throw new StrutsConfigException('Only one attribute of "action", "include", "redirect" or "forward" can be specified for mapping "'.$this->path.'"');
 
         $this->actionClassName = $className;
         return $this;
@@ -247,12 +252,14 @@ class ActionMapping extends Object {
      * @param  string $className
      *
      * @return self
+     *
+     * @throws StrutsConfigException on configuration errors
      */
     public function setFormClassName($className) {
         if ($this->configured)                                   throw new IllegalStateException('Configuration is frozen');
         if (!is_string($className))                              throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
-        if (!is_class($className))                               throw new ClassNotFoundException("Undefined class '$className'");
-        if (!is_subclass_of($className, ACTION_FORM_BASE_CLASS)) throw new InvalidArgumentException('Not a subclass of '.ACTION_FORM_BASE_CLASS.': '.$className);
+        if (!is_class($className))                               throw new StrutsConfigException('Class "'.$className.'" not found');
+        if (!is_subclass_of($className, ACTION_FORM_BASE_CLASS)) throw new StrutsConfigException('Not a subclass of '.ACTION_FORM_BASE_CLASS.': "'.$className.'"');
 
         $this->formClassName = $className;
         return $this;
@@ -280,9 +287,9 @@ class ActionMapping extends Object {
      * @return self
      */
     public function setFormScope($value) {
-        if ($this->configured)                        throw new IllegalStateException('Configuration is frozen');
-        if (!is_string($value))                       throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
-        if ($value!=='request' && $value!=='session') throw new InvalidArgumentException('Invalid argument $value: '.$value);
+        if ($this->configured)                      throw new IllegalStateException('Configuration is frozen');
+        if (!is_string($value))                     throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
+        if ($value!='request' && $value!='session') throw new InvalidArgumentException('Invalid argument $value: '.$value);
 
         $this->formScope = $value;
         return $this;

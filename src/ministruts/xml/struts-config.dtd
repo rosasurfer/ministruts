@@ -43,20 +43,21 @@
 
 
 
-<!-- ====== Top Level Elements ========================================================================================== -->
+<!-- ====== Element Definitions ========================================================================================= -->
 
 
 <!--
-   The "struts-config" element is the root of the configuration file hierarchy, and contains nested elements for all of the
-   other configuration settings.
+   The "struts-config" element is the root of the configuration file and contains nested elements for all of the other 
+   configuration settings.
 
-   view-base  Comma-delimited list of directories to lookup views (templates, layouts, tiles, partials etc). Values may be
-              absolute or relative to the application root directory.
-              [default: "app/view"]
+   file-base  Comma-delimited list of paths to scan for files or file system locations (templates, layouts, fragments etc). 
+              Values may be absolute or relative to the application root directory. Each module can have its own list of 
+              "file-base" locations.
+              [default: The application-wide configured view directory or "app/view"]
 -->
 <!ELEMENT struts-config (global-forwards?, action-mappings, tiles?, controller?)>
 <!ATTLIST struts-config
-          view-base    %ResourcePath;    #IMPLIED
+          file-base    %ResourcePath;    #IMPLIED
 >
 
 
@@ -153,19 +154,19 @@
                         attribute set to "true". Only one mapping can be marked as "default" within a module.
                         [default: "false"]
 -->
-<!ELEMENT mapping (set-property*, forward*)>
+<!ELEMENT mapping ((forward*, set-property*)*)>
 <!ATTLIST mapping
-          path                 %RequestPath;        #REQUIRED
-          include              %ResourcePath;       #IMPLIED
-          redirect             %RequestPath;        #IMPLIED
-          forward              %LogicalName;        #IMPLIED
-          action               %ClassName;          #IMPLIED
-          form                 %ClassName;          #IMPLIED
-          form-scope           (request|session)    "request"
-          form-validate-first  %Boolean;            "true"
-          http-methods         CDATA                "get"
-          roles                CDATA                #IMPLIED
-          default              %Boolean;            "false"
+          path                   %RequestPath;        #REQUIRED
+          include                %ResourcePath;       #IMPLIED
+          redirect               %RequestPath;        #IMPLIED
+          forward                %LogicalName;        #IMPLIED
+          action                 %ClassName;          #IMPLIED
+          form                   %ClassName;          #IMPLIED
+          form-scope             (request|session)    "request"
+          form-validate-first    %Boolean;            "true"
+          http-methods           CDATA                "get"
+          roles                  CDATA                #IMPLIED
+          default                %Boolean;            "false"
 >
 
 
@@ -185,7 +186,7 @@
                  template definitions (partals/layouts which must be etxended) and tile view definitions (partials which are
                  ready to be inserted) differently, e.g. templates as ".{name}.tpl" and insertables as ".{name}".
 
-   file          The path of the file to insert relative to the "view-base" directory of the module. Exactly one of "file",
+   file          The path of the file to insert relative to the "file-base" location of the module. Exactly one of "file",
                  "extends-tile" or "alias" must be specified.
 
    extends-tile  Name of a tile that is used as ancestor of this tile. Tile names must start with a dot ".". All attributes
@@ -196,7 +197,7 @@
                  attribute is set the tile can not have nested child elements. Exactly one of "file", "extends-tile" or
                  "alias" must be specified.
 -->
-<!ELEMENT tile (set*, set-property*)>
+<!ELEMENT tile ((set*, set-property*)*)>
 <!ATTLIST tile
           name            %LogicalName;     #REQUIRED
           file            %ResourcePath;    #IMPLIED
@@ -206,22 +207,46 @@
 
 
 <!--
-   The "set" element describes an additional property passed to a tiles definition. The value of this property can be
-   specified as an XML attribute or in the body of the <set> tag.
+   The "set" element describes a resource to insert into a tile, i.e. a page fragment or another tile. 
 
-   name   The unique identifier for this property.
+   name  Name of the variable under which the resource is made available in the resulting view. If only the name is 
+         specified the tile containing the "set" element is marked as a template which can be referenced and extended by a 
+         later definition but cannot be rendered independently.  
 
-   type   The type of the passed value. Optional, can be "string" or "resource". If no type is specified and a resource with
-          a name matching the attribute value of the property is found, the type "resource" is used. Otherwise the type
-          "string" is used.
-
-   value  The value of the property. The value can be specified as an XML attribute, or in the body of the <set> tag.
+   file  The path of the file to insert into the tile relative to the "file-base" location of the module. Only one of "file" 
+         or "tile" can be specified.
+   
+   tile  Name of another tile to insert into the tile. Tile names must start with a dot ".". All properties from the 
+         surrounding tile are also available to the inserted tile. Any property inherited from the surrounding tile can be
+         overwritten by providing a new value. However, this will not modify the value of the original property in the 
+         surrounding tile. Only one of "file" or "tile" can be specified.
 -->
-<!ELEMENT set (#PCDATA)>
+<!ELEMENT set EMPTY>
 <!ATTLIST set
-          name     %LogicalName;        #REQUIRED
-          type     (string|resource)    "resource"
-          value    CDATA                #IMPLIED
+          name     %LogicalName;     #REQUIRED
+          file     %ResourcePath;    #IMPLIED
+          tile     %LogicalName;     #IMPLIED
+
+>
+
+
+<!--
+   The "set-property" element describes an additional property available in a class or a definition. The value of this
+   property can be specified as an XML attribute or in the body of the <set-property> tag.
+   The "set-property" element is especially useful with "tiles" elements where the property is made available as a regular
+   variable in the page context. The element is also useful when a custom class is used with "forward" or "mapping" elements.
+   When the object representing the surrounding element is instantiated, the setter for the property is called and passed
+   the specified value.
+
+   property  Name of the variable or property whose setter method will be called.
+
+   value     String representation of the value of the variable or property. The value can be specified as an XML attribute,
+             or in the body of the <set-property> tag.
+-->
+<!ELEMENT set-property (#PCDATA)>
+<!ATTLIST set-property
+          name     %LogicalName;    #REQUIRED
+          value    CDATA            #IMPLIED
 >
 
 
@@ -238,27 +263,4 @@
 <!ATTLIST controller
           request-processor    %ClassName;    #IMPLIED
           role-processor       %ClassName;    #IMPLIED
->
-
-
-<!-- ====== Subordinate Elements ======================================================================================== -->
-
-
-<!--
-   TODO: Documentation needs to be extended and clarified.
-
-   The "set-property" element specifies the method name and initial value of an additional class configuration property.
-   When the object representing the surrounding element is instantiated, the accessor for the indicated property is called
-   and passed the indicated value. The "set-property" element is especially useful when a custom class is used with "forward"
-   or "mapping" elements. The custom class can be passed whatever properties may be required to configure it without changing
-   the syntax of the struts-config file or the way it is parsed.
-
-   property  Name of the class property whose setter method will be called.
-
-   value     String representation of the value to which the property will be set.
--->
-<!ELEMENT set-property EMPTY>
-<!ATTLIST set-property
-          property    %LogicalName;    #REQUIRED
-          value       CDATA            #REQUIRED
 >

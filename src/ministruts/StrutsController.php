@@ -6,8 +6,8 @@ use rosasurfer\config\Config;
 use rosasurfer\core\Singleton;
 use rosasurfer\dependency\FileDependency;
 
-use rosasurfer\exception\FileNotFoundException;
 use rosasurfer\exception\IllegalStateException;
+use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\exception\RuntimeException;
 
 use function rosasurfer\strLeftTo;
@@ -76,36 +76,37 @@ class StrutsController extends Singleton {
     /**
      * Constructor
      *
-     * Load and parse the Struts configuration and create the corresponding object hierarchy.
+     * Load and parse all Struts configuration files and create the corresponding object hierarchy.
+     *
+     * @throws StrutsConfigException on configuration errors
      */
     protected function __construct() {
         // lookup configuration files
-        $configDir = Config::getDefault()->getDirectory();
-        $configDir = str_replace('\\', '/', $configDir);
-        if (!is_file($configDir.'/struts-config.xml'))
-            throw new FileNotFoundException('Configuration file not found: "'.$configDir.'/struts-config.xml"');
+        $configDir  = Config::getDefault()->getDirectory().DIRECTORY_SEPARATOR;
+        $mainConfig = $configDir.'struts-config.xml';                           // main module config
+        if (!is_file($mainConfig)) throw new StrutsConfigException('Configuration file not found: "'.$mainConfig.'"');
 
-        $files   = glob($configDir.'/struts-config-*.xml', GLOB_ERR);
-        $files[] = $configDir.'/struts-config.xml';
+        $subConfigs = glob($configDir.'struts-config-*.xml', GLOB_ERR) ?: [];   // scan for submodule configs
+        $configs    = [$mainConfig] + $subConfigs;
 
-
-        // create and register a Module for each found file
+        // create and register a Module for each found configuration file
         try {
-            foreach ($files as $file) {
+            foreach ($configs as $file) {
                 $baseName = baseName($file, '.xml');
                 $prefix = (strStartsWith($baseName, 'struts-config-')) ? '/'.subStr($baseName, 14) : '';
 
                 $module = new Module($file, $prefix);
                 $module->freeze();
 
-                if (isSet($this->modules[$prefix]))
-                    throw new RuntimeException('All modules must have unique module prefixes, non-unique prefix: "'.$prefix.'"');
-
+                if (isSet($this->modules[$prefix])) throw new StrutsConfigException('All Struts modules must have unique prefixes, non-unique prefix found: "'.$prefix.'"');
                 $this->modules[$prefix] = $module;
             }
         }
+        catch (IRosasurferException $ex) {
+            throw $ex->addMessage('Error loading config file "'.$file.'"');
+        }
         catch (\Exception $ex) {
-            throw new RuntimeException('Error loading '.$file, null, $ex);
+            throw new RuntimeException('Error loading config file "'.$file.'"', null, $ex);
         }
     }
 

@@ -3,17 +3,13 @@ namespace rosasurfer\ministruts;
 
 use rosasurfer\core\Object;
 
-use rosasurfer\exception\ClassNotFoundException;
-use rosasurfer\exception\FileNotFoundException;
 use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\IllegalTypeException;
-use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
 
 use rosasurfer\log\Logger;
 
 use function rosasurfer\is_class;
-use function rosasurfer\strEndsWithI;
 use function rosasurfer\strLeftTo;
 
 use const rosasurfer\L_DEBUG;
@@ -48,7 +44,7 @@ class Module extends Object {
     protected $prefix;
 
     /** @var string[] - Basisverzeichnisse fuer von diesem Modul einzubindende Resourcen */
-    protected $resourceDirectories = [];
+    protected $resourceLocations = [];
 
     /** @var ActionForward[] - Die globalen Forwards dieses Moduls. */
     protected $forwards = [];
@@ -87,6 +83,8 @@ class Module extends Object {
      * @param  string $fileName - Pfad zur Konfigurationsdatei des Modules
      * @param  string $prefix   - Prefix des Modules
      *
+     * @throws StrutsConfigException on configuration errors
+     *
      * TODO: Module-Encoding entsprechend dem Config-Datei-Encoding implementieren
      */
     public function __construct($fileName, $prefix) {
@@ -116,9 +114,11 @@ class Module extends Object {
      * @param  string $fileName - Pfad zur Konfigurationsdatei
      *
      * @return \SimpleXMLElement
+     *
+     * @throws StrutsConfigException on configuration errors
      */
     protected function loadConfiguration($fileName) {
-        if (!is_file($fileName)) throw new FileNotFoundException('File not found: '.$fileName);
+        if (!is_file($fileName)) throw new StrutsConfigException('Configuration file not found: "'.$fileName.'"');
         $content = file_get_contents($fileName, false);
 
         /**
@@ -128,19 +128,17 @@ class Module extends Object {
          * @see  DTD to XML schema  https://www.w3.org/2000/04/schema_hack/
          * @see  DTD to XML schema  http://www.xmlutilities.net/
          */
-        $currentDir = getCwd();                         // typically dirName(APP_ROOT.'/www/index.php');
 
-        // ins DTD-Verzeichnis wechseln: src/ministruts/xml
-        $dtdDir = __DIR__.'/xml';
-        try { chDir($dtdDir); }
-        catch (\Exception $ex) { throw new RuntimeException('Could not change working directory to "'.$dtdDir.'"', null, $ex); }
+        // ins DTD-Verzeichnis wechseln: "./xml"
+        $workingDir = getCwd();
+        $dtdDir     = __DIR__.'/xml';
+        chDir($dtdDir);
 
         // Konfiguration parsen und validieren
         $xml = new \SimpleXMLElement($content, LIBXML_DTDVALID);
 
         // zurueck ins Ausgangsverzeichnis wechseln
-        try { chDir($currentDir); }
-        catch (\Exception $ex) { throw new RuntimeException('Could not change working directory back to "'.$currentDir.'"', null, $ex); }
+        chDir($workingDir);
 
         return $xml;
     }
@@ -180,25 +178,29 @@ class Module extends Object {
      * Setzt das Basisverzeichnis fuer lokale Resourcen.
      *
      * @param  \SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
+     *
+     * @throws StrutsConfigException on configuration errors
      */
     protected function setResourceBase(\SimpleXMLElement $xml) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
-        if (!$xml['view-base']) {
-            $this->resourceDirectories[] = APPLICATION_ROOT.'/app/view';
+        if (!$xml['file-base']) {
+            // not specified, apply default settings
+            $this->resourceLocations[] = APPLICATION_ROOT.'/app/view';
             return;
         }
+        $locations = explode(',', (string) $xml['file-base']);
 
-        $directories = explode(',', (string) $xml['view-base']);
+        foreach ($locations as $i => $location) {
+            $location = trim($location);
+            if (!strLen($location)) continue;
 
-        foreach ($directories as $directory) {
-            $dir = str_replace('\\', '/', trim($directory));
+            $relativePath = WINDOWS ? !preg_match('/^[a-z]:/i', $location) : ($location[0]!='/');
+            $relativePath && $location=APPLICATION_ROOT.DIRECTORY_SEPARATOR.$location;
 
-            if ($dir[0] == '/') $dir = realPath($dir);
-            else                $dir = realPath(APPLICATION_ROOT.'/'.$dir);
+            if (!is_dir($location)) throw new StrutsConfigException('Resource location <struts-config file-base="'.$locations[$i].'" not found');
 
-            if (!is_dir($dir)) throw new FileNotFoundException('Directory not found: "'.$directory.'"');
-            $this->resourceDirectories[] = $dir;
+            $this->resourceLocations[] = realPath($location);
         }
     }
 
@@ -207,19 +209,19 @@ class Module extends Object {
      * Verarbeitet die in der Konfiguration definierten globalen ActionForwards.
      *
      * @param  \SimpleXMLElement $xml - XML-Konfiguration
+     *
+     * @throws StrutsConfigException on configuration errors
      */
     protected function processForwards(\SimpleXMLElement $xml) {
         // process global 'include' and 'redirect' forwards
-        $elements = $xml->xPath('/struts-config/global-forwards/forward[@include] | /struts-config/global-forwards/forward[@redirect]');
-        if ($elements === false)
-            $elements = array(); // xPath() gibt entgegen der Dokumentation NICHT immer ein Array zurueck
+        $elements = $xml->xPath('/struts-config/global-forwards/forward[@include] | /struts-config/global-forwards/forward[@redirect]') ?: [];
 
         foreach ($elements as $tag) {
             $name = (string) $tag['name'];
-            if (sizeOf($tag->attributes()) > 2) throw new RuntimeException('Global forward "'.$name.'": Only one attribute of "include", "redirect" or "forward" must be specified');
+            if (sizeOf($tag->attributes()) > 2) throw new StrutsConfigException('Global forward "'.$name.'": Only one attribute of "include", "redirect" or "forward" must be specified');
 
             if ($path = (string) $tag['include']) {
-                if (!$this->isIncludable($path, $xml)) throw new RuntimeException('Global forward "'.$name.'", attribute "include": '.($path{0}=='.' ? 'Tiles definition':'File').' "'.$path.'" not found');
+                if (!$this->isIncludable($path, $xml)) throw new StrutsConfigException('Global forward "'.$name.'", attribute "include": '.($path[0]=='.' ? 'Tiles definition':'File').' "'.$path.'" not found');
 
                 if ($this->isTile($path, $xml)) {
                     $forward = new $this->forwardClass($name, $path, false);
@@ -238,17 +240,15 @@ class Module extends Object {
         }
 
         // process global 'forward' forwards (fragwuerdig, aber moeglich)
-        $elements = $xml->xPath('/struts-config/global-forwards/forward[@forward]');
-        if ($elements === false)
-            $elements = array(); // xPath() gibt entgegen der Dokumentation NICHT immer ein Array zurueck
+        $elements = $xml->xPath('/struts-config/global-forwards/forward[@forward]') ?: [];
 
         foreach ($elements as $tag) {
             $name = (string) $tag['name'];
-            if (sizeOf($tag->attributes()) > 2) throw new RuntimeException('Global forward "'.$name.'": Only one attribute of "include", "redirect" or "forward" must be specified');
+            if (sizeOf($tag->attributes()) > 2) throw new StrutsConfigException('Global forward "'.$name.'": Only one attribute of "include", "redirect" or "forward" must be specified');
 
             $alias = (string) $tag['forward'];
             $forward = $this->findForward($alias);
-            if (!$forward) throw new RuntimeException('Global forward "'.$name.'", attribute "forward": Forward "'.$alias.'" not found');
+            if (!$forward) throw new StrutsConfigException('Global forward "'.$name.'", attribute "forward": Forward "'.$alias.'" not found');
 
             $this->addForward($name, $forward);
         }
@@ -259,11 +259,11 @@ class Module extends Object {
      * Verarbeitet die in der Konfiguration definierten ActionMappings.
      *
      * @param  \SimpleXMLElement $xml - XML-Konfiguration
+     *
+     * @throws StrutsConfigException on configuration errors
      */
     protected function processMappings(\SimpleXMLElement $xml) {
-        $elements = $xml->xPath('/struts-config/action-mappings/mapping');
-        if ($elements === false)
-            $elements = [];      // xPath() gibt entgegen der Dokumentation *NICHT* immer ein Array zurueck
+        $elements = $xml->xPath('/struts-config/action-mappings/mapping') ?: [];
 
         foreach ($elements as $tag) {
             $mapping = new $this->mappingClass($this);
@@ -277,9 +277,9 @@ class Module extends Object {
 
             // process include attribute
             if ($tag['include']) {
-                if ($mapping->getForward()) throw new RuntimeException('Mapping "'.$mapping->getPath().'": Only one attribute of "action", "include", "redirect" or "forward" must be specified');
+                if ($mapping->getForward()) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'": Only one attribute of "action", "include", "redirect" or "forward" must be specified');
                 $path = (string) $tag['include'];
-                if (!$this->isIncludable($path, $xml)) throw new RuntimeException('Mapping "'.$mapping->getPath().'", attribute "include": '.($path{0}=='.' ? 'Tiles definition':'File').' "'.$path.'" not found');
+                if (!$this->isIncludable($path, $xml)) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'", attribute "include": '.($path{0}=='.' ? 'Tiles definition':'File').' "'.$path.'" not found');
 
                 if ($this->isTile($path, $xml)) {
                     $forward = new $this->forwardClass('generic', $path, false);
@@ -294,7 +294,7 @@ class Module extends Object {
 
             // process redirect attribute
             if ($tag['redirect']) {
-                if ($mapping->getForward()) throw new RuntimeException('Mapping "'.$mapping->getPath().'": Only one attribute of "action", "include", "redirect" or "forward" must be specified');
+                if ($mapping->getForward()) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'": Only one attribute of "action", "include", "redirect" or "forward" must be specified');
                 $path = (string) $tag['redirect'];
                 // TODO: URL validieren
                 $forward = new $this->forwardClass('generic', $path, true);
@@ -304,18 +304,18 @@ class Module extends Object {
 
             // process forward attribute
             if ($tag['forward']) {
-                if ($mapping->getForward()) throw new RuntimeException('Mapping "'.$mapping->getPath().'": Only one attribute of "action", "include", "redirect" or "forward" must be specified');
+                if ($mapping->getForward()) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'": Only one attribute of "action", "include", "redirect" or "forward" must be specified');
                 $path = (string) $tag['forward'];
                 $forward = $this->findForward($path);
-                if (!$forward) throw new RuntimeException('Mapping "'.$mapping->getPath().'", attribute "forward": Forward "'.$path.'" not found');
+                if (!$forward) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'", attribute "forward": Forward "'.$path.'" not found');
                 $mapping->setForward($forward);
             }
-            if ($mapping->getForward() && sizeOf($tag->xPath('./forward'))) throw new RuntimeException('Mapping "'.$mapping->getPath().'": Only an "include", "redirect" or "forward" attribute *or* nested <forward> elements must be specified');
+            if ($mapping->getForward() && sizeOf($tag->xPath('./forward'))) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'": Only an "include", "redirect" or "forward" attribute *or* nested <forward> elements must be specified');
 
 
             // process action attribute
             if ($tag['action']) {
-                if ($mapping->getForward()) throw new RuntimeException('Mapping "'.$mapping->getPath().'": Only one attribute of "action", "include", "redirect" or "forward" must be specified');
+                if ($mapping->getForward()) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'": Only one attribute of "action", "include", "redirect" or "forward" must be specified');
                 $action = (string) $tag['action'];
                 // TODO: URL validieren
                 $mapping->setActionClassName($action);
@@ -339,13 +339,13 @@ class Module extends Object {
                     $formValidateFirst = $tag['form-validate-first'] ? ($tag['form-validate-first']=='true') : !$action;
                 }
                 else {
-                    if ($tag['form-validate-first']=='false') throw new RuntimeException('Mapping "'.$mapping->getPath().'": An "action", "include", "redirect" or "forward" attribute is required when "form-validate-first" attribute is set to "false"');
+                    if ($tag['form-validate-first']=='false') throw new StrutsConfigException('Mapping "'.$mapping->getPath().'": An "action", "include", "redirect" or "forward" attribute is required when "form-validate-first" attribute is set to "false"');
                     $formValidateFirst = true;
                     // Pruefung auf 'success' und 'error' Forward erfolgt in ActionMapping:freeze()
                 }
             }
             elseif ($formValidateFirst = $tag['form-validate-first']=='true') {
-                throw new RuntimeException('Mapping "'.$mapping->getPath().'": A "form" attribute must be specified when the "form-validate-first" attribute is set to "true"');
+                throw new StrutsConfigException('Mapping "'.$mapping->getPath().'": A "form" attribute must be specified when the "form-validate-first" attribute is set to "true"');
             }
             $mapping->setFormValidateFirst($formValidateFirst);
 
@@ -364,7 +364,7 @@ class Module extends Object {
 
             // process roles attribute
             if ($tag['roles']) {
-                if (!$this->roleProcessorClass) throw new RuntimeException('Mapping "'.$mapping->getPath().'", attribute "roles": RoleProcessor configuration not found');
+                if (!$this->roleProcessorClass) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'", attribute "roles": RoleProcessor configuration not found');
                 $mapping->setRoles((string) $tag['roles']);
             }
 
@@ -377,16 +377,14 @@ class Module extends Object {
             // child nodes
             // -----------
             // process local 'include' and 'redirect' forwards
-            $subElements = $tag->xPath('./forward[@include] | ./forward[@redirect]');
-            if ($subElements === false)
-                $subElements = array(); // xPath() gibt entgegen der Dokumentation NICHT immer ein Array zurueck
+            $subElements = $tag->xPath('./forward[@include] | ./forward[@redirect]') ?: [];
 
             foreach ($subElements as $forwardTag) {
                 $name = (string) $forwardTag['name'];
-                if (sizeOf($forwardTag->attributes()) > 2) throw new RuntimeException('Mapping "'.$mapping->getPath().'", forward "'.$name.'": Only one attribute of "include", "redirect" or "forward" must be specified');
+                if (sizeOf($forwardTag->attributes()) > 2) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'", forward "'.$name.'": Only one attribute of "include", "redirect" or "forward" must be specified');
 
                 if ($path = (string) $forwardTag['include']) {
-                    if (!$this->isIncludable($path, $xml)) throw new RuntimeException('Mapping "'.$mapping->getPath().'", forward "'.$name.'", attribute "include": '.($path{0}=='.' ? 'Tiles definition':'File').' "'.$path.'" not found');
+                    if (!$this->isIncludable($path, $xml)) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'", forward "'.$name.'", attribute "include": '.($path{0}=='.' ? 'Tiles definition':'File').' "'.$path.'" not found');
 
                     if ($this->isTile($path, $xml)) {
                         $forward = new $this->forwardClass($name, $path, false);
@@ -405,19 +403,17 @@ class Module extends Object {
             }
 
             // process local 'forward' forwards
-            $subElements = $tag->xPath('./forward[@forward]');
-            if ($subElements === false)
-                $subElements = array(); // xPath() gibt entgegen der Dokumentation NICHT immer ein Array zurueck
+            $subElements = $tag->xPath('./forward[@forward]') ?: [];
 
             foreach ($subElements as $forwardTag) {
                 $name = (string) $forwardTag['name'];
-                if (sizeOf($forwardTag->attributes()) > 2) throw new RuntimeException('Mapping "'.$mapping->getPath().'", forward "'.$name.'": Only one attribute of "include", "redirect" or "forward" must be specified');
+                if (sizeOf($forwardTag->attributes()) > 2) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'", forward "'.$name.'": Only one attribute of "include", "redirect" or "forward" must be specified');
 
                 $alias = (string) $forwardTag['forward'];
-                if ($alias == ActionForward::__SELF) throw new RuntimeException('Mapping "'.$mapping->getPath().'", forward "'.$name.'", attribute "forward": Can not use magic keyword "'.$alias.'" as attribute value');
+                if ($alias == ActionForward::__SELF) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'", forward "'.$name.'", attribute "forward": Can not use magic keyword "'.$alias.'" as attribute value');
 
                 $forward = $mapping->findForward($alias);
-                if (!$forward) throw new RuntimeException('Mapping "'.$mapping->getPath().'", forward "'.$name.'", attribute "forward": Forward "'.$alias.'" not found');
+                if (!$forward) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'", forward "'.$name.'", attribute "forward": Forward "'.$alias.'" not found');
 
                 $mapping->addForward($name, $forward);
             }
@@ -433,17 +429,16 @@ class Module extends Object {
      * Durchlaeuft alle konfigurierten Tiles.
      *
      * @param  \SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
+     *
+     * @throws StrutsConfigException on configuration errors
      */
     protected function processTiles(\SimpleXMLElement $xml) {
-        $elements = $xml->xPath('/struts-config/tiles/tile');
-        if ($elements === false)
-            $elements = array();                            // xPath() gibt entgegen der Dokumentation *nicht* immer ein Array zurueck
+        $elements = $xml->xPath('/struts-config/tiles/tile') ?: [];
 
         foreach ($elements as $tag) {
             $name = (string) $tag['name'];
-            $tile = $this->getDefinedTile($name, $xml);     // throws exception on configuration errors
+            $tile = $this->getDefinedTile($name, $xml);     // throws exception on tile configuration errors
         }
-        // TODO: rekursive Tiles-Definitionen abfangen
     }
 
 
@@ -454,19 +449,23 @@ class Module extends Object {
      * @param  \SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration der Tile
      *
      * @return Tile
+     *
+     * @throws StrutsConfigException on configuration errors
      */
     private function getDefinedTile($name, \SimpleXMLElement $xml) {
         // if the tile already exists return it
         if (isSet($this->tiles[$name]))
             return $this->tiles[$name];
 
+        // TODO: zirkulare Tiles-Referenzen abfangen
+
         // find it's definition ...
         $nodes = $xml->xPath("/struts-config/tiles/tile[@name='".$name."']");
-        if (!$nodes)            throw new RuntimeException('Tiles definition "'.$name.'" not found'); // FALSE oder leeres Array
-        if (sizeOf($nodes) > 1) throw new RuntimeException('Non-unique "name" attribute detected for tiles definition "'.$name.'"');
+        if (!$nodes)            throw new StrutsConfigException('Tile named "'.$name.'" not found');
+        if (sizeOf($nodes) > 1) throw new StrutsConfigException('Multiple tiles named "'.$name.'" found');
 
         $tag = $nodes[0];
-        if (sizeOf($tag->attributes()) != 2) throw new RuntimeException('Tile "'.$name.'": Exactly one attribute of "file", "extends-tile" or "alias" must be specified');
+        if (sizeOf($tag->attributes()) != 2) throw new StrutsConfigException('<tile name="'.$name.'": exactly one attribute of "file", "extends-tile" or "alias" must be specified');
 
         // check for an alias
         if ($tag['alias']) {
@@ -480,19 +479,19 @@ class Module extends Object {
         if ($tag['file']) {                 // 'file' given
             $fileAttr = (string) $tag['file'];
             $filePath = $this->findFile($fileAttr);
-            if (!$filePath) throw new FileNotFoundException('Tile "'.$name.'", attribute "file": File "'.$fileAttr.'" not found');
+            if (!$filePath) throw new StrutsConfigException('<tile name="'.$name.'" file="'.$fileAttr.'": file not found');
 
             $tile = new $this->tilesClass($this);
             $tile->setFileName($filePath);
         }
-        else {                           // 'file' not given, it's an extended tile (get and clone it's parent)
-            $parent = $this->getDefinedTile((string) $tag['extends-tile'], $xml);
-            $tile = clone $parent;
+        else {                           // 'file' not given, it's extending another tile (get and clone it)
+            $other = $this->getDefinedTile((string) $tag['extends-tile'], $xml);
+            $tile = clone $other;
         }
         $tile->setName($name);
 
-        // process it's properties ...
-        $this->processTileProperties($tile, $tag);
+        // process it's child nodes ...
+        $this->processTileChildNodes($tile, $tag);
 
         // ... and finally save it
         $this->addTile($tile);
@@ -501,58 +500,47 @@ class Module extends Object {
 
 
     /**
-     * Verarbeitet die in einer Tiles-Definition angegebenen zusaetzlichen Properties.
+     * Verarbeitet die in einer Tiles-Definition angegebenen Child-Nodes.
      *
      * @param  Tile              $tile - Tile-Instanz
      * @param  \SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration
+     *
+     * @throws StrutsConfigException on configuration errors
      */
-    private function processTileProperties(Tile $tile, \SimpleXMLElement $xml) {
-        foreach ($xml->set as $tag) {
+    private function processTileChildNodes(Tile $tile, \SimpleXMLElement $xml) {
+        // process <set> elements
+        foreach ($xml->{'set'} as $tag) {
             $name  = (string) $tag['name'];
-            // TODO: Name-Value von <set> wird nicht auf Eindeutigkeit ueberprueft
+            $nodes = $xml->xPath("/struts-config/tiles/tile[@name='".$tile->getName()."']/set[@name='".$name."']");
+            if (sizeOf($nodes) > 1) throw new StrutsConfigException('<tile name="'.$tile->getName().'"... multiple childnodes <set name="'.$name.'" found');
+            if (sizeOf($tag->attributes()) > 2) throw new StrutsConfigException('<tile name="'.$tile->getName().'"... childnode <set name="'.$name.'": exactly one attribute of "file" or "tile" must be specified');
 
-            if ($tag['value']) { // value ist im Attribut angegeben
-                if (strLen($tag) > 0) throw new RuntimeException('Tile "'.$tile->getName().'", child <set name="'.$name.'": Only a "value" attribute *or* a body value must be specified');
-                $value = (string) $tag['value'];
+            $nestedTile = null;
 
-                if ($tag['type']) {
-                    $type = (string) $tag['type'];
-                }
-                elseif ($this->isIncludable($value, $xml)) {
-                    $type = Tile::PROPERTY_TYPE_RESOURCE;
-                }
-                elseif (strEndsWithI($value, ['.htm', '.html', '.inc', '.phtm', '.phtml', '.php'])) {
-                    throw new RuntimeException('Tile "'.$tile->getName().'", child <set name="'.$name.'": specify a type="string|resource" for ambiguous value="'.$value.'" (looks like a filename but file not found)');
-                }
-                else {
-                    $type = Tile::PROPERTY_TYPE_STRING;
-                }
+            if ($tag['file']) {                             // attribute 'file' specified
+                $fileAttr = (string) $tag['file'];
+                $filePath = $this->findFile($fileAttr);
+                if (!$filePath) throw new StrutsConfigException('<tile name="'.$tile->getName().'"... childnode <set name="'.$name.'" file="'.$fileAttr.'": file not found');
+                // generische Tile erzeugen, damit render() existiert
+                $nestedTile = new $this->tilesClass($this, $tile);
+                $nestedTile->setName(Tile::GENERIC_NAME)
+                           ->setFileName($filePath);
             }
-            else {               // value ist im Body angegeben
-                $value = trim((string) $tag);
-                $type = ($tag['type']) ? (string) $tag['type'] : Tile::PROPERTY_TYPE_STRING;
-                if ($type == Tile::PROPERTY_TYPE_RESOURCE) throw new RuntimeException('Tile "'.$tile->getName().'", child <set name="'.$name.'": A "value" attribute must be specified when attribute type is set to "resource"');
+            else if ($tag['tile']) {                        // attribute 'tile' specified
+                $tileAttr   = (string) $tag['tile'];
+                $nestedTile = $this->getDefinedTile($tileAttr, $xml);
             }
-
-
-            // Ist value eine Tile, diese initialisieren.
-            if ($type == Tile::PROPERTY_TYPE_RESOURCE) {
-                if ($this->isTile($value, $xml)) {
-                    $nestedTile = $this->getDefinedTile($value, $xml);
-                }
-                elseif ($this->isFile($value)) {       // generische Tile erzeugen, damit render() existiert
-                    $nestedTile = new $this->tilesClass($this, $tile);
-                    $nestedTile->setName(Tile::GENERIC_NAME)
-                               ->setFileName($this->findFile($value));
-                }
-                else {
-                    throw new RuntimeException('Tile "'.$tile->getName().'", child <set name="'.$name.'" value="'.$value.'": '.($value{0}=='.' ? 'Tiles definition':'File').'  not found');
-                }
-                $value = $nestedTile;
+            else {                                          // not yet defined, it's a template
+                $nestedTile = null;
             }
+            $tile->setNestedTile($name, $nestedTile);
+        }
 
-            // TODO: bei extended Tiles Typuebereinstimmung ueberladener Properties pruefen
-            $tile->setProperty($name, $value);
+        // process <set-property> elements
+        foreach ($xml->{'set-property'} as $tag) {
+            // TODO: Property-Namen auf Eindeutigkeit ueberpruefen
+            // TODO: Typuebereinstimmung ueberladener Properties mit der Extended-Tile pruefen
+            //$tile->setProperty($name, $value);
         }
     }
 
@@ -561,6 +549,8 @@ class Module extends Object {
      * Verarbeitet die in der Konfiguration definierten Error-Einstellungen.
      *
      * @param  \SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
+     *
+     * @throws StrutsConfigException on configuration errors
      */
     protected function processErrors(\SimpleXMLElement $xml) {
     }
@@ -616,16 +606,10 @@ class Module extends Object {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
         $name = $tile->getName();
+        $this->tiles[$name] = $tile;
 
-        if (!isSet($this->tiles[$name])) {
-            $this->tiles[$name] = $tile;
-        }
-
-        if (!is_null($alias)) {
-            if (!isSet($this->tiles[$alias])) {
-                $this->tiles[$alias] = $tile;
-            }
-        }
+        if (!is_null($alias))
+            $this->tiles[$alias] = $tile;
     }
 
 
@@ -668,20 +652,18 @@ class Module extends Object {
      * Verarbeitet Controller-Einstellungen.
      *
      * @param  \SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
+     *
+     * @throws StrutsConfigException on configuration errors
      */
     protected function processController(\SimpleXMLElement $xml) {
-        if ($this->configured)
-            throw new IllegalStateException('Configuration is frozen');
+        if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
-        $elements = $xml->xPath('/struts-config/controller');
-        if ($elements === false)
-            $elements = array(); // xPath() gibt entgegen der Dokumentation NICHT immer ein Array zurueck
+        $elements = $xml->xPath('/struts-config/controller') ?: [];
 
         foreach ($elements as $controller) {
             if ($controller['request-processor']) {
                 $this->setRequestProcessorClass((string) $controller['request-processor']);
             }
-
             if ($controller['role-processor']) {
                 $this->setRoleProcessorClass((string) $controller['role-processor']);
             }
@@ -694,12 +676,13 @@ class Module extends Object {
      * Diese Klasse muss eine Subklasse von RequestProcessor sein.
      *
      * @param  string $className
+     *
+     * @throws StrutsConfigException on configuration errors
      */
     protected function setRequestProcessorClass($className) {
         if ($this->configured)                                            throw new IllegalStateException('Configuration is frozen');
-        if (!is_string($className))                                       throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
-        if (!is_class($className))                                        throw new ClassNotFoundException('Undefined class "'.$className.'"');
-        if (!is_subclass_of($className, DEFAULT_REQUEST_PROCESSOR_CLASS)) throw new InvalidArgumentException('Not a subclass of '.DEFAULT_REQUEST_PROCESSOR_CLASS.': '.$className);
+        if (!is_class($className))                                        throw new StrutsConfigException('Class "'.$className.'" not found');
+        if (!is_subclass_of($className, DEFAULT_REQUEST_PROCESSOR_CLASS)) throw new StrutsConfigException('Not a subclass of '.DEFAULT_REQUEST_PROCESSOR_CLASS.': "'.$className.'"');
 
         $this->requestProcessorClass = $className;
     }
@@ -720,12 +703,13 @@ class Module extends Object {
      * Diese Klasse muss eine Subklasse von RoleProcessor sein.
      *
      * @param  string $className
+     *
+     * @throws StrutsConfigException on configuration errors
      */
     protected function setRoleProcessorClass($className) {
         if ($this->configured)                                      throw new IllegalStateException('Configuration is frozen');
-        if (!is_string($className))                                 throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
-        if (!is_class($className))                                  throw new ClassNotFoundException('Undefined class "'.$className.'"');
-        if (!is_subclass_of($className, ROLE_PROCESSOR_BASE_CLASS)) throw new InvalidArgumentException('Not a subclass of '.ROLE_PROCESSOR_BASE_CLASS.': '.$className);
+        if (!is_class($className))                                  throw new StrutsConfigException('Class "'.$className.'" not found');
+        if (!is_subclass_of($className, ROLE_PROCESSOR_BASE_CLASS)) throw new StrutsConfigException('Not a subclass of '.ROLE_PROCESSOR_BASE_CLASS.': "'.$className.'"');
 
         $this->roleProcessorClass = $className;
     }
@@ -750,12 +734,13 @@ class Module extends Object {
      * Diese Klasse muss eine Subklasse von Tile sein.
      *
      * @param  string $className
+     *
+     * @throws StrutsConfigException on configuration errors
      */
     protected function setTilesClass($className) {
         if ($this->configured)                                throw new IllegalStateException('Configuration is frozen');
-        if (!is_string($className))                           throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
-        if (!is_class($className))                            throw new ClassNotFoundException('Undefined class "'.$className.'"');
-        if (!is_subclass_of($className, DEFAULT_TILES_CLASS)) throw new InvalidArgumentException('Not a subclass of '.DEFAULT_TILES_CLASS.': '.$className);
+        if (!is_class($className))                            throw new StrutsConfigException('Class "'.$className.'" not found');
+        if (!is_subclass_of($className, DEFAULT_TILES_CLASS)) throw new StrutsConfigException('Not a subclass of '.DEFAULT_TILES_CLASS.': "'.$className.'"');
 
         $this->tilesClass = $className;
     }
@@ -776,12 +761,13 @@ class Module extends Object {
      * Diese Klasse muss eine Subklasse von ActionMapping sein.
      *
      * @param  string $className
+     *
+     * @throws StrutsConfigException on configuration errors
      */
     protected function setMappingClass($className) {
         if ($this->configured)                                         throw new IllegalStateException('Configuration is frozen');
-        if (!is_string($className))                                    throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
-        if (!is_class($className))                                     throw new ClassNotFoundException("Undefined class '$className'");
-        if (!is_subclass_of($className, DEFAULT_ACTION_MAPPING_CLASS)) throw new InvalidArgumentException('Not a subclass of '.DEFAULT_ACTION_MAPPING_CLASS.': '.$className);
+        if (!is_class($className))                                     throw new StrutsConfigException('Class "'.$className.'" not found');
+        if (!is_subclass_of($className, DEFAULT_ACTION_MAPPING_CLASS)) throw new StrutsConfigException('Not a subclass of '.DEFAULT_ACTION_MAPPING_CLASS.': "'.$className.'"');
 
         $this->mappingClass = $className;
     }
@@ -802,12 +788,13 @@ class Module extends Object {
      * Diese Klasse muss eine Subklasse von ActionForward sein.
      *
      * @param  string $className
+     *
+     * @throws StrutsConfigException on configuration errors
      */
     protected function setForwardClass($className) {
         if ($this->configured)                                         throw new IllegalStateException('Configuration is frozen');
-        if (!is_string($className))                                    throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
-        if (!is_class($className))                                     throw new ClassNotFoundException('Undefined class "'.$className.'"');
-        if (!is_subclass_of($className, DEFAULT_ACTION_FORWARD_CLASS)) throw new InvalidArgumentException('Not a subclass of '.DEFAULT_ACTION_FORWARD_CLASS.': '.$className);
+        if (!is_class($className))                                     throw new StrutsConfigException('Class "'.$className.'" not found');
+        if (!is_subclass_of($className, DEFAULT_ACTION_FORWARD_CLASS)) throw new StrutsConfigException('Not a subclass of '.DEFAULT_ACTION_FORWARD_CLASS.': "'.$className.'"');
 
         $this->forwardClass = $className;
     }
@@ -867,7 +854,6 @@ class Module extends Object {
     public function findTile($name) {
         if (isSet($this->tiles[$name]))
             return $this->tiles[$name];
-
         return null;
     }
 
@@ -893,16 +879,13 @@ class Module extends Object {
      * @param  \SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration
      *
      * @return bool
+     *
+     * @throws StrutsConfigException on configuration errors
      */
     private function isTile($name, \SimpleXMLElement $xml) {
-        $nodes = $xml->xPath("/struts-config/tiles/tile[@name='$name']");
-
-        if ($nodes) {                 // xPath() gibt entgegen der Dokumentation NICHT immer ein Array zurueck
-            if (sizeOf($nodes) > 1)
-                throw new RuntimeException('Non-unique tiles definition name "'.$name.'"');
-            return true;
-        }
-        return false;
+        $nodes = $xml->xPath("/struts-config/tiles/tile[@name='$name']") ?: [];
+        if (sizeOf($nodes) > 1) throw new StrutsConfigException('Non-unique tiles definition name "'.$name.'"');
+        return !empty($nodes);
     }
 
 
@@ -932,9 +915,9 @@ class Module extends Object {
         // strip query string
         $parts = explode('?', $name, 2);
 
-        foreach ($this->resourceDirectories as $directory) {
-            if (is_file($directory.'/'.$parts[0])) {
-                $name = realPath($directory.'/'.array_shift($parts));
+        foreach ($this->resourceLocations as $location) {
+            if (is_file($location.DIRECTORY_SEPARATOR.$parts[0])) {
+                $name = realPath($location.DIRECTORY_SEPARATOR.array_shift($parts));
                 if ($parts)
                     $name .= '?'.$parts[0];
                 return $name;

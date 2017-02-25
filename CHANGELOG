@@ -1,8 +1,12 @@
 
+2017-02-25
+
+   - struts-config: tile childnodes ("set" elements) and properties ("set-property" elements) are separated
+   
+
 2017-02-24
 
-   - struts-config: tiles definitions may be aliased
-     e.g.: <tile name=".guest.login"  alias=".guest.home" />
+   - struts-config: tile definitions can be aliased, e.g.: <tile name=".guest.login"  alias=".guest.home"/>
 
 
 2017-02-23
@@ -18,7 +22,7 @@
 2017-02-19
 
    - the db/*/Connector constructor is part of interface db/ConnectorInterface
-   - new marker interface core/DiAware for all classes
+   - new interface di/DiAwareInterface for all classes
 
 
 2017-02-17

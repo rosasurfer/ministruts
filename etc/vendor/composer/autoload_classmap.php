@@ -107,6 +107,7 @@ return array(
     'rosasurfer\\ministruts\\RequestProcessor' => $baseDir . '/src/ministruts/RequestProcessor.php',
     'rosasurfer\\ministruts\\Response' => $baseDir . '/src/ministruts/Response.php',
     'rosasurfer\\ministruts\\RoleProcessor' => $baseDir . '/src/ministruts/RoleProcessor.php',
+    'rosasurfer\\ministruts\\StrutsConfigException' => $baseDir . '/src/ministruts/StrutsConfigException.php',
     'rosasurfer\\ministruts\\StrutsController' => $baseDir . '/src/ministruts/StrutsController.php',
     'rosasurfer\\ministruts\\Tile' => $baseDir . '/src/ministruts/Tile.php',
     'rosasurfer\\ministruts\\url\\Url' => $baseDir . '/src/ministruts/url/Url.php',
