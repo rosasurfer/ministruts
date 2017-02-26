@@ -32,7 +32,7 @@ class HttpSession extends Singleton {
     protected function __construct(Request $request) {
         // Pruefen, ob eine Session bereits ausserhalb dieser Instanz gestartet wurde
         if ($request->isSession())
-            throw new IllegalStateException('Cannot initialize '.get_class($this).', found already started session. Use this class *only* for session handling!');
+            throw new IllegalStateException('Cannot initialize '.get_class().', found already started session. Use this class *only* for session handling!');
 
         $this->request = $request;
         $this->init();

@@ -51,7 +51,7 @@ class StdConfig extends Config {
 
 
         // TODO: look-up and delegate to an existing cached instance
-        //       key: get_class($this)."|$configDir|$configFile"
+        //       key: get_class()."|$configDir|$configFile"
 
 
         // define framework config files

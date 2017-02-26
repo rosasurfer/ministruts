@@ -34,7 +34,7 @@ abstract class DAO extends Singleton {
      * Create a new DAO.
      */
     protected function __construct() {
-        $this->entityClass = subStr(get_class($this), 0, -3);
+        $this->entityClass = subStr(get_class(), 0, -3);
     }
 
 
@@ -83,7 +83,7 @@ abstract class DAO extends Singleton {
      * @return array
      */
     final public function getMapping() {
-        if (!isSet($this->mapping)) throw new UnimplementedFeatureException('You must implement '.get_class($this).'->mapping[] to work with this DAO.');
+        if (!isSet($this->mapping)) throw new UnimplementedFeatureException('You must implement '.get_class().'->mapping[] to work with this DAO.');
         return $this->mapping;
     }
 
