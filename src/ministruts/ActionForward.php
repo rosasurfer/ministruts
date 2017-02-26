@@ -58,8 +58,8 @@ class ActionForward extends Object {
      */
     public function __construct($name, $path, $redirect=false) {
         $this->setName($name)
-           ->setPath($path)
-           ->setRedirect($redirect);
+             ->setPath($path)
+             ->setRedirect($redirect);
     }
 
 
@@ -113,7 +113,7 @@ class ActionForward extends Object {
     public function setName($name) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
         if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
-        if ($name==='')        throw new InvalidArgumentException('Invalid argument $name: '.$name);
+        if (!strLen($name))    throw new InvalidArgumentException('Invalid argument $name: '.$name);
 
         $this->name = $name;
         return $this;
@@ -130,7 +130,7 @@ class ActionForward extends Object {
     public function setPath($path) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
         if (!is_string($path)) throw new IllegalTypeException('Illegal type of parameter $path: '.getType($path));
-        if ($path === '')      throw new InvalidArgumentException('Invalid argument $path: '.$path);
+        if (!strLen($path))    throw new InvalidArgumentException('Invalid argument $path: '.$path);
 
         $this->path = $path;
         return $this;
@@ -147,7 +147,7 @@ class ActionForward extends Object {
     public function setLabel($label) {
         if ($this->configured)  throw new IllegalStateException('Configuration is frozen');
         if (!is_string($label)) throw new IllegalTypeException('Illegal type of parameter $label: '.getType($label));
-        if ($label==='')        throw new InvalidArgumentException('Invalid argument $label: '.$label);
+        if (!strLen($label))    throw new InvalidArgumentException('Invalid argument $label: '.$label);
 
         $this->label = $label;
         return $this;
@@ -181,7 +181,7 @@ class ActionForward extends Object {
     public function addQueryData($key, $value) {
         if ($this->configured)      throw new IllegalStateException('Configuration is frozen');
         if (!is_string($key))       throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
-        if ($value === null)        $value = '';
+        if (is_null($value))        $value = '';
         elseif (is_bool($value))    $value = (int) $value;
         elseif (!is_scalar($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
 

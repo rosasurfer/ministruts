@@ -2,9 +2,7 @@
 namespace rosasurfer\ministruts;
 
 use rosasurfer\core\Object;
-
 use rosasurfer\exception\IllegalStateException;
-use rosasurfer\exception\IllegalTypeException;
 
 use function rosasurfer\strRightFrom;
 
@@ -76,7 +74,6 @@ class Tile extends Object {
      */
     public function setName($name) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
 
         $this->name = $name;
         return $this;
@@ -101,8 +98,7 @@ class Tile extends Object {
      * @return self
      */
     public function setFileName($filename) {
-        if ($this->configured)     throw new IllegalStateException('Configuration is frozen');
-        if (!is_string($filename)) throw new IllegalTypeException('Illegal type of parameter $filename: '.getType($filename));
+        if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
         $this->fileName = $filename;
         return $this;
@@ -117,8 +113,6 @@ class Tile extends Object {
      */
     public function setNestedTile($name, self $tile=null) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
-
         $this->nestedTiles[$name] = $tile;
     }
 
@@ -130,10 +124,19 @@ class Tile extends Object {
      * @param  mixed  $value - der zu speichernde Wert
      */
     public function setProperty($name, $value) {
-        if ($this->configured)                             throw new IllegalStateException('Configuration is frozen');
-        if (!is_string($name))                             throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
+        if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
         $this->properties[$name] = $value;
+    }
+
+
+    /**
+     * Whether or not this instance must be extended and can't be inserted into a view directly.
+     *
+     * @return bool
+     */
+    public function isAbstract() {
+        return in_array(null, $this->nestedTiles, true);
     }
 
 
@@ -145,7 +148,7 @@ class Tile extends Object {
     public function freeze() {
         if (!$this->configured) {
             if (!$this->name)     throw new IllegalStateException('No name configured for this '.$this);
-            if (!$this->fileName) throw new IllegalStateException('No file configured for '.get_class($this).' "'.$this->name.'"');
+            if (!$this->fileName) throw new IllegalStateException('No file configured for '.get_class().' "'.$this->name.'"');
 
             foreach ($this->nestedTiles as $tile) {
                 $tile && $tile->freeze();

@@ -5,8 +5,6 @@ use rosasurfer\core\Object;
 
 use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\IllegalTypeException;
-use rosasurfer\exception\InvalidArgumentException;
-use rosasurfer\exception\RuntimeException;
 
 use rosasurfer\log\Logger;
 
@@ -86,12 +84,13 @@ class ActionMapping extends Object {
      * @param  string $path
      *
      * @return self
+     *
+     * @throws StrutsConfigException on configuration errors
      */
     public function setPath($path) {
-        if ($this->configured)          throw new IllegalStateException('Configuration is frozen');
-        if (!is_string($path))          throw new IllegalTypeException('Illegal type of parameter $path: '.getType($path));
-        if (!strStartsWith($path, '/')) throw new InvalidArgumentException('The "path" attribute of a mapping must begin with a slash "/", found "'.$path.'"');
+        if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
+        if (!strStartsWith($path, '/')) throw new StrutsConfigException('The "path" attribute of a mapping must begin with a slash "/", found "'.$path.'"');
         if (!strEndsWith($path, '/'))       // mapping paths must start and end with a slash "/"
             $path .= '/';
 
@@ -135,8 +134,8 @@ class ActionMapping extends Object {
      * @throws StrutsConfigException on configuration errors
      */
     public function setMethod($method) {
-        if ($this->configured)                 throw new IllegalStateException('Configuration is frozen');
-        if (!is_string($method))               throw new IllegalTypeException('Illegal type of parameter $method: '.getType($method));
+        if ($this->configured) throw new IllegalStateException('Configuration is frozen');
+
         $method = strToUpper($method);
         if ($method!='GET' && $method!='POST') throw new StrutsConfigException('Invalid HTTP method "'.$method.'"');
 
@@ -167,11 +166,9 @@ class ActionMapping extends Object {
      */
     public function setRoles($roles) {
         if ($this->configured)  throw new IllegalStateException('Configuration is frozen');
-        if (!is_string($roles)) throw new IllegalTypeException('Illegal type of parameter $roles: '.getType($roles));
 
         //static $pattern = '/^!?[A-Za-z_][A-Za-z0-9_]*(,!?[A-Za-z_][A-Za-z0-9_]*)*$/';
         static $pattern = '/^!?[A-Za-z_][A-Za-z0-9_]*$/';
-
         if (!strLen($roles) || !preg_match($pattern, $roles)) throw new StrutsConfigException('Invalid role expression: "'.$roles.'"');
 
         // check for impossible constraints, ie. "Member,!Member"
@@ -194,10 +191,12 @@ class ActionMapping extends Object {
      * @param  ActionForward $forward - ActionForward
      *
      * @return self
+     *
+     * @throws StrutsConfigException on configuration errors
      */
     public function setForward(ActionForward $forward) {
         if ($this->configured)      throw new IllegalStateException('Configuration is frozen');
-        if ($this->actionClassName) throw new RuntimeException('Configuration error: Only one attribute of "action", "include", "redirect" or "forward" can be specified for mapping "'.$this->path.'"');
+        if ($this->actionClassName) throw new StrutsConfigException('Configuration error: Only one attribute of "action", "include", "redirect" or "forward" can be specified for mapping "'.$this->path.'"');
 
         $this->forward = $forward;
         return $this;
@@ -225,7 +224,6 @@ class ActionMapping extends Object {
      */
     public function setActionClassName($className) {
         if ($this->configured)                              throw new IllegalStateException('Configuration is frozen');
-        if (!is_string($className))                         throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
         if (!is_class($className))                          throw new StrutsConfigException('Class "'.$className.'" not found');
         if (!is_subclass_of($className, ACTION_BASE_CLASS)) throw new StrutsConfigException('Not a subclass of '.ACTION_BASE_CLASS.': "'.$className.'"');
         if ($this->forward)                                 throw new StrutsConfigException('Only one attribute of "action", "include", "redirect" or "forward" can be specified for mapping "'.$this->path.'"');
@@ -257,7 +255,6 @@ class ActionMapping extends Object {
      */
     public function setFormClassName($className) {
         if ($this->configured)                                   throw new IllegalStateException('Configuration is frozen');
-        if (!is_string($className))                              throw new IllegalTypeException('Illegal type of parameter $className: '.getType($className));
         if (!is_class($className))                               throw new StrutsConfigException('Class "'.$className.'" not found');
         if (!is_subclass_of($className, ACTION_FORM_BASE_CLASS)) throw new StrutsConfigException('Not a subclass of '.ACTION_FORM_BASE_CLASS.': "'.$className.'"');
 
@@ -285,11 +282,12 @@ class ActionMapping extends Object {
      * @param  string $value - "request" oder "session"
      *
      * @return self
+     *
+     * @throws StrutsConfigException on configuration errors
      */
     public function setFormScope($value) {
         if ($this->configured)                      throw new IllegalStateException('Configuration is frozen');
-        if (!is_string($value))                     throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
-        if ($value!='request' && $value!='session') throw new InvalidArgumentException('Invalid argument $value: '.$value);
+        if ($value!='request' && $value!='session') throw new StrutsConfigException('Invalid argument $value: '.$value);
 
         $this->formScope = $value;
         return $this;
@@ -341,7 +339,6 @@ class ActionMapping extends Object {
      */
     public function setFormValidateFirst($mode) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-        if (!is_bool($mode))   throw new IllegalTypeException('Illegal type of parameter $mode: '.getType($mode));
 
         $this->formValidateFirst = $mode;
         return $this;
@@ -368,8 +365,7 @@ class ActionMapping extends Object {
      * @return self
      */
     public function setDefault($default) {
-        if ($this->configured)  throw new IllegalStateException('Configuration is frozen');
-        if (!is_bool($default)) throw new IllegalTypeException('Illegal type of parameter $default: '.getType($default));
+        if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
         $this->default = $default;
         return $this;
@@ -397,13 +393,13 @@ class ActionMapping extends Object {
      * @param  ActionForward $forward
      *
      * @return self
+     *
+     * @throws StrutsConfigException on configuration errors
      */
     public function addForward($name, ActionForward $forward) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
 
-        if (isSet($this->forwards[$name]))
-            throw new RuntimeException('Non-unique name detected for local action forward "'.$name.'"');
+        if (isSet($this->forwards[$name])) throw new StrutsConfigException('Non-unique name detected for local action forward "'.$name.'"');
 
         $this->forwards[$name] = $forward;
         return $this;
