@@ -16,9 +16,6 @@ use function rosasurfer\strLeftTo;
 class Module extends Object {
 
 
-    /** @var bool - Ob diese Komponente vollstaendig konfiguriert ist. */
-    protected $configured = false;
-
     /**
      * Der Prefix dieses Modules relative zur ROOT_URL der Anwendung.  Die Prefixe innerhalb einer Anwendung
      * sind eindeutig. Das Module mit einem Leerstring als Prefix ist das Default-Module der Anwendung.
@@ -59,6 +56,12 @@ class Module extends Object {
 
     /** @var RoleProcessor - Die RoleProcessor-Implementierung, die fuer dieses Modul definiert ist. */
     protected $roleProcessor;
+
+    /** @var string[] - initialization context used to detect circular tiles definition references */
+    protected $tilesContext = [];
+
+    /** @var bool - Ob diese Komponente vollstaendig konfiguriert ist. */
+    protected $configured = false;
 
 
     /**
@@ -199,6 +202,7 @@ class Module extends Object {
             if (sizeOf($tag->attributes()) > 2) throw new StrutsConfigException('<global-forwards> <forward name="'.$name.'": Only one attribute of "include", "redirect" or "forward" must be specified');
 
             if ($include = (string) $tag['include']) {
+                $this->tilesContext = [];
                 if (!$this->isIncludable($include, $xml)) throw new StrutsConfigException('<global-forwards> <forward name="'.$name.'" include="'.$include.'": '.($include[0]=='.' ? 'Tile definition':'File').' not found');
 
                 if ($this->isTile($include, $xml)) {
@@ -258,6 +262,8 @@ class Module extends Object {
             // process include attribute
             if ($tag['include']) {
                 if ($mapping->getForward()) throw new StrutsConfigException('<action-mappings> <mapping path="'.$path.'": Only one attribute of "action", "include", "redirect" or "forward" must be specified');
+
+                $this->tilesContext = [];
                 $include = (string) $tag['include'];
                 if (!$this->isIncludable($include, $xml)) throw new StrutsConfigException('<action-mappings> <mapping path="'.$path.'" include="'.$include.'": '.($include[0]=='.' ? 'Tile definition':'File').' not found');
 
@@ -369,6 +375,7 @@ class Module extends Object {
                 if (sizeOf($forwardTag->attributes()) > 2) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'", forward "'.$name.'": Only one attribute of "include", "redirect" or "forward" must be specified');
 
                 if ($include = (string) $forwardTag['include']) {
+                    $this->tilesContext = [];
                     if (!$this->isIncludable($include, $xml)) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'", forward "'.$name.'", attribute "include": '.($include[0]=='.' ? 'Tiles definition':'File').' "'.$include.'" not found');
 
                     if ($this->isTile($include, $xml)) {
@@ -423,6 +430,7 @@ class Module extends Object {
         $elements = $xml->xPath('/struts-config/tiles/tile') ?: [];
 
         foreach ($elements as $tag) {
+            $this->tilesContext = [];
             $name = (string) $tag['name'];
             $this->getTile($name, $xml);
         }
@@ -440,11 +448,16 @@ class Module extends Object {
      * @throws StrutsConfigException on configuration errors
      */
     private function getTile($name, \SimpleXMLElement $xml) {
-        // if the tile already exists return it
+        // if the tile is already registered return it
         if (isSet($this->tiles[$name]))
             return $this->tiles[$name];
 
-        // TODO: zirkulare Tiles-Referenzen abfangen
+        // detect and block circular tile references
+        if (in_array($name, $this->tilesContext)) {
+            $this->tilesContext[] = $name;
+            throw new StrutsConfigException('Circular tile reference detected: "'.join('" -> "', $this->tilesContext).'"');
+        }
+        $this->tilesContext[] = $name;
 
         // find it's definition ...
         $nodes = $xml->xPath("/struts-config/tiles/tile[@name='".$name."']");
