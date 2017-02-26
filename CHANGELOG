@@ -1,4 +1,9 @@
 
+2017-02-26
+
+   - struts-config: prevent use of tile templates as final view definition
+   
+
 2017-02-25
 
    - struts-config: tile childnodes ("set" elements) and properties ("set-property" elements) are separated
