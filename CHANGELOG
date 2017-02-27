@@ -2,7 +2,7 @@
 2017-02-27
 
    - struts-config: rename <forward ... forward="{name}"> to <forward ... alias-for="{name}">
-   - struts-config: replace <set file|tile="{includable}"> by <set include="{includable}">
+   - struts-config: replace <set file|tile="{includable}"> by <include value="{includable}">
 
 
 2017-02-26
