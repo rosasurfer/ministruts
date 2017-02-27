@@ -511,21 +511,21 @@ class Module extends Object {
      * @throws StrutsConfigException on configuration errors
      */
     private function processTileChildNodes(Tile $tile, \SimpleXMLElement $xml) {
-        // process <set> elements
-        foreach ($xml->{'set'} as $tag) {
+        // process <include> elements
+        foreach ($xml->{'include'} as $tag) {
             $name  = (string) $tag['name'];
-            $nodes = $xml->xPath("/struts-config/tiles/tile[@name='".$tile->getName()."']/set[@name='".$name."']");
-            if (sizeOf($nodes) > 1) throw new StrutsConfigException('<tile name="'.$tile->getName().'"... multiple childnodes <set name="'.$name.'" found');
+            $nodes = $xml->xPath("/struts-config/tiles/tile[@name='".$tile->getName()."']/include[@name='".$name."']");
+            if (sizeOf($nodes) > 1) throw new StrutsConfigException('<tile name="'.$tile->getName().'"... multiple childnodes <include name="'.$name.'" found');
 
-            if ($include=(string) $tag['include']) {        // 'include' specified
-                if (!$this->isIncludable($include, $xml)) throw new StrutsConfigException('<tile name="'.$tile->getName().'"... childnode <set name="'.$name.'" include="'.$include.'": '.($include[0]=='.' ? 'Tile definition':'File').' not found');
+            if ($value=(string) $tag['value']) {            // 'value' specified
+                if (!$this->isIncludable($value, $xml)) throw new StrutsConfigException('<tile name="'.$tile->getName().'"... childnode <include name="'.$name.'" value="'.$value.'": '.($value[0]=='.' ? 'Tile definition':'File').' not found');
 
-                if ($this->isTileDefinition($include, $xml)) {
-                    $nestedTile = $this->getTile($include, $xml);
-                    if ($nestedTile->isAbstract()) throw new StrutsConfigException('<tile name="'.$tile->getName().'"... childnode <set name="'.$name.'" include="'.$include.'": The included tile is a template and cannot be used in a "set" definition.');
+                if ($this->isTileDefinition($value, $xml)) {
+                    $nestedTile = $this->getTile($value, $xml);
+                    if ($nestedTile->isAbstract()) throw new StrutsConfigException('<tile name="'.$tile->getName().'"... childnode <include name="'.$name.'" value="'.$value.'": The included tile is a template and cannot be used in an "include" definition.');
                 }
                 else {
-                    $file = $this->findFile($include);
+                    $file = $this->findFile($value);
                     // generische Tile erzeugen, damit render() existiert
                     $nestedTile = new $this->tilesClass($this, $tile);
                     $nestedTile->setName(Tile::GENERIC_NAME)

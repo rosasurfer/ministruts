@@ -196,7 +196,7 @@
                  attribute is set the tile can not have child elements. Exactly one of "file", "extends-tile" or "alias-for" 
                  must be specified.
 -->
-<!ELEMENT tile ((set*, set-property*)*)>
+<!ELEMENT tile ((include*, set-property*)*)>
 <!ATTLIST tile
           name            %LogicalName;     #REQUIRED
           file            %ResourcePath;    #IMPLIED
@@ -217,10 +217,10 @@
             If this attribute is omitted the tile containing the "set" element is marked as a template which can be extended 
             but cannot be rendered independently.
 -->
-<!ELEMENT set EMPTY>
-<!ATTLIST set
-          name       %LogicalName;     #REQUIRED
-          include    %ResourcePath;    #IMPLIED
+<!ELEMENT include EMPTY>
+<!ATTLIST include
+          name     %LogicalName;     #REQUIRED
+          value    %ResourcePath;    #IMPLIED
 >
 
 
