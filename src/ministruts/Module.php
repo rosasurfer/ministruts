@@ -87,6 +87,8 @@ class Module extends Object {
         $this->processMappings($xml);
         $this->processTiles($xml);
         $this->processErrors($xml);
+
+        $this->tilesContext = [];
     }
 
 
