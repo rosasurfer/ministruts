@@ -108,8 +108,8 @@ class Tile extends Object {
     /**
      * Speichert in der Tile unter dem angegebenen Namen eine Child-Tile.
      *
-     * @param  string    $name  - Name der Tile
-     * @param  self|null $child - die zu speichernde Tile oder NULL, wenn die Child-Deklaration abstrakt ist
+     * @param  string    $name - Name der Tile
+     * @param  self|null $tile - die zu speichernde Tile oder NULL, wenn die Child-Deklaration abstrakt ist
      */
     public function setNestedTile($name, self $tile=null) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
