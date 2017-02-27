@@ -1,4 +1,9 @@
 
+2017-02-27
+
+   - struts-config: rename <forward ... forward="{name}"> to <forward ... alias-for="{name}">
+
+
 2017-02-26
 
    - struts-config: prevent use of tile templates as final view definition
@@ -12,7 +17,7 @@
 
 2017-02-24
 
-   - struts-config: tile definitions can be aliased, e.g.: <tile name=".guest.login"  alias=".guest.home"/>
+   - struts-config: tile definitions can be aliased, e.g.: <tile name=".guest.login"  alias-for=".guest.home"/>
 
 
 2017-02-23
