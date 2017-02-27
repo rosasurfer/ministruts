@@ -50,9 +50,9 @@
    The "struts-config" element is the root of the configuration file and contains nested elements for all of the other
    configuration settings.
 
-   file-base  Comma-delimited list of paths to scan for files or file system locations (templates, layouts, fragments etc).
-              Values may be absolute or relative to the application root directory. Each module can have its own list of
-              "file-base" locations.
+   file-base  Comma-delimited list of paths to lookup referenced files or file system locations (templates, layouts, 
+              fragments etc). Values may be absolute or relative to the application root directory. Each module can have its 
+              own list of "file-base" locations.
               [default: The application-wide configured view directory or "app/view"]
 -->
 <!ELEMENT struts-config (global-forwards?, action-mappings, tiles?, controller?)>
@@ -80,11 +80,10 @@
    name       The unique identifier of the forward. Used to select the resource that should complete the request/response.
               
    include    The name of a tiles definition or a file to include. Tiles definition names must start with a dot ".", file
-              system locations must not start with a dot ".". Exactly one of "include", "redirect" or "alias-for" must be
-              specified.
+              names must not start with a dot ".". Exactly one of "include", "redirect" or "alias-for" must be specified.
               
-   redirect   The module-relative path of the location to which a redirect instruction should be issued. Exactly one of
-              "include", "redirect" or "alias-for" must be specified.
+   redirect   The module-relative URI to which a redirect instruction should be issued. Exactly one of "include", "redirect" 
+              or "alias-for" must be specified.
               
    alias-for  The name of another "forward" element to use instead of the current one (local forwards are preferred over
               global ones). Exactly one of "include", "redirect" or "alias-for" must be specified.
@@ -114,9 +113,8 @@
    path                 The module-relative path of the request, starting with a slash "/" character.
 
    include              The name of a tiles definition or a file to include, instead of passing the request to an action.
-                        Tiles definition names must start with a dot ".", file system locations must not start with a dot.
-                        Not valid if the "action" attribute is specified. Only one of "include", "redirect" or "forward" can
-                        be specified.
+                        Tiles definition names must start with a dot ".", file names must not start with a dot. Not valid if 
+                        the "action" attribute is specified. Only one of "include", "redirect" or "forward" can be specified.
 
    redirect             The module-relative path of the location to which a redirect instruction should be issued, instead
                         of passing the request to an action. Not valid if the "action" attribute is specified. Only one of
@@ -210,24 +208,19 @@
 <!--
    The "set" element describes a resource to insert into a tile, i.e. a page fragment or another tile.
 
-   name  Name of the variable under which the resource is made available in the resulting view. If only the name is
-         specified the tile containing the "set" element is marked as a template which can be referenced and extended by a
-         later definition but cannot be rendered independently.
+   name     Name of the variable under which the resource is made available in the resulting view. 
 
-   file  The path of the file to insert into the tile relative to the "file-base" location of the module. Only one of "file"
-         or "tile" can be specified.
-
-   tile  Name of another tile to insert into the tile. Tile names must start with a dot ".". All properties from the
-         surrounding tile are also available to the inserted tile. Any property inherited from the surrounding tile can be
-         overwritten by providing a new value. However, this will not modify the value of the original property in the
-         surrounding tile. Only one of "file" or "tile" can be specified.
+   include  The name of a tiles definition or a file to include. Tile names must start with a dot ".", file names must not 
+            start with a dot. All properties from the surrounding tile are also available to the inserted element. Any 
+            property inherited from the surrounding tile can be overwritten by providing a new value. However, this will not 
+            modify the value of the original property in the surrounding tile.
+            If this attribute is omitted the tile containing the "set" element is marked as a template which can be extended 
+            but cannot be rendered independently.
 -->
 <!ELEMENT set EMPTY>
 <!ATTLIST set
-          name     %LogicalName;     #REQUIRED
-          file     %ResourcePath;    #IMPLIED
-          tile     %LogicalName;     #IMPLIED
-
+          name       %LogicalName;     #REQUIRED
+          include    %ResourcePath;    #IMPLIED
 >
 
 

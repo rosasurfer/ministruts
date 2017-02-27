@@ -207,9 +207,9 @@ class Module extends Object {
                 $this->tilesContext = [];
                 if (!$this->isIncludable($include, $xml)) throw new StrutsConfigException('<global-forwards> <forward name="'.$name.'" include="'.$include.'": '.($include[0]=='.' ? 'Tile definition':'File').' not found');
 
-                if ($this->isTile($include, $xml)) {
+                if ($this->isTileDefinition($include, $xml)) {
                     $tile = $this->getTile($include, $xml);
-                    if ($tile->isAbstract()) throw new StrutsConfigException('<global-forwards> <forward name="'.$name.'" include="'.$include.'": Tile is a template and cannot be used in a "forward" definition');
+                    if ($tile->isAbstract()) throw new StrutsConfigException('<global-forwards> <forward name="'.$name.'" include="'.$include.'": The included tile is a template and cannot be used in a "forward" definition.');
                     $forward = new $this->forwardClass($name, $include, false);
                 }
                 else {
@@ -269,9 +269,9 @@ class Module extends Object {
                 $include = (string) $tag['include'];
                 if (!$this->isIncludable($include, $xml)) throw new StrutsConfigException('<action-mappings> <mapping path="'.$path.'" include="'.$include.'": '.($include[0]=='.' ? 'Tile definition':'File').' not found');
 
-                if ($this->isTile($include, $xml)) {
+                if ($this->isTileDefinition($include, $xml)) {
                     $tile = $this->getTile($include, $xml);
-                    if ($tile->isAbstract()) throw new StrutsConfigException('<action-mappings> <mapping path="'.$path.'" include="'.$include.'": Tile is a template and cannot be used in a "mapping" definition');
+                    if ($tile->isAbstract()) throw new StrutsConfigException('<action-mappings> <mapping path="'.$path.'" include="'.$include.'": The included tile is a template and cannot be used in a "mapping" definition.');
                     $forward = new $this->forwardClass('generic', $include, false);
                 }
                 else {
@@ -380,9 +380,9 @@ class Module extends Object {
                     $this->tilesContext = [];
                     if (!$this->isIncludable($include, $xml)) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'", forward "'.$name.'", attribute "include": '.($include[0]=='.' ? 'Tiles definition':'File').' "'.$include.'" not found');
 
-                    if ($this->isTile($include, $xml)) {
+                    if ($this->isTileDefinition($include, $xml)) {
                         $tile = $this->getTile($include, $xml);
-                        if ($tile->isAbstract()) throw new StrutsConfigException('<action-mappings> <mapping path="'.$path.'"> <forward name="'.$name.'" include="'.$include.'": Tile is a template and cannot be used in a "forward" definition');
+                        if ($tile->isAbstract()) throw new StrutsConfigException('<action-mappings> <mapping path="'.$path.'"> <forward name="'.$name.'" include="'.$include.'": The included tile is a template and cannot be used in a "forward" definition.');
                         $forward = new $this->forwardClass($name, $include, false);
                     }
                     else {
@@ -515,26 +515,27 @@ class Module extends Object {
         foreach ($xml->{'set'} as $tag) {
             $name  = (string) $tag['name'];
             $nodes = $xml->xPath("/struts-config/tiles/tile[@name='".$tile->getName()."']/set[@name='".$name."']");
-            if (sizeOf($nodes) > 1)             throw new StrutsConfigException('<tile name="'.$tile->getName().'"... multiple childnodes <set name="'.$name.'" found');
-            if (sizeOf($tag->attributes()) > 2) throw new StrutsConfigException('<tile name="'.$tile->getName().'"... childnode <set name="'.$name.'": exactly one attribute of "file" or "tile" must be specified');
+            if (sizeOf($nodes) > 1) throw new StrutsConfigException('<tile name="'.$tile->getName().'"... multiple childnodes <set name="'.$name.'" found');
 
-            if ($tag['file']) {                             // attribute 'file' specified
-                $fileAttr = (string) $tag['file'];
-                $filePath = $this->findFile($fileAttr);
-                if (!$filePath) throw new StrutsConfigException('<tile name="'.$tile->getName().'"... childnode <set name="'.$name.'" file="'.$fileAttr.'": file not found');
-                // generische Tile erzeugen, damit render() existiert
-                $nestedTile = new $this->tilesClass($this, $tile);
-                $nestedTile->setName(Tile::GENERIC_NAME)
-                           ->setFileName($filePath);
-            }
-            else if ($tag['tile']) {                        // attribute 'tile' specified
-                $tileAttr   = (string) $tag['tile'];
-                $nestedTile = $this->getTile($tileAttr, $xml);
+            if ($include=(string) $tag['include']) {        // 'include' specified
+                if (!$this->isIncludable($include, $xml)) throw new StrutsConfigException('<tile name="'.$tile->getName().'"... childnode <set name="'.$name.'" include="'.$include.'": '.($include[0]=='.' ? 'Tile definition':'File').' not found');
+
+                if ($this->isTileDefinition($include, $xml)) {
+                    $nestedTile = $this->getTile($include, $xml);
+                    if ($nestedTile->isAbstract()) throw new StrutsConfigException('<tile name="'.$tile->getName().'"... childnode <set name="'.$name.'" include="'.$include.'": The included tile is a template and cannot be used in a "set" definition.');
+                }
+                else {
+                    $file = $this->findFile($include);
+                    // generische Tile erzeugen, damit render() existiert
+                    $nestedTile = new $this->tilesClass($this, $tile);
+                    $nestedTile->setName(Tile::GENERIC_NAME)
+                               ->setFileName($file);
+                }
             }
             else {
-                $nestedTile = null;                         // resource not yet defined, so it's an abstract template
+                $nestedTile = null;                         // resource not yet defined, it's an abstract template
             }
-           $tile->setNestedTile($name, $nestedTile);
+            $tile->setNestedTile($name, $nestedTile);
         }
 
         // process <set-property> elements
@@ -874,7 +875,7 @@ class Module extends Object {
      * @return bool
      */
     private function isIncludable($name, \SimpleXMLElement $xml) {
-        return $this->isTile($name, $xml) || $this->isFile($name);
+        return $this->isTileDefinition($name, $xml) || $this->isFile($name);
     }
 
 
@@ -888,9 +889,9 @@ class Module extends Object {
      *
      * @throws StrutsConfigException on configuration errors
      */
-    private function isTile($name, \SimpleXMLElement $xml) {
-        $tile = $this->getTile($name, $xml);
-        return ($tile !== null);
+    private function isTileDefinition($name, \SimpleXMLElement $xml) {
+        $nodes = $xml->xPath("/struts-config/tiles/tile[@name='$name']") ?: [];
+        return !empty($nodes);
     }
 
 
