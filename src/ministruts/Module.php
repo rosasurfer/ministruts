@@ -564,7 +564,7 @@ class Module extends Object {
      * Fuegt diesem Module einen globalen ActionForward. Ist ein Alias angegeben, wird er unter dem Alias-Namen registriert.
      *
      * @param  ActionForward $forward
-     * @param  string|null   $name    - alias name of the forward (default: none)
+     * @param  string|null   $alias   - alias name of the forward (default: none)
      *
      * @throws StrutsConfigException on configuration errors
      */
@@ -890,7 +890,7 @@ class Module extends Object {
      * @throws StrutsConfigException on configuration errors
      */
     private function isTileDefinition($name, \SimpleXMLElement $xml) {
-        $nodes = $xml->xPath("/struts-config/tiles/tile[@name='$name']") ?: [];
+        $nodes = $xml->xPath("/struts-config/tiles/tile[@name='".$name."']") ?: [];
         return !empty($nodes);
     }
 
