@@ -72,7 +72,7 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Return the id (the primary key) of the instance.
+     * Return the id (primary key) of the instance.
      *
      * @return int - id
      */
@@ -184,7 +184,7 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Insert this instance into the storage mechanism. Needs to be implemented by the actual class.
+     * Insert this instance into the storage mechanism. Must be implemented by the actual class.
      *
      * @return self
      */
@@ -194,7 +194,7 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Update the instance in the storage mechanism. Needs to be implemented by the actual class.
+     * Update the instance in the storage mechanism. Must be implemented by the actual class.
      *
      * @return self
      */
@@ -204,7 +204,7 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Update the relational cross-links of the instance. Needs to be implemented by the actual class.
+     * Update the relational cross-links of the instance. Must be implemented by the actual class.
      *
      * @return self
      */
@@ -214,7 +214,7 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Delete the instance from the storage mechanism. Needs to be implemented by the actual class.
+     * Delete the instance from the storage mechanism. Must be implemented by the actual class.
      *
      * @return NULL
      */
