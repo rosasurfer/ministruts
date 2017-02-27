@@ -58,10 +58,9 @@ class Worker extends Object {
 
         $object = $this->makeObject($result);
         if ($object && !$allowMany && $result->numRows() > 1) throw new MultipleRowsException();
-                                                //       numRows() is not available on SQLite or with PDO, the emulation is slow.
-                                                // TODO: the check can be improved by fetchNext() when reset(-1) and internal record
-        return $object;               //       caching are implemented.
-    }
+                                //       numRows() is not available on SQLite or with PDO, the emulation is slow.
+        return $object;         // TODO: the check can be improved by fetchNext() when reset(-1) and internal record
+    }                           //       caching are implemented.
 
 
     /**

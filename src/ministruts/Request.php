@@ -29,8 +29,8 @@ use rosasurfer\config\Config;
  * @see  Request::removeAttributes()
  *
  *
- * TODO: implement LinkTool
- * TODO: implement version hashes for CSS and JS links
+ * @todo implement LinkTool
+ * @todo implement version hashes for CSS and JS links
  */
 class Request extends Singleton {
 
@@ -539,9 +539,9 @@ class Request extends Singleton {
                 if ($headers === false) throw new RuntimeException('Error reading request headers, getAllHeaders() returned: FALSE');
             }
             else {
-                // @TODO: some transmitted headers are missing in the PHP $_SERVER array, e.g. 'Authorization' (digest)
-                // @TODO: check basic authorization
-                // @TODO: check $_FILES array
+                // TODO: some transmitted headers are missing in the PHP $_SERVER array, e.g. 'Authorization' (digest)
+                // TODO: check basic authorization
+                // TODO: check $_FILES array
                 $headers = array();
                 foreach ($_SERVER as $key => $value) {
                     if(subStr($key, 0, 5) == 'HTTP_') {
@@ -794,7 +794,7 @@ class Request extends Singleton {
      *
      * @return array - die geloeschten Error-Messages
      *
-     * TODO: Error-Messages auch aus der Session loeschen
+     * @todo   Error-Messages auch aus der Session loeschen
      */
     public function removeActionErrors(/*$key1, $key2, $key3 ...*/) {
         $dropped = array();

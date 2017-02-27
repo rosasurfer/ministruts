@@ -23,7 +23,7 @@ use rosasurfer\exception\IllegalTypeException;
  *
  * Gibt die gespeicherte Eigenschaft mit dem Namen "title" zurueck.
  *
- * TODO: Properties aus dem Tiles-Context muessen auch im PageContext erreichbar sein
+ * @todo   Properties aus dem Tiles-Context muessen auch im PageContext erreichbar sein
  */
 class PageContext extends Singleton {
 

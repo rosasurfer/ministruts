@@ -205,10 +205,10 @@ class Config extends Object implements ConfigInterface {
         for ($i=0; $i < $subKeysSize; ++$i) {
             $subkey = trim($subkeys[$i]);
             if (!is_array($properties) || !isSet($properties[$subkey]))
-                break;                                    // not found
-            if ($i+1 == $subKeysSize)                    // return at the last subkey
+                break;                                      // not found
+            if ($i+1 == $subKeysSize)                       // return at the last subkey
                 return $properties[$subkey];
-            $properties = $properties[$subkey];          // go to the next sublevel
+            $properties = $properties[$subkey];             // go to the next sublevel
         }
         return null;
     }
@@ -233,12 +233,12 @@ class Config extends Object implements ConfigInterface {
             if ($i+1 < $subkeysSize) {
                 // not yet the last subkey
                 if (!isSet($properties[$subkey])) {
-                    $properties[$subkey] = [];                            // create another array level
+                    $properties[$subkey] = [];                              // create another array level
                 }
                 elseif (!is_array($properties[$subkey])) {
-                    $properties[$subkey] = ['' => $properties[$subkey]];  // create another array level and keep the
-                }                                                        // existing non-array value   TODO: how to access?
-                $properties =& $properties[$subkey];                     // reference the new array level
+                    $properties[$subkey] = ['' => $properties[$subkey]];    // create another array level and keep the
+                }                                                           // existing non-array value   TODO: how to access?
+                $properties =& $properties[$subkey];                        // reference the new array level
             }
             else {
                 // the last subkey: check for bracket notation
@@ -246,24 +246,24 @@ class Config extends Object implements ConfigInterface {
                     // bracket notation
                     $subkey = $match[1];
                     if (!isSet($properties[$subkey])) {
-                        $properties[$subkey] = [$value];                   // create a new array value
+                        $properties[$subkey] = [$value];                    // create a new array value
                     }
                     else {
-                        if (is_string($properties[$subkey]))               // make the string the array default value
+                        if (is_string($properties[$subkey]))                // make the string the array default value
                             $properties[$subkey] = ['' => $properties[$subkey]];
-                        $properties[$subkey][] = $value;                   // add an arry value
+                        $properties[$subkey][] = $value;                    // add an arry value
                     }
                 }
                 else {
                     // regular non-bracket notation
                     if (!isSet($properties[$subkey])) {
-                        $properties[$subkey] = $value;                     // store the value regularily
+                        $properties[$subkey] = $value;                      // store the value regularily
                     }
                     elseif (is_string($properties[$subkey])) {
-                        $properties[$subkey] = $value;                     // override the existing string value
+                        $properties[$subkey] = $value;                      // override the existing string value
                     }
                     else {
-                        $properties[$subkey][''] = $value;                 // set/override the array default value
+                        $properties[$subkey][''] = $value;                  // set/override the array default value
                     }
                 }
             }
@@ -283,13 +283,13 @@ class Config extends Object implements ConfigInterface {
     protected function parseSubkeys($key) {
         $k          = $key;
         $subkeys    = [];
-        $quoteChars = ["'", '"'];                    // single and double quotes
+        $quoteChars = ["'", '"'];                       // single and double quotes
 
         while (true) {
             $k = trim($k);
 
             foreach ($quoteChars as $char) {
-                if (strPos($k, $char) === 0) {         // subkey starts with a quote char
+                if (strPos($k, $char) === 0) {          // subkey starts with a quote char
                     $pos = strPos($k, $char, 1);        // find the ending quote char
                     if ($pos === false) throw new InvalidArgumentException('Invalid argument $key: '.$key);
                     $subkeys[] = subStr($k, 1, $pos-1);
@@ -303,13 +303,13 @@ class Config extends Object implements ConfigInterface {
             }
 
             // key is not quoted
-            $pos = strPos($k, '.');                   // find next key separator
+            $pos = strPos($k, '.');                     // find next key separator
             if ($pos === false) {
-                $subkeys[] = $k;                       // last subkey
+                $subkeys[] = $k;                        // last subkey
                 break;
             }
             $subkeys[] = trim(subStr($k, 0, $pos));
-            $k         = subStr($k, $pos+1);          // next subkey
+            $k         = subStr($k, $pos+1);            // next subkey
         }
         return $subkeys;
     }

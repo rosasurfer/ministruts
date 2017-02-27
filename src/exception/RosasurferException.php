@@ -54,7 +54,7 @@ class RosasurferException extends \Exception implements IRosasurferException {
                 }
                 array_shift($trace);                               // that's one level more than for "__set()"
             }
-         */
+            */
 
             // store the new stacktrace
             $this->betterTrace = $betterTrace;

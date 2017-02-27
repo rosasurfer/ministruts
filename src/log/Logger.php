@@ -91,12 +91,12 @@ use const rosasurfer\WINDOWS;
  *  log.sms.level              = error             # the loglevel for text messages is set a bit higher to L_ERROR
  *
  *
- * @TODO: Logger::resolveLogCaller()   - test with Closure and internal PHP functions
- * @TODO: Logger::composeHtmlMessage() - append an existing context exception
+ * @todo   Logger::resolveLogCaller()   - test with Closure and internal PHP functions
+ * @todo   Logger::composeHtmlMessage() - append an existing context exception
  *
- * @TODO: refactor and separate handlers into single classes
- * @TODO: implement \Psr\Log\LoggerInterface and remove static crap
- * @TODO: implement full mail address support as in "Joe Blow <address@domain.tld>"
+ * @todo   refactor and separate handlers into single classes
+ * @todo   implement \Psr\Log\LoggerInterface and remove static crap
+ * @todo   implement full mail address support as in "Joe Blow <address@domain.tld>"
  */
 class Logger extends StaticClass {
 
@@ -180,14 +180,14 @@ class Logger extends StaticClass {
         $receivers = [];
         foreach (explode(',', $config->get('log.mail.receiver', '')) as $receiver) {
             if ($receiver=trim($receiver))
-                $receivers[] = $receiver;                                // @TODO: validate address format
+                $receivers[] = $receiver;                               // TODO: validate address format
         }
         if ($receivers) {
             if ($forcedReceivers=$config->get('mail.forced-receiver', null)) {
-                $receivers = [];                                         // To reduce possible errors we use internal PHP mailing
-                foreach (explode(',', $forcedReceivers) as $receiver) {  // functions (not a class) which means we have to manually
-                    if ($receiver=trim($receiver))                        // check the config for the setting "mail.forced-receiver"
-                        $receivers[] = $receiver;                          // (which the SMTPMailer would do automatically).
+                $receivers = [];                                        // To reduce possible errors we use internal PHP mailing
+                foreach (explode(',', $forcedReceivers) as $receiver) { // functions (not a class) which means we have to manually
+                    if ($receiver=trim($receiver))                      // check the config for the setting "mail.forced-receiver"
+                        $receivers[] = $receiver;                       // (which the SMTPMailer would do automatically).
                 }
             }
         }
@@ -209,7 +209,7 @@ class Logger extends StaticClass {
             }
         }
         $logLevel = $config->get('log.sms.level', self::$appLogLevel);
-        if (is_string($logLevel)) {                                    // a string if a configured value
+        if (is_string($logLevel)) {                                     // a string if a configured value
             $logLevel = self::logLevelToId($logLevel);
             if (!$logLevel) $logLevel=self::$appLogLevel;
         }
@@ -459,7 +459,7 @@ class Logger extends StaticClass {
      * @param  int           $level    - loglevel of the loggable
      * @param  array        &$context  - reference to the log context with additional data
      *
-     * @TODO:  replace CURL dependency with internal PHP functions
+     * @todo   replace CURL dependency with internal PHP functions
      */
     private static function invokeSmsHandler($loggable, $level, array &$context) {
         if (!self::$smsHandler) return;
@@ -505,8 +505,8 @@ class Logger extends StaticClass {
                         continue;
                     }
                     if (strStartsWithI($content, 'ERR: 113')) {
-                        // @TODO: 'ERR: 113' => max message parts exceeded, repeat with shortened message
-                        // @TODO:               consider to send concatenated messages
+                        // TODO: 'ERR: 113' => max message parts exceeded, repeat with shortened message
+                        // TODO:               consider to send concatenated messages
                     }
                 }
                 return;
@@ -515,7 +515,7 @@ class Logger extends StaticClass {
 
 
         // (4) check availability and use Nexmo
-        // @TODO encoding issues when sending to Bulgarian receivers (some chars are auto-converted to ciryllic crap)
+        // TODO encoding issues when sending to Bulgarian receivers (some chars are auto-converted to ciryllic crap)
         if (isSet(self::$smsOptions['nexmo'])) {
             $smsOptions = self::$smsOptions['nexmo'];
             if (!empty($smsOptions['api_key']) && !empty($smsOptions['api_secret'])) {
@@ -583,7 +583,7 @@ class Logger extends StaticClass {
             // Instead of messing around here the PrintHandler must not print to STDOUT if the ErrorLogHandler
             // is active and prints to STDERR.
             //
-            // @TODO: suppress output to STDERR in interactive terminals only (i.e. not in cron)
+            // TODO: suppress output to STDERR in interactive terminals only (i.e. not in cron)
         }
         else {
             error_log(trim($msg), ERROR_LOG_DEFAULT);
@@ -794,7 +794,7 @@ class Logger extends StaticClass {
      * @param  array &$context - reference to the log context
      *
      *
-     * @TODO:  test with Closure and internal PHP functions
+     * @todo   test with Closure and internal PHP functions
      */
     private static function resolveLogCaller(array &$context) {
         if (!isSet($context['trace']))

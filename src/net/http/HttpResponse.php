@@ -9,7 +9,7 @@ use rosasurfer\core\Object;
  *
  * Abstrakte Basisklasse fuer HttpResponse-Implementierungen.
  *
- * TODO: toString()-Methode implementieren, die alle Header anzeigt
+ * @todo  toString()-Methode implementieren, die alle Header anzeigt
  */
 abstract class HttpResponse extends Object {
 
@@ -243,9 +243,9 @@ abstract class HttpResponse extends Object {
 
 
     /**
-     * TODO: HttpResponse::$sc - unmoeglicher Name
-     *
      * @var string[] - HTTP status code descriptions
+     *
+     * @todo HttpResponse::$sc - unmoeglicher Name
      */
     public static $sc = [
         self::SC_CONTINUE                        => 'SC_CONTINUE'                       ,

@@ -39,7 +39,7 @@ class TorHelper extends StaticClass {
     private static $logNotice;
 
     /**
-     * TODO: Serverliste bei Fehlern dynamisch anpassen
+     * @todo Serverliste bei Fehlern dynamisch anpassen
      *
      * @var string[] */
     private static $torMirrors = [

@@ -72,7 +72,7 @@ class Module extends Object {
      *
      * @throws StrutsConfigException on configuration errors
      *
-     * TODO: Module-Encoding entsprechend dem Config-Datei-Encoding implementieren
+     * @todo   Module-Encoding entsprechend dem Config-Datei-Encoding implementieren
      */
     public function __construct($fileName, $prefix) {
         if (!is_string($fileName)) throw new IllegalTypeException('Illegal type of parameter $fileName: '.getType($fileName));
@@ -106,7 +106,7 @@ class Module extends Object {
         $content = file_get_contents($fileName, false);
 
         /**
-         * TODO: struts-config.xml ohne Verzeichniswechsel validieren
+         * @todo struts-config.xml ohne Verzeichniswechsel validieren
          *
          * @see  http://xmlwriter.net/xml_guide/doctype_declaration.shtml
          * @see  DTD to XML schema  https://www.w3.org/2000/04/schema_hack/
@@ -134,7 +134,7 @@ class Module extends Object {
      *
      * @return string
      *
-     * TODO: If non-empty the prefix must never start and always end with a slash "/".
+     * @todo   If non-empty the prefix must never start and always end with a slash "/".
      */
     public function getPrefix() {
         return $this->prefix;
@@ -144,11 +144,11 @@ class Module extends Object {
     /**
      * Setzt den Prefix des Modules.
      *
-     * TODO: If non-empty the prefix must never start and always end with a slash "/".
-     *
      * @param  string prefix
      *
      * @throws StrutsConfigException on configuration errors
+     *
+     * @todo   If non-empty the prefix must never start and always end with a slash "/".
      */
     protected function setPrefix($prefix) {
         if ($this->configured)                  throw new IllegalStateException('Configuration is frozen');

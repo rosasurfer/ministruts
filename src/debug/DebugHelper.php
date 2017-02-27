@@ -81,7 +81,7 @@ class DebugHelper extends StaticClass {
                     elseif (is_array ($arg)) $arg = 'Array()';
                 } unset($arg);
             }
-         */
+            */
         }
 
         // Add location details from parameters to frame[0] only if they differ from the old values (now in frame[1])
@@ -101,12 +101,12 @@ class DebugHelper extends StaticClass {
         return $trace;
 
         /**
-       * @TODO: fix wrong stack frames originating from calls to virtual static functions
-       *
-       * phalcon\mvc\Model::__callStatic()                  [php-phalcon]
-       * vokuro\models\Users::findFirstByEmail() # line 27, file: F:\Projekte\phalcon\sample-apps\vokuro\app\library\Auth\Auth.php
-       * vokuro\auth\Auth->check()               # line 27, file: F:\Projekte\phalcon\sample-apps\vokuro\app\library\Auth\Auth.php
-       */
+         * TODO: fix wrong stack frames originating from calls to virtual static functions
+         *
+         * phalcon\mvc\Model::__callStatic()                  [php-phalcon]
+         * vokuro\models\Users::findFirstByEmail() # line 27, file: F:\Projekte\phalcon\sample-apps\vokuro\app\library\Auth\Auth.php
+         * vokuro\auth\Auth->check()               # line 27, file: F:\Projekte\phalcon\sample-apps\vokuro\app\library\Auth\Auth.php
+         */
     }
 
 
@@ -194,13 +194,13 @@ class DebugHelper extends StaticClass {
             $baseName  = strRightFrom($class, '\\', -1, false, $class);
             $result    = $indent.$namespace.$baseName;
 
-            if ($exception instanceof \ErrorException)                                 // A PHP error exception not created
+            if ($exception instanceof \ErrorException)                                  // A PHP error exception not created
                 $result .= '('.self::errorLevelToStr($exception->getSeverity()).')';    // by the framework.
         }
         $message = $exception->getMessage();
 
         if (strLen($indent)) {
-            $lines = explode(NL, normalizeEOL($message));                              // indent multiline messages
+            $lines = explode(NL, normalizeEOL($message));                               // indent multiline messages
             $eom = '';
             if (strEndsWith($message, NL)) {
                 array_pop($lines);

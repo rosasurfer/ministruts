@@ -42,7 +42,7 @@ class ErrorHandler extends StaticClass {
 
 
     /** @var int - error handling mode in which regular PHP errors are logged */
-    const LOG_ERRORS       = 1;
+    const LOG_ERRORS = 1;
 
     /** @var int - error handling mode in which regular PHP errors are converted to exceptions and thrown back */
     const THROW_EXCEPTIONS = 2;
@@ -129,9 +129,9 @@ class ErrorHandler extends StaticClass {
      * Global handler for traditional PHP errors.
      *
      * Errors are handled only if covered by the currently configured error reporting level. Errors of the levels
-     * E_DEPRECATED, E_USER_DEPRECATED, E_USER_NOTICE and E_USER_WARNING are always logged and script execution
-     * continues normally. All other errors are logged according to the configured error handling mode. Either they
-     * are logged and script exceution continues normally, or they are wrapped in a PHPError exception and thrown back.
+     * E_DEPRECATED, E_USER_DEPRECATED, E_USER_NOTICE and E_USER_WARNING are always logged and script execution continues
+     * normally. All other errors are logged according to the configured error handling mode. Either they are logged and
+     * script exceution continues normally, or they are wrapped in a PHPError exception and thrown back.
      *
      * @param  int    $level   - PHP error severity level
      * @param  string $message - error message
@@ -199,10 +199,9 @@ class ErrorHandler extends StaticClass {
         /**
          * Errors triggered by require() or require_once()
          *
-         * Problem:  PHP errors triggered by require() or require_once() are non-catchable errors and do not follow
-         *           regular application flow. PHP terminates the script after leaving the error handler, thrown
-         *           exceptions are ignored. This termination is intended behaviour and the main difference to include()
-         *           and include_once().
+         * Problem:  PHP errors triggered by require() or require_once() are non-catchable errors and do not follow regular
+         *           application flow. PHP terminates the script after leaving the error handler, thrown exceptions are
+         *           ignored. This termination is intended behaviour and the main difference to include() and include_once().
          * Solution: Manually call the exception handler.
          *
          * @see  http://stackoverflow.com/questions/25584494/php-set-exception-handler-not-working-for-error-thrown-in-set-error-handler-cal
@@ -281,10 +280,10 @@ class ErrorHandler extends StaticClass {
     /**
      * Manually called handler for exceptions occurring in object destructors.
      *
-     * Attempting to throw an exception from a destructor during script shutdown causes a fatal error. Therefore this
-     * method has to be called manually from object destructors if an exception occurred. If the script is in the shutdown
-     * phase the exception is passed on to the regular exception handler and the script is terminated. If the script is
-     * currently not in the shutdown phase this method ignores the exception. For an example see this package's README.
+     * Attempting to throw an exception from a destructor during script shutdown causes a fatal error. Therefore this method
+     * has to be called manually from object destructors if an exception occurred. If the script is in the shutdown phase
+     * the exception is passed on to the regular exception handler and the script is terminated. If the script is currently
+     * not in the shutdown phase this method ignores the exception. For an example see this package's README.
      *
      * @param  \Exception $exception
      *

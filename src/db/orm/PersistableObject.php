@@ -27,7 +27,7 @@ use const rosasurfer\PHP_TYPE_STRING;
 abstract class PersistableObject extends Object {
 
 
-    /** @var bool     - current modification status */
+    /** @var bool - current modification status */
     protected $modified = false;
 
     /** @var string[] - modified and unsaved properties */
@@ -140,8 +140,9 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Whether or not the instance was already saved. If the instance was saved it has a unique id assigned to it (the primary
-     * key). If the instance was not yet saved the id is NULL. Overwrite this method if the name of the primary key is not "id".
+     * Whether or not the instance was already saved. If the instance was saved it has a unique id assigned to it
+     * (the primary key). If the instance was not yet saved the id is NULL. Overwrite this method if the name of the
+     * primary key is not "id".
      *
      * @return bool
      */

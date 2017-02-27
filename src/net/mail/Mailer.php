@@ -69,14 +69,14 @@ abstract class Mailer extends Object implements MailerInterface {
             return true;
 
             /**
-          * TODO: Message-Queue implementieren
-          *
-          * Noch keine Moeglichkeit gefunden, bei Redirect-Header und aktiviertem "output_buffering" die Header
-          * vorzuschicken und den Versand im Hintergrund weiterlaufen zu lassen.  Da der Output-Buffer bei einem
-          * Redirect nie voll ist, wartet PHP immer, ob die Shutdown-Funktion noch Content ausgibt.
-          *
-          * Loesung: Versand per Message-Queue in einem anderen Prozess ausfuehren
-          */
+             * TODO: Message-Queue implementieren
+             *
+             * Noch keine Moeglichkeit gefunden, bei Redirect-Header und aktiviertem "output_buffering" die Header
+             * vorzuschicken und den Versand im Hintergrund weiterlaufen zu lassen.  Da der Output-Buffer bei einem
+             * Redirect nie voll ist, wartet PHP immer, ob die Shutdown-Funktion noch Content ausgibt.
+             *
+             * Loesung: Versand per Message-Queue in einem anderen Prozess ausfuehren
+             */
         }
         return false;
     }

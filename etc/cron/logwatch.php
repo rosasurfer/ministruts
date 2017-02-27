@@ -16,8 +16,8 @@
  * If this script is run by CRON there is no way that errors might be missed.  If the script itself causes errors the
  * error messages are printed to STDERR and catched by CRON which again will notify the system user running this script.
  *
- * TODO: Error messages must not be printed to STDOUT but to STDERR.
- * TODO: Parameter for suppresing/not suppressing regular output to enable status messages when not run by CRON.
+ * @todo  Error messages must not be printed to STDOUT but to STDERR.
+ * @todo  Parameter for suppresing/not suppressing regular output to enable status messages when not run by CRON.
  */
 use rosasurfer\config\Config;
 use rosasurfer\exception\IllegalTypeException;
@@ -69,7 +69,7 @@ $sender = $config->get('mail.from', get_current_user().'@localhost');
 $receivers = [];
 foreach (explode(',', $config->get('log.mail.receiver', '')) as $receiver) {
     if ($receiver=trim($receiver))
-        $receivers[] = $receiver;                          // @TODO: validate address format
+        $receivers[] = $receiver;                          // TODO: validate address format
 }
 
 // check setting "mail.forced-receiver" (may be set in development)

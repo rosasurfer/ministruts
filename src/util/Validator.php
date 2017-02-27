@@ -325,7 +325,7 @@ class Validator extends StaticClass {
         // match numbers from BE, ES, BG, CH, A, UK, DE
         return (bool) preg_match('/^(00|\+)(32|34|359|41|43|44|49)-?[1-9](-?[0-9]){2,}$/', $value);
 
-        // @TODO: implement via https://github.com/giggsey/libphonenumber-for-php
+        // TODO: implement via https://github.com/giggsey/libphonenumber-for-php
     }
 
 

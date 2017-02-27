@@ -13,7 +13,7 @@ use rosasurfer\exception\IllegalTypeException;
  * sicher, dass mehrere Zugriffe auf ein gespeichertes Object immer ein und dieselbe Instanz zurueckliefern
  * und wird deshalb intern von jedem Cache als Reference-Pool verwendet.
  *
- * TODO: ReferencePool muss ein Singleton sein
+ * @todo  ReferencePool muss ein Singleton sein
  */
 final class ReferencePool extends CachePeer {
 
