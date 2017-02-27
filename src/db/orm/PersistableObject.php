@@ -174,7 +174,7 @@ abstract class PersistableObject extends Object {
             $this->update();
         }
         else {
-            //Logger::log('Nothing to save, '.get_class().' instance is in sync with the database.', L_NOTICE);
+            //Logger::log('Nothing to save, '.get_class($this).' instance is in sync with the database.', L_NOTICE);
         }
         $this->updateLinks();
         $this->modified = false;
@@ -189,7 +189,7 @@ abstract class PersistableObject extends Object {
      * @return self
      */
     protected function insert() {
-        throw new UnimplementedFeatureException('You must implement '.get_class().'->'.__FUNCTION__.'() to insert a '.get_class().'.');
+        throw new UnimplementedFeatureException('You must implement '.get_class($this).'->'.__FUNCTION__.'() to insert a '.get_class($this).'.');
     }
 
 
@@ -199,7 +199,7 @@ abstract class PersistableObject extends Object {
      * @return self
      */
     protected function update() {
-        throw new UnimplementedFeatureException('You must implement '.get_class().'->'.__FUNCTION__.'() to update a '.get_class().'.');
+        throw new UnimplementedFeatureException('You must implement '.get_class($this).'->'.__FUNCTION__.'() to update a '.get_class($this).'.');
     }
 
 
@@ -219,7 +219,7 @@ abstract class PersistableObject extends Object {
      * @return NULL
      */
     public function delete() {
-        throw new UnimplementedFeatureException('You must implement '.get_class().'->'.__FUNCTION__.'() to delete a '.get_class().'.');
+        throw new UnimplementedFeatureException('You must implement '.get_class($this).'->'.__FUNCTION__.'() to delete a '.get_class($this).'.');
     }
 
 

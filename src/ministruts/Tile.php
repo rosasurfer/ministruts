@@ -148,7 +148,7 @@ class Tile extends Object {
     public function freeze() {
         if (!$this->configured) {
             if (!$this->name)     throw new IllegalStateException('No name configured for this '.$this);
-            if (!$this->fileName) throw new IllegalStateException('No file configured for '.get_class().' "'.$this->name.'"');
+            if (!$this->fileName) throw new IllegalStateException('No file configured for tile "'.$this->name.'"');
 
             foreach ($this->nestedTiles as $tile) {
                 $tile && $tile->freeze();

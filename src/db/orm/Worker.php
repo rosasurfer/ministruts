@@ -53,14 +53,14 @@ class Worker extends Object {
      *
      * @throws MultipleRowsException if the query returned multiple rows and $allowMany was not set to TRUE.
      */
-    public function findOne($query, $allowMany=false) {
-        $result = $this->query($query);
-
+    public function findOne($query, $allowMany=false) {     // TODO: numRows() is not available on SQLite or with PDO, the emulation is slow.
+        $result = $this->query($query);                     //       the check can be improved by fetchNext() when reset(-1) and internal record
+                                                            //       caching are implemented.
         $object = $this->makeObject($result);
         if ($object && !$allowMany && $result->numRows() > 1) throw new MultipleRowsException();
-                                //       numRows() is not available on SQLite or with PDO, the emulation is slow.
-        return $object;         // TODO: the check can be improved by fetchNext() when reset(-1) and internal record
-    }                           //       caching are implemented.
+
+        return $object;
+    }
 
 
     /**
@@ -96,9 +96,7 @@ class Worker extends Object {
      * @return PersistableObject|null - instance or NULL if the result doesn't hold any more rows
      */
     protected function makeObject(IResult $result) {
-
         // TODO: Lookup and return an existing instance instead of a copy.
-
         $row = $result->fetchNext(ARRAY_ASSOC);
         if ($row)
             return PersistableObject::createInstance($this->entityClass, $row);
