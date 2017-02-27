@@ -28,7 +28,7 @@ class Module extends Object {
     protected $resourceLocations = [];
 
     /** @var ActionForward[] - Die globalen Forwards dieses Moduls. */
-    protected $forwards = [];
+    protected $globalForwards = [];
 
     /** @var ActionMapping[] - Die ActionMappings dieses Moduls. */
     protected $mappings = [];
@@ -220,21 +220,21 @@ class Module extends Object {
                 // TODO: URL validieren
                 $forward = new $this->forwardClass($name, $redirect, true);
             }
-            $this->addForward($name, $forward);
+            $this->addGlobalForward($forward);
         }
 
-        // process global 'forward' forwards (fragwuerdig, aber moeglich)
-        $elements = $xml->xPath('/struts-config/global-forwards/forward[@forward]') ?: [];
+        // process global 'alias-for' forwards
+        $elements = $xml->xPath('/struts-config/global-forwards/forward[@alias-for]') ?: [];
 
         foreach ($elements as $tag) {
             $name = (string) $tag['name'];
-            if (sizeOf($tag->attributes()) > 2) throw new StrutsConfigException('Global forward "'.$name.'": Only one attribute of "include", "redirect" or "forward" must be specified');
+            if (sizeOf($tag->attributes()) > 2) throw new StrutsConfigException('Global forward "'.$name.'": Only one attribute of "include", "redirect" or "alias-for" must be specified');
 
-            $alias = (string) $tag['forward'];
+            $alias = (string) $tag['alias-for'];
             $forward = $this->findForward($alias);
-            if (!$forward) throw new StrutsConfigException('Global forward "'.$name.'", attribute "forward": Forward "'.$alias.'" not found');
+            if (!$forward) throw new StrutsConfigException('Global forward "'.$name.'", attribute "alias-for": Forward "'.$alias.'" not found');
 
-            $this->addForward($name, $forward);
+            $this->addGlobalForward($forward, $name);
         }
     }
 
@@ -372,7 +372,7 @@ class Module extends Object {
 
             foreach ($subElements as $forwardTag) {
                 $name = (string) $forwardTag['name'];
-                if (sizeOf($forwardTag->attributes()) > 2) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'", forward "'.$name.'": Only one attribute of "include", "redirect" or "forward" must be specified');
+                if (sizeOf($forwardTag->attributes()) > 2) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'", forward "'.$name.'": Only one attribute of "include", "redirect" or "alias-for" must be specified');
 
                 if ($include = (string) $forwardTag['include']) {
                     $this->tilesContext = [];
@@ -393,23 +393,23 @@ class Module extends Object {
                     // TODO: URL validieren
                     $forward = new $this->forwardClass($name, $redirect, true);
                 }
-                $mapping->addForward($name, $forward);
+                $mapping->addForward($forward, $name);
             }
 
-            // process local 'forward' forwards
-            $subElements = $tag->xPath('./forward[@forward]') ?: [];
+            // process local 'alias-for' forwards
+            $subElements = $tag->xPath('./forward[@alias-for]') ?: [];
 
             foreach ($subElements as $forwardTag) {
                 $name = (string) $forwardTag['name'];
-                if (sizeOf($forwardTag->attributes()) > 2) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'", forward "'.$name.'": Only one attribute of "include", "redirect" or "forward" must be specified');
+                if (sizeOf($forwardTag->attributes()) > 2) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'", forward "'.$name.'": Only one attribute of "include", "redirect" or "alias-for" must be specified');
 
-                $alias = (string) $forwardTag['forward'];
-                if ($alias == ActionForward::__SELF) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'", forward "'.$name.'", attribute "forward": Can not use magic keyword "'.$alias.'" as attribute value');
+                $alias = (string) $forwardTag['alias-for'];
+                if ($alias == ActionForward::__SELF) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'", forward "'.$name.'", attribute "alias-for": Can not use keyword "'.$alias.'" as attribute value');
 
                 $forward = $mapping->findForward($alias);
-                if (!$forward) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'", forward "'.$name.'", attribute "forward": Forward "'.$alias.'" not found');
+                if (!$forward) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'", forward "'.$name.'", attribute "alias-for": Forward "'.$alias.'" not found');
 
-                $mapping->addForward($name, $forward);
+                $mapping->addForward($forward, $name);
             }
 
             // done
@@ -558,22 +558,20 @@ class Module extends Object {
 
 
     /**
-     * Fuegt diesem Module einen globalen ActionForward unter dem angegebenen Namen hinzu.  Der angegebene
-     * Name kann vom internen Namen des Forwards abweichen, sodass die Definition von Aliassen moeglich ist
-     * (ein Forward ist unter mehreren Namen auffindbar).
+     * Fuegt diesem Module einen globalen ActionForward. Ist ein Alias angegeben, wird er unter dem Alias-Namen registriert.
      *
-     * @param  string        $name
      * @param  ActionForward $forward
+     * @param  string|null   $name    - alias name of the forward (default: none)
      *
      * @throws StrutsConfigException on configuration errors
      */
-    protected function addForward($name, ActionForward $forward) {
+    protected function addGlobalForward(ActionForward $forward, $alias=null) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
-        if (isSet($this->forwards[$name]))
-            throw new StrutsConfigException('Non-unique name detected for global ActionForward "'.$name.'"');
+        $name = is_null($alias) ? $forward->getName() : $alias;
 
-        $this->forwards[$name] = $forward;
+        if (isSet($this->globalForwards[$name])) throw new StrutsConfigException('Non-unique name detected for global ActionForward "'.$name.'"');
+        $this->globalForwards[$name] = $forward;
     }
 
 
@@ -820,8 +818,8 @@ class Module extends Object {
      */
     public function freeze() {
         if (!$this->configured) {
-            foreach ($this->forwards as $forward) $forward->freeze();
-            foreach ($this->mappings as $mapping) $mapping->freeze();
+            foreach ($this->globalForwards as $forward) $forward->freeze();
+            foreach ($this->mappings       as $mapping) $mapping->freeze();
 
             foreach ($this->tiles as $i => $tile) {
                 if ($tile->isAbstract()) unset($this->tiles[$i]);
@@ -843,9 +841,8 @@ class Module extends Object {
      * @return ActionForward|null
      */
     public function findForward($name) {
-        if (isSet($this->forwards[$name]))
-            return $this->forwards[$name];
-
+        if (isSet($this->globalForwards[$name]))
+            return $this->globalForwards[$name];
         return null;
     }
 

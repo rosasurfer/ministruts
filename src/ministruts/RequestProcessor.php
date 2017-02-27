@@ -399,7 +399,7 @@ PROCESS_METHOD_ERROR_SC_405;
 
         $forward = $mapping->getForward();
         if (!$forward) {
-            $key = $success ? ActionForward::VALIDATION_SUCCESS_KEY : ActionForward::VALIDATION_ERROR_KEY;
+            $key     = $success ? ActionForward::VALIDATION_SUCCESS_KEY : ActionForward::VALIDATION_ERROR_KEY;
             $forward = $mapping->findForward($key);
         }
         if (!$forward) throw new RuntimeException('ActionForward for mapping "'.$mapping->getPath().'" not found (Module validation error?)');

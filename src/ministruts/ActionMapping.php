@@ -385,20 +385,19 @@ class ActionMapping extends Object {
 
 
     /**
-     * Fuegt dem ActionMapping unter dem angegebenen Namen einen ActionForward hinzu. Der angegebene
-     * Name kann vom internen Namen des Forwards abweichen, sodass die Definition von Aliassen moeglich
-     * ist (ein Forward ist unter mehreren Namen auffindbar).
+     * Fuegt dem ActionMapping unter dem angegebenen Namen einen ActionForward hinzu.
      *
-     * @param  string        $name
      * @param  ActionForward $forward
+     * @param  string|null   $alias   - alias name of the forward (default: none)
      *
      * @return self
      *
      * @throws StrutsConfigException on configuration errors
      */
-    public function addForward($name, ActionForward $forward) {
+    public function addForward(ActionForward $forward, $alias=null) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
+        $name = is_null($alias) ? $forward->getName() : $alias;
         if (isSet($this->forwards[$name])) throw new StrutsConfigException('Non-unique name detected for local action forward "'.$name.'"');
 
         $this->forwards[$name] = $forward;
@@ -462,7 +461,7 @@ class ActionMapping extends Object {
             if (strLen($query))
                 $url .= '?'.$query;
 
-            $class = $this->module->getForwardClass();
+            $class   = $this->module->getForwardClass();
             $forward = new $class($name, $url, true);
             //don't call $forward->freeze(), userland code may want to modify this forward further
             return $forward;

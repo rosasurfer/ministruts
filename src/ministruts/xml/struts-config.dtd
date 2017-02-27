@@ -77,24 +77,24 @@
    available to all mappings of the module. Local forwards are nested within a "mapping" element and are available only to
    the action invoked through that mapping.
 
-   name      The unique identifier of the forward. Used to select the resource that should complete the request/response.
-
-   include   The name of a tiles definition or a file to include. Tiles definition names must start with a dot ".", file
-             system locations must not start with a dot ".". Exactly one of "include", "redirect" or "forward" must be
-             specified.
-
-   redirect  The module-relative path of the location to which a redirect instruction should be issued. Exactly one of
-             "include", "redirect" or "forward" must be specified.
-
-   forward   The name of another "forward" element to use instead of the current one (local forwards are preferred over
-             global ones). Exactly one of "include", "redirect" or "forward" must be specified.
+   name       The unique identifier of the forward. Used to select the resource that should complete the request/response.
+              
+   include    The name of a tiles definition or a file to include. Tiles definition names must start with a dot ".", file
+              system locations must not start with a dot ".". Exactly one of "include", "redirect" or "alias-for" must be
+              specified.
+              
+   redirect   The module-relative path of the location to which a redirect instruction should be issued. Exactly one of
+              "include", "redirect" or "alias-for" must be specified.
+              
+   alias-for  The name of another "forward" element to use instead of the current one (local forwards are preferred over
+              global ones). Exactly one of "include", "redirect" or "alias-for" must be specified.
 -->
 <!ELEMENT forward (set-property*)>
 <!ATTLIST forward
-          name        %LogicalName;     #REQUIRED
-          include     %ResourcePath;    #IMPLIED
-          redirect    %RequestPath;     #IMPLIED
-          forward     %LogicalName;     #IMPLIED
+          name         %LogicalName;     #REQUIRED
+          include      %ResourcePath;    #IMPLIED
+          redirect     %RequestPath;     #IMPLIED
+          alias-for    %LogicalName;     #IMPLIED
 >
 
 
@@ -195,8 +195,8 @@
                  specified.
 
    alias-for     Name of another tile that this tile's name is an alias for. Tile names must start with a dot ".". If this
-                 attribute is set the tile can not have nested child elements. Exactly one of "file", "extends-tile" or
-                 "alias-for" must be specified.
+                 attribute is set the tile can not have child elements. Exactly one of "file", "extends-tile" or "alias-for" 
+                 must be specified.
 -->
 <!ELEMENT tile ((set*, set-property*)*)>
 <!ATTLIST tile
