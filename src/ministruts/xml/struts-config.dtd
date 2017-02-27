@@ -88,7 +88,7 @@
    alias-for  The name of another "forward" element to use instead of the current one (local forwards are preferred over
               global ones). Exactly one of "include", "redirect" or "alias-for" must be specified.
 -->
-<!ELEMENT forward (set-property*)>
+<!ELEMENT forward (set*)>
 <!ATTLIST forward
           name         %LogicalName;     #REQUIRED
           include      %ResourcePath;    #IMPLIED
@@ -152,7 +152,7 @@
                         attribute set to "true". Only one mapping can be marked as "default" within a module.
                         [default: "false"]
 -->
-<!ELEMENT mapping ((forward*, set-property*)*)>
+<!ELEMENT mapping ((forward*, set*)*)>
 <!ATTLIST mapping
           path                   %RequestPath;        #REQUIRED
           include                %ResourcePath;       #IMPLIED
@@ -196,7 +196,7 @@
                  attribute is set the tile can not have child elements. Exactly one of "file", "extends-tile" or "alias-for" 
                  must be specified.
 -->
-<!ELEMENT tile ((include*, set-property*)*)>
+<!ELEMENT tile ((include*, set*)*)>
 <!ATTLIST tile
           name            %LogicalName;     #REQUIRED
           file            %ResourcePath;    #IMPLIED
@@ -225,20 +225,20 @@
 
 
 <!--
-   The "set-property" element describes an additional property available in a class or a definition. The value of this
-   property can be specified as an XML attribute or in the body of the <set-property> tag.
-   The "set-property" element is especially useful with "tiles" elements where the property is made available as a regular
-   variable in the page context. The element is also useful when a custom class is used with "forward" or "mapping" elements.
-   When the object representing the surrounding element is instantiated, the setter for the property is called and passed
-   the specified value.
+   The "set" element describes an additional property in a class or a variable in a tiles definition. The value of this
+   element can be specified as an XML attribute or in the body of the <set> tag.
+   The "set" element is especially useful with "tile" elements where the value is made available as a regular variable 
+   in the resulting view. 
+   The element can also be used for custom classes of "forward" or "mapping" elements. When the object representing the 
+   surrounding element is instantiated, the setter for the property is called and passed the specified value.
 
-   property  Name of the variable or property whose setter method will be called.
+   property  Name of the view variable or class property whose setter method will be called.
 
    value     String representation of the value of the variable or property. The value can be specified as an XML attribute,
-             or in the body of the <set-property> tag.
+             or in the body of the <set> tag.
 -->
-<!ELEMENT set-property (#PCDATA)>
-<!ATTLIST set-property
+<!ELEMENT set (#PCDATA)>
+<!ATTLIST set
           name     %LogicalName;    #REQUIRED
           value    CDATA            #IMPLIED
 >

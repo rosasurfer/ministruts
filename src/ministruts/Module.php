@@ -538,9 +538,9 @@ class Module extends Object {
             $tile->setNestedTile($name, $nestedTile);
         }
 
-        // process <set-property> elements
+        // process <set> elements
         /*
-        foreach ($xml->{'set-property'} as $tag) {
+        foreach ($xml->{'set'} as $tag) {
             // TODO: Property-Namen auf Eindeutigkeit ueberpruefen
             // TODO: Typuebereinstimmung ueberladener Properties mit der Extended-Tile pruefen
             $tile->setProperty($name, $value);
