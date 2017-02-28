@@ -30,7 +30,7 @@ class Tile extends Object {
     /** @var Tile[] - nested tiles */
     protected $nestedTiles = [];
 
-    /** @var array - Property-Pool */
+    /** @var array - additional tile properties */
     protected $properties = [];
 
     /**
@@ -110,10 +110,14 @@ class Tile extends Object {
      *
      * @param  string    $name - Name der Tile
      * @param  self|null $tile - die zu speichernde Tile oder NULL, wenn die Child-Deklaration abstrakt ist
+     *
+     * @return self
      */
     public function setNestedTile($name, self $tile=null) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
+
         $this->nestedTiles[$name] = $tile;
+        return $this;
     }
 
 
@@ -122,11 +126,26 @@ class Tile extends Object {
      *
      * @param  string $name  - Name der Eigenschaft
      * @param  mixed  $value - der zu speichernde Wert
+     *
+     * @return self
      */
     public function setProperty($name, $value) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
         $this->properties[$name] = $value;
+        return $this;
+    }
+
+
+    /**
+     * Gibt die eigenen und die Properties der umgebenden Tile zurueck. Eigene Properties ueberschreiben gleichnamige
+     * Properties der umgebenden Tile.
+     *
+     * @return array - Properties
+     */
+    protected function getMergedProperties() {
+        $parentProperties = $this->parent ? $this->parent->getMergedProperties() : [];
+        return array_merge($parentProperties, $this->properties);
     }
 
 
@@ -160,21 +179,9 @@ class Tile extends Object {
 
 
     /**
-     * Gibt die eigenen und die geerbten Properties dieser Tile zurueck. Eigene Properties ueberschreiben geerbte Properties
-     * mit demselben Namen.
-     *
-     * @return array - Properties
-     */
-    protected function getMergedProperties() {
-        if ($this->parent) {
-            return array_merge($this->parent->getMergedProperties(), $this->properties);
-        }
-        return $this->properties;
-    }
-
-
-    /**
      * Render the Tile.
+     *
+     * @return self
      */
     public function render() {
         $nestedTiles = $this->nestedTiles;
@@ -201,6 +208,8 @@ class Tile extends Object {
         if (LOCALHOST && $this->parent) {
             echo "\n<!-- #end: ".$tileHint." -->\n";
         }
+
+        return $this;
     }
 }
 

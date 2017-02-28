@@ -494,7 +494,7 @@ class Module extends Object {
         $tile->setName($name);
 
         // process it's child nodes ...
-        $this->processTileChildNodes($tile, $tag);
+        $this->processTileProperties($tile, $tag);
 
         // ... and finally save it
         $this->addTile($tile);
@@ -510,12 +510,12 @@ class Module extends Object {
      *
      * @throws StrutsConfigException on configuration errors
      */
-    private function processTileChildNodes(Tile $tile, \SimpleXMLElement $xml) {
+    private function processTileProperties(Tile $tile, \SimpleXMLElement $xml) {
         // process <include> elements
         foreach ($xml->{'include'} as $tag) {
             $name  = (string) $tag['name'];
             $nodes = $xml->xPath("/struts-config/tiles/tile[@name='".$tile->getName()."']/include[@name='".$name."']");
-            if (sizeOf($nodes) > 1) throw new StrutsConfigException('<tile name="'.$tile->getName().'"... multiple childnodes <include name="'.$name.'" found');
+            if (sizeOf($nodes) > 1) throw new StrutsConfigException('<tile name="'.$tile->getName().'"... multiple childnodes <include name="'.$name.'"> found');
 
             if ($value=(string) $tag['value']) {            // 'value' specified
                 if (!$this->isIncludable($value, $xml)) throw new StrutsConfigException('<tile name="'.$tile->getName().'"... childnode <include name="'.$name.'" value="'.$value.'": '.($value[0]=='.' ? 'Tile definition':'File').' not found');
@@ -539,13 +539,26 @@ class Module extends Object {
         }
 
         // process <set> elements
-        /*
         foreach ($xml->{'set'} as $tag) {
-            // TODO: Property-Namen auf Eindeutigkeit ueberpruefen
-            // TODO: Typuebereinstimmung ueberladener Properties mit der Extended-Tile pruefen
+            $name  = (string) $tag['name'];
+            $nodes = $xml->xPath("/struts-config/tiles/tile[@name='".$tile->getName()."']/set[@name='".$name."']");
+            if (sizeOf($nodes) > 1) throw new StrutsConfigException('<tile name="'.$tile->getName().'"... multiple childnodes <set name="'.$name.'"> found');
+
+            if ($tag['value']) {                            // value ist im Attribut angegeben
+                if (strLen($tag) > 0) throw new StrutsConfigException('<tile name="'.$tile->getName().'"... childnode <set name="'.$name.'": Only a "value" attribute *or* a body value must be specified.');
+                $value = (string) $tag['value'];
+            }
+            else {                                          // value ist im Body angegeben
+                $value = trim((string) $tag);
+            }
+            // TODO: Var-Type nicht nur casten, sondern validieren
+            switch (((string)$tag['type']) ?: 'string') {
+                case 'bool' : $value =  (bool) $value; break;
+                case 'int'  : $value =   (int) $value; break;
+                case 'float': $value = (float) $value; break;
+            }
             $tile->setProperty($name, $value);
         }
-        */
     }
 
 
