@@ -1,6 +1,6 @@
 {
-    "name":        "example-namespace/example-app",
-    "description": "Example application using the MiniStruts framework",
+    "name":        "my-namespace/ministruts-demo",
+    "description": "Demo application using the MiniStruts framework",
     "type":        "project",
     "license":     "proprietary",
     "config": {
