@@ -3,8 +3,8 @@
 
    - struts-config: rename <forward ... forward="{name}"> to <forward ... alias-for="{name}">
    - struts-config: replace <set file|tile="{includable}"> by <include value="{includable}">
-   - struts-config: rename <set-property> to <set>
-   
+   - struts-config: re-implement <set-property> as <set>
+
 
 2017-02-26
 
