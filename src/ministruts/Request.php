@@ -34,6 +34,7 @@ use rosasurfer\config\Config;
  */
 class Request extends Singleton {
 
+
     /** @var string */
     private $method;
 
@@ -149,7 +150,7 @@ class Request extends Singleton {
      *
      * @param  string $name - parameter name
      *
-     * @return string - value or NULL if no such parameter exists
+     * @return string|null - value or NULL if no such parameter exists
      */
     public function getParameter($name) {
         if (isSet($_REQUEST[$name])) {
@@ -172,8 +173,7 @@ class Request extends Singleton {
     public function getParameters($name) {
         if (isSet($_REQUEST[$name])) {
             $value = $_REQUEST[$name];
-            !is_array($value) && $value=[$value];
-            return $value;
+            return is_array($value) ? $value : [$value];
         }
         return [];
     }
@@ -436,7 +436,7 @@ class Request extends Singleton {
      * Return the "Content-Type" header of the request. If multiple "Content-Type" headers have been transmitted the first
      * one is returned.
      *
-     * @return string - "Content-Type" header or NULL if no "Content-Type" header was transmitted.
+     * @return string|null - "Content-Type" header or NULL if no "Content-Type" header was transmitted.
      */
     public function getContentType() {
         $contentType = $this->getHeaderValue('Content-Type');
@@ -505,7 +505,7 @@ class Request extends Singleton {
      *
      * @param  string $name - Name des Headers
      *
-     * @return array - Name-Wert-Paar oder NULL, wenn kein Header dieses Namens uebertragen wurde
+     * @return array|null - Name-Wert-Paar oder NULL, wenn kein Header dieses Namens uebertragen wurde
      */
     public function getHeader($name) {
         if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
@@ -570,7 +570,7 @@ class Request extends Singleton {
      *
      * @param  string|string[] $names - one or more header names
      *
-     * @return string - Value(s) or NULL if no such headers have been transmitted.
+     * @return string|null - value or NULL if no such headers have been transmitted.
      */
     public function getHeaderValue($names) {
         if (is_string($names))
@@ -744,7 +744,7 @@ class Request extends Singleton {
         $errors =& $this->getAttribute(ACTION_ERRORS_KEY);
 
         if ($errors === null)
-            $errors = array();
+            $errors = [];
 
         return $errors;
     }
@@ -820,7 +820,7 @@ class Request extends Singleton {
     /**
      * Gibt das diesem Request zugeordnete ActionMapping zurueck.
      *
-     * @return ActionMapping - Mapping oder NULL, wenn die Request-Instance ausserhalb des Struts-Frameworks benutzt wird.
+     * @return ActionMapping|null - Mapping oder NULL, wenn die Request-Instance ausserhalb des Struts-Frameworks benutzt wird.
      */
     final public function getMapping() {
         return $this->getAttribute(ACTION_MAPPING_KEY);
