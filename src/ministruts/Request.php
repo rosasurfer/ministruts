@@ -145,35 +145,37 @@ class Request extends Singleton {
 
 
     /**
-     * Return the request parameter with the specified name. Returns always a single value. If multiple parameters with
-     * the name exist, it returns the last value.
+     * Return the single request parameter with the specified name. If multiple parameters with that name have been
+     * transmitted, the last value is returned. If an array of parameters with that name have been transmitted, it is
+     * ignored.
      *
      * @param  string $name - parameter name
      *
-     * @return string|null - value or NULL if no such parameter exists
+     * @return string|null - value or NULL if no such single parameter has been transmitted
      */
     public function getParameter($name) {
         if (isSet($_REQUEST[$name])) {
             $value = $_REQUEST[$name];
-            if (is_array($value))
-                return $value[sizeOf($value)-1];
-            return $value;
+            if (!is_array($value))
+                return $value;
         }
         return null;
     }
 
 
     /**
-     * Return all request parameters with the specified name. Returns always an array.
+     * Return the array parameters with the specified name. If a single parameter with that name was transmitted, it is
+     * ignored.
      *
      * @param  string $name - parameter name
      *
-     * @return string[] - values or an empty array if no such parameters exist
+     * @return string[] - values or an empty array if no such array parameters have been transmitted
      */
     public function getParameters($name) {
         if (isSet($_REQUEST[$name])) {
             $value = $_REQUEST[$name];
-            return is_array($value) ? $value : [$value];
+            if (is_array($value))
+                return $value;
         }
         return [];
     }
