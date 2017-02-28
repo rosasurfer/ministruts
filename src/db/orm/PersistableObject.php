@@ -27,15 +27,6 @@ use const rosasurfer\PHP_TYPE_STRING;
 abstract class PersistableObject extends Object {
 
 
-    /** @var bool - current modification status */
-    protected $modified = false;
-
-    /** @var string[] - modified and unsaved properties */
-    protected $modifications;
-
-
-    // standard properties
-
     /** @var int - primary key */
     protected $id;
 
@@ -48,26 +39,32 @@ abstract class PersistableObject extends Object {
     /** @var (string)datetime - time of soft deletion */
     protected $deleted;
 
+    /** @var bool - current modification status (dirty checking) */
+    protected $modified = false;
+
+    /** @var string[] - modified and unsaved properties */
+    protected $modifications;
+
 
     /**
-     * Default constructor. Final and used only by the ORM. To create new instances define and use static helper methods.
+     * Default constructor. Used only by the ORM. To create new instances define and use static helper methods.
      *
      * @example
      *
-     *  class MyClass extends PersistableObject {
+     *  class Foo extends PersistableObject {
      *
-     *     public static function create($properties, ...) {
-     *        $instance = new static();
-     *        // set properties...
+     *     public static function create($bar, ...) {
+     *        $instance = new self();
+     *        $instance->setBar($bar);
      *        return $instance;
      *     }
      *  }
      *
-     *  $object = MyClass::create('foo');
-     *  $object->save();
+     *  $foo = Foo::create('bar');
+     *  $foo->save();
      */
     final protected function __construct() {
-        $this->created = $this->touch();
+        $this->created = gmDate('Y-m-d H:i:s');
     }
 
 
