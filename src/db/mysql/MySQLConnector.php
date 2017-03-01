@@ -277,14 +277,13 @@ class MySQLConnector extends Connector {
      * Escape a DBMS identifier, i.e. the name of a database object (schema, table, view, column etc.). The resulting string
      * can be used in queries "as-is" and doesn't need additional quoting.
      *
+     * MySQL: = `{$name}`.`{$subname}`
+     *
      * @param  string $name - identifier to escape
      *
-     * @return string - escaped and quoted identifier; MySQL: `{$name}`.`{$subname}`
+     * @return string - escaped and quoted identifier
      */
     public function escapeIdentifier($name) {
-        if (!$this->isConnected())
-            $this->connect();
-
         if (strContains($name, '.')) {
             $names = explode('.', $name);
 
@@ -302,13 +301,20 @@ class MySQLConnector extends Connector {
      * Escape a DBMS string literal, i.e. a string value. The resulting string can be used in queries "as-is" and doesn't
      * need additional quoting.
      *
-     * @param  string $value - value to escape
+     * MySQL: = '{escapeString($value)}'
      *
-     * @return string - escaped and quoted string value; MySQL: '{$this->escapeString($value)}'
+     * @param  scalar $value - value to escape
+     *
+     * @return scalar - escaped and quoted string or scalar value if the value was not a string
      */
     public function escapeLiteral($value) {
-        if (!$this->isConnected())
-            $this->connect();
+        // bug or feature: mysql_real_escape_string(null) => empty string instead of NULL
+        if ($value === null)
+            return 'null';
+
+        if (is_int($value) || is_float($value))
+            return (string) $value;
+
         $escaped = $this->escapeString($value);
         return "'".$escaped."'";
     }
@@ -317,11 +323,17 @@ class MySQLConnector extends Connector {
     /**
      * Escape a string value. The resulting string must be quoted according to the DBMS before it can be used in queries.
      *
-     * @param  string $value - value to escape
+     * MySQL: = addSlashes($value, ['\', "'", '"'])
      *
-     * @return string - escaped but not quoted string value; MySQL: {addSlashes($value, ['\', "'", '"'])}
+     * @param  scalar $value - value to escape
+     *
+     * @return string|null - escaped but unquoted string or NULL if the value was NULL
      */
     public function escapeString($value) {
+        // bug or or feature: mysql_real_escape_string(null) => empty string instead of NULL
+        if ($value === null)
+            return null;
+
         if (!$this->isConnected())
             $this->connect();
         return mysql_real_escape_string($value, $this->hConnection);

@@ -58,9 +58,9 @@ interface ConnectorInterface {
      * Escape a DBMS string literal, i.e. a string value. The resulting string can be used in queries "as-is" and doesn't
      * need additional quoting.
      *
-     * @param  string $value - value to escape
+     * @param  scalar $value - value to escape
      *
-     * @return string - escaped and quoted string value
+     * @return scalar - escaped and quoted string or scalar value if the value was not a string
      */
     public function escapeLiteral($value);
 
@@ -68,9 +68,9 @@ interface ConnectorInterface {
     /**
      * Escape a string value. The resulting string must be quoted according to the DBMS before it can be used in queries.
      *
-     * @param  string $value - value to escape
+     * @param  scalar $value - value to escape
      *
-     * @return string - escaped but not quoted string value
+     * @return string|null - escaped but unquoted string or NULL if the value was NULL
      */
     public function escapeString($value);
 

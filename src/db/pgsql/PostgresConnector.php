@@ -179,11 +179,20 @@ class PostgresConnector extends Connector {
      * Escape a DBMS string literal, i.e. a string value. The resulting string can be used in queries "as-is" and doesn't
      * need additional quoting.
      *
-     * @param  string $value - value to escape
+     * PostgreSQL: =  E'{escape($value)}'
      *
-     * @return string - escaped and quoted string value; PostgreSQL:  E'{escape($value)}'
+     * @param  scalar $value - value to escape
+     *
+     * @return scalar - escaped and quoted string or scalar value if the value was not a string
      */
     public function escapeLiteral($value) {
+        // bug: pg_escape_literal(null) => '' quoted empty string instead of 'null'
+        if ($value === null)
+            return 'null';
+
+        if (is_int($value) || is_float($value))
+            return (string) $value;
+
         if (!$this->isConnected())
             $this->connect();
         return pg_escape_literal($this->hConnection, $value);
@@ -193,11 +202,17 @@ class PostgresConnector extends Connector {
     /**
      * Escape a string value. The resulting string must be quoted according to the DBMS before it can be used in queries.
      *
-     * @param  string $value - value to escape
+     * PostgreSQL: = escape_chars($value, ['\', "'"])
      *
-     * @return string - escaped but not quoted string value; PostgreSQL:  {escape_chars($value, ['\', "'"])}
+     * @param  scalar $value - value to escape
+     *
+     * @return string|null - escaped but unquoted string or NULL if the value was NULL
      */
     public function escapeString($value) {
+        // bug or feature: pg_escape_string(null) => empty string instead of NULL
+        if ($value === null)
+            return null;
+
         if (!$this->isConnected())
             $this->connect();
         return pg_escape_string($this->hConnection, $value);

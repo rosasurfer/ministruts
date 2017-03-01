@@ -172,8 +172,6 @@ class SQLiteConnector extends Connector {
      * @return string - escaped and quoted identifier; SQLite:  "{$name}"
      */
     public function escapeIdentifier($name) {
-        if (!$this->isConnected())
-            $this->connect();
         return '"'.str_replace('"', '""', $name).'"';
     }
 
@@ -182,13 +180,20 @@ class SQLiteConnector extends Connector {
      * Escape a DBMS string literal, i.e. a string value. The resulting string can be used in queries "as-is" and doesn't
      * need additional quoting.
      *
-     * @param  string $value - value to escape
+     * SQLite: = '{$this->escapeString($value)}'
      *
-     * @return string - escaped and quoted string value; SQLite: '{$this->escapeString($value)}'
+     * @param  scalar $value - value to escape
+     *
+     * @return scalar - escaped and quoted string or scalar value if the value was not a string
      */
     public function escapeLiteral($value) {
-        if (!$this->isConnected())
-            $this->connect();
+        // bug: SQLite3::escapeString(null) => empty string instead of NULL
+        if ($value === null)
+            return 'null';
+
+        if (is_int($value) || is_float($value))
+            return (string) $value;
+
         $escaped = $this->escapeString($value);
         return "'".$escaped."'";
     }
@@ -197,11 +202,17 @@ class SQLiteConnector extends Connector {
     /**
      * Escape a string value. The resulting string must be quoted according to the DBMS before it can be used in queries.
      *
-     * @param  string $value - value to escape
+     * SQLite: = escape($value, $chars=["'"], $escape_character="'")
      *
-     * @return string - escaped but not quoted string value; SQLite: {escape($value, $chars=["'"], $escape_character="'")}
+     * @param  scalar $value - value to escape
+     *
+     * @return string|null - escaped but unquoted string or NULL if the value was NULL
      */
     public function escapeString($value) {
+        // bug or feature: SQLite3::escapeString(null) => empty string instead of NULL
+        if ($value === null)
+            return null;
+
         if (!$this->isConnected())
             $this->connect();
         return $this->handler->escapeString($value);

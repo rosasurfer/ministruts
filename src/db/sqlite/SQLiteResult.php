@@ -169,7 +169,7 @@ class SQLiteResult extends Result {
             $this->result       = null;
             $this->nextRowIndex = -1;
 
-            if ($this->connector->isConnected()) {              // if not connected the result is already released
+            if ($this->connector->isConnected()) {              // if disconnected the result is already released
                 $tmp->finalize();
             }
         }
