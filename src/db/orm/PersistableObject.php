@@ -259,7 +259,7 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Return the DAO for the calling class.
+     * Return the {@link DAO} for the calling class.
      *
      * @return DAO
      */
