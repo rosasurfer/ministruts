@@ -1,4 +1,9 @@
 
+2017-03-02
+
+   - db/pgsql/PostgresConnector: skip unsupported connection options
+   
+   
 2017-02-27
 
    - struts-config: rename <forward ... forward="{name}"> to <forward ... alias-for="{name}">
