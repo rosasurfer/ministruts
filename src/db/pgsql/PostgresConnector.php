@@ -56,7 +56,7 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * Set additional connection options.
+     * Set connection options.
      *
      * @param  string[] $options
      *
@@ -76,6 +76,7 @@ class PostgresConnector extends Connector {
     public function connect() {
         $connStr = '';
         foreach ($this->options as $key => $value) {
+            // TODO: skip unsupported config options
             if ($key=='options' || is_array($value))
                 continue;
             if (!strLen($value)) {
@@ -117,7 +118,7 @@ class PostgresConnector extends Connector {
         @see  https://www.postgresql.org/docs/7.4/static/pgtcl-pgconnect.html
         @see  https://www.postgresql.org/docs/9.6/static/libpq-connect.html#LIBPQ-CONNSTRING
 
-        -----------------------------------------------------------------------------------------------------------------------
+        ---------------------------------------------------------------------------------------------------------------------
 
         - host=/tmp                                                             // connect to socket
         - options='--application_name=$appName'                                 // send $appName to backend (pgAdmin, logs)
@@ -126,8 +127,8 @@ class PostgresConnector extends Connector {
         - putEnv('PGSERVICEFILE=/path/to/your/service/file/pg_service.conf');   // external connection configuration
           pg_connect("service=testdb");
 
-        @see  https://www.postgresql.org/docs/9.6/static/libpq-pgservice.html
-      */
+          @see  https://www.postgresql.org/docs/9.6/static/libpq-pgservice.html
+        */
     }
 
 
@@ -186,7 +187,7 @@ class PostgresConnector extends Connector {
      * @return scalar - escaped and quoted string or scalar value if the value was not a string
      */
     public function escapeLiteral($value) {
-        // bug: pg_escape_literal(null) => '' quoted empty string instead of 'null'
+        // bug or feature: pg_escape_literal(null) => '' quoted empty string instead of 'null'
         if ($value === null)
             return 'null';
 

@@ -187,7 +187,7 @@ class SQLiteConnector extends Connector {
      * @return scalar - escaped and quoted string or scalar value if the value was not a string
      */
     public function escapeLiteral($value) {
-        // bug: SQLite3::escapeString(null) => empty string instead of NULL
+        // bug or feature: SQLite3::escapeString(null) => empty string instead of NULL
         if ($value === null)
             return 'null';
 
