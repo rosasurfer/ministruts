@@ -76,7 +76,7 @@
 <small><sup>3</sup></small> &nbsp; Returns the first inserted row ID. `lastInsertId = mysqli_insert_id() + mysqli_affected_rows() - 1`.  
 <small><sup>4</sup></small> &nbsp;`Result::lastInsertId()` returns the value of `Connector::lastInsertId()`.  
 <small><sup>5</sup></small> &nbsp;`Result::lastInsertId()` returns the value of `Connector::lastInsertId()` at result creation time.  
-<small><sup>6</sup></small> &nbsp; Since PostgreSQL 8.1. Raises SQLSTATE 55000 if no row was yet inserted in the current session.  
+<small><sup>6</sup></small> &nbsp; Since PostgreSQL 8.1, raises SQLSTATE 55000 if no row was yet inserted in the current session.  
 
 _ _ _
 
