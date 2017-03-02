@@ -84,7 +84,7 @@ class PostgresConnector extends Connector {
             'password',
             'connect_timeout',
             'client_encoding',
-            'options',
+          //'options',                                      // TODO: requires special implementation
             'application_name',
             'fallback_application_name',
             'keepalives',
@@ -109,7 +109,6 @@ class PostgresConnector extends Connector {
 
         foreach ($this->options as $key => $value) {
             if (!isSet($paramKeywords[$key])) continue;
-            if ($key == 'options')            continue;     // TODO: requires special implementation
             if (is_array($value))             continue;
 
             if (!strLen($value)) {
@@ -123,8 +122,7 @@ class PostgresConnector extends Connector {
             $connStr .= $key.'='.$value.' ';
         }
 
-        $connStr = trim($connStr);
-        return $connStr;
+        return trim($connStr);
         /*
         The connection string can be empty to use all default parameters, or it can contain one or more parameter settings
         separated by whitespace. Each parameter setting is in the form `keyword=value`. Spaces around the equal sign are
