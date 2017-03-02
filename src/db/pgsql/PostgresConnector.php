@@ -69,16 +69,49 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * Connect the adapter to the database.
+     * Resolve and return the PostgreSQL connection string from the passed connection options.
      *
-     * @return self
+     * @return string
      */
-    public function connect() {
+    private function getConnectionString() {
+        // currently supported keywords:  https://www.postgresql.org/docs/9.6/static/libpq-connect.html#LIBPQ-PARAMKEYWORDS
+        $paramKeywords = [
+            'host',
+            'hostaddr',
+            'port',
+            'dbname',
+            'user',
+            'password',
+            'connect_timeout',
+            'client_encoding',
+            'options',
+            'application_name',
+            'fallback_application_name',
+            'keepalives',
+            'keepalives_idle',
+            'keepalives_interval',
+            'keepalives_count',
+            'tty',                                          // ignored
+            'sslmode',
+            'requiressl',                                   // deprecated in favor of 'sslmode'
+            'sslcompression',
+            'sslcert',
+            'sslkey',
+            'sslrootcert',
+            'sslcrl',
+            'requirepeer',
+            'krbsrvname',
+          //'gsslib',                                       // rejected by php_pgsql 9.4.1
+            'service',
+        ];
+        $paramKeywords = array_flip($paramKeywords);
         $connStr = '';
+
         foreach ($this->options as $key => $value) {
-            // TODO: skip unsupported config options
-            if ($key=='options' || is_array($value))
-                continue;
+            if (!isSet($paramKeywords[$key])) continue;
+            if ($key == 'options')            continue;     // TODO: requires special implementation
+            if (is_array($value))             continue;
+
             if (!strLen($value)) {
                 $value = "''";
             }
@@ -89,28 +122,14 @@ class PostgresConnector extends Connector {
             }
             $connStr .= $key.'='.$value.' ';
         }
+
         $connStr = trim($connStr);
-
-        try {
-            $this->hConnection = pg_connect($connStr, PGSQL_CONNECT_FORCE_NEW);
-            !$this->hConnection && trigger_error(@$php_errormsg, E_USER_ERROR);
-        }
-        catch (IRosasurferException $ex) {
-            throw $ex->addMessage('Cannot connect to PostgreSQL server with connection string: "'.$connStr.'"');
-        }
-        return $this;
-
+        return $connStr;
         /*
         The connection string can be empty to use all default parameters, or it can contain one or more parameter settings
         separated by whitespace. Each parameter setting is in the form `keyword=value`. Spaces around the equal sign are
         optional. To write an empty value or a value containing spaces, surround it with single quotes, e.g.,
         `keyword='a value'`. Single quotes and backslashes within the value must be escaped with a backslash, i.e., \' and \\.
-
-        The currently recognized parameter keywords are: 'host', 'hostaddr', 'port', 'dbname' (defaults to value of 'user'),
-        'user', 'password', 'connect_timeout', 'options', 'tty' (ignored), 'sslmode', 'requiressl' (deprecated in favor of
-        'sslmode'), and 'service'. Which of these arguments exist depends on your PostgreSQL version.
-
-        Keywords:  https://www.postgresql.org/docs/9.6/static/libpq-connect.html#LIBPQ-PARAMKEYWORDS
 
         The 'options' parameter can be used to set command line parameters to be invoked by the server.
 
@@ -119,7 +138,7 @@ class PostgresConnector extends Connector {
         @see  https://www.postgresql.org/docs/9.6/static/libpq-connect.html#LIBPQ-CONNSTRING
 
         ---------------------------------------------------------------------------------------------------------------------
-
+        Examples:
         - host=/tmp                                                             // connect to socket
         - options='--application_name=$appName'                                 // send $appName to backend (pgAdmin, logs)
         - options='--client_encoding=UTF8'                                      // set client encoding
@@ -129,6 +148,24 @@ class PostgresConnector extends Connector {
 
           @see  https://www.postgresql.org/docs/9.6/static/libpq-pgservice.html
         */
+    }
+
+
+    /**
+     * Connect the adapter to the database.
+     *
+     * @return self
+     */
+    public function connect() {
+        $connStr = $this->getConnectionString();
+        try {
+            $this->hConnection = pg_connect($connStr, PGSQL_CONNECT_FORCE_NEW);
+            !$this->hConnection && trigger_error(@$php_errormsg, E_USER_ERROR);
+        }
+        catch (IRosasurferException $ex) {
+            throw $ex->addMessage('Cannot connect to PostgreSQL server with connection string: "'.$connStr.'"');
+        }
+        return $this;
     }
 
 
