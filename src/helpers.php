@@ -13,9 +13,6 @@ use rosasurfer\ministruts\url\VersionedUrl;
 use rosasurfer\util\Validator;
 
 
-// prevent multiple includes
-if (defined('rosasurfer\CLI')) return;
-
 // whether or not we run on a command line interface, on localhost and/or on Windows
 define('rosasurfer\CLI'      , !isSet($_SERVER['REQUEST_METHOD']));
 define('rosasurfer\LOCALHOST', !CLI && in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1', $_SERVER['SERVER_ADDR']]));

@@ -6,10 +6,6 @@ use rosasurfer\ministruts\url\Url;
 use rosasurfer\ministruts\url\VersionedUrl;
 
 
-// block re-includes
-if (defined('CLI')) return;
-
-
 // runtime environment
 const CLI               = \rosasurfer\CLI;
 const LOCALHOST         = \rosasurfer\LOCALHOST;
