@@ -1,10 +1,8 @@
 <?php
-namespace rosasurfer\ministruts;
-
-
 /**
  * Package constants
  */
+namespace rosasurfer\ministruts;
 
 
 /**

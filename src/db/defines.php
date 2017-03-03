@@ -1,10 +1,8 @@
 <?php
-namespace rosasurfer\db;
-
-
 /**
  * Package constants
  */
+namespace rosasurfer\db;
 
 
 // SQL serialization types (value representation in a SQL string)
