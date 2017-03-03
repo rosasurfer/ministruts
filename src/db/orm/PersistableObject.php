@@ -3,6 +3,7 @@ namespace rosasurfer\db\orm;
 
 use rosasurfer\core\Object;
 use rosasurfer\core\Singleton;
+
 use rosasurfer\db\ConnectorInterface as IConnector;
 
 use rosasurfer\exception\IllegalAccessException;
@@ -17,6 +18,9 @@ use const rosasurfer\PHP_TYPE_BOOL;
 use const rosasurfer\PHP_TYPE_FLOAT;
 use const rosasurfer\PHP_TYPE_INT;
 use const rosasurfer\PHP_TYPE_STRING;
+
+use const rosasurfer\db\IDX_MAPPING_COLUMN_NAME;
+use const rosasurfer\db\IDX_MAPPING_PHP_TYPE;
 
 
 /**
@@ -238,10 +242,10 @@ abstract class PersistableObject extends Object {
         $mappings = $object->dao()->getMapping();
 
         foreach ($mappings['columns'] as $phpName => $mapping) {
-            $column = strToLower($mapping[0]);
+            $column = strToLower($mapping[IDX_MAPPING_COLUMN_NAME]);
 
             if ($row[$column] !== null) {
-                $phpType = $mapping[1];
+                $phpType = $mapping[IDX_MAPPING_PHP_TYPE];
 
                 switch ($phpType) {
                     case PHP_TYPE_BOOL  : $object->$phpName =   (bool) $row[$column]; break;
@@ -250,7 +254,7 @@ abstract class PersistableObject extends Object {
                     case PHP_TYPE_STRING: $object->$phpName = (string) $row[$column]; break;
                     case PHP_TYPE_ARRAY : $object->$phpName =   strLen($row[$column]) ? explode(',', $row[$column]) : []; break;
 
-                    default: throw new InvalidArgumentException('Unknown PHP type "'.$phpType.'" in database mapping of '.$class.'::'.$phpName);
+                    default: throw new InvalidArgumentException('Unsupported PHP type "'.$phpType.'" in database mapping of '.$class.'::'.$phpName);
                 }
             }
         }

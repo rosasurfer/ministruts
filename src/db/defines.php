@@ -5,10 +5,10 @@
 namespace rosasurfer\db;
 
 
-// SQL serialization types (value representation in a SQL statement)
+// PHP to SQL serialization types (PHP value representation in a SQL statement)
 
 /**
- * Bind type "default". The bind type to use is derived from the property type.
+ * Bind type "default". The bind type to use is derived from the model's property type.
  */
 const BIND_TYPE_DEFAULT = 0;
 
@@ -71,3 +71,26 @@ const ID_VERSION = 3;
  * Identifier for a column holding the "soft-deletion" time of the record.
  */
 const ID_DELETE  = 4;
+
+
+// Mapping field indexes
+
+/**
+ * Mapping index of a field's PHP type.
+ */
+const IDX_MAPPING_PHP_TYPE = 1;
+
+/**
+ * Mapping index of a field's SQL bind type.
+ */
+const IDX_MAPPING_BIND_TYPE = 2;
+
+/**
+ * Mapping index of a field's DBMS column name.
+ */
+const IDX_MAPPING_COLUMN_NAME = 0;
+
+/**
+ * Mapping index of a field's DBMS column behavior.
+ */
+const IDX_MAPPING_COLUMN_BEHAVIOR = 3;
