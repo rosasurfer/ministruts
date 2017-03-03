@@ -92,7 +92,7 @@ function dump($var, $return=false, $flushBuffers=true) {
 
 
 /**
- * Functional replacement for "echo($var)" which is a language construct and can't be used as a regular function.
+ * Functional replacement for <tt>"echo($var)"</tt> which is a language construct and can't be used as a regular function.
  *
  * @param  mixed $var
  * @param  bool  $flushBuffers - whether or not to flush output buffers (default: TRUE)
@@ -118,7 +118,7 @@ function echoPre($var, $flushBuffers=true) {
 
 
 /**
- * Alias for printPretty()
+ * Alias for {@link printPretty()}
  *
  * Prints a variable in a pretty way. Output always ends with a line feed.
  *
@@ -128,8 +128,6 @@ function echoPre($var, $flushBuffers=true) {
  * @param  bool  $flushBuffers - whether or not to flush output buffers on output (default: TRUE)
  *
  * @return string|null - string if the result is to be returned, NULL otherwise
- *
- * @see    printPretty()
  */
 function pp($var, $return=false, $flushBuffers=true) {
     return \rosasurfer\pp($var, $return, $flushBuffers);
