@@ -124,29 +124,6 @@ class PostgresConnector extends Connector {
 
         return trim($connStr);
     }
-    /*
-    The connection string can be empty to use all default parameters, or it can contain one or more parameter settings
-    separated by whitespace. Each parameter setting is in the form `keyword=value`. Spaces around the equal sign are
-    optional. To write an empty value or a value containing spaces, surround it with single quotes, e.g.,
-    `keyword='a value'`. Single quotes and backslashes within the value must be escaped with a backslash, i.e., \' and \\.
-
-    The 'options' parameter can be used to set command line parameters to be invoked by the server.
-
-    @see  http://php.net/manual/en/function.pg-connect.php
-    @see  https://www.postgresql.org/docs/7.4/static/pgtcl-pgconnect.html
-    @see  https://www.postgresql.org/docs/9.6/static/libpq-connect.html#LIBPQ-CONNSTRING
-
-    ---------------------------------------------------------------------------------------------------------------------
-    Examples:
-    - host=/tmp                                                             // connect to socket
-    - options='--application_name=$appName'                                 // send $appName to backend (pgAdmin, logs)
-    - options='--client_encoding=UTF8'                                      // set client encoding
-
-    - putEnv('PGSERVICEFILE=/path/to/your/service/file/pg_service.conf');   // external connection configuration
-      pg_connect("service=testdb");
-
-      @see  https://www.postgresql.org/docs/9.6/static/libpq-pgservice.html
-    */
 
 
     /**
