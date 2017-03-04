@@ -19,6 +19,8 @@ use const rosasurfer\PHP_TYPE_FLOAT;
 use const rosasurfer\PHP_TYPE_INT;
 use const rosasurfer\PHP_TYPE_STRING;
 
+use const rosasurfer\db\ID_PRIMARY;
+use const rosasurfer\db\IDX_MAPPING_COLUMN_BEHAVIOR;
 use const rosasurfer\db\IDX_MAPPING_COLUMN_NAME;
 use const rosasurfer\db\IDX_MAPPING_PHP_TYPE;
 
@@ -30,9 +32,6 @@ use const rosasurfer\db\IDX_MAPPING_PHP_TYPE;
  */
 abstract class PersistableObject extends Object {
 
-
-    /** @var int - primary key */
-    protected $id;
 
     /** @var (string)datetime - time of creation */
     protected $created;
@@ -69,16 +68,6 @@ abstract class PersistableObject extends Object {
      */
     final protected function __construct() {
         $this->created = gmDate('Y-m-d H:i:s');
-    }
-
-
-    /**
-     * Return the id (primary key) of the instance.
-     *
-     * @return int - id
-     */
-    public function getId() {
-        return $this->id;
     }
 
 
@@ -141,14 +130,19 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Whether or not the instance was already saved. If the instance was saved it has a unique id assigned to it
-     * (the primary key). If the instance was not yet saved the id is NULL. Overwrite this method if the name of the
-     * primary key is not "id".
+     * Whether or not the instance was already saved and has a unique id assigned to it (the primary key).
      *
      * @return bool
      */
     public function isPersistent() {
-        return ($this->id !== null);
+        $mapping = $this->dao()->getMapping();
+
+        // TODO: this check cannot yet handle composite primary keys
+        foreach ($mapping['columns'] as $phpName => $column) {
+            if ($column[IDX_MAPPING_COLUMN_BEHAVIOR] == ID_PRIMARY)
+                return ($this->$phpName !== null);
+        }
+        return false;
     }
 
 

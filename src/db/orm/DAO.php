@@ -9,6 +9,10 @@ use rosasurfer\db\ResultInterface    as IResult;
 use rosasurfer\exception\ConcurrentModificationException;
 use rosasurfer\exception\InvalidArgumentException;
 
+use const rosasurfer\db\ID_PRIMARY;
+use const rosasurfer\db\IDX_MAPPING_COLUMN_BEHAVIOR;
+use const rosasurfer\db\IDX_MAPPING_COLUMN_NAME;
+
 
 /**
  * DAO
@@ -174,17 +178,26 @@ abstract class DAO extends Singleton {
         if (!$object instanceof $class) throw new InvalidArgumentException('Cannot refresh instances of '.get_class($object));
         if (!$object->isPersistent())   throw new InvalidArgumentException('Cannot refresh non-persistent '.get_class($object));
 
+        // TODO: This method cannot yet handle composite primary keys.
+        // TODO: Get PK value via __get() if the getter is not defined (causes crash otherwise).
+
         $mapping   = $this->getMapping();
         $tablename = $mapping['table'];
-        $id        = $object->getId();
+
+        foreach ($mapping['columns'] as $phpName => $column) {
+            if ($column[IDX_MAPPING_COLUMN_BEHAVIOR] == ID_PRIMARY) {
+                $columnName = $column[IDX_MAPPING_COLUMN_NAME];
+                break;
+            }
+        }
+        $id = $object->{'get'.$phpName}();
 
         $sql = "select *
                  from $tablename
-                 where id = $id";
+                 where $columnName = $id";
         $instance = $this->findOne($sql);
 
-        if (!$instance) throw new ConcurrentModificationException('Error refreshing '.get_class($object).' ('.$id.'), data row not found');
-
+        if (!$instance) throw new ConcurrentModificationException('Error refreshing '.get_class($object).' ('.$id.'), data record not found');
         return $instance;
     }
 }
