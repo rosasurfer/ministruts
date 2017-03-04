@@ -29,9 +29,6 @@ use const rosasurfer\PHP_TYPE_STRING;
 abstract class PersistableObject extends Object {
 
 
-    /** @var (string)datetime - time of last modification */
-    protected $version;
-
     /** @var (string)datetime - time of soft deletion */
     protected $deleted;
 
@@ -72,22 +69,19 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Return the version string of the instance. The default implementation returns the last modification time.
-     *
-     * @return string - version
-     */
-    public function getVersion() {
-        return $this->version;
-    }
-
-
-    /**
      * Update the version string of the instance and return it.
      *
-     * @return string - version
+     * @return string|null - version string or NULL if the model has no version field
      */
     protected function touch() {
-        return $this->version = gmDate('Y-m-d H:i:s');
+        $mapping = $this->dao()->getMapping();
+
+        foreach ($mapping['columns'] as $phpName => $column) {
+            if ($column[IDX_MAPPING_COLUMN_BEHAVIOR] == ID_VERSION) {
+                return $this->$phpName = gmDate('Y-m-d H:i:s');
+            }
+        }
+        return null;
     }
 
 
