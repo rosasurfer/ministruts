@@ -5,10 +5,10 @@ use rosasurfer\core\Object;
 
 use rosasurfer\db\ConnectionPool;
 use rosasurfer\db\ConnectorInterface as IConnector;
+use rosasurfer\db\MultipleRowsException;
 use rosasurfer\db\ResultInterface    as IResult;
 
 use const rosasurfer\ARRAY_ASSOC;
-use rosasurfer\db\MultipleRowsException;
 
 
 /**

@@ -1,6 +1,7 @@
 <?php
 namespace rosasurfer\db\orm;
 
+
 use rosasurfer\core\Object;
 use rosasurfer\core\Singleton;
 
@@ -18,11 +19,6 @@ use const rosasurfer\PHP_TYPE_BOOL;
 use const rosasurfer\PHP_TYPE_FLOAT;
 use const rosasurfer\PHP_TYPE_INT;
 use const rosasurfer\PHP_TYPE_STRING;
-
-use const rosasurfer\db\ID_PRIMARY;
-use const rosasurfer\db\IDX_MAPPING_COLUMN_BEHAVIOR;
-use const rosasurfer\db\IDX_MAPPING_COLUMN_NAME;
-use const rosasurfer\db\IDX_MAPPING_PHP_TYPE;
 
 
 /**

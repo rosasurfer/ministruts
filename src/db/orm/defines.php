@@ -2,7 +2,7 @@
 /**
  * Package constants
  */
-namespace rosasurfer\db;
+namespace rosasurfer\db\orm;
 
 
 // PHP to SQL serialization types (PHP value representation in a SQL statement)
@@ -50,7 +50,7 @@ const BIND_TYPE_SET = 7;          // TODO
  */
 
 
-// Column behaviour identifiers
+// Column mark identifiers
 
 /**
  * Identifier for a column being part of the primary key.

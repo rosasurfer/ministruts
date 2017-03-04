@@ -16,7 +16,7 @@ define('rosasurfer\MINISTRUTS_ROOT', dirName(__DIR__));
 
 // Include helper functions and constants which can't be auto-loaded.
 require(MINISTRUTS_ROOT.'/src/helpers.php');
-require(MINISTRUTS_ROOT.'/src/db/defines.php');
+require(MINISTRUTS_ROOT.'/src/db/orm/defines.php');
 require(MINISTRUTS_ROOT.'/src/ministruts/defines.php');
 
 

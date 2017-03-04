@@ -9,10 +9,6 @@ use rosasurfer\db\ResultInterface    as IResult;
 use rosasurfer\exception\ConcurrentModificationException;
 use rosasurfer\exception\InvalidArgumentException;
 
-use const rosasurfer\db\ID_PRIMARY;
-use const rosasurfer\db\IDX_MAPPING_COLUMN_BEHAVIOR;
-use const rosasurfer\db\IDX_MAPPING_COLUMN_NAME;
-
 
 /**
  * DAO
