@@ -184,6 +184,8 @@ abstract class DAO extends Singleton {
         $mapping   = $this->getMapping();
         $tablename = $mapping['table'];
 
+        $phpName = $columnName = null;
+
         foreach ($mapping['columns'] as $phpName => $column) {
             if ($column[IDX_MAPPING_COLUMN_BEHAVIOR] == ID_PRIMARY) {
                 $columnName = $column[IDX_MAPPING_COLUMN_NAME];
