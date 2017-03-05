@@ -12,7 +12,6 @@ use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\UnimplementedFeatureException;
 
 use rosasurfer\log\Logger;
-use rosasurfer\util\Date;
 
 use const rosasurfer\PHP_TYPE_ARRAY;
 use const rosasurfer\PHP_TYPE_BOOL;
@@ -28,9 +27,6 @@ use const rosasurfer\PHP_TYPE_STRING;
  */
 abstract class PersistableObject extends Object {
 
-
-    /** @var (string)datetime - time of soft deletion */
-    protected $deleted;
 
     /** @var bool - current modification status (dirty checking) */
     protected $modified = false;
@@ -86,26 +82,19 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Return the soft deletion time of the instance (if applicable).
-     *
-     * @param  string $format - format as used by date($format, $timestamp)
-     *
-     * @return string - deletion time
-     */
-    public function getDeleted($format = 'Y-m-d H:i:s')  {
-        if ($format == 'Y-m-d H:i:s')
-            return $this->deleted;
-        return Date::format($this->deleted, $format);
-    }
-
-
-    /**
      * Whether or not the instance is marked as "soft deleted".
      *
      * @return bool
      */
     public function isDeleted() {
-        return ($this->deleted !== null);
+        $mapping = $this->dao()->getMapping();
+
+        foreach ($mapping['columns'] as $phpName => $column) {
+            if ($column[IDX_MAPPING_COLUMN_BEHAVIOR] == ID_DELETE) {
+                return ($this->$phpName !== null);
+            }
+        }
+        return false;
     }
 
 
