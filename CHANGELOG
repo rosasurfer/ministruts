@@ -1,4 +1,10 @@
 
+2017-03-05
+
+   - db/orm: extend model mappings by SQL bind types and column behaviors
+   - db/orm: move properties PersistableObject::${primary-key|created|updated|deleted} to model classes 
+
+
 2017-03-02
 
    - db/pgsql/PostgresConnector: skip unsupported connection options
