@@ -714,6 +714,26 @@ function strToBool($value) {
 
 
 /**
+ * Replace multiple consecutive white space characters in a string by a single one.
+ *
+ * @param  string $string    - string to process
+ * @param  bool   $joinLines - whether or not to always return a single line result (default: yes)
+ *
+ * @return string
+ */
+function strCollapseWhiteSpace($string, $joinLines=true) {
+    if (!is_string($string))  throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+    if (!is_bool($joinLines)) throw new IllegalTypeException('Illegal type of parameter $joinLines: '.getType($joinLines));
+
+    $string = normalizeEOL($string);
+    if ($joinLines) {
+        $string = str_replace(EOL_UNIX, ' ', $string);
+    }
+    return preg_replace('/\s+/', ' ', $string);
+}
+
+
+/**
  * Normalize line endings of a string. If the string contains mixed line endings the number of lines of the original
  * and the resulting string may differ. Netscape line endings are honored only if all line endings are Netscape format
  * (no mixed mode).
