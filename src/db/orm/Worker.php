@@ -6,9 +6,10 @@ use rosasurfer\core\Object;
 use rosasurfer\db\ConnectionPool;
 use rosasurfer\db\ConnectorInterface as IConnector;
 use rosasurfer\db\MultipleRowsException;
-use rosasurfer\db\ResultInterface    as IResult;
+use rosasurfer\db\ResultInterface as IResult;
 
 use const rosasurfer\ARRAY_ASSOC;
+use const rosasurfer\NL;
 
 
 /**
@@ -21,13 +22,13 @@ class Worker extends Object {
 
 
     /** @var DAO - DAO of the Worker's model class */
-    private   $dao;
+    private $dao;
 
     /** @var string - class name of the Worker's model */
     protected $entityClass;
 
     /** @var IConnector - database adapter of the Worker's model */
-    private   $connector;
+    private $connector;
 
 
     /**
@@ -84,7 +85,51 @@ class Worker extends Object {
      * @return IResult
      */
     public function query($sql) {
+        $sql = $this->translateQuery($sql);
         return $this->getConnector()->query($sql);
+    }
+
+
+    /**
+     * Translate OOP identifiers in a SQL query into their DBMS counterparts.
+     *
+     * @param  string $sql - original SQL query
+     *
+     * @return string - translated SQL query
+     */
+    private function translateQuery($sql) {
+        $table = $this->dao->getMapping()['table'];
+
+        // string literal pattern
+        //$pattern = '/[\'"][^\'"]*[\'"]/';
+        //if (preg_match_all($pattern, $sql, $matches, PREG_OFFSET_CAPTURE)) {
+        //    echoPre($matches);
+        //    //$tmp = [];
+        //    //foreach ($matches[1] as $match) {
+        //    //    $tmp[$match[1]] = $match[0];
+        //    //};
+        //    //$matches = $tmp;
+        //    //echoPre('found string literals:');
+        //    //echoPre($matches);
+        //}
+
+        // class name pattern
+        //$pattern = '/[^:]:([a-z_]\w*)\b/i';
+        //if (preg_match_all($pattern, $sql, $matches, PREG_OFFSET_CAPTURE)) {
+        //    $tmp = [];
+        //    foreach ($matches[1] as $match) {
+        //        $tmp[$match[1]] = "'".$match[0]."'";
+        //    };
+        //    $matches = $tmp;
+        //    echoPre(NL.'classes:');
+        //    echoPre($matches);
+        //}
+
+        // self pattern
+        $pattern = '/([^:])(:self)\b/';
+        $result = preg_replace($pattern, '$1'.$table, $sql);
+
+        return $result;
     }
 
 

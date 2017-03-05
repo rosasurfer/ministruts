@@ -177,9 +177,7 @@ abstract class DAO extends Singleton {
         // TODO: This method cannot yet handle composite primary keys.
         // TODO: Get PK value via __get() if the getter is not defined (causes crash otherwise).
 
-        $mapping   = $this->getMapping();
-        $tablename = $mapping['table'];
-
+        $mapping = $this->getMapping();
         $phpName = $columnName = null;
 
         foreach ($mapping['columns'] as $phpName => $column) {
@@ -191,7 +189,7 @@ abstract class DAO extends Singleton {
         $id = $object->{'get'.$phpName}();
 
         $sql = "select *
-                 from $tablename
+                 from :self
                  where $columnName = $id";
         $instance = $this->findOne($sql);
 
