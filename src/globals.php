@@ -462,7 +462,7 @@ function strToBool($value) {
 
 
 /**
- * Normalize line endings in a string. If the string contains mixed line endings the number of lines of the original
+ * Normalize line endings of a string. If the string contains mixed line endings the number of lines of the original
  * and the resulting string may differ. Netscape line endings are honored only if all line endings are Netscape format
  * (no mixed mode).
  *
