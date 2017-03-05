@@ -31,7 +31,6 @@ class HeaderUtils extends StaticClass {
                 if (!$found || $matches[0][1]==$request->getHostname())     // SID anhaengen
                     $url .= (strContains($url, '?') ? '&':'?').SID;
             }
-            session_write_close();
         }
         // TODO: QueryString muss kodiert werden
         header('Location: '.$url);

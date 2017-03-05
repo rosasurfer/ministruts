@@ -196,6 +196,11 @@ class PHP extends StaticClass {
         // TODO: check "session.save_path"
         /*PHP_INI_ALL   */ if (       ini_get     ('session.serialize_handler') != 'php')                           $issues[] = 'Info:  session.serialize_handler is not "php": "'.ini_get('session.serialize_handler').'"';
         /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('session.auto_start'))                                           $issues[] = 'Info:  session.auto_start is not Off  [performance]';
+        /*
+        Caution: If you turn on session.auto_start then the only way to put objects into your sessions is to load its class
+                 definition using auto_prepend_file in which you load the class definition else you will have to serialize()
+                 your object and unserialize() it afterwards.
+        */
         if (PHP_VERSION_ID < 50400) {
             /*PHP_INI_ALL*/ if ( self::ini_get_bool('session.bug_compat_42')) {                                      $issues[] = 'Info:  session.bug_compat_42 is not Off';
             /*PHP_INI_ALL*/ if (!self::ini_get_bool('session.bug_compat_warn'))                                      $issues[] = 'Info:  session.bug_compat_warn is not On';
