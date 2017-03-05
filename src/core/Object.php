@@ -2,9 +2,7 @@
 namespace rosasurfer\core;
 
 use rosasurfer\di\DiAwareTrait;
-
 use rosasurfer\exception\RuntimeException;
-use rosasurfer\exception\UnimplementedFeatureException;
 
 use function rosasurfer\strLeftTo;
 use function rosasurfer\strRightFrom;
@@ -16,14 +14,6 @@ use function rosasurfer\strRightFrom;
 class Object {
 
     use DiAwareTrait;
-
-
-    /**
-     *
-     */
-    public static function di() {
-        throw new UnimplementedFeatureException(__METHOD__);
-    }
 
 
     /**

@@ -1,20 +1,23 @@
 <?php
 namespace rosasurfer\di;
 
-use rosasurfer\core\Object;
+use rosasurfer\exception\UnimplementedFeatureException;
 
 
 /**
- * Interface for dependency injection aware classes. A custom class extending {@link Object} automatically becomes DI aware.
- * All framework classes inherit from it.
+ * A trait providing access to the currently registered dependency container.
+ * All classes extending {@link Object} are DI aware.
  */
-interface DiAwareInterface {
+trait DiAwareTrait {
 
 
     /**
      * Return the currently registered dependency injection container.
      *
-     * @return Object
+     * @return null
      */
-    public static function di();
+    public static function di() {
+        //echoPre(__TRAIT__);
+        throw new UnimplementedFeatureException(__METHOD__);
+    }
 }

@@ -55,7 +55,7 @@ return array(
     'rosasurfer\\dependency\\ChainedDependency' => $baseDir . '/src/dependency/ChainedDependency.php',
     'rosasurfer\\dependency\\Dependency' => $baseDir . '/src/dependency/Dependency.php',
     'rosasurfer\\dependency\\FileDependency' => $baseDir . '/src/dependency/FileDependency.php',
-    'rosasurfer\\di\\DiAwareInterface' => $baseDir . '/src/di/DiAwareInterface.php',
+    'rosasurfer\\di\\DiAwareTrait' => $baseDir . '/src/di/DiAwareTrait.php',
     'rosasurfer\\exception\\BusinessRuleException' => $baseDir . '/src/exception/BusinessRuleException.php',
     'rosasurfer\\exception\\ClassNotFoundException' => $baseDir . '/src/exception/ClassNotFoundException.php',
     'rosasurfer\\exception\\ConcurrentModificationException' => $baseDir . '/src/exception/ConcurrentModificationException.php',

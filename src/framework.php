@@ -7,7 +7,7 @@
 namespace rosasurfer;
 
 use rosasurfer\core\Object;
-use rosasurfer\di\DiAwareInterface;
+use rosasurfer\di\DiAwareTrait;
 use rosasurfer\loader\ClassLoader;
 
 
@@ -42,9 +42,9 @@ function registerClassLoader() {
     // create a bootstrap loader for the class rosasurfer\loader\ClassLoader
     $bootstrap = function($class) {
         switch ($class) {
-            case Object::class:           require(MINISTRUTS_ROOT.'/src/core/Object.php'        ); break;
-            case DiAwareInterface::class: require(MINISTRUTS_ROOT.'/src/di/DiAwareInterface.php'); break;
-            case ClassLoader::class:      require(MINISTRUTS_ROOT.'/src/loader/ClassLoader.php' ); break;
+            case Object      ::class: require(MINISTRUTS_ROOT.'/src/core/Object.php'       ); break;
+            case DiAwareTrait::class: require(MINISTRUTS_ROOT.'/src/di/DiAwareTrait.php'   ); break;
+            case ClassLoader ::class: require(MINISTRUTS_ROOT.'/src/loader/ClassLoader.php'); break;
         }
     };
     spl_autoload_register($bootstrap, $throw=true, $prepend=true);
