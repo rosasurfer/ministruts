@@ -3,6 +3,7 @@
 
    - db/orm: extend model mappings by SQL bind types and column behaviors
    - db/orm: move properties PersistableObject::${primary-key|created|updated|deleted} to model classes 
+   - replace di/DiAwareInterface by di/DiAwareTrait
 
 
 2017-03-02
