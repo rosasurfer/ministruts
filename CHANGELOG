@@ -3,7 +3,9 @@
 
    - db/orm: extend model mappings by SQL bind types and column behaviors
    - db/orm: move properties PersistableObject::${primary-key|created|updated|deleted} to model classes 
+   - db/orm: quick and dirty query substitution of model names by table names 
    - replace di/DiAwareInterface by di/DiAwareTrait
+   - add helper function rosasurfer\strCollapseWhiteSpace()
 
 
 2017-03-02
