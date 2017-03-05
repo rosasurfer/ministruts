@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\core;
 
-use rosasurfer\di\DiAwareInterface;
+use rosasurfer\di\DiAwareTrait;
 
 use rosasurfer\exception\RuntimeException;
 use rosasurfer\exception\UnimplementedFeatureException;
@@ -13,15 +13,16 @@ use function rosasurfer\strRightFrom;
 /**
  * Super class for all "rosasurfer" classes
  */
-class Object implements DiAwareInterface {
+class Object {
+
+    use DiAwareTrait;
 
 
     /**
      *
      */
     public static function di() {
-        echoPre(__METHOD__);
-        //throw new UnimplementedFeatureException(__METHOD__);
+        throw new UnimplementedFeatureException(__METHOD__);
     }
 
 
