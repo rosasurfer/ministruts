@@ -192,9 +192,9 @@ abstract class PersistableObject extends Object {
      * rows originating from database queries to objects of the respective model class.
      *
      * @param  string $class - class name of the model
-     * @param  array  $row   - array with property values (typically a row from a database table)
-     *
-     * @return self
+     * @param  array  $row   - array with property values (typically a row from a database table);
+     *                         NULL for a row where the identity field is NULL
+     * @return self|null
      */
     public static function createInstance($class, array $row) {
         if (static::class != __CLASS__) throw new IllegalAccessException('Cannot access method '.__METHOD__.'() from a model class.');
