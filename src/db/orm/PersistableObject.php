@@ -207,7 +207,12 @@ abstract class PersistableObject extends Object {
         foreach ($mappings['columns'] as $phpName => $mapping) {
             $column = strToLower($mapping[IDX_MAPPING_COLUMN_NAME]);
 
-            if ($row[$column] !== null) {
+            if ($row[$column] === null) {
+                if ($mapping[IDX_MAPPING_COLUMN_BEHAVIOR] == ID_PRIMARY) {  // if the column identity is NULL it's an empty row
+                    return null;
+                }
+            }
+            else {
                 $phpType = $mapping[IDX_MAPPING_PHP_TYPE];
 
                 switch ($phpType) {

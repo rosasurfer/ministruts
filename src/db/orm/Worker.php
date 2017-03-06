@@ -160,7 +160,7 @@ class Worker extends Object {
 
         // TODO: Lookup and return existing instances instead of copies.
 
-        $instances = array();
+        $instances = [];
         while ($row = $result->fetchNext(ARRAY_ASSOC)) {
             $instances[] = PersistableObject::createInstance($this->entityClass, $row);
         }
