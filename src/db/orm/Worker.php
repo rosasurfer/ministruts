@@ -113,7 +113,7 @@ class Worker extends Object {
                     $table = $className::dao()->getMapping()['table'];
                     $sql   = substr_replace($sql, $table, $offset-1, strLen($modelName)+1);
                 }
-            };
+            }
         }
         return $sql;
     }

@@ -188,9 +188,9 @@ abstract class DAO extends Singleton {
         }
         $id = $object->{'get'.$phpName}();
 
-        $sql = "select *
-                 from $mapping[table]
-                 where $columnName = $id";
+        $sql = 'select *
+                 from '.$mapping['table'].'
+                 where '.$columnName.' = '.$id;
         $instance = $this->findOne($sql);
 
         if (!$instance) throw new ConcurrentModificationException('Error refreshing '.get_class($object).' ('.$id.'), data record not found');
