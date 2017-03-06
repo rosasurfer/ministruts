@@ -189,7 +189,7 @@ abstract class DAO extends Singleton {
         $id = $object->{'get'.$phpName}();
 
         $sql = "select *
-                 from :self
+                 from $mapping[table]
                  where $columnName = $id";
         $instance = $this->findOne($sql);
 

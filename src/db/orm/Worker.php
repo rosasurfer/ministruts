@@ -8,8 +8,9 @@ use rosasurfer\db\ConnectorInterface as IConnector;
 use rosasurfer\db\MultipleRowsException;
 use rosasurfer\db\ResultInterface as IResult;
 
+use function rosasurfer\strLeftTo;
+
 use const rosasurfer\ARRAY_ASSOC;
-use const rosasurfer\NL;
 
 
 /**
@@ -91,45 +92,30 @@ class Worker extends Object {
 
 
     /**
-     * Translate OOP identifiers in a SQL query into their DBMS counterparts.
+     * Translate model names in a SQL query into their DBMS table counterparts. At the moment this translation works only
+     * for models in the same namespace as the worker's model class.
      *
      * @param  string $sql - original SQL query
      *
      * @return string - translated SQL query
      */
     private function translateQuery($sql) {
-        $table = $this->dao->getMapping()['table'];
+        // model name pattern: ":User" => "t_user" (will also convert matching names in literals and comments)
+        $pattern = '/[^:]:([a-z_]\w*)\b/i';
+        if (preg_match_all($pattern, $sql, $matches, PREG_OFFSET_CAPTURE)) {
+            $namespace = strLeftTo($this->entityClass, '\\', -1, true, '');
 
-        // string literal pattern
-        //$pattern = '/[\'"][^\'"]*[\'"]/';
-        //if (preg_match_all($pattern, $sql, $matches, PREG_OFFSET_CAPTURE)) {
-        //    echoPre($matches);
-        //    //$tmp = [];
-        //    //foreach ($matches[1] as $match) {
-        //    //    $tmp[$match[1]] = $match[0];
-        //    //};
-        //    //$matches = $tmp;
-        //    //echoPre('found string literals:');
-        //    //echoPre($matches);
-        //}
-
-        // class name pattern
-        //$pattern = '/[^:]:([a-z_]\w*)\b/i';
-        //if (preg_match_all($pattern, $sql, $matches, PREG_OFFSET_CAPTURE)) {
-        //    $tmp = [];
-        //    foreach ($matches[1] as $match) {
-        //        $tmp[$match[1]] = "'".$match[0]."'";
-        //    };
-        //    $matches = $tmp;
-        //    echoPre(NL.'classes:');
-        //    echoPre($matches);
-        //}
-
-        // self pattern
-        $pattern = '/([^:])(:self)\b/';
-        $result = preg_replace($pattern, '$1'.$table, $sql);
-
-        return $result;
+            foreach (array_reverse($matches[1]) as $match) {
+                $modelName = $match[0];
+                $offset    = $match[1];
+                $className = $namespace.$modelName;
+                if (is_a($className, PersistableObject::class, true)) {
+                    $table = $className::dao()->getMapping()['table'];
+                    $sql   = substr_replace($sql, $table, $offset-1, strLen($modelName)+1);
+                }
+            };
+        }
+        return $sql;
     }
 
 
