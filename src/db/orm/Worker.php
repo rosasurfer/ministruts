@@ -48,7 +48,7 @@ class Worker extends Object {
     /**
      * Find a single matching record and convert it to an object of the model class.
      *
-     * @param  string $query     - SQL query
+     * @param  string $query     - SQL query, may contain ORM syntax
      * @param  bool   $allowMany - whether or not the query is allowed to return a multi-row result (default: no)
      *
      * @return PersistableObject|null
@@ -68,7 +68,7 @@ class Worker extends Object {
     /**
      * Find all matching records and convert them to objects of the model class.
      *
-     * @param  string $query - SQL query
+     * @param  string $query - SQL query, may contain ORM syntax
      *
      * @return PersistableObject[]
      */
@@ -79,15 +79,30 @@ class Worker extends Object {
 
 
     /**
-     * Execute a SQL statement and return the result. This method should be used if the SQL statement returns rows.
+     * Execute a SQL statement and return the result. This method should be used for SQL statements returning rows.
      *
-     * @param  string $sql - SQL statement
+     * @param  string $sql - SQL statement, may contain ORM syntax
      *
      * @return IResult
      */
     public function query($sql) {
         $sql = $this->translateQuery($sql);
         return $this->getConnector()->query($sql);
+    }
+
+
+    /**
+     * Execute a SQL statement and skip potential result set processing. This method should be used for SQL statements not
+     * returning rows.
+     *
+     * @param  string $sql - SQL statement, may contain ORM syntax
+     *
+     * @return self
+     */
+    public function execute($sql) {
+        $sql = $this->translateQuery($sql);
+        $this->getConnector()->execute($sql);
+        return $this;
     }
 
 
