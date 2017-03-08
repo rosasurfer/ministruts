@@ -1,4 +1,9 @@
 
+2017-03-08
+
+   - db/orm: add method DAO::execute() for execution of arbitrary OQL statements
+   
+
 2017-03-05
 
    - db/orm: extend model mappings by SQL bind types and column behaviors
