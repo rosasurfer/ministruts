@@ -142,7 +142,9 @@ class Worker extends Object {
      * @return PersistableObject|null - instance or NULL if the result doesn't hold any more rows
      */
     protected function makeObject(IResult $result) {
-        // TODO: Lookup and return an existing instance instead of a copy.
+
+        // TODO: Prefer to return existing instance from IdentityMap
+
         $row = $result->fetchNext(ARRAY_ASSOC);
         if ($row)
             return PersistableObject::createInstance($this->entityClass, $row);
@@ -159,7 +161,7 @@ class Worker extends Object {
      */
     protected function makeObjects(IResult $result) {
 
-        // TODO: Lookup and return existing instances instead of copies.
+        // TODO: Prefer to return existing instances from IdentityMap
 
         $instances = [];
         while ($row = $result->fetchNext(ARRAY_ASSOC)) {
