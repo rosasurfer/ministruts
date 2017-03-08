@@ -11,8 +11,6 @@ use rosasurfer\exception\IllegalAccessException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\UnimplementedFeatureException;
 
-use rosasurfer\log\Logger;
-
 use const rosasurfer\PHP_TYPE_ARRAY;
 use const rosasurfer\PHP_TYPE_BOOL;
 use const rosasurfer\PHP_TYPE_FLOAT;
@@ -130,7 +128,7 @@ abstract class PersistableObject extends Object {
      *
      * @return self
      */
-    final public function save() {
+    public function save() {
         if (!$this->isPersistent()) {
             $this->insert();
         }
@@ -138,9 +136,9 @@ abstract class PersistableObject extends Object {
             $this->update();
         }
         else {
-            //Logger::log('Nothing to save, '.get_class($this).' instance is in sync with the database.', L_NOTICE);
+            // nothing to save, the instance should be in sync with the database
         }
-        $this->updateLinks();
+        $this->updateRelations();
         $this->modified = false;
 
         return $this;
@@ -168,11 +166,11 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Update the relational cross-links of the instance. Must be implemented by the actual class.
+     * Update the relations of the instance. Must be implemented by the actual class.
      *
      * @return self
      */
-    protected function updateLinks() {
+    protected function updateRelations() {
         return $this;
     }
 

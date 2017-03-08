@@ -157,7 +157,7 @@ abstract class DAO extends Singleton {
      *
      * @param  string $value - value to escape
      *
-     * @return string - escaped and quoted string value
+     * @return scalar - escaped and quoted string or scalar value if the value was not a string
      */
     public function escapeLiteral($value) {
         return $this->db()->escapeLiteral($value);
@@ -169,7 +169,7 @@ abstract class DAO extends Singleton {
      *
      * @param  string $value - value to escape
      *
-     * @return string - escaped but not quoted string value
+     * @return string|null - escaped but unquoted string or NULL if the value was NULL
      */
     public function escapeString($value) {
         return $this->db()->escapeString($value);
