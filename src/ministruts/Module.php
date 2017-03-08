@@ -103,28 +103,16 @@ class Module extends Object {
      */
     protected function loadConfiguration($fileName) {
         if (!is_file($fileName)) throw new StrutsConfigException('Configuration file not found: "'.$fileName.'"');
-        $content = file_get_contents($fileName, false);
 
-        /**
-         * @todo struts-config.xml ohne Verzeichniswechsel validieren
-         *
-         * @see  http://xmlwriter.net/xml_guide/doctype_declaration.shtml
-         * @see  DTD to XML schema  https://www.w3.org/2000/04/schema_hack/
-         * @see  DTD to XML schema  http://www.xmlutilities.net/
-         */
-
-        // ins DTD-Verzeichnis wechseln: "./xml"
-        $workingDir = getCwd();
-        $dtdDir     = __DIR__.'/xml';
-        chDir($dtdDir);
+        $content = file_get_contents($fileName);
+        $search  = '<!DOCTYPE struts-config SYSTEM "struts-config.dtd">';
+        $offset  = strPos($content, $search);
+        $dtd     = str_replace('\\', '/', __DIR__.'/xml/struts-config.dtd');
+        $replace = '<!DOCTYPE struts-config SYSTEM "file:///'.$dtd.'">';
+        $content = substr_replace($content, $replace, $offset, strLen($search));
 
         // Konfiguration parsen und validieren
-        $xml = new \SimpleXMLElement($content, LIBXML_DTDVALID);
-
-        // zurueck ins Ausgangsverzeichnis wechseln
-        chDir($workingDir);
-
-        return $xml;
+        return new \SimpleXMLElement($content, LIBXML_DTDVALID);
     }
 
 
