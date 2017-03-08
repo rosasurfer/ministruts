@@ -8,7 +8,6 @@ use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\exception\RuntimeException;
 
 use function rosasurfer\strContains;
-use function rosasurfer\strContainsI;
 use function rosasurfer\strStartsWithI;
 
 
@@ -498,7 +497,7 @@ class PostgresConnector extends Connector {
                     $this->lastInsertId = $this->query("select lastVal()")->fetchInt();
                 }
                 catch (\Exception $ex) {
-                    if (!strContainsI($ex->getMessage(), 'ERROR:  lastval is not yet defined in this session'))
+                    if (striPos($ex->getMessage(), 'ERROR:  lastval is not yet defined in this session') === false)
                         throw $ex;
                     $this->lastInsertId = 0;
                 }
