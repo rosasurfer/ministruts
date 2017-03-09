@@ -100,7 +100,7 @@ foreach ($domains as $domain => $domainValues) {
                 if ($result == '0.0.0.0')
                     $result = 'SERVFAIL';
                 $ns = queryDNS($domain, 'NS');
-                echoPre("DNS error for      $domain:   required $type value: $value,   found: $result,   NS: $ns");
+                echoPre('DNS error for      '.$domain.':   required '.$type.' value: '.$value.',   found: '.$result.',   NS: '.$ns);
                 if ($result == 'SERVFAIL')
                     continue 2;
             }
@@ -114,7 +114,7 @@ foreach ($domains as $domain => $domainValues) {
                     if ($result == '0.0.0.0')
                         $result = 'SERVFAIL';
                     $ns = queryDNS($domain, 'NS');
-                    echoPre('DNS error for '.str_pad($subdomain, 4, ' ', STR_PAD_LEFT).".$domain:   required $type value: $value,   found: $result,   NS: $ns");
+                    echoPre('DNS error for '.str_pad($subdomain, 4, ' ', STR_PAD_LEFT).'.'.$domain.':   required '.$type.' value: '.$value.',   found: '.$result.',   NS: '.$ns);
                     if ($result == 'SERVFAIL')
                         continue 4;
                 }
@@ -132,6 +132,6 @@ foreach ($ips as $ip => $value) {
     $result = queryDNS($domain, 'PTR');
     if ($result != $value) {
         $ns = queryDNS($domain, 'NS');
-        echoPre("RDNS error for $ip:   required PTR value: $value,   found: $result,   NS: $ns");
+        echoPre('RDNS error for '.$ip.':   required PTR value: '.$value.',   found: '.$result.',   NS: '.$ns);
     }
 }
