@@ -106,8 +106,7 @@ abstract class HttpClient extends Object {
 
 
     /**
-     * Fuehrt den uebergebenen Request aus und gibt die empfangene Antwort zurueck.  Diese Methode muss
-     * von jedem Client implementiert werden.
+     * Fuehrt den uebergebenen Request aus und gibt die empfangene Antwort zurueck.
      *
      * @param  HttpRequest $request
      *

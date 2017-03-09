@@ -135,11 +135,9 @@ class CurlHttpClient extends HttpClient {
 
 
     /**
-     * Destructor. Schliesst ggf. ein noch offenes CURL-Handle
+     * Destructor. Schliesst ein ggf. noch offenes CURL-Handle.
      */
     public function __destruct() {
-        // Attempting to throw an exception from a destructor during script shutdown causes a fatal error.
-        // @see http://php.net/manual/en/language.oop5.decon.php
         try {
             if (is_resource($this->hCurl)) {
                 $hTmp=$this->hCurl; $this->hCurl=null;
@@ -174,26 +172,11 @@ class CurlHttpClient extends HttpClient {
      * @throws IOException - wenn ein Fehler auftritt
      */
     public function send(HttpRequest $request) {
+        if (!is_resource($this->hCurl))
+            $this->hCurl = curl_init();
+
         $response = CurlHttpResponse::create();
-
-        // CURL-Session initialisieren
-        !is_resource($this->hCurl) && $this->hCurl=curl_init();
-
-        // Optionen setzen, sofern sie nicht schon gesetzt sind
-        $options = $this->options;             $options[CURLOPT_URL      ] = $request->getUrl();
-        !isSet($options[CURLOPT_TIMEOUT  ]) && $options[CURLOPT_TIMEOUT  ] = $this->timeout;      // Execution-Timeout
-        !isSet($options[CURLOPT_USERAGENT]) && $options[CURLOPT_USERAGENT] = $this->userAgent;
-        !isSet($options[CURLOPT_ENCODING ]) && $options[CURLOPT_ENCODING ] = '';                  // sets all supported encodings
-
-        if (!isSet($options[CURLOPT_WRITEHEADER]))
-            if (!isSet($options[CURLOPT_HEADERFUNCTION])) $options[CURLOPT_HEADERFUNCTION] = array($response, 'writeHeader');
-        if (!isSet($options[CURLOPT_FILE]))                                                       // ein gesetztes CURLOPT_RETURNTRANSFER wird ueberschrieben
-            if (!isSet($options[CURLOPT_WRITEFUNCTION]))  $options[CURLOPT_WRITEFUNCTION ] = array($response, 'writeContent');
-
-        // zusaetzliche Header ueberschreiben automatisch generierte Header
-        foreach ($request->getHeaders() as $key => $value) {
-            $options[CURLOPT_HTTPHEADER][] = $key.': '.$value;
-        }
+        $options  = $this->prepareCurlOptions($request, $response);
 
         // CURLOPT_FOLLOWLOCATION funktioniert nur bei deaktiviertem "open_basedir"-Setting
         if (!ini_get('open_basedir')) {
@@ -232,6 +215,43 @@ class CurlHttpClient extends HttpClient {
         }
 
         return $response;
+    }
+
+
+    /**
+     * Create a cUrl options set for the request.
+     *
+     * @param  HttpRequest      $request
+     * @param  CurlHttpResponse $response
+     *
+     * @return array - resulting options
+     */
+    private function prepareCurlOptions(HttpRequest $request, CurlHttpResponse $response) {
+        $options = $this->options;
+        $options[CURLOPT_URL] = $request->getUrl();
+
+        if (!isSet($options[CURLOPT_TIMEOUT]))
+            $options[CURLOPT_TIMEOUT] = $this->timeout;         // execution timeout
+
+        if (!isSet($options[CURLOPT_USERAGENT]))
+            $options[CURLOPT_USERAGENT] = $this->userAgent;
+
+        if (!isSet($options[CURLOPT_ENCODING]))
+            $options[CURLOPT_ENCODING] = '';                    // an empty string means "all supported encodings"
+
+        if (!isSet($options[CURLOPT_WRITEHEADER]))
+            if (!isSet($options[CURLOPT_HEADERFUNCTION]))
+                $options[CURLOPT_HEADERFUNCTION] = [$response, 'writeHeader'];
+
+        if (!isSet($options[CURLOPT_FILE]))
+            if (!isSet($options[CURLOPT_WRITEFUNCTION]))        // overrides CURLOPT_RETURNTRANSFER
+                $options[CURLOPT_WRITEFUNCTION] = [$response, 'writeContent'];
+
+        foreach ($request->getHeaders() as $key => $value) {    // apply specified request headers
+            $options[CURLOPT_HTTPHEADER][] = $key.': '.$value;
+        }
+
+        return $options;
     }
 
 
