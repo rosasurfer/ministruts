@@ -1,6 +1,7 @@
 #!/usr/bin/php
 <?php
 use rosasurfer\config\Config;
+use rosasurfer\exception\InfrastructureException;
 use rosasurfer\exception\RuntimeException;
 
 use const rosasurfer\WINDOWS;
@@ -109,7 +110,7 @@ foreach ($domains as $domain => $domainValues) {
 
         foreach ($value as $subdomain => $subdomainValues) {
             foreach ($subdomainValues as $type => $value) {
-                $result = queryDNS("$subdomain.$domain", $type);
+                $result = queryDNS($subdomain.'.'.$domain, $type);
                 if ($result != $value) {
                     if ($result == '0.0.0.0')
                         $result = 'SERVFAIL';
@@ -125,7 +126,7 @@ foreach ($domains as $domain => $domainValues) {
 
 
 // Reverse-DNS der angegebenen IP-Adressen ueberpruefen
-$ips = $config->get('dns.ip', array());
+$ips = $config->get('dns.ip', []);
 
 foreach ($ips as $ip => $value) {
     $domain = join('.', array_reverse(explode('.', $ip))).'.in-addr.arpa';
