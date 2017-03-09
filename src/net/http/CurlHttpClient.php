@@ -5,9 +5,7 @@ use rosasurfer\debug\ErrorHandler;
 use rosasurfer\exception\IOException;
 use rosasurfer\log\Logger;
 
-use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_INFO;
-use const rosasurfer\L_NOTICE;
 use const rosasurfer\L_WARN;
 
 
@@ -18,14 +16,6 @@ use const rosasurfer\L_WARN;
  */
 class CurlHttpClient extends HttpClient {
 
-    /** @var bool */
-    private static $logDebug;
-
-    /** @var bool */
-    private static $logInfo;
-
-    /** @var bool */
-    private static $logNotice;
 
     /** @var resource - Curl-Handle */
     private $hCurl;
@@ -140,11 +130,6 @@ class CurlHttpClient extends HttpClient {
      * @param  array $options - Array mit zusaetzlichen CURL-Optionen (default: keine)
      */
     public function __construct(array $options=[]) {
-        $loglevel        = Logger::getLogLevel(__CLASS__);
-        self::$logDebug  = ($loglevel <= L_DEBUG );
-        self::$logInfo   = ($loglevel <= L_INFO  );
-        self::$logNotice = ($loglevel <= L_NOTICE);
-
         $this->options = $options;
     }
 
@@ -232,21 +217,18 @@ class CurlHttpClient extends HttpClient {
 
         // Request ausfuehren
         if (curl_exec($this->hCurl) === false) throw new IOException('CURL error '.self::getError($this->hCurl).', url: '.$request->getUrl());
-        $response->setStatus($status=curl_getinfo($this->hCurl, CURLINFO_HTTP_CODE));
+        $status = curl_getinfo($this->hCurl, CURLINFO_HTTP_CODE);
+        $response->setStatus($status);
 
         // ggf. manuellen Redirect ausfuehren (falls "open_basedir" aktiviert ist)
         if (($status==301 || $status==302) && $this->isFollowRedirects() && ini_get('open_basedir')) {
-            if ($this->manualRedirects >= $this->maxRedirects)
-                throw new IOException('CURL error: maxRedirects limit exceeded - '.$this->maxRedirects.', url: '.$request->getUrl());
-
-            // TODO: relative Redirects abfangen
-            // TODO: verschachtelte IOExceptions abfangen
+            if ($this->manualRedirects >= $this->maxRedirects) throw new IOException('CURL error: maxRedirects limit exceeded - '.$this->maxRedirects.', url: '.$request->getUrl());
             $this->manualRedirects++;
-            self::$logInfo && Logger::log('Performing manual redirect to: '.$response->getHeader('Location'), L_INFO);
 
-            $request  = HttpRequest::create()->setUrl($response->getHeader('Location'));
-            $me       = __FUNCTION__;
-            $response = $this->$me($request);
+            $location = $response->getHeader('Location');                       // TODO: relative Redirects abfangen
+            Logger::log('Performing manual redirect to: '.$location, L_INFO);   // TODO: verschachtelte IOExceptions abfangen
+            $request  = HttpRequest::create()->setUrl($location);
+            $response = $this->send($request);
         }
 
         return $response;
