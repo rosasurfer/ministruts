@@ -60,7 +60,7 @@ final class ConnectionPool extends Singleton {
     /**
      * Return the connector instance for the specified connection identifier.
      *
-     * @param  string $id - connection identifier
+     * @param  string|null $id - connection identifier
      *
      * @return IConnector - database adapter for the specified identifier
      */

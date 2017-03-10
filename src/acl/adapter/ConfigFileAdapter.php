@@ -19,8 +19,8 @@ class ConfigFileAdapter extends Object implements AdapterInterface {
     /**
      * Constructor
      *
-     * @param  string $file - name of the config file to read ACL settings from
-     *                        (default: the application configuration)
+     * @param  string|null $file - name of the config file to read ACL settings from
+     *                             (default: the application configuration)
      */
     public function __construct($file=null) {
         if (func_num_args()) {

@@ -12,12 +12,12 @@ interface ResultInterface {
 
 
     /**
-     * ResultInterface:Fetch the next row from the result set.
+     * Fetch the next row from the result set.
      *
      * @param  int $mode - Controls how the returned array is indexed. Can take one of the following values:
      *                     ARRAY_ASSOC, ARRAY_NUM, or ARRAY_BOTH (default).
      *
-     * @return array - array of columns or NULL if no more rows are available
+     * @return array|null - array of columns or NULL if no more rows are available
      */
     public function fetchNext($mode=ARRAY_BOTH);
 

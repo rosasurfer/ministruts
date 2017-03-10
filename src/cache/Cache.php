@@ -39,7 +39,7 @@ final class Cache extends StaticClass {
      * Gibt die Cache-Implementierung fuer den angegebenen Bezeichner zurueck. Verschiedene Bezeichner
      * stehen fuer verschiedene Cache-Implementierungen, z.B. APC-Cache, Dateisystem-Cache, MemCache.
      *
-     * @param  string $label - Bezeichner
+     * @param  string|null $label - Bezeichner
      *
      * @return CachePeer
      */

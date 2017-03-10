@@ -28,6 +28,8 @@ interface ConfigInterface {
      *
      * @param  string $key   - key
      * @param  string $value - new value
+     *
+     * @return void
      */
     public function set($key, $value);
 
