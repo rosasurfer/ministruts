@@ -197,8 +197,8 @@ class MySQLConnector extends Connector {
                     }
                     else {
                         if (!is_numeric($value))
-                            $value = "'$value'";
-                        $sql = "set $option = $value";
+                            $value = "'".$value."'";
+                        $sql = 'set '.$option.' = '.$value;
                         $this->execute($sql) || trigger_error(mysql_error($this->hConnection), E_USER_ERROR);
                     }
                 }
