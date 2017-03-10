@@ -248,28 +248,32 @@ class DebugHelper extends StaticClass {
     public static function errorLevelToStr($level) {
         if (!is_int($level)) throw new IllegalTypeException('Illegal type of parameter $level: '.getType($level));
 
-        $levels = [];
+        $levels = [
+            E_ERROR             => 'E_ERROR',                   //     1
+            E_WARNING           => 'E_WARNING',                 //     2
+            E_PARSE             => 'E_PARSE',                   //     4
+            E_NOTICE            => 'E_NOTICE',                  //     8
+            E_CORE_ERROR        => 'E_CORE_ERROR',              //    16
+            E_CORE_WARNING      => 'E_CORE_WARNING',            //    32
+            E_COMPILE_ERROR     => 'E_COMPILE_ERROR',           //    64
+            E_COMPILE_WARNING   => 'E_COMPILE_WARNING',         //   128
+            E_USER_ERROR        => 'E_USER_ERROR',              //   256
+            E_USER_WARNING      => 'E_USER_WARNING',            //   512
+            E_USER_NOTICE       => 'E_USER_NOTICE',             //  1024
+            E_STRICT            => 'E_STRICT',                  //  2048
+            E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',       //  4096
+            E_DEPRECATED        => 'E_DEPRECATED',              //  8192
+            E_USER_DEPRECATED   => 'E_USER_DEPRECATED',         // 16384
+        ];
 
-        if (!$level)                          $levels[] = '0';                      //  zero
+        if     (!$level)                  $levels = ['0'];      //  zero
+        else if ($level & E_ALL == E_ALL) $levels = ['E_ALL'];  // 32767
         else {
-            if ($level & E_ERROR            ) $levels[] = 'E_ERROR';                //     1
-            if ($level & E_WARNING          ) $levels[] = 'E_WARNING';              //     2
-            if ($level & E_PARSE            ) $levels[] = 'E_PARSE';                //     4
-            if ($level & E_NOTICE           ) $levels[] = 'E_NOTICE';               //     8
-            if ($level & E_CORE_ERROR       ) $levels[] = 'E_CORE_ERROR';           //    16
-            if ($level & E_CORE_WARNING     ) $levels[] = 'E_CORE_WARNING';         //    32
-            if ($level & E_COMPILE_ERROR    ) $levels[] = 'E_COMPILE_ERROR';        //    64
-            if ($level & E_COMPILE_WARNING  ) $levels[] = 'E_COMPILE_WARNING';      //   128
-            if ($level & E_USER_ERROR       ) $levels[] = 'E_USER_ERROR';           //   256
-            if ($level & E_USER_WARNING     ) $levels[] = 'E_USER_WARNING';         //   512
-            if ($level & E_USER_NOTICE      ) $levels[] = 'E_USER_NOTICE';          //  1024
-            if ($level & E_STRICT           ) $levels[] = 'E_STRICT';               //  2048
-            if ($level & E_RECOVERABLE_ERROR) $levels[] = 'E_RECOVERABLE_ERROR';    //  4096
-            if ($level & E_DEPRECATED       ) $levels[] = 'E_DEPRECATED';           //  8192
-            if ($level & E_USER_DEPRECATED  ) $levels[] = 'E_USER_DEPRECATED';      // 16384
-            if ($level & E_ALL == E_ALL     ) $levels   = ['E_ALL'];                // 32767
+            foreach ($levels as $key => $value) {
+                if ($level & $key) continue;
+                unset($levels[$key]);
+            }
         }
-
         return join('|', $levels);
     }
 }
