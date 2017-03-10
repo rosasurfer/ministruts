@@ -3,6 +3,8 @@ namespace rosasurfer\core;
 
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
+use function rosasurfer\is_class;
+use rosasurfer\exception\ClassNotFoundException;
 
 
 /**
@@ -40,6 +42,8 @@ abstract class Singleton extends Object {
         if (isSet($currentCreations[$class]))
             throw new RuntimeException('Infinite loop: recursive call to '.__METHOD__."($class) detected");
         $currentCreations[$class] = true;
+
+        if (!is_class($class)) throw new ClassNotFoundException('Class not found: '.$class );
 
         // Parameter ermitteln
         $args = null;
