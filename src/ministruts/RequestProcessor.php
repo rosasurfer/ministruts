@@ -64,27 +64,23 @@ class RequestProcessor extends Object {
         $this->processSession($request);
 
 
-        // ggf. Locale setzen
-        $this->processLocale($request);
-
-
         // ActionMessages aus der Session loeschen
         $this->processCachedActionMessages($request);
 
 
         // Mapping fuer den Request ermitteln: wird kein Mapping gefunden, generiert die Methode einen 404-Fehler
-        $mapping = $this->processMapping($request, $response);
+        $mapping = $this->processMapping($request);
         if (!$mapping)
             return;
 
 
         // Methodenbeschraenkungen des Mappings pruefen: wird der Zugriff verweigert, generiert die Methode einen 405-Fehler
-        if (!$this->processMethod($request, $response, $mapping))
+        if (!$this->processMethod($request, $mapping))
             return;
 
 
         // benoetigte Rollen ueberpruefen
-        if (!$this->processRoles($request, $response, $mapping))
+        if (!$this->processRoles($request, $mapping))
             return;
 
 
@@ -93,12 +89,12 @@ class RequestProcessor extends Object {
 
 
         // ActionForm validieren
-        if ($form && !$this->processActionFormValidate($request, $response, $mapping, $form))
+        if ($form && !$this->processActionFormValidate($request, $mapping, $form))
             return;
 
 
         // falls statt einer Action ein direkter Forward konfiguriert wurde, diesen verarbeiten
-        if (!$this->processMappingForward($request, $response, $mapping))
+        if (!$this->processMappingForward($request, $mapping))
             return;
 
 
@@ -126,17 +122,6 @@ class RequestProcessor extends Object {
         if (!$request->isSession() && $request->isSessionId()) {
             $request->getSession();
         }
-    }
-
-
-    /**
-     * Waehlt bei Bedarf ein Locale fuer den aktuellen User aus.
-     *
-     * Note: Die Auswahl eines Locale loest automatisch die Erzeugung einer HttpSession aus.
-     *
-     * @param  Request $request
-     */
-    protected function processLocale(Request $request) {
     }
 
 
@@ -196,11 +181,10 @@ class RequestProcessor extends Object {
      * erzeugt und NULL zurueckgegeben.
      *
      * @param  Request  $request
-     * @param  Response $response
      *
-     * @return ActionMapping - ActionMapping oder NULL
+     * @return ActionMapping|null - ActionMapping oder NULL
      */
-    protected function processMapping(Request $request, Response $response) {
+    protected function processMapping(Request $request) {
         // Pfad fuer die Mappingauswahl ermitteln ...
         $requestPath = '/'.trim(preg_replace('|/{2,}|', '/', $request->getPath()), '/').'/';   // normalize request path
         if ($requestPath=='//') $requestPath = '/';
@@ -272,12 +256,11 @@ PROCESS_MAPPING_ERROR_SC_404;
      * beendet wurde.
      *
      * @param  Request       $request
-     * @param  Response      $response
      * @param  ActionMapping $mapping
      *
      * @return bool
      */
-    protected function processMethod(Request $request, Response $response, ActionMapping $mapping) {
+    protected function processMethod(Request $request, ActionMapping $mapping) {
         if ($mapping->isSupportedMethod($request->getMethod()))
             return true;
 
@@ -316,12 +299,11 @@ PROCESS_METHOD_ERROR_SC_405;
      * soll, oder FALSE, wenn der Zugriff nicht gewaehrt wird und der Request beendet wurde.
      *
      * @param  Request       $request
-     * @param  Response      $response
      * @param  ActionMapping $mapping
      *
      * @return bool
      */
-    protected function processRoles(Request $request, Response $response, ActionMapping $mapping) {
+    protected function processRoles(Request $request, ActionMapping $mapping) {
         if ($mapping->getRoles() === null)
             return true;
 
@@ -378,13 +360,12 @@ PROCESS_METHOD_ERROR_SC_405;
      * wenn auf eine andere Resource weitergeleitet und der Request bereits beendet wurde.
      *
      * @param  Request       $request
-     * @param  Response      $response
      * @param  ActionMapping $mapping
      * @param  ActionForm    $form
      *
      * @return bool
      */
-    protected function processActionFormValidate(Request $request, Response $response, ActionMapping $mapping, ActionForm $form) {
+    protected function processActionFormValidate(Request $request, ActionMapping $mapping, ActionForm $form) {
         if (!$mapping->isFormValidateFirst())
             return true;
 
@@ -411,12 +392,11 @@ PROCESS_METHOD_ERROR_SC_405;
      * beendet wurde.
      *
      * @param  Request       $request
-     * @param  Response      $response
      * @param  ActionMapping $mapping
      *
      * @return bool
      */
-    protected function processMappingForward(Request $request, Response $response, ActionMapping $mapping) {
+    protected function processMappingForward(Request $request, ActionMapping $mapping) {
         $forward = $mapping->getForward();
         if (!$forward)
             return true;
