@@ -61,15 +61,15 @@ class RequestProcessor extends Object {
      */
     final public function process(Request $request, Response $response) {
         // ggf. Session starten oder fortsetzen
-        $this->processSession($request, $response);
+        $this->processSession($request);
 
 
         // ggf. Locale setzen
-        $this->processLocale($request, $response);
+        $this->processLocale($request);
 
 
         // ActionMessages aus der Session loeschen
-        $this->processCachedActionMessages($request, $response);
+        $this->processCachedActionMessages($request);
 
 
         // Mapping fuer den Request ermitteln: wird kein Mapping gefunden, generiert die Methode einen 404-Fehler
@@ -89,7 +89,7 @@ class RequestProcessor extends Object {
 
 
         // ActionForm vorbereiten
-        $form = $this->processActionFormCreate($request, $response, $mapping);
+        $form = $this->processActionFormCreate($request, $mapping);
 
 
         // ActionForm validieren
@@ -103,29 +103,28 @@ class RequestProcessor extends Object {
 
 
         // Action erzeugen (Form und Mapping werden schon hier uebergeben, damit User-Code einfacher wird)
-        $action = $this->processActionCreate($request, $response, $mapping, $form);
+        $action = $this->processActionCreate($mapping, $form);
 
 
         // Action aufrufen
-        $forward = $this->processActionExecute($request, $response, $action, $form);
+        $forward = $this->processActionExecute($request, $response, $action);
         if (!$forward)
             return;
 
 
         // den zurueckgegebenen ActionForward verarbeiten
-        $this->processActionForward($request, $response, $forward);
+        $this->processActionForward($request, $forward);
     }
 
 
     /**
      * Wurde mit dem Request eine Session-ID uebertragen, wird die entsprechende HttpSession fortgesetzt.
      *
-     * @param  Request  $request
-     * @param  Response $response
+     * @param  Request $request
      */
-    protected function processSession(Request $request, Response $response) {
+    protected function processSession(Request $request) {
         if (!$request->isSession() && $request->isSessionId()) {
-            $session = $request->getSession();
+            $request->getSession();
         }
     }
 
@@ -135,10 +134,9 @@ class RequestProcessor extends Object {
      *
      * Note: Die Auswahl eines Locale loest automatisch die Erzeugung einer HttpSession aus.
      *
-     * @param  Request  $request
-     * @param  Response $response
+     * @param  Request $request
      */
-    protected function processLocale(Request $request, Response $response) {
+    protected function processLocale(Request $request) {
     }
 
 
@@ -146,13 +144,12 @@ class RequestProcessor extends Object {
      * Verschiebt ActionMessages, die in der HttpSession gespeichert sind, zurueck in den aktuellen
      * Request. Wird verwendet, um ActionMessages ueber einen Redirect hinweg uebertragen zu koennen.
      *
-     * @param  Request  $request
-     * @param  Response $response
+     * @param  Request $request
      *
      * @see    Request::setActionMessage()
      * @see    RequestProcessor::cacheActionMessages()
      */
-    protected function processCachedActionMessages(Request $request, Response $response) {
+    protected function processCachedActionMessages(Request $request) {
         if ($request->isSession()) {
             if (isSet($_SESSION[ACTION_MESSAGES_KEY])) {
                 $messages = $_SESSION[ACTION_MESSAGES_KEY];
@@ -184,7 +181,7 @@ class RequestProcessor extends Object {
         if (sizeOf($errors) == 0)
             return;
 
-        $session = $request->getSession();
+        $request->getSession();
 
         foreach ($errors as $key => $value) {
             $_SESSION[ACTION_ERRORS_KEY][$key] = $value;
@@ -248,7 +245,7 @@ class RequestProcessor extends Object {
         // konfiguriertes 404-Layout suchen
         if ($forward=$this->module->findForward((string) HttpResponse::SC_NOT_FOUND)) {
             // falls vorhanden, einbinden...
-            $this->processActionForward($request, $response, $forward);
+            $this->processActionForward($request, $forward);
         }
         else {
             // ...andererseits einfache Fehlermeldung ausgeben
@@ -293,7 +290,7 @@ PROCESS_MAPPING_ERROR_SC_404;
         // konfiguriertes 405-Layout suchen
         if ($forward=$this->module->findForward((string) HttpResponse::SC_METHOD_NOT_ALLOWED)) {
             // falls vorhanden, einbinden...
-            $this->processActionForward($request, $response, $forward);
+            $this->processActionForward($request, $forward);
         }
         else {
             // ...andererseits einfache Fehlermeldung ausgeben
@@ -332,7 +329,7 @@ PROCESS_METHOD_ERROR_SC_405;
         if (!$forward)
             return true;
 
-        $this->processActionForward($request, $response, $forward);
+        $this->processActionForward($request, $forward);
         return false;
     }
 
@@ -342,12 +339,11 @@ PROCESS_METHOD_ERROR_SC_405;
      * konfiguriert, wird NULL zurueckgegeben.
      *
      * @param  Request       $request
-     * @param  Response      $response
      * @param  ActionMapping $mapping
      *
      * @return ActionForm
      */
-    protected function processActionFormCreate(Request $request, Response $response, ActionMapping $mapping) {
+    protected function processActionFormCreate(Request $request, ActionMapping $mapping) {
         $className = $mapping->getFormClassName();
         if (!$className)
             return null;
@@ -404,7 +400,7 @@ PROCESS_METHOD_ERROR_SC_405;
         }
         if (!$forward) throw new RuntimeException('ActionForward for mapping "'.$mapping->getPath().'" not found (Module validation error?)');
 
-        $this->processActionForward($request, $response, $forward);
+        $this->processActionForward($request, $forward);
         return false;
     }
 
@@ -425,7 +421,7 @@ PROCESS_METHOD_ERROR_SC_405;
         if (!$forward)
             return true;
 
-        $this->processActionForward($request, $response, $forward);
+        $this->processActionForward($request, $forward);
         return false;
     }
 
@@ -433,14 +429,12 @@ PROCESS_METHOD_ERROR_SC_405;
     /**
      * Erzeugt und gibt die Action zurueck, die fuer das angegebene Mapping konfiguriert wurde.
      *
-     * @param  Request       $request
-     * @param  Response      $response
-     * @param  ActionMapping $mapping
-     * @param  ActionForm    $form     - ActionForm, die konfiguriert wurde oder NULL
+     * @param  ActionMapping   $mapping
+     * @param  ActionForm|null $form     - ActionForm, die konfiguriert wurde oder NULL
      *
      * @return Action
      */
-    protected function processActionCreate(Request $request, Response $response, ActionMapping $mapping, ActionForm $form=null) {
+    protected function processActionCreate(ActionMapping $mapping, ActionForm $form=null) {
         $className = $mapping->getActionClassName();
 
         return new $className($mapping, $form);
@@ -500,10 +494,9 @@ PROCESS_METHOD_ERROR_SC_405;
      * die der ActionForward bezeichnet.
      *
      * @param  Request       $request
-     * @param  Response      $response
-     * @param  ActionForward $forward
+    * @param  ActionForward $forward
      */
-    protected function processActionForward(Request $request, Response $response, ActionForward $forward) {
+    protected function processActionForward(Request $request, ActionForward $forward) {
         $module = $this->module;
 
         if ($forward->isRedirect()) {
