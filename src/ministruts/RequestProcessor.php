@@ -527,8 +527,8 @@ PROCESS_METHOD_ERROR_SC_405;
                 $class = $module->getTilesClass();
                 $tile = new $class($this->module);
                 $tile->setName(Tile::GENERIC_NAME)
-                 ->setFileName($path)
-                 ->freeze();
+                     ->setFileName($path)
+                     ->freeze();
             }
             $tile->render();
         }
