@@ -175,7 +175,7 @@ class CurlHttpClient extends HttpClient {
         if (!is_resource($this->hCurl))
             $this->hCurl = curl_init();
 
-        $response = CurlHttpResponse::create();
+        $response = new CurlHttpResponse();
         $options  = $this->prepareCurlOptions($request, $response);
 
         // CURLOPT_FOLLOWLOCATION funktioniert nur bei deaktiviertem "open_basedir"-Setting

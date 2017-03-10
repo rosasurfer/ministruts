@@ -4,12 +4,6 @@ namespace rosasurfer\net\http;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 
-use rosasurfer\log\Logger;
-
-use const rosasurfer\L_DEBUG;
-use const rosasurfer\L_INFO;
-use const rosasurfer\L_NOTICE;
-
 
 /**
  * CurlHttpResponse
@@ -18,15 +12,6 @@ use const rosasurfer\L_NOTICE;
  */
 class CurlHttpResponse extends HttpResponse {
 
-
-    /** @var bool */
-    private static $logDebug;
-
-    /** @var bool */
-    private static $logInfo;
-
-    /** @var bool */
-    private static $logNotice;
 
     /** @var HeaderParser */
     private $headerParser;
@@ -45,22 +30,7 @@ class CurlHttpResponse extends HttpResponse {
      * Erzeugt eine neue Instanz.
      */
     public function __construct() {
-        $loglevel        = Logger::getLogLevel(__CLASS__);
-        self::$logDebug  = ($loglevel <= L_DEBUG );
-        self::$logInfo   = ($loglevel <= L_INFO  );
-        self::$logNotice = ($loglevel <= L_NOTICE);
-
-        $this->headerParser = HeaderParser::create();
-    }
-
-
-    /**
-     * Erzeugt eine neue Instanz.
-     *
-     * @return self
-     */
-    public static function create() {
-        return new static();
+        $this->headerParser = new HeaderParser();
     }
 
 
@@ -91,16 +61,6 @@ class CurlHttpResponse extends HttpResponse {
 
 
     /**
-     * Gibt die empfangenen Header zurueck.
-     *
-     * @return array - Array mit Headern
-     */
-    public function getHeaders() {
-        return $this->headerParser->getHeaders();
-    }
-
-
-    /**
      * Ob ein Header mit dem angegebenen Namen existiert.
      *
      * @param  string $name - Name des Headers
@@ -125,6 +85,16 @@ class CurlHttpResponse extends HttpResponse {
 
 
     /**
+     * Gibt alle empfangenen Header zurueck.
+     *
+     * @return array - Array mit Headern
+     */
+    public function getHeaders() {
+        return $this->headerParser->getHeaders();
+    }
+
+
+    /**
      * Callback fuer CurlHttpClient, dem die empfangenen Response-Header zeilenweise uebergeben werden.
      *
      * @param  resource $hCurl - das CURL-Handle des aktuellen Requests
@@ -133,8 +103,6 @@ class CurlHttpResponse extends HttpResponse {
      * @return int - Anzahl der bei diesem Methodenaufruf erhaltenen Bytes
      */
     public function writeHeader($hCurl, $line) {
-        self::$logDebug && Logger::log('Header line received:  '.$line, L_DEBUG);
-
         $this->headerParser->parseLine($line);
         return strLen($line);
     }

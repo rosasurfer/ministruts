@@ -18,16 +18,6 @@ class HeaderParser extends Object {
 
 
     /**
-     * Erzeugt eine neue Instanz.
-     *
-     * @return self
-     */
-    public static function create() {
-        return new static();
-    }
-
-
-    /**
      * Parst einen uebergebenen Headerblock.
      *
      * @param  string $data - rohe Headerdaten
