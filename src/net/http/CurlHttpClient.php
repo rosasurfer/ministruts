@@ -219,7 +219,7 @@ class CurlHttpClient extends HttpClient {
 
 
     /**
-     * Create a cUrl options set for the request.
+     * Create a cUrl options array for the current request.
      *
      * @param  HttpRequest      $request
      * @param  CurlHttpResponse $response
@@ -227,30 +227,20 @@ class CurlHttpClient extends HttpClient {
      * @return array - resulting options
      */
     private function prepareCurlOptions(HttpRequest $request, CurlHttpResponse $response) {
-        $options = $this->options;
-        $options[CURLOPT_URL] = $request->getUrl();
-
-        if (!isSet($options[CURLOPT_TIMEOUT]))
-            $options[CURLOPT_TIMEOUT] = $this->timeout;         // execution timeout
-
-        if (!isSet($options[CURLOPT_USERAGENT]))
-            $options[CURLOPT_USERAGENT] = $this->userAgent;
-
-        if (!isSet($options[CURLOPT_ENCODING]))
-            $options[CURLOPT_ENCODING] = '';                    // an empty string means "all supported encodings"
+        $options  = [CURLOPT_URL       => $request->getUrl()] + $this->options;
+        $options += [CURLOPT_TIMEOUT   => $this->timeout    ];
+        $options += [CURLOPT_USERAGENT => $this->userAgent  ];
+        $options += [CURLOPT_ENCODING  => ''                ];  // empty string activates all supported encodings
 
         if (!isSet($options[CURLOPT_WRITEHEADER]))
-            if (!isSet($options[CURLOPT_HEADERFUNCTION]))
-                $options[CURLOPT_HEADERFUNCTION] = [$response, 'writeHeader'];
+            $options += [CURLOPT_HEADERFUNCTION => [$response, 'writeHeader']];
 
-        if (!isSet($options[CURLOPT_FILE]))
-            if (!isSet($options[CURLOPT_WRITEFUNCTION]))        // overrides CURLOPT_RETURNTRANSFER
-                $options[CURLOPT_WRITEFUNCTION] = [$response, 'writeContent'];
+        if (!isSet($options[CURLOPT_FILE]))                     // overrides CURLOPT_RETURNTRANSFER
+            $options += [CURLOPT_WRITEFUNCTION  => [$response, 'writeContent']];
 
-        foreach ($request->getHeaders() as $key => $value) {    // apply specified request headers
+        foreach ($request->getHeaders() as $key => $value) {    // add all specified request headers
             $options[CURLOPT_HTTPHEADER][] = $key.': '.$value;
         }
-
         return $options;
     }
 
