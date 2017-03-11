@@ -40,7 +40,7 @@ abstract class Singleton extends Object {
         // rekursives Erzeugen derselben Singleton-Instanz abfangen
         static $currentCreations;
         if (isSet($currentCreations[$class]))
-            throw new RuntimeException('Infinite loop: recursive call to '.__METHOD__."($class) detected");
+            throw new RuntimeException('Infinite loop: recursive call to '.__METHOD__.'('.$class.') detected');
         $currentCreations[$class] = true;
 
         if (!is_class($class)) throw new ClassNotFoundException('Class not found: '.$class );
