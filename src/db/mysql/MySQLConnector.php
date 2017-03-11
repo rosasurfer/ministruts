@@ -30,7 +30,7 @@ class MySQLConnector extends Connector {
     /** @var string */
     protected $host;
 
-    /** @var string */
+    /** @var int */
     protected $port;
 
     /** @var string */

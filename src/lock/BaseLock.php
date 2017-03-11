@@ -24,7 +24,7 @@ abstract class BaseLock extends Object {
      * markiert es als ungueltig (invalid).  Wenn das Lock bereits ungueltig (invalid) ist, hat der Aufruf
      * keinen Effekt.
      *
-     * @see Lock::isValid()
+     * @return void
      */
     abstract public function release();
 

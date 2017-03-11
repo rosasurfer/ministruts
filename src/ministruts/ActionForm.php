@@ -40,6 +40,8 @@ abstract class ActionForm extends Object {
      * Liest die im Request uebergebenen Parameter ein.  Muss anwendungsabhaengig implementiert werden.
      *
      * @param  Request $request - der aktuelle Request
+     *
+     * @return void
      */
     abstract protected function populate(Request $request);
 
