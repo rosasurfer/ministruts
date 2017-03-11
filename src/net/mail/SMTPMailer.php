@@ -137,17 +137,15 @@ class SMTPMailer extends Mailer {
      */
     private function connect() {
         $connection = fSockOpen('tcp://'.$this->config['host'],
-                                        $this->config['port'],
-                                        $errorCode,
-                                        $errorMsg,
-                                        $this->config['timeout']);
+                                         $this->config['port'],
+                                         $errorCode,
+                                         $errorMsg,
+                                         $this->config['timeout']);
         // TODO: connect() bleibt ohne Fehlermeldung haengen, wenn keine Verbindung zustande kommt
-        if (!$connection)
-            throw new RuntimeException("Could not open socket: $errorMsg (error $errorCode)");
+        if (!$connection) throw new RuntimeException('Could not open socket: '.$errorMsg.' (error '.$errorCode.')');
 
         $data = stream_get_meta_data($connection);
-        if ($data['timed_out'])
-            throw new InfrastructureException('Timeout on socket connection');
+        if ($data['timed_out']) throw new InfrastructureException('Timeout on socket connection');
 
         socket_set_timeout($connection, $this->config['timeout']);
         $this->connection = $connection;
@@ -449,7 +447,7 @@ class SMTPMailer extends Mailer {
      * Gesendete Daten loggen
      */
     private function logSentData($data) {
-        $data = preg_replace('/^(.*)/m', " -> $1", $data)."\n";
+        $data = preg_replace('/^(.*)/m', ' -> $1', $data).NL;
         $this->logBuffer .= $data;
     }
 
