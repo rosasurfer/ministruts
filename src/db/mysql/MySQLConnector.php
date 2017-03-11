@@ -69,7 +69,7 @@ class MySQLConnector extends Connector {
         if (isSet($options['host'    ])) $this->setHost    ($options['host'    ]);
         if (isSet($options['username'])) $this->setUsername($options['username']);
         if (isSet($options['password'])) $this->setPassword($options['password']);
-        if (isSet($options['schema'  ])) $this->setDatabase($options['schema'  ]);
+        if (isSet($options['database'])) $this->setDatabase($options['database']);
         if (isSet($options['options' ])) $this->setOptions ($options['options' ]);
     }
 
@@ -189,7 +189,10 @@ class MySQLConnector extends Connector {
 
         // set connection options
         try {
-            foreach ($this->options as $option => $value) {
+            $options = $this->options;
+            $options['time_zone'] = date_default_timezone_get();        // synchronize connection timezone with PHP
+
+            foreach ($options as $option => $value) {
                 if (strLen($value)) {
                     if (strToLower($option) == 'charset') {
                         // use built-in function instead of "set character set {$value}" for valid mysql_real_escape_string()
