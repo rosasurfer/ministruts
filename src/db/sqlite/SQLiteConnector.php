@@ -257,9 +257,7 @@ class SQLiteConnector extends Connector {
             $lastExecMode = $this->skipResults;
             $this->skipResults = true;
 
-            $result = $this->executeRaw($sql);              // In contrast to the documentation SQLite3::exec() and therefore
-            $result->finalize();                            // self::executeRaw() always return a SQLite3Result, never a boolean.
-                                                            // Thus it is safe to unconditionally call finalize().
+            $this->executeRaw($sql);
             return $this;
         }
         finally {
@@ -273,7 +271,7 @@ class SQLiteConnector extends Connector {
      *
      * @param  string $sql - SQL statement
      *
-     * @return \SQLite3Result
+     * @return \SQLite3Result|bool
      *
      * @throws DatabaseException in case of failure
      */
