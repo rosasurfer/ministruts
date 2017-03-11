@@ -187,15 +187,27 @@ class MySQLConnector extends Connector {
             throw $ex->addMessage('Can not connect to MySQL server on "'.$host.'"');
         }
 
-        // set connection options
+        $this->setConnectionOptions();
+        $this->selectDatabase();
+
+        return $this;
+    }
+
+
+    /**
+     * Set the configured connection options.
+     *
+     * @return self
+     */
+    protected function setConnectionOptions() {
         try {
             $options = $this->options;
-            $options['time_zone'] = date_default_timezone_get();        // synchronize connection timezone with PHP
+            $options['time_zone'] = date_default_timezone_get();    // synchronize connection timezone with PHP timezone
 
             foreach ($options as $option => $value) {
                 if (strLen($value)) {
                     if (strToLower($option) == 'charset') {
-                        // use built-in function instead of "set character set {$value}" for valid mysql_real_escape_string()
+                        // use mysql-function instead of SQL "set character set {$value}" for valid mysql_real_escape_string()
                         mysql_set_charset($value, $this->hConnection) || trigger_error(mysql_error($this->hConnection), E_USER_ERROR);
                     }
                     else {
@@ -210,8 +222,16 @@ class MySQLConnector extends Connector {
         catch (IRosasurferException $ex) {
             throw $ex->addMessage('Can not set system variable "'.$value.'"')->setCode(mysql_errno($this->hConnection));
         }
+        return $this;
+    }
 
-        // use specified database
+
+    /**
+     * Pre-select a configured database.
+     *
+     * @return self
+     */
+    protected function selectDatabase() {
         if ($this->database) {
             try {
                 mysql_select_db($this->database, $this->hConnection) || trigger_error(mysql_error($this->hConnection), E_USER_ERROR);
@@ -220,35 +240,7 @@ class MySQLConnector extends Connector {
                 throw $ex->addMessage('Can not select database "'.$this->database.'"')->setCode(mysql_errno($this->hConnection));
             }
         }
-
         return $this;
-        /*
-        @see also: http://nl1.php.net/manual/en/mysql.constants.php#mysql.client-flags
-                 http://nl1.php.net/manual/en/mysqli.real-connect.php
-                 http://nl1.php.net/manual/en/mysqli.options.php
-
-                                            #define CLIENT_LONG_PASSWORD          1             // new more secure passwords
-                                            #define CLIENT_FOUND_ROWS             2             // found instead of affected rows
-                                            #define CLIENT_LONG_FLAG              4             // get all column flags
-                                            #define CLIENT_CONNECT_WITH_DB        8             // one can specify db on connect
-                                            #define CLIENT_NO_SCHEMA             16             // don't allow database.table.column
-        MYSQL_CLIENT_COMPRESS      #define CLIENT_COMPRESS              32             // can use compression protocol
-                                            #define CLIENT_ODBC                  64             // ODBC client
-                                            #define CLIENT_LOCAL_FILES          128             // enable LOAD DATA LOCAL
-        MYSQL_CLIENT_IGNORE_SPACE  #define CLIENT_IGNORE_SPACE         256             // ignore spaces before '('
-                                            #define CLIENT_CHANGE_USER          512             // support the mysql_change_user()    alt: #define CLIENT_PROTOCOL_41  512  // new 4.1 protocol
-        MYSQL_CLIENT_INTERACTIVE   #define CLIENT_INTERACTIVE         1024             // this is an interactive client
-        MYSQL_CLIENT_SSL           #define CLIENT_SSL                 2048             // switch to SSL after handshake
-                                            #define CLIENT_IGNORE_SIGPIPE      4096             // ignore sigpipes
-                                            #define CLIENT_TRANSACTIONS        8192             // client knows about transactions
-                                            #define CLIENT_RESERVED           16384             // old flag for 4.1 protocol
-                                            #define CLIENT_SECURE_CONNECTION  32768             // new 4.1 authentication
-                                            #define CLIENT_MULTI_STATEMENTS   65536             // enable multi-stmt support
-                                            #define CLIENT_MULTI_RESULTS     131072             // enable multi-results
-                                            #define CLIENT_REMEMBER_OPTIONS  ((ulong) 1) << 31  // ?
-
-        Not all of these may work or be meaningful, but CLIENT_FOUND_ROWS does, at least.
-      */
     }
 
 
