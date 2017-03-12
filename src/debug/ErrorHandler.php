@@ -102,8 +102,8 @@ class ErrorHandler extends StaticClass {
         elseif ($mode === self::THROW_EXCEPTIONS) self::$errorMode = self::THROW_EXCEPTIONS;
         else                                      return;
 
-        set_error_handler(self::$errorHandler=__CLASS__.'::handleError', E_ALL);    // E_ALL because error_reporting()
-    }                                                                               // may change at runtime
+        set_error_handler(self::$errorHandler=__CLASS__.'::handleError', error_reporting());
+    }
 
 
     /**
@@ -133,11 +133,11 @@ class ErrorHandler extends StaticClass {
      * normally. All other errors are logged according to the configured error handling mode. Either they are logged and
      * script exceution continues normally, or they are wrapped in a PHPError exception and thrown back.
      *
-     * @param  int    $level   - PHP error severity level
-     * @param  string $message - error message
-     * @param  string $file    - name of file where the error occurred
-     * @param  int    $line    - line of file where the error occurred
-     * @param  array  $context - symbols of the point where the error occurred (variable scope at error trigger time)
+     * @param  int        $level   - PHP error severity level
+     * @param  string     $message - error message
+     * @param  string     $file    - name of file where the error occurred
+     * @param  int        $line    - line of file where the error occurred
+     * @param  array|null $context - symbols of the point where the error occurred (variable scope at error trigger time)
      *
      * @return bool - TRUE,  if the error was successfully handled.
      *                FALSE, if the error shall be processed as if no error handler was installed.
@@ -145,8 +145,8 @@ class ErrorHandler extends StaticClass {
      *
      * @throws PHPError
      */
-    public static function handleError($level, $message, $file, $line, array $context) {
-        // echoPre(__METHOD__.'()  '.DebugHelper::errorLevelToStr($level).': $message='.$message.', $file='.$file.', $line='.$line);
+    public static function handleError($level, $message, $file, $line, array $context=null) {
+        //echoPre(__METHOD__.'()  '.DebugHelper::errorLevelToStr($level).': $message='.$message.', $file='.$file.', $line='.$line);
 
         // (1) Ignore suppressed errors and errors not covered by the current reporting level.
         $reportingLevel = error_reporting();
@@ -206,10 +206,13 @@ class ErrorHandler extends StaticClass {
          *
          * @see  http://stackoverflow.com/questions/25584494/php-set-exception-handler-not-working-for-error-thrown-in-set-error-handler-cal
          */
-        $function = DebugHelper::getFQFunctionName($exception->getBetterTrace()[0]);
-        if ($function=='require' || $function=='require_once') {
-            call_user_func(self::$exceptionHandler, $exception);
-            return true;                                             // PHP will terminate the script anyway
+        $trace = $exception->getBetterTrace();
+        if ($trace) {                                                   // after a FATAL error the trace may be empty
+            $function = DebugHelper::getFQFunctionName($trace[0]);
+            if ($function=='require' || $function=='require_once') {
+                call_user_func(self::$exceptionHandler, $exception);
+                return true;                                            // PHP will terminate the script anyway
+            }
         }
 
         // (6) Throw back everything else.
@@ -226,6 +229,7 @@ class ErrorHandler extends StaticClass {
      * @param \Exception $exception - the unhandled exception
      */
     public static function handleException(\Exception $exception) {
+        //echoPre(__METHOD__.'()  '.$exception->getMessage());
         $context = [];
 
         try {
