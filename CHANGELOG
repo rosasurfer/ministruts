@@ -1,7 +1,8 @@
 
 2017-03-12
 
-   - db/orm: implement nullable/not nullable version field per mapping configuration
+   - core:   outsource Object functionality to trait to enable re-use by non-framework classes
+   - db/orm: implement nullable/not nullable version field via mapping configuration
    - db/orm: implement column mapping to PHP classes
 
 
