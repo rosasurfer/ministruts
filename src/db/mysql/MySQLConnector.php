@@ -14,6 +14,25 @@ use function rosasurfer\strContains;
 
 /**
  * MySQLConnector
+ *
+ * Connection configuration:
+ * <pre>
+ * +-----------------------------+------------------+---------------------------------+
+ * | setting                     | value            | default value                   |
+ * +-----------------------------+------------------+---------------------------------+
+ * | db.{name}.connector         | mysql            | -                               |
+ * | db.{name}.host              | [$host[:$port]]  | localhost:3306                  |
+ * | db.{name}.username          | [$user]          | current system user             |
+ * | db.{name}.password          | [$password]      | (no password)                   |
+ * | db.{name}.database          | [$dbName]        | (no selection)                  |
+ * | db.{name}.options.charset   | [$charsetName]   | utf8                            |
+ * | db.{name}.options.collation | [$collationName] | utf8_unicode_ci                 |
+ * | db.{name}.options.sql_mode  | [$mode]          | traditional,high_not_precedence |
+ * | db.{name}.options.timezone  | [$tzName]        | current local timezone          |
+ * +-----------------------------+------------------+---------------------------------+
+ * </pre>
+ *
+ * Additional MySQL options can be specified under the "options" key.
  */
 class MySQLConnector extends Connector {
 
