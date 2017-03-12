@@ -1,6 +1,7 @@
 <?php
 namespace rosasurfer\core;
 
+use rosasurfer\di\DiAwareTrait;
 use rosasurfer\exception\RuntimeException;
 
 use function rosasurfer\strLeftTo;
@@ -10,6 +11,8 @@ use function rosasurfer\strLeftTo;
  * A trait providing common functionality to all using classes (not only "rosasurfer" classes).
  */
 trait ObjectTrait {
+
+    use DiAwareTrait;
 
 
     /**
