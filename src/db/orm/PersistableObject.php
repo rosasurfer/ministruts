@@ -11,6 +11,8 @@ use rosasurfer\exception\IllegalAccessException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\UnimplementedFeatureException;
 
+use function rosasurfer\is_class;
+
 use const rosasurfer\PHP_TYPE_ARRAY;
 use const rosasurfer\PHP_TYPE_BOOL;
 use const rosasurfer\PHP_TYPE_FLOAT;
@@ -203,13 +205,18 @@ abstract class PersistableObject extends Object {
                 $phpType = $mapping[IDX_MAPPING_PHP_TYPE];
 
                 switch ($phpType) {
-                    case PHP_TYPE_BOOL  : $object->$phpName =   (bool) $row[$column]; break;
-                    case PHP_TYPE_INT   : $object->$phpName =    (int) $row[$column]; break;
-                    case PHP_TYPE_FLOAT : $object->$phpName =  (float) $row[$column]; break;
-                    case PHP_TYPE_STRING: $object->$phpName = (string) $row[$column]; break;
-                    case PHP_TYPE_ARRAY : $object->$phpName =   strLen($row[$column]) ? explode(',', $row[$column]) : []; break;
-
-                    default: throw new InvalidArgumentException('Unsupported PHP type "'.$phpType.'" in database mapping of '.$class.'::'.$phpName);
+                    case PHP_TYPE_BOOL   : $object->$phpName =        (bool) $row[$column];  break;
+                    case PHP_TYPE_INT    : $object->$phpName =         (int) $row[$column];  break;
+                    case PHP_TYPE_FLOAT  : $object->$phpName =       (float) $row[$column];  break;
+                    case PHP_TYPE_STRING : $object->$phpName =      (string) $row[$column];  break;
+                    case PHP_TYPE_ARRAY  : $object->$phpName =        strLen($row[$column]) ? explode(',', $row[$column]) : []; break;
+                    case \DateTime::class: $object->$phpName = new \DateTime($row[$column]); break;
+                    default:
+                        if (is_class($phpType)) {
+                            $object->$phpName = new $phpType($row[$column]);
+                            break;
+                        }
+                        throw new InvalidArgumentException('Unsupported type "'.$phpType.'" for database mapping of '.$class.'::'.$phpName);
                 }
             }
         }

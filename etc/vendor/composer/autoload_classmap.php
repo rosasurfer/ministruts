@@ -44,6 +44,7 @@ return array(
     'rosasurfer\\db\\mysql\\MySQLResult' => $baseDir . '/src/db/mysql/MySQLResult.php',
     'rosasurfer\\db\\orm\\DAO' => $baseDir . '/src/db/orm/DAO.php',
     'rosasurfer\\db\\orm\\PersistableObject' => $baseDir . '/src/db/orm/PersistableObject.php',
+    'rosasurfer\\db\\orm\\TypeInterface' => $baseDir . '/src/db/orm/TypeInterface.php',
     'rosasurfer\\db\\orm\\Worker' => $baseDir . '/src/db/orm/Worker.php',
     'rosasurfer\\db\\pgsql\\PostgresConnector' => $baseDir . '/src/db/pgsql/PostgresConnector.php',
     'rosasurfer\\db\\pgsql\\PostgresResult' => $baseDir . '/src/db/pgsql/PostgresResult.php',
