@@ -6,7 +6,7 @@ use rosasurfer\exception\UnimplementedFeatureException;
 
 /**
  * A trait providing access to the currently registered dependency injection container.
- * All classes extending {@link Object} are dependency aware.
+ * Thus every class can easily be made dependency aware.
  */
 trait DiAwareTrait {
 
@@ -14,7 +14,7 @@ trait DiAwareTrait {
     /**
      * Return the currently registered dependency injection container.
      *
-     * @return null
+     * @return void
      */
     public static function di() {
         throw new UnimplementedFeatureException(__METHOD__);

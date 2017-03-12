@@ -43,6 +43,7 @@ function registerClassLoader() {
     $bootstrap = function($class) {
         switch ($class) {
             case Object      ::class: require(MINISTRUTS_ROOT.'/src/core/Object.php'       ); break;
+            case ObjectTrait ::class: require(MINISTRUTS_ROOT.'/src/core/ObjectTrait.php'  ); break;
             case DiAwareTrait::class: require(MINISTRUTS_ROOT.'/src/di/DiAwareTrait.php'   ); break;
             case ClassLoader ::class: require(MINISTRUTS_ROOT.'/src/loader/ClassLoader.php'); break;
         }

@@ -30,6 +30,7 @@ return array(
     'rosasurfer\\config\\ConfigInterface' => $baseDir . '/src/config/ConfigInterface.php',
     'rosasurfer\\config\\StdConfig' => $baseDir . '/src/config/StdConfig.php',
     'rosasurfer\\core\\Object' => $baseDir . '/src/core/Object.php',
+    'rosasurfer\\core\\ObjectTrait' => $baseDir . '/src/core/ObjectTrait.php',
     'rosasurfer\\core\\Singleton' => $baseDir . '/src/core/Singleton.php',
     'rosasurfer\\core\\StaticClass' => $baseDir . '/src/core/StaticClass.php',
     'rosasurfer\\db\\ConnectionPool' => $baseDir . '/src/db/ConnectionPool.php',
