@@ -50,30 +50,36 @@ const BIND_TYPE_SET = 7;          // TODO
  */
 
 
-// Column mark identifiers
+// Meta column ids and flags. Ids are implemented as flags but exclusive.
 
 /**
- * Identifier for a column being part of the primary key.
+ * Identifier for a column being part of the primary key. Not nullable.
  */
 const ID_PRIMARY = 1;
 
 /**
- * Identifier for a column holding the "creation" time of the record.
+ * Identifier for a column holding the record's "creation" time. Not nullable.
  */
-const ID_CREATE  = 2;
+const ID_CREATE = 2;
 
 /**
- * Identifier for a column holding the "version" value of the record (typically the "last-updated" time).
+ * Identifier for a column holding the record's "version" value, usually (but not necessarily) the "last-modified" time.
+ * May or may not be NULL (nullable).
  */
-const ID_VERSION = 3;
+const ID_VERSION = 4;
 
 /**
- * Identifier for a column holding the "soft-deletion" time of the record.
+ * Identifier for a column holding the record's "soft-deletion" time. Nullable.
  */
-const ID_DELETE  = 4;
+const ID_DELETE = 8;
+
+/**
+ * Flag for a column being never NULL (not nullable).
+ */
+const F_NOT_NULLABLE = 16;
 
 
-// Mapping field indexes
+// Mapping indexes
 
 /**
  * Mapping index of a field's PHP type.
@@ -91,6 +97,6 @@ const IDX_MAPPING_BIND_TYPE = 2;
 const IDX_MAPPING_COLUMN_NAME = 0;
 
 /**
- * Mapping index of a field's DBMS column behavior.
+ * Mapping index of a field's DBMS column behavior (ids and flags).
  */
 const IDX_MAPPING_COLUMN_BEHAVIOR = 3;

@@ -26,7 +26,7 @@ use const rosasurfer\PHP_TYPE_STRING;
 abstract class PersistableObject extends Object {
 
 
-    /** @var bool - current modification status (dirty checking) */
+    /** @var bool - dirty checking status */
     protected $modified = false;
 
     /** @var string[] - modified and unsaved properties */
@@ -34,29 +34,21 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Default constructor. Used only by the ORM. To create new instances define and use static helper methods.
+     * Constructor.
      *
-     * @example
-     *
-     *  class Foo extends PersistableObject {
-     *
-     *     public static function create($bar, ...) {
-     *        $instance = new self();
-     *        $instance->setBar($bar);
-     *        return $instance;
-     *     }
-     *  }
-     *
-     *  $foo = Foo::create('bar');
-     *  $foo->save();
+     * Create a new instance.
      */
-    final protected function __construct() {
-        $mapping = $this->dao()->getMapping();
+    protected function __construct() {
+        $created = $touched = null;
 
-        foreach ($mapping['columns'] as $phpName => $column) {
-            if ($column[IDX_MAPPING_COLUMN_BEHAVIOR] == ID_CREATE) {
-                $this->$phpName = gmDate('Y-m-d H:i:s');
-                break;
+        foreach ($this->dao()->getMapping()['columns'] as $phpName => $column) {
+            $behavior = $column[IDX_MAPPING_COLUMN_BEHAVIOR];
+            if ($behavior & ID_CREATE) {
+                $created        = $touched ?: date('Y-m-d H:i:s');
+                $this->$phpName = $created;
+            }
+            else if ($behavior & ID_VERSION && $behavior & F_NOT_NULLABLE) {
+                $touched = $this->touch($created);
             }
         }
     }
@@ -65,14 +57,14 @@ abstract class PersistableObject extends Object {
     /**
      * Update the version string of the instance and return it.
      *
-     * @return string|null - version string or NULL if the model has no version field
+     * @param  string - version string to assign (default: current local datetime)
+     *
+     * @return string|null - assigned version string or NULL if the model has no version field
      */
-    protected function touch() {
-        $mapping = $this->dao()->getMapping();
-
-        foreach ($mapping['columns'] as $phpName => $column) {
-            if ($column[IDX_MAPPING_COLUMN_BEHAVIOR] == ID_VERSION) {
-                return $this->$phpName = gmDate('Y-m-d H:i:s');
+    protected function touch($version = null) {
+        foreach ($this->dao()->getMapping()['columns'] as $phpName => $column) {
+            if ($column[IDX_MAPPING_COLUMN_BEHAVIOR] & ID_VERSION) {
+                return $this->$phpName = $version ?: date('Y-m-d H:i:s');
             }
         }
         return null;
@@ -85,10 +77,8 @@ abstract class PersistableObject extends Object {
      * @return bool
      */
     public function isDeleted() {
-        $mapping = $this->dao()->getMapping();
-
-        foreach ($mapping['columns'] as $phpName => $column) {
-            if ($column[IDX_MAPPING_COLUMN_BEHAVIOR] == ID_DELETE) {
+        foreach ($mapping = $this->dao()->getMapping()['columns'] as $phpName => $column) {
+            if ($column[IDX_MAPPING_COLUMN_BEHAVIOR] & ID_DELETE) {
                 return ($this->$phpName !== null);
             }
         }
@@ -102,11 +92,10 @@ abstract class PersistableObject extends Object {
      * @return bool
      */
     public function isPersistent() {
-        $mapping = $this->dao()->getMapping();
-
         // TODO: this check cannot yet handle composite primary keys
-        foreach ($mapping['columns'] as $phpName => $column) {
-            if ($column[IDX_MAPPING_COLUMN_BEHAVIOR] == ID_PRIMARY)
+
+        foreach ($mapping = $this->dao()->getMapping()['columns'] as $phpName => $column) {
+            if ($column[IDX_MAPPING_COLUMN_BEHAVIOR] & ID_PRIMARY)
                 return ($this->$phpName !== null);
         }
         return false;
@@ -206,7 +195,7 @@ abstract class PersistableObject extends Object {
             $column = strToLower($mapping[IDX_MAPPING_COLUMN_NAME]);
 
             if ($row[$column] === null) {
-                if ($mapping[IDX_MAPPING_COLUMN_BEHAVIOR] == ID_PRIMARY) {  // if the column identity is NULL it's an empty row
+                if ($mapping[IDX_MAPPING_COLUMN_BEHAVIOR] & ID_PRIMARY) {   // if the column identity is NULL it's an empty row
                     return null;
                 }
             }
