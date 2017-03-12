@@ -2,6 +2,7 @@
 2017-03-12
 
    - db/orm: implement nullable/not nullable version field per mapping configuration
+   - db/orm: implement column mapping to PHP classes
 
 
 2017-03-08
