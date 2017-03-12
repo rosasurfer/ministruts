@@ -89,7 +89,7 @@ const EOL_WINDOWS       = "\r\n";                                 //   CRLF     
  * Dumps a variable to STDOUT or into a string.
  *
  * @param  mixed $var          - variable
- * @param  bool  $return       - TRUE,  if the variable is to be dumped into a string;
+ * @param  bool  $return       - TRUE,  if the variable is to be dumped into a string;<br>
  *                               FALSE, if the variable is to be dumped to STDOUT (default)
  * @param  bool  $flushBuffers - whether or not to flush output buffers on output (default: TRUE)
  *
@@ -140,7 +140,7 @@ function echoPre($var, $flushBuffers=true) {
  * Prints a variable in a pretty way. Output always ends with a line feed.
  *
  * @param  mixed $var          - variable
- * @param  bool  $return       - TRUE,  if the result is to be returned as a string;
+ * @param  bool  $return       - TRUE,  if the result is to be returned as a string;<br>
  *                               FALSE, if the result is to be printed to STDOUT (default)
  * @param  bool  $flushBuffers - whether or not to flush output buffers on output (default: TRUE)
  *
@@ -157,7 +157,7 @@ function pp($var, $return=false, $flushBuffers=true) {
  * Prints a variable in a pretty way. Output always ends with a line feed.
  *
  * @param  mixed $var          - variable
- * @param  bool  $return       - TRUE,  if the result is to be returned as a string;
+ * @param  bool  $return       - TRUE,  if the result is to be returned as a string;<br>
  *                               FALSE, if the result is to be printed to STDOUT (default)
  * @param  bool  $flushBuffers - whether or not to flush output buffers on output (default: TRUE)
  *
@@ -402,7 +402,7 @@ function strEndsWithI($string, $suffix) {
  * Return a left part of a string.
  *
  * @param  string $string - initial string
- * @param  int    $length - greater than/equal to zero: length of the returned substring
+ * @param  int    $length - greater than/equal to zero: length of the returned substring<br>
  *                          lower than zero:            all except the specified number of right characters
  *
  * @return string - substring
@@ -431,10 +431,10 @@ function strLeft($string, $length) {
  * @param  string $string         - initial string
  * @param  string $limiter        - limiting substring (one or more characters)
  * @param  int    $count          - positive: the specified occurrence of the limiting substring from the start
- *                                            of the string
+ *                                            of the string<br>
  *                                  negative: the specified occurrence of the limiting substring from the end of
- *                                            the string
- *                                  zero:     an empty string is returned
+ *                                            the string<br>
+ *                                  zero:     an empty string is returned<br>
  *                                  (default: 1 = the first occurrence)
  * @param  bool   $includeLimiter - whether or not to include the limiting substring in the returned result
  *                                  (default: FALSE)
@@ -501,7 +501,7 @@ function strLeftTo($string, $limiter, $count=1, $includeLimiter=false, $onNotFou
  * Return a right part of a string.
  *
  * @param  string $string - initial string
- * @param  int    $length - greater than/equal to zero: length of the returned substring
+ * @param  int    $length - greater than/equal to zero: length of the returned substring<br>
  *                          lower than zero:            all except the specified number of left characters
  *
  * @return string - substring
@@ -534,10 +534,10 @@ function strRight($string, $length) {
  * @param  string $string         - initial string
  * @param  string $limiter        - limiting substring (one or more characters)
  * @param  int    $count          - positive: the specified occurrence of the limiting substring counted from the
- *                                            start of the string
+ *                                            start of the string<br>
  *                                  negative: the specified occurrence of the limiting substring counted from the
- *                                            end of the string
- *                                  zero:     the initial string is returned
+ *                                            end of the string<br>
+ *                                  zero:     the initial string is returned<br>
  *                                  (default: 1 = the first occurrence)
  * @param  bool   $includeLimiter - whether or not to include the limiting substring in the returned result
  *                                  (default: FALSE)
@@ -739,10 +739,10 @@ function strCollapseWhiteSpace($string, $joinLines=true) {
  * (no mixed mode).
  *
  * @param  string $string - string to normalize
- * @param  string $mode   - format of the resulting string, can be one of:
- *                          EOL_MAC:      line endings are converted to Mac format      "\r"
- *                          EOL_NETSCAPE: line endings are converted to Netscape format "\r\r\n"
- *                          EOL_UNIX:     line endings are converted to Unix format     "\n" (default)
+ * @param  string $mode   - format of the resulting string, can be one of:<br>
+ *                          EOL_MAC:      line endings are converted to Mac format      "\r"<br>
+ *                          EOL_NETSCAPE: line endings are converted to Netscape format "\r\r\n"<br>
+ *                          EOL_UNIX:     line endings are converted to Unix format     "\n" (default)<br>
  *                          EOL_WINDOWS:  line endings are converted to Windows format  "\r\n"
  * @return string
  */
@@ -789,7 +789,7 @@ function typeOf($var) {
  * Check whether a directory exists. If not try to create it. Check further if write permission is granted.
  *
  * @param  string $path - same as mkDir(): directory name
- * @param  int    $mode - same as mkDir(): permission mode to set if the directory is created
+ * @param  int    $mode - same as mkDir(): permission mode to set if the directory is created<br>
  *                                         (default: 0770 = rwxrwx---)
  */
 function mkDirWritable($path, $mode=0770) {
@@ -883,11 +883,11 @@ function metatypeOf($name) {
  *
  * @param  string          $string - string value
  * @param  string|string[] $format - A valid date/datetime format. If multiple values are supplied whether or not the specified
- *                                   string fits at least one of them.
- *                                   Supported format strings: 'Y-m-d [H:i[:s]]'
- *                                                              'Y.m.d [H:i[:s]]'
- *                                                              'd.m.Y [H:i[:s]]'
- *                                                              'd/m/Y [H:i[:s]]'
+ *                                   string fits at least one of them.<br>
+ *                                   Supported format strings: 'Y-m-d [H:i[:s]]'<br>
+ *                                                             'Y.m.d [H:i[:s]]'<br>
+ *                                                             'd.m.Y [H:i[:s]]'<br>
+ *                                                             'd/m/Y [H:i[:s]]'
  *
  * @return int|bool - timestamp matching the string or FALSE if the string is not a valid date/datetime value
  *
