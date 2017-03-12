@@ -68,7 +68,7 @@ abstract class Dependency extends Object {
             return $this;
 
         return ChainedDependency::create($this)
-                                        ->andDependency($dependency);
+                                ->andDependency($dependency);
     }
 
 
