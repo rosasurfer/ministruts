@@ -95,7 +95,7 @@ class PostgresResult extends Result {
 
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function fetchNext($mode=ARRAY_BOTH) {
         if (!$this->hResult || $this->nextRowIndex < 0)
@@ -162,7 +162,7 @@ class PostgresResult extends Result {
 
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function release() {
         if ($this->hResult) {

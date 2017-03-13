@@ -51,7 +51,7 @@ class StdConfig extends Config {
 
 
         // TODO: look-up and delegate to an existing cached instance
-        //       key: get_class($this)."|$configDir|$configFile"
+        //       key: get_class($this).'|'.$configDir.'|'.$configFile
 
 
         // define framework config files
@@ -78,7 +78,7 @@ class StdConfig extends Config {
 
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function info() {
         return __METHOD__.'()  not yet implemented';

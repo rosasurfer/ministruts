@@ -37,7 +37,7 @@ abstract class Result extends Object implements ResultInterface {
 
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function fetchField($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
         if (!is_null($row)) throw new UnimplementedFeatureException('$row='.$row.' (!= NULL)');
@@ -74,7 +74,7 @@ abstract class Result extends Object implements ResultInterface {
 
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function fetchString($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
         if (func_num_args() < 4) $value = $this->fetchField($column, $row, null);
@@ -90,7 +90,7 @@ abstract class Result extends Object implements ResultInterface {
 
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function fetchBool($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
         if (func_num_args() < 4) $value = $this->fetchField($column, $row, null);
@@ -110,7 +110,7 @@ abstract class Result extends Object implements ResultInterface {
 
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function fetchInt($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
         if (func_num_args() < 4) $value = $this->fetchField($column, $row, null);
@@ -137,7 +137,7 @@ abstract class Result extends Object implements ResultInterface {
 
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function fetchFloat($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
         if (func_num_args() < 4) $value = $this->fetchField($column, $row, null);

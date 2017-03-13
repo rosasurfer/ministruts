@@ -79,7 +79,7 @@ class MySQLResult extends Result {
 
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function fetchNext($mode=ARRAY_BOTH) {
         if (!$this->hResult || $this->nextRowIndex < 0)
@@ -173,7 +173,7 @@ class MySQLResult extends Result {
 
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function release() {
         if ($this->hResult) {
