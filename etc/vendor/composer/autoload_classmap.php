@@ -33,6 +33,7 @@ return array(
     'rosasurfer\\core\\ObjectTrait' => $baseDir . '/src/core/ObjectTrait.php',
     'rosasurfer\\core\\Singleton' => $baseDir . '/src/core/Singleton.php',
     'rosasurfer\\core\\StaticClass' => $baseDir . '/src/core/StaticClass.php',
+    'rosasurfer\\date\\DateTime' => $baseDir . '/src/date/DateTime.php',
     'rosasurfer\\db\\ConnectionPool' => $baseDir . '/src/db/ConnectionPool.php',
     'rosasurfer\\db\\Connector' => $baseDir . '/src/db/Connector.php',
     'rosasurfer\\db\\ConnectorInterface' => $baseDir . '/src/db/ConnectorInterface.php',
