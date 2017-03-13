@@ -8,7 +8,7 @@ use function rosasurfer\strLeftTo;
 
 
 /**
- * A trait providing common functionality to all using classes (not only "rosasurfer" classes).
+ * A trait providing dependency injection awareness and default error handling functionality.
  */
 trait ObjectTrait {
 
