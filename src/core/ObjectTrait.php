@@ -72,7 +72,7 @@ trait ObjectTrait {
     /**
      * Return a human-readable version of the instance.
      *
-     * @@param  int $levels - how many levels of an object graph to recurse into
+     * @_param  int $levels - how many levels of an object graph to recurse into
      *                        (default: all)
      * @return string
      */
