@@ -1,4 +1,9 @@
 
+2017-03-13
+
+   - add class date\DateTime (extended version of \DateTime)
+
+
 2017-03-12
 
    - core:   outsource Object functionality to trait to enable re-use by non-framework classes
