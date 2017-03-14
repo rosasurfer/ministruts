@@ -28,7 +28,7 @@ use const rosasurfer\WINDOWS;
  *  - An explicitely defined user config file, e.g. "config.production.properties" or the default user config file
  *    "config.properties" if no explicite user config file is defined.
  */
-class StdConfig extends Config {
+class AutoConfig extends Config {
 
 
     /**

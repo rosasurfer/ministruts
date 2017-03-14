@@ -1,9 +1,9 @@
 <?php
 namespace rosasurfer;
 
+use rosasurfer\config\AutoConfig;
 use rosasurfer\config\Config;
 use rosasurfer\config\ConfigInterface as IConfig;
-use rosasurfer\config\StdConfig;
 
 use rosasurfer\core\StaticClass;
 use rosasurfer\debug\ErrorHandler;
@@ -62,7 +62,12 @@ class MiniStruts extends StaticClass {
         }
 
         // (1) check application settings                              // TODO: remove APPLICATION_ROOT dependency
-        !defined('\APPLICATION_ROOT') && exit(1|echoPre('application error (see error log)')|error_log('Error: The global constant APPLICATION_ROOT must be defined.'));
+        if (!defined('\APPLICATION_ROOT')) {
+            $errorMsg = 'Error: The global constant APPLICATION_ROOT must be defined.';
+            echoPre(CLI ? $errorMsg : 'application error (see error log)');
+            error_log($errorMsg);
+            exit(1);
+        }
         !defined('\APPLICATION_ID'  ) && define('APPLICATION_ID', md5(\APPLICATION_ROOT));
 
         // (2) check for admin tasks if on localhost
@@ -167,7 +172,9 @@ class MiniStruts extends StaticClass {
      */
     private static function setConfiguration($config) {
         if (is_string($config))
-            $config = new StdConfig($config);
+            $config = new AutoConfig($config);
+
+        echoPre($config);
         Config::setDefault($config);
     }
 
