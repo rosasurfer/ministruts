@@ -55,19 +55,28 @@ class AutoConfig extends Config {
         }
         else throw new InvalidArgumentException('Location not found: "'.$location.'"');
 
-
         // TODO: look-up and delegate to an existing cached instance
         //       key: get_class($this).'|'.$userConfig.'|cli='.(int)CLI
 
-
-        // define framework config file
+        // framework config file
         $files[] = MINISTRUTS_ROOT.'/config.properties';
 
-        // add project config files (skip if equal to framework which can happen during CLI testing)
+        // project config files (skip if equal to framework which can happen during CLI testing)
         if ($configDir != realPath(MINISTRUTS_ROOT.'/src')) {
-                   $files[] =                $configDir.'/config.dist.properties';
-            CLI && $files[] =                $configDir.'/config.cli.properties';
-                   $files[] = $configFile ?: $configDir.'/config.properties';
+            // regular config
+                     $files[] = $configDir.'/config.dist.properties';
+            if (CLI) $files[] = $configDir.'/config.cli.properties';
+
+            // user or environment config
+            if ($configFile) {
+                $files[] = $configFile;
+            }
+            else if (($env=getEnv('APP_ENV'))!==false || ($env=getEnv('APPLICATION_ENV'))!==false) {
+                $files[] = $configDir.'/config.'.$env.'.properties';
+            }
+            else {
+                $files[] = $configDir.'/config.properties';
+            }
         }
 
         // load config files
