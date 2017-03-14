@@ -18,11 +18,10 @@ use const rosasurfer\WINDOWS;
  *
  * These files are in the following order (later config settings override existing earlier ones):
  *
- *  - The framework config files: "config.dist.properties"
- *                                "config.properties"
+ *  - The framework config file: "config.properties"
  *
- *  - The project config files:   "config.dist.properties"
- *                                "config.cli.properties" (if applicable)
+ *  - The project config files:  "config.dist.properties"
+ *                               "config.cli.properties" (if applicable)
  *
  *  - An explicitely defined user config file, e.g. "config.production.properties" or the default user config file
  *    "config.properties" if no explicite definition is given.
@@ -61,8 +60,7 @@ class AutoConfig extends Config {
         //       key: get_class($this).'|'.$userConfig.'|cli='.(int)CLI
 
 
-        // define framework config files
-        $files[] = MINISTRUTS_ROOT.'/src/config.dist.properties';
+        // define framework config file
         $files[] = MINISTRUTS_ROOT.'/src/config.properties';
 
         // add project config files (skip if equal to framework which can happen during CLI testing)
