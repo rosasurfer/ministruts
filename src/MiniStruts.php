@@ -173,8 +173,6 @@ class MiniStruts extends StaticClass {
     private static function setConfiguration($config) {
         if (is_string($config))
             $config = new AutoConfig($config);
-
-        echoPre($config);
         Config::setDefault($config);
     }
 
