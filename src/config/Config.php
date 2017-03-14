@@ -12,61 +12,35 @@ use rosasurfer\exception\UnimplementedFeatureException;
 
 use rosasurfer\util\PHP;
 
-use const rosasurfer\CLI;
 use const rosasurfer\WINDOWS;
 
 
 /**
- * General application configuration via property files.
+ * General configuration mechanism via property files.
  *
- * Settings for the application's default configuration are read from the config files "config.dist.properties"
- * (if it exists) and "config.properties" (if it exists). Files in multiple directories are processed and merged in
- * the following order:
- *
- * - "config.dist.properties" in the framework's configuration directory (MINISTRUTS_ROOT.'/src/')
- * - "config.properties"      in the same directory
- *
- * - "config.dist.properties" in the application's configuration directory (APPLICATION_ROOT.'/app/config/')
- * - "config.properties"      in the same directory
- *
- * Additional configuration for CLI applications:
- * - "config.dist.properties" in the directory of the running script
- * - "config.properties"      in the same directory
- *
- *
- * - Configurations consisting of multiple files are merged. Multiple occurrences of the same setting overwrite each
- *   other, the last encountered setting "wins".
- *
- * - Files "config.dist.properties" contain global settings identical for all developers. These files are meant
- *   to be stored in the code repository and hold default settings.
- *
- * - Files "config.properties" contain custom developer specific settings and are not meant to be stored in the code
- *   repository. This files hold user or environment specific settings.
- *
- * - File format:
- *   Settings are defined as "key = value" pairs. Empty lines and enclosing white space are ignored. Subkeys can be used
- *   to create structures which can be queried as a whole (array) or as single values.
- *
+ * File format: <br>
+ * Settings are defined as "key = value" pairs. Enclosing white space and empty lines are ignored. Subkeys can be used to
+ * create structures which can be queried as a whole (array) or as single values.
  *
  * @example
  * <pre>
- * db.connector = mysql                               # subkey notation creates associative option arrays
+ * db.connector = mysql                               # subkey notation creates associative array branches
  * db.host      = localhost:3306
  * db.username  = username
  * db.password  = password
- * db.database  = schema
+ * db.database  = dbname
  *
- * db.options[] = value-at-index-0                    # bracket notation creates numeric option arrays
+ * db.options[] = value-at-index-0                    # bracket notation creates numeric array branches
  * db.options[] = value-at-index-1
  * db.options[] = value-at-index-2
  *
  * # comment on its own line
  * log.level.Action          = warn                   # comment at the end of line
- * log.level.foo\bar\MyClass = notice                 # keys may contain namespaces
+ * log.level.foo\bar\MyClass = notice                 # keys may contain PHP namespaces
  *
  * key.subkey with spaces    = value                  # keys may contain spaces
- * key.   indented.subkey    = value                  # enclosing space around subkeys is ignored
- * key."subkey.with.dots"    = value                  # quoted keys can contain otherwise illegal key characters
+ * key.   indented.subkey    = value                  # enclosing white space around subkeys is ignored
+ * key."a.subkey.with.dots"  = value                  # quoted keys can contain otherwise illegal key characters
  * </pre>
  */
 class Config extends Object implements ConfigInterface {
@@ -78,17 +52,18 @@ class Config extends Object implements ConfigInterface {
     /** @var string[] - config file names */
     protected $files = [];
 
-    /** @var string - config directory (the last requested configuration file's directory) */
+    /** @var string - directory of the last specified config file */
     protected $directory;
 
-    /** @var string[] - tree structure of config values */
+    /** @var array - tree structure of config values */
     protected $properties = [];
 
 
     /**
      * Constructor
      *
-     * Create a new instance and load the specified property files.
+     * Create a new instance and load the specified property files. Settings of all specified files are merged, later
+     * settings override already existing earlier settings.
      *
      * @param  string|string[] $files - single or multiple filenames to load
      */
@@ -151,7 +126,7 @@ class Config extends Object implements ConfigInterface {
 
 
     /**
-     * Get this instance's configuration directory. This is the directory of the last configuration file specified.
+     * Get this instance's configuration directory. This is the directory of the last specified configuration file.
      *
      * {@inheritdoc}
      */
