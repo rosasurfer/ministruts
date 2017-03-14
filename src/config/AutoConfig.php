@@ -61,7 +61,7 @@ class AutoConfig extends Config {
 
 
         // define framework config file
-        $files[] = MINISTRUTS_ROOT.'/src/config.properties';
+        $files[] = MINISTRUTS_ROOT.'/config.properties';
 
         // add project config files (skip if equal to framework which can happen during CLI testing)
         if ($configDir != realPath(MINISTRUTS_ROOT.'/src')) {
