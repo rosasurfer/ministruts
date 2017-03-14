@@ -26,21 +26,21 @@ class MiniStruts extends StaticClass {
     /**
      * Initialize the framework. This method expects an array with any of the following options:
      *
-     * "config"            - IConfig: configuration instance<br>
-     *                     - string:  configuration location, can either be a directory or a file.<br>
+     * "config"            - IConfig: Configuration instance. <br>
+     *                     - string:  Configuration location, can point to a directory or to a .properties file. <br>
      *
      * "handle-errors"     - string:  How to handle regular PHP errors. If set to 'strict' errors are converted to PHP
      *                                ErrorExceptions and thrown. If set to 'weak' errors are logged and execution continues.
-     *                                If set to 'ignore' you have to setup your own error handling mechanism.<br>
+     *                                If set to 'ignore' you have to setup your own error handling mechanism. <br>
      *                                default: 'strict' <br>
      *
      * "handle-exceptions" - bool:    If set to TRUE exceptions are handled by the built-in exception handler. If set to
-     *                                FALSE you have to setup your own exception handling mechanism.<br>
+     *                                FALSE you have to setup your own exception handling mechanism. <br>
      *                                default: TRUE <br>
      *
      * "globals"           - bool:    If set to TRUE, the helper functions and constants defined in "rosasurfer/helpers.php"
      *                                are mapped to and available in the global namespace. This can simplify HTML views as
-     *                                no additional PHP "use" declarations are needed.<br>
+     *                                no additional PHP "use" declarations are needed. <br>
      *                                default: FALSE <br>
      *
      * @param  array $options

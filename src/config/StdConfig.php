@@ -55,15 +55,15 @@ class StdConfig extends Config {
 
 
         // define framework config files
-        $files[]        = MINISTRUTS_ROOT.'/src/config.dist.properties';
+               $files[] = MINISTRUTS_ROOT.'/src/config.dist.properties';
         CLI && $files[] = MINISTRUTS_ROOT.'/src/config.cli.properties';
-        $files[]        = MINISTRUTS_ROOT.'/src/config.properties';
+               $files[] = MINISTRUTS_ROOT.'/src/config.properties';
 
         // add application config files (skip if equal to framework which can happen during CLI testing)
         if ($configDir != realPath(MINISTRUTS_ROOT.'/src')) {
-            $files[]        = $configDir.'/config.dist.properties';
-            CLI && $files[] = $configDir.'/config.cli.properties';
-            $files[]        = $configFile ?: $configDir.'/config.properties';
+                   $files[] =                $configDir.'/config.dist.properties';
+            CLI && $files[] =                $configDir.'/config.cli.properties';
+                   $files[] = $configFile ?: $configDir.'/config.properties';
         }
 
         // load the files
