@@ -13,12 +13,20 @@ use const rosasurfer\WINDOWS;
 /**
  * An application's main configuration using property files.
  *
- * A StdConfig is a standard configuration which typically is used as an application's main configuration. It differs
- * from a non-standard configuration in automatically loading a standardized set of configuration files. These are the
- * framework configuration files ("config.dist.properties", "config.cli.properties" if true and "config.properties")
- * and the project configuration files ("config.dist.properties", "config.cli.properties" if true and an optional
- * user-defined configuration, e.g. "config.production.properties"). If no user-defined configuration file is specified
- * the default user configuration "config.properties" is loaded.
+ * An AutoConfig is a configuration which typically is used as an application's main configuration. It differs from a regular
+ * configuration in automatically loading and merging a standardized set of config files (non-existing files are skipped).
+ *
+ * These files are in the following order (later config settings override existing earlier settings):
+ *
+ *  - The framework config files: "config.dist.properties"
+ *                                "config.cli.properties" (if applicable)
+ *                                "config.properties"
+ *
+ *  - The project config files:   "config.dist.properties"
+ *                                "config.cli.properties" (if applicable)
+ *
+ *  - An explicitely defined user config file, e.g. "config.production.properties" or the default user config file
+ *    "config.properties" if no explicite user config file is defined.
  */
 class StdConfig extends Config {
 
