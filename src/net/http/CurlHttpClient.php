@@ -169,7 +169,7 @@ class CurlHttpClient extends HttpClient {
      *
      * @return HttpResponse
      *
-     * @throws IOException - wenn ein Fehler auftritt
+     * @throws IOException wenn ein Fehler auftritt
      */
     public function send(HttpRequest $request) {
         if (!is_resource($this->hCurl))

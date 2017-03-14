@@ -18,7 +18,7 @@ interface ConfigInterface {
      *
      * @return string|array - config setting
      *
-     * @throws RuntimeException - if the setting is not found and no alternative value was specified
+     * @throws RuntimeException if the setting is not found and no alternative value was specified
      */
     public function get($key, $onNotFound = null);
 
