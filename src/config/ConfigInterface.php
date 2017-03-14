@@ -11,16 +11,16 @@ interface ConfigInterface {
 
 
     /**
-     * Return the config setting with the specified key or the specified alternative value if no such setting is found.
+     * Return the config setting with the specified key or the specified default value if no such setting is found.
      *
-     * @param  string $key        - key
-     * @param  mixed  $onNotFound - alternative value
+     * @param  string $key     - key
+     * @param  mixed  $default - default value
      *
      * @return string|array - config setting
      *
-     * @throws RuntimeException if the setting is not found and no alternative value was specified
+     * @throws RuntimeException if the setting is not found and no default value was specified
      */
-    public function get($key, $onNotFound = null);
+    public function get($key, $default = null);
 
 
     /**

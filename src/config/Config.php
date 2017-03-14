@@ -138,14 +138,14 @@ class Config extends Object implements ConfigInterface {
     /**
      * {@inheritdoc}
      */
-    public function get($key, $onNotFound=null) {
+    public function get($key, $default=null) {
         if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
 
         $value = $this->getProperty($key);
 
         if ($value === null) {
             if (func_num_args() == 1) throw new RuntimeException('No configuration found for key "'.$key.'"');
-            return $onNotFound;
+            return $default;
         }
         return $value;
     }
