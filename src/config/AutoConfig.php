@@ -13,20 +13,19 @@ use const rosasurfer\WINDOWS;
 /**
  * An application's main configuration using property files.
  *
- * An AutoConfig is a configuration which typically is used as an application's main configuration. It differs from a regular
- * configuration in automatically loading and merging a standardized set of config files (non-existing files are skipped).
+ * An AutoConfig instance is a configuration which typically is used as an application's main configuration. It differs from
+ * a regular configuration in automatically loading a standardized set of config files (non-existing files are skipped).
  *
- * These files are in the following order (later config settings override existing earlier settings):
+ * These files are in the following order (later config settings override existing earlier ones):
  *
  *  - The framework config files: "config.dist.properties"
- *                                "config.cli.properties" (if applicable)
  *                                "config.properties"
  *
  *  - The project config files:   "config.dist.properties"
  *                                "config.cli.properties" (if applicable)
  *
  *  - An explicitely defined user config file, e.g. "config.production.properties" or the default user config file
- *    "config.properties" if no explicite user config file is defined.
+ *    "config.properties" if no explicite definition is given.
  */
 class AutoConfig extends Config {
 
@@ -59,13 +58,12 @@ class AutoConfig extends Config {
 
 
         // TODO: look-up and delegate to an existing cached instance
-        //       key: get_class($this).'|'.$configDir.'|'.$configFile
+        //       key: get_class($this).'|'.$userConfig.'|cli='.(int)CLI
 
 
         // define framework config files
-               $files[] = MINISTRUTS_ROOT.'/src/config.dist.properties';
-        CLI && $files[] = MINISTRUTS_ROOT.'/src/config.cli.properties';
-               $files[] = MINISTRUTS_ROOT.'/src/config.properties';
+        $files[] = MINISTRUTS_ROOT.'/src/config.dist.properties';
+        $files[] = MINISTRUTS_ROOT.'/src/config.properties';
 
         // add project config files (skip if equal to framework which can happen during CLI testing)
         if ($configDir != realPath(MINISTRUTS_ROOT.'/src')) {
@@ -81,6 +79,7 @@ class AutoConfig extends Config {
         if (is_file($file = $configDir.'/dirs.php')) {
             $dirs = include($file);
             if (!isSet($dirs['root'])) throw new InvalidArgumentException('Missing config value "root" in project layout file: "'.$file.'"');
+            $dirs['config'] = $this->getDirectory();
 
             foreach ($dirs as $name => &$dir) {
                 if      ( WINDOWS && preg_match('/^[a-z]:/i', $dir)) $absolutePath = true;
@@ -90,6 +89,7 @@ class AutoConfig extends Config {
                     if ($name == 'root') throw new InvalidArgumentException('Invalid config value "root" in project layout file: "'.$file.'" (not an absolute path)');
                     $dir = $dirs['root'].'/'.$dir;
                 }
+                if (is_dir($dir)) $dir = realPath($dir);
             }; unset($dir);
 
             $this->set('app.dir', $dirs);
