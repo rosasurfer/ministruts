@@ -67,15 +67,33 @@ class AutoConfig extends Config {
         CLI && $files[] = MINISTRUTS_ROOT.'/src/config.cli.properties';
                $files[] = MINISTRUTS_ROOT.'/src/config.properties';
 
-        // add application config files (skip if equal to framework which can happen during CLI testing)
+        // add project config files (skip if equal to framework which can happen during CLI testing)
         if ($configDir != realPath(MINISTRUTS_ROOT.'/src')) {
                    $files[] =                $configDir.'/config.dist.properties';
             CLI && $files[] =                $configDir.'/config.cli.properties';
                    $files[] = $configFile ?: $configDir.'/config.properties';
         }
 
-        // load the files
+        // load config files
         parent::__construct($files);
+
+        // add directory layout if it exists
+        if (is_file($file = $configDir.'/dirs.php')) {
+            $dirs = include($file);
+            if (!isSet($dirs['root'])) throw new InvalidArgumentException('Missing config value "root" in project layout file: "'.$file.'"');
+
+            foreach ($dirs as $name => &$dir) {
+                if      ( WINDOWS && preg_match('/^[a-z]:/i', $dir)) $absolutePath = true;
+                else if (!WINDOWS && $dir[0]=='/')                   $absolutePath = true;
+                else                                                 $absolutePath = false;
+                if (!$absolutePath) {
+                    if ($name == 'root') throw new InvalidArgumentException('Invalid config value "root" in project layout file: "'.$file.'" (not an absolute path)');
+                    $dir = $dirs['root'].'/'.$dir;
+                }
+            }; unset($dir);
+
+            $this->set('app.dir', $dirs);
+        }
 
         // create FileDependency and cache the instance
         //$dependency = FileDependency::create(array_keys($config->files));

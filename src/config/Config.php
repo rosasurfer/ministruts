@@ -183,10 +183,9 @@ class Config extends Object implements ConfigInterface {
      * {@inheritdoc}
      */
     public function set($key, $value) {
-        if (!is_string($key))   throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
-        if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
-
+        if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
         $this->setProperty($key, $value);
+        return $this;
     }
 
 

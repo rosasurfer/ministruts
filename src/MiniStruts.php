@@ -50,16 +50,12 @@ class MiniStruts extends StaticClass {
         if (!isSet($options['handle-errors'    ])) $options['handle-errors'    ] = 'strict';
         if (!isSet($options['handle-exceptions'])) $options['handle-exceptions'] = true;
         if (!isSet($options['globals'          ])) $options['globals'          ] = false;
+        //if (!isSet($options['config'         ])) throw error
 
-        foreach ($options as $key => $value) {
-            switch ($key) {
-                case 'config'           : self::setConfiguration      ($value); continue;
-                case 'handle-errors'    : self::setupErrorHandling    ($value); continue;
-                case 'handle-exceptions': self::setupExceptionHandling($value); continue;
-                case 'globals'          : self::loadGlobalHelpers     ($value); continue;
-              //case 'replace-composer' : self::replaceComposer       ($value); continue;     // TODO
-            }
-        }
+        self::setupErrorHandling    ($options['handle-errors'    ]);
+        self::setupExceptionHandling($options['handle-exceptions']);
+        self::loadGlobalHelpers     ($options['globals'          ]);
+        self::setConfiguration      ($options['config'           ]);
 
         // (1) check application settings                              // TODO: remove APPLICATION_ROOT dependency
         if (!defined('\APPLICATION_ROOT')) {

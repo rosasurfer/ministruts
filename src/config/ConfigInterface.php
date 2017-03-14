@@ -27,9 +27,9 @@ interface ConfigInterface {
      * Set/modify the config setting with the specified key.
      *
      * @param  string $key   - key
-     * @param  string $value - new value
+     * @param  mixed  $value - new value
      *
-     * @return void
+     * @return self
      */
     public function set($key, $value);
 
