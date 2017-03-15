@@ -76,10 +76,10 @@ class AutoConfig extends Config {
         // load config files
         parent::__construct($files);
 
-        // add directory layout if it exists
+        // add project directory layout
         if (is_file($file = $configDir.'/dirs.php')) {
             $dirs = include($file);
-            if (!isSet($dirs['root'])) throw new InvalidArgumentException('Missing config value "root" in project layout file: "'.$file.'"');
+            if (!isSet($dirs['root'])) throw new InvalidArgumentException('Missing config value "root" in project directory layout file: "'.$file.'"');
             $dirs['config'] = $this->getDirectory();
 
             foreach ($dirs as $name => &$dir) {
@@ -87,7 +87,7 @@ class AutoConfig extends Config {
                 else if (!WINDOWS && $dir[0]=='/')                   $absolutePath = true;
                 else                                                 $absolutePath = false;
                 if (!$absolutePath) {
-                    if ($name == 'root') throw new InvalidArgumentException('Invalid config value "root" in project layout file: "'.$file.'" (not an absolute path)');
+                    if ($name == 'root') throw new InvalidArgumentException('Invalid config value "root" in project directory layout file: "'.$file.'" (not an absolute path)');
                     $dir = $dirs['root'].'/'.$dir;
                 }
                 if (is_dir($dir)) $dir = realPath($dir);
