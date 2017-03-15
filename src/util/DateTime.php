@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\date;
+namespace rosasurfer\util;
 
 use rosasurfer\core\ObjectTrait as TObject;
 
