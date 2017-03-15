@@ -68,15 +68,9 @@ class AutoConfig extends Config {
             if (CLI) $files[] = $configDir.'/config.cli.properties';
 
             // user or environment config
-            if ($configFile) {
-                $files[] = $configFile;
-            }
-            else if (($env=getEnv('APP_ENV'))!==false || ($env=getEnv('APPLICATION_ENV'))!==false) {
-                $files[] = $configDir.'/config.'.$env.'.properties';
-            }
-            else {
-                $files[] = $configDir.'/config.properties';
-            }
+            if ($configFile)                             $files[] = $configFile;
+            else if (($env=getEnv('APP_ENV')) !== false) $files[] = $configDir.'/config.'.$env.'.properties';
+            else                                         $files[] = $configDir.'/config.properties';
         }
 
         // load config files
