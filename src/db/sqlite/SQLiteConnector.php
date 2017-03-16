@@ -13,17 +13,30 @@ use rosasurfer\WINDOWS;
 /**
  * SQLiteConnector
  *
- * Connector for SQLite/SQLite3 databases. Supported configuration values (see constructor):
+ * Connector configuration:
+ * <pre>
+ * +--------------------------------------------+------------+----------------------------+
+ * | setting                                    | value      | default value              |
+ * +--------------------------------------------+------------+----------------------------+
+ * | db.{name}.connector                        | sqlite     | -                          |
+ * | db.{name}.database                         | dbFileName | - (1)                      |
+ * | db.{name}.options.open_mode                | [openMode] | SQLITE3_OPEN_READWRITE (2) |
+ * | db.{name}.options.foreign_keys             | [on|off]   | on                         |
+ * | db.{name}.options.ignore_check_constraints | [on|off]   | off                        |
+ * +--------------------------------------------+------------+----------------------------+
+ * </pre>
+ *  (1) - A relative database file location is interpreted as relative to the application root directory. <br>
+ *  (2) - Available flags: SQLITE3_OPEN_CREATE | SQLITE3_OPEN_READONLY | SQLITE3_OPEN_READWRITE <br>
  *
- *  "file"   The database file to connect to. A relative location is resolved relative to the application's root directory
- *           as defined by APPLICATION_ROOT. By default the file is opened in mode SQLITE3_OPEN_READWRITE.
+ * Additional SQLite pragma statements may be specified under the "options" key.
  *
- * Note:
- * -----
- * The php_sqlite3 extension v0.7-dev is broken. The first initial call of SQLite3Result::fetchArray() and calls after a
- * SQLite3Result::reset() trigger the re-execution of an already executed query. The workaround for DDL and DML statements
- * is to check with SQLite3Result::numColumns() for an empty result before calling fetchArray(). There is no workaround to
- * prevent multiple executions of SELECT queries except of using the PDO adapter.
+ *
+ * Note: <br>
+ * ----- <br>
+ * The php_sqlite3 extension v0.7-dev has a serious bug. The first call of SQLite3Result::fetchArray() and calls after a
+ * SQLite3Result::reset() trigger re-execution of an already executed query. The workaround for DDL and DML statements is to
+ * check with SQLite3Result::numColumns() for an empty result before calling fetchArray(). There is no workaround to prevent
+ * multiple executions of SELECT queries except of using another SQLite adapter.
  *
  * @see  http://bugs.php.net/bug.php?id=64531
  */
@@ -70,6 +83,7 @@ class SQLiteConnector extends Connector {
      */
     public function __construct(array $options) {
         if (isSet($options['file'])) $this->setFile($options['file']);
+        unset($options['file']);
         $this->setOptions($options);
     }
 
@@ -112,10 +126,10 @@ class SQLiteConnector extends Connector {
      * @return self
      */
     public function connect() {
-        try {                                                                // available flags:
-            $flags = SQLITE3_OPEN_READWRITE;                                  // SQLITE3_OPEN_CREATE
-            $handler = new \SQLite3($this->file, $flags);                     // SQLITE3_OPEN_READONLY
-            !$handler && trigger_error(@$php_errormsg, E_USER_ERROR);         // SQLITE3_OPEN_READWRITE
+        try {                                                               // available flags:
+            $flags = SQLITE3_OPEN_READWRITE;                                // SQLITE3_OPEN_CREATE
+            $handler = new \SQLite3($this->file, $flags);                   // SQLITE3_OPEN_READONLY
+            !$handler && trigger_error(@$php_errormsg, E_USER_ERROR);       // SQLITE3_OPEN_READWRITE
         }
         catch (IRosasurferException $ex) {
             $file = $this->file;
@@ -135,6 +149,26 @@ class SQLiteConnector extends Connector {
             throw $ex->addMessage('Cannot '.$what.' SQLite database file "'.$file.'"'.$where);
         }
         $this->handler = $handler;
+
+        $this->setConnectionOptions();
+    }
+
+
+    /**
+     * Set the configured connection options.
+     *
+     * @return self
+     */
+    protected function setConnectionOptions() {
+        //$options = $this->options;
+        //foreach ($this->options as $option => $value) {
+        //    $this->execute('set '.$option.' = '.$value);
+        //}
+
+        // always activate foreign key checks
+        $this->execute('pragma foreign_keys = on');
+
+        return $this;
     }
 
 
