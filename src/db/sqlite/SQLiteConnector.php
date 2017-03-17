@@ -15,20 +15,19 @@ use rosasurfer\WINDOWS;
  *
  * Connector configuration:
  * <pre>
- * +--------------------------------------------+------------+----------------------------+
- * | setting                                    | value      | default value              |
- * +--------------------------------------------+------------+----------------------------+
- * | db.{name}.connector                        | sqlite     | -                          |
- * | db.{name}.database                         | dbFileName | - (1)                      |
- * | db.{name}.options.open_mode                | [openMode] | SQLITE3_OPEN_READWRITE (2) |
- * | db.{name}.options.foreign_keys             | [on|off]   | on                         |
- * | db.{name}.options.ignore_check_constraints | [on|off]   | off                        |
- * +--------------------------------------------+------------+----------------------------+
+ * +--------------------------------+------------+----------------------------+
+ * | setting                        | value      | default value              |
+ * +--------------------------------+------------+----------------------------+
+ * | db.{name}.connector            | sqlite     | -                          |
+ * | db.{name}.database             | dbFileName | - (1)                      |
+ * | db.{name}.options.open_mode    | [openMode] | SQLITE3_OPEN_READWRITE (2) |
+ * | db.{name}.options.foreign_keys | [on|off]   | on                         |
+ * +--------------------------------+------------+----------------------------+
  * </pre>
  *  (1) - A relative database file location is interpreted as relative to the application root directory. <br>
  *  (2) - Available flags: SQLITE3_OPEN_CREATE | SQLITE3_OPEN_READONLY | SQLITE3_OPEN_READWRITE <br>
  *
- * Additional SQLite pragma statements may be specified under the "options" key.
+ * Additional SQLite pragma options can be specified under the "options" key.
  *
  *
  * Note: <br>
