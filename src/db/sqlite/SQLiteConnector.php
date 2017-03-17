@@ -332,48 +332,6 @@ class SQLiteConnector extends Connector {
 
         return $result;
     }
-    /*
-    $db->query("drop table if exists t_test");
-    $db->query("create table t_test (id integer primary key, name varchar(100) not null)");
-    $db->query("insert into t_test (name) values ('a'), ('b'), ('c'), ('123')");
-    $db->query("set @a = 5");
-    $db->query("explain select count(*) from t_test");
-    $db->query("update t_test set name='c' where name in ('c')");
-    $db->query("select * from t_test where name in ('a','b')");
-    $db->query("select * from t_test where name in ('a','b') limit 1");
-    $db->query("update t_test set name='aa' where name in ('c')");
-    $db->query("select * from t_test where name = 'no-one'");
-    $db->query("select count(*) from t_test");
-    $db->query("delete from t_test where name = 'a' or name = 'b'");
-    $db->query("select count(*) from t_test");
-    $db->query("insert into t_test (name) values ('y'), ('z')");
-    $db->query("insert into t_test (name) values ('x')");
-    $db->query("explain select count(*) from t_test");
-    $db->query("select * from t_test");
-    $db->query("select * from t_test where name = 'no-one'");
-
-    $result  = $db->query($sql);
-    $handler = $db->getInternalHandler();
-    echoPre(str_pad(explode(' ', $sql, 2)[0].':', 9).'  lastInsertRowID='.$handler->lastInsertRowID().'  lastInsertId='.$db->lastInsertId().'  changes='.$handler->changes().'  lastAffectedRows='.$db->lastAffectedRows().'  total_changes='.$db->query('select total_changes()')->fetchInt().'  result='.(is_object($result->getInternalResult()) ? 'object':'      ').'  numRows='.$result->numRows());
-
-    drop:      lastInsertRowID=0  lastInsertId=0  changes=0  lastAffectedRows=0  total_changes=0  result=        num_rows=0
-    create:    lastInsertRowID=0  lastInsertId=0  changes=0  lastAffectedRows=0  total_changes=0  result=        num_rows=0
-    insert:    lastInsertRowID=4  lastInsertId=4  changes=4  lastAffectedRows=4  total_changes=4  result=        num_rows=0
-    explain:   lastInsertRowID=4  lastInsertId=4  changes=4  lastAffectedRows=4  total_changes=4  result=object  num_rows=10
-    update:    lastInsertRowID=4  lastInsertId=4  changes=1  lastAffectedRows=1  total_changes=5  result=        num_rows=0
-    select:    lastInsertRowID=4  lastInsertId=4  changes=1  lastAffectedRows=1  total_changes=5  result=object  num_rows=2
-    select:    lastInsertRowID=4  lastInsertId=4  changes=1  lastAffectedRows=1  total_changes=5  result=object  num_rows=1
-    update:    lastInsertRowID=4  lastInsertId=4  changes=1  lastAffectedRows=1  total_changes=6  result=        num_rows=0
-    select:    lastInsertRowID=4  lastInsertId=4  changes=1  lastAffectedRows=1  total_changes=6  result=object  num_rows=0
-    select:    lastInsertRowID=4  lastInsertId=4  changes=1  lastAffectedRows=1  total_changes=6  result=object  num_rows=1
-    delete:    lastInsertRowID=4  lastInsertId=4  changes=2  lastAffectedRows=2  total_changes=8  result=        num_rows=0
-    select:    lastInsertRowID=4  lastInsertId=4  changes=2  lastAffectedRows=2  total_changes=8  result=object  num_rows=1
-    insert:    lastInsertRowID=6  lastInsertId=6  changes=2  lastAffectedRows=2  total_changes=10  result=        num_rows=0
-    insert:    lastInsertRowID=7  lastInsertId=7  changes=1  lastAffectedRows=1  total_changes=11  result=        num_rows=0
-    explain:   lastInsertRowID=7  lastInsertId=7  changes=1  lastAffectedRows=1  total_changes=11  result=object  num_rows=10
-    select:    lastInsertRowID=7  lastInsertId=7  changes=1  lastAffectedRows=1  total_changes=11  result=object  num_rows=5
-    select:    lastInsertRowID=7  lastInsertId=7  changes=1  lastAffectedRows=1  total_changes=11  result=object  num_rows=0
-   */
 
 
     /**
