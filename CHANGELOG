@@ -1,28 +1,33 @@
 
+2017-03-19
+
+   - struts: remove freezing of ActionForwards
+
+
 2017-03-13
 
-   - add class date\DateTime (extended version of \DateTime)
+   - util: add class date\DateTime (extended version of \DateTime)
 
 
 2017-03-12
 
-   - core:   outsource Object functionality to trait to enable re-use by non-framework classes
-   - db/orm: implement nullable/not nullable version field via mapping configuration
-   - db/orm: implement column mapping to PHP classes
+   - core: outsource Object functionality to trait to enable re-use by non-framework classes
+   - orm:  implement nullable/not nullable version field via mapping configuration
+   - orm:  implement column mapping to PHP classes
 
 
 2017-03-08
 
-   - db/orm: add method DAO::execute() for execution of arbitrary OQL statements
+   - orm: add method DAO::execute() for execution of arbitrary OQL statements
    
 
 2017-03-05
 
-   - db/orm: extend model mappings by SQL bind types and column behaviors
-   - db/orm: move properties PersistableObject::${primary-key|created|updated|deleted} to model classes 
-   - db/orm: quick and dirty query substitution of model names by table names 
-   - replace di/DiAwareInterface by di/DiAwareTrait
-   - add helper function rosasurfer\strCollapseWhiteSpace()
+   - orm:  extend model mappings by SQL bind types and column behaviors
+   - orm:  move properties PersistableObject::${primary-key|created|updated|deleted} to model classes 
+   - orm:  quick and dirty query substitution of model names by table names 
+   - core: replace di/DiAwareInterface by di/DiAwareTrait
+   - util: add helper function rosasurfer\strCollapseWhiteSpace()
 
 
 2017-03-02

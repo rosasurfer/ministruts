@@ -3,7 +3,6 @@ namespace rosasurfer\ministruts;
 
 use rosasurfer\core\Object;
 
-use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 
@@ -44,9 +43,6 @@ class ActionForward extends Object {
 
     /** @var bool */
     protected $redirect;
-
-    /** @var bool - ob diese Komponente vollstaendig konfiguriert ist */
-    protected $configured = false;
 
 
     /**
@@ -111,7 +107,6 @@ class ActionForward extends Object {
      * @return self
      */
     public function setName($name) {
-        if ($this->configured) throw new IllegalStateException('Configuration is frozen');
         if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
         if (!strLen($name))    throw new InvalidArgumentException('Invalid argument $name: '.$name);
 
@@ -128,7 +123,6 @@ class ActionForward extends Object {
      * @return self
      */
     public function setPath($path) {
-        if ($this->configured) throw new IllegalStateException('Configuration is frozen');
         if (!is_string($path)) throw new IllegalTypeException('Illegal type of parameter $path: '.getType($path));
         if (!strLen($path))    throw new InvalidArgumentException('Invalid argument $path: '.$path);
 
@@ -145,7 +139,6 @@ class ActionForward extends Object {
      * @return self
      */
     public function setLabel($label) {
-        if ($this->configured)  throw new IllegalStateException('Configuration is frozen');
         if (!is_string($label)) throw new IllegalTypeException('Illegal type of parameter $label: '.getType($label));
         if (!strLen($label))    throw new InvalidArgumentException('Invalid argument $label: '.$label);
 
@@ -162,7 +155,6 @@ class ActionForward extends Object {
      * @return self
      */
     public function setRedirect($redirect) {
-        if ($this->configured)   throw new IllegalStateException('Configuration is frozen');
         if (!is_bool($redirect)) throw new IllegalTypeException('Illegal type of parameter $redirect: '.getType($redirect));
 
         $this->redirect = $redirect;
@@ -179,7 +171,6 @@ class ActionForward extends Object {
      * @return self
      */
     public function addQueryData($key, $value) {
-        if ($this->configured)      throw new IllegalStateException('Configuration is frozen');
         if (!is_string($key))       throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
         if (is_null($value))        $value = '';
         elseif (is_bool($value))    $value = (int) $value;
@@ -198,31 +189,11 @@ class ActionForward extends Object {
 
 
     /**
-     * Friert die Konfiguration dieser Komponente ein. Nachdem Aufruf dieser Methode kann die Konfiguration
-     * der Komponente nicht mehr veraendert werden.
+     * Erzeugt einen neuen ActionForward, der auf dieser Instanz basiert.
      *
      * @return self
-     */
-    public function freeze() {
-        if (!$this->configured)
-            $this->configured = true;
-
-        return $this;
-    }
-
-
-    /**
-     * Erzeugt einen neuen ActionForward, der auf dieser Instanz basiert. Die Konfiguration des neuen
-     * Forwards ist noch nicht eingefroren, sodass diese Methode zum "Modifizieren" vorhandener Forwards
-     * benutzt werden kann.
-     *
-     * @return self
-     *
-     * @see ActionForward::freeze()
      */
     public function copy() {
-        $forward = clone $this;
-        $forward->configured = false;
-        return $forward;
+        return clone $this;
     }
 }

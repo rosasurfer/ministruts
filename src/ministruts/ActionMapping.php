@@ -426,13 +426,6 @@ class ActionMapping extends Object {
                         throw new IllegalStateException('A "success" and an "error" forward must be configured for validation of mapping "'.$this->path.'"');
                 }
             }
-
-            if ($this->forward)
-                $this->forward->freeze();
-
-            foreach ($this->forwards as $forward)
-                $forward->freeze();
-
             $this->configured = true;
         }
         return $this;
@@ -461,10 +454,8 @@ class ActionMapping extends Object {
             if (strLen($query))
                 $url .= '?'.$query;
 
-            $class   = $this->module->getForwardClass();
-            $forward = new $class($name, $url, true);
-            //don't call $forward->freeze(), userland code may want to modify this forward further
-            return $forward;
+            $class = $this->module->getForwardClass();
+            return new $class($name, $url, true);
         }
 
         $forward = $this->module->findForward($name);

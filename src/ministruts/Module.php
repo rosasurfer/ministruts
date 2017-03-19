@@ -822,8 +822,7 @@ class Module extends Object {
      */
     public function freeze() {
         if (!$this->configured) {
-            foreach ($this->globalForwards as $forward) $forward->freeze();
-            foreach ($this->mappings       as $mapping) $mapping->freeze();
+            foreach ($this->mappings as $mapping) $mapping->freeze();
 
             foreach ($this->tiles as $i => $tile) {
                 if ($tile->isAbstract()) unset($this->tiles[$i]);
