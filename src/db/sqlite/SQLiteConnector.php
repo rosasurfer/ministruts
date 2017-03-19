@@ -35,7 +35,7 @@ use rosasurfer\WINDOWS;
  * The php_sqlite3 extension v0.7-dev has a serious bug. The first call of SQLite3Result::fetchArray() and calls after a
  * SQLite3Result::reset() trigger re-execution of an already executed query. The workaround for DDL and DML statements is to
  * check with SQLite3Result::numColumns() for an empty result before calling fetchArray(). There is no workaround to prevent
- * multiple executions of SELECT queries except of using another SQLite adapter.
+ * multiple executions of SELECT queries except of using a different SQLite adapter.
  *
  * @see  http://bugs.php.net/bug.php?id=64531
  */
