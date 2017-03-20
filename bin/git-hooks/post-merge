@@ -24,9 +24,9 @@ fi
 
 # check for Composer
 result=$(type -P composer.phar 2> /dev/null)
-if [ -z $result ]; then
+if [ -z "$result" ]; then
     result=$(type -P composer 2> /dev/null)
-    [ -z $result ] && echo "ERROR: could not find Composer" && exit 1
+    [ -z "$result" ] && echo "ERROR: could not find Composer" && exit 1
 fi
 if [ ".$OSTYPE" = ".msys" ] || [ ".$OSTYPE" = ".cygwin" ] ; then
    if [ ".$TERM" != ".cygwin" ]; then
@@ -48,8 +48,8 @@ check_run() {
    echo " * running composer install"              && \
    run_composer=1
    
-   if [ -n $run_composer ]; then
-      if [ -n $use_alias ] && [ -f "${HOME}/.bash_aliases" ]; then
+   if [ -n "$run_composer" ]; then
+      if [ -n "$use_alias" ] && [ -f "${HOME}/.bash_aliases" ]; then
          . "${HOME}/.bash_aliases"
          shopt -s expand_aliases
       fi
