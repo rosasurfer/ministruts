@@ -10,20 +10,20 @@ use rosasurfer\core\Object;
 abstract class Action extends Object {
 
 
-    /** @var ActionMapping */
+    /** @var ActionMapping - encapsulates a single routing configuration */
     protected $mapping;
 
-    /** @var ActionForm */
+    /** @var ActionForm - holds user input of the current request */
     protected $form;
 
 
     /**
      * Constructor
      *
-     * Erzeugt eine neue Action.
+     * Create a new Action instance.
      *
-     * @param  ActionMapping   $mapping - das Mapping, zu dem die Action gehoert
-     * @param  ActionForm|null $form    - die ActionForm (default: none)
+     * @param  ActionMapping   $mapping - the mapping using the Action
+     * @param  ActionForm|null $form    - user input of the request (default: none)
      */
     public function __construct(ActionMapping $mapping, ActionForm $form = null) {
         $this->mapping = $mapping;
@@ -32,7 +32,7 @@ abstract class Action extends Object {
 
 
     /**
-     * Gibt das aktuelle ActionMapping, das die Verwendung dieser Action definiert, zurueck.
+     * Return the {@link ActionMapping} using the Action.
      *
      * @return ActionMapping
      */
@@ -42,18 +42,18 @@ abstract class Action extends Object {
 
 
     /**
+     *
+     *
      * Allgemeiner Pre-Processing-Hook, der von Subklassen bei Bedarf ueberschrieben werden kann.  Gibt NULL
      * zurueck, wenn die Verarbeitung fortgesetzt werden soll oder eine ActionForward-Instanz, wenn die
      * Verarbeitung abgebrochen und zu dem vom Forward beschriebenen Ziel verzweigt werden soll.
      * Die Default-Implementierung macht nichts.
      *
-     * Note: Zur Vereinfachung kann statt einer Instanz auch der Name eines ActionForward aus der
-     *       struts-config.xml zurueckgeben werden.
-     *
      * @param  Request  $request
      * @param  Response $response
      *
-     * @return ActionForward|string|null
+     * @return ActionForward|string|null - NULL to continue request processing;
+     *                                     ActionForward instance or forward name if request processing is finished
      */
     public function executeBefore(Request $request, Response $response) {
         return null;
