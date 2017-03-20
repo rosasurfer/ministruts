@@ -7,7 +7,10 @@
 namespace rosasurfer;
 
 use rosasurfer\core\Object;
+use rosasurfer\core\ObjectTrait;
+
 use rosasurfer\di\DiAwareTrait;
+
 use rosasurfer\loader\ClassLoader;
 
 
