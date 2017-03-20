@@ -21,5 +21,8 @@
     "autoload": {
         "classmap": ["src/"],
         "files":    ["src/load.php"]
-    }
+    },
+    "scripts": {
+        "post-install-cmd": "sh -c '[ -f bin/git-hooks/setup.sh ] && sh bin/git-hooks/setup.sh'"
+    }    
 }
