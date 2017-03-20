@@ -40,8 +40,8 @@ check_run() {
    echo " * running composer install"              && \
    {
    if [[ -n "$use_alias" && -f ~/.bash_aliases ]]; then
-      . ~/.bash_aliases
       shopt -s expand_aliases
+      . ~/.bash_aliases
    fi
    eval "COMPOSER_ALLOW_SUPERUSER=1 composer install"
    }
