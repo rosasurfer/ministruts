@@ -5,29 +5,14 @@
 # This hook is not executed by Eclipse.
 #
 
-if [[ -p /dev/stdin ]]; then
-    echo "stdin is coming from a pipe"
-fi
-if [[ -t 0 ]]; then
-    echo "stdin is coming from the terminal"
-fi
-if [[ ! -t 0 && ! -p /dev/stdin ]]; then
-    echo "stdin is redirected"
-fi
 
-exit
-
-#
-# check for and execute an existing user hook
-#
-if [ -f "$0.user" ]; then
-   "$0.user" "$@"
+# execute an existing user hook
+if [ -x "$0.user" ]; then
+   "$0.user" "$@" || exit $?
 fi
 
 
-#
 # find Composer
-#
 result=$(type -P composer.phar 2> /dev/null)
 if [ -z "$result" ]; then
     result=$(type -P composer 2> /dev/null)
