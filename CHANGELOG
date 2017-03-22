@@ -1,4 +1,10 @@
 
+2017-03-22
+
+   - db:  add method Connector::supportsInsertReturn() for "insert into ... returning ..." syntax
+   - orm: automated inserting of model instances in the ORM via PersistableObject::insert() 
+
+
 2017-03-19
 
    - struts: remove freezing of ActionForwards
