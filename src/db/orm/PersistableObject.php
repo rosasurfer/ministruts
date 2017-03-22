@@ -18,6 +18,7 @@ use const rosasurfer\PHP_TYPE_BOOL;
 use const rosasurfer\PHP_TYPE_FLOAT;
 use const rosasurfer\PHP_TYPE_INT;
 use const rosasurfer\PHP_TYPE_STRING;
+use rosasurfer\exception\RuntimeException;
 
 
 /**
@@ -95,7 +96,6 @@ abstract class PersistableObject extends Object {
      */
     public function isPersistent() {
         // TODO: this check cannot yet handle composite primary keys
-
         foreach ($mapping = $this->dao()->getMapping()['columns'] as $phpName => $column) {
             if ($column[IDX_MAPPING_COLUMN_BEHAVIOR] & ID_PRIMARY)
                 return ($this->$phpName !== null);
@@ -137,12 +137,56 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Insert this instance into the storage mechanism. Must be implemented by the actual class.
+     * Insert this instance into the storage mechanism.
      *
      * @return self
      */
     protected function insert() {
-        throw new UnimplementedFeatureException('You must implement '.get_class($this).'->'.__FUNCTION__.'() to insert a '.get_class($this).'.');
+        if ($this->isPersistent()) throw new RuntimeException('Cannot insert already persistent '.$this);
+
+        $db         = $this->db();
+        $mapping    = $this->dao()->getMapping();
+        $table      = $mapping['table'];
+        $columns    = [];
+        $values     = [];
+        $idProperty = null;
+        $idColumn   = null;
+
+        // collect columns and values
+        foreach ($mapping['columns'] as $phpName => $column) {
+            if ($column[IDX_MAPPING_COLUMN_BEHAVIOR] & ID_PRIMARY) {
+                $idProperty = $phpName;
+                $idColumn   = $column[IDX_MAPPING_COLUMN_NAME];
+                continue;                                               // skip the auto-generated identity column
+            }
+            $columns[] = $column[IDX_MAPPING_COLUMN_NAME];
+            $bindType  = $column[IDX_MAPPING_BIND_TYPE] ?: $column[IDX_MAPPING_PHP_TYPE];
+
+            switch ($bindType) {
+                case BIND_TYPE_BOOL   : $values[] =        (int)(bool) $this->$phpName;  break;
+                case BIND_TYPE_INT    : $values[] =              (int) $this->$phpName;  break;
+                case BIND_TYPE_DECIMAL: $values[] =            (float) $this->$phpName;  break;
+                case BIND_TYPE_STRING : $values[] = $db->escapeLiteral($this->$phpName); break;
+                default:
+                    if (is_class($bindType)) {
+                        $value    = (new $bindType())->convertToSql($this->$phpName, $column, $db);
+                        $values[] = $db->escapeLiteral($value);
+                        break;
+                    }
+                    throw new RuntimeException('Unsupported SQL bind type "'.$bindType.'" for database mapping of '.get_class($this).'::'.$phpName);
+            }
+        }
+
+        // create and execute INSERT statement
+        $sql = 'insert into '.$table.' ('.join(', ', $columns).') values ('.join(', ', $values).')';
+
+        if ($db->supportsInsertReturn()) $id = $db->query($sql.' returning '.$idColumn)->fetchField();
+        else                             $id = $db->execute($sql)->lastInsertId();
+
+        // assign returned identity value
+        $this->$idProperty = $id;
+
+        return $this;
     }
 
 
@@ -209,14 +253,14 @@ abstract class PersistableObject extends Object {
                     case PHP_TYPE_INT    : $object->$phpName =         (int) $row[$column];  break;
                     case PHP_TYPE_FLOAT  : $object->$phpName =       (float) $row[$column];  break;
                     case PHP_TYPE_STRING : $object->$phpName =      (string) $row[$column];  break;
-                    case PHP_TYPE_ARRAY  : $object->$phpName =        strLen($row[$column]) ? explode(',', $row[$column]) : []; break;
-                    case \DateTime::class: $object->$phpName = new \DateTime($row[$column]); break;
+                  //case PHP_TYPE_ARRAY  : $object->$phpName =        strLen($row[$column]) ? explode(',', $row[$column]) : []; break;
+                  //case \DateTime::class: $object->$phpName = new \DateTime($row[$column]); break;
                     default:
-                        if (is_class($phpType)) {
-                            $object->$phpName = new $phpType($row[$column]);
-                            break;
-                        }
-                        throw new InvalidArgumentException('Unsupported type "'.$phpType.'" for database mapping of '.$class.'::'.$phpName);
+                        //if (is_class($phpType)) {
+                        //    $object->$phpName = new $phpType($row[$column]);
+                        //    break;
+                        //}
+                        throw new RuntimeException('Unsupported PHP type "'.$phpType.'" for database mapping of '.$class.'::'.$phpName);
                 }
             }
         }

@@ -35,19 +35,17 @@ const BIND_TYPE_STRING = 4;
 /**
  * Bind type "blob"
  */
-const BIND_TYPE_BLOB = 5;
+//const BIND_TYPE_BLOB = 5;         // TODO
 
 /**
  * Bind type "array"
- *
-const BIND_TYPE_ARRAY = 6;        // TODO
  */
+//const BIND_TYPE_ARRAY = 6;        // TODO
 
 /**
  * Bind type "set"
- *
-const BIND_TYPE_SET = 7;          // TODO
  */
+//const BIND_TYPE_SET = 7;          // TODO
 
 
 // Meta column ids and flags. Ids are implemented as flags but exclusive.
