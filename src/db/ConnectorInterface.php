@@ -167,6 +167,14 @@ interface ConnectorInterface {
 
 
     /**
+     * Whether or not the DBMS's SQL dialect supports 'insert into ... returning ...' syntax.
+     *
+     * @return bool
+     */
+    public function supportsInsertReturn();
+
+
+    /**
      * Return the connector's internal connection object.
      *
      * @return resource|object - connection handle or handler instance

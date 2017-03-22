@@ -576,6 +576,16 @@ class MySQLConnector extends Connector {
 
 
     /**
+     * Whether or not the DBMS's SQL dialect supports 'insert into ... returning ...' syntax.
+     *
+     * @return bool
+     */
+    public function supportsInsertReturn() {
+        return false;
+    }
+
+
+    /**
      * Return the connector's internal connection object.
      *
      * @return resource - the internal connection handle

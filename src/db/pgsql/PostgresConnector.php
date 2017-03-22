@@ -530,6 +530,16 @@ class PostgresConnector extends Connector {
 
 
     /**
+     * Whether or not the DBMS's SQL dialect supports 'insert into ... returning ...' syntax.
+     *
+     * @return bool
+     */
+    public function supportsInsertReturn() {
+        return true;
+    }
+
+
+    /**
      * Return the connector's internal connection object.
      *
      * @return resource - the internal connection handle
