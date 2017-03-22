@@ -48,7 +48,7 @@ class Worker extends Object {
     /**
      * Find a single matching record and convert it to an object of the model class.
      *
-     * @param  string $query     - SQL query, may contain ORM syntax
+     * @param  string $query     - SQL query with optional ORM syntax
      * @param  bool   $allowMany - whether or not the query is allowed to return a multi-row result (default: no)
      *
      * @return PersistableObject|null
@@ -68,7 +68,7 @@ class Worker extends Object {
     /**
      * Find all matching records and convert them to objects of the model class.
      *
-     * @param  string $query - SQL query, may contain ORM syntax
+     * @param  string $query - SQL query with optional ORM syntax
      *
      * @return PersistableObject[]
      */
@@ -81,7 +81,7 @@ class Worker extends Object {
     /**
      * Execute a SQL statement and return the result. This method should be used for SQL statements returning rows.
      *
-     * @param  string $sql - SQL statement, may contain ORM syntax
+     * @param  string $sql - SQL statement with optional ORM syntax
      *
      * @return IResult
      */
@@ -95,7 +95,7 @@ class Worker extends Object {
      * Execute a SQL statement and skip potential result set processing. This method should be used for SQL statements not
      * returning rows.
      *
-     * @param  string $sql - SQL statement, may contain ORM syntax
+     * @param  string $sql - SQL statement with optional ORM syntax
      *
      * @return self
      */

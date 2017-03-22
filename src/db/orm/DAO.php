@@ -41,7 +41,7 @@ abstract class DAO extends Singleton {
     /**
      * Find a single matching record and convert it to an object of the model class.
      *
-     * @param  string $query     - SQL query, may contain ORM syntax
+     * @param  string $query     - SQL query with optional ORM syntax
      * @param  bool   $allowMany - whether or not the query is allowed to return a multi-row result (default: no)
      *
      * @return PersistableObject
@@ -56,7 +56,7 @@ abstract class DAO extends Singleton {
     /**
      * Find all matching records and convert them to objects of the model class.
      *
-     * @param  string $query - SQL query, may contain ORM syntax
+     * @param  string $query - SQL query with optional ORM syntax
      *
      * @return PersistableObject[]
      */
@@ -68,7 +68,7 @@ abstract class DAO extends Singleton {
     /**
      * Execute a SQL statement and return the result. This method should be used for SQL statements returning rows.
      *
-     * @param  string $sql - SQL statement, may contain ORM syntax
+     * @param  string $sql - SQL statement with optional ORM syntax
      *
      * @return IResult
      */
@@ -81,12 +81,12 @@ abstract class DAO extends Singleton {
      * Execute a SQL statement and skip potential result set processing. This method should be used for SQL statements not
      * returning rows.
      *
-     * @param  string $sql - SQL statement, may contain ORM syntax
+     * @param  string $sql - SQL statement with optional ORM syntax
      *
      * @return self
      */
     public function execute($sql) {
-        $this->getWorker()->query($sql);
+        $this->getWorker()->execute($sql);
         return $this;
     }
 
@@ -152,12 +152,12 @@ abstract class DAO extends Singleton {
 
 
     /**
-     * Escape a DBMS string literal, i.e. a string value. The resulting string can be used in queries "as-is" and doesn't
-     * need additional quoting.
+     * Escape a DBMS literal, i.e. a column's value. The resulting string can be used in queries "as-is" and doesn't need
+     * additional quoting.
      *
-     * @param  string $value - value to escape
+     * @param  scalar $value - value to escape
      *
-     * @return scalar - escaped and quoted string or scalar value if the value was not a string
+     * @return string - escaped and quoted string or stringified scalar value if the value was not a string
      */
     public function escapeLiteral($value) {
         return $this->db()->escapeLiteral($value);

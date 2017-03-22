@@ -210,14 +210,14 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * Escape a DBMS string literal, i.e. a string value. The resulting string can be used in queries "as-is" and doesn't
-     * need additional quoting.
+     * Escape a DBMS literal, i.e. a column's value. The resulting string can be used in queries "as-is" and doesn't need
+     * additional quoting.
      *
      * SQLite: = '{$this->escapeString($value)}'
      *
      * @param  scalar $value - value to escape
      *
-     * @return scalar - escaped and quoted string or scalar value if the value was not a string
+     * @return string - escaped and quoted string or stringified scalar value if the value was not a string
      */
     public function escapeLiteral($value) {
         // bug or feature: SQLite3::escapeString(null) => empty string instead of NULL
