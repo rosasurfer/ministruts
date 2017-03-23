@@ -179,8 +179,6 @@ abstract class PersistableObject extends Object {
 
         // create and execute INSERT statement
         $sql = 'insert into '.$table.' ('.join(', ', $columns).') values ('.join(', ', $values).')';
-        echoPre($sql);
-
         if ($db->supportsInsertReturn()) $id = $db->query($sql.' returning '.$idColumn)->fetchInt();
         else                             $id = $db->execute($sql)->lastInsertId();
 
