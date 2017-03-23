@@ -137,6 +137,16 @@ abstract class PersistableObject extends Object {
 
 
     /**
+     * Insert pre-processing hook. Overridden to be used by models.
+     *
+     * @return self
+     */
+    protected function beforeInsert() {
+        return $this;
+    }
+
+
+    /**
      * Insert this instance into the storage mechanism.
      *
      * @return self
@@ -188,16 +198,7 @@ abstract class PersistableObject extends Object {
         $this->$idProperty = $id;
 
         $this->afterInsert();
-        return $this;
-    }
 
-
-    /**
-     * Insert pre-processing hook. Overridden to be used by models.
-     *
-     * @return self
-     */
-    protected function beforeInsert() {
         return $this;
     }
 
