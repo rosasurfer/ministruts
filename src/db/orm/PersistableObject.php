@@ -180,7 +180,7 @@ abstract class PersistableObject extends Object {
         // create and execute INSERT statement
         $sql = 'insert into '.$table.' ('.join(', ', $columns).') values ('.join(', ', $values).')';
 
-        if ($db->supportsInsertReturn()) $id = $db->query($sql.' returning '.$idColumn)->fetchField();
+        if ($db->supportsInsertReturn()) $id = $db->query($sql.' returning '.$idColumn)->fetchInt();
         else                             $id = $db->execute($sql)->lastInsertId();
 
         // assign returned identity value
@@ -191,7 +191,7 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Update the instance in the storage mechanism. Must be implemented by the actual class.
+     * Update the instance. To be implemented by the actual class.
      *
      * @return self
      */
@@ -201,7 +201,7 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Update the relations of the instance. Must be implemented by the actual class.
+     * Update the relations of the instance. To be implemented by the actual class.
      *
      * @return self
      */
@@ -211,7 +211,7 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Delete the instance from the storage mechanism. Must be implemented by the actual class.
+     * Delete the instance from the storage mechanism. To be implemented by the actual class.
      *
      * @return NULL
      */
