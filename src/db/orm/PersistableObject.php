@@ -163,10 +163,10 @@ abstract class PersistableObject extends Object {
             $bindType  = $column[IDX_MAPPING_BIND_TYPE] ?: $column[IDX_MAPPING_PHP_TYPE];
 
             switch ($bindType) {
-                case BIND_TYPE_BOOL   : $values[] =        (int)(bool) $this->$phpName;  break;
-                case BIND_TYPE_INT    : $values[] =              (int) $this->$phpName;  break;
-                case BIND_TYPE_DECIMAL: $values[] =            (float) $this->$phpName;  break;
-                case BIND_TYPE_STRING : $values[] = $db->escapeLiteral($this->$phpName); break;
+                case BIND_TYPE_BOOL   : $values[] = $db->escapeLiteral(is_null($this->$phpName) ? null : (int)(bool) $this->$phpName);  break;
+                case BIND_TYPE_INT    : $values[] = $db->escapeLiteral(is_null($this->$phpName) ? null :       (int) $this->$phpName);  break;
+                case BIND_TYPE_DECIMAL: $values[] = $db->escapeLiteral(is_null($this->$phpName) ? null :     (float) $this->$phpName);  break;
+                case BIND_TYPE_STRING : $values[] = $db->escapeLiteral(        $this->$phpName);                                        break;
                 default:
                     if (is_class($bindType)) {
                         $value    = (new $bindType())->convertToSql($this->$phpName, $column, $db);
@@ -179,6 +179,7 @@ abstract class PersistableObject extends Object {
 
         // create and execute INSERT statement
         $sql = 'insert into '.$table.' ('.join(', ', $columns).') values ('.join(', ', $values).')';
+        echoPre($sql);
 
         if ($db->supportsInsertReturn()) $id = $db->query($sql.' returning '.$idColumn)->fetchInt();
         else                             $id = $db->execute($sql)->lastInsertId();
