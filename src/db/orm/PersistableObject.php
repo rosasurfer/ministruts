@@ -144,6 +144,8 @@ abstract class PersistableObject extends Object {
     protected function insert() {
         if ($this->isPersistent()) throw new RuntimeException('Cannot insert already persistent '.$this);
 
+        $this->beforeInsert();
+
         $db         = $this->db();
         $mapping    = $this->dao()->getMapping();
         $table      = $mapping['table'];
@@ -185,6 +187,27 @@ abstract class PersistableObject extends Object {
         // assign returned identity value
         $this->$idProperty = $id;
 
+        $this->afterInsert();
+        return $this;
+    }
+
+
+    /**
+     * Insert pre-processing hook. Overridden to be used by models.
+     *
+     * @return self
+     */
+    protected function beforeInsert() {
+        return $this;
+    }
+
+
+    /**
+     * Insert post-processing hook. Overridden to be used by models.
+     *
+     * @return self
+     */
+    protected function afterInsert() {
         return $this;
     }
 
