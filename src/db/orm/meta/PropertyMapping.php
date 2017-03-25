@@ -43,6 +43,7 @@ class PropertyMapping extends Object {
     public function __construct(EntityMapping $entity, $phpName, array $mapping) {
         if (!is_string($phpName)) throw new IllegalTypeException('Illegal type of parameter $phpName: '.getType($phpName));
 
+        $this->entity        = $entity;
         $this->phpName       = $phpName;
         $this->legacyMapping = $mapping;
     }

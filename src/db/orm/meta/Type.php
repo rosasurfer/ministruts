@@ -1,16 +1,16 @@
 <?php
-namespace rosasurfer\db\orm;
+namespace rosasurfer\db\orm\meta;
 
+use rosasurfer\core\Object;
 use rosasurfer\db\ConnectorInterface as IConnector;
-use rosasurfer\db\orm\meta\PropertyMapping;
 
 
 /**
  * Type
  *
- * Defines conversion methods between a {@link Property}'s PHP and SQL representation.
+ * Defines conversion methods between a {@link PropertyMapping}'s PHP and SQL representation.
  */
-abstract class Type {
+abstract class Type extends Object {
 
 
     /**
@@ -21,7 +21,7 @@ abstract class Type {
      *
      * @return mixed - PHP value
      */
-    public function convertToPhp($value, PropertyMapping $mapping, IConnector $connector);
+    abstract public function convertToPhp($value, PropertyMapping $mapping, IConnector $connector);
 
 
     /**
@@ -32,5 +32,5 @@ abstract class Type {
      *
      * @return string - SQL representation
      */
-    public function convertToSql($value, PropertyMapping $mapping, IConnector $connector);
+    abstract public function convertToSql($value, PropertyMapping $mapping, IConnector $connector);
 }
