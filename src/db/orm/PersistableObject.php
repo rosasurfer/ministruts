@@ -198,7 +198,7 @@ abstract class PersistableObject extends Object {
         }
 
         // perform insertion
-        $id = $dao->doInsert($this, $values);
+        $id = $dao->doInsert($values);
 
         // assign the returned identity value
         $idName = $entity->getIdentity()->getPhpName();
