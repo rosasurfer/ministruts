@@ -1,4 +1,9 @@
 
+2017-03-25
+
+   - orm: automated updates of model instances in the ORM via PersistableObject::update() 
+
+
 2017-03-22
 
    - db:  add method Connector::supportsInsertReturn() for "insert into ... returning ..." syntax
