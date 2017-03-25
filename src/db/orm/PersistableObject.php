@@ -9,6 +9,7 @@ use rosasurfer\db\ConnectorInterface as IConnector;
 
 use rosasurfer\exception\IllegalAccessException;
 use rosasurfer\exception\InvalidArgumentException;
+use rosasurfer\exception\RuntimeException;
 use rosasurfer\exception\UnimplementedFeatureException;
 
 use function rosasurfer\is_class;
@@ -18,7 +19,6 @@ use const rosasurfer\PHP_TYPE_BOOL;
 use const rosasurfer\PHP_TYPE_FLOAT;
 use const rosasurfer\PHP_TYPE_INT;
 use const rosasurfer\PHP_TYPE_STRING;
-use rosasurfer\exception\RuntimeException;
 
 
 /**
@@ -30,10 +30,10 @@ abstract class PersistableObject extends Object {
 
 
     /** @var bool - dirty checking status */
-    protected $modified = false;
+    protected $_modified;
 
-    /** @var string[] - modified and unsaved properties */
-    protected $modifications;
+    /** @var string[]|null - modified and unsaved properties */
+    protected $_modifications;
 
 
     /**
@@ -54,6 +54,48 @@ abstract class PersistableObject extends Object {
                 $touched = $this->touch($created);
             }
         }
+    }
+
+
+    /**
+     * Return the instance's identity value.
+     *
+     * @return mixed - identity value
+     */
+    final public function getOid() {
+        $entity = $this->dao()->getEntityMapping();
+        $idName = $entity->getIdentity()->getPhpName();
+        return $this->$idName;
+    }
+
+
+    /**
+     * Return the instance's version value (if any).
+     *
+     * @return mixed - version value or NULL if the entity class is not versioned
+     */
+    final public function getOversion() {
+        $entity  = $this->dao()->getEntityMapping();
+        $version = $entity->getVersion();
+        if ($version) {
+            $versionName = $version->getPhpName();
+            return $this->$versionName;
+        }
+        return null;
+    }
+
+
+    /**
+     * Generate a new version value for the instance. The generated value is not assigned to the instance's
+     * version property.
+     *
+     * @return mixed|null - version value or NULL if the entity class is not versioned
+     */
+    protected function generateVersion() {
+        if ($this->dao()->getEntityMapping()->isVersioned()) {
+            return date('Y-m-d H:i:s');
+        }
+        return null;
     }
 
 
@@ -110,7 +152,7 @@ abstract class PersistableObject extends Object {
      * @return bool
      */
     public function isModified() {
-        return ($this->modified);
+        return (bool) $this->_modified;
     }
 
 
@@ -123,25 +165,16 @@ abstract class PersistableObject extends Object {
         if (!$this->isPersistent()) {
             $this->insert();
         }
-        elseif ($this->modified) {
+        elseif ($this->isModified()) {
             $this->update();
+            $this->_modifications = null;
+            $this->_modified      = false;
         }
         else {
             // nothing to save, the instance should be in sync with the database
         }
         $this->updateRelations();
-        $this->modified = false;
 
-        return $this;
-    }
-
-
-    /**
-     * Insert pre-processing hook. Overridden to be used by models.
-     *
-     * @return self
-     */
-    protected function beforeInsert() {
         return $this;
     }
 
@@ -204,27 +237,45 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Insert post-processing hook. Overridden to be used by models.
+     * Update the instance.
      *
      * @return self
      */
-    protected function afterInsert() {
+    protected function update() {
+        $dao         = $this->dao();
+        $entity      = $dao->getEntityMapping();
+        $versioned   = $entity->isVersioned();
+        $versionName = null;
+
+        // collect the modified properties
+        $changes = [];
+        foreach ($entity as $name => $property) {
+            $changes[$name] = $this->$name;             // TODO: implement dirty check
+        }
+
+        // check versioning and add old/new version values
+        if ($changes && $versioned) {
+            $versionName = $entity->getVersion()->getPhpName();
+            $changes['old.version'] = $this->$versionName;
+            $changes['new.version'] = $this->generateVersion();
+        }
+
+        // write changes
+        $version = $dao->update($this, $changes);
+
+        // update version property if the class is versioned and reset modification flags
+        if ($versioned) {
+            $this->$versionName = $version;
+        }
+        $this->_modifications = null;
+        $this->_modified      = false;
+
         return $this;
     }
 
 
     /**
-     * Update the instance. To be implemented by the actual class.
-     *
-     * @return self
-     */
-    protected function update() {
-        throw new UnimplementedFeatureException('You must implement '.get_class($this).'->'.__FUNCTION__.'() to update a '.get_class($this).'.');
-    }
-
-
-    /**
-     * Update the relations of the instance. To be implemented by the actual class.
+     * Update the relations of the instance. Must be overridden by the entity instance.
      *
      * @return self
      */
@@ -234,12 +285,32 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Delete the instance from the storage mechanism. To be implemented by the actual class.
+     * Delete the instance from the storage mechanism. Must be overridden by the entity instance.
      *
      * @return NULL
      */
     public function delete() {
         throw new UnimplementedFeatureException('You must implement '.get_class($this).'->'.__FUNCTION__.'() to delete a '.get_class($this).'.');
+    }
+
+
+    /**
+     * Insert pre-processing hook. Can be overridden by the entity instance.
+     *
+     * @return self
+     */
+    protected function beforeInsert() {
+        return $this;
+    }
+
+
+    /**
+     * Insert post-processing hook. Can be overridden by the entity instance.
+     *
+     * @return self
+     */
+    protected function afterInsert() {
+        return $this;
     }
 
 

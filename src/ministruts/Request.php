@@ -409,8 +409,7 @@ class Request extends Singleton {
      * Return the content of the current request (the request body).
      *
      * @return string|null - Request body for POST requests or NULL otherwise. If the "Content-Type" header of a POST request
-     *                       is "multipart/form-data" (a file upload) a string with the posted file's informations is
-     *                       returned.
+     *                       is "multipart/form-data" (a file upload) a string with the posted file's information is returned.
      */
     public function getContent() {
         static $content = null;

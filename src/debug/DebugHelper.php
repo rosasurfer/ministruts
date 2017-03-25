@@ -215,7 +215,7 @@ class DebugHelper extends StaticClass {
 
 
     /**
-     * Return a more readable version of an exception's stacktrace. The representation also contains informations about
+     * Return a more readable version of an exception's stacktrace. The representation also contains information about
      * nested exceptions.
      *
      * @param  \Exception $exception - any exception (not only RosasurferExceptions)

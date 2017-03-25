@@ -6,8 +6,12 @@ use rosasurfer\core\Singleton;
 use rosasurfer\db\ConnectorInterface as IConnector;
 use rosasurfer\db\ResultInterface    as IResult;
 
+use rosasurfer\db\orm\meta\EntityMapping;
+
 use rosasurfer\exception\ConcurrentModificationException;
 use rosasurfer\exception\InvalidArgumentException;
+
+use function rosasurfer\strLeft;
 
 
 /**
@@ -23,6 +27,9 @@ abstract class DAO extends Singleton {
 
     /** @var Worker - the worker this DAO uses */
     private $worker;
+
+    /** @var EntityMapping - the mapping of the DAO's entity class */
+    private $entityMapping;
 
     /** @var string - the name of the DAO's entity class */
     protected $entityClass;
@@ -96,9 +103,22 @@ abstract class DAO extends Singleton {
      *
      * @return array
      */
-    final public function getMapping() {
-        if (!isSet($this->mapping)) throw new UnimplementedFeatureException('You must implement '.get_class($this).'->mapping[] to work with this DAO.');
+    public function getMapping() {
+        if (!isSet($this->mapping)) throw new UnimplementedFeatureException('Define '.get_class($this).'->mapping[] to work with this DAO!');
         return $this->mapping;
+    }
+
+
+    /**
+     * Return the mapping of the DAO's entity class.
+     *
+     * @return EntityMapping
+     */
+    public function getEntityMapping() {
+        if (!$this->entityMapping) {
+            $this->entityMapping = new EntityMapping($this->getEntityClass(), $this->getMapping());
+        }
+        return $this->entityMapping;
     }
 
 
@@ -107,7 +127,7 @@ abstract class DAO extends Singleton {
      *
      * @return string
      */
-    final public function getEntityClass() {
+    public function getEntityClass() {
         return $this->entityClass;
     }
 
@@ -173,6 +193,68 @@ abstract class DAO extends Singleton {
      */
     public function escapeString($value) {
         return $this->db()->escapeString($value);
+    }
+
+
+    /**
+     * Write modifications of a {@link PersistableObject} to the storage mechanism.
+     *
+     * @param  PersistableObject $object  - modified object
+     * @param  array             $changes - modifications
+     *
+     * @return mixed - The new PHP version value after writing the changes if the object's entity class is versioned or TRUE
+     *                 if the entity class is not versioned. FALSE in case of an error.
+     */
+    public function update(PersistableObject $object, array $changes) {
+        $db     = $this->db();
+        $entity = $this->getEntityMapping();
+        $table  = $entity->getTableName();
+
+        // collect identity infos
+        $identity = $entity->getIdentity();
+        $idName   = $identity->getColumnName();
+        $idValue  = $identity->convertToSql($object->getOid(), $db);
+
+        // collect version infos
+        $version = $versionName = $oldVersion = $newVersion = null;
+        $version = $entity->getVersion();
+        if ($version) {
+            $versionName = $version->getPhpName();
+            unset($changes[$versionName], $changes[$identity->getPhpName()]);
+
+            if (isSet($changes[$versionName])) {
+                $version = null;                                    // TODO: throw exception
+            }
+            else {
+                $oldVersion = $version->convertToSql($changes['old.version'], $db);
+                $newVersion = $changes['new.version'];
+                unset($changes['old.version'], $changes['new.version']);
+                $changes[$versionName] = $newVersion;
+                $versionName = $version->getColumnName();
+            }
+        }
+
+        // create SQL
+        $sql = 'update '.$table.' set';                             // update table
+        foreach ($changes as $name => $value) {                     //    set ...
+            $property    = $entity->getProperty($name);             //        ...
+            $columnName  = $property->getColumnName();              //        ...
+            $columnValue = $property->convertToSql($value, $db);    //        column1 = value1,
+            $sql .= ' '.$columnName.' = '.$columnValue.',';         //        column2 = value2,
+        }                                                           //        ...
+        $sql  = strLeft($sql, -1);                                  //        ...
+        $sql .= ' where '.$idName.' = '.$idValue;                   //    where id = value
+        if ($version) {                                             //        ...
+            $op   = $oldVersion=='null' ? 'is':'=';                 //        ...
+            $sql .= ' and '.$versionName.' '.$op.' '.$oldVersion;   //      and version = oldVersion
+        }
+
+        // execute SQL and check for concurrent modifications
+        if ($db->execute($sql)->lastAffectedRows() != 1) {
+            $found = $this->refresh($object);
+            throw new ConcurrentModificationException('Error updating '.get_class($object).' (oid='.$object->getOid().'), expected version: '.$oldVersion.', found version: '.$found->getOversion());
+        }
+        return $newVersion;
     }
 
 
