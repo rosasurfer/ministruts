@@ -197,7 +197,52 @@ abstract class DAO extends Singleton {
 
 
     /**
-     * Write modifications of a {@link PersistableObject} to the storage mechanism.
+     * Perform the actual insertion and write data of a {@link PersistableObject} to the storage mechanism.
+     *
+     * @param  PersistableObject $object - modified object
+     * @param  array             $values - property values
+     *
+     * @return mixed - the inserted record's identity value
+     */
+    public function doInsert(PersistableObject $object, array $values) {
+        $db       = $this->db();
+        $entity   = $this->getEntityMapping();
+        $table    = $entity->getTableName();
+        $identity = $entity->getIdentity();
+        $idName   = $identity->getPhpName();
+        $idValue  = null;
+        if (isSet($values[$idName])) $idValue = $values[$idName];
+        else                         unset($values[$idName]);
+
+        // convert values to their SQL representation
+        $columns = [];
+        foreach ($values as $name => &$value) {
+            $property  = $entity->getProperty($name);
+            $columns[] = $property->getColumnName();
+            $value     = $property->convertToSql($value, $db);
+        }; unset($value);
+
+        // create SQL statement
+        $sql = 'insert into '.$table.' ('.join(', ', $columns).')
+                   values ('.join(', ', $values).')';
+
+        // execute SQL statement
+        if (isSet($idValue)) {
+            $db->execute($sql);
+        }
+        else if ($db->supportsInsertReturn()) {
+            $idName  = $identity->getColumnName();
+            $idValue = $db->query($sql.' returning '.$idName)->fetchInt();
+        }
+        else {
+            $idValue = $db->execute($sql)->lastInsertId();
+        }
+        return $idValue;
+    }
+
+
+    /**
+     * Perform the actual update and write modifications of a {@link PersistableObject} to the storage mechanism.
      *
      * @param  PersistableObject $object  - modified object
      * @param  array             $changes - modifications
@@ -205,7 +250,7 @@ abstract class DAO extends Singleton {
      * @return mixed - The new PHP version value after writing the changes if the object's entity class is versioned or TRUE
      *                 if the entity class is not versioned. FALSE in case of an error.
      */
-    public function update(PersistableObject $object, array $changes) {
+    public function doUpdate(PersistableObject $object, array $changes) {
         $db     = $this->db();
         $entity = $this->getEntityMapping();
         $table  = $entity->getTableName();

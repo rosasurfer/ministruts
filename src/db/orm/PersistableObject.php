@@ -185,53 +185,27 @@ abstract class PersistableObject extends Object {
      * @return self
      */
     protected function insert() {
+        $this->beforeInsert();
         if ($this->isPersistent()) throw new RuntimeException('Cannot insert already persistent '.$this);
 
-        $this->beforeInsert();
+        $dao    = $this->dao();
+        $entity = $dao->getEntityMapping();
 
-        $db         = $this->db();
-        $mapping    = $this->dao()->getMapping();
-        $table      = $mapping['table'];
-        $columns    = [];
-        $values     = [];
-        $idProperty = null;
-        $idColumn   = null;
-
-        // collect columns and values
-        foreach ($mapping['columns'] as $phpName => $column) {
-            if ($column[IDX_MAPPING_COLUMN_BEHAVIOR] & ID_PRIMARY) {
-                $idProperty = $phpName;
-                $idColumn   = $column[IDX_MAPPING_COLUMN_NAME];
-                continue;                                               // skip the auto-generated identity column
-            }
-            $columns[] = $column[IDX_MAPPING_COLUMN_NAME];
-            $bindType  = $column[IDX_MAPPING_BIND_TYPE] ?: $column[IDX_MAPPING_PHP_TYPE];
-
-            switch ($bindType) {
-                case BIND_TYPE_BOOL   : $values[] = $db->escapeLiteral(is_null($this->$phpName) ? null : (int)(bool) $this->$phpName);  break;
-                case BIND_TYPE_INT    : $values[] = $db->escapeLiteral(is_null($this->$phpName) ? null :       (int) $this->$phpName);  break;
-                case BIND_TYPE_DECIMAL: $values[] = $db->escapeLiteral(is_null($this->$phpName) ? null :     (float) $this->$phpName);  break;
-                case BIND_TYPE_STRING : $values[] = $db->escapeLiteral(        $this->$phpName);                                        break;
-                default:
-                    if (is_class($bindType)) {
-                        $value    = (new $bindType())->convertToSql($this->$phpName, $column, $db);
-                        $values[] = $db->escapeLiteral($value);
-                        break;
-                    }
-                    throw new RuntimeException('Unsupported SQL bind type "'.$bindType.'" for database mapping of '.get_class($this).'::'.$phpName);
-            }
+        // collect properties
+        $values = [];
+        foreach ($entity as $name => $property) {
+            $values[$name] = $this->$name;
         }
 
-        // create and execute INSERT statement
-        $sql = 'insert into '.$table.' ('.join(', ', $columns).') values ('.join(', ', $values).')';
-        if ($db->supportsInsertReturn()) $id = $db->query($sql.' returning '.$idColumn)->fetchInt();
-        else                             $id = $db->execute($sql)->lastInsertId();
+        // perform insertion
+        $id = $dao->doInsert($this, $values);
 
-        // assign returned identity value
-        $this->$idProperty = $id;
+        // assign the returned identity value
+        $idName = $entity->getIdentity()->getPhpName();
+        if ($this->$idName === null)
+            $this->$idName = $id;
 
         $this->afterInsert();
-
         return $this;
     }
 
@@ -242,6 +216,8 @@ abstract class PersistableObject extends Object {
      * @return self
      */
     protected function update() {
+        $this->beforeUpdate();
+
         $dao         = $this->dao();
         $entity      = $dao->getEntityMapping();
         $versioned   = $entity->isVersioned();
@@ -260,8 +236,8 @@ abstract class PersistableObject extends Object {
             $changes['new.version'] = $this->generateVersion();
         }
 
-        // write changes
-        $version = $dao->update($this, $changes);
+        // perform update
+        $version = $dao->doUpdate($this, $changes);
 
         // update version property if the class is versioned and reset modification flags
         if ($versioned) {
@@ -270,6 +246,7 @@ abstract class PersistableObject extends Object {
         $this->_modifications = null;
         $this->_modified      = false;
 
+        $this->afterUpdate();
         return $this;
     }
 
@@ -310,6 +287,26 @@ abstract class PersistableObject extends Object {
      * @return self
      */
     protected function afterInsert() {
+        return $this;
+    }
+
+
+    /**
+     * Update pre-processing hook. Can be overridden by the entity instance.
+     *
+     * @return self
+     */
+    protected function beforeUpdate() {
+        return $this;
+    }
+
+
+    /**
+     * Update post-processing hook. Can be overridden by the entity instance.
+     *
+     * @return self
+     */
+    protected function afterUpdate() {
         return $this;
     }
 
