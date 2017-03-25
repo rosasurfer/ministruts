@@ -8,7 +8,7 @@ use rosasurfer\db\ConnectorInterface as IConnector;
 /**
  * Type
  *
- * Defines conversion methods between a {@link PropertyMapping}'s PHP and SQL representation.
+ * Defines conversion methods between a property's PHP and SQL representation.
  */
 abstract class Type extends Object {
 
