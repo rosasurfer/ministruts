@@ -197,14 +197,13 @@ abstract class DAO extends Singleton {
 
 
     /**
-     * Perform the actual insertion and write data of a {@link PersistableObject} to the storage mechanism.
+     * Perform the insertion of a data record representing a {@link PersistableObject} instance.
      *
-     * @param  PersistableObject $object - modified object
-     * @param  array             $values - property values
+     * @param  array $values - record values
      *
      * @return mixed - the inserted record's identity value
      */
-    public function doInsert(PersistableObject $object, array $values) {
+    public function doInsert(array $values) {
         $db       = $this->db();
         $entity   = $this->getEntityMapping();
         $table    = $entity->getTableName();
