@@ -1,4 +1,9 @@
 
+2017-03-26
+
+   - rename package "dependency" to "monitor" 
+
+
 2017-03-25
 
    - orm: automated updates of model instances in the ORM via PersistableObject::update() 
@@ -37,7 +42,7 @@
    - orm:  extend model mappings by SQL bind types and column behaviors
    - orm:  move properties PersistableObject::${primary-key|created|updated|deleted} to model classes 
    - orm:  quick and dirty query substitution of model names by table names 
-   - core: replace di/DiAwareInterface by di/DiAwareTrait
+   - core: replace di/DiAwareInterface by di/DiAwareTrait and include it in all classes
    - util: add helper function rosasurfer\strCollapseWhiteSpace()
 
 
@@ -82,7 +87,7 @@
 2017-02-19
 
    - the db/*/Connector constructor is part of interface db/ConnectorInterface
-   - new interface di/DiAwareInterface for all classes
+   - new interface di/DiAwareInterface
 
 
 2017-02-17
