@@ -170,12 +170,8 @@ abstract class PersistableObject extends Object {
         }
         elseif ($this->isModified()) {
             $this->update();
-            $this->_modifications = null;
-            $this->_modified      = false;
         }
-        else {
-            // nothing to save, the instance should be in sync with the database
-        }
+
         $this->updateRelations();
 
         // execute an existing post-processing hook
