@@ -41,5 +41,5 @@ interface MailerInterface {
      *
      * @return bool - ob der Versand verschoben wurde.
      */
-    protected function sendLater($sender, $receiver, $subject, $message, array $headers=[]);
+    public function sendLater($sender, $receiver, $subject, $message, array $headers=[]);
 }

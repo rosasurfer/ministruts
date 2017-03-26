@@ -66,6 +66,8 @@ class Request extends Singleton {
      * Constructor
      */
     protected function __construct() {
+        parent::__construct();
+
         $this->method = $_SERVER['REQUEST_METHOD'];
 
         // If $_SERVER['QUERY_STRING'] is empty (e.g. at times in nginx) PHP will not parse URL parameters

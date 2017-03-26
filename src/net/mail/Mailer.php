@@ -2,7 +2,10 @@
 namespace rosasurfer\net\mail;
 
 use rosasurfer\core\Object;
+
 use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\exception\UnimplementedFeatureException;
+
 use rosasurfer\util\Validator;
 
 use function rosasurfer\strEndsWith;
@@ -42,8 +45,7 @@ abstract class Mailer extends Object implements MailerInterface {
         if (!isSet($options['class']))
             $options['class'] = 'PHPMailer';
 
-            $class = $options['class'];
-
+        $class = $options['class'];
         return new $class($options);
     }
 
@@ -59,7 +61,7 @@ abstract class Mailer extends Object implements MailerInterface {
      *
      * @return bool - ob der Versand verschoben wurde.
      */
-    protected function sendLater($sender, $receiver, $subject, $message, array $headers=[]) {
+    public function sendLater($sender, $receiver, $subject, $message, array $headers=[]) {
         if (isSet($this->config['send-later']) && $this->config['send-later']) {
 
             $callable = [$this, 'sendMail'];

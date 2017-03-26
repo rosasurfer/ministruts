@@ -82,6 +82,8 @@ class StrutsController extends Singleton {
      * @throws StrutsConfigException on configuration errors
      */
     protected function __construct() {
+        parent::__construct();
+
         // lookup configuration files
         $configDir  = Config::getDefault()->getDirectory().DIRECTORY_SEPARATOR;
         $mainConfig = $configDir.'struts-config.xml';                           // main module config

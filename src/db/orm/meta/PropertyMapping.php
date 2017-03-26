@@ -3,7 +3,9 @@ namespace rosasurfer\db\orm\meta;
 
 use rosasurfer\core\Object;
 use rosasurfer\db\ConnectorInterface as IConnector;
+
 use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\exception\RuntimeException;
 
 use const rosasurfer\db\orm\BIND_TYPE_BOOL;
 use const rosasurfer\db\orm\BIND_TYPE_DECIMAL;

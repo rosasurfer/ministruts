@@ -11,6 +11,7 @@ use rosasurfer\db\pgsql\PostgresConnector;
 use rosasurfer\db\sqlite\SQLiteConnector;
 
 use rosasurfer\exception\IllegalStateException;
+use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RuntimeException;
 
 

@@ -41,6 +41,8 @@ abstract class DAO extends Singleton {
      * Create a new DAO.
      */
     protected function __construct() {
+        parent::__construct();
+
         $this->entityClass = subStr(get_class($this), 0, -3);
     }
 

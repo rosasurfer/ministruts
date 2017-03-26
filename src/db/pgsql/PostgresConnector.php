@@ -4,6 +4,7 @@ namespace rosasurfer\db\pgsql;
 use rosasurfer\db\Connector;
 use rosasurfer\db\DatabaseException;
 
+use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\exception\RuntimeException;
 

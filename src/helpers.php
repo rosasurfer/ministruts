@@ -4,6 +4,7 @@
  */
 namespace rosasurfer;
 
+use rosasurfer\exception\IllegalArgumentException;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 
@@ -11,6 +12,7 @@ use rosasurfer\ministruts\url\Url;
 use rosasurfer\ministruts\url\VersionedUrl;
 
 use rosasurfer\util\Validator;
+use rosasurfer\exception\IOException;
 
 
 // whether or not we run on a command line interface, on localhost and/or on Windows
