@@ -1,8 +1,8 @@
 <?php
 namespace rosasurfer\cache;
 
-use rosasurfer\dependency\Dependency;
 use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\monitor\Dependency;
 
 
 /**

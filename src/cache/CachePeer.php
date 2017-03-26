@@ -2,7 +2,7 @@
 namespace rosasurfer\cache;
 
 use rosasurfer\core\Object;
-use rosasurfer\dependency\Dependency;
+use rosasurfer\monitor\Dependency;
 
 
 /**

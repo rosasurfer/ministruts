@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\dependency;
+namespace rosasurfer\monitor;
 
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;

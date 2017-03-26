@@ -4,6 +4,8 @@ namespace rosasurfer\config;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 
+use rosasurfer\monitor\FileDependency;
+
 use const rosasurfer\CLI;
 use const rosasurfer\LOCALHOST;
 use const rosasurfer\MINISTRUTS_ROOT;
