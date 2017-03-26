@@ -21,7 +21,7 @@ abstract class Type extends Object {
      *
      * @return mixed - PHP value
      */
-    abstract public function convertToPhp($value, PropertyMapping $mapping, IConnector $connector);
+    abstract public function convertToPHP($value, PropertyMapping $mapping, IConnector $connector);
 
 
     /**
@@ -32,5 +32,5 @@ abstract class Type extends Object {
      *
      * @return string - SQL representation
      */
-    abstract public function convertToSql($value, PropertyMapping $mapping, IConnector $connector);
+    abstract public function convertToSQL($value, PropertyMapping $mapping, IConnector $connector);
 }

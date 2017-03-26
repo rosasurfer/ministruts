@@ -218,7 +218,7 @@ abstract class DAO extends Singleton {
         foreach ($values as $name => &$value) {
             $property  = $entity->getProperty($name);
             $columns[] = $property->getColumnName();
-            $value     = $property->convertToSql($value, $db);
+            $value     = $property->convertToSQL($value, $db);
         }; unset($value);
 
         // create SQL statement
@@ -257,7 +257,7 @@ abstract class DAO extends Singleton {
         // collect identity infos
         $identity = $entity->getIdentity();
         $idName   = $identity->getColumnName();
-        $idValue  = $identity->convertToSql($object->getOid(), $db);
+        $idValue  = $identity->convertToSQL($object->getOid(), $db);
 
         // collect version infos
         $versionName = $oldVersion = $newVersion = null;
@@ -270,7 +270,7 @@ abstract class DAO extends Singleton {
                 $version = null;                                    // TODO: throw exception
             }
             else {
-                $oldVersion = $version->convertToSql($changes['old.version'], $db);
+                $oldVersion = $version->convertToSQL($changes['old.version'], $db);
                 $newVersion = $changes['new.version'];
                 unset($changes['old.version'], $changes['new.version']);
                 $changes[$versionName] = $newVersion;
@@ -283,7 +283,7 @@ abstract class DAO extends Singleton {
         foreach ($changes as $name => $value) {                     //    set ...
             $property    = $entity->getProperty($name);             //        ...
             $columnName  = $property->getColumnName();              //        ...
-            $columnValue = $property->convertToSql($value, $db);    //        column1 = value1,
+            $columnValue = $property->convertToSQL($value, $db);    //        column1 = value1,
             $sql .= ' '.$columnName.' = '.$columnValue.',';         //        column2 = value2,
         }                                                           //        ...
         $sql  = strLeft($sql, -1);                                  //        ...

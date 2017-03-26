@@ -77,7 +77,7 @@ class PropertyMapping extends Object {
      *
      * @return mixed - PHP value
      */
-    public function convertToPhp($value, IConnector $connector) {
+    public function convertToPHP($value, IConnector $connector) {
     }
 
 
@@ -89,7 +89,7 @@ class PropertyMapping extends Object {
      *
      * @return string - SQL representation
      */
-    public function convertToSql($value, IConnector $connector) {
+    public function convertToSQL($value, IConnector $connector) {
         if ($value === null) {
             $value = 'null';
         }
@@ -102,7 +102,7 @@ class PropertyMapping extends Object {
                 case BIND_TYPE_STRING : $value = $connector->escapeLiteral((string) $value); break;
                 default:
                     if (is_class($bindType)) {
-                        $value = (new $bindType())->convertToSql($value, $this, $connector);
+                        $value = (new $bindType())->convertToSQL($value, $this, $connector);
                         break;
                     }
                     throw new RuntimeException('Unsupported SQL bind type "'.$bindType.'" for database mapping of '.$this->entity->getClassName().'::'.$this->getPhpName());
