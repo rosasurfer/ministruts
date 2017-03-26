@@ -90,19 +90,23 @@ class PropertyMapping extends Object {
      * @return string - SQL representation
      */
     public function convertToSql($value, IConnector $connector) {
-        $bindType = $this->legacyMapping[IDX_MAPPING_BIND_TYPE] ?: $this->legacyMapping[IDX_MAPPING_PHP_TYPE];
-
-        switch ($bindType) {
-            case BIND_TYPE_BOOL   : $value = $connector->escapeLiteral(is_null($value) ? null : (int)(bool) $value); break;
-            case BIND_TYPE_INT    : $value = $connector->escapeLiteral(is_null($value) ? null :       (int) $value); break;
-            case BIND_TYPE_DECIMAL: $value = $connector->escapeLiteral(is_null($value) ? null :     (float) $value); break;
-            case BIND_TYPE_STRING : $value = $connector->escapeLiteral(        $value);                              break;
-            default:
-                if (is_class($bindType)) {
-                    $value = (new $bindType())->convertToSql($value, $this, $connector);
-                    break;
-                }
-                throw new RuntimeException('Unsupported SQL bind type "'.$bindType.'" for database mapping of '.$this->entity->getClassName().'::'.$this->getPhpName());
+        if ($value === null) {
+            $value = 'null';
+        }
+        else {
+            $bindType = $this->legacyMapping[IDX_MAPPING_BIND_TYPE] ?: $this->legacyMapping[IDX_MAPPING_PHP_TYPE];
+            switch ($bindType) {
+                case BIND_TYPE_BOOL   : $value =                (string)(int)(bool) $value;  break;
+                case BIND_TYPE_INT    : $value =                      (string)(int) $value;  break;
+                case BIND_TYPE_DECIMAL: $value =                    (string)(float) $value;  break;
+                case BIND_TYPE_STRING : $value = $connector->escapeLiteral((string) $value); break;
+                default:
+                    if (is_class($bindType)) {
+                        $value = (new $bindType())->convertToSql($value, $this, $connector);
+                        break;
+                    }
+                    throw new RuntimeException('Unsupported SQL bind type "'.$bindType.'" for database mapping of '.$this->entity->getClassName().'::'.$this->getPhpName());
+            }
         }
         return $value;
     }
