@@ -21,7 +21,6 @@ class IRCMessenger extends Messenger {
      * @param  array $options - Messenger-Optionen
      */
     protected function __construct(array $options) {
-        parent::__construct();
         $this->options = $options;
     }
 
