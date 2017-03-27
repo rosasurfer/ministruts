@@ -7,6 +7,7 @@ use rosasurfer\config\ConfigInterface as IConfig;
 
 use rosasurfer\core\StaticClass;
 use rosasurfer\debug\ErrorHandler;
+use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\util\PHP;
 
 
@@ -50,7 +51,7 @@ class MiniStruts extends StaticClass {
         if (!isSet($options['handle-errors'    ])) $options['handle-errors'    ] = 'strict';
         if (!isSet($options['handle-exceptions'])) $options['handle-exceptions'] = true;
         if (!isSet($options['globals'          ])) $options['globals'          ] = false;
-        //if (!isSet($options['config'         ])) throw error
+        if (!isSet($options['config'           ])) throw new InvalidArgumentException('Invalid argument $options (option "config" not set)');
 
         self::setupErrorHandling    ($options['handle-errors'    ]);
         self::setupExceptionHandling($options['handle-exceptions']);
