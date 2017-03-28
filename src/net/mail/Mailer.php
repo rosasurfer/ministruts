@@ -33,8 +33,8 @@ abstract class Mailer extends Object implements MailerInterface {
      * @param  array $options - Mailer-Optionen
      */
     public function __construct(array $options) {
-        throw new UnimplementedFeatureException('Method '.get_class($this).'::'.__FUNCTION__.'() is not implemented');
         $this->options = $options;
+        throw new UnimplementedFeatureException('Method '.get_class($this).'::'.__FUNCTION__.'() is not implemented');
     }
 
 
