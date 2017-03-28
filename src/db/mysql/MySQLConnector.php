@@ -200,7 +200,8 @@ class MySQLConnector extends Connector {
         // connect
         try {                                                                   // CLIENT_FOUND_ROWS
             $this->hConnection = mysql_connect($host, $user, $pass, $newLink=true/*, $flags=2 */);
-            !$this->hConnection && trigger_error(@$php_errormsg, E_USER_ERROR);
+            if (!$this->hConnection)
+                trigger_error(isSet($php_errormsg) ? $php_errormsg : '(unknown error)', E_USER_ERROR);
         }
         catch (IRosasurferException $ex) {
             throw $ex->addMessage('Can not connect to MySQL server on "'.$host.'"');
@@ -222,6 +223,7 @@ class MySQLConnector extends Connector {
             $options = $this->options;
             $options['time_zone'] = date_default_timezone_get();    // synchronize connection timezone with PHP timezone
 
+            $value = null;
             foreach ($options as $option => $value) {
                 if (strLen($value)) {
                     if (strToLower($option) == 'charset') {

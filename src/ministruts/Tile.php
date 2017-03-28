@@ -202,7 +202,8 @@ class Tile extends Object {
             if ($this->name == self::GENERIC_NAME) $tileHint = $file;
             else                                   $tileHint = $this->name.' ('.$file.')';
             echo "\n<!-- #begin: ".$tileHint." -->\n";
-        }
+        } else                                     $tileHint = null;
+
         includeFile($this->fileName, $nestedTiles + $properties);
 
         if (LOCALHOST && $this->parent) {

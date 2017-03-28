@@ -211,6 +211,7 @@ function prettyBytes($value) {
         return (string) $value;
     $value = (int) $value;
 
+    $unit = null;
     foreach (['K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'] as $unit) {
         $value /= 1024;
         if ($value < 1024)

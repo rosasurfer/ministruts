@@ -135,7 +135,8 @@ class PostgresConnector extends Connector {
         $connStr = $this->getConnectionString();
         try {
             $this->hConnection = pg_connect($connStr, PGSQL_CONNECT_FORCE_NEW);
-            !$this->hConnection && trigger_error(@$php_errormsg, E_USER_ERROR);
+            if (!$this->hConnection)
+                trigger_error(isSet($php_errormsg) ? $php_errormsg : '(unknown error)', E_USER_ERROR);
         }
         catch (IRosasurferException $ex) {
             throw $ex->addMessage('Cannot connect to PostgreSQL server with connection string: "'.$connStr.'"');

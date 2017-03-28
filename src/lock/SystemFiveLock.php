@@ -71,9 +71,9 @@ class SystemFiveLock extends BaseLock {
 
         $integer = $this->keyToId($key);
 
-        $i        = 0;
-        $trials   = 5;    // max. Anzahl akzeptabler Fehler, eine weitere Exception wird weitergereicht
-        $messages = null;
+        $i      = 0;
+        $trials = 5;        // max. Anzahl akzeptabler Fehler, eine weitere Exception wird weitergereicht
+        $hSemaphore = $messages = null;
         do {
             try {
                 // TODO: bei hoher Last koennen sem_get() oder sem_acquire() scheitern

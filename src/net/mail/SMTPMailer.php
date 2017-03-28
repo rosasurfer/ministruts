@@ -245,6 +245,7 @@ class SMTPMailer extends Mailer {
 
 
         // ggf. Startzeitpunkt speichern
+        $start = null;
         if (self::$logDebug)
             $start = microTime(true);
 

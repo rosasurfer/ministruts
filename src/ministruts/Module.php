@@ -313,6 +313,7 @@ class Module extends Object {
 
 
             // process form-validate-first attribute
+            $formValidateFirst = false;
             if ($mapping->getFormClassName()) {
                 $action = $mapping->getActionClassName();
                 if ($action || $mapping->getForward()) {

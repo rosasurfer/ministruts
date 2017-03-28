@@ -93,6 +93,7 @@ class StrutsController extends Singleton {
         $configs    = [$mainConfig] + $subConfigs;
 
         // create and register a Module for each found configuration file
+        $file = null;
         try {
             foreach ($configs as $file) {
                 $baseName = baseName($file, '.xml');

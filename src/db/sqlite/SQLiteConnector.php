@@ -127,10 +127,11 @@ class SQLiteConnector extends Connector {
      * @return self
      */
     public function connect() {
-        try {                                                               // available flags:
-            $flags = SQLITE3_OPEN_READWRITE;                                // SQLITE3_OPEN_CREATE
-            $handler = new \SQLite3($this->file, $flags);                   // SQLITE3_OPEN_READONLY
-            !$handler && trigger_error(@$php_errormsg, E_USER_ERROR);       // SQLITE3_OPEN_READWRITE
+        try {                                                                   // available flags:
+            $flags = SQLITE3_OPEN_READWRITE;                                    // SQLITE3_OPEN_CREATE
+            $handler = new \SQLite3($this->file, $flags);                       // SQLITE3_OPEN_READONLY
+            if (!$handler)                                                      // SQLITE3_OPEN_READWRITE
+                trigger_error(isSet($php_errormsg) ? $php_errormsg : '(unknown error)', E_USER_ERROR);
         }
         catch (IRosasurferException $ex) {
             $file = $this->file;
