@@ -10,6 +10,7 @@ use rosasurfer\db\orm\meta\EntityMapping;
 
 use rosasurfer\exception\ConcurrentModificationException;
 use rosasurfer\exception\InvalidArgumentException;
+use rosasurfer\exception\UnimplementedFeatureException;
 
 use function rosasurfer\strLeft;
 

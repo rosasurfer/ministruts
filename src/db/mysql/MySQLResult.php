@@ -19,9 +19,6 @@ use const rosasurfer\ARRAY_NUM;
 class MySQLResult extends Result {
 
 
-    /** @var IConnector - used database connector */
-    protected $connector;
-
     /** @var string - SQL statement the result was generated from */
     protected $sql;
 
@@ -36,9 +33,6 @@ class MySQLResult extends Result {
 
     /** @var int - number of rows returned by the statement (NULL to distinguish between an unset and a zero value) */
     protected $numRows = null;
-
-    /** @var int - index of the row fetched by the next unqualified fetch* method call or -1 when hit the end */
-    protected $nextRowIndex = 0;
 
 
     /**

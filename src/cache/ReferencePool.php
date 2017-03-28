@@ -32,6 +32,8 @@ final class ReferencePool extends CachePeer {
      * @param  array|null  $options - zusaetzliche Optionen (default: none)
      */
     public function __construct($label=null, array $options=[]) {
+        $this->label   = $label;
+        $this->options = $options;
     }
 
 

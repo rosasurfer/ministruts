@@ -102,7 +102,10 @@ class PHP extends StaticClass {
         /*PHP_INI_ALL   */ if (!self::ini_get_bool('y2k_compliance'                ) && PHP_VERSION_ID <  50400)    $issues[] = 'Info:  y2k_compliance is not On  [standards]';
         /*PHP_INI_ALL   */ $timezone = ini_get    ('date.timezone'                 );
             if (empty($timezone) && (!isSet($_ENV['TZ'])                              || PHP_VERSION_ID >= 50400))   $issues[] = 'Warn:  date.timezone is not set  [setup]';
-        /*PHP_INI_SYSTEM*/ if ( self::ini_get_bool('safe_mode'                     ) && PHP_VERSION_ID <  50400)    $issues[] = 'Info:  safe_mode is not Off  [performance]';
+        /*PHP_INI_SYSTEM*/ if ( self::ini_get_bool('safe_mode'                     ) && PHP_VERSION_ID <  50400)    $issues[] = 'Error:  safe_mode is not Off  [functionality]';
+            /**
+             * With 'safe_mode'=On plenty of required function parameters are ignored: e.g. http://php.net/manual/en/function.mysql-connect.php
+             */
         /*PHP_INI_ALL   */ if (!empty(ini_get     ('open_basedir'                  )))                              $issues[] = 'Info:  open_basedir is not empty: "'.ini_get('open_basedir').'"  [performance]';
         /*PHP_INI_ALL   */ if (!self::ini_get_bool('auto_detect_line_endings'      ))                               $issues[] = 'Info:  auto_detect_line_endings is not On  [funtionality]';
         /*PHP_INI_SYSTEM*/ if (!self::ini_get_bool('allow_url_fopen'               ))                               $issues[] = 'Info:  allow_url_fopen is not On  [functionality]';

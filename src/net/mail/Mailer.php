@@ -20,6 +20,9 @@ use function rosasurfer\strStartsWith;
 abstract class Mailer extends Object implements MailerInterface {
 
 
+    /** @var array */
+    protected $options;
+
     /** @var string[] */
     protected $config;
 
@@ -31,6 +34,7 @@ abstract class Mailer extends Object implements MailerInterface {
      */
     public function __construct(array $options) {
         throw new UnimplementedFeatureException('Method '.get_class($this).'::'.__FUNCTION__.'() is not implemented');
+        $this->options = $options;
     }
 
 

@@ -537,8 +537,8 @@ class Request extends Singleton {
         // read all headers once
         static $headers = null;
         if ($headers === null) {
-            if (function_exists('getAllHeaders')) {
-                $headers = getAllHeaders();
+            if (function_exists('apache_request_headers')) {
+                $headers = apache_request_headers();
                 if ($headers === false) throw new RuntimeException('Error reading request headers, getAllHeaders() returned: FALSE');
             }
             else {

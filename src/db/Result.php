@@ -21,6 +21,13 @@ use const rosasurfer\ARRAY_BOTH;
 abstract class Result extends Object implements ResultInterface {
 
 
+    /** @var ConnectorInterface - used database connector */
+    protected $connector;
+
+    /** @var int - index of the row fetched by the next unqualified fetch* method call or -1 when hit the end */
+    protected $nextRowIndex = 0;
+
+
     /**
      * Destructor
      *
