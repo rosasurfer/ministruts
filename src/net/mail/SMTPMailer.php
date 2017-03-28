@@ -249,12 +249,12 @@ class SMTPMailer extends Mailer {
         if (self::$logDebug)
             $start = microTime(true);
 
-
-        if (is_resource($this->connection))
-            $this->logBuffer = null;      // reset log buffer if already connected
-
-        if (!is_resource($this->connection))
+        if (is_resource($this->connection)) {
+            $this->logBuffer = '';          // reset log buffer if already connected
+        }
+        else {
             $this->connect();
+        }
 
         if ($this->config['auth_username'])
             $this->authenticate();
@@ -400,7 +400,6 @@ class SMTPMailer extends Mailer {
         }
 
         fClose($this->connection);
-        $this->connection = null;
     }
 
 

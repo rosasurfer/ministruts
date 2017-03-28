@@ -10,7 +10,7 @@ use rosasurfer\core\Object;
 class HeaderParser extends Object {
 
 
-    /** @var string[] */
+    /** @var string[]|string[][] */
     private $headers = [];
 
     /** @var string */
@@ -51,7 +51,7 @@ class HeaderParser extends Object {
 
             if (isSet($this->headers[$name])) {
                 if (!is_array($this->headers[$name])) {
-                    $this->headers[$name] = array($this->headers[$name]);
+                    $this->headers[$name] = [$this->headers[$name]];
                 }
                 $this->headers[$name][] = $value;
             }

@@ -23,7 +23,7 @@ abstract class Mailer extends Object implements MailerInterface {
     /** @var array */
     protected $options;
 
-    /** @var string[] */
+    /** @var array */
     protected $config;
 
 

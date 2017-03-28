@@ -188,7 +188,7 @@ class HttpRequest extends Object {
      *
      * @param  string $name - Name des Headers (Gross-/Kleinschreibweise wird ignoriert)
      *
-     * @return string - Wert des Headers oder NULL, wenn kein Header dieses Namens konfiguriert wurde
+     * @return string|null - Wert des Headers oder NULL, wenn kein Header dieses Namens konfiguriert wurde
      */
     public function getHeader($name) {
         if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));

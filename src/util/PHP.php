@@ -346,14 +346,14 @@ class PHP extends StaticClass {
     public static function ini_get_bytes($option) {
         $sValue = $value = ini_get($option);
 
-        if (!strLen($value))     return null;
+        if (!strLen($value))     return 0;
         if (ctype_digit($value)) return (int)$value;
 
         $sign = 1;
         if (strStartsWith($value, '-')) {
             $sign   = -1;
             $sValue = strRight($value, -1);
-            if (!strLen($sValue))     return null;
+            if (!strLen($sValue))     return 0;
             if (ctype_digit($sValue)) return $sign * (int)$sValue;
         }
 
@@ -369,13 +369,13 @@ class PHP extends StaticClass {
                 $factor = 1024 * 1024 * 1024;
                 break;
             default:
-                return null;
+                return 0;
         }
 
         $sValue = strLeft($sValue, -1);
-        if (!strLen($sValue))     return null;
+        if (!strLen($sValue))     return 0;
         if (ctype_digit($sValue)) return $sign * (int)$sValue * $factor;
-        return null;
+        return 0;
     }
 
 
