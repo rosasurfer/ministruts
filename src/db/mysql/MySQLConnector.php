@@ -199,9 +199,9 @@ class MySQLConnector extends Connector {
 
         // connect
         try {                                                                   // CLIENT_FOUND_ROWS
+            $php_errormsg = '';
             $this->hConnection = mysql_connect($host, $user, $pass, $newLink=true/*, $flags=2 */);
-            if (!$this->hConnection)
-                trigger_error(isSet($php_errormsg) ? $php_errormsg : '(unknown error)', E_USER_ERROR);
+            !$this->hConnection && trigger_error($php_errormsg, E_USER_ERROR);
         }
         catch (IRosasurferException $ex) {
             throw $ex->addMessage('Can not connect to MySQL server on "'.$host.'"');
