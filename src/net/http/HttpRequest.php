@@ -28,7 +28,7 @@ class HttpRequest extends Object {
     /**
      * Erzeugt eine neue Instanz.
      *
-     * @return self
+     * @return static
      */
     public static function create() {
         return new static();
@@ -40,7 +40,7 @@ class HttpRequest extends Object {
      *
      * @param  string $method - Methode, zur Zeit werden nur GET und POST unterstuetzt
      *
-     * @return self
+     * @return $this
      */
     public function setMethod($method) {
         if (!is_string($method))                 throw new IllegalTypeException('Illegal type of parameter $method: '.getType($method));
@@ -66,7 +66,7 @@ class HttpRequest extends Object {
      *
      * @param  string $url - URL
      *
-     * @return self
+     * @return $this
      */
     public function setUrl($url) {
         if (!is_string($url)) throw new IllegalTypeException('Illegal type of parameter $url: '.getType($url));
@@ -97,7 +97,7 @@ class HttpRequest extends Object {
      * @param  string $header - Name des Headers
      * @param  string $value  - Wert des Headers, NULL oder ein Leerstring loeschen den entsprechenden Header
      *
-     * @return self
+     * @return $this
      */
     public function setHeader($name, $value) {
         if (!is_string($name))                   throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
@@ -131,7 +131,7 @@ class HttpRequest extends Object {
      * @param  string $header - Name des Headers
      * @param  string $value  - Wert des Headers
      *
-     * @return self
+     * @return $this
      *
      * @see http://stackoverflow.com/questions/3241326/set-more-than-one-http-header-with-the-same-name
      */

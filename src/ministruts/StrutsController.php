@@ -38,16 +38,15 @@ class StrutsController extends Singleton {
     /**
      * Return the singleton instance of this class. The instance might be loaded from a cache.
      *
-     * @return self
+     * @return static
      */
     public static function me() {
-        $class = static::class;
-        if (CLI) throw new IllegalStateException('Can not use '.$class.' in this context.');
+        if (CLI) throw new IllegalStateException('Can not use '.static::class.' in this context.');
 
         $cache = Cache::me();
 
         // cache hit?
-        $controller = $cache->get($class);
+        $controller = $cache->get(static::class);
         if (!$controller) {
             // TODO: fix wrong lock usage (see TODO file)
             // synchronize parsing of the struts-config.xml
@@ -56,7 +55,7 @@ class StrutsController extends Singleton {
 
                 if (!$controller) {
                     // create new controller instance...
-                    $controller = Singleton::getInstance($class);
+                    $controller = Singleton::getInstance(static::class);
 
                     $configDir  = Config::getDefault()->getDirectory();
                     $configFile = str_replace('\\', '/', $configDir.'/struts-config.xml');
@@ -65,7 +64,7 @@ class StrutsController extends Singleton {
                         $dependency->setMinValidity(1 * MINUTE);
 
                     // ...and cache it with a FileDependency
-                    $cache->set($class, $controller, Cache::EXPIRES_NEVER, $dependency);
+                    $cache->set(static::class, $controller, Cache::EXPIRES_NEVER, $dependency);
                 }
 
             //$lock->release();

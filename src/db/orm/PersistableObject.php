@@ -159,7 +159,7 @@ abstract class PersistableObject extends Object {
     /**
      * Save the instance in the storage mechanism.
      *
-     * @return self
+     * @return $this
      */
     public function save() {
         // execute an existing pre-processing hook
@@ -183,7 +183,7 @@ abstract class PersistableObject extends Object {
     /**
      * Insert this instance into the storage mechanism.
      *
-     * @return self
+     * @return $this
      */
     protected function insert() {
         // execute an existing pre-processing hook
@@ -216,7 +216,7 @@ abstract class PersistableObject extends Object {
     /**
      * Update the instance.
      *
-     * @return self
+     * @return $this
      */
     protected function update() {
         // execute an existing pre-processing hook
@@ -259,7 +259,7 @@ abstract class PersistableObject extends Object {
     /**
      * Update the relations of the instance. Must be overridden by the entity instance.
      *
-     * @return self
+     * @return $this
      */
     protected function updateRelations() {
         return $this;

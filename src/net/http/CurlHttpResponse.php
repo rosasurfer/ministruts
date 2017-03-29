@@ -39,7 +39,7 @@ class CurlHttpResponse extends HttpResponse {
      *
      * @param  int $status - HTTP-Statuscode
      *
-     * @return self
+     * @return $this
      */
     public function setStatus($status) {
         if (!is_int($status)) throw new IllegalTypeException('Illegal type of parameter $status: '.getType($status));

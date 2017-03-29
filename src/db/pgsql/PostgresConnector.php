@@ -60,7 +60,7 @@ class PostgresConnector extends Connector {
      *
      * @param  string[] $options
      *
-     * @return self
+     * @return $this
      */
     protected function setOptions(array $options) {
         $this->options = $options;
@@ -129,7 +129,7 @@ class PostgresConnector extends Connector {
     /**
      * Connect the adapter to the database.
      *
-     * @return self
+     * @return $this
      */
     public function connect() {
         $connStr = $this->getConnectionString();
@@ -148,7 +148,7 @@ class PostgresConnector extends Connector {
     /**
      * Disconnect the adapter from the database.
      *
-     * @return self
+     * @return $this
      */
     public function disconnect() {
         if ($this->isConnected()) {
@@ -254,7 +254,7 @@ class PostgresConnector extends Connector {
      *
      * @param  string $sql - SQL statement
      *
-     * @return self
+     * @return $this
      *
      * @throws DatabaseException in case of failure
      */
@@ -415,7 +415,7 @@ class PostgresConnector extends Connector {
     /**
      * Start a new transaction. If there is already an active transaction only the transaction nesting level is increased.
      *
-     * @return self
+     * @return $this
      */
     public function begin() {
         if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
@@ -431,7 +431,7 @@ class PostgresConnector extends Connector {
     /**
      * Commit a pending transaction.
      *
-     * @return self
+     * @return $this
      */
     public function commit() {
         if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
@@ -451,7 +451,7 @@ class PostgresConnector extends Connector {
      * Roll back an active transaction. If a nested transaction is active only the transaction nesting level is decreased.
      * If only one (the outer most) transaction is active the transaction is rolled back.
      *
-     * @return self
+     * @return $this
      */
     public function rollback() {
         if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);

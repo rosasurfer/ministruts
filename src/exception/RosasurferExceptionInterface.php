@@ -14,7 +14,7 @@ interface RosasurferExceptionInterface {
      *
      * @param  string $message
      *
-     * @return self
+     * @return $this
      */
     public function addMessage($message);
 
@@ -25,7 +25,7 @@ interface RosasurferExceptionInterface {
      *
      * @param  mixed $code
      *
-     * @return self
+     * @return $this
      */
     public function setCode($code);
 

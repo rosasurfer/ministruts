@@ -104,7 +104,7 @@ class ActionForward extends Object {
      *
      * @param  string $name
      *
-     * @return self
+     * @return $this
      */
     public function setName($name) {
         if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
@@ -120,7 +120,7 @@ class ActionForward extends Object {
      *
      * @param  string $path
      *
-     * @return self
+     * @return $this
      */
     public function setPath($path) {
         if (!is_string($path)) throw new IllegalTypeException('Illegal type of parameter $path: '.getType($path));
@@ -136,7 +136,7 @@ class ActionForward extends Object {
      *
      * @param  string $label - Label
      *
-     * @return self
+     * @return $this
      */
     public function setLabel($label) {
         if (!is_string($label)) throw new IllegalTypeException('Illegal type of parameter $label: '.getType($label));
@@ -152,7 +152,7 @@ class ActionForward extends Object {
      *
      * @param  bool $redirect
      *
-     * @return self
+     * @return $this
      */
     public function setRedirect($redirect) {
         if (!is_bool($redirect)) throw new IllegalTypeException('Illegal type of parameter $redirect: '.getType($redirect));
@@ -168,7 +168,7 @@ class ActionForward extends Object {
      * @param  string $key   - Schluessel
      * @param  scalar $value - Wert (int|float|string|bool)
      *
-     * @return self
+     * @return $this
      */
     public function addQueryData($key, $value) {
         if (!is_string($key))       throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));

@@ -98,7 +98,7 @@ class MySQLConnector extends Connector {
      *
      * @param  string $hostname - format: "hostname[:port]"
      *
-     * @return self
+     * @return $this
      */
     protected function setHost($hostname) {
         if (!is_string($hostname)) throw new IllegalTypeException('Illegal type of parameter $hostname: '.getType($hostname));
@@ -129,7 +129,7 @@ class MySQLConnector extends Connector {
      *
      * @param  string $name
      *
-     * @return self
+     * @return $this
      */
     protected function setUsername($name) {
         if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
@@ -145,7 +145,7 @@ class MySQLConnector extends Connector {
      *
      * @param  string $password - may be empty or NULL (no password)
      *
-     * @return self
+     * @return $this
      */
     protected function setPassword($password) {
         if (is_null($password)) $password = '';
@@ -161,7 +161,7 @@ class MySQLConnector extends Connector {
      *
      * @param  string $name - schema name
      *
-     * @return self
+     * @return $this
      */
     protected function setDatabase($name) {
         if (!is_null($name) && !is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
@@ -178,7 +178,7 @@ class MySQLConnector extends Connector {
      *
      * @param  string[] $options
      *
-     * @return self
+     * @return $this
      */
     protected function setOptions(array $options) {
         // Here we might filter for known options.
@@ -190,7 +190,7 @@ class MySQLConnector extends Connector {
     /**
      * Connect the adapter to the database.
      *
-     * @return self
+     * @return $this
      */
     public function connect() {
         $host = $this->host; if ($this->port) $host .= ':'.$this->port;
@@ -216,7 +216,7 @@ class MySQLConnector extends Connector {
     /**
      * Set the configured connection options.
      *
-     * @return self
+     * @return $this
      */
     protected function setConnectionOptions() {
         try {
@@ -248,7 +248,7 @@ class MySQLConnector extends Connector {
     /**
      * Pre-select a configured database.
      *
-     * @return self
+     * @return $this
      */
     protected function selectDatabase() {
         if ($this->database) {
@@ -266,7 +266,7 @@ class MySQLConnector extends Connector {
     /**
      * Disconnect the adapter from the database.
      *
-     * @return self
+     * @return $this
      */
     public function disconnect() {
         if ($this->isConnected()) {
@@ -378,7 +378,7 @@ class MySQLConnector extends Connector {
      *
      * @param  string $sql - SQL statement
      *
-     * @return self
+     * @return $this
      *
      * @throws DatabaseException in case of failure
      */
@@ -485,7 +485,7 @@ class MySQLConnector extends Connector {
     /**
      * Start a new transaction. If there is already an active transaction only the transaction nesting level is increased.
      *
-     * @return self
+     * @return $this
      */
     public function begin() {
         if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
@@ -501,7 +501,7 @@ class MySQLConnector extends Connector {
     /**
      * Commit an active transaction. If a nested transaction is active only the transaction nesting level is decreased.
      *
-     * @return self
+     * @return $this
      */
     public function commit() {
         if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
@@ -521,7 +521,7 @@ class MySQLConnector extends Connector {
      * Roll back an active transaction. If a nested transaction is active only the transaction nesting level is decreased.
      * If only one (the outer most) transaction is active the transaction is rolled back.
      *
-     * @return self
+     * @return $this
      */
     public function rollback() {
         if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);

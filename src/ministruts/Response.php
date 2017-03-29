@@ -22,7 +22,7 @@ class Response extends Singleton {
      * Gibt die Singleton-Instanz dieser Klasse zurueck, wenn das Script im Kontext eines HTTP-Requestes aufgerufen
      * wurde. In allen anderen Faellen, z.B. bei Aufruf in der Konsole, wird NULL zurueckgegeben.
      *
-     * @return self|null - Instanz oder NULL
+     * @return static|null - Instanz oder NULL
      */
     public static function me() {
         if (!CLI) return Singleton::getInstance(static::class);

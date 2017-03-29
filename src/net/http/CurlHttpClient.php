@@ -153,7 +153,7 @@ class CurlHttpClient extends HttpClient {
      *
      * @param  array $options - Array mit zusaetzlichen CURL-Optionen (default: keine)
      *
-     * @return self
+     * @return static
      */
     public static function create(array $options=[]) {
         return new static($options);

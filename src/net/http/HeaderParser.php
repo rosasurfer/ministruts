@@ -22,7 +22,7 @@ class HeaderParser extends Object {
      *
      * @param  string $data - rohe Headerdaten
      *
-     * @return self
+     * @return $this
      */
     public function parseLines($data) {
         $lines = explode("\n", $data);
@@ -39,7 +39,7 @@ class HeaderParser extends Object {
      *
      * @param  string $line - Headerzeile
      *
-     * @return self
+     * @return $this
      */
     public function parseLine($line) {
         $line = trim($line, "\r\n");

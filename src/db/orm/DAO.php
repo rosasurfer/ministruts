@@ -93,7 +93,7 @@ abstract class DAO extends Singleton {
      *
      * @param  string $sql - SQL statement with optional ORM syntax
      *
-     * @return self
+     * @return $this
      */
     public function execute($sql) {
         $this->getWorker()->execute($sql);

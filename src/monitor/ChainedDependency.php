@@ -33,7 +33,7 @@ class ChainedDependency extends Dependency {
      *
      * @param  Dependency $dependency - Abhaengigkeit
      *
-     * @return self
+     * @return static
      */
     protected static function create(Dependency $dependency) {
         return new static($dependency);

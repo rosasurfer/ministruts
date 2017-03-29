@@ -83,7 +83,7 @@ class ActionMapping extends Object {
      *
      * @param  string $path
      *
-     * @return self
+     * @return $this
      *
      * @throws StrutsConfigException on configuration errors
      */
@@ -129,7 +129,7 @@ class ActionMapping extends Object {
      *
      * @param  string $method - HTTP-Methode: "GET"|"POST"
      *
-     * @return self
+     * @return $this
      *
      * @throws StrutsConfigException on configuration errors
      */
@@ -160,7 +160,7 @@ class ActionMapping extends Object {
      *
      * @param  string - Rollenausdruck
      *
-     * @return self
+     * @return $this
      *
      * @throws StrutsConfigException on configuration errors
      */
@@ -190,7 +190,7 @@ class ActionMapping extends Object {
      *
      * @param  ActionForward $forward - ActionForward
      *
-     * @return self
+     * @return $this
      *
      * @throws StrutsConfigException on configuration errors
      */
@@ -218,7 +218,7 @@ class ActionMapping extends Object {
      *
      * @param  string $className
      *
-     * @return self
+     * @return $this
      *
      * @throws StrutsConfigException on configuration errors
      */
@@ -249,7 +249,7 @@ class ActionMapping extends Object {
      *
      * @param  string $className
      *
-     * @return self
+     * @return $this
      *
      * @throws StrutsConfigException on configuration errors
      */
@@ -281,7 +281,7 @@ class ActionMapping extends Object {
      *
      * @param  string $value - "request" oder "session"
      *
-     * @return self
+     * @return $this
      *
      * @throws StrutsConfigException on configuration errors
      */
@@ -335,7 +335,7 @@ class ActionMapping extends Object {
      *
      * @param  bool $mode
      *
-     * @return self
+     * @return $this
      */
     public function setFormValidateFirst($mode) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -362,7 +362,7 @@ class ActionMapping extends Object {
      *
      * @param  bool $default
      *
-     * @return self
+     * @return $this
      */
     public function setDefault($default) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -390,7 +390,7 @@ class ActionMapping extends Object {
      * @param  ActionForward $forward
      * @param  string|null   $alias   - alias name of the forward (default: none)
      *
-     * @return self
+     * @return $this
      *
      * @throws StrutsConfigException on configuration errors
      */
@@ -408,7 +408,7 @@ class ActionMapping extends Object {
     /**
      * Friert die Konfiguration dieser Komponente ein.
      *
-     * @return self
+     * @return $this
      */
     public function freeze() {
         if (!$this->configured) {

@@ -22,7 +22,7 @@ interface ConnectorInterface {
     /**
      * Connect the adapter to the database.
      *
-     * @return self
+     * @return $this
      */
     public function connect();
 
@@ -30,7 +30,7 @@ interface ConnectorInterface {
     /**
      * Disconnect the adapter from the database.
      *
-     * @return self
+     * @return $this
      */
     public function disconnect();
 
@@ -93,7 +93,7 @@ interface ConnectorInterface {
      *
      * @param  string $sql - SQL statement
      *
-     * @return self
+     * @return $this
      *
      * @throws DatabaseException in case of failure
      */
@@ -115,7 +115,7 @@ interface ConnectorInterface {
     /**
      * Start a new transaction.
      *
-     * @return self
+     * @return $this
      */
     public function begin();
 
@@ -123,7 +123,7 @@ interface ConnectorInterface {
     /**
      * Commit an active transaction.
      *
-     * @return self
+     * @return $this
      */
     public function commit();
 
@@ -131,7 +131,7 @@ interface ConnectorInterface {
     /**
      * Roll back an active transaction.
      *
-     * @return self
+     * @return $this
      */
     public function rollback();
 

@@ -25,7 +25,7 @@ trait RosasurferExceptionTrait {
      *
      * @param  string $message
      *
-     * @return self
+     * @return $this
      */
     public function addMessage($message) {
         $this->message = trim(trim($this->message).NL.$message);
@@ -39,7 +39,7 @@ trait RosasurferExceptionTrait {
      *
      * @param  mixed $code
      *
-     * @return self
+     * @return $this
      */
     public function setCode($code) {
         if (!isSet($this->code)) {

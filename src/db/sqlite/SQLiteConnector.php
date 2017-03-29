@@ -94,7 +94,7 @@ class SQLiteConnector extends Connector {
      *
      * @param  string $file
      *
-     * @return self
+     * @return $this
      */
     protected function setFile($file) {
         if (!is_string($file)) throw new IllegalTypeException('Illegal type of parameter $file: '.getType($file));
@@ -113,7 +113,7 @@ class SQLiteConnector extends Connector {
      *
      * @param  string[] $options
      *
-     * @return self
+     * @return $this
      */
     protected function setOptions(array $options) {
         $this->options = $options;
@@ -124,7 +124,7 @@ class SQLiteConnector extends Connector {
     /**
      * Connect the adapter to the database.
      *
-     * @return self
+     * @return $this
      */
     public function connect() {
         $php_errormsg = '';
@@ -159,7 +159,7 @@ class SQLiteConnector extends Connector {
     /**
      * Set the configured connection options.
      *
-     * @return self
+     * @return $this
      */
     protected function setConnectionOptions() {
         //$options = $this->options;
@@ -177,7 +177,7 @@ class SQLiteConnector extends Connector {
     /**
      * Disconnect the adapter from the database.
      *
-     * @return self
+     * @return $this
      */
     public function disconnect() {
         if ($this->isConnected()) {
@@ -284,7 +284,7 @@ class SQLiteConnector extends Connector {
      *
      * @param  string $sql - SQL statement
      *
-     * @return self
+     * @return $this
      *
      * @throws DatabaseException in case of failure
      */
@@ -340,7 +340,7 @@ class SQLiteConnector extends Connector {
     /**
      * Start a new transaction. If there is already an active transaction only the transaction nesting level is increased.
      *
-     * @return self
+     * @return $this
      */
     public function begin() {
         if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
@@ -356,7 +356,7 @@ class SQLiteConnector extends Connector {
     /**
      * Commit a pending transaction.
      *
-     * @return self
+     * @return $this
      */
     public function commit() {
         if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
@@ -376,7 +376,7 @@ class SQLiteConnector extends Connector {
      * Roll back an active transaction. If a nested transaction is active only the transaction nesting level is decreased.
      * If only one (the outer most) transaction is active the transaction is rolled back.
      *
-     * @return self
+     * @return $this
      */
     public function rollback() {
         if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);

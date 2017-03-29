@@ -70,7 +70,7 @@ class Tile extends Object {
      *
      * @param  string $name
      *
-     * @return self
+     * @return $this
      */
     public function setName($name) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -95,7 +95,7 @@ class Tile extends Object {
      *
      * @param  string $filename - vollstaendiger Dateiname
      *
-     * @return self
+     * @return $this
      */
     public function setFileName($filename) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -111,7 +111,7 @@ class Tile extends Object {
      * @param  string    $name - Name der Tile
      * @param  self|null $tile - die zu speichernde Tile oder NULL, wenn die Child-Deklaration abstrakt ist
      *
-     * @return self
+     * @return $this
      */
     public function setNestedTile($name, self $tile=null) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -127,7 +127,7 @@ class Tile extends Object {
      * @param  string $name  - Name der Eigenschaft
      * @param  mixed  $value - der zu speichernde Wert
      *
-     * @return self
+     * @return $this
      */
     public function setProperty($name, $value) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -162,7 +162,7 @@ class Tile extends Object {
     /**
      * Friert die Konfiguration dieser Komponente ein.
      *
-     * @return self
+     * @return $this
      */
     public function freeze() {
         if (!$this->configured) {
@@ -181,7 +181,7 @@ class Tile extends Object {
     /**
      * Render the Tile.
      *
-     * @return self
+     * @return $this
      */
     public function render() {
         $nestedTiles = $this->nestedTiles;

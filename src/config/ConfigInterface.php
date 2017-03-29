@@ -29,7 +29,7 @@ interface ConfigInterface {
      * @param  string $key   - key
      * @param  mixed  $value - new value
      *
-     * @return self
+     * @return $this
      */
     public function set($key, $value);
 

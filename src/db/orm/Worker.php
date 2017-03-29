@@ -97,7 +97,7 @@ class Worker extends Object {
      *
      * @param  string $sql - SQL statement with optional ORM syntax
      *
-     * @return self
+     * @return $this
      */
     public function execute($sql) {
         $sql = $this->translateQuery($sql);
