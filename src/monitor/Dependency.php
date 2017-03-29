@@ -61,14 +61,12 @@ abstract class Dependency extends Object {
      *
      * @param  Dependency $dependency - Abhaengigkeit
      *
-     * @return ChainedDependency
+     * @return Dependency
      */
     public function andDependency(Dependency $dependency) {
         if ($dependency === $this)
             return $this;
-
-        return ChainedDependency::create($this)
-                                ->andDependency($dependency);
+        return ChainedDependency::create($this)->andDependency($dependency);
     }
 
 
@@ -77,14 +75,12 @@ abstract class Dependency extends Object {
      *
      * @param  Dependency $dependency - Abhaengigkeit
      *
-     * @return ChainedDependency
+     * @return Dependency
      */
     public function orDependency(Dependency $dependency) {
         if ($dependency === $this)
             return $this;
-
-        return ChainedDependency::create($this)
-                                        ->orDependency($dependency);
+        return ChainedDependency::create($this)->orDependency($dependency);
     }
 
 
@@ -103,7 +99,7 @@ abstract class Dependency extends Object {
      *
      * @param  int $time - Mindestgueltigkeit in Sekunden
      *
-     * @return ChainedDependency
+     * @return Dependency
      */
     public function setMinValidity($time) {
         if (!is_int($time)) throw new IllegalTypeException('Illegal type of parameter $time: '.getType($time));
