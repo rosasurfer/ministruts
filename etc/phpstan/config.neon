@@ -3,8 +3,8 @@
 #
 # phpstan analyse -a autoload.php -c config.neon -l 0 [--] <directory>
 #
-services:                                                           # initialized before "parameters" block 
-   #-                                                               # ClassLoaders needs to be registered via -a autoload.php
+services:                                                           # loaded and validated before "parameters" 
+   #-                                                               
    #    class: rosasurfer\phpstan\DynamicInstanceMethodReturnType
    #    tags:
    #        - phpstan.broker.dynamicMethodReturnTypeExtension
@@ -16,7 +16,7 @@ services:                                                           # initialize
 parameters:
     autoload_files:
         - src/globals.php
-        - etc/phpstan/functions.php                                 # stubs of missing function declarations
+        - etc/phpstan/functions.php                                 # function stubs for procedural code and PHP extensions
                                                                     
     fileExtensions:                                                 # additional files to analyse
        #- html                                                      
