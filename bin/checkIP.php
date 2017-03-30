@@ -69,16 +69,18 @@ function getForwardedRemoteAddress() {
  * mehrere Header des angegebenen Namens uebertragen, werden alle Werte dieser Header als eine komma-getrennte Liste
  * zurueckgegeben (in der uebertragenen Reihenfolge).
  *
- * @param  string|array $names - ein oder mehrere Headernamen
+ * @param  string|string[] $names - ein oder mehrere Headernamen
  *
  * @return string - Wert oder NULL, wenn die angegebenen Header nicht gesetzt sind
  */
 function getHeaderValue($names) {
-    if (is_string($names))
-        $names = array($names);
+    if (is_string($names)) {
+        $names = [$names];
+    }
     elseif (is_array($names)) {
-        foreach ($names as $name)
+        foreach ($names as $name) {
             if (!is_string($name)) throw new Exception('Illegal argument type in argument $names: '.getType($name));
+        }
     }
     else throw new Exception('Illegal type of parameter $names: '.getType($names));
 
