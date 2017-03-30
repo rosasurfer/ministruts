@@ -1,15 +1,15 @@
 <?php
 namespace rosasurfer\util;
 
-use rosasurfer\core\ObjectTrait as TObject;
+use rosasurfer\core\ObjectTrait;
 
 
 /**
- * Extension version of \DateTime.
+ * Extended version of \DateTime.
  */
 class DateTime extends \DateTime {
 
-    use TObject;
+    use ObjectTrait;
 
 
     /**

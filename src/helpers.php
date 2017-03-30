@@ -4,6 +4,8 @@
  */
 namespace rosasurfer;
 
+use \Exception;
+
 use rosasurfer\exception\IllegalArgumentException;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
@@ -817,7 +819,7 @@ function is_class($name) {
     try {
         return class_exists($name, true);
     }
-    catch (\Exception $ex) {/* loaders might wrongly throw exceptions blocking us from continuation */}
+    catch (Exception $ex) {/* loaders might wrongly throw exceptions blocking us from continuation */}
 
     return class_exists($name, false);
 }
@@ -836,7 +838,7 @@ function is_interface($name) {
     try {
         return interface_exists($name, true);
     }
-    catch (\Exception $ex) {/* loaders might wrongly throw exceptions blocking us from continuation */}
+    catch (Exception $ex) {/* loaders might wrongly throw exceptions blocking us from continuation */}
 
     return interface_exists($name, false);
 }
@@ -854,7 +856,7 @@ function is_trait($name) {
     try {
         return trait_exists($name, true);
     }
-    catch (\Exception $ex) {/* loaders might wrongly throw exceptions blocking us from continuation */}
+    catch (Exception $ex) {/* loaders might wrongly throw exceptions blocking us from continuation */}
 
     return trait_exists($name, false);
 }

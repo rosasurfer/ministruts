@@ -1,6 +1,8 @@
 <?php
 namespace rosasurfer\db;
 
+use \Exception;
+
 use rosasurfer\core\Object;
 use rosasurfer\debug\ErrorHandler;
 
@@ -37,7 +39,7 @@ abstract class Result extends Object implements ResultInterface {
         try {
             $this->release();
         }
-        catch (\Exception $ex) {
+        catch (Exception $ex) {
             throw ErrorHandler::handleDestructorException($ex);
         }
     }

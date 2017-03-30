@@ -1,6 +1,7 @@
 <?php
 namespace rosasurfer\lock;
 
+use \Exception;
 use rosasurfer\debug\ErrorHandler;
 
 use rosasurfer\exception\FileNotFoundException;
@@ -85,7 +86,7 @@ class Lock extends BaseLock {
         try {
             $this->release();
         }
-        catch (\Exception $ex) {
+        catch (Exception $ex) {
             throw ErrorHandler::handleDestructorException($ex);
         }
     }

@@ -1,6 +1,7 @@
 <?php
 namespace rosasurfer\db;
 
+use \Exception;
 use rosasurfer\core\Object;
 use rosasurfer\db\ConnectorInterface as IConnector;
 use rosasurfer\debug\ErrorHandler;
@@ -28,7 +29,7 @@ abstract class Connector extends Object implements ConnectorInterface {
                 $this->disconnect();
             }
         }
-        catch (\Exception $ex) {
+        catch (Exception $ex) {
             throw ErrorHandler::handleDestructorException($ex);
         }
     }

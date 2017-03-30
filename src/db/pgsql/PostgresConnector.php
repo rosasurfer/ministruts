@@ -1,6 +1,8 @@
 <?php
 namespace rosasurfer\db\pgsql;
 
+use \Exception;
+
 use rosasurfer\db\Connector;
 use rosasurfer\db\DatabaseException;
 
@@ -498,7 +500,7 @@ class PostgresConnector extends Connector {
                 try {
                     $this->lastInsertId = $this->query('select lastVal()')->fetchInt();
                 }
-                catch (\Exception $ex) {
+                catch (Exception $ex) {
                     if (striPos($ex->getMessage(), 'ERROR:  lastval is not yet defined in this session') === false)
                         throw $ex;
                     $this->lastInsertId = 0;

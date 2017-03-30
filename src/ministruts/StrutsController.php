@@ -1,6 +1,8 @@
 <?php
 namespace rosasurfer\ministruts;
 
+use \Exception;
+
 use rosasurfer\cache\Cache;
 use rosasurfer\config\Config;
 use rosasurfer\core\Singleton;
@@ -108,7 +110,7 @@ class StrutsController extends Singleton {
         catch (IRosasurferException $ex) {
             throw $ex->addMessage('Error loading config file "'.$file.'"');
         }
-        catch (\Exception $ex) {
+        catch (Exception $ex) {
             throw new RuntimeException('Error loading config file "'.$file.'"', null, $ex);
         }
     }

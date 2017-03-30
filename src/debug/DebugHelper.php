@@ -1,6 +1,7 @@
 <?php
 namespace rosasurfer\debug;
 
+use \Exception;
 use rosasurfer\core\StaticClass;
 
 use rosasurfer\exception\IllegalTypeException;
@@ -53,7 +54,7 @@ class DebugHelper extends StaticClass {
         if ($trace && isSet($trace[0]['fixed']))
             return $trace;
 
-        // Fix an incomplete frame[0][line] if parameters are provided and $file matches (e.g. with \SimpleXMLElement).
+        // Fix an incomplete frame[0][line] if parameters are provided and $file matches (e.g. with SimpleXMLElement).
         if ($file!='unknown' && $line) {
             if (isSet($trace[0]['file']) && $trace[0]['file']==$file) {
                 if (isSet($trace[0]['line']) && $trace[0]['line']===0) {
@@ -179,12 +180,12 @@ class DebugHelper extends StaticClass {
     /**
      * Return a more readable version of an exception's message.
      *
-     * @param  \Exception $exception - any exception (not only RosasurferExceptions)
-     * @param  string     $indent    - indent lines by this value (default: empty string)
+     * @param  Exception $exception - any exception (not only RosasurferExceptions)
+     * @param  string    $indent    - indent lines by this value (default: empty string)
      *
      * @return string - message
      */
-    public static function composeBetterMessage(\Exception $exception, $indent='') {
+    public static function composeBetterMessage(Exception $exception, $indent='') {
         if ($exception instanceof PHPError) {
             $result    = $exception->getSimpleType();
         }
@@ -218,12 +219,12 @@ class DebugHelper extends StaticClass {
      * Return a more readable version of an exception's stacktrace. The representation also contains information about
      * nested exceptions.
      *
-     * @param  \Exception $exception - any exception (not only RosasurferExceptions)
-     * @param  string     $indent    - indent the resulting lines by this value (default: empty string)
+     * @param  Exception $exception - any exception (not only RosasurferExceptions)
+     * @param  string    $indent    - indent the resulting lines by this value (default: empty string)
      *
      * @return string - readable stacktrace
      */
-    public static function getBetterTraceAsString(\Exception $exception, $indent='') {
+    public static function getBetterTraceAsString(Exception $exception, $indent='') {
         if ($exception instanceof IRosasurferException) $trace = $exception->getBetterTrace();
         else                                            $trace = self::fixTrace($exception->getTrace(), $exception->getFile(), $exception->getLine());
         $result = self::formatTrace($trace, $indent);

@@ -1,6 +1,8 @@
 <?php
 namespace rosasurfer\net\mail;
 
+use \Exception;
+
 use rosasurfer\config\Config;
 use rosasurfer\debug\ErrorHandler;
 
@@ -128,7 +130,7 @@ class SMTPMailer extends Mailer {
         try {
             $this->disconnect();
         }
-        catch (\Exception $ex) {
+        catch (Exception $ex) {
             throw ErrorHandler::handleDestructorException($ex);
         }
     }

@@ -1,6 +1,7 @@
 <?php
 namespace rosasurfer\db\orm;
 
+use \DateTime;
 
 use rosasurfer\core\Object;
 use rosasurfer\core\Singleton;
@@ -311,12 +312,12 @@ abstract class PersistableObject extends Object {
                 $phpType = $mapping[IDX_MAPPING_PHP_TYPE];
 
                 switch ($phpType) {
-                    case PHP_TYPE_BOOL   : $object->$phpName =        (bool) $row[$column];  break;
-                    case PHP_TYPE_INT    : $object->$phpName =         (int) $row[$column];  break;
-                    case PHP_TYPE_FLOAT  : $object->$phpName =       (float) $row[$column];  break;
-                    case PHP_TYPE_STRING : $object->$phpName =      (string) $row[$column];  break;
-                  //case PHP_TYPE_ARRAY  : $object->$phpName =        strLen($row[$column]) ? explode(',', $row[$column]) : []; break;
-                  //case \DateTime::class: $object->$phpName = new \DateTime($row[$column]); break;
+                    case PHP_TYPE_BOOL  : $object->$phpName =       (bool) $row[$column];  break;
+                    case PHP_TYPE_INT   : $object->$phpName =        (int) $row[$column];  break;
+                    case PHP_TYPE_FLOAT : $object->$phpName =      (float) $row[$column];  break;
+                    case PHP_TYPE_STRING: $object->$phpName =     (string) $row[$column];  break;
+                  //case PHP_TYPE_ARRAY : $object->$phpName =       strLen($row[$column]) ? explode(',', $row[$column]) : []; break;
+                  //case DateTime::class: $object->$phpName = new DateTime($row[$column]); break;
                     default:
                         //if (is_class($phpType)) {
                         //    $object->$phpName = new $phpType($row[$column]);
