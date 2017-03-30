@@ -1,7 +1,3 @@
-# do not ignore the following files
-!.gitattributes
-!.htaccess
-
 # ignore Eclipse folders and files
 /.externalToolBuilders/
 /.settings/
@@ -24,3 +20,9 @@
 vendor/
 /composer.lock
 config.properties
+php-error.log
+
+
+# do not ignore the following files
+!.gitattributes
+!.htaccess
