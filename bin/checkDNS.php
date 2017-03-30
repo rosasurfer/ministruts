@@ -1,7 +1,12 @@
 #!/usr/bin/php
 <?php
+namespace rosasurfer\bin\check_dns;
+
 use rosasurfer\config\Config;
+
+use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InfrastructureException;
+use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
 
 use const rosasurfer\WINDOWS;

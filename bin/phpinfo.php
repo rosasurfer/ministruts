@@ -1,5 +1,7 @@
 #!/usr/bin/php
 <?php
+namespace rosasurfer\bin\phpinfo;
+
 use rosasurfer\MiniStruts;
 use rosasurfer\util\PHP;
 

@@ -1,4 +1,7 @@
 <?php
+namespace rosasurfer\bin\check_ip;
+
+use \Exception;
 use rosasurfer\MiniStruts;
 
 use function rosasurfer\echoPre;
@@ -108,7 +111,7 @@ function getHeaders($names = null) {
     static $headers = null;
     if ($headers === null) {
         if (function_exists('getAllHeaders')) {
-            $headers = getAllHeaders();
+            $headers = apache_request_headers();
             if ($headers === false)
                 throw new Exception('Error reading request headers, getAllHeaders() returned: FALSE');
         }
