@@ -15,7 +15,10 @@ error_reporting(E_ALL & ~E_DEPRECATED);
 
 // configure and load the framework
 require(APPLICATION_ROOT.'/src/load.php');
-MiniStruts::init(['globals' => true]);
+MiniStruts::init([
+    'config'  => __DIR__,
+    'globals' => true,
+]);
 
 
 // --- start ----------------------------------------------------------------------------------------------------------------
