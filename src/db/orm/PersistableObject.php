@@ -1,8 +1,6 @@
 <?php
 namespace rosasurfer\db\orm;
 
-use \DateTime;
-
 use rosasurfer\core\Object;
 use rosasurfer\core\Singleton;
 
@@ -12,6 +10,8 @@ use rosasurfer\exception\IllegalAccessException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
 use rosasurfer\exception\UnimplementedFeatureException;
+
+use \DateTime;
 
 use function rosasurfer\is_class;
 

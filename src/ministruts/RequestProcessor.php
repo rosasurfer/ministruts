@@ -1,15 +1,13 @@
 <?php
 namespace rosasurfer\ministruts;
 
-use \Exception;
-
 use rosasurfer\core\Object;
 use rosasurfer\exception\RuntimeException;
 use rosasurfer\log\Logger;
 
 use rosasurfer\net\http\HeaderUtils;
 use rosasurfer\net\http\HttpResponse;
-
+use \Exception;
 
 use function rosasurfer\strEndsWith;
 use function rosasurfer\strRightFrom;

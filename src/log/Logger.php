@@ -1,8 +1,6 @@
 <?php
 namespace rosasurfer\log;
 
-use \Exception;
-
 use rosasurfer\config\Config;
 use rosasurfer\core\StaticClass;
 
@@ -20,6 +18,7 @@ use rosasurfer\net\http\HttpResponse;
 
 use rosasurfer\ministruts\Request;
 use rosasurfer\util\PHP;
+use \Exception;
 
 use function rosasurfer\ksort_r;
 use function rosasurfer\normalizeEOL;

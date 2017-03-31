@@ -1,12 +1,13 @@
 <?php
 namespace rosasurfer\debug;
 
-use \Exception;
 use rosasurfer\core\StaticClass;
 
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\exception\error\PHPError;
+
+use \Exception;
 
 use function rosasurfer\normalizeEOL;
 use function rosasurfer\strEndsWith;

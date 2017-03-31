@@ -1,14 +1,14 @@
 <?php
 namespace rosasurfer\db\pgsql;
 
-use \Exception;
-
 use rosasurfer\db\Connector;
 use rosasurfer\db\DatabaseException;
 
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\exception\RuntimeException;
+
+use \Exception;
 
 use function rosasurfer\strContains;
 use function rosasurfer\strStartsWithI;

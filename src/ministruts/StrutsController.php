@@ -1,8 +1,6 @@
 <?php
 namespace rosasurfer\ministruts;
 
-use \Exception;
-
 use rosasurfer\cache\Cache;
 use rosasurfer\config\Config;
 use rosasurfer\core\Singleton;
@@ -12,6 +10,7 @@ use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\exception\RuntimeException;
 
 use rosasurfer\monitor\FileDependency;
+use \Exception;
 
 use function rosasurfer\strLeftTo;
 use function rosasurfer\strRightFrom;

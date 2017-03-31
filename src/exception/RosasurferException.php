@@ -1,9 +1,9 @@
 <?php
 namespace rosasurfer\exception;
 
-use \Exception;
 use rosasurfer\debug\DebugHelper;
 use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
+use \Exception;
 
 
 /**

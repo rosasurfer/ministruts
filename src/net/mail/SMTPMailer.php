@@ -1,8 +1,6 @@
 <?php
 namespace rosasurfer\net\mail;
 
-use \Exception;
-
 use rosasurfer\config\Config;
 use rosasurfer\debug\ErrorHandler;
 
@@ -13,6 +11,7 @@ use rosasurfer\exception\RuntimeException;
 
 use rosasurfer\log\Logger;
 use rosasurfer\util\Date;
+use \Exception;
 
 use function rosasurfer\normalizeEOL;
 use function rosasurfer\strContains;

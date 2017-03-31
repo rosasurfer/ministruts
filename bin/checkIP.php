@@ -1,8 +1,8 @@
 <?php
 namespace rosasurfer\bin\check_ip;
 
-use \Exception;
 use rosasurfer\MiniStruts;
+use \Exception;
 
 use function rosasurfer\echoPre;
 

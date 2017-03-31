@@ -9,7 +9,7 @@ namespace {
     }
 
 
-    if (!function_exists('apc_fetch')) {
+    if (!function_exists('apc_add')) {
         /**
          * @param  string $key
          * @param  mixed  $var
@@ -17,55 +17,49 @@ namespace {
          *
          * @return bool
          */
-        function apc_add ($key, $var, $ttl = null) {}
+        function apc_add($key, $var, $ttl = null) {}
 
         /**
          * @param  string $key
-         *
          * @return bool
          */
-        function apc_delete ($key) {}
+        function apc_delete($key) {}
 
         /**
          * @param string|string[] $keys
-         *
          * @return bool|string[]
          */
-        function apc_exists ($keys) {}
+        function apc_exists($keys) {}
 
         /**
          * @param  string|string[] $key
          * @param  bool            $success
-         *
          * @return mixed
          */
-        function apc_fetch ($key, &$success = null) {}
+        function apc_fetch($key, &$success = null) {}
 
         /**
          * @param  string $key
          * @param  mixed  $var
          * @param  int    $ttl
-         *
          * @return bool
          */
-        function apc_store ($key, $var, $ttl = null) {}
+        function apc_store($key, $var, $ttl = null) {}
     }
 
 
-    if (!function_exists('mysql_connect')) {
+    if (!function_exists('mysql_affected_rows')) {
         /**
          * @param  resource $link_identifier
-         *
          * @return int
          */
-        function mysql_affected_rows ($link_identifier = null) {}
+        function mysql_affected_rows($link_identifier = null) {}
 
         /**
          * @param  resource $link_identifier
-         *
          * @return bool
          */
-        function mysql_close ($link_identifier = null) {}
+        function mysql_close($link_identifier = null) {}
 
         /**
          * @param  string $server
@@ -73,125 +67,110 @@ namespace {
          * @param  string $password
          * @param  bool   $new_link
          * @param  int    $client_flags
-         *
          * @return resource
          */
-        function mysql_connect ($server = null, $username = null, $password = null, $new_link = null, $client_flags = null) {}
+        function mysql_connect($server = null, $username = null, $password = null, $new_link = null, $client_flags = null) {}
 
         /**
          * @param  resource $link_identifier
-         *
          * @return string
          */
-        function mysql_error ($link_identifier = null) {}
+        function mysql_error($link_identifier = null) {}
 
         /**
          * @param  resource $link_identifier
-         *
          * @return int
          */
-        function mysql_errno ($link_identifier = null) {}
+        function mysql_errno($link_identifier = null) {}
 
         /**
          * @param  resource $result
          * @param  int      $result_type
-         *
          * @return array|bool
          */
-        function mysql_fetch_array ($result, $result_type = null) {}
+        function mysql_fetch_array($result, $result_type = null) {}
 
         /**
          * @param  resource $result
          * @return bool
          */
-        function mysql_free_result ($result) {}
+        function mysql_free_result($result) {}
 
         /**
          * @param  resource $link_identifier
-         *
          * @return string
          */
-        function mysql_get_server_info ($link_identifier = null) {}
+        function mysql_get_server_info($link_identifier = null) {}
 
         /**
          * @param  resource $link_identifier
-         *
          * @return int
          */
-        function mysql_insert_id ($link_identifier = null) {}
+        function mysql_insert_id($link_identifier = null) {}
 
         /**
          * @param  resource $result
-         *
          * @return int
          */
-        function mysql_num_fields ($result) {}
+        function mysql_num_fields($result) {}
 
         /**
          * @param  resource $result
-         *
          * @return int
          */
-        function mysql_num_rows ($result) {}
+        function mysql_num_rows($result) {}
 
         /**
          * @param  string   $query
          * @param  resource $link_identifier
-         *
          * @return resource|bool
          */
-        function mysql_query ($query, $link_identifier = null) {}
+        function mysql_query($query, $link_identifier = null) {}
 
         /**
          * @param  string   $unescaped_string
          * @param  resource $link_identifier
-         *
          * @return string
          */
-        function mysql_real_escape_string ($unescaped_string, $link_identifier = null) {}
+        function mysql_real_escape_string($unescaped_string, $link_identifier = null) {}
 
         /**
          * @param  string   $database_name
          * @param  resource $link_identifier
-         *
          * @return bool
          */
-        function mysql_select_db ($database_name, $link_identifier = null) {}
+        function mysql_select_db($database_name, $link_identifier = null) {}
 
         /**
          * @param  string   $charset
          * @param  resource $link_identifier
-         *
          * @return bool
          */
-        function mysql_set_charset ($charset, $link_identifier = null) {}
+        function mysql_set_charset($charset, $link_identifier = null) {}
     }
 
 
-    if (!function_exists('sem_get')) {
+    if (!function_exists('sem_acquire')) {
         /**
          * @param  resource $sem_identifier
-         *
          * @return bool
          */
-        function sem_acquire ($sem_identifier) {}
+        function sem_acquire($sem_identifier) {}
 
         /**
          * @param  int $key
          * @param  int $max_acquire
          * @param  int $perm
          * @param  int $auto_release
-         *
          * @return resource|bool
          */
-        function sem_get ($key, $max_acquire = null, $perm = null, $auto_release = null) {}
+        function sem_get($key, $max_acquire = null, $perm = null, $auto_release = null) {}
 
         /**
          * @param  resource $sem_identifier
-         *
          * @return bool
          */
-        function sem_remove ($sem_identifier) {}
+        function sem_remove($sem_identifier) {}
     }
 }
 
@@ -212,12 +191,13 @@ namespace rosasurfer\bin\check_ip {
     /**
      * @return string
      */
-    function getRemoteAddress() {}
+    function getForwardedRemoteAddress() {}
 
     /**
-     * @return string
+     * @param  string|array $names
+     * @return array
      */
-    function getForwardedRemoteAddress() {}
+    function getHeaders($names = null) {}
 
     /**
      * @param  string|array $names
@@ -226,10 +206,9 @@ namespace rosasurfer\bin\check_ip {
     function getHeaderValue($names) {}
 
     /**
-     * @param  string|array $names
-     * @return array
+     * @return string
      */
-    function getHeaders($names = null) {}
+    function getRemoteAddress() {}
 
     /**
      * @param  string $string
@@ -243,11 +222,6 @@ namespace rosasurfer\bin\check_ip {
 namespace rosasurfer\cron\logwatch {
 
     /**
-     * @param  string $entry
-     */
-    function processEntry($entry) {}
-
-    /**
      * @param  string $message
      */
     function error($message) {}
@@ -256,4 +230,9 @@ namespace rosasurfer\cron\logwatch {
      * @param  string $message
      */
     function help($message = null) {}
+
+    /**
+     * @param  string $entry
+     */
+    function processEntry($entry) {}
 }

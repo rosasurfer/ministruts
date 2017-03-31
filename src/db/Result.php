@@ -1,14 +1,14 @@
 <?php
 namespace rosasurfer\db;
 
-use \Exception;
-
 use rosasurfer\core\Object;
 use rosasurfer\debug\ErrorHandler;
 
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\UnimplementedFeatureException;
+
+use \Exception;
 
 use function rosasurfer\strToBool;
 use function rosasurfer\strIsNumeric;

@@ -1,11 +1,10 @@
 <?php
 namespace rosasurfer\net\http;
 
-use \Exception;
-
 use rosasurfer\debug\ErrorHandler;
 use rosasurfer\exception\IOException;
 use rosasurfer\log\Logger;
+use \Exception;
 
 use const rosasurfer\L_INFO;
 use const rosasurfer\L_WARN;

@@ -1,11 +1,12 @@
 <?php
 namespace rosasurfer\ministruts;
 
-use \SimpleXMLElement;
 use rosasurfer\core\Object;
 
 use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\IllegalTypeException;
+
+use \SimpleXMLElement;
 
 use function rosasurfer\is_class;
 use function rosasurfer\strLeftTo;

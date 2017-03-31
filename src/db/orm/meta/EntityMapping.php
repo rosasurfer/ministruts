@@ -1,12 +1,12 @@
 <?php
 namespace rosasurfer\db\orm\meta;
 
-use \Iterator;
-
 use rosasurfer\core\Object;
 
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RuntimeException;
+
+use \Iterator;
 
 use const rosasurfer\db\orm\ID_PRIMARY;
 use const rosasurfer\db\orm\ID_VERSION;

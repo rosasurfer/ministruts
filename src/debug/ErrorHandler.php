@@ -1,7 +1,6 @@
 <?php
 namespace rosasurfer\debug;
 
-use \Exception;
 use rosasurfer\core\StaticClass;
 
 use rosasurfer\exception\error\PHPCompileError;
@@ -22,6 +21,7 @@ use rosasurfer\exception\error\PHPUserWarning;
 use rosasurfer\exception\error\PHPWarning;
 
 use rosasurfer\log\Logger;
+use \Exception;
 
 use function rosasurfer\_true;
 use function rosasurfer\echoPre;

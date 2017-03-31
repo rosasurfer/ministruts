@@ -1,7 +1,6 @@
 <?php
 namespace rosasurfer\lock;
 
-use \Exception;
 use rosasurfer\debug\ErrorHandler;
 
 use rosasurfer\exception\IllegalTypeException;
@@ -9,6 +8,7 @@ use rosasurfer\exception\RuntimeException;
 use rosasurfer\exception\error\PHPError;
 
 use rosasurfer\log\Logger;
+use \Exception;
 
 use function rosasurfer\strStartsWith;
 

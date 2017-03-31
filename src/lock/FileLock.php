@@ -1,10 +1,12 @@
 <?php
 namespace rosasurfer\lock;
 
-use \Exception;
 use rosasurfer\debug\ErrorHandler;
+
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RuntimeException;
+
+use \Exception;
 
 
 /**

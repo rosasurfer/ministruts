@@ -1,13 +1,13 @@
 <?php
 namespace rosasurfer\util;
 
-use \DateTime;
 use rosasurfer\core\StaticClass;
 
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 
 use rosasurfer\log\Logger;
+use \DateTime;
 
 use const rosasurfer\DAYS;
 use const rosasurfer\L_WARN;
