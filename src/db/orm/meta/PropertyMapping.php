@@ -16,6 +16,8 @@ use const rosasurfer\db\orm\IDX_MAPPING_BIND_TYPE;
 use const rosasurfer\db\orm\IDX_MAPPING_COLUMN_NAME;
 use const rosasurfer\db\orm\IDX_MAPPING_PHP_TYPE;
 
+use function rosasurfer\is_class;
+
 
 /**
  * A PropertyMapping is an object encapsulating meta information about how to map a database column to a PHP class member.

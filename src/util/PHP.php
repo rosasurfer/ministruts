@@ -18,6 +18,8 @@ use const rosasurfer\MB;
 use const rosasurfer\NL;
 use const rosasurfer\WINDOWS;
 
+use function rosasurfer\strLeft;
+
 
 /**
  * PHP system-related functionality.

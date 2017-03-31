@@ -9,6 +9,9 @@ use rosasurfer\exception\InfrastructureException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
 
+use function rosasurfer\echoPre;
+use function rosasurfer\strContains;
+
 use const rosasurfer\WINDOWS;
 
 
