@@ -13,6 +13,8 @@ use rosasurfer\exception\RuntimeException;
 use function rosasurfer\strContains;
 use function rosasurfer\strStartsWithI;
 
+use const rosasurfer\NL;
+
 
 /**
  * PostgresConnector
@@ -125,6 +127,43 @@ class PostgresConnector extends Connector {
         }
 
         return trim($connStr);
+    }
+
+
+    /**
+     * Return a textual description of the main database connection options.
+     *
+     * @return string
+     */
+    protected function getConnectionDescription() {
+        $options = $this->options;
+
+        if (is_resource($this->hConnection)) {
+            $host = pg_host($this->hConnection);
+            $port = pg_port($this->hConnection);
+            $db   = pg_dbname($this->hConnection);
+            $path = $this->query('show search_path')->fetchString();
+
+            if (strContains($path, '"$user"') && isSet($options['user'])) {
+                $path = str_replace('"$user"', $options['user'], $path);
+            }
+            $description = $host.':'.$port.'/'.$db.', schema search path: '.$path;
+        }
+        else {
+            if      (isSet($options['hostaddr'])) $host = $options['hostaddr'];
+            else if (isSet($options['host'    ])) $host = $options['host'    ];
+            else                                  $host = '';
+
+            if (isSet($options['port'])) $port = ':'.$options['port'];
+            else                         $port = '';
+
+            if      (isSet($options['dbname'])) $db = $options['dbname'];
+            else if (isSet($options['user'  ])) $db = $options['user'  ];
+            else                                $db = '';
+
+            $description = $host.$port.'/'.$db;
+        }
+        return $description;
     }
 
 
@@ -289,7 +328,7 @@ class PostgresConnector extends Connector {
             $result || trigger_error(pg_last_error($this->hConnection), E_USER_ERROR);
         }
         catch (IRosasurferException $ex) {
-            throw $ex->addMessage('SQL: "'.$sql.'"');
+            throw $ex->addMessage('SQL: "'.$sql.'"'.NL.'Database: '.$this->getConnectionDescription());
         }
 
         $status_string = pg_result_status($result, PGSQL_STATUS_STRING);
@@ -304,113 +343,7 @@ class PostgresConnector extends Connector {
             $this->lastAffectedRows = pg_affected_rows($result);
 
         return $result;
-        /*
-        $db->query("drop table if exists t_test");
-        $db->query("create table t_test (id serial primary key, name varchar(100) not null)");
-        $db->query("insert into t_test (name) values ('a'), ('b'), ('c'), ('123')");
-        $db->query("explain select count(*) from t_test");
-        $db->query("update t_test set name='c' where name in ('c')");
-        $db->query("select * from t_test where name in ('a','b')");
-        $db->query("select * from t_test where name in ('a','b') limit 1");
-        $db->query("update t_test set name='aa' where name in ('c')");
-        $db->query("select * from t_test where name = 'no-one'");
-        $db->query("select count(*) from t_test");
-        $db->query("delete from t_test where name = 'a' or name = 'b'");
-        $db->query("select count(*) from t_test");
-        $db->query("insert into t_test (name) values ('y'), ('z') returning id");
-        $db->query("insert into t_test (name) values ('x')");
-        $db->query("explain select count(*) from t_test");
-        $db->query("select * from t_test");
-        $db->query("begin; select * from t_test; commit");
-        $db->query("select * from t_test where name = 'no-one'");
 
-        $result  = $db->query($sql);
-        $handler = $db->getInternalHandler();
-        $msg = str_pad(explode(' ', $sql, 2)[0].':', 9).'  lastInsertId=%s'.'  affected_rows='.pg_affected_rows($result->getInternalResult()).'  lastAffectedRows='.$db->lastAffectedRows().'  num_rows='.pg_num_rows($result->getInternalResult()).'  status_long='.str_pad(\rosasurfer\db\pgsql\PostgresResult::statusToStr(pg_result_status($result->getInternalResult(), PGSQL_STATUS_LONG)), 16).'  status_string='.pg_result_status($result->getInternalResult(), PGSQL_STATUS_STRING);
-        $msg = sprintf($msg, $db->lastInsertId());
-        echoPre($msg);
-
-        drop:      lastInsertId=0  affected_rows=0  lastAffectedRows=0  num_rows=0  status_long=PGSQL_COMMAND_OK  status_string=DROP TABLE
-        create:    lastInsertId=0  affected_rows=0  lastAffectedRows=0  num_rows=0  status_long=PGSQL_COMMAND_OK  status_string=CREATE TABLE
-        insert:    lastInsertId=4  affected_rows=4  lastAffectedRows=4  num_rows=0  status_long=PGSQL_COMMAND_OK  status_string=INSERT 0 4
-        explain:   lastInsertId=4  affected_rows=0  lastAffectedRows=4  num_rows=2  status_long=PGSQL_TUPLES_OK   status_string=EXPLAIN
-        update:    lastInsertId=4  affected_rows=1  lastAffectedRows=1  num_rows=0  status_long=PGSQL_COMMAND_OK  status_string=UPDATE 1
-        select:    lastInsertId=4  affected_rows=2  lastAffectedRows=1  num_rows=2  status_long=PGSQL_TUPLES_OK   status_string=SELECT 2
-        select:    lastInsertId=4  affected_rows=1  lastAffectedRows=1  num_rows=1  status_long=PGSQL_TUPLES_OK   status_string=SELECT 1
-        update:    lastInsertId=4  affected_rows=1  lastAffectedRows=1  num_rows=0  status_long=PGSQL_COMMAND_OK  status_string=UPDATE 1
-        select:    lastInsertId=4  affected_rows=0  lastAffectedRows=1  num_rows=0  status_long=PGSQL_TUPLES_OK   status_string=SELECT 0
-        select:    lastInsertId=4  affected_rows=1  lastAffectedRows=1  num_rows=1  status_long=PGSQL_TUPLES_OK   status_string=SELECT 1
-        delete:    lastInsertId=4  affected_rows=2  lastAffectedRows=2  num_rows=0  status_long=PGSQL_COMMAND_OK  status_string=DELETE 2
-        select:    lastInsertId=4  affected_rows=1  lastAffectedRows=2  num_rows=1  status_long=PGSQL_TUPLES_OK   status_string=SELECT 1
-        insert:    lastInsertId=6  affected_rows=2  lastAffectedRows=2  num_rows=2  status_long=PGSQL_TUPLES_OK   status_string=INSERT 0 2
-        insert:    lastInsertId=7  affected_rows=1  lastAffectedRows=1  num_rows=0  status_long=PGSQL_COMMAND_OK  status_string=INSERT 0 1
-        explain:   lastInsertId=7  affected_rows=0  lastAffectedRows=1  num_rows=2  status_long=PGSQL_TUPLES_OK   status_string=EXPLAIN
-        select:    lastInsertId=7  affected_rows=5  lastAffectedRows=1  num_rows=5  status_long=PGSQL_TUPLES_OK   status_string=SELECT 5
-        begin:     lastInsertId=7  affected_rows=0  lastAffectedRows=1  num_rows=0  status_long=PGSQL_COMMAND_OK  status_string=COMMIT
-        select:    lastInsertId=7  affected_rows=0  lastAffectedRows=1  num_rows=0  status_long=PGSQL_TUPLES_OK   status_string=SELECT 0
-      */
-
-        // TODO: All queries must be sent via pg_send_query()/pg_get_result(). All errors must be analyzed per result
-        //       via pg_result_error(). This way we get access to SQLSTATE codes and to custom exception handling.
-        //
-        //       PDO and missing support for asynchronous queries:
-        // @see  http://grokbase.com/t/php/php-pdo/09b2hywmak/asynchronous-requests
-        // @see  http://stackoverflow.com/questions/865017/pg-send-query-cannot-set-connection-to-blocking-mode
-        // @see  https://bugs.php.net/bug.php?id=65015
-
-        /*
-        pg_send_query($this->hConnection, $sql);
-        $result = pg_get_result($this->hConnection);    // get one result per statement from a multi-statement query
-
-        echoPre(pg_result_error($result));              // analyze errors
-
-        echoPre('PGSQL_DIAG_SEVERITY           = '.pg_result_error_field($result, PGSQL_DIAG_SEVERITY          ));
-        echoPre('PGSQL_DIAG_SQLSTATE           = '.pg_result_error_field($result, PGSQL_DIAG_SQLSTATE          ));
-        echoPre('PGSQL_DIAG_MESSAGE_PRIMARY    = '.pg_result_error_field($result, PGSQL_DIAG_MESSAGE_PRIMARY   ));
-        echoPre('PGSQL_DIAG_MESSAGE_DETAIL     = '.pg_result_error_field($result, PGSQL_DIAG_MESSAGE_DETAIL    ));
-        echoPre('PGSQL_DIAG_MESSAGE_HINT       = '.pg_result_error_field($result, PGSQL_DIAG_MESSAGE_HINT      ));
-        echoPre('PGSQL_DIAG_STATEMENT_POSITION = '.pg_result_error_field($result, PGSQL_DIAG_STATEMENT_POSITION));
-        echoPre('PGSQL_DIAG_INTERNAL_POSITION  = '.pg_result_error_field($result, PGSQL_DIAG_INTERNAL_POSITION ));
-        echoPre('PGSQL_DIAG_INTERNAL_QUERY     = '.pg_result_error_field($result, PGSQL_DIAG_INTERNAL_QUERY    ));
-        echoPre('PGSQL_DIAG_CONTEXT            = '.pg_result_error_field($result, PGSQL_DIAG_CONTEXT           ));
-        echoPre('PGSQL_DIAG_SOURCE_FILE        = '.pg_result_error_field($result, PGSQL_DIAG_SOURCE_FILE       ));
-        echoPre('PGSQL_DIAG_SOURCE_LINE        = '.pg_result_error_field($result, PGSQL_DIAG_SOURCE_LINE       ));
-        echoPre('PGSQL_DIAG_SOURCE_FUNCTION    = '.pg_result_error_field($result, PGSQL_DIAG_SOURCE_FUNCTION   ));
-        // ----------------------------------------------------------------------------------------------------------
-
-        $>  select lastval()
-        ERROR:  lastval is not yet defined in this session
-        PGSQL_DIAG_SEVERITY           = ERROR
-        PGSQL_DIAG_SQLSTATE           = 55000
-        PGSQL_DIAG_MESSAGE_PRIMARY    = lastval is not yet defined in this session
-        PGSQL_DIAG_MESSAGE_DETAIL     =
-        PGSQL_DIAG_MESSAGE_HINT       =
-        PGSQL_DIAG_STATEMENT_POSITION =
-        PGSQL_DIAG_INTERNAL_POSITION  =
-        PGSQL_DIAG_INTERNAL_QUERY     =
-        PGSQL_DIAG_CONTEXT            =
-        PGSQL_DIAG_SOURCE_FILE        = sequence.c
-        PGSQL_DIAG_SOURCE_LINE        = 794
-        PGSQL_DIAG_SOURCE_FUNCTION    = lastval
-        // ----------------------------------------------------------------------------------------------------------
-
-        $>  insert into t_doesnotexist (name) values ('a')
-        ERROR:  relation "t_doesnotexist" does not exist
-        LINE 1: insert into t_doesnotexist (name) values ('a'), ('b'), ('c')
-                          ^
-        PGSQL_DIAG_SEVERITY           = ERROR
-        PGSQL_DIAG_SQLSTATE           = 42P01
-        PGSQL_DIAG_MESSAGE_PRIMARY    = relation "t_doesnotexist" does not exist
-        PGSQL_DIAG_MESSAGE_DETAIL     =
-        PGSQL_DIAG_MESSAGE_HINT       =
-        PGSQL_DIAG_STATEMENT_POSITION = 13
-        PGSQL_DIAG_INTERNAL_POSITION  =
-        PGSQL_DIAG_INTERNAL_QUERY     =
-        PGSQL_DIAG_CONTEXT            =
-        PGSQL_DIAG_SOURCE_FILE        = parse_relation.c
-        PGSQL_DIAG_SOURCE_LINE        = 866
-        PGSQL_DIAG_SOURCE_FUNCTION    = parserOpenTable
-      */
     }
 
 

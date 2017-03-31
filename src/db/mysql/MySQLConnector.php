@@ -11,6 +11,8 @@ use rosasurfer\exception\RuntimeException;
 
 use function rosasurfer\strContains;
 
+use const rosasurfer\NL;
+
 
 /**
  * MySQLConnector
@@ -184,6 +186,19 @@ class MySQLConnector extends Connector {
         // Here we might filter for known options.
         $this->options = $options;
         return $this;
+    }
+
+
+    /**
+     * Return a textual description of the main database connection options.
+     *
+     * @return string
+     */
+    protected function getConnectionDescription() {
+        $host = $this->host;
+        $port = $this->port     ? ':'.$this->port     : '';
+        $db   = $this->database ? '/'.$this->database : '';
+        return $host.$port.$db;
     }
 
 
@@ -416,7 +431,7 @@ class MySQLConnector extends Connector {
             $result || trigger_error('SQL-Error '.mysql_errno($this->hConnection).': '.mysql_error($this->hConnection), E_USER_ERROR);
         }
         catch (IRosasurferException $ex) {
-            throw $ex->addMessage('SQL: "'.$sql.'"')->setCode(mysql_errno($this->hConnection));
+            throw $ex->addMessage('SQL: "'.$sql.'"'.NL.'Database: '.$this->getConnectionDescription())->setCode(mysql_errno($this->hConnection));
         }
 
         $affected = 0;
@@ -437,49 +452,6 @@ class MySQLConnector extends Connector {
         }
         return $result;
     }
-    /*
-    $db->query("drop table if exists t_test");
-    $db->query("create table t_test (id int auto_increment primary key, name varchar(100) not null)");
-    $db->query("insert into t_test (name) values ('a'), ('b'), ('c'), ('123')");
-    $db->query("set @a = 5");
-    $db->query("explain select count(*) from t_test");
-    $db->query("update t_test set name='c' where name in ('c')");
-    $db->query("select * from t_test where name in ('a','b')");
-    $db->query("select * from t_test where name in ('a','b') limit 1");
-    $db->query("update t_test set name='aa' where name in ('c')");
-    $db->query("select * from t_test where name = 'no-one'");
-    $db->query("select count(*) from t_test");
-    $db->query("delete from t_test where name = 'a' or name = 'b'");
-    $db->query("select count(*) from t_test");
-    $db->query("insert into t_test (name) values ('y'), ('z')");
-    $db->query("insert into t_test (name) values ('x')");
-    $db->query("explain select count(*) from t_test");
-    $db->query("select * from t_test");
-    $db->query("select * from t_test where name = 'no-one'");
-
-    $result  = $db->query($sql);
-    $handler = $db->getInternalHandler();
-    echoPre(str_pad(explode(' ', $sql, 2)[0].':', 9).'  insert_id='.mysql_insert_id($handler).'  lastInsertID='.$db->lastInsertId().'  affected_rows='.mysql_affected_rows($handler).'  lastAffectedRows='.$db->lastAffectedRows().'  result='.($result->getInternalResult() ? 'resource' : '        ').'  num_rows='.($result->getInternalResult() ? mysql_num_rows($result->getInternalResult()) : 0).'  info='.mysql_info($handler));
-
-    drop:      insert_id=0  lastInsertID=0  affected_rows=0  lastAffectedRows=0  result=          num_rows=0  info=
-    create:    insert_id=0  lastInsertID=0  affected_rows=0  lastAffectedRows=0  result=          num_rows=0  info=
-    insert:    insert_id=1  lastInsertID=4  affected_rows=4  lastAffectedRows=4  result=          num_rows=0  info=Records: 4  Duplicates: 0  Warnings: 0
-    set:       insert_id=0  lastInsertID=4  affected_rows=0  lastAffectedRows=4  result=          num_rows=0  info=
-    explain:   insert_id=0  lastInsertID=4  affected_rows=1  lastAffectedRows=4  result=resource  num_rows=1  info=
-    update:    insert_id=0  lastInsertID=4  affected_rows=0  lastAffectedRows=0  result=          num_rows=0  info=Rows matched: 1  Changed: 0  Warnings: 0
-    select:    insert_id=0  lastInsertID=4  affected_rows=2  lastAffectedRows=0  result=resource  num_rows=2  info=
-    select:    insert_id=0  lastInsertID=4  affected_rows=1  lastAffectedRows=0  result=resource  num_rows=1  info=
-    update:    insert_id=0  lastInsertID=4  affected_rows=1  lastAffectedRows=1  result=          num_rows=0  info=Rows matched: 1  Changed: 1  Warnings: 0
-    select:    insert_id=0  lastInsertID=4  affected_rows=0  lastAffectedRows=1  result=resource  num_rows=0  info=
-    select:    insert_id=0  lastInsertID=4  affected_rows=1  lastAffectedRows=1  result=resource  num_rows=1  info=
-    delete:    insert_id=0  lastInsertID=4  affected_rows=2  lastAffectedRows=2  result=          num_rows=0  info=
-    select:    insert_id=0  lastInsertID=4  affected_rows=1  lastAffectedRows=2  result=resource  num_rows=1  info=
-    insert:    insert_id=5  lastInsertID=6  affected_rows=2  lastAffectedRows=2  result=          num_rows=0  info=Records: 2  Duplicates: 0  Warnings: 0
-    insert:    insert_id=7  lastInsertID=7  affected_rows=1  lastAffectedRows=1  result=          num_rows=0  info=
-    explain:   insert_id=0  lastInsertID=7  affected_rows=1  lastAffectedRows=1  result=resource  num_rows=1  info=
-    select:    insert_id=0  lastInsertID=7  affected_rows=5  lastAffectedRows=1  result=resource  num_rows=5  info=
-    select:    insert_id=0  lastInsertID=7  affected_rows=0  lastAffectedRows=1  result=resource  num_rows=0  info=
-   */
 
 
     /**

@@ -9,7 +9,8 @@ use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\exception\RuntimeException;
 
-use rosasurfer\WINDOWS;
+use const rosasurfer\NL;
+use const rosasurfer\WINDOWS;
 
 
 /**
@@ -324,7 +325,7 @@ class SQLiteConnector extends Connector {
             $result || trigger_error('Error '.$this->handler->lastErrorCode().', '.$this->handler->lastErrorMsg(), E_USER_ERROR);
         }
         catch (IRosasurferException $ex) {
-            throw $ex->addMessage('SQL: "'.$sql.'"');
+            throw $ex->addMessage('SQL: "'.$sql.'"'.NL.'Database: '.$this->file);
         }
 
         // track last_insert_id
