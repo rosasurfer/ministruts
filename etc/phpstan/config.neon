@@ -15,16 +15,16 @@ services:                                                           # loaded and
 
 parameters:
     autoload_files:
-        - src/globals.php
-        - etc/phpstan/functions.php                                 # function stubs for procedural code and PHP extensions
+        - etc/phpstan/functions.php                                 # function stubs for PHP extensions and procedural code 
                                                                     
     fileExtensions:                                                 # additional files to analyse
        #- html                                                      
        #- phtml                                                     # TODO: Tiles default vars are not recognized 
                                                                     
     excludes_analyse:                                               # paths (no wildcards) 
-        - %currentWorkingDirectory%/etc/vendor/composer/
-        - %currentWorkingDirectory%/src/util/apc/apc.php            # TODO: replace it
+        - etc/vendor/composer/
+        - src/globals.php
+        - src/util/apc/apc.php                                      # TODO: replace it
 
     ignoreErrors:
         - '#Call to an undefined method rosasurfer\\db\\orm\\PersistableObject::(beforeSave|afterSave||beforeInsert|afterInsert|beforeUpdate|afterUpdate|beforeDelete|afterDelete)\(\).#'
