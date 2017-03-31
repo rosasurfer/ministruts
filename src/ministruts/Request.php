@@ -539,7 +539,7 @@ class Request extends Singleton {
         if ($headers === null) {
             if (function_exists('apache_request_headers')) {
                 $headers = apache_request_headers();
-                if ($headers === false) throw new RuntimeException('Error reading request headers, getAllHeaders() returned: FALSE');
+                if ($headers === false) throw new RuntimeException('Error reading request headers, apache_request_headers() returned: FALSE');
             }
             else {
                 // TODO: some transmitted headers are missing in the PHP $_SERVER array, e.g. 'Authorization' (digest)
