@@ -3,7 +3,7 @@ namespace {
 
     if (!function_exists('apache_request_headers')) {
         /**
-         * @return array
+         * @return array|false
          */
         function apache_request_headers() {}
     }
@@ -14,7 +14,6 @@ namespace {
          * @param  string $key
          * @param  mixed  $var
          * @param  int    $ttl
-         *
          * @return bool
          */
         function apc_add($key, $var, $ttl = null) {}
@@ -67,7 +66,7 @@ namespace {
          * @param  string $password
          * @param  bool   $new_link
          * @param  int    $client_flags
-         * @return resource
+         * @return resource|bool
          */
         function mysql_connect($server = null, $username = null, $password = null, $new_link = null, $client_flags = null) {}
 

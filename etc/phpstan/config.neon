@@ -15,7 +15,7 @@ services:                                                           # initialize
 
 parameters:
     autoload_files:
-        - etc/phpstan/functions.php                                 # stubs for PHP extensions and procedural code 
+        - etc/phpstan/function-stubs.php                            # stubs for PHP extensions and procedural code 
                                                                     
     fileExtensions:                                                 # additional files to analyse
        #- html                                                      
