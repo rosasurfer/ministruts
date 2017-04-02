@@ -140,8 +140,10 @@ class CurlHttpClient extends HttpClient {
      */
     public function __destruct() {
         try {
-            if (is_resource($this->hCurl))
-                curl_close($this->hCurl);
+            if (is_resource($this->hCurl)) {
+                $hTmp=$this->hCurl; $this->hCurl=null;
+                curl_close($hTmp);
+            }
         }
         catch (Exception $ex) {
             throw ErrorHandler::handleDestructorException($ex);

@@ -401,6 +401,7 @@ class SMTPMailer extends Mailer {
         }
 
         fClose($this->connection);
+        $this->connection = null;
     }
 
 
