@@ -1,5 +1,6 @@
-<?php
-namespace rosasurfer\phpstan;
+<?php declare(strict_types=1);
+
+namespace rosasurfer\core\phpstan;
 
 use PhpParser\Node\Expr;
 use PhpParser\Node\Expr\BinaryOp;
@@ -31,8 +32,7 @@ class SingletonGetInstanceReturnType extends Object implements DynamicStaticMeth
     /**
      * @return string
      */
-    public static function getClass() : string
-    {
+    public static function getClass() : string {
         return self::CLASS_NAME;
     }
 
@@ -40,17 +40,15 @@ class SingletonGetInstanceReturnType extends Object implements DynamicStaticMeth
     /**
      * @return bool
      */
-    public function isStaticMethodSupported(MethodReflection $methodReflection) : bool
-    {
-    	return $methodReflection->getName() === self::METHOD_NAME;
+    public function isStaticMethodSupported(MethodReflection $methodReflection) : bool {
+        return $methodReflection->getName() === self::METHOD_NAME;
     }
 
 
     /**
      * @return Type
      */
-    public function getTypeFromStaticMethodCall(MethodReflection $methodReflection, StaticCall $methodCall, Scope $scope) : Type
-    {
+    public function getTypeFromStaticMethodCall(MethodReflection $methodReflection, StaticCall $methodCall, Scope $scope) : Type {
         if (count($methodCall->args) === 0) {
     		return $methodReflection->getReturnType();
     	}

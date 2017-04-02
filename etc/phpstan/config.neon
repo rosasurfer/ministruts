@@ -1,15 +1,12 @@
 #
 # php7 -d memory_limit=128M ../vendor/phpstan/phpstan/bin/phpstan --ansi
 #
-# phpstan analyse -a autoload.php -c config.neon -l 0 [--] <directory>
+# phpstan analyse -a autoload.php -c config.neon --level=0 [--] <directory>
 #
-services:                                                           # initialized before auto-loading in "parameters" 
-   #-                                                               
-   #    class: rosasurfer\phpstan\DynamicInstanceMethodReturnType
-   #    tags:
-   #        - phpstan.broker.dynamicMethodReturnTypeExtension
+
+services:                                                           # loaded before auto-loading in "parameters" 
     -                                                               
-        class: rosasurfer\phpstan\SingletonGetInstanceReturnType
+        class: rosasurfer\core\phpstan\SingletonGetInstanceReturnType
         tags:
             - phpstan.broker.dynamicStaticMethodReturnTypeExtension 
 
@@ -19,7 +16,7 @@ parameters:
                                                                     
     fileExtensions:                                                 # additional files to analyse
        #- html                                                      
-       #- phtml                                                     # TODO: Tiles default vars are not recognized 
+       #- phtml                                                     # TODO: Tiles default variables are not recognized 
                                                                     
     excludes_analyse:                                               # paths (no wildcards) 
         - etc/vendor/composer/

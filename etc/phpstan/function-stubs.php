@@ -1,4 +1,5 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace {
 
     if (!function_exists('apache_request_headers')) {
