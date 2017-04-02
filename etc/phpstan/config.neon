@@ -30,7 +30,8 @@ parameters:
     ignoreErrors:
         - '#Call to ((static )?method|function) [^ ]+ with incorrect case:#'                    # PHP is case insensitive
         - '#(Array \([^ ]+\[\]\)|(Static )?property [^ ]+ \([^ ]+\)) does not accept null\b#i'  # every variable is nullable
-        - '#Parameter [^ ]+ of method [^ ]+ has invalid typehint type ([^ ]+)?\bscalar\b#'      # fixed but not yet released 
+        - '#Parameter [^ ]+ of method [^ ]+ has invalid typehint type ([^ ]+)?\bscalar\b#'      # fixed but not yet released
+        - "#Casting to (bool|int) something that's already (bool|int).#"                        # ever heard of readablity?
 
         - '#Call to an undefined method rosasurfer\\db\\orm\\PersistableObject::(beforeSave|afterSave|beforeInsert|afterInsert|beforeUpdate|afterUpdate|beforeDelete|afterDelete)\b#'
         - '#Cannot call method andDependency\(\) on null\b#'
