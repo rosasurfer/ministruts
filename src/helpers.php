@@ -16,10 +16,15 @@ use rosasurfer\util\Validator;
 use \Exception;
 
 
-// whether or not we run on a command line interface, on localhost and/or on Windows
-define('rosasurfer\CLI'      , !isSet($_SERVER['REQUEST_METHOD']));
-define('rosasurfer\LOCALHOST', !CLI && in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1', $_SERVER['SERVER_ADDR']]));
-define('rosasurfer\WINDOWS'  , (strToUpper(subStr(PHP_OS, 0, 3))=='WIN'));
+// Whether or not we run on a command line interface, on localhost and/or on Windows.
+define('rosasurfer\_CLI'      , !isSet($_SERVER['REQUEST_METHOD']));
+define('rosasurfer\_LOCALHOST', !_CLI && in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1', $_SERVER['SERVER_ADDR']]));
+define('rosasurfer\_WINDOWS'  , (strToUpper(subStr(PHP_OS, 0, 3))=='WIN'));
+
+const CLI       = _CLI;                                             // local constants improve IDE completion
+const LOCALHOST = _LOCALHOST;
+const WINDOWS   = _WINDOWS;
+
 
 // custom log level
 const L_DEBUG           =  1;
@@ -30,11 +35,11 @@ const L_ERROR           = 16;
 const L_FATAL           = 32;
 
 // log destinations for the built-in function error_log()
-const ERROR_LOG_DEFAULT =  0;                                     // message is sent to the configured log or the system logger
-const ERROR_LOG_MAIL    =  1;                                     // message is sent by email
-const ERROR_LOG_DEBUG   =  2;                                     // message is sent through the PHP debugging connection
-const ERROR_LOG_FILE    =  3;                                     // message is appended to a file destination
-const ERROR_LOG_SAPI    =  4;                                     // message is sent directly to the SAPI logging handler
+const ERROR_LOG_DEFAULT =  0;                                       // message is sent to the configured log or the system logger
+const ERROR_LOG_MAIL    =  1;                                       // message is sent by email
+const ERROR_LOG_DEBUG   =  2;                                       // message is sent through the PHP debugging connection
+const ERROR_LOG_FILE    =  3;                                       // message is appended to a file destination
+const ERROR_LOG_SAPI    =  4;                                       // message is sent directly to the SAPI logging handler
 
 // time periods
 const SECOND            =   1;           const SECONDS = SECOND;
@@ -42,8 +47,8 @@ const MINUTE            =  60 * SECONDS; const MINUTES = MINUTE;
 const HOUR              =  60 * MINUTES; const HOURS   = HOUR;
 const DAY               =  24 * HOURS;   const DAYS    = DAY;
 const WEEK              =   7 * DAYS;    const WEEKS   = WEEK;
-const MONTH             =  31 * DAYS;    const MONTHS  = MONTH;   // fuzzy but garantied to cover any month
-const YEAR              = 366 * DAYS;    const YEARS   = YEAR;    // fuzzy but garantied to cover any year
+const MONTH             =  31 * DAYS;    const MONTHS  = MONTH;     // fuzzy but garantied to cover any month
+const YEAR              = 366 * DAYS;    const YEARS   = YEAR;      // fuzzy but garantied to cover any year
 
 // weekdays
 const SUNDAY            = 0;
@@ -57,7 +62,7 @@ const SATURDAY          = 6;
 // byte sizes
 const KB                = 1024;
 const MB                = 1024 * KB;
-const GB                = 1024 * MB;                              // no TB (doesn't fit in 32 bits)
+const GB                = 1024 * MB;                                // no TB (doesn't fit in 32 bits)
 
 // array indexing types
 const ARRAY_ASSOC       = 1;
@@ -65,11 +70,11 @@ const ARRAY_NUM         = 2;
 const ARRAY_BOTH        = 3;
 
 // php.ini changable modes
-const PHP_INI_ALL       = 0;                                      // entry can be set anywhere
-const PHP_INI_USER      = 1;                                      // entry can be set in scripts and in .user.ini
-const PHP_INI_ONLY      = 2;                                      // entry can be set in php.ini only
-const PHP_INI_SYSTEM    = 3;                                      // entry can be set in php.ini and in httpd.conf
-const PHP_INI_PERDIR    = 4;                                      // entry can be set in php.ini, httpd.conf, .htaccess and in .user.ini
+const PHP_INI_ALL       = 0;                                        // entry can be set anywhere
+const PHP_INI_USER      = 1;                                        // entry can be set in scripts and in .user.ini
+const PHP_INI_ONLY      = 2;                                        // entry can be set in php.ini only
+const PHP_INI_SYSTEM    = 3;                                        // entry can be set in php.ini and in httpd.conf
+const PHP_INI_PERDIR    = 4;                                        // entry can be set in php.ini, httpd.conf, .htaccess and in .user.ini
 
 // PHP types
 const PHP_TYPE_BOOL     = 1;
@@ -79,13 +84,13 @@ const PHP_TYPE_STRING   = 4;
 const PHP_TYPE_ARRAY    = 5;
 
 // miscellaneous
-const NL                = "\n";                                   // - ctrl --- hex --- dec ----
-const EOL_MAC           = "\r";                                   //   CR       0D      13
-const EOL_NETSCAPE      = "\r\r\n";                               //   CRCRLF   0D0D0A  13,13,10
-const EOL_UNIX          = "\n";                                   //   LF       0A      10
-const EOL_WINDOWS       = "\r\n";                                 //   CRLF     0D0A    13,10
+const NL                = "\n";                                     // - ctrl --- hex --- dec ----
+const EOL_MAC           = "\r";                                     //   CR       0D      13
+const EOL_NETSCAPE      = "\r\r\n";                                 //   CRCRLF   0D0D0A  13,13,10
+const EOL_UNIX          = "\n";                                     //   LF       0A      10
+const EOL_WINDOWS       = "\r\n";                                   //   CRLF     0D0A    13,10
 
-!defined('PHP_INT_MIN') && define('PHP_INT_MIN', ~PHP_INT_MAX);   // built-in since PHP 7.0 (global)
+!defined('PHP_INT_MIN') && define('PHP_INT_MIN', ~PHP_INT_MAX);     // built-in since PHP 7.0 (global)
 
 
 /**

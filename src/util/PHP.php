@@ -397,7 +397,6 @@ class PHP extends StaticClass {
         if (is_bool($value))
             $value = (int) $value;
 
-        /** @var string $result */
         $oldValue = ini_set($option, $value);
         if ($oldValue !== false)
             return true;

@@ -1,6 +1,7 @@
 <?php
 namespace rosasurfer\ministruts;
 
+use rosasurfer\config\Config;
 use rosasurfer\core\Singleton;
 
 use rosasurfer\exception\IllegalStateException;
@@ -14,9 +15,9 @@ use function rosasurfer\strLeftTo;
 use function rosasurfer\strRightFrom;
 use function rosasurfer\strStartsWith;
 
+use const rosasurfer\CLI;
 use const rosasurfer\DAY;
 use const rosasurfer\NL;
-use rosasurfer\config\Config;
 
 
 /**
@@ -56,9 +57,8 @@ class Request extends Singleton {
      * @throws RuntimeException if not called from the web interface
      */
     public static function me() {
-        if (isSet($_SERVER['REQUEST_METHOD']))
-            return Singleton::getInstance(static::class);
-        throw new RuntimeException('Cannot create a '.static::class.' instance in a non-web context.');
+        if (CLI) throw new RuntimeException('Cannot create a '.static::class.' instance in a non-web context.');
+        return Singleton::getInstance(static::class);
     }
 
 

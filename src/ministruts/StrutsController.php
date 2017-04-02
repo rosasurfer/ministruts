@@ -55,7 +55,7 @@ class StrutsController extends Singleton {
             // $controller = $cache->get($class);                       // re-check after the lock is aquired
 
                 if (!$controller) {
-                    // create new controller instance...
+                    /** @var static $controller */
                     $controller = Singleton::getInstance(static::class);
 
                     $configDir  = Config::getDefault()->getDirectory();

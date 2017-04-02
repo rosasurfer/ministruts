@@ -2,6 +2,7 @@
 namespace rosasurfer\ministruts;
 
 use rosasurfer\core\Singleton;
+use rosasurfer\exception\RuntimeException;
 
 use const rosasurfer\CLI;
 
@@ -22,11 +23,13 @@ class Response extends Singleton {
      * Gibt die Singleton-Instanz dieser Klasse zurueck, wenn das Script im Kontext eines HTTP-Requestes aufgerufen
      * wurde. In allen anderen Faellen, z.B. bei Aufruf in der Konsole, wird NULL zurueckgegeben.
      *
-     * @return static|null - Instanz oder NULL
+     * @return static
+     *
+     * @throws RuntimeException if not called from the web interface
      */
     public static function me() {
-        if (!CLI) return Singleton::getInstance(static::class);
-        return null;
+        if (CLI) throw new RuntimeException('Cannot create a '.static::class.' instance in a non-web context.');
+        return Singleton::getInstance(static::class);
     }
 
 
