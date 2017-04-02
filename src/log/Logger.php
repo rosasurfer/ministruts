@@ -164,13 +164,13 @@ class Logger extends StaticClass {
         if (is_string($logLevel) || isSet($logLevel[''])) {   // the application and/or some class loglevels are configured
             if (is_array($logLevel))
                 $logLevel = $logLevel[''];
-            $logLevel = self::logLevelToId($logLevel);
-            if (!$logLevel) $logLevel=self::DEFAULT_LOGLEVEL;
+            $logLevel = self::logLevelToId($logLevel) ?: self::DEFAULT_LOGLEVEL;
         }
         else {                                                // no loglevels are configured
             $logLevel = self::DEFAULT_LOGLEVEL;
         }
-        self::$appLogLevel = $logLevel;
+        /** @var int $logLevel */
+        self::$appLogLevel = $logLevel = $logLevel;
 
 
         // (2) PrintHandler: enabled for local access or if explicitely enabled
@@ -211,10 +211,10 @@ class Logger extends StaticClass {
         }
         $logLevel = $config->get('log.sms.level', self::$appLogLevel);
         if (is_string($logLevel)) {                                     // a string if a configured value
-            $logLevel = self::logLevelToId($logLevel);
-            if (!$logLevel) $logLevel=self::$appLogLevel;
+            $logLevel = self::logLevelToId($logLevel) ?: self::$appLogLevel;
         }
-        self::$smsLogLevel = $logLevel;
+        /** @var int $logLevel */
+        self::$smsLogLevel = $logLevel = $logLevel;
 
         $options = $config->get('sms', []);
         if (!is_array($options)) throw new IllegalTypeException('Invalid type of config value "sms": '.getType($options).' (not array)');

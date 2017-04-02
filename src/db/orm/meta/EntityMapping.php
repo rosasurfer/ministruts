@@ -31,7 +31,7 @@ class EntityMapping extends Object implements Iterator {
     /** @var PropertyMapping - identity mapping of the entity */
     protected $identity;
 
-    /** @var PropertyMapping|string|bool - version mapping, mapping key (proxy) or FALSE for non-versioned entities */
+    /** @var PropertyMapping|string - version mapping or mapping key; an empty string for non-versioned entities */
     protected $version;
 
     /** @var int - current iterator position when used as an Iterator */
@@ -114,8 +114,7 @@ class EntityMapping extends Object implements Iterator {
         if ($this->identity === null) {
             foreach ($this->legacyMapping['columns'] as $name => $column) {
                 if ($column[IDX_MAPPING_COLUMN_BEHAVIOR] & ID_PRIMARY) {
-                    $this->identity = new PropertyMapping($this, $name, $column);
-                    return $this->identity;
+                    return $this->identity = new PropertyMapping($this, $name, $column);
                 }
             }
             throw new RuntimeException('Invalid mapping for entity "'.$this->getClassName().'" (missing primary key mapping)');
@@ -135,7 +134,8 @@ class EntityMapping extends Object implements Iterator {
                 $name = $this->version;
                 $this->version = new PropertyMapping($this, $name, $this->legacyMapping['columns'][$name]);
             }
-            return $this->version;
+            /** @var PropertyMapping $version */
+            return $version = $this->version;
         }
         return null;
     }
@@ -154,9 +154,9 @@ class EntityMapping extends Object implements Iterator {
                     return true;
                 }
             }
-            $this->version = false;
+            $this->version = '';
         }
-        return ($this->version !== false);
+        return (bool) $this->version;
     }
 
 

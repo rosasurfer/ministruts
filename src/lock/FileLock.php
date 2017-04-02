@@ -56,12 +56,12 @@ final class FileLock extends BaseLock {
         //       mit einem anderen Handle (2) nicht mehr (unter Linux schon). Mit dem zum Sperren verwendeten Handle
         //       funktionieren sie.
 
-        if (!is_string($filename))           throw new IllegalTypeException('Illegal type of parameter $filename: '.getType($filename));
-        if (!is_bool($shared))               throw new IllegalTypeException('Illegal type of parameter $shared: '.getType($shared));
+        if (!is_string($filename))                throw new IllegalTypeException('Illegal type of parameter $filename: '.getType($filename));
+        if (!is_bool($shared))                    throw new IllegalTypeException('Illegal type of parameter $shared: '.getType($shared));
 
-        if (isSet(self::$hFiles[$filename])) throw new RuntimeException('Dead-lock detected: already holding a lock for file "'.$filename.'"');
-        self::$hFiles[$filename] = false;      // Schlaegt der Constructor fehl, verhindert der gesetzte Eintrag ein
-                                                            // Dead-lock bei eventuellem Re-Entry.
+        if (key_exists($filename, self::$hFiles)) throw new RuntimeException('Dead-lock detected: already holding a lock for file "'.$filename.'"');
+        self::$hFiles[$filename] = null;            // Schlaegt der Constructor fehl, verhindert der gesetzte Eintrag ein
+                                                    // Dead-lock bei eventuellem Re-Entry.
         $this->filename = $filename;
         $this->shared   = $shared;
 
@@ -105,7 +105,6 @@ final class FileLock extends BaseLock {
     public function isValid() {
         if (isSet(self::$hFiles[$this->filename]))
             return is_resource(self::$hFiles[$this->filename]);
-
         return false;
     }
 

@@ -51,7 +51,7 @@ class MySQLConnector extends Connector {
     /** @var string */
     protected $host;
 
-    /** @var int */
+    /** @var int|null */
     protected $port;
 
     /** @var string */
@@ -60,7 +60,7 @@ class MySQLConnector extends Connector {
     /** @var string */
     protected $password;
 
-    /** @var string */
+    /** @var string|null */
     protected $database;
 
     /** @var string[] - configuration options */
@@ -215,8 +215,10 @@ class MySQLConnector extends Connector {
         // connect
         try {                                                                   // CLIENT_FOUND_ROWS
             $php_errormsg = '';
-            $this->hConnection = mysql_connect($host, $user, $pass, $newLink=true/*, $flags=2 */);
-            !$this->hConnection && trigger_error($php_errormsg, E_USER_ERROR);
+            /** @var resource $hConnection */
+            $hConnection = mysql_connect($host, $user, $pass, $newLink=true/*, $flags=2 */);
+            !$hConnection && trigger_error($php_errormsg, E_USER_ERROR);
+            $this->hConnection = $hConnection;
         }
         catch (IRosasurferException $ex) {
             throw $ex->addMessage('Can not connect to MySQL server on "'.$host.'"');
@@ -425,7 +427,6 @@ class MySQLConnector extends Connector {
             $this->connect();
 
         // execute statement
-        $result = null;
         try {
             $result = mysql_query($sql, $this->hConnection);
             $result || trigger_error('SQL-Error '.mysql_errno($this->hConnection).': '.mysql_error($this->hConnection), E_USER_ERROR);
@@ -587,7 +588,7 @@ class MySQLConnector extends Connector {
      * @return string - e.g. "5.0.37-community-log"
      */
     public function getVersionString() {
-        if (is_null($this->versionString)) {
+        if ($this->versionString === null) {
             if (!$this->isConnected())
                 $this->connect();
             $this->versionString = mysql_get_server_info($this->hConnection);
@@ -602,7 +603,7 @@ class MySQLConnector extends Connector {
      * @return int - e.g. 5000037 for version string "5.0.37-community-log"
      */
     public function getVersionNumber() {
-        if (is_null($this->versionNumber)) {
+        if ($this->versionNumber === null) {
             $version = $this->getVersionString();
             if (!preg_match('/^(\d+)\.(\d+).(\d+)/', $version, $match))
                 throw new \UnexpectedValueException('Unexpected version string "'.$version.'"');

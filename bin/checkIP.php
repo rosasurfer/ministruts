@@ -74,7 +74,7 @@ function getForwardedRemoteAddress() {
  *
  * @param  string|string[] $names - ein oder mehrere Headernamen
  *
- * @return string - Wert oder NULL, wenn die angegebenen Header nicht gesetzt sind
+ * @return string|null - Wert oder NULL, wenn die angegebenen Header nicht gesetzt sind
  */
 function getHeaderValue($names) {
     if (is_string($names)) {

@@ -382,35 +382,34 @@ class PHP extends StaticClass {
 
 
     /**
-     * Set the specified php.ini setting. Opposite to the built-in function ini_set() this method does not return the
-     * previously set option value but a boolean success status. Used to detect assignment errors if the access level
-     * of the specified option is not PHP_INI_ALL or PHP_INI_USER or the option is locked by the server configuration
+     * Set the specified php.ini setting. Opposite to the built-in PHP function this method does not return the previously
+     * set option value but a boolean success status. Used to detect assignment errors if the access level of the specified
+     * option is not PHP_INI_ALL or PHP_INI_USER or the option is locked by the server configuration
      * (php_admin_value/php_admin_flag).
      *
      * @param  string          $option
      * @param  bool|int|string $value
-     * @param  bool            $suppressErrors - whether or not to suppress errors setting the option (default: FALSE)
+     * @param  bool            $throwException - whether or not to throw an exception in case of errors (default: yes)
      *
      * @return bool - success status
      */
-    public static function ini_set($option, $value, $suppressErrors=false) {
+    public static function ini_set($option, $value, $throwException=true) {
         if (is_bool($value))
             $value = (int) $value;
-        $result = ini_set($option, $value);
-        if ($result === false) {
-            $sValue   = (string) $value;
-            $oldValue = ini_get($option);
-            if ($oldValue == $sValue) {         // ini_set() caused an error but the values remain the same
-                $result = true;                  // => the error can be ignored
-            }
-            else if (!$suppressErrors) {        // ini_set() caused an error and the error can't be ignored
-                throw new RuntimeException('Cannot set php.ini option "'.$option.'" (former value="'.$oldValue.'")');
-            }
-        }
-        else {
-            $result = true;
-        }
-        return $result;
+
+        /** @var string $result */
+        $oldValue = ini_set($option, $value);
+        if ($oldValue !== false)
+            return true;
+
+        $oldValue = ini_get($option);       // ini_set() caused an error
+        $newValue = (string) $value;
+
+        if ($oldValue == $newValue)         // the error can be ignored
+            return true;
+
+        if ($throwException) throw new RuntimeException('Cannot set php.ini option "'.$option.'" (former value="'.$oldValue.'")');
+        return false;
     }
 
 

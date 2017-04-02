@@ -322,9 +322,9 @@ class Request extends Singleton {
 
 
     /**
-     * Return the application's base uri. This value always starts and ends with a slash "/".
+     * Return the application's base uri. The value always starts and ends with a slash "/".
      *
-     * @return string - uri: path (without query string)
+     * @return string - a partial URI (the path without a query string)
      *
      * @example
      * <pre>
@@ -335,7 +335,7 @@ class Request extends Singleton {
 
         // TODO: Move to application as this uri is not a property of the request.
 
-        static $baseUri = null;
+        static $baseUri;
         if (!$baseUri) {
             $baseUri = Config::getDefault()->get('application.base-uri', false);
             if (!$baseUri) {
@@ -720,7 +720,7 @@ class Request extends Singleton {
      *
      * @param  string|null $key - Schluessel der Error-Message (default: none)
      *
-     * @return string - Error-Message
+     * @return string|null - Error-Message
      */
     public function getActionError($key = null) {
         $errors =& $this->getAttribute(ACTION_ERRORS_KEY);

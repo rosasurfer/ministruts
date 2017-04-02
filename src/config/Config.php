@@ -169,7 +169,7 @@ class Config extends Object implements ConfigInterface {
      *
      * @param  string $key
      *
-     * @return string|string[] - a string, a string array or NULL if no such setting is found
+     * @return string[]|string|null - a string, a string array or NULL if no such setting is found
      */
     protected function getProperty($key) {
         $properties  = $this->properties;

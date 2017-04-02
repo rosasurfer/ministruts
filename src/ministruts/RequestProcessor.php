@@ -323,7 +323,7 @@ PROCESS_METHOD_ERROR_SC_405;
      * @param  Request       $request
      * @param  ActionMapping $mapping
      *
-     * @return ActionForm
+     * @return ActionForm|null
      */
     protected function processActionFormCreate(Request $request, ActionMapping $mapping) {
         $className = $mapping->getFormClassName();

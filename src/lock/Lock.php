@@ -33,7 +33,7 @@ use \Exception;
 class Lock extends BaseLock {
 
 
-    /** @var string[] - alle Schluessel der im Moment gehaltenen Locks */
+    /** @var string[] - Schluessel der im Moment gehaltenen Locks */
     private static $lockedKeys;
 
     /** @var BaseLock - aktuelle Implementierung der Instanz */
@@ -57,8 +57,10 @@ class Lock extends BaseLock {
             $trace = debug_backtrace();
             $key   = $trace[0]['file'].'#'.$trace[0]['line'];
         }
+        /** @var string $key */
+        $key = $key;
         if (isSet(self::$lockedKeys[$key])) throw new RuntimeException('Dead-lock detected: already holding a lock for key "'.$key.'"');
-        self::$lockedKeys[$key] = true;
+        self::$lockedKeys[$key] = $key;
 
         $this->key = $key;
 

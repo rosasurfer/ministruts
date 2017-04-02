@@ -29,7 +29,7 @@ final class ReferencePool extends CachePeer {
      * Referenzen verwaltet und im Speicher des Prozesses nur ein Namespace existiert.
      *
      * @param  string|null $label   - Cache-Bezeichner (default: none)
-     * @param  array|null  $options - zusaetzliche Optionen (default: none)
+     * @param  array       $options - zusaetzliche Optionen (default: none)
      */
     public function __construct($label=null, array $options=[]) {
         $this->label   = $label;

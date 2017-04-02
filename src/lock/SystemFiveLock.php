@@ -51,9 +51,7 @@ class SystemFiveLock extends BaseLock {
      *
      * Example:
      * --------
-     *
      *  $lock = new SystemFiveLock(__FILE__.'#'.__LINE__);
-     *
      *
      * @param  string $key - eindeutiger Schluessel der Instanz
      *
@@ -61,9 +59,9 @@ class SystemFiveLock extends BaseLock {
      *                          existiert
      */
     public function __construct($key) {
-        if (!is_string($key))                throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
-        if (isSet(self::$hSemaphores[$key])) throw new RuntimeException('Dead-lock detected: already holding a lock for key "'.$key.'"');
-        self::$hSemaphores[$key] = false;
+        if (!is_string($key))                     throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
+        if (key_exists($key, self::$hSemaphores)) throw new RuntimeException('Dead-lock detected: already holding a lock for key "'.$key.'"');
+        self::$hSemaphores[$key] = null;
 
         $loglevel        = Logger::getLogLevel(__CLASS__);
         self::$logDebug  = ($loglevel <= L_DEBUG );
@@ -136,7 +134,6 @@ class SystemFiveLock extends BaseLock {
     public function isValid() {
         if (isSet(self::$hSemaphores[$this->key]))
             return is_resource(self::$hSemaphores[$this->key]);
-
         return false;
     }
 

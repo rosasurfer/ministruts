@@ -504,7 +504,7 @@ class PostgresConnector extends Connector {
      * @return string - e.g. "9.1.23-rc"
      */
     public function getVersionString() {
-        if (is_null($this->versionString)) {
+        if ($this->versionString === null) {
             if (!$this->isConnected())
                 $this->connect();
             $this->versionString = pg_version($this->hConnection)['server'];
@@ -519,7 +519,7 @@ class PostgresConnector extends Connector {
      * @return int - e.g. 9001023 for version string "9.1.23-rc"
      */
     public function getVersionNumber() {
-        if (is_null($this->versionNumber)) {
+        if ($this->versionNumber === null) {
             $version = $this->getVersionString();
             if (!preg_match('/^(\d+)\.(\d+).(\d+)/', $version, $match))
                 throw new \UnexpectedValueException('Unexpected version string "'.$version.'"');

@@ -22,7 +22,7 @@ class MySQLResult extends Result {
     /** @var string - SQL statement the result was generated from */
     protected $sql;
 
-    /** @var resource - the database connector's original result handle */
+    /** @var resource|null - the database connector's original result handle */
     protected $hResult;
 
     /** @var int - last inserted row id of the connection at instance creation time (not reset between queries) */
@@ -40,12 +40,12 @@ class MySQLResult extends Result {
      *
      * Create a new MySQLResult instance. Called only when execution of a SQL statement returned successful.
      *
-     * @param  IConnector $connector        - connector managing the database connection
-     * @param  string     $sql              - executed SQL statement
-     * @param  resource   $hResult          - result handle or NULL for result-less SQL query; SELECT queries not matching
-     *                                        any rows produce an empty result resource
-     * @param  int        $lastInsertId     - last inserted ID of the connection
-     * @param  int        $lastAffectedRows - last number of affected rows of the connection
+     * @param  IConnector    $connector        - connector managing the database connection
+     * @param  string        $sql              - executed SQL statement
+     * @param  resource|null $hResult          - result handle or NULL for result-less SQL query; SELECT queries not matching
+     *                                           any rows produce an empty result resource
+     * @param  int           $lastInsertId     - last inserted ID of the connection
+     * @param  int           $lastAffectedRows - last number of affected rows of the connection
      */
     public function __construct(IConnector $connector, $sql, $hResult, $lastInsertId, $lastAffectedRows) {
         if (!is_string($sql))                             throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
@@ -182,7 +182,7 @@ class MySQLResult extends Result {
     /**
      * Return the result's internal result object.
      *
-     * @return resource - result handle or NULL for a result-less query
+     * @return resource|null - result handle or NULL for a result-less query
      */
     public function getInternalResult() {
         return $this->hResult;
