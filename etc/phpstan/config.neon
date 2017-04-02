@@ -1,35 +1,41 @@
 #
-# php7 -d memory_limit=128M ../vendor/phpstan/phpstan/bin/phpstan --ansi
+# alias phpstan='php7 -d memory_limit=128M ~/.composer/vendor/phpstan/phpstan/bin/phpstan --ansi'
 #
 # phpstan analyse -a autoload.php -c config.neon --level=0 [--] <directory>
 #
 
 services:                                                           # loaded before auto-loading in "parameters" 
-    -                                                               
+    -
+        class: rosasurfer\db\orm\phpstan\PersistableObjectDaoReturnType
+        tags:
+            - phpstan.broker.dynamicStaticMethodReturnTypeExtension
+    -
         class: rosasurfer\core\phpstan\SingletonGetInstanceReturnType
         tags:
-            - phpstan.broker.dynamicStaticMethodReturnTypeExtension 
+            - phpstan.broker.dynamicStaticMethodReturnTypeExtension
 
 parameters:
     autoload_files:
         - etc/phpstan/function-stubs.php                            # stubs for PHP extensions and procedural code 
-                                                                    
+
     fileExtensions:                                                 # additional files to analyse
-       #- html                                                      
-       #- phtml                                                     # TODO: Tiles default variables are not recognized 
-                                                                    
-    excludes_analyse:                                               # paths (no wildcards) 
+       #- html
+       #- phtml                                                     # TODO: Tiles default variables trigger errors 
+
+    excludes_analyse:
         - etc/vendor/composer/
         - src/globals.php
         - src/util/apc/apc.php                                      # TODO: replace it
 
     ignoreErrors:
-        - '#Call to an undefined method rosasurfer\\db\\orm\\PersistableObject::(beforeSave|afterSave||beforeInsert|afterInsert|beforeUpdate|afterUpdate|beforeDelete|afterDelete)\(\).#'
-        - '#Call to function [a-zA-Z0-9\\_]+\(\) with incorrect case: [a-zA-Z0-9\\_]+.#'
-        - '#Call to (static )?method [a-zA-Z0-9\\:_]+\(\) with incorrect case: [a-zA-Z0-9\\_]+#'        
-        - '#Cannot call method andDependency\(\) on null.#'
-        - '#Parameter \$[a-zA-Z0-9_]+ of method [a-zA-Z0-9\\:_]+\(\) has invalid typehint type [a-zA-Z0-9\\_]*\bscalar.#'
-        - '#rosasurfer\\net\\messenger\\im\\IRCMessenger::__construct\(\) does not call parent constructor from rosasurfer\\net\\messenger\\Messenger.#'
+        - '#Call to ((static )?method|function) [^ ]+ with incorrect case:#'                    # PHP is case insensitive
+        - '#(Array \([^ ]+\[\]\)|(Static )?property [^ ]+ \([^ ]+\)) does not accept null\b#i'  # every variable is nullable
+        - '#Parameter [^ ]+ of method [^ ]+ has invalid typehint type ([^ ]+)?\bscalar\b#'      # fixed but not yet released 
+
+        - '#Call to an undefined method rosasurfer\\db\\orm\\PersistableObject::(beforeSave|afterSave|beforeInsert|afterInsert|beforeUpdate|afterUpdate|beforeDelete|afterDelete)\b#'
+        - '#Cannot call method andDependency\(\) on null\b#'
+        - '#rosasurfer\\net\\messenger\\im\\IRCMessenger::__construct\(\) does not call parent constructor from rosasurfer\\net\\messenger\\Messenger\b#'
+        - '#Property rosasurfer\\db\\orm\\meta\\EntityMapping::\$version \(string\) does not accept rosasurfer\\db\\orm\\meta\\PropertyMapping\b#'
 
     reportUnmatchedIgnoredErrors: false
     polluteScopeWithLoopInitialAssignments: true

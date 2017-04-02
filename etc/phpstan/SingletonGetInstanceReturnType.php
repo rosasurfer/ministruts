@@ -14,13 +14,14 @@ use PhpParser\Node\Scalar\String_;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
 use PHPStan\Type\DynamicStaticMethodReturnTypeExtension;
-use PHPStan\Type\StaticType;
+use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
 
 use rosasurfer\core\Object;
 use rosasurfer\core\Singleton;
 
 use function rosasurfer\echoPre;
+use rosasurfer\db\orm\DAO;
 
 
 class SingletonGetInstanceReturnType extends Object implements DynamicStaticMethodReturnTypeExtension {
@@ -33,6 +34,7 @@ class SingletonGetInstanceReturnType extends Object implements DynamicStaticMeth
      * @return string
      */
     public static function getClass() : string {
+        //echoPre(__METHOD__.'()');
         return self::CLASS_NAME;
     }
 
@@ -41,6 +43,7 @@ class SingletonGetInstanceReturnType extends Object implements DynamicStaticMeth
      * @return bool
      */
     public function isStaticMethodSupported(MethodReflection $methodReflection) : bool {
+        //echoPre(__METHOD__.'()  '.$methodReflection->getName());
         return $methodReflection->getName() === self::METHOD_NAME;
     }
 
@@ -50,23 +53,28 @@ class SingletonGetInstanceReturnType extends Object implements DynamicStaticMeth
      */
     public function getTypeFromStaticMethodCall(MethodReflection $methodReflection, StaticCall $methodCall, Scope $scope) : Type {
         if (count($methodCall->args) === 0) {
-    		return $methodReflection->getReturnType();
-    	}
-    	$arg = $methodCall->args[0]->value;
+            return $methodReflection->getReturnType();
+        }
+        $arg = $methodCall->args[0]->value;
 
-    	if ($arg instanceof String_)
-            return new StaticType($arg->value, false);
+        if ($arg instanceof String_) {
+            $class = $this->fixClass($arg->value);
+            return new ObjectType(...[$class, false]);              // compatible for 0.6.x and master
+        }
 
-    	if ($arg instanceof ClassConstFetch) {
-    	    if (($class = $this->classConstFetchToStr($arg, $scope)) !== null) {
-                return new StaticType($class, false);
-    	    }
-    	}
+        if ($arg instanceof ClassConstFetch) {
+            if (($class = $this->classConstFetchToStr($arg, $scope)) !== null) {
+                $class = $this->fixClass($class);
+                return new ObjectType(...[$class, false]);          // compatible for 0.6.x and master
+            }
+        }
 
-    	if ($arg instanceof BinaryOp) {
-    	    if (($class = $this->binaryOpToStr($arg, $scope)) !== null)
-                return new StaticType($class, false);
-    	}
+        if ($arg instanceof BinaryOp) {
+            if (($class = $this->binaryOpToStr($arg, $scope)) !== null) {
+                $class = $this->fixClass($class);
+                return new ObjectType(...[$class, false]);          // compatible for 0.6.x and master
+            }
+        }
 
         if ($arg instanceof Variable) {
             //echoPre('cannot resolve return type of: '.self::CLASS_NAME.'::'.self::METHOD_NAME.'($'.$arg->name.')  in: '.$scope->getClass());
@@ -82,7 +90,7 @@ class SingletonGetInstanceReturnType extends Object implements DynamicStaticMeth
      * @return string|null
      */
     private function binaryOpToStr(BinaryOp $op, Scope $scope) {
-        $left = $this->exprToStr($op->left, $scope);
+        $left  = $this->exprToStr($op->left,  $scope);
         $right = $this->exprToStr($op->right, $scope);
 
         if (is_null($left) || is_null($right))
@@ -103,8 +111,10 @@ class SingletonGetInstanceReturnType extends Object implements DynamicStaticMeth
         $const = $fetch->name;
 
         if ($const == 'class') {
-            if ($class == 'static')
-                return $scope->getClass();
+            if ($class == 'static') {
+                if (method_exists($scope, $method='getClass'))           return $scope->$method();             // 0.6.x
+                if (method_exists($scope, $method='getClassReflection')) return $scope->$method()->getName();  // master
+            }
             return $class;
         }
         return null;
@@ -122,5 +132,16 @@ class SingletonGetInstanceReturnType extends Object implements DynamicStaticMeth
             if (($expr = $this->classConstFetchToStr($expr, $scope)) !== null)
                 return $expr;
         return null;
+    }
+
+
+    /**
+     * @return string
+     */
+    private function fixClass($class) {
+        if ($class == 'rosasurfer\db\orm\PersistableObjectDAO') {
+            return DAO::class;
+        }
+        return $class;
     }
 }

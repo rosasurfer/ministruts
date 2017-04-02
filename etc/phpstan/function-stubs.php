@@ -40,11 +40,29 @@ namespace {
 
         /**
          * @param  string $key
-         * @param  mixed  $var
+         * @param  mixed  $value
          * @param  int    $ttl
          * @return bool
          */
-        function apc_store($key, $var, $ttl = null) {}
+        function apc_store($key, $value, $ttl = null) {}
+    }
+
+
+    if (!function_exists('apcu_add')) {
+        /**
+         * @param  string|array $keys
+         * @param  mixed        $values
+         * @param  int          $ttl
+         * @return bool|array
+         */
+        function apcu_add($keys, $values, $ttl = null) {}
+
+        /**
+         * @param  string|string[] $key
+         * @param  bool            $success
+         * @return mixed
+         */
+        function apcu_fetch($key, &$success = null) {}
     }
 
 
@@ -235,4 +253,99 @@ namespace rosasurfer\cron\logwatch {
      * @param  string $entry
      */
     function processEntry($entry) {}
+}
+
+
+namespace rosasurfer\util\apc\apc {
+
+    /**
+     * @param  array $array1
+     * @param  array $array2
+     * @return int
+     */
+    function block_sort($array1, $array2) {}
+
+    /**
+     * @param  int  $s
+     * @param  bool $long
+     * @return string
+     */
+    function bsize($s, $long=true) {}
+
+    /**
+     * @param  string $name
+     * @param  mixed  $value
+     */
+    function defaults($name, $value) {}
+
+    /**
+     * @param  int $ts
+     * @return string
+     */
+    function duration($ts) {}
+
+    /**
+     * @param  resource $im
+     * @param  int      $centerX
+     * @param  int      $centerY
+     * @param  int      $diameter
+     * @param  int      $start
+     * @param  int      $end
+     * @param  int      $color1
+     * @param  int      $color2
+     * @param  string   $text
+     * @param  int      $placeindex
+     */
+    function fill_arc($im, $centerX, $centerY, $diameter, $start, $end, $color1, $color2, $text='', $placeindex=0) {}
+
+    /**
+     * @param  resource $im
+     * @param  int      $x
+     * @param  int      $y
+     * @param  int      $w
+     * @param  int      $h
+     * @param  int      $color1
+     * @param  int      $color2
+     * @param  string   $text
+     * @param  int      $placeindex
+     */
+    function fill_box($im, $x, $y, $w, $h, $color1, $color2,$text='',$placeindex=0) {}
+
+    /**
+     * @return bool
+     */
+    function graphics_avail() {}
+
+    /**
+     * @param  string $ob
+     * @param  string $text
+     * @return string
+     */
+    function menu_entry($ob, $text) {}
+
+    /**
+     * @param  string $s
+     */
+    function put_login_link($s='Login') {}
+
+    /**
+     * @param  string $key
+     * @param  string $text
+     * @param  string $extra
+     * @return string
+     */
+    function sortheader($key, $text, $extra='') {}
+
+    /**
+     * @param  resource $im
+     * @param  int      $centerX
+     * @param  int      $centerY
+     * @param  int      $diameter
+     * @param  int      $start
+     * @param  int      $end
+     * @param  int      $color1
+     * @param  string   $text
+     * @param  int      $placeindex
+     */
+    function text_arc($im, $centerX, $centerY, $diameter, $start, $end, $color1, $text, $placeindex=0) {}
 }
