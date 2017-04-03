@@ -453,13 +453,11 @@ PROCESS_METHOD_ERROR_SC_405;
         }
 
         // falls statt eines ActionForwards ein String-Identifier zurueckgegeben wurde, diesen aufloesen
-        if (is_string($forward))
-            $forward = $action->getMapping()->findForward($forward);
-
+        /** @var ActionForward $forward */                          // help static analysers
+        $forward = is_string($forward) ? $action->getMapping()->findForward($forward) : $forward;
 
         // allgemeinen Postprocessing-Hook aufrufen
         $forward = $action->executeAfter($request, $response, $forward);
-
 
         // jetzt evt. aufgetretene Exception weiterreichen
         if ($throwable)

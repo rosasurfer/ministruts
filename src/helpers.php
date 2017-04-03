@@ -240,8 +240,8 @@ function isLittleEndian() {
 /**
  * Functional replacement for ($stringA === $stringB).
  *
- * @param  string $stringA
- * @param  string $stringB
+ * @param  string|null $stringA
+ * @param  string|null $stringB
  * @param  bool   $ignoreCase - default: no
  *
  * @return bool
@@ -260,8 +260,8 @@ function strCompare($stringA, $stringB, $ignoreCase=false) {
 /**
  * Functional replacement for ($stringA === $stringB) ignoring upper/lower case differences.
  *
- * @param  string $stringA
- * @param  string $stringB
+ * @param  string|null $stringA
+ * @param  string|null $stringB
  *
  * @return bool
  */

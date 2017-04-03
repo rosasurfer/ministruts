@@ -773,8 +773,8 @@ class Request extends Singleton {
      * Setzt fuer den angegebenen Schluessel eine Error-Message. Ist Message NULL, wird die Message mit
      * dem angegebenen Schluessel aus dem Request geloescht.
      *
-     * @param  string $key     - Schluessel der Error-Message
-     * @param  string $message - Error-Message
+     * @param  string      $key     - Schluessel der Error-Message
+     * @param  string|null $message - Error-Message
      */
     public function setActionError($key, $message) {
         if ($message === null) {

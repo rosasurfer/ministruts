@@ -75,10 +75,10 @@ class SystemFiveLock extends BaseLock {
         $hSemaphore = $messages = null;
         do {
             try {
-                // TODO: bei hoher Last koennen sem_get() oder sem_acquire() scheitern
-                $hSemaphore = sem_get($integer, 1, 0666);   // Semaphore-Handle holen
+                $hSemaphore = sem_get($integer, 1, 0666);       // Semaphore-Handle holen
+                if (!is_resource($hSemaphore)) throw new RuntimeException('cannot get semaphore handle for key '.$integer);
                 sem_acquire($hSemaphore);
-                break;
+                break;                                          // TODO: bei Last koennen sem_get() oder sem_acquire() scheitern
             }
             catch (PHPError $ex) {
                 // TODO: Quellcode umschreiben (ext/sysvsem/sysvsem.c) und Fehler lokalisieren (vermutlich wird ein File-Limit ueberschritten)

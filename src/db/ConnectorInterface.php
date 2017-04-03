@@ -58,7 +58,7 @@ interface ConnectorInterface {
      * Escape a DBMS literal, i.e. a column's value. The resulting string can be used in queries "as-is" and doesn't need
      * additional quoting.
      *
-     * @param  scalar $value - value to escape
+     * @param  scalar|null $value - value to escape
      *
      * @return string - escaped and quoted string or stringified scalar value if the value was not a string
      */
@@ -68,7 +68,7 @@ interface ConnectorInterface {
     /**
      * Escape a string value. The resulting string must be quoted according to the DBMS before it can be used in queries.
      *
-     * @param  scalar $value - value to escape
+     * @param  scalar|null $value - value to escape
      *
      * @return string|null - escaped but unquoted string or NULL if the value was NULL
      */

@@ -146,9 +146,9 @@ class Worker extends Object {
         // TODO: Prefer to return existing instance from IdentityMap
 
         $row = $result->fetchNext(ARRAY_ASSOC);
-        if ($row)
-            return PersistableObject::createInstance($this->entityClass, $row);
-        return null;
+        if ($row === null)
+            return null;
+        return PersistableObject::createInstance($this->entityClass, $row);
     }
 
 

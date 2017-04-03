@@ -268,7 +268,7 @@ class MySQLConnector extends Connector {
      * @return $this
      */
     protected function selectDatabase() {
-        if ($this->database) {
+        if ($this->database !== null) {
             try {
                 mysql_select_db($this->database, $this->hConnection) || trigger_error(mysql_error($this->hConnection), E_USER_ERROR);
             }
@@ -306,16 +306,11 @@ class MySQLConnector extends Connector {
 
 
     /**
-     * Escape a DBMS identifier, i.e. the name of a database object (schema, table, view, column etc.). The resulting string
-     * can be used in queries "as-is" and doesn't need additional quoting.
-     *
-     * MySQL: = `{$name}`.`{$subname}`
-     *
-     * @param  string $name - identifier to escape
-     *
-     * @return string - escaped and quoted identifier
+     * {@inheritdoc}
      */
     public function escapeIdentifier($name) {
+        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
+
         if (strContains($name, '.')) {
             $names = explode('.', $name);
 
@@ -330,22 +325,17 @@ class MySQLConnector extends Connector {
 
 
     /**
-     * Escape a DBMS literal, i.e. a column's value. The resulting string can be used in queries "as-is" and doesn't need
-     * additional quoting.
-     *
-     * MySQL: = '{escapeString($value)}'
-     *
-     * @param  scalar $value - value to escape
-     *
-     * @return string - escaped and quoted string or stringified scalar value if the value was not a string
+     * {@inheritdoc}
      */
     public function escapeLiteral($value) {
         // bug or feature: mysql_real_escape_string(null) => empty string instead of NULL
-        if ($value === null)
-            return 'null';
+        if ($value === null)  return 'null';
 
-        if (is_int($value) || is_float($value))
-            return (string) $value;
+        if (!is_scalar($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
+
+        if (is_bool ($value)) return (string)(int) $value;
+        if (is_int  ($value)) return (string)      $value;
+        if (is_float($value)) return (string)      $value;
 
         $escaped = $this->escapeString($value);
         return "'".$escaped."'";
@@ -353,18 +343,13 @@ class MySQLConnector extends Connector {
 
 
     /**
-     * Escape a string value. The resulting string must be quoted according to the DBMS before it can be used in queries.
-     *
-     * MySQL: = addSlashes($value, ['\', "'", '"'])
-     *
-     * @param  scalar $value - value to escape
-     *
-     * @return string|null - escaped but unquoted string or NULL if the value was NULL
+     * {@inheritdoc}
      */
     public function escapeString($value) {
         // bug or or feature: mysql_real_escape_string(null) => empty string instead of NULL
         if ($value === null)
             return null;
+        if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
 
         if (!$this->isConnected())
             $this->connect();

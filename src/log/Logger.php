@@ -393,9 +393,9 @@ class Logger extends StaticClass {
     /**
      * Display the message on the standard device (STDOUT on a terminal, HTTP response for a web request).
      *
-     * @param  string|object $loggable - message or exception to log
-     * @param  int           $level    - loglevel of the loggable
-     * @param  array        &$context  - reference to the log context with additional data
+     * @param  string|\Exception $loggable - message or exception to log
+     * @param  int               $level    - loglevel of the loggable
+     * @param  array            &$context  - reference to the log context with additional data
      */
     private static function invokePrintHandler($loggable, $level, array &$context) {
         if (!self::$printHandler) return;
@@ -423,9 +423,9 @@ class Logger extends StaticClass {
     /**
      * Send the message to the configured mail receivers (email addresses).
      *
-     * @param  string|object $loggable - message or exception to log
-     * @param  int           $level    - loglevel of the loggable
-     * @param  array        &$context  - reference to the log context with additional data
+     * @param  string|\Exception $loggable - message or exception to log
+     * @param  int               $level    - loglevel of the loggable
+     * @param  array            &$context  - reference to the log context with additional data
      */
     private static function invokeMailHandler($loggable, $level, array &$context) {
         if (!self::$mailHandler) return;
@@ -456,9 +456,9 @@ class Logger extends StaticClass {
     /**
      * Send the message to the configured SMS receivers (phone numbers).
      *
-     * @param  string|object $loggable - message or exception to log
-     * @param  int           $level    - loglevel of the loggable
-     * @param  array        &$context  - reference to the log context with additional data
+     * @param  string|\Exception $loggable - message or exception to log
+     * @param  int               $level    - loglevel of the loggable
+     * @param  array            &$context  - reference to the log context with additional data
      *
      * @todo   replace CURL dependency with internal PHP functions
      */
@@ -565,9 +565,9 @@ class Logger extends StaticClass {
      * If this directive is not set, errors are sent to the SAPI error logger. For example, it is an error log in Apache
      * or STDERR in CLI.
      *
-     * @param  string|object $loggable - message or exception to log
-     * @param  int           $level    - loglevel of the loggable
-     * @param  array        &$context  - reference to the log context with additional data
+     * @param  string|\Exception $loggable - message or exception to log
+     * @param  int               $level    - loglevel of the loggable
+     * @param  array            &$context  - reference to the log context with additional data
      */
     private static function invokeErrorLogHandler($loggable, $level, array &$context) {
         if (!self::$errorLogHandler) return;
@@ -595,9 +595,9 @@ class Logger extends StaticClass {
     /**
      * Compose a CLI log message and store it in the passed log context under the keys "cliMessage" and "cliExtra".
      *
-     * @param  string|object $loggable - message or exception to log
-     * @param  int           $level    - loglevel of the loggable
-     * @param  array        &$context  - reference to the log context
+     * @param  string|\Exception $loggable - message or exception to log
+     * @param  int               $level    - loglevel of the loggable
+     * @param  array            &$context  - reference to the log context
      */
     private static function composeCliMessage($loggable, $level, array &$context) {
         if (!isSet($context['file']) || !isSet($context['line']))
@@ -613,7 +613,7 @@ class Logger extends StaticClass {
             // simple message
             $msg = $loggable;
 
-            if (strLen($indent)) {                    // indent multiline messages
+            if (strLen($indent)) {                      // indent multiline messages
                 $lines = explode(NL, normalizeEOL($msg));
                 $eom = '';
                 if (strEndsWith($msg, NL)) {
@@ -625,7 +625,8 @@ class Logger extends StaticClass {
             $text = '['.strToUpper(self::$logLevels[$level]).'] '.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
         }
         else {
-            // exception
+            /** @var \Exception $loggable */            // help static analysers
+            $loggable = $loggable;
             $type = null;
             $msg  = trim(DebugHelper::composeBetterMessage($loggable, $indent));
             if (isSet($context['unhandled'])) {
@@ -663,9 +664,9 @@ class Logger extends StaticClass {
     /**
      * Compose a mail log message and store it in the passed log context under the keys "mailSubject" and "mailMessage".
      *
-     * @param  string|object $loggable - message or exception to log
-     * @param  int           $level    - loglevel of the loggable
-     * @param  array        &$context  - reference to the log context
+     * @param  string|\Exception $loggable - message or exception to log
+     * @param  int               $level    - loglevel of the loggable
+     * @param  array            &$context  - reference to the log context
      */
     private static function composeMailMessage($loggable, $level, array &$context) {
         if (!isSet($context['cliMessage']))
@@ -706,9 +707,9 @@ class Logger extends StaticClass {
     /**
      * Compose a HTML log message and store it in the passed log context under the key "htmlMessage".
      *
-     * @param  string|object $loggable - message or exception to log
-     * @param  int           $level    - loglevel of the loggable
-     * @param  array        &$context  - reference to the log context
+     * @param  string|\Exception $loggable - message or exception to log
+     * @param  int               $level    - loglevel of the loggable
+     * @param  array            &$context  - reference to the log context
      */
     private static function composeHtmlMessage($loggable, $level, array &$context) {
         if (!isSet($context['file']) || !isSet($context['line']))

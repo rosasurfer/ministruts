@@ -288,8 +288,8 @@ abstract class PersistableObject extends Object {
      * rows originating from database queries to objects of the respective model class.
      *
      * @param  string $class - class name of the model
-     * @param  array  $row   - array with property values (typically a row from a database table);
-     *                         NULL for a row where the identity field is NULL
+     * @param  array  $row   - array with property values (typically a row from a database table)
+     *
      * @return self|null
      */
     public static function createInstance($class, array $row) {

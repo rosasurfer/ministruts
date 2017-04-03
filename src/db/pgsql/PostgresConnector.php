@@ -216,14 +216,11 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * Escape a DBMS identifier, i.e. the name of a database object (schema, table, view, column etc.). The resulting string
-     * can be used in queries "as-is" and doesn't need additional quoting.
-     *
-     * @param  string $name - identifier to escape
-     *
-     * @return string - escaped and quoted identifier; PostgreSQL:  "{$name}"
+     * {@inheritdoc}
      */
     public function escapeIdentifier($name) {
+        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
+
         if (!$this->isConnected())
             $this->connect();
         return pg_escape_identifier($this->hConnection, $name);
@@ -231,22 +228,17 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * Escape a DBMS literal, i.e. a column's value. The resulting string can be used in queries "as-is" and doesn't need
-     * additional quoting.
-     *
-     * PostgreSQL: =  E'{escape($value)}'
-     *
-     * @param  scalar $value - value to escape
-     *
-     * @return string - escaped and quoted string or stringified scalar value if the value was not a string
+     * {@inheritdoc}
      */
     public function escapeLiteral($value) {
         // bug or feature: pg_escape_literal(null) => '' quoted empty string instead of 'null'
-        if ($value === null)
-            return 'null';
+        if ($value === null)  return 'null';
 
-        if (is_int($value) || is_float($value))
-            return (string) $value;
+        if (!is_scalar($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
+
+        if (is_bool ($value)) return (string)(int) $value;
+        if (is_int  ($value)) return (string)      $value;
+        if (is_float($value)) return (string)      $value;
 
         if (!$this->isConnected())
             $this->connect();
@@ -255,18 +247,13 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * Escape a string value. The resulting string must be quoted according to the DBMS before it can be used in queries.
-     *
-     * PostgreSQL: = escape_chars($value, ['\', "'"])
-     *
-     * @param  scalar $value - value to escape
-     *
-     * @return string|null - escaped but unquoted string or NULL if the value was NULL
+     * {@inheritdoc}
      */
     public function escapeString($value) {
         // bug or feature: pg_escape_string(null) => empty string instead of NULL
         if ($value === null)
             return null;
+        if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
 
         if (!$this->isConnected())
             $this->connect();

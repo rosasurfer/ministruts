@@ -59,7 +59,7 @@ class MySQLResult extends Result {
         $this->lastInsertId     = $lastInsertId;
         $this->lastAffectedRows = $lastAffectedRows;
 
-        if ($hResult && !mysql_num_fields($hResult)) {     // close empty results and release them
+        if (is_resource($hResult) && !mysql_num_fields($hResult)) { // close empty results and release them
             mysql_free_result($hResult);
             $hResult            = null;
             $this->numRows      = 0;
@@ -76,7 +76,7 @@ class MySQLResult extends Result {
      * {@inheritdoc}
      */
     public function fetchNext($mode=ARRAY_BOTH) {
-        if (!$this->hResult || $this->nextRowIndex < 0)
+        if (!is_resource($this->hResult) || $this->nextRowIndex < 0)
             return null;
 
         switch ($mode) {
@@ -131,8 +131,8 @@ class MySQLResult extends Result {
      */
     public function numRows() {
         if ($this->numRows === null) {
-            if ($this->hResult) $this->numRows = mysql_num_rows($this->hResult);
-            else                $this->numRows = 0;
+            if (is_resource($this->hResult)) $this->numRows = mysql_num_rows($this->hResult);
+            else                             $this->numRows = 0;
         }
         return $this->numRows;
     }
@@ -170,7 +170,7 @@ class MySQLResult extends Result {
      * {@inheritdoc}
      */
     public function release() {
-        if ($this->hResult) {
+        if (is_resource($this->hResult)) {
             $tmp = $this->hResult;
             $this->hResult      = null;
             $this->nextRowIndex = -1;

@@ -46,7 +46,7 @@ class AutoConfig extends Config {
     public function __construct($location = '.') {
         if (!is_string($location)) throw new IllegalTypeException('Illegal type of parameter $location: '.getType($location));
 
-        $configDir = $configFile = $files = null;
+        $configDir = $configFile = null;
 
         if (is_file($location)) {
             $configFile = realPath($location);
@@ -61,6 +61,7 @@ class AutoConfig extends Config {
         //       key: get_class($this).'|'.$userConfig.'|cli='.(int)CLI
 
         // framework config file
+        $files = [];
         $files[] = MINISTRUTS_ROOT.'/config.properties';
 
         // project config files (skip if equal to framework which can happen during CLI testing)
