@@ -6,14 +6,20 @@
 
 services:                                                           # loaded before auto-loading in "parameters" 
     -
-        class: rosasurfer\db\orm\phpstan\PersistableObjectDaoReturnType
+        class: rosasurfer\db\orm\phpstan\PersistableObject_CreateInstance_ReturnType
         tags:
+            - phpstan.broker.dynamicMethodReturnTypeExtension
             - phpstan.broker.dynamicStaticMethodReturnTypeExtension
     -
-        class: rosasurfer\core\phpstan\SingletonGetInstanceReturnType
+        class: rosasurfer\db\orm\phpstan\PersistableObject_Dao_ReturnType
+        tags:
+            - phpstan.broker.dynamicMethodReturnTypeExtension
+            - phpstan.broker.dynamicStaticMethodReturnTypeExtension
+    -
+        class: rosasurfer\core\phpstan\Singleton_GetInstance_ReturnType
         tags:
             - phpstan.broker.dynamicStaticMethodReturnTypeExtension
-
+            
 parameters:
     autoload_files:
         - etc/phpstan/function-stubs.php                            # stubs for PHP extensions and procedural code
@@ -27,17 +33,27 @@ parameters:
         - src/globals.php
         - src/util/apc/apc.php                                      # TODO: replace it
 
-    ignoreErrors:
-        - '#Call to ((static )?method|function) [^ ]+ with incorrect case:#'                    # PHP is case insensitive
-        - '#(Array \([^ ]+\[\]\)|(Static )?property [^ ]+ \([^ ]+\)) does not accept null\b#i'  # every variable is nullable
-        - '#Parameter [^ ]+ of method [^ ]+ has invalid typehint type ([^ ]+)?\bscalar\b#'      # fixed but not yet released
-        - "#Casting to (bool|int) something that's already (bool|int).#"                        # simply wrong
-
-        - '#Call to an undefined method rosasurfer\\db\\orm\\PersistableObject::(beforeSave|afterSave|beforeInsert|afterInsert|beforeUpdate|afterUpdate|beforeDelete|afterDelete)\b#'
-        - '#Cannot call method andDependency\(\) on null\b#'
-        - '#rosasurfer\\net\\messenger\\im\\IRCMessenger::__construct\(\) does not call parent constructor from rosasurfer\\net\\messenger\\Messenger\b#'
-        - '#Property rosasurfer\\db\\orm\\meta\\EntityMapping::\$version \(string\) does not accept rosasurfer\\db\\orm\\meta\\PropertyMapping\b#'
-
-    reportUnmatchedIgnoredErrors: false
+    reportUnmatchedIgnoredErrors:           false
     polluteScopeWithLoopInitialAssignments: true
-    polluteCatchScopeWithTryAssignments: true
+    polluteCatchScopeWithTryAssignments:    true
+    
+    ignoreErrors:
+        - '/Call to ((static )?method|function) [^ ]+ with incorrect case:/'                    # seriously?
+        - '/(Array \([^ ]+\[\]\)|(Static )?property [^ ]+ \([^ ]+\)) does not accept null\b/i'  # everything is nullable
+        - "/Casting to (bool|int) something that's already (bool|int)./"                        # simply wrong
+
+        # fixed but not yet released PHPStan bugs 
+        - '/Parameter [^ ]+ of method [^ ]+ has invalid typehint type ([^ ]+)?\bscalar\b/'
+        - '/Parameter #[0-9]+ [^ ]+ of method [^ ]+ expects ([^ ]+)?\bscalar(\|[^|]+)*, (bool|int|float|string|null|([^ ]+)?scalar)(\|(bool|int|float|string|null|([^ ]+)?scalar))* given\b/'
+
+        # unfixed PHPStan bugs 
+        - '/Call to an undefined method rosasurfer\\db\\orm\\PersistableObject::(beforeSave|afterSave|beforeInsert|afterInsert|beforeUpdate|afterUpdate|beforeDelete|afterDelete)\b/'
+        - '/Cannot call method andDependency\(\) on null\b/'
+        - '/rosasurfer\\net\\messenger\\im\\IRCMessenger::__construct\(\) does not call parent constructor from rosasurfer\\net\\messenger\\Messenger\b/'
+        - '/Parameter #1 \$exception of static method rosasurfer\\debug\\DebugHelper::getBetterTraceAsString\(\) expects Exception, Exception\|rosasurfer\\exception\\error\\PHPError\|string given\b/'
+        - '/Parameter #1 \$mode of static method rosasurfer\\debug\\ErrorHandler::setupErrorHandling\(\) expects int, int\|null given\b/'
+        - '/Parameter #2 \$row of static method rosasurfer\\db\\orm\\PersistableObject::createInstance\(\) expects mixed\[\], mixed\[\]\|null given\b/'
+        - '/Parameter #3 \$forward of method rosasurfer\\ministruts\\Action::executeAfter\(\) expects rosasurfer\\ministruts\\ActionForward\|null, rosasurfer\\ministruts\\ActionForward\|string\|null given\b/'        
+        - '/Parameter #3 \$hResult of class rosasurfer\\db\\mysql\\MySQLResult constructor expects resource\|null, bool\|resource\|null given\b/'
+        - '/Parameter #3 \$hResult of class rosasurfer\\db\\mysql\\MySQLResult constructor expects resource\|null, resource\|bool\|null given\b/'
+        - '/Property rosasurfer\\db\\orm\\meta\\EntityMapping::\$version \(string\) does not accept rosasurfer\\db\\orm\\meta\\PropertyMapping\b/'

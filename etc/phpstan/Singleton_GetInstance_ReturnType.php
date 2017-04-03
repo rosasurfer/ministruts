@@ -24,7 +24,7 @@ use function rosasurfer\echoPre;
 use rosasurfer\db\orm\DAO;
 
 
-class SingletonGetInstanceReturnType extends Object implements DynamicStaticMethodReturnTypeExtension {
+class Singleton_GetInstance_ReturnType extends Object implements DynamicStaticMethodReturnTypeExtension {
 
     const CLASS_NAME  = Singleton::class;
     const METHOD_NAME = 'getInstance';
@@ -34,7 +34,6 @@ class SingletonGetInstanceReturnType extends Object implements DynamicStaticMeth
      * @return string
      */
     public static function getClass() : string {
-        //echoPre(__METHOD__.'()');
         return self::CLASS_NAME;
     }
 
@@ -43,7 +42,6 @@ class SingletonGetInstanceReturnType extends Object implements DynamicStaticMeth
      * @return bool
      */
     public function isStaticMethodSupported(MethodReflection $methodReflection) : bool {
-        //echoPre(__METHOD__.'()  '.$methodReflection->getName());
         return $methodReflection->getName() === self::METHOD_NAME;
     }
 
@@ -52,6 +50,8 @@ class SingletonGetInstanceReturnType extends Object implements DynamicStaticMeth
      * @return Type
      */
     public function getTypeFromStaticMethodCall(MethodReflection $methodReflection, StaticCall $methodCall, Scope $scope) : Type {
+        //echoPre(__METHOD__.'()  '.$methodReflection->getName());
+
         if (count($methodCall->args) === 0) {
             return $methodReflection->getReturnType();
         }
@@ -112,8 +112,9 @@ class SingletonGetInstanceReturnType extends Object implements DynamicStaticMeth
 
         if ($const == 'class') {
             if ($class == 'static') {
-                if (method_exists($scope, $method='getClass'))           return $scope->$method();             // 0.6.x
                 if (method_exists($scope, $method='getClassReflection')) return $scope->$method()->getName();  // master
+                if (method_exists($scope, $method='getClass'))           return $scope->$method();             // 0.6.x
+                // intentionally pass on "static" to trigger an error message
             }
             return $class;
         }
@@ -129,8 +130,8 @@ class SingletonGetInstanceReturnType extends Object implements DynamicStaticMeth
             return $expr->value;
 
         if ($expr instanceof ClassConstFetch)
-            if (($expr = $this->classConstFetchToStr($expr, $scope)) !== null)
-                return $expr;
+            return $this->classConstFetchToStr($expr, $scope);
+
         return null;
     }
 
