@@ -16,11 +16,11 @@ services:                                                           # loaded bef
 
 parameters:
     autoload_files:
-        - etc/phpstan/function-stubs.php                            # stubs for PHP extensions and procedural code 
+        - etc/phpstan/function-stubs.php                            # stubs for PHP extensions and procedural code
 
     fileExtensions:                                                 # additional files to analyse
        #- html
-       #- phtml                                                     # TODO: Tiles default variables trigger errors 
+       #- phtml                                                     # TODO: Tiles default variables trigger errors
 
     excludes_analyse:
         - etc/vendor/composer/
