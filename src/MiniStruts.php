@@ -168,8 +168,8 @@ class MiniStruts extends StaticClass {
      * @param  IConfig|string $config - configuration or config location as passed to the framework loader
      */
     private static function setConfiguration($config) {
-        if (is_string($config))
-            $config = new AutoConfig($config);
+        /** @var IConfig $config */
+        $config = is_string($config) ? new AutoConfig($config) : $config;
         Config::setDefault($config);
     }
 
