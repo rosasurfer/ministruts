@@ -22,9 +22,12 @@ use rosasurfer\core\Singleton;
 
 use function rosasurfer\echoPre;
 use rosasurfer\db\orm\DAO;
+use PHPStan\Type\DynamicMethodReturnTypeExtension;
+use PhpParser\Node\Expr\MethodCall;
 
 
-class Singleton_GetInstance_ReturnType extends Object implements DynamicStaticMethodReturnTypeExtension {
+class Singleton_GetInstance_ReturnType extends Object implements DynamicMethodReturnTypeExtension,
+                                                                 DynamicStaticMethodReturnTypeExtension {
 
     const CLASS_NAME  = Singleton::class;
     const METHOD_NAME = 'getInstance';
@@ -41,6 +44,14 @@ class Singleton_GetInstance_ReturnType extends Object implements DynamicStaticMe
     /**
      * @return bool
      */
+    public function isMethodSupported(MethodReflection $methodReflection) : bool {
+        return $methodReflection->getName() === self::METHOD_NAME;
+    }
+
+
+    /**
+     * @return bool
+     */
     public function isStaticMethodSupported(MethodReflection $methodReflection) : bool {
         return $methodReflection->getName() === self::METHOD_NAME;
     }
@@ -49,8 +60,27 @@ class Singleton_GetInstance_ReturnType extends Object implements DynamicStaticMe
     /**
      * @return Type
      */
+    public function getTypeFromMethodCall(MethodReflection $methodReflection, MethodCall $methodCall, Scope $scope) : Type {
+        /*
+        if      (method_exists($scope, $method='getClassReflection')) $callee = $scope->$method()->getName();   // master
+        else if (method_exists($scope, $method='getClass'          )) $callee = $scope->$method();              // 0.6.x
+        else                                                          $callee = '(unknown callee)';
+        echoPre($callee.': '.baseName(self::CLASS_NAME).'->'.self::METHOD_NAME.'() => '.$methodReflection->getReturnType()->getClass());
+        */
+        return $methodReflection->getReturnType();
+    }
+
+
+    /**
+     * @return Type
+     */
     public function getTypeFromStaticMethodCall(MethodReflection $methodReflection, StaticCall $methodCall, Scope $scope) : Type {
-        //echoPre(__METHOD__.'()  '.$methodReflection->getName());
+        /*
+        if      (method_exists($scope, $method='getClassReflection')) $callee = $scope->$method()->getName();   // master
+        else if (method_exists($scope, $method='getClass'          )) $callee = $scope->$method();              // 0.6.x
+        else                                                          $callee = '(unknown callee)';
+        echoPre($callee.': '.baseName(self::CLASS_NAME).'->'.self::METHOD_NAME.'() => '.$methodReflection->getReturnType()->getClass());
+        */
 
         if (count($methodCall->args) === 0) {
             return $methodReflection->getReturnType();
