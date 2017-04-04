@@ -5,6 +5,7 @@ namespace rosasurfer\db\orm\phpstan;
 use PhpParser\Node\Name;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\StaticCall;
+use PhpParser\Node\Expr\Variable;
 
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
@@ -17,6 +18,7 @@ use PHPStan\Type\Type;
 use rosasurfer\core\Object;
 use rosasurfer\db\orm\PersistableObject;
 
+use function rosasurfer\_true;
 use function rosasurfer\echoPre;
 
 
@@ -60,7 +62,20 @@ class PersistableObject_Dao_ReturnType extends Object implements DynamicMethodRe
 
         $error = false;
 
-        if (0 || $error) echoPre($this->getScopeName($scope).': '.baseName(self::CLASS_NAME).'->'.self::METHOD_NAME.'() => '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
+        if ($methodCall->var instanceof Variable) {
+            $var = $methodCall->var;
+            if (is_string($var->name)) {
+                if ($var->name == 'this') {
+                    $scopeName = $this->getScopeName($scope);
+                    if ($scopeName != self::CLASS_NAME) {
+                        $returnClass = $scopeName.'DAO';
+                        $returnType  = $this->createObjectType($returnClass);
+                    }
+                } //else $error = _true(echoPre('cannot resolve callee of instance method call: variable "'.$var->name.'"'));
+            } else       $error = _true(echoPre('cannot resolve callee of instance method call: class($var->name)='.get_class($var->name)));
+        } else           $error = _true(echoPre('cannot resolve callee of instance method call: class($methodCall->var)='.get_class($methodCall->var)));
+
+        if (0 || $error)   echoPre($this->getScopeName($scope).': '.baseName(self::CLASS_NAME).'->'.self::METHOD_NAME.'() => '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
         if (0 && $error) { echoPre($methodCall); exit(); }
         return $returnType;
     }
@@ -87,16 +102,8 @@ class PersistableObject_Dao_ReturnType extends Object implements DynamicMethodRe
                     $returnClass = $scopeName.'DAO';
                     $returnType  = $this->createObjectType($returnClass);
                 }
-            }
-            else {
-                echoPre('cannot resolve callee of static method call: '.$name);
-                $error = true;
-            }
-        }
-        else {
-            echoPre('cannot resolve callee of static method call: '.get_class($methodCall->class));
-            $error = true;
-        }
+            } else $error = _true(echoPre('cannot resolve callee of static method call: name "'.$name.'"'));
+        } else     $error = _true(echoPre('cannot resolve callee of static method call: class($methodCall->class)='.get_class($methodCall->class)));
 
         if (0 || $error)   echoPre($this->getScopeName($scope).': '.baseName(self::CLASS_NAME).'::'.self::METHOD_NAME.'() => '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
         if (0 && $error) { echoPre($methodCall); exit(); }
