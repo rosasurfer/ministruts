@@ -21,7 +21,7 @@ define('rosasurfer\_CLI'      , !isSet($_SERVER['REQUEST_METHOD']));
 define('rosasurfer\_LOCALHOST', !_CLI && in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1', $_SERVER['SERVER_ADDR']]));
 define('rosasurfer\_WINDOWS'  , (strToUpper(subStr(PHP_OS, 0, 3))=='WIN'));
 
-const CLI       = _CLI;                                             // local constants improve IDE completion
+const CLI       = _CLI;                                             // local constants improve IDE code completion
 const LOCALHOST = _LOCALHOST;
 const WINDOWS   = _WINDOWS;
 

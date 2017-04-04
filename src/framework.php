@@ -15,7 +15,7 @@ use rosasurfer\loader\ClassLoader;
 
 
 define('rosasurfer\_MINISTRUTS_ROOT', dirName(__DIR__));
-const MINISTRUTS_ROOT = _MINISTRUTS_ROOT;                       // local constants improve IDE completion
+const MINISTRUTS_ROOT = _MINISTRUTS_ROOT;                       // local constants improve IDE code completion
 
 
 // Include helper functions and constants which can't be auto-loaded.
