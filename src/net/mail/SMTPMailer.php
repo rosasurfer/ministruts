@@ -11,7 +11,6 @@ use rosasurfer\exception\RuntimeException;
 
 use rosasurfer\log\Logger;
 use rosasurfer\util\Date;
-use \Exception;
 
 use function rosasurfer\normalizeEOL;
 use function rosasurfer\strContains;
@@ -129,7 +128,7 @@ class SMTPMailer extends Mailer {
         try {
             $this->disconnect();
         }
-        catch (Exception $ex) {
+        catch (\Exception $ex) {
             throw ErrorHandler::handleDestructorException($ex);
         }
     }

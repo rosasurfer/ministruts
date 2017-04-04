@@ -8,7 +8,6 @@ use rosasurfer\exception\RuntimeException;
 use rosasurfer\exception\error\PHPError;
 
 use rosasurfer\log\Logger;
-use \Exception;
 
 use function rosasurfer\strStartsWith;
 
@@ -120,7 +119,7 @@ class SystemFiveLock extends BaseLock {
         try {
             $this->release();
         }
-        catch (Exception $ex) {
+        catch (\Exception $ex) {
             throw ErrorHandler::handleDestructorException($ex);
         }
     }

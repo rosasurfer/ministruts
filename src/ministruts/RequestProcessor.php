@@ -7,7 +7,6 @@ use rosasurfer\log\Logger;
 
 use rosasurfer\net\http\HeaderUtils;
 use rosasurfer\net\http\HttpResponse;
-use \Exception;
 
 use function rosasurfer\strEndsWith;
 use function rosasurfer\strRightFrom;
@@ -448,7 +447,7 @@ PROCESS_METHOD_ERROR_SC_405;
             if ($forward === null)
                 self::$logInfo && Logger::log('ActionForward of NULL returned from Action::execute()', L_INFO);
         }
-        catch (Exception $ex) {
+        catch (\Exception $ex) {
             $throwable = $ex;    // evt. aufgetretene Exception zwischenspeichern
         }
 

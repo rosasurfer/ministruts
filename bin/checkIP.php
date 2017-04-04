@@ -2,7 +2,6 @@
 namespace rosasurfer\bin\check_ip;
 
 use rosasurfer\MiniStruts;
-use \Exception;
 
 use function rosasurfer\echoPre;
 
@@ -82,10 +81,10 @@ function getHeaderValue($names) {
     }
     elseif (is_array($names)) {
         foreach ($names as $name) {
-            if (!is_string($name)) throw new Exception('Illegal argument type in argument $names: '.getType($name));
+            if (!is_string($name)) throw new \Exception('Illegal argument type in argument $names: '.getType($name));
         }
     }
-    else throw new Exception('Illegal type of parameter $names: '.getType($names));
+    else throw new \Exception('Illegal type of parameter $names: '.getType($names));
 
     $headers = getHeaders($names);
     if ($headers)
@@ -107,10 +106,10 @@ function getHeaders($names = null) {
     elseif (is_string($names)) $names = array($names);
     elseif (is_array($names)) {
         foreach ($names as $name) {
-            if (!is_string($name)) throw new Exception('Illegal argument type in argument $names: '.getType($name));
+            if (!is_string($name)) throw new \Exception('Illegal argument type in argument $names: '.getType($name));
         }
     }
-    else throw new Exception('Illegal type of parameter $names: '.getType($names));
+    else throw new \Exception('Illegal type of parameter $names: '.getType($names));
 
     // einmal alle Header einlesen
     static $headers = null;
@@ -118,7 +117,7 @@ function getHeaders($names = null) {
         if (function_exists('getAllHeaders')) {
             $headers = apache_request_headers();
             if ($headers === false)
-                throw new Exception('Error reading request headers, getAllHeaders() returned: FALSE');
+                throw new \Exception('Error reading request headers, getAllHeaders() returned: FALSE');
         }
         else {
             $headers = array();

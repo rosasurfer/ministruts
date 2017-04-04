@@ -4,7 +4,6 @@ namespace rosasurfer\net\http;
 use rosasurfer\debug\ErrorHandler;
 use rosasurfer\exception\IOException;
 use rosasurfer\log\Logger;
-use \Exception;
 
 use const rosasurfer\L_INFO;
 use const rosasurfer\L_WARN;
@@ -145,7 +144,7 @@ class CurlHttpClient extends HttpClient {
                 curl_close($hTmp);
             }
         }
-        catch (Exception $ex) {
+        catch (\Exception $ex) {
             throw ErrorHandler::handleDestructorException($ex);
         }
     }

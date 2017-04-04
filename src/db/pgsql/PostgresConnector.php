@@ -8,8 +8,6 @@ use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\exception\RuntimeException;
 
-use \Exception;
-
 use function rosasurfer\strContains;
 use function rosasurfer\strStartsWithI;
 
@@ -420,7 +418,7 @@ class PostgresConnector extends Connector {
                 try {
                     $this->lastInsertId = $this->query('select lastVal()')->fetchInt();
                 }
-                catch (Exception $ex) {
+                catch (\Exception $ex) {
                     if (striPos($ex->getMessage(), 'ERROR:  lastval is not yet defined in this session') === false)
                         throw $ex;
                     $this->lastInsertId = 0;

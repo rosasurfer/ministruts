@@ -10,7 +10,6 @@ use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\exception\RuntimeException;
 
 use rosasurfer\monitor\FileDependency;
-use \Exception;
 
 use function rosasurfer\strLeftTo;
 use function rosasurfer\strRightFrom;
@@ -109,7 +108,7 @@ class StrutsController extends Singleton {
         catch (IRosasurferException $ex) {
             throw $ex->addMessage('Error loading config file "'.$file.'"');
         }
-        catch (Exception $ex) {
+        catch (\Exception $ex) {
             throw new RuntimeException('Error loading config file "'.$file.'"', null, $ex);
         }
     }

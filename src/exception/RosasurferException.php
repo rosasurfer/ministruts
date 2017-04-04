@@ -3,13 +3,12 @@ namespace rosasurfer\exception;
 
 use rosasurfer\debug\DebugHelper;
 use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
-use \Exception;
 
 
 /**
  * Base exception for all "rosasurfer" exceptions
  */
-class RosasurferException extends Exception implements IRosasurferException {
+class RosasurferException extends \Exception implements IRosasurferException {
 
     use RosasurferExceptionTrait;
 
@@ -21,11 +20,11 @@ class RosasurferException extends Exception implements IRosasurferException {
     /**
      * Create a new instance. Parameters are identical to the built-in PHP Exception and passed on.
      *
-     * @param  string|null    $message - exception description                           (default: none)
-     * @param  int|null       $code    - exception identifier, usually an application id (default: none)
-     * @param  Exception|null $cause   - another exception causing this exception        (default: none)
+     * @param  string|null     $message - exception description                           (default: none)
+     * @param  int|null        $code    - exception identifier, usually an application id (default: none)
+     * @param  \Exception|null $cause   - another exception causing this exception        (default: none)
      */
-    public function __construct($message=null, $code=null, Exception $cause=null) {
+    public function __construct($message=null, $code=null, \Exception $cause=null) {
         parent::__construct($message, $code, $cause);
     }
 

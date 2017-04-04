@@ -13,7 +13,6 @@ use rosasurfer\ministruts\url\Url;
 use rosasurfer\ministruts\url\VersionedUrl;
 
 use rosasurfer\util\Validator;
-use \Exception;
 
 
 // Whether or not we run on a command line interface, on localhost and/or on Windows.
@@ -823,7 +822,7 @@ function is_class($name) {
     try {
         return class_exists($name, true);
     }
-    catch (Exception $ex) {/* loaders might wrongly throw exceptions blocking us from continuation */}
+    catch (\Exception $ex) {/* loaders might wrongly throw exceptions blocking us from continuation */}
 
     return class_exists($name, false);
 }
@@ -842,7 +841,7 @@ function is_interface($name) {
     try {
         return interface_exists($name, true);
     }
-    catch (Exception $ex) {/* loaders might wrongly throw exceptions blocking us from continuation */}
+    catch (\Exception $ex) {/* loaders might wrongly throw exceptions blocking us from continuation */}
 
     return interface_exists($name, false);
 }
@@ -860,7 +859,7 @@ function is_trait($name) {
     try {
         return trait_exists($name, true);
     }
-    catch (Exception $ex) {/* loaders might wrongly throw exceptions blocking us from continuation */}
+    catch (\Exception $ex) {/* loaders might wrongly throw exceptions blocking us from continuation */}
 
     return trait_exists($name, false);
 }

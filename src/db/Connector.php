@@ -5,7 +5,6 @@ use rosasurfer\core\Object;
 use rosasurfer\db\ConnectorInterface as IConnector;
 use rosasurfer\debug\ErrorHandler;
 use rosasurfer\exception\InvalidArgumentException;
-use \Exception;
 
 
 /**
@@ -29,7 +28,7 @@ abstract class Connector extends Object implements ConnectorInterface {
                 $this->disconnect();
             }
         }
-        catch (Exception $ex) {
+        catch (\Exception $ex) {
             throw ErrorHandler::handleDestructorException($ex);
         }
     }

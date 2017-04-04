@@ -11,8 +11,6 @@ use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
 use rosasurfer\exception\UnimplementedFeatureException;
 
-use \DateTime;
-
 use function rosasurfer\is_class;
 
 use const rosasurfer\PHP_TYPE_ARRAY;

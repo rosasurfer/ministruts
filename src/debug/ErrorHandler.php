@@ -21,7 +21,6 @@ use rosasurfer\exception\error\PHPUserWarning;
 use rosasurfer\exception\error\PHPWarning;
 
 use rosasurfer\log\Logger;
-use \Exception;
 
 use function rosasurfer\_true;
 use function rosasurfer\echoPre;
@@ -227,9 +226,9 @@ class ErrorHandler extends StaticClass {
      * The exception is sent to the default logger with loglevel L_FATAL. After the handler returns PHP will terminate
      * the script.
      *
-     * @param Exception $exception - the unhandled exception
+     * @param  \Exception $exception - the unhandled exception
      */
-    public static function handleException(Exception $exception) {
+    public static function handleException(\Exception $exception) {
         //echoPre(__METHOD__.'()  '.$exception->getMessage());
         $context = [];
 
@@ -244,7 +243,7 @@ class ErrorHandler extends StaticClass {
 
         // Exceptions thrown from within the exception handler will not be passed back to the handler again. Instead the
         // script terminates with an uncatchable fatal error.
-        catch (Exception $secondary) {                      // the application is crashing, last try to log
+        catch (\Exception $secondary) {                     // the application is crashing, last try to log
             $indent = ' ';
 
             // secondary exception
@@ -290,13 +289,13 @@ class ErrorHandler extends StaticClass {
      * the exception is passed on to the regular exception handler and the script is terminated. If the script is currently
      * not in the shutdown phase this method ignores the exception. For an example see this package's README.
      *
-     * @param  Exception $exception
+     * @param  \Exception $exception
      *
-     * @return Exception - the same exception
+     * @return \Exception - the same exception
      *
      * @link   http://php.net/manual/en/language.oop5.decon.php
      */
-    public static function handleDestructorException(Exception $exception) {
+    public static function handleDestructorException(\Exception $exception) {
         if (self::isInShutdown()) {
             self::handleException($exception);
             exit(1);                                                // exit and signal the error

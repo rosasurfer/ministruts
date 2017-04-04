@@ -6,8 +6,6 @@ use rosasurfer\core\Object;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RuntimeException;
 
-use \Iterator;
-
 use const rosasurfer\db\orm\ID_PRIMARY;
 use const rosasurfer\db\orm\ID_VERSION;
 use const rosasurfer\db\orm\IDX_MAPPING_COLUMN_BEHAVIOR;
@@ -16,7 +14,7 @@ use const rosasurfer\db\orm\IDX_MAPPING_COLUMN_BEHAVIOR;
 /**
  * An EntityMapping is an object encapsulating meta information about how to map a database table to a PHP class.
  */
-class EntityMapping extends Object implements Iterator {
+class EntityMapping extends Object implements \Iterator {
 
 
     /** @var string - the entity's class name */

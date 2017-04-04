@@ -8,10 +8,8 @@ use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\UnimplementedFeatureException;
 
-use \Exception;
-
-use function rosasurfer\strToBool;
 use function rosasurfer\strIsNumeric;
+use function rosasurfer\strToBool;
 
 use const rosasurfer\ARRAY_BOTH;
 
@@ -39,7 +37,7 @@ abstract class Result extends Object implements ResultInterface {
         try {
             $this->release();
         }
-        catch (Exception $ex) {
+        catch (\Exception $ex) {
             throw ErrorHandler::handleDestructorException($ex);
         }
     }
