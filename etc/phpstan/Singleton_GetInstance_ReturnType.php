@@ -62,10 +62,10 @@ class Singleton_GetInstance_ReturnType extends Object implements DynamicMethodRe
      */
     public function getTypeFromMethodCall(MethodReflection $methodReflection, MethodCall $methodCall, Scope $scope) : Type {
         /*
-        if      (method_exists($scope, $method='getClassReflection')) $callee = $scope->$method()->getName();   // master
-        else if (method_exists($scope, $method='getClass'          )) $callee = $scope->$method();              // 0.6.x
-        else                                                          $callee = '(unknown callee)';
-        echoPre($callee.': '.baseName(self::CLASS_NAME).'->'.self::METHOD_NAME.'() => '.$methodReflection->getReturnType()->getClass());
+        if      (method_exists($scope, $method='getClassReflection')) $scopeClass = $scope->$method()->getName();   // master
+        else if (method_exists($scope, $method='getClass'          )) $scopeClass = $scope->$method();              // 0.6.x
+        else                                                          $scopeClass = '(unknown scope)';
+        echoPre($scopeClass.': '.baseName(self::CLASS_NAME).'->'.self::METHOD_NAME.'() => '.$methodReflection->getReturnType()->getClass());
         */
         return $methodReflection->getReturnType();
     }
@@ -76,10 +76,10 @@ class Singleton_GetInstance_ReturnType extends Object implements DynamicMethodRe
      */
     public function getTypeFromStaticMethodCall(MethodReflection $methodReflection, StaticCall $methodCall, Scope $scope) : Type {
         /*
-        if      (method_exists($scope, $method='getClassReflection')) $callee = $scope->$method()->getName();   // master
-        else if (method_exists($scope, $method='getClass'          )) $callee = $scope->$method();              // 0.6.x
-        else                                                          $callee = '(unknown callee)';
-        echoPre($callee.': '.baseName(self::CLASS_NAME).'->'.self::METHOD_NAME.'() => '.$methodReflection->getReturnType()->getClass());
+        if      (method_exists($scope, $method='getClassReflection')) $scopeClass = $scope->$method()->getName();   // master
+        else if (method_exists($scope, $method='getClass'          )) $scopeClass = $scope->$method();              // 0.6.x
+        else                                                          $scopeClass = '(unknown scope)';
+        echoPre($scopeClass.': '.baseName(self::CLASS_NAME).'::'.self::METHOD_NAME.'() => '.$methodReflection->getReturnType()->getClass());
         */
 
         if (count($methodCall->args) === 0) {

@@ -2,19 +2,22 @@
 
 namespace rosasurfer\db\orm\phpstan;
 
+use PhpParser\Node\Name;
+use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\StaticCall;
 
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
+
 use PHPStan\Type\DynamicMethodReturnTypeExtension;
 use PHPStan\Type\DynamicStaticMethodReturnTypeExtension;
+use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
 
 use rosasurfer\core\Object;
 use rosasurfer\db\orm\PersistableObject;
 
 use function rosasurfer\echoPre;
-use PhpParser\Node\Expr\MethodCall;
 
 
 class PersistableObject_Dao_ReturnType extends Object implements DynamicMethodReturnTypeExtension,
@@ -36,7 +39,7 @@ class PersistableObject_Dao_ReturnType extends Object implements DynamicMethodRe
      * @return bool
      */
     public function isMethodSupported(MethodReflection $methodReflection) : bool {
-        return $methodReflection->getName() === self::METHOD_NAME;
+        return $methodReflection->getName() == self::METHOD_NAME;
     }
 
 
@@ -44,7 +47,7 @@ class PersistableObject_Dao_ReturnType extends Object implements DynamicMethodRe
      * @return bool
      */
     public function isStaticMethodSupported(MethodReflection $methodReflection) : bool {
-        return $methodReflection->getName() === self::METHOD_NAME;
+        return $methodReflection->getName() == self::METHOD_NAME;
     }
 
 
@@ -52,13 +55,14 @@ class PersistableObject_Dao_ReturnType extends Object implements DynamicMethodRe
      * @return Type
      */
     public function getTypeFromMethodCall(MethodReflection $methodReflection, MethodCall $methodCall, Scope $scope) : Type {
-        /*
-        if      (method_exists($scope, $method='getClassReflection')) $callee = $scope->$method()->getName();   // master
-        else if (method_exists($scope, $method='getClass'          )) $callee = $scope->$method();              // 0.6.x
-        else                                                          $callee = '(unknown callee)';
-        echoPre($callee.': '.baseName(self::CLASS_NAME).'->'.self::METHOD_NAME.'() => '.$methodReflection->getReturnType()->getClass());
-        */
-        return $methodReflection->getReturnType();
+        $returnType  = $origReturnType  = $methodReflection->getReturnType();
+        $returnClass = $origReturnClass = $origReturnType->getClass();
+
+        $error = false;
+
+        if (0 || $error) echoPre($this->getScopeName($scope).': '.baseName(self::CLASS_NAME).'->'.self::METHOD_NAME.'() => '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
+        if (0 && $error) { echoPre($methodCall); exit(); }
+        return $returnType;
     }
 
 
@@ -66,12 +70,64 @@ class PersistableObject_Dao_ReturnType extends Object implements DynamicMethodRe
      * @return Type
      */
     public function getTypeFromStaticMethodCall(MethodReflection $methodReflection, StaticCall $methodCall, Scope $scope) : Type {
-        /*
-        if      (method_exists($scope, $method='getClassReflection')) $callee = $scope->$method()->getName();   // master
-        else if (method_exists($scope, $method='getClass'          )) $callee = $scope->$method();              // 0.6.x
-        else                                                          $callee = '(unknown callee)';
-        echoPre($callee.': '.baseName(self::CLASS_NAME).'->'.self::METHOD_NAME.'() => '.$methodReflection->getReturnType()->getClass());
-        */
-        return $methodReflection->getReturnType();
+        $returnType  = $origReturnType  = $methodReflection->getReturnType();
+        $returnClass = $origReturnClass = $origReturnType->getClass();
+
+        $error = false;
+
+        if ($methodCall->class instanceof Name) {
+            $name = $methodCall->class;
+            if ($name->isFullyQualified()) {
+                $returnClass = $name.'DAO';
+                $returnType  = $this->createObjectType($returnClass);
+            }
+            else if ((string)$name == 'self') {
+                $scopeName = $this->getScopeName($scope);
+                if ($scopeName != self::CLASS_NAME) {
+                    $returnClass = $scopeName.'DAO';
+                    $returnType  = $this->createObjectType($returnClass);
+                }
+            }
+            else {
+                echoPre('cannot resolve callee of static method call: '.$name);
+                $error = true;
+            }
+        }
+        else {
+            echoPre('cannot resolve callee of static method call: '.get_class($methodCall->class));
+            $error = true;
+        }
+
+        if (0 || $error)   echoPre($this->getScopeName($scope).': '.baseName(self::CLASS_NAME).'::'.self::METHOD_NAME.'() => '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
+        if (0 && $error) { echoPre($methodCall); exit(); }
+        return $returnType;
+    }
+
+
+    /**
+     * Return the name of the calling scope.
+     *
+     * @return string - class name or "{main}" for calls from outside a class; "(unknown)" in case of errors
+     */
+    private function getScopeName(Scope $scope) : string {
+        if (method_exists($scope, $method='getClass')) {                    // branch 0.6.x
+            $name = $scope->$method() ?: '{main}';
+        }
+        else if (method_exists($scope, $method='getClassReflection')) {     // branch master
+            $reflection = $scope->$method();
+            $name = $reflection ? $reflection->getName() : '{main}';
+        }
+        else {
+            $name = '(unknown)';
+        }
+        return $name;
+    }
+
+
+    /**
+     * @return ObjectType
+     */
+    private function createObjectType($class) : ObjectType {
+        return new ObjectType(...[$class, false]);                          // branches 0.6.x and master
     }
 }

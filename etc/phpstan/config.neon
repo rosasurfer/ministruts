@@ -48,7 +48,6 @@ parameters:
         - '/Parameter #[0-9]+ [^ ]+ of method [^ ]+ expects ([^ ]+)?\bscalar(\|[^|]+)*, (bool|int|float|string|null|([^ ]+)?scalar)(\|(bool|int|float|string|null|([^ ]+)?scalar))* given\b/'
 
         # unfixed PHPStan bugs 
-        - '/Call to an undefined method rosasurfer\\db\\orm\\PersistableObject::(beforeSave|afterSave|beforeInsert|afterInsert|beforeUpdate|afterUpdate|beforeDelete|afterDelete)\b/'
         - '/Cannot call method andDependency\(\) on null\b/'
         - '/rosasurfer\\net\\messenger\\im\\IRCMessenger::__construct\(\) does not call parent constructor from rosasurfer\\net\\messenger\\Messenger\b/'
         - '/Parameter #1 \$exception of static method rosasurfer\\debug\\DebugHelper::getBetterTraceAsString\(\) expects Exception, Exception\|rosasurfer\\exception\\error\\PHPError\|string given\b/'

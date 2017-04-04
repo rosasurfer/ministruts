@@ -164,7 +164,7 @@ abstract class PersistableObject extends Object {
      */
     public function save() {
         // execute an existing pre-processing hook
-        method_exists($this, 'beforeSave') && $this->beforeSave();
+        method_exists($this, $method='beforeSave') && $this->$method();
 
         if (!$this->isPersistent()) {
             $this->insert();
@@ -176,7 +176,7 @@ abstract class PersistableObject extends Object {
         $this->updateRelations();
 
         // execute an existing post-processing hook
-        method_exists($this, 'afterSave') && $this->afterSave();
+        method_exists($this, $method='afterSave') && $this->$method();
         return $this;
     }
 
@@ -188,7 +188,7 @@ abstract class PersistableObject extends Object {
      */
     protected function insert() {
         // execute an existing pre-processing hook
-        method_exists($this, 'beforeInsert') && $this->beforeInsert();
+        method_exists($this, $method='beforeInsert') && $this->$method();
 
         if ($this->isPersistent()) throw new RuntimeException('Cannot insert already persistent '.$this);
         $dao    = $this->dao();
@@ -209,7 +209,7 @@ abstract class PersistableObject extends Object {
             $this->$idName = $id;
 
         // execute an existing post-processing hook
-        method_exists($this, 'afterInsert') && $this->afterInsert();
+        method_exists($this, $method='afterInsert') && $this->$method();
         return $this;
     }
 
@@ -221,7 +221,7 @@ abstract class PersistableObject extends Object {
      */
     protected function update() {
         // execute an existing pre-processing hook
-        method_exists($this, 'beforeUpdate') && $this->beforeUpdate();
+        method_exists($this, $method='beforeUpdate') && $this->$method();
 
         $dao         = $this->dao();
         $entity      = $dao->getEntityMapping();
@@ -252,7 +252,7 @@ abstract class PersistableObject extends Object {
         $this->_modified      = false;
 
         // execute an existing post-processing hook
-        method_exists($this, 'afterUpdate') && $this->afterUpdate();
+        method_exists($this, $method='afterUpdate') && $this->$method();
         return $this;
     }
 
@@ -274,12 +274,12 @@ abstract class PersistableObject extends Object {
      */
     public function delete() {
         // execute an existing pre-processing hook
-        method_exists($this, 'beforeDelete') && $this->beforeDelete();
+        method_exists($this, $method='beforeDelete') && $this->$method();
 
         throw new UnimplementedFeatureException('You must implement '.get_class($this).'->'.__FUNCTION__.'() to delete a '.get_class($this).'.');
 
         // execute an existing post-processing hook
-        method_exists($this, 'afterDelete') && $this->afterDelete();
+        method_exists($this, $method='afterDelete') && $this->$method();
     }
 
 
