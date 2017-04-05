@@ -259,14 +259,15 @@ abstract class DAO extends Singleton {
 
         // collect identity infos
         $identity = $entity->getIdentity();
-        $idName   = $identity->getColumnName();
+        $idColumn = $identity->getColumnName();
         $idValue  = $identity->convertToSQL($object->getOid(), $db);
 
         // collect version infos
-        $versionName = $oldVersion = $newVersion = null;
+        $versionName = $versionColumn = $oldVersion = $newVersion = null;
         $version     = $entity->getVersion();
         if ($version) {
-            $versionName = $version->getPhpName();
+            $versionName   = $version->getPhpName();
+            $versionColumn = $version->getColumnName();
             unset($changes[$versionName], $changes[$identity->getPhpName()]);
 
             if (isSet($changes[$versionName])) {
@@ -277,7 +278,6 @@ abstract class DAO extends Singleton {
                 $newVersion = $changes['new.version'];
                 unset($changes['old.version'], $changes['new.version']);
                 $changes[$versionName] = $newVersion;
-                $versionName = $version->getColumnName();
             }
         }
 
@@ -290,10 +290,10 @@ abstract class DAO extends Singleton {
             $sql .= ' '.$columnName.' = '.$columnValue.',';         //        column2 = value2,
         }                                                           //        ...
         $sql  = strLeft($sql, -1);                                  //        ...
-        $sql .= ' where '.$idName.' = '.$idValue;                   //    where id = value
+        $sql .= ' where '.$idColumn.' = '.$idValue;                 //    where id = value
         if ($version) {                                             //        ...
             $op   = $oldVersion=='null' ? 'is':'=';                 //        ...
-            $sql .= ' and '.$versionName.' '.$op.' '.$oldVersion;   //      and version = oldVersion
+            $sql .= ' and '.$versionColumn.' '.$op.' '.$oldVersion; //      and version = oldVersion
         }
 
         // execute SQL and check for concurrent modifications
@@ -318,25 +318,19 @@ abstract class DAO extends Singleton {
         if (!$object->isPersistent())   throw new InvalidArgumentException('Cannot refresh non-persistent '.get_class($object));
 
         // TODO: This method cannot yet handle composite primary keys.
-        // TODO: Get PK value via __get() if the getter is not defined (causes crash otherwise).
 
-        $mapping = $this->getMapping();
-        $phpName = $columnName = null;
-
-        foreach ($mapping['columns'] as $phpName => $column) {
-            if ($column[IDX_MAPPING_COLUMN_BEHAVIOR] & ID_PRIMARY) {
-                $columnName = $column[IDX_MAPPING_COLUMN_NAME];
-                break;
-            }
-        }
-        $id = $object->{'get'.$phpName}();
+        $mapping  = $this->getEntityMapping();
+        $table    = $mapping->getTableName();
+        $identity = $mapping->getIdentity();
+        $column   = $identity->getColumnName();
+        $id       = $identity->convertToSQL($object->getOid(), $this->db());
 
         $sql = 'select *
-                 from '.$mapping['table'].'
-                 where '.$columnName.' = '.$id;
+                 from '.$table.'
+                 where '.$column.' = '.$id;
         $instance = $this->findOne($sql);
 
-        if (!$instance) throw new ConcurrentModificationException('Error refreshing '.get_class($object).' ('.$id.'), data record not found');
+        if (!$instance) throw new ConcurrentModificationException('Error refreshing '.get_class($object).' ('.$object->getOid().'), data record not found');
         return $instance;
     }
 }
