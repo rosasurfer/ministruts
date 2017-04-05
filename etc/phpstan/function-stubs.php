@@ -4,47 +4,64 @@ namespace {
 
     if (!function_exists('apache_request_headers')) {
         /**
-         * @return array|false
+         * @return array
          */
-        function apache_request_headers() {}
+        function apache_request_headers() {
+            return [];
+        }
     }
 
 
     if (!function_exists('apc_add')) {
         /**
-         * @param  string $key
-         * @param  mixed  $var
-         * @param  int    $ttl
-         * @return bool
+         * @param  string|array $key
+         * @param  mixed        $var
+         * @param  int          $ttl
+         *
+         * @return bool|array
          */
-        function apc_add($key, $var, $ttl = null) {}
+        function apc_add($key, $var, $ttl = null) {
+            return false;
+        }
 
         /**
          * @param  string $key
+         *
          * @return bool
          */
-        function apc_delete($key) {}
+        function apc_delete($key) {
+            return false;
+        }
 
         /**
          * @param string|string[] $keys
+         *
          * @return bool|string[]
          */
-        function apc_exists($keys) {}
+        function apc_exists($keys) {
+            return false;
+        }
 
         /**
          * @param  string|string[] $key
          * @param  bool            $success
+         *
          * @return mixed
          */
-        function apc_fetch($key, &$success = null) {}
+        function apc_fetch($key, &$success = null) {
+            return false;
+        }
 
         /**
-         * @param  string $key
-         * @param  mixed  $value
-         * @param  int    $ttl
-         * @return bool
+         * @param  string|array $key
+         * @param  mixed        $value
+         * @param  int          $ttl
+         *
+         * @return bool|array
          */
-        function apc_store($key, $value, $ttl = null) {}
+        function apc_store($key, $value, $ttl = null) {
+            return false;
+        }
     }
 
 
@@ -53,31 +70,43 @@ namespace {
          * @param  string|array $keys
          * @param  mixed        $values
          * @param  int          $ttl
+         *
          * @return bool|array
          */
-        function apcu_add($keys, $values, $ttl = null) {}
+        function apcu_add($keys, $values, $ttl = null) {
+            return false;
+        }
 
         /**
          * @param  string|string[] $key
          * @param  bool            $success
+         *
          * @return mixed
          */
-        function apcu_fetch($key, &$success = null) {}
+        function apcu_fetch($key, &$success = null) {
+            return false;
+        }
     }
 
 
     if (!function_exists('mysql_affected_rows')) {
         /**
          * @param  resource $link_identifier
+         *
          * @return int
          */
-        function mysql_affected_rows($link_identifier = null) {}
+        function mysql_affected_rows($link_identifier = null) {
+            return 0;
+        }
 
         /**
          * @param  resource $link_identifier
+         *
          * @return bool
          */
-        function mysql_close($link_identifier = null) {}
+        function mysql_close($link_identifier = null) {
+            return false;
+        }
 
         /**
          * @param  string $server
@@ -85,110 +114,185 @@ namespace {
          * @param  string $password
          * @param  bool   $new_link
          * @param  int    $client_flags
-         * @return resource|bool
+         *
+         * @return resource
          */
-        function mysql_connect($server = null, $username = null, $password = null, $new_link = null, $client_flags = null) {}
+        function mysql_connect($server = null, $username = null, $password = null, $new_link = null, $client_flags = null) {
+            /** @var resource $resource */
+            $resource = fOpen($fileName='', $mode='');
+            return $resource;
+        }
 
         /**
          * @param  resource $link_identifier
+         *
          * @return string
          */
-        function mysql_error($link_identifier = null) {}
+        function mysql_error($link_identifier = null) {
+            return '';
+        }
 
         /**
          * @param  resource $link_identifier
+         *
          * @return int
          */
-        function mysql_errno($link_identifier = null) {}
+        function mysql_errno($link_identifier = null) {
+            return 0;
+        }
 
         /**
          * @param  resource $result
          * @param  int      $result_type
-         * @return array|bool
+         *
+         * @return string[]|bool
          */
-        function mysql_fetch_array($result, $result_type = null) {}
+        function mysql_fetch_array($result, $result_type = null) {
+            return false;
+        }
+
 
         /**
          * @param  resource $result
+         *
          * @return bool
          */
-        function mysql_free_result($result) {}
+        function mysql_free_result($result) {
+            return false;
+        }
 
         /**
          * @param  resource $link_identifier
+         *
          * @return string
          */
-        function mysql_get_server_info($link_identifier = null) {}
+        function mysql_get_server_info($link_identifier = null) {
+            return '';
+        }
 
         /**
          * @param  resource $link_identifier
+         *
          * @return int
          */
-        function mysql_insert_id($link_identifier = null) {}
+        function mysql_insert_id($link_identifier = null) {
+            return 0;
+        }
 
         /**
          * @param  resource $result
+         *
          * @return int
          */
-        function mysql_num_fields($result) {}
+        function mysql_num_fields($result) {
+            return 0;
+        }
 
         /**
          * @param  resource $result
+         *
          * @return int
          */
-        function mysql_num_rows($result) {}
+        function mysql_num_rows($result) {
+            return 0;
+        }
 
         /**
          * @param  string   $query
          * @param  resource $link_identifier
+         *
          * @return resource|bool
          */
-        function mysql_query($query, $link_identifier = null) {}
+        function mysql_query($query, $link_identifier = null) {
+            return false;
+        }
 
         /**
          * @param  string   $unescaped_string
          * @param  resource $link_identifier
+         *
          * @return string
          */
-        function mysql_real_escape_string($unescaped_string, $link_identifier = null) {}
+        function mysql_real_escape_string($unescaped_string, $link_identifier = null) {
+            return '';
+        }
 
         /**
          * @param  string   $database_name
          * @param  resource $link_identifier
+         *
          * @return bool
          */
-        function mysql_select_db($database_name, $link_identifier = null) {}
+        function mysql_select_db($database_name, $link_identifier = null) {
+            return false;
+        }
 
         /**
          * @param  string   $charset
          * @param  resource $link_identifier
+         *
          * @return bool
          */
-        function mysql_set_charset($charset, $link_identifier = null) {}
+        function mysql_set_charset($charset, $link_identifier = null) {
+            return false;
+        }
+    }
+
+
+    if (!function_exists('pcntl_signal')) {
+        /**
+         * @param  int          $signo
+         * @param  callable|int $handler
+         * @param  bool         $restart_syscalls
+         *
+         * @return bool
+         */
+        function pcntl_signal($signo, $handler, $restart_syscalls = null) {
+            return false;
+        }
+
+        /**
+         * @return bool
+         */
+        function pcntl_signal_dispatch() {
+            return false;
+        }
     }
 
 
     if (!function_exists('sem_acquire')) {
         /**
          * @param  resource $sem_identifier
+         * @param  bool     $nowait
+         *
          * @return bool
          */
-        function sem_acquire($sem_identifier) {}
+        function sem_acquire($sem_identifier, $nowait = false) {
+            return false;
+        }
 
         /**
          * @param  int $key
          * @param  int $max_acquire
          * @param  int $perm
          * @param  int $auto_release
-         * @return resource|bool
+         *
+         * @return resource
          */
-        function sem_get($key, $max_acquire = null, $perm = null, $auto_release = null) {}
+        function sem_get($key, $max_acquire = null, $perm = null, $auto_release = null) {
+            /** @var resource $resource */
+            $resource = fOpen($fileName='', $mode='');
+            return $resource;
+        }
 
         /**
          * @param  resource $sem_identifier
+         *
          * @return bool
          */
-        function sem_remove($sem_identifier) {}
+        function sem_remove($sem_identifier) {
+            return false;
+        }
     }
 }
 
@@ -198,9 +302,12 @@ namespace rosasurfer\bin\check_dns {
     /**
      * @param  string $domain
      * @param  string $type
+     *
      * @return string
      */
-    function queryDNS($domain, $type) {}
+    function queryDNS($domain, $type) {
+        return '';
+    }
 }
 
 
@@ -209,31 +316,44 @@ namespace rosasurfer\bin\check_ip {
     /**
      * @return string
      */
-    function getForwardedRemoteAddress() {}
+    function getForwardedRemoteAddress() {
+        return '';
+    }
 
     /**
      * @param  string|array $names
+     *
      * @return array
      */
-    function getHeaders($names = null) {}
+    function getHeaders($names = null) {
+        return [];
+    }
 
     /**
      * @param  string|array $names
+     *
      * @return string
      */
-    function getHeaderValue($names) {}
+    function getHeaderValue($names) {
+        return '';
+    }
 
     /**
      * @return string
      */
-    function getRemoteAddress() {}
+    function getRemoteAddress() {
+        return '';
+    }
 
     /**
      * @param  string $string
      * @param  bool   $returnBytes
+     *
      * @return bool|array
      */
-    function isIPAddress($string, $returnBytes=false) {}
+    function isIPAddress($string, $returnBytes=false) {
+        return false;
+    }
 }
 
 
@@ -261,16 +381,22 @@ namespace rosasurfer\util\apc\apc {
     /**
      * @param  array $array1
      * @param  array $array2
+     *
      * @return int
      */
-    function block_sort($array1, $array2) {}
+    function block_sort($array1, $array2) {
+        return 0;
+    }
 
     /**
      * @param  int  $s
      * @param  bool $long
+     *
      * @return string
      */
-    function bsize($s, $long=true) {}
+    function bsize($s, $long=true) {
+        return '';
+    }
 
     /**
      * @param  string $name
@@ -280,9 +406,12 @@ namespace rosasurfer\util\apc\apc {
 
     /**
      * @param  int $ts
+     *
      * @return string
      */
-    function duration($ts) {}
+    function duration($ts) {
+        return '';
+    }
 
     /**
      * @param  resource $im
@@ -314,14 +443,19 @@ namespace rosasurfer\util\apc\apc {
     /**
      * @return bool
      */
-    function graphics_avail() {}
+    function graphics_avail() {
+        return false;
+    }
 
     /**
      * @param  string $ob
      * @param  string $text
+     *
      * @return string
      */
-    function menu_entry($ob, $text) {}
+    function menu_entry($ob, $text) {
+        return '';
+    }
 
     /**
      * @param  string $s
@@ -332,9 +466,12 @@ namespace rosasurfer\util\apc\apc {
      * @param  string $key
      * @param  string $text
      * @param  string $extra
+     *
      * @return string
      */
-    function sortheader($key, $text, $extra='') {}
+    function sortheader($key, $text, $extra='') {
+        return '';
+    }
 
     /**
      * @param  resource $im

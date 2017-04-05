@@ -17,6 +17,7 @@ use rosasurfer\phpstan\DynamicReturnType;
 use function rosasurfer\_true;
 use function rosasurfer\echoPre;
 use function rosasurfer\strLeft;
+use PHPStan\Type\ArrayType;
 
 
 class DAO_FindAll_ReturnType extends DynamicReturnType implements DynamicMethodReturnTypeExtension {
@@ -32,8 +33,9 @@ class DAO_FindAll_ReturnType extends DynamicReturnType implements DynamicMethodR
      * @return Type
      */
     public function getTypeFromMethodCall(MethodReflection $methodReflection, MethodCall $methodCall, Scope $scope) : Type {
-        $returnType  = $origReturnType  = $methodReflection->getReturnType();
-        $returnClass = $origReturnClass = $origReturnType->getItemType()->getClass().'[]';
+        /** @var ArrayType $returnType */
+        $returnType  = $methodReflection->getReturnType();
+        $returnClass = $origReturnClass = $returnType->getItemType()->getClass().'[]';
         $error = false;
 
         if ($methodCall->var instanceof Variable) {

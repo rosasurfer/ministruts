@@ -31,8 +31,8 @@ class DAO_Refresh_ReturnType extends DynamicReturnType implements DynamicMethodR
      * @return Type
      */
     public function getTypeFromMethodCall(MethodReflection $methodReflection, MethodCall $methodCall, Scope $scope) : Type {
-        $returnType  = $origReturnType  = $methodReflection->getReturnType();
-        $returnClass = $origReturnClass = $origReturnType->getClass();
+        $returnType  = $methodReflection->getReturnType();
+        $returnClass = $origReturnClass = $returnType->getClass();
         $error = false;
 
         if (sizeOf($methodCall->args)) {

@@ -34,8 +34,8 @@ class PersistableObject_Dao_ReturnType extends DynamicReturnType implements Dyna
      * @return Type
      */
     public function getTypeFromMethodCall(MethodReflection $methodReflection, MethodCall $methodCall, Scope $scope) : Type {
-        $returnType  = $origReturnType  = $methodReflection->getReturnType();
-        $returnClass = $origReturnClass = $origReturnType->getClass();
+        $returnType  = $methodReflection->getReturnType();
+        $returnClass = $origReturnClass = $returnType->getClass();
         $error = false;
 
         if ($methodCall->var instanceof Variable) {
@@ -63,8 +63,8 @@ class PersistableObject_Dao_ReturnType extends DynamicReturnType implements Dyna
      * @return Type
      */
     public function getTypeFromStaticMethodCall(MethodReflection $methodReflection, StaticCall $methodCall, Scope $scope) : Type {
-        $returnType  = $origReturnType  = $methodReflection->getReturnType();
-        $returnClass = $origReturnClass = $origReturnType->getClass();
+        $returnType  = $methodReflection->getReturnType();
+        $returnClass = $origReturnClass = $returnType->getClass();
         $error = false;
 
         if ($methodCall->class instanceof Name) {

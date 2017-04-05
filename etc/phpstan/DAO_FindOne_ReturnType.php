@@ -32,18 +32,17 @@ class DAO_FindOne_ReturnType extends DynamicReturnType implements DynamicMethodR
      * @return Type
      */
     public function getTypeFromMethodCall(MethodReflection $methodReflection, MethodCall $methodCall, Scope $scope) : Type {
-        $returnType  = $origReturnType  = $methodReflection->getReturnType();
-        $returnClass = $origReturnClass = $origReturnType->getClass();
+        $returnType  = $methodReflection->getReturnType();
+        $returnClass = $origReturnClass = $returnType->getClass();
         $error = false;
 
         if ($methodCall->var instanceof Variable) {
             $var = $methodCall->var;
             if (is_string($var->name)) {
                 if ($var->name == 'this') {
-                    $daoName = $this->getScopeName($scope);
-                    $class = strLeft($daoName, -3);
-                    if ($class) {
-                        $returnClass = $class;
+                    $daoClass = $this->getScopeName($scope);
+                    if ($daoClass != self::CLASS_NAME) {
+                        $returnClass = strLeft($daoClass, -3);
                         $returnType  = $this->createObjectType($returnClass);
                     }
                 } //else $error = _true(echoPre('cannot resolve callee of instance method call: $'.$var->name.'->'.self::METHOD_NAME.'()'));
