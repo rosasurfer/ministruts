@@ -31,7 +31,7 @@ abstract class Singleton extends Object {
      * @param  string $class - Klassennname
      * @param  ...           - variable number of parameters
      *
-     * @return static
+     * @return self
      */
     final public static function getInstance($class/*, ...*/) {
         if (isSet(self::$instances[$class]))

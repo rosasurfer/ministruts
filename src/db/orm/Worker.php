@@ -125,7 +125,9 @@ class Worker extends Object {
                 $offset    = $match[1];
                 $className = $namespace.$modelName;
                 if (is_a($className, PersistableObject::class, true)) {
-                    $table = $className::dao()->getMapping()['table'];
+                    /** @var DAO $dao */
+                    $dao   = $className::dao();
+                    $table = $dao->getMapping()['table'];
                     $sql   = substr_replace($sql, $table, $offset-1, strLen($modelName)+1);
                 }
             }
@@ -146,7 +148,7 @@ class Worker extends Object {
         // TODO: Prefer to return existing instance from IdentityMap
 
         $row = $result->fetchNext(ARRAY_ASSOC);
-        if ($row === null)
+        if (!$row)
             return null;
         return PersistableObject::createInstance($this->entityClass, $row);
     }
@@ -157,7 +159,7 @@ class Worker extends Object {
      *
      * @param  IResult $result
      *
-     * @return PersistableObject[] - arry of instances or an empty array if the result doesn't hold any more rows
+     * @return PersistableObject[] - array of instances or an empty array if the result doesn't hold any more rows
      */
     protected function makeObjects(IResult $result) {
 

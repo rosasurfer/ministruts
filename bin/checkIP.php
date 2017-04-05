@@ -116,11 +116,9 @@ function getHeaders($names = null) {
     if ($headers === null) {
         if (function_exists('getAllHeaders')) {
             $headers = apache_request_headers();
-            if ($headers === false)
-                throw new \Exception('Error reading request headers, getAllHeaders() returned: FALSE');
         }
         else {
-            $headers = array();
+            $headers = [];
             foreach ($_SERVER as $key => $value) {
                 if(subStr($key, 0, 5) == 'HTTP_') {
                     $key = strToLower(subStr($key, 5));
