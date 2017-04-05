@@ -51,9 +51,7 @@ class CurlHttpResponse extends HttpResponse {
 
 
     /**
-     * Gibt den HTTP-Status zurueck.
-     *
-     * @return int - Statuscode
+     * {@inheritdoc}
      */
     public function getStatus() {
         return $this->status;
@@ -61,11 +59,7 @@ class CurlHttpResponse extends HttpResponse {
 
 
     /**
-     * Ob ein Header mit dem angegebenen Namen existiert.
-     *
-     * @param  string $name - Name des Headers
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function isHeader($name) {
         return $this->headerParser->isHeader($name);
@@ -73,11 +67,7 @@ class CurlHttpResponse extends HttpResponse {
 
 
     /**
-     * Gibt den Header mit dem angegebenen Namen zurueck.
-     *
-     * @param  string $name - Name des Headers
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getHeader($name) {
         return $this->headerParser->getHeader($name);
@@ -85,9 +75,7 @@ class CurlHttpResponse extends HttpResponse {
 
 
     /**
-     * Gibt alle empfangenen Header zurueck.
-     *
-     * @return array - Array mit Headern
+     * {@inheritdoc}
      */
     public function getHeaders() {
         return $this->headerParser->getHeaders();
@@ -127,9 +115,7 @@ class CurlHttpResponse extends HttpResponse {
 
 
     /**
-     * Gibt den Content des HttpResponse zurueck.
-     *
-     * @return string - Content
+     * {@inheritdoc}
      */
     public function getContent() {
         return $this->content;

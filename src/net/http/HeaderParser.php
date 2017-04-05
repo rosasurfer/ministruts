@@ -10,7 +10,7 @@ use rosasurfer\core\Object;
 class HeaderParser extends Object {
 
 
-    /** @var string[]|string[][] */
+    /** @var array */
     private $headers = [];
 
     /** @var string */
@@ -76,7 +76,7 @@ class HeaderParser extends Object {
     /**
      * Gibt alle empfangenen Header zurueck.
      *
-     * @return array - assoziatives Array mit Headern (name => value)
+     * @return array - assoziatives Array mit Headern
      */
     public function getHeaders() {
         return $this->headers;
@@ -100,7 +100,7 @@ class HeaderParser extends Object {
      *
      * @param  string $name - Name des Headers
      *
-     * @return string
+     * @return string|string[]
      */
     public function getHeader($name) {
         return $this->headers[strToLower($name)];

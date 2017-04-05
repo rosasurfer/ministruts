@@ -14,7 +14,7 @@ use rosasurfer\di\DiAwareTrait;
 use rosasurfer\loader\ClassLoader;
 
 
-define('rosasurfer\_MINISTRUTS_ROOT', dirName(__DIR__));
+define(__NAMESPACE__.'\_MINISTRUTS_ROOT', dirName(__DIR__));
 const MINISTRUTS_ROOT = _MINISTRUTS_ROOT;                       // local constants improve IDE code completion
 
 

@@ -322,7 +322,7 @@ abstract class HttpResponse extends Object {
      *
      * @param  string $name - Name des Headers
      *
-     * @return mixed - String oder Array mit dem/den gefundenen Header(n)
+     * @return string|string[] - einzelner String oder String-Array mit den gefundenen Headern
      */
     abstract public function getHeader($name);
 

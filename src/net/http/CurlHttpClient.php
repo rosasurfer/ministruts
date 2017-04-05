@@ -208,6 +208,7 @@ class CurlHttpClient extends HttpClient {
             if ($this->manualRedirects >= $this->maxRedirects) throw new IOException('CURL error: maxRedirects limit exceeded - '.$this->maxRedirects.', url: '.$request->getUrl());
             $this->manualRedirects++;
 
+            /** @var string $location */
             $location = $response->getHeader('Location');                       // TODO: relative Redirects abfangen
             Logger::log('Performing manual redirect to: '.$location, L_INFO);   // TODO: verschachtelte IOExceptions abfangen
             $request  = HttpRequest::create()->setUrl($location);
