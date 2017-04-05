@@ -7,6 +7,9 @@ use PhpParser\Node\Expr\StaticCall;
 
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
+
+use PHPStan\Type\DynamicMethodReturnTypeExtension;
+use PHPStan\Type\DynamicStaticMethodReturnTypeExtension;
 use PHPStan\Type\Type;
 
 use rosasurfer\db\orm\PersistableObject;
@@ -15,8 +18,8 @@ use rosasurfer\phpstan\DynamicReturnType;
 use function rosasurfer\echoPre;
 
 
-class PersistableObject_CreateInstance_ReturnType extends DynamicReturnType {
-
+class PersistableObject_CreateInstance_ReturnType extends DynamicReturnType implements DynamicMethodReturnTypeExtension,
+                                                                                       DynamicStaticMethodReturnTypeExtension {
 
     const CLASS_NAME  = PersistableObject::class;
     const METHOD_NAME = 'createInstance';

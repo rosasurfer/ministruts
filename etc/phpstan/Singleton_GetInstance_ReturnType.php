@@ -15,6 +15,9 @@ use PhpParser\Node\Scalar\String_;
 
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
+
+use PHPStan\Type\DynamicStaticMethodReturnTypeExtension;
+use PHPStan\Type\DynamicMethodReturnTypeExtension;
 use PHPStan\Type\Type;
 
 use rosasurfer\core\Singleton;
@@ -26,13 +29,16 @@ use function rosasurfer\_true;
 use function rosasurfer\echoPre;
 
 
-class Singleton_GetInstance_ReturnType extends DynamicReturnType {
+class Singleton_GetInstance_ReturnType extends DynamicReturnType implements DynamicMethodReturnTypeExtension,
+                                                                            DynamicStaticMethodReturnTypeExtension {
 
     const CLASS_NAME  = Singleton::class;
     const METHOD_NAME = 'getInstance';
 
 
     /**
+     * Resolve the return type of an instance call to Singleton->getInstance().
+     *
      * @return Type
      */
     public function getTypeFromMethodCall(MethodReflection $methodReflection, MethodCall $methodCall, Scope $scope) : Type {
@@ -46,6 +52,8 @@ class Singleton_GetInstance_ReturnType extends DynamicReturnType {
 
 
     /**
+     * Resolve the return type of a static call to Singleton::getInstance().
+     *
      * @return Type
      */
     public function getTypeFromStaticMethodCall(MethodReflection $methodReflection, StaticCall $methodCall, Scope $scope) : Type {

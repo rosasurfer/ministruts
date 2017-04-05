@@ -6,6 +6,18 @@
 
 services:                                                           # loaded before auto-loading in "parameters" 
     -
+        class: rosasurfer\db\orm\phpstan\DAO_FindAll_ReturnType
+        tags:
+            - phpstan.broker.dynamicMethodReturnTypeExtension
+    -
+        class: rosasurfer\db\orm\phpstan\DAO_FindOne_ReturnType
+        tags:
+            - phpstan.broker.dynamicMethodReturnTypeExtension
+    -
+        class: rosasurfer\db\orm\phpstan\DAO_Refresh_ReturnType
+        tags:
+            - phpstan.broker.dynamicMethodReturnTypeExtension
+    -
         class: rosasurfer\db\orm\phpstan\PersistableObject_CreateInstance_ReturnType
         tags:
             - phpstan.broker.dynamicMethodReturnTypeExtension
@@ -20,7 +32,7 @@ services:                                                           # loaded bef
         tags:
             - phpstan.broker.dynamicMethodReturnTypeExtension
             - phpstan.broker.dynamicStaticMethodReturnTypeExtension
-            
+                                                
 parameters:
     autoload_files:
         - etc/phpstan/function-stubs.php                            # stubs for PHP extensions and procedural code
@@ -49,6 +61,7 @@ parameters:
 
         # unfixed PHPStan bugs 
         - '/Cannot call method andDependency\(\) on null\b/'
+        - '/Method DateTimeZone::getTransitions\(\) invoked with 0 parameters, 2 required./'
         - '/rosasurfer\\net\\messenger\\im\\IRCMessenger::__construct\(\) does not call parent constructor from rosasurfer\\net\\messenger\\Messenger\b/'
         - '/Parameter #1 \$exception of static method rosasurfer\\debug\\DebugHelper::getBetterTraceAsString\(\) expects Exception, Exception\|rosasurfer\\exception\\error\\PHPError\|string given\b/'
         - '/Parameter #1 \$mode of static method rosasurfer\\debug\\ErrorHandler::setupErrorHandling\(\) expects int, int\|null given\b/'

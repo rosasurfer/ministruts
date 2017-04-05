@@ -4,17 +4,15 @@ namespace rosasurfer\phpstan;
 
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
-
-use PHPStan\Type\DynamicMethodReturnTypeExtension;
-use PHPStan\Type\DynamicStaticMethodReturnTypeExtension;
 use PHPStan\Type\ObjectType;
 
 use rosasurfer\core\Object;
 use rosasurfer\exception\RuntimeException;
+use PHPStan\Type\ArrayType;
 
 
-abstract class DynamicReturnType extends Object implements DynamicMethodReturnTypeExtension,
-                                                           DynamicStaticMethodReturnTypeExtension {
+abstract class DynamicReturnType extends Object {
+
 
     const CLASS_NAME  = null;
     const METHOD_NAME = null;
@@ -74,5 +72,16 @@ abstract class DynamicReturnType extends Object implements DynamicMethodReturnTy
      */
     protected function createObjectType($class) : ObjectType {
         return new ObjectType(...[$class, false]);                          // branches 0.6.x and master
+    }
+
+
+    /**
+     * Return a new {@link ArrayType}.
+     *
+     * @return ArrayType
+     */
+    protected function createArrayType($class) : ArrayType {
+        $objectType = $this->createObjectType($class);
+        return new ArrayType($objectType, false);
     }
 }

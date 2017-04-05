@@ -9,6 +9,9 @@ use PhpParser\Node\Expr\Variable;
 
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
+
+use PHPStan\Type\DynamicMethodReturnTypeExtension;
+use PHPStan\Type\DynamicStaticMethodReturnTypeExtension;
 use PHPStan\Type\Type;
 
 use rosasurfer\db\orm\PersistableObject;
@@ -18,8 +21,8 @@ use function rosasurfer\_true;
 use function rosasurfer\echoPre;
 
 
-class PersistableObject_Dao_ReturnType extends DynamicReturnType {
-
+class PersistableObject_Dao_ReturnType extends DynamicReturnType implements DynamicMethodReturnTypeExtension,
+                                                                            DynamicStaticMethodReturnTypeExtension {
 
     const CLASS_NAME  = PersistableObject::class;
     const METHOD_NAME = 'dao';
@@ -33,7 +36,6 @@ class PersistableObject_Dao_ReturnType extends DynamicReturnType {
     public function getTypeFromMethodCall(MethodReflection $methodReflection, MethodCall $methodCall, Scope $scope) : Type {
         $returnType  = $origReturnType  = $methodReflection->getReturnType();
         $returnClass = $origReturnClass = $origReturnType->getClass();
-
         $error = false;
 
         if ($methodCall->var instanceof Variable) {
@@ -63,7 +65,6 @@ class PersistableObject_Dao_ReturnType extends DynamicReturnType {
     public function getTypeFromStaticMethodCall(MethodReflection $methodReflection, StaticCall $methodCall, Scope $scope) : Type {
         $returnType  = $origReturnType  = $methodReflection->getReturnType();
         $returnClass = $origReturnClass = $origReturnType->getClass();
-
         $error = false;
 
         if ($methodCall->class instanceof Name) {
