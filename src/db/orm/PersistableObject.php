@@ -71,7 +71,7 @@ abstract class PersistableObject extends Object {
     /**
      * Return the instance's version value (if any).
      *
-     * @return mixed - version value or NULL if the entity class is not versioned
+     * @return mixed|null - version value or NULL if the entity class is not versioned
      */
     final public function getOversion() {
         $entity  = $this->dao()->getEntityMapping();
