@@ -7,71 +7,47 @@ use PhpParser\Node\Expr\StaticCall;
 
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
-use PHPStan\Type\DynamicMethodReturnTypeExtension;
-use PHPStan\Type\DynamicStaticMethodReturnTypeExtension;
 use PHPStan\Type\Type;
 
-use rosasurfer\core\Object;
 use rosasurfer\db\orm\PersistableObject;
+use rosasurfer\phpstan\DynamicReturnType;
 
 use function rosasurfer\echoPre;
 
 
-class PersistableObject_CreateInstance_ReturnType extends Object implements DynamicMethodReturnTypeExtension,
-                                                                            DynamicStaticMethodReturnTypeExtension {
+class PersistableObject_CreateInstance_ReturnType extends DynamicReturnType {
+
 
     const CLASS_NAME  = PersistableObject::class;
     const METHOD_NAME = 'createInstance';
 
 
     /**
-     * @return string
-     */
-    public static function getClass() : string {
-        return self::CLASS_NAME;
-    }
-
-
-    /**
-     * @return bool
-     */
-    public function isMethodSupported(MethodReflection $methodReflection) : bool {
-        return $methodReflection->getName() === self::METHOD_NAME;
-    }
-
-
-	/**
-     * @return bool
-     */
-    public function isStaticMethodSupported(MethodReflection $methodReflection) : bool {
-        return $methodReflection->getName() === self::METHOD_NAME;
-    }
-
-
-    /**
+     * Resolve the return type of an instance call to PersistableObject->createInstance().
+     *
      * @return Type
      */
     public function getTypeFromMethodCall(MethodReflection $methodReflection, MethodCall $methodCall, Scope $scope) : Type {
-        /*
-        if      (method_exists($scope, $method='getClassReflection')) $scopeClass = $scope->$method()->getName();   // master
-        else if (method_exists($scope, $method='getClass'          )) $scopeClass = $scope->$method();              // 0.6.x
-        else                                                          $scopeClass = '(unknown scope)';
-        echoPre($scopeClass.': '.baseName(self::CLASS_NAME).'->'.self::METHOD_NAME.'() => '.$methodReflection->getReturnType()->getClass());
-        */
-        return $methodReflection->getReturnType();
+        $returnType  = $origReturnType  = $methodReflection->getReturnType();
+        $returnClass = $origReturnClass = $origReturnType->getClass();
+        $error = false;
+        if (0 || $error)   echoPre($this->getScopeName($scope).': '.baseName(self::CLASS_NAME).'->'.self::METHOD_NAME.'() => '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
+        if (0 && $error) { echoPre($methodCall); exit(); }
+        return $returnType;
     }
 
 
     /**
+     * Resolve the return type of a static call to PersistableObject::createInstance().
+     *
      * @return Type
      */
     public function getTypeFromStaticMethodCall(MethodReflection $methodReflection, StaticCall $methodCall, Scope $scope) : Type {
-        /*
-        if      (method_exists($scope, $method='getClassReflection')) $scopeClass = $scope->$method()->getName();   // master
-        else if (method_exists($scope, $method='getClass'          )) $scopeClass = $scope->$method();              // 0.6.x
-        else                                                          $scopeClass = '(unknown scope)';
-        echoPre($scopeClass.': '.baseName(self::CLASS_NAME).'::'.self::METHOD_NAME.'() => '.$methodReflection->getReturnType()->getClass());
-        */
-        return $methodReflection->getReturnType();
+        $returnType  = $origReturnType  = $methodReflection->getReturnType();
+        $returnClass = $origReturnClass = $origReturnType->getClass();
+        $error = false;
+        if (0 || $error)   echoPre($this->getScopeName($scope).': '.baseName(self::CLASS_NAME).'::'.self::METHOD_NAME.'() => '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
+        if (0 && $error) { echoPre($methodCall); exit(); }
+        return $returnType;
     }
 }
