@@ -263,8 +263,8 @@ abstract class DAO extends Singleton {
         $idValue  = $identity->convertToSQL($object->getOid(), $db);
 
         // collect version infos
-        $versionName = $versionColumn = $oldVersion = $newVersion = null;
-        $version     = $entity->getVersion();
+        $versionColumn = $oldVersion = $newVersion = null;
+        $version = $entity->getVersion();
         if ($version) {
             $versionName   = $version->getPhpName();
             $versionColumn = $version->getColumnName();
