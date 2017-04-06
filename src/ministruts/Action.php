@@ -69,7 +69,7 @@ abstract class Action extends Object {
      * @param  Request  $request
      * @param  Response $response
      *
-     * @return ActionForward|string
+     * @return ActionForward|string|null
      */
     abstract public function execute(Request $request, Response $response);
 

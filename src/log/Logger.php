@@ -624,7 +624,7 @@ class Logger extends StaticClass {
             $text = '['.strToUpper(self::$logLevels[$level]).'] '.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
         }
         else {
-            /** @var \Exception $loggable */            // help static analysers
+            /** @var \Exception $loggable */
             $loggable = $loggable;
             $type = null;
             $msg  = trim(DebugHelper::composeBetterMessage($loggable, $indent));

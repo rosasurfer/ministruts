@@ -37,7 +37,7 @@ abstract class ActionForm extends Object {
 
 
     /**
-     * Liest die im Request uebergebenen Parameter ein.  Muss anwendungsabhaengig implementiert werden.
+     * Liest die im Request uebergebenen Parameter ein. Muss implementiert werden.
      *
      * @param  Request $request - der aktuelle Request
      *
@@ -47,10 +47,9 @@ abstract class ActionForm extends Object {
 
 
     /**
-     * Ob die eingelesenen Parameter gueltig sind. Muss anwendungsabhaengig ueberschrieben werden.
+     * Ob die eingelesenen Parameter gueltig sind. Muss ueberschrieben werden.
      *
      * @return bool - TRUE, wenn die uebergebenen Parameter gueltig sind, FALSE andererseits
-     *                (diese Default-Implementierung gibt immer TRUE zurueck)
      */
     public function validate() {
         return true;
