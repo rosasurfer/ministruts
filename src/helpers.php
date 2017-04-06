@@ -127,7 +127,7 @@ function echof($var, $flushBuffers=true) {
 
 
 /**
- * Alias for printPretty($var, false, $flushBuffers)
+ * Alias of printPretty($var, false, $flushBuffers)
  *
  * Prints a variable in a pretty way. Output always ends with a line feed.
  *
@@ -142,7 +142,7 @@ function echoPre($var, $flushBuffers=true) {
 
 
 /**
- * Alias for printPretty()
+ * Alias of printPretty()
  *
  * Prints a variable in a pretty way. Output always ends with a line feed.
  *
@@ -633,7 +633,7 @@ function strIsQuoted($value) {
 function strIsSingleQuoted($value) {
     if (!is_string($value))
         return false;
-    return (($len=strLen($value))>1 && $value{0}=="'" && $value{--$len}=="'");
+    return (($len=strLen($value))>1 && $value[0]=="'" && $value{--$len}=="'");
 }
 
 
@@ -647,7 +647,7 @@ function strIsSingleQuoted($value) {
 function strIsDoubleQuoted($value) {
     if (!is_string($value))
         return false;
-    return (($len=strLen($value))>1 && $value{0}=='"' && $value{--$len}=='"');
+    return (($len=strLen($value))>1 && $value[0]=='"' && $value{--$len}=='"');
 }
 
 
@@ -782,7 +782,7 @@ function normalizeEOL($string, $mode = EOL_UNIX) {
 
 
 /**
- * Alias for getType() for C/C++ enthusiasts.
+ * Alias of getType() for C/C++ enthusiasts.
  *
  * @param  mixed $var
  *

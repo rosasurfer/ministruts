@@ -103,7 +103,7 @@ function echof($var, $flushBuffers=true) {
 
 
 /**
- * Alias for printPretty($var, false, $flushBuffers)
+ * Alias of printPretty($var, false, $flushBuffers)
  *
  * Prints a variable in a pretty way. Output always ends with a line feed.
  *
@@ -118,7 +118,7 @@ function echoPre($var, $flushBuffers=true) {
 
 
 /**
- * Alias for {@link printPretty()}
+ * Alias of {@link printPretty()}
  *
  * Prints a variable in a pretty way. Output always ends with a line feed.
  *
@@ -493,7 +493,7 @@ function normalizeEOL($string, $mode = EOL_UNIX) {
 
 
 /**
- * Alias for getType() for C/C++ enthusiasts.
+ * Alias of getType() for C/C++ enthusiasts.
  *
  * @param  mixed $var
  *

@@ -58,7 +58,7 @@ class FileDependency extends Dependency {
         else {                                    // nicht existierende Datei
             $name = str_replace('\\', '/', $fileName);
 
-            if ((WINDOWS && !preg_match('/^[a-z]:/i', $name)) || (!WINDOWS && $name{0}!='/'))
+            if ((WINDOWS && !preg_match('/^[a-z]:/i', $name)) || (!WINDOWS && $name[0]!='/'))
                 $name = getCwd().'/'.$name;         // relativer Pfad: absoluten Pfad erzeugen, da Arbeitsverzeichnis wechseln kann
 
             $this->fileName     = str_replace('/', DIRECTORY_SEPARATOR, $name);

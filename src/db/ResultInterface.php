@@ -25,10 +25,10 @@ interface ResultInterface {
     /**
      * Fetch a single field from the result set.
      *
-     * @param  string|int $column       - name or offset of the column to fetch from (default: 0)
-     * @param  int|null   $row          - row to fetch from, starting at 0 (default: the next row)
-     * @param  mixed      $onNull       - value to return if the cell value is NULL (default: NULL)
-     * @param  mixed      $onNoMoreRows - value to return if no more rows are available
+     * @param  string|int|null $column       - name or offset of the column to fetch from (default: 0)
+     * @param  int|null        $row          - row to fetch from, starting at 0 (default: the next row)
+     * @param  mixed           $onNull       - value to return if the cell value is NULL (default: NULL)
+     * @param  mixed           $onNoMoreRows - value to return if no more rows are available
      *
      * @return mixed - value of a single cell (driver dependent type) or $onNull if the cell value is NULL
      *

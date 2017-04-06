@@ -197,7 +197,7 @@ final class FileSystemCache extends CachePeer {
      */
     private function getFilePath($key) {
         $key = md5($key);
-        return $this->directory.$key{0}.DIRECTORY_SEPARATOR.$key{1}.DIRECTORY_SEPARATOR.subStr($key, 2);
+        return $this->directory.$key[0].DIRECTORY_SEPARATOR.$key[1].DIRECTORY_SEPARATOR.subStr($key, 2);
     }
 
 
