@@ -52,7 +52,7 @@ abstract class Result extends Object implements ResultInterface {
         // Generic default implementation:
         // A connector-specific implementation will be faster and more efficient.
 
-        $row = $this->fetchNext(ARRAY_BOTH);            // field types depend on the DBMS/driver
+        $row = $this->fetchRow(ARRAY_BOTH);             // field types depend on the DBMS/driver
 
         if (!$row) {
             if (func_num_args() < 4) throw new NoMoreRowsException();

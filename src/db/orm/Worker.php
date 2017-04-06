@@ -56,7 +56,7 @@ class Worker extends Object {
      * @throws MultipleRowsException if the query returned multiple rows and $allowMany was not set to TRUE.
      */
     public function findOne($query, $allowMany=false) {     // TODO: numRows() is not available on SQLite or with PDO, the emulation is slow.
-        $result = $this->query($query);                     //       the check can be improved by fetchNext() when reset(-1) and internal record
+        $result = $this->query($query);                     //       the check can be improved by fetchRow() when reset(-1) and internal record
                                                             //       caching are implemented.
         $object = $this->makeObject($result);
         if ($object && !$allowMany && $result->numRows() > 1) throw new MultipleRowsException();
@@ -147,7 +147,7 @@ class Worker extends Object {
 
         // TODO: Prefer to return existing instance from IdentityMap
 
-        $row = $result->fetchNext(ARRAY_ASSOC);
+        $row = $result->fetchRow(ARRAY_ASSOC);
         if (!$row)
             return null;
         return PersistableObject::createInstance($this->entityClass, $row);
@@ -166,7 +166,7 @@ class Worker extends Object {
         // TODO: Prefer to return existing instances from IdentityMap
 
         $instances = [];
-        while ($row = $result->fetchNext(ARRAY_ASSOC)) {
+        while ($row = $result->fetchRow(ARRAY_ASSOC)) {
             $instances[] = PersistableObject::createInstance($this->entityClass, $row);
         }
         return $instances;

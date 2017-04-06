@@ -91,7 +91,7 @@ class PostgresResult extends Result {
     /**
      * {@inheritdoc}
      */
-    public function fetchNext($mode=ARRAY_BOTH) {
+    public function fetchRow($mode=ARRAY_BOTH) {
         if (!$this->hResult || $this->nextRowIndex < 0)
             return null;
 

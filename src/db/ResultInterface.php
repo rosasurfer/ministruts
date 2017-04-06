@@ -19,7 +19,7 @@ interface ResultInterface {
      *
      * @return array|null - array of columns or NULL if no more rows are available
      */
-    public function fetchNext($mode=ARRAY_BOTH);
+    public function fetchRow($mode=ARRAY_BOTH);
 
 
     /**
@@ -84,7 +84,7 @@ interface ResultInterface {
      * @throws NoMoreRowsException       if no more rows are available and parameter $onNoMoreRows was not set.
      * @throws \UnexpectedValueException if the cell value is not NULL and does not represent an integer. The accepted
      *                                   floating point values must have a fractional part equal to 0 (zero).
-     *                                   Use "self::fetchFloat()" to interpret more floating point values as integer.
+     *                                   Use <tt>self::fetchFloat()</tt> to interpret more floating point values as integer.
      */
     public function fetchInt($column=0, $row=null, $onNull=null, $onNoMoreRows=null);
 

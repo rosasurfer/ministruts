@@ -61,9 +61,9 @@ abstract class PersistableObject extends Object {
      *
      * @return mixed - identity value
      */
-    final public function getOid() {
+    final public function getObjectId() {
         $entity = $this->dao()->getEntityMapping();
-        $idName = $entity->getIdentity()->getPhpName();
+        $idName = $entity->getIdentityMapping()->getPhpName();
         return $this->$idName;
     }
 
@@ -73,9 +73,9 @@ abstract class PersistableObject extends Object {
      *
      * @return mixed|null - version value or NULL if the entity class is not versioned
      */
-    final public function getOversion() {
+    final public function getObjectVersion() {
         $entity  = $this->dao()->getEntityMapping();
-        $version = $entity->getVersion();
+        $version = $entity->getVersionMapping();
         if ($version) {
             $versionName = $version->getPhpName();
             return $this->$versionName;
@@ -202,7 +202,7 @@ abstract class PersistableObject extends Object {
         $id = $dao->doInsert($values);
 
         // assign the returned identity value
-        $idName = $entity->getIdentity()->getPhpName();
+        $idName = $entity->getIdentityMapping()->getPhpName();
         if ($this->$idName === null)
             $this->$idName = $id;
 
@@ -234,7 +234,7 @@ abstract class PersistableObject extends Object {
 
         // check versioning and add old/new version values
         if ($changes && $versioned) {
-            $versionName = $entity->getVersion()->getPhpName();
+            $versionName = $entity->getVersionMapping()->getPhpName();
             $changes['old.version'] = $this->$versionName;
             $changes['new.version'] = $this->generateVersion();
         }

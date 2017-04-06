@@ -210,7 +210,7 @@ abstract class DAO extends Singleton {
         $db       = $this->db();
         $entity   = $this->getEntityMapping();
         $table    = $entity->getTableName();
-        $identity = $entity->getIdentity();
+        $identity = $entity->getIdentityMapping();
         $idName   = $identity->getPhpName();
         $idValue  = null;
         if (isSet($values[$idName])) $idValue = $values[$idName];
@@ -221,7 +221,7 @@ abstract class DAO extends Singleton {
         foreach ($values as $name => &$value) {
             $property  = $entity->getProperty($name);
             $columns[] = $property->getColumnName();
-            $value     = $property->convertToSQL($value, $db);
+            $value     = $property->convertToSQLValue($value, $db);
         }; unset($value);
 
         // create SQL statement
@@ -258,23 +258,23 @@ abstract class DAO extends Singleton {
         $table  = $entity->getTableName();
 
         // collect identity infos
-        $identity = $entity->getIdentity();
+        $identity = $entity->getIdentityMapping();
         $idColumn = $identity->getColumnName();
-        $idValue  = $identity->convertToSQL($object->getOid(), $db);
+        $idValue  = $identity->convertToSQLValue($object->getObjectId(), $db);
 
         // collect version infos
         $versionColumn = $oldVersion = $newVersion = null;
-        $version = $entity->getVersion();
+        $version = $entity->getVersionMapping();
         if ($version) {
             $versionName   = $version->getPhpName();
             $versionColumn = $version->getColumnName();
             unset($changes[$versionName], $changes[$identity->getPhpName()]);
 
             if (isSet($changes[$versionName])) {
-                $version = null;                                    // TODO: throw exception
+                $version = null;                                        // TODO: throw exception
             }
             else {
-                $oldVersion = $version->convertToSQL($changes['old.version'], $db);
+                $oldVersion = $version->convertToSQLValue($changes['old.version'], $db);
                 $newVersion = $changes['new.version'];
                 unset($changes['old.version'], $changes['new.version']);
                 $changes[$versionName] = $newVersion;
@@ -282,24 +282,24 @@ abstract class DAO extends Singleton {
         }
 
         // create SQL
-        $sql = 'update '.$table.' set';                             // update table
-        foreach ($changes as $name => $value) {                     //    set ...
-            $property    = $entity->getProperty($name);             //        ...
-            $columnName  = $property->getColumnName();              //        ...
-            $columnValue = $property->convertToSQL($value, $db);    //        column1 = value1,
-            $sql .= ' '.$columnName.' = '.$columnValue.',';         //        column2 = value2,
-        }                                                           //        ...
-        $sql  = strLeft($sql, -1);                                  //        ...
-        $sql .= ' where '.$idColumn.' = '.$idValue;                 //    where id = value
-        if ($version) {                                             //        ...
-            $op   = $oldVersion=='null' ? 'is':'=';                 //        ...
-            $sql .= ' and '.$versionColumn.' '.$op.' '.$oldVersion; //      and version = oldVersion
+        $sql = 'update '.$table.' set';                                 // update table
+        foreach ($changes as $name => $value) {                         //    set ...
+            $property    = $entity->getProperty($name);                 //        ...
+            $columnName  = $property->getColumnName();                  //        ...
+            $columnValue = $property->convertToSQLValue($value, $db);   //        column1 = value1,
+            $sql .= ' '.$columnName.' = '.$columnValue.',';             //        column2 = value2,
+        }                                                               //        ...
+        $sql  = strLeft($sql, -1);                                      //        ...
+        $sql .= ' where '.$idColumn.' = '.$idValue;                     //    where id = value
+        if ($version) {                                                 //        ...
+            $op   = $oldVersion=='null' ? 'is':'=';                     //        ...
+            $sql .= ' and '.$versionColumn.' '.$op.' '.$oldVersion;     //      and version = oldVersion
         }
 
         // execute SQL and check for concurrent modifications
         if ($db->execute($sql)->lastAffectedRows() != 1) {
             $found = $this->refresh($object);
-            throw new ConcurrentModificationException('Error updating '.get_class($object).' (oid='.$object->getOid().'), expected version: '.$oldVersion.', found version: '.$found->getOversion());
+            throw new ConcurrentModificationException('Error updating '.get_class($object).' (oid='.$object->getObjectId().'), expected version: '.$oldVersion.', found version: '.$found->getObjectVersion());
         }
         return $newVersion;
     }
@@ -321,16 +321,16 @@ abstract class DAO extends Singleton {
 
         $mapping  = $this->getEntityMapping();
         $table    = $mapping->getTableName();
-        $identity = $mapping->getIdentity();
+        $identity = $mapping->getIdentityMapping();
         $column   = $identity->getColumnName();
-        $id       = $identity->convertToSQL($object->getOid(), $this->db());
+        $id       = $identity->convertToSQLValue($object->getObjectId(), $this->db());
 
         $sql = 'select *
                  from '.$table.'
                  where '.$column.' = '.$id;
         $instance = $this->findOne($sql);
 
-        if (!$instance) throw new ConcurrentModificationException('Error refreshing '.get_class($object).' ('.$object->getOid().'), data record not found');
+        if (!$instance) throw new ConcurrentModificationException('Error refreshing '.get_class($object).' ('.$object->getObjectId().'), data record not found');
         return $instance;
     }
 }

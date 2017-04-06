@@ -79,7 +79,7 @@ class SQLiteResult extends Result {
      *
      * {@inheritdoc}
      */
-    public function fetchNext($mode=ARRAY_BOTH) {
+    public function fetchRow($mode=ARRAY_BOTH) {
         if (!$this->result || $this->nextRowIndex < 0)        // no automatic result reset()
             return null;
 
@@ -140,14 +140,15 @@ class SQLiteResult extends Result {
             // no support for num_rows() in SQLite3, need to count manually
             $previous = $this->nextRowIndex;
 
-            while ($this->fetchNext());                        // loop from current position to the end
+            while ($this->fetchRow());                          // loop from current position to the end
 
             // we hit the end
             if ($this->numRows) {
                 $this->result->reset();                         // back to start
                 $this->nextRowIndex = 0;
-                while ($previous--)                             // loop back to former position
-                    $this->fetchNext();
+                while ($previous--) {                           // loop back to former position
+                    $this->fetchRow();
+                }
             }
         }
         return $this->numRows;

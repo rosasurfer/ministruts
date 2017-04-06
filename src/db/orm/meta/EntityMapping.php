@@ -108,7 +108,7 @@ class EntityMapping extends Object implements \Iterator {
      *
      * @return PropertyMapping
      */
-    public function getIdentity() {
+    public function getIdentityMapping() {
         if ($this->identity === null) {
             foreach ($this->legacyMapping['columns'] as $name => $column) {
                 if ($column[IDX_MAPPING_COLUMN_BEHAVIOR] & ID_PRIMARY) {
@@ -126,7 +126,7 @@ class EntityMapping extends Object implements \Iterator {
      *
      * @return PropertyMapping|null - property mapping or NULL if the entity is not versioned
      */
-    public function getVersion() {
+    public function getVersionMapping() {
         if ($this->isVersioned()) {
             if (is_string($this->version)) {
                 $name = $this->version;
