@@ -151,7 +151,7 @@ abstract class PersistableObject extends Object {
      * @return bool
      */
     public function isModified() {
-        return (bool) $this->_modified;
+        return (bool)$this->_modified;
     }
 
 
