@@ -44,7 +44,7 @@ use rosasurfer\monitor\Dependency;
 abstract class CachePeer extends Object {
 
 
-    /** @var string|null */
+    /** @var string */
     protected $label;
 
     /** @var string */

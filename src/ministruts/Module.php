@@ -33,7 +33,7 @@ class Module extends Object {
     /** @var ActionMapping[] - Die ActionMappings dieses Moduls. */
     protected $mappings = [];
 
-    /** @var ActionMapping|null - Das Default-ActionMapping dieses Moduls, wenn eines definiert wurde. */
+    /** @var ActionMapping - Das Default-ActionMapping dieses Moduls, wenn eines definiert wurde. */
     protected $defaultMapping;
 
     /** @var Tile[] - Die Tiles dieses Moduls. */

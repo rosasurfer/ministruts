@@ -22,7 +22,7 @@ class MySQLResult extends Result {
     /** @var string - SQL statement the result was generated from */
     protected $sql;
 
-    /** @var resource|null - the database connector's original result handle */
+    /** @var resource - the database connector's original result handle */
     protected $hResult;
 
     /** @var int - last inserted row id of the connection at instance creation time (not reset between queries) */

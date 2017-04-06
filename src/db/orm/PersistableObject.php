@@ -31,7 +31,7 @@ abstract class PersistableObject extends Object {
     /** @var bool - dirty checking status */
     protected $_modified;
 
-    /** @var string[]|null - modified and unsaved properties */
+    /** @var string[] - modified and unsaved properties */
     protected $_modifications;
 
 

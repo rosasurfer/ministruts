@@ -51,7 +51,7 @@ class MySQLConnector extends Connector {
     /** @var string */
     protected $host;
 
-    /** @var int|null */
+    /** @var int */
     protected $port;
 
     /** @var string */
@@ -60,7 +60,7 @@ class MySQLConnector extends Connector {
     /** @var string */
     protected $password;
 
-    /** @var string|null */
+    /** @var string */
     protected $database;
 
     /** @var string[] - configuration options */
