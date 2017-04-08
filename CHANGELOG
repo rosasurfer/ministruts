@@ -1,4 +1,14 @@
 
+2017-04-08
+
+   - struts: support namespace and class imports via XML configuration
+
+
+2017-04-06
+
+   - db: rename method Result::fetchNext() to Result::fetchRow()   
+
+
 2017-03-26
 
    - rename package "dependency" to "monitor" 
