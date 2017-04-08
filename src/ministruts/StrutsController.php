@@ -77,7 +77,7 @@ class StrutsController extends Singleton {
      *
      * Load and parse all Struts configuration files and create the corresponding object hierarchy.
      *
-     * @throws StrutsConfigException on configuration errors
+     * @throws StrutsConfigException in case of configuration errors
      */
     protected function __construct() {
         parent::__construct();

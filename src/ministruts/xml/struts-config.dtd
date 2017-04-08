@@ -1,6 +1,6 @@
 <!--
 
-                                     DTD for the Struts configuration of the application
+                                     DTD for the application's Struts configuration file 
                                     =====================================================
 
 
@@ -49,15 +49,45 @@
 <!--
    The "struts-config" element is the root of the configuration file and contains nested elements for all of the other
    configuration settings.
-
+   
+   namespace  The default PHP namespace used for loading classes referenced by unqualified class names. Valid namespace 
+              separators are the slash "/" and the backslash "\". Additional namespaces may be specified in the "imports" 
+              element of the configuration.    
+              [default: the global namespace]
+   
    file-base  Comma-delimited list of paths to lookup referenced files or file system locations (templates, layouts,
               fragments etc). Values may be absolute or relative to the application root directory. Each module can have its
               own list of "file-base" locations.
               [default: The application-wide configured view directory or "app/view"]
 -->
-<!ELEMENT struts-config (global-forwards?, action-mappings, tiles?, controller?)>
+<!ELEMENT struts-config (imports?, global-forwards?, action-mappings, tiles?, controller?)>
 <!ATTLIST struts-config
+          namespace    %ResourcePath;    #IMPLIED
           file-base    %ResourcePath;    #IMPLIED
+>
+
+
+<!--
+   The "imports" element describes a set of additional PHP names used for loading of classes referenced by unqualified class
+   names. The individual names are configured through nested "import" elements.    
+-->
+<!ELEMENT imports (import*)>
+<!ATTLIST import
+>
+
+
+<!--
+   The "import" element describes an additional name used for class loading if a referenced unqualified class name can not 
+   be resolved in the module's default namespace. The elements value may describe a single PHP class or all classes of a PHP 
+   namespace. A single class is specified by its fully qualified class name. All classes of a namespace are specified by the 
+   namespace followed by a wildcard "*", e.g. "foo/*". When resolving names fully qualified class names are preferred over 
+   names imported by namespace wildcards. Valid namespace separators are the slash "/" and the backslash "\".
+
+   value  The name describing a single PHP class or all classes of a PHP namespace.
+-->
+<!ELEMENT import EMPTY>
+<!ATTLIST import
+          value    %ResourcePath;    #REQUIRED
 >
 
 
@@ -226,7 +256,7 @@
 
 <!--
    The "set" element describes an additional variable in a tiles definition or an additional property in a class. The value
-   of this element can be specified as an XML attribute or in the body of the <set> tag.
+   of this element can be specified as an XML attribute or in the body of the element.
    The "set" element is especially useful in "tile" elements where the value is made available in the resulting view as a
    regular PHP variable. The "set" element can also be used in custom classes of "forward" or "mapping" elements. When the
    object representing the surrounding element is instantiated, the setter for the property is called and passed the
@@ -238,7 +268,7 @@
           type "string" is used.
 
    value  String representation of the variable or property value. The value can be specified as an XML attribute or in the
-          body of the <set> tag.
+          body of the element.
 -->
 <!ELEMENT set (#PCDATA)>
 <!ATTLIST set

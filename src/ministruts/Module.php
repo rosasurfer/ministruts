@@ -7,7 +7,11 @@ use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\IllegalTypeException;
 
 use function rosasurfer\is_class;
+use function rosasurfer\strContains;
+use function rosasurfer\strEndsWith;
+use function rosasurfer\strLeft;
 use function rosasurfer\strLeftTo;
+use function rosasurfer\strStartsWith;
 
 
 /**
@@ -23,6 +27,12 @@ class Module extends Object {
      * @var string
      */
     protected $prefix;
+
+    /** @var string[] - imported fully qualified class names  */
+    protected $uses;
+
+    /** @var string[] - imported namespaces */
+    protected $imports;
 
     /** @var string[] - Basisverzeichnisse fuer von diesem Modul einzubindende Resourcen */
     protected $resourceLocations = [];
@@ -70,7 +80,7 @@ class Module extends Object {
      * @param  string $fileName - Pfad zur Konfigurationsdatei des Modules
      * @param  string $prefix   - Prefix des Modules
      *
-     * @throws StrutsConfigException on configuration errors
+     * @throws StrutsConfigException in case of configuration errors
      *
      * @todo   Module-Encoding entsprechend dem Config-Datei-Encoding implementieren
      */
@@ -81,12 +91,13 @@ class Module extends Object {
         $xml = $this->loadConfiguration($fileName);
 
         $this->setPrefix($prefix);
+        $this->setNamespace($xml);
         $this->setResourceBase($xml);
+        $this->processImports($xml);
         $this->processController($xml);
         $this->processForwards($xml);
         $this->processMappings($xml);
         $this->processTiles($xml);
-        $this->processErrors($xml);
 
         $this->tilesContext = [];
     }
@@ -99,7 +110,7 @@ class Module extends Object {
      *
      * @return \SimpleXMLElement
      *
-     * @throws StrutsConfigException on configuration errors
+     * @throws StrutsConfigException in case of configuration errors
      */
     protected function loadConfiguration($fileName) {
         if (!is_file($fileName)) throw new StrutsConfigException('Configuration file not found: "'.$fileName.'"');
@@ -134,7 +145,7 @@ class Module extends Object {
      *
      * @param  string prefix
      *
-     * @throws StrutsConfigException on configuration errors
+     * @throws StrutsConfigException in case of configuration errors
      *
      * @todo   If non-empty the prefix must never start and always end with a slash "/".
      */
@@ -146,11 +157,40 @@ class Module extends Object {
 
 
     /**
+     * Set the Module's default namespace.
+     *
+     * @param  \SimpleXMLElement $xml - configuration instance
+     *
+     * @throws StrutsConfigException in case of configuration errors
+     */
+    protected function setNamespace($xml) {
+        if ($this->configured) throw new IllegalStateException('Configuration is frozen');
+
+        $namespace = '';                    // default is the global namespace
+
+        if ($xml['namespace']) {
+            $namespace = trim((string) $xml['namespace']);
+            $namespace = str_replace('/', '\\', $namespace);
+
+            if ($namespace == '\\') {
+                $namespace = '';
+            }
+            else if (strLen($namespace)) {
+                if (!$this->isValidNamespace($namespace)) throw new StrutsConfigException('Invalid module namespace "'.$xml['namespace'].'"');
+                if (strStartsWith($namespace, '\\')) $namespace  = subStr($namespace, 1);
+                if (!strEndsWith($namespace, '\\'))  $namespace .= '\\';
+            }
+        }
+        $this->imports[strToLower($namespace)] = $namespace;
+    }
+
+
+    /**
      * Setzt das Basisverzeichnis fuer lokale Resourcen.
      *
      * @param  \SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
      *
-     * @throws StrutsConfigException on configuration errors
+     * @throws StrutsConfigException in case of configuration errors
      */
     protected function setResourceBase(\SimpleXMLElement $xml) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -181,15 +221,19 @@ class Module extends Object {
      *
      * @param  \SimpleXMLElement $xml - XML-Konfiguration
      *
-     * @throws StrutsConfigException on configuration errors
+     * @throws StrutsConfigException in case of configuration errors
      */
     protected function processForwards(\SimpleXMLElement $xml) {
+        if ($this->configured) throw new IllegalStateException('Configuration is frozen');
+
         // process global 'include' and 'redirect' forwards
         $elements = $xml->xPath('/struts-config/global-forwards/forward[@include] | /struts-config/global-forwards/forward[@redirect]') ?: [];
 
         foreach ($elements as $tag) {
             $name = (string) $tag['name'];
             if (sizeOf($tag->attributes()) > 2) throw new StrutsConfigException('<global-forwards> <forward name="'.$name.'": Only one attribute of "include", "redirect" or "forward" must be specified');
+            /** @var ActionForward $forward */
+            $forward = null;
 
             if ($include = (string) $tag['include']) {
                 $this->tilesContext = [];
@@ -206,8 +250,7 @@ class Module extends Object {
                 }
             }
             else {
-                $redirect = (string) $tag['redirect'];
-                // TODO: URL validieren
+                $redirect = (string) $tag['redirect'];                      // TODO: URL validieren
                 $forward = new $this->forwardClass($name, $redirect, true);
             }
             $this->addGlobalForward($forward);
@@ -234,20 +277,21 @@ class Module extends Object {
      *
      * @param  \SimpleXMLElement $xml - XML-Konfiguration
      *
-     * @throws StrutsConfigException on configuration errors
+     * @throws StrutsConfigException in case of configuration errors
      */
     protected function processMappings(\SimpleXMLElement $xml) {
+        if ($this->configured) throw new IllegalStateException('Configuration is frozen');
         $elements = $xml->xPath('/struts-config/action-mappings/mapping') ?: [];
 
         foreach ($elements as $tag) {
+            /** @var ActionMapping $mapping */
             $mapping = new $this->mappingClass($this);
 
             // attributes
             // ----------
             // process path attribute
-            $path = (string) $tag['path'];
+            $path = (string) $tag['path'];                      // TODO: URL validieren
             $mapping->setPath($path);
-
 
             // process include attribute
             if ($tag['include']) {
@@ -256,6 +300,9 @@ class Module extends Object {
                 $this->tilesContext = [];
                 $include = (string) $tag['include'];
                 if (!$this->isIncludable($include, $xml)) throw new StrutsConfigException('<action-mappings> <mapping path="'.$path.'" include="'.$include.'": '.($include[0]=='.' ? 'Tile definition':'File').' not found');
+
+                /** @var ActionForward $forward */
+                $forward = null;
 
                 if ($this->isTileDefinition($include, $xml)) {
                     $tile = $this->getTile($include, $xml);
@@ -273,8 +320,8 @@ class Module extends Object {
             // process redirect attribute
             if ($tag['redirect']) {
                 if ($mapping->getForward()) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'": Only one attribute of "action", "include", "redirect" or "forward" must be specified');
-                $redirect = (string) $tag['redirect'];
-                // TODO: URL validieren
+                $redirect = (string) $tag['redirect'];          // TODO: URL validieren
+                /** @var ActionForward $forward */
                 $forward = new $this->forwardClass('generic', $redirect, true);
                 $mapping->setForward($forward);
             }
@@ -282,27 +329,34 @@ class Module extends Object {
 
             // process forward attribute
             if ($tag['forward']) {
-                if ($mapping->getForward()) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'": Only one attribute of "action", "include", "redirect" or "forward" must be specified');
+                if ($mapping->getForward()) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'": Only one attribute of "action", "include", "redirect" or "forward" must be specified.');
                 $forwardAttr = (string) $tag['forward'];
-                $forward     = $this->findForward($forwardAttr);
-                if (!$forward) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'", attribute "forward": Forward "'.$forwardAttr.'" not found');
+                /** @var ActionForward $forward */
+                $forward = $this->findForward($forwardAttr);
+                if (!$forward)              throw new StrutsConfigException('Mapping "'.$mapping->getPath().'", attribute "forward": Forward "'.$forwardAttr.'" not found.');
                 $mapping->setForward($forward);
             }
-            if ($mapping->getForward() && sizeOf($tag->xPath('./forward'))) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'": Only an "include", "redirect" or "forward" attribute *or* nested <forward> elements must be specified');
+            if ($mapping->getForward() && sizeOf($tag->xPath('./forward'))) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'": Only an "include", "redirect" or "forward" attribute *or* nested <forward> elements must be specified.');
 
 
             // process action attribute
             if ($tag['action']) {
-                if ($mapping->getForward()) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'": Only one attribute of "action", "include", "redirect" or "forward" must be specified');
-                $action = (string) $tag['action'];
-                // TODO: URL validieren
-                $mapping->setActionClassName($action);
+                if ($mapping->getForward())  throw new StrutsConfigException('Mapping "'.$mapping->getPath().'": Only one attribute of "action", "include", "redirect" or "forward" must be specified.');
+                $name       = trim((string) $tag['action']);
+                $classNames = $this->resolveClassName($name);
+                if (!$classNames)            throw new StrutsConfigException('Mapping "'.$mapping->getPath().'", attribute "action": Class '.$tag['action'].' not found.');
+                if (sizeOf($classNames) > 1) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'", attribute "action": Ambiguous class name '.$tag['action'].', found "'.join('", "', $classNames).'".');
+                $mapping->setActionClassName($classNames[0]);
             }
 
 
             // process form attribute
             if ($tag['form']) {
-                $mapping->setFormClassName((string) $tag['form']);
+                $name       = trim((string) $tag['form']);
+                $classNames = $this->resolveClassName($name);
+                if (!$classNames)            throw new StrutsConfigException('Mapping "'.$mapping->getPath().'", attribute "form": Class '.$tag['form'].' not found.');
+                if (sizeOf($classNames) > 1) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'", attribute "form": Ambiguous class name '.$tag['form'].', found "'.join('", "', $classNames).'".');
+                $mapping->setFormClassName($classNames[0]);
             }
 
 
@@ -325,7 +379,7 @@ class Module extends Object {
                     // Pruefung auf 'success' und 'error' Forward erfolgt in ActionMapping:freeze()
                 }
             }
-            elseif ($formValidateFirst = $tag['form-validate-first']=='true') {
+            elseif ($tag['form-validate-first'] == 'true') {
                 throw new StrutsConfigException('Mapping "'.$mapping->getPath().'": A "form" attribute must be specified when the "form-validate-first" attribute is set to "true"');
             }
             $mapping->setFormValidateFirst($formValidateFirst);
@@ -364,6 +418,8 @@ class Module extends Object {
             foreach ($subElements as $forwardTag) {
                 $name = (string) $forwardTag['name'];
                 if (sizeOf($forwardTag->attributes()) > 2) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'", forward "'.$name.'": Only one attribute of "include", "redirect" or "alias-for" must be specified');
+                /** @var ActionForward $forward */
+                $forward = null;
 
                 if ($include = (string) $forwardTag['include']) {
                     $this->tilesContext = [];
@@ -376,7 +432,7 @@ class Module extends Object {
                     }
                     else {
                         $forward = new $this->forwardClass($name, $this->findFile($include), false);
-                        $forward->setLabel(subStr($include, 0, strRPos($include, '.')));
+                        $forward->setLabely(subStr($include, 0, strRPos($include, '.')));
                     }
                 }
                 else {
@@ -415,7 +471,7 @@ class Module extends Object {
      *
      * @param  \SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
      *
-     * @throws StrutsConfigException on configuration errors
+     * @throws StrutsConfigException in case of configuration errors
      */
     protected function processTiles(\SimpleXMLElement $xml) {
         $elements = $xml->xPath('/struts-config/tiles/tile') ?: [];
@@ -436,7 +492,7 @@ class Module extends Object {
      *
      * @return Tile
      *
-     * @throws StrutsConfigException on configuration errors
+     * @throws StrutsConfigException in case of configuration errors
      */
     private function getTile($name, \SimpleXMLElement $xml) {
         // if the tile is already registered return it
@@ -469,9 +525,11 @@ class Module extends Object {
         // create a new instance ...
         if ($tag['file']) {                                     // 'file' given
             $fileAttr = (string) $tag['file'];
+            /** @var string $filePath */
             $filePath = $this->findFile($fileAttr);
             if (!$filePath) throw new StrutsConfigException('<tile name="'.$name.'" file="'.$fileAttr.'": file not found');
 
+            /** @var Tile $tile */
             $tile = new $this->tilesClass($this);
             $tile->setFileName($filePath);
         }
@@ -497,7 +555,7 @@ class Module extends Object {
      * @param  Tile              $tile - Tile-Instanz
      * @param  \SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration
      *
-     * @throws StrutsConfigException on configuration errors
+     * @throws StrutsConfigException in case of configuration errors
      */
     private function processTileProperties(Tile $tile, \SimpleXMLElement $xml) {
         // process <include> elements
@@ -506,7 +564,7 @@ class Module extends Object {
             $nodes = $xml->xPath("/struts-config/tiles/tile[@name='".$tile->getName()."']/include[@name='".$name."']");
             if (sizeOf($nodes) > 1) throw new StrutsConfigException('<tile name="'.$tile->getName().'"... multiple childnodes <include name="'.$name.'"> found');
 
-            if ($value=(string) $tag['value']) {            // 'value' specified
+            if ($value=(string) $tag['value']) {                        // 'value' specified
                 if (!$this->isIncludable($value, $xml)) throw new StrutsConfigException('<tile name="'.$tile->getName().'"... childnode <include name="'.$name.'" value="'.$value.'": '.($value[0]=='.' ? 'Tile definition':'File').' not found');
 
                 if ($this->isTileDefinition($value, $xml)) {
@@ -514,15 +572,16 @@ class Module extends Object {
                     if ($nestedTile->isAbstract()) throw new StrutsConfigException('<tile name="'.$tile->getName().'"... childnode <include name="'.$name.'" value="'.$value.'": The included tile is a template and cannot be used in an "include" definition.');
                 }
                 else {
+                    /** @var string $file */
                     $file = $this->findFile($value);
-                    // generische Tile erzeugen, damit render() existiert
-                    $nestedTile = new $this->tilesClass($this, $tile);
+                    /** @var Tile $nestedTile */
+                    $nestedTile = new $this->tilesClass($this, $tile);  // generische Tile erzeugen, damit render() existiert
                     $nestedTile->setName(Tile::GENERIC_NAME)
                                ->setFileName($file);
                 }
             }
             else {
-                $nestedTile = null;                         // resource not yet defined, it's an abstract template
+                $nestedTile = null;                                     // resource not yet defined, it's an abstract template
             }
             $tile->setNestedTile($name, $nestedTile);
         }
@@ -552,23 +611,12 @@ class Module extends Object {
 
 
     /**
-     * Verarbeitet die in der Konfiguration definierten Error-Einstellungen.
-     *
-     * @param  \SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
-     *
-     * @throws StrutsConfigException on configuration errors
-     */
-    protected function processErrors(\SimpleXMLElement $xml) {
-    }
-
-
-    /**
      * Fuegt diesem Module einen globalen ActionForward. Ist ein Alias angegeben, wird er unter dem Alias-Namen registriert.
      *
      * @param  ActionForward $forward
      * @param  string|null   $alias   - alias name of the forward (default: none)
      *
-     * @throws StrutsConfigException on configuration errors
+     * @throws StrutsConfigException in case of configuration errors
      */
     protected function addGlobalForward(ActionForward $forward, $alias=null) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -585,7 +633,7 @@ class Module extends Object {
      *
      * @param  ActionMapping $mapping
      *
-     * @throws StrutsConfigException on configuration errors
+     * @throws StrutsConfigException in case of configuration errors
      */
     protected function addMapping(ActionMapping $mapping) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -655,23 +703,68 @@ class Module extends Object {
 
 
     /**
+     * Process the configured import settings.
+     *
+     * @param  \SimpleXMLElement $xml - configuration instance
+     *
+     * @throws StrutsConfigException in case of configuration errors
+     */
+    protected function processImports(\SimpleXMLElement $xml) {
+        if ($this->configured) throw new IllegalStateException('Configuration is frozen');
+        $imports = $xml->xPath('/struts-config/imports/import') ?: [];
+
+        foreach ($imports as $import) {
+            $value = trim((string)$import['value']);
+            $value = str_replace('/', '\\', $value);
+
+            if (strEndsWith($value, '\\*')) {           // imported namespace
+                $value = strLeft($value, -1);
+                if (!$this->isValidNamespace($value)) throw new StrutsConfigException('<imports> <import value="'.$import['value'].'": Invalid value (neither a class nor {namespace}/*).');
+                if (strStartsWith($value, '\\')) $value  = subStr($value, 1);
+                if (!strEndsWith($value, '\\'))  $value .= '\\';
+                $this->imports[strToLower($value)] = $value;
+                continue;
+            }
+
+            if (is_class($value)) {                     // imported class
+                if (strStartsWith($value, '\\')) $value = subStr($value, 1);
+                $simpleName = strToLower(baseName($value));
+                if (isSet($this->uses[$simpleName])) throw new StrutsConfigException('<imports> <import value="'.$import['value'].'": Duplicate value.');
+                $this->uses[$simpleName] = $value;
+                continue;
+            }
+            throw new StrutsConfigException('<imports> <import value="'.$import['value'].'": Invalid value (neither a class nor {namespace}/*).');
+        }
+    }
+
+
+    /**
      * Verarbeitet Controller-Einstellungen.
      *
      * @param  \SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
      *
-     * @throws StrutsConfigException on configuration errors
+     * @throws StrutsConfigException in case of configuration errors
      */
     protected function processController(\SimpleXMLElement $xml) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-
         $elements = $xml->xPath('/struts-config/controller') ?: [];
 
         foreach ($elements as $controller) {
-            if ($controller['request-processor']) {
-                $this->setRequestProcessorClass((string) $controller['request-processor']);
+            $attr = 'request-processor';
+            if ($controller[$attr]) {
+                $name       = trim((string) $controller[$attr]);
+                $classNames = $this->resolveClassName($name);
+                if (!$classNames)            throw new StrutsConfigException('<controller '.$attr.'="'.$controller[$attr].'": Class not found.');
+                if (sizeOf($classNames) > 1) throw new StrutsConfigException('<controller '.$attr.'="'.$controller[$attr].'": Ambiguous class name, found "'.join('", "', $classNames).'"');
+                $this->setRequestProcessorClass($classNames[0]);
             }
-            if ($controller['role-processor']) {
-                $this->setRoleProcessorClass((string) $controller['role-processor']);
+            $attr = 'role-processor';
+            if ($controller[$attr]) {
+                $name       = trim((string) $controller[$attr]);
+                $classNames = $this->resolveClassName($name);
+                if (!$classNames)            throw new StrutsConfigException('<controller '.$attr.'="'.$controller[$attr].'": Class not found.');
+                if (sizeOf($classNames) > 1) throw new StrutsConfigException('<controller '.$attr.'="'.$controller[$attr].'": Ambiguous class name, found "'.join('", "', $classNames).'"');
+                $this->setRoleProcessorClass($classNames[0]);
             }
         }
     }
@@ -683,13 +776,11 @@ class Module extends Object {
      *
      * @param  string $className
      *
-     * @throws StrutsConfigException on configuration errors
+     * @throws StrutsConfigException in case of configuration errors
      */
     protected function setRequestProcessorClass($className) {
         if ($this->configured)                                            throw new IllegalStateException('Configuration is frozen');
-        if (!is_class($className))                                        throw new StrutsConfigException('Class "'.$className.'" not found');
-        if (!is_subclass_of($className, DEFAULT_REQUEST_PROCESSOR_CLASS)) throw new StrutsConfigException('Not a subclass of '.DEFAULT_REQUEST_PROCESSOR_CLASS.': "'.$className.'"');
-
+        if (!is_subclass_of($className, DEFAULT_REQUEST_PROCESSOR_CLASS)) throw new StrutsConfigException('Not a subclass of '.DEFAULT_REQUEST_PROCESSOR_CLASS.': '.$className);
         $this->requestProcessorClass = $className;
     }
 
@@ -710,13 +801,11 @@ class Module extends Object {
      *
      * @param  string $className
      *
-     * @throws StrutsConfigException on configuration errors
+     * @throws StrutsConfigException in case of configuration errors
      */
     protected function setRoleProcessorClass($className) {
         if ($this->configured)                                      throw new IllegalStateException('Configuration is frozen');
-        if (!is_class($className))                                  throw new StrutsConfigException('Class "'.$className.'" not found');
-        if (!is_subclass_of($className, ROLE_PROCESSOR_BASE_CLASS)) throw new StrutsConfigException('Not a subclass of '.ROLE_PROCESSOR_BASE_CLASS.': "'.$className.'"');
-
+        if (!is_subclass_of($className, ROLE_PROCESSOR_BASE_CLASS)) throw new StrutsConfigException('Not a subclass of '.ROLE_PROCESSOR_BASE_CLASS.': '.$className);
         $this->roleProcessorClass = $className;
     }
 
@@ -741,12 +830,12 @@ class Module extends Object {
      *
      * @param  string $className
      *
-     * @throws StrutsConfigException on configuration errors
+     * @throws StrutsConfigException in case of configuration errors
      */
     protected function setTilesClass($className) {
         if ($this->configured)                                throw new IllegalStateException('Configuration is frozen');
-        if (!is_class($className))                            throw new StrutsConfigException('Class "'.$className.'" not found');
-        if (!is_subclass_of($className, DEFAULT_TILES_CLASS)) throw new StrutsConfigException('Not a subclass of '.DEFAULT_TILES_CLASS.': "'.$className.'"');
+        if (!is_class($className))                            throw new StrutsConfigException('Class '.$className.' not found');
+        if (!is_subclass_of($className, DEFAULT_TILES_CLASS)) throw new StrutsConfigException('Not a subclass of '.DEFAULT_TILES_CLASS.': '.$className);
 
         $this->tilesClass = $className;
     }
@@ -768,12 +857,12 @@ class Module extends Object {
      *
      * @param  string $className
      *
-     * @throws StrutsConfigException on configuration errors
+     * @throws StrutsConfigException in case of configuration errors
      */
     protected function setMappingClass($className) {
         if ($this->configured)                                         throw new IllegalStateException('Configuration is frozen');
-        if (!is_class($className))                                     throw new StrutsConfigException('Class "'.$className.'" not found');
-        if (!is_subclass_of($className, DEFAULT_ACTION_MAPPING_CLASS)) throw new StrutsConfigException('Not a subclass of '.DEFAULT_ACTION_MAPPING_CLASS.': "'.$className.'"');
+        if (!is_class($className))                                     throw new StrutsConfigException('Class '.$className.' not found');
+        if (!is_subclass_of($className, DEFAULT_ACTION_MAPPING_CLASS)) throw new StrutsConfigException('Not a subclass of '.DEFAULT_ACTION_MAPPING_CLASS.': '.$className);
 
         $this->mappingClass = $className;
     }
@@ -795,12 +884,12 @@ class Module extends Object {
      *
      * @param  string $className
      *
-     * @throws StrutsConfigException on configuration errors
+     * @throws StrutsConfigException in case of configuration errors
      */
     protected function setForwardClass($className) {
         if ($this->configured)                                         throw new IllegalStateException('Configuration is frozen');
-        if (!is_class($className))                                     throw new StrutsConfigException('Class "'.$className.'" not found');
-        if (!is_subclass_of($className, DEFAULT_ACTION_FORWARD_CLASS)) throw new StrutsConfigException('Not a subclass of '.DEFAULT_ACTION_FORWARD_CLASS.': "'.$className.'"');
+        if (!is_class($className))                                     throw new StrutsConfigException('Class '.$className.' not found');
+        if (!is_subclass_of($className, DEFAULT_ACTION_FORWARD_CLASS)) throw new StrutsConfigException('Not a subclass of '.DEFAULT_ACTION_FORWARD_CLASS.': '.$className);
 
         $this->forwardClass = $className;
     }
@@ -888,7 +977,7 @@ class Module extends Object {
      *
      * @return bool
      *
-     * @throws StrutsConfigException on configuration errors
+     * @throws StrutsConfigException in case of configuration errors
      */
     private function isTileDefinition($name, \SimpleXMLElement $xml) {
         $nodes = $xml->xPath("/struts-config/tiles/tile[@name='".$name."']") ?: [];
@@ -931,5 +1020,48 @@ class Module extends Object {
             }
         }
         return null;
+    }
+
+
+    /**
+     * Whether or not a string represents a valid namespace.
+     *
+     * @param  string $value
+     *
+     * @return bool
+     */
+    private function isValidNamespace($value) {
+        $pattern = '/^\\\\?[a-z_][a-z0-9_]*(\\\\[a-z_][a-z0-9_]*)*\\\\?$/i';
+        return (bool) preg_match($pattern, $value);
+    }
+
+
+    /**
+     * Resolves a simple class name and returns the found fully qualified class names.
+     *
+     * @param  string $name
+     *
+     * @return string[] - found class names or an empty array if the class name cannot be resolved
+     */
+    private function resolveClassName($name) {
+        $name = str_replace('/', '\\', trim($name));
+
+        // no need to resolve a qualified name
+        if (strContains($name, '\\'))
+            return is_class($name) ? [$name] : [];
+
+        // unqualified name, check "use" declarations
+        $lowerName = strToLower($name);
+        if (isSet($this->uses[$lowerName]))
+            return [$this->uses[$lowerName]];
+
+        // unqualified name, check imported namespaces
+        $results = [];
+        foreach ($this->imports as $namespace) {
+            $class = $namespace.$name;
+            if (is_class($class))
+                $results[] = $class;
+        }
+        return $results;
     }
 }

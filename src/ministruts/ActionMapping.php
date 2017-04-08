@@ -8,7 +8,6 @@ use rosasurfer\exception\IllegalTypeException;
 
 use rosasurfer\log\Logger;
 
-use function rosasurfer\is_class;
 use function rosasurfer\strEndsWith;
 use function rosasurfer\strStartsWith;
 
@@ -85,7 +84,7 @@ class ActionMapping extends Object {
      *
      * @return $this
      *
-     * @throws StrutsConfigException on configuration errors
+     * @throws StrutsConfigException in case of configuration errors
      */
     public function setPath($path) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -131,7 +130,7 @@ class ActionMapping extends Object {
      *
      * @return $this
      *
-     * @throws StrutsConfigException on configuration errors
+     * @throws StrutsConfigException in case of configuration errors
      */
     public function setMethod($method) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -162,7 +161,7 @@ class ActionMapping extends Object {
      *
      * @return $this
      *
-     * @throws StrutsConfigException on configuration errors
+     * @throws StrutsConfigException in case of configuration errors
      */
     public function setRoles($roles) {
         if ($this->configured)  throw new IllegalStateException('Configuration is frozen');
@@ -192,7 +191,7 @@ class ActionMapping extends Object {
      *
      * @return $this
      *
-     * @throws StrutsConfigException on configuration errors
+     * @throws StrutsConfigException in case of configuration errors
      */
     public function setForward(ActionForward $forward) {
         if ($this->configured)      throw new IllegalStateException('Configuration is frozen');
@@ -220,11 +219,10 @@ class ActionMapping extends Object {
      *
      * @return $this
      *
-     * @throws StrutsConfigException on configuration errors
+     * @throws StrutsConfigException in case of configuration errors
      */
     public function setActionClassName($className) {
         if ($this->configured)                              throw new IllegalStateException('Configuration is frozen');
-        if (!is_class($className))                          throw new StrutsConfigException('Class "'.$className.'" not found');
         if (!is_subclass_of($className, ACTION_BASE_CLASS)) throw new StrutsConfigException('Not a subclass of '.ACTION_BASE_CLASS.': "'.$className.'"');
         if ($this->forward)                                 throw new StrutsConfigException('Only one attribute of "action", "include", "redirect" or "forward" can be specified for mapping "'.$this->path.'"');
 
@@ -251,12 +249,11 @@ class ActionMapping extends Object {
      *
      * @return $this
      *
-     * @throws StrutsConfigException on configuration errors
+     * @throws StrutsConfigException in case of configuration errors
      */
     public function setFormClassName($className) {
         if ($this->configured)                                   throw new IllegalStateException('Configuration is frozen');
-        if (!is_class($className))                               throw new StrutsConfigException('Class "'.$className.'" not found');
-        if (!is_subclass_of($className, ACTION_FORM_BASE_CLASS)) throw new StrutsConfigException('Not a subclass of '.ACTION_FORM_BASE_CLASS.': "'.$className.'"');
+        if (!is_subclass_of($className, ACTION_FORM_BASE_CLASS)) throw new StrutsConfigException('Not a subclass of '.ACTION_FORM_BASE_CLASS.': '.$className);
 
         $this->formClassName = $className;
         return $this;
@@ -283,7 +280,7 @@ class ActionMapping extends Object {
      *
      * @return $this
      *
-     * @throws StrutsConfigException on configuration errors
+     * @throws StrutsConfigException in case of configuration errors
      */
     public function setFormScope($value) {
         if ($this->configured)                      throw new IllegalStateException('Configuration is frozen');
@@ -339,7 +336,6 @@ class ActionMapping extends Object {
      */
     public function setFormValidateFirst($mode) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-
         $this->formValidateFirst = $mode;
         return $this;
     }
@@ -392,7 +388,7 @@ class ActionMapping extends Object {
      *
      * @return $this
      *
-     * @throws StrutsConfigException on configuration errors
+     * @throws StrutsConfigException in case of configuration errors
      */
     public function addForward(ActionForward $forward, $alias=null) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
