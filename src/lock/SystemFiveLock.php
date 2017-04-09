@@ -100,7 +100,7 @@ class SystemFiveLock extends BaseLock {
                     continue;
                 }
                 // Endlosschleife verhindern
-                throw $ex->addMessage('Giving up to get lock for key "$key" after '.$i.' trials'.($messages ? ', former errors:'.NL.join(NL, $messages) : ''));
+                throw $ex->addMessage('Giving up to get lock for key "'.$key.'" after '.$i.' trials'.($messages ? ', former errors:'.NL.join(NL, $messages) : ''));
             }
         }
         while (true);
