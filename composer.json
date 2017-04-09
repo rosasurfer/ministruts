@@ -23,6 +23,6 @@
         "files":    ["src/load.php"]
     },
     "scripts": {
-        "post-install-cmd": "sh bin/git-hooks/setup.sh post-checkout post-merge"
+        "post-install-cmd": "sh bin/git-hooks/check-setup.sh post-checkout post-merge"
     }    
 }
