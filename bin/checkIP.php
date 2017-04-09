@@ -5,7 +5,6 @@ use rosasurfer\MiniStruts;
 
 use function rosasurfer\echoPre;
 
-
 // configuration
 isSet($_SERVER['REQUEST_METHOD']) && exit(1);                           // in case we are running on CLI
 !defined('APPLICATION_ROOT') && define('APPLICATION_ROOT', __DIR__);

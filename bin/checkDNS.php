@@ -14,7 +14,6 @@ use function rosasurfer\strContains;
 
 use const rosasurfer\WINDOWS;
 
-
 /**
  * TODO: Jeder Nameserver muss einzeln abgefragt werden, denn bei fehlerhafter NS-Synchronisierung koennen
  *       sich die zurueckgegebenen Werte der einzelnen Server unterscheiden.
