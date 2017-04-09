@@ -16,7 +16,7 @@ namespace {
         /**
          * @param  string|array $key
          * @param  mixed        $var
-         * @param  int          $ttl
+         * @param  int|null     $ttl
          *
          * @return bool|array
          */
@@ -44,7 +44,7 @@ namespace {
 
         /**
          * @param  string|string[] $key
-         * @param  bool            $success
+         * @param  bool|null       $success
          *
          * @return mixed
          */
@@ -55,7 +55,7 @@ namespace {
         /**
          * @param  string|array $key
          * @param  mixed        $value
-         * @param  int          $ttl
+         * @param  int|null     $ttl
          *
          * @return bool|array
          */
@@ -69,7 +69,7 @@ namespace {
         /**
          * @param  string|array $keys
          * @param  mixed        $values
-         * @param  int          $ttl
+         * @param  int|null     $ttl
          *
          * @return bool|array
          */
@@ -79,7 +79,7 @@ namespace {
 
         /**
          * @param  string|string[] $key
-         * @param  bool            $success
+         * @param  bool|null       $success
          *
          * @return mixed
          */
@@ -91,7 +91,7 @@ namespace {
 
     if (!function_exists('mysql_affected_rows')) {
         /**
-         * @param  resource $link_identifier
+         * @param  resource|null $link_identifier
          *
          * @return int
          */
@@ -100,7 +100,7 @@ namespace {
         }
 
         /**
-         * @param  resource $link_identifier
+         * @param  resource|null $link_identifier
          *
          * @return bool
          */
@@ -109,11 +109,11 @@ namespace {
         }
 
         /**
-         * @param  string $server
-         * @param  string $username
-         * @param  string $password
-         * @param  bool   $new_link
-         * @param  int    $client_flags
+         * @param  string|null $server
+         * @param  string|null $username
+         * @param  string|null $password
+         * @param  bool|null   $new_link
+         * @param  int|null    $client_flags
          *
          * @return resource
          */
@@ -124,7 +124,7 @@ namespace {
         }
 
         /**
-         * @param  resource $link_identifier
+         * @param  resource|null $link_identifier
          *
          * @return string
          */
@@ -133,7 +133,7 @@ namespace {
         }
 
         /**
-         * @param  resource $link_identifier
+         * @param  resource|null $link_identifier
          *
          * @return int
          */
@@ -143,7 +143,7 @@ namespace {
 
         /**
          * @param  resource $result
-         * @param  int      $result_type
+         * @param  int|null $result_type
          *
          * @return string[]|bool
          */
@@ -162,7 +162,7 @@ namespace {
         }
 
         /**
-         * @param  resource $link_identifier
+         * @param  resource|null $link_identifier
          *
          * @return string
          */
@@ -171,7 +171,7 @@ namespace {
         }
 
         /**
-         * @param  resource $link_identifier
+         * @param  resource|null $link_identifier
          *
          * @return int
          */
@@ -198,8 +198,8 @@ namespace {
         }
 
         /**
-         * @param  string   $query
-         * @param  resource $link_identifier
+         * @param  string        $query
+         * @param  resource|null $link_identifier
          *
          * @return resource|bool
          */
@@ -208,8 +208,8 @@ namespace {
         }
 
         /**
-         * @param  string   $unescaped_string
-         * @param  resource $link_identifier
+         * @param  string        $unescaped_string
+         * @param  resource|null $link_identifier
          *
          * @return string
          */
@@ -218,8 +218,8 @@ namespace {
         }
 
         /**
-         * @param  string   $database_name
-         * @param  resource $link_identifier
+         * @param  string        $database_name
+         * @param  resource|null $link_identifier
          *
          * @return bool
          */
@@ -228,8 +228,8 @@ namespace {
         }
 
         /**
-         * @param  string   $charset
-         * @param  resource $link_identifier
+         * @param  string        $charset
+         * @param  resource|null $link_identifier
          *
          * @return bool
          */
@@ -243,7 +243,7 @@ namespace {
         /**
          * @param  int          $signo
          * @param  callable|int $handler
-         * @param  bool         $restart_syscalls
+         * @param  bool|null    $restart_syscalls
          *
          * @return bool
          */
@@ -262,8 +262,8 @@ namespace {
 
     if (!function_exists('sem_acquire')) {
         /**
-         * @param  resource $sem_identifier
-         * @param  bool     $nowait
+         * @param  resource  $sem_identifier
+         * @param  bool|null $nowait
          *
          * @return bool
          */
@@ -272,10 +272,10 @@ namespace {
         }
 
         /**
-         * @param  int $key
-         * @param  int $max_acquire
-         * @param  int $perm
-         * @param  int $auto_release
+         * @param  int      $key
+         * @param  int|null $max_acquire
+         * @param  int|null $perm
+         * @param  int|null $auto_release
          *
          * @return resource
          */
@@ -321,7 +321,7 @@ namespace rosasurfer\bin\check_ip {
     }
 
     /**
-     * @param  string|array $names
+     * @param  string|array|null $names
      *
      * @return array
      */
@@ -346,8 +346,8 @@ namespace rosasurfer\bin\check_ip {
     }
 
     /**
-     * @param  string $string
-     * @param  bool   $returnBytes
+     * @param  string    $string
+     * @param  bool|null $returnBytes
      *
      * @return bool|array
      */
@@ -365,7 +365,7 @@ namespace rosasurfer\cron\logwatch {
     function error($message) {}
 
     /**
-     * @param  string $message
+     * @param  string|null $message
      */
     function help($message = null) {}
 
@@ -389,8 +389,8 @@ namespace rosasurfer\util\apc\apc {
     }
 
     /**
-     * @param  int  $s
-     * @param  bool $long
+     * @param  int       $s
+     * @param  bool|null $long
      *
      * @return string
      */
