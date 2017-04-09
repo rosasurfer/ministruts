@@ -58,16 +58,13 @@ parameters:
         # fixed but not yet released PHPStan bugs 
         - '/Parameter [^ ]+ of method [^ ]+ has invalid typehint type ([^ ]+)?\bscalar\b/'
         - '/Parameter #[0-9]+ [^ ]+ of method [^ ]+ expects ([^ ]+)?\bscalar(\|[^|]+)*, (bool|int|float|string|null|([^ ]+)?scalar)(\|(bool|int|float|string|null|([^ ]+)?scalar))* given\b/'
+        - '/Parameter #3 \$hResult of class rosasurfer\\db\\mysql\\MySQLResult constructor expects resource\|null, resource\|bool\|null given\b/'
+        - '/Property rosasurfer\\db\\orm\\meta\\EntityMapping::\$version \(string\) does not accept rosasurfer\\db\\orm\\meta\\PropertyMapping\b/'
 
         # unfixed PHPStan bugs 
         - '/Cannot call method andDependency\(\) on null\b/'
-        - '/Method DateTimeZone::getTransitions\(\) invoked with 0 parameters, 2 required./'
         - '/rosasurfer\\net\\messenger\\im\\IRCMessenger::__construct\(\) does not call parent constructor from rosasurfer\\net\\messenger\\Messenger\b/'
-        - '/Parameter #1 \$exception of static method rosasurfer\\debug\\DebugHelper::getBetterTraceAsString\(\) expects Exception, Exception\|rosasurfer\\exception\\error\\PHPError\|string given\b/'
         - '/Parameter #1 \$mode of method rosasurfer\\ministruts\\ActionMapping::setFormValidateFirst\(\) expects bool, bool\|mixed given\b/'
         - '/Parameter #1 \$mode of static method rosasurfer\\debug\\ErrorHandler::setupErrorHandling\(\) expects int, int\|null given\b/'
         - '/Parameter #2 \$row of static method rosasurfer\\db\\orm\\PersistableObject::createInstance\(\) expects mixed\[\], mixed\[\]\|null given\b/'
-        - '/Parameter #3 \$forward of method rosasurfer\\ministruts\\Action::executeAfter\(\) expects rosasurfer\\ministruts\\ActionForward\|null, rosasurfer\\ministruts\\ActionForward\|string\|null given\b/'        
         - '/Parameter #3 \$hResult of class rosasurfer\\db\\mysql\\MySQLResult constructor expects resource\|null, bool\|resource\|null given\b/'
-        - '/Parameter #3 \$hResult of class rosasurfer\\db\\mysql\\MySQLResult constructor expects resource\|null, resource\|bool\|null given\b/'
-        - '/Property rosasurfer\\db\\orm\\meta\\EntityMapping::\$version \(string\) does not accept rosasurfer\\db\\orm\\meta\\PropertyMapping\b/'
