@@ -65,7 +65,7 @@ class MiniStruts extends StaticClass {
             error_log($errorMsg);
             exit(1);
         }
-        !defined('\APPLICATION_ID'  ) && define('APPLICATION_ID', md5(\APPLICATION_ROOT));
+        !defined('\APPLICATION_ID') && define('APPLICATION_ID', md5(\APPLICATION_ROOT));
 
         // (2) check for admin tasks if on localhost
         // __phpinfo__               : show PHP config at start of script

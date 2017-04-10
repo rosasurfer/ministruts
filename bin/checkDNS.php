@@ -20,7 +20,6 @@ use const rosasurfer\WINDOWS;
  */
 set_time_limit(0);
 
-define('APPLICATION_ID',  'DNS-Checker');
 define('APPLICATION_ROOT', __DIR__     );
 
 
