@@ -20,11 +20,8 @@ use const rosasurfer\WINDOWS;
  */
 set_time_limit(0);
 
-define('APPLICATION_ROOT', __DIR__     );
-
-
-// Library einbinden
-require(dirName(__DIR__).'/src/load.php');
+// Framework einbinden
+require(__DIR__.'/../src/load.php');
 
 // dns_* functions are not implemented on Windows
 if (WINDOWS) throw new InfrastructureException('This script cannot run on Windows.');

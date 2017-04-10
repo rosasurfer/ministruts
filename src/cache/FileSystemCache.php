@@ -1,6 +1,8 @@
 <?php
 namespace rosasurfer\cache;
 
+use rosasurfer\config\Config;
+
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RuntimeException;
 
@@ -40,15 +42,19 @@ final class FileSystemCache extends CachePeer {
         $this->options   = $options;
 
         // Cache-Verzeichnis ermitteln
-        if (isSet($options['directory'])) $directory = $options['directory'];
-        else                              $directory = 'etc/cache/'.$label;     // Defaultverzeichnis
+        if (isSet($options['directory'])) {
+            $directory    = $options['directory'];
+            $relativePath = WINDOWS ? !preg_match('/^[a-z]:/i', $directory) : ($directory[0]!='/');
+            if ($relativePath) {
+                $directory = Config::getDefault()->get('app.dir.root').'/'.$directory;
+            }
+        }
+        else {
+            /** @var string $directory */
+            $directory = Config::getDefault()->get('app.dir.cache');
+        }
 
-        // relativen Pfad als relativ zu APPLICATION_ROOT interpretieren
-        $directory = str_replace('\\', '/', $directory);
-        if ($directory[0]!='/' && (!WINDOWS || !preg_match('/^[a-z]:/i', $directory)))
-            $directory = str_replace('\\', '/', APPLICATION_ROOT).'/'.$directory;
-
-        // ggf. Cache-Verzeichnis erzeugen
+        // Verzeichnis ggf. erzeugen
         mkDirWritable($directory, 0755);
 
         $this->directory = realPath($directory).DIRECTORY_SEPARATOR;

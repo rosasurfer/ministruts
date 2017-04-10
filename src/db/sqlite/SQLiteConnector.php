@@ -1,6 +1,8 @@
 <?php
 namespace rosasurfer\db\sqlite;
 
+use rosasurfer\config\Config;
+
 use rosasurfer\db\Connector;
 use rosasurfer\db\DatabaseException;
 
@@ -102,7 +104,7 @@ class SQLiteConnector extends Connector {
         if (!strLen($file))    throw new InvalidArgumentException('Invalid parameter $file: "'.$file.'" (empty)');
 
         $relativePath = WINDOWS ? !preg_match('/^[a-z]:/i', $file) : ($file[0]!='/');
-        $relativePath && $file=APPLICATION_ROOT.DIRECTORY_SEPARATOR.$file;
+        $relativePath && $file=Config::getDefault()->get('app.dir.root').DIRECTORY_SEPARATOR.$file;
 
         $this->file = $file;
         return $this;
@@ -144,10 +146,9 @@ class SQLiteConnector extends Connector {
             }
             else {
                 $what = ($flags & SQLITE3_OPEN_CREATE) ? 'create':'find';
-                if      ( WINDOWS && preg_match('/^[a-z]:/i', $file)) $absolutePath = true;
-                else if (!WINDOWS && $file[0]=='/')                   $absolutePath = true;
-                else                                                  $absolutePath = false;
-                if (!$absolutePath) $where = ' in "'.getCwd().'"';
+
+                $relativePath = WINDOWS ? !preg_match('/^[a-z]:/i', $file) : ($file[0]!='/');
+                $relativePath && $where=' in "'.getCwd().'"';
             }
             throw $ex->addMessage('Cannot '.$what.' SQLite database file "'.$file.'"'.$where);
         }

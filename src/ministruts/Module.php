@@ -1,6 +1,7 @@
 <?php
 namespace rosasurfer\ministruts;
 
+use rosasurfer\config\Config;
 use rosasurfer\core\Object;
 
 use rosasurfer\exception\IllegalStateException;
@@ -195,11 +196,16 @@ class Module extends Object {
     protected function setResourceBase(\SimpleXMLElement $xml) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
+        $rootDirectory = Config::getDefault()->get('app.dir.root');
+
         if (!$xml['file-base']) {
-            // not specified, apply default settings
-            $this->resourceLocations[] = APPLICATION_ROOT.'/app/view';
+            // not specified, apply global settings
+            $globalViewDir = Config::getDefault()->get('app.dir.view', null);
+            !$globalViewDir && $globalViewDir = $rootDirectory.'/app/view';
+            $this->resourceLocations[] = $globalViewDir;
             return;
         }
+
         $locations = explode(',', (string) $xml['file-base']);
 
         foreach ($locations as $i => $location) {
@@ -207,7 +213,7 @@ class Module extends Object {
             if (!strLen($location)) continue;
 
             $relativePath = WINDOWS ? !preg_match('/^[a-z]:/i', $location) : ($location[0]!='/');
-            $relativePath && $location=APPLICATION_ROOT.DIRECTORY_SEPARATOR.$location;
+            $relativePath && $location = $rootDirectory.DIRECTORY_SEPARATOR.$location;
 
             if (!is_dir($location)) throw new StrutsConfigException('Resource location <struts-config file-base="'.$locations[$i].'" not found');
 

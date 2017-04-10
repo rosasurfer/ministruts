@@ -1,6 +1,7 @@
 <?php
 namespace rosasurfer\ministruts;
 
+use rosasurfer\config\Config;
 use rosasurfer\core\Object;
 use rosasurfer\exception\IllegalStateException;
 
@@ -195,9 +196,10 @@ class Tile extends Object {
         $properties['page'    ] = PageContext::me();
 
         if (LOCALHOST && $this->parent) {
-            $file = $this->fileName;
-            $file = strRightFrom($file, APPLICATION_ROOT.DIRECTORY_SEPARATOR, 1, false, $file);
-            $file = str_replace('\\', '/', $file);
+            $rootDir = Config::getDefault()->get('app.dir.root');
+            $file    = $this->fileName;
+            $file    = strRightFrom($file, $rootDir.DIRECTORY_SEPARATOR, 1, false, $file);
+            $file    = str_replace('\\', '/', $file);
 
             if ($this->name == self::GENERIC_NAME) $tileHint = $file;
             else                                   $tileHint = $this->name.' ('.$file.')';

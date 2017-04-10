@@ -86,10 +86,9 @@ class AutoConfig extends Config {
             $dirs['config'] = $this->getDirectory();
 
             foreach ($dirs as $name => &$dir) {
-                if      ( WINDOWS && preg_match('/^[a-z]:/i', $dir)) $absolutePath = true;
-                else if (!WINDOWS && $dir[0]=='/')                   $absolutePath = true;
-                else                                                 $absolutePath = false;
-                if (!$absolutePath) {
+                $relativePath = WINDOWS ? !preg_match('/^[a-z]:/i', $dir) : ($dir[0]!='/');
+
+                if ($relativePath) {
                     if ($name == 'root') throw new InvalidArgumentException('Invalid config value "root" in project directory layout file: "'.$file.'" (not an absolute path)');
                     $dir = $dirs['root'].'/'.$dir;
                 }

@@ -58,14 +58,9 @@ class MiniStruts extends StaticClass {
         self::loadGlobalHelpers     ($options['globals'          ]);
         self::setConfiguration      ($options['config'           ]);
 
-        // (1) check application settings                              // TODO: remove APPLICATION_ROOT dependency
-        if (!defined('\APPLICATION_ROOT')) {
-            $errorMsg = 'Error: The global constant APPLICATION_ROOT must be defined.';
-            echoPre(CLI ? $errorMsg : 'application error (see error log)');
-            error_log($errorMsg);
-            exit(1);
-        }
-        !defined('\APPLICATION_ID') && define('APPLICATION_ID', md5(\APPLICATION_ROOT));
+        // (1) check application settings
+        $appRoot = Config::getDefault()->get('app.dir.root');
+        !defined('\APPLICATION_ID') && define('APPLICATION_ID', md5($appRoot));
 
         // (2) check for admin tasks if on localhost
         // __phpinfo__               : show PHP config at start of script

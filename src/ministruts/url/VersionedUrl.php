@@ -1,6 +1,8 @@
 <?php
 namespace rosasurfer\ministruts\url;
 
+use rosasurfer\config\Config;
+
 
 /**
  * Version-aware URL generation helper. Appends a hash of size and last modification time of a local file to the generated
@@ -10,9 +12,7 @@ class VersionedUrl extends Url {
 
 
     /**
-     * Return a text presentation of this Url.
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function __toString() {
         $uri = parent::__toString();
@@ -21,14 +21,12 @@ class VersionedUrl extends Url {
         if (($pos=strPos($relativeUri, '?')) === false) $name = $relativeUri;
         else                                            $name = subStr($relativeUri, 0, $pos);
 
-        // TODO: replace static directory references by configuration value
-        foreach (['/public/', '/web/', '/www/'] as $dir) {
-            if (file_exists($fileName=APPLICATION_ROOT.$dir.$name)) {
-                if ($pos === false) $uri .= '?';
-                else                $uri .= '&';
-                $uri .= decHex(crc32(fileSize($fileName).'|'.fileMtime($fileName)));
-                break;
-            }
+        $webDir = Config::getDefault()->get('app.dir.web');
+
+        if (file_exists($fileName=$webDir.'/'.$name)) {
+            if ($pos === false) $uri .= '?';
+            else                $uri .= '&';
+            $uri .= decHex(crc32(fileSize($fileName).'|'.fileMtime($fileName)));
         }
         return $uri;
     }

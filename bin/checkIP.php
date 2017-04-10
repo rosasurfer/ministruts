@@ -7,12 +7,11 @@ use function rosasurfer\echoPre;
 
 // configuration
 isSet($_SERVER['REQUEST_METHOD']) && exit(1);                           // in case we are running on CLI
-!defined('APPLICATION_ROOT') && define('APPLICATION_ROOT', __DIR__);
 ini_set('error_log', __DIR__.'/php_error.log');
 error_reporting(E_ALL & ~E_DEPRECATED);
 
 // configure and load the framework
-require(APPLICATION_ROOT.'/src/load.php');
+require(__DIR__.'/../src/load.php');
 MiniStruts::init([
     'config'  => __DIR__,
     'globals' => true,

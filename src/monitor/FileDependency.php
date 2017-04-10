@@ -51,15 +51,15 @@ class FileDependency extends Dependency {
         if (!is_string($fileName)) throw new IllegalTypeException('Illegal type of parameter $fileName: '.getType($fileName));
         if (!strLen($fileName))    throw new InvalidArgumentException('Invalid argument $fileName: '.$fileName);
 
-        if (file_exists($fileName)) {             // existierende Datei
+        if (file_exists($fileName)) {                       // existierende Datei
             $this->fileName     = realPath($fileName);
             $this->lastModified = fileMTime($this->fileName);
         }
-        else {                                    // nicht existierende Datei
+        else {                                              // nicht existierende Datei
             $name = str_replace('\\', '/', $fileName);
 
-            if ((WINDOWS && !preg_match('/^[a-z]:/i', $name)) || (!WINDOWS && $name[0]!='/'))
-                $name = getCwd().'/'.$name;         // relativer Pfad: absoluten Pfad erzeugen, da Arbeitsverzeichnis wechseln kann
+            $relativePath = WINDOWS ? !preg_match('/^[a-z]:/i', $name) : ($name[0]!='/');
+            $relativePath && $name=getCwd().'/'.$name;      // absoluten Pfad erzeugen, da Arbeitsverzeichnis wechseln kann
 
             $this->fileName     = str_replace('/', DIRECTORY_SEPARATOR, $name);
             $this->lastModified = null;
