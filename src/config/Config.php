@@ -53,7 +53,7 @@ class Config extends Object implements ConfigInterface {
     protected $files = [];
 
     /** @var string - directory of the last specified config file */
-    protected $directory;
+    protected $lastDirectory;
 
     /** @var array - tree structure of config values */
     protected $properties = [];
@@ -80,7 +80,7 @@ class Config extends Object implements ConfigInterface {
 
             $relative = WINDOWS ? !preg_match('/^[a-z]:/i', $file) : ($file[0] != '/');
             $relative && $file=getCwd().PATH_SEPARATOR.$file;
-            $this->directory = dirName($file);                          // save absolute path of the last specified file
+            $this->lastDirectory = dirName($file);                // save absolute path of the last specified file
         }
         $this->files = $checkedFiles;
 
@@ -122,16 +122,6 @@ class Config extends Object implements ConfigInterface {
             // parse and store property value
             $this->setProperty($key, $value);
         }
-    }
-
-
-    /**
-     * Get this instance's configuration directory. This is the directory of the last specified configuration file.
-     *
-     * {@inheritdoc}
-     */
-    public function getDirectory() {
-        return $this->directory;
     }
 
 

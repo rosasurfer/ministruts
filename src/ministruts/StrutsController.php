@@ -55,8 +55,7 @@ class StrutsController extends Singleton {
 
                 if (!$controller) {
                     $controller = Singleton::getInstance(static::class);
-
-                    $configDir  = Config::getDefault()->getDirectory();
+                    $configDir  = Config::getDefault()->get('app.dir.config');
                     $configFile = str_replace('\\', '/', $configDir.'/struts-config.xml');
                     $dependency = FileDependency::create($configFile);
                     if (!WINDOWS && !LOCALHOST)                           // distinction dev/production
@@ -83,11 +82,11 @@ class StrutsController extends Singleton {
         parent::__construct();
 
         // lookup configuration files
-        $configDir  = Config::getDefault()->getDirectory().DIRECTORY_SEPARATOR;
-        $mainConfig = $configDir.'struts-config.xml';                           // main module config
+        $configDir  = Config::getDefault()->get('app.dir.config');
+        $mainConfig = $configDir.'/struts-config.xml';                          // main module config
         if (!is_file($mainConfig)) throw new StrutsConfigException('Configuration file not found: "'.$mainConfig.'"');
 
-        $subConfigs = glob($configDir.'struts-config-*.xml', GLOB_ERR) ?: [];   // scan for submodule configs
+        $subConfigs = glob($configDir.'/struts-config-*.xml', GLOB_ERR) ?: [];  // scan for submodule configs
         $configs    = [$mainConfig] + $subConfigs;
 
         // create and register a Module for each found configuration file

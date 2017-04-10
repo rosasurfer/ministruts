@@ -80,23 +80,22 @@ class AutoConfig extends Config {
         parent::__construct($files);
 
         // add project directory layout
-        if (is_file($file = $configDir.'/dirs.php')) {
+        if (is_file($file = $configDir.'/dirs.php'))
             $dirs = include($file);
-            if (!isSet($dirs['root'])) throw new InvalidArgumentException('Missing config value "root" in project directory layout file: "'.$file.'"');
-            $dirs['config'] = $this->getDirectory();
+        $dirs['config'] = $this->lastDirectory;
+        if (!isSet($dirs['root'])) throw new InvalidArgumentException('Missing config value "root" in project directory layout file: "'.$file.'"');
 
-            foreach ($dirs as $name => &$dir) {
-                $relativePath = WINDOWS ? !preg_match('/^[a-z]:/i', $dir) : ($dir[0]!='/');
+        foreach ($dirs as $name => &$dir) {
+            $relativePath = WINDOWS ? !preg_match('/^[a-z]:/i', $dir) : ($dir[0]!='/');
+            if ($relativePath) {
+                if ($name == 'root') throw new InvalidArgumentException('Invalid config value "root" in project directory layout file: "'.$file.'" (not an absolute path)');
+                $dir = $dirs['root'].'/'.$dir;
+            }
+            if (is_dir($dir)) $dir = realPath($dir);
+        }; unset($dir);
 
-                if ($relativePath) {
-                    if ($name == 'root') throw new InvalidArgumentException('Invalid config value "root" in project directory layout file: "'.$file.'" (not an absolute path)');
-                    $dir = $dirs['root'].'/'.$dir;
-                }
-                if (is_dir($dir)) $dir = realPath($dir);
-            }; unset($dir);
+        $this->set('app.dir', $dirs);
 
-            $this->set('app.dir', $dirs);
-        }
 
         // create FileDependency and cache the instance
         //$dependency = FileDependency::create(array_keys($config->files));

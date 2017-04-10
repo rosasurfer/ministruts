@@ -35,14 +35,6 @@ interface ConfigInterface {
 
 
     /**
-     * Get the instance's configuration directory.
-     *
-     * @return string
-     */
-    public function getDirectory();
-
-
-    /**
      * Return an informative text describing the instance.
      *
      * @return string
