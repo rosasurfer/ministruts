@@ -337,10 +337,13 @@ class Request extends Singleton {
 
         static $baseUri;
         if (!$baseUri) {
-            $baseUri = Config::getDefault()->get('application.base-uri', false);
-            if (!$baseUri) {
-                // fall-back to old behaviour (triggers an error if not set, which is OK)
-                $baseUri = $_SERVER['APPLICATION_BASE_URI'];
+            if (isSet($_SERVER['APP_BASE_URI'])) {
+                $baseUri = $_SERVER['APP_BASE_URI'];
+            }
+            else {
+                $baseUri = Config::getDefault()->get('app.base-uri', false);
+                if ($baseUri === false)
+                    throw new RuntimeException('Missing application base URI configuration: either $_SERVER["APP_BASE_URI"] or config("app.base-uri") needs to be specified.');
             }
             !strStartsWith($baseUri, '/') && $baseUri  = '/'.$baseUri;
             !strEndsWith  ($baseUri, '/') && $baseUri .= '/';

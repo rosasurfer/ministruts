@@ -6,4 +6,4 @@
 RewriteEngine On
 RewriteRule   (.*)  web/$1  [L]
 
-SetEnv APPLICATION_BASE_URI '/example-app/'
+SetEnv APP_BASE_URI '/local-file-system/www/ministruts/doc/demo/'
