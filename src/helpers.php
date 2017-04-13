@@ -798,9 +798,9 @@ function typeOf($var) {
  *
  * @param  string $path - same as mkDir(): directory name
  * @param  int    $mode - same as mkDir(): permission mode to set if the directory is created<br>
- *                                         (default: 0770 = rwxrwx---)
+ *                                         (default: 0755 = rwxr-xr-x)
  */
-function mkDirWritable($path, $mode=0770) {
+function mkDirWritable($path, $mode=0755) {
     if (!is_string($path))                            throw new IllegalTypeException('Illegal type of parameter $path: '.getType($path));
     if ($mode!==null && !is_int($mode))               throw new IllegalTypeException('Illegal type of parameter $mode: '.getType($mode));
 

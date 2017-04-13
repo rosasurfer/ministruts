@@ -55,7 +55,7 @@ final class FileSystemCache extends CachePeer {
         }
 
         // Verzeichnis ggf. erzeugen
-        mkDirWritable($directory, 0755);
+        mkDirWritable($directory);
 
         $this->directory = realPath($directory).DIRECTORY_SEPARATOR;
     }
@@ -240,7 +240,7 @@ final class FileSystemCache extends CachePeer {
      * @return bool - TRUE bei Erfolg, FALSE andererseits
      */
     private function writeFile($fileName, $value, $expires) {
-        mkDirWritable(dirName($fileName), 0755);
+        mkDirWritable(dirName($fileName));
 
         // TODO: http://phpdevblog.niknovo.com/2009/11/serialize-vs-var-export-vs-json-encode.html
 
