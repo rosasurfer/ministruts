@@ -375,8 +375,9 @@ function strStartsWithI($string, $prefix) {
 function strEndsWith($string, $suffix, $ignoreCase=false) {
     if (is_array($suffix)) {
         $self = __FUNCTION__;
-        foreach ($suffix as $s)
+        foreach ($suffix as $s) {
             if ($self($string, $s, $ignoreCase)) return true;
+        }
         return false;
     }
     if ($string!==null && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
