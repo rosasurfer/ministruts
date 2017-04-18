@@ -9,7 +9,6 @@ use rosasurfer\db\ConnectorInterface as IConnector;
 use rosasurfer\exception\IllegalAccessException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
-use rosasurfer\exception\UnimplementedFeatureException;
 
 use function rosasurfer\is_class;
 
@@ -246,15 +245,17 @@ abstract class PersistableObject extends Object {
         // perform update
         $version = $dao->doUpdate($this, $changes);
 
-        // update version property if the class is versioned and reset modification flags
-        if ($versioned) {
-            $this->$versionName = $version;
-        }
-        $this->_modifications = null;
-        $this->_modified      = false;
+        if ($version !== false) {
+            // update version property if the class is versioned and reset modification flags
+            if ($versioned) {
+                $this->$versionName = $version;
+            }
+            $this->_modifications = null;
+            $this->_modified      = false;
 
-        // post-processing hook
-        $this->afterUpdate();
+            // post-processing hook
+            $this->afterUpdate();
+        }
         return $this;
     }
 
@@ -275,14 +276,17 @@ abstract class PersistableObject extends Object {
      * @return $this
      */
     public function delete() {
+        if (!$this->isPersistent()) throw new InvalidArgumentException('Cannot delete non-persistent '.get_class($this));
+
         // pre-processing hook
         if (!$this->beforeDelete())
             return $this;
 
-        throw new UnimplementedFeatureException('You must implement '.get_class($this).'->'.__FUNCTION__.'() to delete a '.get_class($this).'.');
-
-        // post-processing hook
-        $this->afterDelete();
+        // perform deletion
+        if ($this->dao()->doDelete($this)) {
+            // post-processing hook
+            $this->afterDelete();
+        }
         return $this;
     }
 

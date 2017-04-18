@@ -306,6 +306,39 @@ abstract class DAO extends Singleton {
 
 
     /**
+     * Perform the actual deletion of a {@link PersistableObject}.
+     *
+     * @param  PersistableObject $object
+     *
+     * @return bool - success status
+     */
+    public function doDelete(PersistableObject $object) {
+        $db     = $this->db();
+        $entity = $this->getEntityMapping();
+        $table  = $entity->getTableName();
+
+        // collect identity infos
+        $identity   = $entity->getIdentityMapping();
+        $idProperty = $identity->getPhpName();
+        $idColumn   = $identity->getColumnName();
+        $idValue    = $identity->convertToSQLValue($object->getObjectId(), $db);
+
+        // create SQL
+        $sql = 'delete from '.$table.'
+                   where '.$idColumn.' = '.$idValue;
+
+        // execute SQL and check for concurrent modifications
+        if ($db->execute($sql)->lastAffectedRows() != 1)
+            throw new ConcurrentModificationException('Error deleting '.get_class($object).' (oid='.$object->getObjectId().'): record not found');
+
+        // reset identity property
+        $this->$idProperty = null;
+
+        return true;
+    }
+
+
+    /**
      * Reload and return a fresh version of the specified object.
      *
      * @param  PersistableObject $object
