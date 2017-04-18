@@ -202,7 +202,7 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function escapeIdentifier($name) {
         if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
@@ -212,7 +212,7 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function escapeLiteral($value) {
         // bug or feature: SQLite3::escapeString(null) => empty string instead of NULL
@@ -230,7 +230,7 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function escapeString($value) {
         // bug or feature: SQLite3::escapeString(null) => empty string instead of NULL

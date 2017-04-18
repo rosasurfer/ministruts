@@ -306,7 +306,7 @@ class MySQLConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function escapeIdentifier($name) {
         if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
@@ -325,7 +325,7 @@ class MySQLConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function escapeLiteral($value) {
         // bug or feature: mysql_real_escape_string(null) => empty string instead of NULL
@@ -343,7 +343,7 @@ class MySQLConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function escapeString($value) {
         // bug or or feature: mysql_real_escape_string(null) => empty string instead of NULL

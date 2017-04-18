@@ -77,7 +77,7 @@ class SQLiteResult extends Result {
      *  - NULL values are mapped to NULL.<br>
      *  - Strings and blobs are mapped to string.<br>
      *
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function fetchRow($mode=ARRAY_BOTH) {
         if (!$this->result || $this->nextRowIndex < 0)        // no automatic result reset()
@@ -156,7 +156,7 @@ class SQLiteResult extends Result {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function release() {
         if ($this->result) {
