@@ -145,7 +145,7 @@ class PostgresConnector extends Connector {
             if (strContains($path, '"$user"') && isSet($options['user'])) {
                 $path = str_replace('"$user"', $options['user'], $path);
             }
-            $description = $host.':'.$port.'/'.$db.', schema search path: '.$path;
+            $description = $host.':'.$port.'/'.$db.' (schema search path: '.$path.')';
         }
         else {
             if      (isSet($options['hostaddr'])) $host = $options['hostaddr'];
@@ -313,7 +313,7 @@ class PostgresConnector extends Connector {
             $result || trigger_error(pg_last_error($this->hConnection), E_USER_ERROR);
         }
         catch (IRosasurferException $ex) {
-            throw $ex->addMessage('SQL: "'.$sql.'"'.NL.'Database: '.$this->getConnectionDescription());
+            throw $ex->addMessage('Database: '.$this->getConnectionDescription().NL.'SQL: "'.$sql.'"');
         }
 
         $status_string = pg_result_status($result, PGSQL_STATUS_STRING);

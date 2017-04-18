@@ -313,7 +313,7 @@ class SQLiteConnector extends Connector {
             $result || trigger_error('Error '.$this->handler->lastErrorCode().', '.$this->handler->lastErrorMsg(), E_USER_ERROR);
         }
         catch (IRosasurferException $ex) {
-            throw $ex->addMessage('SQL: "'.$sql.'"'.NL.'Database: '.$this->file);
+            throw $ex->addMessage('Database: '.$this->file.NL.'SQL: "'.$sql.'"');
         }
 
         // track last_insert_id

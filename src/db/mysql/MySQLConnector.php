@@ -417,7 +417,7 @@ class MySQLConnector extends Connector {
             $result || trigger_error('SQL-Error '.mysql_errno($this->hConnection).': '.mysql_error($this->hConnection), E_USER_ERROR);
         }
         catch (IRosasurferException $ex) {
-            throw $ex->addMessage('SQL: "'.$sql.'"'.NL.'Database: '.$this->getConnectionDescription())->setCode(mysql_errno($this->hConnection));
+            throw $ex->addMessage('Database: '.$this->getConnectionDescription().NL.'SQL: "'.$sql.'"')->setCode(mysql_errno($this->hConnection));
         }
 
         $affected = 0;
