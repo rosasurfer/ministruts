@@ -1,4 +1,9 @@
 
+2017-04-18
+
+   - orm: automated model deletion by the ORM via PersistableObject::delete() 
+
+
 2017-04-08
 
    - struts: support namespace and class imports via XML configuration
@@ -16,13 +21,13 @@
 
 2017-03-25
 
-   - orm: automated updates of model instances in the ORM via PersistableObject::update() 
+   - orm: automated model updates by the ORM via PersistableObject::update() 
 
 
 2017-03-22
 
    - db:  add method Connector::supportsInsertReturn() for "insert into ... returning ..." syntax
-   - orm: automated inserting of model instances in the ORM via PersistableObject::insert() 
+   - orm: automated model insertion by the ORM via PersistableObject::insert() 
 
 
 2017-03-19
