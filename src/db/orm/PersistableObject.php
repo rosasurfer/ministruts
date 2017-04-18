@@ -161,8 +161,9 @@ abstract class PersistableObject extends Object {
      * @return $this
      */
     public function save() {
-        // execute an existing pre-processing hook
-        method_exists($this, $method='beforeSave') && $this->$method();
+        // pre-processing hook
+        if (!$this->beforeSave())
+            return $this;
 
         if (!$this->isPersistent()) {
             $this->insert();
@@ -173,8 +174,8 @@ abstract class PersistableObject extends Object {
 
         $this->updateRelations();
 
-        // execute an existing post-processing hook
-        method_exists($this, $method='afterSave') && $this->$method();
+        // post-processing hook
+        $this->afterSave();
         return $this;
     }
 
@@ -185,10 +186,12 @@ abstract class PersistableObject extends Object {
      * @return $this
      */
     protected function insert() {
-        // execute an existing pre-processing hook
-        method_exists($this, $method='beforeInsert') && $this->$method();
-
         if ($this->isPersistent()) throw new RuntimeException('Cannot insert already persistent '.$this);
+
+        // pre-processing hook
+        if (!$this->beforeInsert())
+            return $this;
+
         $dao    = $this->dao();
         $entity = $dao->getEntityMapping();
 
@@ -206,8 +209,8 @@ abstract class PersistableObject extends Object {
         if ($this->$idName === null)
             $this->$idName = $id;
 
-        // execute an existing post-processing hook
-        method_exists($this, $method='afterInsert') && $this->$method();
+        // post-processing hook
+        $this->afterInsert();
         return $this;
     }
 
@@ -218,8 +221,9 @@ abstract class PersistableObject extends Object {
      * @return $this
      */
     protected function update() {
-        // execute an existing pre-processing hook
-        method_exists($this, $method='beforeUpdate') && $this->$method();
+        // pre-processing hook
+        if (!$this->beforeUpdate())
+            return $this;
 
         $dao         = $this->dao();
         $entity      = $dao->getEntityMapping();
@@ -249,8 +253,8 @@ abstract class PersistableObject extends Object {
         $this->_modifications = null;
         $this->_modified      = false;
 
-        // execute an existing post-processing hook
-        method_exists($this, $method='afterUpdate') && $this->$method();
+        // post-processing hook
+        $this->afterUpdate();
         return $this;
     }
 
@@ -268,16 +272,86 @@ abstract class PersistableObject extends Object {
     /**
      * Delete the instance from the storage mechanism. Must be overridden by the entity instance.
      *
-     * @return NULL
+     * @return $this
      */
     public function delete() {
-        // execute an existing pre-processing hook
-        method_exists($this, $method='beforeDelete') && $this->$method();
+        // pre-processing hook
+        if (!$this->beforeDelete())
+            return $this;
 
         throw new UnimplementedFeatureException('You must implement '.get_class($this).'->'.__FUNCTION__.'() to delete a '.get_class($this).'.');
 
-        // execute an existing post-processing hook
-        method_exists($this, $method='afterDelete') && $this->$method();
+        // post-processing hook
+        $this->afterDelete();
+        return $this;
+    }
+
+
+    /**
+     * Save pre-processing hook. Can be overridden by the entity instance.
+     *
+     * @return bool - TRUE if saving is to be continued; FALSE otherwise
+     */
+    protected function beforeSave() {
+        return true;
+    }
+
+
+    /**
+     * Save post-processing hook. Can be overridden by the entity instance.
+     */
+    protected function afterSave() {
+    }
+
+
+    /**
+     * Insert pre-processing hook. Can be overridden by the entity instance.
+     *
+     * @return bool - TRUE if insertion is to be continued; FALSE otherwise
+     */
+    protected function beforeInsert() {
+        return true;
+    }
+
+
+    /**
+     * Insert post-processing hook. Can be overridden by the entity instance.
+     */
+    protected function afterInsert() {
+    }
+
+
+    /**
+     * Update pre-processing hook. Can be overridden by the entity instance.
+     *
+     * @return bool - TRUE if updating is to be continued; FALSE otherwise
+     */
+    protected function beforeUpdate() {
+        return true;
+    }
+
+
+    /**
+     * Update post-processing hook. Can be overridden by the entity instance.
+     */
+    protected function afterUpdate() {
+    }
+
+
+    /**
+     * Delete pre-processing hook. Can be overridden by the entity instance.
+     *
+     * @return bool - TRUE if deletion is to be continued; FALSE otherwise
+     */
+    protected function beforeDelete() {
+        return true;
+    }
+
+
+    /**
+     * Delete post-processing hook. Can be overridden by the entity instance.
+     */
+    protected function afterDelete() {
     }
 
 
