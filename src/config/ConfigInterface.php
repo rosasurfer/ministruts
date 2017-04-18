@@ -16,7 +16,7 @@ interface ConfigInterface {
      * @param  string $key     - key
      * @param  mixed  $default - default value
      *
-     * @return string|array - config setting
+     * @return mixed - config setting
      *
      * @throws RuntimeException if the setting is not found and no default value was specified
      */
