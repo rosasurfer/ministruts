@@ -172,7 +172,7 @@ class SQLiteResult extends Result {
 
 
     /**
-     * Return the result's internal result object.
+     * Return this result's internal SQLite3Result object.
      *
      * @return \SQLite3Result - result handler or NULL for result-less queries
      */

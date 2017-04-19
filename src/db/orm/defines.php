@@ -8,7 +8,7 @@ namespace rosasurfer\db\orm;
 // PHP to SQL serialization types (PHP value representation in a SQL statement)
 
 /**
- * Bind type "default". The bind type to use is derived from the model's property type.
+ * Bind type "default". The used bind type is derived from the entities property type.
  */
 const BIND_TYPE_DEFAULT = 0;
 

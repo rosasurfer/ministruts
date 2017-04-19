@@ -25,7 +25,7 @@ use function rosasurfer\is_class;
 class PropertyMapping extends Object {
 
 
-    /** @var EntityMapping - the entity mapping this instance belongs to */
+    /** @var EntityMapping - the entity mapping this mapping is a part of */
     protected $entity;
 
     /** @var string - the property's PHP name */
@@ -40,7 +40,7 @@ class PropertyMapping extends Object {
      *
      * Create a new PropertyMapping.
      *
-     * @param  EntityMapping $entity  - the entity mapping this instance belongs to
+     * @param  EntityMapping $entity  - the entity mapping this mapping is a part of
      * @param  string        $phpName - the property's PHP name
      * @param  array         $mapping - legacy mapping information
      */

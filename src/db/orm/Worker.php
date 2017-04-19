@@ -16,19 +16,18 @@ use const rosasurfer\ARRAY_ASSOC;
 /**
  * Worker
  *
- * A Worker converts database records to PHP objects. For every model class exists exactly one Worker instance.
- * Only one PHP object is created for database records returned multiple times (e.g. by multiple queries).
+ * A Worker converts database records to PHP objects. For each entity exists a separate Worker instance.
  */
 class Worker extends Object {
 
 
-    /** @var DAO - DAO of the Worker's model class */
+    /** @var DAO - DAO of the worker's entity */
     private $dao;
 
-    /** @var string - class name of the Worker's model */
+    /** @var string - name of the worker's entity class */
     protected $entityClass;
 
-    /** @var IConnector - database adapter of the Worker's model */
+    /** @var IConnector - database adapter used for the worker's entity */
     private $connector;
 
 
@@ -46,7 +45,7 @@ class Worker extends Object {
 
 
     /**
-     * Find a single matching record and convert it to an object of the model class.
+     * Find a single matching record and convert it to an instance of the entity class.
      *
      * @param  string $query     - SQL query with optional ORM syntax
      * @param  bool   $allowMany - whether or not the query is allowed to return a multi-row result (default: no)
@@ -55,10 +54,10 @@ class Worker extends Object {
      *
      * @throws MultipleRowsException if the query returned multiple rows and $allowMany was not set to TRUE.
      */
-    public function findOne($query, $allowMany=false) {     // TODO: numRows() is not available on SQLite or with PDO, the emulation is slow.
-        $result = $this->query($query);                     //       the check can be improved by fetchRow() when reset(-1) and internal record
-                                                            //       caching are implemented.
-        $object = $this->makeObject($result);
+    public function findOne($query, $allowMany=false) { // TODO: numRows() is not available on SQLite or with PDO and the
+        $result = $this->query($query);                 //       emulation is slow. The check can be improved with fetchRow()
+                                                        //       when reset(-1) and internal record caching are implemented.
+        $object = $this->makeObject($result);           //
         if ($object && !$allowMany && $result->numRows() > 1) throw new MultipleRowsException();
 
         return $object;
@@ -66,7 +65,7 @@ class Worker extends Object {
 
 
     /**
-     * Find all matching records and convert them to objects of the model class.
+     * Find all matching records and convert them to instances of the entity class.
      *
      * @param  string $query - SQL query with optional ORM syntax
      *
@@ -107,8 +106,8 @@ class Worker extends Object {
 
 
     /**
-     * Translate model names in a SQL query into their DBMS table counterparts. At the moment this translation works only
-     * for models in the same namespace as the worker's model class.
+     * Translate entity names in a SQL query into their DBMS table counterparts. At the moment this translation requires all
+     * entity classes to be in the same namespace as the worker's entity class.
      *
      * @param  string $sql - original SQL query
      *

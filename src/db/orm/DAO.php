@@ -29,10 +29,10 @@ abstract class DAO extends Singleton {
     /** @var Worker - the worker this DAO uses */
     private $worker;
 
-    /** @var EntityMapping - the mapping of the DAO's entity class */
+    /** @var EntityMapping - the mapping of the DAO's entity */
     private $entityMapping;
 
-    /** @var string - the name of the DAO's entity class */
+    /** @var string - the PHP class name of the DAO's entity */
     protected $entityClass;
 
 
@@ -49,7 +49,7 @@ abstract class DAO extends Singleton {
 
 
     /**
-     * Find a single matching record and convert it to an object of the model class.
+     * Find a single matching record and convert it to an instance of the entity class.
      *
      * @param  string $query     - SQL query with optional ORM syntax
      * @param  bool   $allowMany - whether or not the query is allowed to return a multi-row result (default: no)
@@ -64,7 +64,7 @@ abstract class DAO extends Singleton {
 
 
     /**
-     * Find all matching records and convert them to objects of the model class.
+     * Find all matching records and convert them to instances of the entity class.
      *
      * @param  string $query - SQL query with optional ORM syntax
      *
@@ -102,7 +102,7 @@ abstract class DAO extends Singleton {
 
 
     /**
-     * Return the mapping of the DAO's entity class.
+     * Return the legacy mapping of the DAO's entity.
      *
      * @return array
      */
@@ -113,7 +113,7 @@ abstract class DAO extends Singleton {
 
 
     /**
-     * Return the mapping of the DAO's entity class.
+     * Return the mapping of the DAO's entity.
      *
      * @return EntityMapping
      */
@@ -136,7 +136,7 @@ abstract class DAO extends Singleton {
 
 
     /**
-     * Return the database adapter for the DAO's entity class.
+     * Return the database adapter used for the DAO's entity.
      *
      * @return IConnector
      */
@@ -246,7 +246,7 @@ abstract class DAO extends Singleton {
     /**
      * Perform the actual update and write modifications of a {@link PersistableObject} to the storage mechanism.
      *
-     * @param  PersistableObject $object  - modified object
+     * @param  PersistableObject $object  - modified instance
      * @param  array             $changes - modifications
      *
      * @return mixed - The new PHP version value after writing the changes if the object's entity class is versioned or TRUE
@@ -339,7 +339,7 @@ abstract class DAO extends Singleton {
 
 
     /**
-     * Reload and return a fresh version of the specified object.
+     * Reload and return a fresh version of the specified instance.
      *
      * @param  PersistableObject $object
      *

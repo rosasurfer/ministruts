@@ -169,7 +169,7 @@ class PostgresResult extends Result {
 
 
     /**
-     * Return the result's internal result object.
+     * Return this result's internal result object.
      *
      * @return resource - result handle
      */

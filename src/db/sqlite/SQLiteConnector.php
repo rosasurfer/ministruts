@@ -430,7 +430,7 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * Return the connector's internal connection object.
+     * Return this connector's internal SQLite3 connection object.
      *
      * @return \SQLite3 - the internal connection handler
      */

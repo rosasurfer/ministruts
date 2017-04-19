@@ -102,7 +102,7 @@ abstract class PersistableObject extends Object {
      *
      * @param  string - version string to assign (default: current local datetime)
      *
-     * @return string|null - assigned version string or NULL if the model has no version field
+     * @return string|null - assigned version string or NULL if the entity has no version field
      */
     protected function touch($version = null) {
         foreach ($this->dao()->getMapping()['columns'] as $phpName => $column) {
@@ -361,15 +361,15 @@ abstract class PersistableObject extends Object {
 
     /**
      * Create a new instance and populate it with the specified properties. This method is called by the ORM to transform
-     * rows originating from database queries to objects of the respective model class.
+     * records originating from database queries to instances of the respective entity class.
      *
-     * @param  string $class - class name of the model
+     * @param  string $class - entity class name
      * @param  array  $row   - array with property values (typically a row from a database table)
      *
      * @return self|null
      */
     public static function createInstance($class, array $row) {
-        if (static::class != __CLASS__) throw new IllegalAccessException('Cannot access method '.__METHOD__.'() from a model class.');
+        if (static::class != __CLASS__) throw new IllegalAccessException('Cannot access method '.__METHOD__.'() from an entity class.');
         $object = new $class();
         if (!$object instanceof self)   throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
 
@@ -413,7 +413,7 @@ abstract class PersistableObject extends Object {
      * @return DAO
      */
     public static function dao() {
-        if (static::class == __CLASS__) throw new IllegalAccessException('Use a model class to access method '.__METHOD__.'()');
+        if (static::class == __CLASS__) throw new IllegalAccessException('Use an entity class to access method '.__METHOD__.'()');
         return Singleton::getInstance(static::class.'DAO');
         // TODO: The calling class may be a derived class with the DAO being one of its parents.
     }
@@ -425,7 +425,7 @@ abstract class PersistableObject extends Object {
      * @return IConnector
      */
     public static function db() {
-        if (static::class == __CLASS__) throw new IllegalAccessException('Use a model class to access method '.__METHOD__.'()');
+        if (static::class == __CLASS__) throw new IllegalAccessException('Use an entity class to access method '.__METHOD__.'()');
         return self::dao()->db();
     }
 }
