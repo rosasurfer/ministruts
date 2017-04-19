@@ -547,7 +547,7 @@ class Request extends Singleton {
                 // TODO: some transmitted headers are missing in the PHP $_SERVER array, e.g. 'Authorization' (digest)
                 // TODO: check basic authorization
                 // TODO: check $_FILES array
-                $headers = array();
+                $headers = [];
                 foreach ($_SERVER as $key => $value) {
                     if(subStr($key, 0, 5) == 'HTTP_') {
                         $key = strToLower(subStr($key, 5));
@@ -868,11 +868,13 @@ class Request extends Singleton {
         $string = $_SERVER['REQUEST_METHOD'].' '.$_SERVER['REQUEST_URI'].' '.$_SERVER['SERVER_PROTOCOL'].NL;
 
         // headers
-        $headers = $this->getHeaders();
+        $headers = $this->getHeaders() ?: [];
+
         $maxLen  = 0;
         foreach ($headers as $key => $value) {
             $maxLen = max(strLen($key), $maxLen);
         }
+
         $maxLen++; // add a char for ':'
         foreach ($headers as $key => $value) {
             $string .= str_pad($key.':', $maxLen).' '.$value.NL;

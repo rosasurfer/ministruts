@@ -53,7 +53,7 @@ abstract class DAO extends Singleton {
      * @param  string $query     - SQL query with optional ORM syntax
      * @param  bool   $allowMany - whether or not the query is allowed to return a multi-row result (default: no)
      *
-     * @return PersistableObject
+     * @return PersistableObject|null
      *
      * @throws MultipleRowsException if the query returned multiple rows and $allowMany was not set to TRUE.
      */

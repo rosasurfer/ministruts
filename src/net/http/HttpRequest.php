@@ -162,7 +162,7 @@ class HttpRequest extends Object {
     /**
      * Gibt die angegebenen Header dieses HttpRequests als Array von Name-Wert-Paaren zurueck.
      *
-     * @param  string|array $names - ein oder mehrere Namen; ohne Angabe werden alle Header zurueckgegeben
+     * @param  string|string[] $names - ein oder mehrere Namen; ohne Angabe werden alle Header zurueckgegeben
      *
      * @return array - Name-Wert-Paare
      */
