@@ -1,4 +1,9 @@
 
+2017-04-19
+
+   - orm: re-implement DAO::refresh(PersistableObject) as PersistableObject::reload()
+   
+
 2017-04-18
 
    - orm: automated model deletion by the ORM via PersistableObject::delete() 
