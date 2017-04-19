@@ -17,6 +17,7 @@ use const rosasurfer\PHP_TYPE_BOOL;
 use const rosasurfer\PHP_TYPE_FLOAT;
 use const rosasurfer\PHP_TYPE_INT;
 use const rosasurfer\PHP_TYPE_STRING;
+use rosasurfer\exception\ConcurrentModificationException;
 
 
 /**
@@ -360,6 +361,49 @@ abstract class PersistableObject extends Object {
 
 
     /**
+     * Populate this instance with the specified record values. Called by the ORM during execution of
+     * {@link Worker::makeObject()} and {@link PersistableObject::reload()}.
+     *
+     * @param  array $row - array with property values (typically a single database record)
+     *
+     * @return $this
+     */
+    private function populate(array $row) {
+        $row     = array_change_key_case($row, CASE_LOWER);
+        $mapping = $this->dao()->getMapping();
+
+        foreach ($mapping['columns'] as $phpName => $column) {
+            $columnName = strToLower($column[IDX_MAPPING_COLUMN_NAME]);
+
+            if ($row[$columnName] === null) {
+                $this->$phpName = null;
+            }
+            else {
+                $phpType = $column[IDX_MAPPING_PHP_TYPE];
+
+                switch ($phpType) {
+                    case PHP_TYPE_BOOL  : $this->$phpName =       (bool) $row[$columnName];  break;
+                    case PHP_TYPE_INT   : $this->$phpName =        (int) $row[$columnName];  break;
+                    case PHP_TYPE_FLOAT : $this->$phpName =      (float) $row[$columnName];  break;
+                    case PHP_TYPE_STRING: $this->$phpName =     (string) $row[$columnName];  break;
+                  //case PHP_TYPE_ARRAY : $this->$phpName =       strLen($row[$columnName]) ? explode(',', $row[$columnName]):[]; break;
+                  //case DateTime::class: $this->$phpName = new DateTime($row[$columnName]); break;
+
+                    default:
+                        // TODO: handle custom types
+                        //if (is_class($phpType)) {
+                        //    $object->$phpName = new $phpType($row[$column]);
+                        //    break;
+                        //}
+                        throw new RuntimeException('Unsupported PHP type "'.$phpType.'" for database mapping of '.get_class($this).'::'.$phpName);
+                }
+            }
+        }
+        return $this;
+    }
+
+
+    /**
      * Create a new instance and populate it with the specified properties. This method is called by the ORM to transform
      * records originating from database queries to instances of the respective entity class.
      *
@@ -368,42 +412,49 @@ abstract class PersistableObject extends Object {
      *
      * @return self|null
      */
-    public static function createInstance($class, array $row) {
+    public static function populateNew($class, array $row) {
         if (static::class != __CLASS__) throw new IllegalAccessException('Cannot access method '.__METHOD__.'() from an entity class.');
+
+        /** @var self $object */
         $object = new $class();
-        if (!$object instanceof self)   throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
+        if (!$object instanceof self) throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
 
-        $row      = array_change_key_case($row, CASE_LOWER);
-        $mappings = $object->dao()->getMapping();
+        return $object->populate($row);
+    }
 
-        foreach ($mappings['columns'] as $phpName => $mapping) {
-            $column = strToLower($mapping[IDX_MAPPING_COLUMN_NAME]);
 
-            if ($row[$column] === null) {
-                if ($mapping[IDX_MAPPING_COLUMN_BEHAVIOR] & ID_PRIMARY) {   // if the column identity is NULL it's an empty row
-                    return null;
-                }
-            }
-            else {
-                $phpType = $mapping[IDX_MAPPING_PHP_TYPE];
+    /**
+     * Reload this instance from the datastore and optionally reset relations.
+     *
+     * @param  bool $resetRelations - NOT YET IMPLEMENTED: Whether or not to reset relations and re-fetch on next access.
+     *                                                     (default: no)
+     * @return $this
+     */
+    public function reload($resetRelations = false) {   // TODO: implement and set default=TRUE
+        if (!$this->isPersistent()) throw new InvalidArgumentException('Cannot reload non-persistent '.get_class($this));
 
-                switch ($phpType) {
-                    case PHP_TYPE_BOOL  : $object->$phpName =       (bool) $row[$column];  break;
-                    case PHP_TYPE_INT   : $object->$phpName =        (int) $row[$column];  break;
-                    case PHP_TYPE_FLOAT : $object->$phpName =      (float) $row[$column];  break;
-                    case PHP_TYPE_STRING: $object->$phpName =     (string) $row[$column];  break;
-                  //case PHP_TYPE_ARRAY : $object->$phpName =       strLen($row[$column]) ? explode(',', $row[$column]) : []; break;
-                  //case DateTime::class: $object->$phpName = new DateTime($row[$column]); break;
-                    default:
-                        //if (is_class($phpType)) {
-                        //    $object->$phpName = new $phpType($row[$column]);
-                        //    break;
-                        //}
-                        throw new RuntimeException('Unsupported PHP type "'.$phpType.'" for database mapping of '.$class.'::'.$phpName);
-                }
-            }
-        }
-        return $object;
+        // TODO: This method cannot yet handle composite primary keys.
+
+        $db     = $this->db();
+        $dao    = $this->dao();
+        $entity = $dao->getEntityMapping();
+        $table  = $entity->getTableName();
+
+        // collect identity infos
+        $identity   = $entity->getIdentityMapping();
+        $idColumn   = $identity->getColumnName();
+        $idProperty = $identity->getPhpName();
+        $idValue    = $identity->convertToSQLValue($this->$idProperty, $db);
+
+        // create and execute SQL
+        $sql = 'select *
+                   from '.$table.'
+                   where '.$idColumn.' = '.$idValue;
+        $row = $db->query($sql)->fetchRow();
+        if ($row === null) throw new ConcurrentModificationException('Error reloading '.get_class($this).' ('.$this->getObjectId().'), data record not found');
+
+        // apply record values
+        return $this->populate($row);
     }
 
 

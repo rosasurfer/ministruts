@@ -9,7 +9,6 @@ use rosasurfer\db\ResultInterface    as IResult;
 use rosasurfer\db\orm\meta\EntityMapping;
 
 use rosasurfer\exception\ConcurrentModificationException;
-use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\UnimplementedFeatureException;
 
 use function rosasurfer\strLeft;
@@ -298,8 +297,8 @@ abstract class DAO extends Singleton {
 
         // execute SQL and check for concurrent modifications
         if ($db->execute($sql)->lastAffectedRows() != 1) {
-            $found = $this->refresh($object);
-            throw new ConcurrentModificationException('Error updating '.get_class($object).' (oid='.$object->getObjectId().'), expected version: '.$oldVersion.', found version: '.$found->getObjectVersion());
+            $object->reload();
+            throw new ConcurrentModificationException('Error updating '.get_class($object).' (oid='.$object->getObjectId().'), expected version: '.$oldVersion.', found version: '.$object->getObjectVersion());
         }
         return $newVersion;
     }
@@ -335,35 +334,5 @@ abstract class DAO extends Singleton {
         $this->$idProperty = null;
 
         return true;
-    }
-
-
-    /**
-     * Reload and return a fresh version of the specified instance.
-     *
-     * @param  PersistableObject $object
-     *
-     * @return PersistableObject - refreshed version (a new and different instance)
-     */
-    public function refresh(PersistableObject $object) {
-        $class = $this->getEntityClass();
-        if (!$object instanceof $class) throw new InvalidArgumentException('Cannot refresh instances of '.get_class($object));
-        if (!$object->isPersistent())   throw new InvalidArgumentException('Cannot refresh non-persistent '.get_class($object));
-
-        // TODO: This method cannot yet handle composite primary keys.
-
-        $mapping  = $this->getEntityMapping();
-        $table    = $mapping->getTableName();
-        $identity = $mapping->getIdentityMapping();
-        $column   = $identity->getColumnName();
-        $id       = $identity->convertToSQLValue($object->getObjectId(), $this->db());
-
-        $sql = 'select *
-                 from '.$table.'
-                 where '.$column.' = '.$id;
-        $instance = $this->findOne($sql);
-
-        if (!$instance) throw new ConcurrentModificationException('Error refreshing '.get_class($object).' ('.$object->getObjectId().'), data record not found');
-        return $instance;
     }
 }

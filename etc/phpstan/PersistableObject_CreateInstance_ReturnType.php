@@ -18,15 +18,15 @@ use rosasurfer\phpstan\DynamicReturnType;
 use function rosasurfer\echoPre;
 
 
-class PersistableObject_CreateInstance_ReturnType extends DynamicReturnType implements DynamicMethodReturnTypeExtension,
-                                                                                       DynamicStaticMethodReturnTypeExtension {
+class PersistableObject_PopulateNew_ReturnType extends DynamicReturnType implements DynamicMethodReturnTypeExtension,
+                                                                                    DynamicStaticMethodReturnTypeExtension {
 
     const CLASS_NAME  = PersistableObject::class;
-    const METHOD_NAME = 'createInstance';
+    const METHOD_NAME = 'populateNew';
 
 
     /**
-     * Resolve the return type of an instance call to PersistableObject->createInstance().
+     * Resolve the return type of an instance call to PersistableObject->populateNew().
      *
      * @return Type
      */
@@ -41,7 +41,7 @@ class PersistableObject_CreateInstance_ReturnType extends DynamicReturnType impl
 
 
     /**
-     * Resolve the return type of a static call to PersistableObject::createInstance().
+     * Resolve the return type of a static call to PersistableObject::populateNew().
      *
      * @return Type
      */
