@@ -95,6 +95,6 @@ const IDX_MAPPING_BIND_TYPE = 2;
 const IDX_MAPPING_COLUMN_NAME = 0;
 
 /**
- * Mapping index of a field's DBMS column behavior (ids and flags).
+ * Mapping index of a field's DBMS column behaviour (ids and flags).
  */
-const IDX_MAPPING_COLUMN_BEHAVIOR = 3;
+const IDX_MAPPING_COLUMN_BEHAVIOUR = 3;

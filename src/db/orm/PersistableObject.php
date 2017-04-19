@@ -44,12 +44,12 @@ abstract class PersistableObject extends Object {
         $created = $touched = null;
 
         foreach ($this->dao()->getMapping()['columns'] as $phpName => $column) {
-            $behavior = $column[IDX_MAPPING_COLUMN_BEHAVIOR];
-            if ($behavior & ID_CREATE) {
+            $behaviour = $column[IDX_MAPPING_COLUMN_BEHAVIOUR];
+            if ($behaviour & ID_CREATE) {
                 $created        = $touched ?: date('Y-m-d H:i:s');
                 $this->$phpName = $created;
             }
-            else if ($behavior & ID_VERSION && $behavior & F_NOT_NULLABLE) {
+            else if ($behaviour & ID_VERSION && $behaviour & F_NOT_NULLABLE) {
                 $touched = $this->touch($created);
             }
         }
@@ -107,7 +107,7 @@ abstract class PersistableObject extends Object {
      */
     protected function touch($version = null) {
         foreach ($this->dao()->getMapping()['columns'] as $phpName => $column) {
-            if ($column[IDX_MAPPING_COLUMN_BEHAVIOR] & ID_VERSION) {
+            if ($column[IDX_MAPPING_COLUMN_BEHAVIOUR] & ID_VERSION) {
                 return $this->$phpName = $version ?: date('Y-m-d H:i:s');
             }
         }
@@ -122,7 +122,7 @@ abstract class PersistableObject extends Object {
      */
     public function isDeleted() {
         foreach ($mapping = $this->dao()->getMapping()['columns'] as $phpName => $column) {
-            if ($column[IDX_MAPPING_COLUMN_BEHAVIOR] & ID_DELETE) {
+            if ($column[IDX_MAPPING_COLUMN_BEHAVIOUR] & ID_DELETE) {
                 return ($this->$phpName !== null);
             }
         }
@@ -138,7 +138,7 @@ abstract class PersistableObject extends Object {
     public function isPersistent() {
         // TODO: this check cannot yet handle composite primary keys
         foreach ($mapping = $this->dao()->getMapping()['columns'] as $phpName => $column) {
-            if ($column[IDX_MAPPING_COLUMN_BEHAVIOR] & ID_PRIMARY)
+            if ($column[IDX_MAPPING_COLUMN_BEHAVIOUR] & ID_PRIMARY)
                 return ($this->$phpName !== null);
         }
         return false;

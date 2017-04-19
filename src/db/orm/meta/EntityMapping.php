@@ -8,7 +8,7 @@ use rosasurfer\exception\RuntimeException;
 
 use const rosasurfer\db\orm\ID_PRIMARY;
 use const rosasurfer\db\orm\ID_VERSION;
-use const rosasurfer\db\orm\IDX_MAPPING_COLUMN_BEHAVIOR;
+use const rosasurfer\db\orm\IDX_MAPPING_COLUMN_BEHAVIOUR;
 
 
 /**
@@ -111,7 +111,7 @@ class EntityMapping extends Object implements \Iterator {
     public function getIdentityMapping() {
         if ($this->identity === null) {
             foreach ($this->legacyMapping['columns'] as $name => $column) {
-                if ($column[IDX_MAPPING_COLUMN_BEHAVIOR] & ID_PRIMARY) {
+                if ($column[IDX_MAPPING_COLUMN_BEHAVIOUR] & ID_PRIMARY) {
                     return $this->identity = new PropertyMapping($this, $name, $column);
                 }
             }
@@ -147,7 +147,7 @@ class EntityMapping extends Object implements \Iterator {
     public function isVersioned() {
         if ($this->version === null) {
             foreach ($this->legacyMapping['columns'] as $name => $column) {
-                if ($column[IDX_MAPPING_COLUMN_BEHAVIOR] & ID_VERSION) {
+                if ($column[IDX_MAPPING_COLUMN_BEHAVIOUR] & ID_VERSION) {
                     $this->version = $name;
                     return true;
                 }
