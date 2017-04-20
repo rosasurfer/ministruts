@@ -29,10 +29,7 @@ abstract class PersistableObject extends Object {
 
 
     /** @var bool - dirty checking status */
-    protected $_modified;
-
-    /** @var string[] - modified and unsaved properties */
-    protected $_modifications;
+    private $_modified;
 
 
     /**
@@ -120,7 +117,7 @@ abstract class PersistableObject extends Object {
      *
      * @return bool
      */
-    public function isDeleted() {
+    final public function isDeleted() {
         foreach ($mapping = $this->dao()->getMapping()['columns'] as $phpName => $column) {
             if ($column[IDX_MAPPING_COLUMN_BEHAVIOUR] & ID_DELETE) {
                 return ($this->$phpName !== null);
@@ -135,7 +132,7 @@ abstract class PersistableObject extends Object {
      *
      * @return bool
      */
-    public function isPersistent() {
+    final public function isPersistent() {
         // TODO: this check cannot yet handle composite primary keys
         foreach ($mapping = $this->dao()->getMapping()['columns'] as $phpName => $column) {
             if ($column[IDX_MAPPING_COLUMN_BEHAVIOUR] & ID_PRIMARY)
@@ -146,12 +143,24 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Whether or not the instance contains unsaved  modifications.
+     * Whether or not the instance status is "modified".
      *
      * @return bool
      */
-    public function isModified() {
-        return (bool)$this->_modified;
+    final public function isModified() {
+        return (bool) $this->_modified;
+    }
+
+
+    /**
+     * Set the instance status to "modified".
+     *
+     * @return bool - the previous state
+     */
+    final protected function modified() {
+        $previous = $this->isModified();
+        $this->_modified = true;
+        return $previous;
     }
 
 
@@ -247,12 +256,11 @@ abstract class PersistableObject extends Object {
         $version = $dao->doUpdate($this, $changes);
 
         if ($version !== false) {
-            // update version property if the class is versioned and reset modification flags
+            // update version property if the class is versioned and reset modification status
             if ($versioned) {
                 $this->$versionName = $version;
             }
-            $this->_modifications = null;
-            $this->_modified      = false;
+            $this->_modified = false;
 
             // post-processing hook
             $this->afterUpdate();
