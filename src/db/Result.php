@@ -55,7 +55,7 @@ abstract class Result extends Object implements ResultInterface {
         $row = $this->fetchRow(ARRAY_BOTH);             // field types depend on the DBMS/driver
 
         if (!$row) {
-            if (func_num_args() < 4) throw new NoMoreRowsException();
+            if (func_num_args() < 4) throw new NoMoreRecordsException();
             return $onNoMoreRows;
         }
 

@@ -5,7 +5,7 @@ use rosasurfer\core\Object;
 
 use rosasurfer\db\ConnectionPool;
 use rosasurfer\db\ConnectorInterface as IConnector;
-use rosasurfer\db\MultipleRowsException;
+use rosasurfer\db\MultipleRecordsException;
 use rosasurfer\db\ResultInterface as IResult;
 
 use function rosasurfer\strLeftTo;
@@ -52,13 +52,13 @@ class Worker extends Object {
      *
      * @return PersistableObject|null
      *
-     * @throws MultipleRowsException if the query returned multiple rows and $allowMany was not set to TRUE.
+     * @throws MultipleRecordsException if the query returned multiple rows and $allowMany was not set to TRUE.
      */
     public function findOne($query, $allowMany=false) { // TODO: numRows() is not available on SQLite or with PDO and the
         $result = $this->query($query);                 //       emulation is slow. The check can be improved with fetchRow()
                                                         //       when reset(-1) and internal record caching are implemented.
         $object = $this->makeObject($result);           //
-        if ($object && !$allowMany && $result->numRows() > 1) throw new MultipleRowsException();
+        if ($object && !$allowMany && $result->numRows() > 1) throw new MultipleRecordsException();
 
         return $object;
     }

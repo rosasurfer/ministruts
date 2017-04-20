@@ -3,9 +3,9 @@ namespace rosasurfer\db;
 
 
 /**
- * NoMoreRowsException
+ * NoMoreRecordsException
  *
- * Thrown if a query expecting at least one (more) row can not fetch one.
+ * Thrown if a query expecting at least one (more) record can not fetch one.
  */
-class NoMoreRowsException extends DatabaseException {
+class NoMoreRecordsException extends DatabaseException {
 }

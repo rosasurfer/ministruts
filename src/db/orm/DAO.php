@@ -4,6 +4,7 @@ namespace rosasurfer\db\orm;
 use rosasurfer\core\Singleton;
 
 use rosasurfer\db\ConnectorInterface as IConnector;
+use rosasurfer\db\MultipleRecordsException;
 use rosasurfer\db\ResultInterface    as IResult;
 
 use rosasurfer\db\orm\meta\EntityMapping;
@@ -55,7 +56,7 @@ abstract class DAO extends Singleton {
      *
      * @return PersistableObject|null
      *
-     * @throws MultipleRowsException if the query returned multiple rows and $allowMany was not set to TRUE.
+     * @throws MultipleRecordsException if the query returned multiple rows and $allowMany was not set to TRUE.
      */
     public function findOne($query, $allowMany=false) {
         return $this->getWorker()->findOne($query, $allowMany);

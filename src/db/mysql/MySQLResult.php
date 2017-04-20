@@ -2,7 +2,7 @@
 namespace rosasurfer\db\mysql;
 
 use rosasurfer\db\ConnectorInterface as IConnector;
-use rosasurfer\db\NoMoreRowsException;
+use rosasurfer\db\NoMoreRecordsException;
 use rosasurfer\db\Result;
 
 use rosasurfer\exception\IllegalTypeException;
@@ -157,7 +157,7 @@ class MySQLResult extends Result {
      *
      * @return mixed - content of a single cell (can be NULL)
      *
-     * @throws NoMoreRowsException if no more rows are available and parameter $onNoMoreRows was not set
+     * @throws NoMoreRecordsException if no more rows are available and parameter $onNoMoreRows was not set
      *
     public function fetchColumn($column=null, $row=null, $onNoMoreRows=null) {
         // TODO: mysql_result() compares column names in a case-insensitive way (no manual fiddling needed)

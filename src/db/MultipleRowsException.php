@@ -3,9 +3,9 @@ namespace rosasurfer\db;
 
 
 /**
- * MultipleRowsException
+ * MultipleRecordsException
  *
- * Thrown if a query expecting exactly one (more) row encounters multiple rows.
+ * Thrown if a query expecting exactly one (more) record encounters multiple records.
  */
-class MultipleRowsException extends DatabaseException {
+class MultipleRecordsException extends DatabaseException {
 }

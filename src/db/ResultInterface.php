@@ -32,7 +32,7 @@ interface ResultInterface {
      *
      * @return mixed - value of a single cell (driver dependent type) or $onNull if the cell value is NULL
      *
-     * @throws NoMoreRowsException if no more rows are available and parameter $onNoMoreRows was not set.
+     * @throws NoMoreRecordsException if no more rows are available and parameter $onNoMoreRows was not set.
      */
     public function fetchColumn($column=0, $row=null, $onNull=null, $onNoMoreRows=null);
 
@@ -47,7 +47,7 @@ interface ResultInterface {
      *
      * @return string - string value of a single cell or $onNull if the cell value is NULL
      *
-     * @throws NoMoreRowsException       if no more rows are available and parameter $onNoMoreRows was not set.
+     * @throws NoMoreRecordsException    if no more rows are available and parameter $onNoMoreRows was not set.
      * @throws \UnexpectedValueException if the cell value is not NULL and does not represent a floating point value.
      */
     public function fetchString($column=0, $row=null, $onNull=null, $onNoMoreRows=null);
@@ -63,7 +63,7 @@ interface ResultInterface {
      *
      * @return bool - boolean value of a single cell or $onNull if the cell value is NULL
      *
-     * @throws NoMoreRowsException       if no more rows are available and parameter $onNoMoreRows was not set.
+     * @throws NoMoreRecordsException    if no more rows are available and parameter $onNoMoreRows was not set.
      * @throws \UnexpectedValueException if the cell value is not NULL and does not represent a boolean. Accepted string
      *                                   representations are "true" and "false", "on" and "off", "yes" and "no', and
      *                                   numerical representations.
@@ -81,7 +81,7 @@ interface ResultInterface {
      *
      * @return int - integer value of a single cell or $onNull if the cell value is NULL
      *
-     * @throws NoMoreRowsException       if no more rows are available and parameter $onNoMoreRows was not set.
+     * @throws NoMoreRecordsException    if no more rows are available and parameter $onNoMoreRows was not set.
      * @throws \UnexpectedValueException if the cell value is not NULL and does not represent an integer. The accepted
      *                                   floating point values must have a fractional part equal to 0 (zero).
      *                                   Use <tt>self::fetchFloat()</tt> to interpret more floating point values as integer.
@@ -99,7 +99,7 @@ interface ResultInterface {
      *
      * @return float - floating point value of a single cell or $onNull if the cell value is NULL
      *
-     * @throws NoMoreRowsException       if no more rows are available and parameter $onNoMoreRows was not set.
+     * @throws NoMoreRecordsException    if no more rows are available and parameter $onNoMoreRows was not set.
      * @throws \UnexpectedValueException if the cell value is not NULL and does not represent a floating point value.
      */
     public function fetchFloat($column=0, $row=null, $onNull=null, $onNoMoreRows=null);
