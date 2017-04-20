@@ -149,7 +149,7 @@ class MySQLResult extends Result {
 
 
     /**
-     * Fetch a single field of a row from the result set.
+     * Fetch a single column of a row from the result set.
      *
      * @param  string|int $column       - name or offset of the column to fetch from (default: 0)
      * @param  int        $row          - row to fetch from, starting at 0 (default: the next row)
@@ -159,7 +159,7 @@ class MySQLResult extends Result {
      *
      * @throws NoMoreRowsException if no more rows are available and parameter $onNoMoreRows was not set
      *
-    public function fetchField($column=null, $row=null, $onNoMoreRows=null) {
+    public function fetchColumn($column=null, $row=null, $onNoMoreRows=null) {
         // TODO: mysql_result() compares column names in a case-insensitive way (no manual fiddling needed)
         return mysql_result($this->resultSet, $row=0, $column);
     }

@@ -46,7 +46,7 @@ abstract class Result extends Object implements ResultInterface {
     /**
      * {@inheritDoc}
      */
-    public function fetchField($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
+    public function fetchColumn($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
         if (!is_null($row)) throw new UnimplementedFeatureException('$row='.$row.' (!= NULL)');
 
         // Generic default implementation:
@@ -84,8 +84,8 @@ abstract class Result extends Object implements ResultInterface {
      * {@inheritDoc}
      */
     public function fetchString($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
-        if (func_num_args() < 4) $value = $this->fetchField($column, $row, null);
-        else                     $value = $this->fetchField($column, $row, null, $onNoMoreRows);
+        if (func_num_args() < 4) $value = $this->fetchColumn($column, $row, null);
+        else                     $value = $this->fetchColumn($column, $row, null, $onNoMoreRows);
 
         if (is_string($value)) return $value;
         if (is_null($value))   return $onNull;
@@ -100,8 +100,8 @@ abstract class Result extends Object implements ResultInterface {
      * {@inheritDoc}
      */
     public function fetchBool($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
-        if (func_num_args() < 4) $value = $this->fetchField($column, $row, null);
-        else                     $value = $this->fetchField($column, $row, null, $onNoMoreRows);
+        if (func_num_args() < 4) $value = $this->fetchColumn($column, $row, null);
+        else                     $value = $this->fetchColumn($column, $row, null, $onNoMoreRows);
 
         if (is_bool($value)) return $value;
         if (is_null($value)) return $onNull;
@@ -120,8 +120,8 @@ abstract class Result extends Object implements ResultInterface {
      * {@inheritDoc}
      */
     public function fetchInt($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
-        if (func_num_args() < 4) $value = $this->fetchField($column, $row, null);
-        else                     $value = $this->fetchField($column, $row, null, $onNoMoreRows);
+        if (func_num_args() < 4) $value = $this->fetchColumn($column, $row, null);
+        else                     $value = $this->fetchColumn($column, $row, null, $onNoMoreRows);
 
         if (is_int($value))  return $value;
         if (is_null($value)) return $onNull;
@@ -147,8 +147,8 @@ abstract class Result extends Object implements ResultInterface {
      * {@inheritDoc}
      */
     public function fetchFloat($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
-        if (func_num_args() < 4) $value = $this->fetchField($column, $row, null);
-        else                     $value = $this->fetchField($column, $row, null, $onNoMoreRows);
+        if (func_num_args() < 4) $value = $this->fetchColumn($column, $row, null);
+        else                     $value = $this->fetchColumn($column, $row, null, $onNoMoreRows);
 
         if (is_float($value)) return $value;
         if (is_null($value))  return $onNull;

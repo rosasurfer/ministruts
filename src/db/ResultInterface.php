@@ -23,7 +23,7 @@ interface ResultInterface {
 
 
     /**
-     * Fetch a single field from the result set.
+     * Fetch a single column from the result set.
      *
      * @param  string|int|null $column       - name or offset of the column to fetch from (default: 0)
      * @param  int|null        $row          - row to fetch from, starting at 0 (default: the next row)
@@ -34,7 +34,7 @@ interface ResultInterface {
      *
      * @throws NoMoreRowsException if no more rows are available and parameter $onNoMoreRows was not set.
      */
-    public function fetchField($column=0, $row=null, $onNull=null, $onNoMoreRows=null);
+    public function fetchColumn($column=0, $row=null, $onNull=null, $onNoMoreRows=null);
 
 
     /**
