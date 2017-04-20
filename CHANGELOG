@@ -1,4 +1,11 @@
 
+2017-04-20
+
+   - db: rename Result::fetchField()  => Result::fetchColumn()
+   - db: rename NoMoreRowsException   => NoMoreRecordsException 
+   - db: rename MultipleRowsException => MultipleRecordsException
+   
+
 2017-04-19
 
    - orm: re-implement DAO::refresh(PersistableObject) as PersistableObject::reload()
