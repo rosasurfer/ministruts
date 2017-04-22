@@ -7,16 +7,12 @@ use rosasurfer\db\ConnectorInterface as IConnector;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RuntimeException;
 
-use const rosasurfer\db\orm\BIND_TYPE_BOOL;
-use const rosasurfer\db\orm\BIND_TYPE_DECIMAL;
-use const rosasurfer\db\orm\BIND_TYPE_INT;
-use const rosasurfer\db\orm\BIND_TYPE_STRING;
-
-use const rosasurfer\db\orm\IDX_MAPPING_BIND_TYPE;
-use const rosasurfer\db\orm\IDX_MAPPING_COLUMN_NAME;
-use const rosasurfer\db\orm\IDX_MAPPING_PHP_TYPE;
-
 use function rosasurfer\is_class;
+
+use const rosasurfer\PHP_TYPE_BOOL;
+use const rosasurfer\PHP_TYPE_FLOAT;
+use const rosasurfer\PHP_TYPE_INT;
+use const rosasurfer\PHP_TYPE_STRING;
 
 
 /**
@@ -69,7 +65,7 @@ class PropertyMapping extends Object {
      * @return string
      */
     public function getColumnName() {
-        return $this->legacyMapping[IDX_MAPPING_COLUMN_NAME];
+        return $this->legacyMapping['column'];
     }
 
 
@@ -98,18 +94,18 @@ class PropertyMapping extends Object {
             $value = 'null';
         }
         else {
-            $bindType = $this->legacyMapping[IDX_MAPPING_BIND_TYPE] ?: $this->legacyMapping[IDX_MAPPING_PHP_TYPE];
-            switch ($bindType) {
-                case BIND_TYPE_BOOL   : $value =                (string)(int)(bool) $value;  break;
-                case BIND_TYPE_INT    : $value =                      (string)(int) $value;  break;
-                case BIND_TYPE_DECIMAL: $value =                    (string)(float) $value;  break;
-                case BIND_TYPE_STRING : $value = $connector->escapeLiteral((string) $value); break;
+            $type = $this->legacyMapping['type'];
+            switch ($type) {
+                case PHP_TYPE_BOOL  : $value =                (string)(int)(bool) $value;  break;
+                case PHP_TYPE_INT   : $value =                      (string)(int) $value;  break;
+                case PHP_TYPE_FLOAT : $value =                    (string)(float) $value;  break;
+                case PHP_TYPE_STRING: $value = $connector->escapeLiteral((string) $value); break;
                 default:
-                    if (is_class($bindType)) {
-                        $value = (new $bindType())->convertToSQLValue($value, $this, $connector);
+                    if (is_class($type)) {
+                        $value = (new $type())->convertToSQLValue($value, $this, $connector);
                         break;
                     }
-                    throw new RuntimeException('Unsupported SQL bind type "'.$bindType.'" for database mapping of '.$this->entity->getClassName().'::'.$this->getPhpName());
+                    throw new RuntimeException('Unsupported type "'.$type.'" for database mapping of '.$this->entity->getClassName().'::'.$this->getPhpName());
             }
         }
         return $value;

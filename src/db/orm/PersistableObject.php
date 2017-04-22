@@ -6,6 +6,7 @@ use rosasurfer\core\Singleton;
 
 use rosasurfer\db\ConnectorInterface as IConnector;
 
+use rosasurfer\exception\ConcurrentModificationException;
 use rosasurfer\exception\IllegalAccessException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
@@ -17,7 +18,6 @@ use const rosasurfer\PHP_TYPE_BOOL;
 use const rosasurfer\PHP_TYPE_FLOAT;
 use const rosasurfer\PHP_TYPE_INT;
 use const rosasurfer\PHP_TYPE_STRING;
-use rosasurfer\exception\ConcurrentModificationException;
 
 
 /**
@@ -38,18 +38,8 @@ abstract class PersistableObject extends Object {
      * Create a new instance.
      */
     protected function __construct() {
-        $created = $touched = null;
-
-        foreach ($this->dao()->getMapping()['columns'] as $phpName => $column) {
-            $behaviour = $column[IDX_MAPPING_COLUMN_BEHAVIOUR];
-            if ($behaviour & ID_CREATE) {
-                $created        = $touched ?: date('Y-m-d H:i:s');
-                $this->$phpName = $created;
-            }
-            else if ($behaviour & ID_VERSION && $behaviour & F_NOT_NULLABLE) {
-                $touched = $this->touch($created);
-            }
-        }
+        // post-event hook
+        $this->afterCreate();
     }
 
 
@@ -66,49 +56,18 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Return the instance's version value (if any).
+     * Whether or not the instance was already saved and has a unique id assigned to it (the primary key).
      *
-     * @return mixed|null - version value or NULL if the entity class is not versioned
+     * @return bool
      */
-    final public function getObjectVersion() {
-        $entity  = $this->dao()->getEntityMapping();
-        $version = $entity->getVersionMapping();
-        if ($version) {
-            $versionName = $version->getPhpName();
-            return $this->$versionName;
-        }
-        return null;
-    }
-
-
-    /**
-     * Generate a new version value for the instance. The generated value is not assigned to the instance's
-     * version property.
-     *
-     * @return mixed|null - version value or NULL if the entity class is not versioned
-     */
-    protected function generateVersion() {
-        if ($this->dao()->getEntityMapping()->isVersioned()) {
-            return date('Y-m-d H:i:s');
-        }
-        return null;
-    }
-
-
-    /**
-     * Update the version string of the instance and return it.
-     *
-     * @param  string - version string to assign (default: current local datetime)
-     *
-     * @return string|null - assigned version string or NULL if the entity has no version field
-     */
-    protected function touch($version = null) {
-        foreach ($this->dao()->getMapping()['columns'] as $phpName => $column) {
-            if ($column[IDX_MAPPING_COLUMN_BEHAVIOUR] & ID_VERSION) {
-                return $this->$phpName = $version ?: date('Y-m-d H:i:s');
+    final public function isPersistent() {
+        // TODO: this check cannot yet handle composite primary keys
+        foreach ($this->dao()->getMapping()['columns'] as $name => $column) {
+            if (isSet($column['primary']) && $column['primary']===true) {
+                return ($this->$name !== null);
             }
         }
-        return null;
+        return false;
     }
 
 
@@ -118,25 +77,10 @@ abstract class PersistableObject extends Object {
      * @return bool
      */
     final public function isDeleted() {
-        foreach ($mapping = $this->dao()->getMapping()['columns'] as $phpName => $column) {
-            if ($column[IDX_MAPPING_COLUMN_BEHAVIOUR] & ID_DELETE) {
-                return ($this->$phpName !== null);
+        foreach ($this->dao()->getMapping()['columns'] as $name => $column) {
+            if (isSet($column['soft-delete']) && $column['soft-delete']===true) {
+                return ($this->$name !== null);
             }
-        }
-        return false;
-    }
-
-
-    /**
-     * Whether or not the instance was already saved and has a unique id assigned to it (the primary key).
-     *
-     * @return bool
-     */
-    final public function isPersistent() {
-        // TODO: this check cannot yet handle composite primary keys
-        foreach ($mapping = $this->dao()->getMapping()['columns'] as $phpName => $column) {
-            if ($column[IDX_MAPPING_COLUMN_BEHAVIOUR] & ID_PRIMARY)
-                return ($this->$phpName !== null);
         }
         return false;
     }
@@ -234,32 +178,16 @@ abstract class PersistableObject extends Object {
         if (!$this->beforeUpdate())
             return $this;
 
-        $dao         = $this->dao();
-        $entity      = $dao->getEntityMapping();
-        $versioned   = $entity->isVersioned();
-        $versionName = null;
+        $dao = $this->dao();
 
-        // collect the modified properties
+        // collect modified properties and their values
         $changes = [];
-        foreach ($entity as $name => $property) {
-            $changes[$name] = $this->$name;             // TODO: implement dirty check
-        }
-
-        // check versioning and add old/new version values
-        if ($changes && $versioned) {
-            $versionName = $entity->getVersionMapping()->getPhpName();
-            $changes['old.version'] = $this->$versionName;
-            $changes['new.version'] = $this->generateVersion();
+        foreach ($dao->getEntityMapping() as $property => $mapping) {   // TODO: Until the dirty check is implemented all
+            $changes[$property] = $this->$property;                     //       properties are assumed dirty.
         }
 
         // perform update
-        $version = $dao->doUpdate($this, $changes);
-
-        if ($version !== false) {
-            // update version property if the class is versioned and reset modification status
-            if ($versioned) {
-                $this->$versionName = $version;
-            }
+        if ($dao->doUpdate($this, $changes)) {
             $this->_modified = false;
 
             // post-processing hook
@@ -291,8 +219,14 @@ abstract class PersistableObject extends Object {
         if (!$this->beforeDelete())
             return $this;
 
+        $dao = $this->dao();
+
         // perform deletion
-        if ($this->dao()->doDelete($this)) {
+        if ($dao->doDelete($this)) {
+            // reset identity property
+            $idProperty = $dao->getEntityMapping()->getIdentityMapping()->getPhpName();
+            $this->$idProperty = null;
+
             // post-processing hook
             $this->afterDelete();
         }
@@ -301,9 +235,17 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Save pre-processing hook. Can be overridden by the entity instance.
+     * Creation post-processing hook (application-side ORM trigger). Can be overridden by the instance.
+     */
+    protected function afterCreate() {
+    }
+
+
+    /**
+     * Save pre-processing hook (application-side ORM trigger). Can be overridden by the instance.
      *
-     * @return bool - TRUE if saving is to be continued; FALSE otherwise
+     * @return bool - TRUE  if saving is to be continued;
+     *                FALSE if the saving is to be skipped
      */
     protected function beforeSave() {
         return true;
@@ -311,16 +253,17 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Save post-processing hook. Can be overridden by the entity instance.
+     * Save post-processing hook (application-side ORM trigger). Can be overridden by the instance.
      */
     protected function afterSave() {
     }
 
 
     /**
-     * Insert pre-processing hook. Can be overridden by the entity instance.
+     * Insert pre-processing hook (application-side ORM trigger). Can be overridden by the instance.
      *
-     * @return bool - TRUE if insertion is to be continued; FALSE otherwise
+     * @return bool - TRUE  if insertion is to be continued;
+     *                FALSE if the insertion is to be skipped
      */
     protected function beforeInsert() {
         return true;
@@ -328,16 +271,17 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Insert post-processing hook. Can be overridden by the entity instance.
+     * Insert post-processing hook (application-side ORM trigger). Can be overridden by the instance.
      */
     protected function afterInsert() {
     }
 
 
     /**
-     * Update pre-processing hook. Can be overridden by the entity instance.
+     * Update pre-processing hook (application-side ORM trigger). Can be overridden by the instance.
      *
-     * @return bool - TRUE if updating is to be continued; FALSE otherwise
+     * @return bool - TRUE  if the update is to be continued;
+     *                FALSE if the update is to be skipped
      */
     protected function beforeUpdate() {
         return true;
@@ -345,16 +289,17 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Update post-processing hook. Can be overridden by the entity instance.
+     * Update post-processing hook (application-side ORM trigger). Can be overridden by the instance.
      */
     protected function afterUpdate() {
     }
 
 
     /**
-     * Delete pre-processing hook. Can be overridden by the entity instance.
+     * Delete pre-processing hook (application-side ORM trigger). Can be overridden by the instance.
      *
-     * @return bool - TRUE if deletion is to be continued; FALSE otherwise
+     * @return bool - TRUE  if deletion is to be continued;
+     *                FALSE if the deletion is to be skipped
      */
     protected function beforeDelete() {
         return true;
@@ -362,7 +307,7 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Delete post-processing hook. Can be overridden by the entity instance.
+     * Delete post-processing hook (application-side ORM trigger). Can be overridden by the instance.
      */
     protected function afterDelete() {
     }
@@ -380,16 +325,16 @@ abstract class PersistableObject extends Object {
         $row     = array_change_key_case($row, CASE_LOWER);
         $mapping = $this->dao()->getMapping();
 
-        foreach ($mapping['columns'] as $phpName => $column) {
-            $columnName = strToLower($column[IDX_MAPPING_COLUMN_NAME]);
+        foreach ($mapping['columns'] as $phpName => $columnMapping) {
+            $columnName = strToLower($columnMapping['column']);
 
             if ($row[$columnName] === null) {
                 $this->$phpName = null;
             }
             else {
-                $phpType = $column[IDX_MAPPING_PHP_TYPE];
+                $type = $columnMapping['type'];
 
-                switch ($phpType) {
+                switch ($type) {
                     case PHP_TYPE_BOOL  : $this->$phpName =       (bool) $row[$columnName];  break;
                     case PHP_TYPE_INT   : $this->$phpName =        (int) $row[$columnName];  break;
                     case PHP_TYPE_FLOAT : $this->$phpName =      (float) $row[$columnName];  break;
@@ -399,11 +344,11 @@ abstract class PersistableObject extends Object {
 
                     default:
                         // TODO: handle custom types
-                        //if (is_class($phpType)) {
-                        //    $object->$phpName = new $phpType($row[$column]);
+                        //if (is_class($type)) {
+                        //    $object->$phpName = new $type($row[$column]);
                         //    break;
                         //}
-                        throw new RuntimeException('Unsupported PHP type "'.$phpType.'" for database mapping of '.get_class($this).'::'.$phpName);
+                        throw new RuntimeException('Unsupported type "'.$type.'" for database mapping of '.get_class($this).'::'.$phpName);
                 }
             }
         }
@@ -459,7 +404,7 @@ abstract class PersistableObject extends Object {
                    from '.$table.'
                    where '.$idColumn.' = '.$idValue;
         $row = $db->query($sql)->fetchRow();
-        if ($row === null) throw new ConcurrentModificationException('Error reloading '.get_class($this).' ('.$this->getObjectId().'), data record not found');
+        if ($row === null) throw new ConcurrentModificationException('Error reloading '.get_class($this).' ('.$this->getObjectId().'), record not found');
 
         // apply record values
         return $this->populate($row);

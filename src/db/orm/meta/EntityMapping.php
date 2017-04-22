@@ -6,13 +6,9 @@ use rosasurfer\core\Object;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RuntimeException;
 
-use const rosasurfer\db\orm\ID_PRIMARY;
-use const rosasurfer\db\orm\ID_VERSION;
-use const rosasurfer\db\orm\IDX_MAPPING_COLUMN_BEHAVIOUR;
-
 
 /**
- * An EntityMapping is an object encapsulating meta information about how to map a database table to a PHP class.
+ * An EntityMapping is an object encapsulating meta information about how to map a database record to a PHP object.
  */
 class EntityMapping extends Object implements \Iterator {
 
@@ -29,7 +25,7 @@ class EntityMapping extends Object implements \Iterator {
     /** @var PropertyMapping - identity mapping of the entity */
     protected $identity;
 
-    /** @var PropertyMapping|string - version mapping or mapping key; an empty string for non-versioned entities */
+    /** @var PropertyMapping|bool - version mapping of the entity or FALSE for non-versioned entities */
     protected $version;
 
     /** @var int - current iterator position when used as an Iterator */
@@ -82,7 +78,7 @@ class EntityMapping extends Object implements \Iterator {
      *
      * @return PropertyMapping|null - mapping or NULL if no such property exists
      */
-    public function getProperty($name) {
+    public function getPropertyMapping($name) {
         if (!$this->properties) {
             $keys = array_keys($this->legacyMapping['columns']);
             $this->properties = array_flip($keys);
@@ -104,14 +100,14 @@ class EntityMapping extends Object implements \Iterator {
 
 
     /**
-     * Return the identity property of this mapping.
+     * Return the identity property of the mapping.
      *
      * @return PropertyMapping
      */
     public function getIdentityMapping() {
         if ($this->identity === null) {
             foreach ($this->legacyMapping['columns'] as $name => $column) {
-                if ($column[IDX_MAPPING_COLUMN_BEHAVIOUR] & ID_PRIMARY) {
+                if (isSet($column['primary']) && $column['primary']===true) {
                     return $this->identity = new PropertyMapping($this, $name, $column);
                 }
             }
@@ -122,39 +118,20 @@ class EntityMapping extends Object implements \Iterator {
 
 
     /**
-     * Return the version property of this mapping.
+     * Return the version property of the mapping.
      *
-     * @return PropertyMapping|null - property mapping or NULL if the entity is not versioned
+     * @return PropertyMapping|null - property mapping or NULL if no versioning property is configured
      */
     public function getVersionMapping() {
-        if ($this->isVersioned()) {
-            if (is_string($this->version)) {
-                $name = $this->version;
-                $this->version = new PropertyMapping($this, $name, $this->legacyMapping['columns'][$name]);
-            }
-            /** @var PropertyMapping $version */
-            return $version = $this->version;
-        }
-        return null;
-    }
-
-
-    /**
-     * Whether or not the saved properties of the entity contain versioning information.
-     *
-     * @return bool
-     */
-    public function isVersioned() {
         if ($this->version === null) {
             foreach ($this->legacyMapping['columns'] as $name => $column) {
-                if ($column[IDX_MAPPING_COLUMN_BEHAVIOUR] & ID_VERSION) {
-                    $this->version = $name;
-                    return true;
+                if (isSet($column['version']) && $column['version']===true) {
+                    return $this->version = new PropertyMapping($this, $name, $column);
                 }
             }
-            $this->version = '';
+            $this->version = false;
         }
-        return (bool) $this->version;
+        return $this->version ?: null;
     }
 
 

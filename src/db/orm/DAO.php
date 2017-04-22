@@ -219,7 +219,7 @@ abstract class DAO extends Singleton {
         // convert values to their SQL representation
         $columns = [];
         foreach ($values as $name => &$value) {
-            $property  = $entity->getProperty($name);
+            $property  = $entity->getPropertyMapping($name);
             $columns[] = $property->getColumnName();
             $value     = $property->convertToSQLValue($value, $db);
         }; unset($value);
@@ -249,8 +249,7 @@ abstract class DAO extends Singleton {
      * @param  PersistableObject $object  - modified instance
      * @param  array             $changes - modifications
      *
-     * @return mixed - The new PHP version value after writing the changes if the object's entity class is versioned or TRUE
-     *                 if the entity class is not versioned. FALSE in case of an error.
+     * @return bool - success status
      */
     public function doUpdate(PersistableObject $object, array $changes) {
         $db     = $this->db();
@@ -263,45 +262,39 @@ abstract class DAO extends Singleton {
         $idValue  = $identity->convertToSQLValue($object->getObjectId(), $db);
 
         // collect version infos
-        $versionColumn = $oldVersion = $newVersion = null;
-        $version = $entity->getVersionMapping();
-        if ($version) {
-            $versionName   = $version->getPhpName();
-            $versionColumn = $version->getColumnName();
-            unset($changes[$versionName], $changes[$identity->getPhpName()]);
-
-            if (isSet($changes[$versionName])) {
-                $version = null;                                        // TODO: throw exception
-            }
-            else {
-                $oldVersion = $version->convertToSQLValue($changes['old.version'], $db);
-                $newVersion = $changes['new.version'];
-                unset($changes['old.version'], $changes['new.version']);
-                $changes[$versionName] = $newVersion;
-            }
-        }
+        $versionMapping = $versionName = $versionColumn = $oldVersion = null;
+        //if ($versionMapping = $entity->getVersionMapping()) {
+        //    $versionName   = $versionMapping->getPhpName();
+        //    $versionColumn = $versionMapping->getColumnName();
+        //    $oldVersion    = $object->getSnapshot()->$versionName;        // TODO: implement dirty check via snapshot
+        //    $oldVersion    = $versionMapping->convertToSQLValue($oldVersion, $db);
+        //}
 
         // create SQL
-        $sql = 'update '.$table.' set';                                 // update table
-        foreach ($changes as $name => $value) {                         //    set ...
-            $property    = $entity->getProperty($name);                 //        ...
-            $columnName  = $property->getColumnName();                  //        ...
-            $columnValue = $property->convertToSQLValue($value, $db);   //        column1 = value1,
-            $sql .= ' '.$columnName.' = '.$columnValue.',';             //        column2 = value2,
-        }                                                               //        ...
-        $sql  = strLeft($sql, -1);                                      //        ...
-        $sql .= ' where '.$idColumn.' = '.$idValue;                     //    where id = value
-        if ($version) {                                                 //        ...
-            $op   = $oldVersion=='null' ? 'is':'=';                     //        ...
-            $sql .= ' and '.$versionColumn.' '.$op.' '.$oldVersion;     //      and version = oldVersion
+        $sql = 'update '.$table.' set';                                     // update table
+        foreach ($changes as $name => $value) {                             //    set ...
+            $mapping     = $entity->getPropertyMapping($name);              //        ...
+            $columnName  = $mapping->getColumnName();                       //        ...
+            $columnValue = $mapping->convertToSQLValue($value, $db);        //        column1 = value1,
+            $sql .= ' '.$columnName.' = '.$columnValue.',';                 //        column2 = value2,
+        }                                                                   //        ...
+        $sql  = strLeft($sql, -1);                                          //        ...
+        $sql .= ' where '.$idColumn.' = '.$idValue;                         //    where id = value
+        if ($versionMapping) {                                              //        ...
+            $op   = $oldVersion=='null' ? 'is':'=';                         //        ...
+            $sql .= ' and '.$versionColumn.' '.$op.' '.$oldVersion;         //      and version = oldVersion
         }
 
         // execute SQL and check for concurrent modifications
         if ($db->execute($sql)->lastAffectedRows() != 1) {
-            $object->reload();
-            throw new ConcurrentModificationException('Error updating '.get_class($object).' (oid='.$object->getObjectId().'), expected version: '.$oldVersion.', found version: '.$object->getObjectVersion());
+            if ($versionMapping) {
+                $object->reload();
+                $msg = 'expected version: '.$oldVersion.', found version: '.$object->$versionName;
+            }
+            else $msg = 'record not found';
+            throw new ConcurrentModificationException('Error updating '.get_class($object).' (oid='.$object->getObjectId().'), '.$msg);
         }
-        return $newVersion;
+        return true;
     }
 
 
@@ -318,10 +311,9 @@ abstract class DAO extends Singleton {
         $table  = $entity->getTableName();
 
         // collect identity infos
-        $identity   = $entity->getIdentityMapping();
-        $idProperty = $identity->getPhpName();
-        $idColumn   = $identity->getColumnName();
-        $idValue    = $identity->convertToSQLValue($object->getObjectId(), $db);
+        $identity = $entity->getIdentityMapping();
+        $idColumn = $identity->getColumnName();
+        $idValue  = $identity->convertToSQLValue($object->getObjectId(), $db);
 
         // create SQL
         $sql = 'delete from '.$table.'
@@ -330,10 +322,6 @@ abstract class DAO extends Singleton {
         // execute SQL and check for concurrent modifications
         if ($db->execute($sql)->lastAffectedRows() != 1)
             throw new ConcurrentModificationException('Error deleting '.get_class($object).' (oid='.$object->getObjectId().'): record not found');
-
-        // reset identity property
-        $this->$idProperty = null;
-
         return true;
     }
 }

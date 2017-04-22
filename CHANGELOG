@@ -1,4 +1,10 @@
 
+2017-04-22
+
+   - orm: rewrite mapping configuration
+   - orm: move behaviours to event handlers
+
+
 2017-04-20
 
    - db: rename Result::fetchField()  => Result::fetchColumn()
