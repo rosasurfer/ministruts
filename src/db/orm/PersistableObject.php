@@ -419,7 +419,7 @@ abstract class PersistableObject extends Object {
     public static function dao() {
         if (static::class == __CLASS__) throw new IllegalAccessException('Use an entity class to access method '.__METHOD__.'()');
         return Singleton::getInstance(static::class.'DAO');
-        // TODO: The calling class may be a derived class with the DAO being one of its parents.
+        // TODO: The calling class may be a derived class with the entity class being one of its parents.
     }
 
 
