@@ -46,11 +46,11 @@ class PHPError extends \ErrorException implements IRosasurferException {
             // transform the original stacktrace into a better one
             $trace = DebugHelper::fixTrace($this->getTrace(), $this->getFile(), $this->getLine());
 
-            // drop the first frame if the exception was created in the registered error handler (it always should)
+            // drop the first frame if the exception was created in the registered error handler
             if (DebugHelper::getFQFunctionName($trace[0]) == ErrorHandler::class.'::handleError') {
                 array_shift($trace);
 
-                // if error was triggered by include/require/_once: fix the next frame, it's wrong
+                // if the error was triggered by include/require/_once: fix the next frame, it's wrong
                 if (sizeOf($trace) > 1) {
                     $function = DebugHelper::getFQFunctionName($trace[0]);
                     if ($function=='include' || $function=='include_once' || $function=='require' || $function=='require_once') {

@@ -55,17 +55,18 @@ trait ObjectTrait {
 
 
     /**
-     * Magic method. Catches the other-wise unnoticed setting of undefined class properties.
+     * Magic method. Catches the other-wise unnoticed setting of an inaccessible property.
      *
-     * @param  string $property - name of the undefined property
-     * @param  mixed  $value    - passed value for the undefined property
+     * @param  string $property - name of the undeclared property
+     * @param  mixed  $value    - passed property value
      *
      * @throws RuntimeException
      */
     public function __set($property, $value) {
         $trace = debug_backTrace(DEBUG_BACKTRACE_IGNORE_ARGS|DEBUG_BACKTRACE_PROVIDE_OBJECT);
         $class = get_class($trace[0]['object']);
-        throw new RuntimeException('Undefined class variable '.$class.'::$'.$property);
+        //trigger_error('Undefined or inaccessible property '.$class.'::$'.$property, E_USER_ERROR);
+        throw new RuntimeException('Undefined or inaccessible property '.$class.'::$'.$property);
     }
 
 

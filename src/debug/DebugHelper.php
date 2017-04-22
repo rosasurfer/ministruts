@@ -14,6 +14,7 @@ use function rosasurfer\strRightFrom;
 use function rosasurfer\strStartsWith;
 
 use const rosasurfer\NL;
+use rosasurfer\config\Config;
 
 
 /**
@@ -119,7 +120,8 @@ class DebugHelper extends StaticClass {
      * @return string
      */
     public static function formatTrace(array $trace, $indent='') {
-        $result = '';
+        $appRoot = Config::getDefault()->get('app.dir.root');
+        $result  = '';
 
         $size = sizeOf($trace);
         $callLen = $lineLen = 0;
@@ -128,19 +130,21 @@ class DebugHelper extends StaticClass {
             $frame =& $trace[$i];
 
             $call = self::getFQFunctionName($frame, $nsLowerCase=true);
-            $call!='{main}' && $call!='{closure}' && $call.='()';
+            if ($call!='{main}' && $call!='{closure}')
+                $call.='()';
             $callLen = max($callLen, strLen($call));
             $frame['call'] = $call;
 
             $frame['line'] = isSet($frame['line']) ? ' # line '.$frame['line'].',' : '';
             $lineLen = max($lineLen, strLen($frame['line']));
 
-            if (isSet($frame['file']))                 $frame['file'] = ' file: '.$frame['file'];
+            if (isSet($frame['file']))                 $frame['file'] = ' file: '.strRightFrom($frame['file'], $appRoot.DIRECTORY_SEPARATOR, 1, false, $frame['file']);
             elseif (strStartsWith($call, 'phalcon\\')) $frame['file'] = ' [php-phalcon]';
             else                                       $frame['file'] = ' [php]';
         }
+        $trace[] = ['call'=>'', 'line'=>'', 'file'=>' file base: '.$appRoot];
 
-        for ($i=0; $i < $size; $i++) {
+        for ($i=0; $i <= $size; $i++) {
             $result .= $indent.str_pad($trace[$i]['call'], $callLen).' '.str_pad($trace[$i]['line'], $lineLen).$trace[$i]['file'].NL;
         }
 
