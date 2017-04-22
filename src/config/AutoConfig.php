@@ -106,7 +106,7 @@ class AutoConfig extends Config {
 
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function info() {
         return __METHOD__.'()  not yet implemented';

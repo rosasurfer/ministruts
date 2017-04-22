@@ -126,7 +126,7 @@ class Config extends Object implements ConfigInterface {
 
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function get($key, $default=null) {
         if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
@@ -145,7 +145,7 @@ class Config extends Object implements ConfigInterface {
      * Set/modify the config setting with the specified key. Modified values are not persistet and get lost with script
      * termination.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function set($key, $value) {
         if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
@@ -320,7 +320,7 @@ class Config extends Object implements ConfigInterface {
 
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function info() {
         return __METHOD__.'()  not yet implemented';
