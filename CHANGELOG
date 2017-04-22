@@ -3,6 +3,7 @@
 
    - orm: rewrite mapping configuration
    - orm: move behaviours to event handlers
+   - orm: rename method DAO::findOne() to DAO::find() 
 
 
 2017-04-20

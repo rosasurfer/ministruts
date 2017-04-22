@@ -54,7 +54,7 @@ class Worker extends Object {
      *
      * @throws MultipleRecordsException if the query returned multiple rows and $allowMany was not set to TRUE.
      */
-    public function findOne($query, $allowMany=false) { // TODO: numRows() is not available on SQLite or with PDO and the
+    public function find($query, $allowMany=false) {    // TODO: numRows() is not available on SQLite or with PDO and the
         $result = $this->query($query);                 //       emulation is slow. The check can be improved with fetchRow()
                                                         //       when reset(-1) and internal record caching are implemented.
         $object = $this->makeObject($result);           //

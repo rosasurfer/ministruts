@@ -19,15 +19,15 @@ use function rosasurfer\echoPre;
 use function rosasurfer\strLeft;
 
 
-class DAO_FindOne_ReturnType extends DynamicReturnType implements DynamicMethodReturnTypeExtension {
+class DAO_Find_ReturnType extends DynamicReturnType implements DynamicMethodReturnTypeExtension {
 
 
     const CLASS_NAME  = DAO::class;
-    const METHOD_NAME = 'findOne';
+    const METHOD_NAME = 'find';
 
 
     /**
-     * Resolve the return type of an instance call to DAO->findOne().
+     * Resolve the return type of an instance call to DAO->find().
      *
      * @return Type
      */

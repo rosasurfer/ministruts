@@ -58,8 +58,8 @@ abstract class DAO extends Singleton {
      *
      * @throws MultipleRecordsException if the query returned multiple rows and $allowMany was not set to TRUE.
      */
-    public function findOne($query, $allowMany=false) {
-        return $this->getWorker()->findOne($query, $allowMany);
+    public function find($query, $allowMany=false) {
+        return $this->getWorker()->find($query, $allowMany);
     }
 
 
