@@ -28,7 +28,7 @@ abstract class Type extends Object {
      * @param  PropertyMapping $mapping   - the property mapping
      * @param  IConnector      $connector - the used database connector
      *
-     * @return string - SQL representation
+     * @return string - database representation
      */
-    abstract public function convertToSQLValue($value, PropertyMapping $mapping, IConnector $connector);
+    abstract public function convertToDBValue($value, PropertyMapping $mapping, IConnector $connector);
 }

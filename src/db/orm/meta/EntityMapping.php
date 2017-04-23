@@ -2,13 +2,11 @@
 namespace rosasurfer\db\orm\meta;
 
 use rosasurfer\core\Object;
-
-use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RuntimeException;
 
 
 /**
- * An EntityMapping is an object encapsulating meta information about how to map a database record to a PHP object.
+ * An EntityMapping is an object encapsulating meta information about how to map a PHP class to a database table.
  */
 class EntityMapping extends Object implements \Iterator {
 
@@ -16,10 +14,10 @@ class EntityMapping extends Object implements \Iterator {
     /** @var string - the entity's class name */
     protected $className;
 
-    /** @var array - legacy mapping information (TODO: migrate to XML) */
-    protected $legacyMapping;
+    /** @var array - mapping information */
+    protected $mapping;
 
-    /** @var PropertyMapping[] - property mapping information */
+    /** @var PropertyMapping[] - property mapping instances */
     protected $properties;
 
     /** @var PropertyMapping - identity mapping of the entity */
@@ -28,11 +26,11 @@ class EntityMapping extends Object implements \Iterator {
     /** @var PropertyMapping|bool - version mapping of the entity or FALSE for non-versioned entities */
     protected $version;
 
-    /** @var int - current iterator position when used as an Iterator */
-    private $iteratorPosition = 0;
-
     /** @var string[] - keys of the elements to iterate over when used as an Iterator */
     private $iteratorKeys;
+
+    /** @var int - current iterator position when used as an Iterator */
+    private $iteratorPosition = 0;
 
 
     /**
@@ -40,14 +38,11 @@ class EntityMapping extends Object implements \Iterator {
      *
      * Create a new EntityMapping.
      *
-     * @param  string $class   - entity class name
-     * @param  array  $mapping - legacy mapping information
+     * @param  array $mapping - mapping information
      */
-    public function __construct($class, array $mapping) {
-        if (!is_string($class)) throw new IllegalTypeException('Illegal type of parameter $class: '.getType($class));
-
-        $this->className     = $class;
-        $this->legacyMapping = $mapping;
+    public function __construct(array $mapping) {
+        $this->mapping   = $mapping;
+        $this->className = $mapping['class'];
     }
 
 
@@ -67,48 +62,38 @@ class EntityMapping extends Object implements \Iterator {
      * @return string
      */
     public function getTableName() {
-        return $this->legacyMapping['table'];
+        return $this->mapping['table'];
     }
 
 
     /**
-     * Return the mapping of the property with the specified name.
+     * Return the mapping instance of the property with the specified name.
      *
      * @param  string $name - a property's PHP name
      *
      * @return PropertyMapping|null - mapping or NULL if no such property exists
      */
-    public function getPropertyMapping($name) {
-        if (!$this->properties) {
-            $keys = array_keys($this->legacyMapping['columns']);
-            $this->properties = array_flip($keys);
-        }
-
-        if (!array_key_exists($name, $this->properties))
+    public function getProperty($name) {
+        if (!isSet($this->mapping['properties'][$name]))
             return null;
 
-        if (!is_object($this->properties[$name])) {
-            foreach ($this->legacyMapping['columns'] as $phpName => $column) {
-                if ($name == $phpName) {
-                    $this->properties[$name] = new PropertyMapping($this, $name, $column);
-                    break;
-                }
-            }
-        }
+        if (!isSet($this->properties[$name]))
+            $this->properties[$name] = new PropertyMapping($this, $this->mapping['properties'][$name]);
+
         return $this->properties[$name];
     }
 
 
     /**
-     * Return the identity property of the mapping.
+     * Return the mapping instance of the entity's identity property.
      *
      * @return PropertyMapping
      */
-    public function getIdentityMapping() {
+    public function getIdentity() {
         if ($this->identity === null) {
-            foreach ($this->legacyMapping['columns'] as $name => $column) {
-                if (isSet($column['primary']) && $column['primary']===true) {
-                    return $this->identity = new PropertyMapping($this, $name, $column);
+            foreach ($this->mapping['properties'] as $name => $property) {
+                if (isSet($property['primary']) && $property['primary']===true) {
+                    return $this->identity = new PropertyMapping($this, $property);
                 }
             }
             throw new RuntimeException('Invalid mapping for entity "'.$this->getClassName().'" (missing primary key mapping)');
@@ -118,15 +103,15 @@ class EntityMapping extends Object implements \Iterator {
 
 
     /**
-     * Return the version property of the mapping.
+     * Return the mapping instance of the entity's versioning property.
      *
-     * @return PropertyMapping|null - property mapping or NULL if no versioning property is configured
+     * @return PropertyMapping|null - mapping or NULL if versioning is not configured
      */
-    public function getVersionMapping() {
+    public function getVersion() {
         if ($this->version === null) {
-            foreach ($this->legacyMapping['columns'] as $name => $column) {
-                if (isSet($column['version']) && $column['version']===true) {
-                    return $this->version = new PropertyMapping($this, $name, $column);
+            foreach ($this->mapping['properties'] as $name => $property) {
+                if (isSet($property['version']) && $property['version']===true) {
+                    return $this->version = new PropertyMapping($this, $property);
                 }
             }
             $this->version = false;
@@ -140,25 +125,25 @@ class EntityMapping extends Object implements \Iterator {
      */
     public function rewind() {
         if ($this->iteratorKeys === null) {
-            $this->iteratorKeys = array_keys($this->legacyMapping['columns']);
+            $this->iteratorKeys = array_keys($this->mapping['properties']);
         }
         $this->iteratorPosition = 0;
     }
 
 
     /**
-     * Return the {@link PropertyMapping} at the current iterator position.
+     * Return the property mapping at the current iterator position.
      *
-     * @return PropertyMapping
+     * @return array
      */
     public function current() {
         $key = $this->iteratorKeys[$this->iteratorPosition];
-        return $this->legacyMapping['columns'][$key];
+        return $this->mapping['properties'][$key];
     }
 
 
     /**
-     * Return the key of the {@link PropertyMapping} at the current iterator position.
+     * Return the key of the property mapping at the current iterator position.
      *
      * @return string - key
      */

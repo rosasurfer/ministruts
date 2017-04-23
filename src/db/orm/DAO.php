@@ -8,11 +8,11 @@ use rosasurfer\db\MultipleRecordsException;
 use rosasurfer\db\ResultInterface    as IResult;
 
 use rosasurfer\db\orm\meta\EntityMapping;
-
 use rosasurfer\exception\ConcurrentModificationException;
-use rosasurfer\exception\UnimplementedFeatureException;
 
 use function rosasurfer\strLeft;
+
+use const rosasurfer\PHP_TYPE_BOOL;
 
 
 /**
@@ -102,24 +102,59 @@ abstract class DAO extends Singleton {
 
 
     /**
-     * Return the legacy mapping of the DAO's entity.
+     * Return the mapping configuration of the DAO's entity.
      *
      * @return array
      */
-    public function getMapping() {
-        if (!isSet($this->mapping)) throw new UnimplementedFeatureException('Define '.get_class($this).'->mapping[] to work with this DAO!');
-        return $this->mapping;
+    abstract public function getMapping();
+
+
+    /**
+     * Parse and validate the DAO's data mapping.
+     *
+     * @param  array $mapping - data mapping
+     *
+     * @return array - validated and normalized mapping
+     */
+    protected function parseMapping(array $mapping) {
+        foreach ($mapping['properties'] as $i => $property) {
+            $name = $property['name'];
+            $type = $property['type'];
+
+            if (!isSet($property['column']))
+                $property['column'] = $name;
+
+            $mapping['properties'][$name] =& $property;
+            $getter = ($type==PHP_TYPE_BOOL ? 'is':'get').$name;
+            $mapping['getters'][$getter]  =& $property;
+
+            unset($mapping['properties'][$i], $property);
+        };
+
+        if (isSet($mapping['relations'])) {
+            foreach ($mapping['relations'] as $i => $property) {
+                $name   = $property['name'];
+                $getter = 'get'.$name;
+                $mapping['getters'][$getter] = $property;
+
+                unset($mapping['relations'][$i]);
+            };
+        }
+        else $mapping['relations'] = [];
+
+        $mapping['getters'] = array_change_key_case($mapping['getters'], CASE_LOWER);
+        return $mapping;
     }
 
 
     /**
-     * Return the mapping of the DAO's entity.
+     * Return the object-oriented data mapping of the DAO's entity.
      *
      * @return EntityMapping
      */
     public function getEntityMapping() {
         if (!$this->entityMapping) {
-            $this->entityMapping = new EntityMapping($this->getEntityClass(), $this->getMapping());
+            $this->entityMapping = new EntityMapping($this->getMapping());
         }
         return $this->entityMapping;
     }
@@ -210,8 +245,8 @@ abstract class DAO extends Singleton {
         $db       = $this->db();
         $entity   = $this->getEntityMapping();
         $table    = $entity->getTableName();
-        $identity = $entity->getIdentityMapping();
-        $idName   = $identity->getPhpName();
+        $identity = $entity->getIdentity();
+        $idName   = $identity->getName();
         $idValue  = null;
         if (isSet($values[$idName])) $idValue = $values[$idName];
         else                         unset($values[$idName]);
@@ -219,9 +254,9 @@ abstract class DAO extends Singleton {
         // convert values to their SQL representation
         $columns = [];
         foreach ($values as $name => &$value) {
-            $property  = $entity->getPropertyMapping($name);
-            $columns[] = $property->getColumnName();
-            $value     = $property->convertToSQLValue($value, $db);
+            $property  = $entity->getProperty($name);
+            $columns[] = $property->getColumn();
+            $value     = $property->convertToDBValue($value, $db);
         }; unset($value);
 
         // create SQL statement
@@ -233,8 +268,8 @@ abstract class DAO extends Singleton {
             $db->execute($sql);
         }
         else if ($db->supportsInsertReturn()) {
-            $idName  = $identity->getColumnName();
-            $idValue = $db->query($sql.' returning '.$idName)->fetchInt();
+            $idColumn = $identity->getColumn();
+            $idValue  = $db->query($sql.' returning '.$idColumn)->fetchInt();
         }
         else {
             $idValue = $db->execute($sql)->lastInsertId();
@@ -257,25 +292,25 @@ abstract class DAO extends Singleton {
         $table  = $entity->getTableName();
 
         // collect identity infos
-        $identity = $entity->getIdentityMapping();
-        $idColumn = $identity->getColumnName();
-        $idValue  = $identity->convertToSQLValue($object->getObjectId(), $db);
+        $identity = $entity->getIdentity();
+        $idColumn = $identity->getColumn();
+        $idValue  = $identity->convertToDBValue($object->getObjectId(), $db);
 
         // collect version infos
         $versionMapping = $versionName = $versionColumn = $oldVersion = null;
-        //if ($versionMapping = $entity->getVersionMapping()) {
-        //    $versionName   = $versionMapping->getPhpName();
-        //    $versionColumn = $versionMapping->getColumnName();
+        //if ($versionMapping = $entity->getVersion()) {
+        //    $versionName   = $versionMapping->getName();
+        //    $versionColumn = $versionMapping->getColumn();
         //    $oldVersion    = $object->getSnapshot()->$versionName;        // TODO: implement dirty check via snapshot
-        //    $oldVersion    = $versionMapping->convertToSQLValue($oldVersion, $db);
+        //    $oldVersion    = $versionMapping->convertToDBValue($oldVersion, $db);
         //}
 
         // create SQL
         $sql = 'update '.$table.' set';                                     // update table
         foreach ($changes as $name => $value) {                             //    set ...
-            $mapping     = $entity->getPropertyMapping($name);              //        ...
-            $columnName  = $mapping->getColumnName();                       //        ...
-            $columnValue = $mapping->convertToSQLValue($value, $db);        //        column1 = value1,
+            $mapping     = $entity->getProperty($name);                     //        ...
+            $columnName  = $mapping->getColumn();                           //        ...
+            $columnValue = $mapping->convertToDBValue($value, $db);         //        column1 = value1,
             $sql .= ' '.$columnName.' = '.$columnValue.',';                 //        column2 = value2,
         }                                                                   //        ...
         $sql  = strLeft($sql, -1);                                          //        ...
@@ -311,9 +346,9 @@ abstract class DAO extends Singleton {
         $table  = $entity->getTableName();
 
         // collect identity infos
-        $identity = $entity->getIdentityMapping();
-        $idColumn = $identity->getColumnName();
-        $idValue  = $identity->convertToSQLValue($object->getObjectId(), $db);
+        $identity = $entity->getIdentity();
+        $idColumn = $identity->getColumn();
+        $idValue  = $identity->convertToDBValue($object->getObjectId(), $db);
 
         // create SQL
         $sql = 'delete from '.$table.'

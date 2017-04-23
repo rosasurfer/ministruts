@@ -3,8 +3,6 @@ namespace rosasurfer\db\orm\meta;
 
 use rosasurfer\core\Object;
 use rosasurfer\db\ConnectorInterface as IConnector;
-
-use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RuntimeException;
 
 use function rosasurfer\is_class;
@@ -16,19 +14,19 @@ use const rosasurfer\PHP_TYPE_STRING;
 
 
 /**
- * A PropertyMapping is an object encapsulating meta information about how to map a database column to a PHP class member.
+ * A PropertyMapping is an object encapsulating meta information about how to map a PHP class property to a database column.
  */
 class PropertyMapping extends Object {
 
 
     /** @var EntityMapping - the entity mapping this mapping is a part of */
-    protected $entity;
+    protected $entityMapping;
+
+    /** @var array - mapping information */
+    protected $mapping;
 
     /** @var string - the property's PHP name */
-    protected $phpName;
-
-    /** @var array - legacy mapping information (TODO: migrate to XML) */
-    protected $legacyMapping;
+    protected $name;
 
 
     /**
@@ -37,15 +35,12 @@ class PropertyMapping extends Object {
      * Create a new PropertyMapping.
      *
      * @param  EntityMapping $entity  - the entity mapping this mapping is a part of
-     * @param  string        $phpName - the property's PHP name
-     * @param  array         $mapping - legacy mapping information
+     * @param  array         $mapping - property mapping information
      */
-    public function __construct(EntityMapping $entity, $phpName, array $mapping) {
-        if (!is_string($phpName)) throw new IllegalTypeException('Illegal type of parameter $phpName: '.getType($phpName));
-
-        $this->entity        = $entity;
-        $this->phpName       = $phpName;
-        $this->legacyMapping = $mapping;
+    public function __construct(EntityMapping $entity, array $mapping) {
+        $this->entityMapping = $entity;
+        $this->mapping       = $mapping;
+        $this->name          = $mapping['name'];
     }
 
 
@@ -54,18 +49,18 @@ class PropertyMapping extends Object {
      *
      * @return string
      */
-    public function getPhpName() {
-        return $this->phpName;
+    public function getName() {
+        return $this->name;
     }
 
 
     /**
-     * Return the property's column name.
+     * Return the property's column name (if any).
      *
-     * @return string
+     * @return string|null
      */
-    public function getColumnName() {
-        return $this->legacyMapping['column'];
+    public function getColumn() {
+        return isSet($this->mapping['column']) ? $this->mapping['column'] : null;
     }
 
 
@@ -87,14 +82,14 @@ class PropertyMapping extends Object {
      * @param  mixed      $value     - PHP representation of a property value
      * @param  IConnector $connector - the used database connector
      *
-     * @return string - SQL representation
+     * @return string - database representation
      */
-    public function convertToSQLValue($value, IConnector $connector) {
+    public function convertToDBValue($value, IConnector $connector) {
         if ($value === null) {
             $value = 'null';
         }
         else {
-            $type = $this->legacyMapping['type'];
+            $type = $this->mapping['type'];
             switch ($type) {
                 case PHP_TYPE_BOOL  : $value =                (string)(int)(bool) $value;  break;
                 case PHP_TYPE_INT   : $value =                      (string)(int) $value;  break;
@@ -102,10 +97,10 @@ class PropertyMapping extends Object {
                 case PHP_TYPE_STRING: $value = $connector->escapeLiteral((string) $value); break;
                 default:
                     if (is_class($type)) {
-                        $value = (new $type())->convertToSQLValue($value, $this, $connector);
+                        $value = (new $type())->convertToDBValue($value, $this, $connector);
                         break;
                     }
-                    throw new RuntimeException('Unsupported type "'.$type.'" for database mapping of '.$this->entity->getClassName().'::'.$this->getPhpName());
+                    throw new RuntimeException('Unsupported type "'.$type.'" for database mapping of '.$this->entityMapping->getClassName().'::'.$this->getName());
             }
         }
         return $value;

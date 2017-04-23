@@ -44,26 +44,56 @@ abstract class PersistableObject extends Object {
 
 
     /**
+     * Magic method. Provides default get/set implementations for the mapped properties.
+     *
+     * @param  string $method - name of the called and undefined method
+     * @param  array  $args   - arguments passed to the method call
+     *
+     * @return mixed - return value of the intercepted virtual method
+     */
+    public function __call($method, array $args) {
+        $mapping = $this->dao()->getMapping();
+        $methodL = strToLower($method);
+
+        // calls to getters of mapped properties are intercepted
+        if (isSet($mapping['getters'][$methodL])) {
+            $property = $mapping['getters'][$methodL]['name'];
+            return $this->$property;
+        }
+
+        // calls to setters of mapped properties are intercepted
+        //if (isSet($mapping['setters'][$methodL])) {               // TODO: implement default setters
+        //    $property = $mapping['getters'][$methodL]['name'];
+        //    $this->$property = $args;
+        //    return $this;
+        //}
+
+        // all other calls are passed on
+        parent::__call($method, $args);
+    }
+
+
+    /**
      * Return the instance's identity value.
      *
      * @return mixed - identity value
      */
     final public function getObjectId() {
         $entity = $this->dao()->getEntityMapping();
-        $idName = $entity->getIdentityMapping()->getPhpName();
+        $idName = $entity->getIdentity()->getName();
         return $this->$idName;
     }
 
 
     /**
-     * Whether or not the instance was already saved and has a unique id assigned to it (the primary key).
+     * Whether or not the instance was already saved and has a value assigned to it's id property.
      *
      * @return bool
      */
     final public function isPersistent() {
         // TODO: this check cannot yet handle composite primary keys
-        foreach ($this->dao()->getMapping()['columns'] as $name => $column) {
-            if (isSet($column['primary']) && $column['primary']===true) {
+        foreach ($this->dao()->getMapping()['properties'] as $name => $property) {
+            if (isSet($property['primary']) && $property['primary']===true) {
                 return ($this->$name !== null);
             }
         }
@@ -77,8 +107,8 @@ abstract class PersistableObject extends Object {
      * @return bool
      */
     final public function isDeleted() {
-        foreach ($this->dao()->getMapping()['columns'] as $name => $column) {
-            if (isSet($column['soft-delete']) && $column['soft-delete']===true) {
+        foreach ($this->dao()->getMapping()['properties'] as $name => $property) {
+            if (isSet($property['soft-delete']) && $property['soft-delete']===true) {
                 return ($this->$name !== null);
             }
         }
@@ -158,7 +188,7 @@ abstract class PersistableObject extends Object {
         $id = $dao->doInsert($values);
 
         // assign the returned identity value
-        $idName = $entity->getIdentityMapping()->getPhpName();
+        $idName = $entity->getIdentity()->getName();
         if ($this->$idName === null)
             $this->$idName = $id;
 
@@ -224,8 +254,8 @@ abstract class PersistableObject extends Object {
         // perform deletion
         if ($dao->doDelete($this)) {
             // reset identity property
-            $idProperty = $dao->getEntityMapping()->getIdentityMapping()->getPhpName();
-            $this->$idProperty = null;
+            $idName = $dao->getEntityMapping()->getIdentity()->getName();
+            $this->$idName = null;
 
             // post-processing hook
             $this->afterDelete();
@@ -314,10 +344,10 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Populate this instance with the specified record values. Called by the ORM during execution of
+     * Populate this instance with the specified record values. Called during execution of
      * {@link Worker::makeObject()} and {@link PersistableObject::reload()}.
      *
-     * @param  array $row - array with property values (typically a single database record)
+     * @param  array $row - array with column values (typically a single database record)
      *
      * @return $this
      */
@@ -325,30 +355,30 @@ abstract class PersistableObject extends Object {
         $row     = array_change_key_case($row, CASE_LOWER);
         $mapping = $this->dao()->getMapping();
 
-        foreach ($mapping['columns'] as $phpName => $columnMapping) {
-            $columnName = strToLower($columnMapping['column']);
+        foreach ($mapping['properties'] as $propertyName => $property) {
+            $column = strToLower($property['column']);
 
-            if ($row[$columnName] === null) {
-                $this->$phpName = null;
+            if ($row[$column] === null) {
+                $this->$propertyName = null;
             }
             else {
-                $type = $columnMapping['type'];
+                $type = $property['type'];
 
                 switch ($type) {
-                    case PHP_TYPE_BOOL  : $this->$phpName =       (bool) $row[$columnName];  break;
-                    case PHP_TYPE_INT   : $this->$phpName =        (int) $row[$columnName];  break;
-                    case PHP_TYPE_FLOAT : $this->$phpName =      (float) $row[$columnName];  break;
-                    case PHP_TYPE_STRING: $this->$phpName =     (string) $row[$columnName];  break;
-                  //case PHP_TYPE_ARRAY : $this->$phpName =       strLen($row[$columnName]) ? explode(',', $row[$columnName]):[]; break;
-                  //case DateTime::class: $this->$phpName = new DateTime($row[$columnName]); break;
+                    case PHP_TYPE_BOOL  : $this->$propertyName =       (bool) $row[$column];  break;
+                    case PHP_TYPE_INT   : $this->$propertyName =        (int) $row[$column];  break;
+                    case PHP_TYPE_FLOAT : $this->$propertyName =      (float) $row[$column];  break;
+                    case PHP_TYPE_STRING: $this->$propertyName =     (string) $row[$column];  break;
+                  //case PHP_TYPE_ARRAY : $this->$propertyName =       strLen($row[$column]) ? explode(',', $row[$column]):[]; break;
+                  //case DateTime::class: $this->$propertyName = new DateTime($row[$column]); break;
 
                     default:
                         // TODO: handle custom types
                         //if (is_class($type)) {
-                        //    $object->$phpName = new $type($row[$column]);
+                        //    $object->$propertyName = new $type($row[$column]);
                         //    break;
                         //}
-                        throw new RuntimeException('Unsupported type "'.$type.'" for database mapping of '.get_class($this).'::'.$phpName);
+                        throw new RuntimeException('Unsupported type "'.$type.'" for database mapping of '.get_class($this).'::'.$propertyName);
                 }
             }
         }
@@ -394,10 +424,10 @@ abstract class PersistableObject extends Object {
         $table  = $entity->getTableName();
 
         // collect identity infos
-        $identity   = $entity->getIdentityMapping();
-        $idColumn   = $identity->getColumnName();
-        $idProperty = $identity->getPhpName();
-        $idValue    = $identity->convertToSQLValue($this->$idProperty, $db);
+        $identity = $entity->getIdentity();
+        $idColumn = $identity->getColumn();
+        $idName   = $identity->getName();
+        $idValue  = $identity->convertToDBValue($this->$idName, $db);
 
         // create and execute SQL
         $sql = 'select *
