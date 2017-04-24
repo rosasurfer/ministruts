@@ -4,6 +4,6 @@ include(__DIR__.'/../vendor/autoload.php');
 include(__DIR__.'/DynamicReturnType.php');
 include(__DIR__.'/DAO_Find_ReturnType.php');
 include(__DIR__.'/DAO_FindAll_ReturnType.php');
-include(__DIR__.'/PersistableObject_PopulateNew_ReturnType.php');
 include(__DIR__.'/PersistableObject_Dao_ReturnType.php');
+include(__DIR__.'/PersistableObject_PopulateNew_ReturnType.php');
 include(__DIR__.'/Singleton_GetInstance_ReturnType.php');
