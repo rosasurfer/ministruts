@@ -425,7 +425,7 @@ function strIsDoubleQuoted($value) {
 /**
  * Whether or not a string consists only of digits (0-9).
  *
- * @param  string $value
+ * @param  mixed $value
  *
  * @return bool
  */
