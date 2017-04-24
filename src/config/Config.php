@@ -186,7 +186,7 @@ class Config extends Object implements ConfigInterface {
      */
     protected function setProperty($key, $value) {
         // set the property depending on the existing data structure
-        $properties  =& $this->properties;
+        $properties  = &$this->properties;
         $subkeys     =  $this->parseSubkeys($key);
         $subkeysSize =  sizeOf($subkeys);
 
@@ -202,7 +202,7 @@ class Config extends Object implements ConfigInterface {
                 elseif (!is_array($properties[$subkey])) {
                     $properties[$subkey] = ['' => $properties[$subkey]];    // create another array level and keep the
                 }                                                           // existing non-array value   TODO: how to access?
-                $properties =& $properties[$subkey];                        // reference the new array level
+                $properties = &$properties[$subkey];                        // reference the new array level
             }
             else {
                 // the last subkey: check for bracket notation

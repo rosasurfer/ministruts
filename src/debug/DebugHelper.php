@@ -127,7 +127,7 @@ class DebugHelper extends StaticClass {
         $callLen = $lineLen = 0;
 
         for ($i=0; $i < $size; $i++) {               // align FILE and LINE
-            $frame =& $trace[$i];
+            $frame = &$trace[$i];
 
             $call = self::getFQFunctionName($frame, $nsLowerCase=true);
             if ($call!='{main}' && $call!='{closure}')
