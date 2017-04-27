@@ -7,11 +7,6 @@ use rosasurfer\exception\RuntimeException;
 
 use function rosasurfer\is_class;
 
-use const rosasurfer\PHP_TYPE_BOOL;
-use const rosasurfer\PHP_TYPE_FLOAT;
-use const rosasurfer\PHP_TYPE_INT;
-use const rosasurfer\PHP_TYPE_STRING;
-
 
 /**
  * A PropertyMapping is an object encapsulating meta information about how to map a PHP class property to a database column.
@@ -91,10 +86,18 @@ class PropertyMapping extends Object {
         else {
             $type = $this->mapping['type'];
             switch ($type) {
-                case PHP_TYPE_BOOL  : $value =                (string)(int)(bool) $value;  break;
-                case PHP_TYPE_INT   : $value =                      (string)(int) $value;  break;
-                case PHP_TYPE_FLOAT : $value =                    (string)(float) $value;  break;
-                case PHP_TYPE_STRING: $value = $connector->escapeLiteral((string) $value); break;
+                case 'bool'   :
+                case 'boolean': $value = (string)(int)(bool) $value; break;
+
+                case 'int'    :
+                case 'integer': $value = (string)(int) $value; break;
+
+                case 'real'   :
+                case 'float'  :
+                case 'double' : $value = (string)(float) $value; break;
+
+                case 'string' : $value = $connector->escapeLiteral((string) $value); break;
+
                 default:
                     if (is_class($type)) {
                         $value = (new $type())->convertToDBValue($value, $this, $connector);

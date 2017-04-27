@@ -2,17 +2,13 @@
 namespace rosasurfer\db\orm;
 
 use rosasurfer\core\Singleton;
-
 use rosasurfer\db\ConnectorInterface as IConnector;
 use rosasurfer\db\MultipleRecordsException;
-use rosasurfer\db\ResultInterface    as IResult;
-
+use rosasurfer\db\ResultInterface as IResult;
 use rosasurfer\db\orm\meta\EntityMapping;
 use rosasurfer\exception\ConcurrentModificationException;
 
 use function rosasurfer\strLeft;
-
-use const rosasurfer\PHP_TYPE_BOOL;
 
 
 /**
@@ -121,28 +117,48 @@ abstract class DAO extends Singleton {
             $name = $property['name'];
             $type = $property['type'];
 
-            if (!isSet($property['column']))
-                $property['column'] = $name;
+            if (!isSet($property['column'     ])) $property['column'     ] = $name;
+            if (!isSet($property['column-type'])) $property['column-type'] = $type;
 
-            $mapping['properties'][$name] =& $property;
-            $getter = ($type==PHP_TYPE_BOOL ? 'is':'get').$name;
-            $mapping['getters'][$getter]  =& $property;
+            if (isSet($property['primary']) && $property['primary']===true)
+                $mapping['identity'] = &$property;
 
+            if (isSet($property['version']) && $property['version']===true)
+                $mapping['version'] = &$property;
+
+            $column = $property['column'];
+            $mapping['columns'][$column] = &$property;
+
+            if ($type=='bool' || $type=='boolean') {
+                $mapping['getters']['is'.$name ] = &$property;
+                $mapping['getters']['has'.$name] = &$property;
+            }
+            else {
+                $mapping['getters']['get'.$name] = &$property;
+            }
+            $mapping['properties'][$name] = &$property;
             unset($mapping['properties'][$i], $property);
         };
 
         if (isSet($mapping['relations'])) {
             foreach ($mapping['relations'] as $i => $property) {
                 $name   = $property['name'];
+                $type   = $property['type'];
                 $getter = 'get'.$name;
-                $mapping['getters'][$getter] = $property;
 
-                unset($mapping['relations'][$i]);
+                if (isSet($property['column']))
+                    $mapping['columns'][$property['column']] = &$property;
+
+                $mapping['getters'][$getter] = &$property;
+                $mapping['relations'][$name] = &$property;
+                unset($mapping['relations'][$i], $property);
             };
         }
         else $mapping['relations'] = [];
 
+        $mapping['columns'] = array_change_key_case($mapping['columns'], CASE_LOWER);
         $mapping['getters'] = array_change_key_case($mapping['getters'], CASE_LOWER);
+
         return $mapping;
     }
 
@@ -243,38 +259,33 @@ abstract class DAO extends Singleton {
      */
     public function doInsert(array $values) {
         $db       = $this->db();
-        $entity   = $this->getEntityMapping();
-        $table    = $entity->getTableName();
-        $identity = $entity->getIdentity();
-        $idName   = $identity->getName();
-        $idValue  = null;
-        if (isSet($values[$idName])) $idValue = $values[$idName];
-        else                         unset($values[$idName]);
+        $mapping  = $this->getMapping();
+        $table    = $mapping['table'];
+        $idColumn = $mapping['identity']['column'];
+        $id       = null;
+        if  (isSet($values[$idColumn])) $id = $values[$idColumn];
+        else unset($values[$idColumn]);
 
-        // convert values to their SQL representation
-        $columns = [];
-        foreach ($values as $name => &$value) {
-            $property  = $entity->getProperty($name);
-            $columns[] = $property->getColumn();
-            $value     = $property->convertToDBValue($value, $db);
+        // translate column values
+        foreach ($values as &$value) {
+            $value = $db->escapeLiteral($value);
         }; unset($value);
 
         // create SQL statement
-        $sql = 'insert into '.$table.' ('.join(', ', $columns).')
+        $sql = 'insert into '.$table.' ('.join(', ', array_keys($values)).')
                    values ('.join(', ', $values).')';
 
         // execute SQL statement
-        if (isSet($idValue)) {
+        if ($id) {
             $db->execute($sql);
         }
         else if ($db->supportsInsertReturn()) {
-            $idColumn = $identity->getColumn();
-            $idValue  = $db->query($sql.' returning '.$idColumn)->fetchInt();
+            $id = $db->query($sql.' returning '.$idColumn)->fetchInt();
         }
         else {
-            $idValue = $db->execute($sql)->lastInsertId();
+            $id = $db->execute($sql)->lastInsertId();
         }
-        return $idValue;
+        return $id;
     }
 
 
