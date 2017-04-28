@@ -453,10 +453,9 @@ abstract class PersistableObject extends Object {
     /**
      * Save pre-processing hook (application-side ORM trigger). Can be overridden by the instance.
      *
-     * @return bool - if FALSE saving will be skipped
+     * @return bool|null - if FALSE saving will be skipped
      */
     protected function beforeSave() {
-        return true;
     }
 
 
@@ -470,10 +469,9 @@ abstract class PersistableObject extends Object {
     /**
      * Insert pre-processing hook (application-side ORM trigger). Can be overridden by the instance.
      *
-     * @return bool - if FALSE the insertion will be skipped
+     * @return bool|null - if FALSE the insertion will be skipped
      */
     protected function beforeInsert() {
-        return true;
     }
 
 
@@ -487,10 +485,9 @@ abstract class PersistableObject extends Object {
     /**
      * Update pre-processing hook (application-side ORM trigger). Can be overridden by the instance.
      *
-     * @return bool - if FALSE the update will be skipped
+     * @return bool|null - if FALSE the update will be skipped
      */
     protected function beforeUpdate() {
-        return true;
     }
 
 
@@ -504,10 +501,9 @@ abstract class PersistableObject extends Object {
     /**
      * Delete pre-processing hook (application-side ORM trigger). Can be overridden by the instance.
      *
-     * @return bool - if FALSE the deletion will be skipped
+     * @return bool|null - if FALSE the deletion will be skipped
      */
     protected function beforeDelete() {
-        return true;
     }
 
 
