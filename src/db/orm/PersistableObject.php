@@ -39,7 +39,7 @@ abstract class PersistableObject extends Object {
      */
     protected function __construct() {
         // post-event hook
-        $this->afterCreate();
+        method_exists($this, $method='afterCreate') && $this->$method();
     }
 
 
@@ -115,7 +115,7 @@ abstract class PersistableObject extends Object {
      */
     public function save() {
         // pre-processing hook
-        if (!$this->beforeSave())
+        if (method_exists($this, $method='beforeSave') && $this->$method()===false)
             return $this;
 
         if (!$this->isPersistent()) {
@@ -128,7 +128,7 @@ abstract class PersistableObject extends Object {
         $this->updateRelations();
 
         // post-processing hook
-        $this->afterSave();
+        method_exists($this, $method='afterSave') && $this->$method();
         return $this;
     }
 
@@ -142,7 +142,7 @@ abstract class PersistableObject extends Object {
         if ($this->isPersistent()) throw new RuntimeException('Cannot insert already persistent '.$this);
 
         // pre-processing hook
-        if (!$this->beforeInsert())
+        if (method_exists($this, $method='beforeInsert') && $this->$method()===false)
             return $this;
 
         $dao    = $this->dao();
@@ -163,7 +163,7 @@ abstract class PersistableObject extends Object {
             $this->$idName = $id;
 
         // post-processing hook
-        $this->afterInsert();
+        method_exists($this, $method='afterInsert') && $this->$method();
         return $this;
     }
 
@@ -175,7 +175,7 @@ abstract class PersistableObject extends Object {
      */
     protected function update() {
         // pre-processing hook
-        if (!$this->beforeUpdate())
+        if (method_exists($this, $method='beforeUpdate') && $this->$method()===false)
             return $this;
 
         $dao = $this->dao();
@@ -191,7 +191,7 @@ abstract class PersistableObject extends Object {
             $this->_modified = false;
 
             // post-processing hook
-            $this->afterUpdate();
+            method_exists($this, $method='afterUpdate') && $this->$method();
         }
         return $this;
     }
@@ -216,7 +216,7 @@ abstract class PersistableObject extends Object {
         if (!$this->isPersistent()) throw new InvalidArgumentException('Cannot delete non-persistent '.get_class($this));
 
         // pre-processing hook
-        if (!$this->beforeDelete())
+        if (method_exists($this, $method='beforeDelete') && $this->$method()===false)
             return $this;
 
         $dao = $this->dao();
@@ -228,88 +228,9 @@ abstract class PersistableObject extends Object {
             $this->$idProperty = null;
 
             // post-processing hook
-            $this->afterDelete();
+            method_exists($this, $method='afterDelete') && $this->$method();
         }
         return $this;
-    }
-
-
-    /**
-     * Creation post-processing hook (application-side ORM trigger). Can be overridden by the instance.
-     */
-    protected function afterCreate() {
-    }
-
-
-    /**
-     * Save pre-processing hook (application-side ORM trigger). Can be overridden by the instance.
-     *
-     * @return bool - TRUE  if saving is to be continued;
-     *                FALSE if the saving is to be skipped
-     */
-    protected function beforeSave() {
-        return true;
-    }
-
-
-    /**
-     * Save post-processing hook (application-side ORM trigger). Can be overridden by the instance.
-     */
-    protected function afterSave() {
-    }
-
-
-    /**
-     * Insert pre-processing hook (application-side ORM trigger). Can be overridden by the instance.
-     *
-     * @return bool - TRUE  if insertion is to be continued;
-     *                FALSE if the insertion is to be skipped
-     */
-    protected function beforeInsert() {
-        return true;
-    }
-
-
-    /**
-     * Insert post-processing hook (application-side ORM trigger). Can be overridden by the instance.
-     */
-    protected function afterInsert() {
-    }
-
-
-    /**
-     * Update pre-processing hook (application-side ORM trigger). Can be overridden by the instance.
-     *
-     * @return bool - TRUE  if the update is to be continued;
-     *                FALSE if the update is to be skipped
-     */
-    protected function beforeUpdate() {
-        return true;
-    }
-
-
-    /**
-     * Update post-processing hook (application-side ORM trigger). Can be overridden by the instance.
-     */
-    protected function afterUpdate() {
-    }
-
-
-    /**
-     * Delete pre-processing hook (application-side ORM trigger). Can be overridden by the instance.
-     *
-     * @return bool - TRUE  if deletion is to be continued;
-     *                FALSE if the deletion is to be skipped
-     */
-    protected function beforeDelete() {
-        return true;
-    }
-
-
-    /**
-     * Delete post-processing hook (application-side ORM trigger). Can be overridden by the instance.
-     */
-    protected function afterDelete() {
     }
 
 
