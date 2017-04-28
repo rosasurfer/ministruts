@@ -106,7 +106,7 @@ abstract class PersistableObject extends Object {
      *
      * @param  string $name - property name
      *
-     * @return PersistableObject|PersistableObject[] - property value
+     * @return PersistableObject|PersistableObject[]|null - property value
      */
     private function getRelationValue($name) {
         $value = &$this->$name;                                 // existing property value
@@ -117,6 +117,7 @@ abstract class PersistableObject extends Object {
         $mapping      =  $this->dao()->getMapping();
         $relation     = &$mapping['relations'][$name];
         $isCollection = strEndsWith($relation['assoc'], 'many');
+        /** @var PersistableObject[]|null $emptyResult */
         $emptyResult  = $isCollection ? [] : null;
 
         if ($value === null) {
@@ -534,6 +535,7 @@ abstract class PersistableObject extends Object {
             }
             else {
                 $propertyType = $property['type'];
+                $relatedMapping = null;
 
                 if (isSet($property['assoc'])) {                    // $propertyType is a PersistableObject class
                     if (!isSet($property['key-type'])) {
