@@ -70,53 +70,55 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Return the value of a mapped property.
+     * Return the logical value of a mapped property.
      *
-     * @param  string $name - property name
+     * @param  string $property - property name
      *
      * @return mixed - property value
      */
-    protected function get($name) {
+    protected function get($property) {
         $mapping = $this->dao()->getMapping();
 
-        if (isSet($mapping['properties'][$name]))
-            return $this->getNonRelationValue($name);
+        if (isSet($mapping['properties'][$property]))
+            return $this->getNonRelationValue($property);
 
-        if (isSet($mapping['relations'][$name]))
-            return $this->getRelationValue($name);
+        if (isSet($mapping['relations'][$property]))
+            return $this->getRelationValue($property);
 
-        throw new RuntimeException('Not a mapped property "'.$name.'"');
+        throw new RuntimeException('Not a mapped property "'.$property.'"');
     }
 
 
     /**
-     * Return the value of a mapped non-relation property.
+     * Return the logical value of a mapped non-relation property.
      *
-     * @param  string $name - property name
+     * @param  string $property - property name
      *
      * @return mixed - property value
      */
-    private function getNonRelationValue($name) {
-        return $this->$name;
+    private function getNonRelationValue($property) {
+        return $this->$property;
     }
 
 
     /**
-     * Return the value of a mapped relation property.
+     * Return the logical value of a mapped relation property. If the related objects have not yet been fetched before they
+     * are fetched now.
      *
-     * @param  string $name - property name
+     * @param  string $property - property name
      *
      * @return PersistableObject|PersistableObject[]|null - property value
      */
-    private function getRelationValue($name) {
-        $value = &$this->$name;                                         // existing property value
+    private function getRelationValue($property) {
+        $propertyName = $property;
+        $value = &$this->$propertyName;                                 // existing property value
 
         if (is_object($value)) return $value;                           // relation is fetched and is an object or an array
         if (is_array ($value)) return $value;                           // (Collections are not yet implemented)
 
         $dao          =  $this->dao();
         $mapping      =  $dao->getMapping();
-        $relation     = &$mapping['relations'][$name];
+        $relation     = &$mapping['relations'][$propertyName];
         $isCollection = strEndsWith($relation['assoc'], 'many');
         /** @var PersistableObject[]|null $emptyResult */
         $emptyResult  = $isCollection ? [] : null;
@@ -129,7 +131,7 @@ abstract class PersistableObject extends Object {
             return $emptyResult;
         }
 
-        // The relation is not yet fetched, the property is NULL or holds a column-type foreign-key value.
+        // The relation is not yet fetched, the property is NULL or holds a physical foreign-key value.
         $type           = $relation['type'];                            // related class name
         /** @var DAO $relatedDao */
         $relatedDao     = $type::dao();
@@ -155,7 +157,7 @@ abstract class PersistableObject extends Object {
             if (!isSet($relation['join-table'])) {
                 // the referenced column is part of the related table
                 $refColumnType = $relatedMapping['columns'][$refColumn]['type'];
-                $refValue      = $dao->escapeLiteral($this->getColumnValue($keyName, $refColumnType));
+                $refValue      = $relatedDao->escapeLiteral($this->getPhysicalValue($keyName, $refColumnType));
                 $sql = 'select r.*
                             from '.$relatedTable.' r
                             where r.'.$refColumn.' = '.$refValue;
@@ -164,7 +166,7 @@ abstract class PersistableObject extends Object {
                 // the referenced column is part of a join table
                 $joinTable = $relation['join-table'];
                 $keyColumn = $mapping['properties'][$keyName]['column'];                // the used local key column
-                $keyValue  = $dao->escapeLiteral($this->getColumnValue($keyColumn));    // the local key db value
+                $keyValue  = $dao->escapeLiteral($this->getPhysicalValue($keyColumn));  // the physical local key value
 
                 if (!isSet($relation['foreign-key']))
                     $relation['foreign-key'] = $relatedMapping['identity']['name'];     // default foreign-key is identity
@@ -211,19 +213,19 @@ abstract class PersistableObject extends Object {
     /**
      * Return the value of a mapped column.
      *
-     * @param  string $name - column name
-     * @param  string $type - column type (default: type as configured in the entity mapping)
+     * @param  string $column - column name
+     * @param  string $type   - column type (default: type as configured in the entity mapping)
      *
      * @return mixed - column value
      */
-    private function getColumnValue($name, $type = null) {
+    private function getPhysicalValue($column, $type=null) {
         $mapping = $this->dao()->getMapping();
-        $column  = strToLower($name);
-        if (!isSet($mapping['columns'][$column])) throw new RuntimeException('Not a mapped column "'.$name.'"');
+        $column  = strToLower($column);
+        if (!isSet($mapping['columns'][$column])) throw new RuntimeException('Not a mapped column "'.func_get_arg(0).'"');
 
         $property      = &$mapping['columns'][$column];
         $propertyName  =  $property['name'];
-        $propertyValue =  $this->$propertyName;
+        $propertyValue =  $this->$propertyName;             // the logical or physical column value
 
         if ($propertyValue === null)
             return null;
@@ -231,21 +233,24 @@ abstract class PersistableObject extends Object {
         if (isSet($property['assoc'])) {
             if ($propertyValue === false)
                 return null;
-            if (!is_object($propertyValue))
-                return $propertyValue;                      // a foreign-key value of a not-yet-fetched relation
+            if (!is_object($propertyValue)) {               // a foreign-key value of a not-yet-fetched relation
+                if ($type !== null) throw new RuntimeException('Unexpected parameter $type="'.$type.'" (not null) for relation [name="'.$propertyName.'", column="'.$column.'", ...] of entity "'.$mapping['class'].'"');
+                return $propertyValue;
+            }
 
             /** @var PersistableObject $object */
-            $object = $propertyValue;                       // a single instance from "one-to-one"|"many-to-one"
+            $object = $propertyValue;                       // a single instance of "one-to-one"|"many-to-one" relation, no join table
             if (!isSet($property['ref-column']))
                 $property['ref-column'] = $object->dao()->getMapping()['identity']['column'];
             $fkColumn = $property['ref-column'];
-            return $object->getColumnValue($fkColumn);
+            return $object->getPhysicalValue($fkColumn);
         }
 
-        $columnType = $type ?: $property['column-type'];
+        $columnType = $property['column-type'];
+
         switch ($columnType) {
             case 'bool'   :
-            case 'boolean': return (bool) $propertyValue;
+            case 'boolean': return (bool)(int) $propertyValue;
 
             case 'int'    :
             case 'integer': return (int) $propertyValue;
@@ -257,8 +262,15 @@ abstract class PersistableObject extends Object {
 
             case 'text'   :
             case 'string' : return (string) $propertyValue;
+
+            default:
+                // TODO: convert custom types (e.g. Enum|DateTime) to physical values
+                //if (is_class($propertyType)) {
+                //    $object->$propertyName = new $propertyType($row[$column]);
+                //    break;
+                //}
         }
-        throw new RuntimeException('Unsupported column type "'.$columnType.'"');
+        throw new RuntimeException('Unsupported attribute "column-type"="'.$columnType.'" in property [name="'.$propertyName.'", ...] of entity "'.$mapping['class'].'"');
     }
 
 
@@ -364,7 +376,7 @@ abstract class PersistableObject extends Object {
         // collect column values
         $values = [];
         foreach ($mapping['columns'] as $column => $property) {
-            $values[$column] = $this->getColumnValue($column);
+            $values[$column] = $this->getPhysicalValue($column);
         };
 
         // perform insertion
@@ -528,9 +540,8 @@ abstract class PersistableObject extends Object {
             }
             else {
                 $propertyType = $property['type'];
-                $relatedMapping = null;
 
-                if (isSet($property['assoc'])) {                    // $propertyType is a PersistableObject class
+                if (isSet($property['assoc'])) {                // $property[type] is a PersistableObject class
                     //if (!isSet($property['column-type'])) {
                     //    $relatedMapping = $propertyType::dao()->getMapping();
                     //    if (!isSet($property['ref-column']))
@@ -539,33 +550,28 @@ abstract class PersistableObject extends Object {
                     //    $property['column-type'] = $relatedMapping['columns'][$refColumn]['type'];
                     //}
                     //$propertyType = $property['column-type'];
-                    $propertyType = 'column-type';
+                    $propertyType = 'origin';                   // the foreign-key column is stored as provided
                 }
 
                 switch ($propertyType) {
-                    case 'column-type': $this->$propertyName =             $row[$column]; break;
+                    case 'origin' : $this->$propertyName =             $row[$column]; break;
 
-                    case 'bool'       :
-                    case 'boolean'    : $this->$propertyName = (bool)(int) $row[$column]; break;
-                    case 'int'        :
-                    case 'integer'    : $this->$propertyName =       (int) $row[$column]; break;
-                    case 'float'      :
-                    case 'double'     : $this->$propertyName =     (float) $row[$column]; break;
-                    case 'string'     : $this->$propertyName =    (string) $row[$column]; break;
-                  //case 'array'      : $this->$propertyName =   strLen($row[$column]) ? explode(',', $row[$column]):[]; break;
+                    case 'bool'   :
+                    case 'boolean': $this->$propertyName = (bool)(int) $row[$column]; break;
+                    case 'int'    :
+                    case 'integer': $this->$propertyName =       (int) $row[$column]; break;
+                    case 'float'  :
+                    case 'double' : $this->$propertyName =     (float) $row[$column]; break;
+                    case 'string' : $this->$propertyName =    (string) $row[$column]; break;
+                  //case 'array'  : $this->$propertyName =   strLen($row[$column]) ? explode(',', $row[$column]):[]; break;
                   //case DateTime::class: $this->$propertyName = new DateTime($row[$column]); break;
+
                     default:
-                        if (!isSet($property['assoc'])) {
-                            // TODO: handle custom types
-                            //if (is_class($propertyType)) {
-                            //    $object->$propertyName = new $propertyType($row[$column]);
-                            //    break;
-                            //}
-                        }
-                        else {
-                            $mapping = $relatedMapping;
-                            $column  = $property['ref-column'];
-                        }
+                        // TODO: handle custom types
+                        //if (is_class($propertyType)) {
+                        //    $object->$propertyName = new $propertyType($row[$column]);
+                        //    break;
+                        //}
                         throw new RuntimeException('Unsupported PHP type "'.$propertyType.'" for mapping of database column '.$mapping['table'].'.'.$column);
                 }
             }
