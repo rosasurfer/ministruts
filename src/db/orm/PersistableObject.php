@@ -111,6 +111,7 @@ abstract class PersistableObject extends Object {
      */
     private function getRelationValue($property) {
         $propertyName = $property;
+        /** @var PersistableObject|PersistableObject[]|scalar|null $value */
         $value = &$this->$propertyName;                                 // existing property value
 
         if (is_object($value)) return $value;                           // relation is fetched and is an object or an array
@@ -213,8 +214,8 @@ abstract class PersistableObject extends Object {
     /**
      * Return the value of a mapped column.
      *
-     * @param  string $column - column name
-     * @param  string $type   - column type (default: type as configured in the entity mapping)
+     * @param  string      $column - column name
+     * @param  string|null $type   - column type (default: type as configured in the entity mapping)
      *
      * @return mixed - column value
      */

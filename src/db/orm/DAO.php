@@ -144,7 +144,6 @@ abstract class DAO extends Singleton {
         if (isSet($mapping['relations'])) {
             foreach ($mapping['relations'] as $i => $property) {
                 $name  = $property['name' ];
-                $type  = $property['type' ];
                 $assoc = $property['assoc'];
 
                 // any association using a mandatory or optional join table
