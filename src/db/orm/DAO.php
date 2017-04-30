@@ -9,6 +9,7 @@ use rosasurfer\db\orm\meta\EntityMapping;
 use rosasurfer\exception\ConcurrentModificationException;
 
 use function rosasurfer\strLeft;
+use rosasurfer\exception\RuntimeException;
 
 
 /**
@@ -142,13 +143,47 @@ abstract class DAO extends Singleton {
 
         if (isSet($mapping['relations'])) {
             foreach ($mapping['relations'] as $i => $property) {
-                $name   = $property['name'];
-                $type   = $property['type'];
-                $getter = 'get'.$name;
+                $name  = $property['name' ];
+                $type  = $property['type' ];
+                $assoc = $property['assoc'];
+
+                // one-to-one
+                if ($assoc == 'one-to-one') {
+                    if (!isSet($property['column'])) {
+                        if (!isSet($property['key']))
+                            $property['key'] = $mapping['identity']['name'];
+                        else if (!isSet($mapping['properties'][$property['key']])) throw new RuntimeException('Illegal attribute "key"="'.$property['key'].'" in relation [name="'.$name.'"  assoc="'.$assoc.'"...] of entity class "'.$mapping['class'].'"');
+                        if (!isSet($property['ref-column']))                       throw new RuntimeException('Missing attribute "ref-column"="{column_name}" in relation [name="'.$name.'"  assoc="'.$assoc.'"...] of entity class "'.$mapping['class'].'"');
+                    }
+                }
+
+                // one-to-many
+                else if ($assoc == 'one-to-many') {
+                    if (!isSet($property['key']))
+                        $property['key'] = $mapping['identity']['name'];
+                    else if (!isSet($mapping['properties'][$property['key']])) throw new RuntimeException('Illegal attribute "key"="'.$property['key'].'" in relation [name="'.$name.'"  assoc="'.$assoc.'"...] of entity class "'.$mapping['class'].'"');
+                    if (!isSet($property['ref-column']))                       throw new RuntimeException('Missing attribute "ref-column"="{column_name}" in relation [name="'.$name.'"  assoc="'.$assoc.'"...] of entity class "'.$mapping['class'].'"');
+                }
+
+                // many-to-one
+                else if ($assoc == 'many-to-one') {
+                    if (!isSet($property['column'])) throw new RuntimeException('Missing attribute "column"="{column_name}" in relation [name="'.$name.'"  assoc="'.$assoc.'"...] of entity class "'.$mapping['class'].'"');
+                }
+
+                // many-to-many
+                else if ($assoc == 'many-to-many') {
+                    if (!isSet($property['join-table']))                       throw new RuntimeException('Missing attribute "join-table"="{table_name}" in relation [name="'.$name.'"  assoc="'.$assoc.'"...] of entity class "'.$mapping['class'].'"');
+                    if (!isSet($property['key']))
+                        $property['key'] = $mapping['identity']['name'];
+                    else if (!isSet($mapping['properties'][$property['key']])) throw new RuntimeException('Illegal attribute "key"="'.$property['key'].'" in relation [name="'.$name.'"  assoc="'.$assoc.'"...] of entity class "'.$mapping['class'].'"');
+                    if (!isSet($property['ref-column']))                       throw new RuntimeException('Missing attribute "ref-column"="{'.$property['join-table'].'.column_name}" in relation [name="'.$name.'"  assoc="'.$assoc.'"...] of entity class "'.$mapping['class'].'"');
+                    if (!isSet($property['fk-ref-column']))                    throw new RuntimeException('Missing attribute "fk-ref-column"="{'.$property['join-table'].'.column_name}" in relation [name="'.$name.'"  assoc="'.$assoc.'"...] of entity class "'.$mapping['class'].'"');
+                }
+                else                                                           throw new RuntimeException('Illegal attribute "assoc"="'.$assoc.'" in relation [name="'.$name.'"...] of entity class "'.$mapping['class'].'"');
 
                 if (isSet($property['column']))
                     $mapping['columns'][$property['column']] = &$property;
-
+                $getter = 'get'.$name;
                 $mapping['getters'][$getter] = &$property;
                 $mapping['relations'][$name] = &$property;
                 unset($mapping['relations'][$i], $property);
