@@ -10,10 +10,10 @@ use rosasurfer\core\Object;
 abstract class ActionForm extends Object {
 
 
-    /** @var Request^transient - the current Request the form belongs to */
+    /** @var Request [transient] - the current Request the form belongs to */
     protected $request;
 
-    /** @var string^transient - dispatch action key */
+    /** @var string [transient] - dispatch action key */
     protected $actionKey;
 
 
@@ -37,9 +37,9 @@ abstract class ActionForm extends Object {
 
 
     /**
-     * Liest die im Request uebergebenen Parameter ein. Muss implementiert werden.
+     * Populate the form object with the request parameters.
      *
-     * @param  Request $request - der aktuelle Request
+     * @param  Request $request
      *
      * @return void
      */
@@ -47,9 +47,9 @@ abstract class ActionForm extends Object {
 
 
     /**
-     * Ob die eingelesenen Parameter gueltig sind. Muss ueberschrieben werden.
+     * Validate the form parameters syntactically.
      *
-     * @return bool - TRUE, wenn die uebergebenen Parameter gueltig sind, FALSE andererseits
+     * @return bool - whether or not the parameters are valid
      */
     public function validate() {
         return true;

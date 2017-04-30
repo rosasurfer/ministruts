@@ -725,7 +725,7 @@ class Request extends Singleton {
      * @return string|null - Error-Message
      */
     public function getActionError($key = null) {
-        $errors =& $this->getAttribute(ACTION_ERRORS_KEY);
+        $errors = &$this->getAttribute(ACTION_ERRORS_KEY);
 
         if ($key === null) {       // die erste zurueckgeben
             if ($errors) {
@@ -746,7 +746,7 @@ class Request extends Singleton {
      * @return array - Error-Messages
      */
     public function getActionErrors() {
-        $errors =& $this->getAttribute(ACTION_ERRORS_KEY);
+        $errors = &$this->getAttribute(ACTION_ERRORS_KEY);
 
         if ($errors === null)
             $errors = [];

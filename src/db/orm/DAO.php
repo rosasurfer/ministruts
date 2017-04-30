@@ -2,17 +2,14 @@
 namespace rosasurfer\db\orm;
 
 use rosasurfer\core\Singleton;
-
 use rosasurfer\db\ConnectorInterface as IConnector;
 use rosasurfer\db\MultipleRecordsException;
-use rosasurfer\db\ResultInterface    as IResult;
-
+use rosasurfer\db\ResultInterface as IResult;
 use rosasurfer\db\orm\meta\EntityMapping;
-
 use rosasurfer\exception\ConcurrentModificationException;
-use rosasurfer\exception\UnimplementedFeatureException;
 
 use function rosasurfer\strLeft;
+use rosasurfer\exception\RuntimeException;
 
 
 /**
@@ -102,24 +99,113 @@ abstract class DAO extends Singleton {
 
 
     /**
-     * Return the legacy mapping of the DAO's entity.
+     * Return the mapping configuration of the DAO's entity.
      *
      * @return array
      */
-    public function getMapping() {
-        if (!isSet($this->mapping)) throw new UnimplementedFeatureException('Define '.get_class($this).'->mapping[] to work with this DAO!');
-        return $this->mapping;
+    abstract public function getMapping();
+
+
+    /**
+     * Parse and validate the DAO's data mapping.
+     *
+     * @param  array $mapping - data mapping
+     *
+     * @return array - validated and normalized mapping
+     */
+    protected function parseMapping(array $mapping) {
+        foreach ($mapping['properties'] as $i => $property) {
+            $name = $property['name'];
+            $type = $property['type'];
+
+            if (!isSet($property['column'     ])) $property['column'     ] = $name;
+            if (!isSet($property['column-type'])) $property['column-type'] = $type; // TODO: bug, $type can be a custom type
+
+            if (isSet($property['primary']) && $property['primary']===true)
+                $mapping['identity'] = &$property;
+
+            if (isSet($property['version']) && $property['version']===true)
+                $mapping['version'] = &$property;
+
+            $column = $property['column'];
+            $mapping['columns'][$column] = &$property;
+
+            if ($type=='bool' || $type=='boolean') {
+                $mapping['getters']['is'.$name ] = &$property;
+                $mapping['getters']['has'.$name] = &$property;
+            }
+            else {
+                $mapping['getters']['get'.$name] = &$property;
+            }
+            $mapping['properties'][$name] = &$property;
+            unset($mapping['properties'][$i], $property);
+        };
+
+        if (isSet($mapping['relations'])) {
+            foreach ($mapping['relations'] as $i => $property) {
+                $name  = $property['name' ];
+                $type  = $property['type' ];
+                $assoc = $property['assoc'];
+
+                // any association using a mandatory or optional join table
+                if ($assoc=='many-to-many' || isSet($property['join-table'])) {
+                    if (!isSet($property['join-table']))                       throw new RuntimeException('Missing attribute "join-table"="{table_name}" in relation [name="'.$name.'"  assoc="'.$assoc.'"...] of entity class "'.$mapping['class'].'"');
+                    if (!isSet($property['key']))
+                        $property['key'] = $mapping['identity']['name'];
+                    else if (!isSet($mapping['properties'][$property['key']])) throw new RuntimeException('Illegal attribute "key"="'.$property['key'].'" in relation [name="'.$name.'"  assoc="'.$assoc.'"...] of entity class "'.$mapping['class'].'"');
+                    if (!isSet($property['ref-column']))                       throw new RuntimeException('Missing attribute "ref-column"="{'.$property['join-table'].'.column_name}" in relation [name="'.$name.'"  assoc="'.$assoc.'"...] of entity class "'.$mapping['class'].'"');
+                    if (!isSet($property['fk-ref-column']))                    throw new RuntimeException('Missing attribute "fk-ref-column"="{'.$property['join-table'].'.column_name}" in relation [name="'.$name.'"  assoc="'.$assoc.'"...] of entity class "'.$mapping['class'].'"');
+                }
+
+                // one-to-one (using no optional join table)
+                else if ($assoc == 'one-to-one') {
+                    if (!isSet($property['column'])) {
+                        if (!isSet($property['key']))
+                            $property['key'] = $mapping['identity']['name'];
+                        else if (!isSet($mapping['properties'][$property['key']])) throw new RuntimeException('Illegal attribute "key"="'.$property['key'].'" in relation [name="'.$name.'"  assoc="'.$assoc.'"...] of entity class "'.$mapping['class'].'"');
+                        if (!isSet($property['ref-column']))                       throw new RuntimeException('Missing attribute "ref-column"="{column_name}" in relation [name="'.$name.'"  assoc="'.$assoc.'"...] of entity class "'.$mapping['class'].'"');
+                    }
+                }
+
+                // one-to-many (using no optional join table)
+                else if ($assoc == 'one-to-many') {
+                    if (!isSet($property['key']))
+                        $property['key'] = $mapping['identity']['name'];
+                    else if (!isSet($mapping['properties'][$property['key']])) throw new RuntimeException('Illegal attribute "key"="'.$property['key'].'" in relation [name="'.$name.'"  assoc="'.$assoc.'"...] of entity class "'.$mapping['class'].'"');
+                    if (!isSet($property['ref-column']))                       throw new RuntimeException('Missing attribute "ref-column"="{column_name}" in relation [name="'.$name.'"  assoc="'.$assoc.'"...] of entity class "'.$mapping['class'].'"');
+                }
+
+                // many-to-one (using no optional join table)
+                else if ($assoc == 'many-to-one') {
+                    if (!isSet($property['column'])) throw new RuntimeException('Missing attribute "column"="{column_name}" in relation [name="'.$name.'"  assoc="'.$assoc.'"...] of entity class "'.$mapping['class'].'"');
+                }
+                else                                 throw new RuntimeException('Illegal attribute "assoc"="'.$assoc.'" in relation [name="'.$name.'"...] of entity class "'.$mapping['class'].'"');
+
+                if (isSet($property['column']))
+                    $mapping['columns'][$property['column']] = &$property;
+                $getter = 'get'.$name;
+                $mapping['getters'][$getter] = &$property;
+                $mapping['relations'][$name] = &$property;
+                unset($mapping['relations'][$i], $property);
+            };
+        }
+        else $mapping['relations'] = [];
+
+        $mapping['columns'] = array_change_key_case($mapping['columns'], CASE_LOWER);
+        $mapping['getters'] = array_change_key_case($mapping['getters'], CASE_LOWER);
+
+        return $mapping;
     }
 
 
     /**
-     * Return the mapping of the DAO's entity.
+     * Return the object-oriented data mapping of the DAO's entity.
      *
      * @return EntityMapping
      */
     public function getEntityMapping() {
         if (!$this->entityMapping) {
-            $this->entityMapping = new EntityMapping($this->getEntityClass(), $this->getMapping());
+            $this->entityMapping = new EntityMapping($this->getMapping());
         }
         return $this->entityMapping;
     }
@@ -208,38 +294,33 @@ abstract class DAO extends Singleton {
      */
     public function doInsert(array $values) {
         $db       = $this->db();
-        $entity   = $this->getEntityMapping();
-        $table    = $entity->getTableName();
-        $identity = $entity->getIdentityMapping();
-        $idName   = $identity->getPhpName();
-        $idValue  = null;
-        if (isSet($values[$idName])) $idValue = $values[$idName];
-        else                         unset($values[$idName]);
+        $mapping  = $this->getMapping();
+        $table    = $mapping['table'];
+        $idColumn = $mapping['identity']['column'];
+        $id       = null;
+        if  (isSet($values[$idColumn])) $id = $values[$idColumn];
+        else unset($values[$idColumn]);
 
-        // convert values to their SQL representation
-        $columns = [];
-        foreach ($values as $name => &$value) {
-            $property  = $entity->getPropertyMapping($name);
-            $columns[] = $property->getColumnName();
-            $value     = $property->convertToSQLValue($value, $db);
+        // translate column values
+        foreach ($values as &$value) {
+            $value = $db->escapeLiteral($value);
         }; unset($value);
 
         // create SQL statement
-        $sql = 'insert into '.$table.' ('.join(', ', $columns).')
+        $sql = 'insert into '.$table.' ('.join(', ', array_keys($values)).')
                    values ('.join(', ', $values).')';
 
         // execute SQL statement
-        if (isSet($idValue)) {
+        if ($id) {
             $db->execute($sql);
         }
         else if ($db->supportsInsertReturn()) {
-            $idName  = $identity->getColumnName();
-            $idValue = $db->query($sql.' returning '.$idName)->fetchInt();
+            $id = $db->query($sql.' returning '.$idColumn)->fetchInt();
         }
         else {
-            $idValue = $db->execute($sql)->lastInsertId();
+            $id = $db->execute($sql)->lastInsertId();
         }
-        return $idValue;
+        return $id;
     }
 
 
@@ -257,25 +338,25 @@ abstract class DAO extends Singleton {
         $table  = $entity->getTableName();
 
         // collect identity infos
-        $identity = $entity->getIdentityMapping();
-        $idColumn = $identity->getColumnName();
-        $idValue  = $identity->convertToSQLValue($object->getObjectId(), $db);
+        $identity = $entity->getIdentity();
+        $idColumn = $identity->getColumn();
+        $idValue  = $identity->convertToDBValue($object->getObjectId(), $db);
 
         // collect version infos
         $versionMapping = $versionName = $versionColumn = $oldVersion = null;
-        //if ($versionMapping = $entity->getVersionMapping()) {
-        //    $versionName   = $versionMapping->getPhpName();
-        //    $versionColumn = $versionMapping->getColumnName();
+        //if ($versionMapping = $entity->getVersion()) {
+        //    $versionName   = $versionMapping->getName();
+        //    $versionColumn = $versionMapping->getColumn();
         //    $oldVersion    = $object->getSnapshot()->$versionName;        // TODO: implement dirty check via snapshot
-        //    $oldVersion    = $versionMapping->convertToSQLValue($oldVersion, $db);
+        //    $oldVersion    = $versionMapping->convertToDBValue($oldVersion, $db);
         //}
 
         // create SQL
         $sql = 'update '.$table.' set';                                     // update table
         foreach ($changes as $name => $value) {                             //    set ...
-            $mapping     = $entity->getPropertyMapping($name);              //        ...
-            $columnName  = $mapping->getColumnName();                       //        ...
-            $columnValue = $mapping->convertToSQLValue($value, $db);        //        column1 = value1,
+            $mapping     = $entity->getProperty($name);                     //        ...
+            $columnName  = $mapping->getColumn();                           //        ...
+            $columnValue = $mapping->convertToDBValue($value, $db);         //        column1 = value1,
             $sql .= ' '.$columnName.' = '.$columnValue.',';                 //        column2 = value2,
         }                                                                   //        ...
         $sql  = strLeft($sql, -1);                                          //        ...
@@ -311,9 +392,9 @@ abstract class DAO extends Singleton {
         $table  = $entity->getTableName();
 
         // collect identity infos
-        $identity = $entity->getIdentityMapping();
-        $idColumn = $identity->getColumnName();
-        $idValue  = $identity->convertToSQLValue($object->getObjectId(), $db);
+        $identity = $entity->getIdentity();
+        $idColumn = $identity->getColumn();
+        $idValue  = $identity->convertToDBValue($object->getObjectId(), $db);
 
         // create SQL
         $sql = 'delete from '.$table.'

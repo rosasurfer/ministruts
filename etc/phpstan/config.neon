@@ -49,6 +49,7 @@ parameters:
     ignoreErrors:
         - '/Call to ((static )?method|function) [^ ]+ with incorrect case:/'                            # seriously?
         - '/(Array \([^ ]+\[\]\)|(Static )?property [^ ]+ \(([^ ]+)\)) does not accept (\3\|)?null\b/i' # everything is nullable
+        - '/Parameter #[0-9]+ [^ ]+ of (static )?method [^ ]+ expects ([^ ]+), \2\|null given\b/'       # everything accepts NULL
         - "/Casting to (bool|int|float|string) something that's already (bool|int|float|string)./"      # simply wrong
 
         # fixed but not yet released PHPStan bugs 
@@ -58,9 +59,8 @@ parameters:
 
         # not yet fixed PHPStan bugs 
         - '/Cannot call method andDependency\(\) on null\b/'
-        - '/Method rosasurfer\\db\\orm\\meta\\EntityMapping::getVersionMapping\(\) should return rosasurfer\\db\\orm\\meta\\PropertyMapping\|null but returns bool\|rosasurfer\\db\\orm\\meta\\PropertyMapping\|null\b/'
+        - '/Method rosasurfer\\db\\orm\\meta\\EntityMapping::getVersion\(\) should return rosasurfer\\db\\orm\\meta\\PropertyMapping\|null but returns bool\|rosasurfer\\db\\orm\\meta\\PropertyMapping\|null\b/'
         - '/rosasurfer\\net\\messenger\\im\\IRCMessenger::__construct\(\) does not call parent constructor from rosasurfer\\net\\messenger\\Messenger\b/'
         - '/Parameter #1 \$mode of method rosasurfer\\ministruts\\ActionMapping::setFormValidateFirst\(\) expects bool, bool\|mixed given\b/'
-        - '/Parameter #1 \$mode of static method rosasurfer\\debug\\ErrorHandler::setupErrorHandling\(\) expects int, int\|null given\b/'
-        - '/Parameter #2 \$row of static method rosasurfer\\db\\orm\\PersistableObject::populateNew\(\) expects mixed\[\], mixed\[\]\|null given\b/'
         - '/Parameter #3 \$hResult of class rosasurfer\\db\\mysql\\MySQLResult constructor expects resource\|null, bool\|resource\|null given\b/'
+ 

@@ -83,7 +83,7 @@ class TorHelper extends StaticClass {
         if ($ip == '127.0.0.1')
             return false;
 
-        $nodes =& self::getExitNodes();
+        $nodes = &self::getExitNodes();
         return isSet($nodes[$ip]);
     }
 
