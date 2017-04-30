@@ -1,4 +1,13 @@
 
+2017-04-30
+
+   - orm: add relation configuration to mapping  
+   - orm: add magic getter support for all mapped properties and relation types
+   - orm: support optional join tables for all relation types
+   - orm: lazy-load all relations
+   - orm: remove redundant properties PersistableObject::$relatedObject_id
+
+
 2017-04-22
 
    - orm: rewrite mapping configuration
