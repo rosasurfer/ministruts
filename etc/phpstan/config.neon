@@ -56,7 +56,7 @@ parameters:
         - '/Parameter [^ ]+ of method [^ ]+ has invalid typehint type ([^ ]+)?\bscalar\b/'
         - '/Parameter #[0-9]+ [^ ]+ of method [^ ]+ expects ([^ ]+)?\bscalar(\|[^|]+)*, (bool|int|float|string|null|([^ ]+)?scalar)(\|(bool|int|float|string|null|([^ ]+)?scalar))* given\b/'
         - '/Parameter #3 \$hResult of class rosasurfer\\db\\mysql\\MySQLResult constructor expects resource\|null, resource\|bool\|null given\b/'
-        - '/--- Release 0.6.4 does not recognize virtual methods declared in class doc-blocks using the @method tag. ---/'
+        - '/--- Release 0.6.4 does not recognize virtual methods declared using the @method tag. ---/'
 
         # not yet fixed PHPStan bugs 
         - '/Cannot call method andDependency\(\) on null\b/'
