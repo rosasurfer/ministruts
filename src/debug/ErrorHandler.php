@@ -277,7 +277,7 @@ class ErrorHandler extends StaticClass {
             error_log(trim($msg), ERROR_LOG_DEFAULT);
         }
                                                                     // display a minimal hint to prevent an empty web page
-        !CLI && !LOCALHOST && echoPre('application error (see error log)');
+        !CLI && !LOCALHOST && echoPre('application error (see error log: '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'http-error-log')).')');
     }
 
 

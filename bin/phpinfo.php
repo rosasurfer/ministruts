@@ -2,17 +2,16 @@
 <?php
 namespace rosasurfer\bin\phpinfo;
 
-use rosasurfer\MiniStruts;
 use rosasurfer\util\PHP;
+use function rosasurfer\echoPre;
+use const rosasurfer\NL;
+
 
 /**
  * Command line version of phpInfo()
  */
 require(__DIR__.'/../src/load.php');
-MiniStruts::init([
-    'config'  => __DIR__,
-    'globals' => true,
-]);
-
 
 PHP::phpInfo();
+
+echoPre(NL.'loaded php.ini: "'.php_ini_loaded_file().'"');
