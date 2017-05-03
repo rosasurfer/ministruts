@@ -2,7 +2,6 @@
 !.gitattributes
 !.htaccess
 
-
 # ignore Eclipse folders and files
 /.externalToolBuilders/
 /.settings/
@@ -22,7 +21,11 @@
 /nbactions.xml
 
 # ignore the following folders and files
-vendor/
+/composer
 /composer.lock
+/composer.phar
+/dirs.php
 /php-error.log
+
+vendor/
 config.properties

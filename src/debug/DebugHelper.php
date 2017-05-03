@@ -120,7 +120,8 @@ class DebugHelper extends StaticClass {
      * @return string
      */
     public static function formatTrace(array $trace, $indent='') {
-        $appRoot = Config::getDefault()->get('app.dir.root');
+        $config  = Config::getDefault();
+        $appRoot = $config ? $config->get('app.dir.root') : false;
         $result  = '';
 
         $size = sizeOf($trace);
@@ -138,13 +139,16 @@ class DebugHelper extends StaticClass {
             $frame['line'] = isSet($frame['line']) ? ' # line '.$frame['line'].',' : '';
             $lineLen = max($lineLen, strLen($frame['line']));
 
-            if (isSet($frame['file']))                 $frame['file'] = ' file: '.strRightFrom($frame['file'], $appRoot.DIRECTORY_SEPARATOR, 1, false, $frame['file']);
+            if (isSet($frame['file']))                 $frame['file'] = ' file: '.(!$appRoot ? $frame['file'] : strRightFrom($frame['file'], $appRoot.DIRECTORY_SEPARATOR, 1, false, $frame['file']));
             elseif (strStartsWith($call, 'phalcon\\')) $frame['file'] = ' [php-phalcon]';
             else                                       $frame['file'] = ' [php]';
         }
-        $trace[] = ['call'=>'', 'line'=>'', 'file'=>' file base: '.$appRoot];
+        if ($appRoot) {
+            $trace[] = ['call'=>'', 'line'=>'', 'file'=>' file base: '.$appRoot];
+            $i++;
+        }
 
-        for ($i=0; $i <= $size; $i++) {
+        for ($i=0; $i < $size; $i++) {
             $result .= $indent.str_pad($trace[$i]['call'], $callLen).' '.str_pad($trace[$i]['line'], $lineLen).$trace[$i]['file'].NL;
         }
 
