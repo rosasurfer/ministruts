@@ -14,7 +14,6 @@ use function rosasurfer\strStartsWith;
 
 use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_INFO;
-use const rosasurfer\L_NOTICE;
 
 
 /**
@@ -29,23 +28,19 @@ class RequestProcessor extends Object {
     /** @var bool */
     private static $logInfo;
 
-    /** @var bool */
-    private static $logNotice;
-
-    /** @var Module - Modul, zu dem wir gehoeren */
+    /** @var Module - the Module the instance belongs to */
     protected $module;
 
 
     /**
-     * Erzeugt einen neuen RequestProcessor.
+     * Create a new RequestProcessor.
      *
-     * @param  Module $module - Module, dem dieser RequestProcessor zugeordnet ist
+     * @param  Module $module - the Module the instance belongs to
      */
     public function __construct(Module $module) {
-        $loglevel        = Logger::getLogLevel(__CLASS__);
-        self::$logDebug  = ($loglevel <= L_DEBUG );
-        self::$logInfo   = ($loglevel <= L_INFO  );
-        self::$logNotice = ($loglevel <= L_NOTICE);
+        $loglevel       = Logger::getLogLevel(__CLASS__);
+        self::$logDebug = ($loglevel <= L_DEBUG );
+        self::$logInfo  = ($loglevel <= L_INFO  );
 
         $this->module = $module;
     }

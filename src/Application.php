@@ -5,16 +5,18 @@ use rosasurfer\config\AutoConfig;
 use rosasurfer\config\Config;
 use rosasurfer\config\ConfigInterface as IConfig;
 
-use rosasurfer\core\StaticClass;
+use rosasurfer\core\Object;
 use rosasurfer\debug\ErrorHandler;
 use rosasurfer\exception\InvalidArgumentException;
+use rosasurfer\ministruts\FrontController;
+use rosasurfer\ministruts\Response;
 use rosasurfer\util\PHP;
 
 
 /**
  * Framework initialization
  */
-class Application extends StaticClass {
+class Application extends Object {
 
 
     /** @var int - error handling mode in which regular PHP errors are logged */
@@ -25,14 +27,14 @@ class Application extends StaticClass {
 
 
     /**
-     * Initialize the framework. This method expects an array with any of the following options:
+     * Create and initialize a new MiniStruts application. Expects an array with any of the following options:
      *
      * "config"            - IConfig: Configuration instance. <br>
      *                     - string:  Configuration location, can point to a directory or to a .properties file. <br>
      *
      * "handle-errors"     - string:  How to handle regular PHP errors. If set to 'strict' errors are converted to PHP
-     *                                ErrorExceptions and thrown. If set to 'weak' errors are logged and execution continues.
-     *                                If set to 'ignore' you have to setup your own error handling mechanism. <br>
+     *                                ErrorExceptions and thrown. If set to 'weak' errors are only logged and execution
+     *                                continues. If set to 'ignore' you have to setup your own error handling mechanism. <br>
      *                                default: 'strict' <br>
      *
      * "handle-exceptions" - bool:    If set to TRUE exceptions are handled by the built-in exception handler. If set to
@@ -40,23 +42,23 @@ class Application extends StaticClass {
      *                                default: TRUE <br>
      *
      * "globals"           - bool:    If set to TRUE, the helper functions and constants defined in "rosasurfer/helpers.php"
-     *                                are mapped to and available in the global namespace. This can simplify HTML views as
-     *                                no additional PHP "use" declarations are needed. <br>
+     *                                are mapped to the global namespace. This simplifies views as they will not need PHP
+     *                                "use" declarations to access those helpers. <br>
      *                                default: FALSE <br>
      *
      * @param  array $options
      */
-    public static function init(array $options = []) {
+    public function __construct(array $options = []) {
         // set default values
         if (!isSet($options['handle-errors'    ])) $options['handle-errors'    ] = 'strict';
         if (!isSet($options['handle-exceptions'])) $options['handle-exceptions'] = true;
         if (!isSet($options['globals'          ])) $options['globals'          ] = false;
         if (!isSet($options['config'           ])) throw new InvalidArgumentException('Invalid argument $options (option "config" not set)');
 
-        self::setupErrorHandling    ($options['handle-errors'    ]);
-        self::setupExceptionHandling($options['handle-exceptions']);
-        self::loadGlobalHelpers     ($options['globals'          ]);
-        self::setConfiguration      ($options['config'           ]);
+        $this->setupErrorHandling    ($options['handle-errors'    ]);
+        $this->setupExceptionHandling($options['handle-exceptions']);
+        $this->loadGlobalHelpers     ($options['globals'          ]);
+        $this->setConfiguration      ($options['config'           ]);
 
         // (1) check application settings
         $appRoot = Config::getDefault()->get('app.dir.root');
@@ -104,7 +106,7 @@ class Application extends StaticClass {
         }
 
         // (3) load any further PHP config settings from the application's main configuration
-        self::configurePhp();
+        $this->configurePhp();
 
         // (4) execute "config-info" task if enabled
         if ($configInfoTask) {
@@ -132,9 +134,29 @@ class Application extends StaticClass {
 
 
     /**
+     * Run the application.
+     *
+     * @param  array $options - runtime options (default: none)
+     *
+     * @return Response|null - the response if a web application or NULL if a command line application
+     */
+    public function run(array $options = []) {
+        if (CLI) {
+            // cli application
+            $response = null;
+        }
+        else {
+            // web application
+            $response = FrontController::processRequest($options);
+        }
+        return $response;
+    }
+
+
+    /**
      * Update the PHP configuration with user defined settings.
      */
-    private static function configurePhp() {
+    private function configurePhp() {
         /*
         ini_set('arg_separator.output'    , '&amp;'                );
         ini_set('auto_detect_line_endings',  1                     );
@@ -154,7 +176,7 @@ class Application extends StaticClass {
         ini_set('session.cookie_httponly' ,  1                     );
         ini_set('session.referer_check'   , ''                     );
         ini_set('zend.detect_unicode'     ,  1                     );     // BOM header recognition
-      */
+        */
     }
 
 
@@ -163,7 +185,7 @@ class Application extends StaticClass {
      *
      * @param  IConfig|string $config - configuration or config location as passed to the framework loader
      */
-    private static function setConfiguration($config) {
+    private function setConfiguration($config) {
         /** @var IConfig $config */
         $config = is_string($config) ? new AutoConfig($config) : $config;
         Config::setDefault($config);
@@ -175,7 +197,7 @@ class Application extends StaticClass {
      *
      * @param  int|string $value - configuration value as passed to the framework loader
      */
-    private static function setupErrorHandling($value) {
+    private function setupErrorHandling($value) {
         $flag = self::THROW_EXCEPTIONS;
         if (is_string($value)) {
             $value = trim(strToUpper($value));
@@ -193,7 +215,7 @@ class Application extends StaticClass {
      *
      * @param  bool|int|string $value - configuration value as passed to the framework loader
      */
-    private static function setupExceptionHandling($value) {
+    private function setupExceptionHandling($value) {
         $enabled = true;
         if (is_bool($value) || is_int($value)) {
             $enabled = (bool) $value;
@@ -211,11 +233,11 @@ class Application extends StaticClass {
 
 
     /**
-     * Map the helper constants and functions in namespace \rosasurfer to the global namespace.
+     * Map the helper constants and functions in namespace "\rosasurfer" to the global namespace.
      *
      * @param  mixed $value - configuration value as passed to the framework loader
      */
-    private static function loadGlobalHelpers($value) {
+    private function loadGlobalHelpers($value) {
         $enabled = false;
         if (is_bool($value) || is_int($value)) {
             $enabled = (bool) $value;
@@ -236,7 +258,7 @@ class Application extends StaticClass {
      *
      * @param  mixed $value - configuration value as passed to the framework loader
      */
-    private static function replaceComposer($value) {
+    private function replaceComposer($value) {
         $enabled = false;
         if (is_bool($value) || is_int($value)) {
             $enabled = (bool) $value;

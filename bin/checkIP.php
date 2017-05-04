@@ -12,7 +12,7 @@ error_reporting(E_ALL & ~E_DEPRECATED);
 
 // configure and load the framework
 require(__DIR__.'/../src/load.php');
-Application::init([
+$app = new Application([
     'config'  => __DIR__,
     'globals' => true,
 ]);

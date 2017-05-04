@@ -22,13 +22,13 @@ use const rosasurfer\WINDOWS;
 
 
 /**
- * StrutsController
+ * FrontController
  *
- * To avoid repeated loading and parsing of the XML configuration after instantiation the one and only StrutsController
+ * To avoid repeated loading and parsing of the XML configuration after instantiation the one and only FrontController
  * instance is serialized, cached and re-used across following HTTP requests (until cache invalidation). For this reason
  * the class implementation is "request safe" (in analogy to "thread safety") and holds no variable runtime status.
  */
-class StrutsController extends Singleton {
+class FrontController extends Singleton {
 
 
     /** @var Module[] - all registered Modules, array key is the Module prefix */
@@ -114,8 +114,12 @@ class StrutsController extends Singleton {
 
     /**
      * Process the current HTTP request.
+     *
+     * @param  array $options - runtime options (default: none)
+     *
+     * @return Response - respone wrapper
      */
-    public static function processRequest() {
+    public static function processRequest(array $options = []) {
         $controller = self::me();
         $request    = Request::me();
         $response   = Response::me();
@@ -130,6 +134,8 @@ class StrutsController extends Singleton {
 
         // process Request
         $processor->process($request, $response);
+
+        return $response;
     }
 
 
@@ -154,7 +160,7 @@ class StrutsController extends Singleton {
 
 
     /**
-     * Get the RequestProcessor instance responsible forthe given Module.
+     * Get the RequestProcessor instance responsible for the given Module.
      *
      * @param  Module $module
      *

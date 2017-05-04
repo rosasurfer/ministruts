@@ -1,6 +1,4 @@
 <?php
-// initialize the app
-require(__DIR__.'/../app/init.php');
-
-// run the app
-rosasurfer\ministruts\StrutsController::processRequest();
+/** @var rosasurfer\Application $app */
+$app = require(__DIR__.'/../app/init.php');
+$app->run();
