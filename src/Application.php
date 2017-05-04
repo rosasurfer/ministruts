@@ -14,7 +14,7 @@ use rosasurfer\util\PHP;
 /**
  * Framework initialization
  */
-class MiniStruts extends StaticClass {
+class Application extends StaticClass {
 
 
     /** @var int - error handling mode in which regular PHP errors are logged */

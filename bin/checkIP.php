@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\bin\check_ip;
 
-use rosasurfer\MiniStruts;
+use rosasurfer\Application;
 
 use function rosasurfer\echoPre;
 
@@ -12,7 +12,7 @@ error_reporting(E_ALL & ~E_DEPRECATED);
 
 // configure and load the framework
 require(__DIR__.'/../src/load.php');
-MiniStruts::init([
+Application::init([
     'config'  => __DIR__,
     'globals' => true,
 ]);
