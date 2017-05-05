@@ -229,7 +229,6 @@ class ErrorHandler extends StaticClass {
      * @param  \Exception $exception - the unhandled exception
      */
     public static function handleException(\Exception $exception) {
-        //echoPre(__METHOD__.'()  '.$exception->getMessage());
         $context = [];
 
         try {
@@ -276,8 +275,13 @@ class ErrorHandler extends StaticClass {
 
             error_log(trim($msg), ERROR_LOG_DEFAULT);
         }
-                                                                    // display a minimal hint to prevent an empty web page
-        !CLI && !LOCALHOST && echoPre('application error (see error log: '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'http-error-log')).')');
+
+
+        // display a minimal hint to prevent an empty web page
+        if (!CLI) {
+            $hint = 'see error log'.(LOCALHOST ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'');
+            echoPre('application error ('.$hint.')');
+        }
     }
 
 
