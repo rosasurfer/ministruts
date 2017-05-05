@@ -177,7 +177,7 @@ class PHP extends StaticClass {
                     $newOrder .= $char;
             }
             $order = $newOrder;
-        }                  if ($order != 'GP')                                                                      $issues[] = 'Error: request_order is not "GP": "'.$order.'"  [standards]';
+        }                  if ($order != 'GP')                                                                      $issues[] = 'Error: request_order is not "GP": "'.(empty(ini_get('request_order')) ? '" (empty) => variables_order:"':'').$order.'"  [standards]';
         /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('always_populate_raw_post_data' ) && PHP_VERSION_ID <  70000)    $issues[] = 'Info:  always_populate_raw_post_data is not Off  [performance]';
         /*PHP_INI_ALL   */ if (       ini_get     ('arg_separator.output'          ) != '&')                        $issues[] = 'Warn:  arg_separator.output is not "&": "'.ini_get('arg_separator.output').'"  [standards]';
         /*PHP_INI_ALL   */ if (!self::ini_get_bool('ignore_user_abort'             ))                               $issues[] = 'Warn:  ignore_user_abort is not On  [standards]';
