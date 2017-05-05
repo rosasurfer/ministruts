@@ -230,6 +230,7 @@ class ErrorHandler extends StaticClass {
      */
     public static function handleException(\Exception $exception) {
         $context = [];
+        $second  = null;
 
         try {
             $context['class'    ] = __CLASS__;              // atm not required but somewhen somewhere somebody might ask for it
@@ -242,16 +243,16 @@ class ErrorHandler extends StaticClass {
 
         // Exceptions thrown from within the exception handler will not be passed back to the handler again. Instead the
         // script terminates with an uncatchable fatal error.
-        catch (\Exception $secondary) {                     // the application is crashing, last try to log
+        catch (\Exception $second) {                        // the application is crashing, last try to log
             $indent = ' ';
 
             // secondary exception
-            $msg2  = 'PHP [FATAL] Unhandled '.trim(DebugHelper::composeBetterMessage($secondary)).NL;
-            $file  = $secondary->getFile();
-            $line  = $secondary->getLine();
+            $msg2  = 'PHP [FATAL] Unhandled '.trim(DebugHelper::composeBetterMessage($second)).NL;
+            $file  = $second->getFile();
+            $line  = $second->getLine();
             $msg2 .= $indent.'in '.$file.' on line '.$line.NL.NL;
             $msg2 .= $indent.'Stacktrace:'.NL.' -----------'.NL;
-            $msg2 .= DebugHelper::getBetterTraceAsString($secondary, $indent);
+            $msg2 .= DebugHelper::getBetterTraceAsString($second, $indent);
 
             // primary (the causing) exception
             if (isSet($context['cliMessage'])) {
@@ -278,7 +279,7 @@ class ErrorHandler extends StaticClass {
 
 
         // display a minimal hint to prevent an empty web page
-        if (!CLI) {
+        if (!CLI && ($second || !LOCALHOST)) {
             $hint = 'see error log'.(LOCALHOST ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'');
             echoPre('application error ('.$hint.')');
         }
