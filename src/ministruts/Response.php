@@ -5,6 +5,8 @@ use rosasurfer\core\Singleton;
 use rosasurfer\exception\RuntimeException;
 
 use const rosasurfer\CLI;
+use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\exception\InvalidArgumentException;
 
 
 /**
@@ -15,8 +17,11 @@ use const rosasurfer\CLI;
 class Response extends Singleton {
 
 
+    /** @var int - HTTP status code */
+    protected $status = 0;
+
     /** @var array - Attribute-Pool */
-    private $attributes = [];
+    protected $attributes = [];
 
 
     /**
@@ -30,6 +35,32 @@ class Response extends Singleton {
     public static function me() {
         if (CLI) throw new RuntimeException('Cannot create a '.static::class.' instance in a non-web context.');
         return Singleton::getInstance(static::class);
+    }
+
+
+    /**
+     * Set the response status code.
+     *
+     * @param  int $status - HTTP response status
+     *
+     * @return $this
+     */
+    public function setStatus($status) {
+        if (!is_int($status)) throw new IllegalTypeException('Illegal type of parameter $status: '.getType($status));
+        if ($status < 1)      throw new InvalidArgumentException('Invalid argument $status: '.$status);
+
+        $this->status = $status;
+        return $this;
+    }
+
+
+    /**
+     * Return the HTTP response status.
+     *
+     * @return int
+     */
+    public function getStatus() {
+        return $this->status;
     }
 
 

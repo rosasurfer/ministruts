@@ -31,18 +31,23 @@ class RequestProcessor extends Object {
     /** @var Module - the Module the instance belongs to */
     protected $module;
 
+    /** @var array - processing runtime options */
+    protected $options;
+
 
     /**
      * Create a new RequestProcessor.
      *
-     * @param  Module $module - the Module the instance belongs to
+     * @param  Module $module  - the Module the instance belongs to
+     * @param  array  $options - processing runtime options
      */
-    public function __construct(Module $module) {
+    public function __construct(Module $module, array $options) {
         $loglevel       = Logger::getLogLevel(__CLASS__);
         self::$logDebug = ($loglevel <= L_DEBUG );
         self::$logInfo  = ($loglevel <= L_INFO  );
 
-        $this->module = $module;
+        $this->module  = $module;
+        $this->options = $options;
     }
 
 
@@ -63,13 +68,13 @@ class RequestProcessor extends Object {
 
 
         // Mapping fuer den Request ermitteln: wird kein Mapping gefunden, generiert die Methode einen 404-Fehler
-        $mapping = $this->processMapping($request);
+        $mapping = $this->processMapping($request, $response);
         if (!$mapping)
             return;
 
 
         // Methodenbeschraenkungen des Mappings pruefen: wird der Zugriff verweigert, generiert die Methode einen 405-Fehler
-        if (!$this->processMethod($request, $mapping))
+        if (!$this->processMethod($request, $response, $mapping))
             return;
 
 
@@ -175,10 +180,11 @@ class RequestProcessor extends Object {
      * erzeugt und NULL zurueckgegeben.
      *
      * @param  Request  $request
+     * @param  Response $response
      *
      * @return ActionMapping|null - ActionMapping oder NULL
      */
-    protected function processMapping(Request $request) {
+    protected function processMapping(Request $request, Response $response) {
         // Pfad fuer die Mappingauswahl ermitteln ...
         $requestPath = '/'.trim(preg_replace('|/{2,}|', '/', $request->getPath()), '/').'/';   // normalize request path
         if ($requestPath=='//') $requestPath = '/';
@@ -217,7 +223,13 @@ class RequestProcessor extends Object {
         // kein Mapping gefunden
         self::$logInfo && Logger::log('Could not find a mapping for path: '.$path, L_INFO);
 
-        // Status-Code 404 setzen, bevor Content ausgegeben wird
+        $response->setStatus(HttpResponse::SC_NOT_FOUND);
+
+        if (isSet($this->options['status-404']) && $this->options['status-404']=='pass-through') {
+            return null;
+        }
+
+        // Header setzen, bevor Content ausgegeben wird
         header('HTTP/1.1 404 Not Found', true);
 
         // konfiguriertes 404-Layout suchen
@@ -250,16 +262,23 @@ PROCESS_MAPPING_ERROR_SC_404;
      * beendet wurde.
      *
      * @param  Request       $request
+     * @param  Response      $response
      * @param  ActionMapping $mapping
      *
      * @return bool
      */
-    protected function processMethod(Request $request, ActionMapping $mapping) {
+    protected function processMethod(Request $request, Response $response, ActionMapping $mapping) {
         if ($mapping->isSupportedMethod($request->getMethod()))
             return true;
 
         // Beschraenkung nicht erfuellt
         self::$logDebug && Logger::log('HTTP method "'.$request->getMethod().'" is not supported by ActionMapping, denying access', L_DEBUG);
+
+        $response->setStatus(HttpResponse::SC_METHOD_NOT_ALLOWED);
+
+        if (isSet($this->options['status-405']) && $this->options['status-405']=='pass-through') {
+            return false;
+        }
 
         // Status-Code 405 setzen, bevor Content ausgegeben wird
         header('HTTP/1.1 405 Method Not Allowed', true);

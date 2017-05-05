@@ -130,7 +130,7 @@ class FrontController extends Singleton {
         $request->setAttribute(MODULE_KEY, $module);
 
         // get RequestProcessor
-        $processor = $controller->getRequestProcessor($module);
+        $processor = $controller->getRequestProcessor($module, $options);
 
         // process Request
         $processor->process($request, $response);
@@ -163,11 +163,12 @@ class FrontController extends Singleton {
      * Get the RequestProcessor instance responsible for the given Module.
      *
      * @param  Module $module
+     * @param  array  $options - processing runtime options
      *
      * @return RequestProcessor
      */
-    private function getRequestProcessor(Module $module) {
+    private function getRequestProcessor(Module $module, array $options) {
         $class = $module->getRequestProcessorClass();
-        return new $class($module);
+        return new $class($module, $options);
     }
 }
