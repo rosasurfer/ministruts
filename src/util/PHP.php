@@ -1,14 +1,16 @@
 <?php
 namespace rosasurfer\util;
 
+use rosasurfer\config\Config;
 use rosasurfer\core\StaticClass;
-
 use rosasurfer\debug\DebugHelper;
 
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RuntimeException;
 
 use function rosasurfer\echoPre;
+use function rosasurfer\strContains;
+use function rosasurfer\strLeft;
 use function rosasurfer\strRight;
 use function rosasurfer\strRightFrom;
 use function rosasurfer\strStartsWith;
@@ -17,8 +19,6 @@ use const rosasurfer\CLI;
 use const rosasurfer\MB;
 use const rosasurfer\NL;
 use const rosasurfer\WINDOWS;
-
-use function rosasurfer\strLeft;
 
 
 /**
@@ -241,6 +241,22 @@ class PHP extends StaticClass {
         if (!extension_loaded('mysql'))                                                                              $issues[] = 'Warn:  MySQL extension is not loaded';
         if (!extension_loaded('mysqli'))                                                                             $issues[] = 'Warn:  MySQLi extension is not loaded';
         if (!WINDOWS && !extension_loaded('sysvsem'))                                                                $issues[] = 'Warn:  System-V Semaphore extension is not loaded';
+
+        $appRoot = Config::getDefault()->get('app.dir.root');
+
+        if (is_file($file=$appRoot.'/composer.json')) {
+            $composer = json_decode(file_get_contents($file), true);
+            if (isSet($composer['require']) && is_array($composer['require'])) {
+                foreach ($composer['require'] as $name => $version) {
+                    $name = trim(strToLower($name));
+                    if (in_array($name, ['php', 'php-64bit', 'hhvm']) || strContains($name, '/'))
+                        continue;
+                    if (strStartsWith($name, 'ext-'))
+                        $name = strRight($name, -4);
+                    if (!extension_loaded($name))                                                                    $issues[] = 'Warn:  '.$name.' extension is not loaded';
+                }
+            }
+        }
 
 
         // (8) Opcode cache
