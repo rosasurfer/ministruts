@@ -89,7 +89,7 @@ class PHP extends StaticClass {
         /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('asp_tags'                      ) && PHP_VERSION_ID <  70000)     $issues[] = 'Info:  asp_tags is not Off  [standards]';
         /*PHP_INI_ONLY  */ if ( self::ini_get_bool('expose_php'                    ))                                $issues[] = 'Warn:  expose_php is not Off  [security]';
         /*PHP_INI_ALL   */ if ( self::ini_get_int ('max_execution_time'            ) != 30 && !CLI/*hardcoded*/)     $issues[] = 'Info:  max_execution_time is not 30: '.ini_get('max_execution_time').'  [resources]';
-        /*PHP_INI_ALL   */ if ( self::ini_get_int ('default_socket_timeout'        ) != 30)                          $issues[] = 'Info:  default_socket_timeout is not 30: '.ini_get('default_socket_timeout').'  [resources]';
+        /*PHP_INI_ALL   */ if ( self::ini_get_int ('default_socket_timeout'        )  > 30  /*PHP default: 60*/)     $issues[] = 'Info:  default_socket_timeout is very high: '.ini_get('default_socket_timeout').'  [resources]';
         /*PHP_INI_ALL   */ $bytes = self::ini_get_bytes('memory_limit'             );
             if      ($bytes ==     -1)                                                                               $issues[] = 'Warn:  memory_limit is unlimited  [resources]';
             else if ($bytes <=      0)                                                                               $issues[] = 'Error: memory_limit is invalid: '.ini_get('memory_limit');
@@ -103,7 +103,7 @@ class PHP extends StaticClass {
         /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('allow_call_time_pass_reference') && PHP_VERSION_ID <  50400)     $issues[] = 'Info:  allow_call_time_pass_reference is not Off  [standards]';
         /*PHP_INI_ALL   */ if (!self::ini_get_bool('y2k_compliance'                ) && PHP_VERSION_ID <  50400)     $issues[] = 'Info:  y2k_compliance is not On  [standards]';
         /*PHP_INI_ALL   */ $timezone = ini_get    ('date.timezone'                 );
-            if (empty($timezone) && (!isSet($_ENV['TZ'])                              || PHP_VERSION_ID >= 50400))   $issues[] = 'Warn:  date.timezone is not set  [setup]';
+            if (empty($timezone) && (!isSet($_ENV['TZ'])                             || PHP_VERSION_ID >= 50400))    $issues[] = 'Warn:  date.timezone is not set  [setup]';
         /*PHP_INI_SYSTEM*/ if ( self::ini_get_bool('safe_mode'                     ) && PHP_VERSION_ID <  50400)     $issues[] = 'Error:  safe_mode is not Off  [functionality]';
             /**
              * With 'safe_mode'=On plenty of required function parameters are ignored: e.g. http://php.net/manual/en/function.mysql-connect.php
@@ -226,7 +226,7 @@ class PHP extends StaticClass {
         // (6) mail related
         // ----------------
         /*PHP_INI_ALL   */ //sendmail_from
-        if (WINDOWS && !ini_get('sendmail_path') && !ini_get('sendmail_from') && !isSet($_SERVER['SERVER_ADMIN']))   $issues[] = 'Warn:  Windows - neither sendmail_path nor sendmail_from are set';
+        if (WINDOWS && !ini_get('sendmail_path') && !ini_get('sendmail_from') && !isSet($_SERVER['SERVER_ADMIN']))   $issues[] = 'Warn:  On Windows and neither sendmail_path nor sendmail_from are set';
         /*PHP_INI_SYSTEM*/ if (!WINDOWS && !ini_get('sendmail_path'))                                                $issues[] = 'Warn:  sendmail_path is not set';
         /*PHP_INI_PERDIR*/ if (ini_get('mail.add_x_header'))                                                         $issues[] = 'Warn:  mail.add_x_header is not Off';
 
@@ -242,17 +242,15 @@ class PHP extends StaticClass {
         if (!extension_loaded('mysqli'))                                                                             $issues[] = 'Warn:  MySQLi extension is not loaded';
         if (!WINDOWS && !extension_loaded('sysvsem'))                                                                $issues[] = 'Warn:  System-V Semaphore extension is not loaded';
 
+        // check Composer defined requirements
         $appRoot = Config::getDefault()->get('app.dir.root');
-
         if (is_file($file=$appRoot.'/composer.json')) {
             $composer = json_decode(file_get_contents($file), true);
             if (isSet($composer['require']) && is_array($composer['require'])) {
                 foreach ($composer['require'] as $name => $version) {
                     $name = trim(strToLower($name));
-                    if (in_array($name, ['php', 'php-64bit', 'hhvm']) || strContains($name, '/'))
-                        continue;
-                    if (strStartsWith($name, 'ext-'))
-                        $name = strRight($name, -4);
+                    if (in_array($name, ['php', 'php-64bit', 'hhvm']) || strContains($name, '/')) continue;
+                    if (strStartsWith($name, 'ext-')) $name = strRight($name, -4);
                     if (!extension_loaded($name))                                                                    $issues[] = 'Warn:  '.$name.' extension is not loaded';
                 }
             }
@@ -284,7 +282,7 @@ class PHP extends StaticClass {
         elseif (extension_loaded('zend opcache')) {
             /*PHP_INI_ALL   */ if (!ini_get('opcache.enable'))                                                       $issues[] = 'Warn:  opcache.enable is not On [performance]';
         }
-        else                                                                                                         $issues[] = 'Warn:  Opcode cache not found [performance]';
+        else                                                                                                         $issues[] = 'Warn:  No opcode cache found [performance]';
 
 
         // (9) show issues or confirm if none are found
