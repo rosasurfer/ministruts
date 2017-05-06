@@ -83,8 +83,10 @@ class PHP extends StaticClass {
     public static function phpInfo() {
         $issues = [];
 
+
         // (1) core configuration
         // ----------------------
+        if (!php_ini_loaded_file())                                                                                  $issues[] = 'Error: no "php.ini" configuration file loaded  [setup]';
         /*PHP_INI_PERDIR*/ if (!self::ini_get_bool('short_open_tag'                ))                                $issues[] = 'Error: short_open_tag is not On  [security]';
         /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('asp_tags'                      ) && PHP_VERSION_ID <  70000)     $issues[] = 'Info:  asp_tags is not Off  [standards]';
         /*PHP_INI_ONLY  */ if ( self::ini_get_bool('expose_php'                    ))                                $issues[] = 'Warn:  expose_php is not Off  [security]';
@@ -113,7 +115,7 @@ class PHP extends StaticClass {
         /*PHP_INI_SYSTEM*/ if (!self::ini_get_bool('allow_url_fopen'               ))                                $issues[] = 'Info:  allow_url_fopen is not On  [functionality]';
         /*PHP_INI_SYSTEM*/ if ( self::ini_get_bool('allow_url_include'))                                             $issues[] = 'Error: allow_url_include is not Off  [security]';
         /*PHP_INI_ALL   */ foreach (explode(PATH_SEPARATOR, ini_get('include_path' )) as $path) {
-            if (!strLen($path)) {                                                                                    $issues[] = 'Warn:  include_path contains empty path: "'.ini_get('include_path').'"  [setup]';
+            if (!strLen($path)) {                                                                                    $issues[] = 'Warn:  include_path contains an empty path: "'.ini_get('include_path').'"  [setup]';
                 break;
         }}
 
@@ -244,7 +246,7 @@ class PHP extends StaticClass {
 
         // check Composer defined requirements
         $appRoot = Config::getDefault()->get('app.dir.root');
-        if (is_file($file=$appRoot.'/composer.json')) {
+        if (is_file($file=$appRoot.'/composer.json') && extension_loaded('json')) {
             $composer = json_decode(file_get_contents($file), true);
             if (isSet($composer['require']) && is_array($composer['require'])) {
                 foreach ($composer['require'] as $name => $version) {
@@ -290,7 +292,7 @@ class PHP extends StaticClass {
         else         echoPre('PHP configuration OK');
 
 
-        // (10) call phpInfo() if on a web server
+        // (10) if on a web server call phpInfo()
         if (!CLI) {
             $queryStr = self::getUrlQueryString();
             $params   = [];

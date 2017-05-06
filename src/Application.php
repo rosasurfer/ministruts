@@ -134,7 +134,7 @@ class Application extends Object {
 
 
     /**
-     * Run the application.
+     * Run the application and return the {@link Response} if a web application.
      *
      * @param  array $options - runtime options (default: none)
      *
