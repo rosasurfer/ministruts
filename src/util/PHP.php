@@ -90,8 +90,8 @@ class PHP extends StaticClass {
         /*PHP_INI_PERDIR*/ if (!self::ini_get_bool('short_open_tag'                ))                                $issues[] = 'Error: short_open_tag is not On  [security]';
         /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('asp_tags'                      ) && PHP_VERSION_ID <  70000)     $issues[] = 'Info:  asp_tags is not Off  [standards]';
         /*PHP_INI_ONLY  */ if ( self::ini_get_bool('expose_php'                    ))                                $issues[] = 'Warn:  expose_php is not Off  [security]';
-        /*PHP_INI_ALL   */ if ( self::ini_get_int ('max_execution_time'            ) != 30 && !CLI/*hardcoded*/)     $issues[] = 'Info:  max_execution_time is not 30: '.ini_get('max_execution_time').'  [resources]';
-        /*PHP_INI_ALL   */ if ( self::ini_get_int ('default_socket_timeout'        )  > 30  /*PHP default: 60*/)     $issues[] = 'Info:  default_socket_timeout is very high: '.ini_get('default_socket_timeout').'  [resources]';
+        /*PHP_INI_ALL   */ if ( self::ini_get_int ('max_execution_time'            ) > 30 && !CLI/*hardcoded*/)      $issues[] = 'Info:  max_execution_time is very high: '.ini_get('max_execution_time').'  [resources]';
+        /*PHP_INI_ALL   */ if ( self::ini_get_int ('default_socket_timeout'        ) > 30  /*PHP default: 60*/)      $issues[] = 'Info:  default_socket_timeout is very high: '.ini_get('default_socket_timeout').'  [resources]';
         /*PHP_INI_ALL   */ $bytes = self::ini_get_bytes('memory_limit'             );
             if      ($bytes ==     -1)                                                                               $issues[] = 'Warn:  memory_limit is unlimited  [resources]';
             else if ($bytes <=      0)                                                                               $issues[] = 'Error: memory_limit is invalid: '.ini_get('memory_limit');
