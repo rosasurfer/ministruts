@@ -141,12 +141,10 @@ class Application extends Object {
      * @return Response|null - the response if a web application or NULL if a command line application
      */
     public function run(array $options = []) {
-        if (CLI) {
-            // cli application
+        if (CLI) {                              // cli application
             $response = null;
         }
-        else {
-            // web application
+        else {                                  // web application
             $response = FrontController::processRequest($options);
         }
         return $response;
