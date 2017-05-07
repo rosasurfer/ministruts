@@ -58,7 +58,7 @@
    file-base  Comma-delimited list of paths to lookup referenced files or file system locations (templates, layouts,
               fragments etc). Values may be absolute or relative to the application root directory. Each module can have its
               own list of "file-base" locations.
-              [default: The application-wide configured view directory or "app/view"]
+              [default: the application-wide configured view directory]
 -->
 <!ELEMENT struts-config (imports?, global-forwards?, action-mappings, tiles?, controller?)>
 <!ATTLIST struts-config
