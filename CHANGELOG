@@ -1,4 +1,32 @@
 
+2017-05-10
+
+   - struts-config: add configuration of view helper namespace (used by view templates and tiles)
+   - struts: provide constants for application and module base URI in the view namespace 
+      
+
+2017-05-07
+
+   - struts: add configuration of a custom Struts configuration directory   
+
+
+2017-05-06
+
+   - phpinfo: check platform requirements as specified in composer.json   
+
+
+2017-05-05
+
+   - struts-config: rename attribute <forward @alias-for ...> to <forward @alias-of ...>   
+   - struts-config: rename attribute <tile @alias-for ...> to <tile @alias-of ...>   
+
+
+2017-05-04
+
+   - struts: rename class MiniStruts to Application  
+   - struts: implement Application::run() and passing of runtime options  
+   
+
 2017-04-30
 
    - orm: add relation configuration to mapping  
