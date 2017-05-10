@@ -52,6 +52,9 @@ class Module extends Object {
     /** @var Tile[] - Die Tiles dieses Moduls. */
     protected $tiles = [];
 
+    /** @var string - view helper namespace used by templates and tiles */
+    protected $viewNamespace = '';
+
     /** @var string - Der Klassenname der RequestProcessor-Implementierung, die fuer dieses Modul definiert ist. */
     protected $requestProcessorClass = DEFAULT_REQUEST_PROCESSOR_CLASS;
 
@@ -487,6 +490,26 @@ class Module extends Object {
      * @throws StrutsConfigException in case of configuration errors
      */
     protected function processTiles(\SimpleXMLElement $xml) {
+        $namespace = '';                                            // default is the global namespace
+
+        if ($tiles = $xml->xPath('/struts-config/tiles') ?: []) {
+            $tiles = $tiles[0];
+            if ($tiles['namespace']) {
+                $namespace = trim((string) $tiles['namespace']);
+                $namespace = str_replace('/', '\\', $namespace);
+
+                if ($namespace == '\\') {
+                    $namespace = '';
+                }
+                else if (strLen($namespace)) {
+                    if (!$this->isValidNamespace($namespace)) throw new StrutsConfigException('Invalid tiles namespace "'.$tiles['namespace'].'"');
+                    if (strStartsWith($namespace, '\\')) $namespace  = subStr($namespace, 1);
+                    if (!strEndsWith($namespace, '\\'))  $namespace .= '\\';
+                }
+            }
+        }
+        $this->viewNamespace = $namespace;
+
         $elements = $xml->xPath('/struts-config/tiles/tile') ?: [];
 
         foreach ($elements as $tag) {
@@ -915,6 +938,16 @@ class Module extends Object {
      */
     public function getForwardClass() {
         return $this->forwardClass;
+    }
+
+
+    /**
+     * Return the view helper namespace used by templates and tiles.
+     *
+     * @return string
+     */
+    public function getViewNamespace() {
+        return $this->viewNamespace;
     }
 
 

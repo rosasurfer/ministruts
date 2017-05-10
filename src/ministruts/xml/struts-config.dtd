@@ -51,8 +51,8 @@
    configuration settings.
    
    namespace  The default PHP namespace used for loading classes referenced by unqualified class names. Valid namespace 
-              separators are the slash "/" and the backslash "\". Additional namespaces may be specified in the "imports" 
-              element of the configuration.    
+              separators are slash "/" and backslash "\". Additional namespaces may be specified in the "imports" element of 
+              the configuration.    
               [default: the global namespace]
    
    file-base  Comma-delimited list of paths to lookup referenced files or file system locations (templates, layouts,
@@ -201,9 +201,14 @@
 <!--
    The "tiles" element describes the set of available Tiles objects. Individual tiles are configured through nested "tile"
    elements.
+
+   namespace  The PHP namespace used by view templates and tiles. The namespace will be populated with the configured view 
+              helpers (constants and helper functions). Valid namespace separators are slash "/" and backslash "\".  
+              [default: the global namespace]
 -->
 <!ELEMENT tiles (tile*)>
 <!ATTLIST tiles
+          namespace    %ResourcePath;    #IMPLIED
 >
 
 

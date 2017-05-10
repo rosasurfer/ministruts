@@ -8,6 +8,7 @@ use rosasurfer\exception\IllegalStateException;
 use function rosasurfer\strRightFrom;
 
 use const rosasurfer\LOCALHOST;
+use function rosasurfer\strLeft;
 
 
 /**
@@ -185,9 +186,17 @@ class Tile extends Object {
      * @return $this
      */
     public function render() {
-        $nestedTiles = $this->nestedTiles;
-        $properties  = $this->getMergedProperties();
         $request     = Request::me();
+        $namespace   = $this->module->getViewNamespace();
+        $properties  = $this->getMergedProperties();
+        $nestedTiles = $this->nestedTiles;
+
+        if (!defined($namespace.'APP')) {
+            $appUri    = $request->getApplicationBaseUri();
+            $moduleUri = $appUri.$this->module->getPrefix();
+            define($namespace.'APP',    strLeft($appUri,    -1));
+            define($namespace.'MODULE', strLeft($moduleUri, -1));
+        }
 
         $properties['request' ] = $request;
         $properties['response'] = Response::me();
