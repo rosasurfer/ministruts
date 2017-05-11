@@ -190,11 +190,13 @@ class Tile extends Object {
         $namespace   = $this->module->getViewNamespace();
         $properties  = $this->getMergedProperties();
         $nestedTiles = $this->nestedTiles;
+        $appUri      = $request->getApplicationBaseUri();
 
         if (!defined($namespace.'APP')) {
-            $appUri    = $request->getApplicationBaseUri();
+            define($namespace.'APP', strLeft($appUri, -1));
+        }
+        if (!defined($namespace.'MODULE')) {
             $moduleUri = $appUri.$this->module->getPrefix();
-            define($namespace.'APP',    strLeft($appUri,    -1));
             define($namespace.'MODULE', strLeft($moduleUri, -1));
         }
 
