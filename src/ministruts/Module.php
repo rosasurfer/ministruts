@@ -272,16 +272,16 @@ class Module extends Object {
             $this->addGlobalForward($forward);
         }
 
-        // process global 'alias-for' forwards
-        $elements = $xml->xPath('/struts-config/global-forwards/forward[@alias-for]') ?: [];
+        // process global 'alias-of' forwards
+        $elements = $xml->xPath('/struts-config/global-forwards/forward[@alias-of]') ?: [];
 
         foreach ($elements as $tag) {
             $name = (string) $tag['name'];
-            if (sizeOf($tag->attributes()) > 2) throw new StrutsConfigException('Global forward "'.$name.'": Only one attribute of "include", "redirect" or "alias-for" must be specified');
+            if (sizeOf($tag->attributes()) > 2) throw new StrutsConfigException('Global forward "'.$name.'": Only one attribute of "include", "redirect" or "alias-of" must be specified');
 
-            $alias = (string) $tag['alias-for'];
+            $alias = (string) $tag['alias-of'];
             $forward = $this->findForward($alias);
-            if (!$forward) throw new StrutsConfigException('Global forward "'.$name.'", attribute "alias-for": Forward "'.$alias.'" not found');
+            if (!$forward) throw new StrutsConfigException('Global forward "'.$name.'", attribute "alias-of": Forward "'.$alias.'" not found');
 
             $this->addGlobalForward($forward, $name);
         }
@@ -433,7 +433,7 @@ class Module extends Object {
 
             foreach ($subElements as $forwardTag) {
                 $name = (string) $forwardTag['name'];
-                if (sizeOf($forwardTag->attributes()) > 2) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'", forward "'.$name.'": Only one attribute of "include", "redirect" or "alias-for" must be specified');
+                if (sizeOf($forwardTag->attributes()) > 2) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'", forward "'.$name.'": Only one attribute of "include", "redirect" or "alias-of" must be specified');
                 /** @var ActionForward $forward */
                 $forward = null;
 
@@ -459,18 +459,18 @@ class Module extends Object {
                 $mapping->addForward($forward, $name);
             }
 
-            // process local 'alias-for' forwards
-            $subElements = $tag->xPath('./forward[@alias-for]') ?: [];
+            // process local 'alias-of' forwards
+            $subElements = $tag->xPath('./forward[@alias-of]') ?: [];
 
             foreach ($subElements as $forwardTag) {
                 $name = (string) $forwardTag['name'];
-                if (sizeOf($forwardTag->attributes()) > 2) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'", forward "'.$name.'": Only one attribute of "include", "redirect" or "alias-for" must be specified');
+                if (sizeOf($forwardTag->attributes()) > 2) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'", forward "'.$name.'": Only one attribute of "include", "redirect" or "alias-of" must be specified');
 
-                $alias = (string) $forwardTag['alias-for'];
-                if ($alias == ActionForward::__SELF) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'", forward "'.$name.'", attribute "alias-for": Can not use keyword "'.$alias.'" as attribute value');
+                $alias = (string) $forwardTag['alias-of'];
+                if ($alias == ActionForward::__SELF) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'", forward "'.$name.'", attribute "alias-of": Can not use keyword "'.$alias.'" as attribute value');
 
                 $forward = $mapping->findForward($alias);
-                if (!$forward) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'", forward "'.$name.'", attribute "alias-for": Forward "'.$alias.'" not found');
+                if (!$forward) throw new StrutsConfigException('Mapping "'.$mapping->getPath().'", forward "'.$name.'", attribute "alias-of": Forward "'.$alias.'" not found');
 
                 $mapping->addForward($forward, $name);
             }
@@ -548,11 +548,11 @@ class Module extends Object {
         if (sizeOf($nodes) > 1) throw new StrutsConfigException('Multiple tiles named "'.$name.'" found');
 
         $tag = $nodes[0];
-        if (sizeOf($tag->attributes()) != 2) throw new StrutsConfigException('<tile name="'.$name.'": exactly one attribute of "file", "extends-tile" or "alias-for" must be specified');
+        if (sizeOf($tag->attributes()) != 2) throw new StrutsConfigException('<tile name="'.$name.'": exactly one attribute of "file", "extends-tile" or "alias-of" must be specified');
 
         // check for an alias
-        if ($tag['alias-for']) {                                // 'alias-for' given
-            $alias = (string) $tag['alias-for'];
+        if ($tag['alias-of']) {                                 // 'alias-of' given
+            $alias = (string) $tag['alias-of'];
             $tile  = $this->getTile($alias, $xml);
             $this->addTile($tile, $name);
             return $tile;
