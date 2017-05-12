@@ -704,14 +704,28 @@ function pluralize($count, $singular='', $plural='s') {
 
 
 /**
- * Return a new URL helper instance. Procedural replacement for
- * <br>
- * <tt>new \rosasurfer\ministruts\url\Url(...)</tt>.
+ * Return a version-aware URL helper for the given URI. An URI starting with a slash "/" is interpreted as relative to the
+ * application's base URI. An URI not starting with a slash is interpreted as relative to the application {@link Module}'s
+ * base URI (the module the current request belongs to).<br>
+ * Procedural replacement for <tt>new \rosasurfer\ministruts\url\VersionedUrl($uri)</tt>.
  *
- * @param  string $uri - URI part of the URL to generate. If the URI starts with a slash "/" it is interpreted as relative
- *                       to the application's base URI. If the URI doesn't start with a slash "/" it is interpreted as
- *                       relative to the current application <tt>Module</tt>'s base URI (the module the current HTTP request
- *                       belongs to).
+ * @param  string $uri - URI part of the URL to generate
+ *
+ * @return VersionedUrl
+ */
+function asset($uri) {
+    return \rosasurfer\asset($uri);
+}
+
+
+/**
+ * Return a URL helper for the given URI. An URI starting with a slash "/" is interpreted as relative to the application's
+ * base URI. An URI not starting with a slash is interpreted as relative to the application {@link Module}'s base URI
+ * (the module the current request belongs to).<br>
+ * Procedural replacement for <tt>new \rosasurfer\ministruts\url\Url($uri)</tt>.
+ *
+ * @param  string $uri - URI part of the URL to generate
+ *
  * @return Url
  */
 function url($uri) {
@@ -720,16 +734,15 @@ function url($uri) {
 
 
 /**
- * Return a new version-aware URL helper instance. Procedural replacement for
- * <br>
- * <tt>new \rosasurfer\ministruts\url\VersionedUrl(...)</tt>.
+ * Alias of <tt>asset($uri)</tt>.
  *
- * @param  string $uri - URI part of the URL to generate. If the URI starts with a slash "/" it is interpreted as relative
- *                       to the application's base URI. If the URI doesn't start with a slash "/" it is interpreted as
- *                       relative to the current application <tt>Module</tt>'s base URI (the module the current HTTP request
- *                       belongs to).
+ * @param  string $uri - URI part of the URL to generate
+ *
  * @return VersionedUrl
+ *
+ * @see    rosasurfer\asset()
+ * @deprecated
  */
 function vUrl($uri) {
-    return \rosasurfer\vUrl($uri);
+    return asset($uri);
 }
