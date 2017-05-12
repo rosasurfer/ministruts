@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE struts-config SYSTEM "struts-config.dtd">
 
-<struts-config file-base="app/view">
+<struts-config>
 
 
-	<!-- =============================================== Action Mappings ================================================= -->
+	<!-- =============================================== Action Mappings ================================================ -->
 	<action-mappings>
 		<mapping path="/"  include=".home"/>
 	</action-mappings>
 
                                                           
-	<!-- ==================================================== Tiles ====================================================== -->
+	<!-- ==================================================== Tiles ===================================================== -->
 	<tiles>
 		<!-- default layout -->
 		<tile name=".default" file="layouts/default.phtml"/>

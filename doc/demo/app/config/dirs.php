@@ -10,5 +10,6 @@ return [
     'cache' => 'etc/cache',
     'log'   => 'etc/log',
     'tmp'   => 'etc/tmp',
+    'view'  => 'app/view',
     'web'   => 'web',
 ];
