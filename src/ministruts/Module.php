@@ -247,7 +247,7 @@ class Module extends Object {
 
         foreach ($elements as $tag) {
             $name = (string) $tag['name'];
-            if (sizeOf($tag->attributes()) > 2) throw new StrutsConfigException('<global-forwards> <forward name="'.$name.'": Only one of "include", "forward" or "redirect" must be specified.');
+            if (sizeOf($tag->attributes()) > 2) throw new StrutsConfigException('<global-forwards> <forward name="'.$name.'": Only one of "include", "forward" or "redirect" can be specified.');
             /** @var ActionForward $forward */
             $forward = null;
 
@@ -277,7 +277,7 @@ class Module extends Object {
 
         foreach ($elements as $tag) {
             $name = (string) $tag['name'];
-            if (sizeOf($tag->attributes()) > 2) throw new StrutsConfigException('<global-forwards> <forward name="'.$name.'": Only one of "include", "redirect" or "alias-of" must be specified.');
+            if (sizeOf($tag->attributes()) > 2) throw new StrutsConfigException('<global-forwards> <forward name="'.$name.'": Only one of "include", "redirect" or "alias-of" can be specified.');
 
             $alias = (string) $tag['alias-of'];
             $forward = $this->findForward($alias);
@@ -311,7 +311,7 @@ class Module extends Object {
 
             // process include attribute
             if ($tag['include']) {
-                if ($mapping->getForward()) throw new StrutsConfigException('<mapping path="'.$path.'": Only one of "action", "include", "forward" or "redirect" must be specified.');
+                if ($mapping->getForward()) throw new StrutsConfigException('<mapping path="'.$path.'": Only one of "action", "include", "forward" or "redirect" can be specified.');
 
                 $this->tilesContext = [];
                 $include = (string) $tag['include'];
@@ -335,7 +335,7 @@ class Module extends Object {
 
             // process redirect attribute
             if ($tag['redirect']) {
-                if ($mapping->getForward()) throw new StrutsConfigException('<mapping path="'.$path.'": Only one of "action", "include", "forward" or "redirect" must be specified');
+                if ($mapping->getForward()) throw new StrutsConfigException('<mapping path="'.$path.'": Only one of "action", "include", "forward" or "redirect" can be specified');
                 $redirect = (string) $tag['redirect'];          // TODO: URL validieren
                 /** @var ActionForward $forward */
                 $forward = new $this->forwardClass('generic', $redirect, true);
@@ -345,7 +345,7 @@ class Module extends Object {
 
             // process forward attribute
             if ($tag['forward']) {
-                if ($mapping->getForward()) throw new StrutsConfigException('<mapping path="'.$path.'": Only one of "action", "include", "forward" or "redirect" must be specified.');
+                if ($mapping->getForward()) throw new StrutsConfigException('<mapping path="'.$path.'": Only one of "action", "include", "forward" or "redirect" can be specified.');
                 $forwardAttr = (string) $tag['forward'];
                 /** @var ActionForward $forward */
                 $forward = $this->findForward($forwardAttr);
@@ -357,7 +357,7 @@ class Module extends Object {
 
             // process action attribute
             if ($tag['action']) {
-                if ($mapping->getForward())  throw new StrutsConfigException('<mapping path="'.$path.'": Only one of "action", "include", "forward" or "redirect" must be specified.');
+                if ($mapping->getForward())  throw new StrutsConfigException('<mapping path="'.$path.'": Only one of "action", "include", "forward" or "redirect" can be specified.');
                 $name       = trim((string) $tag['action']);
                 $classNames = $this->resolveClassName($name);
                 if (!$classNames)            throw new StrutsConfigException('<mapping path="'.$path.'" action="'.$tag['action'].'": Class not found.');
@@ -433,7 +433,7 @@ class Module extends Object {
 
             foreach ($subElements as $forwardTag) {
                 $name = (string) $forwardTag['name'];
-                if (sizeOf($forwardTag->attributes()) > 2) throw new StrutsConfigException('<mapping path="'.$path.'"> <forward name="'.$name.'": Only one of "include", "redirect" or "alias-of" must be specified.');
+                if (sizeOf($forwardTag->attributes()) > 2) throw new StrutsConfigException('<mapping path="'.$path.'"> <forward name="'.$name.'": Only one of "include", "redirect" or "alias-of" can be specified.');
                 /** @var ActionForward $forward */
                 $forward = null;
 
@@ -464,7 +464,7 @@ class Module extends Object {
 
             foreach ($subElements as $forwardTag) {
                 $name = (string) $forwardTag['name'];
-                if (sizeOf($forwardTag->attributes()) > 2) throw new StrutsConfigException('<mapping path="'.$path.'"> <forward name="'.$name.'": Only one of "include", "redirect" or "alias-of" must be specified.');
+                if (sizeOf($forwardTag->attributes()) > 2) throw new StrutsConfigException('<mapping path="'.$path.'"> <forward name="'.$name.'": Only one of "include", "redirect" or "alias-of" can be specified.');
 
                 $alias = (string) $forwardTag['alias-of'];
                 if ($alias == ActionForward::__SELF) throw new StrutsConfigException('<mapping path="'.$path.'"> <forward name="'.$name.'" alias-of="'.$alias.'": Can not use reserved word "'.$alias.'" as attribute value.');
@@ -548,7 +548,7 @@ class Module extends Object {
         if (sizeOf($nodes) > 1) throw new StrutsConfigException('Multiple tiles named "'.$name.'" found');
 
         $tag = $nodes[0];
-        if (sizeOf($tag->attributes()) != 2) throw new StrutsConfigException('<tile name="'.$name.'": Only one of "file", "extends-tile" or "alias-of" must be specified.');
+        if (sizeOf($tag->attributes()) != 2) throw new StrutsConfigException('<tile name="'.$name.'": Only one of "file", "extends-tile" or "alias-of" can be specified.');
 
         // check for an alias
         if ($tag['alias-of']) {                                 // 'alias-of' given
@@ -629,7 +629,7 @@ class Module extends Object {
             if (sizeOf($nodes) > 1) throw new StrutsConfigException('<tile name="'.$tile->getName().'"> <set name="'.$name.'": Multiple elements with the same name found.');
 
             if ($tag['value']) {                            // value ist im Attribut angegeben
-                if (strLen($tag) > 0) throw new StrutsConfigException('<tile name="'.$tile->getName().'"> <set name="'.$name.'": Only one of attribute value or tag body value must be specified.');
+                if (strLen($tag) > 0) throw new StrutsConfigException('<tile name="'.$tile->getName().'"> <set name="'.$name.'": Only one of attribute value or tag body value can be specified.');
                 $value = (string) $tag['value'];
             }
             else {                                          // value ist im Body angegeben

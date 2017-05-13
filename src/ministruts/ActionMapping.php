@@ -187,7 +187,7 @@ class ActionMapping extends Object {
      */
     public function setForward(ActionForward $forward) {
         if ($this->configured)      throw new IllegalStateException('Configuration is frozen');
-        if ($this->actionClassName) throw new StrutsConfigException('<mapping path="'.$this->path.'": Only one of "action", "include", "forward" or "redirect" must be specified.');
+        if ($this->actionClassName) throw new StrutsConfigException('<mapping path="'.$this->path.'": Only one of "action", "include", "forward" or "redirect" can be specified.');
 
         $this->forward = $forward;
         return $this;
@@ -216,7 +216,7 @@ class ActionMapping extends Object {
     public function setActionClassName($className) {
         if ($this->configured)                              throw new IllegalStateException('Configuration is frozen');
         if (!is_subclass_of($className, ACTION_BASE_CLASS)) throw new StrutsConfigException('<mapping path="'.$this->path.'" action="'.$className.'": Not a subclass of '.ACTION_BASE_CLASS.'.');
-        if ($this->forward)                                 throw new StrutsConfigException('<mapping path="'.$this->path.'": Only one of "action", "include", "forward" or "redirect" must be specified.');
+        if ($this->forward)                                 throw new StrutsConfigException('<mapping path="'.$this->path.'": Only one of "action", "include", "forward" or "redirect" can be specified.');
 
         $this->actionClassName = $className;
         return $this;
