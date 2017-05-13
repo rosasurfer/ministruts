@@ -90,6 +90,10 @@ namespace {
 
 
     if (!function_exists('mysql_affected_rows')) {
+        define('MYSQL_ASSOC', 1);
+        define('MYSQL_NUM'  , 2);
+        define('MYSQL_BOTH' , 3);
+
         /**
          * @param  resource|null $link_identifier
          *
@@ -293,6 +297,10 @@ namespace {
         function sem_remove($sem_identifier) {
             return false;
         }
+    }
+
+    if (!defined('SID')) {
+        define('SID', 'sessionName=sessionValue');
     }
 }
 

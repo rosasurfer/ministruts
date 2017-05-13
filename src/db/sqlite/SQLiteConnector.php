@@ -258,6 +258,7 @@ class SQLiteConnector extends Connector {
             $lastExecMode = $this->skipResults;
             $this->skipResults = false;
 
+            /** @var \SQLite3Result $result */
             $result = $this->executeRaw($sql);
             return new SQLiteResult($this, $sql, $result, $this->lastInsertId(), $this->lastAffectedRows());
         }
@@ -310,7 +311,7 @@ class SQLiteConnector extends Connector {
         try {
             if ($this->skipResults) $result = $this->handler->exec($sql);     // TRUE on success, FALSE on error
             else                    $result = $this->handler->query($sql);    // bug: always SQLite3Result, never boolean
-            $result || trigger_error('Error '.$this->handler->lastErrorCode().', '.$this->handler->lastErrorMsg(), E_USER_ERROR);
+            if (!$result) trigger_error('Error '.$this->handler->lastErrorCode().', '.$this->handler->lastErrorMsg(), E_USER_ERROR);
         }
         catch (IRosasurferException $ex) {
             throw $ex->addMessage('Database: '.$this->file.NL.'SQL: "'.$sql.'"');

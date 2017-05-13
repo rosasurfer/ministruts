@@ -21,6 +21,7 @@ use const rosasurfer\L_ERROR;
 use const rosasurfer\L_INFO;
 use const rosasurfer\L_NOTICE;
 use const rosasurfer\MINUTES;
+use const rosasurfer\NL;
 
 
 /**
@@ -102,7 +103,7 @@ class TorHelper extends StaticClass {
                 $nodes = $cache->get($key);
 
                 if ($nodes == null) {
-                    $content = null;
+                    $content = '';
                     $size = sizeOf(self::$torMirrors);
 
                     for ($i=0; $i < $size; ++$i) {
@@ -127,7 +128,7 @@ class TorHelper extends StaticClass {
                         break;
                     }
 
-                    $nodes = strLen($content) ? array_flip(explode("\n", normalizeEOL($content))) : array();
+                    $nodes = strLen($content) ? array_flip(explode(NL, normalizeEOL($content))) : [];
 
                     if (!$nodes) Logger::log('Could not get TOR exit nodes from any server', L_ERROR);
 

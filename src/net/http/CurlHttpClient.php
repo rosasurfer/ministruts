@@ -253,7 +253,7 @@ class CurlHttpClient extends HttpClient {
      *
      * @return string
      */
-    private static function getError(&$hCurl) {
+    private static function getError($hCurl) {
         $errorNo  = curl_errno($hCurl);
         $errorStr = curl_error($hCurl);
 

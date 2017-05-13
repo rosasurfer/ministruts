@@ -1,6 +1,7 @@
 <?php
 namespace rosasurfer\cache;
 
+use rosasurfer\config\Config;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\monitor\Dependency;
 
@@ -23,7 +24,7 @@ class ApcCache extends CachePeer {
      */
     public function __construct($label=null, array $options=[]) {
         $this->label     = $label;
-        $this->namespace = ($label===null) ? APPLICATION_ID : $label;
+        $this->namespace = $label ?: md5(Config::getDefault()->get('app.dir.root'));
         $this->options   = $options;
     }
 

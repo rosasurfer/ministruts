@@ -55,8 +55,8 @@ class SQLiteResult extends Result {
         $this->lastInsertId     = $lastInsertId;
         $this->lastAffectedRows = $lastAffectedRows;
 
-        if (!$result->numColumns()) {       // close empty results and release them to prevent access
-            $result->finalize();             // @see bug in SQLite3Result::fetchArray()
+        if (!$result->numColumns()) {           // close empty results and release them to prevent access
+            $result->finalize();                // @see bug in SQLite3Result::fetchArray()
             $result             = null;
             $this->numRows      = 0;
             $this->nextRowIndex = -1;

@@ -49,18 +49,10 @@ parameters:
     ignoreErrors:
         - '/Call to ((static )?method|function) [^ ]+ with incorrect case:/'                            # seriously?
         - '/(Array \([^ ]+\[\]\)|(Static )?property [^ ]+ \(([^ ]+)\)) does not accept (\3\|)?null\b/i' # everything is nullable
-        - '/Parameter #[0-9]+ [^ ]+ of (static )?method [^ ]+ expects ([^ ]+), \2\|null given\b/'       # everything accepts NULL
-        - "/Casting to (bool|int|float|string) something that's already (bool|int|float|string)./"      # wrongly implemented
-
-        # fixed but not yet released PHPStan bugs (last release 0.6.4) 
-        - '/Parameter [^ ]+ of method [^ ]+ has invalid typehint type ([^ ]+)?\bscalar\b/'
-        - '/Parameter #[0-9]+ [^ ]+ of method [^ ]+ expects ([^ ]+)?\bscalar(\|[^|]+)*, (bool|int|float|string|null|([^ ]+)?scalar)(\|(bool|int|float|string|null|([^ ]+)?scalar))* given\b/'
-        - '/Parameter #3 \$hResult of class rosasurfer\\db\\mysql\\MySQLResult constructor expects resource\|null, resource\|bool\|null given\b/'
-        - '/--- Release 0.6.4 does not recognize virtual methods declared using the @method tag. ---/'
+       #- '/Parameter #[0-9]+ [^ ]+ of (static )?method [^ ]+ expects ([^ ]+), \2\|null given\b/'       # everything accepts NULL
+        - "/Casting to (bool|int|float|string) something that's already (bool|int|float|string)./"      # flawed implementation
 
         # not yet fixed PHPStan bugs 
         - '/Cannot call method andDependency\(\) on null\b/'
         - '/Method rosasurfer\\db\\orm\\meta\\EntityMapping::getVersion\(\) should return rosasurfer\\db\\orm\\meta\\PropertyMapping\|null but returns bool\|rosasurfer\\db\\orm\\meta\\PropertyMapping\|null\b/'
-        - '/rosasurfer\\net\\messenger\\im\\IRCMessenger::__construct\(\) does not call parent constructor from rosasurfer\\net\\messenger\\Messenger\b/'
         - '/Parameter #1 \$mode of method rosasurfer\\ministruts\\ActionMapping::setFormValidateFirst\(\) expects bool, bool\|mixed given\b/'
-        - '/Parameter #3 \$hResult of class rosasurfer\\db\\mysql\\MySQLResult constructor expects resource\|null, bool\|resource\|null given\b/'
