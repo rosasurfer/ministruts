@@ -137,25 +137,32 @@
 
 
 <!--
-   The "mapping" element describes an ActionMapping object that is to be used to process a request for a specific
-   module-relative URI. The following attributes are defined:
+   The "mapping" element describes an ActionMapping object to be used to process a request for a specific module-relative 
+   URI. The following attributes are defined:
+
+   name                 The unique identifier of the mapping. Used with reverse-routing and alias resolving to select a 
+                        mapping by name.
+
+   alias                TODO: Not yet implemented
+                        The name of another "mapping" element to use for request processing instead of the current one. 
+                        Allows the definition of multiple request paths using the same mapping definition. Can not be used 
+                        in combination with "action", "include", "forward" or "redirect".   
 
    path                 The module-relative path of the request, starting with a slash "/" character.
 
-   include              The name of a tiles definition or a file to include, instead of passing the request to an action.
-                        Tiles definition names must start with a dot ".", file names must not start with a dot. Not valid if
-                        the "action" attribute is specified. Only one of "include", "redirect" or "forward" can be specified.
+   action               Class name of an Action subclass that will process requests for this action mapping. Can not be used 
+                        in combination with "alias", "include", "forward" or "redirect".   
 
-   redirect             The module-relative path of the location to which a redirect instruction should be issued, instead
-                        of passing the request to an action. Not valid if the "action" attribute is specified. Only one of
-                        "include", "redirect" or "forward" can be specified.
+   include              The name of a tiles definition or a file to include, instead of passing the request to an action.
+                        Tiles definition names must start with a dot ".", file names must not start with a dot. Can not be 
+                        used in combination with "alias", "action", "forward" or "redirect".   
 
    forward              The name of a global "forward" element to forward control to, instead of passing the request to an
-                        action. Not valid if the "action" attribute is specified. Only one of "include", "redirect" or
-                        "forward" can be specified.
+                        action. Can not be used in combination with "alias", "action", "include" or "redirect".   
 
-   action               Class name of an Action subclass that will process requests for action mapping. Not valid if the
-                        "include", "redirect" or "forward" attribute is specified.
+   redirect             The module-relative path of the location to which a redirect instruction should be issued, instead
+                        of passing the request to an action. Can not be used in combination with "alias", "action", "include" 
+                        or "forward".   
 
    form                 Class name of an ActionForm subclass, if any, that is associated with the mapping.
 
@@ -171,7 +178,7 @@
                         nor a forward are configured the framework will perform input validation. For validation by the
                         framework two nested "forward" elements named "success" and "error" must be configured.
 
-   http-methods         Comma-delimited list of HTTP method verbs ("get", "post") the action mapping supports.
+   http-methods         Comma-delimited list of HTTP method verbs the action mapping supports.
                         [default: "get"]
 
    roles                Comma-delimited list of required roles to access the action mapping.
@@ -184,11 +191,12 @@
 -->
 <!ELEMENT mapping ((forward*, set*)*)>
 <!ATTLIST mapping
+          name                   %LogicalName;        #IMPLIED
           path                   %RequestPath;        #REQUIRED
-          include                %ResourcePath;       #IMPLIED
-          redirect               %RequestPath;        #IMPLIED
-          forward                %LogicalName;        #IMPLIED
           action                 %ClassName;          #IMPLIED
+          include                %ResourcePath;       #IMPLIED
+          forward                %LogicalName;        #IMPLIED
+          redirect               %RequestPath;        #IMPLIED
           form                   %ClassName;          #IMPLIED
           form-scope             (request|session)    "request"
           form-validate-first    %Boolean;            "true"

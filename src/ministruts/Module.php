@@ -124,7 +124,7 @@ class Module extends Object {
         $content = file_get_contents($fileName);
         $search  = '<!DOCTYPE struts-config SYSTEM "struts-config.dtd">';
         $offset  = strPos($content, $search);
-        $dtd     = str_replace('\\', '/', __DIR__.'/xml/struts-config.dtd');
+        $dtd     = str_replace('\\', '/', __DIR__.'/dtd/struts-config.dtd');
         $replace = '<!DOCTYPE struts-config SYSTEM "file:///'.$dtd.'">';
         $content = substr_replace($content, $replace, $offset, strLen($search));
 
