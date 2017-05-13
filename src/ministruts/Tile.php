@@ -5,10 +5,10 @@ use rosasurfer\config\Config;
 use rosasurfer\core\Object;
 use rosasurfer\exception\IllegalStateException;
 
+use function rosasurfer\strLeft;
 use function rosasurfer\strRightFrom;
 
 use const rosasurfer\LOCALHOST;
-use function rosasurfer\strLeft;
 
 
 /**
@@ -165,14 +165,15 @@ class Tile extends Object {
      * Friert die Konfiguration dieser Komponente ein.
      *
      * @return $this
+     *
+     * @throws StrutsConfigException in case of configuration errors
      */
     public function freeze() {
         if (!$this->configured) {
-            if (!$this->name)     throw new IllegalStateException('No name configured for this '.$this);
-            if (!$this->fileName) throw new IllegalStateException('No file configured for tile "'.$this->name.'"');
+            if (!$this->fileName) throw new StrutsConfigException('<tile name="'.$this->name.'": No file configured.');
 
             foreach ($this->nestedTiles as $tile) {
-                $tile && $tile->freeze();
+                if ($tile) $tile->freeze();
             }
             $this->configured = true;
         }

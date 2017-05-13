@@ -69,8 +69,7 @@ class RequestProcessor extends Object {
 
         // Mapping fuer den Request ermitteln: wird kein Mapping gefunden, generiert die Methode einen 404-Fehler
         $mapping = $this->processMapping($request, $response);
-        if (!$mapping)
-            return;
+        if (!$mapping) return;
 
 
         // Methodenbeschraenkungen des Mappings pruefen: wird der Zugriff verweigert, generiert die Methode einen 405-Fehler
@@ -103,8 +102,7 @@ class RequestProcessor extends Object {
 
         // Action aufrufen
         $forward = $this->processActionExecute($request, $response, $action);
-        if (!$forward)
-            return;
+        if (!$forward) return;
 
 
         // den zurueckgegebenen ActionForward verarbeiten
@@ -193,7 +191,7 @@ class RequestProcessor extends Object {
         // /module/
         // /module/controller/action/
 
-        $appBaseUri = trim($request->getApplicationBaseUri(), '/');
+        $appUri = trim($request->getApplicationBaseUri(), '/');
         // ""
         // app
 
@@ -201,14 +199,14 @@ class RequestProcessor extends Object {
         // ""
         // module
 
-        $modulePath = '/'.trim($appBaseUri.'/'.$modulePrefix, '/').'/';
-        if ($modulePath=='//') $modulePath = '/';
+        $moduleUri = '/'.trim($appUri.'/'.$modulePrefix, '/').'/';
+        if ($moduleUri=='//') $moduleUri = '/';
         // /
         // /app/
         // /module/
         // /app/module/
 
-        $path = '/'.strRightFrom($requestPath, $modulePath);
+        $path = '/'.strRightFrom($requestPath, $moduleUri);
         // /
         // /controller/action/
 
@@ -366,9 +364,9 @@ PROCESS_METHOD_ERROR_SC_405;
 
 
     /**
-     * Validiert die ActionForm, wenn entprechend konfiguriert.  Ist fuer das ActionMapping ein direkter
+     * Validiert die ActionForm, wenn entprechend konfiguriert.  Ist fuer das ActionMapping ein expliziter
      * Forward konfiguriert, wird nach der Validierung auf diesen Forward weitergeleitet. Ist kein
-     * allgemeiner Forward definiert, wird auf die konfigurierte "success" oder "error"-Resource
+     * expliziter Forward definiert, wird auf die konfigurierte "success" oder "error"-Resource
      * weitergeleitet.  Gibt TRUE zurueck, wenn die Verarbeitung fortgesetzt werden soll, oder FALSE,
      * wenn auf eine andere Resource weitergeleitet und der Request bereits beendet wurde.
      *
@@ -392,7 +390,7 @@ PROCESS_METHOD_ERROR_SC_405;
             $key     = $success ? ActionForward::VALIDATION_SUCCESS_KEY : ActionForward::VALIDATION_ERROR_KEY;
             $forward = $mapping->findForward($key);
         }
-        if (!$forward) throw new RuntimeException('ActionForward for mapping "'.$mapping->getPath().'" not found (Module validation error?)');
+        if (!$forward) throw new RuntimeException('<mapping path="'.$mapping->getPath().'" form-validate-first="true": ActionForward not found (module validation error?)');
 
         $this->processActionForward($request, $forward);
         return false;

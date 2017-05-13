@@ -3,12 +3,12 @@ namespace rosasurfer\ministruts;
 
 use rosasurfer\core\Object;
 
+use rosasurfer\exception\IllegalArgumentException;
 use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\IllegalTypeException;
 
 use rosasurfer\log\Logger;
 
-use function rosasurfer\strEndsWith;
 use function rosasurfer\strStartsWith;
 
 use const rosasurfer\L_WARN;
@@ -83,16 +83,10 @@ class ActionMapping extends Object {
      * @param  string $path
      *
      * @return $this
-     *
-     * @throws StrutsConfigException in case of configuration errors
      */
     public function setPath($path) {
-        if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-
-        if (!strStartsWith($path, '/')) throw new StrutsConfigException('The "path" attribute of a mapping must begin with a slash "/", found "'.$path.'"');
-        if (!strEndsWith($path, '/'))       // mapping paths must start and end with a slash "/"
-            $path .= '/';
-
+        if ($this->configured)          throw new IllegalStateException('Configuration is frozen');
+        if (!strStartsWith($path, '/')) throw new IllegalArgumentException('Illegal parameter $path: "'.$path.'" (value must start with a slash "/")');
         $this->path = $path;
         return $this;
     }
@@ -129,14 +123,12 @@ class ActionMapping extends Object {
      * @param  string $method - HTTP-Methode: "GET"|"POST"
      *
      * @return $this
-     *
-     * @throws StrutsConfigException in case of configuration errors
      */
     public function setMethod($method) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
         $method = strToUpper($method);
-        if ($method!='GET' && $method!='POST') throw new StrutsConfigException('Invalid HTTP method "'.$method.'"');
+        if ($method!='GET' && $method!='POST') throw new IllegalArgumentException('Illegal parameter $method: "'.$method.'" (invalid HTTP method)');
 
         $this->methods[$method] = true;
         return $this;
@@ -168,14 +160,14 @@ class ActionMapping extends Object {
 
         //static $pattern = '/^!?[A-Za-z_][A-Za-z0-9_]*(,!?[A-Za-z_][A-Za-z0-9_]*)*$/';
         static $pattern = '/^!?[A-Za-z_][A-Za-z0-9_]*$/';
-        if (!strLen($roles) || !preg_match($pattern, $roles)) throw new StrutsConfigException('Invalid role expression: "'.$roles.'"');
+        if (!strLen($roles) || !preg_match($pattern, $roles)) throw new StrutsConfigException('<mapping path="'.$this->path.'" roles="'.$roles.'": Invalid roles expression.');
 
         // check for impossible constraints, ie. "Member,!Member"
         $tokens = explode(',', $roles);
         $keys = array_flip($tokens);
 
         foreach ($tokens as $role) {
-            if (isSet($keys['!'.$role])) throw new StrutsConfigException('Invalid role expression: "'.$roles.'"');
+            if (isSet($keys['!'.$role])) throw new StrutsConfigException('<mapping path="'.$this->path.'" roles="'.$roles.'": Invalid roles expression.');
         }
 
         // remove duplicates
@@ -195,7 +187,7 @@ class ActionMapping extends Object {
      */
     public function setForward(ActionForward $forward) {
         if ($this->configured)      throw new IllegalStateException('Configuration is frozen');
-        if ($this->actionClassName) throw new StrutsConfigException('Configuration error: Only one attribute of "action", "include", "redirect" or "forward" can be specified for mapping "'.$this->path.'"');
+        if ($this->actionClassName) throw new StrutsConfigException('<mapping path="'.$this->path.'": Only one of "action", "include", "forward" or "redirect" must be specified.');
 
         $this->forward = $forward;
         return $this;
@@ -223,8 +215,8 @@ class ActionMapping extends Object {
      */
     public function setActionClassName($className) {
         if ($this->configured)                              throw new IllegalStateException('Configuration is frozen');
-        if (!is_subclass_of($className, ACTION_BASE_CLASS)) throw new StrutsConfigException('Not a subclass of '.ACTION_BASE_CLASS.': "'.$className.'"');
-        if ($this->forward)                                 throw new StrutsConfigException('Only one attribute of "action", "include", "redirect" or "forward" can be specified for mapping "'.$this->path.'"');
+        if (!is_subclass_of($className, ACTION_BASE_CLASS)) throw new StrutsConfigException('<mapping path="'.$this->path.'" action="'.$className.'": Not a subclass of '.ACTION_BASE_CLASS.'.');
+        if ($this->forward)                                 throw new StrutsConfigException('<mapping path="'.$this->path.'": Only one of "action", "include", "forward" or "redirect" must be specified.');
 
         $this->actionClassName = $className;
         return $this;
@@ -253,7 +245,7 @@ class ActionMapping extends Object {
      */
     public function setFormClassName($className) {
         if ($this->configured)                                   throw new IllegalStateException('Configuration is frozen');
-        if (!is_subclass_of($className, ACTION_FORM_BASE_CLASS)) throw new StrutsConfigException('Not a subclass of '.ACTION_FORM_BASE_CLASS.': '.$className);
+        if (!is_subclass_of($className, ACTION_FORM_BASE_CLASS)) throw new StrutsConfigException('<mapping path="'.$this->path.'" form="'.$className.'": Not a subclass of '.ACTION_FORM_BASE_CLASS.'.');
 
         $this->formClassName = $className;
         return $this;
@@ -284,7 +276,7 @@ class ActionMapping extends Object {
      */
     public function setFormScope($value) {
         if ($this->configured)                      throw new IllegalStateException('Configuration is frozen');
-        if ($value!='request' && $value!='session') throw new StrutsConfigException('Invalid argument $value: '.$value);
+        if ($value!='request' && $value!='session') throw new StrutsConfigException('<mapping path="'.$this->path.'" form-scope="'.$value.'": Invalid form scope.');
 
         $this->formScope = $value;
         return $this;
@@ -394,7 +386,7 @@ class ActionMapping extends Object {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
         $name = is_null($alias) ? $forward->getName() : $alias;
-        if (isSet($this->forwards[$name])) throw new StrutsConfigException('Non-unique name detected for local action forward "'.$name.'"');
+        if (isSet($this->forwards[$name])) throw new StrutsConfigException('<mapping path="'.$this->path.'"> <forward name="'.$name.'": Non-unique forward name.');
 
         $this->forwards[$name] = $forward;
         return $this;
@@ -405,25 +397,28 @@ class ActionMapping extends Object {
      * Friert die Konfiguration dieser Komponente ein.
      *
      * @return $this
+     *
+     * @throws StrutsConfigException in case of configuration errors
      */
     public function freeze() {
-        if (!$this->configured) {
-            if (!$this->path)                                          throw new IllegalStateException('A "path" attribute must be configured for mapping "'.$this->path.'"');
-            if (!$this->formClassName && $this->formValidateFirst)     throw new IllegalStateException('A "form" must be configured for "form-validate-first" attribute value "true" in mapping "'.$this->path.'"');
+        if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
-            if (!$this->actionClassName && !$this->forward) {
-                if (!$this->formClassName || !$this->formValidateFirst) throw new IllegalStateException('Either an "action", "include", "redirect" or "forward" attribute must be specified for mapping "'.$this->path.'"');
+        if (!$this->path)                                           throw new StrutsConfigException('A "path" attribute must be configured for '.$this);
+        if (!$this->formClassName && $this->formValidateFirst)      throw new StrutsConfigException('<mapping path="'.$this->path.'": A form must be configured if "form-validate-first" is set to "true".');
 
-                if (!$this->formClassName || !$this->formValidateFirst) {
-                    throw new IllegalStateException('Either an "action", "include", "redirect" or "forward" attribute must be specified for mapping "'.$this->path.'"');
-                }
-                elseif ($this->formClassName && $this->formValidateFirst) {
-                    if (!isSet($this->forwards[ActionForward::VALIDATION_SUCCESS_KEY]) || !isSet($this->forwards[ActionForward::VALIDATION_ERROR_KEY]))
-                        throw new IllegalStateException('A "success" and an "error" forward must be configured for validation of mapping "'.$this->path.'"');
-                }
+        if (!$this->actionClassName && !$this->forward) {
+            if (!$this->formClassName || !$this->formValidateFirst) throw new StrutsConfigException('<mapping path="'.$this->path.'": Either an "action", "include", "forward" or "redirect" attribute must be specified.');
+
+            if (!$this->formClassName || !$this->formValidateFirst) {
+                throw new StrutsConfigException('<mapping path="'.$this->path.'": Either an "action", "include", "forward" or "redirect" attribute must be specified.');
             }
-            $this->configured = true;
+            elseif ($this->formClassName && $this->formValidateFirst) {
+                if (!isSet($this->forwards[ActionForward::VALIDATION_SUCCESS_KEY]) || !isSet($this->forwards[ActionForward::VALIDATION_ERROR_KEY]))
+                    throw new IllegalStateException('<mapping path="'.$this->path.' form="'.$this->formClassName.'": A "success" and "error" forward must be configured to validate the form first.');
+            }
         }
+
+        $this->configured = true;
         return $this;
     }
 
