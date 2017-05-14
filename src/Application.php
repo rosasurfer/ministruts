@@ -64,7 +64,7 @@ class Application extends Object {
         $appRoot = Config::getDefault()->get('app.dir.root');
         !defined('\APPLICATION_ID') && define('APPLICATION_ID', md5($appRoot));
 
-        // (2) check for admin tasks if on localhost
+        // (2) if on localhost check for PHP admin tasks
         // __phpinfo__               : show PHP config at start of script
         // __config__                : show application config (may contain further PHP config settings)
         // __config__   + __phpinfo__: show PHP config after application configuration
@@ -72,35 +72,36 @@ class Application extends Object {
         // __cache__                 : show cache admin interface
         $phpInfoTaskAfterConfig = $configInfoTask = $cacheInfoTask = $atShutdown = false;
 
-        if (LOCALHOST) {
-            foreach ($_REQUEST as $param => $value) {
-                $param = strToLower($param);
-                if ($param == '__phpinfo__') {
-                    if ($atShutdown) {
-                        register_shutdown_function(function() {
+        if (isSet($_GET['__phpinfo__'])) {
+            if (LOCALHOST || $this->isWhiteListedRemoteIP()) {
+                foreach ($_GET as $param => $value) {
+                    if ($param == '__phpinfo__') {
+                        if ($atShutdown) {
+                            register_shutdown_function(function() {
+                                PHP::phpInfo();
+                                exit(0);
+                            });
+                        }
+                        else if ($configInfoTask) {
+                            $configInfoTask         = false;       // cancel config-info task
+                            $phpInfoTaskAfterConfig = true;
+                        }
+                        else {
                             PHP::phpInfo();
                             exit(0);
-                        });
+                        }
+                        break;                                    // stop parsing after "__phpinfo__"
                     }
-                    else if ($configInfoTask) {
-                        $configInfoTask         = false;       // cancel config-info task
-                        $phpInfoTaskAfterConfig = true;
+                    else if ($param == '__config__') {
+                        $configInfoTask = true;
                     }
-                    else {
-                        PHP::phpInfo();
-                        exit(0);
+                    else if ($param == '__cache__') {
+                        $cacheInfoTask = true;
+                        break;                                    // stop parsing after "__cache__"
                     }
-                    break;                                    // stop parsing after "__phpinfo__"
-                }
-                else if ($param == '__config__') {
-                    $configInfoTask = true;
-                }
-                else if ($param == '__cache__') {
-                    $cacheInfoTask = true;
-                    break;                                    // stop parsing after "__cache__"
-                }
-                else if ($param == '__shutdown__') {
-                    $atShutdown = true;
+                    else if ($param == '__shutdown__') {
+                        $atShutdown = true;
+                    }
                 }
             }
         }
@@ -127,9 +128,9 @@ class Application extends Object {
         }
 
         // (7) enforce PHP requirements (last step to be able to run admin tasks with erroneous PHP settings)
-        !php_ini_loaded_file()               && exit(1|echoPre('application error (see error log'.(LOCALHOST ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: No "php.ini" configuration file was loaded.'));
-        !PHP::ini_get_bool('short_open_tag') && exit(1|echoPre('application error (see error log'.(LOCALHOST ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: The PHP configuration value "short_open_tag" must be enabled (security).'));
-        ini_get('request_order') != 'GP'     && exit(1|echoPre('application error (see error log'.(LOCALHOST ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: The PHP configuration value "request_order" must be "GP" (current value "'.ini_get('request_order').'").'));
+        !php_ini_loaded_file()               && exit(1|echoPre('application error (see error log'.(LOCALHOST || $this->isWhiteListedRemoteIP() ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: No "php.ini" configuration file was loaded.'));
+        !PHP::ini_get_bool('short_open_tag') && exit(1|echoPre('application error (see error log'.(LOCALHOST || $this->isWhiteListedRemoteIP() ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: The PHP configuration value "short_open_tag" must be enabled (security).'));
+        ini_get('request_order') != 'GP'     && exit(1|echoPre('application error (see error log'.(LOCALHOST || $this->isWhiteListedRemoteIP() ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: The PHP configuration value "request_order" must be "GP" (current value "'.ini_get('request_order').'").'));
     }
 
 
@@ -269,5 +270,30 @@ class Application extends Object {
         if ($enabled) {
             // replace Composer
         }
+    }
+
+
+    /**
+     * Whether or not the current remote ip address is white-listed for admin access. 127.0.0.1 and the web server's ip
+     * address are always white-listed. Other ip addresses can be white-listed per configuration.
+     *
+     * @return bool
+     */
+    public static function isWhiteListedRemoteIP() {
+        if (!isSet($_SERVER['REMOTE_ADDR']))
+            return false;
+
+        static $whiteList;
+        if (!$whiteList) {
+            $ips = ['127.0.0.1', $_SERVER['SERVER_ADDR']];
+
+            if (!$config=Config::getDefault())
+                return in_array($_SERVER['REMOTE_ADDR'], $ips);
+
+            $values = $config->get('admin.whitelist', []);
+            if (!is_array($values)) $values = [$values];
+            $whiteList = array_keys(array_flip(array_merge($ips, $values)));
+        }
+        return in_array($_SERVER['REMOTE_ADDR'], $whiteList);
     }
 }

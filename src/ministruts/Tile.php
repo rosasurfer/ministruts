@@ -9,6 +9,7 @@ use function rosasurfer\strLeft;
 use function rosasurfer\strRightFrom;
 
 use const rosasurfer\LOCALHOST;
+use rosasurfer\Application;
 
 
 /**
@@ -207,7 +208,8 @@ class Tile extends Object {
         $properties['form'    ] = $request->getAttribute(ACTION_FORM_KEY);
         $properties['page'    ] = PageContext::me();
 
-        if (LOCALHOST && $this->parent) {
+        $tileHint = false;
+        if ($this->parent && (LOCALHOST || Application::isWhiteListedRemoteIP())) {
             $rootDir = Config::getDefault()->get('app.dir.root');
             $file    = $this->fileName;
             $file    = strRightFrom($file, $rootDir.DIRECTORY_SEPARATOR, 1, false, $file);
@@ -216,14 +218,13 @@ class Tile extends Object {
             if ($this->name == self::GENERIC_NAME) $tileHint = $file;
             else                                   $tileHint = $this->name.' ('.$file.')';
             echo "\n<!-- #begin: ".$tileHint." -->\n";
-        } else                                     $tileHint = null;
+        }
 
         includeFile($this->fileName, $nestedTiles + $properties);
 
-        if (LOCALHOST && $this->parent) {
+        if ($tileHint) {
             echo "\n<!-- #end: ".$tileHint." -->\n";
         }
-
         return $this;
     }
 }

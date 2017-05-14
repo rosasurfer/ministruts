@@ -33,6 +33,7 @@ use const rosasurfer\L_NOTICE;
 use const rosasurfer\L_WARN;
 use const rosasurfer\LOCALHOST;
 use const rosasurfer\NL;
+use rosasurfer\Application;
 
 
 /**
@@ -279,8 +280,8 @@ class ErrorHandler extends StaticClass {
 
 
         // display a minimal hint to prevent an empty web page
-        if (!CLI && ($second || !LOCALHOST)) {
-            $hint = 'see error log'.(LOCALHOST ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'');
+        if (!CLI && ($second || (!LOCALHOST && !Application::isWhiteListedRemoteIP()))) {
+            $hint = 'see error log'.(LOCALHOST || Application::isWhiteListedRemoteIP() ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'');
             echoPre('application error ('.$hint.')');
         }
     }

@@ -42,6 +42,7 @@ use const rosasurfer\L_WARN;
 use const rosasurfer\LOCALHOST;
 use const rosasurfer\NL;
 use const rosasurfer\WINDOWS;
+use rosasurfer\Application;
 
 
 /**
@@ -173,7 +174,7 @@ class Logger extends StaticClass {
 
 
         // (2) PrintHandler: enabled for local access or if explicitely enabled
-        self::$printHandler = CLI || LOCALHOST || PHP::ini_get_bool('display_errors');
+        self::$printHandler = CLI || LOCALHOST || Application::isWhiteListedRemoteIP() || PHP::ini_get_bool('display_errors');
 
 
         // (3) MailHandler: enabled if mail receivers are configured

@@ -51,14 +51,14 @@ class FrontController extends Singleton {
             // TODO: fix wrong lock usage (see TODO file)
             // synchronize parsing of the struts-config.xml
             // $lock = new FileLock($configFile);
-            // $controller = $cache->get($class);                       // re-check after the lock is aquired
+            // $controller = $cache->get($class);                           // re-check after the lock is aquired
 
                 if (!$controller) {
                     $controller = Singleton::getInstance(static::class);
                     $configDir  = Config::getDefault()->get('app.dir.config');
                     $configFile = str_replace('\\', '/', $configDir.'/struts-config.xml');
                     $dependency = FileDependency::create($configFile);
-                    if (!WINDOWS && !LOCALHOST)                           // distinction dev/production
+                    if (!WINDOWS && !LOCALHOST)                             // distinction dev/production
                         $dependency->setMinValidity(1 * MINUTE);
 
                     // ...and cache it with a FileDependency
