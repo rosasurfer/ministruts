@@ -1,6 +1,7 @@
 <?php
 namespace rosasurfer\ministruts;
 
+use rosasurfer\Application;
 use rosasurfer\config\Config;
 use rosasurfer\core\Object;
 use rosasurfer\exception\IllegalStateException;
@@ -9,7 +10,6 @@ use function rosasurfer\strLeft;
 use function rosasurfer\strRightFrom;
 
 use const rosasurfer\LOCALHOST;
-use rosasurfer\Application;
 
 
 /**

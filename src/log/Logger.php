@@ -1,6 +1,7 @@
 <?php
 namespace rosasurfer\log;
 
+use rosasurfer\Application;
 use rosasurfer\config\Config;
 use rosasurfer\core\StaticClass;
 
@@ -42,7 +43,6 @@ use const rosasurfer\L_WARN;
 use const rosasurfer\LOCALHOST;
 use const rosasurfer\NL;
 use const rosasurfer\WINDOWS;
-use rosasurfer\Application;
 
 
 /**

@@ -1,6 +1,7 @@
 <?php
 namespace rosasurfer\debug;
 
+use rosasurfer\Application;
 use rosasurfer\core\StaticClass;
 
 use rosasurfer\exception\error\PHPCompileError;
@@ -33,7 +34,6 @@ use const rosasurfer\L_NOTICE;
 use const rosasurfer\L_WARN;
 use const rosasurfer\LOCALHOST;
 use const rosasurfer\NL;
-use rosasurfer\Application;
 
 
 /**
