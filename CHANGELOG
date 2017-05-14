@@ -2,6 +2,7 @@
 2017-05-14
 
    - struts: reverse route lookup via mapping attribute name="{LogicalName}"
+   - admin: white-listing of ip addresses for admin access (phpinfo etc.)
 
 
 2017-05-12
