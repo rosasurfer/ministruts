@@ -140,8 +140,10 @@
    The "mapping" element describes an ActionMapping object to be used to process a request for a specific module-relative 
    URI. The following attributes are defined:
 
-   name                 The unique identifier of the mapping. Used with reverse-routing and alias resolving to select a 
-                        mapping by name.
+   name                 The unique identifier of the mapping. Used to build mapping selectors to get mappings URLs by name. 
+                        Names must not contain the colon character ":" as the colon is the Module separator in a selector 
+                        expression.
+                        [default: none]
 
    alias                TODO: Not yet implemented
                         The name of another "mapping" element to use for request processing instead of the current one. 
@@ -182,7 +184,7 @@
                         [default: "get"]
 
    roles                Comma-delimited list of required roles to access the action mapping.
-                        [default: "none"]
+                        [default: none]
 
    default              Set to "true" if the mapping should be configured as the default action mapping for the module. If a
                         request does not match any other mapping, it will be passed to the action mapping with the "default"
