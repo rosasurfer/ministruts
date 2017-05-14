@@ -833,7 +833,7 @@ class Request extends Singleton {
 
 
     /**
-     * Gibt das diesem Request zugeordnete Struts-Module zurueck.
+     * Gibt das diesem Request zugeordnete Struts-{@link Module} zurueck.
      *
      * @return Module - Module oder NULL, wenn die Request-Instance ausserhalb des Struts-Frameworks benutzt wird.
      */

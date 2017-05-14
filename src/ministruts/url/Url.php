@@ -6,7 +6,6 @@ use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\ministruts\Request;
 
 use const rosasurfer\CLI;
-use const rosasurfer\ministruts\MODULE_KEY;
 
 
 /**
@@ -15,7 +14,7 @@ use const rosasurfer\ministruts\MODULE_KEY;
 class Url extends Object {
 
 
-    /** @var string - URI as passed */
+    /** @var string - URI as passed to the constructor */
     protected $uri;
 
     /** @var string - application relative URI */
@@ -49,7 +48,7 @@ class Url extends Object {
         else {
             // prefix the module URI
             $request = Request::me();
-            $prefix  = $request->getAttribute(MODULE_KEY)->getPrefix();
+            $prefix  = $request->getModule()->getPrefix();
             $prefix  = trim($prefix, '/');
             if (strLen($prefix))
                 $prefix = '/'.$prefix;                                   // TODO: What a mess this prefix formatting is!

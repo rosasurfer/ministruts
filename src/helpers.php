@@ -8,7 +8,11 @@ use rosasurfer\exception\IllegalArgumentException;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\IOException;
+use rosasurfer\exception\RuntimeException;
 
+use rosasurfer\log\Logger;
+
+use rosasurfer\ministruts\Request;
 use rosasurfer\ministruts\url\Url;
 use rosasurfer\ministruts\url\VersionedUrl;
 
@@ -181,7 +185,7 @@ function printPretty($var, $return=false, $flushBuffers=true) {
     }
 
     if (!CLI)
-        $str = '<div align="left"><pre style="z-index:65535; margin:0; font:normal normal 12px/normal \'Courier New\',courier,serif">'.htmlSpecialChars($str, ENT_QUOTES).'</pre></div>';
+        $str = '<div align="left"><pre style="z-index:65535; margin:0; font:normal normal 12px/normal \'Courier New\',courier,serif; color:initial">'.htmlSpecialChars($str, ENT_QUOTES).'</pre></div>';
 
     if (!strEndsWith($str, NL))
         $str .= NL;
@@ -1026,17 +1030,32 @@ function pluralize($count, $singular='', $plural='s') {
 
 
 /**
- * Return a version-aware URL helper for the given URI. An URI starting with a slash "/" is interpreted as relative to the
- * application's base URI. An URI not starting with a slash is interpreted as relative to the application {@link Module}'s
- * base URI (the module the current request belongs to).<br>
- * Procedural replacement for <tt>new \rosasurfer\ministruts\url\VersionedUrl($uri)</tt>.
+ * Lookup and return a URL helper for the named route as configured in <tt>&lt;mapping name="{Name}"&gt;</tt>
+ * in struts-config.xml.
  *
- * @param  string $uri - URI part of the URL to generate
+ * @param  string $name - route name
  *
- * @return VersionedUrl
+ * @return Url
  */
-function asset($uri) {
-    return new VersionedUrl($uri);
+function route($name) {
+    $request = Request::me();
+    $module  = $request->getModule();
+    $mapping = $module->getMapping($name);
+
+    if ($mapping) {
+        $path = $mapping->getPath();
+    }
+    else {
+        $msg = 'Route "'.$name.'" not found';
+        if (getEnv('APP_ENVIRONMENT') != 'production') throw new RuntimeException($msg);
+        Logger::log($msg, L_ERROR, $context=['class'=>'']);
+        $path = '/';
+    }
+
+    if (strPos($path, '/') === 0)
+        $path = strLen($path)==1 ? '' : subStr($path, 1);   // subStr() returns FALSE on start==length
+
+    return new Url($path);
 }
 
 
@@ -1067,4 +1086,19 @@ function url($uri) {
  */
 function vUrl($uri) {
     return asset($uri);
+}
+
+
+/**
+ * Return a version-aware URL helper for the given URI. An URI starting with a slash "/" is interpreted as relative to the
+ * application's base URI. An URI not starting with a slash is interpreted as relative to the application {@link Module}'s
+ * base URI (the module the current request belongs to).<br>
+ * Procedural replacement for <tt>new \rosasurfer\ministruts\url\VersionedUrl($uri)</tt>.
+ *
+ * @param  string $uri - URI part of the URL to generate
+ *
+ * @return VersionedUrl
+ */
+function asset($uri) {
+    return new VersionedUrl($uri);
 }

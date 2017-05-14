@@ -704,17 +704,15 @@ function pluralize($count, $singular='', $plural='s') {
 
 
 /**
- * Return a version-aware URL helper for the given URI. An URI starting with a slash "/" is interpreted as relative to the
- * application's base URI. An URI not starting with a slash is interpreted as relative to the application {@link Module}'s
- * base URI (the module the current request belongs to).<br>
- * Procedural replacement for <tt>new \rosasurfer\ministruts\url\VersionedUrl($uri)</tt>.
+ * Lookup and return a URL helper for the named route as configured in <tt>&lt;mapping name="{Name}"&gt;</tt>
+ * in struts-config.xml.
  *
- * @param  string $uri - URI part of the URL to generate
+ * @param  string $name - route name
  *
- * @return VersionedUrl
+ * @return Url
  */
-function asset($uri) {
-    return \rosasurfer\asset($uri);
+function route($name) {
+    return \rosasurfer\route($name);
 }
 
 
@@ -740,9 +738,23 @@ function url($uri) {
  *
  * @return VersionedUrl
  *
- * @see    rosasurfer\asset()
  * @deprecated
  */
 function vUrl($uri) {
     return asset($uri);
+}
+
+
+/**
+ * Return a version-aware URL helper for the given URI. An URI starting with a slash "/" is interpreted as relative to the
+ * application's base URI. An URI not starting with a slash is interpreted as relative to the application {@link Module}'s
+ * base URI (the module the current request belongs to).<br>
+ * Procedural replacement for <tt>new \rosasurfer\ministruts\url\VersionedUrl($uri)</tt>.
+ *
+ * @param  string $uri - URI part of the URL to generate
+ *
+ * @return VersionedUrl
+ */
+function asset($uri) {
+    return \rosasurfer\asset($uri);
 }

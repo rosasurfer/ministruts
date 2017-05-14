@@ -4,7 +4,7 @@
 # phpstan analyse -a autoload.php -c config.neon --level=0 [--] <directory>
 #
 
-services:                                                           # loaded before auto-loading in "parameters" 
+services:                                                           # loaded before auto-loading in block "parameters" 
     -
         class: rosasurfer\db\orm\phpstan\DAO_Find_ReturnType
         tags:
@@ -32,6 +32,7 @@ services:                                                           # loaded bef
 parameters:
     autoload_files:
         - etc/phpstan/function-stubs.php                            # stubs for PHP extensions and procedural code
+        - src/globals.php
 
     fileExtensions:                                                 # additional files to analyse
        #- html
@@ -39,7 +40,6 @@ parameters:
 
     excludes_analyse:
         - etc/vendor/composer/
-        - src/globals.php
         - src/util/apc/apc.php                                      # TODO: replace it
 
     reportUnmatchedIgnoredErrors:           false

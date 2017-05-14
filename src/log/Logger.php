@@ -307,7 +307,7 @@ class Logger extends StaticClass {
     /**
      * Log a message.
      *
-     * @param  string|object $loggable - a message or an object implementing <tt>__toString()</tt>
+     * @param  object|string $loggable - a message or an object implementing <tt>__toString()</tt>
      * @param  int           $level    - loglevel
      * @param  array         $context  - optional logging context with additional data
      */
@@ -717,8 +717,8 @@ class Logger extends StaticClass {
         $line = $context['line'];
 
         // break out of unfortunate HTML tags
-        $html   = '</script></img></select></textarea></font></span></div></i></b>';
-        $html  .= '<div align="left" style="clear:both; z-index:65535; font:normal normal 12px/normal arial,helvetica,sans-serif">';
+        $html   = '><a attr=""></a></script></img></select></textarea></font></span></div></i></b>';
+        $html  .= '<div align="left" style="clear:both; z-index:65535; font:normal normal 12px/normal arial,helvetica,sans-serif; color:initial">';
         $indent = ' ';
 
         // compose message

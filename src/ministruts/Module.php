@@ -725,11 +725,11 @@ class Module extends Object {
 
 
     /**
-     * Gibt das ActionMapping fuer den angegebenen Pfad zurueck.
+     * Lookup the {@link ActionMapping} to process the given request path.
      *
      * @param  string $path
      *
-     * @return ActionMapping|null - Mapping oder NULL, wenn kein Mapping gefunden wurde
+     * @return ActionMapping|null - mapping or NULL if no such mapping was found
      */
     public function findMapping($path) {
         if (!strEndsWith($path, '/'))
@@ -747,6 +747,20 @@ class Module extends Object {
             if ($pattern == '/')
                 break;
         }
+        return null;
+    }
+
+
+    /**
+     * Return the {@link ActionMapping} with the given name.
+     *
+     * @param  string $name
+     *
+     * @return ActionMapping|null - mapping or NULL if no such mapping exists
+     */
+    public function getMapping($name) {
+        if (isSet($this->mappings['names'][$name]))
+            return $this->mappings['names'][$name];
         return null;
     }
 
