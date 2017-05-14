@@ -1,4 +1,9 @@
 
+2017-05-14
+
+   - struts: reverse route lookup via mapping attribute name="{LogicalName}"
+
+
 2017-05-12
 
    - util: add URL helper rosasurfer\asset($uri) and deprecate rosasurfer\vUrl()
