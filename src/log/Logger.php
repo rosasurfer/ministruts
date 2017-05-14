@@ -717,8 +717,13 @@ class Logger extends StaticClass {
         $line = $context['line'];
 
         // break out of unfortunate HTML tags
-        $html   = '><a attr=""></a></script></img></select></textarea></font></span></div></i></b>';
-        $html  .= '<div align="left" style="clear:both; z-index:65535; font:normal normal 12px/normal arial,helvetica,sans-serif; color:initial">';
+        $html   = '><a attr1="" attr2=\'\'></a></script></img></select></textarea></li></ul></font></pre></tt></code></i></b></span></div>';
+        $html  .= '<div align="left" style="clear:both;
+                                            position:relative; z-index:65535; left:initial; top:initial;
+                                            float:left; width:initial; height:initial
+                                            margin:0; padding:4px;
+                                            font:normal normal 12px/normal arial,helvetica,sans-serif;
+                                            color:black; background-color:lightgray">';
         $indent = ' ';
 
         // compose message
@@ -741,7 +746,7 @@ class Logger extends StaticClass {
             $html     .= '<b>['.strToUpper(self::$logLevels[$level]).']</b> '.nl2br(htmlSpecialChars($type.$msg, ENT_QUOTES|ENT_SUBSTITUTE)).'<br>in <b>'.$file.'</b> on line <b>'.$line.'</b><br>';
             $traceStr  = $indent.'Stacktrace:'.NL.' -----------'.NL;
             $traceStr .= DebugHelper::getBetterTraceAsString($loggable, $indent);
-            $html     .= '<br>'.printPretty($traceStr, true).'<br>';
+            $html     .= '<span style="clear:both"></span>'.printPretty($traceStr, true).'<br>';
         }
 
         // append an existing context exception
@@ -751,12 +756,12 @@ class Logger extends StaticClass {
             $html     .= '<br>'.nl2br(htmlSpecialChars($msg, ENT_QUOTES|ENT_SUBSTITUTE)).'<br>';
             $traceStr  = $indent.'Stacktrace:'.NL.' -----------'.NL;
             $traceStr .= DebugHelper::getBetterTraceAsString($exception, $indent);
-            $html     .= '<br>'.printPretty($traceStr, true);
+            $html     .= printPretty($traceStr, true);
      }
 
         // append the current HTTP request
         if (!CLI) {
-            $html .= '<br>'.printPretty('Request:'.NL.'--------'.NL.Request::me(), true).'<br>';
+            $html .= '<br style="clear:both">'.printPretty('Request:'.NL.'--------'.NL.Request::me(), true).'<br>';
         }
 
         // close and store the HTML tag
