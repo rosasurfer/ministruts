@@ -720,14 +720,29 @@ function route($name) {
  * Return a URL helper for the given URI. An URI starting with a slash "/" is interpreted as relative to the application's
  * base URI. An URI not starting with a slash is interpreted as relative to the application {@link Module}'s base URI
  * (the module the current request belongs to).<br>
- * Procedural replacement for <tt>new \rosasurfer\ministruts\url\Url($uri)</tt>.
+ * Procedural equivalent of <tt>new \rosasurfer\ministruts\url\Url($uri)</tt>.
  *
- * @param  string $uri - URI part of the URL to generate
+ * @param  string $uri
  *
  * @return Url
  */
 function url($uri) {
     return \rosasurfer\url($uri);
+}
+
+
+/**
+ * Return a version-aware URL helper for the given URI. An URI starting with a slash "/" is interpreted as relative to the
+ * application's base URI. An URI not starting with a slash is interpreted as relative to the application {@link Module}'s
+ * base URI (the module the current request belongs to).<br>
+ * Procedural equivalent of <tt>new \rosasurfer\ministruts\url\VersionedUrl($uri)</tt>.
+ *
+ * @param  string $uri
+ *
+ * @return VersionedUrl
+ */
+function asset($uri) {
+    return \rosasurfer\asset($uri);
 }
 
 
@@ -742,19 +757,4 @@ function url($uri) {
  */
 function vUrl($uri) {
     return asset($uri);
-}
-
-
-/**
- * Return a version-aware URL helper for the given URI. An URI starting with a slash "/" is interpreted as relative to the
- * application's base URI. An URI not starting with a slash is interpreted as relative to the application {@link Module}'s
- * base URI (the module the current request belongs to).<br>
- * Procedural replacement for <tt>new \rosasurfer\ministruts\url\VersionedUrl($uri)</tt>.
- *
- * @param  string $uri - URI part of the URL to generate
- *
- * @return VersionedUrl
- */
-function asset($uri) {
-    return \rosasurfer\asset($uri);
 }
