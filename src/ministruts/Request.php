@@ -28,10 +28,6 @@ use const rosasurfer\NL;
  * @see  Request::getAttributes()
  * @see  Request::setAttribute()
  * @see  Request::removeAttributes()
- *
- *
- * @todo implement LinkTool
- * @todo implement version hashes for CSS and JS links
  */
 class Request extends Singleton {
 
@@ -236,11 +232,11 @@ class Request extends Singleton {
 
 
     /**
-     * Return the uri of the current request (the value in the first line of the HTTP protocol). This value always starts
+     * Return the URI of the current request (the value in the first line of the HTTP protocol). This value always starts
      * with a slash "/".
      *
-     * @return string - uri: path + query_string
-     *                  All urls in this framework are virtual, there is no "path info" as such.
+     * @return string - URI: path + query_string
+     *                  All URLs in this framework are virtual, there is no "path info" as such.
      * @example
      * <pre>
      * "/application/module/foo/bar.html?key=value"
@@ -252,10 +248,10 @@ class Request extends Singleton {
 
 
     /**
-     * Return the path fragment of the current request's uri. This value always starts with a slash "/".
+     * Return the path fragment of the current request's URI. This value always starts with a slash "/".
      *
      * @return string - path without query string
-     *                  All urls in this framework are virtual, there is no "path info" as such.
+     *                  All URLs in this framework are virtual, there is no "path info" as such.
      * @example
      * <pre>
      * "/application/module/foo/bar.html"

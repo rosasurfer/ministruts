@@ -304,8 +304,8 @@ class PHP extends StaticClass {
             ?>
             <div style="clear:both; text-align:center; margin:0 0 15px 0; padding:20px 0 0 0; font-size:12px; font-weight:bold; font-family:sans-serif">
                 <a href="?<?=$scriptStartQuery?>" style="display:inline-block; width:150px; min-height:15px; margin:0 10px; padding:10px 0; background-color:#ccf; color:#222; border:1px outset #666; white-space:nowrap" title="PHP configuration at start of the script">At Script Start</a>
-                <a href="?<?=$appStartQuery   ?>" style="display:inline-block; width:150px; min-height:15px; margin:0 10px; padding:10px 0; background-color:#ccf; color:#222; border:1px outset #666; white-space:nowrap" title="PHP configuration at start of the application">At Application Start</a>
-                <a href="?<?=$scriptEndQuery  ?>" style="display:inline-block; width:150px; min-height:15px; margin:0 10px; padding:10px 0; background-color:#ccf; color:#222; border:1px outset #666; white-space:nowrap" title="PHP configuration at end of the application">At Application End</a>
+                <a href="?<?=$appStartQuery   ?>" style="display:inline-block; width:150px; min-height:15px; margin:0 10px; padding:10px 0; background-color:#ccf; color:#222; border:1px outset #666; white-space:nowrap" title="PHP configuration at Application::run()">At Application::run()</a>
+                <a href="?<?=$scriptEndQuery  ?>" style="display:inline-block; width:150px; min-height:15px; margin:0 10px; padding:10px 0; background-color:#ccf; color:#222; border:1px outset #666; white-space:nowrap" title="PHP configuration at script shutdown">At Script End</a>
             </div>
             <?
             phpInfo();
