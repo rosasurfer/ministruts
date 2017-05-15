@@ -290,7 +290,7 @@ class Application extends Object {
             if (!$config=Config::getDefault())
                 return in_array($_SERVER['REMOTE_ADDR'], $ips);
 
-            $values = $config->get('admin.whitelist', []);
+            $values = $config->get('admin.ip.whitelist', []);
             if (!is_array($values)) $values = [$values];
             $whiteList = array_keys(array_flip(array_merge($ips, $values)));
         }
