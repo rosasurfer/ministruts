@@ -483,7 +483,7 @@ PROCESS_METHOD_ERROR_SC_405;
      * die der ActionForward bezeichnet.
      *
      * @param  Request       $request
-    * @param  ActionForward $forward
+     * @param  ActionForward $forward
      */
     protected function processActionForward(Request $request, ActionForward $forward) {
         $module = $this->module;

@@ -61,7 +61,7 @@ class Tile extends Object {
     /**
      * Gibt den Namen dieser Tile zurueck.
      *
-     * @return string $name
+     * @return string
      */
     public function getName() {
         return $this->name;
