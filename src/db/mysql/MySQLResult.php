@@ -42,8 +42,8 @@ class MySQLResult extends Result {
      *
      * @param  IConnector    $connector        - connector managing the database connection
      * @param  string        $sql              - executed SQL statement
-     * @param  resource|null $hResult          - result handle or NULL for result-less SQL query; SELECT queries not matching
-     *                                           any rows produce an empty result resource
+     * @param  resource|null $hResult          - result handle or NULL for a result-less SQL query (SELECT queries not matching
+     *                                           any rows produce an empty result resource)
      * @param  int           $lastInsertId     - last inserted ID of the connection
      * @param  int           $lastAffectedRows - last number of affected rows of the connection
      */

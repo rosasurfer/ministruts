@@ -753,7 +753,7 @@ class Request extends Singleton {
 
     /**
      * Ob unter dem angegebenen Schluessel eine Error-Message existiert.  Ohne Angabe eines Schluessel
-     * wird geprueft, ob ueberhaupt irgendeine Error-Message existiert.
+     * wird geprueft, ob eine beliebige Error-Message existiert.
      *
      * @param  string|null $key - Schluessel (default: none)
      *

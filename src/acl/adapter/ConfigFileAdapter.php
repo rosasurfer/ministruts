@@ -22,7 +22,7 @@ class ConfigFileAdapter extends Object implements AdapterInterface {
      * @param  string|null $file - name of the config file to read ACL settings from
      *                             (default: the application configuration)
      */
-    public function __construct($file=null) {
+    public function __construct($file = null) {
         if (func_num_args()) {
             if (!is_string($file)) throw new IllegalTypeException('Illegal type of parameter $file: '.getType($file));
             throw new UnimplementedFeatureException('Support for custom config files not yet implemented');
