@@ -67,7 +67,7 @@ class Module extends Object {
     protected $mappingClass = DEFAULT_ACTION_MAPPING_CLASS;
 
     /** @var string - Der Klassenname der Tiles-Implementierung, die fuer dieses Modul definiert ist. */
-    protected $tilesClass = DEFAULT_TILES_CLASS;
+    protected $tilesClass = Tile::class;
 
     /** @var string - Der Klassenname der RoleProcessor-Implementierung, die fuer dieses Modul definiert ist. */
     protected $roleProcessorClass;
@@ -504,6 +504,17 @@ class Module extends Object {
 
         if ($tiles = $xml->xPath('/struts-config/tiles') ?: []) {
             $tiles = $tiles[0];
+
+            // attribute class="%ClassName" #IMPLIED
+            if ($tiles['class']) {
+                $class   = trim((string) $tiles['class']);
+                $classes = $this->resolveClassName($class);
+                if (!$classes)            throw new StrutsConfigException('<tiles class="'.$tiles['class'].'": Class not found.');
+                if (sizeOf($classes) > 1) throw new StrutsConfigException('<tiles class="'.$tiles['class'].'": Ambiguous class name, found "'.join('", "', $classes).'".');
+                $this->setTilesClass($classes[0]);
+            }
+
+            // attribute namespace="%ResourcePath" #IMPLIED
             if ($tiles['namespace']) {
                 $namespace = trim((string) $tiles['namespace']);
                 $namespace = str_replace('/', '\\', $namespace);
@@ -902,9 +913,9 @@ class Module extends Object {
      * @throws StrutsConfigException in case of configuration errors
      */
     protected function setTilesClass($className) {
-        if ($this->configured)                                throw new IllegalStateException('Configuration is frozen');
-        if (!is_class($className))                            throw new StrutsConfigException('Class '.$className.' not found');
-        if (!is_subclass_of($className, DEFAULT_TILES_CLASS)) throw new StrutsConfigException('Not a subclass of '.DEFAULT_TILES_CLASS.': '.$className);
+        if ($this->configured)                        throw new IllegalStateException('Configuration is frozen');
+        if (!is_class($className))                    throw new StrutsConfigException('Class '.$className.' not found');
+        if (!is_subclass_of($className, Tile::class)) throw new StrutsConfigException('Not a subclass of '.Tile::class.': '.$className);
 
         $this->tilesClass = $className;
     }

@@ -27,13 +27,6 @@ const DEFAULT_ACTION_FORWARD_CLASS = ActionForward::class;
 const DEFAULT_ACTION_MAPPING_CLASS = ActionMapping::class;
 
 /**
- * Default {@link Tile} class.
- *
- * @var string
- */
-const DEFAULT_TILES_CLASS = Tile::class;
-
-/**
  * {@link Action} base class.
  *
  * @var string

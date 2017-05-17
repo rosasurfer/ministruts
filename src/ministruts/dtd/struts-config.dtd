@@ -212,12 +212,16 @@
    The "tiles" element describes the set of available Tiles objects. Individual tiles are configured through nested "tile"
    elements.
 
+   class      Class name of a Tile subclass used as the Module's default Tile implementation.
+              [default: Tile]
+   
    namespace  The PHP namespace used by view templates and tiles. The namespace will be populated with the configured view 
               helpers (constants and helper functions). Valid namespace separators are slash "/" and backslash "\".  
               [default: the global namespace]
 -->
 <!ELEMENT tiles (tile*)>
 <!ATTLIST tiles
+          class        %ClassName;       #IMPLIED
           namespace    %ResourcePath;    #IMPLIED
 >
 
@@ -297,10 +301,10 @@
    The "controller" element describes controller related settings.
 
    request-processor  Class name of the RequestProcessor subclass that will perform request processing for the module.
-                      [default: "RequestProcessor"]
+                      [default: "rosasurfer\ministruts\RequestProcessor"]
 
    role-processor     Class name of the RoleProcessor subclass that will perform role checking for the module.
-                      [default: "none"]
+                      [default: none]
 -->
 <!ELEMENT controller EMPTY>
 <!ATTLIST controller
