@@ -39,7 +39,7 @@ parameters:
        #- phtml                                                     # TODO: Tiles default variables trigger errors
 
     excludes_analyse:
-        - etc/vendor/composer/
+        - etc/vendor/
         - src/util/apc/apc.php                                      # TODO: replace it
 
     reportUnmatchedIgnoredErrors:           false
