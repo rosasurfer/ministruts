@@ -21,9 +21,9 @@ class VersionedUrl extends Url {
         if (($pos=strPos($relativeUri, '?')) === false) $name = $relativeUri;
         else                                            $name = subStr($relativeUri, 0, $pos);
 
-        $webDir = Config::getDefault()->get('app.dir.web');
+        $webDir = Config::getDefault()->get('app.dir.web', null);
 
-        if (file_exists($fileName=$webDir.'/'.$name)) {
+        if ($webDir && file_exists($fileName=$webDir.'/'.$name)) {
             if ($pos === false) $uri .= '?';
             else                $uri .= '&';
             $uri .= decHex(crc32(fileSize($fileName).'|'.fileMtime($fileName)));
