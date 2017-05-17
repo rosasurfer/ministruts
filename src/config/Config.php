@@ -12,7 +12,7 @@ use rosasurfer\exception\UnimplementedFeatureException;
 
 use rosasurfer\util\PHP;
 
-use const rosasurfer\WINDOWS;
+use function rosasurfer\isRelativePath;
 
 
 /**
@@ -80,10 +80,8 @@ class Config extends Object implements ConfigInterface {
             if (!is_string($file)) throw new IllegalTypeException('Illegal type of parameter $files['.$i.']: '.getType($file));
 
             $checkedFiles[$file] = is_file($file);
-
-            $relative = WINDOWS ? !preg_match('/^[a-z]:/i', $file) : ($file[0] != '/');
-            $relative && $file=getCwd().PATH_SEPARATOR.$file;
-            $this->lastDirectory = dirName($file);                // save absolute path of the last specified file
+            isRelativePath($file) && $file=getCwd().PATH_SEPARATOR.$file;
+            $this->lastDirectory = dirName($file);                  // track the path of the last file
         }
         $this->files = $checkedFiles;
 
@@ -93,7 +91,8 @@ class Config extends Object implements ConfigInterface {
         PHP::ini_set('auto_detect_line_endings', true);
 
         foreach ($this->files as $fileName => $fileExists) {
-            $fileExists && $this->loadFile($fileName);
+            if ($fileExists)
+                $this->loadFile($fileName);
         }
 
         PHP::ini_set('auto_detect_line_endings', $oldDetectStatus);
@@ -306,9 +305,11 @@ class Config extends Object implements ConfigInterface {
      * Set the default configuration to be returned by Config::getDefault().
      *
      * @param  IConfig $configuration
+     *
+     * @return IConfig - the same configuration
      */
     public static function setDefault(IConfig $configuration) {
-        self::$defaultInstance = $configuration;
+        return self::$defaultInstance = $configuration;
         // TODO: update cache config
     }
 

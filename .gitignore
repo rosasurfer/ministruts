@@ -28,5 +28,4 @@ vendor/
 /composer-dev.*
 config.properties
 
-/dirs.php
 /php-error.log

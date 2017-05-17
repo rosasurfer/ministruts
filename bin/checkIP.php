@@ -1,20 +1,18 @@
 <?php
 namespace rosasurfer\bin\check_ip;
+isSet($_SERVER['REQUEST_METHOD']) && exit(1);                           // in case we are running on CLI
 
 use rosasurfer\Application;
-
 use function rosasurfer\echoPre;
 
-// configuration
-isSet($_SERVER['REQUEST_METHOD']) && exit(1);                           // in case we are running on CLI
-ini_set('error_log', __DIR__.'/php_error.log');
+// php.ini settings
 error_reporting(E_ALL & ~E_DEPRECATED);
+ini_set('error_log', __DIR__.'/../php-error.log');
 
-// configure and load the framework
+// load the framework and create a new application
 require(__DIR__.'/../src/load.php');
 $app = new Application([
-    'config'  => __DIR__,
-    'globals' => true,
+    'app.global-helpers' => true,
 ]);
 
 

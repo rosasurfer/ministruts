@@ -11,6 +11,8 @@ use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\ministruts\FrontController;
 use rosasurfer\ministruts\Response;
 use rosasurfer\util\PHP;
+use rosasurfer\exception\RuntimeException;
+use rosasurfer\log\Logger;
 
 
 /**
@@ -29,42 +31,44 @@ class Application extends Object {
     /**
      * Create and initialize a new MiniStruts application. Expects an array with any of the following options:
      *
-     * "config"            - IConfig: Configuration instance. <br>
-     *                     - string:  Configuration location, can point to a directory or to a .properties file. <br>
+     * "config"            - IConfig: Configuration instance.<br>
+     *                     - string:  Configuration location, can point to a directory or to a .properties file.<br>
      *
      * "handle-errors"     - string:  How to handle regular PHP errors. If set to 'strict' errors are converted to PHP
      *                                ErrorExceptions and thrown. If set to 'weak' errors are only logged and execution
-     *                                continues. If set to 'ignore' you have to setup your own error handling mechanism. <br>
-     *                                default: 'strict' <br>
+     *                                continues. If set to 'ignore' you have to setup your own error handling mechanism.<br>
+     *                                (default: 'strict')<br>
      *
      * "handle-exceptions" - bool:    If set to TRUE exceptions are handled by the built-in exception handler. If set to
-     *                                FALSE you have to setup your own exception handling mechanism. <br>
-     *                                default: TRUE <br>
+     *                                FALSE you have to setup your own exception handling mechanism.<br>
+     *                                (default: TRUE)<br>
      *
      * "globals"           - bool:    If set to TRUE, the helper functions and constants defined in "rosasurfer/helpers.php"
      *                                are mapped to the global namespace. This simplifies views as they will not need PHP
      *                                "use" declarations to access those helpers. <br>
-     *                                default: FALSE <br>
+     *                                (default: FALSE)<br>
+     *
+     * All further options are added to the application's default configuration {@link Config} as regular config values.
      *
      * @param  array $options
      */
     public function __construct(array $options = []) {
         // set default values
-        if (!isSet($options['handle-errors'    ])) $options['handle-errors'    ] = 'strict';
-        if (!isSet($options['handle-exceptions'])) $options['handle-exceptions'] = true;
-        if (!isSet($options['globals'          ])) $options['globals'          ] = false;
-        if (!isSet($options['config'           ])) throw new InvalidArgumentException('Invalid argument $options (option "config" not set)');
+        if (!isSet($options['app.handle-errors'    ])) $options['app.handle-errors'    ] = 'strict';
+        if (!isSet($options['app.handle-exceptions'])) $options['app.handle-exceptions'] = true;
+        if (!isSet($options['app.global-helpers'   ])) $options['app.global-helpers'   ] = false;
 
-        $this->setupErrorHandling    ($options['handle-errors'    ]);
-        $this->setupExceptionHandling($options['handle-exceptions']);
-        $this->loadGlobalHelpers     ($options['globals'          ]);
-        $this->setConfiguration      ($options['config'           ]);
+        $this->setupErrorHandling    ($options['app.handle-errors'    ]);
+        $this->setupExceptionHandling($options['app.handle-exceptions']);
+        $this->loadGlobalHelpers     ($options['app.global-helpers'   ]);
 
-        // (1) check application settings
-        $appRoot = Config::getDefault()->get('app.dir.root');
-        !defined('\APPLICATION_ID') && define('APPLICATION_ID', md5($appRoot));
+        $config = $this->loadConfiguration($options);
 
-        // (2) if on localhost check for PHP admin tasks
+        // (2) check "app.id"
+        $appId = $config->get('app.id', null);
+        if (!$appId) $config->set('app.id', subStr(md5($config->get('app.dir.root')), 0, 16));
+
+        // (3) if on localhost check for PHP admin tasks
         // __phpinfo__               : show PHP config at start of script
         // __config__                : show application config (may contain further PHP config settings)
         // __config__   + __phpinfo__: show PHP config after application configuration
@@ -106,31 +110,31 @@ class Application extends Object {
             }
         }
 
-        // (3) load any further PHP config settings from the application's main configuration
+        // (4) load further php.ini settings from the configuration
         $this->configurePhp();
 
-        // (4) execute "config-info" task if enabled
+        // (5) execute "config-info" task if enabled
         if ($configInfoTask) {
             echoPre(Config::getDefault()->info());
             exit(0);
         }
 
-        // (5) execute "phpinfo" after-config task if enabled
+        // (6) execute "phpinfo" after-config task if enabled
         if ($phpInfoTaskAfterConfig) {
             PHP::phpInfo();
             exit(0);
         }
 
-        // (6) execute "cache-info" task if enabled
+        // (7) execute "cache-info" task if enabled
         if ($cacheInfoTask) {
             //include(MINISTRUTS_ROOT.'/src/debug/apc.php'); // TODO: not yet implemented
             exit(0);
         }
 
-        // (7) enforce PHP requirements (last step to be able to run admin tasks with erroneous PHP settings)
-        !php_ini_loaded_file()               && exit(1|echoPre('application error (see error log'.(LOCALHOST || $this->isWhiteListedRemoteIP() ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: No "php.ini" configuration file was loaded.'));
-        !PHP::ini_get_bool('short_open_tag') && exit(1|echoPre('application error (see error log'.(LOCALHOST || $this->isWhiteListedRemoteIP() ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: The PHP configuration value "short_open_tag" must be enabled (security).'));
-        ini_get('request_order') != 'GP'     && exit(1|echoPre('application error (see error log'.(LOCALHOST || $this->isWhiteListedRemoteIP() ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: The PHP configuration value "request_order" must be "GP" (current value "'.ini_get('request_order').'").'));
+        // (8) enforce mission-critical PHP requirements (after running any admin tasks)
+        !php_ini_loaded_file()                && exit(1|echoPre('application error (see error log'.(LOCALHOST || $this->isWhiteListedRemoteIP() ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: No "php.ini" configuration file was loaded.'));
+        !PHP::ini_get_bool('short_open_tag')  && exit(1|echoPre('application error (see error log'.(LOCALHOST || $this->isWhiteListedRemoteIP() ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: The PHP configuration value "short_open_tag" must be enabled (security).'));
+        ini_get('request_order') != 'GP'      && exit(1|echoPre('application error (see error log'.(LOCALHOST || $this->isWhiteListedRemoteIP() ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: The PHP configuration value "request_order" must be "GP" (current value "'.ini_get('request_order').'").'));
     }
 
 
@@ -180,14 +184,37 @@ class Application extends Object {
 
 
     /**
-     * Set the specified configuration as the application's main configuration or create one.
+     * Load the specified configuration and make it the application's default configuration.
      *
-     * @param  IConfig|string $config - configuration or config location as passed to the framework loader
+     * @param  array $options - config options as passed to the framework loader
+     *
+     * @return IConfig - loaded configuration
      */
-    private function setConfiguration($config) {
-        /** @var IConfig $config */
-        $config = is_string($config) ? new AutoConfig($config) : $config;
-        Config::setDefault($config);
+    private function loadConfiguration(array $options) {
+        if (!isSet($options['app.dir.root'  ])) $options['app.dir.root'  ] = getCwd();
+        if (!isSet($options['app.dir.config'])) $options['app.dir.config'] = getCwd();
+        //Logger::log('Application option "app.dir.root" not defined, using "'.getCwd().'"', L_NOTICE);
+        //Logger::log('Application option "app.dir.config" not defined, using "'.getCwd().'"', L_NOTICE);
+        //throw new RuntimeException('Missing application option "app.dir.config" (required)');
+
+        $root   = $options['app.dir.root'  ]; unset($options['app.dir.root'  ]);
+        $config = $options['app.dir.config']; unset($options['app.dir.config']);
+
+        if (is_string($config)) {
+            $config = new AutoConfig($root, $config);
+        }
+        else if ($config instanceof IConfig) {
+            $config->set('app.dir.root', $root);
+        }
+        else throw new RuntimeException('Illegal application option "app.dir.config" (must be one of config location or instance of '.IConfig::class.')');
+
+        foreach ($options as $name => $value) {
+            if (is_string($name) && $config->get($name, null)===null) {
+                $config->set($name, $value);
+            }
+        }
+
+        return Config::setDefault($config);
     }
 
 
