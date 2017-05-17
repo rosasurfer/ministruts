@@ -6,7 +6,7 @@ use rosasurfer\exception\IllegalTypeException;
 
 
 /**
- * PageContext
+ * Page
  *
  * Container, in dem fuer den Renderprozess benoetigte Objekte oder Variablen abgelegt werden koennen.
  * Beim Rendern kann auf diese Daten aus dem HTML zugegriffen werden.  Innerhalb eines Seitenfragments
@@ -17,15 +17,15 @@ use rosasurfer\exception\IllegalTypeException;
  * ---------
  *    $page->title = 'HTML-Title';
  *
- * Speichert die Variable "title" mit dem Wert 'HTML-Title' im PageContext
+ * Speichert die Variable "title" mit dem Wert 'HTML-Title' im Page-Context
  *
  *    $var = $page->title;
  *
  * Gibt die gespeicherte Eigenschaft mit dem Namen "title" zurueck.
  *
- * @todo   Properties aus dem Tiles-Context muessen auch im PageContext erreichbar sein
+ * @todo   Properties aus dem Tiles-Context muessen auch in der Page erreichbar sein
  */
-class PageContext extends Singleton {
+class Page extends Singleton {
 
 
     /** @var array - Property-Pool */
@@ -43,7 +43,7 @@ class PageContext extends Singleton {
 
 
     /**
-     * Gibt einen Wert aus dem PageContext zurueck.
+     * Gibt einen Wert aus der Page zurueck.
      *
      * @param  string $key - Schluessel, unter dem der Wert gespeichert ist
      *
@@ -55,7 +55,7 @@ class PageContext extends Singleton {
 
 
     /**
-     * Speichert einen Wert im PageContext.
+     * Speichert einen Wert in der Page.
      *
      * @param  string $key   - Schluessel, unter dem der Wert gespeichert wird
      * @param  mixed  $value - der zu speichernde Wert

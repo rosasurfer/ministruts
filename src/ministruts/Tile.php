@@ -206,7 +206,7 @@ class Tile extends Object {
         $properties['response'] = Response::me();
         $properties['session' ] = $request->isSession() ? $request->getSession() : null;
         $properties['form'    ] = $request->getAttribute(ACTION_FORM_KEY);
-        $properties['page'    ] = PageContext::me();
+        $properties['page'    ] = Page::me();
 
         $tileHint = false;
         if ($this->parent && (LOCALHOST || Application::isWhiteListedRemoteIP())) {

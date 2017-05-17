@@ -104,7 +104,7 @@ return array(
     'rosasurfer\\ministruts\\FrontController' => $baseDir . '/src/ministruts/FrontController.php',
     'rosasurfer\\ministruts\\HttpSession' => $baseDir . '/src/ministruts/HttpSession.php',
     'rosasurfer\\ministruts\\Module' => $baseDir . '/src/ministruts/Module.php',
-    'rosasurfer\\ministruts\\PageContext' => $baseDir . '/src/ministruts/PageContext.php',
+    'rosasurfer\\ministruts\\Page' => $baseDir . '/src/ministruts/Page.php',
     'rosasurfer\\ministruts\\Request' => $baseDir . '/src/ministruts/Request.php',
     'rosasurfer\\ministruts\\RequestProcessor' => $baseDir . '/src/ministruts/RequestProcessor.php',
     'rosasurfer\\ministruts\\Response' => $baseDir . '/src/ministruts/Response.php',
