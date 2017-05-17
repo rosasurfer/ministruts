@@ -97,21 +97,28 @@ class ErrorHandler extends StaticClass {
      *
      * @param  int $mode - mode the error handler to setup for
      *                     can be either self::LOG_ERRORS or self::THROW_EXCEPTIONS
+     *
+     * @return mixed - Returns a string containing the previously defined error handler (if any). If the passed $mode
+     *                 parameter is invalid or if the built-in error handler was active NULL is returned. If the previous
+     *                 error handler was a class method an indexed array with the class and the method name is returned.
      */
     public static function setupErrorHandling($mode) {
         if     ($mode === self::LOG_ERRORS      ) self::$errorMode = self::LOG_ERRORS;
         elseif ($mode === self::THROW_EXCEPTIONS) self::$errorMode = self::THROW_EXCEPTIONS;
-        else                                      return;
+        else                                      return null;
 
-        set_error_handler(self::$errorHandler=__CLASS__.'::handleError', error_reporting());
+        return set_error_handler(self::$errorHandler=__CLASS__.'::handleError', error_reporting());
     }
 
 
     /**
      * Setup global exception handling.
+     *
+     * @return callable|null - Returns the name of the previously defined exception handler, or NULL if no previous handler
+     *                         was defined or an error occurred.
      */
     public static function setupExceptionHandling() {
-        set_exception_handler(self::$exceptionHandler=__CLASS__.'::handleException');
+        $previous = set_exception_handler(self::$exceptionHandler=__CLASS__.'::handleException');
 
         /**
          * Detect entering of the script's shutdown phase to be capable of handling destructor exceptions during shutdown
@@ -123,6 +130,7 @@ class ErrorHandler extends StaticClass {
         register_shutdown_function(function() {
             self::$inShutdown = true;
         });
+        return $previous;
     }
 
 
