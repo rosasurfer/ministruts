@@ -52,7 +52,8 @@ parameters:
        #- '/Parameter #[0-9]+ [^ ]+ of (static )?method [^ ]+ expects ([^ ]+), \2\|null given\b/'       # everything accepts NULL
         - "/Casting to (bool|int|float|string) something that's already (bool|int|float|string)./"      # flawed implementation
 
-        # PHPStan bugs 
+        # unfixed PHPStan bugs 
         - '/Cannot call method andDependency\(\) on null\b/'
         - '/Method rosasurfer\\db\\orm\\meta\\EntityMapping::getVersion\(\) should return rosasurfer\\db\\orm\\meta\\PropertyMapping\|null but returns bool\|rosasurfer\\db\\orm\\meta\\PropertyMapping\|null\b/'
         - '/Parameter #1 \$mode of method rosasurfer\\ministruts\\ActionMapping::setFormValidateFirst\(\) expects bool, bool\|mixed given\b/'
+        - '/Parameter #[12] \$string[AB] of function rosasurfer\\strCompareI expects string, null given\b/'
