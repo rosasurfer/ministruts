@@ -185,12 +185,12 @@ function printPretty($var, $return=false, $flushBuffers=true) {
     }
 
     if (!CLI)
-        $str = '<br><div align="left" style="clear:both;
-                                             position:relative; z-index:65535; left:initial; top:initial;
-                                             float:left; width:initial; height:initial
-                                             margin:0; padding:0;
-                                             font:normal normal 12px/normal \'Courier New\',courier,serif">
-                    <pre>'.htmlSpecialChars($str, ENT_QUOTES).'</pre></div>';
+        $str = '<div align="left" style="clear:both;
+                                         position:relative; z-index:65535; left:initial; top:initial;
+                                         float:left; width:initial; height:initial
+                                         margin:0; padding:0;
+                                         font:normal normal 12px/normal \'Courier New\',courier,serif">
+                    <pre>'.htmlSpecialChars($str, ENT_QUOTES|ENT_IGNORE).'</pre></div>';
 
     if (!strEndsWith($str, NL))
         $str .= NL;
