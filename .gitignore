@@ -21,11 +21,12 @@
 /nbactions.xml
 
 # ignore the following folders and files
+vendor/
 /composer
 /composer.lock
 /composer.phar
+/composer-dev.*
+config.properties
+
 /dirs.php
 /php-error.log
-
-vendor/
-config.properties
