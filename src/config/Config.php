@@ -24,23 +24,26 @@ use const rosasurfer\WINDOWS;
  *
  * @example
  * <pre>
- * db.connector = mysql                               # subkey notation creates associative array branches
+ * db.connector = mysql                         # subkey notation creates associative array branches
  * db.host      = localhost:3306
- * db.username  = username
- * db.password  = password
  * db.database  = dbname
  *
- * db.options[] = value-at-index-0                    # bracket notation creates numeric array branches
+ * db.options[] = value-at-index-0              # bracket notation creates indexed array branches
  * db.options[] = value-at-index-1
  * db.options[] = value-at-index-2
  *
- * # comment on its own line
- * log.level.Action          = warn                   # comment at the end of line
- * log.level.foo\bar\MyClass = notice                 # keys may contain PHP namespaces
+ * # a comment on its own line
+ * log.level.Action          = warn             # a comment at the end of line
+ * log.level.foo\bar\MyClass = notice           # subkeys may contain any character except the dot "."
  *
- * key.subkey with spaces    = value                  # keys may contain spaces
- * key.   indented.subkey    = value                  # enclosing white space around subkeys is ignored
- * key."a.subkey.with.dots"  = value                  # quoted keys can contain otherwise illegal key characters
+ * key.subkey with spaces    = value            # subkeys may contain spaces...
+ * key.   indented.subkey    = value            # ...but enclosing white space around subkeys is ignored
+ * key."a.subkey.with.dots"  = value            # quoted subkeys can contain otherwise illegal key characters
+ *
+ * &lt;?php
+ * Config::get('db.connector')  => single value
+ * Config::get('db')            => associative array of values ['connector'=>..., 'host'=>..., 'database'=>...]
+ * Config::get('db.options')    => indexed array of values     [0=>..., 1=>..., 2=>...]
  * </pre>
  */
 class Config extends Object implements ConfigInterface {
@@ -128,7 +131,7 @@ class Config extends Object implements ConfigInterface {
     /**
      * {@inheritdoc}
      */
-    public function get($key, $default=null) {
+    public function get($key, $default = null) {
         if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
 
         $value = $this->getProperty($key);
@@ -227,7 +230,16 @@ class Config extends Object implements ConfigInterface {
                         $properties[$subkey] = $value;                      // override the existing string value
                     }
                     else {
-                        $properties[$subkey][''] = $value;                  // set/override the array default value
+                        // modification of an array value
+                        if ($value === null) {                              // set the array to NULL, don't remove the key
+                            $properties[$subkey] = $value;
+                        }
+                        else if (is_array($value)) {
+                            $properties[$subkey] = $value;                  // replace the array
+                        }
+                        else {
+                            $properties[$subkey][''] = $value;              // set/override the array default value
+                        }
                     }
                 }
             }
