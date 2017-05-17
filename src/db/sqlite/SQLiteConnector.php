@@ -11,8 +11,9 @@ use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\exception\RuntimeException;
 
+use function rosasurfer\isRelativePath;
+
 use const rosasurfer\NL;
-use const rosasurfer\WINDOWS;
 
 
 /**
@@ -103,8 +104,8 @@ class SQLiteConnector extends Connector {
         if (!is_string($file)) throw new IllegalTypeException('Illegal type of parameter $file: '.getType($file));
         if (!strLen($file))    throw new InvalidArgumentException('Invalid parameter $file: "'.$file.'" (empty)');
 
-        $relativePath = WINDOWS ? !preg_match('/^[a-z]:/i', $file) : ($file[0]!='/');
-        $relativePath && $file=Config::getDefault()->get('app.dir.root').DIRECTORY_SEPARATOR.$file;
+        if (isRelativePath($file))
+            $file = Config::getDefault()->get('app.dir.root').DIRECTORY_SEPARATOR.$file;
 
         $this->file = $file;
         return $this;
@@ -146,9 +147,7 @@ class SQLiteConnector extends Connector {
             }
             else {
                 $what = ($flags & SQLITE3_OPEN_CREATE) ? 'create':'find';
-
-                $relativePath = WINDOWS ? !preg_match('/^[a-z]:/i', $file) : ($file[0]!='/');
-                $relativePath && $where=' in "'.getCwd().'"';
+                isRelativePath($file) && $where=' in "'.getCwd().'"';
             }
             throw $ex->addMessage('Cannot '.$what.' SQLite database file "'.$file.'"'.$where);
         }

@@ -10,10 +10,9 @@ use rosasurfer\exception\error\PHPError;
 
 use rosasurfer\monitor\Dependency;
 
+use function rosasurfer\isRelativePath;
 use function rosasurfer\mkDirWritable;
 use function rosasurfer\strEndsWith;
-
-use const rosasurfer\WINDOWS;
 
 
 /**
@@ -43,11 +42,9 @@ final class FileSystemCache extends CachePeer {
 
         // Cache-Verzeichnis ermitteln
         if (isSet($options['directory'])) {
-            $directory    = $options['directory'];
-            $relativePath = WINDOWS ? !preg_match('/^[a-z]:/i', $directory) : ($directory[0]!='/');
-            if ($relativePath) {
+            $directory = $options['directory'];
+            if (isRelativePath($directory))
                 $directory = Config::getDefault()->get('app.dir.root').'/'.$directory;
-            }
         }
         else {
             /** @var string $directory */

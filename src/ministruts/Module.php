@@ -8,13 +8,12 @@ use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\IllegalTypeException;
 
 use function rosasurfer\is_class;
+use function rosasurfer\isRelativePath;
 use function rosasurfer\strContains;
 use function rosasurfer\strEndsWith;
 use function rosasurfer\strLeft;
 use function rosasurfer\strLeftTo;
 use function rosasurfer\strStartsWith;
-
-use const rosasurfer\WINDOWS;
 
 
 /**
@@ -211,8 +210,7 @@ class Module extends Object {
             $location = Config::getDefault()->get('app.dir.view', null);
             if (!$location) throw new StrutsConfigException('Missing view directory configuration: Neither $config[app.dir.view] nor <struts-config file-base="{base-directory}" are specified');
 
-            $relativePath = WINDOWS ? !preg_match('/^[a-z]:/i', $location) : ($location[0]!='/');
-            $relativePath && $location = $rootDirectory.DIRECTORY_SEPARATOR.$location;
+            isRelativePath($location) && $location = $rootDirectory.DIRECTORY_SEPARATOR.$location;
             if (!is_dir($location)) throw new StrutsConfigException('Resource location $config[app.dir.view]="'.Config::getDefault()->get('app.dir.view').'" not found');
 
             $this->resourceLocations[] = realPath($location);
@@ -225,9 +223,7 @@ class Module extends Object {
             $location = trim($location);
             if (!strLen($location)) continue;
 
-            $relativePath = WINDOWS ? !preg_match('/^[a-z]:/i', $location) : ($location[0]!='/');
-            $relativePath && $location = $rootDirectory.DIRECTORY_SEPARATOR.$location;
-
+            isRelativePath($location) && $location = $rootDirectory.DIRECTORY_SEPARATOR.$location;
             if (!is_dir($location)) throw new StrutsConfigException('<struts-config file-base="'.$locations[$i].'": Resource location not found');
 
             $this->resourceLocations[] = realPath($location);

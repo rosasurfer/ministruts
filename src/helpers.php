@@ -240,6 +240,29 @@ function isLittleEndian() {
 
 
 /**
+ * Whether or not the specified path is relative or absolute, according to the current operating system.
+ *
+ * @param  string $path
+ *
+ * @return bool
+ */
+function isRelativePath($path) {
+    if (!is_string($path)) throw new IllegalTypeException('Illegal type of parameter $path: '.getType($path));
+
+    if (WINDOWS) {
+        if (preg_match('/^[a-z]:/i', $path))
+            return false;
+        return true;
+    }
+
+    if (strLen($path) && $path[0]=='/')
+        return false;
+
+    return true;                    // an empty string cannot be considered absolute, so it's assumed to be relative
+}
+
+
+/**
  * Functional replacement for ($stringA === $stringB).
  *
  * @param  string|null $stringA

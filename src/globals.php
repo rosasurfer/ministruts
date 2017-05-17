@@ -165,6 +165,18 @@ function isLittleEndian() {
 
 
 /**
+ * Whether or not the specified path is relative or absolute, according to the current operating system.
+ *
+ * @param  string $path
+ *
+ * @return bool
+ */
+function isRelativePath($path) {
+    return \rosasurfer\isRelativePath($path);
+}
+
+
+/**
  * Functional replacement for ($stringA === $stringB).
  *
  * @param  string|null $stringA

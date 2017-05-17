@@ -4,7 +4,7 @@ namespace rosasurfer\monitor;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 
-use const rosasurfer\WINDOWS;
+use function rosasurfer\isRelativePath;
 
 
 /**
@@ -57,9 +57,8 @@ class FileDependency extends Dependency {
         }
         else {                                              // nicht existierende Datei
             $name = str_replace('\\', '/', $fileName);
-
-            $relativePath = WINDOWS ? !preg_match('/^[a-z]:/i', $name) : ($name[0]!='/');
-            $relativePath && $name=getCwd().'/'.$name;      // absoluten Pfad erzeugen, da Arbeitsverzeichnis wechseln kann
+            if (isRelativePath($name))
+                $name=getCwd().'/'.$name;      // absoluten Pfad erzeugen, da Arbeitsverzeichnis wechseln kann
 
             $this->fileName     = str_replace('/', DIRECTORY_SEPARATOR, $name);
             $this->lastModified = null;
