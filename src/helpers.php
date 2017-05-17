@@ -249,11 +249,8 @@ function isLittleEndian() {
 function isRelativePath($path) {
     if (!is_string($path)) throw new IllegalTypeException('Illegal type of parameter $path: '.getType($path));
 
-    if (WINDOWS) {
-        if (preg_match('/^[a-z]:/i', $path))
-            return false;
-        return true;
-    }
+    if (WINDOWS)
+        return !preg_match('/^[a-z]:/i', $path);
 
     if (strLen($path) && $path[0]=='/')
         return false;
