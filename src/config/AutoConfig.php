@@ -10,9 +10,6 @@ use rosasurfer\monitor\FileDependency;
 use function rosasurfer\isRelativePath;
 
 use const rosasurfer\CLI;
-use const rosasurfer\LOCALHOST;
-use const rosasurfer\MINISTRUTS_ROOT;
-use const rosasurfer\WINDOWS;
 
 
 /**
@@ -65,18 +62,17 @@ class AutoConfig extends Config {
         // TODO: look-up and delegate to an existing cached instance
         //       key: get_class($this).'|'.$userConfig.'|cli='.(int)CLI
 
-        // start with framework configuration file (if any)
-        $files = [];
-        $files[] = MINISTRUTS_ROOT.'/config.properties';
 
-        // add distributable configuration file
-                 $files[] = $configDir.'/config.dist.properties';
+        // (1) distributable configuration files
+        $files[] = $configDir.'/config.dist.properties';
+
+        // runtime environment
         if (CLI) $files[] = $configDir.'/config.cli.properties';
 
-        // add user or environment configuration files
-        if ($configFile)                           $files[] = $configFile;                              // explicit file
+        // application environment: user or staging configuration
+        if ($configFile)                           $files[] = $configFile;                              // explicite
         else if (($env=getEnv('APP_ENVIRONMENT'))) $files[] = $configDir.'/config.'.$env.'.properties';
-        else                                       $files[] = $configDir.'/config.properties';          // default file
+        else                                       $files[] = $configDir.'/config.properties';          // default
 
         // load all files and set "app.dir.config"
         parent::__construct($files);
@@ -100,16 +96,7 @@ class AutoConfig extends Config {
 
         // (3) create FileDependency and cache the instance
         //$dependency = FileDependency::create(array_keys($config->files));
-        //if (!WINDOWS && !CLI && !LOCALHOST)                         // distinction dev/production (sense???)
-        //   $dependency->setMinValidity(60 * SECONDS);
+        //$dependency->setMinValidity(60 * SECONDS);
         //$cache->set('default', $config, Cache::EXPIRES_NEVER, $dependency);
-    }
-
-
-    /**
-     * {@inheritdoc}
-     */
-    public function info() {
-        return __METHOD__.'()  not yet implemented';
     }
 }

@@ -41,9 +41,9 @@ use function rosasurfer\isRelativePath;
  * key."a.subkey.with.dots"  = value            # quoted subkeys can contain otherwise illegal key characters
  *
  * &lt;?php
- * Config::get('db.connector')  => single value
- * Config::get('db')            => associative array of values ['connector'=>..., 'host'=>..., 'database'=>...]
- * Config::get('db.options')    => indexed array of values     [0=>..., 1=>..., 2=>...]
+ * Config::get('db.connector')  // returns a single value
+ * Config::get('db')            // returns an associative array of values ['connector'=>..., 'host'=>..., 'database'=>...]
+ * Config::get('db.options')    // returns and indexed array of values     [0=>..., 1=>..., 2=>...]
  * </pre>
  */
 class Config extends Object implements ConfigInterface {

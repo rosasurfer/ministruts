@@ -88,7 +88,6 @@ class Application extends Object {
                             });
                         }
                         else if ($configInfoTask) {
-                            $configInfoTask         = false;       // cancel config-info task
                             $phpInfoTaskAfterConfig = true;
                         }
                         else {
@@ -116,8 +115,7 @@ class Application extends Object {
 
         // (5) execute "config-info" task if enabled
         if ($configInfoTask) {
-            echoPre(Config::getDefault()->info());
-            exit(0);
+            //echoPre(Config::getDefault()->info());
         }
 
         // (6) execute "phpinfo" after-config task if enabled
