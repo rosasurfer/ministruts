@@ -152,7 +152,7 @@ function processEntry($entry) {
     $entry = normalizeEOL($entry);                                 // use Unix line-breaks by default but...
     if (WINDOWS)                                                   // use Windows line-breaks on Windows
         $entry = str_replace(EOL_UNIX, EOL_WINDOWS, $entry);
-    $entry = str_replace(chr(0), "?", $entry);                     // replace NUL bytes which destroy the mail
+    $entry = str_replace(chr(0), '?', $entry);                     // replace NUL bytes which destroy the mail
 
     $subject = strTok($entry, "\r\n");                             // that's CR or LF, not CRLF
     $message = $entry;
