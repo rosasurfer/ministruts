@@ -798,8 +798,7 @@ class Request extends Singleton {
      * @todo   Error-Messages auch aus der Session loeschen
      */
     public function removeActionErrors(/*$key1, $key2, $key3 ...*/) {
-        $dropped = array();
-
+        $dropped = [];
         $args = func_get_args();
 
         if ($args) {
