@@ -49,8 +49,6 @@ final class Cache extends StaticClass {
         // Default-Cache
         if ($label === null) {
             if (!self::$default) {
-                $key = '';
-
                 // neuen Cache instantiieren
                 if (extension_loaded('apc') && PHP::ini_get_bool(CLI ? 'apc.enable_cli':'apc.enabled')) {
                     self::$default = new ApcCache($label);

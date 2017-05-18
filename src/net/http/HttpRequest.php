@@ -94,8 +94,8 @@ class HttpRequest extends Object {
     /**
      * Setzt einen HTTP-Header. Ein bereits vorhandener Header desselben Namens wird ueberschrieben.
      *
-     * @param  string $header - Name des Headers
-     * @param  string $value  - Wert des Headers, NULL oder ein Leerstring loeschen den entsprechenden Header
+     * @param  string $name  - Name des Headers
+     * @param  string $value - Wert des Headers, NULL oder ein Leerstring loeschen den entsprechenden Header
      *
      * @return $this
      */
@@ -128,8 +128,8 @@ class HttpRequest extends Object {
      * Fuegt einen HTTP-Header zu den Headern dieses Requests hinzu. Bereit vorhandene gleichnamige Header werden nicht ueberschrieben,
      * sondern gemaess RFC zu einem gemeinsamen Header kombiniert.
      *
-     * @param  string $header - Name des Headers
-     * @param  string $value  - Wert des Headers
+     * @param  string $name  - Name des Headers
+     * @param  string $value - Wert des Headers
      *
      * @return $this
      *
@@ -162,7 +162,7 @@ class HttpRequest extends Object {
     /**
      * Gibt die angegebenen Header dieses HttpRequests als Array von Name-Wert-Paaren zurueck.
      *
-     * @param  string|string[] $names - ein oder mehrere Namen; ohne Angabe werden alle Header zurueckgegeben
+     * @param  string|string[]|null $names - ein oder mehrere Namen; ohne Angabe werden alle Header zurueckgegeben
      *
      * @return array - Name-Wert-Paare
      */

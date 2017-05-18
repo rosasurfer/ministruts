@@ -154,6 +154,7 @@ class SQLiteConnector extends Connector {
         $this->handler = $handler;
 
         $this->setConnectionOptions();
+        return $this;
     }
 
 
