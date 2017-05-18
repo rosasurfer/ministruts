@@ -31,7 +31,7 @@ class IRCMessenger extends Messenger {
      * @param  string $channel - IRC-Channel
      * @param  string $message - Nachricht
      */
-    public function sendMessage($receiver, $message) {
+    public function sendMessage($channel, $message) {
         throw new UnimplementedFeatureException(__METHOD__.'() not yet implemented');
     }
 }
