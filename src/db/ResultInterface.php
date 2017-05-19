@@ -25,10 +25,10 @@ interface ResultInterface {
     /**
      * Fetch a single column from the result set.
      *
-     * @param  string|int|null $column       - name or offset of the column to fetch from (default: 0)
-     * @param  int|null        $row          - row to fetch from, starting at 0 (default: the next row)
-     * @param  mixed           $onNull       - value to return if the cell value is NULL (default: NULL)
-     * @param  mixed           $onNoMoreRows - value to return if no more rows are available
+     * @param  string|int $column       [optional] - name or offset of the column to fetch from (default: 0)
+     * @param  int        $row          [optional] - row to fetch from, starting at 0 (default: the next row)
+     * @param  mixed      $onNull       [optional] - value to return if the cell value is NULL
+     * @param  mixed      $onNoMoreRows [optional] - value to return if no more rows are available
      *
      * @return mixed - value of a single cell (driver dependent type) or $onNull if the cell value is NULL
      *
@@ -40,15 +40,14 @@ interface ResultInterface {
     /**
      * Fetch a single field from the result set as a string value.
      *
-     * @param  string|int $column       - name or offset of the column to fetch from (default: 0)
-     * @param  int|null   $row          - row to fetch from, starting at 0 (default: the next row)
-     * @param  mixed      $onNull       - value to return if the cell value is NULL (default: NULL)
-     * @param  mixed      $onNoMoreRows - value to return if no more rows are available
+     * @param  string|int $column       [optional] - name or offset of the column to fetch from (default: 0)
+     * @param  int        $row          [optional] - row to fetch from, starting at 0 (default: the next row)
+     * @param  mixed      $onNull       [optional] - value to return if the cell value is NULL
+     * @param  mixed      $onNoMoreRows [optional] - value to return if no more rows are available
      *
      * @return string - string value of a single cell or $onNull if the cell value is NULL
      *
      * @throws NoMoreRecordsException    if no more rows are available and parameter $onNoMoreRows was not set.
-     * @throws \UnexpectedValueException if the cell value is not NULL and does not represent a floating point value.
      */
     public function fetchString($column=0, $row=null, $onNull=null, $onNoMoreRows=null);
 
@@ -56,16 +55,16 @@ interface ResultInterface {
     /**
      * Fetch a single field from the result set as a boolean.
      *
-     * @param  string|int $column       - name or offset of the column to fetch from (default: 0)
-     * @param  int|null   $row          - row to fetch from, starting at 0 (default: the next row)
-     * @param  mixed      $onNull       - value to return if the cell value is NULL (default: NULL)
-     * @param  mixed      $onNoMoreRows - value to return if no more rows are available
+     * @param  string|int $column       [optional] - name or offset of the column to fetch from (default: 0)
+     * @param  int        $row          [optional] - row to fetch from, starting at 0 (default: the next row)
+     * @param  mixed      $onNull       [optional] - value to return if the cell value is NULL
+     * @param  mixed      $onNoMoreRows [optional] - value to return if no more rows are available
      *
      * @return bool - boolean value of a single cell or $onNull if the cell value is NULL
      *
      * @throws NoMoreRecordsException    if no more rows are available and parameter $onNoMoreRows was not set.
      * @throws \UnexpectedValueException if the cell value is not NULL and does not represent a boolean. Accepted string
-     *                                   representations are "true" and "false", "on" and "off", "yes" and "no', and
+     *                                   representations are "true" and "false", "on" and "off", "yes" and "no", and
      *                                   numerical representations.
      */
     public function fetchBool($column=0, $row=null, $onNull=null, $onNoMoreRows=null);
@@ -74,10 +73,10 @@ interface ResultInterface {
     /**
      * Fetch a single field from the result set as an integer.
      *
-     * @param  string|int $column       - name or offset of the column to fetch from (default: 0)
-     * @param  int|null   $row          - row to fetch from, starting at 0 (default: the next row)
-     * @param  mixed      $onNull       - value to return if the cell value is NULL (default: NULL)
-     * @param  mixed      $onNoMoreRows - value to return if no more rows are available
+     * @param  string|int $column       [optional] - name or offset of the column to fetch from (default: 0)
+     * @param  int        $row          [optional] - row to fetch from, starting at 0 (default: the next row)
+     * @param  mixed      $onNull       [optional] - value to return if the cell value is NULL
+     * @param  mixed      $onNoMoreRows [optional] - value to return if no more rows are available
      *
      * @return int - integer value of a single cell or $onNull if the cell value is NULL
      *
@@ -92,10 +91,10 @@ interface ResultInterface {
     /**
      * Fetch a single field from the result set as a floating point value.
      *
-     * @param  string|int $column       - name or offset of the column to fetch from (default: 0)
-     * @param  int|null   $row          - row to fetch from, starting at 0 (default: the next row)
-     * @param  mixed      $onNull       - value to return if the cell value is NULL (default: NULL)
-     * @param  mixed      $onNoMoreRows - value to return if no more rows are available
+     * @param  string|int $column       [optional] - name or offset of the column to fetch from (default: 0)
+     * @param  int        $row          [optional] - row to fetch from, starting at 0 (default: the next row)
+     * @param  mixed      $onNull       [optional] - value to return if the cell value is NULL
+     * @param  mixed      $onNoMoreRows [optional] - value to return if no more rows are available
      *
      * @return float - floating point value of a single cell or $onNull if the cell value is NULL
      *

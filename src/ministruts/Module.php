@@ -671,7 +671,7 @@ class Module extends Object {
      * Fuegt diesem Module einen globalen ActionForward. Ist ein Alias angegeben, wird er unter dem Alias-Namen registriert.
      *
      * @param  ActionForward $forward
-     * @param  string|null   $alias   - alias name of the forward (default: none)
+     * @param  string        $alias [optional] - alias name of the forward
      *
      * @throws StrutsConfigException in case of configuration errors
      */
@@ -717,8 +717,8 @@ class Module extends Object {
     /**
      * Fuegt diesem Module eine Tile hinzu.
      *
-     * @param  Tile        $tile
-     * @param  string|null $alias - alias name of the tile (default: none)
+     * @param  Tile   $tile
+     * @param  string $alias [optional] - alias name of the tile
      */
     protected function addTile(Tile $tile, $alias=null) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');

@@ -49,10 +49,10 @@ class Tile extends Object {
     /**
      * Constructor
      *
-     * @param  Module    $module - Module, zu dem diese Tile gehoert
-     * @param  Tile|null $parent - (Parent-)Instanz der neuen (verschachtelten) Instanz
+     * @param  Module $module            - Module, zu dem diese Tile gehoert
+     * @param  Tile   $parent [optional] - (Parent-)Instanz der neuen (verschachtelten) Instanz
      */
-    public function __construct(Module $module, Tile $parent=null) {
+    public function __construct(Module $module, Tile $parent = null) {
         $this->module = $module;
         $this->parent = $parent;
     }
@@ -111,8 +111,8 @@ class Tile extends Object {
     /**
      * Speichert in der Tile unter dem angegebenen Namen eine Child-Tile.
      *
-     * @param  string    $name - Name der Tile
-     * @param  Tile|null $tile - die zu speichernde Tile oder NULL, wenn die Child-Deklaration abstrakt ist
+     * @param  string $name            - Name der Tile
+     * @param  Tile   $tile [optional] - die zu speichernde Tile oder NULL, wenn die Child-Deklaration abstrakt ist
      *
      * @return $this
      */

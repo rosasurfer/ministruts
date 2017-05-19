@@ -118,6 +118,6 @@ class CurlHttpResponse extends HttpResponse {
      * {@inheritdoc}
      */
     public function getContent() {
-        return $this->content;
+        return (string)$this->content;
     }
 }

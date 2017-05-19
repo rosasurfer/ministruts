@@ -668,10 +668,10 @@ class Request extends Singleton {
     /**
      * Setzt einen Cookie mit den angegebenen Daten.
      *
-     * @param  string      $name    - Name des Cookies
-     * @param  mixed       $value   - der zu speichernde Wert (wird zu String gecastet)
-     * @param  int         $expires - Lebenszeit des Cookies (0: bis zum Schliessen des Browsers)
-     * @param  string|null $path    - Pfad, fuer den der Cookie gueltig sein soll (default: whole domain)
+     * @param  string $name            - Name des Cookies
+     * @param  mixed  $value           - der zu speichernde Wert (wird zu String gecastet)
+     * @param  int    $expires         - Lebenszeit des Cookies (0: bis zum Schliessen des Browsers)
+     * @param  string $path [optional] - Pfad, fuer den der Cookie gueltig sein soll (default: whole domain)
      */
     public function setCookie($name, $value, $expires = 0, $path = null) {
         if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
@@ -716,7 +716,7 @@ class Request extends Singleton {
      * Gibt die Error-Message fuer den angegebenen Schluessel zurueck.  Ohne Schluessel wird die erste
      * vorhandene Error-Message zurueckgegeben.
      *
-     * @param  string|null $key - Schluessel der Error-Message (default: none)
+     * @param  string $key [optional] - Schluessel der Error-Message
      *
      * @return string|null - Error-Message
      */
@@ -755,7 +755,7 @@ class Request extends Singleton {
      * Ob unter dem angegebenen Schluessel eine Error-Message existiert.  Ohne Angabe eines Schluessel
      * wird geprueft, ob eine beliebige Error-Message existiert.
      *
-     * @param  string|null $key - Schluessel (default: none)
+     * @param  string $key [optional] - Schluessel
      *
      * @return bool
      */
@@ -771,11 +771,11 @@ class Request extends Singleton {
      * Setzt fuer den angegebenen Schluessel eine Error-Message. Ist Message NULL, wird die Message mit
      * dem angegebenen Schluessel aus dem Request geloescht.
      *
-     * @param  string      $key     - Schluessel der Error-Message
-     * @param  string|null $message - Error-Message
+     * @param  string $key     - Schluessel der Error-Message
+     * @param  string $message - Error-Message
      */
     public function setActionError($key, $message) {
-        if ($message === null) {
+        if (is_null($message)) {
             if (isSet($this->attributes[ACTION_ERRORS_KEY][$key]))
                 unset($this->attributes[ACTION_ERRORS_KEY][$key]);
         }

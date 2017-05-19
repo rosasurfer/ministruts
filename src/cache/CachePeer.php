@@ -107,10 +107,10 @@ abstract class CachePeer extends Object {
      * ueberschrieben.  Laeuft die angegebene Zeitspanne ab oder aendert sich der Status der angegebenen
      * Abhaengigkeit, wird der Wert automatisch ungueltig.
      *
-     * @param  string          $key        - Schluessel, unter dem der Wert gespeichert wird
-     * @param  mixed           $value      - der zu speichernde Wert
-     * @param  int             $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfaellt
-     * @param  Dependency|null $dependency - Abhaengigkeit der Gueltigkeit des gespeicherten Wertes (default: none)
+     * @param  string     $key                   - Schluessel, unter dem der Wert gespeichert wird
+     * @param  mixed      $value                 - der zu speichernde Wert
+     * @param  int        $expires               - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfaellt (default: nie)
+     * @param  Dependency $dependency [optional] - Abhaengigkeit der Gueltigkeit des gespeicherten Wertes
      *
      * @return bool - TRUE bei Erfolg, FALSE andererseits
      */
@@ -122,10 +122,10 @@ abstract class CachePeer extends Object {
      * existiert.  Laeuft die angegebene Zeitspanne ab oder aendert sich der Status der angegebenen
      * Abhaengigkeit, wird der Wert automatisch ungueltig.
      *
-     * @param  string          $key        - Schluessel, unter dem der Wert gespeichert wird
-     * @param  mixed           $value      - der zu speichernde Wert
-     * @param  int             $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfaellt
-     * @param  Dependency|null $dependency - Abhaengigkeit der Gueltigkeit des gespeicherten Wertes (default: none)
+     * @param  string     $key                   - Schluessel, unter dem der Wert gespeichert wird
+     * @param  mixed      $value                 - der zu speichernde Wert
+     * @param  int        $expires               - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfaellt (default: nie)
+     * @param  Dependency $dependency [optional] - Abhaengigkeit der Gueltigkeit des gespeicherten Wertes
      *
      * @return bool - TRUE bei Erfolg, FALSE andererseits
      */
@@ -142,10 +142,10 @@ abstract class CachePeer extends Object {
      * existiert.  Laeuft die angegebene Zeitspanne ab oder aendert sich der Status der angegebenen
      * Abhaengigkeit, wird der Wert automatisch ungueltig.
      *
-     * @param  string          $key        - Schluessel, unter dem der Wert gespeichert wird
-     * @param  mixed           $value      - der zu speichernde Wert
-     * @param  int             $expires    - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfaellt
-     * @param  Dependency|null $dependency - Abhaengigkeit der Gueltigkeit des gespeicherten Wertes (default: none)
+     * @param  string     $key                   - Schluessel, unter dem der Wert gespeichert wird
+     * @param  mixed      $value                 - der zu speichernde Wert
+     * @param  int        $expires               - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfaellt (default: nie)
+     * @param  Dependency $dependency [optional] - Abhaengigkeit der Gueltigkeit des gespeicherten Wertes
      *
      * @return bool - TRUE bei Erfolg, FALSE andererseits
      */

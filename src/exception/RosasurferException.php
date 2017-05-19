@@ -20,9 +20,9 @@ class RosasurferException extends \Exception implements IRosasurferException {
     /**
      * Create a new instance. Parameters are identical to the built-in PHP Exception and passed on.
      *
-     * @param  string|null     $message - exception description                           (default: none)
-     * @param  int|null        $code    - exception identifier, usually an application id (default: none)
-     * @param  \Exception|null $cause   - another exception causing this exception        (default: none)
+     * @param  string     $message [optional] - exception description
+     * @param  int        $code    [optional] - exception identifier, usually an application id
+     * @param  \Exception $cause   [optional] - another exception causing this exception
      */
     public function __construct($message=null, $code=null, \Exception $cause=null) {
         parent::__construct($message, $code, $cause);

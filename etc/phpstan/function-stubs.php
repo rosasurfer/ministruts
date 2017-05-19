@@ -16,7 +16,7 @@ namespace {
         /**
          * @param  string|array $key
          * @param  mixed        $var
-         * @param  int|null     $ttl
+         * @param  int          $ttl [optional]
          *
          * @return bool|array
          */
@@ -44,7 +44,7 @@ namespace {
 
         /**
          * @param  string|string[] $key
-         * @param  bool|null       $success
+         * @param  bool            $success [optional]
          *
          * @return mixed
          */
@@ -55,7 +55,7 @@ namespace {
         /**
          * @param  string|array $key
          * @param  mixed        $value
-         * @param  int|null     $ttl
+         * @param  int          $ttl [optional]
          *
          * @return bool|array
          */
@@ -69,7 +69,7 @@ namespace {
         /**
          * @param  string|array $keys
          * @param  mixed        $values
-         * @param  int|null     $ttl
+         * @param  int          $ttl [optional]
          *
          * @return bool|array
          */
@@ -79,7 +79,7 @@ namespace {
 
         /**
          * @param  string|string[] $key
-         * @param  bool|null       $success
+         * @param  bool            $success [optional]
          *
          * @return mixed
          */
@@ -95,7 +95,7 @@ namespace {
         define('MYSQL_BOTH' , 3);
 
         /**
-         * @param  resource|null $link_identifier
+         * @param  resource $link_identifier [optional]
          *
          * @return int
          */
@@ -104,7 +104,7 @@ namespace {
         }
 
         /**
-         * @param  resource|null $link_identifier
+         * @param  resource $link_identifier [optional]
          *
          * @return bool
          */
@@ -113,11 +113,11 @@ namespace {
         }
 
         /**
-         * @param  string|null $server
-         * @param  string|null $username
-         * @param  string|null $password
-         * @param  bool|null   $new_link
-         * @param  int|null    $client_flags
+         * @param  string $server       [optional]
+         * @param  string $username     [optional]
+         * @param  string $password     [optional]
+         * @param  bool   $new_link     [optional]
+         * @param  int    $client_flags [optional]
          *
          * @return resource
          */
@@ -128,7 +128,7 @@ namespace {
         }
 
         /**
-         * @param  resource|null $link_identifier
+         * @param  resource $link_identifier [optional]
          *
          * @return string
          */
@@ -137,7 +137,7 @@ namespace {
         }
 
         /**
-         * @param  resource|null $link_identifier
+         * @param  resource $link_identifier [optional]
          *
          * @return int
          */
@@ -147,7 +147,7 @@ namespace {
 
         /**
          * @param  resource $result
-         * @param  int|null $result_type
+         * @param  int      $result_type [optional]
          *
          * @return string[]|bool
          */
@@ -166,7 +166,7 @@ namespace {
         }
 
         /**
-         * @param  resource|null $link_identifier
+         * @param  resource $link_identifier [optional]
          *
          * @return string
          */
@@ -175,7 +175,7 @@ namespace {
         }
 
         /**
-         * @param  resource|null $link_identifier
+         * @param  resource $link_identifier [optional]
          *
          * @return int
          */
@@ -202,8 +202,8 @@ namespace {
         }
 
         /**
-         * @param  string        $query
-         * @param  resource|null $link_identifier
+         * @param  string   $query
+         * @param  resource $link_identifier [optional]
          *
          * @return resource|bool
          */
@@ -212,8 +212,8 @@ namespace {
         }
 
         /**
-         * @param  string        $unescaped_string
-         * @param  resource|null $link_identifier
+         * @param  string   $unescaped_string
+         * @param  resource $link_identifier [optional]
          *
          * @return string
          */
@@ -222,8 +222,8 @@ namespace {
         }
 
         /**
-         * @param  string        $database_name
-         * @param  resource|null $link_identifier
+         * @param  string   $database_name
+         * @param  resource $link_identifier [optional]
          *
          * @return bool
          */
@@ -232,8 +232,8 @@ namespace {
         }
 
         /**
-         * @param  string        $charset
-         * @param  resource|null $link_identifier
+         * @param  string   $charset
+         * @param  resource $link_identifier [optional]
          *
          * @return bool
          */
@@ -247,7 +247,7 @@ namespace {
         /**
          * @param  int          $signo
          * @param  callable|int $handler
-         * @param  bool|null    $restart_syscalls
+         * @param  bool         $restart_syscalls [optional]
          *
          * @return bool
          */
@@ -266,8 +266,8 @@ namespace {
 
     if (!function_exists('sem_acquire')) {
         /**
-         * @param  resource  $sem_identifier
-         * @param  bool|null $nowait
+         * @param  resource $sem_identifier
+         * @param  bool     $nowait [optional]
          *
          * @return bool
          */
@@ -276,10 +276,10 @@ namespace {
         }
 
         /**
-         * @param  int      $key
-         * @param  int|null $max_acquire
-         * @param  int|null $perm
-         * @param  int|null $auto_release
+         * @param  int $key
+         * @param  int $max_acquire   [optional]
+         * @param  int $perm          [optional]
+         * @param  int $auto_release  [optional]
          *
          * @return resource
          */
@@ -329,7 +329,7 @@ namespace rosasurfer\bin\check_ip {
     }
 
     /**
-     * @param  string|array|null $names
+     * @param  string|array $names [optional]
      *
      * @return array
      */
@@ -354,8 +354,8 @@ namespace rosasurfer\bin\check_ip {
     }
 
     /**
-     * @param  string    $string
-     * @param  bool|null $returnBytes
+     * @param  string $string
+     * @param  bool   $returnBytes [optional]
      *
      * @return bool|array
      */
@@ -373,7 +373,7 @@ namespace rosasurfer\cron\logwatch {
     function error($message) {}
 
     /**
-     * @param  string|null $message
+     * @param  string $message [optional]
      */
     function help($message = null) {}
 
@@ -397,8 +397,8 @@ namespace rosasurfer\util\apc\apc {
     }
 
     /**
-     * @param  int       $s
-     * @param  bool|null $long
+     * @param  int  $s
+     * @param  bool $long [optional]
      *
      * @return string
      */

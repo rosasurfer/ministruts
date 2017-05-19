@@ -22,8 +22,8 @@ abstract class Action extends Object {
      *
      * Create a new Action instance.
      *
-     * @param  ActionMapping   $mapping - the mapping using the Action
-     * @param  ActionForm|null $form    - user input of the request (default: none)
+     * @param  ActionMapping $mapping         - the mapping using the Action
+     * @param  ActionForm    $form [optional] - user input of the request
      */
     public function __construct(ActionMapping $mapping, ActionForm $form = null) {
         $this->mapping = $mapping;
@@ -83,9 +83,9 @@ abstract class Action extends Object {
      * Datenbankverbindungen.
      * Die Default-Implementierung macht nichts.
      *
-     * @param  Request            $request
-     * @param  Response           $response
-     * @param  ActionForward|null $forward  - der originale ActionForward, wie ihn die Action zurueckgegeben hat
+     * @param  Request       $request
+     * @param  Response      $response
+     * @param  ActionForward $forward  - der originale ActionForward, wie ihn die Action zurueckgegeben hat
      *
      * @return ActionForward|null - der originale oder ein modifizierter ActionForward (z.B. mit weiteren
      *                              Query-Parameter)

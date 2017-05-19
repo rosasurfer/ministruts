@@ -100,10 +100,10 @@ class HttpRequest extends Object {
      * @return $this
      */
     public function setHeader($name, $value) {
-        if (!is_string($name))                   throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
-        if (!strLen($name))                      throw new InvalidArgumentException('Invalid argument $name: '.$name);
+        if (!is_string($name))                      throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
+        if (!strLen($name))                         throw new InvalidArgumentException('Invalid argument $name: '.$name);
 
-        if ($value!==null && !is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
+        if (!is_null($value) && !is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
         if (!strLen($value))
             $value = null;
 
@@ -162,7 +162,7 @@ class HttpRequest extends Object {
     /**
      * Gibt die angegebenen Header dieses HttpRequests als Array von Name-Wert-Paaren zurueck.
      *
-     * @param  string|string[]|null $names - ein oder mehrere Namen; ohne Angabe werden alle Header zurueckgegeben
+     * @param  string|string[] $names [optional] - ein oder mehrere Namen; ohne Angabe werden alle Header zurueckgegeben
      *
      * @return array - Name-Wert-Paare
      */

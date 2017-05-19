@@ -176,7 +176,7 @@ class ActionMapping extends Object {
     /**
      * Gibt die Rollenbeschraenkung dieses Mappings zurueck.
      *
-     * @return string - Rollenbezeichner
+     * @return string|null - Rollenbezeichner
      */
     public function getRoles() {
         return $this->roles;
@@ -427,7 +427,7 @@ class ActionMapping extends Object {
      * Fuegt dem ActionMapping unter dem angegebenen Namen einen ActionForward hinzu.
      *
      * @param  ActionForward $forward
-     * @param  string|null   $alias   - alias name of the forward (default: none)
+     * @param  string        $alias [optional] - alias name of the forward
      *
      * @return $this
      *

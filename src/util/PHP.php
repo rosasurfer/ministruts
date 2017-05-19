@@ -139,8 +139,8 @@ class PHP extends StaticClass {
         /*PHP_INI_ALL   */ if ( self::ini_get_bool('html_errors'                   ))                                $issues[] = 'Warn:  html_errors is not Off  [functionality]';
         /*PHP_INI_ALL   */ if (!self::ini_get_bool('log_errors'                    ))                                $issues[] = 'Error: log_errors is not On  [setup]';
         /*PHP_INI_ALL   */ $bytes = self::ini_get_bytes('log_errors_max_len'       );
-            if      ($bytes===null || $bytes < 0)   /* 'log_errors' and 'log_errors_max_len' do not affect */        $issues[] = 'Error: log_errors_max_len is invalid: '.ini_get('log_errors_max_len');
-            else if ($bytes != 0)                   /* explicit calls to the function error_log()          */        $issues[] = 'Warn:  log_errors_max_len is not 0: '.ini_get('log_errors_max_len').'  [functionality]';
+            if      ($bytes <  0)   /* 'log_errors' and 'log_errors_max_len' do not affect */                        $issues[] = 'Error: log_errors_max_len is invalid: '.ini_get('log_errors_max_len');
+            else if ($bytes != 0)   /* explicit calls to the function error_log()          */                        $issues[] = 'Warn:  log_errors_max_len is not 0: '.ini_get('log_errors_max_len').'  [functionality]';
         /*PHP_INI_ALL   */ $errorLog = ini_get('error_log');
         if (!empty($errorLog) && $errorLog!='syslog') {
             if (is_file($errorLog)) {
@@ -191,7 +191,7 @@ class PHP extends StaticClass {
         /*PHP_INI_ALL   */ if ( self::ini_get_bool('implicit_flush'                ) && !CLI/*hardcoded*/)           $issues[] = 'Warn:  implicit_flush is not Off  [performance]';
         /*PHP_INI_PERDIR*/ $buffer = self::ini_get_bytes('output_buffering'        );
         if (!CLI) {
-            if      ($buffer===null || $buffer < 0)                                                                  $issues[] = 'Error: output_buffering is invalid: '.ini_get('output_buffering');
+            if      ($buffer < 0)                                                                                    $issues[] = 'Error: output_buffering is invalid: '.ini_get('output_buffering');
             else if (!$buffer)                                                                                       $issues[] = 'Info:  output_buffering is not enabled  [performance]';
         }
         // TODO: /*PHP_INI_ALL*/ "zlib.output_compression"

@@ -54,8 +54,8 @@ class PostgresResult extends Result {
     /** @var int - last number of affected rows (not reset between queries) */
     protected $lastAffectedRows = 0;
 
-    /** @var int - number of rows returned by the statement (NULL to distinguish between an unset and a zero value) */
-    protected $numRows = null;
+    /** @var int - number of rows returned by the statement */
+    protected $numRows;
 
 
     /**

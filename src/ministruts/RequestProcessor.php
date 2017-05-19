@@ -420,8 +420,8 @@ PROCESS_METHOD_ERROR_SC_405;
     /**
      * Erzeugt und gibt die Action zurueck, die fuer das angegebene Mapping konfiguriert wurde.
      *
-     * @param  ActionMapping   $mapping
-     * @param  ActionForm|null $form     - ActionForm, die konfiguriert wurde oder NULL
+     * @param  ActionMapping $mapping
+     * @param  ActionForm    $form [optional] - ActionForm, die konfiguriert wurde oder NULL
      *
      * @return Action
      */
@@ -455,9 +455,6 @@ PROCESS_METHOD_ERROR_SC_405;
             // Action nur ausfuehren, wenn executeBefore() nicht schon Abbruch signalisiert hat
             if ($forward === null)
                 $forward = $action->execute($request, $response);
-
-            if ($forward === null)
-                self::$logInfo && Logger::log('ActionForward of NULL returned from Action::execute()', L_INFO);
         }
         catch (\Exception $ex) {
             $throwable = $ex;    // evt. aufgetretene Exception zwischenspeichern

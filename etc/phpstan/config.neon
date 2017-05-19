@@ -47,13 +47,19 @@ parameters:
     polluteCatchScopeWithTryAssignments:    true
     
     ignoreErrors:
-        - '/Call to ((static )?method|function) [^ ]+ with incorrect case:/'                            # seriously?
-        - '/(Array \([^ ]+\[\]\)|(Static )?property [^ ]+ \(([^ ]+)\)) does not accept (\3\|)?null\b/i' # everything is nullable
-       #- '/Parameter #[0-9]+ [^ ]+ of (static )?method [^ ]+ expects ([^ ]+), \2\|null given\b/'       # everything accepts NULL
-        - "/Casting to (bool|int|float|string) something that's already (bool|int|float|string)./"      # flawed implementation
+        - '/Call to ((static )?method|function) [^ ]+ with incorrect case:/'                                    # seriously?
+        - '/Array \(([^ ]+)\[\]\) does not accept (\1\|)?null\b/'                                               # NULL should be considered a value, not a type
+        - '/(Static )?property [^ ]+ \(([^ ]+)\) does not accept (\2\|)?null\b/i'                               # - dito -
+        - '/Parameter #[0-9]+ [^ ]+ of class [^ ]+ constructor expects ([^ ]+), (\1\|)?null given\b/'           # - dito -
+        - '/Parameter #[0-9]+ [^ ]+ of (static )?(function|method) [^ ]+ expects ([^ ]+), (\3\|)?null given\b/' # - dito -
+        - '/Calling method [^ ]+ on possibly nullable type [^ ]+\|null\b/'
+        - "/Casting to (bool|int|float|string) something that's already (bool|int|float|string)./"              # too simplified implementation
+        - '/Strict comparison using [=!]== between (int|string) and null will always evaluate to (true|false)\b/'
 
         # unfixed PHPStan bugs 
         - '/Cannot call method andDependency\(\) on null\b/'
         - '/Method rosasurfer\\db\\orm\\meta\\EntityMapping::getVersion\(\) should return rosasurfer\\db\\orm\\meta\\PropertyMapping\|null but returns bool\|rosasurfer\\db\\orm\\meta\\PropertyMapping\|null\b/'
         - '/Parameter #1 \$mode of method rosasurfer\\ministruts\\ActionMapping::setFormValidateFirst\(\) expects bool, bool\|mixed given\b/'
-        - '/Parameter #[12] \$string[AB] of function rosasurfer\\strCompareI expects string, null given\b/'
+        - '/Method rosasurfer\\db\\(mysql\\MySQL|pgsql\\Postgres|sqlite\\SQLite)Result::numRows\(\) should return int but returns int\|null\b/'
+
+

@@ -214,8 +214,8 @@ abstract class PersistableObject extends Object {
     /**
      * Return the value of a mapped column.
      *
-     * @param  string      $column - column name
-     * @param  string|null $type   - column type (default: type as configured in the entity mapping)
+     * @param  string $column          - column name
+     * @param  string $type [optional] - column type (default: type as configured in the entity mapping)
      *
      * @return mixed - column value
      */
