@@ -344,27 +344,26 @@ class Config extends Object implements ConfigInterface {
      * {@inheritdoc}
      */
     public function info() {
+        $lines[] = 'Application configuration:';
+        $lines[] = '--------------------------';
+        $maxKeyLength = 0;
+        $values = $this->sPrintValues([], $this->properties, $maxKeyLength);
+        kSort($values);
+
+        foreach ($values as $key => &$value) {
+            $value = str_pad($key, $maxKeyLength, ' ', STR_PAD_RIGHT).' = '.$value;
+        }; unset($value);
+        $lines += $values;
+
+        $lines[] = '';
+        $lines[] = '';
         $lines[] = 'Configuration files:';
         $lines[] = '--------------------';
 
         foreach ($this->files as $file => $exists) {
             $lines[] = ($exists ? 'OK':'? ').'   '.$file;
         }
-
-        $lines[] = '';                                                          // indexed array
-        $lines[] = '';
-        $lines[] = 'Configuration:';
-        $lines[] = '--------------';
-
-        $maxKeyLength = 0;
-        $values = $this->sPrintValues([], $this->properties, $maxKeyLength);    // associative array
-        kSort($values);
-
-        foreach ($values as $key => &$value) {
-            $value = str_pad($key, $maxKeyLength, ' ', STR_PAD_RIGHT).' = '.$value;
-        }; unset($value);
-
-        return join(NL, $lines + $values);
+        return join(NL, $lines);
     }
 
 

@@ -287,7 +287,7 @@ class PHP extends StaticClass {
         else                                                                                                         $issues[] = 'Warn:  No opcode cache found [performance]';
 
 
-        // (9) break out of unfortunate HTML tags if on a web server
+        // (9) break out of unfortunate HTML tags and show results followed by phpInfo()
         if (!CLI) {
             ?>
             <div align="left" style="clear:both;
@@ -299,26 +299,28 @@ class PHP extends StaticClass {
             <?php
         }
 
-
-        // (10) show issues or confirm if none are found
+        // show issues or confirm if none are found
         if ($issues) echoPre('PHP configuration issues:'.NL.'-------------------------'.NL.join(NL, $issues));
         else         echoPre('PHP configuration OK');
 
-
-        // (11) call phpInfo() if on a web server
+        // call phpInfo() if on a web server
         if (!CLI) {
-            $queryStr = self::getUrlQueryString();
-            $params   = [];
-            parse_str($queryStr, $params);
-            unset($params['__phpinfo__'], $params['__config__']);
-            $queryPhpInfoTask            = http_build_query($params + ['__phpinfo__' => ''],                      null, '&amp;');
-            $queryPhpInfoAfterConfigTask = http_build_query($params + ['__config__'  => '', '__phpinfo__' => ''], null, '&amp;');
+            $get = $_GET;
+            $isConfig = isSet($get['__config__']);
+            unset($get['__phpinfo__'], $get['__config__']);
+
+            // before/after link
+            if ($isConfig) $queryStr = http_build_query($get + ['__phpinfo__'=>'',                  ], null, '&amp;');
+            else           $queryStr = http_build_query($get + ['__config__' =>'', '__phpinfo__'=>''], null, '&amp;');
             ?>
             <div style="clear:both; text-align:center; margin:0 0 15px 0; padding:20px 0 0 0; font-size:12px; font-weight:bold; font-family:sans-serif">
-                <a href="?<?=$queryPhpInfoTask           ?>" style="display:inline-block; width:180px; min-height:15px; margin:0 10px; padding:10px 0; background-color:#ccf; color:#222; border:1px outset #666; white-space:nowrap" title="PHP settings at start of the script">At Script Start</a>
-                <a href="?<?=$queryPhpInfoAfterConfigTask?>" style="display:inline-block; width:180px; min-height:15px; margin:0 10px; padding:10px 0; background-color:#ccf; color:#222; border:1px outset #666; white-space:nowrap" title="PHP settings after application configuration">After Configuration</a>
+                <a href="?<?=$queryStr?>"
+                   style="display:inline-block; min-width:220px; min-height:15px; margin:0 10px; padding:10px 0; background-color:#ccf; color:#222; border:1px outset #666; white-space:nowrap"
+                   title="PHP settings <?=$isConfig ? 'before':'after'?> application configuration">
+                   <?=$isConfig ? 'Before':'After'?> Application Configuration
+                </a>
             </div>
-            <?
+            <?php
             echo NL;
             phpInfo();
         }
