@@ -13,6 +13,7 @@ use rosasurfer\exception\UnimplementedFeatureException;
 use rosasurfer\util\PHP;
 
 use function rosasurfer\isRelativePath;
+use const rosasurfer\NL;
 
 
 /**
@@ -79,9 +80,16 @@ class Config extends Object implements ConfigInterface {
         foreach ($files as $i => $file) {
             if (!is_string($file)) throw new IllegalTypeException('Illegal type of parameter $files['.$i.']: '.getType($file));
 
-            $checkedFiles[$file] = is_file($file);
-            isRelativePath($file) && $file=getCwd().PATH_SEPARATOR.$file;
-            $this->lastDirectory = dirName($file);                  // track the path of the last file
+            $isFile = is_file($file);
+
+            if ($isFile) {
+                $file = realPath($file);
+                $this->lastDirectory = dirName($file);                  // track the path of the last existing file
+            }
+            else if (isRelativePath($file)) {
+                $file = getCwd().PATH_SEPARATOR.$file;
+            }
+            $checkedFiles[$file] = $isFile;
         }
         $this->files = $checkedFiles;
 
@@ -336,6 +344,48 @@ class Config extends Object implements ConfigInterface {
      * {@inheritdoc}
      */
     public function info() {
-        return __METHOD__.'()  not yet implemented';
+        $lines[] = 'Configuration files:';
+        $lines[] = '--------------------';
+
+        foreach ($this->files as $file => $exists) {
+            $lines[] = ($exists ? 'OK':'? ').'   '.$file;
+        }
+
+        $lines[] = '';                                                          // indexed array
+        $lines[] = '';
+        $lines[] = 'Configuration:';
+        $lines[] = '--------------';
+
+        $maxKeyLength = 0;
+        $values = $this->sPrintValues([], $this->properties, $maxKeyLength);    // associative array
+        kSort($values);
+
+        foreach ($values as $key => &$value) {
+            $value = str_pad($key, $maxKeyLength, ' ', STR_PAD_RIGHT).' = '.$value;
+        }; unset($value);
+
+        return join(NL, $lines + $values);
+    }
+
+
+    /**
+     *
+     */
+    private function sPrintValues($node, $values, &$maxKeyLength) {
+        $self   = __FUNCTION__;
+        $result = [];
+
+        foreach ($values as $subkey => $value) {
+            $key          = join('.', array_merge($node, [$subkey]));
+            $maxKeyLength = max(strLen($key), $maxKeyLength);
+
+            if (is_array($value)) {
+                $result += $this->$self(array_merge($node, [$subkey]), $value, $maxKeyLength);
+            }
+            else {
+                $result[$key] = $value;
+            }
+        }
+        return $result;
     }
 }

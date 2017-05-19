@@ -290,10 +290,9 @@ class PHP extends StaticClass {
         // (9) break out of unfortunate HTML tags if on a web server
         if (!CLI) {
             ?>
-            <a attr1="" attr2=''></a></script></img></select></textarea></li></ul></font></pre></tt></code></i></b></span></div>
             <div align="left" style="clear:both;
                                      position:relative; z-index:65535; left:initial; top:initial;
-                                     width:initial; height:initial
+                                     width:initial; height:initial;
                                      margin:0; padding:4px;
                                      font:normal normal 12px/normal arial,helvetica,sans-serif;
                                      color:black; background-color:white">
@@ -312,14 +311,12 @@ class PHP extends StaticClass {
             $params   = [];
             parse_str($queryStr, $params);
             unset($params['__phpinfo__'], $params['__config__']);
-            $queryPhpInfo       = http_build_query($params + ['__phpinfo__' => ''],                      null, '&amp;');
-            $queryConfigInfo    = http_build_query($params + ['__config__'  => ''],                      null, '&amp;');
-            $queryConfigPhpInfo = http_build_query($params + ['__config__'  => '', '__phpinfo__' => ''], null, '&amp;');
+            $queryPhpInfoTask            = http_build_query($params + ['__phpinfo__' => ''],                      null, '&amp;');
+            $queryPhpInfoAfterConfigTask = http_build_query($params + ['__config__'  => '', '__phpinfo__' => ''], null, '&amp;');
             ?>
             <div style="clear:both; text-align:center; margin:0 0 15px 0; padding:20px 0 0 0; font-size:12px; font-weight:bold; font-family:sans-serif">
-                <a href="?<?=$queryPhpInfo      ?>" style="display:inline-block; width:150px; min-height:15px; margin:0 10px; padding:10px 0; background-color:#ccf; color:#222; border:1px outset #666; white-space:nowrap" title="PHP settings at start of the script">At Script Start</a>
-                <a href="?<?=$queryConfigInfo   ?>" style="display:inline-block; width:150px; min-height:15px; margin:0 10px; padding:10px 0; background-color:#ccf; color:#222; border:1px outset #666; white-space:nowrap" title="Application configuration">Configuration</a>
-                <a href="?<?=$queryConfigPhpInfo?>" style="display:inline-block; width:150px; min-height:15px; margin:0 10px; padding:10px 0; background-color:#ccf; color:#222; border:1px outset #666; white-space:nowrap" title="PHP settings after application configuration">After Configuration</a>
+                <a href="?<?=$queryPhpInfoTask           ?>" style="display:inline-block; width:180px; min-height:15px; margin:0 10px; padding:10px 0; background-color:#ccf; color:#222; border:1px outset #666; white-space:nowrap" title="PHP settings at start of the script">At Script Start</a>
+                <a href="?<?=$queryPhpInfoAfterConfigTask?>" style="display:inline-block; width:180px; min-height:15px; margin:0 10px; padding:10px 0; background-color:#ccf; color:#222; border:1px outset #666; white-space:nowrap" title="PHP settings after application configuration">After Configuration</a>
             </div>
             <?
             echo NL;

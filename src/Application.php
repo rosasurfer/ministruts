@@ -69,42 +69,35 @@ class Application extends Object {
         $appId = $config->get('app.id', null);
         if (!$appId) $config->set('app.id', subStr(md5($config->get('app.dir.root')), 0, 16));
 
-        // (3) if on localhost check for PHP admin tasks
-        // __phpinfo__               : show PHP config at start of script
-        // __config__                : show application config (may contain further PHP config settings)
-        // __config__   + __phpinfo__: show PHP config after application configuration
-        // __shutdown__ + __phpinfo__: show PHP config at shutdown (end of script)
-        // __cache__                 : show cache admin interface
-        $phpInfoTaskAfterConfig = $configInfoTask = $cacheInfoTask = $atShutdown = false;
+        // (3) check for PHP admin tasks if the remote IP has allowance
+        // __phpinfo__             : show PHP config at start of script
+        // __config__ + __phpinfo__: show PHP config after loading of the application configuration
+        // __cache__               : show cache admin interface
+        $phpInfoTask = $phpInfoAfterConfigTask = $configInfoTask = $cacheInfoTask = false;
 
-        if (isSet($_GET['__phpinfo__'])) {
+        if (isSet($_GET['__phpinfo__']) || isSet($_GET['__config__']) || isSet($_GET['__cache__'])) {
             if (LOCALHOST || $this->isWhiteListedRemoteIP()) {
                 foreach ($_GET as $param => $value) {
                     if ($param == '__phpinfo__') {
-                        if ($atShutdown) {
-                            register_shutdown_function(function() {
-                                PHP::phpInfo();
-                                exit(0);
-                            });
-                        }
-                        else if ($configInfoTask) {
-                            $phpInfoTaskAfterConfig = true;
+                        if ($configInfoTask) {
+                            $phpInfoTask            = false;
+                            $phpInfoAfterConfigTask = true;
                         }
                         else {
-                            PHP::phpInfo();
-                            exit(0);
+                            $phpInfoTask = true;
                         }
                         break;                                    // stop parsing after "__phpinfo__"
                     }
                     else if ($param == '__config__') {
                         $configInfoTask = true;
+                        if ($phpInfoTask) {
+                            $phpInfoTask            = false;
+                            $phpInfoAfterConfigTask = true;
+                        }
                     }
                     else if ($param == '__cache__') {
                         $cacheInfoTask = true;
                         break;                                    // stop parsing after "__cache__"
-                    }
-                    else if ($param == '__shutdown__') {
-                        $atShutdown = true;
                     }
                 }
             }
@@ -115,11 +108,22 @@ class Application extends Object {
 
         // (5) execute "config-info" task if enabled
         if ($configInfoTask) {
-            //echoPre(Config::getDefault()->info());
+            ?>
+            <div align="left" style="clear:both;
+                                     position:relative; z-index:65535; left:initial; top:initial;
+                                     width:initial; height:initial:
+                                     margin:0; padding:4px;
+                                     font:normal normal 12px/normal arial,helvetica,sans-serif;
+                                     color:black; background-color:white">
+                <pre style="margin-bottom:24px"><?=print_r(Config::getDefault()->info(), true)?></pre>
+            </div>
+            <?
+            if (!$phpInfoTask && !$phpInfoAfterConfigTask)
+                exit(0);
         }
 
         // (6) execute "phpinfo" after-config task if enabled
-        if ($phpInfoTaskAfterConfig) {
+        if ($phpInfoTask || $phpInfoAfterConfigTask) {
             PHP::phpInfo();
             exit(0);
         }
@@ -127,7 +131,6 @@ class Application extends Object {
         // (7) execute "cache-info" task if enabled
         if ($cacheInfoTask) {
             //include(MINISTRUTS_ROOT.'/src/debug/apc.php'); // TODO: not yet implemented
-            exit(0);
         }
 
         // (8) enforce mission-critical PHP requirements (after running any admin tasks)
