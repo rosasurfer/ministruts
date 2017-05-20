@@ -244,6 +244,8 @@ namespace {
 
 
     if (!function_exists('pcntl_signal')) {
+        define('SIGINT' , 2);
+
         /**
          * @param  int          $signo
          * @param  callable|int $handler
