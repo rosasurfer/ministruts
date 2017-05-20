@@ -82,12 +82,14 @@ abstract class PersistableObject extends Object {
         foreach ($mapping['relations'] as $name => $property) {
             if (is_object($this->$name)) {
                 /** @var PersistableObject $object */
-                $object = $this->$name;                             // property access level encoding
-                $this->$name = $object->getObjectId();              // ------------------------------
-            }                                                       // private:   "\0{className}\0{propertyName}"
-            $protected = "\0*\0".$name;                             // protected: "\0*\0{propertyName}"
-            $public    = $name;                                     // public:    "{propertyName}"
-            unset($array[$protected], $array[$public]);
+                $object = $this->$name;
+                $this->$name = $object->getObjectId();
+            }
+            else if (is_array($this->$name)) {                      // property access level encoding
+                $protected = "\0*\0".$name;                         // ------------------------------
+                $public    = $name;                                 // private:   "\0{className}\0{propertyName}"
+                unset($array[$protected], $array[$public]);         // protected: "\0*\0{propertyName}"
+            }                                                       // public:    "{propertyName}"
         }
         return array_keys($array);
     }
