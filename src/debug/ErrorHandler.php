@@ -32,7 +32,6 @@ use const rosasurfer\L_ERROR;
 use const rosasurfer\L_FATAL;
 use const rosasurfer\L_NOTICE;
 use const rosasurfer\L_WARN;
-use const rosasurfer\LOCALHOST;
 use const rosasurfer\NL;
 
 
@@ -252,8 +251,8 @@ class ErrorHandler extends StaticClass {
 
         // Exceptions thrown from within the exception handler will not be passed back to the handler again. Instead the
         // script terminates with an uncatchable fatal error.
-        catch (\Exception $second) {                        // the application is crashing, last try to log
-            $indent = ' ';
+        catch (\Exception $second) {
+            $indent = ' ';                                  // the application is crashing, last try to log
 
             // secondary exception
             $msg2  = 'PHP [FATAL] Unhandled '.trim(DebugHelper::composeBetterMessage($second)).NL;
@@ -281,16 +280,27 @@ class ErrorHandler extends StaticClass {
             $msg  = $msg2.NL;
             $msg .= $indent.'caused by'.NL;
             $msg .= $msg1;
-            $msg  = str_replace(chr(0), '?', $msg);                 // replace NUL bytes which mess up the logfile
+            $msg  = str_replace(chr(0), '?', $msg);         // replace NUL bytes which mess up the logfile
 
+            if (CLI)                                        // full second exception
+                echo $msg;
             error_log(trim($msg), ERROR_LOG_DEFAULT);
         }
 
-
-        // display a minimal hint to prevent an empty web page
-        if (!CLI && ($second || (!LOCALHOST && !Application::isWhiteListedRemoteIP()))) {
-            $hint = 'see error log'.(LOCALHOST || Application::isWhiteListedRemoteIP() ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'');
-            echoPre('application error ('.$hint.')');
+        // web: prevent an empty page
+        if (!CLI) {
+            try {
+                if (Application::isWhiteListedRemoteIP()) {
+                    if ($second) {                          // full second exception, full log location
+                        echoPre($second);
+                        echoPre('error log: '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : 'web server'));
+                    }
+                }
+                else echoPre('application error (see error log)');
+            }
+            catch (\Exception $third) {
+                echoPre('application error (see error log)');
+            }
         }
     }
 

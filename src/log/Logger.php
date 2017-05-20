@@ -158,7 +158,7 @@ class Logger extends StaticClass {
 
         // (1) application default loglevel: if not configured the built-in default loglevel
         if (!$config=Config::getDefault())
-            throw new RuntimeException('Service locator returned invalid default config: '.getType($config));
+            throw new RuntimeException('Service locator returned empty default config: '.getType($config));
         $logLevel = $config->get('log.level', null);
 
         if (is_string($logLevel) || isSet($logLevel[''])) {   // the application and/or some class loglevels are configured
@@ -268,7 +268,7 @@ class Logger extends StaticClass {
         static $logLevels = null;
         if ($logLevels === null) {
             if (!$config=Config::getDefault())
-                throw new RuntimeException('Service locator returned invalid default config: '.getType($config));
+                throw new RuntimeException('Service locator returned empty default config: '.getType($config));
 
             $logLevels = $config->get('log.level', []);
             if (is_string($logLevels))
@@ -440,7 +440,7 @@ class Logger extends StaticClass {
             $message = str_replace(EOL_UNIX, EOL_WINDOWS, $message);
         $message = str_replace(chr(0), '?', $message);                 // replace NUL bytes which destroy the mail
 
-        if (!$config=Config::getDefault()) throw new RuntimeException('Service locator returned invalid default config: '.getType($config));
+        if (!$config=Config::getDefault()) throw new RuntimeException('Service locator returned empty default config: '.getType($config));
         $sender  = $config->get('mail.from', null);
         $headers = [];
         $sender && $headers[]='From: '.$sender;

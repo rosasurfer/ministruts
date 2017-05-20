@@ -16,7 +16,7 @@ trait ObjectTrait {
 
 
     /**
-     * Magic method. Catches other-wise fatal errors triggered by calls to non-existing instance methods.
+     * Magic method catching other-wise fatal errors triggered by calls of non-existing instance methods.
      *
      * @param  string $method - name of the non-existing method
      * @param  array  $args   - arguments passed to the method call
@@ -41,7 +41,7 @@ trait ObjectTrait {
 
 
     /**
-     * Magic method. Catches other-wise fatal errors triggered by calls to non-existing static methods.
+     * Magic method catching other-wise fatal errors triggered by calls of non-existing static methods.
      *
      * @param  string $method - name of the non-existing method
      * @param  array  $args   - arguments passed to the method call
@@ -55,9 +55,10 @@ trait ObjectTrait {
 
 
     /**
-     * Magic method. Catches the other-wise unnoticed setting of an inaccessible property.
+     * Magic method catching other-wise unnoticed write access of undefined properties and fatal errors triggered by write
+     * access of inaccessible properties.
      *
-     * @param  string $property - name of the undeclared property
+     * @param  string $property - name of the undefined property
      * @param  mixed  $value    - passed property value
      *
      * @throws RuntimeException
@@ -65,7 +66,6 @@ trait ObjectTrait {
     public function __set($property, $value) {
         $trace = debug_backTrace(DEBUG_BACKTRACE_IGNORE_ARGS|DEBUG_BACKTRACE_PROVIDE_OBJECT);
         $class = get_class($trace[0]['object']);
-        //trigger_error('Undefined or inaccessible property '.$class.'::$'.$property, E_USER_ERROR);
         throw new RuntimeException('Undefined or inaccessible property '.$class.'::$'.$property);
     }
 

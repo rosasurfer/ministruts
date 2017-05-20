@@ -39,7 +39,7 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Magic method. Provides default get/set implementations for mapped properties.
+     * Magic method providing default get/set implementations for mapped properties.
      *
      * @param  string $method - name of the called and undefined method
      * @param  array  $args   - arguments passed to the method call

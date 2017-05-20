@@ -222,7 +222,7 @@ class SMTPMailer extends Mailer {
         if (!is_string($receiver)) throw new IllegalTypeException('Illegal type of parameter $receiver: '.getType($receiver));
 
         if (!$config=Config::getDefault())
-            throw new RuntimeException('Service locator returned invalid default config: '.getType($config));
+            throw new RuntimeException('Service locator returned empty default config: '.getType($config));
 
         $forced = $config->get('mail.forced-receiver', '');
         if (!is_string($forced)) throw new IllegalTypeException('Invalid type of variable $forced: '.getType($forced).' (not string)');

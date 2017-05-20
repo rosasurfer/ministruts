@@ -85,7 +85,7 @@ function queryDNS($domain, $type) {
 
 
 if (!$config=Config::getDefault())
-    throw new RuntimeException('Service locator returned invalid default config: '.getType($config));
+    throw new RuntimeException('Service locator returned empty default config: '.getType($config));
 
 
 // normale DNS-Eintraege ueberpruefen (A, MX, NS, TXT, etc.)

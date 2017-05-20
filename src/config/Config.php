@@ -81,18 +81,13 @@ class Config extends Object implements ConfigInterface {
             if (!is_string($file)) throw new IllegalTypeException('Illegal type of parameter $files['.$i.']: '.getType($file));
 
             $isFile = is_file($file);
+            if      ($isFile)               $file = realPath($file);
+            else if (isRelativePath($file)) $file = getCwd().PATH_SEPARATOR.$file;
 
-            if ($isFile) {
-                $file = realPath($file);
-                $this->lastDirectory = dirName($file);                  // track the path of the last existing file
-            }
-            else if (isRelativePath($file)) {
-                $file = getCwd().PATH_SEPARATOR.$file;
-            }
             $checkedFiles[$file] = $isFile;
+            $this->lastDirectory = dirName($file);                  // track the path of the last specified file
         }
         $this->files = $checkedFiles;
-
 
         // load existing files
         $oldDetectStatus = PHP::ini_get_bool('auto_detect_line_endings');

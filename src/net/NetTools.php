@@ -67,7 +67,7 @@ final class NetTools extends StaticClass {
             $proxys = array();
 
             if (!$config=Config::getDefault())
-                throw new RuntimeException('Service locator returned invalid default config: '.getType($config));
+                throw new RuntimeException('Service locator returned empty default config: '.getType($config));
 
             // Config einlesen
             $value = $config->get('proxys', null);

@@ -66,7 +66,7 @@ final class Cache extends StaticClass {
 
         if (!isSet(self::$caches[$label])) {
             if (!$config=Config::getDefault())
-                throw new RuntimeException('Service locator returned invalid default config: '.getType($config));
+                throw new RuntimeException('Service locator returned empty default config: '.getType($config));
 
             // Cache-Konfiguration auslesen und Cache instantiieren
             $class   = $config->get('cache.'.$label.'.class');
