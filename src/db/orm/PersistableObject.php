@@ -70,6 +70,30 @@ abstract class PersistableObject extends Object {
 
 
     /**
+     * Prevent serialization of related objects (transient behaviour). Instead store the physical property value.
+     * After __wakeup() related objects will be re-fetched on access.
+     *
+     * @return string[] - array of property names to serialize
+     */
+    public function __sleep() {
+        $mapping = $this->dao()->getMapping();
+        $array   = (array) $this;
+
+        foreach ($mapping['relations'] as $name => $property) {
+            if (is_object($this->$name)) {
+                /** @var PersistableObject $object */
+                $object = $this->$name;                             // property access level encoding
+                $this->$name = $object->getObjectId();              // ------------------------------
+            }                                                       // private:   "\0{className}\0{propertyName}"
+            $protected = "\0*\0".$name;                             // protected: "\0*\0{propertyName}"
+            $public    = $name;                                     // public:    "{propertyName}"
+            unset($array[$protected], $array[$public]);
+        }
+        return array_keys($array);
+    }
+
+
+    /**
      * Return the logical value of a mapped property.
      *
      * @param  string $property - property name
