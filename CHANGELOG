@@ -1,4 +1,9 @@
 
+2017-05-21
+
+   - struts-config: configurable single or mixed MVC push/pull support
+
+
 2017-05-17
 
    - config: move project layout to regular configuration and get rid of "config/dirs.php"
