@@ -47,13 +47,13 @@ parameters:
     polluteCatchScopeWithTryAssignments:    true
     
     ignoreErrors:
-        - '/Call to ((static )?method|function) [^ ]+ with incorrect case:/'                                    # seriously?
-        - '/Array \(([^ ]+)\[\]\) does not accept (\1\|)?null\b/'                                               # NULL should be considered a value, not a type
-        - '/(Static )?property [^ ]+ \(([^ ]+)\) does not accept (\2\|)?null\b/i'                               # - dito -
-        - '/Parameter #[0-9]+ [^ ]+ of class [^ ]+ constructor expects ([^ ]+), (\1\|)?null given\b/'           # - dito -
-        - '/Parameter #[0-9]+ [^ ]+ of (static )?(function|method) [^ ]+ expects ([^ ]+), (\3\|)?null given\b/' # - dito -
-        - '/Calling method [^ ]+ on possibly nullable type [^ ]+\|null\b/'
-        - "/Casting to (bool|int|float|string) something that's already (bool|int|float|string)./"              # too simplified implementation
+        - '/Call to ((static )?method|function) [^ ]+ with incorrect case:/'                                        # seriously?
+        - '/Array \(([^ ]+)\[\]\) does not accept (\1\|)?null\b/'                                                   # NULL should be considered a value, not a type
+        - '/(Static )?property [^ ]+ \(([^ ]+)\) does not accept (\2\|)?null\b/i'                                   # - dito -
+        - '/Parameter #[0-9]+ [^ ]+ of class [^ ]+ constructor expects ([^ ]+), (\1\|)?null given\b/'               # - dito -
+        - '/Parameter #[0-9]+ [^ ]+ of (static )?(function|method) [^ ]+ expects ([^ ]+), (\3\|)?null given\b/'     # - dito -
+        - '/Calling method [^ ]+ on possibly nullable type [^ ]+\|null\b/'                                          
+        - "/Casting to (bool|int|float|string) something that's already (bool|int|float|string)./"                  # too simple implementation
         - '/Strict comparison using [=!]== between (int|string) and null will always evaluate to (true|false)\b/'
 
         # unfixed PHPStan bugs 
