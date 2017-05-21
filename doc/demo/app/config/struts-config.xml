@@ -17,8 +17,8 @@
 
 
 		<!-- home -->
-		<tile name=".home"  extends-tile=".default">
-			<set name="content"  value="tiles/home.phtml"/>
+		<tile name=".home"  extends=".default">
+			<include name="content"  value="tiles/home.phtml"/>
 		</tile>
 	</tiles>
 

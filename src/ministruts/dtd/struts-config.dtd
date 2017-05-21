@@ -109,21 +109,21 @@
 
    name      The unique identifier of the forward. Used to select the resource that should complete the request/response.
 
-   include   The name of a tiles definition or a file to include. Tiles definition names must start with a dot ".", file
-             names must not start with a dot ".". Exactly one of "include", "redirect" or "alias-of" must be specified.
+   include   The name of a tile definition or a file to include. Tile definition names must start with a dot ".", file names 
+             must not start with a dot ".". Exactly one of "include", "redirect" or "alias" must be specified.
 
    redirect  The module-relative URI to which a redirect instruction should be issued. Exactly one of "include", "redirect"
-             or "alias-of" must be specified.
+             or "alias" must be specified.
 
-   alias-of  The name of another "forward" element to use instead of the current one (local forwards are preferred over
-             global ones). Exactly one of "include", "redirect" or "alias-of" must be specified.
+   alias     The name of another "forward" element to use instead of the current one (local forwards are preferred over
+             global ones). Exactly one of "include", "redirect" or "alias" must be specified.
 -->
 <!ELEMENT forward (set*)>
 <!ATTLIST forward
           name        %LogicalName;     #REQUIRED
           include     %ResourcePath;    #IMPLIED
           redirect    %RequestPath;     #IMPLIED
-          alias-of    %LogicalName;     #IMPLIED
+          alias       %LogicalName;     #IMPLIED
 >
 
 
@@ -209,11 +209,11 @@
 
 
 <!--
-   The "tiles" element describes the set of available Tiles objects. Individual tiles are configured through nested "tile"
+   The "tiles" element describes the set of available tiles objects. Individual tiles are configured through nested "tile"
    elements.
 
    class      Class name of a Tile subclass used as the Module's default Tile implementation.
-              [default: Tile]
+              [default: rosasurfer\ministruts\Tile]
    
    namespace  The PHP namespace used by view templates and tiles. The namespace will be populated with the configured view 
               helpers (constants and helper functions). Valid namespace separators are slash "/" and backslash "\".  
@@ -227,44 +227,49 @@
 
 
 <!--
-   The "tile" element describes a single Tile that can be inserted in a page. It is identified by its logical name.
+   The "tile" element describes a view fragment that can be inserted into a page. It is identified by its logical name.
 
-   name          The unique identifier for this tile. Tile names must start with a dot ".". It is recommended to name tile
-                 template definitions (partals/layouts which must be etxended) and tile view definitions (partials which are
-                 ready to be inserted) differently, e.g. templates as ".{name}.tpl" and insertables as ".{name}".
-
-   file          The path of the file to insert relative to the "file-base" location of the module. Exactly one of "file",
-                 "extends-tile" or "alias-of" must be specified.
-
-   extends-tile  Name of a tile that is used as ancestor of this tile. Tile names must start with a dot ".". All attributes
-                 from the ancestor are available to the new tile. Any attribute inherited from the ancestor can be
-                 overwritten by providing a new value. Exactly one of "file", "extends-tile" or "alias-of" must be
-                 specified.
-
-   alias-of      Name of another tile that this tile's name is an alias for. Tile names must start with a dot ".". If this
-                 attribute is set the tile can not have child elements. Exactly one of "file", "extends-tile" or "alias-of"
-                 must be specified.
+   name      The unique identifier for this tile. Tile names must start with a dot ".". 
+             
+   file      The path of the file to insert relative to the "file-base" location of the module. Exactly one of "file", 
+             "extends" or "alias" must be specified.
+             
+   extends   Name of a tile that is used as an ancestor of this tile. Tile names must start with a dot ".". All attributes 
+             from the ancestor are available to the new tile. Any attribute inherited from the ancestor can be overwritten 
+             by providing a new value. Exactly one of "file", "extends" or "alias" must be specified.
+             
+   alias     Name of another tile to use instead of the current one. Tile names must start with a dot ".". If this attribute 
+             is set the tile can not have child elements. Exactly one of "file", "extends" or "alias" must be specified.
+             
+   push      Whether or not data exchange between the the resulting view and model/controller supports the MVC push model. 
+             Cannot be used in combination with the "alias" atrribute.   
+             If this value is set to "true" all variables in the Page context are made available to the resulting view as 
+             regular PHP variables (MVC push model). If the value is set to "false" the push model is not supported. 
+             The MVC pull model is always supported, regardless of this setting. 
+             [default: "false"]
 -->
 <!ELEMENT tile ((include*, set*)*)>
 <!ATTLIST tile
-          name            %LogicalName;     #REQUIRED
-          file            %ResourcePath;    #IMPLIED
-          extends-tile    %LogicalName;     #IMPLIED
-          alias-of        %LogicalName;     #IMPLIED
+          name       %LogicalName;     #REQUIRED
+          file       %ResourcePath;    #IMPLIED
+          extends    %LogicalName;     #IMPLIED
+          alias      %LogicalName;     #IMPLIED
+          push       %Boolean;         "false"
 >
 
 
 <!--
    The "include" element describes a resource to insert into a tile, i.e. a page fragment or another tile.
 
-   name     Name of the variable under which the resource is made available in the resulting view.
+   name   Name of the variable under which the resource is made available in the resulting view.
 
-   include  The name of a tiles definition or a file to include. Tile names must start with a dot ".", file names must not
-            start with a dot. All properties from the surrounding tile are also available to the inserted element. Any
-            property inherited from the surrounding tile can be overwritten by providing a new value. However, this will not
-            modify the original value in the surrounding tile.
-            If this attribute is omitted the tile containing the "include" element is marked as a template which can be 
-            extended but cannot be rendered independently.
+   value  The name of a tiles definition or a file to include. Tile names must start with a dot ".", file names must not 
+          start with a dot. All properties from the surrounding tile are also available to the inserted element. Any property 
+          inherited from the surrounding tile can be overwritten by providing a new value. However, this will not modify the 
+          original value in the surrounding tile. 
+          If this attribute is omitted the surrounding tile is marked as a template and cannot be rendered independently.
+          If a template is extended by another tile the extending tile can assign and override attributes of the extended 
+          tile. If all "include" elements of a tile have an assigned value the tile can be rendered.  
 -->
 <!ELEMENT include EMPTY>
 <!ATTLIST include
@@ -274,17 +279,17 @@
 
 
 <!--
-   The "set" element describes an additional variable in a tiles definition or an additional property in a class. The value
-   of this element can be specified as an XML attribute or in the body of the element.
-   The "set" element is especially useful in "tile" elements where the value is made available in the resulting view as a
-   regular PHP variable. The "set" element can also be used in custom classes of "forward" or "mapping" elements. When the
-   object representing the surrounding element is instantiated, the setter for the property is called and passed the
-   specified value.
+   The "set" element describes an additional variable or class property. It can be used in "tile", "forward" and "mapping" 
+   elements. The value of this element can be specified as an XML attribute or in the body of the element.
+   
+   If the "set" element is used in a tile the value is made available in the resulting view as a regular PHP variable. If 
+   the "set" element is used in a "forward" or "mapping" element, after the object representing the element is instantiated, 
+   the setter for the property is called and passed the specified value. 
 
-   name   Name of the tiles variable or class property.
+   name   Name of the variable or class property.
 
-   type   The type of the created or passed value. Can be "bool", "int", "float" or "string". If no type is specified the 
-          type "string" is used.
+   type   The type of the created or passed value. Can be "bool", "int", "float" or "string".  
+          [default: "string"]
 
    value  String representation of the variable or property value. The value can be specified as an XML attribute or in the
           body of the element.

@@ -9,8 +9,6 @@ use rosasurfer\exception\IllegalStateException;
 use function rosasurfer\strLeft;
 use function rosasurfer\strRightFrom;
 
-use const rosasurfer\LOCALHOST;
-
 
 /**
  * Tile
@@ -29,6 +27,9 @@ class Tile extends Object {
 
     /** @var string - vollstaendiger Dateiname dieser Tile */
     protected $fileName;
+
+    /** @var bool - whether or not MVC push model is activated for the tile */
+    protected $pushModelSupport;
 
     /** @var Tile[] - nested tiles */
     protected $nestedTiles = [];
@@ -104,6 +105,37 @@ class Tile extends Object {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
         $this->fileName = $filename;
+        return $this;
+    }
+
+
+    /**
+     * Whether or not the MVC push model is activated for the tile.
+     *
+     * @return bool|null - configured state or NULL if the state is inherited from a surrounding element
+     */
+    public function isPushModelSupport() {
+        return $this->pushModelSupport;
+    }
+
+
+    /**
+     * Enable/disable push model support for the tile.
+     *
+     * @param  bool $state
+     *
+     * @return $this
+     */
+    public function setPushModelSupport($state) {
+        if ($this->configured) throw new IllegalStateException('Configuration is frozen');
+
+        $this->pushModelSupport = (bool) $state;
+
+        foreach ($this->nestedTiles as $tile) {
+            if ($tile && $tile->isPushModelSupport()===null) {
+                $tile->setPushModelSupport($state);
+            }
+        }
         return $this;
     }
 
@@ -208,8 +240,13 @@ class Tile extends Object {
         $properties['form'    ] = $request->getAttribute(ACTION_FORM_KEY);
         $properties['page'    ] = Page::me();
 
+        if ($this->isPushModelSupport()) {
+            $pageValues = Page::me()->values();
+            $properties = array_merge($properties, $pageValues);
+        }
+
         $tileHint = false;
-        if ($this->parent && (LOCALHOST || Application::isWhiteListedRemoteIP())) {
+        if ($this->parent && Application::isWhiteListedRemoteIP()) {
             $rootDir = Config::getDefault()->get('app.dir.root');
             $file    = $this->fileName;
             $file    = strRightFrom($file, $rootDir.DIRECTORY_SEPARATOR, 1, false, $file);
@@ -234,11 +271,10 @@ class Tile extends Object {
  * Populate the function context with the passed properties and include the specified file. Prevents the view from accessing
  * the Tile instance (variable $this is not available).
  *
- * @param  string $___        - name of the file to include (somewhat obfuscated)
- * @param  array  $properties - properties accessible to the view
+ * @param  string $file   - name of the file to include
+ * @param  array  $values - values accessible to the view
  */
-function includeFile($___, array $properties) {
-    extract($properties);
-    unset($properties);
-    include($___);
+function includeFile($file_025d513c6bc20fd32378b051168b1dbb, $values_025d513c6bc20fd32378b051168b1dbb) {
+    extract($values_025d513c6bc20fd32378b051168b1dbb);
+    include($file_025d513c6bc20fd32378b051168b1dbb);
 }

@@ -40,7 +40,6 @@ use const rosasurfer\L_FATAL;
 use const rosasurfer\L_INFO;
 use const rosasurfer\L_NOTICE;
 use const rosasurfer\L_WARN;
-use const rosasurfer\LOCALHOST;
 use const rosasurfer\NL;
 use const rosasurfer\WINDOWS;
 
@@ -174,7 +173,7 @@ class Logger extends StaticClass {
 
 
         // (2) PrintHandler: enabled for local access or if explicitely enabled
-        self::$printHandler = CLI || LOCALHOST || Application::isWhiteListedRemoteIP() || PHP::ini_get_bool('display_errors');
+        self::$printHandler = CLI || Application::isWhiteListedRemoteIP() || PHP::ini_get_bool('display_errors');
 
 
         // (3) MailHandler: enabled if mail receivers are configured
@@ -747,7 +746,7 @@ class Logger extends StaticClass {
             $html     .= '<b>['.strToUpper(self::$logLevels[$level]).']</b> '.nl2br(htmlSpecialChars($type.$msg, ENT_QUOTES|ENT_SUBSTITUTE)).'<br>in <b>'.$file.'</b> on line <b>'.$line.'</b><br>';
             $traceStr  = $indent.'Stacktrace:'.NL.' -----------'.NL;
             $traceStr .= DebugHelper::getBetterTraceAsString($loggable, $indent);
-            $html     .= '<span style="clear:both"></span>'.printPretty($traceStr, true).'<br>';
+            $html     .= '<span style="clear:both"></span><br>'.printPretty($traceStr, true).'<br>';
         }
 
         // append an existing context exception
@@ -762,7 +761,7 @@ class Logger extends StaticClass {
 
         // append the current HTTP request
         if (!CLI) {
-            $html .= '<br style="clear:both">'.printPretty('Request:'.NL.'--------'.NL.Request::me(), true).'<br>';
+            $html .= '<br style="clear:both"><br>'.printPretty('Request:'.NL.'--------'.NL.Request::me(), true).'<br>';
         }
 
         // close and store the HTML tag

@@ -22,8 +22,6 @@ use rosasurfer\exception\IllegalTypeException;
  *    $var = $page->title;
  *
  * Gibt die gespeicherte Eigenschaft mit dem Namen "title" zurueck.
- *
- * @todo   Properties aus dem Tiles-Context muessen auch in der Page erreichbar sein
  */
 class Page extends Singleton {
 
@@ -74,7 +72,7 @@ class Page extends Singleton {
      * @return mixed        - Wert oder NULL, wenn die Eigenschaft nicht existiert
      */
     public function __get($name) {
-        return isSet($this->properties[$name]) ? $this->properties[$name] : null;
+        return array_key_exists($name, $this->properties) ? $this->properties[$name] : null;
     }
 
 
@@ -94,5 +92,15 @@ class Page extends Singleton {
         else {
             unset($this->properties[$name]);
         }
+    }
+
+
+    /**
+     * Return all page values stored in the instance.
+     *
+     * @return array - values
+     */
+    public function values() {
+        return self::me()->properties;
     }
 }

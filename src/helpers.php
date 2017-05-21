@@ -188,9 +188,11 @@ function printPretty($var, $return=false, $flushBuffers=true) {
         $str = '<div align="left" style="clear:both;
                                          position:relative; z-index:65535; left:initial; top:initial;
                                          float:left; width:initial; height:initial;
-                                         margin:0; padding:0">
+                                         margin:0; padding:0;
+                                         color:inherit; background-color:inherit">
                     <pre style="width:initial; height:initial;
                                 margin:0; padding:0;
+                                color:inherit; background-color:inherit;
                                 font:normal normal 12px/normal \'Courier New\',courier,serif">'.htmlSpecialChars($str, ENT_QUOTES|ENT_SUBSTITUTE).'</pre>
                 </div>';
     if (!strEndsWith($str, NL))
