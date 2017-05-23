@@ -498,6 +498,18 @@ function normalizeEOL($string, $mode = EOL_UNIX) {
 
 
 /**
+ * Convert an object to an array, including private and protected properties.
+ *
+ * @param  object $object
+ *
+ * @return array
+ */
+function objectToArray($object) {
+    return \rosasurfer\objectToArray($object);
+}
+
+
+/**
  * Alias of getType() for C/C++ enthusiasts.
  *
  * @param  mixed $var

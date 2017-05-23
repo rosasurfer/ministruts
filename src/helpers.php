@@ -808,6 +808,37 @@ function normalizeEOL($string, $mode = EOL_UNIX) {
 
 
 /**
+ * Convert an object to an array, including private and protected properties.
+ *
+ * @param  object $object
+ *
+ * @return array
+ */
+function objectToArray($object) {
+    if (!is_object($object)) throw new IllegalTypeException('Illegal type of parameter $object: '.getType($object));
+
+    $array = (array)$object;
+
+    foreach ($array as $key => $value) {
+        if (strStartsWith($key, "\0*")) {                           // protected
+            $public = strRight($key, -3);
+            if (!array_key_exists($public, $array))
+                $array[$public] = $value;
+        }
+        else if (strStartsWith($key, "\0")) {                       // private
+            $public    = strRightFrom($key, "\0", 2);
+            $protected = "\0*\0".$public;
+            if (!array_key_exists($public, $array) && !array_key_exists($protected, $array))
+                $array[$public] = $value;
+        }
+        else continue;
+        unset($array[$key]);
+    }
+    return $array;
+}
+
+
+/**
  * Alias of getType() for C/C++ enthusiasts.
  *
  * @param  mixed $var
