@@ -33,6 +33,7 @@ use const rosasurfer\L_FATAL;
 use const rosasurfer\L_NOTICE;
 use const rosasurfer\L_WARN;
 use const rosasurfer\NL;
+use rosasurfer\util\PHP;
 
 
 /**
@@ -290,7 +291,7 @@ class ErrorHandler extends StaticClass {
         // web: prevent an empty page
         if (!CLI) {
             try {
-                if (Application::isWhiteListedRemoteIP()) {
+                if (Application::isWhiteListedRemoteIP() || PHP::ini_get_bool('display_errors')) {
                     if ($second) {                          // full second exception, full log location
                         echoPre($second);
                         echoPre('error log: '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : 'web server'));

@@ -153,23 +153,20 @@ class Logger extends StaticClass {
     private static function init() {
         static $initialized = false;
         if ($initialized) return;
+        $config = Config::getDefault();
 
 
-        // (1) application default loglevel: if not configured the built-in default loglevel
-        if (!$config=Config::getDefault())
-            throw new RuntimeException('Service locator returned empty default config: '.getType($config));
-        $logLevel = $config->get('log.level', null);
-
-        if (is_string($logLevel) || isSet($logLevel[''])) {   // the application and/or some class loglevels are configured
+        // (1) resolve the application default loglevel (if not configured the built-in default loglevel)
+        if ($config) {
+            $logLevel = $config->get('log.level', '');
             if (is_array($logLevel))
-                $logLevel = $logLevel[''];
+                $logLevel = isSet($logLevel['']) ? $logLevel[''] : '';
             $logLevel = self::logLevelToId($logLevel) ?: self::DEFAULT_LOGLEVEL;
         }
-        else {                                                // no loglevels are configured
+        else {
             $logLevel = self::DEFAULT_LOGLEVEL;
         }
-        /** @var int $logLevel */
-        self::$appLogLevel = $logLevel = $logLevel;
+        self::$appLogLevel = $logLevel;
 
 
         // (2) PrintHandler: enabled for local access or if explicitely enabled
@@ -178,9 +175,11 @@ class Logger extends StaticClass {
 
         // (3) MailHandler: enabled if mail receivers are configured
         $receivers = [];
-        foreach (explode(',', $config->get('log.mail.receiver', '')) as $receiver) {
-            if ($receiver=trim($receiver))
-                $receivers[] = $receiver;                               // TODO: validate address format
+        if ($config) {
+            foreach (explode(',', $config->get('log.mail.receiver', '')) as $receiver) {
+                if ($receiver=trim($receiver))
+                    $receivers[] = $receiver;                           // TODO: validate address format
+            }
         }
         if ($receivers) {
             if ($forcedReceivers=$config->get('mail.forced-receiver', null)) {
@@ -197,27 +196,32 @@ class Logger extends StaticClass {
 
         // (4) SMSHandler: enabled if SMS receivers are configured (operator settings are checked at log message time)
         self::$smsReceivers = [];
-        foreach (explode(',', $config->get('log.sms.receiver', '')) as $receiver) {
-            if ($receiver=trim($receiver)) {
-                if (strStartsWith($receiver, '+' )) $receiver = subStr($receiver, 1);
-                if (strStartsWith($receiver, '00')) $receiver = subStr($receiver, 2);
-                if (!ctype_digit($receiver)) {
-                    self::log('Invalid SMS receiver configuration: "'.$receiver.'"', L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
-                    continue;
+        if ($config) {
+            foreach (explode(',', $config->get('log.sms.receiver', '')) as $receiver) {
+                if ($receiver=trim($receiver)) {
+                    if (strStartsWith($receiver, '+' )) $receiver = subStr($receiver, 1);
+                    if (strStartsWith($receiver, '00')) $receiver = subStr($receiver, 2);
+                    if (!ctype_digit($receiver)) {
+                        self::log('Invalid SMS receiver configuration: "'.$receiver.'"', L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
+                        continue;
+                    }
+                    self::$smsReceivers[] = $receiver;
                 }
-                self::$smsReceivers[] = $receiver;
             }
+            $logLevel = $config->get('log.sms.level', self::$appLogLevel);
+            if (is_string($logLevel))                                   // a string if configured
+                $logLevel = self::logLevelToId($logLevel) ?: self::$appLogLevel;
         }
-        $logLevel = $config->get('log.sms.level', self::$appLogLevel);
-        if (is_string($logLevel)) {                                     // a string if a configured value
-            $logLevel = self::logLevelToId($logLevel) ?: self::$appLogLevel;
+        else {
+            $logLevel = self::$appLogLevel;
         }
-        /** @var int $logLevel */
-        self::$smsLogLevel = $logLevel = $logLevel;
+        self::$smsLogLevel = $logLevel;
 
-        $options = $config->get('sms', []);
-        if (!is_array($options)) throw new IllegalTypeException('Invalid type of config value "sms": '.getType($options).' (not array)');
-        self::$smsOptions = $options;
+        if ($config) {
+            $options = $config->get('sms', []);
+            if (!is_array($options)) throw new IllegalTypeException('Invalid type of config value "sms": '.getType($options).' (not array)');
+            self::$smsOptions = $options;
+        }
 
         self::$smsHandler = self::$smsReceivers && self::$smsOptions;
 
