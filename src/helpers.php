@@ -79,6 +79,11 @@ const PHP_INI_ONLY      = 2;                                        // entry can
 const PHP_INI_SYSTEM    = 3;                                        // entry can be set in php.ini and in httpd.conf
 const PHP_INI_PERDIR    = 4;                                        // entry can be set in php.ini, httpd.conf, .htaccess and in .user.ini
 
+// class member access levels
+const ACCESS_PUBLIC     = 1;
+const ACCESS_PROTECTED  = 2;
+const ACCESS_PRIVATE    = 3;
+
 // miscellaneous
 const NL                = "\n";                                     // - ctrl --- hex --- dec ----
 const EOL_MAC           = "\r";                                     //   CR       0D      13

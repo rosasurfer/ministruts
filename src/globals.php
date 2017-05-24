@@ -61,6 +61,11 @@ const PHP_INI_ONLY      = \rosasurfer\PHP_INI_ONLY;
 const PHP_INI_SYSTEM    = \rosasurfer\PHP_INI_SYSTEM;
 const PHP_INI_PERDIR    = \rosasurfer\PHP_INI_PERDIR;
 
+// class member access levels
+const ACCESS_PUBLIC     = 1;
+const ACCESS_PROTECTED  = 2;
+const ACCESS_PRIVATE    = 3;
+
 // miscellaneous
 const NL                = \rosasurfer\NL;                      // = EOL_UNIX
 const EOL_MAC           = \rosasurfer\EOL_MAC;                 // "\r"       CR       0D       13
