@@ -82,7 +82,7 @@ const PHP_INI_PERDIR    = 4;                                        // entry can
 // class member access levels
 const ACCESS_PUBLIC     = 1;
 const ACCESS_PROTECTED  = 2;
-const ACCESS_PRIVATE    = 3;
+const ACCESS_PRIVATE    = 4;
 
 // miscellaneous
 const NL                = "\n";                                     // - ctrl --- hex --- dec ----
@@ -813,33 +813,41 @@ function normalizeEOL($string, $mode = EOL_UNIX) {
 
 
 /**
- * Convert an object to an array, including private and protected properties.
+ * Convert an object to an array.
  *
  * @param  object $object
- *
+ * @param  int    $access [optional] - access levels of the properties to return in the result
+ *                                     (default: ACCESS_PUBLIC)
  * @return array
  */
-function objectToArray($object) {
+function objectToArray($object, $access = ACCESS_PUBLIC) {
     if (!is_object($object)) throw new IllegalTypeException('Illegal type of parameter $object: '.getType($object));
+    if (!is_int($access))    throw new IllegalTypeException('Illegal type of parameter $access: '.getType($access));
 
-    $array = (array)$object;
+    $source = (array)$object;
+    $result = [];
 
-    foreach ($array as $key => $value) {
-        if (strStartsWith($key, "\0*")) {                           // protected
-            $public = strRight($key, -3);
-            if (!array_key_exists($public, $array))
-                $array[$public] = $value;
+    foreach ($source as $name => $value) {
+        if ($name[0] != "\0") {                     // public
+            if ($access & ACCESS_PUBLIC) {
+                $result[$name] = $value;
+            }
         }
-        else if (strStartsWith($key, "\0")) {                       // private
-            $public    = strRightFrom($key, "\0", 2);
-            $protected = "\0*\0".$public;
-            if (!array_key_exists($public, $array) && !array_key_exists($protected, $array))
-                $array[$public] = $value;
+        else if ($name[1] == '*') {                 // protected
+            if ($access & ACCESS_PROTECTED) {
+                $publicName = subStr($name, 3);
+                $result[$publicName] = $value;
+            }
         }
-        else continue;
-        unset($array[$key]);
+        else {                                      // private
+            if ($access & ACCESS_PRIVATE) {
+                $publicName = strRightFrom($name, "\0", 2);
+                if (!array_key_exists($publicName, $result))
+                    $result[$publicName] = $value;
+            }
+        }
     }
-    return $array;
+    return $result;
 }
 
 

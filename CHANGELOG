@@ -1,4 +1,9 @@
 
+2017-05-24
+
+   - util: helper function rosasurfer\objectToArray($object, $access)
+
+
 2017-05-21
 
    - struts-config: configurable single or mixed MVC push/pull support
@@ -8,7 +13,7 @@
 
    - config: move project layout to regular configuration and get rid of "config/dirs.php"
    - struts-config: option to configure a Module's default Tile implementation
-   - util: add helper rosasurfer\isRelativePath($string)
+   - util: helper function rosasurfer\isRelativePath($string)
    
 
 2017-05-14

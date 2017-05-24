@@ -62,9 +62,9 @@ const PHP_INI_SYSTEM    = \rosasurfer\PHP_INI_SYSTEM;
 const PHP_INI_PERDIR    = \rosasurfer\PHP_INI_PERDIR;
 
 // class member access levels
-const ACCESS_PUBLIC     = 1;
-const ACCESS_PROTECTED  = 2;
-const ACCESS_PRIVATE    = 3;
+const ACCESS_PUBLIC     = \rosasurfer\ACCESS_PUBLIC;
+const ACCESS_PROTECTED  = \rosasurfer\ACCESS_PROTECTED;
+const ACCESS_PRIVATE    = \rosasurfer\ACCESS_PRIVATE;
 
 // miscellaneous
 const NL                = \rosasurfer\NL;                      // = EOL_UNIX
@@ -503,14 +503,15 @@ function normalizeEOL($string, $mode = EOL_UNIX) {
 
 
 /**
- * Convert an object to an array, including private and protected properties.
+ * Convert an object to an array.
  *
  * @param  object $object
- *
+ * @param  int    $access [optional] - access levels of the properties to return in the result
+ *                                     (default: ACCESS_PUBLIC)
  * @return array
  */
-function objectToArray($object) {
-    return \rosasurfer\objectToArray($object);
+function objectToArray($object, $access = ACCESS_PUBLIC) {
+    return \rosasurfer\objectToArray($object, $access);
 }
 
 
