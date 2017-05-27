@@ -246,16 +246,15 @@ var rosasurfer = {
         if (!div) {
             div = this.log.div = document.createElement('div');
             div.setAttribute('id', 'rosasurfer.log.output');
-            div.style.zIndex          = ''+ (0x7FFFFFFF-1);    // 2147483647-1: one layer available above it
-            div.style.padding         = '6px';
-            div.style.textAlign       = 'left';
-            div.style.fontSize        = '12px';
-            div.style.fontFamily      = 'arial,helvetica,sans-serif';
-            div.style.color           = 'black';
-            div.style.backgroundColor = 'lightgray';
-            div.style.position        = 'absolute';            // default
+            div.style.position        = 'absolute';
+            div.style.zIndex          = '65535';
             div.style.top             = '6px';
             div.style.left            = '6px';
+            div.style.padding         = '6px';
+            div.style.textAlign       = 'left';
+            div.style.font            = 'normal normal 12px/1.5em arial,helvetica,sans-serif';
+            div.style.color           = 'black';
+            div.style.backgroundColor = 'lightgray';
             var bodies = document.getElementsByTagName('body');
             if (!bodies || !bodies.length) return alert('rosasurfer.log()\n\nError: You cannot log from outside the <body> tag!');
             bodies[0].appendChild(div);
