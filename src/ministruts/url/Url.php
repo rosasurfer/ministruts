@@ -29,10 +29,9 @@ class Url extends Object {
      *
      * Create a new Url instance.
      *
-     * @param  string $uri - URI part of the URL to generate. If the URI starts with a slash "/" it is interpreted as relative
-     *                       to the application's base URI. If the URI doesn't start with a slash "/" it is interpreted as
-     *                       relative to the current application <tt>Module</tt>'s base URI (the module the current HTTP
-     *                       request belongs to).
+     * @param  string $uri - URI part of the URL to generate. If the URI starts with a slash "/" it is interpreted as
+     *                       relative to the application's base URI. If the URI does not start with a slash it is interpreted
+     *                       as relative to the current <tt>Module</tt>'s base URI (the module of the current HTTP request).
      */
     public function __construct($uri) {
         if (!is_string($uri)) throw new IllegalTypeException('Illegal type of parameter $uri: '.getType($uri));
@@ -58,8 +57,8 @@ class Url extends Object {
 
 
     /**
-     * Return a text presentation of this Url. This is the absolute URI reference to include in a HTML page to link to the
-     * resource.
+     * Return a text presentation of this instance. This is the absolute URI reference to include in a HTML page to link to
+     * the resource.
      *
      * @return string
      */
