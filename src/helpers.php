@@ -1110,22 +1110,38 @@ function pluralize($count, $singular='', $plural='s') {
  * @return Url
  */
 function route($name) {
+    $path = $query = $hash = null;
+
+    $pos = strPos($name, '#');
+    if ($pos !== false) {
+        $hash = substr($name, $pos);
+        $name = substr($name, 0, $pos);
+    }
+    $pos = strPos($name, '?');
+    if ($pos !== false) {
+        $query = substr($name, $pos);
+        $name  = substr($name, 0, $pos);
+    }
+
     $request = Request::me();
     $module  = $request->getModule();
     $mapping = $module->getMapping($name);
 
     if ($mapping) {
         $path = $mapping->getPath();
+        if ($path[0] == '/') {
+            $path = ($path=='/') ? '' : substr($path, 1);   // substr() returns FALSE on start==length
+        }
     }
     else {
         $msg = 'Route "'.$name.'" not found';
         if (getEnv('APP_ENVIRONMENT') != 'production') throw new RuntimeException($msg);
         Logger::log($msg, L_ERROR, $context=['class'=>'']);
-        $path = '/';
+        $path = '';
     }
 
-    if (strPos($path, '/') === 0)
-        $path = strLen($path)==1 ? '' : subStr($path, 1);   // subStr() returns FALSE on start==length
+    if ($query) $path .= $query;
+    if ($hash)  $path .= $hash;
 
     return new Url($path);
 }
