@@ -13,11 +13,12 @@ use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
 use rosasurfer\exception\error\PHPError;
 
+use rosasurfer\ministruts\Request;
+
 use rosasurfer\net\http\CurlHttpClient;
 use rosasurfer\net\http\HttpRequest;
 use rosasurfer\net\http\HttpResponse;
 
-use rosasurfer\ministruts\Request;
 use rosasurfer\util\PHP;
 
 use function rosasurfer\ksort_r;
@@ -794,9 +795,15 @@ class Logger extends StaticClass {
             break;
         }
 
-        if (!isSet($context['file'])) {
-            $context['file'] = '(unknown)';
-            $context['line'] = '(?)';
+        if (!isSet($context['file'])) {                 // the logger was called from the main script, "file" and "line"
+            if ($trace) {                               // are in the last frame
+                $context['file'] = $trace[$i]['file'];
+                $context['line'] = $trace[$i]['line'];
+            }
+            else {
+                $context['file'] = '(unknown)';
+                $context['line'] = '(?)';
+            }
         }
     }
 
