@@ -794,7 +794,10 @@ class Logger extends StaticClass {
             break;
         }
 
-        // intentionally cause an error if not found (should never happen)
+        if (!isSet($context['file'])) {
+            $context['file'] = '(unknown)';
+            $context['line'] = '(?)';
+        }
     }
 
 
