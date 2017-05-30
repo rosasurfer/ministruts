@@ -5,7 +5,7 @@
 
 # By default PHP FastCGI processes exit after 500 requests.
 # FcgidMaxRequestsPerProcess should be <= PHP_FCGI_MAX_REQUESTS.
-export PHP_FCGI_MAX_REQUESTS=10000
+export PHP_FCGI_MAX_REQUESTS=2000
 
 # Enable to specify a custom php.ini (same as PHP CLI option: -c <path>|<file>).
 #export PHPRC=./
