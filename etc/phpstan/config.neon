@@ -32,7 +32,6 @@ services:                                                           # loaded bef
 parameters:
     autoload_files:
         - etc/phpstan/function-stubs.php                            # stubs for PHP extensions and procedural code
-        - src/globals.php
 
     fileExtensions:                                                 # additional files to analyse
        #- html
@@ -40,6 +39,7 @@ parameters:
 
     excludes_analyse:
         - etc/vendor/
+        - src/globals.php
         - src/util/apc/apc.php                                      # TODO: replace it
 
     reportUnmatchedIgnoredErrors:           false
