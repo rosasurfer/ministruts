@@ -121,7 +121,6 @@ return array(
     'rosasurfer\\net\\http\\CurlHttpClient' => $baseDir . '/src/net/http/CurlHttpClient.php',
     'rosasurfer\\net\\http\\CurlHttpResponse' => $baseDir . '/src/net/http/CurlHttpResponse.php',
     'rosasurfer\\net\\http\\HeaderParser' => $baseDir . '/src/net/http/HeaderParser.php',
-    'rosasurfer\\net\\http\\HeaderUtils' => $baseDir . '/src/net/http/HeaderUtils.php',
     'rosasurfer\\net\\http\\HttpClient' => $baseDir . '/src/net/http/HttpClient.php',
     'rosasurfer\\net\\http\\HttpRequest' => $baseDir . '/src/net/http/HttpRequest.php',
     'rosasurfer\\net\\http\\HttpResponse' => $baseDir . '/src/net/http/HttpResponse.php',

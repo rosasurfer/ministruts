@@ -4,13 +4,9 @@ namespace rosasurfer\ministruts;
 use rosasurfer\core\Object;
 use rosasurfer\exception\RuntimeException;
 use rosasurfer\log\Logger;
-
-use rosasurfer\net\http\HeaderUtils;
 use rosasurfer\net\http\HttpResponse;
 
-use function rosasurfer\strEndsWith;
 use function rosasurfer\strRightFrom;
-use function rosasurfer\strStartsWith;
 
 use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_INFO;
@@ -78,7 +74,7 @@ class RequestProcessor extends Object {
 
 
         // benoetigte Rollen ueberpruefen
-        if (!$this->processRoles($request, $mapping))
+        if (!$this->processRoles($request, $response, $mapping))
             return;
 
 
@@ -87,12 +83,12 @@ class RequestProcessor extends Object {
 
 
         // ActionForm validieren
-        if ($form && !$this->processActionFormValidate($request, $mapping, $form))
+        if ($form && !$this->processActionFormValidate($request, $response, $mapping, $form))
             return;
 
 
         // falls statt einer Action ein direkter Forward konfiguriert wurde, diesen verarbeiten
-        if (!$this->processMappingForward($request, $mapping))
+        if (!$this->processMappingForward($request, $response, $mapping))
             return;
 
 
@@ -106,7 +102,7 @@ class RequestProcessor extends Object {
 
 
         // den zurueckgegebenen ActionForward verarbeiten
-        $this->processActionForward($request, $forward);
+        $this->processActionForward($request, $response, $forward);
     }
 
 
@@ -118,8 +114,7 @@ class RequestProcessor extends Object {
     protected function processSession(Request $request) {
         /*
         // former behaviour: If a session id was transmitted the session was started automatically.
-        //
-        if (session_status()==PHP_SESSION_NONE && $request->hasSessionId()) {
+        if (!$request->isSession() && $request->hasSessionId()) {
             $request->getSession();
         }
         */
@@ -237,7 +232,7 @@ class RequestProcessor extends Object {
         // konfiguriertes 404-Layout suchen
         if ($forward=$this->module->findForward((string) HttpResponse::SC_NOT_FOUND)) {
             // falls vorhanden, einbinden...
-            $this->processActionForward($request, $forward);
+            $this->processActionForward($request, $response, $forward);
         }
         else {
             // ...andererseits einfache Fehlermeldung ausgeben
@@ -288,7 +283,7 @@ PROCESS_MAPPING_ERROR_SC_404;
         // konfiguriertes 405-Layout suchen
         if ($forward=$this->module->findForward((string) HttpResponse::SC_METHOD_NOT_ALLOWED)) {
             // falls vorhanden, einbinden...
-            $this->processActionForward($request, $forward);
+            $this->processActionForward($request, $response, $forward);
         }
         else {
             // ...andererseits einfache Fehlermeldung ausgeben
@@ -314,11 +309,12 @@ PROCESS_METHOD_ERROR_SC_405;
      * soll, oder FALSE, wenn der Zugriff nicht gewaehrt wird und der Request beendet wurde.
      *
      * @param  Request       $request
+     * @param  Response      $response
      * @param  ActionMapping $mapping
      *
      * @return bool
      */
-    protected function processRoles(Request $request, ActionMapping $mapping) {
+    protected function processRoles(Request $request, Response $response, ActionMapping $mapping) {
         if ($mapping->getRoles() === null)
             return true;
 
@@ -326,7 +322,7 @@ PROCESS_METHOD_ERROR_SC_405;
         if (!$forward)
             return true;
 
-        $this->processActionForward($request, $forward);
+        $this->processActionForward($request, $response, $forward);
         return false;
     }
 
@@ -375,12 +371,13 @@ PROCESS_METHOD_ERROR_SC_405;
      * wenn auf eine andere Resource weitergeleitet und der Request bereits beendet wurde.
      *
      * @param  Request       $request
+     * @param  Response      $response
      * @param  ActionMapping $mapping
      * @param  ActionForm    $form
      *
      * @return bool
      */
-    protected function processActionFormValidate(Request $request, ActionMapping $mapping, ActionForm $form) {
+    protected function processActionFormValidate(Request $request, Response $response, ActionMapping $mapping, ActionForm $form) {
         if (!$mapping->isFormValidateFirst())
             return true;
 
@@ -396,7 +393,7 @@ PROCESS_METHOD_ERROR_SC_405;
         }
         if (!$forward) throw new RuntimeException('<mapping path="'.$mapping->getPath().'" form-validate-first="true": ActionForward not found (module validation error?)');
 
-        $this->processActionForward($request, $forward);
+        $this->processActionForward($request, $response, $forward);
         return false;
     }
 
@@ -407,16 +404,17 @@ PROCESS_METHOD_ERROR_SC_405;
      * beendet wurde.
      *
      * @param  Request       $request
+     * @param  Response      $response
      * @param  ActionMapping $mapping
      *
      * @return bool
      */
-    protected function processMappingForward(Request $request, ActionMapping $mapping) {
+    protected function processMappingForward(Request $request, Response $response, ActionMapping $mapping) {
         $forward = $mapping->getForward();
         if (!$forward)
             return true;
 
-        $this->processActionForward($request, $forward);
+        $this->processActionForward($request, $response, $forward);
         return false;
     }
 
@@ -484,29 +482,24 @@ PROCESS_METHOD_ERROR_SC_405;
      * die der ActionForward bezeichnet.
      *
      * @param  Request       $request
+     * @param  Response      $response
      * @param  ActionForward $forward
      */
-    protected function processActionForward(Request $request, ActionForward $forward) {
+    protected function processActionForward(Request $request, Response $response, ActionForward $forward) {
         $module = $this->module;
 
         if ($forward->isRedirect()) {
             $this->cacheActionMessages($request);
-
             $path = $forward->getPath();
 
-            // pruefen, ob der Forward eine URL "http://www..." oder einen Path "/target?..." enthaelt
-            if (strStartsWith($path, 'http')) {
+            if (isSet(parse_url($path)['host'])) {               // check for external URI
                 $url = $path;
             }
             else {
-                $baseUri = $request->getApplicationBaseUri();
-                $url     = $baseUri.$module->getPrefix();
-                !strEndsWith($url, '/') && $url.='/';
-                $url    .= lTrim($path, '/');
+                $moduleUri = rTrim($request->getApplicationBaseUri().$module->getPrefix(), '/');
+                $url = $moduleUri.'/'.lTrim($path, '/');
             }
-
-            // TODO: QueryString kodieren
-            HeaderUtils::redirect($url);
+            $response->redirect($url);
         }
         else {
             $path = $forward->getPath();
