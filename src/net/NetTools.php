@@ -51,8 +51,8 @@ final class NetTools extends StaticClass {
     /**
      * Ob die IP-Adresse auf einen bekannten Proxy-Server weist.
      *
-     * @param  string $address - IP-Adresse
-     * @param  bool   $reverseResolve - ob die IP-Adresse rueck-aufgeloest und ueberprueft werden soll (Default: FALSE)
+     * @param  string $address                   - IP-Adresse
+     * @param  bool   $reverseResolve [optional] - ob die IP-Adresse rueck-aufgeloest und ueberprueft werden soll (default: false)
      *
      * @return bool
      */

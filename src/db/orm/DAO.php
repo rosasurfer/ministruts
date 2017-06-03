@@ -48,14 +48,14 @@ abstract class DAO extends Singleton {
     /**
      * Find a single matching record and convert it to an instance of the entity class.
      *
-     * @param  string $query     - SQL query with optional ORM syntax
-     * @param  bool   $allowMany - whether or not the query is allowed to return a multi-row result (default: no)
+     * @param  string $query                - SQL query with optional ORM syntax
+     * @param  bool   $allowMany [optional] - whether or not the query is allowed to return a multi-row result (default: no)
      *
      * @return PersistableObject|null
      *
      * @throws MultipleRecordsException if the query returned multiple rows and $allowMany was not set to TRUE.
      */
-    public function find($query, $allowMany=false) {
+    public function find($query, $allowMany = false) {
         return $this->getWorker()->find($query, $allowMany);
     }
 

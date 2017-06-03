@@ -181,7 +181,7 @@ function error($message) {
 /**
  * Help. Display script syntax.
  *
- * @param  string $message - additional message to display (default: none)
+ * @param  string $message [optional] - additional message to display (default: none)
  */
 function help($message = null) {
     if (!is_null($message))

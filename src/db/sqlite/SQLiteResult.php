@@ -79,7 +79,7 @@ class SQLiteResult extends Result {
      *
      * {@inheritdoc}
      */
-    public function fetchRow($mode=ARRAY_BOTH) {
+    public function fetchRow($mode = ARRAY_BOTH) {
         if (!$this->result || $this->nextRowIndex < 0)        // no automatic result reset()
             return null;
 

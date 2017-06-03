@@ -97,10 +97,10 @@ const EOL_WINDOWS       = "\r\n";                                   //   CRLF   
 /**
  * Dumps a variable to STDOUT or into a string.
  *
- * @param  mixed $var          - variable
- * @param  bool  $return       - TRUE,  if the variable is to be dumped into a string;<br>
- *                               FALSE, if the variable is to be dumped to STDOUT (default)
- * @param  bool  $flushBuffers - whether or not to flush output buffers on output (default: TRUE)
+ * @param  mixed $var                     - variable
+ * @param  bool  $return       [optional] - TRUE,  if the variable is to be dumped into a string;<br>
+ *                                          FALSE, if the variable is to be dumped to STDOUT (default)
+ * @param  bool  $flushBuffers [optional] - whether or not to flush output buffers on output (default: TRUE)
  *
  * @return string|null - string if the result is to be returned, NULL otherwise
  */
@@ -119,7 +119,7 @@ function dump($var, $return=false, $flushBuffers=true) {
  * Functional replacement for "echo($var)" which is a language construct and can't be used as a regular function.
  *
  * @param  mixed $var
- * @param  bool  $flushBuffers - whether or not to flush output buffers (default: TRUE)
+ * @param  bool  $flushBuffers [optional] - whether or not to flush output buffers (default: TRUE)
  */
 function echof($var, $flushBuffers=true) {
     echo $var;
@@ -134,7 +134,7 @@ function echof($var, $flushBuffers=true) {
  * Prints a variable in a pretty way. Output always ends with a line feed.
  *
  * @param  mixed $var
- * @param  bool  $flushBuffers - whether or not to flush output buffers (default: TRUE)
+ * @param  bool  $flushBuffers [optional] - whether or not to flush output buffers (default: TRUE)
  *
  * @see    printPretty()
  */
@@ -148,10 +148,10 @@ function echoPre($var, $flushBuffers=true) {
  *
  * Prints a variable in a pretty way. Output always ends with a line feed.
  *
- * @param  mixed $var          - variable
- * @param  bool  $return       - TRUE,  if the result is to be returned as a string;<br>
- *                               FALSE, if the result is to be printed to STDOUT (default)
- * @param  bool  $flushBuffers - whether or not to flush output buffers on output (default: TRUE)
+ * @param  mixed $var                     - variable
+ * @param  bool  $return       [optional] - TRUE,  if the result is to be returned as a string;<br>
+ *                                          FALSE, if the result is to be printed to STDOUT (default)
+ * @param  bool  $flushBuffers [optional] - whether or not to flush output buffers on output (default: TRUE)
  *
  * @return string|null - string if the result is to be returned, NULL otherwise
  *
@@ -165,10 +165,10 @@ function pp($var, $return=false, $flushBuffers=true) {
 /**
  * Prints a variable in a pretty way. Output always ends with a line feed.
  *
- * @param  mixed $var          - variable
- * @param  bool  $return       - TRUE,  if the result is to be returned as a string;<br>
- *                               FALSE, if the result is to be printed to STDOUT (default)
- * @param  bool  $flushBuffers - whether or not to flush output buffers on output (default: TRUE)
+ * @param  mixed $var                     - variable
+ * @param  bool  $return       [optional] - TRUE,  if the result is to be returned as a string;<br>
+ *                                          FALSE, if the result is to be printed to STDOUT (default)
+ * @param  bool  $flushBuffers [optional] - whether or not to flush output buffers on output (default: TRUE)
  *
  * @return string|null - string if the result is to be returned, NULL otherwise
  */
@@ -271,7 +271,7 @@ function isRelativePath($path) {
  *
  * @param  string $stringA
  * @param  string $stringB
- * @param  bool   $ignoreCase - default: no
+ * @param  bool   $ignoreCase [optional] - default: no
  *
  * @return bool
  */
@@ -309,7 +309,7 @@ function strCompareI($stringA, $stringB) {
  *
  * @param  string $haystack
  * @param  string $needle
- * @param  bool   $ignoreCase - default: no
+ * @param  bool   $ignoreCase [optional] - default: no
  *
  * @return bool
  */
@@ -348,8 +348,8 @@ function strContainsI($haystack, $needle) {
  * with one of them.
  *
  * @param  string          $string
- * @param  string|string[] $prefix     - one or more prefixes
- * @param  bool            $ignoreCase - default: no
+ * @param  string|string[] $prefix                - one or more prefixes
+ * @param  bool            $ignoreCase [optional] - default: no
  *
  * @return bool
  */
@@ -397,8 +397,8 @@ function strStartsWithI($string, $prefix) {
  * with one of them.
  *
  * @param  string          $string
- * @param  string|string[] $suffix     - one or more suffixes
- * @param  bool            $ignoreCase - default: no
+ * @param  string|string[] $suffix                - one or more suffixes
+ * @param  bool            $ignoreCase [optional] - default: no
  *
  * @return bool
  */
@@ -467,18 +467,18 @@ function strLeft($string, $length) {
 /**
  * Return the left part of a string up to the specified occurrence of a limiting substring.
  *
- * @param  string $string         - initial string
- * @param  string $limiter        - limiting substring (one or more characters)
- * @param  int    $count          - positive: the specified occurrence of the limiting substring from the start
- *                                            of the string<br>
- *                                  negative: the specified occurrence of the limiting substring from the end of
- *                                            the string<br>
- *                                  zero:     an empty string is returned<br>
- *                                  (default: 1 = the first occurrence)
- * @param  bool   $includeLimiter - whether or not to include the limiting substring in the returned result
- *                                  (default: FALSE)
- * @param  mixed  $onNotFound     - value to return if the specified occurrence of the limiting substring is not found
- *                                  (default: the initial string)
+ * @param  string $string                    - initial string
+ * @param  string $limiter                   - limiting substring (one or more characters)
+ * @param  int    $count          [optional] - positive: the specified occurrence of the limiting substring from the start
+ *                                                       of the string<br>
+ *                                             negative: the specified occurrence of the limiting substring from the end of
+ *                                                       the string<br>
+ *                                             zero:     an empty string is returned<br>
+ *                                             (default: 1 = the first occurrence)
+ * @param  bool   $includeLimiter [optional] - whether or not to include the limiting substring in the returned result
+ *                                             (default: FALSE)
+ * @param  mixed  $onNotFound     [optional] - value to return if the specified occurrence of the limiting substring is not found
+ *                                             (default: the initial string)
  *
  * @return string - left part of the initial string or the $onNotFound value
  *
@@ -570,18 +570,18 @@ function strRight($string, $length) {
 /**
  * Return the right part of a string from the specified occurrence of a limiting substring.
  *
- * @param  string $string         - initial string
- * @param  string $limiter        - limiting substring (one or more characters)
- * @param  int    $count          - positive: the specified occurrence of the limiting substring counted from the
- *                                            start of the string<br>
- *                                  negative: the specified occurrence of the limiting substring counted from the
- *                                            end of the string<br>
- *                                  zero:     the initial string is returned<br>
- *                                  (default: 1 = the first occurrence)
- * @param  bool   $includeLimiter - whether or not to include the limiting substring in the returned result
- *                                  (default: FALSE)
- * @param  mixed  $onNotFound     - value to return if the specified occurrence of the limiting substring is not found
- *                                  (default: empty string)
+ * @param  string $string                    - initial string
+ * @param  string $limiter                   - limiting substring (one or more characters)
+ * @param  int    $count          [optional] - positive: the specified occurrence of the limiting substring counted from the
+ *                                                       start of the string<br>
+ *                                             negative: the specified occurrence of the limiting substring counted from the
+ *                                                       end of the string<br>
+ *                                             zero:     the initial string is returned<br>
+ *                                             (default: 1 = the first occurrence)
+ * @param  bool   $includeLimiter [optional] - whether or not to include the limiting substring in the returned result
+ *                                             (default: FALSE)
+ * @param  mixed  $onNotFound     [optional] - value to return if the specified occurrence of the limiting substring is not found
+ *                                             (default: empty string)
  *
  * @return string - right part of the initial string or the $onNotFound value
  *
@@ -755,8 +755,8 @@ function strToBool($value) {
 /**
  * Replace multiple consecutive white space characters in a string by a single one.
  *
- * @param  string $string    - string to process
- * @param  bool   $joinLines - whether or not to always return a single line result (default: yes)
+ * @param  string $string               - string to process
+ * @param  bool   $joinLines [optional] - whether or not to always return a single line result (default: yes)
  *
  * @return string
  */
@@ -777,12 +777,12 @@ function strCollapseWhiteSpace($string, $joinLines=true) {
  * and the resulting string may differ. Netscape line endings are honored only if all line endings are Netscape format
  * (no mixed mode).
  *
- * @param  string $string - string to normalize
- * @param  string $mode   - format of the resulting string, can be one of:<br>
- *                          EOL_MAC:      line endings are converted to Mac format      "\r"<br>
- *                          EOL_NETSCAPE: line endings are converted to Netscape format "\r\r\n"<br>
- *                          EOL_UNIX:     line endings are converted to Unix format     "\n" (default)<br>
- *                          EOL_WINDOWS:  line endings are converted to Windows format  "\r\n"
+ * @param  string $string          - string to normalize
+ * @param  string $mode [optional] - format of the resulting string, can be one of:<br>
+ *                                   EOL_MAC:      line endings are converted to Mac format      "\r"<br>
+ *                                   EOL_NETSCAPE: line endings are converted to Netscape format "\r\r\n"<br>
+ *                                   EOL_UNIX:     line endings are converted to Unix format     "\n" (default)<br>
+ *                                   EOL_WINDOWS:  line endings are converted to Windows format  "\r\n"
  * @return string
  */
 function normalizeEOL($string, $mode = EOL_UNIX) {
@@ -866,11 +866,11 @@ function typeOf($var) {
 /**
  * Check whether a directory exists. If not try to create it. Check further if write permission is granted.
  *
- * @param  string $path - same as mkDir(): directory name
- * @param  int    $mode - same as mkDir(): permission mode to set if the directory is created<br>
- *                                         (default: 0755 = rwxr-xr-x)
+ * @param  string $path            - same as mkDir(): directory name
+ * @param  int    $mode [optional] - same as mkDir(): permission mode to set if the directory is created<br>
+ *                                                    (default: 0755 = rwxr-xr-x)
  */
-function mkDirWritable($path, $mode=0755) {
+function mkDirWritable($path, $mode = 0755) {
     if (!is_string($path))                            throw new IllegalTypeException('Illegal type of parameter $path: '.getType($path));
     if ($mode!==null && !is_int($mode))               throw new IllegalTypeException('Illegal type of parameter $mode: '.getType($mode));
 
@@ -959,19 +959,19 @@ function metatypeOf($name) {
  *
  * Whether or not the specified string value represents a valid date or datetime value.
  *
- * @param  string          $string - string value
- * @param  string|string[] $format - A valid date/datetime format. If multiple values are supplied whether or not the specified
- *                                   string fits at least one of them.<br>
- *                                   Supported format strings: 'Y-m-d [H:i[:s]]'<br>
- *                                                             'Y.m.d [H:i[:s]]'<br>
- *                                                             'd.m.Y [H:i[:s]]'<br>
- *                                                             'd/m/Y [H:i[:s]]'
+ * @param  string          $string            - string value
+ * @param  string|string[] $format [optional] - A valid date/datetime format. If multiple values are supplied whether or not the specified
+ *                                              string fits at least one of them.<br>
+ *                                              Supported format strings: 'Y-m-d [H:i[:s]]'<br>
+ *                                                                         'Y.m.d [H:i[:s]]'<br>
+ *                                                                         'd.m.Y [H:i[:s]]'<br>
+ *                                                                         'd/m/Y [H:i[:s]]'
  *
  * @return int|bool - timestamp matching the string or FALSE if the string is not a valid date/datetime value
  *
  * @see    rosasurfer\util\Validator::isDateTime()
  */
-function is_datetime($string, $format='Y-m-d') {
+function is_datetime($string, $format = 'Y-m-d') {
     return Validator::isDateTime($string, $format);
 }
 
@@ -979,11 +979,11 @@ function is_datetime($string, $format='Y-m-d') {
 /**
  * Functional equivalent of the value TRUE.
  *
- * @param  mixed $value - ignored
+ * @param  mixed $value [optional] - ignored
  *
  * @return bool - TRUE
  */
-function _true($value=null) {
+function _true($value = null) {
     return true;
 }
 
@@ -1004,11 +1004,11 @@ function ifTrue($value, $altValue) {
 /**
  * Functional equivalent of the value FALSE.
  *
- * @param  mixed $value - ignored
+ * @param  mixed $value [optional] - ignored
  *
  * @return bool - FALSE
  */
-function _false($value=null) {
+function _false($value = null) {
     return false;
 }
 
@@ -1029,11 +1029,11 @@ function ifFalse($value, $altValue) {
 /**
  * Functional equivalent of the value NULL.
  *
- * @param  mixed $value - ignored
+ * @param  mixed $value [optional] - ignored
  *
  * @return NULL
  */
-function _null($value=null) {
+function _null($value = null) {
     return null;
 }
 
@@ -1072,13 +1072,13 @@ function ifEmpty($value, $altValue) {
  * Return a sorted copy of the specified array using the algorythm and parameters of ksort().
  *
  * @param  array $values
- * @param  int   $sort_flags
+ * @param  int   $sort_flags [optional]
  *
  * @return array
  *
  * @see    ksort()
  */
-function ksort_r(array $values, $sort_flags=SORT_REGULAR) {
+function ksort_r(array $values, $sort_flags = SORT_REGULAR) {
     ksort($values, $sort_flags);
     return $values;
 }
@@ -1087,9 +1087,9 @@ function ksort_r(array $values, $sort_flags=SORT_REGULAR) {
 /**
  * Return a pluralized message according to the specified number of items.
  *
- * @param  int   $count     - the number of items to determine the message form from
- * @param  string $singular - singular form of message
- * @param  string $plural   - plural form of message
+ * @param  int   $count                - the number of items to determine the message form from
+ * @param  string $singular [optional] - singular form of message
+ * @param  string $plural   [optional] - plural form of message
  *
  * @return string
  */

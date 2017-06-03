@@ -16,10 +16,10 @@ class Validator extends StaticClass {
     /**
      * Ob der uebergebene String eine syntaktisch gueltige IP-Adresse ist.
      *
-     * @param  string $string      - der zu ueberpruefende String
-     * @param  bool   $returnBytes - Typ des Rueckgabewertes
-     *                               FALSE: Boolean (default)
-     *                               TRUE:  Array mit den Adressbytes oder FALSE, wenn der String keine gueltige IP-Adresse darstellt
+     * @param  string $string                 - der zu ueberpruefende String
+     * @param  bool   $returnBytes [optional] - Typ des Rueckgabewertes
+     *                                          FALSE: Boolean (default)
+     *                                          TRUE:  Array mit den Adressbytes oder FALSE, wenn der String keine gueltige IP-Adresse darstellt
      * @return bool|array
      */
     public static function isIPAddress($string, $returnBytes = false) {
@@ -139,9 +139,9 @@ class Validator extends StaticClass {
     /**
      * Ob der uebergebene String einen gueltigen Date/DateTime-Wert darstellt.
      *
-     * @param  string          $date   - der zu ueberpruefende String
-     * @param  string|string[] $format - Format, dem der String entsprechen soll. Sind mehrere angegeben, muss der String
-     *                                   mindestens einem davon entsprechen.
+     * @param  string          $date              - der zu ueberpruefende String
+     * @param  string|string[] $format [optional] - Format, dem der String entsprechen soll. Sind mehrere angegeben, muss der String
+     *                                              mindestens einem davon entsprechen.
      *
      * @return int|bool - Timestamp oder FALSE, wenn der uebergebene Wert ungueltig ist
      *

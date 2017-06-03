@@ -93,7 +93,7 @@ function getHeaderValue($names) {
 /**
  * Gibt die angegebenen Header als Array von Name-Wert-Paaren zurueck (in der uebertragenen Reihenfolge).
  *
- * @param  string|array $names - ein oder mehrere Namen; ohne Angabe werden alle Header zurueckgegeben
+ * @param  string|array $names [optional] - ein oder mehrere Namen; ohne Angabe werden alle Header zurueckgegeben
  *
  * @return array - Name-Wert-Paare
  */
@@ -136,13 +136,13 @@ function getHeaders($names = null) {
 /**
  * Ob der uebergebene String eine syntaktisch gueltige IP-Adresse ist.
  *
- * @param  string $string      - der zu ueberpruefende String
- * @param  bool   $returnBytes - Typ des Rueckgabewertes
- *                               FALSE: Boolean (default)
- *                               TRUE:  Array mit den Adressbytes oder FALSE, wenn der String keine gueltige IP-Adresse darstellt
+ * @param  string $string                 - der zu ueberpruefende String
+ * @param  bool   $returnBytes [optional] - Typ des Rueckgabewertes
+ *                                          FALSE: Boolean (default)
+ *                                          TRUE:  Array mit den Adressbytes oder FALSE, wenn der String keine gueltige IP-Adresse darstellt
  * @return bool|array
  */
-function isIPAddress($string, $returnBytes=false) {
+function isIPAddress($string, $returnBytes = false) {
     static $pattern = '/^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/';
 
     $result = is_string($string) && strLen($string) && preg_match($pattern, $string, $bytes);

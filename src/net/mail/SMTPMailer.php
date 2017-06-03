@@ -208,11 +208,11 @@ class SMTPMailer extends Mailer {
     /**
      * Verschickt eine Mail.
      *
-     * @param  string $sender   - Absender  (Format: 'Vorname Nachname <user@domain.tld>')
-     * @param  string $receiver - Empfaenger (Format: 'Vorname Nachname <user@domain.tld>')
-     * @param  string $subject  - Betreffzeile der E-Mail
-     * @param  string $message  - Inhalt der E-Mail
-     * @param  array  $headers  - zusaetzliche zu setzende Mail-Header (default: none)
+     * @param  string $sender             - Absender  (Format: 'Vorname Nachname <user@domain.tld>')
+     * @param  string $receiver           - Empfaenger (Format: 'Vorname Nachname <user@domain.tld>')
+     * @param  string $subject            - Betreffzeile der E-Mail
+     * @param  string $message            - Inhalt der E-Mail
+     * @param  array  $headers [optional] - zusaetzliche zu setzende Mail-Header (default: none)
      */
     public function sendMail($sender, $receiver, $subject, $message, array $headers=[]) {
         if (!is_string($sender))   throw new IllegalTypeException('Illegal type of parameter $sender: '.getType($sender));
@@ -384,7 +384,7 @@ class SMTPMailer extends Mailer {
     /**
      * Verbindung trennen
      *
-     * @param  bool $silent - ob die Verbindung still und ohne Exception geschlossen werden soll (default: FALSE)
+     * @param  bool $silent [optional] - ob die Verbindung still und ohne Exception geschlossen werden soll (default: FALSE)
      */
     public function disconnect($silent = false) {
         if (!is_resource($this->connection))

@@ -714,7 +714,7 @@ class Module extends Object {
      *
      * @throws StrutsConfigException in case of configuration errors
      */
-    protected function addGlobalForward(ActionForward $forward, $alias=null) {
+    protected function addGlobalForward(ActionForward $forward, $alias = null) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
         $name = is_null($alias) ? $forward->getName() : $alias;
@@ -759,7 +759,7 @@ class Module extends Object {
      * @param  Tile   $tile
      * @param  string $alias [optional] - alias name of the tile
      */
-    protected function addTile(Tile $tile, $alias=null) {
+    protected function addTile(Tile $tile, $alias = null) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
         $name = $tile->getName();

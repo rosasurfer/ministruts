@@ -73,8 +73,8 @@ abstract class CachePeer extends Object {
      * Gibt einen Wert aus dem Cache zurueck.  Existiert der Wert nicht, wird der angegebene Defaultwert
      * zurueckgegeben.
      *
-     * @param  string $key     - Schluessel, unter dem der Wert gespeichert ist
-     * @param  mixed  $default - Defaultwert (kann selbst auch NULL sein)
+     * @param  string $key                - Schluessel, unter dem der Wert gespeichert ist
+     * @param  mixed  $default [optional] - Defaultwert (kann selbst auch NULL sein)
      *
      * @return mixed - Der gespeicherte Wert, NULL, falls kein solcher Schluessel existiert oder der
      *                 angegebene Defaultwert
@@ -109,7 +109,7 @@ abstract class CachePeer extends Object {
      *
      * @param  string     $key                   - Schluessel, unter dem der Wert gespeichert wird
      * @param  mixed      $value                 - der zu speichernde Wert
-     * @param  int        $expires               - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfaellt (default: nie)
+     * @param  int        $expires    [optional] - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfaellt (default: nie)
      * @param  Dependency $dependency [optional] - Abhaengigkeit der Gueltigkeit des gespeicherten Wertes
      *
      * @return bool - TRUE bei Erfolg, FALSE andererseits
@@ -124,7 +124,7 @@ abstract class CachePeer extends Object {
      *
      * @param  string     $key                   - Schluessel, unter dem der Wert gespeichert wird
      * @param  mixed      $value                 - der zu speichernde Wert
-     * @param  int        $expires               - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfaellt (default: nie)
+     * @param  int        $expires    [optional] - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfaellt (default: nie)
      * @param  Dependency $dependency [optional] - Abhaengigkeit der Gueltigkeit des gespeicherten Wertes
      *
      * @return bool - TRUE bei Erfolg, FALSE andererseits
@@ -144,7 +144,7 @@ abstract class CachePeer extends Object {
      *
      * @param  string     $key                   - Schluessel, unter dem der Wert gespeichert wird
      * @param  mixed      $value                 - der zu speichernde Wert
-     * @param  int        $expires               - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfaellt (default: nie)
+     * @param  int        $expires    [optional] - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfaellt (default: nie)
      * @param  Dependency $dependency [optional] - Abhaengigkeit der Gueltigkeit des gespeicherten Wertes
      *
      * @return bool - TRUE bei Erfolg, FALSE andererseits

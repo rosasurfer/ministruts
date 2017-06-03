@@ -51,7 +51,7 @@ class Application extends Object {
      *
      * All further options are added to the application's default configuration {@link Config} as regular config values.
      *
-     * @param  array $options
+     * @param  array $options [optional]
      */
     public function __construct(array $options = []) {
         // set default values

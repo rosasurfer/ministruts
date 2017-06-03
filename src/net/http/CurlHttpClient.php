@@ -127,7 +127,7 @@ class CurlHttpClient extends HttpClient {
     /**
      * Erzeugt eine neue Instanz.
      *
-     * @param  array $options - Array mit zusaetzlichen CURL-Optionen (default: keine)
+     * @param  array $options [optional] - Array mit zusaetzlichen CURL-Optionen (default: keine)
      */
     public function __construct(array $options=[]) {
         $this->options = $options;
@@ -153,7 +153,7 @@ class CurlHttpClient extends HttpClient {
     /**
      * Erzeugt eine neue Instanz der Klasse.
      *
-     * @param  array $options - Array mit zusaetzlichen CURL-Optionen (default: keine)
+     * @param  array $options [optional] - Array mit zusaetzlichen CURL-Optionen (default: keine)
      *
      * @return static
      */

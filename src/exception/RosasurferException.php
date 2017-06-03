@@ -24,7 +24,7 @@ class RosasurferException extends \Exception implements IRosasurferException {
      * @param  int        $code    [optional] - exception identifier, usually an application id
      * @param  \Exception $cause   [optional] - another exception causing this exception
      */
-    public function __construct($message=null, $code=null, \Exception $cause=null) {
+    public function __construct($message=null, $code=null, \Exception $cause = null) {
         parent::__construct($message, $code, $cause);
     }
 

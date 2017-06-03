@@ -154,7 +154,7 @@ class ErrorHandler extends StaticClass {
      *
      * @throws PHPError
      */
-    public static function handleError($level, $message, $file, $line, array $context=null) {
+    public static function handleError($level, $message, $file, $line, array $context = null) {
         //echoPre(__METHOD__.'()  '.DebugHelper::errorLevelToStr($level).': $message='.$message.', $file='.$file.', $line='.$line);
 
         // (1) Ignore suppressed errors and errors not covered by the current reporting level.

@@ -245,7 +245,7 @@ abstract class PersistableObject extends Object {
      *
      * @return mixed - column value
      */
-    private function getPhysicalValue($column, $type=null) {
+    private function getPhysicalValue($column, $type = null) {
         $mapping = $this->dao()->getMapping();
         $column  = strToLower($column);
         if (!isSet($mapping['columns'][$column])) throw new RuntimeException('Not a mapped column "'.func_get_arg(0).'"');
@@ -559,8 +559,8 @@ abstract class PersistableObject extends Object {
     /**
      * Reload this instance from the datastore and optionally reset relations.
      *
-     * @param  bool $resetRelations - NOT YET IMPLEMENTED: Whether or not to reset relations and re-fetch on next access.
-     *                                                     (default: no)
+     * @param  bool $resetRelations [optional] - NOT YET IMPLEMENTED: Whether or not to reset relations and re-fetch on next access.
+     *                                                                (default: no)
      * @return $this
      */
     public function reload($resetRelations = false) {   // TODO: implement and set default=TRUE

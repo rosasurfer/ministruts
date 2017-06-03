@@ -26,9 +26,9 @@ class DebugHelper extends StaticClass {
     /**
      * Take a regular PHP stacktrace and create a fixed and more readable Java-like one.
      *
-     * @param  array  $trace - regular PHP stacktrace
-     * @param  string $file  - name of the file where the stacktrace was generated (optional)
-     * @param  int    $line  - line of the file where the stacktrace was generated (optional)
+     * @param  array  $trace           - regular PHP stacktrace
+     * @param  string $file [optional] - name of the file where the stacktrace was generated
+     * @param  int    $line [optional] - line of the file where the stacktrace was generated
      *
      * @return array - new fixed stacktrace
      *
@@ -49,7 +49,7 @@ class DebugHelper extends StaticClass {
      *   {main}          # line 26, file: /var/www/phalcon/vokuro/public/index.php
      * </pre>
      */
-    public static function fixTrace(array $trace, $file='unknown', $line=0) {
+    public static function fixTrace(array $trace, $file = 'unknown', $line = 0) {
         // check if the stacktrace is already fixed
         if ($trace && isSet($trace[0]['fixed']))
             return $trace;
@@ -114,12 +114,12 @@ class DebugHelper extends StaticClass {
     /**
      * Return a formatted and human-readable version of a stacktrace.
      *
-     * @param  array  $trace  - stacktrace
-     * @param  string $indent - indent the formatted lines by this value (default: empty string)
+     * @param  array  $trace             - stacktrace
+     * @param  string $indent [optional] - indent the formatted lines by this value (default: empty string)
      *
      * @return string
      */
-    public static function formatTrace(array $trace, $indent='') {
+    public static function formatTrace(array $trace, $indent = '') {
         $config  = Config::getDefault();
         $appRoot = $config ? $config->get('app.dir.root') : false;
         $result  = '';
@@ -159,12 +159,12 @@ class DebugHelper extends StaticClass {
     /**
      * Return the fully qualified function or method name of a stacktrace's frame.
      *
-     * @param  array $frame       - frame
-     * @param  bool  $nsLowerCase - whether or not the namespace part of the name to return in lower case (default: no)
+     * @param  array $frame                  - frame
+     * @param  bool  $nsLowerCase [optional] - whether or not the namespace part of the name to return in lower case (default: no)
      *
      * @return string - fully qualified name (without trailing parentheses)
      */
-    public static function getFQFunctionName(array $frame, $nsLowerCase=false) {
+    public static function getFQFunctionName(array $frame, $nsLowerCase = false) {
         $class = $function = '';
 
         if (isSet($frame['function'])) {
@@ -187,12 +187,12 @@ class DebugHelper extends StaticClass {
     /**
      * Return a more readable version of an exception's message.
      *
-     * @param  \Exception $exception - any exception (not only RosasurferExceptions)
-     * @param  string     $indent    - indent lines by this value (default: empty string)
+     * @param  \Exception $exception         - any exception (not only RosasurferExceptions)
+     * @param  string     $indent [optional] - indent lines by this value (default: empty string)
      *
      * @return string - message
      */
-    public static function composeBetterMessage(\Exception $exception, $indent='') {
+    public static function composeBetterMessage(\Exception $exception, $indent = '') {
         if ($exception instanceof PHPError) {
             $result    = $exception->getSimpleType();
         }
@@ -226,12 +226,12 @@ class DebugHelper extends StaticClass {
      * Return a more readable version of an exception's stacktrace. The representation also contains information about
      * nested exceptions.
      *
-     * @param  \Exception $exception - any exception (not only RosasurferExceptions)
-     * @param  string     $indent    - indent the resulting lines by this value (default: empty string)
+     * @param  \Exception $exception         - any exception (not only RosasurferExceptions)
+     * @param  string     $indent [optional] - indent the resulting lines by this value (default: empty string)
      *
      * @return string - readable stacktrace
      */
-    public static function getBetterTraceAsString(\Exception $exception, $indent='') {
+    public static function getBetterTraceAsString(\Exception $exception, $indent = '') {
         if ($exception instanceof IRosasurferException) $trace = $exception->getBetterTrace();
         else                                            $trace = self::fixTrace($exception->getTrace(), $exception->getFile(), $exception->getLine());
         $result = self::formatTrace($trace, $indent);

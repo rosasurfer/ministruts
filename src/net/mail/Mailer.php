@@ -41,7 +41,7 @@ abstract class Mailer extends Object implements MailerInterface {
     /**
      * Erzeugt eine neue Instanz und gibt sie zurueck.
      *
-     * @param  array $options - Mailer-Optionen
+     * @param  array $options [optional] - Mailer-Optionen
      *
      * @return self
      */
@@ -57,11 +57,11 @@ abstract class Mailer extends Object implements MailerInterface {
     /**
      * Verschiebt den Versandvorgang dieses Mailers, wenn dies entsprechend konfiguriert ist.
      *
-     * @param  string   $sender   - Absender  (Format: 'Vorname Nachname <user@domain.tld>')
-     * @param  string   $receiver - Empfaenger (Format: 'Vorname Nachname <user@domain.tld>')
-     * @param  string   $subject  - Betreffzeile der E-Mail
-     * @param  string   $message  - Inhalt der E-Mail
-     * @param  string[] $headers  - zusaetzliche zu setzende Mail-Header (default: keine)
+     * @param  string   $sender             - Absender  (Format: 'Vorname Nachname <user@domain.tld>')
+     * @param  string   $receiver           - Empfaenger (Format: 'Vorname Nachname <user@domain.tld>')
+     * @param  string   $subject            - Betreffzeile der E-Mail
+     * @param  string   $message            - Inhalt der E-Mail
+     * @param  string[] $headers [optional] - zusaetzliche zu setzende Mail-Header (default: keine)
      *
      * @return bool - ob der Versand verschoben wurde.
      */

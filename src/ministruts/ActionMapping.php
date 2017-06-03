@@ -433,7 +433,7 @@ class ActionMapping extends Object {
      *
      * @throws StrutsConfigException in case of configuration errors
      */
-    public function addForward(ActionForward $forward, $alias=null) {
+    public function addForward(ActionForward $forward, $alias = null) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
         $sName = $this->name ? ' name="'.$this->name.'"':'';
         $sPath = $this->path ? ' path="'.$this->path.'"':'';

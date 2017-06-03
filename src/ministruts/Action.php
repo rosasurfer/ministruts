@@ -85,7 +85,7 @@ abstract class Action extends Object {
      *
      * @param  Request       $request
      * @param  Response      $response
-     * @param  ActionForward $forward  - der originale ActionForward, wie ihn die Action zurueckgegeben hat
+     * @param  ActionForward $forward [optional] - der originale ActionForward, wie ihn die Action zurueckgegeben hat
      *
      * @return ActionForward|null - der originale oder ein modifizierter ActionForward (z.B. mit weiteren
      *                              Query-Parameter)

@@ -117,7 +117,7 @@ class FrontController extends Singleton {
     /**
      * Process the current HTTP request.
      *
-     * @param  array $options - runtime options (default: none)
+     * @param  array $options [optional] - runtime options (default: none)
      *
      * @return Response - respone wrapper
      */
