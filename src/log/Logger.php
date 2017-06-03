@@ -260,7 +260,7 @@ class Logger extends StaticClass {
     /**
      * Resolve the loglevel of the specified class.
      *
-     * @param  string $class - class name
+     * @param  string $class [optional] - class name
      *
      * @return int - configured loglevel or the application loglevel if no class specific loglevel is configured
      */
@@ -312,11 +312,11 @@ class Logger extends StaticClass {
     /**
      * Log a message.
      *
-     * @param  object|string $loggable - a message or an object implementing <tt>__toString()</tt>
-     * @param  int           $level    - loglevel
-     * @param  array         $context  - optional logging context with additional data
+     * @param  object|string $loggable           - a message or an object implementing <tt>__toString()</tt>
+     * @param  int           $level              - loglevel
+     * @param  array         $context [optional] - logging context with additional data
      */
-    public static function log($loggable, $level, array $context=[]) {
+    public static function log($loggable, $level, array $context = []) {
         self::init();
 
         // Wrap everything in a try-catch block to prevent user generated log messages
@@ -689,7 +689,16 @@ class Logger extends StaticClass {
         else {
             $request  = Request::me();
             $location = strLeftTo($request->getUrl(), '?');
-            $session  = $request->isSession() ? print_r(ksort_r($_SESSION), true) : null;
+            $session  = null;
+
+            if ($request->isSession()) {
+                $session = $_SESSION;
+            }
+            else if ($request->hasSessionId() && $request->getSession()) {
+                if (session_id() == $request->getSessionId())       // if both differ the id was regenerated
+                    $session = $_SESSION;
+            }
+            $session  = is_null($session) ? null : print_r(ksort_r($session), true);
             $ip       = $_SERVER['REMOTE_ADDR'];
             $host     = getHostByAddr($ip);
             if ($host != $ip)

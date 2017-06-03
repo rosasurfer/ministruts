@@ -9,6 +9,8 @@ use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
 
+use rosasurfer\util\PHP;
+
 use function rosasurfer\strEndsWith;
 use function rosasurfer\strLeft;
 use function rosasurfer\strLeftTo;
@@ -455,23 +457,12 @@ class Request extends Singleton {
 
 
     /**
-     * Ob mit dem Request eine Session-ID uebertragen wurde.
-     *
-     * @return bool
-     */
-    public function isSessionId() {
-        $name = session_name();
-        return (isSet($_COOKIE[$name]) || isSet($_REQUEST[$name]));
-    }
-
-
-    /**
-     * Whether or not an HTTP session exists.
+     * Whether or not an HTTP session was started during the current request. Not whether the session is still open (active).
      *
      * @return bool
      */
     public function isSession() {
-        return defined('SID');
+        return (session_id() !== '');
     }
 
 
@@ -486,17 +477,63 @@ class Request extends Singleton {
 
 
     /**
-     * Zerstoert die aktuelle HttpSession des Requests.
+     * Return the session id transmitted by the client with the request (not the id sent to the client with the reponse).
+     *
+     * @return string
+     */
+    public function getSessionId() {
+        $name = session_name();
+
+        if (PHP::ini_get_bool('session.use_cookies')) {
+            if (isSet($_COOKIE[$name]))
+                return $_COOKIE[$name];
+        }
+        if (PHP::ini_get_bool('session.use_trans_sid') && !PHP::ini_get_bool('session.use_only_cookies')) {
+            if (isSet($_REQUEST[$name]))
+                return $_REQUEST[$name];
+        }
+        return '';
+    }
+
+
+    /**
+     * Whether or not a session id was transmitted with the request in a legal way. An illegal way would be for example a
+     * URL based session id when the php.ini setting 'session.use_trans_sid' is not enabled.
+     *
+     * @return bool
+     */
+    public function hasSessionId() {
+        $name = session_name();
+
+        if (PHP::ini_get_bool('session.use_cookies')) {
+            if (isSet($_COOKIE[$name]))
+                return true;
+        }
+        if (PHP::ini_get_bool('session.use_trans_sid') && !PHP::ini_get_bool('session.use_only_cookies')) {
+            if (isSet($_REQUEST[$name]))
+                return true;
+        }
+        return false;
+    }
+
+
+    /**
+     * Destroy the current session and it's data.
      */
     public function destroySession() {
-        if ($this->isSession()) {
-            // TODO: 1. Cookie mit 2. ueberschreiben statt einen weiteren hinzuzufuegen
-            // besser einen schon gesetzten Cookie mit header($replace = true) ueberschreiben
-            // ausserdem soll $value = '' nicht immer funktionieren, besser: $value = sess_id()
+        if (session_status() == PHP_SESSION_ACTIVE) {
+            // unset all session variables
+            $_SESSION = [];
 
-            // TODO: SID und die gesamte Session zuruecksetzen
-            setcookie(session_name(), '', time() - 1*DAY, '/');
-            session_destroy();
+            // delete the session cookie
+            if (PHP::ini_get_bool('session.use_cookies')) {
+                $params = session_get_cookie_params();
+                setCookie($name=session_name(), $value='', $expire=time()-1*DAY, $params['path'    ],
+                                                                                 $params['domain'  ],
+                                                                                 $params['secure'  ],
+                                                                                 $params['httponly']);
+            }
+            session_destroy();                      // TODO: check if SID is reset
         }
     }
 
@@ -520,7 +557,7 @@ class Request extends Singleton {
     /**
      * Return the specified headers as an array of name-value pairs (in transmitted order).
      *
-     * @param  string|string[] $names - one or more header names; without a name all headers are returned
+     * @param  string|string[] $names [optional] - one or more header names; without a name all headers are returned
      *
      * @return array - name-value pairs
      */

@@ -148,7 +148,7 @@ class Tile extends Object {
      *
      * @return $this
      */
-    public function setNestedTile($name, Tile $tile=null) {
+    public function setNestedTile($name, Tile $tile = null) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
         $this->nestedTiles[$name] = $tile;

@@ -2,10 +2,7 @@
 namespace rosasurfer\ministruts;
 
 use rosasurfer\core\Singleton;
-
-use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\IllegalTypeException;
-
 use rosasurfer\exception\error\PHPError;
 
 
@@ -31,11 +28,6 @@ class HttpSession extends Singleton {
      */
     protected function __construct(Request $request) {
         parent::__construct();
-
-        // Pruefen, ob eine Session bereits ausserhalb dieser Instanz gestartet wurde
-        if ($request->isSession())
-            throw new IllegalStateException('Cannot initialize '.get_class($this).', found already started session. Use this class *only* for session handling!');
-
         $this->request = $request;
         $this->init();
     }
@@ -58,25 +50,25 @@ class HttpSession extends Singleton {
         // Session-Cookie auf Application beschraenken, um mehrere Projekte je Domain zu ermoeglichen
         $params = session_get_cookie_params();
         session_set_cookie_params($params['lifetime'],
-                                $request->getApplicationBaseUri(),
-                                $params['domain'],
-                                $params['secure'],
-                                $params['httponly']);
+                                  $request->getApplicationBaseUri(),
+                                  $params['domain'  ],
+                                  $params['secure'  ],
+                                  $params['httponly']);
 
         // Session starten bzw. fortsetzen
         try {
-            session_start();
+            session_start();                    // TODO: Handle the case when a session was already started elsewhere?
         }
         catch (PHPError $error) {
             if (strPos($error->getMessage(), 'The session id contains illegal characters') === false)
-                throw $error;                 // andere Fehler weiterreichen
-            session_regenerate_id();         // neue ID generieren
+                throw $error;                   // andere Fehler weiterreichen
+            session_regenerate_id();            // neue ID generieren
         }
 
 
         // Inhalt der Session pruefen
         // TODO: Session verwerfen, wenn der User zwischen Cookie- und URL-Uebertragung wechselt
-        if (sizeOf($_SESSION) == 0) {          // 0 bedeutet, die Session ist (fuer diese Methode) neu
+        if (sizeOf($_SESSION) == 0) {           // 0 bedeutet, die Session ist (fuer diese Methode) neu
             $sessionName = session_name();
             $sessionId   = session_id();        // pruefen, woher die ID kommt ...
 
@@ -87,7 +79,7 @@ class HttpSession extends Singleton {
 
             $this->reset($fromUser);            // if $fromUser=TRUE: generate new session id
         }
-        else {                                 // vorhandene Session fortgesetzt
+        else {                                  // vorhandene Session fortgesetzt
             $this->new = false;
         }
     }
@@ -153,8 +145,8 @@ class HttpSession extends Singleton {
      * Gibt den unter dem angegebenen Schluessel in der Session gespeicherten Wert zurueck oder den
      * angegebenen Alternativwert, falls kein Wert unter diesem Schluessel existiert.
      *
-     * @param  string $key     - Schluessel, unter dem der Wert gespeichert ist
-     * @param  mixed  $default - Default- bzw. Alternativwert (kann selbst auch NULL sein)
+     * @param  string $key                - Schluessel, unter dem der Wert gespeichert ist
+     * @param  mixed  $default [optional] - Default- bzw. Alternativwert (kann selbst auch NULL sein)
      *
      * @return mixed - der gespeicherte Wert oder NULL
      */

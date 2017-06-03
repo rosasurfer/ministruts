@@ -111,14 +111,18 @@ class RequestProcessor extends Object {
 
 
     /**
-     * Wurde mit dem Request eine Session-ID uebertragen, wird die entsprechende HttpSession fortgesetzt.
+     * Session handling sccording to the configuration.
      *
      * @param  Request $request
      */
     protected function processSession(Request $request) {
-        if (!$request->isSession() && $request->isSessionId()) {
+        /*
+        // former behaviour: If a session id was transmitted the session was started automatically.
+        //
+        if (session_status()==PHP_SESSION_NONE && $request->hasSessionId()) {
             $request->getSession();
         }
+        */
     }
 
 
@@ -425,7 +429,7 @@ PROCESS_METHOD_ERROR_SC_405;
      *
      * @return Action
      */
-    protected function processActionCreate(ActionMapping $mapping, ActionForm $form=null) {
+    protected function processActionCreate(ActionMapping $mapping, ActionForm $form = null) {
         $className = $mapping->getActionClassName();
 
         return new $className($mapping, $form);
