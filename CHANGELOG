@@ -1,4 +1,9 @@
 
+2017-06-03
+
+   - integrate net/http/HeaderUtils into ministruts/Response
+
+
 2017-05-24
 
    - util: helper function rosasurfer\objectToArray($object, $access)
