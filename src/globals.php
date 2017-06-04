@@ -319,15 +319,15 @@ function strLeft($string, $length) {
  * @param  string $string                    - initial string
  * @param  string $limiter                   - limiting substring (one or more characters)
  * @param  int    $count          [optional] - positive: the specified occurrence of the limiting substring from the start
- *                                                         of the string<br>
- *                                               negative: the specified occurrence of the limiting substring from the end of
- *                                                         the string<br>
- *                                               zero:     an empty string is returned<br>
- *                                               (default: 1 = the first occurrence)
+ *                                                       of the string<br>
+ *                                             negative: the specified occurrence of the limiting substring from the end of
+ *                                                       the string<br>
+ *                                             zero:     an empty string is returned<br>
+ *                                             (default: 1 = the first occurrence)
  * @param  bool   $includeLimiter [optional] - whether or not to include the limiting substring in the returned result
- *                                               (default: FALSE)
+ *                                             (default: FALSE)
  * @param  mixed  $onNotFound     [optional] - value to return if the specified occurrence of the limiting substring is not found
- *                                               (default: the initial string)
+ *                                             (default: the initial string)
  *
  * @return string - left part of the initial string or the $onNotFound value
  *
@@ -371,15 +371,15 @@ function strRight($string, $length) {
  * @param  string $string                    - initial string
  * @param  string $limiter                   - limiting substring (one or more characters)
  * @param  int    $count          [optional] - positive: the specified occurrence of the limiting substring counted from the
- *                                                         start of the string<br>
- *                                               negative: the specified occurrence of the limiting substring counted from the
- *                                                         end of the string<br>
- *                                               zero:     the initial string is returned<br>
- *                                               (default: 1 = the first occurrence)
+ *                                                       start of the string<br>
+ *                                             negative: the specified occurrence of the limiting substring counted from the
+ *                                                       end of the string<br>
+ *                                             zero:     the initial string is returned<br>
+ *                                             (default: 1 = the first occurrence)
  * @param  bool   $includeLimiter [optional] - whether or not to include the limiting substring in the returned result
- *                                               (default: FALSE)
+ *                                             (default: FALSE)
  * @param  mixed  $onNotFound     [optional] - value to return if the specified occurrence of the limiting substring is not found
- *                                               (default: empty string)
+ *                                             (default: empty string)
  *
  * @return string - right part of the initial string or the $onNotFound value
  *
