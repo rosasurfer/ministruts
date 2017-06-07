@@ -3,21 +3,18 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //                                                                                                                    //
 //  This file is a template script, it cannot run by itself. Copy this file to your project's CRON directory and      //
-//  adjust the path in line 34 to your application's init script.  Then setup a cron job to run the script by CRON.   //
+//  adjust the path in line 36 to your application's init script.  Then setup a cron job to run the script by CRON.   //
 //                                                                                                                    //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 /**
- * Scans the application's PHP error log file for entries and notifies by email of any findings. Mails will be sent to
- * the configured log message receivers of the application. If there are no configured receivers mail will be sent to
- * the system user running this script. After notification the found entries are removed from the log file.
+ * Scans the application's PHP error log file for entries and notifies by email. Mail is sent to the configured log message
+ * receivers. If no receivers are configured mail is sent to the system user running the script. Processed log entries are
+ * removed from the log file.
  *
- * If this script is run by CRON there is no way that errors might be missed.  If the script itself causes errors the
- * error messages are printed to STDERR and catched by CRON which again will notify the system user running this script.
- *
- * @todo  Error messages must not be printed to STDOUT but to STDERR.
- * @todo  Parameter for suppresing/not suppressing regular output to enable status messages when not run by CRON.
+ * TODO: Error messages must not be printed to STDOUT but to STDERR.
+ * TODO: Add parameter for not suppressing regular output to get status messages when not executed by CRON.
  */
 namespace rosasurfer\cron\logwatch;
 
@@ -36,17 +33,17 @@ use const rosasurfer\NL;
 use const rosasurfer\WINDOWS;
 
 
-require(__DIR__.'/{application}/{path_to_init}/init.php');
+require(__DIR__.'/{application-path-to-init}/init.php');
 set_time_limit(0);                                       // no time limit for CLI
 
 
-// --- configuration ---------------------------------------------------------------------------------------------------
+// --- configuration --------------------------------------------------------------------------------------------------------
 
 
-$quiet = false;                                          // whether or not "quiet" mode is enabled (for cron)
+$quiet = false;                                          // whether or not "quiet" mode is enabled (for CRON)
 
 
-// --- parse/validate command line arguments ---------------------------------------------------------------------------
+// --- parse/validate command line arguments --------------------------------------------------------------------------------
 
 
 $args = array_slice($_SERVER['argv'], 1);
@@ -61,7 +58,7 @@ foreach ($args as $i => $arg) {
 }
 
 
-// --- start -----------------------------------------------------------------------------------------------------------
+// --- start ----------------------------------------------------------------------------------------------------------------
 
 
 // (1) define error log sender and receivers
@@ -71,7 +68,7 @@ $sender = $config->get('mail.from', get_current_user().'@localhost');
 $receivers = [];
 foreach (explode(',', $config->get('log.mail.receiver', '')) as $receiver) {
     if ($receiver=trim($receiver))
-        $receivers[] = $receiver;                          // TODO: validate address format
+        $receivers[] = $receiver;       // TODO: validate address format
 }
 
 // check setting "mail.forced-receiver" (may be set in development)
@@ -83,7 +80,7 @@ if ($receivers && $forcedReceivers=$config->get('mail.forced-receiver', false)) 
     }
 }
 
-// w/o receiver mail is sent to the current system user
+// without receiver mail is sent to the current system user
 !$receivers && $receivers[]=get_current_user().'@localhost';
 
 
@@ -101,7 +98,7 @@ if (!is_file    ($errorLog)) { $quiet || echoPre('error log does not exist: '.$e
 if (!is_writable($errorLog)) {             error('cannot access log file: '  .$errorLog); exit(1); }
 $errorLog = realPath($errorLog);
 
-// rename the file (we don't want to lock it, doing so could block the main app)
+// rename the file; we don't want to lock it cause doing so could block the main app
 $tempName = tempNam(dirName($errorLog), baseName($errorLog).'.');
 if (!rename($errorLog, $tempName)) {
     error('cannot rename log file: '  .$errorLog);
@@ -115,24 +112,24 @@ $line  = $entry = '';
 $i = 0;
 while (($line=fGets($hFile)) !== false) {
     $i++;
-    if (strStartsWith($line, '[')) {                      // lines starting with "[" are considered the start of an entry
+    if (strStartsWith($line, '[')) {            // lines starting with a bracket "[" are considered the start of an entry
         processEntry($entry);
         $entry = '';
     }
     $entry .= $line;
 }
-processEntry($entry);                                    // process the last entry (if any)
+processEntry($entry);                           // process the last entry (if any)
 
 // delete the processed file
 fClose($hFile);
 unlink($tempName);
 
 
-// (4) The ugly end
+// (4) the ugly end
 exit(0);
 
 
-// --- function definitions --------------------------------------------------------------------------------------------
+// --- function definitions -------------------------------------------------------------------------------------------------
 
 
 /**
@@ -144,17 +141,14 @@ exit(0);
 function processEntry($entry) {
     if (!is_string($entry)) throw new IllegalTypeException('Illegal type of parameter $entry: '.getType($entry));
     $entry = trim($entry);
-    if (!strLen($entry))    return;
+    if (!strLen($entry)) return;
 
     global $quiet, $sender, $receivers;
 
-    // normalize line-breaks
-    $entry = normalizeEOL($entry);                                 // use Unix line-breaks by default but...
-    if (WINDOWS)                                                   // use Windows line-breaks on Windows
-        $entry = str_replace(EOL_UNIX, EOL_WINDOWS, $entry);
-    $entry = str_replace(chr(0), '?', $entry);                     // replace NUL bytes which destroy the mail
+    $entry = normalizeEOL($entry, WINDOWS ? EOL_WINDOWS:EOL_UNIX);  // normalize line-breaks for email
+    $entry = str_replace(chr(0), '?', $entry);                      // replace NUL bytes which destroy the mail
 
-    $subject = strTok($entry, "\r\n");                             // that's CR or LF, not CRLF
+    $subject = strTok($entry, "\r\n");                              // that's CR or LF, not CRLF
     $message = $entry;
 
     $quiet || echoPre('sending log entry: '.subStr($subject, 0, 50).'...');
