@@ -63,11 +63,16 @@ abstract class DAO extends Singleton {
     /**
      * Find all matching records and convert them to instances of the entity class.
      *
-     * @param  string $query - SQL query with optional ORM syntax
+     * @param  string $query [optional] - SQL query with optional ORM syntax; without a query all instances are returned
      *
      * @return PersistableObject[]
      */
-    public function findAll($query) {
+    public function findAll($query = null) {
+        if ($query === null) {
+            $mapping = $this->getMapping();
+            $table = $this->escapeIdentifier($mapping['table']);
+            $query = 'select * from '.$table;
+        }
         return $this->getWorker()->findAll($query);
     }
 
