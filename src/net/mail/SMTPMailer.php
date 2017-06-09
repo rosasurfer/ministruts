@@ -9,7 +9,6 @@ use rosasurfer\exception\InfrastructureException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
 
-use rosasurfer\log\Logger;
 use rosasurfer\util\Date;
 
 use function rosasurfer\normalizeEOL;
@@ -17,37 +16,20 @@ use function rosasurfer\strContains;
 use function rosasurfer\strStartsWithI;
 
 use const rosasurfer\EOL_WINDOWS;
-use const rosasurfer\L_DEBUG;
-use const rosasurfer\L_INFO;
-use const rosasurfer\L_NOTICE;
 use const rosasurfer\NL;
 
 
 /**
- * Mailer, der Mails per SMTP-Protokoll ueber einen SMTP-Server verschickt.
+ * Simple mailer sending an email directly via an SMTP server.
+ *
+ * @deprecated - Use an external library for sending more user friendly email or for using templates.
  */
 class SMTPMailer extends Mailer {
 
 
-    /** @var bool */
-    private static $logDebug;
-
-    /** @var bool */
-    private static $logInfo;
-
-    /** @var bool */
-    private static $logNotice;
-
-    /** @var int - benoetigt der Versand laenger als hier angegeben, wird er im Loglevel DEBUG geloggt */
-    private static $maxSendingTime = 2;
-
     /** @var array */
-    protected $config = [
-        'host'          => null,        // SMTP server host name
-        'port'          => null,        // SMTP server port
-        'timeout'       => 300,         // socket timeout: sendmail braucht ewig
-        'auth_username' => null,        // authentification username
-        'auth_password' => null,        // authentification password
+    private $defaultOptions = [
+        'timeout' => 300,                   // socket timeout
     ];
 
     /** @var string */
@@ -69,50 +51,42 @@ class SMTPMailer extends Mailer {
     /**
      * Constructor
      *
-     * @param  array $options - Mailer-Optionen
+     * @param  array $options - mailer options
      */
     public function __construct(array $options) {
-        parent::__construct($options);
+        parent::__construct(array_merge($this->defaultOptions, $options));
 
-        $loglevel        = Logger::getLogLevel(__CLASS__);
-        self::$logDebug  = ($loglevel <= L_DEBUG );
-        self::$logInfo   = ($loglevel <= L_INFO  );
-        self::$logNotice = ($loglevel <= L_NOTICE);
-
-        // fehlende Optionen mit PHP-Defaults bestuecken
-        if (!isSet($options['host'])) {
-            $options['host'] = ini_get('SMTP');
-            $options['port'] = ini_get('smtp_port');
+        // set missing options to PHP defaults
+        if (!isSet($this->options['host'])) {
+            $this->options['host'] = ini_get('SMTP');
+            $this->options['port'] = ini_get('smtp_port');
         }
         else {
-            $host = $options['host'];
-            if (!is_string($host)) throw new IllegalTypeException('Illegal type of option "host": '.getType($options['host']));
+            $host = $this->options['host'];
+            if (!is_string($host)) throw new IllegalTypeException('Illegal type of option "host": '.getType($this->options['host']));
             $parts = explode(':', $host);
 
             if (sizeOf($parts) == 1) {
-                if (trim($parts[0]) == '') throw new InvalidArgumentException('Invalid option "host": '.$options['host']);
-                if (!isSet($options['port']))
-                    $options['port'] = ini_get('smtp_port');  // TODO: Adresse und Port pruefen
+                if (trim($parts[0]) == '') throw new InvalidArgumentException('Invalid option "host": '.$this->options['host']);
+                if (!isSet($this->options['port']))
+                    $this->options['port'] = ini_get('smtp_port');  // TODO: validate host and port
             }
             elseif (sizeOf($parts) == 2) {
-                if (trim($parts[0])=='' || trim($parts[1])=='') throw new InvalidArgumentException('Invalid option "host": '.$options['host']);
-                $options['host'] = $parts[0];                // TODO: Adresse und Port pruefen
-                $options['port'] = $parts[1];
+                if (trim($parts[0])=='' || trim($parts[1])=='') throw new InvalidArgumentException('Invalid option "host": '.$this->options['host']);
+                $this->options['host'] = $parts[0];                 // TODO: validate host and port
+                $this->options['port'] = $parts[1];
             }
             else {
-                throw new InvalidArgumentException('Invalid option "host": '.$options['host']);
+                throw new InvalidArgumentException('Invalid option "host": '.$this->options['host']);
             }
         }
-
-        // vorgegebene mit uebergebenen Optionen mergen
-        $this->config = array_merge($this->config, $options);
 
         // get our hostname
         $hostName = php_uname('n');
         if (!$hostName)
             $hostName  = 'localhost';
         if (!strContains($hostName, '.'))
-            $hostName .= '.localdomain';    // hostname must contain more than one part (see RFC 2821)
+            $hostName .= '.localdomain';            // hostname must contain more than one part (see RFC 2821)
         $this->hostName = strToLower($hostName);
     }
 
@@ -120,7 +94,7 @@ class SMTPMailer extends Mailer {
     /**
      * Destructor
      *
-     * Sorgt bei Zerstoerung des Objekts dafuer, dass eine noch offene Connection geschlossen werden.
+     * Closes an open connection.
      */
     public function __destruct() {
         // Attempting to throw an exception from a destructor during script shutdown causes a fatal error.
@@ -135,31 +109,31 @@ class SMTPMailer extends Mailer {
 
 
     /**
-     * Verbindung herstellen
+     * Connect to the SMTP server.
      */
     private function connect() {
-        $connection = fSockOpen('tcp://'.$this->config['host'],
-                                         $this->config['port'],
+        $connection = fSockOpen('tcp://'.$this->options['host'],
+                                         $this->options['port'],
                                          $errorCode,
                                          $errorMsg,
-                                         $this->config['timeout']);
-        // TODO: connect() bleibt ohne Fehlermeldung haengen, wenn keine Verbindung zustande kommt
+                                         $this->options['timeout']);
+        // TODO: connect() might hang without producing an error if the connection fails
         if (!$connection) throw new RuntimeException('Could not open socket: '.$errorMsg.' (error '.$errorCode.')');
 
         $data = stream_get_meta_data($connection);
         if ($data['timed_out']) throw new InfrastructureException('Timeout on socket connection');
 
-        socket_set_timeout($connection, $this->config['timeout']);
+        socket_set_timeout($connection, $this->options['timeout']);
         $this->connection = $connection;
 
         // init connection
         $this->readResponse();                          // read greeting
-        $this->writeData('EHLO '.$this->hostName);      // extended Hello first...
+        $this->writeData('EHLO '.$this->hostName);      // extended "Hello" first
         $response = $this->readResponse();
 
         $this->parseResponse($response);
         if ($this->responseStatus != 250) {
-            $this->writeData('HELO '.$this->hostName);   // normal Hello if extended fails...
+            $this->writeData('HELO '.$this->hostName);   // regular "Hello" if the extended one fails
             $response = $this->readResponse();
 
             $this->parseResponse($response);
@@ -170,7 +144,7 @@ class SMTPMailer extends Mailer {
 
 
     /**
-     * Authentifizierung
+     * Authentificate the connection.
      */
     private function authenticate() {
         if (!is_resource($this->connection))
@@ -188,31 +162,31 @@ class SMTPMailer extends Mailer {
             throw new RuntimeException('AUTH LOGIN command not supported: '.$this->responseStatus.' '.$this->response);
 
         // send username
-        $this->writeData(base64_encode($this->config['auth_username']));
+        $this->writeData(base64_encode($this->options['auth_username']));
         $response = $this->readResponse();
 
         $this->parseResponse($response);
         if ($this->responseStatus != 334)
-            throw new RuntimeException('Username '.$this->config['auth_username'].' not accepted'.$this->responseStatus.' '.$this->response);
+            throw new RuntimeException('Username '.$this->options['auth_username'].' not accepted'.$this->responseStatus.' '.$this->response);
 
         // send password
-        $this->writeData(base64_encode($this->config['auth_password']));
+        $this->writeData(base64_encode($this->options['auth_password']));
         $response = $this->readResponse();
 
         $this->parseResponse($response);
         if ($this->responseStatus != 235)
-            throw new RuntimeException('Login failed for username '.$this->config['auth_username'].': '.$this->responseStatus.' '.$this->response);
+            throw new RuntimeException('Login failed for username '.$this->options['auth_username'].': '.$this->responseStatus.' '.$this->response);
     }
 
 
     /**
-     * Verschickt eine Mail.
+     * Send an email.
      *
-     * @param  string $sender             - Absender  (Format: 'Vorname Nachname <user@domain.tld>')
-     * @param  string $receiver           - Empfaenger (Format: 'Vorname Nachname <user@domain.tld>')
-     * @param  string $subject            - Betreffzeile der E-Mail
-     * @param  string $message            - Inhalt der E-Mail
-     * @param  array  $headers [optional] - zusaetzliche zu setzende Mail-Header (default: none)
+     * @param  string $sender             - sender (format: 'FirstName SecondName <user@domain.tld>')
+     * @param  string $receiver           - receiver (format: 'FirstName SecondName <user@domain.tld>')
+     * @param  string $subject            - email subject line
+     * @param  string $message            - email body
+     * @param  array  $headers [optional] - additional headers to set (default: none)
      */
     public function sendMail($sender, $receiver, $subject, $message, array $headers=[]) {
         if (!is_string($sender))   throw new IllegalTypeException('Illegal type of parameter $sender: '.getType($sender));
@@ -221,11 +195,10 @@ class SMTPMailer extends Mailer {
 
         if (!is_string($receiver)) throw new IllegalTypeException('Illegal type of parameter $receiver: '.getType($receiver));
 
-        if (!$config=Config::getDefault())
-            throw new RuntimeException('Service locator returned empty default config: '.getType($config));
+        if (!$config=Config::getDefault()) throw new RuntimeException('Service locator returned empty default config: '.getType($config));
 
         $forced = $config->get('mail.forced-receiver', '');
-        if (!is_string($forced)) throw new IllegalTypeException('Invalid type of variable $forced: '.getType($forced).' (not string)');
+        if (!is_string($forced))           throw new IllegalTypeException('Invalid type of variable $forced: '.getType($forced).' (not string)');
 
         strLen($forced) && $receiver=$forced;
         $to = $this->parseAddress($receiver);
@@ -239,15 +212,10 @@ class SMTPMailer extends Mailer {
         }
 
 
-        // Versand je nach Konfiguration verschieben (um z.B. Transaktionen nicht zu blockieren)
+        // delay sending to the script's shutdown if configured (e.g. as to not to block other tasks)
         if ($this->sendLater($sender, $receiver, $subject, $message, $headers))
             return;
 
-
-        // ggf. Startzeitpunkt speichern
-        $start = null;
-        if (self::$logDebug)
-            $start = microTime(true);
 
         if (is_resource($this->connection)) {
             $this->logBuffer = '';          // reset log buffer if already connected
@@ -256,7 +224,7 @@ class SMTPMailer extends Mailer {
             $this->connect();
         }
 
-        if ($this->config['auth_username'])
+        if (!empty($this->options['auth_username']))
             $this->authenticate();
 
 
@@ -282,7 +250,7 @@ class SMTPMailer extends Mailer {
             throw new RuntimeException('MAIL FROM: <'.$returnPath.'> command not accepted: '.$this->responseStatus.' '.$this->response.NL.NL.'Transfer log:'.NL.'-------------'.NL.$this->logBuffer);
 
         $this->writeData('RCPT TO: <'.$to['address'].'>');
-        $response = $this->readResponse();     // TODO: macht der MTA ein DNS-Lookup, kann es in readResponse() zum Time-out kommen
+        $response = $this->readResponse();     // TODO: a DNS lookup in the receiving MTA might cause a timeout in readResponse()
 
         $this->parseResponse($response);
         if ($this->responseStatus != 250 && $this->responseStatus != 251)
@@ -295,7 +263,7 @@ class SMTPMailer extends Mailer {
         if ($this->responseStatus != 354)
             throw new RuntimeException('DATA command not accepted: '.$this->responseStatus.' '.$this->response.NL.NL.'Transfer log:'.NL.'-------------'.NL.$this->logBuffer);
 
-        // TODO: zu lange Header umbrechen
+        // TODO: wrap long header lines
 
         // needed headers
         $this->writeData('Date: '.date('r'));
@@ -312,28 +280,27 @@ class SMTPMailer extends Mailer {
         $this->writeData('X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2900.2180');
 
 
-        // custom headers
+        // custom headers                   // TODO: validation
         foreach ($headers as $header) {
-            // TODO: Header syntaktisch ueberpruefen
             $header = preg_replace('~([\xA0-\xFF])~e', '"=?ISO-8859-1?Q?=".strToUpper(decHex(ord("$1")))."?="', $header);
             $this->writeData($header);
         }
         $this->writeData('');
 
 
-        $maxLineLength = 990;   // eigentlich 998, doch FastMail nimmt auch nur 990
+        $maxLineLength = 990;   // actually 998 per RFC but e.g. FastMail only accepts 990
 
         // mail body
         $message = normalizeEOL($message);
         $lines = explode("\n", $message);
         foreach ($lines as $line) {
 
-            // break up long lines into several shorter ones
+            // wrap long lines into several shorter ones
             $pieces = null;
             while (strLen($line) > $maxLineLength) {
                 $pos = strRPos(subStr($line, 0, $maxLineLength), ' ');
                 if (!$pos)
-                    $pos = $maxLineLength - 1;    // patch to fix DOS attack
+                    $pos = $maxLineLength - 1;    // patch to fix DoS attack; good old times :-)
 
                 $pieces[] = subStr($line, 0, $pos);
                 $line = subStr($line, $pos + 1);
@@ -342,7 +309,7 @@ class SMTPMailer extends Mailer {
 
             foreach ($pieces as $line) {
                 if (subStr($line, 0, 1) == '.')
-                    $line = '.'.$line;            // escape leading dots to avoid end marker confusion
+                    $line = '.'.$line;            // escape leading dots to avoid mail end marker confusion
                 $this->writeData($line);
             }
         }
@@ -354,19 +321,11 @@ class SMTPMailer extends Mailer {
         $this->parseResponse($response);
         if ($this->responseStatus != 250)
             throw new RuntimeException('Sent data not accepted: '.$this->responseStatus.' '.$this->response.NL.NL.'Transfer log:'.NL.'-------------'.NL.$this->logBuffer);
-
-        // ggf. zu lang dauernden Versand loggen
-        if (self::$logDebug) {
-            $end = microTime(true);
-            $timeTaken = round($end - $start, 4);
-            if ($timeTaken > self::$maxSendingTime)
-                Logger::log(__METHOD__.'() to '.$to['address'].' took more than '.self::$maxSendingTime.' seconds: '.$timeTaken, L_DEBUG);
-        }
     }
 
 
     /**
-     * Verbindung resetten
+     * Reset the connection.
      */
     public function reset() {
         if (!is_resource($this->connection))
@@ -382,9 +341,9 @@ class SMTPMailer extends Mailer {
 
 
     /**
-     * Verbindung trennen
+     * Disconnect.
      *
-     * @param  bool $silent [optional] - ob die Verbindung still und ohne Exception geschlossen werden soll (default: FALSE)
+     * @param  bool $silent [optional] - whether or not to silently suppress disconnect errors (default: no)
      */
     public function disconnect($silent = false) {
         if (!is_resource($this->connection))
@@ -405,7 +364,7 @@ class SMTPMailer extends Mailer {
 
 
     /**
-     * Antwort der Gegenseite lesen
+     * Read the MTA's response.
      */
     private function readResponse() {
         $lines = null;
@@ -424,7 +383,9 @@ class SMTPMailer extends Mailer {
 
 
     /**
-     * Daten in die Socketverbindung schreiben
+     * Write data into the open socket.
+     *
+     * @param string $data
      */
     private function writeData($data) {
         $count = fWrite($this->connection, $data.EOL_WINDOWS, strLen($data)+2);
@@ -437,7 +398,9 @@ class SMTPMailer extends Mailer {
 
 
     /**
-     * Response parsen
+     * Parse the MTA's response.
+     *
+     * @param string $response
      */
     private function parseResponse($response) {
         $response = trim($response);
@@ -447,7 +410,9 @@ class SMTPMailer extends Mailer {
 
 
     /**
-     * Gesendete Daten loggen
+     * Log sent data.
+     *
+     * @param string $data
      */
     private function logSentData($data) {
         $data = preg_replace('/^(.*)/m', ' -> $1', $data).NL;
@@ -456,46 +421,11 @@ class SMTPMailer extends Mailer {
 
 
     /**
-     * Empfangene Daten loggen
+     * Log reseived data.
+     *
+     * @param string $data
      */
     private function logResponse($data) {
         $this->logBuffer .= $data;
     }
-
-
-    // TODO: SPF-Eintrag der Absenderdomain zum Testen umgehen
-    /**
-     * Return-Path: <user@domain.tld>
-     * Received: from compute1.internal (compute1.internal [0.0.0.0])
-     *     by store52m.internal (Cyrus v2.3.13-fmsvn17160) with LMTPA;
-     *     Sun, 21 Dec 2008 07:18:19 -0500
-     * Received: from mx3.domain.tld ([0.0.0.0])
-     *   by compute1.internal (LMTPProxy); Sun, 21 Dec 2008 07:18:20 -0500
-     * Received: from quad.domain.tld (domain.tld [0.0.0.0])
-     *    by mx3.domain.tld (Postfix) with ESMTP id 02D70FE
-     *    for <user@domain.tld>; Sun, 21 Dec 2008 07:18:19 -0500 (EST)
-     * Received: (qmail 6101 invoked by uid 110); 21 Dec 2008 13:18:18 +0100
-     * X-Remote-Delivered-To: 25-user@domain.tld
-     * X-Spam-Checker-Version: SpamAssassin 3.2.4 (2008-01-01) on
-     *    quad.domain.tld
-     * X-Spam-Level:
-     * X-Spam-Status: No, score=0.6 required=7.0 tests=MISSING_MID,RCVD_IN_PBL,
-     *    RDNS_DYNAMIC autolearn=no version=3.2.4
-     * Received: (qmail 6033 invoked from network); 21 Dec 2008 13:18:13 +0100
-     * Received: from d0-0-0-0.cust.domain.tld (HELO device.localdomain) (0.0.0.0)
-     *   by domain.tld with SMTP; 21 Dec 2008 13:18:13 +0100
-     *
-     * Received-SPF: softfail (domain.tld: transitioning SPF record at domain.tlddoes not designate 0.0.0.0 as permitted sender)
-     *                                                                                                                      ^
-     *                                                                                                                      |
-     *                                                                                                    lokale Adresse (beim Testen zu Hause)
-     * Date: Sun, 21 Dec 2008 13:18:13 +0100
-     * From: local.domain.tld <user@domain.tld>
-     * To: User Name <user@domain.tld>
-     * Subject: *********************************** a User Name
-     * Content-Type: text/plain; charset=iso-8859-1
-     *
-     * Hallo User Name,
-     * ...
-     */
 }
