@@ -78,10 +78,10 @@
 
 <!--
    The "import" element describes an additional name used for class loading if a referenced unqualified class name can not 
-   be resolved in the module's default namespace. The elements value may describe a single PHP class or all classes of a PHP 
-   namespace. A single class is specified by its fully qualified class name. All classes of a namespace are specified by the 
-   namespace followed by a wildcard "*", e.g. "foo/*". When resolving names fully qualified class names are preferred over 
-   names imported by namespace wildcards. Valid namespace separators are the slash "/" and the backslash "\".
+   be resolved in the module's default namespace. The element's value may describe a single PHP class or all classes of a 
+   PHP namespace. A single class is specified by its fully qualified class name. All classes of a namespace are specified by 
+   the namespace followed by a wildcard "*", e.g. "foo/*". When resolving names fully qualified class names are preferred 
+   over names imported by namespace wildcards. Valid namespace separators are the slash "/" and the backslash "\".
 
    value  The name describing a single PHP class or all classes of a PHP namespace.
 -->
