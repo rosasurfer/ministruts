@@ -160,6 +160,21 @@ function prettyBytes($value) {
 
 
 /**
+ * Inline replacement for number_format() removing the default parameter violation.
+ *
+ * @param  float  $number
+ * @param  int    $decimals           [optional] - default: 0
+ * @param  string $decimalSeparator   [optional] - default: dot "."
+ * @param  string $thousandsSeparator [optional] - default: comma ","
+ *
+ * @return string - formatted number
+ */
+function numf($number, $decimals=0, $decimalSeparator='.', $thousandsSeparator=',') {
+    return \rosasurfer\numf($number, $decimals, $decimalSeparator, $thousandsSeparator);
+}
+
+
+/**
  * Whether or not the byte order of the machine we are running on is "little endian".
  *
  * @return bool

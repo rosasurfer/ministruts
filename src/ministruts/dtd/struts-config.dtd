@@ -78,10 +78,10 @@
 
 <!--
    The "import" element describes an additional name used for class loading if a referenced unqualified class name can not 
-   be resolved in the module's default namespace. The element's value may describe a single PHP class or all classes of a 
-   PHP namespace. A single class is specified by its fully qualified class name. All classes of a namespace are specified by 
-   the namespace followed by a wildcard "*", e.g. "foo/*". When resolving names fully qualified class names are preferred 
-   over names imported by namespace wildcards. Valid namespace separators are the slash "/" and the backslash "\".
+   be resolved in the module's default namespace. The element's value may describe a single PHP class or an entire PHP 
+   namespace. A single class is specified by its fully qualified class name. An entire namespace is specified by its name 
+   followed by a wildcard "*", e.g. "foo/*". When resolving names fully qualified class names are preferred over names 
+   imported via namespace wildcards. Valid namespace separators are the slash "/" and the backslash "\".
 
    value  The name describing a single PHP class or all classes of a PHP namespace.
 -->
@@ -173,12 +173,12 @@
                         [default: "request"]
 
    form-validate-first  Valid only if the "form" attribute is specified. Set to "true" if the ActionForm should be validated
-                        prior to calling the Action object, or set to "false" if you don't want validation at that time. The
-                        default behaviour is "false" if an action object or a forward (include, redirect, forward) are
-                        configured, and "true" if no action object and no forward are configured.
-                        This means per default a configured action is responsible for input validation. If neither an action
-                        nor a forward are configured the framework will perform input validation. For validation by the
-                        framework two nested "forward" elements named "success" and "error" must be configured.
+                        prior to calling the Action object, or set to "false" if you don't want to perform validation at that 
+                        time. The default behaviour is "false" if an Action or a ActionForward (include, redirect, forward) 
+                        are configured, and "true" if no Action and no ActionForward are configured.
+                        In other words: If an Action is configured per default the Action is responsible for input validation. 
+                        If neither an Action nor a ActionForward are configured the framework will perform input validation. 
+                        For framework validation two nested "forward" elements named "success" and "error" must be configured.
 
    http-methods         Comma-delimited list of HTTP method verbs the action mapping supports.
                         [default: "get"]

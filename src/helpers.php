@@ -232,7 +232,22 @@ function prettyBytes($value) {
         if ($value < 1024)
             break;
     }
-    return sPrintF('%.1f%s', $value, $unit);
+    return sprintf('%.1f%s', $value, $unit);
+}
+
+
+/**
+ * Inline replacement for number_format() removing the default parameter violation.
+ *
+ * @param  float  $number
+ * @param  int    $decimals           [optional] - default: 0
+ * @param  string $decimalSeparator   [optional] - default: dot "."
+ * @param  string $thousandsSeparator [optional] - default: comma ","
+ *
+ * @return string - formatted number
+ */
+function numf($number, $decimals=0, $decimalSeparator='.', $thousandsSeparator=',') {
+    return number_format($number, $decimals, $decimalSeparator, $thousandsSeparator);
 }
 
 
