@@ -301,8 +301,22 @@ namespace {
         }
     }
 
+
     if (!defined('SID')) {
         define('SID', 'sessionName=sessionValue');
+    }
+
+
+    if (!function_exists('stats_standard_deviation')) {
+        /**
+         * @param  array $values
+         * @param  bool  $sample [optional]
+         *
+         * @return float|bool
+         */
+        function stats_standard_deviation(array $values, $sample=false) {
+            return false;
+        }
     }
 }
 
