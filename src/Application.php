@@ -111,7 +111,7 @@ class Application extends Object {
             ?>
             <div align="left" style="clear:both;
                                      position:relative; z-index:65535; left:initial; top:initial;
-                                     width:initial; height:initial:
+                                     width:initial; height:initial;
                                      margin:0; padding:4px;
                                      font:normal normal 12px/normal arial,helvetica,sans-serif;
                                      color:black; background-color:white">
