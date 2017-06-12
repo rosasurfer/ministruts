@@ -322,7 +322,7 @@ abstract class PersistableObject extends Object {
         // TODO: this check cannot yet handle composite primary keys
         $id = $this->getObjectId();
         return ($id !== null);
-        }
+    }
 
 
     /**
