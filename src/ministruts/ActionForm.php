@@ -6,11 +6,13 @@ use rosasurfer\core\Object;
 
 /**
  * ActionForm
+ *
+ * Represents and validates user input and provides an interface to Actions and business layer to access this input.
  */
 abstract class ActionForm extends Object {
 
 
-    /** @var Request [transient] - the current Request the form belongs to */
+    /** @var Request [transient] - the request the form belongs to */
     protected $request;
 
     /** @var string [transient] - dispatch action key */
@@ -29,7 +31,7 @@ abstract class ActionForm extends Object {
 
         // ggf. definierten DispatchAction-Key auslesen
         if     (isSet($_REQUEST['action'  ])) $this->actionKey = $_REQUEST['action'  ];
-        elseif (isSet($_REQUEST['action.x'])) $this->actionKey = $_REQUEST['action.x'];  // submit-Type "image"
+        elseif (isSet($_REQUEST['action.x'])) $this->actionKey = $_REQUEST['action.x'];  // submit type="image"
 
         // Parameter einlesen
         $this->populate($request);

@@ -10,26 +10,28 @@ use rosasurfer\exception\ClassNotFoundException;
 /**
  * Singleton
  *
- * Abstraktes Grundgeruest fuer Implementierungen des Singleton-Patterns.
+ * Factory and base class for implementation of the Singleton pattern.
  */
 abstract class Singleton extends Object {
 
 
-    /** @var Singleton[] - Pool der momentan existierenden Singletons */
+    /** @var Singleton[] - the currently existing singletons */
     private static $instances = [];
 
 
     /**
-     * Nicht-oeffentlicher Constructor
+     * Non-public constructor.
+     *
+     * Prevents instantiation from outside and forces the use of getInstance().
      */
-    protected function __construct() { /* you can't call me from outside ... */ }
+    protected function __construct() {}
 
 
     /**
-     * Gibt die Singleton-Instanz der gewuenschten Klasse zurueck.
+     * Factory method for a Singleton instance of the specified class.
      *
-     * @param  string $class - Klassennname
-     * @param  ...           - variable number of parameters
+     * @param  string $class - class name
+     * @param  ...           - variable number of arguments passed to class constructor
      *
      * @return self
      */
@@ -37,27 +39,24 @@ abstract class Singleton extends Object {
         if (isSet(self::$instances[$class]))
             return self::$instances[$class];
 
-        // rekursives Erzeugen derselben Singleton-Instanz abfangen
+        // set a marker to prevent recursive method invocation for the same class name
         static $currentCreations;
-        if (isSet($currentCreations[$class]))
-            throw new RuntimeException('Infinite loop: recursive call to '.__METHOD__.'('.$class.') detected');
+        if (isSet($currentCreations[$class])) throw new RuntimeException('Recursive call to '.__METHOD__.'('.$class.') detected');
         $currentCreations[$class] = true;
 
+        // check the class (omitting this check can cause an uncatchable fatal error)
         if (!is_class($class)) throw new ClassNotFoundException('Class not found: '.$class );
 
-        // Parameter ermitteln
-        $args = null;
-        if (func_num_args() > 1) {
-            $args = func_get_args();
-            array_shift($args);
-        }
+        // get constructor arguments (if any)
+        $args = func_get_args();
+        array_shift($args);
 
-        // argument unpacking
-        $instance = !$args ? new $class() : new $class(...$args);
+        // unpack the arguments into the constructor
+        $instance = new $class(...$args);
         if (!$instance instanceof self) throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
         self::$instances[$class] = $instance;
 
-        // Marker fuer rekursiven Aufruf zuruecksetzen
+        // reset the marker preventing recursive method invocation
         unset($currentCreations[$class]);
 
         return $instance;
@@ -65,7 +64,7 @@ abstract class Singleton extends Object {
 
 
     /**
-     * Verhindert das Clonen von Singleton-Instanzen.
+     * Prevent cloning of Singleton instances.
      */
-    final private function __clone() {/* do not clone me */}
+    final private function __clone() {}
 }

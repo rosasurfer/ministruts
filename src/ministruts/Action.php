@@ -6,6 +6,8 @@ use rosasurfer\core\Object;
 
 /**
  * Action
+ *
+ * Contains logic to execute for a specific request and represents the interface to the business layer.
  */
 abstract class Action extends Object {
 
@@ -42,18 +44,15 @@ abstract class Action extends Object {
 
 
     /**
-     *
-     *
-     * Allgemeiner Pre-Processing-Hook, der von Subklassen bei Bedarf ueberschrieben werden kann.  Gibt NULL
-     * zurueck, wenn die Verarbeitung fortgesetzt werden soll oder eine ActionForward-Instanz, wenn die
-     * Verarbeitung abgebrochen und zu dem vom Forward beschriebenen Ziel verzweigt werden soll.
-     * Die Default-Implementierung macht nichts.
+     * Optional execution pre-processing hook, to be overwritten if needed. Return NULL if request processing is to continue,
+     * or an ActionForward if request processing is already finished and forward to the target described by the forward.
+     * The default implementation does nothing.
      *
      * @param  Request  $request
      * @param  Response $response
      *
      * @return ActionForward|string|null - NULL to continue request processing;
-     *                                     ActionForward instance or forward name if request processing is finished
+     *                                     ActionForward or forward name if request processing is finished
      */
     public function executeBefore(Request $request, Response $response) {
         return null;
@@ -61,34 +60,29 @@ abstract class Action extends Object {
 
 
     /**
-     * Fuehrt die Action aus und gibt einen ActionForward zurueck, der beschreibt, zu welcher Resource
-     * verzweigt werden soll. Muss implementiert werden.
-     *
-     * NOTE: Statt einer Instanz kann auch der Name eines ActionForward aus der "struts-config.xml" zurueckgeben werden.
+     * Execute the Action and return an ActionForward describing the target to forward to. Must be implemented.
      *
      * @param  Request  $request
      * @param  Response $response
      *
-     * @return ActionForward|string|null
+     * @return ActionForward|string|null - ActionForward or forward name to forward to;
+     *                                     NULL if request processing is finished
      */
     abstract public function execute(Request $request, Response $response);
 
 
     /**
-     * Allgemeiner Post-Processing-Hook, der von Subklassen bei Bedarf ueberschrieben werden kann.
+     * Optional execution post-processing hook, to be overwritten if needed. May be used to finalize/clean-up runtime state,
+     * e.g. committing of transactions or closing of network connections. The default implementation does nothing.
      *
-     * Besondere Vorsicht ist anzuwenden, da zu dem Zeitpunkt, da diese Methode aufgerufen wird, der
-     * Content schon ausgeliefert und der Response schon fertiggestellt sein KANN. Die Methode ist fuer
-     * Aufraeumarbeiten nuetzlich, z.B. das Committen von Transaktionen oder das Schliessen von
-     * Datenbankverbindungen.
-     * Die Default-Implementierung macht nichts.
+     * Special care has to be taken because at the time of invocation request processing may already have been finished and
+     * all content may have been delivered.
      *
      * @param  Request       $request
      * @param  Response      $response
-     * @param  ActionForward $forward [optional] - der originale ActionForward, wie ihn die Action zurueckgegeben hat
+     * @param  ActionForward $forward [optional] - original ActionForward as returned by Action::execute()
      *
-     * @return ActionForward|null - der originale oder ein modifizierter ActionForward (z.B. mit weiteren
-     *                              Query-Parameter)
+     * @return ActionForward|null - original or modified ActionForward (e.g. a route with added query parameters)
      */
     public function executeAfter(Request $request, Response $response, ActionForward $forward = null) {
         return $forward;
@@ -96,15 +90,12 @@ abstract class Action extends Object {
 
 
     /**
-     * Sucht den ActionForward mit dem angegebenen Namen und gibt ihn zurueck. Zuerst werden die lokalen
-     * Forwards des ActionMapping der Action durchsucht, danach die globalen Forwards des Modules. Wird
-     * kein entsprechender Forward gefunden, wird NULL zurueckgegeben.
+     * Find and return the ActionForward with the specified name. Local ActionForwards (mapping forwards) are preferred over
+     * global definitions.
      *
-     * @param  string $name - Bezeichner des ActionForwards
+     * @param  string $name - forward identifier
      *
-     * @return ActionForward|null
-     *
-     * @see ActionMapping::findForward()
+     * @return ActionForward|null - found ActionForward or NULL if no such forward was found
      */
     protected function findForward($name) {
         return $this->mapping->findForward($name);

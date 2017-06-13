@@ -9,9 +9,7 @@ use rosasurfer\monitor\Dependency;
 /**
  * ApcCache
  *
- * Cacht Objekte im APC-Cache.
- *
- * @todo  Cache-Values in Wrapperobjekt speichern und CREATED, EXPIRES etc. verarbeiten
+ * Userland cache for regular PHP objects.
  */
 class ApcCache extends CachePeer {
 
@@ -19,8 +17,8 @@ class ApcCache extends CachePeer {
     /**
      * Constructor.
      *
-     * @param  string $label   [optional] - Cache-Bezeichner
-     * @param  array  $options [optional] - zusaetzliche Optionen
+     * @param  string $label   [optional] - cache identifier used for namespacing
+     * @param  array  $options [optional] - additional options
      */
     public function __construct($label=null, array $options=[]) {
         $this->label     = $label;
@@ -30,92 +28,88 @@ class ApcCache extends CachePeer {
 
 
     /**
-     * Ob unter dem angegebenen Schluessel ein Wert im Cache gespeichert ist.
+     * Whether or not a value with the specified key exists in the cache.
      *
-     * @param  string $key - Schluessel
+     * @param  string $key
      *
      * @return bool
      */
     public function isCached($key) {
-        // Hier wird die eigentliche Arbeit gemacht. Die Methode prueft nicht nur, ob der Wert im Cache
-        // existiert, sondern holt ihn auch gleich und speichert eine Referenz im ReferencePool. Folgende
-        // Abfragen koennen so sofort aus dem ReferencePool bedient werden.
+        // The actual working horse. The method does not only check existence of the key. It retrieves the value and stores
+        // it in the local reference pool, so following cache queries can use the local reference.
 
-        // ReferencePool abfragen
-        if ($this->getReferencePool()->isCached($key)) {
+        // check local reference pool
+        if ($this->getReferencePool()->isCached($key))
             return true;
+
+        // query APC cache
+        $data = apc_fetch($this->namespace.'::'.$key);
+        if (!$data)                                     // cache miss
+            return false;
+
+        // cache hit
+        $created = $data[0];                            // data: [created, expires, serialized([$value, $dependency])]
+        $expires = $data[1];
+
+        // check expiration
+        if ($expires && $created+$expires < time()) {
+            $this->drop($key);
+            return false;
         }
-        else {
-            // APC abfragen
-            $data = apc_fetch($this->namespace.'::'.$key);
-            if (!$data)          // Cache-Miss
-                return false;
 
-            // Cache-Hit, Datenformat: array(created, expires, serialize(array($value, $dependency)))
-            $created = $data[0];
-            $expires = $data[1];
+        // unpack serialized value
+        $data[2]    = unserialize($data[2]);
+        $value      = $data[2][0];
+        $dependency = $data[2][1];
 
-            // expires pruefen
-            if ($expires && $created+$expires < time()) {
+        // check dependency
+        if ($dependency) {
+            $minValid = $dependency->getMinValidity();
+
+            if ($minValid) {
+                if (time() > $created+$minValid) {
+                    if (!$dependency->isValid()) {
+                        $this->drop($key);
+                        return false;
+                    }
+                    // reset the creation time by writing back to the cache (resets $minValid period)
+                    return $this->set($key, $value, $expires, $dependency);
+                }
+            }
+            elseif (!$dependency->isValid()) {
                 $this->drop($key);
                 return false;
             }
-
-            $data[2]    = unserialize($data[2]);
-            $value      = $data[2][0];
-            $dependency = $data[2][1];
-
-            // Dependency pruefen
-            if ($dependency) {
-                $minValid = $dependency->getMinValidity();
-
-                if ($minValid) {
-                    if (time() > $created+$minValid) {
-                        if (!$dependency->isValid()) {
-                            $this->drop($key);
-                            return false;
-                        }
-                        // created aktualisieren (Wert praktisch neu in den Cache schreiben)
-                        return $this->set($key, $value, $expires, $dependency);
-                    }
-                }
-                elseif (!$dependency->isValid()) {
-                    $this->drop($key);
-                    return false;
-                }
-            }
-
-            // ok, Wert im ReferencePool speichern
-            $this->getReferencePool()->set($key, $value, Cache::EXPIRES_NEVER, $dependency);
-            return true;
         }
+
+        // store the validated value in the local reference pool
+        $this->getReferencePool()->set($key, $value, Cache::EXPIRES_NEVER, $dependency);
+        return true;
     }
 
 
     /**
-     * Gibt einen Wert aus dem Cache zurueck.  Existiert der Wert nicht, wird der angegebene Defaultwert
-     * zurueckgegeben.
+     * Return the cached value with the specified key or the default value if no such value exists in the cache.
      *
-     * @param  string $key                - Schluessel, unter dem der Wert gespeichert ist
-     * @param  mixed  $default [optional] - Defaultwert (kann selbst auch NULL sein)
+     * @param  string $key                - key
+     * @param  mixed  $default [optional] - default value
      *
-     * @return mixed - Der gespeicherte Wert oder NULL, falls kein solcher Schluessel existiert.
-     *                 Achtung: Ist im Cache ein NULL-Wert gespeichert, wird ebenfalls NULL zurueckgegeben.
+     * @return mixed - cached value (may be NULL) or NULL if no value with the specified key exists in the cache
      */
     public function get($key, $default = null) {
         if ($this->isCached($key))
             return $this->getReferencePool()->get($key);
-
         return $default;
     }
 
 
     /**
-     * Loescht einen Wert aus dem Cache.
+     * Delete the value with the specified key from the cache.
      *
-     * @param  string $key - Schluessel, unter dem der Wert gespeichert ist
+     * @param  string $key - key
      *
-     * @return bool - TRUE bei Erfolg, FALSE, falls kein solcher Schluessel existiert
+     * @return bool - TRUE on successful deletion;
+     *                FALSE if no such value exists in the cache
      */
     public function drop($key) {
         $this->getReferencePool()->drop($key);
@@ -125,56 +119,52 @@ class ApcCache extends CachePeer {
 
 
     /**
-     * Speichert einen Wert im Cache.  Ein schon vorhandener Wert unter demselben Schluessel wird
-     * ueberschrieben.  Laeuft die angegebene Zeitspanne ab oder aendert sich der Status der angegebenen
-     * Abhaengigkeit, wird der Wert automatisch ungueltig.
+     * Store a value under the specified key in the cache. An existing value already stored under the key is overwritten.
+     * If expiration time or dependency are provided and those conditions are met the value is automatically invalidated but
+     * not automatically removed from the cache.
      *
-     * @param  string     $key                   - Schluessel, unter dem der Wert gespeichert wird
-     * @param  mixed      $value                 - der zu speichernde Wert
-     * @param  int        $expires    [optional] - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfaellt (default: nie)
-     * @param  Dependency $dependency [optional] - Abhaengigkeit der Gueltigkeit des gespeicherten Wertes
+     * @param  string     $key                   - key
+     * @param  mixed      $value                 - value
+     * @param  int        $expires    [optional] - time in seconds after which the value becomes invalid (default: never)
+     * @param  Dependency $dependency [optional] - a dependency object monitoring validity of the value (default: none)
      *
-     * @return bool - TRUE bei Erfolg, FALSE andererseits
+     * @return bool - TRUE on successful storage; FALSE otherwise
      */
-    public function set($key, &$value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null) {
+    public function set($key, &$value, $expires=Cache::EXPIRES_NEVER, Dependency $dependency=null) {
         if (!is_string($key))  throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
         if (!is_int($expires)) throw new IllegalTypeException('Illegal type of parameter $expires: '.getType($expires));
 
-        // im Cache wird ein array(created, expires, serialize(array(value, dependency))) gespeichert
+        // data format in the cache: [created, expires, serialized([value, dependency])]
         $fullKey = $this->namespace.'::'.$key;
         $created = time();
         $data    = array($value, $dependency);
 
         /**
-       * PHP 5.3.3/APC 3.1.3
-       * -------------------
-       * Bug 1: warning "Potential cache slam averted for key '...'"
-       *        apc_add() und apc_store() geben FALSE zurueck, wenn sie innerhalb eines Requests fuer denselben Key
-       *        mehrmals aufgerufen werden
-       *
-       *        @see http://bugs.php.net/bug.php?id=58832
-       *        @see http://stackoverflow.com/questions/4983370/php-apc-potential-cache-slam-averted-for-key
-       *
-       *        Loesung fuer APC >= 3.1.7: re-introduced setting apc.slam_defense=0
-       *        keine Loesung fuer APC 3.1.3 - 3.1.6 gefunden
-       *
-       *        @see http://serverfault.com/questions/342295/apc-keeps-crashing
-       *        @see http://stackoverflow.com/questions/1670034/why-would-apc-store-return-false
-       *        @see http://notmysock.org/blog/php/user-cache-timebomb.html
-       */
+         * PHP 5.3.3/APC 3.1.3
+         * -------------------
+         * Bug: warning "Potential cache slam averted for key '...'"
+         *      - apc_add() and apc_store() return FALSE if called multiple times for the same key
+         *
+         * @see http://bugs.php.net/bug.php?id=58832
+         * @see http://stackoverflow.com/questions/4983370/php-apc-potential-cache-slam-averted-for-key
+         *
+         * - solution for APC >= 3.1.7: re-introduced setting apc.slam_defense=0
+         * - no solution yet for APC 3.1.3-3.1.6
+         *
+         * @see http://serverfault.com/questions/342295/apc-keeps-crashing
+         * @see http://stackoverflow.com/questions/1670034/why-would-apc-store-return-false
+         * @see http://notmysock.org/blog/php/user-cache-timebomb.html
+         */
 
 
-        // Wert speichern:
-        // - moeglichst apc_add() benutzen (weniger Speicherfragmentierung, minimiert Lock-Wait)
-        // - keine APC-TTL setzen, die tatsaechliche TTL wird in self::isCached() geprueft (diverse APC-Bugs bei gesetzter TTL)
-
-        // TODO: http://phpdevblog.niknovo.com/2009/11/serialize-vs-var-export-vs-json-encode.html
-
-        if (function_exists('apc_add')) {                                                // APC >= 3.0.13
-            if (function_exists('apc_exists')) $isKey =        apc_exists($fullKey);      // APC >= 3.1.4
+        // store value:
+        // - If possible use apc_add() which causes less memory fragmentation and minimizes lock waits.
+        // - Don't use APC-TTL as the real TTL is checked in self::isCached(). APC-TTL causes various APC bugs.
+        if (function_exists('apc_add')) {                                               // APC >= 3.0.13
+            if (function_exists('apc_exists')) $isKey =        apc_exists($fullKey);    // APC >= 3.1.4
             else                               $isKey = (bool) apc_fetch ($fullKey);
             if ($isKey)
-                apc_delete($fullKey);      // apc_delete()+apc_add() fragmentieren den Speicher weniger als apc_store()
+                apc_delete($fullKey);      // apc_delete()+apc_add() result in less memory fragmentation than apc_store()
 
             if (!apc_add($fullKey, array($created, $expires, serialize($data)))) {
                 //Logger::log('apc_add() unexpectedly returned FALSE for $key "'.$fullKey.'" '.($isKey ? '(did exist and was deleted)':'(did not exist)'), L_WARN);
@@ -186,9 +176,7 @@ class ApcCache extends CachePeer {
             return false;
         }
 
-
         $this->getReferencePool()->set($key, $value, $expires, $dependency);
-
         return true;
     }
 }

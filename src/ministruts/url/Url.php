@@ -50,7 +50,7 @@ class Url extends Object {
             $prefix  = $request->getModule()->getPrefix();
             $prefix  = trim($prefix, '/');
             if (strLen($prefix))
-                $prefix = '/'.$prefix;                                   // TODO: What a mess this prefix formatting is!
+                $prefix = '/'.$prefix;                          // TODO: What a mess this prefix formatting is!
             $this->appRelativeUri = $prefix.$uri;
         }
     }
