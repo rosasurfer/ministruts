@@ -179,12 +179,13 @@ abstract class PersistableObject extends Object {
                 $value = false;                                         // the relation is marked as empty
                 return $emptyResult;
             }
-            $refColumn = $relation['ref-column'];                       // the referenced column
+            $keyColumn = $mapping['properties'][$keyName]['column'];    // the used local key column
+            $refColumn = $relation['ref-column'];                       // the referencing column
 
             if (!isSet($relation['join-table'])) {
-                // the referenced column is part of the related table
+                // the referencing column is part of the related table
                 $refColumnType = $relatedMapping['columns'][$refColumn]['type'];
-                $refValue      = $relatedDao->escapeLiteral($this->getPhysicalValue($keyName, $refColumnType));
+                $refValue      = $relatedDao->escapeLiteral($this->getPhysicalValue($keyColumn, $refColumnType));
                 $sql = 'select r.*
                             from '.$relatedTable.' r
                             where r.'.$refColumn.' = '.$refValue;
@@ -192,7 +193,6 @@ abstract class PersistableObject extends Object {
             else {
                 // the referenced column is part of a join table
                 $joinTable = $relation['join-table'];
-                $keyColumn = $mapping['properties'][$keyName]['column'];                // the used local key column
                 $keyValue  = $dao->escapeLiteral($this->getPhysicalValue($keyColumn));  // the physical local key value
 
                 if (!isSet($relation['foreign-key']))
