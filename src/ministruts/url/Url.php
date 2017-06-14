@@ -30,8 +30,8 @@ class Url extends Object {
      * Create a new Url instance.
      *
      * @param  string $uri - URI part of the URL to generate. If the URI starts with a slash "/" it is interpreted as
-     *                       relative to the application's base URI. If the URI does not start with a slash it is interpreted
-     *                       as relative to the current <tt>Module</tt>'s base URI (the module of the current HTTP request).
+     *                       relative to the application's base URI (the root Module). If the URI does not start with a
+     *                       slash it is interpreted as relative to the application's current non-root Module.
      */
     public function __construct($uri) {
         if (!is_string($uri)) throw new IllegalTypeException('Illegal type of parameter $uri: '.getType($uri));
@@ -41,16 +41,13 @@ class Url extends Object {
         // TODO: If a full URL is passed (http://...) this method will fail.
 
         if (strPos($uri, '/') === 0) {
-            // prefix the application base URI
+            // the resulting URI is relative to the application base URI
             $this->appRelativeUri = subStr($uri, 1);
         }
         else {
-            // prefix the module URI
+            // the resulting URI is relative to the application's current module (can be the root module, too)
             $request = Request::me();
-            $prefix  = $request->getModule()->getPrefix();
-            $prefix  = trim($prefix, '/');
-            if (strLen($prefix))
-                $prefix = '/'.$prefix;                          // TODO: What a mess this prefix formatting is!
+            $prefix  = $request->getModule()->getPrefix();      // root: "";  submodule: "path/"
             $this->appRelativeUri = $prefix.$uri;
         }
     }

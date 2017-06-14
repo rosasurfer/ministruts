@@ -12,7 +12,6 @@ use rosasurfer\exception\RuntimeException;
 use rosasurfer\monitor\FileDependency;
 
 use function rosasurfer\strLeftTo;
-use function rosasurfer\strRightFrom;
 use function rosasurfer\strStartsWith;
 
 use const rosasurfer\CLI;
@@ -89,14 +88,14 @@ class FrontController extends Singleton {
         if (!is_file($mainConfig)) throw new StrutsConfigException('Main Struts configuration file not found: "'.$mainConfig.'"');
 
         $subConfigs = glob($configDir.'/struts-config-*.xml', GLOB_ERR) ?: [];  // scan for submodule configs
-        $configs    = [$mainConfig] + $subConfigs;
+        $configs    = array_merge([$mainConfig], $subConfigs);
 
         // create and register a Module for each found configuration file
         $file = null;
         try {
             foreach ($configs as $file) {
                 $baseName = baseName($file, '.xml');
-                $prefix = (strStartsWith($baseName, 'struts-config-')) ? '/'.subStr($baseName, 14) : '';
+                $prefix = (strStartsWith($baseName, 'struts-config-')) ? subStr($baseName, 14).'/' : '';
 
                 $module = new Module($file, $prefix);
                 $module->freeze();
@@ -154,8 +153,10 @@ class FrontController extends Singleton {
 
         if (!strStartsWith($requestPath, $baseUri)) throw new RuntimeException('Can not resolve module prefix from request path: '.$requestPath);
 
-        $value = strRightFrom($requestPath, $baseUri);
-        $value = strLeftTo($value, '/');
+        $value = subStr($requestPath, strLen($baseUri));        // baseUri ends with and prefix doesn't start with a slash
+        if (strLen($value)) {
+            $value = strLeftTo($value, '/').'/';                // the prefix ends with a slash only for non-root modules
+        }
 
         return isSet($this->modules[$value]) ? $value : '';
     }

@@ -6,8 +6,6 @@ use rosasurfer\exception\RuntimeException;
 use rosasurfer\log\Logger;
 use rosasurfer\net\http\HttpResponse;
 
-use function rosasurfer\strRightFrom;
-
 use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_INFO;
 
@@ -190,35 +188,26 @@ class RequestProcessor extends Object {
         // /module/
         // /module/controller/action/
 
-        $appUri = trim($request->getApplicationBaseUri(), '/');
-        // ""
-        // app
-
-        $modulePrefix = trim($this->module->getPrefix(), '/');
-        // ""
-        // module
-
-        $moduleUri = '/'.trim($appUri.'/'.$modulePrefix, '/').'/';
-        if ($moduleUri=='//') $moduleUri = '/';
+        $moduleUri = $request->getApplicationBaseUri().$this->module->getPrefix();
         // /
         // /app/
         // /module/
         // /app/module/
 
-        $path = '/'.strRightFrom($requestPath, $moduleUri);
+        $mappingPath = '/'.subStr($requestPath, strLen($moduleUri));
         // /
         // /controller/action/
 
-        self::$logDebug && Logger::log('Path used for mapping selection: "'.$path.'"', L_DEBUG);
+        self::$logDebug && Logger::log('Path used for mapping selection: "'.$mappingPath.'"', L_DEBUG);
 
         // Mapping suchen und im Request speichern
-        if (($mapping=$this->module->findMapping($path)) || ($mapping=$this->module->getDefaultMapping())) {
+        if (($mapping=$this->module->findMapping($mappingPath)) || ($mapping=$this->module->getDefaultMapping())) {
             $request->setAttribute(ACTION_MAPPING_KEY, $mapping);
             return $mapping;
         }
 
         // kein Mapping gefunden
-        self::$logInfo && Logger::log('Could not find a mapping for path: '.$path, L_INFO);
+        self::$logInfo && Logger::log('Could not find a mapping for path: '.$mappingPath, L_INFO);
 
         $response->setStatus(HttpResponse::SC_NOT_FOUND);
 
@@ -496,8 +485,8 @@ PROCESS_METHOD_ERROR_SC_405;
                 $url = $path;
             }
             else {
-                $moduleUri = rTrim($request->getApplicationBaseUri().$module->getPrefix(), '/');
-                $url = $moduleUri.'/'.lTrim($path, '/');
+                $moduleUri = $request->getApplicationBaseUri().$module->getPrefix();
+                $url = $moduleUri.lTrim($path, '/');
             }
             $response->redirect($url);
         }

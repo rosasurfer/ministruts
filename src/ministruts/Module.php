@@ -139,9 +139,8 @@ class Module extends Object {
      * Gibt den Prefix dieses Modules zurueck. Anhand des Prefixes werden die verschiedenen Module der
      * Anwendung unterschieden.
      *
-     * @return string
-     *
-     * @todo   If non-empty the prefix must never start and always end with a slash "/".
+     * @return string - an empty string for the root module;
+     *                  a path fragment not starting but ending with a slash "/" for a non-root module
      */
     public function getPrefix() {
         return $this->prefix;
@@ -151,15 +150,17 @@ class Module extends Object {
     /**
      * Setzt den Prefix des Modules.
      *
-     * @param  string prefix
+     * @param  string prefix - the prefix of the root module is an empty string;
+     *                         the prefix of non-root modules must not start but end with a slash "/"
      *
      * @throws StrutsConfigException in case of configuration errors
-     *
-     * @todo   If non-empty the prefix must never start and always end with a slash "/".
      */
     protected function setPrefix($prefix) {
-        if ($this->configured)                  throw new IllegalStateException('Configuration is frozen');
-        if (strLen($prefix) && $prefix[0]!='/') throw new StrutsConfigException('Module prefixes must start with a slash "/" character, found "'.$prefix.'"');
+        if ($this->configured) throw new IllegalStateException('Configuration is frozen');
+        if ($len=strLen($prefix)) {
+            if ($prefix[     0] == '/') throw new StrutsConfigException('Non-root module prefixes must not start with a slash "/" character, found: "'.$prefix.'"');
+            if ($prefix[$len-1] != '/') throw new StrutsConfigException('Non-root module prefixes must end with a slash "/" character, found: "'.$prefix.'"');
+        }
         $this->prefix = $prefix;
     }
 
