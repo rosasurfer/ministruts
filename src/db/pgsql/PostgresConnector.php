@@ -221,6 +221,16 @@ class PostgresConnector extends Connector {
 
         if (!$this->isConnected())
             $this->connect();
+
+        if (strContains($name, '.')) {
+            $names = explode('.', $name);
+
+            foreach ($names as &$subname) {
+                $subname = pg_escape_identifier($this->hConnection, $subname);
+            }; unset($subname);
+
+            return join('.', $names);
+        }
         return pg_escape_identifier($this->hConnection, $name);
     }
 
