@@ -557,7 +557,7 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Reload this instance from the datastore and optionally reset relations.
+     * Reload this instance from the database and optionally reset relations.
      *
      * @param  bool $resetRelations [optional] - NOT YET IMPLEMENTED: Whether or not to reset relations and re-fetch on next access.
      *                                                                (default: no)

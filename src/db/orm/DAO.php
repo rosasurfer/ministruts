@@ -278,7 +278,7 @@ abstract class DAO extends Singleton {
 
 
     /**
-     * Escape a string value. The resulting string must be quoted according to the DBMS before it can be used in queries.
+     * Escape a scalar value. The resulting string must be quoted according to the DBMS before it can be used in queries.
      *
      * @param  scalar $value - value to escape
      *
