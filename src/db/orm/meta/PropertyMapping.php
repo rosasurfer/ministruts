@@ -87,7 +87,7 @@ class PropertyMapping extends Object {
             $type = $this->mapping['type'];
             switch ($type) {
                 case 'bool'   :
-                case 'boolean': $value = (string)(int)(bool) $value; break;
+                case 'boolean': $value = $connector->escapeLiteral((bool) $value); break;
 
                 case 'int'    :
                 case 'integer': $value = (string)(int) $value; break;

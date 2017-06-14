@@ -244,9 +244,9 @@ class PostgresConnector extends Connector {
 
         if (!is_scalar($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
 
-        if (is_bool ($value)) return (string)(int) $value;
-        if (is_int  ($value)) return (string)      $value;
-        if (is_float($value)) return (string)      $value;
+        if (is_bool ($value)) return $value ? 'true':'false';
+        if (is_int  ($value)) return (string) $value;
+        if (is_float($value)) return (string) $value;
 
         if (!$this->isConnected())
             $this->connect();

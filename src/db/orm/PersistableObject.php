@@ -487,6 +487,7 @@ abstract class PersistableObject extends Object {
     private function populate(array $row) {
         $row     = array_change_key_case($row, CASE_LOWER);
         $mapping = $this->dao()->getMapping();
+        $dbType  = $this->dao()->db()->getType();
 
         foreach ($mapping['columns'] as $column => &$property) {
             $propertyName = $property['name'];
@@ -513,7 +514,12 @@ abstract class PersistableObject extends Object {
                     case 'origin' : $this->$propertyName =             $row[$column]; break;
 
                     case 'bool'   :
-                    case 'boolean': $this->$propertyName = (bool)(int) $row[$column]; break;
+                    case 'boolean':
+                        if ($dbType == 'pgsql') {
+                            if      ($row[$column] == 't') $row[$column] = 1;
+                            else if ($row[$column] == 'f') $row[$column] = 0;
+                        }
+                                    $this->$propertyName = (bool)(int) $row[$column]; break;
                     case 'int'    :
                     case 'integer': $this->$propertyName =       (int) $row[$column]; break;
                     case 'float'  :
