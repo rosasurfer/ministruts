@@ -198,7 +198,7 @@ function printPretty($var, $return=false, $flushBuffers=true) {
                     <pre style="width:initial; height:initial;
                                 margin:0; padding:0;
                                 color:inherit; background-color:inherit;
-                                font:normal normal 12px/normal \'Courier New\',courier,serif">'.htmlSpecialChars($str, ENT_QUOTES|ENT_SUBSTITUTE).'</pre>
+                                font:normal normal 12px/normal \'Courier New\',courier,serif">'.hsc($str).'</pre>
                 </div>';
     if (!strEndsWith($str, NL))
         $str .= NL;
@@ -248,6 +248,28 @@ function prettyBytes($value) {
  */
 function numf($number, $decimals=0, $decimalSeparator='.', $thousandsSeparator=',') {
     return number_format($number, $decimals, $decimalSeparator, $thousandsSeparator);
+}
+
+
+/**
+ * Convert special characters to HTML entities.
+ *
+ * Inline replacement and shortcut for htmlSpecialChars() using different default flags.
+ *
+ * @param  string $string
+ * @param  int    $flags        [optional] - default: ENT_QUOTES|ENT_SUBSTITUTE|ENT_HTML5
+ * @param  string $encoding     [optional] - default: ini_get("default_charset")
+ * @param  bool   $doubleEncode [optional] - default: TRUE
+ *
+ * @return string - converted string
+ *
+ * @see   \htmlSpecialChars()
+ */
+function hsc($string, $flags=null, $encoding=null, $doubleEncode=true) {
+    if ($flags === null) {
+        $flags = ENT_QUOTES|ENT_SUBSTITUTE|ENT_HTML5;
+    }
+    return htmlSpecialChars($string, $flags, $encoding, $doubleEncode);
 }
 
 

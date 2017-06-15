@@ -21,6 +21,7 @@ use rosasurfer\net\http\HttpResponse;
 
 use rosasurfer\util\PHP;
 
+use function rosasurfer\hsc;
 use function rosasurfer\ksort_r;
 use function rosasurfer\normalizeEOL;
 use function rosasurfer\printPretty;
@@ -319,8 +320,7 @@ class Logger extends StaticClass {
     public static function log($loggable, $level, array $context = []) {
         self::init();
 
-        // Wrap everything in a try-catch block to prevent user generated log messages
-        // from getting lost if logging fails.
+        // Wrap everything in a try-catch block to prevent user generated log messages from getting lost if logging fails.
         try {
 
             // block recursive calls
@@ -344,8 +344,8 @@ class Logger extends StaticClass {
             // (2) filter messages not covered by the current loglevel
             $filtered = false;
             if ($level == L_FATAL) {
-                // Filtering not necessary for the highest level. This will cover all calls from the global exception handler
-                // which always logs with the highest level (L_FATAL).
+                // No filtering necessary for the highest loglevel. This will cover all calls from the global exception
+                // handler which always logs with L_FATAL.
             }
             else {
                 // resolve the calling class and check its loglevel
@@ -744,7 +744,7 @@ class Logger extends StaticClass {
         if (is_string($loggable)) {
             // simple message
             $msg   = $loggable;
-            $html .= '<b>['.strToUpper(self::$logLevels[$level]).']</b> '.nl2br(htmlSpecialChars($msg, ENT_QUOTES|ENT_SUBSTITUTE)).'<br>in <b>'.$file.'</b> on line <b>'.$line.'</b><br>';
+            $html .= '<b>['.strToUpper(self::$logLevels[$level]).']</b> '.nl2br(hsc($msg)).'<br>in <b>'.$file.'</b> on line <b>'.$line.'</b><br>';
         }
         else {
             // exception
@@ -757,7 +757,7 @@ class Logger extends StaticClass {
                     $type .= 'PHP Error:';
                 }
             }
-            $html     .= '<b>['.strToUpper(self::$logLevels[$level]).']</b> '.nl2br(htmlSpecialChars($type.$msg, ENT_QUOTES|ENT_SUBSTITUTE)).'<br>in <b>'.$file.'</b> on line <b>'.$line.'</b><br>';
+            $html     .= '<b>['.strToUpper(self::$logLevels[$level]).']</b> '.nl2br(hsc($type.$msg)).'<br>in <b>'.$file.'</b> on line <b>'.$line.'</b><br>';
             $traceStr  = $indent.'Stacktrace:'.NL.' -----------'.NL;
             $traceStr .= DebugHelper::getBetterTraceAsString($loggable, $indent);
             $html     .= '<span style="clear:both"></span><br>'.printPretty($traceStr, true).'<br>';
@@ -767,11 +767,11 @@ class Logger extends StaticClass {
         if (isSet($context['exception'])) {
             $exception = $context['exception'];
             $msg       = DebugHelper::composeBetterMessage($exception);
-            $html     .= '<br>'.nl2br(htmlSpecialChars($msg, ENT_QUOTES|ENT_SUBSTITUTE)).'<br>';
+            $html     .= '<br>'.nl2br(hsc($msg)).'<br>';
             $traceStr  = $indent.'Stacktrace:'.NL.' -----------'.NL;
             $traceStr .= DebugHelper::getBetterTraceAsString($exception, $indent);
             $html     .= printPretty($traceStr, true);
-     }
+        }
 
         // append the current HTTP request
         if (!CLI) {

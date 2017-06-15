@@ -315,7 +315,7 @@ class Request extends Singleton {
      * </pre>
      */
     public function getApplicationRelativePath() {
-        return strRightFrom($this->getPath(), $this->getApplicationBaseUri()).'/';
+        return '/'.strRightFrom($this->getPath(), $this->getApplicationBaseUri());
     }
 
 

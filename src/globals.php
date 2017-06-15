@@ -175,6 +175,25 @@ function numf($number, $decimals=0, $decimalSeparator='.', $thousandsSeparator='
 
 
 /**
+ * Convert special characters to HTML entities.
+ *
+ * Inline replacement and shortcut for htmlSpecialChars() using different default flags.
+ *
+ * @param  string $string
+ * @param  int    $flags        [optional] - default: ENT_QUOTES|ENT_SUBSTITUTE|ENT_HTML5
+ * @param  string $encoding     [optional] - default: ini_get("default_charset")
+ * @param  bool   $doubleEncode [optional] - default: TRUE
+ *
+ * @return string - converted string
+ *
+ * @see   \htmlSpecialChars()
+ */
+function hsc($string, $flags=null, $encoding=null, $doubleEncode=true) {
+    return \rosasurfer\hsc($string, $flags, $encoding, $doubleEncode);
+}
+
+
+/**
  * Whether or not the byte order of the machine we are running on is "little endian".
  *
  * @return bool
