@@ -197,7 +197,8 @@ abstract class PersistableObject extends Object {
 
                 if (!isSet($relation['foreign-key']))
                     $relation['foreign-key'] = $relatedMapping['identity']['name'];     // default foreign-key is identity
-                $fkColumn    = $relation['foreign-key'];                                // the used foreign-key column
+                $fkName      = $relation['foreign-key'];                                // the used foreign-key property
+                $fkColumn    = $relatedMapping['properties'][$fkName]['column'];        // the used foreign-key column
                 $fkRefColumn = $relation['fk-ref-column'];                              // join column referencing the foreign-key
                 $sql = 'select r.*
                             from '.$relatedTable.' r
@@ -214,7 +215,8 @@ abstract class PersistableObject extends Object {
             if (isSet($relation['join-table'])) {
                 if (!isSet($relation['foreign-key']))
                     $relation['foreign-key'] = $relatedMapping['identity']['name'];     // default foreign-key is identity
-                $fkColumn = $relation['foreign-key'];                                   // the used foreign-key column
+                $fkName   = $relation['foreign-key'];                                   // the used foreign-key property
+                $fkColumn = $relatedMapping['properties'][$fkName]['column'];           // the used foreign-key column
             }
             else if (isSet($relation['column'])) {                      // a local column referencing the foreign key
                 if (!isSet($relation['ref-column']))                    // default foreign-key is identity
