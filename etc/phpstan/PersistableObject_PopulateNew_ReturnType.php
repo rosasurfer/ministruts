@@ -7,7 +7,6 @@ use PhpParser\Node\Expr\StaticCall;
 
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
-
 use PHPStan\Type\DynamicMethodReturnTypeExtension;
 use PHPStan\Type\DynamicStaticMethodReturnTypeExtension;
 use PHPStan\Type\Type;
@@ -34,8 +33,8 @@ class PersistableObject_PopulateNew_ReturnType extends DynamicReturnType impleme
         $returnType  = $methodReflection->getReturnType();
         $returnClass = $origReturnClass = $returnType->getClass();
         $error = false;
-        if (0 || $error)   echoPre($this->getScopeName($scope).': '.baseName(self::CLASS_NAME).'->'.self::METHOD_NAME.'() => '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
-        if (0 && $error) { echoPre($methodCall); exit(); }
+
+        if (0 || $error) echoPre($this->getScopeName($scope).': '.baseName(self::CLASS_NAME).'->'.self::METHOD_NAME.'() => '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
         return $returnType;
     }
 
@@ -49,8 +48,8 @@ class PersistableObject_PopulateNew_ReturnType extends DynamicReturnType impleme
         $returnType  = $methodReflection->getReturnType();
         $returnClass = $origReturnClass = $returnType->getClass();
         $error = false;
-        if (0 || $error)   echoPre($this->getScopeName($scope).': '.baseName(self::CLASS_NAME).'::'.self::METHOD_NAME.'() => '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
-        if (0 && $error) { echoPre($methodCall); exit(); }
+
+        if (0 || $error) echoPre($this->getScopeName($scope).': '.baseName(self::CLASS_NAME).'::'.self::METHOD_NAME.'() => '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
         return $returnType;
     }
 }

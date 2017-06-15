@@ -7,8 +7,8 @@ use PhpParser\Node\Expr\Variable;
 
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
-
 use PHPStan\Type\DynamicMethodReturnTypeExtension;
+use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
 
 use rosasurfer\db\orm\DAO;
@@ -43,14 +43,13 @@ class DAO_Find_ReturnType extends DynamicReturnType implements DynamicMethodRetu
                     $daoClass = $this->getScopeName($scope);
                     if ($daoClass != self::CLASS_NAME) {
                         $returnClass = strLeft($daoClass, -3);
-                        $returnType  = $this->createObjectType($returnClass);
+                        $returnType  = new ObjectType($returnClass);
                     }
-                } //else $error = _true(echoPre('cannot resolve callee of instance method call: $'.$var->name.'->'.self::METHOD_NAME.'()'));
-            } else       $error = _true(echoPre('cannot resolve callee of instance method call: class($var->name)='.get_class($var->name)));
-        } else           $error = _true(echoPre('cannot resolve callee of instance method call: class($methodCall->var)='.get_class($methodCall->var)));
+                } //else $error = _true(echoPre(baseName(self::CLASS_NAME).'->'.self::METHOD_NAME.'(1) cannot resolve callee of instance method call: $'.$var->name.'->'.self::METHOD_NAME.'()'));
+            } else       $error = _true(echoPre(baseName(self::CLASS_NAME).'->'.self::METHOD_NAME.'(2) cannot resolve callee of instance method call: class($var->name)='.get_class($var->name)));
+        } else           $error = _true(echoPre(baseName(self::CLASS_NAME).'->'.self::METHOD_NAME.'(3) cannot resolve callee of instance method call: class($methodCall->var)='.get_class($methodCall->var)));
 
-        if (0 || $error)   echoPre($this->getScopeName($scope).': '.baseName(self::CLASS_NAME).'->'.self::METHOD_NAME.'() => '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
-        if (0 && $error) { echoPre($methodCall); exit(); }
+        if (0 || $error) echoPre($this->getScopeName($scope).': '.baseName(self::CLASS_NAME).'->'.self::METHOD_NAME.'() => '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
         return $returnType;
     }
 }

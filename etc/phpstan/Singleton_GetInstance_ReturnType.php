@@ -3,21 +3,19 @@
 namespace rosasurfer\core\phpstan;
 
 use PhpParser\Node\Expr;
-
 use PhpParser\Node\Expr\BinaryOp;
 use PhpParser\Node\Expr\ClassConstFetch;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\StaticCall;
 use PhpParser\Node\Expr\Variable;
-
 use PhpParser\Node\Expr\BinaryOp\Concat;
 use PhpParser\Node\Scalar\String_;
 
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
-
 use PHPStan\Type\DynamicStaticMethodReturnTypeExtension;
 use PHPStan\Type\DynamicMethodReturnTypeExtension;
+use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
 
 use rosasurfer\core\Singleton;
@@ -45,8 +43,8 @@ class Singleton_GetInstance_ReturnType extends DynamicReturnType implements Dyna
         $returnType  = $methodReflection->getReturnType();
         $returnClass = $origReturnClass = $returnType->getClass();
         $error = false;
-        if (0 || $error)   echoPre($this->getScopeName($scope).': '.baseName(self::CLASS_NAME).'->'.self::METHOD_NAME.'() => '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
-        if (0 && $error) { echoPre($methodCall); exit(); }
+
+        if (0 || $error) echoPre($this->getScopeName($scope).': '.baseName(self::CLASS_NAME).'->'.self::METHOD_NAME.'() => '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
         return $returnType;
     }
 
@@ -66,33 +64,32 @@ class Singleton_GetInstance_ReturnType extends DynamicReturnType implements Dyna
 
             if ($arg instanceof String_) {
                 $returnClass = $arg->value;
-                $returnType  = $this->createObjectType($returnClass);
+                $returnType  = new ObjectType($returnClass);
             }
             else if ($arg instanceof ClassConstFetch) {
                 if ($class = $this->classConstFetchToStr($arg, $scope)) {
                     $returnClass = $class;
-                    $returnType  = $this->createObjectType($returnClass);
+                    $returnType  = new ObjectType($returnClass);
                 }
-                else $error = _true(echoPre('cannot resolve class constant "'.$arg->class.'::'.$arg->name.'"'));
+                else $error = _true(echoPre(baseName(self::CLASS_NAME).'::'.self::METHOD_NAME.'(1) cannot resolve class constant "'.$arg->class.'::'.$arg->name.'"'));
             }
             else if ($arg instanceof BinaryOp) {
                 if ($class = $this->binaryOpToStr($arg, $scope)) {
                     if ($class == PersistableObject::class.'DAO') $class = DAO::class;
                     $returnClass = $class;
-                    $returnType  = $this->createObjectType($returnClass);
+                    $returnType  = new ObjectType($returnClass);
                 }
-                else $error = _true(echoPre('cannot convert binary operator argument to string: '.get_class($arg)));
+                else $error = _true(echoPre(baseName(self::CLASS_NAME).'::'.self::METHOD_NAME.'(2) cannot convert binary operator argument to string: '.get_class($arg)));
             }
             else if ($arg instanceof Variable) {
-                $error = _true(echoPre('cannot resolve variable "'.$arg->name.'"'));
+                $error = _true(echoPre(baseName(self::CLASS_NAME).'::'.self::METHOD_NAME.'(3) cannot resolve variable "'.$arg->name.'"'));
             }
             else {
-                $error = _true(echoPre('cannot resolve argument: '.get_class($arg)));
+                $error = _true(echoPre(baseName(self::CLASS_NAME).'::'.self::METHOD_NAME.'(4) cannot resolve argument: '.get_class($arg)));
             }
         }
 
-        if (0 || $error)   echoPre($this->getScopeName($scope).': '.baseName(self::CLASS_NAME).'::'.self::METHOD_NAME.'() => '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
-        if (0 && $error) { echoPre($methodCall); exit(); }
+        if (0 || $error) echoPre($this->getScopeName($scope).': '.baseName(self::CLASS_NAME).'::'.self::METHOD_NAME.'() => '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
         return $returnType;
     }
 

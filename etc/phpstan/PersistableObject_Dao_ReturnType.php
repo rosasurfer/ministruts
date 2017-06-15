@@ -9,9 +9,9 @@ use PhpParser\Node\Expr\Variable;
 
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
-
 use PHPStan\Type\DynamicMethodReturnTypeExtension;
 use PHPStan\Type\DynamicStaticMethodReturnTypeExtension;
+use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
 
 use rosasurfer\db\orm\PersistableObject;
@@ -45,14 +45,13 @@ class PersistableObject_Dao_ReturnType extends DynamicReturnType implements Dyna
                     $scopeName = $this->getScopeName($scope);
                     if ($scopeName != self::CLASS_NAME) {
                         $returnClass = $scopeName.'DAO';
-                        $returnType  = $this->createObjectType($returnClass);
+                        $returnType  = new ObjectType($returnClass);
                     }
-                } //else $error = _true(echoPre('cannot resolve callee of instance method call: variable "'.$var->name.'"'));
-            } else       $error = _true(echoPre('cannot resolve callee of instance method call: class($var->name)='.get_class($var->name)));
-        } else           $error = _true(echoPre('cannot resolve callee of instance method call: class($methodCall->var)='.get_class($methodCall->var)));
+                } //else $error = _true(echoPre(baseName(self::CLASS_NAME).'->'.self::METHOD_NAME.'(1) cannot resolve callee of instance method call: variable "'.$var->name.'"'));
+            } else       $error = _true(echoPre(baseName(self::CLASS_NAME).'->'.self::METHOD_NAME.'(2) cannot resolve callee of instance method call: class($var->name)='.get_class($var->name)));
+        } else           $error = _true(echoPre(baseName(self::CLASS_NAME).'->'.self::METHOD_NAME.'(3) cannot resolve callee of instance method call: class($methodCall->var)='.get_class($methodCall->var)));
 
-        if (0 || $error)   echoPre($this->getScopeName($scope).': '.baseName(self::CLASS_NAME).'->'.self::METHOD_NAME.'() => '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
-        if (0 && $error) { echoPre($methodCall); exit(); }
+        if (0 || $error) echoPre($this->getScopeName($scope).': '.baseName(self::CLASS_NAME).'->'.self::METHOD_NAME.'() => '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
         return $returnType;
     }
 
@@ -71,19 +70,18 @@ class PersistableObject_Dao_ReturnType extends DynamicReturnType implements Dyna
             $name = $methodCall->class;
             if ($name->isFullyQualified()) {
                 $returnClass = $name.'DAO';
-                $returnType  = $this->createObjectType($returnClass);
+                $returnType  = new ObjectType($returnClass);
             }
             else if ((string)$name == 'self') {
                 $scopeName = $this->getScopeName($scope);
                 if ($scopeName != self::CLASS_NAME) {
                     $returnClass = $scopeName.'DAO';
-                    $returnType  = $this->createObjectType($returnClass);
+                    $returnType  = new ObjectType($returnClass);
                 }
-            } else $error = _true(echoPre('cannot resolve callee of static method call: name "'.$name.'"'));
-        } else     $error = _true(echoPre('cannot resolve callee of static method call: class($methodCall->class)='.get_class($methodCall->class)));
+            } else $error = _true(echoPre(baseName(self::CLASS_NAME).'::'.self::METHOD_NAME.'(1) cannot resolve callee of static method call: name "'.$name.'"'));
+        } else     $error = _true(echoPre(baseName(self::CLASS_NAME).'::'.self::METHOD_NAME.'(2) cannot resolve callee of static method call: class($methodCall->class)='.get_class($methodCall->class)));
 
-        if (0 || $error)   echoPre($this->getScopeName($scope).': '.baseName(self::CLASS_NAME).'::'.self::METHOD_NAME.'() => '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
-        if (0 && $error) { echoPre($methodCall); exit(); }
+        if (0 || $error) echoPre($this->getScopeName($scope).': '.baseName(self::CLASS_NAME).'::'.self::METHOD_NAME.'() => '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
         return $returnType;
     }
 }
