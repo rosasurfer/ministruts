@@ -1,4 +1,9 @@
 
+2017-06-15
+
+   - util: helper function rosasurfer\hsc() as inline replacement for htmlSpecialChars() 
+
+
 2017-06-09
 
    - orm: db/orm/DAO::findAll() without a query finds all existing instances
