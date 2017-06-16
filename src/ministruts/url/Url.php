@@ -31,7 +31,7 @@ class Url extends Object {
      *
      * @param  string $uri - URI part of the URL to generate. If the URI starts with a slash "/" it is interpreted as
      *                       relative to the application's base URI (the root Module). If the URI does not start with a
-     *                       slash it is interpreted as relative to the application's current non-root Module.
+     *                       slash it is interpreted as relative to the application's current Module.
      */
     public function __construct($uri) {
         if (!is_string($uri)) throw new IllegalTypeException('Illegal type of parameter $uri: '.getType($uri));

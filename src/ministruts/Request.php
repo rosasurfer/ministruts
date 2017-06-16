@@ -25,11 +25,6 @@ use const rosasurfer\NL;
 /**
  * An object representing the current HTTP request. It provides an additional variables container (a context) with the
  * life-time of the HTTP request.
- *
- * @see  Request::getAttribute()
- * @see  Request::getAttributes()
- * @see  Request::setAttribute()
- * @see  Request::removeAttributes()
  */
 class Request extends Singleton {
 
