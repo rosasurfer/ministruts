@@ -250,6 +250,12 @@ class PostgresConnector extends Connector {
 
         if (!$this->isConnected())
             $this->connect();
+
+        // work around encoding mis-match: ERROR: invalid byte sequence for encoding "UTF8"...
+        $encoding = mb_detect_encoding($value, null, true);
+        if ($encoding!='ASCII' && $encoding=='UTF-8')
+            $value = utf8_encode($value);
+
         return pg_escape_literal($this->hConnection, $value);
     }
 
@@ -265,6 +271,12 @@ class PostgresConnector extends Connector {
 
         if (!$this->isConnected())
             $this->connect();
+
+        // work around encoding mis-match: ERROR: invalid byte sequence for encoding "UTF8"...
+        $encoding = mb_detect_encoding($value, null, true);
+        if ($encoding!='ASCII' && $encoding=='UTF-8')
+            $value = utf8_encode($value);
+
         return pg_escape_string($this->hConnection, $value);
     }
 
