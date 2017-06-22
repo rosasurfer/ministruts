@@ -534,12 +534,12 @@ class Request extends Singleton {
 
 
     /**
-     * Gibt den angegebenen Header als Name-Wert-Paar zurueck.  Wurden mehrere Header dieses Namens uebertragen,
-     * wird der erste uebertragene Header zurueckgegeben.
+     * Gibt den Wert des angegebenen Headers zurueck.  Wurden mehrere Header dieses Namens uebertragen,
+     * wird der Wert des ersten uebertragenen Headers zurueckgegeben.
      *
      * @param  string $name - Name des Headers
      *
-     * @return array|null - Name-Wert-Paar oder NULL, wenn kein Header dieses Namens uebertragen wurde
+     * @return string|null - Wert oder NULL, wenn kein Header dieses Namens uebertragen wurde
      */
     public function getHeader($name) {
         if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
@@ -550,11 +550,11 @@ class Request extends Singleton {
 
 
     /**
-     * Return the specified headers as an array of name-value pairs (in transmitted order).
+     * Return the specified headers as an associative array of header values (in transmitted order).
      *
      * @param  string|string[] $names [optional] - one or more header names; without a name all headers are returned
      *
-     * @return array - name-value pairs
+     * @return array - associative array of header values
      */
     public function getHeaders($names = []) {
         if (is_string($names)) $names = [$names];
