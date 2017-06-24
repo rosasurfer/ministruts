@@ -566,26 +566,38 @@ class Request extends Singleton {
         else throw new IllegalTypeException('Illegal type of parameter $names: '.getType($names));
 
         // read all headers once
-        static $headers = null;
-        if ($headers === null) {
+        static $headers = null; if (!$headers) {
             if (function_exists('apache_request_headers')) {
                 $headers = apache_request_headers();
             }
             else {
-                // TODO: some transmitted headers are missing in the PHP $_SERVER array, e.g. 'Authorization' (digest)
-                // TODO: check basic authorization
                 // TODO: check $_FILES array
+
                 $headers = [];
                 foreach ($_SERVER as $key => $value) {
-                    if(subStr($key, 0, 5) == 'HTTP_') {
-                        $key = strToLower(subStr($key, 5));
-                        $key = str_replace(' ', '-', ucWords(str_replace('_', ' ', $key)));
+                    if (subStr($key, 0, 5) == 'HTTP_') {
+                        $key = subStr($key, 5);
+                        if ($key != 'DNT') {
+                            $key = str_replace(' ', '-', ucWords(str_replace('_', ' ', strToLower($key))));
+                        }
                         $headers[$key] = $value;
                     }
                 }
-                if ($this->isPost()) {
-                    if (isSet($_SERVER['CONTENT_TYPE'  ])) $headers['Content-Type'  ] = $_SERVER['CONTENT_TYPE'  ];
-                    if (isSet($_SERVER['CONTENT_LENGTH'])) $headers['Content-Length'] = $_SERVER['CONTENT_LENGTH'];
+                if (isSet($_SERVER['CONTENT_TYPE'  ])) $headers['Content-Type'  ] = $_SERVER['CONTENT_TYPE'  ];
+                if (isSet($_SERVER['CONTENT_LENGTH'])) $headers['Content-Length'] = $_SERVER['CONTENT_LENGTH'];
+                if (isSet($_SERVER['CONTENT_MD5'   ])) $headers['Content-MD5'   ] = $_SERVER['CONTENT_MD5'   ];
+            }
+
+            if (!isSet($headers['Authorization'])) {
+                if (isSet($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
+                    $headers['Authorization'] = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
+                }
+                elseif (isSet($_SERVER['PHP_AUTH_USER'])) {
+                    $passwd = isSet($_SERVER['PHP_AUTH_PW']) ? $_SERVER['PHP_AUTH_PW'] : '';
+                    $headers['Authorization'] = 'Basic '. base64_encode($_SERVER['PHP_AUTH_USER'].':'.$passwd);
+                }
+                elseif (isset($_SERVER['PHP_AUTH_DIGEST'])) {
+                    $headers['Authorization'] = $_SERVER['PHP_AUTH_DIGEST'];
                 }
             }
         }
