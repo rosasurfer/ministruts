@@ -269,12 +269,12 @@ class Tile extends Object {
 
 /**
  * Populate the function context with the passed properties and include the specified file. Prevents the view from accessing
- * the Tile instance (variable $this is not available).
+ * the Tile instance (var $this is not available).
  *
  * @param  string $file   - name of the file to include
  * @param  array  $values - values accessible to the view
  */
-function includeFile($file_025d513c6bc20fd32378b051168b1dbb, $values_025d513c6bc20fd32378b051168b1dbb) {
-    extract($values_025d513c6bc20fd32378b051168b1dbb);
-    include($file_025d513c6bc20fd32378b051168b1dbb);
+function includeFile(/*$file, $values*/) {
+    extract(func_get_args()[1]);
+    include(func_get_args()[0]);
 }

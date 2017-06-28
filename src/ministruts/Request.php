@@ -566,13 +566,12 @@ class Request extends Singleton {
         else throw new IllegalTypeException('Illegal type of parameter $names: '.getType($names));
 
         // read all headers once
-        static $headers = null; if (!$headers) {
+        static $headers = null; if ($headers === null) {
             if (function_exists('apache_request_headers')) {
                 $headers = apache_request_headers();
             }
             else {
                 // TODO: check $_FILES array
-
                 $headers = [];
                 foreach ($_SERVER as $key => $value) {
                     if (subStr($key, 0, 5) == 'HTTP_') {

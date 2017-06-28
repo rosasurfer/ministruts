@@ -48,6 +48,7 @@ parameters:
     polluteCatchScopeWithTryAssignments:    true
     
     ignoreErrors:
+        # intentionally ignore these 
         - '/Call to ((static )?method|function) [^ ]+ with incorrect case:/'                                        # seriously?
         - '/Array \(([^ ]+)\[\]\) does not accept (\1\|)?null\b/'                                                   # NULL should be considered a value, not a type
         - '/(Static )?property [^ ]+ \(([^ ]+)\) does not accept (\2\|)?null\b/i'                                   # - dito -
@@ -56,8 +57,9 @@ parameters:
         - '/Calling method [^ ]+ on possibly nullable type [^ ]+\|null\b/'
         - "/Casting to (bool|int|float|string) something that's already (bool|int|float|string)/"                   # too simple implementation
         - '/Strict comparison using [=!]== between (int|string) and null will always evaluate to (true|false)\b/'
+        - '/Function rosasurfer\\ministruts\\includeFile invoked with 2 parameters, 0 required\b/'
 
-        # unfixed PHPStan bugs 
+        # PHPStan issues 
         - '/Cannot call method andDependency\(\) on null\b/'
         - '/Method rosasurfer\\db\\orm\\meta\\EntityMapping::getVersion\(\) should return rosasurfer\\db\\orm\\meta\\PropertyMapping\|null but returns bool\|rosasurfer\\db\\orm\\meta\\PropertyMapping\|null\b/'
         - '/Parameter #1 \$mode of method rosasurfer\\ministruts\\ActionMapping::setFormValidateFirst\(\) expects bool, bool\|mixed given\b/'
