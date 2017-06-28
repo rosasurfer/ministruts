@@ -501,7 +501,10 @@ class ActionMapping extends Object {
                 $url .= '?'.$query;
 
             $class = $this->module->getForwardClass();
-            return new $class($name, $url, true);
+
+            /** ActionForward $forward */
+            $forward = new $class($name, $url, true);
+            return $forward;
         }
 
         $forward = $this->module->findForward($name);

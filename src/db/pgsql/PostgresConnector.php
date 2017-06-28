@@ -278,7 +278,7 @@ class PostgresConnector extends Connector {
     /**
      * Fix the invalid encoding of a string to UTF-8 (if necessary).
      *
-     * @param string $string - string with potentially invalid encoding
+     * @param string $value - string with potentially invalid encoding
      *
      * @return string - valid encoded string
      */
