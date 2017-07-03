@@ -492,8 +492,8 @@ class Request extends Singleton {
 
 
     /**
-     * Whether or not a session id was transmitted with the request in a legal way. An illegal way would be for example a
-     * URL based session id when the php.ini setting 'session.use_trans_sid' is not enabled.
+     * Whether or not a valid session id was transmitted with the request (an invalid id can be a URL based id when the
+     * php.ini setting 'session.use_trans_sid' is not enabled).
      *
      * @return bool
      */
