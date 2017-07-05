@@ -5,9 +5,8 @@ use rosasurfer\core\Object;
 
 
 /**
- * ActionForm
- *
- * Represents and validates user input and provides an interface to Actions and business layer to access this input.
+ * An ActionForm encapsulates and represents the user input. Provides an interface for Actions and business layer to access
+ * and validate this input.
  */
 abstract class ActionForm extends Object {
 
@@ -22,18 +21,18 @@ abstract class ActionForm extends Object {
     /**
      * Constructor
      *
-     * Erzeugt eine neue ActionForm fuer den aktuellen Request.
+     * Create a new form instance for the current {@link Request}.
      *
-     * @param  Request $request - der aktuelle Request
+     * @param  Request $request
      */
     public function __construct(Request $request) {
         $this->request = $request;
 
-        // ggf. definierten DispatchAction-Key auslesen
+        // check for a dispatch action key
         if     (isSet($_REQUEST['action'  ])) $this->actionKey = $_REQUEST['action'  ];
         elseif (isSet($_REQUEST['action.x'])) $this->actionKey = $_REQUEST['action.x'];  // submit type="image"
 
-        // Parameter einlesen
+        // read transmitted parameters
         $this->populate($request);
     }
 
@@ -59,9 +58,11 @@ abstract class ActionForm extends Object {
 
 
     /**
-     * Gibt den DispatchAction-Key zurueck (Beschreibung: siehe java.struts.DispatchAction).
+     * Return the dispatch action key (if any).
      *
-     * @return string - Action-Key oder NULL, wenn kein Wert angegeben wurde
+     * @return string|NULL - action key or NULL if no action key was transmitted
+     *
+     * @see    java.struts.DispatchAction
      */
     public function getActionKey() {
         return $this->actionKey;
@@ -82,8 +83,7 @@ abstract class ActionForm extends Object {
 
 
     /**
-     * Reinitialisiert die transienten Werte dieser Instanz.  Wird intern nach dem Deserialisieren
-     * aufgerufen.
+     * Re-initialize the instance after deserialization.
      */
     public function __wakeUp() {
         $this->__construct(Request::me());

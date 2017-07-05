@@ -10,26 +10,19 @@ use rosasurfer\exception\InvalidArgumentException;
 /**
  * ActionForward
  *
- * Ein ActionForward bezeichnet ein Ziel, zu dem nach Aufruf einer Action verzweigt wird.  Er hat die
- * folgenden Eigenschaften:
- *
- *   name     - logischer Name, unter dem der ActionForward gefunden werden kann
- *   path     - physische Resource (z.B. HTML-Datei), Klassenname eines Layouts oder URL
- *   redirect - ob ein Redirect ausgeloest werden soll (nur bei URL, default: false)
+ * An ActionForward describes a target a request is forwarded to after processing. It has a logical name (for identification)
+ * and points either to a physical resource (file, layout template) or to a URL.
  */
 class ActionForward extends Object {
 
 
-    /** @var string - Default-Bezeichner, mit dem nach erfolgreicher Validierung nach einem ActionForward gesucht wird. */
+    /** @var string - default identifier for looking up a forward after a successful form validation */
     const VALIDATION_SUCCESS_KEY = 'success';
 
-    /** @var string - Default-Bezeichner, mit dem nach fehlgeschlagener Validierung nach einem ActionForward gesucht wird. */
+    /** @var string - default identifier for looking up a forward after a failed form validation */
     const VALIDATION_ERROR_KEY   = 'error';
 
-    /**
-     *  @var string - Geschuetzter Forward-Bezeichner, ueber den zur Laufzeit ein Redirect-Forward auf die URL des aktuell
-     *                verwendeten ActionMappings erzeugt werden kann.
-     */
+    /** @var string - reserved identifier for looking up a forward to the currently used ActionMapping */
     const __SELF = '__self';
 
     /** @var string */
@@ -46,11 +39,11 @@ class ActionForward extends Object {
 
 
     /**
-     * Erzeugt einen neuen ActionForward mit den angegebenen Daten.
+     * Create a new instance with the specified properties.
      *
-     * @param  string $name                - logischer Name des Forwards
-     * @param  string $path                - Pfad der Instanz
-     * @param  bool   $redirect [optional] - Redirect-Flag fuer diese Instanz
+     * @param  string $name                - logical forward name
+     * @param  string $path                - resource path
+     * @param  bool   $redirect [optional] - redirect flag (default: FALSE)
      */
     public function __construct($name, $path, $redirect = false) {
         $this->setName($name)
@@ -60,7 +53,7 @@ class ActionForward extends Object {
 
 
     /**
-     * Get den Namen dieses Forwards.
+     * Return the foward's logical name (the identifier).
      *
      * @return string
      */
@@ -70,7 +63,7 @@ class ActionForward extends Object {
 
 
     /**
-     * Return the path of dieses Forwards.
+     * Return the forward's resource path.
      *
      * @return string
      */
@@ -80,7 +73,7 @@ class ActionForward extends Object {
 
 
     /**
-     * Return the label of dieses Forwards.
+     * Return the forward's label.
      *
      * @return string
      */
@@ -90,7 +83,7 @@ class ActionForward extends Object {
 
 
     /**
-     * Return the redirect property of dieses Forwards.
+     * Return the forward's redirect flag.
      *
      * @return bool
      */
@@ -100,7 +93,7 @@ class ActionForward extends Object {
 
 
     /**
-     * Setzt den Namen dieses Forwards.
+     * Set the forward's name.
      *
      * @param  string $name
      *
@@ -116,7 +109,7 @@ class ActionForward extends Object {
 
 
     /**
-     * Setzt den Pfad dieses Forwards.
+     * Set the forward's resource path.
      *
      * @param  string $path
      *
@@ -132,9 +125,9 @@ class ActionForward extends Object {
 
 
     /**
-     * Setzt das Label dieses Forwards. Das Label wird in HTML-Kommentaren etc. verwendet.
+     * Set the forward's label (used only in HTML comments).
      *
-     * @param  string $label - Label
+     * @param  string $label
      *
      * @return $this
      */
@@ -148,7 +141,7 @@ class ActionForward extends Object {
 
 
     /**
-     * Setzt das Redirect-Flag dieses Forwards.
+     * Set the forward's redirect status.
      *
      * @param  bool $redirect
      *
@@ -163,10 +156,10 @@ class ActionForward extends Object {
 
 
     /**
-     * Fuegt dem Querystring dieses ActionForwards ein weiteres Key-Value-Paar hinzu.
+     * Add a query parameter to the forward's URL.
      *
-     * @param  string $key   - Schluessel
-     * @param  scalar $value - Wert (int|float|string|bool)
+     * @param  string $key   - parameter name
+     * @param  scalar $value - parameter value
      *
      * @return $this
      */
@@ -178,7 +171,7 @@ class ActionForward extends Object {
 
         $value = (string) $value;
 
-        // TODO: Uebergabe von mehreren Werten ermoeglichen
+        // TODO: extend to process multiple parameters at once
 
         $separator = (strPos($this->path, '?')!==false) ? '&' : '?';
 
@@ -189,7 +182,7 @@ class ActionForward extends Object {
 
 
     /**
-     * Erzeugt einen neuen ActionForward, der auf dieser Instanz basiert.
+     * Return an identical copy of forward.
      *
      * @return self
      */

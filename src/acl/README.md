@@ -25,9 +25,9 @@
    • Roles organize activities, groups organize identities.
    • Typically a group membership remains during the duration of a login. Roles and permissions, on the other hand, can be
      activated according to specific conditions (e.g. by time of day, location of access).
-   • For the usage of classifying things together, groups and roles function similar. Groups, however, are based on identity
-     whereas roles are meant to demarcate activity.
+   • For the purpose of classifying things together, groups and roles function similar. Groups, however, are based on
+     identity whereas roles are meant to demarcate activity.
    • Actors and Resources are both identities. Thus both can be organized in groups.
 
- - A Resource can become an Actor, an Actor can become a Resource. Both can be converted as required. An identity can be both
-   Actor (subject) and Resource (object) at the same time (e.g. a user updating his user profile).
+ - A Resource can become an Actor, an Actor can become a Resource. Both can be converted as required. An identity can be
+   both Actor (subject) and Resource (object) at the same time (e.g. a user updating his user profile).

@@ -5,9 +5,7 @@ use rosasurfer\core\Object;
 
 
 /**
- * Action
- *
- * Contains logic to execute for a specific request and represents the interface to the business layer.
+ * An Action contains the logic to execute for a specific request and represents the interface to the business layer.
  */
 abstract class Action extends Object {
 
