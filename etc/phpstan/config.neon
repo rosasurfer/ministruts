@@ -20,9 +20,9 @@ parameters:
    #reportUnmatchedIgnoredErrors:           false
     polluteScopeWithLoopInitialAssignments: true
     polluteCatchScopeWithTryAssignments:    true
-    
+
     ignoreErrors:
-        # intentionally ignore these 
+        # intentionally ignore these
         - '/Call to ((static )?method|function) [^ ]+\(\) with incorrect case:/'                                    # seriously?
         - '/Array \(([^ ]+)\[\]\) does not accept (\1\|)?null\b/'                                                   # NULL should be considered a value, not a type
         - '/(Static )?property [^ ]+ \(([^ ]+)\) does not accept (\2\|)?null\b/i'                                   # - dito -
@@ -33,14 +33,14 @@ parameters:
         - '/Strict comparison using [=!]== between (int|string) and null will always evaluate to (true|false)\b/'
         - '/Function rosasurfer\\ministruts\\includeFile invoked with 2 parameters, 0 required\b/'
 
-        # unsolved issues 
+        # unsolved issues
         - '/Method rosasurfer\\db\\orm\\meta\\EntityMapping::getVersion\(\) should return rosasurfer\\db\\orm\\meta\\PropertyMapping\|null but returns bool\|rosasurfer\\db\\orm\\meta\\PropertyMapping\|null\b/'
         - '/Method rosasurfer\\db\\(mysql\\MySQL|pgsql\\Postgres|sqlite\\SQLite)Result::numRows\(\) should return int but returns int\|null\b/'
 
 
-services:                                                           
-        # These classes must be loaded via etc/phpstan/autoload.php (services are initialized    
-        # before execution of block "parameters/autoload_files").   
+services:
+        # These classes must be loaded via etc/phpstan/autoload.php (services are initialized
+        # before execution of block "parameters/autoload_files").
     -
         class: rosasurfer\db\orm\phpstan\DAO_Find_ReturnType
         tags:
