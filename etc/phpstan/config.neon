@@ -39,7 +39,7 @@ parameters:
 
 
 services:
-        # These classes must be loaded via etc/phpstan/autoload.php (services are initialized
+        # Service classes must be loaded via etc/phpstan/autoload.php (services are initialized
         # before execution of block "parameters/autoload_files").
     -
         class: rosasurfer\db\orm\phpstan\DAO_Find_ReturnType
