@@ -35,6 +35,14 @@ interface ConfigInterface {
 
 
     /**
+     * Return the directory of the configuration file loaded last.
+     *
+     * @return string
+     */
+    public function getLastDirectory();
+
+
+    /**
      * Return an informative text describing the instance.
      *
      * @return string

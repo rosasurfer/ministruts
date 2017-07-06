@@ -3,11 +3,7 @@ namespace rosasurfer\config;
 
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
-use rosasurfer\exception\RuntimeException;
-
 use rosasurfer\monitor\FileDependency;
-
-use function rosasurfer\isRelativePath;
 
 use const rosasurfer\CLI;
 
@@ -40,30 +36,31 @@ class AutoConfig extends Config {
      *    remaining application config files are loaded from the same directory (the directory containing $configLocation).
      *  - If $configLocation is a directory, the application config files are loaded from that directory.
      *
-     * @param  string $appRootDir     - application root directory
-     * @param  string $configLocation - configuration file or directory
+     * @param  string $location           - configuration file or directory
+     * @param  string $baseDir [optional] - if provided all relative "app.dir.*" config values are expanded by this directory
+     *                                      (default: no expansion)
      */
-    public function __construct($appRootDir, $configLocation) {
-        if (!is_string($appRootDir))     throw new IllegalTypeException('Illegal type of parameter $appRootDir: '.getType($appRootDir));
-        if (!is_string($configLocation)) throw new IllegalTypeException('Illegal type of parameter $configLocation: '.getType($configLocation));
-
-        // (1) load all relevant config files
-        $configDir = $configFile = null;
-
-        if (is_file($configLocation)) {
-            $configFile = realPath($configLocation);
-            $configDir  = dirName($configFile);
-        }
-        else if (is_dir($configLocation)) {
-            $configDir = realPath($configLocation);
-        }
-        else throw new InvalidArgumentException('Location not found: "'.$configLocation.'"');
+    public function __construct($location, $baseDir = null) {
+        if (!is_string($location))                   throw new IllegalTypeException('Illegal type of parameter $location: '.getType($location));
+        if ($baseDir!==null && !is_string($baseDir)) throw new IllegalTypeException('Illegal type of parameter $baseDir: '.getType($baseDir));
 
         // TODO: look-up and delegate to an existing cached instance
         //       key: get_class($this).'|'.$userConfig.'|cli='.(int)CLI
 
 
-        // (1) distributable configuration files
+        // (1) collect all relevant config files
+        $configDir = $configFile = null;
+
+        if (is_file($location)) {
+            $configFile = realPath($location);
+            $configDir  = dirName($configFile);
+        }
+        else if (is_dir($location)) {
+            $configDir = realPath($location);
+        }
+        else throw new InvalidArgumentException('Location not found: "'.$location.'"');
+
+        // distributable config file
         $files[] = $configDir.'/config.dist.properties';
 
         // runtime environment
@@ -74,24 +71,16 @@ class AutoConfig extends Config {
         else if (($env=getEnv('APP_ENVIRONMENT'))) $files[] = $configDir.'/config.'.$env.'.properties';
         else                                       $files[] = $configDir.'/config.properties';          // default
 
-        // load all files and set "app.dir.config"
-        parent::__construct($files);
-        $this->set('app.dir.config', $this->lastDirectory);
+        // load all files (do not pass a provided $baseDir but apply it manually in the next step)
+        parent::__construct($files, null);
 
 
-        // (2) check "app.dir.root" and expand relative "app.dir.*" values
-        $dirs = $this->get('app.dir', []);
-        if (!isSet($dirs['root']))
-            $dirs['root'] = $appRootDir;
+        // (2) set "app.dir.config", "app.dir.root" and expand relative "app.dir.*" values
+        $this->set('app.dir.config', $this->getLastDirectory());
 
-        foreach ($dirs as $name => &$dir) {
-            if (isRelativePath($dir)) {
-                if ($name == 'root') throw new RuntimeException('Invalid config value "app.dir.root"="'.$dir.'" (not an absolute path)');
-                $dir = $dirs['root'].'/'.$dir;
-            }
-            if (is_dir($dir)) $dir = realPath($dir);
-        }; unset($dir);
-        $this->set('app.dir', $dirs);
+        if ($baseDir) $this->set('app.dir.root', $baseDir);                 // override a configured value
+        else          $baseDir = $this->get('app.dir.root', null);          // get a configured value
+        if ($baseDir) $this->expandRelativeDirs($baseDir);
 
 
         // (3) create FileDependency and cache the instance

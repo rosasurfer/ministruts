@@ -299,7 +299,7 @@ function isRelativePath($path) {
     if (strLen($path) && $path[0]=='/')
         return false;
 
-    return true;                    // an empty string cannot be considered absolute, so it's assumed to be relative
+    return true;                // an empty string cannot be considered absolute, so it's assumed to be relative directory
 }
 
 

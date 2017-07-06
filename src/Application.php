@@ -7,17 +7,17 @@ use rosasurfer\config\ConfigInterface as IConfig;
 
 use rosasurfer\core\Object;
 use rosasurfer\debug\ErrorHandler;
+use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RuntimeException;
 
 use rosasurfer\ministruts\FrontController;
 use rosasurfer\ministruts\Response;
 
 use rosasurfer\util\PHP;
-use rosasurfer\log\Logger;
 
 
 /**
- * Framework initialization
+ * A wrapper object for initializing and running an application.
  */
 class Application extends Object {
 
@@ -32,24 +32,28 @@ class Application extends Object {
     /**
      * Create and initialize a new MiniStruts application. Expects an array with any of the following options:
      *
-     * "config"            - IConfig: Configuration instance.<br>
-     *                     - string:  Configuration location, can point to a directory or to a .properties file.<br>
+     * "app.config"            - IConfig: The project's configuration as an object.<br>
      *
-     * "handle-errors"     - string:  How to handle regular PHP errors. If set to 'strict' errors are converted to PHP
-     *                                ErrorExceptions and thrown. If set to 'weak' errors are only logged and execution
-     *                                continues. If set to 'ignore' you have to setup your own error handling mechanism.<br>
-     *                                (default: 'strict')<br>
+     * "app.dir.root"          - string:  The project's root directory.<br>
+     *                                    (default: the current directory)<br>
      *
-     * "handle-exceptions" - bool:    If set to TRUE exceptions are handled by the built-in exception handler. If set to
-     *                                FALSE you have to setup your own exception handling mechanism.<br>
-     *                                (default: TRUE)<br>
+     * "app.dir.config"        - string:  The projetc's configuration location as a directory or a .properties file.<br>
+     *                                    (default: directory returned by "app.config"<IConfig> or the current directory)<br>
      *
-     * "globals"           - bool:    If set to TRUE, the helper functions and constants defined in "rosasurfer/helpers.php"
-     *                                are mapped to the global namespace. This simplifies views as they will not need PHP
-     *                                "use" declarations to access those helpers. <br>
-     *                                (default: FALSE)<br>
+     * "app.global-helpers"    - bool:    If set to TRUE, the helper functions and constants defined in "rosasurfer/helpers.php"
+     *                                    are also mapped to the global PHP namespace.<br>
+     *                                    (default: FALSE)<br>
      *
-     * All further options are added to the application's default configuration {@link Config} as regular config values.
+     * "app.handle-errors"     - string:  How to handle regular PHP errors. If set to "strict" errors are converted to PHP
+     *                                    ErrorExceptions and thrown. If set to "weak" errors are only logged and execution
+     *                                    continues. If set to "ignore" you have to setup your own error handling mechanism.<br>
+     *                                    (default: "strict")<br>
+     *
+     * "app.handle-exceptions" - bool:    If set to TRUE exceptions are handled by the built-in exception handler. If set to
+     *                                    FALSE you have to setup your own exception handling mechanism.<br>
+     *                                    (default: TRUE)<br>
+     *
+     * Additional options are added to the application's default configuration {@link Config} as regular config values.
      *
      * @param  array $options [optional]
      */
@@ -190,31 +194,38 @@ class Application extends Object {
      *
      * @param  array $options - config options as passed to the framework loader
      *
-     * @return IConfig - loaded configuration
+     * @return IConfig - initialized configuration
      */
     private function loadConfiguration(array $options) {
-        if (!isSet($options['app.dir.root'  ])) $options['app.dir.root'  ] = getCwd();
-        if (!isSet($options['app.dir.config'])) $options['app.dir.config'] = getCwd();
-        //Logger::log('Application option "app.dir.root" not defined, using "'.getCwd().'"', L_NOTICE);
-        //Logger::log('Application option "app.dir.config" not defined, using "'.getCwd().'"', L_NOTICE);
-        //throw new RuntimeException('Missing application option "app.dir.config" (required)');
+        if (isSet($options['app.dir.config']) && isSet($options['app.config']))
+            throw new RuntimeException('Only one of the application options "app.config" or "app.dir.config" can be provided.');
 
-        $root   = $options['app.dir.root'  ]; unset($options['app.dir.root'  ]);
-        $config = $options['app.dir.config']; unset($options['app.dir.config']);
-
-        if (is_string($config)) {
-            $config = new AutoConfig($root, $config);
+        if (isSet($options['app.dir.config'])) {
+            $location = $options['app.dir.config'];
+            $config   = new AutoConfig($location, null);    // $baseDir is applied manually in the last step
+            unset($options['app.dir.config']);
         }
-        else if ($config instanceof IConfig) {
-            $config->set('app.dir.root', $root);
+        else if (isSet($options['app.config'])) {
+            $config = $options['app.config'];
+            if (!$config instanceof IConfig) throw new IllegalTypeException('Illegal type of application option["app.config"]: '.getType($config));
+            if (!$config->get('app.dir.config', false))
+                $config->set('app.dir.config', $config->getLastDirectory());
+            unset($options['app.config']);
         }
-        else throw new RuntimeException('Illegal application option "app.dir.config" (must be one of config location or instance of '.IConfig::class.')');
+        else throw new RuntimeException('One of application options "app.config" ('.IConfig::class.') or "app.dir.config" (string) must be provided.');
 
+        $baseDir = isSet($options['app.dir.root']) ? $options['app.dir.root'] : getCwd();
+        unset($options['app.dir.root']);
+
+        // copy all remaining options
         foreach ($options as $name => $value) {
-            if (is_string($name) && $config->get($name, null)===null) {
+            if (is_string($name))
                 $config->set($name, $value);
-            }
         }
+
+        // apply $baseDir and expand relative directories
+        $config->set('app.dir.root', $baseDir);
+        $config->expandRelativeDirs($baseDir);
 
         return Config::setDefault($config);
     }
