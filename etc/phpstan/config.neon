@@ -29,7 +29,7 @@ parameters:
         - '/Parameter #[0-9]+ [^ ]+ of class [^ ]+ constructor expects ([^ ]+), (\1\|)?null given\b/'               # - dito -
         - '/Parameter #[0-9]+ [^ ]+ of (static )?(function|method) [^ ]+ expects ([^ ]+), (\3\|)?null given\b/'     # - dito -
         - '/Calling method [^ ]+\(\) on possibly null value of type [^ ]+\|null\b/'
-        - "/Casting to (bool|int|float|string) something that's already (bool|int|float|string)/"                   # too simple implementation
+        - "/Casting to (bool|int|float|string) something that's already (bool|int|float|string)/"                   # current implementation ignores not initialized vars
         - '/Strict comparison using [=!]== between (int|string) and null will always evaluate to (true|false)\b/'
         - '/Function rosasurfer\\ministruts\\includeFile invoked with 2 parameters, 0 required\b/'
 
