@@ -8,21 +8,19 @@ use rosasurfer\exception\RuntimeException;
 
 
 /**
- * FileLock
+ * An object representing an aquired lock on a file.
  *
- * A token representing a lock on a file.
+ * After aquiring the lock the initial lock status is valid. It remains valid until the lock is released by invoking the
+ * release() method or by the termination of the current PHP process, whichever comes first. The validity of the lock can
+ * be tested by invoking its isValid() method.
  *
- * A file-lock object is created each time a lock is acquired on a file.
+ * A file lock is either exclusive or shared. A shared lock prevents other concurrently-running processes from acquiring an
+ * overlapping exclusive lock, but does allow them to acquire overlapping shared locks. An exclusive lock prevents other
+ * processes from acquiring an overlapping lock of either type. Once a lock is released, it has no further effect on the
+ * locks that may be acquired by other processes.
  *
- * A file-lock object is initially valid.  It remains valid until the lock is released by invoking the
- * release() method or by the termination of the current PHP process, whichever comes first. The validity
- * of a lock may be tested by invoking its isValid() method.  A file lock is either exclusive or shared.
- * A shared lock prevents other concurrently-running programs from acquiring an overlapping exclusive
- * lock, but does allow them to acquire overlapping shared locks.  An exclusive lock prevents other programs
- * from acquiring an overlapping lock of either type.  Once it is released, a lock has no further effect
- * on the locks that may be acquired by other programs.  Whether a lock is exclusive or shared may be
- * determined by invoking its isShared() method.  Some platforms do not support shared locks, in which
- * case a request for a shared lock is automatically converted into a request for an exclusive lock.
+ * Whether a lock is exclusive or shared can be determined by invoking its isShared() method. Some platforms do not support
+ * shared locks, in which case a request for a shared lock is automatically converted into a request for an exclusive lock.
  */
 final class FileLock extends BaseLock {
 

@@ -12,7 +12,7 @@ abstract class BaseLock extends Object {
 
 
     /**
-     * Ob dieses Lock gueltig (valid) ist.
+     * Whether or not the lock is aquired and valid.
      *
      * @return bool
      */
@@ -20,9 +20,8 @@ abstract class BaseLock extends Object {
 
 
     /**
-     * Wenn dieses Lock gueltig (valid) ist, gibt der Aufruf dieser Methode das gehaltene Lock frei und
-     * markiert es als ungueltig (invalid).  Wenn das Lock bereits ungueltig (invalid) ist, hat der Aufruf
-     * keinen Effekt.
+     * If called on an aquired and valid lock the lock is released and marked as invalid.
+     * If called on an already relesed lock the call does nothing.
      *
      * @return void
      */
@@ -30,20 +29,19 @@ abstract class BaseLock extends Object {
 
 
     /**
-     * Transformiert einen Schluessel (String) in einen eindeutigen numerischen Wert (Integer).
+     * Convert a key (string) to a unique numerical value (int).
      *
-     * @param  string $key - Schluessel
+     * @param  string $key
      *
-     * @return int
+     * @return int - numerical value
      */
     protected function keyToId($key) {
         return (int) hexDec(subStr(md5($key), 0, 7)) + strLen($key);
-                                            // 7: strLen(decHex(PHP_INT_MAX)) - 1   (x86)
-    }
+    }                                         // 7: strLen(decHex(PHP_INT_MAX)) - 1 (x86)
 
 
     /**
-     * Verhindert das Serialisieren von Lock-Instanzen.
+     * Prevent serialization of lock instances.
      */
     final public function __sleep() {
         throw new IllegalStateException('You cannot serialize me: '.get_class($this));
@@ -51,7 +49,7 @@ abstract class BaseLock extends Object {
 
 
     /**
-     * Verhindert das Deserialisieren von Lock-Instanzen.
+     * Prevent de-serialization of lock instances.
      */
     final public function __wakeUp() {
         throw new IllegalStateException('You cannot unserialize me: '.get_class($this));
