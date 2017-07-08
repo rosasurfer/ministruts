@@ -148,7 +148,7 @@ function printPretty($var, $return=false, $flushBuffers=true) {
 
 
 /**
- * Pretty printer for byte values.
+ * Format a byte value.
  *
  * @param  int|float|string $value               - byte value
  * @param  int              $decimals [optional] - number of decimal digits (default: 1)
@@ -157,6 +157,18 @@ function printPretty($var, $return=false, $flushBuffers=true) {
  */
 function prettyBytes($value, $decimals=1) {
     return \rosasurfer\prettyBytes($value, $decimals);
+}
+
+
+/**
+ * Convert a byte value to an integer. The value may contain a php.ini byte unit identifier (K, M, G).
+ *
+ * @param  string|int $value - byte value
+ *
+ * @return int - converted byte value
+ */
+function byteValue($value) {
+    return \rosasurfer\byteValue($value);
 }
 
 

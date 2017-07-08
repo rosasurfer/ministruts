@@ -64,8 +64,8 @@ const SATURDAY          = 6;
 
 // byte sizes
 const KB                = 1024;
-const MB                = 1024 * KB;
-const GB                = 1024 * MB;                                // no TB (doesn't fit in 32 bits)
+const MB                = 1024 << 10;
+const GB                = 1024 << 20;                               // no TB (doesn't fit in 32 bits)
 
 // array indexing types
 const ARRAY_ASSOC       = 1;
@@ -215,7 +215,7 @@ function printPretty($var, $return=false, $flushBuffers=true) {
 
 
 /**
- * Pretty printer for byte values.
+ * Format a byte value.
  *
  * @param  int|float|string $value               - byte value
  * @param  int              $decimals [optional] - number of decimal digits (default: 1)
@@ -246,6 +246,57 @@ function prettyBytes($value, $decimals=1) {
     }
 
     return sprintf('%.'.$decimals.'f%s', $value, $unit);
+}
+
+
+/**
+ * Convert a byte value to an integer. The value may contain a php.ini byte unit identifier (K, M, G).
+ *
+ * @param  string|int $value - byte value
+ *
+ * @return int - converted byte value
+ */
+function byteValue($value) {
+    if (is_int($value))
+        return $value;
+    if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
+
+    if (!strLen($value))     return 0;
+    if (ctype_digit($value)) return (int)$value;
+
+    $sValue = $value;
+    $sign   = 1;
+
+    if ($value[0] == '-') {
+        $sign   = -1;
+        $sValue = subStr($value, 1);
+        if (!strLen($sValue))     return 0;
+        if (ctype_digit($sValue)) return $sign * (int)$sValue;
+    }
+
+    $shift = 0;
+    switch (strToUpper(strRight($sValue, 1))) {
+        case 'K':
+            $shift = 10;        // 1024
+            break;
+        case 'M':
+            $shift = 20;        // 1024 * 1024
+            break;
+        case 'G':
+            $shift = 30;        // 1024 * 1024 * 1024
+            break;
+        default:
+            return 0;
+    }
+
+    $sValue = strLeft($sValue, -1);
+    if (!strLen($sValue)) return 0;
+
+    if (ctype_digit($sValue)) {
+        $iValue = (int)$sValue;
+        return $sign * ($iValue << $shift);
+    }
+    return 0;
 }
 
 

@@ -8,9 +8,9 @@ use rosasurfer\debug\DebugHelper;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RuntimeException;
 
+use function rosasurfer\byteValue;
 use function rosasurfer\echoPre;
 use function rosasurfer\strContains;
-use function rosasurfer\strLeft;
 use function rosasurfer\strRight;
 use function rosasurfer\strRightFrom;
 use function rosasurfer\strStartsWith;
@@ -92,11 +92,19 @@ class PHP extends StaticClass {
         /*PHP_INI_ONLY  */ if ( self::ini_get_bool('expose_php'                    ))                                $issues[] = 'Warn:  expose_php is not Off  [security]';
         /*PHP_INI_ALL   */ if ( self::ini_get_int ('max_execution_time'            ) > 30 && !CLI/*hardcoded*/)      $issues[] = 'Info:  max_execution_time is very high: '.ini_get('max_execution_time').'  [resources]';
         /*PHP_INI_ALL   */ if ( self::ini_get_int ('default_socket_timeout'        ) > 30  /*PHP default: 60*/)      $issues[] = 'Info:  default_socket_timeout is very high: '.ini_get('default_socket_timeout').'  [resources]';
-        /*PHP_INI_ALL   */ $bytes = self::ini_get_bytes('memory_limit'             );
-            if      ($bytes ==     -1)                                                                               $issues[] = 'Warn:  memory_limit is unlimited  [resources]';
-            else if ($bytes <=      0)                                                                               $issues[] = 'Error: memory_limit is invalid: '.ini_get('memory_limit');
-            else if ($bytes <  4 * MB)                                                                               $issues[] = 'Info:  memory_limit is very low: '.ini_get('memory_limit').'  [resources]';
-            else if ($bytes > 32 * MB)                                                                               $issues[] = 'Info:  memory_limit is very high: '.ini_get('memory_limit').'  [resources]';
+        /*PHP_INI_ALL   */ $memoryLimit = self::ini_get_bytes('memory_limit'       );
+                           $sWarnLimit  = Config::getDefault()->get('log.warn.memory_limit', '');
+                           $warnLimit   = byteValue($sWarnLimit);
+            if      ($memoryLimit ==     -1)                                                                         $issues[] = 'Warn:  memory_limit is unlimited  [resources]';
+            else if ($memoryLimit <=      0)                                                                         $issues[] = 'Error: memory_limit is invalid: '.ini_get('memory_limit');
+            else if ($memoryLimit <  8 * MB)                                                                         $issues[] = 'Info:  memory_limit is very low: '.ini_get('memory_limit').'  [resources]';
+            else if ($memoryLimit > 32 * MB && ($warnLimit <= 0 || $warnLimit >= $memoryLimit))                      $issues[] = 'Info:  memory_limit is very high: '.ini_get('memory_limit').'  [resources]';
+            if ($warnLimit) {
+                if      ($warnLimit <             0)                                                                 $issues[] = 'Error: log.warn.memory_limit is invalid: '.$sWarnLimit.'  [configuration]';
+                else if ($warnLimit >= $memoryLimit)                                                                 $issues[] = 'Error: log.warn.memory_limit ('.$sWarnLimit.') is not lower than memory_limit ('.ini_get('memory_limit').')  [configuration]';
+                else if ($warnLimit <        4 * MB)                                                                 $issues[] = 'Info:  log.warn.memory_limit ('.$sWarnLimit.') is very low (memory_limit: '.ini_get('memory_limit').')  [configuration]';
+                else if ($warnLimit >       64 * MB)                                                                 $issues[] = 'Info:  log.warn.memory_limit ('.$sWarnLimit.') is very high (memory_limit: '.ini_get('memory_limit').')  [configuration]';
+            }
         /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('register_globals'              ) && PHP_VERSION_ID <  50400)     $issues[] = 'Error: register_globals is not Off  [security]';
         /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('register_long_arrays'          ) && PHP_VERSION_ID <  50400)     $issues[] = 'Info:  register_long_arrays is not Off  [performance]';
         /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('register_argc_argv'            ) && !CLI/*hardcoded*/)           $issues[] = 'Info:  register_argc_argv is not Off  [performance]';
@@ -376,38 +384,7 @@ class PHP extends StaticClass {
      * @return int
      */
     public static function ini_get_bytes($option) {
-        $sValue = $value = ini_get($option);
-
-        if (!strLen($value))     return 0;
-        if (ctype_digit($value)) return (int)$value;
-
-        $sign = 1;
-        if (strStartsWith($value, '-')) {
-            $sign   = -1;
-            $sValue = strRight($value, -1);
-            if (!strLen($sValue))     return 0;
-            if (ctype_digit($sValue)) return $sign * (int)$sValue;
-        }
-
-        $factor = 1;
-        switch (strToLower(strRight($sValue, 1))) {
-            case 'k':
-                $factor = 1024;
-                break;
-            case 'm':
-                $factor = 1024 * 1024;
-                break;
-            case 'g':
-                $factor = 1024 * 1024 * 1024;
-                break;
-            default:
-                return 0;
-        }
-
-        $sValue = strLeft($sValue, -1);
-        if (!strLen($sValue))     return 0;
-        if (ctype_digit($sValue)) return $sign * (int)$sValue * $factor;
-        return 0;
+        return byteValue(ini_get($option));
     }
 
 

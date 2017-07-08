@@ -14,6 +14,7 @@ use rosasurfer\ministruts\FrontController;
 use rosasurfer\ministruts\Response;
 
 use rosasurfer\util\PHP;
+use rosasurfer\log\Logger;
 
 
 /**
@@ -166,6 +167,15 @@ class Application extends Object {
      * Update the PHP configuration with user defined settings.
      */
     private function configurePhp() {
+        $memoryWarnLimit = byteValue(Config::getDefault()->get('log.warn.memory_limit', 0));
+        if ($memoryWarnLimit > 0) {
+            register_shutdown_function(function() use ($memoryWarnLimit) {
+                $usedBytes = memory_get_peak_usage($real=true);
+                if ($usedBytes > $memoryWarnLimit) {
+                    Logger::log('Memory consumption exceeded '.prettyBytes($memoryWarnLimit).' (peak usage: '.prettyBytes($usedBytes).')', L_WARN, ['class' => __CLASS__]);
+                }
+            });
+        }
         /*
         ini_set('arg_separator.output'    , '&amp;'                );
         ini_set('auto_detect_line_endings',  1                     );
