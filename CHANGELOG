@@ -1,4 +1,9 @@
 
+2017-07-08
+
+   - util: add precision parameter to helper function rosasurfer\prettyBytes($value, $decimals=1)  
+
+
 2017-06-15
 
    - util: helper function rosasurfer\hsc() as inline replacement for htmlSpecialChars() 
