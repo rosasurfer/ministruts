@@ -150,12 +150,13 @@ function printPretty($var, $return=false, $flushBuffers=true) {
 /**
  * Pretty printer for byte values.
  *
- * @param  int $value - byte value
+ * @param  int|float|string $value               - byte value
+ * @param  int              $decimals [optional] - number of decimal digits (default: 1)
  *
  * @return string - formatted byte value
  */
-function prettyBytes($value) {
-    return \rosasurfer\prettyBytes($value);
+function prettyBytes($value, $decimals=1) {
+    return \rosasurfer\prettyBytes($value, $decimals);
 }
 
 

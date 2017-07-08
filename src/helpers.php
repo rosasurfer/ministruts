@@ -217,22 +217,35 @@ function printPretty($var, $return=false, $flushBuffers=true) {
 /**
  * Pretty printer for byte values.
  *
- * @param  int $value - byte value
+ * @param  int|float|string $value               - byte value
+ * @param  int              $decimals [optional] - number of decimal digits (default: 1)
  *
  * @return string - formatted byte value
  */
-function prettyBytes($value) {
+function prettyBytes($value, $decimals=1) {
+    if (!is_int($value)) {
+        if (is_string($value)) {
+            if (!strIsNumeric($value)) throw new InvalidArgumentException('Invalid parameter $value: "'.$value.'" (non-numeric)');
+            $value = (float) $value;
+        }
+        else if (!is_float($value))    throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
+        if ($value < PHP_INT_MIN)      throw new IllegalArgumentException('Illegal parameter $value: '.$value.' (out of range)');
+        if ($value > PHP_INT_MAX)      throw new IllegalArgumentException('Illegal parameter $value: '.$value.' (out of range)');
+        $value = (int) round($value);
+    }
+    if (!is_int($decimals))            throw new IllegalTypeException('Illegal type of parameter $decimals: '.getType($decimals));
+
     if ($value < 1024)
         return (string) $value;
-    $value = (int) $value;
 
-    $unit = null;
+    $unit = '';
     foreach (['K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'] as $unit) {
         $value /= 1024;
         if ($value < 1024)
             break;
     }
-    return sprintf('%.1f%s', $value, $unit);
+
+    return sprintf('%.'.$decimals.'f%s', $value, $unit);
 }
 
 
@@ -732,9 +745,9 @@ function strIsDigits($value) {
 
 
 /**
- * Whether or not a string consists only of numerical characters and represents a valid numerical value.
- * Opposite to the PHP built-in function is_numeric() this function returns FALSE if the string
- * begins with non-numerical characters (e.g. white space).
+ * Whether or not a string consists only of numerical characters and represents a valid numerical value. Opposite to the
+ * built-in PHP function is_numeric() this function returns FALSE if the string begins with non-numerical characters
+ * (e.g. white space).
  *
  * @param  string $value
  *
