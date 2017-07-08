@@ -1,7 +1,9 @@
 
 2017-07-08
 
-   - util: add precision parameter to helper function rosasurfer\prettyBytes($value, $decimals=1)  
+   - util: add precision parameter to helper function rosasurfer\prettyBytes($value, $decimals=1)
+   - util: add helper function rosasurfer\byteValue()
+   - config: implement logging of excessive memory consumption (config option "log.warn.memory_limit")  
 
 
 2017-06-15
