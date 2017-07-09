@@ -571,15 +571,15 @@ class Request extends Singleton {
         static $headers = null; if ($headers === null) {
             if (function_exists('apache_request_headers')) {
                 $headers = apache_request_headers();
+                // TODO: Apache skips REDIRECT_* headers
             }
             else {
-                // TODO: check $_FILES array
                 $headers = [];
                 foreach ($_SERVER as $name => $value) {
-                    if (subStr($name, 0, 14) == 'REDIRECT_HTTP_') {
+                    while (subStr($name, 0, 9) == 'REDIRECT_') {
                         $name = subStr($name, 9);
                         if (isSet($_SERVER[$name]))
-                            continue;
+                            continue 2;
                     }
                     if (subStr($name, 0, 5) == 'HTTP_') {
                         $name = subStr($name, 5);
