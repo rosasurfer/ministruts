@@ -210,19 +210,18 @@ class Application extends Object {
         if (isSet($options['app.dir.config']) && isSet($options['app.config']))
             throw new RuntimeException('Only one of the application options "app.config" or "app.dir.config" can be provided.');
 
-        if (isSet($options['app.dir.config'])) {
-            $location = $options['app.dir.config'];
+        if (!isSet($options['app.config'])) {
+            $location = isSet($options['app.dir.config']) ? $options['app.dir.config'] : getCwd();
             $config   = new AutoConfig($location, null);    // $baseDir is applied manually in the last step
             unset($options['app.dir.config']);
         }
-        else if (isSet($options['app.config'])) {
+        else {
             $config = $options['app.config'];
             if (!$config instanceof IConfig) throw new IllegalTypeException('Illegal type of application option["app.config"]: '.getType($config));
             if (!$config->get('app.dir.config', false))
                 $config->set('app.dir.config', $config->getLastDirectory());
             unset($options['app.config']);
         }
-        else throw new RuntimeException('One of application options "app.config" ('.IConfig::class.') or "app.dir.config" (string) must be provided.');
 
         $baseDir = isSet($options['app.dir.root']) ? $options['app.dir.root'] : getCwd();
         unset($options['app.dir.root']);
