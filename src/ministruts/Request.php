@@ -552,12 +552,14 @@ class Request extends Singleton {
     /**
      * Return the specified headers as an associative array of header values (in transmitted order).
      *
-     * @param  string|string[] $names [optional] - one or more header names; without a name all headers are returned
+     * @param  string|string[] $names [optional] - one or more header names (default: all headers)
      *
      * @return array - associative array of header values
      */
     public function getHeaders($names = []) {
-        if (is_string($names)) $names = [$names];
+        if (is_string($names)) {
+            $names = [$names];
+        }
         elseif (is_array($names)) {
             foreach ($names as $name) {
                 if (!is_string($name)) throw new IllegalTypeException('Illegal argument type in argument $names: '.getType($name));
@@ -573,25 +575,24 @@ class Request extends Singleton {
             else {
                 // TODO: check $_FILES array
                 $headers = [];
-                foreach ($_SERVER as $key => $value) {
-                    if (subStr($key, 0, 5) == 'HTTP_') {
-                        $key = subStr($key, 5);
-                        if ($key != 'DNT') {
-                            $key = str_replace(' ', '-', ucWords(str_replace('_', ' ', strToLower($key))));
+                foreach ($_SERVER as $name => $value) {
+                    if (subStr($name, 0, 14) == 'REDIRECT_HTTP_') {
+                        $name = subStr($name, 9);
+                        if (isSet($_SERVER[$name]))
+                            continue;
+                    }
+                    if (subStr($name, 0, 5) == 'HTTP_') {
+                        $name = subStr($name, 5);
+                        if ($name != 'DNT') {
+                            $name = str_replace(' ', '-', ucWords(str_replace('_', ' ', strToLower($name))));
                         }
-                        $headers[$key] = $value;
+                        $headers[$name] = $value;
                     }
                 }
-                if (isSet($_SERVER['CONTENT_TYPE'  ])) $headers['Content-Type'  ] = $_SERVER['CONTENT_TYPE'  ];
-                if (isSet($_SERVER['CONTENT_LENGTH'])) $headers['Content-Length'] = $_SERVER['CONTENT_LENGTH'];
-                if (isSet($_SERVER['CONTENT_MD5'   ])) $headers['Content-MD5'   ] = $_SERVER['CONTENT_MD5'   ];
             }
 
             if (!isSet($headers['Authorization'])) {
-                if (isSet($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
-                    $headers['Authorization'] = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
-                }
-                elseif (isSet($_SERVER['PHP_AUTH_USER'])) {
+                if (isSet($_SERVER['PHP_AUTH_USER'])) {
                     $passwd = isSet($_SERVER['PHP_AUTH_PW']) ? $_SERVER['PHP_AUTH_PW'] : '';
                     $headers['Authorization'] = 'Basic '. base64_encode($_SERVER['PHP_AUTH_USER'].':'.$passwd);
                 }
