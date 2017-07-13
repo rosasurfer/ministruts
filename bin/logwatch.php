@@ -33,7 +33,7 @@ use const rosasurfer\NL;
 use const rosasurfer\WINDOWS;
 
 
-require(__DIR__.'/{application-path-to-init}/init.php');
+require(dirName(realPath(__FILE__)).'/{application-path-to-init}/init.php');
 set_time_limit(0);                                       // no time limit for CLI
 
 
@@ -183,7 +183,7 @@ function help($message = null) {
 
     $self = baseName($_SERVER['PHP_SELF']);
 
-    echo <<<HELP
+echo <<<HELP
 
  Syntax:  $self [options]
 
