@@ -23,8 +23,8 @@ use rosasurfer\exception\error\PHPWarning;
 
 use rosasurfer\log\Logger;
 
-use function rosasurfer\_true;
 use function rosasurfer\echoPre;
+use function rosasurfer\true;
 
 use const rosasurfer\CLI;
 use const rosasurfer\ERROR_LOG_DEFAULT;
@@ -169,10 +169,10 @@ class ErrorHandler extends StaticClass {
         // (2) Process errors according to their severity level.
         switch ($level) {
             // always log non-critical and user errors and continue normally (without a stacktrace)
-            case E_DEPRECATED     : return _true(Logger::log($message, L_NOTICE, $logContext));
-            case E_USER_DEPRECATED: return _true(Logger::log($message, L_NOTICE, $logContext));
-            case E_USER_NOTICE    : return _true(Logger::log($message, L_NOTICE, $logContext));
-            case E_USER_WARNING   : return _true(Logger::log($message, L_WARN  , $logContext));
+            case E_DEPRECATED     : return true(Logger::log($message, L_NOTICE, $logContext));
+            case E_USER_DEPRECATED: return true(Logger::log($message, L_NOTICE, $logContext));
+            case E_USER_NOTICE    : return true(Logger::log($message, L_NOTICE, $logContext));
+            case E_USER_WARNING   : return true(Logger::log($message, L_WARN  , $logContext));
         }
 
         // (3) Wrap everything else in the matching PHPError exception.

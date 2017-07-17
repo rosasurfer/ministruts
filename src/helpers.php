@@ -1084,6 +1084,20 @@ function is_datetime($string, $format = 'Y-m-d') {
  *
  * @return bool - TRUE
  */
+function true($value = null) {
+    return true;
+}
+
+
+/**
+ * Functional equivalent of the value TRUE.
+ *
+ * @param  mixed $value [optional] - ignored
+ *
+ * @return bool - TRUE
+ *
+ * @deprecated
+ */
 function _true($value = null) {
     return true;
 }
@@ -1109,6 +1123,20 @@ function ifTrue($value, $altValue) {
  *
  * @return bool - FALSE
  */
+function false($value = null) {
+    return false;
+}
+
+
+/**
+ * Functional equivalent of the value FALSE.
+ *
+ * @param  mixed $value [optional] - ignored
+ *
+ * @return bool - FALSE
+ *
+ * @deprecated
+ */
 function _false($value = null) {
     return false;
 }
@@ -1133,6 +1161,20 @@ function ifFalse($value, $altValue) {
  * @param  mixed $value [optional] - ignored
  *
  * @return NULL
+ */
+function null($value = null) {
+    return null;
+}
+
+
+/**
+ * Functional equivalent of the value NULL.
+ *
+ * @param  mixed $value [optional] - ignored
+ *
+ * @return NULL
+ *
+ * @deprecated
  */
 function _null($value = null) {
     return null;

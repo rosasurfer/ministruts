@@ -17,8 +17,8 @@ use PHPStan\Type\Type;
 use rosasurfer\db\orm\PersistableObject;
 use rosasurfer\phpstan\DynamicReturnType;
 
-use function rosasurfer\_true;
 use function rosasurfer\echoPre;
+use function rosasurfer\true;
 
 
 class PersistableObject_Dao_ReturnType extends DynamicReturnType implements DynamicMethodReturnTypeExtension,
@@ -47,9 +47,9 @@ class PersistableObject_Dao_ReturnType extends DynamicReturnType implements Dyna
                         $returnClass = $scopeName.'DAO';
                         $returnType  = new ObjectType($returnClass);
                     }
-                } //else $error = _true(echoPre(baseName(self::CLASS_NAME).'->'.self::METHOD_NAME.'(1) cannot resolve callee of instance method call: variable "'.$var->name.'"'));
-            } else       $error = _true(echoPre(baseName(self::CLASS_NAME).'->'.self::METHOD_NAME.'(2) cannot resolve callee of instance method call: class($var->name)='.get_class($var->name)));
-        } else           $error = _true(echoPre(baseName(self::CLASS_NAME).'->'.self::METHOD_NAME.'(3) cannot resolve callee of instance method call: class($methodCall->var)='.get_class($methodCall->var)));
+                } //else $error = true(echoPre(baseName(self::CLASS_NAME).'->'.self::METHOD_NAME.'(1) cannot resolve callee of instance method call: variable "'.$var->name.'"'));
+            } else       $error = true(echoPre(baseName(self::CLASS_NAME).'->'.self::METHOD_NAME.'(2) cannot resolve callee of instance method call: class($var->name)='.get_class($var->name)));
+        } else           $error = true(echoPre(baseName(self::CLASS_NAME).'->'.self::METHOD_NAME.'(3) cannot resolve callee of instance method call: class($methodCall->var)='.get_class($methodCall->var)));
 
         if (0 || $error) echoPre($this->getScopeName($scope).': '.baseName(self::CLASS_NAME).'->'.self::METHOD_NAME.'() => '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
         return $returnType;
@@ -78,8 +78,8 @@ class PersistableObject_Dao_ReturnType extends DynamicReturnType implements Dyna
                     $returnClass = $scopeName.'DAO';
                     $returnType  = new ObjectType($returnClass);
                 }
-            } else $error = _true(echoPre(baseName(self::CLASS_NAME).'::'.self::METHOD_NAME.'(1) cannot resolve callee of static method call: name "'.$name.'"'));
-        } else     $error = _true(echoPre(baseName(self::CLASS_NAME).'::'.self::METHOD_NAME.'(2) cannot resolve callee of static method call: class($methodCall->class)='.get_class($methodCall->class)));
+            } else $error = true(echoPre(baseName(self::CLASS_NAME).'::'.self::METHOD_NAME.'(1) cannot resolve callee of static method call: name "'.$name.'"'));
+        } else     $error = true(echoPre(baseName(self::CLASS_NAME).'::'.self::METHOD_NAME.'(2) cannot resolve callee of static method call: class($methodCall->class)='.get_class($methodCall->class)));
 
         if (0 || $error) echoPre($this->getScopeName($scope).': '.baseName(self::CLASS_NAME).'::'.self::METHOD_NAME.'() => '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
         return $returnType;

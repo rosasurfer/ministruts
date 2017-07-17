@@ -23,8 +23,8 @@ use rosasurfer\db\orm\DAO;
 use rosasurfer\db\orm\PersistableObject;
 use rosasurfer\phpstan\DynamicReturnType;
 
-use function rosasurfer\_true;
 use function rosasurfer\echoPre;
+use function rosasurfer\true;
 
 
 class Singleton_GetInstance_ReturnType extends DynamicReturnType implements DynamicMethodReturnTypeExtension,
@@ -71,7 +71,7 @@ class Singleton_GetInstance_ReturnType extends DynamicReturnType implements Dyna
                     $returnClass = $class;
                     $returnType  = new ObjectType($returnClass);
                 }
-                else $error = _true(echoPre(baseName(self::CLASS_NAME).'::'.self::METHOD_NAME.'(1) cannot resolve class constant "'.$arg->class.'::'.$arg->name.'"'));
+                else $error = true(echoPre(baseName(self::CLASS_NAME).'::'.self::METHOD_NAME.'(1) cannot resolve class constant "'.$arg->class.'::'.$arg->name.'"'));
             }
             else if ($arg instanceof BinaryOp) {
                 if ($class = $this->binaryOpToStr($arg, $scope)) {
@@ -79,13 +79,13 @@ class Singleton_GetInstance_ReturnType extends DynamicReturnType implements Dyna
                     $returnClass = $class;
                     $returnType  = new ObjectType($returnClass);
                 }
-                else $error = _true(echoPre(baseName(self::CLASS_NAME).'::'.self::METHOD_NAME.'(2) cannot convert binary operator argument to string: '.get_class($arg)));
+                else $error = true(echoPre(baseName(self::CLASS_NAME).'::'.self::METHOD_NAME.'(2) cannot convert binary operator argument to string: '.get_class($arg)));
             }
             else if ($arg instanceof Variable) {
-                $error = _true(echoPre(baseName(self::CLASS_NAME).'::'.self::METHOD_NAME.'(3) cannot resolve variable "'.$arg->name.'"'));
+                $error = true(echoPre(baseName(self::CLASS_NAME).'::'.self::METHOD_NAME.'(3) cannot resolve variable "'.$arg->name.'"'));
             }
             else {
-                $error = _true(echoPre(baseName(self::CLASS_NAME).'::'.self::METHOD_NAME.'(4) cannot resolve argument: '.get_class($arg)));
+                $error = true(echoPre(baseName(self::CLASS_NAME).'::'.self::METHOD_NAME.'(4) cannot resolve argument: '.get_class($arg)));
             }
         }
 
