@@ -19,7 +19,7 @@ use const rosasurfer\L_WARN;
 class ActionMapping extends Object {
 
 
-    /** @var bool - Ob diese Komponente vollstaendig konfiguriert ist. */
+    /** @var bool - whether or not this component is fully configured */
     protected $configured = false;
 
     /** @var string */
@@ -49,20 +49,20 @@ class ActionMapping extends Object {
     /** @var bool */
     protected $default = false;
 
-    /** @var ActionForward - Im Mapping statt einer Action konfigurierter ActionForward. */
+    /** @var ActionForward - the mapping's explicitely specified ActionForward. */
     protected $forward;
 
-    /** @var ActionForward[] - Die lokalen Forwards dieses Mappings. */
+    /** @var ActionForward[] - the mapping's local forwards */
     protected $forwards = [];
 
-    /** @var Module - Module, zu dem das Mapping gehoert */
+    /** @var Module - Module the mapping belongs to */
     protected $module;
 
 
     /**
      * Constructor
      *
-     * @param  Module $module - Module, zu dem dieses Mapping gehoert
+     * @param  Module $module - Module the mapping belongs to
      */
     public function __construct(Module $module) {
         $this->module = $module;
@@ -70,9 +70,9 @@ class ActionMapping extends Object {
 
 
     /**
-     * Gibt das Module, zu dem dieses Mapping gehoert, zurueck.
+     * Return the {@link Module} the mapping belongs to.
      *
-     * @return Module instance
+     * @return Module
      */
     public function getModule() {
         return $this->module;
@@ -109,7 +109,7 @@ class ActionMapping extends Object {
 
 
     /**
-     * Setzt den Pfad dieses Mappings.
+     * Set the mapping's path.
      *
      * @param  string $path
      *
@@ -127,7 +127,7 @@ class ActionMapping extends Object {
 
 
     /**
-     * Gibt den Pfad dieses Mappings zurueck.
+     * Return the mapping's path.
      *
      * @return string
      */
@@ -137,24 +137,22 @@ class ActionMapping extends Object {
 
 
     /**
-     * Ob das Mapping fuer die angegebene HTTP-Methode konfiguriert wurde.
+     * Whether or not the mapping is configured to handle requests of the specified HTTP method.
      *
-     * @param  string $method - HTTP-Methode
+     * @param  string $method - HTTP method verb
      *
      * @return bool
      */
     public function isSupportedMethod($method) {
         if (!is_string($method)) throw new IllegalTypeException('Illegal type of parameter $method: '.getType($method));
-
         return isSet($this->methods[strToUpper($method)]);
     }
 
 
     /**
-     * Setzt die HTTP-Methoden, die dieses Mapping unterstuetzt.  Requests einer nicht konfigurierten
-     * Methode werden abgewiesen.
+     * Set the HTTP methods the mapping will handle.
      *
-     * @param  string $method - HTTP-Methode: "GET"|"POST"
+     * @param  string $method - HTTP method verb
      *
      * @return $this
      *
@@ -174,9 +172,9 @@ class ActionMapping extends Object {
 
 
     /**
-     * Gibt die Rollenbeschraenkung dieses Mappings zurueck.
+     * Return the mapping's role restrictions.
      *
-     * @return string|null - Rollenbezeichner
+     * @return string|null - role identifier or NULL if no role restrictions are defined
      */
     public function getRoles() {
         return $this->roles;
@@ -184,10 +182,9 @@ class ActionMapping extends Object {
 
 
     /**
-     * Setzt die Rollenbeschraenkung dieses Mappings.  Requests, die nicht den angebenen Rollen genuegen,
-     * werden abgewiesen.
+     * Set the mapping's role restrictions.
      *
-     * @param  string - Rollenausdruck
+     * @param  string - role expression
      *
      * @return $this
      *
@@ -202,7 +199,7 @@ class ActionMapping extends Object {
         static $pattern = '/^!?[A-Za-z_][A-Za-z0-9_]*$/';
         if (!strLen($roles) || !preg_match($pattern, $roles)) throw new StrutsConfigException('<mapping'.$sName.$sPath.' roles="'.$roles.'": Invalid roles expression.');
 
-        // check for impossible constraints, ie. "Member,!Member"
+        // check for invalid id combinations, e.g. "Member,!Member"
         $tokens = explode(',', $roles);
         $keys = array_flip($tokens);
 
@@ -217,9 +214,9 @@ class ActionMapping extends Object {
 
 
     /**
-     * Setzt einen direkt konfigurierten ActionForward (statt einer Action).
+     * Explicitely configure an {@link ActionForward} instead of an {@link Action}.
      *
-     * @param  ActionForward $forward - ActionForward
+     * @param  ActionForward $forward
      *
      * @return $this
      *
@@ -238,9 +235,9 @@ class ActionMapping extends Object {
 
 
     /**
-     * Gibt den direkt konfigurierten ActionForward zurueck, oder NULL, wenn eine Action konfiguriert wurde.
+     * Return the explicitely configured {@link ActionForward}.
      *
-     * @return ActionForward|null
+     * @return ActionForward|null - ActionForward or NULL if no explicit forward is configured
      */
     public function getForward() {
         return $this->forward;
@@ -248,7 +245,7 @@ class ActionMapping extends Object {
 
 
     /**
-     * Setzt den Klassennamen der auszufuehrenden Action.
+     * Set the class name of the {@link Action} to process requests.
      *
      * @param  string $className
      *
@@ -270,10 +267,9 @@ class ActionMapping extends Object {
 
 
     /**
-     * Gibt den Klassennamen der auszufuehrenden Action zurueck, oder NULL, wenn keine Action konfiguriert
-     * wurde.
+     * Return the class name of the {@link Action} to process requests.
      *
-     * @return string - Klassenname
+     * @return string|null - Action class name or NULL if no Action is configured
      */
     public function getActionClassName() {
         return $this->actionClassName;
@@ -281,7 +277,7 @@ class ActionMapping extends Object {
 
 
     /**
-     * Setzt den Klassennamen der zur Action gehoerenden ActionForm.
+     * Set the class name of the {@link ActionForm} used by the mapping.
      *
      * @param  string $className
      *
@@ -302,9 +298,9 @@ class ActionMapping extends Object {
 
 
     /**
-     * Gibt den Klassennamen der ActionForm oder NULL, wenn keine ActionForm konfiguriert wurde, zurueck.
+     * Return the class name of the {@link ActionForm} used by the mapping.
      *
-     * @return string - Klassenname
+     * @return string - ActionForm class name
      */
     public function getFormClassName() {
         return $this->formClassName;
@@ -312,12 +308,10 @@ class ActionMapping extends Object {
 
 
     /**
-     * Setzt das Scope-Attribute der ActionForm dieses Mappings.  Das Scope-Attribute bestimmt, in
-     * welchem Kontext auf die ActionForm-Instanz zugegriffen wird.  Default ist "request".  Wird dieser
-     * Wert auf "session" gesetzt, koennen Formulareingaben ueber mehrere Requests zur Verfuegung stehen
-     * (z.B. fuer Page-Wizards o.ae. mehrseitige Formulare).
+     * Set the scope attribute used for the {@link ActionForm} of the mapping. The scope attribute identifies the storage
+     * location for the Actionform.
      *
-     * @param  string $value - "request" oder "session"
+     * @param  string $value - may be "request" or "session"
      *
      * @return $this
      *
@@ -336,9 +330,9 @@ class ActionMapping extends Object {
 
 
     /**
-     * Gibt den Bezeichner des Kontexts zurueck, in dem auf die ActionForm dieses Mappings zugegriffen wird.
+     * Return the scope attribute used for storing the {@link ActionForm} of the mapping.
      *
-     * @return string - Scope-Bezeichner
+     * @return string - scope attribute value
      */
     public function getFormScope() {
         return $this->formScope;
@@ -346,11 +340,9 @@ class ActionMapping extends Object {
 
 
     /**
-     * Ob die ActionForm dieses Mappings im Request gespeichert wird.
+     * Whether or not the mapping's {@link ActionForm} is stored in the {@link Request} instance.
      *
      * @return bool
-     *
-     * @see ActionMapping::setFormScope()
      */
     public function isRequestScope() {
         return ($this->formScope == 'request');
@@ -358,11 +350,9 @@ class ActionMapping extends Object {
 
 
     /**
-     * Ob die ActionForm dieses Mappings in der HttpSession gespeichert wird.
+     * Whether or not the mapping's {@link ActionForm} is stored in the {@link HttpSession} instance.
      *
      * @return bool
-     *
-     * @see ActionMapping::setFormScope()
      */
     public function isSessionScope() {
         return ($this->formScope == 'session');
@@ -370,6 +360,20 @@ class ActionMapping extends Object {
 
 
     /**
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
      * Setzt das FormValidateFirst-Flag fuer die ActionForm des ActionMappings.  Das Flag zeigt an, ob die
      * ActionForm vor Aufruf der Action validiert werden soll oder nicht.  Ohne entsprechende Angabe
      * in der struts-config.xml wird die ActionForm immer validiert.
