@@ -122,7 +122,7 @@ class Application extends Object {
                                      color:black; background-color:white">
                 <pre style="margin-bottom:24px"><?=print_r(Config::getDefault()->info(), true)?></pre>
             </div>
-            <?
+            <?php
             if (!$phpInfoTask && !$phpInfoAfterConfigTask)
                 exit(0);
         }
