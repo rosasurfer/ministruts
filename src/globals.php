@@ -678,7 +678,7 @@ function true($value = null) {
  *
  * @return bool - TRUE
  *
- * @deprecated
+ * @deprecated - use true() instead
  */
 function _true($value = null) {
     trigger_error(__FUNCTION__.' is deprecated and will be removed in a future release', E_USER_DEPRECATED);
@@ -718,7 +718,7 @@ function false($value = null) {
  *
  * @return bool - FALSE
  *
- * @deprecated
+ * @deprecated - use false() instead
  */
 function _false($value = null) {
     trigger_error(__FUNCTION__.' is deprecated and will be removed in a future release', E_USER_DEPRECATED);
@@ -758,7 +758,7 @@ function null($value = null) {
  *
  * @return NULL
  *
- * @deprecated
+ * @deprecated - use null() instead
  */
 function _null($value = null) {
     trigger_error(__FUNCTION__.' is deprecated and will be removed in a future release', E_USER_DEPRECATED);
@@ -875,7 +875,7 @@ function asset($uri) {
  *
  * @return VersionedUrl
  *
- * @deprecated
+ * @deprecated - use asset() instead
  */
 function vUrl($uri) {
     trigger_error(__FUNCTION__.' is deprecated and will be removed in a future release', E_USER_DEPRECATED);

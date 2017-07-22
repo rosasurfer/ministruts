@@ -22,7 +22,7 @@ use const rosasurfer\NL;
 /**
  * Simple mailer sending an email directly via an SMTP server.
  *
- * @deprecated - Use an external library for sending more user friendly email or for using templates.
+ * @deprecated - use a better maintained external library instead
  */
 class SMTPMailer extends Mailer {
 

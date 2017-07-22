@@ -98,7 +98,7 @@ class Date extends StaticClass {
      *
      * @return string - formatted date/datetime value in the local timezone
      *
-     * @deprecated
+     * @deprecated - use date($format, strToTime($datetime)) instead
      */
     public static function format($datetime, $format) {
         trigger_error(__METHOD__.' is deprecated and will be removed in a future release', E_USER_DEPRECATED);
