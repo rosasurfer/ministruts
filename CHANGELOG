@@ -1,4 +1,11 @@
 
+2017-07-22
+
+   - util: new helper functions rosasurfer\true(), rosasurfer\false(), rosasurfer\null()
+   - util: deprecate rosasurfer\_true(), rosasurfer\_false(), rosasurfer\_null() 
+   - util: deprecate rosasurfer\util\Date::format() 
+
+
 2017-07-08
 
    - util: add precision parameter to helper function rosasurfer\prettyBytes($value, $decimals=1)
