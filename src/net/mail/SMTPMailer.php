@@ -54,6 +54,8 @@ class SMTPMailer extends Mailer {
      * @param  array $options - mailer options
      */
     public function __construct(array $options) {
+        trigger_error(__CLASS__.' is deprecated and will be removed in a future release', E_USER_DEPRECATED);
+
         parent::__construct(array_merge($this->defaultOptions, $options));
 
         // set missing options to PHP defaults

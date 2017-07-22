@@ -1099,6 +1099,7 @@ function true($value = null) {
  * @deprecated
  */
 function _true($value = null) {
+    trigger_error(__FUNCTION__.' is deprecated and will be removed in a future release', E_USER_DEPRECATED);
     return true;
 }
 
@@ -1138,6 +1139,7 @@ function false($value = null) {
  * @deprecated
  */
 function _false($value = null) {
+    trigger_error(__FUNCTION__.' is deprecated and will be removed in a future release', E_USER_DEPRECATED);
     return false;
 }
 
@@ -1177,6 +1179,7 @@ function null($value = null) {
  * @deprecated
  */
 function _null($value = null) {
+    trigger_error(__FUNCTION__.' is deprecated and will be removed in a future release', E_USER_DEPRECATED);
     return null;
 }
 
@@ -1330,5 +1333,6 @@ function asset($uri) {
  * @deprecated
  */
 function vUrl($uri) {
+    trigger_error(__FUNCTION__.' is deprecated and will be removed in a future release', E_USER_DEPRECATED);
     return asset($uri);
 }

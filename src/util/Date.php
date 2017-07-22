@@ -97,8 +97,12 @@ class Date extends StaticClass {
      * @param  string $format   - string with format codes according to the PHP function date()
      *
      * @return string - formatted date/datetime value in the local timezone
+     *
+     * @deprecated
      */
     public static function format($datetime, $format) {
+        trigger_error(__METHOD__.' is deprecated and will be removed in a future release', E_USER_DEPRECATED);
+
         if (!is_string($datetime)) throw new IllegalTypeException('Illegal type of parameter $datetime: '.getType($datetime));
         if (!is_string($format))   throw new IllegalTypeException('Illegal type of parameter $format: '.getType($format));
 
