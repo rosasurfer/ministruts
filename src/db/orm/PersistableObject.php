@@ -3,9 +3,7 @@ namespace rosasurfer\db\orm;
 
 use rosasurfer\core\Object;
 use rosasurfer\core\Singleton;
-
 use rosasurfer\db\ConnectorInterface as IConnector;
-
 use rosasurfer\exception\ConcurrentModificationException;
 use rosasurfer\exception\IllegalAccessException;
 use rosasurfer\exception\InvalidArgumentException;
@@ -13,6 +11,7 @@ use rosasurfer\exception\RuntimeException;
 
 use function rosasurfer\is_class;
 use function rosasurfer\strEndsWith;
+use function rosasurfer\strLeft;
 
 
 /**
@@ -399,8 +398,7 @@ abstract class PersistableObject extends Object {
         if (method_exists($this, $method='beforeInsert') && $this->$method()===false)
             return $this;
 
-        $dao     = $this->dao();
-        $mapping = $dao->getMapping();
+        $mapping = $this->dao()->getMapping();
 
         // collect column values
         $values = [];
@@ -409,7 +407,7 @@ abstract class PersistableObject extends Object {
         };
 
         // perform insertion
-        $id = $dao->doInsert($values);
+        $id = $this->doInsert($values);
 
         // assign the returned identity value
         $idName = $mapping['identity']['name'];
@@ -432,16 +430,17 @@ abstract class PersistableObject extends Object {
         if (method_exists($this, $method='beforeUpdate') && $this->$method()===false)
             return $this;
 
-        $dao = $this->dao();
+        $mapping = $this->dao()->getMapping();
+        $changes = [];
 
         // collect modified properties and their values
-        $changes = [];
-        foreach ($dao->getEntityMapping() as $property => $mapping) {   // TODO: Until the dirty check is implemented all
-            $changes[$property] = $this->$property;                     //       properties are assumed dirty.
+        foreach ($mapping['properties'] as $property) {                 // TODO: Until the dirty check is implemented all
+            $propertyName = $property['name'];                          //       properties are assumed dirty.
+            $changes[$propertyName] = $this->$propertyName;
         }
 
         // perform update
-        if ($dao->doUpdate($this, $changes)) {
+        if ($this->doUpdate($changes)) {
             $this->_modified = false;
 
             // post-processing hook
@@ -463,18 +462,135 @@ abstract class PersistableObject extends Object {
         if (method_exists($this, $method='beforeDelete') && $this->$method()===false)
             return $this;
 
-        $dao = $this->dao();
-
         // perform deletion
-        if ($dao->doDelete($this)) {
+        if ($this->doDelete()) {
             // reset identity property
-            $idName = $dao->getEntityMapping()->getIdentity()->getName();
+            $idName = $this->dao()->getMapping()['identity']['name'];
             $this->$idName = null;
 
             // post-processing hook
             method_exists($this, $method='afterDelete') && $this->$method();
         }
         return $this;
+    }
+
+
+    /**
+     * Perform the actual insertion of a data record representing the instance.
+     *
+     * @param  array $values - record values
+     *
+     * @return mixed - the inserted record's identity value
+     */
+    private function doInsert(array $values) {
+        $db       = $this->db();
+        $mapping  = $this->dao()->getMapping();
+        $table    = $mapping['table'];
+        $idColumn = $mapping['identity']['column'];
+        $id       = null;
+        if  (isSet($values[$idColumn])) $id = $values[$idColumn];
+        else unset($values[$idColumn]);
+
+        // translate column values
+        foreach ($values as &$value) {
+            $value = $db->escapeLiteral($value);
+        }; unset($value);
+
+        // create SQL statement
+        $sql = 'insert into '.$table.' ('.join(', ', array_keys($values)).')
+                   values ('.join(', ', $values).')';
+
+        // execute SQL statement
+        if ($id) {
+            $db->execute($sql);
+        }
+        else if ($db->supportsInsertReturn()) {
+            $id = $db->query($sql.' returning '.$idColumn)->fetchInt();
+        }
+        else {
+            $id = $db->execute($sql)->lastInsertId();
+        }
+        return $id;
+    }
+
+
+    /**
+     * Perform the actual update and write modifications of the instance to the storage mechanism.
+     *
+     * @param  array $changes - modifications
+     *
+     * @return bool - success status
+     */
+    private function doUpdate(array $changes) {
+        $db     = $this->db();
+        $entity = $this->dao()->getEntityMapping();
+        $table  = $entity->getTableName();
+
+        // collect identity infos
+        $identity = $entity->getIdentity();
+        $idColumn = $identity->getColumn();
+        $idValue  = $identity->convertToDBValue($this->getObjectId(), $db);
+
+        // collect version infos
+        $versionMapping = $versionName = $versionColumn = $oldVersion = null;
+        //if ($versionMapping = $entity->getVersion()) {
+        //    $versionName   = $versionMapping->getName();
+        //    $versionColumn = $versionMapping->getColumn();
+        //    $oldVersion    = $object->getSnapshot()->$versionName;        // TODO: implement dirty check via snapshot
+        //    $oldVersion    = $versionMapping->convertToDBValue($oldVersion, $db);
+        //}
+
+        // create SQL
+        $sql = 'update '.$table.' set';                                     // update table
+        foreach ($changes as $name => $value) {                             //    set ...
+            $mapping     = $entity->getProperty($name);                     //        ...
+            $columnName  = $mapping->getColumn();                           //        ...
+            $columnValue = $mapping->convertToDBValue($value, $db);         //        column1 = value1,
+            $sql .= ' '.$columnName.' = '.$columnValue.',';                 //        column2 = value2,
+        }                                                                   //        ...
+        $sql  = strLeft($sql, -1);                                          //        ...
+        $sql .= ' where '.$idColumn.' = '.$idValue;                         //    where id = value
+        if ($versionMapping) {                                              //        ...
+            $op   = $oldVersion=='null' ? 'is':'=';                         //        ...
+            $sql .= ' and '.$versionColumn.' '.$op.' '.$oldVersion;         //      and version = oldVersion
+        }
+
+        // execute SQL and check for concurrent modifications
+        if ($db->execute($sql)->lastAffectedRows() != 1) {
+            if ($versionMapping) {
+                $this->reload();
+                $msg = 'expected version: '.$oldVersion.', found version: '.$this->$versionName;
+            }
+            else $msg = 'record not found';
+            throw new ConcurrentModificationException('Error updating '.get_class($this).' (oid='.$this->getObjectId().'), '.$msg);
+        }
+        return true;
+    }
+
+
+    /**
+     * Perform the actual deletion of the instance.
+     *
+     * @return bool - success status
+     */
+    private function doDelete() {
+        $db     = $this->db();
+        $entity = $this->dao()->getEntityMapping();
+        $table  = $entity->getTableName();
+
+        // collect identity infos
+        $identity = $entity->getIdentity();
+        $idColumn = $identity->getColumn();
+        $idValue  = $identity->convertToDBValue($this->getObjectId(), $db);
+
+        // create SQL
+        $sql = 'delete from '.$table.'
+                   where '.$idColumn.' = '.$idValue;
+
+        // execute SQL and check for concurrent modifications
+        if ($db->execute($sql)->lastAffectedRows() != 1)
+            throw new ConcurrentModificationException('Error deleting '.get_class($this).' (oid='.$this->getObjectId().'): record not found');
+        return true;
     }
 
 
