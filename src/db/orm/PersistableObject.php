@@ -33,7 +33,7 @@ abstract class PersistableObject extends Object {
      */
     protected function __construct() {
         // post-event hook
-        method_exists($this, $method='afterCreate') && $this->$method();
+        $this->afterCreate();
     }
 
 
@@ -370,7 +370,7 @@ abstract class PersistableObject extends Object {
      */
     public function save() {
         // pre-processing hook
-        if (method_exists($this, $method='beforeSave') && $this->$method()===false)
+        if ($this->beforeSave() === false)
             return $this;
 
         if (!$this->isPersistent()) {
@@ -381,7 +381,7 @@ abstract class PersistableObject extends Object {
         }
 
         // post-processing hook
-        method_exists($this, $method='afterSave') && $this->$method();
+        $this->afterSave();
         return $this;
     }
 
@@ -395,7 +395,7 @@ abstract class PersistableObject extends Object {
         if ($this->isPersistent()) throw new RuntimeException('Cannot insert already persistent '.$this);
 
         // pre-processing hook
-        if (method_exists($this, $method='beforeInsert') && $this->$method()===false)
+        if ($this->beforeInsert() === false)
             return $this;
 
         $mapping = $this->dao()->getMapping();
@@ -415,7 +415,7 @@ abstract class PersistableObject extends Object {
             $this->$idName = $id;
 
         // post-processing hook
-        method_exists($this, $method='afterInsert') && $this->$method();
+        $this->afterInsert();
         return $this;
     }
 
@@ -427,7 +427,7 @@ abstract class PersistableObject extends Object {
      */
     protected function update() {
         // pre-processing hook
-        if (method_exists($this, $method='beforeUpdate') && $this->$method()===false)
+        if ($this->beforeUpdate() === false)
             return $this;
 
         $mapping = $this->dao()->getMapping();
@@ -444,7 +444,7 @@ abstract class PersistableObject extends Object {
             $this->_modified = false;
 
             // post-processing hook
-            method_exists($this, $method='afterUpdate') && $this->$method();
+            $this->afterUpdate();
         }
         return $this;
     }
@@ -459,7 +459,7 @@ abstract class PersistableObject extends Object {
         if (!$this->isPersistent()) throw new InvalidArgumentException('Cannot delete non-persistent '.get_class($this));
 
         // pre-processing hook
-        if (method_exists($this, $method='beforeDelete') && $this->$method()===false)
+        if ($this->beforeDelete() === false)
             return $this;
 
         // perform deletion
@@ -469,7 +469,7 @@ abstract class PersistableObject extends Object {
             $this->$idName = null;
 
             // post-processing hook
-            method_exists($this, $method='afterDelete') && $this->$method();
+            $this->afterDelete();
         }
         return $this;
     }
@@ -712,6 +712,81 @@ abstract class PersistableObject extends Object {
 
         // apply record values
         return $this->populate($row);
+    }
+
+
+    /**
+     * Create post-processing hook.
+     */
+    protected function afterCreate() {
+    }
+
+
+    /**
+     * Save pre-processing hook. If the hook returns FALSE the save operation is skipped.
+     *
+     * @return bool
+     */
+    protected function beforeSave() {
+        return true;
+    }
+
+
+    /**
+     * Save post-processing hook.
+     */
+    protected function afterSave() {
+    }
+
+
+    /**
+     * Insert pre-processing hook. If the hook returns FALSE the insert operation is skipped.
+     *
+     * @return bool
+     */
+    protected function beforeInsert() {
+        return true;
+    }
+
+
+    /**
+     * Insert post-processing hook.
+     */
+    protected function afterInsert() {
+    }
+
+
+    /**
+     * Update pre-processing hook. If the hook returns FALSE the update operation is skipped.
+     *
+     * @return bool
+     */
+    protected function beforeUpdate() {
+        return true;
+    }
+
+
+    /**
+     * Update post-processing hook.
+     */
+    protected function afterUpdate() {
+    }
+
+
+    /**
+     * Delete pre-processing hook. If the hook returns FALSE the delete operation is skipped.
+     *
+     * @return bool
+     */
+    protected function beforeDelete() {
+        return true;
+    }
+
+
+    /**
+     * Delete post-processing hook.
+     */
+    protected function afterDelete() {
     }
 
 
