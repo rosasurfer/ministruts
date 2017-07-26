@@ -1,7 +1,7 @@
 #
 # alias phpstan='php7 -d memory_limit=256M -d short_open_tag=On /path/to/phpstan/bin/phpstan --ansi'
 #
-# phpstan analyse -a etc/phpstan/autoload.php -c etc/phpstan/config.neon --level=0 [--] <path>
+# phpstan analyse -a etc/phpstan/autoload.php -c etc/phpstan/config.neon --level=0..7 [--] <path>
 #
 
 parameters:
@@ -16,7 +16,10 @@ parameters:
         - etc/vendor/
         - src/globals.php
         - src/util/apc/apc.php                                      # TODO: replace it
-
+ 
+    universalObjectCratesClasses:
+        - rosasurfer\ministruts\Page
+     
    #reportUnmatchedIgnoredErrors:           false
     polluteScopeWithLoopInitialAssignments: true
     polluteCatchScopeWithTryAssignments:    true
