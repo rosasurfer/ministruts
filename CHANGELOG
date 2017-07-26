@@ -1,4 +1,9 @@
 
+2017-07-26
+
+   - ministruts: enable Page::get() to return an alternative value
+
+
 2017-07-22
 
    - util: new helper functions rosasurfer\true(), rosasurfer\false(), rosasurfer\null()
