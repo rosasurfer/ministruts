@@ -41,14 +41,20 @@ class Page extends Singleton {
 
 
     /**
-     * Gibt einen Wert aus der Page zurueck.
+     * Lookup and return a property stored in the instance.
      *
-     * @param  string $key - Schluessel, unter dem der Wert gespeichert ist
+     * @param  string $name                - property name
+     * @param  mixed  $altValue [optional] - value to return if no such property exists
      *
-     * @return mixed - der gespeicherte Wert oder NULL, falls kein solcher Schluessel existiert
+     * @return mixed - value
      */
-    public static function get($key) {
-        return self::me()->__get($key);
+    public static function get($name, $altValue = null) {
+        $page = self::me();
+
+        if (array_key_exists($name, $page->properties))
+            return $page->properties[$name];
+
+        return $altValue;
     }
 
 
@@ -64,15 +70,16 @@ class Page extends Singleton {
 
 
     /**
-     * Magische PHP-Methode, die die Eigenschaft mit dem angegebenen Namen zurueckgibt. Wird automatisch
-     * aufgerufen und ermoeglicht den Zugriff auf Eigenschaften mit dynamischen Namen.
+     * Magic method. Returns the property stored under the specified key.
      *
-     * @param  string $name - Name der Eigenschaft
+     * @param  string $name - property name
      *
-     * @return mixed        - Wert oder NULL, wenn die Eigenschaft nicht existiert
+     * @return mixed - value
      */
     public function __get($name) {
-        return array_key_exists($name, $this->properties) ? $this->properties[$name] : null;
+        if (array_key_exists($name, $this->properties))
+            return $this->properties[$name];
+        return null;
     }
 
 
