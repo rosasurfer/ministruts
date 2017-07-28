@@ -1,4 +1,11 @@
 
+2017-07-28
+
+   - orm: move methods DAO::doInsert()|doUpdate()|doDelete() to PersistableObject
+   - orm: set visibility of methods PersistableObject::doInsert()|doUpdate()|doDelete() to "private"
+   - orm: set visibility of methods PersistableObject::insert()|update() to "private"
+   
+
 2017-07-26
 
    - ministruts: enable Page::get() to return an alternative value
