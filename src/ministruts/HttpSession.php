@@ -9,22 +9,22 @@ use rosasurfer\exception\error\PHPError;
 /**
  * HttpSession
  *
- * Wrapper fuer die aktuelle HttpSession des Users.
+ * An object wrapping the current HTTP session.
  */
 class HttpSession extends Singleton {
 
 
-    /** @var Request - Der Request, zu dem wir gehoeren. */
+    /** @var Request - request the session belongs to */
     protected $request;
 
-    /** @var bool - Ob die Session neu ist oder nicht. Die Session ist neu, wenn der User die Session-ID noch nicht kennt. */
+    /** @var bool - Whether or not the session is "new". A session is new if the user agent doesn't yet know the session id. */
     protected $new = null;
 
 
     /**
      * Constructor
      *
-     * @param  Request $request - der Request, zu dem die Session gehoert
+     * @param  Request $request - request the session belongs to
      */
     protected function __construct(Request $request) {
         parent::__construct();
@@ -34,17 +34,22 @@ class HttpSession extends Singleton {
 
 
     /**
-     * Initialisiert diese Session.
+     * Start and initialize the session.
      */
     protected function init() {
         /**
-       * PHP laesst sich ohne weiteres manipulierte Session-IDs unterschieben, solange diese keine ungueltigen Zeichen enthalten
-       * (IDs wie PHPSESSID=111 werden anstandslos akzeptiert).  Wenn session_start() zurueckkehrt, gibt es mit den vorhandenen
-       * PHP-Mitteln keine vernuenftige Moeglichkeit mehr, festzustellen, ob die Session-ID von PHP oder (kuenstlich?) vom User
-       * generiert wurde.  Daher wird in dieser Methode jede neue Session mit einer zusaetzliche Markierung versehen.  Fehlt diese
-       * Markierung nach Rueckkehr von session_start(), wurde die ID nicht von PHP generiert.  Aus Sicherheitsgruenden wird eine
-       * solche Session verworfen und eine neue ID erzeugt.
-       */
+         *
+         *
+         *
+         *
+         *
+         * PHP laesst sich ohne weiteres manipulierte Session-IDs unterschieben, solange diese keine ungueltigen Zeichen enthalten
+         * (IDs wie PHPSESSID=111 werden anstandslos akzeptiert).  Wenn session_start() zurueckkehrt, gibt es mit den vorhandenen
+         * PHP-Mitteln keine vernuenftige Moeglichkeit mehr, festzustellen, ob die Session-ID von PHP oder (kuenstlich?) vom User
+         * generiert wurde.  Daher wird in dieser Methode jede neue Session mit einer zusaetzliche Markierung versehen.  Fehlt diese
+         * Markierung nach Rueckkehr von session_start(), wurde die ID nicht von PHP generiert.  Aus Sicherheitsgruenden wird eine
+         * solche Session verworfen und eine neue ID erzeugt.
+         */
         $request = $this->request;
 
         // Session-Cookie auf Application beschraenken, um mehrere Projekte je Domain zu ermoeglichen
