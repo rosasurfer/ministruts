@@ -391,7 +391,7 @@ abstract class PersistableObject extends Object {
      *
      * @return $this
      */
-    protected function insert() {
+    private function insert() {
         if ($this->isPersistent()) throw new RuntimeException('Cannot insert already persistent '.$this);
 
         // pre-processing hook
@@ -425,7 +425,7 @@ abstract class PersistableObject extends Object {
      *
      * @return $this
      */
-    protected function update() {
+    private function update() {
         // pre-processing hook
         if ($this->beforeUpdate() === false)
             return $this;
