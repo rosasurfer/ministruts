@@ -88,7 +88,7 @@ class Module extends Object {
      * @param  string $fileName - Pfad zur Konfigurationsdatei des Modules
      * @param  string $prefix   - Prefix des Modules
      *
-     * @throws StrutsConfigException in case of configuration errors
+     * @throws StrutsConfigException on configuration errors
      *
      * @todo   Module-Encoding entsprechend dem Config-Datei-Encoding implementieren
      */
@@ -118,7 +118,7 @@ class Module extends Object {
      *
      * @return \SimpleXMLElement
      *
-     * @throws StrutsConfigException in case of configuration errors
+     * @throws StrutsConfigException on configuration errors
      */
     protected function loadConfiguration($fileName) {
         if (!is_file($fileName)) throw new StrutsConfigException('Configuration file not found: "'.$fileName.'"');
@@ -153,7 +153,7 @@ class Module extends Object {
      * @param  string prefix - the prefix of the root module is an empty string;
      *                         the prefix of non-root modules must not start but end with a slash "/"
      *
-     * @throws StrutsConfigException in case of configuration errors
+     * @throws StrutsConfigException on configuration errors
      */
     protected function setPrefix($prefix) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -170,7 +170,7 @@ class Module extends Object {
      *
      * @param  \SimpleXMLElement $xml - configuration instance
      *
-     * @throws StrutsConfigException in case of configuration errors
+     * @throws StrutsConfigException on configuration errors
      */
     protected function setNamespace($xml) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -199,7 +199,7 @@ class Module extends Object {
      *
      * @param  \SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
      *
-     * @throws StrutsConfigException in case of configuration errors
+     * @throws StrutsConfigException on configuration errors
      */
     protected function setResourceBase(\SimpleXMLElement $xml) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -237,7 +237,7 @@ class Module extends Object {
      *
      * @param  \SimpleXMLElement $xml - XML-Konfiguration
      *
-     * @throws StrutsConfigException in case of configuration errors
+     * @throws StrutsConfigException on configuration errors
      */
     protected function processForwards(\SimpleXMLElement $xml) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -301,7 +301,7 @@ class Module extends Object {
      *
      * @param  \SimpleXMLElement $xml - XML-Konfiguration
      *
-     * @throws StrutsConfigException in case of configuration errors
+     * @throws StrutsConfigException on configuration errors
      */
     protected function processMappings(\SimpleXMLElement $xml) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -514,7 +514,7 @@ class Module extends Object {
      *
      * @param  \SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
      *
-     * @throws StrutsConfigException in case of configuration errors
+     * @throws StrutsConfigException on configuration errors
      */
     protected function processTiles(\SimpleXMLElement $xml) {
         $namespace = '';                                            // default is the global namespace
@@ -566,7 +566,7 @@ class Module extends Object {
      *
      * @return Tile
      *
-     * @throws StrutsConfigException in case of configuration errors
+     * @throws StrutsConfigException on configuration errors
      */
     private function getTile($name, \SimpleXMLElement $xml) {
         // if the tile is already registered return it
@@ -648,7 +648,7 @@ class Module extends Object {
      * @param  Tile              $tile - Tile-Instanz
      * @param  \SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration
      *
-     * @throws StrutsConfigException in case of configuration errors
+     * @throws StrutsConfigException on configuration errors
      */
     private function processTileProperties(Tile $tile, \SimpleXMLElement $xml) {
         // process <include> elements
@@ -713,7 +713,7 @@ class Module extends Object {
      * @param  ActionForward $forward
      * @param  string        $alias [optional] - alias name of the forward
      *
-     * @throws StrutsConfigException in case of configuration errors
+     * @throws StrutsConfigException on configuration errors
      */
     protected function addGlobalForward(ActionForward $forward, $alias = null) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -730,7 +730,7 @@ class Module extends Object {
      *
      * @param  ActionMapping $mapping
      *
-     * @throws StrutsConfigException in case of configuration errors
+     * @throws StrutsConfigException on configuration errors
      */
     protected function addMapping(ActionMapping $mapping) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -827,7 +827,7 @@ class Module extends Object {
      *
      * @param  \SimpleXMLElement $xml - configuration instance
      *
-     * @throws StrutsConfigException in case of configuration errors
+     * @throws StrutsConfigException on configuration errors
      */
     protected function processImports(\SimpleXMLElement $xml) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -863,7 +863,7 @@ class Module extends Object {
      *
      * @param  \SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
      *
-     * @throws StrutsConfigException in case of configuration errors
+     * @throws StrutsConfigException on configuration errors
      */
     protected function processController(\SimpleXMLElement $xml) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -895,7 +895,7 @@ class Module extends Object {
      *
      * @param  string $className
      *
-     * @throws StrutsConfigException in case of configuration errors
+     * @throws StrutsConfigException on configuration errors
      */
     protected function setRequestProcessorClass($className) {
         if ($this->configured)                                            throw new IllegalStateException('Configuration is frozen');
@@ -920,7 +920,7 @@ class Module extends Object {
      *
      * @param  string $className
      *
-     * @throws StrutsConfigException in case of configuration errors
+     * @throws StrutsConfigException on configuration errors
      */
     protected function setRoleProcessorClass($className) {
         if ($this->configured)                                      throw new IllegalStateException('Configuration is frozen');
@@ -949,7 +949,7 @@ class Module extends Object {
      *
      * @param  string $className
      *
-     * @throws StrutsConfigException in case of configuration errors
+     * @throws StrutsConfigException on configuration errors
      */
     protected function setTilesClass($className) {
         if ($this->configured)                        throw new IllegalStateException('Configuration is frozen');
@@ -976,7 +976,7 @@ class Module extends Object {
      *
      * @param  string $className
      *
-     * @throws StrutsConfigException in case of configuration errors
+     * @throws StrutsConfigException on configuration errors
      */
     protected function setMappingClass($className) {
         if ($this->configured)                                         throw new IllegalStateException('Configuration is frozen');
@@ -1003,7 +1003,7 @@ class Module extends Object {
      *
      * @param  string $className
      *
-     * @throws StrutsConfigException in case of configuration errors
+     * @throws StrutsConfigException on configuration errors
      */
     protected function setForwardClass($className) {
         if ($this->configured)                                         throw new IllegalStateException('Configuration is frozen');
@@ -1106,7 +1106,7 @@ class Module extends Object {
      *
      * @return bool
      *
-     * @throws StrutsConfigException in case of configuration errors
+     * @throws StrutsConfigException on configuration errors
      */
     private function isTileDefinition($name, \SimpleXMLElement $xml) {
         $nodes = $xml->xPath("/struts-config/tiles/tile[@name='".$name."']") ?: [];

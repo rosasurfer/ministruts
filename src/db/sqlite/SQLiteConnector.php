@@ -251,7 +251,7 @@ class SQLiteConnector extends Connector {
      *
      * @return SQLiteResult
      *
-     * @throws DatabaseException in case of failure
+     * @throws DatabaseException on errors
      */
     public function query($sql) {
         try {
@@ -276,7 +276,7 @@ class SQLiteConnector extends Connector {
      *
      * @return $this
      *
-     * @throws DatabaseException in case of failure
+     * @throws DatabaseException on errors
      */
     public function execute($sql) {
         try {
@@ -299,7 +299,7 @@ class SQLiteConnector extends Connector {
      *
      * @return \SQLite3Result|bool
      *
-     * @throws DatabaseException in case of failure
+     * @throws DatabaseException on errors
      */
     public function executeRaw($sql) {
         if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));

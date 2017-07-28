@@ -48,36 +48,36 @@ const ACTION_FORM_BASE_CLASS = ActionForm::class;
 const ROLE_PROCESSOR_BASE_CLASS = RoleProcessor::class;
 
 /**
- * Request or session key where {@link ActionMessage}s are stored (if any).
+ * Request or session key under which {@link ActionMessage}s are stored (if any).
  */
 const ACTION_MESSAGES_KEY = 'org.apache.struts.action.MESSAGES';
 
 /**
- * Request or session key where {@link ActionError}s are stored (if any).
+ * Request or session key under which {@link ActionError}s are stored (if any).
  */
 const ACTION_ERRORS_KEY = 'org.apache.struts.action.ERRORS';
 
 /**
- * Request or session key where the current request's {@link ActionForm} is stored.
+ * Request or session key under which the current request's {@link ActionForm} is stored.
  */
 const ACTION_FORM_KEY = 'org.apache.struts.action.FORM';
 
 /**
- * Request key where the current request's {@link ActionMapping} is stored.
+ * Request key under which the current request's {@link ActionMapping} is stored.
  */
 const ACTION_MAPPING_KEY = 'org.apache.struts.action.MAPPING';
 
 /**
- * Session key where the currently selected {@link Locale} is stored.
+ * Session key under which the currently selected {@link Locale} is stored.
  */
 const LOCALE_KEY = 'org.apache.struts.action.LOCALE';
 
 /**
- * Request key where available {@link MessageResource}s are stored (i18n).
+ * Request key under which available {@link MessageResource}s are stored (i18n).
  */
 const MESSAGES_KEY = 'org.apache.struts.action.MESSAGE_RESOURCES';
 
 /**
- * Request key where the current request's {@link Module} is stored.
+ * Request key under which the current request's {@link Module} is stored.
  */
 const MODULE_KEY = 'org.apache.struts.action.MODULE';

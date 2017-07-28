@@ -297,7 +297,7 @@ class PostgresConnector extends Connector {
      *
      * @return PostgresResult
      *
-     * @throws DatabaseException in case of failure
+     * @throws DatabaseException on errors
      */
     public function query($sql) {
         $result = $this->executeRaw($sql);
@@ -313,7 +313,7 @@ class PostgresConnector extends Connector {
      *
      * @return $this
      *
-     * @throws DatabaseException in case of failure
+     * @throws DatabaseException on errors
      */
     public function execute($sql) {
         $result = $this->executeRaw($sql);
@@ -330,7 +330,7 @@ class PostgresConnector extends Connector {
      *
      * @return resource - result handle
      *
-     * @throws DatabaseException in case of failure
+     * @throws DatabaseException on errors
      */
     public function executeRaw($sql) {
         if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));

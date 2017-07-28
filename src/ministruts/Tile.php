@@ -199,7 +199,7 @@ class Tile extends Object {
      *
      * @return $this
      *
-     * @throws StrutsConfigException in case of configuration errors
+     * @throws StrutsConfigException on configuration errors
      */
     public function freeze() {
         if (!$this->configured) {

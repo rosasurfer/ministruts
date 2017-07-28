@@ -23,14 +23,14 @@ use const rosasurfer\WINDOWS;
 /**
  * FrontController
  *
- * To avoid repeated loading and parsing of the XML configuration after instantiation the one and only FrontController
- * instance is serialized, cached and re-used across following HTTP requests (until cache invalidation). For this reason
- * the class implementation is "request safe" (in analogy to "thread safety") and holds no variable runtime status.
+ * To avoid repeated loading and parsing of the XML configuration the FrontController instance is cached and re-used across
+ * multiple HTTP requests (until cache invalidation). The class implementation is "request safe" and holds no variable
+ * runtime status (similar to "thread safe" implementations in other languages).
  */
 class FrontController extends Singleton {
 
 
-    /** @var Module[] - all registered Modules, array key is the Module prefix */
+    /** @var Module[] - all registered Struts modules (array key is the module prefix) */
     private $modules = [];
 
 
@@ -75,7 +75,7 @@ class FrontController extends Singleton {
      *
      * Load and parse all Struts configuration files and create the corresponding object hierarchy.
      *
-     * @throws StrutsConfigException in case of configuration errors
+     * @throws StrutsConfigException on configuration errors
      */
     protected function __construct() {
         parent::__construct();
@@ -141,7 +141,7 @@ class FrontController extends Singleton {
 
 
     /**
-     * Resolve the prefix of the Module responsible for processing of the given Request
+     * Resolve the prefix of the {@link Module} responsible for processing of the given {@link Request}.
      *
      * @param  Request $request
      *
@@ -163,7 +163,7 @@ class FrontController extends Singleton {
 
 
     /**
-     * Get the RequestProcessor instance responsible for the given Module.
+     * Get the {@link RequestProcessor} instance responsible for the given {@link Module}.
      *
      * @param  Module $module
      * @param  array  $options - processing runtime options

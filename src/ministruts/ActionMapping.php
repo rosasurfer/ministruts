@@ -86,7 +86,7 @@ class ActionMapping extends Object {
      *
      * @return $this
      *
-     * @throws StrutsConfigException in case of configuration errors
+     * @throws StrutsConfigException on configuration errors
      */
     public function setName($name) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -115,7 +115,7 @@ class ActionMapping extends Object {
      *
      * @return $this
      *
-     * @throws StrutsConfigException in case of configuration errors
+     * @throws StrutsConfigException on configuration errors
      */
     public function setPath($path) {
         if ($this->configured)          throw new IllegalStateException('Configuration is frozen');
@@ -150,13 +150,13 @@ class ActionMapping extends Object {
 
 
     /**
-     * Set the HTTP methods the mapping will handle.
+     * Set the HTTP methods the mapping will be able to handle.
      *
      * @param  string $method - HTTP method verb
      *
      * @return $this
      *
-     * @throws StrutsConfigException in case of configuration errors
+     * @throws StrutsConfigException on configuration errors
      */
     public function setMethod($method) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -188,7 +188,7 @@ class ActionMapping extends Object {
      *
      * @return $this
      *
-     * @throws StrutsConfigException in case of configuration errors
+     * @throws StrutsConfigException on configuration errors
      */
     public function setRoles($roles) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -220,7 +220,7 @@ class ActionMapping extends Object {
      *
      * @return $this
      *
-     * @throws StrutsConfigException in case of configuration errors
+     * @throws StrutsConfigException on configuration errors
      */
     public function setForward(ActionForward $forward) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -251,7 +251,7 @@ class ActionMapping extends Object {
      *
      * @return $this
      *
-     * @throws StrutsConfigException in case of configuration errors
+     * @throws StrutsConfigException on configuration errors
      */
     public function setActionClassName($className) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -283,7 +283,7 @@ class ActionMapping extends Object {
      *
      * @return $this
      *
-     * @throws StrutsConfigException in case of configuration errors
+     * @throws StrutsConfigException on configuration errors
      */
     public function setFormClassName($className) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -308,14 +308,14 @@ class ActionMapping extends Object {
 
 
     /**
-     * Set the scope attribute used for the {@link ActionForm} of the mapping. The scope attribute identifies the storage
-     * location for the Actionform.
+     * Set the scope attribute used for the mapping's {@link ActionForm}. The scope attribute identifies the storage
+     * location of the Actionform.
      *
      * @param  string $value - may be "request" or "session"
      *
      * @return $this
      *
-     * @throws StrutsConfigException in case of configuration errors
+     * @throws StrutsConfigException on configuration errors
      */
     public function setFormScope($value) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -330,7 +330,7 @@ class ActionMapping extends Object {
 
 
     /**
-     * Return the scope attribute used for storing the {@link ActionForm} of the mapping.
+     * Return the scope attribute used for storing the mapping's {@link ActionForm}.
      *
      * @return string - scope attribute value
      */
@@ -360,23 +360,9 @@ class ActionMapping extends Object {
 
 
     /**
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     * Setzt das FormValidateFirst-Flag fuer die ActionForm des ActionMappings.  Das Flag zeigt an, ob die
-     * ActionForm vor Aufruf der Action validiert werden soll oder nicht.  Ohne entsprechende Angabe
-     * in der struts-config.xml wird die ActionForm immer validiert.
+     * Set the status of the mapping's {@link ActionForm} "validate-first" flag. If the flag is set the ActionForm is
+     * validated by the framework before the {@link Action} is executed. If the flag is not set the Action is responsible
+     * for validating the ActionForm.
      *
      * @param  bool $mode
      *
@@ -390,7 +376,7 @@ class ActionMapping extends Object {
 
 
     /**
-     * Ob die ActionForm des Mappings vor Aufruf der Action automatisch validiert wird oder nicht.
+     * Whether or not the mapping's {@ActionForm} is validated by the framework before execution of the the {@link Action}.
      *
      * @return bool
      */
@@ -400,9 +386,8 @@ class ActionMapping extends Object {
 
 
     /**
-     * Setzt das Default-Flag fuer dieses ActionMapping. Requests, die keinem anderen Mapping zugeordnet
-     * werden koennen, werden von dem Mapping mit gesetztem Default-Flag verarbeitet. Nur ein Mapping
-     * innerhalb eines Modules kann dieses Flag gesetzt werden.
+     * Set the mapping's "default" flag. Requests otherwise causing a HTTP 404 status are processed by the mapping with the
+     * "default" flag set. Only one mapping can have this flag set.
      *
      * @param  bool $default
      *
@@ -416,7 +401,7 @@ class ActionMapping extends Object {
 
 
     /**
-     * Ob fuer dieses ActionMapping das Default-Flag gesetzt ist.
+     * Whether or not the mapping's "default" flag is set.
      *
      * @return bool
      *
@@ -428,14 +413,14 @@ class ActionMapping extends Object {
 
 
     /**
-     * Fuegt dem ActionMapping unter dem angegebenen Namen einen ActionForward hinzu.
+     * Add an {@ActionForward} accessible under the specified name to the mapping.
      *
      * @param  ActionForward $forward
      * @param  string        $alias [optional] - alias name of the forward
      *
      * @return $this
      *
-     * @throws StrutsConfigException in case of configuration errors
+     * @throws StrutsConfigException on configuration errors
      */
     public function addForward(ActionForward $forward, $alias = null) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -451,11 +436,11 @@ class ActionMapping extends Object {
 
 
     /**
-     * Friert die Konfiguration dieser Komponente ein.
+     * Lock the mapping's configuration. Called after all properties of the mapping are set.
      *
      * @return $this
      *
-     * @throws StrutsConfigException in case of configuration errors
+     * @throws StrutsConfigException on configuration errors
      */
     public function freeze() {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -483,15 +468,12 @@ class ActionMapping extends Object {
 
 
     /**
-     * Sucht und gibt den ActionForward mit dem angegebenen Namen zurueck. Zuerst werden die lokalen
-     * Forwards des Mappings durchsucht, danach die globalen Forwards des Modules.  Wird kein Forward
-     * gefunden, wird NULL zurueckgegeben.  Zusaetzlich zu den konfigurierten Forwards kann zur Laufzeit
-     * unter dem geschuetzten Bezeichner "__self" ein Redirect-Forward auf das ActionMapping selbst
-     * abgerufen werden.
+     * Lookup and return the {@ActionForward} accessible under the specified name. First the lookup tries to find a local
+     * forward of the given name. If no local forward is found global forwards are checked.
      *
-     * @param  string $name - logischer Name
+     * @param  string $name - logical name; can be "__self" to return a redirect forward to the mapping itself
      *
-     * @return ActionForward|null
+     * @return ActionForward|null - ActionForward or NULL if neither a local nor a global forward was found
      */
     public function findForward($name) {
         if (isSet($this->forwards[$name]))

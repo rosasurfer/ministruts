@@ -34,7 +34,7 @@ abstract class DynamicReturnType extends Object {
     }
 
 
-	/**
+    /**
      * @return bool
      */
     public function isStaticMethodSupported(MethodReflection $methodReflection) : bool {
@@ -46,7 +46,7 @@ abstract class DynamicReturnType extends Object {
     /**
      * Return the name of the calling scope.
      *
-     * @return string - class name or "{main}" for calls from outside a class; "(unknown)" in case of errors
+     * @return string - class name or "{main}" for calls from outside a class; "(unknown)" on errors
      */
     protected function getScopeName(Scope $scope) : string {
         $reflection = $scope->getClassReflection();

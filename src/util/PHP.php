@@ -396,7 +396,7 @@ class PHP extends StaticClass {
      *
      * @param  string          $option
      * @param  bool|int|string $value
-     * @param  bool            $throwException [optional] - whether or not to throw an exception in case of errors (default: yes)
+     * @param  bool            $throwException [optional] - whether or not to throw an exception on errors (default: yes)
      *
      * @return bool - success status
      */

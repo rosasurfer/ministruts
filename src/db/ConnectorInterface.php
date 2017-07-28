@@ -82,7 +82,7 @@ interface ConnectorInterface {
      *
      * @return IResult
      *
-     * @throws DatabaseException in case of failure
+     * @throws DatabaseException on errors
      */
     public function query($sql);
 
@@ -95,7 +95,7 @@ interface ConnectorInterface {
      *
      * @return $this
      *
-     * @throws DatabaseException in case of failure
+     * @throws DatabaseException on errors
      */
     public function execute($sql);
 
@@ -107,7 +107,7 @@ interface ConnectorInterface {
      *
      * @return mixed - raw driver response
      *
-     * @throws DatabaseException in case of failure
+     * @throws DatabaseException on errors
      */
     public function executeRaw($sql);
 
