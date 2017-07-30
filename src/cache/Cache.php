@@ -2,12 +2,9 @@
 namespace rosasurfer\cache;
 
 use rosasurfer\config\Config;
-
 use rosasurfer\core\StaticClass;
-
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RuntimeException;
-
 use rosasurfer\util\PHP;
 
 use const rosasurfer\CLI;

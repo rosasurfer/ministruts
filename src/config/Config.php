@@ -4,12 +4,10 @@ namespace rosasurfer\config;
 use rosasurfer\cache\Cache;
 use rosasurfer\config\ConfigInterface as IConfig;
 use rosasurfer\core\Object;
-
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
 use rosasurfer\exception\UnimplementedFeatureException;
-
 use rosasurfer\util\PHP;
 
 use function rosasurfer\isRelativePath;

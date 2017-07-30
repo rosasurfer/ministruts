@@ -3,7 +3,6 @@ namespace rosasurfer\db\mysql;
 
 use rosasurfer\db\Connector;
 use rosasurfer\db\DatabaseException;
-
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;

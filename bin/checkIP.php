@@ -1,9 +1,11 @@
 <?php
 namespace rosasurfer\bin\check_ip;
-isSet($_SERVER['REQUEST_METHOD']) && exit(1);                           // in case we are running on CLI
 
 use rosasurfer\Application;
+
 use function rosasurfer\echoPre;
+
+isSet($_SERVER['REQUEST_METHOD']) && exit(1);                           // in case we are running on CLI
 
 // php.ini settings
 error_reporting(E_ALL & ~E_DEPRECATED);

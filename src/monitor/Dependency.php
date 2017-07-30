@@ -2,7 +2,6 @@
 namespace rosasurfer\monitor;
 
 use rosasurfer\core\Object;
-
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 

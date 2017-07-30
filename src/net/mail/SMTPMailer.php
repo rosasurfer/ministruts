@@ -3,12 +3,10 @@ namespace rosasurfer\net\mail;
 
 use rosasurfer\config\Config;
 use rosasurfer\debug\ErrorHandler;
-
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InfrastructureException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
-
 use rosasurfer\util\Date;
 
 use function rosasurfer\normalizeEOL;

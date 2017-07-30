@@ -4,7 +4,6 @@ namespace rosasurfer\phpstan;
 
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
-
 use rosasurfer\core\Object;
 use rosasurfer\exception\RuntimeException;
 

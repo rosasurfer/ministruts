@@ -2,10 +2,8 @@
 namespace rosasurfer\util;
 
 use rosasurfer\core\StaticClass;
-
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
-
 use rosasurfer\log\Logger;
 
 use const rosasurfer\DAYS;

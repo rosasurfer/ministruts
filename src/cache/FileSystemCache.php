@@ -2,12 +2,9 @@
 namespace rosasurfer\cache;
 
 use rosasurfer\config\Config;
-
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RuntimeException;
-
 use rosasurfer\exception\error\PHPError;
-
 use rosasurfer\monitor\Dependency;
 
 use function rosasurfer\isRelativePath;

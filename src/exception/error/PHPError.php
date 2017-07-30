@@ -3,7 +3,6 @@ namespace rosasurfer\exception\error;
 
 use rosasurfer\debug\DebugHelper;
 use rosasurfer\debug\ErrorHandler;
-
 use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\exception\RosasurferExceptionTrait;
 

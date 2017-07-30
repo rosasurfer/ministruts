@@ -4,13 +4,11 @@ namespace rosasurfer\db\orm\phpstan;
 
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\Variable;
-
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
 use PHPStan\Type\DynamicMethodReturnTypeExtension;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
-
 use rosasurfer\db\orm\DAO;
 use rosasurfer\phpstan\DynamicReturnType;
 

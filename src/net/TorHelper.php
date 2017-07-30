@@ -3,13 +3,10 @@ namespace rosasurfer\net;
 
 use rosasurfer\cache\Cache;
 use rosasurfer\core\StaticClass;
-
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\IOException;
-
 use rosasurfer\lock\Lock;
 use rosasurfer\log\Logger;
-
 use rosasurfer\net\http\CurlHttpClient;
 use rosasurfer\net\http\HttpRequest;
 use rosasurfer\net\http\HttpResponse;

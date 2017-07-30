@@ -3,12 +3,10 @@ namespace rosasurfer\ministruts;
 
 use rosasurfer\config\Config;
 use rosasurfer\core\Singleton;
-
 use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
-
 use rosasurfer\util\PHP;
 
 use function rosasurfer\strEndsWith;

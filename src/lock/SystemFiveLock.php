@@ -2,11 +2,9 @@
 namespace rosasurfer\lock;
 
 use rosasurfer\debug\ErrorHandler;
-
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RuntimeException;
 use rosasurfer\exception\error\PHPError;
-
 use rosasurfer\log\Logger;
 
 use function rosasurfer\strStartsWith;

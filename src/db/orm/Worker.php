@@ -2,7 +2,6 @@
 namespace rosasurfer\db\orm;
 
 use rosasurfer\core\Object;
-
 use rosasurfer\db\ConnectionPool;
 use rosasurfer\db\ConnectorInterface as IConnector;
 use rosasurfer\db\MultipleRecordsException;

@@ -2,7 +2,6 @@
 namespace rosasurfer\lock;
 
 use rosasurfer\debug\ErrorHandler;
-
 use rosasurfer\exception\FileNotFoundException;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RuntimeException;

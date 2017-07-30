@@ -3,7 +3,6 @@ namespace rosasurfer\ministruts;
 
 use rosasurfer\config\Config;
 use rosasurfer\core\Object;
-
 use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\IllegalTypeException;
 

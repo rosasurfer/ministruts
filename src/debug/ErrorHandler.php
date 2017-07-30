@@ -3,7 +3,6 @@ namespace rosasurfer\debug;
 
 use rosasurfer\Application;
 use rosasurfer\core\StaticClass;
-
 use rosasurfer\exception\error\PHPCompileError;
 use rosasurfer\exception\error\PHPCompileWarning;
 use rosasurfer\exception\error\PHPCoreError;
@@ -20,8 +19,8 @@ use rosasurfer\exception\error\PHPUserError;
 use rosasurfer\exception\error\PHPUserNotice;
 use rosasurfer\exception\error\PHPUserWarning;
 use rosasurfer\exception\error\PHPWarning;
-
 use rosasurfer\log\Logger;
+use rosasurfer\util\PHP;
 
 use function rosasurfer\echoPre;
 use function rosasurfer\true;
@@ -33,7 +32,6 @@ use const rosasurfer\L_FATAL;
 use const rosasurfer\L_NOTICE;
 use const rosasurfer\L_WARN;
 use const rosasurfer\NL;
-use rosasurfer\util\PHP;
 
 
 /**

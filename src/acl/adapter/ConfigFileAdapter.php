@@ -2,9 +2,7 @@
 namespace rosasurfer\acl\adapter;
 
 use rosasurfer\config\Config;
-
 use rosasurfer\core\Object;
-
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RuntimeException;
 use rosasurfer\exception\UnimplementedFeatureException;

@@ -4,7 +4,6 @@ namespace rosasurfer\util;
 use rosasurfer\config\Config;
 use rosasurfer\core\StaticClass;
 use rosasurfer\debug\DebugHelper;
-
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RuntimeException;
 

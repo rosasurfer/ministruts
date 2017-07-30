@@ -3,7 +3,6 @@ namespace rosasurfer\db;
 
 use rosasurfer\core\Object;
 use rosasurfer\debug\ErrorHandler;
-
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\UnimplementedFeatureException;

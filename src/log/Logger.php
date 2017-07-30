@@ -4,21 +4,16 @@ namespace rosasurfer\log;
 use rosasurfer\Application;
 use rosasurfer\config\Config;
 use rosasurfer\core\StaticClass;
-
 use rosasurfer\debug\DebugHelper;
 use rosasurfer\debug\ErrorHandler;
-
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
 use rosasurfer\exception\error\PHPError;
-
 use rosasurfer\ministruts\Request;
-
 use rosasurfer\net\http\CurlHttpClient;
 use rosasurfer\net\http\HttpRequest;
 use rosasurfer\net\http\HttpResponse;
-
 use rosasurfer\util\PHP;
 
 use function rosasurfer\hsc;

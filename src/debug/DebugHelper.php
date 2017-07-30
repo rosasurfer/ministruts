@@ -1,8 +1,8 @@
 <?php
 namespace rosasurfer\debug;
 
+use rosasurfer\config\Config;
 use rosasurfer\core\StaticClass;
-
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\exception\error\PHPError;
@@ -14,7 +14,6 @@ use function rosasurfer\strRightFrom;
 use function rosasurfer\strStartsWith;
 
 use const rosasurfer\NL;
-use rosasurfer\config\Config;
 
 
 /**

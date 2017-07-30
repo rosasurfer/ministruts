@@ -2,7 +2,6 @@
 namespace rosasurfer\ministruts;
 
 use rosasurfer\core\Object;
-
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 

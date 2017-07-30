@@ -3,7 +3,6 @@ namespace rosasurfer\db\sqlite;
 
 use rosasurfer\db\ConnectorInterface as IConnector;
 use rosasurfer\db\Result;
-
 use rosasurfer\exception\IllegalTypeException;
 
 use const rosasurfer\ARRAY_ASSOC;
