@@ -794,18 +794,31 @@ class Request extends Singleton {
 
 
     /**
-     * Ob unter dem angegebenen Schluessel eine Error-Message existiert.  Ohne Angabe eines Schluessel
-     * wird geprueft, ob eine beliebige Error-Message existiert.
+     * Whether or not an error message exists for one of the specified keys. With no key whether or not any error message
+     * exists.
      *
-     * @param  string $key [optional] - Schluessel
+     * @param  string|string[] $keys [optional] - message keys
      *
      * @return bool
      */
-    public function isActionError($key = null) {
-        if ($key !== null) {
-            return ($this->getActionError($key) !== null);
+    public function isActionError($keys = null) {
+        if (is_string($keys))
+            $keys = [$keys];
+
+        if (is_array($keys)) {
+            foreach ($keys as $key) {
+                if ($this->getActionError($key) !== null)
+                    return true;
+            }
+            if ($keys)
+                return false;
+            $keys = null;
         }
-        return (sizeOf($this->getAttribute(ACTION_ERRORS_KEY)) > 0);
+
+        if (is_null($keys))
+            return (sizeOf($this->getAttribute(ACTION_ERRORS_KEY)) > 0);
+
+        throw new IllegalTypeException('Illegal type of parameter $keys: '.getType($keys));
     }
 
 
