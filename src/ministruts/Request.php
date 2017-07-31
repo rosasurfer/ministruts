@@ -572,6 +572,7 @@ class Request extends Singleton {
                 // TODO: Apache skips REDIRECT_* headers
             }
             else {
+                static $fixHeaderNames = ['CDN'=>1, 'DNT'=>2, 'X-CDN'=>3];
                 $headers = [];
                 foreach ($_SERVER as $name => $value) {
                     while (subStr($name, 0, 9) == 'REDIRECT_') {
@@ -581,9 +582,8 @@ class Request extends Singleton {
                     }
                     if (subStr($name, 0, 5) == 'HTTP_') {
                         $name = subStr($name, 5);
-                        if ($name != 'DNT') {
+                        if (!isSet($fixHeaderNames[$name]))
                             $name = str_replace(' ', '-', ucWords(str_replace('_', ' ', strToLower($name))));
-                        }
                         $headers[$name] = $value;
                     }
                 }
