@@ -153,11 +153,11 @@
    path                 The module-relative path of the request, starting with a slash "/" character.
 
    match                TODO: Not yet implemented
-                        The path attribute's matching type. Can be one of "literal" or "param". If the value is "literal" the 
-                        path attribute is matched as-is. If the value is "param" the path attribute can contain parameter 
-                        placeholders of the form "/path/{:param1:}/{:param2:}" matching variable path segments. Parameter 
-                        segment separator is the slash "/" character. If the last parameter placeholder is not followed by a 
-                        slash it matches everything up to the end of the request path.    
+                        The path attribute's matching type. Can be one of "literal" or "variable". If the value is "literal" 
+                        the path attribute is matched as-is. If the value is "variable" the path attribute can contain 
+                        parameter placeholders of the form "/path/{:param1:}/{:param2:}" matching variable path segments. 
+                        Parameter separator is the slash "/" character. If the last parameter placeholder is not followed by 
+                        a slash the parameter matches everything up to the end of the request path.    
                         [default: "literal"]
    
    action               Class name of an Action subclass that will process requests for this action mapping. Can not be used 
@@ -203,6 +203,7 @@
 <!ATTLIST mapping
           name                   %LogicalName;        #IMPLIED
           path                   %RequestPath;        #REQUIRED
+          match                  (literal|variable)   "literal"
           action                 %ClassName;          #IMPLIED
           include                %ResourcePath;       #IMPLIED
           forward                %LogicalName;        #IMPLIED
