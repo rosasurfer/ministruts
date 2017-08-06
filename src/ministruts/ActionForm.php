@@ -32,7 +32,7 @@ abstract class ActionForm extends Object {
         if     (isSet($_REQUEST['action'  ])) $this->actionKey = $_REQUEST['action'  ];
         elseif (isSet($_REQUEST['action.x'])) $this->actionKey = $_REQUEST['action.x'];  // submit type="image"
 
-        // read transmitted parameters
+        // read submitted parameters
         $this->populate($request);
     }
 
@@ -60,7 +60,7 @@ abstract class ActionForm extends Object {
     /**
      * Return the dispatch action key (if any).
      *
-     * @return string|NULL - action key or NULL if no action key was transmitted
+     * @return string|null - action key or NULL if no action key was submitted
      *
      * @see    java.struts.DispatchAction
      */

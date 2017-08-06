@@ -139,7 +139,7 @@ class Request extends Singleton {
 
     /**
      * Return the single request parameter with the specified name. If multiple parameters with that name have been
-     * transmitted, the last value is returned. If an array of parameters with that name have been transmitted, it is
+     * transmitted, the last value is returned. If an array of parameters with that name have been transmitted it is
      * ignored.
      *
      * @param  string $name - parameter name
@@ -157,7 +157,7 @@ class Request extends Singleton {
 
 
     /**
-     * Return the array parameters with the specified name. If a single parameter with that name was transmitted, it is
+     * Return the array parameters with the specified name. If a single parameter with that name was transmitted it is
      * ignored.
      *
      * @param  string $name - parameter name
