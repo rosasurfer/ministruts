@@ -55,8 +55,8 @@ class PHP extends StaticClass {
         // pOpen() suffers from the same bug, probably caused by both using feof()
 
         $descriptors = [0 => ['pipe', 'rb'],         // stdin
-                      1 => ['pipe', 'wb'],         // stdout
-                      2 => ['pipe', 'wb']];        // stderr
+                        1 => ['pipe', 'wb'],         // stdout
+                        2 => ['pipe', 'wb']];        // stderr
         $pipes = [];
         $hProc = proc_open($cmd, $descriptors, $pipes, null, null, ['bypass_shell'=>true]);
 
@@ -64,7 +64,7 @@ class PHP extends StaticClass {
         fClose($pipes[0]);                           // 0 => writeable handle connected to child stdin
         fClose($pipes[1]);                           // 1 => readable handle connected to child stdout
         fClose($pipes[2]);                           // 2 => readable handle connected to child stderr
-        proc_close($hProc);                          // we MUST close the pipes before proc_close() to avoid a deadlock
+        proc_close($hProc);                          // we must close the pipes before proc_close() to avoid a deadlock
 
         return $stdout;
     }
