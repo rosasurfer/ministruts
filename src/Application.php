@@ -136,9 +136,9 @@ class Application extends Object {
         }
 
         // (8) enforce mission-critical PHP requirements (after running any admin tasks)
-        !php_ini_loaded_file()                && exit(1|echoPre('application error (see error log'.($this->isWhiteListedRemoteIP() ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: No "php.ini" configuration file was loaded.'));
-        !PHP::ini_get_bool('short_open_tag')  && exit(1|echoPre('application error (see error log'.($this->isWhiteListedRemoteIP() ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: The PHP configuration value "short_open_tag" must be enabled (security).'));
-        ini_get('request_order') != 'GP'      && exit(1|echoPre('application error (see error log'.($this->isWhiteListedRemoteIP() ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: The PHP configuration value "request_order" must be "GP" (current value "'.ini_get('request_order').'").'));
+        !php_ini_loaded_file()                        && exit(1|echoPre('application error (see error log'.($this->isWhiteListedRemoteIP() ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: No "php.ini" configuration file was loaded.'));
+        !CLI && !PHP::ini_get_bool('short_open_tag')  && exit(1|echoPre('application error (see error log'.($this->isWhiteListedRemoteIP() ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: The PHP configuration value "short_open_tag" must be enabled (security).'));
+        !CLI && ini_get('request_order') != 'GP'      && exit(1|echoPre('application error (see error log'.($this->isWhiteListedRemoteIP() ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: The PHP configuration value "request_order" must be "GP" (current value "'.ini_get('request_order').'").'));
     }
 
 
