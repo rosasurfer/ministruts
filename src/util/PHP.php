@@ -243,13 +243,13 @@ class PHP extends StaticClass {
         // (7) extensions
         // --------------
         /*PHP_INI_SYSTEM*/ if (ini_get('enable_dl'))                                                                 $issues[] = 'Warn:  enable_dl is not Off';
-        if (!extension_loaded('ctype'))                                                                              $issues[] = 'Warn:  ctype extension is not loaded';
-        if (!extension_loaded('curl'))                                                                               $issues[] = 'Warn:  curl extension is not loaded';
-        if (!extension_loaded('iconv'))                                                                              $issues[] = 'Warn:  iconv extension is not loaded';
-        if (!extension_loaded('json'))                                                                               $issues[] = 'Warn:  JSON extension is not loaded';
-        if (!extension_loaded('mysql'))                                                                              $issues[] = 'Warn:  MySQL extension is not loaded';
-        if (!extension_loaded('mysqli'))                                                                             $issues[] = 'Warn:  MySQLi extension is not loaded';
-        if (!WINDOWS && !extension_loaded('sysvsem'))                                                                $issues[] = 'Warn:  System-V Semaphore extension is not loaded';
+        if (!extension_loaded('ctype'))                                                                              $issues[] = 'Info:  ctype extension is not loaded';
+        if (!extension_loaded('curl'))                                                                               $issues[] = 'Info:  curl extension is not loaded';
+        if (!extension_loaded('iconv'))                                                                              $issues[] = 'Info:  iconv extension is not loaded';
+        if (!extension_loaded('json'))                                                                               $issues[] = 'Info:  JSON extension is not loaded';
+        if (!extension_loaded('mysql'))                                                                              $issues[] = 'Info:  MySQL extension is not loaded';
+        if (!extension_loaded('mysqli'))                                                                             $issues[] = 'Info:  MySQLi extension is not loaded';
+        if (!WINDOWS && !extension_loaded('sysvsem'))                                                                $issues[] = 'Info:  System-V Semaphore extension is not loaded';
 
         // check Composer defined requirements
         $appRoot = Config::getDefault()->get('app.dir.root');
