@@ -17,26 +17,31 @@ class HttpSession extends Singleton {
     /** @var Request - request the session belongs to */
     protected $request;
 
-    /** @var bool - Whether or not the session is "new". A session is new if the user agent doesn't yet know the session id. */
-    protected $new = null;
+    /** @var bool - Whether or not the session is "new". A session is new if the client doesn't yet know the session id. */
+    protected $new;
 
 
     /**
      * Constructor
      *
-     * @param  Request $request - request the session belongs to
+     * @param  Request $request                                    - request the session belongs to
+     * @param  bool    $suppressHeadersAlreadySentError [optional] - whether or not to suppress "headers already sent" errors
+     *                                                               (default: no)
      */
-    protected function __construct(Request $request) {
+    protected function __construct(Request $request, $suppressHeadersAlreadySentError = false) {
         parent::__construct();
         $this->request = $request;
-        $this->init();
+        $this->init($suppressHeadersAlreadySentError);
     }
 
 
     /**
      * Start and initialize the session.
+     *
+     * @param  bool $suppressHeadersAlreadySentError [optional] - whether or not to suppress "headers already sent" errors
+     *                                                            (default: no)
      */
-    protected function init() {
+    protected function init($suppressHeadersAlreadySentError = false) {
         /**
          *
          *
@@ -62,12 +67,19 @@ class HttpSession extends Singleton {
 
         // Session starten bzw. fortsetzen
         try {
-            session_start();                    // TODO: Handle the case when a session was already started elsewhere?
+            session_start();                        // TODO: Handle the case when a session was already started elsewhere?
         }
         catch (PHPError $error) {
-            if (strPos($error->getMessage(), 'The session id contains illegal characters') === false)
-                throw $error;                   // andere Fehler weiterreichen
-            session_regenerate_id();            // neue ID generieren
+            if (preg_match('/The session id contains illegal characters/', $error->getMessage())) {
+                session_regenerate_id();            // neue ID generieren
+            }
+            else if (preg_match('/- headers already sent (by )?\(output started at /', $error->getMessage())) {
+                if (!$suppressHeadersAlreadySentError)
+                    throw $error;
+            }
+            else {
+                throw $error;
+            }
         }
 
 

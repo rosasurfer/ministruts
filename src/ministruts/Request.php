@@ -452,10 +452,12 @@ class Request extends Singleton {
     /**
      * Gibt die aktuelle HttpSession zurueck. Existiert noch keine Session, wird eine erzeugt.
      *
+     * @param  bool $suppressHeadersAlreadySentError [optional] - whether or not to suppress "headers already sent" errors
+     *                                                            (default: no)
      * @return HttpSession
      */
-    public function getSession() {
-        return Singleton::getInstance(HttpSession::class, $this);
+    public function getSession($suppressHeadersAlreadySentError = false) {
+        return Singleton::getInstance(HttpSession::class, $this, $suppressHeadersAlreadySentError);
     }
 
 
