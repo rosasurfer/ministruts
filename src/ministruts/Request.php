@@ -450,16 +450,6 @@ class Request extends Singleton {
 
 
     /**
-     * Whether or not an HTTP session was started during the current request. Not whether the session is still open (active).
-     *
-     * @return bool
-     */
-    public function isSession() {
-        return (session_id() !== '');
-    }
-
-
-    /**
      * Gibt die aktuelle HttpSession zurueck. Existiert noch keine Session, wird eine erzeugt.
      *
      * @return HttpSession
@@ -470,42 +460,66 @@ class Request extends Singleton {
 
 
     /**
-     * Return the session id transmitted by the client with the request (not the id sent to the client with the reponse).
+     * Whether or not an HTTP session was started during the current request. Not whether the session is still open (active).
+     *
+     * @return bool
+     */
+    public function isSession() {
+        return (session_id() !== '');
+    }
+
+
+    /**
+     * Whether or not a session attribute of the specified name exists. If no session exists none is started.
+     *
+     * @param  string $key - key
+     *
+     * @return bool
+     */
+    public function isSessionAttribute($key) {
+        if ($this->isSession() || $this->hasSessionId())
+            return $this->getSession()->isAttribute($key);
+        return false;
+    }
+
+
+    /**
+     * Return the session id transmitted with the request (not the id sent with the response; which may differ).
      *
      * @return string
      */
     public function getSessionId() {
         $name = session_name();
 
-        if (PHP::ini_get_bool('session.use_cookies')) {
+        if (PHP::ini_get_bool('session.use_cookies'))
             if (isSet($_COOKIE[$name]))
                 return $_COOKIE[$name];
-        }
-        if (PHP::ini_get_bool('session.use_trans_sid') && !PHP::ini_get_bool('session.use_only_cookies')) {
+
+        if (!PHP::ini_get_bool('session.use_only_cookies'))
             if (isSet($_REQUEST[$name]))
                 return $_REQUEST[$name];
-        }
+
         return '';
     }
 
 
     /**
-     * Whether or not a valid session id was transmitted with the request (an invalid id can be a URL based id when the
-     * php.ini setting 'session.use_trans_sid' is not enabled).
+     * Whether or not a valid session id was transmitted with the request. An invalid id is a URL based session id when the
+     * php.ini setting 'session.use_only_cookies' is enabled.
      *
      * @return bool
      */
     public function hasSessionId() {
         $name = session_name();
 
-        if (PHP::ini_get_bool('session.use_cookies')) {
+        if (PHP::ini_get_bool('session.use_cookies'))
             if (isSet($_COOKIE[$name]))
                 return true;
-        }
-        if (PHP::ini_get_bool('session.use_trans_sid') && !PHP::ini_get_bool('session.use_only_cookies')) {
+
+        if (!PHP::ini_get_bool('session.use_only_cookies'))
             if (isSet($_REQUEST[$name]))
                 return true;
-        }
+
         return false;
     }
 
@@ -665,7 +679,7 @@ class Request extends Singleton {
      * @return mixed - der gespeicherte Wert oder NULL
      */
     public function &getAttribute($key) {
-        if (isSet($this->attributes[$key]))
+        if (array_key_exists($key, $this->attributes))
             return $this->attributes[$key];
 
         $value = null;

@@ -7,6 +7,7 @@ use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\exception\RuntimeException;
+use rosasurfer\util\PHP;
 
 use function rosasurfer\strContains;
 use function rosasurfer\strEndsWith;
@@ -92,7 +93,7 @@ class Response extends Singleton {
      * @return mixed - der gespeicherte Wert oder NULL
      */
     public function &getAttribute($key) {
-        if (isSet($this->attributes[$key]))
+        if (array_key_exists($key, $this->attributes))
             return $this->attributes[$key];
 
         $value = null;
@@ -112,33 +113,35 @@ class Response extends Singleton {
         // HTTP/1.1 requires an absolute 'Location' value
         $url = self::relativeToAbsoluteUrl($uri, $currentUrl);
 
-        // append session id if a session is active and URL rewriting is enabled (strongly discouraged)
-        if (defined('SID') && strLen(SID)) {                // TODO: check if session_destroy() resets SID
-            $cookie       = session_get_cookie_params();
-            $cookieDomain = strToLower(empty($cookie['domain']) ? $request->getHostname() : $cookie['domain']);
-            $cookiePath   =            empty($cookie['path'  ]) ? '/'                     : $cookie['path'  ];
-            $cookieSecure =                  $cookie['secure'];
+        // append session id if a session is active and URL rewriting is not disabled (strongly discouraged)
+        if (defined('SID') && strLen(SID)) {                        // empty string if the session id was submitted in a cookie
+            if (!PHP::ini_get_bool('session.use_only_cookies')) {   // TODO: check if session_destroy() resets SID
+                $cookie       = session_get_cookie_params();
+                $cookieDomain = strToLower(empty($cookie['domain']) ? $request->getHostname() : $cookie['domain']);
+                $cookiePath   =            empty($cookie['path'  ]) ? '/'                     : $cookie['path'  ];
+                $cookieSecure =                  $cookie['secure'];
 
-            $target       = parse_url($url);
-            $targetDomain = strToLower($target['host'  ]);
-            $targetPath   =      empty($target['path'  ]) ? '/' : $target['path'];
-            $targetSecure = strToLower($target['scheme']) == 'https';
+                $target       = parse_url($url);
+                $targetDomain = strToLower($target['host'  ]);
+                $targetPath   =      empty($target['path'  ]) ? '/' : $target['path'];
+                $targetSecure = strToLower($target['scheme']) == 'https';
 
-            $subdomains = false;
-            if ($cookieDomain[0] == '.') {                  // TODO: check if the leading dot is still required
-                $subdomains = true;                         //       (@see http://bayou.io/draft/cookie.domain.html)
-                $cookieDomain = subStr($cookieDomain, 1);
-            }
+                $subdomains = false;
+                if ($cookieDomain[0] == '.') {                      // TODO: check if the leading dot is still required
+                    $subdomains = true;                             //       (@see http://bayou.io/draft/cookie.domain.html)
+                    $cookieDomain = subStr($cookieDomain, 1);
+                }
 
-            if ($domainMatch = (preg_match('/\b'.$cookieDomain.'$/', $targetDomain) && ($cookieDomain==$targetDomain || $subdomains))) {
-                if ($pathMatch = strStartsWith($targetPath, $cookiePath)) {
-                    if ($secureMatch = !$cookieSecure || $targetSecure) {
-                        if (isSet($target['fragment']))  $url  = strLeft($url, strLen($hash = '#'.$target['fragment']));
-                        else if (strEndsWith($url, '#')) $url  = strLeft($url, strLen($hash = '#'));
-                        else                             $hash = '';
+                if ($domainMatch = (preg_match('/\b'.$cookieDomain.'$/', $targetDomain) && ($cookieDomain==$targetDomain || $subdomains))) {
+                    if ($pathMatch = strStartsWith($targetPath, $cookiePath)) {
+                        if ($secureMatch = !$cookieSecure || $targetSecure) {
+                            if (isSet($target['fragment']))  $url  = strLeft($url, strLen($hash = '#'.$target['fragment']));
+                            else if (strEndsWith($url, '#')) $url  = strLeft($url, strLen($hash = '#'));
+                            else                             $hash = '';
 
-                        $separator = !strContains($url, '?') ? '?' : '&';
-                        $url .= $separator.SID.$hash;
+                            $separator = !strContains($url, '?') ? '?' : '&';
+                            $url .= $separator.SID.$hash;
+                        }
                     }
                 }
             }

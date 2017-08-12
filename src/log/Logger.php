@@ -690,7 +690,7 @@ class Logger extends StaticClass {
                 $session = $_SESSION;
             }
             else if ($request->hasSessionId() && $request->getSession()) {
-                if (session_id() == $request->getSessionId())       // if both differ the id was regenerated
+                if (session_id() == $request->getSessionId())       // if both differ the id was regenerated and the session is empty
                     $session = $_SESSION;
             }
             $session  = is_null($session) ? null : print_r(ksort_r($session), true);

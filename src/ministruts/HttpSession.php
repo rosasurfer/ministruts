@@ -156,9 +156,8 @@ class HttpSession extends Singleton {
      * @return mixed - der gespeicherte Wert oder NULL
      */
     public function getAttribute($key, $default = null) {
-        if (isSet($_SESSION[$key]))
+        if (array_key_exists($key, $_SESSION))
             return $_SESSION[$key];
-
         return $default;
     }
 
@@ -215,6 +214,6 @@ class HttpSession extends Singleton {
      * @return bool
      */
     public function isAttribute($key) {
-        return isSet($_SESSION[$key]);
+        return array_key_exists($key, $_SESSION);
     }
 }

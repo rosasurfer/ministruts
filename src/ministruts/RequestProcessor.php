@@ -334,7 +334,7 @@ PROCESS_METHOD_ERROR_SC_405;
 
         // bei gesetztem Session-Scope ActionForm zuerst in der Session suchen ...
         if ($mapping->isSessionScope())
-            $form = $request->getSession()->getAttribute($className);
+            $form = $request->getSession()->getAttribute($className);       // implicitely start a session
 
         // ... ansonsten neue Instanz erzeugen
         if (!$form)
@@ -346,7 +346,7 @@ PROCESS_METHOD_ERROR_SC_405;
 
         // ... und ggf. auch in der Session speichern
         if ($mapping->isSessionScope())
-            $request->getSession()->setAttribute($className, $form);
+            $request->getSession()->setAttribute($className, $form);        // use started session
 
         return $form;
     }
