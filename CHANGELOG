@@ -1,4 +1,9 @@
 
+2017-08-12
+
+   - struts: add method ministruts\Request::isSessionAttribute($key)
+
+
 2017-07-28
 
    - orm: move methods DAO::doInsert()|doUpdate()|doDelete() to PersistableObject
