@@ -402,28 +402,25 @@ class Request extends Singleton {
 
 
     /**
-     * Return the content of the current request (the request body).
+     * Return the content of the current request (the request body). For file uploads the method returns not the real
+     * (binary) content. Instead it returns the available meta infos.
      *
-     * @return string|null - Request body for POST requests or NULL otherwise. If the "Content-Type" header of a POST request
-     *                       is "multipart/form-data" (a file upload) a string with the posted file's information is returned.
+     * @return string - request body or meta infos
      */
     public function getContent() {
-        static $content = null;
-        static $read    = false;
+        static $content  = '';
+        static $beenRead = false;
 
-        if (!$read) {
-            if ($this->isPost()) {
-                if ($this->getContentType() != 'multipart/form-data') {
-                    $content = file_get_contents('php://input');
-                }
-                else {
-                    // php://input is not available with enctype="multipart/form-data"
-                    if ($_POST)
-                        $content = '$_POST => '.print_r($_POST, true)."\n";
-                    $content .= '$_FILES => '.print_r($_FILES, true);
-                }
+        if (!$beenRead) {
+            if ($this->getContentType() == 'multipart/form-data') {
+                if ($_POST)                                             // php://input is not available with
+                    $content = '$_POST => '.print_r($_POST, true).NL;   // enctype="multipart/form-data"
+                $content .= '$_FILES => '.print_r($_FILES, true);
             }
-            $read = true;
+            else {
+                $content = file_get_contents('php://input');
+            }
+            $beenRead = true;
         }
         return $content;
     }
@@ -946,12 +943,10 @@ class Request extends Singleton {
             $string .= str_pad($key.':', $maxLen).' '.$value.NL;
         }
 
-        // content (body)
-        if ($this->isPost()) {
-            $content = $this->getContent();
-            if (strLen($content))
-                $string .= NL.$content.NL;
-        }
+        // content (request body)
+        $content = $this->getContent();
+        if (strLen($content))
+            $string .= NL.$content.NL;
 
         return $string;
     }
