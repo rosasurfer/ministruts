@@ -129,7 +129,7 @@ class RequestProcessor extends Object {
      * @see    RequestProcessor::cacheActionMessages()
      */
     protected function processCachedActionMessages(Request $request) {
-        if ($request->isSession()) {
+        if ($request->hasSessionId() && $request->getSession()) {
             if (isSet($_SESSION[ACTION_MESSAGES_KEY])) {
                 $messages = $_SESSION[ACTION_MESSAGES_KEY];
                 $request->setAttribute(ACTION_MESSAGES_KEY, $messages);
