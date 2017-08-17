@@ -55,7 +55,7 @@ class Config extends Object implements ConfigInterface {
     /** @var string[] - config file names */
     protected $files = [];
 
-    /** @var string - directory of the last specified config file */
+    /** @var string - directory of the most recently specified config file */
     protected $lastDirectory;
 
     /** @var array - tree structure of config values */
@@ -65,8 +65,8 @@ class Config extends Object implements ConfigInterface {
     /**
      * Constructor
      *
-     * Create a new instance and load the specified property files. The settings of all files are merged, later settings
-     * override earlier already existing ones.
+     * Create a new instance and load the specified property files. Settings of all files are merged, later settings
+     * override earlier (already existing) ones.
      *
      * @param  string|string[] $files              - a single or multiple configuration file names
      * @param  string          $baseDir [optional] - if provided all relative "app.dir.*" config values are expanded by this
@@ -102,7 +102,7 @@ class Config extends Object implements ConfigInterface {
 
         // expand relative "app.dir.*" values
         if ($baseDir !== null)
-            $this->expandRelativeDirs($baseDir);
+            $this->expandDirs($baseDir);
     }
 
 
@@ -135,11 +135,11 @@ class Config extends Object implements ConfigInterface {
 
 
     /**
-     * Return the directory the last config files was loaded from.
+     * Return the directory of the most recently loaded configuration file.
      *
-     * @return string
+     * @return string|null - directory name or NULL if the configuration is not based on files
      */
-    public function getLastDirectory() {
+    public function getDirectory() {
         return $this->lastDirectory;
     }
 
@@ -149,7 +149,7 @@ class Config extends Object implements ConfigInterface {
      *
      * @param  string $baseDir - base directory
      */
-    public function expandRelativeDirs($baseDir) {
+    public function expandDirs($baseDir) {
         if (!is_string($baseDir))                          throw new IllegalTypeException('Illegal type of parameter $baseDir: '.getType($baseDir));
         if (!strLen($baseDir) || isRelativePath($baseDir)) throw new InvalidArgumentException('Invalid parameter $baseDir: "'.$baseDir.'" (not an absolute path)');
 

@@ -216,7 +216,7 @@ class Application extends Object {
             $config = $options['app.config'];
             if (!$config instanceof IConfig) throw new IllegalTypeException('Illegal type of application option["app.config"]: '.getType($config));
             if (!$config->get('app.dir.config', false))
-                $config->set('app.dir.config', $config->getLastDirectory());
+                $config->set('app.dir.config', $config->getDirectory());
             unset($options['app.config']);
         }
 
@@ -231,7 +231,7 @@ class Application extends Object {
 
         // apply $baseDir and expand relative directories
         $config->set('app.dir.root', $baseDir);
-        $config->expandRelativeDirs($baseDir);
+        $config->expandDirs($baseDir);
 
         return Config::setDefault($config);
     }

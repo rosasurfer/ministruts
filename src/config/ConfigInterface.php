@@ -35,11 +35,11 @@ interface ConfigInterface {
 
 
     /**
-     * Return the directory of the configuration file loaded last.
+     * Return the directory of the most recently loaded configuration file.
      *
-     * @return string
+     * @return string|null - directory name or NULL if the configuration is not based on files
      */
-    public function getLastDirectory();
+    public function getDirectory();
 
 
     /**

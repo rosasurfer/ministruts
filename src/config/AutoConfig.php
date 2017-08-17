@@ -76,11 +76,11 @@ class AutoConfig extends Config {
 
 
         // (2) set "app.dir.config", "app.dir.root" and expand relative "app.dir.*" values
-        $this->set('app.dir.config', $this->getLastDirectory());
+        $this->set('app.dir.config', $this->getDirectory());
 
         if ($baseDir) $this->set('app.dir.root', $baseDir);                 // override a configured value
         else          $baseDir = $this->get('app.dir.root', null);          // get a configured value
-        if ($baseDir) $this->expandRelativeDirs($baseDir);
+        if ($baseDir) $this->expandDirs($baseDir);
 
 
         // (3) create FileDependency and cache the instance
