@@ -55,9 +55,9 @@ class PHP extends StaticClass {
         if (!is_string($cmd)) throw new IllegalTypeException('Illegal type of parameter $cmd: '.getType($cmd));
 
         $descriptors = [
-            STDIN  => ['pipe', 'rb'],
-            STDOUT => ['pipe', 'wb'],
-            STDERR => ['pipe', 'wb']
+            STDIN  => ['pipe', 'rb'],   // ['file', '/dev/tty', 'r'],
+            STDOUT => ['pipe', 'wb'],   // ['file', '/dev/tty', 'w'],
+            STDERR => ['pipe', 'wb'],   // ['file', '/dev/tty', 'w'],
         ];
         $pipes = [];
 

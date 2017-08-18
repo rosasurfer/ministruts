@@ -5,11 +5,11 @@
 namespace rosasurfer\util;
 
 
-/** @var int */
+/** @var int - stdin */
 const STDIN = 0;
 
-/** @var int */
+/** @var int - stdout */
 const STDOUT = 1;
 
-/** @var int */
+/** @var int - stderr */
 const STDERR = 2;
