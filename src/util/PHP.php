@@ -43,13 +43,15 @@ class PHP extends StaticClass {
      * Execute a shell command in a cross-platform compatible way and return STDOUT. Works around a Windows bug where
      * a DOS EOF character (0x1A = ASCII 26) in the STDOUT stream causes further reading to stop.
      *
-     * @param  string $cmd                 - shell command to execute
-     * @param  string $stderr   [optional] - if present a variable STDERR will be written to
-     * @param  int    $exitCode [optional] - if present a variable the program exit code will be written to
+     * @param  string   $cmd                 - shell command to execute
+     * @param  string   $stderr   [optional] - if present a variable STDERR will be written to
+     * @param  int      $exitCode [optional] - if present a variable the program exit code will be written to
+     * @param  string   $dir      [optional] - if present the initial working directory for the command
+     * @param  string[] $env      [optional] - if present the environment to *replace* the current one
      *
      * @return string - content of STDOUT
      */
-    public static function shellExec($cmd, &$stderr=null, &$exitCode=null) {
+    public static function shellExec($cmd, &$stderr=null, &$exitCode=null, $dir=null, $env=null) {
         if (!is_string($cmd)) throw new IllegalTypeException('Illegal type of parameter $cmd: '.getType($cmd));
 
         $descriptors = [
@@ -60,15 +62,15 @@ class PHP extends StaticClass {
         $pipes = [];
 
         // pOpen() suffers from the same bug
-        $hProc = proc_open($cmd, $descriptors, $pipes, null, null, ['bypass_shell'=>true]);
+        $hProc = proc_open($cmd, $descriptors, $pipes, $dir, $env, ['bypass_shell'=>true]);
 
         $stdout = stream_get_contents($pipes[STDOUT]);  // $pipes now looks like this:
         $stderr = stream_get_contents($pipes[STDERR]);  // 0 => writeable handle connected to child stdin
         fClose($pipes[STDIN ]);                         // 1 => readable handle connected to child stdout
         fClose($pipes[STDOUT]);                         // 2 => readable handle connected to child stderr
-        fClose($pipes[STDERR]);
+        fClose($pipes[STDERR]);                         // pipes must be closed before proc_close() to avoid a deadlock
 
-        $exitCode = proc_close($hProc);                 // we must close the pipes before proc_close() to avoid a deadlock
+        $exitCode = proc_close($hProc);
         return $stdout;
     }
 
