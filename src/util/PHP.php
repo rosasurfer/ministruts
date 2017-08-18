@@ -40,8 +40,8 @@ class PHP extends StaticClass {
 
 
     /**
-     * Execute a shell command in a cross-platform compatible way and return STDOUT. Works around a Windows bug where
-     * a DOS EOF character (0x1A = ASCII 26) in the STDOUT stream causes further reading to stop.
+     * Execute a process and return STDOUT. Replacement for shell_exec() wich suffers from a Windows bug where a DOS EOF
+     * character (0x1A = ASCII 26) in the STDOUT stream causes further reading to stop.
      *
      * @param  string   $cmd                 - shell command to execute
      * @param  string   $stderr   [optional] - if present a variable STDERR will be written to
@@ -51,8 +51,9 @@ class PHP extends StaticClass {
      *
      * @return string - content of STDOUT
      */
-    public static function shellExec($cmd, &$stderr=null, &$exitCode=null, $dir=null, $env=null) {
+    public static function execProcess($cmd, &$stderr=null, &$exitCode=null, $dir=null, $env=null) {
         if (!is_string($cmd)) throw new IllegalTypeException('Illegal type of parameter $cmd: '.getType($cmd));
+        // pOpen() suffers from the same bug
 
         $descriptors = [
             STDIN  => ['pipe', 'rb'],   // ['file', '/dev/tty', 'r'],
@@ -61,7 +62,6 @@ class PHP extends StaticClass {
         ];
         $pipes = [];
 
-        // pOpen() suffers from the same bug
         $hProc = proc_open($cmd, $descriptors, $pipes, $dir, $env, ['bypass_shell'=>true]);
 
         $stdout = stream_get_contents($pipes[STDOUT]);  // $pipes now looks like this:
