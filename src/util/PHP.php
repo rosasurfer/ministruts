@@ -43,29 +43,32 @@ class PHP extends StaticClass {
      * Execute a shell command in a cross-platform compatible way and return STDOUT. Works around a Windows bug where
      * a DOS EOF character (0x1A = ASCII 26) in the STDOUT stream causes further reading to stop.
      *
-     * @param  string $cmd - shell command to execute
+     * @param  string $cmd                 - shell command to execute
+     * @param  string $stderr   [optional] - if present a variable STDERR will be written to
+     * @param  int    $exitCode [optional] - if present a variable the program exit code will be written to
      *
      * @return string - content of STDOUT
      */
-    public static function shellExec($cmd) {
+    public static function shellExec($cmd, &$stderr=null, &$exitCode=null) {
         if (!is_string($cmd)) throw new IllegalTypeException('Illegal type of parameter $cmd: '.getType($cmd));
 
-        if (!WINDOWS) return \shell_exec($cmd);
-
-        // pOpen() suffers from the same bug, probably caused by both using feof()
-
-        $descriptors = [0 => ['pipe', 'rb'],         // stdin
-                        1 => ['pipe', 'wb'],         // stdout
-                        2 => ['pipe', 'wb']];        // stderr
+        $descriptors = [
+            STDIN  => ['pipe', 'rb'],
+            STDOUT => ['pipe', 'wb'],
+            STDERR => ['pipe', 'wb']
+        ];
         $pipes = [];
+
+        // pOpen() suffers from the same bug
         $hProc = proc_open($cmd, $descriptors, $pipes, null, null, ['bypass_shell'=>true]);
 
-        $stdout = stream_get_contents($pipes[1]);    // $pipes now looks like this:
-        fClose($pipes[0]);                           // 0 => writeable handle connected to child stdin
-        fClose($pipes[1]);                           // 1 => readable handle connected to child stdout
-        fClose($pipes[2]);                           // 2 => readable handle connected to child stderr
-        proc_close($hProc);                          // we must close the pipes before proc_close() to avoid a deadlock
+        $stdout = stream_get_contents($pipes[STDOUT]);  // $pipes now looks like this:
+        $stderr = stream_get_contents($pipes[STDERR]);  // 0 => writeable handle connected to child stdin
+        fClose($pipes[STDIN ]);                         // 1 => readable handle connected to child stdout
+        fClose($pipes[STDOUT]);                         // 2 => readable handle connected to child stderr
+        fClose($pipes[STDERR]);
 
+        $exitCode = proc_close($hProc);                 // we must close the pipes before proc_close() to avoid a deadlock
         return $stdout;
     }
 
