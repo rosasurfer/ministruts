@@ -1,4 +1,9 @@
 
+2017-08-19
+
+   - config: configuration keys are case-insensitive
+
+
 2017-08-12
 
    - struts: add method ministruts\Request::isSessionAttribute($key)
