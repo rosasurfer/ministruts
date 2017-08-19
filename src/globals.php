@@ -10,6 +10,7 @@ use rosasurfer\ministruts\url\VersionedUrl;
 const CLI               = \rosasurfer\CLI;
 const LOCALHOST         = \rosasurfer\LOCALHOST;
 const WINDOWS           = \rosasurfer\WINDOWS;
+const NUL               = \rosasurfer\_NUL;                     // the system's NUL device name
 
 // custom log level
 const L_DEBUG           = \rosasurfer\L_DEBUG;
@@ -67,11 +68,11 @@ const ACCESS_PROTECTED  = \rosasurfer\ACCESS_PROTECTED;
 const ACCESS_PRIVATE    = \rosasurfer\ACCESS_PRIVATE;
 
 // miscellaneous
-const NL                = \rosasurfer\NL;                      // = EOL_UNIX
-const EOL_MAC           = \rosasurfer\EOL_MAC;                 // "\r"       CR       0D       13
-const EOL_NETSCAPE      = \rosasurfer\EOL_NETSCAPE;            // "\r\r\n"   CRCRLF   0D0D0A   13,13,10
-const EOL_UNIX          = \rosasurfer\EOL_UNIX;                // "\n"       LF       0A       10
-const EOL_WINDOWS       = \rosasurfer\EOL_WINDOWS;             // "\r\n"     CRLF     0D0A     13,10
+const NL                = \rosasurfer\NL;                       // = EOL_UNIX
+const EOL_MAC           = \rosasurfer\EOL_MAC;                  // "\r"       CR       0D       13
+const EOL_NETSCAPE      = \rosasurfer\EOL_NETSCAPE;             // "\r\r\n"   CRCRLF   0D0D0A   13,13,10
+const EOL_UNIX          = \rosasurfer\EOL_UNIX;                 // "\n"       LF       0A       10
+const EOL_WINDOWS       = \rosasurfer\EOL_WINDOWS;              // "\r\n"     CRLF     0D0A     13,10
 
 
 /**

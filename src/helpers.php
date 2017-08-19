@@ -19,12 +19,13 @@ use rosasurfer\util\Validator;
 // Whether or not we run on a command line interface, on localhost and/or on Windows.
 define(__NAMESPACE__.'\_CLI',       !isSet($_SERVER['REQUEST_METHOD']));
 define(__NAMESPACE__.'\_LOCALHOST', !_CLI && in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1', $_SERVER['SERVER_ADDR']]));
-define(__NAMESPACE__.'\_WINDOWS',   (strToUpper(subStr(PHP_OS, 0, 3))=='WIN'));
+define(__NAMESPACE__.'\_WINDOWS',   strToUpper(subStr(PHP_OS, 0, 3)) == 'WIN');
+define(__NAMESPACE__.'\_NUL',       _WINDOWS ? 'nul' : '/dev/null');
 
 const CLI       = _CLI;                                             // namespaced constants improve IDE code completion
 const LOCALHOST = _LOCALHOST;
 const WINDOWS   = _WINDOWS;
-
+const NUL       = _NUL;                                             // the system's NUL device name
 
 // custom log level
 const L_DEBUG           =  1;
