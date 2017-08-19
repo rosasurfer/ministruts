@@ -13,7 +13,7 @@ interface ConfigInterface {
     /**
      * Return the config setting with the specified key or the specified default value if no such setting is found.
      *
-     * @param  string $key                - key
+     * @param  string $key                - key (case-insensitive)
      * @param  mixed  $default [optional] - default value
      *
      * @return mixed - config setting
@@ -26,7 +26,7 @@ interface ConfigInterface {
     /**
      * Set/modify the config setting with the specified key.
      *
-     * @param  string $key   - key
+     * @param  string $key   - key (case-insensitive)
      * @param  mixed  $value - new value
      *
      * @return $this

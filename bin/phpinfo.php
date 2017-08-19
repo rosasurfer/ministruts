@@ -6,7 +6,8 @@
 use rosasurfer\Application;
 use rosasurfer\util\PHP;
 
-require(($dir=dirName(realPath(__FILE__))).'/../src/load.php');
+$dir = dirName(realPath(__FILE__));
+require($dir.'/../src/load.php');
 
 
 // php.ini settings

@@ -20,7 +20,7 @@ use const rosasurfer\NL;
  *
  * File format: <br>
  * Settings are defined as "key = value" pairs. Enclosing white space and empty lines are ignored. Subkeys can be used to
- * create structures which can be queried as a whole (array) or as single values.
+ * create structures which can be queried as a whole (array) or as single values. Keys are case-insensitive.
  *
  * @example
  * <pre>
@@ -204,7 +204,7 @@ class Config extends Object implements ConfigInterface {
      */
     protected function getProperty($key) {
         $properties  = $this->properties;
-        $subkeys     = $this->parseSubkeys($key);
+        $subkeys     = $this->parseSubkeys(strToLower($key));
         $subKeysSize = sizeOf($subkeys);
 
         for ($i=0; $i < $subKeysSize; ++$i) {
@@ -228,7 +228,7 @@ class Config extends Object implements ConfigInterface {
     protected function setProperty($key, $value) {
         // set the property depending on the existing data structure
         $properties  = &$this->properties;
-        $subkeys     =  $this->parseSubkeys($key);
+        $subkeys     =  $this->parseSubkeys(strToLower($key));
         $subkeysSize =  sizeOf($subkeys);
 
         for ($i=0; $i < $subkeysSize; ++$i) {
