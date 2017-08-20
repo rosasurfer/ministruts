@@ -192,25 +192,34 @@ class Config extends Object implements ConfigInterface {
      * Return the config setting with the specified key as a boolean. Accepted boolean value representations are "1" and "0",
      * "true" and "false", "on" and "off", "yes" and "no" (case-insensitive).
      *
-     * @param  string $key                    - case-insensitive key
-     * @param  bool   $nullOnError [optional] - whether or not to return NULL for non-boolean representations (default: no)
-     * @param  bool   $default     [optional] - default value
+     * @param  string $key                - case-insensitive key
+     * @param  array  $options [optional] - array with any of the following options:
+     *                   'null-on-error' => bool: whether or not to return NULL for non-boolean representations (default: no)
+     *                   'default'       => bool: default value to return if the setting is not found
      *
-     * @return bool|null - boolean value or NULL if $nullOnError is TRUE and the setting does not represent a boolean value
+     * @return bool|null - boolean value or NULL if the $options['null-on-error'] is TRUE and the setting does not represent
+     *                     a boolean value
      *
-     * @throws RuntimeException if the setting is not found and no default value was specified
+     * @throws RuntimeException if the setting is not found and $options['default'] value was specified
      */
-    public function getBool($key, $nullOnError=false, $default=null) {
+    public function getBool($key, array $options = []) {
         if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
 
         $value = $this->getProperty($key);
 
         if ($value === null) {
-            if (func_num_args() < 3) throw new RuntimeException('No configuration found for key "'.$key.'"');
-            if (!is_bool($default))  throw new IllegalTypeException('Illegal type of parameter $default: '.getType($default));
-            return $default;
+            if (!array_key_exists('default', $options)) throw new RuntimeException('No configuration found for key "'.$key.'"');
+            if (!is_bool($options['default']))          throw new IllegalTypeException('Illegal type of option "default": '.getType($options['default']));
+            return $options['default'];
         }
-        return filter_var($value, FILTER_VALIDATE_BOOLEAN, $nullOnError ? FILTER_NULL_ON_FAILURE : null);
+
+        if (array_key_exists('null-on-error', $options)) {
+            if (!is_bool($options['null-on-error']))    throw new IllegalTypeException('Illegal type of option "null-on-error": '.getType($options['null-on-error']));
+        }
+        else {
+            $options['null-on-error'] = false;
+        }
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN, $options['null-on-error'] ? FILTER_NULL_ON_FAILURE : null);
     }
 
 
