@@ -168,6 +168,8 @@ class Config extends Object implements ConfigInterface {
 
     /**
      * {@inheritdoc}
+     *
+     * @return mixed - config setting
      */
     public function get($key, $default = null) {
         if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
@@ -187,6 +189,8 @@ class Config extends Object implements ConfigInterface {
      * termination.
      *
      * {@inheritdoc}
+     *
+     * @return $this
      */
     public function set($key, $value) {
         if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
@@ -200,7 +204,7 @@ class Config extends Object implements ConfigInterface {
      *
      * @param  string $key
      *
-     * @return string[]|string|null - a string, a string array or NULL if no such setting is found
+     * @return string|string[]|null - a string, a string array or NULL if no such setting is found
      */
     protected function getProperty($key) {
         $properties  = $this->properties;
@@ -256,7 +260,7 @@ class Config extends Object implements ConfigInterface {
                     else {
                         if (is_string($properties[$subkey]))                // make the string the array default value
                             $properties[$subkey] = ['' => $properties[$subkey]];
-                        $properties[$subkey][] = $value;                    // add an arry value
+                        $properties[$subkey][] = $value;                    // add an array value
                     }
                 }
                 else {
@@ -335,7 +339,7 @@ class Config extends Object implements ConfigInterface {
      * @return IConfig
      */
     public static function getDefault() {
-        // intentionally cause an error if $defaultInstance was not yet set
+        // intentionally accept an error if $defaultInstance was not yet set
         return self::$defaultInstance;
     }
 
@@ -363,7 +367,7 @@ class Config extends Object implements ConfigInterface {
 
 
     /**
-     * Handle clones (public but can't be called).
+     * Clone the instance.
      */
     public function __clone() {
         throw new UnimplementedFeatureException(__METHOD__.'() not yet implemented');
@@ -373,12 +377,14 @@ class Config extends Object implements ConfigInterface {
 
     /**
      * {@inheritdoc}
+     *
+     * @return string
      */
     public function info() {
         $lines[] = 'Application configuration:';
         $lines[] = '--------------------------';
         $maxKeyLength = 0;
-        $values = $this->sPrintValues([], $this->properties, $maxKeyLength);
+        $values = $this->dumpValues([], $this->properties, $maxKeyLength);
         kSort($values);
 
         foreach ($values as $key => &$value) {
@@ -399,9 +405,11 @@ class Config extends Object implements ConfigInterface {
 
 
     /**
+     * Dump keys and values of the instance into a human-readable string and return it.
      *
+     * @return string
      */
-    private function sPrintValues($node, $values, &$maxKeyLength) {
+    private function dumpValues($node, $values, &$maxKeyLength) {
         $self   = __FUNCTION__;
         $result = [];
 
@@ -417,5 +425,56 @@ class Config extends Object implements ConfigInterface {
             }
         }
         return $result;
+    }
+
+
+    /**
+     * Whether or not a config setting with the specified key exists.
+     *
+     * @param  string $key - case-insensitive key
+     *
+     * @return bool
+     */
+    public function offsetExists($key) {
+        if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
+        return ($this->getProperty($key) !== null);
+    }
+
+
+    /**
+     * Return the config setting with the specified key.
+     *
+     * @param  string $key - case-insensitive key
+     *
+     * @return mixed - config setting
+     *
+     * @throws RuntimeException if the setting is not found
+     */
+    public function offsetGet($key) {
+        return $this->get($key);
+    }
+
+
+    /**
+     * Set/modify the config setting with the specified key.
+     *
+     * @param  string $key   - case-insensitive key
+     * @param  mixed  $value - new value
+     *
+     * @return mixed - new value
+     */
+    public function offsetSet($key, $value) {
+        $this->set($key, $value);
+        return $value;
+    }
+
+
+    /**
+     * Unset the config setting with the specified key.
+     *
+     * @param  string $key - case-insensitive key
+     */
+    public function offsetUnset($key) {
+        $this->set($key, null);
     }
 }
