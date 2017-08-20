@@ -3,6 +3,7 @@
 
    - config: configuration keys are case-insensitive
    - config: config/ConfigInterface extends \ArrayAccess
+   - config: config/Config::getBool()
 
 
 2017-08-12
