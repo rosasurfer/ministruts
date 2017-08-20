@@ -24,6 +24,23 @@ interface ConfigInterface extends \ArrayAccess {
 
 
     /**
+     * Return the config setting with the specified key as a boolean. Accepted boolean value representations are "1" and "0",
+     * "true" and "false", "on" and "off", "yes" and "no" (case-insensitive).
+     *
+     * @param  string $key                - case-insensitive key
+     * @param  array  $options [optional] - array with any of the following options:
+     *                   'null-on-error' => bool: whether or not to return NULL for non-boolean representations (default: no)
+     *                   'default'       => bool: default value to return if the setting is not found
+     *
+     * @return bool|null - boolean value or NULL if the $options['null-on-error'] is TRUE and the setting does not represent
+     *                     a boolean value
+     *
+     * @throws RuntimeException if the setting is not found and $options['default'] value was specified
+     */
+    public function getBool($key, array $options = []);
+
+
+    /**
      * Set/modify the config setting with the specified key.
      *
      * @param  string $key   - case-insensitive key

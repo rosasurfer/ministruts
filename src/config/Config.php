@@ -199,8 +199,6 @@ class Config extends Object implements ConfigInterface {
      *
      * @return bool|null - boolean value or NULL if the $options['null-on-error'] is TRUE and the setting does not represent
      *                     a boolean value
-     *
-     * @throws RuntimeException if the setting is not found and $options['default'] value was specified
      */
     public function getBool($key, array $options = []) {
         if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
