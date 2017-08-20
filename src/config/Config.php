@@ -20,7 +20,8 @@ use const rosasurfer\NL;
  *
  * File format: <br>
  * Settings are defined as "key = value" pairs. Enclosing white space and empty lines are ignored. Subkeys can be used to
- * create structures which can be queried as a whole (array) or as single values. Keys are case-insensitive.
+ * create structures which can be queried as a whole (array) or as single values. Keys are case-insensitive. Config instances
+ * can be accessed like arrays.
  *
  * @example
  * <pre>
@@ -41,9 +42,9 @@ use const rosasurfer\NL;
  * key."a.subkey.with.dots"  = value            # quoted subkeys can contain otherwise illegal key characters
  *
  * &lt;?php
- * Config::get('db.connector')  // returns a single value
- * Config::get('db')            // returns an associative array of values ['connector'=>..., 'host'=>..., 'database'=>...]
- * Config::get('db.options')    // returns and indexed array of values     [0=>..., 1=>..., 2=>...]
+ * Config::get('db.connector')          // return a single value
+ * Config::get('db')                    // return an associative indexed array of values ['connector'=>..., 'host'=>..., ...]
+ * Config::get('db.options')            // return a numerical indexed array of values    [0=>..., 1=>..., 2=>...]
  * </pre>
  */
 class Config extends Object implements ConfigInterface {
@@ -167,7 +168,10 @@ class Config extends Object implements ConfigInterface {
 
 
     /**
-     * {@inheritdoc}
+     * Return the config setting with the specified key or the default value if no such setting is found.
+     *
+     * @param  string $key                - case-insensitive key
+     * @param  mixed  $default [optional] - default value
      *
      * @return mixed - config setting
      */
@@ -185,10 +189,36 @@ class Config extends Object implements ConfigInterface {
 
 
     /**
-     * Set/modify the config setting with the specified key. Modified values are not persistet and get lost with script
-     * termination.
+     * Return the config setting with the specified key as a boolean. Accepted boolean value representations are "1" and "0",
+     * "true" and "false", "on" and "off", "yes" and "no" (case-insensitive).
      *
-     * {@inheritdoc}
+     * @param  string $key                    - case-insensitive key
+     * @param  bool   $nullOnError [optional] - whether or not to return NULL for non-boolean representations (default: no)
+     * @param  bool   $default     [optional] - default value
+     *
+     * @return bool|null - boolean value or NULL if $nullOnError is TRUE and the setting does not represent a boolean value
+     *
+     * @throws RuntimeException if the setting is not found and no default value was specified
+     */
+    public function getBool($key, $nullOnError=false, $default=null) {
+        if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
+
+        $value = $this->getProperty($key);
+
+        if ($value === null) {
+            if (func_num_args() < 3) throw new RuntimeException('No configuration found for key "'.$key.'"');
+            if (!is_bool($default))  throw new IllegalTypeException('Illegal type of parameter $default: '.getType($default));
+            return $default;
+        }
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN, $nullOnError ? FILTER_NULL_ON_FAILURE : null);
+    }
+
+
+    /**
+     * Set/modify the config setting with the specified key.
+     *
+     * @param  string $key   - case-insensitive key
+     * @param  mixed  $value - new value
      *
      * @return $this
      */
