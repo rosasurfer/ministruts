@@ -9,8 +9,9 @@ use rosasurfer\ministruts\url\VersionedUrl;
 // runtime environment
 const CLI               = \rosasurfer\CLI;
 const LOCALHOST         = \rosasurfer\LOCALHOST;
+const MACOS             = \rosasurfer\MACOS;
 const WINDOWS           = \rosasurfer\WINDOWS;
-const NUL               = \rosasurfer\_NUL;                     // the system's NUL device name
+const NUL               = \rosasurfer\NUL;                      // the system's NUL device name
 
 // custom log level
 const L_DEBUG           = \rosasurfer\L_DEBUG;
