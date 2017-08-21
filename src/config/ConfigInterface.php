@@ -28,14 +28,14 @@ interface ConfigInterface extends \ArrayAccess {
      * "true" and "false", "on" and "off", "yes" and "no" (case-insensitive).
      *
      * @param  string $key                - case-insensitive key
-     * @param  array  $options [optional] - array with any of the following options:
-     *                   'null-on-error' => bool: whether or not to return NULL for non-boolean representations (default: no)
-     *                   'default'       => bool: default value to return if the setting is not found
+     * @param  array  $options [optional] - associative array of options of <tt>filter_var($var, FILTER_VALIDATE_BOOLEAN)</tt> <br>
+     *                'flags'   => FILTER_NULL_ON_FAILURE: return NULL instead of FALSE on failure <br>
+     *                'default' => bool:                   default value to return if the setting is not found <br>
      *
-     * @return bool|null - boolean value or NULL if the $options['null-on-error'] is TRUE and the setting does not represent
+     * @return bool|null - boolean value or NULL if the flag FILTER_NULL_ON_FAILURE is set and the setting does not represent
      *                     a boolean value
      *
-     * @throws RuntimeException if the setting is not found and $options['default'] value was specified
+     * @throws RuntimeException if the setting is not found and $options['default'] was not specified
      */
     public function getBool($key, array $options = []);
 

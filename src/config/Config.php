@@ -193,11 +193,11 @@ class Config extends Object implements ConfigInterface {
      * "true" and "false", "on" and "off", "yes" and "no" (case-insensitive).
      *
      * @param  string $key                - case-insensitive key
-     * @param  array  $options [optional] - array with any of the following options:
-     *                   'null-on-error' => bool: whether or not to return NULL for non-boolean representations (default: no)
-     *                   'default'       => bool: default value to return if the setting is not found
+     * @param  array  $options [optional] - associative array of options of <tt>filter_var($var, FILTER_VALIDATE_BOOLEAN)</tt> <br>
+     *                'flags'   => FILTER_NULL_ON_FAILURE: return NULL instead of FALSE on failure <br>
+     *                'default' => bool:                   default value to return if the setting is not found <br>
      *
-     * @return bool|null - boolean value or NULL if the $options['null-on-error'] is TRUE and the setting does not represent
+     * @return bool|null - boolean value or NULL if the flag FILTER_NULL_ON_FAILURE is set and the setting does not represent
      *                     a boolean value
      */
     public function getBool($key, array $options = []) {
@@ -211,13 +211,11 @@ class Config extends Object implements ConfigInterface {
             return $options['default'];
         }
 
-        if (array_key_exists('null-on-error', $options)) {
-            if (!is_bool($options['null-on-error']))    throw new IllegalTypeException('Illegal type of option "null-on-error": '.getType($options['null-on-error']));
-        }
-        else {
-            $options['null-on-error'] = false;
-        }
-        return filter_var($value, FILTER_VALIDATE_BOOLEAN, $options['null-on-error'] ? FILTER_NULL_ON_FAILURE : null);
+        $flags = array_key_exists('flags', $options) ? (int) $options['flags'] : 0;
+
+        if ($flags & FILTER_NULL_ON_FAILURE && $value==='')         // crappy PHP considers '' as a valid strict boolean
+            return null;
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN, $flags);
     }
 
 
