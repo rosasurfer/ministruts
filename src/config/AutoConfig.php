@@ -32,23 +32,21 @@ class AutoConfig extends Config {
      *
      * Create a new instance from the specified location.
      *
-     *  - If parameter $configLocation is a file the file is loaded as the user-defined application configuration. The
-     *    remaining application config files are loaded from the same directory (the directory containing $configLocation).
-     *  - If $configLocation is a directory, the application config files are loaded from that directory.
+     * If parameter $location is a file the file is loaded as the user-defined application configuration. The remaining
+     * application config files are loaded from the same directory (the directory containing $configLocation).
      *
-     * @param  string $location           - configuration file or directory
-     * @param  string $baseDir [optional] - if provided all relative "app.dir.*" config values are expanded by this directory
-     *                                      (default: no expansion)
+     * If $location is a directory the application config files are loaded from that directory.
+     *
+     * @param  string $location - configuration file or directory
      */
-    public function __construct($location, $baseDir = null) {
-        if (!is_string($location))                   throw new IllegalTypeException('Illegal type of parameter $location: '.getType($location));
-        if ($baseDir!==null && !is_string($baseDir)) throw new IllegalTypeException('Illegal type of parameter $baseDir: '.getType($baseDir));
+    public function __construct($location) {
+        if (!is_string($location)) throw new IllegalTypeException('Illegal type of parameter $location: '.getType($location));
 
         // TODO: look-up and delegate to an existing cached instance
         //       key: get_class($this).'|'.$userConfig.'|cli='.(int)CLI
 
 
-        // (1) collect all relevant config files
+        // collect the applicable config files
         $configDir = $configFile = null;
 
         if (is_file($location)) {
@@ -72,18 +70,14 @@ class AutoConfig extends Config {
         else                                       $files[] = $configDir.'/config.properties';          // default
 
         // load all files (do not pass a provided $baseDir but apply it manually in the next step)
-        parent::__construct($files, null);
+        parent::__construct($files);
 
-
-        // (2) set "app.dir.config", "app.dir.root" and expand relative "app.dir.*" values
+        // set "app.dir.config" to the directory of the most recently processed file
         $this->set('app.dir.config', $this->getDirectory());
 
-        if ($baseDir) $this->set('app.dir.root', $baseDir);                 // override a configured value
-        else          $baseDir = $this->get('app.dir.root', null);          // get a configured value
-        if ($baseDir) $this->expandDirs($baseDir);
 
 
-        // (3) create FileDependency and cache the instance
+        // create FileDependency and cache the instance
         //$dependency = FileDependency::create(array_keys($config->files));
         //$dependency->setMinValidity(60 * SECONDS);
         //$cache->set('default', $config, Cache::EXPIRES_NEVER, $dependency);

@@ -7,6 +7,7 @@ use rosasurfer\config\ConfigInterface as IConfig;
 use rosasurfer\core\Object;
 use rosasurfer\debug\ErrorHandler;
 use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
 use rosasurfer\log\Logger;
 use rosasurfer\ministruts\FrontController;
@@ -197,7 +198,7 @@ class Application extends Object {
 
 
     /**
-     * Load the specified configuration and make it the application's default configuration.
+     * Load the specified configuration and register it as the application's default configuration.
      *
      * @param  array $options - config options as passed to the framework loader
      *
@@ -209,7 +210,7 @@ class Application extends Object {
 
         if (!isSet($options['app.config'])) {
             $location = isSet($options['app.dir.config']) ? $options['app.dir.config'] : getCwd();
-            $config   = new AutoConfig($location, null);    // $baseDir is applied manually in the last step
+            $config = new AutoConfig($location);
             unset($options['app.dir.config']);
         }
         else {
@@ -220,7 +221,7 @@ class Application extends Object {
             unset($options['app.config']);
         }
 
-        $baseDir = isSet($options['app.dir.root']) ? $options['app.dir.root'] : getCwd();
+        $rootDir = isSet($options['app.dir.root']) ? $options['app.dir.root'] : getCwd();
         unset($options['app.dir.root']);
 
         // copy all remaining options
@@ -229,11 +230,35 @@ class Application extends Object {
                 $config->set($name, $value);
         }
 
-        // apply $baseDir and expand relative directories
-        $config->set('app.dir.root', $baseDir);
-        $config->expandDirs($baseDir);
+        // set root directory and expand relative app directories
+        $config->set('app.dir.root', $rootDir);
+        $this->expandAppDirs($config, $rootDir);
 
+        // register the instance as the application's main configuration
         return Config::setDefault($config);
+    }
+
+
+    /**
+     * Expand relative "app.dir.*" values by the specified root directory.
+     *
+     * @param  IConfig $config  - application configuration
+     * @param  string  $rootDir - application root directory
+     */
+    private function expandAppDirs(IConfig $config, $rootDir) {
+        if (!is_string($rootDir))                          throw new IllegalTypeException('Illegal type of config option "app.dir.root": '.getType($rootDir));
+        if (!strLen($rootDir) || isRelativePath($rootDir)) throw new InvalidArgumentException('Invalid config option "app.dir.root": "'.$rootDir.'" (not an absolute path)');
+
+        $rootDir = rTrim(str_replace('\\', '/', $rootDir), '/');
+        $dirs = $config->get('app.dir', []);
+
+        foreach ($dirs as $name => &$dir) {
+            if (isRelativePath($dir))
+                $dir = $rootDir.'/'.$dir;
+            if (is_dir($dir)) $dir = realPath($dir);
+        }; unset($dir);
+
+        $config->set('app.dir', $dirs);         // store everything back
     }
 
 

@@ -69,11 +69,9 @@ class Config extends Object implements ConfigInterface {
      * Create a new instance and load the specified property files. Settings of all files are merged, later settings
      * override earlier (already existing) ones.
      *
-     * @param  string|string[] $files              - a single or multiple configuration file names
-     * @param  string          $baseDir [optional] - if provided all relative "app.dir.*" config values are expanded by this
-     *                                               directory (default: no expansion)
+     * @param  string|string[] $files - a single or multiple configuration file names
      */
-    public function __construct($files, $baseDir = null) {
+    public function __construct($files) {
         if      (is_string($files)) $files = [$files];
         else if (!is_array($files)) throw new IllegalTypeException('Illegal type of parameter $files: '.getType($files));
 
@@ -92,18 +90,11 @@ class Config extends Object implements ConfigInterface {
         $this->files = $checkedFiles;
 
         // load existing files
-        $oldDetectStatus = PHP::ini_get_bool('auto_detect_line_endings');
         ini_set('auto_detect_line_endings', true);
 
         foreach ($this->files as $fileName => $fileExists) {
-            if ($fileExists)
-                $this->loadFile($fileName);
+            $fileExists && $this->loadFile($fileName);
         }
-        ini_set('auto_detect_line_endings', $oldDetectStatus);
-
-        // expand relative "app.dir.*" values
-        if ($baseDir !== null)
-            $this->expandDirs($baseDir);
     }
 
 
@@ -142,28 +133,6 @@ class Config extends Object implements ConfigInterface {
      */
     public function getDirectory() {
         return $this->lastDirectory;
-    }
-
-
-    /**
-     * Expand relative "app.dir.*" values by the specified directory.
-     *
-     * @param  string $baseDir - base directory
-     */
-    public function expandDirs($baseDir) {
-        if (!is_string($baseDir))                          throw new IllegalTypeException('Illegal type of parameter $baseDir: '.getType($baseDir));
-        if (!strLen($baseDir) || isRelativePath($baseDir)) throw new InvalidArgumentException('Invalid parameter $baseDir: "'.$baseDir.'" (not an absolute path)');
-
-        $baseDir = rTrim(str_replace('\\', '/', $baseDir), '/');
-        $dirs = $this->get('app.dir', []);
-
-        foreach ($dirs as $name => &$dir) {
-            if (isRelativePath($dir))
-                $dir = $baseDir.'/'.$dir;
-            if (is_dir($dir)) $dir = realPath($dir);
-        }; unset($dir);
-
-        $this->set('app.dir', $dirs);       // store everything back
     }
 
 
