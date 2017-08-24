@@ -1,4 +1,11 @@
 
+2017-08-24
+
+   - config: add config/ConfigInterface::getMonitoredFiles()
+   - config: drop config/ConfigInterface::getDirectory()
+   - config: replace config/ConfigInterface::info() by config/ConfigInterface::dump() 
+
+
 2017-08-20
 
    - config: configuration keys are case-insensitive
