@@ -399,11 +399,11 @@ class Config extends Object implements ConfigInterface {
     /**
      * Dump keys and values of the instance into a human-readable string and return it.
      *
-     * @param  array $node         [In]
-     * @param  array $values       [In]
-     * @param  int  &$maxKeyLength [Out]
+     * @param  string[] $node         [In]
+     * @param  array    $values       [In]
+     * @param  int     &$maxKeyLength [Out]
      *
-     * @return string
+     * @return string[]
      */
     private function dumpNode($node, $values, &$maxKeyLength) {
         $self   = __FUNCTION__;
