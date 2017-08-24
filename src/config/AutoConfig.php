@@ -72,9 +72,10 @@ class AutoConfig extends Config {
         // load all files (do not pass a provided $baseDir but apply it manually in the next step)
         parent::__construct($files);
 
-        // set "app.dir.config" to the directory of the most recently processed file
-        $this->set('app.dir.config', $this->getDirectory());
-
+        // set "app.dir.config" to the directory of the most recently added file
+        end($this->files);
+        list($file, $isFile) = each($this->files);
+        $this->set('app.dir.config', dirName($file));
 
 
         // create FileDependency and cache the instance

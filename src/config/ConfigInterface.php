@@ -52,17 +52,21 @@ interface ConfigInterface extends \ArrayAccess {
 
 
     /**
-     * Return the directory of the most recently loaded configuration file.
+     * Return the names of the monitored configuration files. The resulting array will contain names of existing and (still)
+     * non-existing files.
      *
-     * @return string|null - directory name or NULL if the configuration is not based on files
+     * @return bool[] - array with elements "file-name" => (bool)status or an empty array if the configuration
+     *                  is not based on files
      */
-    public function getDirectory();
+    public function getMonitoredFiles();
 
 
     /**
-     * Return an informative text describing the instance.
+     * Return a dump with the preferences of the instance.
+     *
+     * @param  string $leftPad [optional] - string to use for left-padding the dump (default: empty string)
      *
      * @return string
      */
-    public function info();
+    public function dump($leftPad = '');
 }

@@ -53,11 +53,8 @@ class Config extends Object implements ConfigInterface {
     /** @var IConfig - the application's current default configuration */
     private static $defaultInstance;
 
-    /** @var string[] - config file names */
+    /** @var bool[] - config file names and their existence status */
     protected $files = [];
-
-    /** @var string - directory of the most recently specified config file */
-    protected $lastDirectory;
 
     /** @var array - tree structure of config values */
     protected $properties = [];
@@ -75,8 +72,10 @@ class Config extends Object implements ConfigInterface {
         if      (is_string($files)) $files = [$files];
         else if (!is_array($files)) throw new IllegalTypeException('Illegal type of parameter $files: '.getType($files));
 
-        // check and remember existence of the files
-        $checkedFiles = [];
+        ini_set('auto_detect_line_endings', true);
+        $this->files = [];
+
+        // check and load existing files
         foreach ($files as $i => $file) {
             if (!is_string($file)) throw new IllegalTypeException('Illegal type of parameter $files['.$i.']: '.getType($file));
 
@@ -84,16 +83,7 @@ class Config extends Object implements ConfigInterface {
             if      ($isFile)               $file = realPath($file);
             else if (isRelativePath($file)) $file = getCwd().PATH_SEPARATOR.$file;
 
-            $checkedFiles[$file] = $isFile;
-            $this->lastDirectory = dirName($file);                  // track the directory of the last specified file
-        }
-        $this->files = $checkedFiles;
-
-        // load existing files
-        ini_set('auto_detect_line_endings', true);
-
-        foreach ($this->files as $fileName => $fileExists) {
-            $fileExists && $this->loadFile($fileName);
+            $this->files[$file] = $isFile && $this->loadFile($file);
         }
     }
 
@@ -102,6 +92,8 @@ class Config extends Object implements ConfigInterface {
      * Load a single properties file. New settings overwrite existing ones.
      *
      * @param  string $filename
+     *
+     * @return bool - success status
      */
     protected function loadFile($filename) {
         $lines = file($filename, FILE_IGNORE_NEW_LINES);
@@ -123,16 +115,19 @@ class Config extends Object implements ConfigInterface {
             // parse and store property value
             $this->setProperty($key, $value);
         }
+        return true;
     }
 
 
     /**
-     * Return the directory of the most recently loaded configuration file.
+     * Return the names of the monitored configuration files. The resulting array will contain names of existing and (still)
+     * non-existing files.
      *
-     * @return string|null - directory name or NULL if the configuration is not based on files
+     * @return bool[] - array with elements "file-name" => (bool)status or an empty array if the configuration
+     *                  is not based on files
      */
-    public function getDirectory() {
-        return $this->lastDirectory;
+    public function getMonitoredFiles() {
+        return $this->files;
     }
 
 
@@ -380,15 +375,16 @@ class Config extends Object implements ConfigInterface {
 
 
     /**
-     * {@inheritdoc}
+     * Return a dump with the preferences of the instance.
+     *
+     * @param  string $leftPad [optional] - string to use for left-padding the dump (default: empty string)
      *
      * @return string
      */
-    public function info() {
-        $lines[] = 'Application configuration:';
-        $lines[] = '--------------------------';
+    public function dump($leftPad = '') {
+        $lines = [];
         $maxKeyLength = 0;
-        $values = $this->dumpValues([], $this->properties, $maxKeyLength);
+        $values = $this->dumpNode([], $this->properties, $maxKeyLength);
         kSort($values);
 
         foreach ($values as $key => &$value) {
@@ -396,24 +392,20 @@ class Config extends Object implements ConfigInterface {
         }; unset($value);
         $lines += $values;
 
-        $lines[] = '';
-        $lines[] = '';
-        $lines[] = 'Configuration files:';
-        $lines[] = '--------------------';
-
-        foreach ($this->files as $file => $exists) {
-            $lines[] = ($exists ? 'OK':'? ').'   '.$file;
-        }
-        return join(NL, $lines);
+        return $leftPad.join(NL.$leftPad, $lines);
     }
 
 
     /**
      * Dump keys and values of the instance into a human-readable string and return it.
      *
+     * @param  array $node         [In]
+     * @param  array $values       [In]
+     * @param  int  &$maxKeyLength [Out]
+     *
      * @return string
      */
-    private function dumpValues($node, $values, &$maxKeyLength) {
+    private function dumpNode($node, $values, &$maxKeyLength) {
         $self   = __FUNCTION__;
         $result = [];
 

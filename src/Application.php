@@ -111,6 +111,11 @@ class Application extends Object {
 
         // (5) execute "config-info" task if enabled
         if ($configInfoTask) {
+            $configFiles = Config::getDefault()->getMonitoredFiles();
+            $files = [];
+            foreach ($configFiles as $file => $exists) {
+                $files[] = ($exists ? 'OK':'? ').'   '.$file;
+            }
             ?>
             <div align="left" style="clear:both;
                                      position:relative; z-index:65535; left:initial; top:initial;
@@ -118,7 +123,17 @@ class Application extends Object {
                                      margin:0; padding:4px;
                                      font:normal normal 12px/normal arial,helvetica,sans-serif;
                                      color:black; background-color:white">
-                <pre style="margin-bottom:24px"><?=print_r(Config::getDefault()->info(), true)?></pre>
+                <pre style="margin-bottom:24px"><?=
+                    'Application configuration files:'.NL
+                   .'--------------------------------'.NL
+                   .join(NL, $files)                  .NL
+                                                      .NL
+                                                      .NL
+                   .'Application configuration:'      .NL
+                   .'--------------------------'      .NL
+                   . print_r(Config::getDefault()->dump(), true)
+                   ?>
+                </pre>
             </div>
             <?php
             if (!$phpInfoTask && !$phpInfoAfterConfigTask)
@@ -216,8 +231,12 @@ class Application extends Object {
         else {
             $config = $options['app.config'];
             if (!$config instanceof IConfig) throw new IllegalTypeException('Illegal type of application option["app.config"]: '.getType($config));
-            if (!$config->get('app.dir.config', false))
-                $config->set('app.dir.config', $config->getDirectory());
+            if (!$config->get('app.dir.config', false)) {
+                $files = $config->getMonitoredFiles();
+                end($files);
+                list($file, $exists) = each($files);
+                $config->set('app.dir.config', dirName($file));
+            }
             unset($options['app.config']);
         }
 
