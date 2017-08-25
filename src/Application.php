@@ -131,7 +131,7 @@ class Application extends Object {
                                                       .NL
                    .'Application configuration:'      .NL
                    .'--------------------------'      .NL
-                   . print_r(Config::getDefault()->dump(), true)
+                   . print_r(Config::getDefault()->dump(['sort'=>SORT_ASC]), true)
                    ?>
                 </pre>
             </div>

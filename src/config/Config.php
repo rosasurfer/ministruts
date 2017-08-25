@@ -377,22 +377,34 @@ class Config extends Object implements ConfigInterface {
     /**
      * Return a dump with the preferences of the instance.
      *
-     * @param  string $leftPad [optional] - string to use for left-padding the dump (default: empty string)
-     *
+     * @param  array $options [optional] - array with optional dump options:
+     *                                     'sort'     => SORT_ASC|SORT_DESC (default: unsorted)
+     *                                     'pad-left' => string             (default: no padding)
      * @return string
      */
-    public function dump($leftPad = '') {
+    public function dump(array $options = null) {
         $lines = [];
         $maxKeyLength = 0;
         $values = $this->dumpNode([], $this->properties, $maxKeyLength);
-        kSort($values);
+
+        if (isSet($options['sort'])) {
+            if ($options['sort'] == SORT_ASC) {
+                kSort($values);
+            }
+            else if ($options['sort'] == SORT_DESC) {
+                kSort($values);
+                $values = array_reverse($values, true);
+            }
+        }
 
         foreach ($values as $key => &$value) {
             $value = str_pad($key, $maxKeyLength, ' ', STR_PAD_RIGHT).' = '.$value;
         }; unset($value);
         $lines += $values;
 
-        return $leftPad.join(NL.$leftPad, $lines);
+        $padLeft = isSet($options['pad-left']) ? $options['pad-left'] : '';
+
+        return $padLeft.join(NL.$padLeft, $lines);
     }
 
 

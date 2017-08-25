@@ -64,9 +64,10 @@ interface ConfigInterface extends \ArrayAccess {
     /**
      * Return a dump with the preferences of the instance.
      *
-     * @param  string $leftPad [optional] - string to use for left-padding the dump (default: empty string)
-     *
+     * @param  array $options [optional] - array with optional dump options:
+     *                                     'sort'     => SORT_ASC|SORT_DESC (default: unsorted)
+     *                                     'pad-left' => string             (default: no padding)
      * @return string
      */
-    public function dump($leftPad = '');
+    public function dump(array $options = null);
 }
