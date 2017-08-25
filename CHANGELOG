@@ -1,4 +1,9 @@
 
+2017-08-25
+
+   - config: config/ConfigInterface::dump() supports sort options  
+
+
 2017-08-24
 
    - config: add config/ConfigInterface::getMonitoredFiles()
