@@ -27,17 +27,23 @@ interface ConfigInterface extends \ArrayAccess {
      * Return the config setting with the specified key as a boolean. Accepted boolean value representations are "1" and "0",
      * "true" and "false", "on" and "off", "yes" and "no" (case-insensitive).
      *
-     * @param  string $key                - case-insensitive key
-     * @param  array  $options [optional] - associative array of options of <tt>filter_var($var, FILTER_VALIDATE_BOOLEAN)</tt> <br>
-     *                'flags'   => FILTER_NULL_ON_FAILURE: return NULL instead of FALSE on failure <br>
-     *                'default' => bool:                   default value to return if the setting is not found <br>
-     *
+     * @param  string         $key                - case-insensitive key
+     * @param  bool|int|array $options [optional] - additional options as supported by <tt>filter_var($var, FILTER_VALIDATE_BOOLEAN)</tt>, <br>
+     *                                              may be any of: <br>
+     *                   bool $default            - default value to return if the setting is not found <br>
+     *                   int  $flags              - flags as supported by <tt>filter_var($var, FILTER_VALIDATE_BOOLEAN)</tt>: <br>
+     *                                              FILTER_NULL_ON_FAILURE - return NULL instead of FALSE on failure <br>
+     *                  array $options            - multiple options are passed as elements of an array: <br>
+     *                                              <tt>$options[              <br>
+     *                                                  'default' => $default, <br>
+     *                                                  'flags'   => $flags    <br>
+     *                                              ]</tt>                     <br>
      * @return bool|null - boolean value or NULL if the flag FILTER_NULL_ON_FAILURE is set and the setting does not represent
      *                     a boolean value
      *
-     * @throws RuntimeException if the setting is not found and $options['default'] was not specified
+     * @throws RuntimeException if the setting is not found and $default was not specified
      */
-    public function getBool($key, array $options = []);
+    public function getBool($key, $options = null);
 
 
     /**

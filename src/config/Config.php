@@ -156,27 +156,45 @@ class Config extends Object implements ConfigInterface {
      * Return the config setting with the specified key as a boolean. Accepted boolean value representations are "1" and "0",
      * "true" and "false", "on" and "off", "yes" and "no" (case-insensitive).
      *
-     * @param  string $key                - case-insensitive key
-     * @param  array  $options [optional] - associative array of options of <tt>filter_var($var, FILTER_VALIDATE_BOOLEAN)</tt> <br>
-     *                'flags'   => FILTER_NULL_ON_FAILURE: return NULL instead of FALSE on failure <br>
-     *                'default' => bool:                   default value to return if the setting is not found <br>
-     *
+     * @param  string         $key                - case-insensitive key
+     * @param  bool|int|array $options [optional] - additional options as supported by <tt>filter_var($var, FILTER_VALIDATE_BOOLEAN)</tt>, <br>
+     *                                              may be any of: <br>
+     *                   bool $default            - default value to return if the setting is not found <br>
+     *                   int  $flags              - flags as supported by <tt>filter_var($var, FILTER_VALIDATE_BOOLEAN)</tt>: <br>
+     *                                              FILTER_NULL_ON_FAILURE - return NULL instead of FALSE on failure <br>
+     *                  array $options            - multiple options are passed as elements of an array: <br>
+     *                                              <tt>$options[              <br>
+     *                                                  'default' => $default, <br>
+     *                                                  'flags'   => $flags    <br>
+     *                                              ]</tt>                     <br>
      * @return bool|null - boolean value or NULL if the flag FILTER_NULL_ON_FAILURE is set and the setting does not represent
      *                     a boolean value
+     *
+     * @throws RuntimeException if the setting is not found and $default was not specified
      */
-    public function getBool($key, array $options = []) {
+    public function getBool($key, $options = null) {
         if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
 
         $value = $this->getProperty($key);
 
         if ($value === null) {
-            if (!array_key_exists('default', $options)) throw new RuntimeException('No configuration found for key "'.$key.'"');
-            if (!is_bool($options['default']))          throw new IllegalTypeException('Illegal type of option "default": '.getType($options['default']));
-            return $options['default'];
+            if (is_bool($options))
+                return $options;
+            if (is_array($options) && array_key_exists('default', $options)) {
+                if (!is_bool($options['default'])) throw new IllegalTypeException('Illegal type of option "default": '.getType($options['default']));
+                return $options['default'];
+            }
+            throw new RuntimeException('No configuration found for key "'.$key.'"');
         }
 
-        $flags = array_key_exists('flags', $options) ? (int) $options['flags'] : 0;
-
+        $flags = 0;
+        if (is_int($options)) {
+            $flags = $options;
+        }
+        else if (is_array($options) && array_key_exists('flags', $options)) {
+            if (!is_int($options['flags'])) throw new IllegalTypeException('Illegal type of option "flags": '.getType($options['flags']));
+            $flags = $options['flags'];
+        }
         if ($flags & FILTER_NULL_ON_FAILURE && $value==='')         // crappy PHP considers '' as a valid strict boolean
             return null;
         return filter_var($value, FILTER_VALIDATE_BOOLEAN, $flags);
