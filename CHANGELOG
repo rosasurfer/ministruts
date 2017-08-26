@@ -1,4 +1,9 @@
 
+2017-08-26
+
+   - struts: ActionForward support for <forward name="..." alias="self">  
+
+
 2017-08-25
 
    - config: config/ConfigInterface::dump() supports sort options  
