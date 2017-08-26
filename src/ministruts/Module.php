@@ -13,6 +13,7 @@ use function rosasurfer\strEndsWith;
 use function rosasurfer\strLeft;
 use function rosasurfer\strLeftTo;
 use function rosasurfer\strStartsWith;
+use function rosasurfer\strCompareI;
 
 
 /**
@@ -453,6 +454,7 @@ class Module extends Object {
 
             foreach ($subElements as $forwardTag) {
                 $name = (string) $forwardTag['name'];
+                if (strCompareI($name, ActionForward::SELF)) throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'"> <forward name="'.$name.'": Can not use reserved name "'.$name.'".');
 
                 $include  = isSet($forwardTag['include' ]) ? (string)$forwardTag['include' ] : null;
                 $redirect = isSet($forwardTag['redirect']) ? (string)$forwardTag['redirect'] : null;
@@ -483,23 +485,21 @@ class Module extends Object {
 
                     $forward = new $this->forwardClass($name, $redirect, true);     // TODO: URL validieren
                 }
-                $mapping->addForward($forward, $name);
+                $mapping->addForward($name, $forward);
             }
 
-            // local 'alias' forwards
+            // local 'alias' forwards (parsed after all other local forwards to be able to access them)
             $subElements = $tag->xPath('./forward[@alias]') ?: [];
 
             foreach ($subElements as $forwardTag) {
                 $name  = (string) $forwardTag['name' ];
                 $alias = (string) $forwardTag['alias'];
-
                 if (isSet($forwardTag['include' ]) || isSet($forwardTag['redirect' ])) throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'"> <forward name="'.$name.'": Only one of "include", "redirect" or "alias" can be specified.');
-                if ($alias == ActionForward::__SELF)                                   throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'"> <forward name="'.$name.'" alias="'.$alias.'": Can not use reserved word "'.$alias.'" as attribute value.');
 
                 $forward = $mapping->findForward($alias);
                 if (!$forward) throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'"> <forward name="'.$name.'" alias="'.$alias.'": Alias forward not found');
 
-                $mapping->addForward($forward, $name);
+                $mapping->addForward($name, $forward);
             }
 
             // done

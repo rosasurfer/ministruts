@@ -6,7 +6,8 @@ use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\log\Logger;
 
-use function rosasurfer\strStartsWith;
+use function rosasurfer\strCompareI;
+use function rosasurfer\strLeftTo;
 
 use const rosasurfer\L_WARN;
 
@@ -87,11 +88,10 @@ class ActionMapping extends Object {
      * @throws StrutsConfigException on configuration errors
      */
     public function setName($name) {
-        if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-        $sPath = $this->path ? ' path="'.$this->path.'"':'';
-        $_name = trim($name);
-        if (!strLen($_name)) throw new StrutsConfigException('<mapping name="'.$name.'"'.$sPath.': Illegal name (empty value).');
-        $this->name = $_name;
+        if ($this->configured)          throw new IllegalStateException('Configuration is frozen');
+        if (!strLen($name=trim($name))) throw new StrutsConfigException('<mapping name="'.func_get_arg(0).'"'.($this->path ? ' path="'.$this->path.'"':'').': Illegal name (empty value).');
+
+        $this->name = $name;
         return $this;
     }
 
@@ -116,9 +116,9 @@ class ActionMapping extends Object {
      * @throws StrutsConfigException on configuration errors
      */
     public function setPath($path) {
-        if ($this->configured)          throw new IllegalStateException('Configuration is frozen');
-        $sName = $this->name ? ' name="'.$this->name.'"':'';
-        if (!strStartsWith($path, '/')) throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'": Illegal path (value must start with a slash "/").');
+        if ($this->configured) throw new IllegalStateException('Configuration is frozen');
+        if ($path[0] != '/')   throw new StrutsConfigException('<mapping'.($this->name ? ' name="'.$this->name.'"':'').' path="'.$path.'": Illegal path (value must start with a slash "/").');
+
         $this->path = $path;
         return $this;
     }
@@ -158,13 +158,13 @@ class ActionMapping extends Object {
      */
     public function setMethod($method) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-        $sName = $this->name ? ' name="'.$this->name.'"':'';
-        $sPath = $this->path ? ' path="'.$this->path.'"':'';
+        $name = $this->name ? ' name="'.$this->name.'"':'';
+        $path = $this->path ? ' path="'.$this->path.'"':'';
 
-        $_method = strToUpper($method);
-        if ($_method!='GET' && $_method!='POST') throw new StrutsConfigException('<mapping'.$sName.''.$sPath.' http-methods="'.$method.'":  Invalid HTTP method.');
+        $method = strToUpper($method);
+        if ($method!='GET' && $method!='POST') throw new StrutsConfigException('<mapping'.$name.''.$path.' http-methods="'.func_get_arg(0).'":  Invalid HTTP method.');
 
-        $this->methods[$_method] = true;
+        $this->methods[$method] = true;
         return $this;
     }
 
@@ -190,19 +190,19 @@ class ActionMapping extends Object {
      */
     public function setRoles($roles) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-        $sName = $this->name ? ' name="'.$this->name.'"':'';
-        $sPath = $this->path ? ' path="'.$this->path.'"':'';
+        $name = $this->name ? ' name="'.$this->name.'"':'';
+        $path = $this->path ? ' path="'.$this->path.'"':'';
 
         //static $pattern = '/^!?[A-Za-z_][A-Za-z0-9_]*(,!?[A-Za-z_][A-Za-z0-9_]*)*$/';
         static $pattern = '/^!?[A-Za-z_][A-Za-z0-9_]*$/';
-        if (!strLen($roles) || !preg_match($pattern, $roles)) throw new StrutsConfigException('<mapping'.$sName.$sPath.' roles="'.$roles.'": Invalid roles expression.');
+        if (!strLen($roles) || !preg_match($pattern, $roles)) throw new StrutsConfigException('<mapping'.$name.$path.' roles="'.$roles.'": Invalid roles expression.');
 
         // check for invalid id combinations, e.g. "Member,!Member"
         $tokens = explode(',', $roles);
         $keys = array_flip($tokens);
 
         foreach ($tokens as $role) {
-            if (isSet($keys['!'.$role])) throw new StrutsConfigException('<mapping'.$sName.$sPath.' roles="'.$roles.'": Invalid roles expression.');
+            if (isSet($keys['!'.$role])) throw new StrutsConfigException('<mapping'.$name.$path.' roles="'.$roles.'": Invalid roles expression.');
         }
 
         // remove duplicates
@@ -222,10 +222,10 @@ class ActionMapping extends Object {
      */
     public function setForward(ActionForward $forward) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-        $sName = $this->name ? ' name="'.$this->name.'"':'';
-        $sPath = $this->path ? ' path="'.$this->path.'"':'';
+        $name = $this->name ? ' name="'.$this->name.'"':'';
+        $path = $this->path ? ' path="'.$this->path.'"':'';
 
-        if ($this->actionClassName) throw new StrutsConfigException('<mapping'.$sName.$sPath.': Only one of "action", "include", "forward" or "redirect" can be specified.');
+        if ($this->actionClassName) throw new StrutsConfigException('<mapping'.$name.$path.': Only one of "action", "include", "forward" or "redirect" can be specified.');
 
         $this->forward = $forward;
         return $this;
@@ -253,11 +253,11 @@ class ActionMapping extends Object {
      */
     public function setActionClassName($className) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-        $sName = $this->name ? ' name="'.$this->name.'"':'';
-        $sPath = $this->path ? ' path="'.$this->path.'"':'';
+        $name = $this->name ? ' name="'.$this->name.'"':'';
+        $path = $this->path ? ' path="'.$this->path.'"':'';
 
-        if (!is_subclass_of($className, ACTION_BASE_CLASS)) throw new StrutsConfigException('<mapping'.$sName.$sPath.' action="'.$className.'": Not a subclass of '.ACTION_BASE_CLASS.'.');
-        if ($this->forward)                                 throw new StrutsConfigException('<mapping'.$sName.$sPath.': Only one of "action", "include", "forward" or "redirect" can be specified.');
+        if (!is_subclass_of($className, ACTION_BASE_CLASS)) throw new StrutsConfigException('<mapping'.$name.$path.' action="'.$className.'": Not a subclass of '.ACTION_BASE_CLASS.'.');
+        if ($this->forward)                                 throw new StrutsConfigException('<mapping'.$name.$path.': Only one of "action", "include", "forward" or "redirect" can be specified.');
 
         $this->actionClassName = $className;
         return $this;
@@ -285,10 +285,10 @@ class ActionMapping extends Object {
      */
     public function setFormClassName($className) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-        $sName = $this->name ? ' name="'.$this->name.'"':'';
-        $sPath = $this->path ? ' path="'.$this->path.'"':'';
+        $name = $this->name ? ' name="'.$this->name.'"':'';
+        $path = $this->path ? ' path="'.$this->path.'"':'';
 
-        if (!is_subclass_of($className, ACTION_FORM_BASE_CLASS)) throw new StrutsConfigException('<mapping'.$sName.$sPath.' form="'.$className.'": Not a subclass of '.ACTION_FORM_BASE_CLASS.'.');
+        if (!is_subclass_of($className, ACTION_FORM_BASE_CLASS)) throw new StrutsConfigException('<mapping'.$name.$path.' form="'.$className.'": Not a subclass of '.ACTION_FORM_BASE_CLASS.'.');
 
         $this->formClassName = $className;
         return $this;
@@ -317,10 +317,10 @@ class ActionMapping extends Object {
      */
     public function setFormScope($value) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-        $sName = $this->name ? ' name="'.$this->name.'"':'';
-        $sPath = $this->path ? ' path="'.$this->path.'"':'';
+        $name = $this->name ? ' name="'.$this->name.'"':'';
+        $path = $this->path ? ' path="'.$this->path.'"':'';
 
-        if ($value!='request' && $value!='session') throw new StrutsConfigException('<mapping'.$sName.$sPath.' form-scope="'.$value.'": Invalid form scope.');
+        if ($value!='request' && $value!='session') throw new StrutsConfigException('<mapping'.$name.$path.' form-scope="'.$value.'": Invalid form scope.');
 
         $this->formScope = $value;
         return $this;
@@ -413,20 +413,20 @@ class ActionMapping extends Object {
     /**
      * Add an {@ActionForward} accessible under the specified name to the mapping.
      *
+     * @param  string        $name    - access identifier (may differ from the forward's name)
      * @param  ActionForward $forward
-     * @param  string        $alias [optional] - alias name of the forward
      *
      * @return $this
      *
      * @throws StrutsConfigException on configuration errors
      */
-    public function addForward(ActionForward $forward, $alias = null) {
+    public function addForward($name, ActionForward $forward) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-        $sName = $this->name ? ' name="'.$this->name.'"':'';
-        $sPath = $this->path ? ' path="'.$this->path.'"':'';
+        $mName = $this->name ? ' name="'.$this->name.'"':'';
+        $mPath = $this->path ? ' path="'.$this->path.'"':'';
+        $mapping = $mName.$mPath;
 
-        $name = is_null($alias) ? $forward->getName() : $alias;
-        if (isSet($this->forwards[$name])) throw new StrutsConfigException('<mapping'.$sName.$sPath.'> <forward name="'.$name.'": Non-unique forward name.');
+        if (isSet($this->forwards[$name])) throw new StrutsConfigException('<mapping'.$mapping.'> <forward name="'.$name.'": Non-unique forward identifier.');
 
         $this->forwards[$name] = $forward;
         return $this;
@@ -442,21 +442,22 @@ class ActionMapping extends Object {
      */
     public function freeze() {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-        $sName = $this->name ? ' name="'.$this->name.'"':'';
-        $sPath = $this->path ? ' path="'.$this->path.'"':'';
+        $name    = $this->name ? ' name="'.$this->name.'"':'';
+        $path    = $this->path ? ' path="'.$this->path.'"':'';
+        $mapping = $name.$path;
 
-        if (!$this->path)                                           throw new StrutsConfigException('<mapping'.$sName.$sPath.': A "path" attribute must be configured for '.$this);
-        if (!$this->formClassName && $this->formValidateFirst)      throw new StrutsConfigException('<mapping'.$sName.$sPath.': A form must be configured if "form-validate-first" is set to "true".');
+        if (!$this->path)                                           throw new StrutsConfigException('<mapping'.$mapping.': A "path" attribute must be configured for '.$this);
+        if (!$this->formClassName && $this->formValidateFirst)      throw new StrutsConfigException('<mapping'.$mapping.': A form must be configured if "form-validate-first" is set to "true".');
 
         if (!$this->actionClassName && !$this->forward) {
-            if (!$this->formClassName || !$this->formValidateFirst) throw new StrutsConfigException('<mapping'.$sName.$sPath.': Either an "action", "include", "forward" or "redirect" attribute must be specified.');
+            if (!$this->formClassName || !$this->formValidateFirst) throw new StrutsConfigException('<mapping'.$mapping.': Either an "action", "include", "forward" or "redirect" attribute must be specified.');
 
             if (!$this->formClassName || !$this->formValidateFirst) {
-                throw new StrutsConfigException('<mapping'.$sName.$sPath.': Either an "action", "include", "forward" or "redirect" attribute must be specified.');
+                throw new StrutsConfigException('<mapping'.$mapping.': Either an "action", "include", "forward" or "redirect" attribute must be specified.');
             }
             elseif ($this->formClassName && $this->formValidateFirst) {
                 if (!isSet($this->forwards[ActionForward::VALIDATION_SUCCESS_KEY]) || !isSet($this->forwards[ActionForward::VALIDATION_ERROR_KEY]))
-                    throw new StrutsConfigException('<mapping'.$sName.$sPath.' form="'.$this->formClassName.'": A "success" and "error" forward must be configured to validate the form.');
+                    throw new StrutsConfigException('<mapping'.$mapping.' form="'.$this->formClassName.'": A "success" and "error" forward must be configured to validate the form.');
             }
         }
 
@@ -469,33 +470,38 @@ class ActionMapping extends Object {
      * Lookup and return the {@ActionForward} accessible under the specified name. First the lookup tries to find a local
      * forward of the given name. If no local forward is found global forwards are checked.
      *
-     * @param  string $name - logical name; can be "__self" to return a redirect forward to the mapping itself
+     * @param  string $name - logical name; can be "self" to return a redirect forward to the mapping itself
      *
      * @return ActionForward|null - ActionForward or NULL if neither a local nor a global forward was found
      */
     public function findForward($name) {
-        if (isSet($this->forwards[$name]))
-            return $this->forwards[$name];
+        /** @var ActionForward $forward */
+        $forward = null;
 
-        if ($name === ActionForward::__SELF) {
-            $url = $this->path;
-
-            $query = Request::me()->getQueryString();
-            if (strLen($query))
-                $url .= '?'.$query;
-
-            $class = $this->module->getForwardClass();
-
-            /** ActionForward $forward */
-            $forward = new $class($name, $url, true);
+        if (isSet($this->forwards[$name])) {
+            $forward = $this->forwards[$name];
+        }
+        else if (strCompareI($name, ActionForward::SELF)) {
+            $name    = ActionForward::SELF;
+            $path    = $this->path;
+            $class   = $this->module->getForwardClass();
+            $forward = new $class($name, $path, true);
+        }
+        else {
+            $forward = $this->module->findForward($name);
+            if (!$forward && $this->configured) Logger::log('No ActionForward found for name "'.$name.'"', L_WARN);
             return $forward;
         }
 
-        $forward = $this->module->findForward($name);
-
-        if ($this->configured && !$forward)
-            Logger::log('No ActionForward found for name "'.$name.'"', L_WARN);
-
+        if ($forward->getName() == ActionForward::SELF) {
+            if ($this->configured) {                        // runtime: set the current request's query string
+                $path  = $this->path;
+                $query = Request::me()->getQueryString();
+                if (strLen($query))
+                    $path = strLeftTo($path, '?').'?'.$query;
+                $forward->setPath($path);
+            }
+        }
         return $forward;
     }
 }

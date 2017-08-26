@@ -10,7 +10,7 @@ use rosasurfer\exception\InvalidArgumentException;
  * ActionForward
  *
  * An ActionForward describes a target a request is forwarded to after processing. It has a logical name (for identification)
- * and points either to a physical resource (file, layout template) or to a URL.
+ * and points either to a physical resource (file, layout template) or to a URI.
  */
 class ActionForward extends Object {
 
@@ -22,7 +22,7 @@ class ActionForward extends Object {
     const VALIDATION_ERROR_KEY   = 'error';
 
     /** @var string - reserved identifier for looking up a forward to the currently used ActionMapping */
-    const __SELF = '__self';
+    const SELF = 'self';
 
     /** @var string */
     protected $name;
@@ -171,10 +171,9 @@ class ActionForward extends Object {
         $value = (string) $value;
 
         // TODO: extend to process multiple parameters at once
-
-        $separator = (strPos($this->path, '?')!==false) ? '&' : '?';
-
-        $this->path .= $separator.$key.'='.str_replace(array(' ', '#', '&'), array('%20', '%23', '%26'), $value);
+        $path      = $this->getPath();
+        $separator = (strPos($path, '?')!==false) ? '&' : '?';
+        $this->setPath($path.$separator.$key.'='.str_replace([' ','#','&'], ['%20','%23','%26'], $value));
 
         return $this;
     }
