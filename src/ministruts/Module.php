@@ -131,7 +131,7 @@ class Module extends Object {
         $content = substr_replace($content, $replace, $offset, strLen($search));
 
         // Konfiguration parsen und validieren
-        return new \SimpleXMLElement($content, LIBXML_DTDVALID);
+        return new \SimpleXMLElement($content, LIBXML_DTDVALID|LIBXML_NONET);
     }
 
 
