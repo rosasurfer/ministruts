@@ -475,7 +475,6 @@ class ActionMapping extends Object {
      * @return ActionForward|null - ActionForward or NULL if neither a local nor a global forward was found
      */
     public function findForward($name) {
-        /** @var ActionForward $forward */
         $forward = null;
 
         if (isSet($this->forwards[$name])) {
@@ -485,6 +484,7 @@ class ActionMapping extends Object {
             $name    = ActionForward::SELF;
             $path    = $this->path;
             $class   = $this->module->getForwardClass();
+            /** @var ActionForward $forward */
             $forward = new $class($name, $path, true);
         }
         else {
