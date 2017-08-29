@@ -38,13 +38,13 @@ use const rosasurfer\NL;
  * log.level.foo\bar\MyClass = notice           # subkeys may contain any character except the dot "."
  *
  * key.subkey with spaces    = value            # subkeys may contain spaces...
- * key.   indented.subkey    = value            # ...but enclosing white space around subkeys is ignored
+ * key.   indented.subkey    = value            # ...but enclosing white space is ignored
  * key."a.subkey.with.dots"  = value            # quoted subkeys can contain otherwise illegal key characters
  *
  * &lt;?php
- * Config::get('db.connector')          // return a single value
- * Config::get('db')                    // return an associative indexed array of values ['connector'=>..., 'host'=>..., ...]
- * Config::get('db.options')            // return a numerical indexed array of values    [0=>..., 1=>..., 2=>...]
+ * Config::get('db.connector')                  // return a single value
+ * Config::get('db')                            // return an associative array of values ['connector'=>..., 'host'=>...]
+ * Config::get('db.options')                    // return a numerical indexed array of values [0=>..., 1=>..., 2=>...]
  * </pre>
  */
 class Config extends Object implements ConfigInterface {
@@ -275,7 +275,7 @@ class Config extends Object implements ConfigInterface {
                         $properties[$subkey] = [$value];                    // create a new array value
                     }
                     else {
-                        if (is_string($properties[$subkey]))                // make the string the array default value
+                        if (!is_array($properties[$subkey]))                // make the existing value the array default value
                             $properties[$subkey] = ['' => $properties[$subkey]];
                         $properties[$subkey][] = $value;                    // add an array value
                     }
@@ -285,20 +285,19 @@ class Config extends Object implements ConfigInterface {
                     if (!isSet($properties[$subkey])) {
                         $properties[$subkey] = $value;                      // store the value regularily
                     }
-                    elseif (is_string($properties[$subkey])) {
-                        $properties[$subkey] = $value;                      // override the existing string value
+                    else if (!is_array($properties[$subkey])) {
+                        $properties[$subkey] = $value;                      // override the existing value
+                    }
+
+                    // modification of an array value
+                    else if ($value === null) {
+                        $properties[$subkey] = $value;                      // set the array to NULL, don't remove the key
+                    }
+                    else if (is_array($value)) {
+                        $properties[$subkey] = $value;                      // replace the array
                     }
                     else {
-                        // modification of an array value
-                        if ($value === null) {                              // set the array to NULL, don't remove the key
-                            $properties[$subkey] = $value;
-                        }
-                        else if (is_array($value)) {
-                            $properties[$subkey] = $value;                  // replace the array
-                        }
-                        else {
-                            $properties[$subkey][''] = $value;              // set/override the array default value
-                        }
+                        $properties[$subkey][''] = $value;                  // set/override the array default value
                     }
                 }
             }
@@ -435,12 +434,18 @@ class Config extends Object implements ConfigInterface {
      *
      * @return string[]
      */
-    private function dumpNode($node, $values, &$maxKeyLength) {
+    private function dumpNode(array $node, array $values, &$maxKeyLength) {
         $self   = __FUNCTION__;
         $result = [];
 
         foreach ($values as $subkey => $value) {
-            $key          = join('.', array_merge($node, [$subkey]));
+            if ($subkey==trim($subkey) && (strLen($subkey) || sizeof($values) > 1)) {
+                $sSubkey = $subkey;
+            }
+            else {
+                $sSubkey = '"'.$subkey.'"';
+            }
+            $key          = join('.', array_merge($node, $sSubkey=='' ? [] : [$sSubkey]));
             $maxKeyLength = max(strLen($key), $maxKeyLength);
 
             if (is_array($value)) {
