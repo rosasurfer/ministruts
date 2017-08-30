@@ -40,6 +40,7 @@ use const rosasurfer\NL;
  * key.subkey with spaces    = value            # subkeys may contain spaces...
  * key.   indented.subkey    = value            # ...but enclosing white space is ignored
  * key."a.subkey.with.dots"  = value            # quoted subkeys can contain otherwise illegal key characters
+ * key                       = value            # the root value of an array is accessed with an empty subkey: key.""
  *
  * &lt;?php
  * Config::get('db.connector')                  // return a single value
@@ -230,7 +231,7 @@ class Config extends Object implements ConfigInterface {
 
         for ($i=0; $i < $subKeysSize; ++$i) {
             $subkey = trim($subkeys[$i]);
-            if (!is_array($properties) || !isSet($properties[$subkey]))
+            if (!isSet($properties[$subkey]))
                 break;                                      // not found
             if ($i+1 == $subKeysSize)                       // return at the last subkey
                 return $properties[$subkey];
@@ -263,7 +264,7 @@ class Config extends Object implements ConfigInterface {
                 }
                 elseif (!is_array($properties[$subkey])) {
                     $properties[$subkey] = ['' => $properties[$subkey]];    // create another array level and keep the
-                }                                                           // existing non-array value   TODO: how to access?
+                }                                                           // existing non-array value
                 $properties = &$properties[$subkey];                        // reference the new array level
             }
             else {
