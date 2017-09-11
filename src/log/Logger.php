@@ -705,7 +705,7 @@ class Logger extends StaticClass {
         $line = $context['line'];
 
         // break out of unfortunate HTML tags
-        $html   = '<a attr1="" attr2=\'\'></a></script></img></select></textarea></li></ul></font></pre></tt></code></i></b></span></div>';
+        $html   = '<a attr1="" attr2=\'\'></a></meta></title></head></script></img></select></textarea></li></ul></font></pre></tt></code></i></b></span></div>';
         $html  .= '<div align="left" style="clear:both;
                                             position:relative; z-index:65535; left:initial; top:initial;
                                             float:left; width:initial; height:initial
