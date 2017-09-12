@@ -275,6 +275,10 @@ class Tile extends Object {
  * @param  array  $values - values accessible to the view
  */
 function includeFile(/*$file, $values*/) {
-    extract(func_get_args()[1]);
+    foreach (func_get_args()[1] as $__key__ => $__value__) {    // We can't use extract() as it skips variables with
+        $$__key__ = $__value__;                                 // irregular names (e.g. with dots).
+    };                                                          // Surprisingly foreach is even faster.
+    unset($__key__, $__value__);
+
     include(func_get_args()[0]);
 }
