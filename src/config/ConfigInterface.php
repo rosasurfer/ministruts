@@ -70,9 +70,9 @@ interface ConfigInterface extends \ArrayAccess {
     /**
      * Return a dump with the preferences of the instance.
      *
-     * @param  array $options [optional] - array with optional dump options:
-     *                                     'sort'     => SORT_ASC|SORT_DESC (default: unsorted)
-     *                                     'pad-left' => string             (default: no padding)
+     * @param  array $options [optional] - array with optional dump options: <br>
+     *                                     'sort'     => SORT_ASC|SORT_DESC (default: unsorted) <br>
+     *                                     'pad-left' => string             (default: no padding) <br>
      * @return string
      */
     public function dump(array $options = null);
