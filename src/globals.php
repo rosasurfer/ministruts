@@ -118,6 +118,16 @@ function echoPre($var, $flushBuffers = true) {
 
 
 /**
+ * Print a message to STDERR.
+ *
+ * @param  string $message
+ */
+function stderror($message) {
+    \rosasurfer\stderror($message);
+}
+
+
+/**
  * Alias of {@link printPretty()}
  *
  * Prints a variable in a pretty way. Output always ends with a line feed.

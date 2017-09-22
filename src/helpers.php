@@ -144,6 +144,16 @@ function echoPre($var, $flushBuffers=true) {
 
 
 /**
+ * Print a message to STDERR.
+ *
+ * @param  string $message
+ */
+function stderror($message) {
+    fWrite(STDERR, $message.NL);
+}
+
+
+/**
  * Alias of printPretty()
  *
  * Prints a variable in a pretty way. Output always ends with a line feed.

@@ -384,11 +384,6 @@ namespace rosasurfer\bin\check_ip {
 namespace rosasurfer\cron\logwatch {
 
     /**
-     * @param  string $message
-     */
-    function error($message) {}
-
-    /**
      * @param  string $message [optional]
      */
     function help($message = null) {}
