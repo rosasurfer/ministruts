@@ -1,4 +1,9 @@
 
+2017-09-22
+
+   - util: new helper function stderror($message)  
+
+
 2017-08-26
 
    - struts: ActionForward support for <forward name="..." alias="self">  
