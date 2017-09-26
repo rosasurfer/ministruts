@@ -503,8 +503,9 @@ PROCESS_METHOD_ERROR_SC_405;
 
             if (!$tile) {
                 // $path ist ein Dateiname, generische Tile erzeugen
-                $class = $module->getTilesClass();
-                $tile = new $class($this->module);
+                $tilesClass = $module->getTilesClass();
+                /** @var Tile $tile */
+                $tile = new $tilesClass($this->module);
                 $tile->setName(Tile::GENERIC_NAME)
                      ->setFileName($path)
                      ->freeze();

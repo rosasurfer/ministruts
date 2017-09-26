@@ -9,6 +9,8 @@ use rosasurfer\exception\IllegalStateException;
 use function rosasurfer\strLeft;
 use function rosasurfer\strRightFrom;
 
+use const rosasurfer\NL;
+
 
 /**
  * Tile
@@ -51,7 +53,7 @@ class Tile extends Object {
      * Constructor
      *
      * @param  Module $module            - Module, zu dem diese Tile gehoert
-     * @param  Tile   $parent [optional] - (Parent-)Instanz der neuen (verschachtelten) Instanz
+     * @param  Tile   $parent [optional] - die umgebende Instanz der Tile
      */
     public function __construct(Module $module, Tile $parent = null) {
         $this->module = $module;
@@ -80,6 +82,20 @@ class Tile extends Object {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
         $this->name = $name;
+        return $this;
+    }
+
+
+    /**
+     * Set the parent of this Tile. Called before rendering as a tile can have different parents if re-used in multiple
+     * places.
+     *
+     * @param  self $parent
+     *
+     * @return $this
+     */
+    public function setParent(self $parent) {
+        $this->parent = $parent;
         return $this;
     }
 
@@ -223,8 +239,12 @@ class Tile extends Object {
         $request     = Request::me();
         $namespace   = $this->module->getViewNamespace();
         $properties  = $this->getMergedProperties();
-        $nestedTiles = $this->nestedTiles;
         $appUri      = $request->getApplicationBaseUri();
+        $nestedTiles = $this->nestedTiles;
+
+        foreach ($nestedTiles as $tile) {
+            $tile->setParent($this);
+        }
 
         if (!defined($namespace.'APP')) {
             define($namespace.'APP', strLeft($appUri, -1));
@@ -246,7 +266,7 @@ class Tile extends Object {
         }
 
         $tileHint = false;
-        if ($this->parent && Application::isWhiteListedRemoteIP()) {
+        if (Application::isWhiteListedRemoteIP()) {
             $rootDir = Config::getDefault()->get('app.dir.root');
             $file    = $this->fileName;
             $file    = strRightFrom($file, $rootDir.DIRECTORY_SEPARATOR, 1, false, $file);
@@ -254,13 +274,13 @@ class Tile extends Object {
 
             if ($this->name == self::GENERIC_NAME) $tileHint = $file;
             else                                   $tileHint = $this->name.' ('.$file.')';
-            echo "\n<!-- #begin: ".$tileHint." -->\n";
+            echo NL.'<!-- #begin: '.$tileHint.' -->'.NL;
         }
 
         includeFile($this->fileName, $nestedTiles + $properties);
 
         if ($tileHint) {
-            echo "\n<!-- #end: ".$tileHint." -->\n";
+            echo NL.'<!-- #end: '.$tileHint.' -->'.NL;
         }
         return $this;
     }
