@@ -8,12 +8,12 @@ use rosasurfer\exception\IllegalTypeException;
 
 use function rosasurfer\is_class;
 use function rosasurfer\isRelativePath;
+use function rosasurfer\strCompareI;
 use function rosasurfer\strContains;
 use function rosasurfer\strEndsWith;
 use function rosasurfer\strLeft;
 use function rosasurfer\strLeftTo;
 use function rosasurfer\strStartsWith;
-use function rosasurfer\strCompareI;
 
 
 /**
@@ -258,7 +258,7 @@ class Module extends Object {
                 if (is_string($redirect) || is_string($alias)) throw new StrutsConfigException('<global-forwards> <forward name="'.$name.'": Only one of "include", "redirect" or "alias" can be specified.');
 
                 $this->tilesContext = [];
-                if (!$this->isIncludable($include, $xml)) throw new StrutsConfigException('<global-forwards> <forward name="'.$name.'" include="'.$include.'": '.($include[0]=='.' ? 'Tile definition':'File').' not found.');
+                if (!$this->isIncludable($include, $xml)) throw new StrutsConfigException('<global-forwards> <forward name="'.$name.'" include="'.$include.'": '.(strStartsWith($include, '.') ? 'Tile definition':'File').' not found.');
 
                 if ($this->isTileDefinition($include, $xml)) {
                     $tile = $this->getTile($include, $xml);
@@ -334,7 +334,7 @@ class Module extends Object {
 
                 $this->tilesContext = [];
                 $include = (string) $tag['include'];
-                if (!$this->isIncludable($include, $xml)) throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'" include="'.$include.'": '.($include[0]=='.' ? 'Tile definition':'File').' not found.');
+                if (!$this->isIncludable($include, $xml)) throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'" include="'.$include.'": '.(strStartsWith($include, '.') ? 'Tile definition':'File').' not found.');
 
                 /** @var ActionForward $forward */
                 $forward = null;
@@ -467,7 +467,7 @@ class Module extends Object {
                     if (is_string($redirect) || is_string($alias)) throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'"> <forward name="'.$name.'": Only one of "include", "redirect" or "alias" can be specified.');
 
                     $this->tilesContext = [];
-                    if (!$this->isIncludable($include, $xml)) throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'"> <forward name="'.$name.'" include="'.$include.'": '.($include[0]=='.' ? 'Tiles definition':'File').' not found.');
+                    if (!$this->isIncludable($include, $xml)) throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'"> <forward name="'.$name.'" include="'.$include.'": '.(strStartsWith($include, '.') ? 'Tiles definition':'File').' not found.');
 
                     if ($this->isTileDefinition($include, $xml)) {
                         $tile = $this->getTile($include, $xml);
@@ -658,7 +658,7 @@ class Module extends Object {
 
             if (isSet($tag['value'])) {                                 // 'value' specified
                 $value = (string) $tag['value'];
-                if (!$this->isIncludable($value, $xml)) throw new StrutsConfigException('<tile name="'.$tile->getName().'"> <include name="'.$name.'" value="'.$value.'": '.($value[0]=='.' ? 'Tile definition':'File').' not found.');
+                if (!$this->isIncludable($value, $xml)) throw new StrutsConfigException('<tile name="'.$tile->getName().'"> <include name="'.$name.'" value="'.$value.'": '.(strStartsWith($value, '.') ? 'Tile definition':'File').' not found.');
 
                 if ($this->isTileDefinition($value, $xml)) {
                     $nestedTile = $this->getTile($value, $xml);
