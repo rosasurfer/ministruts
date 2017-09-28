@@ -238,13 +238,12 @@ class Tile extends Object {
     public function render() {
         $request     = Request::me();
         $namespace   = $this->module->getViewNamespace();
-        $properties  = $this->getMergedProperties();
         $appUri      = $request->getApplicationBaseUri();
         $nestedTiles = $this->nestedTiles;
-
         foreach ($nestedTiles as $tile) {
             $tile->setParent($this);
         }
+        $properties  = $this->getMergedProperties();
 
         if (!defined($namespace.'APP')) {
             define($namespace.'APP', strLeft($appUri, -1));
@@ -267,14 +266,13 @@ class Tile extends Object {
 
         $tileHint = false;
         if (Application::isWhiteListedRemoteIP()) {
-            $rootDir = Config::getDefault()->get('app.dir.root');
-            $file    = $this->fileName;
-            $file    = strRightFrom($file, $rootDir.DIRECTORY_SEPARATOR, 1, false, $file);
-            $file    = str_replace('\\', '/', $file);
-
-            if ($this->name == self::GENERIC_NAME) $tileHint = $file;
-            else                                   $tileHint = $this->name.' ('.$file.')';
-            echo NL.'<!-- #begin: '.$tileHint.' -->'.NL;
+            $rootDir  = Config::getDefault()->get('app.dir.root');
+            $file     = $this->fileName;
+            $file     = strRightFrom($file, $rootDir.DIRECTORY_SEPARATOR, 1, false, $file);
+            $file     = 'file="'.str_replace('\\', '/', $file).'"';
+            $tile     = $this->name==self::GENERIC_NAME ? '':'tile="'.$this->name.'" ';
+            $tileHint = $tile.$file;
+            echo ($this->parent ? NL:'').'<!-- #begin: '.$tileHint.' -->'.NL;
         }
 
         includeFile($this->fileName, $nestedTiles + $properties);
