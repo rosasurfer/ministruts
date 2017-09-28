@@ -200,11 +200,12 @@ function printPretty($var, $return=false, $flushBuffers=true) {
     }
 
     if (!CLI)
-        $str = '<div align="left" style="clear:both;
-                                         position:relative; z-index:65535; left:initial; top:initial;
-                                         float:left; width:initial; height:initial;
-                                         margin:0; padding:0;
-                                         color:inherit; background-color:inherit">
+        $str = '<div align="left"
+                     style="display:initial; visibility:initial; clear:both;
+                     position:relative; z-index:65535; top:initial; left:initial;
+                     float:left; width:initial; height:initial;
+                     margin:0; padding:0;
+                     color:inherit; background-color:inherit">
                     <pre style="width:initial; height:initial;
                                 margin:0; padding:0;
                                 color:inherit; background-color:inherit;

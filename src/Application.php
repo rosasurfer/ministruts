@@ -117,8 +117,8 @@ class Application extends Object {
                 $files[] = ($exists ? 'OK':'? ').'   '.$file;
             }
             ?>
-            <div align="left" style="clear:both;
-                                     position:relative; z-index:65535; left:initial; top:initial;
+            <div align="left" style="display:initial; visibility:initial; clear:both;
+                                     position:relative; z-index:65535; top:initial; left:initial;
                                      width:initial; height:initial;
                                      margin:0; padding:4px;
                                      font:normal normal 12px/normal arial,helvetica,sans-serif;

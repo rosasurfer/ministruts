@@ -302,8 +302,8 @@ class PHP extends StaticClass {
         // (9) break out of unfortunate HTML tags and show results followed by phpInfo()
         if (!CLI) {
             ?>
-            <div align="left" style="clear:both;
-                                     position:relative; z-index:65535; left:initial; top:initial;
+            <div align="left" style="display:initial; visibility:initial; clear:both;
+                                     position:relative; z-index:65535; top:initial; left:initial;
                                      width:initial; height:initial;
                                      margin:0; padding:4px;
                                      font:normal normal 12px/normal arial,helvetica,sans-serif;

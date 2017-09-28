@@ -706,12 +706,14 @@ class Logger extends StaticClass {
 
         // break out of unfortunate HTML tags
         $html   = '<a attr1="" attr2=\'\'></a></meta></title></head></script></img></select></textarea></li></ul></font></pre></tt></code></i></b></span></div>';
-        $html  .= '<div align="left" style="clear:both;
-                                            position:relative; z-index:65535; left:initial; top:initial;
-                                            float:left; width:initial; height:initial
-                                            margin:0; padding:4px;
-                                            font:normal normal 12px/normal arial,helvetica,sans-serif;
-                                            color:black; background-color:#ccc">';
+        $html  .= '<div id="3c94ea325068b3495a430fe527dcf38ae380853446c9128d729ab42ba27c10ca"
+                        align="left"
+                        style="display:initial; visibility:initial; clear:both;
+                        position:relative; z-index:65535; top:initial; left:initial;
+                        float:left; width:initial; height:initial
+                        margin:0; padding:4px;
+                        font:normal normal 12px/normal arial,helvetica,sans-serif;
+                        color:black; background-color:#ccc">';
         $indent = ' ';
 
         // compose message
@@ -752,8 +754,13 @@ class Logger extends StaticClass {
             $html .= '<br style="clear:both"><br>'.printPretty('Request:'.NL.'--------'.NL.Request::me(), true).'<br>';
         }
 
-        // close and store the HTML tag
-        $html .= '</div>';
+        // close the HTML tag (add some JavaScript to ensure it becomes visible)
+        $html .= '</div>
+                  <script>
+                      var bodies = document.getElementsByTagName("body");
+                      bodies && bodies.length && bodies[0].appendChild(document.getElementById("3c94ea325068b3495a430fe527dcf38ae380853446c9128d729ab42ba27c10ca"));
+                  </script>';
+        // store the HTML tag
         $context['htmlMessage'] = $html;
     }
 
