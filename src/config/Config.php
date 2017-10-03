@@ -12,6 +12,7 @@ use rosasurfer\util\PHP;
 
 use function rosasurfer\isRelativePath;
 
+use const rosasurfer\ERROR_LOG_DEFAULT;
 use const rosasurfer\NL;
 
 
@@ -107,8 +108,10 @@ class Config extends Object implements ConfigInterface {
 
             $parts = explode('=', $line, 2);             // separate key/value
             if (sizeOf($parts) < 2) {
-                trigger_error(__METHOD__.'()  Skipping syntax error in "'.$filename.'", line '.($i+1).': missing key-value separator', E_USER_NOTICE);
-                continue;
+                $msg = __METHOD__.'()  Skipping syntax error in "'.$filename.'", line '.($i+1).': missing key-value separator';
+                error_log($msg, ERROR_LOG_DEFAULT);
+                //trigger_error($msg, E_USER_NOTICE);   // don't use trigger_error() as it will enter an infinite loop if
+                continue;                               // the same file is accessed for reading the Logger configuration
             }
             $key   = trim($parts[0]);
             $value = trim($parts[1]);
