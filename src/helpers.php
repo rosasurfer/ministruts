@@ -1101,21 +1101,6 @@ function true($value = null) {
 
 
 /**
- * Functional equivalent of the value TRUE.
- *
- * @param  mixed $value [optional] - ignored
- *
- * @return bool - TRUE
- *
- * @deprecated - use true() instead
- */
-function _true($value = null) {
-    trigger_error(__FUNCTION__.' is deprecated and will be removed in a future release', E_USER_DEPRECATED);
-    return true;
-}
-
-
-/**
  * Return $value or $altValue if $value is TRUE. Functional equivalent of ternary test for TRUE.
  *
  * @param  mixed $value
@@ -1141,21 +1126,6 @@ function false($value = null) {
 
 
 /**
- * Functional equivalent of the value FALSE.
- *
- * @param  mixed $value [optional] - ignored
- *
- * @return bool - FALSE
- *
- * @deprecated - use false() instead
- */
-function _false($value = null) {
-    trigger_error(__FUNCTION__.' is deprecated and will be removed in a future release', E_USER_DEPRECATED);
-    return false;
-}
-
-
-/**
  * Return $value or $altValue if $value is FALSE. Functional equivalent of ternary test for FALSE.
  *
  * @param  mixed $value
@@ -1176,21 +1146,6 @@ function ifFalse($value, $altValue) {
  * @return NULL
  */
 function null($value = null) {
-    return null;
-}
-
-
-/**
- * Functional equivalent of the value NULL.
- *
- * @param  mixed $value [optional] - ignored
- *
- * @return NULL
- *
- * @deprecated - use null() instead
- */
-function _null($value = null) {
-    trigger_error(__FUNCTION__.' is deprecated and will be removed in a future release', E_USER_DEPRECATED);
     return null;
 }
 
@@ -1259,7 +1214,7 @@ function pluralize($count, $singular='', $plural='s') {
 
 
 /**
- * Lookup and return a URL helper for the named route as configured in <tt>&lt;mapping name="{Name}"&gt;</tt>
+ * Lookup and return a {@link URL} helper for the named route as configured in <tt>&lt;mapping name="{Name}"&gt;</tt>
  * in struts-config.xml.
  *
  * @param  string $name - route name
@@ -1305,9 +1260,10 @@ function route($name) {
 
 
 /**
- * Return a URL helper for the given URI. An URI starting with a slash "/" is interpreted as relative to the application's
- * base URI. An URI not starting with a slash is interpreted as relative to the application {@link Module}'s base URI
- * (the module the current request belongs to).<br>
+ * Return a {@link URL} helper for the given URI. An URI starting with a slash "/" is interpreted as relative to the
+ * application's base URI. An URI not starting with a slash is interpreted as relative to the application {@link Module}'s
+ * base URI (the module the current request belongs to).<br>
+ *
  * Procedural equivalent of <tt>new \rosasurfer\ministruts\url\Url($uri)</tt>.
  *
  * @param  string $uri
@@ -1320,9 +1276,10 @@ function url($uri) {
 
 
 /**
- * Return a version-aware URL helper for the given URI. An URI starting with a slash "/" is interpreted as relative to the
- * application's base URI. An URI not starting with a slash is interpreted as relative to the application {@link Module}'s
- * base URI (the module the current request belongs to).<br>
+ * Return a version-aware URL helper for the given URI {@link VersionedUrl}. An URI starting with a slash "/" is interpreted
+ * as relative to the application's base URI. An URI not starting with a slash is interpreted as relative to the application
+ * {@link Module}'s base URI (the module the current request belongs to).<br>
+ *
  * Procedural equivalent of <tt>new \rosasurfer\ministruts\url\VersionedUrl($uri)</tt>.
  *
  * @param  string $uri
@@ -1331,19 +1288,4 @@ function url($uri) {
  */
 function asset($uri) {
     return new VersionedUrl($uri);
-}
-
-
-/**
- * Alias of <tt>asset($uri)</tt>.
- *
- * @param  string $uri
- *
- * @return VersionedUrl
- *
- * @deprecated  - use asset() instead
- */
-function vUrl($uri) {
-    trigger_error(__FUNCTION__.' is deprecated and will be removed in a future release', E_USER_DEPRECATED);
-    return asset($uri);
 }
