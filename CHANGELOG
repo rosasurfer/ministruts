@@ -1,4 +1,9 @@
 
+2017-10-06
+
+   - remove deprecated functions: _true(), _false(), _null(), vUrl(), util/Date::format()
+
+
 2017-09-22
 
    - util: new helper function stderror($message)  
