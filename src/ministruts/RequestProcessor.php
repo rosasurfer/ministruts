@@ -208,16 +208,13 @@ class RequestProcessor extends Object {
 
         // kein Mapping gefunden
         self::$logInfo && Logger::log('Could not find a mapping for path: '.$mappingPath, L_INFO);
-
         $response->setStatus(HttpResponse::SC_NOT_FOUND);
 
-        if (isSet($this->options['status-404']) && $this->options['status-404']=='pass-through') {
+        if (isSet($this->options['status-404']) && $this->options['status-404']=='pass-through')
             return null;
-        }
 
-        // Header setzen, bevor Content ausgegeben wird
-        header('HTTP/1.1 404 Not Found', true);
-
+        header('HTTP/1.1 404 Not Found', true, HttpResponse::SC_NOT_FOUND);
+            
         // konfiguriertes 404-Layout suchen
         if ($forward=$this->module->findForward((string) HttpResponse::SC_NOT_FOUND)) {
             // falls vorhanden, einbinden...
@@ -259,16 +256,13 @@ PROCESS_MAPPING_ERROR_SC_404;
 
         // Beschraenkung nicht erfuellt
         self::$logDebug && Logger::log('HTTP method "'.$request->getMethod().'" is not supported by ActionMapping, denying access', L_DEBUG);
-
         $response->setStatus(HttpResponse::SC_METHOD_NOT_ALLOWED);
 
-        if (isSet($this->options['status-405']) && $this->options['status-405']=='pass-through') {
+        if (isSet($this->options['status-405']) && $this->options['status-405']=='pass-through')
             return false;
-        }
-
-        // Status-Code 405 setzen, bevor Content ausgegeben wird
-        header('HTTP/1.1 405 Method Not Allowed', true);
-
+        
+        header('HTTP/1.1 405 Method Not Allowed', true, HttpResponse::SC_METHOD_NOT_ALLOWED);
+            
         // konfiguriertes 405-Layout suchen
         if ($forward=$this->module->findForward((string) HttpResponse::SC_METHOD_NOT_ALLOWED)) {
             // falls vorhanden, einbinden...
