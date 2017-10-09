@@ -80,12 +80,12 @@ class FrontController extends Singleton {
 
         // lookup Struts configuration files
         $configDir = Config::getDefault()->get('app.dir.struts', null);
-        if (!$configDir)
-            $configDir = Config::getDefault()->get('app.dir.config');           // fall-back to std config directory
-        $mainConfig = $configDir.'/struts-config.xml';                          // main module config
-        if (!is_file($mainConfig)) throw new StrutsConfigException('Main Struts configuration file not found: "'.$mainConfig.'"');
+        !$configDir && $configDir=Config::getDefault()->get('app.dir.config');      // fall-back to std config directory
 
-        $subConfigs = glob($configDir.'/struts-config-*.xml', GLOB_ERR) ?: [];  // scan for submodule configs
+        $mainConfig = str_replace('\\', '/', $configDir.'/struts-config.xml');      // main module config
+        if (!is_file($mainConfig)) throw new StrutsConfigException('Struts configuration file not found: "'.$mainConfig.'"');
+
+        $subConfigs = glob($configDir.'/struts-config-*.xml', GLOB_ERR) ?: [];      // scan for submodule configs
         $configs    = array_merge([$mainConfig], $subConfigs);
 
         // create and register a Module for each found configuration file
