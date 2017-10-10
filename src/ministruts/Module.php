@@ -476,7 +476,7 @@ class Module extends Object {
                     }
                     else {
                         $forward = new $this->forwardClass($name, $this->findFile($include), false);
-                        $forward->setLabely(subStr($include, 0, strRPos($include, '.')));
+                        $forward->setLabel(subStr($include, 0, strRPos($include, '.')));
                     }
                 }
 
