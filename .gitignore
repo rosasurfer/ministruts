@@ -26,6 +26,8 @@ vendor/
 /composer.lock
 /composer.phar
 /composer-dev.*
-config.properties
+
+config.*properties
+!config.dist.properties
 
 /php-error.log
