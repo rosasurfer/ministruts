@@ -16,6 +16,7 @@ use function rosasurfer\strLeftTo;
 use function rosasurfer\strStartsWith;
 
 use const rosasurfer\CLI;
+use rosasurfer\net\http\HttpResponse;
 
 
 /**
@@ -105,8 +106,9 @@ class Response extends Singleton {
      * Send a "Location" header (redirect) pointing to the specified URI. Afterwards the script is terminated.
      *
      * @param  string $uri - absolute or relative URI
+     * @param  int    $type - redirect type: 301 (SC_MOVED_PERMANENTLY) or 302 (SC_MOVED_TEMPORARILY)
      */
-    public function redirect($uri) {
+    public function redirect($uri, $type=HttpResponse::SC_MOVED_TEMPORARILY) {
         $request    = Request::me();
         $currentUrl = $request->getUrl();
 
@@ -148,7 +150,7 @@ class Response extends Singleton {
         }
 
         // set the header
-        header('Location: '.$url);
+        header('Location: '.$url, true, $type);
 
         // terminate the script
         exit(0);

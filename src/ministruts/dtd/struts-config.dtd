@@ -175,19 +175,26 @@
                         of passing the request to an action. Can not be used in combination with "alias", "action", "include" 
                         or "forward".   
 
+   redirect-type        The type of redirect that is issued ("temporary" or "permanent"). Optional if the "redirect" attribute 
+                        is specified, else not valid.
+                        [default: "temporary"]
+
    form                 Class name of an ActionForm subclass, if any, that is associated with the mapping.
 
    form-scope           The context ("request" or "session") that is used to store and access the ActionForm, if any.
                         Optional if the "form" attribute is specified, else not valid.
                         [default: "request"]
 
-   form-validate-first  Valid only if the "form" attribute is specified. Set to "true" if the ActionForm should be validated
-                        prior to calling the Action object, or set to "false" if you don't want to perform validation at that 
-                        time. The default behaviour is "false" if an Action or a ActionForward (include, redirect, forward) 
-                        are configured, and "true" if no Action and no ActionForward are configured.
+   form-validate-first  Set to "true" if the ActionForm should be validated prior to calling the Action object, or set to 
+                        "false" if you don't want to perform validation at that time. The default behaviour is "false" if an 
+                        Action or a ActionForward (include, redirect, forward) are configured, and "true" if no Action and no 
+                        ActionForward are configured.
                         In other words: If an Action is configured per default the Action is responsible for input validation. 
                         If neither an Action nor a ActionForward are configured the framework will perform input validation. 
-                        For framework validation two nested "forward" elements named "success" and "error" must be configured.
+                        For this framework validation two nested "forward" elements named "success" and "error" must be 
+                        configured.
+                        Optional if the "form" attribute is specified, else not valid.
+                        [default: "request"]
 
    http-methods         Comma-delimited list of HTTP method verbs the action mapping supports.
                         [default: "get"]
@@ -202,19 +209,20 @@
 -->
 <!ELEMENT mapping ((forward*, set*)*)>
 <!ATTLIST mapping
-          name                   %LogicalName;        #IMPLIED
-          path                   %RequestPath;        #REQUIRED
-          match                  (literal|variable)   "literal"
-          action                 %ClassName;          #IMPLIED
-          include                %ResourcePath;       #IMPLIED
-          forward                %LogicalName;        #IMPLIED
-          redirect               %RequestPath;        #IMPLIED
-          form                   %ClassName;          #IMPLIED
-          form-scope             (request|session)    "request"
-          form-validate-first    %Boolean;            "true"
-          http-methods           CDATA                "get"
-          roles                  CDATA                #IMPLIED
-          default                %Boolean;            "false"
+          name                   %LogicalName;          #IMPLIED
+          path                   %RequestPath;          #REQUIRED
+          match                  (literal|variable)     "literal"
+          action                 %ClassName;            #IMPLIED
+          include                %ResourcePath;         #IMPLIED
+          forward                %LogicalName;          #IMPLIED
+          redirect               %RequestPath;          #IMPLIED
+          redirect-type          (temporary|permanent)  "temporary"
+          form                   %ClassName;            #IMPLIED
+          form-scope             (request|session)      "request"
+          form-validate-first    %Boolean;              "true"
+          http-methods           CDATA                  "get"
+          roles                  CDATA                  #IMPLIED
+          default                %Boolean;              "false"
 >
 
 

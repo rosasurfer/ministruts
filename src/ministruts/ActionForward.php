@@ -4,6 +4,7 @@ namespace rosasurfer\ministruts;
 use rosasurfer\core\Object;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
+use rosasurfer\net\http\HttpResponse;
 
 
 /**
@@ -36,18 +37,25 @@ class ActionForward extends Object {
     /** @var bool */
     protected $redirect;
 
+    /** @var int */
+    protected $redirectType;
+
 
     /**
      * Create a new instance with the specified properties.
      *
-     * @param  string $name                - logical forward name
-     * @param  string $path                - resource path
-     * @param  bool   $redirect [optional] - redirect flag (default: FALSE)
+     * @param  string $name                    - logical forward name
+     * @param  string $path                    - resource path
+     * @param  bool   $redirect     [optional] - redirect flag (default: FALSE)
+     * @param  int    $redirectType [optional] - redirect type (default: "Moved Temporarily" = 302)
      */
-    public function __construct($name, $path, $redirect = false) {
-        $this->setName($name)
-             ->setPath($path)
+    public function __construct($name, $path, $redirect=false, $redirectType=HttpResponse::SC_MOVED_TEMPORARILY) {
+        $this->setName    ($name)
+             ->setPath    ($path)
              ->setRedirect($redirect);
+
+        if ($redirect)
+            $this->setRedirectType($redirectType);
     }
 
 
@@ -88,6 +96,16 @@ class ActionForward extends Object {
      */
     public function isRedirect() {
         return $this->redirect;
+    }
+
+
+    /**
+     * Return the forward's redirect type (if any).
+     *
+     * @return int - HTTP status code
+     */
+    public function getRedirectType() {
+        return (int) $this->redirectType;
     }
 
 
@@ -150,6 +168,21 @@ class ActionForward extends Object {
         if (!is_bool($redirect)) throw new IllegalTypeException('Illegal type of parameter $redirect: '.getType($redirect));
 
         $this->redirect = $redirect;
+        return $this;
+    }
+
+
+    /**
+     * Set the forward's redirect type.
+     *
+     * @param  int type - HTTP status type
+     *
+     * @return $this
+     */
+    public function setRedirectType($type) {
+        if (!is_int($type)) throw new IllegalTypeException('Illegal type of parameter $type: '.getType($type));
+
+        $this->redirectType = $type;
         return $this;
     }
 

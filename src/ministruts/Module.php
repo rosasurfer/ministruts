@@ -5,6 +5,7 @@ use rosasurfer\config\Config;
 use rosasurfer\core\Object;
 use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\net\http\HttpResponse;
 
 use function rosasurfer\is_class;
 use function rosasurfer\isRelativePath;
@@ -355,12 +356,15 @@ class Module extends Object {
             // attribute redirect="%RequestPath" #IMPLIED
             if (isSet($tag['redirect'])) {
                 if ($mapping->getForward()) throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'": Only one of "action", "include", "forward" or "redirect" can be specified');
-                $redirect = (string) $tag['redirect'];          // TODO: URL validieren
+                $redirect     = (string) $tag['redirect'];      // TODO: URL validieren
+                $redirectType = isSet($tag['redirect-type']) ? (string) $tag['redirect-type'] : 'temporary';
+                $redirectType = $redirectType=='temporary' ? HttpResponse::SC_MOVED_TEMPORARILY : HttpResponse::SC_MOVED_PERMANENTLY;
 
                 /** @var ActionForward $forward */
-                $forward = new $this->forwardClass('generic', $redirect, true);
+                $forward = new $this->forwardClass('generic', $redirect, true, $redirectType);
                 $mapping->setForward($forward);
             }
+            else if (isSet($tag['redirect-type'])) throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'": The "redirect-type" attribute can only be specified together with the "redirect" attribute.');
 
 
             // attribute forward="%LogicalName" #IMPLIED
@@ -399,6 +403,7 @@ class Module extends Object {
 
             // attribute form-scope="(request|session)" "request"
             if (isSet($tag['form-scope'])) {
+                if (!isSet($tag['form']))    throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'": A "form" attribute must be specified if "form-scope" is defined.');
                 $mapping->setFormScope((string) $tag['form-scope']);
             }
 

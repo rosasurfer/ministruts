@@ -214,7 +214,7 @@ class RequestProcessor extends Object {
             return null;
 
         header('HTTP/1.1 404 Not Found', true, HttpResponse::SC_NOT_FOUND);
-            
+
         // konfiguriertes 404-Layout suchen
         if ($forward=$this->module->findForward((string) HttpResponse::SC_NOT_FOUND)) {
             // falls vorhanden, einbinden...
@@ -260,9 +260,9 @@ PROCESS_MAPPING_ERROR_SC_404;
 
         if (isSet($this->options['status-405']) && $this->options['status-405']=='pass-through')
             return false;
-        
+
         header('HTTP/1.1 405 Method Not Allowed', true, HttpResponse::SC_METHOD_NOT_ALLOWED);
-            
+
         // konfiguriertes 405-Layout suchen
         if ($forward=$this->module->findForward((string) HttpResponse::SC_METHOD_NOT_ALLOWED)) {
             // falls vorhanden, einbinden...
@@ -489,7 +489,7 @@ PROCESS_METHOD_ERROR_SC_405;
                 $moduleUri = $request->getApplicationBaseUri().$module->getPrefix();
                 $url = $moduleUri.lTrim($path, '/');
             }
-            $response->redirect($url);
+            $response->redirect($url, $forward->getRedirectType());
         }
         else {
             $path = $forward->getPath();
