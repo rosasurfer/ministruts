@@ -1,4 +1,9 @@
 
+2017-10-12
+
+   - struts: add configuration option for temporary or permanent HTTP redirects
+
+
 2017-10-06
 
    - remove deprecated functions: _true(), _false(), _null(), vUrl(), util/Date::format()
