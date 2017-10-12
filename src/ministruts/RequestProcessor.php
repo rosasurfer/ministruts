@@ -324,6 +324,7 @@ PROCESS_METHOD_ERROR_SC_405;
         if (!$className)
             return null;
 
+        /** @var ActionForm $form */
         $form = null;
 
         // bei gesetztem Session-Scope ActionForm zuerst in der Session suchen ...
@@ -331,9 +332,10 @@ PROCESS_METHOD_ERROR_SC_405;
             $form = $request->getSession()->getAttribute($className);       // implicitely start a session
 
         // ... ansonsten neue Instanz erzeugen
-        if (!$form)
+        if (!$form) {
+            /** @var ActionForm $form */
             $form = new $className($request);
-
+        }
 
         // Instanz im Request ...
         $request->setAttribute(ACTION_FORM_KEY, $form);

@@ -264,9 +264,11 @@ class Module extends Object {
                 if ($this->isTileDefinition($include, $xml)) {
                     $tile = $this->getTile($include, $xml);
                     if ($tile->isAbstract()) throw new StrutsConfigException('<global-forwards> <forward name="'.$name.'" include="'.$include.'": The included tile is a template and cannot be used as a "forward".');
+                    /** @var ActionForward $forward */
                     $forward = new $this->forwardClass($name, $include, false);
                 }
                 else {
+                    /** @var ActionForward $forward */
                     $forward = new $this->forwardClass($name, $this->findFile($include), false);
                     $forward->setLabel(subStr($include, 0, strRPos($include, '.')));
                 }
@@ -275,6 +277,7 @@ class Module extends Object {
             if (is_string($redirect)) {
                 if (is_string($include) || is_string($alias)) throw new StrutsConfigException('<global-forwards> <forward name="'.$name.'": Only one of "include", "redirect" or "alias" can be specified.');
 
+                /** @var ActionForward $forward */
                 $forward = new $this->forwardClass($name, $redirect, true);     // TODO: URL validieren
             }
             $this->addGlobalForward($forward);
@@ -337,15 +340,16 @@ class Module extends Object {
                 $include = (string) $tag['include'];
                 if (!$this->isIncludable($include, $xml)) throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'" include="'.$include.'": '.(strStartsWith($include, '.') ? 'Tile definition':'File').' not found.');
 
-                /** @var ActionForward $forward */
                 $forward = null;
 
                 if ($this->isTileDefinition($include, $xml)) {
                     $tile = $this->getTile($include, $xml);
                     if ($tile->isAbstract()) throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'" include="'.$include.'": The included tile is a template and cannot be used in a "mapping" definition.');
+                    /** @var ActionForward $forward */
                     $forward = new $this->forwardClass('generic', $include, false);
                 }
                 else {
+                    /** @var ActionForward $forward */
                     $forward = new $this->forwardClass('generic', $this->findFile($include), false);
                     $forward->setLabel(strLeftTo($include, '.', -1));
                 }
@@ -465,7 +469,6 @@ class Module extends Object {
                 $redirect = isSet($forwardTag['redirect']) ? (string)$forwardTag['redirect'] : null;
                 $alias    = isSet($forwardTag['alias'   ]) ? (string)$forwardTag['alias'   ] : null;
 
-                /** @var ActionForward $forward */
                 $forward = null;
 
                 if (is_string($include)) {
@@ -477,9 +480,11 @@ class Module extends Object {
                     if ($this->isTileDefinition($include, $xml)) {
                         $tile = $this->getTile($include, $xml);
                         if ($tile->isAbstract()) throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'"> <forward name="'.$name.'" include="'.$include.'": The included tile is a template and cannot be used in a "forward".');
+                        /** @var ActionForward $forward */
                         $forward = new $this->forwardClass($name, $include, false);
                     }
                     else {
+                        /** @var ActionForward $forward */
                         $forward = new $this->forwardClass($name, $this->findFile($include), false);
                         $forward->setLabel(subStr($include, 0, strRPos($include, '.')));
                     }
@@ -488,6 +493,7 @@ class Module extends Object {
                 if (is_string($redirect)) {
                     if (is_string($include) || is_string($alias)) throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'"> <forward name="'.$name.'": Only one of "include", "redirect" or "alias" can be specified.');
 
+                    /** @var ActionForward $forward */
                     $forward = new $this->forwardClass($name, $redirect, true);     // TODO: URL validieren
                 }
                 $mapping->addForward($name, $forward);
@@ -617,6 +623,7 @@ class Module extends Object {
             $filePath = $this->findFile($file);
             if (!$filePath) throw new StrutsConfigException('<tile name="'.$name.'" file="'.$file.'": File not found.');
 
+            /** @var Tile $tile */
             $tile = new $this->tilesClass($this);
             $tile->setName($name);
             $tile->setFileName($filePath);
