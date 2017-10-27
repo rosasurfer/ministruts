@@ -78,6 +78,6 @@ fi
 
 # update ownership and access permissions for writing of files
 USER=username
-id -u "$USER" >/dev/null 2>&1                 && chown -R  "$USER.$USER" "$PROJECT_DIR"
-[ -d "$PROJECT_DIR/etc/log/"                ] && chmod 777 "$PROJECT_DIR/etc/log/"
-[ -d "$PROJECT_DIR/etc/tmp/"                ] && chmod 777 "$PROJECT_DIR/etc/tmp/"
+id -u "$USER" >/dev/null 2>&1  && chown -R  "$USER.$USER" "$PROJECT_DIR"
+[ -d "$PROJECT_DIR/etc/log/" ] && chmod 777 "$PROJECT_DIR/etc/log/"
+[ -d "$PROJECT_DIR/etc/tmp/" ] && chmod 777 "$PROJECT_DIR/etc/tmp/"
