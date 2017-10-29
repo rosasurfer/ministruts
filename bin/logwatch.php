@@ -16,7 +16,7 @@
  * TODO: Error messages must not be printed to STDOUT but to STDERR.
  * TODO: Add parameter for not suppressing regular output to get status messages when not executed by CRON.
  */
-namespace rosasurfer\cron\logwatch;
+namespace rosasurfer\bin\logwatch;
 
 use rosasurfer\config\Config;
 use rosasurfer\exception\IllegalTypeException;

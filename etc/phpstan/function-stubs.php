@@ -381,7 +381,7 @@ namespace rosasurfer\bin\check_ip {
 }
 
 
-namespace rosasurfer\cron\logwatch {
+namespace rosasurfer\bin\logwatch {
 
     /**
      * @param  string $message [optional]
