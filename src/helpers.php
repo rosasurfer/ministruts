@@ -91,7 +91,8 @@ const EOL_NETSCAPE      = "\r\r\n";                                 //   CRCRLF 
 const EOL_UNIX          = "\n";                                     //   LF       0A      10
 const EOL_WINDOWS       = "\r\n";                                   //   CRLF     0D0A    13,10
 
-!defined('PHP_INT_MIN') && define('PHP_INT_MIN', ~PHP_INT_MAX);     // built-in since PHP 7.0 (global)
+// global definitions
+!defined('PHP_INT_MIN') && define('PHP_INT_MIN', ~PHP_INT_MAX);     // since PHP 7.0
 
 
 /**
