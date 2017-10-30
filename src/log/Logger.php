@@ -664,13 +664,13 @@ class Logger extends StaticClass {
             $location = strLeftTo($request->getUrl(), '?');
             $session  = null;
 
-            if ($request->isSession()) {
+            if (isSet($_SESSION)) {
                 $session = $_SESSION;
             }
             else if ($request->hasSessionId()) {
                 $request->getSession($suppressHeadersAlreadySentError = true);
-                if (session_id() == $request->getSessionId())       // if both differ the id was regenerated and the session is empty
-                    $session = $_SESSION;
+                if (session_id() == $request->getSessionId())       // if both differ the id was regenerated and
+                    $session = $_SESSION;                           // the session is empty
             }
             $session  = is_null($session) ? null : print_r(ksort_r($session), true);
             $ip       = $_SERVER['REMOTE_ADDR'];
