@@ -292,7 +292,7 @@ class Application extends Object {
     private function setupErrorHandling($value) {
         $flag = self::THROW_EXCEPTIONS;
         if (is_string($value)) {
-            $value = trim(strToUpper($value));
+            $value = trim(strToLower($value));
             if      ($value == 'weak'  ) $flag = self::LOG_ERRORS;  // default: THROW_EXCEPTIONS
             else if ($value == 'ignore') $flag = null;
         }
