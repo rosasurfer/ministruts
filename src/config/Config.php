@@ -419,6 +419,8 @@ class Config extends Object implements ConfigInterface {
         }
 
         foreach ($values as $key => &$value) {
+            if      (is_null($value)) $value = '(null)';
+            else if (is_bool($value)) $value = ($value ? 'true':'false').' (bool)';
             $value = str_pad($key, $maxKeyLength, ' ', STR_PAD_RIGHT).' = '.$value;
         }; unset($value);
         $lines += $values;
