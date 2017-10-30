@@ -29,32 +29,34 @@ class Application extends Object {
 
 
     /**
-     * Create and initialize a new MiniStruts application. Expects an array with any of the following options:
+     * Create and initialize a new MiniStruts application.
      *
-     * "app.config"            - IConfig: The project's configuration as an object.<br>
+     * @param  array $options [optional] - Expects an array with any of the following options:
      *
-     * "app.dir.root"          - string:  The project's root directory.<br>
-     *                                    (default: the current directory)<br>
+     *        "app.config"            - IConfig: The project's configuration as an instance.<br>
      *
-     * "app.dir.config"        - string:  The projetc's configuration location as a directory or a .properties file.<br>
-     *                                    (default: directory returned by "app.config"<IConfig> or the current directory)<br>
+     *        "app.dir.config"        - string:  The project's configuration location as a directory or a file.<br>
+     *                                           (default: directory returned by the instance passed in "app.config" or the<br>
+     *                                           current directory)<br>
      *
-     * "app.global-helpers"    - bool:    If set to TRUE, the helper functions and constants defined in "rosasurfer/helpers.php"
-     *                                    are also mapped to the global PHP namespace.<br>
-     *                                    (default: FALSE)<br>
+     *        "app.dir.root"          - string:  The project's root directory.<br>
+     *                                           (default: the current directory)<br>
      *
-     * "app.handle-errors"     - string:  How to handle regular PHP errors. If set to "strict" errors are converted to PHP
-     *                                    ErrorExceptions and thrown. If set to "weak" errors are only logged and execution
-     *                                    continues. If set to "ignore" you have to setup your own error handling mechanism.<br>
-     *                                    (default: "strict")<br>
+     *        "app.global-helpers"    - bool:    If set to TRUE the helper functions and constants defined in "src/helpers.php"<br>
+     *                                           are mapped to the global PHP namespace.<br>
+     *                                           (default: FALSE)<br>
      *
-     * "app.handle-exceptions" - bool:    If set to TRUE exceptions are handled by the built-in exception handler. If set to
-     *                                    FALSE you have to setup your own exception handling mechanism.<br>
-     *                                    (default: TRUE)<br>
+     *        "app.handle-errors"     - string:  How to handle regular PHP errors. If set to "strict" errors are converted to<br>
+     *                                           PHP ErrorExceptions and thrown. If set to "weak" errors are only logged and<br>
+     *                                           execution continues. If set to "ignore" you have to setup your own error<br>
+     *                                           handling mechanism.<br>
+     *                                           (default: "strict")<br>
      *
-     * Additional options are added to the application's default configuration {@link Config} as regular config values.
+     *        "app.handle-exceptions" - bool:    If set to TRUE exceptions are handled by the built-in exception handler.<br>
+     *                                           If set to FALSE you have to setup your own exception handling mechanism.<br>
+     *                                           (default: TRUE)<br>
      *
-     * @param  array $options [optional]
+     *        Additional options are added to the application's default configuration {@link Config} as regular config values.
      */
     public function __construct(array $options = []) {
         // set default values
@@ -62,6 +64,7 @@ class Application extends Object {
         if (!isSet($options['app.handle-exceptions'])) $options['app.handle-exceptions'] = true;
         if (!isSet($options['app.global-helpers'   ])) $options['app.global-helpers'   ] = false;
 
+        // (1) setup configuration
         $this->setupErrorHandling    ($options['app.handle-errors'    ]);
         $this->setupExceptionHandling($options['app.handle-exceptions']);
         $this->loadGlobalHelpers     ($options['app.global-helpers'   ]);
@@ -151,7 +154,7 @@ class Application extends Object {
             //include(MINISTRUTS_ROOT.'/src/debug/apc.php'); // TODO: not yet implemented
         }
 
-        // (8) enforce mission-critical PHP requirements (after running any admin tasks)
+        // (8) enforce mission-critical PHP requirements (after processing any admin tasks)
         !php_ini_loaded_file()                        && exit(1|echoPre('application error (see error log'.($this->isWhiteListedRemoteIP() ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: No "php.ini" configuration file was loaded.'));
         !CLI && !PHP::ini_get_bool('short_open_tag')  && exit(1|echoPre('application error (see error log'.($this->isWhiteListedRemoteIP() ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: The PHP configuration value "short_open_tag" must be enabled (security).'));
         !CLI && ini_get('request_order') != 'GP'      && exit(1|echoPre('application error (see error log'.($this->isWhiteListedRemoteIP() ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: The PHP configuration value "request_order" must be "GP" (current value "'.ini_get('request_order').'").'));
@@ -373,8 +376,7 @@ class Application extends Object {
         if (!isSet($_SERVER['REMOTE_ADDR']))
             return false;
 
-        static $whiteList;
-        if (!$whiteList) {
+        static $whiteList; if (!$whiteList) {
             $ips = ['127.0.0.1', $_SERVER['SERVER_ADDR']];
 
             if (!$config=Config::getDefault())
