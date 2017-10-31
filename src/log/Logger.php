@@ -610,8 +610,7 @@ class Logger extends StaticClass {
             $text = '['.strToUpper(self::$logLevels[$level]).'] '.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
         }
         else {
-            /** @var \Exception $loggable */
-            $loggable = $loggable;
+            // exception
             $type = null;
             $msg  = trim(DebugHelper::composeBetterMessage($loggable, $indent));
             if (isSet($context['unhandled'])) {
@@ -712,9 +711,9 @@ class Logger extends StaticClass {
         $file = $context['file'];
         $line = $context['line'];
 
-        // break out of unfortunate HTML tags
-        $html   = '<a attr1="" attr2=\'\'></a></meta></title></head></script></img></select></textarea></li></ul></font></pre></tt></code></i></b></span></div>';
-        $html  .= '<div id="3c94ea325068b3495a430fe527dcf38ae380853446c9128d729ab42ba27c10ca"
+        // break out of unfortunate HTML tags               // id = md5('ministruts')
+        $html  = '<a attr1="" attr2=\'\'></a></meta></title></head></script></img></select></textarea></li></ul></font></pre></tt></code></i></b></span></div>';
+        $html .= '<div id="99a05cf355861c76747b7176c778eed2'.self::$printCounter.'"
                         align="left"
                         style="display:initial; visibility:initial; clear:both;
                         position:relative; z-index:65535; top:initial; left:initial;
@@ -764,11 +763,12 @@ class Logger extends StaticClass {
             $html .= '<br style="clear:both"><br>'.printPretty('Request:'.NL.'--------'.NL.Request::me(), true).'<br>';
         }
 
-        // close the HTML tag (add some JavaScript to ensure it becomes visible)
+        // close the HTML tag and add some JavaScript to ensure it becomes visible                  // id = md5('ministruts')
         $html .= '</div>
                   <script>
                       var bodies = document.getElementsByTagName("body");
-                      bodies && bodies.length && bodies[0].appendChild(document.getElementById("3c94ea325068b3495a430fe527dcf38ae380853446c9128d729ab42ba27c10ca"));
+                      if (bodies && bodies.length)
+                         bodies[0].appendChild(document.getElementById("99a05cf355861c76747b7176c778eed2'.self::$printCounter.'"));
                   </script>';
         // store the HTML tag
         $context['htmlMessage'] = $html;
@@ -814,7 +814,7 @@ class Logger extends StaticClass {
      * @param  array &$context - reference to the log context
      *
      *
-     * @todo   test with Closure and internal PHP functions
+     * TODO:  test with Closure and internal PHP functions
      */
     private static function resolveLogCaller(array &$context) {
         if (!isSet($context['trace']))
@@ -837,4 +837,3 @@ class Logger extends StaticClass {
         $context['class'] = $class;
     }
 }
-
