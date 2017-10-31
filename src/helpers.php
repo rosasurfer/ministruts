@@ -205,10 +205,10 @@ function printPretty($var, $return=false, $flushBuffers=true) {
                      style="display:initial; visibility:initial; clear:both;
                      position:relative; z-index:65535; top:initial; left:initial;
                      float:left; width:initial; height:initial;
-                     margin:0; padding:0;
+                     margin:0; padding:0; border-width:0;
                      color:inherit; background-color:inherit">
                     <pre style="width:initial; height:initial;
-                                margin:0; padding:0;
+                                margin:0; padding:0; border-width:0;
                                 color:inherit; background-color:inherit;
                                 font:normal normal 12px/normal \'Courier New\',courier,serif">'.hsc($str).'</pre>
                 </div>';
