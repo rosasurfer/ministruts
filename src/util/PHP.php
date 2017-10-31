@@ -256,7 +256,7 @@ class PHP extends StaticClass {
         if (!extension_loaded('mysqli'))                                                                             $issues[] = 'Info:  MySQLi extension is not loaded';
         if (!WINDOWS && !extension_loaded('sysvsem'))                                                                $issues[] = 'Info:  System-V Semaphore extension is not loaded';
 
-        // check Composer defined requirements
+        // check Composer defined dependencies
         $appRoot = Config::getDefault()->get('app.dir.root');
         if (is_file($file=$appRoot.'/composer.json') && extension_loaded('json')) {
             $composer = json_decode(file_get_contents($file), true);
@@ -265,7 +265,7 @@ class PHP extends StaticClass {
                     $name = trim(strToLower($name));
                     if (in_array($name, ['php', 'php-64bit', 'hhvm']) || strContains($name, '/')) continue;
                     if (strStartsWith($name, 'ext-')) $name = strRight($name, -4);
-                    if (!extension_loaded($name))                                                                    $issues[] = 'Warn:  '.$name.' extension is not loaded';
+                    if (!extension_loaded($name))                                                                    $issues[] = 'Error: '.$name.' extension is not loaded  [composer dependency]';
                 }
             }
         }
