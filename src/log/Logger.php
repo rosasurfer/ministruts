@@ -332,16 +332,24 @@ class Logger extends StaticClass {
             if (!is_int($level))                            throw new IllegalTypeException('Illegal type of parameter $level: '.getType($level));
             if (!isSet(self::$logLevels[$level]))           throw new InvalidArgumentException('Invalid argument $level: '.$level.' (not a loglevel)');
 
+            $filtered = false;
+
             // filter messages not covered by the current loglevel
-            $covered = true;
-            if ($level != L_FATAL) {                                            // the highest loglevel is always covered
+            if (!$filtered && $level!=L_FATAL) {                                // the highest loglevel is always covered
                 if (!isSet($context['class']))                                  // resolve the caller and check its loglevel
                     self::resolveLogCaller($context);
-                $covered = ($level >= self::getLogLevel($context['class']));    // message is not covered
+                $filtered = $level < self::getLogLevel($context['class']);      // message is not covered
+            }
+
+            // filter "headers already sent" errors triggered by a previously printed HTML log message
+            if (!$filtered && !CLI && self::$printCounter && $loggable instanceof \Exception) {
+                if (preg_match('/- headers already sent (by )?\(output started at /', $loggable->getMessage())) {
+                    $filtered = true;
+                }
             }
 
             // invoke all active log handlers
-            if ($covered) {
+            if (!$filtered) {
                 self::$printHandler    && self::invokePrintHandler   ($loggable, $level, $context);
                 self::$mailHandler     && self::invokeMailHandler    ($loggable, $level, $context);
                 self::$smsHandler      && self::invokeSmsHandler     ($loggable, $level, $context);
