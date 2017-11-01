@@ -7,17 +7,13 @@ use rosasurfer\exception\error\PHPCompileError;
 use rosasurfer\exception\error\PHPCompileWarning;
 use rosasurfer\exception\error\PHPCoreError;
 use rosasurfer\exception\error\PHPCoreWarning;
-use rosasurfer\exception\error\PHPDeprecated;
 use rosasurfer\exception\error\PHPError;
 use rosasurfer\exception\error\PHPNotice;
 use rosasurfer\exception\error\PHPParseError;
 use rosasurfer\exception\error\PHPRecoverableError;
 use rosasurfer\exception\error\PHPStrict;
 use rosasurfer\exception\error\PHPUnknownError;
-use rosasurfer\exception\error\PHPUserDeprecated;
 use rosasurfer\exception\error\PHPUserError;
-use rosasurfer\exception\error\PHPUserNotice;
-use rosasurfer\exception\error\PHPUserWarning;
 use rosasurfer\exception\error\PHPWarning;
 use rosasurfer\log\Logger;
 use rosasurfer\util\PHP;
@@ -175,11 +171,6 @@ class ErrorHandler extends StaticClass {
 
         // (3) Wrap everything else in the matching PHPError exception.
         switch ($level) {
-            case E_DEPRECATED       : $exception = new PHPDeprecated      ($message, $code=null, $severity=$level, $file, $line); break;
-            case E_USER_DEPRECATED  : $exception = new PHPUserDeprecated  ($message, $code=null, $severity=$level, $file, $line); break;
-            case E_USER_NOTICE      : $exception = new PHPUserNotice      ($message, $code=null, $severity=$level, $file, $line); break;
-            case E_USER_WARNING     : $exception = new PHPUserWarning     ($message, $code=null, $severity=$level, $file, $line); break;
-
             case E_PARSE            : $exception = new PHPParseError      ($message, $code=null, $severity=$level, $file, $line); break;
             case E_COMPILE_WARNING  : $exception = new PHPCompileWarning  ($message, $code=null, $severity=$level, $file, $line); break;
             case E_COMPILE_ERROR    : $exception = new PHPCompileError    ($message, $code=null, $severity=$level, $file, $line); break;
@@ -191,8 +182,8 @@ class ErrorHandler extends StaticClass {
             case E_ERROR            : $exception = new PHPError           ($message, $code=null, $severity=$level, $file, $line); break;
             case E_RECOVERABLE_ERROR: $exception = new PHPRecoverableError($message, $code=null, $severity=$level, $file, $line); break;
             case E_USER_ERROR       : $exception = new PHPUserError       ($message, $code=null, $severity=$level, $file, $line); break;
-            default:
-                $exception = new PHPUnknownError($message, $code=null, $severity=$level, $file, $line);
+
+            default                 : $exception = new PHPUnknownError    ($message, $code=null, $severity=$level, $file, $line);
         }
 
         // (4) Handle the error according to the error configuration.
