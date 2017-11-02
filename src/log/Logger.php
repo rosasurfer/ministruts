@@ -623,7 +623,7 @@ class Logger extends StaticClass {
             $text = '['.strToUpper(self::$logLevels[$level]).'] '.$type.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
 
             // the stack trace will go into "cliExtra"
-            $traceStr  = $indent.'Stacktrace:'.NL.' -----------'.NL;
+            $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
             $traceStr .= DebugHelper::getBetterTraceAsString($loggable, $indent);
             $extra    .= NL.$traceStr;
         }
@@ -633,7 +633,7 @@ class Logger extends StaticClass {
             $exception = $context['exception'];
             $msg       = $indent.trim(DebugHelper::composeBetterMessage($exception, $indent));
             $extra    .= NL.$msg.NL;
-            $traceStr  = $indent.'Stacktrace:'.NL.' -----------'.NL;
+            $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
             $traceStr .= DebugHelper::getBetterTraceAsString($exception, $indent);
             $extra    .= NL.$traceStr;
         }
@@ -743,7 +743,7 @@ class Logger extends StaticClass {
             }
             $html     .= '<span style="font-weight:bold">['.strToUpper(self::$logLevels[$level]).']</span> '.nl2br(hsc($type.$msg)).'<br>';
             $html     .= 'in <span style="font-weight:bold">'.$file.'</span> on line <span style="font-weight:bold">'.$line.'</span><br>';
-            $traceStr  = $indent.'Stacktrace:'.NL.' -----------'.NL;
+            $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
             $traceStr .= DebugHelper::getBetterTraceAsString($loggable, $indent);
             $html     .= '<span style="clear:both"></span><br>'.printPretty($traceStr, true).'<br>';
         }
@@ -753,7 +753,7 @@ class Logger extends StaticClass {
             $exception = $context['exception'];
             $msg       = DebugHelper::composeBetterMessage($exception);
             $html     .= '<br>'.nl2br(hsc($msg)).'<br>';
-            $traceStr  = $indent.'Stacktrace:'.NL.' -----------'.NL;
+            $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
             $traceStr .= DebugHelper::getBetterTraceAsString($exception, $indent);
             $html     .= printPretty($traceStr, true);
         }

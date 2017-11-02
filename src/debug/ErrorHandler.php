@@ -249,7 +249,7 @@ class ErrorHandler extends StaticClass {
             $file  = $second->getFile();
             $line  = $second->getLine();
             $msg2 .= $indent.'in '.$file.' on line '.$line.NL.NL;
-            $msg2 .= $indent.'Stacktrace:'.NL.' -----------'.NL;
+            $msg2 .= $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
             $msg2 .= DebugHelper::getBetterTraceAsString($second, $indent);
 
             // primary (the causing) exception
@@ -263,7 +263,7 @@ class ErrorHandler extends StaticClass {
                 $file  = $exception->getFile();
                 $line  = $exception->getLine();
                 $msg1 .= $indent.'in '.$file.' on line '.$line.NL.NL;
-                $msg1 .= $indent.'Stacktrace:'.NL.' -----------'.NL;
+                $msg1 .= $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
                 $msg1 .= DebugHelper::getBetterTraceAsString($exception, $indent);
             }
 
