@@ -207,9 +207,8 @@ function printPretty($var, $return=false, $flushBuffers=true) {
                      float:left; width:initial; height:initial;
                      margin:0; padding:0; border-width:0;
                      color:inherit; background-color:inherit">
-                    <pre style="width:initial; height:initial;
-                                margin:0; padding:0; border-width:0;
-                                color:inherit; background-color:inherit;
+                    <pre style="width:initial; height:initial; margin:0; padding:0; border-width:0;
+                                color:inherit; background-color:inherit; white-space:pre; line-height:12px;
                                 font:normal normal 12px/normal \'Courier New\',courier,serif">'.hsc($str).'</pre>
                 </div>';
     if (!strEndsWith($str, NL))

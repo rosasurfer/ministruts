@@ -48,7 +48,7 @@ class DebugHelper extends StaticClass {
      *   {main}          # line 26, file: /var/www/phalcon/vokuro/public/index.php
      * </pre>
      */
-    public static function fixTrace(array $trace, $file = 'unknown', $line = 0) {
+    public static function fixTrace(array $trace, $file='unknown', $line=0) {
         // check if the stacktrace is already fixed
         if ($trace && isSet($trace[0]['fixed']))
             return $trace;
@@ -74,14 +74,6 @@ class DebugHelper extends StaticClass {
             else                       unset($trace[$i]['line']);
 
             $trace[$i]['fixed'] = true;
-            /*
-            if (isSet($trace[$i]['args'])) {                   // skip content of large vars
-                foreach ($trace[$i]['args'] as &$arg) {
-                    if     (is_object($arg)) $arg = get_class($arg);
-                    elseif (is_array ($arg)) $arg = 'Array()';
-                } unset($arg);
-            }
-            */
         }
 
         // Add location details from parameters to frame[0] only if they differ from the old values (now in frame[1])

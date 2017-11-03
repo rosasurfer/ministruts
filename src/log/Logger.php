@@ -5,7 +5,6 @@ use rosasurfer\Application;
 use rosasurfer\config\Config;
 use rosasurfer\core\StaticClass;
 use rosasurfer\debug\DebugHelper;
-use rosasurfer\debug\ErrorHandler;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
@@ -632,7 +631,7 @@ class Logger extends StaticClass {
         if (isSet($context['exception'])) {
             $exception = $context['exception'];
             $msg       = $indent.trim(DebugHelper::composeBetterMessage($exception, $indent));
-            $extra    .= NL.$msg.NL;
+            $extra    .= NL.$msg.NL.NL;
             $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
             $traceStr .= DebugHelper::getBetterTraceAsString($exception, $indent);
             $extra    .= NL.$traceStr;
@@ -719,7 +718,7 @@ class Logger extends StaticClass {
                         position:relative; z-index:65535; top:initial; left:initial;
                         float:left; width:initial; height:initial
                         margin:0; padding:4px; border-width:0;
-                        font:normal normal 12px/normal arial,helvetica,sans-serif;
+                        font:normal normal 12px/normal arial,helvetica,sans-serif; line-height:12px;
                         color:black; background-color:#ccc">';
         $indent = ' ';
 
@@ -727,8 +726,15 @@ class Logger extends StaticClass {
         if (is_string($loggable)) {
             // simple message
             $msg   = $loggable;
-            $html .= '<span style="font-weight:bold">['.strToUpper(self::$logLevels[$level]).']</span> '.nl2br(hsc($msg)).'<br>';
+            $html .= '<span style="font-weight:bold">['.strToUpper(self::$logLevels[$level]).']</span> <span style="white-space:pre; line-height:8px">'.nl2br(hsc($msg)).'</span><br><br>';
             $html .= 'in <span style="font-weight:bold">'.$file.'</span> on line <span style="font-weight:bold">'.$line.'</span><br>';
+
+            // attach the internal stacktrace if there was no exception
+            if (!isSet($context['exception'])) {
+                $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
+                $traceStr .= DebugHelper::formatTrace($context['trace'], $indent);
+                $html     .= '<span style="clear:both"></span><br>'.printPretty($traceStr, true).'<br>';
+            }
         }
         else {
             // exception
@@ -741,7 +747,7 @@ class Logger extends StaticClass {
                     $type .= 'PHP Error:';
                 }
             }
-            $html     .= '<span style="font-weight:bold">['.strToUpper(self::$logLevels[$level]).']</span> '.nl2br(hsc($type.$msg)).'<br>';
+            $html     .= '<span style="font-weight:bold">['.strToUpper(self::$logLevels[$level]).']</span> <span style="white-space:pre; line-height:8px">'.nl2br(hsc($type.$msg)).'</span><br><br>';
             $html     .= 'in <span style="font-weight:bold">'.$file.'</span> on line <span style="font-weight:bold">'.$line.'</span><br>';
             $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
             $traceStr .= DebugHelper::getBetterTraceAsString($loggable, $indent);
@@ -752,7 +758,7 @@ class Logger extends StaticClass {
         if (isSet($context['exception'])) {
             $exception = $context['exception'];
             $msg       = DebugHelper::composeBetterMessage($exception);
-            $html     .= '<br>'.nl2br(hsc($msg)).'<br>';
+            $html     .= '<br>'.nl2br(hsc($msg)).'<br><br>';
             $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
             $traceStr .= DebugHelper::getBetterTraceAsString($exception, $indent);
             $html     .= printPretty($traceStr, true);
@@ -782,28 +788,20 @@ class Logger extends StaticClass {
      */
     private static function resolveLogLocation(array &$context) {
         if (!isSet($context['trace']))
-            $context['trace'] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+            self::generateStackTrace($context);
         $trace = $context['trace'];
 
-        foreach ($trace as $i => $frame) {              // find the first non-logger frame with "file"
-            if (isSet($frame['class']) && $frame['class']==__CLASS__)
-                continue;
-            if (!isSet($trace[$i-1]['file']))           // first non-logger frame, "file" and "line" are in the previous frame
-                continue;                               // skip internal PHP functions
-            $context['file'] = $trace[$i-1]['file'];
-            $context['line'] = $trace[$i-1]['line'];
-            break;
+        foreach ($trace as $i => $frame) {                  // find the first frame with "file"
+            if (isSet($frame['file'])) {                    // skip internal PHP functions
+                $context['file'] = $frame['file'];
+                $context['line'] = $frame['line'];
+                break;
+            }
         }
 
-        if (!isSet($context['file'])) {                 // the logger was called from the main script, "file" and "line"
-            if ($trace) {                               // are in the last frame
-                $context['file'] = $trace[$i]['file'];
-                $context['line'] = $trace[$i]['line'];
-            }
-            else {
-                $context['file'] = '(unknown)';
-                $context['line'] = '(?)';
-            }
+        if (!isSet($context['file'])) {
+            $context['file'] = '(unknown)';
+            $context['line'] = '(?)';
         }
     }
 
@@ -818,22 +816,27 @@ class Logger extends StaticClass {
      */
     private static function resolveLogCaller(array &$context) {
         if (!isSet($context['trace']))
-            $context['trace'] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+            self::generateStackTrace($context);
         $trace = $context['trace'];
 
-        $class = '';
-        foreach ($trace as $frame) {                 // find the frame calling this logger
-            if (!isSet($frame['class']))              // logger was called from a non-class context
-                break;
-            if ($frame['class'] != __CLASS__) {       // logger was called from another class
-                $function     = DebugHelper::getFQFunctionName($frame);
-                $errorHandler = ErrorHandler::getErrorHandler();
-                if ($function == $errorHandler)        // continue if the caller is the registered error handler
-                    continue;
-                $class = $frame['class'];
-                break;
+        $context['class'] = isSet($trace[0]['class']) ? $trace[0]['class'] : '';
+    }
+
+
+    /**
+     * Generate an internal stacktrace and store it in the log context under the key "trace".
+     *
+     * @param  array &$context - reference to the log context
+     */
+    private static function generateStackTrace(array &$context) {
+        if (!isSet($context['trace'])) {
+            $trace = DebugHelper::fixTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), __FILE__, __LINE__);
+            foreach ($trace as $i => $frame) {
+                if ($frame['class'] != __CLASS__)           // remove non-logger frames
+                    break;
+                unset($trace[$i]);
             }
+            $context['trace'] = array_values($trace);
         }
-        $context['class'] = $class;
     }
 }
