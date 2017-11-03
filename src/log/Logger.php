@@ -618,7 +618,7 @@ class Logger extends StaticClass {
             if (!isSet($context['exception'])) {
                 $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
                 $traceStr .= DebugHelper::formatTrace($context['trace'], $indent);
-                $cliExtra .= NL.printPretty($traceStr, true);
+                $cliExtra .= NL.$traceStr;
             }
         }
         else {
