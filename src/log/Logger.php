@@ -578,6 +578,7 @@ class Logger extends StaticClass {
 
     /**
      * Compose a CLI log message and store it in the passed log context under the keys "cliMessage" and "cliExtra".
+     * The separation is used by the SMS handler which only sends the main message ("cliMessage").
      *
      * @param  string|\Exception $loggable - message or exception to log
      * @param  int               $level    - loglevel of the loggable
@@ -589,7 +590,7 @@ class Logger extends StaticClass {
         $file = $context['file'];
         $line = $context['line'];
 
-        $text = $extra = null;
+        $cliMessage = $cliExtra = null;
         $indent = ' ';
 
         // compose message
@@ -606,7 +607,14 @@ class Logger extends StaticClass {
                 }
                 $msg = join(NL.$indent, $lines).$eom;
             }
-            $text = '['.strToUpper(self::$logLevels[$level]).'] '.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
+            $cliMessage = '['.strToUpper(self::$logLevels[$level]).'] '.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
+
+            // if there was no exception append the internal stacktrace to "cliExtra"
+            if (!isSet($context['exception'])) {
+                $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
+                $traceStr .= DebugHelper::formatTrace($context['trace'], $indent);
+                $cliExtra .= NL.printPretty($traceStr, true);
+            }
         }
         else {
             // exception
@@ -619,28 +627,28 @@ class Logger extends StaticClass {
                     $type .= 'PHP Error:';
                 }
             }
-            $text = '['.strToUpper(self::$logLevels[$level]).'] '.$type.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
+            $cliMessage = '['.strToUpper(self::$logLevels[$level]).'] '.$type.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
 
             // the stack trace will go into "cliExtra"
             $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
             $traceStr .= DebugHelper::getBetterTraceAsString($loggable, $indent);
-            $extra    .= NL.$traceStr;
+            $cliExtra .= NL.$traceStr;
         }
 
         // append an existing context exception to "cliExtra"
         if (isSet($context['exception'])) {
             $exception = $context['exception'];
             $msg       = $indent.trim(DebugHelper::composeBetterMessage($exception, $indent));
-            $extra    .= NL.$msg.NL.NL;
+            $cliExtra .= NL.$msg.NL.NL;
             $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
             $traceStr .= DebugHelper::getBetterTraceAsString($exception, $indent);
-            $extra    .= NL.$traceStr;
+            $cliExtra .= NL.$traceStr;
         }
 
         // store main and extra message
-        $context['cliMessage'] = $text;
-        if ($extra)
-            $context['cliExtra'] = $extra;
+        $context['cliMessage'] = $cliMessage;
+        if ($cliExtra)
+            $context['cliExtra'] = $cliExtra;
     }
 
 
