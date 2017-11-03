@@ -28,6 +28,7 @@ use const rosasurfer\L_FATAL;
 use const rosasurfer\L_NOTICE;
 use const rosasurfer\L_WARN;
 use const rosasurfer\NL;
+use const rosasurfer\L_INFO;
 
 
 /**
@@ -162,11 +163,11 @@ class ErrorHandler extends StaticClass {
 
         // (2) Process errors according to their severity level.
         switch ($level) {
-            // always log non-critical and user errors and continue normally (without a stacktrace)
-            case E_DEPRECATED     : return true(Logger::log($message, L_NOTICE, $logContext));
-            case E_USER_DEPRECATED: return true(Logger::log($message, L_NOTICE, $logContext));
+            // log non-critical errors and continue normally
+            case E_DEPRECATED     : return true(Logger::log($message, L_INFO,   $logContext));
+            case E_USER_DEPRECATED: return true(Logger::log($message, L_INFO,   $logContext));
             case E_USER_NOTICE    : return true(Logger::log($message, L_NOTICE, $logContext));
-            case E_USER_WARNING   : return true(Logger::log($message, L_WARN  , $logContext));
+            case E_USER_WARNING   : return true(Logger::log($message, L_WARN,   $logContext));
         }
 
         // (3) Wrap everything else in the matching PHPError exception.
@@ -231,9 +232,9 @@ class ErrorHandler extends StaticClass {
         $second  = null;
 
         try {
-            $context['class'    ] = __CLASS__;              // atm not required but somewhen somewhere somebody might ask for it
-            $context['file'     ] = $exception->getFile();  // if the location is not preset the Logger will correctly
-            $context['line'     ] = $exception->getLine();  // resolve this method as the originating location
+            $context['class'    ] = __CLASS__;
+            $context['file'     ] = $exception->getFile();  // If the location is not preset the logger will resolve the
+            $context['line'     ] = $exception->getLine();  // exception handler as the originating location.
             $context['unhandled'] = true;
 
             Logger::log($exception, L_FATAL, $context);     // log with the highest level

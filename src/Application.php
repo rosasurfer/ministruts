@@ -367,8 +367,10 @@ class Application extends Object {
 
 
     /**
-     * Whether or not the current remote ip address is white-listed for admin access. 127.0.0.1 and the web server's ip
-     * address are always white-listed. Other ip addresses can be white-listed per configuration.
+     * Whether or not the current remote IP address is white-listed for admin access. 127.0.0.1 and the web server's IP
+     * address are always white-listed. More IP addresses can be white-listed per configuration:
+     *
+     * "admin.ip.whitelist.<name> = <ip-address>"
      *
      * @return bool
      */

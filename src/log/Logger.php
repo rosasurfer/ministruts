@@ -86,9 +86,7 @@ use const rosasurfer\WINDOWS;
  *  log.sms.level              = error             # the loglevel for text messages is set a bit higher to L_ERROR
  *
  *
- * @todo   Logger::resolveLogCaller()   - test with Closure and internal PHP functions
- * @todo   Logger::composeHtmlMessage() - append an existing context exception
- *
+ * @todo   Logger::resolveLogCaller() - test with Closure and internal PHP functions
  * @todo   refactor and separate handlers into single classes
  * @todo   implement \Psr\Log\LoggerInterface and remove static crap
  * @todo   implement full mail address support as in "Joe Blow <address@domain.tld>"
@@ -96,7 +94,7 @@ use const rosasurfer\WINDOWS;
 class Logger extends StaticClass {
 
 
-    /** @var int - built-in default loglevel; used if no application loglevel is configured */
+    /** @var int - built-in default loglevel if no application loglevel is configured */
     const DEFAULT_LOGLEVEL = L_NOTICE;
 
 
@@ -104,19 +102,22 @@ class Logger extends StaticClass {
     private static $appLogLevel = self::DEFAULT_LOGLEVEL;
 
 
-    /** @var bool - whether or not the PrintHandler is enabled */
-    private static $printHandler = false;
+    /** @var bool - whether or not the print handler for L_FATAL messages is enabled */
+    private static $printFatalHandler = false;
 
-    /** @var int - counter for messages handled by the PrintHandler */
+    /** @var bool - whether or not the print handler for non L_FATAL messages is enabled */
+    private static $printNonfatalHandler = false;
+
+    /** @var int - counter for messages handled by the print handler */
     private static $printCounter = 0;
 
-    /** @var bool - whether or not the MailHandler is enabled */
+    /** @var bool - whether or not the mail handler is enabled */
     private static $mailHandler = false;
 
     /** @var string[] - mail receivers */
     private static $mailReceivers = [];
 
-    /** @var bool - whether or not the SMSHandler is enabled */
+    /** @var bool - whether or not the SMS handler is enabled */
     private static $smsHandler = false;
 
     /** @var string[] - SMS receivers */
@@ -128,7 +129,7 @@ class Logger extends StaticClass {
     /** @var array - SMS options; resolved at log message time */
     private static $smsOptions = [];
 
-    /** @var bool - whether or not the ErrorLogHandler is enabled */
+    /** @var bool - whether or not the PHP error_log handler is enabled */
     private static $errorLogHandler = true;
 
     /** @var string[] - loglevel descriptions for message formatter */
@@ -151,7 +152,7 @@ class Logger extends StaticClass {
         $config = Config::getDefault();
 
 
-        // (1) resolve the application default loglevel (if not configured the built-in default loglevel)
+        // (1) Get the application's default loglevel configuration (fall back to the built-in default).
         if ($config) {
             $logLevel = $config->get('log.level', '');
             if (is_array($logLevel))
@@ -164,11 +165,7 @@ class Logger extends StaticClass {
         self::$appLogLevel = $logLevel;
 
 
-        // (2) PrintHandler: enabled for local access or if explicitely enabled
-        self::$printHandler = CLI || Application::isWhiteListedRemoteIP() || PHP::ini_get_bool('display_errors');
-
-
-        // (3) MailHandler: enabled if mail receivers are configured
+        // (2) mail handler: enabled if mail receivers are configured
         $receivers = [];
         if ($config) {
             foreach (explode(',', $config->get('log.mail.receiver', '')) as $receiver) {
@@ -189,7 +186,16 @@ class Logger extends StaticClass {
         self::$mailReceivers =        $receivers;
 
 
-        // (4) SMSHandler: enabled if SMS receivers are configured (operator settings are checked at log message time)
+        // (3) L_FATAL print handler: enabled on local/white-listed access or if explicitely enabled
+        self::$printFatalHandler = CLI || Application::isWhiteListedRemoteIP() || PHP::ini_get_bool('display_errors');
+
+
+        // (4) non L_FATAL print handler: enabled on local access, if explicitely enabled or if the mail handler is disabled
+        self::$printNonfatalHandler = CLI || in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1', $_SERVER['SERVER_ADDR']])
+                                          || PHP::ini_get_bool('display_errors')
+                                          || (self::$printFatalHandler && !self::$mailHandler);
+
+        // (5) SMS handler: enabled if SMS receivers are configured (operator settings are checked at log time)
         self::$smsReceivers = [];
         if ($config) {
             foreach (explode(',', $config->get('log.sms.receiver', '')) as $receiver) {
@@ -221,7 +227,7 @@ class Logger extends StaticClass {
         self::$smsHandler = self::$smsReceivers && self::$smsOptions;
 
 
-        // (5) ErrorLogHandler: enabled if the MailHandler is disabled
+        // (6) PHP error_log handler: enabled if the mail handler is disabled
         self::$errorLogHandler = !self::$mailHandler;
 
         $initialized = true;
@@ -333,11 +339,11 @@ class Logger extends StaticClass {
 
             $filtered = false;
 
-            // filter messages not covered by the current loglevel
-            if (!$filtered && $level!=L_FATAL) {                                // the highest loglevel is always covered
-                if (!isSet($context['class']))                                  // resolve the caller and check its loglevel
+            // filter messages below the active loglevel
+            if (!$filtered && $level!=L_FATAL) {                                // L_FATAL (highest) can't be below
+                if (!isSet($context['class']))                                  // resolve the calling class and check its loglevel
                     self::resolveLogCaller($context);
-                $filtered = $level < self::getLogLevel($context['class']);      // message is not covered
+                $filtered = $level < self::getLogLevel($context['class']);      // message is below the active loglevel
             }
 
             // filter "headers already sent" errors triggered by a previously printed HTML log message
@@ -349,7 +355,10 @@ class Logger extends StaticClass {
 
             // invoke all active log handlers
             if (!$filtered) {
-                self::$printHandler    && self::invokePrintHandler   ($loggable, $level, $context);
+                if ($level == L_FATAL) $printHandler = 'printFatalHandler';
+                else                   $printHandler = 'printNonfatalHandler';
+
+                self::${$printHandler} && self::invokePrintHandler   ($loggable, $level, $context);
                 self::$mailHandler     && self::invokeMailHandler    ($loggable, $level, $context);
                 self::$smsHandler      && self::invokeSmsHandler     ($loggable, $level, $context);
                 self::$errorLogHandler && self::invokeErrorLogHandler($loggable, $level, $context);
@@ -382,7 +391,6 @@ class Logger extends StaticClass {
      * @param  array            &$context  - reference to the log context with additional data
      */
     private static function invokePrintHandler($loggable, $level, array &$context) {
-        if (!self::$printHandler) return;
         $message = null;
 
         if (CLI) {
@@ -412,7 +420,6 @@ class Logger extends StaticClass {
      * @param  array            &$context  - reference to the log context with additional data
      */
     private static function invokeMailHandler($loggable, $level, array &$context) {
-        if (!self::$mailHandler) return;
         if (!isSet($context['mailSubject']) || !isSet($context['mailMessage']))
             self::composeMailMessage($loggable, $level, $context);
 
@@ -447,7 +454,6 @@ class Logger extends StaticClass {
      * @todo   replace CURL dependency with internal PHP functions
      */
     private static function invokeSmsHandler($loggable, $level, array &$context) {
-        if (!self::$smsHandler) return;
         if (!isSet($context['cliMessage']))
             self::composeCliMessage($loggable, $level, $context);
 
@@ -554,7 +560,6 @@ class Logger extends StaticClass {
      * @param  array            &$context  - reference to the log context with additional data
      */
     private static function invokeErrorLogHandler($loggable, $level, array &$context) {
-        if (!self::$errorLogHandler) return;
         if (!isSet($context['cliMessage']))
             self::composeCliMessage($loggable, $level, $context);
 
@@ -839,8 +844,9 @@ class Logger extends StaticClass {
     private static function generateStackTrace(array &$context) {
         if (!isSet($context['trace'])) {
             $trace = DebugHelper::fixTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), __FILE__, __LINE__);
+
             foreach ($trace as $i => $frame) {
-                if ($frame['class'] != __CLASS__)           // remove non-logger frames
+                if (!isSet($frame['class']) || $frame['class']!=__CLASS__)      // remove non-logger frames
                     break;
                 unset($trace[$i]);
             }
