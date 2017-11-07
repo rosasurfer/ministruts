@@ -402,8 +402,8 @@ class Request extends Singleton {
 
 
     /**
-     * Return the content of the current request (the request body). For file uploads the method returns not the real
-     * (binary) content. Instead it returns the available meta infos.
+     * Return the content of the current request (the request body). For file uploads the method returns not the real binary
+     * content. Instead it returns the available meta infos.
      *
      * @return string - request body or meta infos
      */
@@ -413,11 +413,15 @@ class Request extends Singleton {
 
         if (!$beenRead) {
             if ($this->getContentType() == 'multipart/form-data') {
-                if ($_POST)                                             // php://input is not available with
-                    $content = '$_POST => '.print_r($_POST, true).NL;   // enctype="multipart/form-data"
+                // file upload
+                if ($_POST) {                                                           // php://input is not available with
+                    $content = '$_POST => '.print_r($_POST, true).NL;                   // enctype="multipart/form-data"
+                    // TODO: we should limit excessive variable values to 1KB
+                }
                 $content .= '$_FILES => '.print_r($_FILES, true);
             }
             else {
+                // regular request body
                 $content = file_get_contents('php://input');
             }
             $beenRead = true;
@@ -945,9 +949,9 @@ class Request extends Singleton {
 
         // content (request body)
         $content = $this->getContent();
-        if (strLen($content))
-            $string .= NL.$content.NL;
-
+        if (strLen($content)) {
+            $string .= NL.subStr($content, 0, 1024).NL;             // limit the request body to 1024 bytes
+        }
         return $string;
     }
 }
