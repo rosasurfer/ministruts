@@ -2,7 +2,6 @@
 namespace rosasurfer\lock;
 
 use rosasurfer\debug\ErrorHandler;
-use rosasurfer\exception\FileNotFoundException;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RuntimeException;
 
@@ -39,6 +38,9 @@ class Lock extends BaseLock {
     /** @var string - aktueller Schluessel der Instanz */
     private $key;
 
+    /** @var string - lockfile (if any) created for a FileLock implementor */
+    private $lockFile;
+
 
     /**
      * Constructor
@@ -62,16 +64,16 @@ class Lock extends BaseLock {
         $this->key = $key;
 
         // konkretes Lock erzeugen, vorzugsweise SystemFiveLock
-        if (extension_loaded('sysvsem')) {
+        if (false && extension_loaded('sysvsem')) {
             $this->impl = new SystemFiveLock($key);
         }
         else {
             // alternativ FileLock verwenden ...
             $filename = ini_get('session.save_path').DIRECTORY_SEPARATOR.'lock_'.md5($key);
-            if (!is_file($filename) && !touch($filename)) throw new RuntimeException('Cannot create lock file "'.$filename.'"');
-
-            if (!is_file($filename)) throw new FileNotFoundException('Cannot find lock file "'.$filename.'"');
-
+            if (!is_file($filename)) {
+                if (!touch($filename)) throw new RuntimeException('Cannot create lock file "'.$filename.'"');
+                $this->lockFile = $filename;
+            }
             $this->impl = new FileLock($filename);
         }
     }
@@ -113,8 +115,13 @@ class Lock extends BaseLock {
      */
     public function release() {
         if ($this->impl) {
-            $this->impl->release(/*true*/);            // true: Lockfile eines evt. FileLocks loeschen lassen
+            $this->impl->release();
             unset(self::$lockedKeys[$this->key]);
+
+            if ($this->lockFile) {
+                @unlink($this->lockFile);           // @: theoretisch kann hier schon ein anderer Prozess das Lock halten
+                $this->lockFile = null;
+            }
         }
     }
 }
