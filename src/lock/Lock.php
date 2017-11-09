@@ -69,7 +69,7 @@ class Lock extends BaseLock {
         }
         else {
             // alternativ FileLock verwenden ...
-            $filename = ini_get('session.save_path').DIRECTORY_SEPARATOR.'lock_'.md5($key);
+            $filename = ini_get('session.save_path').'/lock_'.md5($key);
             if (!is_file($filename)) {
                 if (!touch($filename)) throw new RuntimeException('Cannot create lock file "'.$filename.'"');
                 $this->lockFile = $filename;
