@@ -25,7 +25,7 @@ final class FileLock extends BaseLock {
 
 
     /** @var resource[] */
-    private static $hFiles;
+    private static $hFiles = [];
 
     /** @var string */
     private $filename;
