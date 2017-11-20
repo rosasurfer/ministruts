@@ -66,7 +66,7 @@ elif [ "$NOTIFY_IF_ON" = "$HOSTNAME" ]; then
     if command -v sendmail >/dev/null; then
         (
         echo 'From: "Deployments '$NOTIFY_FOR_SITE'" <'$NOTIFY_TO_EMAIL'>'
-        if   [ -n "$BRANCH" ]; then echo "Subject: Updated $NOTIFY_FOR_SITE to latest on branch $BRANCH ($NEW)" 
+        if   [ -n "$BRANCH" ]; then echo "Subject: Updated $NOTIFY_FOR_SITE, branch '$BRANCH' to latest ($NEW)" 
         elif [ -n "$TAG"    ]; then echo "Subject: Reset $NOTIFY_FOR_SITE to tag $TAG"
         elif [ -n "$COMMIT" ]; then echo "Subject: Reset $NOTIFY_FOR_SITE to commit $NEW"
         fi
