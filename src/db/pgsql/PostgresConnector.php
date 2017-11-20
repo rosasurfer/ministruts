@@ -8,6 +8,7 @@ use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\exception\RuntimeException;
 
 use function rosasurfer\strContains;
+use function rosasurfer\strContainsI;
 use function rosasurfer\strStartsWithI;
 
 use const rosasurfer\NL;
@@ -136,14 +137,10 @@ class PostgresConnector extends Connector {
         $options = $this->options;
 
         if (is_resource($this->hConnection)) {
-            $host = pg_host($this->hConnection);
-            $port = pg_port($this->hConnection);
-            $db   = pg_dbname($this->hConnection);
-            $path = $this->query('show search_path')->fetchString();
-
-            if (strContains($path, '"$user"') && isSet($options['user'])) {
-                $path = str_replace('"$user"', $options['user'], $path);
-            }
+            $host        = pg_host($this->hConnection);
+            $port        = pg_port($this->hConnection);
+            $db          = pg_dbname($this->hConnection);
+            $path        = $this->getSchemaSearchPath();
             $description = $host.':'.$port.'/'.$db.' (schema search path: '.$path.')';
         }
         else {
@@ -161,6 +158,37 @@ class PostgresConnector extends Connector {
             $description = $host.$port.'/'.$db;
         }
         return $description;
+    }
+
+
+    /**
+     * Return the database's current schema search path.
+     *
+     * @return string|null - schema search path or NULL in case of errors
+     */
+    protected function getSchemaSearchPath() {
+        $options = $this->options;
+        $path = $rolledBack = null;
+
+        while ($this->hConnection) {
+            try {
+                $result = pg_query($this->hConnection, 'show search_path');
+                $row    = pg_fetch_array($result, null, PGSQL_NUM);
+                $path   = $row[0];
+
+                if (strContains($path, '"$user"') && isSet($options['user'])) {
+                    $path = str_replace('"$user"', $options['user'], $path);
+                }
+                break;
+            }
+            catch (\Exception $ex) {
+                if ($rolledBack || !strContainsI($ex->getMessage(), 'current transaction is aborted, commands ignored until end of transaction block'))
+                    throw $ex;
+                $rolledBack = true;
+                $this->rollback();
+            }
+        }
+        return $path;
     }
 
 
@@ -406,8 +434,12 @@ class PostgresConnector extends Connector {
     public function rollback() {
         if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
 
-        if      (!$this->isConnected())    trigger_error('Not connected', E_USER_WARNING);
-        else if (!$this->transactionLevel) trigger_error('No database transaction to roll back', E_USER_WARNING);
+        if (!$this->isConnected()) {
+            trigger_error('Not connected', E_USER_WARNING);
+        }
+        else if (!$this->transactionLevel) {
+            //trigger_error('No database transaction to roll back', E_USER_WARNING);
+        }
         else {
             if ($this->transactionLevel == 1)
                 $this->execute('rollback');
