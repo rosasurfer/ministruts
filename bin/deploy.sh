@@ -76,8 +76,14 @@ elif [ "$NOTIFY_IF_ON" = "$HOSTNAME" ]; then
 fi
 
 
-# update ownership and access permissions for writing of files
+# update access permissions and ownership for writing files
+DIRS="etc/log  etc/tmp"
+
+for dir in $dirs; do
+    dir="$PROJECT_DIR/$dir/"
+    [ -d "$dir" ] || mkdir -p "$dir"
+    chmod 777 "$dir"    
+done
+
 USER=username
-id -u "$USER" >/dev/null 2>&1  && chown -R  "$USER.$USER" "$PROJECT_DIR"
-[ -d "$PROJECT_DIR/etc/log/" ] && chmod 777 "$PROJECT_DIR/etc/log/"
-[ -d "$PROJECT_DIR/etc/tmp/" ] && chmod 777 "$PROJECT_DIR/etc/tmp/"
+id -u "$USER" >/dev/null 2>&1 && chown -R "$USER.$USER" "$PROJECT_DIR"
