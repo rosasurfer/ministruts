@@ -19,6 +19,5 @@
 *.volt         text eol=lf
 *.xml          text eol=lf
 *.yml          text eol=lf
-.gitattributes text eol=lf
-.gitignore     text eol=lf
+.git*          text eol=lf
 .ht*           text eol=lf
