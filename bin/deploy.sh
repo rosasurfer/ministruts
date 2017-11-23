@@ -79,7 +79,7 @@ fi
 # update access permissions and ownership for writing files
 DIRS="etc/log  etc/tmp"
 
-for dir in $dirs; do
+for dir in $DIRS; do
     dir="$PROJECT_DIR/$dir/"
     [ -d "$dir" ] || mkdir -p "$dir"
     chmod 777 "$dir"    
