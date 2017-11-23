@@ -93,7 +93,7 @@ class PHP extends StaticClass {
         if (!php_ini_loaded_file())                                                                                  $issues[] = 'Error: no "php.ini" configuration file loaded  [setup]';
         /*PHP_INI_PERDIR*/ if (!self::ini_get_bool('short_open_tag'                ))                                $issues[] = 'Error: short_open_tag is not On  [security]';
         /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('asp_tags'                      ) && PHP_VERSION_ID <  70000)     $issues[] = 'Info:  asp_tags is not Off  [standards]';
-        /*PHP_INI_ONLY  */ if ( self::ini_get_bool('expose_php'                    ))                                $issues[] = 'Warn:  expose_php is not Off  [security]';
+        /*PHP_INI_ONLY  */ if ( self::ini_get_bool('expose_php'                    ) && !CLI)                        $issues[] = 'Warn:  expose_php is not Off  [security]';
         /*PHP_INI_ALL   */ if ( self::ini_get_int ('max_execution_time'            ) > 30 && !CLI/*hardcoded*/)      $issues[] = 'Info:  max_execution_time is very high: '.ini_get('max_execution_time').'  [resources]';
         /*PHP_INI_ALL   */ if ( self::ini_get_int ('default_socket_timeout'        ) > 30  /*PHP default: 60*/)      $issues[] = 'Info:  default_socket_timeout is very high: '.ini_get('default_socket_timeout').'  [resources]';
         /*PHP_INI_ALL   */ $memoryLimit = self::ini_get_bytes('memory_limit'       );
@@ -193,8 +193,8 @@ class PHP extends StaticClass {
         }                  if ($order != 'GP')                                                                       $issues[] = 'Error: request_order is not "GP": "'.(empty(ini_get('request_order')) ? '" (empty) => variables_order:"':'').$order.'"  [standards]';
         /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('always_populate_raw_post_data' ) && PHP_VERSION_ID <  70000)     $issues[] = 'Info:  always_populate_raw_post_data is not Off  [performance]';
         /*PHP_INI_ALL   */ if (       ini_get     ('arg_separator.output'          ) != '&')                         $issues[] = 'Warn:  arg_separator.output is not "&": "'.ini_get('arg_separator.output').'"  [standards]';
-        /*PHP_INI_ALL   */ if (!self::ini_get_bool('ignore_user_abort'             ))                                $issues[] = 'Warn:  ignore_user_abort is not On  [standards]';
-        /*PHP_INI_SYSTEM*/ if ( self::ini_get_bool('file_uploads'                  )) {                              $issues[] = 'Info:  file_uploads is not Off  [security]';
+        /*PHP_INI_ALL   */ if (!self::ini_get_bool('ignore_user_abort'             ) && !CLI)                        $issues[] = 'Warn:  ignore_user_abort is not On  [standards]';
+        /*PHP_INI_SYSTEM*/ if ( self::ini_get_bool('file_uploads'                  ) && !CLI) {                      $issues[] = 'Info:  file_uploads is not Off  [security]';
             // TODO: check "upload_tmp_dir"
         }
         /*PHP_INI_ALL   */ if (            ini_get('default_mimetype'              )  != 'text/html')                $issues[] = 'Info:  default_mimetype is not "text/html": "'.ini_get('default_mimetype').'"  [standards]';
