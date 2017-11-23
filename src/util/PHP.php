@@ -99,15 +99,14 @@ class PHP extends StaticClass {
         /*PHP_INI_ALL   */ $memoryLimit = self::ini_get_bytes('memory_limit'       );
                            $sWarnLimit  = Config::getDefault()->get('log.warn.memory_limit', '');
                            $warnLimit   = byteValue($sWarnLimit);
-            if      ($memoryLimit ==     -1)                                                                         $issues[] = 'Warn:  memory_limit is unlimited  [resources]';
-            else if ($memoryLimit <=      0)                                                                         $issues[] = 'Error: memory_limit is invalid: '.ini_get('memory_limit');
-            else if ($memoryLimit <  8 * MB)                                                                         $issues[] = 'Info:  memory_limit is very low: '.ini_get('memory_limit').'  [resources]';
-            else if ($memoryLimit > 32 * MB && ($warnLimit <= 0 || $warnLimit >= $memoryLimit))                      $issues[] = 'Info:  memory_limit is very high: '.ini_get('memory_limit').'  [resources]';
+            if      ($memoryLimit ==      -1)                                                                        $issues[] = 'Warn:  memory_limit is unlimited  [resources]';
+            else if ($memoryLimit <=       0)                                                                        $issues[] = 'Error: memory_limit is invalid: '.ini_get('memory_limit');
+            else if ($memoryLimit <   8 * MB)                                                                        $issues[] = 'Info:  memory_limit is very low: '.ini_get('memory_limit').'  [resources]';
+            else if ($memoryLimit > 128 * MB)                                                                        $issues[] = 'Info:  memory_limit is very high: '.ini_get('memory_limit').'  [resources]';
             if ($warnLimit) {
                 if      ($warnLimit <             0)                                                                 $issues[] = 'Error: log.warn.memory_limit is invalid: '.$sWarnLimit.'  [configuration]';
                 else if ($warnLimit >= $memoryLimit)                                                                 $issues[] = 'Error: log.warn.memory_limit ('.$sWarnLimit.') is not lower than memory_limit ('.ini_get('memory_limit').')  [configuration]';
-                else if ($warnLimit <        4 * MB)                                                                 $issues[] = 'Info:  log.warn.memory_limit ('.$sWarnLimit.') is very low (memory_limit: '.ini_get('memory_limit').')  [configuration]';
-                else if ($warnLimit >       64 * MB)                                                                 $issues[] = 'Info:  log.warn.memory_limit ('.$sWarnLimit.') is very high (memory_limit: '.ini_get('memory_limit').')  [configuration]';
+                else if ($warnLimit >      128 * MB)                                                                 $issues[] = 'Info:  log.warn.memory_limit ('.$sWarnLimit.') is very high (memory_limit: '.ini_get('memory_limit').')  [configuration]';
             }
         /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('register_globals'              ) && PHP_VERSION_ID <  50400)     $issues[] = 'Error: register_globals is not Off  [security]';
         /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('register_long_arrays'          ) && PHP_VERSION_ID <  50400)     $issues[] = 'Info:  register_long_arrays is not Off  [performance]';
