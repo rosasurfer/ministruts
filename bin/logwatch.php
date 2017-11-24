@@ -113,7 +113,7 @@ $line  = $entry = '';
 $i = 0;
 while (($line=fGets($hFile)) !== false) {
     $i++;
-    $line = trim($line, "\r\n");                // PHP cannot handle EOL_NETSCAPE "\r\r\n" (standard on PHP-Windows)
+    $line = trim($line, "\r\n");                // PHP cannot handle EOL_NETSCAPE "\r\r\n" which is error_log() standard on Windows
     if (strStartsWith($line, '[')) {            // lines starting with a bracket "[" are considered the start of an entry
         processEntry($entry);
         $entry = '';
