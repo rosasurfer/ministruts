@@ -118,7 +118,7 @@ while (($line=fGets($hFile)) !== false) {
         processEntry($entry);
         $entry = '';
     }
-    $entry .= $line;
+    $entry .= $line.NL;
 }
 processEntry($entry);                           // process the last entry (if any)
 
