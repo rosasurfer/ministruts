@@ -17,17 +17,22 @@ use rosasurfer\util\Validator;
 
 
 // Whether or not we run on a command line interface, on localhost and/or on Windows.
-define('rosasurfer\_CLI',       defined(\STDIN) || isSet($_SERVER['argc']));
+define('rosasurfer\_CLI',       defined('\STDIN') || isSet($_SERVER['argc']));
 define('rosasurfer\_LOCALHOST', !_CLI && in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1', $_SERVER['SERVER_ADDR']]));
 define('rosasurfer\_MACOS',     strToUpper(PHP_OS) == 'DARWIN');
 define('rosasurfer\_WINDOWS',   strToUpper(subStr(PHP_OS, 0, 3)) == 'WIN');
 define('rosasurfer\_NUL',       _WINDOWS ? 'nul' : '/dev/null');
 
-const CLI       = _CLI;                                             // namespaced constants improve IDE code completion
+/** @var bool - whether or not we run on a command line interface */
+const CLI       = _CLI;                                             // const decl. enable better IDE code completion
+/** @var bool - whether or not we run on a webserver's localhost */
 const LOCALHOST = _LOCALHOST;
+/** @var bool - whether or not we run on MacOS */
 const MACOS     = _MACOS;
+/** @var bool - whether or not we run on Windows */
 const WINDOWS   = _WINDOWS;
-const NUL       = _NUL;                                             // the system's NUL device name
+/** @var bool - the system's NUL device name */
+const NUL       = _NUL;
 
 // custom log level
 const L_DEBUG           =  1;
