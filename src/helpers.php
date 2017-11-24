@@ -24,15 +24,15 @@ define('rosasurfer\_WINDOWS',   strToUpper(subStr(PHP_OS, 0, 3)) == 'WIN');
 define('rosasurfer\_NUL',       _WINDOWS ? 'nul' : '/dev/null');
 
 /** @var bool - whether or not we run on a command line interface */
-const CLI       = _CLI;                                             // const decl. enable better IDE code completion
+const CLI = _CLI;                                                   // const decl. improve IDE code completion
 /** @var bool - whether or not we run on a webserver's localhost */
 const LOCALHOST = _LOCALHOST;
 /** @var bool - whether or not we run on MacOS */
-const MACOS     = _MACOS;
+const MACOS = _MACOS;
 /** @var bool - whether or not we run on Windows */
-const WINDOWS   = _WINDOWS;
+const WINDOWS = _WINDOWS;
 /** @var bool - the system's NUL device name */
-const NUL       = _NUL;
+const NUL = _NUL;
 
 // custom log level
 const L_DEBUG           =  1;
