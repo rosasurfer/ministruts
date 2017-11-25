@@ -1,8 +1,8 @@
 #!/bin/bash
 #
 
-# notification configuration   
-NOTIFY_FOR_SITE=www.domain.tld
+# notification configuration
+NOTIFY_FOR_PROJECT=project-name
 NOTIFY_TO_EMAIL=email@domain.tld
 NOTIFY_IF_ON=hostname
 
@@ -40,20 +40,20 @@ elif [ $# -eq 1 ]; then
         echo "Unknown ref-name $1"
         echo "Usage: $(basename "$0") [<branch-name> | <tag-name> | <commit-sha>]"
         exit 2
-    fi            
-else    
+    fi
+else
     echo "Usage: $(basename "$0") [<branch-name> | <tag-name> | <commit-sha>]"
     exit 2
 fi
 
 
-# update project 
+# update project
 OLD=$(git rev-parse --short HEAD)
 git fetch origin
 if   [ -n "$BRANCH" ]; then { git checkout $BRANCH; git merge origin/$BRANCH; }
 elif [ -n "$TAG"    ]; then { git checkout $TAG;                              }
 elif [ -n "$COMMIT" ]; then { git checkout $COMMIT;                           }
-fi    
+fi
 
 
 # check changes and send deployment notifications
@@ -65,14 +65,14 @@ if [ "$OLD" = "$NEW" ]; then
 elif [ "$NOTIFY_IF_ON" = "$HOSTNAME" ]; then
     if command -v sendmail >/dev/null; then
         (
-        echo 'From: "Deployments '$NOTIFY_FOR_SITE'" <'$NOTIFY_TO_EMAIL'>'
-        if   [ -n "$BRANCH" ]; then echo "Subject: Updated $NOTIFY_FOR_SITE, branch $BRANCH to latest ($NEW)" 
-        elif [ -n "$TAG"    ]; then echo "Subject: Reset $NOTIFY_FOR_SITE to tag $TAG"
-        elif [ -n "$COMMIT" ]; then echo "Subject: Reset $NOTIFY_FOR_SITE to commit $NEW"
+        echo 'From: "Deployments '$NOTIFY_FOR_PROJECT'" <'$NOTIFY_TO_EMAIL'>'
+        if   [ -n "$BRANCH" ]; then echo "Subject: Updated $NOTIFY_FOR_PROJECT, branch $BRANCH to latest ($NEW)"
+        elif [ -n "$TAG"    ]; then echo "Subject: Reset $NOTIFY_FOR_PROJECT to tag $TAG"
+        elif [ -n "$COMMIT" ]; then echo "Subject: Reset $NOTIFY_FOR_PROJECT to commit $NEW"
         fi
         git log --pretty='%h %ae %s' $OLD..$NEW
         ) | sendmail -f $NOTIFY_TO_EMAIL $NOTIFY_TO_EMAIL
-    fi         
+    fi
 fi
 
 
@@ -82,7 +82,7 @@ DIRS="etc/log  etc/tmp"
 for dir in $DIRS; do
     dir="$PROJECT_DIR/$dir/"
     [ -d "$dir" ] || mkdir -p "$dir"
-    chmod 777 "$dir"    
+    chmod 777 "$dir"
 done
 
 USER=username
