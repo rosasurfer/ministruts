@@ -793,6 +793,17 @@ function pluralize($count, $singular='', $plural='s') {
 
 
 /**
+ * Execute a task in a synchronized way. Emulates the Java keyword "synchronized". If an anonymous function is passed it is
+ * implicitly casted to a Closure.
+ *
+ * @param  \Closure $task - task to execute
+ */
+function synchronized(\Closure $task) {
+    return \rosasurfer\synchronized($task);
+}
+
+
+/**
  * Lookup and return a {@link URL} helper for the named route as configured in <tt>&lt;mapping name="{Name}"&gt;</tt>
  * in struts-config.xml.
  *

@@ -9,6 +9,7 @@ use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\IOException;
 use rosasurfer\exception\RuntimeException;
+use rosasurfer\lock\Lock;
 use rosasurfer\log\Logger;
 use rosasurfer\ministruts\Request;
 use rosasurfer\ministruts\url\Url;
@@ -1215,6 +1216,22 @@ function pluralize($count, $singular='', $plural='s') {
     if (abs($count) == 1)
         return $singular;
     return $plural;
+}
+
+
+/**
+ * Execute a task in a synchronized way. Emulates the Java keyword "synchronized". If an anonymous function is passed it is
+ * implicitly casted to a Closure.
+ *
+ * @param  \Closure $task - task to execute
+ */
+function synchronized(\Closure $task) {
+    $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+    $lock = new Lock($trace[0]['file'].'#'.$trace[0]['line']);
+
+    $task();
+
+    $lock->release();
 }
 
 

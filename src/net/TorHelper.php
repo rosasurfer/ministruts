@@ -5,13 +5,13 @@ use rosasurfer\cache\Cache;
 use rosasurfer\core\StaticClass;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\IOException;
-use rosasurfer\lock\Lock;
 use rosasurfer\log\Logger;
 use rosasurfer\net\http\CurlHttpClient;
 use rosasurfer\net\http\HttpRequest;
 use rosasurfer\net\http\HttpResponse;
 
 use function rosasurfer\normalizeEOL;
+use function rosasurfer\synchronized;
 
 use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_ERROR;
@@ -96,7 +96,9 @@ class TorHelper extends StaticClass {
         $nodes = $cache->get($key='tor_exit_nodes');
 
         if ($nodes == null) {
-            $lock = new Lock();              // Einlesen der Nodes synchronisieren
+
+            // Einlesen der Nodes synchronisieren
+            synchronized(function() use ($cache, $key, &$nodes) {
                 $nodes = $cache->get($key);
 
                 if ($nodes == null) {
@@ -107,9 +109,8 @@ class TorHelper extends StaticClass {
                         $request = HttpRequest::create()->setUrl('http://'.self::$torMirrors[$i].'/ip_list_exit.php/Tor_ip_list_EXIT.csv');
                         try {
                             // TODO: Warnung ausgeben und Reihenfolge aendern, wenn ein Server nicht antwortet
-                            $response = CurlHttpClient::create()
-                                               ->send($request);
-                            $status = $response->getStatus();
+                            $response = CurlHttpClient::create()->send($request);
+                            $status   = $response->getStatus();
 
                             if ($status != 200) {
                                 self::$logNotice && Logger::log('Could not get TOR exit nodes from '.self::$torMirrors[$i].', HTTP status '.$status.' ('.HttpResponse::$sc[$status]."),\n url: ".$request->getUrl(), L_NOTICE);
@@ -131,8 +132,7 @@ class TorHelper extends StaticClass {
 
                     $cache->set($key, $nodes, 30 * MINUTES);
                 }
-
-            $lock->release();
+            });
         }
         return $nodes;
     }
