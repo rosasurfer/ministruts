@@ -1,4 +1,9 @@
 
+2017-12-12
+
+   - util: add helper function to emulate Java keyword "synchronized"
+
+
 2017-10-12
 
    - struts: add configuration option for temporary or permanent HTTP redirects
