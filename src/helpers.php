@@ -1229,9 +1229,12 @@ function synchronized(\Closure $task) {
     $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
     $lock = new Lock($trace[0]['file'].'#'.$trace[0]['line']);
 
-    $task();
-
-    $lock->release();
+    try {
+        $task();
+    }
+    finally {
+        $lock->release();
+    }
 }
 
 
