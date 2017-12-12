@@ -16,10 +16,9 @@ use const rosasurfer\NL;
 
 
 /**
- * SystemFiveLock
+ * System-V lock
  *
- * A token representing a lock on a System-V shared memory segment.  Some platforms do not support
- * System-V shared memory (ie. Windows).
+ * A lock using a System-V shared memory segment as a mutex (not supported on Windows).
  */
 class SystemFiveLock extends BaseLock {
 
@@ -35,7 +34,8 @@ class SystemFiveLock extends BaseLock {
     /** @var resource[] - semaphore handles */
     private static $hSemaphores;
 
-    private /*string*/ $key;
+    /** @var string */
+    private $key;
 
 
     /**
@@ -65,6 +65,7 @@ class SystemFiveLock extends BaseLock {
         self::$logInfo   = ($loglevel <= L_INFO  );
         self::$logNotice = ($loglevel <= L_NOTICE);
 
+        // use fTok() instead
         $integer = $this->keyToId($key);
 
         $i      = 0;
@@ -124,11 +125,11 @@ class SystemFiveLock extends BaseLock {
 
 
     /**
-     * Ob dieses Lock gueltig (valid) ist.
+     * Whether or not the lock is aquired.
      *
      * @return bool
      */
-    public function isValid() {
+    public function isAquired() {
         if (isSet(self::$hSemaphores[$this->key]))
             return is_resource(self::$hSemaphores[$this->key]);
         return false;
@@ -136,14 +137,26 @@ class SystemFiveLock extends BaseLock {
 
 
     /**
-     * Wenn dieses Lock gueltig (valid) ist, gibt der Aufruf dieser Methode das gehaltene Lock frei und
-     * markiert es als ungueltig (invalid).  Wenn das Lock bereits ungueltig (invalid) ist, hat der Aufruf
-     * keinen Effekt.
+     * If called on an aquired lock the lock is released. If called on an already released lock the call does nothing.
      */
     public function release() {
-        if ($this->isValid()) {
+        if ($this->isAquired()) {
             if (!sem_remove(self::$hSemaphores[$this->key])) throw new RuntimeException('Cannot remove semaphore for key "'.$this->key.'"');
             unset(self::$hSemaphores[$this->key]);
         }
     }
+
+
+    /**
+     * TODO: Replace by fTok()
+     *
+     * Convert a key (string) to a unique numerical value (int).
+     *
+     * @param  string $key
+     *
+     * @return int - numerical value
+     */
+    private function keyToId($key) {
+        return (int) hexDec(subStr(md5($key), 0, 7)) + strLen($key);
+    }                                         // 7: strLen(decHex(PHP_INT_MAX)) - 1 (x86)
 }

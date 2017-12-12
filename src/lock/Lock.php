@@ -4,6 +4,7 @@ namespace rosasurfer\lock;
 use rosasurfer\debug\ErrorHandler;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RuntimeException;
+use rosasurfer\config\Config;
 
 
 /**
@@ -11,20 +12,6 @@ use rosasurfer\exception\RuntimeException;
  *
  * Delegate auf eine konkrete Lock-Implementierung.  Aus Sicht des User-Codes ist nur die Funktionalitaet
  * interessant, nicht wie das Lock konkret implementiert wird.
- *
- * Ein Lock stellt die Sperre eines oder mehrerer Code-Abschnitte gegen gleichzeitigen Zugriff durch
- * konkurrierende PHP-Threads oder -Prozesse dar.
- *
- * Eine Lock-Instanz ist nach Erzeugung gesperrt und die Sperre immer gueltig.  Besitzt zum Zeitpunkt
- * des Aufrufs ein anderer Prozess die gewuenschte Sperre des jeweiligen Code-Abschnitts, blockiert der
- * aufrufende Prozess, bis er die Sperre erlangt.  Die Sperre bleibt gueltig, bis sie durch Aufruf der
- * release()-Methode, durch Zerstoerung der Lock-Instanz oder durch Beendigung des Scriptes (je nachdem
- * welches der Ereignisse zuerst eintritt) freigegeben wird.  Die Gueltigkeit einer Sperre kann durch
- * Aufruf der isValid()-Methode ueberprueft werden.  Nach Freigabe der Sperre hat die Lock-Instanz keinerlei
- * weitere Funktionen mehr.
- *
- * Im Lebenszyklus einer Lock-Instanz kann sich nur die Gueltigkeit der Sperre aendern, alle anderen Aspekte
- * der Instanz sind unveraenderlich.
  */
 class Lock extends BaseLock {
 
@@ -38,43 +25,54 @@ class Lock extends BaseLock {
     /** @var string - aktueller Schluessel der Instanz */
     private $key;
 
-    /** @var string - lockfile (if any) created for a FileLock implementor */
-    private $lockFile;
-
 
     /**
      * Constructor
      *
-     * @param  string $key [optional] - Schluessel, auf dem ein Lock gehalten werden soll
+     * @param  string $key - Schluessel, auf dem ein Lock gehalten werden soll
      */
-    public function __construct($key = null) {
-        if (func_num_args()) {
-            if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
-        }
-        else {
-            // kein Schluessel angegeben, __FILE__ + __LINE__ des aufrufenden Codes verwenden
-            $trace = debug_backtrace();
-            $key   = $trace[0]['file'].'#'.$trace[0]['line'];
-        }
-        /** @var string $key */
-        $key = $key;
+    public function __construct($key) {
+        if (!is_string($key))               throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
         if (isSet(self::$lockedKeys[$key])) throw new RuntimeException('Dead-lock detected: already holding a lock for key "'.$key.'"');
-        self::$lockedKeys[$key] = $key;
 
-        $this->key = $key;
+        self::$lockedKeys[$key] = $this->key = $key;
 
-        // konkretes Lock erzeugen, vorzugsweise SystemFiveLock
+        // vorzugsweise SysVLock verwenden...
         if (false && extension_loaded('sysvsem')) {
             $this->impl = new SystemFiveLock($key);
         }
         else {
-            // alternativ FileLock verwenden ...
-            $filename = ini_get('session.save_path').'/lock_'.md5($key);
-            if (!is_file($filename)) {
-                if (!touch($filename)) throw new RuntimeException('Cannot create lock file "'.$filename.'"');
-                $this->lockFile = $filename;
-            }
-            $this->impl = new FileLock($filename);
+            // alternativ FileLock verwenden...
+            $directory = null;
+            $config = Config::getDefault();
+            $config     && $directory = $config->get('app.dir.temp', null);
+            !$directory && $directory = ini_get('sys_temp_dir');
+            !$directory && $directory = sys_get_temp_dir();
+
+            $this->impl = new FileLock($directory.'/lock_'.md5($key));
+        }
+    }
+
+
+    /**
+     * Whether or not the lock is aquired.
+     *
+     * @return bool
+     */
+    public function isAquired() {
+        if ($this->impl)
+            return $this->impl->isAquired();
+        return false;
+    }
+
+
+    /**
+     * If called on an aquired lock the lock is released. If called on an already released lock the call does nothing.
+     */
+    public function release() {
+        if ($this->impl) {
+            $this->impl->release();
+            unset(self::$lockedKeys[$this->key]);
         }
     }
 
@@ -82,7 +80,7 @@ class Lock extends BaseLock {
     /**
      * Destructor
      *
-     * Sorgt bei Zerstoerung der Instanz dafuer, dass eine evt. erzeugte Lockdatei wieder geloescht wird.
+     * Release the resources occupied by the instance.
      */
     public function __destruct() {
         try {
@@ -90,38 +88,6 @@ class Lock extends BaseLock {
         }
         catch (\Exception $ex) {
             throw ErrorHandler::handleDestructorException($ex);
-        }
-    }
-
-
-    /**
-     * Ob dieses Lock gueltig (valid) ist.
-     *
-     * @return bool
-     */
-    public function isValid() {
-        if ($this->impl)
-            return $this->impl->isValid();
-        return false;
-    }
-
-
-    /**
-     * Wenn dieses Lock gueltig (valid) ist, gibt der Aufruf dieser Methode das gehaltene Lock frei und
-     * markiert es als ungueltig (invalid).  Wenn das Lock bereits ungueltig (invalid) ist, hat der Aufruf
-     * keinen Effekt.
-     *
-     * @see Lock::isValid()
-     */
-    public function release() {
-        if ($this->impl) {
-            $this->impl->release();
-            unset(self::$lockedKeys[$this->key]);
-
-            if ($this->lockFile) {
-                @unlink($this->lockFile);           // @: theoretisch kann hier schon ein anderer Prozess das Lock halten
-                $this->lockFile = null;
-            }
         }
     }
 }

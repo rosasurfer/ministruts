@@ -7,97 +7,48 @@ use rosasurfer\exception\RuntimeException;
 
 
 /**
- * An object representing an aquired lock on a file.
- *
- * After aquiring the lock the initial lock status is valid. It remains valid until the lock is released by invoking the
- * release() method or by the termination of the current PHP process, whichever comes first. The validity of the lock can
- * be tested by invoking its isValid() method.
- *
- * A file lock is either exclusive or shared. A shared lock prevents other concurrently-running processes from acquiring an
- * overlapping exclusive lock, but does allow them to acquire overlapping shared locks. An exclusive lock prevents other
- * processes from acquiring an overlapping lock of either type. Once a lock is released, it has no further effect on the
- * locks that may be acquired by other processes.
- *
- * Whether a lock is exclusive or shared can be determined by invoking its isShared() method. Some platforms do not support
- * shared locks, in which case a request for a shared lock is automatically converted into a request for an exclusive lock.
+ * A lock using files as the resource to synchronize access on.
  */
 final class FileLock extends BaseLock {
 
 
-    /** @var resource[] */
+    /** @var resource[] - all file handles currently used for locking */
     private static $hFiles = [];
 
-    /** @var string */
+    /** @var string - name of the file used by the current instance */
     private $filename;
-
-    /** @var bool */
-    private $shared;
 
 
     /**
      * Constructor
      *
-     * Erzeugt ein neues FileLock fuer die angegebene Datei.
+     * Aquire an exclusive lock for the given file. If the file does not exist it is created. As there is no reliable and
+     * cross-platform mechanism to release occupied file system resources a created file is not deleted. It is the
+     * responsibility of the calling code to remove an obsolete or expired file.
      *
-     * @param  string $filename          - Name der Datei, auf der das Lock gehalten werden soll (muss existieren)
-     * @param  bool   $shared [optional] - TRUE, um ein shared Lock oder FALSE, um ein exclusive Lock zu setzen
-     *                                     (default: FALSE = exklusives Lock)
+     * @param  string $filename
      */
-    public function __construct($filename, $shared = false) {
-
-        // TODO: Ein das Lock haltender Prozess kann die Datei bis zum Aufruf von fLock() wieder geloescht haben.
-
-        // TODO: 2016-06-17: Win7/NTFS: Auf einer gesperrten Datei (Handle 1 ) funktionieren die Dateifunktionen
-        //       mit einem anderen Handle (2) nicht mehr (unter Linux schon). Mit dem zum Sperren verwendeten Handle
-        //       funktionieren sie.
-
+    public function __construct($filename) {
         if (!is_string($filename))                throw new IllegalTypeException('Illegal type of parameter $filename: '.getType($filename));
-        if (!is_bool($shared))                    throw new IllegalTypeException('Illegal type of parameter $shared: '.getType($shared));
 
-        if (key_exists($filename, self::$hFiles)) throw new RuntimeException('Dead-lock detected: already holding a lock for file "'.$filename.'"');
-        self::$hFiles[$filename] = null;            // Schlaegt der Constructor fehl, verhindert der gesetzte Eintrag ein
-                                                    // Dead-lock bei eventuellem Re-Entry.
+        if (key_exists($filename, self::$hFiles)) throw new RuntimeException('Dead-lock: re-entry detected for lock file "'.$filename.'"');
+        self::$hFiles[$filename] = null;                // pre-define the index and handle re-entry if the constructor crashes
+
         $this->filename = $filename;
-        $this->shared   = $shared;
+        $hFile = fOpen($filename, 'c');                 // 'c' will never fail
 
-        self::$hFiles[$filename] = fOpen($filename, 'r');
-        $mode = $shared ? LOCK_SH : LOCK_EX;
+        if (!fLock($hFile, LOCK_EX)) throw new RuntimeException('Can not aquire exclusive lock on file "'.$filename.'"');
 
-        if (!fLock(self::$hFiles[$filename], $mode)) throw new RuntimeException('Can not aquire '.($shared ? 'shared':'exclusive').' file lock for "'.$filename.'"');
+        self::$hFiles[$filename] = $hFile;              // lock is aquired
     }
 
 
     /**
-     * Destructor
-     *
-     * Sorgt bei Zerstoerung der Instanz dafuer, dass ein evt. noch gehaltenes Lock freigegeben wird.
-     */
-    public function __destruct() {
-        try {
-            $this->release();
-        }
-        catch (\Exception $ex) {
-            throw ErrorHandler::handleDestructorException($ex);
-        }
-    }
-
-
-    /**
-     * Ob dieses Lock ein shared oder ein exclusive Lock ist.
+     * Whether or not the lock is aquired.
      *
      * @return bool
      */
-    public function isShared() {
-        return $this->shared;
-    }
-
-
-    /**
-     * Ob dieses Lock gueltig (valid) ist.
-     *
-     * @return bool
-     */
-    public function isValid() {
+    public function isAquired() {
         if (isSet(self::$hFiles[$this->filename]))
             return is_resource(self::$hFiles[$this->filename]);
         return false;
@@ -105,14 +56,29 @@ final class FileLock extends BaseLock {
 
 
     /**
-     * Wenn dieses Lock gueltig (valid) ist, gibt der Aufruf dieser Methode das gehaltene Lock frei und
-     * markiert es als ungueltig (invalid).  Wenn das Lock bereits ungueltig (invalid) ist, hat der Aufruf
-     * keinen Effekt.
+     * If called on an aquired lock the lock is released. If called on an already released lock the call does nothing.
      */
-    public function release($deleteFile = false) {
-        if ($this->isValid()) {
-            fClose(self::$hFiles[$this->filename]);     // see docs: The lock is released also by fClose()...
+    public function release() {
+        if ($this->isAquired()) {
+            $hFile = self::$hFiles[$this->filename];
+            if (!fLock($hFile, LOCK_UN)) throw new RuntimeException('Can not release lock on file "'.$this->filename.'"');
             unset(self::$hFiles[$this->filename]);
+            fClose($hFile);
+        }
+    }
+
+
+    /**
+     * Destructor
+     *
+     * Release the resources occupied by the instance.
+     */
+    public function __destruct() {
+        try {
+            $this->release();
+        }
+        catch (\Exception $ex) {
+            throw ErrorHandler::handleDestructorException($ex);
         }
     }
 }

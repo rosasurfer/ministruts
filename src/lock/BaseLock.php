@@ -12,32 +12,19 @@ abstract class BaseLock extends Object {
 
 
     /**
-     * Whether or not the lock is aquired and valid.
+     * Whether or not the lock is aquired.
      *
      * @return bool
      */
-    abstract public function isValid();
+    abstract public function isAquired();
 
 
     /**
-     * If called on an aquired and valid lock the lock is released and marked as invalid.
-     * If called on an already relesed lock the call does nothing.
+     * If called on an aquired lock the lock is released. If called on an already released lock the call does nothing.
      *
      * @return void
      */
     abstract public function release();
-
-
-    /**
-     * Convert a key (string) to a unique numerical value (int).
-     *
-     * @param  string $key
-     *
-     * @return int - numerical value
-     */
-    protected function keyToId($key) {
-        return (int) hexDec(subStr(md5($key), 0, 7)) + strLen($key);
-    }                                         // 7: strLen(decHex(PHP_INT_MAX)) - 1 (x86)
 
 
     /**
@@ -52,6 +39,6 @@ abstract class BaseLock extends Object {
      * Prevent de-serialization of lock instances.
      */
     final public function __wakeUp() {
-        throw new IllegalStateException('You cannot unserialize me: '.get_class($this));
+        throw new IllegalStateException('You cannot deserialize me: '.get_class($this));
     }
 }
