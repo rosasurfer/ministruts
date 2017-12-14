@@ -18,9 +18,9 @@ use const rosasurfer\NL;
 
 
 /**
- * Simple mailer sending an email directly via an SMTP server.
+ * SMTP mailer sending email directly to a SMTP server.
  *
- * @deprecated - use a better maintained external library instead
+ * @deprecated - There are much better maintained external libraries.
  */
 class SMTPMailer extends Mailer {
 
@@ -49,9 +49,9 @@ class SMTPMailer extends Mailer {
     /**
      * Constructor
      *
-     * @param  array $options - mailer options
+     * @param  array $options [optional] - mailer options (default: none)
      */
-    public function __construct(array $options) {
+    public function __construct(array $options = []) {
         trigger_error(__CLASS__.' is deprecated and will be removed in a future release', E_USER_DEPRECATED);
 
         parent::__construct(array_merge($this->defaultOptions, $options));
@@ -189,26 +189,35 @@ class SMTPMailer extends Mailer {
      * @param  array  $headers [optional] - additional headers to set (default: none)
      */
     public function sendMail($sender, $receiver, $subject, $message, array $headers=[]) {
-        if (!is_string($sender))   throw new IllegalTypeException('Illegal type of parameter $sender: '.getType($sender));
+        // sender
+        if (!is_string($sender))           throw new IllegalTypeException('Illegal type of parameter $sender: '.getType($sender));
         $from = $this->parseAddress($sender);
-        if (!$from)                throw new InvalidArgumentException('Invalid argument $sender: '.$sender);
+        if (!$from)                        throw new InvalidArgumentException('Invalid parameter $sender: '.$sender);
 
-        if (!is_string($receiver)) throw new IllegalTypeException('Illegal type of parameter $receiver: '.getType($receiver));
-
-        if (!$config=Config::getDefault()) throw new RuntimeException('Service locator returned empty default config: '.getType($config));
-
-        $forced = $config->get('mail.forced-receiver', '');
-        if (!is_string($forced))           throw new IllegalTypeException('Invalid type of variable $forced: '.getType($forced).' (not string)');
-
-        strLen($forced) && $receiver=$forced;
+        // receiver
+        if (!is_string($receiver))         throw new IllegalTypeException('Illegal type of parameter $receiver: '.getType($receiver));
         $to = $this->parseAddress($receiver);
-        if (!$to) throw new InvalidArgumentException('Invalid argument $receiver: '.$receiver);
+        if (!$to)                          throw new InvalidArgumentException('Invalid parameter $receiver: '.$receiver);
 
-        if (!is_string($subject)) throw new IllegalTypeException('Illegal type of parameter $subject: '.getType($subject));
-        if (!is_string($message)) throw new IllegalTypeException('Illegal type of parameter $message: '.getType($message));
+        // receiving mailbox
+        if (!$config=Config::getDefault()) throw new RuntimeException('Service locator returned empty default config: '.getType($config));
+        $forced = $config->get('mail.forced-receiver', '');
+        if (!is_string($forced))           throw new IllegalTypeException('Illegal type of config value "mail.forced-receiver": '.getType($forced).' (not string)');
+        $rcpt = $to;
+        if (strLen($forced)) {
+            $rcpt = $this->parseAddress($forced);
+            if (!$rcpt)                    throw new InvalidArgumentException('Invalid config value "mail.forced-receiver": '.$forced);
+        }
 
-        foreach ($headers as $key => $header) {
-            if (!is_string($header)) throw new IllegalTypeException('Illegal parameter type in argument $headers[$key]: '.getType($header));
+        // subject + message
+        if (!is_string($subject))          throw new IllegalTypeException('Illegal type of parameter $subject: '.getType($subject));
+        if (!is_string($message))          throw new IllegalTypeException('Illegal type of parameter $message: '.getType($message));
+
+        // headers
+        foreach ($headers as $i => $header) {
+            if (!is_string($header))       throw new IllegalTypeException('Illegal type of parameter $headers['.$i.']: '.getType($header));
+            if (!preg_match('/^[a-z]+(-[a-z]+)*:/i', $header))
+                                           throw new InvalidArgumentException('Invalid parameter $headers['.$i.']: "'.$header.'"');
         }
 
 
@@ -228,15 +237,15 @@ class SMTPMailer extends Mailer {
             $this->authenticate();
 
 
-        // check for a custom 'Return-Path' header
+        // check for a custom 'Return-Path' header and extract it
         $returnPath = $from['address'];
-        foreach ($headers as $key => $header) {
+        foreach ($headers as $i => $header) {
             $header = trim($header);
             if (strStartsWithI($header, 'return-path:')) {
                 $result = $this->parseAddress(subStr($header, 12));
-                if (!$result) throw new InvalidArgumentException('Invalid Return-Path header: '.$header);
+                if (!$result) throw new InvalidArgumentException('Invalid header "'.$header.'"');
                 $returnPath = $result['address'];
-                unset($headers[$key]);
+                unset($headers[$i]);
             }
         }
 
@@ -247,48 +256,52 @@ class SMTPMailer extends Mailer {
 
         $this->parseResponse($response);
         if ($this->responseStatus != 250)
-            throw new RuntimeException('MAIL FROM: <'.$returnPath.'> command not accepted: '.$this->responseStatus.' '.$this->response.NL.NL.'Transfer log:'.NL.'-------------'.NL.$this->logBuffer);
+            throw new RuntimeException('MAIL FROM: <'.$returnPath.'> command not accepted: '.$this->responseStatus.' '.$this->response.NL.NL.'SMTP transfer log:'.NL.'------------------'.NL.$this->logBuffer);
 
-        $this->writeData('RCPT TO: <'.$to['address'].'>');
+        $this->writeData('RCPT TO: <'.$rcpt['address'].'>');
         $response = $this->readResponse();     // TODO: a DNS lookup in the receiving MTA might cause a timeout in readResponse()
 
         $this->parseResponse($response);
         if ($this->responseStatus != 250 && $this->responseStatus != 251)
-            throw new RuntimeException('RCPT TO: <'.$to['address'].'> command not accepted: '.$this->responseStatus.' '.$this->response.NL.NL.'Transfer log:'.NL.'-------------'.NL.$this->logBuffer);
+            throw new RuntimeException('RCPT TO: <'.$rcpt['address'].'> command not accepted: '.$this->responseStatus.' '.$this->response.NL.NL.'SMTP transfer log:'.NL.'------------------'.NL.$this->logBuffer);
 
         $this->writeData('DATA');
         $response = $this->readResponse();
 
         $this->parseResponse($response);
         if ($this->responseStatus != 354)
-            throw new RuntimeException('DATA command not accepted: '.$this->responseStatus.' '.$this->response.NL.NL.'Transfer log:'.NL.'-------------'.NL.$this->logBuffer);
+            throw new RuntimeException('DATA command not accepted: '.$this->responseStatus.' '.$this->response.NL.NL.'SMTP transfer log:'.NL.'------------------'.NL.$this->logBuffer);
 
         // TODO: wrap long header lines
 
         // needed headers
         $this->writeData('Date: '.date('r'));
 
-        $from = preg_replace('~([\xA0-\xFF])~e', '"=?ISO-8859-1?Q?=".strToUpper(decHex(ord("$1")))."?="', $from);
+        $from = $this->encodeNonAsciiChars($from);
         $this->writeData('From: '.$from['name'].' <'.$from['address'].'>');
 
-        $to = preg_replace('~([\xA0-\xFF])~e', '"=?ISO-8859-1?Q?=".strToUpper(decHex(ord("$1")))."?="', $to);
+        $to = $this->encodeNonAsciiChars($to);
         $this->writeData('To: '.$to['name'].' <'.$to['address'].'>');
 
-        $subject = preg_replace('~([\xA0-\xFF])~e', '"=?ISO-8859-1?Q?=".strToUpper(decHex(ord("$1")))."?="', $subject);
-        $this->writeData('Subject: '.$subject);
+        $encSubject = $this->encodeNonAsciiChars($subject);
+        if (strLen($encSubject) > 76) throw new RuntimeException('The encoded mail subject exceeds the maximum number of characters per line: "'.$subject.'"');
+        $this->writeData('Subject: '.$encSubject);
         $this->writeData('X-Mailer: Microsoft Office Outlook 11');     // save us from Hotmail junk folder
         $this->writeData('X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2900.2180');
 
 
-        // custom headers                   // TODO: validation
-        foreach ($headers as $header) {
-            $header = preg_replace('~([\xA0-\xFF])~e', '"=?ISO-8859-1?Q?=".strToUpper(decHex(ord("$1")))."?="', $header);
-            $this->writeData($header);
+        // custom headers
+        foreach ($headers as $i => $header) {
+            $pattern = '/^([a-z]+(?:-[a-z]+)*): *(.*)/i';
+            if (!preg_match($pattern, $header, $match)) throw new InvalidArgumentException('Invalid parameter $headers['.$i.']: "'.$header.'"');
+            $name  = $match[1];
+            $value = $this->encodeNonAsciiChars(trim($match[2]));
+            $this->writeData($name.': '.$value);
         }
         $this->writeData('');
 
-
         $maxLineLength = 990;   // actually 998 per RFC but e.g. FastMail only accepts 990
+
 
         // mail body
         $message = normalizeEOL($message);
@@ -314,13 +327,14 @@ class SMTPMailer extends Mailer {
             }
         }
 
+
         // end marker
         $this->writeData('.');
         $response = $this->readResponse();
 
         $this->parseResponse($response);
         if ($this->responseStatus != 250)
-            throw new RuntimeException('Sent data not accepted: '.$this->responseStatus.' '.$this->response.NL.NL.'Transfer log:'.NL.'-------------'.NL.$this->logBuffer);
+            throw new RuntimeException('Sent data not accepted: '.$this->responseStatus.' '.$this->response.NL.NL.'SMTP transfer log:'.NL.'------------------'.NL.$this->logBuffer);
     }
 
 
@@ -336,7 +350,7 @@ class SMTPMailer extends Mailer {
 
         $this->parseResponse($response);
         if ($this->responseStatus != 250)
-            throw new RuntimeException('RSET command not accepted: '.$this->responseStatus.' '.$this->response.NL.NL.'Transfer log:'.NL.'-------------'.NL.$this->logBuffer);
+            throw new RuntimeException('RSET command not accepted: '.$this->responseStatus.' '.$this->response.NL.NL.'SMTP transfer log:'.NL.'------------------'.NL.$this->logBuffer);
     }
 
 
@@ -355,7 +369,7 @@ class SMTPMailer extends Mailer {
 
             $this->parseResponse($response);
             if ($this->responseStatus != 221)
-                throw new RuntimeException('QUIT command not accepted: '.$this->responseStatus.' '.$this->response.NL.NL.'Transfer log:'.NL.'-------------'.NL.$this->logBuffer);
+                throw new RuntimeException('QUIT command not accepted: '.$this->responseStatus.' '.$this->response.NL.NL.'SMTP transfer log:'.NL.'------------------'.NL.$this->logBuffer);
         }
 
         fClose($this->connection);
@@ -391,7 +405,7 @@ class SMTPMailer extends Mailer {
         $count = fWrite($this->connection, $data.EOL_WINDOWS, strLen($data)+2);
 
         if ($count != strLen($data)+2)
-            throw new RuntimeException('Error writing to socket, length of data: '.(strLen($data)+2).', bytes written: '.$count.NL.'data: '.$data.NL.NL.'Transfer log:'.NL.'-------------'.NL.$this->logBuffer);
+            throw new RuntimeException('Error writing to socket, length of data: '.(strLen($data)+2).', bytes written: '.$count.NL.'data: '.$data.NL.NL.'SMTP transfer log:'.NL.'------------------'.NL.$this->logBuffer);
 
         $this->logSentData($data);
     }
@@ -427,5 +441,26 @@ class SMTPMailer extends Mailer {
      */
     private function logResponse($data) {
         $this->logBuffer .= $data;
+    }
+
+
+    /**
+     * Encode non-ASCII characters with UTF-8. If a string doesn't contain non-ASCII characters it is not modified.
+     *
+     * @param  string|string[] $value(s)
+     *
+     * @return string|string[] - encoded value(s)
+     */
+    private function encodeNonAsciiChars($value) {
+        if (is_array($value)) {
+            foreach ($value as $k => $v) {
+                $value[$k] = $this->{__FUNCTION__}($v);
+            }
+        }
+        elseif (preg_match('/[\xA0-\xFF]/', $value)) {
+            $value = '=?utf-8?B?'.base64_encode($value).'?=';
+          //$value = '=?utf-8?Q?'.imap_8bit($value).'?=';       // requires imap extension, the encoded string is longer
+        }
+        return $value;
     }
 }
