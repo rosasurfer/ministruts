@@ -15,7 +15,7 @@ parameters:
     excludes_analyse:
         - etc/vendor/
         - src/globals.php
-        - src/util/apc/apc.php                                      # TODO: replace it
+        - src/cache/apc/apc.php                                     # TODO: replace it
  
     universalObjectCratesClasses:
         - rosasurfer\ministruts\Page
