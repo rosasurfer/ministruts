@@ -115,8 +115,7 @@ class Validator extends StaticClass {
 
         // TODO: Adressen in IP-Notation korrekt validieren -> root@[127.0.0.1]
 
-        static $pattern = '/^[a-z0-9+-]+[a-z0-9_.+-]*@(([a-z0-9]+|[a-z0-9]+[a-z0-9-]+[a-z0-9]+)\.)*([a-z0-9][a-z0-9-]*[a-z0-9])\.([a-z]{2,4})$/';
-        return is_string($string) && strLen($string) && preg_match($pattern, strToLower($string));
+        return filter_var($string, FILTER_VALIDATE_EMAIL);
     }
 
 

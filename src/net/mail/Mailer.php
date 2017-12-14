@@ -3,7 +3,6 @@ namespace rosasurfer\net\mail;
 
 use rosasurfer\core\Object;
 use rosasurfer\exception\IllegalTypeException;
-use rosasurfer\util\Validator;
 
 use function rosasurfer\strEndsWith;
 
@@ -80,7 +79,7 @@ abstract class Mailer extends Object implements MailerInterface {
 
 
     /**
-     * Parse a full email address "Firstname Secondname <user@domain>" into name and address part.
+     * Parse a full email address "FirstName LastName <user@domain>" into name and address part.
      *
      * @param  string $address
      *
@@ -94,11 +93,12 @@ abstract class Mailer extends Object implements MailerInterface {
         // check for closing brace ">"
         if (!strEndsWith($address, '>')) {
             // none, it has to be a simple address
-            if (Validator::isEmailAddress($address))
+            if (filter_var($address, FILTER_VALIDATE_EMAIL)) {
                 return [
                     'name'    => '',
                     'address' => $address
                 ];
+            }
             return false;
         }
 
@@ -110,12 +110,12 @@ abstract class Mailer extends Object implements MailerInterface {
         $name    = trim(subStr($address, 0, $open));
         $address = subStr($address, $open+1, strLen($address)-$open-2);
 
-        if (Validator::isEmailAddress($address))
+        if (filter_var($address, FILTER_VALIDATE_EMAIL)) {
             return [
                 'name'    => $name==$address ? '' : $name,
                 'address' => $address
             ];
-
+        }
         return false;
     }
 }
