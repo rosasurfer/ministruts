@@ -6,13 +6,13 @@
 use rosasurfer\Application;
 use rosasurfer\util\PHP;
 
-$dir = dirName(realPath(__FILE__));
-require($dir.'/../src/load.php');
+$root = dirName(dirName(realPath(__FILE__)));
+require($root.'/src/load.php');
 
 
 // php.ini settings
 error_reporting(E_ALL & ~E_DEPRECATED);
-PHP::ini_set('error_log', $dir.'/../php-error.log');
+PHP::ini_set('error_log', $root.'/php-error.log');
 
 
 $app = new Application();
