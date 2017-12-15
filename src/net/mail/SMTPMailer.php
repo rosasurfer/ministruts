@@ -189,12 +189,12 @@ class SMTPMailer extends Mailer {
     public function sendMail($sender, $receiver, $subject, $message, array $headers=[]) {
         // sender
         if (!is_string($sender))           throw new IllegalTypeException('Illegal type of parameter $sender: '.getType($sender));
-        $from = $this->parseAddress($sender);
+        $from = self::parseAddress($sender);
         if (!$from)                        throw new InvalidArgumentException('Invalid parameter $sender: '.$sender);
 
         // receiver
         if (!is_string($receiver))         throw new IllegalTypeException('Illegal type of parameter $receiver: '.getType($receiver));
-        $to = $this->parseAddress($receiver);
+        $to = self::parseAddress($receiver);
         if (!$to)                          throw new InvalidArgumentException('Invalid parameter $receiver: '.$receiver);
 
         // receiving mailbox
@@ -203,7 +203,7 @@ class SMTPMailer extends Mailer {
         if (!is_string($forced))           throw new IllegalTypeException('Illegal type of config value "mail.forced-receiver": '.getType($forced).' (not string)');
         $rcpt = $to;
         if (strLen($forced)) {
-            $rcpt = $this->parseAddress($forced);
+            $rcpt = self::parseAddress($forced);
             if (!$rcpt)                    throw new InvalidArgumentException('Invalid config value "mail.forced-receiver": '.$forced);
         }
 
@@ -240,7 +240,7 @@ class SMTPMailer extends Mailer {
         foreach ($headers as $i => $header) {
             $header = trim($header);
             if (strStartsWithI($header, 'return-path:')) {
-                $result = $this->parseAddress(subStr($header, 12));
+                $result = self::parseAddress(subStr($header, 12));
                 if (!$result) throw new InvalidArgumentException('Invalid header "'.$header.'"');
                 $returnPath = $result['address'];
                 unset($headers[$i]);
@@ -445,7 +445,7 @@ class SMTPMailer extends Mailer {
     /**
      * Encode non-ASCII characters with UTF-8. If a string doesn't contain non-ASCII characters it is not modified.
      *
-     * @param  string|string[] $value(s)
+     * @param  string|string[] $value - value(s)
      *
      * @return string|string[] - encoded value(s)
      */

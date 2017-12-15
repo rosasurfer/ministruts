@@ -5,6 +5,9 @@ use rosasurfer\core\Object;
 use rosasurfer\exception\IllegalTypeException;
 
 use function rosasurfer\strEndsWith;
+use function rosasurfer\strLeft;
+use function rosasurfer\strLeftTo;
+use function rosasurfer\strRightFrom;
 
 
 /**
@@ -77,40 +80,32 @@ abstract class Mailer extends Object implements MailerInterface {
 
 
     /**
-     * Parse a full email address "FirstName LastName <user@domain>" into name and address part.
+     * Parse a full email address "FirstName LastName <user@domain.tld>" into name and address part.
      *
-     * @param  string $address
+     * @param  string $value
      *
      * @return mixed - aray with name and address part or FALSE if the specified address is invalid
      */
-    protected function parseAddress($address) {
-        if (!is_string($address)) throw new IllegalTypeException('Illegal type of parameter $address: '.getType($address));
+    public static function parseAddress($value) {
+        if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
 
-        $address = trim($address);
+        $value = trim($value);
 
-        // check for closing brace ">"
-        if (!strEndsWith($address, '>')) {
-            // none, it has to be a simple address
-            if (filter_var($address, FILTER_VALIDATE_EMAIL)) {
-                return [
-                    'name'    => '',
-                    'address' => $address
-                ];
-            }
-            return false;
+        if (strEndsWith($value, '>')) {
+            // closing brace found, check for a matching opening brace
+            $name    = trim(strLeftTo($value, '<', -1));
+            $address = strRightFrom($value, '<', -1);           // omits the opening brace
+            $address = trim(strLeft($address, -1));             // omit the closing brace
+        }
+        else {
+            // no closing brace found, it must be a simple address
+            $name  = '';
+            $address = $value;
         }
 
-        // closing brace exists, check opening brace "<"
-        $open = strRPos($address, '<');
-        if ($open === false)
-            return false;
-
-        $name    = trim(subStr($address, 0, $open));
-        $address = subStr($address, $open+1, strLen($address)-$open-2);
-
-        if (filter_var($address, FILTER_VALIDATE_EMAIL)) {
+        if (strLen($address) && filter_var($address, FILTER_VALIDATE_EMAIL)) {
             return [
-                'name'    => $name==$address ? '' : $name,
+                'name'    => $name,
                 'address' => $address
             ];
         }
