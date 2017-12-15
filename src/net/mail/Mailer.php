@@ -30,18 +30,16 @@ abstract class Mailer extends Object implements MailerInterface {
 
 
     /**
-     * Create a new instance.
+     * Create and return a new instance.
      *
      * @param  array $options [optional] - mailer options
      *
      * @return self
      */
     public static function create(array $options = []) {
-        $class = SMTPMailer::class;                         // default implementation
-
+        $class = SMTPMailer::class;                         // default mailer
         if (!empty($options['class']))
             $class = $options['class'];
-
         return new $class($options);
     }
 
@@ -49,8 +47,8 @@ abstract class Mailer extends Object implements MailerInterface {
     /**
      * Delay sending of the mail to the script shutdown phase. Can be used to not to block other more important tasks.
      *
-     * NOTE: Usage of this method is a poor man's approach. A more professional way to decouple sending of mail is to use
-     *       a regular message queue.
+     * NOTE: Usage of this method is a poor man's approach and a last resort. A more professional way to decouple sending
+     *       of mail is using a regular message queue.
      *
      * @param  string   $sender             - mail sender
      * @param  string   $receiver           - mail receiver

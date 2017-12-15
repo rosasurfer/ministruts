@@ -18,9 +18,9 @@ use const rosasurfer\NL;
 
 
 /**
- * SMTP mailer sending email directly to a SMTP server.
+ * Mailer sending email via TCP to a SMTP server.
  *
- * @deprecated - There are much better maintained external libraries.
+ * @deprecated - Use a better maintained external library.
  */
 class SMTPMailer extends Mailer {
 
@@ -97,8 +97,6 @@ class SMTPMailer extends Mailer {
      * Closes an open connection.
      */
     public function __destruct() {
-        // Attempting to throw an exception from a destructor during script shutdown causes a fatal error.
-        // @see http://php.net/manual/en/language.oop5.decon.php
         try {
             $this->disconnect();
         }
@@ -133,7 +131,7 @@ class SMTPMailer extends Mailer {
 
         $this->parseResponse($response);
         if ($this->responseStatus != 250) {
-            $this->writeData('HELO '.$this->hostName);   // regular "Hello" if the extended one fails
+            $this->writeData('HELO '.$this->hostName);  // regular "Hello" if the extended one fails
             $response = $this->readResponse();
 
             $this->parseResponse($response);
@@ -156,7 +154,7 @@ class SMTPMailer extends Mailer {
 
         $this->parseResponse($response);
         if ($this->responseStatus == 503)
-            return;                          // already authenticated
+            return;                                     // already authenticated
 
         if ($this->responseStatus != 334)
             throw new RuntimeException('AUTH LOGIN command not supported: '.$this->responseStatus.' '.$this->response);
@@ -227,7 +225,7 @@ class SMTPMailer extends Mailer {
 
 
         if (is_resource($this->connection)) {
-            $this->logBuffer = '';          // reset log buffer if already connected
+            $this->logBuffer = '';                      // reset log buffer if already connected
         }
         else {
             $this->connect();
@@ -259,7 +257,7 @@ class SMTPMailer extends Mailer {
             throw new RuntimeException('MAIL FROM: <'.$returnPath.'> command not accepted: '.$this->responseStatus.' '.$this->response.NL.NL.'SMTP transfer log:'.NL.'------------------'.NL.$this->logBuffer);
 
         $this->writeData('RCPT TO: <'.$rcpt['address'].'>');
-        $response = $this->readResponse();     // TODO: a DNS lookup in the receiving MTA might cause a timeout in readResponse()
+        $response = $this->readResponse();              // TODO: a DNS lookup in the receiving MTA might cause a timeout in readResponse()
 
         $this->parseResponse($response);
         if ($this->responseStatus != 250 && $this->responseStatus != 251)
@@ -300,7 +298,7 @@ class SMTPMailer extends Mailer {
         }
         $this->writeData('');
 
-        $maxLineLength = 990;   // actually 998 per RFC but e.g. FastMail only accepts 990
+        $maxLineLength = 990;                           // actually 998 per RFC but e.g. FastMail only accepts 990
 
 
         // mail body
@@ -313,7 +311,7 @@ class SMTPMailer extends Mailer {
             while (strLen($line) > $maxLineLength) {
                 $pos = strRPos(subStr($line, 0, $maxLineLength), ' ');
                 if (!$pos)
-                    $pos = $maxLineLength - 1;    // patch to fix DoS attack; good old times :-)
+                    $pos = $maxLineLength - 1;          // patch to fix DoS attack; good old times :-)
 
                 $pieces[] = subStr($line, 0, $pos);
                 $line = subStr($line, $pos + 1);
@@ -322,7 +320,7 @@ class SMTPMailer extends Mailer {
 
             foreach ($pieces as $line) {
                 if (subStr($line, 0, 1) == '.')
-                    $line = '.'.$line;            // escape leading dots to avoid mail end marker confusion
+                    $line = '.'.$line;                  // escape leading dots to avoid mail end marker confusion
                 $this->writeData($line);
             }
         }
@@ -357,7 +355,7 @@ class SMTPMailer extends Mailer {
     /**
      * Disconnect.
      *
-     * @param  bool $silent [optional] - whether or not to silently suppress disconnect errors (default: no)
+     * @param  bool $silent [optional] - whether or not to silently suppress disconnect errors (default: don't)
      */
     public function disconnect($silent = false) {
         if (!is_resource($this->connection))

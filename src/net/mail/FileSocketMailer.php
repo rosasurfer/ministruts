@@ -5,25 +5,22 @@ use rosasurfer\exception\UnimplementedFeatureException;
 
 
 /**
- * Mailer, der Mails ueber eine FileSocket-Verbindung verschickt.
+ * Mailer sending email via a file socket to a local MTA.
  */
 class FileSocketMailer extends Mailer {
 
 
     /**
-     * Verschickt eine Mail.
+     * Send an email. Sender and receiver addresses can be specified in simple or full format. The simple format can be
+     * specified with or without parenthesis.
      *
-     * @param  string   $sender             - Absender  (Format: 'Vorname Nachname <user@domain.tld>')
-     * @param  string   $receiver           - Empfaenger (Format: 'Vorname Nachname <user@domain.tld>')
-     * @param  string   $subject            - Betreffzeile der E-Mail
-     * @param  string   $message            - Inhalt der E-Mail
-     * @param  string[] $headers [optional] - zusaetzliche zu setzende Mail-Header (default: none)
+     * @param  string   $sender             - mail sender (From:), full format: "FirstName LastName <user@domain.tld>"
+     * @param  string   $receiver           - mail receiver (To:), full format: "FirstName LastName <user@domain.tld>"
+     * @param  string   $subject            - mail subject
+     * @param  string   $message            - mail body
+     * @param  string[] $headers [optional] - additional MIME headers (default: none)
      */
-    public function sendMail($sender, $receiver, $subject, $message, array $headers=[]) {
+    public function sendMail($sender, $receiver, $subject, $message, array $headers = []) {
         throw new UnimplementedFeatureException('Method '.get_class($this).'::'.__FUNCTION__.'() is not implemented');
-
-        // Versand je nach Konfiguration verschieben (um z.B. Transaktionen nicht zu blockieren)
-        if ($this->sendLater($sender, $receiver, $subject, $message, $headers))
-            return;
     }
 }
