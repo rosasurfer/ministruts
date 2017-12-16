@@ -676,7 +676,7 @@ class Logger extends StaticClass {
         // compose message
         if (CLI) {
             $msg     .= NL.NL.'Shell:'.NL.'------'.NL.print_r(ksort_r($_SERVER), true).NL;
-            $location = $_SERVER['PHP_SELF'];
+            $location = realPath($_SERVER['PHP_SELF']);
         }
         else {
             $request  = Request::me();
@@ -705,7 +705,7 @@ class Logger extends StaticClass {
         $type = ($loggable instanceof \Exception && isSet($context['unhandled'])) ? 'Unhandled Exception ':'';
 
         // store subject and message
-        $context['mailSubject'] = 'PHP ['.self::$logLevels[$level].'] '.$type.'at '.$location;
+        $context['mailSubject'] = 'PHP ['.self::$logLevels[$level].'] '.$type.(CLI ? 'in ':'at ').$location;
         $context['mailMessage'] = $msg;
     }
 
