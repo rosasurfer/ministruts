@@ -299,7 +299,7 @@ class SMTPMailer extends Mailer {
         $this->writeData('');
 
         $maxLineLength = 990;                           // actually 998 per RFC but e.g. FastMail only accepts 990
-
+                                                        // https://tools.ietf.org/html/rfc2822 see 2.1 General description
 
         // mail body
         $message = normalizeEOL($message);
@@ -455,10 +455,23 @@ class SMTPMailer extends Mailer {
                 $value[$k] = $this->{__FUNCTION__}($v);
             }
         }
-        elseif (preg_match('/[\xA0-\xFF]/', $value)) {
+        elseif (preg_match('/[\x80-\xFF]/', $value)) {
             $value = '=?utf-8?B?'.base64_encode($value).'?=';
-          //$value = '=?utf-8?Q?'.imap_8bit($value).'?=';       // requires imap extension, the encoded string is longer
+          //$value = '=?utf-8?Q?'.imap_8bit($value).'?=';       // requires imap extension and the encoded string is longer
         }
+
+        // TODO: see https://tools.ietf.org/html/rfc1522
+        //
+        // An encoded-word may not be more than 75 characters long, including charset,
+        // encoding, encoded-text, and delimiters.  If it is desirable to encode more
+        // text than will fit in an encoded-word of 75 characters, multiple encoded-words
+        // (separated by SPACE or newline) may be used.  Message header lines that contain
+        // one or more encoded words should be no more than 76 characters long.
+        //
+        // While there is no limit to the length of a multiple-line header
+        // field, each line of a header field that contains one or more
+        // encoded-words is limited to 76 characters.
+
         return $value;
     }
 }
