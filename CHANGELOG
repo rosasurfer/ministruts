@@ -1,4 +1,9 @@
 
+2017-12-19
+
+   - rename Application::isWhiteListedRemoteIP() to Application::isAdminIP()
+
+
 2017-12-12
 
    - util: add helper function to emulate Java keyword "synchronized"
