@@ -187,7 +187,7 @@ class Logger extends StaticClass {
 
 
         // (3) L_FATAL print handler: enabled on local/white-listed access or if explicitely enabled
-        self::$printFatalHandler = CLI || Application::isWhiteListedRemoteIP() || PHP::ini_get_bool('display_errors');
+        self::$printFatalHandler = CLI || Application::isAdminIP() || PHP::ini_get_bool('display_errors');
 
 
         // (4) non L_FATAL print handler: enabled on local access, if explicitely enabled or if the mail handler is disabled

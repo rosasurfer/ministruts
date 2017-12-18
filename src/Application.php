@@ -82,7 +82,7 @@ class Application extends Object {
         $phpInfoTask = $phpInfoAfterConfigTask = $configInfoTask = $cacheInfoTask = false;
 
         if (isSet($_GET['__phpinfo__']) || isSet($_GET['__config__']) || isSet($_GET['__cache__'])) {
-            if ($this->isWhiteListedRemoteIP()) {
+            if (self::isAdminIP()) {
                 foreach ($_GET as $param => $value) {
                     if ($param == '__phpinfo__') {
                         if ($configInfoTask) {
@@ -155,9 +155,9 @@ class Application extends Object {
         }
 
         // (8) enforce mission-critical PHP requirements (after processing any admin tasks)
-        !php_ini_loaded_file()                        && exit(1|echoPre('application error (see error log'.($this->isWhiteListedRemoteIP() ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: No "php.ini" configuration file was loaded.'));
-        !CLI && !PHP::ini_get_bool('short_open_tag')  && exit(1|echoPre('application error (see error log'.($this->isWhiteListedRemoteIP() ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: The PHP configuration value "short_open_tag" must be enabled (security).'));
-        !CLI && ini_get('request_order') != 'GP'      && exit(1|echoPre('application error (see error log'.($this->isWhiteListedRemoteIP() ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: The PHP configuration value "request_order" must be "GP" (current value "'.ini_get('request_order').'").'));
+        !php_ini_loaded_file()                        && exit(1|echoPre('application error (see error log'.(self::isAdminIP() ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: No "php.ini" configuration file was loaded.'));
+        !CLI && !PHP::ini_get_bool('short_open_tag')  && exit(1|echoPre('application error (see error log'.(self::isAdminIP() ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: The PHP configuration value "short_open_tag" must be enabled (security).'));
+        !CLI && ini_get('request_order') != 'GP'      && exit(1|echoPre('application error (see error log'.(self::isAdminIP() ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: The PHP configuration value "request_order" must be "GP" (current value "'.ini_get('request_order').'").'));
     }
 
 
@@ -370,11 +370,11 @@ class Application extends Object {
      * Whether or not the current remote IP address is white-listed for admin access. 127.0.0.1 and the web server's IP
      * address are always white-listed. More IP addresses can be white-listed per configuration:
      *
-     * "admin.ip.whitelist.<name> = <ip-address>"
+     *  "admin.ip.whitelist.<name> = <ip-address>"
      *
      * @return bool
      */
-    public static function isWhiteListedRemoteIP() {
+    public static function isAdminIP() {
         if (!isSet($_SERVER['REMOTE_ADDR']))
             return false;
 

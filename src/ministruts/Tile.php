@@ -265,7 +265,7 @@ class Tile extends Object {
         }
 
         $tileHint = false;
-        if (Application::isWhiteListedRemoteIP()) {
+        if (Application::isAdminIP()) {
             $rootDir  = Config::getDefault()->get('app.dir.root');
             $file     = $this->fileName;
             $file     = strRightFrom($file, $rootDir.DIRECTORY_SEPARATOR, 1, false, $file);
