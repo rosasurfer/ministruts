@@ -64,11 +64,14 @@ class PHP extends StaticClass {
 
         $hProc = proc_open($cmd, $descriptors, $pipes, $dir, $env, ['bypass_shell'=>true]);
 
-        $stdout = stream_get_contents($pipes[STDOUT]);  // $pipes now looks like this:
-        $stderr = stream_get_contents($pipes[STDERR]);  // 0 => writeable handle connected to child stdin
-        fClose($pipes[STDIN ]);                         // 1 => readable handle connected to child stdout
-        fClose($pipes[STDOUT]);                         // 2 => readable handle connected to child stderr
-        fClose($pipes[STDERR]);                         // pipes must be closed before proc_close() to avoid a deadlock
+                                                        // $pipes now looks like this:
+                                                        // 0 => writeable handle connected to child stdin
+        $stdout = stream_get_contents($pipes[STDOUT]);  // 1 => readable handle connected to child stdout
+        $stderr = stream_get_contents($pipes[STDERR]);  // 2 => readable handle connected to child stderr
+
+        fClose($pipes[STDIN ]);                         // pipes must be closed before proc_close() to avoid a deadlock
+        fClose($pipes[STDOUT]);
+        fClose($pipes[STDERR]);
 
         $exitCode = proc_close($hProc);
         return $stdout;
