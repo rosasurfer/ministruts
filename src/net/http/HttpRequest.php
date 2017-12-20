@@ -166,14 +166,14 @@ class HttpRequest extends Object {
      * @return array - Name-Wert-Paare
      */
     public function getHeaders($names = null) {
-        if     ($names === null)   $names = array();
-        elseif (is_string($names)) $names = array($names);
+        if     ($names === null)   $names = [];
+        elseif (is_string($names)) $names = [$names];
         elseif (is_array($names)) {
             foreach ($names as $name) {
                 if (!is_string($name)) throw new IllegalTypeException('Illegal parameter type in argument $names: '.getType($name));
             }
         }
-        else                         throw new IllegalTypeException('Illegal type of parameter $names: '.getType($names));
+        else                           throw new IllegalTypeException('Illegal type of parameter $names: '.getType($names));
 
         // alle oder nur die gewuenschten Header zurueckgeben
         if (!$names)

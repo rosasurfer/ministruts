@@ -18,7 +18,7 @@ interface MailerInterface {
 
     /**
      * Send an email. Sender and receiver addresses can be specified in simple or full format. The simple format can be
-     * specified with or without parenthesis.
+     * specified with or without angle brackets.
      *
      * @param  string   $sender             - mail sender (From:), full format: "FirstName LastName <user@domain.tld>"
      * @param  string   $receiver           - mail receiver (To:), full format: "FirstName LastName <user@domain.tld>"
