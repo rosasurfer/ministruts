@@ -1,4 +1,9 @@
 
+2017-12-20
+
+   - mail: implement net/mail/PHPMailer
+
+
 2017-12-19
 
    - rename Application::isWhiteListedRemoteIP() to Application::isAdminIP()
