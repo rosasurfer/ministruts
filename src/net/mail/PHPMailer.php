@@ -55,6 +55,7 @@ class PHPMailer extends Mailer {
 
         // From: (visible sender)
         $from  = self::parseAddress($sender);
+        if (!$from)                        throw new InvalidArgumentException('Invalid parameter $sender: '.$sender);
         $value = $this->removeHeader($headers, 'From');
         if (strLen($value)) {
             $from = self::parseAddress($value);
@@ -76,6 +77,7 @@ class PHPMailer extends Mailer {
 
         // To: (visible receiver)
         $to = self::parseAddress($receiver);
+        if (!$to)                          throw new InvalidArgumentException('Invalid parameter $receiver: '.$receiver);
         $value = $this->removeHeader($headers, 'To');
         if (strLen($value)) {
             $to = self::parseAddress($value);

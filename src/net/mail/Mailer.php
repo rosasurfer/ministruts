@@ -86,7 +86,7 @@ abstract class Mailer extends Object implements MailerInterface {
      *
      * @param  string $value
      *
-     * @return mixed - aray with name and address part or FALSE if the specified address is invalid
+     * @return string[]|null - aray with name and address part or NULL if the specified address is invalid
      */
     public static function parseAddress($value) {
         if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
@@ -111,7 +111,7 @@ abstract class Mailer extends Object implements MailerInterface {
                 'address' => $address
             ];
         }
-        return false;
+        return null;
     }
 
 
