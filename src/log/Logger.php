@@ -13,6 +13,7 @@ use rosasurfer\ministruts\Request;
 use rosasurfer\net\http\CurlHttpClient;
 use rosasurfer\net\http\HttpRequest;
 use rosasurfer\net\http\HttpResponse;
+use rosasurfer\net\mail\Mailer;
 use rosasurfer\util\PHP;
 
 use function rosasurfer\hsc;
@@ -26,8 +27,6 @@ use function rosasurfer\strStartsWith;
 use function rosasurfer\strStartsWithI;
 
 use const rosasurfer\CLI;
-use const rosasurfer\EOL_UNIX;
-use const rosasurfer\EOL_WINDOWS;
 use const rosasurfer\ERROR_LOG_DEFAULT;
 use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_ERROR;
@@ -55,7 +54,7 @@ use const rosasurfer\WINDOWS;
  *
  *                     Example:
  *                     --------
- *                     log.mail.receiver = address1@domain.tld, address2@another-domain.tld
+ *                     log.mail.receivers = address1@domain.tld, address2@another-domain.tld
  *
  *  - SMSHandler:      Send the message to the configured SMS receivers (phone numbers). The handler is invoked if the
  *                     application configuration contains one or more phone numbers for log messages and a valid SMS
@@ -168,7 +167,7 @@ class Logger extends StaticClass {
         // (2) mail handler: enabled if mail receivers are configured
         $receivers = [];
         if ($config) {
-            foreach (explode(',', $config->get('log.mail.receiver', '')) as $receiver) {
+            foreach (explode(',', $config->get('log.mail.receivers', '')) as $receiver) {
                 if ($receiver=trim($receiver))
                     $receivers[] = $receiver;                           // TODO: validate address format
             }
@@ -426,20 +425,20 @@ class Logger extends StaticClass {
         $subject = $context['mailSubject'];
         $message = $context['mailMessage'];
 
-        $message = normalizeEOL($message);                             // use Unix line-breaks on Linux
-        if (WINDOWS)                                                   // and Windows line-breaks on Windows
-            $message = str_replace(EOL_UNIX, EOL_WINDOWS, $message);
-        $message = str_replace(chr(0), '?', $message);                 // replace NUL bytes which destroy the mail
-
         if (!$config=Config::getDefault()) throw new RuntimeException('Service locator returned empty default config: '.getType($config));
-        $sender  = $config->get('mail.from', null);
-        $headers = [];
-        $sender && $headers[]='From: '.$sender;
+
+        $options = $headers = [];
+        $sender  = null;
+        if ($name = $config->get('log.mail.profile', null)) {
+            $profile = 'mail.profile.'.$name;
+            $options = $config->get($profile, []);
+            $sender  = $config->get($profile.'.from', null);
+            $headers = $config->get($profile.'.headers', []);
+        }
+        $mailer = Mailer::create($options);
 
         foreach (self::$mailReceivers as $receiver) {
-            // Windows: mail() fails if "sendmail_from" is not set and "From:" header is missing
-            // Linux:   "From:" header is not reqired but set if provided
-            mail($receiver, $subject, $message, join(EOL_WINDOWS, $headers));
+            $mailer->sendMail($sender, $receiver, $subject, $message, $headers);
         }
     }
 

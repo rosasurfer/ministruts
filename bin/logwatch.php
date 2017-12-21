@@ -67,7 +67,7 @@ foreach ($args as $i => $arg) {
 $config = Config::getDefault();
 $sender = $config->get('mail.from', get_current_user().'@localhost');
 $receivers = [];
-foreach (explode(',', $config->get('log.mail.receiver', '')) as $receiver) {
+foreach (explode(',', $config->get('log.mail.receivers', '')) as $receiver) {
     if ($receiver=trim($receiver))
         $receivers[] = $receiver;       // TODO: validate address format
 }

@@ -7,10 +7,8 @@ use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InfrastructureException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
-use rosasurfer\util\Date;
 
 use function rosasurfer\normalizeEOL;
-use function rosasurfer\strContains;
 
 use const rosasurfer\EOL_WINDOWS;
 use const rosasurfer\NL;
@@ -28,9 +26,6 @@ class SMTPMailer extends Mailer {
     private $defaultOptions = [
         'timeout' => 300,                   // socket timeout
     ];
-
-    /** @var string */
-    private $hostName;
 
     /** @var resource */
     private $connection;
@@ -79,14 +74,6 @@ class SMTPMailer extends Mailer {
                 throw new InvalidArgumentException('Invalid option "host": '.$this->options['host']);
             }
         }
-
-        // get our hostname
-        $hostName = php_uname('n');
-        if (!$hostName)
-            $hostName  = 'localhost';
-        if (!strContains($hostName, '.'))
-            $hostName .= '.localdomain';            // hostname must contain more than one part (see RFC 2821)
-        $this->hostName = strToLower($hostName);
     }
 
 
@@ -177,13 +164,14 @@ class SMTPMailer extends Mailer {
 
 
     /**
-     * Send an email.
+     * Send an email. Sender and receiver addresses can be specified in simple or full format. The simple format can be
+     * specified with or without angle brackets. If an empty sender is specified the mail is sent from the current user.
      *
-     * @param  string $sender             - sender (format: 'FirstName SecondName <user@domain.tld>')
-     * @param  string $receiver           - receiver (format: 'FirstName SecondName <user@domain.tld>')
-     * @param  string $subject            - email subject line
-     * @param  string $message            - email body
-     * @param  array  $headers [optional] - additional headers to set (default: none)
+     * @param  string   $sender             - mail sender (From:), full format: "FirstName LastName <user@domain.tld>"
+     * @param  string   $receiver           - mail receiver (To:), full format: "FirstName LastName <user@domain.tld>"
+     * @param  string   $subject            - mail subject
+     * @param  string   $message            - mail body
+     * @param  string[] $headers [optional] - additional MIME headers (default: none)
      */
     public function sendMail($sender, $receiver, $subject, $message, array $headers = []) {
         // delay sending to the script's shutdown if configured (e.g. as to not to block other tasks)
@@ -197,6 +185,15 @@ class SMTPMailer extends Mailer {
             if (!is_string($header))       throw new IllegalTypeException('Illegal type of parameter $headers['.$i.']: '.getType($header));
             if (!preg_match('/^[a-z]+(-[a-z]+)*:/i', $header))
                                            throw new InvalidArgumentException('Invalid parameter $headers['.$i.']: "'.$header.'"');
+        }
+
+        // auto-complete sender if not specified
+        if (is_null($sender)) {
+            if (!$config=Config::getDefault()) throw new RuntimeException('Service locator returned empty default config: '.getType($config));
+            $sender = $config->get('mail.from', ini_get('sendmail_from'));
+            if (!strLen($sender)) {
+                $sender = strToLower(get_current_user().'@'.$this->hostName);
+            }
         }
 
         // Return-Path: (invisible sender)

@@ -5,6 +5,7 @@ use rosasurfer\core\Object;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 
+use function rosasurfer\strContains;
 use function rosasurfer\strEndsWith;
 use function rosasurfer\strLeft;
 use function rosasurfer\strLeftTo;
@@ -23,6 +24,9 @@ abstract class Mailer extends Object implements MailerInterface {
     /** @var array */
     protected $options;
 
+    /** @var string */
+    protected $hostName;
+
 
     /**
      * Constructor
@@ -31,6 +35,14 @@ abstract class Mailer extends Object implements MailerInterface {
      */
     public function __construct(array $options = []) {
         $this->options = $options;
+
+        // get our hostname
+        $hostName = php_uname('n');
+        if (!$hostName)
+            $hostName  = 'localhost';
+        if (!strContains($hostName, '.'))
+            $hostName .= '.localdomain';            // hostname must contain more than one part (see RFC 2821)
+        $this->hostName = strToLower($hostName);
     }
 
 
