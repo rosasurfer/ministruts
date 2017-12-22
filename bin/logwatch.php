@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //                                                                                                                  //
 //   This file is a template script, you cannot run it as-is. Copy this file to your project's CRON directory and   //
-//   adjust the path in line 36 to your application's init script.  Then setup a CRON job to run the script.        //
+//   adjust the path in line 31 to your application's init script.  Then setup a CRON job to run the script.        //
 //                                                                                                                  //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

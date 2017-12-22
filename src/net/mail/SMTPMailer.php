@@ -421,7 +421,7 @@ class SMTPMailer extends Mailer {
      */
     private function parseResponse($response) {
         $response = trim($response);
-        $this->responseStatus = intVal(subStr($response, 0, 3));
+        $this->responseStatus = (int) subStr($response, 0, 3);
         $this->response = subStr($response, 4);
     }
 
