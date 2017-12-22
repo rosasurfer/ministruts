@@ -35,13 +35,13 @@ use const rosasurfer\WINDOWS;
 
 
 require(dirName(realPath(__FILE__)).'/{application-path-to-init}/init.php');
-set_time_limit(0);                                       // no time limit for CLI
+set_time_limit(0);                                          // no time limit for CLI
 
 
 // --- configuration --------------------------------------------------------------------------------------------------------
 
 
-$quiet = false;                                          // whether or not "quiet" mode is enabled (for CRON)
+$quiet = false;                                             // whether or not "quiet" mode is enabled (for CRON)
 
 
 // --- parse/validate command line arguments --------------------------------------------------------------------------------
@@ -50,8 +50,8 @@ $quiet = false;                                          // whether or not "quie
 $args = array_slice($_SERVER['argv'], 1);
 
 foreach ($args as $i => $arg) {
-    if ($arg == '-h') { help(); exit(0);                           }     // help
-    if ($arg == '-q') { $quiet = true; unset($args[$i]); continue; }     // quiet mode
+    if ($arg == '-h') { help(); exit(0);                           }    // help
+    if ($arg == '-q') { $quiet = true; unset($args[$i]); continue; }    // quiet mode
 
     stderror('invalid argument: '.$arg);
     !$quiet && help();
@@ -67,9 +67,12 @@ foreach ($args as $i => $arg) {
 $config = Config::getDefault();
 $sender = $config->get('mail.from', get_current_user().'@localhost');
 $receivers = [];
-foreach (explode(',', $config->get('log.mail.receivers', '')) as $receiver) {
-    if ($receiver=trim($receiver))
-        $receivers[] = $receiver;       // TODO: validate address format
+foreach (explode(',', $config->get('log.mail.receiver', '')) as $receiver) {
+    if ($receiver = trim($receiver)) {
+        if (filter_var($receiver, FILTER_VALIDATE_EMAIL)) { // silently skip invalid addresses
+            $receivers[] = $receiver;
+        }
+    }
 }
 
 // check setting "mail.forced-receiver" (may be set in development)
@@ -87,7 +90,7 @@ if ($receivers && $forcedReceivers=$config->get('mail.forced-receiver', false)) 
 
 // (2) define the location of the error log
 $errorLog = ini_get('error_log');
-if (empty($errorLog) || $errorLog=='syslog') {           // errors are logged elsewhere
+if (empty($errorLog) || $errorLog=='syslog') {              // errors are logged elsewhere
     if (empty($errorLog)) $quiet || echoPre('errors are logged elsewhere ('.(CLI     ?    'stderr':'sapi'  ).')');
     else                  $quiet || echoPre('errors are logged elsewhere ('.(WINDOWS ? 'event log':'syslog').')');
     exit(0);
@@ -138,7 +141,7 @@ exit(0);
  * Send a single log entry to the defined error log receivers. The first line is sent as the mail subject and the full
  * log entry as the mail body.
  *
- * @param  string $entry - a single or multi line log entry
+ * @param  string $entry - a single log entry
  */
 function processEntry($entry) {
     if (!is_string($entry)) throw new IllegalTypeException('Illegal type of parameter $entry: '.getType($entry));
@@ -165,7 +168,7 @@ function processEntry($entry) {
 
 
 /**
- * Help. Display script syntax.
+ * Syntax helper.
  *
  * @param  string $message [optional] - additional message to display (default: none)
  */

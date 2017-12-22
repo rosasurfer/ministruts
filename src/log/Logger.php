@@ -54,7 +54,7 @@ use const rosasurfer\WINDOWS;
  *
  *                     Example:
  *                     --------
- *                     log.mail.receivers = address1@domain.tld, address2@another-domain.tld
+ *                     log.mail.receiver = address-1@domain.tld, address-2@another-domain.tld
  *
  *  - SMSHandler:      Send the message to the configured SMS receivers (phone numbers). The handler is invoked if the
  *                     application configuration contains one or more phone numbers for log messages and a valid SMS
@@ -167,17 +167,11 @@ class Logger extends StaticClass {
         // (2) mail handler: enabled if mail receivers are configured
         $receivers = [];
         if ($config) {
-            foreach (explode(',', $config->get('log.mail.receivers', '')) as $receiver) {
-                if ($receiver=trim($receiver))
-                    $receivers[] = $receiver;                           // TODO: validate address format
-            }
-        }
-        if ($receivers) {
-            if ($forcedReceivers=$config->get('mail.forced-receiver', null)) {
-                $receivers = [];                                        // To reduce possible errors we use internal PHP mailing
-                foreach (explode(',', $forcedReceivers) as $receiver) { // functions (not a class) which means we have to manually
-                    if ($receiver=trim($receiver))                      // check the config for the setting "mail.forced-receiver"
-                        $receivers[] = $receiver;                       // (which the SMTPMailer would do automatically).
+            foreach (explode(',', $config->get('log.mail.receiver', '')) as $receiver) {
+                if ($receiver = trim($receiver)) {
+                    if (filter_var($receiver, FILTER_VALIDATE_EMAIL)) {     // silently skip invalid addresses
+                        $receivers[] = $receiver;
+                    }
                 }
             }
         }
@@ -412,7 +406,7 @@ class Logger extends StaticClass {
 
 
     /**
-     * Send the message to the configured mail receivers (email addresses).
+     * Send the message to the configured mail receivers.
      *
      * @param  string|\Exception $loggable - message or exception to log
      * @param  int               $level    - loglevel of the loggable
@@ -429,13 +423,13 @@ class Logger extends StaticClass {
 
         $options = $headers = [];
         $sender  = null;
-        if ($name = $config->get('log.mail.profile', null)) {
-            $profile = 'mail.profile.'.$name;
-            $options = $config->get($profile, []);
-            $sender  = $config->get($profile.'.from', null);
-            $headers = $config->get($profile.'.headers', []);
+
+        if (strLen($name = $config->get('log.mail.profile', ''))) {
+            $options = $config->get('mail.profile.'.$name, []);
+            $sender  = $config->get('mail.profile.'.$name.'.from', null);
+            $headers = $config->get('mail.profile.'.$name.'.headers', []);
         }
-        $mailer = Mailer::create($options);
+        static $mailer; !$mailer && $mailer=Mailer::create($options);
 
         foreach (self::$mailReceivers as $receiver) {
             $mailer->sendMail($sender, $receiver, $subject, $message, $headers);
