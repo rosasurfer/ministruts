@@ -434,9 +434,9 @@ class Config extends Object implements ConfigInterface {
     /**
      * Dump keys and values of the instance into a human-readable string and return it.
      *
-     * @param  string[] $node         [In]
-     * @param  array    $values       [In]
-     * @param  int     &$maxKeyLength [Out]
+     * @param  __In__  string[] $node
+     * @param  __In__  array    $values
+     * @param  __Out__ int     &$maxKeyLength
      *
      * @return string[]
      */
