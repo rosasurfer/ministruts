@@ -1223,11 +1223,15 @@ function pluralize($count, $singular='', $plural='s') {
  * Execute a task in a synchronized way. Emulates the Java keyword "synchronized". If an anonymous function is passed it is
  * implicitly casted to a Closure.
  *
- * @param  \Closure $task - task to execute
+ * @param  \Closure $task             - task to execute
+ * @param  string   $mutex [optional] - mutex identifier (default: the calling line of code)
  */
-function synchronized(\Closure $task) {
-    $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-    $lock = new Lock($trace[0]['file'].'#'.$trace[0]['line']);
+function synchronized(\Closure $task, $mutex = null) {
+    if (is_null($mutex)) {
+        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        $mutex = $trace[0]['file'].'#'.$trace[0]['line'];
+    }
+    $lock = new Lock($mutex);
 
     try {
         $task();

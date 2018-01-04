@@ -796,10 +796,11 @@ function pluralize($count, $singular='', $plural='s') {
  * Execute a task in a synchronized way. Emulates the Java keyword "synchronized". If an anonymous function is passed it is
  * implicitly casted to a Closure.
  *
- * @param  \Closure $task - task to execute
+ * @param  \Closure $task             - task to execute
+ * @param  string   $mutex [optional] - mutex identifier (default: the calling line of code)
  */
-function synchronized(\Closure $task) {
-    return \rosasurfer\synchronized($task);
+function synchronized(\Closure $task, $mutex = null) {
+    return \rosasurfer\synchronized($task, $mutex);
 }
 
 
