@@ -1,4 +1,9 @@
 
+2018-01-04
+
+   - util: additional parameter $mutex for function synchronized()
+
+
 2017-12-20
 
    - mail: implement net/mail/PHPMailer
