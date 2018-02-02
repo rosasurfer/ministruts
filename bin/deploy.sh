@@ -85,5 +85,5 @@ for dir in $DIRS; do
     chmod 777 "$dir"
 done
 
-USER=username
-id -u "$USER" >/dev/null 2>&1 && chown -R "$USER.$USER" "$PROJECT_DIR"
+USER=<username>
+id -u "$USER" >/dev/null 2>&1 && chown -R --from=root.root "$USER.$USER" "$PROJECT_DIR"
