@@ -1,8 +1,8 @@
 #
-# Intentionally trigger a server error if mod_rewrite is disabled, to protect the project
-# directory from accidently being exposed to the web.
+# Protect the project from accidently being exposed to the web by a mis-configured web server.
+# Intentionally trigger a server error if mod_rewrite is disabled.
 #
 RewriteEngine On
 RewriteRule   (.*)  web/$1  [L]
 
-SetEnv APP_BASE_URI '/your-local-file-system/.../ministruts/doc/demo/'
+SetEnv APP_BASE_URI '/<local-file-path>/.../ministruts/doc/demo/'
