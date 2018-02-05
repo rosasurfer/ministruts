@@ -732,7 +732,7 @@ class Logger extends StaticClass {
         if (is_string($loggable)) {
             // simple message
             $msg   = $loggable;
-            $html .= '<span style="font-weight:bold">['.strToUpper(self::$logLevels[$level]).']</span> <span style="white-space:pre; line-height:8px">'.nl2br(hsc($msg)).'</span><br><br>';
+            $html .= '<span style="white-space:nowrap"><span style="font-weight:bold">['.strToUpper(self::$logLevels[$level]).']</span> <span style="white-space:pre; line-height:8px">'.nl2br(hsc($msg)).'</span></span><br><br>';
             $html .= 'in <span style="font-weight:bold">'.$file.'</span> on line <span style="font-weight:bold">'.$line.'</span><br>';
 
             // attach the internal stacktrace if there was no exception
@@ -753,7 +753,7 @@ class Logger extends StaticClass {
                     $type .= 'PHP Error:';
                 }
             }
-            $html     .= '<span style="font-weight:bold">['.strToUpper(self::$logLevels[$level]).']</span> <span style="white-space:pre; line-height:8px">'.nl2br(hsc($type.$msg)).'</span><br><br>';
+            $html     .= '<span style="white-space:nowrap"><span style="font-weight:bold">['.strToUpper(self::$logLevels[$level]).']</span> <span style="white-space:pre; line-height:8px">'.nl2br(hsc($type.$msg)).'</span></span><br><br>';
             $html     .= 'in <span style="font-weight:bold">'.$file.'</span> on line <span style="font-weight:bold">'.$line.'</span><br>';
             $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
             $traceStr .= DebugHelper::getBetterTraceAsString($loggable, $indent);
