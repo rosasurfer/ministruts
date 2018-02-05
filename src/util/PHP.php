@@ -119,7 +119,7 @@ class PHP extends StaticClass {
         /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('allow_call_time_pass_reference') && PHP_VERSION_ID <  50400)     $issues[] = 'Info:  allow_call_time_pass_reference is not Off  [standards]';
         /*PHP_INI_ALL   */ if (!self::ini_get_bool('y2k_compliance'                ) && PHP_VERSION_ID <  50400)     $issues[] = 'Info:  y2k_compliance is not On  [standards]';
         /*PHP_INI_ALL   */ $timezone = ini_get    ('date.timezone'                 );
-            if (empty($timezone) && (!getEnv('TZ')                                   || PHP_VERSION_ID >= 50400))    $issues[] = 'Warn:  date.timezone is not set  [setup]';
+            if (empty($timezone) && (empty($_SERVER['TZ'])                           || PHP_VERSION_ID >= 50400))    $issues[] = 'Warn:  date.timezone is not set  [setup]';
         /*PHP_INI_SYSTEM*/ if ( self::ini_get_bool('safe_mode'                     ) && PHP_VERSION_ID <  50400)     $issues[] = 'Error:  safe_mode is not Off  [functionality]';
             /**
              * With 'safe_mode'=On plenty of required function parameters are ignored: e.g. http://php.net/manual/en/function.mysql-connect.php

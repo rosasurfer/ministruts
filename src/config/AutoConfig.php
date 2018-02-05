@@ -65,9 +65,9 @@ class AutoConfig extends Config {
         if (CLI) $files[] = $configDir.'/config.cli.properties';
 
         // application environment: user or staging configuration
-        if ($configFile)                           $files[] = $configFile;                              // explicite
-        else if (($env=getEnv('APP_ENVIRONMENT'))) $files[] = $configDir.'/config.'.$env.'.properties';
-        else                                       $files[] = $configDir.'/config.properties';          // default
+        if ($configFile)                              $files[] = $configFile;                           // explicit
+        else if (!empty($_SERVER['APP_ENVIRONMENT'])) $files[] = $configDir.'/config.'.$_SERVER['APP_ENVIRONMENT'].'.properties';
+        else                                          $files[] = $configDir.'/config.properties';       // default
 
         // load all files (do not pass a provided $baseDir but apply it manually in the next step)
         parent::__construct($files);

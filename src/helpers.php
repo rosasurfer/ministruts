@@ -1276,7 +1276,7 @@ function route($name) {
     }
     else {
         $msg = 'Route "'.$name.'" not found';
-        if (getEnv('APP_ENVIRONMENT') != 'production') throw new RuntimeException($msg);
+        if (isSet($_SERVER['APP_ENVIRONMENT']) && $_SERVER['APP_ENVIRONMENT']!='production') throw new RuntimeException($msg);
         Logger::log($msg, L_ERROR, $context=['class'=>'']);
         $path = '';
     }
