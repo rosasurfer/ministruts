@@ -196,15 +196,16 @@ class Request extends Singleton {
      *
      * @example
      * <pre>
-     * "https://www.domain.tld:433/"
+     * "https://www.domain.tld/"
      * </pre>
      */
     public function getHostUrl() {
         if (!$this->hostUrl) {
             $protocol = isSet($_SERVER['HTTPS']) ? 'https' : 'http';
             $host     = $this->getHostname();
-            $port     = $_SERVER['SERVER_PORT']=='80' ? '' : ':'.$_SERVER['SERVER_PORT'];
-
+            $port     = ':'.$_SERVER['SERVER_PORT'];
+            if ($protocol.$port=='http:80' || $protocol.$port=='https:443')
+                $port = '';
             $this->hostUrl = $protocol.'://'.$host.$port.'/';
         }
         return $this->hostUrl;
