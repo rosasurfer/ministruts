@@ -63,7 +63,7 @@ class PHPMailer extends Mailer {
         }
 
         // From: (visible sender)
-        $from  = self::parseAddress($sender);
+        $from = self::parseAddress($sender);
         if (!$from)                        throw new InvalidArgumentException('Invalid parameter $sender: '.$sender);
         $value = $this->removeHeader($headers, 'From');
         if (strLen($value)) {
@@ -111,8 +111,8 @@ class PHPMailer extends Mailer {
         $headers[] = 'X-Mailer: Microsoft Office Outlook 11';           // save us from Hotmail junk folder
         $headers[] = 'X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2900.2180';
         $headers[] = 'Content-Type: text/plain; charset=utf-8';         // ASCII is a subset of UTF-8
-        $headers[] = 'From: '.$from['name'].' <'.$from['address'].'>';
-      //$headers[] = 'To: '.$to['name'].' <'.$to['address'].'>';        // mail() adds the "To:" header by itself
+        $headers[] = 'From: '.trim($from['name'].' <'.$from['address'].'>');
+        $headers[] = 'To: '.trim($to['name'].' <'.$to['address'].'>');  // mail() adds the "To:" header only if it's missing
 
         // mail body
         if (!is_string($message))          throw new IllegalTypeException('Illegal type of parameter $message: '.getType($message));
@@ -124,7 +124,7 @@ class PHPMailer extends Mailer {
 
         $oldSendmail_from = ini_get('sendmail_from');
         WINDOWS && PHP::ini_set('sendmail_from', $returnPath['address']);
-        $receiver = $to['name'].' <'.$to['address'].'>';
+        $receiver = trim($rcpt['name'].' <'.$rcpt['address'].'>');
 
         mail($receiver, $subject, $message, join(EOL_WINDOWS, $headers), '-f '.$returnPath['address']);
 
