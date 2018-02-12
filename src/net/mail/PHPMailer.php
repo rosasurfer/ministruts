@@ -72,7 +72,7 @@ class PHPMailer extends Mailer {
         }
         $from = $this->encodeNonAsciiChars($from);
 
-        // RCPT: (invisible receiver)
+        // RCPT: (receiving mailbox)
         if (!is_string($receiver))         throw new IllegalTypeException('Illegal type of parameter $receiver: '.getType($receiver));
         $rcpt = self::parseAddress($receiver);
         if (!$rcpt)                        throw new InvalidArgumentException('Invalid parameter $receiver: '.$receiver);
@@ -108,20 +108,20 @@ class PHPMailer extends Mailer {
         }; unset($header);
 
         // add more needed headers
-        $headers[] = 'X-Mailer: Microsoft Office Outlook 11';           // save us from Hotmail junk folder
+        $headers[] = 'X-Mailer: Microsoft Office Outlook 11';               // save us from Hotmail junk folder
         $headers[] = 'X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2900.2180';
-        $headers[] = 'Content-Type: text/plain; charset=utf-8';         // ASCII is a subset of UTF-8
+        $headers[] = 'Content-Type: text/plain; charset=utf-8';             // ASCII is a subset of UTF-8
         $headers[] = 'From: '.trim($from['name'].' <'.$from['address'].'>');
-        $headers[] = 'To: '.trim($to['name'].' <'.$to['address'].'>');  // mail() adds the "To:" header only if it's missing
+        if ($rcpt != $to)                                                   // on Linux mail() always adds another "To:" header (same as RCPT),
+            $headers[] = 'To: '.trim($to['name'].' <'.$to['address'].'>');  // on Windows only if $headers is missing one
 
         // mail body
         if (!is_string($message))          throw new IllegalTypeException('Illegal type of parameter $message: '.getType($message));
-        $message = str_replace(chr(0), '?', $message);                  // replace NUL bytes which destroy the mail
-        $message = normalizeEOL($message, EOL_WINDOWS);                 // multiple lines must be separated by CRLF
+        $message = str_replace(chr(0), '?', $message);                      // replace NUL bytes which destroy the mail
+        $message = normalizeEOL($message, EOL_WINDOWS);                     // multiple lines must be separated by CRLF
 
-        // TODO: wrap long lines into several shorter ones              // max 998 chars per RFC but e.g. FastMail only accepts 990
-                                                                        // @see https://tools.ietf.org/html/rfc2822 see 2.1 General description
-
+        // TODO: wrap long lines into several shorter ones                  // max 998 chars per RFC but e.g. FastMail only accepts 990
+                                                                            // @see https://tools.ietf.org/html/rfc2822 see 2.1 General description
         $oldSendmail_from = ini_get('sendmail_from');
         WINDOWS && PHP::ini_set('sendmail_from', $returnPath['address']);
         $receiver = trim($rcpt['name'].' <'.$rcpt['address'].'>');
