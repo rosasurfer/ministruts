@@ -273,14 +273,29 @@ class Application extends Object {
 
         $rootDir = rTrim(str_replace('\\', '/', $rootDir), '/');
         $dirs = $config->get('app.dir', []);
+        $this->expandDirsRecursive($dirs, $rootDir);
+        $config->set('app.dir', $dirs);                     // store everything back
+    }
+
+
+    /**
+     * Expand an array of "app.dir.*" values by the specified root directory. The array may contain nested levels.
+     *
+     * @param  array &$dirs    - absolute or relative directory values
+     * @param  string $rootDir - application root directory
+     */
+    private function expandDirsRecursive(array &$dirs, $rootDir) {
+        $self = __FUNCTION__;
 
         foreach ($dirs as $name => &$dir) {
+            if (is_array($dir)) {
+                $this->$self($dir, $rootDir);
+                continue;
+            }
             if (isRelativePath($dir))
                 $dir = $rootDir.'/'.$dir;
             if (is_dir($dir)) $dir = realPath($dir);
         }; unset($dir);
-
-        $config->set('app.dir', $dirs);         // store everything back
     }
 
 
