@@ -1,6 +1,7 @@
 #!/bin/bash
 #
 
+
 # notification configuration
 NOTIFY_FOR_PROJECT=project-name
 NOTIFY_TO_EMAIL=email@domain.tld
@@ -17,20 +18,25 @@ PROJECT_DIR=$(git rev-parse --show-toplevel 2>/dev/null)
 cd "$PROJECT_DIR"
 
 
+# get current repo status
+FROM_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+FROM_COMMIT=$(git rev-parse --short HEAD)
+
+
 # check arguments
 if [ $# -eq 0 ]; then
-    # get current branch name
-    NAME=$(git rev-parse --abbrev-ref HEAD)
-    if [ "$NAME" = "HEAD" ]; then
-        COMMIT=$(git rev-parse --short HEAD)
-        echo "HEAD detached at $COMMIT, you must specify a ref-name."
+    # no arguments given, get current branch name
+    if [ "$FROM_BRANCH" = "HEAD" ]; then
+        echo "HEAD is currently detached at $FROM_COMMIT, you must specify a ref-name to deploy."
         echo "Usage: $(basename "$0") [<branch-name> | <tag-name> | <commit-sha>]"
         exit 2
     fi
-    BRANCH="$NAME"
+    BRANCH="$FROM_BRANCH"
 elif [ $# -eq 1 ]; then
-    # resolve argument type
+    # argument given, resolve its type
     if git show-ref -q --verify "refs/heads/$1"; then
+        BRANCH="$1"
+    elif git show-ref -q --verify "refs/remotes/origin/$1"; then
         BRANCH="$1"
     elif git show-ref -q --verify "refs/tags/$1"; then
         TAG="$1"
@@ -48,17 +54,18 @@ fi
 
 
 # update project
-OLD=$(git rev-parse --short HEAD)
+set -e
 git fetch origin
-if   [ -n "$BRANCH" ]; then { git checkout $BRANCH; git merge origin/$BRANCH; }
-elif [ -n "$TAG"    ]; then { git checkout $TAG;                              }
-elif [ -n "$COMMIT" ]; then { git checkout $COMMIT;                           }
+if   [ -n "$BRANCH" ]; then { [ "$BRANCH" != "$FROM_BRANCH" ] && git checkout "$BRANCH"; git merge "origin/$BRANCH"; }
+elif [ -n "$TAG"    ]; then {                                    git checkout "$TAG";                                }
+elif [ -n "$COMMIT" ]; then {                                    git checkout "$COMMIT";                             }
 fi
 
 
 # check changes and send deployment notifications
+OLD=$FROM_COMMIT
 NEW=$(git rev-parse --short HEAD)
-HOSTNAME=$(hostname)
+HOSTNAME="$(hostname)"
 
 if [ "$OLD" = "$NEW" ]; then
     echo No changes.
@@ -67,8 +74,8 @@ elif [ "$NOTIFY_IF_ON" = "$HOSTNAME" ]; then
         (
         echo 'From: "Deployments '$NOTIFY_FOR_PROJECT'" <'$NOTIFY_TO_EMAIL'>'
         if   [ -n "$BRANCH" ]; then echo "Subject: Updated $NOTIFY_FOR_PROJECT, branch $BRANCH to latest ($NEW)"
-        elif [ -n "$TAG"    ]; then echo "Subject: Reset $NOTIFY_FOR_PROJECT to tag $TAG"
-        elif [ -n "$COMMIT" ]; then echo "Subject: Reset $NOTIFY_FOR_PROJECT to commit $NEW"
+        elif [ -n "$TAG"    ]; then echo "Subject: Reset $NOTIFY_FOR_PROJECT to tag $TAG ($NEW)"
+        elif [ -n "$COMMIT" ]; then echo "Subject: Reset $NOTIFY_FOR_PROJECT to commit $COMMIT"
         fi
         git log --pretty='%h %ae %s' $OLD..$NEW
         ) | sendmail -f $NOTIFY_TO_EMAIL $NOTIFY_TO_EMAIL
@@ -79,7 +86,7 @@ fi
 # update access permissions and ownership for writing files
 DIRS="etc/log  etc/tmp"
 
-for dir in $DIRS; do
+for dir in "$DIRS"; do
     dir="$PROJECT_DIR/$dir/"
     [ -d "$dir" ] || mkdir -p "$dir"
     chmod 777 "$dir"
