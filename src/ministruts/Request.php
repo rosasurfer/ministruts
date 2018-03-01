@@ -186,8 +186,8 @@ class Request extends Singleton {
      */
     public function getHostname() {
         if (!empty($_SERVER['HTTP_HOST'])) {
-            $httpHost = strToLower(trim($_SERVER['HTTP_HOST']));
-            if (strLen($httpHost))
+            $httpHost = strToLower(trim($_SERVER['HTTP_HOST']));    // nginx doesn't set $_SERVER[SERVER_NAME]
+            if (strLen($httpHost))                                  // automatically to $_SERVER[HTTP_HOST]
                 return $httpHost;
         }
         return $_SERVER['SERVER_NAME'];
