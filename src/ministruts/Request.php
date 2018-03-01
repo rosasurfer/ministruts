@@ -185,6 +185,11 @@ class Request extends Singleton {
      * </pre>
      */
     public function getHostname() {
+        if (!empty($_SERVER['HTTP_HOST'])) {
+            $httpHost = strToLower(trim($_SERVER['HTTP_HOST']));
+            if (strLen($httpHost))
+                return $httpHost;
+        }
         return $_SERVER['SERVER_NAME'];
     }
 
