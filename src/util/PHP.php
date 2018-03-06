@@ -200,7 +200,7 @@ class PHP extends StaticClass {
         /*PHP_INI_SYSTEM*/ if ( self::ini_get_bool('file_uploads'                  ) && !CLI) {                      $issues[] = 'Info:  file_uploads is not Off  [security]';
         /*PHP_INI_SYSTEM*/ $dir = ini_get($name = 'upload_tmp_dir');
             $file = null;
-            if (trim($dir) == '') {                                                                                  $issues[] = 'Warn:  '.$name.' is not set  [setup]';
+            if (trim($dir) == '') {                                                                                  $issues[] = 'Info:  '.$name.' is not set  [setup]';
                 $dir  = sys_get_temp_dir();
                 $name = 'sys_get_temp_dir()';
             }
