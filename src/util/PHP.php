@@ -198,7 +198,15 @@ class PHP extends StaticClass {
         /*PHP_INI_ALL   */ if (       ini_get     ('arg_separator.output'          ) != '&')                         $issues[] = 'Warn:  arg_separator.output is not "&": "'.ini_get('arg_separator.output').'"  [standards]';
         /*PHP_INI_ALL   */ if (!self::ini_get_bool('ignore_user_abort'             ) && !CLI)                        $issues[] = 'Warn:  ignore_user_abort is not On  [standards]';
         /*PHP_INI_SYSTEM*/ if ( self::ini_get_bool('file_uploads'                  ) && !CLI) {                      $issues[] = 'Info:  file_uploads is not Off  [security]';
-            // TODO: check "upload_tmp_dir"
+        /*PHP_INI_SYSTEM*/ $dir = ini_get($name = 'upload_tmp_dir');
+            $file = null;
+            if (trim($dir) == '') {                                                                                  $issues[] = 'Warn:  '.$name.' is not set  [setup]';
+                $dir  = sys_get_temp_dir();
+                $name = 'sys_get_temp_dir()';
+            }
+            if      (!is_dir($dir))                                                                                  $issues[] = 'Error: '.$name.' "'.$dir.'" is not a valid directory  [setup]';
+            else if (!$file=@tempNam($dir, 'php') || !strStartsWith($file, $dir))                                    $issues[] = 'Error: '.$name.' "'.$dir.'" directory is not writable  [setup]';
+            is_file($file) && @unlink($file);
         }
         /*PHP_INI_ALL   */ if (            ini_get('default_mimetype'              )  != 'text/html')                $issues[] = 'Info:  default_mimetype is not "text/html": "'.ini_get('default_mimetype').'"  [standards]';
         /*PHP_INI_ALL   */ if ( strToLower(ini_get('default_charset'               )) != 'utf-8')                    $issues[] = 'Info:  default_charset is not "UTF-8": "'.ini_get('default_charset').'"  [standards]';
