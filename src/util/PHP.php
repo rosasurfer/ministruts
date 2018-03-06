@@ -205,7 +205,7 @@ class PHP extends StaticClass {
                 $name = 'sys_get_temp_dir()';
             }
             if      (!is_dir($dir))                                                                                  $issues[] = 'Error: '.$name.' "'.$dir.'" is not a valid directory  [setup]';
-            else if (!$file=@tempNam($dir, 'php') || !strStartsWith($file, $dir))                                    $issues[] = 'Error: '.$name.' "'.$dir.'" directory is not writable  [setup]';
+            else if ((!$file=@tempNam($dir, 'php')) || !strStartsWith($file, $dir))                                  $issues[] = 'Error: '.$name.' "'.$dir.'" directory is not writable  [setup]';
             is_file($file) && @unlink($file);
         }
         /*PHP_INI_ALL   */ if (            ini_get('default_mimetype'              )  != 'text/html')                $issues[] = 'Info:  default_mimetype is not "text/html": "'.ini_get('default_mimetype').'"  [standards]';
