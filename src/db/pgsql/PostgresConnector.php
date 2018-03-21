@@ -303,7 +303,7 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * Fix the invalid encoding of a string to UTF-8 (if necessary).
+     * Fix invalid string encodings to UTF-8 (if necessary).
      *
      * @param string $value - string with potentially invalid encoding
      *
@@ -311,7 +311,7 @@ class PostgresConnector extends Connector {
      */
     private function fixUtf8Encoding($value) {
         $encoding = mb_detect_encoding($value, null, true);
-        if ($encoding!='ASCII' && $encoding=='UTF-8')
+        if ($encoding!='ASCII' && $encoding!='UTF-8')
             $value = utf8_encode($value);
         return $value;
     }

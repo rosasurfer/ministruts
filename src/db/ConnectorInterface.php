@@ -70,7 +70,7 @@ interface ConnectorInterface {
      *
      * @param  scalar $value - value to escape
      *
-     * @return string|null - escaped but unquoted string or NULL if the value was NULL
+     * @return string|null - escaped and unquoted string or NULL if the value was NULL
      */
     public function escapeString($value);
 
