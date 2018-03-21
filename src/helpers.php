@@ -25,15 +25,15 @@ define('rosasurfer\_WINDOWS',   strToUpper(subStr(PHP_OS, 0, 3)) == 'WIN');
 define('rosasurfer\_NUL',       _WINDOWS ? 'nul' : '/dev/null');
 
 /** @var bool - whether or not we run on a command line interface */
-const CLI = _CLI;                                                   // const decl. improve IDE code completion
+const CLI     = _CLI;                                               // constant declarations improve IDE code completion
 /** @var bool - whether or not we run on a webserver's localhost */
 const LOCALHOST = _LOCALHOST;
 /** @var bool - whether or not we run on MacOS */
-const MACOS = _MACOS;
+const MACOS   = _MACOS;
 /** @var bool - whether or not we run on Windows */
 const WINDOWS = _WINDOWS;
 /** @var bool - the system's NUL device name */
-const NUL = _NUL;
+const NUL     = _NUL;
 
 // custom log level
 const L_DEBUG           =  1;
@@ -71,19 +71,12 @@ const SATURDAY          = 6;
 // byte sizes
 const KB                = 1024;
 const MB                = 1024 << 10;
-const GB                = 1024 << 20;                               // no TB (doesn't fit in 32 bits)
+const GB                = 1024 << 20;                               // not TB (doesn't fit in 32 bits)
 
 // array indexing types
 const ARRAY_ASSOC       = 1;
 const ARRAY_NUM         = 2;
 const ARRAY_BOTH        = 3;
-
-// php.ini changable modes
-const PHP_INI_ALL       = 0;                                        // entry can be set anywhere
-const PHP_INI_USER      = 1;                                        // entry can be set in scripts and in .user.ini
-const PHP_INI_ONLY      = 2;                                        // entry can be set in php.ini only
-const PHP_INI_SYSTEM    = 3;                                        // entry can be set in php.ini and in httpd.conf
-const PHP_INI_PERDIR    = 4;                                        // entry can be set in php.ini, httpd.conf, .htaccess and in .user.ini
 
 // class member access levels
 const ACCESS_PUBLIC     = 1;
@@ -99,6 +92,14 @@ const EOL_WINDOWS       = "\r\n";                                   //   CRLF   
 
 // global definitions
 !defined('PHP_INT_MIN') && define('PHP_INT_MIN', ~PHP_INT_MAX);     // since PHP 7.0
+
+// php.ini access level
+define('INI_ONLY',       0         );                               // undefined access level constant
+define('PHP_INI_ONLY',   INI_ONLY  );       // 0                    // entry can be set in php.ini only
+define('PHP_INI_USER',   INI_USER  );       // 1                    // entry can be set in scripts and in .user.ini
+define('PHP_INI_PERDIR', INI_PERDIR);       // 2                    // entry can be set in php.ini, httpd.conf, .htaccess and in .user.ini
+define('PHP_INI_SYSTEM', INI_SYSTEM);       // 4                    // entry can be set in php.ini and in httpd.conf
+define('PHP_INI_ALL',    INI_ALL   );       // 7                    // entry can be set anywhere
 
 
 /**

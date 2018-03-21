@@ -56,13 +56,6 @@ const ARRAY_ASSOC       = \rosasurfer\ARRAY_ASSOC;
 const ARRAY_NUM         = \rosasurfer\ARRAY_NUM;
 const ARRAY_BOTH        = \rosasurfer\ARRAY_BOTH;
 
-// php.ini changable modes
-const PHP_INI_ALL       = \rosasurfer\PHP_INI_ALL;
-const PHP_INI_USER      = \rosasurfer\PHP_INI_USER;
-const PHP_INI_ONLY      = \rosasurfer\PHP_INI_ONLY;
-const PHP_INI_SYSTEM    = \rosasurfer\PHP_INI_SYSTEM;
-const PHP_INI_PERDIR    = \rosasurfer\PHP_INI_PERDIR;
-
 // class member access levels
 const ACCESS_PUBLIC     = \rosasurfer\ACCESS_PUBLIC;
 const ACCESS_PROTECTED  = \rosasurfer\ACCESS_PROTECTED;
