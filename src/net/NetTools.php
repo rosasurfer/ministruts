@@ -8,6 +8,7 @@ use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
 
 use function rosasurfer\strEndsWithI;
+use function rosasurfer\strStartsWith;
 
 
 /**
@@ -17,17 +18,23 @@ final class NetTools extends StaticClass {
 
 
     /**
-     * Gibt den Hostnamen einer IP-Adresse zurueck.
+     * Return the host name of the Internet host specified by a given IP address. Additionally checks the result returned
+     * by the built-in PHP function for plausibility.
      *
-     * @param  string $address - IP-Adresse
+     * @param  string $ipAddress - the host IP address
      *
-     * @return string - Hostname oder die originale IP-Adresse, wenn diese nicht aufgeloest werden kann
+     * @return string|bool - the host name on success, the unmodified IP address on failure, or FALSE on malformed input
      */
-    public static function getHostByAddress($address) {
-        if (!is_string($address)) throw new IllegalTypeException('Illegal type of parameter $address: '.getType($address));
-        if ($address == '')       throw new InvalidArgumentException('Invalid argument $address: "'.$address.'"');
+    public static function getHostByAddress($ipAddress) {
+        if (!is_string($ipAddress)) throw new IllegalTypeException('Illegal type of parameter $ipAddress: '.getType($ipAddress));
+        if ($ipAddress == '')       throw new InvalidArgumentException('Invalid argument $ipAddress: "'.$ipAddress.'"');
 
-        return getHostByAddr($address);
+        $result = getHostByAddr($ipAddress);
+
+        if ($result==='localhost' && !strStartsWith($ipAddress, '127.'))
+            $result = $ipAddress;
+
+        return $result;
     }
 
 
@@ -648,6 +655,12 @@ final class NetTools extends StaticClass {
         if (isSet($proxys[$address]))
             return true;
 
-        return ($reverseResolve && strEndsWithI(self::getHostByAddress($address), '.proxy.aol.com'));
+        if ($reverseResolve) {
+            /** @var string $hostname */
+            $hostname = self::getHostByAddress($address);
+            return strEndsWithI($hostname, '.proxy.aol.com');
+        }
+
+        return false;
     }
 }

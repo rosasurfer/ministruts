@@ -10,6 +10,7 @@ use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
 use rosasurfer\exception\error\PHPError;
 use rosasurfer\ministruts\Request;
+use rosasurfer\net\NetTools;
 use rosasurfer\net\http\CurlHttpClient;
 use rosasurfer\net\http\HttpRequest;
 use rosasurfer\net\http\HttpResponse;
@@ -686,7 +687,7 @@ class Logger extends StaticClass {
             }
             $session  = is_null($session) ? null : print_r(ksort_r($session), true);
             $ip       = $_SERVER['REMOTE_ADDR'];
-            $host     = getHostByAddr($ip);
+            $host     = NetTools::getHostByAddress($ip);
             if ($host != $ip)
                 $ip .= ' ('.$host.')';
             $msg .= NL.NL.'Request:'.NL.'--------'.NL.$request.NL.NL

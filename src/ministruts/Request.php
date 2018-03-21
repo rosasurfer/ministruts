@@ -7,6 +7,7 @@ use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
+use rosasurfer\net\NetTools;
 use rosasurfer\util\PHP;
 
 use function rosasurfer\strEndsWith;
@@ -391,7 +392,8 @@ class Request extends Singleton {
     public function getRemoteHostname() {
         static $hostname = null;
         if (!$hostname) {
-            $hostname = getHostByAddr($this->getRemoteAddress());
+            /** @var string $hostname */
+            $hostname = NetTools::getHostByAddress($this->getRemoteAddress());
         }
         return $hostname;
     }

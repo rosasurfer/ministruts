@@ -2,6 +2,7 @@
 namespace rosasurfer\bin\check_ip;
 
 use rosasurfer\Application;
+use rosasurfer\net\NetTools;
 
 use function rosasurfer\echoPre;
 
@@ -22,7 +23,7 @@ $app = new Application([
 
 
 $address = getRemoteAddress();
-$name    = getHostByAddr($address);
+$name    = NetTools::getHostByAddress($address);
 
 if ($address == $name) echoPre('current IP address: '.$address);
 else                   echoPre('current IP address: '.$address.'  ('.$name.')');
@@ -30,7 +31,7 @@ else                   echoPre('current IP address: '.$address.'  ('.$name.')');
 
 $value = getForwardedRemoteAddress();
 if ($value) {
-    if (!isIPAddress($value) || ($value==($name=getHostByAddr($value)))) {
+    if (!isIPAddress($value) || ($value==($name=NetTools::getHostByAddress($value)))) {
         echoPre('forwarded for:      '.$value);
     }
     else {
