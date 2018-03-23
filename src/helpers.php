@@ -94,12 +94,12 @@ const EOL_WINDOWS       = "\r\n";                                   //   CRLF   
 !defined('PHP_INT_MIN') && define('PHP_INT_MIN', ~PHP_INT_MAX);     // since PHP 7.0
 
 // php.ini access level
-define('INI_ONLY',       0         );                               // undefined access level constant
-define('PHP_INI_ONLY',   INI_ONLY  );       // 0                    // entry can be set in php.ini only
-define('PHP_INI_USER',   INI_USER  );       // 1                    // entry can be set in scripts and in .user.ini
-define('PHP_INI_PERDIR', INI_PERDIR);       // 2                    // entry can be set in php.ini, httpd.conf, .htaccess and in .user.ini
-define('PHP_INI_SYSTEM', INI_SYSTEM);       // 4                    // entry can be set in php.ini and in httpd.conf
-define('PHP_INI_ALL',    INI_ALL   );       // 7                    // entry can be set anywhere
+define('INI_ONLY',       0         );                               // undefined access level
+define('PHP_INI_ONLY',   INI_ONLY  );       // 0    no flag         // entry can be set in php.ini only
+define('PHP_INI_USER',   INI_USER  );       // 1    flag            // entry can be set in scripts and in .user.ini
+define('PHP_INI_PERDIR', INI_PERDIR);       // 2    flag            // entry can be set in php.ini, httpd.conf, .htaccess and in .user.ini
+define('PHP_INI_SYSTEM', INI_SYSTEM);       // 4    flag            // entry can be set in php.ini and in httpd.conf
+define('PHP_INI_ALL',    INI_ALL   );       // 7    flag            // entry can be set anywhere
 
 
 /**

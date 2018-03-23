@@ -97,23 +97,24 @@ class PHP extends StaticClass {
         /*PHP_INI_PERDIR*/ if (!self::ini_get_bool('short_open_tag'                ))                                $issues[] = 'Error: short_open_tag is not On  [security]';
         /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('asp_tags'                      ) && PHP_VERSION_ID <  70000)     $issues[] = 'Info:  asp_tags is not Off  [standards]';
         /*PHP_INI_ONLY  */ if ( self::ini_get_bool('expose_php'                    ) && !CLI)                        $issues[] = 'Warn:  expose_php is not Off  [security]';
-        /*PHP_INI_ALL   */ if ( self::ini_get_int ('max_execution_time'            ) > 30 && !CLI/*hardcoded*/)      $issues[] = 'Info:  max_execution_time is very high: '.ini_get('max_execution_time').'  [resources]';
-        /*PHP_INI_ALL   */ if ( self::ini_get_int ('default_socket_timeout'        ) > 30  /*PHP default: 60*/)      $issues[] = 'Info:  default_socket_timeout is very high: '.ini_get('default_socket_timeout').'  [resources]';
+        /*PHP_INI_ALL   */ if ( self::ini_get_int ('max_execution_time'            ) > 30 && !CLI /*hardcoded*/)     $issues[] = 'Info:  max_execution_time is very high: '.ini_get('max_execution_time').'  [resources]';
+        /*PHP_INI_ALL   */ if ( self::ini_get_int ('default_socket_timeout'        ) > 30   /*PHP default: 60*/)     $issues[] = 'Info:  default_socket_timeout is very high: '.ini_get('default_socket_timeout').'  [resources]';
         /*PHP_INI_ALL   */ $memoryLimit = self::ini_get_bytes('memory_limit'       );
                            $sWarnLimit  = Config::getDefault()->get('log.warn.memory_limit', '');
                            $warnLimit   = byteValue($sWarnLimit);
-            if      ($memoryLimit ==      -1)                                                                        $issues[] = 'Warn:  memory_limit is unlimited  [resources]';
-            else if ($memoryLimit <=       0)                                                                        $issues[] = 'Error: memory_limit is invalid: '.ini_get('memory_limit');
-            else if ($memoryLimit <   8 * MB)                                                                        $issues[] = 'Info:  memory_limit is very low: '.ini_get('memory_limit').'  [resources]';
-            else if ($memoryLimit > 128 * MB)                                                                        $issues[] = 'Info:  memory_limit is very high: '.ini_get('memory_limit').'  [resources]';
+            if      ($memoryLimit ==    -1)                                                                          $issues[] = 'Warn:  memory_limit is unlimited  [resources]';
+            else if ($memoryLimit <=     0)                                                                          $issues[] = 'Error: memory_limit is invalid: '.ini_get('memory_limit');
+            else if ($memoryLimit <  32*MB)                                                                          $issues[] = 'Warn:  memory_limit is very low: '.ini_get('memory_limit').'  [resources]';
+            else if ($memoryLimit > 128*MB)                                                                          $issues[] = 'Info:  memory_limit is very high: '.ini_get('memory_limit').'  [resources]';
             if ($warnLimit) {
                 if      ($warnLimit <             0)                                                                 $issues[] = 'Error: log.warn.memory_limit is invalid: '.$sWarnLimit.'  [configuration]';
                 else if ($warnLimit >= $memoryLimit)                                                                 $issues[] = 'Error: log.warn.memory_limit ('.$sWarnLimit.') is not lower than memory_limit ('.ini_get('memory_limit').')  [configuration]';
-                else if ($warnLimit >      128 * MB)                                                                 $issues[] = 'Info:  log.warn.memory_limit ('.$sWarnLimit.') is very high (memory_limit: '.ini_get('memory_limit').')  [configuration]';
+                else if ($warnLimit >        128*MB)                                                                 $issues[] = 'Info:  log.warn.memory_limit ('.$sWarnLimit.') is very high (memory_limit: '.ini_get('memory_limit').')  [configuration]';
             }
+            $memoryLimit_local = $memoryLimit;
         /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('register_globals'              ) && PHP_VERSION_ID <  50400)     $issues[] = 'Error: register_globals is not Off  [security]';
         /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('register_long_arrays'          ) && PHP_VERSION_ID <  50400)     $issues[] = 'Info:  register_long_arrays is not Off  [performance]';
-        /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('register_argc_argv'            ) && !CLI/*hardcoded*/)           $issues[] = 'Info:  register_argc_argv is not Off  [performance]';
+        /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('register_argc_argv'            ) && !CLI      /*hardcoded*/)     $issues[] = 'Info:  register_argc_argv is not Off  [performance]';
         /*PHP_INI_PERDIR*/ if (!self::ini_get_bool('auto_globals_jit'              ))                                $issues[] = 'Info:  auto_globals_jit is not On  [performance]';
         /*PHP_INI_ALL   */ if ( self::ini_get_bool('define_syslog_variables'       ) && PHP_VERSION_ID <  50400)     $issues[] = 'Info:  define_syslog_variables is not Off  [performance]';
         /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('allow_call_time_pass_reference') && PHP_VERSION_ID <  50400)     $issues[] = 'Info:  allow_call_time_pass_reference is not Off  [standards]';
@@ -137,8 +138,8 @@ class PHP extends StaticClass {
         // (2) error handling
         // ------------------                                                                                        /* E_STRICT =  2048 =    100000000000            */
         /*PHP_INI_ALL   */ $current = self::ini_get_int('error_reporting');                                          /* E_ALL    = 30719 = 111011111111111  (PHP 5.3) */
-        $target = (E_ALL|E_STRICT) & ~E_DEPRECATED;                                                                  /* E_ALL    = 32767 = 111111111111111  (PHP 5.4) */
-        if ($notCovered=($target ^ $current) & $target)                                                              $issues[] = 'Warn:  error_reporting does not cover '.DebugHelper::errorLevelToStr($notCovered).'  [standards]';
+            $target = (E_ALL|E_STRICT) & ~E_DEPRECATED;                                                              /* E_ALL    = 32767 = 111111111111111  (PHP 5.4) */
+            if ($notCovered=($target ^ $current) & $target)                                                          $issues[] = 'Warn:  error_reporting does not cover '.DebugHelper::errorLevelToStr($notCovered).'  [standards]';
         if (WINDOWS) {/*always development*/
             /*PHP_INI_ALL*/ if (!self::ini_get_bool('display_errors'                )) /*bool|string:stderr*/        $issues[] = 'Info:  display_errors is not On  [setup]';
             /*PHP_INI_ALL*/ if (!self::ini_get_bool('display_startup_errors'        ))                               $issues[] = 'Info:  display_startup_errors is not On  [setup]';
@@ -156,19 +157,19 @@ class PHP extends StaticClass {
             if      ($bytes <  0)   /* 'log_errors' and 'log_errors_max_len' do not affect */                        $issues[] = 'Error: log_errors_max_len is invalid: '.ini_get('log_errors_max_len');
             else if ($bytes != 0)   /* explicit calls to the function error_log()          */                        $issues[] = 'Warn:  log_errors_max_len is not 0: '.ini_get('log_errors_max_len').'  [functionality]';
         /*PHP_INI_ALL   */ $errorLog = ini_get('error_log');
-        if (!empty($errorLog) && $errorLog!='syslog') {
-            if (is_file($errorLog)) {
-                $hFile = @fOpen($errorLog, 'ab');         // try to open
-                if (is_resource($hFile)) fClose($hFile);
-                else                                                                                                 $issues[] = 'Error: error_log "'.$errorLog.'" file is not writable  [setup]';
+            if (!empty($errorLog) && $errorLog!='syslog') {
+                if (is_file($errorLog)) {
+                    $hFile = @fOpen($errorLog, 'ab');         // try to open
+                    if (is_resource($hFile)) fClose($hFile);
+                    else                                                                                             $issues[] = 'Error: error_log "'.$errorLog.'" file is not writable  [setup]';
+                }
+                else {
+                    $hFile = @fOpen($errorLog, 'wb');         // try to create
+                    if (is_resource($hFile)) fClose($hFile);
+                    else                                                                                             $issues[] = 'Error: error_log "'.$errorLog.'" directory is not writable  [setup]';
+                    is_file($errorLog) && @unlink($errorLog);
+                }
             }
-            else {
-                $hFile = @fOpen($errorLog, 'wb');         // try to create
-                if (is_resource($hFile)) fClose($hFile);
-                else                                                                                                 $issues[] = 'Error: error_log "'.$errorLog.'" directory is not writable  [setup]';
-                is_file($errorLog) && @unlink($errorLog);
-            }
-        }
 
 
         // (3) input sanitizing
@@ -178,26 +179,35 @@ class PHP extends StaticClass {
             /*PHP_INI_PERDIR*/ else if (self::ini_get_bool('magic_quotes_gpc'))                                      $issues[] = 'Error: magic_quotes_gpc is not Off  [standards]';
             /*PHP_INI_ALL   */ if      (self::ini_get_bool('magic_quotes_runtime'))                                  $issues[] = 'Error: magic_quotes_runtime is not Off  [standards]';
         }
-        /*PHP_INI_SYSTEM*/    if      (self::ini_get_bool('sql.safe_mode'       ))                                   $issues[] = 'Warn:  sql.safe_mode is not Off  [setup]';
+        /*PHP_INI_SYSTEM*/     if      (self::ini_get_bool('sql.safe_mode'       ))                                  $issues[] = 'Warn:  sql.safe_mode is not Off  [setup]';
 
 
         // (4) request & HTML handling
         // ---------------------------
-        /*PHP_INI_PERDIR*/ $order = ini_get('request_order'); /*if empty fall-back to order of GPC in 'variables_order'*/
-        if (empty($order)) {
-            /*PHP_INI_PERDIR*/ $order = ini_get('variables_order');
-            $newOrder = '';
-            $len      = strLen($order);
-            for ($i=0; $i < $len; $i++) {
-                if (in_array($char=$order[$i], ['G','P','C']))
-                    $newOrder .= $char;
-            }
-            $order = $newOrder;
-        }                  if ($order != 'GP')                                                                       $issues[] = 'Error: request_order is not "GP": "'.(empty(ini_get('request_order')) ? '" (empty) => variables_order:"':'').$order.'"  [standards]';
+        /*PHP_INI_PERDIR*/ $order = ini_get('request_order'); /*if empty automatic fall-back to GPC order in "variables_order"*/
+            if (empty($order)) {
+                /*PHP_INI_PERDIR*/ $order = ini_get('variables_order');
+                $newOrder = '';
+                $len      = strLen($order);
+                for ($i=0; $i < $len; $i++) {
+                    if (in_array($char=$order[$i], ['G','P','C']))
+                        $newOrder .= $char;
+                }
+                $order = $newOrder;
+            }              if ($order != 'GP')                                                                       $issues[] = 'Error: request_order is not "GP": "'.(empty(ini_get('request_order')) ? '" (empty) => variables_order:"':'').$order.'"  [standards]';
         /*PHP_INI_PERDIR*/ if ( self::ini_get_bool('always_populate_raw_post_data' ) && PHP_VERSION_ID <  70000)     $issues[] = 'Info:  always_populate_raw_post_data is not Off  [performance]';
         /*PHP_INI_ALL   */ if (       ini_get     ('arg_separator.output'          ) != '&')                         $issues[] = 'Warn:  arg_separator.output is not "&": "'.ini_get('arg_separator.output').'"  [standards]';
         /*PHP_INI_ALL   */ if (!self::ini_get_bool('ignore_user_abort'             ) && !CLI)                        $issues[] = 'Warn:  ignore_user_abort is not On  [standards]';
+        /*PHP_INI_PERDIR*/ $postMaxSize = self::ini_get_bytes('post_max_size');
+            $memoryLimit_global = byteValue(ini_get_all()['memory_limit']['global_value']);
+            // The memory_limit needs to be raised accordingly before script entry, not in the script.
+            // If the memory_limit is too low on script entry PHP may crash for larger requests with "Out of memory" (e.g. file uploads).
+            if      ($memoryLimit_global < $postMaxSize      )                                                       $issues[] = 'Error: global memory_limit "'.ini_get_all()['memory_limit']['global_value'].'" is too low for post_max_size "'.ini_get('post_max_size').'"  [request handling]';
+            else if ($memoryLimit_global < $postMaxSize+20*MB) /*PHP needs about 20MB for the runtime*/              $issues[] = 'Info:  global memory_limit "'.ini_get_all()['memory_limit']['global_value'].'" is very low for post_max_size "'.ini_get('post_max_size').'"  [request handling]';
+            if      ($memoryLimit_local  < $postMaxSize)                                                             $issues[] = 'Error: local memory_limit "'.ini_get('memory_limit').'" is too low for post_max_size "'.ini_get('post_max_size').'"  [request handling]';
+            else if ($memoryLimit_local  < $postMaxSize+20*MB)                                                       $issues[] = 'Warn:  local memory_limit "'.ini_get('memory_limit').'" is very low for post_max_size "'.ini_get('post_max_size').'"  [request handling]';
         /*PHP_INI_SYSTEM*/ if ( self::ini_get_bool('file_uploads'                  ) && !CLI) {                      $issues[] = 'Info:  file_uploads is not Off  [security]';
+        /*PHP_INI_PERDIR*/ if (self::ini_get_bytes('upload_max_filesize') >= $postMaxSize)                           $issues[] = 'Error: post_max_size "'.ini_get('post_max_size').'" is not larger than upload_max_filesize "'.ini_get('upload_max_filesize').'"  [request handling]';
         /*PHP_INI_SYSTEM*/ $dir = ini_get($name = 'upload_tmp_dir');
             $file = null;
             if (trim($dir) == '') {                                                                                  $issues[] = 'Info:  '.$name.' is not set  [setup]';
@@ -212,10 +222,10 @@ class PHP extends StaticClass {
         /*PHP_INI_ALL   */ if ( strToLower(ini_get('default_charset'               )) != 'utf-8')                    $issues[] = 'Info:  default_charset is not "UTF-8": "'.ini_get('default_charset').'"  [standards]';
         /*PHP_INI_ALL   */ if ( self::ini_get_bool('implicit_flush'                ) && !CLI/*hardcoded*/)           $issues[] = 'Warn:  implicit_flush is not Off  [performance]';
         /*PHP_INI_PERDIR*/ $buffer = self::ini_get_bytes('output_buffering'        );
-        if (!CLI) {
-            if      ($buffer < 0)                                                                                    $issues[] = 'Error: output_buffering is invalid: '.ini_get('output_buffering');
-            else if (!$buffer)                                                                                       $issues[] = 'Info:  output_buffering is not enabled  [performance]';
-        }
+            if (!CLI) {
+                if      ($buffer < 0)                                                                                $issues[] = 'Error: output_buffering is invalid: '.ini_get('output_buffering');
+                else if (!$buffer)                                                                                   $issues[] = 'Info:  output_buffering is not enabled  [performance]';
+            }
         // TODO: /*PHP_INI_ALL*/ "zlib.output_compression"
 
 
