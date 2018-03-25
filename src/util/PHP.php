@@ -274,7 +274,7 @@ class PHP extends StaticClass {
         if (!extension_loaded('json'))                                                                               $issues[] = 'Info:  JSON extension is not loaded';
         if (!extension_loaded('mysql'))                                                                              $issues[] = 'Info:  MySQL extension is not loaded';
         if (!extension_loaded('mysqli'))                                                                             $issues[] = 'Info:  MySQLi extension is not loaded';
-        if (!extension_loaded('pcntl')   && !WINDOWS)                                                                $issues[] = 'Info:  PCNTL extension is not loaded';
+        if (!extension_loaded('pcntl')   && !WINDOWS && CLI) /*never loaded in a web server context*/                $issues[] = 'Info:  PCNTL extension is not loaded';
         if (!extension_loaded('sysvsem') && !WINDOWS)                                                                $issues[] = 'Info:  System-V Semaphore extension is not loaded';
 
 
