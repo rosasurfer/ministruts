@@ -9,7 +9,7 @@
 
 
 /**
- * Scan the application's PHP error log file for entries and send them by email to the configured logmessage receivers.
+ * Scans the application's PHP error logfile for entries and sends them by email to the configured logmessage receivers.
  * If no receivers are configured mail is sent to the system user running the script. Processed log entries are removed
  * from the file.
  */
