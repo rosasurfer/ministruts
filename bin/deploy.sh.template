@@ -6,14 +6,14 @@
 #########################################################################################################################
 
 
-#                                                                                                                          
-# Application deploy script for Git based repositories. Deploys a branch, a tag or a specific commit and updates existing 
-# Git submodules. Can send email notifications with the deployed changes (commit mesages). 
+#
+# Application deploy script for Git based repositories. Deploys a branch, a tag or a specific commit and updates existing
+# Git submodules. Can send email notifications with the deployed changes (commit mesages).
 #
 # Usage: deploy.sh [<branch-name> | <tag-name> | <commit-sha>]
 #
 # Without arguments the latest version of the current branch is deployed.
-#                                                                                                                          
+#
 set -e
 
 
@@ -28,17 +28,17 @@ command -v git >/dev/null || { echo "ERROR: Git command not found."; exit 1; }
 
 
 # change to the project's toplevel directory
-cd "$(dirname "$(readlink -e "$0")")"                    
+cd "$(dirname "$(readlink -e "$0")")"
 set +e
-PROJECT_DIR="$(git rev-parse --show-toplevel 2>/dev/null)" 
+PROJECT_DIR="$(git rev-parse --show-toplevel 2>/dev/null)"
 set -e
-[ -z "$PROJECT_DIR" ] && { echo "ERROR: Project toplevel directory not found."; exit 1; }  
+[ -z "$PROJECT_DIR" ] && { echo "ERROR: Project toplevel directory not found."; exit 1; }
 cd "$PROJECT_DIR"
 
 
 # get current repo status
 FROM_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
-FROM_COMMIT="$(git rev-parse --short HEAD)"     
+FROM_COMMIT="$(git rev-parse --short HEAD)"
 
 
 # check arguments
