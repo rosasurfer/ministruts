@@ -2,18 +2,8 @@
 #
 # Git hook to run "composer install" if the file "composer.lock" was changed.
 #
-# Notes:
-# ------
-#  - This hook is not executed by Eclipse.
-
-#  - The hook is not executed if merging failed due to conflicts.
-#  - The hook is not executed if you run pull with --rebase option.
+# This hook is not executed by Eclipse.
 #
-#  - post-rewrite works for me. As side effect it is also executed on amend.
-#    @see  http://stackoverflow.com/questions/21307744/git-post-rebase-hook
-#
-#  - I would check updated submodules too:
-#    check_run .gitmodules "git submodule init && git submodule update"
 
 
 # Execute an existing user hook.
@@ -23,7 +13,7 @@ fi
 
 
 # Check user aliases and get an existing Composer definition.
-check_composer_alias() {
+function check_composer_alias() {
     if [[ -z "$COMPOSER_ALIAS_CHECKED" && -f ~/.bash_aliases ]]; then
         . ~/.bash_aliases 
         COMPOSER_ALIAS=${BASH_ALIASES[composer]:-${BASH_ALIASES[composer.phar]}}
@@ -50,11 +40,11 @@ fi
 
 
 # Get the changed files from Git.
-changed_files=$(git diff-tree -r --name-only --no-commit-id HEAD@{1} HEAD)
+changed_files=$(git diff-tree -r --name-only --no-commit-id $1 $2)
 
 
 # Check if composer.lock has changed and run Composer.
-check_and_run() {
+function check_and_run() {
     [ -f "$1" ]                                                         && \
     echo "$changed_files" | grep --quiet -Fx "$1"                       && \
     echo " * changes detected in $1"                                    && \
