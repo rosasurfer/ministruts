@@ -229,8 +229,8 @@ class PHP extends StaticClass {
         // TODO: /*PHP_INI_ALL*/ "zlib.output_compression"
 
 
-        // (5) session related
-        // -------------------
+        // (5) session related settings
+        // ----------------------------
         /*PHP_INI_ALL   */ if (       ini_get     ('session.save_handler') != 'files')                               $issues[] = 'Info:  session.save_handler is not "files": "'.ini_get('session.save_handler').'"';
         // TODO: check "session.save_path"
         /*PHP_INI_ALL   */ if (       ini_get     ('session.serialize_handler') != 'php')                            $issues[] = 'Info:  session.serialize_handler is not "php": "'.ini_get('session.serialize_handler').'"';
@@ -257,8 +257,8 @@ class PHP extends StaticClass {
 
 
 
-        // (6) mail related
-        // ----------------
+        // (6) mail related settings
+        // -------------------------
         /*PHP_INI_ALL   */ //sendmail_from
         if (WINDOWS && !ini_get('sendmail_path') && !ini_get('sendmail_from') && !isSet($_SERVER['SERVER_ADMIN']))   $issues[] = 'Warn:  On Windows and neither sendmail_path nor sendmail_from are set';
         /*PHP_INI_SYSTEM*/ if (!WINDOWS && !ini_get('sendmail_path'))                                                $issues[] = 'Warn:  sendmail_path is not set';
@@ -274,7 +274,9 @@ class PHP extends StaticClass {
         if (!extension_loaded('json'))                                                                               $issues[] = 'Info:  JSON extension is not loaded';
         if (!extension_loaded('mysql'))                                                                              $issues[] = 'Info:  MySQL extension is not loaded';
         if (!extension_loaded('mysqli'))                                                                             $issues[] = 'Info:  MySQLi extension is not loaded';
-        if (!WINDOWS && !extension_loaded('sysvsem'))                                                                $issues[] = 'Info:  System-V Semaphore extension is not loaded';
+        if (!extension_loaded('pcntl')   && !WINDOWS)                                                                $issues[] = 'Info:  PCNTL extension is not loaded';
+        if (!extension_loaded('sysvsem') && !WINDOWS)                                                                $issues[] = 'Info:  System-V Semaphore extension is not loaded';
+
 
         // check Composer defined dependencies
         $appRoot = Config::getDefault()->get('app.dir.root');
