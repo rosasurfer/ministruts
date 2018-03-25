@@ -6,4 +6,4 @@ if (PHP_VERSION_ID < 50600) exit('[FATAL] This project requires PHP >= 5.6'.PHP_
 
 
 // include the framework
-require(__DIR__.'/framework.php');
+require(__DIR__.'/loader.php');
