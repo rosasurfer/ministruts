@@ -321,66 +321,6 @@ namespace {
 }
 
 
-namespace rosasurfer\bin\check_dns {
-
-    /**
-     * @param  string $domain
-     * @param  string $type
-     *
-     * @return string
-     */
-    function queryDNS($domain, $type) {
-        return '';
-    }
-}
-
-
-namespace rosasurfer\bin\check_ip {
-
-    /**
-     * @return string
-     */
-    function getForwardedRemoteAddress() {
-        return '';
-    }
-
-    /**
-     * @param  string|array $names [optional]
-     *
-     * @return array
-     */
-    function getHeaders($names = null) {
-        return [];
-    }
-
-    /**
-     * @param  string|array $names
-     *
-     * @return string
-     */
-    function getHeaderValue($names) {
-        return '';
-    }
-
-    /**
-     * @return string
-     */
-    function getRemoteAddress() {
-        return '';
-    }
-
-    /**
-     * @param  string $string
-     * @param  bool   $returnBytes [optional]
-     *
-     * @return bool|array
-     */
-    function isIPAddress($string, $returnBytes=false) {
-        return false;
-    }
-}
-
-
 namespace rosasurfer\bin\logwatch {
 
     /**
