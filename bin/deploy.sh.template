@@ -1,11 +1,26 @@
 #!/bin/bash
+#########################################################################################################################
+#                                                                                                                       #
+#  This script is a template, it must not be run as-is. Copy it into your project and rename and configure it.          #
+#                                                                                                                       #
+#########################################################################################################################
+
+
+#                                                                                                                          
+# Application deploy script for Git based repositories. Deploys a branch, a tag or a specific commit and updates existing 
+# Git submodules. Can send email notifications with the deployed changes (commit mesages). 
 #
+# Usage: deploy.sh [<branch-name> | <tag-name> | <commit-sha>]
+#
+# Without arguments the latest version of the current branch is deployed.
+#                                                                                                                          
+set -e
 
 
 # notification configuration
-NOTIFY_FOR_PROJECT=project-name
-NOTIFY_TO_EMAIL=email@domain.tld
-NOTIFY_IF_ON=hostname
+NOTIFY_FOR_PROJECT="project-name"
+NOTIFY_IF_ON="hostname"
+NOTIFY_TO_EMAIL="email@domain.tld"
 
 
 # check git availability
@@ -13,14 +28,17 @@ command -v git >/dev/null || { echo "ERROR: Git command not found."; exit 1; }
 
 
 # change to the project's toplevel directory
-cd "$(dirname "$(readlink -e "$0")")"
-PROJECT_DIR=$(git rev-parse --show-toplevel 2>/dev/null)
+cd "$(dirname "$(readlink -e "$0")")"                    
+set +e
+PROJECT_DIR="$(git rev-parse --show-toplevel 2>/dev/null)" 
+set -e
+[ -z "$PROJECT_DIR" ] && { echo "ERROR: Project toplevel directory not found."; exit 1; }  
 cd "$PROJECT_DIR"
 
 
 # get current repo status
-FROM_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-FROM_COMMIT=$(git rev-parse --short HEAD)
+FROM_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+FROM_COMMIT="$(git rev-parse --short HEAD)"     
 
 
 # check arguments
@@ -54,7 +72,6 @@ fi
 
 
 # update project
-set -e
 git fetch origin
 if   [ -n "$BRANCH" ]; then { [ "$BRANCH" != "$FROM_BRANCH" ] && git checkout "$BRANCH"; git merge "origin/$BRANCH"; }
 elif [ -n "$TAG"    ]; then {                                    git checkout "$TAG";                                }
@@ -63,8 +80,8 @@ fi
 
 
 # check changes and send deployment notifications
-OLD=$FROM_COMMIT
-NEW=$(git rev-parse --short HEAD)
+OLD="$FROM_COMMIT"
+NEW="$(git rev-parse --short HEAD)"
 HOSTNAME="$(hostname)"
 
 if [ "$OLD" = "$NEW" ]; then
@@ -78,7 +95,7 @@ elif [ "$NOTIFY_IF_ON" = "$HOSTNAME" ]; then
         elif [ -n "$COMMIT" ]; then echo "Subject: Reset $NOTIFY_FOR_PROJECT to commit $COMMIT"
         fi
         git log --pretty='%h %ae %s' $OLD..$NEW
-        ) | sendmail -f $NOTIFY_TO_EMAIL $NOTIFY_TO_EMAIL
+        ) | sendmail -f "$NOTIFY_TO_EMAIL" "$NOTIFY_TO_EMAIL"
     fi
 fi
 
@@ -92,5 +109,5 @@ for dir in "$DIRS"; do
     chmod 777 "$dir"
 done
 
-USER=<username>
+USER="<username>"
 id -u "$USER" >/dev/null 2>&1 && chown -R --from=root.root "$USER.$USER" "$PROJECT_DIR"
