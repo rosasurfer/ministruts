@@ -2,7 +2,7 @@
 <?php
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //                                                                                                                         //
-//  This file is a template, it must not be run directly. Copy it to your project's CRON directory, rename it and point    //
+//  This script is a template, it must not be run as-is. Copy it to your project's CRON directory, rename it and point     //
 //  line 31 to your application's init script. Finally setup a CRON job passing the option "-q" to it (see syntax help).   //
 //                                                                                                                         //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
