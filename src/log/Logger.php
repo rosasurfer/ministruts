@@ -18,6 +18,7 @@ use rosasurfer\net\mail\Mailer;
 use rosasurfer\util\PHP;
 
 use function rosasurfer\hsc;
+use function rosasurfer\ini_get_bool;
 use function rosasurfer\ksort_r;
 use function rosasurfer\normalizeEOL;
 use function rosasurfer\printPretty;
@@ -181,12 +182,12 @@ class Logger extends StaticClass {
 
 
         // (3) L_FATAL print handler: enabled on local/white-listed access or if explicitely enabled
-        self::$printFatalHandler = CLI || Application::isAdminIP() || PHP::ini_get_bool('display_errors');
+        self::$printFatalHandler = CLI || Application::isAdminIP() || ini_get_bool('display_errors');
 
 
         // (4) non L_FATAL print handler: enabled on local access, if explicitely enabled or if the mail handler is disabled
         self::$printNonfatalHandler = CLI || in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1', $_SERVER['SERVER_ADDR']])
-                                          || PHP::ini_get_bool('display_errors')
+                                          || ini_get_bool('display_errors')
                                           || (self::$printFatalHandler && !self::$mailHandler);
 
         // (5) SMS handler: enabled if SMS receivers are configured (operator settings are checked at log time)

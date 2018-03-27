@@ -19,16 +19,17 @@ use rosasurfer\log\Logger;
 use rosasurfer\util\PHP;
 
 use function rosasurfer\echoPre;
+use function rosasurfer\ini_get_bool;
 use function rosasurfer\true;
 
 use const rosasurfer\CLI;
 use const rosasurfer\ERROR_LOG_DEFAULT;
 use const rosasurfer\L_ERROR;
 use const rosasurfer\L_FATAL;
+use const rosasurfer\L_INFO;
 use const rosasurfer\L_NOTICE;
 use const rosasurfer\L_WARN;
 use const rosasurfer\NL;
-use const rosasurfer\L_INFO;
 
 
 /**
@@ -281,7 +282,7 @@ class ErrorHandler extends StaticClass {
         // web: prevent an empty page
         if (!CLI) {
             try {
-                if (Application::isAdminIP() || PHP::ini_get_bool('display_errors')) {
+                if (Application::isAdminIP() || ini_get_bool('display_errors')) {
                     if ($second) {                          // full second exception, full log location
                         echoPre($second);
                         echoPre('error log: '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : 'web server'));

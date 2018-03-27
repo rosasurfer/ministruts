@@ -10,6 +10,7 @@ use rosasurfer\exception\RuntimeException;
 use rosasurfer\net\NetTools;
 use rosasurfer\util\PHP;
 
+use function rosasurfer\ini_get_bool;
 use function rosasurfer\strEndsWith;
 use function rosasurfer\strLeft;
 use function rosasurfer\strLeftTo;
@@ -502,11 +503,11 @@ class Request extends Singleton {
     public function getSessionId() {
         $name = session_name();
 
-        if (PHP::ini_get_bool('session.use_cookies'))
+        if (ini_get_bool('session.use_cookies'))
             if (isSet($_COOKIE[$name]))
                 return $_COOKIE[$name];
 
-        if (!PHP::ini_get_bool('session.use_only_cookies'))
+        if (!ini_get_bool('session.use_only_cookies'))
             if (isSet($_REQUEST[$name]))
                 return $_REQUEST[$name];
 
@@ -523,11 +524,11 @@ class Request extends Singleton {
     public function hasSessionId() {
         $name = session_name();
 
-        if (PHP::ini_get_bool('session.use_cookies'))
+        if (ini_get_bool('session.use_cookies'))
             if (isSet($_COOKIE[$name]))
                 return true;
 
-        if (!PHP::ini_get_bool('session.use_only_cookies'))
+        if (!ini_get_bool('session.use_only_cookies'))
             if (isSet($_REQUEST[$name]))
                 return true;
 
@@ -544,7 +545,7 @@ class Request extends Singleton {
             $_SESSION = [];
 
             // delete the session cookie
-            if (PHP::ini_get_bool('session.use_cookies')) {
+            if (ini_get_bool('session.use_cookies')) {
                 $params = session_get_cookie_params();
                 setCookie($name=session_name(), $value='', $expire=time()-1*DAY, $params['path'    ],
                                                                                  $params['domain'  ],

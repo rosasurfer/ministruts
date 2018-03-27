@@ -7,8 +7,10 @@ use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\exception\RuntimeException;
+use rosasurfer\net\http\HttpResponse;
 use rosasurfer\util\PHP;
 
+use function rosasurfer\ini_get_bool;
 use function rosasurfer\strContains;
 use function rosasurfer\strEndsWith;
 use function rosasurfer\strLeft;
@@ -16,7 +18,6 @@ use function rosasurfer\strLeftTo;
 use function rosasurfer\strStartsWith;
 
 use const rosasurfer\CLI;
-use rosasurfer\net\http\HttpResponse;
 
 
 /**
@@ -117,7 +118,7 @@ class Response extends Singleton {
 
         // append session id if a session is active and URL rewriting is not disabled (strongly discouraged)
         if (defined('SID') && strLen(SID)) {                        // empty string if the session id was submitted in a cookie
-            if (!PHP::ini_get_bool('session.use_only_cookies')) {   // TODO: check if session_destroy() resets SID
+            if (!ini_get_bool('session.use_only_cookies')) {        // TODO: check if session_destroy() resets SID
                 $cookie       = session_get_cookie_params();
                 $cookieDomain = strToLower(empty($cookie['domain']) ? $request->getHostname() : $cookie['domain']);
                 $cookiePath   =            empty($cookie['path'  ]) ? '/'                     : $cookie['path'  ];

@@ -193,6 +193,37 @@ function numf($number, $decimals=0, $decimalSeparator='.', $thousandsSeparator='
 
 
 /**
+ * Return the value of a php.ini option as a boolean.
+ *
+ * NOTE: Never use ini_get() to read boolean php.ini values as it will return the plain string passed to ini_set().
+ *
+ * @param  string $option
+ * @param  bool   $strict [optional] - Whether or not to enable strict checking of the found value:
+ *                                     FALSE: invalid values a converted to the target type (boolean)
+ *                                     TRUE:  invalid values cause a runtime exception (default: enabled)
+ *
+ * @return bool|null - boolean value or NULL if the setting doesn't exist
+ */
+function ini_get_bool($option, $strict = true) {
+    return \rosasurfer\ini_get_bool($option, $strict);
+}
+
+
+/**
+ * Return the value of a php.ini option as an integer.
+ *
+ * NOTE: Never use ini_get() to read php.ini integer values as it will return the plain string passed to ini_set().
+ *
+ * @param  string $option
+ *
+ * @return int
+ */
+function ini_get_int($option, $strict = true) {
+    return \rosasurfer\ini_get_int($option, $strict);
+}
+
+
+/**
  * Convert special characters to HTML entities.
  *
  * Inline replacement and shortcut for htmlSpecialChars() using different default flags.

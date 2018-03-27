@@ -334,6 +334,73 @@ function numf($number, $decimals=0, $decimalSeparator='.', $thousandsSeparator='
 
 
 /**
+ * Return the value of a php.ini option as a boolean.
+ *
+ * NOTE: Never use ini_get() to read boolean php.ini values as it will return the plain string passed to ini_set().
+ *
+ * @param  string $option
+ * @param  bool   $strict [optional] - Whether or not to enable strict checking of the found value:
+ *                                     FALSE: invalid values a converted to the target type (boolean)
+ *                                     TRUE:  invalid values cause a runtime exception (default: enabled)
+ *
+ * @return bool|null - boolean value or NULL if the setting doesn't exist
+ */
+function ini_get_bool($option, $strict = true) {
+    $value = ini_get($option);
+
+    if ($value === false)                   // setting doesn't exist
+        return null;
+
+    if ($value === '')                      // setting is NULL (unset)
+        return (bool)null;
+
+    switch (strToLower($value)) {
+        case '1'    :
+        case 'on'   :
+        case 'true' :
+        case 'yes'  : return true;
+
+        case '0'    :
+        case 'off'  :
+        case 'false':
+        case 'no'   :
+        case 'none' : return false;
+    }
+
+    if ($strict) throw new RuntimeException('Invalid php.ini setting for type boolean: "'.$option.'" = "'.$value.'"');
+
+    return (bool)(int)$value;
+}
+
+
+/**
+ * Return the value of a php.ini option as an integer.
+ *
+ * NOTE: Never use ini_get() to read php.ini integer values as it will return the plain string passed to ini_set().
+ *
+ * @param  string $option
+ *
+ * @return int
+ */
+function ini_get_int($option, $strict = true) {
+    $value = ini_get($option);
+
+    if ($value === false)                   // setting doesn't exist
+        return null;
+
+    if ($value === '')                      // setting is NULL (unset)
+        return (int)null;
+
+    $iValue = (int)$value;
+
+    if ($strict && $value!==(string)$iValue)
+        throw new RuntimeException('Invalid php.ini setting for type integer: "'.$option.'" = "'.$value.'"');
+
+    return $iValue;
+}
+
+
+/**
  * Convert special characters to HTML entities.
  *
  * Inline replacement and shortcut for htmlSpecialChars() using different default flags.
