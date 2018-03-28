@@ -7,10 +7,11 @@ use rosasurfer\debug\DebugHelper;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RuntimeException;
 
-use function rosasurfer\byteValue;
 use function rosasurfer\echoPre;
 use function rosasurfer\ini_get_bool;
+use function rosasurfer\ini_get_bytes;
 use function rosasurfer\ini_get_int;
+use function rosasurfer\php_byte_value;
 use function rosasurfer\strContains;
 use function rosasurfer\strRight;
 use function rosasurfer\strRightFrom;
@@ -101,9 +102,9 @@ class PHP extends StaticClass {
         /*PHP_INI_ONLY  */ if (       ini_get_bool('expose_php'                    ) && !CLI)                        $issues[] = 'Warn:  expose_php is not Off  [security]';
         /*PHP_INI_ALL   */ if (       ini_get_int ('max_execution_time'            ) > 30 && !CLI /*hardcoded*/)     $issues[] = 'Info:  max_execution_time is very high: '.ini_get('max_execution_time').'  [resources]';
         /*PHP_INI_ALL   */ if (       ini_get_int ('default_socket_timeout'        ) > 30   /*PHP default: 60*/)     $issues[] = 'Info:  default_socket_timeout is very high: '.ini_get('default_socket_timeout').'  [resources]';
-        /*PHP_INI_ALL   */ $memoryLimit = self::ini_get_bytes('memory_limit'       );
+        /*PHP_INI_ALL   */ $memoryLimit = ini_get_bytes('memory_limit');
                            $sWarnLimit  = Config::getDefault()->get('log.warn.memory_limit', '');
-                           $warnLimit   = byteValue($sWarnLimit);
+                           $warnLimit   = php_byte_value($sWarnLimit);
             if      ($memoryLimit ==    -1)                                                                          $issues[] = 'Warn:  memory_limit is unlimited  [resources]';
             else if ($memoryLimit <=     0)                                                                          $issues[] = 'Error: memory_limit is invalid: '.ini_get('memory_limit');
             else if ($memoryLimit <  32*MB)                                                                          $issues[] = 'Warn:  memory_limit is very low: '.ini_get('memory_limit').'  [resources]';
@@ -155,7 +156,7 @@ class PHP extends StaticClass {
         /*PHP_INI_ALL   */ if (      !ini_get_bool('track_errors'                  ))                                $issues[] = 'Info:  track_errors is not On  [functionality]';
         /*PHP_INI_ALL   */ if (       ini_get_bool('html_errors'                   ))                                $issues[] = 'Warn:  html_errors is not Off  [functionality]';
         /*PHP_INI_ALL   */ if (      !ini_get_bool('log_errors'                    ))                                $issues[] = 'Error: log_errors is not On  [setup]';
-        /*PHP_INI_ALL   */ $bytes = self::ini_get_bytes('log_errors_max_len'       );
+        /*PHP_INI_ALL   */ $bytes = ini_get_bytes('log_errors_max_len');
             if      ($bytes <  0)   /* 'log_errors' and 'log_errors_max_len' do not affect */                        $issues[] = 'Error: log_errors_max_len is invalid: '.ini_get('log_errors_max_len');
             else if ($bytes != 0)   /* explicit calls to the function error_log()          */                        $issues[] = 'Warn:  log_errors_max_len is not 0: '.ini_get('log_errors_max_len').'  [functionality]';
         /*PHP_INI_ALL   */ $errorLog = ini_get('error_log');
@@ -200,8 +201,8 @@ class PHP extends StaticClass {
         /*PHP_INI_PERDIR*/ if (       ini_get_bool('always_populate_raw_post_data' ) && PHP_VERSION_ID <  70000)     $issues[] = 'Info:  always_populate_raw_post_data is not Off  [performance]';
         /*PHP_INI_ALL   */ if (       ini_get     ('arg_separator.output'          ) != '&')                         $issues[] = 'Warn:  arg_separator.output is not "&": "'.ini_get('arg_separator.output').'"  [standards]';
         /*PHP_INI_ALL   */ if (      !ini_get_bool('ignore_user_abort'             ) && !CLI)                        $issues[] = 'Warn:  ignore_user_abort is not On  [standards]';
-        /*PHP_INI_PERDIR*/ $postMaxSize = self::ini_get_bytes('post_max_size');
-            $memoryLimit_global = byteValue(ini_get_all()['memory_limit']['global_value']);
+        /*PHP_INI_PERDIR*/ $postMaxSize = ini_get_bytes('post_max_size');
+            $memoryLimit_global = php_byte_value(ini_get_all()['memory_limit']['global_value']);
             // The memory_limit needs to be raised accordingly before script entry, not in the script.
             // If the memory_limit is too low on script entry PHP may crash for larger requests with "Out of memory" (e.g. file uploads).
             if      ($memoryLimit_global < $postMaxSize      )                                                       $issues[] = 'Error: global memory_limit "'.ini_get_all()['memory_limit']['global_value'].'" is too low for post_max_size "'.ini_get('post_max_size').'"  [request handling]';
@@ -209,7 +210,7 @@ class PHP extends StaticClass {
             if      ($memoryLimit_local  < $postMaxSize)                                                             $issues[] = 'Error: local memory_limit "'.ini_get('memory_limit').'" is too low for post_max_size "'.ini_get('post_max_size').'"  [request handling]';
             else if ($memoryLimit_local  < $postMaxSize+20*MB)                                                       $issues[] = 'Warn:  local memory_limit "'.ini_get('memory_limit').'" is very low for post_max_size "'.ini_get('post_max_size').'"  [request handling]';
         /*PHP_INI_SYSTEM*/ if (       ini_get_bool('file_uploads'                  ) && !CLI) {                      $issues[] = 'Info:  file_uploads is not Off  [security]';
-        /*PHP_INI_PERDIR*/ if ( self::ini_get_bytes('upload_max_filesize') >= $postMaxSize)                          $issues[] = 'Error: post_max_size "'.ini_get('post_max_size').'" is not larger than upload_max_filesize "'.ini_get('upload_max_filesize').'"  [request handling]';
+        /*PHP_INI_PERDIR*/ if (       ini_get_bytes('upload_max_filesize') >= $postMaxSize)                          $issues[] = 'Error: post_max_size "'.ini_get('post_max_size').'" is not larger than upload_max_filesize "'.ini_get('upload_max_filesize').'"  [request handling]';
         /*PHP_INI_SYSTEM*/ $dir = ini_get($name = 'upload_tmp_dir');
             $file = null;
             if (trim($dir) == '') {                                                                                  $issues[] = 'Info:  '.$name.' is not set  [setup]';
@@ -223,7 +224,7 @@ class PHP extends StaticClass {
         /*PHP_INI_ALL   */ if (            ini_get('default_mimetype'              )  != 'text/html')                $issues[] = 'Info:  default_mimetype is not "text/html": "'.ini_get('default_mimetype').'"  [standards]';
         /*PHP_INI_ALL   */ if ( strToLower(ini_get('default_charset'               )) != 'utf-8')                    $issues[] = 'Info:  default_charset is not "UTF-8": "'.ini_get('default_charset').'"  [standards]';
         /*PHP_INI_ALL   */ if (       ini_get_bool('implicit_flush'                ) && !CLI/*hardcoded*/)           $issues[] = 'Warn:  implicit_flush is not Off  [performance]';
-        /*PHP_INI_PERDIR*/ $buffer = self::ini_get_bytes('output_buffering'        );
+        /*PHP_INI_PERDIR*/ $buffer = ini_get_bytes('output_buffering');
             if (!CLI) {
                 if      ($buffer < 0)                                                                                $issues[] = 'Error: output_buffering is invalid: '.ini_get('output_buffering');
                 else if (!$buffer)                                                                                   $issues[] = 'Info:  output_buffering is not enabled  [performance]';
@@ -362,27 +363,8 @@ class PHP extends StaticClass {
 
 
     /**
-     * Return the value of a php.ini option as a byte value.
-     *
-     * NOTE: Never use ini_get() to read php.ini byte values as it will return the plain string passed to ini_set().
-     *
-     * @param  string $option
-     *
-     * @return int
-     */
-    public static function ini_get_bytes($option) {
-        $value = ini_get($option);
-
-        //if ($value === false)                   // setting doesn't exist
-        //    return false;
-
-        return byteValue($value);
-    }
-
-
-    /**
-     * Set the specified php.ini setting. Opposite to the built-in PHP function this method does not return the previous
-     * value but a boolean success status. Used to detect assignment errors if the access level of the specified option
+     * Set the specified php.ini setting. Opposite to the built-in PHP function this method does not return the old value
+     * but a boolean success status. Used to detect assignment errors if the access level of the specified option
      * doesn't allow a modification.
      *
      * @param  string          $option

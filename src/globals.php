@@ -166,14 +166,14 @@ function prettyBytes($value, $decimals=1) {
 
 
 /**
- * Convert a byte value to an integer. The value may contain a php.ini byte unit identifier (K, M, G).
+ * Convert a byte value to an integer supporting php.ini shorthand notation ("K", "M", "G").
  *
  * @param  string|int $value - byte value
  *
  * @return int - converted byte value
  */
-function byteValue($value) {
-    return \rosasurfer\byteValue($value);
+function php_byte_value($value) {
+    return \rosasurfer\php_byte_value($value);
 }
 
 
@@ -197,10 +197,11 @@ function numf($number, $decimals=0, $decimalSeparator='.', $thousandsSeparator='
  *
  * NOTE: Never use ini_get() to read boolean php.ini values as it will return the plain string passed to ini_set().
  *
- * @param  string $option
+ * @param  string $option            - option name
  * @param  bool   $strict [optional] - Whether or not to enable strict checking of the found value:
- *                                     FALSE: invalid values a converted to the target type (boolean)
- *                                     TRUE:  invalid values cause a runtime exception (default: enabled)
+ *                                     TRUE:  invalid values cause a runtime exception
+ *                                     FALSE: invalid values are converted to the target type (i.e. boolean)
+ *                                     (default: TRUE)
  *
  * @return bool|null - boolean value or NULL if the setting doesn't exist
  */
@@ -214,12 +215,34 @@ function ini_get_bool($option, $strict = true) {
  *
  * NOTE: Never use ini_get() to read php.ini integer values as it will return the plain string passed to ini_set().
  *
- * @param  string $option
+ * @param  string $option            - option name
+ * @param  bool   $strict [optional] - Whether or not to enable strict checking of the found value:
+ *                                     TRUE:  invalid values cause a runtime exception
+ *                                     FALSE: invalid values are converted to the target type (i.e. integer)
+ *                                     (default: TRUE)
  *
- * @return int
+ * @return int|null - integer value or NULL if the setting doesn't exist
  */
 function ini_get_int($option, $strict = true) {
     return \rosasurfer\ini_get_int($option, $strict);
+}
+
+
+/**
+ * Return the value of a php.ini option as a byte value supporting PHP shorthand notation ("K", "M", "G").
+ *
+ * NOTE: Never use ini_get() to read php.ini byte values as it will return the plain string passed to ini_set().
+ *
+ * @param  string $option            - option name
+ * @param  bool   $strict [optional] - Whether or not to enable strict checking of the found value:
+ *                                     TRUE:  invalid values cause a runtime exception
+ *                                     FALSE: invalid values are converted to the target type (i.e. integer)
+ *                                     (default: TRUE)
+ *
+ * @return int|null - integer value or NULL if the setting doesn't exist
+ */
+function ini_get_bytes($option, $strict = true) {
+    return \rosasurfer\ini_get_bytes($option, $strict);
 }
 
 

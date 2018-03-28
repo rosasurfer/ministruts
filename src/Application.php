@@ -183,7 +183,7 @@ class Application extends Object {
      * Update the PHP configuration with user defined settings.
      */
     private function configurePhp() {
-        $memoryWarnLimit = byteValue(Config::getDefault()->get('log.warn.memory_limit', 0));
+        $memoryWarnLimit = php_byte_value(Config::getDefault()->get('log.warn.memory_limit', 0));
         if ($memoryWarnLimit > 0) {
             register_shutdown_function(function() use ($memoryWarnLimit) {
                 $usedBytes = memory_get_peak_usage($real=true);

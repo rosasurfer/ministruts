@@ -268,53 +268,29 @@ function prettyBytes($value, $decimals=1) {
 
 
 /**
- * Convert a byte value to an integer. The value may contain a php.ini byte unit identifier (K, M, G).
+ * Convert a byte value to an integer supporting php.ini shorthand notation ("K", "M", "G").
  *
  * @param  string|int $value - byte value
  *
  * @return int - converted byte value
  */
-function byteValue($value) {
-    if (is_int($value))
-        return $value;
+function php_byte_value($value) {
+    if (is_int($value))     return $value;
     if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
+    if (!strLen($value))    return 0;
 
-    if (!strLen($value))     return 0;
-    if (ctype_digit($value)) return (int)$value;
-
-    $sValue = $value;
-    $sign   = 1;
-
-    if ($value[0] == '-') {
-        $sign   = -1;
-        $sValue = subStr($value, 1);
-        if (!strLen($sValue))     return 0;
-        if (ctype_digit($sValue)) return $sign * (int)$sValue;
+    if (!preg_match('/^([+-]?[0-9]+)([KMG]?)$/i', $value, $match)) {
+        throw new InvalidArgumentException('Invalid argument $value: "'.$value.'" (not a PHP byte value)');
     }
 
-    $shift = 0;
-    switch (strToUpper(strRight($sValue, 1))) {
-        case 'K':
-            $shift = 10;        // 1024
-            break;
-        case 'M':
-            $shift = 20;        // 1024 * 1024
-            break;
-        case 'G':
-            $shift = 30;        // 1024 * 1024 * 1024
-            break;
-        default:
-            return 0;
-    }
+    $iValue = (int)$match[1];
 
-    $sValue = strLeft($sValue, -1);
-    if (!strLen($sValue)) return 0;
-
-    if (ctype_digit($sValue)) {
-        $iValue = (int)$sValue;
-        return $sign * ($iValue << $shift);
+    switch (strToUpper($match[2])) {
+        case 'K': $iValue <<= 10; break;    // 1024
+        case 'M': $iValue <<= 20; break;    // 1024 * 1024
+        case 'G': $iValue <<= 30; break;    // 1024 * 1024 * 1024
     }
-    return 0;
+    return $iValue;
 }
 
 
@@ -338,10 +314,11 @@ function numf($number, $decimals=0, $decimalSeparator='.', $thousandsSeparator='
  *
  * NOTE: Never use ini_get() to read boolean php.ini values as it will return the plain string passed to ini_set().
  *
- * @param  string $option
+ * @param  string $option            - option name
  * @param  bool   $strict [optional] - Whether or not to enable strict checking of the found value:
- *                                     FALSE: invalid values a converted to the target type (boolean)
- *                                     TRUE:  invalid values cause a runtime exception (default: enabled)
+ *                                     TRUE:  invalid values cause a runtime exception
+ *                                     FALSE: invalid values are converted to the target type (i.e. boolean)
+ *                                     (default: TRUE)
  *
  * @return bool|null - boolean value or NULL if the setting doesn't exist
  */
@@ -378,9 +355,13 @@ function ini_get_bool($option, $strict = true) {
  *
  * NOTE: Never use ini_get() to read php.ini integer values as it will return the plain string passed to ini_set().
  *
- * @param  string $option
+ * @param  string $option            - option name
+ * @param  bool   $strict [optional] - Whether or not to enable strict checking of the found value:
+ *                                     TRUE:  invalid values cause a runtime exception
+ *                                     FALSE: invalid values are converted to the target type (i.e. integer)
+ *                                     (default: TRUE)
  *
- * @return int
+ * @return int|null - integer value or NULL if the setting doesn't exist
  */
 function ini_get_int($option, $strict = true) {
     $value = ini_get($option);
@@ -397,6 +378,40 @@ function ini_get_int($option, $strict = true) {
         throw new RuntimeException('Invalid php.ini setting for type integer: "'.$option.'" = "'.$value.'"');
 
     return $iValue;
+}
+
+
+/**
+ * Return the value of a php.ini option as a byte value supporting PHP shorthand notation ("K", "M", "G").
+ *
+ * NOTE: Never use ini_get() to read php.ini byte values as it will return the plain string passed to ini_set().
+ *
+ * @param  string $option            - option name
+ * @param  bool   $strict [optional] - Whether or not to enable strict checking of the found value:
+ *                                     TRUE:  invalid values cause a runtime exception
+ *                                     FALSE: invalid values are converted to the target type (i.e. integer)
+ *                                     (default: TRUE)
+ *
+ * @return int|null - integer value or NULL if the setting doesn't exist
+ */
+function ini_get_bytes($option, $strict = true) {
+    $value = ini_get($option);
+
+    if ($value === false)                   // setting doesn't exist
+        return null;
+
+    if ($value === '')                      // setting is NULL (unset)
+        return (int)null;
+
+    $result = 0;
+    try {
+        $result = php_byte_value($value);
+    }
+    catch (RuntimeException $ex) {
+        if ($strict) throw new RuntimeException('Invalid php.ini setting for PHP byte value: "'.$option.'" = "'.$value.'"', null, $ex);
+        $result = (int)$value;
+    }
+    return $result;
 }
 
 
