@@ -17,7 +17,7 @@ const MINISTRUTS_ROOT = _MINISTRUTS_ROOT;                       // local constan
 
 
 // Include helper functions and constants which can't be auto-loaded.
-require(MINISTRUTS_ROOT.'/src/helpers.php');
+require(MINISTRUTS_ROOT.'/src/helper.php');
 require(MINISTRUTS_ROOT.'/src/db/orm/meta/defines.php');
 require(MINISTRUTS_ROOT.'/src/ministruts/defines.php');
 require(MINISTRUTS_ROOT.'/src/util/defines.php');

@@ -42,7 +42,7 @@ class Application extends Object {
      *        "app.dir.root"          - string:  The project's root directory.<br>
      *                                           (default: the current directory)<br>
      *
-     *        "app.global-helpers"    - bool:    If set to TRUE the helper functions and constants defined in "src/helpers.php"<br>
+     *        "app.global-helpers"    - bool:    If set to TRUE the helper functions and constants defined in "src/helper.php"<br>
      *                                           are mapped to the global PHP namespace.<br>
      *                                           (default: FALSE)<br>
      *
@@ -355,7 +355,7 @@ class Application extends Object {
         }
 
         if ($enabled) {
-            include(MINISTRUTS_ROOT.'/src/globals.php');
+            include(MINISTRUTS_ROOT.'/src/global-helper.php');
         }
     }
 
