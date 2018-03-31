@@ -18,7 +18,7 @@ use rosasurfer\util\Validator;
 
 
 // Whether or not we run on a command line interface, on localhost and/or on Windows.
-define('rosasurfer\_CLI',       defined('\STDIN') || isSet($_SERVER['argc']));
+define('rosasurfer\_CLI',       (defined('\STDIN') && is_resource('\STDIN')) || isSet($_SERVER['argc']));
 define('rosasurfer\_LOCALHOST', !_CLI && in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1', $_SERVER['SERVER_ADDR']]));
 define('rosasurfer\_MACOS',     strToUpper(PHP_OS) == 'DARWIN');
 define('rosasurfer\_WINDOWS',   strToUpper(subStr(PHP_OS, 0, 3)) == 'WIN');
@@ -103,11 +103,11 @@ define('PHP_INI_ALL',    INI_ALL   );       // 7    flag            // entry can
 
 
 /**
- * Dumps a variable to STDOUT or into a string.
+ * Dumps a variable to the standard output device or into a string.
  *
  * @param  mixed $var                     - variable
  * @param  bool  $return       [optional] - TRUE,  if the variable is to be dumped into a string;<br>
- *                                          FALSE, if the variable is to be dumped to STDOUT (default)
+ *                                          FALSE, if the variable is to be dumped to the standard output device (default)
  * @param  bool  $flushBuffers [optional] - whether or not to flush output buffers on output (default: TRUE)
  *
  * @return string|null - string if the result is to be returned, NULL otherwise
@@ -157,7 +157,17 @@ function echoPre($var, $flushBuffers=true) {
  * @param  string $message
  */
 function stderror($message) {
-    fWrite(STDERR, $message.NL);
+    if (!strEndsWith($message, NL))
+        $message .= NL;
+
+    if (defined('\STDERR') && is_resource('\STDERR')) {
+        fWrite(\STDERR, $message);
+    }
+    else {
+        $handle = fOpen('php://stderr', 'a');
+        fWrite($handle, $message);
+        fClose($handle);
+    }
 }
 
 
@@ -168,7 +178,7 @@ function stderror($message) {
  *
  * @param  mixed $var                     - variable
  * @param  bool  $return       [optional] - TRUE,  if the result is to be returned as a string;<br>
- *                                          FALSE, if the result is to be printed to STDOUT (default)
+ *                                          FALSE, if the result is to be printed to the standard output device (default)
  * @param  bool  $flushBuffers [optional] - whether or not to flush output buffers on output (default: TRUE)
  *
  * @return string|null - string if the result is to be returned, NULL otherwise
@@ -185,7 +195,7 @@ function pp($var, $return=false, $flushBuffers=true) {
  *
  * @param  mixed $var                     - variable
  * @param  bool  $return       [optional] - TRUE,  if the result is to be returned as a string;<br>
- *                                          FALSE, if the result is to be printed to STDOUT (default)
+ *                                          FALSE, if the result is to be printed to the standard output device (default)
  * @param  bool  $flushBuffers [optional] - whether or not to flush output buffers on output (default: TRUE)
  *
  * @return string|null - string if the result is to be returned, NULL otherwise

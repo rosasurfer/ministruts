@@ -20,7 +20,6 @@ const MINISTRUTS_ROOT = _MINISTRUTS_ROOT;                       // local constan
 require(MINISTRUTS_ROOT.'/src/helper.php');
 require(MINISTRUTS_ROOT.'/src/db/orm/meta/defines.php');
 require(MINISTRUTS_ROOT.'/src/ministruts/defines.php');
-require(MINISTRUTS_ROOT.'/src/util/defines.php');
 
 
 /**

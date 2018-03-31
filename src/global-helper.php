@@ -70,11 +70,11 @@ const EOL_WINDOWS       = \rosasurfer\EOL_WINDOWS;              // "\r\n"     CR
 
 
 /**
- * Dumps a variable to STDOUT or into a string.
+ * Dumps a variable to the standard output device or into a string.
  *
  * @param  mixed $var                     - variable
  * @param  bool  $return       [optional] - TRUE,  if the variable is to be dumped into a string;<br>
- *                                          FALSE, if the variable is to be dumped to STDOUT (default)
+ *                                          FALSE, if the variable is to be dumped to the standard output device (default)
  * @param  bool  $flushBuffers [optional] - whether or not to flush output buffers on output (default: TRUE)
  *
  * @return string|null - string if the result is to be returned, NULL otherwise
@@ -121,16 +121,18 @@ function stderror($message) {
 
 
 /**
- * Alias of {@link printPretty()}
+ * Alias of printPretty()
  *
  * Prints a variable in a pretty way. Output always ends with a line feed.
  *
  * @param  mixed $var                     - variable
  * @param  bool  $return       [optional] - TRUE,  if the result is to be returned as a string;<br>
- *                                          FALSE, if the result is to be printed to STDOUT (default)
+ *                                          FALSE, if the result is to be printed to the standard output device (default)
  * @param  bool  $flushBuffers [optional] - whether or not to flush output buffers on output (default: TRUE)
  *
  * @return string|null - string if the result is to be returned, NULL otherwise
+ *
+ * @see    printPretty()
  */
 function pp($var, $return=false, $flushBuffers=true) {
     return \rosasurfer\pp($var, $return, $flushBuffers);
@@ -142,7 +144,7 @@ function pp($var, $return=false, $flushBuffers=true) {
  *
  * @param  mixed $var                     - variable
  * @param  bool  $return       [optional] - TRUE,  if the result is to be returned as a string;<br>
- *                                          FALSE, if the result is to be printed to STDOUT (default)
+ *                                          FALSE, if the result is to be printed to the standard output device (default)
  * @param  bool  $flushBuffers [optional] - whether or not to flush output buffers on output (default: TRUE)
  *
  * @return string|null - string if the result is to be returned, NULL otherwise

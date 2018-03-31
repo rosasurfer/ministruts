@@ -47,9 +47,11 @@ use const rosasurfer\WINDOWS;
  * passes the message to a chain of handlers. Each handler is invoked depending on the application's runtime environment
  * (CLI vs. web server, local vs. remote access) and the application configuration.
  *
- *  - PrintHandler:    Display the message on the standard device (STDOUT on a terminal, HTTP response for SAPI). The
- *                     handler is invoked if the script runs on CLI or as a result of a local web request. For remote
- *                     web requests it displays the message only if the PHP configuration value "display_errors" is set.
+ *  - PrintHandler:    Display the message on the standard output device (STDOUT in CLI mode, HTTP response in a web context).
+ *                     If the script runs in CLI mode the handler is always invoked. If the script runs in a web context the
+ *                     handler is always invoked for local requests (i.e. from localhost). For remote requests the handler
+ *                     is invoked only if the remote IP address has admin access or if the PHP configuration option
+ *                     "display_errors" is set to TRUE.
  *
  *  - MailHandler:     Send the message to the configured mail receivers (email addresses). The handler is invoked if
  *                     the application configuration contains one or more mail receivers for log messages.
@@ -379,7 +381,7 @@ class Logger extends StaticClass {
 
 
     /**
-     * Display the message on the standard device (STDOUT on a terminal, HTTP response for a web request).
+     * Display the message on the standard output device (STDOUT in CLI mode, HTTP response in a web context).
      *
      * @param  string|\Exception $loggable - message or exception to log
      * @param  int               $level    - loglevel of the loggable
@@ -545,10 +547,9 @@ class Logger extends StaticClass {
      *
      * ini_get('error_log')
      *
-     * Name of the file where script errors should be logged. If the special value "syslog" is used, errors are sent
-     * to the system logger instead. On Unix, this means syslog(3) and on Windows it means the event log.
-     * If this directive is not set, errors are sent to the SAPI error logger. For example, it is an error log in Apache
-     * or STDERR in CLI.
+     * Name of the file where script errors should be logged. If the special value "syslog" is used, errors are sent to the
+     * system logger instead. On Unix, this means syslog(3) and on Windows it means the event log. If this directive is not
+     * set, errors are sent to the SAPI error logger. For example, it is an error log in Apache or STDERR in CLI mode.
      *
      * @param  string|\Exception $loggable - message or exception to log
      * @param  int               $level    - loglevel of the loggable
@@ -568,7 +569,7 @@ class Logger extends StaticClass {
             // Instead of messing around here the PrintHandler must not print to STDOUT if the ErrorLogHandler
             // is active and prints to STDERR.
             //
-            // TODO: suppress output to STDERR in interactive terminals only (i.e. not in cron)
+            // TODO: suppress output to STDERR in interactive terminals only (i.e. not in CRON)
         }
         else {
             error_log(trim($msg), ERROR_LOG_DEFAULT);

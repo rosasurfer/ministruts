@@ -58,23 +58,26 @@ class PHP extends StaticClass {
         if (!is_string($cmd)) throw new IllegalTypeException('Illegal type of parameter $cmd: '.getType($cmd));
         // pOpen() suffers from the same bug
 
+        $STDIN  = 0;
+        $STDOUT = 1;
+        $STDERR = 2;
+
         $descriptors = [
-            STDIN  => ['pipe', 'rb'],   // ['file', '/dev/tty', 'r'],
-            STDOUT => ['pipe', 'wb'],   // ['file', '/dev/tty', 'w'],
-            STDERR => ['pipe', 'wb'],   // ['file', '/dev/tty', 'w'],
+            $STDIN  => ['pipe', 'rb'],                  // ['file', '/dev/tty', 'rb'],
+            $STDOUT => ['pipe', 'wb'],                  // ['file', '/dev/tty', 'wb'],
+            $STDERR => ['pipe', 'wb'],                  // ['file', '/dev/tty', 'wb'],
         ];
         $pipes = [];
 
         $hProc = proc_open($cmd, $descriptors, $pipes, $dir, $env, ['bypass_shell'=>true]);
-
                                                         // $pipes now looks like this:
-                                                        // 0 => writeable handle connected to child stdin
-        $stdout = stream_get_contents($pipes[STDOUT]);  // 1 => readable handle connected to child stdout
-        $stderr = stream_get_contents($pipes[STDERR]);  // 2 => readable handle connected to child stderr
+                                                        // 0 => writeable handle connected to the child's STDIN
+        $stdout = stream_get_contents($pipes[$STDOUT]); // 1 => readable handle connected to the child's STDOUT
+        $stderr = stream_get_contents($pipes[$STDERR]); // 2 => readable handle connected to the child's STDERR
 
-        fClose($pipes[STDIN ]);                         // pipes must be closed before proc_close() to avoid a deadlock
-        fClose($pipes[STDOUT]);
-        fClose($pipes[STDERR]);
+        fClose($pipes[$STDIN ]);                        // pipes must be closed before proc_close() to avoid a deadlock
+        fClose($pipes[$STDOUT]);
+        fClose($pipes[$STDERR]);
 
         $exitCode = proc_close($hProc);
         return $stdout;
