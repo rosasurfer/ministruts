@@ -14,7 +14,7 @@ parameters:
 
     excludes_analyse:
         - etc/vendor/
-        - src/globals.php
+        - src/global-helper.php
  
     universalObjectCratesClasses:
         - rosasurfer\ministruts\Page

@@ -21,7 +21,7 @@ use rosasurfer\util\PHP;
 class Application extends Object {
 
 
-    /** @var int - error handling mode in which regular PHP errors are logged */
+    /** @var int - error handling mode in which regular PHP errors are only logged */
     const LOG_ERRORS       = ErrorHandler::LOG_ERRORS;
 
     /** @var int - error handling mode in which regular PHP errors are converted to exceptions and thrown back */
@@ -47,8 +47,8 @@ class Application extends Object {
      *                                           (default: FALSE)<br>
      *
      *        "app.handle-errors"     - string:  How to handle regular PHP errors. If set to "strict" errors are converted to<br>
-     *                                           PHP ErrorExceptions and thrown. If set to "weak" errors are only logged and<br>
-     *                                           execution continues. If set to "ignore" you have to setup your own error<br>
+     *                                           PHP ErrorExceptions and thrown back. If set to "weak" errors are only logged<br>
+     *                                           and execution continues. If set to "ignore" you have to setup your own error<br>
      *                                           handling mechanism.<br>
      *                                           (default: "strict")<br>
      *
@@ -56,7 +56,7 @@ class Application extends Object {
      *                                           If set to FALSE you have to setup your own exception handling mechanism.<br>
      *                                           (default: TRUE)<br>
      *
-     *        Additional options are added to the application's default configuration {@link Config} as regular config values.
+     * All further options are added to the application's default configuration {@link Config} as regular config values.
      */
     public function __construct(array $options = []) {
         // set default values
@@ -169,13 +169,8 @@ class Application extends Object {
      * @return Response|null - the response if a web application or NULL if a command line application
      */
     public function run(array $options = []) {
-        if (CLI) {                              // cli application
-            $response = null;
-        }
-        else {                                  // web application
-            $response = FrontController::processRequest($options);
-        }
-        return $response;
+        if (CLI) return null;
+        return FrontController::processRequest($options);
     }
 
 
