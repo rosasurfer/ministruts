@@ -4,5 +4,3 @@
 #
 RewriteEngine On
 RewriteRule   (.*)  web/$1  [L]
-
-SetEnv APP_BASE_URI '/<local-file-path>/.../ministruts/doc/demo/'

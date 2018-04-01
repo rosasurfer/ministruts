@@ -1,13 +1,5 @@
 #!/usr/bin/env php
 <?php
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//                                                                                                                         //
-//  This script is a template, it must not be run as-is. Copy it to your project's CRON directory, rename it and point     //
-//  line 31 to your application's init script. Finally setup a CRON job passing the option "-q" to it (see syntax help).   //
-//                                                                                                                         //
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
 /**
  * Scans the application's PHP error logfile for entries and sends them by email to the configured logmessage receivers.
  * If no receivers are configured mail is sent to the system user running the script. Processed log entries are removed
@@ -28,7 +20,7 @@ use const rosasurfer\CLI;
 use const rosasurfer\NL;
 use const rosasurfer\WINDOWS;
 
-require(dirName(realPath(__FILE__)).'/<path-to-application-init.php>');
+require(dirName(realPath(__FILE__)).'/../app/init.php>');
 !CLI && exit(1|stderror('error: This script must be executed from a command line interface.'));
 
 

@@ -1,21 +1,20 @@
 <?php
-namespace rosasurfer;
+use rosasurfer\Application;
+
+// class loader
+require(($appRoot=dirName(__DIR__)).'/vendor/autoload.php');
 
 
-// class loader and view helpers
-require(__DIR__.'/../vendor/autoload.php');
-require(__DIR__.'/view/helpers.php');
-
-
-// global settings
+// php.ini settings
 error_reporting(E_ALL);
-ini_set('error_log',         __DIR__.'/../etc/log/php-error.log');
-ini_set('session.save_path', __DIR__.'/../etc/tmp'              );
-ini_set('default_charset',  'UTF-8'                             );
+ini_set('log_errors',        1                                );
+ini_set('error_log',         $appRoot.'/etc/log/php-error.log');
+ini_set('session.save_path', $appRoot.'/etc/tmp'              );
+ini_set('default_charset',  'UTF-8'                           );
 
 
-// initialize a new application
+// create a new application
 return new Application([
-    'config'  => __DIR__.'/config',
-    'globals' => true,
+    'app.dir.root'   => $appRoot,
+    'app.dir.config' => __DIR__.'/config',
 ]);

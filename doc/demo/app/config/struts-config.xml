@@ -3,7 +3,6 @@
 
 <struts-config>
 
-
 	<!-- =============================================== Action Mappings ================================================ -->
 	<action-mappings>
 		<mapping path="/"  include=".home"/>
@@ -11,7 +10,8 @@
 
                                                           
 	<!-- ==================================================== Tiles ===================================================== -->
-	<tiles>
+    <tiles namespace="rosasurfer/ministruts/demo/view">
+    
 		<!-- default layout -->
 		<tile name=".default" file="layouts/default.phtml"/>
 

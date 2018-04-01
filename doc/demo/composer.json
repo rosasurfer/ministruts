@@ -1,6 +1,6 @@
 {
     "name":        "namespace/ministruts-demo",
-    "description": "Demo application using the MiniStruts framework",
+    "description": "Demo application for the MiniStruts framework",
     "type":        "project",
     "license":     "proprietary",
     "config": {
@@ -17,6 +17,7 @@
         "rosasurfer/ministruts": "dev-master"
     },
     "autoload": {
-        "classmap": ["app/"]
+        "classmap": ["app/"],
+        "files":    ["app/view/helper.php"]
     }
 }
