@@ -18,7 +18,7 @@ use rosasurfer\util\Validator;
 
 
 // Whether or not we run on a command line interface, on localhost and/or on Windows.
-define('rosasurfer\_CLI',       (defined('\STDIN') && is_resource('\STDIN')) || isSet($_SERVER['argc']));
+define('rosasurfer\_CLI',       defined('\STDIN') && is_resource(\STDIN));
 define('rosasurfer\_LOCALHOST', !_CLI && in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1', $_SERVER['SERVER_ADDR']]));
 define('rosasurfer\_MACOS',     strToUpper(PHP_OS) == 'DARWIN');
 define('rosasurfer\_WINDOWS',   strToUpper(subStr(PHP_OS, 0, 3)) == 'WIN');
@@ -160,14 +160,9 @@ function stderror($message) {
     if (!strEndsWith($message, NL))
         $message .= NL;
 
-    if (defined('\STDERR') && is_resource('\STDERR')) {
-        fWrite(\STDERR, $message);
-    }
-    else {
-        $handle = fOpen('php://stderr', 'a');
-        fWrite($handle, $message);
-        fClose($handle);
-    }
+    $stderr = CLI ? \STDERR : fOpen('php://stderr', 'a');
+    fWrite($stderr, $message);
+    if (!CLI) fClose($stderr);
 }
 
 
