@@ -1,21 +1,14 @@
 #!/usr/bin/env php
 <?php
 /**
- * Command line version of phpInfo()
+ * Copy this file to your project's bin directory and point line 11 to your application's init script.
+ *
+ *
+ * Command line version of the application's phpInfo() task accessible at http://{project-url}/?__PHPINFO__.
  */
-use rosasurfer\Application;
 use rosasurfer\util\PHP;
 
-$root = dirName(dirName(realPath(__FILE__)));
-require($root.'/src/load.php');
-
-
-// php.ini settings
-error_reporting(E_ALL & ~E_DEPRECATED);
-PHP::ini_set('error_log', $root.'/php-error.log');
-
-
-$app = new Application();                               // creating an application loads the configuration
+require(dirName(realPath(__FILE__)).'/../app/init.php');
 
 PHP::phpInfo();
 echo PHP_EOL.'loaded php.ini: "'.php_ini_loaded_file().'"'.PHP_EOL;

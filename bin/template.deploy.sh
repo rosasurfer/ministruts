@@ -1,11 +1,7 @@
 #!/bin/bash
-#########################################################################################################################
-#                                                                                                                       #
-#  This script is a template, it must not be run as-is. Copy it into your project and rename and configure it.          #
-#                                                                                                                       #
-#########################################################################################################################
-
-
+#
+# Copy this file to your project's bin directory and update the configuration in lines 16 ff. 
+#
 #
 # Application deploy script for Git based repositories. Deploys a branch, a tag or a specific commit and updates existing
 # Git submodules. Can send email notifications with the deployed changes (commit mesages).
