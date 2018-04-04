@@ -445,3 +445,22 @@ namespace rosasurfer\util\apc\apc {
      */
     function text_arc($im, $centerX, $centerY, $diameter, $start, $end, $color1, $text, $placeindex=0) {}
 }
+
+
+namespace rosasurfer\ministruts\demo\view {
+
+    /**
+     * @param  string $uri
+     *
+     * @return \rosasurfer\ministruts\url\VersionedUrl
+     */
+    function asset($uri) {
+        return \rosasurfer\asset($uri);
+    }
+
+    /**
+     * @param  mixed $var
+     * @param  bool  $flushBuffers
+     */
+    function echoPre($var, $flushBuffers = true) {}
+}

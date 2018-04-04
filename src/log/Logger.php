@@ -15,7 +15,6 @@ use rosasurfer\net\http\CurlHttpClient;
 use rosasurfer\net\http\HttpRequest;
 use rosasurfer\net\http\HttpResponse;
 use rosasurfer\net\mail\Mailer;
-use rosasurfer\util\PHP;
 
 use function rosasurfer\hsc;
 use function rosasurfer\ini_get_bool;

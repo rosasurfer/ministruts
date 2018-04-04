@@ -121,7 +121,7 @@ function stderror($message) {
 
 
 /**
- * Alias of printPretty()
+ * Alias of {@link printPretty()}
  *
  * Prints a variable in a pretty way. Output always ends with a line feed.
  *

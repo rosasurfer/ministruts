@@ -4,7 +4,7 @@
  * Copy this file to your project's bin directory and point line 11 to your application's init script.
  *
  *
- * Command line version of the application's phpInfo() task accessible at http://{project-url}/?__PHPINFO__.
+ * Command line version of the application's phpInfo() task accessible at http://{project-url}/?__phpinfo__.
  */
 use rosasurfer\util\PHP;
 
