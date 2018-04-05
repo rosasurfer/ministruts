@@ -16,6 +16,37 @@ use const rosasurfer\NL;
 
 /**
  * PostgresConnector
+ *
+ *
+ * Connection configuration:
+ * <pre>
+ * +-------------------------------------+-----------------+-----------------+
+ * | config setting                      | value           | default value   |
+ * +-------------------------------------+-----------------+-----------------+
+ * | db.{connection}.connector           | postgres        | -               |
+ * | db.{connection}.{keyword}           | {value}         | -               |
+ * +-------------------------------------+-----------------+-----------------+
+ * </pre>
+ * All connection keywords supported by PostgreSQL can be specified. The keyword "options" can be used as a regular
+ * PostgreSQL connection keyword for command line options.
+ *
+ *
+ * Additional user-defined options:
+ * <pre>
+ * +-------------------------------------+-----------------+-----------------+
+ * | option                              | value           | default value   |
+ * +-------------------------------------+-----------------+-----------------+
+ * | db.{connection}.options.search_path | [schemaName]    | "$user", public |
+ * | db.{connection}.options.{name1}     | {value}         | -               |
+ * | ...                                 | ...             | -               |
+ * | db.{connection}.options.{nameN}     | {value}         | -               |
+ * +-------------------------------------+-----------------+-----------------+
+ * </pre>
+ * User-defined options can be specified as nested suboptions and are sent to the database as system variables in the
+ * scope of the active session.
+ *
+ *
+ * @see  https://www.postgresql.org/docs/9.6/static/libpq-connect.html#LIBPQ-PARAMKEYWORDS)
  */
 class PostgresConnector extends Connector {
 
@@ -29,8 +60,11 @@ class PostgresConnector extends Connector {
     /** @var int - DBMS version number */
     protected $versionNumber;
 
-    /** @var string[] - configuration options */
+    /** @var string[] - connection options */
     protected $options = [];
+
+    /** @var string[] - session variables */
+    protected $sessionVars = [];
 
     /** @var resource - internal connection handle */
     protected $hConnection;
@@ -50,7 +84,7 @@ class PostgresConnector extends Connector {
      *
      * Create a new PostgresConnector instance.
      *
-     * @param  array $options - PostgreSQL typical configuration options
+     * @param  array $options - PostgreSQL connection options
      */
     public function __construct(array $options) {
         $this->setOptions($options);
@@ -76,7 +110,7 @@ class PostgresConnector extends Connector {
      * @return string
      */
     private function getConnectionString() {
-        // currently supported keywords:  https://www.postgresql.org/docs/9.6/static/libpq-connect.html#LIBPQ-PARAMKEYWORDS
+        // supported keywords:  https://www.postgresql.org/docs/9.6/static/libpq-connect.html#LIBPQ-PARAMKEYWORDS
         $paramKeywords = [
             'host',
             'hostaddr',
@@ -86,7 +120,7 @@ class PostgresConnector extends Connector {
             'password',
             'connect_timeout',
             'client_encoding',
-          //'options',                                      // TODO: requires special implementation
+            'options',
             'application_name',
             'fallback_application_name',
             'keepalives',
@@ -110,8 +144,26 @@ class PostgresConnector extends Connector {
         $connStr = '';
 
         foreach ($this->options as $key => $value) {
-            if (!isSet($paramKeywords[$key])) continue;
-            if (is_array($value))             continue;
+            $keyL = trim(strToLower($key));
+
+            if (!isSet($paramKeywords[$keyL])) continue;    // unknown keyword
+
+            if (is_array($value)) {
+                if ($keyL != 'options') continue;           // "options" is the only allowed keyword with nested settings
+
+                // split regular connection options and session variables
+                if (isSet($value[''])) {
+                    $this->options[$key] = $value[''];
+                    unset($value['']);
+                    $this->sessionVars = $value;
+                    $value = $this->options[$key];          // the root value goes into the connection string
+                }
+                else {
+                    unset($this->options[$key]);
+                    $this->sessionVars = $value;
+                    continue;                               // "options" has only session vars and no root value [""]
+                }
+            }
 
             if (!strLen($value)) {
                 $value = "''";
@@ -123,13 +175,12 @@ class PostgresConnector extends Connector {
             }
             $connStr .= $key.'='.$value.' ';
         }
-
         return trim($connStr);
     }
 
 
     /**
-     * Return a textual description of the main database connection options.
+     * Return a textual description of the database connection options.
      *
      * @return string
      */
@@ -206,6 +257,26 @@ class PostgresConnector extends Connector {
         }
         catch (IRosasurferException $ex) {
             throw $ex->addMessage('Cannot connect to PostgreSQL server with connection string: "'.$connStr.'"');
+        }
+
+        $this->setConnectionOptions();
+        return $this;
+    }
+
+
+    /**
+     * Set the configured connection options.
+     *
+     * @return $this
+     */
+    protected function setConnectionOptions() {
+        $options = $this->sessionVars;
+        //$options['time_zone'] = date_default_timezone_get();      // synchronize connection timezone with PHP timezone
+
+        foreach ($options as $option => $value) {
+            if (strLen($value)) {
+                $this->execute('set '.$option.' to '.$value);       // as is (no quoting)
+            }
         }
         return $this;
     }

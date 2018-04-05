@@ -16,24 +16,25 @@ use const rosasurfer\NL;
 /**
  * MySQLConnector
  *
- * Connection configuration:
+ * Connection configuration and default options:
  * <pre>
- * +-----------------------------+-----------------+---------------------------------+
- * | setting                     | value           | default value                   |
- * +-----------------------------+-----------------+---------------------------------+
- * | db.{name}.connector         | mysql           | -                               |
- * | db.{name}.host              | [host[:port]]   | localhost:3306                  |
- * | db.{name}.username          | [user]          | the current system user         |
- * | db.{name}.password          | [password]      | (no password)                   |
- * | db.{name}.database          | [dbName]        | (no selection)                  |
- * | db.{name}.options.charset   | [charsetName]   | utf8                            |
- * | db.{name}.options.collation | [collationName] | utf8_unicode_ci                 |
- * | db.{name}.options.sql_mode  | [mode]          | traditional,high_not_precedence |
- * | db.{name}.options.timezone  | [tzName]        | the current local timezone      |
- * +-----------------------------+-----------------+---------------------------------+
+ * +-----------------------------------+-----------------+-----------------------------------+
+ * | config setting                    | value           | default value                     |
+ * +-----------------------------------+-----------------+-----------------------------------+
+ * | db.{connection}.connector         | mysql           | -                                 |
+ * | db.{connection}.host              | [host[:port]]   | "localhost:3306"                  |
+ * | db.{connection}.username          | [user]          | the current system user           |
+ * | db.{connection}.password          | [password]      | (no password)                     |
+ * | db.{connection}.database          | [dbName]        | (no selection)                    |
+ * +-----------------------------------+-----------------+-----------------------------------+
+ * | db.{connection}.options.charset   | [charsetName]   | "utf8"                            |
+ * | db.{connection}.options.collation | [collationName] | "utf8_unicode_ci"                 |
+ * | db.{connection}.options.sql_mode  | [mode]          | "traditional,high_not_precedence" |
+ * | db.{connection}.options.timezone  | [tzName]        | the current local timezone        |
+ * +-----------------------------------+-----------------+-----------------------------------+
  * </pre>
  *
- * Additional MySQL options may be specified under the "options" key.
+ * Additional options may be specified and are valid for the active session.
  */
 class MySQLConnector extends Connector {
 
@@ -62,7 +63,7 @@ class MySQLConnector extends Connector {
     /** @var string */
     protected $database;
 
-    /** @var string[] - configuration options */
+    /** @var string[] - connection options */
     protected $options = [];
 
     /** @var resource - internal connection handle */
@@ -83,7 +84,7 @@ class MySQLConnector extends Connector {
      *
      * Create a new MySQLConnector instance.
      *
-     * @param  array $options - MySQL typical configuration options
+     * @param  array $options - MySQL connection options
      */
     public function __construct(array $options) {
         if (isSet($options['host'    ])) $this->setHost    ($options['host'    ]);
@@ -212,12 +213,10 @@ class MySQLConnector extends Connector {
         $pass = $this->password;
 
         // connect
-        try {                                                                   // CLIENT_FOUND_ROWS
+        try {                                                                      // flags: CLIENT_FOUND_ROWS = 2
             $php_errormsg = '';
-            /** @var resource $hConnection */
-            $hConnection = mysql_connect($host, $user, $pass, $newLink=true/*, $flags=2 */);
-            !$hConnection && trigger_error($php_errormsg, E_USER_ERROR);
-            $this->hConnection = $hConnection;
+            $this->hConnection = mysql_connect($host, $user, $pass, $newLink=true/*, $flags=2*/);
+            !$this->hConnection && trigger_error($php_errormsg, E_USER_ERROR);
         }
         catch (IRosasurferException $ex) {
             throw $ex->addMessage('Can not connect to MySQL server on "'.$host.'"');
@@ -235,27 +234,23 @@ class MySQLConnector extends Connector {
      * @return $this
      */
     protected function setConnectionOptions() {
-        try {
-            $options = $this->options;
-            $options['time_zone'] = date_default_timezone_get();    // synchronize connection timezone with PHP timezone
+        $options = $this->options;
+        $options['time_zone'] = date_default_timezone_get();    // synchronize connection timezone with PHP timezone
 
-            $value = null;
-            foreach ($options as $option => $value) {
-                if (strLen($value)) {
-                    if (strToLower($option) == 'charset') {
-                        // use mysql-function instead of SQL "set character set {$value}" for valid mysql_real_escape_string()
-                        mysql_set_charset($value, $this->hConnection) || trigger_error(mysql_error($this->hConnection), E_USER_ERROR);
-                    }
-                    else {
-                        if (!is_numeric($value))
-                            $value = "'".$value."'";
-                        $this->execute('set '.$option.' = '.$value);
-                    }
+        foreach ($options as $option => $value) {
+            if (strLen($value)) {
+                if (strToLower($option) == 'charset') {
+                    // We use the built-in MySQL function mysql_set_charset() instead of the plain SQL "set character set {$value}".
+                    // This makes mysql_real_escape_string() aware of the char set.
+                    mysql_set_charset($value, $this->hConnection) || trigger_error(mysql_error($this->hConnection), E_USER_ERROR);
+                }
+                else {
+                    // pass everything else on as a system variable
+                    if (!is_numeric($value))
+                        $value = "'".$value."'";
+                    $this->execute('set '.$option.' = '.$value);
                 }
             }
-        }
-        catch (IRosasurferException $ex) {
-            throw $ex->addMessage('Can not set system variable "'.$value.'"')->setCode(mysql_errno($this->hConnection));
         }
         return $this;
     }
