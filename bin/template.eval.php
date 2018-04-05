@@ -17,9 +17,9 @@
  *   echo "APP_LOG_DIR: $APP_LOG_DIR"
  *
  */
-use const rosasurfer\CLI;
-
 use function rosasurfer\stderror;
+use const    rosasurfer\CLI;
+
 
 require(dirName(realPath(__FILE__)).'/../app/init.php');
 !CLI && exit(1|stderror('error: This script must be executed in CLI mode.'));
