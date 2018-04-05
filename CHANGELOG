@@ -1,4 +1,9 @@
 
+2018-04-05
+
+   - db: the PostgresConnector supports additional connection options (as system variables) 
+
+
 2018-03-25
 
    - CLI mode: register a Ctrl-C handler to execute destructors on shutdown
