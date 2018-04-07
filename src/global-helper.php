@@ -60,6 +60,7 @@ const ARRAY_BOTH        = \rosasurfer\ARRAY_BOTH;
 const ACCESS_PUBLIC     = \rosasurfer\ACCESS_PUBLIC;
 const ACCESS_PROTECTED  = \rosasurfer\ACCESS_PROTECTED;
 const ACCESS_PRIVATE    = \rosasurfer\ACCESS_PRIVATE;
+const ACCESS_ALL        = \rosasurfer\ACCESS_ALL;
 
 // miscellaneous
 const NL                = \rosasurfer\NL;                       // = EOL_UNIX

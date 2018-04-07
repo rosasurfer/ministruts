@@ -82,6 +82,7 @@ const ARRAY_BOTH        = 3;
 const ACCESS_PUBLIC     = 1;
 const ACCESS_PROTECTED  = 2;
 const ACCESS_PRIVATE    = 4;
+const ACCESS_ALL        = ACCESS_PUBLIC | ACCESS_PROTECTED | ACCESS_PRIVATE;
 
 // miscellaneous
 const NL                = "\n";                                     // - ctrl --- hex --- dec ----
