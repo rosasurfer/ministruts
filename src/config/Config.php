@@ -7,7 +7,6 @@ use rosasurfer\core\Object;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
-use rosasurfer\exception\UnimplementedFeatureException;
 use rosasurfer\util\PHP;
 
 use function rosasurfer\isRelativePath;
@@ -40,8 +39,8 @@ use const rosasurfer\NL;
  *
  * key.subkey with spaces    = value            # subkeys may contain spaces...
  * key.   indented.subkey    = value            # ...but enclosing white space is ignored
- * key."a.subkey.with.dots"  = value            # quoted subkeys can contain otherwise illegal key characters
- * key                       = value            # the root value of an array is accessed with an empty subkey: key.""
+ * key."a.subkey.with.dots"  = value            # quoted subkeys can contain otherwise illegal key characters (i.e. dots)
+ * key                       = value            # the root value of an array is accessed via an empty subkey: key.""
  *
  * &lt;?php
  * Config::get('db.connector')                  // return a single value
@@ -383,15 +382,6 @@ class Config extends Object implements ConfigInterface {
     public static function resetDefault() {
         self::$defaultInstance = null;
         // TODO: update cache config
-    }
-
-
-    /**
-     * Clone the instance.
-     */
-    public function __clone() {
-        throw new UnimplementedFeatureException(__METHOD__.'() not yet implemented');
-        // TODO: update cache id or disable caching of this instance
     }
 
 
