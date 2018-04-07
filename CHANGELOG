@@ -1,4 +1,9 @@
 
+2018-04-08
+
+   - util: add class member access level constant ACCESS_ALL
+
+
 2018-04-05
 
    - db: the PostgresConnector supports additional connection options (as system variables) 
