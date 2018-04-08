@@ -121,7 +121,7 @@ abstract class DAO extends Singleton {
             $type = $property['type'];
 
             if (!isSet($property['column'     ])) $property['column'     ] = $name;
-            if (!isSet($property['column-type'])) $property['column-type'] = $type; // TODO: bug, $type can be a custom type
+            if (!isSet($property['column-type'])) $property['column-type'] = $type;     // TODO: bug, $type may be a custom type
 
             if (isSet($property['primary']) && $property['primary']===true)
                 $mapping['identity'] = &$property;

@@ -68,12 +68,23 @@ interface ConfigInterface extends \ArrayAccess {
 
 
     /**
-     * Return a dump with the preferences of the instance.
+     * Return a plain text dump of the instance's preferences.
      *
-     * @param  array $options [optional] - array with optional dump options: <br>
+     * @param  array $options [optional] - array with dump options: <br>
      *                                     'sort'     => SORT_ASC|SORT_DESC (default: unsorted) <br>
      *                                     'pad-left' => string             (default: no padding) <br>
      * @return string
      */
     public function dump(array $options = null);
+
+
+    /**
+     * Return an array with "key-value" pairs of the config settings. The returned result may be saved to a storage mechanism
+     * (e.g. a file or a database) or used to duplicate an instance by passing it to ConfigInterface::import().
+     *
+     * @param  array $options [optional] - array with export options: <br>
+     *                                     'sort' => SORT_ASC|SORT_DESC (default: unsorted) <br>
+     * @return string[]
+     */
+    public function export(array $options = null);
 }

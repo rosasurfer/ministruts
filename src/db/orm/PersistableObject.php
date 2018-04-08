@@ -717,6 +717,8 @@ abstract class PersistableObject extends Object {
 
     /**
      * Create post-processing hook.
+     *
+     * @return void
      */
     protected function afterCreate() {
     }
@@ -734,6 +736,8 @@ abstract class PersistableObject extends Object {
 
     /**
      * Save post-processing hook.
+     *
+     * @return void
      */
     protected function afterSave() {
     }
@@ -751,6 +755,8 @@ abstract class PersistableObject extends Object {
 
     /**
      * Insert post-processing hook.
+     *
+     * @return void
      */
     protected function afterInsert() {
     }
@@ -768,6 +774,8 @@ abstract class PersistableObject extends Object {
 
     /**
      * Update post-processing hook.
+     *
+     * @return void
      */
     protected function afterUpdate() {
     }
@@ -785,6 +793,8 @@ abstract class PersistableObject extends Object {
 
     /**
      * Delete post-processing hook.
+     *
+     * @return void
      */
     protected function afterDelete() {
     }

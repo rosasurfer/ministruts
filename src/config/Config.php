@@ -48,7 +48,7 @@ use const rosasurfer\NL;
  * Config::get('db.options')                    // return a numerical indexed array of values [0=>..., 1=>..., 2=>...]
  * </pre>
  */
-class Config extends Object implements ConfigInterface {
+class Config extends Object implements IConfig {
 
 
     /** @var IConfig - the application's current default configuration */
@@ -386,11 +386,11 @@ class Config extends Object implements ConfigInterface {
 
 
     /**
-     * Return a dump with the preferences of the instance.
+     * Return a plain text dump of the instance's preferences.
      *
-     * @param  array $options [optional] - array with optional dump options:
-     *                                     'sort'     => SORT_ASC|SORT_DESC (default: unsorted)
-     *                                     'pad-left' => string             (default: no padding)
+     * @param  array $options [optional] - array with dump options: <br>
+     *                                     'sort'     => SORT_ASC|SORT_DESC (default: unsorted) <br>
+     *                                     'pad-left' => string             (default: no padding) <br>
      * @return string
      */
     public function dump(array $options = null) {
@@ -452,6 +452,38 @@ class Config extends Object implements ConfigInterface {
             }
         }
         return $result;
+    }
+
+
+
+    /**
+     * Return an array with "key-value" pairs of the config settings. The returned result may be saved to a storage mechanism
+     * (e.g. a file or a database) or used to duplicate an instance by passing it to ConfigInterface::import().
+     *
+     * @param  array $options [optional] - array with export options: <br>
+     *                                     'sort' => SORT_ASC|SORT_DESC (default: unsorted) <br>
+     * @return string[]
+     */
+    public function export(array $options = null) {
+        $maxKeyLength = null;
+        $values = $this->dumpNode([], $this->properties, $maxKeyLength);
+
+        if (isSet($options['sort'])) {
+            if ($options['sort'] == SORT_ASC) {
+                kSort($values);
+            }
+            else if ($options['sort'] == SORT_DESC) {
+                kSort($values);
+                $values = array_reverse($values, true);
+            }
+        }
+
+        foreach ($values as $key => &$value) {
+            if      (is_null($value)) $value = '';
+            else if (is_bool($value)) $value = (int)$value;
+        }; unset($value);
+
+        return $values;
     }
 
 
