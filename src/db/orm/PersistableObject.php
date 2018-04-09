@@ -70,7 +70,7 @@ abstract class PersistableObject extends Object {
 
     /**
      * Prevent serialization of related objects (transient behaviour). Instead store the physical property value.
-     * After __wakeup() related objects will be re-fetched on access.
+     * After __wakeup() relations will be re-fetched on access.
      *
      * @return string[] - array of property names to serialize
      */
@@ -716,7 +716,9 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Create post-processing hook.
+     * "Create" post-processing hook.
+     *
+     * Application-side ORM trigger to execute arbitrary code.
      *
      * @return void
      */
@@ -725,9 +727,11 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Save pre-processing hook. If the hook returns FALSE the save operation is skipped.
+     * "Save" pre-processing hook.
      *
-     * @return bool
+     * Application-side ORM trigger to execute arbitrary code.
+     *
+     * @return bool - If the method returns FALSE the "save" operation is skipped, otherwise it is not.
      */
     protected function beforeSave() {
         return true;
@@ -735,7 +739,9 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Save post-processing hook.
+     * "Save" post-processing hook.
+     *
+     * Application-side ORM trigger to execute arbitrary code.
      *
      * @return void
      */
@@ -744,9 +750,11 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Insert pre-processing hook. If the hook returns FALSE the insert operation is skipped.
+     * "Insert" pre-processing hook.
      *
-     * @return bool
+     * Application-side ORM trigger to execute arbitrary code.
+     *
+     * @return bool - If the method returns FALSE the "insert" operation is skipped, otherwise it is not.
      */
     protected function beforeInsert() {
         return true;
@@ -754,7 +762,9 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Insert post-processing hook.
+     * "Insert" post-processing hook.
+     *
+     * Application-side ORM trigger to execute arbitrary code.
      *
      * @return void
      */
@@ -763,9 +773,11 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Update pre-processing hook. If the hook returns FALSE the update operation is skipped.
+     * "Update" pre-processing hook.
      *
-     * @return bool
+     * Application-side ORM trigger to execute arbitrary code.
+     *
+     * @return bool - If the method returns FALSE the "update" operation is skipped, otherwise it is not.
      */
     protected function beforeUpdate() {
         return true;
@@ -773,7 +785,9 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Update post-processing hook.
+     * "Update" post-processing hook.
+     *
+     * Application-side ORM trigger to execute arbitrary code.
      *
      * @return void
      */
@@ -782,9 +796,11 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Delete pre-processing hook. If the hook returns FALSE the delete operation is skipped.
+     * "Delete" pre-processing hook.
      *
-     * @return bool
+     * Application-side ORM trigger to execute arbitrary code.
+     *
+     * @return bool - If the method returns FALSE the "delete" operation is skipped, otherwise it is not.
      */
     protected function beforeDelete() {
         return true;
@@ -792,7 +808,9 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Delete post-processing hook.
+     * "Delete" post-processing hook.
+     *
+     * Application-side ORM trigger to execute arbitrary code.
      *
      * @return void
      */

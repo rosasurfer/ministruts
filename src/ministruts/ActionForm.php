@@ -50,7 +50,7 @@ abstract class ActionForm extends Object {
     /**
      * Validate the form parameters syntactically.
      *
-     * @return bool - whether or not the parameters are valid
+     * @return bool - whether or not the submitted parameters are valid
      */
     public function validate() {
         return true;
