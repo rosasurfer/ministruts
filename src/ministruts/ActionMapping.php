@@ -162,7 +162,7 @@ class ActionMapping extends Object {
         $path = $this->path ? ' path="'.$this->path.'"':'';
 
         $method = strToUpper($method);
-        if ($method!='GET' && $method!='POST') throw new StrutsConfigException('<mapping'.$name.''.$path.' http-methods="'.func_get_arg(0).'":  Invalid HTTP method.');
+        if ($method!='GET' && $method!='POST') throw new StrutsConfigException('<mapping'.$name.''.$path.' methods="'.func_get_arg(0).'":  Invalid HTTP method.');
 
         $this->methods[$method] = true;
         return $this;

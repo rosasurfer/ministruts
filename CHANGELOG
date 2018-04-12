@@ -383,7 +383,6 @@
 2017-01-25
 
    - redefine Struts config DTD for improved clarity:
-     /struts-config/action-mappings/mapping[@methods]  => [@http-methods]
      /struts-config/action-mappings/mapping[@scope]    => [@form-scope]
      /struts-config/action-mappings/mapping[@validate] => [@validate-before]
      /struts-config/tiles/tile[@path]                  => [@file]

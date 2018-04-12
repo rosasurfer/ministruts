@@ -431,9 +431,9 @@ class Module extends Object {
             $mapping->setFormValidateFirst($formValidateFirst);
 
 
-            // attribute http-methods="CDATA" "get"
-            if (isSet($tag['http-methods'])) {
-                $methods = explode(',', (string) $tag['http-methods']);
+            // attribute methods="CDATA" "get"
+            if (isSet($tag['methods'])) {
+                $methods = explode(',', (string) $tag['methods']);
                 foreach ($methods as $method) {
                     $mapping->setMethod(trim($method));
                 }

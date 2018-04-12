@@ -196,7 +196,7 @@
                         Optional if the "form" attribute is specified, else not valid.
                         [default: "request"]
 
-   http-methods         Comma-delimited list of HTTP method verbs the action mapping supports.
+   methods              Comma-delimited list of HTTP method verbs the action mapping supports.
                         [default: "get"]
 
    roles                Comma-delimited list of required roles to access the action mapping.
@@ -220,7 +220,7 @@
           form                   %ClassName;            #IMPLIED
           form-scope             (request|session)      "request"
           form-validate-first    %Boolean;              "true"
-          http-methods           CDATA                  "get"
+          methods                CDATA                  "get"
           roles                  CDATA                  #IMPLIED
           default                %Boolean;              "false"
 >
