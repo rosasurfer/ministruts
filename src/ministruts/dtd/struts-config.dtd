@@ -116,8 +116,8 @@
              or "alias" must be specified.
 
    alias     The name of another "forward" element to use instead of the current one (local forwards are preferred over
-             global ones). Local forwards support the reserved alias "self" to reference a forward to the current mapping.
-             Exactly one of "include", "redirect" or "alias" must be specified.
+             global ones). Local forwards support the reserved alias "self" to reference a redirect forward to the current 
+             mapping. Exactly one of "include", "redirect" or "alias" must be specified.
 -->
 <!ELEMENT forward (set*)>
 <!ATTLIST forward
