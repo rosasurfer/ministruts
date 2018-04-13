@@ -140,13 +140,13 @@ class Request extends Singleton {
 
 
     /**
-     * Return the single request parameter with the specified name. If multiple parameters with that name have been
-     * transmitted, the last value is returned. If an array of parameters with that name have been transmitted it is
-     * ignored.
+     * Return the single $_REQUEST parameter with the specified name. If multiple $_REQUEST parameters with that name have
+     * been transmitted, the last one is returned. If an array of $_REQUEST parameters with that name have been transmitted
+     * they are ignored.
      *
      * @param  string $name - parameter name
      *
-     * @return string|null - value or NULL if no such single parameter has been transmitted
+     * @return string|null - value or NULL if no such single $_REQUEST parameter has been transmitted
      */
     public function getParameter($name) {
         if (isSet($_REQUEST[$name])) {
@@ -159,16 +159,90 @@ class Request extends Singleton {
 
 
     /**
-     * Return the array parameters with the specified name. If a single parameter with that name was transmitted it is
-     * ignored.
+     * Return an array of $_REQUEST parameters with the specified name. If a single $_REQUEST parameter with that name was
+     * transmitted it is ignored.
      *
      * @param  string $name - parameter name
      *
-     * @return string[] - values or an empty array if no such array parameters have been transmitted
+     * @return string[] - values or an empty array if no such array of $_REQUEST parameters have been transmitted
      */
     public function getParameters($name) {
         if (isSet($_REQUEST[$name])) {
             $value = $_REQUEST[$name];
+            if (is_array($value))
+                return $value;
+        }
+        return [];
+    }
+
+
+    /**
+     * Return the single $_GET parameter with the specified name. If multiple $_GET parameters with that name have been
+     * transmitted, the last one is returned. If an array of $_GET parameters with that name have been transmitted they are
+     * ignored.
+     *
+     * @param  string $name - parameter name
+     *
+     * @return string|null - value or NULL if no such single $_GET parameter has been transmitted
+     */
+    public function getGetParameter($name) {
+        if (isSet($_GET[$name])) {
+            $value = $_GET[$name];
+            if (!is_array($value))
+                return $value;
+        }
+        return null;
+    }
+
+
+    /**
+     * Return an array of $_GET parameters with the specified name. If a single $_GET parameter with that name was
+     * transmitted it is ignored.
+     *
+     * @param  string $name - parameter name
+     *
+     * @return string[] - values or an empty array if no such array of $_GET parameters have been transmitted
+     */
+    public function getGetParameters($name) {
+        if (isSet($_GET[$name])) {
+            $value = $_GET[$name];
+            if (is_array($value))
+                return $value;
+        }
+        return [];
+    }
+
+
+    /**
+     * Return the single $_POST parameter with the specified name. If multiple $_POST parameters with that name have been
+     * transmitted, the last one is returned. If an array of $_POST parameters with that name have been transmitted they are
+     * ignored.
+     *
+     * @param  string $name - parameter name
+     *
+     * @return string|null - value or NULL if no such single $_POST parameter has been transmitted
+     */
+    public function getPostParameter($name) {
+        if (isSet($_POST[$name])) {
+            $value = $_POST[$name];
+            if (!is_array($value))
+                return $value;
+        }
+        return null;
+    }
+
+
+    /**
+     * Return an array of $_POST parameters with the specified name. If a single $_POST parameter with that name was
+     * transmitted it is ignored.
+     *
+     * @param  string $name - parameter name
+     *
+     * @return string[] - values or an empty array if no such array of $_POST parameters have been transmitted
+     */
+    public function getPostParameters($name) {
+        if (isSet($_POST[$name])) {
+            $value = $_POST[$name];
             if (is_array($value))
                 return $value;
         }
