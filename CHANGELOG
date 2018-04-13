@@ -1,4 +1,10 @@
 
+2018-04-13
+
+   - struts: add methods ministruts\Request::get(Get|Post)Parameter(s)()
+   - struts: rename attribute "action-mappings/mapping[@http-methods]" to "action-mappings/mapping[@methods]"
+
+
 2018-04-08
 
    - config: add method config/ConfigInterface::export()  
