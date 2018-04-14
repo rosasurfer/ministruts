@@ -101,6 +101,28 @@ abstract class DAO extends Singleton {
 
 
     /**
+     * Execute a task in a transactional way. The transaction is automatically committed or rolled back.
+     * A nested transaction is executed in the context of the nesting transaction.
+     *
+     * @param  \Closure $task - task to execute (an anonymous function is implicitly casted)
+     *
+     * @return $this
+     */
+    public function transaction(\Closure $task) {
+        try {
+            $this->db()->begin();
+            $task();
+            $this->db()->commit();
+        }
+        catch (\Exception $ex) {
+            $this->db()->rollback();
+            throw $ex;
+        }
+        return $this;
+    }
+
+
+    /**
      * Return the mapping configuration of the DAO's entity.
      *
      * @return array
