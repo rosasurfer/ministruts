@@ -46,4 +46,26 @@ abstract class Connector extends Object implements ConnectorInterface {
         if (!is_subclass_of($class, IConnector::class)) throw new InvalidArgumentException('Not a '.IConnector::class.' implementing class: '.$class);
         return new $class($options);
     }
+
+
+    /**
+     * Execute a task in a transactional way. The transaction is automatically committed or rolled back.
+     * A nested transaction is executed in the context of the nesting transaction.
+     *
+     * @param  \Closure $task - task to execute (an anonymous function is implicitly casted)
+     *
+     * @return IConnector
+     */
+    public function transaction(\Closure $task) {
+        try {
+            $this->begin();
+            $task();
+            $this->commit();
+        }
+        catch (\Exception $ex) {
+            $this->rollback();
+            throw $ex;
+        }
+        return $this;
+    }
 }

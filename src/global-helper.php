@@ -843,10 +843,9 @@ function pluralize($count, $singular='', $plural='s') {
 
 
 /**
- * Execute a task in a synchronized way. Emulates the Java keyword "synchronized". If an anonymous function is passed it is
- * implicitly casted to a Closure.
+ * Execute a task in a synchronized way. Emulates the Java keyword "synchronized".
  *
- * @param  \Closure $task             - task to execute
+ * @param  \Closure $task             - task to execute (an anonymous function is implicitly casted)
  * @param  string   $mutex [optional] - mutex identifier (default: the calling line of code)
  */
 function synchronized(\Closure $task, $mutex = null) {
