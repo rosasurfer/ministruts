@@ -1,4 +1,10 @@
 
+2018-04-14
+
+   - db: add method db\ConnectorInterface::transaction() to execute a task as a closure 
+   - db: add method db\orm\DAO::transaction() to execute a task as a closure 
+
+
 2018-04-13
 
    - struts: add methods ministruts\Request::get(Get|Post)Parameter(s)()
