@@ -32,10 +32,11 @@ class AutoConfig extends Config {
      *
      * Create a new instance from the specified location.
      *
-     * If parameter $location is a file the file is loaded as the user-defined application configuration. The remaining
-     * application config files are loaded from the same directory (the directory containing $configLocation).
+     * - If parameter $location is a directory the application configuration is loaded from that directory.
      *
-     * If $location is a directory the application config files are loaded from that directory.
+     * - If parameter $location is a file the file is loaded and treated as the user-defined application configuration.
+     *   Other needed configuration files (dist, cli) are looked-up in the same directory (the one containing the file
+     *   $location).
      *
      * @param  string $location - configuration file or directory
      */
