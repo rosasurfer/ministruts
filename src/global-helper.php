@@ -2,6 +2,8 @@
 /**
  * Map the helper constants and functions in namespace \rosasurfer to the global namespace.
  */
+use rosasurfer\ministruts\ActionMapping;
+use rosasurfer\ministruts\Module;
 use rosasurfer\ministruts\url\Url;
 use rosasurfer\ministruts\url\VersionedUrl;
 
@@ -854,8 +856,7 @@ function synchronized(\Closure $task, $mutex = null) {
 
 
 /**
- * Lookup and return a {@link URL} helper for the named route as configured in <tt>&lt;mapping name="{Name}"&gt;</tt>
- * in struts-config.xml.
+ * Lookup and return a {@link Url} helper for the named {@link ActionMapping}.
  *
  * @param  string $name - route name
  *
@@ -867,7 +868,7 @@ function route($name) {
 
 
 /**
- * Return a {@link URL} helper for the given URI. An URI starting with a slash "/" is interpreted as relative to the
+ * Return a {@link Url} helper for the given URI. An URI starting with a slash "/" is interpreted as relative to the
  * application's base URI. An URI not starting with a slash is interpreted as relative to the application {@link Module}'s
  * base URI (the module the current request belongs to).<br>
  *
