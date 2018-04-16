@@ -52,9 +52,7 @@ abstract class ActionForm extends Object {
      *
      * @return bool - whether or not the submitted parameters are valid
      */
-    public function validate() {
-        return true;
-    }
+    abstract public function validate();
 
 
     /**
