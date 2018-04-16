@@ -79,8 +79,7 @@ interface ConfigInterface extends \ArrayAccess {
 
 
     /**
-     * Return an array with "key-value" pairs of the config settings. The returned result may be saved to a storage mechanism
-     * (e.g. a file or a database) or used to duplicate an instance by passing it to ConfigInterface::import().
+     * Return an array with "key-value" pairs of the config settings.
      *
      * @param  array $options [optional] - array with export options: <br>
      *                                     'sort' => SORT_ASC|SORT_DESC (default: unsorted) <br>

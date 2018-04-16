@@ -54,7 +54,7 @@ abstract class Connector extends Object implements ConnectorInterface {
      *
      * @param  \Closure $task - task to execute (an anonymous function is implicitly casted)
      *
-     * @return IConnector
+     * @return $this
      */
     public function transaction(\Closure $task) {
         try {
