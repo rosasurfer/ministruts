@@ -278,7 +278,7 @@ class Config extends Object implements IConfig {
                         $properties[$subkey] = [$value];                    // create a new array value
                     }
                     else {
-                        if (!is_array($properties[$subkey]))                // make the existing value the array default value
+                        if (!is_array($properties[$subkey]))                // make the existing value the array root value
                             $properties[$subkey] = ['' => $properties[$subkey]];
                         $properties[$subkey][] = $value;                    // add an array value
                     }
@@ -300,7 +300,7 @@ class Config extends Object implements IConfig {
                         $properties[$subkey] = $value;                      // replace the array
                     }
                     else {
-                        $properties[$subkey][''] = $value;                  // set/override the array default value
+                        $properties[$subkey][''] = $value;                  // set/override the array root value
                     }
                 }
             }
