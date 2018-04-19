@@ -7,5 +7,19 @@ namespace rosasurfer\ministruts;
  * method of the action. If no dispatch action key is submitted or a method matching the dispatch action key is not found
  * the DispatchAction falls back to the standard Action behaviour.
  */
-abstract class DispatchAction extends Action {
+class DispatchAction extends Action {
+
+
+    /**
+     * Fall-back {@link Action} method called if no dispatch action key is submitted or a method matching the dispatch
+     * action key is not found.
+     *
+     * By default the action returns a redirect to the root URI of the application. To change this behaviour implement an
+     * application specific base DispatchAction which your concrete dispatch actions inherit from.
+     *
+     * {@inheritdoc}
+     */
+    public function execute(Request $request, Response $response) {
+        return new ActionForward('generic', $request->getApplicationUrl(), true);
+    }
 }
