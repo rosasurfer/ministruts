@@ -1020,7 +1020,7 @@ class Request extends Singleton {
         // headers
         $headers = $this->getHeaders() ?: [];
 
-        $maxLen  = 0;
+        $maxLen = 0;
         foreach ($headers as $key => $value) {
             $maxLen = max(strLen($key), $maxLen);
         }

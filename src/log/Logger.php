@@ -719,7 +719,7 @@ class Logger extends StaticClass {
         $line = $context['line'];
 
         // break out of unfortunate HTML tags               // id = md5('ministruts')
-        $html  = '<a attr1="" attr2=\'\'></a></meta></title></head></script></img></select></textarea></li></ul></font></pre></tt></code></i></b></span></div>';
+        $html  = '<a attr1="" attr2=\'\'></a></meta></title></head></script></img></input></select></textarea></label></li></ul></font></pre></tt></code></i></b></span></div>';
         $html .= '<div id="99a05cf355861c76747b7176c778eed2'.self::$printCounter.'"
                         align="left"
                         style="display:initial; visibility:initial; clear:both;

@@ -202,6 +202,7 @@ class PHP extends StaticClass {
                 $order = $newOrder;
             }              if ($order != 'GP')                                                                       $issues[] = 'Error: request_order is not "GP": "'.(empty(ini_get('request_order')) ? '" (empty) => variables_order:"':'').$order.'"  [standards]';
         /*PHP_INI_PERDIR*/ if (       ini_get_bool('always_populate_raw_post_data' ) && PHP_VERSION_ID <  70000)     $issues[] = 'Info:  always_populate_raw_post_data is not Off  [performance]';
+        /*PHP_INI_PERDIR*/ if (      !ini_get_bool('enable_post_data_reading'      ) && PHP_VERSION_ID >= 50400)     $issues[] = 'Warn:  enable_post_data_reading is not On  [request handling]';
         /*PHP_INI_ALL   */ if (       ini_get     ('arg_separator.output'          ) != '&')                         $issues[] = 'Warn:  arg_separator.output is not "&": "'.ini_get('arg_separator.output').'"  [standards]';
         /*PHP_INI_ALL   */ if (      !ini_get_bool('ignore_user_abort'             ) && !CLI)                        $issues[] = 'Warn:  ignore_user_abort is not On  [standards]';
         /*PHP_INI_PERDIR*/ $postMaxSize = ini_get_bytes('post_max_size');
@@ -327,7 +328,7 @@ class PHP extends StaticClass {
         else                                                                                                         $issues[] = 'Warn:  No opcode cache found [performance]';
 
 
-        // (9) break out of unfortunate HTML tags and show results followed by phpInfo()
+        // (9) show results followed by phpInfo()
         if (!CLI) {
             ?>
             <div align="left" style="display:initial; visibility:initial; clear:both;

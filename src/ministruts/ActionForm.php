@@ -29,8 +29,25 @@ abstract class ActionForm extends Object {
         $this->request = $request;
 
         // check for a dispatch action key
-        if     (isSet($_REQUEST['action'  ])) $this->actionKey = $_REQUEST['action'  ];
-        elseif (isSet($_REQUEST['action.x'])) $this->actionKey = $_REQUEST['action.x'];  // submit type="image"
+        if     (isSet($_REQUEST       ['action'])) $this->actionKey = $_REQUEST       ['action'];
+        elseif (isSet($_REQUEST['img']['action'])) $this->actionKey = $_REQUEST['img']['action'];   // submit type="image"
+
+        /**
+         * PHP silently converts dots "." and spaces " " in parameter names to underscores
+         *
+         * - workaround for browser-defined keys (i.e. <img type="submit"...>):
+         *   <img type="submit" name="img[action]" ...>
+         *   The browser will send "img[action].x=1234" and PHP will skip the ".x" part
+         *
+         * - workaround for user-defined keys: wrap the keys in a top-level array
+         *   $_POST = Array (
+         *       [action_x] => update
+         *       [application_name] => foobar
+         *       [top_level_with_dots] => Array (
+         *           [nested.level.with.dots] => my-value
+         *       )
+         *   )
+         */
 
         // read submitted parameters
         $this->populate($request);

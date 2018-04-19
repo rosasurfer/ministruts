@@ -162,7 +162,7 @@ class Config extends Object implements IConfig {
      * @param  string         $key                - case-insensitive key
      * @param  bool|int|array $options [optional] - additional options as supported by <tt>filter_var($var, FILTER_VALIDATE_BOOLEAN)</tt>, <br>
      *                                              may be any of: <br>
-     *                   bool $default            - default value to return if the setting is not found <br>
+     *                   bool $default            - default value to return if the setting does not exist <br>
      *                   int  $flags              - flags as supported by <tt>filter_var($var, FILTER_VALIDATE_BOOLEAN)</tt>: <br>
      *                                              FILTER_NULL_ON_FAILURE - return NULL instead of FALSE on failure <br>
      *                  array $options            - multiple options are passed as elements of an array: <br>
@@ -173,7 +173,7 @@ class Config extends Object implements IConfig {
      * @return bool|null - boolean value or NULL if the flag FILTER_NULL_ON_FAILURE is set and the setting does not represent
      *                     a boolean value
      *
-     * @throws RuntimeException if the setting is not found and $default was not specified
+     * @throws RuntimeException if the setting does not exist and $default was not specified
      */
     public function getBool($key, $options = null) {
         if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
@@ -506,7 +506,7 @@ class Config extends Object implements IConfig {
      *
      * @return mixed - config setting
      *
-     * @throws RuntimeException if the setting is not found
+     * @throws RuntimeException if the setting does not exist
      */
     public function offsetGet($key) {
         return $this->get($key);
