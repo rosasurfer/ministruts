@@ -14,7 +14,7 @@ abstract class ActionForm extends Object {
     /** @var Request [transient] - the request the form belongs to */
     protected $request;
 
-    /** @var string [transient] - dispatch action key */
+    /** @var string [transient] - dispatch action key; populated if the Action handling the request is a DispatchAction */
     protected $actionKey;
 
 
@@ -28,26 +28,36 @@ abstract class ActionForm extends Object {
     public function __construct(Request $request) {
         $this->request = $request;
 
-        // check for a dispatch action key
-        if     (isSet($_REQUEST       ['action'])) $this->actionKey = $_REQUEST       ['action'];
-        elseif (isSet($_REQUEST['img']['action'])) $this->actionKey = $_REQUEST['img']['action'];   // submit type="image"
-
         /**
-         * PHP silently converts dots "." and spaces " " in parameter names to underscores
+         * Read a submitted dispatch action key.
          *
-         * - workaround for browser-defined keys (i.e. <img type="submit"...>):
-         *   <img type="submit" name="img[action]" ...>
-         *   The browser will send "img[action].x=1234" and PHP will skip the ".x" part
-         *
-         * - workaround for user-defined keys: wrap the keys in a top-level array
-         *   $_POST = Array (
-         *       [action_x] => update
-         *       [application_name] => foobar
-         *       [top_level_with_dots] => Array (
-         *           [nested.level.with.dots] => my-value
-         *       )
-         *   )
-         */
+         * @var ActionMapping $mapping */
+        $mapping = $request->getAttribute(ACTION_MAPPING_KEY);
+
+        if (is_subclass_of($mapping->getActionClassName(), DispatchAction::class)) {
+            //
+            // PHP silently converts dots "." and spaces " " in top-level parameter names to underscores.
+            //
+            // - Workaround for user-defined keys => wrap the key in a top-level array
+            //   $_POST = Array (
+            //       [action_x] => update
+            //       [application_name] => foobar
+            //       [top_level_with_dots] => Array (
+            //           [nested.level.with.dots] => custom-value
+            //       )
+            //   )
+            //
+            // - Workaround for browser-modified keys, i.e. <img type="submit"... => select the key value wisely:
+            //   <img type="submit" name="submit[action]" ...>
+            //   The browser will send "submit[action].x=1234" and PHP will ignore the ".x" part
+            //
+
+            /**
+             * The framework expects the dispatch action key nested in an array:
+             */
+            if (isSet($_REQUEST['submit']['action']))
+                $this->actionKey = $_REQUEST['submit']['action'];   // <img type="submit" name="submit[action]"...
+        }
 
         // read submitted parameters
         $this->populate($request);

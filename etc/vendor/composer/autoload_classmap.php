@@ -101,6 +101,7 @@ return array(
     'rosasurfer\\ministruts\\ActionForm' => $baseDir . '/src/ministruts/ActionForm.php',
     'rosasurfer\\ministruts\\ActionForward' => $baseDir . '/src/ministruts/ActionForward.php',
     'rosasurfer\\ministruts\\ActionMapping' => $baseDir . '/src/ministruts/ActionMapping.php',
+    'rosasurfer\\ministruts\\DispatchAction' => $baseDir . '/src/ministruts/DispatchAction.php',
     'rosasurfer\\ministruts\\FrontController' => $baseDir . '/src/ministruts/FrontController.php',
     'rosasurfer\\ministruts\\HttpSession' => $baseDir . '/src/ministruts/HttpSession.php',
     'rosasurfer\\ministruts\\Module' => $baseDir . '/src/ministruts/Module.php',
