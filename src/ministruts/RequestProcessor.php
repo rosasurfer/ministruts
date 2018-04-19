@@ -327,22 +327,24 @@ PROCESS_METHOD_ERROR_SC_405;
         /** @var ActionForm $form */
         $form = null;
 
-        // bei gesetztem Session-Scope ActionForm zuerst in der Session suchen ...
+        // if the form has "session" scope we re-use an existing one from the session
         if ($mapping->isSessionScope())
-            $form = $request->getSession()->getAttribute($className);       // implicitely start a session
+            $form = $request->getSession()->getAttribute($className);       // implicitely starts a session
 
-        // ... ansonsten neue Instanz erzeugen
-        if (!$form) {
-            /** @var ActionForm $form */
-            $form = new $className($request);
-        }
+        // otherwise create a new instance
+        /** @var ActionForm $form */
+        if (!$form) $form = new $className($request);
 
-        // Instanz im Request ...
+        // populate the form
+        $form->initActionKey($request);
+        $form->populate($request);
+
+        // store the ActionForm in the request
         $request->setAttribute(ACTION_FORM_KEY, $form);
 
-        // ... und ggf. auch in der Session speichern
+        // if the form has "session" scope also store it in the session
         if ($mapping->isSessionScope())
-            $request->getSession()->setAttribute($className, $form);        // use started session
+            $request->getSession()->setAttribute($className, $form);
 
         return $form;
     }

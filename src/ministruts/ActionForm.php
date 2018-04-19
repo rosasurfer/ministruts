@@ -27,15 +27,34 @@ abstract class ActionForm extends Object {
      */
     public function __construct(Request $request) {
         $this->request = $request;
+    }
 
-        /**
-         * Read a submitted dispatch action key.
-         *
-         * @var ActionMapping $mapping */
+
+    /**
+     * Read and store a submitted {@link DispatchAction} key.
+     *
+     * @param  Request $request
+     *
+     * @example
+     *
+     * The framework expects the action key nested in an array. Include it in your HTML like this:
+     *
+     * <pre>
+     * &lt;img type="submit" name="submit[action]" value="..." src=... /&gt;
+     * </pre>
+     */
+    public function initActionKey(Request $request) {
+        /** @var ActionMapping $mapping */
         $mapping = $request->getAttribute(ACTION_MAPPING_KEY);
+        $actionClassName = $mapping->getActionClassName();
 
-        if (is_subclass_of($mapping->getActionClassName(), DispatchAction::class)) {
-            //
+        global $counter; is_int($counter) || $counter = 0;
+        header('X-Debug-'.(++$counter).': '.__METHOD__.'() $request->attribute(ACTION_MAPPING_KEY) => '.getType($mapping));
+
+        if (is_subclass_of($actionClassName, DispatchAction::class)) {
+            if (isSet($_REQUEST['submit']['action']))
+                $this->actionKey = $_REQUEST['submit']['action'];
+
             // PHP silently converts dots "." and spaces " " in top-level parameter names to underscores.
             //
             // - Workaround for user-defined keys => wrap the key in a top-level array
@@ -49,18 +68,20 @@ abstract class ActionForm extends Object {
             //
             // - Workaround for browser-modified keys, i.e. <img type="submit"... => select the key value wisely:
             //   <img type="submit" name="submit[action]" ...>
-            //   The browser will send "submit[action].x=1234" and PHP will ignore the ".x" part
-            //
-
-            /**
-             * The framework expects the dispatch action key nested in an array:
-             */
-            if (isSet($_REQUEST['submit']['action']))
-                $this->actionKey = $_REQUEST['submit']['action'];   // <img type="submit" name="submit[action]"...
+            //   The browser will send "submit[action].x=123&submit[action].y=456" and PHP will discard the coordinates.
         }
+    }
 
-        // read submitted parameters
-        $this->populate($request);
+
+    /**
+     * Return the dispatch action key (if the action is a {@link DispatchAction} and a key was submitted).
+     *
+     * @return string|null - action key or NULL if no action key was submitted
+     *
+     * @see    java.struts.DispatchAction
+     */
+    public function getActionKey() {
+        return $this->actionKey;
     }
 
 
@@ -71,7 +92,7 @@ abstract class ActionForm extends Object {
      *
      * @return void
      */
-    abstract protected function populate(Request $request);
+    abstract public function populate(Request $request);
 
 
     /**
@@ -80,18 +101,6 @@ abstract class ActionForm extends Object {
      * @return bool - whether or not the submitted parameters are valid
      */
     abstract public function validate();
-
-
-    /**
-     * Return the dispatch action key (if any).
-     *
-     * @return string|null - action key or NULL if no action key was submitted
-     *
-     * @see    java.struts.DispatchAction
-     */
-    public function getActionKey() {
-        return $this->actionKey;
-    }
 
 
     /**
