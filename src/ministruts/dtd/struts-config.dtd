@@ -259,11 +259,11 @@
    alias     Name of another tile to use instead of the current one. Tile names must start with a dot ".". If this attribute 
              is set the tile can not have child elements. Exactly one of "file", "extends" or "alias" must be specified.
              
-   push      Whether or not data exchange between the the resulting view and model/controller supports the MVC push model. 
-             Cannot be used in combination with the "alias" atrribute.   
-             If this value is set to "true" all variables in the Page context are made available to the resulting view as 
-             regular PHP variables (MVC push model). If the value is set to "false" the push model is not supported. 
-             The MVC pull model is always supported, regardless of this setting. 
+   push      Whether or not data exchange between controller and view supports the MVC push model. Cannot be used in 
+             combination with the "alias" atrribute.   
+             If this value is set to "true" all variables in the Page context are made available to the view as regular PHP 
+             variables (MVC push model). If the value is set to "false" the push model is not supported. The MVC pull model 
+             is always supported, regardless of this setting. 
              [default: "false"]
 -->
 <!ELEMENT tile ((include*, set*)*)>
@@ -277,17 +277,17 @@
 
 
 <!--
-   The "include" element describes a resource to insert into a tile, i.e. a page fragment or another tile.
+   The "include" element describes a resource to insert into a tile, i.e. a view fragment or another tile.
 
-   name   Name of the variable under which the resource is made available in the resulting view.
+   name   Name of the variable under which the resource is made available in the view.
 
    value  The name of a tiles definition or a file to include. Tile names must start with a dot ".", file names must not 
           start with a dot. All properties from the surrounding tile are also available to the inserted element. Any property 
           inherited from the surrounding tile can be overwritten by providing a new value. However, this will not modify the 
           original value in the surrounding tile. 
-          If this attribute is omitted the surrounding tile is marked as a template and cannot be rendered independently.
-          If a template is extended by another tile the extending tile can assign and override attributes of the extended 
-          tile. If all "include" elements of a tile have an assigned value the tile can be rendered.  
+          If this attribute is omitted the surrounding tile is a template and cannot be rendered independently. If a template 
+          is extended by another tile the extending tile can assign and override attributes of the extended tile. If all 
+          "include" elements of a tile have an assigned value the tile can be rendered.  
 -->
 <!ELEMENT include EMPTY>
 <!ATTLIST include
