@@ -124,6 +124,16 @@ function stderror($message) {
 
 
 /**
+ * Send an "X-Debug-???" header with a message. Each sent header name will end with a different and increasing number.
+ *
+ * @param  string $message
+ */
+function debugHeader($message) {
+    \rosasurfer\debugHeader($message);
+}
+
+
+/**
  * Alias of {@link printPretty()}
  *
  * Prints a variable in a pretty way. Output always ends with a line feed.

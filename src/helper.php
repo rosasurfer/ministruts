@@ -170,6 +170,22 @@ function stderror($message) {
 
 
 /**
+ * Send an "X-Debug-???" header with a message. Each sent header name will end with a different and increasing number.
+ *
+ * @param  string $message
+ */
+function debugHeader($message) {
+    if (CLI) return;
+
+    if (!is_string($message))
+        $message = (string) $message;
+
+    static $i = 0;
+    header('X-Debug-'.++$i.': '.$message);
+}
+
+
+/**
  * Alias of {@link printPretty()}
  *
  * Prints a variable in a pretty way. Output always ends with a line feed.
