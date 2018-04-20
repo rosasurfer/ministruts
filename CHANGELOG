@@ -1,7 +1,8 @@
 
 2018-04-20
 
-   - util: add helper function debugHeader() 
+   - util: add helper function debugHeader()
+   - struts: when serializing ActionForms object references are skipped   
 
 
 2018-04-14

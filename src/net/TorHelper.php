@@ -81,7 +81,7 @@ class TorHelper extends StaticClass {
         if ($ip == '127.0.0.1')
             return false;
 
-        $nodes = &self::getExitNodes();
+        $nodes = self::getExitNodes();
         return isSet($nodes[$ip]);
     }
 
@@ -91,7 +91,7 @@ class TorHelper extends StaticClass {
      *
      * @return array - assoziatives Array mit den IP-Adressen aller Exit-Nodes
      */
-    private static function &getExitNodes() {
+    private static function getExitNodes() {
         $cache = Cache::me(__CLASS__);
         $nodes = $cache->get($key='tor_exit_nodes');
 

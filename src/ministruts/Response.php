@@ -81,7 +81,7 @@ class Response extends Singleton {
      * @param  string $key   - Schluessel, unter dem der Wert gespeichert wird
      * @param  mixed  $value - der zu speichernde Wert
      */
-    public function setAttribute($key, &$value) {
+    public function setAttribute($key, $value) {
         $this->attributes[$key] = $value;
     }
 
@@ -94,7 +94,7 @@ class Response extends Singleton {
      *
      * @return mixed - der gespeicherte Wert oder NULL
      */
-    public function &getAttribute($key) {
+    public function getAttribute($key) {
         if (array_key_exists($key, $this->attributes))
             return $this->attributes[$key];
 
