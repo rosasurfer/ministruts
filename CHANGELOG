@@ -1,4 +1,9 @@
 
+2018-04-20
+
+   - util: add helper function debugHeader() 
+
+
 2018-04-14
 
    - db: add method db\ConnectorInterface::transaction() to execute a task as a closure 
