@@ -48,9 +48,6 @@ abstract class ActionForm extends Object {
         $mapping = $request->getAttribute(ACTION_MAPPING_KEY);
         $actionClassName = $mapping->getActionClassName();
 
-        global $counter; is_int($counter) || $counter = 0;
-        header('X-Debug-'.(++$counter).': '.__METHOD__.'() $request->attribute(ACTION_MAPPING_KEY) => '.getType($mapping));
-
         if (is_subclass_of($actionClassName, DispatchAction::class)) {
             if (isSet($_REQUEST['submit']['action']))
                 $this->actionKey = $_REQUEST['submit']['action'];
@@ -104,14 +101,20 @@ abstract class ActionForm extends Object {
 
 
     /**
-     * Prevent serialization of transient properties.                    // access level encoding
-     *                                                                   // ---------------------
-     * @return string[] - array of property names to serialize           // private:   "\0{className}\0{propertyName}"
-     */                                                                  // protected: "\0*\0{propertyName}"
-    public function __sleep() {                                          // public:    "{propertyName}"
+     * Prevent serialization of transient properties.                   // access level encoding
+     *                                                                  // ---------------------
+     * @return string[] - array of property names to serialize          // private:   "\0{className}\0{propertyName}"
+     */                                                                 // protected: "\0*\0{propertyName}"
+    public function __sleep() {                                         // public:    "{propertyName}"
         $array = (array) $this;
+
         unset($array["\0*\0request"  ]);
         unset($array["\0*\0actionKey"]);
+
+        foreach ($array as $name => $property) {
+            if (is_object($property))
+                unset($array[$name]);                                   // drop all remaining object references
+        }
         return array_keys($array);
     }
 

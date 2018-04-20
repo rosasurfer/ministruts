@@ -3,11 +3,7 @@ namespace rosasurfer\ministruts;
 
 use rosasurfer\core\Object;
 use rosasurfer\exception\RuntimeException;
-use rosasurfer\log\Logger;
 use rosasurfer\net\http\HttpResponse;
-
-use const rosasurfer\L_DEBUG;
-use const rosasurfer\L_INFO;
 
 
 /**
@@ -15,12 +11,6 @@ use const rosasurfer\L_INFO;
  */
 class RequestProcessor extends Object {
 
-
-    /** @var bool */
-    private static $logDebug;
-
-    /** @var bool */
-    private static $logInfo;
 
     /** @var Module - the Module the instance belongs to */
     protected $module;
@@ -36,10 +26,6 @@ class RequestProcessor extends Object {
      * @param  array  $options - processing runtime options
      */
     public function __construct(Module $module, array $options) {
-        $loglevel       = Logger::getLogLevel(__CLASS__);
-        self::$logDebug = ($loglevel <= L_DEBUG );
-        self::$logInfo  = ($loglevel <= L_INFO  );
-
         $this->module  = $module;
         $this->options = $options;
     }
@@ -105,7 +91,7 @@ class RequestProcessor extends Object {
 
 
     /**
-     * Session handling sccording to the configuration.
+     * Session handling according to the configuration.
      *
      * @param  Request $request
      */
@@ -157,7 +143,7 @@ class RequestProcessor extends Object {
      */
     protected function cacheActionMessages(Request $request) {
         $errors = $request->getActionErrors();
-        if (sizeOf($errors) == 0)
+        if (!$errors)
             return;
 
         $request->getSession();
@@ -198,8 +184,6 @@ class RequestProcessor extends Object {
         // /
         // /controller/action/
 
-        self::$logDebug && Logger::log('Path used for mapping selection: "'.$mappingPath.'"', L_DEBUG);
-
         // Mapping suchen und im Request speichern
         if (($mapping=$this->module->findMapping($mappingPath)) || ($mapping=$this->module->getDefaultMapping())) {
             $request->setAttribute(ACTION_MAPPING_KEY, $mapping);
@@ -207,7 +191,6 @@ class RequestProcessor extends Object {
         }
 
         // kein Mapping gefunden
-        self::$logInfo && Logger::log('Could not find a mapping for path: '.$mappingPath, L_INFO);
         $response->setStatus(HttpResponse::SC_NOT_FOUND);
 
         if (isSet($this->options['status-404']) && $this->options['status-404']=='pass-through')
@@ -255,7 +238,6 @@ PROCESS_MAPPING_ERROR_SC_404;
             return true;
 
         // Beschraenkung nicht erfuellt
-        self::$logDebug && Logger::log('HTTP method "'.$request->getMethod().'" is not supported by ActionMapping, denying access', L_DEBUG);
         $response->setStatus(HttpResponse::SC_METHOD_NOT_ALLOWED);
 
         if (isSet($this->options['status-405']) && $this->options['status-405']=='pass-through')

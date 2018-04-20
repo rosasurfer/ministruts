@@ -374,7 +374,7 @@ class ActionMapping extends Object {
 
 
     /**
-     * Whether or not the mapping's {@ActionForm} is validated by the framework before execution of the the {@link Action}.
+     * Whether or not the mapping's {@link ActionForm} is validated by the framework before execution of the the {@link Action}.
      *
      * @return bool
      */
@@ -411,7 +411,7 @@ class ActionMapping extends Object {
 
 
     /**
-     * Add an {@ActionForward} accessible under the specified name to the mapping.
+     * Add an {@link ActionForward} accessible under the specified name to the mapping.
      *
      * @param  string        $name    - access identifier (may differ from the forward's name)
      * @param  ActionForward $forward
@@ -467,7 +467,7 @@ class ActionMapping extends Object {
 
 
     /**
-     * Lookup and return the {@ActionForward} accessible under the specified name. First the lookup tries to find a local
+     * Lookup and return the {@link ActionForward} accessible under the specified name. First the lookup tries to find a local
      * forward of the given name. If no local forward is found global forwards are checked.
      *
      * @param  string $name - logical name; can be "self" to return a redirect forward to the mapping itself
