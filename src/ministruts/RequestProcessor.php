@@ -43,8 +43,8 @@ class RequestProcessor extends Object {
         $this->processSession($request);
 
 
-        // ActionMessages aus der Session loeschen
-        $this->processCachedActionMessages($request);
+        // move ActionMessages stored in the session back to the Request
+        $this->restoreCachedActionMessages($request);
 
 
         // Mapping fuer den Request ermitteln: wird kein Mapping gefunden, generiert die Methode einen 404-Fehler
@@ -106,53 +106,48 @@ class RequestProcessor extends Object {
 
 
     /**
-     * Verschiebt ActionMessages, die in der HttpSession gespeichert sind, zurueck in den aktuellen
-     * Request. Wird verwendet, um ActionMessages ueber einen Redirect hinweg uebertragen zu koennen.
+     * Moves all ActionMessages (including ActionErrors) from the current {@link Request} to the session.
+     * At the next request the messages are restored and moved back to the new request.
      *
      * @param  Request $request
-     *
-     * @see    Request::setActionMessage()
-     * @see    RequestProcessor::cacheActionMessages()
      */
-    protected function processCachedActionMessages(Request $request) {
-        if ($request->hasSessionId() && $request->getSession()) {
-            if (isSet($_SESSION[ACTION_MESSAGES_KEY])) {
-                $messages = $_SESSION[ACTION_MESSAGES_KEY];
-                $request->setAttribute(ACTION_MESSAGES_KEY, $messages);
-                unset($_SESSION[ACTION_MESSAGES_KEY]);
-            }
+    protected function cacheActionMessages(Request $request) {
+        $errors = $request->removeActionErrors();
+        if ($errors && $request->getSession()) {
+            if (isSet($_SESSION[ACTION_ERRORS_KEY]))
+                $errors = array_merge($_SESSION[ACTION_ERRORS_KEY], $errors);
+            $_SESSION[ACTION_ERRORS_KEY] = $errors;
+        }
 
-            if (isSet($_SESSION[ACTION_ERRORS_KEY])) {
-                $errors = $_SESSION[ACTION_ERRORS_KEY];
-                $request->setAttribute(ACTION_ERRORS_KEY, $errors);
-                unset($_SESSION[ACTION_ERRORS_KEY]);
-            }
-            // TODO: ActionError -> ActionMessage
+        $messages = $request->removeActionMessages();
+        if ($messages && $request->getSession()) {
+            if (isSet($_SESSION[ACTION_MESSAGES_KEY]))
+                $messages = array_merge($_SESSION[ACTION_MESSAGES_KEY], $messages);
+            $_SESSION[ACTION_MESSAGES_KEY] = $messages;
         }
     }
 
 
     /**
-     * Kopiert alle vorhandenen ActionMessages in die HttpSession. Beim naechsten Request werden diese
-     * Messages automatisch zurueck in den Request verschoben und stehen wieder zur Verfuegung.
+     * Move all ActionMessages (including ActionErrors) stored in the session to the current {@link Request}.
+     * Found ActionErrors (from the previous request) are converted to ActionMessages of the current request.
      *
      * @param  Request $request
-     *
-     * @see    Request::setActionMessage()
-     * @see    RequestProcessor::processCachedActionMessages()
      */
-    protected function cacheActionMessages(Request $request) {
-        $errors = $request->getActionErrors();
-        if (!$errors)
-            return;
+    protected function restoreCachedActionMessages(Request $request) {
+        if ($request->hasSessionId() && $request->getSession()) {
+            $messages = $errors = [];
 
-        $request->getSession();
-
-        foreach ($errors as $key => $value) {
-            $_SESSION[ACTION_ERRORS_KEY][$key] = $value;
+            if (isSet($_SESSION[ACTION_MESSAGES_KEY])) {
+                $messages = $_SESSION[ACTION_MESSAGES_KEY];
+                unset($_SESSION[ACTION_MESSAGES_KEY]);
+            }
+            if (isSet($_SESSION[ACTION_ERRORS_KEY])) {
+                $errors = $_SESSION[ACTION_ERRORS_KEY];
+                unset($_SESSION[ACTION_ERRORS_KEY]);
+            }
+            $request->setAttribute(ACTION_MESSAGES_KEY, array_merge($messages, $errors));
         }
-
-        // TODO: ActionMessages verarbeiten
     }
 
 

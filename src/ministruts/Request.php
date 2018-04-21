@@ -764,12 +764,10 @@ class Request extends Singleton {
      *
      * @return mixed - der gespeicherte Wert oder NULL
      */
-    public function &getAttribute($key) {
-        if (array_key_exists($key, $this->attributes))
+    public function getAttribute($key) {
+        if (key_exists($key, $this->attributes))
             return $this->attributes[$key];
-
-        $value = null;
-        return $value;    // Referenz auf NULL
+        return null;
     }
 
 
@@ -789,7 +787,7 @@ class Request extends Singleton {
      * @param  string $key   - Schluessel, unter dem der Wert gespeichert wird
      * @param  mixed  $value - der zu speichernde Wert
      */
-    public function setAttribute($key, &$value) {
+    public function setAttribute($key, $value) {
         $this->attributes[$key] = $value;
     }
 
@@ -855,23 +853,132 @@ class Request extends Singleton {
 
 
     /**
-     * Gibt die Error-Message fuer den angegebenen Schluessel zurueck.  Ohne Schluessel wird die erste
-     * vorhandene Error-Message zurueckgegeben.
+     * Return the ActionMessage for the specified key or the first ActionMessage if no key was given.
      *
-     * @param  string $key [optional] - Schluessel der Error-Message
+     * @param  string $key [optional]
      *
-     * @return string|null - Error-Message
+     * @return string|null - ActionMessage
+     */
+    public function getActionMessage($key = null) {
+        $messages = $this->getAttribute(ACTION_MESSAGES_KEY);
+
+        if ($key === null) {                            // return the first one
+            if ($messages) {
+                foreach ($messages as $message) return $message;
+            }
+        }
+        elseif (key_exists($key, $messages)) {          // return the specified one
+            return $messages[$key];
+        }
+        return $this->getActionError($key);             // look-up separately stored ActionErrors
+    }
+
+
+    /**
+     * Return all existing ActionMessages, including ActionErrors.
+     *
+     * @return array
+     */
+    public function getActionMessages() {
+        $messages = $this->getAttribute(ACTION_MESSAGES_KEY);
+        if ($messages === null)
+            $messages = [];
+        $errors = $this->getActionErrors();
+
+        return array_merge($messages, $errors);
+    }
+
+
+    /**
+     * Whether or not an ActionMessage exists for one of the specified keys, or for any key if no key was given.
+     *
+     * @param  string|string[] $keys [optional] - message keys
+     *
+     * @return bool
+     */
+    public function isActionMessage($keys = null) {
+        $messages = $this->getAttribute(ACTION_MESSAGES_KEY);
+        if (!$messages)
+            return $this->isActionError($keys);
+
+        if (is_string($keys))
+            $keys = [$keys];
+
+        if (is_array($keys)) {
+            foreach ($keys as $key) {
+                if (key_exists($key, $messages)) return true;
+            }
+            if ($keys)
+                return $this->isActionError($keys);
+            $keys = null;
+        }
+
+        if (is_null($keys))
+            return true;
+        throw new IllegalTypeException('Illegal type of parameter $keys: '.getType($keys));
+    }
+
+
+    /**
+     * Store or delete an ActionMessage for the specified key.
+     *
+     * @param  string $key     - message key
+     * @param  string $message - message; if NULL the message for the specified key is deleted
+     *                           (an ActionError with the same key is not deleted)
+     */
+    public function setActionMessage($key, $message) {
+        if (is_null($message)) {
+            unset($this->attributes[ACTION_MESSAGES_KEY][$key]);
+        }
+        elseif (is_string($message)) {
+            $this->attributes[ACTION_MESSAGES_KEY][$key] = $message;
+        }
+        else throw new IllegalTypeException('Illegal type of parameter $message: '.getType($message));
+    }
+
+
+    /**
+     * Delete the ActionMessages with the specified keys.
+     *
+     * @param  string $key - zero or more message keys to delete; without a key all ActionMessages are deleted
+     *                       (ActionErrors with the same keys are not deleted
+     *
+     * @return array - the deleted ActionMessages
+     */
+    public function removeActionMessages(/*$key1, $key2, $key3...*/) {
+        $messages = $this->getAttribute(ACTION_MESSAGES_KEY);
+
+        if ($args = func_get_args()) {
+            $dropped = [];
+            foreach ($args as $key) {
+                if (isSet($messages[$key]))
+                    $dropped[$key] = $messages[$key];
+                unset($this->attributes[ACTION_MESSAGES_KEY][$key]);
+            }
+            return $dropped;
+        }
+
+        unset($this->attributes[ACTION_MESSAGES_KEY]);
+        return $messages;
+    }
+
+
+    /**
+     * Return the ActionError for the specified key or the first ActionError if no key was given.
+     *
+     * @param  string $key [optional]
+     *
+     * @return string|null - ActionError
      */
     public function getActionError($key = null) {
-        $errors = &$this->getAttribute(ACTION_ERRORS_KEY);
+        $errors = $this->getAttribute(ACTION_ERRORS_KEY);
 
-        if ($key === null) {       // die erste zurueckgeben
+        if ($key === null) {                            // return the first one
             if ($errors) {
-                foreach ($errors as $error)
-                    return $error;
+                foreach ($errors as $error) return $error;
             }
-        }                          // eine bestimmte zurueckgeben
-        elseif (isSet($errors[$key])) {
+        }
+        elseif (key_exists($key, $errors)) {            // return the specified one
             return $errors[$key];
         }
         return null;
@@ -879,36 +986,36 @@ class Request extends Singleton {
 
 
     /**
-     * Gibt alle vorhandenen Error-Messages zurueck.
+     * Return all existing ActionErrors.
      *
-     * @return array - Error-Messages
+     * @return array
      */
     public function getActionErrors() {
-        $errors = &$this->getAttribute(ACTION_ERRORS_KEY);
-
+        $errors = $this->getAttribute(ACTION_ERRORS_KEY);
         if ($errors === null)
             $errors = [];
-
         return $errors;
     }
 
 
     /**
-     * Whether or not an error message exists for one of the specified keys. With no key whether or not any error message
-     * exists.
+     * Whether or not an ActionError exists for one of the specified keys or for any key if no key was given.
      *
-     * @param  string|string[] $keys [optional] - message keys
+     * @param  string|string[] $keys [optional] - error keys
      *
      * @return bool
      */
     public function isActionError($keys = null) {
+        $errors = $this->getAttribute(ACTION_ERRORS_KEY);
+        if (!$errors)
+            return false;
+
         if (is_string($keys))
             $keys = [$keys];
 
         if (is_array($keys)) {
             foreach ($keys as $key) {
-                if ($this->getActionError($key) !== null)
-                    return true;
+                if (key_exists($key, $errors)) return true;
             }
             if ($keys)
                 return false;
@@ -916,59 +1023,50 @@ class Request extends Singleton {
         }
 
         if (is_null($keys))
-            return (sizeOf($this->getAttribute(ACTION_ERRORS_KEY)) > 0);
-
+            return true;
         throw new IllegalTypeException('Illegal type of parameter $keys: '.getType($keys));
     }
 
 
     /**
-     * Setzt fuer den angegebenen Schluessel eine Error-Message. Ist Message NULL, wird die Message mit
-     * dem angegebenen Schluessel aus dem Request geloescht.
+     * Store or delete an ActionError for the specified key.
      *
-     * @param  string $key     - Schluessel der Error-Message
-     * @param  string $message - Error-Message
+     * @param  string $key     - error key
+     * @param  string $message - error message; if NULL the error for the specified key is deleted
      */
     public function setActionError($key, $message) {
         if (is_null($message)) {
-            if (isSet($this->attributes[ACTION_ERRORS_KEY][$key]))
-                unset($this->attributes[ACTION_ERRORS_KEY][$key]);
+            unset($this->attributes[ACTION_ERRORS_KEY][$key]);
         }
         elseif (is_string($message)) {
             $this->attributes[ACTION_ERRORS_KEY][$key] = $message;
         }
-        else {
-            throw new IllegalTypeException('Illegal type of parameter $message: '.getType($message));
-        }
+        else throw new IllegalTypeException('Illegal type of parameter $message: '.getType($message));
     }
 
 
     /**
-     * Loescht Error-Messages aus dem Request.
+     * Delete the ActionErrors with the specified keys.
      *
-     * @param  string $key - die Schluessel der zu loeschenden Werte (ohne Angabe werden alle Error-Messages geloescht)
+     * @param  string $key - zero or more error keys to delete; without a key all ActionErrors are deleted
      *
-     * @return array - die geloeschten Error-Messages
-     *
-     * @todo   Error-Messages auch aus der Session loeschen
+     * @return array - the deleted ActionErrors
      */
-    public function removeActionErrors(/*$key1, $key2, $key3 ...*/) {
-        $dropped = [];
-        $args = func_get_args();
+    public function removeActionErrors(/*$key1, $key2, $key3...*/) {
+        $errors = $this->getAttribute(ACTION_ERRORS_KEY);
 
-        if ($args) {
-            foreach ($args as $key => $value) {
-                if ($error = $this->getActionError($value)) {
-                    $dropped[$value] = $error;
-                    $this->setActionError($value, null);
-                }
+        if ($args = func_get_args()) {
+            $dropped = [];
+            foreach ($args as $key) {
+                if (isSet($errors[$key]))
+                    $dropped[$key] = $errors[$key];
+                unset($this->attributes[ACTION_ERRORS_KEY][$key]);
             }
             return $dropped;
         }
 
-        $dropped = $this->getActionErrors();
         unset($this->attributes[ACTION_ERRORS_KEY]);
-        return $dropped;
+        return $errors;
     }
 
 
