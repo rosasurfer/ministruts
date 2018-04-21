@@ -167,7 +167,7 @@ class Request extends Singleton {
      * @return string[] - values or an empty array if no such array of $_REQUEST parameters have been transmitted
      */
     public function getParameters($name) {
-        if (isSet($_REQUEST[$name])) {
+        if (key_exists($name, $_REQUEST)) {
             $value = $_REQUEST[$name];
             if (is_array($value))
                 return $value;

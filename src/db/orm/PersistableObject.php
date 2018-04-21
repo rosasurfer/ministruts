@@ -369,19 +369,25 @@ abstract class PersistableObject extends Object {
      * @return $this
      */
     public function save() {
-        // pre-processing hook
-        if ($this->beforeSave() === false)
-            return $this;
-
         if (!$this->isPersistent()) {
-            $this->insert();
+            $this->dao()->transaction(function() {
+                if ($this->beforeSave() === false)              // pre-processing hook
+                    return;
+                $this->insert();
+                $this->afterSave();                             // post-processing hook
+            });
         }
         elseif ($this->isModified()) {
-            $this->update();
+            $this->dao()->transaction(function() {
+                if ($this->beforeSave() === false)              // pre-processing hook
+                    return;
+                $this->update();
+                $this->afterSave();                             // post-processing hook
+            });
         }
-
-        // post-processing hook
-        $this->afterSave();
+        else {
+            // persistent but not modified
+        }
         return $this;
     }
 
@@ -458,19 +464,18 @@ abstract class PersistableObject extends Object {
     public function delete() {
         if (!$this->isPersistent()) throw new InvalidArgumentException('Cannot delete non-persistent '.get_class($this));
 
-        // pre-processing hook
-        if ($this->beforeDelete() === false)
-            return $this;
+        $this->dao()->transaction(function() {
+            if ($this->beforeDelete() === false)                            // pre-processing hook
+                return;
 
-        // perform deletion
-        if ($this->doDelete()) {
-            // reset identity property
-            $idName = $this->dao()->getMapping()['identity']['name'];
-            $this->$idName = null;
+            if ($this->doDelete()) {                                        // perform deletion
+                // reset identity property
+                $idName = $this->dao()->getMapping()['identity']['name'];
+                $this->$idName = null;
 
-            // post-processing hook
-            $this->afterDelete();
-        }
+                $this->afterDelete();                                       // post-processing hook
+            }
+        });
         return $this;
     }
 
