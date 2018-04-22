@@ -43,42 +43,37 @@ abstract class ActionForm extends Object {
 
 
     /**
-     * Read and store a submitted {@link DispatchAction} key.
+     * Read a submitted {@link DispatchAction} key.
      *
      * @param  Request $request
      *
      * @example
      *
-     * The framework expects the action key nested in an array. Include it in your HTML like this:
-     *
+     * The framework expects the action key nested in an array named "submit". Write the HTML like this:
      * <pre>
-     * &lt;img type="submit" name="submit[action]" value="..." src=... /&gt;
+     * &lt;img type="submit" name="submit[action]" value="{action-key}" src=... /&gt;
      * </pre>
      */
     public function initActionKey(Request $request) {
-        /** @var ActionMapping $mapping */
-        $mapping = $request->getAttribute(ACTION_MAPPING_KEY);
-        $actionClassName = $mapping->getActionClassName();
-
-        if (is_subclass_of($actionClassName, DispatchAction::class)) {
-            if (isSet($_REQUEST['submit']['action']))
-                $this->actionKey = $_REQUEST['submit']['action'];
-
-            // PHP silently converts dots "." and spaces " " in top-level parameter names to underscores.
-            //
-            // - Workaround for user-defined keys => wrap the key in a top-level array
-            //   $_POST = Array (
-            //       [action_x] => update
-            //       [application_name] => foobar
-            //       [top_level_with_dots] => Array (
-            //           [nested.level.with.dots] => custom-value
-            //       )
-            //   )
-            //
-            // - Workaround for browser-modified keys, i.e. <img type="submit"... => select the key value wisely:
-            //   <img type="submit" name="submit[action]" ...>
-            //   The browser will send "submit[action].x=123&submit[action].y=456" and PHP will discard the coordinates.
-        }
+        //
+        // PHP silently converts dots "." and spaces " " in top-level parameter names to underscores. This breaks a submit
+        // tag with an action key if the tag is an image tag as the HTML standard appends the clicked image coordinates.
+        //
+        // - Workaround for browser-modified names, i.e. <img type="submit"... => select the name attribute as below:
+        //   <img type="submit" name="submit[action]" ...>
+        //   The browser will send "submit[action].x=123&submit[action].y=456" and PHP will discard the coordinates.
+        //
+        // - Workaround for all other parameter names with dots => wrap the name in a top-level array:
+        //   $_POST = Array (
+        //       [action_x] => update                               // <img type="submit" name="action"... broken by PHP
+        //       [application_name] => foobar                       // regular custom parameters broken by PHP
+        //       [top_level_with_dots] => Array (                   // custom top-level parameters broken by PHP
+        //           [nested.level.with.dots] => custom-value       // custom wrapped parameters not broken by PHP
+        //       )
+        //   )
+        //
+        if (isSet($_REQUEST['submit']['action']))
+            $this->actionKey = $_REQUEST['submit']['action'];
     }
 
 

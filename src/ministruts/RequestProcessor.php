@@ -297,23 +297,27 @@ PROCESS_METHOD_ERROR_SC_405;
      * @return ActionForm|null
      */
     protected function processActionFormCreate(Request $request, ActionMapping $mapping) {
-        $className = $mapping->getFormClassName();
-        if (!$className)
+        $formClass = $mapping->getFormClassName();
+        if (!$formClass)
             return null;
 
         /** @var ActionForm $form */
         $form = null;
 
-        // if the form has "session" scope we re-use an existing one from the session
+        // if the form has "session" scope try to find an existing form in the session
         if ($mapping->isSessionScope())
-            $form = $request->getSession()->getAttribute($className);       // implicitely starts a session
+            $form = $request->getSession()->getAttribute($formClass);       // implicitely starts a session
 
-        // otherwise create a new instance
+        // if none was found create a new instance
         /** @var ActionForm $form */
-        if (!$form) $form = new $className($request);
+        if (!$form) $form = new $formClass($request);
+
+        // if a DispatchAction is used read the action key
+        $actionClass = $mapping->getActionClassName();
+        if (is_subclass_of($actionClass, DispatchAction::class))
+            $form->initActionKey($request);
 
         // populate the form
-        $form->initActionKey($request);
         $form->populate($request);
 
         // store the ActionForm in the request
@@ -321,7 +325,7 @@ PROCESS_METHOD_ERROR_SC_405;
 
         // if the form has "session" scope also store it in the session
         if ($mapping->isSessionScope())
-            $request->getSession()->setAttribute($className, $form);
+            $request->getSession()->setAttribute($formClass, $form);
 
         return $form;
     }
@@ -409,8 +413,7 @@ PROCESS_METHOD_ERROR_SC_405;
      * @return ActionForward|null
      */
     protected function processActionExecute(Request $request, Response $response, Action $action) {
-        $forward   = null;
-        $throwable = null;
+        $forward = $throwable = null;
 
         // Alles kapseln, damit Postprocessing-Hook auch nach Auftreten einer Exception aufgerufen
         // werden kann (z.B. Transaction-Rollback o.ae.)
@@ -419,8 +422,10 @@ PROCESS_METHOD_ERROR_SC_405;
             $forward = $action->executeBefore($request, $response);
 
             // Action nur ausfuehren, wenn executeBefore() nicht schon Abbruch signalisiert hat
-            if ($forward === null)
+            if ($forward === null) {
+                // TODO: implement dispatching for DispatchActions; as of now it must be done manually in execute()
                 $forward = $action->execute($request, $response);
+            }
         }
         catch (\Exception $ex) {
             $throwable = $ex;    // evt. aufgetretene Exception zwischenspeichern
