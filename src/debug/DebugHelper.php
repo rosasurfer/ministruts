@@ -122,7 +122,8 @@ class DebugHelper extends StaticClass {
             $frame = &$trace[$i];
 
             $call = self::getFQFunctionName($frame, $nsLowerCase=true);
-            if ($call!='{main}' && $call!='{closure}')
+
+            if ($call!='{main}' && !strEndsWith($call, '{closure}'))
                 $call.='()';
             $callLen = max($callLen, strLen($call));
             $frame['call'] = $call;
