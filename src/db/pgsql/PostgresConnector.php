@@ -219,7 +219,7 @@ class PostgresConnector extends Connector {
      */
     protected function getSchemaSearchPath() {
         $options = $this->options;
-        $path = $rolledBack = null;
+        $path = null;
 
         while ($this->hConnection) {
             try {
@@ -233,10 +233,14 @@ class PostgresConnector extends Connector {
                 break;
             }
             catch (\Exception $ex) {
-                if ($rolledBack || !strContainsI($ex->getMessage(), 'current transaction is aborted, commands ignored until end of transaction block'))
-                    throw $ex;
-                $rolledBack = true;
-                $this->rollback();
+                if (strContainsI($ex->getMessage(), 'current transaction is aborted, commands ignored until end of transaction block')) {
+                    if ($this->transactionLevel > 0) {
+                        $this->transactionLevel = 1;            // immediately skip nested transactions
+                        $this->rollback();
+                        continue;
+                    }
+                }
+                throw $ex;
             }
         }
         return $path;
