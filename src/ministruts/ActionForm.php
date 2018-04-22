@@ -17,6 +17,18 @@ abstract class ActionForm extends Object {
     /** @var string [transient] - dispatch action key; populated if the Action handling the request is a DispatchAction */
     protected $actionKey;
 
+    /** @var string[] [transient] */
+    protected static $fileUploadErrors = [
+        UPLOAD_ERR_OK         => 'Success (UPLOAD_ERR_OK)',
+        UPLOAD_ERR_INI_SIZE   => 'Upload error, file too big (UPLOAD_ERR_INI_SIZE)',
+        UPLOAD_ERR_FORM_SIZE  => 'Upload error, file too big (UPLOAD_ERR_FORM_SIZE)',
+        UPLOAD_ERR_PARTIAL    => 'Partial file upload error, try again (UPLOAD_ERR_PARTIAL)',
+        UPLOAD_ERR_NO_FILE    => 'Error while uploading the file (UPLOAD_ERR_NO_FILE)',
+        UPLOAD_ERR_NO_TMP_DIR => 'Read/write error while uploading the file (UPLOAD_ERR_NO_TMP_DIR)',
+        UPLOAD_ERR_CANT_WRITE => 'Read/write error while uploading the file (UPLOAD_ERR_CANT_WRITE)',
+        UPLOAD_ERR_EXTENSION  => 'Error while uploading the file (UPLOAD_ERR_EXTENSION)',
+    ];
+
 
     /**
      * Constructor
