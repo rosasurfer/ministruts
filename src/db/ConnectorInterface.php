@@ -142,7 +142,7 @@ interface ConnectorInterface {
      *
      * @param  \Closure $task - task to execute (an anonymous function is implicitly casted)
      *
-     * @return $this
+     * @return mixed - the task's return value (if any)
      */
     public function transaction(\Closure $task);
 
