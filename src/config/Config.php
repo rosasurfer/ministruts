@@ -147,7 +147,7 @@ class Config extends Object implements IConfig {
 
         $value = $this->getProperty($key);
 
-        if ($value === null) {
+        if ($value === "\0") {
             if (func_num_args() == 1) throw new RuntimeException('No configuration found for key "'.$key.'"');
             return $default;
         }
@@ -180,7 +180,7 @@ class Config extends Object implements IConfig {
 
         $value = $this->getProperty($key);
 
-        if ($value === null) {
+        if ($value === "\0") {
             if (is_bool($options))
                 return $options;
             if (is_array($options) && array_key_exists('default', $options)) {
@@ -198,7 +198,7 @@ class Config extends Object implements IConfig {
             if (!is_int($options['flags'])) throw new IllegalTypeException('Illegal type of option "flags": '.getType($options['flags']));
             $flags = $options['flags'];
         }
-        if ($flags & FILTER_NULL_ON_FAILURE && $value==='')         // crappy PHP considers '' as a valid strict boolean
+        if ($flags & FILTER_NULL_ON_FAILURE && ($value===null || $value===''))  // crap-PHP considers NULL and '' as valid strict booleans
             return null;
         return filter_var($value, FILTER_VALIDATE_BOOLEAN, $flags);
     }
@@ -224,7 +224,7 @@ class Config extends Object implements IConfig {
      *
      * @param  string $key
      *
-     * @return string|string[]|null - a string, a string array or NULL if no such setting is found
+     * @return mixed - property value or "\0" if no such setting is found
      */
     protected function getProperty($key) {
         $properties  = $this->properties;
@@ -233,13 +233,13 @@ class Config extends Object implements IConfig {
 
         for ($i=0; $i < $subKeysSize; ++$i) {
             $subkey = trim($subkeys[$i]);
-            if (!isSet($properties[$subkey]))
+            if (!key_exists($subkey, $properties))
                 break;                                      // not found
             if ($i+1 == $subKeysSize)                       // return at the last subkey
                 return $properties[$subkey];
             $properties = $properties[$subkey];             // go to the next sublevel
         }
-        return null;
+        return "\0";
     }
 
 
@@ -261,7 +261,7 @@ class Config extends Object implements IConfig {
 
             if ($i+1 < $subkeysSize) {
                 // not yet the last subkey
-                if (!isSet($properties[$subkey])) {
+                if (!key_exists($subkey, $properties)) {
                     $properties[$subkey] = [];                              // create another array level
                 }
                 elseif (!is_array($properties[$subkey])) {
@@ -274,7 +274,7 @@ class Config extends Object implements IConfig {
                 if (preg_match('/(.+)\b *\[ *\]$/', $subkey, $match)) {
                     // bracket notation
                     $subkey = $match[1];
-                    if (!isSet($properties[$subkey])) {
+                    if (!key_exists($subkey, $properties)) {
                         $properties[$subkey] = [$value];                    // create a new array value
                     }
                     else {
@@ -285,7 +285,7 @@ class Config extends Object implements IConfig {
                 }
                 else {
                     // regular non-bracket notation
-                    if (!isSet($properties[$subkey])) {
+                    if (!key_exists($subkey, $properties)) {
                         $properties[$subkey] = $value;                      // store the value regularily
                     }
                     else if (!is_array($properties[$subkey])) {
