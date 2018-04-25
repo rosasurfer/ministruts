@@ -1,4 +1,9 @@
 
+2018-04-25
+
+   - util: add helper function is_dir_empty()
+
+
 2018-04-20
 
    - util: add helper function debugHeader()

@@ -1108,6 +1108,44 @@ function mkDirWritable($path, $mode = 0755) {
 
 
 /**
+ * Whether or not a directory is considered empty.
+ *
+ * (a directory with just '.svn' or '.git' is empty)
+ *
+ * @param  string          $dirname
+ * @param  string|string[] $ignore - one or more directory entries to intentionally ignore during the check, e.g. ".git"
+ *                                   (default: none)
+ * @return bool
+ */
+function is_dir_empty($dirname, $ignore = []) {
+    if (!is_dir($dirname))
+        return false;
+
+    if (!is_array($ignore))
+        $ignore = [$ignore];
+    $ignored = array_merge(['.', '..'], $ignore);           // always ignore '.' and '..'
+
+    foreach (scanDir($dirname) as $entry) {
+        if (!in_array($entry, $ignored))
+            return false;
+    }
+
+    /*
+    TODO: for better performance replace with
+
+    $handle = opendir($dir);
+    while (false !== ($entry = readdir($handle))) {
+    if ($entry != "." && $entry != "..") {
+      return FALSE;
+    }
+    }
+    Don’t forget to closedir($handle) afterwards.
+    */
+    return true;
+}
+
+
+/**
  * Whether or not the specified class exists (loaded or not) and is not an interface or a trait. Identical to
  * <pre>class_exists($name, true)</pre> except it also returnes FALSE if auto loading triggers an exception.
  *
