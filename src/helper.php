@@ -1099,6 +1099,8 @@ function mkDirWritable($path, $mode = 0755) {
     if (!is_string($path))                            throw new IllegalTypeException('Illegal type of parameter $path: '.getType($path));
     if ($mode!==null && !is_int($mode))               throw new IllegalTypeException('Illegal type of parameter $mode: '.getType($mode));
 
+    clearStatCache($clearRealPathCache=true, $path);
+
     if (is_file($path))                               throw new IOException('Cannot write to directory "'.$path.'" (is a file)');
     if (!is_dir($path) && !mkDir($path, $mode, true)) throw new IOException('Cannot create directory "'.$path.'"');
     if (!is_writable($path))                          throw new IOException('Cannot write to directory "'.$path.'"');
