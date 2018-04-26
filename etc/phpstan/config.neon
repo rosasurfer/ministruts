@@ -13,6 +13,9 @@ parameters:
        #- phtml                                                     # TODO: Tile default vars trigger errors
 
     excludes_analyse:
+        - .git/
+        - .settings/
+        - etc/js/
         - etc/vendor/
         - src/global-helper.php
  
