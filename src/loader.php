@@ -70,6 +70,6 @@ registerClassLoader();
  */
 if (CLI && function_exists('\pcntl_signal')) {
     pcntl_signal(SIGINT, function($signo, $signinfo = null) {
-        exit();                                                 // calling exit() is sufficient to execute destructors
+        exit(1);                                                // calling exit() is sufficient to execute destructors
     });
 }
