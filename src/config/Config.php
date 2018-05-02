@@ -144,6 +144,7 @@ class Config extends Object implements IConfig {
      */
     public function get($key, $default = null) {
         if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
+        // TODO: a numerically indexed property array will have integer keys
 
         $value = $this->getProperty($key);
 
@@ -233,7 +234,7 @@ class Config extends Object implements IConfig {
 
         for ($i=0; $i < $subKeysSize; ++$i) {
             $subkey = trim($subkeys[$i]);
-            if (!key_exists($subkey, $properties))
+            if (!is_array($properties) || !key_exists($subkey, $properties))
                 break;                                      // not found
             if ($i+1 == $subKeysSize)                       // return at the last subkey
                 return $properties[$subkey];
@@ -410,7 +411,7 @@ class Config extends Object implements IConfig {
 
         foreach ($values as $key => &$value) {
             if      (is_null($value)) $value = '(null)';
-            else if (is_bool($value)) $value = ($value ? 'true':'false').' (bool)';
+            else if (is_bool($value)) $value = ($value ? '(true)' : '(false)');
             $value = str_pad($key, $maxKeyLength, ' ', STR_PAD_RIGHT).' = '.$value;
         }; unset($value);
         $lines += $values;
