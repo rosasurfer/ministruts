@@ -10,6 +10,10 @@ use rosasurfer\exception\RuntimeException;
 use rosasurfer\util\PHP;
 
 use function rosasurfer\isRelativePath;
+use function rosasurfer\strContains;
+use function rosasurfer\strIsQuoted;
+use function rosasurfer\strLeft;
+use function rosasurfer\strStartsWith;
 
 use const rosasurfer\ERROR_LOG_DEFAULT;
 use const rosasurfer\NL;
@@ -73,8 +77,10 @@ class Config extends Object implements IConfig {
         if      (is_string($files)) $files = [$files];
         else if (!is_array($files)) throw new IllegalTypeException('Illegal type of parameter $files: '.getType($files));
 
-        ini_set('auto_detect_line_endings', true);
+        ini_set('auto_detect_line_endings', 1);
+        ini_set('track_errors', 1);
         $this->files = [];
+
 
         // check and load existing files
         foreach ($files as $i => $file) {
@@ -97,28 +103,62 @@ class Config extends Object implements IConfig {
      * @return bool - success status
      */
     protected function loadFile($filename) {
-        $lines = file($filename, FILE_IGNORE_NEW_LINES);
-
+        $lines = file($filename, FILE_IGNORE_NEW_LINES);            // don't use not FILE_SKIP_EMPTY_LINES to have correct line
+                                                                    // numbers for error messages
         foreach ($lines as $i => $line) {
-            $parts = explode('#', $line, 2);
-            $line  = trim($parts[0]);                    // drop comments
-            if (!strLen($line))                          // skip empty lines
+            $line = trim($line);
+            if (!strLen($line) || $line[0]=='#')                    // skip empty and comment lines
                 continue;
 
-            $parts = explode('=', $line, 2);             // separate key/value
+            $parts = explode('=', $line, 2);                        // split key/value
             if (sizeOf($parts) < 2) {
-                $msg = __METHOD__.'()  Skipping syntax error in "'.$filename.'", line '.($i+1).': missing key-value separator';
-                error_log($msg, ERROR_LOG_DEFAULT);
-                //trigger_error($msg, E_USER_NOTICE);   // don't use trigger_error() as it will enter an infinite loop if
-                continue;                               // the same file is accessed for reading the Logger configuration
+                // Don't use trigger_error() as it will enter an infinite loop if the same config is accessed again.
+                error_log(__METHOD__.'()  Skipping syntax error in "'.$filename.'", line '.($i+1).': missing key-value separator', ERROR_LOG_DEFAULT);
+                continue;
             }
-            $key   = trim($parts[0]);
-            $value = trim($parts[1]);
+            $key      = trim($parts[0]);
+            $rawValue = trim($parts[1]);
+
+            // drop possible comments
+            if (strPos($rawValue, '#')!==false && strLen($comment=$this->getLineComment($rawValue))) {
+                $value = trim(strLeft($rawValue, -strLen($comment)));
+            }
+            else {
+                $value = $rawValue;
+            }
 
             // parse and store property value
             $this->setProperty($key, $value);
         }
         return true;
+    }
+
+
+    /**
+     * Resolve the line comment of a raw configuration setting. The only supported comment separator is the hash "#".
+     *
+     * @param  string $value
+     *
+     * @return string - line comment or an empty string if the line has no comment
+     */
+    private function getLineComment($value) {
+        $php_errormsg = '';
+        $tokens = token_get_all('<?php '.$value);
+
+        // Don't use trigger_error() as it will enter an infinite loop if the same config is accessed again.
+        if (strLen($php_errormsg) && !strStartsWith($php_errormsg, 'Unterminated comment starting line'))       // that's /*...
+            error_log(__METHOD__.'()  Unexpected token_get_all() error for $value: '.$value, ERROR_LOG_DEFAULT);
+
+        $lastToken = end($tokens);
+
+        if (!is_array($lastToken) || token_name($lastToken[0])!='T_COMMENT')
+            return '';
+
+        $comment = $lastToken[1];
+        if ($comment[0] == '#')
+            return $comment;
+
+        return $this->{__FUNCTION__}(subStr($comment, 1));
     }
 
 
@@ -255,9 +295,38 @@ class Config extends Object implements IConfig {
      * Set/modify the property with the specified key.
      *
      * @param  string $key
-     * @param  string $value
+     * @param  mixed  $value
      */
     protected function setProperty($key, $value) {
+        // convert string representations of special values
+        if (is_string($value)) {
+            switch (strToLower($value)) {
+                case  'null' :
+                case '(null)':
+                    $value = null;
+                    break;
+
+                case  'true' :
+                case '(true)':
+                case  'on'   :
+                case  'yes'  :
+                    $value = true;
+                    break;
+
+                case  'false' :
+                case '(false)':
+                case  'off'   :
+                case  'no'    :
+                    $value = false;
+                    break;
+
+                default:
+                    if (strIsQuoted($value)) {
+                        $value = subStr($value, 1, strLen($value)-2);
+                    }
+            }
+        }
+
         // set the property depending on the existing data structure
         $properties  = &$this->properties;
         $subkeys     =  $this->parseSubkeys(strToLower($key));
@@ -417,8 +486,28 @@ class Config extends Object implements IConfig {
         }
 
         foreach ($values as $key => &$value) {
-            if      (is_null($value)) $value = '(null)';
-            else if (is_bool($value)) $value = ($value ? '(true)' : '(false)');
+            // convert special values to their string representation
+            if     (is_null($value)) $value = '(null)';
+            elseif (is_bool($value)) $value = ($value ? '(true)' : '(false)');
+            elseif (is_string($value)) {
+                switch (strToLower($value)) {
+                    case  'null'  :
+                    case '(null)' :
+                    case  'true'  :
+                    case '(true)' :
+                    case  'false' :
+                    case '(false)':
+                    case  'on'    :
+                    case  'off'   :
+                    case  'yes'   :
+                    case  'no'    :
+                        $value = '"'.$value.'"';
+                        break;
+                    default:
+                        if (strContains($value, '#'))
+                            $value = '"'.$value.'"';
+                }
+            }
             $value = str_pad($key, $maxKeyLength, ' ', STR_PAD_RIGHT).' = '.$value;
         }; unset($value);
         $lines += $values;
@@ -430,13 +519,13 @@ class Config extends Object implements IConfig {
 
 
     /**
-     * Dump keys and values of the instance into a human-readable string and return it.
+     * Dump the tree structure of a node into a flat format and return it.
      *
      * @param  __In__  string[] $node
      * @param  __In__  array    $values
      * @param  __Out__ int     &$maxKeyLength
      *
-     * @return string[]
+     * @return array
      */
     private function dumpNode(array $node, array $values, &$maxKeyLength) {
         $self   = __FUNCTION__;
@@ -486,8 +575,28 @@ class Config extends Object implements IConfig {
         }
 
         foreach ($values as $key => &$value) {
-            if      (is_null($value)) $value = '';
-            else if (is_bool($value)) $value = (int)$value;
+            // convert special values to their string representation
+            if     (is_null($value)) $value = '(null)';
+            elseif (is_bool($value)) $value = ($value ? '(true)' : '(false)');
+            elseif (is_string($value)) {
+                switch (strToLower($value)) {
+                    case  'null'  :
+                    case '(null)' :
+                    case  'true'  :
+                    case '(true)' :
+                    case  'false' :
+                    case '(false)':
+                    case  'on'    :
+                    case  'off'   :
+                    case  'yes'   :
+                    case  'no'    :
+                        $value = '"'.$value.'"';
+                        break;
+                    default:
+                        if (strContains($value, '#'))
+                            $value = '"'.$value.'"';
+                }
+            }
         }; unset($value);
 
         return $values;
@@ -503,7 +612,11 @@ class Config extends Object implements IConfig {
      */
     public function offsetExists($key) {
         if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
-        return ($this->getProperty($key) !== null);
+
+        $notFound = false;
+        $this->getProperty($key, $notFound);
+
+        return !$notFound;
     }
 
 
