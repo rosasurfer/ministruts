@@ -146,9 +146,10 @@ class Config extends Object implements IConfig {
         if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
         // TODO: a numerically indexed property array will have integer keys
 
-        $value = $this->getProperty($key);
+        $notFound = false;
+        $value = $this->getProperty($key, $notFound);
 
-        if ($value === "\0") {
+        if ($notFound) {
             if (func_num_args() == 1) throw new RuntimeException('No configuration found for key "'.$key.'"');
             return $default;
         }
@@ -179,9 +180,10 @@ class Config extends Object implements IConfig {
     public function getBool($key, $options = null) {
         if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
 
-        $value = $this->getProperty($key);
+        $notFound = false;
+        $value = $this->getProperty($key, $notFound);
 
-        if ($value === "\0") {
+        if ($notFound) {
             if (is_bool($options))
                 return $options;
             if (is_array($options) && array_key_exists('default', $options)) {
@@ -223,14 +225,17 @@ class Config extends Object implements IConfig {
     /**
      * Look-up a property and return its value.
      *
-     * @param  string $key
+     * @param  string  $key      - property key
+     * @param  bool   &$notFound - flag indicating whether or not the property was found
      *
-     * @return mixed - property value or "\0" if no such setting is found
+     * @return mixed - Property value (including NULL) or NULL if no such property was found. If NULL is returned the flag
+     *                 $notFound must be checked to find out whether or not the property was not found.
      */
-    protected function getProperty($key) {
+    protected function getProperty($key, &$notFound) {
         $properties  = $this->properties;
         $subkeys     = $this->parseSubkeys(strToLower($key));
         $subKeysSize = sizeOf($subkeys);
+        $notFound    = false;
 
         for ($i=0; $i < $subKeysSize; ++$i) {
             $subkey = trim($subkeys[$i]);
@@ -240,7 +245,9 @@ class Config extends Object implements IConfig {
                 return $properties[$subkey];
             $properties = $properties[$subkey];             // go to the next sublevel
         }
-        return "\0";
+
+        $notFound = true;
+        return null;
     }
 
 
