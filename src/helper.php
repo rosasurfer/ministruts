@@ -875,7 +875,7 @@ function strRightFrom($string, $limiter, $count=1, $includeLimiter=false, $onNot
 function strIsQuoted($value) {
     if (!is_string($value))
         return false;
-    return strLen($value)>1 && (strIsSingleQuoted($value) || strIsDoubleQuoted($value));
+    return (strLen($value) > 1 && (strIsSingleQuoted($value) || strIsDoubleQuoted($value)));
 }
 
 
@@ -889,7 +889,8 @@ function strIsQuoted($value) {
 function strIsSingleQuoted($value) {
     if (!is_string($value))
         return false;
-    return (($len=strLen($value))>1 && $value[0]=="'" && $value{--$len}=="'");
+    $len = strLen($value);
+    return ($len > 1 && $value[0]=="'" && $value[--$len]=="'");
 }
 
 
@@ -903,7 +904,8 @@ function strIsSingleQuoted($value) {
 function strIsDoubleQuoted($value) {
     if (!is_string($value))
         return false;
-    return (($len=strLen($value))>1 && $value[0]=='"' && $value{--$len}=='"');
+    $len = strLen($value);
+    return ($len > 1 && $value[0]=='"' && $value[--$len]=='"');
 }
 
 
