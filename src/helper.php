@@ -500,10 +500,9 @@ function isRelativePath($path) {
  *
  * @return bool
  */
-function strCompare($stringA, $stringB, $ignoreCase=false) {
+function strCompare($stringA, $stringB, $ignoreCase = false) {
     if ($stringA!==null && !is_string($stringA)) throw new IllegalTypeException('Illegal type of parameter $stringA: '.getType($stringA));
     if ($stringB!==null && !is_string($stringB)) throw new IllegalTypeException('Illegal type of parameter $stringB: '.getType($stringB));
-    if (!is_bool($ignoreCase))                   throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
 
     if ($ignoreCase)
         return strCompareI($stringA, $stringB);
@@ -538,10 +537,9 @@ function strCompareI($stringA, $stringB) {
  *
  * @return bool
  */
-function strContains($haystack, $needle, $ignoreCase=false) {
+function strContains($haystack, $needle, $ignoreCase = false) {
     if ($haystack!==null && !is_string($haystack)) throw new IllegalTypeException('Illegal type of parameter $haystack: '.getType($haystack));
     if (!is_string($needle))                       throw new IllegalTypeException('Illegal type of parameter $needle: '.getType($needle));
-    if (!is_bool($ignoreCase))                     throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
 
     $haystackLen = strLen($haystack);
     $needleLen   = strLen($needle);
@@ -578,7 +576,7 @@ function strContainsI($haystack, $needle) {
  *
  * @return bool
  */
-function strStartsWith($string, $prefix, $ignoreCase=false) {
+function strStartsWith($string, $prefix, $ignoreCase = false) {
     if (is_array($prefix)) {
         $self = __FUNCTION__;
         foreach ($prefix as $p) {
@@ -589,7 +587,6 @@ function strStartsWith($string, $prefix, $ignoreCase=false) {
 
     if ($string!==null && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
     if (!is_string($prefix))                   throw new IllegalTypeException('Illegal type of parameter $prefix: '.$prefix.' ('.getType($prefix).')');
-    if (!is_bool($ignoreCase))                 throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
 
     $stringLen = strLen($string);
     $prefixLen = strLen($prefix);
@@ -627,7 +624,7 @@ function strStartsWithI($string, $prefix) {
  *
  * @return bool
  */
-function strEndsWith($string, $suffix, $ignoreCase=false) {
+function strEndsWith($string, $suffix, $ignoreCase = false) {
     if (is_array($suffix)) {
         $self = __FUNCTION__;
         foreach ($suffix as $s) {
@@ -637,7 +634,6 @@ function strEndsWith($string, $suffix, $ignoreCase=false) {
     }
     if ($string!==null && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
     if (!is_string($suffix))                   throw new IllegalTypeException('Illegal type of parameter $suffix: '.$suffix.' ('.getType($suffix).')');
-    if (!is_bool($ignoreCase))                 throw new IllegalTypeException('Illegal type of parameter $ignoreCase: '.getType($ignoreCase));
 
     $stringLen = strLen($string);
     $suffixLen = strLen($suffix);
@@ -988,8 +984,7 @@ function strToBool($value) {
  * @return string
  */
 function strCollapseWhiteSpace($string, $joinLines=true) {
-    if (!is_string($string))  throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
-    if (!is_bool($joinLines)) throw new IllegalTypeException('Illegal type of parameter $joinLines: '.getType($joinLines));
+    if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
 
     $string = normalizeEOL($string);
     if ($joinLines) {
