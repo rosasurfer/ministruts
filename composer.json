@@ -15,6 +15,9 @@
         "vendor-dir":         "etc/vendor",
         "optimize-autoloader": true
     },
+    "repositories": [{ 
+        "packagist.org": false 
+    }],
     "require": {
         "php":          "^5.6",
         "ext-mbstring": "*"
