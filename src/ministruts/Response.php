@@ -18,6 +18,7 @@ use function rosasurfer\strLeftTo;
 use function rosasurfer\strStartsWith;
 
 use const rosasurfer\CLI;
+use function rosasurfer\strRightFrom;
 
 
 /**
@@ -165,10 +166,22 @@ class Response extends Singleton {
      * @param  string $base - base URL
      *
      * @return string - absolute URL
+     *
+     *
+     * TODO: rewrite as parse_url() fails at query parameters with colons, e.g. "/beanstalk-console?server=vm-centos:11300"
      */
     public static function relativeToAbsoluteUrl($rel, $base) {
-        if (!$relParts  = parse_url($rel))  throw new InvalidArgumentException('Invalid argument $rel: '.$rel);
-        if (!$baseParts = parse_url($base)) throw new InvalidArgumentException('Invalid argument $base: '.$base);
+        $relFragment = strRightFrom($rel, '#');
+        strLen($relFragment) && $rel = strLeft($rel, -strLen($relFragment)-1);
+
+        $relQuery = strRightFrom($rel, '?');
+        strLen($relQuery) && $rel = strLeft($rel, -strLen($relQuery)-1);
+
+        if (($relParts =parse_url($rel )) === false) throw new InvalidArgumentException('Invalid argument $rel: '.$rel);
+        if (($baseParts=parse_url($base)) === false) throw new InvalidArgumentException('Invalid argument $base: '.$base);
+
+        strLen($relQuery)    && $relParts['query'   ] = $relQuery;
+        strLen($relFragment) && $relParts['fragment'] = $relFragment;
 
         try {
             // if $rel is empty return $base
