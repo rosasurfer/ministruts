@@ -15,10 +15,10 @@ use function rosasurfer\strContains;
 use function rosasurfer\strEndsWith;
 use function rosasurfer\strLeft;
 use function rosasurfer\strLeftTo;
+use function rosasurfer\strRightFrom;
 use function rosasurfer\strStartsWith;
 
 use const rosasurfer\CLI;
-use function rosasurfer\strRightFrom;
 
 
 /**
@@ -180,8 +180,14 @@ class Response extends Singleton {
         if (($relParts =parse_url($rel )) === false) throw new InvalidArgumentException('Invalid argument $rel: '.$rel);
         if (($baseParts=parse_url($base)) === false) throw new InvalidArgumentException('Invalid argument $base: '.$base);
 
-        strLen($relQuery)    && $relParts['query'   ] = $relQuery;
-        strLen($relFragment) && $relParts['fragment'] = $relFragment;
+        if (strLen($relQuery)) {
+            $relParts['query'] = $relQuery;
+            $rel .= '?'.$relQuery;
+        }
+        if (strLen($relFragment)) {
+            $relParts['fragment'] = $relFragment;
+            $rel .= '#'.$relFragment;
+        }
 
         try {
             // if $rel is empty return $base
