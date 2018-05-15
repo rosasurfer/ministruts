@@ -357,7 +357,7 @@ class PHP extends StaticClass {
             </div>
             <?php
             echo NL;
-            phpInfo();
+            @phpInfo();         // PHP might trigger warnings that are already checked and displayed (e.g. "date.timezone").
         }
     }
 
