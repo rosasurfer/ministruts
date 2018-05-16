@@ -1410,19 +1410,12 @@ function route($name) {
     $module  = $request->getModule();
     $mapping = $module->getMapping($name);
 
-    if ($mapping) {
-        $path = $mapping->getPath();
-        if ($path[0] == '/') {
-            $path = ($path=='/') ? '' : substr($path, 1);   // substr() returns FALSE on start==length
-        }
-    }
-    else {
-        $msg = 'Route "'.$name.'" not found';
-        if (isSet($_SERVER['APP_ENVIRONMENT']) && $_SERVER['APP_ENVIRONMENT']!='production') throw new RuntimeException($msg);
-        Logger::log($msg, L_ERROR, $context=['class'=>'']);
-        $path = '';
-    }
+    if (!$mapping) throw new RuntimeException('Route "'.$name.'" not found');
 
+    $path = $mapping->getPath();
+    if ($path[0] == '/') {
+        $path = ($path=='/') ? '' : substr($path, 1);   // substr() returns FALSE on start==length
+    }
     if ($query) $path .= $query;
     if ($hash)  $path .= $hash;
 
