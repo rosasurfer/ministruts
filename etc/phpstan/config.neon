@@ -22,7 +22,7 @@ parameters:
     universalObjectCratesClasses:
         - rosasurfer\ministruts\Page
      
-   #reportUnmatchedIgnoredErrors:           false
+    reportUnmatchedIgnoredErrors:           false
     polluteScopeWithLoopInitialAssignments: true
     polluteCatchScopeWithTryAssignments:    true
 
