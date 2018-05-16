@@ -457,7 +457,7 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Delete the instance from the storage mechanism. Must be overridden by the entity instance.
+     * Delete the instance from the storage mechanism.
      *
      * @return $this
      */
