@@ -371,16 +371,16 @@ abstract class PersistableObject extends Object {
     public function save() {
         if (!$this->isPersistent()) {
             $this->dao()->transaction(function() {
-                if ($this->beforeSave() === false)              // pre-processing hook
-                    return;
+                if ($this->beforeSave() !== true)               // pre-processing hook
+                    return $this;
                 $this->insert();
                 $this->afterSave();                             // post-processing hook
             });
         }
         elseif ($this->isModified()) {
             $this->dao()->transaction(function() {
-                if ($this->beforeSave() === false)              // pre-processing hook
-                    return;
+                if ($this->beforeSave() !== true)               // pre-processing hook
+                    return $this;
                 $this->update();
                 $this->afterSave();                             // post-processing hook
             });
@@ -401,7 +401,7 @@ abstract class PersistableObject extends Object {
         if ($this->isPersistent()) throw new RuntimeException('Cannot insert already persistent '.$this);
 
         // pre-processing hook
-        if ($this->beforeInsert() === false)
+        if ($this->beforeInsert() !== true)
             return $this;
 
         $mapping = $this->dao()->getMapping();
@@ -433,7 +433,7 @@ abstract class PersistableObject extends Object {
      */
     private function update() {
         // pre-processing hook
-        if ($this->beforeUpdate() === false)
+        if ($this->beforeUpdate() !== true)
             return $this;
 
         $mapping = $this->dao()->getMapping();
@@ -465,8 +465,8 @@ abstract class PersistableObject extends Object {
         if (!$this->isPersistent()) throw new InvalidArgumentException('Cannot delete non-persistent '.get_class($this));
 
         $this->dao()->transaction(function() {
-            if ($this->beforeDelete() === false)                            // pre-processing hook
-                return;
+            if ($this->beforeDelete() !== true)                             // pre-processing hook
+                return $this;
 
             if ($this->doDelete()) {                                        // perform deletion
                 // reset identity property
