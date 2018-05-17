@@ -10,6 +10,7 @@ use rosasurfer\exception\RuntimeException;
 use rosasurfer\util\PHP;
 
 use function rosasurfer\isRelativePath;
+use function rosasurfer\stderror;
 use function rosasurfer\strContains;
 use function rosasurfer\strIsQuoted;
 use function rosasurfer\strLeft;
@@ -103,8 +104,12 @@ class Config extends Object implements IConfig {
      * @return bool - success status
      */
     protected function loadFile($filename) {
-        $lines = file($filename, FILE_IGNORE_NEW_LINES);            // don't use not FILE_SKIP_EMPTY_LINES to have correct line
+        $lines = file($filename, FILE_IGNORE_NEW_LINES);            // don't use FILE_SKIP_EMPTY_LINES to have correct line
                                                                     // numbers for error messages
+        if ($lines && strStartsWith($lines[0], "\xEF\xBB\xBF")) {
+            $lines[0] = subStr($lines[0], 3);                       // skip BOM header at the beginning of the file
+        }
+
         foreach ($lines as $i => $line) {
             $line = trim($line);
             if (!strLen($line) || $line[0]=='#')                    // skip empty and comment lines
@@ -112,8 +117,10 @@ class Config extends Object implements IConfig {
 
             $parts = explode('=', $line, 2);                        // split key/value
             if (sizeOf($parts) < 2) {
-                // Don't use trigger_error() as it will enter an infinite loop if the same config is accessed again.
-                error_log(__METHOD__.'()  Skipping syntax error in "'.$filename.'", line '.($i+1).': missing key-value separator', ERROR_LOG_DEFAULT);
+                // Don't trigger a regular error as it will cause an infinite loop if the same config is used by the error handler.
+                $msg = __METHOD__.'()  Skipping syntax error in "'.$filename.'", line '.($i+1).': missing key-value separator';
+                stderror($msg);
+                error_log($msg, ERROR_LOG_DEFAULT);
                 continue;
             }
             $key      = trim($parts[0]);
