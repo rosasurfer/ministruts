@@ -107,7 +107,7 @@ class Config extends Object implements IConfig {
         $lines = file($filename, FILE_IGNORE_NEW_LINES);            // don't use FILE_SKIP_EMPTY_LINES to have correct line
                                                                     // numbers for error messages
         if ($lines && strStartsWith($lines[0], "\xEF\xBB\xBF")) {
-            $lines[0] = subStr($lines[0], 3);                       // skip BOM header at the beginning of the file
+            $lines[0] = subStr($lines[0], 3);                       // detect and drop a possible BOM header
         }
 
         foreach ($lines as $i => $line) {
