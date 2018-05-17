@@ -563,12 +563,12 @@ class Logger extends StaticClass {
             $msg .= $context['cliExtra'];
         $msg = str_replace(chr(0), '?', $msg);                   // replace NUL bytes which mess up the logfile
 
-        if (!ini_get('error_log') && CLI) {
+        if (CLI && empty(ini_get('error_log'))) {
             // Suppress duplicated output to STDERR, the PrintHandler already wrote to STDOUT.
-            // Instead of messing around here the PrintHandler must not print to STDOUT if the ErrorLogHandler
-            // is active and prints to STDERR.
-            //
-            // TODO: suppress output to STDERR in interactive terminals only (i.e. not in CRON)
+
+            // TODO: Instead of messing around here the PrintHandler must not print to STDOUT if the ErrorLogHandler
+            //       is active and prints to STDERR.
+            // TODO: Suppress output to STDERR in interactive terminals only (i.e. not in CRON).
         }
         else {
             error_log(trim($msg), ERROR_LOG_DEFAULT);
