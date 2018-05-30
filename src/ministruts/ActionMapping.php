@@ -494,7 +494,7 @@ class ActionMapping extends Object {
         }
 
         if ($forward->getName() == ActionForward::SELF) {
-            if ($this->configured) {                        // runtime: set the current request's query string
+            if ($this->configured) {                            // runtime: set the current request's query string
                 $path  = $this->path;
                 $query = Request::me()->getQueryString();
                 if (strLen($query))
@@ -502,6 +502,24 @@ class ActionMapping extends Object {
                 $forward->setPath($path);
             }
         }
+        return $forward;
+    }
+
+
+    /**
+     * Lookup and return the configured {@link ActionForward} accessible under the specified name. This method differs from
+     * {@link ActionMapping::findForward()} in that it always returns an instance.
+     *
+     * @param  string $name - logical name; can be "self" to return a redirect forward to the mapping itself
+     *
+     * @return ActionForward
+     *
+     * @throws StrutsConfigException if the forward was not found
+     */
+    public function findForwardOrFail($name) {
+        $forward = $this->findForward($name);
+        if (!$forward)
+            throw new StrutsConfigException('<mapping name="'.$this->getName().'"  path="'.$this->getPath().'": ActionForward "edit" not found.');
         return $forward;
     }
 }
