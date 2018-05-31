@@ -6,6 +6,7 @@ use rosasurfer\core\Singleton;
 use rosasurfer\db\ConnectorInterface as IConnector;
 use rosasurfer\exception\ConcurrentModificationException;
 use rosasurfer\exception\IllegalAccessException;
+use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
 
@@ -462,7 +463,7 @@ abstract class PersistableObject extends Object {
      * @return $this
      */
     public function delete() {
-        if (!$this->isPersistent()) throw new InvalidArgumentException('Cannot delete non-persistent '.get_class($this));
+        if (!$this->isPersistent()) throw new IllegalStateException('Cannot delete non-persistent '.get_class($this));
 
         $this->dao()->transaction(function() {
             if ($this->beforeDelete() !== true)                             // pre-processing hook
@@ -693,7 +694,7 @@ abstract class PersistableObject extends Object {
      * @return $this
      */
     public function reload($resetRelations = false) {   // TODO: implement and set default=TRUE
-        if (!$this->isPersistent()) throw new InvalidArgumentException('Cannot reload non-persistent '.get_class($this));
+        if (!$this->isPersistent()) throw new IllegalStateException('Cannot reload non-persistent '.get_class($this));
 
         // TODO: This method cannot yet handle composite primary keys.
 
