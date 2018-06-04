@@ -1,12 +1,12 @@
 #!/bin/bash
 #
-# This script is called by Composer after execution of "composer install". It copies the hook scripts contained in this  
-# directory to the project's Git hook directory. These scripts are called by Git each time the project is updated from the 
+# This script is called by Composer after execution of "composer install". It copies the hook scripts contained in this
+# directory to the project's Git hook directory. These scripts are called by Git each time the project is updated from the
 # repository.
 #
-# The scripts check the Composer lock file for modifications. If the lock file was modified by the update the scripts execute 
+# The scripts check the Composer lock file for modifications. If the lock file was modified by the update the scripts execute
 # "composer install" to automatically update any changed Composer dependencies. If the lock file was not modified the scripts
-# execute "composer dump-autoload" to automatically update any changed PHP class definitions. 
+# execute "composer dump-autoload" to automatically update any changed PHP class definitions.
 #
 # @see  https://getcomposer.org/doc/articles/scripts.md
 #

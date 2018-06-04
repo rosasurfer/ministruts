@@ -1,14 +1,14 @@
 #!/bin/bash
 #
-# Git hook to automatically execute Composer commands after a Git checkout. If the file "composer.lock" was modified by the 
-# checkout the command "composer install" is executed. If the file "composer.lock" was not modified by the checkout the 
+# Git hook to automatically execute Composer commands after a Git checkout. If the file "composer.lock" was modified by the
+# checkout the command "composer install" is executed. If the file "composer.lock" was not modified by the checkout the
 # command "composer dump-autoload" is executed.
 #
 #
-# Notes: 
+# Notes:
 # ------
 #  - If the hook is not executed automatically the Composer commands have to be called manually.
-#  - Whether or not hooks are executed by a graphical Git replacement depends on the tool. For example the JGit 
+#  - Whether or not hooks are executed by a graphical Git replacement depends on the tool. For example the JGit
 #    implementation of Eclipse atm does not execute hooks.
 #
 set -e
@@ -23,13 +23,13 @@ function error() {
 
 
 # check user aliases and get an existing Composer alias
-COMPOSER_ALIAS= 
+COMPOSER_ALIAS=
 COMPOSER_ALIAS_CHECKED=
 function check_composer_alias() {
     if [[ -z "$COMPOSER_ALIAS_CHECKED" && -f ~/.bash_aliases ]]; then
-        . ~/.bash_aliases 
+        . ~/.bash_aliases
         COMPOSER_ALIAS=${BASH_ALIASES[composer]:-${BASH_ALIASES[composer.phar]}}
-        unalias -a 
+        unalias -a
     fi
     COMPOSER_ALIAS_CHECKED=done
 }
@@ -53,7 +53,7 @@ CYGWIN=$(type -P cygpath.exe)
 if [[ -n "$CYGWIN" && "$TERM" == *"color"* ]]; then
     check_composer_alias
     COMPOSER=${COMPOSER_ALIAS:-$COMPOSER}
-fi    
+fi
 
 
 # get the changed files from Git
@@ -69,6 +69,6 @@ function check_lockfile() {
         COMPOSER_ALLOW_SUPERUSER=1 $COMPOSER install --ignore-platform-reqs --no-dev
     else
         COMPOSER_ALLOW_SUPERUSER=1 $COMPOSER dump-autoload
-    fi    
+    fi
 }
-check_lockfile 
+check_lockfile
