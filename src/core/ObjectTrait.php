@@ -5,6 +5,7 @@ use rosasurfer\di\DiAwareTrait;
 use rosasurfer\exception\RuntimeException;
 
 use function rosasurfer\strLeftTo;
+use function rosasurfer\strRightFrom;
 
 
 /**
@@ -31,7 +32,7 @@ trait ObjectTrait {
             if (strToLower($frame['function']) !== '__call') {
                 $class     = $frame['class'];
                 $namespace = strLeftTo($class, '\\', -1, true, '');
-                $name      = baseName($class);
+                $name      = strRightFrom($class, '\\', -1, false, $class);
                 $class     = strToLower($namespace).$name;
                 break;
             }

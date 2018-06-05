@@ -15,6 +15,7 @@ use function rosasurfer\strEndsWith;
 use function rosasurfer\strLeft;
 use function rosasurfer\strLeftTo;
 use function rosasurfer\strStartsWith;
+use function rosasurfer\strRightFrom;
 
 
 /**
@@ -859,7 +860,7 @@ class Module extends Object {
 
             if (is_class($value)) {                     // imported class
                 if (strStartsWith($value, '\\')) $value = subStr($value, 1);
-                $simpleName = strToLower(baseName($value));
+                $simpleName = strToLower(strRightFrom($value, '\\', -1, false, $value));
                 if (isSet($this->uses[$simpleName])) throw new StrutsConfigException('<imports> <import value="'.$import['value'].'": Duplicate value.');
                 $this->uses[$simpleName] = $value;
                 continue;
