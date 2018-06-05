@@ -62,7 +62,7 @@ class PHP extends StaticClass {
         $STDOUT = 1;
         $STDERR = 2;
 
-        $descriptors = [
+        $descriptors = [                                // for files instead of pipes:
             $STDIN  => ['pipe', 'rb'],                  // ['file', '/dev/tty', 'rb'],
             $STDOUT => ['pipe', 'wb'],                  // ['file', '/dev/tty', 'wb'],
             $STDERR => ['pipe', 'wb'],                  // ['file', '/dev/tty', 'wb'],
@@ -70,10 +70,27 @@ class PHP extends StaticClass {
         $pipes = [];
 
         $hProc = proc_open($cmd, $descriptors, $pipes, $dir, $env, ['bypass_shell'=>true]);
-                                                        // $pipes now looks like this:
-                                                        // 0 => writeable handle connected to the child's STDIN
-        $stdout = stream_get_contents($pipes[$STDOUT]); // 1 => readable handle connected to the child's STDOUT
-        $stderr = stream_get_contents($pipes[$STDERR]); // 2 => readable handle connected to the child's STDERR
+
+        // $pipes now looks like this:
+        // $pipes[0] => writeable handle connected to the child's STDIN
+        // $pipes[1] => readable handle connected to the child's STDOUT
+        // $pipes[2] => readable handle connected to the child's STDERR
+
+        stream_set_blocking($pipes[$STDIN ], false);
+        stream_set_blocking($pipes[$STDOUT], false);
+        stream_set_blocking($pipes[$STDERR], false);
+
+    	$stdout = $stderr = null;
+        while (!fEof($pipes[$STDOUT]) || !fEof($pipes[$STDERR])) {
+    		if (($line=fGets($pipes[$STDOUT])) !== false) {
+                $stdout .= $line;
+                //echo 'STDOUT: '.$line;
+    		}
+            if (($line=fGets($pipes[$STDERR])) !== false) {
+                $stderr .= $line;
+                //echo 'STDERR: '.$line;
+            }
+        }
 
         fClose($pipes[$STDIN ]);                        // pipes must be closed before proc_close() to avoid a deadlock
         fClose($pipes[$STDOUT]);
@@ -89,6 +106,14 @@ class PHP extends StaticClass {
             ERROR_PATH_NOT_FOUND => 'The specified path was not found (3).',
             ERROR_BAD_FORMAT     => 'The .exe file is invalid (11).',
         ];
+
+        @see  https://blog.dubbelboer.com/2012/08/24/execute-with-timeout.html
+        @see  https://stackoverflow.com/questions/5309900/php-process-execution-timeout
+        @see  https://stackoverflow.com/questions/2603912/php-set-timeout-for-script-with-system-call-set-time-limit-not-working
+        @see  https://bugs.php.net/bug.php?id=64438  +++
+        @see  https://bugs.php.net/bug.php?id=51800  +++
+        @see  https://stackoverflow.com/questions/31194152/proc-open-hangs-when-trying-to-read-from-a-stream
+        @see  https://www.ntwind.com/software/hstart.html
         */
     }
 
