@@ -46,7 +46,7 @@ abstract class Result extends Object implements ResultInterface {
      * {@inheritdoc}
      */
     public function fetchColumn($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
-        if (!is_null($row)) throw new UnimplementedFeatureException('$row='.$row.' (!= NULL)');
+        if (isSet($row)) throw new UnimplementedFeatureException('$row='.$row.' (!= NULL)');
 
         // Generic default implementation:
         // A connector-specific implementation will be faster and more efficient.

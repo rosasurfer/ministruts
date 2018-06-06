@@ -47,10 +47,10 @@ class MySQLResult extends Result {
      * @param  int        $lastAffectedRows - last number of affected rows of the connection
      */
     public function __construct(IConnector $connector, $sql, $hResult, $lastInsertId, $lastAffectedRows) {
-        if (!is_string($sql))                             throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
-        if (!is_resource($hResult) && !is_null($hResult)) throw new IllegalTypeException('Illegal type of parameter $hResult: '.getType($hResult));
-        if (!is_int($lastInsertId))                       throw new IllegalTypeException('Illegal type of parameter $lastInsertId: '.getType($lastInsertId));
-        if (!is_int($lastAffectedRows))                   throw new IllegalTypeException('Illegal type of parameter $lastAffectedRows: '.getType($lastAffectedRows));
+        if (!is_string($sql))                          throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
+        if (!is_resource($hResult) && isSet($hResult)) throw new IllegalTypeException('Illegal type of parameter $hResult: '.getType($hResult));
+        if (!is_int($lastInsertId))                    throw new IllegalTypeException('Illegal type of parameter $lastInsertId: '.getType($lastInsertId));
+        if (!is_int($lastAffectedRows))                throw new IllegalTypeException('Illegal type of parameter $lastAffectedRows: '.getType($lastAffectedRows));
 
         $this->connector        = $connector;
         $this->sql              = $sql;

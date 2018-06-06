@@ -778,7 +778,7 @@ class Module extends Object {
         $name = $tile->getName();
         $this->tiles[$name] = $tile;
 
-        if (!is_null($alias))
+        if (isSet($alias))
             $this->tiles[$alias] = $tile;
     }
 

@@ -166,7 +166,7 @@ class MySQLConnector extends Connector {
      * @return $this
      */
     protected function setDatabase($name) {
-        if (!is_null($name) && !is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
+        if (isSet($name) && !is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
         if (!strLen($name))
             $name = null;
 
