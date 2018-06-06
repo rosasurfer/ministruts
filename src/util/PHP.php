@@ -112,6 +112,7 @@ class PHP extends StaticClass {
         @see  https://stackoverflow.com/questions/2603912/php-set-timeout-for-script-with-system-call-set-time-limit-not-working
         @see  https://bugs.php.net/bug.php?id=64438  +++
         @see  https://bugs.php.net/bug.php?id=51800  +++
+        @see  http://blogs.msdn.com/b/oldnewthing/archive/2011/07/07/10183884.aspx
         @see  https://stackoverflow.com/questions/31194152/proc-open-hangs-when-trying-to-read-from-a-stream
         @see  https://www.ntwind.com/software/hstart.html
         */
