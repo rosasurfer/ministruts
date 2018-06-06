@@ -46,32 +46,38 @@ class PHP extends StaticClass {
      * Execute a process and return STDOUT. Replacement for shell_exec() wich suffers from a Windows bug where a DOS EOF
      * character (0x1A = ASCII 26) in the STDOUT stream causes further reading to stop.
      *
-     * @param  string   $cmd                 - shell command to execute
-     * @param  string   $stderr   [optional] - if present a variable STDERR will be written to
-     * @param  int      $exitCode [optional] - if present a variable the program exit code will be written to
+     * pOpen() suffers from the same bug.
+     * passThru() does not capture STDERR.
+     *
+     * @param  string   $cmd                 - external command to execute
+     * @param  string   $stderr   [optional] - if present a variable the contents of STDERR will be written to
+     * @param  int      $exitCode [optional] - if present a variable the commands's exit code will be written to
      * @param  string   $dir      [optional] - if present the initial working directory for the command
      * @param  string[] $env      [optional] - if present the environment to *replace* the current one
+     * @param  array    $options  [optional] - additional options controlling runtime behaviour: <br>
+     *          "passthrough-stdout" => bool:  whether or not to additionally pass-through the contents of STDOUT <br>
+     *                                         (default: no) <br>
+     *          "passthrough-stderr" => bool:  whether or not to additionally pass-through the contents of STDERR <br>
+     *                                         (default: no) <br>
      *
-     * @return string - content of STDOUT
+     * @return string - contents of STDOUT
      */
-    public static function execProcess($cmd, &$stderr=null, &$exitCode=null, $dir=null, $env=null) {
+    public static function execProcess($cmd, &$stderr=null, &$exitCode=null, $dir=null, $env=null, array $options=[]) {
         if (!is_string($cmd)) throw new IllegalTypeException('Illegal type of parameter $cmd: '.getType($cmd));
-        // pOpen() suffers from the same bug
 
-        $STDIN  = 0;
+        $STDIN  = 0;                                // descriptor indexes
         $STDOUT = 1;
         $STDERR = 2;
 
-        $descriptors = [                                // for files instead of pipes:
-            $STDIN  => ['pipe', 'rb'],                  // ['file', '/dev/tty', 'rb'],
-            $STDOUT => ['pipe', 'wb'],                  // ['file', '/dev/tty', 'wb'],
-            $STDERR => ['pipe', 'wb'],                  // ['file', '/dev/tty', 'wb'],
+        $descriptors = [                            // can be pipes or files:
+            $STDIN  => ['pipe', 'rb'],              // ['file', '/dev/tty', 'rb'],
+            $STDOUT => ['pipe', 'wb'],              // ['file', '/dev/tty', 'wb'],
+            $STDERR => ['pipe', 'wb'],              // ['file', '/dev/tty', 'wb'],
         ];
         $pipes = [];
-
         $hProc = proc_open($cmd, $descriptors, $pipes, $dir, $env, ['bypass_shell'=>true]);
 
-        // $pipes now looks like this:
+        // $pipes[] now looks like this:
         // $pipes[0] => writeable handle connected to the child's STDIN
         // $pipes[1] => readable handle connected to the child's STDOUT
         // $pipes[2] => readable handle connected to the child's STDERR
@@ -80,19 +86,20 @@ class PHP extends StaticClass {
         stream_set_blocking($pipes[$STDOUT], false);
         stream_set_blocking($pipes[$STDERR], false);
 
-    	$stdout = $stderr = '';
-        while (!fEof($pipes[$STDOUT]) || !fEof($pipes[$STDERR])) {
-    		if (($line=fGets($pipes[$STDOUT])) !== false) {
-                $stdout .= $line;
-                //echo 'STDOUT: '.$line;
-    		}
-            if (($line=fGets($pipes[$STDERR])) !== false) {
-                $stderr .= $line;
-                //echo 'STDERR: '.$line;
-            }
+        $stdout = $stderr = '';                     // descriptor contents
+        $stdoutPassthrough = isSet($options['passthrough-stdout']) && $options['passthrough-stdout'];
+        $stderrPassthrough = isSet($options['passthrough-stderr']) && $options['passthrough-stderr'];
+
+        while (!fEof($pipes[$STDOUT]) && ($line=fGets($pipes[$STDOUT]))!==false) {
+            $stdout .= $line;
+            if ($stdoutPassthrough) echo $line;
+        }
+        while (!fEof($pipes[$STDERR]) && ($line=fGets($pipes[$STDERR]))!==false) {
+            $stderr .= $line;
+            if ($stderrPassthrough) echo $line;
         }
 
-        fClose($pipes[$STDIN ]);                        // pipes must be closed before proc_close() to avoid a deadlock
+        fClose($pipes[$STDIN ]);                    // pipes must be closed before proc_close() to prevent a deadlock
         fClose($pipes[$STDOUT]);
         fClose($pipes[$STDERR]);
 
@@ -101,20 +108,11 @@ class PHP extends StaticClass {
 
         /*
         $win32Errors = [
-            0                    => 'The system is out of memory or resources.',
+            0                    => 'The system is out of memory or resources (0).',
             ERROR_FILE_NOT_FOUND => 'The specified file was not found (2).',
             ERROR_PATH_NOT_FOUND => 'The specified path was not found (3).',
             ERROR_BAD_FORMAT     => 'The .exe file is invalid (11).',
         ];
-
-        @see  https://blog.dubbelboer.com/2012/08/24/execute-with-timeout.html
-        @see  https://stackoverflow.com/questions/5309900/php-process-execution-timeout
-        @see  https://stackoverflow.com/questions/2603912/php-set-timeout-for-script-with-system-call-set-time-limit-not-working
-        @see  https://bugs.php.net/bug.php?id=64438  +++
-        @see  https://bugs.php.net/bug.php?id=51800  +++
-        @see  http://blogs.msdn.com/b/oldnewthing/archive/2011/07/07/10183884.aspx
-        @see  https://stackoverflow.com/questions/31194152/proc-open-hangs-when-trying-to-read-from-a-stream
-        @see  https://www.ntwind.com/software/hstart.html
         */
     }
 
