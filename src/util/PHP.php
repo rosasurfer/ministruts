@@ -80,7 +80,7 @@ class PHP extends StaticClass {
         stream_set_blocking($pipes[$STDOUT], false);
         stream_set_blocking($pipes[$STDERR], false);
 
-    	$stdout = $stderr = null;
+    	$stdout = $stderr = '';
         while (!fEof($pipes[$STDOUT]) || !fEof($pipes[$STDERR])) {
     		if (($line=fGets($pipes[$STDOUT])) !== false) {
                 $stdout .= $line;
