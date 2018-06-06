@@ -156,7 +156,8 @@ function processEntry($entry) {
  */
 function help($message = null) {
     if (isSet($message))
-        echo($message.NL);
+        echo $message.NL;
+
     $self = baseName($_SERVER['PHP_SELF']);
 
 echo <<<HELP
