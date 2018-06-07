@@ -208,6 +208,8 @@ class MySQLConnector extends Connector {
      * @return $this
      */
     public function connect() {
+        if (!function_exists('\mysql_connect')) throw new RuntimeException('Undefined function mysql_connect(), mysql extension is not available');
+
         $host = $this->host; if ($this->port) $host .= ':'.$this->port;
         $user = $this->username;
         $pass = $this->password;

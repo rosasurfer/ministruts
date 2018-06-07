@@ -253,6 +253,8 @@ class PostgresConnector extends Connector {
      * @return $this
      */
     public function connect() {
+        if (!function_exists('\pg_connect')) throw new RuntimeException('Undefined function pg_connect(), pgsql extension is not available');
+
         $connStr = $this->getConnectionString();
         try {
             $php_errormsg = '';
