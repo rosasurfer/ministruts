@@ -8,6 +8,9 @@ use rosasurfer\core\Object;
 use rosasurfer\exception\RuntimeException;
 
 
+/**
+ *
+ */
 abstract class DynamicReturnType extends Object {
 
 

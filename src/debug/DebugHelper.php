@@ -8,6 +8,7 @@ use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\exception\error\PHPError;
 
 use function rosasurfer\normalizeEOL;
+use function rosasurfer\simpleClassName;
 use function rosasurfer\strEndsWith;
 use function rosasurfer\strLeftTo;
 use function rosasurfer\strRightFrom;
@@ -191,7 +192,7 @@ class DebugHelper extends StaticClass {
         else {
             $class     = get_class($exception);
             $namespace = strToLower(strLeftTo($class, '\\', -1, true, ''));
-            $baseName  = strRightFrom($class, '\\', -1, false, $class);
+            $baseName  = simpleClassName($class);
             $result    = $indent.$namespace.$baseName;
 
             if ($exception instanceof \ErrorException)                                  // A PHP error exception not created

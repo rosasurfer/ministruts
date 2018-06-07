@@ -715,6 +715,18 @@ function is_trait($name) {
 
 
 /**
+ * Return the simple name of a class name (i.e. the base name).
+ *
+ * @param  string $className - full class name
+ *
+ * @return string
+ */
+function simpleClassName($className) {
+    return \rosasurfer\simpleClassName($className);
+}
+
+
+/**
  * Return one of the metatypes "class", "interface" or "trait" for an object type identifier.
  *
  * @param  string $name - name

@@ -127,7 +127,7 @@ function dump($var, $return=false, $flushBuffers=true) {
 
 
 /**
- * Functional replacement for "echo($var)" which is a language construct and can't be used as a regular function.
+ * Functional replacement for <tt>"echo($var)"</tt> which is a language construct and can't be used as a regular function.
  *
  * @param  mixed $var
  * @param  bool  $flushBuffers [optional] - whether or not to flush output buffers (default: TRUE)
@@ -1194,6 +1194,18 @@ function is_trait($name) {
     catch (\Exception $ex) {/* loaders might wrongly throw exceptions blocking us from continuation */}
 
     return trait_exists($name, false);
+}
+
+
+/**
+ * Return the simple name of a class name (i.e. the base name).
+ *
+ * @param  string $className - full class name
+ *
+ * @return string
+ */
+function simpleClassName($className) {
+    return strRightFrom($className, '\\', -1, false, $className);
 }
 
 

@@ -9,13 +9,13 @@ use rosasurfer\net\http\HttpResponse;
 
 use function rosasurfer\is_class;
 use function rosasurfer\isRelativePath;
+use function rosasurfer\simpleClassName;
 use function rosasurfer\strCompareI;
 use function rosasurfer\strContains;
 use function rosasurfer\strEndsWith;
 use function rosasurfer\strLeft;
 use function rosasurfer\strLeftTo;
 use function rosasurfer\strStartsWith;
-use function rosasurfer\strRightFrom;
 
 
 /**
@@ -860,7 +860,7 @@ class Module extends Object {
 
             if (is_class($value)) {                     // imported class
                 if (strStartsWith($value, '\\')) $value = subStr($value, 1);
-                $simpleName = strToLower(strRightFrom($value, '\\', -1, false, $value));
+                $simpleName = simpleClassName($value);
                 if (isSet($this->uses[$simpleName])) throw new StrutsConfigException('<imports> <import value="'.$import['value'].'": Duplicate value.');
                 $this->uses[$simpleName] = $value;
                 continue;
