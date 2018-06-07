@@ -75,8 +75,15 @@ class PHP extends StaticClass {
             $STDERR => ['pipe', 'wb'],              // ['file', '/dev/tty', 'wb'],
         ];
         $pipes = [];
-        $hProc = proc_open($cmd, $descriptors, $pipes, $dir, $env, ['bypass_shell'=>true]);
 
+        try {
+            $hProc = proc_open($cmd, $descriptors, $pipes, $dir, $env, ['bypass_shell'=>true]);
+        }
+        catch (\Exception $ex) {
+            if (WINDOWS && preg_match('/proc_open\(\): CreateProcess failed, error code - ([0-9]+)/i', $ex->getMessage(), $match))
+                throw new RuntimeException($ex->getMessage().' ('.Windows::errorToString((int) $match[1]).')', null, $ex);
+            throw $ex;
+        }
         // $pipes[] now looks like this:
         // $pipes[0] => writeable handle connected to the child's STDIN
         // $pipes[1] => readable handle connected to the child's STDOUT
@@ -105,15 +112,6 @@ class PHP extends StaticClass {
 
         $exitCode = proc_close($hProc);
         return $stdout;
-
-        /*
-        $win32Errors = [
-            0                    => 'The system is out of memory or resources (0).',
-            ERROR_FILE_NOT_FOUND => 'The specified file was not found (2).',
-            ERROR_PATH_NOT_FOUND => 'The specified path was not found (3).',
-            ERROR_BAD_FORMAT     => 'The .exe file is invalid (11).',
-        ];
-        */
     }
 
 
