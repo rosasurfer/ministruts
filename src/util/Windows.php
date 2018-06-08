@@ -16,10 +16,11 @@ class Windows extends StaticClass {
 
     /** @var array - Win32 errors and descriptions */
     private static $win32Errors = [
-         0 => ['0',                    'The system is out of memory or resources.'],
-         2 => ['ERROR_FILE_NOT_FOUND', 'The specified file was not found.'        ],
-         3 => ['ERROR_PATH_NOT_FOUND', 'The specified path was not found.'        ],
-        11 => ['ERROR_BAD_FORMAT',     'The .exe file is invalid.'                ],
+          0 => ['0',                    'The system is out of memory or resources.'                      ],
+          2 => ['ERROR_FILE_NOT_FOUND', 'The system cannot find the file specified.'                     ],
+          3 => ['ERROR_PATH_NOT_FOUND', 'The system cannot find the path specified.'                     ],
+         11 => ['ERROR_BAD_FORMAT',     'An attempt was made to load a program with an incorrect format.'],
+        193 => ['ERROR_BAD_EXE_FORMAT', 'The command is not a valid Win32 application.'                  ],
     ];
 
 

@@ -12,6 +12,7 @@ use function rosasurfer\ini_get_bool;
 use function rosasurfer\ini_get_bytes;
 use function rosasurfer\ini_get_int;
 use function rosasurfer\php_byte_value;
+use function rosasurfer\stderror;
 use function rosasurfer\strContains;
 use function rosasurfer\strRight;
 use function rosasurfer\strRightFrom;
@@ -55,9 +56,9 @@ class PHP extends StaticClass {
      * @param  string   $dir      [optional] - if present the initial working directory for the command
      * @param  string[] $env      [optional] - if present the environment to *replace* the current one
      * @param  array    $options  [optional] - additional options controlling runtime behaviour: <br>
-     *          "passthrough-stdout" => bool:  whether or not to additionally pass-through the contents of STDOUT <br>
+     *          "stdout-passthrough" => bool:  whether or not to additionally pass-through the contents of STDOUT <br>
      *                                         (default: no) <br>
-     *          "passthrough-stderr" => bool:  whether or not to additionally pass-through the contents of STDERR <br>
+     *          "stderr-passthrough" => bool:  whether or not to additionally pass-through the contents of STDERR <br>
      *                                         (default: no) <br>
      *
      * @return string - contents of STDOUT
@@ -65,14 +66,10 @@ class PHP extends StaticClass {
     public static function execProcess($cmd, &$stderr=null, &$exitCode=null, $dir=null, $env=null, array $options=[]) {
         if (!is_string($cmd)) throw new IllegalTypeException('Illegal type of parameter $cmd: '.getType($cmd));
 
-        $STDIN  = 0;                                // descriptor indexes
-        $STDOUT = 1;
-        $STDERR = 2;
-
-        $descriptors = [                            // can be pipes or files:
-            $STDIN  => ['pipe', 'rb'],              // ['file', '/dev/tty', 'rb'],
-            $STDOUT => ['pipe', 'wb'],              // ['file', '/dev/tty', 'wb'],
-            $STDERR => ['pipe', 'wb'],              // ['file', '/dev/tty', 'wb'],
+        $descriptors = [                                // "pipes" or "files":
+            ($STDIN =0) => ['pipe', 'rb'],              // ['file', '/dev/tty', 'rb'],
+            ($STDOUT=1) => ['pipe', 'wb'],              // ['file', '/dev/tty', 'wb'],
+            ($STDERR=2) => ['pipe', 'wb'],              // ['file', '/dev/tty', 'wb'],
         ];
         $pipes = [];
 
@@ -80,35 +77,47 @@ class PHP extends StaticClass {
             $hProc = proc_open($cmd, $descriptors, $pipes, $dir, $env, ['bypass_shell'=>true]);
         }
         catch (\Exception $ex) {
-            if (WINDOWS && preg_match('/proc_open\(\): CreateProcess failed, error code - ([0-9]+)/i', $ex->getMessage(), $match))
-                throw new RuntimeException($ex->getMessage().' ('.Windows::errorToString((int) $match[1]).')', null, $ex);
+            if (WINDOWS && preg_match('/proc_open\(\): CreateProcess failed, error code - ([0-9]+)/i', $ex->getMessage(), $match)) {
+                $error = Windows::errorToString((int) $match[1]);
+                if ($error != $match[1]) throw new RuntimeException($ex->getMessage().' ('.$error.')', null, $ex);
+            }
             throw $ex;
         }
-        // $pipes[] now looks like this:
-        // $pipes[0] => writeable handle connected to the child's STDIN
-        // $pipes[1] => readable handle connected to the child's STDOUT
-        // $pipes[2] => readable handle connected to the child's STDERR
+        fClose             ($pipes[$STDIN]);            // $pipes[0] => writeable handle connected to the child's STDIN
+        stream_set_blocking($pipes[$STDOUT], false);    // $pipes[1] => readable handle connected to the child's STDOUT
+        stream_set_blocking($pipes[$STDERR], false);    // $pipes[2] => readable handle connected to the child's STDERR
 
-        stream_set_blocking($pipes[$STDIN ], false);
-        stream_set_blocking($pipes[$STDOUT], false);
-        stream_set_blocking($pipes[$STDERR], false);
+        $stdoutPassthrough = isSet($options['stdout-passthrough']) && $options['stdout-passthrough'];
+        $stderrPassthrough = isSet($options['stderr-passthrough']) && $options['stderr-passthrough'];
 
-        $stdout = $stderr = '';                     // descriptor contents
-        $stdoutPassthrough = isSet($options['passthrough-stdout']) && $options['passthrough-stdout'];
-        $stderrPassthrough = isSet($options['passthrough-stderr']) && $options['passthrough-stderr'];
-
-        while (!fEof($pipes[$STDOUT]) && ($line=fGets($pipes[$STDOUT]))!==false) {
-            $stdout .= $line;
-            if ($stdoutPassthrough) echo $line;
-        }
-        while (!fEof($pipes[$STDERR]) && ($line=fGets($pipes[$STDERR]))!==false) {
-            $stderr .= $line;
-            if ($stderrPassthrough) echo $line;
-        }
-
-        fClose($pipes[$STDIN ]);                    // pipes must be closed before proc_close() to prevent a deadlock
-        fClose($pipes[$STDOUT]);
-        fClose($pipes[$STDERR]);
+        $observed = [                                                   // streams to watch
+            (int)$pipes[$STDOUT] => $pipes[$STDOUT],
+            (int)$pipes[$STDERR] => $pipes[$STDERR],
+        ];
+        $handlers = [                                                   // a handler for each stream
+            (int)$pipes[$STDOUT] => function($line) use (&$stdout, $stdoutPassthrough) {
+                $stdout .= $line; if ($stdoutPassthrough) echo $line;
+            },
+            (int)$pipes[$STDERR] => function($line) use (&$stderr, $stderrPassthrough) {
+                $stderr .= $line; if ($stderrPassthrough) stderror($line);
+            },
+        ];
+        $stdout = $stderr = '';                                         // stream contents
+        $null = null;
+        do {
+            $readable = $observed;
+            $changes = stream_select($readable, $null, $null, $seconds=0, $microseconds=200000);    // timeout = 0.2 sec
+            foreach ($readable as $stream) {
+                if (($line = fGets($stream)) === false) {               // covers fEof() too
+                    fClose($stream);
+                    unset($observed[(int)$stream]);                     // close and remove from observed streams
+                    continue;
+                }
+                do {
+                    $handlers[(int)$stream]($line);                     // process incoming content
+                } while (!WINDOWS && ($line=fGets($stream))!==false);   // on Windows a second call blocks
+            }
+        } while ($observed);                                            // loop until all observable streams are closed
 
         $exitCode = proc_close($hProc);
         return $stdout;
