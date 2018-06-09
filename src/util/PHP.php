@@ -94,6 +94,7 @@ class PHP extends StaticClass {
             (int)$pipes[$STDOUT] => $pipes[$STDOUT],
             (int)$pipes[$STDERR] => $pipes[$STDERR],
         ];
+        $stdout = $stderr = '';                                         // stream contents
         $handlers = [                                                   // a handler for each stream
             (int)$pipes[$STDOUT] => function($line) use (&$stdout, $stdoutPassthrough) {
                 $stdout .= $line; if ($stdoutPassthrough) echo $line;
@@ -102,13 +103,12 @@ class PHP extends StaticClass {
                 $stderr .= $line; if ($stderrPassthrough) stderror($line);
             },
         ];
-        $stdout = $stderr = '';                                         // stream contents
         $null = null;
         do {
             $readable = $observed;
             $changes = stream_select($readable, $null, $null, $seconds=0, $microseconds=200000);    // timeout = 0.2 sec
             foreach ($readable as $stream) {
-                if (($line = fGets($stream)) === false) {               // covers fEof() too
+                if (($line = fGets($stream)) === false) {               // this covers fEof() too
                     fClose($stream);
                     unset($observed[(int)$stream]);                     // close and remove from observed streams
                     continue;
