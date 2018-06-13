@@ -222,7 +222,7 @@ class Config extends Object implements IConfig {
      * @return bool|null - boolean value or NULL if the flag FILTER_NULL_ON_FAILURE is set and the setting does not represent
      *                     a boolean value
      *
-     * @throws RuntimeException if the setting does not exist and $default was not specified
+     * @throws RuntimeException if the setting does not exist and no default value was specified
      */
     public function getBool($key, $options = null) {
         if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
