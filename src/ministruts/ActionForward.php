@@ -6,6 +6,8 @@ use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\net\http\HttpResponse;
 
+use function rosasurfer\strLeftTo;
+
 
 /**
  * ActionForward
@@ -210,6 +212,29 @@ class ActionForward extends Object {
         $path      = $this->getPath();
         $separator = (strPos($path, '?')!==false) ? '&' : '?';
         $this->setPath($path.$separator.$key.'='.str_replace([' ','#','&'], ['%20','%23','%26'], $value));
+
+        return $this;
+    }
+
+
+    /**
+     * Set the hash fragment of the forward's URL.
+     *
+     * @param  string $value - hash value
+     *
+     * @return $this
+     */
+    public function setHash($value) {
+
+        // TODO: freeze the instance after configuration and automatically call copy()
+
+        if (isSet($value)) {
+            if     (is_bool($value))    $value = (int) $value;
+            elseif (!is_scalar($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
+        }
+        $value = (string) $value;
+        $path = $this->getPath();
+        $this->setPath(strLeftTo($path, '#', $count=1, $includeLimiter=false, $onNotFound=$path).'#'.$value);
 
         return $this;
     }
