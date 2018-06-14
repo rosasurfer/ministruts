@@ -1,4 +1,9 @@
 
+2018-06-14
+
+   - struts: add method ministruts\ActionForward::setHash()
+
+
 2018-06-07
 
    - util: add helper function simpleClassName()
