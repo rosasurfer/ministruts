@@ -175,7 +175,7 @@ function printPretty($var, $return=false, $flushBuffers=true) {
  *
  * @return string - formatted byte value
  */
-function prettyBytes($value, $decimals=1) {
+function prettyBytes($value, $decimals = 1) {
     return \rosasurfer\prettyBytes($value, $decimals);
 }
 
