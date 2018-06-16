@@ -73,6 +73,18 @@ const EOL_WINDOWS       = \rosasurfer\EOL_WINDOWS;              // "\r\n"     CR
 
 
 /**
+ * Convert a value to a boolean and return the human-readable string "true" or "false".
+ *
+ * @param  mixed $value - value interpreted as a boolean
+ *
+ * @return string
+ */
+function boolToStr($value) {
+    return \rosasurfer\boolToStr($value);
+}
+
+
+/**
  * Dumps a variable to the standard output device or into a string.
  *
  * @param  mixed $var                     - variable

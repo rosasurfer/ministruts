@@ -106,6 +106,30 @@ define('PHP_INI_ALL',    INI_ALL   );       // 7    flag            // entry can
 
 
 /**
+ * Convert a value to a boolean and return the human-readable string "true" or "false".
+ *
+ * @param  mixed $value - value interpreted as a boolean
+ *
+ * @return string
+ */
+function boolToStr($value) {
+    if (is_string($value)) {
+        $value = trim(strToLower($value));
+        switch ($value) {
+            case 'true' :
+            case 'on'   :
+            case 'yes'  : return 'true';
+
+            case 'false':
+            case 'off'  :
+            case 'no'   : return 'false';
+        }
+    }
+    return $value ? 'true':'false';
+}
+
+
+/**
  * Dumps a variable to the standard output device or into a string.
  *
  * @param  mixed $var                     - variable
