@@ -30,16 +30,16 @@ use const rosasurfer\NL;
  *
  * @example
  * <pre>
- * db.connector = mysql                         # subkey notation creates associative array branches
+ * db.connector = mysql                         # named key notation creates associative property branches
  * db.host      = localhost:3306
  * db.database  = dbname
  *
- * db.options[] = value-at-index-0              # bracket notation creates indexed array branches
- * db.options[] = value-at-index-1
- * db.options[] = value-at-index-2
+ * db.options[] = value at index 0              # bracket notation creates indexed property branches
+ * db.options[] = value at index 1
+ * db.options[] = value at index 2
  *
  * # a comment on its own line
- * log.level.Action          = warn             # a comment at the end of line
+ * log.level.Action          = warn             # a trailing comment
  * log.level.foo\bar\MyClass = notice           # subkeys may contain any character except the dot "."
  *
  * key.subkey with spaces    = value            # subkeys may contain spaces...
@@ -48,9 +48,9 @@ use const rosasurfer\NL;
  * key                       = value            # the root value of an array is accessed via an empty subkey: key.""
  *
  * &lt;?php
- * Config::get('db.connector')                  // return a single value
- * Config::get('db')                            // return an associative array of values ['connector'=>..., 'host'=>...]
- * Config::get('db.options')                    // return a numerical indexed array of values [0=>..., 1=>..., 2=>...]
+ * Config::get('db.connector')                  # return a single value
+ * Config::get('db')                            # return an associative array of values ['connector'=>..., 'host'=>...]
+ * Config::get('db.options')                    # return a numerical indexed array of values [0=>..., 1=>..., 2=>...]
  * </pre>
  */
 class Config extends Object implements IConfig {
@@ -662,5 +662,15 @@ class Config extends Object implements IConfig {
      */
     public function offsetUnset($key) {
         $this->set($key, null);
+    }
+
+
+    /**
+     * Count the root properties of the configuration.
+     *
+     * @return int
+     */
+    public function count() {
+        return sizeOf($this->properties);
     }
 }

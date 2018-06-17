@@ -7,7 +7,7 @@ use rosasurfer\exception\RuntimeException;
 /**
  * Interface to be implemented by concrete configurations.
  */
-interface ConfigInterface extends \ArrayAccess {
+interface ConfigInterface extends \ArrayAccess, \Countable {
 
 
     /**
