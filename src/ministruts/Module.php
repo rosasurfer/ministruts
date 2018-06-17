@@ -470,13 +470,13 @@ class Module extends Object {
                 $redirect = isSet($forwardTag['redirect']) ? (string)$forwardTag['redirect'] : null;
                 $alias    = isSet($forwardTag['alias'   ]) ? (string)$forwardTag['alias'   ] : null;
 
-                $forward = null;
-
                 if (is_string($include)) {
                     if (is_string($redirect) || is_string($alias)) throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'"> <forward name="'.$name.'": Only one of "include", "redirect" or "alias" can be specified.');
 
                     $this->tilesContext = [];
                     if (!$this->isIncludable($include, $xml)) throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'"> <forward name="'.$name.'" include="'.$include.'": '.(strStartsWith($include, '.') ? 'Tiles definition':'File').' not found.');
+
+                    $forward = null;
 
                     if ($this->isTileDefinition($include, $xml)) {
                         $tile = $this->getTile($include, $xml);
@@ -489,6 +489,7 @@ class Module extends Object {
                         $forward = new $this->forwardClass($name, $this->findFile($include), false);
                         $forward->setLabel(subStr($include, 0, strRPos($include, '.')));
                     }
+                    $mapping->addForward($name, $forward);
                 }
 
                 if (is_string($redirect)) {
@@ -496,8 +497,8 @@ class Module extends Object {
 
                     /** @var ActionForward $forward */
                     $forward = new $this->forwardClass($name, $redirect, true);     // TODO: URL validieren
+                    $mapping->addForward($name, $forward);
                 }
-                $mapping->addForward($name, $forward);
             }
 
             // local 'alias' forwards (parsed after all other local forwards to be able to access them)

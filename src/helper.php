@@ -173,7 +173,7 @@ function echof($var, $flushBuffers=true) {
  *
  * @see    printPretty()
  */
-function echoPre($var, $flushBuffers=true) {
+function echoPre($var, $flushBuffers = true) {
     printPretty($var, false, $flushBuffers);
 }
 
