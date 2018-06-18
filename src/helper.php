@@ -156,7 +156,7 @@ function dump($var, $return=false, $flushBuffers=true) {
  * @param  mixed $var
  * @param  bool  $flushBuffers [optional] - whether or not to flush output buffers (default: TRUE)
  */
-function echof($var, $flushBuffers=true) {
+function echof($var, $flushBuffers = true) {
     echo $var;
     if ($flushBuffers)
         ob_get_level() && ob_flush();
@@ -174,7 +174,7 @@ function echof($var, $flushBuffers=true) {
  * @see    printPretty()
  */
 function echoPre($var, $flushBuffers = true) {
-    printPretty($var, false, $flushBuffers);
+    printPretty($var, $return=false, $flushBuffers);
 }
 
 
@@ -586,7 +586,7 @@ function strContains($haystack, $needle, $ignoreCase = false) {
  * @return bool
  */
 function strContainsI($haystack, $needle) {
-    return strContains($haystack, $needle, true);
+    return strContains($haystack, $needle, $ignoreCase=true);
 }
 
 
@@ -634,7 +634,7 @@ function strStartsWith($string, $prefix, $ignoreCase = false) {
  * @return bool
  */
 function strStartsWithI($string, $prefix) {
-    return strStartsWith($string, $prefix, true);
+    return strStartsWith($string, $prefix, $ignoreCase=true);
 }
 
 
@@ -678,7 +678,7 @@ function strEndsWith($string, $suffix, $ignoreCase = false) {
  * @return bool
  */
 function strEndsWithI($string, $suffix) {
-    return strEndsWith($string, $suffix, true);
+    return strEndsWith($string, $suffix, $ignoreCase=true);
 }
 
 
@@ -1007,7 +1007,7 @@ function strToBool($value) {
  *
  * @return string
  */
-function strCollapseWhiteSpace($string, $joinLines=true) {
+function strCollapseWhiteSpace($string, $joinLines = true) {
     if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
 
     $string = normalizeEOL($string);
@@ -1098,7 +1098,7 @@ function objectToArray($object, $access = ACCESS_PUBLIC) {
 
 
 /**
- * Alias of getType() for C/C++ enthusiasts.
+ * Alias of getType() for C enthusiasts.
  *
  * @param  mixed $var
  *
@@ -1229,7 +1229,7 @@ function is_trait($name) {
  * @return string
  */
 function simpleClassName($className) {
-    return strRightFrom($className, '\\', -1, false, $className);
+    return strRightFrom($className, $limiter='\\', $count=-1, $includeLimiter=false, $onNotFound=$className);
 }
 
 
@@ -1287,7 +1287,7 @@ function true($value = null) {
 
 
 /**
- * Return $value or $altValue if $value is TRUE. Functional equivalent of ternary test for TRUE.
+ * Return $value or $altValue if $value evaluates to TRUE. Functional equivalent of ternary test for TRUE.
  *
  * @param  mixed $value
  * @param  mixed $altValue
@@ -1295,7 +1295,7 @@ function true($value = null) {
  * @return mixed
  */
 function ifTrue($value, $altValue) {
-    return ($value===true) ? $altValue : $value;
+    return $value ? $altValue : $value;
 }
 
 
@@ -1312,7 +1312,7 @@ function false($value = null) {
 
 
 /**
- * Return $value or $altValue if $value is FALSE. Functional equivalent of ternary test for FALSE.
+ * Return $value or $altValue if $value evaluates to FALSE. Functional equivalent of ternary test for FALSE.
  *
  * @param  mixed $value
  * @param  mixed $altValue
@@ -1320,7 +1320,7 @@ function false($value = null) {
  * @return mixed
  */
 function ifFalse($value, $altValue) {
-    return ($value===false) ? $altValue : $value;
+    return !$value ? $altValue : $value;
 }
 
 
@@ -1337,7 +1337,7 @@ function null($value = null) {
 
 
 /**
- * Return $value or $altValue if $value is NULL. Functional equivalent of ternary test for NULL.
+ * Return $value or $altValue if $value is strictly NULL. Functional equivalent of ternary test for NULL.
  *
  * @param  mixed $value
  * @param  mixed $altValue

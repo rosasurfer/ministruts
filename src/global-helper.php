@@ -785,7 +785,7 @@ function true($value = null) {
 
 
 /**
- * Return $value or $altValue if $value is TRUE. Functional equivalent of ternary test for TRUE.
+ * Return $value or $altValue if $value evaluates to TRUE. Functional equivalent of ternary test for TRUE.
  *
  * @param  mixed $value
  * @param  mixed $altValue
@@ -810,7 +810,7 @@ function false($value = null) {
 
 
 /**
- * Return $value or $altValue if $value is FALSE. Functional equivalent of ternary test for FALSE.
+ * Return $value or $altValue if $value evaluates to FALSE. Functional equivalent of ternary test for FALSE.
  *
  * @param  mixed $value
  * @param  mixed $altValue
@@ -835,7 +835,7 @@ function null($value = null) {
 
 
 /**
- * Return $value or $altValue if $value is NULL. Functional equivalent of ternary test for NULL.
+ * Return $value or $altValue if $value is strictly NULL. Functional equivalent of ternary test for NULL.
  *
  * @param  mixed $value
  * @param  mixed $altValue
