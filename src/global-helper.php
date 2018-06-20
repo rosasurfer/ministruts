@@ -81,13 +81,13 @@ const EOL_WINDOWS       = \rosasurfer\EOL_WINDOWS;              // "\r\n"     CR
  *
  * @return bool
  */
-function array_key_exists_ex($key, $array) {
-    return \rosasurfer\array_key_exists_ex($key, $array);
+function arrayx_key_exists($key, $array) {
+    return \rosasurfer\arrayx_key_exists($key, $array);
 }
 
 
 /**
- * Alias of {@link array_key_exists_ex()}.
+ * Alias of {@link arrayx_key_exists()}.
  *
  * Whether or not an array-like variable has the specified key. Wrapper for PHP's disfunctional <tt>array_*</tt> functions
  * which do not work with PHP's own {@link \ArrayAccess} interface.
@@ -97,8 +97,8 @@ function array_key_exists_ex($key, $array) {
  *
  * @return bool
  */
-function key_exists_ex($key, $array) {
-    return \rosasurfer\key_exists_ex($key, $array);
+function keyx_exists($key, $array) {
+    return \rosasurfer\keyx_exists($key, $array);
 }
 
 
@@ -765,8 +765,8 @@ function is_trait($name) {
  *
  * @return bool
  */
-function is_array_ex($var) {
-    return \rosasurfer\is_array_ex($var);
+function is_arrayx($var) {
+    return \rosasurfer\is_arrayx($var);
 }
 
 

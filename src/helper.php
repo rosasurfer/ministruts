@@ -114,7 +114,7 @@ define('PHP_INI_ALL',    INI_ALL   );       // 7    flag            // entry can
  *
  * @return bool
  */
-function array_key_exists_ex($key, $array) {
+function arrayx_key_exists($key, $array) {
     if (is_array($array))               return array_key_exists($key, $array);
     if ($array instanceof \ArrayAccess) return $array->offsetExists($key);
     return false;
@@ -122,7 +122,7 @@ function array_key_exists_ex($key, $array) {
 
 
 /**
- * Alias of {@link array_key_exists_ex()}.
+ * Alias of {@link arrayx_key_exists()}.
  *
  * Whether or not an array-like variable has the specified key. Wrapper for PHP's disfunctional <tt>array_*</tt> functions
  * which do not work with PHP's own {@link \ArrayAccess} interface.
@@ -132,8 +132,8 @@ function array_key_exists_ex($key, $array) {
  *
  * @return bool
  */
-function key_exists_ex($key, $array) {
-    return array_key_exists_ex($key, $array);
+function keyx_exists($key, $array) {
+    return arrayx_key_exists($key, $array);
 }
 
 
@@ -1262,7 +1262,7 @@ function is_trait($name) {
  *
  * @return bool
  */
-function is_array_ex($var) {
+function is_arrayx($var) {
     return is_array($var) || $var instanceof \ArrayAccess;
 }
 
