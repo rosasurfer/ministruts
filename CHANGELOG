@@ -1,4 +1,10 @@
 
+2018-06-20
+
+   - util: add array helper functions supporting the \ArrayAccess interface 
+           array_key_exists_ex(), key_exists_ex(), is_array_ex() 
+
+
 2018-06-14
 
    - struts: add method ministruts\ActionForward::setHash()
