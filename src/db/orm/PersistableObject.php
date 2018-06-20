@@ -738,7 +738,7 @@ abstract class PersistableObject extends Object {
      *
      * Application-side ORM trigger to execute arbitrary code.
      *
-     * @return bool - If the method does not return boolean TRUE the "save" operation is skipped.
+     * @return bool - If the method does not return boolean TRUE the "save" operation is canceled.
      */
     protected function beforeSave() {
         return true;
@@ -761,7 +761,7 @@ abstract class PersistableObject extends Object {
      *
      * Application-side ORM trigger to execute arbitrary code.
      *
-     * @return bool - If the method does not return boolean TRUE the "insert" operation is skipped.
+     * @return bool - If the method does not return boolean TRUE the "insert" operation is canceled.
      */
     protected function beforeInsert() {
         return true;
@@ -784,7 +784,7 @@ abstract class PersistableObject extends Object {
      *
      * Application-side ORM trigger to execute arbitrary code.
      *
-     * @return bool - If the method does not return boolean TRUE the "update" operation is skipped.
+     * @return bool - If the method does not return boolean TRUE the "update" operation is canceled.
      */
     protected function beforeUpdate() {
         return true;
@@ -807,7 +807,7 @@ abstract class PersistableObject extends Object {
      *
      * Application-side ORM trigger to execute arbitrary code.
      *
-     * @return bool - If the method does not return boolean TRUE the "delete" operation is skipped.
+     * @return bool - If the method does not return boolean TRUE the "delete" operation is canceled.
      */
     protected function beforeDelete() {
         return true;
