@@ -1032,19 +1032,20 @@ function strToBool($value) {
 
 
 /**
- * Replace multiple consecutive white space characters in a string by a single one.
+ * Reduce multiple consecutive white space characters in a string to a single one.
  *
  * @param  string $string               - string to process
- * @param  bool   $joinLines [optional] - whether or not to always return a single line result (default: yes)
+ * @param  bool   $joinLines [optional] - whether or not to return a single line result (default: yes)
+ * @param  string $separator [optional] - the separator to use for joining (default: space " ")
  *
  * @return string
  */
-function strCollapseWhiteSpace($string, $joinLines = true) {
+function strCollapseWhiteSpace($string, $joinLines=true, $separator=' ') {
     if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
 
     $string = normalizeEOL($string);
     if ($joinLines) {
-        $string = str_replace(EOL_UNIX, ' ', $string);
+        $string = str_replace(EOL_UNIX, $separator, $string);
     }
     return preg_replace('/\s+/', ' ', $string);
 }

@@ -635,15 +635,16 @@ function strToBool($value) {
 
 
 /**
- * Replace multiple consecutive white space characters in a string by a single one.
+ * Reduce multiple consecutive white space characters in a string to a single one.
  *
  * @param  string $string               - string to process
- * @param  bool   $joinLines [optional] - whether or not to always return a single line result (default: yes)
+ * @param  bool   $joinLines [optional] - whether or not to return a single line result (default: yes)
+ * @param  string $separator [optional] - the separator to use for joining (default: space " ")
  *
  * @return string
  */
-function strCollapseWhiteSpace($string, $joinLines = true) {
-    return \rosasurfer\strCollapseWhiteSpace($string, $joinLines);
+function strCollapseWhiteSpace($string, $joinLines=true, $separator=' ') {
+    return \rosasurfer\strCollapseWhiteSpace($string, $joinLines, $separator);
 }
 
 
