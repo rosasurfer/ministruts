@@ -736,7 +736,7 @@ abstract class PersistableObject extends Object {
     /**
      * "Save" pre-processing hook.
      *
-     * Application-side ORM trigger to execute arbitrary code.
+     * Application-side ORM trigger to execute arbitrary code. Part of the implicite "save" transaction.
      *
      * @return bool - If the method does not return boolean TRUE the "save" operation is canceled.
      */
@@ -748,7 +748,7 @@ abstract class PersistableObject extends Object {
     /**
      * "Save" post-processing hook.
      *
-     * Application-side ORM trigger to execute arbitrary code.
+     * Application-side ORM trigger to execute arbitrary code. Part of the implicite "save" transaction.
      *
      * @return void
      */
@@ -759,7 +759,7 @@ abstract class PersistableObject extends Object {
     /**
      * "Insert" pre-processing hook.
      *
-     * Application-side ORM trigger to execute arbitrary code.
+     * Application-side ORM trigger to execute arbitrary code. Part of the implicite "save" transaction.
      *
      * @return bool - If the method does not return boolean TRUE the "insert" operation is canceled.
      */
@@ -771,7 +771,7 @@ abstract class PersistableObject extends Object {
     /**
      * "Insert" post-processing hook.
      *
-     * Application-side ORM trigger to execute arbitrary code.
+     * Application-side ORM trigger to execute arbitrary code. Part of the implicite "save" transaction.
      *
      * @return void
      */
@@ -782,7 +782,7 @@ abstract class PersistableObject extends Object {
     /**
      * "Update" pre-processing hook.
      *
-     * Application-side ORM trigger to execute arbitrary code.
+     * Application-side ORM trigger to execute arbitrary code. Part of the implicite "save" transaction.
      *
      * @return bool - If the method does not return boolean TRUE the "update" operation is canceled.
      */
@@ -794,7 +794,7 @@ abstract class PersistableObject extends Object {
     /**
      * "Update" post-processing hook.
      *
-     * Application-side ORM trigger to execute arbitrary code.
+     * Application-side ORM trigger to execute arbitrary code. Part of the implicite "save" transaction.
      *
      * @return void
      */
@@ -805,7 +805,7 @@ abstract class PersistableObject extends Object {
     /**
      * "Delete" pre-processing hook.
      *
-     * Application-side ORM trigger to execute arbitrary code.
+     * Application-side ORM trigger to execute arbitrary code. Part of the implicite "delete" transaction.
      *
      * @return bool - If the method does not return boolean TRUE the "delete" operation is canceled.
      */
@@ -817,7 +817,7 @@ abstract class PersistableObject extends Object {
     /**
      * "Delete" post-processing hook.
      *
-     * Application-side ORM trigger to execute arbitrary code.
+     * Application-side ORM trigger to execute arbitrary code. Part of the implicite "delete" transaction.
      *
      * @return void
      */
