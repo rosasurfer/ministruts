@@ -72,8 +72,7 @@
    names. The individual names are configured through nested "import" elements.    
 -->
 <!ELEMENT imports (import*)>
-<!ATTLIST import
->
+<!ATTLIST import>
 
 
 <!--
@@ -97,8 +96,7 @@
    override a global forward by defining a local (i.e. nested) "forward" element of the same name.
 -->
 <!ELEMENT global-forwards (forward*)>
-<!ATTLIST global-forwards
->
+<!ATTLIST global-forwards>
 
 
 <!--
@@ -133,8 +131,7 @@
    given URL pattern. Individual ActionMappings are configured through nested "mapping" elements.
 -->
 <!ELEMENT action-mappings (mapping+)>
-<!ATTLIST action-mappings
->
+<!ATTLIST action-mappings>
 
 
 <!--
