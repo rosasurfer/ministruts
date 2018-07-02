@@ -125,6 +125,7 @@ class Module extends Object {
     protected function loadConfiguration($fileName) {
         if (!is_file($fileName)) throw new StrutsConfigException('Configuration file not found: "'.$fileName.'"');
 
+        // TODO: what about checking the search result?
         $content = file_get_contents($fileName);
         $search  = '<!DOCTYPE struts-config SYSTEM "struts-config.dtd">';
         $offset  = strPos($content, $search);
