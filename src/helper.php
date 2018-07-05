@@ -108,7 +108,7 @@ define('PHP_INI_ALL',    INI_ALL   );       // 7    flag            // entry can
 /**
  * Whether or not an array-like variable has the specified key.
  *
- * Wrapper for PHP's disfunctional <tt>array_*</tt> functions which do not work with PHP's own {@link \ArrayAccess} interface.
+ * Wrapper for PHP's <tt>array_*</tt> functions which do not support PHP's own {@link \ArrayAccess} interface.
  *
  * @param  string             $key
  * @param  array|\ArrayAccess $array
@@ -140,7 +140,7 @@ function keyx_exists($key, $array) {
 /**
  * Return all or a subset of the keys of an array-like variable.
  *
- * Wrapper for PHP's disfunctional <tt>array_*</tt> functions which do not work with PHP's own {@link \ArrayAccess} interface.
+ * Wrapper for PHP's <tt>array_*</tt> functions which do not support PHP's own {@link \ArrayAccess} interface.
  *
  * @param  array|\ArrayAccess $array
  * @param  mixed              $search [optional]
@@ -1284,7 +1284,7 @@ function is_trait($name) {
 /**
  * Whether or not a variable can be used like an array.
  *
- * Wrapper for PHP's disfunctional <tt>array_*</tt> functions which do not work with PHP's own {@link \ArrayAccess} interface.
+ * Wrapper for PHP's <tt>array_*</tt> functions which do not support PHP's own {@link \ArrayAccess} interface.
  *
  * @param  array|\ArrayAccess $var
  *
