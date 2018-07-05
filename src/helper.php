@@ -106,8 +106,9 @@ define('PHP_INI_ALL',    INI_ALL   );       // 7    flag            // entry can
 
 
 /**
- * Whether or not an array-like variable has the specified key. Wrapper for PHP's disfunctional <tt>array_*</tt> functions
- * which do not work with PHP's own {@link \ArrayAccess} interface.
+ * Whether or not an array-like variable has the specified key.
+ *
+ * Wrapper for PHP's disfunctional <tt>array_*</tt> functions which do not work with PHP's own {@link \ArrayAccess} interface.
  *
  * @param  string             $key
  * @param  array|\ArrayAccess $array
@@ -124,8 +125,7 @@ function arrayx_key_exists($key, $array) {
 /**
  * Alias of {@link arrayx_key_exists()}.
  *
- * Whether or not an array-like variable has the specified key. Wrapper for PHP's disfunctional <tt>array_*</tt> functions
- * which do not work with PHP's own {@link \ArrayAccess} interface.
+ * Whether or not an array-like variable has the specified key.
  *
  * @param  string             $key
  * @param  array|\ArrayAccess $array
@@ -134,6 +134,33 @@ function arrayx_key_exists($key, $array) {
  */
 function keyx_exists($key, $array) {
     return arrayx_key_exists($key, $array);
+}
+
+
+/**
+ * Return all or a subset of the keys of an array-like variable.
+ *
+ * Wrapper for PHP's disfunctional <tt>array_*</tt> functions which do not work with PHP's own {@link \ArrayAccess} interface.
+ *
+ * @param  array|\ArrayAccess $array
+ * @param  mixed              $search [optional]
+ * @param  bool               $strict [optional]
+ *
+ * @return array
+ */
+function array_keysx($array, $search=null, $strict=false) {
+    if (is_array($array)) return array_keys(...func_get_args());
+
+    if ($array instanceof \ArrayAccess) {
+        $results = [];
+        foreach ($array as $key => $value) {
+            if (func_num_args() == 1)             $results[] = $key;
+            else if ($strict) $value===$search && $results[] = $key;
+            else              $value== $search && $results[] = $key;
+        }
+        return $results;
+    }
+    throw new IllegalTypeException('Illegal type of parameter $array: '.(is_object($array) ? get_class($array) : getType($array)));
 }
 
 
@@ -1255,8 +1282,9 @@ function is_trait($name) {
 
 
 /**
- * Whether or not a variable can be used like an array. Wrapper for PHP's disfunctional <tt>array_*</tt> functions which
- * do not work with PHP's own {@link \ArrayAccess} interface.
+ * Whether or not a variable can be used like an array.
+ *
+ * Wrapper for PHP's disfunctional <tt>array_*</tt> functions which do not work with PHP's own {@link \ArrayAccess} interface.
  *
  * @param  array|\ArrayAccess $var
  *
