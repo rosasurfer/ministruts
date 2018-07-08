@@ -149,7 +149,9 @@ class FrontController extends Singleton {
         $requestPath = $request->getPath();
         $baseUri     = $request->getApplicationBaseUri();
 
-        if (!strStartsWith($requestPath, $baseUri)) throw new RuntimeException('Can not resolve module prefix from request path: '.$requestPath);
+        if (!strStartsWith($requestPath, $baseUri)) {
+            throw new RuntimeException('Can not resolve module prefix from request path "'.$requestPath.'" (base URI: "'.$baseUri.'")');
+        }
 
         $value = subStr($requestPath, strLen($baseUri));        // baseUri ends with and prefix doesn't start with a slash
         if (strLen($value)) {
