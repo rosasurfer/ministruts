@@ -433,7 +433,7 @@ class PHP extends StaticClass {
 
 
     /**
-     * Return the query string of the current url (if any).
+     * Return the query string of the current URL (if any).
      *
      * @return string
      */
@@ -452,7 +452,7 @@ class PHP extends StaticClass {
 
 
     /**
-     * Return the hash string of the current url (if any).
+     * Return the hash string of the current URL (if any).
      *
      * @return string - hash including the hash mark or an empty string
      */

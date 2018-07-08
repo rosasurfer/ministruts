@@ -83,7 +83,7 @@ class Request extends Singleton {
         foreach ($params as $param) {
             $parts = explode('=', $param, 2);
             $name  = trim(urlDecode($parts[0])); if (!strLen($name)) continue;
-       //$name  = str_replace(['.', ' '], '_', $name);                           // replace as the PHP implementation does
+            //$name  = str_replace(['.', ' '], '_', $name);                             // replace as the PHP implementation does
             $value = sizeOf($parts)==1 ? '' : urlDecode($parts[1]);
 
             // TODO: process multi-dimensional arrays
@@ -157,7 +157,7 @@ class Request extends Singleton {
      *
      * @param  string $name - parameter name
      *
-     * @return string|null - value or NULL if no such single $_REQUEST parameter has been transmitted
+     * @return string|null - value or NULL if no such $_REQUEST parameter has been transmitted
      */
     public function getParameter($name) {
         if (isSet($_REQUEST[$name])) {
@@ -194,7 +194,7 @@ class Request extends Singleton {
      *
      * @param  string $name - parameter name
      *
-     * @return string|null - value or NULL if no such single $_GET parameter has been transmitted
+     * @return string|null - value or NULL if no such $_GET parameter has been transmitted
      */
     public function getGetParameter($name) {
         if (isSet($_GET[$name])) {
@@ -231,7 +231,7 @@ class Request extends Singleton {
      *
      * @param  string $name - parameter name
      *
-     * @return string|null - value or NULL if no such single $_POST parameter has been transmitted
+     * @return string|null - value or NULL if no such $_POST parameter has been transmitted
      */
     public function getPostParameter($name) {
         if (isSet($_POST[$name])) {
@@ -282,9 +282,9 @@ class Request extends Singleton {
 
 
     /**
-     * Return the root url of the server the request was made to. This value always ends with a slash "/".
+     * Return the root URL of the server the request was made to. This value always ends with a slash "/".
      *
-     * @return string - root url: protocol + host_name + port
+     * @return string - root URL: protocol + host_name + port
      *
      * @example
      * <pre>
@@ -305,10 +305,10 @@ class Request extends Singleton {
 
 
     /**
-     * Return the full url of the request.
+     * Return the full URL of the request.
      *
-     * @return string - full url: protocol + host_name + port + path + query_string
-     *                  All urls in this framework are virtual, there is no "path info" as such.
+     * @return string - full URL: protocol + host_name + port + path + query_string
+     *                  All URLs in this framework are virtual, there is no "path info" as such.
      * @example
      * <pre>
      * "https://www.domain.tld:433/myapplication/module/foo/bar.html?key=value"
@@ -358,9 +358,9 @@ class Request extends Singleton {
 
 
     /**
-     * Return the root url of the application. This value always ends with a slash "/".
+     * Return the root URL of the application. This value always ends with a slash "/".
      *
-     * @return string - url: protocol + host_name + port + application_base_uri
+     * @return string - URL: protocol + host_name + port + application_base_uri
      *
      * @example
      * <pre>
@@ -368,16 +368,16 @@ class Request extends Singleton {
      * </pre>
      */
     public function getApplicationUrl() {
-        // TODO: Move to application as this url is not a property of the request.
+        // TODO: Move to application as this URL is not a property of the request.
         return strLeft($this->getHostUrl(), -1).$this->getApplicationBaseUri();
     }
 
 
     /**
-     * Return the request's uri relative to the application's base url. This value always starts with a slash "/".
+     * Return the request's URI relative to the application's base URL. This value always starts with a slash "/".
      *
-     * @return string - uri: slash + module_prefix + path + query_string
-     *                  All urls in this framework are virtual, there is no "path info" as such.
+     * @return string - URI: slash + module_prefix + path + query_string
+     *                  All URLs in this framework are virtual, there is no "path info" as such.
      * @example
      * <pre>
      * $request->getUrl():                    "http://a.domain.tld/path/myapplication/module/foo/bar.html?key=value"
@@ -390,11 +390,11 @@ class Request extends Singleton {
 
 
     /**
-     * Return the request's path fragment relative to the application's base url. This value always starts with
+     * Return the request's path fragment relative to the application's base URL. This value always starts with
      * a slash "/".
      *
      * @return string - path fragment: slash + module_prefix + path (without query string)
-     *                  All urls in this framework are virtual, there is no "path info" as such.
+     *                  All URLs in this framework are virtual, there is no "path info" as such.
      * @example
      * <pre>
      * "/module/foo/bar.html"
@@ -406,7 +406,7 @@ class Request extends Singleton {
 
 
     /**
-     * Return the application's base uri. The value always starts and ends with a slash "/".
+     * Return the application's base URI. The value always starts and ends with a slash "/".
      *
      * @return string - a partial URI (the path without a query string)
      *
@@ -417,7 +417,7 @@ class Request extends Singleton {
      */
     public function getApplicationBaseUri() {
 
-        // TODO: Move to application as this uri is not a property of the request.
+        // TODO: Move to application as this URI is not a property of the request.
 
         static $baseUri;
         if (!$baseUri) {
@@ -426,8 +426,7 @@ class Request extends Singleton {
             }
             else {
                 $baseUri = Config::getDefault()->get('app.base-uri', false);
-                if ($baseUri === false)
-                    throw new RuntimeException('Missing application base URI configuration: either $_SERVER["APP_BASE_URI"] or config("app.base-uri") needs to be configured.');
+                if (!$baseUri) throw new RuntimeException('Missing application base URI configuration: either $_SERVER["APP_BASE_URI"] or config("app.base-uri") needs to be configured.');
             }
             !strStartsWith($baseUri, '/') && $baseUri  = '/'.$baseUri;
             !strEndsWith  ($baseUri, '/') && $baseUri .= '/';
@@ -437,7 +436,7 @@ class Request extends Singleton {
 
 
     /**
-     * Return the query string of the url.
+     * Return the query string of the request's URL.
      *
      * @return string
      *
@@ -724,7 +723,7 @@ class Request extends Singleton {
      *
      * @param  string|string[] $names - one or more header names
      *
-     * @return string|null - value or NULL if no such headers have been transmitted.
+     * @return string|null - value or NULL if no such headers have been transmitted
      */
     public function getHeaderValue($names) {
         if (is_string($names))

@@ -486,7 +486,7 @@ class Logger extends StaticClass {
 
                     if ($status != 200) {
                         try {
-                            self::log('Unexpected HTTP status code '.$status.' ('.HttpResponse::$sc[$status].') for url: '.$request->getUrl(), L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
+                            self::log('Unexpected HTTP status code '.$status.' ('.HttpResponse::$sc[$status].') for URL: '.$request->getUrl(), L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
                         }
                         catch (\Exception $ex) {/*eat it*/}
                         continue;
@@ -522,14 +522,14 @@ class Logger extends StaticClass {
                     $content  = $response->getContent();
                     if ($status != 200) {
                         try {
-                            self::log('Unexpected HTTP status code '.$status.' ('.HttpResponse::$sc[$status].') for url: '.$request->getUrl(), L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
+                            self::log('Unexpected HTTP status code '.$status.' ('.HttpResponse::$sc[$status].') for URL: '.$request->getUrl(), L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
                         }
                         catch (\Exception $ex) {/*eat it*/}
                         continue;
                     }
                     if (is_null($content)) {
                         try {
-                            self::log('Empty reply from server, url: '.$request->getUrl(), L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
+                            self::log('Empty reply from server, URL: '.$request->getUrl(), L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
                         }
                         catch (\Exception $ex) {/*eat it*/}
                         continue;

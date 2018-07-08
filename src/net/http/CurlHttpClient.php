@@ -12,7 +12,7 @@ use const rosasurfer\L_WARN;
 /**
  * CurlHttpClient
  *
- * Eine Klasse, die mit CURL HttpRequests ausfuehren kann.
+ * Eine Klasse, die mit cURL HttpRequests ausfuehren kann.
  */
 class CurlHttpClient extends HttpClient {
 
@@ -199,13 +199,13 @@ class CurlHttpClient extends HttpClient {
         curl_setopt_array($this->hCurl, $options);
 
         // Request ausfuehren
-        if (curl_exec($this->hCurl) === false) throw new IOException('CURL error '.self::getError($this->hCurl).', url: '.$request->getUrl());
+        if (curl_exec($this->hCurl) === false) throw new IOException('cURL error '.self::getError($this->hCurl).', URL: '.$request->getUrl());
         $status = curl_getinfo($this->hCurl, CURLINFO_HTTP_CODE);
         $response->setStatus($status);
 
         // ggf. manuellen Redirect ausfuehren (falls "open_basedir" aktiviert ist)
         if (($status==301 || $status==302) && $this->isFollowRedirects() && ini_get('open_basedir')) {
-            if ($this->manualRedirects >= $this->maxRedirects) throw new IOException('CURL error: maxRedirects limit exceeded - '.$this->maxRedirects.', url: '.$request->getUrl());
+            if ($this->manualRedirects >= $this->maxRedirects) throw new IOException('CURL error: maxRedirects limit exceeded - '.$this->maxRedirects.', URL: '.$request->getUrl());
             $this->manualRedirects++;
 
             /** @var string $location */
