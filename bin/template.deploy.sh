@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copy this file to your project's bin directory and update the configuration in lines 16 ff. 
+# Copy this file to your project's bin directory and update the configuration in lines 16 ff.
 #
 #
 # Application deploy script for Git based repositories. Deploys a branch, a tag or a specific commit and updates existing
@@ -76,9 +76,9 @@ fi
 
 
 # update project
-if   [ -n "$BRANCH" ]; then { [ "$BRANCH" != "$FROM_BRANCH" ] && git checkout "$BRANCH"; git merge "origin/$BRANCH"; }
-elif [ -n "$TAG"    ]; then {                                    git checkout "$TAG";                                }
-elif [ -n "$COMMIT" ]; then {                                    git checkout "$COMMIT";                             }
+if   [ -n "$BRANCH" ]; then { [ "$BRANCH" != "$FROM_BRANCH" ] && git checkout "$BRANCH"; git merge --ff-only "origin/$BRANCH"; }
+elif [ -n "$TAG"    ]; then {                                    git checkout "$TAG";                                          }
+elif [ -n "$COMMIT" ]; then {                                    git checkout "$COMMIT";                                       }
 fi
 
 
