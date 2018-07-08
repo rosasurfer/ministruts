@@ -268,7 +268,8 @@ class Request extends Singleton {
      *
      * @example
      * <pre>
-     * "www.domain.tld"
+     * $request->getUrl():       "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
+     * $request->getHostname():  "a.domain.tld"
      * </pre>
      */
     public function getHostname() {
@@ -284,11 +285,12 @@ class Request extends Singleton {
     /**
      * Return the root URL of the server the request was made to. This value always ends with a slash "/".
      *
-     * @return string - root URL: protocol + host_name + port
+     * @return string - root URL: protocol + host name + port
      *
      * @example
      * <pre>
-     * "https://www.domain.tld/"
+     * $request->getUrl():      "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
+     * $request->getHostUrl():  "http://a.domain.tld/"
      * </pre>
      */
     public function getHostUrl() {
@@ -307,11 +309,11 @@ class Request extends Singleton {
     /**
      * Return the full URL of the request.
      *
-     * @return string - full URL: protocol + host_name + port + path + query_string
+     * @return string - full URL: protocol + host name + port + path + query string
      *                  All URLs in this framework are virtual, there is no "path info" as such.
      * @example
      * <pre>
-     * "https://www.domain.tld:433/myapplication/module/foo/bar.html?key=value"
+     * "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
      * </pre>
      */
     public function getUrl() {
@@ -323,11 +325,12 @@ class Request extends Singleton {
      * Return the URI of the request (the value in the first line of the HTTP protocol). This value always starts
      * with a slash "/".
      *
-     * @return string - URI: path + query_string
+     * @return string - URI: path + query string
      *                  All URLs in this framework are virtual, there is no "path info" as such.
      * @example
      * <pre>
-     * "/application/module/foo/bar.html?key=value"
+     * $request->getUrl():  "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
+     * $request->getUri():  "/path/application/module/foo/bar.html?key=value"
      * </pre>
      */
     public function getUri() {
@@ -342,7 +345,8 @@ class Request extends Singleton {
      *                  All URLs in this framework are virtual, there is no "path info" as such.
      * @example
      * <pre>
-     * "/application/module/foo/bar.html"
+     * $request->getUrl():   "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
+     * $request->getPath():  "/path/application/module/foo/bar.html"
      * </pre>
      */
     public function getPath() {
@@ -360,15 +364,16 @@ class Request extends Singleton {
     /**
      * Return the root URL of the application. This value always ends with a slash "/".
      *
-     * @return string - URL: protocol + host_name + port + application_base_uri
+     * @return string - URL: protocol + host name + port + application_base_uri
      *
      * @example
      * <pre>
-     * "https://www.domain.tld:433/myapplication/"
+     * $request->getUrl():              "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
+     * $request->getApplicationUrl():   "http://a.domain.tld/path/application/"
      * </pre>
      */
     public function getApplicationUrl() {
-        // TODO: Move to application as this URL is not a property of the request.
+        // TODO: Move to application as this is not a property of the request.
         return strLeft($this->getHostUrl(), -1).$this->getApplicationBaseUri();
     }
 
@@ -376,15 +381,16 @@ class Request extends Singleton {
     /**
      * Return the request's URI relative to the application's base URL. This value always starts with a slash "/".
      *
-     * @return string - URI: slash + module_prefix + path + query_string
+     * @return string - URI: slash + module prefix + path + query string
      *                  All URLs in this framework are virtual, there is no "path info" as such.
      * @example
      * <pre>
-     * $request->getUrl():                    "http://a.domain.tld/path/myapplication/module/foo/bar.html?key=value"
+     * $request->getUrl():                    "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
      * $request->getApplicationRelativeUri(): "/module/foo/bar.html?key=value"
      * </pre>
      */
     public function getApplicationRelativeUri() {
+        // TODO: Move to application as this is not a property of the request.
         return strRightFrom($this->getUri(), $this->getApplicationBaseUri()).'/';
     }
 
@@ -393,14 +399,16 @@ class Request extends Singleton {
      * Return the request's path fragment relative to the application's base URL. This value always starts with
      * a slash "/".
      *
-     * @return string - path fragment: slash + module_prefix + path (without query string)
+     * @return string - path fragment: slash + module prefix + path (without query string)
      *                  All URLs in this framework are virtual, there is no "path info" as such.
      * @example
      * <pre>
-     * "/module/foo/bar.html"
+     * $request->getUrl():                      "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
+     * $request->getApplicationRelativePath()   "/module/foo/bar.html"
      * </pre>
      */
     public function getApplicationRelativePath() {
+        // TODO: Move to application as this is not a property of the request.
         return '/'.strRightFrom($this->getPath(), $this->getApplicationBaseUri());
     }
 
@@ -408,17 +416,16 @@ class Request extends Singleton {
     /**
      * Return the application's base URI. The value always starts and ends with a slash "/".
      *
-     * @return string - a partial URI (the path without a query string)
+     * @return string - a partial URI (application path without module prefix or query string)
      *
      * @example
      * <pre>
-     * "/application/"
+     * $request->getUrl():                  "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
+     * $request->getApplicationBaseUri():   "/path/application/"
      * </pre>
      */
     public function getApplicationBaseUri() {
-
-        // TODO: Move to application as this URI is not a property of the request.
-
+        // TODO: Move to application as this is not a property of the request.
         static $baseUri;
         if (!$baseUri) {
             if (isSet($_SERVER['APP_BASE_URI'])) {
@@ -442,12 +449,13 @@ class Request extends Singleton {
      *
      * @example
      * <pre>
-     * "key1=value1&key2=value2"
+     * $request->getUrl():          "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
+     * $request->getQueryString():  "key=value"
      * </pre>
      */
     public function getQueryString() {
-        // The variable $_SERVER['QUERY_STRING'] is set by the server and can differ, e.g. it might hold additional
-        // parameters or it might be empty (nginx).
+        // The variable $_SERVER['QUERY_STRING'] is set by the server and can differ from the transmitted query string.
+        // It might hold additional parameters added by the server or it might be empty (e.g. on a mis-configured nginx).
 
         if (isSet($_SERVER['QUERY_STRING']) && strLen($_SERVER['QUERY_STRING'])) {
             $query = $_SERVER['QUERY_STRING'];
