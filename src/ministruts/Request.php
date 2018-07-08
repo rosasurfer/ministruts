@@ -20,6 +20,7 @@ use function rosasurfer\strStartsWith;
 use const rosasurfer\CLI;
 use const rosasurfer\DAY;
 use const rosasurfer\NL;
+use function rosasurfer\strCompareI;
 
 
 /**
@@ -110,7 +111,7 @@ class Request extends Singleton {
 
 
     /**
-     * Return the HTTP methode of the current request.
+     * Return the HTTP methode of the request.
      *
      * @return string
      */
@@ -120,7 +121,7 @@ class Request extends Singleton {
 
 
     /**
-     * Whether or not the current request is a GET request.
+     * Whether or not the request is a GET request.
      *
      * @return bool
      */
@@ -130,12 +131,22 @@ class Request extends Singleton {
 
 
     /**
-     * Whether or not the current request is a POST request.
+     * Whether or not the request is a POST request.
      *
      * @return bool
      */
     public function isPost() {
         return ($this->method == 'POST');
+    }
+
+
+    /**
+     * Whether or not the request was made over a secure channel (HTTPS).
+     *
+     * @return bool
+     */
+    public function isSecure() {
+        return !empty($_SERVER['HTTPS']) && !strCompareI($_SERVER['HTTPS'], 'off');
     }
 
 
@@ -282,7 +293,7 @@ class Request extends Singleton {
      */
     public function getHostUrl() {
         if (!$this->hostUrl) {
-            $protocol = isSet($_SERVER['HTTPS']) ? 'https' : 'http';
+            $protocol = $this->isSecure() ? 'https' : 'http';
             $host     = $this->getHostname();
             $port     = ':'.$_SERVER['SERVER_PORT'];
             if ($protocol.$port=='http:80' || $protocol.$port=='https:443')
@@ -294,7 +305,7 @@ class Request extends Singleton {
 
 
     /**
-     * Return the full url of the current request.
+     * Return the full url of the request.
      *
      * @return string - full url: protocol + host_name + port + path + query_string
      *                  All urls in this framework are virtual, there is no "path info" as such.
@@ -309,7 +320,7 @@ class Request extends Singleton {
 
 
     /**
-     * Return the URI of the current request (the value in the first line of the HTTP protocol). This value always starts
+     * Return the URI of the request (the value in the first line of the HTTP protocol). This value always starts
      * with a slash "/".
      *
      * @return string - URI: path + query_string
@@ -325,7 +336,7 @@ class Request extends Singleton {
 
 
     /**
-     * Return the path fragment of the current request's URI. This value always starts with a slash "/".
+     * Return the path fragment of the request's URI. This value always starts with a slash "/".
      *
      * @return string - path without query string
      *                  All URLs in this framework are virtual, there is no "path info" as such.
@@ -347,7 +358,7 @@ class Request extends Singleton {
 
 
     /**
-     * Return the root url of the current application. This value always ends with a slash "/".
+     * Return the root url of the application. This value always ends with a slash "/".
      *
      * @return string - url: protocol + host_name + port + application_base_uri
      *
@@ -363,7 +374,7 @@ class Request extends Singleton {
 
 
     /**
-     * Return the current request's uri relative to the application's base url. This value always starts with a slash "/".
+     * Return the request's uri relative to the application's base url. This value always starts with a slash "/".
      *
      * @return string - uri: slash + module_prefix + path + query_string
      *                  All urls in this framework are virtual, there is no "path info" as such.
@@ -379,7 +390,7 @@ class Request extends Singleton {
 
 
     /**
-     * Return the current request's path fragment relative to the application's base url. This value always starts with
+     * Return the request's path fragment relative to the application's base url. This value always starts with
      * a slash "/".
      *
      * @return string - path fragment: slash + module_prefix + path (without query string)
@@ -426,7 +437,7 @@ class Request extends Singleton {
 
 
     /**
-     * Return the query string of the current url.
+     * Return the query string of the url.
      *
      * @return string
      *
@@ -450,7 +461,7 @@ class Request extends Singleton {
 
 
     /**
-     * Return the remote IP address the current request is made from.
+     * Return the IP address the request was made from.
      *
      * @return string - IP address
      */
@@ -460,7 +471,7 @@ class Request extends Singleton {
 
 
     /**
-     * Return the remote host name the current request is made from.
+     * Return the name of the host the request was made from.
      *
      * @return string - host name
      */
@@ -485,8 +496,8 @@ class Request extends Singleton {
 
 
     /**
-     * Return the content of the current request (the request body). For file uploads the method returns not the real binary
-     * content. Instead it returns the available meta infos.
+     * Return the content of the request (the body). For file uploads the method returns not the real binary content.
+     * Instead it returns the available meta infos.
      *
      * @return string - request body or meta infos
      */
@@ -546,7 +557,7 @@ class Request extends Singleton {
 
 
     /**
-     * Whether or not an HTTP session was started during the current request. Not whether the session is still open (active).
+     * Whether or not an HTTP session was started during the request. Not whether the session is still open (active).
      *
      * @return bool
      */
