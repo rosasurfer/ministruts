@@ -380,11 +380,13 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * Fix invalid string encodings to UTF-8 (if necessary).
+     * Fix the encoding of a potentially non-UTF-8 encoded value.
      *
-     * @param string $value - string with potentially invalid encoding
+     * @param string $value - potentially non-UTF-8 encoded value
      *
-     * @return string - valid encoded string
+     * @return string - UTF-8 encoded value
+     *
+     * @see https://www.drupal.org/node/434802
      */
     private function fixUtf8Encoding($value) {
         $encoding = mb_detect_encoding($value, null, true);
