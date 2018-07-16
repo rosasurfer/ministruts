@@ -152,9 +152,8 @@ class Validator extends StaticClass {
     public static function isDateTime($date, $format='Y-m-d') {
         if (!is_string($date)) throw new IllegalTypeException('Illegal type of parameter $date: '.getType($date));
         if (is_array($format)) {
-            $me = __FUNCTION__;
             foreach ($format as $value) {
-                $time = self::$me($date, $value);
+                $time = self::{__FUNCTION__}($date, $value);
                 if (is_int($time))
                     return $time;
             }

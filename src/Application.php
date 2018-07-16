@@ -280,11 +280,9 @@ class Application extends Object {
      * @param  string $rootDir - application root directory
      */
     private function expandDirsRecursive(array &$dirs, $rootDir) {
-        $self = __FUNCTION__;
-
         foreach ($dirs as $name => &$dir) {
             if (is_array($dir)) {
-                $this->$self($dir, $rootDir);
+                $this->{__FUNCTION__}($dir, $rootDir);
                 continue;
             }
             if (isRelativePath($dir))

@@ -535,7 +535,6 @@ class Config extends Object implements IConfig {
      * @return array
      */
     private function dumpNode(array $node, array $values, &$maxKeyLength) {
-        $self   = __FUNCTION__;
         $result = [];
 
         foreach ($values as $subkey => $value) {
@@ -549,7 +548,7 @@ class Config extends Object implements IConfig {
             $maxKeyLength = max(strLen($key), $maxKeyLength);
 
             if (is_array($value)) {
-                $result += $this->$self(array_merge($node, [$subkey]), $value, $maxKeyLength);
+                $result += $this->{__FUNCTION__}(array_merge($node, [$subkey]), $value, $maxKeyLength);
             }
             else {
                 $result[$key] = $value;
