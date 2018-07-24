@@ -723,7 +723,7 @@ class Logger extends StaticClass {
         $html .= '<div id="99a05cf355861c76747b7176c778eed2'.self::$printCounter.'"
                         align="left"
                         style="display:initial; visibility:initial; clear:both;
-                        position:relative; z-index:65535; top:initial; left:initial;
+                        position:relative; z-index:4294967295; top:initial; left:initial;
                         float:left; width:initial; height:initial
                         margin:0; padding:4px; border-width:0;
                         font:normal normal 12px/normal arial,helvetica,sans-serif; line-height:12px;

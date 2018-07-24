@@ -1,5 +1,6 @@
 'use strict';
 
+
 /**
  * Polyfill and extend objects.
  */
@@ -283,7 +284,7 @@ var rosasurfer = {
             div = this.log.div = document.createElement('div');
             div.setAttribute('id', 'rosasurfer.log.output');
             div.style.position        = 'absolute';
-            div.style.zIndex          = '65535';
+            div.style.zIndex          = '4294967295';
             div.style.top             = '6px';
             div.style.left            = '6px';
             div.style.padding         = '6px';
