@@ -1,4 +1,4 @@
-#!/usr/bin/env php
+#!/usr/bin/env php56
 <?php
 /**
  * Copy this file to your project's bin directory and point line 11 to your application's init script.
