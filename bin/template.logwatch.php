@@ -1,7 +1,7 @@
 #!/usr/bin/env php56
 <?php
 /**
- * Copy this file to your project's bin directory and point line 27 to your application's init script.
+ * TEMPLATE: Copy this file to your project and point line 27 to your application's init script.
  * You may want to setup a CRON job for it (see logwatch.php -h for command line options).
  *
  *
