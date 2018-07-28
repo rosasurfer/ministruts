@@ -3,7 +3,7 @@
 # TEMPLATE: Copy this file to your project and update the configuration in lines 18-22.
 #
 #
-# Application deploy script for Git based repositories. Deploys a branch, a tag or a specific commit. 
+# Application deploy script for Git based repositories. Deploys a branch, a tag or a specific commit.
 # Sends email notifications with the deployed changes (commit mesages) if configured.
 #
 # Usage: deploy.sh [<branch-name> | <tag-name> | <commit-sha>]
@@ -16,10 +16,10 @@
 set -e
 
 
-# notification configuration (environment variables will have precedence over hardcoded values)
-NOTIFY_FOR_PROJECT="${NOTIFY_FOR_PROJECT:-<project-name>}"      `# project identifier             `
-NOTIFY_IF_ON_HOST="${NOTIFY_IF_ON_HOST:-<hostname>}"            `# notify if deployed on that host`
-NOTIFY_RECEIVER="${NOTIFY_RECEIVER:-<email@domain.tld>}"        `# notification receiver          `
+# notification configuration (environment variables of the same name will have precedence over values hardcoded here)
+NOTIFY_FOR_PROJECT="${NOTIFY_FOR_PROJECT:-<project-name>}"      `# fill in your project identifier              `
+NOTIFY_ON_HOST="${NOTIFY_ON_HOST:-<hostname>}"                  `# fill in the hostname to notify if deployed on`
+NOTIFY_RECEIVER="${NOTIFY_RECEIVER:-<email@domain.tld>}"        `# fill in the notification receiver            `
 
 
 # --- functions -------------------------------------------------------------------------------------------------------------
@@ -98,25 +98,25 @@ if [ "$OLD" = "$NEW" ]; then
 else
     # send deployment notifications if configured
 
-    # trim potential angle brackets
+    # trim angle brackets
     NOTIFY_FOR_PROJECT=${NOTIFY_FOR_PROJECT#<}; NOTIFY_FOR_PROJECT=${NOTIFY_FOR_PROJECT%>}
-    NOTIFY_IF_ON_HOST=${NOTIFY_IF_ON_HOST#<};   NOTIFY_IF_ON_HOST=${NOTIFY_IF_ON_HOST%>}
+    NOTIFY_ON_HOST=${NOTIFY_ON_HOST#<};         NOTIFY_ON_HOST=${NOTIFY_ON_HOST%>}
     NOTIFY_RECEIVER=${NOTIFY_RECEIVER#<};       NOTIFY_RECEIVER=${NOTIFY_RECEIVER%>}
-    
+
     # reset default values
-    [ "$NOTIFY_FOR_PROJECT" = "project-name"     ] && NOTIFY_FOR_PROJECT= 
-    [ "$NOTIFY_IF_ON_HOST"  = "hostname"         ] && NOTIFY_IF_ON_HOST= 
+    [ "$NOTIFY_FOR_PROJECT" = "project-name"     ] && NOTIFY_FOR_PROJECT=
+    [ "$NOTIFY_ON_HOST"     = "hostname"         ] && NOTIFY_ON_HOST=
     [ "$NOTIFY_RECEIVER"    = "email@domain.tld" ] && NOTIFY_RECEIVER=
-    
-    # check / autocomplete missing values
+
+    # check missing values
     NOTIFY=0
-    if [[ -n "$NOTIFY_IF_ON_HOST" && -n "$NOTIFY_RECEIVER" ]]; then
-        if [ "$NOTIFY_IF_ON_HOST" = "$(hostname)" ]; then
+    if [[ -n "$NOTIFY_ON_HOST" && -n "$NOTIFY_RECEIVER" ]]; then
+        if [ "$NOTIFY_ON_HOST" = "$(hostname)" ]; then
             [ -z "$NOTIFY_FOR_PROJECT" ] && NOTIFY_FOR_PROJECT=$(basename $(git config --get remote.origin.url) .git)
             NOTIFY=1
         fi
-    fi                
-    
+    fi
+
     # notify
     if [ $NOTIFY -eq 1 ]; then
         if command -v sendmail >/dev/null; then
@@ -130,7 +130,7 @@ else
             ) | sendmail -f "$NOTIFY_RECEIVER" "$NOTIFY_RECEIVER"
         fi
     fi
-fi    
+fi
 
 
 # update access permissions and ownership for writing of files
