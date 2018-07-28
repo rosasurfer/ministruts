@@ -1,22 +1,25 @@
 #!/bin/bash
 #
-# Copy this file to your project's bin directory and update the configuration in lines 16 ff.
+# TEMPLATE: Copy this file to your project and update the configuration in lines 18-22.
 #
 #
-# Application deploy script for Git based repositories. Deploys a branch, a tag or a specific commit and updates existing
-# Git submodules. Can send email notifications with the deployed changes (commit mesages).
+# Application deploy script for Git based repositories. Deploys a branch, a tag or a specific commit. 
+# Sends email notifications with the deployed changes (commit mesages) if configured.
 #
 # Usage: deploy.sh [<branch-name> | <tag-name> | <commit-sha>]
 #
 # Without arguments the latest version of the current branch is deployed.
 #
+#
+# TODO: update existing submodules
+#
 set -e
 
 
-# notification configuration
-NOTIFY_FOR_PROJECT="<project-name>"
-NOTIFY_IF_ON="<hostname>"
-NOTIFY_TO_EMAIL="<email@domain.tld>"
+# notification configuration (environment variables will have precedence over hardcoded values)
+NOTIFY_FOR_PROJECT="${NOTIFY_FOR_PROJECT:-<project-name>}"      `# project identifier             `
+NOTIFY_IF_ON_HOST="${NOTIFY_IF_ON_HOST:-<hostname>}"            `# notify if deployed on that host`
+NOTIFY_RECEIVER="${NOTIFY_RECEIVER:-<email@domain.tld>}"        `# notification receiver          `
 
 
 # --- functions -------------------------------------------------------------------------------------------------------------
@@ -86,28 +89,51 @@ elif [ -n "$COMMIT" ]; then
 fi
 
 
-# check updates and send deployment notifications
+# check updates
 OLD=$FROM_COMMIT
 NEW=$(git rev-parse --short HEAD)
-HOSTNAME=$(hostname)
 
 if [ "$OLD" = "$NEW" ]; then
     echo No changes.
-elif [ "$NOTIFY_IF_ON" = "$HOSTNAME" ]; then
-    if command -v sendmail >/dev/null; then
-        (
-        echo 'From: "Deployments '$NOTIFY_FOR_PROJECT'" <'$NOTIFY_TO_EMAIL'>'
-        if   [ -n "$BRANCH" ]; then echo "Subject: Updated $NOTIFY_FOR_PROJECT, branch $BRANCH to latest ($NEW)"
-        elif [ -n "$TAG"    ]; then echo "Subject: Reset $NOTIFY_FOR_PROJECT to tag $TAG ($NEW)"
-        elif [ -n "$COMMIT" ]; then echo "Subject: Reset $NOTIFY_FOR_PROJECT to commit $COMMIT"
+else
+    # send deployment notifications if configured
+
+    # trim potential angle brackets
+    NOTIFY_FOR_PROJECT=${NOTIFY_FOR_PROJECT#<}; NOTIFY_FOR_PROJECT=${NOTIFY_FOR_PROJECT%>}
+    NOTIFY_IF_ON_HOST=${NOTIFY_IF_ON_HOST#<};   NOTIFY_IF_ON_HOST=${NOTIFY_IF_ON_HOST%>}
+    NOTIFY_RECEIVER=${NOTIFY_RECEIVER#<};       NOTIFY_RECEIVER=${NOTIFY_RECEIVER%>}
+    
+    # reset default values
+    [ "$NOTIFY_FOR_PROJECT" = "project-name"     ] && NOTIFY_FOR_PROJECT= 
+    [ "$NOTIFY_IF_ON_HOST"  = "hostname"         ] && NOTIFY_IF_ON_HOST= 
+    [ "$NOTIFY_RECEIVER"    = "email@domain.tld" ] && NOTIFY_RECEIVER=
+    
+    # check / autocomplete missing values
+    NOTIFY=0
+    if [[ -n "$NOTIFY_IF_ON_HOST" && -n "$NOTIFY_RECEIVER" ]]; then
+        if [ "$NOTIFY_IF_ON_HOST" = "$(hostname)" ]; then
+            [ -z "$NOTIFY_FOR_PROJECT" ] && NOTIFY_FOR_PROJECT=$(basename $(git config --get remote.origin.url) .git)
+            NOTIFY=1
         fi
-        git log --pretty='%h %ae %s' $OLD..$NEW
-        ) | sendmail -f "$NOTIFY_TO_EMAIL" "$NOTIFY_TO_EMAIL"
+    fi                
+    
+    # notify
+    if [ $NOTIFY -eq 1 ]; then
+        if command -v sendmail >/dev/null; then
+            (
+            echo 'From: "Deployments '$NOTIFY_FOR_PROJECT'" <'$NOTIFY_RECEIVER'>'
+            if   [ -n "$BRANCH" ]; then echo "Subject: Updated $NOTIFY_FOR_PROJECT, branch $BRANCH to latest ($NEW)"
+            elif [ -n "$TAG"    ]; then echo "Subject: Reset $NOTIFY_FOR_PROJECT to tag $TAG ($NEW)"
+            elif [ -n "$COMMIT" ]; then echo "Subject: Reset $NOTIFY_FOR_PROJECT to commit $COMMIT"
+            fi
+            git log --pretty='%h %ae %s' $OLD..$NEW
+            ) | sendmail -f "$NOTIFY_RECEIVER" "$NOTIFY_RECEIVER"
+        fi
     fi
-fi
+fi    
 
 
-# update access permissions and ownership for writing files
+# update access permissions and ownership for writing of files
 DIRS="etc/log  etc/tmp"
 
 for dir in $DIRS; do
