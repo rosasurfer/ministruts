@@ -7,9 +7,9 @@
 # FcgidMaxRequestsPerProcess in apache.conf must be <= PHP_FCGI_MAX_REQUESTS.
 export PHP_FCGI_MAX_REQUESTS=2000
 
-# Use a custom php.ini in this directory or the global one if no custom file exists.
-# If a custom file exists the global version will be completely ignored. 
-#export PHPRC=./
+# Use a custom php.ini in this directory or the system configuration if no custom file exists.
+# If a custom file exists the system configuration will be completely skipped.
+export PHPRC=./
 
 # Replace with the path to your FastCGI-enabled PHP executable.
-exec php-cgi "$@"
+exec php56-cgi "$@"
