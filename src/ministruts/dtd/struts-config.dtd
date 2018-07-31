@@ -282,9 +282,9 @@
           start with a dot. All properties from the surrounding tile are also available to the inserted element. Any property 
           inherited from the surrounding tile can be overwritten by providing a new value. However, this will not modify the 
           original value in the surrounding tile. 
-          If this attribute is omitted the surrounding tile is a template and cannot be rendered independently. If a template 
-          is extended by another tile the extending tile can assign and override attributes of the extended tile. If all 
-          "include" elements of a tile have an assigned value the tile can be rendered.  
+          If this attribute is omitted the surrounding tile is marked as a template and cannot be rendered independently. 
+          If a template is extended by another tile the extending tile can assign and override attributes of the extended 
+          tile. If all "include" elements of a tile have an assigned value the tile can be rendered.  
 -->
 <!ELEMENT include EMPTY>
 <!ATTLIST include
