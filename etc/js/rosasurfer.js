@@ -260,7 +260,7 @@ var rosasurfer = {
         if (properties.length) {
             if (sort)
                properties = properties.sort();
-            this.log(properties.join('<br>\n'));
+            this.log(properties.join('\n'));
         }
         else {
             alert('rosasurfer.showProperties()\n\n'+ type +' has no known properties.');
@@ -300,9 +300,9 @@ var rosasurfer = {
         else if (target=='bottom') div.style.position = 'relative';
 
         msg = typeof(msg)=='undefined' ? 'undefined' : msg.toString().replace(/ {2,}/g, function(match) {
-            return '&nbsp;'.repeat(match.length);
-        });
-
+                                                                                            return '&nbsp;'.repeat(match.length);
+                                                                                        })
+                                                                     .replace(/\n/g, '<br>');
         div.innerHTML += msg +'<br>\n';
     },
 
