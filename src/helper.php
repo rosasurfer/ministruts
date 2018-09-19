@@ -298,14 +298,14 @@ function pp($var, $return=false, $flushBuffers=true) {
  * @return string|null - string if the result is to be returned, NULL otherwise
  */
 function printPretty($var, $return=false, $flushBuffers=true) {
-    if (is_object($var) && method_exists($var, '__toString')) {
+    if (is_object($var) && method_exists($var, '__toString') && !$var instanceof \SimpleXMLElement) {
         $str = (string) $var->__toString();         // calling __toString() manually prevents possible error
     }                                               // "Method __toString() must return a string value"
     elseif (is_object($var) || is_array($var)) {
         $str = print_r($var, true);
     }
     elseif ($var === null) {
-        $str = '(NULL)';                            // analogous to typeof(null) = 'NULL';
+        $str = '(null)';                            // analogous to typeof(null) = 'NULL';
     }
     elseif (is_bool($var)) {
         $str = ($var ? 'true':'false').' (bool)';
