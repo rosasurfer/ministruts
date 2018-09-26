@@ -484,10 +484,10 @@ class Config extends Object implements IConfig {
 
         if (isSet($options['sort'])) {
             if ($options['sort'] == SORT_ASC) {
-                kSort($values);
+                kSort($values, SORT_NATURAL);
             }
             else if ($options['sort'] == SORT_DESC) {
-                krSort($values);
+                krSort($values, SORT_NATURAL);
             }
         }
 
@@ -571,10 +571,10 @@ class Config extends Object implements IConfig {
 
         if (isSet($options['sort'])) {
             if ($options['sort'] == SORT_ASC) {
-                kSort($values);
+                kSort($values, SORT_NATURAL);
             }
             else if ($options['sort'] == SORT_DESC) {
-                krSort($values);
+                krSort($values, SORT_NATURAL);
             }
         }
 
