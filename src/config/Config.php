@@ -487,8 +487,7 @@ class Config extends Object implements IConfig {
                 kSort($values);
             }
             else if ($options['sort'] == SORT_DESC) {
-                kSort($values);
-                $values = array_reverse($values, true);
+                krSort($values);
             }
         }
 
@@ -575,8 +574,7 @@ class Config extends Object implements IConfig {
                 kSort($values);
             }
             else if ($options['sort'] == SORT_DESC) {
-                kSort($values);
-                $values = array_reverse($values, true);
+                krSort($values);
             }
         }
 
