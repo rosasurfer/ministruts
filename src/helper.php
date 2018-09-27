@@ -152,9 +152,10 @@ function array_keysx($array, $search=null, $strict=false) {
     if (is_array($array)) return array_keys(...func_get_args());
 
     if ($array instanceof \ArrayAccess) {
+        $argc    = func_num_args();
         $results = [];
         foreach ($array as $key => $value) {
-            if (func_num_args() == 1)             $results[] = $key;
+            if ($argc == 1)                       $results[] = $key;
             else if ($strict) $value===$search && $results[] = $key;
             else              $value== $search && $results[] = $key;
         }
