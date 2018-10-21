@@ -217,17 +217,15 @@ var rosasurfer = {
    getType: function getType(arg) {
       var type = typeof(arg);
       if (type == 'object') {
-         if (arg === null) {
-            type = 'null';
+         if      (arg === null)    type = 'null';
+         else if (arg.constructor) type = arg.constructor.name || arg.constructor.toString();
+         else                      type = ''+ arg;
+         
+         if (type.startsWith('[object ')) {              // [object HTMLAnchorElement]
+            type = type.slice(8, -1);
          }
-         else {
-            type = arg.constructor.name || arg.constructor.toString();
-            if (type.startsWith('[object ')) {              // [object HTMLAnchorElement]
-               type = type.slice(8, -1);
-            }
-            else if (type.startsWith('function ')) {        // function HTMLAnchorElement() { [native code] }
-               type = type.slice(9, type.indexOf('('));
-            }
+         else if (type.startsWith('function ')) {        // function HTMLAnchorElement() { [native code] }
+            type = type.slice(9, type.indexOf('('));
          }
       }
       return type;
