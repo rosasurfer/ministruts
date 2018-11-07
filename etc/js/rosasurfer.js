@@ -90,7 +90,6 @@ if ('ab'.substr(-1) != 'b') {
  */
 var rosasurfer = {
 
-
     /**
      * Get an object holding all query parameters. Array parameters are supported for the first dimension.
      *
@@ -207,29 +206,29 @@ var rosasurfer = {
     },
 
 
-   /**
-    * Return a nicer representation of the specified argument's type.
-    *
-    * @param  mixed arg
-    *
-    * @return string
-    */
-   getType: function getType(arg) {
-      var type = typeof(arg);
-      if (type == 'object') {
-         if      (arg === null)    type = 'null';
-         else if (arg.constructor) type = arg.constructor.name || arg.constructor.toString();
-         else                      type = ''+ arg;
-         
-         if (type.startsWith('[object ')) {              // [object HTMLAnchorElement]
-            type = type.slice(8, -1);
-         }
-         else if (type.startsWith('function ')) {        // function HTMLAnchorElement() { [native code] }
-            type = type.slice(9, type.indexOf('('));
-         }
-      }
-      return type;
-   },
+    /**
+     * Return a nicer representation of the specified argument's type.
+     *
+     * @param  mixed arg
+     *
+     * @return string
+     */
+    getType: function getType(arg) {
+        var type = typeof(arg);
+        if (type == 'object') {
+            if      (arg === null)    type = 'null';
+            else if (arg.constructor) type = arg.constructor.name || arg.constructor.toString();
+            else                      type = ''+ arg;
+            
+            if (type.startsWith('[object ')) {              // [object HTMLAnchorElement]
+                type = type.slice(8, -1);
+            }
+            else if (type.startsWith('function ')) {        // function HTMLAnchorElement() { [native code] }
+                type = type.slice(9, type.indexOf('('));
+            }
+        }
+        return type;
+    },
 
 
     /**
