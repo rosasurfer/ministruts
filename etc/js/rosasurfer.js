@@ -322,7 +322,14 @@ var rosasurfer = {
         var property='', properties=[], type=this.getType(arg);
         for (var i in arg) {
             try {
-                property = type +'.'+ i +' = '+ arg[i];
+                property = ''+ arg[i];                                                                       
+                if ((i=='innerHTML' || i=='textContent') && (property=property.replace(/\n/g, ' ')) && property.length > 100) {   
+                    property = property.substr(0, 100) +'...';                                      // limit long HTML contents
+                }
+                else if (property.startsWith('function ') && property.contains('[native code]')) {  // remove line breaks from native function bodies 
+                    property =  property.replace(/\n/g, ' ');                                        
+                }
+                property = type +'.'+ i +' = '+ property;
             }
             catch (ex) {
                 property = type +'.'+ i +' = exception while reading property ('+ ex.name +': '+ ex.message +')';
