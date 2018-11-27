@@ -5,6 +5,7 @@ use rosasurfer\config\Config;
 use rosasurfer\core\StaticClass;
 use rosasurfer\debug\DebugHelper;
 use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\exception\RuntimeException;
 
 use function rosasurfer\echoPre;
@@ -47,8 +48,8 @@ class PHP extends StaticClass {
      * Execute a process and return STDOUT. Replacement for shell_exec() wich suffers from a Windows bug where a DOS EOF
      * character (0x1A = ASCII 26) in the STDOUT stream causes further reading to stop.
      *
-     * pOpen() suffers from the same bug.
-     * passThru() does not capture STDERR.
+     * - pOpen() suffers from the same bug
+     * - passThru() does not capture STDERR
      *
      * @param  string   $cmd                 - external command to execute
      * @param  string   $stderr   [optional] - if present a variable the contents of STDERR will be written to
@@ -77,11 +78,12 @@ class PHP extends StaticClass {
             $hProc = proc_open($cmd, $descriptors, $pipes, $dir, $env, ['bypass_shell'=>true]);
         }
         catch (\Exception $ex) {
+            if (!$ex instanceof IRosasurferException) $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex);
             if (WINDOWS && preg_match('/proc_open\(\): CreateProcess failed, error code - ([0-9]+)/i', $ex->getMessage(), $match)) {
                 $error = Windows::errorToString((int) $match[1]);
-                if ($error != $match[1]) throw new RuntimeException($ex->getMessage().' ('.$error.')', null, $ex);
+                if ($error != $match[1]) $ex->addMessage($match[1].': '.$error);
             }
-            throw $ex;
+            throw $ex->addMessage('CMD: "'.$cmd.'"');
         }
         fClose             ($pipes[$STDIN]);            // $pipes[0] => writeable handle connected to the child's STDIN
         stream_set_blocking($pipes[$STDOUT], false);    // $pipes[1] => readable handle connected to the child's STDOUT
