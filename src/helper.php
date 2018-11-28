@@ -20,22 +20,22 @@ use rosasurfer\util\Validator;
 
 
 // Whether or not we run on a command line interface, on localhost and/or on Windows.
-define('rosasurfer\_CLI',       defined('\STDIN') && is_resource(\STDIN));
-define('rosasurfer\_LOCALHOST', !_CLI && in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1', $_SERVER['SERVER_ADDR']]));
-define('rosasurfer\_MACOS',     strToUpper(PHP_OS) == 'DARWIN');
-define('rosasurfer\_WINDOWS',   strToUpper(subStr(PHP_OS, 0, 3)) == 'WIN');
-define('rosasurfer\_NUL',       _WINDOWS ? 'nul' : '/dev/null');
+define('rosasurfer\_CLI',        defined('\STDIN') && is_resource(\STDIN));
+define('rosasurfer\_LOCALHOST',  !_CLI && in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1', $_SERVER['SERVER_ADDR']]));
+define('rosasurfer\_MACOS',      strToUpper(PHP_OS) == 'DARWIN');
+define('rosasurfer\_WINDOWS',    strToUpper(subStr(PHP_OS, 0, 3)) == 'WIN');
+define('rosasurfer\_NUL_DEVICE', _WINDOWS ? 'nul' : '/dev/null');
 
-/** @var bool - whether or not we run on a command line interface */
-const CLI     = _CLI;                                               // constant declarations improve IDE code completion
-/** @var bool - whether or not we run on a webserver's localhost */
-const LOCALHOST = _LOCALHOST;
-/** @var bool - whether or not we run on MacOS */
-const MACOS   = _MACOS;
-/** @var bool - whether or not we run on Windows */
-const WINDOWS = _WINDOWS;
-/** @var bool - the system's NUL device name */
-const NUL     = _NUL;
+/** @var bool    - whether or not we run on a command line interface */         // constant declarations improve IDE code completion
+const CLI        = _CLI;
+/** @var bool    - whether or not we run on a webserver's localhost */
+const LOCALHOST  = _LOCALHOST;
+/** @var bool    - whether or not we run on MacOS */
+const MACOS      = _MACOS;
+/** @var bool    - whether or not we run on Windows */
+const WINDOWS    = _WINDOWS;
+/** @var string  - the system's NUL device name */
+const NUL_DEVICE = _NUL_DEVICE;
 
 // custom log level
 const L_DEBUG           =  1;
@@ -571,7 +571,7 @@ function isRelativePath($path) {
     if (strLen($path) && $path[0]=='/')
         return false;
 
-    return true;                // an empty string cannot be considered absolute, so it's assumed to be relative directory
+    return true;                // an empty string cannot be considered absolute, so it's assumed to be a relative
 }
 
 
@@ -1217,11 +1217,11 @@ function is_dir_empty($dirname, $ignore = []) {
 
     $handle = opendir($dir);
     while (false !== ($entry = readdir($handle))) {
-    if ($entry != "." && $entry != "..") {
-      return FALSE;
+        if ($entry != "." && $entry != "..") {
+          return FALSE;
+        }
     }
-    }
-    Don’t forget to closedir($handle) afterwards.
+    Don't forget to closedir($handle) afterwards.
     */
     return true;
 }

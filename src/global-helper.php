@@ -13,7 +13,7 @@ const CLI               = \rosasurfer\CLI;
 const LOCALHOST         = \rosasurfer\LOCALHOST;
 const MACOS             = \rosasurfer\MACOS;
 const WINDOWS           = \rosasurfer\WINDOWS;
-const NUL               = \rosasurfer\NUL;                      // the system's NUL device name
+const NUL_DEVICE        = \rosasurfer\NUL_DEVICE;                   // the system's NUL device name
 
 // custom log level
 const L_DEBUG           = \rosasurfer\L_DEBUG;
