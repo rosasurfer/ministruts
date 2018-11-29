@@ -17,6 +17,8 @@ use function rosasurfer\strLeft;
 use function rosasurfer\strLeftTo;
 use function rosasurfer\strStartsWith;
 
+use const rosasurfer\NL;
+
 
 /**
  * Module
@@ -212,8 +214,9 @@ class Module extends Object {
         if (!isSet($xml['file-base'])) {
             // not specified, apply global configuration
             $location = Config::getDefault()->get('app.dir.view', null);
-            if (!$location) throw new StrutsConfigException('Missing view directory configuration: Neither $config[app.dir.view] nor <struts-config file-base="{base-directory}" are specified');
-
+            if (!$location) throw new StrutsConfigException('Missing view directory configuration: '
+                .'Neither $config[app.dir.view] nor <struts-config file-base="{base-directory}" are specified'.NL
+                .'config: '.NL.Config::getDefault()->dump());
             isRelativePath($location) && $location = $rootDirectory.DIRECTORY_SEPARATOR.$location;
             if (!is_dir($location)) throw new StrutsConfigException('Resource location $config[app.dir.view]="'.Config::getDefault()->get('app.dir.view').'" not found');
 
