@@ -2,85 +2,68 @@
 
 
 /**
- * Polyfill and extend objects.
+ * Polyfills and objects extensions.
  */
-if (!Array.isArray) Array.isArray = function isArray   (/*mixed*/    arg)         { return Object.prototype.toString.call(arg) === '[object Array]'; };
-if (!Array.from) {  Array.from    = (function() {
+if (!Array.from) { Array.from = (function() {
     var toStr = Object.prototype.toString;
-    var isCallable = function (fn) {
-      return typeof fn === 'function' || toStr.call(fn) === '[object Function]';
+    var isCallable = function(fn) {
+        return typeof(fn)==='function' || toStr.call(fn)==='[object Function]';
     };
-    var toInteger = function (value) {
-      var number = Number(value);
-      if (isNaN(number)) { return 0; }
-      if (number === 0 || !isFinite(number)) { return number; }
-      return (number > 0 ? 1 : -1) * Math.floor(Math.abs(number));
+    var toInteger = function(value) {m
+        var number = Number(value);
+        if (isNaN(number))                   return 0;
+        if (number===0 || !isFinite(number)) return number;
+        return (number > 0 ? 1 : -1) * Math.floor(Math.abs(number));
     };
     var maxSafeInteger = Math.pow(2, 53) - 1;
-    var toLength = function (value) {
-      var len = toInteger(value);
-      return Math.min(Math.max(len, 0), maxSafeInteger);
+    var toLength = function(value) {
+        var len = toInteger(value);
+        return Math.min(Math.max(len, 0), maxSafeInteger);
     };
 
     // The length property of the from method is 1.
     return function from(arrayLike/*, mapFn, thisArg */) {
-      // 1. Let C be the this value.
-      var C = this;
-
-      // 2. Let items be ToObject(arrayLike).
-      var items = Object(arrayLike);
-
-      // 3. ReturnIfAbrupt(items).
-      if (arrayLike == null) {
-        throw new TypeError('Array.from requires an array-like object - not null or undefined');
-      }
-
-      // 4. If mapfn is undefined, then let mapping be false.
-      var mapFn = arguments.length > 1 ? arguments[1] : void undefined;
-      var T;
-      if (typeof mapFn !== 'undefined') {
-        // 5. else
-        // 5. a If IsCallable(mapfn) is false, throw a TypeError exception.
-        if (!isCallable(mapFn)) {
-          throw new TypeError('Array.from: when provided, the second argument must be a function');
+        // 1. Let C be the this value.
+        var C = this;
+        // 2. Let items be ToObject(arrayLike).
+        var items = Object(arrayLike);
+        // 3. ReturnIfAbrupt(items).
+        if (arrayLike == null) throw new TypeError('Array.from requires an array-like object - not null or undefined');
+        // 4. If mapfn is undefined, then let mapping be false.
+        var mapFn = arguments.length > 1 ? arguments[1] : void undefined;
+        var T;
+        if (typeof(mapFn) !== 'undefined') {
+            // 5. a If IsCallable(mapfn) is false, throw a TypeError exception.
+            if (!isCallable(mapFn)) throw new TypeError('Array.from: when provided, the second argument must be a function');
+            // 5. b. If thisArg was supplied, let T be thisArg; else let T be undefined.
+            if (arguments.length > 2)
+                T = arguments[2];
         }
-
-        // 5. b. If thisArg was supplied, let T be thisArg; else let T be undefined.
-        if (arguments.length > 2) {
-          T = arguments[2];
+        // 10. Let lenValue be Get(items, "length").
+        // 11. Let len be ToLength(lenValue).
+        var len = toLength(items.length);
+        // 13. If IsConstructor(C) is true, then
+        // 13. a. Let A be the result of calling the [[Construct]] internal method 
+        // of C with an argument list containing the single item len.
+        // 14. a. Else, Let A be ArrayCreate(len).
+        var A = isCallable(C) ? Object(new C(len)) : new Array(len);
+        // 16. Let k be 0.
+        var k = 0, kValue;
+        // 17. Repeat, while k < len… (also steps a - h)
+        while (k < len) {
+            kValue = items[k];
+            if (mapFn) A[k] = typeof(T)==='undefined' ? mapFn(kValue, k) : mapFn.call(T, kValue, k);
+            else       A[k] = kValue;
+            k++;
         }
-      }
-
-      // 10. Let lenValue be Get(items, "length").
-      // 11. Let len be ToLength(lenValue).
-      var len = toLength(items.length);
-
-      // 13. If IsConstructor(C) is true, then
-      // 13. a. Let A be the result of calling the [[Construct]] internal method 
-      // of C with an argument list containing the single item len.
-      // 14. a. Else, Let A be ArrayCreate(len).
-      var A = isCallable(C) ? Object(new C(len)) : new Array(len);
-
-      // 16. Let k be 0.
-      var k = 0;
-      // 17. Repeat, while k < len… (also steps a - h)
-      var kValue;
-      while (k < len) {
-        kValue = items[k];
-        if (mapFn) {
-          A[k] = typeof T === 'undefined' ? mapFn(kValue, k) : mapFn.call(T, kValue, k);
-        } else {
-          A[k] = kValue;
-        }
-        k += 1;
-      }
-      // 18. Let putStatus be Put(A, "length", len, true).
-      A.length = len;
-      // 20. Return A.
-      return A;
+        // 18. Let putStatus be Put(A, "length", len, true).
+        A.length = len;
+        // 20. Return A.
+        return A;
     };
   }());
 }
+if (!Array.isArray)             Array.isArray             = function isArray   (/*mixed*/ arg) { return Object.prototype.toString.call(arg) === '[object Array]'; };
 if (!Array.prototype.forEach  ) Array.prototype.forEach   = function forEach   (/*function*/ func, scope) { for (var i=0, len=this.length; i < len; ++i) func.call(scope, this[i], i, this); }
 
 if (!Date.prototype.addDays   ) Date.prototype.addDays    = function addDays   (/*int*/ days)    { this.setTime(this.getTime() + (days*24*60*60*1000)); return this; }
@@ -88,22 +71,31 @@ if (!Date.prototype.addHours  ) Date.prototype.addHours   = function addHours  (
 if (!Date.prototype.addMinutes) Date.prototype.addMinutes = function addMinutes(/*int*/ minutes) { this.setTime(this.getTime() + (   minutes*60*1000)); return this; }
 if (!Date.prototype.addSeconds) Date.prototype.addSeconds = function addSeconds(/*int*/ seconds) { this.setTime(this.getTime() + (      seconds*1000)); return this; }
 
-if (!String.prototype.capitalize     ) String.prototype.capitalize      = function capitalize     ()                  { return this.charAt(0).toUpperCase() + this.slice(1); }
-if (!String.prototype.capitalizeWords) String.prototype.capitalizeWords = function capitalizeWords()                  { return this.replace(/\w\S*/g, function(word) { return word.capitalize(); }); }
-if (!String.prototype.decodeEntities ) String.prototype.decodeEntities  = function decodeEntities ()                  { if (!String.prototype.decodeEntities.textarea) /*static*/ String.prototype.decodeEntities.textarea = document.createElement('textarea'); String.prototype.decodeEntities.textarea.innerHTML = this; return String.prototype.decodeEntities.textarea.value; }
-if (!String.prototype.trim           ) String.prototype.trim            = function trim           ()                  { return this.replace(/(^\s+)|(\s+$)/g, ''); }
-if (!String.prototype.startsWith     ) String.prototype.startsWith      = function startsWith     (/*string*/ prefix) { return (this.indexOf(prefix) === 0); }
-if (!String.prototype.contains       ) String.prototype.contains        = function contains       (/*string*/ string) { return (this.indexOf(string) != -1); }
-if (!String.prototype.endsWith       ) String.prototype.endsWith        = function endsWith       (/*string*/ suffix) { var pos = this.lastIndexOf(suffix); return (pos!=-1 && this.length==pos+suffix.length); }
-if (!String.prototype.repeat         ) String.prototype.repeat          = function repeat         (/*int*/    count)  {
-    if (count < 0)                    throw new RangeError('repeat count must be non-negative');
-    if (count == Infinity)            throw new RangeError('repeat count must be less than infinity');
+if (!String.prototype.capitalize     ) String.prototype.capitalize      = function capitalize     ()                                    { return this.charAt(0).toUpperCase() + this.slice(1); }
+if (!String.prototype.capitalizeWords) String.prototype.capitalizeWords = function capitalizeWords()                                    { return this.replace(/\w\S*/g, function(word) { return word.capitalize(); }); }
+if (!String.prototype.decodeEntities ) String.prototype.decodeEntities  = function decodeEntities ()                                    { if (!String.prototype.decodeEntities.textarea) /*static*/ String.prototype.decodeEntities.textarea = document.createElement('textarea'); String.prototype.decodeEntities.textarea.innerHTML = this; return String.prototype.decodeEntities.textarea.value; }
+if (!String.prototype.startsWith     ) String.prototype.startsWith      = function startsWith     (/*string*/ prefix, /*int*/ pos)      { return this.substr(!pos || pos < 0 ? 0 : +pos, prefix.length) === prefix; }
+if (!String.prototype.endsWith       ) String.prototype.endsWith        = function endsWith       (/*string*/ suffix, /*int*/ this_len) { if (this_len===undefined || this_len > this.length) this_len = this.length; return this.substring(this_len - suffix.length, this_len) === suffix; }
+if (!String.prototype.includes       ) String.prototype.includes        = function includes       (/*string*/ string, /*int*/ start)    { if (typeof(start) !== 'number') start = 0; if (start + string.length > this.length) return false; return this.indexOf(string, start) !== -1; } 
+if (!String.prototype.contains       ) String.prototype.contains        = String.prototype.includes;
+if (!String.prototype.trim           ) String.prototype.trim            = function trim           ()                                    { return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, ''); }
+if (!String.prototype.repeat         ) String.prototype.repeat          = function repeat         (/*int*/ count) {
+    var str = ''+ this;
+    count = +count;
+    if (count != count) 
+        count = 0;
+    if (count < 0)         throw new RangeError('repeat count must be non-negative');
+    if (count == Infinity) throw new RangeError('repeat count must be less than infinity');
     count = Math.floor(count);
-    if (this.length * count >= 1<<28) throw new RangeError('repeat count must not overflow maximum string size');
-    var result = '';
-    while (count--)
-        result += this;
-    return result;
+    if (!str.length || !count) 
+        return '';
+    if (str.length * count >= 1 << 28) throw new RangeError('repeat count must not overflow maximum string size');
+    var maxCount = str.length * count;
+    count = Math.floor(Math.log(count) / Math.log(2));
+    while (count--) 
+       str += str;
+    str += str.substring(0, maxCount - str.length);
+    return str;
 }
 
 // fix broken Internet Explorer substr()
@@ -118,14 +110,14 @@ if ('ab'.substr(-1) != 'b') {
     }
 }
 
-// fix inaccurate Number.toFixed()
+// Add Number.prototype.toFixed10() for decimal adjustment to be used instead of the inaccurate Number.prototype.toFixed().
 (function() {
     /**
      * Decimal adjustment of a number.
      *
      * @param  string type  - type of adjustment
      * @param  number value - number
-     * @param  int    exp   - exponent (the 10 logarithm of the adjustment base)
+     * @param  int    exp   - exponent (the decimal logarithm of the adjustment base)
      *
      * @return number - adjusted value
      *
@@ -373,7 +365,7 @@ var rosasurfer = {
             div.style.color           = 'black';
             div.style.backgroundColor = 'lightgray';
             var bodies = document.getElementsByTagName('body');
-            if (!bodies || !bodies.length) return alert('rosasurfer.log()\n\nFailed attaching the output DIV to the page body (BODY tag not found).\nWait for document.onLoad() or use console.log() if you want to log from the page header?');
+            if (!bodies || !bodies.length) return alert('rosasurfer.log()\n\nFailed attaching the logger output DIV to the page (BODY tag not found).\nWait for document.onLoad() or use console.log() if you want to log from the page header?');
             bodies[0].appendChild(div);
         }
         if      (target=='top'   ) div.style.position = 'absolute';
