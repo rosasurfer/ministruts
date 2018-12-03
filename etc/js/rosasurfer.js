@@ -9,7 +9,7 @@ if (!Array.from) { Array.from = (function() {
     var isCallable = function(fn) {
         return typeof(fn)==='function' || toStr.call(fn)==='[object Function]';
     };
-    var toInteger = function(value) {m
+    var toInteger = function(value) {
         var number = Number(value);
         if (isNaN(number))                   return 0;
         if (number===0 || !isFinite(number)) return number;
