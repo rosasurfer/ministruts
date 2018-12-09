@@ -28,7 +28,8 @@ use const rosasurfer\NL;
  * | db.{name}.options.foreign_keys | [on|off]   | on                         |
  * +--------------------------------+------------+----------------------------+
  * </pre>
- *  (1) - A relative database file location is interpreted as relative to the application root directory. <br>
+ *  (1) - A relative database file location is interpreted as relative to the application's data directory (if configured). <br>
+ *        If the file is not found an attempt is made to find it in the application's root directory. <br>
  *  (2) - Available flags: SQLITE3_OPEN_CREATE | SQLITE3_OPEN_READONLY | SQLITE3_OPEN_READWRITE <br>
  *
  * Additional SQLite pragma options can be specified under the "options" key.
@@ -94,18 +95,30 @@ class SQLiteConnector extends Connector {
     /**
      * Set the file name of the database to connect to. May be ":memory:" to use an in-memory database.
      *
-     * @param  string $file
-     *
+     * @param  string $file - A relative database file location is interpreted as relative to the application's data
+     *                        directory (if configured). If the file is not found an attempt is made to find it in the
+     *                        application's root directory.
      * @return $this
      */
     protected function setFile($file) {
         if (!is_string($file)) throw new IllegalTypeException('Illegal type of parameter $file: '.getType($file));
         if (!strLen($file))    throw new InvalidArgumentException('Invalid parameter $file: "'.$file.'" (empty)');
 
-        if (isRelativePath($file))
-            $file = Config::getDefault()->get('app.dir.root').DIRECTORY_SEPARATOR.$file;
+        if ($file == ':memory:' || !isRelativePath($file)) {
+            $this->file = $file;
+        }
+        else {
+            $dataDir = Config::getDefault()->get('app.dir.data', null);
+            $rootDir = Config::getDefault()->get('app.dir.root', null);
 
-        $this->file = $file;
+            if ($dataDir && (is_file($dataDir.'/'.$file) || !is_file($rootDir.'/'.$file))) {
+                $file = $dataDir.'/'.$file;
+            }
+            else {
+                $file = $rootDir.'/'.$file;
+            }
+            $this->file = str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $file);
+        }
         return $this;
     }
 
@@ -151,7 +164,7 @@ class SQLiteConnector extends Connector {
                 $what = ($flags & SQLITE3_OPEN_CREATE) ? 'create':'find';
                 isRelativePath($file) && $where=' in "'.getCwd().'"';
             }
-            throw $ex->addMessage('Cannot '.$what.' SQLite database file "'.$file.'"'.$where);
+            throw $ex->addMessage('Cannot '.$what.' database file "'.$file.'"'.$where);
         }
         $this->handler = $handler;
 
