@@ -137,7 +137,9 @@ class SQLiteConnector extends Connector {
             $handler = new \SQLite3($this->file, $flags);                       // SQLITE3_OPEN_READONLY
             !$handler && trigger_error($php_errormsg, E_USER_ERROR);            // SQLITE3_OPEN_READWRITE
         }
-        catch (IRosasurferException $ex) {
+        catch (\Exception $ex) {
+            if (!$ex instanceof IRosasurferException)
+                $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex);
             $file = $this->file;
             $what = $where = null;
             if (file_exists($file)) {
@@ -313,7 +315,9 @@ class SQLiteConnector extends Connector {
             else                    $result = $this->handler->query($sql);    // bug: always SQLite3Result, never boolean
             if (!$result) trigger_error('Error '.$this->handler->lastErrorCode().', '.$this->handler->lastErrorMsg(), E_USER_ERROR);
         }
-        catch (IRosasurferException $ex) {
+        catch (\Exception $ex) {
+            if (!$ex instanceof IRosasurferException)
+                $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex);
             throw $ex->addMessage('Database: '.$this->file.NL.'SQL: "'.$sql.'"');
         }
 

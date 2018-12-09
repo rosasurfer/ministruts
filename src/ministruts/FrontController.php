@@ -102,11 +102,10 @@ class FrontController extends Singleton {
                 $this->modules[$prefix] = $module;
             }
         }
-        catch (IRosasurferException $ex) {
-            throw $ex->addMessage('Error loading config file "'.$file.'"');
-        }
         catch (\Exception $ex) {
-            throw new RuntimeException('Error loading config file "'.$file.'"', null, $ex);
+            if (!$ex instanceof IRosasurferException)
+                $ex = new StrutsConfigException($ex->getMessage(), $ex->getCode(), $ex);
+            throw $ex->addMessage('Error loading config file "'.$file.'"');
         }
     }
 

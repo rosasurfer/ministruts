@@ -220,7 +220,9 @@ class MySQLConnector extends Connector {
             $this->hConnection = mysql_connect($host, $user, $pass, $newLink=true/*, $flags=2*/);
             !$this->hConnection && trigger_error($php_errormsg, E_USER_ERROR);
         }
-        catch (IRosasurferException $ex) {
+        catch (\Exception $ex) {
+            if (!$ex instanceof IRosasurferException)
+                $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex);
             throw $ex->addMessage('Can not connect to MySQL server on "'.$host.'"');
         }
 
@@ -268,7 +270,9 @@ class MySQLConnector extends Connector {
             try {
                 mysql_select_db($this->database, $this->hConnection) || trigger_error(mysql_error($this->hConnection), E_USER_ERROR);
             }
-            catch (IRosasurferException $ex) {
+            catch (\Exception $ex) {
+                if (!$ex instanceof IRosasurferException)
+                    $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex);
                 throw $ex->addMessage('Can not select database "'.$this->database.'"')->setCode(mysql_errno($this->hConnection));
             }
         }
@@ -412,7 +416,9 @@ class MySQLConnector extends Connector {
             $result = mysql_query($sql, $this->hConnection);
             $result || trigger_error('SQL-Error '.mysql_errno($this->hConnection).': '.mysql_error($this->hConnection), E_USER_ERROR);
         }
-        catch (IRosasurferException $ex) {
+        catch (\Exception $ex) {
+            if (!$ex instanceof IRosasurferException)
+                $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex);
             throw $ex->addMessage('Database: '.$this->getConnectionDescription().NL.'SQL: "'.$sql.'"')->setCode(mysql_errno($this->hConnection));
         }
 

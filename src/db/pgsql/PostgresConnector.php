@@ -261,7 +261,9 @@ class PostgresConnector extends Connector {
             $this->hConnection = pg_connect($connStr, PGSQL_CONNECT_FORCE_NEW);
             !$this->hConnection && trigger_error($php_errormsg, E_USER_ERROR);
         }
-        catch (IRosasurferException $ex) {
+        catch (\Exception $ex) {
+            if (!$ex instanceof IRosasurferException)
+                $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex);
             throw $ex->addMessage('Cannot connect to PostgreSQL server with connection string: "'.$connStr.'"');
         }
 
@@ -447,9 +449,11 @@ class PostgresConnector extends Connector {
         $result = null;
         try {
             $result = pg_query($this->hConnection, $sql);         // wraps multi-statement queries in a transaction
-            $result || trigger_error(pg_last_error($this->hConnection), E_USER_ERROR);
+            !$result && trigger_error(pg_last_error($this->hConnection), E_USER_ERROR);
         }
-        catch (IRosasurferException $ex) {
+        catch (\Exception $ex) {
+            if (!$ex instanceof IRosasurferException)
+                $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex);
             throw $ex->addMessage('Database: '.$this->getConnectionDescription().NL.'SQL: "'.$sql.'"');
         }
 
