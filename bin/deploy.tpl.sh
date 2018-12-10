@@ -17,7 +17,7 @@ set -e
 
 
 # notification configuration (environment variables of the same name will have precedence over values hardcoded here)
-NOTIFY_FOR_PROJECT="${NOTIFY_FOR_PROJECT:-<project-name>}"      `# fill in your project identifier              `
+NOTIFY_FOR_PROJECT="${NOTIFY_FOR_PROJECT:-<project-name>}"      `# fill in the project identifier               `
 NOTIFY_ON_HOST="${NOTIFY_ON_HOST:-<hostname>}"                  `# fill in the hostname to notify if deployed on`
 NOTIFY_RECEIVER="${NOTIFY_RECEIVER:-<email@domain.tld>}"        `# fill in the notification receiver            `
 
