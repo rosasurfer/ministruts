@@ -262,6 +262,42 @@ class Request extends Singleton {
 
 
     /**
+     * Return an object-oriented representation of the uploaded files. The broken PHP array structure of uploaded files is
+     * converted to regular file arrays.
+     *
+     * @TODO: convert file data to {@link UploadedFile} instances
+     *
+     * @return array - associative array of files
+     */
+    public function getFiles() {
+        static $files;
+        if (!isSet($files)) {
+            $normalizeLevel = function(array $file) use (&$normalizeLevel) {
+                if (isSet($file['name']) && is_array($file['name'])) {
+            	    $properties = array_keys($file);
+                    $normalized = [];
+                    foreach (array_keys($file['name']) as $name) {
+                        foreach ($properties as $property) {
+                            $normalized[$name][$property] = $file[$property][$name];
+                        }
+                        $normalized[$name] = $normalizeLevel($normalized[$name]);
+                    }
+                    $file = $normalized;
+                }
+                return $file;
+            };
+            $files = [];
+            if (isSet($_FILES)) {
+                foreach ($_FILES as $key => $file) {
+            	    $files[$key] = $normalizeLevel($file);
+            	}
+            }
+        }
+        return $files;
+    }
+
+
+    /**
      * Return the host name the request was made to.
      *
      * @return string - host name
@@ -510,22 +546,22 @@ class Request extends Singleton {
      */
     public function getContent() {
         static $content  = '';
-        static $beenRead = false;
+        static $isRead = false;
 
-        if (!$beenRead) {
+        if (!$isRead) {
             if ($this->getContentType() == 'multipart/form-data') {
                 // file upload
                 if ($_POST) {                                                           // php://input is not available with
                     $content = '$_POST => '.print_r($_POST, true).NL;                   // enctype="multipart/form-data"
                     // TODO: we should limit excessive variable values to 1KB
                 }
-                $content .= '$_FILES => '.print_r($_FILES, true);
+                $content .= '$_FILES => '.print_r($this->getFiles(), true);
             }
             else {
                 // regular request body
                 $content = file_get_contents('php://input');
             }
-            $beenRead = true;
+            $isRead = true;
         }
         return $content;
     }
