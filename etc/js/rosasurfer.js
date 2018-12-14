@@ -309,9 +309,10 @@ var rosasurfer = {
         if (arg === undefined)                            return alert('rosasurfer.showProperties()\n\nPassed parameter: undefined');
         if (arg === null)                                 return alert('rosasurfer.showProperties()\n\nPassed parameter: null');
         if (this.getType(arg).startsWith('XrayWrapper ')) return this.showProperties(arg.wrappedJSObject, sort);
-        sort = (sort===undefined) ? true : Boolean(sort);
 
         var property='', properties=[], type=this.getType(arg);
+        sort = (sort===undefined) ? (type!='Array') : Boolean(sort);
+        
         for (var i in arg) {
             try {
                 property = ''+ arg[i];                                                                       
