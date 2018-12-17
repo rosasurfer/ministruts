@@ -145,7 +145,6 @@ class SQLiteConnector extends Connector {
     public function connect() {
         if (!class_exists('SQLite3')) throw new RuntimeException('Undefined class \SQLite3, sqlite3 extension is not available');
 
-        $php_errormsg = '';
         try {                                                                   // available flags:
             $flags  = SQLITE3_OPEN_READWRITE;                                   // SQLITE3_OPEN_CREATE
             $sqlite = new \SQLite3($this->file, $flags);                        // SQLITE3_OPEN_READONLY
