@@ -19,14 +19,15 @@ use const rosasurfer\NL;
  *
  * Connector configuration:
  * <pre>
- * +--------------------------------+------------+----------------------------+
- * | setting                        | value      | default value              |
- * +--------------------------------+------------+----------------------------+
- * | db.{name}.connector            | sqlite     | -                          |
- * | db.{name}.database             | dbFileName | - (1)                      |
- * | db.{name}.options.open_mode    | [openMode] | SQLITE3_OPEN_READWRITE (2) |
- * | db.{name}.options.foreign_keys | [on|off]   | on                         |
- * +--------------------------------+------------+----------------------------+
+ * +--------------------------------------+------------+----------------------------+
+ * | setting                              | value      | default value              |
+ * +--------------------------------------+------------+----------------------------+
+ * | db.{name}.connector                  | sqlite     | -                          |
+ * | db.{name}.database                   | dbFileName | - (1)                      |
+ * | db.{name}.options.open_mode          | [openMode] | SQLITE3_OPEN_READWRITE (2) |
+ * | db.{name}.options.foreign_keys       | [on|off]   | on                         |
+ * | db.{name}.options.recursive_triggers | [on|off]   | on                         |
+ * +--------------------------------------+------------+----------------------------+
  * </pre>
  *  (1) - A relative database file location is interpreted as relative to the application's data directory (if configured). <br>
  *        If the file is not found an attempt is made to find it in the application's root directory. <br>
@@ -63,7 +64,7 @@ class SQLiteConnector extends Connector {
     protected $options = [];
 
     /** @var \SQLite3 - internal database handler instance */
-    protected $handler;
+    protected $sqlite;
 
     /** @var int - transaction nesting level */
     protected $transactionLevel = 0;
@@ -146,9 +147,9 @@ class SQLiteConnector extends Connector {
 
         $php_errormsg = '';
         try {                                                                   // available flags:
-            $flags = SQLITE3_OPEN_READWRITE;                                    // SQLITE3_OPEN_CREATE
-            $handler = new \SQLite3($this->file, $flags);                       // SQLITE3_OPEN_READONLY
-            !$handler && trigger_error($php_errormsg, E_USER_ERROR);            // SQLITE3_OPEN_READWRITE
+            $flags  = SQLITE3_OPEN_READWRITE;                                   // SQLITE3_OPEN_CREATE
+            $sqlite = new \SQLite3($this->file, $flags);                        // SQLITE3_OPEN_READONLY
+            if (!$sqlite) throw new DatabaseException($php_errormsg);           // SQLITE3_OPEN_READWRITE
         }
         catch (\Exception $ex) {
             if (!$ex instanceof IRosasurferException)
@@ -166,8 +167,8 @@ class SQLiteConnector extends Connector {
             }
             throw $ex->addMessage('Cannot '.$what.' database file "'.$file.'"'.$where);
         }
-        $this->handler = $handler;
 
+        $this->sqlite = $sqlite;
         $this->setConnectionOptions();
         return $this;
     }
@@ -184,8 +185,8 @@ class SQLiteConnector extends Connector {
         //    $this->execute('set '.$option.' = '.$value);
         //}
 
-        // always activate foreign key checks
         $this->execute('pragma foreign_keys = on');
+        $this->execute('pragma recursive_triggers = on');
 
         return $this;
     }
@@ -198,9 +199,9 @@ class SQLiteConnector extends Connector {
      */
     public function disconnect() {
         if ($this->isConnected()) {
-            $handler = $this->handler;
-            $this->handler = null;
-            $handler->close();
+            $sqlite = $this->sqlite;
+            $this->sqlite = null;
+            $sqlite->close();
         }
         return $this;
     }
@@ -212,7 +213,7 @@ class SQLiteConnector extends Connector {
      * @return bool
      */
     public function isConnected() {
-        return is_object($this->handler);
+        return is_object($this->sqlite);
     }
 
 
@@ -255,7 +256,7 @@ class SQLiteConnector extends Connector {
 
         if (!$this->isConnected())
             $this->connect();
-        return $this->handler->escapeString($value);
+        return $this->sqlite->escapeString($value);
     }
 
 
@@ -324,9 +325,9 @@ class SQLiteConnector extends Connector {
         // execute statement
         $result = null;
         try {
-            if ($this->skipResults) $result = $this->handler->exec($sql);     // TRUE on success, FALSE on error
-            else                    $result = $this->handler->query($sql);    // bug: always SQLite3Result, never boolean
-            if (!$result) trigger_error('Error '.$this->handler->lastErrorCode().', '.$this->handler->lastErrorMsg(), E_USER_ERROR);
+            if ($this->skipResults) $result = $this->sqlite->exec($sql);        // TRUE on success, FALSE on error
+            else                    $result = $this->sqlite->query($sql);       // bug: always SQLite3Result, never boolean
+            if (!$result) trigger_error('Error '.$this->sqlite->lastErrorCode().', '.$this->sqlite->lastErrorMsg(), E_USER_ERROR);
         }
         catch (\Exception $ex) {
             if (!$ex instanceof IRosasurferException)
@@ -335,10 +336,10 @@ class SQLiteConnector extends Connector {
         }
 
         // track last_insert_id
-        $this->lastInsertId = $this->handler->lastInsertRowID();
+        $this->lastInsertId = $this->sqlite->lastInsertRowID();
 
         // track last_affected_rows
-        $this->lastAffectedRows = $this->handler->changes();
+        $this->lastAffectedRows = $this->sqlite->changes();
 
         return $result;
     }
@@ -455,7 +456,7 @@ class SQLiteConnector extends Connector {
     public function getInternalHandler() {
         if (!$this->isConnected())
             $this->connect();
-        return $this->handler;
+        return $this->sqlite;
     }
 
 
@@ -478,7 +479,7 @@ class SQLiteConnector extends Connector {
         if (is_null($this->versionString)) {
             if (!$this->isConnected())
                 $this->connect();
-            $this->versionString = $this->handler->version()['versionString'];
+            $this->versionString = $this->sqlite->version()['versionString'];
         }
         return $this->versionString;
     }
@@ -493,7 +494,7 @@ class SQLiteConnector extends Connector {
         if (is_null($this->versionNumber)) {
             if (!$this->isConnected())
                 $this->connect();
-            $this->versionNumber = $this->handler->version()['versionNumber'];
+            $this->versionNumber = $this->sqlite->version()['versionNumber'];
         }
         return $this->versionNumber;
     }
