@@ -149,8 +149,7 @@ class SQLiteConnector extends Connector {
         try {                                                                   // available flags:
             $flags  = SQLITE3_OPEN_READWRITE;                                   // SQLITE3_OPEN_CREATE
             $sqlite = new \SQLite3($this->file, $flags);                        // SQLITE3_OPEN_READONLY
-            if (!$sqlite) throw new DatabaseException($php_errormsg);           // SQLITE3_OPEN_READWRITE
-        }
+        }                                                                       // SQLITE3_OPEN_READWRITE
         catch (\Exception $ex) {
             if (!$ex instanceof IRosasurferException)
                 $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex);
