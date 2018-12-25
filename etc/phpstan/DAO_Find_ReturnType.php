@@ -43,7 +43,7 @@ class DAO_Find_ReturnType extends DynamicReturnType implements DynamicMethodRetu
             if (is_string($var->name)) {
                 if ($var->name == 'this') {
                     $daoClass = $this->getScopeName($scope);
-                    if ($daoClass != self::CLASS_NAME) {
+                    if ($daoClass != self::CLASS_NAME) {                // skip self-referencing DAO calls
                         $returnClass = strLeft($daoClass, -3);
                         $returnType  = new ObjectType($returnClass);
                     }
@@ -51,7 +51,7 @@ class DAO_Find_ReturnType extends DynamicReturnType implements DynamicMethodRetu
             } else       $error = true(echoPre(simpleClassName(self::CLASS_NAME).'->'.self::METHOD_NAME.'(2) cannot resolve callee of instance method call: class($var->name)='.get_class($var->name)));
         } else           $error = true(echoPre(simpleClassName(self::CLASS_NAME).'->'.self::METHOD_NAME.'(3) cannot resolve callee of instance method call: class($methodCall->var)='.get_class($methodCall->var)));
 
-        if (0 || $error) echoPre($this->getScopeName($scope).': '.simpleClassName(self::CLASS_NAME).'->'.self::METHOD_NAME.'() => '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
+        if (0 || $error) echoPre('call of: '.simpleClassName(self::CLASS_NAME).'->'.self::METHOD_NAME.'()  from: '.$this->getScopeName($scope).'  shall return: '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
         return $returnType;
     }
 }

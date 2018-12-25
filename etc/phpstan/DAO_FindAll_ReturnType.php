@@ -13,6 +13,7 @@ use PHPStan\Type\DynamicMethodReturnTypeExtension;
 use PHPStan\Type\DynamicStaticMethodReturnTypeExtension;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
+
 use rosasurfer\db\orm\DAO;
 use rosasurfer\phpstan\DynamicReturnType;
 
@@ -48,17 +49,22 @@ class DAO_FindAll_ReturnType extends DynamicReturnType implements DynamicMethodR
             if (is_string($var->name)) {
                 if ($var->name == 'this') {
                     $daoName = $this->getScopeName($scope);
-                    $class = strLeft($daoName, -3);
-                    if ($class) {
-                        $returnClass = $class;
-                        $returnType  = new ArrayType(new ObjectType($returnClass));
-                        $returnClass = $returnType->getItemType()->getClass().'[]';
+                    if ($daoName != self::CLASS_NAME) {                 // skip self-referencing DAO calls
+                        $class = strLeft($daoName, -3);
+                        if ($class) {
+                            $returnClass = $class;
+                            $returnType  = new ArrayType(new ObjectType($returnClass));
+                            $returnClass = $returnType->getItemType()->getClass().'[]';
+                        }
+                    }
+                    else {
+                        //echoPre($methodCall);
                     }
                 }//else $error = true(echoPre(simpleClassName(self::CLASS_NAME).'->'.self::METHOD_NAME.'(1) cannot resolve callee of instance method call: $'.$var->name.'->'.self::METHOD_NAME.'()'));
             } else      $error = true(echoPre(simpleClassName(self::CLASS_NAME).'->'.self::METHOD_NAME.'(2) cannot resolve callee of instance method call: class($var->name)='.get_class($var->name)));
         }//else         $error = true(echoPre(simpleClassName(self::CLASS_NAME).'->'.self::METHOD_NAME.'(3) cannot resolve callee of instance method call: class($methodCall->var)='.get_class($methodCall->var)));
 
-        if (0 || $error) echoPre($this->getScopeName($scope).': '.simpleClassName(self::CLASS_NAME).'->'.self::METHOD_NAME.'() => '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
+        if (0 || $error) echoPre('call of: '.simpleClassName(self::CLASS_NAME).'->'.self::METHOD_NAME.'()  from: '.$this->getScopeName($scope).'  shall return: '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
         return $returnType;
     }
 
@@ -77,14 +83,16 @@ class DAO_FindAll_ReturnType extends DynamicReturnType implements DynamicMethodR
         if ($methodCall->class instanceof Name) {
             $name = $methodCall->class;
             if ((string)$name == 'parent') {
-                $scopeName   = $this->getScopeName($scope);
-                $returnClass = strLeft($scopeName, -3);
-                $returnType  = new ArrayType(new ObjectType($returnClass));
+                $scopeName = $this->getScopeName($scope);
+                if ($scopeName != self::CLASS_NAME) {                   // skip self-referencing DAO calls
+                    $returnClass = strLeft($scopeName, -3);
+                    $returnType  = new ArrayType(new ObjectType($returnClass));
+                }
             }
             else $error = true(echoPre(simpleClassName(self::CLASS_NAME).'::'.self::METHOD_NAME.'(1) cannot resolve callee of static method call: name "'.$name.'"'));
         } else   $error = true(echoPre(simpleClassName(self::CLASS_NAME).'::'.self::METHOD_NAME.'(2) cannot resolve callee of static method call: class($methodCall->class)='.get_class($methodCall->class)));
 
-        if (0 || $error) echoPre($this->getScopeName($scope).': '.simpleClassName(self::CLASS_NAME).'::'.self::METHOD_NAME.'() => '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
+        if (0 || $error) echoPre('call of: '.simpleClassName(self::CLASS_NAME).'::'.self::METHOD_NAME.'()  from: '.$this->getScopeName($scope).'  shall return: '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
         return $returnType;
     }
 }
