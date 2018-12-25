@@ -57,7 +57,7 @@ class Worker extends Object {
         $result = $this->query($query);                 //       emulation is slow. The check can be improved with fetchRow()
                                                         //       when reset(-1) and internal record caching are implemented.
         $object = $this->makeObject($result);           //
-        if ($object && !$allowMany && $result->numRows() > 1) throw new MultipleRecordsException();
+        if ($object && !$allowMany && $result->numRows() > 1) throw new MultipleRecordsException($query);
 
         return $object;
     }

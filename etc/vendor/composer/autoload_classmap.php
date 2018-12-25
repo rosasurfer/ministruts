@@ -39,6 +39,7 @@ return array(
     'rosasurfer\\db\\DatabaseException' => $baseDir . '/src/db/DatabaseException.php',
     'rosasurfer\\db\\MultipleRecordsException' => $baseDir . '/src/db/MultipleRecordsException.php',
     'rosasurfer\\db\\NoMoreRecordsException' => $baseDir . '/src/db/NoMoreRecordsException.php',
+    'rosasurfer\\db\\NoSuchRecordException' => $baseDir . '/src/db/NoSuchRecordException.php',
     'rosasurfer\\db\\Result' => $baseDir . '/src/db/Result.php',
     'rosasurfer\\db\\ResultInterface' => $baseDir . '/src/db/ResultInterface.php',
     'rosasurfer\\db\\mysql\\MySQLConnector' => $baseDir . '/src/db/mysql/MySQLConnector.php',

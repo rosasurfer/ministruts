@@ -4,6 +4,7 @@ namespace rosasurfer\db\orm;
 use rosasurfer\core\Singleton;
 use rosasurfer\db\ConnectorInterface as IConnector;
 use rosasurfer\db\MultipleRecordsException;
+use rosasurfer\db\NoSuchRecordException;
 use rosasurfer\db\ResultInterface as IResult;
 use rosasurfer\db\orm\meta\EntityMapping;
 use rosasurfer\exception\RuntimeException;
@@ -71,6 +72,42 @@ abstract class DAO extends Singleton {
             $query = 'select * from '.$table;
         }
         return $this->getWorker()->findAll($query);
+    }
+
+
+    /**
+     * Get a single matching record and convert it to an instance of the entity class.
+     *
+     * @param  string $query                - SQL query with optional ORM syntax
+     * @param  bool   $allowMany [optional] - whether or not the query is allowed to return a multi-row result (default: no)
+     *
+     * @return PersistableObject
+     *
+     * @throws NoSuchRecordException    if the query returned no rows
+     * @throws MultipleRecordsException if the query returned multiple rows and $allowMany was not set to TRUE
+     */
+    public function get($query, $allowMany = false) {
+        $result = $this->find($query, $allowMany);
+        if (!$result)
+            throw new NoSuchRecordException($query);
+        return $result;
+    }
+
+
+    /**
+     * Get all matching records (at least one) and convert them to instances of the entity class.
+     *
+     * @param  string $query [optional] - SQL query with optional ORM syntax; without a query all instances are returned
+     *
+     * @return PersistableObject[] - at least one instance
+     *
+     * @throws NoSuchRecordException  if the query returned no rows
+     */
+    public function getAll($query = null) {
+        $results = $this->findAll($query);
+        if (!$results)
+            throw new NoSuchRecordException($query);
+        return $results;
     }
 
 
