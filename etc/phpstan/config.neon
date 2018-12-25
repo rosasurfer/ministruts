@@ -27,9 +27,9 @@ parameters:
     polluteCatchScopeWithTryAssignments:    true
 
     ignoreErrors:
-        # intentionally ignore these
-        - '/Call to ((static )?method|function) [^ ]+\(\) with incorrect case:/'                                    # seriously?
-        - '/Array \(([^ ]+)\[\]\) does not accept (\1\|)?null\b/'                                                   # NULL should be considered a value, not a type
+        # intentionally ignore the following issues
+        - '/Call to ((static )?method|function) [^ ]+\(\) with incorrect case:/'                                    # Says who?
+        - '/Array \(([^ ]+)\[\]\) does not accept (\1\|)?null\b/'                                                   # NULL is a value (not a type) and always valid.
         - '/(Static )?property [^ ]+ \(([^ ]+)\) does not accept (\2\|)?null\b/i'                                   # - dito -
         - '/Property [^ ]+ \([^ ]+\[\]\) does not accept default value of type null\[\]/i'                          # - dito -
         - '/Parameter #[0-9]+ [^ ]+ of class [^ ]+ constructor expects ([^ ]+), (\1\|)?null given\b/'               # - dito -
