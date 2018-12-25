@@ -54,7 +54,8 @@ abstract class DynamicReturnType extends Object {
      * @return string - class name or "{main}" for calls from outside a class; "(unknown)" on errors
      */
     protected function getScopeName(Scope $scope) : string {
-        $reflection = $scope->getClassReflection();
-        return $reflection ? $reflection->getName() : '{main}';
+        if ($scope->isInClass())
+            return $scope->getClassReflection()->getName();
+        return '{main}';
     }
 }
