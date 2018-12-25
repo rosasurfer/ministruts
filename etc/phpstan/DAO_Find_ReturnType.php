@@ -24,8 +24,11 @@ use function rosasurfer\true;
 class DAO_Find_ReturnType extends DynamicReturnType implements DynamicMethodReturnTypeExtension {
 
 
-    const CLASS_NAME  = DAO::class;
-    const METHOD_NAME = 'find';
+    /** @var string */
+    protected static $className = DAO::class;
+
+    /** @var string[] */
+    protected static $methodNames = ['find', 'get'];
 
 
     /**
@@ -43,15 +46,15 @@ class DAO_Find_ReturnType extends DynamicReturnType implements DynamicMethodRetu
             if (is_string($var->name)) {
                 if ($var->name == 'this') {
                     $daoClass = $this->getScopeName($scope);
-                    if ($daoClass != self::CLASS_NAME) {                // skip self-referencing DAO calls
+                    if ($daoClass != static::$className) {                  // skip self-referencing DAO calls
                         $returnClass = strLeft($daoClass, -3);
                         $returnType  = new ObjectType($returnClass);
                     }
-                } //else $error = true(echoPre(simpleClassName(self::CLASS_NAME).'->'.self::METHOD_NAME.'(1) cannot resolve callee of instance method call: $'.$var->name.'->'.self::METHOD_NAME.'()'));
-            } else       $error = true(echoPre(simpleClassName(self::CLASS_NAME).'->'.self::METHOD_NAME.'(2) cannot resolve callee of instance method call: class($var->name)='.get_class($var->name)));
-        } else           $error = true(echoPre(simpleClassName(self::CLASS_NAME).'->'.self::METHOD_NAME.'(3) cannot resolve callee of instance method call: class($methodCall->var)='.get_class($methodCall->var)));
+                } //else $error = true(echoPre(simpleClassName(static::$className).'->'.$methodCall->name.'(1) cannot resolve callee of instance method call: $'.$var->name.'->'.self::METHOD_NAME.'()'));
+            } else       $error = true(echoPre(simpleClassName(static::$className).'->'.$methodCall->name.'(2) cannot resolve callee of instance method call: class($var->name)='.get_class($var->name)));
+        } else           $error = true(echoPre(simpleClassName(static::$className).'->'.$methodCall->name.'(3) cannot resolve callee of instance method call: class($methodCall->var)='.get_class($methodCall->var)));
 
-        if (0 || $error) echoPre('call of: '.simpleClassName(self::CLASS_NAME).'->'.self::METHOD_NAME.'()  from: '.$this->getScopeName($scope).'  shall return: '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
+        if (0 || $error) echoPre('call of: '.simpleClassName(static::$className).'->'.$methodCall->name.'()  from: '.$this->getScopeName($scope).'  shall return: '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
         return $returnType;
     }
 }

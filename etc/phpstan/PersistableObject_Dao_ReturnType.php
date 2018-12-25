@@ -26,8 +26,11 @@ use function rosasurfer\true;
 class PersistableObject_Dao_ReturnType extends DynamicReturnType implements DynamicMethodReturnTypeExtension,
                                                                             DynamicStaticMethodReturnTypeExtension {
 
-    const CLASS_NAME  = PersistableObject::class;
-    const METHOD_NAME = 'dao';
+    /** @var string */
+    protected static $className = PersistableObject::class;
+
+    /** @var string[] */
+    protected static $methodNames = ['dao'];
 
 
     /**
@@ -45,15 +48,15 @@ class PersistableObject_Dao_ReturnType extends DynamicReturnType implements Dyna
             if (is_string($var->name)) {
                 if ($var->name == 'this') {
                     $scopeName = $this->getScopeName($scope);
-                    if ($scopeName != self::CLASS_NAME) {
+                    if ($scopeName != static::$className) {
                         $returnClass = $scopeName.'DAO';
                         $returnType  = new ObjectType($returnClass);
                     }
-                } //else $error = true(echoPre(simpleClassName(self::CLASS_NAME).'->'.self::METHOD_NAME.'(1) cannot resolve callee of instance method call: variable "'.$var->name.'"'));
-            } else       $error = true(echoPre(simpleClassName(self::CLASS_NAME).'->'.self::METHOD_NAME.'(2) cannot resolve callee of instance method call: class($var->name)='.get_class($var->name)));
-        } else           $error = true(echoPre(simpleClassName(self::CLASS_NAME).'->'.self::METHOD_NAME.'(3) cannot resolve callee of instance method call: class($methodCall->var)='.get_class($methodCall->var)));
+                } //else $error = true(echoPre(simpleClassName(static::$className).'->'.$methodCall->name.'(1) cannot resolve callee of instance method call: variable "'.$var->name.'"'));
+            } else       $error = true(echoPre(simpleClassName(static::$className).'->'.$methodCall->name.'(2) cannot resolve callee of instance method call: class($var->name)='.get_class($var->name)));
+        } else           $error = true(echoPre(simpleClassName(static::$className).'->'.$methodCall->name.'(3) cannot resolve callee of instance method call: class($methodCall->var)='.get_class($methodCall->var)));
 
-        if (0 || $error) echoPre('call of: '.simpleClassName(self::CLASS_NAME).'->'.self::METHOD_NAME.'()  from: '.$this->getScopeName($scope).'  shall return: '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
+        if (0 || $error) echoPre('call of: '.simpleClassName(static::$className).'->'.$methodCall->name.'()  from: '.$this->getScopeName($scope).'  shall return: '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
         return $returnType;
     }
 
@@ -76,14 +79,14 @@ class PersistableObject_Dao_ReturnType extends DynamicReturnType implements Dyna
             }
             else if ((string)$name == 'self') {
                 $scopeName = $this->getScopeName($scope);
-                if ($scopeName != self::CLASS_NAME) {
+                if ($scopeName != static::$className) {
                     $returnClass = $scopeName.'DAO';
                     $returnType  = new ObjectType($returnClass);
                 }
-            } else $error = true(echoPre(simpleClassName(self::CLASS_NAME).'::'.self::METHOD_NAME.'(1) cannot resolve callee of static method call: name "'.$name.'"'));
-        } else     $error = true(echoPre(simpleClassName(self::CLASS_NAME).'::'.self::METHOD_NAME.'(2) cannot resolve callee of static method call: class($methodCall->class)='.get_class($methodCall->class)));
+            } else $error = true(echoPre(simpleClassName(static::$className).'::'.$methodCall->name.'(1) cannot resolve callee of static method call: name "'.$name.'"'));
+        } else     $error = true(echoPre(simpleClassName(static::$className).'::'.$methodCall->name.'(2) cannot resolve callee of static method call: class($methodCall->class)='.get_class($methodCall->class)));
 
-        if (0 || $error) echoPre('call of: '.simpleClassName(self::CLASS_NAME).'::'.self::METHOD_NAME.'()  from: '.$this->getScopeName($scope).'  shall return: '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
+        if (0 || $error) echoPre('call of: '.simpleClassName(static::$className).'::'.$methodCall->name.'()  from: '.$this->getScopeName($scope).'  shall return: '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
         return $returnType;
     }
 }

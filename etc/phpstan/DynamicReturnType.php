@@ -14,16 +14,19 @@ use rosasurfer\exception\RuntimeException;
 abstract class DynamicReturnType extends Object {
 
 
-    const CLASS_NAME  = null;
-    const METHOD_NAME = null;
+    /** @var string */
+    protected static $className = null;
+
+    /** @var string[] */
+    protected static $methodNames = [];
 
 
     /**
      * @return string
      */
     public static function getClass() : string {
-        if (!static::CLASS_NAME) throw new RuntimeException('The class constant '.static::class.'::CLASS_NAME must be defined.');
-        return static::CLASS_NAME;
+        if (!static::$className) throw new RuntimeException('The class property '.static::class.'::$className must be defined.');
+        return static::$className;
     }
 
 
@@ -31,8 +34,8 @@ abstract class DynamicReturnType extends Object {
      * @return bool
      */
     public function isMethodSupported(MethodReflection $methodReflection) : bool {
-        if (!static::METHOD_NAME) throw new RuntimeException('The class constant '.static::class.'::METHOD_NAME must be defined.');
-        return $methodReflection->getName() == static::METHOD_NAME;
+        if (!static::$methodNames) throw new RuntimeException('The class property '.static::class.'::$methodNames must be defined.');
+        return in_array($methodReflection->getName(), static::$methodNames);
     }
 
 
@@ -40,8 +43,8 @@ abstract class DynamicReturnType extends Object {
      * @return bool
      */
     public function isStaticMethodSupported(MethodReflection $methodReflection) : bool {
-        if (!static::METHOD_NAME) throw new RuntimeException('The class constant '.static::class.'::METHOD_NAME must be defined.');
-        return $methodReflection->getName() == static::METHOD_NAME;
+        if (!static::$methodNames) throw new RuntimeException('The class constant '.static::class.'::$methodNames must be defined.');
+        return in_array($methodReflection->getName(), static::$methodNames);
     }
 
 

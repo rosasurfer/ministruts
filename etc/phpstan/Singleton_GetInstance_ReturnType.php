@@ -33,8 +33,11 @@ use function rosasurfer\true;
 class Singleton_GetInstance_ReturnType extends DynamicReturnType implements DynamicMethodReturnTypeExtension,
                                                                             DynamicStaticMethodReturnTypeExtension {
 
-    const CLASS_NAME  = Singleton::class;
-    const METHOD_NAME = 'getInstance';
+    /** @var string */
+    protected static $className = Singleton::class;
+
+    /** @var string[] */
+    protected static $methodNames = ['getInstance'];
 
 
     /**
@@ -47,7 +50,7 @@ class Singleton_GetInstance_ReturnType extends DynamicReturnType implements Dyna
         $returnClass = $origReturnClass = $returnType->getClass();
         $error = false;
 
-        if (0 || $error) echoPre('call of: '.simpleClassName(self::CLASS_NAME).'->'.self::METHOD_NAME.'()  from: '.$this->getScopeName($scope).'  shall return: '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
+        if (0 || $error) echoPre('call of: '.simpleClassName(static::$className).'->'.$methodCall->name.'()  from: '.$this->getScopeName($scope).'  shall return: '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
         return $returnType;
     }
 
@@ -74,7 +77,7 @@ class Singleton_GetInstance_ReturnType extends DynamicReturnType implements Dyna
                     $returnClass = $class;
                     $returnType  = new ObjectType($returnClass);
                 }
-                else $error = true(echoPre(simpleClassName(self::CLASS_NAME).'::'.self::METHOD_NAME.'(1) cannot resolve class constant "'.$arg->class.'::'.$arg->name.'"'));
+                else $error = true(echoPre(simpleClassName(static::$className).'::'.$methodCall->name.'(1) cannot resolve class constant "'.$arg->class.'::'.$arg->name.'"'));
             }
             else if ($arg instanceof BinaryOp) {
                 if ($class = $this->binaryOpToStr($arg, $scope)) {
@@ -82,17 +85,17 @@ class Singleton_GetInstance_ReturnType extends DynamicReturnType implements Dyna
                     $returnClass = $class;
                     $returnType  = new ObjectType($returnClass);
                 }
-                else $error = true(echoPre(simpleClassName(self::CLASS_NAME).'::'.self::METHOD_NAME.'(2) cannot convert binary operator argument to string: '.get_class($arg)));
+                else $error = true(echoPre(simpleClassName(static::$className).'::'.$methodCall->name.'(2) cannot convert binary operator argument to string: '.get_class($arg)));
             }
             else if ($arg instanceof Variable) {
-                $error = true(echoPre(simpleClassName(self::CLASS_NAME).'::'.self::METHOD_NAME.'(3) cannot resolve variable "'.$arg->name.'"'));
+                $error = true(echoPre(simpleClassName(static::$className).'::'.$methodCall->name.'(3) cannot resolve variable "'.$arg->name.'"'));
             }
             else {
-                $error = true(echoPre(simpleClassName(self::CLASS_NAME).'::'.self::METHOD_NAME.'(4) cannot resolve argument: '.get_class($arg)));
+                $error = true(echoPre(simpleClassName(static::$className).'::'.$methodCall->name.'(4) cannot resolve argument: '.get_class($arg)));
             }
         }
 
-        if (0 || $error) echoPre('call of: '.simpleClassName(self::CLASS_NAME).'::'.self::METHOD_NAME.'()  from: '.$this->getScopeName($scope).'  shall return: '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
+        if (0 || $error) echoPre('call of: '.simpleClassName(static::$className).'::'.$methodCall->name.'()  from: '.$this->getScopeName($scope).'  shall return: '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
         return $returnType;
     }
 

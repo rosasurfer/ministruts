@@ -22,8 +22,11 @@ use function rosasurfer\simpleClassName;
 class PersistableObject_PopulateNew_ReturnType extends DynamicReturnType implements DynamicMethodReturnTypeExtension,
                                                                                     DynamicStaticMethodReturnTypeExtension {
 
-    const CLASS_NAME  = PersistableObject::class;
-    const METHOD_NAME = 'populateNew';
+    /** @var string */
+    protected static $className = PersistableObject::class;
+
+    /** @var string[] */
+    protected static $methodNames = ['populateNew'];
 
 
     /**
@@ -36,7 +39,7 @@ class PersistableObject_PopulateNew_ReturnType extends DynamicReturnType impleme
         $returnClass = $origReturnClass = $returnType->getClass();
         $error = false;
 
-        if (0 || $error) echoPre('call of: '.simpleClassName(self::CLASS_NAME).'->'.self::METHOD_NAME.'()  from: '.$this->getScopeName($scope).'  shall return: '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
+        if (0 || $error) echoPre('call of: '.simpleClassName(static ::$className).'->'.$methodCall->name.'()  from: '.$this->getScopeName($scope).'  shall return: '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
         return $returnType;
     }
 
@@ -51,7 +54,7 @@ class PersistableObject_PopulateNew_ReturnType extends DynamicReturnType impleme
         $returnClass = $origReturnClass = $returnType->getClass();
         $error = false;
 
-        if (0 || $error) echoPre('call of: '.simpleClassName(self::CLASS_NAME).'::'.self::METHOD_NAME.'()  from: '.$this->getScopeName($scope).'  shall return: '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
+        if (0 || $error) echoPre('call of: '.simpleClassName(static ::$className).'::'.$methodCall->name.'()  from: '.$this->getScopeName($scope).'  shall return: '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
         return $returnType;
     }
 }
