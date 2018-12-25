@@ -4,6 +4,7 @@ namespace rosasurfer\phpstan;
 
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
+
 use rosasurfer\core\Object;
 use rosasurfer\exception\RuntimeException;
 
@@ -49,13 +50,28 @@ abstract class DynamicReturnType extends Object {
 
 
     /**
-     * Return the name of the calling scope.
+     * Return a description of the given scope.
      *
-     * @return string - class name or "{main}" for calls from outside a class; "(unknown)" on errors
+     * @param  Scope $scope
+     *
+     * @return string - scope description
      */
-    protected function getScopeName(Scope $scope) : string {
-        if ($scope->isInClass())
-            return $scope->getClassReflection()->getName();
-        return '{main}';
+    protected function getScopeDescription(Scope $scope) : string {
+        if ($scope->isInClass()) {
+            $description = $scope->getClassReflection()->getName();
+            if ($scope->getFunctionName())       $description .= '::'.$scope->getFunctionName().'()';
+            if ($scope->isInAnonymousFunction()) $description .= '{closure}';
+            return $description;
+        }
+
+        if ($scope->getFunctionName()) {
+            $description = $scope->getFunctionName().'()';
+            if ($scope->isInAnonymousFunction()) $description .= '{closure}';
+            return $description;
+        }
+
+        $description = $scope->isInAnonymousFunction() ? '{closure}' : '{main}';
+        $description = trim($scope->getNamespace().'\\'.$description, '\\');
+        return $description;
     }
 }

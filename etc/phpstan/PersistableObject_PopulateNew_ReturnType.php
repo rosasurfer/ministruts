@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace rosasurfer\db\orm\phpstan;
+namespace rosasurfer\phpstan;
 
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\StaticCall;
@@ -9,8 +9,8 @@ use PHPStan\Reflection\MethodReflection;
 use PHPStan\Type\DynamicMethodReturnTypeExtension;
 use PHPStan\Type\DynamicStaticMethodReturnTypeExtension;
 use PHPStan\Type\Type;
+
 use rosasurfer\db\orm\PersistableObject;
-use rosasurfer\phpstan\DynamicReturnType;
 
 use function rosasurfer\echoPre;
 use function rosasurfer\simpleClassName;
@@ -39,7 +39,7 @@ class PersistableObject_PopulateNew_ReturnType extends DynamicReturnType impleme
         $returnClass = $origReturnClass = $returnType->getClass();
         $error = false;
 
-        if (0 || $error) echoPre('call of: '.simpleClassName(static ::$className).'->'.$methodCall->name.'()  from: '.$this->getScopeName($scope).'  shall return: '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
+        if (0 || $error) echoPre('call of: '.simpleClassName(static ::$className).'->'.$methodCall->name.'()  from: '.$this->getScopeDescription($scope).'  shall return: '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
         return $returnType;
     }
 
@@ -54,7 +54,7 @@ class PersistableObject_PopulateNew_ReturnType extends DynamicReturnType impleme
         $returnClass = $origReturnClass = $returnType->getClass();
         $error = false;
 
-        if (0 || $error) echoPre('call of: '.simpleClassName(static ::$className).'::'.$methodCall->name.'()  from: '.$this->getScopeName($scope).'  shall return: '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
+        if (0 || $error) echoPre('call of: '.simpleClassName(static ::$className).'::'.$methodCall->name.'()  from: '.$this->getScopeDescription($scope).'  shall return: '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
         return $returnType;
     }
 }

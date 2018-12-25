@@ -233,7 +233,7 @@ abstract class PersistableObject extends Object {
         }
 
         if (!$isCollection) $value = $relatedDao->find($sql);           // => PersistableObject
-        else                $value = $relatedDao->findAll($sql);        // => Collection<PersistableObject>
+        else                $value = $relatedDao->findAll($sql);        // => PersistableObject[]
 
         return $value;
     }
