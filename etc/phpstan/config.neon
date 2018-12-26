@@ -15,6 +15,7 @@ parameters:
     excludes_analyse:
         - .git/
         - .settings/
+        - etc/httpd/
         - etc/js/
         - etc/vendor/
         - src/global-helper.php
@@ -28,7 +29,7 @@ parameters:
 
     ignoreErrors:
         # intentionally ignore the following issues
-        - '/Call to ((static )?method|function) [^ ]+\(\) with incorrect case:/'                                    # Says who?
+        - '/Call to ((static )?method|function) [^ ]+\(\) with incorrect case:/'                                    # Ever heared of naming standards?
         - '/Array \(([^ ]+)\[\]\) does not accept (\1\|)?null\b/'                                                   # NULL is a value (not a type) and always valid.
         - '/(Static )?property [^ ]+ \(([^ ]+)\) does not accept (\2\|)?null\b/i'                                   # - dito -
         - '/Property [^ ]+ \([^ ]+\[\]\) does not accept default value of type null\[\]/i'                          # - dito -
