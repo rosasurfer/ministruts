@@ -247,7 +247,7 @@ class ErrorHandler extends StaticClass {
             $indent = ' ';                                  // the application is crashing, last try to log
 
             // secondary exception
-            $msg2  = 'PHP [FATAL] Unhandled '.trim(DebugHelper::composeBetterMessage($second)).NL;
+            $msg2  = '[FATAL] Unhandled '.trim(DebugHelper::composeBetterMessage($second)).NL;
             $file  = $second->getFile();
             $line  = $second->getLine();
             $msg2 .= $indent.'in '.$file.' on line '.$line.NL.NL;
@@ -275,7 +275,7 @@ class ErrorHandler extends StaticClass {
             $msg  = str_replace(chr(0), '?', $msg);         // replace NUL bytes which mess up the logfile
 
             if (CLI)                                        // full second exception
-                echo $msg;
+                echo $msg.NL;
             error_log(trim($msg), ERROR_LOG_DEFAULT);
         }
 

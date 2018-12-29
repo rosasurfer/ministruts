@@ -391,7 +391,6 @@ class Logger extends StaticClass {
 
         if (CLI) {
             !key_exists('cliMessage', $context) && self::composeCliMessage($loggable, $level, $context);
-            if (self::$printCounter) $message = NL;
             $message .= $context['cliMessage'];
             if (key_exists('cliExtra', $context))
                 $message .= $context['cliExtra'];
@@ -401,7 +400,7 @@ class Logger extends StaticClass {
             $message = $context['htmlMessage'];
         }
 
-        echo $message;
+        echo $message.NL;
         ob_get_level() && ob_flush();
 
         self::$printCounter++;
@@ -718,7 +717,7 @@ class Logger extends StaticClass {
         $file = $context['file'];
         $line = $context['line'];
 
-        // break out of unfortunate HTML tags               // id = md5('ministruts')
+        // break out of unfortunate HTML tags              // id = md5('ministruts')
         $html  = '<a attr1="" attr2=\'\'></a></meta></title></head></script></img></input></select></textarea></label></li></ul></font></pre></tt></code></small></i></b></span></div>';
         $html .= '<div id="99a05cf355861c76747b7176c778eed2'.self::$printCounter.'"
                         align="left"
@@ -777,7 +776,7 @@ class Logger extends StaticClass {
             $html .= '<br style="clear:both"><br>'.printPretty('Request:'.NL.'--------'.NL.Request::me(), true).'<br>';
         }
 
-        // close the HTML tag and add some JavaScript to ensure it becomes visible                  // id = md5('ministruts')
+        // close the HTML tag and add some JavaScript to ensure it becomes visible                      // id = md5('ministruts')
         $html .= '</div>
                   <script>
                       var bodies = document.getElementsByTagName("body");
