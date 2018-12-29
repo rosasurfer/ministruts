@@ -23,7 +23,7 @@ use rosasurfer\util\Validator;
 define('rosasurfer\_CLI',        defined('\STDIN') && is_resource(\STDIN));
 define('rosasurfer\_LOCALHOST',  !_CLI && in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1', $_SERVER['SERVER_ADDR']]));
 define('rosasurfer\_MACOS',      strToUpper(PHP_OS) == 'DARWIN');
-define('rosasurfer\_WINDOWS',    strToUpper(subStr(PHP_OS, 0, 3)) == 'WIN');
+define('rosasurfer\_WINDOWS',    defined('\PHP_WINDOWS_VERSION_BUILD'));
 define('rosasurfer\_NUL_DEVICE', _WINDOWS ? 'nul' : '/dev/null');
 
 /** @var bool    - whether or not we run on a command line interface */

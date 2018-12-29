@@ -7,6 +7,7 @@ use rosasurfer\log\Logger;
 
 use const rosasurfer\L_INFO;
 use const rosasurfer\L_WARN;
+use const rosasurfer\NL;
 
 
 /**
@@ -199,7 +200,7 @@ class CurlHttpClient extends HttpClient {
         curl_setopt_array($this->hCurl, $options);
 
         // Request ausfuehren
-        if (curl_exec($this->hCurl) === false) throw new IOException('cURL error '.self::getError($this->hCurl).', URL: '.$request->getUrl());
+        if (curl_exec($this->hCurl) === false) throw new IOException('cURL error '.self::getError($this->hCurl).','.NL.'URL: '.$request->getUrl());
         $status = curl_getinfo($this->hCurl, CURLINFO_HTTP_CODE);
         $response->setStatus($status);
 
