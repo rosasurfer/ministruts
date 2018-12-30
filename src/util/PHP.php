@@ -69,10 +69,21 @@ class PHP extends StaticClass {
     public static function execProcess($cmd, &$stderr=null, &$exitCode=null, $dir=null, $env=null, array $options=[]) {
         if (!is_string($cmd)) throw new IllegalTypeException('Illegal type of parameter $cmd: '.getType($cmd));
 
-        $descriptors = [                                // "pipes" or "files":
-            ($STDIN =0) => ['pipe', 'rb'],              // ['file', '/dev/tty', 'rb'],
-            ($STDOUT=1) => ['pipe', 'wb'],              // ['file', '/dev/tty', 'wb'],
-            ($STDERR=2) => ['pipe', 'wb'],              // ['file', '/dev/tty', 'wb'],
+        // check whether the process needs to be watched asynchronously
+        $argc         = func_num_args();
+        $needStderr   = ($argc > 1);
+        $needExitCode = ($argc > 2);
+        $stdoutPassthrough = isSet($options['stdout-passthrough']) && $options['stdout-passthrough'];
+        $stderrPassthrough = isSet($options['stderr-passthrough']) && $options['stderr-passthrough'];
+
+        if (!$needStderr && !$needExitCode && !WINDOWS)
+            return \shell_exec($cmd);                       // the process doesn't need watching and we can go with shell_exec()
+
+        // we must use proc_open()/proc_close()
+        $descriptors = [                                    // "pipes" or "files":
+            ($STDIN =0) => ['pipe', 'rb'],                  // ['file', '/dev/tty', 'rb'],
+            ($STDOUT=1) => ['pipe', 'wb'],                  // ['file', '/dev/tty', 'wb'],
+            ($STDERR=2) => ['pipe', 'wb'],                  // ['file', '/dev/tty', 'wb'],
         ];
         $pipes = [];
 
@@ -87,12 +98,22 @@ class PHP extends StaticClass {
             }
             throw $ex->addMessage('CMD: "'.$cmd.'"');
         }
-        fClose             ($pipes[$STDIN]);            // $pipes[0] => writeable handle connected to the child's STDIN
-        stream_set_blocking($pipes[$STDOUT], false);    // $pipes[1] => readable handle connected to the child's STDOUT
-        stream_set_blocking($pipes[$STDERR], false);    // $pipes[2] => readable handle connected to the child's STDERR
 
-        $stdoutPassthrough = isSet($options['stdout-passthrough']) && $options['stdout-passthrough'];
-        $stderrPassthrough = isSet($options['stderr-passthrough']) && $options['stderr-passthrough'];
+        // the process doesn't need asynchronous watching
+        if (!$stdoutPassthrough && !$stderrPassthrough) {
+            $stdout = stream_get_contents($pipes[$STDOUT]);
+            $stderr = stream_get_contents($pipes[$STDERR]);
+            fClose($pipes[$STDIN ]);                        // $pipes[0] => writeable handle connected to the child's STDIN
+            fClose($pipes[$STDOUT]);                        // $pipes[1] => readable handle connected to the child's STDOUT
+            fClose($pipes[$STDERR]);                        // $pipes[2] => readable handle connected to the child's STDERR
+            $exitCode = proc_close($hProc);                 // we must close the pipes before proc_close() to avoid a deadlock
+            return $stdout;
+        }
+
+        // the process needs to be watched asynchronously
+        fClose             ($pipes[$STDIN]);
+        stream_set_blocking($pipes[$STDOUT], false);
+        stream_set_blocking($pipes[$STDERR], false);
 
         $observed = [                                                   // streams to watch
             (int)$pipes[$STDOUT] => $pipes[$STDOUT],
@@ -112,7 +133,7 @@ class PHP extends StaticClass {
             $readable = $observed;
             $changes = stream_select($readable, $null, $null, $seconds=0, $microseconds=200000);    // timeout = 0.2 sec
             foreach ($readable as $stream) {
-                if (($line = fGets($stream)) === false) {               // this covers fEof() too
+                if (($line=fGets($stream)) === false) {                 // this covers fEof() too
                     fClose($stream);
                     unset($observed[(int)$stream]);                     // close and remove from observed streams
                     continue;
