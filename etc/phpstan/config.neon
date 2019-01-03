@@ -36,12 +36,16 @@ parameters:
         - '/Parameter #[0-9]+ [^ ]+ of class [^ ]+ constructor expects ([^ ]+), (\1\|)?null given\b/'               # - dito -
         - '/Parameter #[0-9]+ [^ ]+ of (static )?(function|method) [^ ]+ expects ([^ ]+), (\3\|)?null given\b/'     # - dito -
         - '/Calling method [^ ]+\(\) on possibly null value of type [^ ]+\|null\b/'
-        - "/Casting to (bool|int|float|string) something that's already (bool|int|float|string)/"                   # the current implementation ignores not initialized vars
+        - "/Casting to (bool|int|float|string) something that's already (bool|int|float|string)/"                   # PHPStan ignores non-initialized vars
         - '/Strict comparison using [=!]== between (int|string) and null will always evaluate to (true|false)\b/'
 
-        # unsolved issues
+        # false positives since v0.8+
         - '/Method rosasurfer\\db\\orm\\meta\\EntityMapping::getVersion\(\) should return rosasurfer\\db\\orm\\meta\\PropertyMapping\|null but returns bool\|rosasurfer\\db\\orm\\meta\\PropertyMapping\|null\b/'
 
+        # false positives since v0.8.3+
+        - '/Method rosasurfer\\db\\orm\\PersistableObject::getRelationValue\(\) should return rosasurfer\\db\\orm\\PersistableObject\[\]\|rosasurfer\\db\\orm\\PersistableObject\|null but returns rosasurfer\\db\\orm\\PersistableObject\[\]\|bool\|float\|int\|rosasurfer\\db\\orm\\PersistableObject\|string\|null\b/'       
+        - '/Parameter #1 \$value of method rosasurfer\\db\\orm\\DAO::escapeLiteral\(\) expects bool\|float\|int\|string, rosasurfer\\db\\orm\\PersistableObject\[\]\|bool\|float\|int\|rosasurfer\\db\\orm\\PersistableObject\|string given\b/'                                                                             
+        
 
 services:
         # service classes must be loaded via etc/phpstan/autoload.php

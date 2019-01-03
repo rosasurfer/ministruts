@@ -23,6 +23,8 @@ abstract class DynamicReturnType extends Object {
 
 
     /**
+     * Return the name of the class containing methods with dynamic return types.
+     *
      * @return string
      */
     public static function getClass() : string {
@@ -32,6 +34,8 @@ abstract class DynamicReturnType extends Object {
 
 
     /**
+     * Whether the named instance method returns dynamic types.
+     *
      * @return bool
      */
     public function isMethodSupported(MethodReflection $methodReflection) : bool {
@@ -41,6 +45,8 @@ abstract class DynamicReturnType extends Object {
 
 
     /**
+     * Whether the named static method returns dynamic types.
+     *
      * @return bool
      */
     public function isStaticMethodSupported(MethodReflection $methodReflection) : bool {
@@ -50,7 +56,7 @@ abstract class DynamicReturnType extends Object {
 
 
     /**
-     * Return a description of the given scope.
+     * Return a description of the passed scope.
      *
      * @param  Scope $scope
      *
