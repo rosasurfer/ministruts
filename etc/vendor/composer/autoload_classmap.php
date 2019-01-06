@@ -136,6 +136,7 @@ return array(
     'rosasurfer\\net\\messenger\\im\\IRCMessenger' => $baseDir . '/src/net/messenger/im/IRCMessenger.php',
     'rosasurfer\\net\\messenger\\sms\\ClickatellMessenger' => $baseDir . '/src/net/messenger/sms/ClickatellMessenger.php',
     'rosasurfer\\net\\messenger\\sms\\NexmoMessenger' => $baseDir . '/src/net/messenger/sms/NexmoMessenger.php',
+    'rosasurfer\\process\\Process' => $baseDir . '/src/process/Process.php',
     'rosasurfer\\util\\Date' => $baseDir . '/src/util/Date.php',
     'rosasurfer\\util\\DateTime' => $baseDir . '/src/util/DateTime.php',
     'rosasurfer\\util\\Number' => $baseDir . '/src/util/Number.php',

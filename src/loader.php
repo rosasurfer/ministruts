@@ -68,8 +68,8 @@ registerClassLoader();
 /**
  * Register a SIGINT handler in CLI mode to catch Ctrl-C and execute destructors on shutdown.
  */
-if (CLI && function_exists('\pcntl_signal')) {
+if (CLI && function_exists('pcntl_signal')) {
     pcntl_signal(SIGINT, function($signo, $signinfo = null) {
-        exit(1);                                                // calling exit() is sufficient to execute destructors
+        exit(0);                                                // calling exit() is sufficient to execute destructors
     });
 }
