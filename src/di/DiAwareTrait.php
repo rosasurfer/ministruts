@@ -5,8 +5,8 @@ use rosasurfer\exception\UnimplementedFeatureException;
 
 
 /**
- * A trait providing access to the currently registered dependency injection container.
- * Thus every class can easily be made dependency aware.
+ * A trait adding the behaviour "DI awareness" to any class. Used to access the currently registered dependency injection
+ * container. Any class can easily be made dependency aware.
  */
 trait DiAwareTrait {
 

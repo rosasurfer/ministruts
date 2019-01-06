@@ -9,7 +9,7 @@ use function rosasurfer\strLeftTo;
 
 
 /**
- * A trait providing dependency injection awareness and default error handling functionality.
+ * A trait adding common "Object" behaviour to any class, i.e. general error detection capabilities and DI awareness.
  */
 trait ObjectTrait {
 
