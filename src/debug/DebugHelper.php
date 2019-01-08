@@ -267,8 +267,9 @@ class DebugHelper extends StaticClass {
             E_USER_DEPRECATED   => 'E_USER_DEPRECATED',         // 16384
         ];
 
-        if     (!$level)                  $levels = ['0'];      //  zero
-        else if ($level & E_ALL == E_ALL) $levels = ['E_ALL'];  // 32767
+    if      (!$level)                                                       $levels = ['0'];                        //     0
+    else if (($level &  E_ALL)                  ==  E_ALL)                  $levels = ['E_ALL'];                    // 32767
+    else if (($level & (E_ALL & ~E_DEPRECATED)) == (E_ALL & ~E_DEPRECATED)) $levels = ['E_ALL & ~E_DEPRECATED'];    // 24575
         else {
             foreach ($levels as $key => $value) {
                 if ($level & $key) continue;
