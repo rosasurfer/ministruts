@@ -106,62 +106,99 @@ define('PHP_INI_ALL',    INI_ALL   );       // 7    flag            // entry can
 
 
 /**
- * Whether or not an array-like variable has the specified key.
+ * Filters elements of an array-like variable using a callback function. Iterates over each value in the array passing it to
+ * the callback function. If the function returns TRUE, the current value from the array is returned as part of the resulting
+ * array. Array keys are preserved.
  *
- * Wrapper for PHP's <tt>array_*</tt> functions which do not support PHP's own {@link \ArrayAccess} interface.
+ * Complement of PHP's <tt>array_filter()</tt> function adding support for {@link \Traversable} implementations.
  *
- * @param  string             $key
- * @param  array|\ArrayAccess $array
+ * @param  array|\Traversable $input
+ * @param  callable           $callback [optional]
+ * @param  int                $flags    [optional]
  *
- * @return bool
+ * @return array
  */
-function arrayx_key_exists($key, $array) {
-    if (is_array($array))               return array_key_exists($key, $array);
-    if ($array instanceof \ArrayAccess) return $array->offsetExists($key);
-    return false;
+function array_filter($input, $callback=null, $flags=0) {
+    $args = func_get_args();
+    if ($input instanceof \Traversable)
+        $args[0] = iterator_to_array($input);
+    return \array_filter(...$args);
 }
 
 
 /**
- * Alias of {@link arrayx_key_exists()}.
+ * Whether the given index exists in an array-like variable.
  *
- * Whether or not an array-like variable has the specified key.
+ * Complement of PHP's <tt>array_key_exists()</tt> function adding support for {@link \ArrayAccess} implementations.
  *
- * @param  string             $key
+ * @param  mixed              $key
  * @param  array|\ArrayAccess $array
  *
  * @return bool
  */
-function keyx_exists($key, $array) {
-    return arrayx_key_exists($key, $array);
+function array_key_exists($key, $array) {
+    if ($array instanceof \ArrayAccess)
+        return $array->offsetExists($key);
+    return \array_key_exists($key, $array);
+}
+
+
+/**
+ * Alias of {@link rosasurfer\array_key_exists()}.
+ *
+ * Whether the given index exists in an array-like variable.
+ *
+ * Complement of PHP's <tt>key_exists()</tt> function adding support for {@link \ArrayAccess} implementations.
+ *
+ * @param  mixed              $key
+ * @param  array|\ArrayAccess $array
+ *
+ * @return bool
+ */
+function key_exists($key, $array) {
+    return array_key_exists($key, $array);
 }
 
 
 /**
  * Return all or a subset of the keys of an array-like variable.
  *
- * Wrapper for PHP's <tt>array_*</tt> functions which do not support PHP's own {@link \ArrayAccess} interface.
+ * Complement of PHP's <tt>array_keys()</tt> function adding support for {@link \Traversable} implementations.
  *
- * @param  array|\ArrayAccess $array
+ * @param  array|\Traversable $array
  * @param  mixed              $search [optional]
  * @param  bool               $strict [optional]
  *
  * @return array
  */
-function array_keysx($array, $search=null, $strict=false) {
-    if (is_array($array)) return array_keys(...func_get_args());
-
-    if ($array instanceof \ArrayAccess) {
-        $argc    = func_num_args();
-        $results = [];
-        foreach ($array as $key => $value) {
-            if ($argc == 1)                       $results[] = $key;
-            else if ($strict) $value===$search && $results[] = $key;
-            else              $value== $search && $results[] = $key;
-        }
-        return $results;
+function array_keys($array, $search=null, $strict=false) {
+    $args = func_get_args();
+    if ($array instanceof \Traversable) {
+        $args[0] = iterator_to_array($array, $useKeys=true);
     }
-    throw new IllegalTypeException('Illegal type of parameter $array: '.(is_object($array) ? get_class($array) : getType($array)));
+    return \array_keys(...$args);
+}
+
+
+/**
+ * Merges the elements of one or more array-like variables together so that the values of one are appended to the end of the
+ * previous one. Values with the same string keys will overwrite the previous one. Numeric keys will be renumbered and values
+ * with the same numeric keys will not overwrite the previous one.
+ *
+ * Complement of PHP's <tt>array_merge()</tt> function adding support for {@link \Traversable} implementations.
+ *
+ * @param  array|\Traversable $values
+ * @param  array|\Traversable $...
+ *
+ * @return array
+ */
+function array_merge($values) {
+    $args = func_get_args();
+    foreach ($args as $key => $arg) {
+        if ($arg instanceof \Traversable)
+            $args[$key] = iterator_to_array($arg, $useKeys=true);
+    }
+    return \array_merge(...$args);
 }
 
 
@@ -1149,7 +1186,7 @@ function objectToArray($object, $access = ACCESS_PUBLIC) {
         else {                                      // private
             if ($access & ACCESS_PRIVATE) {
                 $publicName = strRightFrom($name, "\0", 2);
-                if (!array_key_exists($publicName, $result))
+                if (!\array_key_exists($publicName, $result))
                     $result[$publicName] = $value;
             }
         }
@@ -1205,7 +1242,7 @@ function is_dir_empty($dirname, $ignore = []) {
 
     if (!is_array($ignore))
         $ignore = [$ignore];
-    $ignored = array_merge(['.', '..'], $ignore);           // always ignore '.' and '..'
+    $ignored = \array_merge(['.', '..'], $ignore);          // always ignore '.' and '..'
 
     foreach (scanDir($dirname) as $entry) {
         if (!in_array($entry, $ignored))
@@ -1283,15 +1320,15 @@ function is_trait($name) {
 
 
 /**
- * Whether or not a variable can be used like an array.
+ * Whether a variable can be used like an array.
  *
- * Wrapper for PHP's <tt>array_*</tt> functions which do not support PHP's own {@link \ArrayAccess} interface.
+ * Complement for PHP's <tt>is_array()</tt> function adding support for {@link \ArrayAccess} implementations.
  *
  * @param  array|\ArrayAccess $var
  *
  * @return bool
  */
-function is_arrayx($var) {
+function is_array_like($var) {
     return is_array($var) || $var instanceof \ArrayAccess;
 }
 

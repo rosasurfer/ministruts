@@ -73,52 +73,6 @@ const EOL_WINDOWS       = \rosasurfer\EOL_WINDOWS;              // "\r\n"     CR
 
 
 /**
- * Whether or not an array-like variable has the specified key.
- *
- * Wrapper for PHP's <tt>array_*</tt> functions which do not support PHP's own {@link \ArrayAccess} interface.
- *
- * @param  string             $key
- * @param  array|\ArrayAccess $array
- *
- * @return bool
- */
-function arrayx_key_exists($key, $array) {
-    return \rosasurfer\arrayx_key_exists($key, $array);
-}
-
-
-/**
- * Alias of {@link arrayx_key_exists()}.
- *
- * Whether or not an array-like variable has the specified key.
- *
- * @param  string             $key
- * @param  array|\ArrayAccess $array
- *
- * @return bool
- */
-function keyx_exists($key, $array) {
-    return \rosasurfer\keyx_exists($key, $array);
-}
-
-
-/**
- * Return all or a subset of the keys of an array-like variable.
- *
- * Wrapper for PHP's <tt>array_*</tt> functions which do not support PHP's own {@link \ArrayAccess} interface.
- *
- * @param  array|\ArrayAccess $array
- * @param  mixed              $search [optional]
- * @param  bool               $strict [optional]
- *
- * @return array
- */
-function array_keysx($array, $search=null, $strict=false) {
-    return \rosasurfer\array_keysx(...func_get_args());
-}
-
-
-/**
  * Convert a value to a boolean and return the human-readable string "true" or "false".
  *
  * @param  mixed $value - value interpreted as a boolean
@@ -770,20 +724,6 @@ function is_interface($name) {
  */
 function is_trait($name) {
     return \rosasurfer\is_trait($name);
-}
-
-
-/**
- * Whether or not a variable can be used like an array.
- *
- * Wrapper for PHP's <tt>array_*</tt> functions which do not support PHP's own {@link \ArrayAccess} interface.
- *
- * @param  array|\ArrayAccess $var
- *
- * @return bool
- */
-function is_arrayx($var) {
-    return \rosasurfer\is_arrayx($var);
 }
 
 
