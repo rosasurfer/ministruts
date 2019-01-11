@@ -18,7 +18,7 @@ parameters:
         - etc/httpd/
         - etc/js/
         - etc/vendor/
-        - src/global-helper.php
+        - src/globals.php
 
     universalObjectCratesClasses:
         - rosasurfer\ministruts\Page

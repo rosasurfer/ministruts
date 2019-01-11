@@ -1,7 +1,13 @@
 <?php
 /**
- * Map the helper constants and functions in namespace \rosasurfer to the global namespace.
+ * If the {@link Application} option "app.globals" is set to TRUE definitions in namespace "\rosasurfer" are additionally
+ * mapped to the global namespace. Tis feature is not needed and it's generally not recommended to avoid potential naming
+ * conflicts in the global scope. However, it may be used to simplify life of developers using editors with limited automatic
+ * code completion capabilities.
+ *
+ * (default: FALSE)
  */
+use rosasurfer\Application;
 use rosasurfer\ministruts\ActionMapping;
 use rosasurfer\ministruts\Module;
 use rosasurfer\ministruts\url\Url;

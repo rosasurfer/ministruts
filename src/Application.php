@@ -42,8 +42,8 @@ class Application extends Object {
      *        "app.dir.root"          - string:  The project's root directory.<br>
      *                                           (default: the current directory)<br>
      *
-     *        "app.global-helpers"    - bool:    If set to TRUE the helper functions and constants defined in "src/helper.php"<br>
-     *                                           are mapped to the global PHP namespace.<br>
+     *        "app.globals"           - bool:    If set to TRUE definitions in "src/helper.php"<br> are mapped to the global
+     *                                           PHP namespace.<br>
      *                                           (default: FALSE)<br>
      *
      *        "app.handle-errors"     - string:  How to handle regular PHP errors. If set to "strict" errors are converted to<br>
@@ -62,12 +62,12 @@ class Application extends Object {
         // set default values
         if (!isSet($options['app.handle-errors'    ])) $options['app.handle-errors'    ] = 'strict';
         if (!isSet($options['app.handle-exceptions'])) $options['app.handle-exceptions'] = true;
-        if (!isSet($options['app.global-helpers'   ])) $options['app.global-helpers'   ] = false;
+        if (!isSet($options['app.globals'          ])) $options['app.globals'          ] = isSet($options['app.global-helpers']) ? $options['app.global-helpers'] : false;
 
         // (1) setup configuration
         $this->setupErrorHandling    ($options['app.handle-errors'    ]);
         $this->setupExceptionHandling($options['app.handle-exceptions']);
-        $this->loadGlobalHelpers     ($options['app.global-helpers'   ]);
+        $this->loadGlobals           ($options['app.globals'          ]);
 
         $config = $this->loadConfiguration($options);
 
@@ -333,11 +333,11 @@ class Application extends Object {
 
 
     /**
-     * Map the helper constants and functions in namespace "\rosasurfer" to the global namespace.
+     * Map common definitions in namespace "\rosasurfer" to the global namespace.
      *
      * @param  mixed $value - configuration value as passed to the framework loader
      */
-    private function loadGlobalHelpers($value) {
+    private function loadGlobals($value) {
         $enabled = false;
         if (is_bool($value) || is_int($value)) {
             $enabled = (bool) $value;
@@ -348,7 +348,7 @@ class Application extends Object {
         }
 
         if ($enabled) {
-            include(MINISTRUTS_ROOT.'/src/global-helper.php');
+            include(MINISTRUTS_ROOT.'/src/globals.php');
         }
     }
 
