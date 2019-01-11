@@ -1,7 +1,9 @@
 <?php
 namespace rosasurfer\exception;
 
+use rosasurfer\core\ObjectTrait;
 use rosasurfer\debug\DebugHelper;
+use rosasurfer\di\DiAwareTrait;
 use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 
 
@@ -10,7 +12,7 @@ use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
  */
 class RosasurferException extends \Exception implements IRosasurferException {
 
-    use RosasurferExceptionTrait;
+    use RosasurferExceptionTrait, ObjectTrait, DiAwareTrait;
 
 
     /** @var array - better stacktrace */

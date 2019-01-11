@@ -1,7 +1,6 @@
 <?php
 namespace rosasurfer\core;
 
-use rosasurfer\di\DiAwareTrait;
 use rosasurfer\exception\RuntimeException;
 
 use function rosasurfer\simpleClassName;
@@ -9,11 +8,9 @@ use function rosasurfer\strLeftTo;
 
 
 /**
- * A trait adding common "Object" behaviour to any class, i.e. general error detection capabilities and DI awareness.
+ * A trait adding {@link Object} behaviour to any class (i.e. common error detection capabilities).
  */
 trait ObjectTrait {
-
-    use DiAwareTrait;
 
 
     /**
@@ -68,25 +65,5 @@ trait ObjectTrait {
         $trace = debug_backTrace(DEBUG_BACKTRACE_IGNORE_ARGS|DEBUG_BACKTRACE_PROVIDE_OBJECT);
         $class = get_class($trace[0]['object']);
         throw new RuntimeException('Undefined or inaccessible property '.$class.'::$'.$property);
-    }
-
-
-    /**
-     * Return a human-readable version of the instance.
-     *
-     * @_param  int $levels - how many levels of an object graph to recurse into
-     *                        (default: all)
-     * @return string
-     */
-    public function __toString(/*$levels=PHP_INT_MAX*/) {
-        /*
-        // TODO
-        if (func_num_args()) {
-            $levels = func_get_arg(0);
-            if ($levels != PHP_INT_MAX) {
-            }
-        }
-        */
-        return print_r($this, true);
     }
 }
