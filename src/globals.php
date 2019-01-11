@@ -675,7 +675,7 @@ function typeOf($var) {
  *                                                    (default: 0755 = rwxr-xr-x)
  */
 function mkDirWritable($path, $mode = 0755) {
-    return \rosasurfer\mkDirWritable($path, $mode);
+    \rosasurfer\mkDirWritable($path, $mode);
 }
 
 
@@ -907,7 +907,7 @@ function pluralize($count, $singular='', $plural='s') {
  * @param  string   $mutex [optional] - mutex identifier (default: the calling line of code)
  */
 function synchronized(\Closure $task, $mutex = null) {
-    return \rosasurfer\synchronized($task, $mutex);
+    \rosasurfer\synchronized($task, $mutex);
 }
 
 
