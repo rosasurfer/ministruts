@@ -1,22 +1,20 @@
 <?php
 namespace rosasurfer\di;
 
-use rosasurfer\exception\UnimplementedFeatureException;
-
 
 /**
  * A trait adding the behaviour "dependency injection awareness" to any class. Used to access the currently registered
- * dependency injection and service container. Any class can easily be made dependency aware.
+ * default dependency service container. Any class can easily be made dependency aware.
  */
 trait DiAwareTrait {
 
 
     /**
-     * Return the currently registered dependency injection and service container.
+     * Return the currently registered default dependency injection container.
      *
-     * @return void
+     * @return DiInterface
      */
-    public static function di() {
-        throw new UnimplementedFeatureException(__METHOD__);
+    public function di() {
+        return Di::getDefault();
     }
 }
