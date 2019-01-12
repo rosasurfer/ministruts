@@ -1242,7 +1242,7 @@ function is_dir_empty($dirname, $ignore = []) {
 
     if (!is_array($ignore))
         $ignore = [$ignore];
-    $ignored = \array_merge(['.', '..'], $ignore);          // always ignore '.' and '..'
+    $ignored = \array_unique(\array_merge(['.', '..'], $ignore));   // always ignore pseudo directories '.' and '..'
 
     foreach (scanDir($dirname) as $entry) {
         if (!in_array($entry, $ignored))
