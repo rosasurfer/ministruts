@@ -2,6 +2,8 @@
 namespace rosasurfer\di;
 
 use rosasurfer\core\Object;
+use rosasurfer\di\def\DefaultCliDi;
+use rosasurfer\di\def\DefaultDi;
 
 use const rosasurfer\CLI;
 
@@ -9,7 +11,7 @@ use const rosasurfer\CLI;
 /**
  * Di
  *
- * A component that implements Dependency Injection/Location of services and is itself a container for them.
+ * A class that implements standard dependency injection/location of services and is itself a container for them.
  *
  * <pre>
  *  $di = new Di();

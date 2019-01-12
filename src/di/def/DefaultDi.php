@@ -1,14 +1,15 @@
 <?php
-namespace rosasurfer\di;
+namespace rosasurfer\di\def;                        // namespaces are not allowed to contain the word "default"
+
+use rosasurfer\di\Di;
 
 
 /**
- * Default DI for command-line interface applications.
+ * Default DI for all applications.
  *
  * A variant of the standard Di. By default it automatically registers all the services provided by the framework.
- * This class is especially suitable for CLI applications.
  */
-class DefaultCliDi extends DefaultDi {
+class DefaultDi extends Di {
 
 
     /**
