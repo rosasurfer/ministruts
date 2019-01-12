@@ -110,7 +110,7 @@ class HttpRequest extends Object {
         $value = trim($value);
 
         // alle vorhandenen Header dieses Namens suchen und loeschen (unabhaengig von Gross-/Kleinschreibung)
-        $intersect = array_intersect_ukey($this->headers, array($name => 1), 'strCaseCmp');
+        $intersect = \array_intersect_ukey($this->headers, array($name => 1), 'strCaseCmp');
         foreach ($intersect as $key => $vv) {
             unset($this->headers[$key]);
         }
@@ -145,7 +145,7 @@ class HttpRequest extends Object {
         $value = trim($value);
 
         // vorhandene Header dieses Namens suchen und loeschen (unabhaengig von Gross-/Kleinschreibung)
-        $intersect = array_intersect_ukey($this->headers, array($name => 1), 'strCaseCmp');
+        $intersect = \array_intersect_ukey($this->headers, array($name => 1), 'strCaseCmp');
         foreach ($intersect as $key => $vv) {
             unset($this->headers[$key]);
         }
@@ -178,7 +178,7 @@ class HttpRequest extends Object {
         // alle oder nur die gewuenschten Header zurueckgeben
         if (!$names)
             return $this->headers;
-        return array_intersect_ukey($this->headers, array_flip($names), 'strCaseCmp');
+        return \array_intersect_ukey($this->headers, \array_flip($names), 'strCaseCmp');
     }
 
 

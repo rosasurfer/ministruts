@@ -115,14 +115,14 @@ class RequestProcessor extends Object {
         $errors = $request->removeActionErrors();
         if ($errors && $request->getSession()) {
             if (isSet($_SESSION[ACTION_ERRORS_KEY]))
-                $errors = array_merge($_SESSION[ACTION_ERRORS_KEY], $errors);
+                $errors = \array_merge($_SESSION[ACTION_ERRORS_KEY], $errors);
             $_SESSION[ACTION_ERRORS_KEY] = $errors;
         }
 
         $messages = $request->removeActionMessages();
         if ($messages && $request->getSession()) {
             if (isSet($_SESSION[ACTION_MESSAGES_KEY]))
-                $messages = array_merge($_SESSION[ACTION_MESSAGES_KEY], $messages);
+                $messages = \array_merge($_SESSION[ACTION_MESSAGES_KEY], $messages);
             $_SESSION[ACTION_MESSAGES_KEY] = $messages;
         }
     }
@@ -146,7 +146,7 @@ class RequestProcessor extends Object {
                 $errors = $_SESSION[ACTION_ERRORS_KEY];
                 unset($_SESSION[ACTION_ERRORS_KEY]);
             }
-            $request->setAttribute(ACTION_MESSAGES_KEY, array_merge($messages, $errors));
+            $request->setAttribute(ACTION_MESSAGES_KEY, \array_merge($messages, $errors));
         }
     }
 

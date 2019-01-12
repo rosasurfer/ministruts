@@ -233,7 +233,7 @@ class Config extends Object implements IConfig {
         if ($notFound) {
             if (is_bool($options))
                 return $options;
-            if (is_array($options) && array_key_exists('default', $options)) {
+            if (is_array($options) && \key_exists('default', $options)) {
                 if (!is_bool($options['default'])) throw new IllegalTypeException('Illegal type of option "default": '.getType($options['default']));
                 return $options['default'];
             }
@@ -244,7 +244,7 @@ class Config extends Object implements IConfig {
         if (is_int($options)) {
             $flags = $options;
         }
-        else if (is_array($options) && array_key_exists('flags', $options)) {
+        else if (is_array($options) && \key_exists('flags', $options)) {
             if (!is_int($options['flags'])) throw new IllegalTypeException('Illegal type of option "flags": '.getType($options['flags']));
             $flags = $options['flags'];
         }
@@ -543,11 +543,11 @@ class Config extends Object implements IConfig {
             else {
                 $sSubkey = '"'.$subkey.'"';
             }
-            $key          = join('.', array_merge($node, $sSubkey=='' ? [] : [$sSubkey]));
+            $key          = join('.', \array_merge($node, $sSubkey=='' ? [] : [$sSubkey]));
             $maxKeyLength = max(strLen($key), $maxKeyLength);
 
             if (is_array($value)) {
-                $result += $this->{__FUNCTION__}(array_merge($node, [$subkey]), $value, $maxKeyLength);
+                $result += $this->{__FUNCTION__}(\array_merge($node, [$subkey]), $value, $maxKeyLength);
             }
             else {
                 $result[$key] = $value;

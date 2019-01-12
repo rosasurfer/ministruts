@@ -24,7 +24,7 @@ require(dirName(realPath(__FILE__)).'/../app/init.php');
 
 
 /** @var string[] $args */
-$args = array_slice($_SERVER['argv'], 1);
+$args = \array_slice($_SERVER['argv'], 1);
 !$args && exit(0);
 
 eval($args[0]);

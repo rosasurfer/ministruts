@@ -39,7 +39,7 @@ $quiet = false;                                             // whether or not "q
 
 
 /** @var string[] $args */
-$args = array_slice($_SERVER['argv'], 1);
+$args = \array_slice($_SERVER['argv'], 1);
 
 foreach ($args as $i => $arg) {
     if ($arg == '-h') { help(); exit(0);                           }    // help

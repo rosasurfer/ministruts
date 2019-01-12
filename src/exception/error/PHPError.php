@@ -47,7 +47,7 @@ class PHPError extends \ErrorException implements IRosasurferException {
 
             // drop the first frame if the exception was created in the registered error handler
             if (DebugHelper::getFQFunctionName($trace[0]) == ErrorHandler::class.'::handleError') {
-                array_shift($trace);
+                \array_shift($trace);
 
                 // if the error was triggered by include/require/_once: fix the next frame, it's wrong
                 if (sizeOf($trace) > 1) {

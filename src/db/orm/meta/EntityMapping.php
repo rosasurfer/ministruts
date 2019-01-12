@@ -125,7 +125,7 @@ class EntityMapping extends Object implements \Iterator {
      */
     public function rewind() {
         if ($this->iteratorKeys === null) {
-            $this->iteratorKeys = array_keys($this->mapping['properties']);
+            $this->iteratorKeys = \array_keys($this->mapping['properties']);
         }
         $this->iteratorPosition = 0;
     }

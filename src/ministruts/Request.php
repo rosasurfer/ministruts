@@ -274,9 +274,9 @@ class Request extends Singleton {
         if (!isSet($files)) {
             $normalizeLevel = function(array $file) use (&$normalizeLevel) {
                 if (isSet($file['name']) && is_array($file['name'])) {
-            	    $properties = array_keys($file);
+                    $properties = \array_keys($file);
                     $normalized = [];
-                    foreach (array_keys($file['name']) as $name) {
+                    foreach (\array_keys($file['name']) as $name) {
                         foreach ($properties as $property) {
                             $normalized[$name][$property] = $file[$property][$name];
                         }
@@ -289,8 +289,8 @@ class Request extends Singleton {
             $files = [];
             if (isSet($_FILES)) {
                 foreach ($_FILES as $key => $file) {
-            	    $files[$key] = $normalizeLevel($file);
-            	}
+                    $files[$key] = $normalizeLevel($file);
+                }
             }
         }
         return $files;
@@ -578,10 +578,10 @@ class Request extends Singleton {
 
         if ($contentType) {
             $headers     = explode(',', $contentType, 2);
-            $contentType = array_shift($headers);
+            $contentType = \array_shift($headers);
 
             $values      = explode(';', $contentType, 2);
-            $contentType = trim(array_shift($values));
+            $contentType = trim(\array_shift($values));
         }
         return $contentType;
     }
@@ -697,7 +697,7 @@ class Request extends Singleton {
         if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
 
         $headers = $this->getHeaders($name);
-        return array_shift($headers);
+        return \array_shift($headers);
     }
 
 
@@ -757,7 +757,7 @@ class Request extends Singleton {
         // return all or just the specified headers
         if (!$names)
             return $headers;
-        return array_intersect_ukey($headers, array_flip($names), 'strCaseCmp');
+        return \array_intersect_ukey($headers, \array_flip($names), 'strCaseCmp');
     }
 
 
@@ -804,7 +804,7 @@ class Request extends Singleton {
 
         $headers = $this->getHeaders($names);
         if ($headers)
-            return array_map('trim', explode(',', join(',', $headers)));
+            return \array_map('trim', explode(',', join(',', $headers)));
 
         return $headers; // empty array;
     }
@@ -939,7 +939,7 @@ class Request extends Singleton {
             $messages = [];
         $errors = $this->getActionErrors();
 
-        return array_merge($messages, $errors);
+        return \array_merge($messages, $errors);
     }
 
 

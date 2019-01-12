@@ -1159,7 +1159,7 @@ class Module extends Object {
 
         foreach ($this->resourceLocations as $location) {
             if (is_file($location.DIRECTORY_SEPARATOR.$parts[0])) {
-                $name = realPath($location.DIRECTORY_SEPARATOR.array_shift($parts));
+                $name = realPath($location.DIRECTORY_SEPARATOR.\array_shift($parts));
                 if ($parts)
                     $name .= '?'.$parts[0];
                 return $name;

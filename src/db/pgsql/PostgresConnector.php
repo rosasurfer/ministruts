@@ -140,7 +140,7 @@ class PostgresConnector extends Connector {
           //'gsslib',                                       // rejected by php_pgsql 9.4.1
             'service',
         ];
-        $paramKeywords = array_flip($paramKeywords);
+        $paramKeywords = \array_flip($paramKeywords);
         $connStr = '';
 
         foreach ($this->options as $key => $value) {

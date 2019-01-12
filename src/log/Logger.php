@@ -272,12 +272,12 @@ class Logger extends StaticClass {
 
             $logLevels = $config->get('log.level', []);
             if (is_string($logLevels))
-                $logLevels = ['' => $logLevels];                        // only the general application loglevel is configured
+                $logLevels = ['' => $logLevels];                            // only the general application loglevel is configured
 
             foreach ($logLevels as $className => $level) {
                 if (!is_string($level)) throw new IllegalTypeException('Illegal configuration value for "log.level.'.$className.'": '.getType($level));
 
-                if ($level == '') {                                     // classes with empty values fall back to the application loglevel
+                if ($level == '') {                                         // classes with empty values fall back to the application loglevel
                     unset($logLevels[$className]);
                 }
                 else {
@@ -285,14 +285,14 @@ class Logger extends StaticClass {
                     if (!$logLevel) throw new InvalidArgumentException('Invalid configuration value for "log.level.'.$className.'" = '.$level);
                     $logLevels[$className] = $logLevel;
 
-                    if (strStartsWith($className, '\\')) {              // normalize class names: remove leading back slash
+                    if (strStartsWith($className, '\\')) {                  // normalize class names: remove leading back slash
                         unset($logLevels[$className]);
                         $className = subStr($className, 1);
                         $logLevels[$className] = $logLevel;
                     }
                 }
             }
-            $logLevels = array_change_key_case($logLevels, CASE_LOWER); // normalize class names: lower-case for case-insensitive look-up
+            $logLevels = \array_change_key_case($logLevels, CASE_LOWER);    // normalize class names: lower-case for case-insensitive look-up
         }
 
         // look-up the loglevel for the specified class
@@ -601,7 +601,7 @@ class Logger extends StaticClass {
                 $lines = explode(NL, normalizeEOL($msg));
                 $eom = '';
                 if (strEndsWith($msg, NL)) {
-                    array_pop($lines);
+                    \array_pop($lines);
                     $eom = NL;
                 }
                 $msg = join(NL.$indent, $lines).$eom;
@@ -844,7 +844,7 @@ class Logger extends StaticClass {
                     break;
                 unset($trace[$i]);
             }
-            $context['trace'] = array_values($trace);
+            $context['trace'] = \array_values($trace);
         }
     }
 }

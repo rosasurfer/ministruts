@@ -51,7 +51,7 @@ class Page extends Singleton {
     public static function get($name, $altValue = null) {
         $page = self::me();
 
-        if (array_key_exists($name, $page->properties))
+        if (\key_exists($name, $page->properties))
             return $page->properties[$name];
 
         return $altValue;
@@ -77,7 +77,7 @@ class Page extends Singleton {
      * @return mixed - value
      */
     public function __get($name) {
-        if (array_key_exists($name, $this->properties))
+        if (\key_exists($name, $this->properties))
             return $this->properties[$name];
         return null;
     }

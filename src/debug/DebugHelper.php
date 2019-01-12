@@ -89,7 +89,7 @@ class DebugHelper extends StaticClass {
         // Remove the last frame (the one we added for the main script) if it now points to an unknown location (PHP core).
         $size = sizeOf($trace);
         if (!isSet($trace[$size-1]['file'])) {
-            array_pop($trace);
+            \array_pop($trace);
         }
         return $trace;
 
@@ -204,7 +204,7 @@ class DebugHelper extends StaticClass {
             $lines = explode(NL, normalizeEOL($message));                               // indent multiline messages
             $eom = '';
             if (strEndsWith($message, NL)) {
-                array_pop($lines);
+                \array_pop($lines);
                 $eom = NL;
             }
             $message = join(NL.$indent, $lines).$eom;

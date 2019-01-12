@@ -199,14 +199,14 @@ class ActionMapping extends Object {
 
         // check for invalid id combinations, e.g. "Member,!Member"
         $tokens = explode(',', $roles);
-        $keys = array_flip($tokens);
+        $keys = \array_flip($tokens);
 
         foreach ($tokens as $role) {
             if (isSet($keys['!'.$role])) throw new StrutsConfigException('<mapping'.$name.$path.' roles="'.$roles.'": Invalid roles expression.');
         }
 
         // remove duplicates
-        $this->roles = join(',', array_flip($keys));
+        $this->roles = join(',', \array_flip($keys));
         return $this;
     }
 

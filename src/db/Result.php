@@ -62,13 +62,13 @@ abstract class Result extends Object implements ResultInterface {
             $value = $row[0];
         }
         else {
-            if (!array_key_exists($column, $row)) {
+            if (!\key_exists($column, $row)) {
                 if (is_int($column))     throw new InvalidArgumentException('Invalid $column: '.$column.' (no such column)');
                 if (!is_string($column)) throw new IllegalTypeException('Illegal type of parameter $column: '.getType($column));
 
-                $row    = array_change_key_case($row, CASE_LOWER);
+                $row    = \array_change_key_case($row, CASE_LOWER);
                 $column = strToLower($column);
-                if (!array_key_exists($column, $row)) throw new InvalidArgumentException('Invalid $column: "'.$column.'" (no such column)');
+                if (!\key_exists($column, $row)) throw new InvalidArgumentException('Invalid $column: "'.$column.'" (no such column)');
             }
             $value = $row[$column];
         }

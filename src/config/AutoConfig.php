@@ -80,7 +80,7 @@ class AutoConfig extends Config {
 
 
         // create FileDependency and cache the instance
-        //$dependency = FileDependency::create(array_keys($config->files));
+        //$dependency = FileDependency::create(\array_keys($config->files));
         //$dependency->setMinValidity(60 * SECONDS);
         //$cache->set('default', $config, Cache::EXPIRES_NEVER, $dependency);
     }

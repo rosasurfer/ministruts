@@ -28,7 +28,7 @@ class Validator extends StaticClass {
         $result = is_string($string) && strLen($string) && preg_match($pattern, $string, $bytes);
 
         if ($result) {
-            array_shift($bytes);
+            \array_shift($bytes);
 
             foreach ($bytes as $i => $byte) {
                 $b = (int) $byte;

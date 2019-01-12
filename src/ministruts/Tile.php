@@ -196,7 +196,7 @@ class Tile extends Object {
      */
     protected function getMergedProperties() {
         $parentProperties = $this->parent ? $this->parent->getMergedProperties() : [];
-        return array_merge($parentProperties, $this->properties);
+        return \array_merge($parentProperties, $this->properties);
     }
 
 
@@ -261,7 +261,7 @@ class Tile extends Object {
 
         if ($this->isPushModelSupport()) {
             $pageValues = Page::me()->values();
-            $properties = array_merge($properties, $pageValues);
+            $properties = \array_merge($properties, $pageValues);
         }
 
         $tileHint = false;

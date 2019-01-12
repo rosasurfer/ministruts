@@ -116,7 +116,7 @@ class HttpSession extends Singleton {
         }
 
         // empty the session
-        $this->removeAttribute(array_keys($_SESSION));
+        $this->removeAttribute(\array_keys($_SESSION));
 
         // initialize the session
         $request = $this->request;                                              // TODO: $request->getHeader() einbauen
@@ -168,7 +168,7 @@ class HttpSession extends Singleton {
      * @return mixed - der gespeicherte Wert oder NULL
      */
     public function getAttribute($key, $default = null) {
-        if (array_key_exists($key, $_SESSION))
+        if (\key_exists($key, $_SESSION))
             return $_SESSION[$key];
         return $default;
     }
@@ -226,6 +226,6 @@ class HttpSession extends Singleton {
      * @return bool
      */
     public function isAttribute($key) {
-        return array_key_exists($key, $_SESSION);
+        return \key_exists($key, $_SESSION);
     }
 }

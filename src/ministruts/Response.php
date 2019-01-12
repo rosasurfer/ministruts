@@ -96,7 +96,7 @@ class Response extends Singleton {
      * @return mixed - der gespeicherte Wert oder NULL
      */
     public function getAttribute($key) {
-        if (array_key_exists($key, $this->attributes))
+        if (\key_exists($key, $this->attributes))
             return $this->attributes[$key];
 
         $value = null;

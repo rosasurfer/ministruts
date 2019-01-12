@@ -122,7 +122,7 @@ abstract class ActionForm extends Object {
             if (is_object($property))
                 unset($array[$name]);                                   // drop all remaining object references
         }
-        return array_keys($array);
+        return \array_keys($array);
     }
 
 

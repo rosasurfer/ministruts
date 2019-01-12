@@ -118,7 +118,7 @@ class Worker extends Object {
         if (preg_match_all($pattern, $sql, $matches, PREG_OFFSET_CAPTURE)) {
             $namespace = strLeftTo($this->entityClass, '\\', -1, true, '');
 
-            foreach (array_reverse($matches[1]) as $match) {
+            foreach (\array_reverse($matches[1]) as $match) {
                 $modelName = $match[0];
                 $offset    = $match[1];
                 $className = $namespace.$modelName;

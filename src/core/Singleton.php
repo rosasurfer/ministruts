@@ -50,7 +50,7 @@ abstract class Singleton extends Object {
 
         // get constructor arguments (if any)
         $args = func_get_args();
-        array_shift($args);
+        \array_shift($args);
 
         // unpack the arguments into the constructor
         $instance = new $class(...$args);

@@ -126,7 +126,7 @@ class TorHelper extends StaticClass {
                         break;
                     }
 
-                    $nodes = strLen($content) ? array_flip(explode(NL, normalizeEOL($content))) : [];
+                    $nodes = strLen($content) ? \array_flip(explode(NL, normalizeEOL($content))) : [];
 
                     if (!$nodes) Logger::log('Could not get TOR exit nodes from any server', L_ERROR);
 

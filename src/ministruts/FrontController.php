@@ -86,7 +86,7 @@ class FrontController extends Singleton {
         if (!is_file($mainConfig)) throw new StrutsConfigException('Struts configuration file not found: "'.$mainConfig.'"');
 
         $subConfigs = glob($configDir.'/struts-config-*.xml', GLOB_ERR) ?: [];      // scan for submodule configs
-        $configs    = array_merge([$mainConfig], $subConfigs);
+        $configs    = \array_merge([$mainConfig], $subConfigs);
 
         // create and register a Module for each found configuration file
         $file = null;

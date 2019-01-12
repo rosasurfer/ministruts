@@ -91,7 +91,7 @@ abstract class PersistableObject extends Object {
                 unset($array[$protected], $array[$public]);         // protected: "\0*\0{propertyName}"
             }                                                       // public:    "{propertyName}"
         }
-        return array_keys($array);
+        return \array_keys($array);
     }
 
 
@@ -503,7 +503,7 @@ abstract class PersistableObject extends Object {
         }; unset($value);
 
         // create SQL statement
-        $sql = 'insert into '.$table.' ('.join(', ', array_keys($values)).')
+        $sql = 'insert into '.$table.' ('.join(', ', \array_keys($values)).')
                    values ('.join(', ', $values).')';
 
         // execute SQL statement
@@ -609,7 +609,7 @@ abstract class PersistableObject extends Object {
      * @return $this
      */
     private function populate(array $row) {
-        $row     = array_change_key_case($row, CASE_LOWER);
+        $row     = \array_change_key_case($row, CASE_LOWER);
         $mapping = $this->dao()->getMapping();
         $dbType  = $this->dao()->db()->getType();
 

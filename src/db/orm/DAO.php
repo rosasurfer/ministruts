@@ -251,8 +251,8 @@ abstract class DAO extends Singleton {
         }
         else $mapping['relations'] = [];
 
-        $mapping['columns'] = array_change_key_case($mapping['columns'], CASE_LOWER);
-        $mapping['getters'] = array_change_key_case($mapping['getters'], CASE_LOWER);
+        $mapping['columns'] = \array_change_key_case($mapping['columns'], CASE_LOWER);
+        $mapping['getters'] = \array_change_key_case($mapping['getters'], CASE_LOWER);
 
         return $mapping;
     }
