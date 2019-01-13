@@ -15,11 +15,10 @@ interface ServiceInterface {
     /**
      * Constructor
      *
-     * @param  string        $name              - service name
-     * @param  string|object $definition        - service definition
-     * @param  bool          $shared [optional] - whether the service is shared (default: yes)
+     * @param  string        $name       - service name
+     * @param  string|object $definition - service definition
      */
-    public function __construct($name, $definition, $shared = true);
+    public function __construct($name, $definition);
 
 
     /**
@@ -39,17 +38,11 @@ interface ServiceInterface {
 
 
     /**
-     * Whether the service is shared.
-     *
-     * @return bool
-     */
-    public function isShared();
-
-
-    /**
      * Resolve the service.
+     *
+     * @param  bool $shared [optional] - whether to return an already existing instance (default: yes)
      *
      * @return object
      */
-    public function resolve();
+    public function resolve($shared = true);
 }

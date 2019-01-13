@@ -1,6 +1,8 @@
 <?php
 namespace rosasurfer\di;
 
+use rosasurfer\di\service\ServiceInterface;
+
 
 /**
  * DiInterface
@@ -11,8 +13,18 @@ interface DiInterface {
 
 
     /**
-     * Return the last dependency injection container registered with the application or the default implementation if none
-     * was yet registered.
+     * Register a service in the service container.
+     *
+     * @param  string        $name
+     * @param  string|object $definition
+     *
+     * @return ServiceInterface
+     */
+    public function set($name, $definition);
+
+
+    /**
+     * Return the last dependency injection container registered with the application.
      *
      * @return self
      */

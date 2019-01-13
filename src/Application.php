@@ -6,9 +6,11 @@ use rosasurfer\config\Config;
 use rosasurfer\config\ConfigInterface as IConfig;
 use rosasurfer\core\Object;
 use rosasurfer\debug\ErrorHandler;
+use rosasurfer\di\Di;
+use rosasurfer\di\auto\DefaultCliDi;
+use rosasurfer\di\auto\DefaultDi;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
-use rosasurfer\exception\RuntimeException;
 use rosasurfer\log\Logger;
 use rosasurfer\ministruts\FrontController;
 use rosasurfer\ministruts\Response;
@@ -64,12 +66,18 @@ class Application extends Object {
         if (!isSet($options['app.handle-exceptions'])) $options['app.handle-exceptions'] = true;
         if (!isSet($options['app.globals'          ])) $options['app.globals'          ] = isSet($options['app.global-helpers']) ? $options['app.global-helpers'] : false;
 
-        // (1) setup configuration
+        // setup the configuration
         $this->setupErrorHandling    ($options['app.handle-errors'    ]);
         $this->setupExceptionHandling($options['app.handle-exceptions']);
         $this->loadGlobals           ($options['app.globals'          ]);
 
         $config = $this->loadConfiguration($options);
+
+        // initialize the default DI container
+        $configDir = $config->get('app.dir.config');
+        $di = !CLI ? new DefaultDi($configDir) : new DefaultCliDi($configDir);
+        Di::setDefault($di);
+
 
         // (2) check "app.id"
         $appId = $config->get('app.id', null);
@@ -219,7 +227,7 @@ class Application extends Object {
      */
     private function loadConfiguration(array $options) {
         if (isSet($options['app.dir.config']) && isSet($options['app.config']))
-            throw new RuntimeException('Only one of the application options "app.config" or "app.dir.config" can be provided.');
+            throw new InvalidArgumentException('Invalid application options: only one of "app.config" or "app.dir.config" can be specified.');
 
         if (!isSet($options['app.config'])) {
             $location = isSet($options['app.dir.config']) ? $options['app.dir.config'] : getCwd();

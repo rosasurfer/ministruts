@@ -2,10 +2,9 @@
 namespace rosasurfer\di;
 
 use rosasurfer\core\Object;
-use rosasurfer\di\def\DefaultCliDi;
-use rosasurfer\di\def\DefaultDi;
-
-use const rosasurfer\CLI;
+use rosasurfer\di\service\ServiceInterface;
+use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\di\service\Service;
 
 
 /**
@@ -33,6 +32,9 @@ class Di extends Object implements DiInterface {
     /** @var DiInterface - the latest instance registered as the default DI */
     protected static $default;
 
+    /** @var ServiceInterface[] - list of registered services */
+    protected $services;
+
 
     /**
      * Constructor
@@ -42,13 +44,40 @@ class Di extends Object implements DiInterface {
 
 
     /**
+     * Load custom service definitions.
+     *
+     * @param  string $configDir - directory to load service definitions from
+     *
+     * @return bool - whether custom service definitions have been successfully loaded
+     */
+    protected function loadCustomServices($configDir) {
+        if (!is_string($configDir)) throw new IllegalTypeException('Illegal type of parameter $configDir: '.getType($configDir));
+        if (!is_file($file = $configDir.'/services.php'))
+            return false;
+
+        $definitions = include($file);
+
+        foreach ($definitions as $name => $definition) {
+            $this->set($name, $definition);
+        }
+        return true;
+    }
+
+
+    /**
+     * {@inheritdoc}
+     */
+    public function set($name, $definition) {
+        $service = new Service($name, $definition);
+        $this->services[$name] = $service;
+        return $service;
+    }
+
+
+    /**
      * {@inheritdoc}
      */
     public static function getDefault() {
-        if (!self::$default) {
-            if (CLI) self::$default = new DefaultCliDi();
-            else     self::$default = new DefaultDi();
-        }
         return self::$default;
     }
 

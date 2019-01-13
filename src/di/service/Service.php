@@ -1,7 +1,8 @@
 <?php
 namespace rosasurfer\di\service;
 
-use rosasurfer\exception\RuntimeException;
+use rosasurfer\exception\ClassNotFoundException;
+use rosasurfer\exception\IllegalTypeException;
 
 use function rosasurfer\is_class;
 
@@ -25,24 +26,19 @@ class Service implements ServiceInterface {
     /** @var string|object */
     protected $definition;
 
-    /** @var bool */
-    protected $shared;
-
     /** @var object */
-    protected $sharedInstance;
+    protected $instance;
 
 
     /**
      * Constructor
      *
-     * @param  string        $name              - service name
-     * @param  string|object $definition        - service definition
-     * @param  bool          $shared [optional] - whether the service is shared (default: yes)
+     * @param  string        $name       - service name
+     * @param  string|object $definition - service definition
      */
-    public function __construct($name, $definition, $shared = true) {
+    public function __construct($name, $definition) {
         $this->name       = $name;
         $this->definition = $definition;
-        $this->shared     = $shared;
     }
 
 
@@ -65,31 +61,24 @@ class Service implements ServiceInterface {
     /**
      * {@inheritdoc}
      */
-    public function isShared() {
-        return $this->shared;
-    }
+    public function resolve($shared = true) {
+        if ($shared && $this->instance)
+            return $this->instance;
 
-
-    /**
-     * {@inheritdoc}
-     */
-    public function resolve() {
-        if ($this->shared && $this->sharedInstance)
-            return $this->sharedInstance;
-
-        $instance = null;
         $definition = $this->definition;
+        $instance = null;
 
         if (is_string($definition)) {                       // strings must be a class name without parameters
-            if (!is_class($definition)) throw new RuntimeException('Service "'.$this->name.'" cannot be resolved, definition: "'.$definition.'" (string)');
+            if (!is_class($definition)) throw new ClassNotFoundException('Service "'.$this->name.'" cannot be resolved (unknown class "'.$definition.'")');
             $instance = new $definition();
         }
         else if (is_object($definition)) {                  // objects may be a Closure or an already resolved instance
             $instance = $definition instanceof \Closure ? $definition() : $definition;
         }
-        else throw new RuntimeException('Service "'.$this->name.'" cannot be resolved, definition type: '.getType($definition));
+        else throw new IllegalTypeException('Service "'.$this->name.'" cannot be resolved (illegal definition type: '.getType($definition).')');
 
-        if ($this->shared) $this->sharedInstance = $instance;
+        if ($shared)
+            $this->instance = $instance;
         return $instance;
     }
 }
