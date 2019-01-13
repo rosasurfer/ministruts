@@ -13,7 +13,7 @@
  *
  *   #!/bin/bash
  *   #
- *   APP_LOG_DIR="$(bin/eval.php 'echo rosasurfer\config\Config::getDefault()["app.dir.log"];')"
+ *   APP_LOG_DIR="$(bin/eval.php 'echo \rosasurfer\Application::getDefaultConfig()["app.dir.log"];')"
  *   echo "APP_LOG_DIR: $APP_LOG_DIR"
  */
 use function rosasurfer\stderror;

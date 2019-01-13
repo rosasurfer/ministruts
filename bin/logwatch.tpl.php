@@ -11,7 +11,8 @@
  */
 namespace rosasurfer\bin\logwatch;
 
-use rosasurfer\config\Config;
+use rosasurfer\Application;
+use rosasurfer\config\ConfigInterface;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\net\mail\Mailer;
 use rosasurfer\util\PHP;
@@ -114,7 +115,8 @@ function processEntry($entry) {
     $entry = trim($entry);
     if (!strLen($entry)) return;
 
-    $config = Config::getDefault();
+    /** @var ConfigInterface $config */
+    $config = Application::getDefaultConfig();
 
     $receivers = [];
     foreach (explode(',', $config->get('log.mail.receiver', '')) as $receiver) {

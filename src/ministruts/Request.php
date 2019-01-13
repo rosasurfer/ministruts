@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\ministruts;
 
-use rosasurfer\config\Config;
+use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\Singleton;
 use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\IllegalTypeException;
@@ -11,6 +11,7 @@ use rosasurfer\net\NetTools;
 use rosasurfer\util\PHP;
 
 use function rosasurfer\ini_get_bool;
+use function rosasurfer\strCompareI;
 use function rosasurfer\strEndsWith;
 use function rosasurfer\strLeft;
 use function rosasurfer\strLeftTo;
@@ -20,7 +21,6 @@ use function rosasurfer\strStartsWith;
 use const rosasurfer\CLI;
 use const rosasurfer\DAY;
 use const rosasurfer\NL;
-use function rosasurfer\strCompareI;
 
 
 /**
@@ -468,7 +468,9 @@ class Request extends Singleton {
                 $baseUri = $_SERVER['APP_BASE_URI'];
             }
             else {
-                $baseUri = Config::getDefault()->get('app.base-uri', false);
+                /** @var ConfigInterface $config */
+                $config  = $this->di()['config'];
+                $baseUri = $config->get('app.base-uri', false);
                 if (!$baseUri) throw new RuntimeException('Unknown application base URI, either $_SERVER["APP_BASE_URI"] or $config["app.base-uri"] needs to be configured.');
             }
             !strStartsWith($baseUri, '/') && $baseUri  = '/'.$baseUri;

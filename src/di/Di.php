@@ -1,7 +1,6 @@
 <?php
 namespace rosasurfer\di;
 
-use rosasurfer\Application;
 use rosasurfer\core\Object;
 use rosasurfer\di\service\Service;
 use rosasurfer\di\service\ServiceInterface as IService;
@@ -29,9 +28,6 @@ use rosasurfer\exception\IllegalTypeException;
  */
 class Di extends Object implements DiInterface {
 
-
-    /** @var DiInterface - the current default instance of the application */
-    protected static $default;
 
     /** @var IService[] - a list of registered services */
     protected $services;
@@ -156,30 +152,5 @@ class Di extends Object implements DiInterface {
      */
     public function offsetUnset($name) {
         $this->remove($name);
-    }
-
-
-    /**
-     * Return the default dependency injection container of the {@link Application}. This is the instance previously set
-     * with {@link Di::setDefault()}.
-     *
-     * @return DiInterface
-     */
-    public static function getDefault() {
-        return self::$default;
-    }
-
-
-    /**
-     * Set a new default dependency injection container for the {@link Application}.
-     *
-     * @param  DiInterface $di
-     *
-     * @return DiInterface - the previously registered default container
-     */
-    public static function setDefault(DiInterface $di) {
-        $previous = self::$default;
-        self::$default = $di;
-        return $previous;
     }
 }

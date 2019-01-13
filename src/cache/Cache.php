@@ -1,10 +1,9 @@
 <?php
 namespace rosasurfer\cache;
 
-use rosasurfer\config\Config;
+use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\StaticClass;
 use rosasurfer\exception\IllegalTypeException;
-use rosasurfer\exception\RuntimeException;
 use rosasurfer\util\PHP;
 
 use function rosasurfer\ini_get_bool;
@@ -64,8 +63,8 @@ final class Cache extends StaticClass {
 
 
         if (!isSet(self::$caches[$label])) {
-            if (!$config=Config::getDefault())
-                throw new RuntimeException('Service locator returned empty default config: '.getType($config));
+            /** @var ConfigInterface $config */
+            $config = self::di()['config'];
 
             // Cache-Konfiguration auslesen und Cache instantiieren
             $class   = $config->get('cache.'.$label.'.class');

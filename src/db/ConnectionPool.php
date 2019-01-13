@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\db;
 
-use rosasurfer\config\Config;
+use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\Singleton;
 use rosasurfer\db\ConnectorInterface as IConnector;
 use rosasurfer\db\mysql\MySQLConnector;
@@ -9,7 +9,6 @@ use rosasurfer\db\pgsql\PostgresConnector;
 use rosasurfer\db\sqlite\SQLiteConnector;
 use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\IllegalTypeException;
-use rosasurfer\exception\RuntimeException;
 
 
 /**
@@ -73,9 +72,8 @@ final class ConnectionPool extends Singleton {
             $connector = $me->pool[$id];
         }
         else {                                                   // no, get the connection's config
-            if (!$config=Config::getDefault())
-                throw new RuntimeException('Service locator returned empty default config: '.getType($config));
-
+            /** @var ConfigInterface $config */
+            $config  = self::di()['config'];
             $options = $config->get('db.'.$id, []);
             if (!is_array($options)) throw new IllegalTypeException('Invalid config value "db.'.$id.'": '.getType($options).' (not array)');
             if (!$options)           throw new IllegalStateException('No configuration found for database alias "'.$id.'"');

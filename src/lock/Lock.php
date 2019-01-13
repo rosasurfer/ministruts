@@ -1,10 +1,10 @@
 <?php
 namespace rosasurfer\lock;
 
+use rosasurfer\config\ConfigInterface;
 use rosasurfer\debug\ErrorHandler;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RuntimeException;
-use rosasurfer\config\Config;
 
 
 /**
@@ -42,10 +42,11 @@ class Lock extends BaseLock {
             $this->impl = new SystemFiveLock($key);
         }
         else {
+            /** @var ConfigInterface $config */
+            $config = $this->di()['config'];
+
             // alternativ FileLock verwenden...
-            $directory = null;
-            $config = Config::getDefault();
-            $config     && $directory = $config->get('app.dir.temp', null);
+            $directory = $config->get('app.dir.temp', null);
             !$directory && $directory = ini_get('sys_temp_dir');
             !$directory && $directory = sys_get_temp_dir();
 

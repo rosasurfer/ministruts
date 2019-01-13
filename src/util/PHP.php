@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\util;
 
-use rosasurfer\config\Config;
+use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\StaticClass;
 use rosasurfer\debug\DebugHelper;
 use rosasurfer\exception\IllegalTypeException;
@@ -159,6 +159,8 @@ class PHP extends StaticClass {
      * PHP_INI_PERDIR - entry can be set in php.ini, httpd.conf, .htaccess and in .user.ini
      */
     public static function phpInfo() {
+        /** @var ConfigInterface $config */
+        $config = self::di()['config'];
         $issues = [];
 
 
@@ -171,7 +173,7 @@ class PHP extends StaticClass {
         /*PHP_INI_ALL   */ if (       ini_get_int ('max_execution_time'            ) > 30 && !CLI /*hardcoded*/)     $issues[] = 'Info:  max_execution_time is very high: '.ini_get('max_execution_time').'  [resources]';
         /*PHP_INI_ALL   */ if (       ini_get_int ('default_socket_timeout'        ) > 30   /*PHP default: 60*/)     $issues[] = 'Info:  default_socket_timeout is very high: '.ini_get('default_socket_timeout').'  [resources]';
         /*PHP_INI_ALL   */ $memoryLimit = ini_get_bytes('memory_limit');
-                           $sWarnLimit  = Config::getDefault()->get('log.warn.memory_limit', '');
+                           $sWarnLimit  = $config->get('log.warn.memory_limit', '');
                            $warnLimit   = php_byte_value($sWarnLimit);
             if      ($memoryLimit ==    -1)                                                                          $issues[] = 'Warn:  memory_limit is unlimited  [resources]';
             else if ($memoryLimit <=     0)                                                                          $issues[] = 'Error: memory_limit is invalid: '.ini_get('memory_limit');
@@ -347,7 +349,7 @@ class PHP extends StaticClass {
 
 
         // check Composer defined dependencies
-        $appRoot = Config::getDefault()->get('app.dir.root');
+        $appRoot = $config['app.dir.root'];
         if (is_file($file=$appRoot.'/composer.json') && extension_loaded('json')) {
             $composer = json_decode(file_get_contents($file), true);
             if (isSet($composer['require']) && is_array($composer['require'])) {

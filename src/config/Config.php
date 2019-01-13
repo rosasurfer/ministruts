@@ -18,7 +18,6 @@ use function rosasurfer\strStartsWith;
 
 use const rosasurfer\ERROR_LOG_DEFAULT;
 use const rosasurfer\NL;
-use rosasurfer\Application;
 
 
 /**
@@ -56,9 +55,6 @@ use rosasurfer\Application;
  */
 class Config extends Object implements IConfig {
 
-
-    /** @var IConfig - the current default instance of the application */
-    protected static $default;
 
     /** @var bool[] - config file names and their existence status */
     protected $files = [];
@@ -637,30 +633,5 @@ class Config extends Object implements IConfig {
      */
     public function count() {
         return sizeOf($this->properties);
-    }
-
-
-    /**
-     * Return the current default configuration of the {@link Application}. This is the configuration previously set
-     * with {@link Config::setDefault()}.
-     *
-     * @return IConfig
-     */
-    public static function getDefault() {
-        return self::$default;
-    }
-
-
-    /**
-     * Set a new default configuration for the {@link Application}.
-     *
-     * @param  IConfig $configuration
-     *
-     * @return IConfig - the previously registered default configuration
-     */
-    public static function setDefault(IConfig $configuration) {
-        $previous = self::$default;
-        self::$default = $configuration;
-        return $previous;
     }
 }

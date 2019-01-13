@@ -1,7 +1,6 @@
 <?php
 namespace rosasurfer;
 
-use rosasurfer\config\Config;
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\config\auto\DefaultConfig;
 use rosasurfer\core\Object;
@@ -25,10 +24,10 @@ class Application extends Object {
 
 
     /** @var ConfigInterface - the application's current default configuration */
-    protected $defaultConfig;
+    protected static $defaultConfig;
 
     /** @var DiInterface - the application's current default DI container */
-    protected $defaultDi;
+    protected static $defaultDi;
 
 
     /** @var int - error handling mode in which regular PHP errors are only logged */
@@ -78,19 +77,18 @@ class Application extends Object {
         $this->loadGlobals           ($options['app.globals'          ]);
 
         /** @var DefaultConfig $config */
-        $config = $this->loadDefaultConfiguration($options);
-        $configDir = $config->get('app.dir.config');
+        $config = $this->initDefaultConfiguration($options);
+        $this->setDefaultConfig($config);
 
         /** @var DiInterface $di */
-        $di = !CLI ? new DefaultDi($configDir) : new DefaultCliDi($configDir);
-        $di->set('app',    $this  )
+        $di = $this->initDefaultDi($config['app.dir.config']);
+        $di->set('app', $this)
            ->set('config', $config);
-        $this->defaultDi = $di;
-        Di::setDefault($di);
+        $this->setDefaultDi($di);
 
         // check "app.id"
-        $appId = $this->defaultConfig->get('app.id', null);
-        if (!$appId) $config->set('app.id', subStr(md5($config->get('app.dir.root')), 0, 16));
+        $appId = $config->get('app.id', null);
+        if (!$appId) $config->set('app.id', subStr(md5($config['app.dir.root']), 0, 16));
 
         // check for PHP admin tasks if the remote IP has allowance
         // __phpinfo__             : show PHP config at start of script
@@ -228,13 +226,13 @@ class Application extends Object {
 
 
     /**
-     * Load and initialize a {@link DefaultConfig} and register it as the application's default.
+     * Load and initialize a {@link DefaultConfig}.
      *
      * @param  array $options - configuration options as passed to the framework loader
      *
      * @return DefaultConfig
      */
-    protected function loadDefaultConfiguration(array $options) {
+    protected function initDefaultConfiguration(array $options) {
         $configLocation = isSet($options['app.dir.config']) ? $options['app.dir.config'] : getCwd();
         $config = new DefaultConfig($configLocation);
         unset($options['app.dir.config']);
@@ -251,8 +249,6 @@ class Application extends Object {
         $config->set('app.dir.root', $rootDir);
         $this->expandAppDirs($config, $rootDir);
 
-        // register the instance as the default configuration
-        $this->defaultConfig = $config;
         return $config;
     }
 
@@ -290,6 +286,18 @@ class Application extends Object {
                 $dir = $rootDir.'/'.$dir;
             if (is_dir($dir)) $dir = realPath($dir);
         }; unset($dir);
+    }
+
+
+    /**
+     * Load and initialize a default {@link DiInterface}.
+     *
+     * @param  string $serviceDir - directory with service configurations
+     *
+     * @return DiInterface
+     */
+    protected function initDefaultDi($serviceDir) {
+        return !CLI ? new DefaultDi($serviceDir) : new DefaultCliDi($serviceDir);
     }
 
 
@@ -375,6 +383,67 @@ class Application extends Object {
     }
 
 
+
+
+    /**
+     * Return the current default configuration of the {@link Application}. This is the configuration previously set
+     * with {@link Application::setDefault()}.
+     *
+     * @return ConfigInterface
+     */
+    public static function getDefaultConfig() {
+        return self::$defaultConfig;
+    }
+
+
+    /**
+     * Set a new default configuration for the {@link Application}.
+     *
+     * @param  ConfigInterface $configuration
+     *
+     * @return ConfigInterface - the previously registered default configuration
+     */
+    final public static function setDefaultConfig(ConfigInterface $configuration) {
+        $previous = self::$defaultConfig;
+        self::$defaultConfig = $configuration;
+        if (self::$defaultDi) {
+            self::$defaultDi->set('config', $configuration);
+        }
+        return $previous;
+    }
+
+
+    /**
+     * Return the default dependency injection container of the {@link Application}. This is the instance previously set
+     * with {@link Application::setDefault()}.
+     *
+     * @return DiInterface
+     */
+    public static function getDefaultDi() {
+        return self::$defaultDi;
+    }
+
+
+    /**
+     * Set a new default dependency injection container for the {@link Application}.
+     *
+     * @param  DiInterface $di
+     *
+     * @return DiInterface - the previously registered default container
+     */
+    final public static function setDefaultDi(DiInterface $di) {
+        $previous = self::$defaultDi;
+        if (!$di->isService('app') && $previous && $previous->isService('app')) {
+            $di['app'] = $previous['app'];
+        }
+        if (!$di->isService('config') && self::$defaultConfig) {
+            $di['config'] = self::$defaultConfig;
+        }
+        self::$defaultDi = $di;
+        return $previous;
+    }
+
+
     /**
      * Whether or not the current remote IP address is white-listed for admin access. 127.0.0.1 and the web server's IP
      * address are always white-listed. More IP addresses can be white-listed per configuration:
@@ -390,10 +459,10 @@ class Application extends Object {
         static $whiteList; if (!$whiteList) {
             $ips = ['127.0.0.1', $_SERVER['SERVER_ADDR']];
 
-            if (!$config=Config::getDefault())
+            if (!self::$defaultConfig)
                 return in_array($_SERVER['REMOTE_ADDR'], $ips);
 
-            $values = $config->get('admin.ip.whitelist', []);
+            $values = self::$defaultConfig->get('admin.ip.whitelist', []);
             if (!is_array($values)) $values = [$values];
             $whiteList = \array_keys(\array_flip(\array_merge($ips, $values)));
         }

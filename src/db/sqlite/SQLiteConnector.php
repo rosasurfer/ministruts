@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\db\sqlite;
 
-use rosasurfer\config\Config;
+use rosasurfer\config\ConfigInterface;
 use rosasurfer\db\Connector;
 use rosasurfer\db\DatabaseException;
 use rosasurfer\exception\IllegalTypeException;
@@ -109,8 +109,10 @@ class SQLiteConnector extends Connector {
             $this->file = $file;
         }
         else {
-            $dataDir = Config::getDefault()->get('app.dir.data', null);
-            $rootDir = Config::getDefault()->get('app.dir.root', null);
+            /** @var ConfigInterface $config */
+            $config  = $this->di()['config'];
+            $dataDir = $config->get('app.dir.data', null);
+            $rootDir = $config->get('app.dir.root', null);
 
             if ($dataDir && (is_file($dataDir.'/'.$file) || !is_file($rootDir.'/'.$file))) {
                 $file = $dataDir.'/'.$file;

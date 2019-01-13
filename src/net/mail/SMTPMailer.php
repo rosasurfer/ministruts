@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\net\mail;
 
-use rosasurfer\config\Config;
+use rosasurfer\config\ConfigInterface;
 use rosasurfer\debug\ErrorHandler;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InfrastructureException;
@@ -179,17 +179,17 @@ class SMTPMailer extends Mailer {
             $this->sendLater($sender, $receiver, $subject, $message, $headers);
             return;
         }
+        /** @var ConfigInterface $config */
+        $config = $this->di()['config'];
 
         // first validate the additional headers
         foreach ($headers as $i => $header) {
-            if (!is_string($header))       throw new IllegalTypeException('Illegal type of parameter $headers['.$i.']: '.getType($header));
-            if (!preg_match('/^[a-z]+(-[a-z]+)*:/i', $header))
-                                           throw new InvalidArgumentException('Invalid parameter $headers['.$i.']: "'.$header.'"');
+            if (!is_string($header))                           throw new IllegalTypeException('Illegal type of parameter $headers['.$i.']: '.getType($header));
+            if (!preg_match('/^[a-z]+(-[a-z]+)*:/i', $header)) throw new InvalidArgumentException('Invalid parameter $headers['.$i.']: "'.$header.'"');
         }
 
         // auto-complete sender if not specified
         if (is_null($sender)) {
-            if (!$config=Config::getDefault()) throw new RuntimeException('Service locator returned empty default config: '.getType($config));
             $sender = $config->get('mail.from', ini_get('sendmail_from'));
             if (!strLen($sender)) {
                 $sender = strToLower(get_current_user().'@'.$this->hostName);
@@ -197,48 +197,47 @@ class SMTPMailer extends Mailer {
         }
 
         // Return-Path: (invisible sender)
-        if (!is_string($sender))           throw new IllegalTypeException('Illegal type of parameter $sender: '.getType($sender));
+        if (!is_string($sender))               throw new IllegalTypeException('Illegal type of parameter $sender: '.getType($sender));
         $returnPath = self::parseAddress($sender);
-        if (!$returnPath)                  throw new InvalidArgumentException('Invalid parameter $sender: '.$sender);
+        if (!$returnPath)                      throw new InvalidArgumentException('Invalid parameter $sender: '.$sender);
         $value = $this->removeHeader($headers, 'Return-Path');
         if (strLen($value)) {
             $returnPath = self::parseAddress($value);
-            if (!$returnPath)              throw new InvalidArgumentException('Invalid header "Return-Path: '.$value.'"');
+            if (!$returnPath)                  throw new InvalidArgumentException('Invalid header "Return-Path: '.$value.'"');
         }
 
         // From: (visible sender)
         $from  = self::parseAddress($sender);
-        if (!$from)                        throw new InvalidArgumentException('Invalid parameter $sender: '.$sender);
+        if (!$from)                            throw new InvalidArgumentException('Invalid parameter $sender: '.$sender);
         $value = $this->removeHeader($headers, 'From');
         if (strLen($value)) {
             $from = self::parseAddress($value);
-            if (!$from)                    throw new InvalidArgumentException('Invalid header "From: '.$value.'"');
+            if (!$from)                        throw new InvalidArgumentException('Invalid header "From: '.$value.'"');
         }
 
         // RCPT: (invisible receiver)
-        if (!is_string($receiver))         throw new IllegalTypeException('Illegal type of parameter $receiver: '.getType($receiver));
+        if (!is_string($receiver))             throw new IllegalTypeException('Illegal type of parameter $receiver: '.getType($receiver));
         $rcpt = self::parseAddress($receiver);
-        if (!$rcpt)                        throw new InvalidArgumentException('Invalid parameter $receiver: '.$receiver);
-        if (!$config=Config::getDefault()) throw new RuntimeException('Service locator returned empty default config: '.getType($config));
+        if (!$rcpt)                            throw new InvalidArgumentException('Invalid parameter $receiver: '.$receiver);
         $forced = $config->get('mail.forced-receiver', '');
-        if (!is_string($forced))           throw new IllegalTypeException('Illegal type of config value "mail.forced-receiver": '.getType($forced).' (not string)');
+        if (!is_string($forced))               throw new IllegalTypeException('Illegal type of config value "mail.forced-receiver": '.getType($forced).' (not string)');
         if (strLen($forced)) {
             $rcpt = self::parseAddress($forced);
-            if (!$rcpt)                    throw new InvalidArgumentException('Invalid config value "mail.forced-receiver": '.$forced);
+            if (!$rcpt)                        throw new InvalidArgumentException('Invalid config value "mail.forced-receiver": '.$forced);
         }
 
         // To: (visible receiver)
         $to = self::parseAddress($receiver);
-        if (!$to)                          throw new InvalidArgumentException('Invalid parameter $sender: '.$sender);
+        if (!$to)                              throw new InvalidArgumentException('Invalid parameter $sender: '.$sender);
         $value = $this->removeHeader($headers, 'To');
         if (strLen($value)) {
             $to = self::parseAddress($value);
-            if (!$to)                      throw new InvalidArgumentException('Invalid header "To: '.$value.'"');
+            if (!$to)                          throw new InvalidArgumentException('Invalid header "To: '.$value.'"');
         }
 
         // Subject: subject and body
-        if (!is_string($subject))          throw new IllegalTypeException('Illegal type of parameter $subject: '.getType($subject));
-        if (!is_string($message))          throw new IllegalTypeException('Illegal type of parameter $message: '.getType($message));
+        if (!is_string($subject))              throw new IllegalTypeException('Illegal type of parameter $subject: '.getType($subject));
+        if (!is_string($message))              throw new IllegalTypeException('Illegal type of parameter $message: '.getType($message));
 
 
         // start SMTP communication
@@ -336,8 +335,11 @@ class SMTPMailer extends Mailer {
         $response = $this->readResponse();
 
         $this->parseResponse($response);
-        if ($this->responseStatus != 250)
-            throw new RuntimeException('Sent data not accepted: '.$this->responseStatus.' '.$this->response.NL.NL.'SMTP transfer log:'.NL.'------------------'.NL.$this->logBuffer);
+        if ($this->responseStatus != 250) throw new RuntimeException('Sent data not accepted: '.$this->responseStatus.' '.$this->response.NL
+                                                                     .NL
+                                                                     .'SMTP transfer log:'.NL
+                                                                     .'------------------'.NL
+                                                                     .$this->logBuffer);
     }
 
 

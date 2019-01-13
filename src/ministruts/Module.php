@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\ministruts;
 
-use rosasurfer\config\Config;
+use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\Object;
 use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\IllegalTypeException;
@@ -209,16 +209,18 @@ class Module extends Object {
     protected function setResourceBase(\SimpleXMLElement $xml) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
-        $rootDirectory = Config::getDefault()->get('app.dir.root');
+        /** @var ConfigInterface $config */
+        $config = $this->di()['config'];
+        $rootDirectory = $config['app.dir.root'];
 
         if (!isSet($xml['file-base'])) {
             // not specified, apply global configuration
-            $location = Config::getDefault()->get('app.dir.view', null);
+            $location = $config->get('app.dir.view', null);
             if (!$location) throw new StrutsConfigException('Missing view directory configuration: '
                 .'Neither $config[app.dir.view] nor <struts-config file-base="{base-directory}" are specified'.NL
-                .'config: '.NL.Config::getDefault()->dump());
+                .'config: '.NL.$config->dump());
             isRelativePath($location) && $location = $rootDirectory.DIRECTORY_SEPARATOR.$location;
-            if (!is_dir($location)) throw new StrutsConfigException('Resource location $config[app.dir.view]="'.Config::getDefault()->get('app.dir.view').'" not found');
+            if (!is_dir($location)) throw new StrutsConfigException('Resource location $config[app.dir.view]="'.$config['app.dir.view'].'" not found');
 
             $this->resourceLocations[] = realPath($location);
             return;

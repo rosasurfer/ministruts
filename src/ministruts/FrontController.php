@@ -2,7 +2,7 @@
 namespace rosasurfer\ministruts;
 
 use rosasurfer\cache\Cache;
-use rosasurfer\config\Config;
+use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\Singleton;
 use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
@@ -52,7 +52,7 @@ class FrontController extends Singleton {
 
                 if (!$controller) {
                     $controller = Singleton::getInstance(static::class);
-                    $configDir  = Config::getDefault()->get('app.dir.config');
+                    $configDir  = self::di()['config']['app.dir.config'];
                     $configFile = str_replace('\\', '/', $configDir.'/struts-config.xml');
                     $dependency = FileDependency::create($configFile);
                     if (!WINDOWS && !LOCALHOST)                             // distinction dev/production?  TODO: non-sense
@@ -78,9 +78,12 @@ class FrontController extends Singleton {
     protected function __construct() {
         parent::__construct();
 
+        /** @var ConfigInterface $config */
+        $config = $this->di()['config'];
+
         // lookup Struts configuration files
-        $configDir = Config::getDefault()->get('app.dir.struts', null);
-        !$configDir && $configDir=Config::getDefault()->get('app.dir.config');      // fall-back to std config directory
+        $configDir = $config->get('app.dir.struts', null);
+        !$configDir && $configDir=$config['app.dir.config'];                        // fall-back to standard config directory
 
         $mainConfig = str_replace('\\', '/', $configDir.'/struts-config.xml');      // main module config
         if (!is_file($mainConfig)) throw new StrutsConfigException('Struts configuration file not found: "'.$mainConfig.'"');
