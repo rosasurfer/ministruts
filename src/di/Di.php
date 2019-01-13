@@ -1,11 +1,11 @@
 <?php
 namespace rosasurfer\di;
 
-use rosasurfer\core\Object;
-use rosasurfer\di\service\ServiceInterface;
-use rosasurfer\exception\IllegalTypeException;
-use rosasurfer\di\service\Service;
 use rosasurfer\Application;
+use rosasurfer\core\Object;
+use rosasurfer\di\service\Service;
+use rosasurfer\di\service\ServiceInterface as IService;
+use rosasurfer\exception\IllegalTypeException;
 
 
 /**
@@ -33,7 +33,7 @@ class Di extends Object implements DiInterface {
     /** @var DiInterface - the current default instance of the application */
     protected static $default;
 
-    /** @var ServiceInterface[] - a list of registered services */
+    /** @var IService[] - a list of registered services */
     protected $services;
 
 
@@ -93,7 +93,75 @@ class Di extends Object implements DiInterface {
     public function set($name, $definition) {
         $service = new Service($name, $definition);
         $this->services[$name] = $service;
-        return $service;
+        return $definition;
+    }
+
+
+    /**
+     * {@inheritdoc}
+     */
+    public function remove($name) {
+        unset($this->services[$name]);
+    }
+
+
+    /**
+     * Whether a service with the specified name is registered.
+     *
+     * @param  mixed $name
+     *
+     * @return bool
+     */
+    public function isService($name) {
+        return isSet($this->services[$name]);
+    }
+
+
+    /**
+     * Check whether a service with the specified name is registered using {@link \ArrayAccess} syntax.
+     *
+     * @param  mixed $name
+     *
+     * @return bool
+     */
+    public function offsetExists($name) {
+        return $this->isService($name);
+    }
+
+
+    /**
+     * Resolve a named service and return its implementation using {@link \ArrayAccess} syntax.
+     *
+     * @param  string $name
+     *
+     * @return object
+     */
+    public function offsetGet($name) {
+        return $this->get($name);
+    }
+
+
+    /**
+     * Register a service in the container using {@link \ArrayAccess} syntax.
+     *
+     * @param  string        $name       - service identifier
+     * @param  string|object $definition - a service class name, a service instance or a \Closure acting as an instance
+     *                                     factory
+     *
+     * @return string|object - the same definition
+     */
+    public function offsetSet($name, $definition) {
+        return $this->set($name, $definition);
+    }
+
+
+    /**
+     * Remove a service from the container using {@link \ArrayAccess} syntax.
+     *
+     * @param  string $name - service identifier
+     */
+    public function offsetUnset($name) {
+        $this->remove($name);
     }
 
 

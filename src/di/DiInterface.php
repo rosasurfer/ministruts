@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\di;
 
-use rosasurfer\di\service\ServiceInterface;
+use rosasurfer\di\service\ServiceInterface as IService;
 
 
 /**
@@ -9,11 +9,11 @@ use rosasurfer\di\service\ServiceInterface;
  *
  * Interface to be implemented by dependency injection/service locator containers.
  */
-interface DiInterface {
+interface DiInterface extends \ArrayAccess {
 
 
     /**
-     * Return a named service.
+     * Resolve a named {@link IService} and return its implementation.
      *
      * @param  string $name
      *
@@ -23,7 +23,7 @@ interface DiInterface {
 
 
     /**
-     * Return a new instance of a named service.
+     * Resolve a named {@link IService} and return a new instance of its implementation.
      *
      * @param  string $name
      *
@@ -33,12 +33,31 @@ interface DiInterface {
 
 
     /**
-     * Register a service in the service container.
+     * Register a service in the container.
      *
      * @param  string        $name       - service identifier
-     * @param  string|object $definition - a service class name, a service instance or a \Closure acting as an
-     *                                     instance factory
-     * @return ServiceInterface
+     * @param  string|object $definition - a service class name, a service instance or a \Closure acting as an instance
+     *                                     factory
+     *
+     * @return string|object - the same definition
      */
     public function set($name, $definition);
+
+
+    /**
+     * Remove a service from the container.
+     *
+     * @param  string $name - service identifier
+     */
+    public function remove($name);
+
+
+    /**
+     * Whether a {@link IService} with the specified name is registered in the container.
+     *
+     * @param  mixed $name
+     *
+     * @return bool
+     */
+    public function isService($name);
 }
