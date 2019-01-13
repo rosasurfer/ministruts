@@ -106,11 +106,7 @@ class Di extends Object implements DiInterface {
 
 
     /**
-     * Whether a service with the specified name is registered.
-     *
-     * @param  mixed $name
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function isService($name) {
         return isSet($this->services[$name]);
@@ -147,11 +143,9 @@ class Di extends Object implements DiInterface {
      * @param  string        $name       - service identifier
      * @param  string|object $definition - a service class name, a service instance or a \Closure acting as an instance
      *                                     factory
-     *
-     * @return string|object - the same definition
      */
     public function offsetSet($name, $definition) {
-        return $this->set($name, $definition);
+        $this->set($name, $definition);
     }
 
 
@@ -187,13 +181,5 @@ class Di extends Object implements DiInterface {
         $previous = self::$default;
         self::$default = $di;
         return $previous;
-    }
-
-
-    /**
-     * Reset the default dependency injection container used by the {@link Application}.
-     */
-    public static function reset() {
-        self::$default = null;
     }
 }

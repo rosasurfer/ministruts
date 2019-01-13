@@ -1,6 +1,8 @@
 <?php
-namespace rosasurfer\config;
+namespace rosasurfer\config\auto;
 
+use rosasurfer\Application;
+use rosasurfer\config\Config;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\monitor\FileDependency;
@@ -9,12 +11,13 @@ use const rosasurfer\CLI;
 
 
 /**
- * An application's main configuration using Java-like property files.
+ * An {@link Application}'s default configuration using Java-like property files.
  *
- * An AutoConfig instance is a configuration which typically is used as an application's main configuration. It differs from
- * a regular configuration in automatically loading a standardized set of config files (non-existing files are skipped).
+ * A variant of the standard {@link Config}. It automatically loads and monitores a standard set of configuration files in
+ * the directory "{app.dir.config}".
  *
- * These files are in the following order (later config settings override existing earlier ones):
+ *
+ * These files are in the following order (later config settings with the same key override existing ones):
  *
  *  - The framework config file: "config.properties"
  *
@@ -24,7 +27,7 @@ use const rosasurfer\CLI;
  *  - An explicitely defined user config file, e.g. "config.production.properties" or the default user config file
  *    "config.properties" if no explicite definition is given.
  */
-class AutoConfig extends Config {
+class DefaultConfig extends Config {
 
 
     /**
@@ -42,10 +45,6 @@ class AutoConfig extends Config {
      */
     public function __construct($location) {
         if (!is_string($location)) throw new IllegalTypeException('Illegal type of parameter $location: '.getType($location));
-
-        // TODO: look-up and delegate to an existing cached instance
-        //       key: get_class($this).'|'.$userConfig.'|cli='.(int)CLI
-
 
         // collect the applicable config files
         $configDir = $configFile = null;

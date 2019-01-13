@@ -1,9 +1,9 @@
 <?php
 namespace rosasurfer;
 
-use rosasurfer\config\AutoConfig;
 use rosasurfer\config\Config;
 use rosasurfer\config\ConfigInterface as IConfig;
+use rosasurfer\config\auto\DefaultConfig;
 use rosasurfer\core\Object;
 use rosasurfer\debug\ErrorHandler;
 use rosasurfer\di\Di;
@@ -231,7 +231,7 @@ class Application extends Object {
 
         if (!isSet($options['app.config'])) {
             $location = isSet($options['app.dir.config']) ? $options['app.dir.config'] : getCwd();
-            $config = new AutoConfig($location);
+            $config = new DefaultConfig($location);
             unset($options['app.dir.config']);
         }
         else {

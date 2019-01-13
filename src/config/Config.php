@@ -438,39 +438,6 @@ class Config extends Object implements IConfig {
 
 
     /**
-     * Return the current default configuration of the {@link Application}. This is the configuration previously set
-     * with {@link Config::setDefault()}.
-     *
-     * @return IConfig
-     */
-    public static function getDefault() {
-        return self::$default;
-    }
-
-
-    /**
-     * Set a new default configuration for the {@link Application}.
-     *
-     * @param  IConfig $configuration
-     *
-     * @return IConfig - the previously registered default configuration
-     */
-    public static function setDefault(IConfig $configuration) {
-        $previous = self::$default;
-        self::$default = $configuration;
-        return $previous;
-    }
-
-
-    /**
-     * Reset the default configuration container used by the {@link Application}.
-     */
-    public static function reset() {
-        self::$default = null;
-    }
-
-
-    /**
      * Return a plain text dump of the instance's preferences.
      *
      * @param  array $options [optional] - array with dump options: <br>
@@ -670,5 +637,30 @@ class Config extends Object implements IConfig {
      */
     public function count() {
         return sizeOf($this->properties);
+    }
+
+
+    /**
+     * Return the current default configuration of the {@link Application}. This is the configuration previously set
+     * with {@link Config::setDefault()}.
+     *
+     * @return IConfig
+     */
+    public static function getDefault() {
+        return self::$default;
+    }
+
+
+    /**
+     * Set a new default configuration for the {@link Application}.
+     *
+     * @param  IConfig $configuration
+     *
+     * @return IConfig - the previously registered default configuration
+     */
+    public static function setDefault(IConfig $configuration) {
+        $previous = self::$default;
+        self::$default = $configuration;
+        return $previous;
     }
 }
