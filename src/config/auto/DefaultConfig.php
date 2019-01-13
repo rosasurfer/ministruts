@@ -13,11 +13,9 @@ use const rosasurfer\CLI;
 /**
  * An {@link Application}'s default configuration using Java-like property files.
  *
- * A variant of the standard {@link Config}. It automatically loads and monitores a standard set of configuration files in
- * the directory "{app.dir.config}".
- *
- *
- * These files are in the following order (later config settings with the same key override existing ones):
+ * A variant of the standard {@link Config}. It automatically loads and monitores a standard set of configuration files from
+ * the directory "{app.dir.config}". These files are in the following order (later config settings with the same key override
+ * existing ones):
  *
  *  - The framework config file: "config.properties"
  *

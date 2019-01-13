@@ -93,7 +93,7 @@ class Di extends Object implements DiInterface {
     public function set($name, $definition) {
         $service = new Service($name, $definition);
         $this->services[$name] = $service;
-        return $definition;
+        return $this;
     }
 
 

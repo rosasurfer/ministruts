@@ -39,7 +39,7 @@ interface DiInterface extends \ArrayAccess {
      * @param  string|object $definition - a service class name, a service instance or a \Closure acting as an instance
      *                                     factory
      *
-     * @return string|object - the same definition
+     * @return self - the same container (for chaining)
      */
     public function set($name, $definition);
 

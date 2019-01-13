@@ -174,8 +174,8 @@ class Config extends Object implements IConfig {
      * Return the names of the monitored configuration files. The resulting array will contain names of existing and (still)
      * non-existing files.
      *
-     * @return bool[] - array with elements "file-name" => (bool)status or an empty array if the configuration
-     *                  is not based on files
+     * @return bool[] - array with elements "file-name" => (bool)status or an empty array if the configuration is not
+     *                  based on files
      */
     public function getMonitoredFiles() {
         return $this->files;
