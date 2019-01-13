@@ -260,7 +260,8 @@ class Application extends Object {
         $this->expandAppDirs($config, $rootDir);
 
         // register the instance as the application's main configuration
-        return Config::setDefault($config);
+        Config::setDefault($config);
+        return $config;
     }
 
 

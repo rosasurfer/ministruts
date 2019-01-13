@@ -18,6 +18,7 @@ use function rosasurfer\strStartsWith;
 
 use const rosasurfer\ERROR_LOG_DEFAULT;
 use const rosasurfer\NL;
+use rosasurfer\Application;
 
 
 /**
@@ -56,8 +57,8 @@ use const rosasurfer\NL;
 class Config extends Object implements IConfig {
 
 
-    /** @var IConfig - the application's current default configuration */
-    private static $defaultInstance;
+    /** @var IConfig - the current default instance of the application */
+    protected static $default;
 
     /** @var bool[] - config file names and their existence status */
     protected $files = [];
@@ -437,35 +438,35 @@ class Config extends Object implements IConfig {
 
 
     /**
-     * Get the current default configuration. This is the configuration set by Config::setDefault().
+     * Return the current default configuration of the {@link Application}. This is the configuration previously set
+     * with {@link Config::setDefault()}.
      *
      * @return IConfig
      */
     public static function getDefault() {
-        // intentionally accept an error if $defaultInstance was not yet set
-        return self::$defaultInstance;
+        return self::$default;
     }
 
 
     /**
-     * Set the default configuration to be returned by Config::getDefault().
+     * Set a new default configuration for the {@link Application}.
      *
      * @param  IConfig $configuration
      *
-     * @return IConfig - the same configuration
+     * @return IConfig - the previously registered default configuration
      */
     public static function setDefault(IConfig $configuration) {
-        return self::$defaultInstance = $configuration;
-        // TODO: update cache config
+        $previous = self::$default;
+        self::$default = $configuration;
+        return $previous;
     }
 
 
     /**
-     * Reset the internal default configuration.
+     * Reset the default configuration container used by the {@link Application}.
      */
-    public static function resetDefault() {
-        self::$defaultInstance = null;
-        // TODO: update cache config
+    public static function reset() {
+        self::$default = null;
     }
 
 

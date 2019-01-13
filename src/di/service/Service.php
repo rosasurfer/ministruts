@@ -10,7 +10,7 @@ use function rosasurfer\is_class;
 /**
  * Service
  *
- * Represents a service in the services container.
+ * Represents a service registered in the service container.
  *
  * <pre>
  *  $service = new Service('request', 'rosasurfer\\ministruts\\Request');

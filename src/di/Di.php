@@ -5,6 +5,7 @@ use rosasurfer\core\Object;
 use rosasurfer\di\service\ServiceInterface;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\di\service\Service;
+use rosasurfer\Application;
 
 
 /**
@@ -29,10 +30,10 @@ use rosasurfer\di\service\Service;
 class Di extends Object implements DiInterface {
 
 
-    /** @var DiInterface - the latest instance registered as the default DI */
+    /** @var DiInterface - the current default instance of the application */
     protected static $default;
 
-    /** @var ServiceInterface[] - list of registered services */
+    /** @var ServiceInterface[] - a list of registered services */
     protected $services;
 
 
@@ -48,7 +49,7 @@ class Di extends Object implements DiInterface {
      *
      * @param  string $configDir - directory to load service definitions from
      *
-     * @return bool - whether custom service definitions have been successfully loaded
+     * @return bool - whether custom service definitions have been found and successfully loaded
      */
     protected function loadCustomServices($configDir) {
         if (!is_string($configDir)) throw new IllegalTypeException('Illegal type of parameter $configDir: '.getType($configDir));
@@ -75,7 +76,10 @@ class Di extends Object implements DiInterface {
 
 
     /**
-     * {@inheritdoc}
+     * Return the default dependency injection container of the {@link Application}. This is the instance previously set
+     * with {@link Di::setDefault()}.
+     *
+     * @return DiInterface
      */
     public static function getDefault() {
         return self::$default;
@@ -83,15 +87,21 @@ class Di extends Object implements DiInterface {
 
 
     /**
-     * {@inheritdoc}
+     * Set a new default dependency injection container for the {@link Application}.
+     *
+     * @param  DiInterface $di
+     *
+     * @return DiInterface - the previously registered default container
      */
     public static function setDefault(DiInterface $di) {
+        $previous = self::$default;
         self::$default = $di;
+        return $previous;
     }
 
 
     /**
-     * {@inheritdoc}
+     * Reset the default dependency injection container used by the {@link Application}.
      */
     public static function reset() {
         self::$default = null;
