@@ -68,6 +68,28 @@ class Di extends Object implements DiInterface {
     /**
      * {@inheritdoc}
      */
+    public function get($name) {
+        $instance = null;
+        if (isSet($this->services[$name]))
+            $instance = $this->services[$name]->resolve($shared=true);
+        return $instance;
+    }
+
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getNew($name) {
+        $instance = null;
+        if (isSet($this->services[$name]))
+            $instance = $this->services[$name]->resolve($shared=false);
+        return $instance;
+    }
+
+
+    /**
+     * {@inheritdoc}
+     */
     public function set($name, $definition) {
         $service = new Service($name, $definition);
         $this->services[$name] = $service;

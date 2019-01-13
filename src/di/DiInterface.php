@@ -13,6 +13,26 @@ interface DiInterface {
 
 
     /**
+     * Return a named service.
+     *
+     * @param  string $name
+     *
+     * @return object
+     */
+    public function get($name);
+
+
+    /**
+     * Return a new instance of a named service.
+     *
+     * @param  string $name
+     *
+     * @return object
+     */
+    public function getNew($name);
+
+
+    /**
      * Register a service in the service container.
      *
      * @param  string        $name       - service identifier

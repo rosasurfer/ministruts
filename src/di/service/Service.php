@@ -69,13 +69,13 @@ class Service implements ServiceInterface {
         $instance = null;
 
         if (is_string($definition)) {                       // strings must be a class name without parameters
-            if (!is_class($definition)) throw new ClassNotFoundException('Service "'.$this->name.'" cannot be resolved (unknown class "'.$definition.'")');
+            if (!is_class($definition)) throw new ClassNotFoundException('Cannot resolve service "'.$this->name.'" (unknown class "'.$definition.'")');
             $instance = new $definition();
         }
         else if (is_object($definition)) {                  // objects may be a Closure or an already resolved instance
             $instance = $definition instanceof \Closure ? $definition() : $definition;
         }
-        else throw new IllegalTypeException('Service "'.$this->name.'" cannot be resolved (illegal definition type: '.getType($definition).')');
+        else throw new IllegalTypeException('Cannot resolve service "'.$this->name.'" (illegal definition type: '.getType($definition).')');
 
         if ($shared)
             $this->instance = $instance;
