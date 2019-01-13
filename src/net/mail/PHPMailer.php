@@ -45,7 +45,7 @@ class PHPMailer extends Mailer {
         }
 
         // auto-complete sender if not specified
-        if (is_null($sender)) {
+        if (!isSet($sender)) {
             $sender = $config->get('mail.from', ini_get('sendmail_from'));
             if (!strLen($sender)) {
                 $sender = strToLower(get_current_user().'@'.$this->hostName);
