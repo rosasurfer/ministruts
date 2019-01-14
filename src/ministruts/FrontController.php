@@ -21,14 +21,15 @@ use const rosasurfer\WINDOWS;
 /**
  * FrontController
  *
- * To avoid repeated loading and parsing of the XML configuration the FrontController instance is cached and re-used across
- * multiple HTTP requests (until cache invalidation). The class implementation is "request safe" and holds no variable
- * runtime status (similar to "thread safe" implementations in other languages).
+ * To avoid repeated parsing of the Struts XML configuration the FrontController instance is cached and re-used across
+ * multiple HTTP requests (until cache invalidation). This means the instance is constantly serialized and unserialized.
+ * Therefore the class implementation has to be "request safe" (similar to "thread safety" in other languages) and must
+ * not hold variable runtime status.
  */
 class FrontController extends Singleton {
 
 
-    /** @var Module[] - all registered Struts modules (array key is the module prefix) */
+    /** @var Module[] - all registered Struts modules with the module prefix as index */
     private $modules = [];
 
 
@@ -147,13 +148,12 @@ class FrontController extends Singleton {
      *
      * @return string - Module prefix
      */
-    private function getModulePrefix(Request $request) {
+    protected function getModulePrefix(Request $request) {
         $requestPath = $request->getPath();
         $baseUri     = $request->getApplicationBaseUri();
 
-        if (!strStartsWith($requestPath, $baseUri)) {
-            throw new RuntimeException('Can not resolve module prefix from request path "'.$requestPath.'" (base URI: "'.$baseUri.'")');
-        }
+        if (!strStartsWith($requestPath, $baseUri))
+            throw new RuntimeException('Can not resolve module prefix from request path "'.$requestPath.'" (application base uri: "'.$baseUri.'")');
 
         $value = subStr($requestPath, strLen($baseUri));        // baseUri ends with and prefix doesn't start with a slash
         if (strLen($value)) {
@@ -172,7 +172,7 @@ class FrontController extends Singleton {
      *
      * @return RequestProcessor
      */
-    private function getRequestProcessor(Module $module, array $options) {
+    protected function getRequestProcessor(Module $module, array $options) {
         $class = $module->getRequestProcessorClass();
         return new $class($module, $options);
     }

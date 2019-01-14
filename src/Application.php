@@ -38,32 +38,34 @@ class Application extends Object {
 
 
     /**
-     * Create and initialize a new MiniStruts application.
+     * Create and initialize a new MiniStruts application.                                                                      <br>
      *
-     * @param  array $options [optional] - Expects an array with any of the following options:
+     * @param  array $options [optional] - Expects an array with any of the following options:                                  <br>
      *
-     *        "app.dir.config"        - string:  The project's configuration location as a directory or a file.<br>
-     *                                           (default: directory returned by the instance passed in "app.config" or the<br>
-     *                                           current directory)<br>
+     *        "app.dir.root"          - string:  The project's root directory.                                                  <br>
+     *                                           (default: the current directory)                                               <br>
      *
-     *        "app.dir.root"          - string:  The project's root directory.<br>
-     *                                           (default: the current directory)<br>
+     *        "app.dir.config"        - string:  The project's configuration location as a directory or a file.                 <br>
+     *                                           (default: the current directory)                                               <br>
      *
-     *        "app.globals"           - bool:    If set to TRUE definitions in "src/helper.php"<br> are mapped to the global
-     *                                           PHP namespace.<br>
-     *                                           (default: FALSE)<br>
+     *        "app.globals"           - bool:    If set definitions in "src/helpers.php" are additionally mapped to the global  <br>
+     *                                           namespace. In general this is not recommended to avoid potential naming        <br>
+     *                                           conflicts in the global scope. However, it may be used to simplify life of     <br>
+     *                                           developers using editors with limited automatic code completion capabilities.  <br>
+     *                                           (default: disabled)                                                            <br>
      *
-     *        "app.handle-errors"     - string:  How to handle regular PHP errors. If set to "strict" errors are converted to<br>
-     *                                           PHP ErrorExceptions and thrown back. If set to "weak" errors are only logged<br>
-     *                                           and execution continues. If set to "ignore" you have to setup your own error<br>
-     *                                           handling mechanism.<br>
-     *                                           (default: "strict")<br>
+     *        "app.handle-errors"     - string:  How to handle regular PHP errors: If set to "strict" errors are converted to   <br>
+     *                                           to ErrorExceptions and thrown back. If set to "weak" errors are only logged    <br>
+     *                                           and execution continues. If set to "ignore" the application has to setup its   <br>
+     *                                           own error handling mechanism.                                                  <br>
+     *                                           (default: "strict")                                                            <br>
      *
-     *        "app.handle-exceptions" - bool:    If set to TRUE exceptions are handled by the built-in exception handler.<br>
-     *                                           If set to FALSE you have to setup your own exception handling mechanism.<br>
-     *                                           (default: TRUE)<br>
+     *        "app.handle-exceptions" - bool:    How to handle PHP exceptions: If set exceptions are handled by the framework's <br>
+     *                                           exception handler. Otherwise the application has to setup its own exception    <br>
+     *                                           handling mechanism.                                                            <br>
+     *                                           (default: enabled)                                                             <br>
      *
-     * All further options are added to the application's current default configuration as regular config values.
+     * All further options are added to the application's current default configuration as regular config values.               <br>
      */
     public function __construct(array $options = []) {
         // set default values
@@ -77,7 +79,7 @@ class Application extends Object {
         $this->loadGlobals           ($options['app.globals'          ]);
 
         /** @var DefaultConfig $config */
-        $config = $this->initDefaultConfiguration($options);
+        $config = $this->initDefaultConfig($options);
         $this->setDefaultConfig($config);
 
         /** @var DiInterface $di */
@@ -193,7 +195,7 @@ class Application extends Object {
      * Update the PHP configuration with user defined settings.
      */
     protected function configurePhp() {
-        $memoryWarnLimit = php_byte_value($this->defaultConfig->get('log.warn.memory_limit', 0));
+        $memoryWarnLimit = php_byte_value(self::$defaultConfig->get('log.warn.memory_limit', 0));
         if ($memoryWarnLimit > 0) {
             register_shutdown_function(function() use ($memoryWarnLimit) {
                 $usedBytes = memory_get_peak_usage($real=true);
@@ -232,7 +234,7 @@ class Application extends Object {
      *
      * @return DefaultConfig
      */
-    protected function initDefaultConfiguration(array $options) {
+    protected function initDefaultConfig(array $options) {
         $configLocation = isSet($options['app.dir.config']) ? $options['app.dir.config'] : getCwd();
         $config = new DefaultConfig($configLocation);
         unset($options['app.dir.config']);
@@ -290,7 +292,7 @@ class Application extends Object {
 
 
     /**
-     * Load and initialize a default {@link DiInterface}.
+     * Load and initialize a default Dependency Injection container.
      *
      * @param  string $serviceDir - directory with service configurations
      *
@@ -304,18 +306,16 @@ class Application extends Object {
     /**
      * Setup the application's error handling.
      *
-     * @param  int|string $value - configuration value as passed to the framework loader
+     * @param  string $value - configuration value as passed to the framework loader
      */
     protected function setupErrorHandling($value) {
-        $flag = self::THROW_EXCEPTIONS;
+        $mode = self::THROW_EXCEPTIONS;                             // default
         if (is_string($value)) {
             $value = trim(strToLower($value));
-            if      ($value == 'weak'  ) $flag = self::LOG_ERRORS;  // default: THROW_EXCEPTIONS
-            else if ($value == 'ignore') $flag = null;
+            if      ($value == 'weak'  ) $mode = self::LOG_ERRORS;
+            else if ($value == 'ignore') $mode = 0;
         }
-        if ($flag) {
-            ErrorHandler::setupErrorHandling($flag);
-        }
+        $mode && ErrorHandler::setupErrorHandling($mode);
     }
 
 
@@ -325,19 +325,15 @@ class Application extends Object {
      * @param  bool|int|string $value - configuration value as passed to the framework loader
      */
     protected function setupExceptionHandling($value) {
-        $enabled = true;
+        $enabled = true;                                            // default
         if (is_bool($value) || is_int($value)) {
             $enabled = (bool) $value;
         }
         elseif (is_string($value)) {
-            $value = trim(strToLower($value));
-            if ($value=='0' || $value=='off' || $value=='false')
-                $enabled = false;                                   // default: true
+            $value   = trim(strToLower($value));
+            $enabled = ($value=='0' || $value=='off' || $value=='false');
         }
-
-        if ($enabled) {
-            ErrorHandler::setupExceptionHandling();
-        }
+        $enabled && ErrorHandler::setupExceptionHandling();
     }
 
 
@@ -347,7 +343,7 @@ class Application extends Object {
      * @param  mixed $value - configuration value as passed to the framework loader
      */
     protected function loadGlobals($value) {
-        $enabled = false;
+        $enabled = false;                                           // default
         if (is_bool($value) || is_int($value)) {
             $enabled = (bool) $value;
         }
@@ -355,8 +351,7 @@ class Application extends Object {
             $value   = trim(strToLower($value));
             $enabled = ($value=='1' || $value=='on' || $value=='true');
         }
-
-        if ($enabled) {
+        if ($enabled && !function_exists('booltostr')) {            // prevent multiple includes
             include(MINISTRUTS_ROOT.'/src/globals.php');
         }
     }
@@ -368,7 +363,7 @@ class Application extends Object {
      * @param  mixed $value - configuration value as passed to the framework loader
      */
     protected function replaceComposer($value) {
-        $enabled = false;
+        $enabled = false;                                           // default
         if (is_bool($value) || is_int($value)) {
             $enabled = (bool) $value;
         }
@@ -376,18 +371,15 @@ class Application extends Object {
             $value   = trim(strToLower($value));
             $enabled = ($value=='1' || $value=='on' || $value=='true');
         }
-
         if ($enabled) {
             // replace Composer
         }
     }
 
 
-
-
     /**
      * Return the current default configuration of the {@link Application}. This is the configuration previously set
-     * with {@link Application::setDefault()}.
+     * with {@link Application::setDefaultConfig()}.
      *
      * @return ConfigInterface
      */
@@ -415,7 +407,7 @@ class Application extends Object {
 
     /**
      * Return the default dependency injection container of the {@link Application}. This is the instance previously set
-     * with {@link Application::setDefault()}.
+     * with {@link Application::setDefaultDi()}.
      *
      * @return DiInterface
      */

@@ -12,14 +12,14 @@ use rosasurfer\di\DiAwareTrait;
 use rosasurfer\loader\ClassLoader;
 
 
-define(__NAMESPACE__.'\_MINISTRUTS_ROOT', dirName(__DIR__));
+define('rosasurfer\_MINISTRUTS_ROOT', dirName(__DIR__));
 const MINISTRUTS_ROOT = _MINISTRUTS_ROOT;                       // local constants improve IDE code completion
 
 
-// Include helper functions and constants which can't be auto-loaded.
-require(MINISTRUTS_ROOT.'/src/helpers.php');
-require(MINISTRUTS_ROOT.'/src/db/orm/meta/defines.php');
-require(MINISTRUTS_ROOT.'/src/ministruts/defines.php');
+// Include helper functions and constants which can't be auto-loaded (prevent multiple includes).
+if (!defined('rosasurfer\CLI'))                   require(MINISTRUTS_ROOT.'/src/helpers.php');
+if (!defined('rosasurfer\db\orm\meta\BOOL'))      require(MINISTRUTS_ROOT.'/src/db/orm/meta/defines.php');
+if (!defined('rosasurfer\ministruts\MODULE_KEY')) require(MINISTRUTS_ROOT.'/src/ministruts/defines.php');
 
 
 /**
