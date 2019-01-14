@@ -84,8 +84,8 @@ class Application extends Object {
 
         /** @var DiInterface $di */
         $di = $this->initDefaultDi($config['app.dir.config']);
-        $di->set('app', $this)
-           ->set('config', $config);
+        $di->set('app', $this);
+        $di->set('config', $config);
         $this->setDefaultDi($di);
 
         // check "app.id"

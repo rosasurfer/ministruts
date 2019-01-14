@@ -67,7 +67,7 @@ class Di extends Object implements DiInterface {
     public function get($name) {
         $instance = null;
         if (isSet($this->services[$name]))
-            $instance = $this->services[$name]->resolve($shared=true);
+            $instance = $this->services[$name]->resolve();
         return $instance;
     }
 
@@ -75,10 +75,10 @@ class Di extends Object implements DiInterface {
     /**
      * {@inheritdoc}
      */
-    public function getNew($name) {
+    public function factory($name) {
         $instance = null;
-        if (isSet($this->services[$name]))
-            $instance = $this->services[$name]->resolve($shared=false);
+        if ($this->isService($name))
+            $instance = $this->services[$name]->resolve($existing=false);
         return $instance;
     }
 
@@ -89,7 +89,7 @@ class Di extends Object implements DiInterface {
     public function set($name, $definition) {
         $service = new Service($name, $definition);
         $this->services[$name] = $service;
-        return $this;
+        return $service;
     }
 
 
@@ -97,7 +97,12 @@ class Di extends Object implements DiInterface {
      * {@inheritdoc}
      */
     public function remove($name) {
-        unset($this->services[$name]);
+        $service = null;
+        if ($this->isService($name)) {
+            $service = $this->services[$name];
+            unset($this->services[$name]);
+        }
+        return $service;
     }
 
 

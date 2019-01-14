@@ -1,13 +1,11 @@
 <?php
 namespace rosasurfer\di\service;
 
-use rosasurfer\di\Di;
-
 
 /**
  * ServiceInterface
  *
- * An interface implemented by services to be registered in a {@link Di} container.
+ * An interface implemented by services to be registered in a service container.
  */
 interface ServiceInterface {
 
@@ -40,9 +38,9 @@ interface ServiceInterface {
     /**
      * Resolve the service.
      *
-     * @param  bool $shared [optional] - whether to return an already existing instance (default: yes)
+     * @param  bool $existing [optional] - whether to return an existing instance (default: yes)
      *
      * @return object
      */
-    public function resolve($shared = true);
+    public function resolve($existing = true);
 }
