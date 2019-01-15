@@ -26,10 +26,11 @@ interface DiInterface extends \ArrayAccess {
      * Resolve a named service and return a new instance of its implementation.
      *
      * @param  string $name
+     * @param  mixed  $parameters - variable list of parameters
      *
      * @return object
      */
-    public function factory($name);
+    public function factory($name, ...$parameters);
 
 
     /**

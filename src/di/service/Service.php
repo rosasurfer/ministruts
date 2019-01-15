@@ -61,23 +61,24 @@ class Service implements ServiceInterface {
     /**
      * {@inheritdoc}
      */
-    public function resolve($existing = true) {
-        if ($existing && $this->instance)
+    public function resolve($factory=false, $parameters=[]) {
+        if (!$factory && $this->instance)
             return $this->instance;
 
+        $instance   = null;
         $definition = $this->definition;
-        $instance = null;
+        !$factory  && $parameters = [];
 
         if (is_string($definition)) {                       // plain strings are class names without parameters
             if (!is_class($definition)) throw new ClassNotFoundException('Cannot resolve service "'.$this->name.'" (unknown class "'.$definition.'")');
-            $instance = new $definition();
+            $instance = new $definition(...$parameters);
         }
         else if (is_object($definition)) {                  // objects may be a \Closure or an already resolved instance
-            $instance = $definition instanceof \Closure ? $definition() : $definition;
+            $instance = $definition instanceof \Closure ? $definition(...$parameters) : $definition;
         }
         else throw new IllegalTypeException('Cannot resolve service "'.$this->name.'" (illegal definition type: '.getType($definition).')');
 
-        if ($existing)
+        if (!$factory)
             $this->instance = $instance;
         return $instance;
     }

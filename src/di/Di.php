@@ -75,10 +75,10 @@ class Di extends Object implements DiInterface {
     /**
      * {@inheritdoc}
      */
-    public function factory($name) {
+    public function factory($name, ...$parameters) {
         $instance = null;
         if ($this->isService($name))
-            $instance = $this->services[$name]->resolve($existing=false);
+            $instance = $this->services[$name]->resolve($factory=true, $parameters);
         return $instance;
     }
 

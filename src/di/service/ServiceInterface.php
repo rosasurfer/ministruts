@@ -38,9 +38,10 @@ interface ServiceInterface {
     /**
      * Resolve the service.
      *
-     * @param  bool $existing [optional] - whether to return an existing instance (default: yes)
+     * @param  bool  $factory    [optional] - whether to return a new instance (default: no)
+     * @param  array $parameters [optional] - additional parameters of a factory call (default: none)
      *
      * @return object
      */
-    public function resolve($existing = true);
+    public function resolve($factory=false, $parameters=[]);
 }
