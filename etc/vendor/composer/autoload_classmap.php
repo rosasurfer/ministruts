@@ -64,6 +64,7 @@ return array(
     'rosasurfer\\di\\auto\\DefaultDi' => $baseDir . '/src/di/auto/DefaultDi.php',
     'rosasurfer\\di\\service\\Service' => $baseDir . '/src/di/service/Service.php',
     'rosasurfer\\di\\service\\ServiceInterface' => $baseDir . '/src/di/service/ServiceInterface.php',
+    'rosasurfer\\di\\service\\ServiceNotFoundException' => $baseDir . '/src/di/service/ServiceNotFoundException.php',
     'rosasurfer\\exception\\BusinessRuleException' => $baseDir . '/src/exception/BusinessRuleException.php',
     'rosasurfer\\exception\\ClassNotFoundException' => $baseDir . '/src/exception/ClassNotFoundException.php',
     'rosasurfer\\exception\\ConcurrentModificationException' => $baseDir . '/src/exception/ConcurrentModificationException.php',

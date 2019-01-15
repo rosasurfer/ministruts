@@ -13,7 +13,8 @@ interface DiInterface extends \ArrayAccess {
 
 
     /**
-     * Resolve a named service and return its implementation.
+     * Resolve a named service and return its implementation. This method uses the service locator pattern and always
+     * returns the same instance.
      *
      * @param  string $name
      *
@@ -23,18 +24,20 @@ interface DiInterface extends \ArrayAccess {
 
 
     /**
-     * Resolve a named service and return a new instance of its implementation.
+     * Resolve a named service and return its implementation. This method uses the factory pattern and always returns
+     * a new instance.
      *
      * @param  string $name
-     * @param  mixed  $parameters - variable list of parameters
+     * @param  mixed  $params - variable list of custom parameters
      *
      * @return object
      */
-    public function factory($name, ...$parameters);
+    public function factory($name, ...$params);
 
 
     /**
-     * Register a service in the container.
+     * Register a service in the container. An already existing service of the same will be replaced.
+     * The type (service locator or factory pattern) is determined at runtime from the chosen resolver method.
      *
      * @param  string        $name       - service identifier
      * @param  string|object $definition - a class name, an implementation instance or a \Closure acting as an instance
@@ -58,7 +61,7 @@ interface DiInterface extends \ArrayAccess {
     /**
      * Whether a service with the specified name is registered in the container.
      *
-     * @param  string $name
+     * @param  string $name - service identifier
      *
      * @return bool
      */

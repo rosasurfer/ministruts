@@ -4,6 +4,7 @@ namespace rosasurfer\di;
 use rosasurfer\core\Object;
 use rosasurfer\di\service\Service;
 use rosasurfer\di\service\ServiceInterface as IService;
+use rosasurfer\di\service\ServiceNotFoundException;
 use rosasurfer\exception\IllegalTypeException;
 
 
@@ -12,18 +13,24 @@ use rosasurfer\exception\IllegalTypeException;
  *
  * A class that implements standard dependency injection/location of services and is itself a container for them.
  *
- * <pre>
- *  $di = new Di();
+ * The definition of a service does not specify a type (service locator or factory pattern). Instead the type is determined
+ * at runtime from the used DI resolver.
  *
- *  // using a string definition
+ * <pre>
+ *  $di = new Di();                                         // creating a new container
+ *  $di = $this->di();                                      // getting the default container inside of a class context
+ *  $di = Application::getDi();                             // getting the default container outside of a class context
+ *
+ *  // defining a parameterless service using a string
  *  $di->set('request', 'rosasurfer\\ministruts\\Request');
  *
- *  // using an anonymous function
- *  $di->set('request', function() {
- *      return new \rosasurfer\ministruts\Request();
+ *  // defining a parameterized service using an anonymous function
+ *  $di->set('tile', function(...$args) {
+ *      return new \rosasurfer\ministruts\Tile(...$args);
  *  });
  *
- *  $request = $di->getRequest();
+ *  $request = $di->get('request');                         // resolving a shared instance using the service locator pattern
+ *  $tile    = $di->factory('tile', ...$args);              // resolving a new instance using the factory pattern
  * </pre>
  */
 class Di extends Object implements DiInterface {
@@ -52,9 +59,7 @@ class Di extends Object implements DiInterface {
         if (!is_file($file = $configDir.'/services.php'))
             return false;
 
-        $definitions = include($file);
-
-        foreach ($definitions as $name => $definition) {
+        foreach (include($file) as $name => $definition) {
             $this->set($name, $definition);
         }
         return true;
@@ -63,23 +68,25 @@ class Di extends Object implements DiInterface {
 
     /**
      * {@inheritdoc}
+     *
+     * @throws ServiceNotFoundException if the service is unknown
      */
     public function get($name) {
-        $instance = null;
         if (isSet($this->services[$name]))
-            $instance = $this->services[$name]->resolve();
-        return $instance;
+            return $this->services[$name]->resolve($factory=false);
+        throw new ServiceNotFoundException('Service "'.$name.'" not found.');
     }
 
 
     /**
      * {@inheritdoc}
+     *
+     * @throws ServiceNotFoundException if the service is unknown
      */
-    public function factory($name, ...$parameters) {
-        $instance = null;
+    public function factory($name, ...$params) {
         if ($this->isService($name))
-            $instance = $this->services[$name]->resolve($factory=true, $parameters);
-        return $instance;
+            return $this->services[$name]->resolve($factory=true, $params);
+        throw new ServiceNotFoundException('Service "'.$name.'" not found.');
     }
 
 
