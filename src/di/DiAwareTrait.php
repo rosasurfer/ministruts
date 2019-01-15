@@ -17,6 +17,6 @@ trait DiAwareTrait {
      * @return DiInterface
      */
     protected static function di() {
-        return Application::getDefaultDi();
+        return Application::getDi();
     }
 }

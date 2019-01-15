@@ -116,7 +116,7 @@ function processEntry($entry) {
     if (!strLen($entry)) return;
 
     /** @var ConfigInterface $config */
-    $config = Application::getDefaultConfig();
+    $config = Application::getConfig();
 
     $receivers = [];
     foreach (explode(',', $config->get('log.mail.receiver', '')) as $receiver) {

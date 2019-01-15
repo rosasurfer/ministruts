@@ -80,13 +80,13 @@ class Application extends Object {
 
         /** @var DefaultConfig $config */
         $config = $this->initDefaultConfig($options);
-        $this->setDefaultConfig($config);
+        $this->setConfig($config);
 
         /** @var DiInterface $di */
         $di = $this->initDefaultDi($config['app.dir.config']);
         $di->set('app', $this);
         $di->set('config', $config);
-        $this->setDefaultDi($di);
+        $this->setDi($di);
 
         // check "app.id"
         $appId = $config->get('app.id', null);
@@ -379,11 +379,11 @@ class Application extends Object {
 
     /**
      * Return the current default configuration of the {@link Application}. This is the configuration previously set
-     * with {@link Application::setDefaultConfig()}.
+     * with {@link Application::setConfig()}.
      *
      * @return ConfigInterface
      */
-    public static function getDefaultConfig() {
+    public static function getConfig() {
         return self::$defaultConfig;
     }
 
@@ -395,23 +395,22 @@ class Application extends Object {
      *
      * @return ConfigInterface - the previously registered default configuration
      */
-    final public static function setDefaultConfig(ConfigInterface $configuration) {
+    final public static function setConfig(ConfigInterface $configuration) {
         $previous = self::$defaultConfig;
         self::$defaultConfig = $configuration;
-        if (self::$defaultDi) {
+        if (self::$defaultDi)
             self::$defaultDi->set('config', $configuration);
-        }
         return $previous;
     }
 
 
     /**
      * Return the default dependency injection container of the {@link Application}. This is the instance previously set
-     * with {@link Application::setDefaultDi()}.
+     * with {@link Application::setDi()}.
      *
      * @return DiInterface
      */
-    public static function getDefaultDi() {
+    public static function getDi() {
         return self::$defaultDi;
     }
 
@@ -423,7 +422,7 @@ class Application extends Object {
      *
      * @return DiInterface - the previously registered default container
      */
-    final public static function setDefaultDi(DiInterface $di) {
+    final public static function setDi(DiInterface $di) {
         $previous = self::$defaultDi;
         if (!$di->isService('app') && $previous && $previous->isService('app')) {
             $di['app'] = $previous['app'];
