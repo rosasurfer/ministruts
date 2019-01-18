@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\ministruts\url;
 
-use rosasurfer\config\Config;
+use rosasurfer\config\ConfigInterface;
 
 
 /**
@@ -21,7 +21,9 @@ class VersionedUrl extends Url {
         if (($pos=strPos($relativeUri, '?')) === false) $name = $relativeUri;
         else                                            $name = subStr($relativeUri, 0, $pos);
 
-        $webDir = Config::getDefault()->get('app.dir.web', null);
+        /** @var ConfigInterface $config */
+        $config = $this->di()['config'];
+        $webDir = $config->get('app.dir.web', null);
 
         if ($webDir && file_exists($fileName=$webDir.'/'.$name)) {
             if ($pos === false) $uri .= '?';

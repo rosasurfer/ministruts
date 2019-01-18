@@ -1,11 +1,9 @@
 <?php
 /**
- * If the {@link Application} option "app.globals" is set to TRUE definitions in namespace "\rosasurfer" are additionally
- * mapped to the global namespace. Tis feature is not needed and it's generally not recommended to avoid potential naming
- * conflicts in the global scope. However, it may be used to simplify life of developers using editors with limited automatic
- * code completion capabilities.
- *
- * (default: FALSE)
+ * If the {@link Application} option "app.globals" is set definitions in namespace "\rosasurfer" are additionally mapped to
+ * the global namespace. In general this is not recommended to avoid potential naming conflicts in the global scope.
+ * However, it may be used to simplify life of developers using editors with limited automatic code completion capabilities.
+ * (default: disabled)
  */
 use rosasurfer\Application;
 use rosasurfer\ministruts\ActionMapping;

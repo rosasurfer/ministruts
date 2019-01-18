@@ -2,7 +2,7 @@
 namespace rosasurfer\log;
 
 use rosasurfer\Application;
-use rosasurfer\config\Config;
+use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\StaticClass;
 use rosasurfer\debug\DebugHelper;
 use rosasurfer\exception\IllegalTypeException;
@@ -151,8 +151,9 @@ class Logger extends StaticClass {
     private static function init() {
         static $initialized = false;
         if ($initialized) return;
-        $config = Config::getDefault();
 
+        /** @var ConfigInterface $config */
+        $config = self::di()['config'];
 
         // (1) Get the application's default loglevel configuration (fall back to the built-in default).
         if ($config) {
@@ -267,8 +268,8 @@ class Logger extends StaticClass {
         // read the configured class specific loglevels
         static $logLevels = null;
         if ($logLevels === null) {
-            if (!$config=Config::getDefault())
-                throw new RuntimeException('Service locator returned empty default config: '.getType($config));
+            /** @var ConfigInterface $config */
+            $config = self::di()['config'];
 
             $logLevels = $config->get('log.level', []);
             if (is_string($logLevels))
@@ -421,8 +422,8 @@ class Logger extends StaticClass {
         $subject = $context['mailSubject'];
         $message = $context['mailMessage'];
 
-        if (!$config=Config::getDefault()) throw new RuntimeException('Service locator returned empty default config: '.getType($config));
-
+        /** @var ConfigInterface $config */
+        $config  = self::di()['config'];
         $options = $headers = [];
         $sender  = null;
 

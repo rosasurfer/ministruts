@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\cache;
 
-use rosasurfer\config\Config;
+use rosasurfer\config\ConfigInterface;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RuntimeException;
 use rosasurfer\exception\error\PHPError;
@@ -37,15 +37,19 @@ final class FileSystemCache extends CachePeer {
         $this->namespace = $label;
         $this->options   = $options;
 
+        /** @var ConfigInterface $config */
+        $config = $this->di()['config'];
+
         // Cache-Verzeichnis ermitteln
         if (isSet($options['directory'])) {
             $directory = $options['directory'];
-            if (isRelativePath($directory))
-                $directory = Config::getDefault()->get('app.dir.root').'/'.$directory;
+            if (isRelativePath($directory)) {
+                $directory = $config['app.dir.root'].'/'.$directory;
+            }
         }
         else {
             /** @var string $directory */
-            $directory = Config::getDefault()->get('app.dir.cache');
+            $directory = $config['app.dir.cache'];
         }
 
         // Verzeichnis ggf. erzeugen

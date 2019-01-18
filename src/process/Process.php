@@ -11,8 +11,8 @@ class Process extends StaticClass {
 
 
     /**
-     * Call signal handlers for pending signals.
-     * On platforms which do not support signal handling (e.g. on Windows) the call does nothing.
+     * Call signal handlers to handle pending signals.
+     * On platforms which do not support POSIX signal handling (e.g. on Windows) the call does nothing.
      *
      * @return bool - success status
      */

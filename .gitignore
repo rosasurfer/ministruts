@@ -31,3 +31,4 @@ config.*properties
 !config.dist.properties
 
 /php-error.log
+/services.php

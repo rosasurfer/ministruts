@@ -56,9 +56,6 @@ use const rosasurfer\NL;
 class Config extends Object implements IConfig {
 
 
-    /** @var IConfig - the application's current default configuration */
-    private static $defaultInstance;
-
     /** @var bool[] - config file names and their existence status */
     protected $files = [];
 
@@ -173,8 +170,8 @@ class Config extends Object implements IConfig {
      * Return the names of the monitored configuration files. The resulting array will contain names of existing and (still)
      * non-existing files.
      *
-     * @return bool[] - array with elements "file-name" => (bool)status or an empty array if the configuration
-     *                  is not based on files
+     * @return bool[] - array with elements "file-name" => (bool)status or an empty array if the configuration is not
+     *                  based on files
      */
     public function getMonitoredFiles() {
         return $this->files;
@@ -433,39 +430,6 @@ class Config extends Object implements IConfig {
             $k         = subStr($k, $pos+1);            // next subkey
         }
         return $subkeys;
-    }
-
-
-    /**
-     * Get the current default configuration. This is the configuration set by Config::setDefault().
-     *
-     * @return IConfig
-     */
-    public static function getDefault() {
-        // intentionally accept an error if $defaultInstance was not yet set
-        return self::$defaultInstance;
-    }
-
-
-    /**
-     * Set the default configuration to be returned by Config::getDefault().
-     *
-     * @param  IConfig $configuration
-     *
-     * @return IConfig - the same configuration
-     */
-    public static function setDefault(IConfig $configuration) {
-        return self::$defaultInstance = $configuration;
-        // TODO: update cache config
-    }
-
-
-    /**
-     * Reset the internal default configuration.
-     */
-    public static function resetDefault() {
-        self::$defaultInstance = null;
-        // TODO: update cache config
     }
 
 

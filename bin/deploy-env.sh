@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Example of launching a deploy script and passing the configuration via the environment.
+# Example of launching a deploy script and passing the configuration via environment variables.
 #
 set -e
 

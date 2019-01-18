@@ -2,8 +2,8 @@
 namespace rosasurfer\ministruts;
 
 use rosasurfer\Application;
-use rosasurfer\config\Config;
 use rosasurfer\core\Object;
+use rosasurfer\di\DiInterface;
 use rosasurfer\exception\IllegalStateException;
 
 use function rosasurfer\strLeft;
@@ -236,6 +236,9 @@ class Tile extends Object {
      * @return $this
      */
     public function render() {
+        /** @var DiInterface $di */
+        $di = $this->di();
+
         $request     = Request::me();
         $namespace   = $this->module->getViewNamespace();
         $appUri      = $request->getApplicationBaseUri();
@@ -266,7 +269,7 @@ class Tile extends Object {
 
         $tileHint = false;
         if (Application::isAdminIP()) {
-            $rootDir  = Config::getDefault()->get('app.dir.root');
+            $rootDir  = $di['config']['app.dir.root'];
             $file     = $this->fileName;
             $file     = strRightFrom($file, $rootDir.DIRECTORY_SEPARATOR, 1, false, $file);
             $file     = 'file="'.str_replace('\\', '/', $file).'"';

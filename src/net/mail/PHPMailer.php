@@ -1,10 +1,9 @@
 <?php
 namespace rosasurfer\net\mail;
 
-use rosasurfer\config\Config;
+use rosasurfer\config\ConfigInterface;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
-use rosasurfer\exception\RuntimeException;
 use rosasurfer\util\PHP;
 
 use function rosasurfer\normalizeEOL;
@@ -35,6 +34,8 @@ class PHPMailer extends Mailer {
             $this->sendLater($sender, $receiver, $subject, $message, $headers);
             return;
         }
+        /** @var ConfigInterface $config */
+        $config = $this->di()['config'];
 
         // first validate the additional headers
         foreach ($headers as $i => $header) {
@@ -44,8 +45,7 @@ class PHPMailer extends Mailer {
         }
 
         // auto-complete sender if not specified
-        if (is_null($sender)) {
-            if (!$config=Config::getDefault()) throw new RuntimeException('Service locator returned empty default config: '.getType($config));
+        if (!isSet($sender)) {
             $sender = $config->get('mail.from', ini_get('sendmail_from'));
             if (!strLen($sender)) {
                 $sender = strToLower(get_current_user().'@'.$this->hostName);
@@ -76,7 +76,6 @@ class PHPMailer extends Mailer {
         if (!is_string($receiver))         throw new IllegalTypeException('Illegal type of parameter $receiver: '.getType($receiver));
         $rcpt = self::parseAddress($receiver);
         if (!$rcpt)                        throw new InvalidArgumentException('Invalid parameter $receiver: '.$receiver);
-        if (!$config=Config::getDefault()) throw new RuntimeException('Service locator returned empty default config: '.getType($config));
         $forced = $config->get('mail.forced-receiver', '');
         if (!is_string($forced))           throw new IllegalTypeException('Illegal type of config value "mail.forced-receiver": '.getType($forced).' (not string)');
         if (strLen($forced)) {

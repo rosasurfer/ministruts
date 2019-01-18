@@ -1,14 +1,16 @@
 <?php
 namespace rosasurfer;
 
-use rosasurfer\config\AutoConfig;
-use rosasurfer\config\Config;
-use rosasurfer\config\ConfigInterface as IConfig;
+use rosasurfer\config\ConfigInterface;
+use rosasurfer\config\auto\DefaultConfig;
 use rosasurfer\core\Object;
 use rosasurfer\debug\ErrorHandler;
+use rosasurfer\di\Di;
+use rosasurfer\di\DiInterface;
+use rosasurfer\di\auto\DefaultCliDi;
+use rosasurfer\di\auto\DefaultDi;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
-use rosasurfer\exception\RuntimeException;
 use rosasurfer\log\Logger;
 use rosasurfer\ministruts\FrontController;
 use rosasurfer\ministruts\Response;
@@ -16,9 +18,16 @@ use rosasurfer\util\PHP;
 
 
 /**
- * A wrapper object for initializing and running an application.
+ * A wrapper object representing a running application.
  */
 class Application extends Object {
+
+
+    /** @var ConfigInterface - the application's current default configuration */
+    protected static $defaultConfig;
+
+    /** @var DiInterface - the application's current default DI container */
+    protected static $defaultDi;
 
 
     /** @var int - error handling mode in which regular PHP errors are only logged */
@@ -29,34 +38,34 @@ class Application extends Object {
 
 
     /**
-     * Create and initialize a new MiniStruts application.
+     * Create and initialize a new MiniStruts application.                                                                      <br>
      *
-     * @param  array $options [optional] - Expects an array with any of the following options:
+     * @param  array $options [optional] - Expects an array with any of the following options:                                  <br>
      *
-     *        "app.config"            - IConfig: The project's configuration as an instance.<br>
+     *        "app.dir.root"          - string:  The project's root directory.                                                  <br>
+     *                                           (default: the current directory)                                               <br>
      *
-     *        "app.dir.config"        - string:  The project's configuration location as a directory or a file.<br>
-     *                                           (default: directory returned by the instance passed in "app.config" or the<br>
-     *                                           current directory)<br>
+     *        "app.dir.config"        - string:  The project's configuration location as a directory or a file.                 <br>
+     *                                           (default: the current directory)                                               <br>
      *
-     *        "app.dir.root"          - string:  The project's root directory.<br>
-     *                                           (default: the current directory)<br>
+     *        "app.globals"           - bool:    If set definitions in "src/helpers.php" are additionally mapped to the global  <br>
+     *                                           namespace. In general this is not recommended to avoid potential naming        <br>
+     *                                           conflicts in the global scope. However, it may be used to simplify life of     <br>
+     *                                           developers using editors with limited automatic code completion capabilities.  <br>
+     *                                           (default: disabled)                                                            <br>
      *
-     *        "app.globals"           - bool:    If set to TRUE definitions in "src/helper.php"<br> are mapped to the global
-     *                                           PHP namespace.<br>
-     *                                           (default: FALSE)<br>
+     *        "app.handle-errors"     - string:  How to handle regular PHP errors: If set to "strict" errors are converted to   <br>
+     *                                           to ErrorExceptions and thrown back. If set to "weak" errors are only logged    <br>
+     *                                           and execution continues. If set to "ignore" the application has to setup its   <br>
+     *                                           own error handling mechanism.                                                  <br>
+     *                                           (default: "strict")                                                            <br>
      *
-     *        "app.handle-errors"     - string:  How to handle regular PHP errors. If set to "strict" errors are converted to<br>
-     *                                           PHP ErrorExceptions and thrown back. If set to "weak" errors are only logged<br>
-     *                                           and execution continues. If set to "ignore" you have to setup your own error<br>
-     *                                           handling mechanism.<br>
-     *                                           (default: "strict")<br>
+     *        "app.handle-exceptions" - bool:    How to handle PHP exceptions: If set exceptions are handled by the framework's <br>
+     *                                           exception handler. Otherwise the application has to setup its own exception    <br>
+     *                                           handling mechanism.                                                            <br>
+     *                                           (default: enabled)                                                             <br>
      *
-     *        "app.handle-exceptions" - bool:    If set to TRUE exceptions are handled by the built-in exception handler.<br>
-     *                                           If set to FALSE you have to setup your own exception handling mechanism.<br>
-     *                                           (default: TRUE)<br>
-     *
-     * All further options are added to the application's default configuration {@link Config} as regular config values.
+     * All further options are added to the application's current default configuration as regular config values.               <br>
      */
     public function __construct(array $options = []) {
         // set default values
@@ -64,18 +73,26 @@ class Application extends Object {
         if (!isSet($options['app.handle-exceptions'])) $options['app.handle-exceptions'] = true;
         if (!isSet($options['app.globals'          ])) $options['app.globals'          ] = isSet($options['app.global-helpers']) ? $options['app.global-helpers'] : false;
 
-        // (1) setup configuration
+        // setup the configuration
         $this->setupErrorHandling    ($options['app.handle-errors'    ]);
         $this->setupExceptionHandling($options['app.handle-exceptions']);
         $this->loadGlobals           ($options['app.globals'          ]);
 
-        $config = $this->loadConfiguration($options);
+        /** @var DefaultConfig $config */
+        $config = $this->initDefaultConfig($options);
+        $this->setConfig($config);
 
-        // (2) check "app.id"
+        /** @var DiInterface $di */
+        $di = $this->initDefaultDi($config['app.dir.config']);
+        $di->set('app', $this);
+        $di->set('config', $config);
+        $this->setDi($di);
+
+        // check "app.id"
         $appId = $config->get('app.id', null);
-        if (!$appId) $config->set('app.id', subStr(md5($config->get('app.dir.root')), 0, 16));
+        if (!$appId) $config->set('app.id', subStr(md5($config['app.dir.root']), 0, 16));
 
-        // (3) check for PHP admin tasks if the remote IP has allowance
+        // check for PHP admin tasks if the remote IP has allowance
         // __phpinfo__             : show PHP config at start of script
         // __config__ + __phpinfo__: show PHP config after loading of the application configuration
         // __cache__               : show cache admin interface
@@ -109,12 +126,12 @@ class Application extends Object {
             }
         }
 
-        // (4) load further php.ini settings from the configuration
+        // load further php.ini settings from the configuration
         $this->configurePhp();
 
-        // (5) execute "config-info" task if enabled
+        // execute "config-info" task if enabled
         if ($configInfoTask) {
-            $configFiles = Config::getDefault()->getMonitoredFiles();
+            $configFiles = $config->getMonitoredFiles();
             $files = [];
             foreach ($configFiles as $file => $exists) {
                 $files[] = ($exists ? 'OK':'? ').'   '.$file;
@@ -134,7 +151,7 @@ class Application extends Object {
                                                       .NL
                    .'Application configuration:'      .NL
                    .'--------------------------'      .NL
-                   . print_r(Config::getDefault()->dump(['sort'=>SORT_ASC]), true)
+                   . print_r($config->dump(['sort'=>SORT_ASC]), true)
                    ?>
                 </pre>
             </div>
@@ -143,18 +160,18 @@ class Application extends Object {
                 exit(0);
         }
 
-        // (6) execute "phpinfo" after-config task if enabled
+        // execute "phpinfo" after-config task if enabled
         if ($phpInfoTask || $phpInfoAfterConfigTask) {
             PHP::phpInfo();
             exit(0);
         }
 
-        // (7) execute "cache-info" task if enabled
+        // execute "cache-info" task if enabled
         if ($cacheInfoTask) {
             //include(MINISTRUTS_ROOT.'/src/debug/apc.php'); // TODO: not yet implemented
         }
 
-        // (8) enforce mission-critical PHP requirements (after processing any admin tasks)
+        // enforce mission-critical PHP requirements (after processing of any admin tasks)
         !php_ini_loaded_file()                   && exit(1|echoPre('application error (see error log'.(self::isAdminIP() ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: No "php.ini" configuration file was loaded.'));
         !CLI && !ini_get_bool('short_open_tag')  && exit(1|echoPre('application error (see error log'.(self::isAdminIP() ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: The PHP configuration value "short_open_tag" must be enabled (security).'));
         !CLI && ini_get('request_order') != 'GP' && exit(1|echoPre('application error (see error log'.(self::isAdminIP() ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: The PHP configuration value "request_order" must be "GP" (current value "'.ini_get('request_order').'").'));
@@ -177,8 +194,8 @@ class Application extends Object {
     /**
      * Update the PHP configuration with user defined settings.
      */
-    private function configurePhp() {
-        $memoryWarnLimit = php_byte_value(Config::getDefault()->get('log.warn.memory_limit', 0));
+    protected function configurePhp() {
+        $memoryWarnLimit = php_byte_value(self::$defaultConfig->get('log.warn.memory_limit', 0));
         if ($memoryWarnLimit > 0) {
             register_shutdown_function(function() use ($memoryWarnLimit) {
                 $usedBytes = memory_get_peak_usage($real=true);
@@ -211,58 +228,40 @@ class Application extends Object {
 
 
     /**
-     * Load the specified configuration and register it as the application's default configuration.
+     * Load and initialize a {@link DefaultConfig}.
      *
-     * @param  array $options - config options as passed to the framework loader
+     * @param  array $options - configuration options as passed to the framework loader
      *
-     * @return IConfig - initialized configuration
+     * @return DefaultConfig
      */
-    private function loadConfiguration(array $options) {
-        if (isSet($options['app.dir.config']) && isSet($options['app.config']))
-            throw new RuntimeException('Only one of the application options "app.config" or "app.dir.config" can be provided.');
-
-        if (!isSet($options['app.config'])) {
-            $location = isSet($options['app.dir.config']) ? $options['app.dir.config'] : getCwd();
-            $config = new AutoConfig($location);
-            unset($options['app.dir.config']);
-        }
-        else {
-            $config = $options['app.config'];
-            if (!$config instanceof IConfig) throw new IllegalTypeException('Illegal type of application option["app.config"]: '.getType($config));
-            if (!$config->get('app.dir.config', false)) {
-                $files = $config->getMonitoredFiles();
-                end($files);
-                list($file, $exists) = each($files);
-                $config->set('app.dir.config', dirName($file));
-            }
-            unset($options['app.config']);
-        }
+    protected function initDefaultConfig(array $options) {
+        $configLocation = isSet($options['app.dir.config']) ? $options['app.dir.config'] : getCwd();
+        $config = new DefaultConfig($configLocation);
+        unset($options['app.dir.config']);
 
         $rootDir = isSet($options['app.dir.root']) ? $options['app.dir.root'] : getCwd();
         unset($options['app.dir.root']);
 
-        // copy all remaining options
+        // copy remaining config options to the DefaultConfig
         foreach ($options as $name => $value) {
-            if (is_string($name))
-                $config->set($name, $value);
+            $config->set($name, $value);
         }
 
         // set root directory and expand relative app directories
         $config->set('app.dir.root', $rootDir);
         $this->expandAppDirs($config, $rootDir);
 
-        // register the instance as the application's main configuration
-        return Config::setDefault($config);
+        return $config;
     }
 
 
     /**
      * Expand relative "app.dir.*" values by the specified root directory.
      *
-     * @param  IConfig $config  - application configuration
-     * @param  string  $rootDir - application root directory
+     * @param  ConfigInterface $config  - application configuration
+     * @param  string          $rootDir - application root directory
      */
-    private function expandAppDirs(IConfig $config, $rootDir) {
+    protected function expandAppDirs(ConfigInterface $config, $rootDir) {
         if (!is_string($rootDir))                          throw new IllegalTypeException('Illegal type of config option "app.dir.root": '.getType($rootDir));
         if (!strLen($rootDir) || isRelativePath($rootDir)) throw new InvalidArgumentException('Invalid config option "app.dir.root": "'.$rootDir.'" (not an absolute path)');
 
@@ -279,7 +278,7 @@ class Application extends Object {
      * @param  array &$dirs    - absolute or relative directory values
      * @param  string $rootDir - application root directory
      */
-    private function expandDirsRecursive(array &$dirs, $rootDir) {
+    protected function expandDirsRecursive(array &$dirs, $rootDir) {
         foreach ($dirs as $name => &$dir) {
             if (is_array($dir)) {
                 $this->{__FUNCTION__}($dir, $rootDir);
@@ -293,20 +292,30 @@ class Application extends Object {
 
 
     /**
+     * Load and initialize a default Dependency Injection container.
+     *
+     * @param  string $serviceDir - directory with service configurations
+     *
+     * @return DiInterface
+     */
+    protected function initDefaultDi($serviceDir) {
+        return !CLI ? new DefaultDi($serviceDir) : new DefaultCliDi($serviceDir);
+    }
+
+
+    /**
      * Setup the application's error handling.
      *
-     * @param  int|string $value - configuration value as passed to the framework loader
+     * @param  string $value - configuration value as passed to the framework loader
      */
-    private function setupErrorHandling($value) {
-        $flag = self::THROW_EXCEPTIONS;
+    protected function setupErrorHandling($value) {
+        $mode = self::THROW_EXCEPTIONS;                             // default
         if (is_string($value)) {
             $value = trim(strToLower($value));
-            if      ($value == 'weak'  ) $flag = self::LOG_ERRORS;  // default: THROW_EXCEPTIONS
-            else if ($value == 'ignore') $flag = null;
+            if      ($value == 'weak'  ) $mode = self::LOG_ERRORS;
+            else if ($value == 'ignore') $mode = 0;
         }
-        if ($flag) {
-            ErrorHandler::setupErrorHandling($flag);
-        }
+        $mode && ErrorHandler::setupErrorHandling($mode);
     }
 
 
@@ -315,20 +324,16 @@ class Application extends Object {
      *
      * @param  bool|int|string $value - configuration value as passed to the framework loader
      */
-    private function setupExceptionHandling($value) {
-        $enabled = true;
+    protected function setupExceptionHandling($value) {
+        $enabled = true;                                            // default
         if (is_bool($value) || is_int($value)) {
             $enabled = (bool) $value;
         }
         elseif (is_string($value)) {
-            $value = trim(strToLower($value));
-            if ($value=='0' || $value=='off' || $value=='false')
-                $enabled = false;                                   // default: true
+            $value   = trim(strToLower($value));
+            $enabled = ($value=='0' || $value=='off' || $value=='false');
         }
-
-        if ($enabled) {
-            ErrorHandler::setupExceptionHandling();
-        }
+        $enabled && ErrorHandler::setupExceptionHandling();
     }
 
 
@@ -337,8 +342,8 @@ class Application extends Object {
      *
      * @param  mixed $value - configuration value as passed to the framework loader
      */
-    private function loadGlobals($value) {
-        $enabled = false;
+    protected function loadGlobals($value) {
+        $enabled = false;                                           // default
         if (is_bool($value) || is_int($value)) {
             $enabled = (bool) $value;
         }
@@ -346,8 +351,7 @@ class Application extends Object {
             $value   = trim(strToLower($value));
             $enabled = ($value=='1' || $value=='on' || $value=='true');
         }
-
-        if ($enabled) {
+        if ($enabled && !function_exists('booltostr')) {            // prevent multiple includes
             include(MINISTRUTS_ROOT.'/src/globals.php');
         }
     }
@@ -358,8 +362,8 @@ class Application extends Object {
      *
      * @param  mixed $value - configuration value as passed to the framework loader
      */
-    private function replaceComposer($value) {
-        $enabled = false;
+    protected function replaceComposer($value) {
+        $enabled = false;                                           // default
         if (is_bool($value) || is_int($value)) {
             $enabled = (bool) $value;
         }
@@ -367,10 +371,67 @@ class Application extends Object {
             $value   = trim(strToLower($value));
             $enabled = ($value=='1' || $value=='on' || $value=='true');
         }
-
         if ($enabled) {
             // replace Composer
         }
+    }
+
+
+    /**
+     * Return the current default configuration of the {@link Application}. This is the configuration previously set
+     * with {@link Application::setConfig()}.
+     *
+     * @return ConfigInterface
+     */
+    public static function getConfig() {
+        return self::$defaultConfig;
+    }
+
+
+    /**
+     * Set a new default configuration for the {@link Application}.
+     *
+     * @param  ConfigInterface $configuration
+     *
+     * @return ConfigInterface - the previously registered default configuration
+     */
+    final public static function setConfig(ConfigInterface $configuration) {
+        $previous = self::$defaultConfig;
+        self::$defaultConfig = $configuration;
+        if (self::$defaultDi)
+            self::$defaultDi->set('config', $configuration);
+        return $previous;
+    }
+
+
+    /**
+     * Return the default dependency injection container of the {@link Application}. This is the instance previously set
+     * with {@link Application::setDi()}.
+     *
+     * @return DiInterface
+     */
+    public static function getDi() {
+        return self::$defaultDi;
+    }
+
+
+    /**
+     * Set a new default dependency injection container for the {@link Application}.
+     *
+     * @param  DiInterface $di
+     *
+     * @return DiInterface - the previously registered default container
+     */
+    final public static function setDi(DiInterface $di) {
+        $previous = self::$defaultDi;
+        if (!$di->isService('app') && $previous && $previous->isService('app')) {
+            $di['app'] = $previous['app'];
+        }
+        if (!$di->isService('config') && self::$defaultConfig) {
+            $di['config'] = self::$defaultConfig;
+        }
+        self::$defaultDi = $di;
+        return $previous;
     }
 
 
@@ -389,10 +450,10 @@ class Application extends Object {
         static $whiteList; if (!$whiteList) {
             $ips = ['127.0.0.1', $_SERVER['SERVER_ADDR']];
 
-            if (!$config=Config::getDefault())
+            if (!self::$defaultConfig)
                 return in_array($_SERVER['REMOTE_ADDR'], $ips);
 
-            $values = $config->get('admin.ip.whitelist', []);
+            $values = self::$defaultConfig->get('admin.ip.whitelist', []);
             if (!is_array($values)) $values = [$values];
             $whiteList = \array_keys(\array_flip(\array_merge($ips, $values)));
         }

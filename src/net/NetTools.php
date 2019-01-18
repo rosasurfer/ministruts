@@ -1,11 +1,10 @@
 <?php
 namespace rosasurfer\net;
 
-use rosasurfer\config\Config;
+use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\StaticClass;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
-use rosasurfer\exception\RuntimeException;
 
 use function rosasurfer\strEndsWithI;
 use function rosasurfer\strStartsWith;
@@ -71,8 +70,8 @@ final class NetTools extends StaticClass {
         if ($proxys === null) {
             $proxys = array();
 
-            if (!$config=Config::getDefault())
-                throw new RuntimeException('Service locator returned empty default config: '.getType($config));
+            /** @var ConfigInterface $config */
+            $config = self::di()['config'];
 
             // Config einlesen
             $value = $config->get('proxys', null);

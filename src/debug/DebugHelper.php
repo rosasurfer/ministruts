@@ -1,7 +1,6 @@
 <?php
 namespace rosasurfer\debug;
 
-use rosasurfer\config\Config;
 use rosasurfer\core\StaticClass;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
@@ -112,8 +111,7 @@ class DebugHelper extends StaticClass {
      * @return string
      */
     public static function formatTrace(array $trace, $indent = '') {
-        $config  = Config::getDefault();
-        $appRoot = $config ? $config->get('app.dir.root') : false;
+        $appRoot = self::di()['config']['app.dir.root'];
         $result  = '';
 
         $size = sizeOf($trace);

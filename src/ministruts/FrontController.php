@@ -2,7 +2,7 @@
 namespace rosasurfer\ministruts;
 
 use rosasurfer\cache\Cache;
-use rosasurfer\config\Config;
+use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\Singleton;
 use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
@@ -21,14 +21,15 @@ use const rosasurfer\WINDOWS;
 /**
  * FrontController
  *
- * To avoid repeated loading and parsing of the XML configuration the FrontController instance is cached and re-used across
- * multiple HTTP requests (until cache invalidation). The class implementation is "request safe" and holds no variable
- * runtime status (similar to "thread safe" implementations in other languages).
+ * To avoid repeated parsing of the Struts XML configuration the FrontController instance is cached and re-used across
+ * multiple HTTP requests (until cache invalidation). This means the instance is constantly serialized and unserialized.
+ * Therefore the class implementation has to be "request safe" (similar to "thread safety" in other languages) and must
+ * not hold variable runtime status.
  */
 class FrontController extends Singleton {
 
 
-    /** @var Module[] - all registered Struts modules (array key is the module prefix) */
+    /** @var Module[] - all registered Struts modules with the module prefix as index */
     private $modules = [];
 
 
@@ -52,7 +53,7 @@ class FrontController extends Singleton {
 
                 if (!$controller) {
                     $controller = Singleton::getInstance(static::class);
-                    $configDir  = Config::getDefault()->get('app.dir.config');
+                    $configDir  = self::di()['config']['app.dir.config'];
                     $configFile = str_replace('\\', '/', $configDir.'/struts-config.xml');
                     $dependency = FileDependency::create($configFile);
                     if (!WINDOWS && !LOCALHOST)                             // distinction dev/production?  TODO: non-sense
@@ -78,9 +79,12 @@ class FrontController extends Singleton {
     protected function __construct() {
         parent::__construct();
 
+        /** @var ConfigInterface $config */
+        $config = $this->di()['config'];
+
         // lookup Struts configuration files
-        $configDir = Config::getDefault()->get('app.dir.struts', null);
-        !$configDir && $configDir=Config::getDefault()->get('app.dir.config');      // fall-back to std config directory
+        $configDir = $config->get('app.dir.struts', null);
+        !$configDir && $configDir=$config['app.dir.config'];                        // fall-back to standard config directory
 
         $mainConfig = str_replace('\\', '/', $configDir.'/struts-config.xml');      // main module config
         if (!is_file($mainConfig)) throw new StrutsConfigException('Struts configuration file not found: "'.$mainConfig.'"');
@@ -144,13 +148,12 @@ class FrontController extends Singleton {
      *
      * @return string - Module prefix
      */
-    private function getModulePrefix(Request $request) {
+    protected function getModulePrefix(Request $request) {
         $requestPath = $request->getPath();
         $baseUri     = $request->getApplicationBaseUri();
 
-        if (!strStartsWith($requestPath, $baseUri)) {
-            throw new RuntimeException('Can not resolve module prefix from request path "'.$requestPath.'" (base URI: "'.$baseUri.'")');
-        }
+        if (!strStartsWith($requestPath, $baseUri))
+            throw new RuntimeException('Can not resolve module prefix from request path "'.$requestPath.'" (application base uri: "'.$baseUri.'")');
 
         $value = subStr($requestPath, strLen($baseUri));        // baseUri ends with and prefix doesn't start with a slash
         if (strLen($value)) {
@@ -169,7 +172,7 @@ class FrontController extends Singleton {
      *
      * @return RequestProcessor
      */
-    private function getRequestProcessor(Module $module, array $options) {
+    protected function getRequestProcessor(Module $module, array $options) {
         $class = $module->getRequestProcessorClass();
         return new $class($module, $options);
     }
