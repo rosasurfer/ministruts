@@ -71,7 +71,7 @@ class Application extends Object {
         // set default values
         if (!isSet($options['app.handle-errors'    ])) $options['app.handle-errors'    ] = 'strict';
         if (!isSet($options['app.handle-exceptions'])) $options['app.handle-exceptions'] = true;
-        if (!isSet($options['app.globals'          ])) $options['app.globals'          ] = isSet($options['app.global-helpers']) ? $options['app.global-helpers'] : false;
+        if (!isSet($options['app.globals'          ])) $options['app.globals'          ] = false;
 
         // setup the configuration
         $this->setupErrorHandling    ($options['app.handle-errors'    ]);
