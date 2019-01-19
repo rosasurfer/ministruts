@@ -2,7 +2,6 @@
     "name":        "rosasurfer/ministruts",
     "description": "Struts 1.2 inspired MVC web framework for PHP",
     "type":        "library",
-    "homepage":    "http://ministruts.rosasurfer.com/",
     "license":     "WTFPL",
     "authors": [{
         "name":  "Peter Walther",
@@ -32,5 +31,8 @@
         "branch-alias": {
             "dev-master": "0.9.x-dev"
         }
+    },
+    "support": {
+        "source": "https://github.com/rosasurfer/ministruts"
     }
 }
