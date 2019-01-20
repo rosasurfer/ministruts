@@ -24,7 +24,6 @@ use function rosasurfer\simpleClassName;
 use function rosasurfer\strEndsWith;
 use function rosasurfer\strLeft;
 use function rosasurfer\true;
-use rosasurfer;
 
 
 /**

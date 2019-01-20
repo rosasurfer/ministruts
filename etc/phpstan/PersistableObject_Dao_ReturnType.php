@@ -11,6 +11,7 @@ use PHPStan\Reflection\MethodReflection;
 use PHPStan\Type\DynamicMethodReturnTypeExtension;
 use PHPStan\Type\DynamicStaticMethodReturnTypeExtension;
 use PHPStan\Type\ObjectType;
+use PHPStan\Type\StaticType;
 use PHPStan\Type\Type;
 
 use rosasurfer\db\orm\PersistableObject;
@@ -18,7 +19,6 @@ use rosasurfer\db\orm\PersistableObject;
 use function rosasurfer\echoPre;
 use function rosasurfer\simpleClassName;
 use function rosasurfer\true;
-use PHPStan\Type\StaticType;
 
 
 /**

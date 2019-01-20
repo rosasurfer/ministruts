@@ -12,6 +12,7 @@ use PHPStan\Type\ArrayType;
 use PHPStan\Type\DynamicMethodReturnTypeExtension;
 use PHPStan\Type\DynamicStaticMethodReturnTypeExtension;
 use PHPStan\Type\ObjectType;
+use PHPStan\Type\StaticType;
 use PHPStan\Type\Type;
 
 use rosasurfer\db\orm\DAO;
@@ -21,7 +22,6 @@ use function rosasurfer\simpleClassName;
 use function rosasurfer\strEndsWith;
 use function rosasurfer\strLeft;
 use function rosasurfer\true;
-use PHPStan\Type\StaticType;
 
 
 /**
