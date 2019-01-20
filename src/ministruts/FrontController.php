@@ -52,7 +52,7 @@ class FrontController extends Singleton {
             // $controller = $cache->get($class);                           // re-check after the lock is aquired
 
                 if (!$controller) {
-                    $controller = Singleton::getInstance(static::class);
+                    $controller = self::getInstance(static::class);
                     $configDir  = self::di()['config']['app.dir.config'];
                     $configFile = str_replace('\\', '/', $configDir.'/struts-config.xml');
                     $dependency = FileDependency::create($configFile);

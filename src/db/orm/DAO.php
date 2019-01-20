@@ -8,6 +8,9 @@ use rosasurfer\db\NoSuchRecordException;
 use rosasurfer\db\ResultInterface as IResult;
 use rosasurfer\db\orm\meta\EntityMapping;
 use rosasurfer\exception\RuntimeException;
+use rosasurfer\exception\ClassNotFoundException;
+use rosasurfer\exception\InvalidArgumentException;
+use function rosasurfer\is_class;
 
 
 /**
@@ -32,13 +35,30 @@ abstract class DAO extends Singleton {
 
 
     /**
+     * Get the specified DAO implementation.
+     *
+     * @param  string $class - DAO class name
+     *
+     * @return self
+     */
+    final public static function getImplementation($class) {
+        if (!is_a($class, __CLASS__, $allowString=true)) {
+            if (!is_class($class)) throw new ClassNotFoundException('Class not found: '.$class );
+            throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
+        }
+        /** @var self $dao */
+        $dao = self::getInstance($class);
+        return $dao;
+    }
+
+
+    /**
      * Constructor
      *
      * Create a new DAO.
      */
     protected function __construct() {
         parent::__construct();
-
         $this->entityClass = subStr(get_class($this), 0, -3);
     }
 

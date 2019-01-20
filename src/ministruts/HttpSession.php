@@ -22,6 +22,21 @@ class HttpSession extends Singleton {
 
 
     /**
+     * Return the <tt>Singleton</tt> instance.
+     *
+     * @param  Request $request                                    - request the session belongs to
+     * @param  bool    $suppressHeadersAlreadySentError [optional] - whether or not to suppress "headers already sent" errors
+     *
+     * @return static
+     *
+     * @throws RuntimeException if not called from the web interface
+     */
+    public static function me(Request $request, $suppressHeadersAlreadySentError = false) {
+        return self::getInstance(static::class, $request, $suppressHeadersAlreadySentError);
+    }
+
+
+    /**
      * Constructor
      *
      * @param  Request $request                                    - request the session belongs to

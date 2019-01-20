@@ -36,7 +36,7 @@ class Page extends Singleton {
      * @return static
      */
     public static function me() {
-        return Singleton::getInstance(static::class);
+        return self::getInstance(static::class);
     }
 
 

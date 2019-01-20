@@ -18,6 +18,7 @@ use rosasurfer\db\orm\PersistableObject;
 use function rosasurfer\echoPre;
 use function rosasurfer\simpleClassName;
 use function rosasurfer\true;
+use PHPStan\Type\StaticType;
 
 
 /**
@@ -34,54 +35,58 @@ class PersistableObject_Dao_ReturnType extends DynamicReturnType implements Dyna
 
 
     /**
-     * Resolve the return type of an instance call to PersistableObject->dao().
+     * Resolve the return type of instance calls to {@link PersistableObject::dao()}.
      *
      * @return Type
      */
     public function getTypeFromMethodCall(MethodReflection $methodReflection, MethodCall $methodCall, Scope $scope) : Type {
-        $returnType  = $methodReflection->getReturnType();
-        $returnClass = $origReturnClass = $returnType->getClass();
+        $returnType = $methodReflection->getReturnType();
+        $origReturnDescribe = $returnType->describe();
         $error = false;
 
-        if ($methodCall->var instanceof Variable) {
-            $entityClass = $scope->getType($methodCall->var)->getClass();
-            if ($entityClass != static::$className) {
-                $returnClass = $entityClass.'DAO';
-                $returnType  = new ObjectType($returnClass);
-            }
-        } else $error = true(echoPre('(1) '.simpleClassName(static::$className).'->'.$methodCall->name.'() cannot resolve callee of instance method call: class($methodCall->var) = '.get_class($methodCall->var)));
+        if ($returnType instanceof ObjectType) {
+            if ($methodCall->var instanceof Variable) {
+                $scopedType = $scope->getType($methodCall->var);
+                $class = $scopedType instanceof StaticType ? $scopedType->getClass() : $scopedType->describe();
+                if ($class != static::$className)                                           // skip self-referencing calls
+                    $returnType = new ObjectType($class.'DAO');
+            } else $error = true(echoPre('(1) '.simpleClassName(static::$className).'->'.$methodCall->name.'() cannot resolve callee of instance method call: class($methodCall->var) = '.get_class($methodCall->var)));
+        } else     $error = true(echoPre('(2) '.simpleClassName(static::$className).'->'.$methodCall->name.'() encountered unexpected return type: '.get_class($returnType).' => '.$returnType->describe()));
 
-        if (0 || $error) echoPre('call of: '.simpleClassName(static::$className).'->'.$methodCall->name.'()  from: '.$this->getScopeDescription($scope).'  shall return: '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
+        $returnDescribe = $returnType->describe();
+
+        if (0 || $error) echoPre('call of: '.simpleClassName(static::$className).'->'.$methodCall->name.'()  from: '.$this->getScopeDescription($scope).'  shall return: '.$returnDescribe.($returnDescribe==$origReturnDescribe ? ' (pass through)':''));
         return $returnType;
     }
 
 
     /**
-     * Resolve the return type of a static call to PersistableObject::dao().
+     * Resolve the return type of static calls to {@link PersistableObject::dao()}.
      *
      * @return Type
      */
     public function getTypeFromStaticMethodCall(MethodReflection $methodReflection, StaticCall $methodCall, Scope $scope) : Type {
-        $returnType  = $methodReflection->getReturnType();
-        $returnClass = $origReturnClass = $returnType->getClass();
+        $returnType = $methodReflection->getReturnType();
+        $origReturnDescribe = $returnType->describe();
         $error = false;
 
-        if ($methodCall->class instanceof Name) {
-            $name = $methodCall->class;
-            if ($name->isFullyQualified()) {
-                $returnClass = $name.'DAO';
-                $returnType  = new ObjectType($returnClass);
-            }
-            else if ((string)$name == 'self') {
-                $scopeName = $scope->getClassReflection()->getName();
-                if ($scopeName != static::$className) {
-                    $returnClass = $scopeName.'DAO';
-                    $returnType  = new ObjectType($returnClass);
+        if ($returnType instanceof ObjectType) {
+            if ($methodCall->class instanceof Name) {
+                $name = $methodCall->class;
+                if ($name->isFullyQualified()) {
+                    $returnType = new ObjectType($name.'DAO');
                 }
-            } else $error = true(echoPre('(1) '.simpleClassName(static::$className).'::'.$methodCall->name.'() cannot resolve callee of static method call: name "'.$name.'"'));
-        } else     $error = true(echoPre('(2) '.simpleClassName(static::$className).'::'.$methodCall->name.'() cannot resolve callee of static method call: class($methodCall->class) = '.get_class($methodCall->class)));
+                else if ((string)$name == 'self') {
+                    $class = $scope->getClassReflection()->getName();
+                    if ($class != static::$className)                                       // skip self-referencing calls
+                        $returnType = new ObjectType($class.'DAO');
+                } else $error = true(echoPre('(1) '.simpleClassName(static::$className).'::'.$methodCall->name.'() cannot resolve callee of static method call: name "'.$name.'"'));
+            } else     $error = true(echoPre('(2) '.simpleClassName(static::$className).'::'.$methodCall->name.'() cannot resolve callee of static method call: class($methodCall->class) = '.get_class($methodCall->class)));
+        } else         $error = true(echoPre('(3) '.simpleClassName(static::$className).'::'.$methodCall->name.'() encountered unexpected return type: '.get_class($returnType).' => '.$returnType->describe()));
 
-        if (0 || $error) echoPre('call of: '.simpleClassName(static::$className).'::'.$methodCall->name.'()  from: '.$this->getScopeDescription($scope).'  shall return: '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
+        $returnDescribe = $returnType->describe();
+
+        if (0 || $error) echoPre('call of: '.simpleClassName(static::$className).'::'.$methodCall->name.'()  from: '.$this->getScopeDescription($scope).'  shall return: '.$returnDescribe.($returnDescribe==$origReturnDescribe ? ' (pass through)':''));
         return $returnType;
     }
 }
