@@ -27,7 +27,7 @@ abstract class DynamicReturnType extends Object {
      *
      * @return string
      */
-    public static function getClass() : string {
+    public function getClass() : string {
         if (!static::$className) throw new RuntimeException('The class property '.static::class.'::$className must be defined.');
         return static::$className;
     }

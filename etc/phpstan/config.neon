@@ -17,7 +17,7 @@ parameters:
         - .settings/
         - etc/httpd/
         - etc/js/
-        - etc/phpstan-0.9/
+        - etc/phpstan/
         - etc/vendor/
         - src/globals.php
 
@@ -31,7 +31,8 @@ parameters:
     ignoreErrors:
         # intentionally ignore the following issues
         - '/Call to ((static )?method|function) [^ ]+\(\) with incorrect case:/'                                    # Ever heared of naming standards?
-        - '/Array \(([^ ]+)\[\]\) does not accept (\1\|)?null\b/'                                                   # NULL is a value (not a type) and always valid.
+        - '/Array \( ([^ ]+)\[\] \) does not accept (\1\|)?null\b/'                                                 # NULL is a value (not a type) and always valid.
+        - '/Array \(array<([^ ]+)>\) does not accept (\1\|)?null\b/'                                                # - dito -
         - '/(Static )?property [^ ]+ \(([^ ]+)\) does not accept (\2\|)?null\b/i'                                   # - dito -
         - '/Property [^ ]+ \([^ ]+\[\]\) does not accept default value of type null\[\]/i'                          # - dito -
         - '/Parameter #[0-9]+ [^ ]+ of class [^ ]+ constructor expects ([^ ]+), (\1\|)?null given\b/'               # - dito -
@@ -40,12 +41,15 @@ parameters:
         - "/Casting to (bool|int|float|string) something that's already (bool|int|float|string)/"                   # PHPStan ignores non-initialized vars
         - '/Strict comparison using [=!]== between (int|string) and null will always evaluate to (true|false)\b/'
 
-        # false positives since v0.8+
+        # false positives since v0.8
         - '/Method rosasurfer\\db\\orm\\meta\\EntityMapping::getVersion\(\) should return rosasurfer\\db\\orm\\meta\\PropertyMapping\|null but returns bool\|rosasurfer\\db\\orm\\meta\\PropertyMapping\|null\b/'
 
-        # false positives since v0.8.3+
+        # false positives since v0.8.3
         - '/Method rosasurfer\\db\\orm\\PersistableObject::getRelationValue\(\) should return rosasurfer\\db\\orm\\PersistableObject\[\]\|rosasurfer\\db\\orm\\PersistableObject\|null but returns rosasurfer\\db\\orm\\PersistableObject\[\]\|bool\|float\|int\|rosasurfer\\db\\orm\\PersistableObject\|string\|null\b/'
         - '/Parameter #1 \$value of method rosasurfer\\db\\orm\\DAO::escapeLiteral\(\) expects bool\|float\|int\|string, rosasurfer\\db\\orm\\PersistableObject\[\]\|bool\|float\|int\|rosasurfer\\db\\orm\\PersistableObject\|string given\b/'
+        
+        # false positives since v0.9
+        - '/PHPDoc tag @param for parameter \$[^ ]+ with type array(<[^ |]+(\|[^ |]+)?>)? is not subtype of native type array<int, mixed>/'
 
 
 services:

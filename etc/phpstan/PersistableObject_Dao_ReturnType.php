@@ -47,7 +47,7 @@ class PersistableObject_Dao_ReturnType extends DynamicReturnType implements Dyna
         if ($returnType instanceof ObjectType) {
             if ($methodCall->var instanceof Variable) {
                 $scopedType = $scope->getType($methodCall->var);
-                $class = $scopedType instanceof StaticType ? $scopedType->getClass() : $scopedType->describe();
+                $class = $scopedType instanceof StaticType ? $scopedType->getBaseClass() : $scopedType->describe();
                 if ($class != static::$className)                                           // skip self-referencing calls
                     $returnType = new ObjectType($class.'DAO');
             } else $error = true(echoPre('(1) '.simpleClassName(static::$className).'->'.$methodCall->name.'() cannot resolve callee of instance method call: class($methodCall->var) = '.get_class($methodCall->var)));
