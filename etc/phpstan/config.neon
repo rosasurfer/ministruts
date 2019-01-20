@@ -1,5 +1,5 @@
 #
-# alias phpstan='php7 -d memory_limit=256M -d short_open_tag=On /path/to/phpstan/bin/phpstan --ansi'
+# alias phpstan='php7 -d memory_limit=256M -d short_open_tag=On /path/to/phpstan/bin/phpstan'
 #
 # phpstan analyse -a etc/phpstan/autoload.php -c etc/phpstan/config.neon --level=0..7 [--] <path>
 #
@@ -17,6 +17,7 @@ parameters:
         - .settings/
         - etc/httpd/
         - etc/js/
+        - etc/phpstan-0.9/
         - etc/vendor/
         - src/globals.php
 
@@ -43,9 +44,9 @@ parameters:
         - '/Method rosasurfer\\db\\orm\\meta\\EntityMapping::getVersion\(\) should return rosasurfer\\db\\orm\\meta\\PropertyMapping\|null but returns bool\|rosasurfer\\db\\orm\\meta\\PropertyMapping\|null\b/'
 
         # false positives since v0.8.3+
-        - '/Method rosasurfer\\db\\orm\\PersistableObject::getRelationValue\(\) should return rosasurfer\\db\\orm\\PersistableObject\[\]\|rosasurfer\\db\\orm\\PersistableObject\|null but returns rosasurfer\\db\\orm\\PersistableObject\[\]\|bool\|float\|int\|rosasurfer\\db\\orm\\PersistableObject\|string\|null\b/'       
-        - '/Parameter #1 \$value of method rosasurfer\\db\\orm\\DAO::escapeLiteral\(\) expects bool\|float\|int\|string, rosasurfer\\db\\orm\\PersistableObject\[\]\|bool\|float\|int\|rosasurfer\\db\\orm\\PersistableObject\|string given\b/'                                                                             
-        
+        - '/Method rosasurfer\\db\\orm\\PersistableObject::getRelationValue\(\) should return rosasurfer\\db\\orm\\PersistableObject\[\]\|rosasurfer\\db\\orm\\PersistableObject\|null but returns rosasurfer\\db\\orm\\PersistableObject\[\]\|bool\|float\|int\|rosasurfer\\db\\orm\\PersistableObject\|string\|null\b/'
+        - '/Parameter #1 \$value of method rosasurfer\\db\\orm\\DAO::escapeLiteral\(\) expects bool\|float\|int\|string, rosasurfer\\db\\orm\\PersistableObject\[\]\|bool\|float\|int\|rosasurfer\\db\\orm\\PersistableObject\|string given\b/'
+
 
 services:
         # service classes must be loaded via etc/phpstan/autoload.php
@@ -54,6 +55,7 @@ services:
         class: rosasurfer\phpstan\DAO_Find_ReturnType
         tags:
             - phpstan.broker.dynamicMethodReturnTypeExtension
+            - phpstan.broker.dynamicStaticMethodReturnTypeExtension
     -
         class: rosasurfer\phpstan\DAO_FindAll_ReturnType
         tags:
@@ -65,12 +67,6 @@ services:
             - phpstan.broker.dynamicMethodReturnTypeExtension
             - phpstan.broker.dynamicStaticMethodReturnTypeExtension
     -
-        class: rosasurfer\phpstan\PersistableObject_PopulateNew_ReturnType
-        tags:
-            - phpstan.broker.dynamicMethodReturnTypeExtension
-            - phpstan.broker.dynamicStaticMethodReturnTypeExtension
-    -
         class: rosasurfer\phpstan\Singleton_GetInstance_ReturnType
         tags:
-            - phpstan.broker.dynamicMethodReturnTypeExtension
             - phpstan.broker.dynamicStaticMethodReturnTypeExtension

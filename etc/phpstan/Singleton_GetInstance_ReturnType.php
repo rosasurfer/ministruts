@@ -13,13 +13,10 @@ use PhpParser\Node\Scalar\String_;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
 use PHPStan\Type\DynamicStaticMethodReturnTypeExtension;
-use PHPStan\Type\DynamicMethodReturnTypeExtension;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
 
 use rosasurfer\core\Singleton;
-use rosasurfer\db\orm\DAO;
-use rosasurfer\db\orm\PersistableObject;
 
 use function rosasurfer\echoPre;
 use function rosasurfer\simpleClassName;
@@ -29,8 +26,7 @@ use function rosasurfer\true;
 /**
  *
  */
-class Singleton_GetInstance_ReturnType extends DynamicReturnType implements DynamicMethodReturnTypeExtension,
-                                                                            DynamicStaticMethodReturnTypeExtension {
+class Singleton_GetInstance_ReturnType extends DynamicReturnType implements DynamicStaticMethodReturnTypeExtension {
 
     /** @var string */
     protected static $className = Singleton::class;
@@ -40,58 +36,41 @@ class Singleton_GetInstance_ReturnType extends DynamicReturnType implements Dyna
 
 
     /**
-     * Resolve the return type of an instance call to Singleton->getInstance().
-     *
-     * @return Type
-     */
-    public function getTypeFromMethodCall(MethodReflection $methodReflection, MethodCall $methodCall, Scope $scope) : Type {
-        $returnType  = $methodReflection->getReturnType();
-        $returnClass = $origReturnClass = $returnType->getClass();
-        $error = false;
-
-        if (0 || $error) echoPre('call of: '.simpleClassName(static::$className).'->'.$methodCall->name.'()  from: '.$this->getScopeDescription($scope).'  shall return: '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
-        return $returnType;
-    }
-
-
-    /**
-     * Resolve the return type of a static call to Singleton::getInstance().
+     * Resolve the return type of static calls to {@link Singleton::getInstance()}.
      *
      * @return Type
      */
     public function getTypeFromStaticMethodCall(MethodReflection $methodReflection, StaticCall $methodCall, Scope $scope) : Type {
-        $returnType  = $methodReflection->getReturnType();
-        $returnClass = $origReturnClass = $returnType->getClass();
+        $returnType = $methodReflection->getReturnType();
+        $origReturnDescribe = $returnType->describe();
         $error = false;
 
-        if (sizeOf($methodCall->args)) {
-            $arg = $methodCall->args[0]->value;
+        if ($returnType instanceof ObjectType) {
+            if ($args = $methodCall->args) {
+                $arg = $args[0]->value;
 
-            if ($arg instanceof String_) {
-                $returnClass = $arg->value;
-                $returnType  = new ObjectType($returnClass);
-            }
-            else if ($arg instanceof ClassConstFetch) {
-                if ($class = $this->classConstFetchToStr($arg, $scope)) {
-                    $returnClass = $class;
-                    $returnType  = new ObjectType($returnClass);
+                // check for a constant class name parameter
+                if ($arg instanceof String_) {                                      // constant
+                    $returnType = new ObjectType($arg->value);
                 }
-                else $error = true(echoPre('(1) '.simpleClassName(static::$className).'::'.$methodCall->name.'() cannot resolve class constant "'.$arg->class.'::'.$arg->name.'"'));
-            }
-            else if ($arg instanceof BinaryOp) {
-                if ($class = $this->binaryOpToStr($arg, $scope)) {
-                    if ($class == PersistableObject::class.'DAO') $class = DAO::class;
-                    $returnClass = $class;
-                    $returnType  = new ObjectType($returnClass);
+                else if ($arg instanceof ClassConstFetch) {                         // constant
+                    if ($class = $this->classConstFetchToStr($arg, $scope)) {
+                        $returnType = new ObjectType($class);
+                    } else $error = true(echoPre('(1) '.simpleClassName(static::$className).'::'.$methodCall->name.'() cannot resolve class constant "'.$arg->class.'::'.$arg->name.'"'));
                 }
-                else $error = true(echoPre('(2) '.simpleClassName(static::$className).'::'.$methodCall->name.'() cannot convert binary operator argument to string: '.get_class($arg)));
-            }
-            else if ($arg instanceof Variable) {
-                     $error = true(echoPre('(3) '.simpleClassName(static::$className).'::'.$methodCall->name.'() cannot resolve variable "'.$arg->name.'"'));
-            } else   $error = true(echoPre('(4) '.simpleClassName(static::$className).'::'.$methodCall->name.'() cannot resolve argument: '.get_class($arg)));
-        }
+                else if ($arg instanceof BinaryOp) {                                // constant
+                    if ($class = $this->binaryOpToStr($arg, $scope)) {
+                        $returnType = new ObjectType($class);
+                    } else $error = true(echoPre('(2) '.simpleClassName(static::$className).'::'.$methodCall->name.'() cannot convert binary operator argument to string: '.get_class($arg)));
+                }
+                else if ($arg instanceof Variable) {                                // variables can only be resolved at runtime:
+                } else $error = true(echoPre('(3) '.simpleClassName(static::$className).'::'.$methodCall->name.'() cannot resolve argument type: '.get_class($arg)));
+            } else     $error = true(echoPre('(4) '.simpleClassName(static::$className).'::'.$methodCall->name.'() cannot find class name argument: sizeof($args) = 0'));
+        } else         $error = true(echoPre('(5) '.simpleClassName(static::$className).'::'.$methodCall->name.'() encountered unexpected return type: '.get_class($returnType).' => '.$returnType->describe()));
 
-        if (0 || $error) echoPre('call of: '.simpleClassName(static::$className).'::'.$methodCall->name.'()  from: '.$this->getScopeDescription($scope).'  shall return: '.$returnClass.($returnClass==$origReturnClass ? ' (pass through)':''));
+        $returnDescribe = $returnType->describe();
+
+        if (0 || $error) echoPre('call of: '.simpleClassName(static::$className).'::'.$methodCall->name.'()  from: '.$this->getScopeDescription($scope).'  shall return: '.$returnDescribe.($returnDescribe==$origReturnDescribe ? ' (pass through)':''));
         return $returnType;
     }
 
@@ -105,10 +84,8 @@ class Singleton_GetInstance_ReturnType extends DynamicReturnType implements Dyna
 
         if (!$left || !$right)
             return null;
-
         if ($op instanceof Concat)
             return $left.$right;
-
         return null;
     }
 
@@ -135,10 +112,8 @@ class Singleton_GetInstance_ReturnType extends DynamicReturnType implements Dyna
     private function exprToStr(Expr $expr, Scope $scope) {
         if ($expr instanceof String_)
             return $expr->value;
-
         if ($expr instanceof ClassConstFetch)
             return $this->classConstFetchToStr($expr, $scope);
-
         return null;
     }
 }
