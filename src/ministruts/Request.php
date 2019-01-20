@@ -597,7 +597,7 @@ class Request extends Singleton {
      * @return HttpSession
      */
     public function getSession($suppressHeadersAlreadySentError = false) {
-        return Singleton::getInstance(HttpSession::class, $this, $suppressHeadersAlreadySentError);
+        return HttpSession::me($this, $suppressHeadersAlreadySentError);
     }
 
 

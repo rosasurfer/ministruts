@@ -2,7 +2,6 @@
 namespace rosasurfer\db\orm;
 
 use rosasurfer\core\Object;
-use rosasurfer\core\Singleton;
 use rosasurfer\db\ConnectorInterface as IConnector;
 use rosasurfer\exception\ConcurrentModificationException;
 use rosasurfer\exception\IllegalAccessException;
@@ -668,21 +667,21 @@ abstract class PersistableObject extends Object {
 
     /**
      * Create a new instance and populate it with the specified properties. This method is called by the ORM to transform
-     * records originating from database queries to instances of the respective entity class.
+     * database query result records to instances of the respective entity class.
      *
      * @param  string $class - entity class name
-     * @param  array  $row   - array with property values (typically a row from a database table)
+     * @param  array  $row   - array with property values (a result row from a database query)
      *
-     * @return self|null
+     * @return self
      */
     public static function populateNew($class, array $row) {
-        if (static::class != __CLASS__) throw new IllegalAccessException('Cannot access method '.__METHOD__.'() from an entity class.');
+        if (static::class != __CLASS__)                  throw new IllegalAccessException('Cannot access method '.__METHOD__.'() on a derived class.');
+        if (!is_a($class, __CLASS__, $allowString=true)) throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
 
         /** @var self $object */
         $object = new $class();
-        if (!$object instanceof self) throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
-
-        return $object->populate($row);
+        $object->populate($row);
+        return $object;
     }
 
 
@@ -832,7 +831,7 @@ abstract class PersistableObject extends Object {
      */
     public static function dao() {
         if (static::class == __CLASS__) throw new IllegalAccessException('Use an entity class to access method '.__METHOD__.'()');
-        return Singleton::getInstance(static::class.'DAO');
+        return DAO::getImplementation(static::class.'DAO');
         // TODO: The calling class may be a derived class with the entity class being one of its parents.
     }
 

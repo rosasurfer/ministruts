@@ -23,49 +23,46 @@ abstract class Singleton extends Object {
     /**
      * Non-public constructor.
      *
-     * Prevents instantiation from outside and forces the use of getInstance().
+     * Prevents instantiation from outside and forces the use of {@link Singleton::getInstance()}.
      */
     protected function __construct() {}
 
 
     /**
-     * Factory method for a Singleton instance of the specified class.
+     * Factory method for a {@link Singleton} instance of the specified class.
      *
-     * @param  string $class - class name
-     * @param  ...           - variable number of arguments passed to class constructor
+     * @param  string $class  - class name
+     * @param  mixed  $params - variable list of constructor parameters
      *
      * @return self
      */
-    final public static function getInstance($class/*, ...*/) {
+    final protected static function getInstance($class, ...$params) {
         if (isSet(self::$instances[$class]))
             return self::$instances[$class];
 
-        // set a marker to prevent recursive method invocation for the same class name
+        // set a marker to detect recursive method invocations
         static $currentCreations;
-        if (isSet($currentCreations[$class])) throw new RuntimeException('Recursive call to '.__METHOD__.'('.$class.') detected');
+        if (isSet($currentCreations[$class])) throw new RuntimeException('Detected recursive call of '.__METHOD__.'('.$class.')');
         $currentCreations[$class] = true;
 
-        // check the class (omitting this check can cause an uncatchable fatal error)
-        if (!is_class($class)) throw new ClassNotFoundException('Class not found: '.$class );
+        // check validity of the passed class (omitting this check can cause an uncatchable fatal error)
+        if (!is_a($class, __CLASS__, $allowString=true)) {
+            if (!is_class($class)) throw new ClassNotFoundException('Class not found: '.$class );
+            throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
+        }
 
-        // get constructor arguments (if any)
-        $args = func_get_args();
-        \array_shift($args);
+        // instantiate the class with the passed parameters
+        self::$instances[$class] = new $class(...$params);
 
-        // unpack the arguments into the constructor
-        $instance = new $class(...$args);
-        if (!$instance instanceof self) throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
-        self::$instances[$class] = $instance;
-
-        // reset the marker preventing recursive method invocation
+        // reset the marker for detecting recursive method invocations
         unset($currentCreations[$class]);
 
-        return $instance;
+        return self::$instances[$class];
     }
 
 
     /**
-     * Prevent cloning of Singleton instances.
+     * Prevent cloning of {@link Singleton} instances.
      */
     final private function __clone() {}
 }
