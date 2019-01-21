@@ -269,8 +269,8 @@ class Config extends Object implements IConfig {
     /**
      * Look-up a property and return its value.
      *
-     * @param  string  $key      - property key
-     * @param  bool   &$notFound - flag indicating whether or not the property was found
+     * @param  string $key      - property key
+     * @param  bool   $notFound - reference to a flag indicating whether or not the property was found
      *
      * @return mixed - Property value (including NULL) or NULL if no such property was found. If NULL is returned the flag
      *                 $notFound must be checked to find out whether or not the property was not found.
@@ -491,9 +491,9 @@ class Config extends Object implements IConfig {
     /**
      * Dump the tree structure of a node into a flat format and return it.
      *
-     * @param  __In__  string[] $node
-     * @param  __In__  array    $values
-     * @param  __Out__ int     &$maxKeyLength
+     * @param  string[] $node         [in ]
+     * @param  array    $values       [in ]
+     * @param  int      $maxKeyLength [out]
      *
      * @return array
      */

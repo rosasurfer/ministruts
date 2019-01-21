@@ -187,12 +187,12 @@ function array_keys($array, $search=null, $strict=false) {
  *
  * Complement of PHP's <tt>array_merge()</tt> function adding support for {@link \Traversable} implementations.
  *
- * @param  array|\Traversable $values
- * @param  array|\Traversable $...
+ * @param  array|\Traversable        $array1
+ * @param  array<array|\Traversable> $arrays
  *
  * @return array
  */
-function array_merge($values) {
+function array_merge($array1, ...$arrays) {
     $args = func_get_args();
     foreach ($args as $key => $arg) {
         if ($arg instanceof \Traversable)
@@ -337,8 +337,8 @@ function pp($var, $return=false, $flushBuffers=true) {
  */
 function printPretty($var, $return=false, $flushBuffers=true) {
     if (is_object($var) && method_exists($var, '__toString') && !$var instanceof \SimpleXMLElement) {
-        $str = (string) $var->__toString();         // calling __toString() manually prevents possible error
-    }                                               // "Method __toString() must return a string value"
+        $str = (string) $var;
+    }
     elseif (is_object($var) || is_array($var)) {
         $str = print_r($var, true);
     }
@@ -795,12 +795,9 @@ function strEndsWithI($string, $suffix) {
  * </pre>
  */
 function strLeft($string, $length) {
-    if (!is_int($length))         throw new IllegalTypeException('Illegal type of parameter $length: '.getType($length));
-    if ($string === null)
-        return '';
-    if (is_int($string))
-        $string = (string)$string;
-    elseif (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+    if (!isSet($string))     return '';
+    if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+    if (!is_int($length))    throw new IllegalTypeException('Illegal type of parameter $length: '.getType($length));
 
     return subStr($string, 0, $length);
 }
@@ -894,12 +891,9 @@ function strLeftTo($string, $limiter, $count=1, $includeLimiter=false, $onNotFou
  * </pre>
  */
 function strRight($string, $length) {
-    if (!is_int($length))        throw new IllegalTypeException('Illegal type of parameter $length: '.getType($length));
-    if ($string === null)
-        return '';
-    if (is_int($string))
-        $string = (string)$string;
-    elseif (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+    if (!isSet($string))     return '';
+    if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+    if (!is_int($length))    throw new IllegalTypeException('Illegal type of parameter $length: '.getType($length));
 
     if ($length == 0)
         return '';
@@ -1043,7 +1037,7 @@ function strIsDigits($value) {
  * built-in PHP function is_numeric() this function returns FALSE if the string begins with non-numerical characters
  * (e.g. white space).
  *
- * @param  string $value
+ * @param  scalar $value
  *
  * @return bool
  */
@@ -1122,15 +1116,16 @@ function strCollapseWhiteSpace($string, $joinLines=true, $separator=' ') {
  * (no mixed mode).
  *
  * @param  string $string          - string to normalize
- * @param  string $mode [optional] - format of the resulting string, can be one of:<br>
- *                                   EOL_MAC:      line endings are converted to Mac format      "\r"<br>
- *                                   EOL_NETSCAPE: line endings are converted to Netscape format "\r\r\n"<br>
- *                                   EOL_UNIX:     line endings are converted to Unix format     "\n" (default)<br>
- *                                   EOL_WINDOWS:  line endings are converted to Windows format  "\r\n"
+ * @param  string $mode [optional] - format of the resulting string, can be one of:                                      <br>
+ *                                   EOL_MAC:      line endings are converted to Mac format      "\r"                    <br>
+ *                                   EOL_NETSCAPE: line endings are converted to Netscape format "\r\r\n"                <br>
+ *                                   EOL_UNIX:     line endings are converted to Unix format     "\n" (default)          <br>
+ *                                   EOL_WINDOWS:  line endings are converted to Windows format  "\r\n"                  <br>
  * @return string
  */
 function normalizeEOL($string, $mode = EOL_UNIX) {
     if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.getType($string));
+    if (!is_string($mode))   throw new IllegalTypeException('Illegal type of parameter $mode: '.getType($mode));
 
     $done = false;
 
@@ -1150,7 +1145,7 @@ function normalizeEOL($string, $mode = EOL_UNIX) {
         $string = str_replace(EOL_UNIX, $mode, $string);
     }
     else if ($mode !== EOL_UNIX) {
-        throw new InvalidArgumentException('Invalid parameter $mode: '.is_array($mode) ? 'array':$mode);
+        throw new InvalidArgumentException('Invalid parameter $mode: "'.$mode.'"');
     }
     return $string;
 }

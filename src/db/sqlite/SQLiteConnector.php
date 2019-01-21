@@ -476,7 +476,7 @@ class SQLiteConnector extends Connector {
      * @return string - e.g. "3.5.9-rc"
      */
     public function getVersionString() {
-        if (is_null($this->versionString)) {
+        if (!isSet($this->versionString)) {
             if (!$this->isConnected())
                 $this->connect();
             $this->versionString = $this->sqlite->version()['versionString'];
@@ -491,7 +491,7 @@ class SQLiteConnector extends Connector {
      * @return int - e.g. 3005009 for version string "3.5.9-rc"
      */
     public function getVersionNumber() {
-        if (is_null($this->versionNumber)) {
+        if (!isSet($this->versionNumber)) {
             if (!$this->isConnected())
                 $this->connect();
             $this->versionNumber = $this->sqlite->version()['versionNumber'];

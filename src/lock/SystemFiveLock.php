@@ -32,7 +32,7 @@ class SystemFiveLock extends BaseLock {
     private static $logNotice;
 
     /** @var resource[] - semaphore handles */
-    private static $hSemaphores;
+    private static $hSemaphores = [];
 
     /** @var string */
     private $key;
@@ -56,8 +56,8 @@ class SystemFiveLock extends BaseLock {
      *                          existiert
      */
     public function __construct($key) {
-        if (!is_string($key))                     throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
-        if (key_exists($key, self::$hSemaphores)) throw new RuntimeException('Dead-lock detected: already holding a lock for key "'.$key.'"');
+        if (!is_string($key))                      throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
+        if (\key_exists($key, self::$hSemaphores)) throw new RuntimeException('Dead-lock detected: already holding a lock for key "'.$key.'"');
         self::$hSemaphores[$key] = null;
 
         $loglevel        = Logger::getLogLevel(__CLASS__);

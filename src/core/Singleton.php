@@ -32,7 +32,7 @@ abstract class Singleton extends Object {
      * Factory method for a {@link Singleton} instance of the specified class.
      *
      * @param  string $class  - class name
-     * @param  mixed  $params - variable list of constructor parameters
+     * @param  array  $params - variable list of constructor parameters
      *
      * @return self
      */

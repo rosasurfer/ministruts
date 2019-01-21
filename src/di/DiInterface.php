@@ -27,8 +27,8 @@ interface DiInterface extends \ArrayAccess {
      * Resolve a named service and return its implementation. This method uses the factory pattern and always returns
      * a new instance.
      *
-     * @param  string $name
-     * @param  mixed  $params - variable list of custom parameters
+     * @param  string  $name
+     * @param  array   $params - variable list of custom parameters
      *
      * @return object
      */

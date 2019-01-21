@@ -177,7 +177,7 @@ class ActionForward extends Object {
     /**
      * Set the forward's redirect type.
      *
-     * @param  int type - HTTP status type
+     * @param  int $type - HTTP status type
      *
      * @return $this
      */
@@ -198,11 +198,10 @@ class ActionForward extends Object {
      * @return $this
      */
     public function addQueryData($key, $value) {
-
         // TODO: freeze the instance after configuration and automatically call copy()
 
         if (!is_string($key))       throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
-        if (is_null($value))        $value = '';
+        if (!isSet($value))         $value = '';
         elseif (is_bool($value))    $value = (int) $value;
         elseif (!is_scalar($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
 
@@ -220,17 +219,17 @@ class ActionForward extends Object {
     /**
      * Set the hash fragment of the forward's URL.
      *
-     * @param  string $value - hash value
+     * @param  scalar $value - hash value
      *
      * @return $this
      */
     public function setHash($value) {
-
         // TODO: freeze the instance after configuration and automatically call copy()
 
         if (isSet($value)) {
-            if     (is_bool($value))    $value = (int) $value;
-            elseif (!is_scalar($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
+            if (!is_scalar($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
+            if (is_bool($value))
+                $value = (int) $value;
         }
         $value = (string) $value;
         $path = $this->getPath();

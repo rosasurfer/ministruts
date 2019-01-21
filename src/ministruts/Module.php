@@ -155,8 +155,8 @@ class Module extends Object {
     /**
      * Setzt den Prefix des Modules.
      *
-     * @param  string prefix - the prefix of the root module is an empty string;
-     *                         the prefix of non-root modules must not start but end with a slash "/"
+     * @param  string $prefix - the prefix of the root module is an empty string;
+     *                          the prefix of non-root modules must not start but must end with a slash "/"
      *
      * @throws StrutsConfigException on configuration errors
      */
@@ -625,7 +625,7 @@ class Module extends Object {
 
         // attribute "file" %ResourcePath; #IMPLIED
         if (is_string($file)) {
-            if (is_string($extends) || is_string($alias)) throw new StrutsConfigException('<tile name="'.$name.'": Only one of "file", "extends" or "alias" can be specified.');
+            if (is_string($extends)) throw new StrutsConfigException('<tile name="'.$name.'": Only one of "file", "extends" or "alias" can be specified.');
 
             /** @var string $filePath */
             $filePath = $this->findFile($file);
@@ -639,8 +639,6 @@ class Module extends Object {
 
         // attribute "extends" %LogicalName; #IMPLIED
         else  {
-            if (is_string($file) || is_string($alias)) throw new StrutsConfigException('<tile name="'.$name.'": Only one of "file", "extends" or "alias" can be specified.');
-
             $extended = $this->getTile($extends, $xml);
             $tile = clone $extended;                            // clone the extended tile
             $tile->setName($name);
@@ -648,7 +646,6 @@ class Module extends Object {
 
         // attribute "push" %Boolean; "false"
         if (is_string($push)) {
-            if (is_string($alias)) throw new StrutsConfigException('<tile name="'.$name.'" alias="'.$alias.'" push="'.$push.'": The "alias" and "push" attributes cannot be combined.');
             $tile->setPushModelSupport($push == 'true');
         }
 
