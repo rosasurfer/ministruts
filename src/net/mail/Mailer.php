@@ -154,8 +154,8 @@ abstract class Mailer extends Object implements MailerInterface {
      * Remove a given header from the array and return its value. If the array contains multiple headers of that name all
      * such headers are removed and the last removed one is returned.
      *
-     * @param  string[] &$headers - array of headers
-     * @param  string    $name    - header to remove
+     * @param  string[] $headers - reference to an array of headers
+     * @param  string   $name    - header to remove
      *
      * @return string|null - value of the last removed header or NULL if the header was not found
      */
@@ -178,20 +178,25 @@ abstract class Mailer extends Object implements MailerInterface {
     /**
      * Encode non-ASCII characters with UTF-8. If a string doesn't contain non-ASCII characters it is not modified.
      *
-     * @param  string|string[] $value - value(s)
+     * @param  string|string[] $value - a single or a list of values
      *
-     * @return string|string[] - encoded value(s)
+     * @return string|string[] - a single or a list of encoded values
      */
     protected function encodeNonAsciiChars($value) {
         if (is_array($value)) {
+            /** @var string[] */
+            $result = [];
             foreach ($value as $k => $v) {
-                $value[$k] = $this->{__FUNCTION__}($v);
+                $result[$k] = $this->{__FUNCTION__}($v);
             }
+            return $result;
         }
-        elseif (preg_match('/[\x80-\xFF]/', $value)) {
-            $value = '=?utf-8?B?'.base64_encode($value).'?=';
+
+        if (preg_match('/[\x80-\xFF]/', $value)) {
+            return '=?utf-8?B?'.base64_encode($value).'?=';
           //$value = '=?utf-8?Q?'.imap_8bit($value).'?=';       // requires imap extension and the encoded string is longer
         }
+        return $value;
 
         // TODO: see https://tools.ietf.org/html/rfc1522
         //
@@ -204,7 +209,5 @@ abstract class Mailer extends Object implements MailerInterface {
         // While there is no limit to the length of a multiple-line header
         // field, each line of a header field that contains one or more
         // encoded-words is limited to 76 characters.
-
-        return $value;
     }
 }

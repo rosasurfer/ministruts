@@ -182,7 +182,7 @@ class ActionMapping extends Object {
     /**
      * Set the mapping's role restrictions.
      *
-     * @param  string - role expression
+     * @param  string $roles - role expression
      *
      * @return $this
      *

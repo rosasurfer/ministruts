@@ -46,7 +46,8 @@ abstract class Result extends Object implements ResultInterface {
      * {@inheritdoc}
      */
     public function fetchColumn($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
-        if (isSet($row)) throw new UnimplementedFeatureException('$row='.$row.' (!= NULL)');
+        if (!isSet($column)) throw new IllegalTypeException('Illegal type of parameter $column: '.getType($column));
+        if (isSet($row))     throw new UnimplementedFeatureException('$row='.$row.' (!= NULL)');
 
         // Generic default implementation:
         // A connector-specific implementation will be faster and more efficient.
@@ -58,20 +59,15 @@ abstract class Result extends Object implements ResultInterface {
             return $onNoMoreRows;
         }
 
-        if ($column===0 || is_null($column)) {
-            $value = $row[0];
-        }
-        else {
-            if (!\key_exists($column, $row)) {
-                if (is_int($column))     throw new InvalidArgumentException('Invalid $column: '.$column.' (no such column)');
-                if (!is_string($column)) throw new IllegalTypeException('Illegal type of parameter $column: '.getType($column));
+        if (!\key_exists($column, $row)) {
+            if (is_int($column))     throw new InvalidArgumentException('Invalid parameter $column: '.$column.' (no such column)');
+            if (!is_string($column)) throw new IllegalTypeException('Illegal type of parameter $column: '.getType($column));
 
-                $row    = \array_change_key_case($row, CASE_LOWER);
-                $column = strToLower($column);
-                if (!\key_exists($column, $row)) throw new InvalidArgumentException('Invalid $column: "'.$column.'" (no such column)');
-            }
-            $value = $row[$column];
+            $row    = \array_change_key_case($row, CASE_LOWER);
+            $column = strToLower($column);
+            if (!\key_exists($column, $row)) throw new InvalidArgumentException('Invalid parameter $column: "'.$column.'" (no such column)');
         }
+        $value = $row[$column];
 
         if (is_null($value))
             return $onNull;

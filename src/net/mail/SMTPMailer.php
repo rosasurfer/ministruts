@@ -311,7 +311,7 @@ class SMTPMailer extends Mailer {
         foreach ($lines as $line) {
 
             // wrap long lines into several shorter ones
-            $pieces = null;
+            $pieces = [];
             while (strLen($line) > $maxLineLength) {
                 $pos = strRPos(subStr($line, 0, $maxLineLength), ' ');
                 if (!$pos)

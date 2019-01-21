@@ -214,22 +214,17 @@ class HttpSession extends Singleton {
     /**
      * Delete session values stored under the specified key(s).
      *
-     * @param  string|array $key - single session key or array of session keys of values to remove
-     * @param  ...               - variable length list of more keys
+     * @param  string|string[] $key - single session key or array of session keys of values to remove
      */
-    public function removeAttribute($key /*...*/) {
-        foreach (func_get_args() as $i => $key) {
-            if (is_array($key)) {
-                foreach ($key as $n => $arrayKey) {
-                    if (!is_string($arrayKey)) throw new IllegalTypeException('Illegal type of parameter '.$i.'['.$n.']: '.getType($arrayKey));
-                    unset($_SESSION[$arrayKey]);
-                }
-            }
-            else {
-                if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter '.$i.': '.getType($key));
-                unset($_SESSION[$key]);
+    public function removeAttribute($key) {
+        if (is_array($key)) {
+            foreach ($key as $k => $value) {
+                if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $key['.$k.']: '.getType($value));
+                unset($_SESSION[$value]);
             }
         }
+        else if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
+        unset($_SESSION[$key]);
     }
 
 

@@ -12,6 +12,7 @@ use PHPStan\Type\ArrayType;
 use PHPStan\Type\DynamicMethodReturnTypeExtension;
 use PHPStan\Type\DynamicStaticMethodReturnTypeExtension;
 use PHPStan\Type\ObjectType;
+use PHPStan\Type\StaticType;
 use PHPStan\Type\Type;
 
 use rosasurfer\db\orm\DAO;
@@ -21,7 +22,6 @@ use function rosasurfer\simpleClassName;
 use function rosasurfer\strEndsWith;
 use function rosasurfer\strLeft;
 use function rosasurfer\true;
-use PHPStan\Type\StaticType;
 
 
 /**
@@ -53,16 +53,16 @@ class DAO_FindAll_ReturnType extends DynamicReturnType implements DynamicMethodR
                     /** @var Name $name */
                     $name = $methodCall->var->class;
                     if ($name->isFullyQualified()) {
-                        $returnType = new ArrayType(new ObjectType((string)$name));
+                        $returnType = $this->copyArrayType($returnType, new ObjectType((string)$name));
                     } else $error = true(echoPre('(1) '.simpleClassName(static::$className).'->'.$methodCall->name.'() cannot resolve callee of instance method call: class($methodCall->var->class) = '.get_class($methodCall->var->class).' (not fully qualified)'));
                 } else     $error = true(echoPre('(2) '.simpleClassName(static::$className).'->'.$methodCall->name.'() cannot resolve callee of instance method call: class($methodCall->var->class) = '.get_class($methodCall->var->class)));
             }
             else if ($methodCall->var instanceof Variable) {
                 $scopedType = $scope->getType($methodCall->var);
-                $class = $scopedType instanceof StaticType ? $scopedType->getClass() : $scopedType->describe();
+                $class = $scopedType instanceof StaticType ? $scopedType->getBaseClass() : $scopedType->describe();
                 if ($class != static::$className) {                                         // skip self-referencing calls
                     if (strEndsWith($class, 'DAO')) {
-                        $returnType = new ArrayType(new ObjectType(strLeft($class, -3)));
+                        $returnType = $this->copyArrayType($returnType, new ObjectType(strLeft($class, -3)));
                     } else $error = true(echoPre('(3) '.simpleClassName(static::$className).'->'.$methodCall->name.'() cannot resolve callee of instance method call: scoped type = '.get_class($scopedType).' => '.$scopedType->describe()));
                 }
             } else         $error = true(echoPre('(4) '.simpleClassName(static::$className).'->'.$methodCall->name.'() cannot resolve callee of instance method call: class($methodCall->var) = '.get_class($methodCall->var)));
@@ -92,7 +92,7 @@ class DAO_FindAll_ReturnType extends DynamicReturnType implements DynamicMethodR
                 if ((string)$name == 'parent') {
                     $scopeName = $scope->getClassReflection()->getName();
                     if (strEndsWith($scopeName, 'DAO')) {
-                        $returnType = new ArrayType(new ObjectType(strLeft($scopeName, -3)));
+                        $returnType = $this->copyArrayType($returnType, new ObjectType(strLeft($scopeName, -3)));
                     } else $error = true(echoPre('(1) '.simpleClassName(static::$className).'::'.$methodCall->name.'() encountered unexpected callee class name: '.$scopeName));
                 } else     $error = true(echoPre('(2) '.simpleClassName(static::$className).'::'.$methodCall->name.'() cannot resolve callee of static method call: name "'.$name.'"'));
             } else         $error = true(echoPre('(3) '.simpleClassName(static::$className).'::'.$methodCall->name.'() cannot resolve callee of static method call: class($methodCall->class) = '.get_class($methodCall->class)));
@@ -102,5 +102,20 @@ class DAO_FindAll_ReturnType extends DynamicReturnType implements DynamicMethodR
 
         if (0 || $error) echoPre('call of: '.simpleClassName(static::$className).'::'.$methodCall->name.'()  from: '.$this->getScopeDescription($scope).'  shall return: '.$returnDescribe.($returnDescribe==$origReturnDescribe ? ' (pass through)':''));
         return $returnType;
+    }
+
+
+    /**
+     * Copy an existing {@link ArrayType} and set a new item type.
+     *
+     * @return ArrayType
+     */
+    protected function copyArrayType(ArrayType $arrayType, ObjectType $itemType) : ArrayType {
+        return new ArrayType(
+            $arrayType->getIterableKeyType(),
+            $itemType,
+            $arrayType->isItemTypeInferredFromLiteralArray(),
+        	$arrayType->isCallable()
+        );
     }
 }

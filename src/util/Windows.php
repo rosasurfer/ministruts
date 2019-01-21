@@ -27,7 +27,7 @@ class Windows extends StaticClass {
     /**
      * Return a human-readable version of a Win32 error code.
      *
-     * @param  int error
+     * @param  int $error
      *
      * @return string
      */
@@ -43,7 +43,7 @@ class Windows extends StaticClass {
     /**
      * Return a description of a Win32 error code.
      *
-     * @param  int error
+     * @param  int $error
      *
      * @return string
      */

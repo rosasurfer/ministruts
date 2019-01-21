@@ -385,7 +385,7 @@ class Logger extends StaticClass {
      *
      * @param  string|\Exception $loggable - message or exception to log
      * @param  int               $level    - loglevel of the loggable
-     * @param  array            &$context  - reference to the log context with additional data
+     * @param  array             $context  - reference to the log context with additional data
      */
     private static function invokePrintHandler($loggable, $level, array &$context) {
         $message = null;
@@ -413,7 +413,7 @@ class Logger extends StaticClass {
      *
      * @param  string|\Exception $loggable - message or exception to log
      * @param  int               $level    - loglevel of the loggable
-     * @param  array            &$context  - reference to the log context with additional data
+     * @param  array             $context  - reference to the log context with additional data
      */
     private static function invokeMailHandler($loggable, $level, array &$context) {
         if (!key_exists('mailSubject', $context) || !key_exists('mailMessage', $context))
@@ -445,9 +445,9 @@ class Logger extends StaticClass {
      *
      * @param  string|\Exception $loggable - message or exception to log
      * @param  int               $level    - loglevel of the loggable
-     * @param  array            &$context  - reference to the log context with additional data
+     * @param  array             $context  - reference to the log context with additional data
      *
-     * @todo   replace CURL dependency with internal PHP functions
+     * @TODO   replace CURL dependency with internal PHP functions
      */
     private static function invokeSmsHandler($loggable, $level, array &$context) {
         if (!key_exists('cliMessage', $context))
@@ -527,7 +527,7 @@ class Logger extends StaticClass {
                         catch (\Exception $ex) {/*eat it*/}
                         continue;
                     }
-                    if (is_null($content)) {
+                    if (!isSet($content)) {
                         try {
                             self::log('Empty reply from server, URL: '.$request->getUrl(), L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
                         }
@@ -552,7 +552,7 @@ class Logger extends StaticClass {
      *
      * @param  string|\Exception $loggable - message or exception to log
      * @param  int               $level    - loglevel of the loggable
-     * @param  array            &$context  - reference to the log context with additional data
+     * @param  array             $context  - reference to the log context with additional data
      */
     private static function invokeErrorLogHandler($loggable, $level, array &$context) {
         if (!key_exists('cliMessage', $context))
@@ -582,7 +582,7 @@ class Logger extends StaticClass {
      *
      * @param  string|\Exception $loggable - message or exception to log
      * @param  int               $level    - loglevel of the loggable
-     * @param  array            &$context  - reference to the log context
+     * @param  array             $context  - reference to the log context
      */
     private static function composeCliMessage($loggable, $level, array &$context) {
         if (!key_exists('file', $context) || !key_exists('line', $context))
@@ -657,7 +657,7 @@ class Logger extends StaticClass {
      *
      * @param  string|\Exception $loggable - message or exception to log
      * @param  int               $level    - loglevel of the loggable
-     * @param  array            &$context  - reference to the log context
+     * @param  array             $context  - reference to the log context
      */
     private static function composeMailMessage($loggable, $level, array &$context) {
         if (!key_exists('cliMessage', $context))
@@ -710,7 +710,7 @@ class Logger extends StaticClass {
      *
      * @param  string|\Exception $loggable - message or exception to log
      * @param  int               $level    - loglevel of the loggable
-     * @param  array            &$context  - reference to the log context
+     * @param  array             $context  - reference to the log context
      */
     private static function composeHtmlMessage($loggable, $level, array &$context) {
         if (!key_exists('file', $context) || !key_exists('line', $context))
@@ -792,7 +792,7 @@ class Logger extends StaticClass {
     /**
      * Resolve the location the logger was called from and store it in the log context under the keys "file" and "line".
      *
-     * @param  array &$context - reference to the log context
+     * @param  array $context - reference to the log context
      */
     private static function resolveLogLocation(array &$context) {
         if (!key_exists('trace', $context))
@@ -817,7 +817,7 @@ class Logger extends StaticClass {
     /**
      * Resolve the class the logger was called from and store it in the log context under the key "class".
      *
-     * @param  array &$context - reference to the log context
+     * @param  array $context - reference to the log context
      *
      *
      * TODO:  test with Closure and internal PHP functions
@@ -834,7 +834,7 @@ class Logger extends StaticClass {
     /**
      * Generate an internal stacktrace and store it in the log context under the key "trace".
      *
-     * @param  array &$context - reference to the log context
+     * @param  array $context - reference to the log context
      */
     private static function generateStackTrace(array &$context) {
         if (!key_exists('trace', $context)) {

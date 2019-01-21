@@ -983,7 +983,7 @@ class Request extends Singleton {
      *                           (an ActionError with the same key is not deleted)
      */
     public function setActionMessage($key, $message) {
-        if (is_null($message)) {
+        if (!isSet($message)) {
             unset($this->attributes[ACTION_MESSAGES_KEY][$key]);
         }
         elseif (is_string($message)) {
@@ -996,23 +996,22 @@ class Request extends Singleton {
     /**
      * Delete the ActionMessages with the specified keys.
      *
-     * @param  string $key - zero or more message keys to delete; without a key all ActionMessages are deleted
-     *                       (ActionErrors with the same keys are not deleted
+     * @param  string[] $keys - zero or more message keys to delete; without a key all ActionMessages are deleted
+     *                          (ActionErrors with the same keys are not deleted
      *
      * @return array - the deleted ActionMessages
      */
-    public function removeActionMessages(/*$key1, $key2, $key3...*/) {
+    public function removeActionMessages(...$keys) {
         $messages = $this->getAttribute(ACTION_MESSAGES_KEY);
+        $dropped = [];
 
-        if ($args = func_get_args()) {
-            $dropped = [];
-            foreach ($args as $key) {
-                if (isSet($messages[$key]))
-                    $dropped[$key] = $messages[$key];
-                unset($this->attributes[ACTION_MESSAGES_KEY][$key]);
-            }
-            return $dropped;
+        foreach ($keys as $key) {
+            if (isSet($messages[$key]))
+                $dropped[$key] = $messages[$key];
+            unset($this->attributes[ACTION_MESSAGES_KEY][$key]);
         }
+        if ($keys)
+            return $dropped;
 
         unset($this->attributes[ACTION_MESSAGES_KEY]);
         return $messages;
@@ -1091,7 +1090,7 @@ class Request extends Singleton {
      * @param  string $message - error message; if NULL the error for the specified key is deleted
      */
     public function setActionError($key, $message) {
-        if (is_null($message)) {
+        if (!isSet($message)) {
             unset($this->attributes[ACTION_ERRORS_KEY][$key]);
         }
         elseif (is_string($message)) {
@@ -1104,22 +1103,21 @@ class Request extends Singleton {
     /**
      * Delete the ActionErrors with the specified keys.
      *
-     * @param  string $key - zero or more error keys to delete; without a key all ActionErrors are deleted
+     * @param  string[] $keys - zero or more error keys to delete; without a key all ActionErrors are deleted
      *
      * @return array - the deleted ActionErrors
      */
-    public function removeActionErrors(/*$key1, $key2, $key3...*/) {
+    public function removeActionErrors(...$keys) {
         $errors = $this->getAttribute(ACTION_ERRORS_KEY);
+        $dropped = [];
 
-        if ($args = func_get_args()) {
-            $dropped = [];
-            foreach ($args as $key) {
-                if (isSet($errors[$key]))
-                    $dropped[$key] = $errors[$key];
-                unset($this->attributes[ACTION_ERRORS_KEY][$key]);
-            }
-            return $dropped;
+        foreach ($keys as $key) {
+            if (isSet($errors[$key]))
+                $dropped[$key] = $errors[$key];
+            unset($this->attributes[ACTION_ERRORS_KEY][$key]);
         }
+        if ($keys)
+            return $dropped;
 
         unset($this->attributes[ACTION_ERRORS_KEY]);
         return $errors;

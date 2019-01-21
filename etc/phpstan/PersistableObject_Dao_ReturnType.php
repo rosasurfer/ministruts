@@ -11,6 +11,7 @@ use PHPStan\Reflection\MethodReflection;
 use PHPStan\Type\DynamicMethodReturnTypeExtension;
 use PHPStan\Type\DynamicStaticMethodReturnTypeExtension;
 use PHPStan\Type\ObjectType;
+use PHPStan\Type\StaticType;
 use PHPStan\Type\Type;
 
 use rosasurfer\db\orm\PersistableObject;
@@ -18,7 +19,6 @@ use rosasurfer\db\orm\PersistableObject;
 use function rosasurfer\echoPre;
 use function rosasurfer\simpleClassName;
 use function rosasurfer\true;
-use PHPStan\Type\StaticType;
 
 
 /**
@@ -47,7 +47,7 @@ class PersistableObject_Dao_ReturnType extends DynamicReturnType implements Dyna
         if ($returnType instanceof ObjectType) {
             if ($methodCall->var instanceof Variable) {
                 $scopedType = $scope->getType($methodCall->var);
-                $class = $scopedType instanceof StaticType ? $scopedType->getClass() : $scopedType->describe();
+                $class = $scopedType instanceof StaticType ? $scopedType->getBaseClass() : $scopedType->describe();
                 if ($class != static::$className)                                           // skip self-referencing calls
                     $returnType = new ObjectType($class.'DAO');
             } else $error = true(echoPre('(1) '.simpleClassName(static::$className).'->'.$methodCall->name.'() cannot resolve callee of instance method call: class($methodCall->var) = '.get_class($methodCall->var)));

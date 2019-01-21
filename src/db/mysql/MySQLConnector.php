@@ -150,7 +150,7 @@ class MySQLConnector extends Connector {
      * @return $this
      */
     protected function setPassword($password) {
-        if (is_null($password)) $password = '';
+        if (!isSet($password)) $password = '';
         else if (!is_string($password)) throw new IllegalTypeException('Illegal type of parameter $password: '.getType($password));
 
         $this->password = $password;

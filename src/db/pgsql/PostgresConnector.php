@@ -60,7 +60,7 @@ class PostgresConnector extends Connector {
     /** @var int - DBMS version number */
     protected $versionNumber;
 
-    /** @var string[] - connection options */
+    /** @var string[]|string[][] - connection options */
     protected $options = [];
 
     /** @var string[] - session variables */

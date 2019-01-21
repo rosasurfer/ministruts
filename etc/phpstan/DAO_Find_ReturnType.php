@@ -8,13 +8,13 @@ use PhpParser\Node\Expr\StaticCall;
 use PhpParser\Node\Expr\Variable;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
-use PHPStan\Type\CommonUnionType;
 use PHPStan\Type\DynamicMethodReturnTypeExtension;
 use PHPStan\Type\DynamicStaticMethodReturnTypeExtension;
 use PHPStan\Type\NullType;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\StaticType;
 use PHPStan\Type\Type;
+use PHPStan\Type\UnionType;
 
 use rosasurfer\db\orm\DAO;
 use rosasurfer\db\orm\PersistableObject;
@@ -24,7 +24,6 @@ use function rosasurfer\simpleClassName;
 use function rosasurfer\strEndsWith;
 use function rosasurfer\strLeft;
 use function rosasurfer\true;
-use rosasurfer;
 
 
 /**
@@ -64,7 +63,7 @@ class DAO_Find_ReturnType extends DynamicReturnType implements DynamicMethodRetu
                     }
                     else if ($methodCall->var instanceof Variable) {
                         $scopedType = $scope->getType($methodCall->var);
-                        $class = $scopedType instanceof StaticType ? $scopedType->getClass() : $scopedType->describe();
+                        $class = $scopedType instanceof StaticType ? $scopedType->getBaseClass() : $scopedType->describe();
                         if ($class != static::$className) {                                 // skip self-referencing calls
                             if (strEndsWith($class, 'DAO')) {
                                 $type = new ObjectType(strLeft($class, -3));
@@ -128,12 +127,12 @@ class DAO_Find_ReturnType extends DynamicReturnType implements DynamicMethodRetu
      * @return Type
      */
     protected function resolveReturnType(Type $type, \Closure $resolver) : Type {
-        if ($type instanceof CommonUnionType) {
+        if ($type instanceof UnionType) {
             $old = $type->getTypes();
             $new = [];
             foreach ($old as $subtype)
                 $new[] = $resolver($subtype);
-            return ($old===$new) ? $type : new CommonUnionType($new);
+            return ($old===$new) ? $type : new UnionType($new);
         }
         return $resolver($type);
     }
