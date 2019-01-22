@@ -625,8 +625,11 @@ function strCompare($stringA, $stringB, $ignoreCase = false) {
     if ($stringA!==null && !is_string($stringA)) throw new IllegalTypeException('Illegal type of parameter $stringA: '.getType($stringA));
     if ($stringB!==null && !is_string($stringB)) throw new IllegalTypeException('Illegal type of parameter $stringB: '.getType($stringB));
 
-    if ($ignoreCase)
-        return strCompareI($stringA, $stringB);
+    if ($ignoreCase) {
+        if ($stringA===null || $stringB===null)
+            return ($stringA === $stringB);
+        return (strToLower($stringA) === strToLower($stringB));
+    }
     return ($stringA === $stringB);
 }
 
@@ -640,12 +643,7 @@ function strCompare($stringA, $stringB, $ignoreCase = false) {
  * @return bool
  */
 function strCompareI($stringA, $stringB) {
-    if ($stringA!==null && !is_string($stringA)) throw new IllegalTypeException('Illegal type of parameter $stringA: '.getType($stringA));
-    if ($stringB!==null && !is_string($stringB)) throw new IllegalTypeException('Illegal type of parameter $stringB: '.getType($stringB));
-
-    if ($stringA===null || $stringB===null)
-        return ($stringA === $stringB);
-    return (strToLower($stringA) === strToLower($stringB));
+    return strCompare($stringA, $stringB, $ignoreCase=true);
 }
 
 
@@ -699,9 +697,8 @@ function strContainsI($haystack, $needle) {
  */
 function strStartsWith($string, $prefix, $ignoreCase = false) {
     if (is_array($prefix)) {
-        $self = __FUNCTION__;
         foreach ($prefix as $p) {
-            if ($self($string, $p, $ignoreCase)) return true;
+            if (strStartsWith($string, $p, $ignoreCase)) return true;
         }
         return false;
     }
@@ -747,9 +744,8 @@ function strStartsWithI($string, $prefix) {
  */
 function strEndsWith($string, $suffix, $ignoreCase = false) {
     if (is_array($suffix)) {
-        $self = __FUNCTION__;
         foreach ($suffix as $s) {
-            if ($self($string, $s, $ignoreCase)) return true;
+            if (strEndsWith($string, $s, $ignoreCase)) return true;
         }
         return false;
     }
@@ -761,6 +757,9 @@ function strEndsWith($string, $suffix, $ignoreCase = false) {
 
     if (!$stringLen || !$suffixLen)
         return false;
+
+    if ($ignoreCase)
+        return (($stringLen-$suffixLen) === strRiPos($string, $suffix));
     return (($stringLen-$suffixLen) === strRPos($string, $suffix));
 }
 
