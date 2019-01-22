@@ -12,7 +12,6 @@ use PHPStan\Type\DynamicMethodReturnTypeExtension;
 use PHPStan\Type\DynamicStaticMethodReturnTypeExtension;
 use PHPStan\Type\NullType;
 use PHPStan\Type\ObjectType;
-use PHPStan\Type\StaticType;
 use PHPStan\Type\Type;
 use PHPStan\Type\UnionType;
 
@@ -57,14 +56,14 @@ class DAO_Find_ReturnType extends DynamicReturnType implements DynamicMethodRetu
                             /** @var Name $name */
                             $name = $methodCall->var->class;
                             if ($name->isFullyQualified()) {
-                                $type = new ObjectType((string)$name);
+                                if ((string)$name != static::$className)                    // skip self-referencing calls
+                                    $type = new ObjectType((string)$name);
                             } else $error = true(echoPre('(1) '.simpleClassName(static::$className).'->'.$methodCall->name.'() cannot resolve callee of instance method call: class($methodCall->var->class) = '.get_class($methodCall->var->class).' (not fully qualified)'));
                         } else     $error = true(echoPre('(2) '.simpleClassName(static::$className).'->'.$methodCall->name.'() cannot resolve callee of instance method call: class($methodCall->var->class) = '.get_class($methodCall->var->class)));
                     }
                     else if ($methodCall->var instanceof Variable) {
                         $scopedType = $scope->getType($methodCall->var);
-                        $class = $scopedType instanceof StaticType ? $scopedType->getBaseClass() : $scopedType->describe();
-                        if ($class != static::$className) {                                 // skip self-referencing calls
+                        if ($class = $this->findSubclass($scopedType, static::$className)) {
                             if (strEndsWith($class, 'DAO')) {
                                 $type = new ObjectType(strLeft($class, -3));
                             } else $error = true(echoPre('(3) '.simpleClassName(static::$className).'->'.$methodCall->name.'() encountered unexpected callee class name: '.$class));
@@ -79,7 +78,7 @@ class DAO_Find_ReturnType extends DynamicReturnType implements DynamicMethodRetu
         $returnType = $this->resolveReturnType($returnType, $resolver);
         $returnDescribe = $returnType->describe();
 
-        if (0 || $error) echoPre('call of: '.simpleClassName(static::$className).'->'.$methodCall->name.'()  from: '.$this->getScopeDescription($scope).'  shall return: '.$returnDescribe.($returnDescribe==$origReturnDescribe ? ' (pass through)':''));
+        if (0 || $error) echoPre('call of: '.simpleClassName(static::$className).'->'.$methodCall->name.'()  in: '.$this->getScopeDescription($scope).'  shall return: '.$returnDescribe.($returnDescribe==$origReturnDescribe ? ' (pass through)' : ' (was '.$origReturnDescribe.')'));
         return $returnType;
     }
 
@@ -116,7 +115,7 @@ class DAO_Find_ReturnType extends DynamicReturnType implements DynamicMethodRetu
         $returnType = $this->resolveReturnType($returnType, $resolver);
         $returnDescribe = $returnType->describe();
 
-        if (0 || $error) echoPre('call of: '.simpleClassName(static::$className).'::'.$methodCall->name.'()  from: '.$this->getScopeDescription($scope).'  shall return: '.$returnDescribe.($returnDescribe==$origReturnDescribe ? ' (pass through)':''));
+        if (0 || $error) echoPre('call of: '.simpleClassName(static::$className).'::'.$methodCall->name.'()  in: '.$this->getScopeDescription($scope).'  shall return: '.$returnDescribe.($returnDescribe==$origReturnDescribe ? ' (pass through)' : ' (was '.$origReturnDescribe.')'));
         return $returnType;
     }
 

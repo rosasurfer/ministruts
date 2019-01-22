@@ -11,7 +11,6 @@ use PHPStan\Reflection\MethodReflection;
 use PHPStan\Type\DynamicMethodReturnTypeExtension;
 use PHPStan\Type\DynamicStaticMethodReturnTypeExtension;
 use PHPStan\Type\ObjectType;
-use PHPStan\Type\StaticType;
 use PHPStan\Type\Type;
 
 use rosasurfer\db\orm\PersistableObject;
@@ -47,15 +46,14 @@ class PersistableObject_Dao_ReturnType extends DynamicReturnType implements Dyna
         if ($returnType instanceof ObjectType) {
             if ($methodCall->var instanceof Variable) {
                 $scopedType = $scope->getType($methodCall->var);
-                $class = $scopedType instanceof StaticType ? $scopedType->getBaseClass() : $scopedType->describe();
-                if ($class != static::$className)                                           // skip self-referencing calls
+                if ($class = $this->findSubclass($scopedType, static::$className))
                     $returnType = new ObjectType($class.'DAO');
             } else $error = true(echoPre('(1) '.simpleClassName(static::$className).'->'.$methodCall->name.'() cannot resolve callee of instance method call: class($methodCall->var) = '.get_class($methodCall->var)));
         } else     $error = true(echoPre('(2) '.simpleClassName(static::$className).'->'.$methodCall->name.'() encountered unexpected return type: '.get_class($returnType).' => '.$returnType->describe()));
 
         $returnDescribe = $returnType->describe();
 
-        if (0 || $error) echoPre('call of: '.simpleClassName(static::$className).'->'.$methodCall->name.'()  from: '.$this->getScopeDescription($scope).'  shall return: '.$returnDescribe.($returnDescribe==$origReturnDescribe ? ' (pass through)':''));
+        if (0 || $error) echoPre('call of: '.simpleClassName(static::$className).'->'.$methodCall->name.'()  in: '.$this->getScopeDescription($scope).'  shall return: '.$returnDescribe.($returnDescribe==$origReturnDescribe ? ' (pass through)' : ' (was '.$origReturnDescribe.')'));
         return $returnType;
     }
 
@@ -74,7 +72,8 @@ class PersistableObject_Dao_ReturnType extends DynamicReturnType implements Dyna
             if ($methodCall->class instanceof Name) {
                 $name = $methodCall->class;
                 if ($name->isFullyQualified()) {
-                    $returnType = new ObjectType($name.'DAO');
+                    if ((string)$name != static::$className)                                // skip self-referencing calls
+                        $returnType = new ObjectType($name.'DAO');
                 }
                 else if ((string)$name == 'self') {
                     $class = $scope->getClassReflection()->getName();
@@ -86,7 +85,7 @@ class PersistableObject_Dao_ReturnType extends DynamicReturnType implements Dyna
 
         $returnDescribe = $returnType->describe();
 
-        if (0 || $error) echoPre('call of: '.simpleClassName(static::$className).'::'.$methodCall->name.'()  from: '.$this->getScopeDescription($scope).'  shall return: '.$returnDescribe.($returnDescribe==$origReturnDescribe ? ' (pass through)':''));
+        if (0 || $error) echoPre('call of: '.simpleClassName(static::$className).'::'.$methodCall->name.'()  in: '.$this->getScopeDescription($scope).'  shall return: '.$returnDescribe.($returnDescribe==$origReturnDescribe ? ' (pass through)' : ' (was '.$origReturnDescribe.')'));
         return $returnType;
     }
 }
