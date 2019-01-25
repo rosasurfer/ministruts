@@ -181,6 +181,36 @@ function array_keys($array, $search=null, $strict=false) {
 
 
 /**
+ * Return the first element of an array-like variable without affecting the internal array pointer.
+ *
+ * @param  array|\Traversable $values
+ *
+ * @return mixed - the first element or NULL if the array-like variable is empty
+ */
+function first($values) {
+    if ($values instanceof \Traversable)
+        $values = iterator_to_array($values);
+    return reset($values);
+}
+
+
+/**
+ * Return the last element of an array-like variable without affecting the internal array pointer.
+ *
+ * @param  array|\Traversable $values
+ *
+ * @return mixed - the last element or NULL if the array-like variable is empty
+ */
+function last($values) {
+    if ($values instanceof \Traversable)
+        $values = iterator_to_array($values);
+    if (!$values)
+        return null;
+    return end($values);
+}
+
+
+/**
  * Merges the elements of one or more array-like variables together so that the values of one are appended to the end of the
  * previous one. Values with the same string keys will overwrite the previous one. Numeric keys will be renumbered and values
  * with the same numeric keys will not overwrite the previous one.
