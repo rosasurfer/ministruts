@@ -2,7 +2,7 @@
 /**
  * Framework loader.
  *
- * Load helper functions and constants and register the internal class loader.
+ * Load framework functions and constants and register the internal class loader.
  */
 namespace rosasurfer;
 
@@ -32,6 +32,9 @@ if (!defined('rosasurfer\ministruts\MODULE_KEY')) require(MINISTRUTS_ROOT.'/src/
  * - The registration is wrapped in a function call to scope isolate its execution.
  */
 function registerClassLoader() {
+    static $done = false;
+    if ($done) return;
+
     // check for an existing legacy auto-loader
     $legacyAutoLoad = function_exists('__autoload');
     if ($legacyAutoLoad) {
@@ -61,6 +64,8 @@ function registerClassLoader() {
     if ($legacyAutoLoad && spl_autoload_functions()[0]!='__autoload') {
         spl_autoload_register('__autoload', $throw=true, $prepend=true);
     }
+
+    $done = true;
 }
 registerClassLoader();
 

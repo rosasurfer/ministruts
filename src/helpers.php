@@ -121,7 +121,7 @@ define('PHP_INI_ALL',    INI_ALL   );       // 7    flag            // entry can
 function array_filter($input, $callback=null, $flags=0) {
     $args = func_get_args();
     if ($input instanceof \Traversable)
-        $args[0] = iterator_to_array($input);
+        $args[0] = iterator_to_array($input, $useKeys=true);
     return \array_filter(...$args);
 }
 
@@ -189,7 +189,7 @@ function array_keys($array, $search=null, $strict=false) {
  */
 function first($values) {
     if ($values instanceof \Traversable)
-        $values = iterator_to_array($values);
+        $values = iterator_to_array($values, $useKeys=false);
     return reset($values);
 }
 
@@ -202,11 +202,13 @@ function first($values) {
  * @return mixed - the last element or NULL if the array-like variable is empty
  */
 function last($values) {
-    if ($values instanceof \Traversable)
-        $values = iterator_to_array($values);
-    if (!$values)
-        return null;
-    return end($values);
+    if ($values instanceof \Traversable) {
+        $values = iterator_to_array($values, $useKeys=false);
+    }
+    else if (!is_array($values)) {
+        throw new IllegalTypeException('Illegal type of parameter $values: '.getType($values));
+    }
+    return $values ? end($values) : null;
 }
 
 
