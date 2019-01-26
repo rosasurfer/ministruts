@@ -53,8 +53,9 @@ trait ObjectTrait {
 
 
     /**
-     * Magic method catching other-wise unnoticed write access of undefined properties and fatal errors triggered by write
-     * access of inaccessible properties.
+     * Magic method catching:
+     * - otherwise unnoticed write access to undefined properties
+     * - fatal errors caused by write access to inaccessible properties
      *
      * @param  string $property - name of the undefined property
      * @param  mixed  $value    - passed property value
