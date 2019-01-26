@@ -31,7 +31,7 @@ class Application extends Object {
 
 
     /** @var int - error handling mode in which regular PHP errors are only logged */
-    const LOG_ERRORS       = ErrorHandler::LOG_ERRORS;
+    const LOG_ERRORS = ErrorHandler::LOG_ERRORS;
 
     /** @var int - error handling mode in which regular PHP errors are converted to exceptions and thrown back */
     const THROW_EXCEPTIONS = ErrorHandler::THROW_EXCEPTIONS;
