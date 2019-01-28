@@ -1276,15 +1276,13 @@ function is_dir_empty($dirname, $ignore = []) {
     }
 
     /*
-    TODO: for better performance replace with
-
-    $handle = opendir($dir);
-    while (false !== ($entry = readdir($handle))) {
-        if ($entry != "." && $entry != "..") {
-          return FALSE;
-        }
+    // TODO: for better performance
+    $hDir = openDir($dir);
+    while (($entry = readDir($hDir)) !== false) {
+        if ($entry=='.' || $entry=='..')
+            continue;
     }
-    Don't forget to closedir($handle) afterwards.
+    closeDir($hDir);
     */
     return true;
 }
