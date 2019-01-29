@@ -195,6 +195,21 @@ function first($values) {
 
 
 /**
+ * Return the first key of an array-like variable without affecting the internal array pointer.
+ *
+ * @param  array|\Traversable $values
+ *
+ * @return mixed - the first key or NULL if the array-like variable is empty
+ */
+function firstKey($values) {
+    if ($values instanceof \Traversable)
+        $values = iterator_to_array($values);
+    reset($values);
+    return key($values);
+}
+
+
+/**
  * Return the last element of an array-like variable without affecting the internal array pointer.
  *
  * @param  array|\Traversable $values
@@ -209,6 +224,27 @@ function last($values) {
         throw new IllegalTypeException('Illegal type of parameter $values: '.getType($values));
     }
     return $values ? end($values) : null;
+}
+
+
+/**
+ * Return the last key of an array-like variable without affecting the internal array pointer.
+ *
+ * @param  array|\Traversable $values
+ *
+ * @return mixed - the last key or NULL if the array-like variable is empty
+ */
+function lastKey($values) {
+    if ($values instanceof \Traversable) {
+        $values = iterator_to_array($values);
+    }
+    else if (!is_array($values)) {
+        throw new IllegalTypeException('Illegal type of parameter $values: '.getType($values));
+    }
+    if (!$values)
+        return null;
+    end($values);
+    return key($values);
 }
 
 
