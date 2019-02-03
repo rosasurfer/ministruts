@@ -67,7 +67,7 @@ class Service implements ServiceInterface {
 
         $instance   = null;
         $definition = $this->definition;
-        !$factory  && $parameters = [];
+        !$factory && $parameters = [];
 
         if (is_string($definition)) {                       // plain strings are class names without parameters
             if (!is_class($definition)) throw new ClassNotFoundException('Cannot resolve service "'.$this->name.'" (unknown class "'.$definition.'")');

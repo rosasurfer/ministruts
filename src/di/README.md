@@ -13,9 +13,9 @@ usage pattern is determined at runtime depending on the used DI accessor method:
 
 - ```DI::get($name)```: Uses the dependency in a service location context and returns always the same instance. This method
   does not support additional instantiation parameters. All required parameters must be specified in the service definition.
-- ```DI::factory($name, ...$params)```: Uses the dependency in a dependency injection context and returns always a new
-  instance. This method supports additional instantiation parameters for each new instance.
-  
+- ```DI::create($name, ...$params)```: Uses the dependency in a factory context and returns always a new instance.
+  This method supports additional instantiation parameters for each new instance.
+
 Dependencies are lazy-loaded, i.e. they are instantiated on first use.
 
 
@@ -53,7 +53,7 @@ arguments in a parameterless context, i.e. service location) is not possible:
 ```php
 $di = Application::getDi();
 $options = ['status'=>'not-afraid'];
-$warrior = $di->factory('warrior', $options);
+$warrior = $di->create('warrior', $options);
 ```
 
 On dependency instantiation closures/anonymous functions are invoked in the class context of the DI container. In the function

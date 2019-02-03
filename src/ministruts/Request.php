@@ -996,8 +996,8 @@ class Request extends Singleton {
     /**
      * Delete the ActionMessages with the specified keys.
      *
-     * @param  string[] $keys - zero or more message keys to delete; without a key all ActionMessages are deleted
-     *                          (ActionErrors with the same keys are not deleted
+     * @param  string[] ...$keys - zero or more message keys to delete; without a key all ActionMessages are deleted
+     *                             (ActionErrors with the same keys are not deleted
      *
      * @return array - the deleted ActionMessages
      */
@@ -1103,7 +1103,7 @@ class Request extends Singleton {
     /**
      * Delete the ActionErrors with the specified keys.
      *
-     * @param  string[] $keys - zero or more error keys to delete; without a key all ActionErrors are deleted
+     * @param  string[] ...$keys - zero or more error keys to delete; without a key all ActionErrors are deleted
      *
      * @return array - the deleted ActionErrors
      */

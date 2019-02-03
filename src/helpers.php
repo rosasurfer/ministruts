@@ -255,8 +255,8 @@ function lastKey($values) {
  *
  * Complement of PHP's <tt>array_merge()</tt> function adding support for {@link \Traversable} implementations.
  *
- * @param  array|\Traversable        $array1
- * @param  array<array|\Traversable> $arrays
+ * @param  array|\Traversable           $array1
+ * @param  array<array|\Traversable> ...$arrays
  *
  * @return array
  */
