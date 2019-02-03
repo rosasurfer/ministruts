@@ -239,13 +239,9 @@ final class FileSystemCache extends CachePeer {
      */
     private function writeFile($fileName, $value, $expires) {
         mkDirWritable(dirName($fileName));
+        file_put_contents($fileName, serialize($value));
 
         // TODO: http://phpdevblog.niknovo.com/2009/11/serialize-vs-var-export-vs-json-encode.html
-
-        $fH = fOpen($fileName, 'wb');
-        fWrite($fH, serialize($value));
-        fClose($fH);
-
         return true;
     }
 }
