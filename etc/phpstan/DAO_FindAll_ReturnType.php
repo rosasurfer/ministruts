@@ -12,7 +12,6 @@ use PHPStan\Type\ArrayType;
 use PHPStan\Type\DynamicMethodReturnTypeExtension;
 use PHPStan\Type\DynamicStaticMethodReturnTypeExtension;
 use PHPStan\Type\ObjectType;
-use PHPStan\Type\StaticType;
 use PHPStan\Type\Type;
 
 use rosasurfer\db\orm\DAO;
@@ -53,24 +52,26 @@ class DAO_FindAll_ReturnType extends DynamicReturnType implements DynamicMethodR
                     /** @var Name $name */
                     $name = $methodCall->var->class;
                     if ($name->isFullyQualified()) {
-                        $returnType = $this->copyArrayType($returnType, new ObjectType((string)$name));
+                        if ((string)$name != static::$className)                            // skip self-referencing calls
+                            $returnType = $this->copyArrayType($returnType, new ObjectType((string)$name));
                     } else $error = true(echoPre('(1) '.simpleClassName(static::$className).'->'.$methodCall->name.'() cannot resolve callee of instance method call: class($methodCall->var->class) = '.get_class($methodCall->var->class).' (not fully qualified)'));
                 } else     $error = true(echoPre('(2) '.simpleClassName(static::$className).'->'.$methodCall->name.'() cannot resolve callee of instance method call: class($methodCall->var->class) = '.get_class($methodCall->var->class)));
             }
             else if ($methodCall->var instanceof Variable) {
                 $scopedType = $scope->getType($methodCall->var);
-                $class = $scopedType instanceof StaticType ? $scopedType->getBaseClass() : $scopedType->describe();
-                if ($class != static::$className) {                                         // skip self-referencing calls
+                $class = $this->findSubclass($scopedType, static::$className);
+                if ($class) {
                     if (strEndsWith($class, 'DAO')) {
                         $returnType = $this->copyArrayType($returnType, new ObjectType(strLeft($class, -3)));
-                    } else $error = true(echoPre('(3) '.simpleClassName(static::$className).'->'.$methodCall->name.'() cannot resolve callee of instance method call: scoped type = '.get_class($scopedType).' => '.$scopedType->describe()));
+                    }
+                    else $error = true(echoPre('(3) '.simpleClassName(static::$className).'->'.$methodCall->name.'() cannot resolve callee of instance method call: scoped type = '.get_class($scopedType).' => '.$scopedType->describe()));
                 }
-            } else         $error = true(echoPre('(4) '.simpleClassName(static::$className).'->'.$methodCall->name.'() cannot resolve callee of instance method call: class($methodCall->var) = '.get_class($methodCall->var)));
-        } else             $error = true(echoPre('(5) '.simpleClassName(static::$className).'->'.$methodCall->name.'() encountered unexpected return type: '.get_class($returnType).' => '.$returnType->describe()));
+            } else       $error = true(echoPre('(4) '.simpleClassName(static::$className).'->'.$methodCall->name.'() cannot resolve callee of instance method call: class($methodCall->var) = '.get_class($methodCall->var)));
+        } else           $error = true(echoPre('(5) '.simpleClassName(static::$className).'->'.$methodCall->name.'() encountered unexpected return type: '.get_class($returnType).' => '.$returnType->describe()));
 
         $returnDescribe = $returnType->describe();
 
-        if (0 || $error) echoPre('call of: '.simpleClassName(static::$className).'->'.$methodCall->name.'()  from: '.$this->getScopeDescription($scope).'  shall return: '.$returnDescribe.($returnDescribe==$origReturnDescribe ? ' (pass through)':''));
+        if (0 || $error) echoPre('call of: '.simpleClassName(static::$className).'->'.$methodCall->name.'()  in: '.$this->getScopeDescription($scope).'  shall return: '.$returnDescribe.($returnDescribe==$origReturnDescribe ? ' (pass through)' : ' (was '.$origReturnDescribe.')'));
         return $returnType;
     }
 
@@ -100,7 +101,7 @@ class DAO_FindAll_ReturnType extends DynamicReturnType implements DynamicMethodR
 
         $returnDescribe = $returnType->describe();
 
-        if (0 || $error) echoPre('call of: '.simpleClassName(static::$className).'::'.$methodCall->name.'()  from: '.$this->getScopeDescription($scope).'  shall return: '.$returnDescribe.($returnDescribe==$origReturnDescribe ? ' (pass through)':''));
+        if (0 || $error) echoPre('call of: '.simpleClassName(static::$className).'::'.$methodCall->name.'()  in: '.$this->getScopeDescription($scope).'  shall return: '.$returnDescribe.($returnDescribe==$origReturnDescribe ? ' (pass through)' : ' (was '.$origReturnDescribe.')'));
         return $returnType;
     }
 

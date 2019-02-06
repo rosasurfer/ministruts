@@ -121,7 +121,7 @@ define('PHP_INI_ALL',    INI_ALL   );       // 7    flag            // entry can
 function array_filter($input, $callback=null, $flags=0) {
     $args = func_get_args();
     if ($input instanceof \Traversable)
-        $args[0] = iterator_to_array($input);
+        $args[0] = iterator_to_array($input, $useKeys=true);
     return \array_filter(...$args);
 }
 
@@ -181,14 +181,82 @@ function array_keys($array, $search=null, $strict=false) {
 
 
 /**
+ * Return the first element of an array-like variable without affecting the internal array pointer.
+ *
+ * @param  array|\Traversable $values
+ *
+ * @return mixed - the first element or NULL if the array-like variable is empty
+ */
+function first($values) {
+    if ($values instanceof \Traversable)
+        $values = iterator_to_array($values, $useKeys=false);
+    return reset($values);
+}
+
+
+/**
+ * Return the first key of an array-like variable without affecting the internal array pointer.
+ *
+ * @param  array|\Traversable $values
+ *
+ * @return mixed - the first key or NULL if the array-like variable is empty
+ */
+function firstKey($values) {
+    if ($values instanceof \Traversable)
+        $values = iterator_to_array($values);
+    reset($values);
+    return key($values);
+}
+
+
+/**
+ * Return the last element of an array-like variable without affecting the internal array pointer.
+ *
+ * @param  array|\Traversable $values
+ *
+ * @return mixed - the last element or NULL if the array-like variable is empty
+ */
+function last($values) {
+    if ($values instanceof \Traversable) {
+        $values = iterator_to_array($values, $useKeys=false);
+    }
+    else if (!is_array($values)) {
+        throw new IllegalTypeException('Illegal type of parameter $values: '.getType($values));
+    }
+    return $values ? end($values) : null;
+}
+
+
+/**
+ * Return the last key of an array-like variable without affecting the internal array pointer.
+ *
+ * @param  array|\Traversable $values
+ *
+ * @return mixed - the last key or NULL if the array-like variable is empty
+ */
+function lastKey($values) {
+    if ($values instanceof \Traversable) {
+        $values = iterator_to_array($values);
+    }
+    else if (!is_array($values)) {
+        throw new IllegalTypeException('Illegal type of parameter $values: '.getType($values));
+    }
+    if (!$values)
+        return null;
+    end($values);
+    return key($values);
+}
+
+
+/**
  * Merges the elements of one or more array-like variables together so that the values of one are appended to the end of the
  * previous one. Values with the same string keys will overwrite the previous one. Numeric keys will be renumbered and values
  * with the same numeric keys will not overwrite the previous one.
  *
  * Complement of PHP's <tt>array_merge()</tt> function adding support for {@link \Traversable} implementations.
  *
- * @param  array|\Traversable        $array1
- * @param  array<array|\Traversable> $arrays
+ * @param  array|\Traversable           $array1
+ * @param  array<array|\Traversable> ...$arrays
  *
  * @return array
  */
@@ -625,8 +693,11 @@ function strCompare($stringA, $stringB, $ignoreCase = false) {
     if ($stringA!==null && !is_string($stringA)) throw new IllegalTypeException('Illegal type of parameter $stringA: '.getType($stringA));
     if ($stringB!==null && !is_string($stringB)) throw new IllegalTypeException('Illegal type of parameter $stringB: '.getType($stringB));
 
-    if ($ignoreCase)
-        return strCompareI($stringA, $stringB);
+    if ($ignoreCase) {
+        if ($stringA===null || $stringB===null)
+            return ($stringA === $stringB);
+        return (strToLower($stringA) === strToLower($stringB));
+    }
     return ($stringA === $stringB);
 }
 
@@ -640,12 +711,7 @@ function strCompare($stringA, $stringB, $ignoreCase = false) {
  * @return bool
  */
 function strCompareI($stringA, $stringB) {
-    if ($stringA!==null && !is_string($stringA)) throw new IllegalTypeException('Illegal type of parameter $stringA: '.getType($stringA));
-    if ($stringB!==null && !is_string($stringB)) throw new IllegalTypeException('Illegal type of parameter $stringB: '.getType($stringB));
-
-    if ($stringA===null || $stringB===null)
-        return ($stringA === $stringB);
-    return (strToLower($stringA) === strToLower($stringB));
+    return strCompare($stringA, $stringB, $ignoreCase=true);
 }
 
 
@@ -699,9 +765,8 @@ function strContainsI($haystack, $needle) {
  */
 function strStartsWith($string, $prefix, $ignoreCase = false) {
     if (is_array($prefix)) {
-        $self = __FUNCTION__;
         foreach ($prefix as $p) {
-            if ($self($string, $p, $ignoreCase)) return true;
+            if (strStartsWith($string, $p, $ignoreCase)) return true;
         }
         return false;
     }
@@ -747,9 +812,8 @@ function strStartsWithI($string, $prefix) {
  */
 function strEndsWith($string, $suffix, $ignoreCase = false) {
     if (is_array($suffix)) {
-        $self = __FUNCTION__;
         foreach ($suffix as $s) {
-            if ($self($string, $s, $ignoreCase)) return true;
+            if (strEndsWith($string, $s, $ignoreCase)) return true;
         }
         return false;
     }
@@ -761,6 +825,9 @@ function strEndsWith($string, $suffix, $ignoreCase = false) {
 
     if (!$stringLen || !$suffixLen)
         return false;
+
+    if ($ignoreCase)
+        return (($stringLen-$suffixLen) === strRiPos($string, $suffix));
     return (($stringLen-$suffixLen) === strRPos($string, $suffix));
 }
 

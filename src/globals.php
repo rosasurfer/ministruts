@@ -77,6 +77,54 @@ const EOL_WINDOWS       = \rosasurfer\EOL_WINDOWS;              // "\r\n"     CR
 
 
 /**
+ * Return the first element of an array-like variable without affecting the internal array pointer.
+ *
+ * @param  array|\Traversable $values
+ *
+ * @return mixed - the first element or NULL if the array-like variable is empty
+ */
+function first($values) {
+    return \rosasurfer\first($values);
+}
+
+
+/**
+ * Return the first key of an array-like variable without affecting the internal array pointer.
+ *
+ * @param  array|\Traversable $values
+ *
+ * @return mixed - the first key or NULL if the array-like variable is empty
+ */
+function firstKey($values) {
+    return \rosasurfer\firstKey($values);
+}
+
+
+/**
+ * Return the last element of an array-like variable without affecting the internal array pointer.
+ *
+ * @param  array|\Traversable $values
+ *
+ * @return mixed - the last element or NULL if the array-like variable is empty
+ */
+function last($values) {
+    return \rosasurfer\last($values);
+}
+
+
+/**
+ * Return the last key of an array-like variable without affecting the internal array pointer.
+ *
+ * @param  array|\Traversable $values
+ *
+ * @return mixed - the last key or NULL if the array-like variable is empty
+ */
+function lastKey($values) {
+    return \rosasurfer\lastKey($values);
+}
+
+
+/**
  * Convert a value to a boolean and return the human-readable string "true" or "false".
  *
  * @param  mixed $value - value interpreted as a boolean

@@ -222,8 +222,10 @@ class HttpSession extends Singleton {
                 if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $key['.$k.']: '.getType($value));
                 unset($_SESSION[$value]);
             }
+            return;
         }
-        else if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
+
+        if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
         unset($_SESSION[$key]);
     }
 

@@ -354,12 +354,11 @@ abstract class PersistableObject extends Object {
     /**
      * Set the instance status to "modified".
      *
-     * @return bool - the previous state
+     * @return $this
      */
     final protected function modified() {
-        $previous = $this->isModified();
         $this->_modified = true;
-        return $previous;
+        return $this;
     }
 
 
@@ -414,6 +413,7 @@ abstract class PersistableObject extends Object {
 
         // perform insertion
         $id = $this->doInsert($values);
+        $this->_modified = false;
 
         // assign the returned identity value
         $idName = $mapping['identity']['name'];

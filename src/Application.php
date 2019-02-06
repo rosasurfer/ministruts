@@ -268,6 +268,7 @@ class Application extends Object {
         $rootDir = rTrim(str_replace('\\', '/', $rootDir), '/');
         $dirs = $config->get('app.dir', []);
         $this->expandDirsRecursive($dirs, $rootDir);
+
         $config->set('app.dir', $dirs);                     // store everything back
     }
 
@@ -278,7 +279,7 @@ class Application extends Object {
      * @param  string[]|string[][] $dirs    - reference to an array of absolute or relative directory names
      * @param  string              $rootDir - application root directory
      */
-    protected function expandDirsRecursive(array $dirs, $rootDir) {
+    protected function expandDirsRecursive(array &$dirs, $rootDir) {
         foreach ($dirs as $name => &$dir) {
             if (is_array($dir)) {
                 $this->{__FUNCTION__}($dir, $rootDir);

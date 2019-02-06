@@ -30,7 +30,7 @@ use rosasurfer\exception\IllegalTypeException;
  *  });
  *
  *  $request = $di->get('request');                         // resolving a shared instance using the service locator pattern
- *  $tile    = $di->factory('tile', ...$args);              // resolving a new instance using the factory pattern
+ *  $tile    = $di->create('tile', ...$args);               // resolving a new instance using the factory pattern
  * </pre>
  */
 class Di extends Object implements DiInterface {
@@ -83,7 +83,7 @@ class Di extends Object implements DiInterface {
      *
      * @throws ServiceNotFoundException if the service is unknown
      */
-    public function factory($name, ...$params) {
+    public function create($name, ...$params) {
         if ($this->isService($name))
             return $this->services[$name]->resolve($factory=true, $params);
         throw new ServiceNotFoundException('Service "'.$name.'" not found.');

@@ -6,11 +6,11 @@
 
 parameters:
     autoload_files:
-        - etc/phpstan/function-stubs.php                            # stubs for PHP extensions and procedural code
+        - etc/phpstan/function-stubs.php                                    # stubs for PHP extensions and procedural code
 
-    fileExtensions:                                                 # additional files to analyse
+    fileExtensions:                                                         # additional files to analyse
        #- html
-       #- phtml                                                     # TODO: Tile default vars trigger errors
+       #- phtml                                                             # TODO: Tile default vars trigger errors
 
     excludes_analyse:
         - .git/
@@ -30,11 +30,13 @@ parameters:
 
     ignoreErrors:
         # intentionally ignore the following issues
-        - '/Call to ((static )?method|function) [^ ]+\(\) with incorrect case:/'                                    # Ever heared of naming standards?
-        - '/Array \( ([^ ]+)\[\] \) does not accept (\1\|)?null\b/'                                                 # NULL is a value (not a type) and always valid.
+        - '/Call to ((static )?method|function) [^ ]+\(\) with incorrect case:/'                                    # We prefer camel-case standards.
+        - '/Class stdClass referenced with incorrect case: StdClass\b/'                                             # - dito -
+        - '/Array \(([^ ]+)\[\]\) does not accept (\1\|)?null\b/'                                                   # NULL is a value (not a type) and can always be assigned.
         - '/Array \(array<([^ ]+)>\) does not accept (\1\|)?null\b/'                                                # - dito -
         - '/(Static )?property [^ ]+ \(([^ ]+)\) does not accept (\2\|)?null\b/i'                                   # - dito -
         - '/Property [^ ]+ \([^ ]+\[\]\) does not accept default value of type null\[\]/i'                          # - dito -
+        - '/Property [^ ]+ \(array<[^ ]+>\) does not accept default value of type array<int, null>/'                # - dito -
         - '/Parameter #[0-9]+ [^ ]+ of class [^ ]+ constructor expects ([^ ]+), (\1\|)?null given\b/'               # - dito -
         - '/Parameter #[0-9]+ [^ ]+ of (static )?(function|method) [^ ]+ expects ([^ ]+), (\3\|)?null given\b/'     # - dito -
         - '/Calling method [^ ]+\(\) on possibly null value of type [^ ]+\|null\b/'
@@ -47,14 +49,13 @@ parameters:
         # false positives since v0.8.3
         - '/Method rosasurfer\\db\\orm\\PersistableObject::getRelationValue\(\) should return rosasurfer\\db\\orm\\PersistableObject\[\]\|rosasurfer\\db\\orm\\PersistableObject\|null but returns rosasurfer\\db\\orm\\PersistableObject\[\]\|bool\|float\|int\|rosasurfer\\db\\orm\\PersistableObject\|string\|null\b/'
         - '/Parameter #1 \$value of method rosasurfer\\db\\orm\\DAO::escapeLiteral\(\) expects bool\|float\|int\|string, rosasurfer\\db\\orm\\PersistableObject\[\]\|bool\|float\|int\|rosasurfer\\db\\orm\\PersistableObject\|string given\b/'
-        
+
         # false positives since v0.9
         - '/PHPDoc tag @param for parameter \$[^ ]+ with type array(<[^ |]+(\|[^ |]+)?>)? is not subtype of native type array<int, mixed>/'
 
 
-services:
-        # service classes must be loaded via etc/phpstan/autoload.php
-        # (services are initialized before execution of block "parameters/autoload_files")
+services: # Services must be loaded via cmd line option --autoload-file as they are
+          # instantiated before execution of block "parameters/autoload_files".
     -
         class: rosasurfer\phpstan\DAO_Find_ReturnType
         tags:

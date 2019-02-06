@@ -30,14 +30,14 @@ use const rosasurfer\NL;
  * +--------------------------------------+------------+----------------------------+
  * </pre>
  *  (1) - A relative database file location is interpreted as relative to the application's data directory (if configured). <br>
- *        If the file is not found an attempt is made to find it in the application's root directory. <br>
- *  (2) - Available flags: SQLITE3_OPEN_CREATE | SQLITE3_OPEN_READONLY | SQLITE3_OPEN_READWRITE <br>
+ *        If the file is not found an attempt is made to find it in the application's root directory.                       <br>
+ *  (2) - Available flags: SQLITE3_OPEN_CREATE | SQLITE3_OPEN_READONLY | SQLITE3_OPEN_READWRITE                             <br>
  *
  * Additional SQLite pragma options can be specified under the "options" key.
  *
  *
- * Note: <br>
- * ----- <br>
+ * Notes: <br>
+ * ------ <br>
  * The php_sqlite3 extension v0.7-dev has a serious bug. The first call of SQLite3Result::fetchArray() and calls after a
  * SQLite3Result::reset() trigger re-execution of an already executed query. The workaround for DDL and DML statements is to
  * check with SQLite3Result::numColumns() for an empty result before calling fetchArray(). There is no workaround to prevent

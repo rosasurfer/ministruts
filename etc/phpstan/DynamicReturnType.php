@@ -5,6 +5,10 @@ namespace rosasurfer\phpstan;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
 
+use PHPStan\Type\UnionType;
+use PHPStan\Type\Type;
+use PHPStan\Type\TypeWithClassName;
+
 use rosasurfer\core\Object;
 use rosasurfer\exception\RuntimeException;
 
@@ -79,5 +83,35 @@ abstract class DynamicReturnType extends Object {
         $description = $scope->isInAnonymousFunction() ? '{closure}' : '{main}';
         $description = trim($scope->getNamespace().'\\'.$description, '\\');
         return $description;
+    }
+
+
+    /**
+     * Analyse a {@link Type} and find a subclass of the specified base class.
+     *
+     * @param  Type   $type
+     * @param  string $baseClass
+     *
+     * @return string|null - subclass or NULL if no such subclass was found
+     */
+    protected function findSubclass(Type $type, $baseClass) {
+        $subclass = $name = null;
+
+        if ($type instanceof UnionType) {
+            $self = __FUNCTION__;
+            foreach ($type->getTypes() as $subtype) {
+                $subclass = $this->$self($subtype, $baseClass);
+                if ($subclass) break;
+            }
+            return $subclass;
+        }
+
+        if ($type instanceof TypeWithClassName) $name = $type->getClassName();
+        else                                    $name = $type->describe();
+
+        if ($name!=$baseClass && is_a($name, $baseClass, $allowString=true)) {
+            $subclass = $name;
+        }
+        return $subclass;
     }
 }
