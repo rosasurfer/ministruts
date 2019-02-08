@@ -163,7 +163,7 @@ interface ResultInterface {
      *
      * @return string
      */
-    public function gettype();
+    public function getType();
 
 
     /**

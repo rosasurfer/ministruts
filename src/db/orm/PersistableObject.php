@@ -610,7 +610,7 @@ abstract class PersistableObject extends Object {
     private function populate(array $row) {
         $row     = \array_change_key_case($row, CASE_LOWER);
         $mapping = $this->dao()->getMapping();
-        $dbType  = $this->dao()->db()->gettype();
+        $dbType  = $this->dao()->db()->getType();
 
         foreach ($mapping['columns'] as $column => &$property) {
             $propertyName = $property['name'];

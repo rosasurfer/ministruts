@@ -465,7 +465,7 @@ class SQLiteConnector extends Connector {
      *
      * @return string
      */
-    public function gettype() {
+    public function getType() {
         return $this->type;
     }
 

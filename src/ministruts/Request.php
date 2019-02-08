@@ -869,7 +869,7 @@ class Request extends Singleton {
      * @param  int    $expires         - Lebenszeit des Cookies (0: bis zum Schliessen des Browsers)
      * @param  string $path [optional] - Pfad, fuer den der Cookie gueltig sein soll (default: whole domain)
      */
-    public function setcookie($name, $value, $expires = 0, $path = null) {
+    public function setCookie($name, $value, $expires = 0, $path = null) {
         if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
         if (!is_int($expires)) throw new IllegalTypeException('Illegal type of parameter $expires: '.gettype($expires));
         if ($expires < 0)      throw new InvalidArgumentException('Invalid argument $expires: '.$expires);

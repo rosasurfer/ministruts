@@ -168,8 +168,8 @@ abstract class Result extends Object implements ResultInterface {
      *
      * @return string
      */
-    public function gettype() {
-        return $this->connector->gettype();
+    public function getType() {
+        return $this->connector->getType();
     }
 
 

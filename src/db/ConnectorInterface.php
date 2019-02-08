@@ -198,7 +198,7 @@ interface ConnectorInterface {
      *
      * @return string
      */
-    public function gettype();
+    public function getType();
 
 
     /**
