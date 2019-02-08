@@ -44,11 +44,11 @@ final class NetTools extends StaticClass {
      *
      * @return string - IP-Adresse oder der originale Hostname, wenn dieser nicht aufgeloest werden kann
      */
-    public static function gethostbyname($name) {
+    public static function getHostByName($name) {
         if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
         if ($name == '')       throw new InvalidArgumentException('Invalid argument $name: "'.$name.'"');
 
-        return gethostbyname($name);
+        return \gethostbyname($name);
     }
 
 

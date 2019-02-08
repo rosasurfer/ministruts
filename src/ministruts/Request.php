@@ -881,7 +881,7 @@ class Request extends Singleton {
 
         if (!is_string($path)) throw new IllegalTypeException('Illegal type of parameter $path: '.gettype($path));
 
-        setcookie($name, $value, $expires, $path);
+        \setcookie($name, $value, $expires, $path);
     }
 
 
