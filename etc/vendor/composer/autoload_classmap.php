@@ -87,6 +87,7 @@ return array(
     'rosasurfer\\exception\\error\\PHPWarning' => $baseDir . '/src/exception/error/PHPWarning.php',
     'rosasurfer\\file\\FileSystem' => $baseDir . '/src/file/FileSystem.php',
     'rosasurfer\\file\\xml\\SimpleXMLElement' => $baseDir . '/src/file/xml/SimpleXMLElement.php',
+    'rosasurfer\\file\\zip\\ZipArchive' => $baseDir . '/src/file/zip/ZipArchive.php',
     'rosasurfer\\loader\\ClassLoader' => $baseDir . '/src/loader/ClassLoader.php',
     'rosasurfer\\lock\\BaseLock' => $baseDir . '/src/lock/BaseLock.php',
     'rosasurfer\\lock\\FileLock' => $baseDir . '/src/lock/FileLock.php',
