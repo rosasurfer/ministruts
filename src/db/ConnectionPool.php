@@ -68,24 +68,24 @@ final class ConnectionPool extends Singleton {
             if (!$me->default) throw new IllegalStateException('Invalid default database configuration: null');
             $connector = $me->default;
         }
-        elseif (isSet($me->pool[$id])) {                         // is the connection already known?
+        elseif (isset($me->pool[$id])) {                         // is the connection already known?
             $connector = $me->pool[$id];
         }
         else {                                                   // no, get the connection's config
             /** @var ConfigInterface $config */
             $config  = self::di()['config'];
             $options = $config->get('db.'.$id, []);
-            if (!is_array($options)) throw new IllegalTypeException('Invalid config value "db.'.$id.'": '.getType($options).' (not array)');
+            if (!is_array($options)) throw new IllegalTypeException('Invalid config value "db.'.$id.'": '.gettype($options).' (not array)');
             if (!$options)           throw new IllegalStateException('No configuration found for database alias "'.$id.'"');
 
             // resolve the class name to use for the connector
             $className = $options['connector']; unset($options['connector']);
             $className = str_replace('/', '\\', $className);
-            if ($className[0]=='\\') $className = subStr($className, 1);
+            if ($className[0]=='\\') $className = substr($className, 1);
 
             // check known aliases for a match
-            $lName = strToLower($className);
-            if (isSet(self::$aliases[$lName]))
+            $lName = strtolower($className);
+            if (isset(self::$aliases[$lName]))
                 $className = self::$aliases[$lName];
 
             // instantiate and save a new connector

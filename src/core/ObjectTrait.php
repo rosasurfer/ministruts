@@ -22,15 +22,15 @@ trait ObjectTrait {
      * @throws RuntimeException
      */
     public function __call($method, array $args) {
-        $trace = debug_backTrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
         $class = '{unknown_class}';
 
         foreach ($trace as $frame) {
-            if (strToLower($frame['function']) !== '__call') {
+            if (strtolower($frame['function']) !== '__call') {
                 $class     = $frame['class'];
                 $namespace = strLeftTo($class, '\\', -1, true, '');
-                $baseName  = simpleClassName($class);
-                $class     = strToLower($namespace).$baseName;
+                $basename  = simpleClassName($class);
+                $class     = strtolower($namespace).$basename;
                 break;
             }
         }
@@ -63,7 +63,7 @@ trait ObjectTrait {
      * @throws RuntimeException
      */
     public function __set($property, $value) {
-        $trace = debug_backTrace(DEBUG_BACKTRACE_IGNORE_ARGS|DEBUG_BACKTRACE_PROVIDE_OBJECT);
+        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS|DEBUG_BACKTRACE_PROVIDE_OBJECT);
         $class = get_class($trace[0]['object']);
         throw new RuntimeException('Undefined or inaccessible property '.$class.'::$'.$property);
     }

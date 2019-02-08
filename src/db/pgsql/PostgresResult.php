@@ -68,9 +68,9 @@ class PostgresResult extends Result {
      * @param  int        $lastAffectedRows - last number of affected rows of the connection
      */
     public function __construct(IConnector $connector, $sql, $hResult, $lastAffectedRows) {
-        if (!is_string($sql))           throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
-        if (!is_resource($hResult))     throw new IllegalTypeException('Illegal type of parameter $hResult: '.getType($hResult));
-        if (!is_int($lastAffectedRows)) throw new IllegalTypeException('Illegal type of parameter $lastAffectedRows: '.getType($lastAffectedRows));
+        if (!is_string($sql))           throw new IllegalTypeException('Illegal type of parameter $sql: '.gettype($sql));
+        if (!is_resource($hResult))     throw new IllegalTypeException('Illegal type of parameter $hResult: '.gettype($hResult));
+        if (!is_int($lastAffectedRows)) throw new IllegalTypeException('Illegal type of parameter $lastAffectedRows: '.gettype($lastAffectedRows));
 
         $this->connector        = $connector;
         $this->sql              = $sql;
@@ -185,7 +185,7 @@ class PostgresResult extends Result {
      * @return string
      */
     public static function statusToStr($status) {
-        if (!is_int($status)) throw new IllegalTypeException('Illegal type of parameter $status: '.getType($status));
+        if (!is_int($status)) throw new IllegalTypeException('Illegal type of parameter $status: '.gettype($status));
 
         switch ($status) {
             case PGSQL_EMPTY_QUERY   : return 'PGSQL_EMPTY_QUERY';

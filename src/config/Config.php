@@ -73,7 +73,7 @@ class Config extends Object implements IConfig {
      */
     public function __construct($files) {
         if      (is_string($files)) $files = [$files];
-        else if (!is_array($files)) throw new IllegalTypeException('Illegal type of parameter $files: '.getType($files));
+        else if (!is_array($files)) throw new IllegalTypeException('Illegal type of parameter $files: '.gettype($files));
 
         ini_set('auto_detect_line_endings', 1);
         ini_set('track_errors', 1);
@@ -82,11 +82,11 @@ class Config extends Object implements IConfig {
 
         // check and load existing files
         foreach ($files as $i => $file) {
-            if (!is_string($file)) throw new IllegalTypeException('Illegal type of parameter $files['.$i.']: '.getType($file));
+            if (!is_string($file)) throw new IllegalTypeException('Illegal type of parameter $files['.$i.']: '.gettype($file));
 
             $isFile = is_file($file);
-            if      ($isFile)               $file = realPath($file);
-            else if (isRelativePath($file)) $file = getCwd().PATH_SEPARATOR.$file;
+            if      ($isFile)               $file = realpath($file);
+            else if (isRelativePath($file)) $file = getcwd().PATH_SEPARATOR.$file;
 
             $this->files[$file] = $isFile && $this->loadFile($file);
         }
@@ -104,16 +104,16 @@ class Config extends Object implements IConfig {
         $lines = file($filename, FILE_IGNORE_NEW_LINES);            // don't use FILE_SKIP_EMPTY_LINES to have correct line
                                                                     // numbers for error messages
         if ($lines && strStartsWith($lines[0], "\xEF\xBB\xBF")) {
-            $lines[0] = subStr($lines[0], 3);                       // detect and drop a possible BOM header
+            $lines[0] = substr($lines[0], 3);                       // detect and drop a possible BOM header
         }
 
         foreach ($lines as $i => $line) {
             $line = trim($line);
-            if (!strLen($line) || $line[0]=='#')                    // skip empty and comment lines
+            if (!strlen($line) || $line[0]=='#')                    // skip empty and comment lines
                 continue;
 
             $parts = explode('=', $line, 2);                        // split key/value
-            if (sizeOf($parts) < 2) {
+            if (sizeof($parts) < 2) {
                 // Don't trigger a regular error as it will cause an infinite loop if the same config is used by the error handler.
                 $msg = __METHOD__.'()  Skipping syntax error in "'.$filename.'", line '.($i+1).': missing key-value separator';
                 stderror($msg);
@@ -124,8 +124,8 @@ class Config extends Object implements IConfig {
             $rawValue = trim($parts[1]);
 
             // drop possible comments
-            if (strPos($rawValue, '#')!==false && strLen($comment=$this->getLineComment($rawValue))) {
-                $value = trim(strLeft($rawValue, -strLen($comment)));
+            if (strpos($rawValue, '#')!==false && strlen($comment=$this->getLineComment($rawValue))) {
+                $value = trim(strLeft($rawValue, -strlen($comment)));
             }
             else {
                 $value = $rawValue;
@@ -150,7 +150,7 @@ class Config extends Object implements IConfig {
         $tokens = token_get_all('<?php '.$value);
 
         // Don't use trigger_error() as it will enter an infinite loop if the same config is accessed again.
-        if (strLen($php_errormsg) && !strStartsWith($php_errormsg, 'Unterminated comment starting line'))       // that's /*...
+        if (strlen($php_errormsg) && !strStartsWith($php_errormsg, 'Unterminated comment starting line'))       // that's /*...
             error_log(__METHOD__.'()  Unexpected token_get_all() error for $value: '.$value, ERROR_LOG_DEFAULT);
 
         $lastToken = end($tokens);
@@ -162,7 +162,7 @@ class Config extends Object implements IConfig {
         if ($comment[0] == '#')
             return $comment;
 
-        return $this->{__FUNCTION__}(subStr($comment, 1));
+        return $this->{__FUNCTION__}(substr($comment, 1));
     }
 
 
@@ -187,7 +187,7 @@ class Config extends Object implements IConfig {
      * @return mixed - config setting
      */
     public function get($key, $default = null) {
-        if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
+        if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.gettype($key));
         // TODO: a numerically indexed property array will have integer keys
 
         $notFound = false;
@@ -222,7 +222,7 @@ class Config extends Object implements IConfig {
      * @throws RuntimeException if the setting does not exist and no default value was specified
      */
     public function getBool($key, $options = null) {
-        if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
+        if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.gettype($key));
 
         $notFound = false;
         $value = $this->getProperty($key, $notFound);
@@ -231,7 +231,7 @@ class Config extends Object implements IConfig {
             if (is_bool($options))
                 return $options;
             if (is_array($options) && \key_exists('default', $options)) {
-                if (!is_bool($options['default'])) throw new IllegalTypeException('Illegal type of option "default": '.getType($options['default']));
+                if (!is_bool($options['default'])) throw new IllegalTypeException('Illegal type of option "default": '.gettype($options['default']));
                 return $options['default'];
             }
             throw new RuntimeException('No configuration found for key "'.$key.'"');
@@ -242,7 +242,7 @@ class Config extends Object implements IConfig {
             $flags = $options;
         }
         else if (is_array($options) && \key_exists('flags', $options)) {
-            if (!is_int($options['flags'])) throw new IllegalTypeException('Illegal type of option "flags": '.getType($options['flags']));
+            if (!is_int($options['flags'])) throw new IllegalTypeException('Illegal type of option "flags": '.gettype($options['flags']));
             $flags = $options['flags'];
         }
         if ($flags & FILTER_NULL_ON_FAILURE && ($value===null || $value===''))  // crap-PHP considers NULL and '' as valid strict booleans
@@ -260,7 +260,7 @@ class Config extends Object implements IConfig {
      * @return $this
      */
     public function set($key, $value) {
-        if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
+        if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.gettype($key));
         $this->setProperty($key, $value);
         return $this;
     }
@@ -277,8 +277,8 @@ class Config extends Object implements IConfig {
      */
     protected function getProperty($key, &$notFound) {
         $properties  = $this->properties;
-        $subkeys     = $this->parseSubkeys(strToLower($key));
-        $subKeysSize = sizeOf($subkeys);
+        $subkeys     = $this->parseSubkeys(strtolower($key));
+        $subKeysSize = sizeof($subkeys);
         $notFound    = false;
 
         for ($i=0; $i < $subKeysSize; ++$i) {
@@ -304,7 +304,7 @@ class Config extends Object implements IConfig {
     protected function setProperty($key, $value) {
         // convert string representations of special values
         if (is_string($value)) {
-            switch (strToLower($value)) {
+            switch (strtolower($value)) {
                 case  'null' :
                 case '(null)':
                     $value = null;
@@ -326,19 +326,19 @@ class Config extends Object implements IConfig {
 
                 default:
                     if (strIsQuoted($value)) {
-                        $value = subStr($value, 1, strLen($value)-2);
+                        $value = substr($value, 1, strlen($value)-2);
                     }
             }
         }
 
         // set the property depending on the existing data structure
         $properties  = &$this->properties;
-        $subkeys     =  $this->parseSubkeys(strToLower($key));
-        $subkeysSize =  sizeOf($subkeys);
+        $subkeys     =  $this->parseSubkeys(strtolower($key));
+        $subkeysSize =  sizeof($subkeys);
 
         for ($i=0; $i < $subkeysSize; ++$i) {
             $subkey = trim($subkeys[$i]);
-            if (!strLen($subkey)) throw new InvalidArgumentException('Invalid argument $key: '.$key);
+            if (!strlen($subkey)) throw new InvalidArgumentException('Invalid argument $key: '.$key);
 
             if ($i+1 < $subkeysSize) {
                 // not yet the last subkey
@@ -407,27 +407,27 @@ class Config extends Object implements IConfig {
             $k = trim($k);
 
             foreach ($quoteChars as $char) {
-                if (strPos($k, $char) === 0) {          // subkey starts with a quote char
-                    $pos = strPos($k, $char, 1);        // find the ending quote char
+                if (strpos($k, $char) === 0) {          // subkey starts with a quote char
+                    $pos = strpos($k, $char, 1);        // find the ending quote char
                     if ($pos === false) throw new InvalidArgumentException('Invalid argument $key: '.$key);
-                    $subkeys[] = subStr($k, 1, $pos-1);
-                    $k         = trim(subStr($k, $pos+1));
-                    if (!strLen($k))                    // last subkey or next char is a key separator
+                    $subkeys[] = substr($k, 1, $pos-1);
+                    $k         = trim(substr($k, $pos+1));
+                    if (!strlen($k))                    // last subkey or next char is a key separator
                         break 2;
-                    if (strPos($k, '.') !== 0) throw new InvalidArgumentException('Invalid argument $key: '.$key);
-                    $k = subStr($k, 1);
+                    if (strpos($k, '.') !== 0) throw new InvalidArgumentException('Invalid argument $key: '.$key);
+                    $k = substr($k, 1);
                     continue 2;
                 }
             }
 
             // key is not quoted
-            $pos = strPos($k, '.');                     // find next key separator
+            $pos = strpos($k, '.');                     // find next key separator
             if ($pos === false) {
                 $subkeys[] = $k;                        // last subkey
                 break;
             }
-            $subkeys[] = trim(subStr($k, 0, $pos));
-            $k         = subStr($k, $pos+1);            // next subkey
+            $subkeys[] = trim(substr($k, 0, $pos));
+            $k         = substr($k, $pos+1);            // next subkey
         }
         return $subkeys;
     }
@@ -446,12 +446,12 @@ class Config extends Object implements IConfig {
         $maxKeyLength = 0;
         $values = $this->dumpNode([], $this->properties, $maxKeyLength);
 
-        if (isSet($options['sort'])) {
+        if (isset($options['sort'])) {
             if ($options['sort'] == SORT_ASC) {
-                kSort($values, SORT_NATURAL);
+                ksort($values, SORT_NATURAL);
             }
             else if ($options['sort'] == SORT_DESC) {
-                krSort($values, SORT_NATURAL);
+                krsort($values, SORT_NATURAL);
             }
         }
 
@@ -460,7 +460,7 @@ class Config extends Object implements IConfig {
             if     (is_null($value)) $value = '(null)';
             elseif (is_bool($value)) $value = ($value ? '(true)' : '(false)');
             elseif (is_string($value)) {
-                switch (strToLower($value)) {
+                switch (strtolower($value)) {
                     case  'null'  :
                     case '(null)' :
                     case  'true'  :
@@ -482,7 +482,7 @@ class Config extends Object implements IConfig {
         }; unset($value);
         $lines += $values;
 
-        $padLeft = isSet($options['pad-left']) ? $options['pad-left'] : '';
+        $padLeft = isset($options['pad-left']) ? $options['pad-left'] : '';
 
         return $padLeft.join(NL.$padLeft, $lines);
     }
@@ -501,14 +501,14 @@ class Config extends Object implements IConfig {
         $result = [];
 
         foreach ($values as $subkey => $value) {
-            if ($subkey==trim($subkey) && (strLen($subkey) || sizeof($values) > 1)) {
+            if ($subkey==trim($subkey) && (strlen($subkey) || sizeof($values) > 1)) {
                 $sSubkey = $subkey;
             }
             else {
                 $sSubkey = '"'.$subkey.'"';
             }
             $key          = join('.', \array_merge($node, $sSubkey=='' ? [] : [$sSubkey]));
-            $maxKeyLength = max(strLen($key), $maxKeyLength);
+            $maxKeyLength = max(strlen($key), $maxKeyLength);
 
             if (is_array($value)) {
                 $result += $this->{__FUNCTION__}(\array_merge($node, [$subkey]), $value, $maxKeyLength);
@@ -533,12 +533,12 @@ class Config extends Object implements IConfig {
         $maxKeyLength = null;
         $values = $this->dumpNode([], $this->properties, $maxKeyLength);
 
-        if (isSet($options['sort'])) {
+        if (isset($options['sort'])) {
             if ($options['sort'] == SORT_ASC) {
-                kSort($values, SORT_NATURAL);
+                ksort($values, SORT_NATURAL);
             }
             else if ($options['sort'] == SORT_DESC) {
-                krSort($values, SORT_NATURAL);
+                krsort($values, SORT_NATURAL);
             }
         }
 
@@ -547,7 +547,7 @@ class Config extends Object implements IConfig {
             if     (is_null($value)) $value = '(null)';
             elseif (is_bool($value)) $value = ($value ? '(true)' : '(false)');
             elseif (is_string($value)) {
-                switch (strToLower($value)) {
+                switch (strtolower($value)) {
                     case  'null'  :
                     case '(null)' :
                     case  'true'  :
@@ -579,7 +579,7 @@ class Config extends Object implements IConfig {
      * @return bool
      */
     public function offsetExists($key) {
-        if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
+        if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.gettype($key));
 
         $notFound = false;
         $this->getProperty($key, $notFound);
@@ -632,6 +632,6 @@ class Config extends Object implements IConfig {
      * @return int
      */
     public function count() {
-        return sizeOf($this->properties);
+        return sizeof($this->properties);
     }
 }

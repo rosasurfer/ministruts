@@ -55,7 +55,7 @@ class PropertyMapping extends Object {
      * @return string|null
      */
     public function getColumn() {
-        return isSet($this->mapping['column']) ? $this->mapping['column'] : null;
+        return isset($this->mapping['column']) ? $this->mapping['column'] : null;
     }
 
 

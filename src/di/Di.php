@@ -55,7 +55,7 @@ class Di extends Object implements DiInterface {
      * @return bool - whether custom service definitions have been found and successfully loaded
      */
     protected function loadCustomServices($configDir) {
-        if (!is_string($configDir)) throw new IllegalTypeException('Illegal type of parameter $configDir: '.getType($configDir));
+        if (!is_string($configDir)) throw new IllegalTypeException('Illegal type of parameter $configDir: '.gettype($configDir));
         if (!is_file($file = $configDir.'/services.php'))
             return false;
 
@@ -72,7 +72,7 @@ class Di extends Object implements DiInterface {
      * @throws ServiceNotFoundException if the service is unknown
      */
     public function get($name) {
-        if (isSet($this->services[$name]))
+        if (isset($this->services[$name]))
             return $this->services[$name]->resolve($factory=false);
         throw new ServiceNotFoundException('Service "'.$name.'" not found.');
     }
@@ -117,7 +117,7 @@ class Di extends Object implements DiInterface {
      * {@inheritdoc}
      */
     public function isService($name) {
-        return isSet($this->services[$name]);
+        return isset($this->services[$name]);
     }
 
 

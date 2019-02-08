@@ -76,7 +76,7 @@ class Service implements ServiceInterface {
         else if (is_object($definition)) {                  // objects may be a \Closure or an already resolved instance
             $instance = $definition instanceof \Closure ? $definition(...$parameters) : $definition;
         }
-        else throw new IllegalTypeException('Cannot resolve service "'.$this->name.'" (illegal definition type: '.getType($definition).')');
+        else throw new IllegalTypeException('Cannot resolve service "'.$this->name.'" (illegal definition type: '.gettype($definition).')');
 
         if (!$factory)
             $this->instance = $instance;

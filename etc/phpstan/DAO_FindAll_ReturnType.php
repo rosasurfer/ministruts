@@ -58,7 +58,7 @@ class DAO_FindAll_ReturnType extends DynamicReturnType implements DynamicMethodR
                 } else     $error = true(echoPre('(2) '.simpleClassName(static::$className).'->'.$methodCall->name.'() cannot resolve callee of instance method call: class($methodCall->var->class) = '.get_class($methodCall->var->class)));
             }
             else if ($methodCall->var instanceof Variable) {
-                $scopedType = $scope->getType($methodCall->var);
+                $scopedType = $scope->gettype($methodCall->var);
                 $class = $this->findSubclass($scopedType, static::$className);
                 if ($class) {
                     if (strEndsWith($class, 'DAO')) {
@@ -116,7 +116,7 @@ class DAO_FindAll_ReturnType extends DynamicReturnType implements DynamicMethodR
             $arrayType->getIterableKeyType(),
             $itemType,
             $arrayType->isItemTypeInferredFromLiteralArray(),
-        	$arrayType->isCallable()
+            $arrayType->isCallable()
         );
     }
 }

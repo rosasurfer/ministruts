@@ -45,7 +45,7 @@ class PersistableObject_Dao_ReturnType extends DynamicReturnType implements Dyna
 
         if ($returnType instanceof ObjectType) {
             if ($methodCall->var instanceof Variable) {
-                $scopedType = $scope->getType($methodCall->var);
+                $scopedType = $scope->gettype($methodCall->var);
                 if ($class = $this->findSubclass($scopedType, static::$className))
                     $returnType = new ObjectType($class.'DAO');
             } else $error = true(echoPre('(1) '.simpleClassName(static::$className).'->'.$methodCall->name.'() cannot resolve callee of instance method call: class($methodCall->var) = '.get_class($methodCall->var)));

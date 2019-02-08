@@ -144,15 +144,15 @@ class PostgresConnector extends Connector {
         $connStr = '';
 
         foreach ($this->options as $key => $value) {
-            $keyL = trim(strToLower($key));
+            $keyL = trim(strtolower($key));
 
-            if (!isSet($paramKeywords[$keyL])) continue;    // unknown keyword
+            if (!isset($paramKeywords[$keyL])) continue;    // unknown keyword
 
             if (is_array($value)) {
                 if ($keyL != 'options') continue;           // "options" is the only allowed keyword with nested settings
 
                 // split regular connection options and session variables
-                if (isSet($value[''])) {
+                if (isset($value[''])) {
                     $this->options[$key] = $value[''];
                     unset($value['']);
                     $this->sessionVars = $value;
@@ -165,7 +165,7 @@ class PostgresConnector extends Connector {
                 }
             }
 
-            if (!strLen($value)) {
+            if (!strlen($value)) {
                 $value = "''";
             }
             else {
@@ -195,15 +195,15 @@ class PostgresConnector extends Connector {
             $description = $host.':'.$port.'/'.$db.' (schema search path: '.$path.')';
         }
         else {
-            if      (isSet($options['hostaddr'])) $host = $options['hostaddr'];
-            else if (isSet($options['host'    ])) $host = $options['host'    ];
+            if      (isset($options['hostaddr'])) $host = $options['hostaddr'];
+            else if (isset($options['host'    ])) $host = $options['host'    ];
             else                                  $host = '';
 
-            if (isSet($options['port'])) $port = ':'.$options['port'];
+            if (isset($options['port'])) $port = ':'.$options['port'];
             else                         $port = '';
 
-            if      (isSet($options['dbname'])) $db = $options['dbname'];
-            else if (isSet($options['user'  ])) $db = $options['user'  ];
+            if      (isset($options['dbname'])) $db = $options['dbname'];
+            else if (isset($options['user'  ])) $db = $options['user'  ];
             else                                $db = '';
 
             $description = $host.$port.'/'.$db;
@@ -227,7 +227,7 @@ class PostgresConnector extends Connector {
                 $row    = pg_fetch_array($result, null, PGSQL_NUM);
                 $path   = $row[0];
 
-                if (strContains($path, '"$user"') && isSet($options['user'])) {
+                if (strContains($path, '"$user"') && isset($options['user'])) {
                     $path = str_replace('"$user"', $options['user'], $path);
                 }
                 break;
@@ -282,7 +282,7 @@ class PostgresConnector extends Connector {
         //$options['time_zone'] = date_default_timezone_get();      // synchronize connection timezone with PHP timezone
 
         foreach ($options as $option => $value) {
-            if (strLen($value)) {
+            if (strlen($value)) {
                 $this->execute('set '.$option.' to '.$value);       // as is (no quoting)
             }
         }
@@ -323,7 +323,7 @@ class PostgresConnector extends Connector {
      * {@inheritdoc}
      */
     public function escapeIdentifier($name) {
-        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
+        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
 
         if (!$this->isConnected())
             $this->connect();
@@ -348,7 +348,7 @@ class PostgresConnector extends Connector {
         // bug or feature: pg_escape_literal(null) => '' quoted empty string instead of 'null'
         if ($value === null)  return 'null';
 
-        if (!is_scalar($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
+        if (!is_scalar($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.gettype($value));
 
         if (is_bool ($value)) return $value ? 'true':'false';
         if (is_int  ($value)) return (string) $value;
@@ -370,7 +370,7 @@ class PostgresConnector extends Connector {
         // bug or feature: pg_escape_string(null) => empty string instead of NULL
         if ($value === null)
             return null;
-        if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
+        if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.gettype($value));
 
         if (!$this->isConnected())
             $this->connect();
@@ -441,7 +441,7 @@ class PostgresConnector extends Connector {
      * @throws DatabaseException on errors
      */
     public function executeRaw($sql) {
-        if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
+        if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.gettype($sql));
         if (!$this->isConnected())
             $this->connect();
 
@@ -564,7 +564,7 @@ class PostgresConnector extends Connector {
                     $this->lastInsertId = $this->query('select lastVal()')->fetchInt();
                 }
                 catch (\Exception $ex) {
-                    if (striPos($ex->getMessage(), 'ERROR:  lastval is not yet defined in this session') === false)
+                    if (stripos($ex->getMessage(), 'ERROR:  lastval is not yet defined in this session') === false)
                         throw $ex;
                     $this->lastInsertId = 0;
                 }
@@ -623,7 +623,7 @@ class PostgresConnector extends Connector {
      *
      * @return string
      */
-    public function getType() {
+    public function gettype() {
         return $this->type;
     }
 

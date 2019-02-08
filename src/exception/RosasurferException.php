@@ -45,13 +45,13 @@ class RosasurferException extends \Exception implements IRosasurferException {
 
             /*
             // if the exception was thrown in a magic "__set()" shift frames until we reach the erroneous assignment
-            while (strToLower($trace[0]['function']) == '__set') {
+            while (strtolower($trace[0]['function']) == '__set') {
                 \array_shift($trace);
             }
 
             // if the exception was thrown in a magic "__call()" shift frames until we reach the erroneous call
-            if (strToLower($trace[0]['function']) == '__call') {
-                while (strToLower($trace[0]['function']) == '__call') {
+            if (strtolower($trace[0]['function']) == '__call') {
+                while (strtolower($trace[0]['function']) == '__call') {
                     \array_shift($trace);
                 }
                 \array_shift($trace);                              // that's one level more than for "__set()"

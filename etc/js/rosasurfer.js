@@ -281,7 +281,7 @@ var rosasurfer = {
      *
      * @return string
      */
-    getType: function getType(arg) {
+    gettype: function gettype(arg) {
         var type = typeof(arg);
         if (type == 'object') {
             if      (arg === null)    type = 'null';
@@ -308,9 +308,9 @@ var rosasurfer = {
     showProperties: function showProperties(arg, sort) {
         if (arg === undefined)                            return alert('rosasurfer.showProperties()\n\nPassed parameter: undefined');
         if (arg === null)                                 return alert('rosasurfer.showProperties()\n\nPassed parameter: null');
-        if (this.getType(arg).startsWith('XrayWrapper ')) return this.showProperties(arg.wrappedJSObject, sort);
+        if (this.gettype(arg).startsWith('XrayWrapper ')) return this.showProperties(arg.wrappedJSObject, sort);
 
-        var property='', properties=[], type=this.getType(arg);
+        var property='', properties=[], type=this.gettype(arg);
         sort = (sort===undefined) ? (type!='Array') : Boolean(sort);
         
         for (var i in arg) {
@@ -395,7 +395,7 @@ var rosasurfer = {
      * @param  mixed msg
      */
     logStatus: function logStatus(msg) {
-        if (this.getType(msg) == 'Event') this.logEvent(msg);
+        if (this.gettype(msg) == 'Event') this.logEvent(msg);
         else                              self.status = msg;
     },
 

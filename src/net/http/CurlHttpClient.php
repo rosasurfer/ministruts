@@ -187,18 +187,18 @@ class CurlHttpClient extends HttpClient {
             if ($this->isFollowRedirects()) {
                 $options[CURLOPT_FOLLOWLOCATION] = true;
             }
-            elseif (isSet($options[CURLOPT_FOLLOWLOCATION]) && $options[CURLOPT_FOLLOWLOCATION]) {
+            elseif (isset($options[CURLOPT_FOLLOWLOCATION]) && $options[CURLOPT_FOLLOWLOCATION]) {
                 $this->setFollowRedirects(true);
             }
             if ($this->isFollowRedirects()) {
-                !isSet($options[CURLOPT_MAXREDIRS]) && $options[CURLOPT_MAXREDIRS]=$this->maxRedirects;
+                !isset($options[CURLOPT_MAXREDIRS]) && $options[CURLOPT_MAXREDIRS]=$this->maxRedirects;
             }
         }
 
         if ($request->getMethod() == 'POST') {
             $options[CURLOPT_POST      ] = true;
-            $options[CURLOPT_URL       ] = subStr($request->getUrl(), 0, strPos($request->getUrl(), '?'));
-            $options[CURLOPT_POSTFIELDS] = strStr($request->getUrl(), '?');
+            $options[CURLOPT_URL       ] = substr($request->getUrl(), 0, strpos($request->getUrl(), '?'));
+            $options[CURLOPT_POSTFIELDS] = strstr($request->getUrl(), '?');
         }
         curl_setopt_array($this->hCurl, $options);
 
@@ -237,10 +237,10 @@ class CurlHttpClient extends HttpClient {
         $options += [CURLOPT_USERAGENT => $this->userAgent  ];
         $options += [CURLOPT_ENCODING  => ''                ];  // empty string activates all supported encodings
 
-        if (!isSet($options[CURLOPT_WRITEHEADER]))
+        if (!isset($options[CURLOPT_WRITEHEADER]))
             $options += [CURLOPT_HEADERFUNCTION => [$response, 'writeHeader']];
 
-        if (!isSet($options[CURLOPT_FILE]))                     // overrides CURLOPT_RETURNTRANSFER
+        if (!isset($options[CURLOPT_FILE]))                     // overrides CURLOPT_RETURNTRANSFER
             $options += [CURLOPT_WRITEFUNCTION  => [$response, 'writeContent']];
 
         foreach ($request->getHeaders() as $key => $value) {    // add all specified request headers
@@ -261,7 +261,7 @@ class CurlHttpClient extends HttpClient {
         $errorNo  = curl_errno($hCurl);
         $errorStr = curl_error($hCurl);
 
-        if (isSet(self::$errors[$errorNo])) {
+        if (isset(self::$errors[$errorNo])) {
             $errorNo = self::$errors[$errorNo];
         }
         else {

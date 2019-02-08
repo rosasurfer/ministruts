@@ -56,11 +56,11 @@ class ZipArchive extends \ZipArchive {
             return parent::ER_OK;
 
         if (!is_int($result)) {
-            Logger::log('ZipArchive::open() returned an illegal result: '.$result.' ('.getType($result).')', L_ERROR);
+            Logger::log('ZipArchive::open() returned an illegal result: '.$result.' ('.gettype($result).')', L_ERROR);
             return parent::ER_INTERNAL;
         }
-        if (!isSet(static::$errors[$result]))
-            Logger::log('ZipArchive::open() returned an unknown result: '.$result.' ('.getType($result).')', L_WARN);
+        if (!isset(static::$errors[$result]))
+            Logger::log('ZipArchive::open() returned an unknown result: '.$result.' ('.gettype($result).')', L_WARN);
 
         return $result;
     }
@@ -74,7 +74,7 @@ class ZipArchive extends \ZipArchive {
      * @return string
      */
     public static function errorToStr($error) {
-        if (isSet(static::$errors[$error]))
+        if (isset(static::$errors[$error]))
             return static::$errors[$error][0];
         return (string)$error;
     }
@@ -88,7 +88,7 @@ class ZipArchive extends \ZipArchive {
      * @return string
      */
     public static function errorDescription($error) {
-        if (isSet(static::$errors[$error]))
+        if (isset(static::$errors[$error]))
             return static::$errors[$error][1];
         return 'unknown error';
     }

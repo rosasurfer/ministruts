@@ -96,13 +96,13 @@ class FrontController extends Singleton {
         $file = null;
         try {
             foreach ($configs as $file) {
-                $baseName = baseName($file, '.xml');
-                $prefix = (strStartsWith($baseName, 'struts-config-')) ? subStr($baseName, 14).'/' : '';
+                $basename = basename($file, '.xml');
+                $prefix = (strStartsWith($basename, 'struts-config-')) ? substr($basename, 14).'/' : '';
 
                 $module = new Module($file, $prefix);
                 $module->freeze();
 
-                if (isSet($this->modules[$prefix])) throw new StrutsConfigException('All Struts modules must have unique prefixes, non-unique prefix found: "'.$prefix.'"');
+                if (isset($this->modules[$prefix])) throw new StrutsConfigException('All Struts modules must have unique prefixes, non-unique prefix found: "'.$prefix.'"');
                 $this->modules[$prefix] = $module;
             }
         }
@@ -155,12 +155,12 @@ class FrontController extends Singleton {
         if (!strStartsWith($requestPath, $baseUri))
             throw new RuntimeException('Can not resolve module prefix from request path "'.$requestPath.'" (application base uri: "'.$baseUri.'")');
 
-        $value = subStr($requestPath, strLen($baseUri));        // baseUri ends with and prefix doesn't start with a slash
-        if (strLen($value)) {
+        $value = substr($requestPath, strlen($baseUri));        // baseUri ends with and prefix doesn't start with a slash
+        if (strlen($value)) {
             $value = strLeftTo($value, '/').'/';                // the prefix ends with a slash only for non-root modules
         }
 
-        return isSet($this->modules[$value]) ? $value : '';
+        return isset($this->modules[$value]) ? $value : '';
     }
 
 
