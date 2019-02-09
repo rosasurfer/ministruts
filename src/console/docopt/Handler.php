@@ -71,7 +71,7 @@ class Handler extends Object {
 
             $usageSections = self::parseSection('usage:', $doc);
             if (!$usageSections)            throw new DocoptFormatError('"usage:" (case-insensitive) not found.');
-            if (sizeOf($usageSections) > 1) throw new DocoptFormatError('More than one "usage:" (case-insensitive).');
+            if (sizeof($usageSections) > 1) throw new DocoptFormatError('More than one "usage:" (case-insensitive).');
             $usage = $usageSections[0];
 
             // temp fix until python port provides solution
@@ -409,7 +409,7 @@ class Handler extends Object {
         }));
         if ($tokens->errorClass==UserSyntaxError::class && !$similar) {
             $similar = array_values(array_filter($options, function($o) use ($long) {
-                return ($o->long && strPos($o->long, $long)===0);
+                return ($o->long && strpos($o->long, $long)===0);
             }));
         }
         /** @var Option $o */
@@ -423,7 +423,7 @@ class Handler extends Object {
                 $o = new Option(null, $long, $argcount, $argcount ? $value : true);
             }
         }
-        elseif (sizeOf($similar) > 1) {
+        elseif (sizeof($similar) > 1) {
             // might be simply specified ambiguously 2+ times?
             $tokens->throwException($long.' is not a unique prefix: '.join(', ', array_map(function($o) {
                 return $o->long;
