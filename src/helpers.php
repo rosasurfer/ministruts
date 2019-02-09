@@ -1325,6 +1325,21 @@ function is_dir_empty($dirname, $ignore = []) {
 
 
 /**
+ * Auto-load the specified class, interface or trait. If the component was already loaded the call does nothing.
+ *
+ * @param  string $name - name
+ *
+ * @return bool - FALSE if a component of that name doesn't exist or couldn't be loaded
+ */
+function autoload($name) {
+    if (class_exists    ($name, true)) return true;
+    if (interface_exists($name, true)) return true;
+    if (trait_exists    ($name, true)) return true;
+    return false;
+}
+
+
+/**
  * Whether or not the specified class exists (loaded or not) and is not an interface or a trait. Identical to
  * <pre>class_exists($name, true)</pre> except it also returnes FALSE if auto loading triggers an exception.
  *
