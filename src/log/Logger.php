@@ -478,8 +478,8 @@ class Logger extends StaticClass {
                 foreach (self::$smsReceivers as $receiver) {
                     $params['to'] = $receiver;
                     $url      = 'https://api.clickatell.com/http/sendmsg?'.http_build_query($params, null, '&');
-                    $request  = HttpRequest::create()->setUrl($url);
-                    $client   = CurlHttpClient::create($curlOptions);
+                    $request  = new HttpRequest($url);
+                    $client   = new CurlHttpClient($curlOptions);
                     $response = $client->send($request);
                     $status   = $response->getStatus();
                     $content  = $response->getContent();
@@ -515,8 +515,8 @@ class Logger extends StaticClass {
                 foreach (self::$smsReceivers as $receiver) {
                     $params['to'] = $receiver;
                     $url      = 'https://rest.nexmo.com/sms/json?'.http_build_query($params, null, '&');
-                    $request  = HttpRequest::create()->setUrl($url);
-                    $client   = CurlHttpClient::create($curlOptions);
+                    $request  = new HttpRequest($url);
+                    $client   = new CurlHttpClient($curlOptions);
                     $response = $client->send($request);
                     $status   = $response->getStatus();
                     $content  = $response->getContent();
