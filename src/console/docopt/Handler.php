@@ -19,11 +19,12 @@ use rosasurfer\console\docopt\pattern\Required;
 
 use function rosasurfer\array_filter;
 use function rosasurfer\array_merge;
+use function rosasurfer\echoPre;
 use function rosasurfer\strEndsWith;
 
 
 /**
- *
+ * Handler
  */
 class Handler extends Object {
 
@@ -47,7 +48,7 @@ class Handler extends Object {
     /**
      * Constructor
      *
-     * @param  mixed[] $options
+     * @param  array $options [optional]
      */
     public function __construct(array $options = []) {
         foreach ($options as $name => $value) {
@@ -60,7 +61,7 @@ class Handler extends Object {
 
     /**
      * @param  string         $doc
-     * @param  string|mixed[] $argv
+     * @param  string|mixed[] $argv [optional]
      *
      * @return Response
      */
@@ -112,12 +113,12 @@ class Handler extends Object {
 
 
     /**
-     *
+     * @param  UserSyntaxError $exception
      */
-    protected function handleExit(UserSyntaxError $ex) {
+    protected function handleExit(UserSyntaxError $exception) {
         if ($this->exit) {
-            echo $ex->getMessage().PHP_EOL;
-            exit($ex->status);
+            echoPre($exception->getMessage());
+            exit($exception->status);
         }
     }
 
@@ -176,7 +177,9 @@ class Handler extends Object {
      * If options_first: argv ::= [ long | shorts ]* [ argument ]* [ '--' [ argument ]* ] ;
      * else:             argv ::= [ long | shorts | argument ]* [ '--' [ argument ]* ] ;
      *
-     * @param  bool $optionsFirst
+     * @param  TokenStream    $tokens
+     * @param  \ArrayIterator $options
+     * @param  bool           $optionsFirst [optional]
      *
      * @return Pattern[]
      */
@@ -221,13 +224,13 @@ class Handler extends Object {
             list (, $s) = explode(':', $s, 2);
             $splitTmp = array_slice(preg_split("@\n[ \t]*(-\S+?)@", "\n".$s, null, PREG_SPLIT_DELIM_CAPTURE), 1);
             $split = [];
-            for ($cnt = count($splitTmp), $i=0; $i < $cnt; $i+=2) {
-                $split[] = $splitTmp[$i] . (isset($splitTmp[$i+1]) ? $splitTmp[$i+1] : '');
+            for ($size=sizeof($splitTmp), $i=0; $i < $size; $i+=2) {
+                $split[] = $splitTmp[$i].(isset($splitTmp[$i+1]) ? $splitTmp[$i+1] : '');
             }
             $options = [];
-            foreach ($split as $s) {
-                if (strpos($s, '-') === 0) {
-                    $options[] = Option::parse($s);
+            foreach ($split as $value) {
+                if ($value[0] == '-') {
+                    $options[] = Option::parse($value);
                 }
             }
             $defaults = array_merge($defaults, $options);
@@ -237,14 +240,15 @@ class Handler extends Object {
 
 
     /**
-     * @param  string $source
+     * @param  string         $source
+     * @param  \ArrayIterator $options
      *
      * @return Required
      */
     public static function parsePattern($source, \ArrayIterator $options) {
         $tokens = TokenStream::fromPattern($source);
         $result = self::parseExpression($tokens, $options);
-        if ($tokens->current() != null) {
+        if ($tokens->current() !== null) {
             $tokens->throwException('unexpected ending: '.join(' ', $tokens->left()));
         }
         return new Required($result);
@@ -258,22 +262,25 @@ class Handler extends Object {
      * @return string[]
      */
     public static function parseSection($name, $source) {
-        $ret = [];
+        $result = [];
         if (preg_match_all('@^([^\n]*'.$name.'[^\n]*\n?(?:[ \t].*?(?:\n|$))*)@im', $source, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
-                $ret[] = trim($match[0]);
+                $result[] = trim($match[0]);
             }
         }
-        return $ret;
+        return $result;
     }
 
 
     /**
      * expr ::= seq ( '|' seq )* ;
      *
+     * @param  TokenStream    $tokens
+     * @param  \ArrayIterator $options
+     *
      * @return Either|Pattern[]
      */
-    private static function parseExpression(TokenStream $tokens, \ArrayIterator $options) {
+    protected static function parseExpression(TokenStream $tokens, \ArrayIterator $options) {
         $seq = self::parseSequence($tokens, $options);
         if ($tokens->current() != '|')
             return $seq;
@@ -302,9 +309,12 @@ class Handler extends Object {
     /**
      * seq ::= ( atom [ '...' ] )* ;
      *
+     * @param  TokenStream    $tokens
+     * @param  \ArrayIterator $options
+     *
      * @return Pattern[]
      */
-    private static function parseSequence(TokenStream $tokens, \ArrayIterator $options) {
+    protected static function parseSequence(TokenStream $tokens, \ArrayIterator $options) {
         $result = [];
         $not = [null, '', ']', ')', '|'];
         while (!in_array($tokens->current(), $not, true)) {
@@ -324,9 +334,12 @@ class Handler extends Object {
     /**
      * shorts ::= '-' ( chars )* [ [ ' ' ] chars ] ;
      *
+     * @param  TokenStream    $tokens
+     * @param  \ArrayIterator $options
+     *
      * @return Option[]
      */
-    private static function parseShort(TokenStream $tokens, \ArrayIterator $options) {
+    protected static function parseShort(TokenStream $tokens, \ArrayIterator $options) {
         $token = $tokens->move();
 
         if (strpos($token, '-') !== 0 || strpos($token, '--') === 0)
@@ -383,9 +396,12 @@ class Handler extends Object {
     /**
      * long ::= '--' chars [ ( ' ' | '=' ) chars ] ;
      *
+     * @param  TokenStream    $tokens
+     * @param  \ArrayIterator $options
+     *
      * @return Option[]
      */
-    private static function parseLong(TokenStream $tokens, \ArrayIterator $options) {
+    protected static function parseLong(TokenStream $tokens, \ArrayIterator $options) {
         $token = $tokens->move();
         $exploded = explode('=', $token, 2);
         if (count($exploded) == 2) {
@@ -453,9 +469,12 @@ class Handler extends Object {
     /**
      * atom ::= '(' expr ')' | '[' expr ']' | 'options' | long | shorts | argument | command ;
      *
+     * @param  TokenStream    $tokens
+     * @param  \ArrayIterator $options
+     *
      * @return Pattern[]
      */
-    private static function parseAtom(TokenStream $tokens, \ArrayIterator $options) {
+    protected static function parseAtom(TokenStream $tokens, \ArrayIterator $options) {
         $token = $tokens->current();
         $result = [];
 
@@ -559,7 +578,7 @@ class Handler extends Object {
      *
      * @return bool
      */
-    private static function isUpper($string) {
+    protected static function isUpper($string) {
         return preg_match('/[A-Z]/', $string) && !preg_match('/[a-z]/', $string);
     }
 }

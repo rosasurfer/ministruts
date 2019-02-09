@@ -5,7 +5,7 @@ use rosasurfer\console\docopt\SingleMatch;
 
 
 /**
- *
+ * Command
  */
 class Command extends Argument {
 
@@ -15,7 +15,7 @@ class Command extends Argument {
      *
      * @return SingleMatch
      */
-    public function singleMatch($left) {
+    public function singleMatch(array $left) {
         foreach ($left as $n => $pattern) {
             if ($pattern instanceof Argument) {
                 if ($pattern->value == $this->name()) {

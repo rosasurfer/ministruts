@@ -5,7 +5,7 @@ use rosasurfer\core\Object;
 
 
 /**
- *
+ * Response
  */
 class Response extends Object implements \ArrayAccess, \IteratorAggregate {
 
@@ -22,8 +22,8 @@ class Response extends Object implements \ArrayAccess, \IteratorAggregate {
 
     /**
      * @param  array  $args
-     * @param  int    $status
-     * @param  string $output
+     * @param  int    $status [optional]
+     * @param  string $output [optional]
      */
     public function __construct(array $args, $status=0, $output='') {
         $this->args = $args;
@@ -36,12 +36,14 @@ class Response extends Object implements \ArrayAccess, \IteratorAggregate {
      * @return bool
      */
     public function success() {
-        return $this->status === 0;
+        return ($this->status === 0);
     }
 
 
     /**
+     * @param  mixed $offset
      *
+     * @return bool
      */
     public function offsetExists($offset) {
         return isset($this->args[$offset]);
@@ -49,7 +51,9 @@ class Response extends Object implements \ArrayAccess, \IteratorAggregate {
 
 
     /**
+     * @param  mixed $offset
      *
+     * @return string
      */
     public function offsetGet($offset) {
         return $this->args[$offset];
@@ -57,7 +61,8 @@ class Response extends Object implements \ArrayAccess, \IteratorAggregate {
 
 
     /**
-     *
+     * @param  mixed $offset
+     * @param  mixed $value
      */
     public function offsetSet($offset, $value) {
         $this->args[$offset] = $value;
@@ -65,7 +70,7 @@ class Response extends Object implements \ArrayAccess, \IteratorAggregate {
 
 
     /**
-     *
+     * @param  mixed $offset
      */
     public function offsetUnset($offset) {
         unset($this->args[$offset]);
@@ -73,7 +78,7 @@ class Response extends Object implements \ArrayAccess, \IteratorAggregate {
 
 
     /**
-     *
+     * @return \ArrayIterator
      */
     public function getIterator() {
         return new \ArrayIterator($this->args);

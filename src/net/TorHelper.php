@@ -106,10 +106,10 @@ class TorHelper extends StaticClass {
                     $size = sizeof(self::$torMirrors);
 
                     for ($i=0; $i < $size; ++$i) {
-                        $request = HttpRequest::create()->setUrl('http://'.self::$torMirrors[$i].'/ip_list_exit.php/Tor_ip_list_EXIT.csv');
+                        $request = new HttpRequest('http://'.self::$torMirrors[$i].'/ip_list_exit.php/Tor_ip_list_EXIT.csv');
                         try {
                             // TODO: Warnung ausgeben und Reihenfolge aendern, wenn ein Server nicht antwortet
-                            $response = CurlHttpClient::create()->send($request);
+                            $response = (new CurlHttpClient())->send($request);
                             $status   = $response->getStatus();
 
                             if ($status != 200) {

@@ -7,7 +7,7 @@ use rosasurfer\core\ObjectTrait;
 
 
 /**
- *
+ * TokenStream
  */
 class TokenStream extends \ArrayIterator {
 
@@ -20,7 +20,7 @@ class TokenStream extends \ArrayIterator {
 
     /**
      * @param  string|mixed[] $source
-     * @param  string         $errorClass - class name of errors
+     * @param  string         $errorClass [optional] - class name of errors
      */
     public function __construct($source, $errorClass = UserSyntaxError::class) {
         if (!is_array($source)) {

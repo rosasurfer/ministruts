@@ -5,10 +5,10 @@ use rosasurfer\config\ConfigInterface;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RuntimeException;
 use rosasurfer\exception\error\PHPError;
+use rosasurfer\file\FileSystem as FS;
 use rosasurfer\monitor\Dependency;
 
 use function rosasurfer\isRelativePath;
-use function rosasurfer\mkDirWritable;
 use function rosasurfer\strEndsWith;
 
 
@@ -53,7 +53,7 @@ final class FileSystemCache extends CachePeer {
         }
 
         // Verzeichnis ggf. erzeugen
-        mkDirWritable($directory);
+        FS::mkDir($directory);
 
         $this->directory = realpath($directory).DIRECTORY_SEPARATOR;
     }
@@ -238,7 +238,7 @@ final class FileSystemCache extends CachePeer {
      * @return bool - TRUE bei Erfolg, FALSE andererseits
      */
     private function writeFile($fileName, $value, $expires) {
-        mkDirWritable(dirname($fileName));
+        FS::mkDir(dirname($fileName));
         file_put_contents($fileName, serialize($value));
 
         // TODO: http://phpdevblog.niknovo.com/2009/11/serialize-vs-var-export-vs-json-encode.html

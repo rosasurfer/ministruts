@@ -215,7 +215,7 @@ class CurlHttpClient extends HttpClient {
             /** @var string $location */
             $location = $response->getHeader('Location');                       // TODO: relative Redirects abfangen
             Logger::log('Performing manual redirect to: '.$location, L_INFO);   // TODO: verschachtelte IOExceptions abfangen
-            $request  = HttpRequest::create()->setUrl($location);
+            $request  = new HttpRequest($location);
             $response = $this->send($request);
         }
 
