@@ -2,7 +2,6 @@
 namespace rosasurfer\console\docopt\pattern;
 
 use rosasurfer\core\Object;
-use rosasurfer\console\docopt\Handler;
 
 use function rosasurfer\array_merge;
 
@@ -45,22 +44,6 @@ abstract class Pattern extends Object {
      */
     public function name() {
         return $this->name;
-    }
-
-
-    /**
-     * @return string
-     */
-    public function __toString() {
-        return serialize($this);
-    }
-
-
-    /**
-     * @return string
-     */
-    public function hash() {
-        return (string) crc32((string)$this);
     }
 
 
@@ -108,7 +91,7 @@ abstract class Pattern extends Object {
      */
     public function fixRepeatingArguments() {
         $either = [];
-        foreach (Handler::transform($this)->children as $child) {
+        foreach (static::transform($this)->children as $child) {
             $either[] = $child->children;
         }
 
@@ -146,5 +129,71 @@ abstract class Pattern extends Object {
             }
         }
         return $this;
+    }
+
+
+    /**
+     * Expand pattern into an (almost) equivalent one, but with single {@link Either}.
+     *
+     * Example: ((-a | -b) (-c | -d)) => (-a -c | -a -d | -b -c | -b -d)
+     * Quirks: [-a] => (-a), (-a...) => (-a -a)
+     *
+     * @param  Pattern $pattern
+     *
+     * @return Either
+     */
+    protected static function transform(Pattern $pattern) {
+        $result = [];
+        $groups = [[$pattern]];
+
+        while ($groups) {
+            $children = array_shift($groups);
+            $hasBranchPattern = false;
+            foreach ($children as $c) {
+                if ($c instanceof BranchPattern) {
+                    $hasBranchPattern = true;
+                    break;
+                }
+            }
+            if ($hasBranchPattern) {
+                /** @var BranchPattern $child */
+                $child = null;
+                foreach ($children as $key => $currentChild) {
+                    if ($currentChild instanceof BranchPattern) {
+                        $child = $currentChild;
+                        unset($children[$key]);
+                        break;
+                    }
+                }
+                if ($child instanceof Either) {
+                    foreach ($child->children as $c) {
+                        $groups[] = array_merge([$c], $children);
+                    }
+                }
+                else if ($child instanceof OneOrMore) {
+                    $groups[] = array_merge($child->children, $child->children, $children);
+                }
+                else {
+                    $groups[] = array_merge($child->children, $children);
+                }
+            }
+            else {
+                $result[] = $children;
+            }
+        }
+
+        $rs = [];
+        foreach ($result as $e) {
+            $rs[] = new Required($e);
+        }
+        return new Either($rs);
+    }
+
+
+    /**
+     * @return string
+     */
+    public function __toString() {
+        return serialize($this);
     }
 }

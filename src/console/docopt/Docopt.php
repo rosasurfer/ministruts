@@ -6,8 +6,6 @@ use rosasurfer\core\StaticClass;
 
 /**
  * Docopt
- *
- * Command-line argument parser that will make you smile.
  */
 class Docopt extends StaticClass {
 
@@ -18,11 +16,11 @@ class Docopt extends StaticClass {
      * @param  string       $doc
      * @param  string|array $params [optional]
      *
-     * @return Response
+     * @return Result
      */
     public static function handle($doc, $params = []) {
         $argv = null;
-        if (isSet($params['argv'])) {
+        if (isset($params['argv'])) {
             $argv = $params['argv'];
             unset($params['argv']);
         }
@@ -32,7 +30,7 @@ class Docopt extends StaticClass {
         }
         /** @var array */
         $options = $params;
-        $handler = new Handler($options);
-        return $handler->handle($doc, $argv);
+        $parser = new Parser($options);
+        return $parser->parse($doc, $argv);
     }
 }

@@ -3,14 +3,15 @@ namespace rosasurfer\console\docopt\exception;
 
 use rosasurfer\exception\RuntimeException;
 
+use const rosasurfer\NL;
+
 
 /**
- * UserSyntaxError
+ * UserNotification
  *
- * An exception marking errors made by the end user of the CLI application. The application was launched with invalid
- * arguments.
+ * An exception marking help screens and syntax errors to be shown to the end user of the CLI application.
  */
-class UserSyntaxError extends RuntimeException {
+class UserNotification extends RuntimeException {
 
 
     /** @var string */
@@ -19,12 +20,13 @@ class UserSyntaxError extends RuntimeException {
     /** @var int */
     public $status;
 
+
     /**
      * @param string $message [optional]
      * @param int    $status  [optional]
      */
     public function __construct($message=null, $status=1) {
-        parent::__construct(trim($message.PHP_EOL.static::$usage));
+        parent::__construct(trim($message.NL.static::$usage));
         $this->status = $status;
     }
 }
