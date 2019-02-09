@@ -12,7 +12,7 @@ class OneOrMore extends BranchPattern {
      * @param  Pattern[] $left
      * @param  Pattern[] $collected [optional]
      *
-     * @return mixed[]
+     * @return array
      */
     public function match(array $left, array $collected = []) {
         if (count($this->children) != 1)

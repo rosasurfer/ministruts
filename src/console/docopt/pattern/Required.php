@@ -12,7 +12,7 @@ class Required extends BranchPattern {
      * @param  Pattern[] $left
      * @param  Pattern[] $collected [optional]
      *
-     * @return mixed[]
+     * @return array
      */
     public function match(array $left, array $collected = []) {
         $l = $left;

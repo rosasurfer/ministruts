@@ -11,7 +11,7 @@ use rosasurfer\console\docopt\pattern\Pattern;
 class SingleMatch extends Object {
 
 
-    /** @var ?int */
+    /** @var int */
     public $pos;
 
     /** @var Pattern */
@@ -19,8 +19,8 @@ class SingleMatch extends Object {
 
 
     /**
-     * @param  ?int    $pos
-     * @param  Pattern $pattern
+     * @param  int|null $pos
+     * @param  Pattern  $pattern [optional]
      */
     public function __construct($pos, Pattern $pattern = null) {
         $this->pos = $pos;
@@ -29,7 +29,7 @@ class SingleMatch extends Object {
 
 
     /**
-     *
+     * @return array
      */
     public function toArray() {
         return [$this->pos, $this->pattern];

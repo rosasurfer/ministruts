@@ -46,7 +46,7 @@ abstract class BranchPattern extends Pattern {
      * @param  Pattern[] $left
      * @param  Pattern[] $collected [optional]
      *
-     * @return mixed[]
+     * @return array
      */
     public function match(array $left, array $collected = []) {
         throw new \RuntimeException("Unsupported");

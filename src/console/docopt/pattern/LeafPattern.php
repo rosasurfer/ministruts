@@ -28,7 +28,7 @@ abstract class LeafPattern extends Pattern {
      *
      * @return SingleMatch
      */
-    abstract public function singleMatch($left);
+    abstract public function singleMatch(array $left);
 
 
     /**
@@ -47,7 +47,7 @@ abstract class LeafPattern extends Pattern {
      * @param  Pattern[] $left
      * @param  Pattern[] $collected [optional]
      *
-     * @return mixed[]
+     * @return array
      */
     public function match(array $left, array $collected = []) {
         list ($pos, $match) = $this->singleMatch($left)->toArray();

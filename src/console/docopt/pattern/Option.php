@@ -79,7 +79,7 @@ class Option extends LeafPattern {
      *
      * @return SingleMatch
      */
-    public function singleMatch($left) {
+    public function singleMatch(array $left) {
         foreach ($left as $n => $pattern) {
             if ($this->name() == $pattern->name())
                 return new SingleMatch($n, $pattern);

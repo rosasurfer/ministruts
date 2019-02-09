@@ -16,7 +16,7 @@ class Docopt extends StaticClass {
      * API compatibility with python docopt
      *
      * @param  string       $doc
-     * @param  string|array $params
+     * @param  string|array $params [optional]
      *
      * @return Response
      */

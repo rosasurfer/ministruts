@@ -12,7 +12,7 @@ class Optional extends BranchPattern {
      * @param  Pattern[] $left
      * @param  Pattern[] $collected [optional]
      *
-     * @return mixed[]
+     * @return array
      */
     public function match(array $left, array $collected = []) {
         foreach ($this->children as $pattern) {
