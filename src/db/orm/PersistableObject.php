@@ -48,16 +48,16 @@ abstract class PersistableObject extends Object {
     public function __call($method, array $args) {
         $dao     = $this->dao();
         $mapping = $dao->getMapping();
-        $methodL = strToLower($method);
+        $methodL = strtolower($method);
 
         // calls to getters of mapped properties are intercepted
-        if (isSet($mapping['getters'][$methodL])) {
+        if (isset($mapping['getters'][$methodL])) {
             $property = $mapping['getters'][$methodL]['name'];
             return $this->get($property);
         }
 
         // calls to setters of mapped properties are intercepted
-        //if (isSet($mapping['setters'][$methodL])) {               // TODO: implement default setters
+        //if (isset($mapping['setters'][$methodL])) {               // TODO: implement default setters
         //    $property = $mapping['getters'][$methodL]['name'];
         //    $this->$property = $args;
         //    return $this;
@@ -104,10 +104,10 @@ abstract class PersistableObject extends Object {
     protected function get($property) {
         $mapping = $this->dao()->getMapping();
 
-        if (isSet($mapping['properties'][$property]))
+        if (isset($mapping['properties'][$property]))
             return $this->getNonRelationValue($property);
 
-        if (isSet($mapping['relations'][$property]))
+        if (isset($mapping['relations'][$property]))
             return $this->getRelationValue($property);
 
         throw new RuntimeException('Not a mapped property "'.$property.'"');
@@ -165,13 +165,13 @@ abstract class PersistableObject extends Object {
         $relatedTable   = $relatedMapping['table'];
 
         if ($value === null) {
-            if (isSet($relation['column'])) {                           // a local column with a foreign-key value of NULL
+            if (isset($relation['column'])) {                           // a local column with a foreign-key value of NULL
                 $value = false;
                 return $emptyResult;                                    // the relation is marked as empty
             }
 
             // a local key is used
-            if (!isSet($relation['key']))
+            if (!isset($relation['key']))
                 $relation['key'] = $mapping['identity']['name'];        // default local key is identity
             $keyName = $relation['key'];                                // the used local key property
             if ($this->$keyName === null) {
@@ -181,7 +181,7 @@ abstract class PersistableObject extends Object {
             $keyColumn = $mapping['properties'][$keyName]['column'];    // the used local key column
             $refColumn = $relation['ref-column'];                       // the referencing column
 
-            if (!isSet($relation['join-table'])) {
+            if (!isset($relation['join-table'])) {
                 // the referencing column is part of the related table
                 $refColumnType = $relatedMapping['columns'][$refColumn]['type'];
                 $refValue      = $relatedDao->escapeLiteral($this->getPhysicalValue($keyColumn, $refColumnType));
@@ -194,7 +194,7 @@ abstract class PersistableObject extends Object {
                 $joinTable = $relation['join-table'];
                 $keyValue  = $dao->escapeLiteral($this->getPhysicalValue($keyColumn));  // the physical local key value
 
-                if (!isSet($relation['foreign-key']))
+                if (!isset($relation['foreign-key']))
                     $relation['foreign-key'] = $relatedMapping['identity']['name'];     // default foreign-key is identity
                 $fkName      = $relation['foreign-key'];                                // the used foreign-key property
                 $fkColumn    = $relatedMapping['properties'][$fkName]['column'];        // the used foreign-key column
@@ -211,14 +211,14 @@ abstract class PersistableObject extends Object {
         }
         else {
             // $value holds a non-NULL column-type foreign-key value pointing to a single related record
-            if (isSet($relation['join-table'])) {
-                if (!isSet($relation['foreign-key']))
+            if (isset($relation['join-table'])) {
+                if (!isset($relation['foreign-key']))
                     $relation['foreign-key'] = $relatedMapping['identity']['name'];     // default foreign-key is identity
                 $fkName   = $relation['foreign-key'];                                   // the used foreign-key property
                 $fkColumn = $relatedMapping['properties'][$fkName]['column'];           // the used foreign-key column
             }
-            else if (isSet($relation['column'])) {                      // a local column referencing the foreign key
-                if (!isSet($relation['ref-column']))                    // default foreign-key is identity
+            else if (isset($relation['column'])) {                      // a local column referencing the foreign key
+                if (!isset($relation['ref-column']))                    // default foreign-key is identity
                     $relation['ref-column'] = $relatedMapping['identity']['column'];
                 $fkColumn = $relation['ref-column'];                    // the used foreign-key column
             }
@@ -248,8 +248,8 @@ abstract class PersistableObject extends Object {
      */
     private function getPhysicalValue($column, $type = null) {
         $mapping = $this->dao()->getMapping();
-        $column  = strToLower($column);
-        if (!isSet($mapping['columns'][$column])) throw new RuntimeException('Not a mapped column "'.func_get_arg(0).'"');
+        $column  = strtolower($column);
+        if (!isset($mapping['columns'][$column])) throw new RuntimeException('Not a mapped column "'.func_get_arg(0).'"');
 
         $property      = &$mapping['columns'][$column];
         $propertyName  =  $property['name'];
@@ -258,7 +258,7 @@ abstract class PersistableObject extends Object {
         if ($propertyValue === null)
             return null;
 
-        if (isSet($property['assoc'])) {
+        if (isset($property['assoc'])) {
             if ($propertyValue === false)
                 return null;
             if (!is_object($propertyValue)) {               // a foreign-key value of a not-yet-fetched relation
@@ -268,7 +268,7 @@ abstract class PersistableObject extends Object {
 
             /** @var PersistableObject $object */
             $object = $propertyValue;                       // a single instance of "one-to-one"|"many-to-one" relation, no join table
-            if (!isSet($property['ref-column']))
+            if (!isset($property['ref-column']))
                 $property['ref-column'] = $object->dao()->getMapping()['identity']['column'];
             $fkColumn = $property['ref-column'];
             return $object->getPhysicalValue($fkColumn);
@@ -333,7 +333,7 @@ abstract class PersistableObject extends Object {
      */
     final public function isDeleted() {
         foreach ($this->dao()->getMapping()['properties'] as $name => $property) {
-            if (isSet($property['soft-delete']) && $property['soft-delete']===true) {
+            if (isset($property['soft-delete']) && $property['soft-delete']===true) {
                 return ($this->$name !== null);
             }
         }
@@ -354,12 +354,11 @@ abstract class PersistableObject extends Object {
     /**
      * Set the instance status to "modified".
      *
-     * @return bool - the previous state
+     * @return $this
      */
     final protected function modified() {
-        $previous = $this->isModified();
         $this->_modified = true;
-        return $previous;
+        return $this;
     }
 
 
@@ -414,6 +413,7 @@ abstract class PersistableObject extends Object {
 
         // perform insertion
         $id = $this->doInsert($values);
+        $this->_modified = false;
 
         // assign the returned identity value
         $idName = $mapping['identity']['name'];
@@ -493,7 +493,7 @@ abstract class PersistableObject extends Object {
         $table    = $mapping['table'];
         $idColumn = $mapping['identity']['column'];
         $id       = null;
-        if  (isSet($values[$idColumn])) $id = $values[$idColumn];
+        if  (isset($values[$idColumn])) $id = $values[$idColumn];
         else unset($values[$idColumn]);
 
         // translate column values
@@ -621,10 +621,10 @@ abstract class PersistableObject extends Object {
             else {
                 $propertyType = $property['type'];
 
-                if (isSet($property['assoc'])) {                // $property[type] is a PersistableObject class
-                    //if (!isSet($property['column-type'])) {
+                if (isset($property['assoc'])) {                // $property[type] is a PersistableObject class
+                    //if (!isset($property['column-type'])) {
                     //    $relatedMapping = $propertyType::dao()->getMapping();
-                    //    if (!isSet($property['ref-column']))
+                    //    if (!isset($property['ref-column']))
                     //        $property['ref-column'] = $relatedMapping['identity']['column'];
                     //    $refColumn = $property['ref-column'];
                     //    $property['column-type'] = $relatedMapping['columns'][$refColumn]['type'];
@@ -648,7 +648,7 @@ abstract class PersistableObject extends Object {
                     case 'float'  :
                     case 'double' : $this->$propertyName =     (float) $row[$column]; break;
                     case 'string' : $this->$propertyName =    (string) $row[$column]; break;
-                  //case 'array'  : $this->$propertyName =   strLen($row[$column]) ? explode(',', $row[$column]):[]; break;
+                  //case 'array'  : $this->$propertyName =   strlen($row[$column]) ? explode(',', $row[$column]):[]; break;
                   //case DateTime::class: $this->$propertyName = new DateTime($row[$column]); break;
 
                     default:

@@ -39,25 +39,25 @@ class PHPMailer extends Mailer {
 
         // first validate the additional headers
         foreach ($headers as $i => $header) {
-            if (!is_string($header))       throw new IllegalTypeException('Illegal type of parameter $headers['.$i.']: '.getType($header));
+            if (!is_string($header))       throw new IllegalTypeException('Illegal type of parameter $headers['.$i.']: '.gettype($header));
             if (!preg_match('/^[a-z]+(-[a-z]+)*:/i', $header))
                                            throw new InvalidArgumentException('Invalid parameter $headers['.$i.']: "'.$header.'"');
         }
 
         // auto-complete sender if not specified
-        if (!isSet($sender)) {
+        if (!isset($sender)) {
             $sender = $config->get('mail.from', ini_get('sendmail_from'));
-            if (!strLen($sender)) {
-                $sender = strToLower(get_current_user().'@'.$this->hostName);
+            if (!strlen($sender)) {
+                $sender = strtolower(get_current_user().'@'.$this->hostName);
             }
         }
 
         // Return-Path: (invisible sender)
-        if (!is_string($sender))           throw new IllegalTypeException('Illegal type of parameter $sender: '.getType($sender));
+        if (!is_string($sender))           throw new IllegalTypeException('Illegal type of parameter $sender: '.gettype($sender));
         $returnPath = self::parseAddress($sender);
         if (!$returnPath)                  throw new InvalidArgumentException('Invalid parameter $sender: '.$sender);
         $value = $this->removeHeader($headers, 'Return-Path');
-        if (strLen($value)) {
+        if (strlen($value)) {
             $returnPath = self::parseAddress($value);
             if (!$returnPath)              throw new InvalidArgumentException('Invalid header "Return-Path: '.$value.'"');
         }
@@ -66,19 +66,19 @@ class PHPMailer extends Mailer {
         $from = self::parseAddress($sender);
         if (!$from)                        throw new InvalidArgumentException('Invalid parameter $sender: '.$sender);
         $value = $this->removeHeader($headers, 'From');
-        if (strLen($value)) {
+        if (strlen($value)) {
             $from = self::parseAddress($value);
             if (!$from)                    throw new InvalidArgumentException('Invalid header "From: '.$value.'"');
         }
         $from = $this->encodeNonAsciiChars($from);
 
         // RCPT: (receiving mailbox)
-        if (!is_string($receiver))         throw new IllegalTypeException('Illegal type of parameter $receiver: '.getType($receiver));
+        if (!is_string($receiver))         throw new IllegalTypeException('Illegal type of parameter $receiver: '.gettype($receiver));
         $rcpt = self::parseAddress($receiver);
         if (!$rcpt)                        throw new InvalidArgumentException('Invalid parameter $receiver: '.$receiver);
         $forced = $config->get('mail.forced-receiver', '');
-        if (!is_string($forced))           throw new IllegalTypeException('Illegal type of config value "mail.forced-receiver": '.getType($forced).' (not string)');
-        if (strLen($forced)) {
+        if (!is_string($forced))           throw new IllegalTypeException('Illegal type of config value "mail.forced-receiver": '.gettype($forced).' (not string)');
+        if (strlen($forced)) {
             $rcpt = self::parseAddress($forced);
             if (!$rcpt)                    throw new InvalidArgumentException('Invalid config value "mail.forced-receiver": '.$forced);
         }
@@ -87,14 +87,14 @@ class PHPMailer extends Mailer {
         $to = self::parseAddress($receiver);
         if (!$to)                          throw new InvalidArgumentException('Invalid parameter $receiver: '.$receiver);
         $value = $this->removeHeader($headers, 'To');
-        if (strLen($value)) {
+        if (strlen($value)) {
             $to = self::parseAddress($value);
             if (!$to)                      throw new InvalidArgumentException('Invalid header "To: '.$value.'"');
         }
         $to = $this->encodeNonAsciiChars($to);
 
         // Subject:
-        if (!is_string($subject))          throw new IllegalTypeException('Illegal type of parameter $subject: '.getType($subject));
+        if (!is_string($subject))          throw new IllegalTypeException('Illegal type of parameter $subject: '.gettype($subject));
         $subject = $this->encodeNonAsciiChars(trim($subject));
 
         // encode remaining headers (must be ASCII chars only)
@@ -115,7 +115,7 @@ class PHPMailer extends Mailer {
             $headers[] = 'To: '.trim($to['name'].' <'.$to['address'].'>');  // on Windows only if $headers is missing one
 
         // mail body
-        if (!is_string($message))          throw new IllegalTypeException('Illegal type of parameter $message: '.getType($message));
+        if (!is_string($message))          throw new IllegalTypeException('Illegal type of parameter $message: '.gettype($message));
         $message = str_replace(chr(0), '?', $message);                      // replace NUL bytes which destroy the mail
         $message = normalizeEOL($message, EOL_WINDOWS);                     // multiple lines must be separated by CRLF
 

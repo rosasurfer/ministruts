@@ -42,7 +42,7 @@ trait RosasurferExceptionTrait {
      * @return $this
      */
     public function setCode($code) {
-        if (!isSet($this->code)) {
+        if (!isset($this->code)) {
             $this->code = $code;
         }
         return $this;

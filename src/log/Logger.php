@@ -159,7 +159,7 @@ class Logger extends StaticClass {
         if ($config) {
             $logLevel = $config->get('log.level', '');
             if (is_array($logLevel))
-                $logLevel = isSet($logLevel['']) ? $logLevel[''] : '';
+                $logLevel = isset($logLevel['']) ? $logLevel[''] : '';
             $logLevel = self::logLevelToId($logLevel) ?: self::DEFAULT_LOGLEVEL;
         }
         else {
@@ -197,8 +197,8 @@ class Logger extends StaticClass {
         if ($config) {
             foreach (explode(',', $config->get('log.sms.receiver', '')) as $receiver) {
                 if ($receiver=trim($receiver)) {
-                    if (strStartsWith($receiver, '+' )) $receiver = subStr($receiver, 1);
-                    if (strStartsWith($receiver, '00')) $receiver = subStr($receiver, 2);
+                    if (strStartsWith($receiver, '+' )) $receiver = substr($receiver, 1);
+                    if (strStartsWith($receiver, '00')) $receiver = substr($receiver, 2);
                     if (!ctype_digit($receiver)) {
                         self::log('Invalid SMS receiver configuration: "'.$receiver.'"', L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
                         continue;
@@ -217,7 +217,7 @@ class Logger extends StaticClass {
 
         if ($config) {
             $options = $config->get('sms', []);
-            if (!is_array($options)) throw new IllegalTypeException('Invalid type of config value "sms": '.getType($options).' (not array)');
+            if (!is_array($options)) throw new IllegalTypeException('Invalid type of config value "sms": '.gettype($options).' (not array)');
             self::$smsOptions = $options;
         }
 
@@ -239,9 +239,9 @@ class Logger extends StaticClass {
      * @return int|null - loglevel constant or NULL, if $value is not a valid loglevel description
      */
     public static function logLevelToId($value) {
-        if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
+        if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.gettype($value));
 
-        switch (strToLower($value)) {
+        switch (strtolower($value)) {
             case 'debug' : return L_DEBUG;
             case 'info'  : return L_INFO;
             case 'notice': return L_NOTICE;
@@ -262,7 +262,7 @@ class Logger extends StaticClass {
      * @return int - configured loglevel or the application loglevel if no class specific loglevel is configured
      */
     public static function getLogLevel($class = '') {
-        if (!is_string($class)) throw new IllegalTypeException('Illegal type of parameter $class: '.getType($class));
+        if (!is_string($class)) throw new IllegalTypeException('Illegal type of parameter $class: '.gettype($class));
         self::init();
 
         // read the configured class specific loglevels
@@ -276,7 +276,7 @@ class Logger extends StaticClass {
                 $logLevels = ['' => $logLevels];                            // only the general application loglevel is configured
 
             foreach ($logLevels as $className => $level) {
-                if (!is_string($level)) throw new IllegalTypeException('Illegal configuration value for "log.level.'.$className.'": '.getType($level));
+                if (!is_string($level)) throw new IllegalTypeException('Illegal configuration value for "log.level.'.$className.'": '.gettype($level));
 
                 if ($level == '') {                                         // classes with empty values fall back to the application loglevel
                     unset($logLevels[$className]);
@@ -288,7 +288,7 @@ class Logger extends StaticClass {
 
                     if (strStartsWith($className, '\\')) {                  // normalize class names: remove leading back slash
                         unset($logLevels[$className]);
-                        $className = subStr($className, 1);
+                        $className = substr($className, 1);
                         $logLevels[$className] = $logLevel;
                     }
                 }
@@ -297,8 +297,8 @@ class Logger extends StaticClass {
         }
 
         // look-up the loglevel for the specified class
-        $class = strToLower($class);
-        if (isSet($logLevels[$class]))
+        $class = strtolower($class);
+        if (isset($logLevels[$class]))
             return $logLevels[$class];
 
         // return the general application loglevel if no class specific loglevel is configured
@@ -326,13 +326,13 @@ class Logger extends StaticClass {
 
             // validate parameters
             if (!is_string($loggable)) {
-                if (!is_object($loggable))                   throw new IllegalTypeException('Illegal type of parameter $loggable: '.getType($loggable));
+                if (!is_object($loggable))                   throw new IllegalTypeException('Illegal type of parameter $loggable: '.gettype($loggable));
                 if (!method_exists($loggable, '__toString')) throw new IllegalTypeException('Illegal type of parameter $loggable: '.get_class($loggable).'::__toString() not found');
                 if (!$loggable instanceof \Exception)
                     $loggable = (string) $loggable;
             }
-            if (!is_int($level))                            throw new IllegalTypeException('Illegal type of parameter $level: '.getType($level));
-            if (!isSet(self::$logLevels[$level]))           throw new InvalidArgumentException('Invalid argument $level: '.$level.' (not a loglevel)');
+            if (!is_int($level))                            throw new IllegalTypeException('Illegal type of parameter $level: '.gettype($level));
+            if (!isset(self::$logLevels[$level]))           throw new InvalidArgumentException('Invalid argument $level: '.$level.' (not a loglevel)');
 
             $filtered = false;
 
@@ -372,7 +372,7 @@ class Logger extends StaticClass {
             if ($level!=L_FATAL || !$loggable instanceof \Exception) {
                 $file = key_exists('file', $context) ? $context['file'] : '';
                 $line = key_exists('line', $context) ? $context['line'] : '';
-                $msg  = 'PHP ['.strToUpper(self::$logLevels[$level]).'] '.$loggable.NL.' in '.$file.' on line '.$line;
+                $msg  = 'PHP ['.strtoupper(self::$logLevels[$level]).'] '.$loggable.NL.' in '.$file.' on line '.$line;
                 error_log(trim($msg), ERROR_LOG_DEFAULT);
             }
             throw $ex;
@@ -427,7 +427,7 @@ class Logger extends StaticClass {
         $options = $headers = [];
         $sender  = null;
 
-        if (strLen($name = $config->get('log.mail.profile', ''))) {
+        if (strlen($name = $config->get('log.mail.profile', ''))) {
             $options = $config->get('mail.profile.'.$name, []);
             $sender  = $config->get('mail.profile.'.$name.'.from', null);
             $headers = $config->get('mail.profile.'.$name.'.headers', []);
@@ -462,11 +462,11 @@ class Logger extends StaticClass {
         // (2) clean-up message
         $message = trim($context['cliMessage']);
         $message = normalizeEOL($message);                             // enforce Unix line-breaks
-        $message = subStr($message, 0, 150);                           // limit length to about one text message
+        $message = substr($message, 0, 150);                           // limit length to about one text message
 
 
         // (3) check availability and use Clickatell
-        if (isSet(self::$smsOptions['clickatell'])) {
+        if (isset(self::$smsOptions['clickatell'])) {
             $smsOptions = self::$smsOptions['clickatell'];
             if (!empty($smsOptions['user']) && !empty($smsOptions['password']) && !empty($smsOptions['api_id'])) {
                 $params = [];
@@ -503,7 +503,7 @@ class Logger extends StaticClass {
 
         // (4) check availability and use Nexmo
         // TODO encoding issues when sending to Bulgarian receivers (some chars are auto-converted to ciryllic crap)
-        if (isSet(self::$smsOptions['nexmo'])) {
+        if (isset(self::$smsOptions['nexmo'])) {
             $smsOptions = self::$smsOptions['nexmo'];
             if (!empty($smsOptions['api_key']) && !empty($smsOptions['api_secret'])) {
                 $params = [];
@@ -527,7 +527,7 @@ class Logger extends StaticClass {
                         catch (\Exception $ex) {/*eat it*/}
                         continue;
                     }
-                    if (!isSet($content)) {
+                    if (!isset($content)) {
                         try {
                             self::log('Empty reply from server, URL: '.$request->getUrl(), L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
                         }
@@ -598,7 +598,7 @@ class Logger extends StaticClass {
             // simple message
             $msg = $loggable;
 
-            if (strLen($indent)) {                      // indent multiline messages
+            if (strlen($indent)) {                      // indent multiline messages
                 $lines = explode(NL, normalizeEOL($msg));
                 $eom = '';
                 if (strEndsWith($msg, NL)) {
@@ -607,7 +607,7 @@ class Logger extends StaticClass {
                 }
                 $msg = join(NL.$indent, $lines).$eom;
             }
-            $cliMessage = '['.strToUpper(self::$logLevels[$level]).'] '.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
+            $cliMessage = '['.strtoupper(self::$logLevels[$level]).'] '.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
 
             // if there was no exception append the internal stacktrace to "cliExtra"
             if (!key_exists('exception', $context)) {
@@ -627,7 +627,7 @@ class Logger extends StaticClass {
                     $type .= 'PHP Error:';
                 }
             }
-            $cliMessage = '['.strToUpper(self::$logLevels[$level]).'] '.$type.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
+            $cliMessage = '['.strtoupper(self::$logLevels[$level]).'] '.$type.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
 
             // the stack trace will go into "cliExtra"
             $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
@@ -671,14 +671,14 @@ class Logger extends StaticClass {
         // compose message
         if (CLI) {
             $msg     .= NL.NL.'Shell:'.NL.'------'.NL.print_r(ksort_r($_SERVER), true).NL;
-            $location = realPath($_SERVER['PHP_SELF']);
+            $location = realpath($_SERVER['PHP_SELF']);
         }
         else {
             $request  = Request::me();
             $location = strLeftTo($request->getUrl(), '?');
             $session  = null;
 
-            if (isSet($_SESSION)) {
+            if (isset($_SESSION)) {
                 $session = $_SESSION;
             }
             else if ($request->hasSessionId()) {
@@ -734,7 +734,7 @@ class Logger extends StaticClass {
         if (is_string($loggable)) {
             // simple message
             $msg   = $loggable;
-            $html .= '<span style="white-space:nowrap"><span style="font-weight:bold">['.strToUpper(self::$logLevels[$level]).']</span> <span style="white-space:pre; line-height:8px">'.nl2br(hsc($msg)).'</span></span><br><br>';
+            $html .= '<span style="white-space:nowrap"><span style="font-weight:bold">['.strtoupper(self::$logLevels[$level]).']</span> <span style="white-space:pre; line-height:8px">'.nl2br(hsc($msg)).'</span></span><br><br>';
             $html .= 'in <span style="font-weight:bold">'.$file.'</span> on line <span style="font-weight:bold">'.$line.'</span><br>';
 
             // attach the internal stacktrace if there was no exception
@@ -755,7 +755,7 @@ class Logger extends StaticClass {
                     $type .= 'PHP Error:';
                 }
             }
-            $html     .= '<span style="white-space:nowrap"><span style="font-weight:bold">['.strToUpper(self::$logLevels[$level]).']</span> <span style="white-space:pre; line-height:8px">'.nl2br(hsc($type.$msg)).'</span></span><br><br>';
+            $html     .= '<span style="white-space:nowrap"><span style="font-weight:bold">['.strtoupper(self::$logLevels[$level]).']</span> <span style="white-space:pre; line-height:8px">'.nl2br(hsc($type.$msg)).'</span></span><br><br>';
             $html     .= 'in <span style="font-weight:bold">'.$file.'</span> on line <span style="font-weight:bold">'.$line.'</span><br>';
             $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
             $traceStr .= DebugHelper::getBetterTraceAsString($loggable, $indent);
@@ -800,7 +800,7 @@ class Logger extends StaticClass {
         $trace = $context['trace'];
 
         foreach ($trace as $i => $frame) {                  // find the first frame with "file"
-            if (isSet($frame['file'])) {                    // skip internal PHP functions
+            if (isset($frame['file'])) {                    // skip internal PHP functions
                 $context['file'] = $frame['file'];
                 $context['line'] = $frame['line'];
                 break;
@@ -827,7 +827,7 @@ class Logger extends StaticClass {
             self::generateStackTrace($context);
         $trace = $context['trace'];
 
-        $context['class'] = isSet($trace[0]['class']) ? $trace[0]['class'] : '';
+        $context['class'] = isset($trace[0]['class']) ? $trace[0]['class'] : '';
     }
 
 
@@ -841,7 +841,7 @@ class Logger extends StaticClass {
             $trace = DebugHelper::fixTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), __FILE__, __LINE__);
 
             foreach ($trace as $i => $frame) {
-                if (!isSet($frame['class']) || $frame['class']!=__CLASS__)      // remove non-logger frames
+                if (!isset($frame['class']) || $frame['class']!=__CLASS__)      // remove non-logger frames
                     break;
                 unset($trace[$i]);
             }

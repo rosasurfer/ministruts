@@ -123,7 +123,7 @@ namespace {
          */
         function mysql_connect($server = null, $username = null, $password = null, $new_link = null, $client_flags = null) {
             /** @var resource $resource */
-            $resource = fOpen($fileName='', $mode='');
+            $resource = fopen($fileName='', $mode='');
             return $resource;
         }
 
@@ -287,7 +287,7 @@ namespace {
          */
         function sem_get($key, $max_acquire = null, $perm = null, $auto_release = null) {
             /** @var resource $resource */
-            $resource = fOpen($fileName='', $mode='');
+            $resource = fopen($fileName='', $mode='');
             return $resource;
         }
 

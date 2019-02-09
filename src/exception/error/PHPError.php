@@ -50,12 +50,12 @@ class PHPError extends \ErrorException implements IRosasurferException {
                 \array_shift($trace);
 
                 // if the error was triggered by include/require/_once: fix the next frame, it's wrong
-                if (sizeOf($trace) > 1) {
+                if (sizeof($trace) > 1) {
                     $function = DebugHelper::getFQFunctionName($trace[0]);
                     if ($function=='include' || $function=='include_once' || $function=='require' || $function=='require_once') {
-                        if (isSet($trace[0]['file']) && isSet($trace[1]['file'])) {
+                        if (isset($trace[0]['file']) && isset($trace[1]['file'])) {
                             if ($trace[0]['file'] == $trace[1]['file']) {
-                                if (isSet($trace[0]['line']) && isSet($trace[1]['line'])) {
+                                if (isset($trace[0]['line']) && isset($trace[1]['line'])) {
                                     if ($trace[0]['line'] == $trace[1]['line']) {
                                         unset($trace[0]['file'], $trace[0]['line']);
                                     }

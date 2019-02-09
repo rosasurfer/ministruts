@@ -42,17 +42,17 @@ class DefaultConfig extends Config {
      * @param  string $location - configuration file or directory
      */
     public function __construct($location) {
-        if (!is_string($location)) throw new IllegalTypeException('Illegal type of parameter $location: '.getType($location));
+        if (!is_string($location)) throw new IllegalTypeException('Illegal type of parameter $location: '.gettype($location));
 
         // collect the applicable config files
         $configDir = $configFile = null;
 
         if (is_file($location)) {
-            $configFile = realPath($location);
-            $configDir  = dirName($configFile);
+            $configFile = realpath($location);
+            $configDir  = dirname($configFile);
         }
         else if (is_dir($location)) {
-            $configDir = realPath($location);
+            $configDir = realpath($location);
         }
         else throw new InvalidArgumentException('Location not found: "'.$location.'"');
 
@@ -73,7 +73,7 @@ class DefaultConfig extends Config {
         // set "app.dir.config" to the directory of the most recently added file
         end($this->files);
         list($file, $isFile) = each($this->files);
-        $this->set('app.dir.config', dirName($file));
+        $this->set('app.dir.config', dirname($file));
 
 
         // create FileDependency and cache the instance

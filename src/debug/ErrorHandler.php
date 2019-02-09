@@ -255,9 +255,9 @@ class ErrorHandler extends StaticClass {
             $msg2 .= DebugHelper::getBetterTraceAsString($second, $indent);
 
             // primary (the causing) exception
-            if (isSet($context['cliMessage'])) {
+            if (isset($context['cliMessage'])) {
                 $msg1 = $context['cliMessage'];
-                if (isSet($context['cliExtra']))
+                if (isset($context['cliExtra']))
                     $msg1 .= $context['cliExtra'];
             }
             else {
@@ -285,7 +285,7 @@ class ErrorHandler extends StaticClass {
                 if (Application::isAdminIP() || ini_get_bool('display_errors')) {
                     if ($second) {                          // full second exception, full log location
                         echoPre($second);
-                        echoPre('error log: '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : 'web server'));
+                        echoPre('error log: '.(strlen($errorLog=ini_get('error_log')) ? $errorLog : 'web server'));
                     }
                 }
                 else echoPre('application error (see error log)');

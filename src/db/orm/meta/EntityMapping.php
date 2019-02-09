@@ -74,10 +74,10 @@ class EntityMapping extends Object implements \Iterator {
      * @return PropertyMapping|null - mapping or NULL if no such property exists
      */
     public function getProperty($name) {
-        if (!isSet($this->mapping['properties'][$name]))
+        if (!isset($this->mapping['properties'][$name]))
             return null;
 
-        if (!isSet($this->properties[$name]))
+        if (!isset($this->properties[$name]))
             $this->properties[$name] = new PropertyMapping($this, $this->mapping['properties'][$name]);
 
         return $this->properties[$name];
@@ -92,7 +92,7 @@ class EntityMapping extends Object implements \Iterator {
     public function getIdentity() {
         if ($this->identity === null) {
             foreach ($this->mapping['properties'] as $name => $property) {
-                if (isSet($property['primary']) && $property['primary']===true) {
+                if (isset($property['primary']) && $property['primary']===true) {
                     return $this->identity = new PropertyMapping($this, $property);
                 }
             }
@@ -110,7 +110,7 @@ class EntityMapping extends Object implements \Iterator {
     public function getVersion() {
         if ($this->version === null) {
             foreach ($this->mapping['properties'] as $name => $property) {
-                if (isSet($property['version']) && $property['version']===true) {
+                if (isset($property['version']) && $property['version']===true) {
                     return $this->version = new PropertyMapping($this, $property);
                 }
             }
@@ -166,6 +166,6 @@ class EntityMapping extends Object implements \Iterator {
      * @return bool
      */
     public function valid() {
-        return isSet($this->iteratorKeys[$this->iteratorPosition]);
+        return isset($this->iteratorKeys[$this->iteratorPosition]);
     }
 }

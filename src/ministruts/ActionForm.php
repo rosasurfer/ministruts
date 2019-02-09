@@ -72,7 +72,7 @@ abstract class ActionForm extends Object {
         //       )
         //   )
         //
-        if (isSet($_REQUEST['submit']['action']))
+        if (isset($_REQUEST['submit']['action']))
             $this->actionKey = $_REQUEST['submit']['action'];
     }
 

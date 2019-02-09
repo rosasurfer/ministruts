@@ -114,14 +114,14 @@ class RequestProcessor extends Object {
     protected function cacheActionMessages(Request $request) {
         $errors = $request->removeActionErrors();
         if ($errors && $request->getSession()) {
-            if (isSet($_SESSION[ACTION_ERRORS_KEY]))
+            if (isset($_SESSION[ACTION_ERRORS_KEY]))
                 $errors = \array_merge($_SESSION[ACTION_ERRORS_KEY], $errors);
             $_SESSION[ACTION_ERRORS_KEY] = $errors;
         }
 
         $messages = $request->removeActionMessages();
         if ($messages && $request->getSession()) {
-            if (isSet($_SESSION[ACTION_MESSAGES_KEY]))
+            if (isset($_SESSION[ACTION_MESSAGES_KEY]))
                 $messages = \array_merge($_SESSION[ACTION_MESSAGES_KEY], $messages);
             $_SESSION[ACTION_MESSAGES_KEY] = $messages;
         }
@@ -138,11 +138,11 @@ class RequestProcessor extends Object {
         if ($request->hasSessionId() && $request->getSession()) {
             $messages = $errors = [];
 
-            if (isSet($_SESSION[ACTION_MESSAGES_KEY])) {
+            if (isset($_SESSION[ACTION_MESSAGES_KEY])) {
                 $messages = $_SESSION[ACTION_MESSAGES_KEY];
                 unset($_SESSION[ACTION_MESSAGES_KEY]);
             }
-            if (isSet($_SESSION[ACTION_ERRORS_KEY])) {
+            if (isset($_SESSION[ACTION_ERRORS_KEY])) {
                 $errors = $_SESSION[ACTION_ERRORS_KEY];
                 unset($_SESSION[ACTION_ERRORS_KEY]);
             }
@@ -175,7 +175,7 @@ class RequestProcessor extends Object {
         // /module/
         // /app/module/
 
-        $mappingPath = '/'.subStr($requestPath, strLen($moduleUri));
+        $mappingPath = '/'.substr($requestPath, strlen($moduleUri));
         // /
         // /controller/action/
 
@@ -188,7 +188,7 @@ class RequestProcessor extends Object {
         // kein Mapping gefunden
         $response->setStatus(HttpResponse::SC_NOT_FOUND);
 
-        if (isSet($this->options['status-404']) && $this->options['status-404']=='pass-through')
+        if (isset($this->options['status-404']) && $this->options['status-404']=='pass-through')
             return null;
 
         header('HTTP/1.1 404 Not Found', true, HttpResponse::SC_NOT_FOUND);
@@ -235,7 +235,7 @@ PROCESS_MAPPING_ERROR_SC_404;
         // Beschraenkung nicht erfuellt
         $response->setStatus(HttpResponse::SC_METHOD_NOT_ALLOWED);
 
-        if (isSet($this->options['status-405']) && $this->options['status-405']=='pass-through')
+        if (isset($this->options['status-405']) && $this->options['status-405']=='pass-through')
             return false;
 
         header('HTTP/1.1 405 Method Not Allowed', true, HttpResponse::SC_METHOD_NOT_ALLOWED);
@@ -468,12 +468,12 @@ PROCESS_METHOD_ERROR_SC_405;
             $this->cacheActionMessages($request);
             $path = $forward->getPath();
 
-            if (isSet(parse_url($path)['host'])) {               // check for external URI
+            if (isset(parse_url($path)['host'])) {               // check for external URI
                 $url = $path;
             }
             else {
                 $moduleUri = $request->getApplicationBaseUri().$module->getPrefix();
-                $url = $moduleUri.lTrim($path, '/');
+                $url = $moduleUri.ltrim($path, '/');
             }
             $response->redirect($url, $forward->getRedirectType());
         }

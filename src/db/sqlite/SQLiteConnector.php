@@ -30,14 +30,14 @@ use const rosasurfer\NL;
  * +--------------------------------------+------------+----------------------------+
  * </pre>
  *  (1) - A relative database file location is interpreted as relative to the application's data directory (if configured). <br>
- *        If the file is not found an attempt is made to find it in the application's root directory. <br>
- *  (2) - Available flags: SQLITE3_OPEN_CREATE | SQLITE3_OPEN_READONLY | SQLITE3_OPEN_READWRITE <br>
+ *        If the file is not found an attempt is made to find it in the application's root directory.                       <br>
+ *  (2) - Available flags: SQLITE3_OPEN_CREATE | SQLITE3_OPEN_READONLY | SQLITE3_OPEN_READWRITE                             <br>
  *
  * Additional SQLite pragma options can be specified under the "options" key.
  *
  *
- * Note: <br>
- * ----- <br>
+ * Notes: <br>
+ * ------ <br>
  * The php_sqlite3 extension v0.7-dev has a serious bug. The first call of SQLite3Result::fetchArray() and calls after a
  * SQLite3Result::reset() trigger re-execution of an already executed query. The workaround for DDL and DML statements is to
  * check with SQLite3Result::numColumns() for an empty result before calling fetchArray(). There is no workaround to prevent
@@ -87,7 +87,7 @@ class SQLiteConnector extends Connector {
      * @param  array $options - SQLite connection options. See the class description for supported values.
      */
     public function __construct(array $options) {
-        if (isSet($options['file'])) $this->setFile($options['file']);
+        if (isset($options['file'])) $this->setFile($options['file']);
         unset($options['file']);
         $this->setOptions($options);
     }
@@ -102,8 +102,8 @@ class SQLiteConnector extends Connector {
      * @return $this
      */
     protected function setFile($file) {
-        if (!is_string($file)) throw new IllegalTypeException('Illegal type of parameter $file: '.getType($file));
-        if (!strLen($file))    throw new InvalidArgumentException('Invalid parameter $file: "'.$file.'" (empty)');
+        if (!is_string($file)) throw new IllegalTypeException('Illegal type of parameter $file: '.gettype($file));
+        if (!strlen($file))    throw new InvalidArgumentException('Invalid parameter $file: "'.$file.'" (empty)');
 
         if ($file == ':memory:' || !isRelativePath($file)) {
             $this->file = $file;
@@ -158,12 +158,12 @@ class SQLiteConnector extends Connector {
             $what = $where = null;
             if (file_exists($file)) {
                 $what = 'open';
-                if (is_dir($file=realPath($file)))
+                if (is_dir($file=realpath($file)))
                     $where = ' (directory)';
             }
             else {
                 $what = ($flags & SQLITE3_OPEN_CREATE) ? 'create':'find';
-                isRelativePath($file) && $where=' in "'.getCwd().'"';
+                isRelativePath($file) && $where=' in "'.getcwd().'"';
             }
             throw $ex->addMessage('Cannot '.$what.' database file "'.$file.'"'.$where);
         }
@@ -221,7 +221,7 @@ class SQLiteConnector extends Connector {
      * {@inheritdoc}
      */
     public function escapeIdentifier($name) {
-        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
+        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
 
         return '"'.str_replace('"', '""', $name).'"';
     }
@@ -234,7 +234,7 @@ class SQLiteConnector extends Connector {
         // bug or feature: SQLite3::escapeString(null) => empty string instead of NULL
         if ($value === null)  return 'null';
 
-        if (!is_scalar($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
+        if (!is_scalar($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.gettype($value));
 
         if (is_bool ($value)) return (string)(int) $value;
         if (is_int  ($value)) return (string)      $value;
@@ -252,7 +252,7 @@ class SQLiteConnector extends Connector {
         // bug or feature: SQLite3::escapeString(null) => empty string instead of NULL
         if ($value === null)
             return null;
-        if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
+        if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.gettype($value));
 
         if (!$this->isConnected())
             $this->connect();
@@ -318,7 +318,7 @@ class SQLiteConnector extends Connector {
      * @throws DatabaseException on errors
      */
     public function executeRaw($sql) {
-        if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
+        if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.gettype($sql));
         if (!$this->isConnected())
             $this->connect();
 
@@ -476,7 +476,7 @@ class SQLiteConnector extends Connector {
      * @return string - e.g. "3.5.9-rc"
      */
     public function getVersionString() {
-        if (!isSet($this->versionString)) {
+        if (!isset($this->versionString)) {
             if (!$this->isConnected())
                 $this->connect();
             $this->versionString = $this->sqlite->version()['versionString'];
@@ -491,7 +491,7 @@ class SQLiteConnector extends Connector {
      * @return int - e.g. 3005009 for version string "3.5.9-rc"
      */
     public function getVersionNumber() {
-        if (!isSet($this->versionNumber)) {
+        if (!isset($this->versionNumber)) {
             if (!$this->isConnected())
                 $this->connect();
             $this->versionNumber = $this->sqlite->version()['versionNumber'];

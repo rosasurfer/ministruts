@@ -31,18 +31,18 @@ abstract class Singleton extends Object {
     /**
      * Factory method for a {@link Singleton} instance of the specified class.
      *
-     * @param  string $class  - class name
-     * @param  array  $params - variable list of constructor parameters
+     * @param  string   $class  - class name
+     * @param  array ...$params - variable list of constructor parameters
      *
      * @return self
      */
     final protected static function getInstance($class, ...$params) {
-        if (isSet(self::$instances[$class]))
+        if (isset(self::$instances[$class]))
             return self::$instances[$class];
 
         // set a marker to detect recursive method invocations
         static $currentCreations;
-        if (isSet($currentCreations[$class])) throw new RuntimeException('Detected recursive call of '.__METHOD__.'('.$class.')');
+        if (isset($currentCreations[$class])) throw new RuntimeException('Detected recursive call of '.__METHOD__.'('.$class.')');
         $currentCreations[$class] = true;
 
         // check validity of the passed class (omitting this check can cause an uncatchable fatal error)

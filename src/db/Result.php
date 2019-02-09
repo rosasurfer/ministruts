@@ -46,8 +46,8 @@ abstract class Result extends Object implements ResultInterface {
      * {@inheritdoc}
      */
     public function fetchColumn($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
-        if (!isSet($column)) throw new IllegalTypeException('Illegal type of parameter $column: '.getType($column));
-        if (isSet($row))     throw new UnimplementedFeatureException('$row='.$row.' (!= NULL)');
+        if (!isset($column)) throw new IllegalTypeException('Illegal type of parameter $column: '.gettype($column));
+        if (isset($row))     throw new UnimplementedFeatureException('$row='.$row.' (!= NULL)');
 
         // Generic default implementation:
         // A connector-specific implementation will be faster and more efficient.
@@ -61,10 +61,10 @@ abstract class Result extends Object implements ResultInterface {
 
         if (!\key_exists($column, $row)) {
             if (is_int($column))     throw new InvalidArgumentException('Invalid parameter $column: '.$column.' (no such column)');
-            if (!is_string($column)) throw new IllegalTypeException('Illegal type of parameter $column: '.getType($column));
+            if (!is_string($column)) throw new IllegalTypeException('Illegal type of parameter $column: '.gettype($column));
 
             $row    = \array_change_key_case($row, CASE_LOWER);
-            $column = strToLower($column);
+            $column = strtolower($column);
             if (!\key_exists($column, $row)) throw new InvalidArgumentException('Invalid parameter $column: "'.$column.'" (no such column)');
         }
         $value = $row[$column];

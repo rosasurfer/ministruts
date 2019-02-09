@@ -116,7 +116,7 @@ class DAO_FindAll_ReturnType extends DynamicReturnType implements DynamicMethodR
             $arrayType->getIterableKeyType(),
             $itemType,
             $arrayType->isItemTypeInferredFromLiteralArray(),
-        	$arrayType->isCallable()
+            $arrayType->isCallable()
         );
     }
 }

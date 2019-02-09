@@ -69,9 +69,9 @@ class Application extends Object {
      */
     public function __construct(array $options = []) {
         // set default values
-        if (!isSet($options['app.handle-errors'    ])) $options['app.handle-errors'    ] = 'strict';
-        if (!isSet($options['app.handle-exceptions'])) $options['app.handle-exceptions'] = true;
-        if (!isSet($options['app.globals'          ])) $options['app.globals'          ] = false;
+        if (!isset($options['app.handle-errors'    ])) $options['app.handle-errors'    ] = 'strict';
+        if (!isset($options['app.handle-exceptions'])) $options['app.handle-exceptions'] = true;
+        if (!isset($options['app.globals'          ])) $options['app.globals'          ] = false;
 
         // setup the configuration
         $this->setupErrorHandling    ($options['app.handle-errors'    ]);
@@ -90,7 +90,7 @@ class Application extends Object {
 
         // check "app.id"
         $appId = $config->get('app.id', null);
-        if (!$appId) $config->set('app.id', subStr(md5($config['app.dir.root']), 0, 16));
+        if (!$appId) $config->set('app.id', substr(md5($config['app.dir.root']), 0, 16));
 
         // check for PHP admin tasks if the remote IP has allowance
         // __phpinfo__             : show PHP config at start of script
@@ -98,7 +98,7 @@ class Application extends Object {
         // __cache__               : show cache admin interface
         $phpInfoTask = $phpInfoAfterConfigTask = $configInfoTask = $cacheInfoTask = false;
 
-        if (isSet($_GET['__phpinfo__']) || isSet($_GET['__config__']) || isSet($_GET['__cache__'])) {
+        if (isset($_GET['__phpinfo__']) || isset($_GET['__config__']) || isset($_GET['__cache__'])) {
             if (self::isAdminIP()) {
                 foreach ($_GET as $param => $value) {
                     if ($param == '__phpinfo__') {
@@ -162,7 +162,7 @@ class Application extends Object {
 
         // execute "phpinfo" after-config task if enabled
         if ($phpInfoTask || $phpInfoAfterConfigTask) {
-            PHP::phpInfo();
+            PHP::phpinfo();
             exit(0);
         }
 
@@ -172,9 +172,9 @@ class Application extends Object {
         }
 
         // enforce mission-critical PHP requirements (after processing of any admin tasks)
-        !php_ini_loaded_file()                   && exit(1|echoPre('application error (see error log'.(self::isAdminIP() ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: No "php.ini" configuration file was loaded.'));
-        !CLI && !ini_get_bool('short_open_tag')  && exit(1|echoPre('application error (see error log'.(self::isAdminIP() ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: The PHP configuration value "short_open_tag" must be enabled (security).'));
-        !CLI && ini_get('request_order') != 'GP' && exit(1|echoPre('application error (see error log'.(self::isAdminIP() ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: The PHP configuration value "request_order" must be "GP" (current value "'.ini_get('request_order').'").'));
+        !php_ini_loaded_file()                   && exit(1|echoPre('application error (see error log'.(self::isAdminIP() ? ': '.(strlen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: No "php.ini" configuration file was loaded.'));
+        !CLI && !ini_get_bool('short_open_tag')  && exit(1|echoPre('application error (see error log'.(self::isAdminIP() ? ': '.(strlen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: The PHP configuration value "short_open_tag" must be enabled (security).'));
+        !CLI && ini_get('request_order') != 'GP' && exit(1|echoPre('application error (see error log'.(self::isAdminIP() ? ': '.(strlen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: The PHP configuration value "request_order" must be "GP" (current value "'.ini_get('request_order').'").'));
     }
 
 
@@ -235,11 +235,11 @@ class Application extends Object {
      * @return DefaultConfig
      */
     protected function initDefaultConfig(array $options) {
-        $configLocation = isSet($options['app.dir.config']) ? $options['app.dir.config'] : getCwd();
+        $configLocation = isset($options['app.dir.config']) ? $options['app.dir.config'] : getcwd();
         $config = new DefaultConfig($configLocation);
         unset($options['app.dir.config']);
 
-        $rootDir = isSet($options['app.dir.root']) ? $options['app.dir.root'] : getCwd();
+        $rootDir = isset($options['app.dir.root']) ? $options['app.dir.root'] : getcwd();
         unset($options['app.dir.root']);
 
         // copy remaining config options to the DefaultConfig
@@ -262,10 +262,10 @@ class Application extends Object {
      * @param  string          $rootDir - application root directory
      */
     protected function expandAppDirs(ConfigInterface $config, $rootDir) {
-        if (!is_string($rootDir))                          throw new IllegalTypeException('Illegal type of config option "app.dir.root": '.getType($rootDir));
-        if (!strLen($rootDir) || isRelativePath($rootDir)) throw new InvalidArgumentException('Invalid config option "app.dir.root": "'.$rootDir.'" (not an absolute path)');
+        if (!is_string($rootDir))                          throw new IllegalTypeException('Illegal type of config option "app.dir.root": '.gettype($rootDir));
+        if (!strlen($rootDir) || isRelativePath($rootDir)) throw new InvalidArgumentException('Invalid config option "app.dir.root": "'.$rootDir.'" (not an absolute path)');
 
-        $rootDir = rTrim(str_replace('\\', '/', $rootDir), '/');
+        $rootDir = rtrim(str_replace('\\', '/', $rootDir), '/');
         $dirs = $config->get('app.dir', []);
         $this->expandDirsRecursive($dirs, $rootDir);
 
@@ -287,7 +287,7 @@ class Application extends Object {
             }
             if (isRelativePath($dir))
                 $dir = $rootDir.'/'.$dir;
-            if (is_dir($dir)) $dir = realPath($dir);
+            if (is_dir($dir)) $dir = realpath($dir);
         }; unset($dir);
     }
 
@@ -312,7 +312,7 @@ class Application extends Object {
     protected function setupErrorHandling($value) {
         $mode = self::THROW_EXCEPTIONS;                             // default
         if (is_string($value)) {
-            $value = trim(strToLower($value));
+            $value = trim(strtolower($value));
             if      ($value == 'weak'  ) $mode = self::LOG_ERRORS;
             else if ($value == 'ignore') $mode = 0;
         }
@@ -331,7 +331,7 @@ class Application extends Object {
             $enabled = (bool) $value;
         }
         elseif (is_string($value)) {
-            $value   = trim(strToLower($value));
+            $value   = trim(strtolower($value));
             $enabled = ($value=='0' || $value=='off' || $value=='false');
         }
         $enabled && ErrorHandler::setupExceptionHandling();
@@ -349,7 +349,7 @@ class Application extends Object {
             $enabled = (bool) $value;
         }
         elseif (is_string($value)) {
-            $value   = trim(strToLower($value));
+            $value   = trim(strtolower($value));
             $enabled = ($value=='1' || $value=='on' || $value=='true');
         }
         if ($enabled && !function_exists('booltostr')) {            // prevent multiple includes
@@ -369,7 +369,7 @@ class Application extends Object {
             $enabled = (bool) $value;
         }
         elseif (is_string($value)) {
-            $value   = trim(strToLower($value));
+            $value   = trim(strtolower($value));
             $enabled = ($value=='1' || $value=='on' || $value=='true');
         }
         if ($enabled) {
@@ -445,7 +445,7 @@ class Application extends Object {
      * @return bool
      */
     public static function isAdminIP() {
-        if (!isSet($_SERVER['REMOTE_ADDR']))
+        if (!isset($_SERVER['REMOTE_ADDR']))
             return false;
 
         static $whiteList; if (!$whiteList) {

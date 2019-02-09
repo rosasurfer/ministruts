@@ -45,11 +45,11 @@ class HeaderParser extends Object {
         $line = trim($line, "\r\n");
 
         if (preg_match('/^([\w-]+):\s+(.+)/', $line, $matches)) {
-            $name = strToLower($matches[1]);
+            $name = strtolower($matches[1]);
             $value = $matches[2];
             $this->currentHeader = $name;
 
-            if (isSet($this->headers[$name])) {
+            if (isset($this->headers[$name])) {
                 if (!is_array($this->headers[$name])) {
                     $this->headers[$name] = [$this->headers[$name]];
                 }
@@ -61,7 +61,7 @@ class HeaderParser extends Object {
         }
         elseif (preg_match('/^\s+(.+)$/', $line, $matches) && $this->currentHeader !== null) {
             if (is_array($this->headers[$this->currentHeader])) {
-                $lastKey = sizeOf($this->headers[$this->currentHeader]) - 1;
+                $lastKey = sizeof($this->headers[$this->currentHeader]) - 1;
                 $this->headers[$this->currentHeader][$lastKey] .= $matches[1];
             }
             else {
@@ -91,7 +91,7 @@ class HeaderParser extends Object {
      * @return bool
      */
     public function isHeader($name) {
-        return isSet($this->headers[strToLower($name)]);
+        return isset($this->headers[strtolower($name)]);
     }
 
 
@@ -103,6 +103,6 @@ class HeaderParser extends Object {
      * @return string|string[]
      */
     public function getHeader($name) {
-        return $this->headers[strToLower($name)];
+        return $this->headers[strtolower($name)];
     }
 }

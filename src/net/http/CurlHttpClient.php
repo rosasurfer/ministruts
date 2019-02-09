@@ -19,16 +19,16 @@ class CurlHttpClient extends HttpClient {
 
 
     /** @var resource - Curl-Handle */
-    private $hCurl;
+    protected $hCurl;
 
     /** @var int - Zaehler fuer manuelle Redirects (falls "open_basedir" aktiv ist) */
-    private $manualRedirects = 0;
+    protected $manualRedirects = 0;
 
     /** @var array - zusaetzliche CURL-Optionen */
-    private $options = [];
+    protected $options = [];
 
     /** @var string[] - CURL-Fehlerbeschreibungen */
-    private static $errors = [
+    protected static $errors = [
         CURLE_OK                      => 'CURLE_OK'                      ,
         CURLE_UNSUPPORTED_PROTOCOL    => 'CURLE_UNSUPPORTED_PROTOCOL'    ,
         CURLE_FAILED_INIT             => 'CURLE_FAILED_INIT'             ,
@@ -130,7 +130,7 @@ class CurlHttpClient extends HttpClient {
      *
      * @param  array $options [optional] - Array mit zusaetzlichen CURL-Optionen (default: keine)
      */
-    public function __construct(array $options=[]) {
+    public function __construct(array $options = []) {
         $this->options = $options;
     }
 
@@ -141,7 +141,8 @@ class CurlHttpClient extends HttpClient {
     public function __destruct() {
         try {
             if (is_resource($this->hCurl)) {
-                $hTmp=$this->hCurl; $this->hCurl=null;
+                $hTmp = $this->hCurl;
+                $this->hCurl = null;
                 curl_close($hTmp);
             }
         }
@@ -157,6 +158,8 @@ class CurlHttpClient extends HttpClient {
      * @param  array $options [optional] - Array mit zusaetzlichen CURL-Optionen (default: keine)
      *
      * @return static
+     *
+     * @deprecated
      */
     public static function create(array $options=[]) {
         return new static($options);
@@ -184,18 +187,18 @@ class CurlHttpClient extends HttpClient {
             if ($this->isFollowRedirects()) {
                 $options[CURLOPT_FOLLOWLOCATION] = true;
             }
-            elseif (isSet($options[CURLOPT_FOLLOWLOCATION]) && $options[CURLOPT_FOLLOWLOCATION]) {
+            elseif (isset($options[CURLOPT_FOLLOWLOCATION]) && $options[CURLOPT_FOLLOWLOCATION]) {
                 $this->setFollowRedirects(true);
             }
             if ($this->isFollowRedirects()) {
-                !isSet($options[CURLOPT_MAXREDIRS]) && $options[CURLOPT_MAXREDIRS]=$this->maxRedirects;
+                !isset($options[CURLOPT_MAXREDIRS]) && $options[CURLOPT_MAXREDIRS]=$this->maxRedirects;
             }
         }
 
         if ($request->getMethod() == 'POST') {
             $options[CURLOPT_POST      ] = true;
-            $options[CURLOPT_URL       ] = subStr($request->getUrl(), 0, strPos($request->getUrl(), '?'));
-            $options[CURLOPT_POSTFIELDS] = strStr($request->getUrl(), '?');
+            $options[CURLOPT_URL       ] = substr($request->getUrl(), 0, strpos($request->getUrl(), '?'));
+            $options[CURLOPT_POSTFIELDS] = strstr($request->getUrl(), '?');
         }
         curl_setopt_array($this->hCurl, $options);
 
@@ -228,16 +231,16 @@ class CurlHttpClient extends HttpClient {
      *
      * @return array - resulting options
      */
-    private function prepareCurlOptions(HttpRequest $request, CurlHttpResponse $response) {
+    protected function prepareCurlOptions(HttpRequest $request, CurlHttpResponse $response) {
         $options  = [CURLOPT_URL       => $request->getUrl()] + $this->options;
         $options += [CURLOPT_TIMEOUT   => $this->timeout    ];
         $options += [CURLOPT_USERAGENT => $this->userAgent  ];
         $options += [CURLOPT_ENCODING  => ''                ];  // empty string activates all supported encodings
 
-        if (!isSet($options[CURLOPT_WRITEHEADER]))
+        if (!isset($options[CURLOPT_WRITEHEADER]))
             $options += [CURLOPT_HEADERFUNCTION => [$response, 'writeHeader']];
 
-        if (!isSet($options[CURLOPT_FILE]))                     // overrides CURLOPT_RETURNTRANSFER
+        if (!isset($options[CURLOPT_FILE]))                     // overrides CURLOPT_RETURNTRANSFER
             $options += [CURLOPT_WRITEFUNCTION  => [$response, 'writeContent']];
 
         foreach ($request->getHeaders() as $key => $value) {    // add all specified request headers
@@ -254,11 +257,11 @@ class CurlHttpClient extends HttpClient {
      *
      * @return string
      */
-    private static function getError($hCurl) {
+    protected static function getError($hCurl) {
         $errorNo  = curl_errno($hCurl);
         $errorStr = curl_error($hCurl);
 
-        if (isSet(self::$errors[$errorNo])) {
+        if (isset(self::$errors[$errorNo])) {
             $errorNo = self::$errors[$errorNo];
         }
         else {

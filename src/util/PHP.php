@@ -67,14 +67,14 @@ class PHP extends StaticClass {
      * @return string - contents of STDOUT
      */
     public static function execProcess($cmd, &$stderr=null, &$exitCode=null, $dir=null, $env=null, array $options=[]) {
-        if (!is_string($cmd)) throw new IllegalTypeException('Illegal type of parameter $cmd: '.getType($cmd));
+        if (!is_string($cmd)) throw new IllegalTypeException('Illegal type of parameter $cmd: '.gettype($cmd));
 
         // check whether the process needs to be watched asynchronously
         $argc         = func_num_args();
         $needStderr   = ($argc > 1);
         $needExitCode = ($argc > 2);
-        $stdoutPassthrough = isSet($options['stdout-passthrough']) && $options['stdout-passthrough'];
-        $stderrPassthrough = isSet($options['stderr-passthrough']) && $options['stderr-passthrough'];
+        $stdoutPassthrough = isset($options['stdout-passthrough']) && $options['stdout-passthrough'];
+        $stderrPassthrough = isset($options['stderr-passthrough']) && $options['stderr-passthrough'];
 
         if (!$needStderr && !$needExitCode && !WINDOWS)
             return \shell_exec($cmd);                       // the process doesn't need watching and we can go with shell_exec()
@@ -103,15 +103,15 @@ class PHP extends StaticClass {
         if (!$stdoutPassthrough && !$stderrPassthrough) {
             $stdout = stream_get_contents($pipes[$STDOUT]);
             $stderr = stream_get_contents($pipes[$STDERR]);
-            fClose($pipes[$STDIN ]);                        // $pipes[0] => writeable handle connected to the child's STDIN
-            fClose($pipes[$STDOUT]);                        // $pipes[1] => readable handle connected to the child's STDOUT
-            fClose($pipes[$STDERR]);                        // $pipes[2] => readable handle connected to the child's STDERR
+            fclose($pipes[$STDIN ]);                        // $pipes[0] => writeable handle connected to the child's STDIN
+            fclose($pipes[$STDOUT]);                        // $pipes[1] => readable handle connected to the child's STDOUT
+            fclose($pipes[$STDERR]);                        // $pipes[2] => readable handle connected to the child's STDERR
             $exitCode = proc_close($hProc);                 // we must close the pipes before proc_close() to avoid a deadlock
             return $stdout;
         }
 
         // the process needs to be watched asynchronously
-        fClose             ($pipes[$STDIN]);
+        fclose             ($pipes[$STDIN]);
         stream_set_blocking($pipes[$STDOUT], false);
         stream_set_blocking($pipes[$STDERR], false);
 
@@ -133,14 +133,14 @@ class PHP extends StaticClass {
             $readable = $observed;
             $changes = stream_select($readable, $null, $null, $seconds=0, $microseconds=200000);    // timeout = 0.2 sec
             foreach ($readable as $stream) {
-                if (($line=fGets($stream)) === false) {                 // this covers fEof() too
-                    fClose($stream);
+                if (($line=fgets($stream)) === false) {                 // this covers fEof() too
+                    fclose($stream);
                     unset($observed[(int)$stream]);                     // close and remove from observed streams
                     continue;
                 }
                 do {
                     $handlers[(int)$stream]($line);                     // process incoming content
-                } while (!WINDOWS && ($line=fGets($stream))!==false);   // on Windows a second call blocks
+                } while (!WINDOWS && ($line=fgets($stream))!==false);   // on Windows a second call blocks
             }
         } while ($observed);                                            // loop until all observable streams are closed
 
@@ -150,7 +150,7 @@ class PHP extends StaticClass {
 
 
     /**
-     * Check PHP settings, print issues and call phpInfo().
+     * Check PHP settings, print issues and call phpinfo().
      *
      * PHP_INI_ALL    - entry can be set anywhere
      * PHP_INI_USER   - entry can be set in scripts and in .user.ini
@@ -158,7 +158,7 @@ class PHP extends StaticClass {
      * PHP_INI_SYSTEM - entry can be set in php.ini and in httpd.conf
      * PHP_INI_PERDIR - entry can be set in php.ini, httpd.conf, .htaccess and in .user.ini
      */
-    public static function phpInfo() {
+    public static function phpinfo() {
         /** @var ConfigInterface $config */
         $config = self::di()['config'];
         $issues = [];
@@ -203,7 +203,7 @@ class PHP extends StaticClass {
         /*PHP_INI_SYSTEM*/ if (      !ini_get_bool('allow_url_fopen'               ))                                $issues[] = 'Info:  allow_url_fopen is not On  [functionality]';
         /*PHP_INI_SYSTEM*/ if (       ini_get_bool('allow_url_include'))                                             $issues[] = 'Error: allow_url_include is not Off  [security]';
         /*PHP_INI_ALL   */ foreach (explode(PATH_SEPARATOR, ini_get('include_path' )) as $path) {
-            if (!strLen($path)) {                                                                                    $issues[] = 'Warn:  include_path contains an empty path: "'.ini_get('include_path').'"  [setup]';
+            if (!strlen($path)) {                                                                                    $issues[] = 'Warn:  include_path contains an empty path: "'.ini_get('include_path').'"  [setup]';
                 break;
         }}
 
@@ -228,13 +228,13 @@ class PHP extends StaticClass {
         /*PHP_INI_ALL   */ $errorLog = ini_get('error_log');
             if (!empty($errorLog) && $errorLog!='syslog') {
                 if (is_file($errorLog)) {
-                    $hFile = @fOpen($errorLog, 'ab');         // try to open
-                    if (is_resource($hFile)) fClose($hFile);
+                    $hFile = @fopen($errorLog, 'ab');         // try to open
+                    if (is_resource($hFile)) fclose($hFile);
                     else                                                                                             $issues[] = 'Error: error_log "'.$errorLog.'" file is not writable  [setup]';
                 }
                 else {
-                    $hFile = @fOpen($errorLog, 'wb');         // try to create
-                    if (is_resource($hFile)) fClose($hFile);
+                    $hFile = @fopen($errorLog, 'wb');         // try to create
+                    if (is_resource($hFile)) fclose($hFile);
                     else                                                                                             $issues[] = 'Error: error_log "'.$errorLog.'" directory is not writable  [setup]';
                     is_file($errorLog) && @unlink($errorLog);
                 }
@@ -257,7 +257,7 @@ class PHP extends StaticClass {
             if (empty($order)) {
                 /*PHP_INI_PERDIR*/ $order = ini_get('variables_order');
                 $newOrder = '';
-                $len      = strLen($order);
+                $len      = strlen($order);
                 for ($i=0; $i < $len; $i++) {
                     if (in_array($char=$order[$i], ['G','P','C']))
                         $newOrder .= $char;
@@ -285,11 +285,11 @@ class PHP extends StaticClass {
                 $name = 'sys_get_temp_dir()';
             }
             if (!is_dir($dir))                                                                                       $issues[] = 'Error: '.$name.' "'.$dir.'" is not a valid directory  [setup]';
-            else if (!($file=@tempNam($dir, 'php')) || !strStartsWith(realPath($file), realPath($dir)))              $issues[] = 'Error: '.$name.' "'.$dir.'" directory is not writable  [setup]';
+            else if (!($file=@tempnam($dir, 'php')) || !strStartsWith(realpath($file), realpath($dir)))              $issues[] = 'Error: '.$name.' "'.$dir.'" directory is not writable  [setup]';
             is_file($file) && @unlink($file);
         }
         /*PHP_INI_ALL   */ if (            ini_get('default_mimetype'              )  != 'text/html')                $issues[] = 'Info:  default_mimetype is not "text/html": "'.ini_get('default_mimetype').'"  [standards]';
-        /*PHP_INI_ALL   */ if ( strToLower(ini_get('default_charset'               )) != 'utf-8')                    $issues[] = 'Info:  default_charset is not "UTF-8": "'.ini_get('default_charset').'"  [standards]';
+        /*PHP_INI_ALL   */ if ( strtolower(ini_get('default_charset'               )) != 'utf-8')                    $issues[] = 'Info:  default_charset is not "UTF-8": "'.ini_get('default_charset').'"  [standards]';
         /*PHP_INI_ALL   */ if (       ini_get_bool('implicit_flush'                ) && !CLI/*hardcoded*/)           $issues[] = 'Warn:  implicit_flush is not Off  [performance]';
         /*PHP_INI_PERDIR*/ $buffer = ini_get_bytes('output_buffering');
             if (!CLI) {
@@ -330,7 +330,7 @@ class PHP extends StaticClass {
         // (6) mail related settings
         // -------------------------
         /*PHP_INI_ALL   */ //sendmail_from
-        if (WINDOWS && !ini_get('sendmail_path') && !ini_get('sendmail_from') && !isSet($_SERVER['SERVER_ADMIN']))   $issues[] = 'Warn:  On Windows and neither sendmail_path nor sendmail_from are set';
+        if (WINDOWS && !ini_get('sendmail_path') && !ini_get('sendmail_from') && !isset($_SERVER['SERVER_ADMIN']))   $issues[] = 'Warn:  On Windows and neither sendmail_path nor sendmail_from are set';
         /*PHP_INI_SYSTEM*/ if (!WINDOWS && !ini_get('sendmail_path'))                                                $issues[] = 'Warn:  sendmail_path is not set';
         /*PHP_INI_PERDIR*/ if (ini_get('mail.add_x_header'))                                                         $issues[] = 'Warn:  mail.add_x_header is not Off';
 
@@ -352,9 +352,9 @@ class PHP extends StaticClass {
         $appRoot = $config['app.dir.root'];
         if (is_file($file=$appRoot.'/composer.json') && extension_loaded('json')) {
             $composer = json_decode(file_get_contents($file), true);
-            if (isSet($composer['require']) && is_array($composer['require'])) {
+            if (isset($composer['require']) && is_array($composer['require'])) {
                 foreach ($composer['require'] as $name => $version) {
-                    $name = trim(strToLower($name));
+                    $name = trim(strtolower($name));
                     if (in_array($name, ['php', 'php-64bit', 'hhvm']) || strContains($name, '/')) continue;
                     if (strStartsWith($name, 'ext-')) $name = strRight($name, -4);
                     if (!extension_loaded($name))                                                                    $issues[] = 'Error: '.$name.' extension is not loaded  [composer dependency]';
@@ -391,7 +391,7 @@ class PHP extends StaticClass {
         else                                                                                                         $issues[] = 'Warn:  No opcode cache found [performance]';
 
 
-        // (9) show results followed by phpInfo()
+        // (9) show results followed by phpinfo()
         if (!CLI) {
             ?>
             <div align="left" style="display:initial; visibility:initial; clear:both;
@@ -407,10 +407,10 @@ class PHP extends StaticClass {
         if ($issues) echoPre('PHP configuration issues:'.NL.'-------------------------'.NL.join(NL, $issues));
         else         echoPre('PHP configuration OK');
 
-        // call phpInfo() if on a web server
+        // call phpinfo() if on a web server
         if (!CLI) {
             $get = $_GET;
-            $isConfig = isSet($get['__config__']);
+            $isConfig = isset($get['__config__']);
             unset($get['__phpinfo__'], $get['__config__']);
 
             // before/after link
@@ -424,7 +424,7 @@ class PHP extends StaticClass {
             </div>
             <?php
             echo NL;
-            @phpInfo();         // PHP might trigger warnings that are already checked and displayed (e.g. "date.timezone").
+            @phpinfo();         // PHP might trigger warnings that are already checked and displayed (e.g. "date.timezone").
         }
     }
 
@@ -468,7 +468,7 @@ class PHP extends StaticClass {
         // The variable $_SERVER['QUERY_STRING'] is set by the server and can differ, e.g. it might hold additional
         // parameters or it might be empty (nginx).
 
-        if (isSet($_SERVER['QUERY_STRING']) && strLen($_SERVER['QUERY_STRING'])) {
+        if (isset($_SERVER['QUERY_STRING']) && strlen($_SERVER['QUERY_STRING'])) {
             $query = $_SERVER['QUERY_STRING'];
         }
         else {

@@ -48,17 +48,17 @@ class FileDependency extends Dependency {
      * @param  string $fileName - Dateiname
      */
     public function __construct($fileName) {
-        if (!is_string($fileName)) throw new IllegalTypeException('Illegal type of parameter $fileName: '.getType($fileName));
-        if (!strLen($fileName))    throw new InvalidArgumentException('Invalid argument $fileName: '.$fileName);
+        if (!is_string($fileName)) throw new IllegalTypeException('Illegal type of parameter $fileName: '.gettype($fileName));
+        if (!strlen($fileName))    throw new InvalidArgumentException('Invalid argument $fileName: '.$fileName);
 
         if (file_exists($fileName)) {                       // existierende Datei
-            $this->fileName     = realPath($fileName);
-            $this->lastModified = fileMTime($this->fileName);
+            $this->fileName     = realpath($fileName);
+            $this->lastModified = filemtime($this->fileName);
         }
         else {                                              // nicht existierende Datei
             $name = str_replace('\\', '/', $fileName);
             if (isRelativePath($name))
-                $name=getCwd().'/'.$name;      // absoluten Pfad erzeugen, da Arbeitsverzeichnis wechseln kann
+                $name=getcwd().'/'.$name;      // absoluten Pfad erzeugen, da Arbeitsverzeichnis wechseln kann
 
             $this->fileName     = str_replace('/', DIRECTORY_SEPARATOR, $name);
             $this->lastModified = null;
@@ -75,8 +75,8 @@ class FileDependency extends Dependency {
      */
     public static function create($fileNames) {
         if (!is_array($fileNames)) {
-            if (!is_string($fileNames)) throw new IllegalTypeException('Illegal type of parameter $fileNames: '.getType($fileNames));
-            if (!strLen($fileNames))    throw new InvalidArgumentException('Invalid argument $fileNames: '.$fileNames);
+            if (!is_string($fileNames)) throw new IllegalTypeException('Illegal type of parameter $fileNames: '.gettype($fileNames));
+            if (!strlen($fileNames))    throw new InvalidArgumentException('Invalid argument $fileNames: '.$fileNames);
             $fileNames = array($fileNames);
         }
         if (!$fileNames) throw new InvalidArgumentException('Invalid argument $fileNames: '.$fileNames);
@@ -99,10 +99,10 @@ class FileDependency extends Dependency {
      *                FALSE, wenn die Datei sich geaendert hat.
      */
     public function isValid() {
-        // TODO: stat-Cache bei wiederholten Aufrufen loeschen, siehe clearStatCache()
+        // TODO: stat-Cache bei wiederholten Aufrufen loeschen, siehe clearstatcache()
 
         if (file_exists($this->fileName)) {
-            if ($this->lastModified !== fileMTime($this->fileName))
+            if ($this->lastModified !== filemtime($this->fileName))
                 return false;
         }
         elseif ($this->lastModified !== null) {

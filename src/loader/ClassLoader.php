@@ -63,9 +63,9 @@ class ClassLoader extends Object {
      * @param  string $class
      */
     public function autoLoad($class) {
-        $lowerClass = strToLower($class);
+        $lowerClass = strtolower($class);
 
-        if (isSet($this->classMap[$lowerClass])) {
+        if (isset($this->classMap[$lowerClass])) {
             include($this->classMap[$lowerClass]);
         }
     }

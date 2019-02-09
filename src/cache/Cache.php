@@ -59,10 +59,10 @@ final class Cache extends StaticClass {
         }
 
         // spezifischer Cache
-        if (!is_string($label)) throw new IllegalTypeException('Illegal type of parameter $label: '.getType($label));
+        if (!is_string($label)) throw new IllegalTypeException('Illegal type of parameter $label: '.gettype($label));
 
 
-        if (!isSet(self::$caches[$label])) {
+        if (!isset(self::$caches[$label])) {
             /** @var ConfigInterface $config */
             $config = self::di()['config'];
 

@@ -25,7 +25,7 @@ class Validator extends StaticClass {
     public static function isIPAddress($string, $returnBytes = false) {
         static $pattern = '/^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/';
 
-        $result = is_string($string) && strLen($string) && preg_match($pattern, $string, $bytes);
+        $result = is_string($string) && strlen($string) && preg_match($pattern, $string, $bytes);
 
         if ($result) {
             \array_shift($bytes);
@@ -131,7 +131,7 @@ class Validator extends StaticClass {
         // TODO: Adressen in IP-Notation korrekt validieren -> root@[127.0.0.1]
 
         static $pattern = '/^[a-z0-9?*+-]+[a-z0-9?*_.+-]*@(([a-z0-9?*]+|[a-z0-9?*]+[a-z0-9?*-]+[a-z0-9?*]+)\.)*(\*|[a-z0-9?*][a-z0-9?*-]*[a-z0-9?*])\.(\*|[a-z?*]{2,4})$/';
-        return is_string($string) && strLen($string) && preg_match($pattern, strToLower($string));
+        return is_string($string) && strlen($string) && preg_match($pattern, strtolower($string));
     }
 
 
@@ -150,7 +150,7 @@ class Validator extends StaticClass {
      *                       'd/m/Y [H:i[:s]]'
      */
     public static function isDateTime($date, $format='Y-m-d') {
-        if (!is_string($date)) throw new IllegalTypeException('Illegal type of parameter $date: '.getType($date));
+        if (!is_string($date)) throw new IllegalTypeException('Illegal type of parameter $date: '.gettype($date));
         if (is_array($format)) {
             foreach ($format as $value) {
                 $time = self::{__FUNCTION__}($date, $value);
@@ -159,7 +159,7 @@ class Validator extends StaticClass {
             }
             return false;
         }
-        if (!is_string($format)) throw new IllegalTypeException('Illegal type of parameter $format: '.getType($format));
+        if (!is_string($format)) throw new IllegalTypeException('Illegal type of parameter $format: '.gettype($format));
 
         /*
         // !!! deaktiviert!!!: strPTime() haelt sich nicht 100% an das angegebene Format sondern versucht, intelligent zu sein
@@ -171,7 +171,7 @@ class Validator extends StaticClass {
             elseif ($format == 'd.m.Y H:i'  ) $data = strPTime($date, '%d.%m.%Y %H:%M');
             elseif ($format == 'd.m.Y H:i:s') $data = strPTime($date, '%d.%m.%Y %H:%M:%S');
             else                              $data = strPTime($date, $format);
-            return ($data !== false && checkDate($data['tm_mon']+1, $data['tm_mday'], $data['tm_year']+1900) && $data['tm_sec'] <= 59 && $data['unparsed']=='');
+            return ($data !== false && checkdate($data['tm_mon']+1, $data['tm_mday'], $data['tm_year']+1900) && $data['tm_sec'] <= 59 && $data['unparsed']=='');
         }
       */
         $year = $month = $day = $hour = $minute = $second = null;
@@ -287,7 +287,7 @@ class Validator extends StaticClass {
         else {
             return false;
         }
-        return (checkDate($month, $day, $year) && $hour< 24 && $minute< 60 && $second< 60) ? mkTime($hour, $minute, $second, (int)$month, (int)$day, (int)$year) : false;
+        return (checkdate($month, $day, $year) && $hour< 24 && $minute< 60 && $second< 60) ? mktime($hour, $minute, $second, (int)$month, (int)$day, (int)$year) : false;
     }
 
 
@@ -315,7 +315,7 @@ class Validator extends StaticClass {
 
         // handle empty value
         $value = trim($value);
-        if (!strLen($value)) return false;
+        if (!strlen($value)) return false;
 
         // remove spaces
         $value = str_replace(' ', '', $value);
@@ -337,7 +337,7 @@ class Validator extends StaticClass {
     public static function isAddress($string) {
         static $pattern = '/^([a-zäöüÄÖÜ](-?[a-zäöüßÄÖÜé])+\.? *)+[a-z0-9\/.-]*$/';
 
-        return is_string($string) && strLen($string) && preg_match($pattern, strToLower($string));
+        return is_string($string) && strlen($string) && preg_match($pattern, strtolower($string));
     }
 
 
@@ -350,7 +350,7 @@ class Validator extends StaticClass {
      */
     public static function isFirstName($string) {
         static $pattern = '/^([a-zäöüÄÖÜ]([\'-]?[a-zäöüßéÄÖÜ])+ *)+$/';
-        return is_string($string) && strLen($string) && preg_match($pattern, strToLower($string));
+        return is_string($string) && strlen($string) && preg_match($pattern, strtolower($string));
     }
 
 
@@ -375,7 +375,7 @@ class Validator extends StaticClass {
      */
     public static function isPlaceName($string) {
         static $pattern = '/^([a-zäöüÄÖÜ](-?[a-zäöüßÄÖÜ])+\.? *)+$/';
-        return is_string($string) && strLen($string) && preg_match($pattern, strToLower($string));
+        return is_string($string) && strlen($string) && preg_match($pattern, strtolower($string));
     }
 
 
@@ -388,7 +388,7 @@ class Validator extends StaticClass {
      */
     public static function isStreetName($string) {
         static $pattern = '/^[a-zäöüßÄÖÜ. -]{3,}$/';
-        return is_string($string) && strLen($string) && preg_match($pattern, strToLower($string));
+        return is_string($string) && strlen($string) && preg_match($pattern, strtolower($string));
     }
 
 
@@ -401,6 +401,6 @@ class Validator extends StaticClass {
      */
     public static function isStreetNumber($string) {
         static $pattern = '/^[0-9A-Za-z-\/]+$/';
-        return is_string($string) && strLen($string) && preg_match($pattern, strToLower($string));
+        return is_string($string) && strlen($string) && preg_match($pattern, strtolower($string));
     }
 }

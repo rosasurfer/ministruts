@@ -45,9 +45,9 @@ class SQLiteResult extends Result {
      * @param  int            $lastAffectedRows - last number of affected rows of the connection
      */
     public function __construct(IConnector $connector, $sql, \SQLite3Result $result, $lastInsertId, $lastAffectedRows) {
-        if (!is_string($sql))           throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
-        if (!is_int($lastInsertId))     throw new IllegalTypeException('Illegal type of parameter $lastInsertId: '.getType($lastInsertId));
-        if (!is_int($lastAffectedRows)) throw new IllegalTypeException('Illegal type of parameter $lastAffectedRows: '.getType($lastAffectedRows));
+        if (!is_string($sql))           throw new IllegalTypeException('Illegal type of parameter $sql: '.gettype($sql));
+        if (!is_int($lastInsertId))     throw new IllegalTypeException('Illegal type of parameter $lastInsertId: '.gettype($lastInsertId));
+        if (!is_int($lastAffectedRows)) throw new IllegalTypeException('Illegal type of parameter $lastAffectedRows: '.gettype($lastAffectedRows));
 
         $this->connector        = $connector;
         $this->sql              = $sql;
