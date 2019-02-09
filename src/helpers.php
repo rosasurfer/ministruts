@@ -1312,17 +1312,30 @@ function is_dir_empty($dirname, $ignore = []) {
     }
 
     /*
-    TODO: for better performance replace with
-
-    $handle = opendir($dir);
-    while (false !== ($entry = readdir($handle))) {
-        if ($entry != "." && $entry != "..") {
-          return FALSE;
-        }
+    // TODO: for better performance
+    $hDir = openDir($dir);
+    while (($entry = readDir($hDir)) !== false) {
+        if ($entry=='.' || $entry=='..')
+            continue;
     }
-    Don't forget to closedir($handle) afterwards.
+    closeDir($hDir);
     */
     return true;
+}
+
+
+/**
+ * Auto-load the specified class, interface or trait. If the component was already loaded the call does nothing.
+ *
+ * @param  string $name - name
+ *
+ * @return bool - FALSE if a component of that name doesn't exist or couldn't be loaded
+ */
+function autoload($name) {
+    if (class_exists    ($name, true)) return true;
+    if (interface_exists($name, true)) return true;
+    if (trait_exists    ($name, true)) return true;
+    return false;
 }
 
 
