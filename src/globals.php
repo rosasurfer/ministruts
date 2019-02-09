@@ -719,6 +719,7 @@ function typeOf($var) {
  * @param  string $path            - same as mkdir(): directory name
  * @param  int    $mode [optional] - same as mkdir(): permission mode to set if the directory is created<br>
  *                                                    (default: 0755 = rwxr-xr-x)
+ * @deprecated
  */
 function mkDirWritable($path, $mode = 0755) {
     \rosasurfer\mkDirWritable($path, $mode);
