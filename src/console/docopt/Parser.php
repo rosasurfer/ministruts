@@ -4,10 +4,9 @@ namespace rosasurfer\console\docopt;
 use rosasurfer\core\Object;
 
 use rosasurfer\console\docopt\exception\DocoptFormatError;
-use rosasurfer\console\docopt\exception\UserSyntaxError;
+use rosasurfer\console\docopt\exception\UserNotification;
 
 use rosasurfer\console\docopt\pattern\Argument;
-use rosasurfer\console\docopt\pattern\BranchPattern;
 use rosasurfer\console\docopt\pattern\Command;
 use rosasurfer\console\docopt\pattern\Either;
 use rosasurfer\console\docopt\pattern\OneOrMore;
@@ -24,25 +23,25 @@ use function rosasurfer\strEndsWith;
 
 
 /**
- * Handler
+ * Parser
  */
-class Handler extends Object {
+class Parser extends Object {
 
+
+    /** @var string */
+    protected $version;
+
+    /** @var bool */
+    protected $optionsFirst = false;
+
+    /** @var bool */
+    protected $help = true;
 
     /** @var bool */
     protected $exit = true;
 
     /** @var bool */
     protected $exitFullUsage = false;
-
-    /** @var bool */
-    protected $help = true;
-
-    /** @var bool */
-    protected $optionsFirst = false;
-
-    /** @var string */
-    protected $version;
 
 
     /**
@@ -63,31 +62,29 @@ class Handler extends Object {
      * @param  string         $doc
      * @param  string|mixed[] $argv [optional]
      *
-     * @return Response
+     * @return Result
      */
-    public function handle($doc, $argv = null) {
+    public function parse($doc, $argv = null) {
         try {
-            if (!isSet($argv) && isSet($_SERVER['argv']))
+            if (!isset($argv) && isset($_SERVER['argv']))
                 $argv = array_slice($_SERVER['argv'], 1);
 
-            $usageSections = self::parseSection('usage:', $doc);
-            if (!$usageSections)            throw new DocoptFormatError('"usage:" (case-insensitive) not found.');
-            if (sizeof($usageSections) > 1) throw new DocoptFormatError('More than one "usage:" (case-insensitive).');
+            $usageSections = static::parseSection('usage:', $doc);
+            if (!$usageSections)            throw new DocoptFormatError('"Usage:" section not found');
+            if (sizeof($usageSections) > 1) throw new DocoptFormatError('More than one "Usage:" section found');
             $usage = $usageSections[0];
 
             // temp fix until python port provides solution
-            UserSyntaxError::$usage = !$this->exitFullUsage ? $usage : $doc;
+            UserNotification::$usage = !$this->exitFullUsage ? $usage : $doc;
 
-            $options = self::parseDefaults($doc);
-
-            $formalUse = self::formalUsage($usage);
-            $pattern = self::parsePattern($formalUse, $options);
-
-            $argv = self::parseArgv(new TokenStream($argv), $options, $this->optionsFirst);
+            $options   = static::parseDefaults($doc);
+            $formalUse = static::formalUsage($usage);
+            $pattern   = static::parsePattern($formalUse, $options);
+            $argv      = static::parseArgv(new TokenIterator($argv), $options, $this->optionsFirst);
 
             $patternOptions = $pattern->flat([Option::class]);
             foreach ($pattern->flat([OptionsShortcut::class]) as $optionsShortcut) {
-                $docOptions = self::parseDefaults($doc);
+                $docOptions = static::parseDefaults($doc);
                 $optionsShortcut->children = array_diff((array)$docOptions, $patternOptions);
             }
 
@@ -101,21 +98,21 @@ class Handler extends Object {
                         $result[$name] = $pattern->value;
                     }
                 }
-                return new Response($result);
+                return new Result($result);
             }
-            throw new UserSyntaxError();
+            throw new UserNotification();
         }
-        catch (UserSyntaxError $ex) {
+        catch (UserNotification $ex) {
             $this->handleExit($ex);
-            return new Response([], $ex->status, $ex->getMessage());
+            return new Result([], $ex->status, $ex->getMessage());
         }
     }
 
 
     /**
-     * @param  UserSyntaxError $exception
+     * @param  UserNotification $exception
      */
-    protected function handleExit(UserSyntaxError $exception) {
+    protected function handleExit(UserNotification $exception) {
         if ($this->exit) {
             echoPre($exception->getMessage());
             exit($exception->status);
@@ -130,25 +127,25 @@ class Handler extends Object {
      * @param  string    $doc
      */
     protected function extras($help, $version, $argv, $doc) {
-        $ofound = $vfound = false;
+        $hfound = $vfound = false;
 
         foreach ($argv as $o) {
             if ($o->value) {
                 if ($o->name()=='-h' || $o->name()=='--help') {
-                    $ofound = true;
+                    $hfound = true;
                 }
                 if ($o->name()=='--version') {
                     $vfound = true;
                 }
             }
         }
-        if ($help && $ofound) {
-            UserSyntaxError::$usage = null;
-            throw new UserSyntaxError($doc, 0);
+        if ($help && $hfound) {
+            UserNotification::$usage = null;
+            throw new UserNotification($doc, 0);
         }
         if ($version && $vfound) {
-            UserSyntaxError::$usage = null;
-            throw new UserSyntaxError($version, 0);
+            UserNotification::$usage = null;
+            throw new UserNotification($version, 0);
         }
     }
 
@@ -158,7 +155,7 @@ class Handler extends Object {
      *
      * @return string
      */
-    public static function formalUsage($section) {
+    protected static function formalUsage($section) {
         list (, $section) = explode(':', $section, 2);  # drop "usage:"
         $pu = preg_split('/\s+/', trim($section));
 
@@ -177,13 +174,13 @@ class Handler extends Object {
      * If options_first: argv ::= [ long | shorts ]* [ argument ]* [ '--' [ argument ]* ] ;
      * else:             argv ::= [ long | shorts | argument ]* [ '--' [ argument ]* ] ;
      *
-     * @param  TokenStream    $tokens
+     * @param  TokenIterator  $tokens
      * @param  \ArrayIterator $options
      * @param  bool           $optionsFirst [optional]
      *
      * @return Pattern[]
      */
-    public static function parseArgv(TokenStream $tokens, \ArrayIterator $options, $optionsFirst = false) {
+    protected static function parseArgv(TokenIterator $tokens, \ArrayIterator $options, $optionsFirst = false) {
         $parsed = [];
 
         while ($tokens->current() !== null) {
@@ -194,10 +191,10 @@ class Handler extends Object {
                 return $parsed;
             }
             elseif (strpos($tokens->current(), '--')===0) {
-                $parsed = array_merge($parsed, self::parseLong($tokens, $options));
+                $parsed = array_merge($parsed, static::parseLong($tokens, $options));
             }
             elseif (strpos($tokens->current(), '-')===0 && $tokens->current() != '-') {
-                $parsed = array_merge($parsed, self::parseShort($tokens, $options));
+                $parsed = array_merge($parsed, static::parseShort($tokens, $options));
             }
             elseif ($optionsFirst) {
                 return array_merge($parsed, array_map(function($value) {
@@ -217,9 +214,9 @@ class Handler extends Object {
      *
      * @return \ArrayIterator
      */
-    public static function parseDefaults($doc) {
+    protected static function parseDefaults($doc) {
         $defaults = [];
-        foreach (self::parseSection('options:', $doc) as $s) {
+        foreach (static::parseSection('options:', $doc) as $s) {
             # FIXME corner case "bla: options: --foo"
             list (, $s) = explode(':', $s, 2);
             $splitTmp = array_slice(preg_split("@\n[ \t]*(-\S+?)@", "\n".$s, null, PREG_SPLIT_DELIM_CAPTURE), 1);
@@ -245,11 +242,12 @@ class Handler extends Object {
      *
      * @return Required
      */
-    public static function parsePattern($source, \ArrayIterator $options) {
-        $tokens = TokenStream::fromPattern($source);
-        $result = self::parseExpression($tokens, $options);
+    protected static function parsePattern($source, \ArrayIterator $options) {
+        $tokens = TokenIterator::fromPattern($source);
+        $result = static::parseExpression($tokens, $options);
         if ($tokens->current() !== null) {
-            $tokens->throwException('unexpected ending: '.join(' ', $tokens->left()));
+            $exception = $tokens->getErrorClass();
+            throw new $exception('Unexpected ending: '.join(' ', $tokens->left()));
         }
         return new Required($result);
     }
@@ -261,7 +259,7 @@ class Handler extends Object {
      *
      * @return string[]
      */
-    public static function parseSection($name, $source) {
+    protected static function parseSection($name, $source) {
         $result = [];
         if (preg_match_all('@^([^\n]*'.$name.'[^\n]*\n?(?:[ \t].*?(?:\n|$))*)@im', $source, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
@@ -275,13 +273,13 @@ class Handler extends Object {
     /**
      * expr ::= seq ( '|' seq )* ;
      *
-     * @param  TokenStream    $tokens
+     * @param  TokenIterator  $tokens
      * @param  \ArrayIterator $options
      *
      * @return Either|Pattern[]
      */
-    protected static function parseExpression(TokenStream $tokens, \ArrayIterator $options) {
-        $seq = self::parseSequence($tokens, $options);
+    protected static function parseExpression(TokenIterator $tokens, \ArrayIterator $options) {
+        $seq = static::parseSequence($tokens, $options);
         if ($tokens->current() != '|')
             return $seq;
 
@@ -291,7 +289,7 @@ class Handler extends Object {
 
         while ($tokens->current() == '|') {
             $tokens->move();
-            $seq = self::parseSequence($tokens, $options);
+            $seq = static::parseSequence($tokens, $options);
             if (count($seq) > 1) {
                 $result[] = new Required($seq);
             }
@@ -309,16 +307,16 @@ class Handler extends Object {
     /**
      * seq ::= ( atom [ '...' ] )* ;
      *
-     * @param  TokenStream    $tokens
+     * @param  TokenIterator  $tokens
      * @param  \ArrayIterator $options
      *
      * @return Pattern[]
      */
-    protected static function parseSequence(TokenStream $tokens, \ArrayIterator $options) {
+    protected static function parseSequence(TokenIterator $tokens, \ArrayIterator $options) {
         $result = [];
         $not = [null, '', ']', ')', '|'];
         while (!in_array($tokens->current(), $not, true)) {
-            $atom = self::parseAtom($tokens, $options);
+            $atom = static::parseAtom($tokens, $options);
             if ($tokens->current() == '...') {
                 $atom = [new OneOrMore($atom)];
                 $tokens->move();
@@ -334,12 +332,12 @@ class Handler extends Object {
     /**
      * shorts ::= '-' ( chars )* [ [ ' ' ] chars ] ;
      *
-     * @param  TokenStream    $tokens
+     * @param  TokenIterator  $tokens
      * @param  \ArrayIterator $options
      *
      * @return Option[]
      */
-    protected static function parseShort(TokenStream $tokens, \ArrayIterator $options) {
+    protected static function parseShort(TokenIterator $tokens, \ArrayIterator $options) {
         $token = $tokens->move();
 
         if (strpos($token, '-') !== 0 || strpos($token, '--') === 0)
@@ -359,12 +357,13 @@ class Handler extends Object {
 
             $similarCnt = count($similar);
             if ($similarCnt > 1) {
-                $tokens->throwException($short.' is specified ambiguously '.$similarCnt.' times');
+                $exception = $tokens->getErrorClass();
+                throw new $exception($short.' is specified ambiguously '.$similarCnt.' times');
             }
             elseif ($similarCnt < 1) {
                 $o = new Option($short, null, 0);
                 $options[] = $o;
-                if ($tokens->errorClass == UserSyntaxError::class) {
+                if ($tokens->getErrorClass() == UserNotification::class) {
                     $o = new Option($short, null, 0, true);
                 }
             }
@@ -374,7 +373,8 @@ class Handler extends Object {
                 if ($o->argcount != 0) {
                     if ($left == '') {
                         if ($tokens->current() === null || $tokens->current() == '--') {
-                            $tokens->throwException($short.' requires argument');
+                            $exception = $tokens->getErrorClass();
+                            throw new $exception($short.' requires argument');
                         }
                         $value = $tokens->move();
                     }
@@ -383,7 +383,7 @@ class Handler extends Object {
                         $left = '';
                     }
                 }
-                if ($tokens->errorClass == UserSyntaxError::class) {
+                if ($tokens->getErrorClass() == UserNotification::class) {
                     $o->value = $value!==null ? $value : true;
                 }
             }
@@ -396,15 +396,17 @@ class Handler extends Object {
     /**
      * long ::= '--' chars [ ( ' ' | '=' ) chars ] ;
      *
-     * @param  TokenStream    $tokens
+     * @param  TokenIterator  $tokens
      * @param  \ArrayIterator $options
      *
      * @return Option[]
      */
-    protected static function parseLong(TokenStream $tokens, \ArrayIterator $options) {
-        $token = $tokens->move();
-        $exploded = explode('=', $token, 2);
-        if (count($exploded) == 2) {
+    protected static function parseLong(TokenIterator $tokens, \ArrayIterator $options) {
+        $tokenError = $tokens->getErrorClass();
+        $token      = $tokens->move();
+        $exploded   = explode('=', $token, 2);
+
+        if (sizeof($exploded) == 2) {
             $long = $exploded[0];
             $eq = '=';
             $value = $exploded[1];
@@ -423,7 +425,7 @@ class Handler extends Object {
         $similar = array_values(array_filter($options, function($o) use ($long) {
             return ($o->long && $o->long==$long);
         }));
-        if ($tokens->errorClass==UserSyntaxError::class && !$similar) {
+        if ($tokenError==UserNotification::class && !$similar) {
             $similar = array_values(array_filter($options, function($o) use ($long) {
                 return ($o->long && strpos($o->long, $long)===0);
             }));
@@ -435,31 +437,28 @@ class Handler extends Object {
             $argcount = (int) ($eq=='=');
             $o = new Option(null, $long, $argcount);
             $options[] = $o;
-            if ($tokens->errorClass == UserSyntaxError::class) {
+            if ($tokenError == UserNotification::class) {
                 $o = new Option(null, $long, $argcount, $argcount ? $value : true);
             }
         }
         elseif (sizeof($similar) > 1) {
             // might be simply specified ambiguously 2+ times?
-            $tokens->throwException($long.' is not a unique prefix: '.join(', ', array_map(function($o) {
+            throw new $tokenError($long.' is not a unique prefix: '.join(', ', array_map(function($o) {
                 return $o->long;
             }, $similar)));
         }
         else {
             $o = new Option($similar[0]->short, $similar[0]->long, $similar[0]->argcount, $similar[0]->value);
             if ($o->argcount == 0) {
-                if (isSet($value)) $tokens->throwException($o->long.' must not have an argument');
+                if (isset($value)) throw new $tokenError($o->long.' must not have an argument');
             }
-            else {
-                if ($value === null) {
-                    if ($tokens->current()===null || $tokens->current()=='--') {
-                        $tokens->throwException($o->long.' requires argument');
-                    }
-                    $value = $tokens->move();
-                }
+            else if ($value === null) {
+                if ($tokens->current()===null || $tokens->current()=='--')
+                    throw new $tokenError($o->long.' requires argument');
+                $value = $tokens->move();
             }
-            if ($tokens->errorClass == UserSyntaxError::class) {
-                $o->value = isSet($value) ? $value : true;
+            if ($tokens->getErrorClass() == UserNotification::class) {
+                $o->value = isset($value) ? $value : true;
             }
         }
         return [$o];
@@ -469,14 +468,15 @@ class Handler extends Object {
     /**
      * atom ::= '(' expr ')' | '[' expr ']' | 'options' | long | shorts | argument | command ;
      *
-     * @param  TokenStream    $tokens
+     * @param  TokenIterator  $tokens
      * @param  \ArrayIterator $options
      *
      * @return Pattern[]
      */
-    protected static function parseAtom(TokenStream $tokens, \ArrayIterator $options) {
-        $token = $tokens->current();
-        $result = [];
+    protected static function parseAtom(TokenIterator $tokens, \ArrayIterator $options) {
+        $tokenError = $tokens->getErrorClass();
+        $token      = $tokens->current();
+        $result     = [];
 
         if ($token=='(' || $token=='[') {
             $tokens->move();
@@ -485,24 +485,24 @@ class Handler extends Object {
                 '(' => [')', Required::class],
                 '[' => [']', Optional::class],
             ];
-            list ($matching, $pattern) = $index[$token];
+            list ($matching, $patternClass) = $index[$token];
 
-            $result = new $pattern(self::parseExpression($tokens, $options));
+            $result = new $patternClass(static::parseExpression($tokens, $options));
             if ($tokens->move() != $matching)
-                $tokens->throwException("Unmatched '$token'");
+                throw new $tokenError('Unmatched "'.$token.'"');
             return [$result];
         }
         elseif ($token == 'options') {
             $tokens->move();
             return [new OptionsShortcut()];
         }
-        elseif (strpos($token, '--') === 0 && $token != '--') {
-            return self::parseLong($tokens, $options);
+        elseif (strpos($token, '--')===0 && $token!='--') {
+            return static::parseLong($tokens, $options);
         }
-        elseif (strpos($token, '-') === 0 && $token != '-' && $token != '--') {
-            return self::parseShort($tokens, $options);
+        elseif (strpos($token, '-')===0 && $token!='-' && $token!='--') {
+            return static::parseShort($tokens, $options);
         }
-        elseif (strpos($token, '<') === 0 && strEndsWith($token, '>') || self::isUpper($token)) {
+        elseif ((strpos($token, '<')===0 && strEndsWith($token, '>')) || static::isUpperCase($token)) {
             return [new Argument($tokens->move())];
         }
         else {
@@ -512,73 +512,13 @@ class Handler extends Object {
 
 
     /**
-     * Expand pattern into an (almost) equivalent one, but with single Either.
-     *
-     * Example: ((-a | -b) (-c | -d)) => (-a -c | -a -d | -b -c | -b -d)
-     * Quirks: [-a] => (-a), (-a...) => (-a -a)
-     *
-     * @param  Pattern $pattern
-     *
-     * @return Either
-     */
-    public static function transform(Pattern $pattern) {
-        $result = [];
-        $groups = [[$pattern]];
-
-        while ($groups) {
-            $children = array_shift($groups);
-            $hasBranchPattern = false;
-            foreach ($children as $c) {
-                if ($c instanceof BranchPattern) {
-                    $hasBranchPattern = true;
-                    break;
-                }
-            }
-            if ($hasBranchPattern) {
-                /** @var BranchPattern $child */
-                $child = null;
-                foreach ($children as $key => $currentChild) {
-                    if ($currentChild instanceof BranchPattern) {
-                        $child = $currentChild;
-                        unset($children[$key]);
-                        break;
-                    }
-                }
-                if ($child instanceof Either) {
-                    foreach ($child->children as $c) {
-                        $groups[] = array_merge([$c], $children);
-                    }
-                }
-                else if ($child instanceof OneOrMore) {
-                    $groups[] = array_merge($child->children, $child->children, $children);
-                }
-                else {
-                    $groups[] = array_merge($child->children, $children);
-                }
-            }
-            else {
-                $result[] = $children;
-            }
-        }
-
-        $rs = [];
-        foreach ($result as $e) {
-            $rs[] = new Required($e);
-        }
-        return new Either($rs);
-    }
-
-
-    /**
-     * Return true if all cased characters in the string are uppercase and there is
-     * at least one cased character, false otherwise.
-     * Python method with no knowrn equivalent in PHP.
+     * Whether all cased characters in the string are uppercase, and there is at least one of them.
      *
      * @param  string $string
      *
      * @return bool
      */
-    protected static function isUpper($string) {
+    protected static function isUpperCase($string) {
         return preg_match('/[A-Z]/', $string) && !preg_match('/[a-z]/', $string);
     }
 }

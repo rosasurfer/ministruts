@@ -2,27 +2,27 @@
 namespace rosasurfer\console\docopt;
 
 use rosasurfer\console\docopt\exception\DocoptFormatError;
-use rosasurfer\console\docopt\exception\UserSyntaxError;
+use rosasurfer\console\docopt\exception\UserNotification;
 use rosasurfer\core\ObjectTrait;
 
 
 /**
- * TokenStream
+ * TokenIterator
  */
-class TokenStream extends \ArrayIterator {
+class TokenIterator extends \ArrayIterator {
 
     use ObjectTrait;
 
 
     /** @var string */
-    public $errorClass;
+    protected $errorClass;
 
 
     /**
      * @param  string|mixed[] $source
      * @param  string         $errorClass [optional] - class name of errors
      */
-    public function __construct($source, $errorClass = UserSyntaxError::class) {
+    public function __construct($source, $errorClass = UserNotification::class) {
         if (!is_array($source)) {
             $source = trim($source);
             if ($source) $source = preg_split('/\s+/', $source);
@@ -42,8 +42,15 @@ class TokenStream extends \ArrayIterator {
     public static function fromPattern($source) {
         $source = preg_replace('/([\[\]\(\)\|]|\.\.\.)/', ' $1 ', $source);
         $source = preg_split('/\s+|(\S*<.*?'.'>)/', $source, null, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
-
         return new static($source, DocoptFormatError::class);
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getErrorClass() {
+        return $this->errorClass;
     }
 
 
@@ -62,18 +69,9 @@ class TokenStream extends \ArrayIterator {
      */
     public function left() {
         $left = [];
-        while (($token = $this->move()) !== null) {
+        while (($token=$this->move()) !== null) {
             $left[] = $token;
         }
         return $left;
-    }
-
-
-    /**
-     * @param string $message
-     */
-    public function throwException($message) {
-        $exception = $this->errorClass;
-        throw new $exception($message);
     }
 }
