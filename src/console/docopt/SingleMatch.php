@@ -6,7 +6,7 @@ use rosasurfer\console\docopt\pattern\Pattern;
 
 
 /**
- *
+ * SingleMatch
  */
 class SingleMatch extends Object {
 

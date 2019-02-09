@@ -5,7 +5,7 @@ use rosasurfer\core\Object;
 
 
 /**
- *
+ * Response
  */
 class Response extends Object implements \ArrayAccess, \IteratorAggregate {
 

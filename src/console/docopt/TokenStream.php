@@ -7,7 +7,7 @@ use rosasurfer\core\ObjectTrait;
 
 
 /**
- *
+ * TokenStream
  */
 class TokenStream extends \ArrayIterator {
 

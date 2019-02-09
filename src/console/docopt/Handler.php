@@ -23,7 +23,7 @@ use function rosasurfer\strEndsWith;
 
 
 /**
- *
+ * Handler
  */
 class Handler extends Object {
 

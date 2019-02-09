@@ -3,7 +3,7 @@ namespace rosasurfer\console\docopt\pattern;
 
 
 /**
- *
+ * Optional
  */
 class Optional extends BranchPattern {
 

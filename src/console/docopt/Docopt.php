@@ -5,6 +5,8 @@ use rosasurfer\core\StaticClass;
 
 
 /**
+ * Docopt
+ *
  * Command-line argument parser that will make you smile.
  */
 class Docopt extends StaticClass {

@@ -5,7 +5,7 @@ use rosasurfer\console\docopt\SingleMatch;
 
 
 /**
- *
+ * Argument
  */
 class Argument extends LeafPattern {
 

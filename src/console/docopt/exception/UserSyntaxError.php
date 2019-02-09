@@ -5,6 +5,8 @@ use rosasurfer\exception\RuntimeException;
 
 
 /**
+ * UserSyntaxError
+ *
  * An exception marking errors made by the end user of the CLI application. The application was launched with invalid
  * arguments.
  */

@@ -5,7 +5,7 @@ use function rosasurfer\array_merge;
 
 
 /**
- *
+ * BranchPattern
  */
 abstract class BranchPattern extends Pattern {
 

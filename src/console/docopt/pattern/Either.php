@@ -3,7 +3,7 @@ namespace rosasurfer\console\docopt\pattern;
 
 
 /**
- *
+ * Either
  */
 class Either extends BranchPattern {
 

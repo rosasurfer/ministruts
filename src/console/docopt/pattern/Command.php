@@ -5,7 +5,7 @@ use rosasurfer\console\docopt\SingleMatch;
 
 
 /**
- *
+ * Command
  */
 class Command extends Argument {
 

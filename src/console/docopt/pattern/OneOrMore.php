@@ -3,7 +3,7 @@ namespace rosasurfer\console\docopt\pattern;
 
 
 /**
- *
+ * OneOrMore
  */
 class OneOrMore extends BranchPattern {
 

@@ -8,7 +8,7 @@ use function rosasurfer\array_merge;
 
 
 /**
- *
+ * LeafPattern
  */
 abstract class LeafPattern extends Pattern {
 
