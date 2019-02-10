@@ -25,7 +25,7 @@ use function rosasurfer\strStartsWith;
 /**
  * Parser
  *
- * A command line argument parser that will make you smile.
+ * A command line argument parser for the {@link http://docopt.org} language format.
  */
 class Parser extends Object {
 
