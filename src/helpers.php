@@ -4,8 +4,8 @@
  */
 namespace rosasurfer;
 
-use rosasurfer\console\docopt\DocoptParser;
-use rosasurfer\console\docopt\DocoptResult;
+use rosasurfer\console\docopt\Parser as DocoptParser;
+use rosasurfer\console\docopt\Result as DocoptResult;
 use rosasurfer\exception\IllegalArgumentException;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
@@ -1682,23 +1682,15 @@ function asset($uri) {
 
 
 /**
- * Parse the current CLI arguments and match them against the specified {@link http://docopt.org/} syntax definition.
+ * Parse command line arguments and match them against the specified {@link http://docopt.org} syntax definition.
  *
- * @param  string       $doc               - help text (syntax definition in docopt language format)
- * @param  string|array $params [optional] - parse options (default: none)
+ * @param  string          $doc                - help text, i.e. a syntax definition in docopt language format
+ * @param  string|string[] $args    [optional] - arguments to parse (default: the arguments passed in $_SERVER['argv'])
+ * @param  array           $options [optional] - parser options (default: none)
  *
  * @return DocoptResult - the parsing result
  */
-function docopt($doc, $params = []) {
-    $argv = null;
-    if (is_string($params)) {
-        $argv = $params;
-        $params = [];
-    }
-    else if (isset($params['argv'])) {
-        $argv = $params['argv'];
-        unset($params['argv']);
-    }
-    $parser = new DocoptParser($params);
-    return $parser->parse($doc, $argv);
+function docopt($doc, $args=null, array $options=[]) {
+    $parser = new DocoptParser($options);
+    return $parser->parse($doc, $args);
 }

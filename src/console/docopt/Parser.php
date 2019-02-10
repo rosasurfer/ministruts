@@ -23,11 +23,11 @@ use function rosasurfer\strEndsWith;
 
 
 /**
- * DocoptParser
+ * Parser
  *
  * A command line argument parser that will make you smile.
  */
-class DocoptParser extends Object {
+class Parser extends Object {
 
 
     /** @var string */
@@ -66,12 +66,12 @@ class DocoptParser extends Object {
 
 
     /**
-     * Parse the current CLI arguments and match them against the specified {@link http://docopt.org/} syntax definition.
+     * Parse the current CLI arguments and match them against the specified {@link http://docopt.org} syntax definition.
      *
      * @param  string         $doc
      * @param  string|mixed[] $argv [optional]
      *
-     * @return DocoptResult
+     * @return Result
      */
     public function parse($doc, $argv = null) {
         try {
@@ -105,13 +105,13 @@ class DocoptParser extends Object {
                         $result[$name] = $pattern->value;
                     }
                 }
-                return new DocoptResult($result);
+                return new Result($result);
             }
             throw new UserNotification();
         }
         catch (UserNotification $ex) {
             $this->handleExit($ex);
-            return new DocoptResult([], $ex->status, $ex->addMessage($this->autoHelp)->getMessage());
+            return new Result([], $ex->status, $ex->addMessage($this->autoHelp)->getMessage());
         }
     }
 

@@ -6,11 +6,11 @@ use rosasurfer\exception\IllegalAccessException;
 
 
 /**
- * DocoptResult
+ * Result
  *
  * Represents the parsing result of a {@link Parser::parse()} call.
  */
-class DocoptResult extends Object implements \ArrayAccess, \IteratorAggregate {
+class Result extends Object implements \ArrayAccess, \IteratorAggregate {
 
 
     /** @var array */
