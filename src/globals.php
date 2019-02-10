@@ -747,7 +747,7 @@ function is_dir_empty($dirname, $ignore = []) {
  *
  * @param  string $name - name
  *
- * @return bool - FALSE if a component of that name doesn't exist or couldn't be loaded
+ * @return string|null - the same name or NULL if a component of that name doesn't exist or couldn't be loaded
  */
 function autoload($name) {
     return \rosasurfer\autoload($name);

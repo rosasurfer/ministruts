@@ -1332,13 +1332,12 @@ function is_dir_empty($dirname, $ignore = []) {
  *
  * @param  string $name - name
  *
- * @return bool - FALSE if a component of that name doesn't exist or couldn't be loaded
+ * @return string|null - the same name or NULL if a component of that name doesn't exist or couldn't be loaded
  */
 function autoload($name) {
-    if (class_exists    ($name, true)) return true;
-    if (interface_exists($name, true)) return true;
-    if (trait_exists    ($name, true)) return true;
-    return false;
+    if (class_exists($name, true) || interface_exists($name, true) || trait_exists($name, true))
+        return $name;
+    return null;
 }
 
 
