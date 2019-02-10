@@ -165,12 +165,10 @@ class Logger extends StaticClass {
 
         // (2) mail handler: enabled if mail receivers are configured
         $receivers = [];
-        if ($config) {
-            foreach (explode(',', $config->get('log.mail.receiver', '')) as $receiver) {
-                if ($receiver = trim($receiver)) {
-                    if (filter_var($receiver, FILTER_VALIDATE_EMAIL)) {     // silently skip invalid addresses
-                        $receivers[] = $receiver;
-                    }
+        foreach (explode(',', $config->get('log.mail.receiver', '')) as $receiver) {
+            if ($receiver = trim($receiver)) {
+                if (filter_var($receiver, FILTER_VALIDATE_EMAIL)) {         // silently skip invalid addresses
+                    $receivers[] = $receiver;
                 }
             }
         }
@@ -189,32 +187,25 @@ class Logger extends StaticClass {
 
         // (5) SMS handler: enabled if SMS receivers are configured (operator settings are checked at log time)
         self::$smsReceivers = [];
-        if ($config) {
-            foreach (explode(',', $config->get('log.sms.receiver', '')) as $receiver) {
-                if ($receiver=trim($receiver)) {
-                    if (strStartsWith($receiver, '+' )) $receiver = substr($receiver, 1);
-                    if (strStartsWith($receiver, '00')) $receiver = substr($receiver, 2);
-                    if (!ctype_digit($receiver)) {
-                        self::log('Invalid SMS receiver configuration: "'.$receiver.'"', L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
-                        continue;
-                    }
-                    self::$smsReceivers[] = $receiver;
+        foreach (explode(',', $config->get('log.sms.receiver', '')) as $receiver) {
+            if ($receiver=trim($receiver)) {
+                if (strStartsWith($receiver, '+' )) $receiver = substr($receiver, 1);
+                if (strStartsWith($receiver, '00')) $receiver = substr($receiver, 2);
+                if (!ctype_digit($receiver)) {
+                    self::log('Invalid SMS receiver configuration: "'.$receiver.'"', L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
+                    continue;
                 }
+                self::$smsReceivers[] = $receiver;
             }
-            $logLevel = $config->get('log.sms.level', self::$appLogLevel);
-            if (is_string($logLevel))                                   // a string if configured
-                $logLevel = self::logLevelToId($logLevel) ?: self::$appLogLevel;
         }
-        else {
-            $logLevel = self::$appLogLevel;
-        }
+        $logLevel = $config->get('log.sms.level', self::$appLogLevel);
+        if (is_string($logLevel))                                   // a string if configured
+            $logLevel = self::logLevelToId($logLevel) ?: self::$appLogLevel;
         self::$smsLogLevel = $logLevel;
 
-        if ($config) {
-            $options = $config->get('sms', []);
-            if (!is_array($options)) throw new IllegalTypeException('Invalid type of config value "sms": '.gettype($options).' (not array)');
-            self::$smsOptions = $options;
-        }
+        $options = $config->get('sms', []);
+        if (!is_array($options)) throw new IllegalTypeException('Invalid type of config value "sms": '.gettype($options).' (not array)');
+        self::$smsOptions = $options;
 
         self::$smsHandler = self::$smsReceivers && self::$smsOptions;
 
