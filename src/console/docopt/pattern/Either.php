@@ -24,15 +24,15 @@ class Either extends BranchPattern {
         }
         if ($outcomes) {
             // return min(outcomes, key=lambda outcome: len(outcome[1]))
-            $min = $ret = null;
+            $min = $result = null;
             foreach ($outcomes as $o) {
-                $cnt = count($o[1]);
-                if ($min === null || $cnt < $min) {
-                   $min = $cnt;
-                   $ret = $o;
+                $size = sizeof($o[1]);
+                if ($min === null || $size < $min) {
+                   $min    = $size;
+                   $result = $o;
                 }
             }
-            return $ret;
+            return $result;
         }
         return [false, $left, $collected];
     }

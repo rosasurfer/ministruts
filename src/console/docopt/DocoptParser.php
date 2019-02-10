@@ -23,9 +23,11 @@ use function rosasurfer\strEndsWith;
 
 
 /**
- * Parser
+ * DocoptParser
+ *
+ * A command line argument parser that will make you smile.
  */
-class Parser extends Object {
+class DocoptParser extends Object {
 
 
     /** @var string */
@@ -43,9 +45,14 @@ class Parser extends Object {
     /** @var bool */
     protected $exitFullUsage = false;
 
+    /** @var string - help text displayed with every parser generated output */
+    protected $autoHelp;
+
 
     /**
      * Constructor
+     *
+     * Create a new docopt CLI argument parser.
      *
      * @param  array $options [optional]
      */
@@ -59,23 +66,23 @@ class Parser extends Object {
 
 
     /**
+     * Parse the current CLI arguments and match them against the specified {@link http://docopt.org/} syntax definition.
+     *
      * @param  string         $doc
      * @param  string|mixed[] $argv [optional]
      *
-     * @return Result
+     * @return DocoptResult
      */
     public function parse($doc, $argv = null) {
         try {
             if (!isset($argv) && isset($_SERVER['argv']))
                 $argv = array_slice($_SERVER['argv'], 1);
 
-            $usageSections = static::parseSection('usage:', $doc);
-            if (!$usageSections)            throw new DocoptFormatError('"Usage:" section not found');
-            if (sizeof($usageSections) > 1) throw new DocoptFormatError('More than one "Usage:" section found');
-            $usage = $usageSections[0];
-
-            // temp fix until python port provides solution
-            UserNotification::$usage = !$this->exitFullUsage ? $usage : $doc;
+            $usage = static::parseSection('usage:', $doc);
+            if (!$usage)            throw new DocoptFormatError('"Usage:" section not found');
+            if (sizeof($usage) > 1) throw new DocoptFormatError('More than one "Usage:" section found');
+            $usage = $usage[0];
+            $this->autoHelp = $this->exitFullUsage ? $doc : $usage;
 
             $options   = static::parseDefaults($doc);
             $formalUse = static::formalUsage($usage);
@@ -88,7 +95,7 @@ class Parser extends Object {
                 $optionsShortcut->children = array_diff((array)$docOptions, $patternOptions);
             }
 
-            $this->extras($this->help, $this->version, $argv, $doc);
+            $this->handleSpecials($this->help, $this->version, $argv, $doc);
 
             list($matched, $left, $collected) = $pattern->fix()->match($argv);
             if ($matched && !$left) {
@@ -98,24 +105,13 @@ class Parser extends Object {
                         $result[$name] = $pattern->value;
                     }
                 }
-                return new Result($result);
+                return new DocoptResult($result);
             }
             throw new UserNotification();
         }
         catch (UserNotification $ex) {
             $this->handleExit($ex);
-            return new Result([], $ex->status, $ex->getMessage());
-        }
-    }
-
-
-    /**
-     * @param  UserNotification $exception
-     */
-    protected function handleExit(UserNotification $exception) {
-        if ($this->exit) {
-            echoPre($exception->getMessage());
-            exit($exception->status);
+            return new DocoptResult([], $ex->status, $ex->addMessage($this->autoHelp)->getMessage());
         }
     }
 
@@ -126,7 +122,7 @@ class Parser extends Object {
      * @param  Pattern[] $argv
      * @param  string    $doc
      */
-    protected function extras($help, $version, $argv, $doc) {
+    protected function handleSpecials($help, $version, $argv, $doc) {
         $hfound = $vfound = false;
 
         foreach ($argv as $o) {
@@ -140,12 +136,23 @@ class Parser extends Object {
             }
         }
         if ($help && $hfound) {
-            UserNotification::$usage = null;
+            $this->autoHelp = null;
             throw new UserNotification($doc, 0);
         }
         if ($version && $vfound) {
-            UserNotification::$usage = null;
+            $this->autoHelp = null;
             throw new UserNotification($version, 0);
+        }
+    }
+
+
+    /**
+     * @param  UserNotification $exception
+     */
+    protected function handleExit(UserNotification $exception) {
+        if ($this->exit) {
+            echoPre($exception->addMessage($this->autoHelp)->getMessage());
+            exit($exception->status);
         }
     }
 
@@ -219,7 +226,7 @@ class Parser extends Object {
         foreach (static::parseSection('options:', $doc) as $s) {
             # FIXME corner case "bla: options: --foo"
             list (, $s) = explode(':', $s, 2);
-            $splitTmp = array_slice(preg_split("@\n[ \t]*(-\S+?)@", "\n".$s, null, PREG_SPLIT_DELIM_CAPTURE), 1);
+            $splitTmp = array_slice(preg_split("/\n[ \t]*(-\S+?)/", "\n".$s, null, PREG_SPLIT_DELIM_CAPTURE), 1);
             $split = [];
             for ($size=sizeof($splitTmp), $i=0; $i < $size; $i+=2) {
                 $split[] = $splitTmp[$i].(isset($splitTmp[$i+1]) ? $splitTmp[$i+1] : '');
@@ -261,7 +268,7 @@ class Parser extends Object {
      */
     protected static function parseSection($name, $source) {
         $result = [];
-        if (preg_match_all('@^([^\n]*'.$name.'[^\n]*\n?(?:[ \t].*?(?:\n|$))*)@im', $source, $matches, PREG_SET_ORDER)) {
+        if (preg_match_all('/^([^\n]*'.$name.'[^\n]*\n?(?:[ \t].*?(?:\n|$))*)/im', $source, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
                 $result[] = trim($match[0]);
             }
@@ -284,21 +291,17 @@ class Parser extends Object {
             return $seq;
 
         $result = null;
-        if (count($seq) > 1) $result = [new Required($seq)];
-        else                 $result = $seq;
+        if (sizeof($seq) > 1) $result = [new Required($seq)];
+        else                  $result = $seq;
 
         while ($tokens->current() == '|') {
             $tokens->move();
             $seq = static::parseSequence($tokens, $options);
-            if (count($seq) > 1) {
-                $result[] = new Required($seq);
-            }
-            else {
-                $result = array_merge($result, $seq);
-            }
+            if (sizeof($seq) > 1) $result[] = new Required($seq);
+            else                  $result   = array_merge($result, $seq);
         }
 
-        if (count($result) > 1)
+        if (sizeof($result) > 1)
             return new Either($result);
         return $result;
     }
@@ -355,7 +358,7 @@ class Parser extends Object {
                 }
             }
 
-            $similarCnt = count($similar);
+            $similarCnt = sizeof($similar);
             if ($similarCnt > 1) {
                 $exception = $tokens->getErrorClass();
                 throw new $exception($short.' is specified ambiguously '.$similarCnt.' times');

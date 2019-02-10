@@ -6,11 +6,11 @@ use rosasurfer\exception\IllegalAccessException;
 
 
 /**
- * Result
+ * DocoptResult
  *
- * Represents the parse result of a CLI call.
+ * Represents the parsing result of a {@link Parser::parse()} call.
  */
-class Result extends Object implements \ArrayAccess, \IteratorAggregate {
+class DocoptResult extends Object implements \ArrayAccess, \IteratorAggregate {
 
 
     /** @var array */
@@ -29,8 +29,8 @@ class Result extends Object implements \ArrayAccess, \IteratorAggregate {
      * Create a new Docopt parser result.
      *
      * @param  array  $args                    - parsed arguments
-     * @param  int    $errorStatus  [optional] - the CLI call's error status  (default: 0)
-     * @param  string $errorMessage [optional] - the CLI call's error message (default: none)
+     * @param  int    $errorStatus  [optional] - the result's error status  (default: 0)
+     * @param  string $errorMessage [optional] - the result's error message (default: none)
      */
     public function __construct(array $args, $errorStatus=0, $errorMessage='') {
         $this->args         = $args;

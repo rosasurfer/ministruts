@@ -1,9 +1,11 @@
 <?php
 /**
- * Helper constants and functions
+ * Helper functions and constants
  */
 namespace rosasurfer;
 
+use rosasurfer\console\docopt\DocoptParser;
+use rosasurfer\console\docopt\DocoptResult;
 use rosasurfer\exception\IllegalArgumentException;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
@@ -1676,4 +1678,27 @@ function url($uri) {
  */
 function asset($uri) {
     return new VersionedUrl($uri);
+}
+
+
+/**
+ * Parse the current CLI arguments and match them against the specified {@link http://docopt.org/} syntax definition.
+ *
+ * @param  string       $doc               - help text (syntax definition in docopt language format)
+ * @param  string|array $params [optional] - parse options (default: none)
+ *
+ * @return DocoptResult - the parsing result
+ */
+function docopt($doc, $params = []) {
+    $argv = null;
+    if (is_string($params)) {
+        $argv = $params;
+        $params = [];
+    }
+    else if (isset($params['argv'])) {
+        $argv = $params['argv'];
+        unset($params['argv']);
+    }
+    $parser = new DocoptParser($params);
+    return $parser->parse($doc, $argv);
 }

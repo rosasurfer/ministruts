@@ -3,8 +3,6 @@ namespace rosasurfer\console\docopt\exception;
 
 use rosasurfer\exception\RuntimeException;
 
-use const rosasurfer\NL;
-
 
 /**
  * UserNotification
@@ -13,9 +11,6 @@ use const rosasurfer\NL;
  */
 class UserNotification extends RuntimeException {
 
-
-    /** @var string */
-    public static $usage;
 
     /** @var int */
     public $status;
@@ -26,7 +21,7 @@ class UserNotification extends RuntimeException {
      * @param int    $status  [optional]
      */
     public function __construct($message=null, $status=1) {
-        parent::__construct(trim($message.NL.static::$usage));
+        parent::__construct($message);
         $this->status = $status;
     }
 }

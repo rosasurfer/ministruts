@@ -6,6 +6,7 @@
  * (default: disabled)
  */
 use rosasurfer\Application;
+use rosasurfer\console\docopt\DocoptResult;
 use rosasurfer\ministruts\ActionMapping;
 use rosasurfer\ministruts\Module;
 use rosasurfer\ministruts\url\Url;
@@ -1011,4 +1012,17 @@ function url($uri) {
  */
 function asset($uri) {
     return \rosasurfer\asset($uri);
+}
+
+
+/**
+ * Parse the current CLI arguments and match them against the specified {@link http://docopt.org/} syntax definition.
+ *
+ * @param  string       $doc               - help text (syntax definition in docopt language format)
+ * @param  string|array $params [optional] - parse options (default: none)
+ *
+ * @return DocoptResult - the parsing result
+ */
+function docopt($doc, $params = []) {
+    return \rosasurfer\docopt($doc, $params);
 }
