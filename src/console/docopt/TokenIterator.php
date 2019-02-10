@@ -15,22 +15,22 @@ class TokenIterator extends \ArrayIterator {
 
 
     /** @var string */
-    protected $errorClass;
+    protected $tokenError;
 
 
     /**
-     * @param  string|mixed[] $source
-     * @param  string         $errorClass [optional] - class name of errors
+     * @param  string|string[] $source
+     * @param  string          $tokenError [optional] - classname of token errors used for error output
+     *                                                  (default: "UserNotification")
      */
-    public function __construct($source, $errorClass = UserNotification::class) {
+    public function __construct($source, $tokenError = UserNotification::class) {
         if (!is_array($source)) {
             $source = trim($source);
-            if ($source) $source = preg_split('/\s+/', $source);
-            else         $source = [];
+            $source = strlen($source) ? preg_split('/\s+/', $source) : [];
         }
         parent::__construct($source);
 
-        $this->errorClass = $errorClass;
+        $this->tokenError = $tokenError;
     }
 
 
@@ -47,10 +47,10 @@ class TokenIterator extends \ArrayIterator {
 
 
     /**
-     * @return string
+     * @return string - classname of token errors
      */
-    public function getErrorClass() {
-        return $this->errorClass;
+    public function getTokenError() {
+        return $this->tokenError;
     }
 
 

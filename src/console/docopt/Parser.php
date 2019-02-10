@@ -5,7 +5,6 @@ use rosasurfer\core\Object;
 
 use rosasurfer\console\docopt\exception\DocoptFormatError;
 use rosasurfer\console\docopt\exception\UserNotification;
-
 use rosasurfer\console\docopt\pattern\Argument;
 use rosasurfer\console\docopt\pattern\Command;
 use rosasurfer\console\docopt\pattern\Either;
@@ -20,6 +19,7 @@ use function rosasurfer\array_filter;
 use function rosasurfer\array_merge;
 use function rosasurfer\echoPre;
 use function rosasurfer\strEndsWith;
+use function rosasurfer\strStartsWith;
 
 
 /**
@@ -29,9 +29,6 @@ use function rosasurfer\strEndsWith;
  */
 class Parser extends Object {
 
-
-    /** @var string */
-    protected $version;
 
     /** @var bool */
     protected $optionsFirst = false;
@@ -48,11 +45,14 @@ class Parser extends Object {
     /** @var string - help text displayed with every parser generated output */
     protected $autoHelp;
 
+    /** @var string */
+    protected $version;
+
 
     /**
      * Constructor
      *
-     * Create a new docopt CLI argument parser.
+     * Create a new docopt command line argument parser.
      *
      * @param  array $options [optional]
      */
@@ -66,17 +66,17 @@ class Parser extends Object {
 
 
     /**
-     * Parse the current CLI arguments and match them against the specified {@link http://docopt.org} syntax definition.
+     * Parse command line arguments and match them against the specified {@link http://docopt.org} syntax definition.
      *
      * @param  string         $doc
-     * @param  string|mixed[] $argv [optional]
+     * @param  string|mixed[] $args [optional]
      *
      * @return Result
      */
-    public function parse($doc, $argv = null) {
+    public function parse($doc, $args = null) {
         try {
-            if (!isset($argv) && isset($_SERVER['argv']))
-                $argv = array_slice($_SERVER['argv'], 1);
+            if (!isset($args) && isset($_SERVER['argv']))
+                $args = array_slice($_SERVER['argv'], 1);
 
             $usage = static::parseSection('usage:', $doc);
             if (!$usage)            throw new DocoptFormatError('"Usage:" section not found');
@@ -84,20 +84,21 @@ class Parser extends Object {
             $usage = $usage[0];
             $this->autoHelp = $this->exitFullUsage ? $doc : $usage;
 
-            $options   = static::parseDefaults($doc);
-            $formalUse = static::formalUsage($usage);
-            $pattern   = static::parsePattern($formalUse, $options);
-            $argv      = static::parseArgv(new TokenIterator($argv), $options, $this->optionsFirst);
+            $docOptions = static::parseDefaults($doc);
+            $formalUse  = static::formalUsage($usage);
+            $pattern    = static::parsePattern($formalUse, $docOptions);
+            $args       = static::parseArgs(new TokenIterator($args), $docOptions, $this->optionsFirst);
 
+            $docOptions     = static::parseDefaults($doc);              // create a new iterator with unmodified elements
             $patternOptions = $pattern->flat([Option::class]);
+
             foreach ($pattern->flat([OptionsShortcut::class]) as $optionsShortcut) {
-                $docOptions = static::parseDefaults($doc);
                 $optionsShortcut->children = array_diff((array)$docOptions, $patternOptions);
             }
 
-            $this->handleSpecials($this->help, $this->version, $argv, $doc);
+            $this->handleSpecials($this->help, $this->version, $args, $doc);
 
-            list($matched, $left, $collected) = $pattern->fix()->match($argv);
+            list($matched, $left, $collected) = $pattern->fix()->match($args);
             if ($matched && !$left) {
                 $result = [];
                 foreach (array_merge($pattern->flat(), $collected) as $pattern) {
@@ -176,7 +177,7 @@ class Parser extends Object {
 
 
     /**
-     * Parse command-line argument vector.
+     * Parse arguments.
      *
      * If options_first: argv ::= [ long | shorts ]* [ argument ]* [ '--' [ argument ]* ] ;
      * else:             argv ::= [ long | shorts | argument ]* [ '--' [ argument ]* ] ;
@@ -187,7 +188,7 @@ class Parser extends Object {
      *
      * @return Pattern[]
      */
-    protected static function parseArgv(TokenIterator $tokens, \ArrayIterator $options, $optionsFirst = false) {
+    protected static function parseArgs(TokenIterator $tokens, \ArrayIterator $options, $optionsFirst = false) {
         $parsed = [];
 
         while ($tokens->current() !== null) {
@@ -197,10 +198,10 @@ class Parser extends Object {
                 }
                 return $parsed;
             }
-            elseif (strpos($tokens->current(), '--')===0) {
+            elseif (strStartsWith($tokens->current(), '--')) {
                 $parsed = array_merge($parsed, static::parseLong($tokens, $options));
             }
-            elseif (strpos($tokens->current(), '-')===0 && $tokens->current() != '-') {
+            elseif (strStartsWith($tokens->current(), '-') && $tokens->current()!='-') {
                 $parsed = array_merge($parsed, static::parseShort($tokens, $options));
             }
             elseif ($optionsFirst) {
@@ -223,10 +224,10 @@ class Parser extends Object {
      */
     protected static function parseDefaults($doc) {
         $defaults = [];
-        foreach (static::parseSection('options:', $doc) as $s) {
+        foreach (static::parseSection('options:', $doc) as $section) {
             # FIXME corner case "bla: options: --foo"
-            list (, $s) = explode(':', $s, 2);
-            $splitTmp = array_slice(preg_split("/\n[ \t]*(-\S+?)/", "\n".$s, null, PREG_SPLIT_DELIM_CAPTURE), 1);
+            list (, $section) = explode(':', $section, 2);
+            $splitTmp = array_slice(preg_split("/\n[ \t]*(-\S+?)/", "\n".$section, null, PREG_SPLIT_DELIM_CAPTURE), 1);
             $split = [];
             for ($size=sizeof($splitTmp), $i=0; $i < $size; $i+=2) {
                 $split[] = $splitTmp[$i].(isset($splitTmp[$i+1]) ? $splitTmp[$i+1] : '');
@@ -253,8 +254,8 @@ class Parser extends Object {
         $tokens = TokenIterator::fromPattern($source);
         $result = static::parseExpression($tokens, $options);
         if ($tokens->current() !== null) {
-            $exception = $tokens->getErrorClass();
-            throw new $exception('Unexpected ending: '.join(' ', $tokens->left()));
+            $error = $tokens->getTokenError();
+            throw new $error('Unexpected ending: '.join(' ', $tokens->left()));
         }
         return new Required($result);
     }
@@ -360,13 +361,13 @@ class Parser extends Object {
 
             $similarCnt = sizeof($similar);
             if ($similarCnt > 1) {
-                $exception = $tokens->getErrorClass();
-                throw new $exception($short.' is specified ambiguously '.$similarCnt.' times');
+                $error = $tokens->getTokenError();
+                throw new $error($short.' is specified ambiguously '.$similarCnt.' times');
             }
             elseif ($similarCnt < 1) {
                 $o = new Option($short, null, 0);
                 $options[] = $o;
-                if ($tokens->getErrorClass() == UserNotification::class) {
+                if ($tokens->getTokenError() == UserNotification::class) {
                     $o = new Option($short, null, 0, true);
                 }
             }
@@ -375,9 +376,9 @@ class Parser extends Object {
                 $value = null;
                 if ($o->argcount != 0) {
                     if ($left == '') {
-                        if ($tokens->current() === null || $tokens->current() == '--') {
-                            $exception = $tokens->getErrorClass();
-                            throw new $exception($short.' requires argument');
+                        if ($tokens->current()===null || $tokens->current()=='--') {
+                            $error = $tokens->getTokenError();
+                            throw new $error($short.' requires argument');
                         }
                         $value = $tokens->move();
                     }
@@ -386,8 +387,8 @@ class Parser extends Object {
                         $left = '';
                     }
                 }
-                if ($tokens->getErrorClass() == UserNotification::class) {
-                    $o->value = $value!==null ? $value : true;
+                if ($tokens->getTokenError() == UserNotification::class) {
+                    $o->value = isset($value) ? $value : true;
                 }
             }
             $parsed[] = $o;
@@ -405,7 +406,7 @@ class Parser extends Object {
      * @return Option[]
      */
     protected static function parseLong(TokenIterator $tokens, \ArrayIterator $options) {
-        $tokenError = $tokens->getErrorClass();
+        $tokenError = $tokens->getTokenError();
         $token      = $tokens->move();
         $exploded   = explode('=', $token, 2);
 
@@ -460,7 +461,7 @@ class Parser extends Object {
                     throw new $tokenError($o->long.' requires argument');
                 $value = $tokens->move();
             }
-            if ($tokens->getErrorClass() == UserNotification::class) {
+            if ($tokens->getTokenError() == UserNotification::class) {
                 $o->value = isset($value) ? $value : true;
             }
         }
@@ -477,7 +478,7 @@ class Parser extends Object {
      * @return Pattern[]
      */
     protected static function parseAtom(TokenIterator $tokens, \ArrayIterator $options) {
-        $tokenError = $tokens->getErrorClass();
+        $tokenError = $tokens->getTokenError();
         $token      = $tokens->current();
         $result     = [];
 

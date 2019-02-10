@@ -112,7 +112,7 @@ define('PHP_INI_ALL',    INI_ALL   );       // 7    flag            // entry can
  * the callback function. If the function returns TRUE, the current value from the array is returned as part of the resulting
  * array. Array keys are preserved.
  *
- * Complement of PHP's <tt>array_filter()</tt> function adding support for {@link \Traversable} implementations.
+ * Complement of PHP's <tt>array_filter()</tt> function adding support for {@link \Traversable} parameters.
  *
  * @param  array|\Traversable $input
  * @param  callable           $callback [optional]
@@ -131,7 +131,7 @@ function array_filter($input, $callback=null, $flags=0) {
 /**
  * Whether the given index exists in an array-like variable.
  *
- * Complement of PHP's <tt>array_key_exists()</tt> function adding support for {@link \ArrayAccess} implementations.
+ * Complement of PHP's <tt>array_key_exists()</tt> function adding support for {@link \ArrayAccess} parameters.
  *
  * @param  mixed              $key
  * @param  array|\ArrayAccess $array
@@ -150,7 +150,7 @@ function array_key_exists($key, $array) {
  *
  * Whether the given index exists in an array-like variable.
  *
- * Complement of PHP's <tt>key_exists()</tt> function adding support for {@link \ArrayAccess} implementations.
+ * Complement of PHP's <tt>key_exists()</tt> function adding support for {@link \ArrayAccess} parameters.
  *
  * @param  mixed              $key
  * @param  array|\ArrayAccess $array
@@ -165,7 +165,7 @@ function key_exists($key, $array) {
 /**
  * Return all or a subset of the keys of an array-like variable.
  *
- * Complement of PHP's <tt>array_keys()</tt> function adding support for {@link \Traversable} implementations.
+ * Complement of PHP's <tt>array_keys()</tt> function adding support for {@link \Traversable} parameters.
  *
  * @param  array|\Traversable $array
  * @param  mixed              $search [optional]
@@ -255,7 +255,7 @@ function lastKey($values) {
  * previous one. Values with the same string keys will overwrite the previous one. Numeric keys will be renumbered and values
  * with the same numeric keys will not overwrite the previous one.
  *
- * Complement of PHP's <tt>array_merge()</tt> function adding support for {@link \Traversable} implementations.
+ * Complement of PHP's <tt>array_merge()</tt> function adding support for {@link \Traversable} parameters.
  *
  * @param  array|\Traversable           $array1
  * @param  array<array|\Traversable> ...$arrays
@@ -1400,7 +1400,7 @@ function is_trait($name) {
 /**
  * Whether a variable can be used like an array.
  *
- * Complement for PHP's <tt>is_array()</tt> function adding support for {@link \ArrayAccess} implementations.
+ * Complement for PHP's <tt>is_array()</tt> function adding support for {@link \ArrayAccess} parameters.
  *
  * @param  array|\ArrayAccess $var
  *
