@@ -77,7 +77,7 @@ class FileDependency extends Dependency {
         if (!is_array($fileNames)) {
             if (!is_string($fileNames)) throw new IllegalTypeException('Illegal type of parameter $fileNames: '.gettype($fileNames));
             if (!strlen($fileNames))    throw new InvalidArgumentException('Invalid argument $fileNames: '.$fileNames);
-            $fileNames = array($fileNames);
+            $fileNames = [$fileNames];
         }
         if (!$fileNames) throw new InvalidArgumentException('Invalid argument $fileNames: '.$fileNames);
 

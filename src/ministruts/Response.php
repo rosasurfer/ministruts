@@ -138,7 +138,7 @@ class Response extends Singleton {
 
                 if ($domainMatch = (preg_match('/\b'.$cookieDomain.'$/', $targetDomain) && ($cookieDomain==$targetDomain || $subdomains))) {
                     if ($pathMatch = strStartsWith($targetPath, $cookiePath)) {
-                        if ($secureMatch = !$cookieSecure || $targetSecure) {
+                        if ($secureMatch = (!$cookieSecure || $targetSecure)) {
                             if (isset($target['fragment']))  $url  = strLeft($url, strlen($hash = '#'.$target['fragment']));
                             else if (strEndsWith($url, '#')) $url  = strLeft($url, strlen($hash = '#'));
                             else                             $hash = '';
