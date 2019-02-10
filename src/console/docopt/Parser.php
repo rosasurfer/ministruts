@@ -4,7 +4,7 @@ namespace rosasurfer\console\docopt;
 use rosasurfer\core\Object;
 
 use rosasurfer\console\docopt\exception\DocoptFormatError;
-use rosasurfer\console\docopt\exception\UserNotification;
+use rosasurfer\console\docopt\exception\DocoptUserNotification;
 use rosasurfer\console\docopt\pattern\Argument;
 use rosasurfer\console\docopt\pattern\Command;
 use rosasurfer\console\docopt\pattern\Either;
@@ -108,9 +108,9 @@ class Parser extends Object {
                 }
                 return new Result($result);
             }
-            throw new UserNotification();
+            throw new DocoptUserNotification();
         }
-        catch (UserNotification $ex) {
+        catch (DocoptUserNotification $ex) {
             $this->handleExit($ex);
             return new Result([], $ex->status, $ex->addMessage($this->autoHelp)->getMessage());
         }
@@ -138,19 +138,19 @@ class Parser extends Object {
         }
         if ($help && $hfound) {
             $this->autoHelp = null;
-            throw new UserNotification($doc, 0);
+            throw new DocoptUserNotification($doc, 0);
         }
         if ($version && $vfound) {
             $this->autoHelp = null;
-            throw new UserNotification($version, 0);
+            throw new DocoptUserNotification($version, 0);
         }
     }
 
 
     /**
-     * @param  UserNotification $exception
+     * @param  DocoptUserNotification $exception
      */
-    protected function handleExit(UserNotification $exception) {
+    protected function handleExit(DocoptUserNotification $exception) {
         if ($this->exit) {
             echoPre($exception->addMessage($this->autoHelp)->getMessage());
             exit($exception->status);
@@ -367,7 +367,7 @@ class Parser extends Object {
             elseif ($similarCnt < 1) {
                 $o = new Option($short, null, 0);
                 $options[] = $o;
-                if ($tokens->getTokenError() == UserNotification::class) {
+                if ($tokens->getTokenError() == DocoptUserNotification::class) {
                     $o = new Option($short, null, 0, true);
                 }
             }
@@ -387,7 +387,7 @@ class Parser extends Object {
                         $left = '';
                     }
                 }
-                if ($tokens->getTokenError() == UserNotification::class) {
+                if ($tokens->getTokenError() == DocoptUserNotification::class) {
                     $o->value = isset($value) ? $value : true;
                 }
             }
@@ -429,7 +429,7 @@ class Parser extends Object {
         $similar = array_values(array_filter($options, function($o) use ($long) {
             return ($o->long && $o->long==$long);
         }));
-        if ($tokenError==UserNotification::class && !$similar) {
+        if ($tokenError==DocoptUserNotification::class && !$similar) {
             $similar = array_values(array_filter($options, function($o) use ($long) {
                 return ($o->long && strpos($o->long, $long)===0);
             }));
@@ -441,7 +441,7 @@ class Parser extends Object {
             $argcount = (int) ($eq=='=');
             $o = new Option(null, $long, $argcount);
             $options[] = $o;
-            if ($tokenError == UserNotification::class) {
+            if ($tokenError == DocoptUserNotification::class) {
                 $o = new Option(null, $long, $argcount, $argcount ? $value : true);
             }
         }
@@ -461,7 +461,7 @@ class Parser extends Object {
                     throw new $tokenError($o->long.' requires argument');
                 $value = $tokens->move();
             }
-            if ($tokens->getTokenError() == UserNotification::class) {
+            if ($tokens->getTokenError() == DocoptUserNotification::class) {
                 $o->value = isset($value) ? $value : true;
             }
         }

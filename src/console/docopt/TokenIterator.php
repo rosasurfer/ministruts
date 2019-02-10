@@ -2,7 +2,7 @@
 namespace rosasurfer\console\docopt;
 
 use rosasurfer\console\docopt\exception\DocoptFormatError;
-use rosasurfer\console\docopt\exception\UserNotification;
+use rosasurfer\console\docopt\exception\DocoptUserNotification;
 use rosasurfer\core\ObjectTrait;
 
 
@@ -21,9 +21,9 @@ class TokenIterator extends \ArrayIterator {
     /**
      * @param  string|string[] $source
      * @param  string          $tokenError [optional] - classname of token errors used for error output
-     *                                                  (default: "UserNotification")
+     *                                                  (default: "DocoptUserNotification")
      */
-    public function __construct($source, $tokenError = UserNotification::class) {
+    public function __construct($source, $tokenError = DocoptUserNotification::class) {
         if (!is_array($source)) {
             $source = trim($source);
             $source = strlen($source) ? preg_split('/\s+/', $source) : [];

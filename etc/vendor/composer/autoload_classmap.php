@@ -20,7 +20,7 @@ return array(
     'rosasurfer\\console\\docopt\\SingleMatch' => $baseDir . '/src/console/docopt/SingleMatch.php',
     'rosasurfer\\console\\docopt\\TokenIterator' => $baseDir . '/src/console/docopt/TokenIterator.php',
     'rosasurfer\\console\\docopt\\exception\\DocoptFormatError' => $baseDir . '/src/console/docopt/exception/DocoptFormatError.php',
-    'rosasurfer\\console\\docopt\\exception\\UserNotification' => $baseDir . '/src/console/docopt/exception/UserNotification.php',
+    'rosasurfer\\console\\docopt\\exception\\DocoptUserNotification' => $baseDir . '/src/console/docopt/exception/DocoptUserNotification.php',
     'rosasurfer\\console\\docopt\\pattern\\Argument' => $baseDir . '/src/console/docopt/pattern/Argument.php',
     'rosasurfer\\console\\docopt\\pattern\\BranchPattern' => $baseDir . '/src/console/docopt/pattern/BranchPattern.php',
     'rosasurfer\\console\\docopt\\pattern\\Command' => $baseDir . '/src/console/docopt/pattern/Command.php',

@@ -5,11 +5,11 @@ use rosasurfer\exception\RuntimeException;
 
 
 /**
- * UserNotification
+ * DocoptUserNotification
  *
- * An exception marking help screens and syntax errors to be shown to the end user of the CLI application.
+ * An exception marking help infos and syntax errors to be shown to the end user of the CLI application.
  */
-class UserNotification extends RuntimeException {
+class DocoptUserNotification extends RuntimeException {
 
 
     /** @var int */
