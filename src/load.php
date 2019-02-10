@@ -25,26 +25,14 @@ if (!defined('rosasurfer\ministruts\MODULE_KEY')) require(MINISTRUTS_ROOT.'/src/
 /**
  * Register the framework's class loader.
  *
- * - If the framework is used without Composer a loader for the framework classes is required. If Composer is used this
- *   class loader simply has no effect.
- * - The loader is registered after already registered SPL class loaders. To provide backward compatibility to non-SPL
- *   projects an existing __autoload() function is registered first.
- * - The registration is wrapped in a function call to scope isolate its execution.
+ * If the framework is used without Composer a loader for the framework classes is required. If Composer is used this
+ * class loader simply has no effect. The loader registers itself after already registered other SPL class loaders.
  */
 function registerClassLoader() {
     static $done = false;
     if ($done) return;
 
-    // check for an existing legacy auto-loader
-    $legacyAutoLoad = function_exists('__autoload');
-    if ($legacyAutoLoad) {
-        $splLoaders = spl_autoload_functions();
-        if ($splLoaders) {
-            $legacyAutoLoad = (sizeof($splLoaders)==1 && $splLoaders[0]=='__autoload');
-        }
-    }
-
-    // create a bootstrap loader for the class rosasurfer\loader\ClassLoader
+    // register a bootstrap loader for class rosasurfer\loader\ClassLoader
     $bootstrap = function($class) {
         switch ($class) {
             case Object      ::class: require(MINISTRUTS_ROOT.'/src/core/Object.php'       ); break;
@@ -60,21 +48,16 @@ function registerClassLoader() {
     $loader->register();
     spl_autoload_unregister($bootstrap);
 
-    // register an otherwise lost legacy auto-loader
-    if ($legacyAutoLoad && spl_autoload_functions()[0]!='__autoload') {
-        spl_autoload_register('__autoload', $throw=true, $prepend=true);
-    }
-
     $done = true;
 }
 registerClassLoader();
 
 
 /**
- * Register a SIGINT handler in CLI mode to catch Ctrl-C and execute destructors on shutdown.
+ * In CLI mode register a SIGINT handler to catch Ctrl-C and execute destructors on shutdown.
  */
 if (CLI && function_exists('pcntl_signal')) {
     pcntl_signal(SIGINT, function($signo, $signinfo = null) {
-        exit(0);                                                // calling exit() is sufficient to execute destructors
+        exit(1);                                                // calling exit() is sufficient to execute destructors
     });
 }
