@@ -30,12 +30,17 @@ class FileSystem extends StaticClass {
      */
     public static function mkDir($path, $mode=null, $recursive=true, $context=null) {
         if (!is_dir($path)) {
-            if (is_file($path))
-                throw new RuntimeException('Cannot create directory "'.$path.'" (existing file of the same name)');
+            if (is_file($path)) throw new RuntimeException('Cannot create directory "'.$path.'" (existing file of the same name)');
+            $args = func_get_args();
+            $argc = func_num_args();
 
-            if (!mkdir($path, $mode, $recursive, $context))
-                throw new RuntimeException('Cannot create directory "'.$path.'"');
-        }
+            if ($argc < 3) {
+                if ($argc == 1)
+                    $args[] = null;         // use default $mode = null
+                $args[] = true;             // use default $recursive = true
+            }
+            if (!mkdir(...$args)) throw new RuntimeException('Cannot create directory "'.$path.'"');
+        }                                   // unpack new arguments as mkdir() will not accept $context = null
         return true;
     }
 }

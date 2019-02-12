@@ -30,4 +30,4 @@ $result = docopt($doc, null, ['version'=>'Naval Fate 2.0']);
 foreach ($result as $key => $value) {
     echoPre($key.': '.json_encode($value));
 }
-echoPre($result);
+echoPre($result->getArgs());

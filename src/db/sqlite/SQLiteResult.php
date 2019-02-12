@@ -68,13 +68,13 @@ class SQLiteResult extends Result {
 
 
     /**
-     * Fetch  the next row from the result set.
+     * Fetch the next row from the result set.
      *
-     * The types of the values of the returned array are mapped from SQLite3 types as follows:<br>
-     *  - Integers are mapped to int if they fit into the range PHP_INT_MIN..PHP_INT_MAX, otherwise to string.<br>
-     *  - Floats are mapped to float.<br>
-     *  - NULL values are mapped to NULL.<br>
-     *  - Strings and blobs are mapped to string.<br>
+     * The types of the values of the returned array are mapped from SQLite3 types as follows:                  <br>
+     *  - Integers are mapped to int if they fit into the range PHP_INT_MIN...PHP_INT_MAX, otherwise to string. <br>
+     *  - Floats are mapped to float.                                                                           <br>
+     *  - NULL values are mapped to NULL.                                                                       <br>
+     *  - Strings and blobs are mapped to string.                                                               <br>
      *
      * {@inheritdoc}
      */

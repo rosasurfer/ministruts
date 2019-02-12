@@ -18,4 +18,4 @@ $result = docopt($doc, null, ['version'=>'0.1.1rc']);
 foreach ($result as $key => $value) {
     echoPre($key.': '.json_encode($value));
 }
-echoPre($result);
+echoPre($result->getArgs());

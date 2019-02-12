@@ -24,4 +24,4 @@ $result = docopt($doc);
 foreach ($result as $key => $value) {
     echoPre($key.': '.json_encode($value));
 }
-echoPre($result);
+echoPre($result->getArgs());
