@@ -22,3 +22,9 @@
 *.yml        text eol=lf
 .git*        text eol=lf
 .ht*         text eol=lf
+
+
+# Gitgub Linguist overrides
+bin/win32/*  linguist-vendored
+doc/*        linguist-documentation
+etc/*        linguist-vendored
