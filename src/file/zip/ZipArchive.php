@@ -47,7 +47,7 @@ class ZipArchive extends \ZipArchive {
     /**
      * {@inheritdoc}
      *
-     * @return int - Returns always an error status and not a mixed value. On success it especially returns ER_OK.
+     * @return int - Returns always an error status and not a mixed value. On success it returns ER_OK.
      */
     public function open($filename, $flags = null) {
         $result = parent::open($filename, $flags);
@@ -56,11 +56,11 @@ class ZipArchive extends \ZipArchive {
             return parent::ER_OK;
 
         if (!is_int($result)) {
-            Logger::log('ZipArchive::open() returned an illegal result: '.$result.' ('.gettype($result).')', L_ERROR);
+            Logger::log('ZipArchive::open() returned an invalid result: '.$result.' ('.gettype($result).')', L_ERROR);
             return parent::ER_INTERNAL;
         }
         if (!isset(static::$errors[$result]))
-            Logger::log('ZipArchive::open() returned an unknown result: '.$result.' ('.gettype($result).')', L_WARN);
+            Logger::log('ZipArchive::open() returned an unknown error: '.$result, L_WARN);
 
         return $result;
     }
