@@ -146,6 +146,11 @@ class PHP extends StaticClass {
 
         $exitCode = proc_close($hProc);
         return $stdout;
+
+        /**
+         * @see  https://symfony.com/doc/current/components/process.html#getting-real-time-process-output
+         * @see  https://gonzalo123.com/2012/10/08/how-to-send-the-output-of-symfonys-process-component-to-a-node-js-server-in-real-time-with-socket-io/
+         */
     }
 
 
