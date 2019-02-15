@@ -6,7 +6,7 @@
  * (default: disabled)
  */
 use rosasurfer\Application;
-use rosasurfer\console\docopt\Result as DocoptResult;
+use rosasurfer\console\docopt\DocoptResult;
 use rosasurfer\ministruts\ActionMapping;
 use rosasurfer\ministruts\Module;
 use rosasurfer\ministruts\url\Url;

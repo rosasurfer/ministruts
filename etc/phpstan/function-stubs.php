@@ -3,6 +3,7 @@
 namespace {
 
     if (!function_exists('apache_request_headers')) {
+
         /**
          * @return array
          */
@@ -13,6 +14,7 @@ namespace {
 
 
     if (!function_exists('apc_add')) {
+
         /**
          * @param  string|array $key
          * @param  mixed        $var
@@ -66,6 +68,7 @@ namespace {
 
 
     if (!function_exists('apcu_add')) {
+
         /**
          * @param  string|array $keys
          * @param  mixed        $values
@@ -90,6 +93,7 @@ namespace {
 
 
     if (!function_exists('mysql_affected_rows')) {
+
         define('MYSQL_ASSOC', 1);
         define('MYSQL_NUM'  , 2);
         define('MYSQL_BOTH' , 3);
@@ -244,6 +248,7 @@ namespace {
 
 
     if (!function_exists('pcntl_signal')) {
+
         define('SIGINT' , 2);
 
         /**
@@ -267,6 +272,7 @@ namespace {
 
 
     if (!function_exists('sem_acquire')) {
+
         /**
          * @param  resource $sem_identifier
          * @param  bool     $nowait [optional]
@@ -308,6 +314,7 @@ namespace {
 
 
     if (!function_exists('stats_standard_deviation')) {
+
         /**
          * @param  array $values
          * @param  bool  $sample [optional]

@@ -23,11 +23,11 @@ use function rosasurfer\strStartsWith;
 
 
 /**
- * Parser
+ * DocoptParser
  *
  * A command line argument parser for the {@link http://docopt.org} language format.
  */
-class Parser extends Object {
+class DocoptParser extends Object {
 
 
     /** @var bool */
@@ -71,14 +71,14 @@ class Parser extends Object {
      * @param  string         $doc
      * @param  string|mixed[] $args [optional]
      *
-     * @return Result
+     * @return DocoptResult
      */
     public function parse($doc, $args = null) {
         try {
             if (!isset($args) && isset($_SERVER['argv']))
                 $args = array_slice($_SERVER['argv'], 1);
 
-            $usage = static::parseSection('usage:', $doc);
+            $usage = static::parseSection('Usage:', $doc);
             if (!$usage)            throw new DocoptFormatError('"Usage:" section not found');
             if (sizeof($usage) > 1) throw new DocoptFormatError('More than one "Usage:" section found');
             $usage = $usage[0];
@@ -106,13 +106,13 @@ class Parser extends Object {
                         $result[$name] = $pattern->value;
                     }
                 }
-                return new Result($result);
+                return new DocoptResult($result);
             }
             throw new DocoptUserNotification();
         }
         catch (DocoptUserNotification $ex) {
             $this->handleExit($ex);
-            return new Result([], $ex->status, $ex->addMessage($this->autoHelp)->getMessage());
+            return new DocoptResult([], $ex->status, $ex->addMessage($this->autoHelp)->getMessage());
         }
     }
 
