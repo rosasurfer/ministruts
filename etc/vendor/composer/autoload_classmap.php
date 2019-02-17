@@ -6,6 +6,9 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname(dirname($vendorDir));
 
 return array(
+    'Psr\\Container\\ContainerExceptionInterface' => $vendorDir . '/psr/container/src/ContainerExceptionInterface.php',
+    'Psr\\Container\\ContainerInterface' => $vendorDir . '/psr/container/src/ContainerInterface.php',
+    'Psr\\Container\\NotFoundExceptionInterface' => $vendorDir . '/psr/container/src/NotFoundExceptionInterface.php',
     'rosasurfer\\Application' => $baseDir . '/src/Application.php',
     'rosasurfer\\cache\\ApcCache' => $baseDir . '/src/cache/ApcCache.php',
     'rosasurfer\\cache\\Cache' => $baseDir . '/src/cache/Cache.php',
@@ -60,6 +63,7 @@ return array(
     'rosasurfer\\db\\sqlite\\SQLiteResult' => $baseDir . '/src/db/sqlite/SQLiteResult.php',
     'rosasurfer\\debug\\DebugHelper' => $baseDir . '/src/debug/DebugHelper.php',
     'rosasurfer\\debug\\ErrorHandler' => $baseDir . '/src/debug/ErrorHandler.php',
+    'rosasurfer\\di\\ContainerException' => $baseDir . '/src/di/ContainerException.php',
     'rosasurfer\\di\\Di' => $baseDir . '/src/di/Di.php',
     'rosasurfer\\di\\DiAwareTrait' => $baseDir . '/src/di/DiAwareTrait.php',
     'rosasurfer\\di\\DiInterface' => $baseDir . '/src/di/DiInterface.php',
@@ -79,6 +83,7 @@ return array(
     'rosasurfer\\exception\\IllegalTypeException' => $baseDir . '/src/exception/IllegalTypeException.php',
     'rosasurfer\\exception\\InfrastructureException' => $baseDir . '/src/exception/InfrastructureException.php',
     'rosasurfer\\exception\\InvalidArgumentException' => $baseDir . '/src/exception/InvalidArgumentException.php',
+    'rosasurfer\\exception\\NotFoundException' => $baseDir . '/src/exception/NotFoundException.php',
     'rosasurfer\\exception\\PermissionDeniedException' => $baseDir . '/src/exception/PermissionDeniedException.php',
     'rosasurfer\\exception\\RosasurferException' => $baseDir . '/src/exception/RosasurferException.php',
     'rosasurfer\\exception\\RosasurferExceptionInterface' => $baseDir . '/src/exception/RosasurferExceptionInterface.php',

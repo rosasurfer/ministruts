@@ -1,11 +1,13 @@
 <?php
 namespace rosasurfer\di\service;
 
-use rosasurfer\exception\RuntimeException;
+use rosasurfer\di\ContainerException;
+
+use Psr\Container\NotFoundExceptionInterface;
 
 
 /**
  * ServiceNotFoundException
  */
-class ServiceNotFoundException extends RuntimeException {
+class ServiceNotFoundException extends ContainerException implements NotFoundExceptionInterface {
 }
