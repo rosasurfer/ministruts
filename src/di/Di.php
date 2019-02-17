@@ -37,13 +37,14 @@ class Di extends Object implements DiInterface {
 
 
     /** @var IService[] - a list of registered services */
-    protected $services;
+    protected $services = [];
 
 
     /**
      * Constructor
      */
     public function __construct() {
+        // the empty constructor catches parent::_construct() calls from subclasses
     }
 
 
@@ -94,9 +95,7 @@ class Di extends Object implements DiInterface {
      * {@inheritdoc}
      */
     public function set($name, $definition) {
-        $service = new Service($name, $definition);
-        $this->services[$name] = $service;
-        return $service;
+        return $this->services[$name] = new Service($name, $definition);
     }
 
 

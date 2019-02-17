@@ -21,13 +21,14 @@ class DefaultCliDi extends Di {
      */
     public function __construct($configDir) {
         parent::__construct();
-        /*
-        $this->services = [
-            'frontController'  => new Service('frontController' , 'rosasurfer\\ministruts\\FrontController' ),
-            'request'          => new Service('request'         , 'rosasurfer\\ministruts\\Request'         ),
-            'requestProcessor' => new Service('requestProcessor', 'rosasurfer\\ministruts\\RequestProcessor'),
+
+        $defaultServices = [
+            // 'frontController'  => new Service('frontController' , 'rosasurfer\\ministruts\\FrontController' ),
+            // 'request'          => new Service('request'         , 'rosasurfer\\ministruts\\Request'         ),
+            // 'requestProcessor' => new Service('requestProcessor', 'rosasurfer\\ministruts\\RequestProcessor'),
         ];
-        */
+        $this->services = array_merge($this->services, $defaultServices);
+
         $this->loadCustomServices($configDir);
     }
 }
