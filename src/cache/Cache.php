@@ -64,7 +64,7 @@ final class Cache extends StaticClass {
 
         if (!isset(self::$caches[$label])) {
             /** @var ConfigInterface $config */
-            $config = self::di()['config'];
+            $config = self::di('config');
 
             // Cache-Konfiguration auslesen und Cache instantiieren
             $class   = $config->get('cache.'.$label.'.class');

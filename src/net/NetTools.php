@@ -71,7 +71,7 @@ final class NetTools extends StaticClass {
             $proxys = array();
 
             /** @var ConfigInterface $config */
-            $config = self::di()['config'];
+            $config = self::di('config');
 
             // Config einlesen
             $value = $config->get('proxys', null);

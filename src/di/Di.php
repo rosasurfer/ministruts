@@ -18,8 +18,8 @@ use rosasurfer\exception\IllegalTypeException;
  *
  * <pre>
  *  $di = new Di();                                         // creating a new container
- *  $di = $this->di();                                      // getting the default container inside of a class context
- *  $di = Application::getDi();                             // getting the default container outside of a class context
+ *  $di = $this->di();                                      // getting the default container if in a class context
+ *  $di = Application::getDi();                             // getting the default container if not in a class context
  *
  *  // defining a parameterless service using a string
  *  $di->set('request', 'rosasurfer\\ministruts\\Request');

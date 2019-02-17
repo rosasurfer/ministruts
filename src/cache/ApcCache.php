@@ -21,7 +21,7 @@ class ApcCache extends CachePeer {
      */
     public function __construct($label=null, array $options=[]) {
         $this->label     = $label;
-        $this->namespace = $label ?: md5($this->di()['config']['app.dir.root']);
+        $this->namespace = $label ?: md5($this->di('config')['app.dir.root']);
         $this->options   = $options;
     }
 

@@ -165,7 +165,7 @@ class PHP extends StaticClass {
      */
     public static function phpinfo() {
         /** @var ConfigInterface $config */
-        $config = self::di()['config'];
+        $config = self::di('config');
         $issues = [];
 
 

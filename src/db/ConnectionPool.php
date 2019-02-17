@@ -73,7 +73,7 @@ final class ConnectionPool extends Singleton {
         }
         else {                                                   // no, get the connection's config
             /** @var ConfigInterface $config */
-            $config  = self::di()['config'];
+            $config  = self::di('config');
             $options = $config->get('db.'.$id, []);
             if (!is_array($options)) throw new IllegalTypeException('Invalid config value "db.'.$id.'": '.gettype($options).' (not array)');
             if (!$options)           throw new IllegalStateException('No configuration found for database alias "'.$id.'"');

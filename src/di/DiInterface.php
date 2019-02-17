@@ -7,7 +7,7 @@ use rosasurfer\di\service\ServiceInterface;
 /**
  * DiInterface
  *
- * Interface to be implemented by dependency injection/service locator containers.
+ * Interface to be implemented by dependency injection containers.
  */
 interface DiInterface extends \ArrayAccess {
 

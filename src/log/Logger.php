@@ -153,7 +153,7 @@ class Logger extends StaticClass {
         if ($initialized) return;
 
         /** @var ConfigInterface $config */
-        $config = self::di()['config'];
+        $config = self::di('config');
 
         // (1) Get the application's default loglevel configuration (fall back to the built-in default).
         $logLevel = $config->get('log.level', '');
@@ -255,7 +255,7 @@ class Logger extends StaticClass {
         static $logLevels = null;
         if ($logLevels === null) {
             /** @var ConfigInterface $config */
-            $config = self::di()['config'];
+            $config = self::di('config');
 
             $logLevels = $config->get('log.level', []);
             if (is_string($logLevels))
@@ -409,7 +409,7 @@ class Logger extends StaticClass {
         $message = $context['mailMessage'];
 
         /** @var ConfigInterface $config */
-        $config  = self::di()['config'];
+        $config  = self::di('config');
         $options = $headers = [];
         $sender  = null;
 

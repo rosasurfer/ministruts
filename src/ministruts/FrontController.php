@@ -53,7 +53,7 @@ class FrontController extends Singleton {
 
                 if (!$controller) {
                     $controller = self::getInstance(static::class);
-                    $configDir  = self::di()['config']['app.dir.config'];
+                    $configDir  = self::di('config')['app.dir.config'];
                     $configFile = str_replace('\\', '/', $configDir.'/struts-config.xml');
                     $dependency = FileDependency::create($configFile);
                     if (!WINDOWS && !LOCALHOST)                             // distinction dev/production?  TODO: non-sense
@@ -80,7 +80,7 @@ class FrontController extends Singleton {
         parent::__construct();
 
         /** @var ConfigInterface $config */
-        $config = $this->di()['config'];
+        $config = $this->di('config');
 
         // lookup Struts configuration files
         $configDir = $config->get('app.dir.struts', null);

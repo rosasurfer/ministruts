@@ -43,7 +43,7 @@ class Lock extends BaseLock {
         }
         else {
             /** @var ConfigInterface $config */
-            $config = $this->di()['config'];
+            $config = $this->di('config');
 
             // alternativ FileLock verwenden...
             $directory = $config->get('app.dir.temp', null);

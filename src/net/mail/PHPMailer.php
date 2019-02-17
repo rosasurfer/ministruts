@@ -35,7 +35,7 @@ class PHPMailer extends Mailer {
             return;
         }
         /** @var ConfigInterface $config */
-        $config = $this->di()['config'];
+        $config = $this->di('config');
 
         // first validate the additional headers
         foreach ($headers as $i => $header) {

@@ -210,7 +210,7 @@ class Module extends Object {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
         /** @var ConfigInterface $config */
-        $config = $this->di()['config'];
+        $config = $this->di('config');
         $rootDirectory = $config['app.dir.root'];
 
         if (!isset($xml['file-base'])) {

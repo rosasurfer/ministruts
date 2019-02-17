@@ -22,7 +22,7 @@ class VersionedUrl extends Url {
         else                                            $name = substr($relativeUri, 0, $pos);
 
         /** @var ConfigInterface $config */
-        $config = $this->di()['config'];
+        $config = $this->di('config');
         $webDir = $config->get('app.dir.web', null);
 
         if ($webDir && file_exists($fileName=$webDir.'/'.$name)) {

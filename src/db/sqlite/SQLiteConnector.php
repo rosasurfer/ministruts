@@ -110,7 +110,7 @@ class SQLiteConnector extends Connector {
         }
         else {
             /** @var ConfigInterface $config */
-            $config  = $this->di()['config'];
+            $config  = $this->di('config');
             $dataDir = $config->get('app.dir.data', null);
             $rootDir = $config->get('app.dir.root', null);
 

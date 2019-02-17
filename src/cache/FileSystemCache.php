@@ -38,7 +38,7 @@ final class FileSystemCache extends CachePeer {
         $this->options   = $options;
 
         /** @var ConfigInterface $config */
-        $config = $this->di()['config'];
+        $config = $this->di('config');
 
         // Cache-Verzeichnis ermitteln
         if (isset($options['directory'])) {

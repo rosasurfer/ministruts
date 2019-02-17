@@ -469,7 +469,7 @@ class Request extends Singleton {
             }
             else {
                 /** @var ConfigInterface $config */
-                $config  = $this->di()['config'];
+                $config  = $this->di('config');
                 $baseUri = $config->get('app.base-uri', false);
                 if (!$baseUri) throw new RuntimeException('Unknown application base URI, either $_SERVER["APP_BASE_URI"] or $config["app.base-uri"] needs to be configured.');
             }
