@@ -79,7 +79,7 @@ class Input extends Object {
             return false;
         $value = $this->docoptResult[$name];
         if (is_array($value))
-            return (bool)$value;                        // an empty array means the option is not available
+            return (bool)$value;                        // an empty array means a repeatable option is not available
         return $value !== false;                        // FALSE means the option was not set
     }
 

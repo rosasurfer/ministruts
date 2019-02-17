@@ -184,8 +184,8 @@ class Application extends Object {
      * @return $this
      */
     public function addCommand(Command $command) {
-        $command->freeze();
         $this->commands[$command->getName()] = $command;
+        $command->freeze();
         return $this;
     }
 
@@ -198,12 +198,15 @@ class Application extends Object {
      * @return Response|int - the HTTP response if a web application; the error status if a command line application
      */
     public function run(array $options = []) {
-        if (CLI) {
-            /** @var Command|null $cmd */
-            $cmd = first($this->commands);
-            return $cmd ? $cmd->run() : 0;
-        }
-        return FrontController::processRequest($options);
+        if (!CLI)
+            return FrontController::processRequest($options);
+
+        if (sizeof($this->commands) > 1)
+            echoPre('At the moment multi-level commands are not supported.');
+
+        /** @var Command|null $cmd */
+        $cmd = first($this->commands);
+        return $cmd ? $cmd->run() : 0;
     }
 
 

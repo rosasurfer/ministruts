@@ -15,14 +15,14 @@ use rosasurfer\exception\RuntimeException;
 /**
  * Command
  *
- * The configuration of a command is frozen after it is added to the {@link Application} or when the command is executed,
- * whichever comes first. A frozen configuration can't be changed anymore.
+ * The configuration of a command will be frozen after it is added to the {@link Application}. A frozen configuration
+ * can't be changed anymore.
  */
 class Command extends Object {
 
 
     /** @var string */
-    private $name;
+    private $name = '';
 
     /** @var string[] */
     private $aliases = [];
@@ -33,6 +33,9 @@ class Command extends Object {
     /** @var DocoptResult - parsed and matched docopt block */
     private $docoptResult;
 
+    /** @var \Closure */
+    private $task;
+
     /** @var bool - whether the command configuration is frozen */
     private $frozen = false;
 
@@ -40,21 +43,16 @@ class Command extends Object {
     /**
      * Constructor
      *
-     * Create a new command and optionally set its name. The name may also be set separately.
-     *
-     * @param  string $name [optional] - command name (default: none)
-     *
-     * @see    Command::setName()
+     * Create a new command.
      */
-    public function __construct($name = null) {
-        if (isset($name))
-            $this->setName($name);
+    public function __construct() {
         $this->configure();
     }
 
 
     /**
-     * Configures the command. Override this method to pre-define a custom configuration.
+     * Configures the command. Override this method to pre-define a custom configuration. All configuration properties are
+     * optional and may also be set separately.
      *
      * @return $this
      */
@@ -70,19 +68,23 @@ class Command extends Object {
      */
     public function run() {
         $input = new Input($this->docoptResult);
-        return $this->execute($input);
+
+        if ($this->task) $status = $this->task->__invoke($input);
+        else             $status = $this->execute($input);
+
+        return (int) $status;
     }
 
 
     /**
-     * Execute the command. Override this method to pre-define a custom command implementation.
+     * Execute the command. Override this method to pre-define a command implementation or set it dynamically via
+     * {@link Command::setTask()}.
      *
      * @param  Input $input
      *
      * @return int - execution status code: 0 (zero) for "success"
      */
     protected function execute(Input $input) {
-        throw new IllegalStateException('Override this method to pre-define a custom command implementation.');
     }
 
 
@@ -98,7 +100,7 @@ class Command extends Object {
 
     /**
      * Set the name of the command. A name must not contain white space and may define namespaces by using a colon ":".
-     * If an empty string is passed the command is marked as the default command of the CLI application.
+     * An empty string as the name marks the default command of the CLI application.
      *
      * @param  string $name - e.g. "foo" or "bar:baz"
      *
@@ -182,8 +184,32 @@ class Command extends Object {
 
 
     /**
+     * Return the command's dynamic task implementation.
+     *
+     * @return \Closure|null
+     */
+    public function getTask() {
+        return $this->task;
+    }
+
+
+    /**
+     * Set the command's dynamic task implementation. When the command is executed a dynamic task has higher priority than
+     * a pre-defined implementation in an overridden {@link Command::execute()} method.
+     *
+     * @param  \Closure $task
+     *
+     * @return $this
+     */
+    public function setTask(\Closure $task) {
+        $this->task = $task->bindTo($this);
+        return $this;
+    }
+
+
+    /**
      * Validate the command configuration and lock its configuration. Called after the command is added to the
-     * {@link Application} or when the command is executed, whichever comes first.
+     * {@link Application}.
      *
      * @return $this
      */
