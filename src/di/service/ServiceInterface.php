@@ -5,7 +5,7 @@ namespace rosasurfer\di\service;
 /**
  * ServiceInterface
  *
- * An interface implemented by services to be registered in a service container.
+ * An interface implemented by services to be registered in a dependency injection container.
  */
 interface ServiceInterface {
 

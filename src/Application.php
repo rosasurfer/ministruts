@@ -425,10 +425,10 @@ class Application extends Object {
      */
     final public static function setDi(DiInterface $di) {
         $previous = self::$defaultDi;
-        if (!$di->isService('app') && $previous && $previous->isService('app')) {
+        if (!$di->has('app') && $previous && $previous->has('app')) {
             $di['app'] = $previous['app'];
         }
-        if (!$di->isService('config') && self::$defaultConfig) {
+        if (!$di->has('config') && self::$defaultConfig) {
             $di['config'] = self::$defaultConfig;
         }
         self::$defaultDi = $di;

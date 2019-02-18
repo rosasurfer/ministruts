@@ -53,7 +53,7 @@ class Di extends Object implements DiInterface {
      *
      * @param  string $configDir - directory to load service definitions from
      *
-     * @return bool - whether custom service definitions have been found and successfully loaded
+     * @return bool - whether a custom service definitions has been found and successfully loaded
      */
     protected function loadCustomServices($configDir) {
         if (!is_string($configDir)) throw new IllegalTypeException('Illegal type of parameter $configDir: '.gettype($configDir));
@@ -70,29 +70,67 @@ class Di extends Object implements DiInterface {
     /**
      * {@inheritdoc}
      *
-     * @throws ServiceNotFoundException if the service is unknown
+     * @param  string $name - service identifier
+     *
+     * @return bool
      */
-    public function get($name) {
-        if (isset($this->services[$name]))
-            return $this->services[$name]->resolve($factory=false);
-        throw new ServiceNotFoundException('Service "'.$name.'" not found.');
+    public function has($name) {
+        return isset($this->services[$name]);
+    }
+
+
+    /**
+     * @deprecated
+     */
+    public function isService($name) {
+        return $this->has($name);
     }
 
 
     /**
      * {@inheritdoc}
      *
-     * @throws ServiceNotFoundException if the service is unknown
+     * @param  string $name
+     *
+     * @return object
      */
-    public function create($name, ...$params) {
-        if ($this->isService($name))
-            return $this->services[$name]->resolve($factory=true, $params);
-        throw new ServiceNotFoundException('Service "'.$name.'" not found.');
+    public function get($name) {
+        if (!isset($this->services[$name])) throw new ServiceNotFoundException('Service "'.$name.'" not found.');
+        try {
+            return $this->services[$name]->resolve($factory=false);
+        }
+        catch (\Exception $ex) {
+            throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex);
+        }
     }
 
 
     /**
      * {@inheritdoc}
+     *
+     * @param  string   $name
+     * @param  array ...$params - variable list of custom parameters
+     *
+     * @return object
+     */
+    public function create($name, ...$params) {
+        if (!isset($this->services[$name])) throw new ServiceNotFoundException('Service "'.$name.'" not found.');
+        try {
+            return $this->services[$name]->resolve($factory=true, $params);
+        }
+        catch (\Exception $ex) {
+            throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex);
+        }
+    }
+
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param  string        $name       - service identifier
+     * @param  string|object $definition - a class name, an instance or a Closure acting as an instance factory
+     *
+     * @return IService - the service wrapper
      */
     public function set($name, $definition) {
         return $this->services[$name] = new Service($name, $definition);
@@ -101,22 +139,18 @@ class Di extends Object implements DiInterface {
 
     /**
      * {@inheritdoc}
+     *
+     * @param  string $name - service identifier
+     *
+     * @return IService|null - the removed service wrapper or NULL if no such service was found
      */
     public function remove($name) {
         $service = null;
-        if ($this->isService($name)) {
+        if ($this->has($name)) {
             $service = $this->services[$name];
             unset($this->services[$name]);
         }
         return $service;
-    }
-
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isService($name) {
-        return isset($this->services[$name]);
     }
 
 
@@ -128,16 +162,20 @@ class Di extends Object implements DiInterface {
      * @return bool
      */
     public function offsetExists($name) {
-        return $this->isService($name);
+        return $this->has($name);
     }
 
 
     /**
-     * Resolve a named service and return its implementation using {@link \ArrayAccess} syntax.
+     * Resolve a named service and return its implementation using {@link \ArrayAccess} syntax. This method always returns
+     * the same instance.
      *
      * @param  string $name
      *
      * @return object
+     *
+     * @throws ServiceNotFoundException if the service was not found
+     * @throws ContainerException       if the dependency could not be resolved
      */
     public function offsetGet($name) {
         return $this->get($name);
@@ -148,8 +186,7 @@ class Di extends Object implements DiInterface {
      * Register a service in the container using {@link \ArrayAccess} syntax.
      *
      * @param  string        $name       - service identifier
-     * @param  string|object $definition - a service class name, a service instance or a \Closure acting as an instance
-     *                                     factory
+     * @param  string|object $definition - a class name, an instance or a Closure acting as an instance factory
      */
     public function offsetSet($name, $definition) {
         $this->set($name, $definition);

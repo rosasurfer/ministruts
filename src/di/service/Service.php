@@ -60,6 +60,11 @@ class Service implements ServiceInterface {
 
     /**
      * {@inheritdoc}
+     *
+     * @param  bool  $factory    [optional] - whether to return a new instance (default: no)
+     * @param  array $parameters [optional] - additional parameters of a factory call (default: none)
+     *
+     * @return object
      */
     public function resolve($factory=false, $parameters=[]) {
         if (!$factory && $this->instance)
