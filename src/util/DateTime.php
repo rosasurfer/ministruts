@@ -2,6 +2,7 @@
 namespace rosasurfer\util;
 
 use rosasurfer\core\ObjectTrait;
+use rosasurfer\di\DiAwareTrait;
 
 
 /**
@@ -9,7 +10,7 @@ use rosasurfer\core\ObjectTrait;
  */
 class DateTime extends \DateTime {
 
-    use ObjectTrait;
+    use ObjectTrait, DiAwareTrait;
 
 
     /**

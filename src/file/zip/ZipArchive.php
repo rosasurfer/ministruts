@@ -1,6 +1,8 @@
 <?php
 namespace rosasurfer\file\zip;
 
+use rosasurfer\core\ObjectTrait;
+use rosasurfer\di\DiAwareTrait;
 use rosasurfer\log\Logger;
 
 use const rosasurfer\L_ERROR;
@@ -13,6 +15,8 @@ use const rosasurfer\L_WARN;
  * Drop-in replacement for the built-in PHP class with improved error handling.
  */
 class ZipArchive extends \ZipArchive {
+
+    use ObjectTrait, DiAwareTrait;
 
 
     /** @var string[][] */

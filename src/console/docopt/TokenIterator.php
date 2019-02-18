@@ -4,6 +4,7 @@ namespace rosasurfer\console\docopt;
 use rosasurfer\console\docopt\exception\DocoptFormatError;
 use rosasurfer\console\docopt\exception\DocoptUserNotification;
 use rosasurfer\core\ObjectTrait;
+use rosasurfer\di\DiAwareTrait;
 
 
 /**
@@ -11,7 +12,7 @@ use rosasurfer\core\ObjectTrait;
  */
 class TokenIterator extends \ArrayIterator {
 
-    use ObjectTrait;
+    use ObjectTrait, DiAwareTrait;
 
 
     /** @var string */

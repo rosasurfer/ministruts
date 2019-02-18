@@ -1,6 +1,8 @@
 <?php
 namespace rosasurfer\exception\error;
 
+use rosasurfer\core\ObjectTrait;
+use rosasurfer\di\DiAwareTrait;
 use rosasurfer\debug\DebugHelper;
 use rosasurfer\debug\ErrorHandler;
 use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
@@ -12,7 +14,7 @@ use rosasurfer\exception\RosasurferExceptionTrait;
  */
 class PHPError extends \ErrorException implements IRosasurferException {
 
-    use RosasurferExceptionTrait;
+    use RosasurferExceptionTrait, ObjectTrait, DiAwareTrait;
 
 
     /** @var array - better stacktrace */
