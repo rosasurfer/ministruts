@@ -26,20 +26,13 @@ class FileSystem extends StaticClass {
      * @param  resource $context   [optional]
      *
      * @return bool - success status
-     *
-     * @throws RuntimeException if the directory cannot be created
      */
-    public static function mkDir($path, $mode=null, $recursive=true, $context=null) {
+    public static function mkDir($path, $mode=0777, $recursive=true, $context=null) {
         if (!is_dir($path)) {
             if (is_file($path)) throw new RuntimeException('Cannot create directory "'.$path.'" (existing file of the same name)');
-            $args = func_get_args();
-            $argc = func_num_args();
+            $args = [$path, $mode, $recursive];
+            func_num_args() > 3 && $args[] = $context;
 
-            if ($argc < 3) {
-                if ($argc == 1)
-                    $args[] = null;                             // use default $mode = null
-                $args[] = true;                                 // use default $recursive = true
-            }
             try {
                 if (!mkdir(...$args)) throw new \Exception();   // unpack new arguments as mkdir() will not accept $context = null
             }
