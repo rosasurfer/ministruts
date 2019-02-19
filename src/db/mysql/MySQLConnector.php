@@ -271,9 +271,8 @@ class MySQLConnector extends Connector {
                 mysql_select_db($this->database, $this->hConnection) || trigger_error(mysql_error($this->hConnection), E_USER_ERROR);
             }
             catch (\Exception $ex) {
-                if (!$ex instanceof IRosasurferException)
-                    $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex);
-                throw $ex->addMessage('Can not select database "'.$this->database.'"')->setCode(mysql_errno($this->hConnection));
+                $ex = new DatabaseException($ex->getMessage(), mysql_errno($this->hConnection), $ex);
+                throw $ex->addMessage('Can not select database "'.$this->database.'"');
             }
         }
         return $this;
@@ -417,9 +416,8 @@ class MySQLConnector extends Connector {
             $result || trigger_error('SQL-Error '.mysql_errno($this->hConnection).': '.mysql_error($this->hConnection), E_USER_ERROR);
         }
         catch (\Exception $ex) {
-            if (!$ex instanceof IRosasurferException)
-                $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex);
-            throw $ex->addMessage('Database: '.$this->getConnectionDescription().NL.'SQL: "'.$sql.'"')->setCode(mysql_errno($this->hConnection));
+            $ex = new DatabaseException($ex->getMessage(), mysql_errno($this->hConnection), $ex);
+            throw $ex->addMessage('Database: '.$this->getConnectionDescription().NL.'SQL: "'.$sql.'"');
         }
 
         $affected = 0;

@@ -15,13 +15,15 @@ trait RosasurferExceptionTrait {
     /** @var string - better message */
     private $betterMessage;
 
+    /** @var array - better stacktrace */
+    private $betterTrace;
+
     /** @var string - better stacktrace as string */
     private $betterTraceAsString;
 
 
     /**
-     * Add a message to the exception's existing message. Used during up-bubbling to add additional information to an
-     * exception's original message.
+     * Add a message to the exception's existing message. Used to add additional information to an existing message.
      *
      * @param  string $message
      *
@@ -34,8 +36,8 @@ trait RosasurferExceptionTrait {
 
 
     /**
-     * Set the error code of the exception. Used during up-bubbling to add additional information to the instance.
-     * Ignored if the exception's error code is already set.
+     * Set the error code of the exception *only* if it's not yet set. An existing error code cannot be changed. In this
+     * case the method does nothing.
      *
      * @param  mixed $code
      *

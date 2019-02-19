@@ -15,10 +15,6 @@ class RosasurferException extends \Exception implements IRosasurferException {
     use RosasurferExceptionTrait, ObjectTrait, DiAwareTrait;
 
 
-    /** @var array - better stacktrace */
-    private $betterTrace;
-
-
     /**
      * Create a new instance. Parameters are identical to the built-in PHP Exception and passed on.
      *
@@ -40,7 +36,7 @@ class RosasurferException extends \Exception implements IRosasurferException {
         $betterTrace = $this->betterTrace;
 
         if (!$betterTrace) {
-            // transform the original stacktrace into a better trace
+            // transform the original stacktrace into a better one
             $betterTrace = DebugHelper::fixTrace($this->getTrace(), $this->getFile(), $this->getLine());
 
             /*

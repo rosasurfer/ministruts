@@ -5,7 +5,6 @@ use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\StaticClass;
 use rosasurfer\debug\DebugHelper;
 use rosasurfer\exception\IllegalTypeException;
-use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\exception\RuntimeException;
 
 use function rosasurfer\echoPre;
@@ -91,7 +90,7 @@ class PHP extends StaticClass {
             $hProc = proc_open($cmd, $descriptors, $pipes, $dir, $env, ['bypass_shell'=>true]);
         }
         catch (\Exception $ex) {
-            if (!$ex instanceof IRosasurferException) $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex);
+            $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex);
             if (WINDOWS && preg_match('/proc_open\(\): CreateProcess failed, error code - ([0-9]+)/i', $ex->getMessage(), $match)) {
                 $error = Windows::errorToString((int) $match[1]);
                 if ($error != $match[1]) $ex->addMessage($match[1].': '.$error);
