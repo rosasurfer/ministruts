@@ -67,6 +67,7 @@ class Command extends Object {
      * @return int - execution status code: 0 (zero) for "success"
      */
     public function run() {
+        /** @var Input $input */
         $input = $this->di()->set('input', new Input($this->docoptResult));
 
         if ($this->task) $status = $this->task->__invoke($input);
