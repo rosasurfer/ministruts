@@ -346,17 +346,44 @@ function echoPre($var, $flushBuffers = true) {
 
 
 /**
+ * Print a message to STDOUT.
+ *
+ * @param  string $message
+ */
+function stdout($message) {
+    if (!strEndsWith($message, NL))
+        $message .= NL;
+
+    $hStream = CLI ? \STDOUT : fopen('php://stdout', 'a');
+    fwrite($hStream, $message);
+    if (!CLI) fclose($hStream);
+}
+
+
+/**
  * Print a message to STDERR.
  *
  * @param  string $message
  */
-function stderror($message) {
+function stderr($message) {
     if (!strEndsWith($message, NL))
         $message .= NL;
 
-    $stderr = CLI ? \STDERR : fopen('php://stderr', 'a');
-    fwrite($stderr, $message);
-    if (!CLI) fclose($stderr);
+    $hStream = CLI ? \STDERR : fopen('php://stderr', 'a');
+    fwrite($hStream, $message);
+    if (!CLI) fclose($hStream);
+}
+
+
+/**
+ * Print a message to STDERR.
+ *
+ * @param  string $message
+ *
+ * @deprecated
+ */
+function stderror($message) {
+    stderr($message);
 }
 
 

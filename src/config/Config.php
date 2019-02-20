@@ -10,7 +10,7 @@ use rosasurfer\exception\RuntimeException;
 use rosasurfer\util\PHP;
 
 use function rosasurfer\isRelativePath;
-use function rosasurfer\stderror;
+use function rosasurfer\stderr;
 use function rosasurfer\strContains;
 use function rosasurfer\strIsQuoted;
 use function rosasurfer\strLeft;
@@ -116,7 +116,7 @@ class Config extends Object implements IConfig {
             if (sizeof($parts) < 2) {
                 // Don't trigger a regular error as it will cause an infinite loop if the same config is used by the error handler.
                 $msg = __METHOD__.'()  Skipping syntax error in "'.$filename.'", line '.($i+1).': missing key-value separator';
-                stderror($msg);
+                stderr($msg);
                 error_log($msg, ERROR_LOG_DEFAULT);
                 continue;
             }

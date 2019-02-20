@@ -12,7 +12,7 @@ use function rosasurfer\ini_get_bool;
 use function rosasurfer\ini_get_bytes;
 use function rosasurfer\ini_get_int;
 use function rosasurfer\php_byte_value;
-use function rosasurfer\stderror;
+use function rosasurfer\stderr;
 use function rosasurfer\strContains;
 use function rosasurfer\strRight;
 use function rosasurfer\strRightFrom;
@@ -124,7 +124,7 @@ class PHP extends StaticClass {
                 $stdout .= $line; if ($stdoutPassthrough) echo $line;
             },
             (int)$pipes[$STDERR] => function($line) use (&$stderr, $stderrPassthrough) {
-                $stderr .= $line; if ($stderrPassthrough) stderror($line);
+                $stderr .= $line; if ($stderrPassthrough) stderr($line);
             },
         ];
         $null = null;

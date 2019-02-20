@@ -179,12 +179,34 @@ function echoPre($var, $flushBuffers = true) {
 
 
 /**
+ * Print a message to STDOUT.
+ *
+ * @param  string $message
+ */
+function stdout($message) {
+    \rosasurfer\stdout($message);
+}
+
+
+/**
  * Print a message to STDERR.
  *
  * @param  string $message
  */
+function stderr($message) {
+    \rosasurfer\stderr($message);
+}
+
+
+/**
+ * Print a message to STDERR.
+ *
+ * @param  string $message
+ *
+ * @deprecated
+ */
 function stderror($message) {
-    \rosasurfer\stderror($message);
+    \rosasurfer\stderr($message);
 }
 
 
