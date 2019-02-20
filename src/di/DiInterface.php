@@ -71,7 +71,7 @@ interface DiInterface extends \ArrayAccess, ContainerInterface {
      * @param  string        $name       - service identifier
      * @param  string|object $definition - a class name, an instance or a Closure acting as an instance factory
      *
-     * @return IService - the service wrapper
+     * @return string|object - the same definition
      */
     public function set($name, $definition);
 

@@ -5,5 +5,5 @@ namespace rosasurfer\exception;
 /**
  * FileNotFoundException
  */
-class FileNotFoundException extends RuntimeException {
+class FileNotFoundException extends NotFoundException {
 }

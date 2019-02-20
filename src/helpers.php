@@ -4,8 +4,8 @@
  */
 namespace rosasurfer;
 
-use rosasurfer\console\docopt\Parser as DocoptParser;
-use rosasurfer\console\docopt\Result as DocoptResult;
+use rosasurfer\console\docopt\DocoptParser;
+use rosasurfer\console\docopt\DocoptResult;
 use rosasurfer\exception\IllegalArgumentException;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;

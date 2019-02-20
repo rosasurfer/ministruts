@@ -3,6 +3,7 @@ namespace rosasurfer;
 
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\config\auto\DefaultConfig;
+use rosasurfer\console\Command;
 use rosasurfer\core\Object;
 use rosasurfer\debug\ErrorHandler;
 use rosasurfer\di\Di;
@@ -18,7 +19,7 @@ use rosasurfer\util\PHP;
 
 
 /**
- * A wrapper object representing a running application.
+ * An object representing a running application.
  */
 class Application extends Object {
 
@@ -29,12 +30,8 @@ class Application extends Object {
     /** @var DiInterface - the application's current default DI container */
     protected static $defaultDi;
 
-
-    /** @var int - error handling mode in which regular PHP errors are only logged */
-    const LOG_ERRORS = ErrorHandler::LOG_ERRORS;
-
-    /** @var int - error handling mode in which regular PHP errors are converted to exceptions and thrown back */
-    const THROW_EXCEPTIONS = ErrorHandler::THROW_EXCEPTIONS;
+    /** @var Command[] - registered CLI commands */
+    private $commands;
 
 
     /**
@@ -48,21 +45,21 @@ class Application extends Object {
      *        "app.dir.config"        - string:  The project's configuration location as a directory or a file.                 <br>
      *                                           (default: the current directory)                                               <br>
      *
-     *        "app.globals"           - bool:    If set definitions in "src/helpers.php" are additionally mapped to the global  <br>
-     *                                           namespace. In general this is not recommended to avoid potential naming        <br>
-     *                                           conflicts in the global scope. However, it may be used to simplify life of     <br>
-     *                                           developers using editors with limited automatic code completion capabilities.  <br>
+     *        "app.globals"           - bool:    If enabled definitions in "src/helpers.php" are additionally mapped to the     <br>
+     *                                           global namespace. In general this is not recommended to avoid potential naming <br>
+     *                                           conflicts in the global scope. However it may be used to simplify life of      <br>
+     *                                           developers using editors with limited code completion capabilities.            <br>
      *                                           (default: disabled)                                                            <br>
      *
      *        "app.handle-errors"     - string:  How to handle regular PHP errors: If set to "strict" errors are converted to   <br>
-     *                                           to ErrorExceptions and thrown back. If set to "weak" errors are only logged    <br>
-     *                                           and execution continues. If set to "ignore" the application has to setup its   <br>
+     *                                           ErrorExceptions and thrown. If set to "weak" errors are only logged and        <br>
+     *                                           execution continues. If set to "ignore" the application must implement its     <br>
      *                                           own error handling mechanism.                                                  <br>
      *                                           (default: "strict")                                                            <br>
      *
-     *        "app.handle-exceptions" - bool:    How to handle PHP exceptions: If set exceptions are handled by the framework's <br>
-     *                                           exception handler. Otherwise the application has to setup its own exception    <br>
-     *                                           handling mechanism.                                                            <br>
+     *        "app.handle-exceptions" - bool:    How to handle PHP exceptions: If enabled exceptions are handled by the         <br>
+     *                                           framework's exception handler. Otherwise the application must implement its    <br>
+     *                                           own exception handling mechanism.                                              <br>
      *                                           (default: enabled)                                                             <br>
      *
      * All further options are added to the application's current default configuration as regular config values.               <br>
@@ -179,15 +176,37 @@ class Application extends Object {
 
 
     /**
-     * Run the application and return the {@link Response} if a web application.
+     * Register {@link Command} with the application for execution in CLI mode. An already registered command with the same
+     * name as the one to add will be overwritten.
      *
-     * @param  array $options [optional] - runtime options
+     * @param  Command $command
      *
-     * @return Response|null - the response if a web application or NULL if a command line application
+     * @return $this
+     */
+    public function addCommand(Command $command) {
+        $this->commands[$command->getName()] = $command;
+        $command->freeze();
+        return $this;
+    }
+
+
+    /**
+     * Run the application.
+     *
+     * @param  array $options [optional] - additional execution options (default: none)
+     *
+     * @return Response|int - the HTTP response if a web application; the error status if a command line application
      */
     public function run(array $options = []) {
-        if (CLI) return null;
-        return FrontController::processRequest($options);
+        if (!CLI)
+            return FrontController::processRequest($options);
+
+        if (sizeof($this->commands) > 1)
+            echoPre('At the moment multi-level commands are not supported.');
+
+        /** @var Command|null $cmd */
+        $cmd = first($this->commands);
+        return $cmd ? $cmd->run() : 0;
     }
 
 
@@ -310,10 +329,11 @@ class Application extends Object {
      * @param  string $value - configuration value as passed to the framework loader
      */
     protected function setupErrorHandling($value) {
-        $mode = self::THROW_EXCEPTIONS;                             // default
+        $mode = ErrorHandler::THROW_EXCEPTIONS;                         // default
+
         if (is_string($value)) {
-            $value = trim(strtolower($value));
-            if      ($value == 'weak'  ) $mode = self::LOG_ERRORS;
+            $value = strtolower($value);
+            if      ($value == 'weak'  ) $mode = ErrorHandler::LOG_ERRORS;
             else if ($value == 'ignore') $mode = 0;
         }
         $mode && ErrorHandler::setupErrorHandling($mode);
