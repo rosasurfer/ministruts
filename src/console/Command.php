@@ -4,8 +4,8 @@ namespace rosasurfer\console;
 use rosasurfer\Application;
 use rosasurfer\console\docopt\DocoptParser;
 use rosasurfer\console\docopt\DocoptResult;
-use rosasurfer\console\input\Input;
 use rosasurfer\core\Object;
+use rosasurfer\di\Di;
 use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
@@ -67,11 +67,17 @@ class Command extends Object {
      * @return int - execution status code: 0 (zero) for "success"
      */
     public function run() {
-        /** @var Input $input */
-        $input = $this->di()->set('input', new Input($this->docoptResult));
+        /** @var Di $di */
+        $di = $this->di();
 
-        if ($this->task) $status = $this->task->__invoke($input);
-        else             $status = $this->execute($input);
+        /** @var Input $input */
+        $input  = $di->set('input', new Input($this->docoptResult));
+
+        /** @var Output $output */
+        $output = $di->has('output') ? $di->get('output') : $di->set('output', new Output());
+
+        if ($this->task) $status = $this->task->__invoke($input, $output);
+        else             $status = $this->execute($input, $output);
 
         return (int) $status;
     }
@@ -81,11 +87,12 @@ class Command extends Object {
      * Execute the command. Override this method to pre-define a command implementation or set it dynamically via
      * {@link Command::setTask()}.
      *
-     * @param  Input $input
+     * @param  Input  $input
+     * @param  Output $output
      *
      * @return int - execution status code: 0 (zero) for "success"
      */
-    protected function execute(Input $input) {
+    protected function execute(Input $input, Output $output) {
     }
 
 
