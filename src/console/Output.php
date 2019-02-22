@@ -2,8 +2,10 @@
 namespace rosasurfer\console;
 
 use rosasurfer\core\Object;
+use rosasurfer\exception\IllegalTypeException;
 
 use const rosasurfer\CLI;
+use const rosasurfer\NL;
 
 
 /**
@@ -18,6 +20,12 @@ class Output extends Object {
      * @param  string $message
      */
     public function stdout($message) {
+        if (!is_string($message)) throw new IllegalTypeException('Illegal type of parameter $message: '.gettype($message));
+
+        $len = strlen($message);
+        if ($len && $message[$len-1]!=NL)
+            $message .= NL;
+
         $hStream = CLI ? \STDOUT : fopen('php://stdout', 'a');
         fwrite($hStream, $message);
         if (!CLI) fclose($hStream);
@@ -30,6 +38,12 @@ class Output extends Object {
      * @param  string $message
      */
     public function stderr($message) {
+        if (!is_string($message)) throw new IllegalTypeException('Illegal type of parameter $message: '.gettype($message));
+
+        $len = strlen($message);
+        if ($len && $message[$len-1]!=NL)
+            $message .= NL;
+
         $hStream = CLI ? \STDERR : fopen('php://stderr', 'a');
         fwrite($hStream, $message);
         if (!CLI) fclose($hStream);

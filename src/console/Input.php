@@ -3,7 +3,7 @@ namespace rosasurfer\console;
 
 use rosasurfer\console\docopt\DocoptResult;
 use rosasurfer\core\Object;
-use rosasurfer\exception\NotFoundException;
+use rosasurfer\exception\IllegalTypeException;
 
 
 /**
@@ -37,39 +37,37 @@ class Input extends Object {
 
 
     /**
-     * Whether the command with the given name was specified.
+     * Whether the command with the given name is defined. Not whether the command was specified..
      *
-     * @param  string $name - command name: all command line parameters which don't match the definition of arguments or
-     *                        options are interpreted as (possibly sub)commands
+     * @param  string $name - command name: all parameters not matching arguments or options are interpreted as commands
+     *                        and/or subcommands
      * @return bool
      */
-    public function hasCommand($name, $count = 1) {
+    public function isCommand($name, $count = 1) {
         // TODO: this implementation sucks
         if (isset($this->docoptResult[$name]) && strlen($name))
-            return (!$this->hasArgument($name) && !$this->hasOption($name));
+            return (!$this->isArgument($name) && !$this->isOption($name));
         return false;
     }
 
 
     /**
-     * Whether the argument with the given name was specified.
+     * Whether the argument with the given name is defined. Not whether the argument was specified..
      *
-     * @param  string $name - argument name: either wrapped in angular brackets or all-uppercase
+     * @param  string $name - argument name: either all-uppercase or enclosed in angular brackets
      *
      * @return bool
      */
-    public function hasArgument($name) {
-        if (!isset($this->docoptResult[$name]) || !($len=strlen($name)))
+    public function isArgument($name) {
+        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
+
+        if (!($len=strlen($name)) || !isset($this->docoptResult[$name]))
             return false;
 
         $bracketed = ('<'==$name[0] && $name[$len-1]=='>');
-        $upperCase = ($name === strtoupper($name));
+        $upperCase = ($name == strtoupper($name));
 
-        if ($bracketed || $upperCase) {
-            $value = $this->docoptResult[$name];
-            return (!is_array($value) || $value);
-        }
-        return false;
+        return ($bracketed || $upperCase);
     }
 
 
@@ -78,31 +76,31 @@ class Input extends Object {
      *
      * @param  string $name - argument name: either wrapped in angular brackets or all-uppercase
      *
-     * @return string|string[] - a single or multiple argument values
-     *
-     * @throws NotFoundException if the argument was not specified
+     * @return string|string[]|null - the argument value(s) or NULL if the argument was not specified
      */
     public function getArgument($name) {
-        if ($this->hasArgument($name))
-            return $this->docoptResult[$name];
-        throw new NotFoundException('Argument "'.$name.'" not found.');
+        if ($this->isArgument($name)) {
+            $value = $this->docoptResult[$name];
+            if (!is_array($value) || $value)
+                return $value;
+        }
+        return null;
     }
 
 
     /**
-     * Whether the option with the given name is available as input. Options may be available due to default values.
+     * Whether the option with the given name is defined. Not whether the option was specified..
      *
-     * @param  string $name - option name: either long "--" (precedence) or short "-" option name (including dashes)
+     * @param  string $name - option name: either a long "--" (precedence) or a short "-" option name (including dashes)
      *
      * @return bool
      */
-    public function hasOption($name) {
-        if (!isset($this->docoptResult[$name]) || !strlen($name) || $name[0]!='-' || $name=='-' || $name=='--')
+    public function isOption($name) {
+        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
+
+        if (!strlen($name) || !isset($this->docoptResult[$name]) || $name[0]!='-' || $name=='-' || $name=='--')
             return false;
-        $value = $this->docoptResult[$name];
-        if (is_array($value))
-            return (bool) $value;                       // an empty array means a repeatable option is not available
-        return $value !== false;                        // FALSE means the option was not set
+        return true;
     }
 
 
@@ -112,12 +110,13 @@ class Input extends Object {
      * @param  string $name - option name: either long "--" (precedence) or short "-" option name (including dashes)
      *
      * @return bool|string|string[] - a single or multiple option values
-     *
-     * @throws NotFoundException if the option is not available as input
      */
     public function getOption($name) {
-        if ($this->hasOption($name))
-            return $this->docoptResult[$name];
-        throw new NotFoundException('Option "'.$name.'" not found.');
+        if ($this->isOption($name)) {
+            $value = $this->docoptResult[$name];
+            if (!is_array($value) || $value)
+                return $value;
+        }
+        return false;
     }
 }

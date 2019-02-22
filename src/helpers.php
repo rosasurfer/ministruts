@@ -351,6 +351,8 @@ function echoPre($var, $flushBuffers = true) {
  * @param  string $message
  */
 function stdout($message) {
+    if (!is_string($message)) throw new IllegalTypeException('Illegal type of parameter $message: '.gettype($message));
+
     if (!strEndsWith($message, NL))
         $message .= NL;
 
@@ -366,6 +368,8 @@ function stdout($message) {
  * @param  string $message
  */
 function stderr($message) {
+    if (!is_string($message)) throw new IllegalTypeException('Illegal type of parameter $message: '.gettype($message));
+
     if (!strEndsWith($message, NL))
         $message .= NL;
 
