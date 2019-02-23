@@ -45,7 +45,7 @@ class Command extends Object {
     /** @var Output */
     protected $output;
 
-    /** @var int */
+    /** @var int - the command's error status */
     protected $errorStatus = 0;
 
 

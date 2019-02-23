@@ -87,9 +87,9 @@ class Input extends Object {
 
 
     /**
-     * Return the value of the option with the given name. The option may be the defined due to a default value.
+     * Return the value of the option with the given name. The value may be the defined default value.
      *
-     * @param  string $name - option name: either long "--" (precedence) or short "-" option name (including dashes)
+     * @param  string $name - option name: long (if defined) or short option name including leading dashes
      *
      * @return bool|string|string[] - a single or multiple option values
      */
