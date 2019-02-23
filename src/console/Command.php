@@ -39,6 +39,12 @@ class Command extends Object {
     /** @var bool - whether the command configuration is frozen */
     private $frozen = false;
 
+    /** @var Input */
+    protected $input;
+
+    /** @var Output */
+    protected $output;
+
 
     /**
      * Constructor
@@ -69,15 +75,14 @@ class Command extends Object {
     public function run() {
         /** @var Di $di */
         $di = $this->di();
-
-        /** @var Input $input */
-        $input  = $di->set(Input::class, new Input($this->docoptResult));
+        $this->input = $di->set(Input::class, new Input($this->docoptResult));
 
         /** @var Output $output */
         $output = $di->has($key=Output::class) ? $di->get($key) : $di->set($key, new Output());
+        $this->output = $output;
 
-        if ($this->task) $status = $this->task->__invoke($input, $output);
-        else             $status = $this->execute($input, $output);
+        if ($this->task) $status = $this->task->__invoke($this->input, $output);
+        else             $status = $this->execute($this->input, $output);
 
         return (int) $status;
     }
@@ -258,5 +263,29 @@ class Command extends Object {
         if (strlen($name) && !preg_match('/^[^\s:]+(:[^\s:]+)*$/', $name))
             throw new InvalidArgumentException('Invalid parameter $name: "'.$name.'" (not a command name)');
         return $this;
+    }
+
+
+    /**
+     * Print a message to STDOUT.
+     *
+     * @param  string $message
+     *
+     * @return string
+     */
+    protected function out($message) {
+        $this->output->stdout($message);
+    }
+
+
+    /**
+     * Print a message to STDERR.
+     *
+     * @param  string $message
+     *
+     * @return string
+     */
+    protected function error($message) {
+        $this->output->stderr($message);
     }
 }
