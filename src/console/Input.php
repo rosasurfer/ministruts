@@ -37,21 +37,6 @@ class Input extends Object {
 
 
     /**
-     * Whether the command with the given name is defined. Not whether the command was specified..
-     *
-     * @param  string $name - command name: all parameters not matching arguments or options are interpreted as commands
-     *                        and/or subcommands
-     * @return bool
-     */
-    public function isCommand($name, $count = 1) {
-        // TODO: this implementation sucks
-        if (isset($this->docoptResult[$name]) && strlen($name))
-            return (!$this->isArgument($name) && !$this->isOption($name));
-        return false;
-    }
-
-
-    /**
      * Whether the argument with the given name is defined. Not whether the argument was specified..
      *
      * @param  string $name - argument name: either all-uppercase or enclosed in angular brackets

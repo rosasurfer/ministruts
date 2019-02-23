@@ -17,7 +17,7 @@ trait DiAwareTrait {
      *
      * @param  string $name [optional] - service identifier (default: the dependency injection container)
      *
-     * @return object|DiInterface
+     * @return DiInterface|object
      */
     protected static function di($name = null) {
         $di = Application::getDi();

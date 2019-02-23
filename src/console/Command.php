@@ -71,10 +71,10 @@ class Command extends Object {
         $di = $this->di();
 
         /** @var Input $input */
-        $input  = $di->set('input', new Input($this->docoptResult));
+        $input  = $di->set(Input::class, new Input($this->docoptResult));
 
         /** @var Output $output */
-        $output = $di->has('output') ? $di->get('output') : $di->set('output', new Output());
+        $output = $di->has($key=Output::class) ? $di->get($key) : $di->set($key, new Output());
 
         if ($this->task) $status = $this->task->__invoke($input, $output);
         else             $status = $this->execute($input, $output);
