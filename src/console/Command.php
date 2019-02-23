@@ -78,11 +78,8 @@ class Command extends Object {
     public function run() {
         /** @var Di $di */
         $di = $this->di();
-        $this->input = $di->set(Input::class, new Input($this->docoptResult));
-
-        /** @var Output $output */
-        $output = $di->has($key=Output::class) ? $di->get($key) : $di->set($key, new Output());
-        $this->output = $output;
+        $this->input  = $di->set(Input::class, new Input($this->docoptResult));
+        $this->output = $di->has($key=Output::class) ? $di[$key] : $di->set($key, new Output());
 
         if ($this->task) $status = $this->task->__invoke();
         else             $status = $this->execute();

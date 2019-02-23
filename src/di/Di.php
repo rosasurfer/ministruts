@@ -18,8 +18,8 @@ use rosasurfer\exception\IllegalTypeException;
  *
  * <pre>
  *  $di = new Di();                                         // creating a new container
- *  $di = $this->di();                                      // getting the default container if in a class context
- *  $di = Application::getDi();                             // getting the default container if not in a class context
+ *  $di = $this->di();                                      // getting the default container in a class context
+ *  $di = Application::getDi();                             // getting the default container in a non-class context
  *
  *  // defining a parameterless service using a string
  *  $di->set('request', 'rosasurfer\\ministruts\\Request');
@@ -44,7 +44,7 @@ class Di extends Object implements DiInterface {
      * Constructor
      */
     public function __construct() {
-        // the empty constructor catches parent::_construct() calls from subclasses
+        // catch parent::__construct() calls from subclasses
     }
 
 
