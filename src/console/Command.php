@@ -45,6 +45,9 @@ class Command extends Object {
     /** @var Output */
     protected $output;
 
+    /** @var int */
+    protected $errorStatus = 0;
+
 
     /**
      * Constructor
@@ -81,8 +84,8 @@ class Command extends Object {
         $output = $di->has($key=Output::class) ? $di->get($key) : $di->set($key, new Output());
         $this->output = $output;
 
-        if ($this->task) $status = $this->task->__invoke($this->input, $output);
-        else             $status = $this->execute($this->input, $output);
+        if ($this->task) $status = $this->task->__invoke();
+        else             $status = $this->execute();
 
         return (int) $status;
     }
@@ -92,12 +95,10 @@ class Command extends Object {
      * Execute the command. Override this method to pre-define a command implementation or set it dynamically via
      * {@link Command::setTask()}.
      *
-     * @param  Input  $input
-     * @param  Output $output
-     *
      * @return int - execution status code: 0 (zero) for "success"
      */
-    protected function execute(Input $input, Output $output) {
+    protected function execute() {
+        return 0;
     }
 
 
@@ -274,7 +275,7 @@ class Command extends Object {
      * @return string
      */
     protected function out($message) {
-        $this->output->stdout($message);
+        $this->output->out($message);
     }
 
 
@@ -286,6 +287,6 @@ class Command extends Object {
      * @return string
      */
     protected function error($message) {
-        $this->output->stderr($message);
+        $this->output->error($message);
     }
 }

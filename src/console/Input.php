@@ -64,11 +64,8 @@ class Input extends Object {
      * @return string|string[]|null - the argument value(s) or NULL if the argument was not specified
      */
     public function getArgument($name) {
-        if ($this->isArgument($name)) {
-            $value = $this->docoptResult[$name];
-            if (!is_array($value) || $value)
-                return $value;
-        }
+        if ($this->isArgument($name))
+            return $this->docoptResult[$name];
         return null;
     }
 
@@ -97,11 +94,8 @@ class Input extends Object {
      * @return bool|string|string[] - a single or multiple option values
      */
     public function getOption($name) {
-        if ($this->isOption($name)) {
-            $value = $this->docoptResult[$name];
-            if (!is_array($value) || $value)
-                return $value;
-        }
+        if ($this->isOption($name))
+            return $this->docoptResult[$name];
         return false;
     }
 }

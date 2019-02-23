@@ -19,7 +19,7 @@ class Output extends Object {
      *
      * @param  string $message
      */
-    public function stdout($message) {
+    public function out($message) {
         if (!is_string($message)) throw new IllegalTypeException('Illegal type of parameter $message: '.gettype($message));
 
         $len = strlen($message);
@@ -37,7 +37,7 @@ class Output extends Object {
      *
      * @param  string $message
      */
-    public function stderr($message) {
+    public function error($message) {
         if (!is_string($message)) throw new IllegalTypeException('Illegal type of parameter $message: '.gettype($message));
 
         $len = strlen($message);
