@@ -57,15 +57,35 @@ class Input extends Object {
 
 
     /**
-     * Return the value of the argument with the given name.
+     * Return the single-value argument with the given name.
      *
-     * @param  string $name - argument name: either wrapped in angular brackets or all-uppercase
+     * @param  string $name - either wrapped in angular brackets or all-uppercase name
      *
-     * @return string|string[]|null - the argument value(s) or NULL if the argument was not specified
+     * @return string|null - the argument value or NULL if the argument was not specified
      */
     public function getArgument($name) {
-        if ($this->isArgument($name))
-            return $this->docoptResult[$name];
+        if ($this->isArgument($name)) {
+            $value = $this->docoptResult[$name];
+            if (!is_array($value))
+                return $value;
+        }
+        return null;
+    }
+
+
+    /**
+     * Return the multi-value argument with the given name.
+     *
+     * @param  string $name - either wrapped in angular brackets or all-uppercase name
+     *
+     * @return string[]|null - the argument values or NULL if the arguments were not specified
+     */
+    public function getArguments($name) {
+        if ($this->isArgument($name)) {
+            $value = $this->docoptResult[$name];
+            if (is_array($value))
+                return $value;
+        }
         return null;
     }
 
@@ -87,15 +107,35 @@ class Input extends Object {
 
 
     /**
-     * Return the value of the option with the given name. The value may be the defined default value.
+     * Return the single-value option with the given name. The value may be the defined default value.
      *
-     * @param  string $name - option name: long (if defined) or short option name including leading dashes
+     * @param  string $name - long (if defined) or short option name including leading dashes
      *
-     * @return bool|string|string[] - a single or multiple option values
+     * @return bool|string - the option value or FALSE if the option was not specified
      */
     public function getOption($name) {
-        if ($this->isOption($name))
-            return $this->docoptResult[$name];
+        if ($this->isOption($name)) {
+            $value = $this->docoptResult[$name];
+            if (!is_array($value))
+                return $value;
+        }
+        return false;
+    }
+
+
+    /**
+     * Return the multi-value option with the given name. The values may be the defined default values.
+     *
+     * @param  string $name - long (if defined) or short option name including leading dashes
+     *
+     * @return bool|string[] - the option value or FALSE if the options were not specified
+     */
+    public function getOptions($name) {
+        if ($this->isOption($name)) {
+            $value = $this->docoptResult[$name];
+            if (is_array($value))
+                return $value;
+        }
         return false;
     }
 }
