@@ -55,6 +55,7 @@ class Command extends Object {
      * Create a new command.
      */
     public function __construct() {
+        $this->output = $this->di(Output::class);
         $this->configure();
     }
 
@@ -78,8 +79,7 @@ class Command extends Object {
     public function run() {
         /** @var Di $di */
         $di = $this->di();
-        $this->input  = $di->set(Input::class, new Input($this->docoptResult));
-        $this->output = $di->has($key=Output::class) ? $di[$key] : $di->set($key, new Output());
+        $this->input = $di->set(Input::class, new Input($this->docoptResult));
 
         if ($this->task) $status = $this->task->__invoke();
         else             $status = $this->execute();

@@ -34,7 +34,7 @@ class Service implements ServiceInterface {
      * Constructor
      *
      * @param  string        $name       - service name
-     * @param  string|object $definition - service definition
+     * @param  string|object $definition - a class name, an instance or a Closure acting as an instance factory
      */
     public function __construct($name, $definition) {
         $this->name       = $name;

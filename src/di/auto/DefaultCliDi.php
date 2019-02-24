@@ -1,6 +1,7 @@
 <?php
 namespace rosasurfer\di\auto;
 
+use rosasurfer\console\Output;
 use rosasurfer\di\Di;
 use rosasurfer\di\service\Service;
 
@@ -23,6 +24,7 @@ class DefaultCliDi extends Di {
         parent::__construct();
 
         $defaultServices = [
+            Output::class         => new Service(Output::class     , Output::class                             ),
             // 'frontController'  => new Service('frontController' , 'rosasurfer\\ministruts\\FrontController' ),
             // 'request'          => new Service('request'         , 'rosasurfer\\ministruts\\Request'         ),
             // 'requestProcessor' => new Service('requestProcessor', 'rosasurfer\\ministruts\\RequestProcessor'),
