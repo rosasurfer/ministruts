@@ -14,7 +14,7 @@ trait ObjectTrait {
 
 
     /**
-     * Magic method catching other-wise fatal errors triggered by calls of non-existing instance methods.
+     * Magic method catching otherwise fatal errors triggered by calls of non-existing instance methods.
      *
      * @param  string $method - name of the non-existing method
      * @param  array  $args   - arguments passed to the method call
@@ -39,7 +39,7 @@ trait ObjectTrait {
 
 
     /**
-     * Magic method catching other-wise fatal errors triggered by calls of non-existing static methods.
+     * Magic method catching otherwise fatal errors triggered by calls of non-existing static methods.
      *
      * @param  string $method - name of the non-existing method
      * @param  array  $args   - arguments passed to the method call
