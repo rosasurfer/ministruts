@@ -1,9 +1,9 @@
 <?php
 namespace rosasurfer\db\mysql;
 
+use rosasurfer\core\assert\Assert;
 use rosasurfer\db\Connector;
 use rosasurfer\db\DatabaseException;
-use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\exception\RuntimeException;
@@ -103,8 +103,8 @@ class MySQLConnector extends Connector {
      * @return $this
      */
     protected function setHost($hostname) {
-        if (!is_string($hostname)) throw new IllegalTypeException('Illegal type of parameter $hostname: '.gettype($hostname));
-        if (!strlen($hostname))    throw new InvalidArgumentException('Invalid parameter $hostname: "'.$hostname.'" (empty)');
+        Assert::string($hostname);
+        if (!strlen($hostname)) throw new InvalidArgumentException('Invalid parameter $hostname: "'.$hostname.'" (empty)');
 
         $host = $hostname;
         $port = null;
@@ -134,8 +134,8 @@ class MySQLConnector extends Connector {
      * @return $this
      */
     protected function setUsername($name) {
-        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
-        if (!strlen($name))    throw new InvalidArgumentException('Invalid parameter $name: "'.$name.'" (empty)');
+        Assert::string($name);
+        if (!strlen($name)) throw new InvalidArgumentException('Invalid parameter $name: "'.$name.'" (empty)');
 
         $this->username = $name;
         return $this;
@@ -151,7 +151,7 @@ class MySQLConnector extends Connector {
      */
     protected function setPassword($password) {
         if (!isset($password)) $password = '';
-        else if (!is_string($password)) throw new IllegalTypeException('Illegal type of parameter $password: '.gettype($password));
+        else Assert::string($password);
 
         $this->password = $password;
         return $this;
@@ -166,7 +166,7 @@ class MySQLConnector extends Connector {
      * @return $this
      */
     protected function setDatabase($name) {
-        if (isset($name) && !is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
+        Assert::nullOrString($name);
         if (!strlen($name))
             $name = null;
 
@@ -308,7 +308,7 @@ class MySQLConnector extends Connector {
      * {@inheritdoc}
      */
     public function escapeIdentifier($name) {
-        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
+        Assert::string($name);
 
         if (strContains($name, '.')) {
             $names = explode('.', $name);
@@ -329,8 +329,7 @@ class MySQLConnector extends Connector {
     public function escapeLiteral($value) {
         // bug or feature: mysql_real_escape_string(null) => empty string instead of NULL
         if ($value === null)  return 'null';
-
-        if (!is_scalar($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.gettype($value));
+        Assert::scalar($value);
 
         if (is_bool ($value)) return (string)(int) $value;
         if (is_int  ($value)) return (string)      $value;
@@ -348,7 +347,7 @@ class MySQLConnector extends Connector {
         // bug or or feature: mysql_real_escape_string(null) => empty string instead of NULL
         if ($value === null)
             return null;
-        if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.gettype($value));
+        Assert::string($value);
 
         if (!$this->isConnected())
             $this->connect();
@@ -406,7 +405,7 @@ class MySQLConnector extends Connector {
      * @throws DatabaseException on errors
      */
     public function executeRaw($sql) {
-        if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.gettype($sql));
+        Assert::string($sql);
         if (!$this->isConnected())
             $this->connect();
 

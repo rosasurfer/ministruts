@@ -3,7 +3,7 @@ namespace rosasurfer\console;
 
 use rosasurfer\console\docopt\DocoptResult;
 use rosasurfer\core\Object;
-use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\core\assert\Assert;
 
 
 /**
@@ -44,7 +44,7 @@ class Input extends Object {
      * @return bool
      */
     public function isArgument($name) {
-        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
+        Assert::string($name);
 
         if (!($len=strlen($name)) || !isset($this->docoptResult[$name]))
             return false;
@@ -98,7 +98,7 @@ class Input extends Object {
      * @return bool
      */
     public function isOption($name) {
-        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
+        Assert::string($name);
 
         if (!strlen($name) || !isset($this->docoptResult[$name]) || $name[0]!='-' || $name=='-' || $name=='--')
             return false;

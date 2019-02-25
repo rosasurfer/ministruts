@@ -2,7 +2,7 @@
 namespace rosasurfer\net\mail;
 
 use rosasurfer\core\Object;
-use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\core\assert\Assert;
 use rosasurfer\exception\InvalidArgumentException;
 
 use function rosasurfer\strContains;
@@ -101,8 +101,7 @@ abstract class Mailer extends Object implements MailerInterface {
      * @return string[]|null - aray with name and address part or NULL if the specified address is invalid
      */
     public static function parseAddress($value) {
-        if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.gettype($value));
-
+        Assert::string($value);
         $value = trim($value);
 
         if (strEndsWith($value, '>')) {
@@ -137,7 +136,7 @@ abstract class Mailer extends Object implements MailerInterface {
      * @return string|null - value of the last found header or NULL if the header was not found
      */
     protected function getHeader(array $headers, $name) {
-        if (!is_string($name))                           throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
+        Assert::string($name, 'Illegal type of parameter $name: %s');
         if (!preg_match('/^[a-z]+(-[a-z]+)*$/i', $name)) throw new InvalidArgumentException('Invalid parameter $name: "'.$name.'"');
 
         // reversely iterate over the array to find the last of duplicate headers
@@ -160,7 +159,7 @@ abstract class Mailer extends Object implements MailerInterface {
      * @return string|null - value of the last removed header or NULL if the header was not found
      */
     protected function removeHeader(array &$headers, $name) {
-        if (!is_string($name))                           throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
+        Assert::string($name, 'Illegal type of parameter $name: %s');
         if (!preg_match('/^[a-z]+(-[a-z]+)*$/i', $name)) throw new InvalidArgumentException('Invalid parameter $name: "'.$name.'"');
 
         $result = null;

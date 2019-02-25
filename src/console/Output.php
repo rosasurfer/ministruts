@@ -2,7 +2,7 @@
 namespace rosasurfer\console;
 
 use rosasurfer\core\Object;
-use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\core\assert\Assert;
 
 use const rosasurfer\CLI;
 use const rosasurfer\NL;
@@ -20,7 +20,7 @@ class Output extends Object {
      * @param  string $message
      */
     public function out($message) {
-        if (!is_string($message)) throw new IllegalTypeException('Illegal type of parameter $message: '.gettype($message));
+        Assert::string($message);
 
         $len = strlen($message);
         if ($len && $message[$len-1]!=NL)
@@ -38,7 +38,7 @@ class Output extends Object {
      * @param  string $message
      */
     public function error($message) {
-        if (!is_string($message)) throw new IllegalTypeException('Illegal type of parameter $message: '.gettype($message));
+        Assert::string($message);
 
         $len = strlen($message);
         if ($len && $message[$len-1]!=NL)

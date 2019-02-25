@@ -2,7 +2,7 @@
 namespace rosasurfer\util;
 
 use rosasurfer\core\StaticClass;
-use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\core\assert\Assert;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\log\Logger;
 
@@ -25,9 +25,9 @@ class Date extends StaticClass {
      * @return int - Tage
      */
     public static function diffDays($start, $end) {
-        if (!is_string($start))                      throw new IllegalTypeException('Illegal type of parameter $start: '.gettype($start));
+        Assert::string($start, 'Illegal type of parameter $start: %s');
+        Assert::string($end,   'Illegal type of parameter $end: %s');
         if (Validator::isDateTime($start) === false) throw new InvalidArgumentException('Invalid argument $start: "'.$start.'"');
-        if (!is_string($end))                        throw new IllegalTypeException('Illegal type of parameter $end: '.gettype($end));
         if (Validator::isDateTime($end) === false)   throw new InvalidArgumentException('Invalid argument $end: "'.$end.'"');
 
         $ts1 = strtotime($start.' GMT'); // ohne Angabe einer Zeitzone wird die lokale DST einkalkuliert
@@ -51,9 +51,9 @@ class Date extends StaticClass {
      * @return array
      */
     public static function getDateRange($startDate, $days) {
-        if (!is_string($startDate))                      throw new IllegalTypeException('Illegal type of parameter $startDate: '.gettype($startDate));
+        Assert::string($startDate, 'Illegal type of parameter $startDate: %s');
+        Assert::int   ($days,      'Illegal type of parameter $days: %s');
         if (Validator::isDateTime($startDate) === false) throw new InvalidArgumentException('Invalid argument $startDate: "'.$startDate.'"');
-        if (!is_int($days))                              throw new IllegalTypeException('Illegal type of parameter $days: '.gettype($days));
         if ($days < 0)                                   throw new InvalidArgumentException('Invalid argument $days: '.$days);
 
         $range = array();
@@ -77,7 +77,7 @@ class Date extends StaticClass {
      */
     public static function addDays($date, $days) {
         if (Validator::isDateTime($date) === false) throw new InvalidArgumentException('Invalid argument $date: '.$date);
-        if (!is_int($days))                         throw new IllegalTypeException('Illegal type of parameter $days: '.gettype($days));
+        Assert::int($days, 'Illegal type of parameter $days: %s');
 
         $parts = explode('-', $date);
         $year  = (int) $parts[0];

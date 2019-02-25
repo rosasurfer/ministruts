@@ -4,8 +4,8 @@ namespace rosasurfer\log;
 use rosasurfer\Application;
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\StaticClass;
+use rosasurfer\core\assert\Assert;
 use rosasurfer\debug\DebugHelper;
-use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
 use rosasurfer\exception\error\PHPError;
@@ -204,7 +204,7 @@ class Logger extends StaticClass {
         self::$smsLogLevel = $logLevel;
 
         $options = $config->get('sms', []);
-        if (!is_array($options)) throw new IllegalTypeException('Invalid type of config value "sms": '.gettype($options).' (not array)');
+        Assert::isArray($options, 'Invalid type of config value "sms": %s');
         self::$smsOptions = $options;
 
         self::$smsHandler = self::$smsReceivers && self::$smsOptions;
@@ -225,7 +225,7 @@ class Logger extends StaticClass {
      * @return int|null - loglevel constant or NULL, if $value is not a valid loglevel description
      */
     public static function logLevelToId($value) {
-        if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.gettype($value));
+        Assert::string($value);
 
         switch (strtolower($value)) {
             case 'debug' : return L_DEBUG;
@@ -248,7 +248,7 @@ class Logger extends StaticClass {
      * @return int - configured loglevel or the application loglevel if no class specific loglevel is configured
      */
     public static function getLogLevel($class = '') {
-        if (!is_string($class)) throw new IllegalTypeException('Illegal type of parameter $class: '.gettype($class));
+        Assert::string($class);
         self::init();
 
         // read the configured class specific loglevels
@@ -262,7 +262,7 @@ class Logger extends StaticClass {
                 $logLevels = ['' => $logLevels];                            // only the general application loglevel is configured
 
             foreach ($logLevels as $className => $level) {
-                if (!is_string($level)) throw new IllegalTypeException('Illegal configuration value for "log.level.'.$className.'": '.gettype($level));
+                Assert::string($level, 'Illegal type of config value "log.level.'.$className.'": %s');
 
                 if ($level == '') {                                         // classes with empty values fall back to the application loglevel
                     unset($logLevels[$className]);
@@ -312,13 +312,12 @@ class Logger extends StaticClass {
 
             // validate parameters
             if (!is_string($loggable)) {
-                if (!is_object($loggable))                   throw new IllegalTypeException('Illegal type of parameter $loggable: '.gettype($loggable));
-                if (!method_exists($loggable, '__toString')) throw new IllegalTypeException('Illegal type of parameter $loggable: '.get_class($loggable).'::__toString() not found');
+                Assert::methodExists($loggable, '__toString', 'Illegal type of parameter $loggable: %s (object with method __toString() expected');
                 if (!$loggable instanceof \Exception)
                     $loggable = (string) $loggable;
             }
-            if (!is_int($level))                            throw new IllegalTypeException('Illegal type of parameter $level: '.gettype($level));
-            if (!isset(self::$logLevels[$level]))           throw new InvalidArgumentException('Invalid argument $level: '.$level.' (not a loglevel)');
+            Assert::int($level, 'Illegal type of parameter $level: %s');
+            if (!isset(self::$logLevels[$level])) throw new InvalidArgumentException('Invalid argument $level: '.$level.' (not a loglevel)');
 
             $filtered = false;
 

@@ -5,9 +5,9 @@ use rosasurfer\Application;
 use rosasurfer\console\docopt\DocoptParser;
 use rosasurfer\console\docopt\DocoptResult;
 use rosasurfer\core\Object;
+use rosasurfer\core\assert\Assert;
 use rosasurfer\di\Di;
 use rosasurfer\exception\IllegalStateException;
-use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
 
@@ -181,8 +181,8 @@ class Command extends Object {
      * @link   http://docopt.org
      */
     public function setDocoptDefinition($doc) {
-        if ($this->frozen)    throw new RuntimeException('Configuration of "'.get_class($this).'" is frozen');
-        if (!is_string($doc)) throw new IllegalTypeException('Illegal type of parameter $doc: '.gettype($doc));
+        if ($this->frozen) throw new RuntimeException('Configuration of "'.get_class($this).'" is frozen');
+        Assert::string($doc);
 
         $parser = new DocoptParser();
         $this->docoptResult = $parser->parse($doc);
@@ -253,7 +253,7 @@ class Command extends Object {
      * @return $this
      */
     private function validateName($name) {
-        if (!is_string($name))    throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
+        Assert::string($name);
         if ($name != trim($name)) throw new InvalidArgumentException('Invalid parameter $name: "'.$name.'" (enclosing white space)');
 
         if (strlen($name) && !preg_match('/^[^\s:]+(:[^\s:]+)*$/', $name))

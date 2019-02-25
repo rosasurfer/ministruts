@@ -2,7 +2,7 @@
 namespace rosasurfer\ministruts\url;
 
 use rosasurfer\core\Object;
-use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\core\assert\Assert;
 use rosasurfer\ministruts\Request;
 
 use const rosasurfer\CLI;
@@ -34,7 +34,7 @@ class Url extends Object {
      *                       slash it is interpreted as relative to the application's current Module.
      */
     public function __construct($uri) {
-        if (!is_string($uri)) throw new IllegalTypeException('Illegal type of parameter $uri: '.gettype($uri));
+        Assert::string($uri);
         $this->uri = $uri;
 
         // TODO: If called from a non-MiniStruts context (i.e. CLI) this method will fail.

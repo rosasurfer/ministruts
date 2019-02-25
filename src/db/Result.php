@@ -2,8 +2,8 @@
 namespace rosasurfer\db;
 
 use rosasurfer\core\Object;
+use rosasurfer\core\assert\Assert;
 use rosasurfer\debug\ErrorHandler;
-use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\UnimplementedFeatureException;
 
@@ -46,8 +46,8 @@ abstract class Result extends Object implements ResultInterface {
      * {@inheritdoc}
      */
     public function fetchColumn($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
-        if (!isset($column)) throw new IllegalTypeException('Illegal type of parameter $column: '.gettype($column));
-        if (isset($row))     throw new UnimplementedFeatureException('$row='.$row.' (!= NULL)');
+        Assert::intOrString($column, 'Illegal type of parameter $column: %s');
+        if (isset($row)) throw new UnimplementedFeatureException('$row='.$row.' (!= NULL)');
 
         // Generic default implementation:
         // A connector-specific implementation will be faster and more efficient.
@@ -60,8 +60,7 @@ abstract class Result extends Object implements ResultInterface {
         }
 
         if (!\key_exists($column, $row)) {
-            if (is_int($column))     throw new InvalidArgumentException('Invalid parameter $column: '.$column.' (no such column)');
-            if (!is_string($column)) throw new IllegalTypeException('Illegal type of parameter $column: '.gettype($column));
+            if (is_int($column)) throw new InvalidArgumentException('Invalid parameter $column: '.$column.' (no such column)');
 
             $row    = \array_change_key_case($row, CASE_LOWER);
             $column = strtolower($column);

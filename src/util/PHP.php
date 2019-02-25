@@ -3,8 +3,8 @@ namespace rosasurfer\util;
 
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\StaticClass;
+use rosasurfer\core\assert\Assert;
 use rosasurfer\debug\DebugHelper;
-use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RuntimeException;
 
 use function rosasurfer\echoPre;
@@ -66,7 +66,7 @@ class PHP extends StaticClass {
      * @return string - contents of STDOUT
      */
     public static function execProcess($cmd, &$stderr=null, &$exitCode=null, $dir=null, $env=null, array $options=[]) {
-        if (!is_string($cmd)) throw new IllegalTypeException('Illegal type of parameter $cmd: '.gettype($cmd));
+        Assert::string($cmd, 'Illegal type of parameter $cmd: %s');
 
         // check whether the process needs to be watched asynchronously
         $argc         = func_num_args();

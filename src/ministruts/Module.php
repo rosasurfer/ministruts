@@ -3,8 +3,8 @@ namespace rosasurfer\ministruts;
 
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\Object;
+use rosasurfer\core\assert\Assert;
 use rosasurfer\exception\IllegalStateException;
-use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\net\http\HttpResponse;
 
 use function rosasurfer\is_class;
@@ -97,8 +97,8 @@ class Module extends Object {
      * @todo   Module-Encoding entsprechend dem Config-Datei-Encoding implementieren
      */
     public function __construct($fileName, $prefix) {
-        if (!is_string($fileName)) throw new IllegalTypeException('Illegal type of parameter $fileName: '.gettype($fileName));
-        if (!is_string($prefix))   throw new IllegalTypeException('Illegal type of parameter $prefix: '.gettype($prefix));
+        Assert::string($fileName, 'Illegal type of parameter $fileName: %s');
+        Assert::string($prefix,   'Illegal type of parameter $prefix: %s');
 
         $xml = $this->loadConfiguration($fileName);
 

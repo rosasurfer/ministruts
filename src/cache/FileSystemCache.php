@@ -2,7 +2,7 @@
 namespace rosasurfer\cache;
 
 use rosasurfer\config\ConfigInterface;
-use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\core\assert\Assert;
 use rosasurfer\exception\RuntimeException;
 use rosasurfer\exception\error\PHPError;
 use rosasurfer\file\FileSystem as FS;
@@ -177,8 +177,8 @@ final class FileSystemCache extends CachePeer {
      * @return bool - TRUE bei Erfolg, FALSE andererseits
      */
     public function set($key, &$value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null) {
-        if (!is_string($key))  throw new IllegalTypeException('Illegal type of parameter $key: '.gettype($key));
-        if (!is_int($expires)) throw new IllegalTypeException('Illegal type of parameter $expires: '.gettype($expires));
+        Assert::string($key,  'Illegal type of parameter $key: %s');
+        Assert::int($expires, 'Illegal type of parameter $expires: %s');
 
         // im Cache wird ein array(created, expires, value, dependency) gespeichert
         $created = time();

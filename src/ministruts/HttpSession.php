@@ -2,7 +2,7 @@
 namespace rosasurfer\ministruts;
 
 use rosasurfer\core\Singleton;
-use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\core\assert\Assert;
 use rosasurfer\exception\error\PHPError;
 
 
@@ -123,7 +123,7 @@ class HttpSession extends Singleton {
      * @param  bool $regenerateId - whether or not to generate a new session id and to delete an old session file
      */
     public function reset($regenerateId) {
-        if (!is_bool($regenerateId)) throw new IllegalTypeException('Illegal type of parameter $regenerateId: '.gettype($regenerateId));
+        Assert::bool($regenerateId);
 
         if ($regenerateId) {
             // assign new id, delete old file
@@ -200,7 +200,7 @@ class HttpSession extends Singleton {
      * @param  mixed  $value - der zu speichernde Wert
      */
     public function setAttribute($key, $value) {
-        if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.gettype($key));
+        Assert::string($key, 'Illegal type of parameter $key: %s');
 
         if ($value !== null) {
             $_SESSION[$key] = $value;
@@ -218,14 +218,14 @@ class HttpSession extends Singleton {
      */
     public function removeAttribute($key) {
         if (is_array($key)) {
-            foreach ($key as $k => $value) {
-                if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $key['.$k.']: '.gettype($value));
+            foreach ($key as $i => $value) {
+                Assert::string($value, 'Illegal type of parameter $key['.$i.']: %s');
                 unset($_SESSION[$value]);
             }
             return;
         }
 
-        if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.gettype($key));
+        Assert::string($key, 'Illegal type of parameter $key: %s');
         unset($_SESSION[$key]);
     }
 

@@ -2,7 +2,7 @@
 namespace rosasurfer\net\mail;
 
 use rosasurfer\config\ConfigInterface;
-use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\core\assert\Assert;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\util\PHP;
 
@@ -39,7 +39,7 @@ class PHPMailer extends Mailer {
 
         // first validate the additional headers
         foreach ($headers as $i => $header) {
-            if (!is_string($header))       throw new IllegalTypeException('Illegal type of parameter $headers['.$i.']: '.gettype($header));
+            Assert::string($header, 'Illegal type of parameter $headers['.$i.']: %s');
             if (!preg_match('/^[a-z]+(-[a-z]+)*:/i', $header))
                                            throw new InvalidArgumentException('Invalid parameter $headers['.$i.']: "'.$header.'"');
         }
@@ -53,7 +53,7 @@ class PHPMailer extends Mailer {
         }
 
         // Return-Path: (invisible sender)
-        if (!is_string($sender))           throw new IllegalTypeException('Illegal type of parameter $sender: '.gettype($sender));
+        Assert::string($sender, 'Illegal type of parameter $sender: %s');
         $returnPath = self::parseAddress($sender);
         if (!$returnPath)                  throw new InvalidArgumentException('Invalid parameter $sender: '.$sender);
         $value = $this->removeHeader($headers, 'Return-Path');
@@ -73,11 +73,11 @@ class PHPMailer extends Mailer {
         $from = $this->encodeNonAsciiChars($from);
 
         // RCPT: (receiving mailbox)
-        if (!is_string($receiver))         throw new IllegalTypeException('Illegal type of parameter $receiver: '.gettype($receiver));
+        Assert::string($receiver, 'Illegal type of parameter $receiver: %s');
         $rcpt = self::parseAddress($receiver);
         if (!$rcpt)                        throw new InvalidArgumentException('Invalid parameter $receiver: '.$receiver);
         $forced = $config->get('mail.forced-receiver', '');
-        if (!is_string($forced))           throw new IllegalTypeException('Illegal type of config value "mail.forced-receiver": '.gettype($forced).' (not string)');
+        Assert::string($forced, 'Illegal type of config value "mail.forced-receiver": %s');
         if (strlen($forced)) {
             $rcpt = self::parseAddress($forced);
             if (!$rcpt)                    throw new InvalidArgumentException('Invalid config value "mail.forced-receiver": '.$forced);
@@ -94,7 +94,7 @@ class PHPMailer extends Mailer {
         $to = $this->encodeNonAsciiChars($to);
 
         // Subject:
-        if (!is_string($subject))          throw new IllegalTypeException('Illegal type of parameter $subject: '.gettype($subject));
+        Assert::string($subject, 'Illegal type of parameter $subject: %s');
         $subject = $this->encodeNonAsciiChars(trim($subject));
 
         // encode remaining headers (must be ASCII chars only)
@@ -115,7 +115,7 @@ class PHPMailer extends Mailer {
             $headers[] = 'To: '.trim($to['name'].' <'.$to['address'].'>');  // on Windows only if $headers is missing one
 
         // mail body
-        if (!is_string($message))          throw new IllegalTypeException('Illegal type of parameter $message: '.gettype($message));
+        Assert::string($message, 'Illegal type of parameter $message: %s');
         $message = str_replace(chr(0), '?', $message);                      // replace NUL bytes which destroy the mail
         $message = normalizeEOL($message, EOL_WINDOWS);                     // multiple lines must be separated by CRLF
 

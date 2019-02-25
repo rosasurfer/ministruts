@@ -5,12 +5,12 @@ use rosasurfer\config\ConfigInterface;
 use rosasurfer\config\auto\DefaultConfig;
 use rosasurfer\console\Command;
 use rosasurfer\core\Object;
+use rosasurfer\core\assert\Assert;
 use rosasurfer\debug\ErrorHandler;
 use rosasurfer\di\Di;
 use rosasurfer\di\DiInterface;
 use rosasurfer\di\auto\DefaultCliDi;
 use rosasurfer\di\auto\DefaultDi;
-use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\log\Logger;
 use rosasurfer\ministruts\FrontController;
@@ -282,7 +282,7 @@ class Application extends Object {
      * @param  string          $rootDir - application root directory
      */
     protected function expandAppDirs(ConfigInterface $config, $rootDir) {
-        if (!is_string($rootDir))                          throw new IllegalTypeException('Illegal type of config option "app.dir.root": '.gettype($rootDir));
+        Assert::string($rootDir, 'Illegal type of parameter $rootDir: %s');
         if (!strlen($rootDir) || isRelativePath($rootDir)) throw new InvalidArgumentException('Invalid config option "app.dir.root": "'.$rootDir.'" (not an absolute path)');
 
         $rootDir = rtrim(str_replace('\\', '/', $rootDir), '/');

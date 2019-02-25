@@ -2,8 +2,8 @@
 namespace rosasurfer\lock;
 
 use rosasurfer\config\ConfigInterface;
+use rosasurfer\core\assert\Assert;
 use rosasurfer\debug\ErrorHandler;
-use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RuntimeException;
 
 
@@ -32,7 +32,7 @@ class Lock extends BaseLock {
      * @param  string $key - Schluessel, auf dem ein Lock gehalten werden soll
      */
     public function __construct($key) {
-        if (!is_string($key))               throw new IllegalTypeException('Illegal type of parameter $key: '.gettype($key));
+        Assert::string($key);
         if (isset(self::$lockedKeys[$key])) throw new RuntimeException('Dead-lock detected: already holding a lock for key "'.$key.'"');
 
         self::$lockedKeys[$key] = $this->key = $key;

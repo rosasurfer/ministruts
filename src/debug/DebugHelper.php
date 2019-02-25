@@ -2,7 +2,7 @@
 namespace rosasurfer\debug;
 
 use rosasurfer\core\StaticClass;
-use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\core\assert\Assert;
 use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\exception\error\PHPError;
 
@@ -245,7 +245,7 @@ class DebugHelper extends StaticClass {
      * @return string
      */
     public static function errorLevelToStr($level) {
-        if (!is_int($level)) throw new IllegalTypeException('Illegal type of parameter $level: '.gettype($level));
+        Assert::int($level);
 
         $levels = [
             E_ERROR             => 'E_ERROR',                   //     1
