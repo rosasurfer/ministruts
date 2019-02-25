@@ -77,13 +77,13 @@ class Application extends Object {
 
         /** @var DefaultConfig $config */
         $config = $this->initDefaultConfig($options);
-        $this->setConfig($config);
 
         /** @var DiInterface $di */
         $di = $this->initDefaultDi($config['app.dir.config']);
         $di->set('app', $this);
         $di->set('config', $config);
-        $this->setDi($di);
+
+        // TODO: Application options must be validated manually as services/config are not available until this point.
 
         // check "app.id"
         $appId = $config->get('app.id', null);
@@ -255,7 +255,8 @@ class Application extends Object {
      */
     protected function initDefaultConfig(array $options) {
         $configLocation = isset($options['app.dir.config']) ? $options['app.dir.config'] : getcwd();
-        $config = new DefaultConfig($configLocation);
+
+        $this->setConfig($config = new DefaultConfig($configLocation));
         unset($options['app.dir.config']);
 
         $rootDir = isset($options['app.dir.root']) ? $options['app.dir.root'] : getcwd();
@@ -319,7 +320,8 @@ class Application extends Object {
      * @return DiInterface
      */
     protected function initDefaultDi($serviceDir) {
-        return !CLI ? new DefaultDi($serviceDir) : new DefaultCliDi($serviceDir);
+        $this->setDi($di = !CLI ? new DefaultDi($serviceDir) : new DefaultCliDi($serviceDir));
+        return $di;
     }
 
 
