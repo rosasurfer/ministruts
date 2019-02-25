@@ -14,7 +14,7 @@ trait ObjectTrait {
 
 
     /**
-     * Magic method catching otherwise fatal errors triggered by calls of non-existing instance methods.
+     * Method catching otherwise fatal errors triggered by calls of non-existing instance methods.
      *
      * @param  string $method - name of the non-existing method
      * @param  array  $args   - arguments passed to the method call
@@ -39,7 +39,7 @@ trait ObjectTrait {
 
 
     /**
-     * Magic method catching otherwise fatal errors triggered by calls of non-existing static methods.
+     * Method catching otherwise fatal errors triggered by calls of non-existing static methods.
      *
      * @param  string $method - name of the non-existing method
      * @param  array  $args   - arguments passed to the method call
@@ -53,9 +53,8 @@ trait ObjectTrait {
 
 
     /**
-     * Magic method catching:
-     * - otherwise unnoticed write access to undefined properties
-     * - fatal errors caused by write access to inaccessible properties
+     * Method catching otherwise unnoticed write access to undefined properties.
+     * Method catching otherwise fatal errors caused by write access to inaccessible properties.
      *
      * @param  string $property - name of the undefined property
      * @param  mixed  $value    - passed property value
