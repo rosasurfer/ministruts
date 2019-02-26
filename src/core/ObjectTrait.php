@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\core;
 
-use rosasurfer\exception\RuntimeException;
+use rosasurfer\core\exception\RuntimeException;
 
 use function rosasurfer\simpleClassName;
 use function rosasurfer\strLeftTo;

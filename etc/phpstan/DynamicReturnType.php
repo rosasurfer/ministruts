@@ -10,7 +10,7 @@ use PHPStan\Type\Type;
 use PHPStan\Type\TypeWithClassName;
 
 use rosasurfer\core\Object;
-use rosasurfer\exception\RuntimeException;
+use rosasurfer\core\exception\RuntimeException;
 
 
 /**

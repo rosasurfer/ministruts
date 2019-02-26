@@ -5,7 +5,7 @@ use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\StaticClass;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\debug\DebugHelper;
-use rosasurfer\exception\RuntimeException;
+use rosasurfer\core\exception\RuntimeException;
 
 use function rosasurfer\echoPre;
 use function rosasurfer\ini_get_bool;

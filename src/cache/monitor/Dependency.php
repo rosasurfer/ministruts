@@ -3,7 +3,7 @@ namespace rosasurfer\cache\monitor;
 
 use rosasurfer\core\Object;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\exception\InvalidArgumentException;
+use rosasurfer\core\exception\InvalidArgumentException;
 
 
 /**

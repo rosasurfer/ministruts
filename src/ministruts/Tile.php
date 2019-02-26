@@ -3,7 +3,7 @@ namespace rosasurfer\ministruts;
 
 use rosasurfer\Application;
 use rosasurfer\core\Object;
-use rosasurfer\exception\IllegalStateException;
+use rosasurfer\core\exception\IllegalStateException;
 
 use function rosasurfer\strLeft;
 use function rosasurfer\strRightFrom;

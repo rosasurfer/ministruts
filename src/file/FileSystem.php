@@ -2,8 +2,8 @@
 namespace rosasurfer\file;
 
 use rosasurfer\core\StaticClass;
-use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
-use rosasurfer\exception\RuntimeException;
+use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
+use rosasurfer\core\exception\RuntimeException;
 
 
 /**

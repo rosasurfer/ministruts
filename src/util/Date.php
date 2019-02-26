@@ -3,7 +3,7 @@ namespace rosasurfer\util;
 
 use rosasurfer\core\StaticClass;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\exception\InvalidArgumentException;
+use rosasurfer\core\exception\InvalidArgumentException;
 use rosasurfer\log\Logger;
 
 use const rosasurfer\DAYS;

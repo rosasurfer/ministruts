@@ -2,7 +2,7 @@
 namespace rosasurfer\ministruts;
 
 use rosasurfer\core\Object;
-use rosasurfer\exception\RuntimeException;
+use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\net\http\HttpResponse;
 
 

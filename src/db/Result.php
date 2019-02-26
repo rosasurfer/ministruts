@@ -4,8 +4,8 @@ namespace rosasurfer\db;
 use rosasurfer\core\Object;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\debug\ErrorHandler;
-use rosasurfer\exception\InvalidArgumentException;
-use rosasurfer\exception\UnimplementedFeatureException;
+use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\UnimplementedFeatureException;
 
 use function rosasurfer\strIsNumeric;
 use function rosasurfer\strToBool;

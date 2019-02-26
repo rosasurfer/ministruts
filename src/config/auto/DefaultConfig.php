@@ -2,10 +2,10 @@
 namespace rosasurfer\config\auto;
 
 use rosasurfer\Application;
+use rosasurfer\cache\monitor\FileDependency;
 use rosasurfer\config\Config;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\exception\InvalidArgumentException;
-use rosasurfer\monitor\FileDependency;
+use rosasurfer\core\exception\InvalidArgumentException;
 
 use const rosasurfer\CLI;
 

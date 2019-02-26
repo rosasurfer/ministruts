@@ -4,7 +4,7 @@ namespace rosasurfer\net;
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\StaticClass;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\exception\InvalidArgumentException;
+use rosasurfer\core\exception\InvalidArgumentException;
 
 use function rosasurfer\strEndsWithI;
 use function rosasurfer\strStartsWith;

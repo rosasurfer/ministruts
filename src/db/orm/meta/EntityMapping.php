@@ -2,7 +2,7 @@
 namespace rosasurfer\db\orm\meta;
 
 use rosasurfer\core\Object;
-use rosasurfer\exception\RuntimeException;
+use rosasurfer\core\exception\RuntimeException;
 
 
 /**

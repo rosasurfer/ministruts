@@ -5,7 +5,7 @@ namespace rosasurfer\core\assert;
 /**
  * IllegalTypeException
  */
-class IllegalTypeException extends \rosasurfer\exception\IllegalTypeException {
+class IllegalTypeException extends \rosasurfer\core\exception\IllegalTypeException {
 
     use FailedAssertionTrait;
 }

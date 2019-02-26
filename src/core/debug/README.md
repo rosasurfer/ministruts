@@ -9,7 +9,7 @@ catchable by an installed error handler.
 To cover such exceptions with the framework's error handler the destructor which might throw an exception must be wrapped:
 
 ```php
-use rosasurfer\debug\ErrorHandler;
+use rosasurfer\core\debug\ErrorHandler;
 
 class Foo {
 

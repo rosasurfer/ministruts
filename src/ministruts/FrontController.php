@@ -5,9 +5,9 @@ use rosasurfer\cache\Cache;
 use rosasurfer\cache\monitor\FileDependency;
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\Singleton;
-use rosasurfer\exception\IllegalStateException;
-use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
-use rosasurfer\exception\RuntimeException;
+use rosasurfer\core\exception\IllegalStateException;
+use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
+use rosasurfer\core\exception\RuntimeException;
 
 use function rosasurfer\strLeftTo;
 use function rosasurfer\strStartsWith;

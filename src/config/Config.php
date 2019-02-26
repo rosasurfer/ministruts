@@ -5,8 +5,8 @@ use rosasurfer\cache\Cache;
 use rosasurfer\config\ConfigInterface as IConfig;
 use rosasurfer\core\Object;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\exception\InvalidArgumentException;
-use rosasurfer\exception\RuntimeException;
+use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\util\PHP;
 
 use function rosasurfer\isRelativePath;

@@ -3,8 +3,8 @@ namespace rosasurfer\lock;
 
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\debug\ErrorHandler;
-use rosasurfer\exception\RuntimeException;
-use rosasurfer\exception\error\PHPError;
+use rosasurfer\core\exception\RuntimeException;
+use rosasurfer\core\exception\error\PHPError;
 use rosasurfer\log\Logger;
 
 use function rosasurfer\strStartsWith;

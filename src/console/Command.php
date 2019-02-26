@@ -6,10 +6,10 @@ use rosasurfer\console\docopt\DocoptParser;
 use rosasurfer\console\docopt\DocoptResult;
 use rosasurfer\core\Object;
 use rosasurfer\core\assert\Assert;
+use rosasurfer\core\exception\IllegalStateException;
+use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\di\Di;
-use rosasurfer\exception\IllegalStateException;
-use rosasurfer\exception\InvalidArgumentException;
-use rosasurfer\exception\RuntimeException;
 
 
 /**

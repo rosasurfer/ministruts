@@ -2,7 +2,7 @@
 namespace rosasurfer\lock;
 
 use rosasurfer\core\Object;
-use rosasurfer\exception\IllegalStateException;
+use rosasurfer\core\exception\IllegalStateException;
 
 
 /**

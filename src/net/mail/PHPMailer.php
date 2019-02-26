@@ -3,7 +3,7 @@ namespace rosasurfer\net\mail;
 
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\exception\InvalidArgumentException;
+use rosasurfer\core\exception\InvalidArgumentException;
 use rosasurfer\util\PHP;
 
 use function rosasurfer\normalizeEOL;

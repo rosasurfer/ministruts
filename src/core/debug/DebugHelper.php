@@ -3,8 +3,8 @@ namespace rosasurfer\core\debug;
 
 use rosasurfer\core\StaticClass;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
-use rosasurfer\exception\error\PHPError;
+use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
+use rosasurfer\core\exception\error\PHPError;
 
 use function rosasurfer\normalizeEOL;
 use function rosasurfer\simpleClassName;

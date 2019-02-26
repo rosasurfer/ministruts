@@ -2,14 +2,15 @@
 namespace rosasurfer\db\orm;
 
 use rosasurfer\core\Singleton;
+use rosasurfer\core\exception\ClassNotFoundException;
+use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\db\ConnectorInterface as IConnector;
 use rosasurfer\db\MultipleRecordsException;
 use rosasurfer\db\NoSuchRecordException;
 use rosasurfer\db\ResultInterface as IResult;
 use rosasurfer\db\orm\meta\EntityMapping;
-use rosasurfer\exception\RuntimeException;
-use rosasurfer\exception\ClassNotFoundException;
-use rosasurfer\exception\InvalidArgumentException;
+
 use function rosasurfer\is_class;
 
 

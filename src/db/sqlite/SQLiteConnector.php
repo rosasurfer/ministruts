@@ -3,11 +3,11 @@ namespace rosasurfer\db\sqlite;
 
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\assert\Assert;
+use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
+use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\db\Connector;
 use rosasurfer\db\DatabaseException;
-use rosasurfer\exception\InvalidArgumentException;
-use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
-use rosasurfer\exception\RuntimeException;
 
 use function rosasurfer\isRelativePath;
 

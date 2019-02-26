@@ -2,8 +2,8 @@
 namespace rosasurfer\db\orm\meta;
 
 use rosasurfer\core\Object;
+use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\db\ConnectorInterface as IConnector;
-use rosasurfer\exception\RuntimeException;
 
 use function rosasurfer\is_class;
 

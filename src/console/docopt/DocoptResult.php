@@ -2,7 +2,7 @@
 namespace rosasurfer\console\docopt;
 
 use rosasurfer\core\Object;
-use rosasurfer\exception\IllegalAccessException;
+use rosasurfer\core\exception\IllegalAccessException;
 
 
 /**

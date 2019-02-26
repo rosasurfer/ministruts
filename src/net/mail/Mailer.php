@@ -3,7 +3,7 @@ namespace rosasurfer\net\mail;
 
 use rosasurfer\core\Object;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\exception\InvalidArgumentException;
+use rosasurfer\core\exception\InvalidArgumentException;
 
 use function rosasurfer\strContains;
 use function rosasurfer\strEndsWith;

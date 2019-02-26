@@ -3,9 +3,9 @@ namespace rosasurfer\ministruts;
 
 use rosasurfer\core\Singleton;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\exception\InvalidArgumentException;
-use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
-use rosasurfer\exception\RuntimeException;
+use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
+use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\net\http\HttpResponse;
 use rosasurfer\util\PHP;
 

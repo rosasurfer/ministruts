@@ -3,7 +3,7 @@ namespace rosasurfer\ministruts;
 
 use rosasurfer\core\Object;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\exception\IllegalStateException;
+use rosasurfer\core\exception\IllegalStateException;
 use rosasurfer\log\Logger;
 
 use function rosasurfer\strCompareI;

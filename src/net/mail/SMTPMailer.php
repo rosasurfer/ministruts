@@ -4,9 +4,9 @@ namespace rosasurfer\net\mail;
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\debug\ErrorHandler;
-use rosasurfer\exception\InfrastructureException;
-use rosasurfer\exception\InvalidArgumentException;
-use rosasurfer\exception\RuntimeException;
+use rosasurfer\core\exception\InfrastructureException;
+use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\RuntimeException;
 
 use function rosasurfer\normalizeEOL;
 

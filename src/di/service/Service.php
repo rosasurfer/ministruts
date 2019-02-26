@@ -1,8 +1,8 @@
 <?php
 namespace rosasurfer\di\service;
 
-use rosasurfer\exception\ClassNotFoundException;
-use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\core\exception\ClassNotFoundException;
+use rosasurfer\core\exception\IllegalTypeException;
 
 use function rosasurfer\is_class;
 

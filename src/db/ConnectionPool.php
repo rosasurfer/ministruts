@@ -4,11 +4,11 @@ namespace rosasurfer\db;
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\Singleton;
 use rosasurfer\core\assert\Assert;
+use rosasurfer\core\exception\IllegalStateException;
 use rosasurfer\db\ConnectorInterface as IConnector;
 use rosasurfer\db\mysql\MySQLConnector;
 use rosasurfer\db\pgsql\PostgresConnector;
 use rosasurfer\db\sqlite\SQLiteConnector;
-use rosasurfer\exception\IllegalStateException;
 
 
 /**

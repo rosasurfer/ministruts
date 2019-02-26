@@ -3,8 +3,8 @@ namespace rosasurfer\net\http;
 
 use rosasurfer\core\Object;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\exception\InvalidArgumentException;
-use rosasurfer\exception\IOException;
+use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\IOException;
 
 
 /**

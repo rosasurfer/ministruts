@@ -2,7 +2,7 @@
 namespace rosasurfer\net\http;
 
 use rosasurfer\core\debug\ErrorHandler;
-use rosasurfer\exception\IOException;
+use rosasurfer\core\exception\IOException;
 use rosasurfer\log\Logger;
 
 use const rosasurfer\L_INFO;
