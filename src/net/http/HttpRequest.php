@@ -38,18 +38,6 @@ class HttpRequest extends Object {
 
 
     /**
-     * Create a new instance.
-     *
-     * @return static
-     *
-     * @deprecated
-     */
-    public static function create() {
-        return new static();
-    }
-
-
-    /**
      * Return the request's HTTP method.
      *
      * @return string
