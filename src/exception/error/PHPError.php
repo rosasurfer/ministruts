@@ -2,9 +2,9 @@
 namespace rosasurfer\exception\error;
 
 use rosasurfer\core\ObjectTrait;
+use rosasurfer\core\debug\DebugHelper;
+use rosasurfer\core\debug\ErrorHandler;
 use rosasurfer\di\DiAwareTrait;
-use rosasurfer\debug\DebugHelper;
-use rosasurfer\debug\ErrorHandler;
 use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\exception\RosasurferExceptionTrait;
 

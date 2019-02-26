@@ -4,7 +4,7 @@ namespace rosasurfer\util;
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\StaticClass;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\debug\DebugHelper;
+use rosasurfer\core\debug\DebugHelper;
 use rosasurfer\exception\RuntimeException;
 
 use function rosasurfer\echoPre;

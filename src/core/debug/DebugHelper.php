@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\debug;
+namespace rosasurfer\core\debug;
 
 use rosasurfer\core\StaticClass;
 use rosasurfer\core\assert\Assert;

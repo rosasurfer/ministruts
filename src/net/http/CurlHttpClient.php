@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\net\http;
 
-use rosasurfer\debug\ErrorHandler;
+use rosasurfer\core\debug\ErrorHandler;
 use rosasurfer\exception\IOException;
 use rosasurfer\log\Logger;
 

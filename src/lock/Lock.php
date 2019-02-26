@@ -3,7 +3,7 @@ namespace rosasurfer\lock;
 
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\debug\ErrorHandler;
+use rosasurfer\core\debug\ErrorHandler;
 use rosasurfer\exception\RuntimeException;
 
 

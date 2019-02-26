@@ -2,8 +2,8 @@
 namespace rosasurfer\db;
 
 use rosasurfer\core\Object;
+use rosasurfer\core\debug\ErrorHandler;
 use rosasurfer\db\ConnectorInterface as IConnector;
-use rosasurfer\debug\ErrorHandler;
 use rosasurfer\exception\InvalidArgumentException;
 
 

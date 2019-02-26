@@ -3,7 +3,7 @@ namespace rosasurfer\db;
 
 use rosasurfer\core\Object;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\debug\ErrorHandler;
+use rosasurfer\core\debug\ErrorHandler;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\UnimplementedFeatureException;
 
