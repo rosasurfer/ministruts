@@ -1,8 +1,8 @@
 <?php
 namespace rosasurfer\lock;
 
+use rosasurfer\core\assert\Assert;
 use rosasurfer\debug\ErrorHandler;
-use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RuntimeException;
 use rosasurfer\exception\error\PHPError;
 use rosasurfer\log\Logger;
@@ -56,7 +56,7 @@ class SystemFiveLock extends BaseLock {
      *                          existiert
      */
     public function __construct($key) {
-        if (!is_string($key))                      throw new IllegalTypeException('Illegal type of parameter $key: '.gettype($key));
+        Assert::string($key);
         if (\key_exists($key, self::$hSemaphores)) throw new RuntimeException('Dead-lock detected: already holding a lock for key "'.$key.'"');
         self::$hSemaphores[$key] = null;
 

@@ -2,10 +2,10 @@
 namespace rosasurfer\di;
 
 use rosasurfer\core\Object;
+use rosasurfer\core\assert\Assert;
 use rosasurfer\di\service\Service;
 use rosasurfer\di\service\ServiceInterface as IService;
 use rosasurfer\di\service\ServiceNotFoundException;
-use rosasurfer\exception\IllegalTypeException;
 
 
 /**
@@ -56,7 +56,7 @@ class Di extends Object implements DiInterface {
      * @return bool - whether a custom service definitions has been found and successfully loaded
      */
     protected function loadCustomServices($configDir) {
-        if (!is_string($configDir)) throw new IllegalTypeException('Illegal type of parameter $configDir: '.gettype($configDir));
+        Assert::string($configDir);
         if (!is_file($file = $configDir.'/services.php'))
             return false;
 

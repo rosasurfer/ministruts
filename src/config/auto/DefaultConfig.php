@@ -3,7 +3,7 @@ namespace rosasurfer\config\auto;
 
 use rosasurfer\Application;
 use rosasurfer\config\Config;
-use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\core\assert\Assert;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\monitor\FileDependency;
 
@@ -42,7 +42,7 @@ class DefaultConfig extends Config {
      * @param  string $location - configuration file or directory
      */
     public function __construct($location) {
-        if (!is_string($location)) throw new IllegalTypeException('Illegal type of parameter $location: '.gettype($location));
+        Assert::string($location);
 
         // collect the applicable config files
         $configDir = $configFile = null;

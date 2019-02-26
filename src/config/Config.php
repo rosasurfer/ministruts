@@ -4,7 +4,7 @@ namespace rosasurfer\config;
 use rosasurfer\cache\Cache;
 use rosasurfer\config\ConfigInterface as IConfig;
 use rosasurfer\core\Object;
-use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\core\assert\Assert;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
 use rosasurfer\util\PHP;
@@ -72,8 +72,8 @@ class Config extends Object implements IConfig {
      * @param  string|string[] $files - a single or multiple configuration file names
      */
     public function __construct($files) {
-        if      (is_string($files)) $files = [$files];
-        else if (!is_array($files)) throw new IllegalTypeException('Illegal type of parameter $files: '.gettype($files));
+        if (is_string($files)) $files = [$files];
+        else Assert::isArray($files);
 
         ini_set('auto_detect_line_endings', 1);
         ini_set('track_errors', 1);
@@ -82,7 +82,7 @@ class Config extends Object implements IConfig {
 
         // check and load existing files
         foreach ($files as $i => $file) {
-            if (!is_string($file)) throw new IllegalTypeException('Illegal type of parameter $files['.$i.']: '.gettype($file));
+            Assert::string($file, 'Illegal type of parameter $files['.$i.']: %s');
 
             $isFile = is_file($file);
             if      ($isFile)               $file = realpath($file);
@@ -187,7 +187,7 @@ class Config extends Object implements IConfig {
      * @return mixed - config setting
      */
     public function get($key, $default = null) {
-        if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.gettype($key));
+        Assert::string($key, 'Illegal type of parameter $key: %s');
         // TODO: a numerically indexed property array will have integer keys
 
         $notFound = false;
@@ -222,18 +222,15 @@ class Config extends Object implements IConfig {
      * @throws RuntimeException if the setting does not exist and no default value was specified
      */
     public function getBool($key, $options = null) {
-        if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.gettype($key));
-
+        Assert::string($key, 'Illegal type of parameter $key: %s');
         $notFound = false;
         $value = $this->getProperty($key, $notFound);
 
         if ($notFound) {
             if (is_bool($options))
                 return $options;
-            if (is_array($options) && \key_exists('default', $options)) {
-                if (!is_bool($options['default'])) throw new IllegalTypeException('Illegal type of option "default": '.gettype($options['default']));
-                return $options['default'];
-            }
+            if (is_array($options) && \key_exists('default', $options))
+                return (bool) $options['default'];
             throw new RuntimeException('No configuration found for key "'.$key.'"');
         }
 
@@ -242,7 +239,7 @@ class Config extends Object implements IConfig {
             $flags = $options;
         }
         else if (is_array($options) && \key_exists('flags', $options)) {
-            if (!is_int($options['flags'])) throw new IllegalTypeException('Illegal type of option "flags": '.gettype($options['flags']));
+            Assert::int($options['flags'], 'Illegal type of option "flags": %s');
             $flags = $options['flags'];
         }
         if ($flags & FILTER_NULL_ON_FAILURE && ($value===null || $value===''))  // crap-PHP considers NULL and '' as valid strict booleans
@@ -260,7 +257,7 @@ class Config extends Object implements IConfig {
      * @return $this
      */
     public function set($key, $value) {
-        if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.gettype($key));
+        Assert::string($key, 'Illegal type of parameter $key: %s');
         $this->setProperty($key, $value);
         return $this;
     }
@@ -579,11 +576,9 @@ class Config extends Object implements IConfig {
      * @return bool
      */
     public function offsetExists($key) {
-        if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.gettype($key));
-
+        Assert::string($key);
         $notFound = false;
         $this->getProperty($key, $notFound);
-
         return !$notFound;
     }
 

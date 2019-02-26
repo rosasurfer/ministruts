@@ -2,7 +2,7 @@
 namespace rosasurfer\ministruts;
 
 use rosasurfer\core\Singleton;
-use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\core\assert\Assert;
 
 
 /**
@@ -91,7 +91,7 @@ class Page extends Singleton {
      * @param  mixed  $value - Wert
      */
     public function __set($name, $value) {
-        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
+        Assert::string($name, 'Illegal type of parameter $name: %s');
 
         if ($value !== null) {
             $this->properties[$name] = $value;

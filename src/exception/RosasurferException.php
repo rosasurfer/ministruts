@@ -8,7 +8,7 @@ use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 
 
 /**
- * Base exception for all "rosasurfer" exceptions
+ * Base exception for all "rosasurfer" exceptions.
  */
 class RosasurferException extends \Exception implements IRosasurferException {
 

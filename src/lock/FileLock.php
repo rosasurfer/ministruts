@@ -1,8 +1,8 @@
 <?php
 namespace rosasurfer\lock;
 
+use rosasurfer\core\assert\Assert;
 use rosasurfer\debug\ErrorHandler;
-use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RuntimeException;
 
 
@@ -29,8 +29,7 @@ final class FileLock extends BaseLock {
      * @param  string $filename
      */
     public function __construct($filename) {
-        if (!is_string($filename))                throw new IllegalTypeException('Illegal type of parameter $filename: '.gettype($filename));
-
+        Assert::string($filename);
         if (key_exists($filename, self::$hFiles)) throw new RuntimeException('Dead-lock: re-entry detected for lock file "'.$filename.'"');
         self::$hFiles[$filename] = null;                // pre-define the index and handle re-entry if the constructor crashes
 

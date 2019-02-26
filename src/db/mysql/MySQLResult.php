@@ -1,10 +1,10 @@
 <?php
 namespace rosasurfer\db\mysql;
 
+use rosasurfer\core\assert\Assert;
 use rosasurfer\db\ConnectorInterface as IConnector;
 use rosasurfer\db\NoMoreRecordsException;
 use rosasurfer\db\Result;
-use rosasurfer\exception\IllegalTypeException;
 
 use const rosasurfer\ARRAY_ASSOC;
 use const rosasurfer\ARRAY_BOTH;
@@ -47,10 +47,10 @@ class MySQLResult extends Result {
      * @param  int        $lastAffectedRows - last number of affected rows of the connection
      */
     public function __construct(IConnector $connector, $sql, $hResult, $lastInsertId, $lastAffectedRows) {
-        if (!is_string($sql))                          throw new IllegalTypeException('Illegal type of parameter $sql: '.gettype($sql));
-        if (!is_resource($hResult) && isset($hResult)) throw new IllegalTypeException('Illegal type of parameter $hResult: '.gettype($hResult));
-        if (!is_int($lastInsertId))                    throw new IllegalTypeException('Illegal type of parameter $lastInsertId: '.gettype($lastInsertId));
-        if (!is_int($lastAffectedRows))                throw new IllegalTypeException('Illegal type of parameter $lastAffectedRows: '.gettype($lastAffectedRows));
+        Assert::string($sql,             'Illegal type of parameter $sql: %s');
+        Assert::nullOrResource($hResult, 'Illegal type of parameter $hResult: %s');
+        Assert::int($lastInsertId,       'Illegal type of parameter $lastInsertId: %s');
+        Assert::int($lastAffectedRows,   'Illegal type of parameter $lastAffectedRows: %s');
 
         $this->connector        = $connector;
         $this->sql              = $sql;

@@ -1,9 +1,9 @@
 <?php
 namespace rosasurfer\db\pgsql;
 
+use rosasurfer\core\assert\Assert;
 use rosasurfer\db\Connector;
 use rosasurfer\db\DatabaseException;
-use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\exception\RuntimeException;
 
@@ -323,7 +323,7 @@ class PostgresConnector extends Connector {
      * {@inheritdoc}
      */
     public function escapeIdentifier($name) {
-        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
+        Assert::string($name);
 
         if (!$this->isConnected())
             $this->connect();
@@ -347,8 +347,7 @@ class PostgresConnector extends Connector {
     public function escapeLiteral($value) {
         // bug or feature: pg_escape_literal(null) => '' quoted empty string instead of 'null'
         if ($value === null)  return 'null';
-
-        if (!is_scalar($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.gettype($value));
+        Assert::scalar($value);
 
         if (is_bool ($value)) return $value ? 'true':'false';
         if (is_int  ($value)) return (string) $value;
@@ -370,7 +369,7 @@ class PostgresConnector extends Connector {
         // bug or feature: pg_escape_string(null) => empty string instead of NULL
         if ($value === null)
             return null;
-        if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.gettype($value));
+        Assert::string($value);
 
         if (!$this->isConnected())
             $this->connect();
@@ -441,7 +440,7 @@ class PostgresConnector extends Connector {
      * @throws DatabaseException on errors
      */
     public function executeRaw($sql) {
-        if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.gettype($sql));
+        Assert::string($sql);
         if (!$this->isConnected())
             $this->connect();
 

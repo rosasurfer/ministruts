@@ -2,7 +2,7 @@
 namespace rosasurfer\ministruts;
 
 use rosasurfer\core\Object;
-use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\core\assert\Assert;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\net\http\HttpResponse;
 
@@ -119,8 +119,8 @@ class ActionForward extends Object {
      * @return $this
      */
     public function setName($name) {
-        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
-        if (!strlen($name))    throw new InvalidArgumentException('Invalid argument $name: '.$name);
+        Assert::string($name);
+        if (!strlen($name)) throw new InvalidArgumentException('Invalid argument $name: '.$name);
 
         $this->name = $name;
         return $this;
@@ -135,8 +135,8 @@ class ActionForward extends Object {
      * @return $this
      */
     public function setPath($path) {
-        if (!is_string($path)) throw new IllegalTypeException('Illegal type of parameter $path: '.gettype($path));
-        if (!strlen($path))    throw new InvalidArgumentException('Invalid argument $path: '.$path);
+        Assert::string($path);
+        if (!strlen($path)) throw new InvalidArgumentException('Invalid argument $path: '.$path);
 
         $this->path = $path;
         return $this;
@@ -151,8 +151,8 @@ class ActionForward extends Object {
      * @return $this
      */
     public function setLabel($label) {
-        if (!is_string($label)) throw new IllegalTypeException('Illegal type of parameter $label: '.gettype($label));
-        if (!strlen($label))    throw new InvalidArgumentException('Invalid argument $label: '.$label);
+        Assert::string($label);
+        if (!strlen($label)) throw new InvalidArgumentException('Invalid argument $label: '.$label);
 
         $this->label = $label;
         return $this;
@@ -167,8 +167,7 @@ class ActionForward extends Object {
      * @return $this
      */
     public function setRedirect($redirect) {
-        if (!is_bool($redirect)) throw new IllegalTypeException('Illegal type of parameter $redirect: '.gettype($redirect));
-
+        Assert::bool($redirect);
         $this->redirect = $redirect;
         return $this;
     }
@@ -182,8 +181,7 @@ class ActionForward extends Object {
      * @return $this
      */
     public function setRedirectType($type) {
-        if (!is_int($type)) throw new IllegalTypeException('Illegal type of parameter $type: '.gettype($type));
-
+        Assert::int($type);
         $this->redirectType = $type;
         return $this;
     }
@@ -199,11 +197,11 @@ class ActionForward extends Object {
      */
     public function addQueryData($key, $value) {
         // TODO: freeze the instance after configuration and automatically call copy()
+        Assert::string($key, 'Illegal type of parameter $key: %s');
+        Assert::nullOrScalar($value, 'Illegal type of parameter $value: %s');
 
-        if (!is_string($key))       throw new IllegalTypeException('Illegal type of parameter $key: '.gettype($key));
-        if (!isset($value))         $value = '';
-        elseif (is_bool($value))    $value = (int) $value;
-        elseif (!is_scalar($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.gettype($value));
+        if     (!isset($value))  $value = '';
+        elseif (is_bool($value)) $value = (int) $value;
 
         $value = (string) $value;
 
@@ -227,12 +225,12 @@ class ActionForward extends Object {
         // TODO: freeze the instance after configuration and automatically call copy()
 
         if (isset($value)) {
-            if (!is_scalar($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.gettype($value));
+            Assert::scalar($value);
             if (is_bool($value))
                 $value = (int) $value;
         }
         $value = (string) $value;
-        $path = $this->getPath();
+        $path  = $this->getPath();
         $this->setPath(strLeftTo($path, '#', $count=1, $includeLimiter=false, $onNotFound=$path).'#'.$value);
 
         return $this;

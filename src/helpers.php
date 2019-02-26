@@ -6,8 +6,8 @@ namespace rosasurfer;
 
 use rosasurfer\console\docopt\DocoptParser;
 use rosasurfer\console\docopt\DocoptResult;
+use rosasurfer\core\assert\Assert;
 use rosasurfer\exception\IllegalArgumentException;
-use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\IOException;
 use rosasurfer\exception\RuntimeException;
@@ -222,9 +222,8 @@ function last($values) {
     if ($values instanceof \Traversable) {
         $values = iterator_to_array($values, $useKeys=false);
     }
-    else if (!is_array($values)) {
-        throw new IllegalTypeException('Illegal type of parameter $values: '.gettype($values));
-    }
+    else Assert::isArray($values);
+
     return $values ? end($values) : null;
 }
 
@@ -240,9 +239,8 @@ function lastKey($values) {
     if ($values instanceof \Traversable) {
         $values = iterator_to_array($values);
     }
-    else if (!is_array($values)) {
-        throw new IllegalTypeException('Illegal type of parameter $values: '.gettype($values));
-    }
+    else Assert::isArray($values);
+
     if (!$values)
         return null;
     end($values);
@@ -351,11 +349,9 @@ function echoPre($var, $flushBuffers = true) {
  * @param  string $message
  */
 function stdout($message) {
-    if (!is_string($message)) throw new IllegalTypeException('Illegal type of parameter $message: '.gettype($message));
-
+    Assert::string($message);
     if (!strEndsWith($message, NL))
         $message .= NL;
-
     $hStream = CLI ? \STDOUT : fopen('php://stdout', 'a');
     fwrite($hStream, $message);
     if (!CLI) fclose($hStream);
@@ -368,11 +364,9 @@ function stdout($message) {
  * @param  string $message
  */
 function stderr($message) {
-    if (!is_string($message)) throw new IllegalTypeException('Illegal type of parameter $message: '.gettype($message));
-
+    Assert::string($message);
     if (!strEndsWith($message, NL))
         $message .= NL;
-
     $hStream = CLI ? \STDERR : fopen('php://stderr', 'a');
     fwrite($hStream, $message);
     if (!CLI) fclose($hStream);
@@ -492,12 +486,13 @@ function prettyBytes($value, $decimals = 1) {
             if (!strIsNumeric($value)) throw new InvalidArgumentException('Invalid parameter $value: "'.$value.'" (non-numeric)');
             $value = (float) $value;
         }
-        else if (!is_float($value))    throw new IllegalTypeException('Illegal type of parameter $value: '.gettype($value));
+        else Assert::float($value, 'Illegal type of parameter $value: %s');
+
         if ($value < PHP_INT_MIN)      throw new IllegalArgumentException('Illegal parameter $value: '.$value.' (out of range)');
         if ($value > PHP_INT_MAX)      throw new IllegalArgumentException('Illegal parameter $value: '.$value.' (out of range)');
         $value = (int) round($value);
     }
-    if (!is_int($decimals))            throw new IllegalTypeException('Illegal type of parameter $decimals: '.gettype($decimals));
+    Assert::int($decimals, 'Illegal type of parameter $decimals: %s');
 
     if ($value < 1024)
         return (string) $value;
@@ -521,9 +516,9 @@ function prettyBytes($value, $decimals = 1) {
  * @return int - converted byte value
  */
 function php_byte_value($value) {
-    if (is_int($value))     return $value;
-    if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.gettype($value));
-    if (!strlen($value))    return 0;
+    if (is_int($value)) return $value;
+    Assert::string($value);
+    if (!strlen($value)) return 0;
 
     if (!preg_match('/^([+-]?[0-9]+)([KMG]?)$/i', $value, $match)) {
         throw new InvalidArgumentException('Invalid argument $value: "'.$value.'" (not a PHP byte value)');
@@ -701,14 +696,13 @@ function isLittleEndian() {
  * @return bool
  */
 function isRelativePath($path) {
-    if (!is_string($path)) throw new IllegalTypeException('Illegal type of parameter $path: '.gettype($path));
+    Assert::string($path);
 
     if (WINDOWS)
         return !preg_match('/^[a-z]:/i', $path);
 
     if (strlen($path) && $path[0]=='/')
         return false;
-
     return true;                // an empty string cannot be considered absolute, so it's assumed to be a relative
 }
 
@@ -723,8 +717,8 @@ function isRelativePath($path) {
  * @return bool
  */
 function strCompare($stringA, $stringB, $ignoreCase = false) {
-    if ($stringA!==null && !is_string($stringA)) throw new IllegalTypeException('Illegal type of parameter $stringA: '.gettype($stringA));
-    if ($stringB!==null && !is_string($stringB)) throw new IllegalTypeException('Illegal type of parameter $stringB: '.gettype($stringB));
+    Assert::nullOrString($stringA, 'Illegal type of parameter $stringA: %s');
+    Assert::nullOrString($stringB, 'Illegal type of parameter $stringB: %s');
 
     if ($ignoreCase) {
         if ($stringA===null || $stringB===null)
@@ -758,8 +752,8 @@ function strCompareI($stringA, $stringB) {
  * @return bool
  */
 function strContains($haystack, $needle, $ignoreCase = false) {
-    if ($haystack!==null && !is_string($haystack)) throw new IllegalTypeException('Illegal type of parameter $haystack: '.gettype($haystack));
-    if (!is_string($needle))                       throw new IllegalTypeException('Illegal type of parameter $needle: '.gettype($needle));
+    Assert::nullOrString($haystack, 'Illegal type of parameter $haystack: %s');
+    Assert::string($needle, 'Illegal type of parameter $needle: %s');
 
     $haystackLen = strlen($haystack);
     $needleLen   = strlen($needle);
@@ -804,8 +798,8 @@ function strStartsWith($string, $prefix, $ignoreCase = false) {
         return false;
     }
 
-    if ($string!==null && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.gettype($string));
-    if (!is_string($prefix))                   throw new IllegalTypeException('Illegal type of parameter $prefix: '.$prefix.' ('.gettype($prefix).')');
+    Assert::nullOrString($string, 'Illegal type of parameter $string: %s');
+    Assert::string($prefix, 'Illegal type of parameter $prefix: %s');
 
     $stringLen = strlen($string);
     $prefixLen = strlen($prefix);
@@ -850,8 +844,8 @@ function strEndsWith($string, $suffix, $ignoreCase = false) {
         }
         return false;
     }
-    if ($string!==null && !is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.gettype($string));
-    if (!is_string($suffix))                   throw new IllegalTypeException('Illegal type of parameter $suffix: '.$suffix.' ('.gettype($suffix).')');
+    Assert::nullOrString($string, 'Illegal type of parameter $string: %s');
+    Assert::string      ($suffix, 'Illegal type of parameter $suffix: %s');
 
     $stringLen = strlen($string);
     $suffixLen = strlen($suffix);
@@ -895,9 +889,9 @@ function strEndsWithI($string, $suffix) {
  * </pre>
  */
 function strLeft($string, $length) {
-    if (!isset($string))     return '';
-    if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.gettype($string));
-    if (!is_int($length))    throw new IllegalTypeException('Illegal type of parameter $length: '.gettype($length));
+    if (!isset($string)) return '';
+    Assert::string($string, 'Illegal type of parameter $string: %s');
+    Assert::int   ($length, 'Illegal type of parameter $length: %s');
 
     return substr($string, 0, $length);
 }
@@ -931,11 +925,11 @@ function strLeft($string, $length) {
  * </pre>
  */
 function strLeftTo($string, $limiter, $count=1, $includeLimiter=false, $onNotFound=null) {
-    if (!is_string($string))       throw new IllegalTypeException('Illegal type of parameter $string: '.gettype($string));
-    if (!is_string($limiter))      throw new IllegalTypeException('Illegal type of parameter $limiter: '.gettype($limiter));
-    if (!strlen($limiter))         throw new IllegalArgumentException('Illegal limiting substring: "" (empty)');
-    if (!is_int($count))           throw new IllegalTypeException('Illegal type of parameter $count: '.gettype($count));
-    if (!is_bool($includeLimiter)) throw new IllegalTypeException('Illegal type of parameter $includeLimiter: '.gettype($includeLimiter));
+    Assert::string($string,         'Illegal type of parameter $string: %s');
+    Assert::string($limiter,        'Illegal type of parameter $limiter: %s');
+    Assert::int   ($count,          'Illegal type of parameter $count: %s');
+    Assert::bool  ($includeLimiter, 'Illegal type of parameter $includeLimiter: %s');
+    if (!strlen($limiter)) throw new IllegalArgumentException('Illegal limiting substring: "" (empty)');
 
     if ($count > 0) {
         $pos = -1;
@@ -991,9 +985,9 @@ function strLeftTo($string, $limiter, $count=1, $includeLimiter=false, $onNotFou
  * </pre>
  */
 function strRight($string, $length) {
-    if (!isset($string))     return '';
-    if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.gettype($string));
-    if (!is_int($length))    throw new IllegalTypeException('Illegal type of parameter $length: '.gettype($length));
+    if (!isset($string)) return '';
+    Assert::string($string, 'Illegal type of parameter $string: %s');
+    Assert::int   ($length, 'Illegal type of parameter $length: %s');
 
     if ($length == 0)
         return '';
@@ -1030,11 +1024,11 @@ function strRight($string, $length) {
  * </pre>
  */
 function strRightFrom($string, $limiter, $count=1, $includeLimiter=false, $onNotFound=null) {
-    if (!is_string($string))       throw new IllegalTypeException('Illegal type of parameter $string: '.gettype($string));
-    if (!is_string($limiter))      throw new IllegalTypeException('Illegal type of parameter $limiter: '.gettype($limiter));
-    if (!strlen($limiter))         throw new IllegalArgumentException('Illegal limiting substring: "" (empty)');
-    if (!is_int($count))           throw new IllegalTypeException('Illegal type of parameter $count: '.gettype($count));
-    if (!is_bool($includeLimiter)) throw new IllegalTypeException('Illegal type of parameter $includeLimiter: '.gettype($includeLimiter));
+    Assert::string($string,         'Illegal type of parameter $string: %s');
+    Assert::string($limiter,        'Illegal type of parameter $limiter: %s');
+    Assert::int   ($count,          'Illegal type of parameter $count: %s');
+    Assert::bool  ($includeLimiter, 'Illegal type of parameter $includeLimiter: %s');
+    if (!strlen($limiter)) throw new IllegalArgumentException('Illegal limiting substring: "" (empty)');
 
     if ($count > 0) {
         $pos = -1;
@@ -1200,7 +1194,7 @@ function strToBool($value) {
  * @return string
  */
 function strCollapseWhiteSpace($string, $joinLines=true, $separator=' ') {
-    if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.gettype($string));
+    Assert::string($string, 'Illegal type of parameter $string: %s');
 
     $string = normalizeEOL($string);
     if ($joinLines) {
@@ -1224,9 +1218,8 @@ function strCollapseWhiteSpace($string, $joinLines=true, $separator=' ') {
  * @return string
  */
 function normalizeEOL($string, $mode = EOL_UNIX) {
-    if (!is_string($string)) throw new IllegalTypeException('Illegal type of parameter $string: '.gettype($string));
-    if (!is_string($mode))   throw new IllegalTypeException('Illegal type of parameter $mode: '.gettype($mode));
-
+    Assert::string($string, 'Illegal type of parameter $string: %s');
+    Assert::string($mode,   'Illegal type of parameter $mode: %s');
     $done = false;
 
     if (strContains($string, EOL_NETSCAPE)) {
@@ -1260,8 +1253,8 @@ function normalizeEOL($string, $mode = EOL_UNIX) {
  * @return array
  */
 function objectToArray($object, $access = ACCESS_PUBLIC) {
-    if (!is_object($object)) throw new IllegalTypeException('Illegal type of parameter $object: '.gettype($object));
-    if (!is_int($access))    throw new IllegalTypeException('Illegal type of parameter $access: '.gettype($access));
+    Assert::object($object, 'Illegal type of parameter $object: %s');
+    Assert::int   ($access, 'Illegal type of parameter $access: %s');
 
     $source = (array)$object;
     $result = [];
@@ -1311,8 +1304,8 @@ function typeOf($var) {
  * @deprecated
  */
 function mkDirWritable($path, $mode = 0775) {
-    if (!is_string($path))                            throw new IllegalTypeException('Illegal type of parameter $path: '.gettype($path));
-    if ($mode!==null && !is_int($mode))               throw new IllegalTypeException('Illegal type of parameter $mode: '.gettype($mode));
+    Assert::string   ($path, 'Illegal type of parameter $path: %s');
+    Assert::nullOrInt($mode, 'Illegal type of parameter $mode: %s');
 
     clearstatcache($clearRealPathCache=true, $path);
 
@@ -1461,8 +1454,8 @@ function simpleClassName($className) {
  * @return string metatype
  */
 function metatypeOf($name) {
-    if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
-    if ($name == '')       throw new InvalidArgumentException('Invalid argument $name: ""');
+    Assert::string($name);
+    if ($name == '') throw new InvalidArgumentException('Invalid argument $name: ""');
 
     if (is_class    ($name)) return 'class';
     if (is_interface($name)) return 'interface';
@@ -1612,7 +1605,7 @@ function ksort_r(array $values, $sort_flags = SORT_REGULAR) {
  * @return string
  */
 function pluralize($count, $singular='', $plural='s') {
-    if (!is_int($count)) throw new IllegalTypeException('Illegal type of parameter $count: '.gettype($count));
+    Assert::int($count, 'Illegal type of parameter $count: %s');
     if (abs($count) == 1)
         return $singular;
     return $plural;

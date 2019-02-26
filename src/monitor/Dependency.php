@@ -2,7 +2,7 @@
 namespace rosasurfer\monitor;
 
 use rosasurfer\core\Object;
-use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\core\assert\Assert;
 use rosasurfer\exception\InvalidArgumentException;
 
 
@@ -101,11 +101,10 @@ abstract class Dependency extends Object {
      * @return Dependency
      */
     public function setMinValidity($time) {
-        if (!is_int($time)) throw new IllegalTypeException('Illegal type of parameter $time: '.gettype($time));
-        if ($time < 0)      throw new InvalidArgumentException('Invalid argument $time: '.$time);
+        Assert::int($time);
+        if ($time < 0) throw new InvalidArgumentException('Invalid argument $time: '.$time);
 
         $this->minValidity = $time;
-
         return $this;
     }
 }

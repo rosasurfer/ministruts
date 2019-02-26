@@ -5,12 +5,12 @@ use rosasurfer\config\ConfigInterface;
 use rosasurfer\config\auto\DefaultConfig;
 use rosasurfer\console\Command;
 use rosasurfer\core\Object;
+use rosasurfer\core\assert\Assert;
 use rosasurfer\debug\ErrorHandler;
 use rosasurfer\di\Di;
 use rosasurfer\di\DiInterface;
 use rosasurfer\di\auto\DefaultCliDi;
 use rosasurfer\di\auto\DefaultDi;
-use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\log\Logger;
 use rosasurfer\ministruts\FrontController;
@@ -77,13 +77,13 @@ class Application extends Object {
 
         /** @var DefaultConfig $config */
         $config = $this->initDefaultConfig($options);
-        $this->setConfig($config);
 
         /** @var DiInterface $di */
         $di = $this->initDefaultDi($config['app.dir.config']);
         $di->set('app', $this);
         $di->set('config', $config);
-        $this->setDi($di);
+
+        // TODO: Application options must be validated manually as services/config are not available until this point.
 
         // check "app.id"
         $appId = $config->get('app.id', null);
@@ -255,7 +255,8 @@ class Application extends Object {
      */
     protected function initDefaultConfig(array $options) {
         $configLocation = isset($options['app.dir.config']) ? $options['app.dir.config'] : getcwd();
-        $config = new DefaultConfig($configLocation);
+
+        $this->setConfig($config = new DefaultConfig($configLocation));
         unset($options['app.dir.config']);
 
         $rootDir = isset($options['app.dir.root']) ? $options['app.dir.root'] : getcwd();
@@ -281,7 +282,7 @@ class Application extends Object {
      * @param  string          $rootDir - application root directory
      */
     protected function expandAppDirs(ConfigInterface $config, $rootDir) {
-        if (!is_string($rootDir))                          throw new IllegalTypeException('Illegal type of config option "app.dir.root": '.gettype($rootDir));
+        Assert::string($rootDir, 'Illegal type of parameter $rootDir: %s');
         if (!strlen($rootDir) || isRelativePath($rootDir)) throw new InvalidArgumentException('Invalid config option "app.dir.root": "'.$rootDir.'" (not an absolute path)');
 
         $rootDir = rtrim(str_replace('\\', '/', $rootDir), '/');
@@ -319,7 +320,8 @@ class Application extends Object {
      * @return DiInterface
      */
     protected function initDefaultDi($serviceDir) {
-        return !CLI ? new DefaultDi($serviceDir) : new DefaultCliDi($serviceDir);
+        $this->setDi($di = !CLI ? new DefaultDi($serviceDir) : new DefaultCliDi($serviceDir));
+        return $di;
     }
 
 

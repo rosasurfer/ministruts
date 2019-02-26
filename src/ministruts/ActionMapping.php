@@ -2,8 +2,8 @@
 namespace rosasurfer\ministruts;
 
 use rosasurfer\core\Object;
+use rosasurfer\core\assert\Assert;
 use rosasurfer\exception\IllegalStateException;
-use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\log\Logger;
 
 use function rosasurfer\strCompareI;
@@ -142,7 +142,7 @@ class ActionMapping extends Object {
      * @return bool
      */
     public function isSupportedMethod($method) {
-        if (!is_string($method)) throw new IllegalTypeException('Illegal type of parameter $method: '.gettype($method));
+        Assert::string($method);
         return isset($this->methods[strtoupper($method)]);
     }
 

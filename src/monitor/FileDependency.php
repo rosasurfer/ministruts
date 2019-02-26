@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\monitor;
 
-use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\core\assert\Assert;
 use rosasurfer\exception\InvalidArgumentException;
 
 use function rosasurfer\isRelativePath;
@@ -48,8 +48,8 @@ class FileDependency extends Dependency {
      * @param  string $fileName - Dateiname
      */
     public function __construct($fileName) {
-        if (!is_string($fileName)) throw new IllegalTypeException('Illegal type of parameter $fileName: '.gettype($fileName));
-        if (!strlen($fileName))    throw new InvalidArgumentException('Invalid argument $fileName: '.$fileName);
+        Assert::string($fileName);
+        if (!strlen($fileName)) throw new InvalidArgumentException('Invalid argument $fileName: '.$fileName);
 
         if (file_exists($fileName)) {                       // existierende Datei
             $this->fileName     = realpath($fileName);
@@ -75,8 +75,8 @@ class FileDependency extends Dependency {
      */
     public static function create($fileNames) {
         if (!is_array($fileNames)) {
-            if (!is_string($fileNames)) throw new IllegalTypeException('Illegal type of parameter $fileNames: '.gettype($fileNames));
-            if (!strlen($fileNames))    throw new InvalidArgumentException('Invalid argument $fileNames: '.$fileNames);
+            Assert::string($fileNames);
+            if (!strlen($fileNames)) throw new InvalidArgumentException('Invalid argument $fileNames: '.$fileNames);
             $fileNames = [$fileNames];
         }
         if (!$fileNames) throw new InvalidArgumentException('Invalid argument $fileNames: '.$fileNames);
