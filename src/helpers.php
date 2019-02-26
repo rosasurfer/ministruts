@@ -9,7 +9,6 @@ use rosasurfer\console\docopt\DocoptResult;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\exception\IllegalArgumentException;
 use rosasurfer\core\exception\InvalidArgumentException;
-use rosasurfer\core\exception\IOException;
 use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\lock\Lock;
 use rosasurfer\log\Logger;
@@ -1280,26 +1279,6 @@ function objectToArray($object, $access = ACCESS_PUBLIC) {
  */
 function typeOf($var) {
     return gettype($var);
-}
-
-
-/**
- * Check whether a directory exists. If not try to create it. Check further if write permission is granted.
- *
- * @param  string $path            - same as mkdir(): directory name
- * @param  int    $mode [optional] - same as mkdir(): permission mode to set if the directory is created<br>
- *                                                    (default: 0775 = rwxrwxr-x)
- * @deprecated
- */
-function mkDirWritable($path, $mode = 0775) {
-    Assert::string   ($path, 'Illegal type of parameter $path: %s');
-    Assert::nullOrInt($mode, 'Illegal type of parameter $mode: %s');
-
-    clearstatcache($clearRealPathCache=true, $path);
-
-    if (is_file($path))                               throw new IOException('Cannot write to directory "'.$path.'" (is a file)');
-    if (!is_dir($path) && !mkdir($path, $mode, true)) throw new IOException('Cannot create directory "'.$path.'"');
-    if (!is_writable($path))                          throw new IOException('Cannot write to directory "'.$path.'"');
 }
 
 

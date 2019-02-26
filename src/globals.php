@@ -725,19 +725,6 @@ function typeOf($var) {
 
 
 /**
- * Check whether a directory exists. If not try to create it. Check further if write permission is granted.
- *
- * @param  string $path            - same as mkdir(): directory name
- * @param  int    $mode [optional] - same as mkdir(): permission mode to set if the directory is created<br>
- *                                                    (default: 0775 = rwxrwxr-x)
- * @deprecated
- */
-function mkDirWritable($path, $mode = 0775) {
-    \rosasurfer\mkDirWritable($path, $mode);
-}
-
-
-/**
  * Whether or not a directory is considered empty.
  *
  * (a directory with just '.svn' or '.git' is empty)
