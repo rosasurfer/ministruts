@@ -156,20 +156,6 @@ class CurlHttpClient extends HttpClient {
 
 
     /**
-     * Erzeugt eine neue Instanz der Klasse.
-     *
-     * @param  array $options [optional] - Array mit zusaetzlichen CURL-Optionen (default: keine)
-     *
-     * @return static
-     *
-     * @deprecated
-     */
-    public static function create(array $options=[]) {
-        return new static($options);
-    }
-
-
-    /**
      * Fuehrt den uebergebenen Request aus und gibt die empfangene Antwort zurueck.
      *
      * @param  HttpRequest $request
