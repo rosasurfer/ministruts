@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\loader;
+namespace rosasurfer\core\loader;
 
 use rosasurfer\core\Object;
 

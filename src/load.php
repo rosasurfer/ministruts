@@ -8,8 +8,8 @@ namespace rosasurfer;
 
 use rosasurfer\core\Object;
 use rosasurfer\core\ObjectTrait;
+use rosasurfer\core\loader\ClassLoader;
 use rosasurfer\di\DiAwareTrait;
-use rosasurfer\loader\ClassLoader;
 
 
 define('rosasurfer\_MINISTRUTS_ROOT', dirname(__DIR__));
@@ -35,10 +35,10 @@ function registerClassLoader() {
     // register a bootstrap loader for class rosasurfer\loader\ClassLoader
     $bootstrap = function($class) {
         switch ($class) {
-            case Object      ::class: require(MINISTRUTS_ROOT.'/src/core/Object.php'       ); break;
-            case ObjectTrait ::class: require(MINISTRUTS_ROOT.'/src/core/ObjectTrait.php'  ); break;
-            case DiAwareTrait::class: require(MINISTRUTS_ROOT.'/src/di/DiAwareTrait.php'   ); break;
-            case ClassLoader ::class: require(MINISTRUTS_ROOT.'/src/loader/ClassLoader.php'); break;
+            case Object      ::class: require(MINISTRUTS_ROOT.'/src/core/Object.php'            ); break;
+            case ObjectTrait ::class: require(MINISTRUTS_ROOT.'/src/core/ObjectTrait.php'       ); break;
+            case ClassLoader ::class: require(MINISTRUTS_ROOT.'/src/core/loader/ClassLoader.php'); break;
+            case DiAwareTrait::class: require(MINISTRUTS_ROOT.'/src/di/DiAwareTrait.php'        ); break;
         }
     };
     spl_autoload_register($bootstrap, $throw=true, $prepend=true);
