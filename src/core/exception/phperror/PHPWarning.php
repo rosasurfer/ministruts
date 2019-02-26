@@ -1,11 +1,11 @@
 <?php
-namespace rosasurfer\core\exception\error;
+namespace rosasurfer\core\exception\phperror;
 
 
 /**
- * "rosasurfer" exception for a PHP user error.
+ * "rosasurfer" exception for a PHP warning.
  */
-class PHPUserError extends PHPError {
+class PHPWarning extends PHPError {
 
 
     /**
@@ -14,6 +14,6 @@ class PHPUserError extends PHPError {
      * @return string
      */
     public function getSimpleType() {
-        return 'PHP User Error';
+        return 'PHP Warning';
     }
 }

@@ -8,7 +8,7 @@ use rosasurfer\core\assert\Assert;
 use rosasurfer\core\debug\DebugHelper;
 use rosasurfer\core\exception\InvalidArgumentException;
 use rosasurfer\core\exception\RuntimeException;
-use rosasurfer\core\exception\error\PHPError;
+use rosasurfer\core\exception\phperror\PHPError;
 use rosasurfer\ministruts\Request;
 use rosasurfer\net\NetTools;
 use rosasurfer\net\http\CurlHttpClient;
