@@ -5,5 +5,7 @@ namespace rosasurfer\core\assert;
 /**
  * InvalidArgumentException
  */
-class InvalidArgumentException extends AssertionException {
+class InvalidArgumentException extends \rosasurfer\exception\InvalidArgumentException {
+
+    use FailedAssertionTrait;
 }

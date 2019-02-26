@@ -5,14 +5,6 @@ use rosasurfer\core\StaticClass;
 
 
 /**
- * This class is a backported hybrid of the subjectively best parts of the following two assertion packages:
- *
- * @see  beberlei/assert  by Benjamin Eberlei
- * @see  webmozart/assert by Bernhard Schussek
- */
-
-
-/**
  * Assert
  *
  * Efficient assertions to validate arguments.
