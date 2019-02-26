@@ -199,18 +199,6 @@ function stderr($message) {
 
 
 /**
- * Print a message to STDERR.
- *
- * @param  string $message
- *
- * @deprecated
- */
-function stderror($message) {
-    \rosasurfer\stderr($message);
-}
-
-
-/**
  * Send an "X-Debug-???" header with a message. Each sent header name will end with a different and increasing number.
  *
  * @param  string $message
