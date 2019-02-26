@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\monitor;
+namespace rosasurfer\cache\monitor;
 
 use rosasurfer\core\Object;
 use rosasurfer\core\assert\Assert;

@@ -2,12 +2,12 @@
 namespace rosasurfer\ministruts;
 
 use rosasurfer\cache\Cache;
+use rosasurfer\cache\monitor\FileDependency;
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\Singleton;
 use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\exception\RuntimeException;
-use rosasurfer\monitor\FileDependency;
 
 use function rosasurfer\strLeftTo;
 use function rosasurfer\strStartsWith;

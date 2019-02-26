@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\monitor;
+namespace rosasurfer\cache\monitor;
 
 use rosasurfer\exception\RuntimeException;
 

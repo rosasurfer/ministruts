@@ -1,8 +1,8 @@
 <?php
 namespace rosasurfer\cache;
 
+use rosasurfer\cache\monitor\Dependency;
 use rosasurfer\core\Object;
-use rosasurfer\monitor\Dependency;
 
 
 /**

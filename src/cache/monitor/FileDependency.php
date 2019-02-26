@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\monitor;
+namespace rosasurfer\cache\monitor;
 
 use rosasurfer\core\assert\Assert;
 use rosasurfer\exception\InvalidArgumentException;

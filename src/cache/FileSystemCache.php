@@ -1,12 +1,12 @@
 <?php
 namespace rosasurfer\cache;
 
+use rosasurfer\cache\monitor\Dependency;
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\exception\RuntimeException;
 use rosasurfer\exception\error\PHPError;
 use rosasurfer\file\FileSystem as FS;
-use rosasurfer\monitor\Dependency;
 
 use function rosasurfer\isRelativePath;
 use function rosasurfer\strEndsWith;
