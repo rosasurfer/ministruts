@@ -80,14 +80,6 @@ class Di extends Object implements DiInterface {
 
 
     /**
-     * @deprecated
-     */
-    public function isService($name) {
-        return $this->has($name);
-    }
-
-
-    /**
      * {@inheritdoc}
      *
      * @param  string $name
