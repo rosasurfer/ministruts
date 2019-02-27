@@ -47,7 +47,7 @@ class Input extends Object {
     public function isCommand($name) {
         if (!($len=strlen($name)) || !isset($this->docoptResult[$name]))
             return false;
-        return preg_match('/^[a-z]+$/', $name);
+        return (bool) preg_match('/^[a-z]+$/', $name);
     }
 
 
