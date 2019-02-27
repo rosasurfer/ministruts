@@ -74,7 +74,7 @@ class Command extends Object {
     /**
      * Trigger execution of the command.
      *
-     * @return int - execution status code: 0 (zero) for "success"
+     * @return int - execution status: 0 for "success"
      */
     public function run() {
         $this->input = $this->di()->set(Input::class, new Input($this->docoptResult));
@@ -90,7 +90,7 @@ class Command extends Object {
      * Execute the command. Override this method to pre-define a command implementation or set it dynamically via
      * {@link Command::setTask()}.
      *
-     * @return int - execution status code: 0 (zero) for "success"
+     * @return int - execution status: 0 for "success"
      */
     protected function execute() {
         return 0;
