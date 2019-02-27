@@ -27,7 +27,8 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "0.10.x-dev"
+            "dev-master":   "0.9.x-dev",
+            "dev-0.10-dev": "0.10.x-dev"
         }
     },
     "support": {
