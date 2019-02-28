@@ -106,12 +106,11 @@ class Input extends Object {
 
 
     /**
-     * Return the multi-value argument with the given name.
-     * See {@link Input::isArgument()} for the definition of "argument".
+     * Return the multi-value argument with the given name. See {@link Input::isArgument()} for the definition of "argument".
      *
      * @param  string $name
      *
-     * @return string[]|null - the argument values or NULL if the arguments were not specified
+     * @return string[] - the argument values or an empty array if the arguments were not specified
      */
     public function getArguments($name) {
         if ($this->isArgument($name)) {
@@ -119,7 +118,7 @@ class Input extends Object {
             if (is_array($value))
                 return $value;
         }
-        return null;
+        return [];
     }
 
 
@@ -166,7 +165,7 @@ class Input extends Object {
      *
      * @param  string $name
      *
-     * @return bool|string[] - the option value or FALSE if the options were not specified
+     * @return string[] - the option values or an empty array if the options were not specified
      */
     public function getOptions($name) {
         if ($this->isOption($name)) {
@@ -174,6 +173,6 @@ class Input extends Object {
             if (is_array($value))
                 return $value;
         }
-        return false;
+        return [];
     }
 }
