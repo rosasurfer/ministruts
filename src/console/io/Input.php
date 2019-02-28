@@ -52,17 +52,20 @@ class Input extends Object {
 
 
     /**
-     * Whether the command with the given name was specified. Returns a non-zero value only if the command is defined.
-     * See {@link Input::isCommand()} for the definition of "command".
+     * Whether the command with the given name was specified. See {@link Input::isCommand()} for the definition of "command".
      *
      * @param  string $name
      *
-     * @return int - number of times the command was specified; 0 (zero) if the command is not defined
+     * @return bool|int - boolean value or number of times the command was specified (if multiple times)
      */
-    public function getCommand($name) {
-        if ($this->isCommand($name))
-            return (int) $this->docoptResult[$name];
-        return 0;
+    public function hasCommand($name) {
+        if ($this->isCommand($name)) {
+            $value = $this->docoptResult[$name];
+            if (is_int($value) && $value > 1)
+                return $value;
+            return (bool) $value;
+        }
+        return false;
     }
 
 
