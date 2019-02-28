@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\di\auto;
 
-use rosasurfer\console\Output;
+use rosasurfer\console\io\Output;
 use rosasurfer\di\Di;
 use rosasurfer\di\service\Service;
 

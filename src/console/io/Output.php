@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\console;
+namespace rosasurfer\console\io;
 
 use rosasurfer\core\Object;
 use rosasurfer\exception\IllegalTypeException;

@@ -4,6 +4,8 @@ namespace rosasurfer\console;
 use rosasurfer\Application;
 use rosasurfer\console\docopt\DocoptParser;
 use rosasurfer\console\docopt\DocoptResult;
+use rosasurfer\console\io\Input;
+use rosasurfer\console\io\Output;
 use rosasurfer\core\Object;
 use rosasurfer\di\Di;
 use rosasurfer\exception\IllegalStateException;
