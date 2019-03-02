@@ -19,29 +19,29 @@ use const rosasurfer\NL;
  *
  * Connector configuration:
  * <pre>
- * +--------------------------------------+------------+----------------------------+
- * | setting                              | value      | default value              |
- * +--------------------------------------+------------+----------------------------+
- * | db.{name}.connector                  | sqlite     | -                          |
- * | db.{name}.database                   | dbFileName | - (1)                      |
- * | db.{name}.options.open_mode          | [openMode] | SQLITE3_OPEN_READWRITE (2) |
- * | db.{name}.options.foreign_keys       | [on|off]   | on                         |
- * | db.{name}.options.recursive_triggers | [on|off]   | on                         |
- * +--------------------------------------+------------+----------------------------+
+ * +--------------------------------------+-------------+----------------------------+
+ * | setting                              | value       | default value              |
+ * +--------------------------------------+-------------+----------------------------+
+ * | db.{name}.connector                  | sqlite      | -                          |
+ * | db.{name}.file                       | db-filename | - (1)                      |
+ * | db.{name}.options.open_mode          | [openMode]  | SQLITE3_OPEN_READWRITE (2) |
+ * | db.{name}.options.foreign_keys       | [on|off]    | on                         |
+ * | db.{name}.options.recursive_triggers | [on|off]    | on                         |
+ * +--------------------------------------+-------------+----------------------------+
  * </pre>
- *  (1) - A relative database file location is interpreted as relative to the application's data directory (if configured). <br>
- *        If the file is not found an attempt is made to find it in the application's root directory.                       <br>
+ *  (1) - A relative db file location is interpreted as relative to <tt>Config["app.dir.root"]</tt>.                        <br>
  *  (2) - Available flags: SQLITE3_OPEN_CREATE | SQLITE3_OPEN_READONLY | SQLITE3_OPEN_READWRITE                             <br>
  *
  * Additional SQLite pragma options can be specified under the "options" key.
  *
  *
- * Notes: <br>
- * ------ <br>
- * The php_sqlite3 extension v0.7-dev has a serious bug. The first call of SQLite3Result::fetchArray() and calls after a
- * SQLite3Result::reset() trigger re-execution of an already executed query. The workaround for DDL and DML statements is to
- * check with SQLite3Result::numColumns() for an empty result before calling fetchArray(). There is no workaround to prevent
- * multiple executions of SELECT queries except of using a different SQLite adapter.
+ * Notes:                                                                                                                   <br>
+ * ------                                                                                                                   <br>
+ * The php_sqlite3 module version v0.7-dev has a bug. The first call of {@link \SQLite3Result::fetchArray()} and calls after
+ * a {@link SQLite3Result::reset()} trigger re-execution of an already executed query. The workaround for DDL and DML
+ * statements is to check with {@link \SQLite3Result::numColumns()} for an empty result before calling <tt>fetchArray()</tt>.
+ * There is <b>no</b> workaround to prevent multiple executions of SELECT queries except using a different SQLite adapter,
+ * e.g. the PDO SQLite3 adapter.
  *
  * @see  http://bugs.php.net/bug.php?id=64531
  */
@@ -110,17 +110,8 @@ class SQLiteConnector extends Connector {
         }
         else {
             /** @var ConfigInterface $config */
-            $config  = $this->di('config');
-            $storageDir = $config->get('app.dir.storage', null);
-            $rootDir    = $config->get('app.dir.root', null);
-
-            if ($storageDir && (is_file($storageDir.'/'.$file) || !is_file($rootDir.'/'.$file))) {
-                $file = $storageDir.'/'.$file;
-            }
-            else {
-                $file = $rootDir.'/'.$file;
-            }
-            $this->file = str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $file);
+            $rootDir = $this->di('config')['app.dir.root'];
+            $this->file = str_replace('\\', '/', $rootDir.'/'.$file);
         }
         return $this;
     }
