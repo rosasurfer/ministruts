@@ -96,7 +96,7 @@ class SQLiteConnector extends Connector {
     /**
      * Set the file name of the database to connect to. May be ":memory:" to use an in-memory database.
      *
-     * @param  string $file - A relative database file location is interpreted as relative to the application's data
+     * @param  string $file - A relative database file location is interpreted as relative to the application's storage
      *                        directory (if configured). If the file is not found an attempt is made to find it in the
      *                        application's root directory.
      * @return $this
@@ -111,11 +111,11 @@ class SQLiteConnector extends Connector {
         else {
             /** @var ConfigInterface $config */
             $config  = $this->di('config');
-            $dataDir = $config->get('app.dir.data', null);
-            $rootDir = $config->get('app.dir.root', null);
+            $storageDir = $config->get('app.dir.storage', null);
+            $rootDir    = $config->get('app.dir.root', null);
 
-            if ($dataDir && (is_file($dataDir.'/'.$file) || !is_file($rootDir.'/'.$file))) {
-                $file = $dataDir.'/'.$file;
+            if ($storageDir && (is_file($storageDir.'/'.$file) || !is_file($rootDir.'/'.$file))) {
+                $file = $storageDir.'/'.$file;
             }
             else {
                 $file = $rootDir.'/'.$file;
