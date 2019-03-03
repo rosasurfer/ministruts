@@ -7,6 +7,7 @@ require(dirname(realpath(__FILE__)).'/../../../../src/load.php');
 
 $self = basename($_SERVER['PHP_SELF']);
 $doc = <<<DOCOPT
+
 Example of a program which uses the [options] shortcut.
 
 Usage: $self  [options] <port>

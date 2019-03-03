@@ -6,6 +6,7 @@ use function rosasurfer\docopt;
 require(dirname(realpath(__FILE__)).'/../../../../../src/load.php');
 
 $doc = <<<DOCOPT
+
 Usage: git add [options] [--] [<filepattern>...]
 
     -h, --help

@@ -6,6 +6,7 @@ use function rosasurfer\docopt;
 require(dirname(realpath(__FILE__)).'/../../../../../src/load.php');
 
 $doc = <<<DOCOPT
+
 Usage: git remote [-v | --verbose]
        git remote add [-t <branch>] [-m <master>] [-f] [--mirror] <name> <url>
        git remote rename <old> <new>
