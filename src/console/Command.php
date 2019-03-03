@@ -48,7 +48,7 @@ class Command extends Object {
     protected $output;
 
     /** @var int - the command's error status */
-    protected $error = 0;
+    protected $status = 0;
 
 
     /**
@@ -81,10 +81,10 @@ class Command extends Object {
     public function run() {
         $this->input = $this->di()->set(Input::class, new Input($this->docoptResult));
 
-        if ($this->task) $status = $this->task->__invoke();
-        else             $status = $this->execute();
+        if ($this->task) $status = $this->task->__invoke($this->input, $this->output);
+        else             $status = $this->execute($this->input, $this->output);
 
-        return (int) $status;
+        return $this->status = (int) $status;
     }
 
 
@@ -92,9 +92,12 @@ class Command extends Object {
      * Execute the command. Override this method to pre-define a command implementation or set it dynamically via
      * {@link Command::setTask()}.
      *
+     * @param  Input  $input
+     * @param  Output $output
+     *
      * @return int - execution status: 0 for "success"
      */
-    protected function execute() {
+    protected function execute(Input $input, Output $output) {
         return 0;
     }
 
