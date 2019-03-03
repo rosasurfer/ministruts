@@ -4,7 +4,6 @@ namespace rosasurfer\console\io;
 use rosasurfer\console\docopt\DocoptResult;
 use rosasurfer\core\Object;
 use rosasurfer\exception\IllegalTypeException;
-use function rosasurfer\first;
 
 
 /**
@@ -103,7 +102,7 @@ class Input extends Object {
         if ($this->isArgument($name)) {
             $value = $this->docoptResult[$name];
             if (is_array($value))
-                return first($value);
+                return $value ? $value[0] : null;
             return $value;
         }
         return null;
@@ -115,7 +114,7 @@ class Input extends Object {
      *
      * @param  string $name
      *
-     * @return string[] - argument values or an empty array if the arguments were not specified
+     * @return string[] - argument values or an empty array if the argument was not specified
      */
     public function getArguments($name) {
         if ($this->isArgument($name)) {
@@ -129,11 +128,10 @@ class Input extends Object {
 
 
     /**
-     * Whether the option with the given name is defined (not whether the option was specified).
-     * Options are command line parameters defined with one leading dash (short options) or with two leading dashes (long
-     * options). If an option is defined in both ways the parsed input values only reflect the long option.
+     * Whether the option with the given name is defined (not whether the option was specified). Options are command line
+     * parameters defined with one leading dash (short options) or with two leading dashes (long options).
      *
-     * @param  string $name - option name with leading dash(es)
+     * @param  string $name - long or short option name with leading dash(es)
      *
      * @return bool
      */
@@ -147,41 +145,52 @@ class Input extends Object {
 
 
     /**
-     * Return the single-value option or the first multi-value option with the given name. The returned value may be the
-     * defined default value. See {@link Input::isOption()} for the definition of "option".
+     * Return the value of the option with the given name.
+     *
+     * If the option is not repetitive and has no arguments a boolean value is returned. If the option is repetitive and has
+     * no arguments an integer is returned indicating the number of times the option was specified. If the option has
+     * arguments the first argument is returned. The returned value may be the defined default value.
+     * See {@link Input::isOption()} for the definition of "option".
      *
      * @param  string $name
      *
-     * @return bool|string - the option value or FALSE if the option was not specified
+     * @return bool|int|string - option value or FALSE if the option was not specified
      */
     public function getOption($name) {
         if ($this->isOption($name)) {
             $value = $this->docoptResult[$name];
-            if (!is_array($value))
-                return $value;
-            $value = first($value);
-            if (isset($value))
-                return $value;
+            if (is_array($value))                                   // repetitive option with arguments
+                return $value ? $value[0] : false;
+            /*
+            if (is_int($value))  return $value;                     // repetitive option without arguments
+            if (is_bool($value)) return $value;                     // non-repetitive option, no arguments
+            else                 return $value;                     // non-repetitive option with argument
+            */
+            return $value;
         }
         return false;
     }
 
 
     /**
-     * Return the options with the given name. The returned values may be the defined default values.
+     * Return the values of the options with the given name. The returned values may be the defined default values.
      * See {@link Input::isOption()} for the definition of "option".
      *
      * @param  string $name
      *
-     * @return string[] - the option values or an empty array if the options were not specified
+     * @return string[] - option values or an empty array if the option was not specified
      */
     public function getOptions($name) {
         if ($this->isOption($name)) {
             $value = $this->docoptResult[$name];
-            if (is_array($value))
+            if (is_array($value))                                   // repetitive option with arguments
                 return $value;
-            if ($value !== false)
-                return [$value];
+            /*
+            if (is_int($value))  return [$value];                   // repetitive option without arguments
+            if (is_bool($value)) return $value ? [$value] : [];     // non-repetitive option, no arguments
+            else                 return [$value];                   // non-repetitive option with argument
+            */
+            if ($value !== false) return [$value];
         }
         return [];
     }

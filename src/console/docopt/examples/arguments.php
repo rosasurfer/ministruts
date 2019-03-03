@@ -3,7 +3,7 @@
 use function rosasurfer\echoPre;
 use function rosasurfer\docopt;
 
-require(dirname(realpath(__FILE__)).'/../../../../etc/vendor/autoload.php');
+require(dirname(realpath(__FILE__)).'/../../../../src/load.php');
 
 $self = basename($_SERVER['PHP_SELF']);
 $doc = <<<HELP
@@ -30,4 +30,4 @@ $result = docopt($doc);
 foreach ($result as $key => $value) {
     echoPre($key.': '.json_encode($value));
 }
-echoPre($result->getArgs());
+
