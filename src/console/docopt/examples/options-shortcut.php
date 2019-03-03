@@ -6,10 +6,10 @@ use function rosasurfer\echoPre;
 require(dirname(realpath(__FILE__)).'/../../../../src/load.php');
 
 $self = basename($_SERVER['PHP_SELF']);
-$doc = <<<HELP
+$doc = <<<DOCOPT
 Example of a program which uses the [options] shortcut.
 
-Usage: $self [options] <port>
+Usage: $self  [options] <port>
 
 Options:
   -h --help              show this help message and exit
@@ -19,7 +19,7 @@ Options:
   --apply                apply changes to database
   -q                     operate in quiet mode
 
-HELP;
+DOCOPT;
 
 $result = docopt($doc, null, ['version'=>'1.0.0rc2']);
 foreach ($result as $key => $value) {

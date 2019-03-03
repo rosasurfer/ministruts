@@ -3,9 +3,9 @@
 use function rosasurfer\echoPre;
 use function rosasurfer\docopt;
 
-require(dirname(realpath(__FILE__)).'/../../../../../etc/vendor/autoload.php');
+require(dirname(realpath(__FILE__)).'/../../../../../src/load.php');
 
-$doc = <<<HELP
+$doc = <<<DOCOPT
 Usage: git add [options] [--] [<filepattern>...]
 
     -h, --help
@@ -23,10 +23,9 @@ Usage: git add [options] [--] [<filepattern>...]
     --ignore-errors      just skip files which cannot be added because of errors
     --ignore-missing     check if - even missing - files are ignored in dry run
 
-HELP;
+DOCOPT;
 
 $result = docopt($doc);
 foreach ($result as $key => $value) {
     echoPre($key.': '.json_encode($value));
 }
-echoPre($result->getArgs());

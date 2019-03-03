@@ -3,9 +3,9 @@
 use function rosasurfer\echoPre;
 use function rosasurfer\docopt;
 
-require(dirname(realpath(__FILE__)).'/../../../../../etc/vendor/autoload.php');
+require(dirname(realpath(__FILE__)).'/../../../../../src/load.php');
 
-$doc = <<<HELP
+$doc = <<<DOCOPT
 Usage: git branch [options] [-r | -a] [--merged=<commit> | --no-merged=<commit>]
        git branch [options] [-l] [-f] <branchname> [<start-point>]
        git branch [options] [-r] (-d | -D) <branchname>
@@ -32,10 +32,9 @@ Specific git-branch actions:
     --no-merged=<commit>  print only not merged branches
     --merged=<commit>     print only merged branches
 
-HELP;
+DOCOPT;
 
 $result = docopt($doc);
 foreach ($result as $key => $value) {
     echoPre($key.': '.json_encode($value));
 }
-echoPre($result->getArgs());
