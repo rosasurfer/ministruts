@@ -91,7 +91,7 @@ class Page extends Singleton {
      * @param  mixed  $value - Wert
      */
     public function __set($name, $value) {
-        Assert::string($name, 'Illegal type of parameter $name: %s');
+        Assert::string($name, '$name');
 
         if ($value !== null) {
             $this->properties[$name] = $value;

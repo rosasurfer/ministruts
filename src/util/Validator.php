@@ -148,7 +148,7 @@ class Validator extends StaticClass {
      *                       'd/m/Y [H:i[:s]]'
      */
     public static function isDateTime($date, $format='Y-m-d') {
-        Assert::string($date, 'Illegal type of parameter $date: %s');
+        Assert::string($date, '$date');
 
         if (is_array($format)) {
             foreach ($format as $value) {
@@ -158,7 +158,7 @@ class Validator extends StaticClass {
             }
             return false;
         }
-        Assert::string($format, 'Illegal type of parameter $format: %s');
+        Assert::string($format, '$format');
 
         /*
         // !!! deaktiviert!!!: strPTime() haelt sich nicht 100% an das angegebene Format sondern versucht, intelligent zu sein

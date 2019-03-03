@@ -716,7 +716,7 @@ class Request extends Singleton {
         }
         elseif (is_array($names)) {
             foreach ($names as $i => $name) {
-                Assert::string($name, 'Illegal type of header $names['.$i.']: %s');
+                Assert::string($name, '$names['.$i.']');
             }
         }
         else throw new IllegalTypeException('Illegal type of parameter $names: '.gettype($names));
@@ -776,7 +776,7 @@ class Request extends Singleton {
             $names = array($names);
         elseif (is_array($names)) {
             foreach ($names as $i => $name) {
-                Assert::string($name, 'Illegal type of header $names['.$i.']: %s');
+                Assert::string($name, '$names['.$i.']');
             }
         }
         else throw new IllegalTypeException('Illegal type of parameter $names: '.gettype($names));
@@ -801,7 +801,7 @@ class Request extends Singleton {
             $names = array($names);
         elseif (is_array($names)) {
             foreach ($names as $i => $name) {
-                Assert::string($name, 'Illegal type of header $names['.$i.']: %s');
+                Assert::string($name, '$names['.$i.']');
             }
         }
         else throw new IllegalTypeException('Illegal type of parameter $names: '.gettype($names));
@@ -872,15 +872,15 @@ class Request extends Singleton {
      * @param  string $path [optional] - Pfad, fuer den der Cookie gueltig sein soll (default: whole domain)
      */
     public function setCookie($name, $value, $expires = 0, $path = null) {
-        Assert::string($name,    'Illegal type of parameter $name: %s');
-        Assert::int   ($expires, 'Illegal type of parameter $expires: %s');
+        Assert::string($name,    '$name');
+        Assert::int   ($expires, '$expires');
         if ($expires < 0) throw new InvalidArgumentException('Invalid argument $expires: '.$expires);
 
         $value = (string)$value;
 
         if ($path === null)
             $path = $this->getApplicationBaseUri();
-        Assert::string($path, 'Illegal type of parameter $path: %s');
+        Assert::string($path, '$path');
 
         \setcookie($name, $value, $expires, $path);
     }
@@ -983,7 +983,7 @@ class Request extends Singleton {
      *                           (an ActionError with the same key is not deleted)
      */
     public function setActionMessage($key, $message) {
-        Assert::nullOrString($message, 'Illegal type of parameter $message: %s');
+        Assert::nullOrString($message, '$message');
 
         if (!isset($message)) {
             unset($this->attributes[ACTION_MESSAGES_KEY][$key]);
@@ -1069,7 +1069,7 @@ class Request extends Singleton {
         if (is_string($keys))
             $keys = [$keys];
 
-        Assert::nullOrArray($keys, 'Illegal type of parameter $keys: %s');
+        Assert::nullOrArray($keys);
 
         if (is_array($keys)) {
             foreach ($keys as $key) {
@@ -1090,7 +1090,7 @@ class Request extends Singleton {
      * @param  string $message - error message; if NULL the error for the specified key is deleted
      */
     public function setActionError($key, $message) {
-        Assert::nullOrString($message, 'Illegal type of parameter $message: %s');
+        Assert::nullOrString($message, '$message');
         if (!isset($message)) {
             unset($this->attributes[ACTION_ERRORS_KEY][$key]);
         }

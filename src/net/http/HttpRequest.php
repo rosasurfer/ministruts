@@ -98,9 +98,9 @@ class HttpRequest extends Object {
      * @return $this
      */
     public function setHeader($name, $value) {
-        Assert::string($name,        'Illegal type of parameter $name: %s');
+        Assert::string($name,        '$name');
         if (!strlen($name))           throw new InvalidArgumentException('Invalid argument $name: '.$name);
-        Assert::nullOrString($value, 'Illegal type of parameter $value: %s');
+        Assert::nullOrString($value, '$value');
 
         $name  = trim($name);
         $value = trim($value);
@@ -130,8 +130,8 @@ class HttpRequest extends Object {
      * @see http://stackoverflow.com/questions/3241326/set-more-than-one-http-header-with-the-same-name
      */
     public function addHeader($name, $value) {
-        Assert::string($name,  'Illegal type of parameter $name: %s');
-        Assert::string($value, 'Illegal type of parameter $value: %s');
+        Assert::string($name,  '$name');
+        Assert::string($value, '$value');
         if (!strlen($name))     throw new InvalidArgumentException('Invalid argument $name: '.$name);
         if (!strlen($value))    throw new InvalidArgumentException('Invalid argument $value: '.$value);
 
@@ -183,7 +183,7 @@ class HttpRequest extends Object {
         elseif (is_string($names)) $names = [$names];
         elseif (is_array($names)) {
             foreach ($names as $i => $name) {
-                Assert::string($name, 'Illegal type of parameter $names['.$i.']: %s');
+                Assert::string($name, '$names['.$i.']');
             }
         }
         else throw new IllegalTypeException('Illegal type of parameter $names: '.gettype($names));

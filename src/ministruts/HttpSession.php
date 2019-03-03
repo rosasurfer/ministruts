@@ -200,7 +200,7 @@ class HttpSession extends Singleton {
      * @param  mixed  $value - der zu speichernde Wert
      */
     public function setAttribute($key, $value) {
-        Assert::string($key, 'Illegal type of parameter $key: %s');
+        Assert::string($key, '$key');
 
         if ($value !== null) {
             $_SESSION[$key] = $value;
@@ -219,13 +219,13 @@ class HttpSession extends Singleton {
     public function removeAttribute($key) {
         if (is_array($key)) {
             foreach ($key as $i => $value) {
-                Assert::string($value, 'Illegal type of parameter $key['.$i.']: %s');
+                Assert::string($value, '$key['.$i.']');
                 unset($_SESSION[$value]);
             }
             return;
         }
 
-        Assert::string($key, 'Illegal type of parameter $key: %s');
+        Assert::string($key);
         unset($_SESSION[$key]);
     }
 

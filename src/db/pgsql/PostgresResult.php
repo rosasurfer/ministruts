@@ -68,9 +68,9 @@ class PostgresResult extends Result {
      * @param  int        $lastAffectedRows - last number of affected rows of the connection
      */
     public function __construct(IConnector $connector, $sql, $hResult, $lastAffectedRows) {
-        Assert::string($sql,           'Illegal type of parameter $sql: %s');
-        Assert::resource($hResult,     'Illegal type of parameter $hResult: %s');
-        Assert::int($lastAffectedRows, 'Illegal type of parameter $lastAffectedRows: %s');
+        Assert::string  ($sql,              '$sql');
+        Assert::resource($hResult,          '$hResult');
+        Assert::int     ($lastAffectedRows, '$lastAffectedRows');
 
         $this->connector        = $connector;
         $this->sql              = $sql;

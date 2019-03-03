@@ -473,13 +473,13 @@ function prettyBytes($value, $decimals = 1) {
             if (!strIsNumeric($value)) throw new InvalidArgumentException('Invalid parameter $value: "'.$value.'" (non-numeric)');
             $value = (float) $value;
         }
-        else Assert::float($value, 'Illegal type of parameter $value: %s');
+        else Assert::float($value, '$value');
 
-        if ($value < PHP_INT_MIN)      throw new IllegalArgumentException('Illegal parameter $value: '.$value.' (out of range)');
-        if ($value > PHP_INT_MAX)      throw new IllegalArgumentException('Illegal parameter $value: '.$value.' (out of range)');
+        if ($value < PHP_INT_MIN) throw new IllegalArgumentException('Illegal parameter $value: '.$value.' (out of range)');
+        if ($value > PHP_INT_MAX) throw new IllegalArgumentException('Illegal parameter $value: '.$value.' (out of range)');
         $value = (int) round($value);
     }
-    Assert::int($decimals, 'Illegal type of parameter $decimals: %s');
+    Assert::int($decimals, '$decimals');
 
     if ($value < 1024)
         return (string) $value;
@@ -704,8 +704,8 @@ function isRelativePath($path) {
  * @return bool
  */
 function strCompare($stringA, $stringB, $ignoreCase = false) {
-    Assert::nullOrString($stringA, 'Illegal type of parameter $stringA: %s');
-    Assert::nullOrString($stringB, 'Illegal type of parameter $stringB: %s');
+    Assert::nullOrString($stringA, '$stringA');
+    Assert::nullOrString($stringB, '$stringB');
 
     if ($ignoreCase) {
         if ($stringA===null || $stringB===null)
@@ -739,8 +739,8 @@ function strCompareI($stringA, $stringB) {
  * @return bool
  */
 function strContains($haystack, $needle, $ignoreCase = false) {
-    Assert::nullOrString($haystack, 'Illegal type of parameter $haystack: %s');
-    Assert::string($needle, 'Illegal type of parameter $needle: %s');
+    Assert::nullOrString($haystack, '$haystack');
+    Assert::string      ($needle,   '$needle');
 
     $haystackLen = strlen($haystack);
     $needleLen   = strlen($needle);
@@ -785,8 +785,8 @@ function strStartsWith($string, $prefix, $ignoreCase = false) {
         return false;
     }
 
-    Assert::nullOrString($string, 'Illegal type of parameter $string: %s');
-    Assert::string($prefix, 'Illegal type of parameter $prefix: %s');
+    Assert::nullOrString($string, '$string');
+    Assert::string      ($prefix, '$prefix');
 
     $stringLen = strlen($string);
     $prefixLen = strlen($prefix);
@@ -831,8 +831,8 @@ function strEndsWith($string, $suffix, $ignoreCase = false) {
         }
         return false;
     }
-    Assert::nullOrString($string, 'Illegal type of parameter $string: %s');
-    Assert::string      ($suffix, 'Illegal type of parameter $suffix: %s');
+    Assert::nullOrString($string, '$string');
+    Assert::string      ($suffix, '$suffix');
 
     $stringLen = strlen($string);
     $suffixLen = strlen($suffix);
@@ -877,8 +877,8 @@ function strEndsWithI($string, $suffix) {
  */
 function strLeft($string, $length) {
     if (!isset($string)) return '';
-    Assert::string($string, 'Illegal type of parameter $string: %s');
-    Assert::int   ($length, 'Illegal type of parameter $length: %s');
+    Assert::string($string, '$string');
+    Assert::int   ($length, '$length');
 
     return substr($string, 0, $length);
 }
@@ -912,10 +912,10 @@ function strLeft($string, $length) {
  * </pre>
  */
 function strLeftTo($string, $limiter, $count=1, $includeLimiter=false, $onNotFound=null) {
-    Assert::string($string,         'Illegal type of parameter $string: %s');
-    Assert::string($limiter,        'Illegal type of parameter $limiter: %s');
-    Assert::int   ($count,          'Illegal type of parameter $count: %s');
-    Assert::bool  ($includeLimiter, 'Illegal type of parameter $includeLimiter: %s');
+    Assert::string($string,         '$string');
+    Assert::string($limiter,        '$limiter');
+    Assert::int   ($count,          '$count');
+    Assert::bool  ($includeLimiter, '$includeLimiter');
     if (!strlen($limiter)) throw new IllegalArgumentException('Illegal limiting substring: "" (empty)');
 
     if ($count > 0) {
@@ -973,8 +973,8 @@ function strLeftTo($string, $limiter, $count=1, $includeLimiter=false, $onNotFou
  */
 function strRight($string, $length) {
     if (!isset($string)) return '';
-    Assert::string($string, 'Illegal type of parameter $string: %s');
-    Assert::int   ($length, 'Illegal type of parameter $length: %s');
+    Assert::string($string, '$string');
+    Assert::int   ($length, '$length');
 
     if ($length == 0)
         return '';
@@ -1011,10 +1011,10 @@ function strRight($string, $length) {
  * </pre>
  */
 function strRightFrom($string, $limiter, $count=1, $includeLimiter=false, $onNotFound=null) {
-    Assert::string($string,         'Illegal type of parameter $string: %s');
-    Assert::string($limiter,        'Illegal type of parameter $limiter: %s');
-    Assert::int   ($count,          'Illegal type of parameter $count: %s');
-    Assert::bool  ($includeLimiter, 'Illegal type of parameter $includeLimiter: %s');
+    Assert::string($string,         '$string');
+    Assert::string($limiter,        '$limiter');
+    Assert::int   ($count,          '$count');
+    Assert::bool  ($includeLimiter, '$includeLimiter');
     if (!strlen($limiter)) throw new IllegalArgumentException('Illegal limiting substring: "" (empty)');
 
     if ($count > 0) {
@@ -1181,7 +1181,7 @@ function strToBool($value) {
  * @return string
  */
 function strCollapseWhiteSpace($string, $joinLines=true, $separator=' ') {
-    Assert::string($string, 'Illegal type of parameter $string: %s');
+    Assert::string($string, '$string');
 
     $string = normalizeEOL($string);
     if ($joinLines) {
@@ -1205,8 +1205,8 @@ function strCollapseWhiteSpace($string, $joinLines=true, $separator=' ') {
  * @return string
  */
 function normalizeEOL($string, $mode = EOL_UNIX) {
-    Assert::string($string, 'Illegal type of parameter $string: %s');
-    Assert::string($mode,   'Illegal type of parameter $mode: %s');
+    Assert::string($string, '$string');
+    Assert::string($mode,   '$mode');
     $done = false;
 
     if (strContains($string, EOL_NETSCAPE)) {
@@ -1240,8 +1240,8 @@ function normalizeEOL($string, $mode = EOL_UNIX) {
  * @return array
  */
 function objectToArray($object, $access = ACCESS_PUBLIC) {
-    Assert::object($object, 'Illegal type of parameter $object: %s');
-    Assert::int   ($access, 'Illegal type of parameter $access: %s');
+    Assert::object($object, '$object');
+    Assert::int   ($access, '$access');
 
     $source = (array)$object;
     $result = [];
@@ -1572,7 +1572,7 @@ function ksort_r(array $values, $sort_flags = SORT_REGULAR) {
  * @return string
  */
 function pluralize($count, $singular='', $plural='s') {
-    Assert::int($count, 'Illegal type of parameter $count: %s');
+    Assert::int($count, '$count');
     if (abs($count) == 1)
         return $singular;
     return $plural;

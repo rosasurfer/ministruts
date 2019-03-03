@@ -177,8 +177,8 @@ final class FileSystemCache extends CachePeer {
      * @return bool - TRUE bei Erfolg, FALSE andererseits
      */
     public function set($key, &$value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null) {
-        Assert::string($key,  'Illegal type of parameter $key: %s');
-        Assert::int($expires, 'Illegal type of parameter $expires: %s');
+        Assert::string($key,  '$key');
+        Assert::int($expires, '$expires');
 
         // im Cache wird ein array(created, expires, value, dependency) gespeichert
         $created = time();

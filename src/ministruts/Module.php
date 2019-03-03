@@ -97,8 +97,8 @@ class Module extends Object {
      * @todo   Module-Encoding entsprechend dem Config-Datei-Encoding implementieren
      */
     public function __construct($fileName, $prefix) {
-        Assert::string($fileName, 'Illegal type of parameter $fileName: %s');
-        Assert::string($prefix,   'Illegal type of parameter $prefix: %s');
+        Assert::string($fileName, '$fileName');
+        Assert::string($prefix,   '$prefix');
 
         $xml = $this->loadConfiguration($fileName);
 

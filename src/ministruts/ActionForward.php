@@ -197,8 +197,8 @@ class ActionForward extends Object {
      */
     public function addQueryData($key, $value) {
         // TODO: freeze the instance after configuration and automatically call copy()
-        Assert::string($key, 'Illegal type of parameter $key: %s');
-        Assert::nullOrScalar($value, 'Illegal type of parameter $value: %s');
+        Assert::string      ($key,   '$key');
+        Assert::nullOrScalar($value, '$value');
 
         if     (!isset($value))  $value = '';
         elseif (is_bool($value)) $value = (int) $value;

@@ -136,7 +136,7 @@ abstract class Mailer extends Object implements MailerInterface {
      * @return string|null - value of the last found header or NULL if the header was not found
      */
     protected function getHeader(array $headers, $name) {
-        Assert::string($name, 'Illegal type of parameter $name: %s');
+        Assert::string($name, '$name');
         if (!preg_match('/^[a-z]+(-[a-z]+)*$/i', $name)) throw new InvalidArgumentException('Invalid parameter $name: "'.$name.'"');
 
         // reversely iterate over the array to find the last of duplicate headers
@@ -159,7 +159,7 @@ abstract class Mailer extends Object implements MailerInterface {
      * @return string|null - value of the last removed header or NULL if the header was not found
      */
     protected function removeHeader(array &$headers, $name) {
-        Assert::string($name, 'Illegal type of parameter $name: %s');
+        Assert::string($name, '$name');
         if (!preg_match('/^[a-z]+(-[a-z]+)*$/i', $name)) throw new InvalidArgumentException('Invalid parameter $name: "'.$name.'"');
 
         $result = null;

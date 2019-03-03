@@ -61,9 +61,9 @@ final class NetTools extends StaticClass {
      * @return bool
      */
     public static function isProxyAddress($address, $reverseResolve = false) {
-        Assert::string($address,      'Illegal type of parameter $address: %s');
+        Assert::string($address,      '$address');
         if (!strlen($address))         throw new InvalidArgumentException('Invalid argument $address: '.$address);
-        Assert::bool($reverseResolve, 'Illegal type of parameter $reverseResolve: %s');
+        Assert::bool($reverseResolve, '$reverseResolve');
 
         static $proxys = null;
 

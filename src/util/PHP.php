@@ -66,7 +66,7 @@ class PHP extends StaticClass {
      * @return string - contents of STDOUT
      */
     public static function execProcess($cmd, &$stderr=null, &$exitCode=null, $dir=null, $env=null, array $options=[]) {
-        Assert::string($cmd, 'Illegal type of parameter $cmd: %s');
+        Assert::string($cmd, '$cmd');
 
         // check whether the process needs to be watched asynchronously
         $argc         = func_num_args();

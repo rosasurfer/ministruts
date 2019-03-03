@@ -47,10 +47,10 @@ class MySQLResult extends Result {
      * @param  int        $lastAffectedRows - last number of affected rows of the connection
      */
     public function __construct(IConnector $connector, $sql, $hResult, $lastInsertId, $lastAffectedRows) {
-        Assert::string($sql,             'Illegal type of parameter $sql: %s');
-        Assert::nullOrResource($hResult, 'Illegal type of parameter $hResult: %s');
-        Assert::int($lastInsertId,       'Illegal type of parameter $lastInsertId: %s');
-        Assert::int($lastAffectedRows,   'Illegal type of parameter $lastAffectedRows: %s');
+        Assert::string        ($sql,              '$sql');
+        Assert::nullOrResource($hResult,          '$hResult');
+        Assert::int           ($lastInsertId,     '$lastInsertId');
+        Assert::int           ($lastAffectedRows, '$lastAffectedRows');
 
         $this->connector        = $connector;
         $this->sql              = $sql;

@@ -130,8 +130,8 @@ class ApcCache extends CachePeer {
      * @return bool - TRUE on successful storage; FALSE otherwise
      */
     public function set($key, &$value, $expires=Cache::EXPIRES_NEVER, Dependency $dependency=null) {
-        Assert::string($key,  'Illegal type of parameter $key: %s');
-        Assert::int($expires, 'Illegal type of parameter $expires: %s');
+        Assert::string($key,  '$key');
+        Assert::int($expires, '$expires');
 
         // data format in the cache: [created, expires, serialized([value, dependency])]
         $fullKey = $this->namespace.'::'.$key;

@@ -23,10 +23,10 @@ class Number extends StaticClass {
      * @return string
      */
     public static function formatMoney($value, $decimals=2, $decimalsSeparator='.', $thousandsSeparator='') {
-        Assert::intOrFloat($value,              'Illegal type of parameter $value: %s');
-        Assert::int       ($decimals,           'Illegal type of parameter $decimals: %s');
-        Assert::string    ($decimalsSeparator,  'Illegal type of parameter $decimalsSeparator: %s');
-        Assert::string    ($thousandsSeparator, 'Illegal type of parameter $thousandsSeparator: %s');
+        Assert::intOrFloat($value,              '$value');
+        Assert::int       ($decimals,           '$decimals');
+        Assert::string    ($decimalsSeparator,  '$decimalsSeparator');
+        Assert::string    ($thousandsSeparator, '$thousandsSeparator');
 
         return number_format($value, $decimals, $decimalsSeparator, $thousandsSeparator);
     }

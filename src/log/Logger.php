@@ -204,7 +204,7 @@ class Logger extends StaticClass {
         self::$smsLogLevel = $logLevel;
 
         $options = $config->get('sms', []);
-        Assert::isArray($options, 'Invalid type of config value "sms": %s');
+        Assert::isArray($options, 'config value "sms"');
         self::$smsOptions = $options;
 
         self::$smsHandler = self::$smsReceivers && self::$smsOptions;
@@ -262,7 +262,7 @@ class Logger extends StaticClass {
                 $logLevels = ['' => $logLevels];                            // only the general application loglevel is configured
 
             foreach ($logLevels as $className => $level) {
-                Assert::string($level, 'Illegal type of config value "log.level.'.$className.'": %s');
+                Assert::string($level, 'config value "log.level.'.$className.'"');
 
                 if ($level == '') {                                         // classes with empty values fall back to the application loglevel
                     unset($logLevels[$className]);
@@ -312,11 +312,11 @@ class Logger extends StaticClass {
 
             // validate parameters
             if (!is_string($loggable)) {
-                Assert::methodExists($loggable, '__toString', 'Illegal type of parameter $loggable: %s (object with method __toString() expected');
+                Assert::methodExists($loggable, '__toString', '$loggable');
                 if (!$loggable instanceof \Exception)
                     $loggable = (string) $loggable;
             }
-            Assert::int($level, 'Illegal type of parameter $level: %s');
+            Assert::int($level, '$level');
             if (!isset(self::$logLevels[$level])) throw new InvalidArgumentException('Invalid argument $level: '.$level.' (not a loglevel)');
 
             $filtered = false;

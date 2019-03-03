@@ -46,7 +46,7 @@ abstract class Result extends Object implements ResultInterface {
      * {@inheritdoc}
      */
     public function fetchColumn($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
-        Assert::intOrString($column, 'Illegal type of parameter $column: %s');
+        Assert::intOrString($column, '$column');
         if (isset($row)) throw new UnimplementedFeatureException('$row='.$row.' (!= NULL)');
 
         // Generic default implementation:

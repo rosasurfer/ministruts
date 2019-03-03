@@ -82,7 +82,7 @@ class Config extends Object implements IConfig {
 
         // check and load existing files
         foreach ($files as $i => $file) {
-            Assert::string($file, 'Illegal type of parameter $files['.$i.']: %s');
+            Assert::string($file, '$files['.$i.']');
 
             $isFile = is_file($file);
             if      ($isFile)               $file = realpath($file);
@@ -187,7 +187,7 @@ class Config extends Object implements IConfig {
      * @return mixed - config setting
      */
     public function get($key, $default = null) {
-        Assert::string($key, 'Illegal type of parameter $key: %s');
+        Assert::string($key, '$key');
         // TODO: a numerically indexed property array will have integer keys
 
         $notFound = false;
@@ -222,7 +222,7 @@ class Config extends Object implements IConfig {
      * @throws RuntimeException if the setting does not exist and no default value was specified
      */
     public function getBool($key, $options = null) {
-        Assert::string($key, 'Illegal type of parameter $key: %s');
+        Assert::string($key, '$key');
         $notFound = false;
         $value = $this->getProperty($key, $notFound);
 
@@ -239,7 +239,7 @@ class Config extends Object implements IConfig {
             $flags = $options;
         }
         else if (is_array($options) && \key_exists('flags', $options)) {
-            Assert::int($options['flags'], 'Illegal type of option "flags": %s');
+            Assert::int($options['flags'], 'option "flags"');
             $flags = $options['flags'];
         }
         if ($flags & FILTER_NULL_ON_FAILURE && ($value===null || $value===''))  // crap-PHP considers NULL and '' as valid strict booleans
@@ -257,7 +257,7 @@ class Config extends Object implements IConfig {
      * @return $this
      */
     public function set($key, $value) {
-        Assert::string($key, 'Illegal type of parameter $key: %s');
+        Assert::string($key, '$key');
         $this->setProperty($key, $value);
         return $this;
     }

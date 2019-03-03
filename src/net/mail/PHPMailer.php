@@ -39,7 +39,7 @@ class PHPMailer extends Mailer {
 
         // first validate the additional headers
         foreach ($headers as $i => $header) {
-            Assert::string($header, 'Illegal type of parameter $headers['.$i.']: %s');
+            Assert::string($header, '$headers['.$i.']');
             if (!preg_match('/^[a-z]+(-[a-z]+)*:/i', $header))
                                            throw new InvalidArgumentException('Invalid parameter $headers['.$i.']: "'.$header.'"');
         }
@@ -53,7 +53,7 @@ class PHPMailer extends Mailer {
         }
 
         // Return-Path: (invisible sender)
-        Assert::string($sender, 'Illegal type of parameter $sender: %s');
+        Assert::string($sender, '$sender');
         $returnPath = self::parseAddress($sender);
         if (!$returnPath)                  throw new InvalidArgumentException('Invalid parameter $sender: '.$sender);
         $value = $this->removeHeader($headers, 'Return-Path');
@@ -73,11 +73,11 @@ class PHPMailer extends Mailer {
         $from = $this->encodeNonAsciiChars($from);
 
         // RCPT: (receiving mailbox)
-        Assert::string($receiver, 'Illegal type of parameter $receiver: %s');
+        Assert::string($receiver, '$receiver');
         $rcpt = self::parseAddress($receiver);
         if (!$rcpt)                        throw new InvalidArgumentException('Invalid parameter $receiver: '.$receiver);
         $forced = $config->get('mail.forced-receiver', '');
-        Assert::string($forced, 'Illegal type of config value "mail.forced-receiver": %s');
+        Assert::string($forced, 'config value "mail.forced-receiver"');
         if (strlen($forced)) {
             $rcpt = self::parseAddress($forced);
             if (!$rcpt)                    throw new InvalidArgumentException('Invalid config value "mail.forced-receiver": '.$forced);
@@ -94,7 +94,7 @@ class PHPMailer extends Mailer {
         $to = $this->encodeNonAsciiChars($to);
 
         // Subject:
-        Assert::string($subject, 'Illegal type of parameter $subject: %s');
+        Assert::string($subject, '$subject');
         $subject = $this->encodeNonAsciiChars(trim($subject));
 
         // encode remaining headers (must be ASCII chars only)
@@ -115,7 +115,7 @@ class PHPMailer extends Mailer {
             $headers[] = 'To: '.trim($to['name'].' <'.$to['address'].'>');  // on Windows only if $headers is missing one
 
         // mail body
-        Assert::string($message, 'Illegal type of parameter $message: %s');
+        Assert::string($message, '$message');
         $message = str_replace(chr(0), '?', $message);                      // replace NUL bytes which destroy the mail
         $message = normalizeEOL($message, EOL_WINDOWS);                     // multiple lines must be separated by CRLF
 

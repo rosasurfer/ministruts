@@ -75,7 +75,7 @@ final class ConnectionPool extends Singleton {
             /** @var ConfigInterface $config */
             $config  = self::di('config');
             $options = $config->get('db.'.$id, []);
-            Assert::isArray($options, 'Invalid config value "db.'.$id.'": %s');
+            Assert::isArray($options, 'config value "db.'.$id.'"');
             if (!$options) throw new IllegalStateException('No configuration found for database alias "'.$id.'"');
 
             // resolve the class name to use for the connector

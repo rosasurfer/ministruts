@@ -282,7 +282,7 @@ class Application extends Object {
      * @param  string          $rootDir - application root directory
      */
     protected function expandAppDirs(ConfigInterface $config, $rootDir) {
-        Assert::string($rootDir, 'Illegal type of parameter $rootDir: %s');
+        Assert::string($rootDir, '$rootDir');
         if (!strlen($rootDir) || isRelativePath($rootDir)) throw new InvalidArgumentException('Invalid config option "app.dir.root": "'.$rootDir.'" (not an absolute path)');
 
         $rootDir = rtrim(str_replace('\\', '/', $rootDir), '/');
