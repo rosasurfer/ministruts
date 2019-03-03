@@ -262,28 +262,4 @@ class Command extends Object {
             throw new InvalidArgumentException('Invalid parameter $name: "'.$name.'" (not a command name)');
         return $this;
     }
-
-
-    /**
-     * Print a message to STDOUT.
-     *
-     * @param  string $message
-     *
-     * @return string
-     */
-    protected function out($message) {
-        $this->output->out($message);
-    }
-
-
-    /**
-     * Print a message to STDERR.
-     *
-     * @param  string $message
-     *
-     * @return string
-     */
-    protected function error($message) {
-        $this->output->error($message);
-    }
 }
