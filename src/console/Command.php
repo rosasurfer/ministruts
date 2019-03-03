@@ -36,6 +36,9 @@ class Command extends Object {
     private $docoptResult;
 
     /** @var \Closure */
+    private $validator;
+
+    /** @var \Closure */
     private $task;
 
     /** @var bool - whether the command configuration is frozen */
@@ -79,12 +82,33 @@ class Command extends Object {
      * @return int - execution status: 0 for "success"
      */
     public function run() {
-        $this->input = $this->di()->set(Input::class, new Input($this->docoptResult));
+        $this->input = new Input($this->docoptResult);
+        $this->di()->set(Input::class, $this->input);
+
+        if ($this->validator) $error = $this->validator->__invoke($this->input, $this->output);
+        else                  $error = $this->validate($this->input, $this->output);
+
+        if ($error)
+            return $this->status = (int) $error;
 
         if ($this->task) $status = $this->task->__invoke($this->input, $this->output);
         else             $status = $this->execute($this->input, $this->output);
 
         return $this->status = (int) $status;
+    }
+
+
+    /**
+     * Validate the command line arguments. Override this method to pre-define custom validation or set the validator
+     * dynamically via {@link Command::setValidator()}.
+     *
+     * @param  Input  $input
+     * @param  Output $output
+     *
+     * @return int - validation error status: 0 for "no error"
+     */
+    protected function validate(Input $input, Output $output) {
+        return 0;
     }
 
 
@@ -198,6 +222,30 @@ class Command extends Object {
 
 
     /**
+     * Return the command's dynamic validation implementation.
+     *
+     * @return \Closure|null
+     */
+    public function getValidator() {
+        return $this->validator;
+    }
+
+
+    /**
+     * Set the command's dynamic validation implementation. When a command is executed a dynamic validator is given higher
+     * priority than a pre-defined implementation in an overridden {@link Command::validate()} method.
+     *
+     * @param  \Closure $validator
+     *
+     * @return $this
+     */
+    public function setValidator(\Closure $validator) {
+        $this->validator = $validator->bindTo($this);
+        return $this;
+    }
+
+
+    /**
      * Return the command's dynamic task implementation.
      *
      * @return \Closure|null
@@ -208,7 +256,7 @@ class Command extends Object {
 
 
     /**
-     * Set the command's dynamic task implementation. When the command is executed a dynamic task has higher priority than
+     * Set the command's dynamic task implementation. When a command is executed a dynamic task is given higher priority than
      * a pre-defined implementation in an overridden {@link Command::execute()} method.
      *
      * @param  \Closure $task
@@ -229,23 +277,10 @@ class Command extends Object {
      */
     final public function freeze() {
         if (!$this->frozen) {
-            $this->validate();
+            if (!isset($this->name))         throw new IllegalStateException('Incomplete command configuration: no name');
+            if (!isset($this->docoptResult)) throw new IllegalStateException('Incomplete command configuration: no docopt definition');
             $this->frozen = true;
         }
-        return $this;
-    }
-
-
-    /**
-     * Validate the command configuration.
-     *
-     * @return $this
-     *
-     * @throws IllegalStateException if the command configuration is incomplete
-     */
-    private function validate() {
-        if (!isset($this->name))         throw new IllegalStateException('Incomplete command configuration: no name');
-        if (!isset($this->docoptResult)) throw new IllegalStateException('Incomplete command configuration: no docopt definition');
         return $this;
     }
 
