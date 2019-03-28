@@ -98,7 +98,7 @@ class PHP extends StaticClass {
             throw $ex->addMessage('CMD: "'.$cmd.'"');
         }
 
-        // the process doesn't need asynchronous watching
+        // if the process doesn't need asynchronous watching
         if (!$stdoutPassthrough && !$stderrPassthrough) {
             $stdout = stream_get_contents($pipes[$STDOUT]);
             $stderr = stream_get_contents($pipes[$STDERR]);
