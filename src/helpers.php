@@ -1216,11 +1216,11 @@ function strCollapseWhiteSpace($string, $joinLines=true, $separator=' ') {
  * (no mixed mode).
  *
  * @param  string $string          - string to normalize
- * @param  string $mode [optional] - format of the resulting string, can be one of:                                      <br>
- *                                   EOL_MAC:      line endings are converted to Mac format      "\r"                    <br>
- *                                   EOL_NETSCAPE: line endings are converted to Netscape format "\r\r\n"                <br>
- *                                   EOL_UNIX:     line endings are converted to Unix format     "\n" (default)          <br>
- *                                   EOL_WINDOWS:  line endings are converted to Windows format  "\r\n"                  <br>
+ * @param  string $mode [optional] - format of the resulting string, can be one of:                                     <br>
+ *                                   EOL_MAC:      line endings are converted to Mac format      "\r"                   <br>
+ *                                   EOL_NETSCAPE: line endings are converted to Netscape format "\r\r\n"               <br>
+ *                                   EOL_UNIX:     line endings are converted to Unix format     "\n" (default)         <br>
+ *                                   EOL_WINDOWS:  line endings are converted to Windows format  "\r\n"                 <br>
  * @return string
  */
 function normalizeEOL($string, $mode = EOL_UNIX) {
