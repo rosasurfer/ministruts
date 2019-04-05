@@ -19,7 +19,7 @@
         "ext-ctype":     "*",
         "ext-json":      "*",
         "ext-mbstring":  "*",
-        "psr/container": "*"            
+        "psr/container": "^1.0"
     },
     "autoload": {
         "classmap": ["src/"],
