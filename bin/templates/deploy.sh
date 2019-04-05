@@ -1,33 +1,45 @@
 #!/bin/bash
 #
-# TEMPLATE: Copy this file to your project and update the configuration in lines 18-22.
+# TEMPLATE
+#
+# Copy this file to your project's "bin" directory and update the configuration in lines 30-32.
 #
 #
 # Application deploy script for Git based repositories. Deploys a branch, a tag or a specific commit.
-# Sends email notifications with the deployed changes (commit mesages) if configured.
+# Sends email notifications with the deployed changes (i.e. commit mesages) if configured.
 #
-# Usage: deploy.sh [<branch-name> | <tag-name> | <commit-sha>]
+# Usage: deploy.sh [<branch-name> | <tag-name> | <commit-hash>]
 #
 # Without arguments the latest version of the current branch is deployed.
 #
+#
+# Configuration
+# -------------
+# Configuration values may be hard-coded or passed via the environment. Variables passed via the environment have precendence
+# over hard-coded values. The variable NOTIFY_FOR_PROJECT is optional and defaults to the checked-out project name.
+#
+# Example:  $ NOTIFY_ON_HOST=radegast NOTIFY_RECEIVER='radegast@gmail.com' deploy.sh master
+# 
 #
 # TODO: update existing submodules
 #
 set -e
 
 
-# notification configuration (environment variables of the same name will have precedence over values hardcoded here)
-NOTIFY_FOR_PROJECT="${NOTIFY_FOR_PROJECT:-<project-name>}"      `# fill in the project identifier               `
-NOTIFY_ON_HOST="${NOTIFY_ON_HOST:-<hostname>}"                  `# fill in the hostname to notify if deployed on`
-NOTIFY_RECEIVER="${NOTIFY_RECEIVER:-<email@domain.tld>}"        `# fill in the notification receiver            `
+# email notification configuration
+NOTIFY_FOR_PROJECT="${NOTIFY_FOR_PROJECT:-<project-name>}"      `# replace <project-name> with your project identifier          `
+NOTIFY_ON_HOST="${NOTIFY_ON_HOST:-<hostname>}"                  `# replace <hostname> with the hostname to notify if deployed on`
+NOTIFY_RECEIVER="${NOTIFY_RECEIVER:-<email@domain.tld>}"        `# replace <email@domain.tld> with the receiver's email address `
 
 
 # --- functions -------------------------------------------------------------------------------------------------------------
 
-# print a message to stderr
+
+# print a message to STDERR
 function error() {
     echo "error: $@" 1>&2
 }
+
 
 # --- end of functions ------------------------------------------------------------------------------------------------------
 
