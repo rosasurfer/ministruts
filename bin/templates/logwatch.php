@@ -1,13 +1,15 @@
-#!/usr/bin/env php56
+#!/usr/bin/env php
 <?php
 /**
- * TEMPLATE: Copy this file to your project and point line 27 to your application's init script.
- * You may want to setup a CRON job for it (see logwatch.php -h for command line options).
+ * TEMPLATE
+ *
+ * Copy this file to your project's "bin" directory and point line 30 to your application's real init script.
  *
  *
- * Scans the application's PHP error logfile for entries and sends them by email to the configured log receivers.
- * If no receivers are configured mail is sent to the system user running the script. Processed log entries are
- * removed from the file.
+ * Scans the application's PHP error log for new entries and mails them to the configured receivers. If no receivers are
+ * configured mail is sent to the system user running the script. Processed log entries are removed from the file.
+ *
+ * You may want to setup a CRON job for this script (@see `logwatch.php -h` for command line options).
  */
 namespace rosasurfer\bin\logwatch;
 
@@ -29,14 +31,14 @@ require(dirname(realpath(__FILE__)).'/../app/init.php');
 !CLI && exit(1|stderr('error: This script must be executed in CLI mode.'));
 
 
-// --- Configuration --------------------------------------------------------------------------------------------------------
+// --- configuration --------------------------------------------------------------------------------------------------------
 
 
 set_time_limit(0);                                          // no time limit for CLI
 $quiet = false;                                             // whether or not "quiet" mode is enabled (e.g. for CRON)
 
 
-// --- Parse and validate command line arguments ----------------------------------------------------------------------------
+// --- parse and validate command line arguments ----------------------------------------------------------------------------
 
 
 /** @var string[] $args */
@@ -52,7 +54,7 @@ foreach ($args as $i => $arg) {
 }
 
 
-// --- Start ----------------------------------------------------------------------------------------------------------------
+// --- start ----------------------------------------------------------------------------------------------------------------
 
 
 // (1) define the location of the error log
@@ -96,12 +98,10 @@ processEntry($entry);                           // process the last entry (if an
 fclose($hFile);
 unlink($tempName);
 
-
-// (3) the ugly end
 exit(0);
 
 
-// --- Functions ------------------------------------------------------------------------------------------------------------
+// --- functions ------------------------------------------------------------------------------------------------------------
 
 
 /**
@@ -173,3 +173,6 @@ echo <<<HELP
 
 HELP;
 }
+
+
+// --- the ugly end----------------------------------------------------------------------------------------------------------
