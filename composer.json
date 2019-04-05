@@ -15,9 +15,6 @@
         "vendor-dir":         "etc/vendor",
         "optimize-autoloader": true
     },
-    "repositories": [{ 
-        "packagist.org": false 
-    }],
     "require": {
         "php":          "^5.6",
         "ext-ctype":    "*",
@@ -30,7 +27,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "0.8.x-dev"
+            "dev-0.8": "0.8.x-dev"
         }
     }
 }
