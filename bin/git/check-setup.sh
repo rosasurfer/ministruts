@@ -52,7 +52,7 @@ if [ $(type -P cygpath.exe) ]; then
     SCRIPT_DIR=$(cygpath -m "$SCRIPT_DIR")
     TOP_LEVEL_DIR=$(cygpath -m "$TOP_LEVEL_DIR")
     GIT_HOOK_DIR=$(cygpath -m "$GIT_HOOK_DIR")
-fi    
+fi
 
 
 # make sure we run in the repo's root directory (as to not to mess-up nested repos)

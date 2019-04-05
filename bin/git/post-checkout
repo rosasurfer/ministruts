@@ -83,7 +83,7 @@ function check_lockfile() {
         echo " * running composer install"
         COMPOSER_ALLOW_SUPERUSER=1 $COMPOSER install --ignore-platform-reqs --no-dev --no-suggest
     else
-        COMPOSER_ALLOW_SUPERUSER=1 $COMPOSER dump-autoload 
+        COMPOSER_ALLOW_SUPERUSER=1 $COMPOSER dump-autoload
     fi
 }
 check_lockfile
