@@ -452,7 +452,7 @@ class Request extends Singleton {
     /**
      * Return the application's base URI. The value always starts and ends with a slash "/".
      *
-     * @return string - a partial URI (application path without module prefix or query string)
+     * @return string - a partial URI (application path without module prefix and query string)
      *
      * @example
      * <pre>
@@ -463,11 +463,10 @@ class Request extends Singleton {
     public function getApplicationBaseUri() {
         // TODO: Move to application as this is not a property of the request.
         static $baseUri;
-        if (!$baseUri) {
-            if (isset($_SERVER['APP_BASE_URI'])) {
-                $baseUri = $_SERVER['APP_BASE_URI'];
-            }
-            else {
+        if (!isset($baseUri)) {
+            $baseUri = $this->resolveBaseUriVar();
+
+            if (!isset($baseUri)) {
                 /** @var ConfigInterface $config */
                 $config  = $this->di('config');
                 $baseUri = $config->get('app.base-uri', false);
@@ -477,6 +476,26 @@ class Request extends Singleton {
             !strEndsWith  ($baseUri, '/') && $baseUri .= '/';
         }
         return $baseUri;
+    }
+
+
+    /**
+     * Resolve the value of an existing APP_BASE_URI server variable. Considers existing redirection values.
+     *
+     * @return string|null - value or NULL if the variable is not defined
+     */
+    private function resolveBaseUriVar() {
+        $envName = 'APP_BASE_URI';
+        $envValue = null;
+
+        if (!isset($_SERVER[$envName]))
+            $envName = 'REDIRECT_'.$envName;
+
+        while (isset($_SERVER[$envName])) {
+            $envValue = $_SERVER[$envName];
+            $envName = 'REDIRECT_'.$envName;
+        }
+        return $envValue;
     }
 
 
