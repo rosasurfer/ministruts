@@ -1,8 +1,10 @@
 #!/bin/bash
 #
-# TEMPLATE
+# --- TEMPLATE --------------------------------------------------------------------------------------------------------------
 #
-# Copy this file to your project's "bin" directory and update the configuration in lines 30-32.
+# Copy this file to your project's "bin" directory and update the configuration in lines 33-35.
+#
+# ---------------------------------------------------------------------------------------------------------------------------
 #
 #
 # Application deploy script for Git based repositories. Deploys a branch, a tag or a specific commit.
@@ -15,21 +17,22 @@
 #
 # Configuration
 # -------------
-# Configuration values may be hard-coded or passed via the environment. Variables passed via the environment have precendence
-# over hard-coded values. The variable NOTIFY_FOR_PROJECT is optional and defaults to the checked-out project name.
+# Configuration values may be hard-coded here or passed via the environment. Values passed via the environment override
+# values hard-coded here. The variable NOTIFY_FOR_PROJECT is optional and defaults to the name of the checked-out project.
 #
-# Example:  $ NOTIFY_ON_HOST=radegast NOTIFY_RECEIVER='radegast@gmail.com' deploy.sh master
-# 
+# Example:
+#  $ NOTIFY_ON_HOST=hostname  NOTIFY_RECEIVER=email@domain.tld  deploy.sh  master
+#
 #
 # TODO: update existing submodules
 #
 set -e
 
 
-# email notification configuration
-NOTIFY_FOR_PROJECT="${NOTIFY_FOR_PROJECT:-<project-name>}"      `# replace <project-name> with your project identifier          `
-NOTIFY_ON_HOST="${NOTIFY_ON_HOST:-<hostname>}"                  `# replace <hostname> with the hostname to notify if deployed on`
-NOTIFY_RECEIVER="${NOTIFY_RECEIVER:-<email@domain.tld>}"        `# replace <email@domain.tld> with the receiver's email address `
+# notify configuration (environment variables will have higher precedence than values hardcoded here)
+NOTIFY_FOR_PROJECT="${NOTIFY_FOR_PROJECT:-<placeholder>}"   `# replace <placeholder> with your project name                    `
+NOTIFY_ON_HOST="${NOTIFY_ON_HOST:-<placeholder>}"           `# replace <placeholder> with the hostname to notify if deployed on`
+NOTIFY_RECEIVER="${NOTIFY_RECEIVER:-<placeholder>}"         `# replace <placeholder> with the receiver's email address         `
 
 
 # --- functions -------------------------------------------------------------------------------------------------------------
@@ -101,26 +104,19 @@ elif [ -n "$COMMIT" ]; then
 fi
 
 
-# check updates
+# check applied changes
 OLD=$FROM_COMMIT
 NEW=$(git rev-parse --short HEAD)
 
 if [ "$OLD" = "$NEW" ]; then
     echo No changes.
 else
-    # send deployment notifications if configured
+    # validate notify configuration
+    [ "$NOTIFY_FOR_PROJECT" = "<placeholder>" ] && NOTIFY_FOR_PROJECT=
+    [ "$NOTIFY_ON_HOST"     = "<placeholder>" ] && NOTIFY_ON_HOST=
+    [ "$NOTIFY_RECEIVER"    = "<placeholder>" ] && NOTIFY_RECEIVER=
 
-    # trim angle brackets
-    NOTIFY_FOR_PROJECT=${NOTIFY_FOR_PROJECT#<}; NOTIFY_FOR_PROJECT=${NOTIFY_FOR_PROJECT%>}
-    NOTIFY_ON_HOST=${NOTIFY_ON_HOST#<};         NOTIFY_ON_HOST=${NOTIFY_ON_HOST%>}
-    NOTIFY_RECEIVER=${NOTIFY_RECEIVER#<};       NOTIFY_RECEIVER=${NOTIFY_RECEIVER%>}
-
-    # reset default values
-    [ "$NOTIFY_FOR_PROJECT" = "project-name"     ] && NOTIFY_FOR_PROJECT=
-    [ "$NOTIFY_ON_HOST"     = "hostname"         ] && NOTIFY_ON_HOST=
-    [ "$NOTIFY_RECEIVER"    = "email@domain.tld" ] && NOTIFY_RECEIVER=
-
-    # check missing values
+    # autocomplete optional values
     NOTIFY=0
     if [[ -n "$NOTIFY_ON_HOST" && -n "$NOTIFY_RECEIVER" ]]; then
         if [ "$NOTIFY_ON_HOST" = "$(hostname)" ]; then
@@ -129,7 +125,7 @@ else
         fi
     fi
 
-    # notify
+    # send deployment notifications
     if [ $NOTIFY -eq 1 ]; then
         if command -v sendmail >/dev/null; then
             (
@@ -145,14 +141,14 @@ else
 fi
 
 
-# update access permissions and ownership for writing of files
-DIRS="etc/log  etc/tmp"
+# update read permissions for web server and PHP for everything (skip hidden files, ignore errors)
+chmod -R a+rX "${PROJECT_DIR}"/* 2>/dev/null && :
 
+
+# update write permissions for web server and PHP for special files/folders only (don't ignore errors)
+DIRS="etc/log etc/tmp"
 for dir in $DIRS; do
     dir="$PROJECT_DIR/$dir/"
     [ -d "$dir" ] || mkdir -p "$dir"
-    chmod -R u+rwX,g+rwX "$dir"
+    chmod a+rwX "$dir"
 done
-
-USER="<username>"
-id -u "$USER" >/dev/null 2>&1 && chown -R --from=root.root "$USER.$USER" "$PROJECT_DIR"

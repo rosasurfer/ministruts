@@ -1,9 +1,11 @@
 #!/usr/bin/env php
 <?php
 /**
- * TEMPLATE
+ * --- TEMPLATE -------------------------------------------------------------------------------------------------------------
  *
  * Copy this file to your project's "bin" directory and point line 30 to your application's real init script.
+ *
+ * --------------------------------------------------------------------------------------------------------------------------
  *
  *
  * Scans the application's PHP error log for new entries and mails them to the configured receivers. If no receivers are
