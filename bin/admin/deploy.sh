@@ -29,7 +29,7 @@
 set -e
 
 
-# notify configuration (environment variables will have higher precedence than values hardcoded here)
+# notification configuration (environment variables will have higher precedence than values hardcoded here)
 NOTIFY_FOR_PROJECT="${NOTIFY_FOR_PROJECT:-<placeholder>}"   `# replace <placeholder> with your project name                    `
 NOTIFY_ON_HOST="${NOTIFY_ON_HOST:-<placeholder>}"           `# replace <placeholder> with the hostname to notify if deployed on`
 NOTIFY_RECEIVER="${NOTIFY_RECEIVER:-<placeholder>}"         `# replace <placeholder> with the receiver's email address         `
@@ -142,13 +142,12 @@ fi
 
 
 # grant read permission to everyone
-chmod -R a+rX "${PROJECT_DIR}"/* 2>/dev/null || true    `# you may want to limit this to the web server and/or php-fpm user`
+chmod -R a+rX * 2>/dev/null || true                     `# you may want to limit this to the web server and/or php-fpm user`
 
 
 # grant write permission on special folders
 DIRS=('etc/log' 'etc/tmp')
 for dir in "${DIRS[@]}"; do
-    dir="$PROJECT_DIR/$dir/"
     [ -d "$dir" ] || mkdir -p "$dir"
     chmod a+rwX "$dir"                                  `# you may want to limit this to the web server and/or php-fpm user`
 done
@@ -157,6 +156,5 @@ done
 # grant write permission on special files
 FILES=('file1' 'file2')
 for file in "${FILES[@]}"; do
-    file="$PROJECT_DIR/$file"
     [ -f "$file" ] && chmod a+w "$file"                 `# you may want to limit this to the web server and/or php-fpm user`
 done
