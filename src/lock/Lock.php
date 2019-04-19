@@ -56,7 +56,7 @@ class Lock extends BaseLock {
 
 
     /**
-     * Whether or not the lock is aquired.
+     * Whether the lock is aquired.
      *
      * @return bool
      */

@@ -104,22 +104,22 @@ class Logger extends StaticClass {
     private static $appLogLevel = self::DEFAULT_LOGLEVEL;
 
 
-    /** @var bool - whether or not the print handler for L_FATAL messages is enabled */
+    /** @var bool - whether the print handler for L_FATAL messages is enabled */
     private static $printFatalHandler = false;
 
-    /** @var bool - whether or not the print handler for non L_FATAL messages is enabled */
+    /** @var bool - whether the print handler for non L_FATAL messages is enabled */
     private static $printNonfatalHandler = false;
 
     /** @var int - counter for messages handled by the print handler */
     private static $printCounter = 0;
 
-    /** @var bool - whether or not the mail handler is enabled */
+    /** @var bool - whether the mail handler is enabled */
     private static $mailHandler = false;
 
     /** @var string[] - mail receivers */
     private static $mailReceivers = [];
 
-    /** @var bool - whether or not the SMS handler is enabled */
+    /** @var bool - whether the SMS handler is enabled */
     private static $smsHandler = false;
 
     /** @var string[] - SMS receivers */
@@ -131,7 +131,7 @@ class Logger extends StaticClass {
     /** @var array - SMS options; resolved at log message time */
     private static $smsOptions = [];
 
-    /** @var bool - whether or not the PHP error_log handler is enabled */
+    /** @var bool - whether the PHP error_log handler is enabled */
     private static $errorLogHandler = true;
 
     /** @var string[] - loglevel descriptions for message formatter */

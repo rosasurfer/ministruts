@@ -121,7 +121,7 @@ class Request extends Singleton {
 
 
     /**
-     * Whether or not the request is a GET request.
+     * Whether the request is a GET request.
      *
      * @return bool
      */
@@ -131,7 +131,7 @@ class Request extends Singleton {
 
 
     /**
-     * Whether or not the request is a POST request.
+     * Whether the request is a POST request.
      *
      * @return bool
      */
@@ -141,7 +141,7 @@ class Request extends Singleton {
 
 
     /**
-     * Whether or not the request was made over a secure channel (HTTPS).
+     * Whether the request was made over a secure channel (HTTPS).
      *
      * @return bool
      */
@@ -611,7 +611,7 @@ class Request extends Singleton {
     /**
      * Gibt die aktuelle HttpSession zurueck. Existiert noch keine Session, wird eine erzeugt.
      *
-     * @param  bool $suppressHeadersAlreadySentError [optional] - whether or not to suppress "headers already sent" errors
+     * @param  bool $suppressHeadersAlreadySentError [optional] - whether to suppress "headers already sent" errors
      *                                                            (default: no)
      * @return HttpSession
      */
@@ -621,7 +621,7 @@ class Request extends Singleton {
 
 
     /**
-     * Whether or not an HTTP session was started during the request. Not whether the session is still open (active).
+     * Whether an HTTP session was started during the request. Not whether the session is still open (active).
      *
      * @return bool
      */
@@ -631,7 +631,7 @@ class Request extends Singleton {
 
 
     /**
-     * Whether or not a session attribute of the specified name exists. If no session exists none is started.
+     * Whether a session attribute of the specified name exists. If no session exists none is started.
      *
      * @param  string $key - key
      *
@@ -665,8 +665,8 @@ class Request extends Singleton {
 
 
     /**
-     * Whether or not a valid session id was transmitted with the request. An invalid id is a URL based session id when the
-     * php.ini setting 'session.use_only_cookies' is enabled.
+     * Whether a valid session id was transmitted with the request. An invalid id is a URL based session id when the php.ini
+     * setting 'session.use_only_cookies' is enabled.
      *
      * @return bool
      */
@@ -965,7 +965,7 @@ class Request extends Singleton {
 
 
     /**
-     * Whether or not an ActionMessage exists for one of the specified keys, or for any key if no key was given.
+     * Whether an ActionMessage exists for one of the specified keys, or for any key if no key was given.
      *
      * @param  string|string[] $keys [optional] - message keys
      *
@@ -1073,7 +1073,7 @@ class Request extends Singleton {
 
 
     /**
-     * Whether or not an ActionError exists for one of the specified keys or for any key if no key was given.
+     * Whether an ActionError exists for one of the specified keys or for any key if no key was given.
      *
      * @param  string|string[] $keys [optional] - error keys
      *

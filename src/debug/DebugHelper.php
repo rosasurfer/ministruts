@@ -151,7 +151,7 @@ class DebugHelper extends StaticClass {
      * Return the fully qualified function or method name of a stacktrace's frame.
      *
      * @param  array $frame                  - frame
-     * @param  bool  $nsLowerCase [optional] - whether or not the namespace part of the name to return in lower case (default: no)
+     * @param  bool  $nsLowerCase [optional] - whether the namespace part of the name to return in lower case (default: no)
      *
      * @return string - fully qualified name (without trailing parentheses)
      */

@@ -8,8 +8,8 @@
 # Notes:
 # ------
 #  - If the hook is not executed automatically the Composer commands have to be called manually.
-#  - Whether or not hooks are executed by a graphical Git replacement depends on the tool. For example the JGit
-#    implementation of Eclipse atm does not execute hooks.
+#  - Whether hooks are executed by a graphical Git replacement depends on the tool. For example the JGit implementation of
+#    Eclipse atm does not execute hooks.
 #
 #
 # From the Git hooks documentation:

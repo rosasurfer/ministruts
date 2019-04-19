@@ -55,13 +55,13 @@ class PHP extends StaticClass {
      * @param  int      $exitCode [optional] - if present a variable the commands's exit code will be written to
      * @param  string   $dir      [optional] - if present the initial working directory for the command
      * @param  string[] $env      [optional] - if present the environment to *replace* the current one
-     * @param  array    $options  [optional] - additional options controlling runtime behaviour: <br>
-     *          "stdout-passthrough" => bool:  Whether or not to additionally pass-through (print) the contents of STDOUT. <br>
-     *                                         This option will not affect the return value. <br>
-     *                                         (default: no) <br>
-     *          "stderr-passthrough" => bool:  whether or not to additionally pass-through (print) the contents of STDERR. <br>
-     *                                         This option will not affect the return value. <br>
-     *                                         (default: no) <br>
+     * @param  array    $options  [optional] - additional options controlling runtime behaviour:                     <br>
+     *          "stdout-passthrough" => bool:  Whether to additionally pass-through (print) the contents of STDOUT.  <br>
+     *                                         This option will not affect the return value.                         <br>
+     *                                         (default: no)                                                         <br>
+     *          "stderr-passthrough" => bool:  whether to additionally pass-through (print) the contents of STDERR.  <br>
+     *                                         This option will not affect the return value.                         <br>
+     *                                         (default: no)                                                         <br>
      *
      * @return string - contents of STDOUT
      */
@@ -437,7 +437,7 @@ class PHP extends StaticClass {
      *
      * @param  string          $option
      * @param  bool|int|string $value
-     * @param  bool            $throwException [optional] - whether or not to throw an exception on errors (default: yes)
+     * @param  bool            $throwException [optional] - whether to throw an exception on errors (default: yes)
      *
      * @return bool - success status
      */

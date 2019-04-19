@@ -143,7 +143,7 @@ function boolToStr($value) {
  * @param  mixed $var                     - variable
  * @param  bool  $return       [optional] - TRUE,  if the variable is to be dumped into a string <br>
  *                                          FALSE, if the variable is to be dumped to the standard output device (default)
- * @param  bool  $flushBuffers [optional] - whether or not to flush output buffers on output (default: TRUE)
+ * @param  bool  $flushBuffers [optional] - whether to flush output buffers on output (default: TRUE)
  *
  * @return string|null - string if the result is to be returned, NULL otherwise
  */
@@ -156,7 +156,7 @@ function dump($var, $return=false, $flushBuffers=true) {
  * Functional replacement for <tt>"echo($var)"</tt> which is a language construct and can't be used as a regular function.
  *
  * @param  mixed $var
- * @param  bool  $flushBuffers [optional] - whether or not to flush output buffers (default: TRUE)
+ * @param  bool  $flushBuffers [optional] - whether to flush output buffers (default: TRUE)
  */
 function echof($var, $flushBuffers = true) {
     \rosasurfer\echof($var, $flushBuffers);
@@ -169,7 +169,7 @@ function echof($var, $flushBuffers = true) {
  * Prints a variable in a pretty way. Output always ends with a line feed.
  *
  * @param  mixed $var
- * @param  bool  $flushBuffers [optional] - whether or not to flush output buffers (default: TRUE)
+ * @param  bool  $flushBuffers [optional] - whether to flush output buffers (default: TRUE)
  *
  * @see    printPretty()
  */
@@ -228,7 +228,7 @@ function debugHeader($message) {
  * @param  mixed $var                     - variable
  * @param  bool  $return       [optional] - TRUE,  if the result is to be returned as a string <br>
  *                                          FALSE, if the result is to be printed to the standard output device (default)
- * @param  bool  $flushBuffers [optional] - whether or not to flush output buffers on output (default: TRUE)
+ * @param  bool  $flushBuffers [optional] - whether to flush output buffers on output (default: TRUE)
  *
  * @return string|null - string if the result is to be returned, NULL otherwise
  *
@@ -245,7 +245,7 @@ function pp($var, $return=false, $flushBuffers=true) {
  * @param  mixed $var                     - variable
  * @param  bool  $return       [optional] - TRUE,  if the result is to be returned as a string <br>
  *                                          FALSE, if the result is to be printed to the standard output device (default)
- * @param  bool  $flushBuffers [optional] - whether or not to flush output buffers on output (default: TRUE)
+ * @param  bool  $flushBuffers [optional] - whether to flush output buffers on output (default: TRUE)
  *
  * @return string|null - string if the result is to be returned, NULL otherwise
  */
@@ -300,7 +300,7 @@ function numf($number, $decimals=0, $decimalSeparator='.', $thousandsSeparator='
  * NOTE: Never use ini_get() to read boolean php.ini values as it will return the plain string passed to ini_set().
  *
  * @param  string $option            - option name
- * @param  bool   $strict [optional] - Whether or not to enable strict checking of the found value:
+ * @param  bool   $strict [optional] - Whether to enable strict checking of the found value:
  *                                     TRUE:  invalid values cause a runtime exception
  *                                     FALSE: invalid values are converted to the target type (i.e. boolean)
  *                                     (default: TRUE)
@@ -318,7 +318,7 @@ function ini_get_bool($option, $strict = true) {
  * NOTE: Never use ini_get() to read php.ini integer values as it will return the plain string passed to ini_set().
  *
  * @param  string $option            - option name
- * @param  bool   $strict [optional] - Whether or not to enable strict checking of the found value:
+ * @param  bool   $strict [optional] - Whether to enable strict checking of the found value:
  *                                     TRUE:  invalid values cause a runtime exception
  *                                     FALSE: invalid values are converted to the target type (i.e. integer)
  *                                     (default: TRUE)
@@ -336,7 +336,7 @@ function ini_get_int($option, $strict = true) {
  * NOTE: Never use ini_get() to read php.ini byte values as it will return the plain string passed to ini_set().
  *
  * @param  string $option            - option name
- * @param  bool   $strict [optional] - Whether or not to enable strict checking of the found value:
+ * @param  bool   $strict [optional] - Whether to enable strict checking of the found value:
  *                                     TRUE:  invalid values cause a runtime exception
  *                                     FALSE: invalid values are converted to the target type (i.e. integer)
  *                                     (default: TRUE)
@@ -368,7 +368,7 @@ function hsc($string, $flags=null, $encoding=null, $doubleEncode=true) {
 
 
 /**
- * Whether or not the byte order of the machine we are running on is "little endian".
+ * Whether the byte order of the machine we are running on is "little endian".
  *
  * @return bool
  */
@@ -378,7 +378,7 @@ function isLittleEndian() {
 
 
 /**
- * Whether or not the specified path is relative or absolute, according to the current operating system.
+ * Whether the specified path is relative or absolute, according to the current operating system.
  *
  * @param  string $path
  *
@@ -417,7 +417,7 @@ function strCompareI($stringA, $stringB) {
 
 
 /**
- * Whether or not a string contains a substring.
+ * Whether a string contains a substring.
  *
  * @param  string $haystack
  * @param  string $needle
@@ -431,7 +431,7 @@ function strContains($haystack, $needle, $ignoreCase = false) {
 
 
 /**
- * Whether or not a string contains a substring ignoring upper/lower case differences.
+ * Whether a string contains a substring ignoring upper/lower case differences.
  *
  * @param  string $haystack
  * @param  string $needle
@@ -444,8 +444,7 @@ function strContainsI($haystack, $needle) {
 
 
 /**
- * Whether or not a string starts with a substring. If multiple prefixes are specified whether or not the string starts
- * with one of them.
+ * Whether a string starts with a substring. If multiple prefixes are specified whether the string starts with one of them.
  *
  * @param  string          $string
  * @param  string|string[] $prefix                - one or more prefixes
@@ -459,8 +458,8 @@ function strStartsWith($string, $prefix, $ignoreCase = false) {
 
 
 /**
- * Whether or not a string starts with a substring ignoring upper/lower case differences. If multiple prefixes are
- * specified whether or not the string starts with one of them.
+ * Whether a string starts with a substring ignoring upper/lower case differences. If multiple prefixes are specified
+ * whether the string starts with one of them.
  *
  * @param  string          $string
  * @param  string|string[] $prefix - one or more prefixes
@@ -473,8 +472,7 @@ function strStartsWithI($string, $prefix) {
 
 
 /**
- * Whether or not a string ends with a substring. If multiple suffixes are specified whether or not the string ends
- * with one of them.
+ * Whether a string ends with a substring. If multiple suffixes are specified whether the string ends with one of them.
  *
  * @param  string          $string
  * @param  string|string[] $suffix                - one or more suffixes
@@ -488,8 +486,8 @@ function strEndsWith($string, $suffix, $ignoreCase = false) {
 
 
 /**
- * Whether or not a string ends with a substring ignoring upper/lower case differences. If multiple suffixes are
- * specified whether or not the string ends with one of them.
+ * Whether a string ends with a substring ignoring upper/lower case differences. If multiple suffixes are specified whether
+ * the string ends with one of them.
  *
  * @param  string          $string
  * @param  string|string[] $suffix - one or more suffixes
@@ -532,7 +530,7 @@ function strLeft($string, $length) {
  *                                                       the string<br>
  *                                             zero:     an empty string is returned<br>
  *                                             (default: 1 = the first occurrence)
- * @param  bool   $includeLimiter [optional] - whether or not to include the limiting substring in the returned result
+ * @param  bool   $includeLimiter [optional] - whether to include the limiting substring in the returned result
  *                                             (default: FALSE)
  * @param  mixed  $onNotFound     [optional] - value to return if the specified occurrence of the limiting substring is not found
  *                                             (default: the initial string)
@@ -584,7 +582,7 @@ function strRight($string, $length) {
  *                                                       end of the string<br>
  *                                             zero:     the initial string is returned<br>
  *                                             (default: 1 = the first occurrence)
- * @param  bool   $includeLimiter [optional] - whether or not to include the limiting substring in the returned result
+ * @param  bool   $includeLimiter [optional] - whether to include the limiting substring in the returned result
  *                                             (default: FALSE)
  * @param  mixed  $onNotFound     [optional] - value to return if the specified occurrence of the limiting substring is not found
  *                                             (default: empty string)
@@ -605,7 +603,7 @@ function strRightFrom($string, $limiter, $count=1, $includeLimiter=false, $onNot
 
 
 /**
- * Whether or not a string is wrapped in single or double quotes.
+ * Whether a string is wrapped in single or double quotes.
  *
  * @param  string $value
  *
@@ -617,7 +615,7 @@ function strIsQuoted($value) {
 
 
 /**
- * Whether or not a string is wrapped in single quotes.
+ * Whether a string is wrapped in single quotes.
  *
  * @param  string $value
  *
@@ -629,7 +627,7 @@ function strIsSingleQuoted($value) {
 
 
 /**
- * Whether or not a string is wrapped in double quotes.
+ * Whether a string is wrapped in double quotes.
  *
  * @param  string $value
  *
@@ -641,7 +639,7 @@ function strIsDoubleQuoted($value) {
 
 
 /**
- * Whether or not a string consists only of digits (0-9).
+ * Whether a string consists only of digits (0-9).
  *
  * @param  mixed $value
  *
@@ -653,7 +651,7 @@ function strIsDigits($value) {
 
 
 /**
- * Whether or not a string consists only of numerical characters and represents a valid numerical value.
+ * Whether a string consists only of numerical characters and represents a valid numerical value.
  * Opposite to the PHP built-in function is_numeric() this function returns FALSE if the string
  * begins with non-numerical characters (e.g. white space).
  *
@@ -683,7 +681,7 @@ function strToBool($value) {
  * Reduce multiple consecutive white space characters in a string to a single one.
  *
  * @param  string $string               - string to process
- * @param  bool   $joinLines [optional] - whether or not to return a single line result (default: yes)
+ * @param  bool   $joinLines [optional] - whether to return a single line result (default: yes)
  * @param  string $separator [optional] - the separator to use for joining (default: space " ")
  *
  * @return string
@@ -750,7 +748,7 @@ function mkDirWritable($path, $mode = 0775) {
 
 
 /**
- * Whether or not a directory is considered empty.
+ * Whether a directory is considered empty.
  *
  * (a directory with just '.svn' or '.git' is empty)
  *
@@ -777,7 +775,7 @@ function autoload($name) {
 
 
 /**
- * Whether or not the specified class exists (loaded or not) and is not an interface or a trait. Identical to
+ * Whether the specified class exists (loaded or not) and is not an interface or a trait. Identical to
  * <pre>class_exists($name, true)</pre> except it also returnes FALSE if auto loading triggers an exception.
  *
  * @param  string $name - class name
@@ -790,7 +788,7 @@ function is_class($name) {
 
 
 /**
- * Whether or not the specified interface exists (loaded or not) and is not a class or a trait. Identical to
+ * Whether the specified interface exists (loaded or not) and is not a class or a trait. Identical to
  * <pre>interface_exists($name, true)</pre> except it also returnes FALSE if auto loading triggers an exception.
  *
  * @param  string $name - interface name
@@ -803,7 +801,7 @@ function is_interface($name) {
 
 
 /**
- * Whether or not the specified trait exists (loaded or not) and is not a class or an interface. Identical to
+ * Whether the specified trait exists (loaded or not) and is not a class or an interface. Identical to
  * <pre>trait_exists($name, true)</pre> except it also returnes FALSE if auto loading triggers an exception.
  *
  * @param  string $name - trait name
@@ -842,15 +840,15 @@ function metatypeOf($name) {
 /**
  * Procedural replacement for rosasurfer\util\Validator::isDateTime()
  *
- * Whether or not the specified string value represents a valid date or datetime value.
+ * Whether the specified string value represents a valid date or datetime value.
  *
  * @param  string          $string            - string value
- * @param  string|string[] $format [optional] - A valid date/datetime format. If multiple values are supplied whether or not the specified
- *                                              string fits at least one of them.<br>
- *                                              Supported format strings: 'Y-m-d [H:i[:s]]'<br>
- *                                                                         'Y.m.d [H:i[:s]]'<br>
- *                                                                         'd.m.Y [H:i[:s]]'<br>
- *                                                                         'd/m/Y [H:i[:s]]'
+ * @param  string|string[] $format [optional] - A valid date/datetime format. If multiple values are supplied whether the
+ *                                              specified string fits at least one of them.  <br>
+ *                                              Supported format strings: 'Y-m-d [H:i[:s]]'  <br>
+ *                                                                        'Y.m.d [H:i[:s]]'  <br>
+ *                                                                        'd.m.Y [H:i[:s]]'  <br>
+ *                                                                        'd/m/Y [H:i[:s]]'  <br>
  *
  * @return int|bool - timestamp matching the string or FALSE if the string is not a valid date/datetime value
  *

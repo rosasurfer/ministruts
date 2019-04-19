@@ -54,7 +54,7 @@ class ErrorHandler extends StaticClass {
     /** @var callable - the registered exception handler */
     private static $exceptionHandler;
 
-    /** @var bool - whether or not the script is in the shutdown phase */
+    /** @var bool - whether the script is in the shutdown phase */
     private static $inShutdown;
 
 
@@ -79,7 +79,7 @@ class ErrorHandler extends StaticClass {
 
 
     /**
-     * Whether or not the script is in the shutdown phase.
+     * Whether the script is in the shutdown phase.
      *
      * @return bool
      */

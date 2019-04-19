@@ -43,7 +43,7 @@ if (!Array.from) { Array.from = (function() {
         // 11. Let len be ToLength(lenValue).
         var len = toLength(items.length);
         // 13. If IsConstructor(C) is true, then
-        // 13. a. Let A be the result of calling the [[Construct]] internal method 
+        // 13. a. Let A be the result of calling the [[Construct]] internal method
         // of C with an argument list containing the single item len.
         // 14. a. Else, Let A be ArrayCreate(len).
         var A = isCallable(C) ? Object(new C(len)) : new Array(len);
@@ -76,23 +76,23 @@ if (!String.prototype.capitalizeWords) String.prototype.capitalizeWords = functi
 if (!String.prototype.decodeEntities ) String.prototype.decodeEntities  = function decodeEntities ()                                    { if (!String.prototype.decodeEntities.textarea) /*static*/ String.prototype.decodeEntities.textarea = document.createElement('textarea'); String.prototype.decodeEntities.textarea.innerHTML = this; return String.prototype.decodeEntities.textarea.value; }
 if (!String.prototype.startsWith     ) String.prototype.startsWith      = function startsWith     (/*string*/ prefix, /*int*/ pos)      { return this.substr(!pos || pos < 0 ? 0 : +pos, prefix.length) === prefix; }
 if (!String.prototype.endsWith       ) String.prototype.endsWith        = function endsWith       (/*string*/ suffix, /*int*/ this_len) { if (this_len===undefined || this_len > this.length) this_len = this.length; return this.substring(this_len - suffix.length, this_len) === suffix; }
-if (!String.prototype.includes       ) String.prototype.includes        = function includes       (/*string*/ string, /*int*/ start)    { if (typeof(start) !== 'number') start = 0; if (start + string.length > this.length) return false; return this.indexOf(string, start) !== -1; } 
+if (!String.prototype.includes       ) String.prototype.includes        = function includes       (/*string*/ string, /*int*/ start)    { if (typeof(start) !== 'number') start = 0; if (start + string.length > this.length) return false; return this.indexOf(string, start) !== -1; }
 if (!String.prototype.contains       ) String.prototype.contains        = String.prototype.includes;
 if (!String.prototype.trim           ) String.prototype.trim            = function trim           ()                                    { return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, ''); }
 if (!String.prototype.repeat         ) String.prototype.repeat          = function repeat         (/*int*/ count) {
     var str = ''+ this;
     count = +count;
-    if (count != count) 
+    if (count != count)
         count = 0;
     if (count < 0)         throw new RangeError('repeat count must be non-negative');
     if (count == Infinity) throw new RangeError('repeat count must be less than infinity');
     count = Math.floor(count);
-    if (!str.length || !count) 
+    if (!str.length || !count)
         return '';
     if (str.length * count >= 1 << 28) throw new RangeError('repeat count must not overflow maximum string size');
     var maxCount = str.length * count;
     count = Math.floor(Math.log(count) / Math.log(2));
-    while (count--) 
+    while (count--)
        str += str;
     str += str.substring(0, maxCount - str.length);
     return str;
@@ -218,7 +218,7 @@ var rosasurfer = {
 
 
     /**
-     * Whether or not a parameter exists in the query string.
+     * Whether a parameter exists in the query string.
      *
      * @param  string name           - parameter name
      * @param  string url [optional] - URL to check for the query parameter (default: the current page location)
@@ -287,7 +287,7 @@ var rosasurfer = {
             if      (arg === null)    type = 'null';
             else if (arg.constructor) type = arg.constructor.name || arg.constructor.toString();
             else                      type = ''+ arg;
-            
+
             if (type.startsWith('[object ')) {              // [object HTMLAnchorElement]
                 type = type.slice(8, -1);
             }
@@ -303,7 +303,7 @@ var rosasurfer = {
      * Show all accessible properties of the passed argument.
      *
      * @param  mixed arg
-     * @param  bool  sort [optional] - whether or not to sort the displayed properties (default: yes)
+     * @param  bool  sort [optional] - whether to sort the displayed properties (default: yes)
      */
     showProperties: function showProperties(arg, sort) {
         if (arg === undefined)                            return alert('rosasurfer.showProperties()\n\nPassed parameter: undefined');
@@ -312,15 +312,15 @@ var rosasurfer = {
 
         var property='', properties=[], type=this.getType(arg);
         sort = (sort===undefined) ? (type!='Array') : Boolean(sort);
-        
+
         for (var i in arg) {
             try {
-                property = ''+ arg[i];                                                                       
-                if ((i=='innerHTML' || i=='textContent') && (property=property.replace(/\n/g, ' ')) && property.length > 100) {   
+                property = ''+ arg[i];
+                if ((i=='innerHTML' || i=='textContent') && (property=property.replace(/\n/g, ' ')) && property.length > 100) {
                     property = property.substr(0, 100) +'...';                                      // limit long HTML contents
                 }
-                else if (property.startsWith('function ') && property.contains('[native code]')) {  // remove line breaks from native function bodies 
-                    property =  property.replace(/\n/g, ' ');                                        
+                else if (property.startsWith('function ') && property.contains('[native code]')) {  // remove line breaks from native function bodies
+                    property =  property.replace(/\n/g, ' ');
                 }
                 property = type +'.'+ i +' = '+ property;
             }
@@ -371,7 +371,7 @@ var rosasurfer = {
         }
         if      (target=='top'   ) div.style.position = 'absolute';
         else if (target=='bottom') div.style.position = 'relative';
-        
+
         if (msg === null)                  msg = '(null)';
         else if (typeof(msg)=='undefined') msg = '(undefined)';
         else                               msg = msg.toString().replace(/ {2,}/g, function(match) { return '&nbsp;'.repeat(match.length); })

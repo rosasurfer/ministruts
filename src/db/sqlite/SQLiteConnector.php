@@ -75,7 +75,7 @@ class SQLiteConnector extends Connector {
     /** @var int - the last number of affected rows (not reset between queries) */
     protected $lastAffectedRows = 0;
 
-    /** @var bool - whether or not a query to execute can skip results */
+    /** @var bool - whether a query to execute can skip results */
     private $skipResults = false;
 
 
@@ -199,7 +199,7 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * Whether or not the adapter currently is connected to the database.
+     * Whether the adapter currently is connected to the database.
      *
      * @return bool
      */
@@ -392,7 +392,7 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * Whether or not the connection currently is in a transaction.
+     * Whether the connection currently is in a transaction.
      *
      * @return bool
      */
@@ -430,7 +430,7 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * Whether or not the DBMS's SQL dialect supports 'insert into ... returning ...' syntax.
+     * Whether the DBMS's SQL dialect supports 'insert into ... returning ...' syntax.
      *
      * @return bool
      */

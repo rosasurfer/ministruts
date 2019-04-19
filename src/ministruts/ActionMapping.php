@@ -18,7 +18,7 @@ use const rosasurfer\L_WARN;
 class ActionMapping extends Object {
 
 
-    /** @var bool - whether or not this component is fully configured */
+    /** @var bool - whether this component is fully configured */
     protected $configured = false;
 
     /** @var string */
@@ -135,7 +135,7 @@ class ActionMapping extends Object {
 
 
     /**
-     * Whether or not the mapping is configured to handle requests of the specified HTTP method.
+     * Whether the mapping is configured to handle requests of the specified HTTP method.
      *
      * @param  string $method - HTTP method verb
      *
@@ -338,7 +338,7 @@ class ActionMapping extends Object {
 
 
     /**
-     * Whether or not the mapping's {@link ActionForm} is stored in the {@link Request} instance.
+     * Whether the mapping's {@link ActionForm} is stored in the {@link Request} instance.
      *
      * @return bool
      */
@@ -348,7 +348,7 @@ class ActionMapping extends Object {
 
 
     /**
-     * Whether or not the mapping's {@link ActionForm} is stored in the {@link HttpSession} instance.
+     * Whether the mapping's {@link ActionForm} is stored in the {@link HttpSession} instance.
      *
      * @return bool
      */
@@ -374,7 +374,7 @@ class ActionMapping extends Object {
 
 
     /**
-     * Whether or not the mapping's {@link ActionForm} is validated by the framework before execution of the the {@link Action}.
+     * Whether the mapping's {@link ActionForm} is validated by the framework before execution of the the {@link Action}.
      *
      * @return bool
      */
@@ -399,7 +399,7 @@ class ActionMapping extends Object {
 
 
     /**
-     * Whether or not the mapping's "default" flag is set.
+     * Whether the mapping's "default" flag is set.
      *
      * @return bool
      *
