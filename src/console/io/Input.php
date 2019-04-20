@@ -19,9 +19,12 @@ class Input extends Object {
     /**
      * Constructor
      *
-     * @param  DocoptResult $docopt - a parsed and matched docopt result
+     * NULL may be passed instead of an actual {@link DocoptResult} to initialize an empty default Input service.
+     * Such an instance will return an empty value on all command, argument or option queries.
+     *
+     * @param  DocoptResult $docopt [optional] - a parsed and matched docopt result
      */
-    public function __construct(DocoptResult $docopt) {
+    public function __construct(DocoptResult $docopt = null) {
         $this->docoptResult = $docopt;
     }
 
@@ -45,6 +48,9 @@ class Input extends Object {
      * @return bool
      */
     public function isCommand($name) {
+        if (!$this->docoptResult)
+            return false;
+
         if (!($len=strlen($name)) || !isset($this->docoptResult[$name]))
             return false;
         return (bool) preg_match('/^[a-z]+$/', $name);
@@ -59,6 +65,9 @@ class Input extends Object {
      * @return bool|int - boolean value or number of times the command was specified (if defined)
      */
     public function hasCommand($name) {
+        if (!$this->docoptResult)
+            return false;
+
         if ($this->isCommand($name)) {
             $value = $this->docoptResult[$name];
             if (is_int($value) && $value > 1)
@@ -79,6 +88,8 @@ class Input extends Object {
      */
     public function isArgument($name) {
         if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
+        if (!$this->docoptResult)
+            return false;
 
         if (!($len=strlen($name)) || !isset($this->docoptResult[$name]))
             return false;
@@ -99,6 +110,9 @@ class Input extends Object {
      * @return string|null - argument value or NULL if the argument was not specified
      */
     public function getArgument($name) {
+        if (!$this->docoptResult)
+            return null;
+
         if ($this->isArgument($name)) {
             $value = $this->docoptResult[$name];
             if (is_array($value))
@@ -117,6 +131,9 @@ class Input extends Object {
      * @return string[] - argument values or an empty array if the argument was not specified
      */
     public function getArguments($name) {
+        if (!$this->docoptResult)
+            return [];
+
         if ($this->isArgument($name)) {
             $value = $this->docoptResult[$name];
             if (is_array($value))
@@ -137,6 +154,8 @@ class Input extends Object {
      */
     public function isOption($name) {
         if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
+        if (!$this->docoptResult)
+            return false;
 
         if (!strlen($name) || !isset($this->docoptResult[$name]) || $name[0]!='-' || $name=='-' || $name=='--')
             return false;
@@ -157,6 +176,9 @@ class Input extends Object {
      * @return bool|int|string - option value or FALSE if the option was not specified
      */
     public function getOption($name) {
+        if (!$this->docoptResult)
+            return false;
+
         if ($this->isOption($name)) {
             $value = $this->docoptResult[$name];
             if (is_array($value))                                   // repetitive option with arguments
@@ -181,6 +203,9 @@ class Input extends Object {
      * @return string[] - option values or an empty array if the option was not specified
      */
     public function getOptions($name) {
+        if (!$this->docoptResult)
+            return [];
+
         if ($this->isOption($name)) {
             $value = $this->docoptResult[$name];
             if (is_array($value))                                   // repetitive option with arguments

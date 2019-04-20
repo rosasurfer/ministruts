@@ -1,6 +1,7 @@
 <?php
 namespace rosasurfer\di\auto;
 
+use rosasurfer\console\io\Input;
 use rosasurfer\console\io\Output;
 use rosasurfer\di\Di;
 use rosasurfer\di\service\Service;
@@ -24,6 +25,9 @@ class DefaultDi extends Di {
         parent::__construct();
 
         $defaultServices = [
+            // an empty default Input service without a docopt definition
+            Input::class          => new Service(Input::class      , Input::class                              ),
+
             Output::class         => new Service(Output::class     , Output::class                             ),
             // 'frontController'  => new Service('frontController' , 'rosasurfer\\ministruts\\FrontController' ),
             // 'request'          => new Service('request'         , 'rosasurfer\\ministruts\\Request'         ),
