@@ -48,7 +48,7 @@ abstract class HttpResponse extends Object {
     const SC_NON_AUTHORITATIVE_INFORMATION = 203;
 
     /**
-     * @var int - Status code (204) indicating that the request succeeded but thatthere was no new information to return.
+     * @var int - Status code (204) indicating that the request succeeded but that there was no new information to return.
      */
     const SC_NO_CONTENT = 204;
 
