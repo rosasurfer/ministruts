@@ -17,10 +17,25 @@ class Output extends Object {
     /**
      * Write a message to STDOUT.
      *
-     * @param  string $message
+     * @param  mixed $message
      */
     public function out($message) {
-        if (!is_string($message)) throw new IllegalTypeException('Illegal type of parameter $message: '.gettype($message));
+        $var = $message;
+        if (is_object($var) && method_exists($var, '__toString') && !$var instanceof \SimpleXMLElement) {
+            $str = (string) $var;
+        }
+        elseif (is_object($var) || is_array($var)) {
+            $str = print_r($var, true);
+        }
+        elseif ($var === null) {
+            $str = '(null)';                                // analogous to typeof(null) = 'NULL'
+        }
+        elseif (is_bool($var)) {
+            $str = ($var ? 'true':'false').' (bool)';
+        }
+        else {
+            $str = (string) $var;
+        }
 
         $len = strlen($message);
         if ($len && $message[$len-1]!=NL)
