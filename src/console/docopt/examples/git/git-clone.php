@@ -3,9 +3,10 @@
 use function rosasurfer\echoPre;
 use function rosasurfer\docopt;
 
-require(dirname(realpath(__FILE__)).'/../../../../../etc/vendor/autoload.php');
+require(dirname(realpath(__FILE__)).'/../../../../../src/load.php');
 
-$doc = <<<HELP
+$doc = <<<DOCOPT
+
 Usage: git clone [options] [--] <repo> [<dir>]
 
     -v, --verbose          be more verbose
@@ -28,10 +29,9 @@ Usage: git clone [options] [--] <repo> [<dir>]
                            path to git-upload-pack on the remote
     --depth <depth>        create a shallow clone of that depth
 
-HELP;
+DOCOPT;
 
 $result = docopt($doc);
 foreach ($result as $key => $value) {
     echoPre($key.': '.json_encode($value));
 }
-echoPre($result->getArgs());

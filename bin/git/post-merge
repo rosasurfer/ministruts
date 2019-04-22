@@ -10,15 +10,15 @@
 #  - The hook is not executed if merging failed due to conflicts.
 #  - The hook is not executed if "git pull" is run with the --rebase option.
 #  - If the hook is not executed automatically the Composer commands have to be called manually.
-#  - Whether or not hooks are executed by a graphical Git replacement depends on the tool. For example the JGit
-#    implementation of Eclipse atm does not execute hooks.
+#  - Whether hooks are executed by a graphical Git replacement depends on the tool. For example the JGit implementation of
+#    Eclipse atm does not execute hooks.
 #
 #
 # From the Git hooks documentation:
 # ---------------------------------
 # This hook is invoked by git merge, which happens when a git pull is done on a local repository. The hook takes a single 
-# parameter, a status flag specifying whether or not the merge being done was a squash merge. This hook cannot affect the 
-# outcome of git merge and is not executed, if the merge failed due to conflicts.
+# parameter, a status flag specifying whether the merge being done was a squash merge. This hook cannot affect the outcome of
+# `git merge` and is not executed, if the merge failed due to conflicts.
 #
 #
 set -e

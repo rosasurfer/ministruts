@@ -304,7 +304,7 @@ class Validator extends StaticClass {
 
 
     /**
-     * Whether or not the passed string represents a valid phone number.
+     * Whether the passed string represents a valid phone number.
      *
      * @param  string $value
      *

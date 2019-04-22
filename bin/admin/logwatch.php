@@ -37,7 +37,7 @@ require(dirname(realpath(__FILE__)).'/../app/init.php');
 
 
 set_time_limit(0);                                          // no time limit for CLI
-$quiet = false;                                             // whether or not "quiet" mode is enabled (e.g. for CRON)
+$quiet = false;                                             // whether "quiet" mode is enabled (e.g. for CRON)
 
 
 // --- parse and validate command line arguments ----------------------------------------------------------------------------

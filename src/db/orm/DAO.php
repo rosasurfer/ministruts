@@ -67,7 +67,7 @@ abstract class DAO extends Singleton {
      * Find a single matching record and convert it to an instance of the entity class.
      *
      * @param  string $query                - SQL query with optional ORM syntax
-     * @param  bool   $allowMany [optional] - whether or not the query is allowed to return a multi-row result (default: no)
+     * @param  bool   $allowMany [optional] - whether the query is allowed to return a multi-row result (default: no)
      *
      * @return PersistableObject|null
      *
@@ -99,7 +99,7 @@ abstract class DAO extends Singleton {
      * Get a single matching record and convert it to an instance of the entity class.
      *
      * @param  string $query                - SQL query with optional ORM syntax
-     * @param  bool   $allowMany [optional] - whether or not the query is allowed to return a multi-row result (default: no)
+     * @param  bool   $allowMany [optional] - whether the query is allowed to return a multi-row result (default: no)
      *
      * @return PersistableObject
      *

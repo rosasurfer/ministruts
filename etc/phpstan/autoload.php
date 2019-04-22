@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-include(__DIR__.'/../vendor/autoload.php');
+include(__DIR__.'/../../src/load.php');
 include(__DIR__.'/DynamicReturnType.php');
 include(__DIR__.'/DAO_Find_ReturnType.php');
 include(__DIR__.'/DAO_FindAll_ReturnType.php');

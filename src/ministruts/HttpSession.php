@@ -3,6 +3,7 @@ namespace rosasurfer\ministruts;
 
 use rosasurfer\core\Singleton;
 use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\exception\RuntimeException;
 use rosasurfer\exception\error\PHPError;
 
 
@@ -17,19 +18,19 @@ class HttpSession extends Singleton {
     /** @var Request - request the session belongs to */
     protected $request;
 
-    /** @var bool - Whether or not the session is "new". A session is new if the client doesn't yet know the session id. */
+    /** @var bool - Whether the session is "new". A session is new if the client doesn't yet know the session id. */
     protected $new;
 
 
     /**
-     * Return the <tt>Singleton</tt> instance.
+     * Return the {@link Singleton} instance.
      *
      * @param  Request $request                                    - request the session belongs to
-     * @param  bool    $suppressHeadersAlreadySentError [optional] - whether or not to suppress "headers already sent" errors
+     * @param  bool    $suppressHeadersAlreadySentError [optional] - whether to suppress "headers already sent" errors
      *
      * @return static
      *
-     * @throws RuntimeException if not called from the web interface
+     * @throws RuntimeException:: if not called from the web interface
      */
     public static function me(Request $request, $suppressHeadersAlreadySentError = false) {
         return self::getInstance(static::class, $request, $suppressHeadersAlreadySentError);
@@ -40,7 +41,7 @@ class HttpSession extends Singleton {
      * Constructor
      *
      * @param  Request $request                                    - request the session belongs to
-     * @param  bool    $suppressHeadersAlreadySentError [optional] - whether or not to suppress "headers already sent" errors
+     * @param  bool    $suppressHeadersAlreadySentError [optional] - whether to suppress "headers already sent" errors
      *                                                               (default: no)
      */
     protected function __construct(Request $request, $suppressHeadersAlreadySentError = false) {
@@ -53,22 +54,17 @@ class HttpSession extends Singleton {
     /**
      * Start and initialize the session.
      *
-     * @param  bool $suppressHeadersAlreadySentError [optional] - whether or not to suppress "headers already sent" errors
+     * @param  bool $suppressHeadersAlreadySentError [optional] - whether to suppress "headers already sent" errors
      *                                                            (default: no)
      */
     protected function init($suppressHeadersAlreadySentError = false) {
         /**
-         *
-         *
-         *
-         *
-         *
-         * PHP laesst sich ohne weiteres manipulierte Session-IDs unterschieben, solange diese keine ungueltigen Zeichen enthalten
-         * (IDs wie PHPSESSID=111 werden anstandslos akzeptiert).  Wenn session_start() zurueckkehrt, gibt es mit den vorhandenen
-         * PHP-Mitteln keine vernuenftige Moeglichkeit mehr, festzustellen, ob die Session-ID von PHP oder (kuenstlich?) vom User
-         * generiert wurde.  Daher wird in dieser Methode jede neue Session mit einer zusaetzliche Markierung versehen.  Fehlt diese
-         * Markierung nach Rueckkehr von session_start(), wurde die ID nicht von PHP generiert.  Aus Sicherheitsgruenden wird eine
-         * solche Session verworfen und eine neue ID erzeugt.
+         * PHP laesst sich ohne weiteres manipulierte Session-IDs unterschieben, solange diese keine ungueltigen Zeichen
+         * enthalten (IDs wie PHPSESSID=111 werden anstandslos akzeptiert).  Wenn session_start() zurueckkehrt, gibt es mit
+         * den vorhandenen PHP-Mitteln keine vernuenftige Moeglichkeit mehr, festzustellen, ob die Session-ID von PHP oder
+         * (kuenstlich?) vom User generiert wurde.  Daher wird in dieser Methode jede neue Session mit einer zusaetzliche
+         * Markierung versehen.  Fehlt diese Markierung nach Rueckkehr von session_start(), wurde die ID nicht von PHP
+         * generiert.  Aus Sicherheitsgruenden wird eine solche Session verworfen und eine neue ID erzeugt.
          */
         $request = $this->request;
 
@@ -120,7 +116,7 @@ class HttpSession extends Singleton {
     /**
      * Reset this session to a clean and new state.
      *
-     * @param  bool $regenerateId - whether or not to generate a new session id and to delete an old session file
+     * @param  bool $regenerateId - whether to generate a new session id and to delete an old session file
      */
     public function reset($regenerateId) {
         if (!is_bool($regenerateId)) throw new IllegalTypeException('Illegal type of parameter $regenerateId: '.gettype($regenerateId));

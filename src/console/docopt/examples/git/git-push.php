@@ -3,9 +3,10 @@
 use function rosasurfer\echoPre;
 use function rosasurfer\docopt;
 
-require(dirname(realpath(__FILE__)).'/../../../../../etc/vendor/autoload.php');
+require(dirname(realpath(__FILE__)).'/../../../../../src/load.php');
 
-$doc = <<<HELP
+$doc = <<<DOCOPT
+
 Usage: git push [options] [<repository> [<refspec>...]]
 
     -h, --help
@@ -26,10 +27,9 @@ Usage: git push [options] [<repository> [<refspec>...]]
     -u, --set-upstream     set upstream for git pull/status
     --progress             force progress reporting
 
-HELP;
+DOCOPT;
 
 $result = docopt($doc);
 foreach ($result as $key => $value) {
     echoPre($key.': '.json_encode($value));
 }
-echoPre($result->getArgs());

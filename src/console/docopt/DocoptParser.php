@@ -378,7 +378,7 @@ class DocoptParser extends Object {
                     if ($left == '') {
                         if ($tokens->current()===null || $tokens->current()=='--') {
                             $error = $tokens->getTokenError();
-                            throw new $error($short.' requires argument');
+                            throw new $error($short.' requires an argument');
                         }
                         $value = $tokens->move();
                     }
@@ -458,7 +458,7 @@ class DocoptParser extends Object {
             }
             else if ($value === null) {
                 if ($tokens->current()===null || $tokens->current()=='--')
-                    throw new $tokenError($o->long.' requires argument');
+                    throw new $tokenError($o->long.' requires an argument');
                 $value = $tokens->move();
             }
             if ($tokens->getTokenError() == DocoptUserNotification::class) {
