@@ -25,8 +25,6 @@ class Output extends Object {
         $hStream = CLI ? \STDOUT : fopen('php://stdout', 'a');
         fwrite($hStream, $message);
         if (!CLI) fclose($hStream);
-
-        echoPre($var);
     }
 
 
