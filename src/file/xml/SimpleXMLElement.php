@@ -8,7 +8,7 @@ use rosasurfer\di\DiAwareTrait;
 /**
  * SimpleXMLElement
  *
- * A SimpleXMLElement drop-in replacement that will make you smile.
+ * A {@link \SimpleXMLElement} drop-in replacement with added DI awareness and error handling.
  */
 class SimpleXMLElement extends \SimpleXMLElement {
 
