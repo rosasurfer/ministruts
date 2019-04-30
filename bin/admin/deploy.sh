@@ -142,19 +142,25 @@ fi
 
 
 # grant read permission to everyone
-chmod -R a+rX * 2>/dev/null || true                     `# you may want to limit this to the web server and/or php-fpm user`
+chmod -R a+rX * 2>/dev/null || true                                         `# limit this to the web server and/or PHP user`
 
 
 # grant write permission on special folders
 DIRS=('etc/log' 'etc/tmp')
 for dir in "${DIRS[@]}"; do
     [ -d "$dir" ] || mkdir -p "$dir"
-    chmod a+rwX "$dir"                                  `# you may want to limit this to the web server and/or php-fpm user`
+    chmod a+rwX "$dir" 2>/dev/null || true                                  `# limit this to the web server and/or PHP user`
 done
 
 
 # grant write permission on special files
 FILES=('file1' 'file2')
 for file in "${FILES[@]}"; do
-    [ -f "$file" ] && chmod a+w "$file"                 `# you may want to limit this to the web server and/or php-fpm user`
+    [ -f "$file" ] && chmod a+w "$file" 2>/dev/null                         `# limit this to the web server and/or PHP user`
 done
+
+
+# if the specified user and group exist let the user own the project
+USER='<username>'
+GROUP='<groupname>'
+id -u "$USER" &>/dev/null && id -g "$GROUP" &>/dev/null && chown -R "$USER.$GROUP" "$PROJECT_DIR" 2>/dev/null &
