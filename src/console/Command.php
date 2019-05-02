@@ -79,7 +79,7 @@ class Command extends Object {
     /**
      * Trigger execution of the command.
      *
-     * @return int - execution status: 0 for "success"
+     * @return int - execution status (0 for success)
      */
     public function run() {
         $this->input = new Input($this->docoptResult);
@@ -119,7 +119,7 @@ class Command extends Object {
      * @param  Input  $input
      * @param  Output $output
      *
-     * @return int - execution status: 0 for "success"
+     * @return int - execution status (0 for success)
      */
     protected function execute(Input $input, Output $output) {
         return 0;

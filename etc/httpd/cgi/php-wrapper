@@ -1,8 +1,7 @@
 #!/bin/sh
 #
-# This script must be executable. If mod_suexec is used the script AND the containing "cgi" directory must be owned by
-# the same user and group as specified in the Apache's "SuexecUserGroup" directive. On errors check the logfile shown by
-# `suexec -V`.
+# This script must be executable. If mod_suexec is used the script AND the containing directory must be owned by the user
+# and group specified in Apache's "SuexecUserGroup" directive. On errors check settings and the logfile shown by `suexec -V`.
 #
 
 #

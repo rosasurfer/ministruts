@@ -64,7 +64,7 @@ abstract class ActionForm extends Object {
         //   The browser will send "submit[action].x=123&submit[action].y=456" and PHP will discard the coordinates.
         //
         // - Workaround for all other parameter names with dots => wrap the name in a top-level array:
-        //   $_POST = Array (
+        //   $_POST = array(
         //       [action_x] => update                               // <img type="submit" name="action"... broken by PHP
         //       [application_name] => foobar                       // regular custom parameters broken by PHP
         //       [top_level_with_dots] => Array (                   // custom top-level parameters broken by PHP
