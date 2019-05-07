@@ -10,7 +10,7 @@
 # Application deploy script for Git based repositories. Deploys a branch, a tag or a specific commit.
 # Sends email notifications with the deployed changes (i.e. commit mesages) if configured.
 #
-# Usage: deploy.sh [<branch-name> | <tag-name> | <commit-hash>]
+# Usage: deploy.sh [<branch> | <tag> | <commit>]
 #
 # Without arguments the latest version of the current branch is deployed.
 #
@@ -40,7 +40,7 @@ NOTIFY_RECEIVER="${NOTIFY_RECEIVER:-<placeholder>}"         `# replace <placehol
 
 # print a message to STDERR
 function error() {
-    echo "error: $@" 1>&2
+    echo "$@" 1>&2
 }
 
 
@@ -48,7 +48,7 @@ function error() {
 
 
 # check git availability
-command -v git >/dev/null || { error "ERROR: Git command not found."; exit 1; }
+command -v git >/dev/null || { error "error: Git command not found."; exit 1; }
 
 
 # change to the project's toplevel directory
@@ -64,15 +64,15 @@ git fetch origin
 
 
 # check arguments
-if [ $# -eq 0 ]; then
+if [ $# = 0 ]; then
     # no arguments given, get current branch name
     if [ "$FROM_BRANCH" = "HEAD" ]; then
-        error "HEAD is currently detached at $FROM_COMMIT, you must specify a ref-name to deploy."
-        error "Usage: $(basename "$0") [<branch-name> | <tag-name> | <commit-sha>]"
+        error "HEAD is currently detached at $FROM_COMMIT, you must specify a ref name to deploy."
+        error "Usage: $(basename "$0") [<branch> | <tag> | <commit>]"
         exit 2
     fi
     BRANCH="$FROM_BRANCH"
-elif [ $# -eq 1 ]; then
+elif [ $# = 1 ]; then
     # argument given, resolve its type
     if git show-ref -q --verify "refs/heads/$1"; then
         BRANCH="$1"
@@ -83,12 +83,12 @@ elif [ $# -eq 1 ]; then
     elif git rev-parse -q --verify "$1^{commit}" >/dev/null; then
         COMMIT="$1"
     else
-        error "Unknown ref-name $1"
-        error "Usage: $(basename "$0") [<branch-name> | <tag-name> | <commit-sha>]"
+        error "Unknown ref name $1"
+        error "Usage: $(basename "$0") [<branch> | <tag> | <commit>]"
         exit 2
     fi
 else
-    error "Usage: $(basename "$0") [<branch-name> | <tag-name> | <commit-sha>]"
+    error "Usage: $(basename "$0") [<branch> | <tag> | <commit>]"
     exit 2
 fi
 
@@ -126,7 +126,7 @@ else
     fi
 
     # send deployment notifications
-    if [ $NOTIFY -eq 1 ]; then
+    if [ $NOTIFY = 1 ]; then
         if command -v sendmail >/dev/null; then
             (
             echo 'From: "Deployments '$NOTIFY_FOR_PROJECT'" <'$NOTIFY_RECEIVER'>'
@@ -142,21 +142,21 @@ fi
 
 
 # grant read permission to everyone
-chmod -R a+rX * 2>/dev/null || true                                         `# limit this to the web server and/or PHP user`
+chmod -R a+rX * 2>/dev/null || true                             `# you want to limit this to the web server and/or PHP user`
 
 
 # grant write permission on special folders
 DIRS=('etc/log' 'etc/tmp')
 for dir in "${DIRS[@]}"; do
     [ -d "$dir" ] || mkdir -p "$dir"
-    chmod a+rwX "$dir" 2>/dev/null || true                                  `# limit this to the web server and/or PHP user`
+    chmod a+rwX "$dir" 2>/dev/null || true                      `# you want to limit this to the web server and/or PHP user`
 done
 
 
 # grant write permission on special files
 FILES=('file1' 'file2')
 for file in "${FILES[@]}"; do
-    [ -f "$file" ] && chmod a+w "$file" 2>/dev/null                         `# limit this to the web server and/or PHP user`
+    [ -f "$file" ] && chmod a+w "$file" 2>/dev/null             `# you want to limit this to the web server and/or PHP user`
 done
 
 
