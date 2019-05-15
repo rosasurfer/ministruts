@@ -9,10 +9,10 @@ abstract class RoleProcessor {
 
 
     /**
-     * Ob der aktuelle User Inhaber der angegebenen Rolle(n) ist.
+     * Whether the current user owns the specified role(s).
      *
      * @param  Request $request
-     * @param  string  $roles   - Rollenbezeichner
+     * @param  string  $roles - one or more role identifier
      *
      * @return bool
      */
@@ -20,15 +20,15 @@ abstract class RoleProcessor {
 
 
     /**
-     * Ob der aktuelle User Inhaber der definierten Rolle(n) des angegebenen Mappings ist.  Gibt NULL
-     * zurueck, wenn die Verarbeitung fortgesetzt und der Zugriff gewaehrt, oder eine ActionForward-
-     * Instanz, wenn der Zugriff nicht gewaehrt und statt dessen zu dem vom Forward beschriebenen Ziel
-     * verzweigt werden soll.
+     * Whether the current user owns the role(s) specified by the given {@link ActionMapping}.
+     *
+     * If the user owns the role(s) and access is granted the method returns NULL. If access is denied the method returns an
+     * {@link ActionForward} pointing to the resource the user should be directed to.
      *
      * @param  Request       $request
      * @param  ActionMapping $mapping
      *
-     * @return ActionForward
+     * @return ActionForward|null
      */
     abstract public function processRoles(Request $request, ActionMapping $mapping);
 }
