@@ -1,18 +1,20 @@
 <?php
 namespace rosasurfer\ministruts;
 
+use rosasurfer\core\Object;
+
 
 /**
  * RoleProcessor
  */
-abstract class RoleProcessor {
+abstract class RoleProcessor extends Object {
 
 
     /**
-     * Whether the current user owns the specified role(s).
+     * Whether the rights of the current user satisfy the specified role constraint.
      *
      * @param  Request $request
-     * @param  string  $roles - one or more role identifier
+     * @param  string  $role - role identifier or constraint (e.g. "admin" or "!admin")
      *
      * @return bool
      */
@@ -20,9 +22,9 @@ abstract class RoleProcessor {
 
 
     /**
-     * Whether the current user owns the role(s) specified by the given {@link ActionMapping}.
+     * Whether the rights of the current user satisfy the role constraints specified by the given {@link ActionMapping}.
      *
-     * If the user owns the role(s) and access is granted the method returns NULL. If access is denied the method returns an
+     * If access to the ActionMapping is granted the method returns NULL. If access is denied the method returns an
      * {@link ActionForward} pointing to the resource the user should be directed to.
      *
      * @param  Request       $request
