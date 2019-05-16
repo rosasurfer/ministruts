@@ -468,12 +468,16 @@ PROCESS_METHOD_ERROR_SC_405;
             $this->cacheActionMessages($request);
             $path = $forward->getPath();
 
-            if (isset(parse_url($path)['host'])) {               // check for external URI
+            if (isset(parse_url($path)['host'])) {                  // an external uri
                 $url = $path;
             }
-            else {
+            else if ($path[0] == '/') {                             // an application-relative uri
+                $appUri = $request->getApplicationBaseUri();
+                $url = $appUri.ltrim($path, '/');
+            }
+            else {                                                  // a module-relative uri
                 $moduleUri = $request->getApplicationBaseUri().$module->getPrefix();
-                $url = $moduleUri.ltrim($path, '/');
+                $url = $moduleUri.$path;
             }
             $response->redirect($url, $forward->getRedirectType());
         }

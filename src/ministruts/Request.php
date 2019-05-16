@@ -427,7 +427,7 @@ class Request extends Singleton {
      */
     public function getApplicationRelativeUri() {
         // TODO: Move to application as this is not a property of the request.
-        return strRightFrom($this->getUri(), $this->getApplicationBaseUri()).'/';
+        return '/'.strRightFrom($this->getUri(), $this->getApplicationBaseUri());
     }
 
 
