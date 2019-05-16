@@ -11,14 +11,14 @@ abstract class RoleProcessor extends Object {
 
 
     /**
-     * Whether the rights of the current user satisfy the specified role constraint.
+     * Whether the current web user owns the specified role.
      *
      * @param  Request $request
-     * @param  string  $role - role identifier or constraint (e.g. "admin" or "!admin")
+     * @param  string  $role - a single role identifier (not an expression)
      *
      * @return bool
      */
-    abstract public function isUserInRole(Request $request, $roles);
+    abstract public function isUserInRole(Request $request, $role);
 
 
     /**
@@ -30,7 +30,7 @@ abstract class RoleProcessor extends Object {
      * @param  Request       $request
      * @param  ActionMapping $mapping
      *
-     * @return ActionForward|null
+     * @return ActionForward|string|null - ActionForward instance or the name of a configured ActionForward
      */
     abstract public function processRoles(Request $request, ActionMapping $mapping);
 }

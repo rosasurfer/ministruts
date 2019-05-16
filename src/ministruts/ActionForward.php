@@ -240,7 +240,7 @@ class ActionForward extends Object {
 
 
     /**
-     * Return an identical copy of forward.
+     * Return an identical copy of the forward.
      *
      * @return self
      */
