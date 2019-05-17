@@ -4,12 +4,9 @@ namespace rosasurfer\ministruts;
 use rosasurfer\core\Object;
 use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\IllegalTypeException;
-use rosasurfer\log\Logger;
 
 use function rosasurfer\strCompareI;
 use function rosasurfer\strLeftTo;
-
-use const rosasurfer\L_WARN;
 
 
 /**
@@ -481,21 +478,19 @@ class ActionMapping extends Object {
             $forward = $this->forwards[$name];
         }
         else if (strCompareI($name, ActionForward::SELF)) {
-            $name    = ActionForward::SELF;
-            $path    = $this->path;
-            $class   = $this->module->getForwardClass();
+            $name = ActionForward::SELF;
+            $path = $this->path;
+            $class = $this->module->getForwardClass();
             /** @var ActionForward $forward */
             $forward = new $class($name, $path, true);
         }
         else {
-            $forward = $this->module->findForward($name);
-            if (!$forward && $this->configured) Logger::log('No ActionForward found for name "'.$name.'"', L_WARN);
-            return $forward;
+            return $this->module->findForward($name);
         }
 
         if ($forward->getName() == ActionForward::SELF) {
             if ($this->configured) {                            // runtime: set the current request's query string
-                $path  = $this->path;
+                $path = $this->path;
                 $query = Request::me()->getQueryString();
                 if (strlen($query))
                     $path = strLeftTo($path, '?').'?'.$query;
@@ -519,7 +514,7 @@ class ActionMapping extends Object {
     public function findForwardOrFail($name) {
         $forward = $this->findForward($name);
         if (!$forward)
-            throw new StrutsConfigException('<mapping name="'.$this->getName().'"  path="'.$this->getPath().'": ActionForward "edit" not found.');
+            throw new StrutsConfigException('<mapping name="'.$this->getName().'"  path="'.$this->getPath().'": ActionForward "'.$name.'" not found.');
         return $forward;
     }
 }

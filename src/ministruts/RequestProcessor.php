@@ -275,12 +275,17 @@ PROCESS_METHOD_ERROR_SC_405;
      * @return bool
      */
     protected function processRoles(Request $request, Response $response, ActionMapping $mapping) {
-        if ($mapping->getRoles() === null)
+        if (empty($mapping->getRoles()))
             return true;
 
+        /** @var ActionForward|string|null $forward */
         $forward = $this->module->getRoleProcessor()->processRoles($request, $mapping);
-        if (!$forward)
+        if (!isset($forward))
             return true;
+
+        // if a string identifier was returned resolve the named instance
+        if (is_string($forward))
+            $forward = $mapping->findForwardOrFail($forward);
 
         $this->processActionForward($request, $response, $forward);
         return false;
