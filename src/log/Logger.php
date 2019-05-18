@@ -668,13 +668,19 @@ class Logger extends StaticClass {
                 $session = $_SESSION;
             }
             else if ($request->hasSessionId()) {
-                $request->getSession($suppressHeadersAlreadySentError = true);
+                try {
+                    $request->getSession();                         // Make sure the session was restarted.
+                }                                                   // A session may exist but content was delivered before
+                catch (PHPError $error) {                           // the session was restarted.
+                    if (!preg_match('/- headers already sent (by )?\(output started at /', $error->getMessage()))
+                        throw $error;
+                }
                 if (session_id() == $request->getSessionId())       // if both differ the id was regenerated and
-                    $session = $_SESSION;                           // the session is empty
+                    $session = $_SESSION;                           // the session is considered empty (except markers)
             }
-            $session  = is_null($session) ? null : print_r(ksort_r($session), true);
-            $ip       = $_SERVER['REMOTE_ADDR'];
-            $host     = NetTools::getHostByAddress($ip);
+            $session = isset($session) ? print_r(ksort_r($session), true) : null;
+            $ip      = $_SERVER['REMOTE_ADDR'];
+            $host    = NetTools::getHostByAddress($ip);
             if ($host != $ip)
                 $ip .= ' ('.$host.')';
             $msg .= NL.NL.'Request:'.NL.'--------'.NL.$request.NL.NL

@@ -25,46 +25,40 @@ class HttpSession extends Singleton {
     /**
      * Return the {@link Singleton} instance.
      *
-     * @param  Request $request                                    - request the session belongs to
-     * @param  bool    $suppressHeadersAlreadySentError [optional] - whether to suppress "headers already sent" errors
+     * @param  Request $request - request the session belongs to
      *
      * @return static
      *
-     * @throws RuntimeException:: if not called from the web interface
+     * @throws RuntimeException if not called from the web interface
      */
-    public static function me(Request $request, $suppressHeadersAlreadySentError = false) {
-        return self::getInstance(static::class, $request, $suppressHeadersAlreadySentError);
+    public static function me(Request $request) {
+        return self::getInstance(static::class, $request);
     }
 
 
     /**
      * Constructor
      *
-     * @param  Request $request                                    - request the session belongs to
-     * @param  bool    $suppressHeadersAlreadySentError [optional] - whether to suppress "headers already sent" errors
-     *                                                               (default: no)
+     * @param  Request $request - request the session belongs to
      */
-    protected function __construct(Request $request, $suppressHeadersAlreadySentError = false) {
+    protected function __construct(Request $request) {
         parent::__construct();
         $this->request = $request;
-        $this->init($suppressHeadersAlreadySentError);
+        $this->init();
     }
 
 
     /**
      * Start and initialize the session.
-     *
-     * @param  bool $suppressHeadersAlreadySentError [optional] - whether to suppress "headers already sent" errors
-     *                                                            (default: no)
      */
-    protected function init($suppressHeadersAlreadySentError = false) {
+    protected function init() {
         /**
          * PHP laesst sich ohne weiteres manipulierte Session-IDs unterschieben, solange diese keine ungueltigen Zeichen
-         * enthalten (IDs wie PHPSESSID=111 werden anstandslos akzeptiert).  Wenn session_start() zurueckkehrt, gibt es mit
+         * enthalten (IDs wie PHPSESSID=111 werden anstandslos akzeptiert). Wenn session_start() zurueckkehrt, gibt es mit
          * den vorhandenen PHP-Mitteln keine vernuenftige Moeglichkeit mehr, festzustellen, ob die Session-ID von PHP oder
-         * (kuenstlich?) vom User generiert wurde.  Daher wird in dieser Methode jede neue Session mit einer zusaetzliche
-         * Markierung versehen.  Fehlt diese Markierung nach Rueckkehr von session_start(), wurde die ID nicht von PHP
-         * generiert.  Aus Sicherheitsgruenden wird eine solche Session verworfen und eine neue ID erzeugt.
+         * kuenstlich vom User generiert wurde. Daher wird in dieser Methode jede neu erzeugte Session markiert. Fehlt diese
+         * Markierung nach Rueckkehr von session_start(), wurde die Session nicht von dieser Methode erzeugt.
+         * Aus Sicherheitsgruenden wird eine solche Session verworfen und eine neue initialisiert.
          */
         $request = $this->request;
 
@@ -81,34 +75,25 @@ class HttpSession extends Singleton {
             session_start();                        // TODO: Handle the case when a session was already started elsewhere?
         }
         catch (PHPError $error) {
-            if (preg_match('/The session id contains illegal characters/', $error->getMessage())) {
-                session_regenerate_id();            // neue ID generieren
-            }
-            else if (preg_match('/- headers already sent (by )?\(output started at /', $error->getMessage())) {
-                if (!$suppressHeadersAlreadySentError)
-                    throw $error;
-            }
-            else {
+            if (!preg_match('/The session id contains illegal characters/i', $error->getMessage()))
                 throw $error;
-            }
+            session_regenerate_id();                // regenerate a new id
         }
 
-
-        // Inhalt der Session pruefen
-        // TODO: Session verwerfen, wenn der User zwischen Cookie- und URL-Uebertragung wechselt
-        if (sizeof($_SESSION) == 0) {           // 0 bedeutet, die Session ist (fuer diese Methode) neu
+        // check session state
+        if (sizeof($_SESSION) == 0) {               // 0 means a new session without markers
             $sessionName = session_name();
-            $sessionId   = session_id();        // pruefen, woher die ID kommt ...
+            $sessionId = session_id();
 
-            // TODO: Verwendung von $_COOKIE und $_REQUEST ist unsicher
-            if     (isset($_COOKIE [$sessionName]) && $_COOKIE [$sessionName] == $sessionId) $fromUser = true; // ID kommt vom Cookie
-            elseif (isset($_REQUEST[$sessionName]) && $_REQUEST[$sessionName] == $sessionId) $fromUser = true; // ID kommt aus GET/POST
-            else                                                                             $fromUser = false;
+            // check whether the session id was submitted by the user
+            if     (isset($_COOKIE [$sessionName]) && $_COOKIE [$sessionName]==$sessionId) $fromUser = true;
+            elseif (isset($_REQUEST[$sessionName]) && $_REQUEST[$sessionName]==$sessionId) $fromUser = true;    // GET/POST
+            else                                                                           $fromUser = false;
 
-            $this->reset($fromUser);            // if $fromUser=TRUE: generate new session id
+            $this->reset($regenerateId = $fromUser);
         }
-        else {                                  // vorhandene Session fortgesetzt
-            $this->new = false;
+        else {
+            $this->new = false;                     // continue existing session (with markers)
         }
     }
 
@@ -122,17 +107,13 @@ class HttpSession extends Singleton {
         if (!is_bool($regenerateId)) throw new IllegalTypeException('Illegal type of parameter $regenerateId: '.gettype($regenerateId));
 
         if ($regenerateId) {
-            // assign new id, delete old file
-            session_regenerate_id(true);
+            session_regenerate_id(true);                                        // generate new id (deletes the old file)
         }
+        $this->removeAttribute(\array_keys($_SESSION));                         // empty the session
 
-        // empty the session
-        $this->removeAttribute(\array_keys($_SESSION));
-
-        // initialize the session
-        $request = $this->request;                                              // TODO: $request->getHeader() einbauen
+        $request = $this->request;                                              // initialize session markers
         $_SESSION['__SESSION_CREATED__'  ] = microtime(true);
-        $_SESSION['__SESSION_IP__'       ] = $request->getRemoteAddress();      // TODO: forwarded remote IP einbauen
+        $_SESSION['__SESSION_IP__'       ] = $request->getRemoteAddress();      // TODO: resolve/store forwarded IP
         $_SESSION['__SESSION_USERAGENT__'] = $request->getHeaderValue('User-Agent');
 
         $this->new = true;

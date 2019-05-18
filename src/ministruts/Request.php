@@ -611,12 +611,10 @@ class Request extends Singleton {
     /**
      * Return the current HTTP session object. If a session does not yet exist, one is created.
      *
-     * @param  bool $suppressHeadersAlreadySentError [optional] - whether to suppress "headers already sent" errors
-     *                                                            (default: no)
      * @return HttpSession
      */
-    public function getSession($suppressHeadersAlreadySentError = false) {
-        return HttpSession::me($this, $suppressHeadersAlreadySentError);
+    public function getSession() {
+        return HttpSession::me($this);
     }
 
 
