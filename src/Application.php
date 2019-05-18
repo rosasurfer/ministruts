@@ -169,9 +169,9 @@ class Application extends Object {
         }
 
         // enforce mission-critical PHP requirements (after processing of any admin tasks)
-        !php_ini_loaded_file()                   && exit(1|echoPre('application error (see error log'.(self::isAdminIP() ? ': '.(strlen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: No "php.ini" configuration file was loaded.'));
-        !CLI && !ini_get_bool('short_open_tag')  && exit(1|echoPre('application error (see error log'.(self::isAdminIP() ? ': '.(strlen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: The PHP configuration value "short_open_tag" must be enabled (security).'));
-        !CLI && ini_get('request_order') != 'GP' && exit(1|echoPre('application error (see error log'.(self::isAdminIP() ? ': '.(strlen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: The PHP configuration value "request_order" must be "GP" (current value "'.ini_get('request_order').'").'));
+        !php_ini_loaded_file()                    && exit(1|echoPre('application error (see error log'.(self::isAdminIP() ? ': '.(strlen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: No "php.ini" configuration file was loaded.'));
+        !CLI && !ini_get_bool('short_open_tag')   && exit(1|echoPre('application error (see error log'.(self::isAdminIP() ? ': '.(strlen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: The PHP configuration value "short_open_tag" must be enabled (security).'));
+        !CLI &&  ini_get('request_order') != 'GP' && exit(1|echoPre('application error (see error log'.(self::isAdminIP() ? ': '.(strlen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: The PHP configuration value "request_order" must be "GP" (current value "'.ini_get('request_order').'").'));
     }
 
 

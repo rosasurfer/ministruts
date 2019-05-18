@@ -5,6 +5,7 @@ use rosasurfer\core\Singleton;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\RuntimeException;
 use rosasurfer\exception\error\PHPError;
+use rosasurfer\util\PHP;
 
 
 /**
@@ -52,55 +53,39 @@ class HttpSession extends Singleton {
      * Start and initialize the session.
      */
     protected function init() {
-        /**
-         * PHP laesst sich ohne weiteres manipulierte Session-IDs unterschieben, solange diese keine ungueltigen Zeichen
-         * enthalten (IDs wie PHPSESSID=111 werden anstandslos akzeptiert). Wenn session_start() zurueckkehrt, gibt es mit
-         * den vorhandenen PHP-Mitteln keine vernuenftige Moeglichkeit mehr, festzustellen, ob die Session-ID von PHP oder
-         * kuenstlich vom User generiert wurde. Daher wird in dieser Methode jede neu erzeugte Session markiert. Fehlt diese
-         * Markierung nach Rueckkehr von session_start(), wurde die Session nicht von dieser Methode erzeugt.
-         * Aus Sicherheitsgruenden wird eine solche Session verworfen und eine neue initialisiert.
-         */
         $request = $this->request;
 
-        // Session-Cookie auf Application beschraenken, um mehrere Projekte je Domain zu ermoeglichen
+        // limit session cookie to application path to support multiple projects per domain
         $params = session_get_cookie_params();
         session_set_cookie_params($params['lifetime'],
                                   $request->getApplicationBaseUri(),
                                   $params['domain'  ],
                                   $params['secure'  ],
                                   $params['httponly']);
+        PHP::ini_set('session.use_strict_mode', true);  // enforce prevention of user-defined session ids
 
-        // Session starten bzw. fortsetzen
+        // start or continue the session
         try {
-            session_start();                        // TODO: Handle the case when a session was already started elsewhere?
+            session_start();                            // intentionally trigger an error if the session has already been started
         }
-        catch (PHPError $error) {
-            if (preg_match('/The session id contains illegal characters/i', $error->getMessage())) {
-                session_regenerate_id();            // generate a new id
-            }
+        catch (PHPError $error) {                       // TODO: Is this check still needed?
+            if (preg_match('/The session id contains illegal characters/i', $error->getMessage()))
+                session_regenerate_id();
             else throw $error;
         }
 
         // check session state
-        if (sizeof($_SESSION) == 0) {               // 0 means a new session without markers
-            $sessionName = session_name();
-            $sessionId = session_id();
-
-            // check whether the session id was submitted by the user
-            if     (isset($_COOKIE [$sessionName]) && $_COOKIE [$sessionName]==$sessionId) $fromUser = true;
-            elseif (isset($_REQUEST[$sessionName]) && $_REQUEST[$sessionName]==$sessionId) $fromUser = true;    // GET/POST
-            else                                                                           $fromUser = false;
-
-            $this->reset($regenerateId = $fromUser);
+        if (sizeof($_SESSION) == 0) {                   // 0 means the session is new and not yet marked
+            $this->reset(false);
         }
         else {
-            $this->new = false;                     // continue existing session (with markers)
+            $this->new = false;                         // continue an existing session (with markers)
         }
     }
 
 
     /**
-     * Reset this session to a clean and new state.
+     * Reset this session to a new and empty state.
      *
      * @param  bool $regenerateId - whether to generate a new session id and to delete an old session file
      */
@@ -108,14 +93,12 @@ class HttpSession extends Singleton {
         if (!is_bool($regenerateId)) throw new IllegalTypeException('Illegal type of parameter $regenerateId: '.gettype($regenerateId));
 
         if ($regenerateId) {
-            session_regenerate_id(true);                                        // generate new id and delete the old file
+            session_regenerate_id(true);                                            // generate new id and delete the old file
         }
-        $this->removeAttribute(\array_keys($_SESSION));                         // empty the session
-
-        $request = $this->request;                                              // initialize session markers
-        $_SESSION['__SESSION_CREATED__'  ] = microtime(true);
-        $_SESSION['__SESSION_IP__'       ] = $request->getRemoteAddress();      // TODO: resolve/store forwarded IP
-        $_SESSION['__SESSION_USERAGENT__'] = $request->getHeaderValue('User-Agent');
+        $_SESSION = [];                                                             // empty the session
+        $_SESSION['__SESSION_CREATED__'  ] = microtime(true);                       // initialize the session markers
+        $_SESSION['__SESSION_IP__'       ] = $this->request->getRemoteAddress();    // TODO: resolve/store forwarded IP
+        $_SESSION['__SESSION_USERAGENT__'] = $this->request->getHeaderValue('User-Agent');
 
         $this->new = true;
     }
@@ -196,8 +179,8 @@ class HttpSession extends Singleton {
      */
     public function removeAttribute($key) {
         if (is_array($key)) {
-            foreach ($key as $k => $value) {
-                if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $key['.$k.']: '.gettype($value));
+            foreach ($key as $i => $value) {
+                if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $key['.$i.']: '.gettype($value));
                 unset($_SESSION[$value]);
             }
             return;
