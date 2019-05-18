@@ -105,7 +105,7 @@ class HttpSession extends Singleton {
 
 
     /**
-     * Ob diese Session neu ist oder nicht. Die Session ist neu, wenn der User die aktuelle Session-ID noch nicht kennt.
+     * Whether the session is new. A session is considered "new" if the web user does not yet know the session id.
      *
      * @return bool
      */
@@ -115,19 +115,9 @@ class HttpSession extends Singleton {
 
 
     /**
-     * Gibt die Session-ID der Session zurueck.
+     * Return the current name of the session variable.
      *
-     * @return string - Session-ID
-     */
-    public function getId() {
-        return session_id();
-    }
-
-
-    /**
-     * Gibt den Namen der Sessionvariable zurueck.
-     *
-     * @return string - Name
+     * @return string
      */
     public function getName() {
         return session_name();
@@ -135,13 +125,22 @@ class HttpSession extends Singleton {
 
 
     /**
-     * Gibt den unter dem angegebenen Schluessel in der Session gespeicherten Wert zurueck oder den
-     * angegebenen Alternativwert, falls kein Wert unter diesem Schluessel existiert.
+     * Return the current session id.
      *
-     * @param  string $key                - Schluessel, unter dem der Wert gespeichert ist
-     * @param  mixed  $default [optional] - Default- bzw. Alternativwert (kann selbst auch NULL sein)
+     * @return string
+     */
+    public function getId() {
+        return session_id();
+    }
+
+
+    /**
+     * Return the session value stored under the specified key, or the passed default value if no such session value exists.
      *
-     * @return mixed - der gespeicherte Wert oder NULL
+     * @param  string $key                - session key
+     * @param  mixed  $default [optional] - alternative default (default: NULL)
+     *
+     * @return mixed
      */
     public function getAttribute($key, $default = null) {
         if (\key_exists($key, $_SESSION))
@@ -151,14 +150,11 @@ class HttpSession extends Singleton {
 
 
     /**
-     * Speichert in der Session unter dem angegebenen Schluessel einen Wert.  Ein unter dem selben
-     * Schluessel schon vorhandener Wert wird ersetzt.
+     * Store a value under the specified key in the session. An already existing value under the same key is replaced.
+     * If NULL is passed as a value the effect is the same as calling {@link HttpSession::removeAttribute($key)}.
      *
-     * Ist der uebergebene Wert NULL, hat dies den selben Effekt wie der Aufruf von
-     * HttpSession::removeAttribute($key)
-     *
-     * @param  string $key   - Schluessel, unter dem der Wert gespeichert wird
-     * @param  mixed  $value - der zu speichernde Wert
+     * @param  string $key   - session key
+     * @param  mixed  $value - value to store
      */
     public function setAttribute($key, $value) {
         if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.gettype($key));
@@ -173,9 +169,9 @@ class HttpSession extends Singleton {
 
 
     /**
-     * Delete session values stored under the specified key(s).
+     * Delete all session values stored under the specified key(s).
      *
-     * @param  string|string[] $key - single session key or array of session keys of values to remove
+     * @param  string|string[] $key - a single session key or an array of session keys
      */
     public function removeAttribute($key) {
         if (is_array($key)) {
@@ -192,9 +188,9 @@ class HttpSession extends Singleton {
 
 
     /**
-     * Ob unter dem angegebenen Schluessel ein Wert in der Session existiert.
+     * Whether a value is stored in the session under the specified key.
      *
-     * @param  string $key - Schluessel
+     * @param  string $key
      *
      * @return bool
      */
