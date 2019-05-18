@@ -427,7 +427,7 @@ class Request extends Singleton {
      */
     public function getApplicationRelativeUri() {
         // TODO: Move to application as this is not a property of the request.
-        return strRightFrom($this->getUri(), $this->getApplicationBaseUri()).'/';
+        return '/'.strRightFrom($this->getUri(), $this->getApplicationBaseUri());
     }
 
 
@@ -550,9 +550,9 @@ class Request extends Singleton {
 
 
     /**
-     * Gibt den Wert des 'X-Forwarded-For'-Headers des aktuellen Requests zurueck.
+     * Return the value of a transmitted "X-Forwarded-For" header.
      *
-     * @return string|null - Wert (ein oder mehrere IP-Adressen oder Hostnamen) oder NULL, wenn der Header nicht gesetzt ist
+     * @return string|null - header value (one or more ip addresses or hostnames) or NULL if the header was not transmitted
      */
     public function getForwardedRemoteAddress() {
         return $this->getHeaderValue(array('X-Forwarded-For', 'X-UP-Forwarded-For'));
@@ -609,7 +609,7 @@ class Request extends Singleton {
 
 
     /**
-     * Gibt die aktuelle HttpSession zurueck. Existiert noch keine Session, wird eine erzeugt.
+     * Return the current HTTP session object. If a session does not yet exist, one is created.
      *
      * @param  bool $suppressHeadersAlreadySentError [optional] - whether to suppress "headers already sent" errors
      *                                                            (default: no)
