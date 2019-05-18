@@ -18,7 +18,7 @@ class HttpSession extends Singleton {
     /** @var Request - request the session belongs to */
     protected $request;
 
-    /** @var bool - Whether the session is "new". A session is new if the client doesn't yet know the session id. */
+    /** @var bool - Whether the session is considered "new". A session is new if the client doesn't yet know the session id. */
     protected $new;
 
 
@@ -75,9 +75,10 @@ class HttpSession extends Singleton {
             session_start();                        // TODO: Handle the case when a session was already started elsewhere?
         }
         catch (PHPError $error) {
-            if (!preg_match('/The session id contains illegal characters/i', $error->getMessage()))
-                throw $error;
-            session_regenerate_id();                // regenerate a new id
+            if (preg_match('/The session id contains illegal characters/i', $error->getMessage())) {
+                session_regenerate_id();            // generate a new id
+            }
+            else throw $error;
         }
 
         // check session state
@@ -107,7 +108,7 @@ class HttpSession extends Singleton {
         if (!is_bool($regenerateId)) throw new IllegalTypeException('Illegal type of parameter $regenerateId: '.gettype($regenerateId));
 
         if ($regenerateId) {
-            session_regenerate_id(true);                                        // generate new id (deletes the old file)
+            session_regenerate_id(true);                                        // generate new id and delete the old file
         }
         $this->removeAttribute(\array_keys($_SESSION));                         // empty the session
 
