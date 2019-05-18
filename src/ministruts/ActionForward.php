@@ -13,7 +13,7 @@ use function rosasurfer\strLeftTo;
  * ActionForward
  *
  * An ActionForward describes a target a request is forwarded to after processing. It has a logical name (for identification)
- * and points either to a physical resource (file, layout template) or to a URI.
+ * and points either to a physical resource (a file, a layout or a template) or to an URI.
  */
 class ActionForward extends Object {
 
@@ -24,7 +24,7 @@ class ActionForward extends Object {
     /** @var string - default identifier for looking up a forward after a failed form validation */
     const VALIDATION_ERROR_KEY   = 'error';
 
-    /** @var string - reserved identifier for looking up a forward to the currently used ActionMapping */
+    /** @var string - reserved identifier which references a forward to the currently used ActionMapping */
     const SELF = 'self';
 
     /** @var string */
@@ -190,7 +190,7 @@ class ActionForward extends Object {
 
 
     /**
-     * Add a query parameter to the forward's URL.
+     * Add a query parameter to the forward's URI.
      *
      * @param  string $key   - parameter name
      * @param  scalar $value - parameter value
@@ -217,7 +217,7 @@ class ActionForward extends Object {
 
 
     /**
-     * Set the hash fragment of the forward's URL.
+     * Set the hash fragment of the forward's URI.
      *
      * @param  scalar $value - hash value
      *
@@ -240,7 +240,7 @@ class ActionForward extends Object {
 
 
     /**
-     * Return an identical copy of the forward.
+     * Return an identical copy of the instance.
      *
      * @return self
      */

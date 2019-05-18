@@ -5,8 +5,8 @@ use rosasurfer\core\Object;
 
 
 /**
- * An ActionForm encapsulates and represents the user input. Provides an interface for Actions and business layer to access
- * and validate this input.
+ * An ActionForm encapsulates and represents the user input. It provides an interface for {@link Action}s and business layer
+ * to access and validate this input.
  */
 abstract class ActionForm extends Object {
 
@@ -49,7 +49,7 @@ abstract class ActionForm extends Object {
      *
      * @example
      *
-     * The framework expects the action key nested in an array named "submit". Write the HTML like this:
+     * MiniStruts expects the action key nested in an array named "submit". Write your HTML like so:
      * <pre>
      * &lt;img type="submit" name="submit[action]" value="{action-key}" src=... /&gt;
      * </pre>
@@ -119,8 +119,9 @@ abstract class ActionForm extends Object {
         unset($array["\0*\0actionKey"]);
 
         foreach ($array as $name => $property) {
-            if (is_object($property))
+            if (is_object($property)) {
                 unset($array[$name]);                                   // drop all remaining object references
+            }
         }
         return \array_keys($array);
     }

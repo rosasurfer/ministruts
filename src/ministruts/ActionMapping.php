@@ -11,6 +11,11 @@ use function rosasurfer\strLeftTo;
 
 /**
  * ActionMapping
+ *
+ * An ActionMapping encapsulates the processing instructions for a single route. For in-depth documentation of properties
+ * and configuration see the following link:
+ *
+ * @link  https://github.com/rosasurfer/ministruts/blob/master/src/ministruts/dtd/struts-config.dtd#L137
  */
 class ActionMapping extends Object {
 
@@ -58,7 +63,7 @@ class ActionMapping extends Object {
     /**
      * Constructor
      *
-     * @param  Module $module - Module the mapping belongs to
+     * @param  Module $module - application module the mapping belongs to
      */
     public function __construct(Module $module) {
         $this->module = $module;
@@ -167,9 +172,10 @@ class ActionMapping extends Object {
 
 
     /**
-     * Return the mapping's role restrictions.
+     * Return the mapping's role constraint. Depending on the used {@link RoleProcessor} this may be a single role identifier
+     * or a logical expression (possibly referencing multiple roles).
      *
-     * @return string|null - role identifier or NULL if no role restrictions are defined
+     * @return string|null - role constraint or NULL if no role constraint is defined
      */
     public function getRoles() {
         return $this->roles;
@@ -177,9 +183,9 @@ class ActionMapping extends Object {
 
 
     /**
-     * Set the mapping's role restrictions.
+     * Set the mapping's role constraint.
      *
-     * @param  string $roles - role expression
+     * @param  string $roles - role constraint or expression
      *
      * @return $this
      *
@@ -209,7 +215,7 @@ class ActionMapping extends Object {
 
 
     /**
-     * Explicitely configure an {@link ActionForward} instead of an {@link Action}.
+     * Configure the mapping to use an {@link ActionForward} instead of passing processing to an {@link Action}.
      *
      * @param  ActionForward $forward
      *
@@ -230,9 +236,9 @@ class ActionMapping extends Object {
 
 
     /**
-     * Return the explicitely configured {@link ActionForward}.
+     * Return a configured {@link ActionForward}.
      *
-     * @return ActionForward|null - ActionForward or NULL if no explicit forward is configured
+     * @return ActionForward|null - ActionForward or NULL if no forward is configured
      */
     public function getForward() {
         return $this->forward;
@@ -303,8 +309,8 @@ class ActionMapping extends Object {
 
 
     /**
-     * Set the scope attribute used for the mapping's {@link ActionForm}. The scope attribute identifies the storage
-     * location of the Actionform.
+     * Set the scope attribute of the mapping's {@link ActionForm}. The scope attribute identifies the storage location of
+     * the Actionform.
      *
      * @param  string $value - may be "request" or "session"
      *
@@ -325,7 +331,7 @@ class ActionMapping extends Object {
 
 
     /**
-     * Return the scope attribute used for storing the mapping's {@link ActionForm}.
+     * Return the scope attribute of the mapping's {@link ActionForm}.
      *
      * @return string - scope attribute value
      */
@@ -335,7 +341,7 @@ class ActionMapping extends Object {
 
 
     /**
-     * Whether the mapping's {@link ActionForm} is stored in the {@link Request} instance.
+     * Whether the mapping's {@link ActionForm} is stored in the {@link Request}.
      *
      * @return bool
      */
@@ -345,7 +351,7 @@ class ActionMapping extends Object {
 
 
     /**
-     * Whether the mapping's {@link ActionForm} is stored in the {@link HttpSession} instance.
+     * Whether the mapping's {@link ActionForm} is stored in the {@link HttpSession}.
      *
      * @return bool
      */
@@ -464,8 +470,8 @@ class ActionMapping extends Object {
 
 
     /**
-     * Lookup and return the {@link ActionForward} accessible under the specified name. First the lookup tries to find a local
-     * forward of the given name. If no local forward is found global forwards are checked.
+     * Lookup and return the {@link ActionForward} accessible under the specified name. First the lookup tries to find a
+     * local forward of the given name. If no local forward is found global forwards are checked.
      *
      * @param  string $name - logical name; can be "self" to return a redirect forward to the mapping itself
      *
@@ -489,9 +495,9 @@ class ActionMapping extends Object {
         }
 
         if ($forward->getName() == ActionForward::SELF) {
-            if ($this->configured) {                            // runtime: set the current request's query string
-                $path = $this->path;
-                $query = Request::me()->getQueryString();
+            if ($this->configured) {                            // at runtime only: append the request's query string
+                $path = $this->path;                            // TODO: Don't lose additional path data. Example:
+                $query = Request::me()->getQueryString();       //       /path/beautified-url-data/?query-string
                 if (strlen($query))
                     $path = strLeftTo($path, '?').'?'.$query;
                 $forward->setPath($path);
@@ -505,7 +511,7 @@ class ActionMapping extends Object {
      * Lookup and return the configured {@link ActionForward} accessible under the specified name. This method differs from
      * {@link ActionMapping::findForward()} in that it always returns an instance.
      *
-     * @param  string $name - logical name; can be "self" to return a redirect forward to the mapping itself
+     * @param  string $name - logical name (may be "self" to return a forward to the currently active mapping's route)
      *
      * @return ActionForward
      *

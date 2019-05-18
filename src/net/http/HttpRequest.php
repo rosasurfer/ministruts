@@ -27,7 +27,7 @@ class HttpRequest extends Object {
      *
      * Create a new HttpRequest.
      *
-     * @param  string $url [optional] - url (default: none)
+     * @param  string $url [optional] - URL (default: none)
      */
     public function __construct($url = null) {
         if (isset($url)) {
