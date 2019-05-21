@@ -96,19 +96,15 @@ class SMTPMailer extends Mailer {
      * Connect to the SMTP server.
      */
     private function connect() {
-        $connection = fsockopen('tcp://'.$this->options['host'],
-                                         $this->options['port'],
-                                         $errorCode,
-                                         $errorMsg,
-                                         $this->options['timeout']);
-        // TODO: connect() might hang without producing an error if the connection fails
-        if (!$connection) throw new RuntimeException('Could not open socket: '.$errorMsg.' (error '.$errorCode.')');
-
-        $data = stream_get_meta_data($connection);
+        $this->connection = fsockopen('tcp://'.$this->options['host'],
+                                               $this->options['port'],
+                                               $errorCode,
+                                               $errorMsg,
+                                               $this->options['timeout']);
+        $data = stream_get_meta_data($this->connection);
         if ($data['timed_out']) throw new InfrastructureException('Timeout on socket connection');
 
-        socket_set_timeout($connection, $this->options['timeout']);
-        $this->connection = $connection;
+        socket_set_timeout($this->connection, $this->options['timeout']);
 
         // init connection
         $this->readResponse();                          // read greeting
@@ -128,7 +124,7 @@ class SMTPMailer extends Mailer {
 
 
     /**
-     * Authentificate the connection.
+     * Authenticate the connection.
      */
     private function authenticate() {
         if (!is_resource($this->connection))
