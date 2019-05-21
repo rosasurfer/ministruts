@@ -1,6 +1,6 @@
 #
 # Requires:
-#   PHP 7.*
+#   PHP 7.0
 #   https://github.com/rosasurfer/phpstan, branch "0.9-pewa"
 #
 # Usage:
