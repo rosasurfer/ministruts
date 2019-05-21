@@ -30,9 +30,9 @@ function copyHook() {
     TARGET="$GIT_HOOK_DIR/$1"
     
     # copy file
-	if ! cmp -s "$SOURCE" "$TARGET"; then
+    if ! cmp -s "$SOURCE" "$TARGET"; then
         cp -p "$SOURCE" "$TARGET" || return $?
-	fi
+    fi
 
     # set executable permission
     chmod u+x "$TARGET" || return $?
