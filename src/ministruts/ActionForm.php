@@ -5,8 +5,8 @@ use rosasurfer\core\Object;
 
 
 /**
- * An ActionForm encapsulates and represents the user input. Provides an interface for Actions and business layer to access
- * and validate this input.
+ * An ActionForm encapsulates and represents the user input. It provides an interface for {@link Action}s and business layer
+ * to access and validate this input.
  */
 abstract class ActionForm extends Object {
 
@@ -49,7 +49,7 @@ abstract class ActionForm extends Object {
      *
      * @example
      *
-     * The framework expects the action key nested in an array named "submit". Write the HTML like this:
+     * MiniStruts expects the action key nested in an array named "submit". Write your HTML like so:
      * <pre>
      * &lt;img type="submit" name="submit[action]" value="{action-key}" src=... /&gt;
      * </pre>
@@ -64,7 +64,7 @@ abstract class ActionForm extends Object {
         //   The browser will send "submit[action].x=123&submit[action].y=456" and PHP will discard the coordinates.
         //
         // - Workaround for all other parameter names with dots => wrap the name in a top-level array:
-        //   $_POST = Array (
+        //   $_POST = array(
         //       [action_x] => update                               // <img type="submit" name="action"... broken by PHP
         //       [application_name] => foobar                       // regular custom parameters broken by PHP
         //       [top_level_with_dots] => Array (                   // custom top-level parameters broken by PHP
@@ -102,7 +102,7 @@ abstract class ActionForm extends Object {
     /**
      * Validate the form parameters syntactically.
      *
-     * @return bool - whether or not the submitted parameters are valid
+     * @return bool - whether the submitted parameters are valid
      */
     abstract public function validate();
 
@@ -119,8 +119,9 @@ abstract class ActionForm extends Object {
         unset($array["\0*\0actionKey"]);
 
         foreach ($array as $name => $property) {
-            if (is_object($property))
+            if (is_object($property)) {
                 unset($array[$name]);                                   // drop all remaining object references
+            }
         }
         return \array_keys($array);
     }

@@ -55,13 +55,13 @@ class PHP extends StaticClass {
      * @param  int      $exitCode [optional] - if present a variable the commands's exit code will be written to
      * @param  string   $dir      [optional] - if present the initial working directory for the command
      * @param  string[] $env      [optional] - if present the environment to *replace* the current one
-     * @param  array    $options  [optional] - additional options controlling runtime behaviour: <br>
-     *          "stdout-passthrough" => bool:  Whether or not to additionally pass-through (print) the contents of STDOUT. <br>
-     *                                         This option will not affect the return value. <br>
-     *                                         (default: no) <br>
-     *          "stderr-passthrough" => bool:  whether or not to additionally pass-through (print) the contents of STDERR. <br>
-     *                                         This option will not affect the return value. <br>
-     *                                         (default: no) <br>
+     * @param  array    $options  [optional] - additional options controlling runtime behaviour:                     <br>
+     *          "stdout-passthrough" => bool:  Whether to additionally pass-through (print) the contents of STDOUT.  <br>
+     *                                         This option will not affect the return value.                         <br>
+     *                                         (default: no)                                                         <br>
+     *          "stderr-passthrough" => bool:  whether to additionally pass-through (print) the contents of STDERR.  <br>
+     *                                         This option will not affect the return value.                         <br>
+     *                                         (default: no)                                                         <br>
      *
      * @return string - contents of STDOUT
      */
@@ -98,7 +98,7 @@ class PHP extends StaticClass {
             throw $ex->addMessage('CMD: "'.$cmd.'"');
         }
 
-        // the process doesn't need asynchronous watching
+        // if the process doesn't need asynchronous watching
         if (!$stdoutPassthrough && !$stderrPassthrough) {
             $stdout = stream_get_contents($pipes[$STDOUT]);
             $stderr = stream_get_contents($pipes[$STDERR]);
@@ -197,8 +197,8 @@ class PHP extends StaticClass {
         /*PHP_INI_PERDIR*/ if (       ini_get_bool('allow_call_time_pass_reference') && PHP_VERSION_ID <  50400)     $issues[] = 'Info:  allow_call_time_pass_reference is not Off  [standards]';
         /*PHP_INI_ALL   */ if (      !ini_get_bool('y2k_compliance'                ) && PHP_VERSION_ID <  50400)     $issues[] = 'Info:  y2k_compliance is not On  [standards]';
         /*PHP_INI_ALL   */ $timezone = ini_get    ('date.timezone'                 );
-            if (empty($timezone) && (empty($_SERVER['TZ'])                           || PHP_VERSION_ID >= 50400))    $issues[] = 'Warn:  date.timezone is not set  [setup]';
-        /*PHP_INI_SYSTEM*/ if (       ini_get_bool('safe_mode'                     ) && PHP_VERSION_ID <  50400)     $issues[] = 'Error:  safe_mode is not Off  [functionality]';
+            if (empty($timezone) && (empty($_SERVER['TZ'])                           || PHP_VERSION_ID >= 50400))    $issues[] = 'Error: date.timezone is not set  [setup]';
+        /*PHP_INI_SYSTEM*/ if (       ini_get_bool('safe_mode'                     ) && PHP_VERSION_ID <  50400)     $issues[] = 'Error: safe_mode is not Off  [functionality]';
             /**
              * With 'safe_mode'=On plenty of required function parameters are ignored: e.g. http://php.net/manual/en/function.mysql-connect.php
              */
@@ -271,7 +271,7 @@ class PHP extends StaticClass {
         /*PHP_INI_PERDIR*/ if (       ini_get_bool('always_populate_raw_post_data' ) && PHP_VERSION_ID <  70000)     $issues[] = 'Info:  always_populate_raw_post_data is not Off  [performance]';
         /*PHP_INI_PERDIR*/ if (      !ini_get_bool('enable_post_data_reading'      ) && PHP_VERSION_ID >= 50400)     $issues[] = 'Warn:  enable_post_data_reading is not On  [request handling]';
         /*PHP_INI_ALL   */ if (       ini_get     ('arg_separator.output'          ) != '&')                         $issues[] = 'Warn:  arg_separator.output is not "&": "'.ini_get('arg_separator.output').'"  [standards]';
-        /*PHP_INI_ALL   */ if (      !ini_get_bool('ignore_user_abort'             ) && !CLI)                        $issues[] = 'Warn:  ignore_user_abort is not On  [standards]';
+        /*PHP_INI_ALL   */ if (      !ini_get_bool('ignore_user_abort'             ) && !CLI)                        $issues[] = 'Error: ignore_user_abort is not On  [setup]';
         /*PHP_INI_PERDIR*/ $postMaxSize = ini_get_bytes('post_max_size');
             $memoryLimit_global = php_byte_value(ini_get_all()['memory_limit']['global_value']);
             // The memory_limit needs to be raised accordingly before script entry, not in the script.
@@ -342,14 +342,11 @@ class PHP extends StaticClass {
         // (7) extensions
         // --------------
         /*PHP_INI_SYSTEM*/ if (ini_get('enable_dl'))                                                                 $issues[] = 'Warn:  enable_dl is not Off';
-        if (!extension_loaded('ctype'))                                                                              $issues[] = 'Info:  ctype extension is not loaded';
-        if (!extension_loaded('curl'))                                                                               $issues[] = 'Info:  curl extension is not loaded';
-        if (!extension_loaded('iconv'))                                                                              $issues[] = 'Info:  iconv extension is not loaded';
-        if (!extension_loaded('json'))                                                                               $issues[] = 'Info:  JSON extension is not loaded';
-        if (!extension_loaded('mysql'))                                                                              $issues[] = 'Info:  MySQL extension is not loaded';
-        if (!extension_loaded('mysqli'))                                                                             $issues[] = 'Info:  MySQLi extension is not loaded';
-        if (!extension_loaded('pcntl')   && !WINDOWS && CLI) /*never loaded in a web server context*/                $issues[] = 'Info:  PCNTL extension is not loaded';
-        if (!extension_loaded('sysvsem') && !WINDOWS)                                                                $issues[] = 'Info:  System-V Semaphore extension is not loaded';
+        if (!extension_loaded('ctype'))                                                                              $issues[] = 'Warn:  ctype extension is not loaded  [functionality]';
+        if (!extension_loaded('iconv'))                                                                              $issues[] = 'Warn:  iconv extension is not loaded  [functionality]';
+        if (!extension_loaded('json'))                                                                               $issues[] = 'Warn:  JSON extension is not loaded  [functionality]';
+        if (!extension_loaded('pcntl')   && !WINDOWS && CLI) /*never loaded in a web server context*/                $issues[] = 'Warn:  PCNTL extension is not loaded  [functionality]';
+        if (!extension_loaded('sysvsem') && !WINDOWS)                                                                $issues[] = 'Info:  System-V Semaphore extension is not loaded  [functionality]';
 
 
         // check Composer defined dependencies
@@ -440,7 +437,7 @@ class PHP extends StaticClass {
      *
      * @param  string          $option
      * @param  bool|int|string $value
-     * @param  bool            $throwException [optional] - whether or not to throw an exception on errors (default: yes)
+     * @param  bool            $throwException [optional] - whether to throw an exception on errors (default: yes)
      *
      * @return bool - success status
      */

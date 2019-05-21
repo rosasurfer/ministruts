@@ -122,7 +122,7 @@ class Request extends Singleton {
 
 
     /**
-     * Whether or not the request is a GET request.
+     * Whether the request is a GET request.
      *
      * @return bool
      */
@@ -132,7 +132,7 @@ class Request extends Singleton {
 
 
     /**
-     * Whether or not the request is a POST request.
+     * Whether the request is a POST request.
      *
      * @return bool
      */
@@ -142,7 +142,7 @@ class Request extends Singleton {
 
 
     /**
-     * Whether or not the request was made over a secure channel (HTTPS).
+     * Whether the request was made over a secure channel (HTTPS).
      *
      * @return bool
      */
@@ -428,7 +428,7 @@ class Request extends Singleton {
      */
     public function getApplicationRelativeUri() {
         // TODO: Move to application as this is not a property of the request.
-        return strRightFrom($this->getUri(), $this->getApplicationBaseUri()).'/';
+        return '/'.strRightFrom($this->getUri(), $this->getApplicationBaseUri());
     }
 
 
@@ -453,7 +453,7 @@ class Request extends Singleton {
     /**
      * Return the application's base URI. The value always starts and ends with a slash "/".
      *
-     * @return string - a partial URI (application path without module prefix or query string)
+     * @return string - a partial URI (application path without module prefix and query string)
      *
      * @example
      * <pre>
@@ -464,11 +464,10 @@ class Request extends Singleton {
     public function getApplicationBaseUri() {
         // TODO: Move to application as this is not a property of the request.
         static $baseUri;
-        if (!$baseUri) {
-            if (isset($_SERVER['APP_BASE_URI'])) {
-                $baseUri = $_SERVER['APP_BASE_URI'];
-            }
-            else {
+        if (!isset($baseUri)) {
+            $baseUri = $this->resolveBaseUriVar();
+
+            if (!isset($baseUri)) {
                 /** @var ConfigInterface $config */
                 $config  = $this->di('config');
                 $baseUri = $config->get('app.base-uri', false);
@@ -478,6 +477,26 @@ class Request extends Singleton {
             !strEndsWith  ($baseUri, '/') && $baseUri .= '/';
         }
         return $baseUri;
+    }
+
+
+    /**
+     * Resolve the value of an existing APP_BASE_URI server variable. Considers existing redirection values.
+     *
+     * @return string|null - value or NULL if the variable is not defined
+     */
+    private function resolveBaseUriVar() {
+        $envName = 'APP_BASE_URI';
+        $envValue = null;
+
+        if (!isset($_SERVER[$envName]))
+            $envName = 'REDIRECT_'.$envName;
+
+        while (isset($_SERVER[$envName])) {
+            $envValue = $_SERVER[$envName];
+            $envName = 'REDIRECT_'.$envName;
+        }
+        return $envValue;
     }
 
 
@@ -532,9 +551,9 @@ class Request extends Singleton {
 
 
     /**
-     * Gibt den Wert des 'X-Forwarded-For'-Headers des aktuellen Requests zurueck.
+     * Return the value of a transmitted "X-Forwarded-For" header.
      *
-     * @return string|null - Wert (ein oder mehrere IP-Adressen oder Hostnamen) oder NULL, wenn der Header nicht gesetzt ist
+     * @return string|null - header value (one or more ip addresses or hostnames) or NULL if the header was not transmitted
      */
     public function getForwardedRemoteAddress() {
         return $this->getHeaderValue(array('X-Forwarded-For', 'X-UP-Forwarded-For'));
@@ -591,19 +610,17 @@ class Request extends Singleton {
 
 
     /**
-     * Gibt die aktuelle HttpSession zurueck. Existiert noch keine Session, wird eine erzeugt.
+     * Return the current HTTP session object. If a session does not yet exist, one is created.
      *
-     * @param  bool $suppressHeadersAlreadySentError [optional] - whether or not to suppress "headers already sent" errors
-     *                                                            (default: no)
      * @return HttpSession
      */
-    public function getSession($suppressHeadersAlreadySentError = false) {
-        return HttpSession::me($this, $suppressHeadersAlreadySentError);
+    public function getSession() {
+        return HttpSession::me($this);
     }
 
 
     /**
-     * Whether or not an HTTP session was started during the request. Not whether the session is still open (active).
+     * Whether an HTTP session was started during the request. Not whether the session is still open (active).
      *
      * @return bool
      */
@@ -613,7 +630,7 @@ class Request extends Singleton {
 
 
     /**
-     * Whether or not a session attribute of the specified name exists. If no session exists none is started.
+     * Whether a session attribute of the specified name exists. If no session exists none is started.
      *
      * @param  string $key - key
      *
@@ -647,8 +664,8 @@ class Request extends Singleton {
 
 
     /**
-     * Whether or not a valid session id was transmitted with the request. An invalid id is a URL based session id when the
-     * php.ini setting 'session.use_only_cookies' is enabled.
+     * Whether a valid session id was transmitted with the request. An invalid id is a URL based session id when the php.ini
+     * setting 'session.use_only_cookies' is enabled.
      *
      * @return bool
      */
@@ -947,7 +964,7 @@ class Request extends Singleton {
 
 
     /**
-     * Whether or not an ActionMessage exists for one of the specified keys, or for any key if no key was given.
+     * Whether an ActionMessage exists for one of the specified keys, or for any key if no key was given.
      *
      * @param  string|string[] $keys [optional] - message keys
      *
@@ -1055,7 +1072,7 @@ class Request extends Singleton {
 
 
     /**
-     * Whether or not an ActionError exists for one of the specified keys or for any key if no key was given.
+     * Whether an ActionError exists for one of the specified keys or for any key if no key was given.
      *
      * @param  string|string[] $keys [optional] - error keys
      *

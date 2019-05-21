@@ -34,7 +34,7 @@ class FrontController extends Singleton {
 
 
     /**
-     * Return the singleton instance of this class. The instance might be loaded from a cache.
+     * Return the {@link Singleton} instance of this class. The instance might be loaded from a cache.
      *
      * @return static
      */
@@ -142,7 +142,7 @@ class FrontController extends Singleton {
 
 
     /**
-     * Resolve the prefix of the {@link Module} responsible for processing of the given {@link Request}.
+     * Resolve the prefix of the {@link Module} responsible for processing of the passed {@link Request}.
      *
      * @param  Request $request
      *
@@ -153,7 +153,7 @@ class FrontController extends Singleton {
         $baseUri     = $request->getApplicationBaseUri();
 
         if (!strStartsWith($requestPath, $baseUri))
-            throw new RuntimeException('Can not resolve module prefix from request path "'.$requestPath.'" (application base uri: "'.$baseUri.'")');
+            throw new RuntimeException('Can not resolve module prefix from request path "'.$requestPath.'" (application base URI: "'.$baseUri.'")');
 
         $value = substr($requestPath, strlen($baseUri));        // baseUri ends with and prefix doesn't start with a slash
         if (strlen($value)) {
@@ -165,7 +165,7 @@ class FrontController extends Singleton {
 
 
     /**
-     * Get the {@link RequestProcessor} instance responsible for the given {@link Module}.
+     * Get the {@link RequestProcessor} instance responsible for processing requests to the passed {@link Module}.
      *
      * @param  Module $module
      * @param  array  $options - processing runtime options

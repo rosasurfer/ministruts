@@ -3,9 +3,10 @@
 use function rosasurfer\echoPre;
 use function rosasurfer\docopt;
 
-require(dirname(realpath(__FILE__)).'/../../../../../etc/vendor/autoload.php');
+require(dirname(realpath(__FILE__)).'/../../../../../src/load.php');
 
-$doc = <<<HELP
+$doc = <<<DOCOPT
+
 Usage: git commit [options] [--] [<filepattern>...]
 
     -h, --help
@@ -49,10 +50,9 @@ Commit contents options
                            show untracked files, optional modes: all, normal, no.
                            [default: all]
 
-HELP;
+DOCOPT;
 
 $result = docopt($doc);
 foreach ($result as $key => $value) {
     echoPre($key.': '.json_encode($value));
 }
-echoPre($result->getArgs());

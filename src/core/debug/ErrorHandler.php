@@ -54,7 +54,7 @@ class ErrorHandler extends StaticClass {
     /** @var callable - the registered exception handler */
     private static $exceptionHandler;
 
-    /** @var bool - whether or not the script is in the shutdown phase */
+    /** @var bool - whether the script is in the shutdown phase */
     private static $inShutdown;
 
 
@@ -79,7 +79,7 @@ class ErrorHandler extends StaticClass {
 
 
     /**
-     * Whether or not the script is in the shutdown phase.
+     * Whether the script is in the shutdown phase.
      *
      * @return bool
      */
@@ -194,7 +194,7 @@ class ErrorHandler extends StaticClass {
             return true;
         }
 
-        // (5) Handle cases where throwing an exception is not allowed or not possible.
+        // (5) Handle cases where throwing an exception is not possible or not allowed.
 
         /**
          * Errors triggered by require() or require_once()
@@ -309,19 +309,16 @@ class ErrorHandler extends StaticClass {
      *
      * @return \Exception - the same exception
      *
-     * @link    http://php.net/manual/en/language.oop5.decon.php
+     * @link   http://php.net/manual/en/language.oop5.decon.php
      */
     public static function handleDestructorException(\Exception $exception) {
         if (self::isInShutdown()) {
             self::handleException($exception);
             exit(1);                                                // exit and signal the error
 
-            /**
-             * Calling exit() is the only way to prevent the immediately following non-catchable fatal error.
-             * However, calling exit() in a destructor will also prevent execution of remaining shutdown routines.
-             *
-             * @see above link
-             */
+            // Calling exit() is the only way to prevent the immediately following non-catchable fatal error.
+            // However, calling exit() in a destructor will also prevent any remaining shutdown routines from executing.
+            // @see above link
         }
         return $exception;
     }

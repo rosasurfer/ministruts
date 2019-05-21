@@ -1,6 +1,6 @@
 <!--
 
-                                     DTD for the application's Struts configuration file 
+                                     DTD for the application's Struts configuration file
                                     =====================================================
 
 
@@ -49,12 +49,12 @@
 <!--
    The "struts-config" element is the root of the configuration file and contains nested elements for all of the other
    configuration settings.
-   
-   namespace  The default PHP namespace used for loading classes referenced by unqualified class names. Valid namespace 
-              separators are slash "/" and backslash "\". Additional namespaces may be specified in the "imports" element of 
-              the configuration.    
+
+   namespace  The default PHP namespace used for loading classes referenced by unqualified class names. Valid namespace
+              separators are slash "/" and backslash "\". Additional namespaces may be specified in the "imports" element of
+              the configuration.
               [default: the global namespace]
-   
+
    file-base  Comma-delimited list of paths to lookup referenced files or file system locations (templates, layouts,
               fragments etc). Values may be absolute or relative to the application root directory. Each module can have its
               own list of "file-base" locations.
@@ -69,17 +69,17 @@
 
 <!--
    The "imports" element describes a set of additional PHP names used for loading of classes referenced by unqualified class
-   names. The individual names are configured through nested "import" elements.    
+   names. The individual names are configured through nested "import" elements.
 -->
 <!ELEMENT imports (import*)>
 <!ATTLIST import>
 
 
 <!--
-   The "import" element describes an additional name used for class loading if a referenced unqualified class name can not 
-   be resolved in the module's default namespace. The element's value may describe a single PHP class or an entire PHP 
-   namespace. A single class is specified by its fully qualified class name. An entire namespace is specified by its name 
-   followed by a wildcard "*", e.g. "foo/*". When resolving names fully qualified class names are preferred over names 
+   The "import" element describes an additional name used for class loading if a referenced unqualified class name can not
+   be resolved in the module's default namespace. The element's value may describe a single PHP class or an entire PHP
+   namespace. A single class is specified by its fully qualified class name. An entire namespace is specified by its name
+   followed by a wildcard "*", e.g. "foo/*". When resolving names fully qualified class names are preferred over names
    imported via namespace wildcards. Valid namespace separators are the slash "/" and the backslash "\".
 
    value  The name describing a single PHP class or all classes of a PHP namespace.
@@ -107,14 +107,14 @@
 
    name      The unique identifier of the forward. Used to select the resource that should complete the request/response.
 
-   include   The name of a tile definition or a file to include. Tile definition names must start with a dot ".", file names 
+   include   The name of a tile definition or a file to include. Tile definition names must start with a dot ".", file names
              must not start with a dot ".". Exactly one of "include", "redirect" or "alias" must be specified.
 
    redirect  The module-relative URI to which a redirect instruction should be issued. Exactly one of "include", "redirect"
              or "alias" must be specified.
 
    alias     The name of another "forward" element to use instead of the current one (local forwards are preferred over
-             global ones). Local forwards support the reserved alias "self" to reference a redirect forward to the current 
+             global ones). Local forwards support the reserved alias "self" to reference a redirect forward to the current
              mapping. Exactly one of "include", "redirect" or "alias" must be specified.
 -->
 <!ELEMENT forward (set*)>
@@ -135,44 +135,44 @@
 
 
 <!--
-   The "mapping" element describes an ActionMapping object to be used to process a request for a specific module-relative 
+   The "mapping" element describes an ActionMapping object to be used to process a request for a specific module-relative
    URI. The following attributes are defined:
 
-   name                 The unique identifier of the mapping. Used to build mapping selectors to get mappings URLs by name. 
-                        Names must not contain the colon character ":" as the colon is the Module separator in a selector 
+   name                 The unique identifier of the mapping. Used to build mapping selectors to get mappings URLs by name.
+                        Names must not contain the colon character ":" as the colon is the Module separator in a selector
                         expression.
                         [default: none]
 
    alias                TODO: Not yet implemented
-                        The name of another "mapping" element to use for request processing instead of the current one. 
-                        Allows the definition of multiple request paths using the same mapping definition. Can not be used 
-                        in combination with "action", "include", "forward" or "redirect".   
+                        The name of another "mapping" element to use for request processing instead of the current one.
+                        Allows the definition of multiple request paths using the same mapping definition. Can not be used
+                        in combination with "action", "include", "forward" or "redirect".
 
    path                 The module-relative path of the request, starting with a slash "/" character.
 
    match                TODO: Not yet implemented
-                        The path attribute's matching type. Can be one of "literal" or "variable". If the value is "literal" 
-                        the path attribute is matched as-is. If the value is "variable" the path attribute can contain 
-                        parameter placeholders of the form "/path/{:param1:}/{:param2:}" matching variable path segments. 
-                        Parameter separator is the slash "/" character. If the last parameter placeholder is not followed by 
-                        a slash the parameter matches everything up to the end of the request path.    
+                        The path attribute's matching type. Can be one of "literal" or "variable". If the value is "literal"
+                        the path attribute is matched as-is. If the value is "variable" the path attribute can contain
+                        parameter placeholders of the form "/path/{:param1:}/{:param2:}" matching variable path segments.
+                        Parameter separator is the slash "/" character. If the last parameter placeholder is not followed by
+                        a slash the parameter matches everything up to the end of the request path.
                         [default: "literal"]
-   
-   action               Class name of an Action subclass that will process requests for this action mapping. Can not be used 
-                        in combination with "alias", "include", "forward" or "redirect".   
+
+   action               Class name of an Action subclass that will process requests for this action mapping. Can not be used
+                        in combination with "alias", "include", "forward" or "redirect".
 
    include              The name of a tiles definition or a file to include, instead of passing the request to an action.
-                        Tiles definition names must start with a dot ".", file names must not start with a dot. Can not be 
-                        used in combination with "alias", "action", "forward" or "redirect".   
+                        Tiles definition names must start with a dot ".", file names must not start with a dot. Can not be
+                        used in combination with "alias", "action", "forward" or "redirect".
 
    forward              The name of a global "forward" element to forward control to, instead of passing the request to an
-                        action. Can not be used in combination with "alias", "action", "include" or "redirect".   
+                        action. Can not be used in combination with "alias", "action", "include" or "redirect".
 
    redirect             The module-relative path of the location to which a redirect instruction should be issued, instead
-                        of passing the request to an action. Can not be used in combination with "alias", "action", "include" 
-                        or "forward".   
+                        of passing the request to an action. Can not be used in combination with "alias", "action", "include"
+                        or "forward".
 
-   redirect-type        The type of redirect that is issued ("temporary" or "permanent"). Optional if the "redirect" attribute 
+   redirect-type        The type of redirect that is issued ("temporary" or "permanent"). Optional if the "redirect" attribute
                         is specified, else not valid.
                         [default: "temporary"]
 
@@ -182,13 +182,13 @@
                         Optional if the "form" attribute is specified, else not valid.
                         [default: "request"]
 
-   form-validate-first  Set to "true" if the ActionForm should be validated prior to calling the Action object, or set to 
-                        "false" if you don't want to perform validation at that time. The default behaviour is "false" if an 
-                        Action or a ActionForward (include, redirect, forward) are configured, and "true" if no Action and no 
+   form-validate-first  Set to "true" if the ActionForm should be validated prior to calling the Action object, or set to
+                        "false" if you don't want to perform validation at that time. The default behaviour is "false" if an
+                        Action or a ActionForward (include, redirect, forward) are configured, and "true" if no Action and no
                         ActionForward are configured.
-                        In other words: If an Action is configured per default the Action is responsible for input validation. 
-                        If neither an Action nor a ActionForward are configured the framework will perform input validation. 
-                        For this framework validation two nested "forward" elements named "success" and "error" must be 
+                        In other words: If an Action is configured per default the Action is responsible for input validation.
+                        If neither an Action nor a ActionForward are configured the framework will perform input validation.
+                        For this framework validation two nested "forward" elements named "success" and "error" must be
                         configured.
                         Optional if the "form" attribute is specified, else not valid.
                         [default: "request"]
@@ -229,9 +229,9 @@
 
    class      Class name of a Tile subclass used as the Module's default Tile implementation.
               [default: rosasurfer\ministruts\Tile]
-   
-   namespace  The PHP namespace used by view templates and tiles. The namespace will be populated with the configured view 
-              helpers (constants and helper functions). Valid namespace separators are slash "/" and backslash "\".  
+
+   namespace  The PHP namespace used by view templates and tiles. The namespace will be populated with the configured view
+              helpers (constants and helper functions). Valid namespace separators are slash "/" and backslash "\".
               [default: the global namespace]
 -->
 <!ELEMENT tiles (tile*)>
@@ -244,23 +244,23 @@
 <!--
    The "tile" element describes a view fragment that can be inserted into a page. It is identified by its logical name.
 
-   name      The unique identifier for this tile. Tile names must start with a dot ".". 
-             
-   file      The path of the file to insert relative to the "file-base" location of the module. Exactly one of "file", 
+   name      The unique identifier for this tile. Tile names must start with a dot ".".
+
+   file      The path of the file to insert relative to the "file-base" location of the module. Exactly one of "file",
              "extends" or "alias" must be specified.
-             
-   extends   Name of a tile that is used as an ancestor of this tile. Tile names must start with a dot ".". All attributes 
-             from the ancestor are available to the new tile. Any attribute inherited from the ancestor can be overwritten 
+
+   extends   Name of a tile that is used as an ancestor of this tile. Tile names must start with a dot ".". All attributes
+             from the ancestor are available to the new tile. Any attribute inherited from the ancestor can be overwritten
              by providing a new value. Exactly one of "file", "extends" or "alias" must be specified.
-             
-   alias     Name of another tile to use instead of the current one. Tile names must start with a dot ".". If this attribute 
+
+   alias     Name of another tile to use instead of the current one. Tile names must start with a dot ".". If this attribute
              is set the tile can not have child elements. Exactly one of "file", "extends" or "alias" must be specified.
-             
-   push      Whether or not data exchange between controller and view supports the MVC push model. Cannot be used in 
-             combination with the "alias" atrribute.   
-             If this value is set to "true" all variables in the Page context are made available to the view as regular PHP 
-             variables (MVC push model). If the value is set to "false" the push model is not supported. The MVC pull model 
-             is always supported, regardless of this setting. 
+
+   push      Whether data exchange between controller and view supports the MVC push model. Cannot be used in combination
+             with the "alias" atrribute.
+             If this value is set to "true" all variables in the Page context are made available to the view as regular PHP
+             variables (MVC push model). If the value is set to "false" the push model is not supported. The MVC pull model
+             is always supported, regardless of this setting.
              [default: "false"]
 -->
 <!ELEMENT tile ((include*, set*)*)>
@@ -278,13 +278,13 @@
 
    name   Name of the variable under which the resource is made available in the view.
 
-   value  The name of a tiles definition or a file to include. Tile names must start with a dot ".", file names must not 
-          start with a dot. All properties from the surrounding tile are also available to the inserted element. Any property 
-          inherited from the surrounding tile can be overwritten by providing a new value. However, this will not modify the 
-          original value in the surrounding tile. 
-          If this attribute is omitted the surrounding tile is marked as a template and cannot be rendered independently. 
-          If a template is extended by another tile the extending tile can assign and override attributes of the extended 
-          tile. If all "include" elements of a tile have an assigned value the tile can be rendered.  
+   value  The name of a tiles definition or a file to include. Tile names must start with a dot ".", file names must not
+          start with a dot. All properties from the surrounding tile are also available to the inserted element. Any property
+          inherited from the surrounding tile can be overwritten by providing a new value. However, this will not modify the
+          original value in the surrounding tile.
+          If this attribute is omitted the surrounding tile is marked as a template and cannot be rendered independently.
+          If a template is extended by another tile the extending tile can assign and override attributes of the extended
+          tile. If all "include" elements of a tile have an assigned value the tile can be rendered.
 -->
 <!ELEMENT include EMPTY>
 <!ATTLIST include
@@ -294,16 +294,16 @@
 
 
 <!--
-   The "set" element describes an additional variable or class property. It can be used in "tile", "forward" and "mapping" 
+   The "set" element describes an additional variable or class property. It can be used in "tile", "forward" and "mapping"
    elements. The value of this element can be specified as an XML attribute or in the body of the element.
-   
-   If the "set" element is used in a tile the value is made available in the resulting view as a regular PHP variable. If 
-   the "set" element is used in a "forward" or "mapping" element, after the object representing the element is instantiated, 
-   the setter for the property is called and passed the specified value. 
+
+   If the "set" element is used in a tile the value is made available in the resulting view as a regular PHP variable. If
+   the "set" element is used in a "forward" or "mapping" element, after the object representing the element is instantiated,
+   the setter for the property is called and passed the specified value.
 
    name   Name of the variable or class property.
 
-   type   The type of the created or passed value. Can be "bool", "int", "float" or "string".  
+   type   The type of the created or passed value. Can be "bool", "int", "float" or "string".
           [default: "string"]
 
    value  String representation of the variable or property value. The value can be specified as an XML attribute or in the

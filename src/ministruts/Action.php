@@ -43,8 +43,8 @@ abstract class Action extends Object {
 
     /**
      * Optional execution pre-processing hook, to be overwritten if needed. Return NULL if request processing is to continue,
-     * or an ActionForward if request processing is already finished and forward to the target described by the forward.
-     * The default implementation does nothing.
+     * or an {@link ActionForward} if request processing is already finished and forward to the target described by the
+     * forward. This default implementation does nothing.
      *
      * @param  Request  $request
      * @param  Response $response
@@ -58,7 +58,7 @@ abstract class Action extends Object {
 
 
     /**
-     * Execute the Action and return an ActionForward describing the target to forward to. Must be implemented.
+     * Execute the Action and return an {@link ActionForward} describing the target to forward to.
      *
      * @param  Request  $request
      * @param  Response $response
@@ -71,10 +71,10 @@ abstract class Action extends Object {
 
     /**
      * Optional execution post-processing hook, to be overwritten if needed. May be used to finalize/clean-up runtime state,
-     * e.g. committing of transactions or closing of network connections. The default implementation does nothing.
+     * e.g. committing of transactions or closing of network connections. This default implementation does nothing.
      *
-     * Special care has to be taken because at the time of invocation request processing may already have been finished and
-     * all content may have been delivered.
+     * Special care needs to be taken in regard to sending of additional headers because at the time of invocation request
+     * processing may have been already finished.
      *
      * @param  Request       $request
      * @param  Response      $response
@@ -88,8 +88,7 @@ abstract class Action extends Object {
 
 
     /**
-     * Find and return the ActionForward with the specified name. Local ActionForwards (mapping forwards) are preferred over
-     * global definitions.
+     * Find and return the {@link ActionForward} with the specified name.
      *
      * @param  string $name - forward identifier
      *

@@ -73,7 +73,7 @@ abstract class Mailer extends Object implements MailerInterface {
      * @param  string   $message            - mail body
      * @param  string[] $headers [optional] - additional MIME headers (default: none)
      *
-     * @return bool - whether or not sending of the email was successfully delayed
+     * @return bool - whether sending of the email was successfully delayed
      *
      */
     protected function sendLater($sender, $receiver, $subject, $message, array $headers = []) {

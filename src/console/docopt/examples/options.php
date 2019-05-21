@@ -1,21 +1,21 @@
-
 #!/usr/bin/env php
 <?php
 use function rosasurfer\docopt;
 use function rosasurfer\echoPre;
 
-require(dirname(realpath(__FILE__)).'/../../../../etc/vendor/autoload.php');
+require(dirname(realpath(__FILE__)).'/../../../../src/load.php');
 
 $self = basename($_SERVER['PHP_SELF']);
-$doc = <<<HELP
+$doc = <<<DOCOPT
+
 Example of a program with many options.
 
 Usage:
-  $self [-hvqrf NAME] [--exclude=PATTERNS]
-        [--select=ERRORS | --ignore=ERRORS] [--show-source]
-        [--statistics] [--count] [--benchmark] PATH...
-  $self (--doctest | --testsuite=DIR)
-  $self --version
+  $self  [-hvqrf NAME] [--exclude=PATTERNS]
+         [--select=ERRORS | --ignore=ERRORS] [--show-source]
+         [--statistics] [--count] [--benchmark] PATH...
+  $self  (--doctest | --testsuite=DIR)
+  $self  --version
 
 Arguments:
   PATH                 destination path
@@ -40,10 +40,9 @@ Options:
   --testsuite=DIR      run regression tests from dir
   --doctest            run doctest on myself
 
-HELP;
+DOCOPT;
 
 $result = docopt($doc, null, ['version'=>'1.0.0rc2']);
 foreach ($result as $key => $value) {
     echoPre($key.': '.json_encode($value));
 }
-echoPre($result->getArgs());

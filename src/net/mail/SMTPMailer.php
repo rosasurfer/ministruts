@@ -362,7 +362,7 @@ class SMTPMailer extends Mailer {
     /**
      * Disconnect.
      *
-     * @param  bool $silent [optional] - whether or not to silently suppress disconnect errors (default: don't)
+     * @param  bool $silent [optional] - whether to silently suppress disconnect errors (default: don't)
      */
     public function disconnect($silent = false) {
         if (!is_resource($this->connection))

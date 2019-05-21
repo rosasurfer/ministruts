@@ -315,7 +315,7 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Whether or not the instance was already saved and has a value assigned to it's id property.
+     * Whether the instance was already saved and has a value assigned to it's id property.
      *
      * @return bool
      */
@@ -327,7 +327,7 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Whether or not the instance is marked as "soft deleted".
+     * Whether the instance is marked as "soft deleted".
      *
      * @return bool
      */
@@ -342,7 +342,7 @@ abstract class PersistableObject extends Object {
 
 
     /**
-     * Whether or not the instance status is "modified".
+     * Whether the instance status is "modified".
      *
      * @return bool
      */
@@ -689,7 +689,7 @@ abstract class PersistableObject extends Object {
      * Reload this instance from the database and optionally reset relations.
      *
      * @param  bool $resetRelations [optional] - NOT YET IMPLEMENTED
-     *                                           Whether or not to reset relations and re-fetch on next access.
+     *                                           Whether to reset relations and re-fetch on next access.
      *                                           (default: no)
      * @return $this
      */

@@ -295,7 +295,7 @@ class MySQLConnector extends Connector {
 
 
     /**
-     * Whether or not the adapter currently is connected to the database.
+     * Whether the adapter currently is connected to the database.
      *
      * @return bool
      */
@@ -495,7 +495,7 @@ class MySQLConnector extends Connector {
 
 
     /**
-     * Whether or not the connection currently is in a transaction.
+     * Whether the connection currently is in a transaction.
      *
      * @return bool
      */
@@ -535,7 +535,7 @@ class MySQLConnector extends Connector {
 
 
     /**
-     * Whether or not the DBMS's SQL dialect supports 'insert into ... returning ...' syntax.
+     * Whether the DBMS's SQL dialect supports 'insert into ... returning ...' syntax.
      *
      * @return bool
      */

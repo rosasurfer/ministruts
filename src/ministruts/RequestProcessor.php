@@ -275,12 +275,17 @@ PROCESS_METHOD_ERROR_SC_405;
      * @return bool
      */
     protected function processRoles(Request $request, Response $response, ActionMapping $mapping) {
-        if ($mapping->getRoles() === null)
+        if (empty($mapping->getRoles()))
             return true;
 
+        /** @var ActionForward|string|null $forward */
         $forward = $this->module->getRoleProcessor()->processRoles($request, $mapping);
-        if (!$forward)
+        if (!isset($forward))
             return true;
+
+        // if a string identifier was returned resolve the named instance
+        if (is_string($forward))
+            $forward = $mapping->findForwardOrFail($forward);
 
         $this->processActionForward($request, $response, $forward);
         return false;
@@ -468,12 +473,16 @@ PROCESS_METHOD_ERROR_SC_405;
             $this->cacheActionMessages($request);
             $path = $forward->getPath();
 
-            if (isset(parse_url($path)['host'])) {               // check for external URI
+            if (isset(parse_url($path)['host'])) {                  // an external URI
                 $url = $path;
             }
-            else {
+            else if ($path[0] == '/') {                             // an application-relative URI
+                $appUri = $request->getApplicationBaseUri();
+                $url = $appUri.ltrim($path, '/');
+            }
+            else {                                                  // a module-relative uri
                 $moduleUri = $request->getApplicationBaseUri().$module->getPrefix();
-                $url = $moduleUri.ltrim($path, '/');
+                $url = $moduleUri.$path;
             }
             $response->redirect($url, $forward->getRedirectType());
         }

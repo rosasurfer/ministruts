@@ -3,25 +3,25 @@
 use function rosasurfer\echoPre;
 use function rosasurfer\docopt;
 
-require(dirname(realpath(__FILE__)).'/../../../../etc/vendor/autoload.php');
+require(dirname(realpath(__FILE__)).'/../../../../src/load.php');
 
 $self = basename($_SERVER['PHP_SELF']);
-$doc = <<<HELP
-Usage: $self --help
-       $self -v...
-       $self go [go]
-       $self (--path=<path>)...
-       $self <file> <file>
+$doc = <<<DOCOPT
 
-Try:   $self -vvvvvvvvvv
-       $self go go
-       $self --path ./here --path ./there
-       $self this.txt that.txt
+Usage: $self  --help
+       $self  -v...
+       $self  go [go]
+       $self  (--path=<path>)...
+       $self  <file> <file>
 
-HELP;
+Try:   $self  -vvvvvvvvvv
+       $self  go go
+       $self  --path ./here --path ./there
+       $self  this.txt that.txt
+
+DOCOPT;
 
 $result = docopt($doc);
 foreach ($result as $key => $value) {
     echoPre($key.': '.json_encode($value));
 }
-echoPre($result->getArgs());

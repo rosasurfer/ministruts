@@ -21,7 +21,10 @@ nbactions.xml
 /dist/
 
 # ignore the following folders and files
+/etc/httpd/cgi/php.ini
+
 vendor/
+
 /composer
 /composer.lock
 /composer.phar

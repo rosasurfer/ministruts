@@ -151,7 +151,7 @@ class DebugHelper extends StaticClass {
      * Return the fully qualified function or method name of a stacktrace's frame.
      *
      * @param  array $frame                  - frame
-     * @param  bool  $nsLowerCase [optional] - whether or not the namespace part of the name to return in lower case (default: no)
+     * @param  bool  $nsLowerCase [optional] - whether the namespace part of the name to return in lower case (default: no)
      *
      * @return string - fully qualified name (without trailing parentheses)
      */
@@ -265,9 +265,9 @@ class DebugHelper extends StaticClass {
             E_USER_DEPRECATED   => 'E_USER_DEPRECATED',         // 16384
         ];
 
-    if      (!$level)                                                       $levels = ['0'];                        //     0
-    else if (($level &  E_ALL)                  ==  E_ALL)                  $levels = ['E_ALL'];                    // 32767
-    else if (($level & (E_ALL & ~E_DEPRECATED)) == (E_ALL & ~E_DEPRECATED)) $levels = ['E_ALL & ~E_DEPRECATED'];    // 24575
+        if      (!$level)                                                       $levels = ['0'];                        //     0
+        else if (($level &  E_ALL)                  ==  E_ALL)                  $levels = ['E_ALL'];                    // 32767
+        else if (($level & (E_ALL & ~E_DEPRECATED)) == (E_ALL & ~E_DEPRECATED)) $levels = ['E_ALL & ~E_DEPRECATED'];    // 24575
         else {
             foreach ($levels as $key => $value) {
                 if ($level & $key) continue;

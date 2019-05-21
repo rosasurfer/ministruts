@@ -27,7 +27,7 @@ class ApcCache extends CachePeer {
 
 
     /**
-     * Whether or not a value with the specified key exists in the cache.
+     * Whether a value with the specified key exists in the cache.
      *
      * @param  string $key
      *

@@ -104,22 +104,22 @@ class Logger extends StaticClass {
     private static $appLogLevel = self::DEFAULT_LOGLEVEL;
 
 
-    /** @var bool - whether or not the print handler for L_FATAL messages is enabled */
+    /** @var bool - whether the print handler for L_FATAL messages is enabled */
     private static $printFatalHandler = false;
 
-    /** @var bool - whether or not the print handler for non L_FATAL messages is enabled */
+    /** @var bool - whether the print handler for non L_FATAL messages is enabled */
     private static $printNonfatalHandler = false;
 
     /** @var int - counter for messages handled by the print handler */
     private static $printCounter = 0;
 
-    /** @var bool - whether or not the mail handler is enabled */
+    /** @var bool - whether the mail handler is enabled */
     private static $mailHandler = false;
 
     /** @var string[] - mail receivers */
     private static $mailReceivers = [];
 
-    /** @var bool - whether or not the SMS handler is enabled */
+    /** @var bool - whether the SMS handler is enabled */
     private static $smsHandler = false;
 
     /** @var string[] - SMS receivers */
@@ -131,7 +131,7 @@ class Logger extends StaticClass {
     /** @var array - SMS options; resolved at log message time */
     private static $smsOptions = [];
 
-    /** @var bool - whether or not the PHP error_log handler is enabled */
+    /** @var bool - whether the PHP error_log handler is enabled */
     private static $errorLogHandler = true;
 
     /** @var string[] - loglevel descriptions for message formatter */
@@ -667,13 +667,19 @@ class Logger extends StaticClass {
                 $session = $_SESSION;
             }
             else if ($request->hasSessionId()) {
-                $request->getSession($suppressHeadersAlreadySentError = true);
+                try {
+                    $request->getSession();                         // Make sure the session was restarted.
+                }                                                   // A session may exist but content was delivered before
+                catch (PHPError $error) {                           // the session was restarted.
+                    if (!preg_match('/- headers already sent (by )?\(output started at /', $error->getMessage()))
+                        throw $error;
+                }
                 if (session_id() == $request->getSessionId())       // if both differ the id was regenerated and
-                    $session = $_SESSION;                           // the session is empty
+                    $session = $_SESSION;                           // the session is considered empty (except markers)
             }
-            $session  = is_null($session) ? null : print_r(ksort_r($session), true);
-            $ip       = $_SERVER['REMOTE_ADDR'];
-            $host     = NetTools::getHostByAddress($ip);
+            $session = isset($session) ? print_r(ksort_r($session), true) : null;
+            $ip      = $_SERVER['REMOTE_ADDR'];
+            $host    = NetTools::getHostByAddress($ip);
             if ($host != $ip)
                 $ip .= ' ('.$host.')';
             $msg .= NL.NL.'Request:'.NL.'--------'.NL.$request.NL.NL

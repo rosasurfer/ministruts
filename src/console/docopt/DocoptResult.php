@@ -17,7 +17,7 @@ class DocoptResult extends Object implements \ArrayAccess, \IteratorAggregate {
     protected $args;
 
     /** @var int */
-    protected $errorStatus;
+    protected $error;
 
     /** @var string */
     protected $errorMessage;
@@ -29,12 +29,12 @@ class DocoptResult extends Object implements \ArrayAccess, \IteratorAggregate {
      * Create a new Docopt parser result.
      *
      * @param  array  $args                    - parsed arguments
-     * @param  int    $errorStatus  [optional] - the result's error status  (default: 0)
+     * @param  int    $error        [optional] - the result's error status  (default: 0)
      * @param  string $errorMessage [optional] - the result's error message (default: none)
      */
-    public function __construct(array $args, $errorStatus=0, $errorMessage='') {
+    public function __construct(array $args, $error=0, $errorMessage='') {
         $this->args         = $args;
-        $this->errorStatus  = $errorStatus;
+        $this->error        = $error;
         $this->errorMessage = $errorMessage;
     }
 
@@ -55,8 +55,8 @@ class DocoptResult extends Object implements \ArrayAccess, \IteratorAggregate {
      *
      * @return int
      */
-    public function getErrorStatus() {
-        return $this->errorStatus;
+    public function getError() {
+        return $this->error;
     }
 
 
@@ -76,7 +76,7 @@ class DocoptResult extends Object implements \ArrayAccess, \IteratorAggregate {
      * @return bool
      */
     public function isSuccess() {
-        return (int)$this->errorStatus == 0;
+        return (int)$this->error == 0;
     }
 
 

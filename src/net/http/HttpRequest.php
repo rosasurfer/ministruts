@@ -28,7 +28,7 @@ class HttpRequest extends Object {
      *
      * Create a new HttpRequest.
      *
-     * @param  string $url [optional] - url (default: none)
+     * @param  string $url [optional] - URL (default: none)
      */
     public function __construct($url = null) {
         if (isset($url)) {
@@ -98,8 +98,8 @@ class HttpRequest extends Object {
      * @return $this
      */
     public function setHeader($name, $value) {
-        Assert::string($name,        '$name');
-        if (!strlen($name))           throw new InvalidArgumentException('Invalid argument $name: '.$name);
+        Assert::string($name, '$name');
+        if (!strlen($name)) throw new InvalidArgumentException('Invalid argument $name: '.$name);
         Assert::nullOrString($value, '$value');
 
         $name  = trim($name);

@@ -1,7 +1,11 @@
 #
-# alias phpstan='php7 -d memory_limit=256M -d short_open_tag=On /path/to/phpstan/bin/phpstan'
+# Requires:
+#   PHP 7.0
+#   https://github.com/rosasurfer/phpstan, branch "0.9-pewa"
 #
-# phpstan analyse -a etc/phpstan/autoload.php -c etc/phpstan/config.neon --level=0..7 [--] <path>
+# Usage:
+#  alias phpstan='php7 -d memory_limit=256M -d short_open_tag=On /path/to/rosasurfer-phpstan/bin/phpstan'
+#  phpstan analyse -a etc/phpstan/autoload.php -c etc/phpstan/config.neon --level=0..7 [--] <path>
 #
 
 parameters:

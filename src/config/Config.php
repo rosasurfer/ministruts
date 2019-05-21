@@ -267,10 +267,10 @@ class Config extends Object implements IConfig {
      * Look-up a property and return its value.
      *
      * @param  string $key      - property key
-     * @param  bool   $notFound - reference to a flag indicating whether or not the property was found
+     * @param  bool   $notFound - reference to a flag indicating whether the property was found
      *
      * @return mixed - Property value (including NULL) or NULL if no such property was found. If NULL is returned the flag
-     *                 $notFound must be checked to find out whether or not the property was not found.
+     *                 $notFound must be checked to find out whether the property was found.
      */
     protected function getProperty($key, &$notFound) {
         $properties  = $this->properties;
@@ -569,7 +569,7 @@ class Config extends Object implements IConfig {
 
 
     /**
-     * Whether or not a config setting with the specified key exists.
+     * Whether a config setting with the specified key exists.
      *
      * @param  string $key - case-insensitive key
      *
@@ -579,6 +579,7 @@ class Config extends Object implements IConfig {
         Assert::string($key);
         $notFound = false;
         $this->getProperty($key, $notFound);
+
         return !$notFound;
     }
 

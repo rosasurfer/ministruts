@@ -127,7 +127,7 @@ final class ReferencePool extends CachePeer {
         Assert::string($key,  '$key');
         Assert::int($expires, '$expires');
 
-        // im Cache wird ein Array[creation_timestamp, value, expires, dependency] gespeichert
+        // im Cache wird ein array(creation_timestamp, value, expires, dependency) gespeichert
         $this->pool[$key] = array($timestamp=null, $value, $expires=null, $dependency);
 
         return true;

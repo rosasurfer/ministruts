@@ -1,11 +1,11 @@
 <?php
-namespace rosasurfer\console;
+namespace rosasurfer\console\io;
 
 use rosasurfer\core\Object;
-use rosasurfer\core\assert\Assert;
+
+use function rosasurfer\printPretty;
 
 use const rosasurfer\CLI;
-use const rosasurfer\NL;
 
 
 /**
@@ -17,14 +17,10 @@ class Output extends Object {
     /**
      * Write a message to STDOUT.
      *
-     * @param  string $message
+     * @param  mixed $message
      */
     public function out($message) {
-        Assert::string($message);
-
-        $len = strlen($message);
-        if ($len && $message[$len-1]!=NL)
-            $message .= NL;
+        $message = printPretty($message, $return=true);
 
         $hStream = CLI ? \STDOUT : fopen('php://stdout', 'a');
         fwrite($hStream, $message);
@@ -35,14 +31,10 @@ class Output extends Object {
     /**
      * Write a message to STDERR.
      *
-     * @param  string $message
+     * @param  mixed $message
      */
     public function error($message) {
-        Assert::string($message);
-
-        $len = strlen($message);
-        if ($len && $message[$len-1]!=NL)
-            $message .= NL;
+        $message = printPretty($message, $return=true);
 
         $hStream = CLI ? \STDERR : fopen('php://stderr', 'a');
         fwrite($hStream, $message);

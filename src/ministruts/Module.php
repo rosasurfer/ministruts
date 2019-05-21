@@ -1169,7 +1169,7 @@ class Module extends Object {
 
 
     /**
-     * Whether or not a string represents a valid namespace.
+     * Whether a string represents a valid namespace.
      *
      * @param  string $value
      *

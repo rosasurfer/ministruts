@@ -161,7 +161,7 @@ class EntityMapping extends Object implements \Iterator {
 
 
     /**
-     * Whether or not the element index at the current iterator position is valid.
+     * Whether the element index at the current iterator position is valid.
      *
      * @return bool
      */

@@ -29,7 +29,7 @@ class Tile extends Object {
     /** @var string - vollstaendiger Dateiname dieser Tile */
     protected $fileName;
 
-    /** @var bool - whether or not MVC push model is activated for the tile */
+    /** @var bool - whether the MVC push model is activated for the tile */
     protected $pushModelSupport;
 
     /** @var Tile[] - nested tiles */
@@ -125,7 +125,7 @@ class Tile extends Object {
 
 
     /**
-     * Whether or not the MVC push model is activated for the tile.
+     * Whether the MVC push model is activated for the tile.
      *
      * @return bool|null - configured state or NULL if the state is inherited from a surrounding element
      */
@@ -200,7 +200,7 @@ class Tile extends Object {
 
 
     /**
-     * Whether or not this instance must be extended and can't be inserted into a view directly.
+     * Whether this instance must be extended and can't be inserted into a view directly.
      *
      * @return bool
      */

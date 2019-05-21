@@ -4,6 +4,7 @@ namespace rosasurfer\ministruts;
 use rosasurfer\core\Singleton;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\exception\phperror\PHPError;
+use rosasurfer\util\PHP;
 
 
 /**
@@ -17,134 +18,93 @@ class HttpSession extends Singleton {
     /** @var Request - request the session belongs to */
     protected $request;
 
-    /** @var bool - Whether or not the session is "new". A session is new if the client doesn't yet know the session id. */
+    /** @var bool - Whether the session is considered "new". A session is new if the client doesn't yet know the session id. */
     protected $new;
 
 
     /**
-     * Return the <tt>Singleton</tt> instance.
+     * Return the {@link Singleton} instance.
      *
-     * @param  Request $request                                    - request the session belongs to
-     * @param  bool    $suppressHeadersAlreadySentError [optional] - whether or not to suppress "headers already sent" errors
+     * @param  Request $request - request the session belongs to
      *
      * @return static
      *
      * @throws RuntimeException if not called from the web interface
      */
-    public static function me(Request $request, $suppressHeadersAlreadySentError = false) {
-        return self::getInstance(static::class, $request, $suppressHeadersAlreadySentError);
+    public static function me(Request $request) {
+        return self::getInstance(static::class, $request);
     }
 
 
     /**
      * Constructor
      *
-     * @param  Request $request                                    - request the session belongs to
-     * @param  bool    $suppressHeadersAlreadySentError [optional] - whether or not to suppress "headers already sent" errors
-     *                                                               (default: no)
+     * @param  Request $request - request the session belongs to
      */
-    protected function __construct(Request $request, $suppressHeadersAlreadySentError = false) {
+    protected function __construct(Request $request) {
         parent::__construct();
         $this->request = $request;
-        $this->init($suppressHeadersAlreadySentError);
+        $this->init();
     }
 
 
     /**
      * Start and initialize the session.
-     *
-     * @param  bool $suppressHeadersAlreadySentError [optional] - whether or not to suppress "headers already sent" errors
-     *                                                            (default: no)
      */
-    protected function init($suppressHeadersAlreadySentError = false) {
-        /**
-         *
-         *
-         *
-         *
-         *
-         * PHP laesst sich ohne weiteres manipulierte Session-IDs unterschieben, solange diese keine ungueltigen Zeichen enthalten
-         * (IDs wie PHPSESSID=111 werden anstandslos akzeptiert).  Wenn session_start() zurueckkehrt, gibt es mit den vorhandenen
-         * PHP-Mitteln keine vernuenftige Moeglichkeit mehr, festzustellen, ob die Session-ID von PHP oder (kuenstlich?) vom User
-         * generiert wurde.  Daher wird in dieser Methode jede neue Session mit einer zusaetzliche Markierung versehen.  Fehlt diese
-         * Markierung nach Rueckkehr von session_start(), wurde die ID nicht von PHP generiert.  Aus Sicherheitsgruenden wird eine
-         * solche Session verworfen und eine neue ID erzeugt.
-         */
+    protected function init() {
         $request = $this->request;
 
-        // Session-Cookie auf Application beschraenken, um mehrere Projekte je Domain zu ermoeglichen
+        // limit session cookie to application path to support multiple projects per domain
         $params = session_get_cookie_params();
         session_set_cookie_params($params['lifetime'],
                                   $request->getApplicationBaseUri(),
                                   $params['domain'  ],
                                   $params['secure'  ],
                                   $params['httponly']);
+        PHP::ini_set('session.use_strict_mode', true);  // enforce prevention of user-defined session ids
 
-        // Session starten bzw. fortsetzen
+        // start or continue the session
         try {
-            session_start();                        // TODO: Handle the case when a session was already started elsewhere?
+            session_start();                            // intentionally trigger an error if the session has already been started
         }
-        catch (PHPError $error) {
-            if (preg_match('/The session id contains illegal characters/', $error->getMessage())) {
-                session_regenerate_id();            // neue ID generieren
-            }
-            else if (preg_match('/- headers already sent (by )?\(output started at /', $error->getMessage())) {
-                if (!$suppressHeadersAlreadySentError)
-                    throw $error;
-            }
-            else {
-                throw $error;
-            }
+        catch (PHPError $error) {                       // TODO: Is this check still needed?
+            if (preg_match('/The session id contains illegal characters/i', $error->getMessage()))
+                session_regenerate_id();
+            else throw $error;
         }
 
-
-        // Inhalt der Session pruefen
-        // TODO: Session verwerfen, wenn der User zwischen Cookie- und URL-Uebertragung wechselt
-        if (sizeof($_SESSION) == 0) {           // 0 bedeutet, die Session ist (fuer diese Methode) neu
-            $sessionName = session_name();
-            $sessionId   = session_id();        // pruefen, woher die ID kommt ...
-
-            // TODO: Verwendung von $_COOKIE und $_REQUEST ist unsicher
-            if     (isset($_COOKIE [$sessionName]) && $_COOKIE [$sessionName] == $sessionId) $fromUser = true; // ID kommt vom Cookie
-            elseif (isset($_REQUEST[$sessionName]) && $_REQUEST[$sessionName] == $sessionId) $fromUser = true; // ID kommt aus GET/POST
-            else                                                                             $fromUser = false;
-
-            $this->reset($fromUser);            // if $fromUser=TRUE: generate new session id
+        // check session state
+        if (sizeof($_SESSION) == 0) {                   // 0 means the session is new and not yet marked
+            $this->reset(false);
         }
-        else {                                  // vorhandene Session fortgesetzt
-            $this->new = false;
+        else {
+            $this->new = false;                         // continue an existing session (with markers)
         }
     }
 
 
     /**
-     * Reset this session to a clean and new state.
+     * Reset this session to a new and empty state.
      *
-     * @param  bool $regenerateId - whether or not to generate a new session id and to delete an old session file
+     * @param  bool $regenerateId - whether to generate a new session id and to delete an old session file
      */
     public function reset($regenerateId) {
         Assert::bool($regenerateId);
 
         if ($regenerateId) {
-            // assign new id, delete old file
-            session_regenerate_id(true);
+            session_regenerate_id(true);                                            // generate new id and delete the old file
         }
-
-        // empty the session
-        $this->removeAttribute(\array_keys($_SESSION));
-
-        // initialize the session
-        $request = $this->request;                                              // TODO: $request->getHeader() einbauen
-        $_SESSION['__SESSION_CREATED__'  ] = microtime(true);
-        $_SESSION['__SESSION_IP__'       ] = $request->getRemoteAddress();      // TODO: forwarded remote IP einbauen
-        $_SESSION['__SESSION_USERAGENT__'] = $request->getHeaderValue('User-Agent');
+        $_SESSION = [];                                                             // empty the session
+        $_SESSION['__SESSION_CREATED__'  ] = microtime(true);                       // initialize the session markers
+        $_SESSION['__SESSION_IP__'       ] = $this->request->getRemoteAddress();    // TODO: resolve/store forwarded IP
+        $_SESSION['__SESSION_USERAGENT__'] = $this->request->getHeaderValue('User-Agent');
 
         $this->new = true;
     }
 
 
     /**
-     * Ob diese Session neu ist oder nicht. Die Session ist neu, wenn der User die aktuelle Session-ID noch nicht kennt.
+     * Whether the session is new. A session is considered "new" if the web user does not yet know the session id.
      *
      * @return bool
      */
@@ -154,19 +114,9 @@ class HttpSession extends Singleton {
 
 
     /**
-     * Gibt die Session-ID der Session zurueck.
+     * Return the current name of the session variable.
      *
-     * @return string - Session-ID
-     */
-    public function getId() {
-        return session_id();
-    }
-
-
-    /**
-     * Gibt den Namen der Sessionvariable zurueck.
-     *
-     * @return string - Name
+     * @return string
      */
     public function getName() {
         return session_name();
@@ -174,13 +124,22 @@ class HttpSession extends Singleton {
 
 
     /**
-     * Gibt den unter dem angegebenen Schluessel in der Session gespeicherten Wert zurueck oder den
-     * angegebenen Alternativwert, falls kein Wert unter diesem Schluessel existiert.
+     * Return the current session id.
      *
-     * @param  string $key                - Schluessel, unter dem der Wert gespeichert ist
-     * @param  mixed  $default [optional] - Default- bzw. Alternativwert (kann selbst auch NULL sein)
+     * @return string
+     */
+    public function getId() {
+        return session_id();
+    }
+
+
+    /**
+     * Return the session value stored under the specified key, or the passed default value if no such session value exists.
      *
-     * @return mixed - der gespeicherte Wert oder NULL
+     * @param  string $key                - session key
+     * @param  mixed  $default [optional] - alternative default (default: NULL)
+     *
+     * @return mixed
      */
     public function getAttribute($key, $default = null) {
         if (\key_exists($key, $_SESSION))
@@ -190,14 +149,11 @@ class HttpSession extends Singleton {
 
 
     /**
-     * Speichert in der Session unter dem angegebenen Schluessel einen Wert.  Ein unter dem selben
-     * Schluessel schon vorhandener Wert wird ersetzt.
+     * Store a value under the specified key in the session. An already existing value under the same key is replaced.
+     * If NULL is passed as a value the effect is the same as calling {@link HttpSession::removeAttribute($key)}.
      *
-     * Ist der uebergebene Wert NULL, hat dies den selben Effekt wie der Aufruf von
-     * HttpSession::removeAttribute($key)
-     *
-     * @param  string $key   - Schluessel, unter dem der Wert gespeichert wird
-     * @param  mixed  $value - der zu speichernde Wert
+     * @param  string $key   - session key
+     * @param  mixed  $value - value to store
      */
     public function setAttribute($key, $value) {
         Assert::string($key, '$key');
@@ -212,9 +168,9 @@ class HttpSession extends Singleton {
 
 
     /**
-     * Delete session values stored under the specified key(s).
+     * Delete all session values stored under the specified key(s).
      *
-     * @param  string|string[] $key - single session key or array of session keys of values to remove
+     * @param  string|string[] $key - a single session key or an array of session keys
      */
     public function removeAttribute($key) {
         if (is_array($key)) {
@@ -231,9 +187,9 @@ class HttpSession extends Singleton {
 
 
     /**
-     * Ob unter dem angegebenen Schluessel ein Wert in der Session existiert.
+     * Whether a value is stored in the session under the specified key.
      *
-     * @param  string $key - Schluessel
+     * @param  string $key
      *
      * @return bool
      */
