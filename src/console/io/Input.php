@@ -80,7 +80,7 @@ class Input extends Object {
 
     /**
      * Whether the argument with the given name is defined (not whether the argument was specified).
-     * Arguments are command line parameters defined either in angular brackets or in all-uppercase letters.
+     * Arguments are command line parameters defined either in angular brackets or in all-uppercase characters.
      *
      * @param  string $name - argument name
      *
