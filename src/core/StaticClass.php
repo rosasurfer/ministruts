@@ -5,7 +5,7 @@ namespace rosasurfer\core;
 /**
  * Super class for classes meant to be called only statical. Derived classes cannot be instantiated.
  */
-abstract class StaticClass extends Object {
+abstract class StaticClass extends CObject {
 
 
     /**

@@ -6,7 +6,7 @@ use rosasurfer\console\docopt\DocoptParser;
 use rosasurfer\console\docopt\DocoptResult;
 use rosasurfer\console\io\Input;
 use rosasurfer\console\io\Output;
-use rosasurfer\core\Object;
+use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\exception\IllegalStateException;
 use rosasurfer\core\exception\InvalidArgumentException;
@@ -20,7 +20,7 @@ use rosasurfer\di\Di;
  * The configuration of a command will be frozen after it is added to the {@link Application}. A frozen configuration
  * can't be changed anymore.
  */
-class Command extends Object {
+class Command extends CObject {
 
 
     /** @var string */

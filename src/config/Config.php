@@ -3,7 +3,7 @@ namespace rosasurfer\config;
 
 use rosasurfer\cache\Cache;
 use rosasurfer\config\ConfigInterface as IConfig;
-use rosasurfer\core\Object;
+use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\exception\InvalidArgumentException;
 use rosasurfer\core\exception\RuntimeException;
@@ -53,7 +53,7 @@ use const rosasurfer\NL;
  * Config::get('db.options')                    # return a numerical indexed array of values [0=>..., 1=>..., 2=>...]
  * </pre>
  */
-class Config extends Object implements IConfig {
+class Config extends CObject implements IConfig {
 
 
     /** @var bool[] - config file names and their existence status */

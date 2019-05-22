@@ -2,7 +2,7 @@
 namespace rosasurfer\ministruts;
 
 use rosasurfer\config\ConfigInterface;
-use rosasurfer\core\Object;
+use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\exception\IllegalStateException;
 use rosasurfer\net\http\HttpResponse;
@@ -23,7 +23,7 @@ use const rosasurfer\NL;
 /**
  * Module
  */
-class Module extends Object {
+class Module extends CObject {
 
 
     /**

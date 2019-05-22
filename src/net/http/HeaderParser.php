@@ -1,13 +1,13 @@
 <?php
 namespace rosasurfer\net\http;
 
-use rosasurfer\core\Object;
+use rosasurfer\core\CObject;
 
 
 /**
  * HeaderParser
  */
-class HeaderParser extends Object {
+class HeaderParser extends CObject {
 
 
     /** @var array */

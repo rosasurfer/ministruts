@@ -2,14 +2,14 @@
 namespace rosasurfer\console\io;
 
 use rosasurfer\console\docopt\DocoptResult;
-use rosasurfer\core\Object;
+use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
 
 
 /**
  * Input
  */
-class Input extends Object {
+class Input extends CObject {
 
 
     /** @var DocoptResult */

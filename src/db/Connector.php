@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\db;
 
-use rosasurfer\core\Object;
+use rosasurfer\core\CObject;
 use rosasurfer\core\debug\ErrorHandler;
 use rosasurfer\core\exception\InvalidArgumentException;
 use rosasurfer\db\ConnectorInterface as IConnector;
@@ -12,7 +12,7 @@ use rosasurfer\db\ConnectorInterface as IConnector;
  *
  * Abstract super class for concrete storage mechanism adapters.
  */
-abstract class Connector extends Object implements ConnectorInterface {
+abstract class Connector extends CObject implements ConnectorInterface {
 
 
     /**

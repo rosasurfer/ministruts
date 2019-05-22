@@ -1,14 +1,14 @@
 <?php
 namespace rosasurfer\lock;
 
-use rosasurfer\core\Object;
+use rosasurfer\core\CObject;
 use rosasurfer\core\exception\IllegalStateException;
 
 
 /**
  * BaseLock
  */
-abstract class BaseLock extends Object {
+abstract class BaseLock extends CObject {
 
 
     /**

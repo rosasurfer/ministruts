@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\db\orm;
 
-use rosasurfer\core\Object;
+use rosasurfer\core\CObject;
 use rosasurfer\core\exception\ConcurrentModificationException;
 use rosasurfer\core\exception\IllegalAccessException;
 use rosasurfer\core\exception\IllegalStateException;
@@ -19,7 +19,7 @@ use function rosasurfer\strLeft;
  *
  * Abstract base class for stored objects.
  */
-abstract class PersistableObject extends Object {
+abstract class PersistableObject extends CObject {
 
 
     /** @var bool - dirty checking status */

@@ -1,13 +1,13 @@
 <?php
 namespace rosasurfer\ministruts;
 
-use rosasurfer\core\Object;
+use rosasurfer\core\CObject;
 
 
 /**
  * RoleProcessor
  */
-abstract class RoleProcessor extends Object {
+abstract class RoleProcessor extends CObject {
 
 
     /**

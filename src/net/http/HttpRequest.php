@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\net\http;
 
-use rosasurfer\core\Object;
+use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\exception\IllegalTypeException;
 use rosasurfer\core\exception\InvalidArgumentException;
@@ -10,7 +10,7 @@ use rosasurfer\core\exception\InvalidArgumentException;
 /**
  * HttpRequest
  */
-class HttpRequest extends Object {
+class HttpRequest extends CObject {
 
 
     /** @var string */

@@ -1,11 +1,11 @@
 <?php
 namespace rosasurfer\db\orm\meta;
 
-use rosasurfer\core\Object;
+use rosasurfer\core\CObject;
 
 
 /**
  *
  */
-class Model extends Object {
+class Model extends CObject {
 }

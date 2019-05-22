@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\cache\monitor;
 
-use rosasurfer\core\Object;
+use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\exception\InvalidArgumentException;
 
@@ -39,7 +39,7 @@ use rosasurfer\core\exception\InvalidArgumentException;
  * @see ChainedDependency
  * @see FileDependency
  */
-abstract class Dependency extends Object {
+abstract class Dependency extends CObject {
 
 
     /** @var int - Mindestgueltigkeit */

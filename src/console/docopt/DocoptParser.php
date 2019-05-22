@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\console\docopt;
 
-use rosasurfer\core\Object;
+use rosasurfer\core\CObject;
 
 use rosasurfer\console\docopt\exception\DocoptFormatError;
 use rosasurfer\console\docopt\exception\DocoptUserNotification;
@@ -27,7 +27,7 @@ use function rosasurfer\strStartsWith;
  *
  * A command line argument parser for the {@link http://docopt.org} language format.
  */
-class DocoptParser extends Object {
+class DocoptParser extends CObject {
 
 
     /** @var bool */

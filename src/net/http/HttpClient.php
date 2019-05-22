@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\net\http;
 
-use rosasurfer\core\Object;
+use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\exception\InvalidArgumentException;
 use rosasurfer\core\exception\IOException;
@@ -10,7 +10,7 @@ use rosasurfer\core\exception\IOException;
 /**
  * Basisklasse fuer konkrete HttpClients.
  */
-abstract class HttpClient extends Object {
+abstract class HttpClient extends CObject {
 
 
     // Default-Einstellungen

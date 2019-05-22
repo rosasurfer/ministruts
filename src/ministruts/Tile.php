@@ -2,7 +2,7 @@
 namespace rosasurfer\ministruts;
 
 use rosasurfer\Application;
-use rosasurfer\core\Object;
+use rosasurfer\core\CObject;
 use rosasurfer\core\exception\IllegalStateException;
 
 use function rosasurfer\strLeft;
@@ -14,7 +14,7 @@ use const rosasurfer\NL;
 /**
  * Tile
  */
-class Tile extends Object {
+class Tile extends CObject {
 
 
     /** @var string - runtime generated name for anonymous tiles */

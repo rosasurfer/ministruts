@@ -6,7 +6,7 @@
  */
 namespace rosasurfer;
 
-use rosasurfer\core\Object;
+use rosasurfer\core\CObject;
 use rosasurfer\core\ObjectTrait;
 use rosasurfer\core\loader\ClassLoader;
 use rosasurfer\di\DiAwareTrait;
@@ -35,7 +35,7 @@ function registerClassLoader() {
     // register a bootstrap loader for class rosasurfer\loader\ClassLoader
     $bootstrap = function($class) {
         switch ($class) {
-            case Object      ::class: require(MINISTRUTS_ROOT.'/src/core/Object.php'            ); break;
+            case CObject     ::class: require(MINISTRUTS_ROOT.'/src/core/CObject.php'           ); break;
             case ObjectTrait ::class: require(MINISTRUTS_ROOT.'/src/core/ObjectTrait.php'       ); break;
             case DiAwareTrait::class: require(MINISTRUTS_ROOT.'/src/di/DiAwareTrait.php'        ); break;
             case ClassLoader ::class: require(MINISTRUTS_ROOT.'/src/core/loader/ClassLoader.php'); break;

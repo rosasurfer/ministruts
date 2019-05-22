@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\net\messenger;
 
-use rosasurfer\core\Object;
+use rosasurfer\core\CObject;
 
 
 /**
@@ -9,7 +9,7 @@ use rosasurfer\core\Object;
  *
  * Messenger-Factory und abstrakte Basisklasse fuer alle Messenger-Implementierungen.
  */
-abstract class Messenger extends Object {
+abstract class Messenger extends CObject {
 
 
     /**

@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\db\orm\meta;
 
-use rosasurfer\core\Object;
+use rosasurfer\core\CObject;
 use rosasurfer\db\ConnectorInterface as IConnector;
 
 
@@ -10,7 +10,7 @@ use rosasurfer\db\ConnectorInterface as IConnector;
  *
  * Defines conversion methods between a property's PHP and SQL representation.
  */
-abstract class Type extends Object {
+abstract class Type extends CObject {
 
 
     /**

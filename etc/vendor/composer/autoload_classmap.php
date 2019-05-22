@@ -41,7 +41,7 @@ return array(
     'rosasurfer\\console\\docopt\\pattern\\Required' => $baseDir . '/src/console/docopt/pattern/Required.php',
     'rosasurfer\\console\\io\\Input' => $baseDir . '/src/console/io/Input.php',
     'rosasurfer\\console\\io\\Output' => $baseDir . '/src/console/io/Output.php',
-    'rosasurfer\\core\\Object' => $baseDir . '/src/core/Object.php',
+    'rosasurfer\\core\\CObject' => $baseDir . '/src/core/CObject.php',
     'rosasurfer\\core\\ObjectTrait' => $baseDir . '/src/core/ObjectTrait.php',
     'rosasurfer\\core\\Singleton' => $baseDir . '/src/core/Singleton.php',
     'rosasurfer\\core\\StaticClass' => $baseDir . '/src/core/StaticClass.php',

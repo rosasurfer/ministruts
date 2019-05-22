@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\di;
 
-use rosasurfer\core\Object;
+use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\di\service\Service;
 use rosasurfer\di\service\ServiceInterface as IService;
@@ -33,7 +33,7 @@ use rosasurfer\di\service\ServiceNotFoundException;
  *  $tile    = $di->create('tile', ...$args);               // resolving a new instance using the factory pattern
  * </pre>
  */
-class Di extends Object implements DiInterface {
+class Di extends CObject implements DiInterface {
 
 
     /** @var IService[] - a list of registered services */

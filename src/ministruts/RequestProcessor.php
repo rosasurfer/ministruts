@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\ministruts;
 
-use rosasurfer\core\Object;
+use rosasurfer\core\CObject;
 use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\net\http\HttpResponse;
 
@@ -9,7 +9,7 @@ use rosasurfer\net\http\HttpResponse;
 /**
  * RequestProcessor
  */
-class RequestProcessor extends Object {
+class RequestProcessor extends CObject {
 
 
     /** @var Module - the Module the instance belongs to */

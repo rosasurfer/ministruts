@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\console\docopt\pattern;
 
-use rosasurfer\core\Object;
+use rosasurfer\core\CObject;
 
 use function rosasurfer\array_merge;
 
@@ -9,7 +9,7 @@ use function rosasurfer\array_merge;
 /**
  * Pattern
  */
-abstract class Pattern extends Object {
+abstract class Pattern extends CObject {
 
 
     /** @var string */

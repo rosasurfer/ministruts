@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\core\loader;
 
-use rosasurfer\core\Object;
+use rosasurfer\core\CObject;
 
 use const rosasurfer\MINISTRUTS_ROOT;
 
@@ -9,7 +9,7 @@ use const rosasurfer\MINISTRUTS_ROOT;
 /**
  * ClassLoader
  */
-class ClassLoader extends Object {
+class ClassLoader extends CObject {
 
 
     /** @var string[] - class map */

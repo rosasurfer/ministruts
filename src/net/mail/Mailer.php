@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\net\mail;
 
-use rosasurfer\core\Object;
+use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\exception\InvalidArgumentException;
 
@@ -18,7 +18,7 @@ use function rosasurfer\strStartsWithI;
  *
  * Mailer factory and abstract base class for mailer implementations.
  */
-abstract class Mailer extends Object implements MailerInterface {
+abstract class Mailer extends CObject implements MailerInterface {
 
 
     /** @var array */

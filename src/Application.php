@@ -4,7 +4,7 @@ namespace rosasurfer;
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\config\auto\DefaultConfig;
 use rosasurfer\console\Command;
-use rosasurfer\core\Object;
+use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\debug\ErrorHandler;
 use rosasurfer\core\exception\InvalidArgumentException;
@@ -21,7 +21,7 @@ use rosasurfer\util\PHP;
 /**
  * An object representing a running application.
  */
-class Application extends Object {
+class Application extends CObject {
 
 
     /** @var ConfigInterface - the application's current default configuration */

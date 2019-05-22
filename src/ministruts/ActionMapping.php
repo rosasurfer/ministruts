@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\ministruts;
 
-use rosasurfer\core\Object;
+use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\exception\IllegalStateException;
 
@@ -17,7 +17,7 @@ use function rosasurfer\strLeftTo;
  *
  * @link  https://github.com/rosasurfer/ministruts/blob/master/src/ministruts/dtd/struts-config.dtd#L137
  */
-class ActionMapping extends Object {
+class ActionMapping extends CObject {
 
 
     /** @var bool - whether this component is fully configured */

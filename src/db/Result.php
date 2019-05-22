@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\db;
 
-use rosasurfer\core\Object;
+use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\debug\ErrorHandler;
 use rosasurfer\core\exception\InvalidArgumentException;
@@ -17,7 +17,7 @@ use const rosasurfer\ARRAY_BOTH;
  * Represents the result of an executed SQL statement. Depending on the statement type the result may or may not contain
  * a result set.
  */
-abstract class Result extends Object implements ResultInterface {
+abstract class Result extends CObject implements ResultInterface {
 
 
     /** @var ConnectorInterface - used database connector */

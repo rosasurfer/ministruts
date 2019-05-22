@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\ministruts\url;
 
-use rosasurfer\core\Object;
+use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\ministruts\Request;
 
@@ -11,7 +11,7 @@ use const rosasurfer\CLI;
 /**
  * URL generation helper
  */
-class Url extends Object {
+class Url extends CObject {
 
 
     /** @var string - URI as passed to the constructor */

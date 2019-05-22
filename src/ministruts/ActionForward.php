@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\ministruts;
 
-use rosasurfer\core\Object;
+use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\exception\InvalidArgumentException;
 use rosasurfer\net\http\HttpResponse;
@@ -15,7 +15,7 @@ use function rosasurfer\strLeftTo;
  * An ActionForward describes a target a request is forwarded to after processing. It has a logical name (for identification)
  * and points either to a physical resource (a file, a layout or a template) or to an URI.
  */
-class ActionForward extends Object {
+class ActionForward extends CObject {
 
 
     /** @var string - default identifier for looking up a forward after a successful form validation */

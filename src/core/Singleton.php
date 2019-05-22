@@ -13,7 +13,7 @@ use function rosasurfer\is_class;
  *
  * Factory and base class for implementation of the Singleton pattern.
  */
-abstract class Singleton extends Object {
+abstract class Singleton extends CObject {
 
 
     /** @var Singleton[] - the currently existing singletons */
