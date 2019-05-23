@@ -44,12 +44,6 @@ class Command extends CObject {
     /** @var bool - whether the command configuration is frozen */
     private $frozen = false;
 
-    /** @var Input */
-    protected $input;
-
-    /** @var Output */
-    protected $output;
-
     /** @var int - the command's error status */
     protected $status = 0;
 
@@ -60,7 +54,6 @@ class Command extends CObject {
      * Create a new command.
      */
     public function __construct() {
-        $this->output = $this->di(Output::class);
         $this->configure();
     }
 
@@ -82,17 +75,18 @@ class Command extends CObject {
      * @return int - execution status (0 for success)
      */
     public function run() {
-        $this->input = new Input($this->docoptResult);
-        $this->di()->set(Input::class, $this->input);
+        $input = new Input($this->docoptResult);
+        $this->di()->set(Input::class, $input);
+        $output = $this->di(Output::class);
 
-        if ($this->validator) $error = $this->validator->__invoke($this->input, $this->output);
-        else                  $error = $this->validate($this->input, $this->output);
+        if ($this->validator) $error = $this->validator->__invoke($input, $output);
+        else                  $error = $this->validate($input, $output);
 
         if ($error)
             return $this->status = (int) $error;
 
-        if ($this->task) $status = $this->task->__invoke($this->input, $this->output);
-        else             $status = $this->execute($this->input, $this->output);
+        if ($this->task) $status = $this->task->__invoke($input, $output);
+        else             $status = $this->execute($input, $output);
 
         return $this->status = (int) $status;
     }
@@ -105,7 +99,7 @@ class Command extends CObject {
      * @param  Input  $input
      * @param  Output $output
      *
-     * @return int - validation error status: 0 for "no error"
+     * @return int - validation error status (0 for no error)
      */
     protected function validate(Input $input, Output $output) {
         return 0;
