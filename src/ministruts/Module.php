@@ -277,7 +277,6 @@ class Module extends CObject {
                 else {
                     /** @var ActionForward $forward */
                     $forward = new $this->forwardClass($name, $this->findFile($include), false);
-                    $forward->setLabel(substr($include, 0, strrpos($include, '.')));
                 }
             }
 
@@ -358,7 +357,6 @@ class Module extends CObject {
                 else {
                     /** @var ActionForward $forward */
                     $forward = new $this->forwardClass('generic', $this->findFile($include), false);
-                    $forward->setLabel(strLeftTo($include, '.', -1));
                 }
                 $mapping->setForward($forward);
             }
@@ -493,7 +491,6 @@ class Module extends CObject {
                     else {
                         /** @var ActionForward $forward */
                         $forward = new $this->forwardClass($name, $this->findFile($include), false);
-                        $forward->setLabel(substr($include, 0, strrpos($include, '.')));
                     }
                     $mapping->addForward($name, $forward);
                 }

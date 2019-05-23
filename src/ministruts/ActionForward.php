@@ -33,9 +33,6 @@ class ActionForward extends CObject {
     /** @var string */
     protected $path;
 
-    /** @var string */
-    protected $label;
-
     /** @var bool */
     protected $redirect;
 
@@ -78,16 +75,6 @@ class ActionForward extends CObject {
      */
     public function getPath() {
         return $this->path;
-    }
-
-
-    /**
-     * Return the forward's label.
-     *
-     * @return string
-     */
-    public function getLabel() {
-        return $this->label;
     }
 
 
@@ -139,22 +126,6 @@ class ActionForward extends CObject {
         if (!strlen($path)) throw new InvalidArgumentException('Invalid argument $path: '.$path);
 
         $this->path = $path;
-        return $this;
-    }
-
-
-    /**
-     * Set the forward's label (used only in HTML comments).
-     *
-     * @param  string $label
-     *
-     * @return $this
-     */
-    public function setLabel($label) {
-        Assert::string($label);
-        if (!strlen($label)) throw new InvalidArgumentException('Invalid argument $label: '.$label);
-
-        $this->label = $label;
         return $this;
     }
 
