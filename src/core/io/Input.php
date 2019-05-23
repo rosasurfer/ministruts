@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\console\io;
+namespace rosasurfer\core\io;
 
 use rosasurfer\console\docopt\DocoptResult;
 use rosasurfer\core\Object;

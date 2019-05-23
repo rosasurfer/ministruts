@@ -10,7 +10,7 @@
 
 parameters:
     autoload_files:
-        - etc/phpstan/function-stubs.php                                    # stubs for PHP extensions and procedural code
+        - etc/phpstan/stubs.php                                             # stubs for PHP extensions and procedural code
 
     fileExtensions:                                                         # additional files to analyse
        #- html

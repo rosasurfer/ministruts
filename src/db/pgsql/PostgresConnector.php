@@ -457,6 +457,7 @@ class PostgresConnector extends Connector {
             throw $ex->addMessage('Database: '.$this->getConnectionDescription().NL.'SQL: "'.$sql.'"');
         }
 
+        /** @var string $status_string */
         $status_string = pg_result_status($result, PGSQL_STATUS_STRING);
 
         // reset last_insert_id on INSERTs, afterwards it's resolved on request as it requires an extra SQL query

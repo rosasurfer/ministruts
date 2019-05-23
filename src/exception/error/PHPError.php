@@ -22,7 +22,7 @@ class PHPError extends \ErrorException implements IRosasurferException {
      *
      * @param  string $message  - error description
      * @param  int    $code     - error identifier, usually an application id
-     * @param  int    $severity - the error reporting of the PHP error
+     * @param  int    $severity - PHP error reporting level of the error
      * @param  string $file     - the name of the file where the error occurred
      * @param  int    $line     - the line number in the file where the error occurred
      */

@@ -5,8 +5,8 @@ use rosasurfer\di\DiAwareTrait;
 
 
 /**
- * Super class for all "rosasurfer" classes. Other classes may directly use {@link ObjectTrait} and/or {@link DiAwareTrait}
- * to achieve the same functionality.
+ * Parent class of all "rosasurfer" classes. Other classes may directly use {@link ObjectTrait} and/or {@link DiAwareTrait}
+ * to implement the same functionality.
  */
 class Object {
 
@@ -16,19 +16,9 @@ class Object {
     /**
      * Return a human-readable version of the instance.
      *
-     * @_param  int $levels - how many levels of an object graph to recurse into
-     *                        (default: all)
      * @return string
      */
-    public function __toString(/*$levels=PHP_INT_MAX*/) {
-        /*
-        // TODO
-        if (func_num_args()) {
-            $levels = func_get_arg(0);
-            if ($levels != PHP_INT_MAX) {
-            }
-        }
-        */
+    public function __toString() {
         return print_r($this, true);
     }
 }
