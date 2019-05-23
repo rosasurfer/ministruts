@@ -20,7 +20,7 @@ return array(
     'rosasurfer\\cache\\monitor\\FileDependency' => $baseDir . '/src/cache/monitor/FileDependency.php',
     'rosasurfer\\config\\Config' => $baseDir . '/src/config/Config.php',
     'rosasurfer\\config\\ConfigInterface' => $baseDir . '/src/config/ConfigInterface.php',
-    'rosasurfer\\config\\auto\\DefaultConfig' => $baseDir . '/src/config/auto/DefaultConfig.php',
+    'rosasurfer\\config\\defaultt\\DefaultConfig' => $baseDir . '/src/config/defaultt/DefaultConfig.php',
     'rosasurfer\\console\\Command' => $baseDir . '/src/console/Command.php',
     'rosasurfer\\console\\docopt\\DocoptParser' => $baseDir . '/src/console/docopt/DocoptParser.php',
     'rosasurfer\\console\\docopt\\DocoptResult' => $baseDir . '/src/console/docopt/DocoptResult.php',

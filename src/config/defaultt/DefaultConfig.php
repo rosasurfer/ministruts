@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\config\auto;
+namespace rosasurfer\config\defaultt;
 
 use rosasurfer\Application;
 use rosasurfer\cache\monitor\FileDependency;
