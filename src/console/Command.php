@@ -77,6 +77,7 @@ class Command extends Object {
     public function run() {
         $input = new Input($this->docoptResult);
         $this->di()->set(Input::class, $input);
+        /** @var Output $output */
         $output = $this->di(Output::class);
 
         if ($this->validator) $error = $this->validator->__invoke($input, $output);
