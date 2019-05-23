@@ -8,12 +8,12 @@ use rosasurfer\di\service\Service;
 
 
 /**
- * Default DI automatically created for web applications.
+ * Default dependency injector automatically created for web applications.
  *
  * A variant of the standard {@link Di}. It automatically registers all the services provided by the framework and loads
  * user-defined services from the file "{app.dir.config}/services.php".
  */
-class DefaultDi extends Di {
+class WebServiceContainer extends Di {
 
 
     /**

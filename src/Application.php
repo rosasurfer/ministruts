@@ -10,8 +10,8 @@ use rosasurfer\core\debug\ErrorHandler;
 use rosasurfer\core\exception\InvalidArgumentException;
 use rosasurfer\di\Di;
 use rosasurfer\di\DiInterface;
-use rosasurfer\di\defaultt\DefaultCliDi;
-use rosasurfer\di\defaultt\DefaultDi;
+use rosasurfer\di\defaultt\CliServiceContainer;
+use rosasurfer\di\defaultt\WebServiceContainer;
 use rosasurfer\log\Logger;
 use rosasurfer\ministruts\FrontController;
 use rosasurfer\ministruts\Response;
@@ -313,14 +313,14 @@ class Application extends CObject {
 
 
     /**
-     * Load and initialize a default Dependency Injection container.
+     * Load and initialize a default dependency injection container.
      *
      * @param  string $serviceDir - directory with service configurations
      *
      * @return DiInterface
      */
     protected function initDefaultDi($serviceDir) {
-        $this->setDi($di = !CLI ? new DefaultDi($serviceDir) : new DefaultCliDi($serviceDir));
+        $this->setDi($di = CLI ? new CliServiceContainer($serviceDir) : new WebServiceContainer($serviceDir));
         return $di;
     }
 
