@@ -236,16 +236,6 @@ class ActionMapping extends CObject {
 
 
     /**
-     * Return a configured {@link ActionForward}.
-     *
-     * @return ActionForward|null - ActionForward or NULL if no forward is configured
-     */
-    public function getForward() {
-        return $this->forward;
-    }
-
-
-    /**
      * Set the class name of the {@link Action} to process requests.
      *
      * @param  string $className
@@ -471,11 +461,12 @@ class ActionMapping extends CObject {
 
     /**
      * Lookup and return the {@link ActionForward} accessible under the specified name. First the lookup tries to find a
-     * local forward of the given name. If no local forward is found global forwards are checked.
+     * local forward of the specified name. If no such forward is found global forwards are checked. This method returns NULL
+     * if no forward is found.
      *
      * @param  string $name - logical name; can be "self" to return a redirect forward to the mapping itself
      *
-     * @return ActionForward|null - ActionForward or NULL if neither a local nor a global forward was found
+     * @return ActionForward|null - ActionForward or NULL if no such forward was found
      */
     public function findForward($name) {
         $forward = null;
@@ -508,16 +499,21 @@ class ActionMapping extends CObject {
 
 
     /**
-     * Lookup and return the configured {@link ActionForward} accessible under the specified name. This method differs from
-     * {@link ActionMapping::findForward()} in that it always returns an instance.
+     * Return the mapping's configured {@link ActionForward} or lookup and return the forward accessible under the specified
+     * name. First the lookup tries to find a local forward of the specified name. If no such forward is found global
+     * forwards are checked. This method throws an exception if a name was specified but no such forward was found.
      *
-     * @param  string $name - logical name (may be "self" to return a forward to the currently active mapping's route)
+     * @param  string $name [optional] - logical name; can be "self" to return a redirect forward to the mapping itself
+     *                                   (default: none)
      *
-     * @return ActionForward
+     * @return ActionForward|null - ActionForward or NULL if no name was specified and no forward is configured
      *
-     * @throws StrutsConfigException if the forward was not found
+     * @throws StrutsConfigException if a name was specified but no such forward was found
      */
-    public function findForwardOrFail($name) {
+    public function getForward($name = null) {
+        if (!func_num_args())
+            return $this->forward;
+
         $forward = $this->findForward($name);
         if (!$forward)
             throw new StrutsConfigException('<mapping name="'.$this->getName().'"  path="'.$this->getPath().'": ActionForward "'.$name.'" not found.');

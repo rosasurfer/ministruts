@@ -285,7 +285,7 @@ PROCESS_METHOD_ERROR_SC_405;
 
         // if a string identifier was returned resolve the named instance
         if (is_string($forward))
-            $forward = $mapping->findForwardOrFail($forward);
+            $forward = $mapping->getForward($forward);
 
         $this->processActionForward($request, $response, $forward);
         return false;
