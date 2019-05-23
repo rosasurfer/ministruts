@@ -1,11 +1,11 @@
 <?php
-namespace rosasurfer\core\exception\phperror;
+namespace rosasurfer\core\exception\error;
 
 
 /**
- * "rosasurfer" exception for a PHP notice.
+ * "rosasurfer" exception for a PHP deprecated message.
  */
-class PHPNotice extends PHPError {
+class PHPDeprecated extends PHPError {
 
 
     /**
@@ -14,6 +14,6 @@ class PHPNotice extends PHPError {
      * @return string
      */
     public function getSimpleType() {
-        return 'PHP Notice';
+        return 'PHP Deprecated';
     }
 }

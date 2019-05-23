@@ -4,7 +4,7 @@ namespace rosasurfer\core\debug;
 use rosasurfer\core\StaticClass;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
-use rosasurfer\core\exception\phperror\PHPError;
+use rosasurfer\core\exception\error\PHPError;
 
 use function rosasurfer\normalizeEOL;
 use function rosasurfer\simpleClassName;

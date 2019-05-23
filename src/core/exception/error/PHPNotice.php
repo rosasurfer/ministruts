@@ -1,11 +1,11 @@
 <?php
-namespace rosasurfer\core\exception\phperror;
+namespace rosasurfer\core\exception\error;
 
 
 /**
- * "rosasurfer" exception for a PHP parse error.
+ * "rosasurfer" exception for a PHP notice.
  */
-class PHPParseError extends PHPError {
+class PHPNotice extends PHPError {
 
 
     /**
@@ -14,6 +14,6 @@ class PHPParseError extends PHPError {
      * @return string
      */
     public function getSimpleType() {
-        return 'PHP Parse Error';
+        return 'PHP Notice';
     }
 }

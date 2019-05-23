@@ -5,7 +5,7 @@ use rosasurfer\cache\monitor\Dependency;
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\exception\RuntimeException;
-use rosasurfer\core\exception\phperror\PHPError;
+use rosasurfer\core\exception\error\PHPError;
 use rosasurfer\file\FileSystem as FS;
 
 use function rosasurfer\isRelativePath;

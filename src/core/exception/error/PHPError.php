@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\core\exception\phperror;
+namespace rosasurfer\core\exception\error;
 
 use rosasurfer\core\ObjectTrait;
 use rosasurfer\core\debug\DebugHelper;
