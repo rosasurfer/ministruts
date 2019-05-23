@@ -11,9 +11,9 @@ with service definitions in the form ```$name => $definition```.
 A definition does not define whether a service can be used in a dependency injection or in a service location context. The
 usage pattern is determined at runtime depending on the used DI accessor method:
 
-- ```DI::get($name)```: Uses the dependency in a service location context and returns always the same instance. This method
+- ```Di::get($name)```: Uses the dependency in a service location context and returns always the same instance. This method
   does not support additional instantiation parameters. All required parameters must be specified in the service definition.
-- ```DI::create($name, ...$params)```: Uses the dependency in a factory context and returns always a new instance.
+- ```Di::create($name, ...$params)```: Uses the dependency in a factory context and returns always a new instance.
   This method supports additional instantiation parameters for each new instance.
 
 Dependencies are lazy-loaded, i.e. they are instantiated on first use.
