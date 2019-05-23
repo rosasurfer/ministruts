@@ -15,9 +15,6 @@ use rosasurfer\util\PHP;
 class HttpSession extends Singleton {
 
 
-    /** @var Request - request the session belongs to */
-    protected $request;
-
     /** @var bool - Whether the session is considered "new". A session is new if the client doesn't yet know the session id. */
     protected $new;
 
@@ -25,25 +22,20 @@ class HttpSession extends Singleton {
     /**
      * Return the {@link Singleton} instance.
      *
-     * @param  Request $request - request the session belongs to
-     *
      * @return static
      *
      * @throws RuntimeException if not called from the web interface
      */
-    public static function me(Request $request) {
-        return self::getInstance(static::class, $request);
+    public static function me() {
+        return self::getInstance(static::class);
     }
 
 
     /**
      * Constructor
-     *
-     * @param  Request $request - request the session belongs to
      */
-    protected function __construct(Request $request) {
+    protected function __construct() {
         parent::__construct();
-        $this->request = $request;
         $this->init();
     }
 
@@ -52,7 +44,7 @@ class HttpSession extends Singleton {
      * Start and initialize the session.
      */
     protected function init() {
-        $request = $this->request;
+        $request = Request::me();
 
         // limit session cookie to application path to support multiple projects per domain
         $params = session_get_cookie_params();
@@ -94,10 +86,12 @@ class HttpSession extends Singleton {
         if ($regenerateId) {
             session_regenerate_id(true);                                            // generate new id and delete the old file
         }
+        $request = Request::me();
+
         $_SESSION = [];                                                             // empty the session
         $_SESSION['__SESSION_CREATED__'  ] = microtime(true);                       // initialize the session markers
-        $_SESSION['__SESSION_IP__'       ] = $this->request->getRemoteAddress();    // TODO: resolve/store forwarded IP
-        $_SESSION['__SESSION_USERAGENT__'] = $this->request->getHeaderValue('User-Agent');
+        $_SESSION['__SESSION_IP__'       ] = $request->getRemoteAddress();          // TODO: resolve/store forwarded IP
+        $_SESSION['__SESSION_USERAGENT__'] = $request->getHeaderValue('User-Agent');
 
         $this->new = true;
     }

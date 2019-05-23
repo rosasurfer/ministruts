@@ -615,7 +615,7 @@ class Request extends Singleton {
      * @return HttpSession
      */
     public function getSession() {
-        return HttpSession::me($this);
+        return HttpSession::me();
     }
 
 
