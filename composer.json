@@ -8,14 +8,11 @@
         "email": "ministruts@rosasurfer.com"
     }],
     "config": {
-        "platform": {
-            "php": "5.6"
-        },
         "vendor-dir":         "etc/vendor",
         "optimize-autoloader": true
     },
     "require": {
-        "php":           "^5.6",
+        "php":           ">=5.6",
         "ext-ctype":     "*",
         "ext-filter":    "*",
         "ext-json":      "*",
