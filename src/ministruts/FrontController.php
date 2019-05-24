@@ -6,7 +6,6 @@ use rosasurfer\cache\monitor\FileDependency;
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\Singleton;
 use rosasurfer\core\exception\IllegalStateException;
-use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\core\exception\RuntimeException;
 
 use function rosasurfer\strLeftTo;
@@ -93,7 +92,7 @@ class FrontController extends Singleton {
         $configs    = \array_merge([$mainConfig], $subConfigs);
 
         // create and register a Module for each found configuration file
-        $file = null;
+        $file = $ex = null;
         try {
             foreach ($configs as $file) {
                 $basename = basename($file, '.xml');
@@ -106,11 +105,10 @@ class FrontController extends Singleton {
                 $this->modules[$prefix] = $module;
             }
         }
-        catch (\Exception $ex) {
-            if (!$ex instanceof IRosasurferException)
-                $ex = new StrutsConfigException($ex->getMessage(), $ex->getCode(), $ex);
-            throw $ex->addMessage('Error instantiating Struts module from file "'.$file.'"');
-        }
+        catch (\Throwable $ex) { $ex = new StrutsConfigException($ex->getMessage(), $ex->getCode(), $ex); }
+        catch (\Exception $ex) { $ex = new StrutsConfigException($ex->getMessage(), $ex->getCode(), $ex); }
+
+        if ($ex) throw $ex->addMessage('Error instantiating Struts module from file "'.$file.'"');
     }
 
 

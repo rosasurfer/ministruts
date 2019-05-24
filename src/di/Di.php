@@ -91,9 +91,8 @@ class Di extends CObject implements DiInterface {
         try {
             return $this->services[$name]->resolve($factory=false);
         }
-        catch (\Exception $ex) {
-            throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex);
-        }
+        catch (\Throwable $ex) { throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex); }
+        catch (\Exception $ex) { throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex); }
     }
 
 
@@ -110,9 +109,8 @@ class Di extends CObject implements DiInterface {
         try {
             return $this->services[$name]->resolve($factory=true, $params);
         }
-        catch (\Exception $ex) {
-            throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex);
-        }
+        catch (\Throwable $ex) { throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex); }
+        catch (\Exception $ex) { throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex); }
     }
 
 

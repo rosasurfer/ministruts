@@ -738,7 +738,7 @@ function is_dir_empty($dirname, $ignore = []) {
 
 
 /**
- * Auto-load the specified class, interface or trait. If the component was already loaded the call does nothing.
+ * Manually load the specified class, interface or trait. If the component was already loaded the call does nothing.
  *
  * @param  string $name - name
  *

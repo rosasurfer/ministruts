@@ -208,23 +208,23 @@ class MySQLConnector extends Connector {
      * @return $this
      */
     public function connect() {
-        if (!function_exists('\mysql_connect')) throw new RuntimeException('Undefined function mysql_connect(), mysql extension is not available');
+        if (!function_exists('\mysql_connect')) throw new RuntimeException('Undefined function mysql_connect() (mysql extension is not available)');
 
         $host = $this->host; if ($this->port) $host .= ':'.$this->port;
         $user = $this->username;
         $pass = $this->password;
 
         // connect
+        $ex = null;
         try {                                                                      // flags: CLIENT_FOUND_ROWS = 2
             $php_errormsg = '';
             $this->hConnection = mysql_connect($host, $user, $pass, $newLink=true/*, $flags=2*/);
-            !$this->hConnection && trigger_error($php_errormsg, E_USER_ERROR);
+            if (!$this->hConnection) throw new DatabaseException($php_errormsg);
         }
-        catch (\Exception $ex) {
-            if (!$ex instanceof IRosasurferException)
-                $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex);
-            throw $ex->addMessage('Can not connect to MySQL server on "'.$host.'"');
-        }
+        catch (IRosasurferException $ex) {}
+        catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
+        catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
+        if ($ex) throw $ex->addMessage('Can not connect to MySQL server on "'.$host.'"');
 
         $this->setConnectionOptions();
         $this->selectDatabase();
@@ -266,14 +266,16 @@ class MySQLConnector extends Connector {
      * @return $this
      */
     protected function selectDatabase() {
-        if ($this->database !== null) {
+        if (isset($this->database)) {
+            $ex = null;
             try {
-                mysql_select_db($this->database, $this->hConnection) || trigger_error(mysql_error($this->hConnection), E_USER_ERROR);
+                if (!mysql_select_db($this->database, $this->hConnection))
+                    throw new DatabaseException(mysql_error($this->hConnection), mysql_errno($this->hConnection));
             }
-            catch (\Exception $ex) {
-                $ex = new DatabaseException($ex->getMessage(), mysql_errno($this->hConnection), $ex);
-                throw $ex->addMessage('Can not select database "'.$this->database.'"');
-            }
+            catch (IRosasurferException $ex) {}
+            catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), mysql_errno($this->hConnection), $ex); }
+            catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), mysql_errno($this->hConnection), $ex); }
+            if ($ex) throw $ex->addMessage('Can not select database "'.$this->database.'"');
         }
         return $this;
     }
@@ -402,7 +404,7 @@ class MySQLConnector extends Connector {
      *
      * @return resource|bool - result handle or boolean (depending on the statement type)
      *
-     * @throws DatabaseException on errors
+     * @throws DatabaseException if an error occurs
      */
     public function executeRaw($sql) {
         Assert::string($sql);
@@ -410,18 +412,18 @@ class MySQLConnector extends Connector {
             $this->connect();
 
         // execute statement
+        $result = $ex = false;
         try {
             $result = mysql_query($sql, $this->hConnection);
-            $result || trigger_error('SQL-Error '.mysql_errno($this->hConnection).': '.mysql_error($this->hConnection), E_USER_ERROR);
+            if (!$result) throw new DatabaseException('SQL-Error '.mysql_errno($this->hConnection).': '.mysql_error($this->hConnection), mysql_errno($this->hConnection));
         }
-        catch (\Exception $ex) {
-            $ex = new DatabaseException($ex->getMessage(), mysql_errno($this->hConnection), $ex);
-            throw $ex->addMessage('Database: '.$this->getConnectionDescription().NL.'SQL: "'.$sql.'"');
-        }
-
-        $affected = 0;
+        catch (IRosasurferException $ex) {}
+        catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), mysql_errno($this->hConnection), $ex); }
+        catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), mysql_errno($this->hConnection), $ex); }
+        if ($ex) throw $ex->addMessage('Database: '.$this->getConnectionDescription().NL.'SQL: "'.$sql.'"');
 
         // track last_insert_id
+        $affected = 0;
         $id = mysql_insert_id($this->hConnection);
         if ($id) $this->lastInsertId = $id + ($affected=mysql_affected_rows($this->hConnection)) - 1;
 

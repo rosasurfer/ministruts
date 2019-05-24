@@ -1320,7 +1320,7 @@ function is_dir_empty($dirname, $ignore = []) {
 
 
 /**
- * Auto-load the specified class, interface or trait. If the component was already loaded the call does nothing.
+ * Manually load the specified class, interface or trait. If the component was already loaded the call does nothing.
  *
  * @param  string $name - name
  *
@@ -1345,7 +1345,8 @@ function is_class($name) {
     try {
         return class_exists($name, true);
     }
-    catch (\Exception $ex) {/* loaders might wrongly throw exceptions blocking us from continuation */}
+    catch (\Throwable $ex) {}   // faulty class loaders must not block the script from continuation
+    catch (\Exception $ex) {}
 
     return class_exists($name, false);
 }
@@ -1364,7 +1365,8 @@ function is_interface($name) {
     try {
         return interface_exists($name, true);
     }
-    catch (\Exception $ex) {/* loaders might wrongly throw exceptions blocking us from continuation */}
+    catch (\Throwable $ex) {}   // faulty class loaders must not block the script from continuation
+    catch (\Exception $ex) {}
 
     return interface_exists($name, false);
 }
@@ -1382,7 +1384,8 @@ function is_trait($name) {
     try {
         return trait_exists($name, true);
     }
-    catch (\Exception $ex) {/* loaders might wrongly throw exceptions blocking us from continuation */}
+    catch (\Throwable $ex) {}   // faulty class loaders must not block the script from continuation
+    catch (\Exception $ex) {}
 
     return trait_exists($name, false);
 }

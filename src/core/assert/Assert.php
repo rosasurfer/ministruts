@@ -161,6 +161,27 @@ class Assert extends StaticClass {
 
 
     /**
+     * Ensure that the passed value is a throwable object.
+     *
+     * @param  mixed    $value
+     * @param  string   $message [optional] - value identifier or custom user message
+     * @param  array ...$args    [optional] - additional user message arguments
+     */
+    public static function throwable($value, $message = null, ...$args) {
+        if (PHP_VERSION_ID < 70000) {
+            if (!$value instanceof \Exception) {
+                throw new IllegalTypeException(static::illegalTypeMessage($value, '\Exception', $message, $args));
+            }
+        }
+        else {
+            if (!$value instanceof \Throwable) {
+                throw new IllegalTypeException(static::illegalTypeMessage($value, '\Throwable', $message, $args));
+            }
+        }
+    }
+
+
+    /**
      * Ensure that the passed class has a method.
      *
      * @param  mixed    $classOrObject

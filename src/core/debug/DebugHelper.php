@@ -178,14 +178,16 @@ class DebugHelper extends StaticClass {
     /**
      * Return a more readable version of an exception's message.
      *
-     * @param  \Exception $exception         - any exception (not only RosasurferExceptions)
-     * @param  string     $indent [optional] - indent lines by this value (default: empty string)
+     * @param  \Exception|\Throwable $exception         - any exception (PHP5) or throwable (PHP7)
+     * @param  string                $indent [optional] - indent lines by the specified value (default: no indentation)
      *
      * @return string - message
      */
-    public static function composeBetterMessage(\Exception $exception, $indent = '') {
+    public static function composeBetterMessage($exception, $indent = '') {
+        Assert::throwable($exception, '$exception');
+
         if ($exception instanceof PHPError) {
-            $result    = $exception->getSimpleType();
+            $result = $exception->getSimpleType();
         }
         else {
             $class     = get_class($exception);
@@ -217,17 +219,19 @@ class DebugHelper extends StaticClass {
      * Return a more readable version of an exception's stacktrace. The representation also contains information about
      * nested exceptions.
      *
-     * @param  \Exception $exception         - any exception (not only RosasurferExceptions)
-     * @param  string     $indent [optional] - indent the resulting lines by this value (default: empty string)
-     *
+     * @param  \Exception|\Throwable $exception         - any exception (PHP5) or throwable (PHP7)
+     * @param  string                $indent [optional] - indent the resulting lines by the specified value
+     *                                                    (default: no indentation)
      * @return string - readable stacktrace
      */
-    public static function getBetterTraceAsString(\Exception $exception, $indent = '') {
+    public static function getBetterTraceAsString($exception, $indent = '') {
+        Assert::throwable($exception, '$exception');
+
         if ($exception instanceof IRosasurferException) $trace = $exception->getBetterTrace();
         else                                            $trace = self::fixTrace($exception->getTrace(), $exception->getFile(), $exception->getLine());
         $result = self::formatTrace($trace, $indent);
 
-        if ($cause=$exception->getPrevious()) {
+        if ($cause = $exception->getPrevious()) {
             // recursively add stacktraces of nested exceptions
             $message = trim(self::composeBetterMessage($cause, $indent));
             $result .= NL.$indent.'caused by'.NL.$indent.$message.NL.NL;

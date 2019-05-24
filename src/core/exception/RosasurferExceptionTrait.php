@@ -7,7 +7,7 @@ use const rosasurfer\NL;
 
 
 /**
- * A trait adding the behaviour of {@link RosasurferException}s to any {@link \Exception}.
+ * A trait capable of adding the behaviour of {@link RosasurferException} to any {@link \Exception} or {@link \Throwable}.
  */
 trait RosasurferExceptionTrait {
 

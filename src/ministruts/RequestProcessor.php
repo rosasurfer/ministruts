@@ -418,7 +418,7 @@ PROCESS_METHOD_ERROR_SC_405;
      * @return ActionForward|null
      */
     protected function processActionExecute(Request $request, Response $response, Action $action) {
-        $forward = $throwable = null;
+        $forward = $ex = null;
 
         // Alles kapseln, damit Postprocessing-Hook auch nach Auftreten einer Exception aufgerufen
         // werden kann (z.B. Transaction-Rollback o.ae.)
@@ -432,27 +432,18 @@ PROCESS_METHOD_ERROR_SC_405;
                 $forward = $action->execute($request, $response);
             }
         }
-        catch (\Exception $ex) {
-            $throwable = $ex;    // evt. aufgetretene Exception zwischenspeichern
-        }
+        catch (\Throwable $ex) {}           // auftretende Exceptions zwischenspeichern
+        catch (\Exception $ex) {}
 
         // falls statt eines ActionForwards ein String-Identifier zurueckgegeben wurde, diesen aufloesen
-        if (is_string($forward)) {
-            if ($forwardInstance = $action->getMapping()->findForward($forward)) {
-                $forward = $forwardInstance;
-            }
-            else {
-                $throwable = new RuntimeException('No ActionForward found for name "'.$forward.'"');
-                $forward = null;
-            }
-        }
+        if (is_string($forward))
+            $forward = $action->getMapping()->getForward($forward);
 
         // allgemeinen Postprocessing-Hook aufrufen
         $forward = $action->executeAfter($request, $response, $forward);
 
-        // jetzt evt. aufgetretene Exception weiterreichen
-        if ($throwable)
-            throw $throwable;
+        // jetzt aufgetretene Exception weiterreichen
+        if ($ex) throw $ex;
 
         return $forward;
     }

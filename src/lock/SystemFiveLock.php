@@ -3,8 +3,8 @@ namespace rosasurfer\lock;
 
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\debug\ErrorHandler;
+use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\core\exception\RuntimeException;
-use rosasurfer\core\exception\error\PHPError;
 use rosasurfer\log\Logger;
 
 use function rosasurfer\strStartsWith;
@@ -72,13 +72,18 @@ class SystemFiveLock extends BaseLock {
         $trials = 5;        // max. Anzahl akzeptabler Fehler, eine weitere Exception wird weitergereicht
         $hSemaphore = $messages = null;
         do {
+            $ex = null;
             try {
                 $hSemaphore = sem_get($integer, 1, 0666);       // Semaphore-Handle holen
                 if (!is_resource($hSemaphore)) throw new RuntimeException('cannot get semaphore handle for key '.$integer);
                 sem_acquire($hSemaphore);
                 break;                                          // TODO: bei Last koennen sem_get() oder sem_acquire() scheitern
             }
-            catch (PHPError $ex) {
+            catch (IRosasurferException $ex) {}
+            catch (\Throwable           $ex) { $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex); }
+            catch (\Exception           $ex) { $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex); }
+
+            if ($ex) {
                 // TODO: Quellcode umschreiben (ext/sysvsem/sysvsem.c) und Fehler lokalisieren (vermutlich wird ein File-Limit ueberschritten)
                 $message  = $ex->getMessage();
                 $hexId    = dechex($integer);
@@ -118,9 +123,8 @@ class SystemFiveLock extends BaseLock {
         try {
             $this->release();
         }
-        catch (\Exception $ex) {
-            throw ErrorHandler::handleDestructorException($ex);
-        }
+        catch (\Throwable $ex) { throw ErrorHandler::handleDestructorException($ex); }
+        catch (\Exception $ex) { throw ErrorHandler::handleDestructorException($ex); }
     }
 
 

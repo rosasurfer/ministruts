@@ -28,9 +28,8 @@ abstract class Connector extends CObject implements ConnectorInterface {
                 $this->disconnect();
             }
         }
-        catch (\Exception $ex) {
-            throw ErrorHandler::handleDestructorException($ex);
-        }
+        catch (\Throwable $ex) { throw ErrorHandler::handleDestructorException($ex); }
+        catch (\Exception $ex) { throw ErrorHandler::handleDestructorException($ex); }
     }
 
 
@@ -63,9 +62,7 @@ abstract class Connector extends CObject implements ConnectorInterface {
             $this->commit();
             return $result;
         }
-        catch (\Exception $ex) {
-            $this->rollback();
-            throw $ex;
-        }
+        catch (\Throwable $ex) { $this->rollback(); throw $ex; }
+        catch (\Exception $ex) { $this->rollback(); throw $ex; }
     }
 }

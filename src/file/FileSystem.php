@@ -35,12 +35,15 @@ class FileSystem extends StaticClass {
             $args = [$path, $mode, $recursive];
             func_num_args() > 3 && $args[] = $context;
 
+            $ex = null;
             try {
-                mkdir(...$args);                        // unpack new arguments as mkdir() will not accept $context = null
+                \mkdir(...$args);                       // unpack new arguments as mkdir() will not accept $context = null
             }
             catch (IRosasurferException $ex) {}
+            catch (\Throwable           $ex) { $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex); }
             catch (\Exception           $ex) { $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex); }
-            if (isset($ex)) throw $ex->addMessage('Cannot create directory "'.$path.'"');
+
+            if ($ex) throw $ex->addMessage('Cannot create directory "'.$path.'"');
         }
         return true;
     }

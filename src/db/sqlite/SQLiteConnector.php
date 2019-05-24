@@ -136,15 +136,18 @@ class SQLiteConnector extends Connector {
      * @return $this
      */
     public function connect() {
-        if (!class_exists('SQLite3')) throw new RuntimeException('Undefined class \SQLite3, sqlite3 extension is not available');
+        if (!class_exists('SQLite3')) throw new RuntimeException('Undefined class \SQLite3 (sqlite3 extension is not available)');
 
-        try {                                                                   // available flags:
-            $flags  = SQLITE3_OPEN_READWRITE;                                   // SQLITE3_OPEN_CREATE
-            $sqlite = new \SQLite3($this->file, $flags);                        // SQLITE3_OPEN_READONLY
-        }                                                                       // SQLITE3_OPEN_READWRITE
-        catch (\Exception $ex) {
-            if (!$ex instanceof IRosasurferException)
-                $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex);
+        $flags = SQLITE3_OPEN_READWRITE;                                // available flags:
+        $ex = null;                                                     // SQLITE3_OPEN_CREATE
+        try {                                                           // SQLITE3_OPEN_READONLY
+            $this->sqlite = new \SQLite3($this->file, $flags);          // SQLITE3_OPEN_READWRITE
+        }
+        catch (IRosasurferException $ex) {}
+        catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
+        catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
+
+        if ($ex) {
             $file = $this->file;
             $what = $where = null;
             if (file_exists($file)) {
@@ -153,13 +156,12 @@ class SQLiteConnector extends Connector {
                     $where = ' (directory)';
             }
             else {
-                $what = ($flags & SQLITE3_OPEN_CREATE) ? 'create':'find';
+                $what = ($flags & SQLITE3_OPEN_CREATE) ? 'create' : 'find';
                 isRelativePath($file) && $where=' in "'.getcwd().'"';
             }
             throw $ex->addMessage('Cannot '.$what.' database file "'.$file.'"'.$where);
         }
 
-        $this->sqlite = $sqlite;
         $this->setConnectionOptions();
         return $this;
     }
@@ -312,17 +314,16 @@ class SQLiteConnector extends Connector {
             $this->connect();
 
         // execute statement
-        $result = null;
+        $result = $ex = false;
         try {
             if ($this->skipResults) $result = $this->sqlite->exec($sql);        // TRUE on success, FALSE on error
             else                    $result = $this->sqlite->query($sql);       // bug: always SQLite3Result, never boolean
-            if (!$result) trigger_error('Error '.$this->sqlite->lastErrorCode().', '.$this->sqlite->lastErrorMsg(), E_USER_ERROR);
+            if (!$result) throw new DatabaseException('Error '.$this->sqlite->lastErrorCode().', '.$this->sqlite->lastErrorMsg());
         }
-        catch (\Exception $ex) {
-            if (!$ex instanceof IRosasurferException)
-                $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex);
-            throw $ex->addMessage('Database: '.$this->file.NL.'SQL: "'.$sql.'"');
-        }
+        catch (IRosasurferException $ex) {}
+        catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
+        catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
+        if ($ex) throw $ex->addMessage('Database: '.$this->file.NL.'SQL: "'.$sql.'"');
 
         // track last_insert_id
         $this->lastInsertId = $this->sqlite->lastInsertRowID();

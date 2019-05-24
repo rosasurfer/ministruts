@@ -3,6 +3,7 @@ namespace rosasurfer\core\debug;
 
 use rosasurfer\Application;
 use rosasurfer\core\StaticClass;
+use rosasurfer\core\assert\Assert;
 use rosasurfer\core\exception\error\PHPCompileError;
 use rosasurfer\core\exception\error\PHPCompileWarning;
 use rosasurfer\core\exception\error\PHPCoreError;
@@ -20,6 +21,7 @@ use rosasurfer\util\PHP;
 
 use function rosasurfer\echoPre;
 use function rosasurfer\ini_get_bool;
+use function rosasurfer\strLeftTo;
 use function rosasurfer\true;
 
 use const rosasurfer\CLI;
@@ -103,7 +105,8 @@ class ErrorHandler extends StaticClass {
         elseif ($mode === self::THROW_EXCEPTIONS) self::$errorMode = self::THROW_EXCEPTIONS;
         else                                      return null;
 
-        return set_error_handler(self::$errorHandler=__CLASS__.'::handleError', error_reporting());
+        self::$errorHandler = __CLASS__.'::handleError';
+        return set_error_handler(self::$errorHandler, error_reporting());
     }
 
 
@@ -114,7 +117,8 @@ class ErrorHandler extends StaticClass {
      *                         was defined or an error occurred.
      */
     public static function setupExceptionHandling() {
-        $previous = set_exception_handler(self::$exceptionHandler=__CLASS__.'::handleException');
+        self::$exceptionHandler = __CLASS__.'::handleException';
+        $previous = set_exception_handler(self::$exceptionHandler);
 
         /**
          * Detect entering of the script's shutdown phase to be capable of handling destructor exceptions during shutdown
@@ -158,6 +162,8 @@ class ErrorHandler extends StaticClass {
         if (!$reportingLevel)            return false;     // the @ operator was specified
         if (!($reportingLevel & $level)) return true;      // the error is not covered by current reporting level
 
+        $message = strLeftTo($message, ' (this will throw an Error in a future version of PHP)', -1);
+
         $logContext         = [];
         $logContext['file'] = $file;
         $logContext['line'] = $line;
@@ -194,11 +200,11 @@ class ErrorHandler extends StaticClass {
             return true;
         }
 
-        // (5) Handle cases where throwing an exception is not possible or not allowed.
-
         /**
-         * Errors triggered by require() or require_once()
+         * (5) Handle cases where throwing an exception is not possible or not allowed.
          *
+         * (5.1) Errors triggered by require() or require_once()
+         * -----------------------------------------------------
          * Problem:  PHP errors triggered by require() or require_once() are non-catchable errors and do not follow regular
          *           application flow. PHP terminates the script after leaving the error handler, thrown exceptions are
          *           ignored. This termination is intended behaviour and the main difference to include() and include_once().
@@ -226,27 +232,29 @@ class ErrorHandler extends StaticClass {
      * The exception is sent to the default logger with loglevel L_FATAL. After the handler returns PHP will terminate
      * the script.
      *
-     * @param  \Exception $exception - the unhandled exception
+     * @param  \Exception|\Throwable $exception - the unhandled exception (PHP5) or throwable (PHP7)
      */
-    public static function handleException(\Exception $exception) {
-        $context = [];
-        $second  = null;
+    public static function handleException($exception) {
+        $context = [
+            'class'               => __CLASS__,
+            'file'                => $exception->getFile(),   // If the location is not preset the logger will resolve this
+            'line'                => $exception->getLine(),   // exception handler as the originating location.
+            'unhandled-exception' => true,                    // flag to signal origin
+        ];
 
+        // Exceptions thrown from the exception handler itself will not be passed back to the handler again but instead
+        // terminate the script with an uncatchable fatal error. To prevent this they are handled explicitely.
+        $second = null;
         try {
-            $context['class'    ] = __CLASS__;
-            $context['file'     ] = $exception->getFile();  // If the location is not preset the logger will resolve the
-            $context['line'     ] = $exception->getLine();  // exception handler as the originating location.
-            $context['unhandled'] = true;
-
-            Logger::log($exception, L_FATAL, $context);     // log with the highest level
+            Assert::throwable($exception);
+            Logger::log($exception, L_FATAL, $context);       // log with the highest level
         }
+        catch (\Throwable $second) {}
+        catch (\Exception $second) {}
 
-        // Exceptions thrown from within the exception handler will not be passed back to the handler again. Instead the
-        // script terminates with an uncatchable fatal error.
-        catch (\Exception $second) {
-            $indent = ' ';                                  // the application is crashing, last try to log
-
-            // secondary exception
+        if ($second)  {
+            // secondary exception: the application is crashing, last try to log
+            $indent = ' ';
             $msg2  = '[FATAL] Unhandled '.trim(DebugHelper::composeBetterMessage($second)).NL;
             $file  = $second->getFile();
             $line  = $second->getLine();
@@ -272,14 +280,14 @@ class ErrorHandler extends StaticClass {
             $msg  = $msg2.NL;
             $msg .= $indent.'caused by'.NL;
             $msg .= $msg1;
-            $msg  = str_replace(chr(0), '?', $msg);         // replace NUL bytes which mess up the logfile
+            $msg  = str_replace(chr(0), '?', $msg);     // replace NUL bytes which mess up the logfile
 
-            if (CLI)                                        // full second exception
+            if (CLI)                                    // full second exception
                 echo $msg.NL;
             error_log(trim($msg), ERROR_LOG_DEFAULT);
         }
 
-        // web: prevent an empty page
+        // web interface: prevent an empty page
         if (!CLI) {
             try {
                 if (Application::isAdminIP() || ini_get_bool('display_errors')) {
@@ -290,9 +298,8 @@ class ErrorHandler extends StaticClass {
                 }
                 else echoPre('application error (see error log)');
             }
-            catch (\Exception $third) {
-                echoPre('application error (see error log)');
-            }
+            catch (\Throwable $third) { echoPre('application error (see error log)'); }
+            catch (\Exception $third) { echoPre('application error (see error log)'); }
         }
     }
 
@@ -300,25 +307,26 @@ class ErrorHandler extends StaticClass {
     /**
      * Manually called handler for exceptions occurring in object destructors.
      *
-     * Attempting to throw an exception from a destructor during script shutdown causes a fatal error. Therefore this method
-     * has to be called manually from object destructors if an exception occurred. If the script is in the shutdown phase
-     * the exception is passed on to the regular exception handler and the script is terminated. If the script is currently
-     * not in the shutdown phase this method ignores the exception. For an example see this package's README.
+     * Attempting to throw an exception from a destructor during script shutdown causes a fatal error which is not catchable
+     * by an installed error handler. Therefore this method must be called manually from object destructors if an exception
+     * occurred. If the script is in the shutdown phase the exception is passed on to the regular exception handler and the
+     * script is terminated. If the script is not in the shutdown phase this method ignores the exception and regular
+     * exception handling takes over. For an example see this package's README file.
      *
-     * @param  \Exception $exception
+     * @param  \Exception|\Throwable $exception - exception (PHP5) or throwable (PHP7)
      *
-     * @return \Exception - the same exception
+     * @return \Exception|\Throwable - the same exception or throwable
      *
      * @link   http://php.net/manual/en/language.oop5.decon.php
      */
-    public static function handleDestructorException(\Exception $exception) {
+    public static function handleDestructorException($exception) {
         if (self::isInShutdown()) {
             self::handleException($exception);
             exit(1);                                                // exit and signal the error
 
             // Calling exit() is the only way to prevent the immediately following non-catchable fatal error.
-            // However, calling exit() in a destructor will also prevent any remaining shutdown routines from executing.
-            // @see above link
+            // However, calling exit() in a destructor will also prevent execution of any remaining shutdown routines.
+            // (see above link)
         }
         return $exception;
     }

@@ -222,6 +222,7 @@ class PostgresConnector extends Connector {
         $path = null;
 
         while ($this->hConnection) {
+            $ex = null;
             try {
                 $result = pg_query($this->hConnection, 'show search_path');
                 $row    = pg_fetch_array($result, null, PGSQL_NUM);
@@ -232,10 +233,13 @@ class PostgresConnector extends Connector {
                 }
                 break;
             }
-            catch (\Exception $ex) {
+            catch (\Throwable $ex) {}
+            catch (\Exception $ex) {}
+
+            if ($ex) {
                 if (strContainsI($ex->getMessage(), 'current transaction is aborted, commands ignored until end of transaction block')) {
                     if ($this->transactionLevel > 0) {
-                        $this->transactionLevel = 1;            // immediately skip nested transactions
+                        $this->transactionLevel = 1;        // immediately skip nested transactions
                         $this->rollback();
                         continue;
                     }
@@ -253,19 +257,20 @@ class PostgresConnector extends Connector {
      * @return $this
      */
     public function connect() {
-        if (!function_exists('\pg_connect')) throw new RuntimeException('Undefined function pg_connect(), pgsql extension is not available');
+        if (!function_exists('\pg_connect')) throw new RuntimeException('Undefined function pg_connect() (pgsql extension is not available)');
 
         $connStr = $this->getConnectionString();
+        $ex = null;
+
         try {
             $php_errormsg = '';
             $this->hConnection = pg_connect($connStr, PGSQL_CONNECT_FORCE_NEW);
-            !$this->hConnection && trigger_error($php_errormsg, E_USER_ERROR);
+            if (!$this->hConnection) throw new DatabaseException($php_errormsg);
         }
-        catch (\Exception $ex) {
-            if (!$ex instanceof IRosasurferException)
-                $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex);
-            throw $ex->addMessage('Cannot connect to PostgreSQL server with connection string: "'.$connStr.'"');
-        }
+        catch (IRosasurferException $ex) {}
+        catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
+        catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
+        if ($ex) throw $ex->addMessage('Cannot connect to PostgreSQL server with connection string: "'.$connStr.'"');
 
         $this->setConnectionOptions();
         return $this;
@@ -445,16 +450,15 @@ class PostgresConnector extends Connector {
             $this->connect();
 
         // execute statement
-        $result = null;
+        $result = $ex = null;
         try {
             $result = pg_query($this->hConnection, $sql);         // wraps multi-statement queries in a transaction
-            !$result && trigger_error(pg_last_error($this->hConnection), E_USER_ERROR);
+            if (!$result) throw new DatabaseException(pg_last_error($this->hConnection));
         }
-        catch (\Exception $ex) {
-            if (!$ex instanceof IRosasurferException)
-                $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex);
-            throw $ex->addMessage('Database: '.$this->getConnectionDescription().NL.'SQL: "'.$sql.'"');
-        }
+        catch (IRosasurferException $ex) {}
+        catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
+        catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
+        if ($ex) throw $ex->addMessage('Database: '.$this->getConnectionDescription().NL.'SQL: "'.$sql.'"');
 
         /** @var string $status_string */
         $status_string = pg_result_status($result, PGSQL_STATUS_STRING);
@@ -553,16 +557,20 @@ class PostgresConnector extends Connector {
      * @link   http://github.com/rosasurfer/ministruts/tree/master/src/db
      */
     public function lastInsertId() {
-        if ($this->lastInsertId === null) {
+        if (!isset($this->lastInsertId)) {
             $version = $this->getVersionNumber();
+
             if ($version < 8001000) {              // 8.1
                 $this->lastInsertId = -1;
             }
             else {
+                $ex = null;
                 try {
                     $this->lastInsertId = $this->query('select lastVal()')->fetchInt();
                 }
-                catch (\Exception $ex) {
+                catch (\Throwable $ex) {}
+                catch (\Exception $ex) {}
+                if ($ex) {
                     if (stripos($ex->getMessage(), 'ERROR:  lastval is not yet defined in this session') === false)
                         throw $ex;
                     $this->lastInsertId = 0;

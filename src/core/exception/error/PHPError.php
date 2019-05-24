@@ -10,7 +10,7 @@ use rosasurfer\di\DiAwareTrait;
 
 
 /**
- * "rosasurfer" exception for regular PHP errors wrapped in an exception
+ * "rosasurfer" exception for PHP errors converted to an {@link \ErrorException}.
  */
 class PHPError extends \ErrorException implements IRosasurferException {
 
@@ -18,7 +18,7 @@ class PHPError extends \ErrorException implements IRosasurferException {
 
 
     /**
-     * Create a new instance. Parameters are identical to the built-in PHP ErrorException and passed on.
+     * Create a new instance. Parameters are identical to the built-in PHP {@link \ErrorException} and passed on.
      *
      * @param  string $message  - error description
      * @param  int    $code     - error identifier, usually an application id
@@ -71,7 +71,7 @@ class PHPError extends \ErrorException implements IRosasurferException {
 
 
     /**
-     * Return the simple PHP type description of this PHPError.
+     * Return the PHP type description of this PHPError.
      *
      * @return string
      */
