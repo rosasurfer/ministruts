@@ -189,7 +189,7 @@ class Assert extends StaticClass {
      * @param  string   $message [optional] - value identifier or custom user message
      * @param  array ...$args    [optional] - additional user message arguments
      */
-    public static function methodExists($classOrObject, $method, $message = null, ...$args) {
+    public static function hasMethod($classOrObject, $method, $message = null, ...$args) {
         if (!method_exists($classOrObject, $method)) {
             if      (is_string($classOrObject)) $value = $classOrObject;
             else if (is_object($classOrObject)) $value = get_class($classOrObject);
