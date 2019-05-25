@@ -10,7 +10,7 @@ use rosasurfer\core\assert\Assert;
 use rosasurfer\core\exception\IllegalArgumentException;
 use rosasurfer\core\exception\InvalidArgumentException;
 use rosasurfer\core\exception\RuntimeException;
-use rosasurfer\lock\Lock;
+use rosasurfer\core\lock\Lock;
 use rosasurfer\log\Logger;
 use rosasurfer\ministruts\ActionMapping;
 use rosasurfer\ministruts\Module;

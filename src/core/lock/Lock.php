@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\lock;
+namespace rosasurfer\core\lock;
 
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\assert\Assert;
