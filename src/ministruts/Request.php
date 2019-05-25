@@ -4,6 +4,7 @@ namespace rosasurfer\ministruts;
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\Singleton;
 use rosasurfer\core\assert\Assert;
+use rosasurfer\core\debug\ErrorHandler;
 use rosasurfer\core\exception\IllegalStateException;
 use rosasurfer\core\exception\IllegalTypeException;
 use rosasurfer\core\exception\InvalidArgumentException;
@@ -1183,27 +1184,34 @@ class Request extends Singleton {
      * @return string
      */
     public function __toString() {
-        // request
-        $string = $_SERVER['REQUEST_METHOD'].' '.$_SERVER['REQUEST_URI'].' '.$_SERVER['SERVER_PROTOCOL'].NL;
+        try {
+            // request
+            $string = $_SERVER['REQUEST_METHOD'].' '.$_SERVER['REQUEST_URI'].' '.$_SERVER['SERVER_PROTOCOL'].NL;
 
-        // headers
-        $headers = $this->getHeaders() ?: [];
+            // headers
+            $headers = $this->getHeaders() ?: [];
 
-        $maxLen = 0;
-        foreach ($headers as $key => $value) {
-            $maxLen = max(strlen($key), $maxLen);
+            $maxLen = 0;
+            foreach ($headers as $key => $value) {
+                $maxLen = max(strlen($key), $maxLen);
+            }
+
+            $maxLen++; // add a char for ':'
+            foreach ($headers as $key => $value) {
+                $string .= str_pad($key.':', $maxLen).' '.$value.NL;
+            }
+
+            // content (request body)
+            $content = $this->getContent();
+            if (strlen($content)) {
+                $string .= NL.substr($content, 0, 1024).NL;     // limit the request body to 1024 bytes
+            }
+
+            Assert::string($string);                            // Ensure the method returns a string value as otherwise...
+            return $string;                                     // PHP will trigger a non-catchable fatal error.
         }
+        catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }
+        catch (\Exception $ex) { ErrorHandler::handleToStringException($ex); }
 
-        $maxLen++; // add a char for ':'
-        foreach ($headers as $key => $value) {
-            $string .= str_pad($key.':', $maxLen).' '.$value.NL;
-        }
-
-        // content (request body)
-        $content = $this->getContent();
-        if (strlen($content)) {
-            $string .= NL.substr($content, 0, 1024).NL;             // limit the request body to 1024 bytes
-        }
-        return $string;
     }
 }

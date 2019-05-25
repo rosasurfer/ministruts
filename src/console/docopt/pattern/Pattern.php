@@ -2,6 +2,8 @@
 namespace rosasurfer\console\docopt\pattern;
 
 use rosasurfer\core\CObject;
+use rosasurfer\core\assert\Assert;
+use rosasurfer\core\debug\ErrorHandler;
 
 use function rosasurfer\array_merge;
 
@@ -194,6 +196,12 @@ abstract class Pattern extends CObject {
      * @return string
      */
     public function __toString() {
-        return serialize($this);
+        try {
+            $value = serialize($this);
+            Assert::string($value);                             // Ensure the method returns a string value as otherwise...
+            return $value;                                      // PHP will trigger a non-catchable fatal error.
+        }
+        catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }
+        catch (\Exception $ex) { ErrorHandler::handleToStringException($ex); }
     }
 }

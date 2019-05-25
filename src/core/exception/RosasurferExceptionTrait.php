@@ -1,7 +1,9 @@
 <?php
 namespace rosasurfer\core\exception;
 
+use rosasurfer\core\assert\Assert;
 use rosasurfer\core\debug\DebugHelper;
+use rosasurfer\core\debug\ErrorHandler;
 
 use const rosasurfer\NL;
 
@@ -93,6 +95,12 @@ trait RosasurferExceptionTrait {
      * @return string
      */
     public function __toString() {
-        return $this->getBetterMessage();
+        try {
+            $value = $this->getBetterMessage();
+            Assert::string($value);                             // Ensure the method returns a string value as otherwise...
+            return $value;                                      // PHP will trigger a non-catchable fatal error.
+        }
+        catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }
+        catch (\Exception $ex) { ErrorHandler::handleToStringException($ex); }
     }
 }

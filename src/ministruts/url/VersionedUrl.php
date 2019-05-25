@@ -2,6 +2,8 @@
 namespace rosasurfer\ministruts\url;
 
 use rosasurfer\config\ConfigInterface;
+use rosasurfer\core\assert\Assert;
+use rosasurfer\core\debug\ErrorHandler;
 
 
 /**
@@ -13,23 +15,30 @@ class VersionedUrl extends Url {
 
     /**
      * {@inheritdoc}
+     *
+     * @return string
      */
     public function __toString() {
-        $uri = parent::__toString();
+        try {
+            $uri = parent::__toString();
+            $relativeUri = $this->appRelativeUri;
+            if (($pos=strpos($relativeUri, '?')) === false) $name = $relativeUri;
+            else                                            $name = substr($relativeUri, 0, $pos);
 
-        $relativeUri = $this->appRelativeUri;
-        if (($pos=strpos($relativeUri, '?')) === false) $name = $relativeUri;
-        else                                            $name = substr($relativeUri, 0, $pos);
+            /** @var ConfigInterface $config */
+            $config = $this->di('config');
+            $webDir = $config->get('app.dir.web', null);
 
-        /** @var ConfigInterface $config */
-        $config = $this->di('config');
-        $webDir = $config->get('app.dir.web', null);
+            if ($webDir && file_exists($fileName=$webDir.'/'.$name)) {
+                if ($pos === false) $uri .= '?';
+                else                $uri .= '&';
+                $uri .= dechex(crc32(filesize($fileName).'|'.filemtime($fileName)));
+            }
 
-        if ($webDir && file_exists($fileName=$webDir.'/'.$name)) {
-            if ($pos === false) $uri .= '?';
-            else                $uri .= '&';
-            $uri .= dechex(crc32(filesize($fileName).'|'.filemtime($fileName)));
+            Assert::string($uri);                               // Ensure the method returns a string value as otherwise...
+            return $uri;                                        // PHP will trigger a non-catchable fatal error.
         }
-        return $uri;
+        catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }
+        catch (\Exception $ex) { ErrorHandler::handleToStringException($ex); }
     }
 }

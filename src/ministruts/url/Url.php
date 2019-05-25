@@ -3,6 +3,7 @@ namespace rosasurfer\ministruts\url;
 
 use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
+use rosasurfer\core\debug\ErrorHandler;
 use rosasurfer\ministruts\Request;
 
 use const rosasurfer\CLI;
@@ -60,13 +61,20 @@ class Url extends CObject {
      * @return string
      */
     public function __toString() {
-        $uri = $this->appRelativeUri;
-        if ($this->parameters) {
-            if (strpos($uri, '?') === false) $uri .= '?';
-            else                             $uri .= '&';
-            $uri .= http_build_query($this->parameters, null, '&');
+        try {
+            $uri = $this->appRelativeUri;
+            if ($this->parameters) {
+                if (strpos($uri, '?') === false) $uri .= '?';
+                else                             $uri .= '&';
+                $uri .= http_build_query($this->parameters, null, '&');
+            }
+            $request = Request::me();
+            $uri = $request->getApplicationBaseUri().$uri;
+
+            Assert::string($uri);                               // Ensure the method returns a string value as otherwise...
+            return $uri;                                        // PHP will trigger a non-catchable fatal error.
         }
-        $request = Request::me();
-        return $request->getApplicationBaseUri().$uri;
+        catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }
+        catch (\Exception $ex) { ErrorHandler::handleToStringException($ex); }
     }
 }
