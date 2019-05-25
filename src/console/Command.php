@@ -4,13 +4,13 @@ namespace rosasurfer\console;
 use rosasurfer\Application;
 use rosasurfer\console\docopt\DocoptParser;
 use rosasurfer\console\docopt\DocoptResult;
+use rosasurfer\console\io\Input;
+use rosasurfer\console\io\Output;
 use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\exception\IllegalStateException;
 use rosasurfer\core\exception\InvalidArgumentException;
 use rosasurfer\core\exception\RuntimeException;
-use rosasurfer\core\io\Input;
-use rosasurfer\core\io\Output;
 use rosasurfer\di\Di;
 
 
