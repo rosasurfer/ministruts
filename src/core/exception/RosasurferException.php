@@ -28,7 +28,7 @@ class RosasurferException extends \Exception implements IRosasurferException {
 
 
     /**
-     * Return the exception's stacktrace in a more readable way (Java-like).
+     * {@inheritdoc}
      *
      * @return array
      */

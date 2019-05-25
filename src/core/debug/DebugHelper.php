@@ -153,7 +153,7 @@ class DebugHelper extends StaticClass {
      * @param  array $frame                  - frame
      * @param  bool  $nsLowerCase [optional] - whether the namespace part of the name to return in lower case (default: no)
      *
-     * @return string - fully qualified name (without trailing parentheses)
+     * @return string - fully qualified function or method name (without trailing parentheses)
      */
     public static function getFQFunctionName(array $frame, $nsLowerCase = false) {
         $class = $function = '';

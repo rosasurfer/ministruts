@@ -23,7 +23,8 @@ trait RosasurferExceptionTrait {
 
 
     /**
-     * Add a message to the exception's existing message. Used to add additional information to an existing message.
+     * Add a message to the exception's existing message. Used during up-bubbling to add additional infos to an exception's
+     * original message.
      *
      * @param  string $message
      *
@@ -36,10 +37,10 @@ trait RosasurferExceptionTrait {
 
 
     /**
-     * Set the error code of the exception *only* if it's not yet set. An existing error code cannot be changed. In this
-     * case the method does nothing.
+     * Set the error code of an {@link \Exception} or {@link \Throwable}. Used during up-bubbling to add additional infos
+     * to an existing exception. Ignored if the exception's error code is already set.
      *
-     * @param  mixed $code
+     * @param  int|string $code
      *
      * @return $this
      */
@@ -52,9 +53,9 @@ trait RosasurferExceptionTrait {
 
 
     /**
-     * Return the exception's message in a more readable way.
+     * Return the message of the {@link \Exception} or {@link \Throwable} in a more readable way.
      *
-     * @return string - message
+     * @return string
      */
     public function getBetterMessage() {
         if (!$this->betterMessage)
@@ -64,7 +65,8 @@ trait RosasurferExceptionTrait {
 
 
     /**
-     * Return a text representation of the exception's stacktrace in a more readable way (Java-like).
+     * Return a string representation of the stack trace of the {@link \Exception} or {@link \Throwable} in a more readable
+     * way (Java-like).
      *
      * @return string
      */
@@ -76,19 +78,19 @@ trait RosasurferExceptionTrait {
 
 
     /**
-     * Return the name of the function (if any) where the exception was raised.
+     * Return the name of the function or method (if any) where the {@link \Exception} or {@link \Throwable} was created.
      *
      * @return string
      */
-    public function getFunctionName() {
+    public function getFunction() {
         return DebugHelper::getFQFunctionName($this->getBetterTrace()[0]);
     }
 
 
     /**
-     * Return a description of the exception.
+     * Return a string representation of the {@link \Exception} or {@link \Throwable}.
      *
-     * @return string - description
+     * @return string
      */
     public function __toString() {
         return $this->getBetterMessage();
