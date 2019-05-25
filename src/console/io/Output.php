@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\core\io;
+namespace rosasurfer\console\io;
 
 use rosasurfer\core\Object;
 
