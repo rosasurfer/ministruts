@@ -1,6 +1,6 @@
 {
     "name":        "rosasurfer/ministruts",
-    "description": "Struts 1.2 inspired MVC micro framework for PHP",
+    "description": "Java Struts inspired MVC micro framework for PHP",
     "type":        "library",
     "license":     "WTFPL",
     "authors": [{

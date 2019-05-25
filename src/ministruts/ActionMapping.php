@@ -439,19 +439,20 @@ class ActionMapping extends CObject {
         $path    = $this->path ? ' path="'.$this->path.'"':'';
         $mapping = $name.$path;
 
-        if (!$this->path)                                           throw new StrutsConfigException('<mapping'.$mapping.': A "path" attribute must be configured for '.$this);
-        if (!$this->formClassName && $this->formValidateFirst)      throw new StrutsConfigException('<mapping'.$mapping.': A form must be configured if "form-validate-first" is set to "true".');
+        if (!$this->path)                                      throw new StrutsConfigException('<mapping'.$mapping.': A "path" attribute must be configured for '.$this);
+        if (!$this->formClassName && $this->formValidateFirst) throw new StrutsConfigException('<mapping'.$mapping.': A form must be configured if "form-validate-first" is set to "true".');
 
         if (!$this->actionClassName && !$this->forward) {
-            if (!$this->formClassName || !$this->formValidateFirst) throw new StrutsConfigException('<mapping'.$mapping.': Either an "action", "include", "forward" or "redirect" attribute must be specified.');
+            // In general either an "action" or a "forward" resource is required to process a request. Except if a "form"
+            // is configured as "form-validate-first" (implicit or explicit). Only in that case the "forward" resource is
+            // looked-up from child elements "forward[@name=error|success]" and the mapping may define neither an "action"
+            // nor a "forward".
 
-            if (!$this->formClassName || !$this->formValidateFirst) {
-                throw new StrutsConfigException('<mapping'.$mapping.': Either an "action", "include", "forward" or "redirect" attribute must be specified.');
-            }
-            elseif ($this->formClassName && $this->formValidateFirst) {
-                if (!isset($this->forwards[ActionForward::VALIDATION_SUCCESS_KEY]) || !isset($this->forwards[ActionForward::VALIDATION_ERROR_KEY]))
-                    throw new StrutsConfigException('<mapping'.$mapping.' form="'.$this->formClassName.'": A "success" and "error" forward must be configured to validate the form.');
-            }
+            if (!$this->formClassName || !$this->formValidateFirst)
+                throw new StrutsConfigException('<mapping'.$mapping.': Either an "action", "include", "redirect" or "forward" attribute must be specified.');
+
+            if (!isset($this->forwards[ActionForward::VALIDATION_SUCCESS_KEY]) || !isset($this->forwards[ActionForward::VALIDATION_ERROR_KEY]))
+                throw new StrutsConfigException('<mapping'.$mapping.' form="'.$this->formClassName.'": A "success" and "error" forward must be configured to automatically validate the form.');
         }
 
         $this->configured = true;

@@ -18,25 +18,26 @@ use function rosasurfer\strLeftTo;
 class ActionForward extends CObject {
 
 
+    /** @var string - reserved identifier which references a forward to the currently used ActionMapping */
+    const SELF = 'self';
+
     /** @var string - default identifier for looking up a forward after a successful form validation */
     const VALIDATION_SUCCESS_KEY = 'success';
 
     /** @var string - default identifier for looking up a forward after a failed form validation */
     const VALIDATION_ERROR_KEY   = 'error';
 
-    /** @var string - reserved identifier which references a forward to the currently used ActionMapping */
-    const SELF = 'self';
 
     /** @var string */
     protected $name;
 
-    /** @var string */
+    /** @var string - a URI, a tile name (if starting with ".") or a filename (if not starting with ".") */
     protected $path;
 
-    /** @var bool */
+    /** @var bool - whether $path is a URI and a redirect will be issued */
     protected $redirect;
 
-    /** @var int */
+    /** @var int - type (HTTP status code) of the redirect to issue (if any) */
     protected $redirectType;
 
 
@@ -45,8 +46,8 @@ class ActionForward extends CObject {
      *
      * @param  string $name                    - logical forward name
      * @param  string $path                    - resource path
-     * @param  bool   $redirect     [optional] - redirect flag (default: FALSE)
-     * @param  int    $redirectType [optional] - redirect type (default: "Moved Temporarily" = 302)
+     * @param  bool   $redirect     [optional] - whether $path is a redirect (default: no)
+     * @param  int    $redirectType [optional] - redirect type (default: SC_MOVED_TEMPORARILY (302))
      */
     public function __construct($name, $path, $redirect=false, $redirectType=HttpResponse::SC_MOVED_TEMPORARILY) {
         $this->setName    ($name)
