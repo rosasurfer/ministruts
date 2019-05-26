@@ -106,30 +106,35 @@
     "global-forwards" element and are available to all ActionMappings of the {@link Module}. Local forwards are defined in a
     "mapping" element and are available only in the context of that ActionMapping.
 
-    name      The unique identifier of the forward. Used to select the resource that should complete the request/response.
+    name           The unique identifier of the forward. Used to select the resource to complete the request/response.
+                   
+    include        The name of a {@link Tile} definition or a file to include. Tile definition names must start with a dot 
+                   ".", file names must not start with a dot ".". Exactly one of "include", "mapping", "redirect" or 
+                   "forward" must be specified.
+                   
+    mapping        The name of an {@link ActionMapping} to which a redirect instruction should be issued. Exactly one of 
+                   "include", "mapping", "redirect" or "forward" must be specified.
+                   
+    redirect       The {@link Module}-relative URI to which a redirect instruction should be issued. Exactly one of "include",
+                   "mapping", "redirect" or "forward" must be specified.
 
-    include   The name of a {@link Tile} definition or a file to include. Tile definition names must start with a dot ".",
-              file names must not start with a dot ".". Exactly one of "include", "mapping", "redirect" or "forward" must be
-              specified.
+    redirect-type  The type of redirect to be issued ("temporary" or "permanent"). Optional if the "redirect" attribute is 
+                   specified, else not valid.
+                   [default: "temporary"]
 
-    mapping   The name of an {@link ActionMapping} to which a redirect instruction should be issued. Exactly one of "include",
-              "mapping", "redirect" or "forward" must be specified.
-
-    redirect  The {@link Module}-relative URI to which a redirect instruction should be issued. Exactly one of "include",
-              "mapping", "redirect" or "forward" must be specified.
-
-    forward   The name of another "forward" element to use instead of the current one (locally defined forwards are preferred
-              over globally defined ones). This attribute supports the reserved value "self" to define a forward to the
-              currently used {@link ActionMapping}. Exactly one of "include", "mapping", "redirect" or "forward" must be
-              specified.
+    forward        The name of another "forward" element to use instead of the current one. Locally defined forwards are 
+                   preferred over globally defined ones. Supports the reserved value "self" to define a forward to the
+                   currently used {@link ActionMapping} itself. Exactly one of "include", "mapping", "redirect" or "forward" 
+                   must be specified.
 -->
 <!ELEMENT forward (set*)>
 <!ATTLIST forward
-          name        %LogicalName;     #REQUIRED
-          include     %ResourcePath;    #IMPLIED
-          mapping     %LogicalName;     #IMPLIED
-          redirect    %RequestPath;     #IMPLIED
-          forward     %LogicalName;     #IMPLIED
+          name           %LogicalName;          #REQUIRED
+          include        %ResourcePath;         #IMPLIED
+          mapping        %LogicalName;          #IMPLIED
+          redirect       %RequestPath;          #IMPLIED
+          redirect-type  (temporary|permanent)  "temporary"
+          forward        %LogicalName;          #IMPLIED
 >
 
 

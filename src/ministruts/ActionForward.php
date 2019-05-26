@@ -38,20 +38,20 @@ class ActionForward extends CObject {
     protected $redirect;
 
     /** @var int - type (HTTP status code) of the redirect to issue (if any) */
-    protected $redirectType;
+    protected $redirectType = HttpResponse::SC_MOVED_TEMPORARILY;
 
 
     /**
      * Create a new instance with the specified properties.
      *
      * @param  string $name                    - logical forward name
-     * @param  string $path                    - resource path
-     * @param  bool   $redirect     [optional] - whether $path is a redirect (default: no)
+     * @param  string $resource                - resource path
+     * @param  bool   $redirect     [optional] - whether $resource is a redirect (default: no)
      * @param  int    $redirectType [optional] - redirect type (default: SC_MOVED_TEMPORARILY (302))
      */
-    public function __construct($name, $path, $redirect=false, $redirectType=HttpResponse::SC_MOVED_TEMPORARILY) {
-        $this->setName    ($name)
-             ->setPath    ($path)
+    public function __construct($name, $resource, $redirect=false, $redirectType=HttpResponse::SC_MOVED_TEMPORARILY) {
+        $this->setName($name)
+             ->setPath($resource)
              ->setRedirect($redirect);
 
         if ($redirect)
@@ -66,36 +66,6 @@ class ActionForward extends CObject {
      */
     public function getName() {
         return $this->name;
-    }
-
-
-    /**
-     * Return the forward's resource path.
-     *
-     * @return string
-     */
-    public function getPath() {
-        return $this->path;
-    }
-
-
-    /**
-     * Return the forward's redirect flag.
-     *
-     * @return bool
-     */
-    public function isRedirect() {
-        return $this->redirect;
-    }
-
-
-    /**
-     * Return the forward's redirect type (if any).
-     *
-     * @return int - HTTP status code
-     */
-    public function getRedirectType() {
-        return (int) $this->redirectType;
     }
 
 
@@ -116,6 +86,16 @@ class ActionForward extends CObject {
 
 
     /**
+     * Return the forward's resource path.
+     *
+     * @return string
+     */
+    public function getPath() {
+        return $this->path;
+    }
+
+
+    /**
      * Set the forward's resource path.
      *
      * @param  string $path
@@ -132,16 +112,36 @@ class ActionForward extends CObject {
 
 
     /**
+     * Return the forward's redirect flag.
+     *
+     * @return bool
+     */
+    public function isRedirect() {
+        return $this->redirect;
+    }
+
+
+    /**
      * Set the forward's redirect status.
      *
-     * @param  bool $redirect
+     * @param  bool $status
      *
      * @return $this
      */
-    public function setRedirect($redirect) {
-        Assert::bool($redirect);
-        $this->redirect = $redirect;
+    public function setRedirect($status) {
+        Assert::bool($status);
+        $this->redirect = $status;
         return $this;
+    }
+
+
+    /**
+     * Return the forward's redirect type (if any).
+     *
+     * @return int - HTTP status code
+     */
+    public function getRedirectType() {
+        return (int) $this->redirectType;
     }
 
 
