@@ -295,18 +295,19 @@ class Module extends CObject {
             $this->addGlobalForward($forward);
         }
 
-        // process global 'forward' forwards (aliases, parsed after the other forwards to be able to find them)
+        // process global 'forward' forwards (parsed after the other forwards to be able to find them)
         $elements = $xml->xpath('/struts-config/global-forwards/forward[@forward]') ?: [];
 
         foreach ($elements as $tag) {
             $name  = (string)$tag['name'   ];
             $alias = (string)$tag['forward'];
+            if ($name == $alias)                                   throw new StrutsConfigException('<global-forwards> <forward name="'.$name.'": The forward attribute "'.$alias.'" must not be self-referencing.');
 
             if (isset($tag['include']) || isset($tag['redirect'])) throw new StrutsConfigException('<global-forwards> <forward name="'.$name.'": Only one of "include", "redirect" or "forward" can be specified.');
             if (isset($tag['redirect-type']))                      throw new StrutsConfigException('<global-forwards> <forward name="'.$name.'": The "redirect" attribute must be specified if "redirect-type" is defined.');
 
             $forward = $this->findForward($alias);
-            if (!$forward) throw new StrutsConfigException('<global-forwards> <forward name="'.$name.'" forward="'.$alias.'": Referenced forward "'.$alias.'" not found.');
+            if (!$forward) throw new StrutsConfigException('<global-forwards> <forward name="'.$name.'": Referenced forward "'.$alias.'" not found.');
 
             $this->addGlobalForward($forward, $name);
         }
@@ -508,11 +509,12 @@ class Module extends CObject {
             foreach ($subElements as $forwardTag) {
                 $name  = (string) $forwardTag['name'   ];
                 $alias = (string) $forwardTag['forward'];
+                if ($name == $alias)                                                 throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'"> <forward name="'.$name.'": The forward attribute "'.$alias.'" must not be self-referencing.');
                 if (isset($forwardTag['include']) || isset($forwardTag['redirect'])) throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'"> <forward name="'.$name.'": Only one of "include", "redirect" or "forward" can be specified.');
                 if (isset($forwardTag['redirect-type']))                             throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'"> <forward name="'.$name.'": The "redirect" attribute must be specified if "redirect-type" is defined.');
 
                 $forward = $mapping->findForward($alias);
-                if (!$forward) throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'"> <forward name="'.$name.'" forward="'.$alias.'": Referenced forward "'.$alias.'" not found');
+                if (!$forward) throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'"> <forward name="'.$name.'": Referenced forward "'.$alias.'" not found.');
 
                 $mapping->addForward($name, $forward);
             }
