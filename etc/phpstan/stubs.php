@@ -194,8 +194,7 @@ namespace {
          */
         function curl_init($url = null) {
             /** @var resource $result */
-            $result = null;
-            return $result;
+            return $result = null;
         }
 
         /**
@@ -250,8 +249,8 @@ namespace {
     if (!function_exists('mysql_affected_rows')) {
 
         define('MYSQL_ASSOC', 1);
-        define('MYSQL_NUM'  , 2);
-        define('MYSQL_BOTH' , 3);
+        define('MYSQL_NUM',   2);
+        define('MYSQL_BOTH',  3);
 
         /**
          * @param  resource $link_identifier [optional]
@@ -282,8 +281,7 @@ namespace {
          */
         function mysql_connect($server = null, $username = null, $password = null, $new_link = null, $client_flags = null) {
             /** @var resource $result */
-            $result = null;
-            return $result;
+            return $result = null;
         }
 
         /**
@@ -404,7 +402,7 @@ namespace {
 
     if (!function_exists('pcntl_signal')) {
 
-        define('SIGINT' , 2);
+        define('SIGINT', 2);
 
         /**
          * @param  int          $signo
@@ -422,6 +420,189 @@ namespace {
          */
         function pcntl_signal_dispatch() {
             return false;
+        }
+    }
+
+
+    if (!function_exists('pg_affected_rows')) {
+
+        define('PGSQL_ASSOC',             1);
+        define('PGSQL_BAD_RESPONSE',      3);
+        define('PGSQL_BOTH',              3);
+        define('PGSQL_COMMAND_OK',        1);
+        define('PGSQL_CONNECT_FORCE_NEW', 2);
+        define('PGSQL_COPY_IN',           4);
+        define('PGSQL_COPY_OUT',          3);
+        define('PGSQL_EMPTY_QUERY',       0);
+        define('PGSQL_FATAL_ERROR',       7);
+        define('PGSQL_NONFATAL_ERROR',    6);
+        define('PGSQL_NUM',               2);
+        define('PGSQL_STATUS_LONG',       1);
+        define('PGSQL_STATUS_STRING',     2);
+        define('PGSQL_TUPLES_OK',         2);
+
+
+        /**
+         * @param  resource $result
+         *
+         * @return int
+         */
+        function pg_affected_rows($result) {
+            return 0;
+        }
+
+        /**
+         * @param  resource $connection [optional]
+         *
+         * @return bool
+         */
+        function pg_close($connection = null) {
+            return false;
+        }
+
+        /**
+         * @param  string $connection_string
+         * @param  int    $connect_type [optional]
+         *
+         * @return resource
+         */
+        function pg_connect($connection_string, $connect_type = null) {
+            /** @var resource $result */
+            return $result = null;
+        }
+
+        /**
+         * @param  resource $connection [optional]
+         *
+         * @return string
+         */
+        function pg_dbname($connection = null) {
+            return '';
+        }
+
+        /**
+         * @param  resource $connection [optional]
+         * @param  string   $data
+         *
+         * @return string
+         */
+        function pg_escape_identifier($connection = null, $data) {
+            return '';
+        }
+
+        /**
+         * @param  resource $connection [optional]
+         * @param  string   $data
+         *
+         * @return string
+         */
+        function pg_escape_literal($connection = null, $data) {
+            return '';
+        }
+
+        /**
+         * @param  resource $connection [optional]
+         * @param  string   $data
+         *
+         * @return string
+         */
+        function pg_escape_string($connection = null, $data) {
+            return '';
+        }
+
+        /**
+         * @param  resource $result
+         * @param  int      $row  [optional]
+         * @param  int      $type [optional]
+         *
+         * @return array|bool
+         */
+        function pg_fetch_array($result, $row=null, $type=PGSQL_BOTH) {
+            return false;
+        }
+
+        /**
+         * @param  resource $result
+         *
+         * @return bool
+         */
+        function pg_free_result($result) {
+            return false;
+        }
+
+        /**
+         * @param  resource $connection [optional]
+         *
+         * @return string
+         */
+        function pg_host($connection = null) {
+            return '';
+        }
+
+        /**
+         * @param  resource $connection [optional]
+         *
+         * @return string
+         */
+        function pg_last_error($connection = null) {
+            return '';
+        }
+
+        /**
+         * @param  resource $result
+         *
+         * @return int
+         */
+        function pg_num_fields($result) {
+            return 0;
+        }
+
+        /**
+         * @param  resource $result
+         *
+         * @return int
+         */
+        function pg_num_rows($result) {
+            return 0;
+        }
+
+        /**
+         * @param  resource $connection [optional]
+         *
+         * @return int
+         */
+        function pg_port($connection = null) {
+            return 0;
+        }
+
+        /**
+         * @param  resource $connection [optional]
+         * @param  string   $query
+         *
+         * @return resource
+         */
+        function pg_query($connection = null, $query) {
+            /** @var resource $result */
+            return $result = null;
+        }
+
+        /**
+         * @param  resource $result
+         * @param  int      $type [optional]
+         *
+         * @return int|string
+         */
+        function pg_result_status($result, $type = PGSQL_STATUS_LONG) {
+            return 0;
+        }
+
+        /**
+         * @param  resource $connection [optional]
+         *
+         * @return array
+         */
+        function pg_version($connection = null) {
+            return [];
         }
     }
 
@@ -448,8 +629,7 @@ namespace {
          */
         function sem_get($key, $max_acquire = null, $perm = null, $auto_release = null) {
             /** @var resource $result */
-            $result = null;
-            return $result;
+            return $result = null;
         }
 
         /**

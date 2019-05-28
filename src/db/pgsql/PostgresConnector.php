@@ -449,8 +449,11 @@ class PostgresConnector extends Connector {
         if (!$this->isConnected())
             $this->connect();
 
+        /** @var resource $result */
+        $result = null;
+
         // execute statement
-        $result = $ex = null;
+        $ex = null;
         try {
             $result = pg_query($this->hConnection, $sql);         // wraps multi-statement queries in a transaction
             if (!$result) throw new DatabaseException(pg_last_error($this->hConnection));
@@ -461,15 +464,15 @@ class PostgresConnector extends Connector {
         if ($ex) throw $ex->addMessage('Database: '.$this->getConnectionDescription().NL.'SQL: "'.$sql.'"');
 
         /** @var string $status_string */
-        $status_string = pg_result_status($result, PGSQL_STATUS_STRING);
+        $status = pg_result_status($result, PGSQL_STATUS_STRING);
 
         // reset last_insert_id on INSERTs, afterwards it's resolved on request as it requires an extra SQL query
-        if (strStartsWithI($status_string, 'INSERT '))
+        if (strStartsWithI($status, 'INSERT '))
             $this->lastInsertId = null;
 
         // track last_affected_rows
         $pattern = '/^(INSERT|UPDATE|DELETE)\b/i';
-        if (preg_match($pattern, $status_string))
+        if (preg_match($pattern, $status))
             $this->lastAffectedRows = pg_affected_rows($result);
 
         return $result;
