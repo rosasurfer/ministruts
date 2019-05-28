@@ -2,8 +2,8 @@
 namespace rosasurfer\db;
 
 use rosasurfer\core\CObject;
-use rosasurfer\core\assert\Assert;
 use rosasurfer\core\debug\ErrorHandler;
+use rosasurfer\core\exception\IllegalTypeException;
 use rosasurfer\core\exception\InvalidArgumentException;
 use rosasurfer\core\exception\UnimplementedFeatureException;
 
@@ -45,7 +45,8 @@ abstract class Result extends CObject implements ResultInterface {
      * {@inheritdoc}
      */
     public function fetchColumn($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
-        Assert::intOrString($column, '$column');
+        if (!is_int($column) && !is_string($column))
+            throw new IllegalTypeException('Illegal type of parameter $column: '.gettype($column));
         if (isset($row)) throw new UnimplementedFeatureException('$row='.$row.' (!= NULL)');
 
         // Generic default implementation:

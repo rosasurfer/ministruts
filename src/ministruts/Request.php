@@ -987,8 +987,8 @@ class Request extends Singleton {
                 return $this->isActionError($keys);
             $keys = null;
         }
+        else throw new IllegalTypeException('Illegal type of parameter $keys: '.gettype($keys));
 
-        Assert::null($keys);
         return true;
     }
 
