@@ -3,7 +3,7 @@ namespace rosasurfer\cache;
 
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\StaticClass;
-use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\core\assert\Assert;
 use rosasurfer\util\PHP;
 
 use function rosasurfer\ini_get_bool;
@@ -59,8 +59,7 @@ final class Cache extends StaticClass {
         }
 
         // spezifischer Cache
-        if (!is_string($label)) throw new IllegalTypeException('Illegal type of parameter $label: '.gettype($label));
-
+        Assert::string($label);
 
         if (!isset(self::$caches[$label])) {
             /** @var ConfigInterface $config */

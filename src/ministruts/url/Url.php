@@ -1,8 +1,9 @@
 <?php
 namespace rosasurfer\ministruts\url;
 
-use rosasurfer\core\Object;
-use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\core\CObject;
+use rosasurfer\core\assert\Assert;
+use rosasurfer\core\debug\ErrorHandler;
 use rosasurfer\ministruts\Request;
 
 use const rosasurfer\CLI;
@@ -11,7 +12,7 @@ use const rosasurfer\CLI;
 /**
  * URL generation helper
  */
-class Url extends Object {
+class Url extends CObject {
 
 
     /** @var string - URI as passed to the constructor */
@@ -34,7 +35,7 @@ class Url extends Object {
      *                       slash it is interpreted as relative to the application's current Module.
      */
     public function __construct($uri) {
-        if (!is_string($uri)) throw new IllegalTypeException('Illegal type of parameter $uri: '.gettype($uri));
+        Assert::string($uri);
         $this->uri = $uri;
 
         // TODO: If called from a non-MiniStruts context (i.e. CLI) this method will fail.
@@ -60,13 +61,20 @@ class Url extends Object {
      * @return string
      */
     public function __toString() {
-        $uri = $this->appRelativeUri;
-        if ($this->parameters) {
-            if (strpos($uri, '?') === false) $uri .= '?';
-            else                             $uri .= '&';
-            $uri .= http_build_query($this->parameters, null, '&');
+        try {
+            $uri = $this->appRelativeUri;
+            if ($this->parameters) {
+                if (strpos($uri, '?') === false) $uri .= '?';
+                else                             $uri .= '&';
+                $uri .= http_build_query($this->parameters, null, '&');
+            }
+            $request = Request::me();
+            $uri = $request->getApplicationBaseUri().$uri;
+
+            Assert::string($uri);                               // Ensure the method returns a string value as otherwise...
+            return $uri;                                        // PHP will trigger a non-catchable fatal error.
         }
-        $request = Request::me();
-        return $request->getApplicationBaseUri().$uri;
+        catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }
+        catch (\Exception $ex) { ErrorHandler::handleToStringException($ex); }
     }
 }

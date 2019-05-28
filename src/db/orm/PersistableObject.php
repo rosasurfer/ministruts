@@ -1,13 +1,13 @@
 <?php
 namespace rosasurfer\db\orm;
 
-use rosasurfer\core\Object;
+use rosasurfer\core\CObject;
+use rosasurfer\core\exception\ConcurrentModificationException;
+use rosasurfer\core\exception\IllegalAccessException;
+use rosasurfer\core\exception\IllegalStateException;
+use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\db\ConnectorInterface as IConnector;
-use rosasurfer\exception\ConcurrentModificationException;
-use rosasurfer\exception\IllegalAccessException;
-use rosasurfer\exception\IllegalStateException;
-use rosasurfer\exception\InvalidArgumentException;
-use rosasurfer\exception\RuntimeException;
 
 use function rosasurfer\is_class;
 use function rosasurfer\strEndsWith;
@@ -19,7 +19,7 @@ use function rosasurfer\strLeft;
  *
  * Abstract base class for stored objects.
  */
-abstract class PersistableObject extends Object {
+abstract class PersistableObject extends CObject {
 
 
     /** @var bool - dirty checking status */

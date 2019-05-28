@@ -1,9 +1,9 @@
 <?php
 namespace rosasurfer\db\sqlite;
 
+use rosasurfer\core\assert\Assert;
 use rosasurfer\db\ConnectorInterface as IConnector;
 use rosasurfer\db\Result;
-use rosasurfer\exception\IllegalTypeException;
 
 use const rosasurfer\ARRAY_ASSOC;
 use const rosasurfer\ARRAY_BOTH;
@@ -45,9 +45,9 @@ class SQLiteResult extends Result {
      * @param  int            $lastAffectedRows - last number of affected rows of the connection
      */
     public function __construct(IConnector $connector, $sql, \SQLite3Result $result, $lastInsertId, $lastAffectedRows) {
-        if (!is_string($sql))           throw new IllegalTypeException('Illegal type of parameter $sql: '.gettype($sql));
-        if (!is_int($lastInsertId))     throw new IllegalTypeException('Illegal type of parameter $lastInsertId: '.gettype($lastInsertId));
-        if (!is_int($lastAffectedRows)) throw new IllegalTypeException('Illegal type of parameter $lastAffectedRows: '.gettype($lastAffectedRows));
+        Assert::string($sql,              '$sql');
+        Assert::int   ($lastInsertId,     '$lastInsertId');
+        Assert::int   ($lastAffectedRows, '$lastAffectedRows');
 
         $this->connector        = $connector;
         $this->sql              = $sql;

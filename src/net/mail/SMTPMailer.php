@@ -2,11 +2,11 @@
 namespace rosasurfer\net\mail;
 
 use rosasurfer\config\ConfigInterface;
-use rosasurfer\debug\ErrorHandler;
-use rosasurfer\exception\IllegalTypeException;
-use rosasurfer\exception\InfrastructureException;
-use rosasurfer\exception\InvalidArgumentException;
-use rosasurfer\exception\RuntimeException;
+use rosasurfer\core\assert\Assert;
+use rosasurfer\core\debug\ErrorHandler;
+use rosasurfer\core\exception\InfrastructureException;
+use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\RuntimeException;
 
 use function rosasurfer\normalizeEOL;
 
@@ -57,7 +57,7 @@ class SMTPMailer extends Mailer {
         }
         else {
             $host = $this->options['host'];
-            if (!is_string($host)) throw new IllegalTypeException('Illegal type of option "host": '.gettype($this->options['host']));
+            Assert::string($host, 'option "host"');
             $parts = explode(':', $host);
 
             if (sizeof($parts) == 1) {
@@ -86,9 +86,8 @@ class SMTPMailer extends Mailer {
         try {
             $this->disconnect();
         }
-        catch (\Exception $ex) {
-            throw ErrorHandler::handleDestructorException($ex);
-        }
+        catch (\Throwable $ex) { throw ErrorHandler::handleDestructorException($ex); }
+        catch (\Exception $ex) { throw ErrorHandler::handleDestructorException($ex); }
     }
 
 
@@ -96,19 +95,15 @@ class SMTPMailer extends Mailer {
      * Connect to the SMTP server.
      */
     private function connect() {
-        $connection = fsockopen('tcp://'.$this->options['host'],
-                                         $this->options['port'],
-                                         $errorCode,
-                                         $errorMsg,
-                                         $this->options['timeout']);
-        // TODO: connect() might hang without producing an error if the connection fails
-        if (!$connection) throw new RuntimeException('Could not open socket: '.$errorMsg.' (error '.$errorCode.')');
-
-        $data = stream_get_meta_data($connection);
+        $this->connection = fsockopen('tcp://'.$this->options['host'],
+                                               $this->options['port'],
+                                               $errorCode,
+                                               $errorMsg,
+                                               $this->options['timeout']);
+        $data = stream_get_meta_data($this->connection);
         if ($data['timed_out']) throw new InfrastructureException('Timeout on socket connection');
 
-        socket_set_timeout($connection, $this->options['timeout']);
-        $this->connection = $connection;
+        socket_set_timeout($this->connection, $this->options['timeout']);
 
         // init connection
         $this->readResponse();                          // read greeting
@@ -128,7 +123,7 @@ class SMTPMailer extends Mailer {
 
 
     /**
-     * Authentificate the connection.
+     * Authenticate the connection.
      */
     private function authenticate() {
         if (!is_resource($this->connection))
@@ -184,7 +179,7 @@ class SMTPMailer extends Mailer {
 
         // first validate the additional headers
         foreach ($headers as $i => $header) {
-            if (!is_string($header))                           throw new IllegalTypeException('Illegal type of parameter $headers['.$i.']: '.gettype($header));
+            Assert::string($header, '$headers['.$i.']');
             if (!preg_match('/^[a-z]+(-[a-z]+)*:/i', $header)) throw new InvalidArgumentException('Invalid parameter $headers['.$i.']: "'.$header.'"');
         }
 
@@ -197,7 +192,7 @@ class SMTPMailer extends Mailer {
         }
 
         // Return-Path: (invisible sender)
-        if (!is_string($sender))               throw new IllegalTypeException('Illegal type of parameter $sender: '.gettype($sender));
+        Assert::string($sender, '$sender');
         $returnPath = self::parseAddress($sender);
         if (!$returnPath)                      throw new InvalidArgumentException('Invalid parameter $sender: '.$sender);
         $value = $this->removeHeader($headers, 'Return-Path');
@@ -216,11 +211,11 @@ class SMTPMailer extends Mailer {
         }
 
         // RCPT: (invisible receiver)
-        if (!is_string($receiver))             throw new IllegalTypeException('Illegal type of parameter $receiver: '.gettype($receiver));
+        Assert::string($receiver, '$receiver');
         $rcpt = self::parseAddress($receiver);
         if (!$rcpt)                            throw new InvalidArgumentException('Invalid parameter $receiver: '.$receiver);
         $forced = $config->get('mail.forced-receiver', '');
-        if (!is_string($forced))               throw new IllegalTypeException('Illegal type of config value "mail.forced-receiver": '.gettype($forced).' (not string)');
+        Assert::string($forced, 'config value "mail.forced-receiver"');
         if (strlen($forced)) {
             $rcpt = self::parseAddress($forced);
             if (!$rcpt)                        throw new InvalidArgumentException('Invalid config value "mail.forced-receiver": '.$forced);
@@ -236,8 +231,8 @@ class SMTPMailer extends Mailer {
         }
 
         // Subject: subject and body
-        if (!is_string($subject))              throw new IllegalTypeException('Illegal type of parameter $subject: '.gettype($subject));
-        if (!is_string($message))              throw new IllegalTypeException('Illegal type of parameter $message: '.gettype($message));
+        Assert::string($subject, '$subject');
+        Assert::string($message, '$message');
 
 
         // start SMTP communication

@@ -1,14 +1,14 @@
 <?php
 namespace rosasurfer\console\docopt;
 
-use rosasurfer\core\Object;
+use rosasurfer\core\CObject;
 use rosasurfer\console\docopt\pattern\Pattern;
 
 
 /**
  * SingleMatch
  */
-class SingleMatch extends Object {
+class SingleMatch extends CObject {
 
 
     /** @var int */

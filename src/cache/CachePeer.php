@@ -1,8 +1,8 @@
 <?php
 namespace rosasurfer\cache;
 
-use rosasurfer\core\Object;
-use rosasurfer\monitor\Dependency;
+use rosasurfer\cache\monitor\Dependency;
+use rosasurfer\core\CObject;
 
 
 /**
@@ -41,7 +41,7 @@ use rosasurfer\monitor\Dependency;
  * @see FileSystemCache
  * @see ReferencePool
  */
-abstract class CachePeer extends Object {
+abstract class CachePeer extends CObject {
 
 
     /** @var string */

@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\db\orm;
 
-use rosasurfer\core\Object;
+use rosasurfer\core\CObject;
 use rosasurfer\db\ConnectionPool;
 use rosasurfer\db\ConnectorInterface as IConnector;
 use rosasurfer\db\MultipleRecordsException;
@@ -17,7 +17,7 @@ use const rosasurfer\ARRAY_ASSOC;
  *
  * A Worker converts database records to PHP objects. For each entity exists a separate Worker instance.
  */
-class Worker extends Object {
+class Worker extends CObject {
 
 
     /** @var DAO - DAO of the worker's entity */

@@ -1,6 +1,6 @@
 #
 # Requires:
-#   PHP 7.0
+#   PHP 7
 #   https://github.com/rosasurfer/phpstan, branch "0.9-pewa"
 #
 # Usage:
@@ -10,7 +10,7 @@
 
 parameters:
     autoload_files:
-        - etc/phpstan/function-stubs.php                                    # stubs for PHP extensions and procedural code
+        - etc/phpstan/stubs.php                                             # stubs for unloaded PHP extensions
 
     fileExtensions:                                                         # additional files to analyse
        #- html

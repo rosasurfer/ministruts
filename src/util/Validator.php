@@ -2,9 +2,7 @@
 namespace rosasurfer\util;
 
 use rosasurfer\core\StaticClass;
-use rosasurfer\exception\IllegalTypeException;
-
-use const rosasurfer\WINDOWS;
+use rosasurfer\core\assert\Assert;
 
 
 /**
@@ -150,7 +148,8 @@ class Validator extends StaticClass {
      *                       'd/m/Y [H:i[:s]]'
      */
     public static function isDateTime($date, $format='Y-m-d') {
-        if (!is_string($date)) throw new IllegalTypeException('Illegal type of parameter $date: '.gettype($date));
+        Assert::string($date, '$date');
+
         if (is_array($format)) {
             foreach ($format as $value) {
                 $time = self::{__FUNCTION__}($date, $value);
@@ -159,7 +158,7 @@ class Validator extends StaticClass {
             }
             return false;
         }
-        if (!is_string($format)) throw new IllegalTypeException('Illegal type of parameter $format: '.gettype($format));
+        Assert::string($format, '$format');
 
         /*
         // !!! deaktiviert!!!: strPTime() haelt sich nicht 100% an das angegebene Format sondern versucht, intelligent zu sein

@@ -1,9 +1,9 @@
 <?php
 namespace rosasurfer\ministruts;
 
-use rosasurfer\core\Object;
-use rosasurfer\exception\IllegalTypeException;
-use rosasurfer\exception\InvalidArgumentException;
+use rosasurfer\core\CObject;
+use rosasurfer\core\assert\Assert;
+use rosasurfer\core\exception\InvalidArgumentException;
 use rosasurfer\net\http\HttpResponse;
 
 use function rosasurfer\strLeftTo;
@@ -15,8 +15,11 @@ use function rosasurfer\strLeftTo;
  * An ActionForward describes a target a request is forwarded to after processing. It has a logical name (for identification)
  * and points either to a physical resource (a file, a layout or a template) or to an URI.
  */
-class ActionForward extends Object {
+class ActionForward extends CObject {
 
+
+    /** @var string - reserved identifier which references a forward to the currently used ActionMapping */
+    const SELF = 'self';
 
     /** @var string - default identifier for looking up a forward after a successful form validation */
     const VALIDATION_SUCCESS_KEY = 'success';
@@ -24,36 +27,31 @@ class ActionForward extends Object {
     /** @var string - default identifier for looking up a forward after a failed form validation */
     const VALIDATION_ERROR_KEY   = 'error';
 
-    /** @var string - reserved identifier which references a forward to the currently used ActionMapping */
-    const SELF = 'self';
 
     /** @var string */
     protected $name;
 
-    /** @var string */
+    /** @var string - a URI, a tile name (if starting with ".") or a filename (if not starting with ".") */
     protected $path;
 
-    /** @var string */
-    protected $label;
-
-    /** @var bool */
+    /** @var bool - whether $path is a URI and a redirect will be issued */
     protected $redirect;
 
-    /** @var int */
-    protected $redirectType;
+    /** @var int - type (HTTP status code) of the redirect to issue (if any) */
+    protected $redirectType = HttpResponse::SC_MOVED_TEMPORARILY;
 
 
     /**
      * Create a new instance with the specified properties.
      *
      * @param  string $name                    - logical forward name
-     * @param  string $path                    - resource path
-     * @param  bool   $redirect     [optional] - redirect flag (default: FALSE)
-     * @param  int    $redirectType [optional] - redirect type (default: "Moved Temporarily" = 302)
+     * @param  string $resource                - resource path
+     * @param  bool   $redirect     [optional] - whether $resource is a redirect (default: no)
+     * @param  int    $redirectType [optional] - redirect type (default: SC_MOVED_TEMPORARILY (302))
      */
-    public function __construct($name, $path, $redirect=false, $redirectType=HttpResponse::SC_MOVED_TEMPORARILY) {
-        $this->setName    ($name)
-             ->setPath    ($path)
+    public function __construct($name, $resource, $redirect=false, $redirectType=HttpResponse::SC_MOVED_TEMPORARILY) {
+        $this->setName($name)
+             ->setPath($resource)
              ->setRedirect($redirect);
 
         if ($redirect)
@@ -72,6 +70,22 @@ class ActionForward extends Object {
 
 
     /**
+     * Set the forward's name.
+     *
+     * @param  string $name
+     *
+     * @return $this
+     */
+    public function setName($name) {
+        Assert::string($name);
+        if (!strlen($name)) throw new InvalidArgumentException('Invalid argument $name: '.$name);
+
+        $this->name = $name;
+        return $this;
+    }
+
+
+    /**
      * Return the forward's resource path.
      *
      * @return string
@@ -82,12 +96,18 @@ class ActionForward extends Object {
 
 
     /**
-     * Return the forward's label.
+     * Set the forward's resource path.
      *
-     * @return string
+     * @param  string $path
+     *
+     * @return $this
      */
-    public function getLabel() {
-        return $this->label;
+    public function setPath($path) {
+        Assert::string($path);
+        if (!strlen($path)) throw new InvalidArgumentException('Invalid argument $path: '.$path);
+
+        $this->path = $path;
+        return $this;
     }
 
 
@@ -102,75 +122,26 @@ class ActionForward extends Object {
 
 
     /**
+     * Set the forward's redirect status.
+     *
+     * @param  bool $status
+     *
+     * @return $this
+     */
+    public function setRedirect($status) {
+        Assert::bool($status);
+        $this->redirect = $status;
+        return $this;
+    }
+
+
+    /**
      * Return the forward's redirect type (if any).
      *
      * @return int - HTTP status code
      */
     public function getRedirectType() {
         return (int) $this->redirectType;
-    }
-
-
-    /**
-     * Set the forward's name.
-     *
-     * @param  string $name
-     *
-     * @return $this
-     */
-    public function setName($name) {
-        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
-        if (!strlen($name))    throw new InvalidArgumentException('Invalid argument $name: '.$name);
-
-        $this->name = $name;
-        return $this;
-    }
-
-
-    /**
-     * Set the forward's resource path.
-     *
-     * @param  string $path
-     *
-     * @return $this
-     */
-    public function setPath($path) {
-        if (!is_string($path)) throw new IllegalTypeException('Illegal type of parameter $path: '.gettype($path));
-        if (!strlen($path))    throw new InvalidArgumentException('Invalid argument $path: '.$path);
-
-        $this->path = $path;
-        return $this;
-    }
-
-
-    /**
-     * Set the forward's label (used only in HTML comments).
-     *
-     * @param  string $label
-     *
-     * @return $this
-     */
-    public function setLabel($label) {
-        if (!is_string($label)) throw new IllegalTypeException('Illegal type of parameter $label: '.gettype($label));
-        if (!strlen($label))    throw new InvalidArgumentException('Invalid argument $label: '.$label);
-
-        $this->label = $label;
-        return $this;
-    }
-
-
-    /**
-     * Set the forward's redirect status.
-     *
-     * @param  bool $redirect
-     *
-     * @return $this
-     */
-    public function setRedirect($redirect) {
-        if (!is_bool($redirect)) throw new IllegalTypeException('Illegal type of parameter $redirect: '.gettype($redirect));
-
-        $this->redirect = $redirect;
-        return $this;
     }
 
 
@@ -182,8 +153,7 @@ class ActionForward extends Object {
      * @return $this
      */
     public function setRedirectType($type) {
-        if (!is_int($type)) throw new IllegalTypeException('Illegal type of parameter $type: '.gettype($type));
-
+        Assert::int($type);
         $this->redirectType = $type;
         return $this;
     }
@@ -199,11 +169,11 @@ class ActionForward extends Object {
      */
     public function addQueryData($key, $value) {
         // TODO: freeze the instance after configuration and automatically call copy()
+        Assert::string      ($key,   '$key');
+        Assert::nullOrScalar($value, '$value');
 
-        if (!is_string($key))       throw new IllegalTypeException('Illegal type of parameter $key: '.gettype($key));
-        if (!isset($value))         $value = '';
-        elseif (is_bool($value))    $value = (int) $value;
-        elseif (!is_scalar($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.gettype($value));
+        if     (!isset($value))  $value = '';
+        elseif (is_bool($value)) $value = (int) $value;
 
         $value = (string) $value;
 
@@ -227,7 +197,7 @@ class ActionForward extends Object {
         // TODO: freeze the instance after configuration and automatically call copy()
 
         if (isset($value)) {
-            if (!is_scalar($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.gettype($value));
+            Assert::scalar($value);
             if (is_bool($value))
                 $value = (int) $value;
         }

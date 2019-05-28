@@ -26,18 +26,6 @@ interface DiInterface extends \ArrayAccess, ContainerInterface {
 
 
     /**
-     * Whether a service with the specified name is registered in the container.
-     *
-     * @param  string $name - service identifier
-     *
-     * @return bool
-     *
-     * @deprecated
-     */
-    public function isService($name);
-
-
-    /**
      * Resolve a named service and return its implementation. This method always returns the same instance.
      *
      * @param  string $name

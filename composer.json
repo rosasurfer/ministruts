@@ -1,6 +1,6 @@
 {
     "name":        "rosasurfer/ministruts",
-    "description": "Struts 1.2 inspired MVC micro framework for PHP",
+    "description": "Java Struts inspired MVC micro framework for PHP",
     "type":        "library",
     "license":     "WTFPL",
     "authors": [{
@@ -8,14 +8,11 @@
         "email": "ministruts@rosasurfer.com"
     }],
     "config": {
-        "platform": {
-            "php": "5.6"
-        },
         "vendor-dir":         "etc/vendor",
         "optimize-autoloader": true
     },
     "require": {
-        "php":           "^5.6",
+        "php":           ">=5.6",
         "ext-ctype":     "*",
         "ext-filter":    "*",
         "ext-json":      "*",
@@ -30,8 +27,8 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-0.9": "0.9.x-dev",
-            "dev-0.10-dev": "0.10.x-dev"
+            "dev-0.9":    "0.9.x-dev",
+            "dev-master": "0.10.x-dev"
         }
     }
 }

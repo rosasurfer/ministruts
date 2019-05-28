@@ -1,8 +1,8 @@
 <?php
 namespace rosasurfer\net\http;
 
-use rosasurfer\exception\IllegalTypeException;
-use rosasurfer\exception\InvalidArgumentException;
+use rosasurfer\core\assert\Assert;
+use rosasurfer\core\exception\InvalidArgumentException;
 
 
 /**
@@ -42,8 +42,8 @@ class CurlHttpResponse extends HttpResponse {
      * @return $this
      */
     public function setStatus($status) {
-        if (!is_int($status)) throw new IllegalTypeException('Illegal type of parameter $status: '.gettype($status));
-        if ($status < 1)      throw new InvalidArgumentException('Invalid argument $status: '.$status);
+        Assert::int($status);
+        if ($status < 1) throw new InvalidArgumentException('Invalid argument $status: '.$status);
 
         $this->status = $status;
         return $this;

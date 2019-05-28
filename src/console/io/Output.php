@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\console\io;
 
-use rosasurfer\core\Object;
+use rosasurfer\core\CObject;
 
 use function rosasurfer\printPretty;
 
@@ -11,7 +11,7 @@ use const rosasurfer\CLI;
 /**
  * Output
  */
-class Output extends Object {
+class Output extends CObject {
 
 
     /**

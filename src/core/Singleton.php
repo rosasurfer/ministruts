@@ -1,9 +1,9 @@
 <?php
 namespace rosasurfer\core;
 
-use rosasurfer\exception\ClassNotFoundException;
-use rosasurfer\exception\InvalidArgumentException;
-use rosasurfer\exception\RuntimeException;
+use rosasurfer\core\exception\ClassNotFoundException;
+use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\RuntimeException;
 
 use function rosasurfer\is_class;
 
@@ -13,7 +13,7 @@ use function rosasurfer\is_class;
  *
  * Factory and base class for implementation of the Singleton pattern.
  */
-abstract class Singleton extends Object {
+abstract class Singleton extends CObject {
 
 
     /** @var Singleton[] - the currently existing singletons */

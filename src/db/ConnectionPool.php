@@ -3,12 +3,12 @@ namespace rosasurfer\db;
 
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\Singleton;
+use rosasurfer\core\assert\Assert;
+use rosasurfer\core\exception\IllegalStateException;
 use rosasurfer\db\ConnectorInterface as IConnector;
 use rosasurfer\db\mysql\MySQLConnector;
 use rosasurfer\db\pgsql\PostgresConnector;
 use rosasurfer\db\sqlite\SQLiteConnector;
-use rosasurfer\exception\IllegalStateException;
-use rosasurfer\exception\IllegalTypeException;
 
 
 /**
@@ -75,8 +75,8 @@ final class ConnectionPool extends Singleton {
             /** @var ConfigInterface $config */
             $config  = self::di('config');
             $options = $config->get('db.'.$id, []);
-            if (!is_array($options)) throw new IllegalTypeException('Invalid config value "db.'.$id.'": '.gettype($options).' (not array)');
-            if (!$options)           throw new IllegalStateException('No configuration found for database alias "'.$id.'"');
+            Assert::isArray($options, 'config value "db.'.$id.'"');
+            if (!$options) throw new IllegalStateException('No configuration found for database alias "'.$id.'"');
 
             // resolve the class name to use for the connector
             $className = $options['connector']; unset($options['connector']);

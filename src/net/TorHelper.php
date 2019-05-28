@@ -3,8 +3,8 @@ namespace rosasurfer\net;
 
 use rosasurfer\cache\Cache;
 use rosasurfer\core\StaticClass;
-use rosasurfer\exception\IllegalTypeException;
-use rosasurfer\exception\IOException;
+use rosasurfer\core\assert\Assert;
+use rosasurfer\core\exception\IOException;
 use rosasurfer\log\Logger;
 use rosasurfer\net\http\CurlHttpClient;
 use rosasurfer\net\http\HttpRequest;
@@ -75,7 +75,7 @@ class TorHelper extends StaticClass {
      */
     public static function isExitNode($ip) {
         self::init();
-        if (!is_string($ip)) throw new IllegalTypeException('Illegal type of parameter $ip: '.gettype($ip));
+        Assert::string($ip);
 
         // TODO: mit Filter-Extension lokale Netze abfangen
         if ($ip == '127.0.0.1')

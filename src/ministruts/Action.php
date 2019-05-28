@@ -1,13 +1,13 @@
 <?php
 namespace rosasurfer\ministruts;
 
-use rosasurfer\core\Object;
+use rosasurfer\core\CObject;
 
 
 /**
  * An Action contains the logic to execute a specific request and represents the interface to the business layer.
  */
-abstract class Action extends Object {
+abstract class Action extends CObject {
 
 
     /** @var ActionMapping - encapsulates a single routing configuration */

@@ -1,9 +1,9 @@
 <?php
 namespace rosasurfer\ministruts;
 
-use rosasurfer\core\Object;
-use rosasurfer\exception\IllegalStateException;
-use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\core\CObject;
+use rosasurfer\core\assert\Assert;
+use rosasurfer\core\exception\IllegalStateException;
 
 use function rosasurfer\strCompareI;
 use function rosasurfer\strLeftTo;
@@ -17,7 +17,7 @@ use function rosasurfer\strLeftTo;
  *
  * @link  https://github.com/rosasurfer/ministruts/blob/master/src/ministruts/dtd/struts-config.dtd#L137
  */
-class ActionMapping extends Object {
+class ActionMapping extends CObject {
 
 
     /** @var bool - whether this component is fully configured */
@@ -144,7 +144,7 @@ class ActionMapping extends Object {
      * @return bool
      */
     public function isSupportedMethod($method) {
-        if (!is_string($method)) throw new IllegalTypeException('Illegal type of parameter $method: '.gettype($method));
+        Assert::string($method);
         return isset($this->methods[strtoupper($method)]);
     }
 
@@ -232,16 +232,6 @@ class ActionMapping extends Object {
 
         $this->forward = $forward;
         return $this;
-    }
-
-
-    /**
-     * Return a configured {@link ActionForward}.
-     *
-     * @return ActionForward|null - ActionForward or NULL if no forward is configured
-     */
-    public function getForward() {
-        return $this->forward;
     }
 
 
@@ -449,19 +439,20 @@ class ActionMapping extends Object {
         $path    = $this->path ? ' path="'.$this->path.'"':'';
         $mapping = $name.$path;
 
-        if (!$this->path)                                           throw new StrutsConfigException('<mapping'.$mapping.': A "path" attribute must be configured for '.$this);
-        if (!$this->formClassName && $this->formValidateFirst)      throw new StrutsConfigException('<mapping'.$mapping.': A form must be configured if "form-validate-first" is set to "true".');
+        if (!$this->path)                                      throw new StrutsConfigException('<mapping'.$mapping.': A "path" attribute must be configured for '.$this);
+        if (!$this->formClassName && $this->formValidateFirst) throw new StrutsConfigException('<mapping'.$mapping.': A form must be configured if "form-validate-first" is set to "true".');
 
         if (!$this->actionClassName && !$this->forward) {
-            if (!$this->formClassName || !$this->formValidateFirst) throw new StrutsConfigException('<mapping'.$mapping.': Either an "action", "include", "forward" or "redirect" attribute must be specified.');
+            // In general either an "action" or a "forward" resource is required to process a request. Except if a "form"
+            // is configured as "form-validate-first" (implicit or explicit). Only in that case the "forward" resource is
+            // looked-up from child elements "forward[@name=error|success]" and the mapping may define neither an "action"
+            // nor a "forward".
 
-            if (!$this->formClassName || !$this->formValidateFirst) {
-                throw new StrutsConfigException('<mapping'.$mapping.': Either an "action", "include", "forward" or "redirect" attribute must be specified.');
-            }
-            elseif ($this->formClassName && $this->formValidateFirst) {
-                if (!isset($this->forwards[ActionForward::VALIDATION_SUCCESS_KEY]) || !isset($this->forwards[ActionForward::VALIDATION_ERROR_KEY]))
-                    throw new StrutsConfigException('<mapping'.$mapping.' form="'.$this->formClassName.'": A "success" and "error" forward must be configured to validate the form.');
-            }
+            if (!$this->formClassName || !$this->formValidateFirst)
+                throw new StrutsConfigException('<mapping'.$mapping.': Either an "action", "include", "redirect" or "forward" attribute must be specified.');
+
+            if (!isset($this->forwards[ActionForward::VALIDATION_SUCCESS_KEY]) || !isset($this->forwards[ActionForward::VALIDATION_ERROR_KEY]))
+                throw new StrutsConfigException('<mapping'.$mapping.' form="'.$this->formClassName.'": A "success" and "error" forward must be configured to automatically validate the form.');
         }
 
         $this->configured = true;
@@ -471,11 +462,12 @@ class ActionMapping extends Object {
 
     /**
      * Lookup and return the {@link ActionForward} accessible under the specified name. First the lookup tries to find a
-     * local forward of the given name. If no local forward is found global forwards are checked.
+     * local forward of the specified name. If no such forward is found global forwards are checked. This method returns NULL
+     * if no forward is found.
      *
      * @param  string $name - logical name; can be "self" to return a redirect forward to the mapping itself
      *
-     * @return ActionForward|null - ActionForward or NULL if neither a local nor a global forward was found
+     * @return ActionForward|null - ActionForward or NULL if no such forward was found
      */
     public function findForward($name) {
         $forward = null;
@@ -508,16 +500,21 @@ class ActionMapping extends Object {
 
 
     /**
-     * Lookup and return the configured {@link ActionForward} accessible under the specified name. This method differs from
-     * {@link ActionMapping::findForward()} in that it always returns an instance.
+     * Return the mapping's configured {@link ActionForward} or lookup and return the forward accessible under the specified
+     * name. First the lookup tries to find a local forward of the specified name. If no such forward is found global
+     * forwards are checked. This method throws an exception if a name was specified but no such forward was found.
      *
-     * @param  string $name - logical name (may be "self" to return a forward to the currently active mapping's route)
+     * @param  string $name [optional] - logical name; can be "self" to return a redirect forward to the mapping itself
+     *                                   (default: none)
      *
-     * @return ActionForward
+     * @return ActionForward|null - ActionForward or NULL if no name was specified and no forward is configured
      *
-     * @throws StrutsConfigException if the forward was not found
+     * @throws StrutsConfigException if a name was specified but no such forward was found
      */
-    public function findForwardOrFail($name) {
+    public function getForward($name = null) {
+        if (!func_num_args())
+            return $this->forward;
+
         $forward = $this->findForward($name);
         if (!$forward)
             throw new StrutsConfigException('<mapping name="'.$this->getName().'"  path="'.$this->getPath().'": ActionForward "'.$name.'" not found.');

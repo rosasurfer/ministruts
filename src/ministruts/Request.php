@@ -3,10 +3,12 @@ namespace rosasurfer\ministruts;
 
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\Singleton;
-use rosasurfer\exception\IllegalStateException;
-use rosasurfer\exception\IllegalTypeException;
-use rosasurfer\exception\InvalidArgumentException;
-use rosasurfer\exception\RuntimeException;
+use rosasurfer\core\assert\Assert;
+use rosasurfer\core\debug\ErrorHandler;
+use rosasurfer\core\exception\IllegalStateException;
+use rosasurfer\core\exception\IllegalTypeException;
+use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\net\NetTools;
 use rosasurfer\util\PHP;
 
@@ -614,7 +616,7 @@ class Request extends Singleton {
      * @return HttpSession
      */
     public function getSession() {
-        return HttpSession::me($this);
+        return HttpSession::me();
     }
 
 
@@ -713,8 +715,7 @@ class Request extends Singleton {
      * @return string|null - Wert oder NULL, wenn kein Header dieses Namens uebertragen wurde
      */
     public function getHeader($name) {
-        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
-
+        Assert::string($name);
         $headers = $this->getHeaders($name);
         return \array_shift($headers);
     }
@@ -732,8 +733,8 @@ class Request extends Singleton {
             $names = [$names];
         }
         elseif (is_array($names)) {
-            foreach ($names as $name) {
-                if (!is_string($name)) throw new IllegalTypeException('Illegal argument type in argument $names: '.gettype($name));
+            foreach ($names as $i => $name) {
+                Assert::string($name, '$names['.$i.']');
             }
         }
         else throw new IllegalTypeException('Illegal type of parameter $names: '.gettype($names));
@@ -792,10 +793,11 @@ class Request extends Singleton {
         if (is_string($names))
             $names = array($names);
         elseif (is_array($names)) {
-            foreach ($names as $name)
-                if (!is_string($name)) throw new IllegalTypeException('Illegal argument type in argument $names: '.gettype($name));
+            foreach ($names as $i => $name) {
+                Assert::string($name, '$names['.$i.']');
+            }
         }
-        else                         throw new IllegalTypeException('Illegal type of parameter $names: '.gettype($names));
+        else throw new IllegalTypeException('Illegal type of parameter $names: '.gettype($names));
 
         $headers = $this->getHeaders($names);
         if ($headers)
@@ -816,10 +818,11 @@ class Request extends Singleton {
         if (is_string($names))
             $names = array($names);
         elseif (is_array($names)) {
-            foreach ($names as $name)
-                if (!is_string($name)) throw new IllegalTypeException('Illegal argument type in argument $names: '.gettype($name));
+            foreach ($names as $i => $name) {
+                Assert::string($name, '$names['.$i.']');
+            }
         }
-        else                         throw new IllegalTypeException('Illegal type of parameter $names: '.gettype($names));
+        else throw new IllegalTypeException('Illegal type of parameter $names: '.gettype($names));
 
         $headers = $this->getHeaders($names);
         if ($headers)
@@ -887,16 +890,15 @@ class Request extends Singleton {
      * @param  string $path [optional] - Pfad, fuer den der Cookie gueltig sein soll (default: whole domain)
      */
     public function setCookie($name, $value, $expires = 0, $path = null) {
-        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
-        if (!is_int($expires)) throw new IllegalTypeException('Illegal type of parameter $expires: '.gettype($expires));
-        if ($expires < 0)      throw new InvalidArgumentException('Invalid argument $expires: '.$expires);
+        Assert::string($name,    '$name');
+        Assert::int   ($expires, '$expires');
+        if ($expires < 0) throw new InvalidArgumentException('Invalid argument $expires: '.$expires);
 
         $value = (string)$value;
 
         if ($path === null)
             $path = $this->getApplicationBaseUri();
-
-        if (!is_string($path)) throw new IllegalTypeException('Illegal type of parameter $path: '.gettype($path));
+        Assert::string($path, '$path');
 
         \setcookie($name, $value, $expires, $path);
     }
@@ -910,7 +912,7 @@ class Request extends Singleton {
      * @return bool
      */
     public function isUserInRole($roles) {
-        if (!is_string($roles)) throw new IllegalTypeException('Illegal type of parameter $roles: '.gettype($roles));
+        Assert::string($roles);
 
         // Module holen
         $module = $this->getAttribute(MODULE_KEY);
@@ -985,10 +987,9 @@ class Request extends Singleton {
                 return $this->isActionError($keys);
             $keys = null;
         }
+        else throw new IllegalTypeException('Illegal type of parameter $keys: '.gettype($keys));
 
-        if (is_null($keys))
-            return true;
-        throw new IllegalTypeException('Illegal type of parameter $keys: '.gettype($keys));
+        return true;
     }
 
 
@@ -1000,13 +1001,14 @@ class Request extends Singleton {
      *                           (an ActionError with the same key is not deleted)
      */
     public function setActionMessage($key, $message) {
+        Assert::nullOrString($message, '$message');
+
         if (!isset($message)) {
             unset($this->attributes[ACTION_MESSAGES_KEY][$key]);
         }
-        elseif (is_string($message)) {
+        else {
             $this->attributes[ACTION_MESSAGES_KEY][$key] = $message;
         }
-        else throw new IllegalTypeException('Illegal type of parameter $message: '.gettype($message));
     }
 
 
@@ -1085,6 +1087,8 @@ class Request extends Singleton {
         if (is_string($keys))
             $keys = [$keys];
 
+        Assert::nullOrArray($keys);
+
         if (is_array($keys)) {
             foreach ($keys as $key) {
                 if (key_exists($key, $errors)) return true;
@@ -1093,10 +1097,7 @@ class Request extends Singleton {
                 return false;
             $keys = null;
         }
-
-        if (is_null($keys))
-            return true;
-        throw new IllegalTypeException('Illegal type of parameter $keys: '.gettype($keys));
+        return true;
     }
 
 
@@ -1107,13 +1108,13 @@ class Request extends Singleton {
      * @param  string $message - error message; if NULL the error for the specified key is deleted
      */
     public function setActionError($key, $message) {
+        Assert::nullOrString($message, '$message');
         if (!isset($message)) {
             unset($this->attributes[ACTION_ERRORS_KEY][$key]);
         }
-        elseif (is_string($message)) {
+        else {
             $this->attributes[ACTION_ERRORS_KEY][$key] = $message;
         }
-        else throw new IllegalTypeException('Illegal type of parameter $message: '.gettype($message));
     }
 
 
@@ -1183,27 +1184,34 @@ class Request extends Singleton {
      * @return string
      */
     public function __toString() {
-        // request
-        $string = $_SERVER['REQUEST_METHOD'].' '.$_SERVER['REQUEST_URI'].' '.$_SERVER['SERVER_PROTOCOL'].NL;
+        try {
+            // request
+            $string = $_SERVER['REQUEST_METHOD'].' '.$_SERVER['REQUEST_URI'].' '.$_SERVER['SERVER_PROTOCOL'].NL;
 
-        // headers
-        $headers = $this->getHeaders() ?: [];
+            // headers
+            $headers = $this->getHeaders() ?: [];
 
-        $maxLen = 0;
-        foreach ($headers as $key => $value) {
-            $maxLen = max(strlen($key), $maxLen);
+            $maxLen = 0;
+            foreach ($headers as $key => $value) {
+                $maxLen = max(strlen($key), $maxLen);
+            }
+
+            $maxLen++; // add a char for ':'
+            foreach ($headers as $key => $value) {
+                $string .= str_pad($key.':', $maxLen).' '.$value.NL;
+            }
+
+            // content (request body)
+            $content = $this->getContent();
+            if (strlen($content)) {
+                $string .= NL.substr($content, 0, 1024).NL;     // limit the request body to 1024 bytes
+            }
+
+            Assert::string($string);                            // Ensure the method returns a string value as otherwise...
+            return $string;                                     // PHP will trigger a non-catchable fatal error.
         }
+        catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }
+        catch (\Exception $ex) { ErrorHandler::handleToStringException($ex); }
 
-        $maxLen++; // add a char for ':'
-        foreach ($headers as $key => $value) {
-            $string .= str_pad($key.':', $maxLen).' '.$value.NL;
-        }
-
-        // content (request body)
-        $content = $this->getContent();
-        if (strlen($content)) {
-            $string .= NL.substr($content, 0, 1024).NL;             // limit the request body to 1024 bytes
-        }
-        return $string;
     }
 }

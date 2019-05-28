@@ -4,11 +4,11 @@ namespace rosasurfer\log;
 use rosasurfer\Application;
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\StaticClass;
-use rosasurfer\debug\DebugHelper;
-use rosasurfer\exception\IllegalTypeException;
-use rosasurfer\exception\InvalidArgumentException;
-use rosasurfer\exception\RuntimeException;
-use rosasurfer\exception\error\PHPError;
+use rosasurfer\core\assert\Assert;
+use rosasurfer\core\debug\DebugHelper;
+use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\RuntimeException;
+use rosasurfer\core\exception\error\PHPError;
 use rosasurfer\ministruts\Request;
 use rosasurfer\net\NetTools;
 use rosasurfer\net\http\CurlHttpClient;
@@ -204,7 +204,7 @@ class Logger extends StaticClass {
         self::$smsLogLevel = $logLevel;
 
         $options = $config->get('sms', []);
-        if (!is_array($options)) throw new IllegalTypeException('Invalid type of config value "sms": '.gettype($options).' (not array)');
+        Assert::isArray($options, 'config value "sms"');
         self::$smsOptions = $options;
 
         self::$smsHandler = self::$smsReceivers && self::$smsOptions;
@@ -225,7 +225,7 @@ class Logger extends StaticClass {
      * @return int|null - loglevel constant or NULL, if $value is not a valid loglevel description
      */
     public static function logLevelToId($value) {
-        if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.gettype($value));
+        Assert::string($value);
 
         switch (strtolower($value)) {
             case 'debug' : return L_DEBUG;
@@ -248,7 +248,7 @@ class Logger extends StaticClass {
      * @return int - configured loglevel or the application loglevel if no class specific loglevel is configured
      */
     public static function getLogLevel($class = '') {
-        if (!is_string($class)) throw new IllegalTypeException('Illegal type of parameter $class: '.gettype($class));
+        Assert::string($class);
         self::init();
 
         // read the configured class specific loglevels
@@ -262,7 +262,7 @@ class Logger extends StaticClass {
                 $logLevels = ['' => $logLevels];                            // only the general application loglevel is configured
 
             foreach ($logLevels as $className => $level) {
-                if (!is_string($level)) throw new IllegalTypeException('Illegal configuration value for "log.level.'.$className.'": '.gettype($level));
+                Assert::string($level, 'config value "log.level.'.$className.'"');
 
                 if ($level == '') {                                         // classes with empty values fall back to the application loglevel
                     unset($logLevels[$className]);
@@ -295,14 +295,15 @@ class Logger extends StaticClass {
     /**
      * Log a message.
      *
-     * @param  object|string $loggable           - a message or an object implementing <tt>__toString()</tt>
+     * @param  string|object $loggable           - a message or an object implementing <tt>__toString()</tt>
      * @param  int           $level              - loglevel
      * @param  array         $context [optional] - logging context with additional data
      */
     public static function log($loggable, $level, array $context = []) {
         self::init();
 
-        // Wrap everything in a try-catch block to prevent user generated log messages from getting lost if logging fails.
+        // wrap everything in try-catch to handle the case when logging fails
+        $ex = null;
         try {
             // block recursive calls
             // TODO: instead of recursive calls block duplicate messages
@@ -312,13 +313,12 @@ class Logger extends StaticClass {
 
             // validate parameters
             if (!is_string($loggable)) {
-                if (!is_object($loggable))                   throw new IllegalTypeException('Illegal type of parameter $loggable: '.gettype($loggable));
-                if (!method_exists($loggable, '__toString')) throw new IllegalTypeException('Illegal type of parameter $loggable: '.get_class($loggable).'::__toString() not found');
-                if (!$loggable instanceof \Exception)
+                Assert::hasMethod($loggable, '__toString', '$loggable');
+                if (!$loggable instanceof \Throwable && !$loggable instanceof \Exception)
                     $loggable = (string) $loggable;
             }
-            if (!is_int($level))                            throw new IllegalTypeException('Illegal type of parameter $level: '.gettype($level));
-            if (!isset(self::$logLevels[$level]))           throw new InvalidArgumentException('Invalid argument $level: '.$level.' (not a loglevel)');
+            Assert::int($level, '$level');
+            if (!isset(self::$logLevels[$level])) throw new InvalidArgumentException('Invalid argument $level: '.$level.' (not a loglevel)');
 
             $filtered = false;
 
@@ -330,7 +330,7 @@ class Logger extends StaticClass {
             }
 
             // filter "headers already sent" errors triggered by a previously printed HTML log message
-            if (!$filtered && !CLI && self::$printCounter && $loggable instanceof \Exception) {
+            if (!$filtered && !CLI && self::$printCounter && is_object($loggable)) {
                 if (preg_match('/- headers already sent (by )?\(output started at /', $loggable->getMessage())) {
                     $filtered = true;
                 }
@@ -351,11 +351,13 @@ class Logger extends StaticClass {
             $isActive = false;
 
         }
-        catch (\Exception $ex) {
-            // Prevent user generated log messages from getting lost if logging fails. In the context of this method
-            // only exceptions logged with L_FATAL are not user generated (i.e. they are generated by the registered
-            // exception handler).
-            if ($level!=L_FATAL || !$loggable instanceof \Exception) {
+        catch (\Throwable $ex) {}
+        catch (\Exception $ex) {}
+
+        if ($ex) {
+            // If the call comes from the internal exception handler failed logging is already handled. If the call comes
+            // from user-land make sure the message doesn't get lost and is logged to the PHP default error log.
+            if (!key_exists('unhandled-exception', $context)) {
                 $file = key_exists('file', $context) ? $context['file'] : '';
                 $line = key_exists('line', $context) ? $context['line'] : '';
                 $msg  = 'PHP ['.strtoupper(self::$logLevels[$level]).'] '.$loggable.NL.' in '.$file.' on line '.$line;
@@ -369,9 +371,9 @@ class Logger extends StaticClass {
     /**
      * Display the message on the standard output device (STDOUT in CLI mode, HTTP response in a web context).
      *
-     * @param  string|\Exception $loggable - message or exception to log
-     * @param  int               $level    - loglevel of the loggable
-     * @param  array             $context  - reference to the log context with additional data
+     * @param  string|\Exception|\Throwable $loggable - message or exception to log
+     * @param  int                          $level    - loglevel of the loggable
+     * @param  array                        $context  - reference to the log context with additional data
      */
     private static function invokePrintHandler($loggable, $level, array &$context) {
         $message = null;
@@ -397,9 +399,9 @@ class Logger extends StaticClass {
     /**
      * Send the message to the configured mail receivers.
      *
-     * @param  string|\Exception $loggable - message or exception to log
-     * @param  int               $level    - loglevel of the loggable
-     * @param  array             $context  - reference to the log context with additional data
+     * @param  string|\Exception|\Throwable $loggable - message or exception to log
+     * @param  int                          $level    - loglevel of the loggable
+     * @param  array                        $context  - reference to the log context with additional data
      */
     private static function invokeMailHandler($loggable, $level, array &$context) {
         if (!key_exists('mailSubject', $context) || !key_exists('mailMessage', $context))
@@ -429,9 +431,9 @@ class Logger extends StaticClass {
     /**
      * Send the message to the configured SMS receivers (phone numbers).
      *
-     * @param  string|\Exception $loggable - message or exception to log
-     * @param  int               $level    - loglevel of the loggable
-     * @param  array             $context  - reference to the log context with additional data
+     * @param  string|\Exception|\Throwable $loggable - message or exception to log
+     * @param  int                          $level    - loglevel of the loggable
+     * @param  array                        $context  - reference to the log context with additional data
      *
      * @TODO   replace CURL dependency with internal PHP functions
      */
@@ -474,7 +476,8 @@ class Logger extends StaticClass {
                         try {
                             self::log('Unexpected HTTP status code '.$status.' ('.HttpResponse::$sc[$status].') for URL: '.$request->getUrl(), L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
                         }
-                        catch (\Exception $ex) {/*eat it*/}
+                        catch (\Throwable $ex) {}   // intentionally eat it
+                        catch (\Exception $ex) {}
                         continue;
                     }
                     if (strStartsWithI($content, 'ERR: 113')) {
@@ -510,14 +513,16 @@ class Logger extends StaticClass {
                         try {
                             self::log('Unexpected HTTP status code '.$status.' ('.HttpResponse::$sc[$status].') for URL: '.$request->getUrl(), L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
                         }
-                        catch (\Exception $ex) {/*eat it*/}
+                        catch (\Throwable $ex) {}   // intentionally eat it
+                        catch (\Exception $ex) {}
                         continue;
                     }
                     if (!isset($content)) {
                         try {
                             self::log('Empty reply from server, URL: '.$request->getUrl(), L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
                         }
-                        catch (\Exception $ex) {/*eat it*/}
+                        catch (\Throwable $ex) {}   // intentionally eat it
+                        catch (\Exception $ex) {}
                         continue;
                     }
                 }
@@ -536,9 +541,9 @@ class Logger extends StaticClass {
      * system logger instead. On Unix, this means syslog(3) and on Windows it means the event log. If this directive is not
      * set, errors are sent to the SAPI error logger. For example, it is an error log in Apache or STDERR in CLI mode.
      *
-     * @param  string|\Exception $loggable - message or exception to log
-     * @param  int               $level    - loglevel of the loggable
-     * @param  array             $context  - reference to the log context with additional data
+     * @param  string|\Exception|\Throwable $loggable - message or exception to log
+     * @param  int                          $level    - loglevel of the loggable
+     * @param  array                        $context  - reference to the log context with additional data
      */
     private static function invokeErrorLogHandler($loggable, $level, array &$context) {
         if (!key_exists('cliMessage', $context))
@@ -566,9 +571,9 @@ class Logger extends StaticClass {
      * Compose a CLI log message and store it in the passed log context under the keys "cliMessage" and "cliExtra".
      * The separation is used by the SMS handler which only sends the main message ("cliMessage").
      *
-     * @param  string|\Exception $loggable - message or exception to log
-     * @param  int               $level    - loglevel of the loggable
-     * @param  array             $context  - reference to the log context
+     * @param  string|\Exception|\Throwable $loggable - message or exception to log
+     * @param  int                          $level    - loglevel of the loggable
+     * @param  array                        $context  - reference to the log context
      */
     private static function composeCliMessage($loggable, $level, array &$context) {
         if (!key_exists('file', $context) || !key_exists('line', $context))
@@ -581,7 +586,7 @@ class Logger extends StaticClass {
 
         // compose message
         if (is_string($loggable)) {
-            // simple message
+            // $loggable is a simple message
             $msg = $loggable;
 
             if (strlen($indent)) {                      // indent multiline messages
@@ -603,10 +608,10 @@ class Logger extends StaticClass {
             }
         }
         else {
-            // exception
+            // $loggable is an exception
             $type = null;
             $msg  = trim(DebugHelper::composeBetterMessage($loggable, $indent));
-            if (key_exists('unhandled', $context)) {
+            if (key_exists('unhandled-exception', $context)) {
                 $type = 'Unhandled ';
                 if ($loggable instanceof PHPError) {
                     $msg   = strRightFrom($msg, ':');
@@ -641,9 +646,9 @@ class Logger extends StaticClass {
     /**
      * Compose a mail log message and store it in the passed log context under the keys "mailSubject" and "mailMessage".
      *
-     * @param  string|\Exception $loggable - message or exception to log
-     * @param  int               $level    - loglevel of the loggable
-     * @param  array             $context  - reference to the log context
+     * @param  string|\Exception|\Throwable $loggable - message or exception to log
+     * @param  int                          $level    - loglevel of the loggable
+     * @param  array                        $context  - reference to the log context
      */
     private static function composeMailMessage($loggable, $level, array &$context) {
         if (!key_exists('cliMessage', $context))
@@ -689,7 +694,7 @@ class Logger extends StaticClass {
               . 'IP:   '.$ip.NL
               . 'Time: '.date('Y-m-d H:i:s').NL;
         }
-        $type = ($loggable instanceof \Exception && key_exists('unhandled', $context)) ? 'Unhandled Exception ':'';
+        $type = (key_exists('unhandled-exception', $context)) ? 'Unhandled Exception ':'';
 
         // store subject and message
         $context['mailSubject'] = 'PHP ['.self::$logLevels[$level].'] '.$type.(CLI ? 'in ':'at ').$location;
@@ -700,9 +705,9 @@ class Logger extends StaticClass {
     /**
      * Compose a HTML log message and store it in the passed log context under the key "htmlMessage".
      *
-     * @param  string|\Exception $loggable - message or exception to log
-     * @param  int               $level    - loglevel of the loggable
-     * @param  array             $context  - reference to the log context
+     * @param  string|\Exception|\Throwable $loggable - message or exception to log
+     * @param  int                          $level    - loglevel of the loggable
+     * @param  array                        $context  - reference to the log context
      */
     private static function composeHtmlMessage($loggable, $level, array &$context) {
         if (!key_exists('file', $context) || !key_exists('line', $context))
@@ -724,7 +729,7 @@ class Logger extends StaticClass {
 
         // compose message
         if (is_string($loggable)) {
-            // simple message
+            // $loggable is a simple message
             $msg   = $loggable;
             $html .= '<span style="white-space:nowrap"><span style="font-weight:bold">['.strtoupper(self::$logLevels[$level]).']</span> <span style="white-space:pre; line-height:8px">'.nl2br(hsc($msg)).'</span></span><br><br>';
             $html .= 'in <span style="font-weight:bold">'.$file.'</span> on line <span style="font-weight:bold">'.$line.'</span><br>';
@@ -737,10 +742,10 @@ class Logger extends StaticClass {
             }
         }
         else {
-            // exception
+            // $loggable is an exception
             $type = null;
             $msg  = trim(DebugHelper::composeBetterMessage($loggable));
-            if (key_exists('unhandled', $context)) {
+            if (key_exists('unhandled-exception', $context)) {
                 $type = 'Unhandled ';
                 if ($loggable instanceof PHPError) {
                     $msg   = strRightFrom($msg, ':');

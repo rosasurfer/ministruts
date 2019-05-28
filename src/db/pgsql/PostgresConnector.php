@@ -1,11 +1,11 @@
 <?php
 namespace rosasurfer\db\pgsql;
 
+use rosasurfer\core\assert\Assert;
+use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
+use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\db\Connector;
 use rosasurfer\db\DatabaseException;
-use rosasurfer\exception\IllegalTypeException;
-use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
-use rosasurfer\exception\RuntimeException;
 
 use function rosasurfer\strContains;
 use function rosasurfer\strContainsI;
@@ -222,6 +222,7 @@ class PostgresConnector extends Connector {
         $path = null;
 
         while ($this->hConnection) {
+            $ex = null;
             try {
                 $result = pg_query($this->hConnection, 'show search_path');
                 $row    = pg_fetch_array($result, null, PGSQL_NUM);
@@ -232,10 +233,13 @@ class PostgresConnector extends Connector {
                 }
                 break;
             }
-            catch (\Exception $ex) {
+            catch (\Throwable $ex) {}
+            catch (\Exception $ex) {}
+
+            if ($ex) {
                 if (strContainsI($ex->getMessage(), 'current transaction is aborted, commands ignored until end of transaction block')) {
                     if ($this->transactionLevel > 0) {
-                        $this->transactionLevel = 1;            // immediately skip nested transactions
+                        $this->transactionLevel = 1;        // immediately skip nested transactions
                         $this->rollback();
                         continue;
                     }
@@ -253,19 +257,20 @@ class PostgresConnector extends Connector {
      * @return $this
      */
     public function connect() {
-        if (!function_exists('\pg_connect')) throw new RuntimeException('Undefined function pg_connect(), pgsql extension is not available');
+        if (!function_exists('\pg_connect')) throw new RuntimeException('Undefined function pg_connect() (pgsql extension is not available)');
 
         $connStr = $this->getConnectionString();
+        $ex = null;
+
         try {
             $php_errormsg = '';
             $this->hConnection = pg_connect($connStr, PGSQL_CONNECT_FORCE_NEW);
-            !$this->hConnection && trigger_error($php_errormsg, E_USER_ERROR);
+            if (!$this->hConnection) throw new DatabaseException($php_errormsg);
         }
-        catch (\Exception $ex) {
-            if (!$ex instanceof IRosasurferException)
-                $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex);
-            throw $ex->addMessage('Cannot connect to PostgreSQL server with connection string: "'.$connStr.'"');
-        }
+        catch (IRosasurferException $ex) {}
+        catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
+        catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
+        if ($ex) throw $ex->addMessage('Cannot connect to PostgreSQL server with connection string: "'.$connStr.'"');
 
         $this->setConnectionOptions();
         return $this;
@@ -323,7 +328,7 @@ class PostgresConnector extends Connector {
      * {@inheritdoc}
      */
     public function escapeIdentifier($name) {
-        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
+        Assert::string($name);
 
         if (!$this->isConnected())
             $this->connect();
@@ -347,8 +352,7 @@ class PostgresConnector extends Connector {
     public function escapeLiteral($value) {
         // bug or feature: pg_escape_literal(null) => '' quoted empty string instead of 'null'
         if ($value === null)  return 'null';
-
-        if (!is_scalar($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.gettype($value));
+        Assert::scalar($value);
 
         if (is_bool ($value)) return $value ? 'true':'false';
         if (is_int  ($value)) return (string) $value;
@@ -370,7 +374,7 @@ class PostgresConnector extends Connector {
         // bug or feature: pg_escape_string(null) => empty string instead of NULL
         if ($value === null)
             return null;
-        if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.gettype($value));
+        Assert::string($value);
 
         if (!$this->isConnected())
             $this->connect();
@@ -441,22 +445,22 @@ class PostgresConnector extends Connector {
      * @throws DatabaseException on errors
      */
     public function executeRaw($sql) {
-        if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.gettype($sql));
+        Assert::string($sql);
         if (!$this->isConnected())
             $this->connect();
 
         // execute statement
-        $result = null;
+        $result = $ex = null;
         try {
             $result = pg_query($this->hConnection, $sql);         // wraps multi-statement queries in a transaction
-            !$result && trigger_error(pg_last_error($this->hConnection), E_USER_ERROR);
+            if (!$result) throw new DatabaseException(pg_last_error($this->hConnection));
         }
-        catch (\Exception $ex) {
-            if (!$ex instanceof IRosasurferException)
-                $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex);
-            throw $ex->addMessage('Database: '.$this->getConnectionDescription().NL.'SQL: "'.$sql.'"');
-        }
+        catch (IRosasurferException $ex) {}
+        catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
+        catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
+        if ($ex) throw $ex->addMessage('Database: '.$this->getConnectionDescription().NL.'SQL: "'.$sql.'"');
 
+        /** @var string $status_string */
         $status_string = pg_result_status($result, PGSQL_STATUS_STRING);
 
         // reset last_insert_id on INSERTs, afterwards it's resolved on request as it requires an extra SQL query
@@ -469,7 +473,6 @@ class PostgresConnector extends Connector {
             $this->lastAffectedRows = pg_affected_rows($result);
 
         return $result;
-
     }
 
 
@@ -554,16 +557,20 @@ class PostgresConnector extends Connector {
      * @link   http://github.com/rosasurfer/ministruts/tree/master/src/db
      */
     public function lastInsertId() {
-        if ($this->lastInsertId === null) {
+        if (!isset($this->lastInsertId)) {
             $version = $this->getVersionNumber();
+
             if ($version < 8001000) {              // 8.1
                 $this->lastInsertId = -1;
             }
             else {
+                $ex = null;
                 try {
                     $this->lastInsertId = $this->query('select lastVal()')->fetchInt();
                 }
-                catch (\Exception $ex) {
+                catch (\Throwable $ex) {}
+                catch (\Exception $ex) {}
+                if ($ex) {
                     if (stripos($ex->getMessage(), 'ERROR:  lastval is not yet defined in this session') === false)
                         throw $ex;
                     $this->lastInsertId = 0;

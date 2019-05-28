@@ -1,8 +1,8 @@
 <?php
 namespace rosasurfer\cache;
 
-use rosasurfer\exception\IllegalTypeException;
-use rosasurfer\monitor\Dependency;
+use rosasurfer\cache\monitor\Dependency;
+use rosasurfer\core\assert\Assert;
 
 
 /**
@@ -124,8 +124,8 @@ final class ReferencePool extends CachePeer {
      * @return bool - TRUE bei Erfolg, FALSE andererseits
      */
     public function set($key, &$value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null) {
-        if (!is_string($key))  throw new IllegalTypeException('Illegal type of parameter $key: '.gettype($key));
-        if (!is_int($expires)) throw new IllegalTypeException('Illegal type of parameter $expires: '.gettype($expires));
+        Assert::string($key,  '$key');
+        Assert::int($expires, '$expires');
 
         // im Cache wird ein array(creation_timestamp, value, expires, dependency) gespeichert
         $this->pool[$key] = array($timestamp=null, $value, $expires=null, $dependency);

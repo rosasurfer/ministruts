@@ -1,8 +1,8 @@
 <?php
 namespace rosasurfer\console\docopt;
 
-use rosasurfer\core\Object;
-use rosasurfer\exception\IllegalAccessException;
+use rosasurfer\core\CObject;
+use rosasurfer\core\exception\IllegalAccessException;
 
 
 /**
@@ -10,7 +10,7 @@ use rosasurfer\exception\IllegalAccessException;
  *
  * Represents the parsing result of a {@link DocoptParser::parse()} call.
  */
-class DocoptResult extends Object implements \ArrayAccess, \IteratorAggregate {
+class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
 
 
     /** @var array */

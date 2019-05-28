@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\net\http;
 
-use rosasurfer\core\Object;
+use rosasurfer\core\CObject;
 
 
 /**
@@ -11,7 +11,7 @@ use rosasurfer\core\Object;
  *
  * @todo  toString()-Methode implementieren, die alle Header anzeigt
  */
-abstract class HttpResponse extends Object {
+abstract class HttpResponse extends CObject {
 
 
     // Server status codes; see RFC 2068.

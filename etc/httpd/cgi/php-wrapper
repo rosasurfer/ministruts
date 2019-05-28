@@ -17,4 +17,4 @@ export PHP_FCGI_MAX_REQUESTS=2000
 export PHPRC=./
 
 # Replace with the path to your FastCGI-enabled PHP executable.
-exec php56-cgi "$@"
+exec php-cgi "$@"

@@ -1,9 +1,9 @@
 <?php
 namespace rosasurfer\db\orm\meta;
 
-use rosasurfer\core\Object;
+use rosasurfer\core\CObject;
+use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\db\ConnectorInterface as IConnector;
-use rosasurfer\exception\RuntimeException;
 
 use function rosasurfer\is_class;
 
@@ -11,7 +11,7 @@ use function rosasurfer\is_class;
 /**
  * A PropertyMapping is an object encapsulating meta information about how to map a PHP class property to a database column.
  */
-class PropertyMapping extends Object {
+class PropertyMapping extends CObject {
 
 
     /** @var EntityMapping - the entity mapping this mapping is a part of */

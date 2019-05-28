@@ -6,12 +6,12 @@ use rosasurfer\console\docopt\DocoptParser;
 use rosasurfer\console\docopt\DocoptResult;
 use rosasurfer\console\io\Input;
 use rosasurfer\console\io\Output;
-use rosasurfer\core\Object;
+use rosasurfer\core\CObject;
+use rosasurfer\core\assert\Assert;
+use rosasurfer\core\exception\IllegalStateException;
+use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\di\Di;
-use rosasurfer\exception\IllegalStateException;
-use rosasurfer\exception\IllegalTypeException;
-use rosasurfer\exception\InvalidArgumentException;
-use rosasurfer\exception\RuntimeException;
 
 
 /**
@@ -20,7 +20,7 @@ use rosasurfer\exception\RuntimeException;
  * The configuration of a command will be frozen after it is added to the {@link Application}. A frozen configuration
  * can't be changed anymore.
  */
-class Command extends Object {
+class Command extends CObject {
 
 
     /** @var string */
@@ -44,12 +44,6 @@ class Command extends Object {
     /** @var bool - whether the command configuration is frozen */
     private $frozen = false;
 
-    /** @var Input */
-    protected $input;
-
-    /** @var Output */
-    protected $output;
-
     /** @var int - the command's error status */
     protected $status = 0;
 
@@ -60,7 +54,6 @@ class Command extends Object {
      * Create a new command.
      */
     public function __construct() {
-        $this->output = $this->di(Output::class);
         $this->configure();
     }
 
@@ -82,17 +75,19 @@ class Command extends Object {
      * @return int - execution status (0 for success)
      */
     public function run() {
-        $this->input = new Input($this->docoptResult);
-        $this->di()->set(Input::class, $this->input);
+        $input = new Input($this->docoptResult);
+        $this->di()->set(Input::class, $input);
+        /** @var Output $output */
+        $output = $this->di(Output::class);
 
-        if ($this->validator) $error = $this->validator->__invoke($this->input, $this->output);
-        else                  $error = $this->validate($this->input, $this->output);
+        if ($this->validator) $error = $this->validator->__invoke($input, $output);
+        else                  $error = $this->validate($input, $output);
 
         if ($error)
             return $this->status = (int) $error;
 
-        if ($this->task) $status = $this->task->__invoke($this->input, $this->output);
-        else             $status = $this->execute($this->input, $this->output);
+        if ($this->task) $status = $this->task->__invoke($input, $output);
+        else             $status = $this->execute($input, $output);
 
         return $this->status = (int) $status;
     }
@@ -105,7 +100,7 @@ class Command extends Object {
      * @param  Input  $input
      * @param  Output $output
      *
-     * @return int - validation error status: 0 for "no error"
+     * @return int - validation error status (0 for no error)
      */
     protected function validate(Input $input, Output $output) {
         return 0;
@@ -210,8 +205,8 @@ class Command extends Object {
      * @link   http://docopt.org
      */
     public function setDocoptDefinition($doc) {
-        if ($this->frozen)    throw new RuntimeException('Configuration of "'.get_class($this).'" is frozen');
-        if (!is_string($doc)) throw new IllegalTypeException('Illegal type of parameter $doc: '.gettype($doc));
+        if ($this->frozen) throw new RuntimeException('Configuration of "'.get_class($this).'" is frozen');
+        Assert::string($doc);
 
         $parser = new DocoptParser();
         $this->docoptResult = $parser->parse($doc);
@@ -293,7 +288,7 @@ class Command extends Object {
      * @return $this
      */
     private function validateName($name) {
-        if (!is_string($name))    throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
+        Assert::string($name);
         if ($name != trim($name)) throw new InvalidArgumentException('Invalid parameter $name: "'.$name.'" (enclosing white space)');
 
         if (strlen($name) && !preg_match('/^[^\s:]+(:[^\s:]+)*$/', $name))

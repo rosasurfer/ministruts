@@ -2,14 +2,14 @@
 namespace rosasurfer\console\io;
 
 use rosasurfer\console\docopt\DocoptResult;
-use rosasurfer\core\Object;
-use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\core\CObject;
+use rosasurfer\core\assert\Assert;
 
 
 /**
  * Input
  */
-class Input extends Object {
+class Input extends CObject {
 
 
     /** @var DocoptResult */
@@ -87,7 +87,7 @@ class Input extends Object {
      * @return bool
      */
     public function isArgument($name) {
-        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
+        Assert::string($name);
         if (!$this->docoptResult)
             return false;
 
@@ -153,7 +153,7 @@ class Input extends Object {
      * @return bool
      */
     public function isOption($name) {
-        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
+        Assert::string($name);
         if (!$this->docoptResult)
             return false;
 

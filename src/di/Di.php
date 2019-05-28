@@ -1,11 +1,11 @@
 <?php
 namespace rosasurfer\di;
 
-use rosasurfer\core\Object;
+use rosasurfer\core\CObject;
+use rosasurfer\core\assert\Assert;
 use rosasurfer\di\service\Service;
 use rosasurfer\di\service\ServiceInterface as IService;
 use rosasurfer\di\service\ServiceNotFoundException;
-use rosasurfer\exception\IllegalTypeException;
 
 
 /**
@@ -33,7 +33,7 @@ use rosasurfer\exception\IllegalTypeException;
  *  $tile    = $di->create('tile', ...$args);               // resolving a new instance using the factory pattern
  * </pre>
  */
-class Di extends Object implements DiInterface {
+class Di extends CObject implements DiInterface {
 
 
     /** @var IService[] - a list of registered services */
@@ -56,7 +56,7 @@ class Di extends Object implements DiInterface {
      * @return bool - whether a custom service definitions has been found and successfully loaded
      */
     protected function loadCustomServices($configDir) {
-        if (!is_string($configDir)) throw new IllegalTypeException('Illegal type of parameter $configDir: '.gettype($configDir));
+        Assert::string($configDir);
         if (!is_file($file = $configDir.'/services.php'))
             return false;
 
@@ -80,14 +80,6 @@ class Di extends Object implements DiInterface {
 
 
     /**
-     * @deprecated
-     */
-    public function isService($name) {
-        return $this->has($name);
-    }
-
-
-    /**
      * {@inheritdoc}
      *
      * @param  string $name
@@ -99,9 +91,8 @@ class Di extends Object implements DiInterface {
         try {
             return $this->services[$name]->resolve($factory=false);
         }
-        catch (\Exception $ex) {
-            throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex);
-        }
+        catch (\Throwable $ex) { throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex); }
+        catch (\Exception $ex) { throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex); }
     }
 
 
@@ -118,9 +109,8 @@ class Di extends Object implements DiInterface {
         try {
             return $this->services[$name]->resolve($factory=true, $params);
         }
-        catch (\Exception $ex) {
-            throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex);
-        }
+        catch (\Throwable $ex) { throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex); }
+        catch (\Exception $ex) { throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex); }
     }
 
 

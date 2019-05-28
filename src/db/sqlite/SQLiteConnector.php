@@ -2,12 +2,12 @@
 namespace rosasurfer\db\sqlite;
 
 use rosasurfer\config\ConfigInterface;
+use rosasurfer\core\assert\Assert;
+use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
+use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\db\Connector;
 use rosasurfer\db\DatabaseException;
-use rosasurfer\exception\IllegalTypeException;
-use rosasurfer\exception\InvalidArgumentException;
-use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
-use rosasurfer\exception\RuntimeException;
 
 use function rosasurfer\isRelativePath;
 
@@ -102,8 +102,8 @@ class SQLiteConnector extends Connector {
      * @return $this
      */
     protected function setFile($file) {
-        if (!is_string($file)) throw new IllegalTypeException('Illegal type of parameter $file: '.gettype($file));
-        if (!strlen($file))    throw new InvalidArgumentException('Invalid parameter $file: "'.$file.'" (empty)');
+        Assert::string($file);
+        if (!strlen($file)) throw new InvalidArgumentException('Invalid parameter $file: "'.$file.'" (empty)');
 
         if ($file == ':memory:' || !isRelativePath($file)) {
             $this->file = $file;
@@ -136,15 +136,18 @@ class SQLiteConnector extends Connector {
      * @return $this
      */
     public function connect() {
-        if (!class_exists('SQLite3')) throw new RuntimeException('Undefined class \SQLite3, sqlite3 extension is not available');
+        if (!class_exists('SQLite3')) throw new RuntimeException('Undefined class \SQLite3 (sqlite3 extension is not available)');
 
-        try {                                                                   // available flags:
-            $flags  = SQLITE3_OPEN_READWRITE;                                   // SQLITE3_OPEN_CREATE
-            $sqlite = new \SQLite3($this->file, $flags);                        // SQLITE3_OPEN_READONLY
-        }                                                                       // SQLITE3_OPEN_READWRITE
-        catch (\Exception $ex) {
-            if (!$ex instanceof IRosasurferException)
-                $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex);
+        $flags = SQLITE3_OPEN_READWRITE;                                // available flags:
+        $ex = null;                                                     // SQLITE3_OPEN_CREATE
+        try {                                                           // SQLITE3_OPEN_READONLY
+            $this->sqlite = new \SQLite3($this->file, $flags);          // SQLITE3_OPEN_READWRITE
+        }
+        catch (IRosasurferException $ex) {}
+        catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
+        catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
+
+        if ($ex) {
             $file = $this->file;
             $what = $where = null;
             if (file_exists($file)) {
@@ -153,13 +156,12 @@ class SQLiteConnector extends Connector {
                     $where = ' (directory)';
             }
             else {
-                $what = ($flags & SQLITE3_OPEN_CREATE) ? 'create':'find';
+                $what = ($flags & SQLITE3_OPEN_CREATE) ? 'create' : 'find';
                 isRelativePath($file) && $where=' in "'.getcwd().'"';
             }
             throw $ex->addMessage('Cannot '.$what.' database file "'.$file.'"'.$where);
         }
 
-        $this->sqlite = $sqlite;
         $this->setConnectionOptions();
         return $this;
     }
@@ -212,8 +214,7 @@ class SQLiteConnector extends Connector {
      * {@inheritdoc}
      */
     public function escapeIdentifier($name) {
-        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
-
+        Assert::string($name);
         return '"'.str_replace('"', '""', $name).'"';
     }
 
@@ -224,8 +225,7 @@ class SQLiteConnector extends Connector {
     public function escapeLiteral($value) {
         // bug or feature: SQLite3::escapeString(null) => empty string instead of NULL
         if ($value === null)  return 'null';
-
-        if (!is_scalar($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.gettype($value));
+        Assert::scalar($value);
 
         if (is_bool ($value)) return (string)(int) $value;
         if (is_int  ($value)) return (string)      $value;
@@ -243,7 +243,7 @@ class SQLiteConnector extends Connector {
         // bug or feature: SQLite3::escapeString(null) => empty string instead of NULL
         if ($value === null)
             return null;
-        if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.gettype($value));
+        Assert::string($value);
 
         if (!$this->isConnected())
             $this->connect();
@@ -309,22 +309,21 @@ class SQLiteConnector extends Connector {
      * @throws DatabaseException on errors
      */
     public function executeRaw($sql) {
-        if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.gettype($sql));
+        Assert::string($sql);
         if (!$this->isConnected())
             $this->connect();
 
         // execute statement
-        $result = null;
+        $result = $ex = false;
         try {
             if ($this->skipResults) $result = $this->sqlite->exec($sql);        // TRUE on success, FALSE on error
             else                    $result = $this->sqlite->query($sql);       // bug: always SQLite3Result, never boolean
-            if (!$result) trigger_error('Error '.$this->sqlite->lastErrorCode().', '.$this->sqlite->lastErrorMsg(), E_USER_ERROR);
+            if (!$result) throw new DatabaseException('Error '.$this->sqlite->lastErrorCode().', '.$this->sqlite->lastErrorMsg());
         }
-        catch (\Exception $ex) {
-            if (!$ex instanceof IRosasurferException)
-                $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex);
-            throw $ex->addMessage('Database: '.$this->file.NL.'SQL: "'.$sql.'"');
-        }
+        catch (IRosasurferException $ex) {}
+        catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
+        catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
+        if ($ex) throw $ex->addMessage('Database: '.$this->file.NL.'SQL: "'.$sql.'"');
 
         // track last_insert_id
         $this->lastInsertId = $this->sqlite->lastInsertRowID();

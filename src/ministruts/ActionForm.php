@@ -1,14 +1,14 @@
 <?php
 namespace rosasurfer\ministruts;
 
-use rosasurfer\core\Object;
+use rosasurfer\core\CObject;
 
 
 /**
  * An ActionForm encapsulates and represents the user input. It provides an interface for {@link Action}s and business layer
  * to access and validate this input.
  */
-abstract class ActionForm extends Object {
+abstract class ActionForm extends CObject {
 
 
     /** @var Request [transient] - the request the form belongs to */

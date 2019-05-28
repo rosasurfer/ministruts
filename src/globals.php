@@ -199,18 +199,6 @@ function stderr($message) {
 
 
 /**
- * Print a message to STDERR.
- *
- * @param  string $message
- *
- * @deprecated
- */
-function stderror($message) {
-    \rosasurfer\stderr($message);
-}
-
-
-/**
  * Send an "X-Debug-???" header with a message. Each sent header name will end with a different and increasing number.
  *
  * @param  string $message
@@ -735,19 +723,6 @@ function typeOf($var) {
 
 
 /**
- * Check whether a directory exists. If not try to create it. Check further if write permission is granted.
- *
- * @param  string $path            - same as mkdir(): directory name
- * @param  int    $mode [optional] - same as mkdir(): permission mode to set if the directory is created<br>
- *                                                    (default: 0775 = rwxrwxr-x)
- * @deprecated
- */
-function mkDirWritable($path, $mode = 0775) {
-    \rosasurfer\mkDirWritable($path, $mode);
-}
-
-
-/**
  * Whether a directory is considered empty.
  *
  * (a directory with just '.svn' or '.git' is empty)
@@ -763,7 +738,7 @@ function is_dir_empty($dirname, $ignore = []) {
 
 
 /**
- * Auto-load the specified class, interface or trait. If the component was already loaded the call does nothing.
+ * Manually load the specified class, interface or trait. If the component was already loaded the call does nothing.
  *
  * @param  string $name - name
  *

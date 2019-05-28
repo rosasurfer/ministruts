@@ -1,14 +1,14 @@
 <?php
 namespace rosasurfer\db\orm\meta;
 
-use rosasurfer\core\Object;
-use rosasurfer\exception\RuntimeException;
+use rosasurfer\core\CObject;
+use rosasurfer\core\exception\RuntimeException;
 
 
 /**
  * An EntityMapping is an object encapsulating meta information about how to map a PHP class to a database table.
  */
-class EntityMapping extends Object implements \Iterator {
+class EntityMapping extends CObject implements \Iterator {
 
 
     /** @var string - the entity's class name */

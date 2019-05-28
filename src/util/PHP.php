@@ -3,9 +3,10 @@ namespace rosasurfer\util;
 
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\StaticClass;
-use rosasurfer\debug\DebugHelper;
-use rosasurfer\exception\IllegalTypeException;
-use rosasurfer\exception\RuntimeException;
+use rosasurfer\core\assert\Assert;
+use rosasurfer\core\debug\DebugHelper;
+use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
+use rosasurfer\core\exception\RuntimeException;
 
 use function rosasurfer\echoPre;
 use function rosasurfer\ini_get_bool;
@@ -66,7 +67,7 @@ class PHP extends StaticClass {
      * @return string - contents of STDOUT
      */
     public static function execProcess($cmd, &$stderr=null, &$exitCode=null, $dir=null, $env=null, array $options=[]) {
-        if (!is_string($cmd)) throw new IllegalTypeException('Illegal type of parameter $cmd: '.gettype($cmd));
+        Assert::string($cmd, '$cmd');
 
         // check whether the process needs to be watched asynchronously
         $argc         = func_num_args();
@@ -86,11 +87,15 @@ class PHP extends StaticClass {
         ];
         $pipes = [];
 
+        $hProc = $ex = null;
         try {
             $hProc = proc_open($cmd, $descriptors, $pipes, $dir, $env, ['bypass_shell'=>true]);
         }
-        catch (\Exception $ex) {
-            $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex);
+        catch (IRosasurferException $ex) {}
+        catch (\Throwable           $ex) { $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex); }
+        catch (\Exception           $ex) { $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex); }
+
+        if ($ex) {
             if (WINDOWS && preg_match('/proc_open\(\): CreateProcess failed, error code - ([0-9]+)/i', $ex->getMessage(), $match)) {
                 $error = Windows::errorToString((int) $match[1]);
                 if ($error != $match[1]) $ex->addMessage($match[1].': '.$error);

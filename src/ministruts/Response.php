@@ -2,11 +2,10 @@
 namespace rosasurfer\ministruts;
 
 use rosasurfer\core\Singleton;
-
-use rosasurfer\exception\IllegalTypeException;
-use rosasurfer\exception\InvalidArgumentException;
-use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
-use rosasurfer\exception\RuntimeException;
+use rosasurfer\core\assert\Assert;
+use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
+use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\net\http\HttpResponse;
 use rosasurfer\util\PHP;
 
@@ -58,8 +57,8 @@ class Response extends Singleton {
      * @return $this
      */
     public function setStatus($status) {
-        if (!is_int($status)) throw new IllegalTypeException('Illegal type of parameter $status: '.gettype($status));
-        if ($status < 1)      throw new InvalidArgumentException('Invalid argument $status: '.$status);
+        Assert::int($status);
+        if ($status < 1) throw new InvalidArgumentException('Invalid argument $status: '.$status);
 
         $this->status = $status;
         return $this;

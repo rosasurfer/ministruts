@@ -2,7 +2,7 @@
 namespace rosasurfer\util;
 
 use rosasurfer\core\StaticClass;
-use rosasurfer\exception\IllegalTypeException;
+use rosasurfer\core\assert\Assert;
 
 
 /**
@@ -32,7 +32,7 @@ class Windows extends StaticClass {
      * @return string
      */
     public static function errorToString($error) {
-        if (!is_int($error)) throw new IllegalTypeException('Illegal type of parameter $error: '.gettype($error));
+        Assert::int($error);
 
         if (key_exists($error, self::$win32Errors))
             return self::$win32Errors[$error][0];
@@ -48,7 +48,7 @@ class Windows extends StaticClass {
      * @return string
      */
     public static function errorDescription($error) {
-        if (!is_int($error)) throw new IllegalTypeException('Illegal type of parameter $error: '.gettype($error));
+        Assert::int($error);
 
         if (key_exists($error, self::$win32Errors))
             return self::$win32Errors[$error][1];

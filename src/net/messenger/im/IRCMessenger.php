@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\net\messenger\im;
 
-use rosasurfer\exception\UnimplementedFeatureException;
+use rosasurfer\core\exception\UnimplementedFeatureException;
 use rosasurfer\net\messenger\Messenger;
 
 

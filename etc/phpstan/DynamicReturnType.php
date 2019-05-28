@@ -9,14 +9,14 @@ use PHPStan\Type\UnionType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeWithClassName;
 
-use rosasurfer\core\Object;
-use rosasurfer\exception\RuntimeException;
+use rosasurfer\core\CObject;
+use rosasurfer\core\exception\RuntimeException;
 
 
 /**
  *
  */
-abstract class DynamicReturnType extends Object {
+abstract class DynamicReturnType extends CObject {
 
 
     /** @var string */

@@ -1,15 +1,16 @@
 <?php
 namespace rosasurfer\net\http;
 
-use rosasurfer\core\Object;
-use rosasurfer\exception\IllegalTypeException;
-use rosasurfer\exception\InvalidArgumentException;
+use rosasurfer\core\CObject;
+use rosasurfer\core\assert\Assert;
+use rosasurfer\core\exception\IllegalTypeException;
+use rosasurfer\core\exception\InvalidArgumentException;
 
 
 /**
  * HttpRequest
  */
-class HttpRequest extends Object {
+class HttpRequest extends CObject {
 
 
     /** @var string */
@@ -37,18 +38,6 @@ class HttpRequest extends Object {
 
 
     /**
-     * Create a new instance.
-     *
-     * @return static
-     *
-     * @deprecated
-     */
-    public static function create() {
-        return new static();
-    }
-
-
-    /**
      * Return the request's HTTP method.
      *
      * @return string
@@ -66,7 +55,7 @@ class HttpRequest extends Object {
      * @return $this
      */
     public function setMethod($method) {
-        if (!is_string($method))                 throw new IllegalTypeException('Illegal type of parameter $method: '.gettype($method));
+        Assert::string($method);
         if ($method!=='GET' && $method!=='POST') throw new InvalidArgumentException('Invalid argument $method: '.$method);
 
         $this->method = $method;
@@ -92,13 +81,9 @@ class HttpRequest extends Object {
      * @return $this
      */
     public function setUrl($url) {
-        if (!is_string($url)) throw new IllegalTypeException('Illegal type of parameter $url: '.gettype($url));
-
+        Assert::string($url);
         // TODO: validate URL
-
-        if (strpos($url, ' ') !== false)
-            throw new InvalidArgumentException('Invalid argument $url: '.$url);
-
+        if (strpos($url, ' ') !== false)throw new InvalidArgumentException('Invalid argument $url: '.$url);
         $this->url = $url;
         return $this;
     }
@@ -113,9 +98,9 @@ class HttpRequest extends Object {
      * @return $this
      */
     public function setHeader($name, $value) {
-        if (!is_string($name))                   throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
-        if (!strlen($name))                      throw new InvalidArgumentException('Invalid argument $name: '.$name);
-        if (isset($value) && !is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.gettype($value));
+        Assert::string($name, '$name');
+        if (!strlen($name)) throw new InvalidArgumentException('Invalid argument $name: '.$name);
+        Assert::nullOrString($value, '$value');
 
         $name  = trim($name);
         $value = trim($value);
@@ -145,10 +130,9 @@ class HttpRequest extends Object {
      * @see http://stackoverflow.com/questions/3241326/set-more-than-one-http-header-with-the-same-name
      */
     public function addHeader($name, $value) {
-        if (!is_string($name))  throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
+        Assert::string($name,  '$name');
+        Assert::string($value, '$value');
         if (!strlen($name))     throw new InvalidArgumentException('Invalid argument $name: '.$name);
-
-        if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.gettype($value));
         if (!strlen($value))    throw new InvalidArgumentException('Invalid argument $value: '.$value);
 
         $name  = trim($name);
@@ -176,8 +160,8 @@ class HttpRequest extends Object {
      * @return string|null - header value or NULL if no such header was found
      */
     public function getHeader($name) {
-        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
-        if (!strlen($name))    throw new InvalidArgumentException('Invalid argument $name: '.$name);
+        Assert::string($name);
+        if (!strlen($name)) throw new InvalidArgumentException('Invalid argument $name: '.$name);
 
         $headers = $this->getHeaders($name);
         if ($headers)
@@ -199,10 +183,10 @@ class HttpRequest extends Object {
         elseif (is_string($names)) $names = [$names];
         elseif (is_array($names)) {
             foreach ($names as $i => $name) {
-                if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $names['.$i.']: '.gettype($name));
+                Assert::string($name, '$names['.$i.']');
             }
         }
-        else                           throw new IllegalTypeException('Illegal type of parameter $names: '.gettype($names));
+        else throw new IllegalTypeException('Illegal type of parameter $names: '.gettype($names));
 
         // without a name return all headers
         if (!$names) {
