@@ -51,7 +51,7 @@ abstract class Mailer extends CObject implements MailerInterface {
      *
      * @param  array $options [optional] - mailer options
      *
-     * @return self
+     * @return Mailer
      */
     public static function create(array $options = []) {
         $class = PHPMailer::class;                          // default mailer

@@ -463,7 +463,7 @@ class PostgresConnector extends Connector {
         catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
         if ($ex) throw $ex->addMessage('Database: '.$this->getConnectionDescription().NL.'SQL: "'.$sql.'"');
 
-        /** @var string $status_string */
+        /** @var string $status */
         $status = pg_result_status($result, PGSQL_STATUS_STRING);
 
         // reset last_insert_id on INSERTs, afterwards it's resolved on request as it requires an extra SQL query

@@ -34,7 +34,7 @@ abstract class Singleton extends CObject {
      * @param  string   $class  - class name
      * @param  array ...$params - variable list of constructor parameters
      *
-     * @return self
+     * @return Singleton
      */
     final protected static function getInstance($class, ...$params) {
         if (isset(self::$instances[$class]))
