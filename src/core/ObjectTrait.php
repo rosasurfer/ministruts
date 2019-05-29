@@ -14,9 +14,9 @@ trait ObjectTrait {
 
 
     /**
-     * Method catching otherwise fatal errors triggered by calls of non-existing instance methods.
+     * Method catching otherwise fatal errors triggered by calls of non-existing or inaccessible instance methods.
      *
-     * @param  string $method - name of the non-existing method
+     * @param  string $method - name of the called method
      * @param  array  $args   - arguments passed to the method call
      *
      * @throws RuntimeException
@@ -34,21 +34,21 @@ trait ObjectTrait {
                 break;
             }
         }
-        throw new RuntimeException('Call of undefined method '.$class.'->'.$method.'()');
+        throw new RuntimeException('Call of undefined or inaccessible method '.$class.'->'.$method.'()');
     }
 
 
     /**
-     * Method catching otherwise fatal errors triggered by calls of non-existing static methods.
+     * Method catching otherwise fatal errors triggered by calls of non-existing or inaccessible static methods.
      *
-     * @param  string $method - name of the non-existing method
+     * @param  string $method - name of the called method
      * @param  array  $args   - arguments passed to the method call
      *
      * @throws RuntimeException
      */
     public static function __callStatic($method, array $args) {
         // TODO: adjust error message according to stacktrace
-        throw new RuntimeException('Call of undefined method '.static::class.'::'.$method.'()');
+        throw new RuntimeException('Call of undefined or inaccessible method '.static::class.'::'.$method.'()');
     }
 
 

@@ -672,7 +672,7 @@ abstract class PersistableObject extends CObject {
      * @param  string $class - entity class name
      * @param  array  $row   - array with property values (a result row from a database query)
      *
-     * @return self
+     * @return PersistableObject
      */
     public static function populateNew($class, array $row) {
         if (static::class != __CLASS__)                  throw new IllegalAccessException('Cannot access method '.__METHOD__.'() on a derived class.');

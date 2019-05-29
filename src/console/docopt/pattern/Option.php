@@ -40,7 +40,7 @@ class Option extends LeafPattern {
     /**
      * @param  string $optionDescription
      *
-     * @return self
+     * @return Option
      */
     public static function parse($optionDescription) {
         $short    = null;

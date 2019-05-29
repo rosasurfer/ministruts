@@ -28,7 +28,7 @@ class Argument extends LeafPattern {
     /**
      * @param  string $source
      *
-     * @return self
+     * @return Argument
      */
     public static function parse($source) {
         $name = null;

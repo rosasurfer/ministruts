@@ -45,7 +45,7 @@ class ChainedDependency extends Dependency {
      *
      * @param  Dependency $dependency - Abhaengigkeit
      *
-     * @return self
+     * @return ChainedDependency
      */
     public function andDependency(Dependency $dependency) {
         if ($dependency === $this)
@@ -67,7 +67,7 @@ class ChainedDependency extends Dependency {
      *
      * @param  Dependency $dependency - Abhaengigkeit
      *
-     * @return self
+     * @return ChainedDependency
      */
     public function orDependency(Dependency $dependency) {
         if ($dependency === $this)

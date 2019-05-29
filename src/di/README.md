@@ -43,13 +43,13 @@ return [
 Dependencies can be defined at runtime:
 ```php
 $di = $this->di();                         // getting the default container in a class context
-$di = Application::getDi();                // getting the default container if not in a class context
+$di = Application::getDi();                // getting the default container in a non-class context
 
 // defining a parameterless dependency
 $di->set('warrior', \rosasurfer\model\Hobbit::class);
 ```
-A parameterless definition can be used in a parameterized factory context. The opposite (using a definition which requires
-arguments in a parameterless context, i.e. service location) is not possible:
+A parameterless definition can be used in a parameterized factory context. The opposite - using a definition which requires
+parameters in a parameterless context (i.e. service location) - is not possible:
 ```php
 $di = Application::getDi();
 $options = ['status'=>'not-afraid'];

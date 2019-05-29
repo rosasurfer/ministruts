@@ -40,7 +40,7 @@ abstract class DAO extends Singleton {
      *
      * @param  string $class - DAO class name
      *
-     * @return self
+     * @return DAO
      */
     final public static function getImplementation($class) {
         if (!is_a($class, __CLASS__, $allowString=true)) {

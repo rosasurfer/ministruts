@@ -212,7 +212,7 @@ class ActionForward extends CObject {
     /**
      * Return an identical copy of the instance.
      *
-     * @return self
+     * @return ActionForward
      */
     public function copy() {
         return clone $this;

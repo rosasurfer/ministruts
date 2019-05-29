@@ -38,7 +38,7 @@ class TokenIterator extends \ArrayIterator {
     /**
      * @param  string $source
      *
-     * @return self
+     * @return TokenIterator
      */
     public static function fromPattern($source) {
         $source = preg_replace('/([\[\]\(\)\|]|\.\.\.)/', ' $1 ', $source);
