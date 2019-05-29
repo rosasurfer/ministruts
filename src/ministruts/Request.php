@@ -1207,7 +1207,7 @@ class Request extends Singleton {
                 $string .= NL.substr($content, 0, 1024).NL;     // limit the request body to 1024 bytes
             }
 
-            Assert::string($string);                            // Ensure the method returns a string value as otherwise...
+            Assert::string($string);                            // Ensure the method returns a string as otherwise...
             return $string;                                     // PHP will trigger a non-catchable fatal error.
         }
         catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }

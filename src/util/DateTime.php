@@ -23,7 +23,7 @@ class DateTime extends \DateTime {
     public function __toString() {
         try {
             $value = $this->format('l, d-M-Y H:i:s O (T)');     // Monday, 13-Mar-2017 13:19:59 +0200 (EET)
-            Assert::string($value);                             // Ensure the method returns a string value as otherwise...
+            Assert::string($value);                             // Ensure the method returns a string as otherwise...
             return $value;                                      // PHP will trigger a non-catchable fatal error.
         }
         catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }

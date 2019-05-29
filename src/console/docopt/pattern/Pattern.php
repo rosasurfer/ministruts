@@ -198,7 +198,7 @@ abstract class Pattern extends CObject {
     public function __toString() {
         try {
             $value = serialize($this);
-            Assert::string($value);                             // Ensure the method returns a string value as otherwise...
+            Assert::string($value);                             // Ensure the method returns a string as otherwise...
             return $value;                                      // PHP will trigger a non-catchable fatal error.
         }
         catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }
