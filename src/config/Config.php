@@ -47,9 +47,10 @@ use const rosasurfer\NL;
  * key                       = value            # the root value of an array is accessed via an empty subkey: key.""
  *
  * &lt;?php
- * Config::get('db.connector')                  # return a single value
- * Config::get('db')                            # return an associative array of values ['connector'=>..., 'host'=>...]
- * Config::get('db.options')                    # return a numerical indexed array of values [0=>..., 1=>..., 2=>...]
+ * $config = Application::getConfig();
+ * $config->get('db.connector')                 # return a single value
+ * $config->get('db')                           # return an associative array of values ['connector'=>..., 'host'=>...]
+ * $config->get('db.options')                   # return a numerical indexed array of values [0=>..., 1=>..., 2=>...]
  * </pre>
  */
 class Config extends CObject implements ConfigInterface {
