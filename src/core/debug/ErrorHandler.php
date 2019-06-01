@@ -322,7 +322,7 @@ class ErrorHandler extends StaticClass {
     public static function handleDestructorException($exception) {
         if (self::isInShutdown()) {
             $handler = set_exception_handler(function() {});    // resolve the currently active exception handler
-            restore_error_handler();
+            restore_exception_handler();
             call_user_func($handler, $exception);
 
             // Calling exit() is the only way to prevent the immediately following non-catchable fatal error.
@@ -346,7 +346,7 @@ class ErrorHandler extends StaticClass {
      */
     public static function handleToStringException($exception) {
         $handler = set_exception_handler(function() {});        // resolve the currently active exception handler
-        restore_error_handler();
+        restore_exception_handler();
         call_user_func($handler, $exception);
 
         // Calling exit() is the only way to prevent the immediately following non-catchable fatal error.
