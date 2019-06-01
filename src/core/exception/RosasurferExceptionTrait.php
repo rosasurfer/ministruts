@@ -33,7 +33,9 @@ trait RosasurferExceptionTrait {
      * @return $this
      */
     public function addMessage($message) {
-        $this->message = trim(trim($this->message).NL.$message);
+        if (strlen($message)) {
+            $this->message = trim(trim($this->message).NL.$message);
+        }
         return $this;
     }
 

@@ -47,37 +47,11 @@ class ErrorHandler extends StaticClass {
     const THROW_EXCEPTIONS = 2;
 
 
-    /** @var callable - the registered error handler */
-    private static $errorHandler;
-
     /** @var int - the mode the error handler is configured for, can be either self::LOG_ERRORS or self::THROW_EXCEPTIONS */
     private static $errorMode;
 
-    /** @var callable - the registered exception handler */
-    private static $exceptionHandler;
-
     /** @var bool - whether the script is in the shutdown phase */
     private static $inShutdown;
-
-
-    /**
-     * Get the registered error handler (if any).
-     *
-     * @return callable
-     */
-    public static function getErrorHandler() {
-        return self::$errorHandler;
-    }
-
-
-    /**
-     * Get the registered exception handler (if any).
-     *
-     * @return callable
-     */
-    public static function getExceptionHandler() {
-        return self::$exceptionHandler;
-    }
 
 
     /**
@@ -93,32 +67,21 @@ class ErrorHandler extends StaticClass {
     /**
      * Setup global error handling.
      *
-     * @param  int $mode - mode the error handler to setup for
-     *                     can be either self::LOG_ERRORS or self::THROW_EXCEPTIONS
-     *
-     * @return mixed - Returns a string containing the previously defined error handler (if any). If the passed $mode
-     *                 parameter is invalid or if the built-in error handler was active NULL is returned. If the previous
-     *                 error handler was a class method an indexed array with the class and the method name is returned.
+     * @param  int $mode - type of error handling: self::LOG_ERRORS | self::THROW_EXCEPTIONS
      */
     public static function setupErrorHandling($mode) {
         if     ($mode === self::LOG_ERRORS      ) self::$errorMode = self::LOG_ERRORS;
         elseif ($mode === self::THROW_EXCEPTIONS) self::$errorMode = self::THROW_EXCEPTIONS;
-        else                                      return null;
-
-        self::$errorHandler = __CLASS__.'::handleError';
-        return set_error_handler(self::$errorHandler, error_reporting());
+        else                                      return;
+        set_error_handler(__CLASS__.'::handleError', error_reporting());
     }
 
 
     /**
      * Setup global exception handling.
-     *
-     * @return callable|null - Returns the name of the previously defined exception handler, or NULL if no previous handler
-     *                         was defined or an error occurred.
      */
     public static function setupExceptionHandling() {
-        self::$exceptionHandler = __CLASS__.'::handleException';
-        $previous = set_exception_handler(self::$exceptionHandler);
+        set_exception_handler(__CLASS__.'::handleException');
 
         /**
          * Detect entering of the script's shutdown phase to be capable of handling destructor exceptions during shutdown
@@ -130,7 +93,6 @@ class ErrorHandler extends StaticClass {
         register_shutdown_function(function() {
             self::$inShutdown = true;
         });
-        return $previous;
     }
 
 
@@ -155,9 +117,9 @@ class ErrorHandler extends StaticClass {
      * @throws PHPError
      */
     public static function handleError($level, $message, $file, $line, array $context = null) {
-        //echoPre(__METHOD__.'()  '.DebugHelper::errorLevelToStr($level).': $message='.$message.', $file='.$file.', $line='.$line);
+        //echoPre(DebugHelper::errorLevelToStr($level).': $message='.$message.', $file='.$file.', $line='.$line);
 
-        // (1) Ignore suppressed errors and errors not covered by the current reporting level.
+        // Ignore suppressed errors and errors not covered by the current reporting level.
         $reportingLevel = error_reporting();
         if (!$reportingLevel)            return false;     // the @ operator was specified
         if (!($reportingLevel & $level)) return true;      // the error is not covered by current reporting level
@@ -168,7 +130,7 @@ class ErrorHandler extends StaticClass {
         $logContext['file'] = $file;
         $logContext['line'] = $line;
 
-        // (2) Process errors according to their severity level.
+        // Process errors according to their severity level.
         switch ($level) {
             // log non-critical errors and continue normally
             case E_DEPRECATED     : return true(Logger::log($message, L_INFO,   $logContext));
@@ -177,7 +139,7 @@ class ErrorHandler extends StaticClass {
             case E_USER_WARNING   : return true(Logger::log($message, L_WARN,   $logContext));
         }
 
-        // (3) Wrap everything else in the matching PHPError exception.
+        // Wrap everything else in the matching PHPError exception.
         switch ($level) {
             case E_PARSE            : $exception = new PHPParseError      ($message, $code=null, $severity=$level, $file, $line); break;
             case E_COMPILE_WARNING  : $exception = new PHPCompileWarning  ($message, $code=null, $severity=$level, $file, $line); break;
@@ -194,17 +156,17 @@ class ErrorHandler extends StaticClass {
             default                 : $exception = new PHPUnknownError    ($message, $code=null, $severity=$level, $file, $line);
         }
 
-        // (4) Handle the error according to the error configuration.
+        // Handle the error according to the configuration.
         if (self::$errorMode == self::LOG_ERRORS) {
             Logger::log($exception, L_ERROR, $logContext);
             return true;
         }
 
         /**
-         * (5) Handle cases where throwing an exception is not possible or not allowed.
+         * Handle cases where throwing an exception is not possible or not allowed.
          *
-         * (5.1) Errors triggered by require() or require_once()
-         * -----------------------------------------------------
+         * Errors triggered by require() or require_once():
+         * ------------------------------------------------
          * Problem:  PHP errors triggered by require() or require_once() are non-catchable errors and do not follow regular
          *           application flow. PHP terminates the script after leaving the error handler, thrown exceptions are
          *           ignored. This termination is intended behaviour and the main difference to include() and include_once().
@@ -216,12 +178,14 @@ class ErrorHandler extends StaticClass {
         if ($trace) {                                                   // after a FATAL error the trace may be empty
             $function = DebugHelper::getFQFunctionName($trace[0]);
             if ($function=='require' || $function=='require_once') {
-                call_user_func(self::$exceptionHandler, $exception);
-                return true;                                            // PHP will terminate the script anyway
+                $currentHandler = set_exception_handler(function() {});
+                restore_exception_handler();
+                $currentHandler && $currentHandler($exception);
+                return (bool)$currentHandler;                           // PHP will terminate the script anyway
             }
         }
 
-        // (6) Throw back everything else.
+        // throw back everything else
         throw $exception;
     }
 
@@ -282,8 +246,7 @@ class ErrorHandler extends StaticClass {
             $msg .= $msg1;
             $msg  = str_replace(chr(0), '?', $msg);     // replace NUL bytes which mess up the logfile
 
-            if (CLI)                                    // full second exception
-                echo $msg.NL;
+            if (CLI) echo $msg.NL;                      // full second exception
             error_log(trim($msg), ERROR_LOG_DEFAULT);
         }
 
@@ -321,13 +284,13 @@ class ErrorHandler extends StaticClass {
      */
     public static function handleDestructorException($exception) {
         if (self::isInShutdown()) {
-            $handler = set_exception_handler(function() {});    // resolve the currently active exception handler
+            $currentHandler = set_exception_handler(function() {});
             restore_exception_handler();
-            call_user_func($handler, $exception);
 
-            // Calling exit() is the only way to prevent the immediately following non-catchable fatal error.
-            // However, calling exit() in a destructor will also prevent execution of any remaining shutdown routines.
-            exit(1);                                            // exit with status code
+            if ($currentHandler) {
+                $currentHandler($exception);        // Calling exit() is the only way to prevent the immediately following
+                exit(1);                            // non-catchable fatal error. However, calling exit() in a destructor will
+            }                                       // also prevent execution of any remaining shutdown routines.
         }
         return $exception;
     }
@@ -345,11 +308,12 @@ class ErrorHandler extends StaticClass {
      * @link   https://bugs.php.net/bug.php?id=53648
      */
     public static function handleToStringException($exception) {
-        $handler = set_exception_handler(function() {});        // resolve the currently active exception handler
+        $currentHandler = set_exception_handler(function() {});
         restore_exception_handler();
-        call_user_func($handler, $exception);
 
-        // Calling exit() is the only way to prevent the immediately following non-catchable fatal error.
-        exit(1);                                                // exit with status code
+        if ($currentHandler) {
+            $currentHandler($exception);            // Calling exit() is the only way to prevent the immediately following
+            exit(1);                                // non-catchable fatal error.
+        }
     }
 }
