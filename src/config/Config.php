@@ -454,7 +454,7 @@ class Config extends CObject implements ConfigInterface {
 
         foreach ($values as $key => &$value) {
             // convert special values to their string representation
-            if     (is_null($value)) $value = '(null)';
+            if     (!isset($value))  $value = '(null)';
             elseif (is_bool($value)) $value = ($value ? '(true)' : '(false)');
             elseif (is_string($value)) {
                 switch (strtolower($value)) {
@@ -541,7 +541,7 @@ class Config extends CObject implements ConfigInterface {
 
         foreach ($values as $key => &$value) {
             // convert special values to their string representation
-            if     (is_null($value)) $value = '(null)';
+            if     (!isset($value))  $value = '(null)';
             elseif (is_bool($value)) $value = ($value ? '(true)' : '(false)');
             elseif (is_string($value)) {
                 switch (strtolower($value)) {

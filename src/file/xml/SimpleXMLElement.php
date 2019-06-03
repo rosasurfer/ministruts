@@ -57,8 +57,7 @@ class SimpleXMLElement extends \SimpleXMLElement {
                 foreach ($errors as $i => $error) {
                     $errors[$i] = strRightFrom($error[1], 'SimpleXMLElement::__construct(): ', 1, false, $error[1]);
                 }
-                $ex->addMessage(join(NL, $errors));
-                throw $ex;
+                throw $ex->addMessage(join(NL, $errors));
             }
 
             foreach ($errors as $error) {

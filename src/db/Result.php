@@ -68,9 +68,7 @@ abstract class Result extends CObject implements ResultInterface {
         }
         $value = $row[$column];
 
-        if (is_null($value))
-            return $onNull;
-        return $value;
+        return isset($value) ? $value : $onNull;
     }
 
 
@@ -82,7 +80,7 @@ abstract class Result extends CObject implements ResultInterface {
         else                     $value = $this->fetchColumn($column, $row, null, $onNoMoreRows);
 
         if (is_string($value)) return $value;
-        if (is_null($value))   return $onNull;
+        if (!isset($value))    return $onNull;
 
         if (is_bool($value))
             $value = (int) $value;
@@ -98,11 +96,11 @@ abstract class Result extends CObject implements ResultInterface {
         else                     $value = $this->fetchColumn($column, $row, null, $onNoMoreRows);
 
         if (is_bool($value)) return $value;
-        if (is_null($value)) return $onNull;
+        if (!isset($value))  return $onNull;
 
         $bValue = strToBool($value);
 
-        if (is_null($bValue)) {
+        if (!isset($bValue)) {
             if (!strIsNumeric($value)) throw new \UnexpectedValueException('unexpected numerical value for a boolean: "'.$value.'"');
             $bValue = (bool)(float) $value;        // skip leading zeros of numeric strings
         }
@@ -117,8 +115,8 @@ abstract class Result extends CObject implements ResultInterface {
         if (func_num_args() < 4) $value = $this->fetchColumn($column, $row, null);
         else                     $value = $this->fetchColumn($column, $row, null, $onNoMoreRows);
 
-        if (is_int($value))  return $value;
-        if (is_null($value)) return $onNull;
+        if (is_int($value)) return $value;
+        if (!isset($value)) return $onNull;
 
         if (is_float($value)) {
             $iValue = (int) $value;
@@ -145,7 +143,7 @@ abstract class Result extends CObject implements ResultInterface {
         else                     $value = $this->fetchColumn($column, $row, null, $onNoMoreRows);
 
         if (is_float($value)) return $value;
-        if (is_null($value))  return $onNull;
+        if (!isset($value))   return $onNull;
 
         if (!strIsNumeric($value)) throw new \UnexpectedValueException('unexpected string value: "'.$value.'" (not a float)');
         return (float) $value;                 // skip leading zeros of numeric strings

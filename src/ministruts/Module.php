@@ -756,7 +756,7 @@ class Module extends CObject {
     protected function addGlobalForward(ActionForward $forward, $alias = null) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
-        $name = is_null($alias) ? $forward->getName() : $alias;
+        $name = isset($alias) ? $alias : $forward->getName();
 
         if (isset($this->globalForwards[$name])) throw new StrutsConfigException('Non-unique name detected for global ActionForward "'.$name.'"');
         $this->globalForwards[$name] = $forward;
