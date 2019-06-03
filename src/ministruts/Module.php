@@ -5,8 +5,10 @@ use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\exception\IllegalStateException;
+use rosasurfer\file\xml\SimpleXMLElement;
 use rosasurfer\net\http\HttpResponse;
 
+use function rosasurfer\first;
 use function rosasurfer\is_class;
 use function rosasurfer\isRelativePath;
 use function rosasurfer\simpleClassName;
@@ -18,7 +20,6 @@ use function rosasurfer\strLeftTo;
 use function rosasurfer\strStartsWith;
 
 use const rosasurfer\NL;
-use function rosasurfer\first;
 
 
 /**
@@ -121,7 +122,7 @@ class Module extends CObject {
      *
      * @param  string $fileName - Pfad zur Konfigurationsdatei
      *
-     * @return \SimpleXMLElement
+     * @return SimpleXMLElement
      *
      * @throws StrutsConfigException on configuration errors
      */
@@ -137,7 +138,7 @@ class Module extends CObject {
         $content = substr_replace($content, $replace, $offset, strlen($search));
 
         // Konfiguration parsen und validieren
-        return new \SimpleXMLElement($content, LIBXML_DTDVALID|LIBXML_NONET);
+        return SimpleXMLElement::from($content, LIBXML_DTDVALID|LIBXML_NONET);
     }
 
 
@@ -174,11 +175,11 @@ class Module extends CObject {
     /**
      * Set the Module's default namespace.
      *
-     * @param  \SimpleXMLElement $xml - configuration instance
+     * @param  SimpleXMLElement $xml - configuration instance
      *
      * @throws StrutsConfigException on configuration errors
      */
-    protected function setNamespace($xml) {
+    protected function setNamespace(SimpleXMLElement $xml) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
         $namespace = '';                    // default is the global namespace
@@ -203,11 +204,11 @@ class Module extends CObject {
     /**
      * Setzt das Basisverzeichnis fuer lokale Resourcen.
      *
-     * @param  \SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
+     * @param  SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
      *
      * @throws StrutsConfigException on configuration errors
      */
-    protected function setResourceBase(\SimpleXMLElement $xml) {
+    protected function setResourceBase(SimpleXMLElement $xml) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
         /** @var ConfigInterface $config */
@@ -244,11 +245,11 @@ class Module extends CObject {
     /**
      * Verarbeitet die in der Konfiguration definierten globalen ActionForwards.
      *
-     * @param  \SimpleXMLElement $xml - XML-Konfiguration
+     * @param  SimpleXMLElement $xml - XML-Konfiguration
      *
      * @throws StrutsConfigException on configuration errors
      */
-    protected function processGlobalForwards(\SimpleXMLElement $xml) {
+    protected function processGlobalForwards(SimpleXMLElement $xml) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
         // process all global forwards having no "forward" attribute
@@ -327,11 +328,11 @@ class Module extends CObject {
     /**
      * Verarbeitet die in der Konfiguration definierten ActionMappings.
      *
-     * @param  \SimpleXMLElement $xml - XML-Konfiguration
+     * @param  SimpleXMLElement $xml - XML-Konfiguration
      *
      * @throws StrutsConfigException on configuration errors
      */
-    protected function processMappings(\SimpleXMLElement $xml) {
+    protected function processMappings(SimpleXMLElement $xml) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
         $elements = $xml->xpath('/struts-config/action-mappings/mapping') ?: [];
 
@@ -551,11 +552,11 @@ class Module extends CObject {
     /**
      * Durchlaeuft alle konfigurierten Tiles.
      *
-     * @param  \SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
+     * @param  SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
      *
      * @throws StrutsConfigException on configuration errors
      */
-    protected function processTiles(\SimpleXMLElement $xml) {
+    protected function processTiles(SimpleXMLElement $xml) {
         $namespace = '';                                            // default is the global namespace
 
         if ($tiles = $xml->xpath('/struts-config/tiles') ?: []) {
@@ -600,14 +601,14 @@ class Module extends CObject {
     /**
      * Return the initialized {@link Tile} with the specified name.
      *
-     * @param  string            $name - tile name
-     * @param  \SimpleXMLElement $xml  - the module's Struts configuration
+     * @param  string           $name - tile name
+     * @param  SimpleXMLElement $xml  - the module's Struts configuration
      *
      * @return Tile
      *
      * @throws StrutsConfigException on configuration errors
      */
-    private function getTile($name, \SimpleXMLElement $xml) {
+    private function getTile($name, SimpleXMLElement $xml) {
         // if the tile is already registered return it
         if (isset($this->tiles[$name]))
             return $this->tiles[$name];
@@ -620,7 +621,7 @@ class Module extends CObject {
         $this->tilesContext[] = $name;
 
         // find the tile definition...
-        /** @var \SimpleXMLElement[] $nodes */
+        /** @var SimpleXMLElement[] $nodes */
         $nodes = $xml->xpath("/struts-config/tiles/tile[@name='".$name."']");
         if (!$nodes)            throw new StrutsConfigException('Tile named "'.$name.'" not found');
         if (sizeof($nodes) > 1) throw new StrutsConfigException('Multiple tiles named "'.$name.'" found');
@@ -682,12 +683,12 @@ class Module extends CObject {
     /**
      * Verarbeitet die in einer Tiles-Definition angegebenen Child-Nodes.
      *
-     * @param  Tile              $tile - Tile-Instanz
-     * @param  \SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration
+     * @param  Tile             $tile - Tile-Instanz
+     * @param  SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration
      *
      * @throws StrutsConfigException on configuration errors
      */
-    private function processTileProperties(Tile $tile, \SimpleXMLElement $xml) {
+    private function processTileProperties(Tile $tile, SimpleXMLElement $xml) {
         // process <include> elements
         foreach ($xml->{'include'} as $tag) {
             $name  = (string) $tag['name'];
@@ -862,11 +863,11 @@ class Module extends CObject {
     /**
      * Process the configured import settings.
      *
-     * @param  \SimpleXMLElement $xml - configuration instance
+     * @param  SimpleXMLElement $xml - configuration instance
      *
      * @throws StrutsConfigException on configuration errors
      */
-    protected function processImports(\SimpleXMLElement $xml) {
+    protected function processImports(SimpleXMLElement $xml) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
         $imports = $xml->xpath('/struts-config/imports/import') ?: [];
 
@@ -898,11 +899,11 @@ class Module extends CObject {
     /**
      * Verarbeitet Controller-Einstellungen.
      *
-     * @param  \SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
+     * @param  SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
      *
      * @throws StrutsConfigException on configuration errors
      */
-    protected function processController(\SimpleXMLElement $xml) {
+    protected function processController(SimpleXMLElement $xml) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
         $elements = $xml->xpath('/struts-config/controller') ?: [];
 
@@ -1125,12 +1126,12 @@ class Module extends CObject {
      * Ob unter dem angegebenen Namen eine inkludierbare Resource existiert. Dies kann entweder eine
      * Tiles-Definition oder eine Datei sein.
      *
-     * @param  string            $name - Name der Resource
-     * @param  \SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration
+     * @param  string           $name - Name der Resource
+     * @param  SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration
      *
      * @return bool
      */
-    private function isIncludable($name, \SimpleXMLElement $xml) {
+    private function isIncludable($name, SimpleXMLElement $xml) {
         return $this->isTileDefinition($name, $xml) || $this->isFile($name);
     }
 
@@ -1138,14 +1139,14 @@ class Module extends CObject {
     /**
      * Ob unter dem angegebenen Namen eine Tile definiert ist.
      *
-     * @param  string            $name - Name der Tile
-     * @param  \SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration
+     * @param  string           $name - Name der Tile
+     * @param  SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration
      *
      * @return bool
      *
      * @throws StrutsConfigException on configuration errors
      */
-    private function isTileDefinition($name, \SimpleXMLElement $xml) {
+    private function isTileDefinition($name, SimpleXMLElement $xml) {
         $nodes = $xml->xpath("/struts-config/tiles/tile[@name='".$name."']") ?: [];
         return (bool) sizeof($nodes);
     }
