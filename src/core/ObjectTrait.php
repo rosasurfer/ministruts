@@ -14,9 +14,9 @@ trait ObjectTrait {
 
 
     /**
-     * Method catching otherwise fatal errors triggered by calls of non-existing or inaccessible instance methods.
+     * Handle calls of undefined or inaccessible instance methods. Prevents triggering of otherwise fatal script errors.
      *
-     * @param  string $method - name of the called method
+     * @param  string $method - name of the undefined or inaccessible method
      * @param  array  $args   - arguments passed to the method call
      *
      * @throws RuntimeException
@@ -39,9 +39,9 @@ trait ObjectTrait {
 
 
     /**
-     * Method catching otherwise fatal errors triggered by calls of non-existing or inaccessible static methods.
+     * Handle calls of undefined or inaccessible static methods. Prevents triggering of otherwise fatal script errors.
      *
-     * @param  string $method - name of the called method
+     * @param  string $method - name of the undefined or inaccessible method
      * @param  array  $args   - arguments passed to the method call
      *
      * @throws RuntimeException

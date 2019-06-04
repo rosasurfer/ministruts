@@ -40,7 +40,7 @@ abstract class PersistableObject extends CObject {
     /**
      * Magic method providing default get/set implementations for mapped properties.
      *
-     * @param  string $method - name of the called and undefined method
+     * @param  string $method - name of the undefined or inaccessible method
      * @param  array  $args   - arguments passed to the method call
      *
      * @return mixed - return value of the intercepted virtual method

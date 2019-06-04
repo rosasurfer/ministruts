@@ -46,6 +46,8 @@ return array(
     'rosasurfer\\core\\Singleton' => $baseDir . '/src/core/Singleton.php',
     'rosasurfer\\core\\StaticClass' => $baseDir . '/src/core/StaticClass.php',
     'rosasurfer\\core\\assert\\Assert' => $baseDir . '/src/core/assert/Assert.php',
+    'rosasurfer\\core\\assert\\Assertion' => $baseDir . '/src/core/assert/Assertion.php',
+    'rosasurfer\\core\\assert\\FailedAssertionExceptionInterface' => $baseDir . '/src/core/assert/FailedAssertionExceptionInterface.php',
     'rosasurfer\\core\\assert\\FailedAssertionTrait' => $baseDir . '/src/core/assert/FailedAssertionTrait.php',
     'rosasurfer\\core\\assert\\IllegalTypeException' => $baseDir . '/src/core/assert/IllegalTypeException.php',
     'rosasurfer\\core\\assert\\InvalidArgumentException' => $baseDir . '/src/core/assert/InvalidArgumentException.php',
