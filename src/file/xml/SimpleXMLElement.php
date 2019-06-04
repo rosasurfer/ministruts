@@ -30,7 +30,7 @@ class SimpleXMLElement extends \SimpleXMLElement {
      * @param  string $ns         [optional] - namespace prefix or URI (default: empty)
      * @param  bool   $nsIsPrefix [optional] - whether $ns is a prefix or a URI (default: a URI)
      *
-     * @return SimpleXMLElement
+     * @return static
      */
     public static function from($data, $options=0, $dataIsUri=false, $ns='', $nsIsPrefix=false) {
         $errors = [];
