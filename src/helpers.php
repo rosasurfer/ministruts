@@ -1590,7 +1590,7 @@ function pluralize($count, $singular='', $plural='s') {
  * @param  string   $mutex [optional] - mutex identifier (default: the calling line of code)
  */
 function synchronized(\Closure $task, $mutex = null) {
-    if (is_null($mutex)) {
+    if (!isset($mutex)) {
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
         $mutex = $trace[0]['file'].'#'.$trace[0]['line'];
     }

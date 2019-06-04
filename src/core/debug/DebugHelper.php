@@ -53,7 +53,7 @@ class DebugHelper extends StaticClass {
         if ($trace && isset($trace[0]['fixed']))
             return $trace;
 
-        // Fix an incomplete frame[0][line] if parameters are provided and $file matches (e.g. with SimpleXMLElement).
+        // Fix an incomplete frame[0][line] if parameters are provided and $file matches (e.g. with \SimpleXMLElement).
         if ($file!='unknown' && $line) {
             if (isset($trace[0]['file']) && $trace[0]['file']==$file) {
                 if (isset($trace[0]['line']) && $trace[0]['line']===0) {
