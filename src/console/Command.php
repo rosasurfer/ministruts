@@ -75,8 +75,10 @@ class Command extends CObject {
      * @return int - execution status (0 for success)
      */
     public function run() {
-        $input = new Input($this->docoptResult);
-        $this->di()->set(Input::class, $input);
+        /** @var Input $input */
+        $input = $this->di(Input::class);
+        $input->setDocoptResult($this->docoptResult);
+
         /** @var Output $output */
         $output = $this->di(Output::class);
 

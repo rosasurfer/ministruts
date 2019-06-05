@@ -23,6 +23,9 @@ class Service implements ServiceInterface {
     /** @var string */
     protected $name;
 
+    /** @var string[] */
+    protected $aliases;
+
     /** @var string|object */
     protected $definition;
 
@@ -38,12 +41,15 @@ class Service implements ServiceInterface {
      */
     public function __construct($name, $definition) {
         $this->name       = $name;
+        $this->aliases[]  = $name;
         $this->definition = $definition;
     }
 
 
     /**
      * {@inheritdoc}
+     *
+     * @return string
      */
     public function getName() {
         return $this->name;
@@ -52,9 +58,35 @@ class Service implements ServiceInterface {
 
     /**
      * {@inheritdoc}
+     *
+     * @return string|object $definition - a class name, an instance or a Closure acting as an instance factory
      */
     public function getDefinition() {
         return $this->definition;
+    }
+
+
+    /**
+     * Return the service's alias names.
+     *
+     * @return string[] - list of aliases (including the original name)
+     */
+    public function getAliases() {
+        return $this->aliases;
+    }
+
+
+    /**
+     * Add an alias name for the service.
+     *
+     * @param  string $name - alias name
+     *
+     * @return $this
+     */
+    public function addAlias($name) {
+        if (!in_array($name, $this->aliases))
+            $this->aliases[] = $name;
+        return $this;
     }
 
 

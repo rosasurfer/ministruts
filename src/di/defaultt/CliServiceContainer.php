@@ -8,10 +8,10 @@ use rosasurfer\di\service\Service;
 
 
 /**
- * Default dependency injector automatically created for command-line interface applications.
+ * Default dependency injector automatically created for command-line applications.
  *
- * A variant of the standard {@link Di} especially suitable for CLI applications. It automatically registers all the
- * services provided by the framework and loads user-defined services from the file "{app.dir.config}/services.php".
+ * A variant of the standard dependency injector {@link Di} suitable for CLI applications. Registers CLI related services
+ * provided by the framework and user-defined services loaded from the file "{app.dir.config}/services.php".
  */
 class CliServiceContainer extends Di {
 
@@ -22,19 +22,13 @@ class CliServiceContainer extends Di {
      * @param  string $configDir - directory to load custom service definitions from
      */
     public function __construct($configDir) {
-        parent::__construct();
-
-        $defaultServices = [
-            // an empty default Input service without a docopt definition
-            Input::class          => new Service(Input::class      , Input::class                              ),
-
-            Output::class         => new Service(Output::class     , Output::class                             ),
-            // 'frontController'  => new Service('frontController' , 'rosasurfer\\ministruts\\FrontController' ),
-            // 'request'          => new Service('request'         , 'rosasurfer\\ministruts\\Request'         ),
-            // 'requestProcessor' => new Service('requestProcessor', 'rosasurfer\\ministruts\\RequestProcessor'),
+        $services = [
+            (new Service(Input::class,  Input::class ))->addAlias('input'),
+            (new Service(Output::class, Output::class))->addAlias('output'),
         ];
-        $this->services = array_merge($this->services, $defaultServices);
-
-        $this->loadCustomServices($configDir);
+        foreach ($services as $service) {
+            $this->registerService($service);
+        }
+        parent::__construct($configDir);
     }
 }

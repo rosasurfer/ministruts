@@ -5,13 +5,15 @@ use rosasurfer\console\io\Input;
 use rosasurfer\console\io\Output;
 use rosasurfer\di\Di;
 use rosasurfer\di\service\Service;
+use rosasurfer\ministruts\Request;
+use rosasurfer\ministruts\RequestProcessor;
 
 
 /**
  * Default dependency injector automatically created for web applications.
  *
- * A variant of the standard {@link Di}. It automatically registers all the services provided by the framework and loads
- * user-defined services from the file "{app.dir.config}/services.php".
+ * A variant of the standard dependency injector {@link Di} suitable for web applications. Registers web app related services
+ * provided by the framework and user-defined services loaded from the file "{app.dir.config}/services.php".
  */
 class WebServiceContainer extends Di {
 
@@ -22,19 +24,17 @@ class WebServiceContainer extends Di {
      * @param  string $configDir - directory to load custom service definitions from
      */
     public function __construct($configDir) {
-        parent::__construct();
 
-        $defaultServices = [
-            // an empty default Input service without a docopt definition
-            Input::class          => new Service(Input::class      , Input::class                              ),
 
-            Output::class         => new Service(Output::class     , Output::class                             ),
-            // 'frontController'  => new Service('frontController' , 'rosasurfer\\ministruts\\FrontController' ),
-            // 'request'          => new Service('request'         , 'rosasurfer\\ministruts\\Request'         ),
-            // 'requestProcessor' => new Service('requestProcessor', 'rosasurfer\\ministruts\\RequestProcessor'),
+        $services = [
+            (new Service(Input::class,            Input::class           ))->addAlias('input'),
+            (new Service(Output::class,           Output::class          ))->addAlias('output'),
+          //(new Service(Request::class,          Request::class         ))->addAlias('request'),
+          //(new Service(RequestProcessor::class, RequestProcessor::class))->addAlias('requestProcessor'),
         ];
-        $this->services = array_merge($this->services, $defaultServices);
-
-        $this->loadCustomServices($configDir);
+        foreach ($services as $service) {
+            $this->registerService($service);
+        }
+        parent::__construct($configDir);
     }
 }

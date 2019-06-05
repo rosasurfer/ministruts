@@ -56,12 +56,13 @@ interface DiInterface extends \ArrayAccess, ContainerInterface {
      * Register a service in the container. An already existing service of the same name will be replaced. The service
      * usage type (service locator or factory pattern) is determined at runtime from the called resolver method.
      *
-     * @param  string        $name       - service identifier
-     * @param  string|object $definition - a class name, an instance or a Closure acting as an instance factory
+     * @param  string        $name               - service identifier
+     * @param  string|object $definition         - a class name, an instance or a Closure acting as an instance factory
+     * @param  string[]      $aliases [optional] - service identifier aliases (default: none)
      *
      * @return string|object - the same definition
      */
-    public function set($name, $definition);
+    public function set($name, $definition, array $aliases=null);
 
 
     /**

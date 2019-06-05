@@ -13,8 +13,8 @@ use rosasurfer\di\service\ServiceNotFoundException;
  *
  * A class that implements standard dependency injection/location of services and is itself a container for them.
  *
- * The definition of a service does not specify a type (service locator or factory pattern). Instead the type is determined
- * at runtime from the used DI resolver.
+ * The definition of a service does not specify a design principle of the component (i.e. service locator or factory).
+ * The design principle is determined at runtime from the called DI resolver method.
  *
  * <pre>
  *  $di = new Di();                                         // creating a new container
@@ -36,32 +36,56 @@ use rosasurfer\di\service\ServiceNotFoundException;
 class Di extends CObject implements DiInterface {
 
 
-    /** @var IService[] - a list of registered services */
+    /** @var IService[] - list of registered services */
     protected $services = [];
 
 
     /**
-     * Constructor
+     * Create a new instance and optionally load custom service definitions.
+     *
+     * @param  string $configDir [optional] - directory to load service definitions from (default: no loading)
      */
-    public function __construct() {
-        // catch parent::__construct() calls from subclasses
+    public function __construct($configDir = null) {
+        if (isset($configDir)) {
+            Assert::string($configDir);
+            $this->loadCustomServices($configDir);
+        }
     }
 
 
     /**
-     * Load custom service definitions.
+     * Register a service.
+     *
+     * @param  IService $service
+     *
+     * @return $this
+     */
+    protected function registerService(IService $service) {
+        foreach ($service->getAliases() as $alias) {
+            $this->services[$alias] = $service;
+        }
+        return $this;
+    }
+
+
+    /**
+     * Load and register custom service definitions.
      *
      * @param  string $configDir - directory to load service definitions from
      *
-     * @return bool - whether a custom service definitions has been found and successfully loaded
+     * @return bool - whether custom service definitions have been found and successfully processed
      */
     protected function loadCustomServices($configDir) {
-        Assert::string($configDir);
         if (!is_file($file = $configDir.'/services.php'))
             return false;
 
         foreach (include($file) as $name => $definition) {
-            $this->set($name, $definition);
+            $aliases = null;
+            if (is_array($definition)) {
+                $aliases = $definition;
+                $definition = array_shift($aliases);
+            }
+            $this->set($name, $definition, $aliases);
         }
         return true;
     }
@@ -117,13 +141,21 @@ class Di extends CObject implements DiInterface {
     /**
      * {@inheritdoc}
      *
-     * @param  string        $name       - service identifier
-     * @param  string|object $definition - a class name, an instance or a Closure acting as an instance factory
+     * @param  string        $name               - service identifier
+     * @param  string|object $definition         - a class name, an instance or a Closure acting as an instance factory
+     * @param  string[]      $aliases [optional] - service identifier aliases (default: none)
      *
      * @return string|object - the same definition
      */
-    public function set($name, $definition) {
-        $this->services[$name] = new Service($name, $definition);
+    public function set($name, $definition, array $aliases=null) {
+        $service = new Service($name, $definition);
+
+        if (isset($aliases)) {
+            foreach ($aliases as $alias) {
+                $service->addAlias($alias);
+            }
+        }
+        $this->registerService($service);
         return $definition;
     }
 
