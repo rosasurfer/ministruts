@@ -3,7 +3,7 @@ namespace rosasurfer\core;
 
 
 /**
- * Super class for classes meant to be called only statical. Derived classes cannot be instantiated.
+ * Parent class for all classes meant to be used only statical. Derived classes cannot be instantiated.
  */
 abstract class StaticClass extends CObject {
 
@@ -11,5 +11,5 @@ abstract class StaticClass extends CObject {
     /**
      * Locked constructor
      */
-    final private function __construct() {/* you can't call me */}
+    final private function __construct() {}
 }
