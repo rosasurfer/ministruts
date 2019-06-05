@@ -14,6 +14,6 @@ class Request extends Proxy {
      * @return string
      */
     protected static function getProxiedIdentifier() {
-        return 'request';
+        return \rosasurfer\ministruts\Request::class;
     }
 }
