@@ -24,79 +24,95 @@ use const rosasurfer\NL;
 
 /**
  * Module
+ *
+ * Struts modules allow separation (splitting) of a web application into multiple logical sections. Each Module (or section)
+ * is defined by a unique base path (aka the Module prefix), e.g. "/admin/", "/backend/" or "/shop/". Each Module has its
+ * own Struts configuration and can be configured and managed entirely separate from all other modules.
+ *
+ * The main Module of an application has the module prefix "" (an empty string), its base path is "/" and its Struts
+ * configuration is stored in "struts-config.xml". Other modules of the application have a non-empty prefix, their base path
+ * is "/{prefix}/" and their Struts configurations are stored in files named "struts-config-{prefix}.xml". Modules can be
+ * nested, and a full module can be moved in the application by only changing the module's prefix.
+ *
+ * The full URI of a route to a specific module's {@link ActionMapping} is "/{app-base-path}/{module-prefix}/{mapping-path}".
  */
 class Module extends CObject {
 
 
     /**
-     * Der Prefix dieses Modules relative zur ROOT_URL der Anwendung.  Die Prefixe innerhalb einer Anwendung
-     * sind eindeutig. Das Module mit einem Leerstring als Prefix ist das Default-Module der Anwendung.
+     * Module prefix relative to the base URI of the web application. All module prefixes in an application are unique.
+     * The module with the prefix "" (empty string) is the main module of an application.
      *
-     * @var string
+     * @var string (configurable)
      */
     protected $prefix;
 
-    /** @var string[] - imported fully qualified class names  */
+    /** @var string[] - imported fully qualified class names (configurable) */
     protected $uses;
 
-    /** @var string[] - imported namespaces */
+    /** @var string[] - imported namespaces (configurable) */
     protected $imports;
 
-    /** @var string[] - Basisverzeichnisse fuer von diesem Modul einzubindende Resourcen */
+    /** @var string[] - base directory for file resources used by the module (configurable) */
     protected $resourceLocations = [];
 
-    /** @var ActionForward[] - Die globalen Forwards dieses Moduls. */
+    /** @var ActionForward[] - all global forwards of the module (configurable) */
     protected $globalForwards = [];
 
-    /** @var ActionMapping[][] - all action mappings of the module */
+    /** @var ActionMapping[][] - all action mappings of the module (configurable) */
     protected $mappings = [
         'names' => [],
         'paths' => [],
     ];
 
-    /** @var ActionMapping - Das Default-ActionMapping dieses Moduls, wenn eines definiert wurde. */
+    /**
+     * Default action mapping of the module or NULL if undefined. Used when a request does not match any other action mapping
+     * (configurable).
+     *
+     * @var ActionMapping
+     */
     protected $defaultMapping;
 
-    /** @var Tile[] - Die Tiles dieses Moduls. */
+    /** @var Tile[] - all tiles of the module (configurable) */
     protected $tiles = [];
 
-    /** @var string - view helper namespace used by templates and tiles */
+    /** @var string - default view namespace for file resources and tiles (configurable) */
     protected $viewNamespace = '';
 
-    /** @var string - Der Klassenname der RequestProcessor-Implementierung, die fuer dieses Modul definiert ist. */
+    /** @var string - classname of the {@link RequestProcessor} implementation used by the module (configurable) */
     protected $requestProcessorClass = DEFAULT_REQUEST_PROCESSOR_CLASS;
 
-    /** @var string - Der Klassenname der ActionForward-Implementierung, die fuer dieses Modul definiert ist. */
+    /** @var string - default classname of the {@link ActionForward} implementation used by the module (configurable) */
     protected $forwardClass = DEFAULT_ACTION_FORWARD_CLASS;
 
-    /** @var string - Der Klassenname der ActionMapping-Implementierung, die fuer dieses Modul definiert ist. */
+    /** @var string - default classname of the {@link ActionMapping} implementation used by the module (configurable) */
     protected $mappingClass = DEFAULT_ACTION_MAPPING_CLASS;
 
-    /** @var string - Der Klassenname der Tiles-Implementierung, die fuer dieses Modul definiert ist. */
+    /** @var string - default classname of the {@link Tile} implementation used by the module (configurable) */
     protected $tilesClass = Tile::class;
 
-    /** @var string - Der Klassenname der RoleProcessor-Implementierung, die fuer dieses Modul definiert ist. */
+    /** @var string - classname of the {@link RoleProcessor} implementation used by the module (configurable) */
     protected $roleProcessorClass;
 
-    /** @var RoleProcessor - Die RoleProcessor-Implementierung, die fuer dieses Modul definiert ist. */
+    /** @var RoleProcessor - the RoleProcessor instance used by the module */
     protected $roleProcessor;
 
-    /** @var string[] - initialization context used to detect circular tile definition references */
+    /** @var string[] - module initialization context for detecting circular tile references */
     protected $tilesContext = [];
 
-    /** @var bool - Ob diese Komponente vollstaendig konfiguriert ist. */
+    /** @var bool - whether this component is fully configured */
     protected $configured = false;
 
 
     /**
-     * Erzeugt ein neues Modul, liest und parst dessen Konfigurationsdatei.
+     * Create a new instance, read and parse the module's XML configuration (struts-config.xml).
      *
-     * @param  string $fileName - Pfad zur Konfigurationsdatei des Modules
-     * @param  string $prefix   - Prefix des Modules
+     * @param  string $fileName - full name of the module's configuration file
+     * @param  string $prefix   - module prefix
      *
      * @throws StrutsConfigException on configuration errors
      *
-     * @todo   Module-Encoding entsprechend dem Config-Datei-Encoding implementieren
+     * @todo   check/handle different config file encodings
      */
     public function __construct($fileName, $prefix) {
         Assert::string($fileName, '$fileName');
@@ -118,9 +134,9 @@ class Module extends CObject {
 
 
     /**
-     * Validiert die angegebene Konfigurationsdatei und wandelt sie in ein XML-Objekt um.
+     * Read and validate the module configuration, and convert it to a {@link SimpleXMLElement} instance.
      *
-     * @param  string $fileName - Pfad zur Konfigurationsdatei
+     * @param  string $fileName - full filename
      *
      * @return SimpleXMLElement
      *
@@ -137,17 +153,16 @@ class Module extends CObject {
         $replace = '<!DOCTYPE struts-config SYSTEM "file:///'.$dtd.'">';
         $content = substr_replace($content, $replace, $offset, strlen($search));
 
-        // Konfiguration parsen und validieren
+        // parse, validate, instantiate...
         return SimpleXMLElement::from($content, LIBXML_DTDVALID|LIBXML_NONET);
     }
 
 
     /**
-     * Gibt den Prefix dieses Modules zurueck. Anhand des Prefixes werden die verschiedenen Module der
-     * Anwendung unterschieden.
+     * Return the prefix of this module. All module prefixes of an application are unique.
      *
-     * @return string - an empty string for the root module;
-     *                  a path fragment not starting but ending with a slash "/" for a non-root module
+     * @return string - an empty string for the main module;
+     *                  a path fragment not starting but ending with a slash "/" for a non-main module
      */
     public function getPrefix() {
         return $this->prefix;
@@ -155,40 +170,41 @@ class Module extends CObject {
 
 
     /**
-     * Setzt den Prefix des Modules.
+     * Set the module prefix.
      *
-     * @param  string $prefix - the prefix of the root module is an empty string;
-     *                          the prefix of non-root modules must not start but must end with a slash "/"
+     * @param  string $prefix - the prefix of the main module is an empty string;
+     *                          prefixes of non-main modules must not start but must end with a slash "/"
      *
      * @throws StrutsConfigException on configuration errors
      */
     protected function setPrefix($prefix) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
         if ($len=strlen($prefix)) {
-            if ($prefix[     0] == '/') throw new StrutsConfigException('Non-root module prefixes must not start with a slash "/" character, found: "'.$prefix.'"');
-            if ($prefix[$len-1] != '/') throw new StrutsConfigException('Non-root module prefixes must end with a slash "/" character, found: "'.$prefix.'"');
+            if ($prefix[     0] == '/') throw new StrutsConfigException('Non-main module prefixes must not start with a slash "/" character, found: "'.$prefix.'"');
+            if ($prefix[$len-1] != '/') throw new StrutsConfigException('Non-main module prefixes must end with a slash "/" character, found: "'.$prefix.'"');
         }
         $this->prefix = $prefix;
     }
 
 
     /**
-     * Set the Module's default namespace.
+     * Set the default namespace used by the Module when looking up relative classnames.
      *
-     * @param  SimpleXMLElement $xml - configuration instance
+     * @param  SimpleXMLElement $xml - module configuration
      *
      * @throws StrutsConfigException on configuration errors
      */
     protected function setNamespace(SimpleXMLElement $xml) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
-        $namespace = '';                    // default is the global namespace
+        // default is the global namespace
+        $namespace = '';
 
         if (isset($xml['namespace'])) {
             $namespace = trim((string) $xml['namespace']);
             $namespace = str_replace('/', '\\', $namespace);
 
-            if ($namespace == '\\') {
+            if ($namespace == '\\') {           // that's again the global namespace
                 $namespace = '';
             }
             else if (strlen($namespace)) {
@@ -202,9 +218,9 @@ class Module extends CObject {
 
 
     /**
-     * Setzt das Basisverzeichnis fuer lokale Resourcen.
+     * Set the base directory used by the module when looking up file resources.
      *
-     * @param  SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
+     * @param  SimpleXMLElement $xml - module configuration
      *
      * @throws StrutsConfigException on configuration errors
      */
@@ -243,9 +259,9 @@ class Module extends CObject {
 
 
     /**
-     * Verarbeitet die in der Konfiguration definierten globalen ActionForwards.
+     * Process all configured global {@link ActionForward}s.
      *
-     * @param  SimpleXMLElement $xml - XML-Konfiguration
+     * @param  SimpleXMLElement $xml - module configuration
      *
      * @throws StrutsConfigException on configuration errors
      */
@@ -326,9 +342,9 @@ class Module extends CObject {
 
 
     /**
-     * Verarbeitet die in der Konfiguration definierten ActionMappings.
+     * Process all configured {@link ActionMapping}s.
      *
-     * @param  SimpleXMLElement $xml - XML-Konfiguration
+     * @param  SimpleXMLElement $xml - module configuration
      *
      * @throws StrutsConfigException on configuration errors
      */
@@ -343,7 +359,7 @@ class Module extends CObject {
             // process attributes                           // final logical validation is done in ActionMapping::freeze()
             // ------------------
             // attribute path="%RequestPath" #REQUIRED
-            $path = (string) $tag['path'];                  // TODO: URL validieren
+            $path = (string) $tag['path'];                  // TODO: validate URI
             $mapping->setPath($path);
 
             // attribute name="%LogicalName" #IMPLIED
@@ -380,7 +396,7 @@ class Module extends CObject {
             // attributes redirect="%RequestPath" #IMPLIED and redirect-type="[temporary|permanent]" "temporary"
             if (isset($tag['redirect'])) {
                 if ($mapping->getForward()) throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'": Only one of "action", "include", "redirect" or "forward" can be specified');
-                $redirect     = (string) $tag['redirect'];      // TODO: URL validieren
+                $redirect     = (string) $tag['redirect'];      // TODO: validate URI
                 $redirectType = isset($tag['redirect-type']) ? (string) $tag['redirect-type'] : 'temporary';
                 $redirectType = $redirectType=='temporary' ? HttpResponse::SC_MOVED_TEMPORARILY : HttpResponse::SC_MOVED_PERMANENTLY;
 
@@ -437,7 +453,7 @@ class Module extends CObject {
                 else {
                     if ($tag['form-validate-first']=='false') throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'": An "action", "include", "redirect" or "forward" attribute must be defined if "form-validate-first" is set to "false"');
                     $formValidateFirst = true;
-                    // Pruefung auf 'success' und 'error' Forward erfolgt in ActionMapping:freeze()
+                    // checking existence of "success" und "error" takes place in ActionMapping:freeze()
                 }
             }
             elseif ($tag['form-validate-first'] == 'true') {
@@ -490,11 +506,11 @@ class Module extends CObject {
                     if (isset($redirect) || isset($mappingAttr) || isset($alias)) throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'"> <forward name="'.$name.'": Only one of "include", "redirect", "mapping" or "forward" can be specified.');
 
                     $this->tilesContext = [];
-                    if (!$this->isIncludable($include, $xml))                     throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'"> <forward name="'.$name.'" include="'.$include.'": '.(strStartsWith($include, '.') ? 'Tiles definition':'File').' not found.');
+                    if (!$this->isIncludable($include, $xml)) throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'"> <forward name="'.$name.'" include="'.$include.'": '.(strStartsWith($include, '.') ? 'Tiles definition':'File').' not found.');
 
                     if ($this->isTileDefinition($include, $xml)) {
                         $tile = $this->getTile($include, $xml);
-                        if ($tile->isAbstract())                                  throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'"> <forward name="'.$name.'" include="'.$include.'": The included tile is a template and cannot be used as a forward resource.');
+                        if ($tile->isAbstract()) throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'"> <forward name="'.$name.'" include="'.$include.'": The included tile is a template and cannot be used as a forward resource.');
                         /** @var ActionForward $forward */
                         $forward = new $this->forwardClass($name, $include, false);
                     }
@@ -505,18 +521,18 @@ class Module extends CObject {
                 }
 
                 if (isset($redirect)) {
-                    if (isset($include) || isset($mappingAttr) || isset($alias))  throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'"> <forward name="'.$name.'": Only one of "include", "redirect", "mapping" or "forward" can be specified.');
+                    if (isset($include) || isset($mappingAttr) || isset($alias)) throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'"> <forward name="'.$name.'": Only one of "include", "redirect", "mapping" or "forward" can be specified.');
                     $redirectType = $redirectType=='temporary' ? HttpResponse::SC_MOVED_TEMPORARILY : HttpResponse::SC_MOVED_PERMANENTLY;
 
                     /** @var ActionForward $forward */
                     $forward = new $this->forwardClass($name, $redirect, true, $redirectType);  // TODO: URL validieren
                 }
-                elseif (isset($forwardTag['redirect-type']))                      throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'"> <forward name="'.$name.'": The "redirect" attribute must be specified if "redirect-type" is defined.');
+                elseif (isset($forwardTag['redirect-type'])) throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'"> <forward name="'.$name.'": The "redirect" attribute must be specified if "redirect-type" is defined.');
 
                 if (isset($mappingAttr)) {
-                    if (isset($include) || isset($redirect) || isset($alias))     throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'"> <forward name="'.$name.'": Only one of "include", "redirect", "mapping" or "forward" can be specified.');
+                    if (isset($include) || isset($redirect) || isset($alias)) throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'"> <forward name="'.$name.'": Only one of "include", "redirect", "mapping" or "forward" can be specified.');
                     $mappingTag = first($xml->xpath('/struts-config/action-mappings/mapping[@name="'.$mappingAttr.'"]') ?: []);
-                    if (!$mappingTag)                                             throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'"> <forward name="'.$name.'": Referenced action mapping "'.$mapping.'" not found.');
+                    if (!$mappingTag)                                         throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'"> <forward name="'.$name.'": Referenced action mapping "'.$mapping.'" not found.');
                     $mappingPath = (string)$mappingTag['path'];
 
                     /** @var ActionForward $forward */
@@ -550,9 +566,9 @@ class Module extends CObject {
 
 
     /**
-     * Durchlaeuft alle konfigurierten Tiles.
+     * Process all configured {@link Tile}s.
      *
-     * @param  SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
+     * @param  SimpleXMLElement $xml - module configuration
      *
      * @throws StrutsConfigException on configuration errors
      */
@@ -602,7 +618,7 @@ class Module extends CObject {
      * Return the initialized {@link Tile} with the specified name.
      *
      * @param  string           $name - tile name
-     * @param  SimpleXMLElement $xml  - the module's Struts configuration
+     * @param  SimpleXMLElement $xml  - module configuration
      *
      * @return Tile
      *
@@ -662,7 +678,7 @@ class Module extends CObject {
         // attribute "extends" %LogicalName; #IMPLIED
         else  {
             $extended = $this->getTile($extends, $xml);
-            $tile = clone $extended;                            // clone the extended tile
+            $tile = clone $extended;                    // clone the extended tile
             $tile->setName($name);
         }
 
@@ -681,10 +697,10 @@ class Module extends CObject {
 
 
     /**
-     * Verarbeitet die in einer Tiles-Definition angegebenen Child-Nodes.
+     * Process the child nodes of a {@link Tile} definition.
      *
-     * @param  Tile             $tile - Tile-Instanz
-     * @param  SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration
+     * @param  Tile             $tile
+     * @param  SimpleXMLElement $xml - module configuration
      *
      * @throws StrutsConfigException on configuration errors
      */
@@ -695,7 +711,7 @@ class Module extends CObject {
             $nodes = $xml->xpath("/struts-config/tiles/tile[@name='".$tile->getName()."']/include[@name='".$name."']");
             if (sizeof($nodes) > 1) throw new StrutsConfigException('<tile name="'.$tile->getName().'"> <include name="'.$name.'">: Multiple elements with the same name found.');
 
-            if (isset($tag['value'])) {                                 // 'value' specified
+            if (isset($tag['value'])) {                                 // "value" is specified
                 $value = (string) $tag['value'];
                 if (!$this->isIncludable($value, $xml)) throw new StrutsConfigException('<tile name="'.$tile->getName().'"> <include name="'.$name.'" value="'.$value.'": '.(strStartsWith($value, '.') ? 'Tile definition':'File').' not found.');
 
@@ -707,7 +723,7 @@ class Module extends CObject {
                     /** @var string $file */
                     $file = $this->findFile($value);
                     /** @var Tile $nestedTile */
-                    $nestedTile = new $this->tilesClass($this, $tile);  // generische Tile erzeugen, damit render() existiert
+                    $nestedTile = new $this->tilesClass($this, $tile);  // create a generic Tile, thereby render() exists
                     $nestedTile->setName(Tile::GENERIC_NAME)
                                ->setFileName($file);
                 }
@@ -726,15 +742,15 @@ class Module extends CObject {
             $nodes = $xml->xpath("/struts-config/tiles/tile[@name='".$tile->getName()."']/set[@name='".$name."']");
             if (sizeof($nodes) > 1) throw new StrutsConfigException('<tile name="'.$tile->getName().'"> <set name="'.$name.'": Multiple elements with the same name found.');
 
-            if (isset($tag['value'])) {                                 // value ist im Attribut angegeben
+            if (isset($tag['value'])) {                                 // value is specified as an attribute
                 if (strlen($tag) > 0) throw new StrutsConfigException('<tile name="'.$tile->getName().'"> <set name="'.$name.'": Only one of attribute value or tag body value can be specified.');
                 $value = (string) $tag['value'];
             }
-            else {                                                      // value ist im Body angegeben
+            else {                                                      // value is specified as tag content
                 $value = trim((string) $tag);
             }
 
-            // TODO: Var-Type nicht nur casten, sondern validieren
+            // TODO: check that $value matches the specified type
             switch (((string)$tag['type']) ?: 'string') {
                 case 'bool' : $value =  (bool) $value; break;
                 case 'int'  : $value =   (int) $value; break;
@@ -746,7 +762,8 @@ class Module extends CObject {
 
 
     /**
-     * Fuegt diesem Module einen globalen ActionForward. Ist ein Alias angegeben, wird er unter dem Alias-Namen registriert.
+     * Add a global {@link ActionForward} to this module. If an alias is specified the forward is stored under that name
+     * instead of the forward's own name.
      *
      * @param  ActionForward $forward
      * @param  string        $alias [optional] - alias name of the forward
@@ -764,7 +781,7 @@ class Module extends CObject {
 
 
     /**
-     * Fuegt diesem Module ein ActionMapping hinzu.
+     * Add an {@link ActionMapping} to this module.
      *
      * @param  ActionMapping $mapping
      *
@@ -793,7 +810,7 @@ class Module extends CObject {
 
 
     /**
-     * Fuegt diesem Module eine Tile hinzu.
+     * Add a {@link Tile} to this module. If an alias is specified the tile is stored under both names (alias and tile name).
      *
      * @param  Tile   $tile
      * @param  string $alias [optional] - alias name of the tile
@@ -810,7 +827,7 @@ class Module extends CObject {
 
 
     /**
-     * Lookup the {@link ActionMapping} to process the given request path.
+     * Lookup the {@link ActionMapping} responsible for processing the given request path.
      *
      * @param  string $path
      *
@@ -851,9 +868,9 @@ class Module extends CObject {
 
 
     /**
-     * Gibt das Default-ActionMapping dieses Moduls zurueck.
+     * Return the module's default {@link ActionMapping} (if configured).
      *
-     * @return ActionMapping|null - Mapping oder NULL, wenn kein Default-Mapping definiert ist
+     * @return ActionMapping|null - instance or NULL if no default mapping is configured
      */
     public function getDefaultMapping() {
         return $this->defaultMapping;
@@ -863,7 +880,7 @@ class Module extends CObject {
     /**
      * Process the configured import settings.
      *
-     * @param  SimpleXMLElement $xml - configuration instance
+     * @param  SimpleXMLElement $xml - module configuration
      *
      * @throws StrutsConfigException on configuration errors
      */
@@ -897,9 +914,9 @@ class Module extends CObject {
 
 
     /**
-     * Verarbeitet Controller-Einstellungen.
+     * Process the configured controller settings.
      *
-     * @param  SimpleXMLElement $xml - XML-Objekt mit der Konfiguration
+     * @param  SimpleXMLElement $xml - module configuration
      *
      * @throws StrutsConfigException on configuration errors
      */
@@ -928,8 +945,8 @@ class Module extends CObject {
 
 
     /**
-     * Setzt den Klassennamen der RequestProcessor-Implementierung, die fuer dieses Module benutzt wird.
-     * Diese Klasse muss eine Subklasse von RequestProcessor sein.
+     * Set the classname of the {@link RequestProcessor} implementation to be used by the module.
+     * The class must be a subclass {@link RequestProcessor}.
      *
      * @param  string $className
      *
@@ -943,7 +960,7 @@ class Module extends CObject {
 
 
     /**
-     * Gibt den Klassennamen der RequestProcessor-Implementierung zurueck.
+     * Return the classname of the {@link RequestProcessor} implementation used by the module.
      *
      * @return string
      */
@@ -953,8 +970,8 @@ class Module extends CObject {
 
 
     /**
-     * Setzt den Klassennamen der RoleProcessor-Implementierung, die fuer dieses Module benutzt wird.
-     * Diese Klasse muss eine Subklasse von RoleProcessor sein.
+     * Set the classname of the {@link RoleProcessor} implementation to be used by the module.
+     * The class must be a subclass of {@link RoleProcessor}.
      *
      * @param  string $className
      *
@@ -968,7 +985,7 @@ class Module extends CObject {
 
 
     /**
-     * Gibt die RoleProcessor-Implementierung dieses Moduls zurueck.
+     * Return the {@link RoleProcessor} intance of the module.
      *
      * @return RoleProcessor
      */
@@ -982,8 +999,8 @@ class Module extends CObject {
 
 
     /**
-     * Setzt den Klassennamen der Tiles-Implementierung, die fuer dieses Modul benutzt wird.
-     * Diese Klasse muss eine Subklasse von Tile sein.
+     * Set the classname of the {@link Tile} implementation to be used by the module.
+     * The class must be a subclass of {@link Tile}.
      *
      * @param  string $className
      *
@@ -999,7 +1016,7 @@ class Module extends CObject {
 
 
     /**
-     * Gibt den Klassennamen der Tiles-Implementierung zurueck.
+     * Return the classname of the {@link Tile} implementation used by the module.
      *
      * @return string
      */
@@ -1009,8 +1026,8 @@ class Module extends CObject {
 
 
     /**
-     * Setzt den Klassennamen der ActionMapping-Implementierung, die fuer dieses Modul benutzt wird.
-     * Diese Klasse muss eine Subklasse von ActionMapping sein.
+     * Set the classname of the {@link ActionMapping} implementation to be used by the module.
+     * The class must be a subclass of {@link ActionMapping}.
      *
      * @param  string $className
      *
@@ -1026,7 +1043,7 @@ class Module extends CObject {
 
 
     /**
-     * Gibt den Klassennamen der ActionMapping-Implementierung zurueck.
+     * Return the classname of the {@link ActionMapping} implementation used by the module.
      *
      * @return string
      */
@@ -1036,8 +1053,8 @@ class Module extends CObject {
 
 
     /**
-     * Setzt den Klassennamen der ActionForward-Implementierung, die fuer dieses Modul benutzt wird.
-     * Diese Klasse muss eine Subklasse von ActionForward sein.
+     * Set the classname of the {@link ActionForward} implementation to be used by the module.
+     * The class must be a subclass of {@link ActionForward}.
      *
      * @param  string $className
      *
@@ -1053,7 +1070,7 @@ class Module extends CObject {
 
 
     /**
-     * Gibt den Klassennamen der ActionForward-Implementierung zurueck.
+     * Return the classname of the {@link ActionForward} implementation used by the module.
      *
      * @return string
      */
@@ -1063,7 +1080,7 @@ class Module extends CObject {
 
 
     /**
-     * Return the view helper namespace used by templates and tiles.
+     * Return the default view namespace used by file resources and tiles.
      *
      * @return string
      */
@@ -1073,14 +1090,15 @@ class Module extends CObject {
 
 
     /**
-     * Friert die Konfiguration ein, sodass sie nicht mehr geaendert werden kann.
+     * Lock the configuration of this component. After the method returned modifications of the component will trigger
+     * an exception.
      *
      * @return $this
      */
     public function freeze() {
         if (!$this->configured) {
-            foreach ($this->mappings['paths'] as $mapping) {
-                $mapping->freeze();             // no need to freeze named mappings as all have a path property
+            foreach ($this->mappings['paths'] as $mapping) {        // $mappings['paths'] contains all mapping, incl.
+                $mapping->freeze();                                 // those in $mappings['names']
             }
             foreach ($this->tiles as $i => $tile) {
                 if ($tile->isAbstract()) unset($this->tiles[$i]);
@@ -1093,12 +1111,11 @@ class Module extends CObject {
 
 
     /**
-     * Sucht und gibt den globalen ActionForward mit dem angegebenen Namen zurueck.
-     * Wird kein Forward gefunden, wird NULL zurueckgegeben.
+     * Find and return the global {@link ActionForward} with the specified name.
      *
-     * @param  string $name - logischer Name des ActionForwards
+     * @param  string $name - forward name
      *
-     * @return ActionForward|null
+     * @return ActionForward|null - instance or NULL if no such forward was found
      */
     public function findForward($name) {
         if (isset($this->globalForwards[$name]))
@@ -1108,12 +1125,11 @@ class Module extends CObject {
 
 
     /**
-     * Gibt die Tile mit dem angegebenen Namen zurueck oder NULL, wenn keine Tile mit diesem Namen
-     * gefunden wurde.
+     * Find and return the {@link Tile} with the specified name.
      *
-     * @param  string $name - logischer Name der Tile
+     * @param  string $name - tile name
      *
-     * @return Tile|null
+     * @return Tile|null - instance or NULL if no such tile was found
      */
     public function findTile($name) {
         if (isset($this->tiles[$name]))
@@ -1123,11 +1139,10 @@ class Module extends CObject {
 
 
     /**
-     * Ob unter dem angegebenen Namen eine inkludierbare Resource existiert. Dies kann entweder eine
-     * Tiles-Definition oder eine Datei sein.
+     * Whether a file resource or a {@link Tile} exists under the specified name.
      *
-     * @param  string           $name - Name der Resource
-     * @param  SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration
+     * @param  string           $name - resource name
+     * @param  SimpleXMLElement $xml  - module configuration
      *
      * @return bool
      */
@@ -1137,10 +1152,10 @@ class Module extends CObject {
 
 
     /**
-     * Ob unter dem angegebenen Namen eine Tile definiert ist.
+     * Whether a {@link Tile} with the specified name is defined in the module's configuration.
      *
-     * @param  string           $name - Name der Tile
-     * @param  SimpleXMLElement $xml  - XML-Objekt mit der Konfiguration
+     * @param  string           $name - tile name
+     * @param  SimpleXMLElement $xml  - module configuration
      *
      * @return bool
      *
@@ -1153,9 +1168,9 @@ class Module extends CObject {
 
 
     /**
-     * Ob in den Resource-Verzeichnissen dieses Modules unter dem angegebenen Namen eine Datei existiert.
+     * Whether a file resource with the specified name exists in the module's configured resource locations.
      *
-     * @param  string $path - Pfadangabe
+     * @param  string $path - filename
      *
      * @return bool
      */
@@ -1166,23 +1181,21 @@ class Module extends CObject {
 
 
     /**
-     * Sucht in den Resource-Verzeichnissen dieses Modules nach einer Datei mit dem angegebenen Namen
-     * und gibt den vollstaendigen Dateinamen zurueck, oder NULL, wenn keine Datei mit diesem Namen
-     * gefunden wurde.
+     * Find a file with the specified name in the module's configured resource locations, and return its full name.
      *
-     * @param  string $name - relativer Dateiname
+     * @param  string $name - relative name
      *
-     * @return string|null - Dateiname
+     * @return string|null - full filename or NULL if no such file was found
      */
     private function findFile($name) {
-        // strip query string
+        // strip a potential query string
         $parts = explode('?', $name, 2);
 
         foreach ($this->resourceLocations as $location) {
             if (is_file($location.DIRECTORY_SEPARATOR.$parts[0])) {
                 $name = realpath($location.DIRECTORY_SEPARATOR.\array_shift($parts));
                 if ($parts)
-                    $name .= '?'.$parts[0];
+                    $name .= '?'.$parts[1];     // re-attach a stripped query string
                 return $name;
             }
         }
@@ -1204,7 +1217,7 @@ class Module extends CObject {
 
 
     /**
-     * Resolves a simple class name and returns all found fully qualified class names.
+     * Resolve a simple class name and return all found fully qualified class names.
      *
      * @param  string $name
      *
