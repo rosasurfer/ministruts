@@ -155,7 +155,7 @@ class FrontController extends Singleton {
 
         $value = substr($requestPath, strlen($baseUri));        // baseUri ends with and prefix doesn't start with a slash
         if (strlen($value)) {
-            $value = strLeftTo($value, '/').'/';                // the prefix ends with a slash only for non-root modules
+            $value = strLeftTo($value, '/').'/';                // the prefix ends with a slash only for non-main modules
         }
 
         return isset($this->modules[$value]) ? $value : '';

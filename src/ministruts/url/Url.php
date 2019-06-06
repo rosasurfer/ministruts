@@ -31,7 +31,7 @@ class Url extends CObject {
      * Create a new Url instance.
      *
      * @param  string $uri - URI part of the URL to generate. If the URI starts with a slash "/" it is interpreted as
-     *                       relative to the application's base URI (the root Module). If the URI does not start with a
+     *                       relative to the application's base URI (the main Module). If the URI does not start with a
      *                       slash it is interpreted as relative to the application's current Module.
      */
     public function __construct($uri) {
@@ -46,7 +46,7 @@ class Url extends CObject {
             $this->appRelativeUri = substr($uri, 1);
         }
         else {
-            // the resulting URI is relative to the application's current module (can be the root module, too)
+            // the resulting URI is relative to the application's current module (which may be the main module)
             $request = Request::me();
             $prefix  = $request->getModule()->getPrefix();      // root: "";  submodule: "path/"
             $this->appRelativeUri = $prefix.$uri;
