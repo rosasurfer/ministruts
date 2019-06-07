@@ -76,11 +76,11 @@ class Command extends CObject {
      */
     public function run() {
         /** @var Input $input */
-        $input = $this->di(Input::class);
+        $input = $this->di('input');
         $input->setDocoptResult($this->docoptResult);
 
         /** @var Output $output */
-        $output = $this->di(Output::class);
+        $output = $this->di('output');
 
         if ($this->validator) $error = $this->validator->__invoke($input, $output);
         else                  $error = $this->validate($input, $output);
