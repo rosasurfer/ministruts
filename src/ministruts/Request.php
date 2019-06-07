@@ -41,6 +41,9 @@ class Request extends Singleton {
     /** @var string */
     private $path;
 
+    /** @var array - normalized structure of files uploaded with the request */
+    private $files;
+
     /** @var array - additional variables context */
     private $attributes = [];
 
@@ -154,8 +157,8 @@ class Request extends Singleton {
 
     /**
      * Return the single $_REQUEST parameter with the specified name. If multiple $_REQUEST parameters with that name have
-     * been transmitted, the last one is returned. If an array of $_REQUEST parameters with that name have been transmitted
-     * they are ignored.
+     * been transmitted, the last one is returned. If an array of $_REQUEST parameters with that name has been transmitted
+     * they are all ignored.
      *
      * @param  string $name - parameter name
      *
@@ -177,7 +180,7 @@ class Request extends Singleton {
      *
      * @param  string $name - parameter name
      *
-     * @return string[] - values or an empty array if no such array of $_REQUEST parameters have been transmitted
+     * @return string[] - values or an empty array if no such array of $_REQUEST parameters has been transmitted
      */
     public function getParameters($name) {
         if (key_exists($name, $_REQUEST)) {
@@ -191,8 +194,8 @@ class Request extends Singleton {
 
     /**
      * Return the single $_GET parameter with the specified name. If multiple $_GET parameters with that name have been
-     * transmitted, the last one is returned. If an array of $_GET parameters with that name have been transmitted they are
-     * ignored.
+     * transmitted, the last one is returned. If an array of $_GET parameters with that name has been transmitted they are
+     * all ignored.
      *
      * @param  string $name - parameter name
      *
@@ -214,7 +217,7 @@ class Request extends Singleton {
      *
      * @param  string $name - parameter name
      *
-     * @return string[] - values or an empty array if no such array of $_GET parameters have been transmitted
+     * @return string[] - values or an empty array if no such array of $_GET parameters has been transmitted
      */
     public function getGetParameters($name) {
         if (isset($_GET[$name])) {
@@ -228,8 +231,8 @@ class Request extends Singleton {
 
     /**
      * Return the single $_POST parameter with the specified name. If multiple $_POST parameters with that name have been
-     * transmitted, the last one is returned. If an array of $_POST parameters with that name have been transmitted they are
-     * ignored.
+     * transmitted, the last one is returned. If an array of $_POST parameters with that name has been transmitted they are
+     * all ignored.
      *
      * @param  string $name - parameter name
      *
@@ -251,7 +254,7 @@ class Request extends Singleton {
      *
      * @param  string $name - parameter name
      *
-     * @return string[] - values or an empty array if no such array of $_POST parameters have been transmitted
+     * @return string[] - values or an empty array if no such array of $_POST parameters has been transmitted
      */
     public function getPostParameters($name) {
         if (isset($_POST[$name])) {
@@ -264,16 +267,15 @@ class Request extends Singleton {
 
 
     /**
-     * Return an object-oriented representation of the uploaded files. The broken PHP array structure of uploaded files is
-     * converted to regular file arrays.
-     *
-     * @TODO: convert file data to {@link UploadedFile} instances
+     * Return an object-oriented representation of the files uploaded with the request. The PHP array structure of $_FILES
+     * is converted to normalized arrays.
      *
      * @return array - associative array of files
+     *
+     * @todo   Convert the returned arrays to instances of {@link UploadedFile}.
      */
     public function getFiles() {
-        static $files;
-        if (!isset($files)) {
+        if (!isset($this->files)) {
             $normalizeLevel = function(array $file) use (&$normalizeLevel) {
                 if (isset($file['name']) && is_array($file['name'])) {
                     $properties = \array_keys($file);
@@ -288,14 +290,34 @@ class Request extends Singleton {
                 }
                 return $file;
             };
-            $files = [];
+            $this->files = [];
             if (isset($_FILES)) {
                 foreach ($_FILES as $key => $file) {
-                    $files[$key] = $normalizeLevel($file);
+                    $this->files[$key] = $normalizeLevel($file);
                 }
             }
         }
-        return $files;
+        return $this->files;
+    }
+
+
+    /**
+     * Return an object-oriented representation of a file uploaded with the request.
+     *
+     * @param  string $name - parameter name of the file upload
+     *
+     * @return array|null - array or NULL if no such file was uploaded
+     *
+     * @todo   Convert the returned array to an instance of {@link UploadedFile}.
+     */
+    public function getFile($name) {
+        Assert::string($name);
+
+        $files = $this->getFiles();
+
+        if (isset($files[$name]))
+            return $files[$name];
+        return null;
     }
 
 
