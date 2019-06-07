@@ -70,7 +70,7 @@ class Page extends Singleton {
 
 
     /**
-     * Magic method. Returns the property stored under the specified key.
+     * Magic method&#46;  Returns the property stored under the specified key.
      *
      * @param  string $name - property name
      *
@@ -84,8 +84,8 @@ class Page extends Singleton {
 
 
     /**
-     * Magische Methode, die die Eigenschaft mit dem angegebenen Namen setzt.  Wird automatisch
-     * aufgerufen und ermoeglicht den Zugriff auf Eigenschaften mit dynamischen Namen.
+     * Magische Methode, die die Eigenschaft mit dem angegebenen Namen setzt&#46;  Wird automatisch aufgerufen und
+     * ermoeglicht den Zugriff auf Eigenschaften mit dynamischen Namen.
      *
      * @param  string $name  - Name der Eigenschaft
      * @param  mixed  $value - Wert

@@ -118,7 +118,7 @@ class Validator extends StaticClass {
 
 
     /**
-     * Ob der uebergebene String ein gueltiges E-Mail-Adressmuster ist. Wildcards sind ? und *.
+     * Ob der uebergebene String ein gueltiges E-Mail-Adressmuster ist&#46;  Wildcards sind ? und *.
      *
      * @param  string $string - der zu ueberpruefende String
      *
@@ -327,7 +327,7 @@ class Validator extends StaticClass {
 
 
     /**
-     * Ob der uebergebene String ein vollstaendiger Strassenname ist (Landstr. [23]).
+     * Ob der uebergebene String ein vollstaendiger Strassenname ist (Landstr&#46; [23]).
      *
      * @param  string $string - der zu pruefende String
      *

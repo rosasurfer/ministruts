@@ -62,10 +62,10 @@ abstract class Mailer extends CObject implements MailerInterface {
 
 
     /**
-     * Delay sending of the mail to the script shutdown phase. Can be used to not to block other more important tasks.
+     * Delay sending of the mail to the script shutdown phase&#46;  Can be used to not to block other more important tasks.
      *
-     * NOTE: Usage of this method is a poor man's approach and a last resort. A more professional way to decouple sending
-     *       of mail is using a regular message queue.
+     * NOTE: Usage of this method is a poor man's approach and a last resort&#46;  A more professional way to decouple
+     *       sending of mail is using a regular message queue.
      *
      * @param  string   $sender             - mail sender
      * @param  string   $receiver           - mail receiver
@@ -127,8 +127,8 @@ abstract class Mailer extends CObject implements MailerInterface {
 
 
     /**
-     * Search for a given header and return its value. If the array contains multiple headers of that the last such header
-     * is returned.
+     * Search for a given header and return its value&#46;  If the array contains multiple headers of that the last such
+     * header is returned.
      *
      * @param  string[] $headers - array of headers
      * @param  string   $name    - header to search for
@@ -150,8 +150,8 @@ abstract class Mailer extends CObject implements MailerInterface {
 
 
     /**
-     * Remove a given header from the array and return its value. If the array contains multiple headers of that name all
-     * such headers are removed and the last removed one is returned.
+     * Remove a given header from the array and return its value&#46;  If the array contains multiple headers of that name
+     * all such headers are removed and the last removed one is returned.
      *
      * @param  string[] $headers - reference to an array of headers
      * @param  string   $name    - header to remove
@@ -175,7 +175,7 @@ abstract class Mailer extends CObject implements MailerInterface {
 
 
     /**
-     * Encode non-ASCII characters with UTF-8. If a string doesn't contain non-ASCII characters it is not modified.
+     * Encode non-ASCII characters with UTF-8&#46;  If a string doesn't contain non-ASCII characters it is not modified.
      *
      * @param  string|string[] $value - a single or a list of values
      *

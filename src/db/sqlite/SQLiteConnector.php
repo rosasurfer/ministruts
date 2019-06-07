@@ -19,15 +19,15 @@ use const rosasurfer\NL;
  *
  * Connector configuration:
  * <pre>
- * +--------------------------------------+-------------+----------------------------+
- * | setting                              | value       | default value              |
- * +--------------------------------------+-------------+----------------------------+
- * | db.{name}.connector                  | sqlite      | -                          |
- * | db.{name}.file                       | db-filename | - (1)                      |
- * | db.{name}.options.open_mode          | [openMode]  | SQLITE3_OPEN_READWRITE (2) |
- * | db.{name}.options.foreign_keys       | [on|off]    | on                         |
- * | db.{name}.options.recursive_triggers | [on|off]    | on                         |
- * +--------------------------------------+-------------+----------------------------+
+ *  +--------------------------------------+-------------+----------------------------+
+ *  | setting                              | value       | default value              |
+ *  +--------------------------------------+-------------+----------------------------+
+ *  | db.{name}.connector                  | sqlite      | -                          |
+ *  | db.{name}.file                       | db-filename | - (1)                      |
+ *  | db.{name}.options.open_mode          | [openMode]  | SQLITE3_OPEN_READWRITE (2) |
+ *  | db.{name}.options.foreign_keys       | [on|off]    | on                         |
+ *  | db.{name}.options.recursive_triggers | [on|off]    | on                         |
+ *  +--------------------------------------+-------------+----------------------------+
  * </pre>
  *  (1) - A relative db file location is interpreted as relative to <tt>Config["app.dir.root"]</tt>.                        <br>
  *  (2) - Available flags: SQLITE3_OPEN_CREATE | SQLITE3_OPEN_READONLY | SQLITE3_OPEN_READWRITE                             <br>

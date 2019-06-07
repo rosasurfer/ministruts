@@ -153,9 +153,9 @@ class Request extends Singleton {
 
 
     /**
-     * Return the single $_REQUEST parameter with the specified name. If multiple $_REQUEST parameters with that name have
-     * been transmitted, the last one is returned. If an array of $_REQUEST parameters with that name have been transmitted
-     * they are ignored.
+     * Return the single $_REQUEST parameter with the specified name&#46;  If multiple $_REQUEST parameters with that name
+     * have been transmitted, the last one is returned&#46;  If an array of $_REQUEST parameters with that name have been
+     * transmitted they are ignored.
      *
      * @param  string $name - parameter name
      *
@@ -172,8 +172,8 @@ class Request extends Singleton {
 
 
     /**
-     * Return an array of $_REQUEST parameters with the specified name. If a single $_REQUEST parameter with that name was
-     * transmitted it is ignored.
+     * Return an array of $_REQUEST parameters with the specified name&#46;  If a single $_REQUEST parameter with that name
+     * was transmitted it is ignored.
      *
      * @param  string $name - parameter name
      *
@@ -190,9 +190,9 @@ class Request extends Singleton {
 
 
     /**
-     * Return the single $_GET parameter with the specified name. If multiple $_GET parameters with that name have been
-     * transmitted, the last one is returned. If an array of $_GET parameters with that name have been transmitted they are
-     * ignored.
+     * Return the single $_GET parameter with the specified name&#46;  If multiple $_GET parameters with that name have been
+     * transmitted, the last one is returned&#46;  If an array of $_GET parameters with that name have been transmitted they
+     * are ignored.
      *
      * @param  string $name - parameter name
      *
@@ -209,7 +209,7 @@ class Request extends Singleton {
 
 
     /**
-     * Return an array of $_GET parameters with the specified name. If a single $_GET parameter with that name was
+     * Return an array of $_GET parameters with the specified name&#46;  If a single $_GET parameter with that name was
      * transmitted it is ignored.
      *
      * @param  string $name - parameter name
@@ -227,9 +227,9 @@ class Request extends Singleton {
 
 
     /**
-     * Return the single $_POST parameter with the specified name. If multiple $_POST parameters with that name have been
-     * transmitted, the last one is returned. If an array of $_POST parameters with that name have been transmitted they are
-     * ignored.
+     * Return the single $_POST parameter with the specified name&#46;  If multiple $_POST parameters with that name have
+     * been transmitted, the last one is returned&#46;  If an array of $_POST parameters with that name have been transmitted
+     * they are ignored.
      *
      * @param  string $name - parameter name
      *
@@ -246,7 +246,7 @@ class Request extends Singleton {
 
 
     /**
-     * Return an array of $_POST parameters with the specified name. If a single $_POST parameter with that name was
+     * Return an array of $_POST parameters with the specified name&#46;  If a single $_POST parameter with that name was
      * transmitted it is ignored.
      *
      * @param  string $name - parameter name
@@ -264,7 +264,7 @@ class Request extends Singleton {
 
 
     /**
-     * Return an object-oriented representation of the uploaded files. The broken PHP array structure of uploaded files is
+     * Return an object-oriented representation of the uploaded files&#46;  The PHP array structure of uploaded files is
      * converted to regular file arrays.
      *
      * @TODO: convert file data to {@link UploadedFile} instances
@@ -306,8 +306,8 @@ class Request extends Singleton {
      *
      * @example
      * <pre>
-     * $request->getUrl():       "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
-     * $request->getHostname():  "a.domain.tld"
+     *  $request->getUrl():       "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
+     *  $request->getHostname():  "a.domain.tld"
      * </pre>
      */
     public function getHostname() {
@@ -321,14 +321,14 @@ class Request extends Singleton {
 
 
     /**
-     * Return the root URL of the server the request was made to. This value always ends with a slash "/".
+     * Return the root URL of the server the request was made to&#46;  This value always ends with a slash "/".
      *
      * @return string - root URL: protocol + host name + port
      *
      * @example
      * <pre>
-     * $request->getUrl():      "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
-     * $request->getHostUrl():  "http://a.domain.tld/"
+     *  $request->getUrl():      "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
+     *  $request->getHostUrl():  "http://a.domain.tld/"
      * </pre>
      */
     public function getHostUrl() {
@@ -351,7 +351,7 @@ class Request extends Singleton {
      *                  All URLs in this framework are virtual, there is no "path info" as such.
      * @example
      * <pre>
-     * "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
+     *  "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
      * </pre>
      */
     public function getUrl() {
@@ -360,15 +360,15 @@ class Request extends Singleton {
 
 
     /**
-     * Return the URI of the request (the value in the first line of the HTTP protocol). This value always starts
-     * with a slash "/".
+     * Return the URI of the request (the value in the first line of the HTTP protocol)&#46;  This value always starts with
+     * a slash "/".
      *
      * @return string - URI: path + query string
      *                  All URLs in this framework are virtual, there is no "path info" as such.
      * @example
      * <pre>
-     * $request->getUrl():  "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
-     * $request->getUri():  "/path/application/module/foo/bar.html?key=value"
+     *  $request->getUrl():  "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
+     *  $request->getUri():  "/path/application/module/foo/bar.html?key=value"
      * </pre>
      */
     public function getUri() {
@@ -377,14 +377,14 @@ class Request extends Singleton {
 
 
     /**
-     * Return the path fragment of the request's URI. This value always starts with a slash "/".
+     * Return the path fragment of the request's URI&#46;  This value always starts with a slash "/".
      *
      * @return string - path without query string
      *                  All URLs in this framework are virtual, there is no "path info" as such.
      * @example
      * <pre>
-     * $request->getUrl():   "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
-     * $request->getPath():  "/path/application/module/foo/bar.html"
+     *  $request->getUrl():   "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
+     *  $request->getPath():  "/path/application/module/foo/bar.html"
      * </pre>
      */
     public function getPath() {
@@ -400,14 +400,14 @@ class Request extends Singleton {
 
 
     /**
-     * Return the root URL of the application. This value always ends with a slash "/".
+     * Return the root URL of the application&#46;  This value always ends with a slash "/".
      *
      * @return string - URL: protocol + host name + port + application_base_uri
      *
      * @example
      * <pre>
-     * $request->getUrl():              "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
-     * $request->getApplicationUrl():   "http://a.domain.tld/path/application/"
+     *  $request->getUrl():              "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
+     *  $request->getApplicationUrl():   "http://a.domain.tld/path/application/"
      * </pre>
      */
     public function getApplicationUrl() {
@@ -417,14 +417,14 @@ class Request extends Singleton {
 
 
     /**
-     * Return the request's URI relative to the application's base URL. This value always starts with a slash "/".
+     * Return the request's URI relative to the application's base URL&#46;  This value always starts with a slash "/".
      *
      * @return string - URI: slash + module prefix + path + query string
      *                  All URLs in this framework are virtual, there is no "path info" as such.
      * @example
      * <pre>
-     * $request->getUrl():                    "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
-     * $request->getApplicationRelativeUri(): "/module/foo/bar.html?key=value"
+     *  $request->getUrl():                    "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
+     *  $request->getApplicationRelativeUri(): "/module/foo/bar.html?key=value"
      * </pre>
      */
     public function getApplicationRelativeUri() {
@@ -434,15 +434,15 @@ class Request extends Singleton {
 
 
     /**
-     * Return the request's path fragment relative to the application's base URL. This value always starts with
-     * a slash "/".
+     * Return the request's path fragment relative to the application's base URL&#46;  This value always starts with a
+     * slash "/".
      *
      * @return string - path fragment: slash + module prefix + path (without query string)
      *                  All URLs in this framework are virtual, there is no "path info" as such.
      * @example
      * <pre>
-     * $request->getUrl():                      "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
-     * $request->getApplicationRelativePath()   "/module/foo/bar.html"
+     *  $request->getUrl():                      "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
+     *  $request->getApplicationRelativePath()   "/module/foo/bar.html"
      * </pre>
      */
     public function getApplicationRelativePath() {
@@ -452,14 +452,14 @@ class Request extends Singleton {
 
 
     /**
-     * Return the application's base URI. The value always starts and ends with a slash "/".
+     * Return the application's base URI&#46;  The value always starts and ends with a slash "/".
      *
      * @return string - a partial URI (application path without module prefix and query string)
      *
      * @example
      * <pre>
-     * $request->getUrl():                  "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
-     * $request->getApplicationBaseUri():   "/path/application/"
+     *  $request->getUrl():                  "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
+     *  $request->getApplicationBaseUri():   "/path/application/"
      * </pre>
      */
     public function getApplicationBaseUri() {
@@ -482,7 +482,7 @@ class Request extends Singleton {
 
 
     /**
-     * Resolve the value of an existing APP_BASE_URI server variable. Considers existing redirection values.
+     * Resolve the value of an existing APP_BASE_URI server variable&#46;  Considers existing redirection values.
      *
      * @return string|null - value or NULL if the variable is not defined
      */
@@ -508,8 +508,8 @@ class Request extends Singleton {
      *
      * @example
      * <pre>
-     * $request->getUrl():          "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
-     * $request->getQueryString():  "key=value"
+     *  $request->getUrl():          "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
+     *  $request->getQueryString():  "key=value"
      * </pre>
      */
     public function getQueryString() {
@@ -562,7 +562,7 @@ class Request extends Singleton {
 
 
     /**
-     * Return the content of the request (the body). For file uploads the method returns not the real binary content.
+     * Return the content of the request (the body)&#46;  For file uploads the method returns not the real binary content&#46;
      * Instead it returns the available meta infos.
      *
      * @return string - request body or meta infos
@@ -591,8 +591,8 @@ class Request extends Singleton {
 
 
     /**
-     * Return the "Content-Type" header of the request. If multiple "Content-Type" headers have been transmitted the first
-     * one is returned.
+     * Return the "Content-Type" header of the request&#46;  If multiple "Content-Type" headers have been transmitted the
+     * first one is returned.
      *
      * @return string|null - "Content-Type" header or NULL if no "Content-Type" header was transmitted.
      */
@@ -611,7 +611,7 @@ class Request extends Singleton {
 
 
     /**
-     * Return the current HTTP session object. If a session does not yet exist, one is created.
+     * Return the current HTTP session object&#46;  If a session does not yet exist, one is created.
      *
      * @return HttpSession
      */
@@ -621,7 +621,7 @@ class Request extends Singleton {
 
 
     /**
-     * Whether an HTTP session was started during the request. Not whether the session is still open (active).
+     * Whether an HTTP session was started during the request&#46;  Not whether the session is still open (active).
      *
      * @return bool
      */
@@ -631,7 +631,7 @@ class Request extends Singleton {
 
 
     /**
-     * Whether a session attribute of the specified name exists. If no session exists none is started.
+     * Whether a session attribute of the specified name exists&#46;  If no session exists none is started.
      *
      * @param  string $key - key
      *
@@ -665,8 +665,8 @@ class Request extends Singleton {
 
 
     /**
-     * Whether a valid session id was transmitted with the request. An invalid id is a URL based session id when the php.ini
-     * setting 'session.use_only_cookies' is enabled.
+     * Whether a valid session id was transmitted with the request&#46;  An invalid id is a URL based session id when the
+     * php.ini setting 'session.use_only_cookies' is enabled.
      *
      * @return bool
      */
@@ -707,8 +707,8 @@ class Request extends Singleton {
 
 
     /**
-     * Gibt den Wert des angegebenen Headers zurueck.  Wurden mehrere Header dieses Namens uebertragen,
-     * wird der Wert des ersten uebertragenen Headers zurueckgegeben.
+     * Gibt den Wert des angegebenen Headers zurueck&#46;  Wurden mehrere Header dieses Namens uebertragen, wird der Wert des
+     * ersten uebertragenen Headers zurueckgegeben.
      *
      * @param  string $name - Name des Headers
      *
@@ -782,7 +782,7 @@ class Request extends Singleton {
 
 
     /**
-     * Return the value of the specified header. If multiple headers are specified or multiple headers have been
+     * Return the value of the specified header&#46;  If multiple headers are specified or multiple headers have been
      * transmitted, return all values as a comma-separated list (in transmission order).
      *
      * @param  string|string[] $names - one or more header names
@@ -858,7 +858,8 @@ class Request extends Singleton {
 
 
     /**
-     * Store a value in the <tt>Request</tt> context. Can be used to transfer data from controllers or <tt>Action</tt>s to views.
+     * Store a value in the <tt>Request</tt> context&#46;  Can be used to transfer data from controllers or <tt>Action</tt>s
+     * to views.
      *
      * @param  string $key   - Schluessel, unter dem der Wert gespeichert wird
      * @param  mixed  $value - der zu speichernde Wert
@@ -869,7 +870,7 @@ class Request extends Singleton {
 
 
     /**
-     * Loescht die Werte mit den angegebenen Schluesseln aus dem Request-Context. Es koennen mehrere Schluessel
+     * Loescht die Werte mit den angegebenen Schluesseln aus dem Request-Context&#46;  Es koennen mehrere Schluessel
      * angegeben werden.
      *
      * @param  string $key - Schluessel des zu loeschenden Wertes

@@ -48,7 +48,7 @@ class HttpRequest extends CObject {
 
 
     /**
-     * Set the request's HTTP method. Currently only GET and POST are implemented.
+     * Set the request's HTTP method&#46;  Currently only GET and POST are implemented.
      *
      * @param  string $method
      *
@@ -90,7 +90,7 @@ class HttpRequest extends CObject {
 
 
     /**
-     * Set an HTTP header. This method overwrites an existing header of the same name.
+     * Set an HTTP header&#46;  This method overwrites an existing header of the same name.
      *
      * @param  string      $name  - header name
      * @param  string|null $value - header value (an empty value removes an existing header)
@@ -120,7 +120,7 @@ class HttpRequest extends CObject {
 
 
     /**
-     * Add an HTTP header to the existing ones. Existing headers of the same name are not overwritten.
+     * Add an HTTP header to the existing ones&#46;  Existing headers of the same name are not overwritten.
      *
      * @param  string $name  - header name
      * @param  string $value - header value
@@ -153,7 +153,7 @@ class HttpRequest extends CObject {
 
 
     /**
-     * Return the request header with the specified name. This method returns the value of a single header.
+     * Return the request header with the specified name&#46;  This method returns the value of a single header.
      *
      * @param  string $name - header name (case is ignored)
      *
@@ -171,7 +171,7 @@ class HttpRequest extends CObject {
 
 
     /**
-     * Return the request headers with the specified names. This method returns a key-value pair for each found header.
+     * Return the request headers with the specified names&#46;  This method returns a key-value pair for each found header.
      *
      * @param  string|string[] $names [optional] - one or more header names (case is ignored)
      *                                             (default: without a name all headers are returned)
