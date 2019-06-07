@@ -12,7 +12,7 @@ trait DiAwareTrait {
 
 
     /**
-     * Optionally resolve a named service and return its implementation using the service locator pattern. If no service
+     * Optionally resolve a named service and return its implementation using the service locator pattern&#46;  If no service
      * was specified return the default dependency injection container of the {@link Application}.
      *
      * @param  string $name [optional] - service identifier (default: the dependency injection container)

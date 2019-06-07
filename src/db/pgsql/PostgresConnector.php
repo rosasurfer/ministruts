@@ -20,12 +20,12 @@ use const rosasurfer\NL;
  *
  * Connection configuration:
  * <pre>
- * +-------------------------------------+-----------------+-----------------+
- * | config setting                      | value           | default value   |
- * +-------------------------------------+-----------------+-----------------+
- * | db.{connection}.connector           | postgres        | -               |
- * | db.{connection}.{keyword}           | {value}         | -               |
- * +-------------------------------------+-----------------+-----------------+
+ *  +-------------------------------------+-----------------+-----------------+
+ *  | config setting                      | value           | default value   |
+ *  +-------------------------------------+-----------------+-----------------+
+ *  | db.{connection}.connector           | postgres        | -               |
+ *  | db.{connection}.{keyword}           | {value}         | -               |
+ *  +-------------------------------------+-----------------+-----------------+
  * </pre>
  * All connection keywords supported by PostgreSQL can be specified. The keyword "options" can be used as a regular
  * PostgreSQL connection keyword for command line options.
@@ -33,14 +33,14 @@ use const rosasurfer\NL;
  *
  * Additional user-defined options:
  * <pre>
- * +-------------------------------------+-----------------+-----------------+
- * | option                              | value           | default value   |
- * +-------------------------------------+-----------------+-----------------+
- * | db.{connection}.options.search_path | [schemaName]    | "$user", public |
- * | db.{connection}.options.{name1}     | {value}         | -               |
- * | ...                                 | ...             | -               |
- * | db.{connection}.options.{nameN}     | {value}         | -               |
- * +-------------------------------------+-----------------+-----------------+
+ *  +-------------------------------------+-----------------+-----------------+
+ *  | option                              | value           | default value   |
+ *  +-------------------------------------+-----------------+-----------------+
+ *  | db.{connection}.options.search_path | [schemaName]    | "$user", public |
+ *  | db.{connection}.options.{name1}     | {value}         | -               |
+ *  | ...                                 | ...             | -               |
+ *  | db.{connection}.options.{nameN}     | {value}         | -               |
+ *  +-------------------------------------+-----------------+-----------------+
  * </pre>
  * User-defined options can be specified as nested suboptions and are sent to the database as system variables in the
  * scope of the active session.

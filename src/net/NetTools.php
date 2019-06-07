@@ -17,8 +17,8 @@ final class NetTools extends StaticClass {
 
 
     /**
-     * Return the host name of the Internet host specified by a given IP address. Additionally checks the result returned
-     * by the built-in PHP function for plausibility.
+     * Return the host name of the internet host specified by a given IP address&#46;  Additionally checks the result
+     * returned by the built-in PHP function for plausibility.
      *
      * @param  string $ipAddress - the host IP address
      *

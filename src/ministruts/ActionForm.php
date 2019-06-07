@@ -51,7 +51,7 @@ abstract class ActionForm extends CObject {
      *
      * MiniStruts expects the action key nested in an array named "submit". Write your HTML like so:
      * <pre>
-     * &lt;img type="submit" name="submit[action]" value="{action-key}" src=... /&gt;
+     *  &lt;img type="submit" name="submit[action]" value="{action-key}" src=... /&gt;
      * </pre>
      */
     public function initActionKey(Request $request) {

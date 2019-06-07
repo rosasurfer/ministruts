@@ -30,9 +30,27 @@ interface ServiceInterface {
     /**
      * Return the service definition.
      *
-     * @return mixed
+     * @return string|object $definition - a class name, an instance or a Closure acting as an instance factory
      */
     public function getDefinition();
+
+
+    /**
+     * Return the service's alias names.
+     *
+     * @return string[] - list of aliases (including the original name)
+     */
+    public function getAliases();
+
+
+    /**
+     * Add an alias name for the service.
+     *
+     * @param  string $name - alias name
+     *
+     * @return $this
+     */
+    public function addAlias($name);
 
 
     /**

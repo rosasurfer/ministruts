@@ -13,8 +13,8 @@ class Number extends StaticClass {
 
 
     /**
-     * Format a numeric value with a currency format. Opposite to the PHP built-in function number_format() this function
-     * can be called with any number of optional arguments.
+     * Format a numeric value with a currency format&#46;  Opposite to the PHP built-in function number_format() this
+     * function can be called with any number of optional arguments.
      *
      * @param  int|float $value                         - numeric value
      * @param  int       $decimals           [optional] - number of decimals  (default:   2)

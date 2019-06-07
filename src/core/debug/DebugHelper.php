@@ -34,18 +34,18 @@ class DebugHelper extends StaticClass {
      * @example
      * original stacktrace:
      * <pre>
-     *   require_once()  # line 5,  file: /var/www/phalcon/vokuro/vendor/autoload.php
-     *   include_once()  # line 21, file: /var/www/phalcon/vokuro/app/config/loader.php
-     *   include()       # line 26, file: /var/www/phalcon/vokuro/public/index.php
-     *   {main}
+     *  require_once()  # line 5,  file: /var/www/phalcon/vokuro/vendor/autoload.php
+     *  include_once()  # line 21, file: /var/www/phalcon/vokuro/app/config/loader.php
+     *  include()       # line 26, file: /var/www/phalcon/vokuro/public/index.php
+     *  {main}
      * </pre>
      *
      * new stacktrace:
      * <pre>
-     *   require_once()             [php]
-     *   include_once()  # line 5,  file: /var/www/phalcon/vokuro/vendor/autoload.php
-     *   include()       # line 21, file: /var/www/phalcon/vokuro/app/config/loader.php
-     *   {main}          # line 26, file: /var/www/phalcon/vokuro/public/index.php
+     *  require_once()             [php]
+     *  include_once()  # line 5,  file: /var/www/phalcon/vokuro/vendor/autoload.php
+     *  include()       # line 21, file: /var/www/phalcon/vokuro/app/config/loader.php
+     *  {main}          # line 26, file: /var/www/phalcon/vokuro/public/index.php
      * </pre>
      */
     public static function fixTrace(array $trace, $file='unknown', $line=0) {

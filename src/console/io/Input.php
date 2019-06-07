@@ -17,14 +17,13 @@ class Input extends CObject {
 
 
     /**
-     * Constructor
+     * Set the internal docopt result.
      *
-     * NULL may be passed instead of an actual {@link DocoptResult} to initialize an empty default Input service.
-     * Such an instance will return an empty value on all command, argument or option queries.
+     * @param  DocoptResult $docopt
      *
-     * @param  DocoptResult $docopt [optional] - a parsed and matched docopt result
+     * @return $this
      */
-    public function __construct(DocoptResult $docopt = null) {
+    public function setDocoptResult(DocoptResult $docopt) {
         $this->docoptResult = $docopt;
     }
 
@@ -48,6 +47,7 @@ class Input extends CObject {
      * @return bool
      */
     public function isCommand($name) {
+        Assert::string($name);
         if (!$this->docoptResult)
             return false;
 
@@ -58,13 +58,15 @@ class Input extends CObject {
 
 
     /**
-     * Whether the command with the given name was specified. See {@link Input::isCommand()} for the definition of "command".
+     * Whether the command with the given name was specified.
+     * See {@link Input::isCommand()} for the definition of "command".
      *
      * @param  string $name
      *
      * @return bool|int - boolean value or number of times the command was specified (if defined)
      */
     public function hasCommand($name) {
+        Assert::string($name);
         if (!$this->docoptResult)
             return false;
 
@@ -110,6 +112,7 @@ class Input extends CObject {
      * @return string|null - argument value or NULL if the argument was not specified
      */
     public function getArgument($name) {
+        Assert::string($name);
         if (!$this->docoptResult)
             return null;
 
@@ -124,13 +127,15 @@ class Input extends CObject {
 
 
     /**
-     * Return the arguments with the given name. See {@link Input::isArgument()} for the definition of "argument".
+     * Return the arguments with the given name.
+     * See {@link Input::isArgument()} for the definition of "argument".
      *
      * @param  string $name
      *
      * @return string[] - argument values or an empty array if the argument was not specified
      */
     public function getArguments($name) {
+        Assert::string($name);
         if (!$this->docoptResult)
             return [];
 
@@ -145,8 +150,9 @@ class Input extends CObject {
 
 
     /**
-     * Whether the option with the given name is defined (not whether the option was specified). Options are command line
-     * parameters defined with one leading dash (short options) or with two leading dashes (long options).
+     * Whether the option with the given name is defined (not whether the option was specified).
+     *
+     * Options are command line parameters with one leading dash (short options) or with two leading dashes (long options).
      *
      * @param  string $name - long or short option name with leading dash(es)
      *
@@ -176,6 +182,7 @@ class Input extends CObject {
      * @return bool|int|string - option value or FALSE if the option was not specified
      */
     public function getOption($name) {
+        Assert::string($name);
         if (!$this->docoptResult)
             return false;
 
@@ -203,6 +210,7 @@ class Input extends CObject {
      * @return string[] - option values or an empty array if the option was not specified
      */
     public function getOptions($name) {
+        Assert::string($name);
         if (!$this->docoptResult)
             return [];
 

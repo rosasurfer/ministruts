@@ -498,8 +498,8 @@ function strEndsWithI($string, $suffix) {
  *
  * @example
  * <pre>
- * strLeft('abcde',  2) => 'ab'
- * strLeft('abcde', -1) => 'abcd'
+ *  strLeft('abcde',  2) => 'ab'
+ *  strLeft('abcde', -1) => 'abcd'
  * </pre>
  */
 function strLeft($string, $length) {
@@ -527,11 +527,11 @@ function strLeft($string, $length) {
  *
  * @example
  * <pre>
- * strLeftTo('abcde', 'd')      => 'abc'
- * strLeftTo('abcde', 'x')      => 'abcde'   // limiter not found
- * strLeftTo('abccc', 'c',   3) => 'abcc'
- * strLeftTo('abccc', 'c',  -3) => 'ab'
- * strLeftTo('abccc', 'c', -99) => 'abccc'   // number of occurrences not found
+ *  strLeftTo('abcde', 'd')      => 'abc'
+ *  strLeftTo('abcde', 'x')      => 'abcde'   // limiter not found
+ *  strLeftTo('abccc', 'c',   3) => 'abcc'
+ *  strLeftTo('abccc', 'c',  -3) => 'ab'
+ *  strLeftTo('abccc', 'c', -99) => 'abccc'   // number of occurrences not found
  * </pre>
  */
 function strLeftTo($string, $limiter, $count=1, $includeLimiter=false, $onNotFound=null) {
@@ -550,8 +550,8 @@ function strLeftTo($string, $limiter, $count=1, $includeLimiter=false, $onNotFou
  *
  * @example
  * <pre>
- * strRight('abcde',  1) => 'e'
- * strRight('abcde', -2) => 'cde'
+ *  strRight('abcde',  1) => 'e'
+ *  strRight('abcde', -2) => 'cde'
  * </pre>
  */
 function strRight($string, $length) {
@@ -579,10 +579,10 @@ function strRight($string, $length) {
  *
  * @example
  * <pre>
- * strRightFrom('abc_abc', 'c')     => '_abc'
- * strRightFrom('abcabc',  'x')     => ''             // limiter not found
- * strRightFrom('abc_abc', 'a',  2) => 'bc'
- * strRightFrom('abc_abc', 'b', -2) => 'c_abc'
+ *  strRightFrom('abc_abc', 'c')     => '_abc'
+ *  strRightFrom('abcabc',  'x')     => ''             // limiter not found
+ *  strRightFrom('abc_abc', 'a',  2) => 'bc'
+ *  strRightFrom('abc_abc', 'b', -2) => 'c_abc'
  * </pre>
  */
 function strRightFrom($string, $limiter, $count=1, $includeLimiter=false, $onNotFound=null) {

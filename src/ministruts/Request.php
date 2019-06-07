@@ -302,7 +302,7 @@ class Request extends Singleton {
 
 
     /**
-     * Return an object-oriented representation of a file uploaded with the request.
+     * Return an object-oriented representation of a single file uploaded with the request.
      *
      * @param  string $name - parameter name of the file upload
      *
