@@ -27,7 +27,7 @@ class CliServiceContainer extends Di {
             (new Service(Output::class, Output::class))->addAlias('output'),
         ];
         foreach ($services as $service) {
-            $this->registerService($service);
+            $this->addService($service);
         }
         parent::__construct($configDir);
     }

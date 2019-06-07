@@ -12,8 +12,8 @@ use rosasurfer\ministruts\RequestProcessor;
 /**
  * Default dependency injector automatically created for web applications.
  *
- * A variant of the standard dependency injector {@link Di} suitable for web applications. Registers web app related services
- * provided by the framework and user-defined services loaded from the file "{app.dir.config}/services.php".
+ * A variant of the standard dependency injector {@link Di} suitable for web applications. Registers web app related
+ * services provided by the framework and user-defined services loaded from the file "{app.dir.config}/services.php".
  */
 class WebServiceContainer extends Di {
 
@@ -21,7 +21,7 @@ class WebServiceContainer extends Di {
     /**
      * Constructor
      *
-     * @param  string $configDir - directory to load custom service definitions from
+     * @param  string $configDir - directory to load service definitions from
      */
     public function __construct($configDir) {
         $services = [
@@ -31,7 +31,7 @@ class WebServiceContainer extends Di {
           //(new Service(RequestProcessor::class, RequestProcessor::class))->addAlias('requestProcessor'),
         ];
         foreach ($services as $service) {
-            $this->registerService($service);
+            $this->addService($service);
         }
         parent::__construct($configDir);
     }

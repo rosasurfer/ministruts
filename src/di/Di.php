@@ -41,26 +41,26 @@ class Di extends CObject implements DiInterface {
 
 
     /**
-     * Create a new instance and optionally load custom service definitions.
+     * Create a new instance and optionally load service definitions.
      *
      * @param  string $configDir [optional] - directory to load service definitions from (default: no loading)
      */
     public function __construct($configDir = null) {
         if (isset($configDir)) {
             Assert::string($configDir);
-            $this->loadCustomServices($configDir);
+            $this->loadServices($configDir);
         }
     }
 
 
     /**
-     * Register a service.
+     * Register a {@link IService} in the container.
      *
      * @param  IService $service
      *
      * @return $this
      */
-    protected function registerService(IService $service) {
+    protected function addService(IService $service) {
         foreach ($service->getAliases() as $alias) {
             $this->services[$alias] = $service;
         }
@@ -69,13 +69,13 @@ class Di extends CObject implements DiInterface {
 
 
     /**
-     * Load and register custom service definitions.
+     * Load and register service definitions.
      *
      * @param  string $configDir - directory to load service definitions from
      *
-     * @return bool - whether custom service definitions have been found and successfully processed
+     * @return bool - whether service definitions have been found and successfully processed
      */
-    protected function loadCustomServices($configDir) {
+    protected function loadServices($configDir) {
         if (!is_file($file = $configDir.'/services.php'))
             return false;
 
@@ -106,23 +106,6 @@ class Di extends CObject implements DiInterface {
     /**
      * {@inheritdoc}
      *
-     * @param  string $name
-     *
-     * @return object
-     */
-    public function get($name) {
-        if (!isset($this->services[$name])) throw new ServiceNotFoundException('Service "'.$name.'" not found.');
-        try {
-            return $this->services[$name]->resolve($factory=false);
-        }
-        catch (\Throwable $ex) { throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex); }
-        catch (\Exception $ex) { throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex); }
-    }
-
-
-    /**
-     * {@inheritdoc}
-     *
      * @param  string   $name
      * @param  array ...$params - variable list of custom parameters
      *
@@ -132,6 +115,23 @@ class Di extends CObject implements DiInterface {
         if (!isset($this->services[$name])) throw new ServiceNotFoundException('Service "'.$name.'" not found.');
         try {
             return $this->services[$name]->resolve($factory=true, $params);
+        }
+        catch (\Throwable $ex) { throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex); }
+        catch (\Exception $ex) { throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex); }
+    }
+
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param  string $name
+     *
+     * @return object
+     */
+    public function get($name) {
+        if (!isset($this->services[$name])) throw new ServiceNotFoundException('Service "'.$name.'" not found.');
+        try {
+            return $this->services[$name]->resolve($factory=false);
         }
         catch (\Throwable $ex) { throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex); }
         catch (\Exception $ex) { throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex); }
@@ -155,7 +155,7 @@ class Di extends CObject implements DiInterface {
                 $service->addAlias($alias);
             }
         }
-        $this->registerService($service);
+        $this->addService($service);
         return $definition;
     }
 
@@ -171,7 +171,10 @@ class Di extends CObject implements DiInterface {
         $service = null;
         if ($this->has($name)) {
             $service = $this->services[$name];
-            unset($this->services[$name]);
+
+            foreach ($service->getAliases() as $alias) {
+                unset($this->services[$alias]);
+            }
         }
         return $service;
     }
