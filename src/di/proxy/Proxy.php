@@ -20,7 +20,7 @@ abstract class Proxy extends StaticClass {
      *
      * @return string
      */
-    protected static function getProxiedIdentifier() {
+    protected static function getProxiedId() {
         throw new UnimplementedFeatureException(static::class.' must implement method Proxy::'.__FUNCTION__.'()');
     }
 
@@ -31,7 +31,7 @@ abstract class Proxy extends StaticClass {
      * @return object
      */
     public static function getProxiedInstance() {
-        $id = static::getProxiedIdentifier();
+        $id = static::getProxiedId();
 
         if (isset(static::$resolvedInstances[$id]))
             return static::$resolvedInstances[$id];

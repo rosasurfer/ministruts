@@ -16,7 +16,7 @@ class Output extends Proxy {
      *
      * @return string
      */
-    protected static function getProxiedIdentifier() {
+    protected static function getProxiedId() {
         return \rosasurfer\console\io\Output::class;
     }
 }

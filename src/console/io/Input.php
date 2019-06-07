@@ -58,7 +58,8 @@ class Input extends CObject {
 
 
     /**
-     * Whether the command with the given name was specified. See {@link Input::isCommand()} for the definition of "command".
+     * Whether the command with the given name was specified.
+     * See {@link Input::isCommand()} for the definition of "command".
      *
      * @param  string $name
      *
@@ -126,7 +127,8 @@ class Input extends CObject {
 
 
     /**
-     * Return the arguments with the given name. See {@link Input::isArgument()} for the definition of "argument".
+     * Return the arguments with the given name.
+     * See {@link Input::isArgument()} for the definition of "argument".
      *
      * @param  string $name
      *
@@ -148,8 +150,9 @@ class Input extends CObject {
 
 
     /**
-     * Whether the option with the given name is defined (not whether the option was specified). Options are command line
-     * parameters defined with one leading dash (short options) or with two leading dashes (long options).
+     * Whether the option with the given name is defined (not whether the option was specified).
+     *
+     * Options are command line parameters with one leading dash (short options) or with two leading dashes (long options).
      *
      * @param  string $name - long or short option name with leading dash(es)
      *
