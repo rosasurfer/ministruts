@@ -122,7 +122,6 @@ return array(
     'rosasurfer\\di\\proxy\\Input' => $baseDir . '/src/di/proxy/Input.php',
     'rosasurfer\\di\\proxy\\Output' => $baseDir . '/src/di/proxy/Output.php',
     'rosasurfer\\di\\proxy\\Proxy' => $baseDir . '/src/di/proxy/Proxy.php',
-    'rosasurfer\\di\\proxy\\Request' => $baseDir . '/src/di/proxy/Request.php',
     'rosasurfer\\di\\service\\Service' => $baseDir . '/src/di/service/Service.php',
     'rosasurfer\\di\\service\\ServiceInterface' => $baseDir . '/src/di/service/ServiceInterface.php',
     'rosasurfer\\di\\service\\ServiceNotFoundException' => $baseDir . '/src/di/service/ServiceNotFoundException.php',
