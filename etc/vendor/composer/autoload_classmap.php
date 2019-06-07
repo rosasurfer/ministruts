@@ -120,6 +120,7 @@ return array(
     'rosasurfer\\di\\defaultt\\CliServiceContainer' => $baseDir . '/src/di/defaultt/CliServiceContainer.php',
     'rosasurfer\\di\\defaultt\\WebServiceContainer' => $baseDir . '/src/di/defaultt/WebServiceContainer.php',
     'rosasurfer\\di\\proxy\\Input' => $baseDir . '/src/di/proxy/Input.php',
+    'rosasurfer\\di\\proxy\\Output' => $baseDir . '/src/di/proxy/Output.php',
     'rosasurfer\\di\\proxy\\Proxy' => $baseDir . '/src/di/proxy/Proxy.php',
     'rosasurfer\\di\\proxy\\Request' => $baseDir . '/src/di/proxy/Request.php',
     'rosasurfer\\di\\service\\Service' => $baseDir . '/src/di/service/Service.php',
