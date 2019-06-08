@@ -34,7 +34,7 @@ class Windows extends StaticClass {
     public static function errorToString($error) {
         Assert::int($error);
 
-        if (key_exists($error, self::$win32Errors))
+        if (\key_exists($error, self::$win32Errors))
             return self::$win32Errors[$error][0];
         return (string) $error;
     }
@@ -50,7 +50,7 @@ class Windows extends StaticClass {
     public static function errorDescription($error) {
         Assert::int($error);
 
-        if (key_exists($error, self::$win32Errors))
+        if (\key_exists($error, self::$win32Errors))
             return self::$win32Errors[$error][1];
         return (string) $error;
     }

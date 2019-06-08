@@ -20,11 +20,14 @@ class Assert extends StaticClass {
      * @param  mixed    $value
      * @param  string   $message [optional] - value identifier or description
      * @param  array ...$args    [optional] - additional description arguments
+     *
+     * @return bool - whether the assertion is TRUE
      */
     public static function isArray($value, $message = null, ...$args) {
         if (!is_array($value)) {
             throw new IllegalTypeException(static::illegalTypeMessage($value, 'array', $message, $args));
         }
+        return true;
     }
 
 
@@ -34,11 +37,14 @@ class Assert extends StaticClass {
      * @param  mixed    $value
      * @param  string   $message [optional] - value identifier or description
      * @param  array ...$args    [optional] - additional description arguments
+     *
+     * @return bool - whether the assertion is TRUE
      */
     public static function bool($value, $message = null, ...$args) {
         if (!is_bool($value)) {
             throw new IllegalTypeException(static::illegalTypeMessage($value, 'bool', $message, $args));
         }
+        return true;
     }
 
 
@@ -48,11 +54,14 @@ class Assert extends StaticClass {
      * @param  mixed    $value
      * @param  string   $message [optional] - value identifier or description
      * @param  array ...$args    [optional] - additional description arguments
+     *
+     * @return bool - whether the assertion is TRUE
      */
     public static function int($value, $message = null, ...$args) {
         if (!is_int($value)) {
             throw new IllegalTypeException(static::illegalTypeMessage($value, 'int', $message, $args));
         }
+        return true;
     }
 
 
@@ -62,11 +71,14 @@ class Assert extends StaticClass {
      * @param  mixed    $value
      * @param  string   $message [optional] - value identifier or description
      * @param  array ...$args    [optional] - additional description arguments
+     *
+     * @return bool - whether the assertion is TRUE
      */
     public static function float($value, $message = null, ...$args) {
         if (!is_float($value)) {
             throw new IllegalTypeException(static::illegalTypeMessage($value, 'float', $message, $args));
         }
+        return true;
     }
 
 
@@ -76,11 +88,14 @@ class Assert extends StaticClass {
      * @param  mixed    $value
      * @param  string   $message [optional]
      * @param  array ...$args    [optional] - additional message arguments
+     *
+     * @return bool - whether the assertion is TRUE
      */
     public static function string($value, $message = null, ...$args) {
         if (!is_string($value)) {
             throw new IllegalTypeException(static::illegalTypeMessage($value, 'string', $message, $args));
         }
+        return true;
     }
 
 
@@ -90,11 +105,14 @@ class Assert extends StaticClass {
      * @param  mixed    $value
      * @param  string   $message [optional] - value identifier or description
      * @param  array ...$args    [optional] - additional description arguments
+     *
+     * @return bool - whether the assertion is TRUE
      */
     public static function scalar($value, $message = null, ...$args) {
         if (!is_scalar($value)) {
             throw new IllegalTypeException(static::illegalTypeMessage($value, 'scalar', $message, $args));
         }
+        return true;
     }
 
 
@@ -104,11 +122,14 @@ class Assert extends StaticClass {
      * @param  mixed    $value
      * @param  string   $message [optional] - value identifier or description
      * @param  array ...$args    [optional] - additional description arguments
+     *
+     * @return bool - whether the assertion is TRUE
      */
     public static function object($value, $message = null, ...$args) {
         if (!is_object($value)) {
             throw new IllegalTypeException(static::illegalTypeMessage($value, 'object', $message, $args));
         }
+        return true;
     }
 
 
@@ -118,6 +139,8 @@ class Assert extends StaticClass {
      * @param  mixed    $value
      * @param  string   $message [optional] - value identifier or description
      * @param  array ...$args    [optional] - additional description arguments
+     *
+     * @return bool - whether the assertion is TRUE
      */
     public static function throwable($value, $message = null, ...$args) {
         if (PHP_VERSION_ID < 70000) {
@@ -130,6 +153,7 @@ class Assert extends StaticClass {
                 throw new IllegalTypeException(static::illegalTypeMessage($value, '\Throwable', $message, $args));
             }
         }
+        return true;
     }
 
 
@@ -140,6 +164,8 @@ class Assert extends StaticClass {
      * @param  string   $method
      * @param  string   $message [optional] - value identifier or description
      * @param  array ...$args    [optional] - additional description arguments
+     *
+     * @return bool - whether the assertion is TRUE
      */
     public static function hasMethod($objectOrClass, $method, $message = null, ...$args) {
         if (!method_exists($objectOrClass, $method)) {
@@ -148,6 +174,7 @@ class Assert extends StaticClass {
             else                                $value = static::valueToStr($objectOrClass);
             throw new IllegalTypeException(static::illegalTypeMessage($value, 'object or class with method "'.$method.'"()', $message, $args));
         }
+        return true;
     }
 
 
@@ -158,6 +185,8 @@ class Assert extends StaticClass {
      * @param  string   $type    [optional]
      * @param  string   $message [optional] - value identifier or description
      * @param  array ...$args    [optional] - additional description arguments
+     *
+     * @return bool - whether the assertion is TRUE
      */
     public static function resource($value, $type = null, $message = null, ...$args) {
         if (!is_resource($value)) {
@@ -166,6 +195,7 @@ class Assert extends StaticClass {
         if (isset($type) && get_resource_type($value) != $type) {
             throw new IllegalTypeException(static::illegalTypeMessage($value, $type.' resource', $message, $args));
         }
+        return true;
     }
 
 
@@ -175,11 +205,14 @@ class Assert extends StaticClass {
      * @param  mixed    $value
      * @param  string   $message [optional] - value identifier or description
      * @param  array ...$args    [optional] - additional description arguments
+     *
+     * @return bool - whether the assertion is TRUE
      */
     public static function nullOrArray($value, $message = null, ...$args) {
         if (isset($value) && !is_array($value)) {
             throw new IllegalTypeException(static::illegalTypeMessage($value, 'null or array', $message, $args));
         }
+        return true;
     }
 
 
@@ -189,11 +222,14 @@ class Assert extends StaticClass {
      * @param  mixed    $value
      * @param  string   $message [optional] - value identifier or description
      * @param  array ...$args    [optional] - additional description arguments
+     *
+     * @return bool - whether the assertion is TRUE
      */
     public static function nullOrBool($value, $message = null, ...$args) {
         if (isset($value) && !is_bool($value)) {
             throw new IllegalTypeException(static::illegalTypeMessage($value, 'null or bool', $message, $args));
         }
+        return true;
     }
 
 
@@ -203,11 +239,14 @@ class Assert extends StaticClass {
      * @param  mixed    $value
      * @param  string   $message [optional] - value identifier or description
      * @param  array ...$args    [optional] - additional description arguments
+     *
+     * @return bool - whether the assertion is TRUE
      */
     public static function nullOrInt($value, $message = null, ...$args) {
         if (isset($value) && !is_int($value)) {
             throw new IllegalTypeException(static::illegalTypeMessage($value, 'null or int', $message, $args));
         }
+        return true;
     }
 
 
@@ -217,11 +256,14 @@ class Assert extends StaticClass {
      * @param  mixed    $value
      * @param  string   $message [optional] - value identifier or description
      * @param  array ...$args    [optional] - additional description arguments
+     *
+     * @return bool - whether the assertion is TRUE
      */
     public static function nullOrFloat($value, $message = null, ...$args) {
         if (isset($value) && !is_float($value)) {
             throw new IllegalTypeException(static::illegalTypeMessage($value, 'null or float', $message, $args));
         }
+        return true;
     }
 
 
@@ -231,11 +273,14 @@ class Assert extends StaticClass {
      * @param  mixed    $value
      * @param  string   $message [optional] - value identifier or description
      * @param  array ...$args    [optional] - additional description arguments
+     *
+     * @return bool - whether the assertion is TRUE
      */
     public static function nullOrString($value, $message = null, ...$args) {
         if (isset($value) && !is_string($value)) {
             throw new IllegalTypeException(static::illegalTypeMessage($value, 'null or string', $message, $args));
         }
+        return true;
     }
 
 
@@ -245,11 +290,14 @@ class Assert extends StaticClass {
      * @param  mixed    $value
      * @param  string   $message [optional] - value identifier or description
      * @param  array ...$args    [optional] - additional description arguments
+     *
+     * @return bool - whether the assertion is TRUE
      */
     public static function nullOrScalar($value, $message = null, ...$args) {
         if (isset($value) && !is_scalar($value)) {
             throw new IllegalTypeException(static::illegalTypeMessage($value, 'null or scalar', $message, $args));
         }
+        return true;
     }
 
 
@@ -259,11 +307,14 @@ class Assert extends StaticClass {
      * @param  mixed    $value
      * @param  string   $message [optional] - value identifier or description
      * @param  array ...$args    [optional] - additional description arguments
+     *
+     * @return bool - whether the assertion is TRUE
      */
     public static function nullOrObject($value, $message = null, ...$args) {
         if (isset($value) && !is_object($value)) {
             throw new IllegalTypeException(static::illegalTypeMessage($value, 'null or object', $message, $args));
         }
+        return true;
     }
 
 
@@ -274,6 +325,8 @@ class Assert extends StaticClass {
      * @param  string   $type    [optional]
      * @param  string   $message [optional] - value identifier or description
      * @param  array ...$args    [optional] - additional description arguments
+     *
+     * @return bool - whether the assertion is TRUE
      */
     public static function nullOrResource($value, $type = null, $message = null, ...$args) {
         if (isset($value)) {
@@ -284,6 +337,7 @@ class Assert extends StaticClass {
                 throw new IllegalTypeException(static::illegalTypeMessage($value, 'null or '.$type.' resource', $message, $args));
             }
         }
+        return true;
     }
 
 

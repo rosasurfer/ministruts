@@ -68,7 +68,7 @@ final class NetTools extends StaticClass {
         static $proxys = null;
 
         if ($proxys === null) {
-            $proxys = array();
+            $proxys = [];
 
             /** @var ConfigInterface $config */
             $config = self::di('config');
