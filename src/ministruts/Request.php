@@ -67,18 +67,6 @@ class Request extends CObject {
 
 
     /**
-     * Return the instance currently registered in the service container.
-     *
-     * @return static
-     *
-     * @deprecated
-     */
-    public static function _me() {
-        return self::di(__CLASS__);
-    }
-
-
-    /**
      * Parse the specified query string and store parameters in $GET and $_REQUEST.
      *
      * @param  string $data - raw query string
@@ -1223,5 +1211,17 @@ class Request extends CObject {
         }
         catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }
         catch (\Exception $ex) { ErrorHandler::handleToStringException($ex); }
+    }
+
+
+    /**
+     * Return the instance currently registered in the service container.
+     *
+     * @return static
+     *
+     * @deprecated
+     */
+    public static function me() {
+        return self::di(__CLASS__);
     }
 }
