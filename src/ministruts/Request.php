@@ -1158,7 +1158,7 @@ class Request extends Singleton {
     /**
      * Return the MiniStruts {@link ActionMapping} responsible for processing the current request.
      *
-     * @return ActionMapping|null - instance or NULL if called without a Struts configration
+     * @return ActionMapping|null - instance or NULL if the request doesn't match any of the configured mappings
      */
     final public function getMapping() {
         return $this->getAttribute(ACTION_MAPPING_KEY);
@@ -1168,7 +1168,7 @@ class Request extends Singleton {
     /**
      * Return the MiniStruts {@link Module} the current request is assigned to.
      *
-     * @return Module - instance or NULL if called without a Struts configration
+     * @return Module|null - instance or NULL if the request doesn't match any of the configured modules
      */
     final public function getModule() {
         return $this->getAttribute(MODULE_KEY);
@@ -1192,7 +1192,7 @@ class Request extends Singleton {
 
 
     /**
-     * Return a human-readable version of this request.
+     * Return a human-readable version of the request.
      *
      * @return string
      */
