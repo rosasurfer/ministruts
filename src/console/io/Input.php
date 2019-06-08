@@ -8,6 +8,8 @@ use rosasurfer\core\assert\Assert;
 
 /**
  * Input
+ *
+ * An object providing access to command line input and parsed command line arguments.
  */
 class Input extends CObject {
 

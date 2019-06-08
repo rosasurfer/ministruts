@@ -16,11 +16,11 @@ abstract class Proxy extends StaticClass {
 
 
     /**
-     * Get the identifier of the object behind the proxy.
+     * Return the service identifier of the proxied instance.
      *
      * @return string
      */
-    protected static function getProxiedId() {
+    protected static function getServiceId() {
         throw new UnimplementedFeatureException(static::class.' must implement method Proxy::'.__FUNCTION__.'()');
     }
 
@@ -30,8 +30,8 @@ abstract class Proxy extends StaticClass {
      *
      * @return object
      */
-    public static function getProxiedInstance() {
-        $id = static::getProxiedId();
+    public static function instance() {
+        $id = static::getServiceId();
 
         if (isset(static::$resolvedInstances[$id]))
             return static::$resolvedInstances[$id];
@@ -49,7 +49,7 @@ abstract class Proxy extends StaticClass {
      * @return mixed
      */
     public static function __callStatic($method, array $args) {
-        $instance = static::getProxiedInstance();
+        $instance = static::instance();
         return $instance->$method(...$args);
     }
 }

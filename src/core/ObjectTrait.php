@@ -53,8 +53,8 @@ trait ObjectTrait {
 
 
     /**
-     * Method catching otherwise unnoticed write access to undefined properties.
-     * Method catching otherwise fatal errors caused by write access to inaccessible properties.
+     * Method catching otherwise unnoticed write access to undefined instance properties.
+     * Method catching otherwise fatal errors caused by write access to inaccessible instance properties.
      *
      * @param  string $property - name of the undefined property
      * @param  mixed  $value    - passed property value
