@@ -136,7 +136,7 @@ class ApcCache extends CachePeer {
         // data format in the cache: [created, expires, serialized([value, dependency])]
         $fullKey = $this->namespace.'::'.$key;
         $created = time();
-        $data    = array($value, $dependency);
+        $data    = [$value, $dependency];
 
         /**
          * PHP 5.3.3/APC 3.1.3
@@ -165,12 +165,12 @@ class ApcCache extends CachePeer {
             if ($isKey)
                 apc_delete($fullKey);      // apc_delete()+apc_add() result in less memory fragmentation than apc_store()
 
-            if (!apc_add($fullKey, array($created, $expires, serialize($data)))) {
+            if (!apc_add($fullKey, [$created, $expires, serialize($data)])) {
                 //Logger::log('apc_add() unexpectedly returned FALSE for $key "'.$fullKey.'" '.($isKey ? '(did exist and was deleted)':'(did not exist)'), L_WARN);
                 return false;
             }
         }
-        elseif (!apc_store($fullKey, array($created, $expires, serialize($data)))) {
+        elseif (!apc_store($fullKey, [$created, $expires, serialize($data)])) {
             //Logger::log('apc_store() unexpectedly returned FALSE for $key "'.$fullKey.'" '.($isKey ? '(did exist and was deleted)':'(did not exist)'), L_WARN);
             return false;
         }

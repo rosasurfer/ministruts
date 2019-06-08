@@ -30,7 +30,7 @@ final class FileLock extends BaseLock {
      */
     public function __construct($filename) {
         Assert::string($filename);
-        if (key_exists($filename, self::$hFiles)) throw new RuntimeException('Dead-lock: re-entry detected for lock file "'.$filename.'"');
+        if (\key_exists($filename, self::$hFiles)) throw new RuntimeException('Dead-lock: re-entry detected for lock file "'.$filename.'"');
         self::$hFiles[$filename] = null;                // pre-define the index and handle re-entry if the constructor crashes
 
         $this->filename = $filename;

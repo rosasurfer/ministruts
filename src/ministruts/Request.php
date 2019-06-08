@@ -26,8 +26,10 @@ use const rosasurfer\NL;
 
 
 /**
- * An object representing the current HTTP request. It provides an additional variables container (a context) with the
- * life-time of the HTTP request.
+ * Request
+ *
+ * An object representing the current HTTP request. Provides an additional variables context with the life-time of
+ * the request.
  */
 class Request extends Singleton {
 
@@ -49,14 +51,14 @@ class Request extends Singleton {
 
 
     /**
-     * Return the <tt>Singleton</tt> instance.
+     * Return the {@link Singleton} instance of this class.
      *
      * @return static
      *
-     * @throws RuntimeException if not called from the web interface
+     * @throws RuntimeException if not called in a web application context
      */
     public static function me() {
-        if (CLI) throw new RuntimeException('Cannot create a '.static::class.' instance in a non-web context.');
+        if (CLI) throw new RuntimeException('Cannot create a '.static::class.' instance in a command line context.');
         return Singleton::getInstance(static::class);
     }
 
@@ -69,8 +71,8 @@ class Request extends Singleton {
 
         $this->method = $_SERVER['REQUEST_METHOD'];
 
-        // If $_SERVER['QUERY_STRING'] is empty (e.g. at times in nginx) PHP will not parse URL parameters
-        // and it needs to be done manually.
+        // If $_SERVER['QUERY_STRING'] is empty (e.g. at times in nginx) PHP will not parse query parameters
+        // and it has to be done manually.
         $query = $this->getQueryString();
         if (strlen($query) && !$_GET)
             $this->parseQueryString($query);
@@ -88,7 +90,7 @@ class Request extends Singleton {
         foreach ($params as $param) {
             $parts = explode('=', $param, 2);
             $name  = trim(urldecode($parts[0])); if (!strlen($name)) continue;
-            //$name  = str_replace(['.', ' '], '_', $name);                             // replace as the PHP implementation does
+            //$name  = str_replace(['.', ' '], '_', $name);                         // replace as the PHP implementation does
             $value = sizeof($parts)==1 ? '' : urldecode($parts[1]);
 
             // TODO: process multi-dimensional arrays
@@ -103,20 +105,20 @@ class Request extends Singleton {
                 }
                 else {
                     $_GET[$name][$key]                                    = $value;
-                    !isset($_POST[$name][$key]) && $_REQUEST[$name][$key] = $value;   // GET must not over-write POST
+                    !isset($_POST[$name][$key]) && $_REQUEST[$name][$key] = $value; // GET must not over-write POST
                 }
             }
             else {
                 // name is not an array index
                 $_GET[$name]                              = $value;
-                !isset($_POST[$name]) && $_REQUEST[$name] = $value;                  // GET must not over-write POST
+                !isset($_POST[$name]) && $_REQUEST[$name] = $value;                 // GET must not over-write POST
             }
         }
     }
 
 
     /**
-     * Return the HTTP methode of the request.
+     * Return the HTTP method of the request.
      *
      * @return string
      */
@@ -146,7 +148,7 @@ class Request extends Singleton {
 
 
     /**
-     * Whether the request was made over a secure channel (HTTPS).
+     * Whether the request was made over a secure connection (HTTPS).
      *
      * @return bool
      */
@@ -157,8 +159,7 @@ class Request extends Singleton {
 
     /**
      * Return the single $_REQUEST parameter with the specified name. If multiple $_REQUEST parameters with that name have
-     * been transmitted, the last one is returned. If an array of $_REQUEST parameters with that name has been transmitted
-     * they are all ignored.
+     * been transmitted, the last one is returned. A transmitted array of $_REQUEST parameters with that name is ignored.
      *
      * @param  string $name - parameter name
      *
@@ -175,15 +176,15 @@ class Request extends Singleton {
 
 
     /**
-     * Return an array of $_REQUEST parameters with the specified name. If a single $_REQUEST parameter with that name was
-     * transmitted it is ignored.
+     * Return an array of $_REQUEST parameters with the specified name. A single transmitted $_REQUEST parameter with that
+     * name is ignored.
      *
      * @param  string $name - parameter name
      *
      * @return string[] - values or an empty array if no such array of $_REQUEST parameters has been transmitted
      */
     public function getParameters($name) {
-        if (key_exists($name, $_REQUEST)) {
+        if (\key_exists($name, $_REQUEST)) {
             $value = $_REQUEST[$name];
             if (is_array($value))
                 return $value;
@@ -194,8 +195,7 @@ class Request extends Singleton {
 
     /**
      * Return the single $_GET parameter with the specified name. If multiple $_GET parameters with that name have been
-     * transmitted, the last one is returned. If an array of $_GET parameters with that name has been transmitted they are
-     * all ignored.
+     * transmitted, the last one is returned. A transmitted array of $_GET parameters with that name is ignored.
      *
      * @param  string $name - parameter name
      *
@@ -212,8 +212,8 @@ class Request extends Singleton {
 
 
     /**
-     * Return an array of $_GET parameters with the specified name. If a single $_GET parameter with that name was
-     * transmitted it is ignored.
+     * Return an array of $_GET parameters with the specified name. A single transmitted $_GET parameter with that name is
+     * ignored.
      *
      * @param  string $name - parameter name
      *
@@ -231,8 +231,7 @@ class Request extends Singleton {
 
     /**
      * Return the single $_POST parameter with the specified name. If multiple $_POST parameters with that name have been
-     * transmitted, the last one is returned. If an array of $_POST parameters with that name has been transmitted they are
-     * all ignored.
+     * transmitted, the last one is returned. A transmitted array of $_POST parameters with that name is ignored.
      *
      * @param  string $name - parameter name
      *
@@ -249,8 +248,8 @@ class Request extends Singleton {
 
 
     /**
-     * Return an array of $_POST parameters with the specified name. If a single $_POST parameter with that name was
-     * transmitted it is ignored.
+     * Return an array of $_POST parameters with the specified name. A single transmitted $_POST parameter with that name
+     * is ignored.
      *
      * @param  string $name - parameter name
      *
@@ -328,8 +327,8 @@ class Request extends Singleton {
      *
      * @example
      * <pre>
-     * $request->getUrl():       "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
-     * $request->getHostname():  "a.domain.tld"
+     *  $request->getUrl();             // "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
+     *  $request->getHostname();        // "a.domain.tld"
      * </pre>
      */
     public function getHostname() {
@@ -349,8 +348,8 @@ class Request extends Singleton {
      *
      * @example
      * <pre>
-     * $request->getUrl():      "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
-     * $request->getHostUrl():  "http://a.domain.tld/"
+     *  $request->getUrl();             // "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
+     *  $request->getHostUrl();         // "http://a.domain.tld/"
      * </pre>
      */
     public function getHostUrl() {
@@ -370,10 +369,10 @@ class Request extends Singleton {
      * Return the full URL of the request.
      *
      * @return string - full URL: protocol + host name + port + path + query string
-     *                  All URLs in this framework are virtual, there is no "path info" as such.
+     *
      * @example
      * <pre>
-     * "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
+     *  $request->getUrl();         // "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
      * </pre>
      */
     public function getUrl() {
@@ -386,11 +385,11 @@ class Request extends Singleton {
      * with a slash "/".
      *
      * @return string - URI: path + query string
-     *                  All URLs in this framework are virtual, there is no "path info" as such.
+     *
      * @example
      * <pre>
-     * $request->getUrl():  "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
-     * $request->getUri():  "/path/application/module/foo/bar.html?key=value"
+     *  $request->getUrl();         // "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
+     *  $request->getUri();         // "/path/application/module/foo/bar.html?key=value"
      * </pre>
      */
     public function getUri() {
@@ -402,11 +401,11 @@ class Request extends Singleton {
      * Return the path fragment of the request's URI. This value always starts with a slash "/".
      *
      * @return string - path without query string
-     *                  All URLs in this framework are virtual, there is no "path info" as such.
+     *
      * @example
      * <pre>
-     * $request->getUrl():   "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
-     * $request->getPath():  "/path/application/module/foo/bar.html"
+     *  $request->getUrl();         // "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
+     *  $request->getPath():        // "/path/application/module/foo/bar.html"
      * </pre>
      */
     public function getPath() {
@@ -428,8 +427,8 @@ class Request extends Singleton {
      *
      * @example
      * <pre>
-     * $request->getUrl():              "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
-     * $request->getApplicationUrl():   "http://a.domain.tld/path/application/"
+     *  $request->getUrl();             // "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
+     *  $request->getApplicationUrl();  // "http://a.domain.tld/path/application/"
      * </pre>
      */
     public function getApplicationUrl() {
@@ -442,11 +441,11 @@ class Request extends Singleton {
      * Return the request's URI relative to the application's base URL. This value always starts with a slash "/".
      *
      * @return string - URI: slash + module prefix + path + query string
-     *                  All URLs in this framework are virtual, there is no "path info" as such.
+     *
      * @example
      * <pre>
-     * $request->getUrl():                    "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
-     * $request->getApplicationRelativeUri(): "/module/foo/bar.html?key=value"
+     *  $request->getUrl();                     // "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
+     *  $request->getApplicationRelativeUri();  // "/module/foo/bar.html?key=value"
      * </pre>
      */
     public function getApplicationRelativeUri() {
@@ -460,11 +459,11 @@ class Request extends Singleton {
      * a slash "/".
      *
      * @return string - path fragment: slash + module prefix + path (without query string)
-     *                  All URLs in this framework are virtual, there is no "path info" as such.
+     *
      * @example
      * <pre>
-     * $request->getUrl():                      "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
-     * $request->getApplicationRelativePath()   "/module/foo/bar.html"
+     *  $request->getUrl();                     // "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
+     *  $request->getApplicationRelativePath(); // "/module/foo/bar.html"
      * </pre>
      */
     public function getApplicationRelativePath() {
@@ -480,8 +479,8 @@ class Request extends Singleton {
      *
      * @example
      * <pre>
-     * $request->getUrl():                  "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
-     * $request->getApplicationBaseUri():   "/path/application/"
+     *  $request->getUrl();                     // "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
+     *  $request->getApplicationBaseUri();      // "/path/application/"
      * </pre>
      */
     public function getApplicationBaseUri() {
@@ -530,8 +529,8 @@ class Request extends Singleton {
      *
      * @example
      * <pre>
-     * $request->getUrl():          "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
-     * $request->getQueryString():  "key=value"
+     *  $request->getUrl();                 // "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
+     *  $request->getQueryString();         // "key=value"
      * </pre>
      */
     public function getQueryString() {
@@ -579,15 +578,15 @@ class Request extends Singleton {
      * @return string|null - header value (one or more ip addresses or hostnames) or NULL if the header was not transmitted
      */
     public function getForwardedRemoteAddress() {
-        return $this->getHeaderValue(array('X-Forwarded-For', 'X-UP-Forwarded-For'));
+        return $this->getHeaderValue(['X-Forwarded-For', 'X-UP-Forwarded-For']);
     }
 
 
     /**
-     * Return the content of the request (the body). For file uploads the method returns not the real binary content.
-     * Instead it returns the available meta infos.
+     * Return the content of the request (the body). For file uploads the method doesn't return the real binary content.
+     * Instead it returns available metadata.
      *
-     * @return string - request body or meta infos
+     * @return string - request body or metadata
      */
     public function getContent() {
         static $content  = '';
@@ -596,8 +595,8 @@ class Request extends Singleton {
         if (!$isRead) {
             if ($this->getContentType() == 'multipart/form-data') {
                 // file upload
-                if ($_POST) {                                                           // php://input is not available with
-                    $content = '$_POST => '.print_r($_POST, true).NL;                   // enctype="multipart/form-data"
+                if ($_POST) {                                                   // php://input is not available with
+                    $content = '$_POST => '.print_r($_POST, true).NL;           // enctype="multipart/form-data"
                     // TODO: we should limit excessive variable values to 1KB
                 }
                 $content .= '$_FILES => '.print_r($this->getFiles(), true);
@@ -616,7 +615,7 @@ class Request extends Singleton {
      * Return the "Content-Type" header of the request. If multiple "Content-Type" headers have been transmitted the first
      * one is returned.
      *
-     * @return string|null - "Content-Type" header or NULL if no "Content-Type" header was transmitted.
+     * @return string|null - "Content-Type" header or NULL if no "Content-Type" header was transmitted
      */
     public function getContentType() {
         $contentType = $this->getHeaderValue('Content-Type');
@@ -633,7 +632,7 @@ class Request extends Singleton {
 
 
     /**
-     * Return the current HTTP session object. If a session does not yet exist, one is created.
+     * Return the current HTTP session object. If a session object does not yet exist, one is created.
      *
      * @return HttpSession
      */
@@ -667,7 +666,7 @@ class Request extends Singleton {
 
 
     /**
-     * Return the session id transmitted with the request (not the id sent with the response; which may differ).
+     * Return the session id transmitted with the request (not the id sent with the response, which may differ).
      *
      * @return string
      */
@@ -688,7 +687,7 @@ class Request extends Singleton {
 
     /**
      * Whether a valid session id was transmitted with the request. An invalid id is a URL based session id when the php.ini
-     * setting 'session.use_only_cookies' is enabled.
+     * setting "session.use_only_cookies" is enabled.
      *
      * @return bool
      */
@@ -723,18 +722,17 @@ class Request extends Singleton {
                                                                                  $params['secure'  ],
                                                                                  $params['httponly']);
             }
-            session_destroy();                      // TODO: check if SID is reset
+            session_destroy();          // TODO: check if SID is reset
         }
     }
 
 
     /**
-     * Gibt den Wert des angegebenen Headers zurueck.  Wurden mehrere Header dieses Namens uebertragen,
-     * wird der Wert des ersten uebertragenen Headers zurueckgegeben.
+     * Return the first transmitted header with the specified name.
      *
-     * @param  string $name - Name des Headers
+     * @param  string $name - header name
      *
-     * @return string|null - Wert oder NULL, wenn kein Header dieses Namens uebertragen wurde
+     * @return string|null - header value or NULL if no such header was transmitted
      */
     public function getHeader($name) {
         Assert::string($name);
@@ -744,7 +742,7 @@ class Request extends Singleton {
 
 
     /**
-     * Return the specified headers as an associative array of header values (in transmitted order).
+     * Return all headers with the specified name as an associative array of header values (in transmitted order).
      *
      * @param  string|string[] $names [optional] - one or more header names (default: all headers)
      *
@@ -804,16 +802,16 @@ class Request extends Singleton {
 
 
     /**
-     * Return the value of the specified header. If multiple headers are specified or multiple headers have been
-     * transmitted, return all values as a comma-separated list (in transmission order).
+     * Return a single value of all specified header(s). If multiple headers are specified or multiple headers have been
+     * transmitted, return all values as one comma-separated value (in transmission order).
      *
-     * @param  string|string[] $names - one or more header names
+     * @param  string|string[] $names - one or multiple header names
      *
      * @return string|null - value or NULL if no such headers have been transmitted
      */
     public function getHeaderValue($names) {
         if (is_string($names))
-            $names = array($names);
+            $names = [$names];
         elseif (is_array($names)) {
             foreach ($names as $i => $name) {
                 Assert::string($name, '$names['.$i.']');
@@ -824,21 +822,20 @@ class Request extends Singleton {
         $headers = $this->getHeaders($names);
         if ($headers)
             return join(',', $headers);
-
         return null;
     }
 
 
     /**
-     * Gibt die einzelnen Werte aller angegebenen Header als Array zurueck (in der uebertragenen Reihenfolge).
+     * Return the values of all specified header(s) as an array (in transmission order).
      *
-     * @param  string|string[] $names - ein oder mehrere Headernamen
+     * @param  string|string[] $names - one or multiple header names
      *
-     * @return array - Werte
+     * @return string[] - values or an empty array if no such headers have been transmitted
      */
     public function getHeaderValues($names) {
         if (is_string($names))
-            $names = array($names);
+            $names = [$names];
         elseif (is_array($names)) {
             foreach ($names as $i => $name) {
                 Assert::string($name, '$names['.$i.']');
@@ -847,10 +844,9 @@ class Request extends Singleton {
         else throw new IllegalTypeException('Illegal type of parameter $names: '.gettype($names));
 
         $headers = $this->getHeaders($names);
-        if ($headers)
-            return \array_map('trim', explode(',', join(',', $headers)));
-
-        return $headers; // empty array;
+        if (!$headers)
+            return [];
+        return \array_map('trim', explode(',', join(',', $headers)));
     }
 
 
@@ -863,7 +859,7 @@ class Request extends Singleton {
      * @return mixed - der gespeicherte Wert oder NULL
      */
     public function getAttribute($key) {
-        if (key_exists($key, $this->attributes))
+        if (\key_exist($key, $this->attributes))
             return $this->attributes[$key];
         return null;
     }
@@ -964,7 +960,7 @@ class Request extends Singleton {
                 foreach ($messages as $message) return $message;
             }
         }
-        elseif (key_exists($key, $messages)) {          // return the specified one
+        elseif (\key_exists($key, $messages)) {         // return the specified one
             return $messages[$key];
         }
         return $this->getActionError($key);             // look-up separately stored ActionErrors
@@ -1003,7 +999,7 @@ class Request extends Singleton {
 
         if (is_array($keys)) {
             foreach ($keys as $key) {
-                if (key_exists($key, $messages)) return true;
+                if (\key_exists($key, $messages)) return true;
             }
             if ($keys)
                 return $this->isActionError($keys);
@@ -1074,7 +1070,7 @@ class Request extends Singleton {
                 foreach ($errors as $error) return $error;
             }
         }
-        elseif (key_exists($key, $errors)) {            // return the specified one
+        elseif (\key_exists($key, $errors)) {           // return the specified one
             return $errors[$key];
         }
         return null;
@@ -1113,7 +1109,7 @@ class Request extends Singleton {
 
         if (is_array($keys)) {
             foreach ($keys as $key) {
-                if (key_exists($key, $errors)) return true;
+                if (\key_exists($key, $errors)) return true;
             }
             if ($keys)
                 return false;

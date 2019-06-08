@@ -56,7 +56,7 @@ class Date extends StaticClass {
         if (Validator::isDateTime($startDate) === false) throw new InvalidArgumentException('Invalid argument $startDate: "'.$startDate.'"');
         if ($days < 0)                                   throw new InvalidArgumentException('Invalid argument $days: '.$days);
 
-        $range = array();
+        $range = [];
         $date  = new DateTime($startDate);
 
         for ($i=0; $i < $days; ++$i) {

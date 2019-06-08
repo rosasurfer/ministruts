@@ -280,7 +280,7 @@ class Config extends CObject implements ConfigInterface {
 
         for ($i=0; $i < $subKeysSize; ++$i) {
             $subkey = trim($subkeys[$i]);
-            if (!is_array($properties) || !key_exists($subkey, $properties))
+            if (!is_array($properties) || !\key_exists($subkey, $properties))
                 break;                                      // not found
             if ($i+1 == $subKeysSize)                       // return at the last subkey
                 return $properties[$subkey];
@@ -339,7 +339,7 @@ class Config extends CObject implements ConfigInterface {
 
             if ($i+1 < $subkeysSize) {
                 // not yet the last subkey
-                if (!key_exists($subkey, $properties)) {
+                if (!\key_exists($subkey, $properties)) {
                     $properties[$subkey] = [];                              // create another array level
                 }
                 elseif (!is_array($properties[$subkey])) {
@@ -352,7 +352,7 @@ class Config extends CObject implements ConfigInterface {
                 if (preg_match('/(.+)\b *\[ *\]$/', $subkey, $match)) {
                     // bracket notation
                     $subkey = $match[1];
-                    if (!key_exists($subkey, $properties)) {
+                    if (!\key_exists($subkey, $properties)) {
                         $properties[$subkey] = [$value];                    // create a new array value
                     }
                     else {
@@ -363,7 +363,7 @@ class Config extends CObject implements ConfigInterface {
                 }
                 else {
                     // regular non-bracket notation
-                    if (!key_exists($subkey, $properties)) {
+                    if (!\key_exists($subkey, $properties)) {
                         $properties[$subkey] = $value;                      // store the value regularily
                     }
                     else if (!is_array($properties[$subkey])) {

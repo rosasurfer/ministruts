@@ -184,7 +184,7 @@ final class FileSystemCache extends CachePeer {
         $created = time();
 
         $file = $this->getFilePath($key);
-        $this->writeFile($file, array($created, $expires, $value, $dependency), $expires);
+        $this->writeFile($file, [$created, $expires, $value, $dependency], $expires);
 
         $this->getReferencePool()->set($key, $value, $expires, $dependency);
 

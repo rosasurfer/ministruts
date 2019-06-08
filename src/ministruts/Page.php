@@ -2,36 +2,29 @@
 namespace rosasurfer\ministruts;
 
 use rosasurfer\core\Singleton;
-use rosasurfer\core\assert\Assert;
 
 
 /**
  * Page
  *
- * Container, in dem fuer den Renderprozess benoetigte Objekte oder Variablen abgelegt werden koennen.
- * Beim Rendern kann auf diese Daten aus dem HTML zugegriffen werden.  Innerhalb eines Seitenfragments
- * koennen auch Daten im Container gespeichert werden, jedoch nur, wenn dabei keine vorhandenen
- * Daten ueberschrieben werden.
+ * A context for storing variables required for rendering views or view fragments, i.e. {@link Tile}s. During the render
+ * process stored variables can be referenced, and new variables can be stored as long as they don't overwrite existing ones.
  *
- * Beispiel:
- * ---------
- *    $page->title = 'HTML-Title';
- *
- * Speichert die Variable "title" mit dem Wert 'HTML-Title' im Page-Context
- *
- *    $var = $page->title;
- *
- * Gibt die gespeicherte Eigenschaft mit dem Namen "title" zurueck.
+ * @example
+ * <pre>
+ *  $page->title = 'HTML title';        // store a variable under the name "title"
+ *  $var = $page->title;                // retrieve the variable named "title"
+ * </pre>
  */
 class Page extends Singleton {
 
 
-    /** @var array - Property-Pool */
+    /** @var array - stored variables */
     protected $properties = [];
 
 
     /**
-     * Gibt die Singleton-Instanz dieser Klasse zurueck.
+     * Return the {@link Singleton} instance of this class.
      *
      * @return static
      */
@@ -41,10 +34,10 @@ class Page extends Singleton {
 
 
     /**
-     * Lookup and return a property stored in the instance.
+     * Lookup and return a stored variable.
      *
-     * @param  string $name                - property name
-     * @param  mixed  $altValue [optional] - value to return if no such property exists
+     * @param  string $name                - variable name
+     * @param  mixed  $altValue [optional] - value to return if no such variable exists (default: NULL)
      *
      * @return mixed - value
      */
@@ -59,20 +52,23 @@ class Page extends Singleton {
 
 
     /**
-     * Speichert einen Wert in der Page.
+     * Store a variable in the Page context.
      *
-     * @param  string $key   - Schluessel, unter dem der Wert gespeichert wird
-     * @param  mixed  $value - der zu speichernde Wert
+     * @param  string $name  - variable name
+     * @param  mixed  $value - variable value
+     *
+     * @return mixed - the same value
      */
-    public static function set($key, $value) {
-        return self::me()->__set($key, $value);
+    public static function set($name, $value) {
+        self::me()->__set($name, $value);
+        return $value;
     }
 
 
     /**
-     * Magic method&#46;  Returns the property stored under the specified key.
+     * Return the variable stored under the specified name.
      *
-     * @param  string $name - property name
+     * @param  string $name - variable name
      *
      * @return mixed - value
      */
@@ -84,16 +80,13 @@ class Page extends Singleton {
 
 
     /**
-     * Magische Methode, die die Eigenschaft mit dem angegebenen Namen setzt&#46;  Wird automatisch aufgerufen und
-     * ermoeglicht den Zugriff auf Eigenschaften mit dynamischen Namen.
+     * Set the variable with the specified name.
      *
-     * @param  string $name  - Name der Eigenschaft
-     * @param  mixed  $value - Wert
+     * @param  string $name  - variable name
+     * @param  mixed  $value - variable value
      */
     public function __set($name, $value) {
-        Assert::string($name, '$name');
-
-        if ($value !== null) {
+        if (isset($value)) {
             $this->properties[$name] = $value;
         }
         else {
@@ -103,7 +96,7 @@ class Page extends Singleton {
 
 
     /**
-     * Return all page values stored in the instance.
+     * Return all variables stored in the context.
      *
      * @return array - values
      */
