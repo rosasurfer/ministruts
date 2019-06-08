@@ -65,7 +65,7 @@ class Input extends CObject {
      *
      * @param  string $name
      *
-     * @return bool|int - boolean value or number of times the command was specified (if defined)
+     * @return bool|int - boolean value or number of times a repetitive command was specified
      */
     public function hasCommand($name) {
         Assert::string($name);

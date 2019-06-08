@@ -7,20 +7,21 @@ namespace rosasurfer\di\proxy;
  *
  * Proxy for the "output" implementation currently registered in the service container.
  *
- * Default implementation: {@link \rosasurfer\console\io\Output}  <br>
- * Default methods:                                               <br>
- * {@link \rosasurfer\console\io\Output::out()}                   <br>
- * {@link \rosasurfer\console\io\Output::error()}                 <br>
+ * Default implementations:                       <br>
+ * {@link \rosasurfer\console\io\Output         } <br>
+ * {@link \rosasurfer\console\io\Output::out()  } <br>
+ * {@link \rosasurfer\console\io\Output::error()} <br>
  *
  *
- * @method static out(mixed $message)   Write a message to STDOUT.
- * @method static error(mixed $message) Write a message to STDERR.
+ * @method static \rosasurfer\console\io\Output instance()            Get the object behind the proxy.
+ * @method static                               out(mixed $message)   Write a message to STDOUT.
+ * @method static                               error(mixed $message) Write a message to STDERR.
  */
 class Output extends Proxy {
 
 
     /**
-     * Return the service identifier of the proxied instance.
+     * {@inheritdoc}
      *
      * @return string
      */

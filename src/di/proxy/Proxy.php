@@ -21,12 +21,12 @@ abstract class Proxy extends StaticClass {
      * @return string
      */
     protected static function getServiceId() {
-        throw new UnimplementedFeatureException(static::class.' must implement method Proxy::'.__FUNCTION__.'()');
+        throw new UnimplementedFeatureException(static::class.' must implement Proxy::'.__FUNCTION__.'()');
     }
 
 
     /**
-     * Get the object behind the proxy.
+     * Get the instance behind the proxy.
      *
      * @return object
      */
