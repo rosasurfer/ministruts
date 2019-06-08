@@ -23,6 +23,7 @@ use function rosasurfer\strStartsWith;
 use const rosasurfer\CLI;
 use const rosasurfer\DAY;
 use const rosasurfer\NL;
+use function rosasurfer\first;
 
 
 /**
@@ -851,24 +852,24 @@ class Request extends Singleton {
 
 
     /**
-     * Gibt den im Request-Context unter dem angegebenen Schluessel gespeicherten Wert zurueck oder NULL,
-     * wenn unter diesem Schluessel kein Wert existiert.
+     * Return a value stored in the request's variables context under the specified name.
      *
-     * @param  string $key - Schluessel, unter dem der Wert im Context gespeichert ist
+     * @param  string $name - attribute name
      *
-     * @return mixed - der gespeicherte Wert oder NULL
+     * @return mixed - attribute value or NULL if no value is stored under the specified name
      */
-    public function getAttribute($key) {
-        if (\key_exists($key, $this->attributes))
-            return $this->attributes[$key];
+    public function getAttribute($name) {
+        Assert::string($name);
+        if (\key_exists($name, $this->attributes))
+            return $this->attributes[$name];
         return null;
     }
 
 
     /**
-     * Gibt alle im Request-Context gespeicherten Werte zurueck.
+     * Return all values stored in the request's variables context.
      *
-     * @return array - Werte-Array
+     * @return array
      */
     public function getAttributes() {
         return $this->attributes;
@@ -876,89 +877,88 @@ class Request extends Singleton {
 
 
     /**
-     * Store a value in the <tt>Request</tt> context. Can be used to transfer data from controllers or <tt>Action</tt>s to views.
+     * Store a value in the request's variables context. May be used to transfer data from controllers or {@link Action}s
+     * to views.
      *
-     * @param  string $key   - Schluessel, unter dem der Wert gespeichert wird
-     * @param  mixed  $value - der zu speichernde Wert
+     * @param  string $name  - name under the which the variables is stored
+     * @param  mixed  $value - value to store
      */
-    public function setAttribute($key, $value) {
-        $this->attributes[$key] = $value;
+    public function setAttribute($name, $value) {
+        Assert::string($name);
+        $this->attributes[$name] = $value;
     }
 
 
     /**
-     * Loescht die Werte mit den angegebenen Schluesseln aus dem Request-Context. Es koennen mehrere Schluessel
-     * angegeben werden.
+     * Remove the variable(s) with the specified name(s) from the request's variables context.
      *
-     * @param  string $key - Schluessel des zu loeschenden Wertes
+     * @param  string ...$names - names of the values to remove
      */
-    public function removeAttributes($key /*, $key2, $key3 ...*/) {
-        foreach (func_get_args() as $key) {
-            unset($this->attributes[$key]);
+    public function removeAttributes(...$names) {
+        foreach ($names as $name) {
+            unset($this->attributes[$name]);
         }
     }
 
 
     /**
-     * Setzt einen Cookie mit den angegebenen Daten.
+     * Send a cookie.
      *
-     * @param  string $name            - Name des Cookies
-     * @param  mixed  $value           - der zu speichernde Wert (wird zu String gecastet)
-     * @param  int    $expires         - Lebenszeit des Cookies (0: bis zum Schliessen des Browsers)
-     * @param  string $path [optional] - Pfad, fuer den der Cookie gueltig sein soll (default: whole domain)
+     * @param  string $name               - cookie name
+     * @param  string $value              - cookie value
+     * @param  int    $expires [optional] - timestamp when the cookie expires (default: when the browser is closed)
+     * @param  string $path    [optional] - path the cookie will be available for (default: the application)
      */
     public function setCookie($name, $value, $expires = 0, $path = null) {
-        Assert::string($name,    '$name');
-        Assert::int   ($expires, '$expires');
+        Assert::string($name, '$name');
+        Assert::string($value, '$value');
+        Assert::int($expires, '$expires');
+        Assert::nullOrString($path, '$path');
+
         if ($expires < 0) throw new InvalidArgumentException('Invalid argument $expires: '.$expires);
 
-        $value = (string)$value;
-
-        if ($path === null)
+        if (!isset($path)) {
             $path = $this->getApplicationBaseUri();
-        Assert::string($path, '$path');
-
+        }
         \setcookie($name, $value, $expires, $path);
     }
 
 
     /**
-     * Ob der User, der den Request ausgeloest hat, Inhaber der angegebenen Rolle(n) ist.
+     * Whether the current web user owns the specified role.
      *
-     * @param  string $roles - Rollenbezeichner
+     * @param  string $role - a single role identifier (not an expression)
      *
      * @return bool
      */
-    public function isUserInRole($roles) {
-        Assert::string($roles);
+    public function isUserInRole($role) {
+        Assert::string($role);
 
-        // Module holen
+        /** @var Module $module */
         $module = $this->getAttribute(MODULE_KEY);
-        if (!$module) throw new RuntimeException('You can not call '.__METHOD__.'() in this context');
+        if (!$module) throw new RuntimeException('Current Struts module not found');
 
-        // RoleProcessor holen ...
         $processor = $module->getRoleProcessor();
-        if (!$processor) throw new RuntimeException('You can not call '.__METHOD__.'() without configuring a RoleProcessor');
+        if (!$processor) throw new RuntimeException('No RoleProcessor configured for Struts module with prefix "'.$module->getPrefix().'"');
 
-        // ... und Aufruf weiterreichen
-        return $processor->isUserInRole($this, $roles);
+        return $processor->isUserInRole($this, $role);
     }
 
 
     /**
-     * Return the ActionMessage for the specified key or the first ActionMessage if no key was given.
+     * Return the stored ActionMessage for the specified key, or the first ActionMessage if no key was given.
      *
      * @param  string $key [optional]
      *
-     * @return string|null - ActionMessage
+     * @return string|null - message
      */
     public function getActionMessage($key = null) {
+        Assert::nullOrString($key);
         $messages = $this->getAttribute(ACTION_MESSAGES_KEY);
 
-        if ($key === null) {                            // return the first one
-            if ($messages) {
-                foreach ($messages as $message) return $message;
-            }
+        if (!isset($key)) {                             // return the first one
+            if ($messages)
+                return first($messages);
         }
         elseif (\key_exists($key, $messages)) {         // return the specified one
             return $messages[$key];
@@ -968,16 +968,13 @@ class Request extends Singleton {
 
 
     /**
-     * Return all existing ActionMessages, including ActionErrors.
+     * Return all stored ActionMessages, including ActionErrors.
      *
-     * @return array
+     * @return string[]
      */
     public function getActionMessages() {
-        $messages = $this->getAttribute(ACTION_MESSAGES_KEY);
-        if ($messages === null)
-            $messages = [];
+        $messages = $this->getAttribute(ACTION_MESSAGES_KEY) ?: [];
         $errors = $this->getActionErrors();
-
         return \array_merge($messages, $errors);
     }
 
@@ -990,35 +987,34 @@ class Request extends Singleton {
      * @return bool
      */
     public function isActionMessage($keys = null) {
-        $messages = $this->getAttribute(ACTION_MESSAGES_KEY);
-        if (!$messages)
-            return $this->isActionError($keys);
+        $messages = $this->getActionMessages();
 
-        if (is_string($keys))
-            $keys = [$keys];
+        if (!isset($keys))
+            return (bool) $messages;
 
-        if (is_array($keys)) {
+        if (is_string($keys)) $keys = [$keys];
+        else                  Assert::isArray($keys);
+
+        if (!$keys)
+            return (bool) $messages;
+
+        if ($messages) {
             foreach ($keys as $key) {
                 if (\key_exists($key, $messages)) return true;
             }
-            if ($keys)
-                return $this->isActionError($keys);
-            $keys = null;
         }
-        else throw new IllegalTypeException('Illegal type of parameter $keys: '.gettype($keys));
-
-        return true;
+        return false;
     }
 
 
     /**
-     * Store or delete an ActionMessage for the specified key.
+     * Store an ActionMessage for the specified key.
      *
      * @param  string $key     - message key
-     * @param  string $message - message; if NULL the message for the specified key is deleted
-     *                           (an ActionError with the same key is not deleted)
+     * @param  string $message - message; if NULL is passed the message for the specified key is removed
      */
     public function setActionMessage($key, $message) {
+        Assert::string($key, '$key');
         Assert::nullOrString($message, '$message');
 
         if (!isset($message)) {
@@ -1031,24 +1027,24 @@ class Request extends Singleton {
 
 
     /**
-     * Delete the ActionMessages with the specified keys.
+     * Remove the ActionMessage(s) with the specified key(s).
      *
-     * @param  string[] ...$keys - zero or more message keys to delete; without a key all ActionMessages are deleted
-     *                             (ActionErrors with the same keys are not deleted
+     * @param  string ...$keys - zero or more message keys to remove; without a key all ActionMessages are removed
      *
-     * @return array - the deleted ActionMessages
+     * @return string[] - the removed ActionMessages
      */
     public function removeActionMessages(...$keys) {
-        $messages = $this->getAttribute(ACTION_MESSAGES_KEY);
-        $dropped = [];
+        $messages = $this->getAttribute(ACTION_MESSAGES_KEY) ?: [];
+        $removed = [];
 
         foreach ($keys as $key) {
+            Assert::string($key, '$keys');
             if (isset($messages[$key]))
-                $dropped[$key] = $messages[$key];
+                $removed[$key] = $messages[$key];
             unset($this->attributes[ACTION_MESSAGES_KEY][$key]);
         }
         if ($keys)
-            return $dropped;
+            return $removed;
 
         unset($this->attributes[ACTION_MESSAGES_KEY]);
         return $messages;
@@ -1056,19 +1052,19 @@ class Request extends Singleton {
 
 
     /**
-     * Return the ActionError for the specified key or the first ActionError if no key was given.
+     * Return the stored ActionError for the specified key, or the first ActionError if no key was given.
      *
      * @param  string $key [optional]
      *
-     * @return string|null - ActionError
+     * @return string|null - message
      */
     public function getActionError($key = null) {
+        Assert::nullOrString($key);
         $errors = $this->getAttribute(ACTION_ERRORS_KEY);
 
-        if ($key === null) {                            // return the first one
-            if ($errors) {
-                foreach ($errors as $error) return $error;
-            }
+        if (!isset($key)) {                             // return the first one
+            if ($errors)
+                return first($errors);
         }
         elseif (\key_exists($key, $errors)) {           // return the specified one
             return $errors[$key];
@@ -1078,55 +1074,53 @@ class Request extends Singleton {
 
 
     /**
-     * Return all existing ActionErrors.
+     * Return all stored ActionErrors.
      *
-     * @return array
+     * @return string[]
      */
     public function getActionErrors() {
-        $errors = $this->getAttribute(ACTION_ERRORS_KEY);
-        if ($errors === null)
-            $errors = [];
-        return $errors;
+        return $this->getAttribute(ACTION_ERRORS_KEY) ?: [];
     }
 
 
     /**
-     * Whether an ActionError exists for one of the specified keys or for any key if no key was given.
+     * Whether an ActionError exists for one of the specified keys, or for any key if no key was given.
      *
      * @param  string|string[] $keys [optional] - error keys
      *
      * @return bool
      */
     public function isActionError($keys = null) {
-        $errors = $this->getAttribute(ACTION_ERRORS_KEY);
-        if (!$errors)
-            return false;
+        $errors = $this->getActionErrors();
 
-        if (is_string($keys))
-            $keys = [$keys];
+        if (!isset($keys))
+            return (bool) $errors;
 
-        Assert::nullOrArray($keys);
+        if (is_string($keys)) $keys = [$keys];
+        else                  Assert::isArray($keys);
 
-        if (is_array($keys)) {
+        if (!$keys)
+            return (bool) $errors;
+
+        if ($errors) {
             foreach ($keys as $key) {
                 if (\key_exists($key, $errors)) return true;
             }
-            if ($keys)
-                return false;
-            $keys = null;
         }
-        return true;
+        return false;
     }
 
 
     /**
-     * Store or delete an ActionError for the specified key.
+     * Store an ActionError for the specified key.
      *
      * @param  string $key     - error key
-     * @param  string $message - error message; if NULL the error for the specified key is deleted
+     * @param  string $message - message; if NULL is passed the error for the specified key is removed
      */
     public function setActionError($key, $message) {
+        Assert::string($key, '$key');
         Assert::nullOrString($message, '$message');
+
         if (!isset($message)) {
             unset($this->attributes[ACTION_ERRORS_KEY][$key]);
         }
@@ -1137,23 +1131,24 @@ class Request extends Singleton {
 
 
     /**
-     * Delete the ActionErrors with the specified keys.
+     * Remove the ActionError(s) with the specified key(s).
      *
-     * @param  string[] ...$keys - zero or more error keys to delete; without a key all ActionErrors are deleted
+     * @param  string ...$keys - zero or more error keys to delete; without a key all ActionErrors are removed
      *
-     * @return array - the deleted ActionErrors
+     * @return string[] - the removed ActionErrors
      */
     public function removeActionErrors(...$keys) {
-        $errors = $this->getAttribute(ACTION_ERRORS_KEY);
-        $dropped = [];
+        $errors = $this->getAttribute(ACTION_ERRORS_KEY) ?: [];
+        $removed = [];
 
         foreach ($keys as $key) {
+            Assert::string($key, '$keys');
             if (isset($errors[$key]))
-                $dropped[$key] = $errors[$key];
+                $removed[$key] = $errors[$key];
             unset($this->attributes[ACTION_ERRORS_KEY][$key]);
         }
         if ($keys)
-            return $dropped;
+            return $removed;
 
         unset($this->attributes[ACTION_ERRORS_KEY]);
         return $errors;
@@ -1161,9 +1156,9 @@ class Request extends Singleton {
 
 
     /**
-     * Gibt das diesem Request zugeordnete ActionMapping zurueck.
+     * Return the MiniStruts {@link ActionMapping} responsible for processing the current request.
      *
-     * @return ActionMapping|null - Mapping oder NULL, wenn die Request-Instance ausserhalb des Struts-Frameworks benutzt wird.
+     * @return ActionMapping|null - instance or NULL if called without a Struts configration
      */
     final public function getMapping() {
         return $this->getAttribute(ACTION_MAPPING_KEY);
@@ -1171,9 +1166,9 @@ class Request extends Singleton {
 
 
     /**
-     * Gibt das diesem Request zugeordnete Struts-{@link Module} zurueck.
+     * Return the MiniStruts {@link Module} the current request is assigned to.
      *
-     * @return Module - Module oder NULL, wenn die Request-Instance ausserhalb des Struts-Frameworks benutzt wird.
+     * @return Module - instance or NULL if called without a Struts configration
      */
     final public function getModule() {
         return $this->getAttribute(MODULE_KEY);
@@ -1181,18 +1176,18 @@ class Request extends Singleton {
 
 
     /**
-     * Reject serialization of Request instances.
+     * Reject serialization of request instances.
      */
     final public function __sleep() {
-        throw new IllegalStateException('You must not serialize a '.get_class($this));
+        throw new IllegalStateException('You cannot serialize a '.get_class($this));
     }
 
 
     /**
-     * Reject de-serialization of Request instances.
+     * Reject deserialization of Request instances.
      */
     final public function __wakeUp() {
-        throw new IllegalStateException('You must not deserialize a '.get_class($this));
+        throw new IllegalStateException('You cannot deserialize a '.get_class($this));
     }
 
 
@@ -1214,7 +1209,7 @@ class Request extends Singleton {
                 $maxLen = max(strlen($key), $maxLen);
             }
 
-            $maxLen++; // add a char for ':'
+            $maxLen++;                                          // add one char for ':'
             foreach ($headers as $key => $value) {
                 $string .= str_pad($key.':', $maxLen).' '.$value.NL;
             }
@@ -1225,7 +1220,7 @@ class Request extends Singleton {
                 $string .= NL.substr($content, 0, 1024).NL;     // limit the request body to 1024 bytes
             }
 
-            Assert::string($string);                            // Ensure the method returns a string as otherwise...
+            Assert::string($string);                            // Ensure __toString() returns a string as otherwise...
             return $string;                                     // PHP will trigger a non-catchable fatal error.
         }
         catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }

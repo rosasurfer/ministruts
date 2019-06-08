@@ -25,7 +25,7 @@ class CObject {
     public function __toString() {
         try {
             $value = print_r($this, true);
-            Assert::string($value);                             // Ensure the method returns a string as otherwise...
+            Assert::string($value);                             // Ensure __toString() returns a string as otherwise...
             return $value;                                      // PHP will trigger a non-catchable fatal error.
         }
         catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }
