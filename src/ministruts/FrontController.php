@@ -8,6 +8,7 @@ use rosasurfer\core\Singleton;
 use rosasurfer\core\exception\IllegalStateException;
 use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\core\exception\RuntimeException;
+use rosasurfer\di\proxy\Request as RequestProxy;
 
 use function rosasurfer\strLeftTo;
 use function rosasurfer\strStartsWith;
@@ -123,18 +124,18 @@ class FrontController extends Singleton {
      */
     public static function processRequest(array $options = []) {
         $controller = self::me();
-        $request    = Request::me();
-        $response   = Response::me();
+        $request = RequestProxy::instance();
+        $response = Response::me();
 
-        // select Module
+        // select the Module
         $prefix = $controller->getModulePrefix($request);
         $module = $controller->modules[$prefix];
         $request->setAttribute(MODULE_KEY, $module);
 
-        // get RequestProcessor
+        // get the RequestProcessor
         $processor = $controller->getRequestProcessor($module, $options);
 
-        // process Request
+        // process the request
         $processor->process($request, $response);
 
         return $response;

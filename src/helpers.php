@@ -11,10 +11,10 @@ use rosasurfer\core\exception\IllegalArgumentException;
 use rosasurfer\core\exception\InvalidArgumentException;
 use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\core\lock\Lock;
+use rosasurfer\di\proxy\Request;
 use rosasurfer\log\Logger;
 use rosasurfer\ministruts\ActionMapping;
 use rosasurfer\ministruts\Module;
-use rosasurfer\ministruts\Request;
 use rosasurfer\ministruts\url\Url;
 use rosasurfer\ministruts\url\VersionedUrl;
 use rosasurfer\util\Validator;
@@ -1625,10 +1625,7 @@ function route($name) {
         $name  = substr($name, 0, $pos);
     }
 
-    $request = Request::me();
-    $module  = $request->getModule();
-    $mapping = $module->getMapping($name);
-
+    $mapping = Request::getModule()->getMapping($name);
     if (!$mapping) throw new RuntimeException('Route "'.$name.'" not found');
 
     $path = $mapping->getPath();

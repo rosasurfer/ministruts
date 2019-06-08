@@ -2,6 +2,7 @@
 namespace rosasurfer\ministruts;
 
 use rosasurfer\core\CObject;
+use rosasurfer\di\proxy\Request as RequestProxy;
 
 
 /**
@@ -131,6 +132,6 @@ abstract class ActionForm extends CObject {
      * Re-initialize the instance after deserialization.
      */
     public function __wakeUp() {
-        $this->__construct(Request::me());
+        $this->__construct(RequestProxy::instance());
     }
 }

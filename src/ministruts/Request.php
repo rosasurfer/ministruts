@@ -21,7 +21,6 @@ use function rosasurfer\strLeftTo;
 use function rosasurfer\strRightFrom;
 use function rosasurfer\strStartsWith;
 
-use const rosasurfer\CLI;
 use const rosasurfer\DAY;
 use const rosasurfer\NL;
 
@@ -72,12 +71,9 @@ class Request extends CObject {
      *
      * @return static
      *
-     * @throws RuntimeException if not called in a web application context
-     *
      * @deprecated
      */
-    public static function me() {
-        if (CLI) throw new RuntimeException('Cannot resolve a Request instance in a command line context.');
+    public static function _me() {
         return self::di(__CLASS__);
     }
 

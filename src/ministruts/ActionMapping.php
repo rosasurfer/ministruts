@@ -4,6 +4,7 @@ namespace rosasurfer\ministruts;
 use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\exception\IllegalStateException;
+use rosasurfer\di\proxy\Request as RequestProxy;
 
 use function rosasurfer\strCompareI;
 use function rosasurfer\strLeftTo;
@@ -489,7 +490,7 @@ class ActionMapping extends CObject {
         if ($forward->getName() == ActionForward::SELF) {
             if ($this->configured) {                            // at runtime only: append the request's query string
                 $path = $this->path;                            // TODO: Don't lose additional path data. Example:
-                $query = Request::me()->getQueryString();       //       /path/beautified-url-data/?query-string
+                $query = RequestProxy::getQueryString();        //       /path/beautified-url-data/?query-string
                 if (strlen($query))
                     $path = strLeftTo($path, '?').'?'.$query;
                 $forward->setPath($path);
