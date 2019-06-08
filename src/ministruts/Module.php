@@ -987,12 +987,12 @@ class Module extends CObject {
     /**
      * Return the {@link RoleProcessor} intance of the module.
      *
-     * @return RoleProcessor
+     * @return RoleProcessor|null - instance or NULL if no RoleProcessor is configured for the module
      */
     public function getRoleProcessor() {
         if (!$this->roleProcessor) {
             $class = $this->roleProcessorClass;
-            $this->roleProcessor = new $class();
+            $class && $this->roleProcessor = new $class();
         }
         return $this->roleProcessor;
     }
