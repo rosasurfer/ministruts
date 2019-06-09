@@ -8,6 +8,8 @@ use rosasurfer\core\assert\Assert;
 
 /**
  * Input
+ *
+ * An object providing access to command line input and parsed command line arguments.
  */
 class Input extends CObject {
 
@@ -63,7 +65,7 @@ class Input extends CObject {
      *
      * @param  string $name
      *
-     * @return bool|int - boolean value or number of times the command was specified (if defined)
+     * @return bool|int - boolean value or number of times a repetitive command was specified
      */
     public function hasCommand($name) {
         Assert::string($name);

@@ -2,7 +2,7 @@
 namespace rosasurfer\ministruts;
 
 use rosasurfer\config\ConfigInterface;
-use rosasurfer\core\Singleton;
+use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\debug\ErrorHandler;
 use rosasurfer\core\exception\IllegalStateException;
@@ -12,6 +12,7 @@ use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\net\NetTools;
 use rosasurfer\util\PHP;
 
+use function rosasurfer\first;
 use function rosasurfer\ini_get_bool;
 use function rosasurfer\strCompareI;
 use function rosasurfer\strEndsWith;
@@ -20,19 +21,17 @@ use function rosasurfer\strLeftTo;
 use function rosasurfer\strRightFrom;
 use function rosasurfer\strStartsWith;
 
-use const rosasurfer\CLI;
 use const rosasurfer\DAY;
 use const rosasurfer\NL;
-use function rosasurfer\first;
 
 
 /**
  * Request
  *
- * An object representing the current HTTP request. Provides an additional variables context with the life-time of
- * the request.
+ * An object representing the current HTTP request. Provides helper methods and an additional variables context with the
+ * life-time of the request.
  */
-class Request extends Singleton {
+class Request extends CObject {
 
 
     /** @var string */
@@ -52,31 +51,18 @@ class Request extends Singleton {
 
 
     /**
-     * Return the {@link Singleton} instance of this class.
-     *
-     * @return static
-     *
-     * @throws RuntimeException if not called in a web application context
-     */
-    public static function me() {
-        if (CLI) throw new RuntimeException('Cannot create a '.static::class.' instance in a command line context.');
-        return Singleton::getInstance(static::class);
-    }
-
-
-    /**
      * Constructor
      */
-    protected function __construct() {
-        parent::__construct();
-
+    public function __construct() {
         $this->method = $_SERVER['REQUEST_METHOD'];
 
-        // If $_SERVER['QUERY_STRING'] is empty (e.g. at times in nginx) PHP will not parse query parameters
-        // and it has to be done manually.
+        // issue: if $_SERVER['QUERY_STRING'] is empty (e.g. at times in nginx) PHP will not parse
+        //        query parameters and it has to be done manually
         $query = $this->getQueryString();
-        if (strlen($query) && !$_GET)
+
+        if (!$_GET && strlen($query)) {
             $this->parseQueryString($query);
+        }
     }
 
 
@@ -747,7 +733,7 @@ class Request extends Singleton {
      *
      * @param  string|string[] $names [optional] - one or more header names (default: all headers)
      *
-     * @return array - associative array of header values
+     * @return string[] - associative array of header values
      */
     public function getHeaders($names = []) {
         if (is_string($names)) {
@@ -1225,6 +1211,17 @@ class Request extends Singleton {
         }
         catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }
         catch (\Exception $ex) { ErrorHandler::handleToStringException($ex); }
+    }
 
+
+    /**
+     * Return the instance currently registered in the service container.
+     *
+     * @return static
+     *
+     * @deprecated
+     */
+    public static function me() {
+        return self::di(__CLASS__);
     }
 }

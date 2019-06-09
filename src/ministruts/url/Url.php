@@ -4,7 +4,8 @@ namespace rosasurfer\ministruts\url;
 use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\debug\ErrorHandler;
-use rosasurfer\ministruts\Request;
+use rosasurfer\di\proxy\Request;
+use rosasurfer\ministruts\Module;
 
 use const rosasurfer\CLI;
 
@@ -47,8 +48,7 @@ class Url extends CObject {
         }
         else {
             // the resulting URI is relative to the application's current module (which may be the main module)
-            $request = Request::me();
-            $prefix  = $request->getModule()->getPrefix();      // root: "";  submodule: "path/"
+            $prefix = Request::getModule()->getPrefix();        // main: "";  submodule: "path/"
             $this->appRelativeUri = $prefix.$uri;
         }
     }
@@ -68,8 +68,7 @@ class Url extends CObject {
                 else                             $uri .= '&';
                 $uri .= http_build_query($this->parameters, null, '&');
             }
-            $request = Request::me();
-            $uri = $request->getApplicationBaseUri().$uri;
+            $uri = Request::getApplicationBaseUri().$uri;
 
             Assert::string($uri);                               // Ensure __toString() returns a string as otherwise...
             return $uri;                                        // PHP will trigger a non-catchable fatal error.

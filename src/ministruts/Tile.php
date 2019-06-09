@@ -4,6 +4,7 @@ namespace rosasurfer\ministruts;
 use rosasurfer\Application;
 use rosasurfer\core\CObject;
 use rosasurfer\core\exception\IllegalStateException;
+use rosasurfer\di\proxy\Request as RequestProxy;
 
 use function rosasurfer\strLeft;
 use function rosasurfer\strRightFrom;
@@ -235,7 +236,7 @@ class Tile extends CObject {
      * @return $this
      */
     public function render() {
-        $request     = Request::me();
+        $request     = RequestProxy::instance();
         $namespace   = $this->module->getViewNamespace();
         $appUri      = $request->getApplicationBaseUri();
         $nestedTiles = $this->nestedTiles;

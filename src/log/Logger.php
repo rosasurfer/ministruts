@@ -9,7 +9,7 @@ use rosasurfer\core\debug\DebugHelper;
 use rosasurfer\core\exception\InvalidArgumentException;
 use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\core\exception\error\PHPError;
-use rosasurfer\ministruts\Request;
+use rosasurfer\di\proxy\Request;
 use rosasurfer\net\NetTools;
 use rosasurfer\net\http\CurlHttpClient;
 use rosasurfer\net\http\HttpRequest;
@@ -665,7 +665,7 @@ class Logger extends StaticClass {
             $location = realpath($_SERVER['PHP_SELF']);
         }
         else {
-            $request  = Request::me();
+            $request  = Request::instance();
             $location = strLeftTo($request->getUrl(), '?');
             $session  = null;
 
@@ -771,7 +771,7 @@ class Logger extends StaticClass {
 
         // append the current HTTP request
         if (!CLI) {
-            $html .= '<br style="clear:both"><br>'.printPretty('Request:'.NL.'--------'.NL.Request::me(), true).'<br>';
+            $html .= '<br style="clear:both"><br>'.printPretty('Request:'.NL.'--------'.NL.Request::instance(), true).'<br>';
         }
 
         // close the HTML tag and add some JavaScript to ensure it becomes visible                      // id = md5('ministruts')

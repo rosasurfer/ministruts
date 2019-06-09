@@ -4,6 +4,7 @@ namespace rosasurfer\ministruts;
 use rosasurfer\core\Singleton;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\exception\error\PHPError;
+use rosasurfer\di\proxy\Request as RequestProxy;
 use rosasurfer\util\PHP;
 
 
@@ -44,12 +45,10 @@ class HttpSession extends Singleton {
      * Start and initialize the session.
      */
     protected function init() {
-        $request = Request::me();
-
         // limit session cookie to application path to support multiple projects per domain
         $params = session_get_cookie_params();
         session_set_cookie_params($params['lifetime'],
-                                  $request->getApplicationBaseUri(),
+                                  RequestProxy::getApplicationBaseUri(),
                                   $params['domain'  ],
                                   $params['secure'  ],
                                   $params['httponly']);
@@ -86,7 +85,7 @@ class HttpSession extends Singleton {
         if ($regenerateId) {
             session_regenerate_id(true);                                            // generate new id and delete the old file
         }
-        $request = Request::me();
+        $request = RequestProxy::instance();
 
         $_SESSION = [];                                                             // empty the session
         $_SESSION['__SESSION_CREATED__'  ] = microtime(true);                       // initialize the session markers

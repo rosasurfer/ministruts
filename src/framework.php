@@ -25,8 +25,8 @@ if (!defined('rosasurfer\ministruts\MODULE_KEY')) require(MINISTRUTS_ROOT.'/src/
 /**
  * Register the framework's class loader.
  *
- * If the framework is used without Composer a loader for the framework classes is required. If Composer is used this
- * class loader simply has no effect. The loader registers itself after already registered other SPL class loaders.
+ * If the framework is used without Composer a class loader is required. If Composer is used this
+ * class loader simply has no effect. The loader registers itself after already registered class loaders.
  */
 function registerClassLoader() {
     static $done = false;

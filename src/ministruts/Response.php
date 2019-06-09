@@ -6,6 +6,7 @@ use rosasurfer\core\assert\Assert;
 use rosasurfer\core\exception\InvalidArgumentException;
 use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\core\exception\RuntimeException;
+use rosasurfer\di\proxy\Request as RequestProxy;
 use rosasurfer\net\http\HttpResponse;
 use rosasurfer\util\PHP;
 
@@ -110,8 +111,7 @@ class Response extends Singleton {
      * @param  int    $type - redirect type: 301 (SC_MOVED_PERMANENTLY) or 302 (SC_MOVED_TEMPORARILY)
      */
     public function redirect($uri, $type=HttpResponse::SC_MOVED_TEMPORARILY) {
-        $request    = Request::me();
-        $currentUrl = $request->getUrl();
+        $currentUrl = RequestProxy::getUrl();
 
         // HTTP/1.1 requires an absolute 'Location' value
         $url = self::relativeToAbsoluteUrl($uri, $currentUrl);
@@ -120,8 +120,8 @@ class Response extends Singleton {
         if (defined('SID') && strlen(SID)) {                        // empty string if the session id was submitted in a cookie
             if (!ini_get_bool('session.use_only_cookies')) {        // TODO: check if session_destroy() resets SID
                 $cookie       = session_get_cookie_params();
-                $cookieDomain = strtolower(empty($cookie['domain']) ? $request->getHostname() : $cookie['domain']);
-                $cookiePath   =            empty($cookie['path'  ]) ? '/'                     : $cookie['path'  ];
+                $cookieDomain = strtolower(empty($cookie['domain']) ? RequestProxy::getHostname() : $cookie['domain']);
+                $cookiePath   =            empty($cookie['path'  ]) ? '/'                         : $cookie['path'  ];
                 $cookieSecure =                  $cookie['secure'];
 
                 $target       = parse_url($url);
