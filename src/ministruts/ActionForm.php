@@ -17,7 +17,7 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
     /** @var Request [transient] - the request the form belongs to */
     protected $request;
 
-    /** @var string [transient] - dispatch action key; populated if the Action handling the request is a DispatchAction */
+    /** @var string [transient] - dispatch action key, populated if the Action handling the request is a DispatchAction */
     protected $actionKey;
 
     /** @var string[] [transient] */
