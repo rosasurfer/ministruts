@@ -56,23 +56,43 @@ abstract class ActionForm extends CObject {
      * </pre>
      */
     public function initActionKey(Request $request) {
-        //
-        // PHP silently converts dots "." and spaces " " in top-level parameter names to underscores. This breaks a submit
-        // tag with an action key if the tag is an image tag as the HTML standard appends the clicked image coordinates.
-        //
-        // - Workaround for browser-modified names, i.e. <img type="submit"... => select the name attribute as below:
-        //   <img type="submit" name="submit[action]" ...>
-        //   The browser will send "submit[action].x=123&submit[action].y=456" and PHP will discard the coordinates.
-        //
-        // - Workaround for all other parameter names with dots => wrap the name in a top-level array:
-        //   $_POST = array(
-        //       [action_x] => update                               // <img type="submit" name="action"... broken by PHP
-        //       [application_name] => foobar                       // regular custom parameters broken by PHP
-        //       [top_level_with_dots] => Array (                   // custom top-level parameters broken by PHP
-        //           [nested.level.with.dots] => custom-value       // custom wrapped parameters not broken by PHP
-        //       )
-        //   )
-        //
+        /**
+         * PHP breaks transmitted parameters by silently converting dots "." and spaces " " in names to underscores. This
+         * breaks especially submit image elements, as the HTML standard appends the clicked image coordinates to the submit
+         * parameter.
+         *
+         * HTML example:
+         *   <form action="/url">
+         *      <input type="text" name="foo.bar" value="baz">
+         *      <img type="submit" name="image" src="image.png">
+         *   </form>
+         *
+         * Parameters sent by the browser:
+         *   GET /url?foo.bar=baz&image.x=123&image.y=456 HTTP/1.0
+         *
+         * Parameters after PHP handling:
+         *   $_GET = array(
+         *       [foo_bar] => baz               // broken name
+         *       [image_x] => 123               // broken name
+         *       [image_y] => 456               // broken name
+         *   )
+         *
+         *
+         * - Workaround for image submit elements (<img type="submit"...):
+         *   Use the element's name attribute as: <img type="submit" name="submit[action]" ...>
+         *   The browser will send "submit[action].x=123&submit[action].y=456". PHP will discard and lose the coordinates
+         *   but the submit parameter will keep it's original name.
+         *
+         * - Workaround for other parameters with dots or spaces:
+         *   Wrap the name in an array:
+         *   $_REQUEST = array(
+         *       [action_x] => update                               // <img type="submit" name="action"... broken by PHP
+         *       [application_name] => foobar                       // regular custom parameters broken by PHP
+         *       [top_level_with_dots] => Array (                   // custom top-level parameters broken by PHP
+         *           [nested.level.with.dots] => custom-value       // custom wrapped parameters not broken by PHP
+         *       )
+         *   )
+         */
         if (isset($_REQUEST['submit']['action']))
             $this->actionKey = $_REQUEST['submit']['action'];
     }
