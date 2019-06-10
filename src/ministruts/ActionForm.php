@@ -2,6 +2,8 @@
 namespace rosasurfer\ministruts;
 
 use rosasurfer\core\CObject;
+use rosasurfer\core\assert\Assert;
+use rosasurfer\core\exception\IllegalAccessException;
 use rosasurfer\di\proxy\Request as RequestProxy;
 
 
@@ -9,7 +11,7 @@ use rosasurfer\di\proxy\Request as RequestProxy;
  * An ActionForm encapsulates and represents the user input. It provides an interface for {@link Action}s and business layer
  * to access and validate this input.
  */
-abstract class ActionForm extends CObject {
+abstract class ActionForm extends CObject implements \ArrayAccess {
 
 
     /** @var Request [transient] - the request the form belongs to */
@@ -126,6 +128,57 @@ abstract class ActionForm extends CObject {
      * @return bool - whether the submitted parameters are valid
      */
     abstract public function validate();
+
+
+    /**
+     * Whether an input parameter with the specified name exists.
+     *
+     * @param  string $name
+     *
+     * @return bool
+     */
+    public function offsetExists($name) {
+        Assert::string($name);
+        return property_exists($this, $name);
+    }
+
+
+    /**
+     * Return the input parameter with the specified name.
+     *
+     * @param  string $name
+     *
+     * @return string|null - parameter value or NULL if no such input parameter exists
+     */
+    public function offsetGet($name) {
+        Assert::string($name);
+        return isset($this->name) ? $this->name : null;
+    }
+
+
+    /**
+     * Setting/modifying input parameters is not allowed.
+     *
+     * @param  string $name
+     * @param  mixed  $value
+     *
+     * $throws IllegalAccessException
+     */
+    final public function offsetSet($name, $value) {
+        throw new IllegalAccessException('Cannot set/modify input parameters');
+    }
+
+
+    /**
+     * Unsetting input parameters is not allowed.
+     *
+     * @param  string $name
+     *
+     * $throws IllegalAccessException
+     */
+    final public function offsetUnset($name) {
+        throw new IllegalAccessException('Cannot unset input parameters');
+    }
 
 
     /**

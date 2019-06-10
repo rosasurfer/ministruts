@@ -2,11 +2,15 @@
 namespace rosasurfer\di\proxy;
 
 use rosasurfer\core\StaticClass;
+use rosasurfer\core\exception\IllegalAccessException;
 use rosasurfer\core\exception\UnimplementedFeatureException;
 
 
 /**
  * Proxy
+ *
+ * A Proxy forwards static method calls to an actual instance. The standard way to resolve a proxied instance is a look-up
+ * in the application's default service container. Override {@link Proxy::instance()} to change that behavior.
  */
 abstract class Proxy extends StaticClass {
 
@@ -26,7 +30,8 @@ abstract class Proxy extends StaticClass {
 
 
     /**
-     * Get the instance behind the proxy. The default implementation looks-up the instance in the service container.
+     * Get the object instance behind the proxy. The standard implementation looks-up the instance in the application's
+     * default service container. Override this method to change that behavior.
      *
      * @return object
      */
@@ -41,7 +46,7 @@ abstract class Proxy extends StaticClass {
 
 
     /**
-     * Forward static method calls to the object behind the proxy.
+     * Forward static method calls to the object instance behind the proxy.
      *
      * @param  string $method - method name
      * @param  array  $args   - arguments passed to the method call
@@ -49,6 +54,9 @@ abstract class Proxy extends StaticClass {
      * @return mixed
      */
     public static function __callStatic($method, array $args) {
+        if (substr($method, 0, 2) == '__')
+            throw new IllegalAccessException('Cannot forward call to internal method '.get_class(static::instance()).'::'.$method.'()');
+
         $instance = static::instance();
         return $instance->$method(...$args);
     }
