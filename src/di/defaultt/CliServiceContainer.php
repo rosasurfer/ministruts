@@ -23,8 +23,8 @@ class CliServiceContainer extends Di {
      */
     public function __construct($configDir) {
         $services = [
-            (new Service(Input::class,  Input::class ))->addAlias('input'),
-            (new Service(Output::class, Output::class))->addAlias('output'),
+            (new Service('input',  Input::class ))->addAlias(Input::class),
+            (new Service('output', Output::class))->addAlias(Output::class),
         ];
         foreach ($services as $service) {
             $this->addService($service);

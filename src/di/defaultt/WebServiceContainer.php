@@ -25,10 +25,10 @@ class WebServiceContainer extends Di {
      */
     public function __construct($configDir) {
         $services = [
-            (new Service(Input::class,   Input::class  ))->addAlias('input'),
-            (new Service(Output::class,  Output::class ))->addAlias('output'),
-            (new Service(Request::class, Request::class))->addAlias('request'),
-          //(new Service(RequestProcessor::class, RequestProcessor::class))->addAlias('requestProcessor'),
+            (new Service('input',   Input::class  ))->addAlias(Input::class),
+            (new Service('output',  Output::class ))->addAlias(Output::class),
+            (new Service('request', Request::class))->addAlias(Request::class),
+          //(new Service('requestProcessor', RequestProcessor::class))->addAlias(RequestProcessor::class),
         ];
         foreach ($services as $service) {
             $this->addService($service);

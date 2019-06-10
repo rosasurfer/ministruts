@@ -11,64 +11,7 @@ use rosasurfer\ministruts\Module;
  *
  * Proxy for the "request" implementation currently registered in the service container.
  *
- * Default implementations:                                             <br>
- * {@link \rosasurfer\ministruts\Request                              } <br>
- * {@link \rosasurfer\ministruts\Request::getMethod()                 } <br>
- * {@link \rosasurfer\ministruts\Request::isGet()                     } <br>
- * {@link \rosasurfer\ministruts\Request::isPost()                    } <br>
- * {@link \rosasurfer\ministruts\Request::isSecure()                  } <br>
- * {@link \rosasurfer\ministruts\Request::getParameter()              } <br>
- * {@link \rosasurfer\ministruts\Request::getParameters()             } <br>
- * {@link \rosasurfer\ministruts\Request::getGetParameter()           } <br>
- * {@link \rosasurfer\ministruts\Request::getGetParameters()          } <br>
- * {@link \rosasurfer\ministruts\Request::getPostParameter()          } <br>
- * {@link \rosasurfer\ministruts\Request::getPostParameters()         } <br>
- * {@link \rosasurfer\ministruts\Request::getFiles()                  } <br>
- * {@link \rosasurfer\ministruts\Request::getFile()                   } <br>
- * {@link \rosasurfer\ministruts\Request::getHostname()               } <br>
- * {@link \rosasurfer\ministruts\Request::getHostUrl()                } <br>
- * {@link \rosasurfer\ministruts\Request::getUrl()                    } <br>
- * {@link \rosasurfer\ministruts\Request::getUri()                    } <br>
- * {@link \rosasurfer\ministruts\Request::getPath()                   } <br>
- * {@link \rosasurfer\ministruts\Request::getApplicationUrl()         } <br>
- * {@link \rosasurfer\ministruts\Request::getApplicationRelativeUri() } <br>
- * {@link \rosasurfer\ministruts\Request::getApplicationRelativePath()} <br>
- * {@link \rosasurfer\ministruts\Request::getApplicationBaseUri()     } <br>
- * {@link \rosasurfer\ministruts\Request::getQueryString()            } <br>
- * {@link \rosasurfer\ministruts\Request::getRemoteAddress()          } <br>
- * {@link \rosasurfer\ministruts\Request::getRemoteHostname()         } <br>
- * {@link \rosasurfer\ministruts\Request::getForwardedRemoteAddress() } <br>
- * {@link \rosasurfer\ministruts\Request::getContent()                } <br>
- * {@link \rosasurfer\ministruts\Request::getContentType()            } <br>
- * {@link \rosasurfer\ministruts\Request::getSession()                } <br>
- * {@link \rosasurfer\ministruts\Request::isSession()                 } <br>
- * {@link \rosasurfer\ministruts\Request::isSessionAttribute()        } <br>
- * {@link \rosasurfer\ministruts\Request::getSessionId()              } <br>
- * {@link \rosasurfer\ministruts\Request::hasSessionId()              } <br>
- * {@link \rosasurfer\ministruts\Request::destroySession()            } <br>
- * {@link \rosasurfer\ministruts\Request::getHeader()                 } <br>
- * {@link \rosasurfer\ministruts\Request::getHeaders()                } <br>
- * {@link \rosasurfer\ministruts\Request::getHeaderValue()            } <br>
- * {@link \rosasurfer\ministruts\Request::getHeaderValues()           } <br>
- * {@link \rosasurfer\ministruts\Request::getAttribute()              } <br>
- * {@link \rosasurfer\ministruts\Request::getAttributes()             } <br>
- * {@link \rosasurfer\ministruts\Request::setAttribute()              } <br>
- * {@link \rosasurfer\ministruts\Request::removeAttributes()          } <br>
- * {@link \rosasurfer\ministruts\Request::setCookie()                 } <br>
- * {@link \rosasurfer\ministruts\Request::isUserInRole()              } <br>
- * {@link \rosasurfer\ministruts\Request::getActionMessage()          } <br>
- * {@link \rosasurfer\ministruts\Request::getActionMessages()         } <br>
- * {@link \rosasurfer\ministruts\Request::isActionMessage()           } <br>
- * {@link \rosasurfer\ministruts\Request::setActionMessage()          } <br>
- * {@link \rosasurfer\ministruts\Request::removeActionMessages()      } <br>
- * {@link \rosasurfer\ministruts\Request::getActionError()            } <br>
- * {@link \rosasurfer\ministruts\Request::getActionErrors()           } <br>
- * {@link \rosasurfer\ministruts\Request::isActionError()             } <br>
- * {@link \rosasurfer\ministruts\Request::setActionError()            } <br>
- * {@link \rosasurfer\ministruts\Request::removeActionErrors()        } <br>
- * {@link \rosasurfer\ministruts\Request::getMapping()                } <br>
- * {@link \rosasurfer\ministruts\Request::getModule()                 } <br>
- *
+ * Default implementation: {@link \rosasurfer\ministruts\Request}
  *
  * @method static \rosasurfer\ministruts\Request            instance()                                                                Get the object behind the proxy.
  * @method static string                                    getMethod()                                                               Return the HTTP method of the request.
@@ -135,7 +78,8 @@ class Request extends Proxy {
      *
      * @return string
      */
-    protected static function getServiceId() {
+    protected static function getServiceName() {
+        return 'request';
         return \rosasurfer\ministruts\Request::class;
     }
 }

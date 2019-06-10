@@ -9,19 +9,7 @@ use rosasurfer\console\docopt\DocoptResult;
  *
  * Proxy for the "input" implementation currently registered in the service container.
  *
- * Default implementations:                                <br>
- * {@link \rosasurfer\console\io\Input                   } <br>
- * {@link \rosasurfer\console\io\Input::setDocoptResult()} <br>
- * {@link \rosasurfer\console\io\Input::getDocoptResult()} <br>
- * {@link \rosasurfer\console\io\Input::isCommand()      } <br>
- * {@link \rosasurfer\console\io\Input::hasCommand()     } <br>
- * {@link \rosasurfer\console\io\Input::isArgument()     } <br>
- * {@link \rosasurfer\console\io\Input::getArgument()    } <br>
- * {@link \rosasurfer\console\io\Input::getArguments()   } <br>
- * {@link \rosasurfer\console\io\Input::isOption()       } <br>
- * {@link \rosasurfer\console\io\Input::getOption()      } <br>
- * {@link \rosasurfer\console\io\Input::getOptions()     } <br>
- *
+ * Default implementation: {@link \rosasurfer\console\io\Input}
  *
  * @method static \rosasurfer\console\io\Input            instance()                            Get the object behind the proxy.
  * @method static \rosasurfer\console\io\Input            setDocoptResult(DocoptResult $docopt) Set the internal docopt result.
@@ -43,7 +31,8 @@ class Input extends Proxy {
      *
      * @return string
      */
-    protected static function getServiceId() {
+    protected static function getServiceName() {
+        return 'input';
         return \rosasurfer\console\io\Input::class;
     }
 }
