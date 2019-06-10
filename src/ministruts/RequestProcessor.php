@@ -42,48 +42,38 @@ class RequestProcessor extends CObject {
         // ggf. Session starten oder fortsetzen
         $this->processSession($request);
 
-
         // move ActionMessages stored in the session back to the Request
         $this->restoreCachedActionMessages($request);
-
 
         // Mapping fuer den Request ermitteln: wird kein Mapping gefunden, generiert die Methode einen 404-Fehler
         $mapping = $this->processMapping($request, $response);
         if (!$mapping) return;
 
-
         // Methodenbeschraenkungen des Mappings pruefen: wird der Zugriff verweigert, generiert die Methode einen 405-Fehler
         if (!$this->processMethod($request, $response, $mapping))
             return;
-
 
         // benoetigte Rollen ueberpruefen
         if (!$this->processRoles($request, $response, $mapping))
             return;
 
-
         // ActionForm vorbereiten
         $form = $this->processActionFormCreate($request, $mapping);
 
-
-        // ActionForm validieren
-        if ($form && !$this->processActionFormValidate($request, $response, $mapping, $form))
+        // ActionForm validieren (wenn entsprechend konfiguriert)
+        if (!$this->processActionFormValidate($request, $response, $mapping, $form))
             return;
-
 
         // falls statt einer Action ein direkter Forward konfiguriert wurde, diesen verarbeiten
         if (!$this->processMappingForward($request, $response, $mapping))
             return;
 
-
         // Action erzeugen (Form und Mapping werden schon hier uebergeben, damit User-Code einfacher wird)
         $action = $this->processActionCreate($mapping, $form);
-
 
         // Action aufrufen
         $forward = $this->processActionExecute($request, $response, $action);
         if (!$forward) return;
-
 
         // den zurueckgegebenen ActionForward verarbeiten
         $this->processActionForward($request, $response, $forward);
@@ -292,37 +282,38 @@ PROCESS_METHOD_ERROR_SC_405;
 
 
     /**
-     * Erzeugt die ActionForm des angegebenen Mappings bzw&#46; gibt sie zurueck&#46;  Ist keine ActionForm konfiguriert,
-     * wird NULL zurueckgegeben.
+     * Return the {@link ActionForm} instance for the specified {@link ActionMapping}. If no ActionForm was configured a
+     * {@link DefaultActionForm} is instantiated and returned.
      *
      * @param  Request       $request
      * @param  ActionMapping $mapping
      *
-     * @return ActionForm|null
+     * @return ActionForm
      */
     protected function processActionFormCreate(Request $request, ActionMapping $mapping) {
-        $formClass = $mapping->getFormClassName();
-        if (!$formClass)
-            return null;
-
         /** @var ActionForm $form */
         $form = null;
 
-        // if the form has "session" scope try to find an existing form in the session
-        if ($mapping->isSessionScope())
-            $form = $request->getSession()->getAttribute($formClass);       // implicitely starts a session
+        if ($formClass = $mapping->getFormClassName()) {
+            // if the form has "session" scope try to find an existing form in the session
+            if ($mapping->isSessionScope())
+                $form = $request->getSession()->getAttribute($formClass);       // implicitely starts a session
 
-        // if none was found create a new instance
-        /** @var ActionForm $form */
-        if (!$form) $form = new $formClass($request);
+            // if none was found create a new instance
+            !$form && $form = new $formClass($request);
 
-        // if a DispatchAction is used read the action key
-        $actionClass = $mapping->getActionClassName();
-        if (is_subclass_of($actionClass, DispatchAction::class))
-            $form->initActionKey($request);
+            // if a DispatchAction is used read the action key
+            $actionClass = $mapping->getActionClassName();
+            if (is_subclass_of($actionClass, DispatchAction::class))
+                $form->initActionKey($request);
 
-        // populate the form
-        $form->populate($request);
+            // populate the form
+            $form->populate($request);
+        }
+        else {
+            // create a default instance
+            $form = new DefaultActionForm($request);
+        }
 
         // store the ActionForm in the request
         $request->setAttribute(ACTION_FORM_KEY, $form);
@@ -394,11 +385,11 @@ PROCESS_METHOD_ERROR_SC_405;
      * Erzeugt und gibt die Action zurueck, die fuer das angegebene Mapping konfiguriert wurde.
      *
      * @param  ActionMapping $mapping
-     * @param  ActionForm    $form [optional] - ActionForm, die konfiguriert wurde oder NULL
+     * @param  ActionForm    $form - configured ActionForm or DefaultActionForm if no form was configured
      *
      * @return Action
      */
-    protected function processActionCreate(ActionMapping $mapping, ActionForm $form = null) {
+    protected function processActionCreate(ActionMapping $mapping, ActionForm $form) {
         $className = $mapping->getActionClassName();
 
         return new $className($mapping, $form);

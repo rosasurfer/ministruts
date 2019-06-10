@@ -22,10 +22,10 @@ abstract class Action extends CObject {
      *
      * Create a new Action instance.
      *
-     * @param  ActionMapping $mapping         - the mapping using the Action
-     * @param  ActionForm    $form [optional] - user input of the request
+     * @param  ActionMapping $mapping - the mapping using the Action
+     * @param  ActionForm    $form    - user input of the request
      */
-    public function __construct(ActionMapping $mapping, ActionForm $form = null) {
+    public function __construct(ActionMapping $mapping, ActionForm $form) {
         $this->mapping = $mapping;
         $this->form    = $form;
     }
