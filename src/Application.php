@@ -195,18 +195,20 @@ class Application extends CObject {
      *
      * @param  array $options [optional] - additional execution options (default: none)
      *
-     * @return Response|int - the HTTP response if a web application; the error status if a command line application
+     * @return Response|int - the HTTP response wrapper for a web application, or the error status for a CLI application
      */
     public function run(array $options = []) {
-        if (!CLI)
+        if (!CLI) {
             return FrontController::processRequest($options);
+        }
+        if ($this->commands) {
+            if (sizeof($this->commands) > 1) echoPre('Multi-level commands are not yet supported.');
 
-        if (sizeof($this->commands) > 1)
-            echoPre('At the moment multi-level commands are not supported.');
-
-        /** @var Command|null $cmd */
-        $cmd = first($this->commands);
-        return $cmd ? $cmd->run() : 0;
+            /** @var Command $cmd */
+            $cmd = first($this->commands);
+            return $cmd->run();
+        }
+        return 0;
     }
 
 

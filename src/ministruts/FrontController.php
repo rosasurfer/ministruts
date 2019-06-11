@@ -116,11 +116,11 @@ class FrontController extends Singleton {
 
 
     /**
-     * Process the current HTTP request.
+     * Process the current HTTP request and return the response wrapper.
      *
      * @param  array $options [optional] - runtime options (default: none)
      *
-     * @return Response - respone wrapper
+     * @return Response - response wrapper
      */
     public static function processRequest(array $options = []) {
         $controller = self::me();
