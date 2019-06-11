@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\ministruts;
 
-use rosasurfer\di\proxy\Form;
+use rosasurfer\core\proxy\Form;
 
 
 /**

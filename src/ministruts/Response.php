@@ -6,7 +6,7 @@ use rosasurfer\core\assert\Assert;
 use rosasurfer\core\exception\InvalidArgumentException;
 use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\core\exception\RuntimeException;
-use rosasurfer\di\proxy\Request as RequestProxy;
+use rosasurfer\core\proxy\Request as RequestProxy;
 use rosasurfer\net\http\HttpResponse;
 use rosasurfer\util\PHP;
 

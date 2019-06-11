@@ -4,7 +4,7 @@ namespace rosasurfer\ministruts;
 use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\exception\IllegalAccessException;
-use rosasurfer\di\proxy\Request as RequestProxy;
+use rosasurfer\core\proxy\Request as RequestProxy;
 
 
 /**

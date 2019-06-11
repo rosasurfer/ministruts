@@ -9,7 +9,7 @@ use rosasurfer\core\debug\DebugHelper;
 use rosasurfer\core\exception\InvalidArgumentException;
 use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\core\exception\error\PHPError;
-use rosasurfer\di\proxy\Request;
+use rosasurfer\core\proxy\Request;
 use rosasurfer\net\NetTools;
 use rosasurfer\net\http\CurlHttpClient;
 use rosasurfer\net\http\HttpRequest;

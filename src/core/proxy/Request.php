@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\di\proxy;
+namespace rosasurfer\core\proxy;
 
 use rosasurfer\ministruts\ActionMapping;
 use rosasurfer\ministruts\HttpSession;

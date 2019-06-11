@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\di\proxy;
+namespace rosasurfer\core\proxy;
 
 use rosasurfer\core\exception\IllegalAccessException;
 use rosasurfer\ministruts\ActionForm;

@@ -11,7 +11,7 @@ use rosasurfer\core\exception\IllegalArgumentException;
 use rosasurfer\core\exception\InvalidArgumentException;
 use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\core\lock\Lock;
-use rosasurfer\di\proxy\Request;
+use rosasurfer\core\proxy\Request;
 use rosasurfer\log\Logger;
 use rosasurfer\ministruts\ActionMapping;
 use rosasurfer\ministruts\Module;
