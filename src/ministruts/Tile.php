@@ -243,7 +243,7 @@ class Tile extends CObject {
         foreach ($nestedTiles as $tile) {
             $tile->setParent($this);
         }
-        $properties  = $this->getMergedProperties();
+        $properties = $this->getMergedProperties();
 
         if (!defined($namespace.'APP')) {
             define($namespace.'APP', strLeft($appUri, -1));
