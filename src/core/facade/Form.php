@@ -5,6 +5,7 @@ use rosasurfer\core\exception\IllegalAccessException;
 use rosasurfer\core\proxy\Request;
 use rosasurfer\ministruts\ActionForm;
 use rosasurfer\ministruts\ActionMapping;
+use rosasurfer\ministruts\DefaultActionForm;
 use rosasurfer\ministruts\DispatchAction;
 
 use const rosasurfer\ministruts\ACTION_FORM_KEY;
@@ -15,12 +16,22 @@ use const rosasurfer\ministruts\ACTION_FORM_KEY;
  *
  * A {@link Facade} for the current {@link ActionForm} configured for an {@link ActionMapping}, and the {@link ActionForm}
  * used in the previous HTTP request if the current request is a result of an HTTP redirect. If no form is configured for a
- * mapping the framework instantiates and assigns a {@link Defau}default form implementation.
+ * mapping the framework instantiates and assigns a {@link DefaultActionForm}.
  *
  *
  * @method static string|null getActionKey() Return the dispatch action key (if the action is a {@link DispatchAction} and a key was submitted).
  */
 class Form extends Facade {
+
+
+    /**
+     * Return the {@link ActionForm} instance assigned to the current HTTP request.
+     *
+     * @return ActionForm
+     */
+    public static function instance() {
+        return Request::getAttribute(ACTION_FORM_KEY);
+    }
 
 
     /**
