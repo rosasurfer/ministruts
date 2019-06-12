@@ -1,14 +1,14 @@
 <?php
 namespace rosasurfer\ministruts;
 
-use rosasurfer\core\proxy\Form;
+use rosasurfer\core\facade\Form;
 
 
 /**
  * DefaultActionForm
  *
- * An empty default implementation which is instantiated and used if no custom {@link ActionForm} is configured for an
- * {@link ActionMapping}. Makes sure that the {@link Form} proxy can always resolve an actual {@link ActionForm} instance.
+ * An empty default implementation which is instantiated and assigned to an {@link ActionMapping} if no custom
+ * {@link ActionForm} is configured. Ensures that the {@link Form} facade always finds an actual {@link ActionForm} instance.
  * All parameter getters called on this class return NULL.
  */
 final class DefaultActionForm extends ActionForm {
