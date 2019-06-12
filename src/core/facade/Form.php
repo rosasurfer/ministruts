@@ -1,12 +1,9 @@
 <?php
 namespace rosasurfer\core\facade;
 
-use rosasurfer\core\exception\IllegalAccessException;
 use rosasurfer\core\proxy\Request;
 use rosasurfer\ministruts\ActionForm;
-use rosasurfer\ministruts\ActionMapping;
 use rosasurfer\ministruts\DefaultActionForm;
-use rosasurfer\ministruts\DispatchAction;
 
 use const rosasurfer\ministruts\ACTION_FORM_KEY;
 
@@ -14,14 +11,23 @@ use const rosasurfer\ministruts\ACTION_FORM_KEY;
 /**
  * Form
  *
- * A {@link Facade} for the current {@link ActionForm} configured for an {@link ActionMapping}, and the {@link ActionForm}
- * used in the previous HTTP request if the current request is a result of an HTTP redirect. If no form is configured for a
- * mapping the framework instantiates and assigns a {@link DefaultActionForm}.
- *
- *
- * @method static string|null getActionKey() Return the dispatch action key (if the action is a {@link DispatchAction} and a key was submitted).
+ * A {@link Facade} for the properties of the {@link ActionForm} assigned to the current HTTP request, and the properties
+ * of the {@link ActionForm} assigned to the previous HTTP request if the current request is a result of an HTTP redirect.
  */
 class Form extends Facade {
+
+
+    /**
+     * Return the current HTTP request's {@link ActionForm} property with the specified name.
+     *
+     * @param  string $name - property name
+     *
+     * @return mixed
+     */
+    public static function get($name) {
+        $form = static::target();
+        return $form->get($name);
+    }
 
 
     /**
@@ -29,49 +35,32 @@ class Form extends Facade {
      *
      * @return ActionForm
      */
-    public static function instance() {
-        return Request::getAttribute(ACTION_FORM_KEY);
+    public static function current() {
+        return static::target();
     }
 
 
     /**
-     * Resolve the target {@link ActionForm} instance for a static method call.
+     * If the current request is a result of an HTTP redirect return the {@link ActionForm} instance assigned to the previous
+     * HTTP request. Otherwise return an instance of {@link DefaultActionForm}.
      *
-     * @param  string $method - method name
-     *
-     * @return ActionForm|null
+     * @return ActionForm
      */
-    protected static function target($method) {
-        $key = 'form';
-        return Request::getAttribute(ACTION_FORM_KEY);
+    public static function old() {
+        static $oldForm;                // @TODO: return the real instance
+        !$oldForm && $oldForm = new DefaultActionForm(Request::instance());
+        return $oldForm;
     }
 
 
     /**
-     * {@inheritdoc}
+     * Resolve the {@link ActionForm} instance responsible for handling the specified method call.
      *
-     * @param  string $method - method name
-     * @param  array  $args   - arguments passed to the method call
+     * @param  string $method [optional] - method name (default: ignored)
      *
-     * @return mixed
+     * @return ActionForm - always the instance assigned to the current HTTP request.
      */
-    public static function __callStatic($method, array $args) {
-        if (substr($method, 0, 2) == '__')
-            throw new IllegalAccessException('Cannot access internal method '.ActionForm::class.'::'.$method.'()');
-
-        switch (strtolower($method)) {
-            case 'initactionkey':
-            case 'populate'     :
-            case 'validate'     :
-            case 'offsetexists' :
-            case 'offsetget'    :
-            case 'offsetset'    :
-            case 'offsetunset'  :
-                throw new IllegalAccessException('Cannot access internal method '.ActionForm::class.'::'.$method.'()');
-        }
-
-        if ($target = static::target($method))
-            return $target->$method(...$args);
-        return null;
+    protected static function target($method = null) {
+        return Request::getAttribute(ACTION_FORM_KEY);
     }
 }

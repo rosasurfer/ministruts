@@ -131,7 +131,33 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
 
 
     /**
-     * Whether an input parameter with the specified name exists.
+     * Return the property with the specified name. If a getter for the property exists the getter is called. Otherwise
+     * the property is returned.
+     *
+     * @param  string $name - property name
+     *
+     * @return mixed
+     */
+    public function get($name) {
+        Assert::string($name);
+
+        switch ($name) {
+            case 'request':
+            case 'fileUploadErrors':
+                return null;
+        }
+        if (method_exists($this, $method='get'.$name)) {
+            return $this->$method();
+        }
+        if (property_exists($this, $name)) {
+            return $this->$name;
+        }
+        return null;
+    }
+
+
+    /**
+     * Whether a form property with the specified name exists.
      *
      * @param  string $name
      *
@@ -145,26 +171,20 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
             case 'fileUploadErrors':
                 return false;
         }
-        return property_exists($this, $name);
+        return property_exists($this, $name) || method_exists($this, 'get'.$name);
     }
 
 
     /**
-     * Return the input parameter with the specified name.
+     * Return the property with the specified name. If a getter for the property exists the getter is called. Otherwise
+     * the property is returned.
      *
      * @param  string $name
      *
-     * @return string|null - parameter value or NULL if no such input parameter exists
+     * @return mixed
      */
     public function offsetGet($name) {
-        Assert::string($name);
-
-        switch ($name) {
-            case 'request':
-            case 'fileUploadErrors':
-                return null;
-        }
-        return isset($this->name) ? $this->name : null;
+        return $this->get($name);
     }
 
 
