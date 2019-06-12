@@ -13,8 +13,7 @@ parameters:
         - etc/phpstan/stubs.php                                             # stubs for unloaded PHP extensions
 
     fileExtensions:                                                         # additional files to analyse
-       #- html
-       #- phtml                                                             # TODO: Tile default vars trigger errors
+        - phtml
 
     excludes_analyse:
         - .git/

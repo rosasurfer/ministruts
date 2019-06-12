@@ -58,7 +58,7 @@ class FileSystem extends StaticClass {
      * it will be overwritten.
      *
      * @param  string   $source             - path to the source file
-     * @param  int      $destination        - destination file
+     * @param  string   $destination        - destination file
      * @param  resource $context [optional]
      *
      * @return bool - success status
