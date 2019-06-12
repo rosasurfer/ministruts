@@ -7,10 +7,10 @@ use rosasurfer\core\exception\UnimplementedFeatureException;
 
 
 /**
- * Proxy
+ * A {@link Proxy} forwards calls of one API to another one.
  *
- * A Proxy forwards static method calls to an actual instance. The standard way to resolve a proxied instance is a look-up
- * in the application's default service container. Override {@link Proxy::instance()} to change that behavior.
+ * In MiniStruts it forwards static method calls to actual instances. The standard behavior to resolve proxied instances is
+ * a look-up in the application's default service container. Override {@link Proxy::instance()} to change that behavior.
  */
 abstract class Proxy extends StaticClass {
 
@@ -55,7 +55,7 @@ abstract class Proxy extends StaticClass {
      */
     public static function __callStatic($method, array $args) {
         if (substr($method, 0, 2) == '__')
-            throw new IllegalAccessException('Cannot forward call to internal method '.get_class(static::instance()).'::'.$method.'()');
+            throw new IllegalAccessException('Cannot forward to internal method '.get_class(static::instance()).'::'.$method.'()');
 
         $instance = static::instance();
         return $instance->$method(...$args);

@@ -139,6 +139,12 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
      */
     public function offsetExists($name) {
         Assert::string($name);
+
+        switch ($name) {
+            case 'request':
+            case 'fileUploadErrors':
+                return false;
+        }
         return property_exists($this, $name);
     }
 
@@ -152,6 +158,12 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
      */
     public function offsetGet($name) {
         Assert::string($name);
+
+        switch ($name) {
+            case 'request':
+            case 'fileUploadErrors':
+                return null;
+        }
         return isset($this->name) ? $this->name : null;
     }
 
