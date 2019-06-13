@@ -8,8 +8,8 @@ use rosasurfer\core\proxy\Request as RequestProxy;
 
 
 /**
- * An ActionForm encapsulates and represents the user input. It provides an interface for {@link Action}s and business layer
- * to access and validate this input.
+ * An {@link ActionForm} encapsulates and represents the user input. It provides an interface for {@link Action}s and
+ * business layer to access and validate this input.
  */
 abstract class ActionForm extends CObject implements \ArrayAccess {
 
@@ -60,38 +60,37 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
     public function initActionKey(Request $request) {
         /**
          * PHP breaks transmitted parameters by silently converting dots "." and spaces " " in names to underscores. This
-         * breaks especially submit image elements, as the HTML standard appends the clicked image coordinates to the submit
+         * especially breaks submit image elements, as the HTML standard appends the clicked image coordinates to the submit
          * parameter.
          *
          * HTML example:
          *   <form action="/url">
          *      <input type="text" name="foo.bar" value="baz">
-         *      <img type="submit" name="image" src="image.png">
+         *      <img type="submit" name="action" src="image.png">
          *   </form>
          *
          * Parameters sent by the browser:
-         *   GET /url?foo.bar=baz&image.x=123&image.y=456 HTTP/1.0
+         *   GET /url?foo.bar=baz&action.x=123&action.y=456 HTTP/1.0
          *
-         * Parameters after PHP handling:
+         * Parameters after PHP input processing:
          *   $_GET = array(
-         *       [foo_bar] => baz               // broken name
-         *       [image_x] => 123               // broken name
-         *       [image_y] => 456               // broken name
+         *       [foo_bar]  => baz                              // broken name
+         *       [action_x] => 123                              // broken name
+         *       [action_y] => 456                              // broken name
          *   )
          *
-         *
          * - Workaround for image submit elements (<img type="submit"...):
-         *   Use the element's name attribute as: <img type="submit" name="submit[action]" ...>
-         *   The browser will send "submit[action].x=123&submit[action].y=456". PHP will discard and lose the coordinates
-         *   but the submit parameter will keep it's original name.
+         *   Note the element's name attribute as follows: <img type="submit" name="submit[action]" ...>
+         *   The browser will send "?submit[action].x=123&submit[action].y=456". PHP will treat the parameter as an array
+         *   and discard the image coordinates, and the submit parameter name will stay unmodified.
          *
          * - Workaround for other parameters with dots or spaces:
          *   Wrap the name in an array:
          *   $_REQUEST = array(
-         *       [action_x] => update                               // <img type="submit" name="action"... broken by PHP
-         *       [application_name] => foobar                       // regular custom parameters broken by PHP
-         *       [top_level_with_dots] => Array (                   // custom top-level parameters broken by PHP
-         *           [nested.level.with.dots] => custom-value       // custom wrapped parameters not broken by PHP
+         *       [action_x]            => value                 // <img type="submit" name="action"...  => broken by PHP
+         *       [application_name]    => value                 // regular custom parameter             => broken by PHP
+         *       [top_level_with_dots] => Array (               // custom top-level parameter           => broken by PHP
+         *           [nested.level.with.dots] => value          // custom parameters wrapped in array   => not broken by PHP
          *       )
          *   )
          */
@@ -197,7 +196,7 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
      * $throws IllegalAccessException
      */
     final public function offsetSet($name, $value) {
-        throw new IllegalAccessException('Cannot set/modify input parameters');
+        throw new IllegalAccessException('Cannot set/modify ActionForm properties');
     }
 
 
@@ -209,7 +208,7 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
      * $throws IllegalAccessException
      */
     final public function offsetUnset($name) {
-        throw new IllegalAccessException('Cannot unset input parameters');
+        throw new IllegalAccessException('Cannot unset ActionForm properties');
     }
 
 
