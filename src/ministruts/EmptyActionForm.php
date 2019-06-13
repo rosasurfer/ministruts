@@ -1,17 +1,15 @@
 <?php
 namespace rosasurfer\ministruts;
 
-use rosasurfer\core\facade\Form;
-
 
 /**
- * DefaultActionForm
+ * EmptyActionForm
  *
  * An empty default implementation which is instantiated and assigned to an {@link ActionMapping} if no custom
- * {@link ActionForm} is configured. Ensures that the {@link Form} facade always finds an actual {@link ActionForm} instance.
+ * {@link ActionForm} is configured. Ensures that view helper always find an actual {@link ActionForm} instance.
  * All parameter getters called on this class return NULL.
  */
-final class DefaultActionForm extends ActionForm {
+final class EmptyActionForm extends ActionForm {
 
 
     /**

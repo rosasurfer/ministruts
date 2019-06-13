@@ -282,8 +282,8 @@ PROCESS_METHOD_ERROR_SC_405;
 
 
     /**
-     * Return the {@link ActionForm} instance for the specified {@link ActionMapping}. If no ActionForm was configured a
-     * {@link DefaultActionForm} is instantiated and returned.
+     * Return the {@link ActionForm} instance assigned to the passed {@link ActionMapping}. If no ActionForm was configured an
+     * {@link EmptyActionForm} is instantiated and assigned.
      *
      * @param  Request       $request
      * @param  ActionMapping $mapping
@@ -311,8 +311,8 @@ PROCESS_METHOD_ERROR_SC_405;
             $form->populate($request);
         }
         else {
-            // create a default instance
-            $form = new DefaultActionForm($request);
+            // create an empty default instance
+            $form = new EmptyActionForm($request);
         }
 
         // store the ActionForm in the request
@@ -385,7 +385,7 @@ PROCESS_METHOD_ERROR_SC_405;
      * Erzeugt und gibt die Action zurueck, die fuer das angegebene Mapping konfiguriert wurde.
      *
      * @param  ActionMapping $mapping
-     * @param  ActionForm    $form - configured ActionForm or DefaultActionForm if no form was configured
+     * @param  ActionForm    $form - the ActionForm instance assigned to the mapping
      *
      * @return Action
      */

@@ -3,7 +3,7 @@ namespace rosasurfer\core\facade;
 
 use rosasurfer\core\proxy\Request;
 use rosasurfer\ministruts\ActionForm;
-use rosasurfer\ministruts\DefaultActionForm;
+use rosasurfer\ministruts\EmptyActionForm;
 
 use const rosasurfer\ministruts\ACTION_FORM_KEY;
 
@@ -42,13 +42,13 @@ class Form extends Facade {
 
     /**
      * If the current request is a result of an HTTP redirect return the {@link ActionForm} instance assigned to the previous
-     * HTTP request. Otherwise return an instance of {@link DefaultActionForm}.
+     * HTTP request. Otherwise return an instance of {@link EmptyActionForm}.
      *
      * @return ActionForm
      */
     public static function old() {
         static $oldForm;                // @TODO: return the real instance
-        !$oldForm && $oldForm = new DefaultActionForm(Request::instance());
+        !$oldForm && $oldForm = new EmptyActionForm(Request::instance());
         return $oldForm;
     }
 
