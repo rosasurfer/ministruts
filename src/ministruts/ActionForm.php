@@ -133,17 +133,18 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
      * Return the property with the specified name. If a getter for the property exists the getter is called. Otherwise
      * the property is returned.
      *
-     * @param  string $name - property name
+     * @param  string $name               - property name
+     * @param  mixed  $default [optional] - default value to return if the specified property was not found (default: none)
      *
      * @return mixed
      */
-    public function get($name) {
+    public function get($name, $default = null) {
         Assert::string($name);
 
         switch ($name) {
             case 'request':
             case 'fileUploadErrors':
-                return null;
+                return $default;
         }
         if (method_exists($this, $method='get'.$name)) {
             return $this->$method();
@@ -151,7 +152,7 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
         if (property_exists($this, $name)) {
             return $this->$name;
         }
-        return null;
+        return $default;
     }
 
 

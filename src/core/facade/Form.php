@@ -20,13 +20,14 @@ class Form extends Facade {
     /**
      * Return the current HTTP request's {@link ActionForm} property with the specified name.
      *
-     * @param  string $name - property name
+     * @param  string $name               - property name
+     * @param  mixed  $default [optional] - default value to return if the specified property was not found (default: none)
      *
      * @return mixed
      */
-    public static function get($name) {
+    public static function get($name, $default = null) {
         $form = static::target();
-        return $form->get($name);
+        return $form->get($name, $default);
     }
 
 
