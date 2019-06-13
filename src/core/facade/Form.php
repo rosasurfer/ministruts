@@ -32,25 +32,39 @@ class Form extends Facade {
 
 
     /**
-     * Return the {@link ActionForm} instance assigned to the current HTTP request.
+     * Return the {@link ActionForm} instance assigned to the current HTTP request. Use the optional $type parameter to
+     * distinguish between multiple different {@link ActionForm}s in the same page.
      *
+     * @param  string $type [optional] - ensure the returned instance matches the specified class name, or return an
+     *                                   EmptyActionForm if this is not the case
+     *                                   (default: no type restriction)
      * @return ActionForm
      */
-    public static function current() {
-        return static::target();
+    public static function current($type = null) {
+        $form = static::target();
+
+        if (!isset($type) || $form instanceof $type)
+            return $form;
+        return new EmptyActionForm(Request::instance());
     }
 
 
     /**
      * If the current request is a result of an HTTP redirect return the {@link ActionForm} instance assigned to the previous
-     * HTTP request. Otherwise return an instance of {@link EmptyActionForm}.
+     * HTTP request. Otherwise return an instance of {@link EmptyActionForm}. Use the optional $type parameter to distinguish
+     * between multiple different {@link ActionForm}s in the same page.
      *
+     * @param  string $type [optional] - ensure the returned instance matches the specified class name, or return an
+     *                                   EmptyActionForm if this is not the case
+     *                                   (default: no type restriction)
      * @return ActionForm
      */
-    public static function old() {
-        static $oldForm;                // @TODO: return the real instance
-        !$oldForm && $oldForm = new EmptyActionForm(Request::instance());
-        return $oldForm;
+    public static function old($type = null) {
+        $form = new EmptyActionForm(Request::instance());           // @TODO: resolve the real instance
+
+        if (!isset($type) || $form instanceof $type)
+            return $form;
+        return new EmptyActionForm(Request::instance());
     }
 
 
@@ -59,7 +73,7 @@ class Form extends Facade {
      *
      * @param  string $method [optional] - method name (default: ignored)
      *
-     * @return ActionForm - always the instance assigned to the current HTTP request.
+     * @return ActionForm - always the instance assigned to the current HTTP request
      */
     protected static function target($method = null) {
         return Request::getAttribute(ACTION_FORM_KEY);
