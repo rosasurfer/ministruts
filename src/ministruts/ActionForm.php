@@ -5,6 +5,7 @@ use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\exception\IllegalAccessException;
 use rosasurfer\core\proxy\Request as RequestProxy;
+use function rosasurfer\debugHeader;
 
 
 /**
@@ -42,6 +43,9 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
      */
     public function __construct(Request $request) {
         $this->request = $request;
+
+        //$this->initActionKey($request);
+        //$this->populate($request);
     }
 
 
@@ -52,7 +56,7 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
      *
      * @example
      *
-     * MiniStruts expects the action key nested in an array named "submit". Write your HTML like so:
+     * MiniStruts expects the action key nested in an array named "submit". Write your HTML as follows:
      * <pre>
      *  &lt;img type="submit" name="submit[action]" value="{action-key}" src=... /&gt;
      * </pre>
@@ -94,8 +98,13 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
          *       )
          *   )
          */
-        if (isset($_REQUEST['submit']['action']))
+        if (isset($_REQUEST['submit']['action'])) {
             $this->actionKey = $_REQUEST['submit']['action'];
+            //debugHeader('submitted actionKey: '.(isset($this->actionKey) ? '"'.$this->actionKey.'"': 'NULL'));
+        }
+        else {
+            //debugHeader('no actionKey submitted');
+        }
     }
 
 
@@ -214,19 +223,19 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
 
 
     /**
-     * Prevent serialization of transient properties.                   // access level encoding
-     *                                                                  // ---------------------
-     * @return string[] - array of property names to serialize          // private:   "\0{className}\0{propertyName}"
-     */                                                                 // protected: "\0*\0{propertyName}"
-    public function __sleep() {                                         // public:    "{propertyName}"
-        $array = (array) $this;
-
-        unset($array["\0*\0request"  ]);
-        unset($array["\0*\0actionKey"]);
-
+     * Prevent serialization of transient properties.
+     *
+     * @return string[] - array of property names to serialize
+     */
+    public function __sleep() {
+        $array = (array) $this;                                         // access level encoding
+                                                                        // ---------------------
+        unset($array["\0*\0request"  ]);                                // private:   "\0{className}\0{property-name}"
+        unset($array["\0*\0actionKey"]);                                // protected: "\0*\0{property-name}"
+                                                                        // public:    "{property-name}"
         foreach ($array as $name => $property) {
             if (is_object($property)) {
-                unset($array[$name]);                                   // drop all remaining object references
+                unset($array[$name]);                                   // drop remaining object references
             }
         }
         return \array_keys($array);
