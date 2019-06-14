@@ -5,9 +5,6 @@ use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\exception\IllegalAccessException;
 
-use function rosasurfer\debugHeader;
-use function rosasurfer\simpleClassName;
-
 
 /**
  * An {@link ActionForm} encapsulates and represents the user input. It provides an interface for {@link Action}s and
@@ -243,7 +240,6 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
      * Re-initialize the instance after deserialization.
      */
     public function __wakeUp() {
-        // intentionally don't call the constructor
-        debugHeader(simpleClassName($this).'::__wakeup()');
+        // intentionally don't call the constructor as an awakened instance is always an old form
     }
 }
