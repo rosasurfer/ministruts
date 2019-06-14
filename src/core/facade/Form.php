@@ -26,7 +26,7 @@ class Form extends Facade {
      * @return mixed
      */
     public static function get($name, $default = null) {
-        $form = static::target();
+        $form = static::current();
         return $form->get($name, $default);
     }
 
@@ -41,9 +41,9 @@ class Form extends Facade {
      * @return ActionForm
      */
     public static function current($type = null) {
-        $form = static::target();
+        $form = Request::getAttribute(ACTION_FORM_KEY);
 
-        if (!isset($type) || $form instanceof $type)
+        if ($form && (!isset($type) || $form instanceof $type))
             return $form;
         return new EmptyActionForm(Request::instance());
     }
@@ -62,20 +62,8 @@ class Form extends Facade {
     public static function old($type = null) {
         $form = new EmptyActionForm(Request::instance());           // @TODO: resolve the real instance
 
-        if (!isset($type) || $form instanceof $type)
+        if ($form && (!isset($type) || $form instanceof $type))
             return $form;
         return new EmptyActionForm(Request::instance());
-    }
-
-
-    /**
-     * Resolve the {@link ActionForm} instance responsible for handling the specified method call.
-     *
-     * @param  string $method [optional] - method name (default: ignored)
-     *
-     * @return ActionForm - always the instance assigned to the current HTTP request
-     */
-    protected static function target($method = null) {
-        return Request::getAttribute(ACTION_FORM_KEY);
     }
 }
