@@ -375,7 +375,7 @@ function stderr($message) {
 
 
 /**
- * Send an "X-Debug-???" header with a message. Each sent header name will end with a different and increasing number.
+ * Send an "X-Debug-{id}" header with a message. Each sent header will have a different and increasing id.
  *
  * @param  string $message
  */
@@ -384,6 +384,9 @@ function debugHeader($message) {
 
     if (!is_string($message))
         $message = (string) $message;
+    $message = str_replace(chr(0), '\0', $message);         // headers must not contain NUL bytes
+    $message = normalizeEOL($message);
+    $message = str_replace(NL, '\n ', $message);            // header() does not accept multi-line headers
 
     static $i = 0;
     header('X-Debug-'.++$i.': '.$message);
@@ -1407,12 +1410,14 @@ function is_array_like($var) {
 /**
  * Return the simple name of a class name (i.e. the base name).
  *
- * @param  string $className - full class name
+ * @param  string|object $class - class name or instance
  *
  * @return string
  */
-function simpleClassName($className) {
-    return strRightFrom($className, $limiter='\\', $count=-1, $includeLimiter=false, $onNotFound=$className);
+function simpleClassName($class) {
+    if (is_object($class)) $class = get_class($class);
+    else                   Assert::string($class);
+    return strRightFrom($class, $limiter='\\', $count=-1, $includeLimiter=false, $onNotFound=$class);
 }
 
 

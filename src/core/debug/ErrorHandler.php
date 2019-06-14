@@ -244,7 +244,7 @@ class ErrorHandler extends StaticClass {
             $msg  = $msg2.NL;
             $msg .= $indent.'caused by'.NL;
             $msg .= $msg1;
-            $msg  = str_replace(chr(0), '?', $msg);     // replace NUL bytes which mess up the logfile
+            $msg  = str_replace(chr(0), '\0', $msg);    // replace NUL bytes which mess up the logfile
 
             if (CLI) echo $msg.NL;                      // full second exception
             error_log(trim($msg), ERROR_LOG_DEFAULT);

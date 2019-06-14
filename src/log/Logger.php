@@ -552,7 +552,7 @@ class Logger extends StaticClass {
         $msg = 'PHP '.$context['cliMessage'];
         if (\key_exists('cliExtra', $context))
             $msg .= $context['cliExtra'];
-        $msg = str_replace(chr(0), '?', $msg);                   // replace NUL bytes which mess up the logfile
+        $msg = str_replace(chr(0), '\0', $msg);                 // replace NUL bytes which mess up the logfile
 
         if (CLI && empty(ini_get('error_log'))) {
             // Suppress duplicated output to STDERR, the PrintHandler already wrote to STDOUT.

@@ -199,7 +199,7 @@ function stderr($message) {
 
 
 /**
- * Send an "X-Debug-???" header with a message. Each sent header name will end with a different and increasing number.
+ * Send an "X-Debug-{id}" header with a message. Each sent header will have a different and increasing id.
  *
  * @param  string $message
  */
@@ -791,12 +791,12 @@ function is_trait($name) {
 /**
  * Return the simple name of a class name (i.e. the base name).
  *
- * @param  string $className - full class name
+ * @param  string|object $class - class name or instance
  *
  * @return string
  */
-function simpleClassName($className) {
-    return \rosasurfer\simpleClassName($className);
+function simpleClassName($class) {
+    return \rosasurfer\simpleClassName($class);
 }
 
 

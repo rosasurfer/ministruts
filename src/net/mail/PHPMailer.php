@@ -117,7 +117,7 @@ class PHPMailer extends Mailer {
 
         // mail body
         Assert::string($message, '$message');
-        $message = str_replace(chr(0), '?', $message);                      // replace NUL bytes which destroy the mail
+        $message = str_replace(chr(0), '\0', $message);                     // replace NUL bytes which destroy the mail
         $message = normalizeEOL($message, EOL_WINDOWS);                     // multiple lines must be separated by CRLF
 
         // TODO: wrap long lines into several shorter ones                  // max 998 chars per RFC but e.g. FastMail only accepts 990
