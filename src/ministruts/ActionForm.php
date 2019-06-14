@@ -4,7 +4,9 @@ namespace rosasurfer\ministruts;
 use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\exception\IllegalAccessException;
-use rosasurfer\core\proxy\Request as RequestProxy;
+
+use function rosasurfer\debugHeader;
+use function rosasurfer\simpleClassName;
 
 
 /**
@@ -36,31 +38,36 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
     /**
      * Constructor
      *
-     * Create a new form instance for the current {@link Request}.
+     * Create a new form instance with data from the passed {@link Request}.
      *
      * @param  Request $request
      */
     public function __construct(Request $request) {
         $this->request = $request;
 
-        //$this->initActionKey($request);
-        //$this->populate($request);
+        /** @var ActionMapping $mapping */
+        $mapping = $request->getAttribute(ACTION_MAPPING_KEY);
+        $actionClass = $mapping->getActionClassName();
+
+        // if a DispatchAction is used read the action key
+        if (is_subclass_of($actionClass, DispatchAction::class)) {
+            $this->initActionKey();
+        }
+        $this->populate();
     }
 
 
     /**
      * Read a submitted {@link DispatchAction} key.
      *
-     * @param  Request $request
+     * MiniStruts expects the action key nested in an array named "submit". Write your HTML as follows:
      *
      * @example
-     *
-     * MiniStruts expects the action key nested in an array named "submit". Write your HTML as follows:
      * <pre>
      *  &lt;img type="submit" name="submit[action]" value="{action-key}" src=... /&gt;
      * </pre>
      */
-    public function initActionKey(Request $request) {
+    protected function initActionKey() {
         /**
          * PHP breaks transmitted parameters by silently converting dots "." and spaces " " in names to underscores. This
          * especially breaks submit image elements, as the HTML standard appends the clicked image coordinates to the submit
@@ -97,12 +104,9 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
          *       )
          *   )
          */
-        if (isset($_REQUEST['submit']['action'])) {
-            $this->actionKey = $_REQUEST['submit']['action'];
-            //debugHeader('submitted actionKey: '.(isset($this->actionKey) ? '"'.$this->actionKey.'"': 'NULL'));
-        }
-        else {
-            //debugHeader('no actionKey submitted');
+        $params = $this->request->getParameters();
+        if (isset($params['submit']['action'])) {
+            $this->actionKey = $params['submit']['action'];
         }
     }
 
@@ -122,11 +126,9 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
     /**
      * Populate the form object with the request parameters.
      *
-     * @param  Request $request
-     *
      * @return void
      */
-    abstract public function populate(Request $request);
+    abstract protected function populate();
 
 
     /**
@@ -241,6 +243,7 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
      * Re-initialize the instance after deserialization.
      */
     public function __wakeUp() {
-        $this->__construct(RequestProxy::instance());
+        // intentionally don't call the constructor
+        debugHeader(simpleClassName($this).'::__wakeup()');
     }
 }

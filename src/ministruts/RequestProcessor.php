@@ -3,8 +3,9 @@ namespace rosasurfer\ministruts;
 
 use rosasurfer\core\CObject;
 use rosasurfer\core\exception\RuntimeException;
-use rosasurfer\net\http\HttpResponse;
 use rosasurfer\core\facade\Form;
+use rosasurfer\core\facade\Forms;
+use rosasurfer\net\http\HttpResponse;
 
 
 /**
@@ -239,26 +240,12 @@ PROCESS_METHOD_ERROR_SC_405;
      * @return ActionForm
      */
     protected function processActionFormCreate(Request $request, ActionMapping $mapping) {
+        $formClass = $mapping->getFormClassName();
+
         /** @var ActionForm $form */
-        $form = null;
+        $form = $formClass ? new $formClass($request) : new EmptyActionForm($request);
 
-        if ($formClass = $mapping->getFormClassName()) {
-            $form = new $formClass($request);
-
-            // if a DispatchAction is used read the action key
-            $actionClass = $mapping->getActionClassName();
-            if (is_subclass_of($actionClass, DispatchAction::class))
-                $form->initActionKey($request);
-
-            // populate the form
-            $form->populate($request);
-        }
-        else {
-            // create an empty default instance
-            $form = new EmptyActionForm($request);
-        }
-
-        // store the ActionForm in the request
+        // store the form in the request
         $request->setAttribute(ACTION_FORM_KEY, $form);
 
         return $form;
@@ -444,8 +431,8 @@ PROCESS_METHOD_ERROR_SC_405;
 
 
     /**
-     * Move an old ActionForm stored in the session to the current {@link Request}. The form will be available via the
-     * facade {@link Form::old()} as form of the previous request.
+     * Move an old {@link ActionForm} stored in the session to the current {@link Request}. The form will be available
+     * via the facades {@link Forms} and {@link Form::old()} as form of the previous request.
      *
      * @param  Request $request
      */
