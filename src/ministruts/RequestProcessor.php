@@ -245,8 +245,6 @@ PROCESS_METHOD_ERROR_SC_405;
         if ($formClass = $mapping->getFormClassName()) {
             $form = new $formClass($request);
 
-            //debugHeader('regular form initialization');
-
             // if a DispatchAction is used read the action key
             $actionClass = $mapping->getActionClassName();
             if (is_subclass_of($actionClass, DispatchAction::class))
@@ -294,9 +292,12 @@ PROCESS_METHOD_ERROR_SC_405;
         if (!$forward) {
             $key     = $success ? ActionForward::VALIDATION_SUCCESS_KEY : ActionForward::VALIDATION_ERROR_KEY;
             $forward = $mapping->findForward($key);
-        }
-        if (!$forward) throw new RuntimeException('<mapping path="'.$mapping->getPath().'" form-validate-first="true": ActionForward not found (module validation error?)');
 
+            if (!$forward) throw new RuntimeException(
+                '<mapping path="'.$mapping->getPath().'" form-validate-first="true": '
+               .'ActionForward "'.$key.'" not found (module validation error, should never happen)'
+            );
+        }
         $this->processActionForward($request, $response, $forward);
         return false;
     }

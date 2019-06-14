@@ -5,7 +5,6 @@ use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\exception\IllegalAccessException;
 use rosasurfer\core\proxy\Request as RequestProxy;
-use function rosasurfer\debugHeader;
 
 
 /**
@@ -18,10 +17,10 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
     /** @var Request [transient] - the request the form belongs to */
     protected $request;
 
-    /** @var string [transient] - dispatch action key, populated if the Action handling the request is a DispatchAction */
+    /** @var string - dispatch action key, populated if the Action handling the request is a DispatchAction */
     protected $actionKey;
 
-    /** @var string[] [transient] */
+    /** @var string[] */
     protected static $fileUploadErrors = [
         UPLOAD_ERR_OK         => 'Success (UPLOAD_ERR_OK)',
         UPLOAD_ERR_INI_SIZE   => 'Upload error, file too big (UPLOAD_ERR_INI_SIZE)',
@@ -228,14 +227,10 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
      * @return string[] - array of property names to serialize
      */
     public function __sleep() {
-        $array = (array) $this;                                         // access level encoding
-                                                                        // ---------------------
-        unset($array["\0*\0request"  ]);                                // private:   "\0{className}\0{property-name}"
-        unset($array["\0*\0actionKey"]);                                // protected: "\0*\0{property-name}"
-                                                                        // public:    "{property-name}"
+        $array = (array)$this;
         foreach ($array as $name => $property) {
-            if (is_object($property)) {
-                unset($array[$name]);                                   // drop remaining object references
+            if (is_object($property) || is_resource($property)) {
+                unset($array[$name]);                               // drop object and resource references
             }
         }
         return \array_keys($array);
