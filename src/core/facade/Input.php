@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\core\facade;
 
-use rosasurfer\core\io\web\Input as WebInput;
+use rosasurfer\core\io\WebInput;
 use rosasurfer\core\proxy\Request as RequestProxy;
 use rosasurfer\ministruts\Request;
 
@@ -31,7 +31,7 @@ class Input extends Facade {
     /**
      * Return the wrapper around the current HTTP request parameters.
      *
-     * @return \rosasurfer\core\io\web\Input
+     * @return WebInput
      */
     public static function current() {
         return RequestProxy::getAttribute('input');
@@ -42,7 +42,7 @@ class Input extends Facade {
      * If the current request is a result of an HTTP redirect return the input wrapper around the previous HTTP request
      * parameters. Otherwise return an empty input wrapper.
      *
-     * @return \rosasurfer\core\io\web\Input
+     * @return WebInput
      */
     public static function old() {
         $input = RequestProxy::getAttribute('input.old');

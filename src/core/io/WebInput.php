@@ -1,16 +1,16 @@
 <?php
-namespace rosasurfer\core\io\web;
+namespace rosasurfer\core\io;
 
 use rosasurfer\core\CObject;
 use rosasurfer\ministruts\Request;
 
 
 /**
- * Input
+ * WebInput
  *
  * An object providing access to raw HTTP request parameters.
  */
-class Input extends CObject {
+class WebInput extends CObject {
 
 
     /** @var Request [transient] - the request the instance belongs to */
@@ -28,7 +28,6 @@ class Input extends CObject {
 
 
     /**
-     *
      * @param  string $name
      * @param  mixed  $default [optional]
      *
