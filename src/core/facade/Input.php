@@ -1,7 +1,11 @@
 <?php
 namespace rosasurfer\core\facade;
 
+use rosasurfer\core\proxy\Request as RequestProxy;
+use rosasurfer\ministruts\Input as InputInstance;
 use rosasurfer\ministruts\Request;
+
+use const rosasurfer\ministruts\ACTION_FORM_KEY;
 
 
 /**
@@ -32,7 +36,7 @@ class Input extends Facade {
      * @return \rosasurfer\ministruts\Input
      */
     public static function current() {
-        return Request::getAttribute(ACTION_FORM_KEY);
+        return RequestProxy::getAttribute(ACTION_FORM_KEY);
     }
 
 
@@ -43,6 +47,6 @@ class Input extends Facade {
      * @return \rosasurfer\ministruts\Input
      */
     public static function old() {
-        return Request::getAttribute(ACTION_FORM_KEY.'.old') ?: new InputInstance();
+        return RequestProxy::getAttribute(ACTION_FORM_KEY.'.old') ?: new InputInstance();
     }
 }
